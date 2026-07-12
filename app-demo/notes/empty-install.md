@@ -99,3 +99,132 @@ Five dev variants (`?v=` or dev bar): `connect` / `installing` / `connected` /
 4. "Map this repo" while a mapping pass runs: what does the button become
    (progress honesty without a persistent spinner — one animation budget)?
 5. Does Moment A deserve a keyboard path (autofocus the CTA)? Likely yes at S4.
+
+## S2 (iter-15) — visual polish + open-question resolutions
+
+File: `static/empty-install-s2.html` (S1 frozen for diff). Variants grew 5 → 8:
+`connect / installing / install-failed / connected / mapping / first-task /
+two-tasks / first-task-200` (dev bar or `?v=`; `?dev=0` hides the dev bar for shots).
+
+### Self-review convergence log
+- **Round 1** (16 shots: 8 variants × 1280×800 + 1440×900): **1 defect** —
+  the autofocused CTA (Q5 resolution) rendered the browser-default blue focus
+  ring; off-system chrome (taste profile: Linear finish; nothing default-styled).
+  Fix: the app's own focus language ported from `src/app.css` —
+  `button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}`,
+  `:focus:not(:focus-visible){outline:none}` — mouse use stays ring-free.
+- **Round 2** (16 shots): **0 new defects**. Converged in 2 rounds.
+- **Final** canonical shots re-taken after convergence.
+- Every round: zero console/page errors, probes green (no page overflow,
+  per-variant `[data-show]` visibility counts, 150-char path truncation active
+  (`scrollWidth > clientWidth`), footprints fully inside the territory, no
+  footprint overlap, card-centering geometry captured).
+
+### Kernel note adjudicated: connect-card centering (canvas vs full window)
+Probe numbers at 1280: card center x = 790 = canvas center; window center = 640
+(the card sits 150px right of window center — the "right-heavy" observation is
+real). **Chosen: canvas centering.** The balance argument: optical centering is
+judged against the *bounded field* the element sits in, and the canvas is a
+strongly bounded field — rail border seam on the left, its own grid background,
+its own radial highlight. Window-centering would put the card at x=640, i.e.
+asymmetric 150px/450px gutters *inside the visible grid field*, which reads as a
+mistake against the field even though it "fixes" the window math. The rail is
+not blank mass either — it carries the dashed "No tasks yet" placeholder, so the
+window's left side has real content weight. Precedent: the conflict card centers
+over `.main` because it scrims/blurs the WHOLE main (rail included) into one
+uniform underlay first; Moment A's rail is live and unscrimmed, so the same
+trick doesn't apply. Fork logged (veto = window centering).
+
+### The 5 S1 open questions — resolved
+1. **Multi-footprint packing rule** (needed by S3) — decided + demoed in
+   `two-tasks`:
+   - `repoFiles` = `git ls-files | wc -l`, a mechanical git fact known the
+     moment the repo connects (DB-creation scan). No invented denominator.
+   - Footprint **area fraction = clamp(filesTouched / repoFiles, floor, cap)**;
+     floor = the S1 N=1 block (24%×26% ≈ 6% of the gray — the smallest block
+     whose kicker + foot stay legible at 1280, measured); cap = 60% (the gray
+     must visibly remain "the whole repo" while unmapped). Between the rungs the
+     block scales from the floor block by sqrt(area ratio) in both dimensions
+     (size is a redundant channel — the count TEXT in the foot is the first
+     channel, per guideline 6, so sqrt damping is honest).
+   - **Shelf packing**: bottom-left origin, launch order (oldest first),
+     left→right with 3% gutters, blocks bottom-aligned per shelf; wrap upward to
+     a new shelf when the row is full. Overflow ladder (N=many): all blocks
+     shrink proportionally down to the floor (temporary shrink of others), and
+     once at floor the OLDEST collapse into a "+N earlier sessions" chip pinned
+     bottom-right of the gray (collapse-to-+N) — both sanctioned strategies.
+   - `two-tasks` fixture: health-check (3 files, floor block, position identical
+     to S1's N=1 — the rule degenerates to S1 at N=1) + request tracing
+     (120 of ~640 files → sqrt-damped ~18.5% area, 42%×44%, bottom-aligned on
+     the same shelf). Probes assert inside-territory + no overlap at both sizes.
+2. **Moment B guidance lifetime**: stays until the first footprint replaces it —
+   no timer, no first-event heuristic (a timer is a new invisible concept;
+   guideline 3). Confirmed as designed in S1.
+3. **Installing → connected transition** — storyboarded, no morph:
+   - t=0: third row's check lands (mono "done", alive ink) — the user must SEE
+     the final state before it leaves;
+   - t=400ms (2 × `--t-base`, derived from the motion tokens, not a new magic
+     number): card exits via reverse `cardIn` (fade + 8px down, 200ms);
+   - t=600ms: connected chrome enters with the existing 200ms entry language —
+     repo chip + "Synced just now" (titlebar), rail zero-groups + launch button,
+     gray territory + guidance. Single stagger step, both durations from tokens.
+   - Morphing the 420px card into the full-bleed territory was rejected:
+     spectacle without information (chill/tasteful), and it would smear the one
+     moment the checklist must read as "done". Implemented at S4; fork logged.
+4. **"Map this repo" while mapping runs** — `mapping` variant: the button yields
+   in place to an honest status chip `● Mapping this repo · 2m` (breathe dot =
+   that state's ONE persistent animation — motion means something is happening,
+   which is literally true; nothing else on B moves). Tooltip: local claude
+   reading the repo, started 2m ago, ~10min total, nothing blocked, click stops
+   the pass. Click = stop (no dead pixels). Elapsed time in mono, not a spinner,
+   not a fake percent — we have no honest progress fraction, so we show the one
+   honest number we do have (elapsed).
+5. **Moment A keyboard path**: resolved NOW, not deferred — CTA autofocuses, so
+   first-run is Enter-to-connect; ring only on `:focus-visible` (the round-1
+   defect + fix above). S4 keeps the autofocus on mount.
+
+### Stress additions (this iteration's brief)
+- **Two concurrent first tasks** → `two-tasks` (packing rule above); rail shows
+  Running 2, titlebar "2 running".
+- **150-char repo path** (was 92): `/Users/mirabelle/…/deployment-pipelines-and-
+  observability-stack` = exactly 150 chars; leading-ellipsis truncation probe
+  green at both sizes; full path in tooltip. Used in `installing` AND
+  `install-failed`.
+- **Install with one step failed** → `install-failed`, the honest error row:
+  - Failure model: steps are independent, so the install DOESN'T stop — hooks
+    failed, MCP + DB completed and show "done". Honest partial success, no
+    all-or-nothing pretense.
+  - The failed row: ✗ icon in `--need` + mono **failed** in `--need-ink` (text
+    pill first, color reinforces); label stays ink-700.
+  - Reason row beneath (indented to the label): `~/.claude/settings.json` as a
+    mono code chip + "isn't writable" + **Retry** button right-aligned into the
+    status column. Retry tooltip: reruns ONLY the hooks step, done steps stay
+    done. Reason tooltip carries the actual fix (`chmod u+w …`).
+  - Footer = consequence honesty: "2 of 3 done. Sessions won't report until
+    hooks install." (what the failure MEANS, not just that it happened).
+  - No red banner, no modal: the card itself is the surface; one need-ink word
+    carries the state.
+
+### Scale-extremes updates (delta over S1 prelims)
+- **N=many (tasks pre-mapping)**: rule now defined (shelf → shrink-to-floor →
+  +N collapse); `two-tasks` renders the 2-case; the +N rung lands with S3
+  fixtures/S5 states.
+- **TEXT long**: path stress raised 92 → 150 chars, probe-verified both sizes.
+- **DYNAMIC**: mapping state reachable via dev bar/`?v=`; A→A′ still via the
+  real CTA click; failed state honest and recoverable (Retry).
+- **SPACE tiny**: floor block (24%×26%) IS the defined minimum — below it the
+  rule refuses to shrink and collapses to +N instead (rung ladder explicit now).
+
+### Shots
+`notes/shots/empty-install-s2-{connect,installing,install-failed,connected,mapping,first-task,two-tasks,first-task-200}-{1280x800,1440x900}.png`
+(final; `-r1`/`-r2` review rounds kept alongside — 48 files total).
+
+### Open questions for S3
+1. `repoFiles` for the packing denominator: confirm the DB-creation scan stores
+   the `git ls-files` count as a first-class fact (types need a field for it).
+2. The "+N earlier sessions" chip: exact threshold falls out of the floor rule
+   (when shelves can't fit all floors), but the chip's click behavior (expand?
+   focus rail?) is an S5 interaction question.
+3. `install-failed` for the MCP/DB steps: same row language should generalize —
+   S3 types should carry per-step status (`pending|now|done|failed`) + an
+   optional failure reason string, not a bespoke hooks-only shape.

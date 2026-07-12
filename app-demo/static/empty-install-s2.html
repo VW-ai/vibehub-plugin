@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibehub — Empty / first-run · S2 static</title>
+<style>
+/* Design tokens — extracted VERBATIM from workbench-refs/reference-screen-v8.html */
+:root{
+  /* ink ramp */
+  --ink-900:#191b1f; --ink-700:#3c3f45; --ink-500:#6b6f77; --ink-400:#8b8f97; --ink-300:#b4b7bd; --ink-200:#d9dade; --ink-150:#e7e8ea; --ink-100:#f0f0f1;
+  --paper:#f7f7f5; --card:#ffffff;
+  /* semantic (text ink deliberately darker than fill hue) */
+  --need:#c0392b; --need-bg:#f6e8e5; --need-ink:#9c3022;
+  --clash:#9a6b16; --clash-bg:#f4ecd9; --clash-ink:#775211;
+  --alive:#3e7d4c; --alive-bg:#e4efe6; --alive-ink:#2f6039;
+  --read:#5a7fb8;  --read-ink:#48699c;
+  /* elevation */
+  --sh-1:0 1px 2px rgba(20,22,26,.05);
+  --sh-2:0 1px 3px rgba(20,22,26,.07),0 4px 14px rgba(20,22,26,.06);
+  /* shape scale: exactly three radii */
+  --r-s:6px; --r-m:10px; --r-l:16px;
+  /* space scale: 4/8/12/16/24 only */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-6:24px;
+  /* type scale: exactly four sizes */
+  --fs-1:10px; --fs-2:11px; --fs-3:12px; --fs-4:13px;
+  /* motion: two durations, one curve */
+  --t-fast:120ms; --t-base:200ms; --ease:cubic-bezier(.25,.8,.3,1);
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important} /* global guard — author display rules must never defeat hidden (3rd-occurrence bug class) */
+/* system focus ring (matches app.css) — :focus-visible only, so mouse use stays clean.
+   Needed here because the CTA autofocuses (keyboard path, S1 open question 5). */
+button:focus-visible,.task:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+button:focus:not(:focus-visible),.task:focus:not(:focus-visible){outline:none}
+html,body{height:100%}
+body{background:linear-gradient(160deg,#e9e9e7,#e4e5e6);font-family:var(--sans);color:var(--ink-900);display:flex;align-items:center;justify-content:center;padding:var(--sp-6);-webkit-font-smoothing:antialiased}
+svg{vertical-align:-2px}
+button{font-family:inherit}
+
+.window{width:min(1320px,100%);height:min(820px,calc(100vh - 48px));background:var(--paper);border-radius:14px;box-shadow:0 22px 70px rgba(15,17,21,.28),0 2px 8px rgba(15,17,21,.12);overflow:hidden;display:flex;flex-direction:column}
+
+/* ── titlebar (v8 verbatim; per-moment slots swap) ── */
+.titlebar{height:44px;flex:none;display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-4);background:rgba(250,250,249,.92);border-bottom:1px solid var(--ink-150)}
+.lights{display:flex;gap:var(--sp-2)}
+.lights i{width:12px;height:12px;border-radius:50%}
+.lights i:nth-child(1){background:#f4635e}.lights i:nth-child(2){background:#f7bd45}.lights i:nth-child(3){background:#43c644}
+.wordmark{font-weight:650;font-size:var(--fs-4);letter-spacing:-.1px}
+.repo{height:24px;display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-700);background:var(--card);border-radius:var(--r-s);padding:0 10px;box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.repo:hover{box-shadow:var(--sh-2)}
+.repo .branch{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500)}
+.norepo{display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-400);cursor:help}
+.spacer{flex:1}
+.stat{height:22px;display:flex;align-items:center;gap:5px;font-size:var(--fs-2);font-weight:500;padding:0 10px;border-radius:11px;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
+.stat:hover{filter:brightness(.96)}
+.stat.alive{background:var(--alive-bg);color:var(--alive-ink)}
+.fresh{display:flex;align-items:center;gap:6px;font-size:var(--fs-2);color:var(--ink-500);cursor:pointer}
+.fresh .dot{width:6px;height:6px;border-radius:50%;background:var(--alive)}
+
+.main{flex:1;display:flex;min-height:0}
+
+/* ── rail (v8 verbatim) ── */
+.rail{width:300px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--ink-150);background:rgba(252,252,251,.7)}
+.tasks{flex:1;overflow:auto;padding:var(--sp-3) var(--sp-3) var(--sp-2)}
+.group{margin-bottom:var(--sp-3)}
+.group h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase;padding:0 var(--sp-1) 6px;display:flex;justify-content:space-between;line-height:1.4;cursor:help}
+.group h4 b{font-family:var(--mono);font-weight:500}
+.group.zero h4{color:var(--ink-300)} /* collapsed empty group: header only, quieter */
+.task{background:var(--card);border-radius:var(--r-m);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);margin-bottom:6px}
+.task:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
+.task:active{transform:none;box-shadow:var(--sh-1)}
+.task .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.task h3{font-size:var(--fs-4);font-weight:600;letter-spacing:-.1px;line-height:1.45;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none}
+.pill{flex:none;height:18px;display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;border-radius:9px;padding:0 8px;cursor:help}
+.pill.alive{background:var(--alive-bg);color:var(--alive-ink)}
+.task .row2{display:flex;align-items:center;gap:var(--sp-1);margin-top:6px;min-width:0;overflow:hidden}
+.chip{flex:none;height:16px;display:inline-flex;align-items:center;font-family:var(--mono);font-size:var(--fs-1);padding:0 6px;border-radius:5px;cursor:help;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;line-height:16px}
+.chip.w{background:var(--alive-bg);color:var(--alive-ink)}
+.chip.n{background:var(--ink-100);color:var(--ink-500)}
+.launch{margin:0 var(--sp-3) var(--sp-3);height:34px;border:0;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease);display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
+.launch:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.launch:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+/* rail true-empty placeholder — dashed outline sanctioned here only */
+.rail-empty{border:1.5px dashed var(--ink-200);border-radius:var(--r-m);padding:var(--sp-4);text-align:center;color:var(--ink-400);font-size:var(--fs-3);line-height:1.6;cursor:help}
+.rail-empty b{display:block;font-weight:600;color:var(--ink-500)}
+
+/* ── canvas (v8 verbatim) ── */
+.canvas{flex:1;position:relative;overflow:hidden}
+.canvas::before{content:"";position:absolute;inset:0;background:radial-gradient(1200px 700px at 70% -10%,rgba(255,255,255,.7),transparent 60%)}
+.grid{position:absolute;inset:0;background-image:radial-gradient(rgba(25,27,31,.05) 1px,transparent 1px);background-size:26px 26px}
+.terr{position:absolute;border-radius:var(--r-l);background:var(--ink-100);cursor:pointer;transition:box-shadow var(--t-base) var(--ease)}
+.terr:hover{box-shadow:inset 0 0 0 1.5px rgba(25,27,31,.14),var(--sh-2)}
+.terr .label{position:absolute;top:var(--sp-3);left:var(--sp-4);font-size:var(--fs-2);letter-spacing:.5px;color:var(--ink-500);font-weight:600;line-height:1.4}
+.terr.quiet .label{color:var(--ink-300)}
+.terr .foot{position:absolute;left:var(--sp-4);bottom:var(--sp-2);right:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+
+/* ── Moment A: connect card, centered over the empty canvas ── */
+.center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:var(--sp-6);pointer-events:none}
+.connect{pointer-events:auto;width:420px;max-width:100%;background:var(--card);border-radius:var(--r-l);box-shadow:var(--sh-2),0 12px 34px rgba(15,17,21,.1);padding:var(--sp-6);animation:cardIn var(--t-base) var(--ease) backwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+.connect h2{font-size:var(--fs-4);font-weight:650;letter-spacing:-.1px;cursor:help}
+.connect .sub{margin-top:var(--sp-1);font-size:var(--fs-3);color:var(--ink-500);line-height:1.55}
+.connect .cta{margin-top:var(--sp-4);width:100%;height:34px;border:0;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14);transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
+.connect .cta:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.connect .cta:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+/* picked repo path (installing state): long paths keep their tail — leading ellipsis */
+.connect .path{margin-top:var(--sp-4);display:flex;align-items:center;gap:6px;height:26px;background:var(--ink-100);border-radius:var(--r-s);padding:0 var(--sp-2);min-width:0;cursor:help}
+.connect .path svg{flex:none;color:var(--ink-400)}
+.connect .path .p{flex:1;min-width:0;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl;text-align:left}
+.connect .path .p bdi{unicode-bidi:plaintext}
+/* checklist rows: what installing does (A) / is doing (A-installing) */
+.steps{margin-top:var(--sp-4);border-top:1px solid var(--ink-150);padding-top:var(--sp-3)}
+.step{display:flex;align-items:center;gap:var(--sp-2);padding:5px 0;font-size:var(--fs-3);color:var(--ink-700);cursor:help}
+.step .ic{flex:none;width:15px;height:15px;display:flex;align-items:center;justify-content:center;color:var(--ink-300)}
+.step .ic.done{color:var(--alive)}
+.step .st{flex:none;margin-left:auto;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+.step .st.done{color:var(--alive-ink)}
+.step.pend{color:var(--ink-400)}
+/* honest failed step: text status first (mono "failed"), need ink reinforces */
+.step .ic.fail{color:var(--need)}
+.step .st.fail{color:var(--need-ink);font-weight:600}
+.why{display:flex;align-items:center;gap:var(--sp-2);margin:2px 0 4px 23px;font-size:var(--fs-2);color:var(--ink-500);line-height:1.5;cursor:help}
+.why code{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-700);background:var(--ink-100);border-radius:4px;padding:1px 4px}
+.retry{flex:none;margin-left:auto;height:22px;border:0;border-radius:var(--r-s);padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:600;background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.retry:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+/* the ONE persistent animation on this screen: the in-progress dot while installing */
+.step .ic .busy{width:7px;height:7px;border-radius:50%;background:var(--alive);animation:breathe 2.8s var(--ease) infinite}
+@keyframes breathe{0%,100%{opacity:.4}50%{opacity:1}}
+.connect .local{margin-top:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);line-height:1.5;cursor:help}
+
+/* ── Moment B: guidance inside the uncategorized territory ── */
+.guide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-3);text-align:center;padding:var(--sp-6)}
+.guide p{font-size:var(--fs-3);color:var(--ink-500);line-height:1.55;cursor:help}
+.mapbtn{height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-3);font-size:var(--fs-3);font-weight:600;background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.mapbtn:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+/* Moment C keeps the map action reachable, compact, top-right of the territory */
+.mapbtn.corner{position:absolute;top:var(--sp-3);right:var(--sp-4)}
+/* mapping in progress: the button yields to an honest status chip.
+   The breathe dot is this state's ONE persistent animation (nothing else moves in B). */
+.mapstat{height:26px;display:inline-flex;align-items:center;gap:7px;border-radius:var(--r-s);padding:0 var(--sp-3);font-size:var(--fs-3);font-weight:600;background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;border:0;font-family:inherit;transition:box-shadow var(--t-fast) var(--ease)}
+.mapstat:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+.mapstat .dot{width:7px;height:7px;border-radius:50%;background:var(--alive);animation:breathe 2.8s var(--ease) infinite}
+.mapstat .t{font-family:var(--mono);font-size:var(--fs-1);font-weight:500;color:var(--ink-400)}
+
+/* ── Moment C: session footprint on the unmapped gray — soft green fill (fill = write) ── */
+.fp{position:absolute;border-radius:var(--r-m);background:linear-gradient(180deg,#e9f2ea,#e0ede2);box-shadow:inset 0 0 0 1px rgba(62,125,76,.13),var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.fp:hover{box-shadow:inset 0 0 0 1.5px rgba(62,125,76,.3),var(--sh-2)}
+.fp .who{position:absolute;top:var(--sp-2);left:var(--sp-3);right:var(--sp-3);font-size:var(--fs-2);font-weight:600;color:#4c7a57;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.fp .files{position:absolute;left:var(--sp-3);bottom:var(--sp-2);right:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+
+/* tooltip: 260ms intent delay, instant hide (verbatim pattern from v8) */
+#tip{position:fixed;z-index:99;background:var(--ink-900);color:#f4f4f3;font-size:var(--fs-2);line-height:1.5;padding:7px 10px;border-radius:7px;max-width:270px;box-shadow:0 6px 24px rgba(15,17,21,.3);pointer-events:none;opacity:0;transition:opacity var(--t-fast) var(--ease);transform:translateY(2px)}
+#tip.on{opacity:1;transform:none}
+
+/* dev-only variant switcher — NOT product UI */
+.dev{position:fixed;right:10px;bottom:10px;z-index:98;display:flex;gap:4px;align-items:center;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);background:rgba(255,255,255,.85);border-radius:var(--r-s);padding:4px 6px;box-shadow:var(--sh-1)}
+.dev button{border:0;background:none;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500);cursor:pointer;padding:2px 5px;border-radius:4px}
+.dev button.on{background:var(--ink-900);color:#fff}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="titlebar">
+    <div class="lights"><i></i><i></i><i></i></div>
+    <div class="wordmark">Vibehub</div>
+
+    <!-- Moment A: no repo yet — honest, quiet -->
+    <div class="norepo" data-show="connect installing install-failed" data-tip="Vibehub watches one repo per window. Nothing is watched yet — connect a repo to start.">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8Z"/></svg>
+      No repo connected
+    </div>
+
+    <!-- Moments B/C: connected repo chip -->
+    <div class="repo" data-show="connected mapping first-task two-tasks first-task-200" data-tip="Switch repository · one window per repo">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg>
+      acme/greenfield <span class="branch">main · 1 branch</span>
+    </div>
+
+    <div class="spacer"></div>
+
+    <!-- zero-count stats are hidden, not rendered as "0 waiting" noise -->
+    <div class="stat alive" data-show="first-task first-task-200" data-tip="Tasks making progress. Nothing needed from you">1 running</div>
+    <div class="stat alive" data-show="two-tasks" data-tip="Tasks making progress. Nothing needed from you">2 running</div>
+
+    <div class="fresh" data-show="connected mapping" data-tip="Hooks installed and first git fetch done · click to sync now"><span class="dot"></span>Synced just now</div>
+    <div class="fresh" data-show="first-task two-tasks first-task-200" data-tip="Last git fetch + hook event · click to sync now"><span class="dot"></span>Synced 12s ago</div>
+  </div>
+
+  <div class="main">
+    <aside class="rail">
+      <div class="tasks">
+
+        <!-- Moment A: true empty rail (dashed = sanctioned true-empty placeholder) -->
+        <div class="rail-empty" data-show="connect installing install-failed" data-tip="Tasks are Claude Code sessions on their own branches. The rail fills in as you launch them — or as hooks pick up sessions you start in your terminal.">
+          <b>No tasks yet</b>
+          Connect a repo to start.
+        </div>
+
+        <!-- Moment B: connected, nothing has happened — empty groups collapse to headers -->
+        <div data-show="connected mapping">
+          <div class="group zero"><h4 data-tip="Tasks that stopped to ask you something land here. None yet.">Needs you <b>0</b></h4></div>
+          <div class="group zero"><h4 data-tip="Live sessions land here — launched from Vibehub or picked up from your terminal by the installed hooks.">Running <b>0</b></h4></div>
+          <div class="group zero"><h4 data-tip="Tasks finished today. None yet.">Done today <b>0</b></h4></div>
+        </div>
+
+        <!-- Moment C: the first task, alive -->
+        <div data-show="first-task">
+          <div class="group zero"><h4 data-tip="Tasks that stopped to ask you something land here. None yet.">Needs you <b>0</b></h4></div>
+          <div class="group">
+            <h4 data-tip="Live sessions — launched from Vibehub or picked up from your terminal by the installed hooks.">Running <b>1</b></h4>
+            <div class="task">
+              <div class="row1"><span class="pill alive" data-tip="Agent actively producing — tool calls and edits flowing">RUNNING</span><h3>Add health-check endpoint</h3><span class="age" data-tip="Session started 4 minutes ago — picked up by the installed hooks">4m</span></div>
+              <div class="row2"><span class="chip w" data-tip="Declared write scope: health endpoint — not yet mapped to a feature">w health-endpoint</span><span class="chip n" data-tip="branch vibehub/health-check-endpoint · worktree ~/dev/greenfield">health-check-endpoint</span></div>
+            </div>
+          </div>
+          <div class="group zero"><h4 data-tip="Tasks finished today. None yet.">Done today <b>0</b></h4></div>
+        </div>
+
+        <!-- Two concurrent first tasks: both pre-mapping, packed on the gray -->
+        <div data-show="two-tasks">
+          <div class="group zero"><h4 data-tip="Tasks that stopped to ask you something land here. None yet.">Needs you <b>0</b></h4></div>
+          <div class="group">
+            <h4 data-tip="Live sessions — launched from Vibehub or picked up from your terminal by the installed hooks.">Running <b>2</b></h4>
+            <div class="task">
+              <div class="row1"><span class="pill alive" data-tip="Agent actively producing — tool calls and edits flowing">RUNNING</span><h3>Add health-check endpoint</h3><span class="age" data-tip="Session started 4 minutes ago — picked up by the installed hooks">4m</span></div>
+              <div class="row2"><span class="chip w" data-tip="Declared write scope: health endpoint — not yet mapped to a feature">w health-endpoint</span><span class="chip n" data-tip="branch vibehub/health-check-endpoint · worktree ~/dev/greenfield">health-check-endpoint</span></div>
+            </div>
+            <div class="task">
+              <div class="row1"><span class="pill alive" data-tip="Agent actively producing — tool calls and edits flowing">RUNNING</span><h3>Wire request tracing through services</h3><span class="age" data-tip="Session started 11 minutes ago — launched from Vibehub">11m</span></div>
+              <div class="row2"><span class="chip w" data-tip="Declared write scope: request tracing — not yet mapped to a feature">w request-tracing</span><span class="chip n" data-tip="branch vibehub/request-tracing · worktree ~/dev/greenfield">request-tracing</span></div>
+            </div>
+          </div>
+          <div class="group zero"><h4 data-tip="Tasks finished today. None yet.">Done today <b>0</b></h4></div>
+        </div>
+
+        <!-- Moment C at scale: a 200-file first session -->
+        <div data-show="first-task-200">
+          <div class="group zero"><h4 data-tip="Tasks that stopped to ask you something land here. None yet.">Needs you <b>0</b></h4></div>
+          <div class="group">
+            <h4 data-tip="Live sessions — launched from Vibehub or picked up from your terminal by the installed hooks.">Running <b>1</b></h4>
+            <div class="task">
+              <div class="row1"><span class="pill alive" data-tip="Agent actively producing — tool calls and edits flowing">RUNNING</span><h3>Migrate codebase to strict TypeScript</h3><span class="age" data-tip="Session started 18 minutes ago — picked up by the installed hooks">18m</span></div>
+              <div class="row2"><span class="chip w" data-tip="Declared write scope: whole repo — not yet mapped to features">w repo-wide</span><span class="chip n" data-tip="branch vibehub/strict-typescript-migration · worktree ~/dev/greenfield">strict-typescript-migration</span></div>
+            </div>
+          </div>
+          <div class="group zero"><h4 data-tip="Tasks finished today. None yet.">Done today <b>0</b></h4></div>
+        </div>
+      </div>
+
+      <button class="launch" data-show="connected mapping first-task two-tasks first-task-200" data-tip="Assemble context and launch a Claude Code session on a new branch">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"/></svg>
+        Start a task
+      </button>
+    </aside>
+
+    <section class="canvas">
+      <div class="grid"></div>
+
+      <!-- ══ Moment A: fresh install, repo not connected ══ -->
+      <div class="center" data-show="connect">
+        <div class="connect">
+          <h2 data-tip="One button. Everything below runs on this Mac — nothing leaves it.">Connect this Mac to your repo</h2>
+          <p class="sub">Pick a repo folder and Vibehub starts watching it.</p>
+          <button class="cta" id="pick" autofocus data-tip="Opens the system folder picker. Choosing a repo runs the three steps below — a few seconds, all local.">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 1h5.5c.966 0 1.75.784 1.75 1.75v1h4.25c.966 0 1.75.784 1.75 1.75v7.75A1.75 1.75 0 0 1 13.25 15H2.75A1.75 1.75 0 0 1 1 13.25V2.75C1 1.784 1.784 1 2.75 1Zm.75 3.5v8.75c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V5.5a.25.25 0 0 0-.25-.25H8.5v-2a.25.25 0 0 0-.25-.25h-5.5a.25.25 0 0 0-.25.25Z" fill-rule="evenodd"/></svg>
+            Choose repo folder
+          </button>
+          <div class="steps">
+            <div class="step" data-tip="Adds Vibehub to your Claude Code hooks (settings.json). Every session in this repo reports its events — you keep working in your terminal exactly as before.">
+              <span class="ic"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2ZM.5 8a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Z" fill-rule="evenodd"/></svg></span>
+              Installs hooks for Claude Code
+            </div>
+            <div class="step" data-tip="Registers the Vibehub MCP server with Claude Code so sessions can declare scopes and self-report. Local process, no network.">
+              <span class="ic"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2ZM.5 8a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Z" fill-rule="evenodd"/></svg></span>
+              Registers the MCP server
+            </div>
+            <div class="step" data-tip="One SQLite file next to your repo config. Everything Vibehub knows lives in it — yours to inspect or delete.">
+              <span class="ic"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2ZM.5 8a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Z" fill-rule="evenodd"/></svg></span>
+              Creates a local database
+            </div>
+          </div>
+          <p class="local" data-tip="Vibehub reads hook events and git on this machine. There is no server, no sign-in, and it never calls a model unless you ask it to.">All local — no account, no API key.</p>
+        </div>
+      </div>
+
+      <!-- ══ Moment A′: post-click installing state ══ -->
+      <div class="center" data-show="installing">
+        <div class="connect">
+          <h2 data-tip="One button. Everything below runs on this Mac — nothing leaves it.">Connect this Mac to your repo</h2>
+          <div class="path" data-tip="/Users/mirabelle/work/clients/meridian-holdings/engineering/platform-monorepo/services-and-infrastructure/deployment-pipelines-and-observability-stack — the folder you picked. Long paths keep their tail; the full path lives here.">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 1h5.5c.966 0 1.75.784 1.75 1.75v1h4.25c.966 0 1.75.784 1.75 1.75v7.75A1.75 1.75 0 0 1 13.25 15H2.75A1.75 1.75 0 0 1 1 13.25V2.75C1 1.784 1.784 1 2.75 1Z"/></svg>
+            <span class="p"><bdi>/Users/mirabelle/work/clients/meridian-holdings/engineering/platform-monorepo/services-and-infrastructure/deployment-pipelines-and-observability-stack</bdi></span>
+          </div>
+          <div class="steps">
+            <div class="step" data-tip="Done — Vibehub is in this repo&rsquo;s Claude Code hooks (settings.json). Sessions here now report their events.">
+              <span class="ic done"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></span>
+              Installs hooks for Claude Code
+              <span class="st done">done</span>
+            </div>
+            <div class="step" data-tip="Registering the Vibehub MCP server with Claude Code — local process, no network.">
+              <span class="ic"><span class="busy"></span></span>
+              Registers the MCP server
+              <span class="st">now</span>
+            </div>
+            <div class="step pend" data-tip="Next: one SQLite file next to your repo config. Everything Vibehub knows lives in it — yours to inspect or delete.">
+              <span class="ic"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2ZM.5 8a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Z" fill-rule="evenodd"/></svg></span>
+              Creates a local database
+            </div>
+          </div>
+          <p class="local" data-tip="Vibehub reads hook events and git on this machine. There is no server, no sign-in, and it never calls a model unless you ask it to.">Usually a few seconds — all local.</p>
+        </div>
+      </div>
+
+      <!-- ══ Moment A″: installing, one step failed — honest error, retry, no dead end ══ -->
+      <div class="center" data-show="install-failed">
+        <div class="connect">
+          <h2 data-tip="One button. Everything below runs on this Mac — nothing leaves it.">Connect this Mac to your repo</h2>
+          <div class="path" data-tip="/Users/mirabelle/work/clients/meridian-holdings/engineering/platform-monorepo/services-and-infrastructure/deployment-pipelines-and-observability-stack — the folder you picked. Long paths keep their tail; the full path lives here.">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 1h5.5c.966 0 1.75.784 1.75 1.75v1h4.25c.966 0 1.75.784 1.75 1.75v7.75A1.75 1.75 0 0 1 13.25 15H2.75A1.75 1.75 0 0 1 1 13.25V2.75C1 1.784 1.784 1 2.75 1Z"/></svg>
+            <span class="p"><bdi>/Users/mirabelle/work/clients/meridian-holdings/engineering/platform-monorepo/services-and-infrastructure/deployment-pipelines-and-observability-stack</bdi></span>
+          </div>
+          <div class="steps">
+            <div class="step" data-tip="Couldn&rsquo;t write to ~/.claude/settings.json — the hooks step failed. The other two steps finished; retry runs only this one.">
+              <span class="ic fail"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg></span>
+              Installs hooks for Claude Code
+              <span class="st fail">failed</span>
+            </div>
+            <div class="why" data-tip="Vibehub adds itself to this file&rsquo;s hooks section. It exists but isn&rsquo;t writable by your user — `chmod u+w ~/.claude/settings.json`, then retry.">
+              <code>~/.claude/settings.json</code> isn&rsquo;t writable
+              <button class="retry" data-tip="Runs the hooks step again. The two finished steps stay done — nothing reruns.">Retry</button>
+            </div>
+            <div class="step" data-tip="Done — the Vibehub MCP server is registered with Claude Code. Local process, no network.">
+              <span class="ic done"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></span>
+              Registers the MCP server
+              <span class="st done">done</span>
+            </div>
+            <div class="step" data-tip="Done — one SQLite file next to your repo config. Everything Vibehub knows lives in it — yours to inspect or delete.">
+              <span class="ic done"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg></span>
+              Creates a local database
+              <span class="st done">done</span>
+            </div>
+          </div>
+          <p class="local" data-tip="Hooks are how sessions report their events. Until they install, nothing you run in your terminal shows up here.">2 of 3 done. Sessions won&rsquo;t report until hooks install.</p>
+        </div>
+      </div>
+
+      <!-- ══ Moments B/C: one full-bleed uncategorized territory ══ -->
+      <div class="terr quiet" style="left:3%;top:4.5%;width:94%;height:88%" data-show="connected mapping first-task two-tasks first-task-200" data-tip="Every file in acme/greenfield lives here until the repo is mapped. Sessions, states and interventions all work without a map.">
+        <div class="label">UNCATEGORIZED</div>
+        <div class="foot" data-tip="Mapping is optional and never blocks anything — it only makes footprints land on named features instead of this gray.">this repo hasn&rsquo;t been mapped yet</div>
+
+        <!-- Moment B: guidance + the one user-initiated knowledge action -->
+        <div class="guide" data-show="connected">
+          <p data-tip="The installed hooks watch every Claude Code session in this repo — launched from here or straight from your shell.">Work normally in your terminal — sessions appear here as they happen.</p>
+          <button class="mapbtn" data-tip="Runs one pass of your local claude (`claude -p`) to read the repo and sketch feature territories. ~10 minutes on a big repo — your machine, your account, no extra API key. Everything keeps working while it runs.">Map this repo</button>
+        </div>
+
+        <!-- Mapping in progress: the button yields to an honest status chip (same spot) -->
+        <div class="guide" data-show="mapping">
+          <p data-tip="The installed hooks watch every Claude Code session in this repo — launched from here or straight from your shell.">Work normally in your terminal — sessions appear here as they happen.</p>
+          <button class="mapstat" data-tip="Your local claude is reading the repo to sketch feature territories — started 2 minutes ago, usually ~10 minutes total. Everything keeps working while it runs. Click to stop the pass; nothing you&rsquo;ve done is touched."><span class="dot"></span>Mapping this repo <span class="t">2m</span></button>
+        </div>
+
+        <!-- Moment C: mapping still reachable, compact -->
+        <button class="mapbtn corner" data-show="first-task two-tasks first-task-200" data-tip="Runs one pass of your local claude (`claude -p`) to read the repo and sketch feature territories. ~10 minutes on a big repo — your machine, your account, no extra API key. Everything keeps working while it runs.">Map this repo</button>
+
+        <!-- Moment C: first footprint — perception works before the map exists -->
+        <div class="fp" style="left:6%;top:58%;width:24%;height:26%" data-show="first-task" data-tip="&lsquo;Add health-check endpoint&rsquo; has edited 3 files this session: src/health/endpoint.ts, src/health/checks.ts, src/server/routes.ts. They&rsquo;ll attach to named features once the repo is mapped.">
+          <div class="who">Add health-check endpoint</div>
+          <div class="files">3 files · not yet mapped to features</div>
+        </div>
+
+        <!-- Two concurrent pre-mapping sessions: shelf packing, bottom-left, launch order.
+             Size ∝ share of repo files touched (sqrt scale), floored at the legible minimum. -->
+        <div class="fp" style="left:6%;top:58%;width:24%;height:26%" data-show="two-tasks" data-tip="&lsquo;Add health-check endpoint&rsquo; has edited 3 files this session: src/health/endpoint.ts, src/health/checks.ts, src/server/routes.ts. They&rsquo;ll attach to named features once the repo is mapped.">
+          <div class="who">Add health-check endpoint</div>
+          <div class="files">3 files · not yet mapped to features</div>
+        </div>
+        <div class="fp" style="left:33%;top:40%;width:42%;height:44%" data-show="two-tasks" data-tip="&lsquo;Wire request tracing through services&rsquo; has edited 120 files this session — middleware, service entries and instrumentation. They&rsquo;ll attach to named features once the repo is mapped.">
+          <div class="who">Wire request tracing through services</div>
+          <div class="files">120 files · not yet mapped to features</div>
+        </div>
+
+        <!-- Moment C at scale: a 200-file sweep claims most of the gray -->
+        <div class="fp" style="left:6%;top:26%;width:58%;height:58%" data-show="first-task-200" data-tip="&lsquo;Migrate codebase to strict TypeScript&rsquo; has edited 200 files this session (exactly 200 — counts abbreviate past 1,000: 1.2k). They&rsquo;ll attach to named features once the repo is mapped.">
+          <div class="who">Migrate codebase to strict TypeScript</div>
+          <div class="files">200 files · not yet mapped to features</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<div id="tip"></div>
+
+<!-- dev-only variant switcher (not product UI; also reachable via ?v=) -->
+<div class="dev" aria-hidden="true">DEV
+  <button class="on" data-v="connect">A connect</button>
+  <button data-v="installing">A&prime; installing</button>
+  <button data-v="install-failed">A&Prime; failed</button>
+  <button data-v="connected">B connected</button>
+  <button data-v="mapping">B mapping</button>
+  <button data-v="first-task">C first task</button>
+  <button data-v="two-tasks">C &times;2</button>
+  <button data-v="first-task-200">C &times;200</button>
+</div>
+
+<script>
+/* tooltip with 260ms intent delay, instant hide — verbatim from reference-screen-v8 */
+var tip=document.getElementById('tip'), tipTimer=null;
+document.addEventListener('mouseover',function(e){
+  var n=e.target.closest('[data-tip]');
+  clearTimeout(tipTimer);
+  if(!n){tip.classList.remove('on');return}
+  tipTimer=setTimeout(function(){
+    tip.innerHTML=n.dataset.tip;
+    var r=n.getBoundingClientRect();
+    tip.style.left=Math.max(8,Math.min(r.left, innerWidth-286))+'px';
+    tip.style.top=(r.bottom+8>innerHeight-90 ? r.top-8-tip.offsetHeight : r.bottom+8)+'px';
+    tip.classList.add('on');
+  },260);
+});
+document.addEventListener('mouseout',function(e){ if(e.target.closest('[data-tip]')){clearTimeout(tipTimer);tip.classList.remove('on')} });
+
+/* variants: dev bar + ?v= param. Visibility via the hidden attribute only —
+   the global [hidden]{display:none!important} guard makes display rules irrelevant. */
+var VARIANTS=['connect','installing','install-failed','connected','mapping','first-task','two-tasks','first-task-200'];
+function setVariant(v){
+  if(VARIANTS.indexOf(v)<0)v='connect';
+  document.querySelectorAll('[data-show]').forEach(function(n){
+    n.hidden = n.dataset.show.split(' ').indexOf(v)<0;
+  });
+  document.querySelectorAll('.dev button').forEach(function(b){b.classList.toggle('on',b.dataset.v===v)});
+}
+document.querySelectorAll('.dev button').forEach(function(b){b.addEventListener('click',function(){setVariant(b.dataset.v)})});
+var Q=new URLSearchParams(location.search);
+setVariant(Q.get('v')||'connect');
+/* ?dev=0 hides the dev bar for polish shots (dev chrome is not product UI) */
+if(Q.get('dev')==='0')document.querySelector('.dev').hidden=true;
+
+/* Moment A → A′: the primary CTA demonstrates the post-click installing state.
+   (In the app this opens the system folder picker; here the picked-path stand-in.) */
+document.getElementById('pick').addEventListener('click',function(){setVariant('installing')});
+</script>
+</body>
+</html>
