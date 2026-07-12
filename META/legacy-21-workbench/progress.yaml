@@ -5,7 +5,7 @@ progress:
       name: "Map main view (scope occupancy) — dynamize from approved v8"
       status: in_progress
       gate: true
-      notes: "S3 done, next S4. Gates green (install/tsc/build). 3 forks logged to DECISIONS-NEEDED (deferred @types/react for S4; TS-module fixtures for literal type-checking; demoLayout as presentation hint)."
+      notes: "S4 done, next S5. v8 dynamized into React (App/Titlebar/TaskRail/TaskCard/MapCanvas/TerritoryBlock/Legend/Tooltip + derive.ts view models); gates green (tsc/build/playwright 6 shots); screenshot parity vs static v8 at 1280x800 with deltas documented in notes/map-main.md; extremes render (empty/overload/forty) behind ?fixture= switcher. 4 forks logged to DECISIONS-NEEDED."
     - id: m2-task-panel
       name: "Task panel (timeline + intervention)"
       status: planned

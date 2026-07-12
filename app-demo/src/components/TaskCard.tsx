@@ -1,0 +1,54 @@
+import type { MapFixture, Task } from "../types";
+import { pillView, taskAge, taskChips } from "../derive";
+
+export interface TaskCardProps {
+  task: Task;
+  fixture: MapFixture;
+  /** Entry stagger index across ALL cards (v8: .05s + .04s * i). */
+  index: number;
+  hot: boolean;
+  onHoverStart: (task: Task) => void;
+  onHoverEnd: () => void;
+}
+
+const STAGGER_BASE_S = 0.05; // v8 first card delay
+const STAGGER_STEP_S = 0.04; // v8 per-card increment
+
+export function TaskCard({
+  task,
+  fixture,
+  index,
+  hot,
+  onHoverStart,
+  onHoverEnd,
+}: TaskCardProps) {
+  const pill = pillView(task);
+  const chips = taskChips(task, fixture);
+  const classes = ["task"];
+  if (task.state === "done") classes.push("t-done");
+  if (hot) classes.push("hot");
+  return (
+    <div
+      className={classes.join(" ")}
+      style={{ animationDelay: `${STAGGER_BASE_S + STAGGER_STEP_S * index}s` }}
+      onMouseEnter={() => onHoverStart(task)}
+      onMouseLeave={onHoverEnd}
+    >
+      <div className="row1">
+        <span className={`pill ${pill.kind}`} data-tip={pill.tip}>
+          {pill.text}
+        </span>
+        {/* TEXT-long rung: title truncates (CSS ellipsis) + full text on hover */}
+        <h3 data-tip={task.title}>{task.title}</h3>
+        <span className="age">{taskAge(task, fixture)}</span>
+      </div>
+      <div className="row2">
+        {chips.map((c, i) => (
+          <span key={i} className={`chip ${c.kind}`} data-tip={c.tip}>
+            {c.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -138,6 +138,20 @@ export interface DemoLayout {
   height: number; // percent
 }
 
+/**
+ * Presentation-only sub-block offset INSIDE its territory, in px — v8 anchors
+ * sub-blocks with fixed px offsets (viewport-independent), so the fixture
+ * carries them verbatim for screenshot-parity. Same caveat as DemoLayout:
+ * NOT a captured signal; a real layout pass replaces this later.
+ * (S4 reconciliation of the S3 percent approximation — see notes/map-main.md.)
+ */
+export interface DemoSubOffset {
+  left?: number; // px from territory left edge
+  top?: number; // px from territory top edge
+  right?: number; // px from territory right edge
+  bottom?: number; // px from territory bottom edge
+}
+
 /** A semantic territory: an anchor cluster from local distillation. */
 export interface Territory {
   id: string;
@@ -148,8 +162,8 @@ export interface Territory {
   subBlocks: SubBlock[];
   /** v8 hand-tuned rect; later replaced by a real layout algorithm. */
   demoLayout?: DemoLayout;
-  /** Sub-block rects keyed by sub-block id (same caveat as demoLayout). */
-  demoSubLayout?: Record<string, Partial<DemoLayout>>;
+  /** Sub-block px offsets keyed by sub-block id (same caveat as demoLayout). */
+  demoSubLayout?: Record<string, DemoSubOffset>;
 }
 
 /* ── occupancy rollups (derived, but shipped in the fixture so the map is

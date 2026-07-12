@@ -163,10 +163,11 @@ export const v8Baseline = {
         { id: "s-recon", name: "Reconciliation", anchoredFileCount: 6 },
       ],
       demoLayout: { left: 32.5, top: 4.5, width: 37, height: 55 },
+      // px offsets verbatim from v8 (style="left:16px;top:40px" etc.)
       demoSubLayout: {
-        "s-osm": { left: 1.2, top: 4.9 },
-        "s-chan": { left: 1.2, top: 9.3 },
-        "s-recon": { left: 52.3, top: 50.1 },
+        "s-osm": { left: 16, top: 40 },
+        "s-chan": { left: 16, top: 76 },
+        "s-recon": { right: 16, bottom: 40 },
       },
     },
     {

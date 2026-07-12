@@ -1,0 +1,126 @@
+/* Map screen styles — carried over from workbench-refs/reference-screen-v8.html
+   (the frozen approved baseline; v8 IS the parity target — do not "improve").
+   Values reference tokens.css variables only. Additions beyond v8 are marked
+   with a `S4:` comment and exist only for the scale-extremes fixtures /
+   dev fixture switcher. */
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:linear-gradient(160deg,#e9e9e7,#e4e5e6);font-family:var(--sans);color:var(--ink-900);padding:var(--sp-6);-webkit-font-smoothing:antialiased}
+#root{height:100%;display:flex;align-items:center;justify-content:center}
+svg{vertical-align:-2px}
+
+.window{width:min(1320px,100%);height:min(820px,calc(100vh - 48px));background:var(--paper);border-radius:14px;box-shadow:0 22px 70px rgba(15,17,21,.28),0 2px 8px rgba(15,17,21,.12);overflow:hidden;display:flex;flex-direction:column;animation:winIn .5s var(--ease) both}
+@keyframes winIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+
+/* ── titlebar ── */
+.titlebar{height:44px;flex:none;display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-4);background:rgba(250,250,249,.92);border-bottom:1px solid var(--ink-150)}
+.lights{display:flex;gap:var(--sp-2)}
+.lights i{width:12px;height:12px;border-radius:50%}
+.lights i:nth-child(1){background:#f4635e}.lights i:nth-child(2){background:#f7bd45}.lights i:nth-child(3){background:#43c644}
+.wordmark{font-weight:650;font-size:var(--fs-4);letter-spacing:-.1px}
+.repo{height:24px;display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-700);background:var(--card);border-radius:var(--r-s);padding:0 10px;box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.repo:hover{box-shadow:var(--sh-2)}
+.repo .branch{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500)}
+.spacer{flex:1}
+.stat{height:22px;display:flex;align-items:center;gap:5px;font-size:var(--fs-2);font-weight:500;padding:0 10px;border-radius:11px;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
+.stat:hover{filter:brightness(.96)}
+.stat.need{background:var(--need-bg);color:var(--need-ink)}
+.stat.clash{background:var(--clash-bg);color:var(--clash-ink)}
+.stat.alive{background:var(--alive-bg);color:var(--alive-ink)}
+.fresh{display:flex;align-items:center;gap:6px;font-size:var(--fs-2);color:var(--ink-500);cursor:pointer}
+.fresh .dot{width:6px;height:6px;border-radius:50%;background:var(--alive)}
+/* S4: honest stale dot for never-fetched / offline data (guideline 4) */
+.fresh.stale .dot{background:var(--ink-300)}
+/* S4: dev-only fixture switcher — chrome, not product UI */
+.fixture-switch{height:22px;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500);background:var(--card);border:1px solid var(--ink-150);border-radius:var(--r-s);padding:0 4px;cursor:pointer}
+
+.main{flex:1;display:flex;min-height:0}
+
+/* ── rail ── */
+.rail{width:300px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--ink-150);background:rgba(252,252,251,.7)}
+.tasks{flex:1;overflow:auto;padding:var(--sp-3) var(--sp-3) var(--sp-2)}
+.group{margin-bottom:var(--sp-3)}
+.group h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase;padding:0 var(--sp-1) 6px;display:flex;justify-content:space-between;line-height:1.4}
+.group h4 b{font-family:var(--mono);font-weight:500}
+.task{background:var(--card);border-radius:var(--r-m);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease),opacity var(--t-base) var(--ease);margin-bottom:6px;animation:rise .4s var(--ease) both}
+.task:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
+.task:active{transform:none;box-shadow:var(--sh-1)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.task .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.task h3{font-size:var(--fs-4);font-weight:600;letter-spacing:-.1px;line-height:1.45;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none}
+.pill{flex:none;height:18px;display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;border-radius:9px;padding:0 8px;cursor:help}
+.pill.need{background:var(--need-bg);color:var(--need-ink)}
+.pill.clash{background:var(--clash-bg);color:var(--clash-ink)}
+.pill.alive{background:var(--alive-bg);color:var(--alive-ink)}
+.pill.idle{background:var(--ink-100);color:var(--ink-500)}
+.pill.done{background:var(--ink-100);color:var(--ink-400)}
+/* chips: one line, never wraps; overflow collapses to +N */
+.task .row2{display:flex;align-items:center;gap:var(--sp-1);margin-top:6px;min-width:0;overflow:hidden}
+.chip{flex:none;height:16px;display:inline-flex;align-items:center;font-family:var(--mono);font-size:var(--fs-1);padding:0 6px;border-radius:5px;cursor:help;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;line-height:16px}
+.chip.w{background:var(--alive-bg);color:var(--alive-ink)}
+.chip.r{box-shadow:inset 0 0 0 1px #c3d0e2;color:var(--read-ink)}
+.chip.n{background:var(--ink-100);color:var(--ink-500)}
+.chip.more{background:var(--ink-100);color:var(--ink-500);font-weight:600}
+.t-done{opacity:.55}
+/* S4: honest empty rail (N=0 rung) */
+.rail-empty{padding:var(--sp-4) var(--sp-3);font-size:var(--fs-3);color:var(--ink-400);line-height:1.6}
+.launch{margin:0 var(--sp-3) var(--sp-3);height:34px;flex:none;border:none;font-family:inherit;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease);display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
+.launch:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.launch:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+
+/* ── canvas ── */
+.canvas{flex:1;position:relative;overflow:hidden}
+.canvas::before{content:"";position:absolute;inset:0;background:radial-gradient(1200px 700px at 70% -10%,rgba(255,255,255,.7),transparent 60%)}
+.grid{position:absolute;inset:0;background-image:radial-gradient(rgba(25,27,31,.05) 1px,transparent 1px);background-size:26px 26px}
+.terr{position:absolute;border-radius:var(--r-l);background:var(--ink-100);transition:opacity var(--t-base) var(--ease),box-shadow var(--t-base) var(--ease),transform var(--t-base) var(--ease);cursor:pointer;animation:terrIn .55s var(--ease) both}
+.terr:hover{box-shadow:inset 0 0 0 1.5px rgba(25,27,31,.14),var(--sh-2)}
+@keyframes terrIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+.terr .label{position:absolute;top:var(--sp-3);left:var(--sp-4);right:var(--sp-3);font-size:var(--fs-2);letter-spacing:.5px;color:var(--ink-500);font-weight:600;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.terr .foot{position:absolute;left:var(--sp-4);bottom:var(--sp-2);right:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+.terr .foot.need-ink{color:var(--need-ink)}
+.terr.w{background:linear-gradient(180deg,#e9f2ea,#e0ede2);box-shadow:inset 0 0 0 1px rgba(62,125,76,.13),var(--sh-1)}
+.terr.w .label{color:#4c7a57}
+.terr.r{background:var(--card);box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.32),var(--sh-1)}
+.terr.r .label{color:#5c7ba6}
+.terr.quiet .label{color:var(--ink-300)}
+/* S4: SPACE-tiny rung — small rects get a tighter label (long-name fixtures) */
+.terr.compact .label{left:var(--sp-3);top:var(--sp-2);letter-spacing:.3px}
+.terr.compact .foot{left:var(--sp-3);font-family:var(--mono)}
+.sub{position:absolute;height:26px;display:flex;align-items:center;gap:6px;border-radius:var(--r-s);background:rgba(255,255,255,.75);box-shadow:var(--sh-1);padding:0 10px;font-size:var(--fs-2);color:var(--ink-500);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease);white-space:nowrap;max-width:62%}
+.sub:hover{box-shadow:var(--sh-2)}
+.sub em{font-style:normal;overflow:hidden;text-overflow:ellipsis}
+.sub.w{background:#d9ecdc;color:var(--alive-ink);font-weight:500}
+.sub.clash{background:var(--clash-bg);color:var(--clash-ink);font-weight:600;box-shadow:inset 0 0 0 1px rgba(154,107,22,.22),var(--sh-1)}
+.sub.clash .cnt{flex:none;height:16px;display:inline-flex;align-items:center;background:var(--clash);color:#fff;font-size:var(--fs-1);font-weight:600;border-radius:8px;padding:0 7px;animation:breathe 2.8s var(--ease) infinite}
+@keyframes breathe{0%,100%{opacity:.82}50%{opacity:1}}
+
+/* correlate-hover: one dim value everywhere */
+.canvas.focus .terr{opacity:.14}
+.canvas.focus .terr.lit{opacity:1;box-shadow:inset 0 0 0 2px rgba(25,27,31,.3),0 4px 20px rgba(20,22,26,.14);transform:scale(1.012)}
+.canvas.focus .terr.lit .label{color:var(--ink-900)}
+.rail.dim .task{opacity:.3}
+.rail.dim .task.hot{opacity:1}
+
+/* legend = filter */
+.legend{position:absolute;left:var(--sp-4);bottom:var(--sp-3);display:flex;gap:var(--sp-1);background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-radius:var(--r-m);padding:var(--sp-1);font-size:var(--fs-2);color:var(--ink-500);box-shadow:var(--sh-1)}
+.legend span{height:22px;display:flex;align-items:center;gap:5px;padding:0 var(--sp-2);border-radius:var(--r-s);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.legend span:hover{background:var(--ink-100)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3.5px}
+.lg-w{background:#d9ecdc}.lg-r{box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.5);background:#fff}.lg-c{background:var(--clash-bg);box-shadow:inset 0 0 0 1px rgba(154,107,22,.3)}.lg-q{background:var(--ink-100)}
+
+/* S4: honest first-run empty state (N=0 rung) — dashed outline is allowed
+   ONLY here (LOOP.md taste profile: true empty-state placeholder) */
+.canvas-empty{position:absolute;inset:var(--sp-6);display:flex;align-items:center;justify-content:center}
+.canvas-empty .box{max-width:340px;border:1.5px dashed var(--ink-200);border-radius:var(--r-l);padding:var(--sp-6);text-align:center;color:var(--ink-400);font-size:var(--fs-3);line-height:1.6}
+.canvas-empty .box b{display:block;font-size:var(--fs-4);font-weight:600;color:var(--ink-500);margin-bottom:var(--sp-2)}
+
+/* tooltip: 260ms intent delay, instant hide */
+#tip{position:fixed;z-index:99;background:var(--ink-900);color:#f4f4f3;font-size:var(--fs-2);line-height:1.5;padding:7px 10px;border-radius:7px;max-width:270px;box-shadow:0 6px 24px rgba(15,17,21,.3);pointer-events:none;opacity:0;transition:opacity var(--t-fast) var(--ease);transform:translateY(2px)}
+#tip.on{opacity:1;transform:none}
+
+/* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
+@media (prefers-reduced-motion: reduce){
+  .window,.task,.terr,.sub.clash .cnt{animation:none}
+}

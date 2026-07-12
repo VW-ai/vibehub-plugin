@@ -1,0 +1,70 @@
+import type { MapFixture, Task } from "../types";
+import { groupTasks } from "../derive";
+import { TaskCard } from "./TaskCard";
+
+function LaunchIcon() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z" />
+    </svg>
+  );
+}
+
+export interface TaskRailProps {
+  fixture: MapFixture;
+  /** Correlate-hover: dim the whole rail except hot cards. */
+  dim: boolean;
+  hotTaskIds: Set<string>;
+  onTaskHoverStart: (task: Task) => void;
+  onTaskHoverEnd: () => void;
+}
+
+export function TaskRail({
+  fixture,
+  dim,
+  hotTaskIds,
+  onTaskHoverStart,
+  onTaskHoverEnd,
+}: TaskRailProps) {
+  const groups = groupTasks(fixture);
+  let cardIndex = 0; // stagger index runs across group boundaries (v8)
+  return (
+    <aside className={`rail${dim ? " dim" : ""}`}>
+      <div className="tasks">
+        {groups.length === 0 ? (
+          // N=0 rung: honest empty rail — no fake cards, just the truth.
+          <div className="rail-empty">
+            No tasks yet. Start one below — it runs on its own branch.
+          </div>
+        ) : (
+          groups.map((g) => (
+            <div className="group" key={g.title}>
+              <h4>
+                {g.title} <b>{g.tasks.length}</b>
+              </h4>
+              {g.tasks.map((t) => (
+                <TaskCard
+                  key={t.id}
+                  task={t}
+                  fixture={fixture}
+                  index={cardIndex++}
+                  hot={hotTaskIds.has(t.id)}
+                  onHoverStart={onTaskHoverStart}
+                  onHoverEnd={onTaskHoverEnd}
+                />
+              ))}
+            </div>
+          ))
+        )}
+      </div>
+      <button
+        className="launch"
+        type="button"
+        data-tip="Assemble context and launch a Claude Code session on a new branch"
+      >
+        <LaunchIcon />
+        Start a task
+      </button>
+    </aside>
+  );
+}
