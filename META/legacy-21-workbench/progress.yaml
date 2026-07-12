@@ -8,8 +8,8 @@ progress:
       notes: "S3-S5 done. S5: interaction suite 29 tests (correlate-hover exact footprints + .14 dim, reverse territory→rail correlate implemented, legend filters x4, tooltip 260ms/flip/exact-100k, +N chip, switcher, 5 states, keyboard parity, overlap checks @1280x800+1440x900) — 35/35 green incl. parity shots; legend-over-bottom-row fixed via density legend band (48px, only past v8's 92.5% max bottom); entry-animation fill:both bug fixed (was defeating correlate dim + offsetting fixed tooltip). Scale-extremes protocol closed with per-component evidence table in notes/map-main.md. 3 new forks logged to DECISIONS-NEEDED."
     - id: m2-task-panel
       name: "Task panel (timeline + intervention)"
-      status: planned
-      notes: "next stage: S1 (English redo of task-panel mock, v8 tokens)"
+      status: in_progress
+      notes: "S1 done, next S2. Static English redo on v8 tokens at workbench/app-demo/static/task-panel-s1.html — 3 approved sections (identity / one-stream human timeline / pinned intervention deck), rendered in context over dimmed map, 520px right dock. Verified render 1280x800 + 1440x900 (no console errors, action row exact fit, timeline scrolls under pinned deck). Notes + S2 open questions in notes/task-panel.md; 4 forks logged to DECISIONS-NEEDED."
     - id: m3-conflict-card
       name: "Conflict adjudication card"
       status: planned
