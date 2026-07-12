@@ -10,6 +10,9 @@ export interface TerritoryBlockProps {
   /** Total territory count — caps the stagger at scale (N=many rung). */
   count: number;
   lit: boolean;
+  /** Reverse correlate: hover/focus lights this territory's tasks in the rail. */
+  onHoverStart: (terr: Territory) => void;
+  onHoverEnd: () => void;
 }
 
 const STAGGER_BASE_S = 0.08; // v8 first territory delay
@@ -49,6 +52,8 @@ export function TerritoryBlock({
   index,
   count,
   lit,
+  onHoverStart,
+  onHoverEnd,
 }: TerritoryBlockProps) {
   const v = territoryView(terr, fixture);
   const classes = ["terr", ...v.classes];
@@ -59,6 +64,12 @@ export function TerritoryBlock({
       className={classes.join(" ")}
       style={rectStyle(terr, index, count)}
       data-tip={v.tip}
+      data-territory={terr.id}
+      tabIndex={0}
+      onMouseEnter={() => onHoverStart(terr)}
+      onMouseLeave={onHoverEnd}
+      onFocus={() => onHoverStart(terr)}
+      onBlur={onHoverEnd}
     >
       <div className="label">{v.labelText}</div>
       {v.subs.map((s) => (

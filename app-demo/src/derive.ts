@@ -517,6 +517,32 @@ export function highlightForTask(task: Task, fx: MapFixture): Highlight {
   return { litIds, hotTaskIds: new Set([task.id]) };
 }
 
+/**
+ * Reverse correlate (v8 promised bidirectional): hovering a territory
+ * highlights every task touching it in the rail — union of the occupancy
+ * rollup (writers + readers + done-today) and scope declarations (the
+ * declaration side covers tasks not yet rolled up, e.g. queued). Lit = the
+ * hovered territory itself plus its sub-blocks (they travel together).
+ */
+export function highlightForTerritory(terr: Territory, fx: MapFixture): Highlight {
+  const hotTaskIds = new Set<string>();
+  const occ = fx.occupancy.find((o) => o.territoryId === terr.id);
+  if (occ) {
+    for (const id of [
+      ...occ.writingTaskIds,
+      ...occ.readingTaskIds,
+      ...occ.doneTodayTaskIds,
+    ])
+      hotTaskIds.add(id);
+  }
+  for (const t of fx.tasks) {
+    if (t.scopes.some((s) => s.territoryId === terr.id)) hotTaskIds.add(t.id);
+  }
+  const litIds = new Set<string>([terr.id]);
+  for (const sub of terr.subBlocks) litIds.add(sub.id);
+  return { litIds, hotTaskIds };
+}
+
 export function highlightForLegend(kind: LegendKind, fx: MapFixture): Highlight {
   const litIds = new Set<string>();
   for (const terr of fx.territories) {

@@ -10,7 +10,12 @@ body{background:linear-gradient(160deg,#e9e9e7,#e4e5e6);font-family:var(--sans);
 #root{height:100%;display:flex;align-items:center;justify-content:center}
 svg{vertical-align:-2px}
 
-.window{width:min(1320px,100%);height:min(820px,calc(100vh - 48px));background:var(--paper);border-radius:14px;box-shadow:0 22px 70px rgba(15,17,21,.28),0 2px 8px rgba(15,17,21,.12);overflow:hidden;display:flex;flex-direction:column;animation:winIn .5s var(--ease) both}
+/* S5: entry animations fill `backwards`, NOT `both` — their terminal keyframe
+   equals the natural state, so `both` only pins the element there forever:
+   it kept .window carrying an identity transform (which made it the containing
+   block for the fixed #tip → tooltip offset by the body padding) and kept
+   .terr/.task at opacity:1 (which silently defeated the correlate-hover dim). */
+.window{width:min(1320px,100%);height:min(820px,calc(100vh - 48px));background:var(--paper);border-radius:14px;box-shadow:0 22px 70px rgba(15,17,21,.28),0 2px 8px rgba(15,17,21,.12);overflow:hidden;display:flex;flex-direction:column;animation:winIn .5s var(--ease) backwards}
 @keyframes winIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
 
 /* ── titlebar ── */
@@ -43,7 +48,7 @@ svg{vertical-align:-2px}
 .group{margin-bottom:var(--sp-3)}
 .group h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase;padding:0 var(--sp-1) 6px;display:flex;justify-content:space-between;line-height:1.4}
 .group h4 b{font-family:var(--mono);font-weight:500}
-.task{background:var(--card);border-radius:var(--r-m);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease),opacity var(--t-base) var(--ease);margin-bottom:6px;animation:rise .4s var(--ease) both}
+.task{background:var(--card);border-radius:var(--r-m);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease),opacity var(--t-base) var(--ease);margin-bottom:6px;animation:rise .4s var(--ease) backwards}
 .task:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
 .task:active{transform:none;box-shadow:var(--sh-1)}
 @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -74,7 +79,13 @@ svg{vertical-align:-2px}
 .canvas{flex:1;position:relative;overflow:hidden}
 .canvas::before{content:"";position:absolute;inset:0;background:radial-gradient(1200px 700px at 70% -10%,rgba(255,255,255,.7),transparent 60%)}
 .grid{position:absolute;inset:0;background-image:radial-gradient(rgba(25,27,31,.05) 1px,transparent 1px);background-size:26px 26px}
-.terr{position:absolute;border-radius:var(--r-l);background:var(--ink-100);transition:opacity var(--t-base) var(--ease),box-shadow var(--t-base) var(--ease),transform var(--t-base) var(--ease);cursor:pointer;animation:terrIn .55s var(--ease) both}
+/* S5: territory field — at density it reserves the legend band (48px =
+   12 legend offset + 30 legend height + 6 clearance; see MapCanvas.tsx) so
+   percent layout compresses instead of running under the floating legend.
+   Baseline fixtures keep inset:0 → pixel-identical to v8. */
+.field{position:absolute;inset:0}
+.field.with-legend-band{bottom:48px}
+.terr{position:absolute;border-radius:var(--r-l);background:var(--ink-100);transition:opacity var(--t-base) var(--ease),box-shadow var(--t-base) var(--ease),transform var(--t-base) var(--ease);cursor:pointer;animation:terrIn .55s var(--ease) backwards}
 .terr:hover{box-shadow:inset 0 0 0 1.5px rgba(25,27,31,.14),var(--sh-2)}
 @keyframes terrIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
 .terr .label{position:absolute;top:var(--sp-3);left:var(--sp-4);right:var(--sp-3);font-size:var(--fs-2);letter-spacing:.5px;color:var(--ink-500);font-weight:600;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -119,6 +130,11 @@ svg{vertical-align:-2px}
 /* tooltip: 260ms intent delay, instant hide */
 #tip{position:fixed;z-index:99;background:var(--ink-900);color:#f4f4f3;font-size:var(--fs-2);line-height:1.5;padding:7px 10px;border-radius:7px;max-width:270px;box-shadow:0 6px 24px rgba(15,17,21,.3);pointer-events:none;opacity:0;transition:opacity var(--t-fast) var(--ease);transform:translateY(2px)}
 #tip.on{opacity:1;transform:none}
+
+/* S5: keyboard parity — correlate-hover paths reachable without a mouse
+   (focus mirrors hover); ring only on :focus-visible so mouse use is clean */
+.task:focus-visible,.terr:focus-visible,.legend span:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.task:focus:not(:focus-visible),.terr:focus:not(:focus-visible),.legend span:focus:not(:focus-visible){outline:none}
 
 /* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
 @media (prefers-reduced-motion: reduce){

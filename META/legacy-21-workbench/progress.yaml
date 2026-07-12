@@ -1,11 +1,11 @@
 progress:
-  completion: 0.0
+  completion: 0.2
   milestones:
     - id: m1-map-main
       name: "Map main view (scope occupancy) — dynamize from approved v8"
-      status: in_progress
+      status: completed
       gate: true
-      notes: "S4 done, next S5. v8 dynamized into React (App/Titlebar/TaskRail/TaskCard/MapCanvas/TerritoryBlock/Legend/Tooltip + derive.ts view models); gates green (tsc/build/playwright 6 shots); screenshot parity vs static v8 at 1280x800 with deltas documented in notes/map-main.md; extremes render (empty/overload/forty) behind ?fixture= switcher. 4 forks logged to DECISIONS-NEEDED."
+      notes: "S3-S5 done. S5: interaction suite 29 tests (correlate-hover exact footprints + .14 dim, reverse territory→rail correlate implemented, legend filters x4, tooltip 260ms/flip/exact-100k, +N chip, switcher, 5 states, keyboard parity, overlap checks @1280x800+1440x900) — 35/35 green incl. parity shots; legend-over-bottom-row fixed via density legend band (48px, only past v8's 92.5% max bottom); entry-animation fill:both bug fixed (was defeating correlate dim + offsetting fixed tooltip). Scale-extremes protocol closed with per-component evidence table in notes/map-main.md. 3 new forks logged to DECISIONS-NEEDED."
     - id: m2-task-panel
       name: "Task panel (timeline + intervention)"
       status: planned

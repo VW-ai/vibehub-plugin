@@ -138,9 +138,65 @@ Structure, spacing, colors, type match. Known deltas, all explained:
   overlays the bottom-left territory's foot (v8 inherits this; needs a
   density-aware legend position or canvas bottom inset).
 
-## Next stage: S5 (interactions + states)
+## S5 checklist (done)
 
-- Playwright tests enumerating ALL states from fixtures; states checklist.
-- Scale-extremes protocol answers finalized per component (rendering side
-  mostly done above; formalize + tick).
-- Legend/territory-density overlap fix; keyboard reachability of hover paths.
+- [x] Interaction suite `tests/interactions.spec.ts` (29 tests) + S4 parity
+      capture (6) = 35 green. Coverage: correlate-hover per rail card (exact
+      footprint lit, others at .14, rail dims, full reset on leave), reverse
+      correlate, legend filters ×4 (territory set AND rail cards asserted
+      exactly), tooltip (260ms intent delay + instant hide, bottom-edge flip,
+      exact value behind "100k"), +N chip expansion tooltip, fixture switcher
+      live-swap, zero console errors on all 4 fixtures, five state pills at
+      density, keyboard-focus correlate, and overlap/clipping at 1280×800 +
+      1440×900 on v8-baseline AND forty-territories.
+- [x] **Reverse correlate implemented** (v8 promised bidirectional): hovering
+      or keyboard-focusing a territory highlights every task touching it in
+      the rail (union of occupancy writers/readers/done-today + scope
+      declarations), the territory stays lit, everything else dims. Symmetric
+      with card-hover; `highlightForTerritory` in derive.ts.
+- [x] **Legend/density overlap FIXED**: the territory field reserves a 48px
+      legend band (12 offset + 30 legend + 6 clearance) at the bottom, but
+      ONLY when a fixture's deepest rect exceeds v8's own 92.5% max bottom
+      (t-store/t-fe), which is the deepest extent known to clear the legend.
+      v8-baseline stays pixel-identical; forty-territories compresses ~5%
+      vertically instead of hiding its bottom row's feet under the legend.
+      (Chosen over icon-collapse: no new visual mode, one rule, honest.)
+- [x] **Entry-animation fill bug FIXED** (found by the suite): `fill: both`
+      on winIn/rise/terrIn pinned elements at their terminal keyframe forever
+      — `.window` kept an identity transform (becoming the containing block
+      for the fixed #tip → tooltip offset by the body padding) and .terr/.task
+      were pinned at opacity:1, silently defeating the correlate dim after
+      entry. Fill is now `backwards`: identical entry visuals, cascade works
+      after. (The static v8 file keeps its own copy of the bug; the frozen
+      reference is not edited.)
+- [x] Keyboard parity: task cards, territories, legend entries are focusable
+      (tabIndex) and focus mirrors hover (correlate reachable without a
+      mouse); ring on :focus-visible only.
+- [x] Test hooks: `data-task` / `data-territory` / `data-kind` attributes
+      (inert metadata, no styling use).
+- [x] Gates: `tsc --noEmit` clean · `pnpm build` green · `npx playwright
+      test` 35/35 green.
+
+## SCALE-EXTREMES PROTOCOL — closure (written answers per component)
+
+Each row cites the implementing code and/or the test that pins it.
+
+| Case | Component | Answer | Evidence |
+|---|---|---|---|
+| N=0 | rail | Honest one-liner "No tasks yet…", launch CTA still present — app fully usable | `TaskRail.tsx` rail-empty; test "empty-project renders clean" + switcher test |
+| N=0 | canvas | Dashed placeholder box (the ONLY sanctioned dashed outline) with guidance; no legend, no fake territories | `MapCanvas.tsx` canvas-empty; switcher test asserts `.canvas-empty` visible, 0 `.terr` |
+| N=0 | titlebar | Zero-count stats simply absent; "Never synced" + gray stale dot | `derive.ts` titlebarStats/freshness (counts >0 only) |
+| N=1 | rail groups | Empty groups hidden; a 1-card group renders header+count honestly | `derive.ts` groupTasks `.filter(g→len>0)`; v8-baseline "Done today 1" |
+| N=1 | canvas | A single quiet territory earns its space via label + "quiet" foot + file count in tooltip | `derive.ts` footFor/territoryView (quiet path) |
+| N=many | chips (9 scopes) | One line, never wraps; collapse to first 2 + `+N`; +N tooltip enumerates branch + every hidden write/read | `derive.ts` taskChips MAX_CHIPS; test "+N chip: hover enumerates…" |
+| N=many | canvas (40 terr) | All 40 render; entry-stagger window capped at 0.6s; compact foot rung; density legend band | `TerritoryBlock.tsx` STAGGER_WINDOW_S; `MapCanvas.tsx` needsLegendBand; overlap tests @2 viewports |
+| N=many | rail (5 states) | Grouping stays 4 groups max; all five pills present | test "all five state pills render in forty-territories" |
+| TEXT long | task title | CSS ellipsis + full text via tooltip on h3 | `TaskCard.tsx` data-tip={task.title}; app.css .task h3 |
+| TEXT long | territory label/foot | nowrap+ellipsis; territory tooltip carries full name; compact foot's tooltip carries full foot text | app.css .terr .label/.foot; `derive.ts` footFor compact tip |
+| TEXT long | chips | max-width 110px + ellipsis; chip tooltip spells the scope out | app.css .chip; `derive.ts` scopeChip tip |
+| NUMBER huge | file counts | ≥1000 abbreviates ("100k"/"8.4k"); exact value "(100,000 exactly)" in tooltip | `derive.ts` formatCount/exactCount; test "abbreviated 100k…" |
+| SPACE tiny | territory | Degradation ladder: full foot → compact mono "1w · 2r" (rect <14%w/<22%h) → label ellipsis; every rung's full text lives in the tooltip | `derive.ts` COMPACT_* + footFor(compact); forty-territories fixture |
+| DYNAMIC | tooltips/correlate | All hidden info reachable by hover AND keyboard focus; tooltip hides instantly, dim/lit resets on leave/blur — space always returned | `Tooltip.tsx`; App state; tests "hover ends → focus fully resets", "keyboard focus…" |
+| SCREEN sizes | whole screen | 1280×800 + 1440×900: legend clears every territory, territories inside canvas, window inside viewport — asserted on baseline AND 40-territory density | tests "no overlap / no clipping" ×4 |
+
+## Next: m2-task-panel S1 (map-main complete through S5)

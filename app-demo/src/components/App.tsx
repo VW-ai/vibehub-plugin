@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import type { MapFixture, Task } from "../types";
+import type { MapFixture, Task, Territory } from "../types";
 import {
   highlightForLegend,
   highlightForTask,
+  highlightForTerritory,
   type Highlight,
   type LegendKind,
 } from "../derive";
@@ -25,23 +26,27 @@ export interface AppProps {
 
 export function App({ fixtures, initialFixture, showSwitcher }: AppProps) {
   const [fixtureName, setFixtureName] = useState(initialFixture);
-  // Correlate-hover source: either a rail card or a legend entry (never both).
+  // Correlate-hover source: a rail card, a territory (reverse direction),
+  // or a legend entry — only one can be the source at a time.
   const [hoverTask, setHoverTask] = useState<Task | null>(null);
+  const [hoverTerr, setHoverTerr] = useState<Territory | null>(null);
   const [legendFilter, setLegendFilter] = useState<LegendKind | null>(null);
 
   const fixture = fixtures[fixtureName] ?? fixtures[initialFixture]!;
 
   const highlight = useMemo<Highlight>(() => {
     if (hoverTask) return highlightForTask(hoverTask, fixture);
+    if (hoverTerr) return highlightForTerritory(hoverTerr, fixture);
     if (legendFilter) return highlightForLegend(legendFilter, fixture);
     return NO_HIGHLIGHT;
-  }, [hoverTask, legendFilter, fixture]);
+  }, [hoverTask, hoverTerr, legendFilter, fixture]);
 
-  const focus = hoverTask !== null || legendFilter !== null;
+  const focus = hoverTask !== null || hoverTerr !== null || legendFilter !== null;
 
   const switchFixture = (name: string) => {
     setFixtureName(name);
     setHoverTask(null);
+    setHoverTerr(null);
     setLegendFilter(null);
     const url = new URL(window.location.href);
     url.searchParams.set("fixture", name);
@@ -70,6 +75,8 @@ export function App({ fixtures, initialFixture, showSwitcher }: AppProps) {
           litIds={highlight.litIds}
           onFilterStart={setLegendFilter}
           onFilterEnd={() => setLegendFilter(null)}
+          onTerritoryHoverStart={setHoverTerr}
+          onTerritoryHoverEnd={() => setHoverTerr(null)}
         />
       </div>
       <Tooltip />

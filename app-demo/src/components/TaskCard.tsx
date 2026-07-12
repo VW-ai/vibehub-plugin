@@ -31,8 +31,12 @@ export function TaskCard({
     <div
       className={classes.join(" ")}
       style={{ animationDelay: `${STAGGER_BASE_S + STAGGER_STEP_S * index}s` }}
+      data-task={task.id}
+      tabIndex={0}
       onMouseEnter={() => onHoverStart(task)}
       onMouseLeave={onHoverEnd}
+      onFocus={() => onHoverStart(task)}
+      onBlur={onHoverEnd}
     >
       <div className="row1">
         <span className={`pill ${pill.kind}`} data-tip={pill.tip}>
