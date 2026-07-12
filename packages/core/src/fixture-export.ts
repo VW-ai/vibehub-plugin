@@ -33,7 +33,7 @@ import {
   readTeamBranches,
 } from "./team-store.js";
 
-export const UNCATEGORIZED_TERRITORY_ID = "uncategorized";
+import { UNCATEGORIZED_TERRITORY_ID } from "./contract/install-types.js";
 
 const taskId = (branch: string): string => `branch:${branch}`;
 const conflictId = (a: string, b: string): string => `conflict:${a}|${b}`;

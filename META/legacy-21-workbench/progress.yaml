@@ -1,5 +1,5 @@
 progress:
-  completion: 0.7
+  completion: 0.8
   milestones:
     - id: m1-map-main
       name: "Map main view (scope occupancy) — dynamize from approved v8"
@@ -38,8 +38,9 @@ progress:
       notes: "workbench/packages/core+cli 诞生。GitFacade(fetch/branch/足迹 diff/merge-tree 预警/gh pr,worktree 归域 github-004)+ SQLite WAL 团队子集(repos/sync_state/team_branches/team_branch_files/team_conflicts,按 repo 分域)+ team-sync + MapFixture 导出 + demo ?fixture=live(缺席诚实回退)。映射语义四条落 decision-workbench-004(draft 待审):冲突候选=unmerged∧(无PR∨open)(020 并发才算撞)、basic 档 unmerged→stalled/PR 收口→done、蒸馏前单一 Uncategorized 地盘、detectedAt 首检保龄。Vibehub 自身 repo 实证零服务端:9 branches/3 unmerged/1 活跃、7 PRs matched、0 活跃冲突(死分支噪音 2 对被过滤)、真数据地图截图验证。Gates: core vitest 42/42、demo vitest 44/44、Playwright 170/170、tsc clean ×3 包。"
     - id: b2-three-domain-schema
       name: "Backend M1 ②: SQLite 三表域 schema(图/运行/配置,五 types 文件直译,decision-025)"
-      status: pending
-      gate: false
+      status: completed
+      gate: true
+      notes: "migration 002(v1→v2 升级保数据,测试钉死)。运行域 tasks(五态 CHECK)/sessions/events(11 型 union 判别列+JSON verbatim 往返)/footprints/scopes(seq 保申报序)/injections(claim 原子 FIFO 不双发)/conflicts+conflict_symbols(序对齐不变式)/conflict_diagnoses(claude -p verbatim)/notifications(预算账本)/mapping_runs;图域 features(territory/sub-block 同表)/specs(无 D)/anchors/edges;配置域 settings(repo 遮蔽 global)。DERIVED-NEVER-STORED 全线:milestone 档/twist/filesTouched/ordinal/staleness/geometry 不建列,ActivityStore/GraphStore 读时派生(read 不计 staleness、未锚文件=诚实灰区,均有测试)。契约 types ×4 canonical 家入 core/src/contract。Gates: vitest 59/59、tsc clean、build 绿。"
     - id: b3-hook-cli
       name: "Backend M1 ③: `vibehub hook <event>` CLI 心脏 + 真 session 事件流校准 fixture"
       status: pending

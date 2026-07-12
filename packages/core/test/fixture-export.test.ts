@@ -3,10 +3,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { openDb, type Db } from "../src/db.js";
-import {
-  exportTeamMapFixture,
-  UNCATEGORIZED_TERRITORY_ID,
-} from "../src/fixture-export.js";
+import { exportTeamMapFixture } from "../src/fixture-export.js";
+import { UNCATEGORIZED_TERRITORY_ID } from "../src/contract/install-types.js";
 import {
   reconcileConflicts,
   replaceBranchFiles,

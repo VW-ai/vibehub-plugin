@@ -1,5 +1,10 @@
 export * from "./contract/map-types.js";
+export * from "./contract/panel-types.js";
+export * from "./contract/conflict-types.js";
+export * from "./contract/install-types.js";
 export { defaultDbPath, openDb, type Db } from "./db.js";
+export * from "./activity-store.js";
+export * from "./graph-store.js";
 export {
   GitFacade,
   GhFacade,
@@ -26,7 +31,4 @@ export {
   type TeamSyncOptions,
   type TeamSyncResult,
 } from "./team-sync.js";
-export {
-  exportTeamMapFixture,
-  UNCATEGORIZED_TERRITORY_ID,
-} from "./fixture-export.js";
+export { exportTeamMapFixture } from "./fixture-export.js";
