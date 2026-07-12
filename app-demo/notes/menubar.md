@@ -104,7 +104,123 @@ dot/badge/note, overload top-3 + remainder line, 99+ badge cap, footer seam.
 - **SCREEN sizes**: dropdown (340×~250 max) trivially fits 1280×800; anchor is
   resize-recomputed. @2x retina checked (hairlines, badge keyline clean).
 
-### Open questions for S3-S5
+## S3+S4+S5 merged (iter-20, per the kernel small-surface amendment)
+
+### S3 — the rollup (no menubar fixture shape exists)
+
+Open question 1 answered as posed: `src/menubar-types.ts` + `src/menubar-derive.ts`
+are a PURE ROLLUP over `MapFixture` — `deriveMenubar(fx): MenubarSummary`. The
+menubar can never disagree with the map because there is nothing to keep in
+sync: counts (zeros hidden, iter-14), badge (waiting only, 99+ cap, stale =
+gray/static), freshness + stale honesty line (from `sync.lastFetchAt`/`stale`),
+the Needs-you list, quiet line, item tooltip, and even the desk clock
+(`deskClock(capturedAt)`) all derive from the one fixture. No new captured
+fields; `relAge`/`clockTime` reused from derive.ts.
+
+**Ordering (open question 4, encoded):** waiting tasks and conflict PAIRS
+interleave into one list, OLDEST FIRST. Age basis: waiting = `stateSince`;
+conflict = `detectedAt` — when the pair started needing adjudication, NOT the
+older writer's runtime (fork logged iter-20; the S1 static hand-wrote "31m"
+which was the writer's age — under detectedAt the same row reads "8m" and the
+busy row order survives). Conflict = ONE row `"<subject> — 2 writing"`
+(sub-block name, territory-name fallback), both titles in the tooltip.
+Overflow: `and N more waiting…` when everything hidden is waiting, generic
+`and N more…` when a conflict is among the hidden (flood).
+
+Unit tests: `src/menubar-derive.test.ts`, vitest **16/16** (suite 27/27) —
+busy=v8Baseline counts/rows/ages, oldest-first interleave with a conflict
+older than a waiting task, conflict-only state (no badge, never quiet, clash
+stat + adjudication item tip), subject fallback, quiet + true-N=0 quiet,
+stale badge/note/never-fetched, overload top-3 + "9 more waiting", flood
+99+/exact-143/145-total/generic-more/one-unit ages, cap boundary 99 vs 100,
+registry id-uniqueness + shared capturedAt, deskClock timezone-free.
+
+### S4 — dynamized (`?menubar=` route)
+
+`src/components/MenubarScreen.tsx` — a separate render path like
+InstallScreen (App.tsx early-return above the install layer; main.tsx parses
+`?menubar=`). `?menubar=busy|quiet|stale|overload|flood` (or bare `?menubar=1`
+→ busy); unknown names fall through to the map (tested). `busy` IS v8Baseline;
+quiet/stale/overload/flood are plain MapFixtures in
+`src/fixtures/menubar-extremes.ts` (registry `menubarFixtures`) — stale is
+v8Baseline with a 47m-old fetch, overload/flood carry the S1 head items
+verbatim as data plus deterministic index-generated filler (143 waiting /
+2 conflicts / 31 running for flood). Dev switcher = the shared
+`.fixture-switch` select (`?switcher=0` hides it).
+
+CSS ported into app.css under `.mbdesk` (static's `.div/.foot/.spacer`
+renamed `.mb-div/.mb-foot/.mb-spacer` to dodge app collisions; `.stat`,
+`.pill`, `.fresh` reused ON PURPOSE — same v8 vocabulary; `.drop .stat`
+gets the static's `border:0` button fix). Badge reuses the map's `breathe`
+keyframes (identical .82→1 / 2.8s). Anchor = layout-effect + resize listener
+(`innerWidth - rect.right - 2`, min 8), same math as the static's JS.
+
+**Parity (busy/quiet/stale × 1280×800, `menubar-s4-*` vs `menubar-s1-*`):**
+pixel-equivalent — same strip, item, badge, dropdown geometry, pills, rows,
+footer. Deliberate data-rule deltas, each ASSERTED in
+tests/menubar-parity.spec.ts:
+1. busy/stale conflict row age **"8m"** (detectedAt basis) vs static "31m";
+2. flood ages **"2h"/"1h"** per derive.ts's one-unit rule vs static's
+   hand-written compound "1h44m"/"1h12m";
+3. flood **"2 conflicts"** pluralized (static's "2 conflict" treated as a
+   typo — v8 titlebar language pluralizes);
+4. clock **"Sun Jul 12  10:22"** derived from capturedAt (consistent with
+   every age in the dropdown) vs the static's decorative "Fri Jul 11 09:41";
+5. tooltips composed from data (iter-17 precedent) — same intent, mechanical
+   phrasing.
+
+### S5 — interactions
+
+tests/menubar-interactions.spec.ts (**14**) + menubar-parity.spec.ts (**20**):
+- item click closes/reopens (aria-expanded + .open tracked); dropdown starts
+  OPEN on the demo route (the dropdown is the subject; real app starts
+  closed — fork);
+- Escape + outside-click (desktop) close WITH focus return to the item
+  (rAF, keyboard-parity principle); clicks inside non-buttons don't close;
+- selection semantics: rows / stat pills / overflow line / both footer
+  buttons close the menu like a real menubar selection, focus back on the
+  item — the "opens the main window at …" intent lives in each tooltip
+  (demo has no main window; fork);
+- badge matrix: busy "1" breathing (computed animationName = breathe) /
+  quiet absent / stale gray + animationName none / overload "12" / flood
+  "99+" with exact 143 in badge + item tips;
+- needs-you rows carry click-intent tooltips on all 4 row-bearing variants;
+  conflict row tooltip names BOTH tasks;
+- tooltip 260ms intent delay (nothing at 80ms, on at ~400ms, real content,
+  instant hide); every dropdown text leaf under a [data-tip] ancestor ×5
+  variants;
+- keyboard: Tab from the item walks stats → rows → more → footer in DOM
+  order; Enter on a row selects (closes + focus return); Escape-close then
+  Enter-reopen re-anchors under the item;
+- geometry @1280×800 + 1440×900: item center inside the dropdown's x-range,
+  dropdown fully in viewport, zero page overflow both axes.
+
+### Scale-extremes closure (S3-S5 scope — S1 answers above still hold)
+
+- **N=0**: quiet fixture (badge absent, alive-only stat, honest line) AND the
+  true zero (no sessions at all) → "All quiet — nothing running, nothing
+  needs you.", zero stat pills (unit-tested).
+- **N=1/small**: busy (2 rows) — dropdown shrinks to content, tested.
+- **N=many**: overload/flood as DATA now (12/145 needs-you) → top-3 + exact
+  remainder line; list never scrolls (unit + e2e).
+- **TEXT long**: 64-char overload title probed `scrollWidth > clientWidth`
+  (real ellipsis) with the full story in the tooltip.
+- **NUMBER huge**: 99+ badge cap with exact counts in tips (boundary
+  unit-tested 99/100); pills render exact counts (143 < the app-wide ≥1000
+  abbreviation threshold).
+- **SPACE tiny**: the item = icon+count rung; recovery surface = dropdown
+  (unchanged from S1; now reachable by click).
+- **DYNAMIC**: open/close/Escape/outside/selection all yield space back and
+  return focus; hidden info (full titles, exact counts, pair identities)
+  reachable via tooltips; variants via fixtures through one rollup.
+- **SCREENS**: 1280×800 + 1440×900 anchored/in-viewport/no-overflow tested.
+
+### Gates (iter-20)
+
+tsc --noEmit clean · pnpm build green · Playwright FULL **156/156**
+(122 existing untouched + 34 new) · vitest **27/27** (11 + 16 new).
+
+### Open questions for S3-S5 (S1-era — all answered above)
 
 1. Types/fixtures: counts + top items should be a pure rollup over the existing
    `MapFixture` task states — reuse, don't mint a menubar fixture shape.

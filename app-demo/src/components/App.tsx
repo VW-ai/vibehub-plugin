@@ -15,10 +15,13 @@ import {
   conflictFixtureByName,
   installFixtureByName,
   installFixtures,
+  menubarFixtureByName,
+  menubarFixtures,
   panelFixtureByName,
   panelForTask,
 } from "../fixtures";
 import { InstallScreen } from "./InstallScreen";
+import { MenubarScreen } from "./MenubarScreen";
 import { Titlebar } from "./Titlebar";
 import { TaskRail } from "./TaskRail";
 import { MapCanvas } from "./MapCanvas";
@@ -47,6 +50,13 @@ export interface AppProps {
    * state through the install fixtures.
    */
   initialInstall?: string | undefined;
+  /**
+   * `?menubar=<variant>` dev param (m5 S4): render the menubar surface — a
+   * separate demo render path (like InstallScreen) showing the closed-app
+   * "still watching" state. Variants busy/quiet/stale/overload/flood map to
+   * MapFixtures through the pure rollup; `1` → busy; unknown → map.
+   */
+  initialMenubar?: string | undefined;
 }
 
 export function App({
@@ -56,7 +66,18 @@ export function App({
   initialPanel,
   initialConflict,
   initialInstall,
+  initialMenubar,
 }: AppProps) {
+  // Menubar surface (m5): its own demo route, above every window layer —
+  // the whole point is that the main window is CLOSED. Unknown names fall
+  // through to the install/map paths.
+  const [menubarName, setMenubarName] = useState<string | null>(() =>
+    initialMenubar && menubarFixtureByName(initialMenubar)
+      ? initialMenubar === "1"
+        ? "busy"
+        : initialMenubar
+      : null,
+  );
   // Connection-state layer (m4): while a first-run fixture is the subject,
   // the map path below never renders. Unknown names fall through to the map.
   const [installName, setInstallName] = useState<string | null>(() =>
@@ -185,6 +206,27 @@ export function App({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [panel]);
+
+  /* ── menubar surface (m5 S4) — its own render path, no window at all ── */
+  const menubarFixture = menubarName ? menubarFixtureByName(menubarName) : null;
+  if (menubarName && menubarFixture) {
+    const switchMenubar = (name: string) => {
+      if (!menubarFixtureByName(name)) return;
+      setMenubarName(name);
+      const url = new URL(window.location.href);
+      url.searchParams.set("menubar", name);
+      window.history.replaceState(null, "", url);
+    };
+    return (
+      <MenubarScreen
+        fixture={menubarFixture}
+        variantNames={Object.keys(menubarFixtures)}
+        activeVariant={menubarName}
+        showSwitcher={showSwitcher}
+        onSwitch={switchMenubar}
+      />
+    );
+  }
 
   /* ── connection-state layer (m4 S4) — above the map render path ─────── */
   const installFixture = installName ? installFixtureByName(installName) : null;

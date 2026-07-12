@@ -495,3 +495,112 @@ svg{vertical-align:-2px}
   .grade,.cfoot,.symtoggle .car,.split .car{transition:none}
   .connect,.connect.out,.step .ic .busy,.mapstat .dot,.fp-pop,.first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:none}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   menubar (m5, S4) — ported from static/menubar-s1.html (approved S1+S2).
+   Separate demo surface: .mbdesk replaces .window entirely (?menubar=).
+   Reused app vocabulary ON PURPOSE: .stat / .pill / .fresh (v8 language).
+   Renames vs the static to dodge app collisions: .div → .mb-div,
+   .foot → .mb-foot, .spacer → .mb-spacer. ═══════════════════════════════ */
+
+/* the desktop: subtle generic wallpaper (context scaffolding, not product) */
+.mbdesk{position:fixed;inset:0;overflow:hidden;font-family:var(--sans);color:var(--ink-900);
+  background:
+    radial-gradient(1100px 640px at 22% 118%, rgba(122,146,158,.34), transparent 62%),
+    radial-gradient(900px 560px at 84% -12%, rgba(255,255,255,.5), transparent 58%),
+    linear-gradient(158deg,#c8cdd0 0%,#b8c2c6 46%,#a9b6ba 100%)}
+.mbdesk button{font-family:inherit}
+.mbdesk button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.mbdesk button:focus:not(:focus-visible){outline:none}
+
+/* menubar strip: system-ish, generic shapes only */
+.mbdesk .menubar{position:relative;height:25px;display:flex;align-items:center;gap:var(--sp-4);padding:0 var(--sp-3);
+  background:rgba(250,250,249,.72);backdrop-filter:blur(18px);box-shadow:0 1px 0 rgba(20,22,26,.08);
+  font-size:var(--fs-3);color:var(--ink-900)}
+.mbdesk .os{display:flex;align-items:center;color:var(--ink-900);cursor:default}
+.mbdesk .appname{font-weight:650;cursor:default}
+.mbdesk .menus{display:flex;gap:var(--sp-4);color:var(--ink-700);cursor:default}
+.mb-spacer{flex:1}
+.mbdesk .status{display:flex;align-items:center;gap:2px;color:var(--ink-700)}
+.mbdesk .sit{height:21px;display:flex;align-items:center;padding:0 7px;border-radius:4px;cursor:default}
+.mbdesk .clock{padding:0 var(--sp-2);font-size:var(--fs-3);color:var(--ink-900);cursor:default;font-variant-numeric:tabular-nums}
+
+/* the Vibehub menubar item — the only live pixel in the strip */
+.vhitem{position:relative;height:21px;display:flex;align-items:center;padding:0 7px;border:0;border-radius:4px;
+  background:none;cursor:pointer;color:var(--ink-900);transition:background var(--t-fast) var(--ease)}
+.vhitem:hover{background:rgba(25,27,31,.08)}
+.vhitem.open{background:rgba(25,27,31,.14)}
+/* waiting badge: THE one persistent animation on this screen (breathe, shared
+   keyframes with the map's clash counter — same .82→1 / 2.8s language) */
+.vhitem .badge{position:absolute;top:-3px;right:-4px;min-width:14px;height:14px;display:flex;align-items:center;justify-content:center;
+  padding:0 4px;border-radius:7px;background:var(--need);color:#fff;font-size:var(--fs-1);font-weight:600;
+  font-family:var(--mono);line-height:1;box-shadow:0 0 0 1.5px rgba(250,250,249,.9);animation:breathe 2.8s var(--ease) infinite}
+/* stale badge: last-known count, no urgency claim — gray, no breathe */
+.vhitem .badge.stale{background:var(--ink-400);animation:none}
+
+/* dropdown (340px), anchored under the Vibehub item (right set inline by JS) */
+.drop{position:absolute;top:31px;width:340px;background:var(--card);border-radius:var(--r-m);
+  box-shadow:0 14px 44px rgba(15,17,21,.24),0 2px 8px rgba(15,17,21,.1),inset 0 0 0 .5px rgba(25,27,31,.06);
+  padding:var(--sp-2);animation:dropIn var(--t-base) var(--ease) backwards;z-index:5}
+@keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* repo line */
+.rline{display:flex;align-items:center;gap:6px;padding:var(--sp-1) var(--sp-2);min-width:0}
+.rline svg{flex:none;color:var(--ink-500)}
+.rline .name{font-size:var(--fs-3);font-weight:600;color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.rline .gap{flex:1}
+.rline .fresh{flex:none;gap:5px;cursor:help}
+
+/* stale honesty line (decision-github-002: never pretend real-time) */
+.stalenote{margin:2px var(--sp-2) var(--sp-1);font-size:var(--fs-2);color:var(--ink-500);line-height:1.5;cursor:help}
+
+/* counts: the app titlebar's .stat pills verbatim; button UA border off */
+.drop .counts{display:flex;gap:var(--sp-1);padding:var(--sp-1) var(--sp-2) var(--sp-2)}
+.drop .stat{border:0}
+
+.mb-div{height:1px;background:var(--ink-150);margin:0 var(--sp-2) var(--sp-2)}
+
+/* "Needs you" — v8 group header language */
+.drop .gh{display:flex;justify-content:space-between;font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;
+  color:var(--ink-400);text-transform:uppercase;padding:0 var(--sp-2) 6px;line-height:1.4;cursor:help}
+.drop .gh b{font-family:var(--mono);font-weight:500}
+
+/* top items needing you: one line each — pill, title (ellipsis), age */
+.drop .item{width:100%;display:flex;align-items:center;gap:var(--sp-2);min-width:0;padding:5px var(--sp-2);
+  border:0;background:none;text-align:left;border-radius:var(--r-s);cursor:pointer;
+  transition:background var(--t-fast) var(--ease)}
+.drop .item:hover{background:var(--ink-100)}
+.drop .item:active{background:var(--ink-150)}
+.drop .item .pill{cursor:pointer}
+.drop .item .t{flex:1;min-width:0;font-size:var(--fs-4);font-weight:600;letter-spacing:-.1px;line-height:1.45;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-900)}
+.drop .item .age{flex:none;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+/* overflow line: text-first, quiet */
+.drop .more{width:100%;border:0;background:none;text-align:left;display:block;padding:3px var(--sp-2) 5px;
+  font-size:var(--fs-2);color:var(--ink-500);border-radius:var(--r-s);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.drop .more:hover{background:var(--ink-100)}
+
+/* all-quiet line */
+.quietline{display:flex;align-items:center;gap:7px;padding:var(--sp-1) var(--sp-2) var(--sp-2);
+  font-size:var(--fs-3);color:var(--ink-500);line-height:1.5;cursor:help}
+.quietline svg{flex:none;color:var(--alive)}
+
+/* footer: quiet primary + secondary */
+.mb-foot{display:flex;gap:var(--sp-2);padding:0 var(--sp-1) var(--sp-1)}
+.mb-foot button{flex:1;height:28px;border:0;border-radius:var(--r-s);font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
+.open-app{background:var(--ink-900);color:#fbfbfa;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+.open-app:hover{background:#26282e;box-shadow:0 2px 6px rgba(20,22,26,.2)}
+.open-app:active{box-shadow:0 1px 2px rgba(20,22,26,.18)}
+.start-task{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200)}
+.start-task:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+.start-task:active{box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200)}
+
+/* dev variant switcher placement (shared .fixture-switch look) */
+.mb-switch{position:fixed;right:10px;bottom:10px;z-index:98}
+
+@media (prefers-reduced-motion: reduce){
+  .vhitem .badge,.drop{animation:none}
+  .vhitem,.drop .item,.drop .more,.mb-foot button{transition:none}
+}

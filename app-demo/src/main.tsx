@@ -23,6 +23,11 @@ const initialConflict = params.get("conflict") ?? undefined;
 // layer above the map. All 10 install fixtures are reachable by name
 // (e.g. ?install=connect, ?install=nine-footprints). Unknown names → map.
 const initialInstall = params.get("install") ?? undefined;
+// `?menubar=<variant>` renders the menubar surface (m5): a generic desktop +
+// the Vibehub menubar item + dropdown INSTEAD of the map window. Accepts the
+// five S1 variant names (busy/quiet/stale/overload/flood) or the bare flag
+// `?menubar=1` (→ busy). Unknown names fall through to the map.
+const initialMenubar = params.get("menubar") ?? undefined;
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
@@ -34,6 +39,7 @@ if (rootEl) {
       initialPanel={initialPanel}
       initialConflict={initialConflict}
       initialInstall={initialInstall}
+      initialMenubar={initialMenubar}
     />,
   );
 }

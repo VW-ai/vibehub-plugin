@@ -34,6 +34,12 @@ import {
   installFirstTask200,
 } from "./install-first-run";
 import { installNineFootprints, installTinyRepo } from "./install-extremes";
+import {
+  menubarQuiet,
+  menubarStale,
+  menubarOverload,
+  menubarFlood,
+} from "./menubar-extremes";
 
 export { v8Baseline, extremeEmptyProject, extremeScopeOverload, extremeFortyTerritories };
 export { panelRefactorAuth, panelJustLaunched, panelMarathon, panelQuietMilestones };
@@ -152,4 +158,27 @@ export const installFixtures: Record<string, InstallFixture> = {
 /** `?install=` dev param (S4): accepts the S2 variant names verbatim. */
 export function installFixtureByName(name: string): InstallFixture | null {
   return installFixtures[name] ?? null;
+}
+
+export { menubarQuiet, menubarStale, menubarOverload, menubarFlood };
+
+/**
+ * Menubar-route fixtures (m5, S4) — plain MapFixtures keyed by the approved
+ * S1 variant names. `busy` IS the shared v8Baseline (one source of truth for
+ * the default demo data); the others live in menubar-extremes.ts. They are
+ * NOT in the map `fixtures` registry: the menubar reads counts/names only,
+ * so their occupancy/geometry is deliberately not map-grade.
+ */
+export const menubarFixtures: Record<string, MapFixture> = {
+  busy: v8Baseline,
+  quiet: menubarQuiet,
+  stale: menubarStale,
+  overload: menubarOverload,
+  flood: menubarFlood,
+};
+
+/** `?menubar=` dev param: variant name, or the bare flag `1` → busy. */
+export function menubarFixtureByName(name: string): MapFixture | null {
+  if (name === "1") return menubarFixtures["busy"] ?? null;
+  return menubarFixtures[name] ?? null;
 }
