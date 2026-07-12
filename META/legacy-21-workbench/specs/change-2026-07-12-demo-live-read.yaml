@@ -22,7 +22,7 @@ intent:
       "DONE TODAY" 组不再混入陈旧 done。core vitest 75/75。
     - 遗留(有意延后):demo 的契约类型副本未消灭——需要 core 提供
       browser-safe 的 types-only subpath export(packaging pass),
-      不值得为去重赌 172 条 e2e;镜像纪律(改必同步)继续生效。
+      不值得为去重赌 172 条 e2e;镜像纪律(改必同步)继续生效。Wayne 2026-07-12 裁决④确认:维持镜像纪律,M2 碰 core 打包时一并做 subpath export 再合。
 indexing:
   type: change
   priority: P0
