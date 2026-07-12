@@ -26,6 +26,13 @@ import type { Db } from "./db.js";
 
 /* ── tasks ──────────────────────────────────────────────────────────────── */
 
+/**
+ * The branch → task join key (decision-project-024). The hook write path
+ * and the fixture read path MUST agree on this format — it is the only
+ * thing matching a local session to its map row, so it lives exactly once.
+ */
+export const taskIdForBranch = (branch: string): string => `branch:${branch}`;
+
 export interface TaskRow {
   id: string;
   repoId: number;
@@ -159,6 +166,34 @@ export function appendEvent(
   ).run(repoId, taskId, sessionId, event.type, event.at, JSON.stringify(event));
 }
 
+/**
+ * Whether the task has ever emitted an event of this type — an indexed
+ * lookup on the `type` column, NOT a timeline parse (the hook path asks
+ * this on every prompt submit).
+ */
+export function hasEvent(
+  db: Db,
+  taskId: string,
+  type: TimelineEvent["type"],
+): boolean {
+  return (
+    db
+      .prepare(`SELECT 1 FROM events WHERE task_id = ? AND type = ? LIMIT 1`)
+      .get(taskId, type) !== undefined
+  );
+}
+
+/**
+ * Most recent event timestamp in the repo (ISO), null when hooks have never
+ * fired — the honest source of SyncFreshness.lastHookEventAt.
+ */
+export function lastHookEventAt(db: Db, repoId: number): string | null {
+  const r = db
+    .prepare(`SELECT MAX(at) AS m FROM events WHERE repo_id = ?`)
+    .get(repoId) as { m: string | null };
+  return r.m;
+}
+
 /** The task's timeline, chronological (contract: ascending \`at\`). */
 export function readTimeline(db: Db, taskId: string): TimelineEvent[] {
   const rows = db
@@ -182,6 +217,17 @@ export function addFootprint(db: Db, repoId: number, f: FootprintRow): void {
     `INSERT INTO footprints (repo_id, task_id, session_id, path, action, at)
      VALUES (?, ?, ?, ?, ?, ?)`,
   ).run(repoId, f.taskId, f.sessionId, f.path, f.action, f.at);
+}
+
+/** Distinct files the task has EDITED — counted in SQL, never materialized. */
+export function distinctEditedFileCount(db: Db, taskId: string): number {
+  const r = db
+    .prepare(
+      `SELECT COUNT(DISTINCT path) AS n FROM footprints
+       WHERE task_id = ? AND action = 'edit'`,
+    )
+    .get(taskId) as { n: number };
+  return r.n;
 }
 
 export function readFootprints(db: Db, taskId: string): FootprintRow[] {

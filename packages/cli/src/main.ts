@@ -15,32 +15,34 @@
  * DB override: --db or VIBEHUB_DB (hooks configs use env, not flags).
  */
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import {
-  defaultDbPath,
   exportTeamMapFixture,
   GitFacade,
   ingestHookEvent,
   openDb,
+  resolveDbPath,
   syncTeamSnapshot,
+  vibehubHome,
   type HookEventName,
   type HookPayload,
 } from "@vibehub/core";
 
 interface Flags {
   repo: string;
+  /** Resolved DB path: explicit --db > VIBEHUB_DB > default (core policy). */
   db: string;
   out?: string;
   json: boolean;
 }
 
 function parseFlags(argv: string[]): Flags {
-  const flags: Flags = { repo: process.cwd(), db: defaultDbPath(), json: false };
+  let dbFlag: string | undefined;
+  const flags = { repo: process.cwd(), out: undefined as string | undefined, json: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--repo") flags.repo = argv[++i] ?? flags.repo;
-    else if (a === "--db") flags.db = argv[++i] ?? flags.db;
+    else if (a === "--db") dbFlag = argv[++i];
     else if (a === "--out") flags.out = argv[++i];
     else if (a === "--json") flags.json = true;
     else {
@@ -48,7 +50,7 @@ function parseFlags(argv: string[]): Flags {
       process.exit(2);
     }
   }
-  return flags;
+  return { ...flags, db: resolveDbPath(dbFlag) };
 }
 
 const USAGE = `usage:
@@ -78,8 +80,7 @@ function readStdin(): string {
  * break the user's session; failures go to ~/.vibehub/hook.log.
  */
 function runHook(eventArg: string | undefined, rest: string[]): number {
-  const flags = parseFlags(rest);
-  const dbPath = process.env["VIBEHUB_DB"] ?? flags.db;
+  const dbPath = parseFlags(rest).db;
   try {
     const raw = readStdin();
     const payload = JSON.parse(raw) as HookPayload;
@@ -94,7 +95,7 @@ function runHook(eventArg: string | undefined, rest: string[]): number {
     }
   } catch (err) {
     try {
-      const logDir = path.join(os.homedir(), ".vibehub");
+      const logDir = vibehubHome();
       fs.mkdirSync(logDir, { recursive: true });
       fs.appendFileSync(
         path.join(logDir, "hook.log"),

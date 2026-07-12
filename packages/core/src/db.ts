@@ -16,8 +16,21 @@ import path from "node:path";
 
 export type Db = Database.Database;
 
+/** ~/.vibehub — the one place the data dir is spelled. */
+export function vibehubHome(): string {
+  return path.join(os.homedir(), ".vibehub");
+}
+
 export function defaultDbPath(): string {
-  return path.join(os.homedir(), ".vibehub", "workbench.db");
+  return path.join(vibehubHome(), "workbench.db");
+}
+
+/**
+ * The one DB-path policy for every adapter (CLI, vite middleware, future
+ * Tauri shell): explicit flag > VIBEHUB_DB env > default.
+ */
+export function resolveDbPath(explicit?: string): string {
+  return explicit ?? process.env["VIBEHUB_DB"] ?? defaultDbPath();
 }
 
 const MIGRATIONS: string[] = [

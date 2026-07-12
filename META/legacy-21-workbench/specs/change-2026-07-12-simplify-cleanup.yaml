@@ -1,0 +1,52 @@
+spec_id: "change-2026-07-12-simplify-cleanup"
+type: change
+state: active
+intent:
+  summary: "/simplify 四路审查(reuse/simplification/efficiency/altitude)对 M1+treemap 代码的清理落地:hook 热路径 6 spawn→稳态 1 spawn、fixture-export 重排(单次 done-today 过滤/真 lastHookEventAt/store 边界)、DB 路径策略收进 core、行映射样板削除"
+  detail: |
+    热路径(vibehub hook,每个 tool use 触发):
+    - GitFacade.sessionContextAt 单 spawn 拿齐 repoRoot/toplevel/branch;
+      slug/defaultBranch 走 repos 行快路径,仅首见 repo 时 spawn;
+    - launch 判定 hasEvent(type 列索引查询)替全时间线 JSON.parse;
+    - transcript 尾窗读(256KiB tunable,全文件兜底)替整文件读。
+    批路径(team sync):ahead-behind 批量随 for-each-ref 单 spawn
+    (%(ahead-behind),git≥2.41,老 git 自动回退逐分支)。
+    fixture-export 重排:任务合并单列表+done-today 过滤只写一处;
+    lastHookEventAt 由 MAX(events.at) 真派生(替 b3 前的 null 化石);
+    裸 anchors SQL 收进 graph-store.countAnchoredFiles;灰区 pre-蒸馏
+    布局改走 layoutTerritories 单项(消灭 88 vs 88.5 双源漂移);
+    uncategorizedWriteScope/occupancy 助手去重;footprint 计数 SQL
+    COUNT(DISTINCT) 替全量物化。
+    边界与策略:resolveDbPath(--db > VIBEHUB_DB > default)收进 core,
+    三个 adapter 同源(顺修 hook 路径 --db 被 env 压过的不一致);
+    vibehubHome 单点;taskIdForBranch join key 单点(写读两侧共用);
+    team-store 行映射改 SQL 别名(仅 int→bool 留 JS 转换),
+    upsertRepo 复用 getRepoByRoot。
+    跳过(记录不修):injectable-clock 三处内联(局部性优于抽象);
+    conflicts/diagnosis/notification store 面先于调用者存在
+    (M2 MCP/ConflictEngine 的契约预置,非死代码);listTerritories
+    N+1(蒸馏出数百 feature 前是理论成本)。
+    Gates:core vitest 93/93(+5)、demo 44/44、Playwright 172/172、
+    tsc ×3 clean、真 repo CLI 冒烟过。
+indexing:
+  type: change
+  priority: P1
+  layer: feature
+  domain: "workbench"
+  tags: [cleanup, performance, hot-path, refactor]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "/simplify 四路审查 session 2026-07-12"
+  produced_at: "2026-07-12"
+relations:
+  - target: "change-2026-07-12-hook-cli-heart"
+    type: relates_to
+    detail: "hook 毫秒级预算的兑现:稳态 1 spawn"
+anchors:
+  - file: "workbench/packages/core/src/git-facade.ts"
+    symbols: [GitFacade]
+  - file: "workbench/packages/core/src/fixture-export.ts"
+    symbols: [exportTeamMapFixture]
+  - file: "workbench/packages/core/src/db.ts"
+    symbols: [resolveDbPath, vibehubHome]

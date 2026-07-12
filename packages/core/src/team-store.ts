@@ -54,26 +54,17 @@ export function upsertRepo(
      ON CONFLICT(root_path) DO UPDATE SET
        slug = excluded.slug, default_branch = excluded.default_branch`,
   ).run(rootPath, slug, defaultBranch, now);
-  const row = db
-    .prepare(`SELECT id, root_path, slug, default_branch FROM repos WHERE root_path = ?`)
-    .get(rootPath) as { id: number; root_path: string; slug: string | null; default_branch: string };
-  return {
-    id: row.id,
-    rootPath: row.root_path,
-    slug: row.slug,
-    defaultBranch: row.default_branch,
-  };
+  return getRepoByRoot(db, rootPath)!;
 }
 
 export function getRepoByRoot(db: Db, rootPath: string): RepoRow | null {
   const row = db
-    .prepare(`SELECT id, root_path, slug, default_branch FROM repos WHERE root_path = ?`)
-    .get(rootPath) as
-    | { id: number; root_path: string; slug: string | null; default_branch: string }
-    | undefined;
-  return row
-    ? { id: row.id, rootPath: row.root_path, slug: row.slug, defaultBranch: row.default_branch }
-    : null;
+    .prepare(
+      `SELECT id, root_path AS rootPath, slug, default_branch AS defaultBranch
+       FROM repos WHERE root_path = ?`,
+    )
+    .get(rootPath) as RepoRow | undefined;
+  return row ?? null;
 }
 
 export function writeSyncState(
@@ -160,34 +151,14 @@ export function replaceTeamBranches(
 export function readTeamBranches(db: Db, repoId: number): TeamBranchRow[] {
   const rows = db
     .prepare(
-      `SELECT name, head_sha, last_commit_at, last_author, ahead, behind, merged,
-              pr_number, pr_state, pr_title
+      `SELECT name, head_sha AS headSha, last_commit_at AS lastCommitAt,
+              last_author AS lastAuthor, ahead, behind, merged,
+              pr_number AS prNumber, pr_state AS prState, pr_title AS prTitle
        FROM team_branches WHERE repo_id = ? ORDER BY last_commit_at DESC`,
     )
-    .all(repoId) as Array<{
-    name: string;
-    head_sha: string;
-    last_commit_at: string;
-    last_author: string;
-    ahead: number;
-    behind: number;
-    merged: number;
-    pr_number: number | null;
-    pr_state: string | null;
-    pr_title: string | null;
-  }>;
-  return rows.map((r) => ({
-    name: r.name,
-    headSha: r.head_sha,
-    lastCommitAt: r.last_commit_at,
-    lastAuthor: r.last_author,
-    ahead: r.ahead,
-    behind: r.behind,
-    merged: r.merged === 1,
-    prNumber: r.pr_number,
-    prState: (r.pr_state as TeamBranchRow["prState"]) ?? null,
-    prTitle: r.pr_title,
-  }));
+    .all(repoId) as Array<Omit<TeamBranchRow, "merged"> & { merged: number }>;
+  // only the int→boolean column needs a JS conversion
+  return rows.map((r) => ({ ...r, merged: r.merged === 1 }));
 }
 
 export function replaceBranchFiles(
@@ -245,24 +216,12 @@ export function reconcileConflicts(
 }
 
 export function readConflicts(db: Db, repoId: number): TeamConflictRow[] {
-  const rows = db
+  return db
     .prepare(
-      `SELECT branch_a, branch_b, path, first_detected_at, last_seen_at
+      `SELECT branch_a AS branchA, branch_b AS branchB, path,
+              first_detected_at AS firstDetectedAt, last_seen_at AS lastSeenAt
        FROM team_conflicts WHERE repo_id = ?
        ORDER BY branch_a, branch_b, path`,
     )
-    .all(repoId) as Array<{
-    branch_a: string;
-    branch_b: string;
-    path: string;
-    first_detected_at: string;
-    last_seen_at: string;
-  }>;
-  return rows.map((r) => ({
-    branchA: r.branch_a,
-    branchB: r.branch_b,
-    path: r.path,
-    firstDetectedAt: r.first_detected_at,
-    lastSeenAt: r.last_seen_at,
-  }));
+    .all(repoId) as TeamConflictRow[];
 }

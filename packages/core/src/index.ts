@@ -2,7 +2,13 @@ export * from "./contract/map-types.js";
 export * from "./contract/panel-types.js";
 export * from "./contract/conflict-types.js";
 export * from "./contract/install-types.js";
-export { defaultDbPath, openDb, type Db } from "./db.js";
+export {
+  defaultDbPath,
+  openDb,
+  resolveDbPath,
+  vibehubHome,
+  type Db,
+} from "./db.js";
 export * from "./activity-store.js";
 export * from "./graph-store.js";
 export {

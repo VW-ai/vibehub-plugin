@@ -8,8 +8,11 @@ import {
   addFootprint,
   appendEvent,
   claimPendingInjections,
+  distinctEditedFileCount,
   enqueueInjection,
+  hasEvent,
   insertConflict,
+  lastHookEventAt,
   listTasks,
   notificationCountSince,
   readConflict,
@@ -122,6 +125,30 @@ describe("ActivityStore (运行域)", () => {
     // insert shuffled; read must come back chronological (contract)
     for (const e of [...events].reverse()) appendEvent(db, 1, "t1", null, e);
     expect(readTimeline(db, "t1")).toEqual(events);
+  });
+
+  it("hasEvent answers via the type column without parsing payloads", () => {
+    upsertTask(db, task("t1"));
+    expect(hasEvent(db, "t1", "launch")).toBe(false);
+    appendEvent(db, 1, "t1", null, { id: "e1", at: T(1), type: "launch", prompt: "go" });
+    expect(hasEvent(db, "t1", "launch")).toBe(true);
+    expect(hasEvent(db, "t1", "commit")).toBe(false);
+  });
+
+  it("lastHookEventAt = max event timestamp per repo, null before any hook", () => {
+    upsertTask(db, task("t1"));
+    expect(lastHookEventAt(db, 1)).toBeNull();
+    appendEvent(db, 1, "t1", null, { id: "e1", at: T(1), type: "launch", prompt: "go" });
+    appendEvent(db, 1, "t1", null, { id: "e2", at: T(5), type: "self_report", text: "hi" });
+    expect(lastHookEventAt(db, 1)).toBe(T(5));
+  });
+
+  it("counts distinct edited files in SQL (reads and repeats excluded)", () => {
+    upsertTask(db, task("t1"));
+    addFootprint(db, 1, { taskId: "t1", sessionId: null, path: "a.ts", action: "edit", at: T(1) });
+    addFootprint(db, 1, { taskId: "t1", sessionId: null, path: "a.ts", action: "edit", at: T(2) });
+    addFootprint(db, 1, { taskId: "t1", sessionId: null, path: "b.ts", action: "read", at: T(3) });
+    expect(distinctEditedFileCount(db, "t1")).toBe(1);
   });
 
   it("derives scope filesTouched from footprints × anchors (never stored)", () => {

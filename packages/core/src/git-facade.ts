@@ -46,6 +46,14 @@ export interface RemoteBranch {
   /** Committer date of the tip (ISO 8601). */
   lastCommitAt: string;
   lastAuthor: string;
+  /**
+   * Commits ahead/behind of the compare ref, when listRemoteBranches was
+   * given one AND git supports %(ahead-behind) (≥ 2.41). ahead === 0 ⇔ the
+   * tip is contained in the compare ref (merged). Absent on older git —
+   * callers fall back to per-branch queries.
+   */
+  ahead?: number;
+  behind?: number;
 }
 
 export interface BranchFile {
@@ -135,26 +143,53 @@ export class GitFacade {
     return { ok: r.status === 0, stderr: r.stderr };
   }
 
-  /** All remote branches except origin/HEAD, newest commit first. */
-  listRemoteBranches(): RemoteBranch[] {
-    const out = this.git([
+  /**
+   * All remote branches except origin/HEAD, newest commit first. With
+   * `aheadBehindVs` (a branch name on origin), each entry also carries
+   * ahead/behind vs that branch in the SAME spawn (%(ahead-behind), git ≥
+   * 2.41) — one call instead of 2 per branch; silently falls back to the
+   * plain listing on older git.
+   */
+  listRemoteBranches(aheadBehindVs?: string): RemoteBranch[] {
+    const base =
+      "%(refname:short)%09%(objectname)%09%(committerdate:iso-strict)%09%(authorname)";
+    let out: string | null = null;
+    let withCounts = false;
+    if (aheadBehindVs) {
+      out = this.tryGit([
+        "for-each-ref",
+        "refs/remotes/origin",
+        "--sort=-committerdate",
+        `--format=${base}%09%(ahead-behind:origin/${aheadBehindVs})`,
+      ]);
+      withCounts = out !== null;
+    }
+    out ??= this.git([
       "for-each-ref",
       "refs/remotes/origin",
       "--sort=-committerdate",
-      "--format=%(refname:short)%09%(objectname)%09%(committerdate:iso-strict)%09%(authorname)",
+      `--format=${base}`,
     ]);
     const branches: RemoteBranch[] = [];
     for (const line of out.split("\n")) {
       if (!line.trim()) continue;
-      const [ref, sha, date, author] = line.split("\t");
+      const [ref, sha, date, author, counts] = line.split("\t");
       if (!ref || !sha || !date) continue;
       if (ref === "origin/HEAD" || ref === "origin") continue;
-      branches.push({
+      const branch: RemoteBranch = {
         name: ref.replace(/^origin\//, ""),
         headSha: sha,
         lastCommitAt: date,
         lastAuthor: author ?? "",
-      });
+      };
+      if (withCounts && counts) {
+        const [ahead, behind] = counts.trim().split(/\s+/).map(Number);
+        if (Number.isFinite(ahead) && Number.isFinite(behind)) {
+          branch.ahead = ahead;
+          branch.behind = behind;
+        }
+      }
+      branches.push(branch);
     }
     return branches;
   }
@@ -249,6 +284,43 @@ export class GitFacade {
   static toplevelAt(anyPath: string): string | null {
     const r = run("git", ["rev-parse", "--show-toplevel"], anyPath);
     return r.status === 0 ? r.stdout.trim() : null;
+  }
+
+  /**
+   * The three session facts the hook path needs, in ONE spawn — `vibehub
+   * hook` fires on every tool use and must stay milliseconds, so per-fact
+   * subprocesses are the budget's biggest enemy. rev-parse emits the
+   * answers line-by-line in argument order.
+   */
+  static sessionContextAt(anyPath: string): {
+    repoRoot: string;
+    toplevel: string;
+    branch: string | null;
+  } {
+    const r = run(
+      "git",
+      [
+        "rev-parse",
+        "--path-format=absolute",
+        "--git-common-dir",
+        "--show-toplevel",
+        "--abbrev-ref",
+        "HEAD",
+      ],
+      anyPath,
+    );
+    if (r.status !== 0) {
+      throw new GitError(["rev-parse", "(session context)"], r.status, r.stderr);
+    }
+    const [commonDir, toplevel, head] = r.stdout.trim().split("\n");
+    if (!commonDir || !toplevel || !head) {
+      throw new GitError(["rev-parse", "(session context)"], r.status, r.stdout);
+    }
+    return {
+      repoRoot: path.dirname(commonDir),
+      toplevel,
+      branch: head !== "HEAD" ? head : null,
+    };
   }
 
   /**
