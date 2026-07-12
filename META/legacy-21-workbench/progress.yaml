@@ -62,7 +62,7 @@ progress:
       gate: true
       notes: "第一批:设计块 A/B/C 落 draft(006 hook 九事件矩阵+robustness 判决/007 微协议四组 style-tiles 候选/008 MCP 工具 description 逐字+schema),⛔ 三卡点待 Wayne 逐块过(hooks 官方能力表 2026-07-12 抓取钉死,非凭记忆)。机械块 D 实装:注入投递扩 Stop(送达即唤醒)/SessionStart(离场补送),pause 批内最严胜出,claimed_at=送达回执+超时读侧推导(pendingInjections);里程碑机械兜底 classifyUserPrompt(routine ack 词表/milestone 结构或 CJK×2 加权长度/ambiguous 留薄 LLM);契约 +promptId/+classification。core vitest 105/105,core+cli tsc clean。待卡点后:块E hooks wiring+vibehub init+MCP server 实装+真 session 端到端。"
   commits:
-    - hash: "09f37b8"
+    - hash: "799eb2b"
       date: "2026-07-12"
       message: "[21-workbench] feat(m2): Claude Code 集成层第一批 — 设计块 A/B/C draft + 注入投递端/里程碑启发式"
       files_changed: 15
