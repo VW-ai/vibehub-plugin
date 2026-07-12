@@ -51,6 +51,14 @@ progress:
       status: pending
       gate: false
   commits:
+    - hash: "03ef9dd"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(backend-m1): vibehub hook CLI 心脏 — 写事件→查注入→退出,真 session 校准通过"
+      files_changed: 9
+      specs_affected:
+        - change-2026-07-12-hook-cli-heart (created)
+      milestones_affected:
+        - b3-hook-cli (→ completed)
     - hash: "33876f3"
       date: "2026-07-12"
       message: "[21-workbench] feat(backend-m1): 三表域 schema 直译 — migration 002 + ActivityStore/GraphStore"
