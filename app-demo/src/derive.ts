@@ -20,7 +20,19 @@ import type {
 
 /* ── formatting primitives ─────────────────────────────────────────────── */
 
-/** Relative age vs capturedAt: "42s", "12m", "3h" (deterministic). */
+/**
+ * Relative age vs capturedAt: "42s" → "12m" → "3h" → "2d" (deterministic).
+ *
+ * AGE FORMATTING RULE (shared by map rail and task panel):
+ *   - < 60 s → "Ns"
+ *   - < 60 m → "Nm"  (rounded to the nearest minute)
+ *   - < 24 h → "Nh"  (rounded to the nearest hour)
+ *   - ≥ 24 h → "Nd"  (rounded to the nearest day — 36h shows "2d")
+ * One unit only, never "1h 12m" — the surface stays scannable; the exact
+ * moment always travels in the tooltip (clockTime / full ISO).
+ * (Day rung added at task-panel S3; sub-day behavior byte-identical to the
+ * frozen v8 parity values, which never exceed hours.)
+ */
 export function relAge(iso: string, capturedAt: string): string {
   const s = Math.max(
     0,
@@ -29,7 +41,9 @@ export function relAge(iso: string, capturedAt: string): string {
   if (s < 60) return `${s}s`;
   const m = Math.round(s / 60);
   if (m < 60) return `${m}m`;
-  return `${Math.round(m / 60)}h`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h`;
+  return `${Math.round(h / 24)}d`;
 }
 
 /**
