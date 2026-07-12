@@ -9,7 +9,7 @@ progress:
     - id: m2-task-panel
       name: "Task panel (timeline + intervention)"
       status: in_progress
-      notes: "S1 done, next S2. Static English redo on v8 tokens at workbench/app-demo/static/task-panel-s1.html — 3 approved sections (identity / one-stream human timeline / pinned intervention deck), rendered in context over dimmed map, 520px right dock. Verified render 1280x800 + 1440x900 (no console errors, action row exact fit, timeline scrolls under pinned deck). Notes + S2 open questions in notes/task-panel.md; 4 forks logged to DECISIONS-NEEDED."
+      notes: "S2 done, next S3. Polish at static/task-panel-s2.html (S1 frozen for diff): 3-round self-review converged 8→1→0 defects (log in notes/task-panel.md). All 6 S1 open questions resolved: phead paper-tint band, scrim .22, open-scrolled-to-newest, Terminate isolation restored (gap 15→39px via 'AI diagnosis' copy), deck-only ask affordance, cross-read outline dot kept. Textarea autogrow 52→124px + internal scroll; scroll-aware tlbar shadow seam; styled scrollbars; View-transcript pressed state. Stress passed: 2-line title (single-line ellipsis rule + tooltip), 40+ entries (deck pinned, deckBottom==winBottom both sizes), 10-line injection. Zero console errors 1280x800+1440x900 across base/expanded/stress. Shots notes/shots/task-panel-s2-* (final + -r1/-r2). 4 forks logged to DECISIONS-NEEDED."
     - id: m3-conflict-card
       name: "Conflict adjudication card"
       status: planned

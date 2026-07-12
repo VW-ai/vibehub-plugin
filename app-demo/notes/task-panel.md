@@ -3,6 +3,8 @@
 S1 artifact: `workbench/app-demo/static/task-panel-s1.html` (self-contained, no
 network, opens from `file://`). Screenshots: `notes/shots/task-panel-s1-1280.png`,
 `-1440.png`, `-1280-expanded.png` (files entry open + transcript tail shown).
+S2 artifact: `workbench/app-demo/static/task-panel-s2.html` (same constraints;
+S1 file kept frozen for diffing). Screenshots: `notes/shots/task-panel-s2-*`.
 
 Source structure: `workbench-refs/task-panel.html` (Chinese mock — 3-section
 structure approved by Wayne, decision-project-023; styling NOT approved).
@@ -78,18 +80,72 @@ Visual system: v8 tokens verbatim (`:root` copied unchanged), tooltip JS verbati
   prompt, no fake entries), huge session counts ("session 12 of 12"), very long
   launch prompts (clamp? scroll?), waiting age > hours (12m → 3h → 2d display).
 
-## Open questions for S2
+## Open questions for S2 — RESOLVED at S2 (see review log below)
 
-1. Panel top: should identity get a subtle paper-tint band vs. flat white, to
-   separate from timeline without a border? (Currently 1px ink-150 line —
-   v8 uses hairlines in the titlebar, so it's on-system, but "shadows not
-   borders" may want a shadow seam instead.)
-2. WAITING pill placement — before the title (current, matches rail cards) or
-   after? Long titles push the age right; check with a 2-line-worthy title.
-3. Should the "Stopped to ask you" entry carry its own inline "Answer" affordance
-   that focuses the textarea, or is the pinned deck affordance enough?
-4. Cross-read notice: dot uses read-outline (new dot variant). Keep, or reuse a
-   plain gray dot and let the text carry it?
-5. Scrim strength .18 — screenshot check against map legibility; maybe .22.
-6. Mode toggle copy length ("Inject without interrupting") is near the seg
-   control's comfortable max — revisit if a third mode ever appears.
+1. Panel top seam → **paper-tint band** rgba(252,252,251,.8) on `.phead` (same
+   family as the deck; precedent = v8 rail bg rgba(252,252,251,.7)). Hairline
+   kept (on-system, v8 titlebar). Identity + deck now bookend the white
+   timeline well symmetrically.
+2. WAITING pill placement → **keep before title** (matches rail cards). Verified
+   with a 2-line-worthy title: pill stays put, title single-line ellipsizes,
+   age + close never move; full title lives in the h2 tooltip. Rule: task
+   titles are ALWAYS single-line ellipsis, tooltip carries full text.
+3. Ask-entry inline "Answer" affordance → **no inline button, deck-only.**
+   The panel now opens scrolled to the newest event, so the WAITING question
+   sits directly above the deck; an inline button would duplicate the primary
+   affordance (guideline 3: new concepts default to cut).
+4. Cross-read outline dot → **keep.** Reads deliberately quieter than filled
+   dots without inventing a color — outline=read is already the system's
+   language (v8 read territories are outlined).
+5. Scrim → **.22** (was .18). At .18 the white territories glared at panel-left;
+   .22 settles the map without hiding it.
+6. Mode toggle copy → **left as-is**, revisit only if a third mode appears.
+
+## S2 review log (kernel-style self-review, screenshots at 1280×800 + 1440×900)
+
+Artifact: `static/task-panel-s2.html`. Shots: `notes/shots/task-panel-s2-*`
+(final = round 3; `-r1`/`-r2` = earlier rounds; scenarios: base / expanded
+(files+transcript open) / stress (long title + 40 extra entries + 10-line
+textarea)). Zero console errors in every round, every size, every scenario.
+
+**Round 1 — 8 defects:**
+1. Header seam flat white + hairline only, asymmetric with the tinted deck →
+   phead paper-tint band (resolves open Q1).
+2. Scrim .18 too weak against white territories → .22 (Q5).
+3. The WAITING question — the reason the panel is open — was below the fold at
+   1280 (tlScroll 475 > client 434, scrollTop 0) → open scrolled to newest.
+4. Terminate "isolation" gap measured **15px** at 520px panel width — reads as
+   part of the button cluster, defeating S1's stated intent → shortened
+   "Run AI diagnosis" → "AI diagnosis" (tooltip keeps the full verb); gap now
+   **39px**, Terminate visually isolated again.
+5. Ask-entry affordance decided: deck-only, no inline button (Q3).
+6. Textarea fixed at 52px hid a 10-line answer with no growth or cue →
+   autogrow on input, 52px floor → 124px ceiling (6 lines of fs-3 × 1.5 + 2×8
+   padding), internal scroll beyond; deck grows, timeline flexes down, deck
+   bottom stays == window bottom (verified 776/776, 860/860).
+7. "View transcript" had no pressed state while the tail was open → `.quiet.on`
+   inset ring (ink-300) + ink-900 text, toggled with the tail.
+8. `.tl`/`.tail` had default scrollbars → thin 8px thumb (ink-200 on white,
+   #4a4d53 on the dark tail), transparent track, padding-box inset.
+   (Checked, not defects: 5/6px micro-spacing — v8 itself uses gap:5/6px;
+   timeline dot column alignment dotCy==tCy ±1px across entry kinds.)
+
+**Round 2 — 1 new defect:**
+9. With open-at-newest, clipped mid-line text collided visually with the
+   TIMELINE header/seg — no cue that content continues above → scroll-aware
+   shadow seam on `.tlbar` (0 1px 2px rgba(20,22,26,.08), shadows-not-borders),
+   on only when scrollTop>0, so the 1440 base view (timeline fits exactly)
+   stays shadow-free. Transition uses --t-fast; killed by reduced-motion.
+
+**Round 3 — 0 new defects.** Converged (8 → 1 → 0).
+
+## S2 stress-test outcomes
+
+- **2-line-worthy title:** single-line ellipsis rule holds; pill/age/close
+  fixed in place; full title in tooltip (rule recorded at Q2 above).
+- **40+ entry timeline:** deck stays pinned (deckBottom==winBottom at both
+  sizes), timeline scrolls under the seam shadow with the styled scrollbar;
+  native overflow scroll — no jank at this order of magnitude.
+- **10-line textarea:** grows 52→124px then scrolls internally; the half-clipped
+  7th line at the ceiling doubles as the scroll cue; the timeline yields the
+  space and takes it back when the text shrinks (autogrow recomputes per input).
