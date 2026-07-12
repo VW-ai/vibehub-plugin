@@ -1,0 +1,25 @@
+progress:
+  completion: 0.0
+  milestones:
+    - id: m1-map-main
+      name: "Map main view (scope occupancy) — dynamize from approved v8"
+      status: planned
+      gate: true
+      notes: "next stage: S3 (S1/S2 done via reference-screen-v8)"
+    - id: m2-task-panel
+      name: "Task panel (timeline + intervention)"
+      status: planned
+      notes: "next stage: S1 (English redo of task-panel mock, v8 tokens)"
+    - id: m3-conflict-card
+      name: "Conflict adjudication card"
+      status: planned
+      notes: "next stage: S1"
+    - id: m4-empty-install
+      name: "Empty state / first-run"
+      status: planned
+      notes: "next stage: S1"
+    - id: m5-menubar
+      name: "Menubar dropdown"
+      status: planned
+      notes: "next stage: S1"
+  commits: []

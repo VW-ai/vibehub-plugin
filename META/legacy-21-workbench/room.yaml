@@ -1,0 +1,7 @@
+id: "21-workbench"
+name: "Workbench — 本地工作台 app(舰队指挥台)"
+parent: "00-project-room"
+lifecycle: in-dev
+owner: Wayne
+created_at: "2026-07-12"
+updated_at: "2026-07-12"
