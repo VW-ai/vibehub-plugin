@@ -1,5 +1,5 @@
 progress:
-  completion: 1.0
+  completion: 0.7
   milestones:
     - id: m1-map-main
       name: "Map main view (scope occupancy) — dynamize from approved v8"
@@ -31,4 +31,33 @@ progress:
       status: completed
       gate: false
       notes: "A+B+④+⑦ done. rev-2 (iter-22): (④, REVOKES iter-7 scrim-over-rail, quote '左栏不要变灰') rail stays LIVE under an open panel/conflict card — scrim+blur cover the CANVAS only (left = --rail-w; conflict card centers over the canvas; divider z-5 stays resizable); another rail card = ONE-click swap-in-place (remount per task via key, opener re-targets for focus-return); same card/pill = toggle close; correlate suppressed while a modal is open (fork logged — veiled canvas would give half-feedback; focus-return correlate flash ⑤ still fires after close); mutual exclusivity + close paths unchanged; install screen keeps full scrim (empty placeholder rail). (⑦, decision-workbench-003, REVOKES iter-20 waiting-only badge) menubar badge = waiting + conflict PAIRS (a pair counts once); tips enumerate both ('1 waiting · 1 conflict'); stale badge stays gray/static; needs-you rows already subject-first — verified, no other UI change. Gates rev-2: tsc clean, build green, vitest 44/44 (42+2: single-waiting promise, pair-cap boundary), Playwright 170/170 (165+5: live-rail ×4, conflict canvas-scrim/toggle ×1; conflict-parity mutual-exclusivity rewired through the now-clickable rail pill) on DEMO_PORT=5499. All assertion deltas documented in DECISIONS-NEEDED rev-2 entries. rev-1 (iter-21) record: WAYNE VERDICTS 2026-07-12 (rule overrides, ratified — logged in DECISIONS-NEEDED): (A) rail-card chip rows WRAP, all chips visible, cards grow taller; +N demoted to >12-chip pathological fallback (first 11 + +N, deduped enumerating tooltip); branch chips show the FULL branch middle-truncated (middleTruncate() pure fn, 28-char budget sized to the 240px min rail; scope chips keep tail-ellipsis); fixture task-pathological-scopes (15 chips) keeps +N exercised. (B) resizable rail/canvas split: pointer-drag divider (no library, grab-offset-correct), clamp 240–480px, double-click resets 300px, localStorage persistence, keyboard accessible (role=separator + aria-value*, arrows ±16px); net-zero layout at the 300px default so fresh contexts stay v8-identical; chip wrap responds live to rail width (asserted at both clamp extremes). Tests: vitest 27→42 (derive.test.ts: middleTruncate edges + chip rules); Playwright 156→165 (old +8-collapse test → wrap/middle-truncation/pathological trio; rail-resize.spec.ts ×7); all spec URLs route through tests/env.ts DEMO_PORT so suites run on a private port (dev server on 5199 untouched). Gates: tsc clean, build green, vitest 42/42, Playwright 165/165 (DEMO_PORT=5299). Documented parity deltas: third scope-overload rail card; full-branch chips; 3-chip baseline cards may wrap to two chip rows."
-  commits: []
+    - id: b1-team-visibility-slice
+      name: "Backend M1 ①: 团队可见端到端垂直切片(git+gh→SQLite→map,decision-github-003 ② 硬门槛)"
+      status: completed
+      gate: true
+      notes: "workbench/packages/core+cli 诞生。GitFacade(fetch/branch/足迹 diff/merge-tree 预警/gh pr,worktree 归域 github-004)+ SQLite WAL 团队子集(repos/sync_state/team_branches/team_branch_files/team_conflicts,按 repo 分域)+ team-sync + MapFixture 导出 + demo ?fixture=live(缺席诚实回退)。映射语义四条落 decision-workbench-004(draft 待审):冲突候选=unmerged∧(无PR∨open)(020 并发才算撞)、basic 档 unmerged→stalled/PR 收口→done、蒸馏前单一 Uncategorized 地盘、detectedAt 首检保龄。Vibehub 自身 repo 实证零服务端:9 branches/3 unmerged/1 活跃、7 PRs matched、0 活跃冲突(死分支噪音 2 对被过滤)、真数据地图截图验证。Gates: core vitest 42/42、demo vitest 44/44、Playwright 170/170、tsc clean ×3 包。"
+    - id: b2-three-domain-schema
+      name: "Backend M1 ②: SQLite 三表域 schema(图/运行/配置,五 types 文件直译,decision-025)"
+      status: pending
+      gate: false
+    - id: b3-hook-cli
+      name: "Backend M1 ③: `vibehub hook <event>` CLI 心脏 + 真 session 事件流校准 fixture"
+      status: pending
+      gate: false
+    - id: b4-demo-real-read
+      name: "Backend M1 ④: demo 前端 fixture → 真 SQLite 读(170 e2e 保绿)"
+      status: pending
+      gate: false
+  commits:
+    - hash: "9e9ab3f"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(backend-m1): team-visibility vertical slice — core+cli 诞生,git+gh→SQLite→map 端到端实证"
+      files_changed: 31
+      specs_affected:
+        - change-2026-07-12-team-visibility-slice (created)
+        - decision-workbench-004 (created, draft)
+        - decision-workbench-001 (draft → active)
+        - decision-workbench-002 (draft → active)
+        - decision-workbench-003 (draft → active)
+      milestones_affected:
+        - b1-team-visibility-slice (→ completed)

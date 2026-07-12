@@ -1,6 +1,6 @@
 spec_id: "decision-workbench-001"
 type: decision
-state: draft
+state: active
 intent:
   summary: "用户注入 prompt 的里程碑分档 = hook 触发的薄 LLM 分类 + AI 短摘要;UI 摘要先行、expand 看原文;绑定 prompt 输入时的 id 使其可回溯"
   detail: |
