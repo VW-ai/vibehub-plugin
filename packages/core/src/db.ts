@@ -309,6 +309,20 @@ const MIGRATIONS: string[] = [
     PRIMARY KEY (repo_id, key)
   );
   `,
+
+  // 003 — cached territory layout (treemap spike). The squarified layout is
+  // computed ONCE per distillation pass (蒸馏时算一次缓存, handoff) and read
+  // by every export; a presentation cache, invalidated by recomputing.
+  `
+  CREATE TABLE feature_layouts (
+    feature_id TEXT PRIMARY KEY REFERENCES features(id),
+    pct_left REAL NOT NULL,
+    pct_top REAL NOT NULL,
+    pct_width REAL NOT NULL,
+    pct_height REAL NOT NULL,
+    computed_at TEXT NOT NULL
+  );
+  `,
 ];
 
 export function openDb(dbPath: string = defaultDbPath()): Db {

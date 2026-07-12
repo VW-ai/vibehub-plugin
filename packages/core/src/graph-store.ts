@@ -7,8 +7,9 @@
  * one `features` table with parent_id; anchoredFileCount is DERIVED
  * (count distinct anchor files), never stored.
  */
-import type { SubBlock, Territory } from "./contract/map-types.js";
+import type { DemoLayout, SubBlock, Territory } from "./contract/map-types.js";
 import type { Db } from "./db.js";
+import { layoutTerritories, type LayoutOptions } from "./treemap.js";
 
 /* ── features (territories & sub-blocks) ────────────────────────────────── */
 
@@ -57,6 +58,59 @@ export function listTerritories(db: Db, repoId: number): Territory[] {
       .map((s) => ({ id: s.id, name: s.name, anchoredFileCount: count(s.id) }));
     return { id: t.id, name: t.name, anchoredFileCount: count(t.id), subBlocks };
   });
+}
+
+/* ── territory layout cache (treemap spike) ─────────────────────────────── */
+
+/**
+ * Compute the squarified layout for the repo's top-level territories
+ * (weights = DERIVED anchoredFileCount) and cache it — the once-per-
+ * distillation layout pass (handoff: 蒸馏时算一次缓存). Wholesale replace:
+ * a new distillation invalidates every rect.
+ */
+export function computeAndCacheTerritoryLayout(
+  db: Db,
+  repoId: number,
+  now: string,
+  opts: LayoutOptions = {},
+): Map<string, DemoLayout> {
+  const terrs = listTerritories(db, repoId).filter((t) => t.anchoredFileCount > 0);
+  const layout = layoutTerritories(
+    terrs.map((t) => ({ id: t.id, weight: t.anchoredFileCount })),
+    opts,
+  );
+  const tx = db.transaction(() => {
+    db.prepare(
+      `DELETE FROM feature_layouts WHERE feature_id IN
+         (SELECT id FROM features WHERE repo_id = ?)`,
+    ).run(repoId);
+    const ins = db.prepare(
+      `INSERT INTO feature_layouts (feature_id, pct_left, pct_top, pct_width, pct_height, computed_at)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    );
+    for (const [id, r] of layout) {
+      ins.run(id, r.left, r.top, r.width, r.height, now);
+    }
+  });
+  tx();
+  return layout;
+}
+
+/** The cached layout; empty map = never computed (caller decides fallback). */
+export function readTerritoryLayouts(
+  db: Db,
+  repoId: number,
+): Map<string, DemoLayout> {
+  const rows = db
+    .prepare(
+      `SELECT fl.feature_id AS id, fl.pct_left AS left, fl.pct_top AS top,
+              fl.pct_width AS width, fl.pct_height AS height
+       FROM feature_layouts fl
+       JOIN features f ON f.id = fl.feature_id
+       WHERE f.repo_id = ?`,
+    )
+    .all(repoId) as Array<{ id: string } & DemoLayout>;
+  return new Map(rows.map((r) => [r.id, { left: r.left, top: r.top, width: r.width, height: r.height }]));
 }
 
 /* ── anchors ────────────────────────────────────────────────────────────── */
