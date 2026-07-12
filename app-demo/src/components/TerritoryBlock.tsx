@@ -1,4 +1,8 @@
-import type { CSSProperties } from "react";
+import type {
+  CSSProperties,
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+} from "react";
 import type { MapFixture, Territory } from "../types";
 import { territoryView } from "../derive";
 
@@ -13,6 +17,8 @@ export interface TerritoryBlockProps {
   /** Reverse correlate: hover/focus lights this territory's tasks in the rail. */
   onHoverStart: (terr: Territory) => void;
   onHoverEnd: () => void;
+  /** Clash sub-block chips open the conflict card (m3 S4 open path #1). */
+  onConflictOpen: (conflictId: string, opener: HTMLElement | null) => void;
 }
 
 const STAGGER_BASE_S = 0.08; // v8 first territory delay
@@ -54,6 +60,7 @@ export function TerritoryBlock({
   lit,
   onHoverStart,
   onHoverEnd,
+  onConflictOpen,
 }: TerritoryBlockProps) {
   const v = territoryView(terr, fixture);
   const classes = ["terr", ...v.classes];
@@ -78,6 +85,25 @@ export function TerritoryBlock({
           className={`sub${s.kind === "plain" ? "" : ` ${s.kind}`}`}
           style={subStyle(s.style)}
           data-tip={s.tip}
+          // Open path #1: the clash chip's own tooltip promises "Click for
+          // evidence + AI diagnosis" — wired here, with keyboard parity.
+          {...(s.conflictId
+            ? {
+                role: "button" as const,
+                tabIndex: 0,
+                onClick: (e: ReactMouseEvent<HTMLDivElement>) => {
+                  e.stopPropagation(); // don't bubble into territory handlers
+                  onConflictOpen(s.conflictId!, e.currentTarget);
+                },
+                onKeyDown: (e: ReactKeyboardEvent<HTMLDivElement>) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onConflictOpen(s.conflictId!, e.currentTarget);
+                  }
+                },
+              }
+            : {})}
         >
           <em>{s.sub.name}</em>
           {s.cnt && <span className="cnt">{s.cnt}</span>}

@@ -1,3 +1,7 @@
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+} from "react";
 import type { MapFixture } from "../types";
 import { freshness, titlebarStats } from "../derive";
 
@@ -16,6 +20,8 @@ export interface TitlebarProps {
   fixtureNames: string[];
   activeFixture: string;
   onFixtureChange: (name: string) => void;
+  /** The conflict stat opens the adjudication card (m3 S4 open path #3). */
+  onConflictOpen: (conflictId: string, opener: HTMLElement | null) => void;
 }
 
 export function Titlebar({
@@ -23,9 +29,11 @@ export function Titlebar({
   fixtureNames,
   activeFixture,
   onFixtureChange,
+  onConflictOpen,
 }: TitlebarProps) {
   const stats = titlebarStats(fixture);
   const fresh = freshness(fixture);
+  const firstConflictId = fixture.conflicts[0]?.id;
   return (
     <div className="titlebar">
       <div className="lights">
@@ -43,11 +51,34 @@ export function Titlebar({
         </span>
       </div>
       <div className="spacer" />
-      {stats.map((s) => (
-        <div key={s.kind} className={`stat ${s.kind}`} data-tip={s.tip}>
-          {s.text}
-        </div>
-      ))}
+      {stats.map((s) => {
+        // Open path #3: the conflict stat opens the adjudication card
+        // (keyboard parity: focusable + Enter/Space, same as the pill).
+        const opens = s.kind === "clash" && firstConflictId !== undefined;
+        return (
+          <div
+            key={s.kind}
+            className={`stat ${s.kind}`}
+            data-tip={s.tip}
+            {...(opens
+              ? {
+                  role: "button" as const,
+                  tabIndex: 0,
+                  onClick: (e: ReactMouseEvent<HTMLDivElement>) =>
+                    onConflictOpen(firstConflictId, e.currentTarget),
+                  onKeyDown: (e: ReactKeyboardEvent<HTMLDivElement>) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onConflictOpen(firstConflictId, e.currentTarget);
+                    }
+                  },
+                }
+              : {})}
+          >
+            {s.text}
+          </div>
+        );
+      })}
       <div className={`fresh${fresh.stale ? " stale" : ""}`} data-tip={fresh.tip}>
         <span className="dot" />
         {fresh.text}

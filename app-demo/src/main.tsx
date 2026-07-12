@@ -15,6 +15,10 @@ const showSwitcher = params.get("switcher") !== "0";
 // `?panel=<name>` opens a task-panel fixture on load (dev path to extremes,
 // e.g. ?panel=marathon → panel-marathon). Unknown names are ignored.
 const initialPanel = params.get("panel") ?? undefined;
+// `?conflict=<name>` opens a conflict-card fixture on load (dev path to all
+// five fixtures, e.g. ?conflict=yellow-stale → conflict-yellow-stale).
+// Ignored when ?panel= is also present (the two modals are exclusive).
+const initialConflict = params.get("conflict") ?? undefined;
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
@@ -24,6 +28,7 @@ if (rootEl) {
       initialFixture={initialFixture}
       showSwitcher={showSwitcher}
       initialPanel={initialPanel}
+      initialConflict={initialConflict}
     />,
   );
 }

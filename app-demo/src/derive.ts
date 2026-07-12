@@ -299,6 +299,8 @@ export interface SubView {
   cnt?: string;
   tip: string;
   style: { left?: number; top?: number; right?: number; bottom?: number };
+  /** Present on clash subs: the chip opens this conflict's card (m3 S4). */
+  conflictId?: string;
 }
 
 export interface FootView {
@@ -431,6 +433,7 @@ function subViews(fx: MapFixture, terr: Territory): SubView[] {
         cnt: `${writers.length || conflict.taskIds.length} writing`,
         tip: `${sub.name} — both tasks declared writes on ${conflict.sharedSymbols.length} shared symbols. Click for evidence + AI diagnosis.`,
         style,
+        conflictId: conflict.id,
       };
     }
     if (writers.length) {

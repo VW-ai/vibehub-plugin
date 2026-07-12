@@ -1,3 +1,7 @@
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+} from "react";
 import type { MapFixture, Task } from "../types";
 import { pillView, taskAge, taskChips } from "../derive";
 
@@ -11,6 +15,8 @@ export interface TaskCardProps {
   onHoverEnd: () => void;
   /** Click / Enter / Space opens the task panel (m2 S4). */
   onOpen: (task: Task) => void;
+  /** The CONFLICT pill opens the adjudication card (m3 S4 open path #2). */
+  onConflictOpen: (conflictId: string, opener: HTMLElement | null, task?: Task) => void;
 }
 
 const STAGGER_BASE_S = 0.05; // v8 first card delay
@@ -24,12 +30,35 @@ export function TaskCard({
   onHoverStart,
   onHoverEnd,
   onOpen,
+  onConflictOpen,
 }: TaskCardProps) {
   const pill = pillView(task);
   const chips = taskChips(task, fixture);
   const classes = ["task"];
   if (task.state === "done") classes.push("t-done");
   if (hot) classes.push("hot");
+  // The CONFLICT pill is its own affordance ("Click to adjudicate" — its v8
+  // tooltip): it opens the conflict card, while the rest of the card keeps
+  // opening the task panel. Fork logged iter-12.
+  const conflictId = pill.kind === "clash" ? task.conflictIds[0] : undefined;
+  const pillClick =
+    conflictId !== undefined
+      ? {
+          role: "button" as const,
+          tabIndex: 0,
+          onClick: (e: ReactMouseEvent<HTMLSpanElement>) => {
+            e.stopPropagation(); // the card underneath opens the panel
+            onConflictOpen(conflictId, e.currentTarget, task);
+          },
+          onKeyDown: (e: ReactKeyboardEvent<HTMLSpanElement>) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              onConflictOpen(conflictId, e.currentTarget, task);
+            }
+          },
+        }
+      : {};
   return (
     <div
       className={classes.join(" ")}
@@ -50,7 +79,7 @@ export function TaskCard({
       }}
     >
       <div className="row1">
-        <span className={`pill ${pill.kind}`} data-tip={pill.tip}>
+        <span className={`pill ${pill.kind}`} data-tip={pill.tip} {...pillClick}>
           {pill.text}
         </span>
         {/* TEXT-long rung: title truncates (CSS ellipsis) + full text on hover */}

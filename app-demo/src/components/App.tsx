@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MapFixture, Task, Territory } from "../types";
 import type { TaskPanelFixture } from "../panel-types";
+import type { ConflictCardFixture } from "../conflict-types";
 import {
   highlightForLegend,
   highlightForTask,
@@ -8,11 +9,18 @@ import {
   type Highlight,
   type LegendKind,
 } from "../derive";
-import { panelFixtureByName, panelForTask } from "../fixtures";
+import { SCRIM_TIP } from "../conflict-derive";
+import {
+  conflictCardForConflict,
+  conflictFixtureByName,
+  panelFixtureByName,
+  panelForTask,
+} from "../fixtures";
 import { Titlebar } from "./Titlebar";
 import { TaskRail } from "./TaskRail";
 import { MapCanvas } from "./MapCanvas";
 import { TaskPanel } from "./TaskPanel";
+import { ConflictCard } from "./ConflictCard";
 import { Tooltip } from "./Tooltip";
 
 const NO_HIGHLIGHT: Highlight = {
@@ -27,9 +35,17 @@ export interface AppProps {
   showSwitcher: boolean;
   /** `?panel=<name>` dev param: open a panel fixture directly on load. */
   initialPanel?: string | undefined;
+  /** `?conflict=<name>` dev param: open a conflict card directly on load. */
+  initialConflict?: string | undefined;
 }
 
-export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: AppProps) {
+export function App({
+  fixtures,
+  initialFixture,
+  showSwitcher,
+  initialPanel,
+  initialConflict,
+}: AppProps) {
   const [fixtureName, setFixtureName] = useState(initialFixture);
   // Correlate-hover source: a rail card, a territory (reverse direction),
   // or a legend entry — only one can be the source at a time.
@@ -39,6 +55,12 @@ export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: Ap
   // Task panel (m2): clicking a rail card opens it over the dimmed map.
   const [panel, setPanel] = useState<TaskPanelFixture | null>(() =>
     initialPanel ? panelFixtureByName(initialPanel) : null,
+  );
+  // Conflict card (m3): sub-block chip / rail CONFLICT pill / titlebar stat.
+  // Mutually exclusive with the panel — one modal surface at a time (fork
+  // logged iter-12): opening either closes the other.
+  const [conflict, setConflict] = useState<ConflictCardFixture | null>(() =>
+    initialConflict && !initialPanel ? conflictFixtureByName(initialConflict) : null,
   );
 
   const fixture = fixtures[fixtureName] ?? fixtures[initialFixture]!;
@@ -52,28 +74,36 @@ export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: Ap
 
   const focus = hoverTask !== null || hoverTerr !== null || legendFilter !== null;
 
-  const switchFixture = (name: string) => {
-    setFixtureName(name);
+  const clearHovers = () => {
     setHoverTask(null);
     setHoverTerr(null);
     setLegendFilter(null);
-    setPanel(null); // a panel belongs to the fixture it was opened from
+  };
+
+  const switchFixture = (name: string) => {
+    setFixtureName(name);
+    clearHovers();
+    setPanel(null); // a modal belongs to the fixture it was opened from
+    setConflict(null);
     const url = new URL(window.location.href);
     url.searchParams.set("fixture", name);
     window.history.replaceState(null, "", url);
   };
 
-  // Focus returns to the opening card on close (keyboard parity: a keyboard
-  // user who opened with Enter must land back where they were — recorded
+  // Focus returns to the opener on close (keyboard parity: a keyboard user
+  // who opened with Enter must land back where they were — recorded
   // principle, Room 20 decision-ledger-viz-001 / dialog convention).
-  // null when the panel was opened via the ?panel= dev param (no card).
+  // Panel opener = a rail card (looked up by task id, still mounted under
+  // the scrim); conflict opener = the exact element (pill / sub chip /
+  // titlebar stat), captured at open time. null for ?panel= / ?conflict=.
   const openerTaskId = useRef<string | null>(null);
+  const conflictOpener = useRef<HTMLElement | null>(null);
 
   const openTask = (task: Task) => {
-    // Opening the panel kills any live correlate-hover (the scrim takes over).
-    setHoverTask(null);
-    setHoverTerr(null);
-    setLegendFilter(null);
+    // Opening the panel kills any live correlate-hover (the scrim takes over)
+    // and closes the conflict card (mutual exclusivity).
+    clearHovers();
+    setConflict(null);
     openerTaskId.current = task.id;
     setPanel(panelForTask(task, fixture));
   };
@@ -90,7 +120,47 @@ export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: Ap
     }
   };
 
-  // Escape closes the panel (alongside X and scrim click).
+  /**
+   * Conflict open path shared by all three entry points. A conflict with no
+   * authored card fixture falls back to opening the task's panel (the card
+   * cannot be honestly synthesized — see fixtures/index.ts); `task` is the
+   * fallback subject (the pill's own task; the sub chip / stat pass the
+   * conflict's first task).
+   */
+  const openConflict = (conflictId: string, opener: HTMLElement | null, task?: Task) => {
+    const card = conflictCardForConflict(conflictId);
+    if (!card) {
+      const fallback =
+        task ??
+        fixture.tasks.find((t) =>
+          fixture.conflicts.some((c) => c.id === conflictId && c.taskIds.includes(t.id)),
+        );
+      if (fallback) openTask(fallback);
+      return;
+    }
+    clearHovers();
+    setPanel(null); // mutual exclusivity
+    conflictOpener.current = opener;
+    setConflict(card);
+  };
+  const closeConflict = () => {
+    setConflict(null);
+    const el = conflictOpener.current;
+    if (el) {
+      requestAnimationFrame(() => el.focus());
+    }
+  };
+
+  /** Side rows in the conflict card open that task's panel (S2 promise). */
+  const openTaskFromConflict = (task: Task) => {
+    // Prefer the map's own task record (same ids on v8-baseline); fall back
+    // to the card's standalone copy for ?conflict= fixtures not on this map.
+    const mapTask = fixture.tasks.find((t) => t.id === task.id) ?? task;
+    openTask(mapTask);
+  };
+
+  // Escape closes the panel (alongside X and scrim click). The conflict
+  // card handles its own Escape (an open pause menu swallows the first one).
   useEffect(() => {
     if (!panel) return;
     const onKey = (e: KeyboardEvent) => {
@@ -107,6 +177,7 @@ export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: Ap
         fixtureNames={showSwitcher ? Object.keys(fixtures) : []}
         activeFixture={fixtureName}
         onFixtureChange={switchFixture}
+        onConflictOpen={openConflict}
       />
       <div className="main">
         <TaskRail
@@ -116,16 +187,18 @@ export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: Ap
           onTaskHoverStart={setHoverTask}
           onTaskHoverEnd={() => setHoverTask(null)}
           onTaskOpen={openTask}
+          onConflictOpen={openConflict}
         />
         <MapCanvas
           fixture={fixture}
           focus={focus}
-          veiled={panel !== null}
+          veiled={panel !== null || conflict !== null}
           litIds={highlight.litIds}
           onFilterStart={setLegendFilter}
           onFilterEnd={() => setLegendFilter(null)}
           onTerritoryHoverStart={setHoverTerr}
           onTerritoryHoverEnd={() => setHoverTerr(null)}
+          onConflictOpen={openConflict}
         />
         {panel && (
           <>
@@ -141,6 +214,20 @@ export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: Ap
               map={fixture}
               onClose={closePanel}
             />
+          </>
+        )}
+        {conflict && (
+          <>
+            <div className="scrim" data-tip={SCRIM_TIP} onClick={closeConflict} />
+            <div className="center">
+              {/* key: switching conflicts remounts the card (fresh expand/menu) */}
+              <ConflictCard
+                key={conflict.conflict.id}
+                fixture={conflict}
+                onClose={closeConflict}
+                onOpenTask={openTaskFromConflict}
+              />
+            </div>
           </>
         )}
       </div>

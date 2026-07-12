@@ -243,10 +243,15 @@ export const v8Baseline = {
       taskIds: ["task-auto-retry-payments", "task-cancel-orders"],
       territoryId: "t-pay",
       subBlockId: "s-osm",
+      // Reconciled at m3 S4 (DECISIONS-NEEDED iter-11 fork → iter-12): the
+      // conflict-card fixture (conflict-osm-red.ts, S2-verbatim) is the
+      // single source of truth for conflict-osm's symbol names; the map only
+      // ever surfaces the COUNT (3, unchanged), so v8 render parity holds.
+      // (v8's own HTML said transition/retryPolicy/onTimeout — never shown.)
       sharedSymbols: [
         "OrderStateMachine.transition",
-        "OrderStateMachine.retryPolicy",
-        "OrderStateMachine.onTimeout",
+        "OrderStateMachine.guards",
+        "ORDER_STATES",
       ],
       severity: "red",
       detectedAt: "2026-07-12T10:13:40-07:00",

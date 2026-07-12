@@ -5,6 +5,11 @@
    dev fixture switcher. */
 
 *{margin:0;padding:0;box-sizing:border-box}
+/* S4 (conflict-card): app-wide hidden guard. Any author display value
+   (flex/grid/inline-block) silently defeats the `hidden` attribute; this bug
+   class bit three times in the statics (.center, .dev — see iter-10 fork).
+   One global rule beats per-selector guards. */
+[hidden]{display:none!important}
 html,body{height:100%}
 body{background:linear-gradient(160deg,#e9e9e7,#e4e5e6);font-family:var(--sans);color:var(--ink-900);padding:var(--sp-6);-webkit-font-smoothing:antialiased}
 #root{height:100%;display:flex;align-items:center;justify-content:center}
@@ -236,7 +241,123 @@ svg{vertical-align:-2px}
 /* keyboard parity on panel affordances (same rule as the map's) */
 .pclose:focus-visible,.filestoggle:focus-visible,.seg button:focus-visible,.modes button:focus-visible,.actions button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
 
+/* ════════════════════════════════════════════════════════════════════════
+   conflict-card (m3, S4) — ported from static/conflict-card-s2.html, the
+   approved S2 artifact. Values verbatim; selectors that would collide with
+   map/panel styles are scoped under .modal (.age, .chip display, .actions
+   .ignore is additive). .pill / .actions button styles are shared with the
+   map + deck ON PURPOSE — S2 copied them from v8 unchanged. */
+
+/* centered 640px modal over the scrimmed map (.center sits inside .main,
+   same underlay language as the task panel; scrim z-4 → modal z-5) */
+.center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:var(--sp-6);pointer-events:none;z-index:5}
+.modal{pointer-events:auto;width:640px;max-width:100%;max-height:100%;background:var(--card);border-radius:var(--r-l);display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,17,21,.14),0 22px 70px rgba(15,17,21,.28);animation:cardIn var(--t-base) var(--ease) backwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+
+/* header */
+.chead{flex:none;padding:var(--sp-4) var(--sp-4) var(--sp-3);border-bottom:1px solid var(--ink-150);background:rgba(252,252,251,.8);border-radius:var(--r-l) var(--r-l) 0 0}
+.chead .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.chead h2{font-size:var(--fs-4);font-weight:650;letter-spacing:-.1px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.modal .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none;cursor:help}
+.crumb{display:flex;align-items:center;gap:var(--sp-2);margin-top:6px;font-size:var(--fs-2);color:var(--ink-500);min-width:0;overflow:hidden}
+.crumb .m{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+.crumb .mono{font-family:var(--mono);font-size:var(--fs-1)}
+.crumb .sep{flex:none;width:3px;height:3px;border-radius:50%;background:var(--ink-300)}
+
+/* grading strip — soft fill, no stripes. RED (W×W) borrows --need (push-
+   eligible = "needs you" channel); YELLOW (W×R) stays in --clash. */
+.grade{flex:none;display:flex;align-items:flex-start;gap:var(--sp-2);padding:var(--sp-2) var(--sp-4);font-size:var(--fs-2);line-height:1.5;cursor:help;position:relative;z-index:2;transition:box-shadow var(--t-fast) var(--ease)}
+.grade b{flex:none;font-family:var(--mono);font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;line-height:1.7}
+.grade.red{background:var(--need-bg);color:var(--need-ink)}
+.grade.yellow{background:var(--clash-bg);color:var(--clash-ink)}
+/* scroll-aware seams (task-panel S2 language): grade casts down when
+   scrolled past the top, footer casts up while more hides below */
+.grade.seam{box-shadow:0 1px 2px rgba(20,22,26,.08)}
+.cfoot{transition:box-shadow var(--t-fast) var(--ease)}
+.cfoot.seam{box-shadow:0 -1px 2px rgba(20,22,26,.08)}
+
+/* body — the modal's only scroll region */
+.cbody{flex:1;min-height:0;overflow:auto;padding:var(--sp-3) var(--sp-4)}
+.cbody::-webkit-scrollbar{width:8px}
+.cbody::-webkit-scrollbar-thumb{background:var(--ink-200);border-radius:4px;border:2px solid var(--card);background-clip:padding-box}
+.cbody::-webkit-scrollbar-track{background:transparent}
+.cbody h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase;margin-bottom:var(--sp-2);display:flex;align-items:center;justify-content:space-between;cursor:help}
+.cbody h4 .mono{font-family:var(--mono);font-weight:500;text-transform:none;letter-spacing:0}
+
+/* zone a1: the two task rows — rail-card hover language (v8 .task) since the
+   affordance is the same: click opens the task panel */
+.side{display:flex;align-items:center;gap:var(--sp-2);min-width:0;padding:var(--sp-2) var(--sp-3);background:rgba(252,252,251,.8);border-radius:var(--r-m);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+.side:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
+.side + .side{margin-top:6px}
+.side h3{font-size:var(--fs-3);font-weight:600;letter-spacing:-.1px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side .chips{flex:none;display:flex;align-items:center;gap:var(--sp-1)}
+/* S2 R1 fix #1: inline-block, not flex — text-overflow needs a block text
+   container to ellipsize (map chips keep v8's inline-flex; scoped here) */
+.modal .chip{display:inline-block;line-height:16px}
+
+/* zone a2: shared symbols */
+.shared{margin-top:var(--sp-3)}
+.sym{display:flex;align-items:center;gap:var(--sp-2);padding:3px 0;min-width:0}
+.sym .dot{flex:none;width:5px;height:5px;border-radius:50%;background:var(--ink-300)}
+.sym .name{font-family:var(--mono);font-size:var(--fs-2);color:var(--ink-700);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+.sym .who{flex:none;margin-left:auto;font-size:var(--fs-1);color:var(--ink-400);cursor:help;white-space:nowrap}
+.symtoggle{border:0;background:none;padding:3px 0 0;font-size:var(--fs-2);font-weight:600;color:var(--ink-500);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.symtoggle:hover{color:var(--ink-900)}
+.symtoggle .car{transition:transform var(--t-fast) var(--ease);color:var(--ink-400)}
+.shared.open .symtoggle .car{transform:rotate(90deg)}
+
+/* zone b: AI diagnosis */
+.diag{margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--ink-150)}
+.verdict{background:rgba(252,252,251,.8);border-radius:var(--r-m);box-shadow:var(--sh-1);padding:var(--sp-3);font-size:var(--fs-3);line-height:1.55;color:var(--ink-700)}
+.verdict b{color:var(--ink-900);font-weight:600}
+.verdict .vline{display:flex;gap:var(--sp-2);margin-top:6px}
+.verdict .vline .vk{flex:none;width:78px;font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;color:var(--ink-400);text-transform:uppercase;line-height:1.9;cursor:help}
+.verdict .vline .vt{flex:1;min-width:0}
+/* backtick tokens from the model render mono (iter-11 fork #4) */
+.verdict .code{font-family:var(--mono);font-size:var(--fs-2)}
+.prov{display:flex;align-items:center;gap:var(--sp-2);margin-top:var(--sp-1);font-size:var(--fs-1);color:var(--ink-400)}
+.prov .pdot{width:5px;height:5px;border-radius:50%;background:var(--alive);flex:none}
+/* staleness honesty: green dot only while the verdict matches reality */
+.prov.stale .pdot{background:var(--ink-300)}
+.prov .edits{color:var(--ink-500);font-weight:600;cursor:help}
+.prov .m{cursor:help}
+.prov button{border:0;background:none;padding:0;font-size:var(--fs-1);font-weight:600;color:var(--ink-500);cursor:pointer;margin-left:auto}
+.prov button:hover{color:var(--ink-900)}
+/* true empty state → dashed placeholder is sanctioned here */
+.diag-empty{border:1.5px dashed var(--ink-200);border-radius:var(--r-m);padding:var(--sp-4);text-align:center}
+.diag-empty p{font-size:var(--fs-3);color:var(--ink-500);line-height:1.55}
+.diag-empty .cap{font-size:var(--fs-2);color:var(--ink-400);margin-top:var(--sp-1)}
+.diag-empty .cap i{font-style:normal;font-weight:600}
+.diag-empty button{margin-top:var(--sp-3);height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-3);font-size:var(--fs-3);font-weight:600;background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.diag-empty button:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+
+/* zone c: adjudication footer (pinned; .actions styles shared with the deck) */
+.cfoot{flex:none;border-top:1px solid var(--ink-150);background:rgba(252,252,251,.8);padding:var(--sp-3) var(--sp-4) var(--sp-4);border-radius:0 0 var(--r-l) var(--r-l)}
+.cfoot textarea{width:100%;height:52px;max-height:124px;resize:none;border:0;border-radius:var(--r-s);background:var(--card);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-150);padding:var(--sp-2) var(--sp-2);font-family:inherit;font-size:var(--fs-3);line-height:1.5;color:var(--ink-900);transition:box-shadow var(--t-fast) var(--ease)}
+.cfoot textarea::placeholder{color:var(--ink-400)}
+.cfoot textarea:focus{outline:none;box-shadow:var(--sh-2),inset 0 0 0 1.5px var(--ink-300)}
+.actions .ignore{background:none;color:var(--ink-400);box-shadow:none;font-size:var(--fs-2)}
+.actions .ignore:hover{background:var(--ink-100);color:var(--ink-700)}
+/* pause split-button: the menu lists both tasks — the UI never presumes a side */
+.split{position:relative;display:inline-flex}
+.pmenu{position:absolute;bottom:32px;left:0;min-width:250px;background:var(--card);border-radius:var(--r-m);box-shadow:var(--sh-2),0 12px 34px rgba(15,17,21,.18);padding:var(--sp-1);z-index:5}
+.split.open > button{box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-300);color:var(--ink-900)}
+.pmenu button{display:flex;width:100%;align-items:center;gap:var(--sp-2);height:auto;padding:6px var(--sp-2);border-radius:var(--r-s);background:none;text-align:left;font-size:var(--fs-2);color:var(--ink-700)}
+.pmenu button:hover{background:var(--ink-100)}
+.pmenu button b{font-weight:600;color:var(--ink-900);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pmenu button .st{margin-left:auto;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+/* honest no-op: an already-waiting task stays clickable (hover-explainable,
+   never dead pixels) but drops to secondary ink */
+.pmenu button.noop b{color:var(--ink-500);font-weight:500}
+.split .car{transition:transform var(--t-fast) var(--ease);color:var(--ink-400);margin-left:4px}
+.split.open .car{transform:rotate(-90deg)}
+
+/* conflict-card openers get the app's keyboard-parity ring */
+.side:focus-visible,.stat:focus-visible,.sub:focus-visible,.task .pill:focus-visible,.symtoggle:focus-visible,.prov button:focus-visible,.diag-empty button:focus-visible,.pmenu button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.side:focus:not(:focus-visible),.stat:focus:not(:focus-visible),.sub:focus:not(:focus-visible),.task .pill:focus:not(:focus-visible){outline:none}
+
 /* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
 @media (prefers-reduced-motion: reduce){
-  .window,.task,.terr,.sub.clash .cnt,.panel,.scrim{animation:none}
+  .window,.task,.terr,.sub.clash .cnt,.panel,.scrim,.modal{animation:none}
+  .grade,.cfoot,.symtoggle .car,.split .car{transition:none}
 }

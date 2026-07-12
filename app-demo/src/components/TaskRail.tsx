@@ -19,6 +19,8 @@ export interface TaskRailProps {
   onTaskHoverEnd: () => void;
   /** Click / Enter on a card opens the task panel over the map (m2 S4). */
   onTaskOpen: (task: Task) => void;
+  /** The CONFLICT pill opens the adjudication card (m3 S4 open path #2). */
+  onConflictOpen: (conflictId: string, opener: HTMLElement | null, task?: Task) => void;
 }
 
 export function TaskRail({
@@ -28,6 +30,7 @@ export function TaskRail({
   onTaskHoverStart,
   onTaskHoverEnd,
   onTaskOpen,
+  onConflictOpen,
 }: TaskRailProps) {
   const groups = groupTasks(fixture);
   let cardIndex = 0; // stagger index runs across group boundaries (v8)
@@ -55,6 +58,7 @@ export function TaskRail({
                   onHoverStart={onTaskHoverStart}
                   onHoverEnd={onTaskHoverEnd}
                   onOpen={onTaskOpen}
+                  onConflictOpen={onConflictOpen}
                 />
               ))}
             </div>

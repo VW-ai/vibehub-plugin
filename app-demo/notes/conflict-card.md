@@ -1,9 +1,97 @@
 # conflict-card — screen notes
 
-Stage: **S3 done** (types `src/conflict-types.ts` + fixtures; S2 polish at
-`static/conflict-card-s2.html`; S1 frozen for diff).
-Variants: `?v=` param or the DEV bar — `""` red W×W diagnosed · `empty` red, diagnosis
-not yet run · `yellow` W×R, 12 shared symbols, long task names.
+Stage: **S4 done** (React `ConflictCard` + zones, integrated into the app with
+three open paths; S3 types/fixtures; S2 polish at `static/conflict-card-s2.html`;
+S1 frozen for diff).
+React variants: `?conflict=` dev param — `osm-red-diagnosed` · `no-diagnosis` ·
+`yellow-stale` · `1200-symbols` · `one-symbol` (short tails accepted).
+Static variants: `?v=` param or the DEV bar — `""` red W×W diagnosed · `empty` ·
+`yellow`.
+
+## S4 checklist
+
+- [x] `src/components/ConflictCard.tsx` (zones a/b/c in one dialog component) +
+      `src/conflict-derive.ts` (pure view derivations) — consuming ONLY
+      `conflictFixtures`; zero hardcoded content in JSX (chrome copy lives in
+      conflict-derive, S2-verbatim where the S2 text was generic).
+- [x] Three open paths wired, all with keyboard parity (focusable opener,
+      Enter/Space, focus RETURNS to the exact opener on close via rAF —
+      the app's one focus rule):
+      1. map sub-block clash chip ("2 writing") — `SubView.conflictId` added in
+         derive.ts, chip gets role=button/tabIndex, stopPropagation so the
+         territory hover/handlers don't swallow it;
+      2. rail CONFLICT pill — the pill is its own affordance ("Click to
+         adjudicate", its v8 tooltip); the REST of the card still opens the
+         task panel (fork logged iter-12);
+      3. titlebar "1 conflict" stat.
+      Close paths: X / Escape / scrim — one contract. Escape with the pause
+      menu open closes the MENU first (S2 behavior), second Escape closes the
+      card (mechanically tested).
+- [x] Reconcile (iter-11 fork → kernel brief): `v8-baseline.ts` conflict-osm
+      `sharedSymbols` now equals the card fixture's names
+      (transition/guards/ORDER_STATES — conflict-osm-red.ts is the single
+      source of truth). The map only surfaces the COUNT (3, unchanged) so v8
+      render parity holds; map suite stayed green with NO test edits (no test
+      asserted the names). Timestamps deliberately NOT reconciled — the two
+      fixtures are different snapshots (map capturedAt 10:22, card 11:15);
+      fork logged iter-12.
+- [x] Global `[hidden]{display:none!important}` in app.css (the iter-10
+      3rd-occurrence bug class); no per-selector guards ported from the
+      statics (the statics keep theirs — frozen artifacts).
+- [x] All S2 behaviors, mechanically verified in tests/conflict-parity.spec.ts:
+      scroll-aware seam shadows (grade down / footer up, off when it fits;
+      recomputed on scroll + ResizeObserver + expand), symbol 3+"+N more"
+      expand/collapse (yields space back), pause split-menu with the honest
+      no-op row (enabled, secondary ink, "waiting 5m"), inject textarea
+      autogrow 52→124→52, empty-note placeholder contract (diagnosed = the
+      send-time default surfaced; no-diagnosis = generic), staleness marker
+      (neutral dot + "· 3 edits since" from the fixture's own touch times),
+      Re-run fresh/stale tooltips, diagnosis empty↔done from `diagnosis`
+      presence.
+- [x] Backtick tokens in diagnosis text render mono (iter-11 fork #4):
+      `codeSpans()` splits the verbatim model text; `.verdict .code` =
+      --mono/fs-2. Asserted: yellow renders exactly 2 mono `resolve()` spans
+      in ui-monospace.
+- [x] Modal exclusivity: conflict card ↔ task panel — opening either closes
+      the other (fork logged iter-12). Side rows ("Between") deliver the S2
+      tooltip promise: click/Enter opens that task's panel (map task record
+      preferred by id; the card's standalone copy backs ?conflict= fixtures
+      not on the map → synthetic panel per m2 honesty rules).
+- [x] Gates: `tsc --noEmit` clean; `pnpm build` green; Playwright **71/71**
+      (59 existing untouched + 12 new in conflict-parity.spec.ts: 6 parity
+      captures + static-ref capture + 3-path/focus-return + exclusivity +
+      menu-Escape + S2-behaviors + 5-fixture zero-error sweep incl. 1200-symbol
+      expand to exactly 1200 rows and "1.2k" h4).
+
+### S4 parity deltas (React vs static/conflict-card-s2.html)
+
+Shots: `conflict-card-s4-{red,yellow,empty}-{1280x800,1440x900}.png` (full page)
++ `conflict-card-s4-modal-{red,yellow,empty}-1280.png` vs
+`conflict-card-s4-static-modal-*-1280.png` (element shots, like-for-like).
+
+1. **Modal element shots: no visible delta** — red/yellow/empty side-by-side
+   are pixel-equivalent (geometry, type, colors, seams, chip ellipsis,
+   dashed empty state, mono spans).
+2. **Underlay (expected)**: the app renders the real map (rail + territories
+   + subs + feet + legend, blurred 1.5px) under the scrim; the static used a
+   hand-simplified rail-less canvas. Titlebar adds the app's freshness
+   element ("Synced 42s ago") and dev switcher (hidden via ?switcher=0 in
+   shots). Stats identical (1 waiting / 1 conflict / 3 running).
+3. **Tooltip copy (invisible in shots)**: S2's hand-written prose tooltips
+   are now mechanical derivations — e.g. "Edited by Auto-retry at 11:04 and
+   by Cancel-on-timeout at 11:07" → "Edited by 'Auto-retry failed payments'
+   at 11:04 and by 'Cancel orders on timeout' at 11:07"; "The batching
+   rewrite edited 3 shared symbols after this diagnosis ran (11:03 → 11:08)"
+   → "3 shared-symbol edits — by 'Rewrite the notification batching…' —
+   landed after this diagnosis ran (11:03 → 11:08)"; the read-chip's "it
+   consumes the registry API, no writes declared" → "no writes declared".
+   Fork logged iter-12.
+4. **Dev bar not ported** — the `?conflict=` param + titlebar fixture
+   switcher replace it; the bar was never product UI.
+5. **"Run AI diagnosis" / "Re-run" / "Inject to both" / pause rows / "Ignore
+   this pair" are static affordances at S4** (tooltips state their
+   contracts; real actions are S5+ scope — same precedent as the panel deck
+   at its S4).
 
 ## S3 checklist
 

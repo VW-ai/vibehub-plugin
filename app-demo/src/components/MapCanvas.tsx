@@ -34,6 +34,8 @@ export interface MapCanvasProps {
   /** Reverse correlate: territory hover highlights its tasks in the rail. */
   onTerritoryHoverStart: (terr: Territory) => void;
   onTerritoryHoverEnd: () => void;
+  /** Clash sub-block chips open the conflict card (m3 S4 open path #1). */
+  onConflictOpen: (conflictId: string, opener: HTMLElement | null) => void;
 }
 
 export function MapCanvas({
@@ -45,6 +47,7 @@ export function MapCanvas({
   onFilterEnd,
   onTerritoryHoverStart,
   onTerritoryHoverEnd,
+  onConflictOpen,
 }: MapCanvasProps) {
   const empty = fixture.territories.length === 0;
   const band = needsLegendBand(fixture);
@@ -77,6 +80,7 @@ export function MapCanvas({
               lit={litIds.has(t.id)}
               onHoverStart={onTerritoryHoverStart}
               onHoverEnd={onTerritoryHoverEnd}
+              onConflictOpen={onConflictOpen}
             />
           ))}
         </div>

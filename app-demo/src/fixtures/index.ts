@@ -71,6 +71,25 @@ export function conflictFixtureByName(name: string): ConflictCardFixture | null 
 }
 
 /**
+ * Map conflict → card wiring (S4). The card fixtures reuse the map's
+ * conflict ids ON PURPOSE (iter-11 fork) so all three open paths — sub-block
+ * chip, rail CONFLICT pill, titlebar conflict stat — route by id. A conflict
+ * with no authored card returns null: the card's symbol evidence (per-side
+ * touch times) cannot be honestly synthesized from a MapFixture, so the
+ * opener falls back to the task panel instead (fork logged iter-12).
+ */
+const CONFLICT_CARD_BY_CONFLICT_ID: Record<string, ConflictCardFixture> = {
+  "conflict-osm": conflictOsmRedDiagnosed,
+  "conflict-templates": conflictYellowStale,
+  "conflict-generated-client": conflictExtreme1200Symbols,
+  "conflict-flag-defaults": conflictExtremeOneSymbol,
+};
+
+export function conflictCardForConflict(conflictId: string): ConflictCardFixture | null {
+  return CONFLICT_CARD_BY_CONFLICT_ID[conflictId] ?? null;
+}
+
+/**
  * Map card → panel wiring (S4). Tasks with a hand-authored panel fixture
  * open it; every other card opens a minimal synthetic panel (launch + state
  * transition only — see synthetic-panel.ts for the honesty rules).
