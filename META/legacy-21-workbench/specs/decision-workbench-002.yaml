@@ -1,0 +1,30 @@
+spec_id: "decision-workbench-002"
+type: decision
+state: draft
+intent:
+  summary: "冲突解决要给用户反馈,并沉淀解决统计:日/周/月解决了多少跨事件/跨 branch 的 conflict;后续 prompt engineering 议题——裁决后如何带 context 回到两个 worktree、如何持续观察"
+  detail: |
+    Wayne 2026-07-12 review verdict ②附加。两块:
+    1. 冲突 resolve 后的用户反馈(时间线/通知里可见"这对冲突已解决");
+       解决事件入库,支持日/周/月统计(工作台的价值证明面);
+    2. 打开的工程议题:裁决(注入协调指令/暂停一侧)之后,如何把裁决
+       context 送回两个 worktree 的 session、如何观察后续是否真解——
+       prompt engineering work,归后端 M1 之后。
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "workbench"
+  tags: [conflict, resolution-feedback, stats, prompt-engineering]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne morning review 2026-07-12, verdict ②"
+  produced_by_agent: "kernel"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-020"
+    type: relates_to
+  - target: "decision-project-018"
+    type: relates_to
+anchors: []

@@ -1,0 +1,31 @@
+spec_id: "decision-workbench-003"
+type: decision
+state: draft
+intent:
+  summary: "多主体条目的统一语言 = subject-first:单主体行以事名为标签;多主体行(冲突等)以争夺物为标签 + 参与数 pill('Order state machine — 2 writing'),hover/expand 列参与者;徽章与计数把 conflict 计入'需要你'"
+  detail: |
+    Wayne 2026-07-12 review verdict ⑦:认可菜单栏徽章计入 conflict,
+    但指出 conflict 天然多事件,要求 UI 与单事件条目有统一表达。
+    定案原则:**行的标签 = 它的主体**——单主体(一件事)行用事名;
+    多主体行用争夺物名(资源/symbol 的人话名)+ 参与数 pill,参与者
+    在 hover/expand 枚举。已有雏形:菜单栏冲突行、地图子块 chip、
+    冲突卡标题都是这个形状——升格为全局原则,后续任何多主体实体
+    (如未来的赛马对、批量事件)沿用。
+    徽章语义修订:需要你 = waiting 任务数 + 待裁决冲突对数(对数,
+    不是参与任务数——一对冲突计 1,与"一个冲突只讨一次注意"一致)。
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "workbench"
+  tags: [ui-language, multi-subject, conflict, badge, menubar]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne morning review 2026-07-12, verdict ⑦"
+  produced_by_agent: "kernel"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-020"
+    type: relates_to
+anchors: []

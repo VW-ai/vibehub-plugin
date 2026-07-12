@@ -1,0 +1,33 @@
+spec_id: "decision-workbench-001"
+type: decision
+state: draft
+intent:
+  summary: "用户注入 prompt 的里程碑分档 = hook 触发的薄 LLM 分类 + AI 短摘要;UI 摘要先行、expand 看原文;绑定 prompt 输入时的 id 使其可回溯"
+  detail: |
+    Wayne 2026-07-12 review verdict ①附加。细化 decision-project-023 的
+    "人的动作必入":实质性注入才升里程碑档,"继续/好的"类轻量确认不升
+    (否则长 session 里程碑档被灌水)。
+    机制:hook 捕获 UserPromptSubmit 后,用很薄的 prompt 判定是否里程碑
+    并生成一句短摘要;UI 先展示摘要,expand 看用户原文;事件携带
+    promptId(输入时分配)做全链路回溯。
+    实现注意:CLI 本体保持零 LLM(decision-013)——薄分类走异步
+    claude -p 或先用机械启发式(长度/内容)兜底,LLM 只裁模糊区;
+    摘要缺席时 UI 回退到原文截断(诚实降级)。归后端 M1。
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "workbench"
+  tags: [timeline, milestone, user-injection, summary, traceability]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne morning review 2026-07-12, verdict ①"
+  produced_by_agent: "kernel"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-023"
+    type: relates_to
+  - target: "decision-project-022"
+    type: relates_to
+anchors: []
