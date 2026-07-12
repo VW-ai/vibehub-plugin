@@ -57,7 +57,7 @@ progress:
       gate: false
       notes: "core treemap.ts 纯函数 squarified(面积比例/无重叠/确定性/N=40 无 sliver/10 万倍偏斜,不变式测试钉死)+ migration 003 feature_layouts 缓存 + fixture-export 接线(蒸馏地盘真布局、灰区按未锚文件加权、occupancy 逐地盘 rollup、申报 scope 指向蒸馏地盘不再归灰)。合成 9 地盘视觉验证:比例正确近方形 respect 92.5% 底线。边界留 M2:灰区缓存(无 feature 行,帧时现算)、sub-block packing。core vitest 88/88。"
   commits:
-    - hash: "5fd3c5c"
+    - hash: "7fda323"
       date: "2026-07-12"
       message: "[21-workbench] chore: 截图字节级刷新 — treemap spike 会话 re-render 残留"
       files_changed: 6
