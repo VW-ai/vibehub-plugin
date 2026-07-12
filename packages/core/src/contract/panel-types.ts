@@ -51,6 +51,12 @@ export interface LaunchEvent extends TimelineEventBase {
   type: "launch";
   /** Verbatim prompt. Never truncated in data — clamping is a UI concern. */
   prompt: string;
+  /**
+   * Claude Code's own prompt UUID (hook payload `prompt_id`) — full-chain
+   * traceability back to the exact input (decision-workbench-001). Absent
+   * on older Claude Code versions.
+   */
+  promptId?: string;
 }
 
 /**
@@ -142,6 +148,17 @@ export interface UserInjectionEvent extends TimelineEventBase {
   mode: "inject" | "pause";
   /** Verbatim message. */
   text: string;
+  /** Claude Code prompt UUID when the injection was typed in the terminal
+   *  (UserPromptSubmit hook); absent for deck-queued injections. */
+  promptId?: string;
+  /**
+   * Milestone-tier verdict (decision-workbench-001): terminal-typed prompts
+   * get the mechanical heuristic ("routine" acks never reach milestone tier;
+   * "ambiguous" renders as milestone until a thin LLM re-judges it). Absent
+   * for deck injections — a deliberate intervention is always milestone
+   * (decision-project-023: 介入必入两档).
+   */
+  classification?: "milestone" | "routine" | "ambiguous";
 }
 
 /**

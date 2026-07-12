@@ -29,7 +29,9 @@ import {
   taskIdForBranch,
   upsertSession,
   upsertTask,
+  type ClaimedInjection,
 } from "./activity-store.js";
+import { classifyUserPrompt } from "./milestone.js";
 import type { Db } from "./db.js";
 import { GitFacade } from "./git-facade.js";
 import { nextState, type HookEventName } from "./state-machine.js";
@@ -41,6 +43,8 @@ export interface HookPayload {
   transcript_path?: string;
   cwd: string;
   hook_event_name?: string;
+  /** Claude Code prompt UUID (absent until first user input / old versions). */
+  prompt_id?: string;
   // UserPromptSubmit
   prompt?: string;
   // PostToolUse
@@ -207,10 +211,28 @@ export function ingestHookEvent(
     case "UserPromptSubmit": {
       if (payload.prompt) {
         const hasLaunch = hasEvent(db, taskId, "launch");
+        const promptId = payload.prompt_id;
         emit(
           hasLaunch
-            ? { id: eid(), at: nowIso, type: "user_injection", mode: "inject", text: payload.prompt }
-            : { id: eid(), at: nowIso, type: "launch", prompt: payload.prompt },
+            ? {
+                id: eid(),
+                at: nowIso,
+                type: "user_injection",
+                mode: "inject",
+                text: payload.prompt,
+                // mechanical milestone tier (decision-workbench-001); the
+                // launch prompt below needs none — founding instructions are
+                // always milestone (023)
+                classification: classifyUserPrompt(payload.prompt),
+                ...(promptId ? { promptId } : {}),
+              }
+            : {
+                id: eid(),
+                at: nowIso,
+                type: "launch",
+                prompt: payload.prompt,
+                ...(promptId ? { promptId } : {}),
+              },
         );
       }
       break;
@@ -275,10 +297,24 @@ export function ingestHookEvent(
     emit(transition);
   }
 
-  // 注入队列回查 (decision-project-018) — deliver pending notes at the
-  // hook boundaries that accept additionalContext.
+  // 注入队列回查 (decision-project-018) — deliver pending notes at every
+  // hook boundary that accepts additionalContext. Stop is the fast lane:
+  // its additionalContext CONTINUES the conversation (official hooks doc),
+  // so a fire-and-forget injection wakes the agent instead of waiting for
+  // the next user prompt (the Stop→waiting transition above is then
+  // corrected by the very next hook fire — honest, self-healing).
+  // SessionStart catches notes queued while the session was away.
+  // Claiming (claimed_at) IS the delivery receipt: the context was emitted
+  // to Claude Code in this very process. There is no daemon to time out a
+  // pending note — "still undelivered" is a read-side derivation
+  // (pendingInjections + age), surfaced by the UI, never a stored state.
   let output: HookIngestResult["output"];
-  if (hook === "UserPromptSubmit" || hook === "PostToolUse") {
+  if (
+    hook === "UserPromptSubmit" ||
+    hook === "PostToolUse" ||
+    hook === "Stop" ||
+    hook === "SessionStart"
+  ) {
     const claimed = claimPendingInjections(db, taskId, nowIso);
     if (claimed.length > 0) {
       for (const c of claimed) {
@@ -293,15 +329,32 @@ export function ingestHookEvent(
       output = {
         hookSpecificOutput: {
           hookEventName: hook,
-          additionalContext:
-            "[Vibehub] Message(s) from your user:\n" +
-            claimed.map((c) => `- ${c.text}`).join("\n"),
+          additionalContext: formatDelivery(claimed),
         },
       };
     }
   }
 
   return { taskId, eventTypesWritten: written, stateBefore, stateAfter, output };
+}
+
+/**
+ * Delivery wrapper (decision-project-018 双模). PROVISIONAL WORDING — the
+ * final text is a 卡点-2 pick (decision-workbench-007); any change after
+ * that is a product change and must leave a spec trace.
+ * One batch = all pending notes FIFO; one pause makes the whole batch a
+ * pause (the stricter semantic wins — the agent can't half-stop).
+ */
+function formatDelivery(claimed: ClaimedInjection[]): string {
+  const lines = claimed.map((c) => `- ${c.text}`).join("\n");
+  if (claimed.some((c) => c.mode === "pause")) {
+    return (
+      "[Vibehub] PAUSE from your user:\n" +
+      lines +
+      "\nStop what you're doing — no further tool calls. Reply to this, then wait for your user before continuing."
+    );
+  }
+  return "[Vibehub] Message(s) from your user:\n" + lines;
 }
 
 function existingSessionStart(db: Db, sessionId: string): string | null {

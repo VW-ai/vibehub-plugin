@@ -46,6 +46,7 @@ export {
   type LayoutOptions,
 } from "./treemap.js";
 export { nextState, type HookEventName } from "./state-machine.js";
+export { classifyUserPrompt, type PromptClassification } from "./milestone.js";
 export {
   ingestHookEvent,
   lastAssistantText,

@@ -11,6 +11,7 @@ import {
 import { nextState } from "../src/state-machine.js";
 import {
   enqueueInjection,
+  pendingInjections,
   readFootprints,
   readTask,
   readTimeline,
@@ -188,6 +189,86 @@ describe("ingestHookEvent on a scratch repo", () => {
       tool_input: { file_path: path.join(repo.work, "src/a.ts") },
     }), { now: () => T(3) });
     expect(r2.output).toBeUndefined();
+  });
+
+  it("Stop delivers pending injections — the wake-the-agent fast lane", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    enqueueInjection(db, repoId, taskBranch, "inject", "Also update the docs.", T(1).toISOString());
+
+    const r = ingestHookEvent(db, "Stop", payload(), { now: () => T(2) });
+    expect(r.output).toEqual({
+      hookSpecificOutput: {
+        hookEventName: "Stop",
+        additionalContext: "[Vibehub] Message(s) from your user:\n- Also update the docs.",
+      },
+    });
+    expect(pendingInjections(db, taskBranch)).toEqual([]);
+  });
+
+  it("SessionStart delivers notes queued while the session was away", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    ingestHookEvent(db, "SessionEnd", payload({ reason: "exit" }), { now: () => T(1) });
+    enqueueInjection(db, repoId, taskBranch, "inject", "When you're back: rebase first.", T(2).toISOString());
+
+    const r = ingestHookEvent(db, "SessionStart", payload({ session_id: "sess-2" }), { now: () => T(3) });
+    expect(r.output?.hookSpecificOutput.hookEventName).toBe("SessionStart");
+    expect(r.output?.hookSpecificOutput.additionalContext).toContain("rebase first");
+  });
+
+  it("one pause in the batch makes the WHOLE batch a pause (stricter wins)", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    enqueueInjection(db, repoId, taskBranch, "inject", "First note.", T(1).toISOString());
+    enqueueInjection(db, repoId, taskBranch, "pause", "Stop — let's talk.", T(2).toISOString());
+
+    const r = ingestHookEvent(db, "UserPromptSubmit", payload({ prompt: "继续" }), { now: () => T(3) });
+    const ctx = r.output!.hookSpecificOutput.additionalContext;
+    expect(ctx).toContain("[Vibehub] PAUSE from your user:");
+    // FIFO order preserved inside the batch
+    expect(ctx.indexOf("First note.")).toBeLessThan(ctx.indexOf("Stop — let's talk."));
+    expect(ctx).toContain("no further tool calls");
+  });
+
+  it("pendingInjections is the read-side delivery-timeout view (no stored state)", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    enqueueInjection(db, repoId, taskBranch, "pause", "Anyone there?", T(1).toISOString());
+
+    // still pending — no delivery-capable hook has fired since enqueue
+    expect(pendingInjections(db, taskBranch)).toMatchObject([
+      { mode: "pause", text: "Anyone there?", createdAt: T(1).toISOString() },
+    ]);
+    // Notification cannot carry additionalContext → must NOT claim
+    ingestHookEvent(db, "Notification", payload({ message: "?" }), { now: () => T(2) });
+    expect(pendingInjections(db, taskBranch)).toHaveLength(1);
+
+    ingestHookEvent(db, "Stop", payload(), { now: () => T(3) });
+    expect(pendingInjections(db, taskBranch)).toEqual([]);
+  });
+
+  it("terminal-typed prompts carry prompt_id and a mechanical milestone tier (workbench-001)", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    ingestHookEvent(db, "UserPromptSubmit", payload({ prompt: "Fix the login retry.", prompt_id: "p-1" }), { now: () => T(1) });
+    ingestHookEvent(db, "UserPromptSubmit", payload({ prompt: "继续", prompt_id: "p-2" }), { now: () => T(2) });
+    ingestHookEvent(db, "UserPromptSubmit", payload({ prompt: "换个方向:先把注入队列的送达确认做完,再回来处理里程碑分类的模糊区,顺序不要反。", prompt_id: "p-3" }), { now: () => T(3) });
+
+    const tl = readTimeline(db, taskBranch);
+    expect(tl.find((e) => e.type === "launch")).toMatchObject({ promptId: "p-1" });
+    const injections = tl.filter((e) => e.type === "user_injection");
+    expect(injections[0]).toMatchObject({ promptId: "p-2", classification: "routine" });
+    expect(injections[1]).toMatchObject({ promptId: "p-3", classification: "milestone" });
+  });
+
+  it("deck-queued injections carry NO classification (deliberate intervention = always milestone)", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    enqueueInjection(db, repoId, taskBranch, "inject", "ok", T(1).toISOString());
+    ingestHookEvent(db, "Stop", payload(), { now: () => T(2) });
+
+    const e = readTimeline(db, taskBranch).find((x) => x.type === "user_injection")!;
+    expect(e).not.toHaveProperty("classification");
   });
 
   it("a session in a WORKTREE lands on the same repo domain (github-004)", () => {

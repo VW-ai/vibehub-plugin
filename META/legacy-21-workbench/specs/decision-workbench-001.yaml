@@ -30,4 +30,6 @@ relations:
     type: relates_to
   - target: "decision-project-022"
     type: relates_to
-anchors: []
+anchors:
+  - file: "workbench/packages/core/src/milestone.ts"
+    symbols: [classifyUserPrompt]

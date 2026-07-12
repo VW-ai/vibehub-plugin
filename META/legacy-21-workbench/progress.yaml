@@ -1,5 +1,5 @@
 progress:
-  completion: 1.0
+  completion: 0.92
   milestones:
     - id: m1-map-main
       name: "Map main view (scope occupancy) — dynamize from approved v8"
@@ -56,7 +56,24 @@ progress:
       status: completed
       gate: false
       notes: "core treemap.ts 纯函数 squarified(面积比例/无重叠/确定性/N=40 无 sliver/10 万倍偏斜,不变式测试钉死)+ migration 003 feature_layouts 缓存 + fixture-export 接线(蒸馏地盘真布局、灰区按未锚文件加权、occupancy 逐地盘 rollup、申报 scope 指向蒸馏地盘不再归灰)。合成 9 地盘视觉验证:比例正确近方形 respect 92.5% 底线。边界留 M2:灰区缓存(无 feature 行,帧时现算)、sub-block packing。core vitest 88/88。"
+    - id: m2-claude-integration
+      name: "M2: Claude Code 集成层 — hook 矩阵 + 微协议 + MCP 三组工具 + 注入投递端"
+      status: in_progress
+      gate: true
+      notes: "第一批:设计块 A/B/C 落 draft(006 hook 九事件矩阵+robustness 判决/007 微协议四组 style-tiles 候选/008 MCP 工具 description 逐字+schema),⛔ 三卡点待 Wayne 逐块过(hooks 官方能力表 2026-07-12 抓取钉死,非凭记忆)。机械块 D 实装:注入投递扩 Stop(送达即唤醒)/SessionStart(离场补送),pause 批内最严胜出,claimed_at=送达回执+超时读侧推导(pendingInjections);里程碑机械兜底 classifyUserPrompt(routine ack 词表/milestone 结构或 CJK×2 加权长度/ambiguous 留薄 LLM);契约 +promptId/+classification。core vitest 105/105,core+cli tsc clean。待卡点后:块E hooks wiring+vibehub init+MCP server 实装+真 session 端到端。"
   commits:
+    - hash: "09f37b8"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(m2): Claude Code 集成层第一批 — 设计块 A/B/C draft + 注入投递端/里程碑启发式"
+      files_changed: 15
+      specs_affected:
+        - decision-workbench-006 (created, draft — 卡点1)
+        - decision-workbench-007 (created, draft — 卡点2)
+        - decision-workbench-008 (created, draft — 卡点3)
+        - change-2026-07-12-m2-integration-design (created)
+        - decision-workbench-001 (anchor added — 机械兜底实装)
+      milestones_affected:
+        - m2-claude-integration (created → in_progress)
     - hash: "7fda323"
       date: "2026-07-12"
       message: "[21-workbench] chore: 截图字节级刷新 — treemap spike 会话 re-render 残留"

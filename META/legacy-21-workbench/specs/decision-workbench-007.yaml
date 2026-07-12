@@ -1,0 +1,55 @@
+spec_id: "decision-workbench-007"
+type: decision
+state: draft
+intent:
+  summary: "微协议 prompt 文本四组(SessionStart 行为协议/meta 角色/scope 越界提醒/注入送达包装),每组 2-3 候选 style-tiles 式待 Wayne 逐条选;统一 [Vibehub] 前缀、全英文;pause>inject 批量包装最严胜出;文本改动=产品改动,实装后任何变更留 spec 痕"
+  detail: |
+    ⛔ 卡点 2 待 Wayne 逐条选(像过 style tiles:每条 2-3 候选,选而非改)。
+    候选全文逐字见 design-claude-code-integration.md 块B;选定后逐字回填本 spec。
+
+    **四组与触发条件/预算/预期行为:**
+    1. **B1 SessionStart 行为协议**(普通 session;每 session 一次,resume/compact
+       重注):候选 A 命令式全款 ~110 tok / B 讲为什么 ~75 / C 极简铁四条 ~45。
+       预期:动手前 register_scope、陌生区前 kb_retrieve、决策当场 kb_record、
+       方向变 self_report。
+    2. **B1-meta 编排席角色**(SessionStart 且 VIBEHUB_SESSION_ROLE=meta,
+       app 发射时设环境变量;M3+ 才有真消费者,文本先定):候选 A ~90 / B ~40。
+       预期:只编排不干活;空写 scope 由 020 twist 自守。
+    3. **B2 scope 越界自报提醒**(PostToolUse 机械探测 edit 足迹越出声明
+       write scope,每 session 至多一次,022 硬条款):候选 A 给台阶双分支 ~55 /
+       B 极简 ~30 / C 问句式。预期:真转向→self_report+register_scope;
+       顺手小改→忽略不产生噪音。
+    4. **B3 注入送达包装**(队列非空时,送达点 UserPromptSubmit/PostToolUse/
+       Stop/SessionStart-resume):inject 模式候选 A 叙事包装 ~25 / B 现 M1
+       极简格式;pause 模式候选 A 全款 ~45 / B 短款。多条 pending FIFO 合并
+       一块;含任一 pause 则整块按 pause 包装(最严语义胜出)。
+
+    **通用规则**:全英文(token 效率+通用性);[Vibehub] 前缀标来源;
+    语气(命令式 vs 提示式)是 Wayne 手感裁决项——候选刻意横跨两种语气。
+constraints:
+  - kind: must
+    rule: "实装后任何微指令文本变更 = 产品改动,必须留 spec 痕"
+  - kind: must
+    rule: "每条微指令必须有显式触发条件与 token 预算标注(026)"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [micro-protocol, prompt-text, injection, style-tiles, session-role]
+provenance:
+  source_type: manual_input
+  confidence: 0.75
+  source_ref: "M2 integration design session 2026-07-12;候选待 Wayne 卡点 2 逐条选"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-026"
+    type: implements
+    detail: "skill→hook 微协议重塑的文本本体"
+  - target: "decision-workbench-006"
+    type: depends_on
+    detail: "触发条件挂在 006 矩阵的接线点上"
+  - target: "intent-workbench-001"
+    type: relates_to
+    detail: "meta 角色注入 = 操作舱编排席的协议前置"
+anchors: []

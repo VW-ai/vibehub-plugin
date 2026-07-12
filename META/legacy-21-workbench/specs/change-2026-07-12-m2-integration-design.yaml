@@ -1,0 +1,57 @@
+spec_id: "change-2026-07-12-m2-integration-design"
+type: change
+state: active
+intent:
+  summary: "M2 Claude Code 集成层第一批:设计块 A/B/C 落 draft(006 hook 矩阵/007 微协议文本/008 MCP 工具面,三卡点待 Wayne)+ 机械块 D 实装(注入投递端扩 Stop/SessionStart+pause 包装+送达读侧语义;里程碑机械启发式 CJK 加权)"
+  detail: |
+    设计侧(卡点前不 promote):
+    - hooks 官方能力表 2026-07-12 抓自 code.claude.com/docs/en/hooks 钉死成表
+      (design-claude-code-integration.md 块A.0),Stop additionalContext 唤醒
+      语义、SessionStart(source=compact) 重注入口等关键事实非凭记忆;
+    - decision-workbench-006(draft):九事件接线矩阵 + 注入预算总账 +
+      robustness 判决(不自建监听器,降级走 021 弱档);
+    - decision-workbench-007(draft):四组微协议文本各 2-3 候选,style-tiles
+      式待逐条选;
+    - decision-workbench-008(draft):register_scope/self_report/kb_retrieve/
+      kb_record 的 description 逐字文本 + schema,GitHub-why-not 已答。
+
+    代码侧(块D,不等卡点):
+    - 注入投递端:回查点从 UserPromptSubmit/PostToolUse 扩到 Stop(送达即
+      唤醒,fire-and-forget 不等下条 prompt)与 SessionStart(离场补送);
+      pause/inject 双模包装,批内一 pause 全 pause(最严胜出),包装文本
+      标注 PROVISIONAL 待卡点 2;claimed_at = 送达回执,超时不存态——
+      pendingInjections() 读侧推导(与 stalled 同纪律);
+    - 里程碑机械兜底(workbench-001):classifyUserPrompt 纯函数,
+      routine(ack 词表)/milestone(结构或加权长度,CJK×2)/ambiguous
+      (留薄 LLM 异步再裁);launch 恒里程碑不分类;deck 注入不分类
+      (介入必入两档,023);
+    - 契约增量:LaunchEvent/UserInjectionEvent +promptId(hook 自带
+      prompt_id,001 回溯),UserInjectionEvent +classification;
+    - core vitest 105/105(+13),core/cli tsc clean。
+indexing:
+  type: change
+  priority: P1
+  layer: feature
+  domain: "workbench"
+  tags: [claude-code, hooks, injection-delivery, milestone-heuristic, m2]
+provenance:
+  source_type: manual_input
+  confidence: 0.9
+  source_ref: "M2 integration session 2026-07-12"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-workbench-006"
+    type: relates_to
+  - target: "decision-workbench-001"
+    type: implements
+    detail: "机械启发式兜底档"
+  - target: "decision-project-018"
+    type: implements
+    detail: "注入队列投递端补全"
+anchors:
+  - file: "workbench/packages/core/src/milestone.ts"
+    symbols: [classifyUserPrompt]
+  - file: "workbench/packages/core/src/hook-ingest.ts"
+    symbols: [ingestHookEvent, formatDelivery]
+  - file: "workbench/packages/core/src/activity-store.ts"
+    symbols: [pendingInjections]

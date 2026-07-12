@@ -1,0 +1,58 @@
+spec_id: "decision-workbench-008"
+type: decision
+state: draft
+intent:
+  summary: "MCP 三组工具面:register_scope(声明+人话状态同动作)/ self_report(轻量叙事更新)/ 沉淀-retrieve 组 = kb_retrieve + kb_record(record 参数化 supersedes/marks_stale,无 delete);description 即行为引导(何时自发调写进 description,不依赖 skill);GitHub-why-not:GitHub 无运行中 session 概念,scope/注入/本地语义图皆事中态,PR/issue 皆事后工件"
+  detail: |
+    ⛔ 卡点 3 待 Wayne 审。四个 tool 的 description 逐字文本 + JSON Schema
+    见 design-claude-code-integration.md 块C;批后逐字回填。
+
+    **工具面(025 三组的落名):**
+    1. `register_scope` — 任务开工前调一次,工作漂移再调;status 一句人话 +
+       write/read path-glob 数组。自报叙事版与 scope 数据版同一动作(022);
+       声明宽不罚(020)。重调即替换 = 状态更新通道。
+    2. `self_report` — 一句话现在在干嘛/刚完成啥;计划变、大步完成、
+       收到越界提醒后调。区域也变了则改调 register_scope(两者都更新)。
+    3. `kb_retrieve` — 碰陌生区前/架构选择前/用户问 why 时查决策图;
+       按 topic 或 file path 查;description 明写 "cheap and local —
+       when in doubt, call it"。
+    4. `kb_record` — 决策发生当场记录,不攒批不等问;one entry = one fact;
+       **无 delete**:改错传 supersedes(版本链),废弃传 marks_stale。
+       产出落 draft 态,人晨审 promote(现行 fr 纪律不变)。
+
+    retrieve 排序/裁剪策略后续吃 Victor plugin 蒸馏的三档拉取表(026 判定
+    可复用约六七成 C/R/U 领域逻辑)。
+
+    **GitHub 为什么做不到(009 必答)**:scope registry 是活 session 的
+    实时声明、注入是往运行中 agent 推消息、决策图是本地 SQLite 语义层——
+    GitHub 没有"正在跑的 session"这个实体,PR/issue/commit 全是事后工件,
+    无一承载事中态。三组全部自研,与 GitHub 零重叠。
+constraints:
+  - kind: must
+    rule: "工具行为引导只住 description(026 驱动②),不得依赖 skill 正文教『何时调』"
+  - kind: must_not
+    rule: "沉淀面无 delete 操作;修正只走 supersedes / marks_stale"
+  - kind: must_not
+    rule: "MCP server 不实现业务逻辑,只做 core 之上的薄适配(013)"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [mcp, tool-description, register-scope, self-report, kb, spontaneous-cru]
+provenance:
+  source_type: manual_input
+  confidence: 0.8
+  source_ref: "M2 integration design session 2026-07-12"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-026"
+    type: implements
+    detail: "自发 CRU 驱动②(工具自述)的落地"
+  - target: "decision-project-025"
+    type: implements
+    detail: "MCP 三组工具的具名细化"
+  - target: "decision-project-009"
+    type: relates_to
+    detail: "GitHub-why-not 已逐组回答"
+anchors: []

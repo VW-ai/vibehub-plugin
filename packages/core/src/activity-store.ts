@@ -344,6 +344,31 @@ export function claimPendingInjections(
     .all(now, taskId) as ClaimedInjection[];
 }
 
+export interface PendingInjection {
+  id: number;
+  mode: "inject" | "pause";
+  text: string;
+  createdAt: string;
+}
+
+/**
+ * Read-side view of not-yet-delivered notes — the delivery-timeout story.
+ * claimed_at doubles as the delivery receipt (set in the same process that
+ * emitted the additionalContext), and with no daemon there is nothing to
+ * fire a timeout: "stuck" is DERIVED at read time from createdAt age (the
+ * UI decides the threshold — e.g. session ended, or no hook fire since),
+ * never stored (same discipline as "stalled" in state-machine.ts).
+ */
+export function pendingInjections(db: Db, taskId: string): PendingInjection[] {
+  return db
+    .prepare(
+      `SELECT id, mode, text, created_at AS createdAt FROM injections
+       WHERE claimed_at IS NULL AND task_id = ?
+       ORDER BY created_at, id`,
+    )
+    .all(taskId) as PendingInjection[];
+}
+
 /* ── conflicts ──────────────────────────────────────────────────────────── */
 
 /** Persist a contract Conflict + the anchoring file per shared symbol. */
