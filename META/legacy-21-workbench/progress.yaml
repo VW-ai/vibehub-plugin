@@ -51,7 +51,26 @@ progress:
       status: completed
       gate: true
       notes: "vite middleware /live-fixture.json 每请求经 core dist 现场 openDb→exportTeamMapFixture(连续请求 capturedAt 不同=实证真读;Tauri 读路径的 dev 替身,浏览器 bundle 不碰 native);无 DB/未 sync 依次回退静态导出→404→前端警告降级。fixture-export 合并本地 hook 任务:同 branch hooks 档赢(真五态/statusDetail/worktreePath,远端只贡献 PR 事实)、未 push branch 照进、scope 申报优先足迹自陈兜底。e2e 170→172(live boot 两侧分支+未知名回退)、demo vitest 44/44、core 74/74、tsc clean。真环境截图:地图实时显示 M1 三切片分支与 walking-skeleton 的并发冲突。遗留:demo 契约类型副本待 core browser-safe subpath export 后消灭(镜像纪律生效中)。"
+    - id: b5-treemap-spike
+      name: "Treemap spike: squarified 布局替手调 demoLayout(蒸馏时算一次缓存)"
+      status: completed
+      gate: false
+      notes: "core treemap.ts 纯函数 squarified(面积比例/无重叠/确定性/N=40 无 sliver/10 万倍偏斜,不变式测试钉死)+ migration 003 feature_layouts 缓存 + fixture-export 接线(蒸馏地盘真布局、灰区按未锚文件加权、occupancy 逐地盘 rollup、申报 scope 指向蒸馏地盘不再归灰)。合成 9 地盘视觉验证:比例正确近方形 respect 92.5% 底线。边界留 M2:灰区缓存(无 feature 行,帧时现算)、sub-block packing。core vitest 88/88。"
   commits:
+    - hash: "7fda323"
+      date: "2026-07-12"
+      message: "[21-workbench] chore: 截图字节级刷新 — treemap spike 会话 re-render 残留"
+      files_changed: 6
+      specs_affected: []
+      milestones_affected: []
+    - hash: "4269a49"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(treemap): squarified 布局替手调 demoLayout — 蒸馏时算一次缓存"
+      files_changed: 11
+      specs_affected:
+        - change-2026-07-12-treemap-spike (created)
+      milestones_affected:
+        - b5-treemap-spike (→ completed)
     - hash: "53c834d"
       date: "2026-07-12"
       message: "[21-workbench] feat(backend-m1): demo 切真 SQLite 读 — vite middleware 现场导出 + 本地任务合并"

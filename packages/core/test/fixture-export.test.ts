@@ -239,6 +239,70 @@ describe("exportTeamMapFixture", () => {
     });
   });
 
+  it("distilled territories get squarified layouts; the gray joins weighted by unanchored files", async () => {
+    const { addAnchor, upsertFeature } = await import("../src/graph-store.js");
+    const { upsertTask, addFootprint } = await import("../src/activity-store.js");
+    // 321 repo files (sync state); 3 anchored → 318 unanchored
+    upsertFeature(db, { id: "auth", repoId, name: "Auth & Sessions", now: T0 });
+    upsertFeature(db, { id: "orders", repoId, name: "Payments & Orders", now: T0 });
+    addAnchor(db, { repoId, featureId: "auth", file: "src/auth/a.ts" });
+    addAnchor(db, { repoId, featureId: "auth", file: "src/auth/b.ts" });
+    addAnchor(db, { repoId, featureId: "orders", file: "src/orders/o.ts" });
+    // a local task footprinting an unanchored file → lands on the gray
+    replaceTeamBranches(db, repoId, []);
+    upsertTask(db, {
+      id: "branch:vibehub/x", repoId, title: "vibehub/x",
+      state: "running", signalTier: "hooks", branch: "vibehub/x",
+      worktreePath: null, prNumber: null, prState: null,
+      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0,
+    });
+    addFootprint(db, repoId, { taskId: "branch:vibehub/x", sessionId: null, path: "src/misc.ts", action: "edit", at: T1 });
+
+    const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });
+
+    expect(fx.territories.map((t) => t.id).sort()).toEqual([
+      "auth", "orders", UNCATEGORIZED_TERRITORY_ID,
+    ]);
+    const gray = fx.territories.find((t) => t.id === UNCATEGORIZED_TERRITORY_ID)!;
+    expect(gray.anchoredFileCount).toBe(318); // 321 - 3 anchored
+    // every territory got a real layout inside the canvas margins
+    for (const t of fx.territories) {
+      expect(t.demoLayout).toBeDefined();
+      expect(t.demoLayout!.top + t.demoLayout!.height).toBeLessThanOrEqual(92.5 + 1e-9);
+    }
+    // gray (318 files) dwarfs auth (2 files) proportionally
+    const auth = fx.territories.find((t) => t.id === "auth")!;
+    const area = (d: NonNullable<typeof gray.demoLayout>) => d.width * d.height;
+    expect(area(gray.demoLayout!)).toBeGreaterThan(area(auth.demoLayout!) * 50);
+    // occupancy rolls up per territory; the task writes on the gray
+    const grayOcc = fx.occupancy.find((o) => o.territoryId === UNCATEGORIZED_TERRITORY_ID)!;
+    expect(grayOcc.writingTaskIds).toEqual(["branch:vibehub/x"]);
+    const authOcc = fx.occupancy.find((o) => o.territoryId === "auth")!;
+    expect(authOcc.writingTaskIds).toEqual([]);
+  });
+
+  it("declared scopes on a distilled territory KEEP it (no gray coercion)", async () => {
+    const { addAnchor, upsertFeature } = await import("../src/graph-store.js");
+    const { upsertTask, setScopes } = await import("../src/activity-store.js");
+    upsertFeature(db, { id: "auth", repoId, name: "Auth", now: T0 });
+    addAnchor(db, { repoId, featureId: "auth", file: "src/auth/a.ts" });
+    replaceTeamBranches(db, repoId, []);
+    upsertTask(db, {
+      id: "branch:vibehub/y", repoId, title: "vibehub/y",
+      state: "running", signalTier: "hooks", branch: "vibehub/y",
+      worktreePath: null, prNumber: null, prState: null,
+      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0,
+    });
+    setScopes(db, repoId, "branch:vibehub/y", [
+      { mode: "write", territoryId: "auth", label: "auth" },
+    ]);
+    const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });
+    expect(fx.tasks[0]!.scopes[0]!.territoryId).toBe("auth");
+    expect(
+      fx.occupancy.find((o) => o.territoryId === "auth")!.writingTaskIds,
+    ).toEqual(["branch:vibehub/y"]);
+  });
+
   it("reports repo header facts", () => {
     replaceTeamBranches(db, repoId, [branch("feat/a"), branch("feat/b")]);
     const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });

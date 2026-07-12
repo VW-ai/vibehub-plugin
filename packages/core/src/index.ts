@@ -32,6 +32,13 @@ export {
   type TeamSyncResult,
 } from "./team-sync.js";
 export { exportTeamMapFixture } from "./fixture-export.js";
+export {
+  squarify,
+  layoutTerritories,
+  DEFAULT_LAYOUT,
+  type TreemapItem,
+  type LayoutOptions,
+} from "./treemap.js";
 export { nextState, type HookEventName } from "./state-machine.js";
 export {
   ingestHookEvent,

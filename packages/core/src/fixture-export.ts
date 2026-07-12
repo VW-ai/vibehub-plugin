@@ -23,6 +23,7 @@ import type {
   MapFixture,
   ScopeDeclaration,
   Task,
+  Territory,
   TerritoryOccupancy,
 } from "./contract/map-types.js";
 import type { Db } from "./db.js";
@@ -32,6 +33,11 @@ import {
   readScopes,
   type TaskRow,
 } from "./activity-store.js";
+import {
+  listTerritories,
+  readTerritoryLayouts,
+} from "./graph-store.js";
+import { layoutTerritories } from "./treemap.js";
 import {
   getRepoByRoot,
   readBranchFiles,
@@ -78,6 +84,14 @@ export function exportTeamMapFixture(
   const sync = readSyncState(db, repo.id);
   const branches = readTeamBranches(db, repo.id);
   const conflictRows = readConflicts(db, repo.id);
+
+  // Distilled territories (graph domain), when a mapping pass has run.
+  // Declared scopes pointing at one of these keep their territory; anything
+  // else lands on the honest gray (see the territories section below).
+  const distilled = listTerritories(db, repoId).filter(
+    (t) => t.anchoredFileCount > 0,
+  );
+  const distilledIds = new Set(distilled.map((t) => t.id));
 
   // conflict rows (one per path) → one Conflict per branch pair
   const byPair = new Map<string, { a: string; b: string; paths: string[]; firstAt: string }>();
@@ -134,6 +148,7 @@ export function exportTeamMapFixture(
     // footprint speaks for itself on the one honest gray territory —
     // same idea as install-types.ts UncategorizedFootprint.
     const declared = readScopes(db, t.id).map((s: ScopeDeclaration) =>
+      distilledIds.has(s.territoryId) ||
       s.territoryId === UNCATEGORIZED_TERRITORY_ID
         ? s
         : { ...s, territoryId: UNCATEGORIZED_TERRITORY_ID },
@@ -228,18 +243,93 @@ export function exportTeamMapFixture(
       };
   }
 
-  const occupancy: TerritoryOccupancy[] = [
-    {
-      territoryId: UNCATEGORIZED_TERRITORY_ID,
-      writingTaskIds: tasks
-        .filter((t) => t.state !== "done" && t.scopes.length > 0)
-        .map((t) => t.id),
-      readingTaskIds: [],
-      doneTodayTaskIds: tasks
-        .filter((t) => t.state === "done") // stale done already filtered out
-        .map((t) => t.id),
-    },
-  ];
+  /** A task lives where its scopes point; scope-less = the honest gray. */
+  const taskTerritoryIds = (t: Task): string[] => {
+    const ids = [...new Set(t.scopes.map((s) => s.territoryId))];
+    return ids.length > 0 ? ids : [UNCATEGORIZED_TERRITORY_ID];
+  };
+
+  let territories: Territory[];
+  if (distilled.length > 0) {
+    // A mapping pass has run: real territories, squarified layout
+    // (weights = anchoredFileCount — the same derived fact the map labels).
+    const anchoredFiles = (
+      db
+        .prepare(`SELECT COUNT(DISTINCT file) AS n FROM anchors WHERE repo_id = ?`)
+        .get(repoId) as { n: number }
+    ).n;
+    const unanchored = Math.max((sync?.repoFiles ?? 0) - anchoredFiles, 0);
+    const grayReferenced =
+      unanchored > 0 ||
+      conflicts.length > 0 ||
+      tasks.some((t) => taskTerritoryIds(t).includes(UNCATEGORIZED_TERRITORY_ID));
+
+    const items = distilled.map((t) => ({ id: t.id, weight: t.anchoredFileCount }));
+    if (grayReferenced) {
+      // The gray joins the treemap weighted by what it honestly holds (the
+      // unanchored files), floored at one file-equivalent: when something
+      // references it, it must stay visible even if every file is anchored.
+      items.push({
+        id: UNCATEGORIZED_TERRITORY_ID,
+        weight: Math.max(unanchored, 1),
+      });
+    }
+    // Cached layout covers distilled features only; whenever the gray joins
+    // the frame we lay out afresh. (Caching a rect for the gray needs the
+    // real TerritoryBuilder pass — M2 question, noted in the change spec.)
+    const cached = readTerritoryLayouts(db, repoId);
+    const layouts =
+      grayReferenced || cached.size === 0 ? layoutTerritories(items) : cached;
+
+    territories = [
+      ...distilled.map((t) => ({ ...t, demoLayout: layouts.get(t.id) })),
+      ...(grayReferenced
+        ? [
+            {
+              id: UNCATEGORIZED_TERRITORY_ID,
+              name: "Uncategorized",
+              anchoredFileCount: unanchored,
+              subBlocks: [],
+              demoLayout: layouts.get(UNCATEGORIZED_TERRITORY_ID),
+            },
+          ]
+        : []),
+    ];
+  } else {
+    // Pre-distillation: the one honest gray, full-bleed (presentation-only).
+    territories = [
+      {
+        id: UNCATEGORIZED_TERRITORY_ID,
+        name: "Uncategorized",
+        anchoredFileCount: sync?.repoFiles ?? 0,
+        subBlocks: [],
+        demoLayout: { left: 2, top: 4, width: 96, height: 88 },
+      },
+    ];
+  }
+
+  const occupancy: TerritoryOccupancy[] = territories.map((terr) => ({
+    territoryId: terr.id,
+    writingTaskIds: tasks
+      .filter(
+        (t) =>
+          t.state !== "done" &&
+          t.scopes.some((s) => s.mode === "write" && s.territoryId === terr.id),
+      )
+      .map((t) => t.id),
+    readingTaskIds: tasks
+      .filter(
+        (t) =>
+          t.state !== "done" &&
+          t.scopes.some((s) => s.mode === "read" && s.territoryId === terr.id),
+      )
+      .map((t) => t.id),
+    doneTodayTaskIds: tasks
+      .filter(
+        (t) => t.state === "done" && taskTerritoryIds(t).includes(terr.id),
+      )
+      .map((t) => t.id),
+  }));
 
   return {
     capturedAt,
@@ -254,16 +344,7 @@ export function exportTeamMapFixture(
       stale: !(sync?.lastFetchOk ?? false),
     },
     tasks,
-    territories: [
-      {
-        id: UNCATEGORIZED_TERRITORY_ID,
-        name: "Uncategorized",
-        anchoredFileCount: sync?.repoFiles ?? 0,
-        subBlocks: [],
-        // Presentation-only full-bleed rect (see file header).
-        demoLayout: { left: 2, top: 4, width: 96, height: 88 },
-      },
-    ],
+    territories,
     occupancy,
     conflicts,
   };

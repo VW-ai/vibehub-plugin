@@ -1,0 +1,49 @@
+spec_id: "change-2026-07-12-treemap-spike"
+type: change
+state: active
+intent:
+  summary: "Treemap spike 落地:squarified 布局(纯函数)替手调 demoLayout — 蒸馏时算一次缓存(migration 003 feature_layouts),fixture-export 有蒸馏地盘时用真布局,occupancy 按地盘归位;合成 9 地盘视觉验证通过"
+  detail: |
+    - core/src/treemap.ts:经典 squarified(Bruls/Huizing/van Wijk),
+      纯几何零信号;权重=anchoredFileCount(蒸馏事实);面积严格成比例、
+      不重叠、canvas 内、确定性(同权保输入序);非正权重=caller bug
+      直接 throw。layoutTerritories 包一层 percent 坐标 + gutter,
+      margin 默认对齐 v8(2% 侧边,92.5% 底线=legend band 规则)。
+    - migration 003 feature_layouts:蒸馏时 computeAndCacheTerritoryLayout
+      算一次整体替换缓存,export 读缓存。
+    - fixture-export:有蒸馏地盘 → 真地盘+真布局;灰区按未锚文件数
+      加权入 treemap(被引用时地板 1 个文件当量保可见);申报 scope
+      指向蒸馏地盘时不再强制归灰;occupancy 从"单灰区"升级为
+      按地盘 rollup(write/read/doneToday 逐地盘)。
+    - 已知边界(M2 归 TerritoryBuilder):灰区无 feature 行,缓存
+      只覆盖蒸馏地盘——灰区在帧时现算;sub-block 内部 packing 未做
+      (demoSubLayout 仍缺席)。
+    - 验证:core vitest 88/88(treemap 不变式:面积比例/无重叠/
+      N=40 无 sliver 爆炸/10 万倍权重偏斜/确定性);合成 9 地盘 +
+      真团队数据截图——比例正确、近方形、respect 底线、occupancy
+      逐地盘归位。
+indexing:
+  type: change
+  priority: P1
+  layer: feature
+  domain: "workbench"
+  tags: [treemap, squarified, layout, territory, cache]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "treemap spike session 2026-07-12(handoff 待办)"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-019"
+    type: implements
+    detail: "主视图 scope 占用图的真布局 pass"
+  - target: "decision-project-025"
+    type: relates_to
+    detail: "TerritoryBuilder 模块的布局部分先行"
+anchors:
+  - file: "workbench/packages/core/src/treemap.ts"
+    symbols: [squarify, layoutTerritories]
+  - file: "workbench/packages/core/src/graph-store.ts"
+    symbols: [computeAndCacheTerritoryLayout, readTerritoryLayouts]
+  - file: "workbench/packages/core/src/fixture-export.ts"
+    symbols: [exportTeamMapFixture]

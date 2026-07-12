@@ -21,6 +21,7 @@ UI 长出的类型契约 = workbench/app-demo/src/*-types.ts ×5,后端实现清
 - [change-2026-07-12-team-visibility-slice] M1 ① 落地:core+cli 诞生,git+gh→SQLite→map 端到端实证(decision-github-003 ② 硬门槛完成)
 - [change-2026-07-12-three-domain-schema] M1 ② 落地:三表域 schema 直译(migration 002)+ ActivityStore/GraphStore,DERIVED-NEVER-STORED 贯彻
 - [change-2026-07-12-hook-cli-heart] M1 ③ 落地:vibehub hook CLI 心脏 + StateMachine,真 claude -p session 校准通过
+- [change-2026-07-12-treemap-spike] Treemap spike:squarified 真布局替手调 demoLayout,蒸馏时算一次缓存(migration 003)
 - [change-2026-07-12-demo-live-read] M1 ④ 落地:demo 切真 SQLite 读(vite middleware 现场导出),本地 hook 任务合并,e2e 172 全绿
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。

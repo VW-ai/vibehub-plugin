@@ -89,6 +89,37 @@ describe("GraphStore (图域 + 配置域)", () => {
     ).toThrow(/CHECK/);
   });
 
+  it("computes and caches the territory layout once (蒸馏时算一次)", async () => {
+    const { computeAndCacheTerritoryLayout, readTerritoryLayouts } = await import(
+      "../src/graph-store.js"
+    );
+    upsertFeature(db, { id: "auth", repoId: 1, name: "Auth", now: T0 });
+    upsertFeature(db, { id: "orders", repoId: 1, name: "Orders", now: T0 });
+    addAnchor(db, { repoId: 1, featureId: "auth", file: "a1.ts" });
+    addAnchor(db, { repoId: 1, featureId: "auth", file: "a2.ts" });
+    addAnchor(db, { repoId: 1, featureId: "orders", file: "o1.ts" });
+
+    expect(readTerritoryLayouts(db, 1).size).toBe(0); // never computed
+
+    const computed = computeAndCacheTerritoryLayout(db, 1, T0);
+    const cached = readTerritoryLayouts(db, 1);
+    expect(cached.size).toBe(2);
+    expect(cached.get("auth")).toEqual(computed.get("auth"));
+    // auth (2 files) gets ~2× orders' (1 file) area — approximate because
+    // the cached rects carry the visual gutter inset (absolute per block)
+    const a = cached.get("auth")!;
+    const o = cached.get("orders")!;
+    const ratio = (a.width * a.height) / (o.width * o.height);
+    expect(ratio).toBeGreaterThan(1.8);
+    expect(ratio).toBeLessThan(2.2);
+
+    // recompute replaces wholesale (new distillation invalidates old rects)
+    upsertFeature(db, { id: "billing", repoId: 1, name: "Billing", now: T0 });
+    addAnchor(db, { repoId: 1, featureId: "billing", file: "b1.ts" });
+    computeAndCacheTerritoryLayout(db, 1, T0);
+    expect(readTerritoryLayouts(db, 1).size).toBe(3);
+  });
+
   it("settings: repo-scoped value shadows global", () => {
     setSetting(db, "fetch.interval", "60");
     expect(getSetting(db, "fetch.interval", 1)).toBe("60"); // falls back to global
@@ -109,7 +140,7 @@ describe("migration ladder", () => {
 
   it("fresh db lands on the latest user_version", () => {
     const db = openDb(path.join(dir, "t.db"));
-    expect(db.pragma("user_version", { simple: true })).toBe(2);
+    expect(db.pragma("user_version", { simple: true })).toBe(3);
     db.close();
   });
 
@@ -141,7 +172,7 @@ describe("migration ladder", () => {
     raw.close();
 
     const db = openDb(p);
-    expect(db.pragma("user_version", { simple: true })).toBe(2);
+    expect(db.pragma("user_version", { simple: true })).toBe(3);
     // v1 data survived
     expect((db.prepare("SELECT slug FROM repos").get() as { slug: string }).slug).toBe("o/n");
     // v2 tables exist
