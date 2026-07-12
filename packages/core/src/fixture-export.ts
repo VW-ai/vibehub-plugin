@@ -21,10 +21,17 @@
 import type {
   Conflict,
   MapFixture,
+  ScopeDeclaration,
   Task,
   TerritoryOccupancy,
 } from "./contract/map-types.js";
 import type { Db } from "./db.js";
+import {
+  listTasks,
+  readFootprints,
+  readScopes,
+  type TaskRow,
+} from "./activity-store.js";
 import {
   getRepoByRoot,
   readBranchFiles,
@@ -49,6 +56,7 @@ export function exportTeamMapFixture(
       `no team snapshot for ${repoRoot} — run syncTeamSnapshot first`,
     );
   }
+  const repoId = repo.id;
   const capturedAt = (opts.now?.() ?? new Date()).toISOString();
   const sync = readSyncState(db, repo.id);
   const branches = readTeamBranches(db, repo.id);
@@ -91,10 +99,85 @@ export function exportTeamMapFixture(
     };
   });
 
+  // Local hook-captured tasks (运行域) — the hooks tier. Where a local task
+  // and a remote branch share the branch name (the join key, 024), the
+  // hooks-tier row wins: it knows the REAL state/timeline; the remote row
+  // only contributes PR facts.
+  const localByBranch = new Map(
+    listTasks(db, repo.id)
+      .filter((t) => t.branch !== null)
+      .map((t) => [t.branch!, t] as const),
+  );
+
+  const localTask = (
+    t: TaskRow,
+    pr: { prNumber: number | null; prState: Task["git"]["prState"] | null },
+  ): Task => {
+    // Declared scopes (MCP registration) when present; otherwise the
+    // footprint speaks for itself on the one honest gray territory —
+    // same idea as install-types.ts UncategorizedFootprint.
+    const declared = readScopes(db, t.id).map((s: ScopeDeclaration) =>
+      s.territoryId === UNCATEGORIZED_TERRITORY_ID
+        ? s
+        : { ...s, territoryId: UNCATEGORIZED_TERRITORY_ID },
+    );
+    let scopes = declared;
+    if (scopes.length === 0) {
+      const edited = new Set(
+        readFootprints(db, t.id)
+          .filter((f) => f.action === "edit")
+          .map((f) => f.path),
+      );
+      if (edited.size > 0) {
+        scopes = [
+          {
+            mode: "write",
+            territoryId: UNCATEGORIZED_TERRITORY_ID,
+            label: "uncategorized",
+            filesTouched: edited.size,
+          },
+        ];
+      }
+    }
+    return {
+      id: t.id,
+      title: t.title,
+      state: t.state,
+      signalTier: "hooks",
+      conflictIds: conflictIdsByBranch.get(t.branch!) ?? [],
+      scopes,
+      git: {
+        branch: t.branch!,
+        ...(t.worktreePath ? { worktreePath: t.worktreePath } : {}),
+        ...(pr.prNumber !== null && pr.prState !== null
+          ? { prNumber: pr.prNumber, prState: pr.prState }
+          : {}),
+      },
+      stateSince: t.stateSince,
+      lastEventAt: t.lastEventAt,
+      ...(t.statusDetail ? { statusDetail: t.statusDetail } : {}),
+    };
+  };
+
+  const remoteBranchNames = new Set(branches.map((b) => b.name));
   const tasks: Task[] = branches
     .filter((b) => !b.merged || b.prState === "merged")
     .map((b) => {
-      const files = readBranchFiles(db, repo.id, b.name);
+      const local = localByBranch.get(b.name);
+      if (local) {
+        return localTask(local, { prNumber: b.prNumber, prState: b.prState });
+      }
+      return teamTask(b);
+    });
+  // Local tasks on unpushed branches (no remote yet) — hooks see them first.
+  for (const [branch, t] of localByBranch) {
+    if (!remoteBranchNames.has(branch)) {
+      tasks.push(localTask(t, { prNumber: t.prNumber, prState: t.prState }));
+    }
+  }
+
+  function teamTask(b: (typeof branches)[number]): Task {
+      const files = readBranchFiles(db, repoId, b.name);
       const done = b.merged || b.prState === "merged" || b.prState === "closed";
       return {
         id: taskId(b.name),
@@ -121,7 +204,7 @@ export function exportTeamMapFixture(
         stateSince: b.lastCommitAt,
         lastEventAt: b.lastCommitAt,
       };
-    });
+  }
 
   const occupancy: TerritoryOccupancy[] = [
     {

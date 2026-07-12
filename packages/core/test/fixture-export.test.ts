@@ -176,6 +176,54 @@ describe("exportTeamMapFixture", () => {
     expect(fx.sync.lastHookEventAt).toBeNull();
   });
 
+  it("hooks-tier local task WINS over the remote row for the same branch (024 join key)", async () => {
+    const { upsertTask, addFootprint } = await import("../src/activity-store.js");
+    replaceTeamBranches(db, repoId, [
+      branch("feat/a", { prNumber: 5, prState: "open", prTitle: "PR title" }),
+    ]);
+    upsertTask(db, {
+      id: "branch:feat/a", repoId, title: "feat/a",
+      state: "waiting", signalTier: "hooks", branch: "feat/a",
+      worktreePath: "/wt/feat-a", prNumber: null, prState: null,
+      stateSince: T1, lastEventAt: T1,
+      statusDetail: "Which retry pattern?", createdAt: T0,
+    });
+    addFootprint(db, repoId, { taskId: "branch:feat/a", sessionId: null, path: "src/x.ts", action: "edit", at: T1 });
+
+    const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });
+    expect(fx.tasks).toHaveLength(1);
+    expect(fx.tasks[0]).toMatchObject({
+      id: "branch:feat/a",
+      state: "waiting", // the REAL hook state, not the basic-tier shim
+      signalTier: "hooks",
+      statusDetail: "Which retry pattern?",
+      git: { branch: "feat/a", worktreePath: "/wt/feat-a", prNumber: 5, prState: "open" },
+    });
+    // footprint fallback scope (no MCP declaration yet)
+    expect(fx.tasks[0]!.scopes).toEqual([
+      { mode: "write", territoryId: UNCATEGORIZED_TERRITORY_ID, label: "uncategorized", filesTouched: 1 },
+    ]);
+  });
+
+  it("local tasks on unpushed branches appear (hooks see them first)", async () => {
+    const { upsertTask } = await import("../src/activity-store.js");
+    replaceTeamBranches(db, repoId, []);
+    upsertTask(db, {
+      id: "branch:vibehub/local-only", repoId, title: "vibehub/local-only",
+      state: "running", signalTier: "hooks", branch: "vibehub/local-only",
+      worktreePath: null, prNumber: null, prState: null,
+      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0,
+    });
+    const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });
+    expect(fx.tasks).toHaveLength(1);
+    expect(fx.tasks[0]).toMatchObject({
+      id: "branch:vibehub/local-only",
+      state: "running",
+      signalTier: "hooks",
+      scopes: [], // no declaration, no footprint — nothing claimed
+    });
+  });
+
   it("reports repo header facts", () => {
     replaceTeamBranches(db, repoId, [branch("feat/a"), branch("feat/b")]);
     const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });
