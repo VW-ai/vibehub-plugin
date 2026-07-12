@@ -50,6 +50,14 @@ progress:
       status: pending
       gate: false
   commits:
+    - hash: "33876f3"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(backend-m1): 三表域 schema 直译 — migration 002 + ActivityStore/GraphStore"
+      files_changed: 14
+      specs_affected:
+        - change-2026-07-12-three-domain-schema (created)
+      milestones_affected:
+        - b2-three-domain-schema (→ completed)
     - hash: "5cc6a1f"
       date: "2026-07-12"
       message: "[21-workbench] feat(backend-m1): team-visibility vertical slice — core+cli 诞生,git+gh→SQLite→map 端到端实证"
