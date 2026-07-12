@@ -23,6 +23,20 @@ intent:
     4. **冲突年龄**:detectedAt = 首次检出时间,跨 re-sync 保留
        (menubar 冲突行 age basis = detectedAt,iter-20 fork 已定);
        不再相交即剪除(resolved is resolved)。
+
+    **2026-07-12 Wayne 晨审:上述四条全部批准,并补充裁决(口述):**
+    5. **队友的事 = 纯 git 档**(比 Codex basic 档更弱):左栏正常展示为
+       "事",标 GitHub 头像 + 创建人,agent 永不 actively work on it;
+       状态只有 git 事实态(ahead/merged/stale),不假装知道对方运行态。
+    6. **队友 branch 的语义 = 本地重跑增量蒸馏**:拿队友 diff + 本地最小
+       worktree,agent 按预设 skill 驱动跑一遍(diff 范围小,快),产物
+       进本地 SQLite 与自己的图合并;
+    7. **"PR 前 export markdown 留 main"方案否决**——那是
+       markdown-lives-on-GitHub 的软化版,与 decision-project-014
+       (SQLite 为体,markdown 读完即弃)冲突;dev 期内部 feature room
+       用得舒服不能反推为产品形态;
+    8. **双方都用系统的 sync = GraphStore 后端切换**(decision-project-011
+       团队版 Postgres),同步走存储层不走 git,不发明中间形态。
 indexing:
   type: decision
   priority: P1
