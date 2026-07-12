@@ -45,6 +45,23 @@ import { UNCATEGORIZED_TERRITORY_ID } from "./contract/install-types.js";
 const taskId = (branch: string): string => `branch:${branch}`;
 const conflictId = (a: string, b: string): string => `conflict:${a}|${b}`;
 
+/**
+ * Same calendar day, UTC. The map frame only shows TODAY's finished work
+ * (the rail's done group and occupancy.doneTodayTaskIds both mean "today"
+ * literally — Wayne verdict 2026-07-12: stale done tasks don't enter the
+ * frame at all). UTC as the day boundary is the simple deterministic
+ * choice; a local-tz boundary is a presentation question for the app shell.
+ */
+const sameUtcDay = (aIso: string, bIso: string): boolean => {
+  const a = new Date(aIso);
+  const b = new Date(bIso);
+  return (
+    a.getUTCFullYear() === b.getUTCFullYear() &&
+    a.getUTCMonth() === b.getUTCMonth() &&
+    a.getUTCDate() === b.getUTCDate()
+  );
+};
+
 export function exportTeamMapFixture(
   db: Db,
   repoRoot: string,
@@ -168,11 +185,16 @@ export function exportTeamMapFixture(
         return localTask(local, { prNumber: b.prNumber, prState: b.prState });
       }
       return teamTask(b);
-    });
+    })
+    // Done work only enters the frame the day it finished (sameUtcDay doc).
+    .filter((t) => t.state !== "done" || sameUtcDay(t.lastEventAt, capturedAt));
   // Local tasks on unpushed branches (no remote yet) — hooks see them first.
   for (const [branch, t] of localByBranch) {
     if (!remoteBranchNames.has(branch)) {
-      tasks.push(localTask(t, { prNumber: t.prNumber, prState: t.prState }));
+      const built = localTask(t, { prNumber: t.prNumber, prState: t.prState });
+      if (built.state !== "done" || sameUtcDay(built.lastEventAt, capturedAt)) {
+        tasks.push(built);
+      }
     }
   }
 
@@ -214,11 +236,7 @@ export function exportTeamMapFixture(
         .map((t) => t.id),
       readingTaskIds: [],
       doneTodayTaskIds: tasks
-        .filter(
-          (t) =>
-            t.state === "done" &&
-            t.lastEventAt.slice(0, 10) === capturedAt.slice(0, 10),
-        )
+        .filter((t) => t.state === "done") // stale done already filtered out
         .map((t) => t.id),
     },
   ];

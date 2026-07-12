@@ -102,6 +102,21 @@ describe("exportTeamMapFixture", () => {
     });
   });
 
+  it("done work from a PREVIOUS day never enters the frame (Wayne verdict 2026-07-12)", () => {
+    replaceTeamBranches(db, repoId, [
+      branch("feat/old-done", {
+        merged: true, prNumber: 3, prState: "merged", prTitle: "Old glory",
+        lastCommitAt: "2026-07-09T15:00:00.000Z", // three days before NOW
+      }),
+      branch("feat/fresh-done", {
+        merged: true, prNumber: 4, prState: "merged", prTitle: "Fresh",
+      }),
+    ]);
+    const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });
+    expect(fx.tasks.map((t) => t.title)).toEqual(["Fresh"]);
+    expect(fx.occupancy[0]!.doneTodayTaskIds).toEqual(["branch:feat/fresh-done"]);
+  });
+
   it("hides merged branches that have no PR fact", () => {
     replaceTeamBranches(db, repoId, [branch("old/merged", { merged: true })]);
     const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });

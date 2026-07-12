@@ -17,6 +17,9 @@ intent:
       fixture 名回退),Playwright 172/172、demo vitest 44/44、
       tsc clean;真环境截图:地图实时显示本次 M1 三个切片分支
       与 walking-skeleton 的并发冲突预警。
+    - 补(2026-07-12 裁决③):非当日完成的 done 任务不进导出帧
+      (sameUtcDay,UTC 日界;occupancy doneToday 同源)——左栏
+      "DONE TODAY" 组不再混入陈旧 done。core vitest 75/75。
     - 遗留(有意延后):demo 的契约类型副本未消灭——需要 core 提供
       browser-safe 的 types-only subpath export(packaging pass),
       不值得为去重赌 172 条 e2e;镜像纪律(改必同步)继续生效。
