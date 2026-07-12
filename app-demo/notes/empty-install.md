@@ -228,3 +228,88 @@ trick doesn't apply. Fork logged (veto = window centering).
 3. `install-failed` for the MCP/DB steps: same row language should generalize —
    S3 types should carry per-step status (`pending|now|done|failed`) + an
    optional failure reason string, not a bespoke hooks-only shape.
+
+## S3 (iter-16) — types + fixtures + packing engine
+
+Files: `src/install-types.ts` (types), `src/install-derive.ts` (packing +
+view helpers), `src/fixtures/install-first-run.ts` (the 8 S2 variants as
+data), `src/fixtures/install-extremes.ts` (2 extremes), registry
+`installFixtures` / `installFixtureByName` in `src/fixtures/index.ts`,
+unit tests `src/install-derive.test.ts` (11 — the loop's first pure-logic
+vitest surface; vite.config.ts now scopes vitest to `src/**/*.test.ts` so
+it never swallows the Playwright specs in `tests/`).
+
+### Checklist
+- [x] Types extend `src/types.ts` — Task / ScopeDeclaration / TaskGit /
+      RepoInfo / SyncFreshness reused verbatim, zero duplication.
+- [x] `RepoConnection` = none | connecting{repoPath, steps} |
+      connected{repoPath, repoFiles, mappedAt?: never} — the `never`
+      encodes "never-yet mapped" at the type level; widen to `string`
+      when distillation ships.
+- [x] `InstallStep` is GENERAL (iter-15 note): {id, label, status:
+      pending|now|done|failed, failure?:{reason, codeRef, fix?}} — the
+      same row language renders a failed MCP or DB step unchanged.
+- [x] `UncategorizedFootprint` stores FACTS only (taskId, filesTouched,
+      firstSeenAt, sampleFiles?); areaFrac / shelf position / collapse are
+      derived by `packFootprints`, never stored.
+- [x] `MappingRun` = none | running{startedAt} | done{startedAt,
+      finishedAt} — elapsed time is the only number we hold (no progress
+      fraction exists, so none is typed).
+- [x] Packing engine pure + deterministic; overflow ladder implemented as
+      written (shrink-all-together via largest-fitting-g binary search on
+      floor↔natural interpolation, never below floor; then collapse OLDEST
+      one at a time to the "+N earlier sessions" chip).
+- [x] Fixtures: 8 S2 variants byte-faithful on content (same repo, paths,
+      titles, ages; capturedAt 2026-07-12T10:22:00-07:00 like the map
+      fixtures) + nine-footprints (collapse path: 6 visible + 3 collapsed)
+      + tiny-repo (repoFiles=12: cap + near-floor + shrink ladder).
+- [x] Gates: tsc --noEmit clean; pnpm build green; Playwright 85/85
+      untouched; vitest 11/11 green (first run).
+
+### Type → signal table
+| Field | Signal |
+|---|---|
+| InstallStep.status | installer CLI exit codes (0 ⇒ done, non-zero ⇒ failed) + process liveness (now/pending) |
+| InstallStep.failure.reason / codeRef / fix | installer stderr, verbatim — never synthesized |
+| RepoConnectionConnecting.repoPath | system folder picker result |
+| RepoConnectionConnected.repoFiles | `git ls-files \| wc -l` at connect (DB-creation scan stores it — closes S2 open question 1) |
+| RepoConnectionConnected.mappedAt | absent by type (`?: never`) — no mapping pass has ever completed on this screen |
+| MappingRun.startedAt / finishedAt | local `claude -p` process start/exit facts |
+| UncategorizedFootprint.filesTouched | count of distinct PostToolUse Edit/Write paths matching NO distillation anchor |
+| UncategorizedFootprint.firstSeenAt | first such hook event's timestamp |
+| UncategorizedFootprint.sampleFiles | first-N of those paths (tooltip detail) |
+| Task.* / scopes / git | unchanged from types.ts (hooks, git, gh, MCP declarations) |
+| footprint geometry | NOT a signal — pure function of (footprints, repoFiles, insets), install-derive.ts |
+
+### Packing engine (install-derive.ts)
+- `footprintDims`: areaFrac = clamp(files/repoFiles, 6.24% floor, 60% cap),
+  dims = floor block × sqrt(areaFrac/floorFrac) both axes. Worked example
+  reproduced in tests: 120/640 → 41.6% × 45.1% (~18.75% area).
+- `packFootprints`: sort oldest-first (firstSeenAt, taskId tiebreak),
+  shelf-pack bottom-left origin / 3% gutters / bottom-aligned / wrap up;
+  insets measured from S2 (left 6, right 6, top 12, bottom 16 — the S1
+  block's left 6 / bottom 84 reproduced exactly; presentation constants,
+  tunable at S4). N=1 degenerates to S1's rect exactly (6, 58, 24, 26).
+- Helpers: `footprintFootText` (reuses formatCount — ONE number rule),
+  `footprintExactFiles`, `collapsedChipText`.
+
+### Deltas vs the S2 hand-drawn statics (S4 must diff/document)
+1. **two-tasks x-order**: S2 drew health-check (newer, 4m) at the origin;
+   the WRITTEN oldest-first rule puts request-tracing (11m) there. Dims
+   match S2 (~42×45 vs drawn 42×44; floor 24×26 exact); the two blocks
+   swap x-positions. Rule wins over the hand demo (fork logged).
+2. **first-task-200**: derived 53.7×58.2 (200/640 = 31.25% area) vs S2's
+   hand-drawn 58×58 (33.6%). Same "claims most of the gray" read.
+
+### Open questions for S4
+1. The "+N earlier sessions" chip: reserve space in the packing region or
+   overlay bottom-right of the gray? (Overlay risks covering a block's
+   foot on full shelves.) Chip click behavior is the S5 question already
+   logged at S2.
+2. Should the connect card's pre-click checklist render from
+   PRISTINE_INSTALL_STEPS (data) or stay chrome copy? (S3 exports the
+   constant; S4 decides the wiring.)
+3. Greedy shelf fit is not strictly monotone in the shrink factor g
+   (wrap decisions flip); binary search converges on a fitting g but not
+   provably THE largest. Invariants (bounds, no overlap, ≥floor) hold by
+   construction — revisit only if a real layout ever looks starved.

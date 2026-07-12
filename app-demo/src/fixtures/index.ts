@@ -7,6 +7,7 @@
 import type { MapFixture, Task } from "../types";
 import type { TaskPanelFixture } from "../panel-types";
 import type { ConflictCardFixture } from "../conflict-types";
+import type { InstallFixture } from "../install-types";
 import { syntheticPanel } from "./synthetic-panel";
 import { v8Baseline } from "./v8-baseline";
 import { extremeEmptyProject } from "./extreme-empty-project";
@@ -22,6 +23,17 @@ import {
   conflictExtreme1200Symbols,
   conflictExtremeOneSymbol,
 } from "./conflict-extremes";
+import {
+  installConnect,
+  installInstalling,
+  installFailed,
+  installConnected,
+  installMapping,
+  installFirstTask,
+  installTwoTasks,
+  installFirstTask200,
+} from "./install-first-run";
+import { installNineFootprints, installTinyRepo } from "./install-extremes";
 
 export { v8Baseline, extremeEmptyProject, extremeScopeOverload, extremeFortyTerritories };
 export { panelRefactorAuth, panelJustLaunched, panelMarathon, panelQuietMilestones };
@@ -31,6 +43,18 @@ export {
   conflictYellowStale,
   conflictExtreme1200Symbols,
   conflictExtremeOneSymbol,
+};
+export {
+  installConnect,
+  installInstalling,
+  installFailed,
+  installConnected,
+  installMapping,
+  installFirstTask,
+  installTwoTasks,
+  installFirstTask200,
+  installNineFootprints,
+  installTinyRepo,
 };
 
 export const fixtures: Record<string, MapFixture> = {
@@ -105,4 +129,27 @@ export function panelForTask(task: Task, map: MapFixture): TaskPanelFixture {
 /** `?panel=` dev param: accepts "panel-marathon" or the short "marathon". */
 export function panelFixtureByName(name: string): TaskPanelFixture | null {
   return panelFixtures[name] ?? panelFixtures[`panel-${name}`] ?? null;
+}
+
+/**
+ * First-run fixtures (m4, S3). The 8 keys mirror the S2 static's `?v=`
+ * variants exactly; "nine-footprints" + "tiny-repo" are SCALE-EXTREMES
+ * fixtures (overflow collapse path / cap + near-floor + shrink ladder).
+ */
+export const installFixtures: Record<string, InstallFixture> = {
+  connect: installConnect,
+  installing: installInstalling,
+  "install-failed": installFailed,
+  connected: installConnected,
+  mapping: installMapping,
+  "first-task": installFirstTask,
+  "two-tasks": installTwoTasks,
+  "first-task-200": installFirstTask200,
+  "nine-footprints": installNineFootprints,
+  "tiny-repo": installTinyRepo,
+};
+
+/** `?install=` dev param (S4): accepts the S2 variant names verbatim. */
+export function installFixtureByName(name: string): InstallFixture | null {
+  return installFixtures[name] ?? null;
 }
