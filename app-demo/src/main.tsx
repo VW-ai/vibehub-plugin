@@ -19,6 +19,10 @@ const initialPanel = params.get("panel") ?? undefined;
 // five fixtures, e.g. ?conflict=yellow-stale → conflict-yellow-stale).
 // Ignored when ?panel= is also present (the two modals are exclusive).
 const initialConflict = params.get("conflict") ?? undefined;
+// `?install=<name>` renders the first-run screen (m4): the connection-state
+// layer above the map. All 10 install fixtures are reachable by name
+// (e.g. ?install=connect, ?install=nine-footprints). Unknown names → map.
+const initialInstall = params.get("install") ?? undefined;
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
@@ -29,6 +33,7 @@ if (rootEl) {
       showSwitcher={showSwitcher}
       initialPanel={initialPanel}
       initialConflict={initialConflict}
+      initialInstall={initialInstall}
     />,
   );
 }

@@ -313,3 +313,101 @@ it never swallows the Playwright specs in `tests/`).
    (wrap decisions flip); binary search converges on a fitting g but not
    provably THE largest. Invariants (bounds, no overlap, ≥floor) hold by
    construction — revisit only if a real layout ever looks starved.
+
+## S4 (iter-17) — first-run states dynamized
+
+Files: `src/components/InstallScreen.tsx` (the App's connection-state layer:
+titlebar/rail/canvas per RepoConnection state + the demo transition machine),
+`src/components/ConnectCard.tsx` (Moments A/A′/A″ card),
+`src/components/InstallChecklist.tsx` (step rows from InstallStep[], incl.
+failed + Retry), `src/components/App.tsx` (+`initialInstall`, early-return
+install layer ABOVE the map render path — map path untouched), `src/main.tsx`
+(+`?install=`), `src/app.css` (install section, S2 values verbatim),
+`tests/install-parity.spec.ts` (16 parity shots + 10 smoke + probes +
+transition + retry + fall-through).
+
+### Checklist
+- [x] Connection-state layer above the map: `?install=<name>` (all 10
+      fixtures) renders `InstallScreen` INSTEAD of the map; unknown names
+      fall through to the map (probe-tested). State routing is data-implied:
+      none → ConnectCard; connecting → ConnectCard + InstallChecklist
+      (statuses/failure verbatim from the fixture); connected → titlebar repo
+      chip + zero-groups rail + launch + full-bleed UNCATEGORIZED gray.
+- [x] Footprints via `packFootprints` (never hand-placed); kicker = task
+      title, foot = `footprintFootText`, tooltip = exact count + sampleFiles.
+      `+N earlier sessions` chip renders on the nine-footprints extreme.
+- [x] MappingRun chip: `mapping` fixture renders `● Mapping this repo · 2m`
+      (elapsed = relAge(startedAt, capturedAt), mono, no percent); "Map this
+      repo" click yields to the chip via a LOCAL MappingRun override; chip
+      click stops the pass (both directions probe-tested). Corner variants on
+      Moment C.
+- [x] Storyboarded hard swap behind the demo CTA path ONLY (direct
+      `?install=` loads stay static for shots): CTA/Enter → `installing`
+      fixture → steps advance (900ms demo pacing, tunable, non-product) →
+      last check lands → hold 400ms (2×--t-base) → card exits (reverse
+      cardIn, 200ms) → swap → connected chrome enters (chromeIn 200ms,
+      one stagger step, `.first-run.enter` scoped so shots are unaffected).
+      Retry runs ONLY the failed step (done rows stay done, probe-asserted),
+      then completes into the same storyboard.
+- [x] Moment A keyboard path: CTA autofocuses; Enter-to-connect asserted.
+- [x] Components consume fixtures via install-types only; TaskCard reused
+      verbatim (minimal MapFixture join, territories deliberately empty);
+      Tooltip + tokens reused; global [hidden] guard already app-wide.
+- [x] Gates: tsc clean · build green · Playwright FULL 103/103 (85 + 18 new)
+      · vitest 11/11.
+
+### Parity vs S2 static (16 shots: 8 variants × 1280×800 + 1440×900)
+Shots `notes/shots/empty-install-s4-*-{1280x800,1440x900}.png` next to the S2
+canonicals. connect / installing / install-failed / connected / mapping /
+first-task read pixel-equivalent (same tokens, same geometry; first-task's
+floor block reproduces S1/S2's 6/58/24/26 EXACTLY — asserted on the style
+attr). The two KNOWN S3 deltas are asserted in the spec, not just tolerated:
+1. **two-tasks x-order** — request-tracing (11m, older) at the bottom-left
+   origin, health-check to its right; the WRITTEN oldest-first rule outvotes
+   the S2 hand placement (iter-16 fork). Dims match (~41.6×45.1 vs drawn
+   42×44; floor exact).
+2. **first-task-200 dims** — derived 53.7×58.2 (200/640 = 31.25% area,
+   sqrt-damped) vs hand-drawn 58×58. Same "claims most of the gray" read.
+
+Other (minor, text/behavior-level) deltas, each deliberate:
+- "Synced just now": derive.ts's freshness would say "Synced 0s ago";
+  the install screen keeps S2's copy with a local <1s rung (map derive
+  untouched — v8 parity values never hit 0s).
+- Tooltip wording is now COMPOSED from fixture data (step tips keyed by
+  id×status; footprint tips from sampleFiles; failure tips from
+  reason/codeRef/fix) — a few clauses differ from S2's hand-written prose
+  (e.g. the 200-file tooltip states the exact count without the abbreviation
+  lecture; scope-chip tips say "· 3 files touched" instead of "not yet mapped
+  to a feature"). Visual surfaces are byte-matched; tooltips are not shots.
+- The install screen mounts with the app's standard entry language (winIn,
+  terrIn, rise) where the static appeared instantly — invisible in settled
+  shots.
+
+### Defect found + fixed during parity review (the collision bug class again)
+The task panel owns bare `.files{display:none; font-family:var(--mono)}`
+(collapsed file-change entry) — it swallowed the footprint foot entirely,
+then rendered it mono once display was restored. Fix: `.fp .files` carries
+explicit `display:block; font-family:var(--sans)` with a load-bearing
+comment; spec asserts `toBeVisible()` (hidden text still satisfies
+`toHaveText` — that's how it slipped). Same class as the `.sub`/`.subnote`
+collisions; `@keyframes breathe` renamed `breathe-soft` for the install dots
+(map's clash counter owns `breathe` at .82 amplitude; S2's install dots are
+.4) — collision avoided at authoring time.
+
+### S4 open questions → resolved this iteration
+1. **+N chip placement**: overlaid bottom-right of the gray, pinned ABOVE the
+   territory foot line (right sp-4 / bottom sp-6) — reserving packing space
+   would shrink live blocks for metadata. Fork logged; click behavior stays
+   the S5 question.
+2. **Pristine checklist source**: renders from `PRISTINE_INSTALL_STEPS`
+   (data) — one row component serves every status. Fork logged.
+3. Binary-search monotonicity caveat: unchanged, no layout looked starved.
+
+### Open items for S5 (interactions + states)
+- Rail card click → task panel on the first-run screen (no-op today; cards
+  are hover-explainable). Correlate-hover card↔footprint.
+- `+N earlier sessions` chip click (expand? focus rail?) — logged at S2.
+- Footprint keyboard focusability (tab → tooltip parity).
+- Local mapping override's elapsed time is frozen at "0s" (capturedAt is the
+  demo clock); decide whether the demo ticks.
+- Scale-extremes protocol: close the full per-component evidence table.

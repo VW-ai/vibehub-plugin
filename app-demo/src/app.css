@@ -383,8 +383,100 @@ svg{vertical-align:-2px}
 .side:focus-visible,.stat:focus-visible,.sub:focus-visible,.task .pill:focus-visible,.symtoggle:focus-visible,.prov button:focus-visible,.diag-empty button:focus-visible,.pmenu button:focus-visible,.fdbk .quiet:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
 .side:focus:not(:focus-visible),.stat:focus:not(:focus-visible),.sub:focus:not(:focus-visible),.task .pill:focus:not(:focus-visible){outline:none}
 
+/* ════════════════════════════════════════════════════════════════════════
+   empty-install / first-run (m4, S4) — ported from static/empty-install-s2.html,
+   the approved S2 artifact. Values verbatim; collisions resolved:
+   - .rail-empty (map owns a plain version) → scoped .first-run .rail-empty;
+   - @keyframes breathe (map owns .82→1 for the clash counter) → the S2
+     install dots keep their own .4→1 amplitude as breathe-soft;
+   - .center / cardIn are shared with the conflict card ON PURPOSE (same
+     centered-over-canvas language). */
+
+/* titlebar: honest pre-connect state — nothing watched, nothing claimed */
+.norepo{display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-400);cursor:help}
+/* collapsed empty rail group: header only, quieter */
+.group.zero h4{color:var(--ink-300)}
+.group h4[data-tip]{cursor:help}
+/* Moment A rail: dashed true-empty placeholder (sanctioned here only) —
+   no launch button; connect is the screen's ONE primary action */
+.first-run .rail-empty{border:1.5px dashed var(--ink-200);border-radius:var(--r-m);padding:var(--sp-4);text-align:center;color:var(--ink-400);font-size:var(--fs-3);line-height:1.6;cursor:help}
+.first-run .rail-empty b{display:block;font-weight:600;color:var(--ink-500)}
+
+/* the connect card (Moments A/A′/A″), centered over the canvas via .center */
+.connect{pointer-events:auto;width:420px;max-width:100%;background:var(--card);border-radius:var(--r-l);box-shadow:var(--sh-2),0 12px 34px rgba(15,17,21,.1);padding:var(--sp-6);animation:cardIn var(--t-base) var(--ease) backwards}
+/* storyboard exit: reverse cardIn (200ms), then the hard swap */
+.connect.out{animation:cardOut var(--t-base) var(--ease) forwards}
+@keyframes cardOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(8px) scale(.99)}}
+.connect h2{font-size:var(--fs-4);font-weight:650;letter-spacing:-.1px;cursor:help}
+.connect .sub{margin-top:var(--sp-1);font-size:var(--fs-3);color:var(--ink-500);line-height:1.55}
+.connect .cta{margin-top:var(--sp-4);width:100%;height:34px;border:0;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14);transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
+.connect .cta:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.connect .cta:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+/* picked repo path: long paths keep their tail — leading ellipsis */
+.connect .path{margin-top:var(--sp-4);display:flex;align-items:center;gap:6px;height:26px;background:var(--ink-100);border-radius:var(--r-s);padding:0 var(--sp-2);min-width:0;cursor:help}
+.connect .path svg{flex:none;color:var(--ink-400)}
+.connect .path .p{flex:1;min-width:0;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl;text-align:left}
+.connect .path .p bdi{unicode-bidi:plaintext}
+/* checklist rows: what installing does / is doing / did / failed to do */
+.steps{margin-top:var(--sp-4);border-top:1px solid var(--ink-150);padding-top:var(--sp-3)}
+.step{display:flex;align-items:center;gap:var(--sp-2);padding:5px 0;font-size:var(--fs-3);color:var(--ink-700);cursor:help}
+.step .ic{flex:none;width:15px;height:15px;display:flex;align-items:center;justify-content:center;color:var(--ink-300)}
+.step .ic.done{color:var(--alive)}
+.step .st{flex:none;margin-left:auto;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+.step .st.done{color:var(--alive-ink)}
+.step.pend{color:var(--ink-400)}
+/* honest failed step: text status first (mono "failed"), need ink reinforces */
+.step .ic.fail{color:var(--need)}
+.step .st.fail{color:var(--need-ink);font-weight:600}
+.why{display:flex;align-items:center;gap:var(--sp-2);margin:2px 0 4px 23px;font-size:var(--fs-2);color:var(--ink-500);line-height:1.5;cursor:help}
+.why code{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-700);background:var(--ink-100);border-radius:4px;padding:1px 4px}
+.retry{flex:none;margin-left:auto;height:22px;border:0;border-radius:var(--r-s);padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:600;background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.retry:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+/* the ONE persistent animation while installing: the in-progress dot */
+.step .ic .busy{width:7px;height:7px;border-radius:50%;background:var(--alive);animation:breathe-soft 2.8s var(--ease) infinite}
+@keyframes breathe-soft{0%,100%{opacity:.4}50%{opacity:1}}
+.connect .local{margin-top:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);line-height:1.5;cursor:help}
+
+/* Moment B: guidance inside the uncategorized territory */
+.guide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-3);text-align:center;padding:var(--sp-6)}
+.guide p{font-size:var(--fs-3);color:var(--ink-500);line-height:1.55;cursor:help}
+.mapbtn{height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-3);font-size:var(--fs-3);font-weight:600;background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.mapbtn:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+/* Moment C keeps the map action reachable, compact, top-right */
+.mapbtn.corner,.mapstat.corner{position:absolute;top:var(--sp-3);right:var(--sp-4)}
+/* mapping in progress: the button yields to an honest status chip; the
+   breathe dot is that state's ONE persistent animation */
+.mapstat{height:26px;display:inline-flex;align-items:center;gap:7px;border-radius:var(--r-s);padding:0 var(--sp-3);font-size:var(--fs-3);font-weight:600;background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;border:0;font-family:inherit;transition:box-shadow var(--t-fast) var(--ease)}
+.mapstat:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+.mapstat .dot{width:7px;height:7px;border-radius:50%;background:var(--alive);animation:breathe-soft 2.8s var(--ease) infinite}
+.mapstat .t{font-family:var(--mono);font-size:var(--fs-1);font-weight:500;color:var(--ink-400)}
+
+/* Moment C: session footprints on the unmapped gray (fill = write) —
+   geometry comes from packFootprints, never hand-placed */
+.fp{position:absolute;border-radius:var(--r-m);background:linear-gradient(180deg,#e9f2ea,#e0ede2);box-shadow:inset 0 0 0 1px rgba(62,125,76,.13),var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.fp:hover{box-shadow:inset 0 0 0 1.5px rgba(62,125,76,.3),var(--sh-2)}
+.fp .who{position:absolute;top:var(--sp-2);left:var(--sp-3);right:var(--sp-3);font-size:var(--fs-2);font-weight:600;color:#4c7a57;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+/* display:block + font-family are load-bearing: the task panel owns bare
+   `.files` (display:none + mono, collapsed file-change entry) and would
+   swallow/restyle this — same collision class as .sub/.subnote */
+.fp .files{display:block;font-family:var(--sans);position:absolute;left:var(--sp-3);bottom:var(--sp-2);right:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+/* overflow ladder's last rung: "+N earlier sessions" chip, overlaid
+   bottom-right ABOVE the territory foot (iter-17 fork; S5 defines click) */
+.fp-chip{position:absolute;right:var(--sp-4);bottom:var(--sp-6);height:22px;border:0;border-radius:11px;padding:0 10px;font-family:var(--mono);font-size:var(--fs-1);font-weight:600;background:rgba(255,255,255,.85);color:var(--ink-500);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.fp-chip:hover{box-shadow:var(--sh-2);color:var(--ink-700)}
+
+/* storyboard entry: after the hard swap the connected chrome enters with the
+   200ms language, one stagger step (demo CTA path only — .enter is set then) */
+@keyframes chromeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:chromeIn var(--t-base) var(--ease) backwards}
+
+/* first-run keyboard parity: same system ring as everywhere else */
+.cta:focus-visible,.retry:focus-visible,.mapbtn:focus-visible,.mapstat:focus-visible,.fp-chip:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.cta:focus:not(:focus-visible),.retry:focus:not(:focus-visible),.mapbtn:focus:not(:focus-visible),.mapstat:focus:not(:focus-visible),.fp-chip:focus:not(:focus-visible){outline:none}
+
 /* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
 @media (prefers-reduced-motion: reduce){
   .window,.task,.terr,.sub.clash .cnt,.panel,.scrim,.modal,.fdbk{animation:none}
   .grade,.cfoot,.symtoggle .car,.split .car{transition:none}
+  .connect,.connect.out,.step .ic .busy,.mapstat .dot,.first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:none}
 }

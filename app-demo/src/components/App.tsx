@@ -13,9 +13,12 @@ import { SCRIM_TIP } from "../conflict-derive";
 import {
   conflictCardForConflict,
   conflictFixtureByName,
+  installFixtureByName,
+  installFixtures,
   panelFixtureByName,
   panelForTask,
 } from "../fixtures";
+import { InstallScreen } from "./InstallScreen";
 import { Titlebar } from "./Titlebar";
 import { TaskRail } from "./TaskRail";
 import { MapCanvas } from "./MapCanvas";
@@ -37,6 +40,13 @@ export interface AppProps {
   initialPanel?: string | undefined;
   /** `?conflict=<name>` dev param: open a conflict card directly on load. */
   initialConflict?: string | undefined;
+  /**
+   * `?install=<name>` dev param (m4 S4): render the first-run screen — the
+   * connection-state layer ABOVE the map render path. In the real app this
+   * layer is driven by the stored RepoConnection; the demo reaches every
+   * state through the install fixtures.
+   */
+  initialInstall?: string | undefined;
 }
 
 export function App({
@@ -45,7 +55,13 @@ export function App({
   showSwitcher,
   initialPanel,
   initialConflict,
+  initialInstall,
 }: AppProps) {
+  // Connection-state layer (m4): while a first-run fixture is the subject,
+  // the map path below never renders. Unknown names fall through to the map.
+  const [installName, setInstallName] = useState<string | null>(() =>
+    initialInstall && installFixtureByName(initialInstall) ? initialInstall : null,
+  );
   const [fixtureName, setFixtureName] = useState(initialFixture);
   // Correlate-hover source: a rail card, a territory (reverse direction),
   // or a legend entry — only one can be the source at a time.
@@ -169,6 +185,27 @@ export function App({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [panel]);
+
+  /* ── connection-state layer (m4 S4) — above the map render path ─────── */
+  const installFixture = installName ? installFixtureByName(installName) : null;
+  if (installName && installFixture) {
+    const switchInstall = (name: string) => {
+      if (!installFixtureByName(name)) return;
+      setInstallName(name);
+      const url = new URL(window.location.href);
+      url.searchParams.set("install", name);
+      window.history.replaceState(null, "", url);
+    };
+    return (
+      <InstallScreen
+        fixture={installFixture}
+        installNames={Object.keys(installFixtures)}
+        activeInstall={installName}
+        showSwitcher={showSwitcher}
+        onSwitch={switchInstall}
+      />
+    );
+  }
 
   return (
     <div className="window">
