@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibehub — Menubar dropdown · S1+S2 static</title>
+<style>
+/* Design tokens — extracted VERBATIM from workbench-refs/reference-screen-v8.html */
+:root{
+  /* ink ramp */
+  --ink-900:#191b1f; --ink-700:#3c3f45; --ink-500:#6b6f77; --ink-400:#8b8f97; --ink-300:#b4b7bd; --ink-200:#d9dade; --ink-150:#e7e8ea; --ink-100:#f0f0f1;
+  --paper:#f7f7f5; --card:#ffffff;
+  /* semantic (text ink deliberately darker than fill hue) */
+  --need:#c0392b; --need-bg:#f6e8e5; --need-ink:#9c3022;
+  --clash:#9a6b16; --clash-bg:#f4ecd9; --clash-ink:#775211;
+  --alive:#3e7d4c; --alive-bg:#e4efe6; --alive-ink:#2f6039;
+  --read:#5a7fb8;  --read-ink:#48699c;
+  /* elevation */
+  --sh-1:0 1px 2px rgba(20,22,26,.05);
+  --sh-2:0 1px 3px rgba(20,22,26,.07),0 4px 14px rgba(20,22,26,.06);
+  /* shape scale: exactly three radii */
+  --r-s:6px; --r-m:10px; --r-l:16px;
+  /* space scale: 4/8/12/16/24 only */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-6:24px;
+  /* type scale: exactly four sizes */
+  --fs-1:10px; --fs-2:11px; --fs-3:12px; --fs-4:13px;
+  /* motion: two durations, one curve */
+  --t-fast:120ms; --t-base:200ms; --ease:cubic-bezier(.25,.8,.3,1);
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important} /* global guard — author display rules must never defeat hidden */
+button{font-family:inherit}
+button:focus-visible,.item:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+button:focus:not(:focus-visible),.item:focus:not(:focus-visible){outline:none}
+html,body{height:100%}
+svg{vertical-align:-2px}
+
+/* ── the desktop: subtle generic wallpaper (context scaffolding, not product UI) ── */
+body{font-family:var(--sans);color:var(--ink-900);-webkit-font-smoothing:antialiased;overflow:hidden;
+  background:
+    radial-gradient(1100px 640px at 22% 118%, rgba(122,146,158,.34), transparent 62%),
+    radial-gradient(900px 560px at 84% -12%, rgba(255,255,255,.5), transparent 58%),
+    linear-gradient(158deg,#c8cdd0 0%,#b8c2c6 46%,#a9b6ba 100%)}
+
+/* ── menubar strip: system-ish, generic shapes only ── */
+.menubar{position:relative;height:25px;display:flex;align-items:center;gap:var(--sp-4);padding:0 var(--sp-3);
+  background:rgba(250,250,249,.72);backdrop-filter:blur(18px);box-shadow:0 1px 0 rgba(20,22,26,.08);
+  font-size:var(--fs-3);color:var(--ink-900)}
+.menubar .os{display:flex;align-items:center;color:var(--ink-900);cursor:default}
+.menubar .appname{font-weight:650;cursor:default}
+.menubar .menus{display:flex;gap:var(--sp-4);color:var(--ink-700);cursor:default}
+.menubar .spacer{flex:1}
+.menubar .status{display:flex;align-items:center;gap:2px;color:var(--ink-700)}
+.menubar .sit{height:21px;display:flex;align-items:center;padding:0 7px;border-radius:4px;cursor:default}
+.menubar .clock{padding:0 var(--sp-2);font-size:var(--fs-3);color:var(--ink-900);cursor:default;font-variant-numeric:tabular-nums}
+
+/* the Vibehub menubar item — the only live pixel in the strip */
+.vhitem{position:relative;height:21px;display:flex;align-items:center;padding:0 7px;border-radius:4px;
+  cursor:pointer;color:var(--ink-900);transition:background var(--t-fast) var(--ease)}
+.vhitem:hover{background:rgba(25,27,31,.08)}
+.vhitem.open{background:rgba(25,27,31,.14)}
+/* waiting badge: the screen's ONE persistent animation (breathe) — something needs you */
+.vhitem .badge{position:absolute;top:-3px;right:-4px;min-width:14px;height:14px;display:flex;align-items:center;justify-content:center;
+  padding:0 4px;border-radius:7px;background:var(--need);color:#fff;font-size:var(--fs-1);font-weight:600;
+  font-family:var(--mono);line-height:1;box-shadow:0 0 0 1.5px rgba(250,250,249,.9);animation:breathe 2.8s var(--ease) infinite}
+@keyframes breathe{0%,100%{opacity:.82}50%{opacity:1}}
+/* stale badge: last-known count, no urgency claim — gray, no breathe */
+.vhitem .badge.stale{background:var(--ink-400);animation:none}
+
+/* ── dropdown (~340px), anchored under the Vibehub item ── */
+.drop{position:absolute;top:31px;right:150px;/* right is re-anchored to the item by JS */width:340px;background:var(--card);border-radius:var(--r-m);
+  box-shadow:0 14px 44px rgba(15,17,21,.24),0 2px 8px rgba(15,17,21,.1),inset 0 0 0 .5px rgba(25,27,31,.06);
+  padding:var(--sp-2);animation:dropIn var(--t-base) var(--ease) backwards;z-index:5}
+@keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* repo line */
+.rline{display:flex;align-items:center;gap:6px;padding:var(--sp-1) var(--sp-2);min-width:0}
+.rline svg{flex:none;color:var(--ink-500)}
+.rline .name{font-size:var(--fs-3);font-weight:600;color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.rline .gap{flex:1}
+.fresh{flex:none;display:flex;align-items:center;gap:5px;font-size:var(--fs-2);color:var(--ink-500);cursor:help}
+.fresh .dot{width:6px;height:6px;border-radius:50%;background:var(--alive)}
+.fresh.stale{color:var(--ink-400)}
+.fresh.stale .dot{background:var(--ink-300)}
+
+/* stale honesty line (decision-github-002: never pretend real-time) */
+.stalenote{margin:2px var(--sp-2) var(--sp-1);font-size:var(--fs-2);color:var(--ink-500);line-height:1.5;cursor:help}
+
+/* counts: same stat-pill language as the app titlebar (v8 verbatim) */
+.counts{display:flex;gap:var(--sp-1);padding:var(--sp-1) var(--sp-2) var(--sp-2)}
+.stat{height:22px;display:flex;align-items:center;gap:5px;font-size:var(--fs-2);font-weight:500;padding:0 10px;border:0;border-radius:11px;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
+.stat:hover{filter:brightness(.96)}
+.stat.need{background:var(--need-bg);color:var(--need-ink)}
+.stat.clash{background:var(--clash-bg);color:var(--clash-ink)}
+.stat.alive{background:var(--alive-bg);color:var(--alive-ink)}
+
+.div{height:1px;background:var(--ink-150);margin:0 var(--sp-2) var(--sp-2)}
+
+/* "Needs you" — v8 group header language */
+.gh{display:flex;justify-content:space-between;font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;
+  color:var(--ink-400);text-transform:uppercase;padding:0 var(--sp-2) 6px;line-height:1.4;cursor:help}
+.gh b{font-family:var(--mono);font-weight:500}
+
+/* top items needing you: one line each — pill, title (ellipsis), age */
+.item{width:100%;display:flex;align-items:center;gap:var(--sp-2);min-width:0;padding:5px var(--sp-2);
+  border:0;background:none;text-align:left;border-radius:var(--r-s);cursor:pointer;
+  transition:background var(--t-fast) var(--ease)}
+.item:hover{background:var(--ink-100)}
+.item:active{background:var(--ink-150)}
+.pill{flex:none;height:18px;display:inline-flex;align-items:center;font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;border-radius:9px;padding:0 8px}
+.pill.need{background:var(--need-bg);color:var(--need-ink)}
+.pill.clash{background:var(--clash-bg);color:var(--clash-ink)}
+.item .t{flex:1;min-width:0;font-size:var(--fs-4);font-weight:600;letter-spacing:-.1px;line-height:1.45;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-900)}
+.item .age{flex:none;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+/* overflow line: text-first, quiet */
+.more{width:100%;border:0;background:none;text-align:left;display:block;padding:3px var(--sp-2) 5px;
+  font-size:var(--fs-2);color:var(--ink-500);border-radius:var(--r-s);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.more:hover{background:var(--ink-100)}
+
+/* all-quiet line */
+.quietline{display:flex;align-items:center;gap:7px;padding:var(--sp-1) var(--sp-2) var(--sp-2);
+  font-size:var(--fs-3);color:var(--ink-500);line-height:1.5;cursor:help}
+.quietline svg{flex:none;color:var(--alive)}
+
+/* footer: quiet primary + secondary */
+.foot{display:flex;gap:var(--sp-2);padding:0 var(--sp-1) var(--sp-1)}
+.foot button{flex:1;height:28px;border:0;border-radius:var(--r-s);font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
+.open-app{background:var(--ink-900);color:#fbfbfa;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+.open-app:hover{background:#26282e;box-shadow:0 2px 6px rgba(20,22,26,.2)}
+.open-app:active{box-shadow:0 1px 2px rgba(20,22,26,.18)}
+.start-task{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200)}
+.start-task:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+.start-task:active{box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200)}
+
+/* tooltip: 260ms intent delay, instant hide (verbatim pattern from v8) */
+#tip{position:fixed;z-index:99;background:var(--ink-900);color:#f4f4f3;font-size:var(--fs-2);line-height:1.5;padding:7px 10px;border-radius:7px;max-width:270px;box-shadow:0 6px 24px rgba(15,17,21,.3);pointer-events:none;opacity:0;transition:opacity var(--t-fast) var(--ease);transform:translateY(2px)}
+#tip.on{opacity:1;transform:none}
+
+/* dev-only variant switcher — NOT product UI */
+.dev{position:fixed;right:10px;bottom:10px;z-index:98;display:flex;gap:4px;align-items:center;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);background:rgba(255,255,255,.85);border-radius:var(--r-s);padding:4px 6px;box-shadow:var(--sh-1)}
+.dev button{border:0;background:none;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500);cursor:pointer;padding:2px 5px;border-radius:4px}
+.dev button.on{background:var(--ink-900);color:#fff}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ══ menubar strip: generic system-ish items (decorative stand-ins, no trademarks) ══ -->
+<div class="menubar">
+  <span class="os" data-tip="Your system menu — decorative stand-in in this demo">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5c2.6 2 5.5 2.4 5.5 6.1 0 3.4-2.5 6-5.5 6.9C5 13.6 2.5 11 2.5 7.6 2.5 3.9 5.4 3.5 8 1.5Z"/></svg>
+  </span>
+  <span class="appname" data-tip="The frontmost app&rsquo;s menus — decorative stand-in in this demo">Shell</span>
+  <div class="menus" data-tip="The frontmost app&rsquo;s menus — decorative stand-in in this demo">
+    <span>File</span><span>Edit</span><span>View</span><span>Window</span><span>Help</span>
+  </div>
+  <div class="spacer"></div>
+  <div class="status">
+    <span class="sit" data-tip="Your other status items — decorative stand-ins in this demo">
+      <svg width="15" height="13" viewBox="0 0 17 14" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="3.5" width="12" height="7" rx="2"/><path d="M14.5 6v2.4" stroke-linecap="round"/><rect x="2.6" y="5.1" width="7.4" height="3.8" rx="1" fill="currentColor" stroke="none"/></svg>
+    </span>
+    <span class="sit" data-tip="Your other status items — decorative stand-ins in this demo">
+      <svg width="14" height="12" viewBox="0 0 16 13" fill="currentColor"><path d="M8 10.4a1.5 1.5 0 1 1 0 2.1 1.5 1.5 0 0 1 0-2.1ZM5.5 8.2a4.3 4.3 0 0 1 5 0l-1 1.3a2.7 2.7 0 0 0-3 0Zm-2.3-2.4a7.6 7.6 0 0 1 9.6 0l-1 1.3a6 6 0 0 0-7.6 0Zm-2.3-2.3a11 11 0 0 1 14.2 0l-1 1.3a9.4 9.4 0 0 0-12.2 0Z"/></svg>
+    </span>
+    <span class="sit" data-tip="Your other status items — decorative stand-ins in this demo">
+      <svg width="14" height="12" viewBox="0 0 15 13" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2 3.5h11M2 6.5h11M2 9.5h11"/><circle cx="10" cy="3.5" r="1.7" fill="var(--card)"/><circle cx="5" cy="6.5" r="1.7" fill="var(--card)"/><circle cx="9" cy="9.5" r="1.7" fill="var(--card)"/></svg>
+    </span>
+
+    <!-- ══ the Vibehub menubar item: territory-map glyph + waiting badge ══ -->
+    <button class="vhitem open" id="vh" data-tip="Vibehub — 1 task waiting on you. The app keeps watching from here even when the window is closed.">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3.25c0-.97.78-1.75 1.75-1.75h3c.97 0 1.75.78 1.75 1.75v3c0 .97-.78 1.75-1.75 1.75h-3A1.75 1.75 0 0 1 1.5 6.25Zm8.5-.5c0-.69.56-1.25 1.25-1.25h2c.69 0 1.25.56 1.25 1.25v5.5c0 .69-.56 1.25-1.25 1.25h-2c-.69 0-1.25-.56-1.25-1.25ZM2 11.25c0-.69.56-1.25 1.25-1.25h5c.69 0 1.25.56 1.25 1.25v2c0 .69-.56 1.25-1.25 1.25h-5C2.56 14.5 2 13.94 2 13.25Z"/></svg>
+      <span class="badge" data-show="busy" data-tip="1 task waiting on your input">1</span>
+      <span class="badge" data-show="overload" data-tip="12 tasks waiting on your input">12</span>
+      <span class="badge" data-show="flood" data-tip="143 tasks waiting on your input — the badge caps at 99+, exact counts live here and in the dropdown">99+</span>
+      <span class="badge stale" data-show="stale" data-tip="Last known: 1 task waiting. Repo data hasn&rsquo;t synced for 47m, so this count may be behind.">1</span>
+    </button>
+
+    <span class="clock" data-tip="Your system clock — decorative stand-in in this demo">Fri Jul 11&nbsp;&nbsp;09:41</span>
+  </div>
+</div>
+
+<!-- ══ the dropdown: the "app closed but still watching" surface ══ -->
+<div class="drop" role="menu" aria-label="Vibehub summary">
+
+  <!-- repo line -->
+  <div class="rline">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg>
+    <span class="name" data-tip="The repo this window watches — one window per repo">VW-ai/Vibehub</span>
+    <span class="gap"></span>
+    <span class="fresh" data-show="busy overload flood" data-tip="Last git fetch + hook event"><span class="dot"></span>Synced 42s ago</span>
+    <span class="fresh" data-show="quiet" data-tip="Last git fetch + hook event"><span class="dot"></span>Synced 18s ago</span>
+    <span class="fresh stale" data-show="stale" data-tip="The app hasn&rsquo;t fetched the repo for 47 minutes — it syncs while the window is open. Hook events still arrive live."><span class="dot"></span>Synced 47m ago</span>
+  </div>
+
+  <!-- stale honesty (decision-github-002: label stale, never pretend real-time) -->
+  <p class="stalenote" data-show="stale" data-tip="Sessions report through the installed hooks even with the app closed, so task states are current. Branch, teammate and PR data need a git fetch — that happens when the window is open.">
+    Showing last known repo state — sessions still report via hooks. Open Vibehub to sync.
+  </p>
+
+  <!-- counts: zero counts are hidden, not rendered as noise -->
+  <div class="counts">
+    <button class="stat need" data-show="busy stale" data-tip="One task is waiting on your input — opens the main window at it">1 waiting</button>
+    <button class="stat clash" data-show="busy stale" data-tip="Two tasks are writing the same symbol — opens the conflict">1 conflict</button>
+    <button class="stat alive" data-show="busy stale" data-tip="Tasks making progress. Nothing needed from you">3 running</button>
+
+    <button class="stat alive" data-show="quiet" data-tip="Tasks making progress. Nothing needed from you">3 running</button>
+
+    <button class="stat need" data-show="overload" data-tip="Twelve tasks are waiting on your input — opens the main window at the list">12 waiting</button>
+    <button class="stat alive" data-show="overload" data-tip="Tasks making progress. Nothing needed from you">5 running</button>
+
+    <button class="stat need" data-show="flood" data-tip="143 tasks are waiting on your input — opens the main window at the list">143 waiting</button>
+    <button class="stat clash" data-show="flood" data-tip="Two symbol conflicts between concurrent writers — opens the oldest">2 conflict</button>
+    <button class="stat alive" data-show="flood" data-tip="Tasks making progress. Nothing needed from you">31 running</button>
+  </div>
+
+  <!-- all-quiet: honest, one line, no fake urgency -->
+  <p class="quietline" data-show="quiet" data-tip="Nothing is waiting on you and nothing is in conflict. The three running sessions will surface here the moment they need you.">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+    All quiet — 3 running, nothing needs you.
+  </p>
+
+  <div class="div" data-show="busy stale overload flood"></div>
+
+  <!-- top items needing you (max 3; a conflict pair counts once) -->
+  <div data-show="busy stale">
+    <div class="gh" data-tip="What&rsquo;s blocked on you right now, oldest first — the same list as the app&rsquo;s Needs-you rail">Needs you <b>2</b></div>
+    <button class="item" data-tip="&lsquo;Refactor auth flow&rsquo; asked which session-expiry policy to use. Waiting 12m — opens the main window at this task.">
+      <span class="pill need">WAITING</span><span class="t">Refactor auth flow</span><span class="age">12m</span>
+    </button>
+    <button class="item" data-tip="&lsquo;Auto-retry failed payments&rsquo; and &lsquo;Cancel orders on timeout&rsquo; both declared writes on OrderStateMachine (3 shared symbols). Opens the adjudication card.">
+      <span class="pill clash">CONFLICT</span><span class="t">Order state machine — 2 writing</span><span class="age">31m</span>
+    </button>
+  </div>
+
+  <div data-show="overload">
+    <div class="gh" data-tip="What&rsquo;s blocked on you right now, oldest first — the same list as the app&rsquo;s Needs-you rail">Needs you <b>12</b></div>
+    <button class="item" data-tip="&lsquo;Reconcile invoice line items against the payments ledger export&rsquo; stopped to ask which ledger column is authoritative. Waiting 52m — opens the main window at this task.">
+      <span class="pill need">WAITING</span><span class="t">Reconcile invoice line items against the payments ledger export</span><span class="age">52m</span>
+    </button>
+    <button class="item" data-tip="&lsquo;Rename OrderStateMachine transitions to match the new lifecycle spec&rsquo; stopped to confirm the deprecation window. Waiting 47m — opens the main window at this task.">
+      <span class="pill need">WAITING</span><span class="t">Rename OrderStateMachine transitions to match the new lifecycle spec</span><span class="age">47m</span>
+    </button>
+    <button class="item" data-tip="&lsquo;Refactor auth flow&rsquo; asked which session-expiry policy to use. Waiting 41m — opens the main window at this task.">
+      <span class="pill need">WAITING</span><span class="t">Refactor auth flow</span><span class="age">41m</span>
+    </button>
+    <button class="more" data-tip="Nine more tasks are waiting on you — opens the main window at the full Needs-you list">and 9 more waiting&hellip;</button>
+  </div>
+
+  <div data-show="flood">
+    <div class="gh" data-tip="What&rsquo;s blocked on you right now, oldest first — the same list as the app&rsquo;s Needs-you rail">Needs you <b>145</b></div>
+    <button class="item" data-tip="&lsquo;Backfill audit-log retention for archived workspaces&rsquo; stopped to ask which retention cutoff applies. Waiting 1h44m — opens the main window at this task.">
+      <span class="pill need">WAITING</span><span class="t">Backfill audit-log retention for archived workspaces</span><span class="age">1h44m</span>
+    </button>
+    <button class="item" data-tip="&lsquo;Auto-retry failed payments&rsquo; and &lsquo;Cancel orders on timeout&rsquo; both declared writes on OrderStateMachine (3 shared symbols). Opens the adjudication card.">
+      <span class="pill clash">CONFLICT</span><span class="t">Order state machine — 2 writing</span><span class="age">1h12m</span>
+    </button>
+    <button class="item" data-tip="&lsquo;Split the notifications worker out of the monolith deploy target&rsquo; stopped to confirm the queue naming scheme. Waiting 58m — opens the main window at this task.">
+      <span class="pill need">WAITING</span><span class="t">Split the notifications worker out of the monolith deploy target</span><span class="age">58m</span>
+    </button>
+    <button class="more" data-tip="142 more items need you — opens the main window at the full Needs-you list">and 142 more&hellip;</button>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- footer -->
+  <div class="foot">
+    <button class="open-app" data-tip="Opens the main window on the map — the full picture behind these counts">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3.25c0-.97.78-1.75 1.75-1.75h3c.97 0 1.75.78 1.75 1.75v3c0 .97-.78 1.75-1.75 1.75h-3A1.75 1.75 0 0 1 1.5 6.25Zm8.5-.5c0-.69.56-1.25 1.25-1.25h2c.69 0 1.25.56 1.25 1.25v5.5c0 .69-.56 1.25-1.25 1.25h-2c-.69 0-1.25-.56-1.25-1.25ZM2 11.25c0-.69.56-1.25 1.25-1.25h5c.69 0 1.25.56 1.25 1.25v2c0 .69-.56 1.25-1.25 1.25h-5C2.56 14.5 2 13.94 2 13.25Z"/></svg>
+      Open Vibehub
+    </button>
+    <button class="start-task" data-tip="Assemble context and launch a Claude Code session on a new branch — opens the main window to configure it">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"/></svg>
+      Start a task
+    </button>
+  </div>
+</div>
+
+<div id="tip"></div>
+
+<!-- dev-only variant switcher (not product UI; also reachable via ?v=) -->
+<div class="dev" aria-hidden="true">DEV
+  <button class="on" data-v="busy">busy</button>
+  <button data-v="quiet">quiet</button>
+  <button data-v="stale">stale</button>
+  <button data-v="overload">overload &times;12</button>
+  <button data-v="flood">flood 99+</button>
+</div>
+
+<script>
+/* tooltip with 260ms intent delay, instant hide — verbatim from reference-screen-v8 */
+var tip=document.getElementById('tip'), tipTimer=null;
+document.addEventListener('mouseover',function(e){
+  var n=e.target.closest('[data-tip]');
+  clearTimeout(tipTimer);
+  if(!n){tip.classList.remove('on');return}
+  tipTimer=setTimeout(function(){
+    tip.innerHTML=n.dataset.tip;
+    var r=n.getBoundingClientRect();
+    tip.style.left=Math.max(8,Math.min(r.left, innerWidth-286))+'px';
+    tip.style.top=(r.bottom+8>innerHeight-90 ? r.top-8-tip.offsetHeight : r.bottom+8)+'px';
+    tip.classList.add('on');
+  },260);
+});
+document.addEventListener('mouseout',function(e){ if(e.target.closest('[data-tip]')){clearTimeout(tipTimer);tip.classList.remove('on')} });
+
+/* variants via hidden attribute only — the global [hidden] guard makes display rules irrelevant */
+var VARIANTS=['busy','quiet','stale','overload','flood'];
+/* the menubar item's own tooltip changes with what it knows */
+var VHTIP={
+  busy:"Vibehub — 1 task waiting on you. The app keeps watching from here even when the window is closed.",
+  quiet:"Vibehub — all quiet. 3 sessions running, nothing needs you.",
+  stale:"Vibehub — last known: 1 task waiting. Repo data hasn&rsquo;t synced for 47m; open the window to sync.",
+  overload:"Vibehub — 12 tasks waiting on you.",
+  flood:"Vibehub — 143 tasks waiting on you (badge caps at 99+)."
+};
+function setVariant(v){
+  if(VARIANTS.indexOf(v)<0)v='busy';
+  document.querySelectorAll('[data-show]').forEach(function(n){
+    n.hidden = n.dataset.show.split(' ').indexOf(v)<0;
+  });
+  document.getElementById('vh').dataset.tip=VHTIP[v];
+  document.querySelectorAll('.dev button').forEach(function(b){b.classList.toggle('on',b.dataset.v===v)});
+}
+document.querySelectorAll('.dev button').forEach(function(b){b.addEventListener('click',function(){setVariant(b.dataset.v)})});
+
+/* anchor the dropdown under the menubar item (macOS menus right-align to their item) */
+function anchor(){
+  var r=document.getElementById('vh').getBoundingClientRect();
+  document.querySelector('.drop').style.right=Math.max(8,innerWidth-r.right-2)+'px';
+}
+window.addEventListener('resize',anchor); anchor();
+var Q=new URLSearchParams(location.search);
+setVariant(Q.get('v')||'busy');
+/* ?dev=0 hides the dev bar for polish shots (dev chrome is not product UI) */
+if(Q.get('dev')==='0')document.querySelector('.dev').hidden=true;
+</script>
+</body>
+</html>
