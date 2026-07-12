@@ -1,0 +1,67 @@
+spec_id: "intent-workbench-001"
+type: intent
+state: draft
+intent:
+  summary: "操作舱前瞻(非 immediate,M3+):同一套 PTY+xterm wrapper 提供两个座位——Meta session(常驻编排席:context management 注入舰队态+meta 微协议,工具面=建事/发射/裁决,声明空写 scope 使 twist 自动守卫『meta 不干活』)与 Task session PTY(每件事的接管席,018 对话接管的完全体);先 spike 验手感再定产品结合"
+  detail: |
+    Wayne 2026-07-12 口述(源于 Victor 在 Helm 做操作舱的讨论;Helm 驾驶舱
+    的设计与开发现已归 Wayne)。明确:**现在不做**,记录待 M3+。
+
+    **两个座位,一个壳(差别只在注入的 context 与授权的工具面):**
+    1. **Meta session**(Wayne 提出):每 repo/窗口常驻一个,job=编排不干活。
+       SessionStart hook 识别 meta 角色 → 注入舰队态摘要(地图 rollup/等你/
+       撞车)+ meta 微协议;工具面 = 建事/发射/注入/裁决(MCP)。它是
+       decision-workbench-005 双入口的对话侧常驻化——GUI 按钮=咒语按钮化,
+       meta session=咒语控制台。守卫:声明空写 scope,碰代码文件即 twist
+       告警(020 机制复用),"meta 不干活,干活=发射新事"由系统自守。
+    2. **Task session PTY**:点开一件事,真 terminal 挂其 session——介入层
+       完全体(看全输出/直接打字/hooks 照采)。
+
+    **技术判断**:Tauri + PTY(portable-pty)+ xterm.js 成熟三件套,嵌 pane
+    为周级 spike;当年 form-path 否决的是"XL 完整 wrapper"(自管进程/多窗格/
+    主工作场所/与 Conductor 拼 UX),非此形态。
+
+    **两条守线**:①地图仍是主视图,操作舱是面板的升级段/tab,不是 app 本体
+    (否则沦为 Conductor 竞品,丢上下文层护城河);②与 decision-project-018
+    constraint("不自己跑/托管 agent 进程")存在张力——落地时需正式
+    supersede 留痕:托管的是终端窗口不是 agent 生命周期。
+
+    **与 Helm 协同**:Helm 驾驶舱(对话+知识库+看文件)核心可复用 meta
+    session pattern,两边一套设计。
+
+    **介入双通道,按 session 出生地分流(2026-07-12 补):**
+    - 舱内出生(app 发射进 PTY pane):terminal 即 session 真 stdin/stdout,
+      直接对话、实时双向(正在生成也能 Ctrl-C),不经注入队列;hook 采集照常;
+    - 舱外出生(用户终端随手开):tty 归属其终端,app 无法事后接管——
+      hook 回查注入仍是唯一诚实通道(tmux attach 类 hack 违背"骑在既有
+      行为上",不做核心路径)。
+    产品激励白送:舱内发射的事介入体验天然高一档,用户被吸向"从 app 发射",
+    无需说教。
+
+    **下一步(到期时)**:先 spike(Tauri+PTY+xterm 跑 claude 验手感),
+    产品结合待 spike 实感后再拍。
+constraints:
+  - kind: must
+    rule: "落地前必须正式处理与 decision-project-018『不托管 agent 进程』的冲突(supersede 留痕)"
+  - kind: must
+    rule: "地图保持主视图;操作舱不得成为 app 本体形态"
+indexing:
+  type: intent
+  priority: P2
+  layer: feature
+  domain: "workbench"
+  tags: [cockpit, meta-session, pty, terminal-wrapper, future, helm]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.8
+  source_ref: "Wayne thinking share — 2026-07-12 main-planning session(明确非 immediate)"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-workbench-005"
+    type: relates_to
+    detail: "meta session = 双入口的对话侧常驻化"
+  - target: "decision-project-018"
+    type: conflicts_with
+    detail: "PTY 托管与『不托管 agent 进程』张力,落地时 supersede"
+anchors: []

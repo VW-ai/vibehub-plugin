@@ -1,0 +1,45 @@
+spec_id: "decision-workbench-005"
+type: decision
+state: draft
+intent:
+  summary: "触发模型 = 双入口同机制:app 里没有『功能触发』只有感知/介入/发射;一切语义动作(如『看看队友这个 branch 在干嘛』)在 Claude Code 里直接说即原生触发(agent 调 MCP/CLI 完成),GUI 按钮 = 咒语的按钮化(发射一个带预置 context 的 session / claude -p),底下同一条 agent 执行路径"
+  detail: |
+    Wayne 2026-07-12 口述(五点 thinking 之五)+ 裁决。
+
+    起点疑问:"后端功能几乎都从 app 触发?用 Claude Code 时没法显式触发?"
+    ——前提恰好相反:intent-project-002 + decision-project-026 拍板 app 里
+    几乎没有功能触发(只有感知+介入+发射),知识库操作全由 agent 自发。
+
+    **定案:两个入口收敛到同一机制。**
+    - Claude Code 内:用户直接说("拉这个 branch 帮我看看")= 原生触发,
+      agent 经 MCP 工具/CLI 执行(拉 branch、跑队友蒸馏、回答);
+    - GUI 内:对应动作按钮(如队友事卡上的 "Summarize this branch")=
+      发射一个带预置 context 的 session 或 claude -p——替用户把那句话说了。
+    GUI 按钮是咒语的按钮化,不存在第三种触发系统;新功能设计时先问
+    "这句话在 Claude Code 里怎么说",按钮只是它的封装。
+constraints:
+  - kind: must_not
+    rule: "不为 GUI 发明独立于 agent 执行路径的功能触发机制"
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "workbench"
+  tags: [trigger-model, dual-entry, mcp, launch, ui]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne 五点 thinking — 2026-07-12(main-planning session 裁决)"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-12"
+relations:
+  - target: "intent-project-002"
+    type: relates_to
+    detail: "app 只交付感知+介入(+发射)的触发面落地"
+  - target: "decision-project-026"
+    type: relates_to
+    detail: "自发 CRU 的入口侧推论"
+  - target: "decision-workbench-004"
+    type: relates_to
+    detail: "队友 branch 蒸馏的触发方式即本条的实例"
+anchors: []
