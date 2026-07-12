@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { MapFixture, Task, Territory } from "../types";
 import type { TaskPanelFixture } from "../panel-types";
 import {
@@ -63,20 +63,38 @@ export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: Ap
     window.history.replaceState(null, "", url);
   };
 
+  // Focus returns to the opening card on close (keyboard parity: a keyboard
+  // user who opened with Enter must land back where they were — recorded
+  // principle, Room 20 decision-ledger-viz-001 / dialog convention).
+  // null when the panel was opened via the ?panel= dev param (no card).
+  const openerTaskId = useRef<string | null>(null);
+
   const openTask = (task: Task) => {
     // Opening the panel kills any live correlate-hover (the scrim takes over).
     setHoverTask(null);
     setHoverTerr(null);
     setLegendFilter(null);
+    openerTaskId.current = task.id;
     setPanel(panelForTask(task, fixture));
   };
-  const closePanel = () => setPanel(null);
+  const closePanel = () => {
+    setPanel(null);
+    const id = openerTaskId.current;
+    if (id) {
+      // after the unmount paints — the card is still mounted under the scrim
+      requestAnimationFrame(() => {
+        document
+          .querySelector<HTMLElement>(`[data-task="${CSS.escape(id)}"]`)
+          ?.focus();
+      });
+    }
+  };
 
   // Escape closes the panel (alongside X and scrim click).
   useEffect(() => {
     if (!panel) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setPanel(null);
+      if (e.key === "Escape") closePanel(); // same path as X — focus returns
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);

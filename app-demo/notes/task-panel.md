@@ -295,3 +295,86 @@ which the S2 "All" view already showed — so All is byte-identical to S2.
   fixture (panel prop `map`), falling back to the scope's own label when
   the territory id is unknown (e.g. marathon's payments ids over
   v8-baseline).
+
+## S5 checklist (interactions + states — stage exit)
+
+Artifact: `tests/panel-interactions.spec.ts` (19 tests). Full suite
+59/59 green (map 35 + panel-parity 5 + panel-interactions 19); `tsc --noEmit`
+clean; `pnpm build` green.
+
+- [x] Open paths: card click / Enter / Space (keyboard parity); panel is a
+      `role=dialog` labeled with the task title
+- [x] Close paths: X / Escape / scrim click — ALL return focus to the
+      opening card (implemented this iteration in App.tsx `closePanel` +
+      `openerTaskId` ref; Escape rerouted through the same path). Recorded
+      keyboard-parity principle satisfied; side effect logged as a fork.
+- [x] Open-at-newest verified mechanically (scrollTop == scrollHeight −
+      clientHeight at 1280); tlbar seam shadow on at open, off at top,
+      returns on scroll-down
+- [x] Milestones toggle: auth timeline 10 → 3 derived entries (2 user-voice
+      + 1 ask; first = launch, last = question), back to 10 under All
+- [x] file_change expand/collapse; off-scope files rendered in EXACTLY the
+      --clash-ink token (computed-color probe), distinct from the list color
+- [x] Transcript tail toggle + `.quiet.on` pressed state, both directions
+- [x] Textarea autogrow: floor 52 → cap 124 exactly, scrollHeight > 124
+      (internal scroll), deck bottom == panel bottom at cap; height returns
+      to 52 when cleared
+- [x] Mode toggle: placeholder narration swaps between the inject and pause
+      contracts (exact copy asserted), `.on` follows the selection
+- [x] Tooltips on panel anchors: not shown at 80ms, shown after 260ms+;
+      real content asserted (age → "In WAITING since 10:31", Terminate →
+      non-destructive reality, Milestones seg → derived-tier description)
+- [x] Synthetic honesty: queued (g-task-queued) → 0 rows + "Not launched
+      yet" note + "(nothing emitted yet…)" tail; running (g-task-running) →
+      exactly 1 row (launch, title stand-in), no transition/report/commit
+- [x] ?panel=marathon: 60 rows, session 12 of 12, scroll range > 500px,
+      seam shadow tracks, deck pinned, Milestones = 14, zero console errors
+- [x] Geometry @1280×800 + 1440×900, busiest state (files burst + tail
+      open): sections stack strictly (phead → tlbar → tl → tail → deck), no
+      positive-area overlap, everything inside the panel, panel inside the
+      window, deck pinned to the panel's bottom edge, every action button
+      unclipped, Terminate isolation gap > 24px (S2 measured 39px)
+
+## SCALE-EXTREMES PROTOCOL — closure table (per component, with evidence)
+
+| Component | Rung | Answer | Evidence |
+|---|---|---|---|
+| **Identity row** | N=0 scopes | chips row renders empty, twist absent (`twistView` returns null without off-scope files) — no fake chips | panel-derive.ts `twistView` (early return); synthetic panels carry only declared scopes |
+| | N=many scopes | ≤2 chips + `+N` fold, tooltip enumerates every hidden scope grouped write/read | panel-derive.ts `panelScopeChips` (MAX_PANEL_SCOPE_CHIPS=2); map +N test precedent (interactions.spec "+N chip") |
+| | TEXT long | title = single-line ellipsis, full text in tooltip (S2 rule Q2); branch/worktree `.trunc` + full path in tooltip (worktree maxWidth 130) | PanelIdentity.tsx h2 `data-tip={task.title}` + app.css `.phead h2` ellipsis; S2 stress shot (2-line title) |
+| | NUMBER huge | session count is the row's only free-running number — "session 12 of 12" verified at marathon; ages ≥24h collapse to "Nd" with the exact moment in the tooltip | panel-interactions "marathon" test (`session 12 of 12`); derive.ts `relAge` day rung + panel-quiet-milestones (2d) |
+| | SPACE tiny | fixed 520px panel — the row never gets narrower; within it the flex order (pill/age/close `flex:none`, h2 `flex:1 min-width:0`) makes the TITLE the only shrinking element | app.css `.phead .row1`; geometry test (all sections inside panel at both viewports) |
+| | DYNAMIC | twist marker + every chip is hover-explainable; tooltip yields on leave (instant hide) | panel tooltips test (260ms delay, instant-hide precedent in map suite) |
+| **Timeline (region)** | N=0 | honest empty state: "Not launched yet — no session, no history." — no fabricated rows | Timeline.tsx `.tl-empty` branch; synthetic-queued test |
+| | N=1 | launch-only timeline: the founding instruction IS the history (panel-just-launched, 42s; synthetic running = same shape) | fixtures/panel-just-launched.ts; synthetic-running test (exactly 1 row) |
+| | N=many | scroll region + pinned deck (deck is a flex peer, can never be displaced); open-at-newest so the fresh end is where you land; seam shadow says "history continues above" | marathon test (60 rows, range>500, deck pinned); TaskPanel.tsx flex column |
+| | DYNAMIC | Milestones tier folds 60→14 / 10→3 mechanically (isMilestone, 023) and gives the space back on All | milestones test + marathon test |
+| | SCREEN sizes | 1280: overflows → opens scrolled + shadow; 1440 base: fits, shadow off; geometry test covers both | open-at-newest test; geometry tests |
+| **Timeline entries** | N=0 files in a burst | cannot render: `file_change` requires a non-empty `files` list by construction (a burst with no edits is not an event) — fixtures/synthetic never emit one | panel-types.ts `file_change.files`; synthetic-panel.ts emits no file events |
+| | N=many files | collapsed "N files changed" + expand-on-click; off-scope subset flagged in clash ink inside the expansion | expand/collapse test (5 files, 2 off-scope) |
+| | TEXT long | bodies WRAP, never truncate (the human record is sacred — S1 rule); marathon's ~700-char launch prompt renders in full | app.css `.ev .body` (no ellipsis); marathon shot task-panel-s4-marathon-1280.png |
+| | NUMBER huge | test counts / file counts render verbatim from fixture (no abbreviation inside the record — honesty beats fit; entries wrap) | TimelineEntry.tsx test_run/file_change templates |
+| | SPACE tiny | fixed 520px: entry grid (time col 44px mono + dot + body) is constant; long mono paths in `.files` wrap at line level | app.css `.ev` grid + `.files` line-height 1.9 |
+| | DYNAMIC | every row's timestamp + body is hover-explainable (timeTip per type); expansion yields space back on collapse | expand/collapse test; timeTip in panel-derive.ts |
+| **Intervention deck** | N=0 input | placeholder narrates the selected mode's contract — never empty chrome | mode-toggle test (exact copy both modes) |
+| | N=many input (huge text) | autogrow 52→124 cap then INTERNAL scroll; deck grows, timeline flexes down, deck bottom == panel bottom; space returns on clear | autogrow test (12 lines: offset 124, scrollHeight>124, pinned, back to 52) |
+| | TEXT long (labels) | action row is fixed copy sized to fit 520px with the Terminate gap intact (S2: 39px after the "AI diagnosis" rename); asserted >24px at both sizes | geometry test (gap + every button inside panel) |
+| | SPACE tiny | deck is `flex:none` — it never shrinks; the timeline is the sacrificial region (autogrow verified this budget) | TaskPanel.tsx structure; autogrow test |
+| | DYNAMIC | every button/mode/textarea carries a contract tooltip (260ms) | deck-anchors tooltip test |
+| **Transcript tail** | N=0 lines | "(nothing emitted yet — the session just started)" — honest, shown for just-launched + synthetic panels | TranscriptTail.tsx fallback; synthetic-queued test |
+| | N=many lines | max-height 120px + internal scroll (dark scrollbar); on-demand only (mock option C), so it costs nothing when closed | app.css `.tail` max-height/overflow; marathon fixture tail |
+| | TEXT long | `white-space:pre-wrap` — raw lines wrap, nothing clipped horizontally | app.css `.tail` |
+| | DYNAMIC | toggled by View transcript with a pressed state; yields its space back on second click (display:none, timeline reflows) | tail-toggle test both directions |
+
+Cross-cutting SCREEN-sizes rung: the geometry tests run the BUSIEST panel
+state (burst expanded + tail open) at 1280×800 and 1440×900 and assert
+strict section stacking, zero positive-area overlap, zero clipping.
+
+### S5 fixes / changes to source
+
+1. **Focus return on close (App.tsx)** — was missing (S4 left focus stranded
+   on the removed panel). `openerTaskId` ref records the card that opened
+   the panel; `closePanel` refocuses it via rAF after unmount; the Escape
+   handler now routes through `closePanel` instead of raw `setPanel(null)`
+   so all three close paths behave identically. `?panel=` dev-param opens
+   have no opener and skip the refocus.
