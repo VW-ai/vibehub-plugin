@@ -49,7 +49,7 @@ progress:
       status: pending
       gate: false
   commits:
-    - hash: "9e9ab3f"
+    - hash: "5cc6a1f"
       date: "2026-07-12"
       message: "[21-workbench] feat(backend-m1): team-visibility vertical slice — core+cli 诞生,git+gh→SQLite→map 端到端实证"
       files_changed: 31
