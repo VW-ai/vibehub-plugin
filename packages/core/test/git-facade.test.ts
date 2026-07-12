@@ -1,5 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import fs from "node:fs";
 import path from "node:path";
+
+const fsRealpath = (p: string): string => fs.realpathSync(p);
 import { GitFacade, parseRemoteSlug } from "../src/git-facade.js";
 import { git, makeScratchRepo, type ScratchRepo } from "./helpers.js";
 
@@ -49,6 +52,26 @@ describe("GitFacade on a scratch repo", () => {
     const wtPath = path.join(repo.root, "wt");
     git(repo.work, "worktree", "add", wtPath, "feat/clean");
     expect(GitFacade.resolveRepoRoot(wtPath)).toBe(repo.work);
+  });
+
+  it("sessionContextAt gets all three session facts in one spawn", () => {
+    const wtPath = path.join(repo.root, "wt-ctx");
+    git(repo.work, "worktree", "add", "-b", "feat/ctx", wtPath);
+    expect(GitFacade.sessionContextAt(wtPath)).toEqual({
+      repoRoot: repo.work, // the DOMAIN
+      toplevel: fsRealpath(wtPath), // the session's own tree
+      branch: "feat/ctx", // the session's own HEAD
+    });
+  });
+
+  it("listRemoteBranches with a compare ref carries ahead/behind (git ≥ 2.41)", () => {
+    const withCounts = facade.listRemoteBranches("main");
+    const left = withCounts.find((b) => b.name === "feat/left")!;
+    const merged = withCounts.find((b) => b.name === "feat/merged")!;
+    if (left.ahead === undefined) return; // older git — fallback path, counts absent
+    expect(left.ahead).toBe(1);
+    expect(left.behind).toBeGreaterThanOrEqual(1);
+    expect(merged.ahead).toBe(0); // ahead 0 ⇔ contained ⇔ merged
   });
 
   it("reads the default branch from origin/HEAD", () => {

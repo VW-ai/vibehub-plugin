@@ -30,7 +30,7 @@ function vibehubLiveFixture(): Plugin {
         void (async () => {
           try {
             const core = await import("../packages/core/dist/index.js");
-            const dbPath = process.env["VIBEHUB_DB"] ?? core.defaultDbPath();
+            const dbPath = core.resolveDbPath(); // core policy: VIBEHUB_DB > default
             if (!fs.existsSync(dbPath)) return next();
             const repoRoot = core.GitFacade.resolveRepoRoot(
               process.env["VIBEHUB_REPO"] ?? process.cwd(),

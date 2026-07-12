@@ -24,15 +24,16 @@ import {
   addFootprint,
   appendEvent,
   claimPendingInjections,
+  hasEvent,
   readTask,
-  readTimeline,
+  taskIdForBranch,
   upsertSession,
   upsertTask,
 } from "./activity-store.js";
 import type { Db } from "./db.js";
 import { GitFacade } from "./git-facade.js";
 import { nextState, type HookEventName } from "./state-machine.js";
-import { upsertRepo } from "./team-store.js";
+import { getRepoByRoot, upsertRepo } from "./team-store.js";
 
 /** The fields Claude Code sends every hook (plus event-specific extras). */
 export interface HookPayload {
@@ -68,14 +69,45 @@ export interface HookIngestResult {
 
 const EDIT_TOOLS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
 
-/** Last assistant text from a Claude Code JSONL transcript; null if none. */
-export function lastAssistantText(transcriptPath: string): string | null {
-  let raw: string;
+/**
+ * Tail window for transcript scans. Long sessions grow transcripts to tens
+ * of MB and Stop fires often — reading the whole file each time is the
+ * cost; the final assistant message lives at the end. 256 KiB comfortably
+ * holds any single turn (tunable if a real transcript ever proves
+ * otherwise); a full-file fallback covers the pathological case.
+ */
+const TRANSCRIPT_TAIL_BYTES = 256 * 1024;
+
+function readTail(filePath: string, bytes: number): string | null {
   try {
-    raw = fs.readFileSync(transcriptPath, "utf8");
+    const fd = fs.openSync(filePath, "r");
+    try {
+      const size = fs.fstatSync(fd).size;
+      const start = Math.max(0, size - bytes);
+      const buf = Buffer.alloc(size - start);
+      fs.readSync(fd, buf, 0, buf.length, start);
+      return buf.toString("utf8");
+    } finally {
+      fs.closeSync(fd);
+    }
   } catch {
     return null;
   }
+}
+
+/** Last assistant text from a Claude Code JSONL transcript; null if none. */
+export function lastAssistantText(transcriptPath: string): string | null {
+  const tail = readTail(transcriptPath, TRANSCRIPT_TAIL_BYTES);
+  if (tail === null) return null;
+  return (
+    scanForLastAssistant(tail) ??
+    // no assistant entry in the tail window — fall back to the full file
+    // (a partial first line in the tail parses as garbage and is skipped)
+    scanForLastAssistant(readTail(transcriptPath, Number.MAX_SAFE_INTEGER) ?? "")
+  );
+}
+
+function scanForLastAssistant(raw: string): string | null {
   const lines = raw.split("\n");
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i]!.trim();
@@ -108,20 +140,27 @@ export function ingestHookEvent(
   opts: { now?: () => Date } = {},
 ): HookIngestResult {
   const nowIso = (opts.now?.() ?? new Date()).toISOString();
-  const git = new GitFacade(payload.cwd);
-  const repo = upsertRepo(
-    db,
-    git.repoRoot,
-    git.remoteSlug(),
-    git.defaultBranchOr("main"),
-    nowIso,
-  );
+  // One spawn for the session facts (hot path: this runs on every tool
+  // use). Branch/toplevel come from the SESSION's cwd (a worktree has its
+  // own HEAD); repoRoot is the shared domain (decision-github-004).
+  const ctx = GitFacade.sessionContextAt(payload.cwd);
+  // Slug/default-branch are stable repo facts — spawn for them only the
+  // first time this repo is ever seen.
+  let repo = getRepoByRoot(db, ctx.repoRoot);
+  if (!repo) {
+    const git = new GitFacade(payload.cwd);
+    repo = upsertRepo(
+      db,
+      git.repoRoot,
+      git.remoteSlug(),
+      git.defaultBranchOr("main"),
+      nowIso,
+    );
+  }
 
-  // Branch/toplevel come from the SESSION's cwd (a worktree has its own
-  // HEAD); the repo row above is the shared domain (decision-github-004).
-  const branch = GitFacade.currentBranchAt(payload.cwd) ?? "detached";
-  const sessionToplevel = GitFacade.toplevelAt(payload.cwd);
-  const taskId = `branch:${branch}`;
+  const branch = ctx.branch ?? "detached";
+  const sessionToplevel = ctx.toplevel;
+  const taskId = taskIdForBranch(branch);
   const existing = readTask(db, taskId);
   const stateBefore = existing?.state ?? null;
   const stateAfter = nextState(existing?.state ?? "queued", hook);
@@ -134,7 +173,7 @@ export function ingestHookEvent(
     signalTier: "hooks",
     branch,
     worktreePath:
-      sessionToplevel && sessionToplevel !== git.repoRoot ? sessionToplevel : null,
+      sessionToplevel !== ctx.repoRoot ? sessionToplevel : null,
     prNumber: existing?.prNumber ?? null,
     prState: existing?.prState ?? null,
     stateSince: stateAfter === stateBefore ? existing!.stateSince : nowIso,
@@ -167,7 +206,7 @@ export function ingestHookEvent(
   switch (hook) {
     case "UserPromptSubmit": {
       if (payload.prompt) {
-        const hasLaunch = readTimeline(db, taskId).some((e) => e.type === "launch");
+        const hasLaunch = hasEvent(db, taskId, "launch");
         emit(
           hasLaunch
             ? { id: eid(), at: nowIso, type: "user_injection", mode: "inject", text: payload.prompt }
@@ -188,7 +227,7 @@ export function ingestHookEvent(
           addFootprint(db, repo.id, {
             taskId,
             sessionId: payload.session_id,
-            path: repoRelative(file, sessionToplevel ?? git.repoRoot),
+            path: repoRelative(file, sessionToplevel),
             action,
             at: nowIso,
           });

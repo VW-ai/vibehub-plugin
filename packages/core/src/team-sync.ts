@@ -72,12 +72,19 @@ export function syncTeamSnapshot(
 
   const branches: TeamBranchRow[] = [];
   const files: Array<{ branch: string; path: string; changeKind: string }> = [];
-  for (const b of git.listRemoteBranches()) {
+  // ahead/behind ride along in the listing spawn on git ≥ 2.41
+  // (ahead === 0 ⇔ merged); older git falls back to per-branch queries.
+  for (const b of git.listRemoteBranches(defaultBranch)) {
     if (b.name === defaultBranch) continue;
-    const merged = git.isMerged(b.headSha, defaultBranch);
-    const { ahead, behind } = merged
-      ? { ahead: 0, behind: 0 }
-      : git.aheadBehind(b.name, defaultBranch);
+    const counted = b.ahead !== undefined && b.behind !== undefined;
+    const merged = counted
+      ? b.ahead === 0
+      : git.isMerged(b.headSha, defaultBranch);
+    const { ahead, behind } = counted
+      ? { ahead: b.ahead!, behind: b.behind! }
+      : merged
+        ? { ahead: 0, behind: 0 }
+        : git.aheadBehind(b.name, defaultBranch);
     const pr = prByBranch.get(b.name);
     branches.push({
       name: b.name,

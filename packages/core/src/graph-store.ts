@@ -131,6 +131,14 @@ export function addAnchor(
   ).run(a.repoId, a.featureId ?? null, a.specId ?? null, a.file, a.symbol ?? null);
 }
 
+/** Distinct anchored files repo-wide — the gray territory's complement. */
+export function countAnchoredFiles(db: Db, repoId: number): number {
+  const r = db
+    .prepare(`SELECT COUNT(DISTINCT file) AS n FROM anchors WHERE repo_id = ?`)
+    .get(repoId) as { n: number };
+  return r.n;
+}
+
 /**
  * Attribute a file path to its feature(s) — the join that turns a raw
  * footprint into territory occupancy. [] = uncategorized (the honest gray).
