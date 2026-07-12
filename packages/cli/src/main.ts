@@ -4,20 +4,28 @@
  * argument parsing and output formatting ONLY; every real operation is one
  * core call. Zero LLM, zero API keys.)
  *
- * M1 ① commands (the team-visibility vertical slice):
+ * Commands:
+ *   vibehub hook <event>                              (M1 ③ — the heart)
  *   vibehub team sync    [--repo <path>] [--db <path>] [--json]
  *   vibehub team fixture [--repo <path>] [--db <path>] [--out <file>]
  *
- * `vibehub hook <event>` (the system's heart) lands in M1 ③.
+ * `vibehub hook` reads the Claude Code hook payload from stdin, does one
+ * short-lived pass (write event → claim injection queue → exit 0) and
+ * NEVER fails the session: any error is swallowed to ~/.vibehub/hook.log.
+ * DB override: --db or VIBEHUB_DB (hooks configs use env, not flags).
  */
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import {
   defaultDbPath,
   exportTeamMapFixture,
   GitFacade,
+  ingestHookEvent,
   openDb,
   syncTeamSnapshot,
+  type HookEventName,
+  type HookPayload,
 } from "@vibehub/core";
 
 interface Flags {
@@ -44,11 +52,66 @@ function parseFlags(argv: string[]): Flags {
 }
 
 const USAGE = `usage:
+  vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|Notification|Stop|SessionEnd>
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
   vibehub team fixture [--repo <path>] [--db <path>] [--out <file>]`;
 
+const HOOK_EVENTS: ReadonlySet<string> = new Set([
+  "SessionStart",
+  "UserPromptSubmit",
+  "PostToolUse",
+  "Notification",
+  "Stop",
+  "SessionEnd",
+]);
+
+function readStdin(): string {
+  try {
+    return fs.readFileSync(0, "utf8");
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * The heart (decision-project-025). Exit 0 ALWAYS — a hook must never
+ * break the user's session; failures go to ~/.vibehub/hook.log.
+ */
+function runHook(eventArg: string | undefined, rest: string[]): number {
+  const flags = parseFlags(rest);
+  const dbPath = process.env["VIBEHUB_DB"] ?? flags.db;
+  try {
+    const raw = readStdin();
+    const payload = JSON.parse(raw) as HookPayload;
+    const event = (eventArg ?? payload.hook_event_name) as HookEventName;
+    if (!HOOK_EVENTS.has(event)) throw new Error(`unknown hook event: ${event}`);
+    const db = openDb(dbPath);
+    try {
+      const result = ingestHookEvent(db, event, payload);
+      if (result.output) console.log(JSON.stringify(result.output));
+    } finally {
+      db.close();
+    }
+  } catch (err) {
+    try {
+      const logDir = path.join(os.homedir(), ".vibehub");
+      fs.mkdirSync(logDir, { recursive: true });
+      fs.appendFileSync(
+        path.join(logDir, "hook.log"),
+        `${new Date().toISOString()} ${eventArg ?? "?"} ${String(err)}\n`,
+      );
+    } catch {
+      // even logging must not fail the session
+    }
+  }
+  return 0;
+}
+
 function main(argv: string[]): number {
   const [group, cmd, ...rest] = argv;
+  if (group === "hook") {
+    return runHook(cmd, rest);
+  }
   if (group !== "team" || !cmd) {
     console.error(USAGE);
     return 2;

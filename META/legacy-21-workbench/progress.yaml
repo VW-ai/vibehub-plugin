@@ -1,5 +1,5 @@
 progress:
-  completion: 0.8
+  completion: 0.9
   milestones:
     - id: m1-map-main
       name: "Map main view (scope occupancy) — dynamize from approved v8"
@@ -43,8 +43,9 @@ progress:
       notes: "migration 002(v1→v2 升级保数据,测试钉死)。运行域 tasks(五态 CHECK)/sessions/events(11 型 union 判别列+JSON verbatim 往返)/footprints/scopes(seq 保申报序)/injections(claim 原子 FIFO 不双发)/conflicts+conflict_symbols(序对齐不变式)/conflict_diagnoses(claude -p verbatim)/notifications(预算账本)/mapping_runs;图域 features(territory/sub-block 同表)/specs(无 D)/anchors/edges;配置域 settings(repo 遮蔽 global)。DERIVED-NEVER-STORED 全线:milestone 档/twist/filesTouched/ordinal/staleness/geometry 不建列,ActivityStore/GraphStore 读时派生(read 不计 staleness、未锚文件=诚实灰区,均有测试)。契约 types ×4 canonical 家入 core/src/contract。Gates: vitest 59/59、tsc clean、build 绿。"
     - id: b3-hook-cli
       name: "Backend M1 ③: `vibehub hook <event>` CLI 心脏 + 真 session 事件流校准 fixture"
-      status: pending
-      gate: false
+      status: completed
+      gate: true
+      notes: "hook-ingest(core)+ vibehub hook <event>(CLI,恒 exit 0,错误吞 ~/.vibehub/hook.log)。branch=join key 自动捕事(017/024);worktree session branch/toplevel 从 cwd 解析(修 facade 锚主 root 的 bug+回归测试);UserPromptSubmit 首条→launch 后续→user_injection、PostToolUse→edit/read 足迹、Notification→question+waiting、Stop→self_report(transcript 尾 assistant 原文机械解析)+waiting、SessionEnd→done;StateMachine 纯函数,stalled=读时观察不存转移(016 无 daemon);注入原子 claim→additionalContext 输出→入时间线不双发(018/023)。真 claude -p session 校准:launch/足迹 edit+read/self_report/state_transition ×2 全收,形状与契约一致,hook.log 零错。Gates: vitest 72/72、tsc clean、build 绿。"
     - id: b4-demo-real-read
       name: "Backend M1 ④: demo 前端 fixture → 真 SQLite 读(170 e2e 保绿)"
       status: pending

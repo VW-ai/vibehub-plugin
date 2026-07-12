@@ -6,7 +6,7 @@ Pivot 主线的实现 room。产品拍板见 00-project-room specs(intent-002 + 
 UI 长出的类型契约 = workbench/app-demo/src/*-types.ts ×5,后端实现清单)。
 
 当前阶段:**backend M1** — 把类型契约实现成真数据路径,四刀 PR 级切片
-(b1 团队可见垂直切片 ✅ / b2 三表域 schema ✅ / b3 hook CLI 心脏 / b4 demo 切真读)。
+(b1 团队可见垂直切片 ✅ / b2 三表域 schema ✅ / b3 hook CLI 心脏 ✅ / b4 demo 切真读)。
 代码落 workbench/packages/core+cli(library-first、CLI 零 LLM,decision-project-013/025)。
 
 ## Decisions
@@ -20,5 +20,6 @@ UI 长出的类型契约 = workbench/app-demo/src/*-types.ts ×5,后端实现清
 
 - [change-2026-07-12-team-visibility-slice] M1 ① 落地:core+cli 诞生,git+gh→SQLite→map 端到端实证(decision-github-003 ② 硬门槛完成)
 - [change-2026-07-12-three-domain-schema] M1 ② 落地:三表域 schema 直译(migration 002)+ ActivityStore/GraphStore,DERIVED-NEVER-STORED 贯彻
+- [change-2026-07-12-hook-cli-heart] M1 ③ 落地:vibehub hook CLI 心脏 + StateMachine,真 claude -p session 校准通过
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。

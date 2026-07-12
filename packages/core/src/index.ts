@@ -32,3 +32,10 @@ export {
   type TeamSyncResult,
 } from "./team-sync.js";
 export { exportTeamMapFixture } from "./fixture-export.js";
+export { nextState, type HookEventName } from "./state-machine.js";
+export {
+  ingestHookEvent,
+  lastAssistantText,
+  type HookPayload,
+  type HookIngestResult,
+} from "./hook-ingest.js";

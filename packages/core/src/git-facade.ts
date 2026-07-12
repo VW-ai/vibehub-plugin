@@ -233,6 +233,37 @@ export class GitFacade {
     return paths;
   }
 
+  /**
+   * Current branch AT a given path — deliberately static: the facade's own
+   * commands run at the main-repo root (the repo DOMAIN), but a session in
+   * a worktree has its own HEAD, which lives at the session's cwd.
+   * Null on detached HEAD.
+   */
+  static currentBranchAt(anyPath: string): string | null {
+    const r = run("git", ["rev-parse", "--abbrev-ref", "HEAD"], anyPath);
+    const name = r.status === 0 ? r.stdout.trim() : "";
+    return name && name !== "HEAD" ? name : null;
+  }
+
+  /** Working-tree top level at a path (a worktree's own root, not the domain's). */
+  static toplevelAt(anyPath: string): string | null {
+    const r = run("git", ["rev-parse", "--show-toplevel"], anyPath);
+    return r.status === 0 ? r.stdout.trim() : null;
+  }
+
+  /**
+   * Default branch, tolerant variant for hook ingestion: falls back to
+   * "main" when there is no remote at all (a hook must never fail a
+   * session over repo shape).
+   */
+  defaultBranchOr(fallback: string): string {
+    try {
+      return this.defaultBranch();
+    } catch {
+      return fallback;
+    }
+  }
+
   /** Tracked-file count — the honest denominator for the unmapped gray. */
   lsFilesCount(): number {
     const out = this.git(["ls-files"]);
