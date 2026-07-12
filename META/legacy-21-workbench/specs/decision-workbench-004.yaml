@@ -1,6 +1,6 @@
 spec_id: "decision-workbench-004"
 type: decision
-state: draft
+state: active
 intent:
   summary: "队友 branch → 地图任务的诚实映射语义:冲突候选 = unmerged ∧ (无 PR ∨ open PR)(020 并发才算撞平移到远端);unmerged→stalled/PR 收口→done(basic 档);蒸馏前全落单一 Uncategorized 地盘,冲突 sharedSymbols = 文件路径;detectedAt = 首次检出、跨 sync 保龄"
   detail: |
