@@ -411,3 +411,84 @@ collisions; `@keyframes breathe` renamed `breathe-soft` for the install dots
 - Local mapping override's elapsed time is frozen at "0s" (capturedAt is the
   demo clock); decide whether the demo ticks.
 - Scale-extremes protocol: close the full per-component evidence table.
+
+## S5 (iter-18) — interactions + states closure
+
+Files: `tests/install-interactions.spec.ts` (19 tests), `InstallScreen.tsx`
+(panel wiring + correlate-hover + the "+N" popover), `app.css` (fp-pop,
+correlate dim/lit, focus rings extended to .fp / popover rows).
+
+### Interaction inventory (all mechanically tested)
+- **CTA storyboard, click path** (parity spec owns the Enter path): connect →
+  installing (path visible, CTA gone) → step milestones 2-done then 3-done
+  (timing-tolerant: milestone assertions with generous timeouts, never tick
+  counting) → connected chrome (repo chip / Synced just now / 3 zero-groups /
+  launch / guidance) → URL follows to `install=connected`. Zero console errors.
+- **Retry**: only the failed step reruns (done stays 2, `.why` gone, no
+  `failed` row), then completes into the same storyboard.
+- **Map this repo → chip → stop**, BOTH placements: Moment B guide and the
+  Moment C corner (footprint count asserted unchanged through the cycle).
+  Chip carries elapsed mono time, asserted to contain no `%`.
+- **Rail card → task panel (iter-17 debt)**: click opens a labeled
+  `role=dialog`; the panel is SYNTHETIC and honest — exactly 1 timeline row
+  ("You · launched", title-as-prompt stand-in, DECISIONS iter-7), tail admits
+  "nothing emitted yet". Canvas gets the map's `.veiled` blur + aria-hidden
+  under the scrim; veil yields back on close.
+- **Footprint → task panel**: footprints are `role=button` + `tabIndex=0`;
+  click AND Enter/Space open the SAME task panel as the rail card — one
+  subject, two affordances; no footprint-detail surface invented (fork).
+  All three close paths (X / Escape / scrim) return focus to the exact
+  opener (card via `[data-task]`, footprint via `[data-fp]` — selector
+  re-queried at close time, rAF then focus; polled in tests).
+- **Footprint tooltip**: 260ms intent delay honored (nothing at 80ms),
+  content = exact count + sampleFiles + the mapping promise; instant hide.
+- **Correlate-hover card ↔ footprint** (LOOP.md S5 requirement, v8 language):
+  card hover/FOCUS lights its footprint (`.lit`: ring + scale 1.012, opacity
+  1) and dims every other block + the chip to .14 (`.terr.fpfocus`); reverse:
+  footprint hover dims the rail (map's `.rail.dim` .3) with its card `.hot`
+  at 1. A COLLAPSED subject lights the +N chip instead — its block has no
+  pixels, and faking one would re-litigate the packing (fork). Space yields
+  back on leave; opening the panel clears the correlate (scrim takes over).
+- **"+N earlier sessions" chip → listing popover** (design fork, below):
+  click toggles `.fp-pop` (aria-haspopup/aria-expanded), listing the
+  collapsed sessions oldest-first (the collapse order), each row = title
+  (ellipsis) + exact mono file count + the footprint tooltip; row click opens
+  that task's panel (popover yields first; panel close focuses the CHIP —
+  the row is unmounted, the chip is the stable opener). Escape (focus→chip),
+  outside click, and chip re-click all yield the space back. The 6 visible
+  blocks do NOT re-pack while the popover is up — a listing, not a re-layout.
+
+### The +N interaction design (fork logged iter-18)
+Chosen: **listing popover**, not "temporarily swap packing to show all at
+floor". The rejected option is geometrically dishonest: collapse happens
+EXACTLY when every block at the floor no longer fits (install-derive.ts
+overflow ladder), so re-showing all-at-floor must either overlap blocks or
+shrink below the measured legibility floor — both violate the written rungs.
+The popover keeps text as the first channel (guideline 6), yields its space
+back on dismiss (DYNAMIC rule), and each row keeps the panel one click away.
+
+### SCALE-EXTREMES closure — per component, with evidence
+| Component | N=0 | N=1 | N=many | TEXT long | NUMBER huge | SPACE tiny | DYNAMIC | SCREENS |
+|---|---|---|---|---|---|---|---|---|
+| Titlebar (first-run) | "No repo connected" quiet chip, no stats, no fresh (`connect` variant; InstallScreen.tsx norepo branch) | `1 running` stat appears only >0 (zero-count stats HIDDEN — parity test "connected: …stat count 0") | stats follow the map's rules once mapped (out of scope here — one running stat max pre-mapping states) | repo slug/branch chip = v8 truncation + tooltip (Titlebar language reused) | n/a (counts ≤ tasks) | v8 titlebar grid | fresh chip has sync tooltip; switcher hidden via `?switcher=0` | parity shots ×2 viewports, all 8 variants |
+| Connect card / checklist | pristine checklist all-pending from PRISTINE_INSTALL_STEPS (data, iter-17 fork) | one step `now` = the ONE breathe-soft animation (`installing`) | 3 steps by decision-025 — fixed; a failed step renders the general row (`install-failed`) | 150-char repo path: leading-ellipsis (direction:rtl+bdi), probe `scrollWidth>clientWidth` green both viewports; full path tooltip | n/a | card fixed 420px, canvas-centered (S2 adjudication) | CTA→installing→connected storyboard + Retry (interactions tests 1–2); autofocus+Enter (parity) | parity shots + probes ×2 |
+| Rail | dashed true-empty placeholder, no launch (`connect`); three quiet 0-group headers once connected (`connected`, count asserted =3) | 1 RUNNING card (`first-task`) | 9 cards scroll in the v8 rail (`nine-footprints`, zero-error sweep) | task titles = v8 single-line ellipsis + tooltip (TaskCard reused verbatim) | mono group counts | 300px v8 rail | card hover/focus = correlate source; card click/Enter/Space opens panel, focus returns (tests) | geometry probes ×2 viewports |
+| Uncategorized territory + guidance | full-bleed gray + one guidance sentence, no legend, nothing fake (`connected`) | guidance replaced by the first footprint — no timer (iter-15; `first-task`) | the gray never subdivides pre-mapping — footprints ride ON it | label/foot ellipsize (v8 .terr rules); foot tooltip carries the mapping honesty | n/a | territory is 94%×88% fixed | fpfocus dim/lit rides on it; tooltip on label + foot | parity + geometry ×2 |
+| Footprints | (none rendered when tasks=[]) | floor block 6/58/24/26 EXACT (parity assert on style attr) | shelf-pack → shrink-to-floor → +N collapse (vitest 11: wrap 4→3+1, 9→6+3, bounds+no-overlap invariants; Playwright geometry: 6 blocks in-bounds pairwise-disjoint ×2 viewports) | kicker + foot ellipsize; tooltip = exact count + sampleFiles (tooltip test) | foot uses formatCount — ≥1000 abbreviates, exact in tooltip (`footprintFootText`, vitest) | floor 24×26 IS the defined minimum; below it the ladder collapses to +N instead of shrinking (install-derive.ts) | hover ring; correlate lit/dim .14; tabbable; Enter/Space opens panel; space yields on leave/close (tests) | nine-footprints + tiny-repo geometry ×2 viewports, page-overflow probes |
+| +N chip + popover | not rendered when nothing collapsed (all first-run variants except nine-footprints) | `+1 earlier session` singular (collapsedChipText, vitest) | `+N` count abbreviates ≥1000 by the ONE rule; popover scrolls past 216px max-height | row titles ellipsize; exact file counts mono | exact counts via exactCount | chip 22px pill pinned above the foot (iter-17); popover 280px anchored above it, in-bounds asserted ×2 viewports | click→popover→row→panel; Escape/outside/re-click yield; aria-expanded; chip is the focus-return opener; correlate lights it for collapsed subjects (tests) | in-bounds probes ×2 |
+| Mapping chip | button state when no run (`connected`) | one running pass = one breathe dot (that state's ONE animation) | n/a — one pass at a time by design | tooltip carries start/eta/cost honesty | elapsed mono via relAge rungs | corner placement on Moment C | button↔chip both directions, both placements, click stops (tests) | parity shots ×2 |
+| Task panel (over first-run) | queued would render "Not launched yet" (panel suite; no queued pre-mapping fixture — hooks only see live sessions) | synthetic = exactly 1 launch row + empty tail, asserted | panel's own N=many closed in m2 (marathon 60) | panel's own rules (m2) | panel's own rules (m2) | 520px panel, canvas veiled behind | open×3 paths / close×3 paths, focus return, remount per task (tests) | veil on/off asserted; panel geometry closed in m2 ×2 viewports |
+
+### Gates (S5 exit)
+- tsc --noEmit clean · pnpm build green.
+- Playwright FULL **122/122** = 103 existing untouched + 19 new
+  (tests/install-interactions.spec.ts) — storyboard, Retry, mapping ×2
+  placements, tooltip timing, panel wiring (4), popover (3), correlate (3),
+  extremes geometry (4 = 2 fixtures × 2 viewports), all first-run green.
+- vitest 11/11 (install-derive unchanged).
+
+### Known demo seams (carried, not hidden)
+- Local mapping override's elapsed reads "0s" (capturedAt is the demo clock;
+  fixture `mapping` shows the real 2m rendering) — iter-17 note stands.
+- Focus-return re-activates correlate (card/footprint onFocus) — same
+  recorded behavior class as the m2 fork; consistent, not accidental.

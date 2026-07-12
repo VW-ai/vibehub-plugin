@@ -18,9 +18,17 @@
  *   CTA → installing fixture → steps advance (demo pacing) → last check
  *   lands → hold 400ms (2×--t-base) → card exits (reverse cardIn, 200ms) →
  *   connected chrome enters (200ms, single stagger step).
+ *
+ * S5 interactions: rail cards + footprints (+ the popover rows) open the
+ * task panel — synthetic (launch row only, honesty rules in
+ * fixtures/synthetic-panel.ts) since no pre-mapping task has an authored
+ * panel. The "+N earlier sessions" chip opens a listing popover (the
+ * collapsed sessions CANNOT honestly be re-shown as blocks: they collapsed
+ * precisely because the floors no longer fit — fork logged iter-18).
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MapFixture, Task } from "../types";
+import type { TaskPanelFixture } from "../panel-types";
 import type { InstallFixture, InstallStep, UncategorizedFootprint } from "../install-types";
 import {
   collapsedChipText,
@@ -29,8 +37,10 @@ import {
   packFootprints,
 } from "../install-derive";
 import { relAge } from "../derive";
+import { panelForTask } from "../fixtures";
 import { ConnectCard } from "./ConnectCard";
 import { TaskCard } from "./TaskCard";
+import { TaskPanel } from "./TaskPanel";
 import { Tooltip } from "./Tooltip";
 
 /* ── demo pacing (NOT product timing) ────────────────────────────────────
@@ -108,6 +118,18 @@ export function InstallScreen({
   // "Map this repo" demo: local MappingRun override (no mapping-with-tasks
   // fixture exists; the chip state must still be reachable — no dead pixels).
   const [mappingOverride, setMappingOverride] = useState<InstallFixture["mapping"] | null>(null);
+  // Task panel (S5): rail cards, footprints and popover rows all open it.
+  const [panel, setPanel] = useState<TaskPanelFixture | null>(null);
+  // Focus returns to the exact opener on close (keyboard parity — same
+  // recorded principle as the map screen). Selector, not element: rail
+  // cards stay mounted under the scrim and are re-queried at close time.
+  const openerSelector = useRef<string | null>(null);
+  // "+N earlier sessions" popover (S5, fork iter-18: listing, not re-packing).
+  const [chipOpen, setChipOpen] = useState(false);
+  // Correlate-hover (S5): card ↔ footprint, one source at a time — the map's
+  // dim/lit language (dim .14 + ring + scale). A collapsed task lights the
+  // +N chip instead (its block has no pixels to light — honest).
+  const [hoverTaskId, setHoverTaskId] = useState<string | null>(null);
 
   const conn = fixture.connection;
   const mapping = mappingOverride ?? fixture.mapping;
@@ -156,6 +178,8 @@ export function InstallScreen({
     setPhase("idle");
     setStepsOverride(null);
     setMappingOverride(null);
+    setPanel(null); // a modal belongs to the fixture it was opened from
+    setChipOpen(false);
     onSwitch(name);
   };
 
@@ -182,6 +206,57 @@ export function InstallScreen({
     ? packFootprints(fixture.footprints, conn.repoFiles)
     : { blocks: [], collapsedTaskIds: [] };
   const taskById = (id: string): Task | undefined => fixture.tasks.find((t) => t.id === id);
+
+  /* ── task panel (S5): synthetic — launch row only, honesty rules ─────── */
+  const openTask = (task: Task, opener: string) => {
+    if (!mapLike) return;
+    setChipOpen(false);
+    setHoverTaskId(null); // the scrim takes over — correlate yields
+    openerSelector.current = opener;
+    setPanel(panelForTask(task, mapLike));
+  };
+  const closePanel = () => {
+    setPanel(null);
+    const sel = openerSelector.current;
+    if (sel) {
+      // after the unmount paints — the opener is still mounted under the scrim
+      requestAnimationFrame(() => document.querySelector<HTMLElement>(sel)?.focus());
+    }
+  };
+
+  // Escape closes the panel (alongside X and scrim click) — same path as X,
+  // so focus returns to the opener.
+  useEffect(() => {
+    if (!panel) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closePanel();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [panel]);
+
+  // The +N popover yields on Escape (focus back to the chip) / outside click.
+  useEffect(() => {
+    if (!chipOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setChipOpen(false);
+        requestAnimationFrame(() =>
+          document.querySelector<HTMLElement>(".fp-chip")?.focus(),
+        );
+      }
+    };
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Element | null;
+      if (!t?.closest(".fp-pop") && !t?.closest(".fp-chip")) setChipOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [chipOpen]);
 
   const freshAgeS = fixture.sync?.lastFetchAt
     ? (Date.parse(fixture.capturedAt) - Date.parse(fixture.sync.lastFetchAt)) / 1000
@@ -258,7 +333,7 @@ export function InstallScreen({
       </div>
 
       <div className="main">
-        <aside className="rail">
+        <aside className={`rail${hoverTaskId !== null ? " dim" : ""}`}>
           <div className="tasks">
             {!connected ? (
               // Moment A: true empty rail — dashed placeholder, connect is the
@@ -294,11 +369,13 @@ export function InstallScreen({
                         task={t}
                         fixture={mapLike}
                         index={cardIndex++}
-                        hot={false}
-                        onHoverStart={noop}
-                        onHoverEnd={noop}
-                        onOpen={noop} /* panel wiring = S5 interactions */
-                        onConflictOpen={noop}
+                        hot={hoverTaskId === t.id}
+                        onHoverStart={(task) => setHoverTaskId(task.id)}
+                        onHoverEnd={() => setHoverTaskId(null)}
+                        onOpen={(task) =>
+                          openTask(task, `[data-task="${CSS.escape(task.id)}"]`)
+                        }
+                        onConflictOpen={noop} /* pre-mapping tasks carry no conflicts */
                       />
                     ))}
                 </div>
@@ -322,7 +399,10 @@ export function InstallScreen({
           )}
         </aside>
 
-        <section className="canvas">
+        <section
+          className={`canvas${panel ? " veiled" : ""}`}
+          aria-hidden={panel !== null || undefined}
+        >
           <div className="grid" />
 
           {!connected && (
@@ -337,7 +417,7 @@ export function InstallScreen({
 
           {connected && (
             <div
-              className="terr quiet"
+              className={`terr quiet${hoverTaskId !== null && packing.blocks.length + packing.collapsedTaskIds.length > 0 ? " fpfocus" : ""}`}
               style={TERRITORY_RECT}
               data-tip={`Every file in ${fixture.repo?.slug ?? "this repo"} lives here until the repo is mapped. Sessions, states and interventions all work without a map.`}
             >
@@ -415,8 +495,14 @@ export function InstallScreen({
                 return (
                   <div
                     key={b.taskId}
-                    className="fp"
+                    className={`fp${hoverTaskId === b.taskId ? " lit" : ""}`}
                     data-fp={b.taskId}
+                    role="button"
+                    tabIndex={0}
+                    onMouseEnter={() => setHoverTaskId(task.id)}
+                    onMouseLeave={() => setHoverTaskId(null)}
+                    onFocus={() => setHoverTaskId(task.id)}
+                    onBlur={() => setHoverTaskId(null)}
                     style={{
                       left: `${b.left}%`,
                       top: `${b.top}%`,
@@ -424,6 +510,16 @@ export function InstallScreen({
                       height: `${b.height}%`,
                     }}
                     data-tip={footprintTip(task.title, fp)}
+                    onClick={() =>
+                      openTask(task, `[data-fp="${CSS.escape(task.id)}"]`)
+                    }
+                    onKeyDown={(e) => {
+                      // keyboard parity: focusable, so open must be too
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        openTask(task, `[data-fp="${CSS.escape(task.id)}"]`);
+                      }
+                    }}
                   >
                     <div className="who">{task.title}</div>
                     <div className="files">{footprintFootText(fp.filesTouched)}</div>
@@ -433,18 +529,61 @@ export function InstallScreen({
 
               {packing.collapsedTaskIds.length > 0 && (
                 <button
-                  className="fp-chip"
+                  className={`fp-chip${hoverTaskId !== null && packing.collapsedTaskIds.includes(hoverTaskId) ? " hot" : ""}`}
                   type="button"
-                  data-tip={`${packing.collapsedTaskIds.length} earlier session${packing.collapsedTaskIds.length === 1 ? "" : "s"} collapsed so the newest stay legible: ${packing.collapsedTaskIds
-                    .map((id) => taskById(id)?.title ?? id)
-                    .join(", ")}. They'll attach to named features once the repo is mapped.`}
+                  aria-haspopup="true"
+                  aria-expanded={chipOpen}
+                  data-tip={`${packing.collapsedTaskIds.length} earlier session${packing.collapsedTaskIds.length === 1 ? "" : "s"} collapsed so the newest stay legible. Click to list them — each opens its task. They'll attach to named features once the repo is mapped.`}
+                  onClick={() => setChipOpen((v) => !v)}
                 >
                   {collapsedChipText(packing.collapsedTaskIds.length)}
                 </button>
               )}
+
+              {chipOpen && packing.collapsedTaskIds.length > 0 && (
+                // The collapsed sessions, listed (oldest first, the packing
+                // order). NOT re-shown as blocks: they collapsed precisely
+                // because the floors no longer fit (fork iter-18). Space
+                // yields back on Escape / outside click / chip re-click.
+                <div className="fp-pop" role="dialog" aria-label="Earlier sessions">
+                  {packing.collapsedTaskIds.map((id) => {
+                    const task = taskById(id);
+                    const fp = fixture.footprints.find((f) => f.taskId === id);
+                    if (!task || !fp) return null;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        className="row"
+                        data-pop-task={task.id}
+                        data-tip={footprintTip(task.title, fp)}
+                        onClick={() => openTask(task, ".fp-chip")}
+                      >
+                        <span className="t">{task.title}</span>
+                        <span className="n">
+                          {footprintExactFiles(fp.filesTouched)}{" "}
+                          {fp.filesTouched === 1 ? "file" : "files"}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </section>
+
+        {panel && mapLike && (
+          <>
+            <div
+              className="scrim"
+              data-tip="Click anywhere on the map to close the panel"
+              onClick={closePanel}
+            />
+            {/* key: switching tasks remounts the panel (fresh tier/tail/scroll) */}
+            <TaskPanel key={panel.task.id} panel={panel} map={mapLike} onClose={closePanel} />
+          </>
+        )}
       </div>
       <Tooltip />
     </div>

@@ -453,8 +453,15 @@ svg{vertical-align:-2px}
 
 /* Moment C: session footprints on the unmapped gray (fill = write) —
    geometry comes from packFootprints, never hand-placed */
-.fp{position:absolute;border-radius:var(--r-m);background:linear-gradient(180deg,#e9f2ea,#e0ede2);box-shadow:inset 0 0 0 1px rgba(62,125,76,.13),var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.fp{position:absolute;border-radius:var(--r-m);background:linear-gradient(180deg,#e9f2ea,#e0ede2);box-shadow:inset 0 0 0 1px rgba(62,125,76,.13),var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),opacity var(--t-base) var(--ease),transform var(--t-base) var(--ease)}
 .fp:hover{box-shadow:inset 0 0 0 1.5px rgba(62,125,76,.3),var(--sh-2)}
+/* correlate-hover (S5): card ↔ footprint, the map's dim/lit language —
+   non-subjects dim to .14, the subject gets ring + scale. A collapsed
+   subject lights the +N chip instead (its block has no pixels) */
+.terr.quiet.fpfocus .fp{opacity:.14}
+.terr.quiet.fpfocus .fp.lit{opacity:1;box-shadow:inset 0 0 0 2px rgba(62,125,76,.4),var(--sh-2);transform:scale(1.012)}
+.terr.quiet.fpfocus .fp-chip{opacity:.14}
+.terr.quiet.fpfocus .fp-chip.hot{opacity:1;box-shadow:var(--sh-2);color:var(--ink-700)}
 .fp .who{position:absolute;top:var(--sp-2);left:var(--sp-3);right:var(--sp-3);font-size:var(--fs-2);font-weight:600;color:#4c7a57;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
 /* display:block + font-family are load-bearing: the task panel owns bare
    `.files` (display:none + mono, collapsed file-change entry) and would
@@ -462,8 +469,16 @@ svg{vertical-align:-2px}
 .fp .files{display:block;font-family:var(--sans);position:absolute;left:var(--sp-3);bottom:var(--sp-2);right:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
 /* overflow ladder's last rung: "+N earlier sessions" chip, overlaid
    bottom-right ABOVE the territory foot (iter-17 fork; S5 defines click) */
-.fp-chip{position:absolute;right:var(--sp-4);bottom:var(--sp-6);height:22px;border:0;border-radius:11px;padding:0 10px;font-family:var(--mono);font-size:var(--fs-1);font-weight:600;background:rgba(255,255,255,.85);color:var(--ink-500);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.fp-chip{position:absolute;right:var(--sp-4);bottom:var(--sp-6);height:22px;border:0;border-radius:11px;padding:0 10px;font-family:var(--mono);font-size:var(--fs-1);font-weight:600;background:rgba(255,255,255,.85);color:var(--ink-500);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),opacity var(--t-base) var(--ease)}
 .fp-chip:hover{box-shadow:var(--sh-2);color:var(--ink-700)}
+/* the chip's listing popover (S5, fork iter-18): the collapsed sessions as
+   rows, oldest first — each opens its task panel. Anchored above the chip,
+   space yields back on Escape / outside click / re-click */
+.fp-pop{position:absolute;right:var(--sp-4);bottom:calc(var(--sp-6) + 22px + var(--sp-2));width:280px;max-height:216px;overflow-y:auto;background:var(--card);border-radius:var(--r-m);box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-200);padding:var(--sp-1);display:flex;flex-direction:column;animation:cardIn var(--t-base) var(--ease) backwards;z-index:3}
+.fp-pop .row{display:flex;align-items:center;gap:var(--sp-3);border:0;background:none;font-family:inherit;text-align:left;height:30px;flex:none;padding:0 var(--sp-2);border-radius:var(--r-s);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.fp-pop .row:hover{background:var(--ink-100)}
+.fp-pop .row .t{flex:1;min-width:0;font-size:var(--fs-3);font-weight:600;color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-pop .row .n{flex:none;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
 
 /* storyboard entry: after the hard swap the connected chrome enters with the
    200ms language, one stagger step (demo CTA path only — .enter is set then) */
@@ -471,12 +486,12 @@ svg{vertical-align:-2px}
 .first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:chromeIn var(--t-base) var(--ease) backwards}
 
 /* first-run keyboard parity: same system ring as everywhere else */
-.cta:focus-visible,.retry:focus-visible,.mapbtn:focus-visible,.mapstat:focus-visible,.fp-chip:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
-.cta:focus:not(:focus-visible),.retry:focus:not(:focus-visible),.mapbtn:focus:not(:focus-visible),.mapstat:focus:not(:focus-visible),.fp-chip:focus:not(:focus-visible){outline:none}
+.cta:focus-visible,.retry:focus-visible,.mapbtn:focus-visible,.mapstat:focus-visible,.fp-chip:focus-visible,.fp:focus-visible,.fp-pop .row:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.cta:focus:not(:focus-visible),.retry:focus:not(:focus-visible),.mapbtn:focus:not(:focus-visible),.mapstat:focus:not(:focus-visible),.fp-chip:focus:not(:focus-visible),.fp:focus:not(:focus-visible),.fp-pop .row:focus:not(:focus-visible){outline:none}
 
 /* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
 @media (prefers-reduced-motion: reduce){
   .window,.task,.terr,.sub.clash .cnt,.panel,.scrim,.modal,.fdbk{animation:none}
   .grade,.cfoot,.symtoggle .car,.split .car{transition:none}
-  .connect,.connect.out,.step .ic .busy,.mapstat .dot,.first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:none}
+  .connect,.connect.out,.step .ic .busy,.mapstat .dot,.fp-pop,.first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:none}
 }
