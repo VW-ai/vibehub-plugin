@@ -1,0 +1,26 @@
+/* Design tokens — extracted VERBATIM from workbench-refs/reference-screen-v8.html
+   (the frozen approved baseline). Do NOT change any value here; propose changes
+   via DECISIONS-NEEDED.md instead. */
+:root{
+  /* ink ramp */
+  --ink-900:#191b1f; --ink-700:#3c3f45; --ink-500:#6b6f77; --ink-400:#8b8f97; --ink-300:#b4b7bd; --ink-200:#d9dade; --ink-150:#e7e8ea; --ink-100:#f0f0f1;
+  --paper:#f7f7f5; --card:#ffffff;
+  /* semantic (text ink deliberately darker than fill hue) */
+  --need:#c0392b; --need-bg:#f6e8e5; --need-ink:#9c3022;
+  --clash:#9a6b16; --clash-bg:#f4ecd9; --clash-ink:#775211;
+  --alive:#3e7d4c; --alive-bg:#e4efe6; --alive-ink:#2f6039;
+  --read:#5a7fb8;  --read-ink:#48699c;
+  /* elevation */
+  --sh-1:0 1px 2px rgba(20,22,26,.05);
+  --sh-2:0 1px 3px rgba(20,22,26,.07),0 4px 14px rgba(20,22,26,.06);
+  /* shape scale: exactly three radii */
+  --r-s:6px; --r-m:10px; --r-l:16px;
+  /* space scale: 4/8/12/16/24 only */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-6:24px;
+  /* type scale: exactly four sizes */
+  --fs-1:10px; --fs-2:11px; --fs-3:12px; --fs-4:13px;
+  /* motion: two durations, one curve */
+  --t-fast:120ms; --t-base:200ms; --ease:cubic-bezier(.25,.8,.3,1);
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+}

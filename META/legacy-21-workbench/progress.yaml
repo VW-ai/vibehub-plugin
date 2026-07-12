@@ -3,9 +3,9 @@ progress:
   milestones:
     - id: m1-map-main
       name: "Map main view (scope occupancy) — dynamize from approved v8"
-      status: planned
+      status: in_progress
       gate: true
-      notes: "next stage: S3 (S1/S2 done via reference-screen-v8)"
+      notes: "S3 done, next S4. Gates green (install/tsc/build). 3 forks logged to DECISIONS-NEEDED (deferred @types/react for S4; TS-module fixtures for literal type-checking; demoLayout as presentation hint)."
     - id: m2-task-panel
       name: "Task panel (timeline + intervention)"
       status: planned
