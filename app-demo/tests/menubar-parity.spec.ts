@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * menubar S4 screenshot-parity capture + structure probes (LOOP.md S4 gate):
  * the React menubar surface next to the frozen S1+S2 static, all 5 variants
@@ -27,7 +28,7 @@ test.beforeAll(() => {
 
 /** Let the dropIn entry animation finish (200ms) + park the pointer. */
 async function open(page: Page, variant: string) {
-  await page.goto(`http://localhost:5199/?menubar=${variant}&switcher=0`);
+  await page.goto(`${BASE}/?menubar=${variant}&switcher=0`);
   await page.locator(".drop").waitFor();
   await page.mouse.move(640, 500);
   await page.waitForTimeout(500);
@@ -192,7 +193,7 @@ for (const width of [1280, 1440] as const) {
 /* ── the map/install paths are untouched by the menubar layer ──────────── */
 
 test("unknown ?menubar= name falls through to the map path", async ({ page }) => {
-  await page.goto("http://localhost:5199/?menubar=nope&fixture=v8-baseline&switcher=0");
+  await page.goto(`${BASE}/?menubar=nope&fixture=v8-baseline&switcher=0`);
   await page.waitForTimeout(1200);
   await expect(page.locator(".mbdesk")).toHaveCount(0);
   await expect(page.locator(".legend")).toBeVisible();
@@ -200,7 +201,7 @@ test("unknown ?menubar= name falls through to the map path", async ({ page }) =>
 });
 
 test("?menubar=1 bare flag opens the busy variant", async ({ page }) => {
-  await page.goto("http://localhost:5199/?menubar=1&switcher=0");
+  await page.goto(`${BASE}/?menubar=1&switcher=0`);
   await page.locator(".drop").waitFor();
   await expect(page.locator(".gh")).toHaveText("Needs you 2");
   await expect(page.locator(".vhitem .badge")).toHaveText("1");

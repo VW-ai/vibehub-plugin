@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * task-panel S4 screenshot-parity capture (LOOP.md S4 mechanical gate):
  * the React panel (opened the REAL way — clicking the "Refactor auth flow"
@@ -26,7 +27,7 @@ async function settle(page: Page) {
 
 /** Open v8-baseline and click the waiting card — the real integration path. */
 async function openPanelViaCard(page: Page) {
-  await page.goto("http://localhost:5199/?fixture=v8-baseline&switcher=0");
+  await page.goto(`${BASE}/?fixture=v8-baseline&switcher=0`);
   await settle(page);
   await page.locator('[data-task="task-refactor-auth"]').click();
   await expect(page.locator(".panel")).toBeVisible();
@@ -58,7 +59,7 @@ test("react panel expanded (files burst + transcript tail) @1280x800", async ({ 
 });
 
 test("react panel extreme via ?panel=marathon @1280x800", async ({ page }) => {
-  await page.goto("http://localhost:5199/?fixture=v8-baseline&switcher=0&panel=marathon");
+  await page.goto(`${BASE}/?fixture=v8-baseline&switcher=0&panel=marathon`);
   await settle(page);
   await expect(page.locator(".panel")).toBeVisible();
   await page.screenshot({ path: `${SHOTS}/task-panel-s4-marathon-1280.png` });

@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * S4 screenshot-parity capture (LOOP.md mechanical gate):
  *  (a) React render of the v8-baseline fixture
@@ -25,7 +26,7 @@ async function settle(page: import("@playwright/test").Page) {
 }
 
 test("react v8-baseline @1280x800", async ({ page }) => {
-  await page.goto("http://localhost:5199/?fixture=v8-baseline&switcher=0");
+  await page.goto(`${BASE}/?fixture=v8-baseline&switcher=0`);
   await settle(page);
   await page.screenshot({ path: `${SHOTS}/react-v8-baseline-1280x800.png` });
 });
@@ -38,14 +39,14 @@ test("static v8 reference @1280x800", async ({ page }) => {
 
 test("react v8-baseline @1440x900", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("http://localhost:5199/?fixture=v8-baseline&switcher=0");
+  await page.goto(`${BASE}/?fixture=v8-baseline&switcher=0`);
   await settle(page);
   await page.screenshot({ path: `${SHOTS}/react-v8-baseline-1440x900.png` });
 });
 
 for (const fixture of ["empty-project", "scope-overload", "forty-territories"]) {
   test(`react extreme fixture ${fixture} @1280x800`, async ({ page }) => {
-    await page.goto(`http://localhost:5199/?fixture=${fixture}`);
+    await page.goto(`${BASE}/?fixture=${fixture}`);
     await settle(page);
     await page.screenshot({ path: `${SHOTS}/react-${fixture}-1280x800.png` });
   });

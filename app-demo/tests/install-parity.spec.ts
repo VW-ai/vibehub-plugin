@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * empty-install S4 screenshot-parity capture + integration smoke
  * (LOOP.md S4 mechanical gate): the React first-run screen next to the
@@ -47,7 +48,7 @@ async function park(page: Page) {
 }
 
 async function open(page: Page, name: string) {
-  await page.goto(`http://localhost:5199/?install=${name}&switcher=0`);
+  await page.goto(`${BASE}/?install=${name}&switcher=0`);
   await settle(page);
   await park(page);
 }
@@ -73,7 +74,7 @@ test("all 10 ?install= fixtures render, zero console/page errors", async ({ page
   });
   page.on("pageerror", (e) => errors.push(String(e)));
   for (const name of [...VARIANTS, "nine-footprints", "tiny-repo"]) {
-    await page.goto(`http://localhost:5199/?install=${name}&switcher=0`);
+    await page.goto(`${BASE}/?install=${name}&switcher=0`);
     await settle(page);
     if (name === "connect" || name === "installing" || name === "install-failed") {
       await expect(page.locator(".connect"), name).toBeVisible();
@@ -241,7 +242,7 @@ test("Retry path: failed step reruns alone, then the same storyboard completes",
 /* ── the mapped-repo path is untouched by the install layer ───────────── */
 
 test("unknown ?install= name falls through to the map path", async ({ page }) => {
-  await page.goto("http://localhost:5199/?install=nope&fixture=v8-baseline&switcher=0");
+  await page.goto(`${BASE}/?install=nope&fixture=v8-baseline&switcher=0`);
   await settle(page);
   await expect(page.locator(".connect")).toHaveCount(0);
   await expect(page.locator(".legend")).toBeVisible();

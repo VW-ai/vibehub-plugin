@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * conflict-card S5 — the interaction/state suite (LOOP.md S5 gate).
  *
@@ -18,7 +19,7 @@
  */
 import { expect, test, type Page } from "@playwright/test";
 
-const APP = "http://localhost:5199/?fixture=v8-baseline&switcher=0";
+const APP = `${BASE}/?fixture=v8-baseline&switcher=0`;
 
 async function settle(page: Page) {
   await page.waitForTimeout(1200);

@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * menubar S5 interaction/state suite (LOOP.md S5 gate):
  *  - item click closes/reopens the dropdown (starts open — the demo subject);
@@ -13,7 +14,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function open(page: Page, variant = "busy") {
-  await page.goto(`http://localhost:5199/?menubar=${variant}&switcher=0`);
+  await page.goto(`${BASE}/?menubar=${variant}&switcher=0`);
   await page.locator(".drop").waitFor();
 }
 

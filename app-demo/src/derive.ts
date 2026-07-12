@@ -160,7 +160,12 @@ export function groupTasks(fx: MapFixture): TaskGroup[] {
   ].filter((g) => g.tasks.length > 0);
 }
 
-/* ── chips (one line, overflow collapses to +N) ────────────────────────── */
+/* ── chips (WRAPPED rows, all visible; pathological counts collapse) ───── */
+/* RULE REVISION (Wayne 2026-07-12 live review, overrides v8's single-line
+ * +N collapse): chip rows wrap and every chip is visible by default — the
+ * card grows taller. The old "first 2 + +N" collapse survives only as a
+ * pathological-count fallback (>PATHOLOGICAL_MAX chips → ~3 wrapped rows
+ * then +N). Recorded in DECISIONS-NEEDED as a ratified verdict. */
 
 export type ChipKind = "w" | "r" | "n" | "more";
 
@@ -170,7 +175,37 @@ export interface ChipView {
   tip: string;
 }
 
-const MAX_CHIPS = 3; // v8: a card never shows more than 3 chips on its line
+/**
+ * Middle truncation for long branch names: preserve head AND tail (both are
+ * semantic in a branch — org/prefix and the trailing subject), single "…" in
+ * the middle, exact text always in the tooltip. Pure; unit-tested.
+ * e.g. middleTruncate("vibehub/auto-retry-failed-payments", 28)
+ *   → "vibehub/auto-r…iled-payments"
+ */
+export function middleTruncate(text: string, max: number): string {
+  if (max <= 1) return text.length > max ? "…" : text;
+  if (text.length <= max) return text;
+  const tail = Math.floor((max - 1) / 2);
+  const head = max - 1 - tail;
+  return `${text.slice(0, head)}…${text.slice(text.length - tail)}`;
+}
+
+/**
+ * Branch-chip character budget for middle truncation. Reasoning: at the
+ * rail's MIN width (240px, resizable split) a chip row is ~192px
+ * (240 − rail padding 2×12 − card padding 2×12); mono at --fs-1 (10px)
+ * renders ~6px/char, so 28 chars + 12px chip padding ≈ 180px — the longest
+ * branch chip still fits one row at the narrowest rail. Tunable; awaits a
+ * measurement pass against real branch-name corpora.
+ */
+export const BRANCH_CHIP_MAX = 28;
+
+/**
+ * Pathological-count fallback threshold: chips beyond this collapse to +N.
+ * 12 chips ≈ 3 wrapped rows at the default 300px rail (~4 chips/row) — the
+ * ceiling Wayne set at review ("wrap 3 rows then +N" for >12). Tunable.
+ */
+export const PATHOLOGICAL_MAX = 12;
 
 function scopeTargetName(s: ScopeDeclaration, fx: MapFixture): string {
   const terr = fx.territories.find((t) => t.id === s.territoryId);
@@ -206,23 +241,32 @@ export function taskChips(task: Task, fx: MapFixture): ChipView[] {
       },
     ];
   }
+  // Branch chip shows the FULL branch (org prefix + subject are both
+  // semantic), middle-truncated past the budget; the tooltip stays exact.
+  // (Rule revision — was: last path segment + CSS tail-ellipsis.)
   const branchChip: ChipView = {
     kind: "n",
-    label: task.git.branch.split("/").pop() ?? task.git.branch,
+    label: middleTruncate(task.git.branch, BRANCH_CHIP_MAX),
     tip: `branch ${task.git.branch}${task.git.worktreePath ? ` · worktree ${task.git.worktreePath}` : ""}`,
   };
   const all: ChipView[] = [...task.scopes.map((s) => scopeChip(s, fx)), branchChip];
-  if (all.length <= MAX_CHIPS) return all;
-  // Collapse: keep the first two scope chips, fold the rest (incl. branch)
-  // into +N whose tooltip spells everything out (v8 "+3" behavior).
-  const visible = all.slice(0, MAX_CHIPS - 1);
-  const hiddenScopes = task.scopes.slice(MAX_CHIPS - 1);
-  const reads = hiddenScopes
-    .filter((s) => s.mode === "read")
-    .map((s) => scopeTargetName(s, fx));
-  const writes = hiddenScopes
-    .filter((s) => s.mode === "write")
-    .map((s) => scopeTargetName(s, fx));
+  if (all.length <= PATHOLOGICAL_MAX) return all;
+  // Pathological fallback: wrap ~3 rows (11 chips) then fold the rest (incl.
+  // the branch, always last) into +N whose tooltip spells everything out.
+  const visible = all.slice(0, PATHOLOGICAL_MAX - 1);
+  const hiddenScopes = task.scopes.slice(PATHOLOGICAL_MAX - 1);
+  // Dedupe territory names: two path-scoped registrations in one territory
+  // are one line of truth for the reader ("reads Infra" once, not twice).
+  const reads = [
+    ...new Set(
+      hiddenScopes.filter((s) => s.mode === "read").map((s) => scopeTargetName(s, fx)),
+    ),
+  ];
+  const writes = [
+    ...new Set(
+      hiddenScopes.filter((s) => s.mode === "write").map((s) => scopeTargetName(s, fx)),
+    ),
+  ];
   const parts = [`branch ${task.git.branch}`];
   if (writes.length) parts.push(`writes ${writes.join(", ")}`);
   if (reads.length) parts.push(`reads ${reads.join(", ")}`);

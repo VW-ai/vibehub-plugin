@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * S5 interaction + state suite (LOOP.md mechanical gate for stage exit).
  *
@@ -5,7 +6,8 @@
  * rail dims, reset on leave), reverse correlate (territory → hot rail
  * cards), legend filters (all 4 kinds light the exact territory set AND
  * rail cards), tooltip semantics (260ms intent delay, bottom-edge flip,
- * exact value behind abbreviated 100k), +N chip expansion, fixture
+ * exact value behind abbreviated 100k), chip wrap + middle truncation +
+ * pathological +N (rev-1, Wayne verdict 2026-07-12), fixture
  * switcher, five-states presence, keyboard parity for hover paths, and
  * overlap/clipping checks at 1280×800 + 1440×900 on v8-baseline AND
  * forty-territories (this is the regression net for the legend-over-
@@ -17,7 +19,6 @@
  */
 import { expect, test, type Page } from "@playwright/test";
 
-const BASE = "http://localhost:5199";
 
 /** Let entry animations finish (longest: territory .34s delay + .55s anim). */
 async function settle(page: Page) {
@@ -220,22 +221,57 @@ test.describe("tooltip", () => {
   });
 });
 
-/* ── +N chip expansion ─────────────────────────────────────────────────── */
+/* ── chip wrap (rev-1, Wayne verdict 2026-07-12) + pathological +N ─────── */
+/* RULE REVISION: chips wrap and are ALL visible by default (the card grows
+   taller); the single-line +N collapse survives only past 12 chips. These
+   replace the former "+8 collapse" test. */
 
-test("+N chip: hover enumerates branch + every hidden scope", async ({ page }) => {
+test("chip wrap: 9 scopes + branch = 10 visible chips, wrapped rows, no +N", async ({ page }) => {
   await open(page, "scope-overload");
   const card = page.locator('[data-task="task-nine-scopes"]');
-  // 9 scopes + branch collapse to: w core · w api · +8
-  await expect(card.locator(".chip")).toHaveCount(3);
+  await expect(card.locator(".chip")).toHaveCount(10);
+  await expect(card.locator(".chip.more")).toHaveCount(0);
+  // the row actually wraps: taller than one 16px chip line
+  const rowBox = await card.locator(".row2").boundingBox();
+  expect(rowBox!.height).toBeGreaterThan(2 * 16);
+  // every chip stays inside the card — visible, not clipped
+  const cardBox = await card.boundingBox();
+  for (const chip of await card.locator(".chip").all()) {
+    const b = await chip.boundingBox();
+    expect(b!.x).toBeGreaterThanOrEqual(cardBox!.x - 0.5);
+    expect(b!.x + b!.width).toBeLessThanOrEqual(cardBox!.x + cardBox!.width + 0.5);
+    expect(b!.y + b!.height).toBeLessThanOrEqual(cardBox!.y + cardBox!.height + 0.5);
+  }
+  // branch chip shows the FULL branch (fits the 28-char budget untruncated)
+  await expect(card.locator(".chip.n")).toHaveText("acme/unify-error-handling");
+});
+
+test("long branch name renders middle-truncated, exact branch in the tooltip", async ({ page }) => {
+  await open(page, "scope-overload");
+  const branchChip = page.locator('[data-task="task-long-title"] .chip.n');
+  // middleTruncate("acme/fix-payments-gateway-502s", 28) — head+tail preserved
+  await expect(branchChip).toHaveText("acme/fix-payme…-gateway-502s");
+  await branchChip.hover();
+  await page.waitForTimeout(500);
+  const tip = page.locator("#tip");
+  await expect(tip).toHaveClass(/on/);
+  await expect(tip).toContainText("branch acme/fix-payments-gateway-502s");
+});
+
+test("pathological chip count (>12): wraps ~3 rows then +N; tooltip enumerates the rest", async ({ page }) => {
+  await open(page, "scope-overload");
+  const card = page.locator('[data-task="task-pathological-scopes"]');
+  // 14 scopes + branch = 15 chips → first 11 + "+4"
+  await expect(card.locator(".chip")).toHaveCount(12);
   const more = card.locator(".chip.more");
-  await expect(more).toHaveText("+8");
+  await expect(more).toHaveText("+4");
   await more.hover();
   await page.waitForTimeout(500);
   const tip = page.locator("#tip");
   await expect(tip).toHaveClass(/on/);
-  await expect(tip).toContainText("branch acme/unify-error-handling");
+  await expect(tip).toContainText("branch acme/audit-error-propagation-sweep");
   await expect(tip).toContainText(
-    "reads Auth, Billing, Search, Mail, Background Jobs, Infra & Deploy, Vendored Monolith Compatibility Shims",
+    "reads Infra & Deploy, Vendored Monolith Compatibility Shims",
   );
 });
 

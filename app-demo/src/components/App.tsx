@@ -34,6 +34,31 @@ const NO_HIGHLIGHT: Highlight = {
   hotTaskIds: new Set<string>(),
 };
 
+/* ── resizable rail/canvas split (rev-1, Wayne verdict 2026-07-12) ────────
+ * Pointer-events drag (no library), clamped 240–480px; double-click resets
+ * to v8's 300px; divider is focusable and arrow keys nudge ±16px (one
+ * spacing token above --sp-3 — big enough to see, small enough to aim);
+ * the chosen width persists locally. Chip wrapping responds live (flex). */
+const RAIL_MIN = 240;
+const RAIL_MAX = 480;
+const RAIL_DEFAULT = 300; // v8's fixed rail width
+const RAIL_STEP = 16;
+const RAIL_WIDTH_KEY = "vibehub-demo.railWidth";
+
+function clampRail(w: number): number {
+  return Math.min(RAIL_MAX, Math.max(RAIL_MIN, Math.round(w)));
+}
+
+function loadRailWidth(): number {
+  try {
+    const v = Number(window.localStorage.getItem(RAIL_WIDTH_KEY));
+    if (Number.isFinite(v) && v >= RAIL_MIN && v <= RAIL_MAX) return v;
+  } catch {
+    /* storage unavailable (private mode) → session-only default */
+  }
+  return RAIL_DEFAULT;
+}
+
 export interface AppProps {
   fixtures: Record<string, MapFixture>;
   initialFixture: string;
@@ -101,6 +126,22 @@ export function App({
   );
 
   const fixture = fixtures[fixtureName] ?? fixtures[initialFixture]!;
+
+  // Resizable rail/canvas split (rev-1): width state + drag/keyboard wiring.
+  const [railWidth, setRailWidth] = useState(loadRailWidth);
+  const [railDragging, setRailDragging] = useState(false);
+  // Grab offset: pointer x − rail right edge at pointerdown. Subtracting it
+  // on move keeps the divider under the finger (no jump on grab) and makes
+  // the width track the pointer exactly, wherever on the 7px hit area the
+  // drag started.
+  const railGrabOffset = useRef(0);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(RAIL_WIDTH_KEY, String(railWidth));
+    } catch {
+      /* storage unavailable → the width simply doesn't persist */
+    }
+  }, [railWidth]);
 
   const highlight = useMemo<Highlight>(() => {
     if (hoverTask) return highlightForTask(hoverTask, fixture);
@@ -258,15 +299,64 @@ export function App({
         onFixtureChange={switchFixture}
         onConflictOpen={openConflict}
       />
-      <div className="main">
+      <div className={`main${railDragging ? " rail-resizing" : ""}`}>
         <TaskRail
           fixture={fixture}
+          width={railWidth}
           dim={focus}
           hotTaskIds={highlight.hotTaskIds}
           onTaskHoverStart={setHoverTask}
           onTaskHoverEnd={() => setHoverTask(null)}
           onTaskOpen={openTask}
           onConflictOpen={openConflict}
+        />
+        <div
+          className={`divider${railDragging ? " dragging" : ""}`}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize the task rail"
+          aria-valuemin={RAIL_MIN}
+          aria-valuemax={RAIL_MAX}
+          aria-valuenow={railWidth}
+          tabIndex={0}
+          data-tip="Drag to resize the rail · double-click resets · arrow keys nudge"
+          onPointerDown={(e) => {
+            if (e.button !== 0) return;
+            e.preventDefault(); // no text selection while dragging
+            const main = e.currentTarget.parentElement;
+            railGrabOffset.current = main
+              ? e.clientX - (main.getBoundingClientRect().left + railWidth)
+              : 0;
+            e.currentTarget.setPointerCapture(e.pointerId);
+            setRailDragging(true);
+          }}
+          onPointerMove={(e) => {
+            if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+            const main = e.currentTarget.parentElement;
+            if (!main) return;
+            setRailWidth(
+              clampRail(
+                e.clientX -
+                  main.getBoundingClientRect().left -
+                  railGrabOffset.current,
+              ),
+            );
+          }}
+          onPointerUp={(e) => {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+            setRailDragging(false);
+          }}
+          onPointerCancel={() => setRailDragging(false)}
+          onDoubleClick={() => setRailWidth(RAIL_DEFAULT)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              setRailWidth((w) => clampRail(w - RAIL_STEP));
+            } else if (e.key === "ArrowRight") {
+              e.preventDefault();
+              setRailWidth((w) => clampRail(w + RAIL_STEP));
+            }
+          }}
         />
         <MapCanvas
           fixture={fixture}

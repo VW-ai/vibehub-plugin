@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * conflict-card S4 screenshot-parity capture (LOOP.md S4 mechanical gate):
  * the React card next to the frozen S2 static, red/yellow/empty ×
@@ -38,7 +39,7 @@ async function park(page: Page) {
 
 /** Open the red card the REAL way: rail CONFLICT pill on v8-baseline. */
 async function openRedViaPill(page: Page) {
-  await page.goto("http://localhost:5199/?fixture=v8-baseline&switcher=0");
+  await page.goto(`${BASE}/?fixture=v8-baseline&switcher=0`);
   await settle(page);
   await page.locator('[data-task="task-auto-retry-payments"] .pill').click();
   await expect(page.locator(".modal")).toBeVisible();
@@ -47,7 +48,7 @@ async function openRedViaPill(page: Page) {
 
 async function openViaParam(page: Page, name: string) {
   await page.goto(
-    `http://localhost:5199/?fixture=v8-baseline&switcher=0&conflict=${name}`,
+    `${BASE}/?fixture=v8-baseline&switcher=0&conflict=${name}`,
   );
   await settle(page);
   await expect(page.locator(".modal")).toBeVisible();
@@ -115,7 +116,7 @@ test("s2 static modal refs (red/yellow/empty) @1280x800", async ({ page }) => {
 /* ── S4 integration smoke (mechanical wiring checks) ──────────────────── */
 
 test("all three open paths + focus returns to each opener", async ({ page }) => {
-  await page.goto("http://localhost:5199/?fixture=v8-baseline&switcher=0");
+  await page.goto(`${BASE}/?fixture=v8-baseline&switcher=0`);
   await settle(page);
 
   // path #2: rail CONFLICT pill; Escape returns focus to the pill
@@ -145,7 +146,7 @@ test("all three open paths + focus returns to each opener", async ({ page }) => 
 });
 
 test("conflict card and task panel are mutually exclusive", async ({ page }) => {
-  await page.goto("http://localhost:5199/?fixture=v8-baseline&switcher=0");
+  await page.goto(`${BASE}/?fixture=v8-baseline&switcher=0`);
   await settle(page);
 
   // panel open → opening the conflict closes the panel
@@ -243,7 +244,7 @@ test("all five ?conflict= fixtures render, zero console/page errors", async ({ p
     "one-symbol",
   ]) {
     await page.goto(
-      `http://localhost:5199/?fixture=v8-baseline&switcher=0&conflict=${name}`,
+      `${BASE}/?fixture=v8-baseline&switcher=0&conflict=${name}`,
     );
     await settle(page);
     await expect(page.locator(".modal"), name).toBeVisible();

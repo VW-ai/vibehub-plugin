@@ -12,6 +12,11 @@ function LaunchIcon() {
 
 export interface TaskRailProps {
   fixture: MapFixture;
+  /**
+   * Resizable split (rev-1, Wayne verdict): the rail's current width in px,
+   * driven by the divider in App. Omitted → the CSS default (300px, v8).
+   */
+  width?: number | undefined;
   /** Correlate-hover: dim the whole rail except hot cards. */
   dim: boolean;
   hotTaskIds: Set<string>;
@@ -25,6 +30,7 @@ export interface TaskRailProps {
 
 export function TaskRail({
   fixture,
+  width,
   dim,
   hotTaskIds,
   onTaskHoverStart,
@@ -35,7 +41,10 @@ export function TaskRail({
   const groups = groupTasks(fixture);
   let cardIndex = 0; // stagger index runs across group boundaries (v8)
   return (
-    <aside className={`rail${dim ? " dim" : ""}`}>
+    <aside
+      className={`rail${dim ? " dim" : ""}`}
+      style={width !== undefined ? { width } : undefined}
+    >
       <div className="tasks">
         {groups.length === 0 ? (
           // N=0 rung: honest empty rail — no fake cards, just the truth.

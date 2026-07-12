@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * empty-install S5 interaction + state suite (LOOP.md mechanical gate for
  * stage exit).
@@ -23,7 +24,6 @@
  */
 import { expect, test, type Page } from "@playwright/test";
 
-const BASE = "http://localhost:5199";
 
 /** Let entry animations finish (longest: winIn .5s). */
 async function settle(page: Page) {

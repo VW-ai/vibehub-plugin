@@ -199,4 +199,61 @@ Each row cites the implementing code and/or the test that pins it.
 | DYNAMIC | tooltips/correlate | All hidden info reachable by hover AND keyboard focus; tooltip hides instantly, dim/lit resets on leave/blur — space always returned | `Tooltip.tsx`; App state; tests "hover ends → focus fully resets", "keyboard focus…" |
 | SCREEN sizes | whole screen | 1280×800 + 1440×900: legend clears every territory, territories inside canvas, window inside viewport — asserted on baseline AND 40-territory density | tests "no overlap / no clipping" ×4 |
 
-## Next: m2-task-panel S1 (map-main complete through S5)
+## rev-1 — post-close-out revisions (Wayne live review, 2026-07-12)
+
+Wayne's verdicts OVERRIDE the earlier rules below; both overrides are
+ratified (logged in DECISIONS-NEEDED.md as WAYNE VERDICT, not forks).
+Quote: "我不希望看不全 tag，哪怕卡片厚一点；分栏应该可拉".
+
+### Rule revision A — chips wrap; all tags visible; cards may grow
+
+- REVOKED: "one line, never wraps; >3 collapses to first 2 + +N"
+  (v8 rule; S4 derivation rules + S5 extremes table rows for chips).
+- NEW RULE: `.row2` is `flex-wrap: wrap`; every chip renders; the card
+  grows taller. Rationale: the tags ARE the perception surface — hiding
+  them behind +N made the rail pretty but less honest than thicker cards.
+- +N survives ONLY as the pathological-count fallback: > 12 chips
+  (`PATHOLOGICAL_MAX`, ≈3 wrapped rows at the 300px default rail; tunable)
+  → first 11 + `+N`, tooltip enumerates branch + hidden writes/reads
+  (territory names deduped — two path registrations in one territory are
+  one line of truth for the reader).
+- Per-chip overflow ladder (TEXT-long rung, revised):
+  - scope chips (w/r): full text → CSS tail-ellipsis at 110px (head is the
+    semantic part: mode + label root) → tooltip exact. Unchanged.
+  - branch chips (n): full branch (org prefix + subject BOTH semantic) →
+    MIDDLE truncation via `middleTruncate()` (pure, unit-tested; budget
+    `BRANCH_CHIP_MAX = 28` chars ≈ fits one row at the 240px min rail;
+    tunable) → tooltip exact. Was: last path segment + tail-ellipsis.
+- Fixture: `extreme-scope-overload` gained `task-pathological-scopes`
+  (14 scopes + branch = 15 chips) so the +N path stays exercised; the
+  9-scope task now demonstrates the wrap.
+
+### Rule revision B — resizable rail/canvas split
+
+- The rail (fixed 300px in v8) is now resizable: a divider between rail
+  and canvas, pointer-events drag (no library), clamped **240–480px**;
+  double-click resets to **300px** (the v8 default); width persists to
+  localStorage (`vibehub-demo.railWidth`); keyboard accessible
+  (focusable `role="separator"` + aria-value*, arrow keys ±16px).
+- Net-zero geometry at default: the 7px divider straddles the rail's
+  existing 1px border with −3px margins, so a fresh context renders the
+  canvas byte-identically to v8 (asserted in rail-resize.spec.ts).
+- Chip wrapping responds live to the rail width (pure flex — verified at
+  both clamp extremes in rail-resize.spec.ts).
+
+### rev-1 test deltas
+
+- vitest 27 → 42: `src/derive.test.ts` added (middleTruncate edges/
+  invariants ×9 + chip-rule cases ×6).
+- Playwright 156 → 165: the old "+8 collapse" test became three tests
+  (wrap, middle truncation, pathological +N) in interactions.spec.ts;
+  `tests/rail-resize.spec.ts` added (7 tests: drag/clamp/reset/persist/
+  keyboard/live-wrap/default-geometry).
+- All spec URLs now route through `tests/env.ts` (`DEMO_PORT` override)
+  so suites run on a private port and never touch a dev server on 5199.
+- Parity deltas (documented, not regressions): scope-overload rail shows
+  a third card; baseline branch chips show the full middle-truncated
+  branch instead of the last path segment, and cards with 3 chips may
+  wrap to two chip rows (cards taller — per verdict A).
+
+## Next: loop closed; awaiting next review round

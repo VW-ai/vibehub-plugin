@@ -1,3 +1,4 @@
+import { BASE } from "./env";
 /**
  * task-panel S5 interaction + state suite (LOOP.md mechanical gate for
  * stage exit).
@@ -21,7 +22,6 @@
  */
 import { expect, test, type Page } from "@playwright/test";
 
-const BASE = "http://localhost:5199";
 
 /** Let map entry animations finish (longest: territory .34s delay + .55s). */
 async function settle(page: Page) {

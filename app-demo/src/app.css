@@ -66,12 +66,17 @@ svg{vertical-align:-2px}
 .pill.alive{background:var(--alive-bg);color:var(--alive-ink)}
 .pill.idle{background:var(--ink-100);color:var(--ink-500)}
 .pill.done{background:var(--ink-100);color:var(--ink-400)}
-/* chips: one line, never wraps; overflow collapses to +N */
-.task .row2{display:flex;align-items:center;gap:var(--sp-1);margin-top:6px;min-width:0;overflow:hidden}
+/* chips: rows WRAP and every chip is visible — the card grows taller (rule
+   revision, Wayne 2026-07-12 live review; overrides v8's "one line + +N".
+   +N survives only as the >12-chip pathological fallback — see derive.ts
+   PATHOLOGICAL_MAX). Wrap responds live to the resizable rail width. */
+.task .row2{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-1);margin-top:6px;min-width:0}
 .chip{flex:none;height:16px;display:inline-flex;align-items:center;font-family:var(--mono);font-size:var(--fs-1);padding:0 6px;border-radius:5px;cursor:help;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;line-height:16px}
 .chip.w{background:var(--alive-bg);color:var(--alive-ink)}
 .chip.r{box-shadow:inset 0 0 0 1px #c3d0e2;color:var(--read-ink)}
-.chip.n{background:var(--ink-100);color:var(--ink-500)}
+/* branch chips: middle-truncated in derive.ts (head+tail both semantic), so
+   the 110px CSS cap lifts; tail-ellipsis stays only as the last-resort rung */
+.chip.n{background:var(--ink-100);color:var(--ink-500);max-width:100%}
 .chip.more{background:var(--ink-100);color:var(--ink-500);font-weight:600}
 .t-done{opacity:.55}
 /* S4: honest empty rail (N=0 rung) */
@@ -79,6 +84,20 @@ svg{vertical-align:-2px}
 .launch{margin:0 var(--sp-3) var(--sp-3);height:34px;flex:none;border:none;font-family:inherit;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease);display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
 .launch:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
 .launch:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+
+/* rev-1 (Wayne verdict 2026-07-12): resizable rail/canvas split. The divider
+   straddles the rail's existing 1px border with negative margins (net 0px of
+   layout — canvas geometry at the default 300px is byte-identical to v8).
+   Drag 240–480px, double-click resets 300, arrow keys ±16, width persists.
+   z-2 keeps it grabbable over territory edges; the modal scrim (z-4) still
+   covers it. Affordance: an ink line materializes on hover/drag/focus. */
+.divider{flex:none;width:7px;margin:0 -3px;position:relative;z-index:2;cursor:col-resize;background:transparent}
+.divider::after{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;background:transparent;transition:background var(--t-fast) var(--ease)}
+.divider:hover::after,.divider.dragging::after{background:var(--ink-300);left:2px;width:3px;border-radius:2px}
+.divider:focus-visible{outline:none}
+.divider:focus-visible::after{background:rgba(25,27,31,.35);left:2px;width:3px;border-radius:2px}
+.main.rail-resizing{cursor:col-resize;user-select:none}
+@media (prefers-reduced-motion:reduce){.divider::after{transition:none}}
 
 /* ── canvas ── */
 .canvas{flex:1;position:relative;overflow:hidden}

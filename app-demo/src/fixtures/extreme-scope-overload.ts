@@ -1,10 +1,12 @@
 /**
  * extreme-scope-overload — N=many on chips: one task declaring 9 scopes
- * (breadth is legal and unpunished per decision-project-020). The rail card
- * must collapse chip overflow to +N on a single non-wrapping line.
- * Also carries a NUMBER-huge territory (100 000 anchored files → must render
- * abbreviated "100k" with exact-count tooltip) and a TEXT-long task title
- * (must truncate with hover-full-text).
+ * (breadth is legal and unpunished per decision-project-020). RULE REVISION
+ * (Wayne 2026-07-12 review): the rail card WRAPS all its chips and grows
+ * taller — 9 scopes + branch render as 10 visible chips. The old +N collapse
+ * survives only past PATHOLOGICAL_MAX (12) chips, exercised here by the
+ * 14-scope task below. Also carries a NUMBER-huge territory (100 000 anchored
+ * files → must render abbreviated "100k" with exact-count tooltip) and a
+ * TEXT-long task title (must truncate with hover-full-text).
  */
 import type { MapFixture, ScopeDeclaration } from "../types";
 
@@ -18,6 +20,28 @@ const nineScopes: ScopeDeclaration[] = [
   { mode: "read", territoryId: "x-jobs", label: "jobs" },
   { mode: "read", territoryId: "x-infra", label: "infra" },
   { mode: "read", territoryId: "x-vendored", label: "vendored-monolith-compat" },
+];
+
+/* Pathological chip count (rev-1): 14 scope declarations + branch = 15
+ * chips — beyond PATHOLOGICAL_MAX (12), so this card wraps ~3 rows then
+ * collapses the tail into +N (first 11 visible + "+4"). Multiple
+ * declarations per territory are legal: each is a separate path-scoped
+ * registration within the territory. */
+const fourteenScopes: ScopeDeclaration[] = [
+  { mode: "write", territoryId: "x-core", label: "core/errors", filesTouched: 4 },
+  { mode: "write", territoryId: "x-core", label: "core/result-types", filesTouched: 2 },
+  { mode: "write", territoryId: "x-api", label: "api/middleware", filesTouched: 3 },
+  { mode: "read", territoryId: "x-api", label: "api/handlers" },
+  { mode: "read", territoryId: "x-auth", label: "auth/sessions" },
+  { mode: "read", territoryId: "x-auth", label: "auth/oauth" },
+  { mode: "read", territoryId: "x-billing", label: "billing/invoices" },
+  { mode: "read", territoryId: "x-billing", label: "billing/webhooks" },
+  { mode: "read", territoryId: "x-search", label: "search/indexer" },
+  { mode: "read", territoryId: "x-mail", label: "mail/templates" },
+  { mode: "read", territoryId: "x-jobs", label: "jobs/scheduler" },
+  { mode: "read", territoryId: "x-infra", label: "infra/terraform" },
+  { mode: "read", territoryId: "x-infra", label: "infra/ci-runners" },
+  { mode: "read", territoryId: "x-vendored", label: "vendored/shims" },
 ];
 
 export const extremeScopeOverload = {
@@ -62,6 +86,21 @@ export const extremeScopeOverload = {
       git: { branch: "acme/fix-payments-gateway-502s" },
       stateSince: "2026-07-12T10:05:00-07:00",
       lastEventAt: "2026-07-12T10:05:00-07:00",
+    },
+    {
+      id: "task-pathological-scopes",
+      title: "Audit error propagation repo-wide",
+      state: "running",
+      signalTier: "hooks",
+      conflictIds: [],
+      scopes: fourteenScopes,
+      git: {
+        branch: "acme/audit-error-propagation-sweep",
+        worktreePath: "~/dev/megarepo-wt/audit",
+      },
+      stateSince: "2026-07-12T09:55:00-07:00",
+      lastEventAt: "2026-07-12T10:20:00-07:00",
+      statusDetail: "Sweeping error paths service by service.",
     },
   ],
   territories: [
@@ -132,56 +171,56 @@ export const extremeScopeOverload = {
   occupancy: [
     {
       territoryId: "x-core",
-      writingTaskIds: ["task-nine-scopes"],
+      writingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       readingTaskIds: [],
       doneTodayTaskIds: [],
     },
     {
       territoryId: "x-api",
-      writingTaskIds: ["task-nine-scopes"],
+      writingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       readingTaskIds: [],
       doneTodayTaskIds: [],
     },
     {
       territoryId: "x-auth",
       writingTaskIds: [],
-      readingTaskIds: ["task-nine-scopes"],
+      readingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       doneTodayTaskIds: [],
     },
     {
       territoryId: "x-billing",
       writingTaskIds: [],
-      readingTaskIds: ["task-nine-scopes"],
+      readingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       doneTodayTaskIds: [],
     },
     {
       territoryId: "x-search",
       writingTaskIds: [],
-      readingTaskIds: ["task-nine-scopes"],
+      readingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       doneTodayTaskIds: [],
     },
     {
       territoryId: "x-mail",
       writingTaskIds: [],
-      readingTaskIds: ["task-nine-scopes"],
+      readingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       doneTodayTaskIds: [],
     },
     {
       territoryId: "x-jobs",
       writingTaskIds: [],
-      readingTaskIds: ["task-nine-scopes"],
+      readingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       doneTodayTaskIds: [],
     },
     {
       territoryId: "x-infra",
       writingTaskIds: ["task-long-title"],
-      readingTaskIds: ["task-nine-scopes"],
+      readingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       doneTodayTaskIds: [],
     },
     {
       territoryId: "x-vendored",
       writingTaskIds: [],
-      readingTaskIds: ["task-nine-scopes"],
+      readingTaskIds: ["task-nine-scopes", "task-pathological-scopes"],
       doneTodayTaskIds: [],
     },
   ],
