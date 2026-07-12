@@ -1,12 +1,118 @@
 # conflict-card — screen notes
 
-Stage: **S4 done** (React `ConflictCard` + zones, integrated into the app with
-three open paths; S3 types/fixtures; S2 polish at `static/conflict-card-s2.html`;
-S1 frozen for diff).
+Stage: **S5 done — screen complete** (interaction/state suite in
+tests/conflict-interactions.spec.ts + adjudication demo-stub feedback +
+scale-extremes closure below; S4 React card + 3 open paths; S3 types/fixtures;
+S2 polish at `static/conflict-card-s2.html`; S1 frozen for diff).
 React variants: `?conflict=` dev param — `osm-red-diagnosed` · `no-diagnosis` ·
 `yellow-stale` · `1200-symbols` · `one-symbol` (short tails accepted).
 Static variants: `?v=` param or the DEV bar — `""` red W×W diagnosed · `empty` ·
 `yellow`.
+
+## S5 checklist
+
+- [x] **Adjudication feedback (demo stub, optimistic UI)** — S4 left the three
+      footer actions static; S5 defines what clicking DOES in the demo (design
+      fork, iter-13):
+      - Clicking an action swaps the footer (textarea + actions) for a
+        **feedback band** (`.fdbk`): text pill first (state's first channel),
+        one plain sentence, a visible mono `demo` marker whose tooltip is the
+        honesty disclosure ("Demo — this card renders a fixture; no live
+        session received this…"), and a quiet **Close card** button that gets
+        focus (the outcome is one keystroke from done; closing returns focus
+        to the exact opener via the normal close path).
+      - **Inject to both** → `SENT` (done tokens): typed note ⇒ "Coordination
+        note queued to both tasks — delivered at their next turn boundary."
+        Empty note **with** a diagnosis ⇒ the send-time default (iter-10
+        fork #3): "The Suggested line above is queued…, marked as
+        AI-suggested." Empty note with **no** diagnosis ⇒ nothing is sent —
+        the button hands focus to the textarea (nothing to default to; an
+        empty send would be an empty message — fork).
+      - **Pause one side** (real side) → `PAUSING` (idle tokens): names the
+        parked task, promises the turn boundary (never claims it already
+        stopped), says the other side keeps running. The waiting side stays
+        the S2 honest no-op: menu closes, NO feedback.
+      - **Ignore this pair** → one modest **inline confirm** in the actions
+        row (never a browser dialog): "Silence this pair permanently?" +
+        "Ignore permanently" (clash-ink quiet) + "Keep" — focus lands on
+        Keep (the safe option; Enter must not destroy). Confirmed ⇒
+        `IGNORED` (idle tokens), sentence scoped to THIS pair on the
+        resource; the card stays open so the evidence remains readable.
+      - Feedback pills use the neutral family only (done/idle) — feedback is
+        not a task state; the three semantic colors stay reserved.
+      - Band is `role="status" aria-live="polite"`, `data-kind` carries the
+        emitted `AdjudicationAction["kind"]` (the S3 union is now actually
+        constructed by the footer). Terminal within the card instance — no
+        undo (the confirm is the gate); the card remounts per conflict id, so
+        close/reopen resets (fixture demo).
+- [x] **Run / Re-run diagnosis stub**: the demo cannot run `claude -p`, and
+      inventing a verdict or a fake progress state would be fabrication — so
+      both buttons TOGGLE an honest inline note (`.stubnote`, aria-pressed):
+      "Demo — nothing ran. In the app this is one `claude -p` pass on your
+      machine, and the verdict above refreshes in place / the diagnosis fills
+      in here." Backticks render mono via the same codeSpans; the verdict and
+      stale marker never change; the note yields its space back on re-click.
+- [x] **Escape priority ladder**: pause menu → ignore confirm → card (each
+      swallows one Escape). Pause menu and ignore confirm displace each other
+      (one open decision at a time).
+- [x] **tests/conflict-interactions.spec.ts — 14 tests**, formalizing S4's
+      ad-hoc coverage + the gaps:
+      1. fixture × zone-state MATRIX: all 5 fixtures × zone a (grade class +
+         kicker, 2 side rows + pills, symbol rows shown, toggle label
+         "+9 more"/"+1,197 more"/none, h4 count 3/12/1.2k/1), zone b
+         (fresh/stale/empty, "· 3 edits since"), zone c (placeholder
+         contract, 2 menu rows, noop count) — zero console/page errors;
+      2. inject typed → SENT band (data-kind, role=status, demo tip,
+         textarea+actions gone, evidence still visible), keyboard-driven
+         end-to-end, Close focused, Enter closes + focus returns to the rail
+         pill opener;
+      3. inject empty + diagnosis → AI-suggested variant; seam booleans
+         re-agree with real scroll metrics after the footer swap;
+      4. inject empty + no diagnosis → no band, textarea focused;
+      5. pause via keyboard (Enter opens menu, Tab, Enter) → PAUSING band;
+      6. noop row → no feedback (S4 regression);
+      7. ignore confirm: Keep focused + Enter cancels; Escape ladder
+         confirm→card;
+      8. ignore confirmed → IGNORED band, card stays open, Close focused;
+      9. menu ↔ confirm mutual displacement;
+      10. Re-run stub toggle (mono `claude -p`, verdict/stale untouched,
+          space yielded back);
+      11. Run-diagnosis stub in the dashed empty state;
+      12. 1200-symbol expand under a 3s smoke ceiling (broken-detector, not a
+          perf benchmark — tunable) + scroll sweep bottom/middle/top with
+          seam-vs-metrics agreement + collapse + SENT still works;
+      13-14. geometry @1280×800 + @1440×900 in the busiest states: stress
+          (12 expanded + textarea at 124px cap + menu open): modal-in-main,
+          strict head/grade/body/foot stacking, foot pinned, .cbody the only
+          scroll region, no page scroll, menu in viewport; then the feedback
+          state: band inside the footer, footer still pinned, no x-overflow.
+- [x] Gates: `tsc --noEmit` clean; `pnpm build` green; Playwright **85/85**
+      (71 existing untouched + 14 new), all first-run green.
+
+## SCALE-EXTREMES PROTOCOL — closure table (per zone, with evidence)
+
+| Zone / component | Rung | Answer | Evidence |
+|---|---|---|---|
+| **Card as a whole** | N=0 conflicts | no card — the entry points (sub chip, rail pill, titlebar stat) don't render without a conflict; a card cannot exist with zero shared symbols (the intersection IS the trigger) | derive.ts SubView.conflictId only set from fixture.conflicts; interactions.spec "titlebar stat absent on conflict-free fixtures" precedent (map S5) |
+| | unauthored conflict | falls back to the task panel — evidence can't be honestly synthesized from a MapFixture | App.tsx `openConflict` fallback (iter-12 fork); fixtures/index.ts comment |
+| **Header / crumb (a)** | TEXT long | h2 single-line ellipsis + full-text tooltip (`titleTip`); crumb segs ellipsize, anchor file mono | conflict-derive.ts titleTip; app.css `.chead h2`; yellow fixture's long titles render in matrix test |
+| | NUMBER (age) | relAge rungs s/m/h/d — `one-symbol` exercises the 45s seconds rung; exact time + long age in the tooltip | conflict-extremes.ts (detected 45s); matrix test renders it; derive.ts relAge tests (map S5) |
+| **Grading strip (a)** | states | exactly two grades ever (red W×W / yellow W×R) — same-file-different-symbols never makes a conflict record, so N/A here by construction | conflict-derive.ts gradeView (two-branch, exhaustive on severity); matrix asserts kicker per fixture |
+| **"Between" rows (a1)** | N=many | never scales — `tasks: [Task, Task]` by type; a third concurrent task = another pair record | conflict-types.ts tuple; matrix asserts `.side` count 2 on all 5 fixtures |
+| | TEXT long | task titles single-line ellipsis + tooltip; branch chips inline-block ellipsis ("auto-retry-fail…") | app.css `.side h3`, `.modal .chip` (S2 R1 fix #1); yellow's 2 long titles in matrix |
+| **Shared symbols (a2)** | N=1 | one row, NO toggle, layout holds | `conflict-one-symbol`; matrix asserts symsShown 1 + toggle count 0 |
+| | N=many | 3 + "+N more" ladder; expanded body is the only scroll region, header/grade/foot pinned | matrix: yellow "+9 more", 1200 "+1,197 more"; perf test expands to exactly 1200 rows; geometry probes |
+| | NUMBER huge | h4 count reuses the map's rule: "1.2k" surface + "1,200" exact in tooltip (iter-11 fork) | conflict-derive.ts symbolCount; matrix + parity test assert "1.2k" |
+| | TEXT long | symbol names ellipsize + full text in row tooltip (61-char and ~90-char names in fixtures) | app.css `.sym .name`; yellow + 1200 fixtures; matrix renders both |
+| | scroll perf | 1200-row expand < 3s smoke ceiling; seam booleans track scroll metrics at bottom/middle/top; collapse yields space back | conflict-interactions.spec test 12 |
+| **Diagnosis (b)** | N=0 (empty) | dashed true-empty state + Run button (cost-honesty tooltip); never auto-fake | matrix on `no-diagnosis`/`one-symbol`; Run-stub test asserts no verdict appears |
+| | stale | neutral dot + "· N edits since" + mechanical tooltip; fresh = green dot, no marker | matrix fresh/stale split; parity spec stale assertions |
+| | TEXT long | verdict/suggested WRAP, never truncate (payload); 3-line Suggested verified at S2, re-rendered in matrix | S2 stress log; app.css `.verdict` (no ellipsis) |
+| **Adjudication (c)** | states | footer has exactly 2 states: actions (with ≤1 open decision: menu XOR confirm) / feedback band (3 variants under one visual pattern) | ConflictCard.tsx feedback/menuOpen/confirmIgnore; displacement test 9 |
+| | TEXT long (note) | textarea autogrow 52→124 cap then internal scroll, footer stays pinned; feedback sentence wraps inside the band (flex p, no overflow) | geometry tests 13-14 (cap = 124 asserted; band no-x-overflow) |
+| | DYNAMIC | menu/confirm/stub-note/expand all yield space back on dismiss; seams recompute on every footer/body resize (ResizeObserver + layout effect deps) | tests 3, 9, 10, 11; ConflictCard.tsx recalcSeams deps |
+| **SPACE tiny** | — | modal fixed 640px, min viewport 1280 — degradation ladder not needed beyond chip/name ellipsis (decided S1, unchanged) | geometry tests: modal-in-main at both viewports in the busiest state |
+| **SCREENS** | 1280×800 / 1440×900 | busiest pre- and post-decision states probed: stacking, pinning, single scroll region, no page scroll, menu in viewport, band in footer | conflict-interactions.spec tests 13-14 |
 
 ## S4 checklist
 
@@ -203,7 +309,7 @@ Shots: `conflict-card-s4-{red,yellow,empty}-{1280x800,1440x900}.png` (full page)
   defeats the `hidden` attribute → both variants rendered stacked. Fixed with
   `.center[hidden]{display:none}`.
 
-## Scale-extremes — preliminary answers (must be closed with evidence by S5)
+## Scale-extremes — preliminary answers (S1; CLOSED by the S5 table above)
 
 - N=0: a conflict card cannot exist with zero shared symbols (intersection IS the
   trigger); zero conflicts = no card, entry points don't render. Diagnosis N=0 = the

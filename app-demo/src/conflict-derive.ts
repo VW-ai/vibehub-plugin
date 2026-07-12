@@ -422,3 +422,93 @@ export function pauseRows(f: ConflictCardFixture): PauseRowView[] {
 export function ignoreTip(f: ConflictCardFixture): string {
   return `Permanently silences THIS pair only — these two tasks on ${f.crumb.resourceName} never surface together again. Any other overlap either task hits still will.`;
 }
+
+/* ── zone c: adjudication feedback (S5, demo stub) ─────────────────────────
+   Clicking an action swaps the footer for an optimistic feedback band:
+   text pill first (SENT / PAUSING / IGNORED), one plain sentence, a visible
+   mono "demo" marker whose tooltip is the honesty disclosure (this card
+   renders a fixture — no live session received anything), and a focused
+   quiet Close button (keyboard-reachable outcome; closing returns focus to
+   the opener via the normal close path). No fake progress, no invented
+   agent responses — the band narrates what WOULD land, in future tense
+   where the real action is asynchronous ("at its next turn boundary"). */
+
+export const DEMO_TIP =
+  "Demo — this card renders a fixture; no live session received this. In the app the action lands at the agents’ next turn boundary.";
+
+export const FEEDBACK_CLOSE = {
+  label: "Close card",
+  tip: "Close the card and return to the map",
+};
+
+export interface FeedbackView {
+  /** Text pill — state's first channel. */
+  pill: "SENT" | "PAUSING" | "IGNORED";
+  /** CSS kind for the pill's redundant color channel (neutral family only —
+   *  feedback is not a task state; the three semantic colors stay reserved). */
+  kind: "done" | "idle";
+  text: string;
+  tip: string;
+}
+
+/**
+ * Inject feedback. Empty note + diagnosis ⇒ the send-time default (the
+ * Suggested line, marked AI-suggested — iter-10 fork #3). Empty note with
+ * NO diagnosis never reaches here: the button focuses the textarea instead
+ * (there is nothing to default to — S5 fork).
+ */
+export function injectFeedback(note: string): FeedbackView {
+  const defaulted = note.trim() === "";
+  return {
+    pill: "SENT",
+    kind: "done",
+    text: defaulted
+      ? "The Suggested line above is queued to both tasks, marked as AI-suggested — delivered at their next turn boundary."
+      : "Coordination note queued to both tasks — delivered at their next turn boundary. Neither side is interrupted.",
+    tip: defaulted
+      ? "Empty note ⇒ the diagnosis’s Suggested line was sent verbatim, labeled as AI-suggested (never as your words)."
+      : "Both agents receive the same note when they next yield — nothing is paused, nothing is interrupted.",
+  };
+}
+
+export function pauseFeedback(f: ConflictCardFixture, task: Task): FeedbackView {
+  const other = f.tasks.find((t) => t.id !== task.id);
+  return {
+    pill: "PAUSING",
+    kind: "idle",
+    text: `‘${task.title}’ will park at its next turn boundary — resume anytime from its panel.${
+      other ? ` ‘${other.title}’ keeps running.` : ""
+    }`,
+    tip: "Pause lands at the agent’s next yield, never mid-tool-call. The parked task holds its branch and worktree.",
+  };
+}
+
+export function ignoreFeedback(f: ConflictCardFixture): FeedbackView {
+  return {
+    pill: "IGNORED",
+    kind: "idle",
+    text: `This pair is silenced — these two tasks on ${f.crumb.resourceName} won’t surface together again. Any other overlap still will.`,
+    tip: "Scoped to THIS pair on THIS resource, permanently. Both tasks keep running; other conflicts they hit still surface.",
+  };
+}
+
+/** Inline ignore confirm (permanence gate — one modest confirm, in place). */
+export const IGNORE_CONFIRM = {
+  q: "Silence this pair permanently?",
+  confirm: "Ignore permanently",
+  confirmTip:
+    "Yes — never surface these two tasks together on this resource again. There is no un-ignore.",
+  keep: "Keep",
+  keepTip: "Cancel — the pair stays visible.",
+};
+
+/* ── zone b: diagnosis run/re-run stub (S5, demo honesty) ───────────────────
+   The demo cannot run `claude -p`, and inventing a fresh verdict would be
+   fabrication — so the buttons toggle an honest inline note instead of any
+   fake progress state. Backticks render mono via the card's codeSpans. */
+
+export const RERUN_STUB =
+  "Demo — nothing ran. In the app this is one `claude -p` pass on your machine, and the verdict above refreshes in place.";
+
+export const RUN_STUB =
+  "Demo — nothing ran. In the app this is one `claude -p` pass on your machine, and the diagnosis fills in here.";

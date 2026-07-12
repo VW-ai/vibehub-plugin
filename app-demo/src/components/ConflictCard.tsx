@@ -7,24 +7,33 @@ import {
   type ReactNode,
 } from "react";
 import type { Task } from "../types";
-import type { ConflictCardFixture } from "../conflict-types";
+import type { AdjudicationAction, ConflictCardFixture } from "../conflict-types";
 import {
   BETWEEN_TIP,
   CLOSE_TIP,
   CONFLICT_PILL_TIP,
+  DEMO_TIP,
   DIAG_EMPTY,
   DIAG_H4_TIP,
+  FEEDBACK_CLOSE,
+  IGNORE_CONFIRM,
   INJECT_TIP,
   PAUSE_TRIGGER_TIP,
+  RERUN_STUB,
+  RUN_STUB,
   SIDE_LABEL_TIP,
   SIDE_ROW_TIP,
   SUGGESTED_TIP,
   VISIBLE_SYMBOLS,
+  type FeedbackView,
   crumbSegs,
   detectedAge,
   gradeView,
+  ignoreFeedback,
   ignoreTip,
+  injectFeedback,
   noteView,
+  pauseFeedback,
   pauseRows,
   provenanceView,
   sideViews,
@@ -98,10 +107,24 @@ export function ConflictCard({ fixture, onClose, onOpenTask }: ConflictCardProps
   const [symsOpen, setSymsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [seams, setSeams] = useState({ top: false, bottom: false });
+  /* S5 adjudication feedback (demo stub): the emitted action + its band.
+     Terminal within the card — closing (remount per conflict id) resets. */
+  const [feedback, setFeedback] = useState<{
+    action: AdjudicationAction;
+    view: FeedbackView;
+  } | null>(null);
+  /* S5: inline permanence gate for "Ignore this pair". */
+  const [confirmIgnore, setConfirmIgnore] = useState(false);
+  /* S5: honest run/re-run stub note in zone b (toggles; no fake progress). */
+  const [stubNote, setStubNote] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
+  const keepRef = useRef<HTMLButtonElement>(null);
+  const fdbkCloseRef = useRef<HTMLButtonElement>(null);
   const menuOpenRef = useRef(menuOpen);
   menuOpenRef.current = menuOpen;
+  const confirmRef = useRef(confirmIgnore);
+  confirmRef.current = confirmIgnore;
 
   /* scroll-aware seams (S2 R1 fix #3): grade casts down once scrolled past
      the top, footer casts up while content hides below; off when it fits.
@@ -115,7 +138,7 @@ export function ConflictCard({ fixture, onClose, onOpenTask }: ConflictCardProps
       bottom: b.scrollTop + b.clientHeight < b.scrollHeight - 1,
     });
   };
-  useLayoutEffect(recalcSeams, [symsOpen, fixture]);
+  useLayoutEffect(recalcSeams, [symsOpen, fixture, feedback, confirmIgnore, stubNote]);
   useEffect(() => {
     const b = bodyRef.current;
     if (!b || !window.ResizeObserver) return;
@@ -124,12 +147,14 @@ export function ConflictCard({ fixture, onClose, onOpenTask }: ConflictCardProps
     return () => ro.disconnect();
   }, []);
 
-  /* Escape: an open pause menu takes it first; otherwise the card closes
-     (same path as X / scrim — focus returns to the opener via App). */
+  /* Escape: an open pause menu takes it first, then an open ignore-confirm
+     (permanence gate cancels — S5), then the card closes (same path as X /
+     scrim — focus returns to the opener via App). */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (menuOpenRef.current) setMenuOpen(false);
+      else if (confirmRef.current) setConfirmIgnore(false);
       else onClose();
     };
     document.addEventListener("keydown", onKey);
@@ -144,11 +169,50 @@ export function ConflictCard({ fixture, onClose, onOpenTask }: ConflictCardProps
     return () => document.removeEventListener("click", close);
   }, [menuOpen]);
 
+  /* S5 focus discipline: the confirm opens on the SAFE option (Keep — Enter
+     must not destroy); the feedback band opens on its Close button so the
+     outcome is keyboard-reachable in one keystroke. */
+  useEffect(() => {
+    if (confirmIgnore) keepRef.current?.focus();
+  }, [confirmIgnore]);
+  useEffect(() => {
+    if (feedback) fdbkCloseRef.current?.focus();
+  }, [feedback]);
+
   const autogrow = () => {
     const t = noteRef.current;
     if (!t) return;
     t.style.height = `${TEXTAREA_FLOOR_PX}px`;
     t.style.height = `${Math.min(t.scrollHeight, TEXTAREA_CEIL_PX)}px`;
+  };
+
+  /* ── S5 adjudication handlers (demo stub — see conflict-derive) ──────── */
+
+  const inject = () => {
+    const note = noteRef.current?.value.trim() ?? "";
+    if (note === "" && !fixture.diagnosis) {
+      // Nothing to default to (no Suggested line) — an empty send would be
+      // an empty message. Honest response: hand focus to the note.
+      noteRef.current?.focus();
+      return;
+    }
+    const action: AdjudicationAction =
+      note === "" ? { kind: "inject_note" } : { kind: "inject_note", note };
+    setFeedback({ action, view: injectFeedback(note) });
+  };
+
+  const pauseSide = (task: Task, noop: boolean) => {
+    setMenuOpen(false);
+    if (noop) return; // pausing an already-waiting task does nothing (S2)
+    setFeedback({
+      action: { kind: "pause_side", taskId: task.id },
+      view: pauseFeedback(fixture, task),
+    });
+  };
+
+  const ignorePair = () => {
+    setConfirmIgnore(false);
+    setFeedback({ action: { kind: "ignore_pair" }, view: ignoreFeedback(fixture) });
   };
 
   const openSide = (task: Task) => onOpenTask(task);
@@ -310,10 +374,20 @@ export function ConflictCard({ fixture, onClose, onOpenTask }: ConflictCardProps
                     {prov.edits.text}
                   </span>
                 )}
-                <button type="button" data-tip={prov.rerunTip}>
+                <button
+                  type="button"
+                  data-tip={prov.rerunTip}
+                  aria-pressed={stubNote}
+                  onClick={() => setStubNote((v) => !v)}
+                >
                   Re-run
                 </button>
               </div>
+              {stubNote && (
+                <p className="stubnote" data-tip={DEMO_TIP}>
+                  {codeSpans(RERUN_STUB)}
+                </p>
+              )}
             </>
           ) : (
             // true empty state → dashed placeholder is sanctioned here
@@ -324,64 +398,137 @@ export function ConflictCard({ fixture, onClose, onOpenTask }: ConflictCardProps
                 <i>{DIAG_EMPTY.capEm}</i>
                 {DIAG_EMPTY.capAfter}
               </p>
-              <button type="button" data-tip={DIAG_EMPTY.buttonTip}>
+              <button
+                type="button"
+                data-tip={DIAG_EMPTY.buttonTip}
+                aria-pressed={stubNote}
+                onClick={() => setStubNote((v) => !v)}
+              >
                 {DIAG_EMPTY.button}
               </button>
+              {stubNote && (
+                <p className="stubnote" data-tip={DEMO_TIP}>
+                  {codeSpans(RUN_STUB)}
+                </p>
+              )}
             </div>
           )}
         </section>
       </div>
 
-      {/* zone c: adjudication */}
+      {/* zone c: adjudication — actions, or the S5 feedback band once one
+          has been taken (demo stub; terminal within this card instance) */}
       <footer className={`cfoot${seams.bottom ? " seam" : ""}`}>
-        <textarea
-          ref={noteRef}
-          placeholder={note.placeholder}
-          data-tip={note.tip}
-          onInput={autogrow}
-        />
-        <div className="actions">
-          <button type="button" className="send" data-tip={INJECT_TIP}>
-            Inject to both
-          </button>
-          <div className={`split${menuOpen ? " open" : ""}`}>
+        {feedback ? (
+          <div
+            className="fdbk"
+            data-kind={feedback.action.kind}
+            role="status"
+            aria-live="polite"
+          >
+            <span className={`pill ${feedback.view.kind}`} data-tip={feedback.view.tip}>
+              {feedback.view.pill}
+            </span>
+            <p>
+              {feedback.view.text}{" "}
+              <span className="demo" data-tip={DEMO_TIP}>
+                demo
+              </span>
+            </p>
             <button
               type="button"
               className="quiet"
-              data-tip={PAUSE_TRIGGER_TIP}
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuOpen((v) => !v);
-              }}
+              ref={fdbkCloseRef}
+              data-tip={FEEDBACK_CLOSE.tip}
+              onClick={onClose}
             >
-              Pause one side
-              <Caret />
+              {FEEDBACK_CLOSE.label}
             </button>
-            {menuOpen && (
-              <div className="pmenu" role="menu">
-                {pauseRows(fixture).map((r) => (
+          </div>
+        ) : (
+          <>
+            <textarea
+              ref={noteRef}
+              placeholder={note.placeholder}
+              data-tip={note.tip}
+              onInput={autogrow}
+            />
+            <div className="actions">
+              <button type="button" className="send" data-tip={INJECT_TIP} onClick={inject}>
+                Inject to both
+              </button>
+              <div className={`split${menuOpen ? " open" : ""}`}>
+                <button
+                  type="button"
+                  className="quiet"
+                  data-tip={PAUSE_TRIGGER_TIP}
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConfirmIgnore(false); // one open decision at a time
+                    setMenuOpen((v) => !v);
+                  }}
+                >
+                  Pause one side
+                  <Caret />
+                </button>
+                {menuOpen && (
+                  <div className="pmenu" role="menu">
+                    {pauseRows(fixture).map((r) => (
+                      <button
+                        type="button"
+                        role="menuitem"
+                        key={r.task.id}
+                        className={r.noop ? "noop" : ""}
+                        data-tip={r.tip}
+                        onClick={() => pauseSide(r.task, r.noop)}
+                      >
+                        <b>{r.name}</b>
+                        <span className="st">{r.st}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <span className="gap" />
+              {confirmIgnore ? (
+                <span className="confirm" role="group" aria-label="Confirm ignore">
+                  <span className="q">{IGNORE_CONFIRM.q}</span>
                   <button
                     type="button"
-                    role="menuitem"
-                    key={r.task.id}
-                    className={r.noop ? "noop" : ""}
-                    data-tip={r.tip}
-                    onClick={() => setMenuOpen(false)}
+                    className="doit"
+                    data-tip={IGNORE_CONFIRM.confirmTip}
+                    onClick={ignorePair}
                   >
-                    <b>{r.name}</b>
-                    <span className="st">{r.st}</span>
+                    {IGNORE_CONFIRM.confirm}
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <span className="gap" />
-          <button type="button" className="ignore" data-tip={ignoreTip(fixture)}>
-            Ignore this pair
-          </button>
-        </div>
+                  <button
+                    type="button"
+                    className="keep"
+                    ref={keepRef}
+                    data-tip={IGNORE_CONFIRM.keepTip}
+                    onClick={() => setConfirmIgnore(false)}
+                  >
+                    {IGNORE_CONFIRM.keep}
+                  </button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="ignore"
+                  data-tip={ignoreTip(fixture)}
+                  onClick={() => {
+                    setMenuOpen(false); // one open decision at a time
+                    setConfirmIgnore(true);
+                  }}
+                >
+                  Ignore this pair
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </footer>
     </div>
   );

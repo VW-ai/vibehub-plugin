@@ -338,6 +338,33 @@ svg{vertical-align:-2px}
 .cfoot textarea:focus{outline:none;box-shadow:var(--sh-2),inset 0 0 0 1.5px var(--ink-300)}
 .actions .ignore{background:none;color:var(--ink-400);box-shadow:none;font-size:var(--fs-2)}
 .actions .ignore:hover{background:var(--ink-100);color:var(--ink-700)}
+
+/* S5: inline ignore-confirm (permanence gate — one modest confirm, in place,
+   never a browser dialog). Sits exactly where the ignore button sat. */
+.confirm{display:inline-flex;align-items:center;gap:var(--sp-1)}
+.confirm .q{font-size:var(--fs-2);color:var(--ink-700);font-weight:600;margin-right:var(--sp-1);white-space:nowrap}
+.confirm .doit{background:none;color:var(--clash-ink);box-shadow:inset 0 0 0 1px var(--ink-200);font-size:var(--fs-2);font-weight:600}
+.confirm .doit:hover{background:var(--clash-bg)}
+.confirm .keep{background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1);font-size:var(--fs-2)}
+.confirm .keep:hover{box-shadow:var(--sh-2)}
+
+/* S5: adjudication feedback band (demo stub) — replaces textarea+actions
+   after an action. Text pill first, neutral family (feedback ≠ task state:
+   the three semantic colors stay reserved). Entry uses the standard 200ms
+   curve; not persistent. */
+.fdbk{display:flex;align-items:flex-start;gap:var(--sp-2);min-height:52px;animation:fdbkIn var(--t-base) var(--ease) backwards}
+.fdbk .pill{cursor:help;margin-top:1px}
+.fdbk p{flex:1;font-size:var(--fs-3);line-height:1.5;color:var(--ink-700);margin:0}
+.fdbk .demo{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);background:var(--ink-100);border-radius:var(--r-s);padding:1px 5px;cursor:help;white-space:nowrap}
+.fdbk .quiet{flex:none;height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:500;background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.fdbk .quiet:hover{box-shadow:var(--sh-2)}
+@keyframes fdbkIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+/* S5: honest run/re-run stub note in zone b — no fake progress, just what
+   would happen; backtick tokens render mono like the verdict's. */
+.stubnote{margin-top:var(--sp-2);font-size:var(--fs-2);line-height:1.5;color:var(--ink-500);cursor:help;text-align:left}
+.stubnote .code{font-family:var(--mono);font-size:var(--fs-1)}
+
 /* pause split-button: the menu lists both tasks — the UI never presumes a side */
 .split{position:relative;display:inline-flex}
 .pmenu{position:absolute;bottom:32px;left:0;min-width:250px;background:var(--card);border-radius:var(--r-m);box-shadow:var(--sh-2),0 12px 34px rgba(15,17,21,.18);padding:var(--sp-1);z-index:5}
@@ -353,11 +380,11 @@ svg{vertical-align:-2px}
 .split.open .car{transform:rotate(-90deg)}
 
 /* conflict-card openers get the app's keyboard-parity ring */
-.side:focus-visible,.stat:focus-visible,.sub:focus-visible,.task .pill:focus-visible,.symtoggle:focus-visible,.prov button:focus-visible,.diag-empty button:focus-visible,.pmenu button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.side:focus-visible,.stat:focus-visible,.sub:focus-visible,.task .pill:focus-visible,.symtoggle:focus-visible,.prov button:focus-visible,.diag-empty button:focus-visible,.pmenu button:focus-visible,.fdbk .quiet:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
 .side:focus:not(:focus-visible),.stat:focus:not(:focus-visible),.sub:focus:not(:focus-visible),.task .pill:focus:not(:focus-visible){outline:none}
 
 /* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
 @media (prefers-reduced-motion: reduce){
-  .window,.task,.terr,.sub.clash .cnt,.panel,.scrim,.modal{animation:none}
+  .window,.task,.terr,.sub.clash .cnt,.panel,.scrim,.modal,.fdbk{animation:none}
   .grade,.cfoot,.symtoggle .car,.split .car{transition:none}
 }
