@@ -1,6 +1,6 @@
 # conflict-card — screen notes
 
-Stage: **S1 done** (static HTML at `static/conflict-card-s1.html`).
+Stage: **S2 done** (polish at `static/conflict-card-s2.html`; S1 frozen for diff).
 Variants: `?v=` param or the DEV bar — `""` red W×W diagnosed · `empty` red, diagnosis
 not yet run · `yellow` W×R, 12 shared symbols, long task names.
 
@@ -71,7 +71,7 @@ not yet run · `yellow` W×R, 12 shared symbols, long task names.
   click/Escape; empty→completed diagnosis is a state swap in one DOM slot.
 - SCREENS: 1280×800 + 1440×900 both verified, no overlap/clipping.
 
-## Open questions for S2
+## Open questions for S2 — RESOLVED at S2 (see review log below)
 
 1. Diagnosis staleness: both sessions keep working after a diagnosis — should the
    provenance line get an explicit stale marker ("2 edits since") instead of relying
@@ -91,6 +91,80 @@ not yet run · `yellow` W×R, 12 shared symbols, long task names.
    S2 could gray it out (disabled) instead. Disabled-but-explained vs enabled-no-op.
 7. Dev bar is visible in screenshots; fine for S1, but S2 polish shots should pass
    `?v=` and hide the bar (add `?dev=0`?).
+
+## S2 review log (kernel-style self-review, screenshots at 1280×800 + 1440×900)
+
+Artifact: `static/conflict-card-s2.html` (S1 copied, only the s2 file edited).
+Shots: `notes/shots/conflict-card-s2-{red,empty,yellow,yellow-expanded,stress}-{1280x800,1440x900}.png`
+(final = round 3; `-r1`/`-r2` = earlier rounds). `stress` = 12 symbols expanded +
+10-line textarea at the 124px cap + pause menu open, all at once. Every round, every
+scenario, both sizes: zero console errors, zero pageerrors, modal-inside-main +
+footer-pinned + dev-bar-hidden geometry probes green.
+
+### Open-question resolutions (implemented; forks logged to DECISIONS-NEEDED iter-10)
+
+1. **Diagnosis staleness → explicit marker.** `.prov` gains a `stale` state: the green
+   dot goes neutral (ink-300 — green only while the verdict matches reality) and an
+   honest "· N edits since" marker (ink-500, tooltip = which side edited what, when,
+   "the verdict may no longer hold"). Yellow variant renders stale (3 edits after its
+   11:02 diagnosis — its own symbol fixture says so); red renders fresh (diagnosed
+   11:12 = the last edit). Re-run tooltips updated to match each state.
+2. **Red grade = need tokens** — ratified with iter-9 defaults; unchanged, no re-shoot.
+3. **Empty-note contract → send-time default, surfaced in the placeholder.** Diagnosed
+   cards: placeholder "leave empty to send the Suggested line above, verbatim…" +
+   tooltip "sent, marked as AI-suggested". No-diagnosis card keeps the generic
+   placeholder (nothing to default to); setVariant swaps both. Prefill REJECTED:
+   prefilled AI text reads as user-authored (dishonest) and inflates the deck.
+4. **Task rows get the rail-card hover** — translateY(-1px) + sh-2, exactly v8's
+   `.task:hover`: same affordance (click opens the task panel), same language.
+5. **No persistent breathe on the RED grade strip** — confirmed no. The map already
+   breathes; a modal you deliberately opened doesn't need to wave at you. Zero
+   persistent animation in the modal.
+6. **Waiting task in pause menu = enabled no-op, visually secondary.** Kept clickable
+   with the honest tooltip (iter-9 ratified; disabled = dead pixels, guideline:
+   everything hover-explainable), but `.noop` drops the name to ink-500/500-weight so
+   the row visibly isn't the point of the menu.
+7. **Dev bar → `?dev=0` hides it**; all S2 shots pass it. Needed its own
+   `.dev[hidden]{display:none}` guard — `.dev{display:flex}` would have silently
+   defeated the hidden attribute (same bug class as S1's `.center` fix).
+
+### Round 1 — 3 defects:
+
+1. **Chips hard-cut instead of ellipsizing** — `.chip` was `inline-flex`; a flex
+   container cannot apply `text-overflow` to its anonymous text child, so branch
+   chips sliced mid-character ("cancel-orders-on-"). → `display:inline-block`
+   (blockified to `block` as a flex item — ellipsis works), text centered by
+   line-height:16px = height. Visible fix: "auto-retry-fail…".
+2. **Red hero state scrolled 7px at 1280×800** — a scroll affordance hiding nothing
+   meaningful (cognitive-load: implies hidden content). → `.diag` margin-top
+   sp-4→sp-3, `.prov` margin-top sp-2→sp-1 (token-compliant). Red/empty now fit
+   both sizes with bodyScroll 0.
+3. **No scroll cue when `.cbody` clips** — yellow@1280 hid the entire provenance row
+   (stale marker + Re-run) below a clean cut; user cannot know it exists (honesty +
+   task-panel S2 precedent, same defect class as its round-2 #9). → scroll-aware
+   seam shadows, task-panel language (0 1px 2px rgba(20,22,26,.08), --t-fast,
+   killed by reduced-motion): grade casts down once scrolled past the top, footer
+   casts up while content hides below; both off when the body fits. Re-checked on
+   scroll, ResizeObserver (textarea autogrow), click (symbol expand), variant switch.
+
+### Round 2 — 0 new defects.
+
+Fix verification + detail pass (clip shots): pmenu no-op row secondary ink, stale
+tooltip content/position, symtoggle chevron rotation + "show less", red fresh prov
+(green dot), side-row hover lift, footer seam @1280. All clean.
+
+### Round 3 — 0 new defects. Converged (3 → 0 → 0). Final shots captured.
+
+### S2 stress outcomes
+
+- **12-symbol expanded**: modal holds 660/708 @1280 (728/776 @1440); `.cbody` is the
+  only scroll region (209px range @1280), header/grade/footer pinned (probe green).
+- **Verdict at 3 lines**: yellow "Suggested" wraps to 3 lines at 640px — wraps, never
+  truncates (it's the payload).
+- **Textarea at cap**: grows 52→124 then scrolls internally; footer stays pinned to
+  the modal bottom; cbody yields (281px scroll range @1280) and the footer seam stays on.
+- **All three at once** (`stress` scenario): no overlap, no clipping, pause menu
+  overlays the textarea as a normal popover and closes on Escape/outside click.
 
 ## S1 verify log
 
