@@ -1,8 +1,75 @@
 # conflict-card — screen notes
 
-Stage: **S2 done** (polish at `static/conflict-card-s2.html`; S1 frozen for diff).
+Stage: **S3 done** (types `src/conflict-types.ts` + fixtures; S2 polish at
+`static/conflict-card-s2.html`; S1 frozen for diff).
 Variants: `?v=` param or the DEV bar — `""` red W×W diagnosed · `empty` red, diagnosis
 not yet run · `yellow` W×R, 12 shared symbols, long task names.
+
+## S3 checklist
+
+- [x] `src/conflict-types.ts` EXTENDS `src/types.ts` — Conflict / Task / scopes /
+      git facts imported, zero duplication. Per-field source annotations in the
+      panel-types.ts style; signal-inventory header lists the card's one
+      non-mechanical source (`claude -p` output, quoted verbatim + provenance-labeled,
+      confined to zone b).
+- [x] `ConflictDiagnosis`: verdict line + `sides: [DiagnosisSide, DiagnosisSide]`
+      (per-side "doing" rows, taskIds order) + `suggested` (also the empty-note
+      send-time default, iter-10 fork #3) + `provenance {diagnosedAt,
+      engine:"claude-p-local"}` + `stalenessEditsSince` (PostToolUse EDIT count after
+      diagnosedAt; reads never count — the verdict goes stale when code changes, not
+      when someone looks). Stored, not derived: `SymbolTouch` keeps only the LATEST
+      touch per side per symbol, so the true edit count is not recoverable from
+      `symbols` (fork logged iter-11).
+- [x] `AdjudicationAction` union: `inject_note {note?}` (empty ⇒ suggested verbatim,
+      marked AI-suggested) | `pause_side {taskId}` | `ignore_pair`. User inputs we
+      forward — signal class 5.
+- [x] `ConflictCardFixture`: capturedAt + conflict (map type unchanged) +
+      `tasks: [Task, Task]` (denormalized, taskIds order — "Between" never scales) +
+      `ResourceCrumb` (denormalized names, CrossReadNotice precedent) +
+      `SharedSymbolEvidence[]` (1:1 with conflict.sharedSymbols, per-symbol
+      `[SymbolTouch, SymbolTouch]` edit/read provenance; "both edited" / "w × r"
+      DERIVED from the two actions, never stored) + `diagnosis?` (absent = dashed
+      empty state).
+- [x] S1 leftover DECIDED: >999 symbol count follows the map's NUMBER-huge rule —
+      reuse `formatCount`/`exactCount` from derive.ts ("1.2k" on the h4, exact
+      "1,200" in the tooltip). Fork logged iter-11.
+- [x] Fixtures (TS literals + `satisfies`, registry `conflictFixtures` +
+      `conflictFixtureByName` in fixtures/index.ts):
+      - `conflict-osm-red-diagnosed` — S2 red verbatim (detected 8m, running 31m/9m,
+        3 symbols with S2 tooltip times, diagnosis 11:12, staleness 0 — 11:12 IS the
+        last edit).
+      - `conflict-no-diagnosis` — the `?v=empty` variant: same consts, no `diagnosis`.
+      - `conflict-yellow-stale` — S2 yellow verbatim: W×R, 12 symbols (61-char name),
+        long task titles, waiting no-op side (asked 11:10, 5m), diagnosis 11:02 with
+        stalenessEditsSince 3 — and the fixture's OWN touch times prove it
+        (11:03/11:05/11:08 edits after 11:02).
+      - `conflict-1200-symbols` — NUMBER-huge/N=many extreme: 1,200 deterministic
+        generated symbols (codegen-sweep story), ~90-char names every 97th row,
+        staleness COMPUTED from the generated touches (cannot lie; lands ≫100).
+      - `conflict-one-symbol` — N=1 (S1 notes' explicit S3 obligation): single
+        symbol, detected 45s ago (seconds rung), no diagnosis.
+- [x] Gates: `npx tsc --noEmit` clean (strict + exactOptionalPropertyTypes);
+      `pnpm build` green; Playwright suite still 59/59. Runtime invariants
+      spot-checked via throwaway vitest (6 tests, deleted after): name/order
+      alignment symbols↔sharedSymbols and touches/sides↔taskIds, symbol-name
+      uniqueness, S2 age reproduction (8m/31m/9m · 31m/1h/5m · 45s),
+      staleness counters equal the touch-derived counts, 1.2k/1,200 formatting.
+
+### Type → signal table (S3)
+
+| Type / field | Signal source |
+|---|---|
+| `SymbolTouch.action/at` | PostToolUse hook: Edit/Write ⇒ "edit", Read ⇒ "read" (timestamps from the hook payload); teammate branches via `git merge-tree` / diff-hunk→anchor (github-002) |
+| `SharedSymbolEvidence.name/file` | distillation anchor map (github-001) |
+| `ResourceCrumb.*` | distillation output (territory/sub-block/resource names, anchoring file), denormalized for standalone render |
+| `ConflictDiagnosis.verdict/sides/suggested` | `claude -p` output, VERBATIM (backtick code tokens kept as emitted; UI renders them mono) |
+| `DiagnosisProvenance.diagnosedAt/engine` | the local `claude -p` process (exit time; engine literal) |
+| `ConflictDiagnosis.stalenessEditsSince` | count of PostToolUse Edit/Write events on shared symbols with timestamp > diagnosedAt |
+| `AdjudicationAction` | user's own card actions — inputs we forward (class 5) |
+| `ConflictCardFixture.tasks/conflict` | map types unchanged (hook state machine + declarations + git facts, see types.ts) |
+| header age "8m" / menu "running 31m" | `relAge(detectedAt/stateSince, capturedAt)` — derived, derive.ts |
+| "both edited" / "w × r" row annotation | DERIVED from the two touches' actions, never stored |
+| h4 count "1.2k" (+ exact tooltip) | DERIVED via `formatCount`/`exactCount` (map's NUMBER-huge rule) |
 
 ## S1 checklist
 
@@ -54,7 +121,7 @@ not yet run · `yellow` W×R, 12 shared symbols, long task names.
   trigger); zero conflicts = no card, entry points don't render. Diagnosis N=0 = the
   dashed empty state (shown, honest).
 - N=1: one shared symbol — list renders one row, no toggle; layout holds (rows are
-  independent). Needs a fixture case by S3.
+  independent). Fixture case CLOSED at S3: `conflict-one-symbol`.
 - N=many: 12 symbols → 3 + "+9 more" expandable (verified); expanded card grows,
   .cbody is the only scroll region, header/grade/footer pinned. 100 symbols → same
   ladder, body scrolls. Exactly two tasks by type (`taskIds: [string, string]`) —
@@ -62,8 +129,9 @@ not yet run · `yellow` W×R, 12 shared symbols, long task names.
 - TEXT long: task names (yellow variant, verified), symbol names (61-char name,
   verified), resource names, branch chips — all single-line ellipsis + full-text
   tooltip. Verdict text wraps (never truncates — it's the payload).
-- NUMBER huge: symbol count in the h4 is mono raw (12); >999 would abbreviate + exact
-  in tooltip — no such fixture yet, decide at S3.
+- NUMBER huge: symbol count in the h4 is mono raw (12); >999 abbreviates + exact in
+  tooltip — DECIDED at S3: reuse the map's formatCount/exactCount ("1.2k" / "1,200");
+  fixture `conflict-1200-symbols` exercises the path (render evidence due S4/S5).
 - SPACE tiny: modal is fixed 640px, min viewport 1280 — no degradation ladder needed
   beyond chip truncation; at 1280×800 red-diagnosed body scrolls ~20px (footer pinned,
   verified via geometry probe).
