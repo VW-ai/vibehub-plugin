@@ -26,6 +26,8 @@ export interface MapCanvasProps {
   fixture: MapFixture;
   /** Correlate-hover focus mode: dim everything except lit territories. */
   focus: boolean;
+  /** Task panel open: blur the canvas 1.5px (S2 context rendering). */
+  veiled: boolean;
   litIds: Set<string>;
   onFilterStart: (kind: LegendKind) => void;
   onFilterEnd: () => void;
@@ -37,6 +39,7 @@ export interface MapCanvasProps {
 export function MapCanvas({
   fixture,
   focus,
+  veiled,
   litIds,
   onFilterStart,
   onFilterEnd,
@@ -46,7 +49,10 @@ export function MapCanvas({
   const empty = fixture.territories.length === 0;
   const band = needsLegendBand(fixture);
   return (
-    <section className={`canvas${focus ? " focus" : ""}`}>
+    <section
+      className={`canvas${focus ? " focus" : ""}${veiled ? " veiled" : ""}`}
+      aria-hidden={veiled || undefined}
+    >
       <div className="grid" />
       {empty ? (
         // N=0 rung: no distillation yet — honest guidance, no fake territories.

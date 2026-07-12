@@ -12,6 +12,9 @@ const initialFixture =
   requested && requested in fixtures ? requested : DEFAULT_FIXTURE;
 // `?switcher=0` hides the dev fixture switcher (used for parity screenshots).
 const showSwitcher = params.get("switcher") !== "0";
+// `?panel=<name>` opens a task-panel fixture on load (dev path to extremes,
+// e.g. ?panel=marathon → panel-marathon). Unknown names are ignored.
+const initialPanel = params.get("panel") ?? undefined;
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
@@ -20,6 +23,7 @@ if (rootEl) {
       fixtures={fixtures}
       initialFixture={initialFixture}
       showSwitcher={showSwitcher}
+      initialPanel={initialPanel}
     />,
   );
 }

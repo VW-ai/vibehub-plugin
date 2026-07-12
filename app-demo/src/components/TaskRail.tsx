@@ -17,6 +17,8 @@ export interface TaskRailProps {
   hotTaskIds: Set<string>;
   onTaskHoverStart: (task: Task) => void;
   onTaskHoverEnd: () => void;
+  /** Click / Enter on a card opens the task panel over the map (m2 S4). */
+  onTaskOpen: (task: Task) => void;
 }
 
 export function TaskRail({
@@ -25,6 +27,7 @@ export function TaskRail({
   hotTaskIds,
   onTaskHoverStart,
   onTaskHoverEnd,
+  onTaskOpen,
 }: TaskRailProps) {
   const groups = groupTasks(fixture);
   let cardIndex = 0; // stagger index runs across group boundaries (v8)
@@ -51,6 +54,7 @@ export function TaskRail({
                   hot={hotTaskIds.has(t.id)}
                   onHoverStart={onTaskHoverStart}
                   onHoverEnd={onTaskHoverEnd}
+                  onOpen={onTaskOpen}
                 />
               ))}
             </div>

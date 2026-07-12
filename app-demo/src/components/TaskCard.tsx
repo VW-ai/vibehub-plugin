@@ -9,6 +9,8 @@ export interface TaskCardProps {
   hot: boolean;
   onHoverStart: (task: Task) => void;
   onHoverEnd: () => void;
+  /** Click / Enter / Space opens the task panel (m2 S4). */
+  onOpen: (task: Task) => void;
 }
 
 const STAGGER_BASE_S = 0.05; // v8 first card delay
@@ -21,6 +23,7 @@ export function TaskCard({
   hot,
   onHoverStart,
   onHoverEnd,
+  onOpen,
 }: TaskCardProps) {
   const pill = pillView(task);
   const chips = taskChips(task, fixture);
@@ -37,6 +40,14 @@ export function TaskCard({
       onMouseLeave={onHoverEnd}
       onFocus={() => onHoverStart(task)}
       onBlur={onHoverEnd}
+      onClick={() => onOpen(task)}
+      onKeyDown={(e) => {
+        // keyboard parity: cards are focusable, so open must be too
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen(task);
+        }
+      }}
     >
       <div className="row1">
         <span className={`pill ${pill.kind}`} data-tip={pill.tip}>

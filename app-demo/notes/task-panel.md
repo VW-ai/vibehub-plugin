@@ -215,3 +215,83 @@ tooltip. Sub-day behavior byte-identical to the frozen v8 parity values
 - Sparse milestones → `panel-quiet-milestones` (exactly 3) and
   `panel-refactor-auth` (also 3 under the 023 derivation — no commits yet,
   honest sparseness per 023's known boundary).
+
+## S4 checklist (dynamize + map integration)
+
+Artifacts: `src/components/TaskPanel.tsx` + `PanelIdentity.tsx` +
+`Timeline.tsx` + `TimelineEntry.tsx` + `TranscriptTail.tsx` +
+`InterventionDeck.tsx`; view helpers added to `src/panel-derive.ts`
+(timeTip / panelScopeChips / sessionMeta / twistView / deckPlaceholder);
+`src/fixtures/synthetic-panel.ts` + `panelForTask` / `panelFixtureByName`
+in `src/fixtures/index.ts`; panel CSS appended to `src/app.css` (S2 values
+verbatim, panel-scoped where selectors would collide with map styles);
+capture spec `tests/panel-parity.spec.ts`. Shots: `notes/shots/task-panel-s4-*`.
+
+- [x] Zero hardcoded content: every prompt/report/file/count/sha/time comes
+      from the panel fixture through panel-types; templates in components
+      are chrome that explains semantics (same license as derive.ts)
+- [x] Click a rail card → panel slides in 200ms (`--t-base`) over the map;
+      canvas blurred 1.5px (S2) + scrim rgba(25,27,31,.22) over the whole
+      .main; close via X, Escape, scrim click; fixture switch closes too
+- [x] Keyboard parity: cards open on Enter/Space (they were already
+      focusable); panel affordances get :focus-visible rings
+- [x] Milestones toggle renders the DERIVED tier (isMilestone, 023
+      whitelist) — see "Derived-tier visual difference" below
+- [x] S2 behaviors preserved and verified live: open-at-newest (scrollTop
+      45/45 at 1280, seam shadow on at open, off at top), file_change
+      expandable with off-scope amber line, transcript tail toggle with
+      pressed state, textarea autogrow 52→124px cap (deck bottom == window
+      bottom 776/776 with 10-line input), mode toggle placeholder narration,
+      global 260ms tooltip reused (map's Tooltip, document delegation)
+- [x] Map ↔ panel wiring: v8-baseline "Refactor auth flow" opens
+      panel-refactor-auth (hand-authored, S2 content verbatim); every other
+      card opens a synthetic panel (launch + state transition only — honesty
+      rules in synthetic-panel.ts; queued → honest ".tl-empty" note, no fake
+      launch); `?panel=marathon|just-launched|quiet-milestones|refactor-auth`
+      dev param reaches the extremes (verified: 60/14 rows, session 12 of 12,
+      3h · 1/1, 42s · 8/3, 2d)
+- [x] Gates: `npx tsc --noEmit` clean; `pnpm build` green; Playwright
+      40/40 = existing map suite 35/35 untouched + 5 new capture tests
+      (tests/panel-parity.spec.ts); zero console errors across all flows
+
+### S4 parity deltas vs static/task-panel-s2.html (panel region ≈ identical)
+
+1. **Underlay**: the real v8-baseline map + left rail sit under the scrim
+   (S2 static had a simplified 6-territory canvas and NO rail). Titlebar
+   shows the map fixture's derived stats + Synced pill (same values as S2's
+   hardcoded ones: 1 waiting / 1 conflict / 3 running).
+2. **Age tooltip**: derived template "In WAITING since 10:31" replaces S2's
+   hand-written "Stopped to ask you a question 12 minutes ago (10:31)" —
+   the generated form works for every state/fixture.
+3. **`.sub` → `.subnote`**: S2's corroboration-line class collided with the
+   MAP's `.sub` (absolute sub-block chips) and was yanked out of flow —
+   renamed in the React port, pixel-identical rendering. (Caught by shot
+   review: the sub overlapped the 10:24 injection before the fix.)
+4. **Milestones seg tooltip copy** updated to describe the 023 derived tier
+   (S2's described its hand-tagged set — superseded, DECISIONS iter-6/7).
+5. Scroll offset at open differs by a few px (content heights differ
+   sub-pixel between engines); same "clipped line above" cue at 1280, same
+   everything-fits view at 1440.
+
+### Derived-tier visual difference (023 supersedes S2's hand-tagged .ms)
+
+On the auth timeline, Milestones now keeps 3 of 10 entries (launch 09:58 →
+injection 10:24 → question 10:31) where the S2 static kept 8. The tier
+reads as "founding instruction → my intervention → what it needs now" — a
+pure user-action/transition spine with zero agent narration; it no longer
+scrolls at 1280 (seam off). Self-reports and file bursts remain All-only,
+which the S2 "All" view already showed — so All is byte-identical to S2.
+
+### Integration decisions (S4)
+
+- The panel is owned by App (open/close state), remounted per task via
+  `key={task.id}` so tier/tail/scroll/textarea state never leaks across
+  tasks. Correlate-hover state is cleared on open; the scrim intercepts all
+  map/rail pointer events while open.
+- Scrim covers rail + canvas (S2 precedent covers only what existed there);
+  clicking a different card therefore requires closing first — deliberate,
+  logged as a fork (iter-7).
+- Territory names for scope-chip tooltips resolve against the CURRENT map
+  fixture (panel prop `map`), falling back to the scope's own label when
+  the territory id is unknown (e.g. marathon's payments ids over
+  v8-baseline).

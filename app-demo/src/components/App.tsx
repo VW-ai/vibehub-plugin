@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { MapFixture, Task, Territory } from "../types";
+import type { TaskPanelFixture } from "../panel-types";
 import {
   highlightForLegend,
   highlightForTask,
@@ -7,9 +8,11 @@ import {
   type Highlight,
   type LegendKind,
 } from "../derive";
+import { panelFixtureByName, panelForTask } from "../fixtures";
 import { Titlebar } from "./Titlebar";
 import { TaskRail } from "./TaskRail";
 import { MapCanvas } from "./MapCanvas";
+import { TaskPanel } from "./TaskPanel";
 import { Tooltip } from "./Tooltip";
 
 const NO_HIGHLIGHT: Highlight = {
@@ -22,15 +25,21 @@ export interface AppProps {
   initialFixture: string;
   /** Dev switcher visibility (`?switcher=0` hides it for parity shots). */
   showSwitcher: boolean;
+  /** `?panel=<name>` dev param: open a panel fixture directly on load. */
+  initialPanel?: string | undefined;
 }
 
-export function App({ fixtures, initialFixture, showSwitcher }: AppProps) {
+export function App({ fixtures, initialFixture, showSwitcher, initialPanel }: AppProps) {
   const [fixtureName, setFixtureName] = useState(initialFixture);
   // Correlate-hover source: a rail card, a territory (reverse direction),
   // or a legend entry — only one can be the source at a time.
   const [hoverTask, setHoverTask] = useState<Task | null>(null);
   const [hoverTerr, setHoverTerr] = useState<Territory | null>(null);
   const [legendFilter, setLegendFilter] = useState<LegendKind | null>(null);
+  // Task panel (m2): clicking a rail card opens it over the dimmed map.
+  const [panel, setPanel] = useState<TaskPanelFixture | null>(() =>
+    initialPanel ? panelFixtureByName(initialPanel) : null,
+  );
 
   const fixture = fixtures[fixtureName] ?? fixtures[initialFixture]!;
 
@@ -48,10 +57,30 @@ export function App({ fixtures, initialFixture, showSwitcher }: AppProps) {
     setHoverTask(null);
     setHoverTerr(null);
     setLegendFilter(null);
+    setPanel(null); // a panel belongs to the fixture it was opened from
     const url = new URL(window.location.href);
     url.searchParams.set("fixture", name);
     window.history.replaceState(null, "", url);
   };
+
+  const openTask = (task: Task) => {
+    // Opening the panel kills any live correlate-hover (the scrim takes over).
+    setHoverTask(null);
+    setHoverTerr(null);
+    setLegendFilter(null);
+    setPanel(panelForTask(task, fixture));
+  };
+  const closePanel = () => setPanel(null);
+
+  // Escape closes the panel (alongside X and scrim click).
+  useEffect(() => {
+    if (!panel) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPanel(null);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [panel]);
 
   return (
     <div className="window">
@@ -68,16 +97,34 @@ export function App({ fixtures, initialFixture, showSwitcher }: AppProps) {
           hotTaskIds={highlight.hotTaskIds}
           onTaskHoverStart={setHoverTask}
           onTaskHoverEnd={() => setHoverTask(null)}
+          onTaskOpen={openTask}
         />
         <MapCanvas
           fixture={fixture}
           focus={focus}
+          veiled={panel !== null}
           litIds={highlight.litIds}
           onFilterStart={setLegendFilter}
           onFilterEnd={() => setLegendFilter(null)}
           onTerritoryHoverStart={setHoverTerr}
           onTerritoryHoverEnd={() => setHoverTerr(null)}
         />
+        {panel && (
+          <>
+            <div
+              className="scrim"
+              data-tip="Click anywhere on the map to close the panel"
+              onClick={closePanel}
+            />
+            {/* key: switching tasks remounts the panel (fresh tier/tail/scroll) */}
+            <TaskPanel
+              key={panel.task.id}
+              panel={panel}
+              map={fixture}
+              onClose={closePanel}
+            />
+          </>
+        )}
       </div>
       <Tooltip />
     </div>

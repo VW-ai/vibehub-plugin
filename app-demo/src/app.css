@@ -40,7 +40,7 @@ svg{vertical-align:-2px}
 /* S4: dev-only fixture switcher — chrome, not product UI */
 .fixture-switch{height:22px;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500);background:var(--card);border:1px solid var(--ink-150);border-radius:var(--r-s);padding:0 4px;cursor:pointer}
 
-.main{flex:1;display:flex;min-height:0}
+.main{flex:1;display:flex;min-height:0;position:relative}
 
 /* ── rail ── */
 .rail{width:300px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--ink-150);background:rgba(252,252,251,.7)}
@@ -136,7 +136,107 @@ svg{vertical-align:-2px}
 .task:focus-visible,.terr:focus-visible,.legend span:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
 .task:focus:not(:focus-visible),.terr:focus:not(:focus-visible),.legend span:focus:not(:focus-visible){outline:none}
 
+/* ════════════════════════════════════════════════════════════════════════
+   task-panel (m2, S4) — ported from static/task-panel-s2.html, the approved
+   S2 artifact. Values verbatim where the selector is panel-only; selectors
+   that would collide with map styles (.age, h2) are scoped under .panel /
+   .phead. .pill and .chip are shared with the map ON PURPOSE — S2 copied
+   them from v8 unchanged, one definition serves both surfaces. */
+
+/* map context while the panel is open: blur the canvas (S2: 1.5px) and put
+   a scrim over the whole .main (rail included — click anywhere closes) */
+.canvas.veiled{filter:blur(1.5px)}
+.scrim{position:absolute;inset:0;background:rgba(25,27,31,.22);cursor:pointer;z-index:4;animation:scrimIn var(--t-base) var(--ease) backwards}
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}
+
+/* the panel: slides in over the map from the right, 520px (S2 verbatim) */
+.panel{position:absolute;top:0;right:0;bottom:0;width:520px;background:var(--card);display:flex;flex-direction:column;box-shadow:-1px 0 0 rgba(20,22,26,.06),-18px 0 48px rgba(15,17,21,.16);animation:panelIn var(--t-base) var(--ease) backwards;z-index:5}
+@keyframes panelIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+
+/* ── section 1: identity ── */
+.phead{flex:none;padding:var(--sp-4) var(--sp-4) var(--sp-3);border-bottom:1px solid var(--ink-150);background:rgba(252,252,251,.8)}
+.phead .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.phead h2{font-size:var(--fs-4);font-weight:650;letter-spacing:-.1px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.panel .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none;cursor:help}
+.pclose{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border:0;background:none;border-radius:var(--r-s);color:var(--ink-400);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.pclose:hover{background:var(--ink-100);color:var(--ink-700)}
+.meta{display:flex;align-items:center;gap:var(--sp-2);margin-top:6px;font-size:var(--fs-2);color:var(--ink-500);min-width:0;overflow:hidden}
+.meta .m{flex:none;cursor:help;white-space:nowrap}
+.meta .mono{font-family:var(--mono);font-size:var(--fs-1)}
+.meta .trunc{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.meta .sep{flex:none;width:3px;height:3px;border-radius:50%;background:var(--ink-300)}
+.scopes{display:flex;align-items:center;gap:var(--sp-1);margin-top:var(--sp-2);min-width:0;overflow:hidden}
+.twist{flex:none;height:16px;display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-1);font-weight:600;padding:0 6px;border-radius:5px;background:var(--clash-bg);color:var(--clash-ink);cursor:help;white-space:nowrap;line-height:16px}
+
+/* ── section 2: human timeline (the panel's only scroll region) ── */
+.tlbar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:var(--sp-2) var(--sp-4) var(--sp-1);position:relative;z-index:1;background:var(--card);transition:box-shadow var(--t-fast) var(--ease)}
+.tlbar.scrolled{box-shadow:0 1px 2px rgba(20,22,26,.08)}
+.tlbar h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase}
+.seg{display:flex;background:var(--ink-100);border-radius:var(--r-s);padding:2px}
+.seg button{height:18px;border:0;background:none;border-radius:4px;padding:0 var(--sp-2);font-size:var(--fs-1);font-weight:600;color:var(--ink-500);cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.seg button.on{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1)}
+.tl{flex:1;min-height:0;overflow:auto;padding:var(--sp-2) var(--sp-4) var(--sp-3)}
+.tl::-webkit-scrollbar,.tail::-webkit-scrollbar{width:8px}
+.tl::-webkit-scrollbar-thumb{background:var(--ink-200);border-radius:4px;border:2px solid var(--card);background-clip:padding-box}
+.tail::-webkit-scrollbar-thumb{background:#4a4d53;border-radius:4px;border:2px solid var(--ink-900);background-clip:padding-box}
+.tl::-webkit-scrollbar-track,.tail::-webkit-scrollbar-track{background:transparent}
+/* honest empty timeline (queued synthetic panels: no session, no history) */
+.tl-empty{padding:var(--sp-4) 0;font-size:var(--fs-3);color:var(--ink-400);line-height:1.6}
+.ev{display:flex;gap:var(--sp-2);padding:5px 0}
+.ev .t{width:34px;flex:none;text-align:right;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-300);line-height:1.7;cursor:help}
+.ev .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-200);margin-top:5px;flex:none}
+.ev.agent .dot{background:var(--alive)}
+.ev.user .dot{background:var(--read)}
+.ev.ask .dot{background:var(--need)}
+.ev .body{flex:1;min-width:0;font-size:var(--fs-3);line-height:1.55;color:var(--ink-700)}
+.ev .body b{color:var(--ink-900);font-weight:600}
+.ev.user .body{background:rgba(90,127,184,.07);border-radius:var(--r-s);padding:5px var(--sp-2)}
+.ev .who{font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;color:var(--read-ink);text-transform:uppercase;margin-bottom:1px}
+/* S2 called this .sub — renamed .subnote here because the MAP already owns
+   .sub (absolute-positioned sub-block chips) and would yank it out of flow */
+.ev .subnote{font-size:var(--fs-2);color:var(--ink-400);margin-top:2px}
+.ev.mech .body{color:var(--ink-400);font-size:var(--fs-2)}
+.ev.ask .body{background:var(--need-bg);border-radius:var(--r-s);padding:5px var(--sp-2)}
+.ev.ask .body b{color:var(--need-ink)}
+.ev.cross .body{font-size:var(--fs-2);color:var(--ink-400)}
+.ev.cross .dot{background:#fff;box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.5)}
+.ev .body .mono{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500)}
+/* collapsed file-change entry */
+.filestoggle{border:0;background:none;padding:0;font-size:var(--fs-3);color:var(--ink-700);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.filestoggle:hover{color:var(--ink-900)}
+.filestoggle .car{transition:transform var(--t-fast) var(--ease);color:var(--ink-400)}
+.files{display:none;margin-top:5px;font-family:var(--mono);font-size:var(--fs-1);line-height:1.9;color:var(--ink-500)}
+.files .out{color:var(--clash-ink);cursor:help}
+.ev.open .files{display:block}
+.ev.open .filestoggle .car{transform:rotate(90deg)}
+/* on-demand transcript tail */
+.tail{flex:none;display:none;margin:0 var(--sp-4) var(--sp-2);background:var(--ink-900);color:#b9beb1;border-radius:var(--r-s);font-family:var(--mono);font-size:var(--fs-1);line-height:1.8;padding:var(--sp-2) var(--sp-3);max-height:120px;overflow:auto;white-space:pre-wrap}
+.tail.show{display:block}
+
+/* ── section 3: intervention deck (pinned; never scrolls away) ── */
+.deck{flex:none;border-top:1px solid var(--ink-150);background:rgba(252,252,251,.8);padding:var(--sp-3) var(--sp-4) var(--sp-4)}
+.modes{display:flex;width:fit-content;background:var(--ink-100);border-radius:var(--r-s);padding:2px;margin-bottom:var(--sp-2)}
+.modes button{height:20px;border:0;background:none;border-radius:4px;padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:600;color:var(--ink-500);cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.modes button.on{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1)}
+.deck textarea{width:100%;height:52px;max-height:124px;resize:none;border:0;border-radius:var(--r-s);background:var(--card);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-150);padding:var(--sp-2) var(--sp-2);font-family:inherit;font-size:var(--fs-3);line-height:1.5;color:var(--ink-900);transition:box-shadow var(--t-fast) var(--ease)}
+.deck textarea::placeholder{color:var(--ink-400)}
+.deck textarea:focus{outline:none;box-shadow:var(--sh-2),inset 0 0 0 1.5px var(--ink-300)}
+.actions{display:flex;align-items:center;gap:var(--sp-1);margin-top:var(--sp-2)}
+.actions button{height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-2);font-size:var(--fs-3);font-weight:500;white-space:nowrap;cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+.actions .send{background:var(--ink-900);color:#fbfbfa;font-weight:600;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
+.actions .send:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.actions .send:active{transform:none}
+.actions .quiet{background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1);font-size:var(--fs-2)}
+.actions .quiet:hover{box-shadow:var(--sh-2)}
+.actions .quiet.on{color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-300)}
+.actions .gap{flex:1}
+.actions .term{background:none;color:var(--need-ink);box-shadow:none;font-weight:500;font-size:var(--fs-2)}
+.actions .term:hover{background:var(--need-bg)}
+
+/* keyboard parity on panel affordances (same rule as the map's) */
+.pclose:focus-visible,.filestoggle:focus-visible,.seg button:focus-visible,.modes button:focus-visible,.actions button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+
 /* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
 @media (prefers-reduced-motion: reduce){
-  .window,.task,.terr,.sub.clash .cnt{animation:none}
+  .window,.task,.terr,.sub.clash .cnt,.panel,.scrim{animation:none}
 }
