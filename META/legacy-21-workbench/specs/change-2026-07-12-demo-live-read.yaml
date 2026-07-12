@@ -1,0 +1,48 @@
+spec_id: "change-2026-07-12-demo-live-read"
+type: change
+state: active
+intent:
+  summary: "M1 ④ 落地:demo 切真 SQLite 读 — vite middleware 每请求现场导出 /live-fixture.json(Tauri 读路径的 dev 替身);fixture-export 合并本地 hook 任务(hooks 档赢过远端行,024 join key);e2e 170→172 全绿"
+  detail: |
+    - fixture-export 合并语义:同 branch 本地 hook 任务赢过远端行
+      (真五态/statusDetail/worktreePath,远端只贡献 PR 事实);
+      未 push 的本地 branch 任务照进(hooks 先看见);scope 优先 MCP
+      申报、缺席时足迹自陈(distinct edit 数落 Uncategorized,
+      install-types 同思想)。
+    - vite middleware `/live-fixture.json`:每请求经 core dist 现场
+      openDb→exportTeamMapFixture(连续请求 capturedAt 不同,实证
+      真读);浏览器 bundle 不碰 native 模块;无 DB/未 sync 依次诚实
+      回退 静态导出→404→前端警告降级。demo 冻结依赖清单未动。
+    - e2e +2(live boot 路径两侧分支都必须渲染出合法地图;未知
+      fixture 名回退),Playwright 172/172、demo vitest 44/44、
+      tsc clean;真环境截图:地图实时显示本次 M1 三个切片分支
+      与 walking-skeleton 的并发冲突预警。
+    - 补(2026-07-12 裁决③):非当日完成的 done 任务不进导出帧
+      (sameUtcDay,UTC 日界;occupancy doneToday 同源)——左栏
+      "DONE TODAY" 组不再混入陈旧 done。core vitest 75/75。
+    - 遗留(有意延后):demo 的契约类型副本未消灭——需要 core 提供
+      browser-safe 的 types-only subpath export(packaging pass),
+      不值得为去重赌 172 条 e2e;镜像纪律(改必同步)继续生效。Wayne 2026-07-12 裁决④确认:维持镜像纪律,M2 碰 core 打包时一并做 subpath export 再合。
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [backend-m1, live-read, vite-middleware, merge-semantics, e2e]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "M1 backend session 2026-07-12(handoff:后端 M1 range ④)"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-025"
+    type: implements
+    detail: "app(替身=dev server)读 SQLite 经 core,app 内零业务逻辑"
+  - target: "decision-project-024"
+    type: implements
+    detail: "branch=join key 的本地/远端任务合并"
+anchors:
+  - file: "workbench/packages/core/src/fixture-export.ts"
+    symbols: [exportTeamMapFixture]
+  - file: "workbench/app-demo/vite.config.ts"
+    symbols: [vibehubLiveFixture]

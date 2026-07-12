@@ -1,0 +1,56 @@
+spec_id: "change-2026-07-12-hook-cli-heart"
+type: change
+state: active
+intent:
+  summary: "M1 ③ 落地:`vibehub hook <event>` CLI 心脏 — 短命(写事件→查注入队列→退出)、零 LLM、永不 fail session;StateMachine 纯函数(五态,stalled=读时观察);真 Claude Code session 校准通过,事件流形状与契约对齐"
+  detail: |
+    core 新增 hook-ingest(逻辑)+ state-machine(纯函数),CLI 加
+    `vibehub hook <event>`(stdin 读 hook payload,任何错误吞进
+    ~/.vibehub/hook.log,恒 exit 0——hook 永不打断用户 session)。
+    - 事捕捉:branch 为 join key(024),未见过的 branch 自动建
+      未命名的事(017,title=branch 名);worktree session 归域主 repo
+      (github-004),branch/toplevel 从 session cwd 解析(修了 facade
+      锚主 root 读错 HEAD 的 bug,有回归测试)。
+    - 事件直译:UserPromptSubmit 首条→launch、后续→user_injection;
+      PostToolUse Edit/Write/MultiEdit/NotebookEdit→edit 足迹、
+      Read→read 足迹(repo-relative);Notification→question(verbatim)
+      +waiting;Stop→self_report(transcript 最后一条 assistant 原文,
+      机械解析零合成)+waiting;SessionEnd→session 收口+done。
+    - StateMachine:活动→running、Stop/Notification→waiting、
+      SessionEnd→done;**stalled 不由事件产出**——无 daemon 无定时器
+      (016),沉默是读时观察(lastEventAt age),不存转移。
+    - 注入回查(018):UserPromptSubmit/PostToolUse 边界原子 claim,
+      按 hook 协议输出 additionalContext,投递入时间线(介入必入史
+      023),不双发(有测试)。
+    - **真 session 校准**:临时 repo 装 hooks 真跑 claude -p,
+      DB 收到 launch/footprints(edit+read)/self_report/两次
+      state_transition,与契约成员形状一致,hook.log 零错误。
+    Gates:core vitest 72/72(+13)、tsc clean、build 绿。
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [backend-m1, hook-cli, state-machine, injection-queue, calibration]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "M1 backend session 2026-07-12(handoff:后端 M1 range ③)"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-025"
+    type: implements
+    detail: "CLI 心脏 `vibehub hook` + StateMachine 模块落地"
+  - target: "decision-project-016"
+    type: implements
+    detail: "短命 CLI 直写 SQLite(WAL),采集不依赖 app 活着"
+  - target: "decision-project-018"
+    type: implements
+    detail: "注入队列 hooks 触发点回查"
+anchors:
+  - file: "workbench/packages/core/src/hook-ingest.ts"
+    symbols: [ingestHookEvent, lastAssistantText]
+  - file: "workbench/packages/core/src/state-machine.ts"
+    symbols: [nextState]
+  - file: "workbench/packages/cli/src/main.ts"
+    symbols: [runHook]

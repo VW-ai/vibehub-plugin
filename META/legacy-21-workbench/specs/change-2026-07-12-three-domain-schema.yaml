@@ -1,0 +1,48 @@
+spec_id: "change-2026-07-12-three-domain-schema"
+type: change
+state: active
+intent:
+  summary: "M1 ② 落地:SQLite 三表域 schema(运行域/图域/配置域)从五个契约 types 文件直译进 core(migration 002)+ ActivityStore/GraphStore 两扇 typed 门;DERIVED-NEVER-STORED 全线贯彻"
+  detail: |
+    migration 002(user_version 1→2,升级保数据,有测试):
+    - 运行域:tasks(五态 CHECK 封顶)/sessions/events(11 型 TimelineEvent
+      判别列 + JSON payload 原样往返)/footprints(原始 file touch,一切
+      足迹派生量之源)/scopes(seq 保申报序)/injections(enqueue/claim
+      原子 FIFO,018)/conflicts+conflict_symbols(序保 1:1 对齐不变式)
+      /conflict_diagnoses(claude -p verbatim + provenance)/notifications
+      (预算账本,020)/mapping_runs(仅 start/exit,无进度分数)。
+    - 图域:features(territory/sub-block 同表 parent_id)/specs(无 D,
+      stale/supersede,026)/anchors(足迹→地盘归因 join)/edges。
+    - 配置域:settings(repo 0=global,repo 值遮蔽 global)。
+    契约铁律落实:milestone 档/twist/filesTouched/session ordinal/
+    staleness 计数/geometry 一律不建列,读时派生(ActivityStore
+    readScopes/sessionIdentity/readDiagnosis 现场计算,有测试钉死:
+    read 不计 staleness、蒸馏前文件归因 []=诚实灰区)。
+    契约类型四文件(panel/conflict/install + map)canonical 家搬进
+    core/src/contract/(app-demo 副本待切片④消灭)。
+    Gates:core vitest 59/59(+17)、tsc clean、build 绿。
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [backend-m1, sqlite, schema, three-domain, activity-store, graph-store]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "M1 backend session 2026-07-12(handoff:后端 M1 range ②)"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-025"
+    type: implements
+    detail: "SQLite 三表域拍板的直译落地"
+  - target: "decision-project-014"
+    type: implements
+    detail: "SQLite 为体:schema migration 梯 = 能力升级通道"
+anchors:
+  - file: "workbench/packages/core/src/db.ts"
+    symbols: [openDb]
+  - file: "workbench/packages/core/src/activity-store.ts"
+    symbols: [upsertTask, appendEvent, readTimeline, setScopes, readScopes, enqueueInjection, claimPendingInjections, insertConflict, readDiagnosis]
+  - file: "workbench/packages/core/src/graph-store.ts"
+    symbols: [upsertFeature, listTerritories, addAnchor, featuresForFile, upsertSpec, setSetting, getSetting]

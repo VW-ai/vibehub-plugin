@@ -29,17 +29,43 @@ const initialInstall = params.get("install") ?? undefined;
 // `?menubar=1` (→ busy). Unknown names fall through to the map.
 const initialMenubar = params.get("menubar") ?? undefined;
 
+// `?fixture=live` loads a REAL team snapshot exported by
+// `vibehub team fixture --out public/live-fixture.json` (M1 ① vertical
+// slice: git+gh → SQLite → this map, zero server). Missing/invalid file
+// falls back to the default fixture with a console warning — the demo's
+// 20 canned fixtures stay untouched.
+async function resolveFixtures(): Promise<{
+  all: typeof fixtures;
+  initial: string;
+}> {
+  if (requested !== "live") return { all: fixtures, initial: initialFixture };
+  try {
+    const res = await fetch("/live-fixture.json");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const live = await res.json();
+    return { all: { ...fixtures, live }, initial: "live" };
+  } catch (err) {
+    console.warn(
+      "live fixture unavailable — run `vibehub team fixture` first; falling back",
+      err,
+    );
+    return { all: fixtures, initial: DEFAULT_FIXTURE };
+  }
+}
+
 const rootEl = document.getElementById("root");
 if (rootEl) {
-  createRoot(rootEl).render(
-    <App
-      fixtures={fixtures}
-      initialFixture={initialFixture}
-      showSwitcher={showSwitcher}
-      initialPanel={initialPanel}
-      initialConflict={initialConflict}
-      initialInstall={initialInstall}
-      initialMenubar={initialMenubar}
-    />,
-  );
+  void resolveFixtures().then(({ all, initial }) => {
+    createRoot(rootEl).render(
+      <App
+        fixtures={all}
+        initialFixture={initial}
+        showSwitcher={showSwitcher}
+        initialPanel={initialPanel}
+        initialConflict={initialConflict}
+        initialInstall={initialInstall}
+        initialMenubar={initialMenubar}
+      />,
+    );
+  });
 }

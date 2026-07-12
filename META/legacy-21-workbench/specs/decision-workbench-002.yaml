@@ -1,6 +1,6 @@
 spec_id: "decision-workbench-002"
 type: decision
-state: draft
+state: active
 intent:
   summary: "冲突解决要给用户反馈,并沉淀解决统计:日/周/月解决了多少跨事件/跨 branch 的 conflict;后续 prompt engineering 议题——裁决后如何带 context 回到两个 worktree、如何持续观察"
   detail: |

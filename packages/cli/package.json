@@ -1,0 +1,26 @@
+{
+  "name": "@vibehub/cli",
+  "version": "0.0.1",
+  "description": "Vibehub workbench CLI — thin adapter over @vibehub/core (decision-project-013: zero LLM, zero business logic; parsing + output formatting only).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "vibehub": "./dist/main.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vibehub/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

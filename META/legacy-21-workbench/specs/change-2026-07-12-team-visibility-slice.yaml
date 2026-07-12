@@ -1,0 +1,54 @@
+spec_id: "change-2026-07-12-team-visibility-slice"
+type: change
+state: active
+intent:
+  summary: "M1 ① 团队可见端到端垂直切片落地:workbench/packages/core+cli 诞生 — git fetch→branch/足迹/merge-tree/gh pr→SQLite→MapFixture 导出→demo ?fixture=live,在 Vibehub 自身 repo 实证,decision-github-003 ② 硬门槛完成"
+  detail: |
+    后端 M1 第一刀(PR 级切片)。新增:
+    - workbench/packages/core(@vibehub/core,library-first,零 LLM):
+      GitFacade(fetch/branch 清单/足迹 diff 三点语义/merge-tree --write-tree
+      两两冲突预警/gh pr list,worktree 经 git-common-dir 归域主 repo)、
+      SQLite door(WAL,~/.vibehub/workbench.db,user_version 迁移梯,
+      团队可见子集:repos/sync_state/team_branches/team_branch_files/
+      team_conflicts,按 repo 分域)、team-sync 编排、fixture-export
+      (真数据 → demo MapFixture 形状);契约类型 map-types.ts 以 core
+      为 canonical 家(app-demo 副本待切片④消灭)。
+    - workbench/packages/cli(@vibehub/cli,薄壳):
+      `vibehub team sync` / `vibehub team fixture`。
+    - demo 增 ?fixture=live:fetch public/live-fixture.json,缺席诚实回退。
+    - pnpm workspace 增 workbench/packages/*(decision-project-012
+      同一 workspace);room 21 drafts 001..003 promote(handoff 授权)。
+    实证(Vibehub 自身 repo,零服务端):fetch 真跑、9 branches
+    (3 unmerged / 1 活跃)、gh 7 PRs matched、0 对活跃冲突(修正前
+    死分支间 2 对噪音被 decision-020 并发才算撞过滤)、地图渲染真数据
+    截图验证。测试:core vitest 42/42;demo vitest 44/44 +
+    Playwright 170/170 全绿。
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [backend-m1, team-visibility, github-integration, sqlite, cli, gitfacade]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "M1 backend session 2026-07-12(handoff:后端 M1 range ①)"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-github-003"
+    type: implements
+    detail: "② 端到端实证硬门槛,本切片完成"
+  - target: "decision-project-025"
+    type: relates_to
+    detail: "core 九模块中 GitFacade + GraphStore 存储门先行落地"
+anchors:
+  - file: "workbench/packages/core/src/git-facade.ts"
+    symbols: [GitFacade, GhFacade, parseRemoteSlug]
+  - file: "workbench/packages/core/src/team-sync.ts"
+    symbols: [syncTeamSnapshot, selectConflictCandidates]
+  - file: "workbench/packages/core/src/fixture-export.ts"
+    symbols: [exportTeamMapFixture]
+  - file: "workbench/packages/core/src/db.ts"
+    symbols: [openDb, defaultDbPath]
+  - file: "workbench/packages/cli/src/main.ts"
+    symbols: [main]

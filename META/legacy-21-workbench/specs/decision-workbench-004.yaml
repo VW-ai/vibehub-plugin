@@ -1,0 +1,48 @@
+spec_id: "decision-workbench-004"
+type: decision
+state: active
+intent:
+  summary: "队友 branch → 地图任务的诚实映射语义:冲突候选 = unmerged ∧ (无 PR ∨ open PR)(020 并发才算撞平移到远端);unmerged→stalled/PR 收口→done(basic 档);蒸馏前全落单一 Uncategorized 地盘,冲突 sharedSymbols = 文件路径;detectedAt = 首次检出、跨 sync 保龄"
+  detail: |
+    M1 ① 实现中定下的四条映射语义,实现者拍板、待 Wayne 晨审:
+    1. **冲突候选过滤**:merge-tree 两两配对只在"活跃"分支间做 —
+       unmerged 且(无 PR 或 PR open)。PR closed/merged 的分支是
+       已收口的工作不是并发写者(decision-project-020 并发才算撞的
+       远端平移)。实证:Vibehub repo 上过滤前 2 对全是死分支噪音,
+       过滤后 0 对,信号纯净。
+    2. **basic 档状态映射**:队友 branch 无本地 session,signalTier =
+       basic;unmerged → stalled(basic 推不出 waiting,先例
+       extreme-scope-overload fixture)、PR merged/closed → done、
+       merged 无 PR 事实的分支不进任务列(旧分支残迹);statusDetail
+       恒缺席(契约:basic 档不合成)。
+    3. **蒸馏前地盘**:全部足迹落单一 "Uncategorized" 地盘
+       (install-types UNCATEGORIZED_TERRITORY_ID 同思想);冲突的
+       sharedSymbols 用 merge-tree 冲突文件路径(蒸馏后才有 symbol
+       锚点);demoLayout 全幅矩形为 presentation-only,treemap spike
+       后替换。
+    4. **冲突年龄**:detectedAt = 首次检出时间,跨 re-sync 保留
+       (menubar 冲突行 age basis = detectedAt,iter-20 fork 已定);
+       不再相交即剪除(resolved is resolved)。
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "workbench"
+  tags: [team-visibility, conflict, mapping, honesty, basic-tier]
+provenance:
+  source_type: manual_input
+  confidence: 0.8
+  source_ref: "M1 backend session 2026-07-12,实现期拍板待审"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-020"
+    type: relates_to
+    detail: "并发才算撞判据平移到远端分支"
+  - target: "decision-github-002"
+    type: implements
+    detail: "纯 git+gh 通路的数据语义细则"
+anchors:
+  - file: "workbench/packages/core/src/team-sync.ts"
+    symbols: [selectConflictCandidates]
+  - file: "workbench/packages/core/src/fixture-export.ts"
+    symbols: [exportTeamMapFixture]

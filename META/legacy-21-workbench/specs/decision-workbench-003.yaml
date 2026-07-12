@@ -1,6 +1,6 @@
 spec_id: "decision-workbench-003"
 type: decision
-state: draft
+state: active
 intent:
   summary: "多主体条目的统一语言 = subject-first:单主体行以事名为标签;多主体行(冲突等)以争夺物为标签 + 参与数 pill('Order state machine — 2 writing'),hover/expand 列参与者;徽章与计数把 conflict 计入'需要你'"
   detail: |

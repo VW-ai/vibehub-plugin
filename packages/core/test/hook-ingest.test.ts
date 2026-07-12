@@ -1,0 +1,224 @@
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { openDb, type Db } from "../src/db.js";
+import {
+  ingestHookEvent,
+  lastAssistantText,
+  type HookPayload,
+} from "../src/hook-ingest.js";
+import { nextState } from "../src/state-machine.js";
+import {
+  enqueueInjection,
+  readFootprints,
+  readTask,
+  readTimeline,
+  sessionIdentity,
+} from "../src/activity-store.js";
+import { getRepoByRoot } from "../src/team-store.js";
+import { git, makeScratchRepo, type ScratchRepo } from "./helpers.js";
+
+const T = (m: number): Date => new Date(`2026-07-12T10:${String(m).padStart(2, "0")}:00.000Z`);
+
+describe("nextState (021: five states, no daemon)", () => {
+  it("activity flows to running", () => {
+    expect(nextState("queued", "SessionStart")).toBe("running");
+    expect(nextState("waiting", "UserPromptSubmit")).toBe("running");
+    expect(nextState("running", "PostToolUse")).toBe("running");
+  });
+  it("stop-shaped events flow to waiting", () => {
+    expect(nextState("running", "Notification")).toBe("waiting");
+    expect(nextState("running", "Stop")).toBe("waiting");
+  });
+  it("session end flows to done", () => {
+    expect(nextState("running", "SessionEnd")).toBe("done");
+  });
+});
+
+describe("ingestHookEvent on a scratch repo", () => {
+  let repo: ScratchRepo;
+  let dir: string;
+  let db: Db;
+  let taskBranch: string;
+
+  const payload = (extra: Partial<HookPayload> = {}): HookPayload => ({
+    session_id: "sess-1",
+    cwd: repo.work,
+    ...extra,
+  });
+
+  beforeEach(() => {
+    repo = makeScratchRepo();
+    git(repo.work, "checkout", "-b", "vibehub/fix-login");
+    taskBranch = "branch:vibehub/fix-login";
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-hook-"));
+    db = openDb(path.join(dir, "t.db"));
+  });
+  afterEach(() => {
+    db.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+    repo.cleanup();
+  });
+
+  it("auto-captures the branch as an unnamed 事 (017/024) and runs the state machine", () => {
+    const r = ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    expect(r.taskId).toBe(taskBranch);
+    expect(r.stateBefore).toBeNull();
+    expect(r.stateAfter).toBe("running");
+
+    const task = readTask(db, taskBranch)!;
+    expect(task.title).toBe("vibehub/fix-login"); // branch = the only honest title
+    expect(task.signalTier).toBe("hooks");
+    expect(getRepoByRoot(db, repo.work)).not.toBeNull();
+  });
+
+  it("first prompt = launch, later prompts = user_injection (contract LaunchEvent)", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    ingestHookEvent(db, "UserPromptSubmit", payload({ prompt: "Fix the login retry." }), { now: () => T(1) });
+    ingestHookEvent(db, "UserPromptSubmit", payload({ prompt: "Also add a test." }), { now: () => T(2) });
+
+    const tl = readTimeline(db, taskBranch);
+    expect(tl.filter((e) => e.type === "launch")).toHaveLength(1);
+    expect(tl[0]).toMatchObject({ type: "launch", prompt: "Fix the login retry." });
+    expect(tl.filter((e) => e.type === "user_injection")).toHaveLength(1);
+  });
+
+  it("PostToolUse writes repo-relative footprints, edit vs read", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    ingestHookEvent(db, "PostToolUse", payload({
+      tool_name: "Edit",
+      tool_input: { file_path: path.join(repo.work, "src/auth/login.ts") },
+    }), { now: () => T(1) });
+    ingestHookEvent(db, "PostToolUse", payload({
+      tool_name: "Read",
+      tool_input: { file_path: path.join(repo.work, "src/shared.ts") },
+    }), { now: () => T(2) });
+    ingestHookEvent(db, "PostToolUse", payload({
+      tool_name: "Bash",
+      tool_input: { command: "ls" },
+    }), { now: () => T(3) });
+
+    expect(readFootprints(db, taskBranch)).toEqual([
+      { taskId: taskBranch, sessionId: "sess-1", path: "src/auth/login.ts", action: "edit", at: T(1).toISOString() },
+      { taskId: taskBranch, sessionId: "sess-1", path: "src/shared.ts", action: "read", at: T(2).toISOString() },
+    ]);
+  });
+
+  it("Notification → question event + waiting with verbatim cause", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const r = ingestHookEvent(db, "Notification", payload({ message: "Which retry pattern?" }), { now: () => T(1) });
+    expect(r.stateAfter).toBe("waiting");
+
+    const task = readTask(db, taskBranch)!;
+    expect(task.statusDetail).toBe("Which retry pattern?");
+    expect(task.stateSince).toBe(T(1).toISOString());
+
+    const tl = readTimeline(db, taskBranch);
+    expect(tl.find((e) => e.type === "question")).toMatchObject({
+      text: "Which retry pattern?",
+      transitionTo: "waiting",
+    });
+    expect(tl.find((e) => e.type === "state_transition")).toMatchObject({
+      from: "running",
+      to: "waiting",
+      cause: "Which retry pattern?",
+    });
+  });
+
+  it("Stop harvests the agent's own last text as self_report (verbatim)", () => {
+    const transcript = path.join(dir, "transcript.jsonl");
+    fs.writeFileSync(
+      transcript,
+      [
+        JSON.stringify({ type: "user", message: { role: "user", content: "hi" } }),
+        JSON.stringify({
+          type: "assistant",
+          message: {
+            role: "assistant",
+            content: [{ type: "text", text: "Done. Retry guard added, 3 tests green." }],
+          },
+        }),
+        "",
+      ].join("\n"),
+    );
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    ingestHookEvent(db, "Stop", payload({ transcript_path: transcript }), { now: () => T(1) });
+
+    const tl = readTimeline(db, taskBranch);
+    expect(tl.find((e) => e.type === "self_report")).toMatchObject({
+      text: "Done. Retry guard added, 3 tests green.",
+    });
+    expect(readTask(db, taskBranch)!.state).toBe("waiting");
+  });
+
+  it("SessionEnd closes the session and the task goes done", () => {
+    ingestHookEvent(db, "SessionStart", payload({ transcript_path: "/tmp/x.jsonl" }), { now: () => T(0) });
+    ingestHookEvent(db, "SessionEnd", payload({ reason: "exit" }), { now: () => T(9) });
+
+    expect(readTask(db, taskBranch)!.state).toBe("done");
+    const identity = sessionIdentity(db, taskBranch, "sess-1")!;
+    expect(identity.sessionOrdinal).toBe(1);
+  });
+
+  it("claims queued injections at the turn boundary and emits hook output (018)", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    enqueueInjection(db, repoId, taskBranch, "inject", "Skip the legacy path.", T(1).toISOString());
+
+    const r = ingestHookEvent(db, "PostToolUse", payload({
+      tool_name: "Edit",
+      tool_input: { file_path: path.join(repo.work, "src/a.ts") },
+    }), { now: () => T(2) });
+
+    expect(r.output).toEqual({
+      hookSpecificOutput: {
+        hookEventName: "PostToolUse",
+        additionalContext: "[Vibehub] Message(s) from your user:\n- Skip the legacy path.",
+      },
+    });
+    // delivery is recorded in the timeline (介入必入史, 023)
+    expect(readTimeline(db, taskBranch).find((e) => e.type === "user_injection")).toMatchObject({
+      mode: "inject",
+      text: "Skip the legacy path.",
+    });
+    // never double-delivered
+    const r2 = ingestHookEvent(db, "PostToolUse", payload({
+      tool_name: "Edit",
+      tool_input: { file_path: path.join(repo.work, "src/a.ts") },
+    }), { now: () => T(3) });
+    expect(r2.output).toBeUndefined();
+  });
+
+  it("a session in a WORKTREE lands on the same repo domain (github-004)", () => {
+    const wt = path.join(repo.root, "wt");
+    git(repo.work, "worktree", "add", "-b", "vibehub/wt-task", wt);
+    ingestHookEvent(db, "SessionStart", payload({ cwd: wt, session_id: "sess-wt" }), { now: () => T(0) });
+
+    const task = readTask(db, "branch:vibehub/wt-task")!;
+    expect(task.worktreePath).toBe(wt);
+    // one repo domain: the worktree session's repo row is the MAIN root
+    expect(getRepoByRoot(db, repo.work)).not.toBeNull();
+  });
+});
+
+describe("lastAssistantText", () => {
+  it("returns null for a missing file", () => {
+    expect(lastAssistantText("/nope/nothing.jsonl")).toBeNull();
+  });
+  it("skips trailing non-assistant entries and joins text blocks", () => {
+    const p = path.join(os.tmpdir(), `vibehub-tt-${process.pid}.jsonl`);
+    fs.writeFileSync(
+      p,
+      [
+        JSON.stringify({ type: "assistant", message: { role: "assistant", content: [{ type: "text", text: "First." }] } }),
+        JSON.stringify({ type: "assistant", message: { role: "assistant", content: [{ type: "text", text: "Second A." }, { type: "text", text: "Second B." }] } }),
+        JSON.stringify({ type: "user", message: { role: "user", content: "ok" } }),
+        "not json at all",
+        "",
+      ].join("\n"),
+    );
+    expect(lastAssistantText(p)).toBe("Second A.\nSecond B.");
+    fs.rmSync(p);
+  });
+});

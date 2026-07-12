@@ -31,4 +31,60 @@ progress:
       status: completed
       gate: false
       notes: "A+B+④+⑦ done. rev-2 (iter-22): (④, REVOKES iter-7 scrim-over-rail, quote '左栏不要变灰') rail stays LIVE under an open panel/conflict card — scrim+blur cover the CANVAS only (left = --rail-w; conflict card centers over the canvas; divider z-5 stays resizable); another rail card = ONE-click swap-in-place (remount per task via key, opener re-targets for focus-return); same card/pill = toggle close; correlate suppressed while a modal is open (fork logged — veiled canvas would give half-feedback; focus-return correlate flash ⑤ still fires after close); mutual exclusivity + close paths unchanged; install screen keeps full scrim (empty placeholder rail). (⑦, decision-workbench-003, REVOKES iter-20 waiting-only badge) menubar badge = waiting + conflict PAIRS (a pair counts once); tips enumerate both ('1 waiting · 1 conflict'); stale badge stays gray/static; needs-you rows already subject-first — verified, no other UI change. Gates rev-2: tsc clean, build green, vitest 44/44 (42+2: single-waiting promise, pair-cap boundary), Playwright 170/170 (165+5: live-rail ×4, conflict canvas-scrim/toggle ×1; conflict-parity mutual-exclusivity rewired through the now-clickable rail pill) on DEMO_PORT=5499. All assertion deltas documented in DECISIONS-NEEDED rev-2 entries. rev-1 (iter-21) record: WAYNE VERDICTS 2026-07-12 (rule overrides, ratified — logged in DECISIONS-NEEDED): (A) rail-card chip rows WRAP, all chips visible, cards grow taller; +N demoted to >12-chip pathological fallback (first 11 + +N, deduped enumerating tooltip); branch chips show the FULL branch middle-truncated (middleTruncate() pure fn, 28-char budget sized to the 240px min rail; scope chips keep tail-ellipsis); fixture task-pathological-scopes (15 chips) keeps +N exercised. (B) resizable rail/canvas split: pointer-drag divider (no library, grab-offset-correct), clamp 240–480px, double-click resets 300px, localStorage persistence, keyboard accessible (role=separator + aria-value*, arrows ±16px); net-zero layout at the 300px default so fresh contexts stay v8-identical; chip wrap responds live to rail width (asserted at both clamp extremes). Tests: vitest 27→42 (derive.test.ts: middleTruncate edges + chip rules); Playwright 156→165 (old +8-collapse test → wrap/middle-truncation/pathological trio; rail-resize.spec.ts ×7); all spec URLs route through tests/env.ts DEMO_PORT so suites run on a private port (dev server on 5199 untouched). Gates: tsc clean, build green, vitest 42/42, Playwright 165/165 (DEMO_PORT=5299). Documented parity deltas: third scope-overload rail card; full-branch chips; 3-chip baseline cards may wrap to two chip rows."
-  commits: []
+    - id: b1-team-visibility-slice
+      name: "Backend M1 ①: 团队可见端到端垂直切片(git+gh→SQLite→map,decision-github-003 ② 硬门槛)"
+      status: completed
+      gate: true
+      notes: "workbench/packages/core+cli 诞生。GitFacade(fetch/branch/足迹 diff/merge-tree 预警/gh pr,worktree 归域 github-004)+ SQLite WAL 团队子集(repos/sync_state/team_branches/team_branch_files/team_conflicts,按 repo 分域)+ team-sync + MapFixture 导出 + demo ?fixture=live(缺席诚实回退)。映射语义四条落 decision-workbench-004(draft 待审):冲突候选=unmerged∧(无PR∨open)(020 并发才算撞)、basic 档 unmerged→stalled/PR 收口→done、蒸馏前单一 Uncategorized 地盘、detectedAt 首检保龄。Vibehub 自身 repo 实证零服务端:9 branches/3 unmerged/1 活跃、7 PRs matched、0 活跃冲突(死分支噪音 2 对被过滤)、真数据地图截图验证。Gates: core vitest 42/42、demo vitest 44/44、Playwright 170/170、tsc clean ×3 包。"
+    - id: b2-three-domain-schema
+      name: "Backend M1 ②: SQLite 三表域 schema(图/运行/配置,五 types 文件直译,decision-025)"
+      status: completed
+      gate: true
+      notes: "migration 002(v1→v2 升级保数据,测试钉死)。运行域 tasks(五态 CHECK)/sessions/events(11 型 union 判别列+JSON verbatim 往返)/footprints/scopes(seq 保申报序)/injections(claim 原子 FIFO 不双发)/conflicts+conflict_symbols(序对齐不变式)/conflict_diagnoses(claude -p verbatim)/notifications(预算账本)/mapping_runs;图域 features(territory/sub-block 同表)/specs(无 D)/anchors/edges;配置域 settings(repo 遮蔽 global)。DERIVED-NEVER-STORED 全线:milestone 档/twist/filesTouched/ordinal/staleness/geometry 不建列,ActivityStore/GraphStore 读时派生(read 不计 staleness、未锚文件=诚实灰区,均有测试)。契约 types ×4 canonical 家入 core/src/contract。Gates: vitest 59/59、tsc clean、build 绿。"
+    - id: b3-hook-cli
+      name: "Backend M1 ③: `vibehub hook <event>` CLI 心脏 + 真 session 事件流校准 fixture"
+      status: completed
+      gate: true
+      notes: "hook-ingest(core)+ vibehub hook <event>(CLI,恒 exit 0,错误吞 ~/.vibehub/hook.log)。branch=join key 自动捕事(017/024);worktree session branch/toplevel 从 cwd 解析(修 facade 锚主 root 的 bug+回归测试);UserPromptSubmit 首条→launch 后续→user_injection、PostToolUse→edit/read 足迹、Notification→question+waiting、Stop→self_report(transcript 尾 assistant 原文机械解析)+waiting、SessionEnd→done;StateMachine 纯函数,stalled=读时观察不存转移(016 无 daemon);注入原子 claim→additionalContext 输出→入时间线不双发(018/023)。真 claude -p session 校准:launch/足迹 edit+read/self_report/state_transition ×2 全收,形状与契约一致,hook.log 零错。Gates: vitest 72/72、tsc clean、build 绿。"
+    - id: b4-demo-real-read
+      name: "Backend M1 ④: demo 前端 fixture → 真 SQLite 读(170 e2e 保绿)"
+      status: completed
+      gate: true
+      notes: "vite middleware /live-fixture.json 每请求经 core dist 现场 openDb→exportTeamMapFixture(连续请求 capturedAt 不同=实证真读;Tauri 读路径的 dev 替身,浏览器 bundle 不碰 native);无 DB/未 sync 依次回退静态导出→404→前端警告降级。fixture-export 合并本地 hook 任务:同 branch hooks 档赢(真五态/statusDetail/worktreePath,远端只贡献 PR 事实)、未 push branch 照进、scope 申报优先足迹自陈兜底。e2e 170→172(live boot 两侧分支+未知名回退)、demo vitest 44/44、core 74/74、tsc clean。真环境截图:地图实时显示 M1 三切片分支与 walking-skeleton 的并发冲突。遗留:demo 契约类型副本待 core browser-safe subpath export 后消灭(镜像纪律生效中)。"
+  commits:
+    - hash: "53c834d"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(backend-m1): demo 切真 SQLite 读 — vite middleware 现场导出 + 本地任务合并"
+      files_changed: 12
+      specs_affected:
+        - change-2026-07-12-demo-live-read (created)
+      milestones_affected:
+        - b4-demo-real-read (→ completed)
+    - hash: "03ef9dd"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(backend-m1): vibehub hook CLI 心脏 — 写事件→查注入→退出,真 session 校准通过"
+      files_changed: 9
+      specs_affected:
+        - change-2026-07-12-hook-cli-heart (created)
+      milestones_affected:
+        - b3-hook-cli (→ completed)
+    - hash: "33876f3"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(backend-m1): 三表域 schema 直译 — migration 002 + ActivityStore/GraphStore"
+      files_changed: 14
+      specs_affected:
+        - change-2026-07-12-three-domain-schema (created)
+      milestones_affected:
+        - b2-three-domain-schema (→ completed)
+    - hash: "5cc6a1f"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(backend-m1): team-visibility vertical slice — core+cli 诞生,git+gh→SQLite→map 端到端实证"
+      files_changed: 31
+      specs_affected:
+        - change-2026-07-12-team-visibility-slice (created)
+        - decision-workbench-004 (created, draft)
+        - decision-workbench-001 (draft → active)
+        - decision-workbench-002 (draft → active)
+        - decision-workbench-003 (draft → active)
+      milestones_affected:
+        - b1-team-visibility-slice (→ completed)
