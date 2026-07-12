@@ -187,17 +187,40 @@ function staleNote(fx: MapFixture): StaleNoteView | null {
 
 /* ── badge + item tip ───────────────────────────────────────────────────── */
 
-function badge(fx: MapFixture, waiting: number): MenubarBadgeView | null {
-  if (waiting === 0) return null;
-  const capped = waiting > BADGE_CAP;
-  const text = capped ? `${BADGE_CAP}+` : String(waiting);
+/**
+ * "1 waiting · 1 conflict" — the badge/item enumeration (zeros hidden, same
+ * rule as the stat pills). Empty string when nothing needs you.
+ */
+function needsEnum(waiting: number, conflicts: number): string {
+  const parts: string[] = [];
+  if (waiting > 0) parts.push(`${waiting} waiting`);
+  if (conflicts > 0) parts.push(`${conflicts} conflict${conflicts === 1 ? "" : "s"}`);
+  return parts.join(" · ");
+}
+
+/**
+ * rev-2 (Wayne verdict ⑦, decision-workbench-003): the badge counts
+ * everything that NEEDS YOU — waiting tasks + conflict PAIRS (a pair counts
+ * once, same as its single needs-you row). REVOKES iter-20's waiting-only
+ * badge. Stale behavior unchanged: gray + static, last-known count.
+ */
+function badge(
+  fx: MapFixture,
+  waiting: number,
+  conflicts: number,
+): MenubarBadgeView | null {
+  const total = waiting + conflicts;
+  if (total === 0) return null;
+  const capped = total > BADGE_CAP;
+  const text = capped ? `${BADGE_CAP}+` : String(total);
+  const parts = needsEnum(waiting, conflicts);
   const age = fetchAge(fx);
   const tip = fx.sync.stale
-    ? `Last known: ${waiting} task${waiting === 1 ? "" : "s"} waiting. Repo data hasn't synced for ${age ?? "ever"}, so this count may be behind.`
+    ? `Last known: ${parts}. Repo data hasn't synced for ${age ?? "ever"}, so this count may be behind.`
     : capped
-      ? `${waiting} tasks waiting on your input — the badge caps at ${BADGE_CAP}+, exact counts live here and in the dropdown`
-      : `${waiting} task${waiting === 1 ? "" : "s"} waiting on your input`;
-  return { text, exact: waiting, stale: fx.sync.stale, tip };
+      ? `${parts} — the badge caps at ${BADGE_CAP}+, exact counts live here and in the dropdown`
+      : `${parts} need${total === 1 ? "s" : ""} you`;
+  return { text, exact: total, stale: fx.sync.stale, tip };
 }
 
 function itemTip(
@@ -206,19 +229,21 @@ function itemTip(
   conflicts: number,
   running: number,
 ): string {
+  const parts = needsEnum(waiting, conflicts);
+  const total = waiting + conflicts;
   if (fx.sync.stale) {
     const age = fetchAge(fx) ?? "ever";
-    return `Vibehub — last known: ${waiting} task${waiting === 1 ? "" : "s"} waiting. Repo data hasn't synced for ${age}; open the window to sync.`;
+    return `Vibehub — last known: ${parts || "nothing needed you"}. Repo data hasn't synced for ${age}; open the window to sync.`;
   }
-  if (waiting === 0 && conflicts === 0)
+  if (total === 0)
     return `Vibehub — all quiet. ${running === 0 ? "No sessions running" : `${running} session${running === 1 ? "" : "s"} running`}, nothing needs you.`;
   if (waiting === 0)
     return `Vibehub — ${conflicts} conflict${conflicts === 1 ? "" : "s"} need${conflicts === 1 ? "s" : ""} adjudication.`;
-  if (waiting > BADGE_CAP)
-    return `Vibehub — ${waiting} tasks waiting on you (badge caps at ${BADGE_CAP}+).`;
-  if (waiting === 1)
+  if (total > BADGE_CAP)
+    return `Vibehub — ${parts} (the badge caps at ${BADGE_CAP}+).`;
+  if (total === 1)
     return "Vibehub — 1 task waiting on you. The app keeps watching from here even when the window is closed.";
-  return `Vibehub — ${waiting} tasks waiting on you.`;
+  return `Vibehub — ${parts} need you.`;
 }
 
 /* ── desktop clock (context scaffolding, still data-driven) ─────────────── */
@@ -264,7 +289,7 @@ export function deriveMenubar(fx: MapFixture): MenubarSummary {
     fresh: fresh(fx),
     staleNote: staleNote(fx),
     stats: stats(waiting, conflicts, running),
-    badge: badge(fx, waiting),
+    badge: badge(fx, waiting, conflicts),
     needsYou: ny,
     quiet,
     itemTip: itemTip(fx, waiting, conflicts, running),

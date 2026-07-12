@@ -89,9 +89,12 @@ svg{vertical-align:-2px}
    straddles the rail's existing 1px border with negative margins (net 0px of
    layout — canvas geometry at the default 300px is byte-identical to v8).
    Drag 240–480px, double-click resets 300, arrow keys ±16, width persists.
-   z-2 keeps it grabbable over territory edges; the modal scrim (z-4) still
-   covers it. Affordance: an ink line materializes on hover/drag/focus. */
-.divider{flex:none;width:7px;margin:0 -3px;position:relative;z-index:2;cursor:col-resize;background:transparent}
+   z-5 keeps it grabbable over territory edges AND over the modal scrim
+   (rev-2, verdict ④: the rail stays live while a panel/card is open, and
+   the divider is the rail's edge control — it never overlaps the 520px
+   right-anchored panel at the 480px clamp on ≥1280 viewports). Affordance:
+   an ink line materializes on hover/drag/focus. */
+.divider{flex:none;width:7px;margin:0 -3px;position:relative;z-index:5;cursor:col-resize;background:transparent}
 .divider::after{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;background:transparent;transition:background var(--t-fast) var(--ease)}
 .divider:hover::after,.divider.dragging::after{background:var(--ink-300);left:2px;width:3px;border-radius:2px}
 .divider:focus-visible{outline:none}
@@ -168,9 +171,13 @@ svg{vertical-align:-2px}
    them from v8 unchanged, one definition serves both surfaces. */
 
 /* map context while the panel is open: blur the canvas (S2: 1.5px) and put
-   a scrim over the whole .main (rail included — click anywhere closes) */
+   a scrim over the CANVAS ONLY — rev-2 (Wayne verdict ④, "左栏不要变灰"):
+   the rail stays live and undimmed; the scrim's left edge = the rail width
+   (--rail-w, set inline on .main; defaults to 0 on scrim-only surfaces like
+   the first-run screen, where full coverage is unchanged). Clicking the
+   veiled map still closes. */
 .canvas.veiled{filter:blur(1.5px)}
-.scrim{position:absolute;inset:0;background:rgba(25,27,31,.22);cursor:pointer;z-index:4;animation:scrimIn var(--t-base) var(--ease) backwards}
+.scrim{position:absolute;top:0;right:0;bottom:0;left:var(--rail-w,0);background:rgba(25,27,31,.22);cursor:pointer;z-index:4;animation:scrimIn var(--t-base) var(--ease) backwards}
 @keyframes scrimIn{from{opacity:0}to{opacity:1}}
 
 /* the panel: slides in over the map from the right, 520px (S2 verbatim) */
@@ -268,8 +275,10 @@ svg{vertical-align:-2px}
    map + deck ON PURPOSE — S2 copied them from v8 unchanged. */
 
 /* centered 640px modal over the scrimmed map (.center sits inside .main,
-   same underlay language as the task panel; scrim z-4 → modal z-5) */
-.center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:var(--sp-6);pointer-events:none;z-index:5}
+   same underlay language as the task panel; scrim z-4 → modal z-5).
+   rev-2 (verdict ④): centers within the CANVAS (left = --rail-w) so the
+   card never floats over the live rail. */
+.center{position:absolute;top:0;right:0;bottom:0;left:var(--rail-w,0);display:flex;align-items:center;justify-content:center;padding:var(--sp-6);pointer-events:none;z-index:5}
 .modal{pointer-events:auto;width:640px;max-width:100%;max-height:100%;background:var(--card);border-radius:var(--r-l);display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,17,21,.14),0 22px 70px rgba(15,17,21,.28);animation:cardIn var(--t-base) var(--ease) backwards}
 @keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
 

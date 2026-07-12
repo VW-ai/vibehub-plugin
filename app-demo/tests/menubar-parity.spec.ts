@@ -10,7 +10,9 @@ import { BASE } from "./env";
  *      hand-wrote compound "1h44m"/"1h12m", which derive.ts forbids);
  *   3. "2 conflicts" pluralized (static's "2 conflict" treated as a typo);
  *   4. clock derives from capturedAt ("Sun Jul 12  10:22") instead of the
- *      static's decorative "Fri Jul 11  09:41".
+ *      static's decorative "Fri Jul 11  09:41";
+ *   5. rev-2 (Wayne verdict ⑦): the badge counts waiting + conflict PAIRS —
+ *      busy/stale render "2" where the static (and iter-20) showed "1".
  */
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
@@ -102,7 +104,8 @@ test("quiet: no badge, alive-only counts, honest all-quiet line", async ({ page 
 test("stale: gray static badge, honesty line, last-known counts", async ({ page }) => {
   await open(page, "stale");
   const badge = page.locator(".vhitem .badge");
-  await expect(badge).toHaveText("1");
+  // DELTA 5: waiting + conflict pair = 2 (rev-2 verdict ⑦)
+  await expect(badge).toHaveText("2");
   await expect(badge).toHaveClass(/stale/);
   // stale badge withholds the breathe animation (motion = live urgency)
   const anim = await badge.evaluate((el) => getComputedStyle(el).animationName);
@@ -204,5 +207,6 @@ test("?menubar=1 bare flag opens the busy variant", async ({ page }) => {
   await page.goto(`${BASE}/?menubar=1&switcher=0`);
   await page.locator(".drop").waitFor();
   await expect(page.locator(".gh")).toHaveText("Needs you 2");
-  await expect(page.locator(".vhitem .badge")).toHaveText("1");
+  // DELTA 5: badge = waiting + conflict pairs (rev-2 verdict ⑦)
+  await expect(page.locator(".vhitem .badge")).toHaveText("2");
 });

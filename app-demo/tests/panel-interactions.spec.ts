@@ -96,9 +96,58 @@ test.describe("close paths (focus returns to the opening card)", () => {
 
   test("scrim click closes; focus returns to the opening card", async ({ page }) => {
     await openAuthPanel(page);
-    // click well left of the panel (the scrim spans the whole .main)
+    // click well left of the panel — rev-2 (verdict ④): the scrim spans the
+    // CANVAS only (the rail stays live), so the position is scrim-relative
     await page.locator(".scrim").click({ position: { x: 60, y: 300 } });
     await expect(page.locator(".panel")).toHaveCount(0);
+    await expect.poll(() => focusedTask(page)).toBe("task-refactor-auth");
+  });
+});
+
+/* ── rev-2 (Wayne verdict ④, "左栏不要变灰"): live rail under an open panel ─
+ * REVOKES iter-7's "scrim covers the rail". Changed assertions documented in
+ * DECISIONS-NEEDED (rev-2 entry): the old suite had no scrim-on-rail or
+ * two-click-switch tests to rewrite — these four are NEW coverage. */
+
+test.describe("live rail while the panel is open (rev-2, verdict ④)", () => {
+  test("scrim covers the canvas only; the rail stays undimmed", async ({ page }) => {
+    await openAuthPanel(page);
+    const rail = (await page.locator(".rail").boundingBox())!;
+    const scrim = (await page.locator(".scrim").boundingBox())!;
+    // the scrim's left edge sits at the rail/canvas seam — never over the rail
+    expect(Math.abs(scrim.x - (rail.x + rail.width))).toBeLessThanOrEqual(1);
+    await expect(page.locator(".canvas")).toHaveClass(/veiled/);
+    await expect(page.locator(".rail")).not.toHaveClass(/dim/);
+  });
+
+  test("correlate is suppressed while the panel is open (the canvas is veiled)", async ({ page }) => {
+    await openAuthPanel(page);
+    // hovering a rail card must NOT drive correlate against the veiled map:
+    // no rail dim, no canvas focus — the card keeps its plain hover affordance
+    await page.locator('[data-task="task-auto-retry-payments"]').hover();
+    await page.waitForTimeout(300);
+    await expect(page.locator(".rail")).not.toHaveClass(/dim/);
+    await expect(page.locator(".canvas")).not.toHaveClass(/focus/);
+    await expect(page.locator(".canvas")).toHaveClass(/veiled/);
+  });
+
+  test("clicking another card swaps the panel in place (ONE click, remount per task)", async ({ page }) => {
+    await openAuthPanel(page);
+    await page.locator('[data-task="task-auto-retry-payments"]').click();
+    const panel = page.locator(".panel");
+    await expect(panel).toHaveCount(1); // swapped, never stacked
+    await expect(panel).toHaveAttribute("aria-label", "Task: Auto-retry failed payments");
+    // the swap re-targets the opener: close returns focus to the NEW card
+    await page.keyboard.press("Escape");
+    await expect(panel).toHaveCount(0);
+    await expect.poll(() => focusedTask(page)).toBe("task-auto-retry-payments");
+  });
+
+  test("clicking the SAME card toggles its panel closed", async ({ page }) => {
+    await openAuthPanel(page);
+    await page.locator(AUTH_CARD).click();
+    await expect(page.locator(".panel")).toHaveCount(0);
+    await expect(page.locator(".scrim")).toHaveCount(0);
     await expect.poll(() => focusedTask(page)).toBe("task-refactor-auth");
   });
 });

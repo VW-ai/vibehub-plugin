@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import type { MapFixture, Task, Territory } from "../types";
 import type { TaskPanelFixture } from "../panel-types";
 import type { ConflictCardFixture } from "../conflict-types";
@@ -171,14 +171,22 @@ export function App({
   // Focus returns to the opener on close (keyboard parity: a keyboard user
   // who opened with Enter must land back where they were — recorded
   // principle, Room 20 decision-ledger-viz-001 / dialog convention).
-  // Panel opener = a rail card (looked up by task id, still mounted under
-  // the scrim); conflict opener = the exact element (pill / sub chip /
-  // titlebar stat), captured at open time. null for ?panel= / ?conflict=.
+  // Panel opener = a rail card (looked up by task id — the rail stays live
+  // and mounted beside the scrimmed canvas); conflict opener = the exact
+  // element (pill / sub chip / titlebar stat), captured at open time.
+  // null for ?panel= / ?conflict=.
   const openerTaskId = useRef<string | null>(null);
   const conflictOpener = useRef<HTMLElement | null>(null);
 
   const openTask = (task: Task) => {
-    // Opening the panel kills any live correlate-hover (the scrim takes over)
+    // rev-2 (Wayne verdict ④): the rail stays LIVE under an open panel —
+    // clicking the SAME card toggles its panel closed; clicking another card
+    // swaps the panel content in place (one click, remount via key below).
+    if (panel && panel.task.id === task.id) {
+      closePanel();
+      return;
+    }
+    // Opening the panel kills any live correlate-hover (the canvas veils)
     // and closes the conflict card (mutual exclusivity).
     clearHovers();
     setConflict(null);
@@ -206,6 +214,13 @@ export function App({
    * conflict's first task).
    */
   const openConflict = (conflictId: string, opener: HTMLElement | null, task?: Task) => {
+    // rev-2 (Wayne verdict ④, same treatment as the panel): the pill of the
+    // conflict already on screen toggles its card closed; a different
+    // conflict swaps the card in place (remount via key below).
+    if (conflict && conflict.conflict.id === conflictId) {
+      closeConflict();
+      return;
+    }
     const card = conflictCardForConflict(conflictId);
     if (!card) {
       const fallback =
@@ -290,6 +305,14 @@ export function App({
     );
   }
 
+  // rev-2 (Wayne verdict ④ — "左栏不要变灰"): while a modal surface (panel /
+  // conflict card) is open, the rail stays fully LIVE; the scrim covers the
+  // CANVAS only (left edge = rail width, via the --rail-w custom property).
+  // Correlate is suppressed while a modal is open — the canvas is veiled, so
+  // lighting footprints under the scrim would be dishonest half-feedback;
+  // cards keep their normal hover affordance (fork logged, DECISIONS-NEEDED).
+  const modalOpen = panel !== null || conflict !== null;
+
   return (
     <div className="window">
       <Titlebar
@@ -299,13 +322,18 @@ export function App({
         onFixtureChange={switchFixture}
         onConflictOpen={openConflict}
       />
-      <div className={`main${railDragging ? " rail-resizing" : ""}`}>
+      <div
+        className={`main${railDragging ? " rail-resizing" : ""}`}
+        style={{ "--rail-w": `${railWidth}px` } as CSSProperties}
+      >
         <TaskRail
           fixture={fixture}
           width={railWidth}
           dim={focus}
           hotTaskIds={highlight.hotTaskIds}
-          onTaskHoverStart={setHoverTask}
+          onTaskHoverStart={(t) => {
+            if (!modalOpen) setHoverTask(t);
+          }}
           onTaskHoverEnd={() => setHoverTask(null)}
           onTaskOpen={openTask}
           onConflictOpen={openConflict}

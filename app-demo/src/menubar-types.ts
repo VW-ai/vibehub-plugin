@@ -14,15 +14,16 @@
 /* ── the waiting badge on the menubar item ──────────────────────────────── */
 
 /**
- * The item's top-right count. Counts WAITING tasks only (approved S1: the
- * badge answers "how many sessions are parked on me", conflicts surface in
- * the dropdown + itemTip — fork logged iter-20). null = nothing waits
- * (quiet: no badge, no fake urgency).
+ * The item's top-right count. Counts everything that NEEDS YOU: waiting
+ * tasks + conflict PAIRS — a pair counts once, matching its single
+ * needs-you row (rev-2, Wayne verdict ⑦ / decision-workbench-003; REVOKES
+ * iter-20's waiting-only badge). The tip enumerates both sides
+ * ("1 waiting · 1 conflict"). null = nothing needs you (no fake urgency).
  */
 export interface MenubarBadgeView {
   /** Rendered text: "1" … "99", then "99+" (cap per iter-19 fork). */
   text: string;
-  /** The uncapped count — travels in tips (honesty when capped). */
+  /** The uncapped waiting + conflict-pair total — travels in tips. */
   exact: number;
   /**
    * True when repo data is stale (SyncFreshness.stale): the badge renders

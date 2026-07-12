@@ -80,12 +80,16 @@ test("the overflow line is a selection too (overload)", async ({ page }) => {
 
 /* ── badge per variant: presence, cap, staleness, the ONE animation ─────── */
 
-test("badge matrix: busy 1 (breathing) / quiet none / stale gray-static / overload 12 / flood 99+", async ({
+// rev-2 (Wayne verdict ⑦): the badge counts waiting + conflict PAIRS —
+// busy/stale were "1" (waiting-only) in iter-20, now "2"; the tips
+// enumerate both kinds ("1 waiting · 1 conflict").
+test("badge matrix: busy 2 (breathing) / quiet none / stale gray-static 2 / overload 12 / flood 99+", async ({
   page,
 }) => {
   await open(page, "busy");
   const badge = page.locator(".vhitem .badge");
-  await expect(badge).toHaveText("1");
+  await expect(badge).toHaveText("2");
+  await expect(badge).toHaveAttribute("data-tip", "1 waiting · 1 conflict need you");
   await expect(badge).not.toHaveClass(/stale/);
   expect(await badge.evaluate((el) => getComputedStyle(el).animationName)).toBe("breathe");
 
@@ -93,7 +97,8 @@ test("badge matrix: busy 1 (breathing) / quiet none / stale gray-static / overlo
   await expect(page.locator(".vhitem .badge")).toHaveCount(0);
 
   await open(page, "stale");
-  await expect(badge).toHaveText("1");
+  await expect(badge).toHaveText("2");
+  await expect(badge).toHaveAttribute("data-tip", /Last known: 1 waiting · 1 conflict/);
   await expect(badge).toHaveClass(/stale/);
   expect(await badge.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
 
@@ -102,9 +107,9 @@ test("badge matrix: busy 1 (breathing) / quiet none / stale gray-static / overlo
 
   await open(page, "flood");
   await expect(badge).toHaveText("99+");
-  // honesty when capped: the exact count travels in the tips
-  await expect(badge).toHaveAttribute("data-tip", /143 tasks waiting/);
-  await expect(page.locator(".vhitem")).toHaveAttribute("data-tip", /143 tasks waiting/);
+  // honesty when capped: the exact enumeration travels in the tips
+  await expect(badge).toHaveAttribute("data-tip", /143 waiting · 2 conflicts/);
+  await expect(page.locator(".vhitem")).toHaveAttribute("data-tip", /143 waiting · 2 conflicts/);
 });
 
 /* ── click intent on needs-you rows (every variant that has rows) ───────── */

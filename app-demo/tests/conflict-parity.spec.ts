@@ -149,18 +149,27 @@ test("conflict card and task panel are mutually exclusive", async ({ page }) => 
   await page.goto(`${BASE}/?fixture=v8-baseline&switcher=0`);
   await settle(page);
 
-  // panel open → opening the conflict closes the panel
+  // panel open → opening the conflict closes the panel. rev-2 (verdict ④):
+  // the rail stays LIVE under the open panel, so the rail CONFLICT pill is
+  // clickable directly (iter-12's suite went through the titlebar stat
+  // because the old full-.main scrim buried the pill — assertion changed).
   await page.locator('[data-task="task-refactor-auth"]').click();
   await expect(page.locator(".panel")).toBeVisible();
-  // the pill sits under the scrim while the panel is open — close first is
-  // NOT required from the titlebar stat (it stays above the scrim's z-order
-  // within the titlebar, outside .main)
-  await page.locator(".stat.clash").click();
+  await page.locator('[data-task="task-auto-retry-payments"] .pill').click();
   await expect(page.locator(".modal")).toBeVisible();
   await expect(page.locator(".panel")).toHaveCount(0);
 
   // conflict open → opening a task (via a side row) closes the conflict
   await page.locator(".side").first().click();
+  await expect(page.locator(".panel")).toBeVisible();
+  await expect(page.locator(".modal")).toHaveCount(0);
+
+  // conflict open → clicking a rail CARD swaps to that task's panel too
+  // (the rail is live under the conflict card's canvas-only scrim)
+  await page.locator(".panel .pclose").click();
+  await page.locator(".stat.clash").click();
+  await expect(page.locator(".modal")).toBeVisible();
+  await page.locator('[data-task="task-refactor-auth"]').click();
   await expect(page.locator(".panel")).toBeVisible();
   await expect(page.locator(".modal")).toHaveCount(0);
 });

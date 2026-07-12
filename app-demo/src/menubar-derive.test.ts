@@ -3,6 +3,12 @@
  * MenubarSummary rollup: counts, zeros-hidden, badge cap, oldest-first
  * interleave (waiting × conflict), conflict-pair-as-one-row, staleness,
  * overflow copy, and the N=0 quiet line.
+ *
+ * rev-2 (Wayne verdict ⑦, decision-workbench-003): the badge counts waiting
+ * tasks + conflict PAIRS (a pair counts once); its tip enumerates both
+ * ("1 waiting · 1 conflict"). Changed assertions from the iter-20 suite:
+ * busy badge 1→2; stale badge 1→2 (still gray/static); flood exact 143→145;
+ * the "conflict-only never shows a badge" case now DOES show a badge.
  */
 import { describe, expect, it } from "vitest";
 import type { MapFixture, Task } from "./types";
@@ -63,8 +69,11 @@ describe("busy = v8Baseline", () => {
 
   it("counts + stat pills match the map titlebar (1 waiting · 1 conflict · 3 running)", () => {
     expect(s.stats.map((x) => x.text)).toEqual(["1 waiting", "1 conflict", "3 running"]);
+    // rev-2 verdict ⑦: badge = waiting + conflict pairs = 2 (was 1)
     expect(s.badge).not.toBeNull();
-    expect(s.badge!.text).toBe("1");
+    expect(s.badge!.text).toBe("2");
+    expect(s.badge!.exact).toBe(2);
+    expect(s.badge!.tip).toBe("1 waiting · 1 conflict need you");
     expect(s.badge!.stale).toBe(false);
     expect(s.quiet).toBeNull();
     expect(s.staleNote).toBeNull();
@@ -90,10 +99,16 @@ describe("busy = v8Baseline", () => {
     expect(r2!.tip).toContain("3 shared symbols");
   });
 
-  it("item tip states the single waiting task + the always-watching promise", () => {
-    expect(s.itemTip).toBe(
+  it("item tip enumerates both needs-you kinds (rev-2 verdict ⑦)", () => {
+    expect(s.itemTip).toBe("Vibehub — 1 waiting · 1 conflict need you.");
+  });
+
+  it("a single waiting task and nothing else keeps the always-watching promise", () => {
+    const s1 = deriveMenubar(fixture({ tasks: [task("w", "waiting", 3)] }));
+    expect(s1.itemTip).toBe(
       "Vibehub — 1 task waiting on you. The app keeps watching from here even when the window is closed.",
     );
+    expect(s1.badge!.tip).toBe("1 waiting needs you");
   });
 });
 
@@ -145,9 +160,11 @@ describe("needs-you ordering", () => {
     });
     const s = deriveMenubar(fx);
     expect(s.needsYou.rows[0]!.title).toBe("Exports — 2 writing");
-    // conflict-only fixture: badge counts WAITING only → absent…
-    expect(s.badge).toBeNull();
-    // …but the item tip and stats still surface the conflict (never quiet)
+    // rev-2 verdict ⑦ (REVOKES iter-20): a conflict-only state DOES badge —
+    // the pair counts once, and the tip names what kind of attention it is
+    expect(s.badge).toMatchObject({ text: "1", exact: 1, stale: false });
+    expect(s.badge!.tip).toBe("1 conflict needs you");
+    // the item tip and stats surface it too (never quiet)
     expect(s.quiet).toBeNull();
     expect(s.stats.map((x) => x.kind)).toEqual(["clash", "alive"]);
     expect(s.itemTip).toBe("Vibehub — 1 conflict needs adjudication.");
@@ -182,9 +199,10 @@ describe("quiet", () => {
 describe("stale", () => {
   const s = deriveMenubar(menubarStale);
 
-  it("badge keeps the last-known count but is marked stale (gray/static)", () => {
-    expect(s.badge).toMatchObject({ text: "1", exact: 1, stale: true });
-    expect(s.badge!.tip).toContain("Last known: 1 task waiting");
+  it("badge keeps the last-known count (waiting + pair) but is marked stale (gray/static)", () => {
+    // rev-2 verdict ⑦: 1 waiting + 1 conflict pair = 2 (was 1)
+    expect(s.badge).toMatchObject({ text: "2", exact: 2, stale: true });
+    expect(s.badge!.tip).toContain("Last known: 1 waiting · 1 conflict");
     expect(s.badge!.tip).toContain("47m");
   });
 
@@ -195,7 +213,7 @@ describe("stale", () => {
     );
     expect(s.staleNote!.tip).toContain("hooks");
     expect(s.stats.map((x) => x.text)).toEqual(["1 waiting", "1 conflict", "3 running"]);
-    expect(s.itemTip).toContain("last known: 1 task waiting");
+    expect(s.itemTip).toContain("last known: 1 waiting · 1 conflict");
   });
 
   it("never-fetched repos are stale by construction", () => {
@@ -228,10 +246,13 @@ describe("overload ×12", () => {
 describe("flood 99+", () => {
   const s = deriveMenubar(menubarFlood);
 
-  it("badge caps at 99+ with the exact count preserved", () => {
-    expect(s.badge).toMatchObject({ text: "99+", exact: 143, stale: false });
-    expect(s.badge!.tip).toContain("143 tasks waiting");
-    expect(s.itemTip).toBe("Vibehub — 143 tasks waiting on you (badge caps at 99+).");
+  it("badge caps at 99+ with the exact waiting+pair count preserved", () => {
+    // rev-2 verdict ⑦: 143 waiting + 2 conflict pairs = 145
+    expect(s.badge).toMatchObject({ text: "99+", exact: 145, stale: false });
+    expect(s.badge!.tip).toContain("143 waiting · 2 conflicts");
+    expect(s.itemTip).toBe(
+      "Vibehub — 143 waiting · 2 conflicts (the badge caps at 99+).",
+    );
   });
 
   it("needs-you 145 (143 waiting + 2 conflict pairs), generic overflow copy", () => {
@@ -252,6 +273,36 @@ describe("flood 99+", () => {
     expect(deriveMenubar(mk(BADGE_CAP)).badge!.text).toBe("99");
     expect(deriveMenubar(mk(BADGE_CAP + 1)).badge!.text).toBe("99+");
     expect(deriveMenubar(mk(BADGE_CAP + 1)).badge!.exact).toBe(BADGE_CAP + 1);
+  });
+
+  it("conflict pairs count toward the cap (98 waiting + 1 pair = 99; 99 + 1 caps)", () => {
+    const mk = (n: number) =>
+      fixture({
+        tasks: [
+          ...Array.from({ length: n }, (_, i) => task(`w${i}`, "waiting", i + 1)),
+          { ...task("a", "running", 40), conflictIds: ["c1"] },
+          { ...task("b", "running", 20), conflictIds: ["c1"] },
+        ],
+        conflicts: [
+          {
+            id: "c1",
+            taskIds: ["a", "b"],
+            territoryId: "t-x",
+            subBlockId: "s-x",
+            sharedSymbols: ["CsvWriter.write"],
+            severity: "red",
+            detectedAt: minsAgo(15),
+          },
+        ],
+      });
+    expect(deriveMenubar(mk(BADGE_CAP - 1)).badge).toMatchObject({
+      text: "99",
+      exact: BADGE_CAP,
+    });
+    const capped = deriveMenubar(mk(BADGE_CAP)).badge!;
+    expect(capped.text).toBe("99+");
+    expect(capped.exact).toBe(BADGE_CAP + 1);
+    expect(capped.tip).toContain("99 waiting · 1 conflict");
   });
 });
 

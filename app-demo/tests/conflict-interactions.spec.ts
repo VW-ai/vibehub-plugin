@@ -176,6 +176,25 @@ test("every fixture renders every zone in its expected state, zero errors", asyn
   expect(errors, errors.join("\n")).toHaveLength(0);
 });
 
+/* ── 1b. rev-2 (Wayne verdict ④): live rail under the open card ────────── */
+
+test("conflict card gets the canvas-only scrim; the same pill toggles it closed", async ({ page }) => {
+  await openRedViaPill(page);
+  // same treatment as the panel: scrim starts at the rail/canvas seam, the
+  // card centers over the CANVAS, and the rail stays undimmed + live
+  const rail = (await page.locator(".rail").boundingBox())!;
+  const scrim = (await page.locator(".scrim").boundingBox())!;
+  expect(Math.abs(scrim.x - (rail.x + rail.width))).toBeLessThanOrEqual(1);
+  const modal = (await page.locator(".modal").boundingBox())!;
+  expect(modal.x).toBeGreaterThanOrEqual(rail.x + rail.width - 1);
+  await expect(page.locator(".rail")).not.toHaveClass(/dim/);
+  // clicking the pill of the conflict already on screen = toggle close
+  const pill = page.locator('[data-task="task-auto-retry-payments"] .pill');
+  await pill.click();
+  await expect(page.locator(".modal")).toHaveCount(0);
+  await expect(pill).toBeFocused(); // focus-return rules unchanged
+});
+
 /* ── 2. inject feedback (demo stub, keyboard-driven end to end) ───────── */
 
 test("inject with a typed note → SENT feedback, keyboard-reachable, close returns focus to the opener", async ({ page }) => {
