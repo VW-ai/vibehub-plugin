@@ -29,6 +29,15 @@ intent:
     **与 Helm 协同**:Helm 驾驶舱(对话+知识库+看文件)核心可复用 meta
     session pattern,两边一套设计。
 
+    **介入双通道,按 session 出生地分流(2026-07-12 补):**
+    - 舱内出生(app 发射进 PTY pane):terminal 即 session 真 stdin/stdout,
+      直接对话、实时双向(正在生成也能 Ctrl-C),不经注入队列;hook 采集照常;
+    - 舱外出生(用户终端随手开):tty 归属其终端,app 无法事后接管——
+      hook 回查注入仍是唯一诚实通道(tmux attach 类 hack 违背"骑在既有
+      行为上",不做核心路径)。
+    产品激励白送:舱内发射的事介入体验天然高一档,用户被吸向"从 app 发射",
+    无需说教。
+
     **下一步(到期时)**:先 spike(Tauri+PTY+xterm 跑 claude 验手感),
     产品结合待 spike 实感后再拍。
 constraints:
