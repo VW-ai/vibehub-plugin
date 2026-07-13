@@ -28,6 +28,10 @@ intent:
     B1 协议保持极短,深语境外置到这个把手;description 明写 "don't read
     it up front for routine tasks" 防开工烧 context。全文见设计文档 C4。
 
+    **已知张力(记档不改 v1)**:register_scope 的"声明宽不罚"与越界
+    提醒/冲突精度互斥——wide 声明(**/*)让两者双双失效;v1 接受,
+    日后满屏 wide 声明时此处是根因,杠杆在 description 措辞或 UI 弱化。
+
     **GitHub 为什么做不到(009 必答)**:scope registry 是活 session 的
     实时声明、注入是往运行中 agent 推消息、决策图是本地 SQLite 语义层——
     GitHub 没有"正在跑的 session"这个实体,PR/issue/commit 全是事后工件,

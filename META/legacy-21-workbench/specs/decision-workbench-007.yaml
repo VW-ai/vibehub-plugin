@@ -37,6 +37,15 @@ intent:
       包装头部一行人话;injections 表加可空 context 列,CLI 透传零 LLM;
     - 里程碑分类改向(详见 006/设计文档 块D 修正提案):三分类 →
       精准优先二值,漏判留默认档,ambiguous 桶或不再需要。
+
+    **2026-07-12 顾问 session 五条建议消化(本 session 逐条评审后入档):**
+    - B1 新增候选 D(两义务混合版):协议只留 register_scope+kb_record,
+      kb_retrieve/self_report 降为 description 承载 + 一行存在性提示兜底
+      (MCP deferred loading 下 description 可能不进 context——顾问论据的
+      已知洞,提示行即补丁);与 Wayne 初裁 A 冲突,卡点 2 四选一重裁;
+    - B2 推荐 A、B3 inject 推荐 A(防注入被当新任务重规划),已标注;
+    - B1-meta 标 DEFERRED(M3+ 连场景一起过,不进卡点 2 裁决面);
+    - 文本终裁权交块 E 实证:服从率为一等指标,人逐条读后定稿。
 constraints:
   - kind: must
     rule: "实装后任何微指令文本变更 = 产品改动,必须留 spec 痕"
