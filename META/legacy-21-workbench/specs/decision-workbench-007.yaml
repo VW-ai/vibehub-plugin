@@ -27,6 +27,16 @@ intent:
 
     **通用规则**:全英文(token 效率+通用性);[Vibehub] 前缀标来源;
     语气(命令式 vs 提示式)是 Wayne 手感裁决项——候选刻意横跨两种语气。
+
+    **Wayne 2026-07-12 口述初裁与新增待裁项(正式确认仍在卡点 2):**
+    - B1 初裁 = 候选 A("不要太极简");
+    - 新提案①:B1 尾部加 manual 指针一行(+~18 tok,"when you need it,
+      not before starting work"),配套 MCP get_manual 工具(008/C4);
+    - 新提案②:B3 送达包装加注入现场上下文(injection locus)——app 端
+      入队时机械附带用户写留言时看着的 UI locus(冲突卡/事件/文件),
+      包装头部一行人话;injections 表加可空 context 列,CLI 透传零 LLM;
+    - 里程碑分类改向(详见 006/设计文档 块D 修正提案):三分类 →
+      精准优先二值,漏判留默认档,ambiguous 桶或不再需要。
 constraints:
   - kind: must
     rule: "实装后任何微指令文本变更 = 产品改动,必须留 spec 痕"

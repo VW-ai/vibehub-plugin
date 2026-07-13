@@ -32,7 +32,7 @@
 | **UserPromptSubmit** | 用户提交 prompt、处理前 | launch/user_injection 事件 + `prompt_id` + 里程碑机械分类(块D) | pending 注入送达(**仅队列非空**);无其他注入 | 0 或队列内容+~20 包装 |
 | **PostToolUse**(`Edit\|Write\|MultiEdit\|NotebookEdit\|Read`) | 碰文件的工具成功后 | 足迹(path/action) | ①pending 注入送达(仅非空);②scope 越界自报提醒(**仅机械探测到足迹越出当前声明 write scope,且本份声明未提醒过——每份 scope 声明至多一次**;重新 register_scope = 新契约 = 重新获得一次提醒资格;探测持续、提醒去重,twist 显形不受影响。022 硬条款,Wayne 2026-07-12 裁决) | 0 稳态;提醒 ≤50 一次性 |
 | **Notification**(`agent_needs_input\|permission_prompt\|idle_prompt`) | agent 停下要人 | question 事件 → waiting 态 | 无(能力上不可注) | 0 |
-| **Stop** | agent 一轮说完 | self_report(transcript 尾原话) | pending 注入送达(仅非空)——**送达即唤醒**,异步注入的最速通道 | 0 稳态 |
+| **Stop** | agent 一轮说完 | self_report(transcript 尾原话) | pending 注入送达(仅非空)——**送达即唤醒**,异步注入的最速通道(Wayne 2026-07-12 口述认可) | 0 稳态 |
 | **SessionEnd**(全 reason) | session 终止 | end reason → done 态 | 无 | 0 |
 | **SubagentStart / SubagentStop**(新增,collect-only) | 子 agent 生灭 | agent_id/agent_type 谱系事件(面板"第N个session"与舰队感知的原料) | 无(v1;子 agent 继承主 session 工作,不重复注协议) | 0 |
 | **PostToolUseFailure**(新增,collect-only) | 工具失败后 | error_message → 时间线弱事件(stalled 诊断佐证) | 无 | 0 |
@@ -107,6 +107,16 @@ Skipping these hides your work from your team.
 ```
 [Vibehub] Active. Rules: register_scope before first edit; kb_retrieve before unfamiliar code; kb_record decisions immediately; self_report on direction change.
 ```
+
+**Wayne 2026-07-12 口述初裁:大概候选 A,"不要太极简"。** 待卡点 2 正式确认。
+
+**新提案(Wayne 2026-07-12 口述,待卡点 2 一并裁):协议尾部加一行 manual 指针**(约 +18 tok):
+
+```
+For the full picture of how Vibehub works (the map, conflicts, what your user sees), call get_manual — when you need it, not before starting work.
+```
+
+配套:MCP 面加第五个只读工具 `get_manual`(见块 C4 提案)。设计意图:入口工具就这几个,更深的语境不塞协议里,给 agent 一个"知道去哪看"的把手;"not before starting work" 防止它开工先读文档烧 context。
 
 ### B1-meta. Meta session 角色注入(编排席)
 
@@ -188,6 +198,15 @@ No further tool calls. Answer, then wait.
 ```
 
 **多条 pending 批量**:同一送达点多条按 FIFO 合并为一个块,`>` 引用逐条列出;有任一 pause 则整块按 pause 包装(最严语义胜出)。
+
+**新提案(Wayne 2026-07-12 口述,待卡点 2 一并裁):注入现场上下文(injection locus)。** Wayne 的观察:用户在 app 里写留言时看着的是某张卡(冲突卡/时间线某事件/某文件),光传原话,"这个先别动"的"这个"就丢了。方向修正:缺的不是 agent 的现场(同 session,它自己有),是**用户写留言时的现场**。方案:app 端入队时机械附带 UI locus(conflict id / event id / file path),送达包装头部多一行,如:
+
+```
+[Vibehub] Message from your user (written on the conflict card: refactor-auth × fix-login, shared file src/auth/session.ts):
+> {text}
+```
+
+零 LLM,injections 表加可空 `context` 列(app 组装人话短语,CLI 只透传)。用户没从卡上发(全局留言)则无此行。
 
 ### B4. 角色区分总表(B1/B1-meta 的分流规则)
 
@@ -297,9 +316,20 @@ Record a decision, constraint or intent into the team graph THE MOMENT it happen
 
 **边界**:kb_record 落 draft 态(人晨审 promote,现行 fr 纪律不变);retrieve 的排序/裁剪策略后续吃 Victor plugin 蒸馏的三档拉取表(026 已判可复用)。
 
+### C4. `get_manual`(新提案,Wayne 2026-07-12 口述,待卡点 3 裁)
+
+只读零参(或一个 `topic` 可选参),返回 Vibehub 的 agent-facing manual:系统是什么、用户在地图上看到什么、四个工具的深层语义、好公民行为准则。**description(草)**:
+
+```
+The full picture of how Vibehub works: what your user sees on their map, how your scope/reports/records surface to your team, and how to be a good citizen of a shared repo. Call when you're unsure why a Vibehub reminder appeared, or before heavy multi-session work. Reference material — don't read it up front for routine tasks.
+```
+
+定位:B1 协议保持极短,深语境外置到这个把手;与 MCP server 连接时自述(server instructions)互补——instructions 是被动喂,manual 是主动取。
+
 ---
 
 ## 块 D(已实现,不等卡点)与块 E(全卡点后)
 
 - D:注入送达端补全(Stop/SessionStart 送达点、pause/inject 分包装、送达=claimed_at、超时读侧推导)+ 里程碑机械启发式(workbench-001 兜底档)。见 PR 代码。
-- E:hooks wiring 进 `.claude/settings` + `vibehub init` 更新 + MCP server 实装 + 真 session 端到端实证(本 repo)。
+- **D 修正提案(Wayne 2026-07-12 口述 + 调研,待卡点 2 裁)**:三分类(routine/milestone/ambiguous)改为**精准优先的二值判定**——只有强信号(结构 payload / 加权长度 / 显式指令形)升里程碑档,其余一律留默认档(全量档里用户 prompt 本来就都在,023 两档 toggle 已有兜底,漏判可见、误判才灌水)。调研佐证:文本 backchannel/acknowledgement 是 NLP 成熟问题(dialogue act classification,SwDA 语料),文本域 ack 接近封闭类、词表可覆盖,但**三分类的模糊中段没有现成轻量方案**——精准优先绕开整个模糊区,ambiguous 桶与薄 LLM 再裁可能都不再需要(如需,LLM 从默认档异步"捞升"而非裁模糊)。
+- E:hooks wiring 进 `.claude/settings` + `vibehub init` 更新 + MCP server 实装 + 真 session 端到端实证(本 repo)。**Wayne 2026-07-12:「我们需要自己先用起来」——dogfood 是块 E 的第一目标,优先级前置。**

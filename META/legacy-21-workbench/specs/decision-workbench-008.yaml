@@ -23,6 +23,11 @@ intent:
     retrieve 排序/裁剪策略后续吃 Victor plugin 蒸馏的三档拉取表(026 判定
     可复用约六七成 C/R/U 领域逻辑)。
 
+    **新提案(Wayne 2026-07-12 口述,待卡点 3 裁):第五工具 get_manual**
+    ——只读,返回 agent-facing manual(系统全貌/用户看到什么/好公民准则);
+    B1 协议保持极短,深语境外置到这个把手;description 明写 "don't read
+    it up front for routine tasks" 防开工烧 context。全文见设计文档 C4。
+
     **GitHub 为什么做不到(009 必答)**:scope registry 是活 session 的
     实时声明、注入是往运行中 agent 推消息、决策图是本地 SQLite 语义层——
     GitHub 没有"正在跑的 session"这个实体,PR/issue/commit 全是事后工件,
