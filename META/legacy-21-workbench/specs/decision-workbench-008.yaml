@@ -2,10 +2,18 @@ spec_id: "decision-workbench-008"
 type: decision
 state: draft
 intent:
-  summary: "MCP 三组工具面:register_scope(声明+人话状态同动作)/ self_report(轻量叙事更新)/ 沉淀-retrieve 组 = kb_retrieve + kb_record(record 参数化 supersedes/marks_stale,无 delete);description 即行为引导(何时自发调写进 description,不依赖 skill);GitHub-why-not:GitHub 无运行中 session 概念,scope/注入/本地语义图皆事中态,PR/issue 皆事后工件"
+  summary: "MCP 五工具面(register_scope/self_report/kb_retrieve/kb_record/get_manual)= 确定性端点 + 质量闸(db 唯一写门);description 只承担『何时调』的行为引导,方法论『怎么做好』住 skill 包(009)【勘误 2026-07-12:初稿『不依赖 skill』框架系谬误,已废】;record 参数化 supersedes/marks_stale,无 delete;GitHub-why-not:GitHub 无运行中 session 概念,scope/注入/本地语义图皆事中态,PR/issue 皆事后工件"
   detail: |
-    ⛔ 卡点 3 待 Wayne 审。四个 tool 的 description 逐字文本 + JSON Schema
-    见 design-claude-code-integration.md 块C;批后逐字回填。
+    ⛔ 卡点 3 待 Wayne 审。五个 tool 的 description 逐字文本 + JSON Schema
+    见 design-claude-code-integration.md §3/附表B;批后逐字回填。
+
+    **【勘误 2026-07-12】本 spec 初稿把工具面当成"接口即全部"——
+    description 承载全部行为引导、产品不带 skill。该框架系谬误(成因
+    复盘见 009):description 只够教"何时调"(~百 token),ingest/蒸馏
+    的方法论(怎么做好)必须住 skill 包;工具本体的正确定位 = 确定性
+    端点 + 质量闸(schema 校验/查重预检/supersede 链完整性,机器不放水,
+    不合格打回),kb_record 的 description 明确指路 vibehub-ingest skill。
+    以下原文按此勘误校正解读。**
 
     **工具面(025 三组的落名):**
     1. `register_scope` — 任务开工前调一次,工作漂移再调;status 一句人话 +
@@ -38,7 +46,7 @@ intent:
     无一承载事中态。三组全部自研,与 GitHub 零重叠。
 constraints:
   - kind: must
-    rule: "工具行为引导只住 description(026 驱动②),不得依赖 skill 正文教『何时调』"
+    rule: "『何时调』只住 description(026 驱动②);『怎么做好』只住 skill 包(009)——两者不得互相越位"
   - kind: must_not
     rule: "沉淀面无 delete 操作;修正只走 supersedes / marks_stale"
   - kind: must_not
@@ -55,6 +63,9 @@ provenance:
   source_ref: "M2 integration design session 2026-07-12"
   produced_at: "2026-07-12"
 relations:
+  - target: "decision-workbench-009"
+    type: depends_on
+    detail: "工具定位(端点+质量闸)与 description/skill 分界由 009 勘误确立"
   - target: "decision-project-026"
     type: implements
     detail: "自发 CRU 驱动②(工具自述)的落地"
