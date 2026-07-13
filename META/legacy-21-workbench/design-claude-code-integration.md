@@ -10,6 +10,8 @@
 
 **交付物是一个 Claude Code plugin,装齐三件套;整个适配层做的唯一一件事:prompt-engineer 用户自己正在跑的 agent,并把它产生的一切机械落进 SQLite。**
 
+**核心价值(Wayne 2026-07-12 再钉)**:context 管理引擎——透出层**永远不是**核心价值;可视化是 commodity(与任何 observability 工具同构),唯一独有格 = 事件 scope。GUI 定位 = 舰队仪表盘 + 快速介入盘,精雕细琢靠 dogfood 迭代;hook/skill/graphstore 半边稳定可预期,GUI 半边才是要雕的。
+
 **产品论题(Wayne 2026-07-12,开源版的赌注)**:用自然语言 skill 替代 codified workflow——ingest/蒸馏这类 pipeline 不写成代码里的 step 1-2-3,写成用户 agent 可执行、用户本人可读可改可 fork 的自然语言;确定性代码收缩到只有必须机械的部分(存储完整性/校验闸/采集)。我们自己 dogfood 这套模式(fr-*/commit-sync 开发 Vibehub 即实验),skill 的每次 change/优化(git 版本史)反哺产品 workflow 设计——块 E 服从率实证是这条反哺回路的第一次正式跑。
 
 | 件 | 职责 | 一句话 |
