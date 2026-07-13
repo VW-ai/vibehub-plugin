@@ -1,0 +1,72 @@
+spec_id: "decision-workbench-009"
+type: decision
+state: draft
+intent:
+  summary: "产品形态 = Claude Code plugin 三件套:hooks(触发骨架,when)+ MCP server(确定性端点+质量闸,db 唯一读写门)+ skill 包(方法论,how well——ingest/蒸馏等 pipeline 住这里);026 重塑的正确解读 = 触发模型换血(咒语→hook微指令/description/自发),方法论文本保留为 skill;蒸馏质量管道 = skill 方法论 × server 机械校验 × draft 态人晨审 三层闸"
+  detail: |
+    Wayne 2026-07-12 口述纠偏(对"MCP 工具=description+确定性脚本"两层
+    框架的修正):"hook/etc 是触发我们的 skill 对 vibehub 数据库查询的
+    节点;怎么查、改、读,本质上依然是 skill 的工作,或者 server 端
+    确定性 pipeline 的工作,比如蒸馏。"
+
+    **三件套解剖(一个 Claude Code plugin 装齐):**
+    1. **hooks = 触发骨架(when)**:微指令在关键时刻点名该干什么
+       (SessionStart 协议、越界提醒、注入送达);零方法论。
+    2. **MCP server = 确定性端点 + 质量闸**:kb_record 不是"单纯脚本"
+       ——它是落库的唯一门,做 schema 校验、查重预检、supersede 链
+       维护、anchor 存在性检查,不合格返回 warning/打回;工具返回值
+       可携带下一步指引(server-driven workflow,pipeline 的确定性
+       段住 server/core)。零语义判断。
+    3. **skill 包 = 方法论(how well)**:ingest(怎么把一段讨论拆成
+       spec objects:七类型判定/查重/relations/provenance/置信度)、
+       蒸馏(冷启动 pipeline:扫描→提 feature→锚定→逐步经 MCP 落库)、
+       retrieval 策略等。**触发者 = hook 微指令指路 + tool description
+       提示 + agent 自发——不再有用户咒语**;方法论正文从我们自己的
+       fr-* skills + Victor plugin(纯 skill 包,9 skill/2106 行,
+       026 判定 C/R/U 领域逻辑约六七成可复用)蒸馏改写。
+
+    **蒸馏/沉淀质量管道 = 三层闸**(回应 Wayne "不带 skill 质量堪忧"):
+    skill 方法论(语义质量:agent 按手册拆解)× server 机械校验
+    (结构质量:schema/去重/引用完整性,机器不放水)× draft 态落库 +
+    人晨审 promote(裁决质量:现行 fr 纪律平移)。三层缺一则退化:
+    缺 skill = 裸 description 写库,条目质量靠运气;缺 server 闸 =
+    垃圾直接入图;缺人审 = 错误决策自动成为团队真理。
+
+    **对既有 draft 的牵动:**
+    - 008(MCP 工具面):工具定位从"接口即全部"修正为"端点+质量闸";
+      kb_record description 增加对 ingest skill 的指路;
+    - B1 协议四义务不变(义务是触发,方法论在 skill);
+    - 块 E 范围追加:skill 包初版(vibehub-ingest / vibehub-distill
+      至少两个)+ server 校验闸,与 MCP server 同批;
+    - get_manual(008/C4)与 skill 包分工:manual 是被动参考,skill
+      是主动方法论,不合并。
+constraints:
+  - kind: must
+    rule: "skill 的触发者只能是 hook 微指令 / tool description / agent 自发;产品面不得出现用户咒语入口(026 不变)"
+  - kind: must
+    rule: "kb_record/蒸馏落库必须过 server 机械校验闸;skill 不得绕过 MCP 直写 db"
+  - kind: must_not
+    rule: "MCP server / core 内禁止 LLM(013 不变);语义判断全部住 skill,由用户 agent 执行"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [plugin, skill-pack, mcp, quality-gate, ingest, distillation, trigger-model]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne 口述纠偏 — 2026-07-12 M2 integration session;实证:V1ctor2182/feature-room-plugin 纯 skill 包解剖 + 本 repo fr-* 插件形态"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-026"
+    type: relates_to
+    detail: "『方法论文本蒸馏复用,驱动骨架从零新建』的正确解读:重塑触发模型,保留 skill 载体"
+  - target: "decision-workbench-008"
+    type: relates_to
+    detail: "工具定位修正:端点+质量闸;kb_record description 指路 ingest skill"
+  - target: "decision-project-013"
+    type: implements
+    detail: "LLM 判断→skill prompt / 确定性算子→CLI(server) 的分界线在 plugin 三件套里的落位"
+anchors: []
