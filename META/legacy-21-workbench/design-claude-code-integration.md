@@ -108,7 +108,7 @@ Skipping these hides your work from your team.
 [Vibehub] Active. Rules: register_scope before first edit; kb_retrieve before unfamiliar code; kb_record decisions immediately; self_report on direction change.
 ```
 
-**Wayne 2026-07-12 口述初裁:大概候选 A,"不要太极简"。** 待卡点 2 正式确认。
+**⛔→✅ B1 已终裁(Wayne 2026-07-12):候选 A(四义务命令式)+ 尾部 manual 指针行。候选 D(两义务混合)出局——裁决理由:token 差价小,协议的另一半作用是开场即让 agent 知道全部 MCP 工具的存在;description 仅在工具被翻到时可见(deferred loading 下不保证),四条全列 = 存在感本身。**
 
 **候选 D(两义务混合版,~75 tok;2026-07-12 顾问 session 建议"四义务砍到两个"后拟)**:
 
@@ -121,7 +121,7 @@ For the full picture, call get_manual — when you need it, not up front.
 ```
 
 理由:kb_retrieve/self_report 的教学与工具 description 重复(026 驱动②),砍掉减仪式;但**保留末尾存在性提示一行**(~12 tok)——Claude Code 对 MCP 工具有 deferred loading(工具 schema 可能不进 context),"全靠 description 活"在被 defer 的客户端上会失联,这行是兜底。register_scope(时序卡"第一次 edit 前")与 kb_record(反 LLM 默认的"攒着以后说")是 description 承载不了的,留在协议里。
-候选 D 与初裁 A 冲突之处待 Wayne 卡点 2 重裁:A=四义务命令式,D=两义务混合。
+**2026-07-12 Wayne 终裁:D 出局,B1 = A + manual 指针行**(见上);本段保留作候选歧路存档。
 
 **新提案(Wayne 2026-07-12 口述,待卡点 2 一并裁):协议尾部加一行 manual 指针**(约 +18 tok):
 

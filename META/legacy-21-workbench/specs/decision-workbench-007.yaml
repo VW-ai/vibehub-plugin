@@ -39,10 +39,10 @@ intent:
       精准优先二值,漏判留默认档,ambiguous 桶或不再需要。
 
     **2026-07-12 顾问 session 五条建议消化(本 session 逐条评审后入档):**
-    - B1 新增候选 D(两义务混合版):协议只留 register_scope+kb_record,
-      kb_retrieve/self_report 降为 description 承载 + 一行存在性提示兜底
-      (MCP deferred loading 下 description 可能不进 context——顾问论据的
-      已知洞,提示行即补丁);与 Wayne 初裁 A 冲突,卡点 2 四选一重裁;
+    - B1 ✅ 已终裁(Wayne 2026-07-12 口头):候选 A(四义务命令式)+
+      manual 指针行;候选 D(两义务混合)出局——token 差价小,协议要
+      承担"开场即让 agent 知道全部 MCP 工具存在"的职能,description
+      在 deferred loading 下不保证可见,四条全列=存在感本身;
     - B2 推荐 A、B3 inject 推荐 A(防注入被当新任务重规划),已标注;
     - B1-meta 标 DEFERRED(M3+ 连场景一起过,不进卡点 2 裁决面);
     - 文本终裁权交块 E 实证:服从率为一等指标,人逐条读后定稿。
