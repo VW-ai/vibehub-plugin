@@ -12,7 +12,7 @@ intent:
     | Hook | 采集 | 注入(条件) | 预算 |
     | SessionStart(全 source) | session 出生+source+agent_type | 行为协议(每 session 一次;resume/compact 重注因 context 已丢;meta/普通分流)+ pending 顺带送达 | ≤120 |
     | UserPromptSubmit | launch/user_injection + prompt_id + 里程碑机械分类 | pending 送达(仅非空) | 0 稳态 |
-    | PostToolUse(Edit|Write|MultiEdit|NotebookEdit|Read matcher) | 足迹 | pending 送达 + scope 越界提醒(仅机械探测越界后,每 session 至多一次) | ≤50 一次性 |
+    | PostToolUse(Edit|Write|MultiEdit|NotebookEdit|Read matcher) | 足迹 | pending 送达 + scope 越界提醒(仅机械探测越界后,每份 scope 声明至多一次;re-register 重置) | ≤50 一次性 |
     | Notification(needs_input 类) | question→waiting | 无(能力上不可注) | 0 |
     | Stop | self_report 原话 | pending 送达(送达即唤醒——Stop 的 additionalContext 让对话继续,异步注入最速通道) | 0 稳态 |
     | SessionEnd | end reason→done | 无 | 0 |
@@ -24,8 +24,9 @@ intent:
     (与我们的"事"不同构)、ConfigChange/FileChanged 等环境杂音、
     Elicitation*/Worktree*/Setup(非采集面)。
 
-    **注入预算总账(单 session 稳态)**:协议 ≤120 一次 + 越界提醒 ≤50 至多
-    一次 + 队列送达(用户主动行为不计侵蚀)。逐 hook 稳态 = 0(026 硬约束)。
+    **注入预算总账(单 session 稳态)**:协议 ≤120 一次 + 越界提醒 ≤50(每份
+    scope 声明至多一次,re-register 重置计数——新契约新资格,探测持续/提醒
+    去重,Wayne 2026-07-12 裁决)+ 队列送达(用户主动行为不计侵蚀)。逐 hook 稳态 = 0(026 硬约束)。
 
     **robustness(Wayne 2026-07-12 疑虑的判决):**
     - settings 失联机械可测:repo 有新 commit 而 sessions 表零新行 →

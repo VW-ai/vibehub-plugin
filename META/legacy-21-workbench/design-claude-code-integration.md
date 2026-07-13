@@ -30,7 +30,7 @@
 |---|---|---|---|---|
 | **SessionStart**(全 source) | session 新建/resume/clear/compact 后 | session 出生:source、agent_type、task 关联(branch) | ①行为协议(**每 session 一次**,026 认可的三驱动之一;meta/普通角色分流,见块B);②source=resume/compact 时重注协议(context 已丢);③pending 注入顺带送达(离场期间攒的) | 协议 ≤120;队列按内容 |
 | **UserPromptSubmit** | 用户提交 prompt、处理前 | launch/user_injection 事件 + `prompt_id` + 里程碑机械分类(块D) | pending 注入送达(**仅队列非空**);无其他注入 | 0 或队列内容+~20 包装 |
-| **PostToolUse**(`Edit\|Write\|MultiEdit\|NotebookEdit\|Read`) | 碰文件的工具成功后 | 足迹(path/action) | ①pending 注入送达(仅非空);②scope 越界自报提醒(**仅机械探测到足迹越出声明 write scope,且本 session 未提醒过——每 session 至多一次**,022 硬条款) | 0 稳态;提醒 ≤50 一次性 |
+| **PostToolUse**(`Edit\|Write\|MultiEdit\|NotebookEdit\|Read`) | 碰文件的工具成功后 | 足迹(path/action) | ①pending 注入送达(仅非空);②scope 越界自报提醒(**仅机械探测到足迹越出当前声明 write scope,且本份声明未提醒过——每份 scope 声明至多一次**;重新 register_scope = 新契约 = 重新获得一次提醒资格;探测持续、提醒去重,twist 显形不受影响。022 硬条款,Wayne 2026-07-12 裁决) | 0 稳态;提醒 ≤50 一次性 |
 | **Notification**(`agent_needs_input\|permission_prompt\|idle_prompt`) | agent 停下要人 | question 事件 → waiting 态 | 无(能力上不可注) | 0 |
 | **Stop** | agent 一轮说完 | self_report(transcript 尾原话) | pending 注入送达(仅非空)——**送达即唤醒**,异步注入的最速通道 | 0 稳态 |
 | **SessionEnd**(全 reason) | session 终止 | end reason → done 态 | 无 | 0 |
@@ -49,7 +49,7 @@
 | ConfigChange / CwdChanged / FileChanged / InstructionsLoaded | 环境杂音;FileChanged 需 SessionStart 注册 watchPaths,复杂度不换感知增量 |
 | Elicitation* / Worktree* / Setup | MCP 表单/worktree 托管/CI 初始化,均非采集面 |
 
-**注入预算总账(单 session 稳态)**:协议 ≤120(一次)+ 越界提醒 ≤50(至多一次)+ 队列送达(用户主动行为,不算预算侵蚀)。逐 hook 稳态 = 0,无条件注入只有 SessionStart 协议一处(026 明文认可的驱动①)。
+**注入预算总账(单 session 稳态)**:协议 ≤120(一次)+ 越界提醒 ≤50(每份 scope 声明至多一次;不重声明的 session 恒 ≤1 次)+ 队列送达(用户主动行为,不算预算侵蚀)。逐 hook 稳态 = 0,无条件注入只有 SessionStart 协议一处(026 明文认可的驱动①)。
 
 ### A.2 Wayne 的 hook robustness 疑虑 — 分析与后备
 
@@ -128,14 +128,14 @@ Skipping these hides your work from your team.
 
 ### B2. Scope 越界自报提醒
 
-- **触发**:PostToolUse 采到 edit 足迹落在声明 write scope 之外(机械判定),**且本 session 未发过此提醒** → 注入一次,之后同 session 静默(022:仅机械探测到越界后注入一次)
+- **触发**:PostToolUse 采到 edit 足迹落在**当前**声明 write scope 之外(机械判定),**且本份声明未发过此提醒** → 注入一次;重新 register_scope 后计数器重置(新契约新资格,Wayne 2026-07-12 裁决)。探测每次照做(twist/地图显形不受限),去重的只是注入动作
 - **预算**:候选 A ≈ 55 tok,B ≈ 30 tok
 - **预期行为**:方向真变了 → agent 补一句 self_report + 重新 register_scope;只是顺手小改 → agent 忽略,不产生对话噪音
 
 **候选 A(给台阶,两分支都说死)**:
 
 ```
-[Vibehub] Your last edit ({file}) is outside your declared scope. If your plan changed, update it now: self_report one line + register_scope the new area. If this is just a quick touch-up, ignore this — you won't be reminded again this session.
+[Vibehub] Your last edit ({file}) is outside your declared scope. If your plan changed, update it now: self_report one line + register_scope the new area. If this is just a quick touch-up, ignore this — you won't be reminded again for this scope.
 ```
 
 **候选 B(极简)**:

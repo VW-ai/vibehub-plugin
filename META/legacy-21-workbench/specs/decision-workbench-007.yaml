@@ -15,8 +15,9 @@ intent:
     2. **B1-meta 编排席角色**(SessionStart 且 VIBEHUB_SESSION_ROLE=meta,
        app 发射时设环境变量;M3+ 才有真消费者,文本先定):候选 A ~90 / B ~40。
        预期:只编排不干活;空写 scope 由 020 twist 自守。
-    3. **B2 scope 越界自报提醒**(PostToolUse 机械探测 edit 足迹越出声明
-       write scope,每 session 至多一次,022 硬条款):候选 A 给台阶双分支 ~55 /
+    3. **B2 scope 越界自报提醒**(PostToolUse 机械探测 edit 足迹越出当前声明
+       write scope,每份 scope 声明至多一次、re-register 重置,022 硬条款
+       + Wayne 2026-07-12 裁决;候选文本中 "this session" 措辞随之调整):候选 A 给台阶双分支 ~55 /
        B 极简 ~30 / C 问句式。预期:真转向→self_report+register_scope;
        顺手小改→忽略不产生噪音。
     4. **B3 注入送达包装**(队列非空时,送达点 UserPromptSubmit/PostToolUse/
