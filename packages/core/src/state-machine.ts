@@ -22,9 +22,13 @@ export type HookEventName =
   | "PostToolUse"
   | "Notification"
   | "Stop"
-  | "SessionEnd";
+  | "SessionEnd"
+  | "SubagentStart"
+  | "SubagentStop"
+  | "PostToolUseFailure"
+  | "StopFailure";
 
-export function nextState(_current: TaskState, hook: HookEventName): TaskState {
+export function nextState(current: TaskState, hook: HookEventName): TaskState {
   switch (hook) {
     case "SessionStart":
     case "UserPromptSubmit":
@@ -35,5 +39,10 @@ export function nextState(_current: TaskState, hook: HookEventName): TaskState {
       return "waiting";
     case "SessionEnd":
       return "done";
+    case "SubagentStart":
+    case "SubagentStop":
+    case "PostToolUseFailure":
+    case "StopFailure":
+      return current;
   }
 }

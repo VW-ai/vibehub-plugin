@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { classifyUserPrompt } from "../src/milestone.js";
 
 describe("classifyUserPrompt (decision-workbench-001 mechanical tier)", () => {
-  it("pure acknowledgements are routine — never milestone-tier", () => {
+  it("pure acknowledgements stay default — never milestone-tier", () => {
     for (const p of [
       "ok",
       "OK!",
@@ -17,13 +17,13 @@ describe("classifyUserPrompt (decision-workbench-001 mechanical tier)", () => {
       "do it",
       "没问题",
     ]) {
-      expect(classifyUserPrompt(p), p).toBe("routine");
+      expect(classifyUserPrompt(p), p).toBe("default");
     }
   });
 
-  it("empty and whitespace-only prompts are routine", () => {
-    expect(classifyUserPrompt("")).toBe("routine");
-    expect(classifyUserPrompt("   \n ")).toBe("routine");
+  it("empty and whitespace-only prompts stay default", () => {
+    expect(classifyUserPrompt("")).toBe("default");
+    expect(classifyUserPrompt("   \n ")).toBe("default");
   });
 
   it("long prompts are milestone on their face", () => {
@@ -46,14 +46,14 @@ describe("classifyUserPrompt (decision-workbench-001 mechanical tier)", () => {
     expect(classifyUserPrompt("look at src/hook-ingest.ts")).toBe("milestone");
   });
 
-  it("short non-acks are ambiguous — the honest middle for the thin LLM", () => {
-    expect(classifyUserPrompt("try the other branch")).toBe("ambiguous");
-    expect(classifyUserPrompt("先别动 schema")).toBe("ambiguous");
-    expect(classifyUserPrompt("why?")).toBe("ambiguous");
+  it("short non-acks stay in the default tier — no ownerless LLM bucket", () => {
+    expect(classifyUserPrompt("try the other branch")).toBe("default");
+    expect(classifyUserPrompt("先别动 schema")).toBe("default");
+    expect(classifyUserPrompt("why?")).toBe("default");
   });
 
-  it("an ack with substantive tail is NOT routine", () => {
-    expect(classifyUserPrompt("ok, but skip the legacy path")).not.toBe("routine");
-    expect(classifyUserPrompt("好的,但是先把测试跑绿")).not.toBe("routine");
+  it("an ack prefix does not hide a structurally strong instruction", () => {
+    expect(classifyUserPrompt("ok, but do this:\nskip the legacy path")).toBe("milestone");
+    expect(classifyUserPrompt("好的,按下面做:\n先把测试跑绿")).toBe("milestone");
   });
 });

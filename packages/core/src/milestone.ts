@@ -3,17 +3,15 @@
  * decision-workbench-001 (实质性注入才升里程碑档,"继续/好的"类不升,防止长
  * session 的里程碑档被灌水). The thin-LLM refinement is checkpoint-gated and,
  * per decision-project-013, could never live in the CLI anyway — so this pure
- * function is the always-on fallback, and "ambiguous" is the only bucket an
- * LLM will ever re-judge (asynchronously, outside the hook path).
+ * function is the always-on fallback. Precision wins: only strong mechanical
+ * signals enter the milestone tier; everything else stays in the default
+ * timeline. There is no daemon-owned LLM re-judge path.
  *
  * Buckets:
- * - "routine":   pure acknowledgements — never milestone-tier;
- * - "milestone": clearly substantive — new direction, structure, payload;
- * - "ambiguous": short but not a known ack. The honest middle: UI treats it
- *   as milestone until an LLM downgrades it (decision-project-023 leans
- *   toward SHOWING the user's actions, not hiding them).
+ * - "default":   acknowledgements and weak/short signals;
+ * - "milestone": clearly substantive — new direction, structure, payload.
  */
-export type PromptClassification = "milestone" | "routine" | "ambiguous";
+export type PromptClassification = "milestone" | "default";
 
 /**
  * Pure acknowledgements, matched after stripping ALL whitespace and
@@ -53,14 +51,14 @@ function weightedLength(text: string): number {
 
 export function classifyUserPrompt(raw: string): PromptClassification {
   const text = raw.trim();
-  if (!text) return "routine";
+  if (!text) return "default";
   // strip whitespace + common CJK/latin punctuation for ack matching
   const norm = text.toLowerCase().replace(/[\s,,、;;.。!!??~~…'"“”()()\-]+/gu, "");
-  if (!norm || ACKS.has(norm)) return "routine";
+  if (!norm || ACKS.has(norm)) return "default";
   // structure = payload: multi-line, code, or an explicit path/URL
   if (/\n/.test(text) || text.includes("```") || /\bhttps?:\/\//.test(text) || /\S+\/\S+\.\w+/.test(text)) {
     return "milestone";
   }
   if (weightedLength(text) >= SUBSTANTIVE_MIN_WEIGHT) return "milestone";
-  return "ambiguous";
+  return "default";
 }

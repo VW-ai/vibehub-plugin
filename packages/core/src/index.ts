@@ -22,6 +22,7 @@ export {
 } from "./git-facade.js";
 export {
   getRepoByRoot,
+  upsertRepo,
   readBranchFiles,
   readConflicts,
   readSyncState,
@@ -38,6 +39,7 @@ export {
   type TeamSyncResult,
 } from "./team-sync.js";
 export { exportTeamMapFixture } from "./fixture-export.js";
+export { readTaskTimeline } from "./timeline-read.js";
 export {
   squarify,
   layoutTerritories,
@@ -47,6 +49,25 @@ export {
 } from "./treemap.js";
 export { nextState, type HookEventName } from "./state-machine.js";
 export { classifyUserPrompt, type PromptClassification } from "./milestone.js";
+export {
+  canonicalRepoPath,
+  claimOffScopeReminder,
+  matchesScopePattern,
+  readScopePatterns,
+  replaceScopePatterns,
+  type ScopePattern,
+} from "./scope-registry.js";
+export {
+  applyDistillation,
+  markSpecStale,
+  recordSpec,
+  retrieveKnowledge,
+  type DistillationManifest,
+  type RecordSpecInput,
+  type SpecRow,
+  type SpecType,
+  type KnowledgeResult,
+} from "./graph-store.js";
 export {
   ingestHookEvent,
   lastAssistantText,

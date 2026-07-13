@@ -13,6 +13,7 @@
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";
+import type { CommitEvent } from "./contract/panel-types.js";
 
 export class GitError extends Error {
   constructor(
@@ -321,6 +322,43 @@ export class GitFacade {
       toplevel,
       branch: head !== "HEAD" ? head : null,
     };
+  }
+
+  /** Current commit at a session path; called once when a task is captured. */
+  static headShaAt(anyPath: string): string {
+    const r = run("git", ["rev-parse", "--verify", "HEAD"], anyPath);
+    if (r.status !== 0) throw new GitError(["rev-parse", "HEAD"], r.status, r.stderr);
+    return r.stdout.trim();
+  }
+
+  /** Read-side commit events bounded by the task's captured HEAD. */
+  commitEventsSince(startHeadSha: string, headRef: string): CommitEvent[] {
+    const out = this.git([
+      "log",
+      "--reverse",
+      "--format=%x1e%H%x1f%cI%x1f%s",
+      "--name-only",
+      `${startHeadSha}..${headRef}`,
+    ]);
+    return out
+      .split("\x1e")
+      .filter((block) => block.trim())
+      .map((block) => {
+        const lines = block.trim().split("\n");
+        const [fullSha, at, message] = lines.shift()!.split("\x1f");
+        if (!fullSha || !at || message === undefined) {
+          throw new Error("malformed git log record");
+        }
+        const files = new Set(lines.map((line) => line.trim()).filter(Boolean));
+        return {
+          id: `git:${fullSha}`,
+          at,
+          type: "commit" as const,
+          sha: fullSha.slice(0, 7),
+          message,
+          filesChanged: files.size,
+        };
+      });
   }
 
   /**

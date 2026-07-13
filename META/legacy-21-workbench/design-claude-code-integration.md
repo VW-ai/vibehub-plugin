@@ -16,15 +16,15 @@
 
 | 件 | 职责 | 一句话 |
 |---|---|---|
-| **hooks** | 触发骨架(**when**) | 在关键时刻点名"该干什么了";零方法论 |
-| **MCP server** | 确定性端点 + 质量闸 | db 的唯一读写门;schema 校验/查重/supersede 链,机器不放水;零语义判断 |
-| **skill 包** | 方法论(**how well**) | 怎么 ingest、怎么蒸馏、怎么查——大块 prompt engineering,agent 被触发后照它干 |
+| **hooks** | 触发骨架(**when**) | 在关键时刻点名"该启动哪类行为了";只含运行协议,零语义 workflow |
+| **MCP server** | 确定性端点 + 质量闸 | db 的唯一读写门;schema 校验/查重/supersede 链,只返回机械事实;零语义判断 |
+| **skill 包** | 唯一 intelligence 层(**how well**) | 完整拥有 ingest、distill、query 的跨步骤方法论、判断与综合策略 |
 
-铁律(全部继承既有拍板,redo 不动):core/CLI/MCP 零 LLM(013)· 稳态逐 hook 注入 = 0(026)· 知识库无 D,只 stale/supersede(026)· hook 永不阻断恒 exit 0 · 用户面无咒语入口,skill 触发者 = hook 微指令 / tool description / agent 自发(026 杀的是咒语,不是 skill 载体)。
+铁律(全部继承既有拍板,redo 不动):core/CLI/MCP 零 LLM(013)· 稳态逐 hook 注入 = 0(026)· 知识库无 D,只 stale/supersede(026)· hook 进程恒 exit 0且不阻断用户动作(Stop pending 的 decision:block 是“阻止停下并继续”,不是用户门禁)· 用户面无咒语入口,skill 触发者 = hook 微指令 / tool description / agent 自发(026 杀的是咒语,不是 skill 载体)。
 
 数据流一条:**session → hooks → `vibehub hook` CLI(写事件+回查注入队列)→ SQLite ← MCP server(工具端点)← skill(方法论)**;app/demo 只读。
 
-## §1 hooks 触发骨架(已定案,卡点 1 待形式确认)
+## §1 hooks 触发骨架(已定案)
 
 九事件接线,其余二十余个不接(逐条理由见附表 A)。**稳态每 hook 注入 = 0;无条件注入全系统仅一处。**
 
@@ -34,7 +34,7 @@
 | UserPromptSubmit | launch/user_injection + prompt_id + 里程碑判定 | pending 送达(仅队列非空) |
 | PostToolUse(Edit\|Write\|MultiEdit\|NotebookEdit\|Read) | 足迹 | pending 送达 + **越界提醒**(仅机械探测越出当前声明 write scope,每份声明至多一次,re-register 重置) |
 | Notification(needs_input 类) | question → waiting | 无(能力上不可注) |
-| Stop | self_report(transcript 尾原话) | pending 送达 — **送达即唤醒**(官方语义:Stop 的 additionalContext 让对话继续) |
+| Stop | self_report(`last_assistant_message`,旧版才回退 transcript 尾) | pending 送达 — **送达即唤醒**(官方 wire format:顶层 `decision:"block"` + `reason`) |
 | SessionEnd | end reason → done | 无 |
 | SubagentStart/Stop | 子 agent 谱系 | 无 |
 | PostToolUseFailure | error_message(stalled 佐证) | 无 |
@@ -53,7 +53,7 @@
 ```
 [Vibehub] This repo runs Vibehub — your team's shared context layer. Protocol:
 1. Before your first edit, call register_scope: what you'll touch + one line on what you're doing.
-2. Before working in code you haven't touched this session, call kb_retrieve — decisions and constraints may bind it.
+2. Before working in code you haven't touched this session, use the vibehub-query skill — decisions and constraints may bind it.
 3. The moment a design decision is made (by you or your user), call kb_record. Don't batch for later.
 4. If your direction changes, say so: self_report, one line.
 For the full picture of how Vibehub works, call get_manual — when you need it, not before starting work.
@@ -81,9 +81,9 @@ Stop what you're doing: no new tool calls. Reply to this message, then wait for 
 
 **B1-meta(编排席)— DEFERRED**:消费者在 M3+ 操作舱,届时连场景一起过;机制先定(app 发射设 `VIBEHUB_SESSION_ROLE=meta`,hook CLI 读环境变量分流)。
 
-## §3 MCP server:端点 + 质量闸(卡点 3)
+## §3 MCP server:端点 + 质量闸(已定案)
 
-四工具 + get_manual。**description 即行为引导**(何时调写进 description,方法论住 skill);server 是 db 唯一写门,落库过机械校验(schema/查重预检/supersede 链完整性/anchor 存在性),不合格返回 warning 打回;工具返回值可携带下一步指引(server-driven workflow)。
+五个日常工具 + `kb_apply_distillation` 批量写端点。**description 不是 intelligence 层**:只说能力、输入输出/机械约束,以及轻量路由到对应 skill;跨工具的『怎么查/怎么拆/怎么综合』只住 skill。server 是 db 唯一写门,落库过机械校验(schema/查重预检/supersede 链完整性/anchor 存在性),不合格返回 warning 打回;返回值只可携带机械事实,不得编排后续语义 workflow。
 
 | 工具 | 一句话 | description 要点(全文见附表 B) |
 |---|---|---|
@@ -92,17 +92,19 @@ Stop what you're doing: no new tool calls. Reply to this message, then wait for 
 | `kb_retrieve` | 查决策图 | 碰陌生区前/架构选择前/用户问 why;按 topic 或 path;"cheap and local — when in doubt, call it" |
 | `kb_record` | 沉淀落库(唯一写门) | 决策发生当场记;无 delete,改错传 supersedes、废弃传 marks_stale;**实质性 ingest(整段讨论/会议记录)description 指路 ingest skill**;落 draft 态人晨审 promote |
 | `get_manual` | agent-facing 手册(被动参考) | 系统全貌/用户看到什么/好公民准则;"don't read it up front for routine tasks" |
+| `kb_apply_distillation` | distill manifest 的原子 apply 门 | 批量校验 feature/anchor/relation 引用与 repo-relative path;单事务写入后重算 layout;不做语义拆解 |
 
 **GitHub-why-not(009 必答)**:scope registry / 注入 / 本地语义图全是"正在跑的 session"的事中态;GitHub 无 session 实体,PR/issue/commit 皆事后工件。零重叠。
 
 ## §4 Skill 包:方法论(redo 新增件,decision-workbench-009)
 
-**没有 skill 包,蒸馏质量管道不成立**——裸 description 写库,条目质量靠运气。方法论正文从我们的 fr-* skills + Victor plugin(纯 skill 包 9 skill/2106 行,026 判定 C/R/U 领域逻辑约六七成可复用)蒸馏改写,触发者换血(咒语 → hook 指路/description 提示/agent 自发)。初版两个:
+**没有 skill 包,蒸馏质量管道不成立**——裸 description 写库,条目质量靠运气。方法论正文从我们的 fr-* skills + Victor plugin(纯 skill 包 9 skill/2106 行,026 判定 C/R/U 领域逻辑约六七成可复用)蒸馏改写,触发者换血(咒语 → hook 指路/description 提示/agent 自发)。初版至少三个:
 
 | Skill | 方法论内容 | 来源复用 | 触发 |
 |---|---|---|---|
 | `vibehub-ingest` | 把一段讨论拆成 spec objects:七类型判定/查重(先 kb_retrieve)/relations/provenance/置信度,逐条经 kb_record 落库 | random-contexts + fr-ingest | kb_record description 指路;agent 自发 |
 | `vibehub-distill` | 冷启动"认识 repo"pipeline:扫描 → 提 feature → 锚定 → 逐步经 MCP 落库(026 唯一用户主动例外) | Room 19 蒸馏方法论 + fr-init | 用户按钮/`vibehub init --distill`(咒语按钮化,005) |
+| `vibehub-query` | 将当前任务/路径/why 问题形成查询,按需扩展或收窄,综合冲突、版本链与约束,输出可执行 context | prompt-gen/dev context-pull + Victor plugin 三档拉取 | SessionStart 路由/agent 自发;`kb_retrieve` 只是底层原语 |
 
 **质量管道三层闸**:skill 方法论(语义质量)× server 机械校验(结构质量)× draft 态 + 人晨审 promote(裁决质量)。三层缺一则退化。
 
@@ -113,24 +115,22 @@ Stop what you're doing: no new tool calls. Reply to this message, then wait for 
 | hook CLI 六事件采集 + 五态 + 注入队列/送达(Stop 唤醒/pause 包装/pendingInjections 读侧超时) | **留**,即 §1 的实现底座;新增三事件在 redo 中补 |
 | classifyUserPrompt 三分类 | **改**:随 §1 里程碑改向收敛为二值(改动小) |
 | 契约 +promptId/+classification | **留** |
-| 送达包装 PROVISIONAL 文本 | **换**:B2/B3 点头后换终稿 |
+| 送达包装 PROVISIONAL 文本 | **已换**:B2/B3 终稿 + locus;Stop wire format 按官方纠正为 decision:block+reason |
 
 ## §6 Redo 实施计划 — 一个交付单元,不碎片化
 
 **单元 = plugin 三件套一次成型,验收 = 我们自己在 Vibehub repo dogfood 跑通**(发射→采集→自报→检索→沉淀→注入送达→里程碑上时间线),PR 转正以 dogfood 为准,不以代码绿为准。顺序:
 
-1. MCP server(四工具+get_manual+校验闸,core 补 supersede 链/检索排序)
-2. skill 包初版(vibehub-ingest / vibehub-distill)
+1. MCP server(五个日常工具+kb_apply_distillation+校验闸,core 补 supersede 链/检索排序/scope matcher)
+2. skill 包初版(vibehub-ingest / vibehub-distill / vibehub-query)
 3. hooks wiring + `vibehub init`(装三件套)+ `vibehub inject`
 4. 微协议文本终稿接线 + 里程碑二值收敛
-5. dogfood 实证,**服从率为一等指标**(N 个真 session,数四义务调用率与时机,人读终裁文本)
+5. dogfood 实证,**服从率为一等指标**(N 个真 session,数四义务调用率与时机,人读终裁文本)。实证清单必须包含:`VIBEHUB_SESSION_ROLE` 是否由 session 进程传进 hook command env;十分钟 Bash 长跑零 hook 时 stalled 读侧假阳性的已知代价。
 
-## §7 待裁清单(唯一 opens 列表)
+## §7 已裁与实证余项
 
-1. **卡点 1**:§1 矩阵 + robustness 判决 + 里程碑二值改向 —— 形式确认
-2. **卡点 2 余项**:B2=A、B3=A 点头;注入现场上下文(locus 行)认不认
-3. **卡点 3**:§3 五工具 description 逐字 + 校验闸语义 + §4 skill 包架构(decision-workbench-009)
-4. 块 E 里程碑二值的强信号清单终版(现:多行/代码块/URL/路径/加权长度)
+1. 卡点 1/2/3 均由 Wayne 2026-07-12 批准;实现以 010 的 intelligence ownership 为最高约束。
+2. 块 E 仍需实证:四义务服从率、`VIBEHUB_SESSION_ROLE` env 继承、Stop decision:block 唤醒、长跑 Bash 的 stalled 假阳性、里程碑二值强信号清单。
 
 ---
 

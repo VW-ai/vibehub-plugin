@@ -36,6 +36,7 @@ import type { Db } from "./db.js";
 import { GitFacade } from "./git-facade.js";
 import { nextState, type HookEventName } from "./state-machine.js";
 import { getRepoByRoot, upsertRepo } from "./team-store.js";
+import { claimOffScopeReminder } from "./scope-registry.js";
 
 /** The fields Claude Code sends every hook (plus event-specific extras). */
 export interface HookPayload {
@@ -54,6 +55,10 @@ export interface HookPayload {
   message?: string;
   // SessionEnd
   reason?: string;
+  // Stop / failure hooks (documented public fields)
+  last_assistant_message?: string;
+  error?: string;
+  error_details?: string;
   [key: string]: unknown;
 }
 
@@ -64,10 +69,12 @@ export interface HookIngestResult {
   stateAfter: TaskState;
   /** Hook-protocol stdout object (injection delivery), if any. */
   output?: {
-    hookSpecificOutput: {
+    hookSpecificOutput?: {
       hookEventName: string;
       additionalContext: string;
     };
+    decision?: "block";
+    reason?: string;
   };
 }
 
@@ -167,7 +174,21 @@ export function ingestHookEvent(
   const taskId = taskIdForBranch(branch);
   const existing = readTask(db, taskId);
   const stateBefore = existing?.state ?? null;
-  const stateAfter = nextState(existing?.state ?? "queued", hook);
+  const deliveryCapable =
+    hook === "UserPromptSubmit" ||
+    hook === "PostToolUse" ||
+    hook === "Stop" ||
+    hook === "SessionStart";
+  const claimed = deliveryCapable
+    ? claimPendingInjections(db, taskId, nowIso)
+    : [];
+  // Stop normally means the turn is waiting for the human. When this same
+  // Stop returns decision:block with the queued note as its reason, Claude
+  // continues immediately: running is a known fact, not a timeout inference.
+  const stateAfter =
+    hook === "Stop" && claimed.length > 0
+      ? "running"
+      : nextState(existing?.state ?? "queued", hook);
 
   upsertTask(db, {
     id: taskId,
@@ -182,11 +203,9 @@ export function ingestHookEvent(
     prState: existing?.prState ?? null,
     stateSince: stateAfter === stateBefore ? existing!.stateSince : nowIso,
     lastEventAt: nowIso,
-    statusDetail:
-      hook === "Notification" && payload.message
-        ? payload.message
-        : (existing?.statusDetail ?? null),
+    statusDetail: statusDetailFor(hook, payload, existing?.statusDetail ?? null),
     createdAt: existing?.createdAt ?? nowIso,
+    startHeadSha: existing?.startHeadSha ?? GitFacade.headShaAt(sessionToplevel),
   });
 
   upsertSession(db, {
@@ -206,6 +225,7 @@ export function ingestHookEvent(
     written.push(e.type);
   };
   const eid = (): string => crypto.randomUUID();
+  const conditionalContext: string[] = [];
 
   switch (hook) {
     case "UserPromptSubmit": {
@@ -246,13 +266,20 @@ export function ingestHookEvent(
             ? "read"
             : null;
         if (action) {
+          const relativeFile = repoRelative(file, sessionToplevel);
           addFootprint(db, repo.id, {
             taskId,
             sessionId: payload.session_id,
-            path: repoRelative(file, sessionToplevel),
+            path: relativeFile,
             action,
             at: nowIso,
           });
+          if (
+            action === "edit" &&
+            claimOffScopeReminder(db, taskId, relativeFile, nowIso)
+          ) {
+            conditionalContext.push(formatOffScopeReminder(relativeFile));
+          }
         }
       }
       break;
@@ -272,14 +299,18 @@ export function ingestHookEvent(
     case "Stop": {
       // The agent's own final turn text, verbatim from the transcript —
       // contract SelfReportEvent source. Nothing synthesized.
-      const text = payload.transcript_path
-        ? lastAssistantText(payload.transcript_path)
-        : null;
+      const text = payload.last_assistant_message ?? (
+        payload.transcript_path ? lastAssistantText(payload.transcript_path) : null
+      );
       if (text) emit({ id: eid(), at: nowIso, type: "self_report", text });
       break;
     }
     case "SessionStart":
     case "SessionEnd":
+    case "SubagentStart":
+    case "SubagentStop":
+    case "PostToolUseFailure":
+    case "StopFailure":
       break;
   }
 
@@ -298,9 +329,9 @@ export function ingestHookEvent(
   }
 
   // 注入队列回查 (decision-project-018) — deliver pending notes at every
-  // hook boundary that accepts additionalContext. Stop is the fast lane:
-  // its additionalContext CONTINUES the conversation (official hooks doc),
-  // so a fire-and-forget injection wakes the agent instead of waiting for
+  // hook boundary that can deliver guidance. Stop is the fast lane: its
+  // official decision:block + reason shape CONTINUES the conversation, so
+  // a fire-and-forget injection wakes the agent instead of waiting for
   // the next user prompt (the Stop→waiting transition above is then
   // corrected by the very next hook fire — honest, self-healing).
   // SessionStart catches notes queued while the session was away.
@@ -309,13 +340,7 @@ export function ingestHookEvent(
   // pending note — "still undelivered" is a read-side derivation
   // (pendingInjections + age), surfaced by the UI, never a stored state.
   let output: HookIngestResult["output"];
-  if (
-    hook === "UserPromptSubmit" ||
-    hook === "PostToolUse" ||
-    hook === "Stop" ||
-    hook === "SessionStart"
-  ) {
-    const claimed = claimPendingInjections(db, taskId, nowIso);
+  if (deliveryCapable) {
     if (claimed.length > 0) {
       for (const c of claimed) {
         emit({
@@ -326,26 +351,57 @@ export function ingestHookEvent(
           text: c.text,
         });
       }
-      output = {
-        hookSpecificOutput: {
-          hookEventName: hook,
-          additionalContext: formatDelivery(claimed),
-        },
-      };
+      if (hook === "Stop") {
+        output = { decision: "block", reason: formatDelivery(claimed) };
+      } else {
+        conditionalContext.push(formatDelivery(claimed));
+      }
     }
+  }
+
+  if (hook === "SessionStart") conditionalContext.unshift(SESSION_PROTOCOL);
+  if (!output && conditionalContext.length > 0) {
+    output = {
+      hookSpecificOutput: {
+        hookEventName: hook,
+        additionalContext: conditionalContext.join("\n\n"),
+      },
+    };
   }
 
   return { taskId, eventTypesWritten: written, stateBefore, stateAfter, output };
 }
 
+const SESSION_PROTOCOL = `[Vibehub] This repo runs Vibehub — your team's shared context layer. Protocol:
+1. Before your first edit, call register_scope with what you'll touch and one line on what you're doing.
+2. Before working in code you haven't touched this session, use the vibehub-query skill; decisions and constraints may bind it.
+3. When a design decision is made, use the vibehub-ingest skill to capture it now; don't batch it for later.
+4. If your direction changes, call self_report with one line.
+Call get_manual only when you need the full picture. Skipping this protocol hides your work from your team.`;
+
+function formatOffScopeReminder(file: string): string {
+  return (
+    `[Vibehub] Your last edit (${file}) is outside your declared write scope. ` +
+    "If your plan changed, call self_report with one line and register_scope the new area. " +
+    "If this is a quick touch-up, continue; you won't be reminded again for this scope."
+  );
+}
+
 /**
- * Delivery wrapper (decision-project-018 双模). PROVISIONAL WORDING — the
- * final text is a 卡点-2 pick (decision-workbench-007); any change after
- * that is a product change and must leave a spec trace.
+ * Delivery wrapper (decision-project-018 双模). Approved B3 wording; any
+ * later change is a product change and must leave a spec trace.
  * One batch = all pending notes FIFO; one pause makes the whole batch a
  * pause (the stricter semantic wins — the agent can't half-stop).
  */
 function formatDelivery(claimed: ClaimedInjection[]): string {
+  if (claimed.length === 1 && claimed[0]!.context && claimed[0]!.mode === "inject") {
+    const note = claimed[0]!;
+    return (
+      `[Vibehub] Message from your user while viewing ${note.context}:\n` +
+      `${note.text}\n` +
+      "Treat this as guidance for the current task; do not restart or re-plan work that is already settled."
+    );
+  }
   const lines = claimed.map((c) => `- ${c.text}`).join("\n");
   if (claimed.some((c) => c.mode === "pause")) {
     return (
@@ -370,6 +426,18 @@ function mapEndReason(
   if (reason === "auto_compact" || reason === "context_limit") return "context_limit";
   if (reason === "clear" || reason === "logout" || reason === "exit") return "user_ended";
   return "completed";
+}
+
+function statusDetailFor(
+  hook: HookEventName,
+  payload: HookPayload,
+  previous: string | null,
+): string | null {
+  if (hook === "Notification" && payload.message) return payload.message;
+  if ((hook === "PostToolUseFailure" || hook === "StopFailure") && payload.error) {
+    return payload.error_details ? `${payload.error}: ${payload.error_details}` : payload.error;
+  }
+  return previous;
 }
 
 function repoRelative(file: string, repoRoot: string): string {

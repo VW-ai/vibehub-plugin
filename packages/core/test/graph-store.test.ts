@@ -13,6 +13,10 @@ import {
   getSetting,
   listTerritories,
   readSpec,
+  recordSpec,
+  markSpecStale,
+  applyDistillation,
+  retrieveKnowledge,
   setSetting,
   upsertFeature,
   upsertSpec,
@@ -89,6 +93,83 @@ describe("GraphStore (图域 + 配置域)", () => {
     ).toThrow(/CHECK/);
   });
 
+  it("records all seven spec types with server-generated ids", () => {
+    const types = [
+      "intent", "decision", "constraint", "convention",
+      "contract", "context", "change",
+    ] as const;
+    for (const [i, type] of types.entries()) {
+      const result = recordSpec(db, 1, {
+        type, summary: `${type} fact`, detail: null,
+      }, T0, () => `server-${i}`);
+      expect(result.spec.id).toBe(`server-${i}`);
+      expect(result.spec.type).toBe(type);
+      expect(result.spec.state).toBe("draft");
+    }
+  });
+
+  it("supersedes atomically and only marks stale without deleting", () => {
+    const old = recordSpec(db, 1, {
+      type: "decision", summary: "Use REST", detail: null,
+    }, T0, () => "old").spec;
+    const next = recordSpec(db, 1, {
+      type: "decision", summary: "Use tRPC", detail: null, supersedes: old.id,
+    }, T0, () => "next").spec;
+    expect(readSpec(db, old.id)?.state).toBe("superseded");
+    expect(edgesFrom(db, next.id)).toContainEqual({ toId: old.id, type: "supersedes" });
+
+    markSpecStale(db, next.id, T0);
+    expect(readSpec(db, next.id)?.state).toBe("stale");
+    expect(db.prepare("SELECT COUNT(*) AS n FROM specs").get()).toEqual({ n: 2 });
+  });
+
+  it("applies a distillation manifest in one transaction and caches layout", () => {
+    applyDistillation(db, 1, {
+      features: [
+        { id: "auth", name: "Auth" },
+        { id: "auth/session", parentId: "auth", name: "Sessions" },
+      ],
+      anchors: [
+        { featureId: "auth/session", file: "src/auth/session.ts", symbol: "Session" },
+      ],
+      relations: [
+        { fromId: "auth/session", toId: "auth", type: "part_of" },
+      ],
+    }, T0);
+    expect(featuresForFile(db, 1, "src/auth/session.ts")).toEqual(["auth/session"]);
+    expect(edgesFrom(db, "auth/session")).toContainEqual({ toId: "auth", type: "part_of" });
+    expect((db.prepare("SELECT COUNT(*) AS n FROM feature_layouts").get() as { n: number }).n).toBe(1);
+  });
+
+  it("rolls back the whole distillation manifest on an invalid anchor", () => {
+    expect(() => applyDistillation(db, 1, {
+      features: [{ id: "auth", name: "Auth" }],
+      anchors: [{ featureId: "missing", file: "src/auth.ts" }],
+      relations: [],
+    }, T0)).toThrow(/missing feature/);
+    expect(listTerritories(db, 1)).toEqual([]);
+  });
+
+  it("retrieves path-bound context before topic-only matches deterministically", () => {
+    upsertFeature(db, { id: "auth", repoId: 1, name: "Auth", now: T0 });
+    const pathBound = recordSpec(db, 1, {
+      type: "constraint", summary: "Tokens stay in cookies", detail: "Auth boundary",
+      featureId: "auth",
+    }, T0, () => "path-bound").spec;
+    addAnchor(db, { repoId: 1, specId: pathBound.id, file: "src/auth/login.ts" });
+    recordSpec(db, 1, {
+      type: "context", summary: "Auth tokens research", detail: null,
+    }, T0, () => "topic-only");
+
+    const results = retrieveKnowledge(db, 1, {
+      query: "auth tokens",
+      paths: ["src/auth/login.ts"],
+      limit: 8,
+    });
+    expect(results.map((r) => r.spec.id)).toEqual(["path-bound", "topic-only"]);
+    expect(results[0]!.matchedPaths).toEqual(["src/auth/login.ts"]);
+  });
+
   it("computes and caches the territory layout once (蒸馏时算一次)", async () => {
     const { computeAndCacheTerritoryLayout, readTerritoryLayouts } = await import(
       "../src/graph-store.js"
@@ -140,7 +221,8 @@ describe("migration ladder", () => {
 
   it("fresh db lands on the latest user_version", () => {
     const db = openDb(path.join(dir, "t.db"));
-    expect(db.pragma("user_version", { simple: true })).toBe(3);
+    expect(db.pragma("user_version", { simple: true })).toBe(5);
+    expect(db.prepare("SELECT COUNT(*) AS n FROM scope_patterns").get()).toEqual({ n: 0 });
     db.close();
   });
 
@@ -172,7 +254,7 @@ describe("migration ladder", () => {
     raw.close();
 
     const db = openDb(p);
-    expect(db.pragma("user_version", { simple: true })).toBe(3);
+    expect(db.pragma("user_version", { simple: true })).toBe(5);
     // v1 data survived
     expect((db.prepare("SELECT slug FROM repos").get() as { slug: string }).slug).toBe("o/n");
     // v2 tables exist

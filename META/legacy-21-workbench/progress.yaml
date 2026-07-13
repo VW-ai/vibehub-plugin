@@ -60,7 +60,7 @@ progress:
       name: "M2: Claude Code 集成层 — hook 矩阵 + 微协议 + MCP 三组工具 + 注入投递端"
       status: in_progress
       gate: true
-      notes: "第一批:设计块 A/B/C 落 draft(006 hook 九事件矩阵+robustness 判决/007 微协议四组 style-tiles 候选/008 MCP 工具 description 逐字+schema),⛔ 三卡点待 Wayne 逐块过(hooks 官方能力表 2026-07-12 抓取钉死,非凭记忆)。机械块 D 实装:注入投递扩 Stop(送达即唤醒)/SessionStart(离场补送),pause 批内最严胜出,claimed_at=送达回执+超时读侧推导(pendingInjections);里程碑机械兜底 classifyUserPrompt(routine ack 词表/milestone 结构或 CJK×2 加权长度/ambiguous 留薄 LLM);契约 +promptId/+classification。core vitest 105/105,core+cli tsc clean。待卡点后:块E hooks wiring+vibehub init+MCP server 实装+真 session 端到端。"
+      notes: "Redo checkpoint 完成,006–010 已裁为 active:Intelligence 单一归 skill;hooks=when,MCP/core=确定性原语+质量闸,description 不承载分布式 workflow。Claude plugin 三件套已落地(plugin manifest/hooks/MCP stdio/skills),MCP 六 capability(register_scope/self_report/kb_retrieve/kb_record/get_manual/kb_apply_distillation),首批 vibehub-ingest/distill/query 三 skill。Core 补齐 scope raw-glob registry+唯一 matcher、task start_head_sha、start..HEAD commit 读侧派生、stored hook+derived commit timeline、GraphStore 七类型/server id/stale+supersede/manifest 单事务 apply+retrieve,SQLite user_version 5;Stop 官方 decision:block+reason,SessionStart 路由 query/ingest,B2 每 scope 一次,locus 注入包装。实证:core 125 tests + MCP 5 tests,core/cli/MCP typecheck+build,plugin strict validate,MCP stdio list/call 与 CLI→SQLite→hook injection 本地探针全绿。仍 in_progress:补 vibehub init 与经明确外发授权后的真实 Claude dogfood;Tauri 打包后置。"
   commits:
     - hash: "799eb2b"
       date: "2026-07-12"

@@ -1,0 +1,96 @@
+/** Raw repo-relative globs are the source fact; territory attribution is derived. */
+import path from "node:path";
+import type { Db } from "./db.js";
+
+export interface ScopePattern {
+  mode: "write" | "read";
+  glob: string;
+  label: string | null;
+}
+
+export function canonicalRepoPath(input: string): string {
+  const slashed = input.replace(/\\/g, "/");
+  if (path.posix.isAbsolute(slashed)) {
+    throw new Error(`scope path must be repo-relative: ${input}`);
+  }
+  const normalized = path.posix.normalize(slashed.replace(/^\.\//, ""));
+  if (normalized === ".." || normalized.startsWith("../")) {
+    throw new Error(`scope path escapes outside the repo: ${input}`);
+  }
+  if (!normalized || normalized === ".") throw new Error("scope path must not be empty");
+  return normalized;
+}
+
+function globRegex(glob: string): RegExp {
+  let source = "^";
+  for (let i = 0; i < glob.length; i++) {
+    const ch = glob[i]!;
+    if (ch === "*" && glob[i + 1] === "*") {
+      i++;
+      if (glob[i + 1] === "/") {
+        i++;
+        source += "(?:.*/)?";
+      } else source += ".*";
+    } else if (ch === "*") source += "[^/]*";
+    else if (ch === "?") source += "[^/]";
+    else source += ch.replace(/[|\\{}()[\]^$+?.]/g, "\\$&");
+  }
+  return new RegExp(source + "$");
+}
+
+export function matchesScopePattern(glob: string, repoPath: string): boolean {
+  return globRegex(canonicalRepoPath(glob)).test(canonicalRepoPath(repoPath));
+}
+
+export function replaceScopePatterns(
+  db: Db,
+  repoId: number,
+  taskId: string,
+  status: string,
+  patterns: Array<{ mode: "write" | "read"; glob: string; label?: string }>,
+): void {
+  const normalized = patterns.map((p) => ({ ...p, glob: canonicalRepoPath(p.glob) }));
+  const tx = db.transaction(() => {
+    db.prepare(`DELETE FROM scope_patterns WHERE task_id = ?`).run(taskId);
+    const insert = db.prepare(
+      `INSERT INTO scope_patterns (repo_id, task_id, seq, mode, glob, label, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    );
+    normalized.forEach((p, seq) =>
+      insert.run(repoId, taskId, seq, p.mode, p.glob, p.label ?? null, status),
+    );
+  });
+  tx();
+}
+
+export function readScopePatterns(db: Db, taskId: string): ScopePattern[] {
+  return db
+    .prepare(`SELECT mode, glob, label FROM scope_patterns WHERE task_id = ? ORDER BY seq`)
+    .all(taskId) as ScopePattern[];
+}
+
+/**
+ * Atomically claim the declaration's one off-scope reminder. Read patterns
+ * never authorize writes; no declaration means there is no claim to compare.
+ */
+export function claimOffScopeReminder(
+  db: Db,
+  taskId: string,
+  repoPath: string,
+  now: string,
+): boolean {
+  const file = canonicalRepoPath(repoPath);
+  const rows = db
+    .prepare(`SELECT glob, reminded_at AS remindedAt FROM scope_patterns
+              WHERE task_id = ? AND mode = 'write' ORDER BY seq`)
+    .all(taskId) as Array<{ glob: string; remindedAt: string | null }>;
+  if (rows.length === 0 || rows.some((row) => matchesScopePattern(row.glob, file))) {
+    return false;
+  }
+  if (rows.some((row) => row.remindedAt !== null)) return false;
+  const result = db
+    .prepare(`UPDATE scope_patterns SET reminded_at = ?
+              WHERE task_id = ? AND reminded_at IS NULL`)
+    .run(now, taskId);
+  return result.changes > 0;
+}

@@ -6,9 +6,10 @@ Pivot 主线的实现 room。产品拍板见 00-project-room specs(intent-002 + 
 UI 长出的类型契约 = workbench/app-demo/src/*-types.ts ×5,后端实现清单)。
 
 M1 已收官(b1-b4 ✅ + treemap spike ✅)。当前阶段:**M2 — Claude Code 集成层**:
-hook 清单矩阵 + 微协议 prompt(026)+ 注入队列投递端 + MCP 三组工具。
-第一批已出:设计块 A/B/C 落 draft(⛔ 三卡点待 Wayne 逐块过,见
-design-claude-code-integration.md)+ 机械块 D 实装(投递端/里程碑启发式)。
+Claude plugin(hooks + MCP + skill pack)+ 注入队列投递端 + 本地 context engine。
+006–010 已裁并完成可本地验证的 engine spine:skill 独占 intelligence,
+hooks 只管 when,MCP/core 只管确定性原语与质量闸。下一 gate 是真实 Claude
+dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
 代码落 workbench/packages/core+cli(library-first、CLI 零 LLM,decision-project-013/025)。
 
 ## Decisions
@@ -17,9 +18,11 @@ design-claude-code-integration.md)+ 机械块 D 实装(投递端/里程碑启发
 - [decision-workbench-002] 冲突解决反馈 + 日/周/月解决统计;裁决后 context 回送两侧 = 后续 prompt engineering 议题(active)
 - [decision-workbench-003] 多主体条目统一语言 = subject-first;徽章 = waiting + 冲突对数(active)
 - [decision-workbench-004] 队友 branch 映射语义:冲突候选=unmerged∧(无PR∨open)、basic 档 stalled/done、蒸馏前 Uncategorized 单地盘、detectedAt 首检保龄(active,2026-07-12 Wayne 逐条过审)
-- [decision-workbench-006] hook 清单矩阵:九事件接线/稳态逐 hook 注入=0/robustness 判决不自建监听器(**draft,⛔ 卡点1**)
-- [decision-workbench-007] 微协议文本四组,style-tiles 式 2-3 候选逐条选(**draft,⛔ 卡点2**)
-- [decision-workbench-008] MCP 工具面:register_scope/self_report/kb_retrieve/kb_record,description 即行为引导(**draft,⛔ 卡点3**)
+- [decision-workbench-006] hook 清单矩阵:九事件接线/稳态逐 hook 注入=0/Stop decision:block 唤醒/robustness 不自建监听器(active,2026-07-12 Wayne 批准)
+- [decision-workbench-007] 微协议终稿:B1 四义务+manual 指针/B2 双分支/B3 locus 包装;Stop 使用官方 block wire format(active,2026-07-12 Wayne 批准)
+- [decision-workbench-008] MCP 六 capability = 确定性端点+质量闸;description 只留机械契约与轻量 skill 路由(active,2026-07-12 Wayne 批准)
+- [decision-workbench-009] Claude plugin 三件套:hooks=when,MCP=deterministic capabilities,skills=how well;自然语言 skill 替代 codified workflow 是产品论题(active,2026-07-12 Wayne 批准)
+- [decision-workbench-010] **Intelligence ownership = skill**:hooks 只管 when,MCP/core 只管确定性原语+质量闸;首批至少 ingest/distill/query 三 skill;description 不得拼成分布式 workflow;engine dogfood 先于 Tauri 打包(active,2026-07-12 Wayne 开工确认)
 
 ## Changes
 
@@ -29,5 +32,6 @@ design-claude-code-integration.md)+ 机械块 D 实装(投递端/里程碑启发
 - [change-2026-07-12-treemap-spike] Treemap spike:squarified 真布局替手调 demoLayout,蒸馏时算一次缓存(migration 003)
 - [change-2026-07-12-demo-live-read] M1 ④ 落地:demo 切真 SQLite 读(vite middleware 现场导出),本地 hook 任务合并,e2e 172 全绿
 - [change-2026-07-12-m2-integration-design] M2 第一批:设计块 A/B/C 落 draft(三卡点)+ 机械块 D(注入投递 Stop 唤醒/SessionStart 补送/pause 最严胜出/送达读侧语义;里程碑机械启发式 CJK 加权)
+- [change-2026-07-12-m2-skill-intelligence-spine] M2 redo checkpoint:Claude plugin/hooks + MCP 六 capability + ingest/distill/query skills + scope/commit/timeline/graph 读写骨架,本地 engine 链路验证通过
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。

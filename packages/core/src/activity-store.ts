@@ -47,20 +47,25 @@ export interface TaskRow {
   lastEventAt: string;
   statusDetail: string | null;
   createdAt: string;
+  /** HEAD when the task was first captured; bounds read-side commit events. */
+  startHeadSha: string | null;
 }
 
 export function upsertTask(db: Db, t: TaskRow): void {
   db.prepare(
     `INSERT INTO tasks (id, repo_id, title, state, signal_tier, branch, worktree_path,
-       pr_number, pr_state, state_since, last_event_at, status_detail, created_at)
+       pr_number, pr_state, state_since, last_event_at, status_detail, created_at,
+       start_head_sha)
      VALUES (@id, @repoId, @title, @state, @signalTier, @branch, @worktreePath,
-       @prNumber, @prState, @stateSince, @lastEventAt, @statusDetail, @createdAt)
+       @prNumber, @prState, @stateSince, @lastEventAt, @statusDetail, @createdAt,
+       @startHeadSha)
      ON CONFLICT(id) DO UPDATE SET
        title = excluded.title, state = excluded.state,
        signal_tier = excluded.signal_tier, branch = excluded.branch,
        worktree_path = excluded.worktree_path, pr_number = excluded.pr_number,
        pr_state = excluded.pr_state, state_since = excluded.state_since,
-       last_event_at = excluded.last_event_at, status_detail = excluded.status_detail`,
+       last_event_at = excluded.last_event_at, status_detail = excluded.status_detail,
+       start_head_sha = COALESCE(tasks.start_head_sha, excluded.start_head_sha)`,
   ).run(t as unknown as Record<string, unknown>);
 }
 
@@ -71,7 +76,7 @@ export function readTask(db: Db, id: string): TaskRow | null {
               branch, worktree_path AS worktreePath, pr_number AS prNumber,
               pr_state AS prState, state_since AS stateSince,
               last_event_at AS lastEventAt, status_detail AS statusDetail,
-              created_at AS createdAt
+              created_at AS createdAt, start_head_sha AS startHeadSha
        FROM tasks WHERE id = ?`,
     )
     .get(id) as TaskRow | undefined;
@@ -85,10 +90,36 @@ export function listTasks(db: Db, repoId: number): TaskRow[] {
               branch, worktree_path AS worktreePath, pr_number AS prNumber,
               pr_state AS prState, state_since AS stateSince,
               last_event_at AS lastEventAt, status_detail AS statusDetail,
-              created_at AS createdAt
+              created_at AS createdAt, start_head_sha AS startHeadSha
        FROM tasks WHERE repo_id = ? ORDER BY created_at`,
     )
     .all(repoId) as TaskRow[];
+}
+
+export interface TaskReport {
+  status: string;
+  done: string | null;
+  reportedAt: string;
+}
+
+export function saveTaskReport(
+  db: Db,
+  taskId: string,
+  report: TaskReport,
+): TaskReport {
+  db.prepare(
+    `INSERT INTO task_reports (task_id, status, done, reported_at)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(task_id) DO UPDATE SET
+       status = excluded.status, done = excluded.done, reported_at = excluded.reported_at`,
+  ).run(taskId, report.status, report.done, report.reportedAt);
+  return report;
+}
+
+export function readTaskReport(db: Db, taskId: string): TaskReport | null {
+  return (db.prepare(
+    `SELECT status, done, reported_at AS reportedAt FROM task_reports WHERE task_id = ?`,
+  ).get(taskId) as TaskReport | undefined) ?? null;
 }
 
 /* ── sessions ───────────────────────────────────────────────────────────── */
@@ -308,13 +339,14 @@ export function enqueueInjection(
   mode: "inject" | "pause",
   text: string,
   now: string,
+  context?: string,
 ): number {
   const r = db
     .prepare(
-      `INSERT INTO injections (repo_id, task_id, mode, text, created_at)
-       VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO injections (repo_id, task_id, mode, text, context, created_at)
+       VALUES (?, ?, ?, ?, ?, ?)`,
     )
-    .run(repoId, taskId, mode, text, now);
+    .run(repoId, taskId, mode, text, context ?? null, now);
   return Number(r.lastInsertRowid);
 }
 
@@ -322,6 +354,7 @@ export interface ClaimedInjection {
   id: number;
   mode: "inject" | "pause";
   text: string;
+  context: string | null;
   createdAt: string;
 }
 
@@ -339,7 +372,7 @@ export function claimPendingInjections(
     .prepare(
       `UPDATE injections SET claimed_at = ?
        WHERE claimed_at IS NULL AND task_id = ?
-       RETURNING id, mode, text, created_at AS createdAt`,
+       RETURNING id, mode, text, context, created_at AS createdAt`,
     )
     .all(now, taskId) as ClaimedInjection[];
 }
@@ -348,13 +381,14 @@ export interface PendingInjection {
   id: number;
   mode: "inject" | "pause";
   text: string;
+  context: string | null;
   createdAt: string;
 }
 
 /**
  * Read-side view of not-yet-delivered notes — the delivery-timeout story.
  * claimed_at doubles as the delivery receipt (set in the same process that
- * emitted the additionalContext), and with no daemon there is nothing to
+ * emitted the hook response), and with no daemon there is nothing to
  * fire a timeout: "stuck" is DERIVED at read time from createdAt age (the
  * UI decides the threshold — e.g. session ended, or no hook fire since),
  * never stored (same discipline as "stalled" in state-machine.ts).
@@ -362,7 +396,7 @@ export interface PendingInjection {
 export function pendingInjections(db: Db, taskId: string): PendingInjection[] {
   return db
     .prepare(
-      `SELECT id, mode, text, created_at AS createdAt FROM injections
+      `SELECT id, mode, text, context, created_at AS createdAt FROM injections
        WHERE claimed_at IS NULL AND task_id = ?
        ORDER BY created_at, id`,
     )

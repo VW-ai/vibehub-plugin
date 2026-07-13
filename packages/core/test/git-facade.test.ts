@@ -62,6 +62,27 @@ describe("GitFacade on a scratch repo", () => {
       toplevel: fsRealpath(wtPath), // the session's own tree
       branch: "feat/ctx", // the session's own HEAD
     });
+    expect(GitFacade.headShaAt(wtPath)).toBe(git(wtPath, "rev-parse", "HEAD").trim());
+  });
+
+  it("derives only commits after the task baseline with stable git ids", () => {
+    const isolated = makeScratchRepo();
+    try {
+      const baseline = git(isolated.work, "rev-parse", "HEAD").trim();
+      isolated.write("src/new.ts", "export const n = 1;\n");
+      isolated.commitAll("feat: add new fact");
+      const events = new GitFacade(isolated.work).commitEventsSince(baseline, "HEAD");
+      expect(events).toHaveLength(1);
+      expect(events[0]).toMatchObject({
+        id: expect.stringMatching(/^git:[0-9a-f]{40}$/),
+        type: "commit",
+        message: "feat: add new fact",
+        filesChanged: 1,
+      });
+      expect(events[0]!.sha).toHaveLength(7);
+    } finally {
+      isolated.cleanup();
+    }
   });
 
   it("listRemoteBranches with a compare ref carries ahead/behind (git ≥ 2.41)", () => {

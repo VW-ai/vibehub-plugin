@@ -336,6 +336,40 @@ const MIGRATIONS: string[] = [
     computed_at TEXT NOT NULL
   );
   `,
+
+  // 004 — M2 runtime contracts: raw scope patterns are the source fact;
+  // territory attribution remains derived. start_head_sha bounds commit
+  // derivation to the lifetime of a task. Injection context carries the
+  // app locus verbatim (nullable for terminal-authored notes).
+  `
+  ALTER TABLE tasks ADD COLUMN start_head_sha TEXT;
+  ALTER TABLE injections ADD COLUMN context TEXT;
+
+  CREATE TABLE scope_patterns (
+    repo_id INTEGER NOT NULL REFERENCES repos(id),
+    task_id TEXT NOT NULL REFERENCES tasks(id),
+    seq INTEGER NOT NULL,
+    mode TEXT NOT NULL CHECK (mode IN ('write','read')),
+    glob TEXT NOT NULL,
+    label TEXT,
+    status TEXT NOT NULL,
+    PRIMARY KEY (task_id, seq)
+  );
+  CREATE INDEX idx_scope_patterns_repo_task ON scope_patterns(repo_id, task_id);
+
+  CREATE TABLE task_reports (
+    task_id TEXT PRIMARY KEY REFERENCES tasks(id),
+    status TEXT NOT NULL,
+    done TEXT,
+    reported_at TEXT NOT NULL
+  );
+  `,
+
+  // 005 — one off-scope reminder per raw scope declaration. Replacing the
+  // declaration deletes these rows, mechanically resetting eligibility.
+  `
+  ALTER TABLE scope_patterns ADD COLUMN reminded_at TEXT;
+  `,
 ];
 
 export function openDb(dbPath: string = defaultDbPath()): Db {

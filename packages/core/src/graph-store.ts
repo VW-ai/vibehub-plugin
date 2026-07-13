@@ -10,6 +10,8 @@
 import type { DemoLayout, SubBlock, Territory } from "./contract/map-types.js";
 import type { Db } from "./db.js";
 import { layoutTerritories, type LayoutOptions } from "./treemap.js";
+import { canonicalRepoPath } from "./scope-registry.js";
+import crypto from "node:crypto";
 
 /* ── features (territories & sub-blocks) ────────────────────────────────── */
 
@@ -178,6 +180,165 @@ export function upsertSpec(db: Db, s: SpecRow, now: string): void {
        state = excluded.state, summary = excluded.summary,
        detail = excluded.detail, updated_at = excluded.updated_at`,
   ).run({ ...s, now } as unknown as Record<string, unknown>);
+}
+
+export type SpecType = SpecRow["type"];
+
+export interface RecordSpecInput {
+  type: SpecType;
+  summary: string;
+  detail: string | null;
+  featureId?: string;
+  supersedes?: string;
+}
+
+/** Deterministic write door used by kb_record; semantic decomposition stays in skills. */
+export function recordSpec(
+  db: Db,
+  repoId: number,
+  input: RecordSpecInput,
+  now: string,
+  makeId: () => string = () => `${input.type}-${crypto.randomUUID()}`,
+): { spec: SpecRow; duplicateCandidates: SpecRow[] } {
+  const duplicateCandidates = db
+    .prepare(
+      `SELECT id, repo_id AS repoId, feature_id AS featureId, type, state, summary, detail
+       FROM specs WHERE repo_id = ? AND lower(trim(summary)) = lower(trim(?))`,
+    )
+    .all(repoId, input.summary) as SpecRow[];
+  if (input.featureId) {
+    const feature = db
+      .prepare(`SELECT 1 FROM features WHERE repo_id = ? AND id = ?`)
+      .get(repoId, input.featureId);
+    if (!feature) throw new Error(`missing feature: ${input.featureId}`);
+  }
+  const superseded = input.supersedes ? readSpec(db, input.supersedes) : null;
+  if (input.supersedes && (!superseded || superseded.repoId !== repoId)) {
+    throw new Error(`missing superseded spec: ${input.supersedes}`);
+  }
+  const spec: SpecRow = {
+    id: makeId(),
+    repoId,
+    featureId: input.featureId ?? null,
+    type: input.type,
+    state: "draft",
+    summary: input.summary,
+    detail: input.detail,
+  };
+  const tx = db.transaction(() => {
+    db.prepare(
+      `INSERT INTO specs (id, repo_id, feature_id, type, state, summary, detail, created_at, updated_at)
+       VALUES (@id, @repoId, @featureId, @type, @state, @summary, @detail, @now, @now)`,
+    ).run({ ...spec, now } as unknown as Record<string, unknown>);
+    if (input.supersedes) {
+      db.prepare(`UPDATE specs SET state = 'superseded', updated_at = ? WHERE id = ?`)
+        .run(now, input.supersedes);
+      addEdge(db, repoId, spec.id, input.supersedes, "supersedes");
+    }
+  });
+  tx();
+  return { spec, duplicateCandidates };
+}
+
+export function markSpecStale(db: Db, id: string, now: string): void {
+  const result = db
+    .prepare(`UPDATE specs SET state = 'stale', updated_at = ? WHERE id = ?`)
+    .run(now, id);
+  if (result.changes !== 1) throw new Error(`missing spec: ${id}`);
+}
+
+export interface KnowledgeResult {
+  spec: SpecRow;
+  matchedPaths: string[];
+  score: number;
+}
+
+/** One deterministic retrieval pass; multi-pass query strategy belongs to vibehub-query. */
+export function retrieveKnowledge(
+  db: Db,
+  repoId: number,
+  input: { query?: string; paths?: string[]; limit?: number },
+): KnowledgeResult[] {
+  const terms = (input.query ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+  const paths = (input.paths ?? []).map(canonicalRepoPath);
+  const specs = db.prepare(
+    `SELECT id, repo_id AS repoId, feature_id AS featureId, type, state, summary, detail
+     FROM specs WHERE repo_id = ? AND state NOT IN ('stale','superseded')`,
+  ).all(repoId) as SpecRow[];
+  const anchorsForSpec = db.prepare(
+    `SELECT DISTINCT file FROM anchors
+     WHERE repo_id = ? AND (spec_id = ? OR feature_id = ?)`,
+  );
+  return specs
+    .map((spec): KnowledgeResult => {
+      const anchored = (anchorsForSpec.all(repoId, spec.id, spec.featureId) as Array<{ file: string }>)
+        .map((row) => row.file);
+      const matchedPaths = paths.filter((p) => anchored.includes(p));
+      const summary = spec.summary.toLowerCase();
+      const detail = (spec.detail ?? "").toLowerCase();
+      const topicScore = terms.reduce(
+        (score, term) => score + (summary.includes(term) ? 10 : 0) + (detail.includes(term) ? 3 : 0),
+        0,
+      );
+      return { spec, matchedPaths, score: matchedPaths.length * 100 + topicScore };
+    })
+    .filter((result) => result.score > 0)
+    .sort((a, b) => b.score - a.score || a.spec.id.localeCompare(b.spec.id))
+    .slice(0, input.limit ?? 8);
+}
+
+export interface DistillationManifest {
+  features: Array<{ id: string; parentId?: string; name: string }>;
+  anchors: Array<{ featureId: string; file: string; symbol?: string }>;
+  relations: Array<{ fromId: string; toId: string; type: string }>;
+}
+
+/** Atomic mechanical apply for a manifest produced by vibehub-distill. */
+export function applyDistillation(
+  db: Db,
+  repoId: number,
+  manifest: DistillationManifest,
+  now: string,
+): void {
+  const ids = new Set<string>();
+  for (const feature of manifest.features) {
+    if (ids.has(feature.id)) throw new Error(`duplicate feature id: ${feature.id}`);
+    ids.add(feature.id);
+  }
+  const featureExists = (id: string): boolean =>
+    ids.has(id) ||
+    db.prepare(`SELECT 1 FROM features WHERE repo_id = ? AND id = ?`).get(repoId, id) !== undefined;
+  const nodeExists = (id: string): boolean =>
+    featureExists(id) ||
+    db.prepare(`SELECT 1 FROM specs WHERE repo_id = ? AND id = ?`).get(repoId, id) !== undefined;
+
+  for (const feature of manifest.features) {
+    if (feature.parentId && !featureExists(feature.parentId)) {
+      throw new Error(`missing parent feature: ${feature.parentId}`);
+    }
+  }
+  const anchors = manifest.anchors.map((anchor) => {
+    if (!featureExists(anchor.featureId)) {
+      throw new Error(`missing feature for anchor: ${anchor.featureId}`);
+    }
+    return { ...anchor, file: canonicalRepoPath(anchor.file) };
+  });
+  for (const relation of manifest.relations) {
+    if (!nodeExists(relation.fromId)) throw new Error(`missing relation node: ${relation.fromId}`);
+    if (!nodeExists(relation.toId)) throw new Error(`missing relation node: ${relation.toId}`);
+  }
+
+  const tx = db.transaction(() => {
+    for (const feature of manifest.features) {
+      upsertFeature(db, { ...feature, repoId, now });
+    }
+    for (const anchor of anchors) addAnchor(db, { ...anchor, repoId });
+    for (const relation of manifest.relations) {
+      addEdge(db, repoId, relation.fromId, relation.toId, relation.type);
+    }
+    computeAndCacheTerritoryLayout(db, repoId, now);
+  });
+  tx();
 }
 
 export function readSpec(db: Db, id: string): SpecRow | null {

@@ -1,6 +1,6 @@
 spec_id: "decision-workbench-009"
 type: decision
-state: draft
+state: active
 intent:
   summary: "产品形态 = Claude Code plugin 三件套:hooks(触发骨架,when)+ MCP server(确定性端点+质量闸,db 唯一读写门)+ skill 包(方法论,how well);产品论题 = 自然语言 skill 替代 codified workflow(用户可读可改可 fork,确定性代码收缩到必须机械处),dogfood 自证 + skill change 版本史反哺 workflow 设计;026 重塑的正确解读 = 触发模型换血(咒语→hook微指令/description/自发),方法论文本保留为 skill;蒸馏质量管道 = skill×server校验×人晨审 三层闸"
   detail: |
@@ -29,7 +29,7 @@ intent:
     3. **skill 包 = 方法论(how well)**:ingest(怎么把一段讨论拆成
        spec objects:七类型判定/查重/relations/provenance/置信度)、
        蒸馏(冷启动 pipeline:扫描→提 feature→锚定→逐步经 MCP 落库)、
-       retrieval 策略等。**触发者 = hook 微指令指路 + tool description
+       query(查询形成/扩展收窄/版本链与冲突综合)等。**触发者 = hook 微指令指路 + tool description
        提示 + agent 自发——不再有用户咒语**;方法论正文从我们自己的
        fr-* skills + Victor plugin(纯 skill 包,9 skill/2106 行,
        026 判定 C/R/U 领域逻辑约六七成可复用)蒸馏改写。
@@ -58,8 +58,8 @@ intent:
     - 008(MCP 工具面):工具定位从"接口即全部"修正为"端点+质量闸";
       kb_record description 增加对 ingest skill 的指路;
     - B1 协议四义务不变(义务是触发,方法论在 skill);
-    - 块 E 范围追加:skill 包初版(vibehub-ingest / vibehub-distill
-      至少两个)+ server 校验闸,与 MCP server 同批;
+    - 块 E 范围追加:skill 包初版(vibehub-ingest / vibehub-distill /
+      vibehub-query 至少三个)+ server 校验闸,与 MCP server 同批;
     - get_manual(008/C4)与 skill 包分工:manual 是被动参考,skill
       是主动方法论,不合并。
 constraints:
@@ -91,4 +91,8 @@ relations:
   - target: "decision-project-013"
     type: implements
     detail: "LLM 判断→skill prompt / 确定性算子→CLI(server) 的分界线在 plugin 三件套里的落位"
-anchors: []
+anchors:
+  - file: "workbench/.claude-plugin/plugin.json"
+  - file: "workbench/skills/vibehub-ingest/SKILL.md"
+  - file: "workbench/skills/vibehub-distill/SKILL.md"
+  - file: "workbench/skills/vibehub-query/SKILL.md"

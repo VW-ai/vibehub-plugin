@@ -6,6 +6,7 @@
  *
  * Commands:
  *   vibehub hook <event>                              (M1 ③ — the heart)
+ *   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>]
  *   vibehub team sync    [--repo <path>] [--db <path>] [--json]
  *   vibehub team fixture [--repo <path>] [--db <path>] [--out <file>]
  *
@@ -17,10 +18,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
+  enqueueInjection,
   exportTeamMapFixture,
   GitFacade,
   ingestHookEvent,
   openDb,
+  readTask,
   resolveDbPath,
   syncTeamSnapshot,
   vibehubHome,
@@ -54,7 +57,8 @@ function parseFlags(argv: string[]): Flags {
 }
 
 const USAGE = `usage:
-  vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|Notification|Stop|SessionEnd>
+  vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop>
+  vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
   vibehub team fixture [--repo <path>] [--db <path>] [--out <file>]`;
 
@@ -62,9 +66,13 @@ const HOOK_EVENTS: ReadonlySet<string> = new Set([
   "SessionStart",
   "UserPromptSubmit",
   "PostToolUse",
+  "PostToolUseFailure",
   "Notification",
   "Stop",
+  "StopFailure",
   "SessionEnd",
+  "SubagentStart",
+  "SubagentStop",
 ]);
 
 function readStdin(): string {
@@ -112,6 +120,50 @@ function main(argv: string[]): number {
   const [group, cmd, ...rest] = argv;
   if (group === "hook") {
     return runHook(cmd, rest);
+  }
+  if (group === "inject" && cmd) {
+    const text = rest.shift();
+    if (!text) {
+      console.error(USAGE);
+      return 2;
+    }
+    let mode: "inject" | "pause" = "inject";
+    let context: string | undefined;
+    let dbFlag: string | undefined;
+    for (let i = 0; i < rest.length; i++) {
+      const flag = rest[i];
+      if (flag === "--mode") {
+        const value = rest[++i];
+        if (value !== "inject" && value !== "pause") {
+          console.error("--mode must be inject or pause");
+          return 2;
+        }
+        mode = value;
+      } else if (flag === "--context") context = rest[++i];
+      else if (flag === "--db") dbFlag = rest[++i];
+      else {
+        console.error(`unknown flag: ${flag}`);
+        return 2;
+      }
+    }
+    const db = openDb(resolveDbPath(dbFlag));
+    try {
+      const task = readTask(db, cmd);
+      if (!task) throw new Error(`unknown task: ${cmd}`);
+      const id = enqueueInjection(
+        db,
+        task.repoId,
+        task.id,
+        mode,
+        text,
+        new Date().toISOString(),
+        context,
+      );
+      console.log(JSON.stringify({ id, taskId: task.id, mode }));
+    } finally {
+      db.close();
+    }
+    return 0;
   }
   if (group !== "team" || !cmd) {
     console.error(USAGE);

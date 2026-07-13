@@ -1,0 +1,84 @@
+spec_id: "decision-workbench-010"
+type: decision
+state: active
+intent:
+  summary: "Intelligence ownership 收口到 skill:首批至少 ingest/distill/query 三个 skill;hooks 只负责触发时机,MCP/core 只提供确定性原语、质量闸与事实反馈,description 不得拼成分布式 workflow;engine dogfood 闭环是验收前置,Tauri 打包不是"
+  detail: |
+    Wayne 2026-07-12 对 M2 redo 的执行确认。上一轮偏差的根因不是少了一个
+    skill 包,而是把本应完整住在 skill 的 intelligence 拆散到了 hook
+    prompt、MCP description 与 server guidance。修正后的唯一 ownership:
+
+    - hooks = when:只发条件化触发/运行协议,不教完整方法论;
+    - skills = how well:拥有跨步骤语义 workflow、判断与综合策略;
+    - MCP = deterministic capabilities:稳定读写原语、schema、机械校验、
+      事务边界和候选事实;不替 agent 做语义裁决;
+    - core/SQLite = integrity:存储完整性、索引、关系不变式与纯派生;
+    - app = perception/intervention:消费事实、展示 scope、允许快速介入。
+
+    **首批 skill 最小集合:**
+    1. `vibehub-ingest`:讨论/材料 → 去重、拆分、关系化的 spec objects;
+    2. `vibehub-distill`:repo 冷启动 → feature/anchor/context graph;
+    3. `vibehub-query`:把当前任务/路径/why 问题形成查询,按需扩展或收窄,
+       综合冲突与版本链,输出可执行 context。`kb_retrieve` 只是其底层查询
+       原语,不得把 query strategy 偷塞进 tool description。
+
+    Tool description 只允许三类内容:能力是什么、输入输出/机械约束、何时
+    路由到哪一个 skill。Server return guidance 只允许机械事实(校验失败、
+    duplicate candidates、missing anchors、stale/supersede 结果),不得规定
+    后续语义 workflow。
+
+    **验收顺序:**先在开发态 app 跑通 hooks → skill → MCP → SQLite → app →
+    injection 的真实 engine dogfood 闭环;Tauri/downloadable packaging 在此后,
+    不作为验证 context engine 的前置条件。
+
+    **2026-07-12 开工契约锁定:**
+    - B1 正式 context pull 触发 `vibehub-query`;`kb_retrieve` 保持一次确定性
+      检索原语,简单 fast-path 可裸调,多轮策略只在 query skill;
+    - `kb_record` 接受七类 spec(intent/decision/constraint/convention/
+      contract/context/change),spec id 由 server 生成,skill 不得用 id 覆盖;
+    - 新增第六 MCP capability `kb_apply_distillation`:接收 distill skill
+      产出的 manifest,整批校验 feature/anchor/relation 后单事务写入并重算
+      layout;语义拆解仍只属于 distill skill;
+    - scope source of truth = canonical repo-relative raw globs;core 唯一 matcher
+      负责 glob→anchor→territory 的读侧派生,未匹配进灰区;
+    - task 首次捕捉保存 `start_head_sha`;CommitEvent 只从
+      `start_head_sha..HEAD` 读侧派生,稳定 id=`git:<sha>`,不吞历史提交。
+constraints:
+  - kind: must
+    rule: "跨工具的语义 workflow、检索策略、拆解与综合判断必须完整归属 skill"
+  - kind: must_not
+    rule: "不得把 intelligence 拆散进 hook 文本、MCP description 或 server return guidance"
+  - kind: must
+    rule: "M2 首批 skill 至少包含 vibehub-ingest、vibehub-distill、vibehub-query"
+  - kind: must_not
+    rule: "Tauri 打包不得作为 engine dogfood 闭环的前置 gate"
+  - kind: must
+    rule: "distillation manifest 只经 kb_apply_distillation 单事务写入;skill 不得直写 SQLite"
+  - kind: must
+    rule: "scope 原始事实保存 repo-relative glob,territory attribution 读侧派生"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [skill, intelligence-ownership, ingest, distill, query, mcp, dogfood]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne 2026-07-12 M2 handoff 澄清与开工确认"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-workbench-009"
+    type: refines
+    detail: "把 plugin 三件套进一步收紧为单一 intelligence ownership"
+  - target: "decision-project-026"
+    type: implements
+    detail: "保留 skill 方法论载体,只替换其触发模型"
+  - target: "decision-workbench-008"
+    type: constrains
+    detail: "约束 MCP description 与 server guidance 不得承载 workflow"
+anchors:
+  - file: "META/21-workbench/design-claude-code-integration.md"
+  - file: "workbench/packages/core/src/scope-registry.ts"
+  - file: "workbench/packages/core/src/timeline-read.ts"
+  - file: "workbench/packages/mcp/src/capabilities.ts"

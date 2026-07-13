@@ -1,11 +1,11 @@
 spec_id: "decision-workbench-007"
 type: decision
-state: draft
+state: active
 intent:
-  summary: "微协议 prompt 文本四组(SessionStart 行为协议/meta 角色/scope 越界提醒/注入送达包装),每组 2-3 候选 style-tiles 式待 Wayne 逐条选;统一 [Vibehub] 前缀、全英文;pause>inject 批量包装最严胜出;文本改动=产品改动,实装后任何变更留 spec 痕"
+  summary: "微协议文本已裁:B1 四义务+manual 指针、B2 给台阶双分支、B3 current-task 包装+locus,pause>inject 批量最严胜出;Stop 用 decision:block+reason 唤醒,其余送达点用 additionalContext;统一 [Vibehub] 前缀、全英文;文本改动留 spec 痕"
   detail: |
-    ⛔ 卡点 2 待 Wayne 逐条选(像过 style tiles:每条 2-3 候选,选而非改)。
-    候选全文逐字见 design-claude-code-integration.md 块B;选定后逐字回填本 spec。
+    Wayne 2026-07-12 已批准 B1/B2/B3 与 locus。终稿见
+    design-claude-code-integration.md §2 与 hook-ingest.ts。
 
     **四组与触发条件/预算/预期行为:**
     1. **B1 SessionStart 行为协议**(普通 session;每 session 一次,resume/compact
@@ -28,7 +28,7 @@ intent:
     **通用规则**:全英文(token 效率+通用性);[Vibehub] 前缀标来源;
     语气(命令式 vs 提示式)是 Wayne 手感裁决项——候选刻意横跨两种语气。
 
-    **Wayne 2026-07-12 口述初裁与新增待裁项(正式确认仍在卡点 2):**
+    **Wayne 2026-07-12 裁决:**
     - B1 初裁 = 候选 A("不要太极简");
     - 新提案①:B1 尾部加 manual 指针一行(+~18 tok,"when you need it,
       not before starting work"),配套 MCP get_manual 工具(008/C4);
@@ -60,7 +60,7 @@ indexing:
 provenance:
   source_type: manual_input
   confidence: 0.75
-  source_ref: "M2 integration design session 2026-07-12;候选待 Wayne 卡点 2 逐条选"
+  source_ref: "M2 integration design session 2026-07-12;Wayne 批准开工"
   produced_at: "2026-07-12"
 relations:
   - target: "decision-project-026"
@@ -72,4 +72,7 @@ relations:
   - target: "intent-workbench-001"
     type: relates_to
     detail: "meta 角色注入 = 操作舱编排席的协议前置"
-anchors: []
+anchors:
+  - file: "workbench/packages/core/src/hook-ingest.ts"
+    symbols: [ingestHookEvent]
+  - file: "workbench/hooks/hooks.json"

@@ -49,6 +49,7 @@ const task = (id: string, over: Partial<TaskRow> = {}): TaskRow => ({
   lastEventAt: T(0),
   statusDetail: null,
   createdAt: T(0),
+  startHeadSha: "abc123",
   ...over,
 });
 
@@ -72,6 +73,7 @@ describe("ActivityStore (运行域)", () => {
     const r = readTask(db, "t1")!;
     expect(r.state).toBe("waiting");
     expect(r.statusDetail).toBe("Which pattern?");
+    expect(r.startHeadSha).toBe("abc123");
     expect(listTasks(db, 1)).toHaveLength(1);
   });
 
@@ -187,6 +189,14 @@ describe("ActivityStore (运行域)", () => {
     expect(claimed.map((c) => c.mode)).toEqual(["inject", "pause"]);
     // second claim: nothing — no double delivery
     expect(claimPendingInjections(db, "t1", T(6))).toEqual([]);
+  });
+
+  it("preserves optional injection locus through claim", () => {
+    upsertTask(db, task("t1"));
+    enqueueInjection(db, 1, "t1", "inject", "Check this.", T(1), "Event · e-7");
+    expect(claimPendingInjections(db, "t1", T(2))).toMatchObject([
+      { text: "Check this.", context: "Event · e-7" },
+    ]);
   });
 
   it("round-trips a Conflict preserving symbol order (contract invariant)", () => {

@@ -1,10 +1,10 @@
 spec_id: "decision-workbench-006"
 type: decision
-state: draft
+state: active
 intent:
   summary: "Claude Code hook 清单矩阵:v1 接线九事件(六旧 + SubagentStart/Stop、PostToolUseFailure、StopFailure collect-only);稳态逐 hook 注入=0,无条件注入仅 SessionStart 协议一处;Stop 送达即唤醒;robustness 判决=内置 hooks(公开契约)+失联机械检测,不自建 session 监听器,降级走 021 弱档"
   detail: |
-    ⛔ 卡点 1 待 Wayne 审。全矩阵与逐事件官方能力事实见
+    Wayne 2026-07-12 已批准矩阵。全矩阵与逐事件官方能力事实见
     design-claude-code-integration.md 块A(能力表 2026-07-12 抓自
     code.claude.com/docs/en/hooks,非凭记忆)。
 
@@ -14,7 +14,7 @@ intent:
     | UserPromptSubmit | launch/user_injection + prompt_id + 里程碑机械分类 | pending 送达(仅非空) | 0 稳态 |
     | PostToolUse(Edit|Write|MultiEdit|NotebookEdit|Read matcher) | 足迹 | pending 送达 + scope 越界提醒(仅机械探测越界后,每份 scope 声明至多一次;re-register 重置) | ≤50 一次性 |
     | Notification(needs_input 类) | question→waiting | 无(能力上不可注) | 0 |
-    | Stop | self_report 原话 | pending 送达(送达即唤醒——Stop 的 additionalContext 让对话继续,异步注入最速通道;Wayne 2026-07-12 口述认可) | 0 稳态 |
+    | Stop | self_report 原话 | pending 送达(送达即唤醒——官方 wire format 为顶层 decision:block + reason;异步注入最速通道) | 0 稳态 |
     | SessionEnd | end reason→done | 无 | 0 |
     | SubagentStart/Stop(新) | 子 agent 谱系 | 无 | 0 |
     | PostToolUseFailure(新) | error_message(stalled 佐证) | 无 | 0 |
@@ -39,7 +39,7 @@ constraints:
   - kind: must
     rule: "稳态逐 hook 注入为零;无条件注入仅 SessionStart 行为协议一处(026)"
   - kind: must_not
-    rule: "vibehub hook 永不阻断(恒 exit 0,不用 exit 2 / decision:block)"
+    rule: "vibehub hook 进程恒 exit 0且不得阻断用户动作;Stop 有 pending 时允许按官方协议返回 decision:block 以阻止本轮停下并继续对话"
   - kind: must_not
     rule: "不自建 session 监听器;降级路径 = 021 弱信号档"
 indexing:

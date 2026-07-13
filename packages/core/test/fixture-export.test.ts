@@ -201,7 +201,7 @@ describe("exportTeamMapFixture", () => {
       state: "waiting", signalTier: "hooks", branch: "feat/a",
       worktreePath: "/wt/feat-a", prNumber: null, prState: null,
       stateSince: T1, lastEventAt: T1,
-      statusDetail: "Which retry pattern?", createdAt: T0,
+      statusDetail: "Which retry pattern?", createdAt: T0, startHeadSha: null,
     });
     addFootprint(db, repoId, { taskId: "branch:feat/a", sessionId: null, path: "src/x.ts", action: "edit", at: T1 });
 
@@ -227,7 +227,7 @@ describe("exportTeamMapFixture", () => {
       id: "branch:vibehub/local-only", repoId, title: "vibehub/local-only",
       state: "running", signalTier: "hooks", branch: "vibehub/local-only",
       worktreePath: null, prNumber: null, prState: null,
-      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0,
+      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0, startHeadSha: null,
     });
     const fx = exportTeamMapFixture(db, "/repo", { now: () => NOW });
     expect(fx.tasks).toHaveLength(1);
@@ -254,7 +254,7 @@ describe("exportTeamMapFixture", () => {
       id: "branch:vibehub/x", repoId, title: "vibehub/x",
       state: "running", signalTier: "hooks", branch: "vibehub/x",
       worktreePath: null, prNumber: null, prState: null,
-      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0,
+      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0, startHeadSha: null,
     });
     addFootprint(db, repoId, { taskId: "branch:vibehub/x", sessionId: null, path: "src/misc.ts", action: "edit", at: T1 });
 
@@ -291,7 +291,7 @@ describe("exportTeamMapFixture", () => {
       id: "branch:vibehub/y", repoId, title: "vibehub/y",
       state: "running", signalTier: "hooks", branch: "vibehub/y",
       worktreePath: null, prNumber: null, prState: null,
-      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0,
+      stateSince: T1, lastEventAt: T1, statusDetail: null, createdAt: T0, startHeadSha: null,
     });
     setScopes(db, repoId, "branch:vibehub/y", [
       { mode: "write", territoryId: "auth", label: "auth" },

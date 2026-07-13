@@ -18,6 +18,7 @@ import {
   sessionIdentity,
 } from "../src/activity-store.js";
 import { getRepoByRoot } from "../src/team-store.js";
+import { replaceScopePatterns } from "../src/scope-registry.js";
 import { git, makeScratchRepo, type ScratchRepo } from "./helpers.js";
 
 const T = (m: number): Date => new Date(`2026-07-12T10:${String(m).padStart(2, "0")}:00.000Z`);
@@ -72,6 +73,28 @@ describe("ingestHookEvent on a scratch repo", () => {
     expect(task.title).toBe("vibehub/fix-login"); // branch = the only honest title
     expect(task.signalTier).toBe("hooks");
     expect(getRepoByRoot(db, repo.work)).not.toBeNull();
+    expect(r.output?.hookSpecificOutput?.additionalContext).toContain(
+      "use the vibehub-query skill",
+    );
+  });
+
+  it("reminds once when an edit leaves the current raw write scope", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    replaceScopePatterns(db, repoId, taskBranch, "auth", [
+      { mode: "write", glob: "src/auth/**" },
+    ]);
+
+    const outside = payload({
+      tool_name: "Edit",
+      tool_input: { file_path: path.join(repo.work, "src/billing.ts") },
+    });
+    const first = ingestHookEvent(db, "PostToolUse", outside, { now: () => T(1) });
+    expect(first.output?.hookSpecificOutput?.additionalContext).toContain(
+      "src/billing.ts) is outside your declared write scope",
+    );
+    const second = ingestHookEvent(db, "PostToolUse", outside, { now: () => T(2) });
+    expect(second.output).toBeUndefined();
   });
 
   it("first prompt = launch, later prompts = user_injection (contract LaunchEvent)", () => {
@@ -153,6 +176,28 @@ describe("ingestHookEvent on a scratch repo", () => {
     expect(readTask(db, taskBranch)!.state).toBe("waiting");
   });
 
+  it("uses Stop's public last_assistant_message without reading the transcript", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    ingestHookEvent(db, "Stop", payload({ last_assistant_message: "Public field report." }), {
+      now: () => T(1),
+    });
+    expect(readTimeline(db, taskBranch).find((e) => e.type === "self_report")).toMatchObject({
+      text: "Public field report.",
+    });
+  });
+
+  it("records failure detail without fabricating a state transition", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const result = ingestHookEvent(
+      db,
+      "StopFailure",
+      payload({ error: "rate_limit", error_details: "429" }),
+      { now: () => T(1) },
+    );
+    expect(result.stateAfter).toBe("running");
+    expect(readTask(db, taskBranch)?.statusDetail).toBe("rate_limit: 429");
+  });
+
   it("SessionEnd closes the session and the task goes done", () => {
     ingestHookEvent(db, "SessionStart", payload({ transcript_path: "/tmp/x.jsonl" }), { now: () => T(0) });
     ingestHookEvent(db, "SessionEnd", payload({ reason: "exit" }), { now: () => T(9) });
@@ -191,6 +236,28 @@ describe("ingestHookEvent on a scratch repo", () => {
     expect(r2.output).toBeUndefined();
   });
 
+  it("carries the panel locus into the delivery wrapper", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    enqueueInjection(
+      db,
+      repoId,
+      taskBranch,
+      "inject",
+      "Keep the public contract stable.",
+      T(1).toISOString(),
+      "Conflict card · packages/core/src/index.ts",
+    );
+
+    const r = ingestHookEvent(db, "PostToolUse", payload(), { now: () => T(2) });
+
+    expect(r.output?.hookSpecificOutput?.additionalContext).toBe(
+      "[Vibehub] Message from your user while viewing Conflict card · packages/core/src/index.ts:\n" +
+        "Keep the public contract stable.\n" +
+        "Treat this as guidance for the current task; do not restart or re-plan work that is already settled.",
+    );
+  });
+
   it("Stop delivers pending injections — the wake-the-agent fast lane", () => {
     ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
     const repoId = getRepoByRoot(db, repo.work)!.id;
@@ -198,12 +265,12 @@ describe("ingestHookEvent on a scratch repo", () => {
 
     const r = ingestHookEvent(db, "Stop", payload(), { now: () => T(2) });
     expect(r.output).toEqual({
-      hookSpecificOutput: {
-        hookEventName: "Stop",
-        additionalContext: "[Vibehub] Message(s) from your user:\n- Also update the docs.",
-      },
+      decision: "block",
+      reason: "[Vibehub] Message(s) from your user:\n- Also update the docs.",
     });
     expect(pendingInjections(db, taskBranch)).toEqual([]);
+    expect(readTask(db, taskBranch)?.state).toBe("running");
+    expect(r.stateAfter).toBe("running");
   });
 
   it("SessionStart delivers notes queued while the session was away", () => {
@@ -213,8 +280,8 @@ describe("ingestHookEvent on a scratch repo", () => {
     enqueueInjection(db, repoId, taskBranch, "inject", "When you're back: rebase first.", T(2).toISOString());
 
     const r = ingestHookEvent(db, "SessionStart", payload({ session_id: "sess-2" }), { now: () => T(3) });
-    expect(r.output?.hookSpecificOutput.hookEventName).toBe("SessionStart");
-    expect(r.output?.hookSpecificOutput.additionalContext).toContain("rebase first");
+    expect(r.output?.hookSpecificOutput?.hookEventName).toBe("SessionStart");
+    expect(r.output?.hookSpecificOutput?.additionalContext).toContain("rebase first");
   });
 
   it("one pause in the batch makes the WHOLE batch a pause (stricter wins)", () => {
@@ -224,7 +291,7 @@ describe("ingestHookEvent on a scratch repo", () => {
     enqueueInjection(db, repoId, taskBranch, "pause", "Stop — let's talk.", T(2).toISOString());
 
     const r = ingestHookEvent(db, "UserPromptSubmit", payload({ prompt: "继续" }), { now: () => T(3) });
-    const ctx = r.output!.hookSpecificOutput.additionalContext;
+    const ctx = r.output!.hookSpecificOutput!.additionalContext;
     expect(ctx).toContain("[Vibehub] PAUSE from your user:");
     // FIFO order preserved inside the batch
     expect(ctx.indexOf("First note.")).toBeLessThan(ctx.indexOf("Stop — let's talk."));
@@ -257,7 +324,7 @@ describe("ingestHookEvent on a scratch repo", () => {
     const tl = readTimeline(db, taskBranch);
     expect(tl.find((e) => e.type === "launch")).toMatchObject({ promptId: "p-1" });
     const injections = tl.filter((e) => e.type === "user_injection");
-    expect(injections[0]).toMatchObject({ promptId: "p-2", classification: "routine" });
+    expect(injections[0]).toMatchObject({ promptId: "p-2", classification: "default" });
     expect(injections[1]).toMatchObject({ promptId: "p-3", classification: "milestone" });
   });
 

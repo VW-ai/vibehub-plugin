@@ -139,12 +139,14 @@ export interface TestRunEvent extends TimelineEventBase {
 /**
  * The user's mid-flight message from the intervention deck (023: 介入必入史,
  * both tiers, never hidden — constraint "用户的介入动作必入时间线").
- * SOURCE: the panel's own Send action; delivered to the session as a
- * UserPromptSubmit at the next turn boundary (inject) or after a stop (pause).
+ * SOURCE: the panel's own Send action; delivered through the next hook that
+ * carries guidance. Stop uses decision:block + reason as the fast lane and
+ * wakes the conversation; UserPromptSubmit/PostToolUse/SessionStart deliver
+ * additionalContext as fallback boundaries.
  */
 export interface UserInjectionEvent extends TimelineEventBase {
   type: "user_injection";
-  /** Which deck mode sent it: queue at turn boundary vs stop-first. */
+  /** Which deck mode sent it: continue-current-task guidance vs stop-first. */
   mode: "inject" | "pause";
   /** Verbatim message. */
   text: string;
@@ -153,12 +155,12 @@ export interface UserInjectionEvent extends TimelineEventBase {
   promptId?: string;
   /**
    * Milestone-tier verdict (decision-workbench-001): terminal-typed prompts
-   * get the mechanical heuristic ("routine" acks never reach milestone tier;
-   * "ambiguous" renders as milestone until a thin LLM re-judges it). Absent
+   * get the precision-first mechanical heuristic (only strong signals reach
+   * milestone tier; all others remain in the default timeline). Absent
    * for deck injections — a deliberate intervention is always milestone
    * (decision-project-023: 介入必入两档).
    */
-  classification?: "milestone" | "routine" | "ambiguous";
+  classification?: "milestone" | "default";
 }
 
 /**

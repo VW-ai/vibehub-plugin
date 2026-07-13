@@ -1,0 +1,27 @@
+{
+  "name": "@vibehub/workbench-mcp",
+  "version": "0.0.1",
+  "description": "Local-first Vibehub MCP — deterministic capabilities and quality gates only.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "vibehub-mcp": "./dist/stdio.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@vibehub/core": "workspace:*",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
