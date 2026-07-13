@@ -62,6 +62,19 @@ progress:
       gate: true
       notes: "Redo checkpoint 完成,006–010 已裁为 active:Intelligence 单一归 skill;hooks=when,MCP/core=确定性原语+质量闸,description 不承载分布式 workflow。Claude plugin 三件套已落地(plugin manifest/hooks/MCP stdio/skills),MCP 六 capability(register_scope/self_report/kb_retrieve/kb_record/get_manual/kb_apply_distillation),首批 vibehub-ingest/distill/query 三 skill。Core 补齐 scope raw-glob registry+唯一 matcher、task start_head_sha、start..HEAD commit 读侧派生、stored hook+derived commit timeline、GraphStore 七类型/server id/stale+supersede/manifest 单事务 apply+retrieve,SQLite user_version 5;Stop 官方 decision:block+reason,SessionStart 路由 query/ingest,B2 每 scope 一次,locus 注入包装。实证:core 125 tests + MCP 5 tests,core/cli/MCP typecheck+build,plugin strict validate,MCP stdio list/call 与 CLI→SQLite→hook injection 本地探针全绿。仍 in_progress:补 vibehub init 与经明确外发授权后的真实 Claude dogfood;Tauri 打包后置。"
   commits:
+    - hash: "d270f5e"
+      date: "2026-07-12"
+      message: "[21-workbench] feat(m2): skill intelligence layer + Claude plugin/MCP spine"
+      files_changed: 49
+      specs_affected:
+        - decision-workbench-006 (draft → active; hook matrix + Stop official wire format)
+        - decision-workbench-007 (draft → active; B1/B2/B3 + locus micro-protocol)
+        - decision-workbench-008 (draft → active; MCP six deterministic capabilities)
+        - decision-workbench-009 (draft → active; plugin three-part intelligence boundary)
+        - decision-workbench-010 (created, active; skill intelligence ownership)
+        - change-2026-07-12-m2-skill-intelligence-spine (created)
+      milestones_affected:
+        - m2-claude-integration (in_progress; engine spine checkpoint complete, real dogfood pending)
     - hash: "799eb2b"
       date: "2026-07-12"
       message: "[21-workbench] feat(m2): Claude Code 集成层第一批 — 设计块 A/B/C draft + 注入投递端/里程碑启发式"
