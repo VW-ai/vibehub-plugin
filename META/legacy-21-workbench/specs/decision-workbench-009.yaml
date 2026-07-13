@@ -41,6 +41,19 @@ intent:
     缺 skill = 裸 description 写库,条目质量靠运气;缺 server 闸 =
     垃圾直接入图;缺人审 = 错误决策自动成为团队真理。
 
+    **用户面推论(Wayne 2026-07-12 口述,与 intent-project-002 KB 隐身
+    同轴延伸)**:用户买到的是"我的 agent 有一个 consistent 的 context"
+    这种感觉——何时沉淀/取出/update 全部由 skill+hook/MCP 幕后完成;
+    用户不需要理解 feature room 结构,不需要知道 skill 存在,更不需要
+    知道"为什么该用 skill"——他不可能用得比设计者好,自发触发的根本
+    理由即把"用好方法论"的责任从用户肩上拿走。可视化纪律:feature/spec
+    是引擎不是仪表盘,不做任何围绕 spec 的重可视化,UI 透出与普通
+    observability 工具同构(状态/时间线/事件本位);**spec 层唯一浮出
+    水面处 = 事件的 scope/地盘**(声明地界/地图领土/冲突 symbol 对准),
+    其余全部沉在水下当燃料(检索质量/冲突语义/注入语境)。结构化数据
+    的 ugly side(七类型/四态/relations/provenance)是内部操作语言,
+    到用户处翻译为"agent 在干嘛/为什么/要不要管"。
+
     **对既有 draft 的牵动:**
     - 008(MCP 工具面):工具定位从"接口即全部"修正为"端点+质量闸";
       kb_record description 增加对 ingest skill 的指路;
