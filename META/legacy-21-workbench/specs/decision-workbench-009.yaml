@@ -2,12 +2,21 @@ spec_id: "decision-workbench-009"
 type: decision
 state: draft
 intent:
-  summary: "产品形态 = Claude Code plugin 三件套:hooks(触发骨架,when)+ MCP server(确定性端点+质量闸,db 唯一读写门)+ skill 包(方法论,how well——ingest/蒸馏等 pipeline 住这里);026 重塑的正确解读 = 触发模型换血(咒语→hook微指令/description/自发),方法论文本保留为 skill;蒸馏质量管道 = skill 方法论 × server 机械校验 × draft 态人晨审 三层闸"
+  summary: "产品形态 = Claude Code plugin 三件套:hooks(触发骨架,when)+ MCP server(确定性端点+质量闸,db 唯一读写门)+ skill 包(方法论,how well);产品论题 = 自然语言 skill 替代 codified workflow(用户可读可改可 fork,确定性代码收缩到必须机械处),dogfood 自证 + skill change 版本史反哺 workflow 设计;026 重塑的正确解读 = 触发模型换血(咒语→hook微指令/description/自发),方法论文本保留为 skill;蒸馏质量管道 = skill×server校验×人晨审 三层闸"
   detail: |
     Wayne 2026-07-12 口述纠偏(对"MCP 工具=description+确定性脚本"两层
     框架的修正):"hook/etc 是触发我们的 skill 对 vibehub 数据库查询的
     节点;怎么查、改、读,本质上依然是 skill 的工作,或者 server 端
     确定性 pipeline 的工作,比如蒸馏。"
+
+    **产品论题(Wayne 2026-07-12 补,高于三件套本身)**:开源版的赌注
+    是用自然语言 skill 替代 codified workflow——pipeline 不写成代码
+    step 1-2-3,写成用户 agent 可执行、用户可读可改可 fork 的自然语言;
+    一次文本编辑 = 一次 workflow 迭代。我们自己 dogfood 这套模式
+    (fr-*/commit-sync 开发 Vibehub 即实验),skill 的 change/优化
+    (git 版本史)反哺产品 workflow 设计;块 E 服从率实证 = 反哺回路
+    第一次正式跑。"不需要 skill"因此是双重错误:丢方法论载体,更丢
+    产品论题本身(013 分界线由实现纪律升格为产品主张)。
 
     **三件套解剖(一个 Claude Code plugin 装齐):**
     1. **hooks = 触发骨架(when)**:微指令在关键时刻点名该干什么
