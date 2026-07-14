@@ -14,7 +14,7 @@ export interface TaskCardProps {
   onHoverStart: (task: Task) => void;
   onHoverEnd: () => void;
   /** Click / Enter / Space opens the task panel (m2 S4). */
-  onOpen: (task: Task) => void;
+  onOpen: (task: Task, opener: HTMLElement | null) => void;
   /** The CONFLICT pill opens the adjudication card (m3 S4 open path #2). */
   onConflictOpen: (conflictId: string, opener: HTMLElement | null, task?: Task) => void;
 }
@@ -69,12 +69,12 @@ export function TaskCard({
       onMouseLeave={onHoverEnd}
       onFocus={() => onHoverStart(task)}
       onBlur={onHoverEnd}
-      onClick={() => onOpen(task)}
+      onClick={(e) => onOpen(task, e.currentTarget)}
       onKeyDown={(e) => {
         // keyboard parity: cards are focusable, so open must be too
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          onOpen(task);
+          onOpen(task, e.currentTarget);
         }
       }}
     >

@@ -23,7 +23,7 @@ export interface TaskRailProps {
   onTaskHoverStart: (task: Task) => void;
   onTaskHoverEnd: () => void;
   /** Click / Enter on a card opens the task panel over the map (m2 S4). */
-  onTaskOpen: (task: Task) => void;
+  onTaskOpen: (task: Task, opener: HTMLElement | null) => void;
   /** The CONFLICT pill opens the adjudication card (m3 S4 open path #2). */
   onConflictOpen: (conflictId: string, opener: HTMLElement | null, task?: Task) => void;
 }

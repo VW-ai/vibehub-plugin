@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { MapSnapshot } from "@vibehub/core/contracts";
+import type { AppliedIntervention, MapSnapshot } from "@vibehub/core/contracts";
 import type { TaskPanelSnapshot } from "@vibehub/core/contracts";
 import { PanelIdentity } from "./PanelIdentity";
 import { Timeline } from "./Timeline";
@@ -11,7 +11,7 @@ export interface TaskPanelProps {
   /** The map snapshot underneath (territory-name resolution for scope tips). */
   map: MapSnapshot;
   onClose: () => void;
-  onIntervention?: (mode: "inject" | "pause", text: string) => Promise<string | null>;
+  onIntervention?: (mode: "inject" | "pause", text: string) => Promise<AppliedIntervention | string>;
 }
 
 /**

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { TaskState } from "@vibehub/core/contracts";
+import type { AppliedIntervention, TaskState } from "@vibehub/core/contracts";
 import { deckPlaceholder, deckTextareaTip, type DeckMode } from "../panel-derive";
 
 /** S2: autogrow floor / ceiling (6 lines of fs-3×1.5 + 2×8 padding). */
@@ -10,7 +10,11 @@ export interface InterventionDeckProps {
   state: TaskState;
   tailShown: boolean;
   onToggleTail: () => void;
-  onSend?: (mode: DeckMode, text: string) => Promise<string | null>;
+  onSend?: (mode: DeckMode, text: string) => Promise<AppliedIntervention | string>;
+}
+
+function accepted(receipt: AppliedIntervention): boolean {
+  return receipt.outcome === "applied" || receipt.outcome === "already_applied";
 }
 
 /**
@@ -23,7 +27,8 @@ export interface InterventionDeckProps {
  */
 export function InterventionDeck({ state, tailShown, onToggleTail, onSend }: InterventionDeckProps) {
   const [mode, setMode] = useState<DeckMode>("inject");
-  const [status, setStatus] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<AppliedIntervention | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const boxRef = useRef<HTMLTextAreaElement>(null);
 
@@ -38,9 +43,15 @@ export function InterventionDeck({ state, tailShown, onToggleTail, onSend }: Int
     const text = boxRef.current?.value.trim() ?? "";
     if (!onSend || !text || sending) return;
     setSending(true);
-    const message = await onSend(mode, text);
-    setStatus(message);
-    if (message === null && boxRef.current) boxRef.current.value = "";
+    setError(null);
+    setReceipt(null);
+    const response = await onSend(mode, text);
+    if (typeof response === "string") {
+      setError(response);
+    } else {
+      setReceipt(response);
+      if (accepted(response) && boxRef.current) boxRef.current.value = "";
+    }
     setSending(false);
   };
 
@@ -126,7 +137,11 @@ export function InterventionDeck({ state, tailShown, onToggleTail, onSend }: Int
           Terminate
         </button>
       </div>
-      {status && <p className="stubnote" role="status">{status}</p>}
+      {error && <p className="stubnote" role="alert">{error}</p>}
+      {receipt && <p className="stubnote" role="status">
+        <b>{receipt.outcome}</b>{receipt.message ? ` — ${receipt.message}` : " — No additional message."}{" "}
+        <time dateTime={receipt.acceptedAt}>{receipt.acceptedAt}</time>
+      </p>}
     </footer>
   );
 }

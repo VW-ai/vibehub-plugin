@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Task } from "@vibehub/core/contracts";
-import type { AdjudicationAction, ConflictCardSnapshot } from "@vibehub/core/contracts";
+import type { AdjudicationAction, AppliedIntervention, ConflictCardSnapshot } from "@vibehub/core/contracts";
 import {
   BETWEEN_TIP,
   CLOSE_TIP,
@@ -93,7 +93,7 @@ export interface ConflictCardProps {
   /** Side rows open the task's panel (S2 tooltip promise, wired at S4). */
   onOpenTask: (task: Task) => void;
   /** Production callback. Absent only in the fixture harness. */
-  onApply?: (action: AdjudicationAction) => Promise<string | null>;
+  onApply?: (action: AdjudicationAction) => Promise<AppliedIntervention | string>;
 }
 
 /**
@@ -120,6 +120,7 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
   /* S5: honest run/re-run stub note in zone b (toggles; no fake progress). */
   const [stubNote, setStubNote] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<AppliedIntervention | null>(null);
   const [applying, setApplying] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
@@ -194,18 +195,27 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
 
   const applyReal = async (action: AdjudicationAction, view: FeedbackView) => {
     if (!onApply) { setFeedback({ action, view }); return; }
-    setApplying(true); setActionError(null);
-    const error = await onApply(action);
+    setApplying(true); setActionError(null); setReceipt(null);
+    const response = await onApply(action);
     setApplying(false);
-    if (error) setActionError(error);
-    else {
+    if (typeof response === "string") {
+      setActionError(response);
+      return;
+    }
+    setReceipt(response);
+    if (response.outcome === "applied" || response.outcome === "already_applied") {
+      if (noteRef.current) noteRef.current.value = "";
+      if (response.outcome === "already_applied") {
+        setFeedback(null);
+        return;
+      }
       const confirmed = action.kind === "inject_note"
         ? { ...view, pill: "QUEUED" as const, text: "Coordination note queued to both tasks. Hook pickup and delivery remain separate later facts.", tip: "SQLite accepted both queue rows atomically; neither task is shown as having received the note yet." }
         : action.kind === "pause_side"
           ? { ...view, pill: "REQUESTED" as const, text: "Pause requested. The task is not shown as stopped until runtime evidence says so.", tip: "SQLite accepted the pause request; later hook/runtime evidence determines pickup and state." }
           : view;
       setFeedback({ action, view: confirmed });
-    }
+    } else setFeedback(null);
   };
 
   const inject = () => {
@@ -440,6 +450,10 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
       {/* zone c: adjudication — actions, or the confirmed feedback band */}
       <footer className={`cfoot${seams.bottom ? " seam" : ""}`}>
         {actionError && <p className="stubnote" role="alert">{actionError}</p>}
+        {receipt && !feedback && <p className="stubnote" role="status">
+          <b>{receipt.outcome}</b>{receipt.message ? ` — ${receipt.message}` : " — No additional message."}{" "}
+          <time dateTime={receipt.acceptedAt}>{receipt.acceptedAt}</time>
+        </p>}
         {feedback ? (
           <div
             className="fdbk"
@@ -453,6 +467,7 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
             <p>
               {feedback.view.text}{" "}
               {!onApply && <span className="preview" data-tip={PREVIEW_TIP}>preview</span>}
+              {receipt && <><br /><b>{receipt.outcome}</b>{receipt.message ? ` — ${receipt.message}` : " — No additional message."}{" "}<time dateTime={receipt.acceptedAt}>{receipt.acceptedAt}</time></>}
             </p>
             <button
               type="button"
