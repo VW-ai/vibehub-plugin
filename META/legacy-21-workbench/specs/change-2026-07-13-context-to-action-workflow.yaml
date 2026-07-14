@@ -1,0 +1,45 @@
+spec_id: "change-2026-07-13-context-to-action-workflow"
+type: change
+state: active
+intent:
+  summary: "把 Workbench 从 context memory 补全为 host-agent 内的 context-to-action layer,冻结 Task/Run/workspace authority、DB evidence/truth 分层、decision-boundary intervention 与 audit repair 边界"
+  detail: |
+    Wayne 2026-07-13 批准核心产品模型并要求立即沉淀。新增完整设计文档与
+    decision-workbench-013,明确:
+
+    - Task 是独立 outcome/success criteria,Run 承载 context/code authority;
+    - context-only Run 不要求 worktree,code-write Task 才 claim canonical
+      workspace,Run writer lease 严格串行并带 fencing epoch;
+    - mechanical execution 仍追加 logs/tests/outcomes/execution findings,但
+      operational evidence 不得原地变成 semantic proposal/canonical truth;
+    - workflow skill 判断 CONTINUE/EXPAND/DELEGATE/HANDOFF/CLOSE,hooks 只识别
+      decision-boundary candidate,MCP/CLI/core 机械执行版本化 transition;
+    - App 保持可选,context-only/non-PR Task 可在 host agent 内 headless CLOSE;
+    - 现有 audit/debug B1-B6 继续负责 M2 implementation bugs;repo-qualified
+      compatibility task ID 不冒充 durable Task/Run protocol 已实现。
+
+    同步修订 decision-project-024 的 summary/clarification/constraint 与 Project
+    Room projection:一事一 branch/PR 只从 code-write lifecycle 起适用,Task 继续
+    平铺,Run 不成为 subtask/lane 或 user-facing hierarchy。
+indexing:
+  type: change
+  priority: P0
+  layer: epic
+  domain: "workbench"
+  tags: [context-to-action, task, run, authority, worktree, evidence, workflow, audit-boundary]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne context-to-action / one-task-one-worktree product discussion — 2026-07-13"
+  produced_at: "2026-07-13"
+relations:
+  - target: "decision-workbench-013"
+    type: creates
+  - target: "decision-project-024"
+    type: refines
+  - target: "decision-workbench-012"
+    type: extends
+anchors:
+  - file: "META/21-workbench/design-context-to-action-workflow.md"
+  - file: "META/21-workbench/specs/decision-workbench-013.yaml"
+  - file: "META/00-project-room/specs/decision-project-024.yaml"

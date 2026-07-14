@@ -1,0 +1,115 @@
+spec_id: "decision-workbench-013"
+type: decision
+state: active
+intent:
+  summary: "VibeHub 从 context memory 补全为 host-agent 内的 context-to-action layer:Task 由独立 outcome/success criteria 定义,Run 承载 context/code mutation authority,code-write Task 才 claim writer worktree;workflow skill 判断 transition,core/MCP/hooks 只触发并机械执行"
+  detail: |
+    Wayne 2026-07-13 明确认可该核心模型。VibeHub 不成为开发中台;用户继续在
+    Claude Code、Codex 等 host agent 中工作。Plugin 不只拉取、归纳和沉淀
+    context,还应根据 context 主动规划下一动作与执行 topology,包括 inline
+    scope evolution、context research、mechanical loop、sub-agent delegation、
+    worktree isolation 与 handoff。
+
+    **Task / Run / Worktree:**
+    - Task 是 durable、可独立描述和验收的 outcome;success criteria 稳定时,
+      inline work 只是当前 Task 的继续或 versioned scope expansion。出现可独立
+      验收/merge 的结果才 split 新 Task。
+    - Run 是一次绑定 Task 的 execution episode。authority 属于 Run,不是 agent
+      进程或静态 Task type。session/sub-agent 必须经稳定 Task/Run identity 绑定。
+    - context-only Run 只绑定 repo snapshot/baseCommit,不需要 worktree。Task
+      首次进入 code-write 才 claim canonical writer worktree;main checkout 也算
+      worktree。一个 active code-writing Task 最多一个 writer worktree,一个
+      worktree 同时最多服务一个 active Task。DB 中 Task→canonical workspace
+      binding 与 Run→writer lease 必须分开:前者表达归属,后者表达此刻谁可写。
+      同一 Task 的 code-writing Runs 必须严格串行;lease transfer 推进 monotonic
+      fencing epoch,使延迟/旧 Run 不可在 handoff 后继续写。
+      Task ID 必须是 repo-scoped stable opaque identity,不得继续由 branch name
+      派生;session 绑定持久化后,branch switch 只记 evidence/metadata,不得静默换 Task。
+
+    **Authority 不是 context write 的布尔值:**context capability 至少区分
+    QUERY、APPEND_EVIDENCE、PROPOSE_SEMANTIC、PROMOTE_SEMANTIC;code 区分
+    READ/WRITE。三种核心 Run mode:
+    1. context shaping:读代码,可追加 evidence/提出 semantic candidates,不写代码;
+    2. mechanical execution:读 frozen semantic context、写代码、追加完整运行
+       evidence/log/finding,但不得重定义 objective/success criteria 或 semantic
+       truth;歧义必须 pause/escalate;
+    3. supervised development:人类紧密在场,可写代码并提出 semantic changes,
+       context/spec 与 code 共演化,稳定机械部分再 freeze/delegate。
+
+    Mechanical Run **依然更新广义 context**,因为 commands/tests/outcomes/logs/
+    execution findings 必须进入 operational evidence 层;它不得直接写 semantic
+    candidate/canonical truth。机械 evidence 只有经后续获授权的 context-shaping
+    或 supervised Run 解释并另建 versioned proposal,才可形成 semantic candidate;
+    canonical promotion 继续 obey decision-workbench-012 的 guarded review/CAS
+    boundary。
+
+    **Intervention:**不按时间轮询,而在 first code write、new requirement、
+    sustained scope drift、independent bounded unit、mechanical ambiguity、
+    context checkpoint/compact、writer contest、Stop/PR/merge 等 decision boundary
+    触发。hook 只识别 candidate 并注入微指令;workflow skill 语义判断
+    CONTINUE/EXPAND/DELEGATE/HANDOFF/CLOSE;MCP/CLI/core 确定性执行。正常继续
+    silent,低风险 bookkeeping auto+inform,task split/worktree/delegation/handoff
+    recommend+confirm,只有 ownership/isolation violation hard block。
+
+    PR merge 是 code-write Task 的优先机械验收信号,不是 universal completion
+    gate。context-only/non-PR Task 必须可在 host agent 内经显式 CLOSE 完成并记录
+    accepting actor + evidence,不得依赖 App。
+
+    当前 audit/debug loop 继续独立负责既有 M2 bugs(B1 cross-repo branch-task
+    collision、B2 hook atomicity、B3 read-model scope、B4-B6 App/design/packaging)。
+    B1 repo-qualified compatibility ID 不等于本决策的 durable Task/Run protocol
+    已实现;writer lease/fencing/authority Run/handoff token/headless CLOSE 属于后续
+    context-to-action implementation scope。
+
+    完整设计与 open questions 见
+    `META/21-workbench/design-context-to-action-workflow.md`。
+constraints:
+  - kind: must
+    rule: "产品必须运行在 Claude Code/Codex 等 host agent 内塑造 context-to-action workflow;App 只能是可选 observability/intervention surface,不得成为开发中台或 workflow 前置"
+  - kind: must
+    rule: "Task 必须按独立 outcome/success criteria 定义;Run 必须承载显式 context/code authority;agent/session/worktree 不得被当成 Task identity"
+  - kind: must
+    rule: "context authority 必须区分 query、append operational evidence、propose semantic candidate 与 promote semantic truth;mechanical execution 必须完整记录 evidence/log/finding,但不得据此隐式获得 semantic rewrite/promotion 权限"
+  - kind: must
+    rule: "context-only Run 不得被强迫创建 worktree;code-write Task 才 claim writer worktree,且 active Task↔writer worktree 必须保持同时期 1:1 exclusivity"
+  - kind: must
+    rule: "Task→canonical workspace binding 与 Run→writer lease 必须分层并事务化;Task/Run identity 必须 repo-scoped 且稳定,session 不得在每个 hook 上用 branch 名重新推导和换绑"
+  - kind: must
+    rule: "同一 Task 的 code-writing Runs 必须严格串行;writer lease transfer 必须带 monotonic fencing epoch,防止 stale Run 在 handoff 后继续写"
+  - kind: must
+    rule: "context-only/non-PR Task 必须支持 host-agent headless CLOSE(actor+evidence);PR merge 与 App 面板不得成为 universal completion gate"
+  - kind: must
+    rule: "workflow transition 的语义判断必须由 skill 承担;hooks 只负责 event candidate/when,MCP/CLI/core 只负责版本化状态、identity、lease、binding、handoff 与 evidence integrity"
+  - kind: must_not
+    rule: "autonomous mechanical Run 不得修改 objective/success criteria 或 canonical semantic truth;遇到 semantic ambiguity 必须 persist finding 并 pause/escalate"
+  - kind: should
+    rule: "普通 continuation 应 silent;scope bookkeeping 可 auto+inform;Task split/worktree/delegation/handoff 应 recommend+confirm;hard block 只用于 ownership/isolation 或明确 safety violation"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "workbench"
+  tags: [context-to-action, task, run, authority, worktree, workflow, delegation, handoff, loop-engineering, evidence]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne product design discussion — 2026-07-13"
+  produced_at: "2026-07-13"
+relations:
+  - target: "decision-project-017"
+    type: refines
+    detail: "将事/session 双向诞生细化为 durable Task + authority-bearing Run"
+  - target: "decision-project-024"
+    type: refines
+    detail: "收窄其普遍适用域:一事一 branch/PR 只从 Task 获得 code-write authority 起适用;context-only Task 不要求 branch/worktree,Task 仍平铺且 branch/worktree 仍只作元数据"
+  - target: "decision-project-026"
+    type: extends
+    detail: "自发 CRU 从 context retrieval/settlement 延伸到 context-aware action/topology planning"
+  - target: "decision-workbench-010"
+    type: extends
+    detail: "将 skill intelligence ownership 延伸到 workflow transition;机械状态转移仍归 MCP/core"
+  - target: "decision-workbench-012"
+    type: extends
+    detail: "在 semantic truth/candidate 之外明确 operational evidence 的 append authority 与 provenance bridge"
+anchors:
+  - file: "META/21-workbench/design-context-to-action-workflow.md"

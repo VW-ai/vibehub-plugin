@@ -25,6 +25,7 @@ dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
 - [decision-workbench-010] **Intelligence ownership = skill**:hooks 只管 when,MCP/core 只管确定性原语+质量闸;首批至少 ingest/distill/query 三 skill;description 不得拼成分布式 workflow;engine dogfood 先于 Tauri 打包(active,2026-07-12 Wayne 开工确认)
 - [decision-workbench-011] **Headless runtime 是独立产品**:plugin+hooks+skills+MCP+CLI/core 自带 SQLite init 与完整 context 自循环;App 是可选 reader/intervention client;filesystem 仅 export;先保持 workbench subtree-ready,真实 dogfood 后再物理拆 repo(active,2026-07-12 Wayne 裁决)
 - [decision-workbench-012] **DB-native skill intelligence**:skills 管语义与渐进 workflow,hooks=when,MCP/CLI/core 经版本化 contracts+共享 dispatcher 管确定性 integrity;canonical promotion guarded/reviewed,distillation 机器 validate/finalize immutable candidate 后再 human review→CAS activation;unresolved 诚实保留,App/Tauri 非 engine gate(active,2026-07-13 forward-test 收口)
+- [decision-workbench-013] **Context-to-action workflow authority**:VibeHub 是 Claude Code/Codex 内的 context-to-action layer,不是开发中台;Task=独立 outcome,Run 承载 context/code authority,context-only 无 worktree、code-write Task 才 claim writer worktree;mechanical Run 可 append evidence/log/finding 但不可重定义 semantic truth;skill 判断 transition,hooks/MCP/core 触发并机械执行(active,2026-07-13 Wayne 批准;完整设计见 design-context-to-action-workflow.md)
 
 ## Changes
 
@@ -35,5 +36,6 @@ dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
 - [change-2026-07-12-demo-live-read] M1 ④ 落地:demo 切真 SQLite 读(vite middleware 现场导出),本地 hook 任务合并,e2e 172 全绿
 - [change-2026-07-12-m2-integration-design] M2 第一批:设计块 A/B/C 落 draft(三卡点)+ 机械块 D(注入投递 Stop 唤醒/SessionStart 补送/pause 最严胜出/送达读侧语义;里程碑机械启发式 CJK 加权)
 - [change-2026-07-12-m2-skill-intelligence-spine] M2 redo checkpoint:Claude plugin/hooks + MCP deterministic capability surface + ingest/distill/query skills + scope/commit/timeline/graph 读写骨架,本地 engine 链路验证通过;2026-07-13 v0.2 移除两个必失败 legacy mutation 名,改走 canonical operation adapters
+- [change-2026-07-13-context-to-action-workflow] 产品协议补全:Task=outcome、Run=authority、code-write 才 claim workspace;机械执行 append evidence 不改 semantic truth;skill 判断 workflow transition;现有 audit B1-B6 与后续 durable Task/Run implementation 分界
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。
