@@ -7,9 +7,9 @@ UI 长出的类型契约 = workbench/app-demo/src/*-types.ts ×5,后端实现清
 
 M1 已收官(b1-b4 ✅ + treemap spike ✅)。当前阶段:**M2 — Claude Code 集成层**:
 Claude plugin(hooks + MCP + skill pack)+ 注入队列投递端 + 本地 context engine。
-006–010 已裁并完成可本地验证的 engine spine:skill 独占 intelligence,
-hooks 只管 when,MCP/core 只管确定性原语与质量闸。下一 gate 是真实 Claude
-dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
+006–014 已裁;headless runtime、DB-native intelligence、production App controller、
+v8 视觉权威与可代表发布物的 local/isolated gates 均已通过。下一 gate 是经明确
+外发授权后的真实 Claude dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
 代码落 workbench/packages/core+cli(library-first、CLI 零 LLM,decision-project-013/025)。
 
 ## Decisions
@@ -38,5 +38,6 @@ dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
 - [change-2026-07-12-m2-integration-design] M2 第一批:设计块 A/B/C 落 draft(三卡点)+ 机械块 D(注入投递 Stop 唤醒/SessionStart 补送/pause 最严胜出/送达读侧语义;里程碑机械启发式 CJK 加权)
 - [change-2026-07-12-m2-skill-intelligence-spine] M2 redo checkpoint:Claude plugin/hooks + MCP deterministic capability surface + ingest/distill/query skills + scope/commit/timeline/graph 读写骨架,本地 engine 链路验证通过;2026-07-13 v0.2 移除两个必失败 legacy mutation 名,改走 canonical operation adapters
 - [change-2026-07-13-context-to-action-workflow] 产品协议补全:Task=outcome、Run=authority、code-write 才 claim workspace;机械执行 append evidence 不改 semantic truth;skill 判断 workflow transition;现有 audit B1-B6 与后续 durable Task/Run implementation 分界
+- [change-2026-07-14-m2-audit-fix-closure] M2 productionization 审计 B1–B6 收口:repo-safe task identity、原子 hook 投递、正确 scope read、production App controller/receipts、v8 UX truth、representative artifact/isolated gates;B7 全矩阵验证通过
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。

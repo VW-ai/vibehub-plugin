@@ -1,0 +1,52 @@
+spec_id: "change-2026-07-14-m2-audit-fix-closure"
+type: change
+state: active
+intent:
+  summary: "以 boundary-driven fix loop 收口 M2 productionization 审计 B1–B6,并用 fresh B7 全矩阵证明 headless runtime、optional App 与发布物验证链一致"
+  detail: |
+    2026-07-13 至 2026-07-14 的独立 working-tree 审计把修复拆成六个可单独
+    评审、验证和提交的边界:
+
+    - B1:task identity 改为 repo-qualified opaque ID,legacy branch lookup 仅只读兼容;
+    - B2:intervention claim、hook event 与状态推进在 immediate transaction 内原子化,
+      transcript I/O 移到锁外,并补真实双 worker 并发证据;
+    - B3:修正 live scope matcher 参数方向,避免已覆盖文件被错误归入灰区;
+    - B4:让 production main.tsx 进入 Playwright gate,补齐 modal/focus/race/resize 与
+      typed intervention receipt controller;
+    - B5:按 Wayne 裁决由 decision-workbench-014 固定 v8 spatial-workbench 为
+      workbench/app/** 视觉权威,移除未实现或会误导的 affordance/copy;
+    - B6:让 isolated/artifact gates 执行真实 production entry、受管 hook/MCP
+      命令、negative corruption proofs 与完整 headless dogfood。
+
+    Fresh B7 verification 在 committed tree 上通过 build/typecheck、300 个 unit、
+    production E2E 25、historical E2E 171、bundle/artifact/dogfood、isolated full
+    matrix 与 diff check。真实 Claude dogfood 涉及外发授权,本 change 不执行、也不
+    把 M2 总 milestone 冒充为 completed;Tauri 仍后置。
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [audit, productionization, headless, sqlite, hook, app, v8, artifact, verification]
+provenance:
+  source_type: implementation_verification
+  confidence: 1.0
+  source_ref: "VibeHub Workbench full-stack working-tree audit and boundary fix loop — 2026-07-13/14"
+  produced_at: "2026-07-14"
+relations:
+  - target: "decision-workbench-011"
+    type: implements
+  - target: "decision-workbench-012"
+    type: hardens
+  - target: "decision-workbench-013"
+    type: bounds
+  - target: "decision-workbench-014"
+    type: implements
+anchors:
+  - file: "docs/superpowers/specs/2026-07-13-workbench-audit-fix-loop-design.md"
+  - file: "docs/superpowers/plans/2026-07-13-workbench-audit-fix-loop.md"
+  - file: "workbench/packages/core/src/runtime-service.ts"
+  - file: "workbench/packages/core/src/hook-ingest.ts"
+  - file: "workbench/app/src/WorkbenchMap.tsx"
+  - file: "workbench/scripts/verify-isolated-workbench.mjs"
+  - file: "workbench/scripts/verify-plugin-artifact.mjs"
