@@ -181,6 +181,9 @@ describe("transactional interventions", () => {
     const before = service.readWorkbenchSnapshot(fx.repo);
     expect(before.status === "ok" && before.data.conflicts.map((conflict) => conflict.id).sort())
       .toEqual(["conflict-1", "conflict:a|b"]);
+    expect(before.status === "ok" && before.data.conflicts.find(
+      (conflict) => conflict.id === "conflict:a|b",
+    )?.taskIds).toEqual(["task-a", "task-b"]);
     const ignored = service.applyIntervention(fx.repo, "ignore-basic", { kind: "ignore_pair", conflictId: "conflict:a|b" });
     expect(ignored.status === "ok" && ignored.data.outcome).toBe("applied");
     const after = service.readWorkbenchSnapshot(fx.repo);

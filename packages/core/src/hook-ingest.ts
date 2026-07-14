@@ -10,8 +10,8 @@
  *
  * Task association (decision-project-024: branch is the join key;
  * decision-project-017: terminal sessions auto-captured as 未命名的事):
- * events land on task `branch:<current-branch>`, created on first sight
- * with the branch name as its only honest title.
+ * events land on one opaque repository-qualified task, created on first
+ * sight with the branch name as its only honest title.
  */
 import fs from "node:fs";
 import crypto from "node:crypto";
@@ -26,6 +26,7 @@ import {
   claimPendingInjections,
   hasEvent,
   readTask,
+  readTaskForBranch,
   taskIdForBranch,
   upsertSession,
   upsertTask,
@@ -171,8 +172,8 @@ export function ingestHookEvent(
 
   const branch = ctx.branch ?? "detached";
   const sessionToplevel = ctx.toplevel;
-  const taskId = taskIdForBranch(branch);
-  const existing = readTask(db, taskId);
+  const existing = readTaskForBranch(db, repo.id, branch);
+  const taskId = existing?.id ?? taskIdForBranch(repo.id, branch);
   const stateBefore = existing?.state ?? null;
   const deliveryCapable =
     hook === "UserPromptSubmit" ||

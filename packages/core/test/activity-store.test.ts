@@ -24,6 +24,7 @@ import {
   saveDiagnosis,
   sessionIdentity,
   setScopes,
+  taskIdForBranch,
   upsertSession,
   upsertTask,
   type TaskRow,
@@ -65,6 +66,16 @@ describe("ActivityStore (运行域)", () => {
   afterEach(() => {
     db.close();
     fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it("constructs stable opaque task ids scoped by repository identity", () => {
+    const repoOne = taskIdForBranch(1, "main");
+    const repoTwo = taskIdForBranch(2, "main");
+
+    expect(repoOne).not.toBe(repoTwo);
+    expect(taskIdForBranch(1, "main")).toBe(repoOne);
+    expect(repoOne).toMatch(/^task:[0-9a-f]+$/);
+    expect(repoOne).not.toContain("main");
   });
 
   it("round-trips a task and updates in place", () => {

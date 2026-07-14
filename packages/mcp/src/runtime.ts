@@ -2,7 +2,7 @@ import {
   GitFacade,
   getRepoByRoot,
   openDb,
-  readTask,
+  readTaskForBranch,
   taskIdForBranch,
   upsertRepo,
   upsertTask,
@@ -34,8 +34,9 @@ export function openRuntimeContext(
       at,
     );
     const branch = session.branch ?? "detached";
-    const taskId = taskIdForBranch(branch);
-    if (!readTask(db, taskId)) {
+    const existing = readTaskForBranch(db, repo.id, branch);
+    const taskId = existing?.id ?? taskIdForBranch(repo.id, branch);
+    if (!existing) {
       upsertTask(db, {
         id: taskId,
         repoId: repo.id,

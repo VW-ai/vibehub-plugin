@@ -63,6 +63,21 @@ describe("KnowledgeService canonical boundary",()=>{
     upsertRepo(db,"/other",null,"main",NOW);expect(()=>new KnowledgeService(db).getSpec(2,"a")).toThrow(/not found/);
   });
 
+  it("mark-stale mutates only the addressed repository when spec ids collide",()=>{
+    const repoTwo=upsertRepo(db,"/repo-two",null,"main",NOW);
+    seedActiveMapping(db,repoTwo.id,[{id:"auth",name:"Auth"}],NOW);
+    const ctxTwo={...ctx,repoId:repoTwo.id,requestId:"repo-two"};
+    service.applyDraftBatch(1,{idempotencyKey:"repo-one-seed",specs:[draft("shared-spec")]},{...ctx,requestId:"repo-one-seed"});
+    service.applyDraftBatch(repoTwo.id,{idempotencyKey:"repo-two-seed",specs:[draft("shared-spec")]},ctxTwo);
+    service.mutate(1,"promote",{specId:"shared-spec",idempotencyKey:"repo-one-promote"},{...ctx,requestId:"repo-one-promote"});
+    service.mutate(repoTwo.id,"promote",{specId:"shared-spec",idempotencyKey:"repo-two-promote"},{...ctxTwo,requestId:"repo-two-promote"});
+
+    service.mutate(1,"mark_stale",{specId:"shared-spec",idempotencyKey:"repo-one-stale"},{...ctx,requestId:"repo-one-stale"});
+
+    expect(service.getSpec(1,"shared-spec").state).toBe("stale");
+    expect(service.getSpec(repoTwo.id,"shared-spec").state).toBe("active");
+  });
+
   it("dispatcher returns exact envelopes and explicit actor/task/error classes",()=>{
     expect(dispatch.dispatch("kb.status",{...ctx,repoId:0},{})).toMatchObject({ok:false,error:{code:"validation_error"}});
     const noActor=dispatch.dispatch("kb.status",{...ctx,actor:"",requestId:"req:no-actor"},{});expect(noActor).toMatchObject({ok:false,error:{code:"actor_required"}});

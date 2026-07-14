@@ -58,6 +58,15 @@ describe("local MCP deterministic capabilities", () => {
     ]);
   });
 
+  it("resolves task capabilities only inside the owning repository", () => {
+    const other = upsertRepo(db, path.join(dir, "other"), null, "main", NOW);
+    const owner = createCapabilities({ db, repoId: 1, taskId: "branch:feat/mcp", now: () => NOW });
+    const nonOwner = createCapabilities({ db, repoId: other.id, taskId: "branch:feat/mcp", now: () => NOW });
+
+    expect(owner.selfReport({ status: "owned" })).toMatchObject({ status: "owned" });
+    expect(() => nonOwner.selfReport({ status: "not-owned" })).toThrow(/missing task/);
+  });
+
   it("advertises only honest tools and canonical mutation adapters have successful fixtures", () => {
     const server=createWorkbenchMcpServer({db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",now:()=>NOW});
     const registered=(server as unknown as {_registeredTools:Record<string,{description?:string}>})._registeredTools;
@@ -213,7 +222,7 @@ describe("MCP runtime context", () => {
 
   it("derives repo and task from the server cwd without a second config source", () => {
     const runtime = openRuntimeContext(repo, path.join(dir, "runtime.db"), () => NOW);
-    expect(runtime.context.taskId).toBe("branch:feat/runtime");
+    expect(runtime.context.taskId).toMatch(/^task:[0-9a-f]+$/);
     expect(runtime.context.repoId).toBe(1);
     expect(readTask(runtime.context.db, runtime.context.taskId)?.startHeadSha).toMatch(/^[0-9a-f]{40}$/);
     runtime.close();

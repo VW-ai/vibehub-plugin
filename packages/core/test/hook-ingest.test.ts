@@ -11,12 +11,15 @@ import {
 import { nextState } from "../src/state-machine.js";
 import {
   enqueueInjection,
+  listTasks,
   pendingInjections,
   readFootprints,
   readTask,
   readTimeline,
   sessionIdentity,
+  taskIdForBranch,
 } from "../src/activity-store.js";
+import { readTaskPanelModel } from "../src/live-read-models.js";
 import { getRepoByRoot } from "../src/team-store.js";
 import { replaceScopePatterns } from "../src/scope-registry.js";
 import { git, makeScratchRepo, type ScratchRepo } from "./helpers.js";
@@ -53,7 +56,7 @@ describe("ingestHookEvent on a scratch repo", () => {
   beforeEach(() => {
     repo = makeScratchRepo();
     git(repo.work, "checkout", "-b", "vibehub/fix-login");
-    taskBranch = "branch:vibehub/fix-login";
+    taskBranch = taskIdForBranch(1, "vibehub/fix-login");
     dir = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-hook-"));
     db = openDb(path.join(dir, "t.db"));
   });
@@ -343,10 +346,69 @@ describe("ingestHookEvent on a scratch repo", () => {
     git(repo.work, "worktree", "add", "-b", "vibehub/wt-task", wt);
     ingestHookEvent(db, "SessionStart", payload({ cwd: wt, session_id: "sess-wt" }), { now: () => T(0) });
 
-    const task = readTask(db, "branch:vibehub/wt-task")!;
+    const task = readTask(db, taskIdForBranch(1, "vibehub/wt-task"))!;
     expect(task.worktreePath).toBe(wt);
     // one repo domain: the worktree session's repo row is the MAIN root
     expect(getRepoByRoot(db, repo.work)).not.toBeNull();
+  });
+});
+
+describe("ingestHookEvent repository ownership", () => {
+  it("keeps identical branch names isolated across repositories in one SQLite database", () => {
+    const repoA = makeScratchRepo();
+    const repoB = makeScratchRepo();
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-hook-repos-"));
+    const db = openDb(path.join(dir, "t.db"));
+    try {
+      const startA = ingestHookEvent(db, "SessionStart", {
+        session_id: "session-a",
+        cwd: repoA.work,
+      }, { now: () => T(0) });
+      const ownerA = getRepoByRoot(db, repoA.work)!;
+      enqueueInjection(db, ownerA.id, startA.taskId, "inject", "repo-a-only", T(0).toISOString());
+      ingestHookEvent(db, "PostToolUse", {
+        session_id: "session-a",
+        cwd: repoA.work,
+        tool_name: "Edit",
+        tool_input: { file_path: path.join(repoA.work, "src/a.ts") },
+      }, { now: () => T(1) });
+      const startB = ingestHookEvent(db, "SessionStart", {
+        session_id: "session-b",
+        cwd: repoB.work,
+      }, { now: () => T(2) });
+      const ownerB = getRepoByRoot(db, repoB.work)!;
+      enqueueInjection(db, ownerB.id, startB.taskId, "inject", "repo-b-only", T(2).toISOString());
+      ingestHookEvent(db, "PostToolUse", {
+        session_id: "session-b",
+        cwd: repoB.work,
+        tool_name: "Edit",
+        tool_input: { file_path: path.join(repoB.work, "src/b.ts") },
+      }, { now: () => T(3) });
+
+      expect(startA.taskId).not.toBe(startB.taskId);
+      expect(listTasks(db, ownerA.id)).toMatchObject([
+        { id: startA.taskId, repoId: ownerA.id, branch: "main" },
+      ]);
+      expect(listTasks(db, ownerB.id)).toMatchObject([
+        { id: startB.taskId, repoId: ownerB.id, branch: "main" },
+      ]);
+      expect(sessionIdentity(db, startA.taskId, "session-a")).not.toBeNull();
+      expect(sessionIdentity(db, startA.taskId, "session-b")).toBeNull();
+      expect(sessionIdentity(db, startB.taskId, "session-b")).not.toBeNull();
+      expect(readTimeline(db, startA.taskId)).toMatchObject([{ text: "repo-a-only" }]);
+      expect(readTimeline(db, startB.taskId)).toMatchObject([{ text: "repo-b-only" }]);
+      expect(readFootprints(db, startA.taskId).map((row) => row.path)).toEqual(["src/a.ts"]);
+      expect(readFootprints(db, startB.taskId).map((row) => row.path)).toEqual(["src/b.ts"]);
+      expect(readTaskPanelModel(db, ownerA.id, repoA.work, startA.taskId, T(4).toISOString())).not.toBeNull();
+      expect(readTaskPanelModel(db, ownerB.id, repoB.work, startA.taskId, T(4).toISOString())).toBeNull();
+      expect(readTaskPanelModel(db, ownerB.id, repoB.work, startB.taskId, T(4).toISOString())).not.toBeNull();
+      expect(readTaskPanelModel(db, ownerA.id, repoA.work, startB.taskId, T(4).toISOString())).toBeNull();
+    } finally {
+      db.close();
+      fs.rmSync(dir, { recursive: true, force: true });
+      repoA.cleanup();
+      repoB.cleanup();
+    }
   });
 });
 

@@ -24,15 +24,17 @@ import type {
 } from "./contract/conflict-types.js";
 import type { Db } from "./db.js";
 import { isConflictPairIgnored } from "./conflict-ignore.js";
+import crypto from "node:crypto";
 
 /* ── tasks ──────────────────────────────────────────────────────────────── */
 
 /**
- * The branch → task join key (decision-project-024). The hook write path
- * and the fixture read path MUST agree on this format — it is the only
- * thing matching a local session to its map row, so it lives exactly once.
+ * Stable opaque identity for the repository-local branch join key
+ * (decision-project-024). Branch remains separate source/display metadata;
+ * callers must never recover repository or branch facts by parsing this id.
  */
-export const taskIdForBranch = (branch: string): string => `branch:${branch}`;
+export const taskIdForBranch = (repoId: number, branch: string): string =>
+  `task:${crypto.createHash("sha256").update(`${repoId}\0${branch}`).digest("hex").slice(0, 32)}`;
 
 export interface TaskRow {
   id: string;
@@ -81,6 +83,33 @@ export function readTask(db: Db, id: string): TaskRow | null {
        FROM tasks WHERE id = ?`,
     )
     .get(id) as TaskRow | undefined;
+  return r ?? null;
+}
+
+/**
+ * Repository-scoped branch lookup used at capture boundaries. The fallback
+ * to an existing non-canonical id is deliberately read-only compatibility:
+ * legacy rows keep their identity and ownership; new rows use the opaque id.
+ */
+export function readTaskForBranch(
+  db: Db,
+  repoId: number,
+  branch: string,
+): TaskRow | null {
+  const canonicalId = taskIdForBranch(repoId, branch);
+  const r = db
+    .prepare(
+      `SELECT id, repo_id AS repoId, title, state, signal_tier AS signalTier,
+              branch, worktree_path AS worktreePath, pr_number AS prNumber,
+              pr_state AS prState, state_since AS stateSince,
+              last_event_at AS lastEventAt, status_detail AS statusDetail,
+              created_at AS createdAt, start_head_sha AS startHeadSha
+       FROM tasks
+       WHERE repo_id = ? AND branch = ?
+       ORDER BY CASE WHEN id = ? THEN 0 ELSE 1 END, created_at, id
+       LIMIT 1`,
+    )
+    .get(repoId, branch, canonicalId) as TaskRow | undefined;
   return r ?? null;
 }
 

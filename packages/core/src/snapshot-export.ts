@@ -34,6 +34,7 @@ import {
   listActiveConflicts,
   listTasks,
   readScopes,
+  readTaskForBranch,
   taskIdForBranch,
   type TaskRow,
 } from "./activity-store.js";
@@ -97,6 +98,8 @@ export function exportTeamMapSnapshot(
     );
   }
   const repoId = repo.id;
+  const taskIdForRepoBranch = (branch: string): string =>
+    readTaskForBranch(db, repoId, branch)?.id ?? taskIdForBranch(repoId, branch);
   const capturedAt = (opts.now?.() ?? new Date()).toISOString();
   const sync = readSyncState(db, repoId);
   const branches = readTeamBranches(db, repoId);
@@ -114,7 +117,9 @@ export function exportTeamMapSnapshot(
     { a: string; b: string; paths: string[]; firstAt: string }
   >();
   for (const c of readConflicts(db, repoId)) {
-    if (isConflictPairIgnored(db, repoId, [taskIdForBranch(c.branchA), taskIdForBranch(c.branchB)])) continue;
+    // Ignore-pair storage intentionally canonicalizes by branch metadata so
+    // pre-opaque rows and new opaque task ids share one durable decision.
+    if (isConflictPairIgnored(db, repoId, [`branch:${c.branchA}`, `branch:${c.branchB}`])) continue;
     const key = `${c.branchA}\t${c.branchB}`;
     const entry = byPair.get(key);
     if (entry) {
@@ -135,7 +140,7 @@ export function exportTeamMapSnapshot(
     const id = conflictId(p.a, p.b);
     return {
       id,
-      taskIds: [taskIdForBranch(p.a), taskIdForBranch(p.b)],
+      taskIds: [taskIdForRepoBranch(p.a), taskIdForRepoBranch(p.b)],
       territoryId: UNCATEGORIZED_TERRITORY_ID,
       // Pre-distillation there are no symbol anchors; the conflicted FILE
       // paths from merge-tree are the honest shared resources.
@@ -197,11 +202,11 @@ export function exportTeamMapSnapshot(
     const files = readBranchFiles(db, repoId, b.name);
     const done = b.merged || b.prState === "merged" || b.prState === "closed";
     return {
-      id: taskIdForBranch(b.name),
+      id: taskIdForRepoBranch(b.name),
       title: b.prTitle ?? b.name,
       state: done ? "done" : "stalled",
       signalTier: "basic",
-      conflictIds: conflictIdsByTaskId.get(taskIdForBranch(b.name)) ?? [],
+      conflictIds: conflictIdsByTaskId.get(taskIdForRepoBranch(b.name)) ?? [],
       scopes: files.length ? [uncategorizedWriteScope(files.length)] : [],
       git: {
         branch: b.name,

@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { openDb, type Db } from "../src/db.js";
 import { exportTeamMapSnapshot } from "../src/snapshot-export.js";
+import { taskIdForBranch } from "../src/activity-store.js";
 import { UNCATEGORIZED_TERRITORY_ID } from "../src/contract/install-types.js";
 import {
   reconcileConflicts,
@@ -70,7 +71,7 @@ describe("exportTeamMapSnapshot", () => {
     expect(fx.tasks).toHaveLength(1);
     const t = fx.tasks[0]!;
     expect(t).toMatchObject({
-      id: "branch:feat/a",
+      id: taskIdForBranch(repoId, "feat/a"),
       title: "feat/a",
       state: "stalled",
       signalTier: "basic",
@@ -114,7 +115,7 @@ describe("exportTeamMapSnapshot", () => {
     ]);
     const fx = exportTeamMapSnapshot(db, "/repo", { now: () => NOW });
     expect(fx.tasks.map((t) => t.title)).toEqual(["Fresh"]);
-    expect(fx.occupancy[0]!.doneTodayTaskIds).toEqual(["branch:feat/fresh-done"]);
+    expect(fx.occupancy[0]!.doneTodayTaskIds).toEqual([taskIdForBranch(repoId, "feat/fresh-done")]);
   });
 
   it("hides merged branches that have no PR fact", () => {
@@ -139,7 +140,7 @@ describe("exportTeamMapSnapshot", () => {
     expect(fx.conflicts).toHaveLength(1);
     expect(fx.conflicts[0]).toEqual({
       id: "conflict:feat/a|feat/b",
-      taskIds: ["branch:feat/a", "branch:feat/b"],
+      taskIds: [taskIdForBranch(repoId, "feat/a"), taskIdForBranch(repoId, "feat/b")],
       territoryId: UNCATEGORIZED_TERRITORY_ID,
       sharedSymbols: ["src/x.ts", "src/y.ts"],
       severity: "red",
@@ -171,9 +172,9 @@ describe("exportTeamMapSnapshot", () => {
 
     expect(fx.occupancy).toHaveLength(1);
     const occ = fx.occupancy[0]!;
-    expect(occ.writingTaskIds).toEqual(["branch:feat/a"]);
+    expect(occ.writingTaskIds).toEqual([taskIdForBranch(repoId, "feat/a")]);
     // done same day as capturedAt → doneToday
-    expect(occ.doneTodayTaskIds).toEqual(["branch:feat/done"]);
+    expect(occ.doneTodayTaskIds).toEqual([taskIdForBranch(repoId, "feat/done")]);
     expect(occ.readingTaskIds).toEqual([]);
   });
 
