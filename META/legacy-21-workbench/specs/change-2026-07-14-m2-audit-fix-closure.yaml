@@ -18,10 +18,12 @@ intent:
     - B6:让 isolated/artifact gates 执行真实 production entry、受管 hook/MCP
       命令、negative corruption proofs 与完整 headless dogfood。
 
-    Fresh B7 verification 在 committed tree 上通过 build/typecheck、300 个 unit、
+    Fresh B7 verification 在 committed tree 上通过 build/typecheck、301 个 unit、
     production E2E 25、historical E2E 171、bundle/artifact/dogfood、isolated full
-    matrix 与 diff check。真实 Claude dogfood 涉及外发授权,本 change 不执行、也不
-    把 M2 总 milestone 冒充为 completed;Tauri 仍后置。
+    matrix 与 diff check。最终对抗审查发现 malformed hook flags 会在 catch 前
+    exit 2;修复后真实 CLI 子进程钉死 hook exit 0,非 hook 参数错误仍 exit 2,
+    reviewer 复审批准。真实 Claude dogfood 涉及外发授权,本 change 不执行、也不把
+    M2 总 milestone 冒充为 completed;Tauri 仍后置。
 indexing:
   type: change
   priority: P0

@@ -44,7 +44,7 @@ interface Flags {
   json: boolean;
 }
 
-function parseFlags(argv: string[]): Flags {
+function parseFlags(argv: string[], failureMode: "exit" | "throw" = "exit"): Flags {
   let dbFlag: string | undefined;
   const flags = { repo: process.cwd(), out: undefined as string | undefined, json: false };
   for (let i = 0; i < argv.length; i++) {
@@ -54,6 +54,7 @@ function parseFlags(argv: string[]): Flags {
     else if (a === "--out") flags.out = argv[++i];
     else if (a === "--json") flags.json = true;
     else {
+      if (failureMode === "throw") throw new Error(`unknown flag: ${a}`);
       console.error(`unknown flag: ${a}`);
       process.exit(2);
     }
@@ -136,8 +137,8 @@ function readStdin(): string {
  * break the user's session; failures go to ~/.vibehub/hook.log.
  */
 function runHook(eventArg: string | undefined, rest: string[]): number {
-  const dbPath = parseFlags(rest).db;
   try {
+    const dbPath = parseFlags(rest, "throw").db;
     const raw = readStdin();
     const payload = JSON.parse(raw) as HookPayload;
     const event = (eventArg ?? payload.hook_event_name) as HookEventName;

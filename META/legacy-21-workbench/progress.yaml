@@ -60,7 +60,7 @@ progress:
       name: "M2: Claude Code 集成层 — hook 矩阵 + 微协议 + MCP 三组工具 + 注入投递端"
       status: in_progress
       gate: true
-      notes: "006–014 已裁:skill 独占 intelligence,hooks=when,MCP/CLI/core=版本化确定性原语+质量闸;headless plugin/hooks/skills/MCP/CLI+SQLite 独立成立,App 是可选 reader/intervention client。Productionization 已覆盖 init/doctor、KB v2、42-operation dispatcher、resumable distillation、progressive skills、repo-safe task identity、原子 hook 投递、真实 App controller/receipts、v8 spatial-workbench UX truth 与 representative artifact/isolated gates。2026-07-14 B7 全矩阵:build/typecheck;unit 300/300(Core 204,CLI 22,MCP 15,App 59);production main.tsx E2E 25/25;historical E2E 171/171;bundle/artifact/dogfood;isolated full matrix 全绿。仍 in_progress:经明确外发授权后的真实 Claude dogfood;Tauri 打包后置。"
+      notes: "006–014 已裁:skill 独占 intelligence,hooks=when,MCP/CLI/core=版本化确定性原语+质量闸;headless plugin/hooks/skills/MCP/CLI+SQLite 独立成立,App 是可选 reader/intervention client。Productionization 已覆盖 init/doctor、KB v2、42-operation dispatcher、resumable distillation、progressive skills、repo-safe task identity、原子 hook 投递、真实 App controller/receipts、v8 spatial-workbench UX truth 与 representative artifact/isolated gates。2026-07-14 B7 全矩阵:build/typecheck;unit 301/301(Core 204,CLI 23,MCP 15,App 59);production main.tsx E2E 25/25;historical E2E 171/171;bundle/artifact/dogfood;isolated full matrix 全绿。最终对抗审查补齐 malformed hook flags 的真实子进程 fail-open 回归并批准。仍 in_progress:经明确外发授权后的真实 Claude dogfood;Tauri 打包后置。"
     - id: m2p1-production-shape
       name: "M2 productionization ①:headless repo/app/contracts 正式形态 + fixtures 隔离"
       status: completed
@@ -115,7 +115,7 @@ progress:
       name: "M2 productionization ⑤G:boundary-driven audit fix closure"
       status: completed
       gate: true
-      notes: "独立审计 B1–B6 已按边界收口:task identity 以 repo-qualified opaque ID 隔离;hook claim/事件/状态在 immediate transaction 内原子化且 transcript I/O 在锁外;live scope matcher 参数方向修正;production main.tsx controller、typed intervention receipts 与 race/focus/modal/reduced-motion 行为有实测;decision-workbench-014 固定 v8 spatial-workbench 权威并移除虚假 affordance;isolated/artifact gates 执行真实 production entry、受管 hook/MCP 命令、corruption negative proofs 与完整 dogfood。B7 fresh verification:build/typecheck,unit 300/300,production E2E 25/25,historical E2E 171/171,bundle/artifact/dogfood,isolated full matrix,diff-check 全绿。真实 Claude 外发 dogfood 未执行且不冒充完成。"
+      notes: "独立审计 B1–B6 已按边界收口:task identity 以 repo-qualified opaque ID 隔离;hook claim/事件/状态在 immediate transaction 内原子化且 transcript I/O 在锁外;live scope matcher 参数方向修正;production main.tsx controller、typed intervention receipts 与 race/focus/modal/reduced-motion 行为有实测;decision-workbench-014 固定 v8 spatial-workbench 权威并移除虚假 affordance;isolated/artifact gates 执行真实 production entry、受管 hook/MCP 命令、corruption negative proofs 与完整 dogfood。B7 fresh verification:build/typecheck,unit 301/301,production E2E 25/25,historical E2E 171/171,bundle/artifact/dogfood,isolated full matrix,diff-check 全绿;最终对抗审查发现并修复 malformed hook flags 在 catch 前 exit 2,真实子进程钉死 hook exit 0 且非 hook 仍 exit 2,复审批准。真实 Claude 外发 dogfood 未执行且不冒充完成。"
   commits:
     - hash: "6cdea81"
       date: "2026-07-14"
