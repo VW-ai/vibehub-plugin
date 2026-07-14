@@ -1,0 +1,170 @@
+import fs from "node:fs";
+import type {
+  ConflictCardSnapshot,
+  SharedSymbolEvidence,
+} from "./contract/conflict-types.js";
+import type { TaskPanelSnapshot } from "./contract/panel-types.js";
+import type { WorkbenchReadWarning } from "./contract/workbench-bridge.js";
+import type { Db } from "./db.js";
+import {
+  readConflict,
+  readDiagnosis,
+  readFootprints,
+  readTask,
+  readTimeline,
+  sessionIdentity,
+} from "./activity-store.js";
+import { GitFacade } from "./git-facade.js";
+import { exportTeamMapSnapshot } from "./snapshot-export.js";
+import { matchesScopePattern, readScopePatterns } from "./scope-registry.js";
+
+export interface ReadModel<T> {
+  data: T;
+  warnings: WorkbenchReadWarning[];
+}
+
+export function readTaskPanelModel(
+  db: Db,
+  repoId: number,
+  repoRoot: string,
+  taskId: string,
+  capturedAt: string,
+): ReadModel<TaskPanelSnapshot> | null {
+  const row = readTask(db, taskId);
+  if (!row || row.repoId !== repoId) return null;
+  const map = exportTeamMapSnapshot(db, repoRoot, { now: () => new Date(capturedAt) });
+  const task = map.tasks.find((candidate) => candidate.id === taskId);
+  if (!task) return null;
+  const warnings: WorkbenchReadWarning[] = [];
+  let timeline = readTimeline(db, taskId);
+  if (row.branch && row.startHeadSha) {
+    try {
+      const commits = new GitFacade(repoRoot).commitEventsSince(row.startHeadSha, row.branch);
+      const byId = new Map([...timeline, ...commits].map((event) => [event.id, event]));
+      timeline = [...byId.values()].sort((a, b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id));
+    } catch (error) {
+      warnings.push({
+        code: "git_unavailable",
+        message: error instanceof Error ? error.message : "Git facts are unavailable.",
+      });
+    }
+  }
+
+  const latest = db.prepare(
+    `SELECT id, transcript_path AS transcriptPath FROM sessions
+     WHERE task_id = ? ORDER BY started_at DESC LIMIT 1`,
+  ).get(taskId) as { id: string; transcriptPath: string | null } | undefined;
+  const session = latest ? sessionIdentity(db, taskId, latest.id) ?? undefined : undefined;
+  let transcriptTail: string[] = [];
+  if (latest?.transcriptPath) {
+    try {
+      transcriptTail = fs.readFileSync(latest.transcriptPath, "utf8").split(/\r?\n/).filter(Boolean).slice(-100);
+    } catch (error) {
+      warnings.push({
+        code: "transcript_unavailable",
+        message: error instanceof Error ? error.message : "Transcript is unavailable.",
+      });
+    }
+  }
+
+  const patterns = readScopePatterns(db, taskId).filter((pattern) => pattern.mode === "write");
+  const offScopeFiles = patterns.length === 0
+    ? []
+    : [...new Set(readFootprints(db, taskId)
+        .filter((footprint) => footprint.action === "edit")
+        .map((footprint) => footprint.path)
+        .filter((file) => !patterns.some((pattern) => matchesScopePattern(file, pattern.glob))))];
+  const acknowledgement = timeline.find(
+    (event) => event.type === "self_report" && event.footprintCorroboration?.offScopeFiles.length,
+  );
+  const data: TaskPanelSnapshot = {
+    capturedAt,
+    task,
+    ...(session ? { session } : {}),
+    ...(offScopeFiles.length
+      ? { twist: { offScopeFiles, ...(acknowledgement ? { acknowledgedByEventId: acknowledgement.id } : {}) } }
+      : {}),
+    timeline,
+    transcriptTail,
+  };
+  return { data, warnings };
+}
+
+export type ConflictDetailModel =
+  | { status: "ok"; data: ConflictCardSnapshot }
+  | { status: "not_found" }
+  | { status: "evidence_unavailable"; message: string };
+
+export function readConflictDetailModel(
+  db: Db,
+  repoId: number,
+  repoRoot: string,
+  conflictId: string,
+  capturedAt: string,
+): ConflictDetailModel {
+  const conflict = readConflict(db, conflictId);
+  if (!conflict) {
+    const summary = exportTeamMapSnapshot(db, repoRoot, { now: () => new Date(capturedAt) })
+      .conflicts.find((candidate) => candidate.id === conflictId);
+    return summary
+      ? { status: "evidence_unavailable", message: "This basic-tier conflict has summary evidence only." }
+      : { status: "not_found" };
+  }
+  const owner = db.prepare(`SELECT repo_id AS repoId FROM conflicts WHERE id = ?`).get(conflictId) as
+    | { repoId: number }
+    | undefined;
+  if (!owner || owner.repoId !== repoId) return { status: "not_found" };
+
+  const map = exportTeamMapSnapshot(db, repoRoot, { now: () => new Date(capturedAt) });
+  const pair = conflict.taskIds.map((id) => map.tasks.find((task) => task.id === id));
+  if (!pair[0] || !pair[1] || pair.some((task) => task!.signalTier === "basic")) {
+    return { status: "evidence_unavailable", message: "Rich conflict evidence requires hook-tier tasks on both sides." };
+  }
+  const symbolRows = db.prepare(
+    `SELECT name, file FROM conflict_symbols WHERE conflict_id = ? ORDER BY seq`,
+  ).all(conflictId) as Array<{ name: string; file: string }>;
+  const symbols: SharedSymbolEvidence[] = [];
+  for (const symbol of symbolRows) {
+    const touches = conflict.taskIds.map((taskId) => db.prepare(
+      `SELECT task_id AS taskId, action, at FROM footprints
+       WHERE task_id = ? AND path = ? ORDER BY at DESC, id DESC LIMIT 1`,
+    ).get(taskId, symbol.file) as { taskId: string; action: "edit" | "read"; at: string } | undefined);
+    if (!touches[0] || !touches[1]) {
+      return { status: "evidence_unavailable", message: "Recorded conflict symbols do not have touch evidence for both sides." };
+    }
+    symbols.push({ name: symbol.name, file: symbol.file, touches: [touches[0], touches[1]] });
+  }
+  if (symbols.length === 0) {
+    return { status: "evidence_unavailable", message: "No rich symbol evidence is recorded for this conflict." };
+  }
+
+  const names = db.prepare(
+    `SELECT c.territory_id AS territoryId, c.sub_block_id AS subBlockId,
+            t.name AS territoryName, s.name AS subBlockName
+     FROM conflicts c
+     LEFT JOIN repo_active_mapping active ON active.repo_id = c.repo_id
+     LEFT JOIN mapping_version_features t ON t.repo_id = active.repo_id
+       AND t.version_id = active.version_id AND t.feature_id = c.territory_id
+     LEFT JOIN mapping_version_features s ON s.repo_id = active.repo_id
+       AND s.version_id = active.version_id AND s.feature_id = c.sub_block_id
+     WHERE c.id = ?`,
+  ).get(conflictId) as {
+    territoryId: string; subBlockId: string | null; territoryName: string | null; subBlockName: string | null;
+  };
+  const territoryName = names.territoryName ?? names.territoryId;
+  const diagnosis = readDiagnosis(db, conflictId);
+  const data: ConflictCardSnapshot = {
+    capturedAt,
+    conflict,
+    tasks: [pair[0], pair[1]],
+    crumb: {
+      resourceName: names.subBlockName ?? territoryName,
+      territoryName,
+      ...(names.subBlockName ? { subBlockName: names.subBlockName } : {}),
+      anchorFile: symbols[0]!.file,
+    },
+    symbols,
+    ...(diagnosis ? { diagnosis } : {}),
+  };
+  return { status: "ok", data };
+}

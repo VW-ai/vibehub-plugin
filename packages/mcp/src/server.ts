@@ -1,35 +1,31 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { operationContextSchema } from "@vibehub/core";
 import { z } from "zod";
 import { createCapabilities, type CapabilityContext } from "./capabilities.js";
 
-const specType = z.enum([
-  "intent", "decision", "constraint", "convention", "contract", "context", "change",
-]);
 const scopeItem = z.object({ glob: z.string().min(1), label: z.string().optional() });
-const manifest = z.object({
-  features: z.array(z.object({
-    id: z.string().min(1), name: z.string().min(1), parentId: z.string().optional(),
-  })),
-  anchors: z.array(z.object({
-    featureId: z.string().min(1), file: z.string().min(1), symbol: z.string().optional(),
-  })),
-  relations: z.array(z.object({
-    fromId: z.string().min(1), toId: z.string().min(1), type: z.string().min(1),
-  })),
-});
+const logicalRequestId = operationContextSchema.shape.requestId.optional();
+export const WORKBENCH_MCP_VERSION = "0.2.0";
+export const WORKBENCH_MCP_TOOL_NAMES = [
+  "register_scope", "self_report", "kb_retrieve", "kb_operation", "distill_operation", "get_manual",
+] as const;
 
 const result = (value: unknown) => ({
   content: [{ type: "text" as const, text: JSON.stringify(value, null, 2) }],
+});
+export const operationEnvelopeResult = (value: ReturnType<ReturnType<typeof createCapabilities>["dispatchKnowledge"]>) => ({
+  content: [{ type: "text" as const, text: JSON.stringify(value, null, 2) }],
+  isError: !value.ok,
 });
 
 export function createWorkbenchMcpServer(context: CapabilityContext): McpServer {
   const api = createCapabilities(context);
   const server = new McpServer(
-    { name: "vibehub-local", version: "0.1.0" },
+    { name: "vibehub-local", version: WORKBENCH_MCP_VERSION },
     { instructions: "Vibehub MCP exposes deterministic local capabilities. Semantic workflows live in vibehub skills." },
   );
 
-  server.registerTool("register_scope", {
+  server.registerTool(WORKBENCH_MCP_TOOL_NAMES[0], {
     title: "Register session scope",
     description: "Store this task's repo-relative read/write globs and human-readable status. Replaces the previous declaration; attribution is derived later.",
     inputSchema: {
@@ -39,7 +35,7 @@ export function createWorkbenchMcpServer(context: CapabilityContext): McpServer 
     },
   }, async (input) => result(api.registerScope(input)));
 
-  server.registerTool("self_report", {
+  server.registerTool(WORKBENCH_MCP_TOOL_NAMES[1], {
     title: "Update task status",
     description: "Persist one concise status line and an optional completed step. This is a mechanical task fact, not a report-writing workflow.",
     inputSchema: {
@@ -48,40 +44,43 @@ export function createWorkbenchMcpServer(context: CapabilityContext): McpServer 
     },
   }, async (input) => result(api.selfReport(input)));
 
-  server.registerTool("kb_retrieve", {
+  server.registerTool(WORKBENCH_MCP_TOOL_NAMES[2], {
     title: "Run one deterministic knowledge query",
     description: "Return one ranked pass over specs bound to topic words or repo-relative paths. Use vibehub-query for multi-pass context strategy.",
     inputSchema: {
       query: z.string().min(1).optional(),
       paths: z.array(z.string().min(1)).optional(),
       limit: z.number().int().min(1).max(50).optional(),
+      includeDrafts: z.boolean().optional(),
+      includeHistory: z.boolean().optional(),
     },
-  }, async (input) => result(api.kbRetrieve(input)));
+  }, async (input) => operationEnvelopeResult(api.dispatchKnowledge("kb.spec.search", input)));
 
-  server.registerTool("kb_record", {
-    title: "Persist one spec fact",
-    description: "Validate and persist one already-decomposed spec as draft. IDs are server-generated; use vibehub-ingest to decompose discussions.",
+  server.registerTool(WORKBENCH_MCP_TOOL_NAMES[3], {
+    title: "Dispatch one canonical knowledge operation",
+    description: "Symmetric adapter over the shared OperationDispatcher. Returns the exact success/error envelope used by `vibehub kb ... --json`.",
     inputSchema: {
-      type: specType.optional(),
-      summary: z.string().min(1).max(300).optional(),
-      detail: z.string().optional(),
-      featureId: z.string().optional(),
-      supersedes: z.string().optional(),
-      marksStale: z.string().optional(),
+      requestId: logicalRequestId,
+      operation: z.string().min(1),
+      input: z.record(z.string(), z.unknown()).optional(),
     },
-  }, async (input) => result(api.kbRecord(input)));
+  }, async ({ operation, input, requestId }) => operationEnvelopeResult(api.dispatchKnowledge(operation, input ?? {}, requestId)));
 
-  server.registerTool("get_manual", {
+  server.registerTool(WORKBENCH_MCP_TOOL_NAMES[4], {
+    title: "Dispatch one deterministic distillation operation",
+    description: "Symmetric adapter over DistillationService through the shared OperationDispatcher. Skills own semantic choices; this tool only validates and persists run mechanics.",
+    inputSchema: {
+      requestId: logicalRequestId,
+      operation: z.string().min(1),
+      input: z.record(z.string(), z.unknown()).optional(),
+    },
+  }, async ({ operation, input, requestId }) => operationEnvelopeResult(api.dispatchOperation(operation, input ?? {}, requestId)));
+
+  server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
     title: "Read the Vibehub agent manual",
     description: "Return reference material about component boundaries and available skills. Not required before routine work.",
     inputSchema: { topic: z.string().optional() },
   }, async (input) => result(api.getManual(input)));
-
-  server.registerTool("kb_apply_distillation", {
-    title: "Apply a distillation manifest",
-    description: "Atomically validate and apply an already-produced feature/anchor/relation manifest, then recompute layout. Semantic mapping belongs to vibehub-distill.",
-    inputSchema: manifest.shape,
-  }, async (input) => result(api.kbApplyDistillation(input)));
 
   return server;
 }

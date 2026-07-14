@@ -1,13 +1,9 @@
 /**
- * Contract types — canonical home in core (decision-project-012; same
- * treatment as map-types.ts). VERBATIM from workbench/app-demo/src/install-types.ts
- * except the ./types import path is retargeted to ./map-types.js. The demo
- * keeps its copy until M1 slice ④; edits must be mirrored until then.
+ * Canonical browser-safe installation-state read-model contracts.
  */
 /**
- * Empty / first-run data types — everything the first-run screen
- * (static/empty-install-s2.html, the approved S2 artifact) renders.
- * EXTENDS the map's types (./types.ts): Task, scopes, git facts, RepoInfo
+ * Empty / first-run data types — everything the first-run screen renders.
+ * Extends canonical map contracts: Task, scopes, git facts, RepoInfo
  * and SyncFreshness are imported, never duplicated.
  *
  * SIGNAL DISCIPLINE (same hard rule as types.ts / panel-types.ts /
@@ -34,7 +30,7 @@
  * panel-types.ts): footprint GEOMETRY — areaFrac, sqrt damping, shelf
  * position, overflow collapse — is a pure function of
  * (footprints, repoFiles, territory rect) and lives in ./install-derive.ts.
- * Fixtures store only the mechanical facts (taskId, filesTouched,
+ * Snapshots store only the mechanical facts (taskId, filesTouched,
  * firstSeenAt); a stored rect could contradict the rule.
  */
 import type { RepoInfo, SyncFreshness, Task } from "./map-types.js";
@@ -199,7 +195,7 @@ export const UNCATEGORIZED_TERRITORY_ID = "uncategorized";
  * Geometry is DERIVED (install-derive.ts packFootprints), never stored.
  */
 export interface UncategorizedFootprint {
-  /** The session that made it (id into InstallFixture.tasks). */
+  /** The session that made it (id into InstallSnapshot.tasks). */
   taskId: string;
   /** Distinct files edited this session (PostToolUse path count). */
   filesTouched: number;
@@ -219,15 +215,15 @@ export interface UncategorizedFootprint {
   sampleFiles?: string[];
 }
 
-/* ── fixture root ───────────────────────────────────────────────────────── */
+/* ── snapshot root ───────────────────────────────────────────────────────── */
 
 /**
  * Everything the first-run screen needs to render one frame.
- * Exactly one of the S2 variants per fixture; the variant is fully
+ * Exactly one of the S2 variants per snapshot; the variant is fully
  * implied by the data (connection kind × steps × mapping × tasks), never
  * stored as a name.
  */
-export interface InstallFixture {
+export interface InstallSnapshot {
   /** The "now" of this snapshot (ISO 8601) — all relative ages derive from it. */
   capturedAt: string;
   connection: RepoConnection;

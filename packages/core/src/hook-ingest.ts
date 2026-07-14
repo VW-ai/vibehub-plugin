@@ -182,13 +182,10 @@ export function ingestHookEvent(
   const claimed = deliveryCapable
     ? claimPendingInjections(db, taskId, nowIso)
     : [];
-  // Stop normally means the turn is waiting for the human. When this same
-  // Stop returns decision:block with the queued note as its reason, Claude
-  // continues immediately: running is a known fact, not a timeout inference.
-  const stateAfter =
-    hook === "Stop" && claimed.length > 0
-      ? "running"
-      : nextState(existing?.state ?? "queued", hook);
+  // Claiming an injection proves queue ownership, not that the runtime has
+  // resumed. Preserve the Stop-observed waiting state until a later hook
+  // supplies independent runtime evidence.
+  const stateAfter = nextState(existing?.state ?? "queued", hook);
 
   upsertTask(db, {
     id: taskId,
@@ -330,13 +327,12 @@ export function ingestHookEvent(
 
   // 注入队列回查 (decision-project-018) — deliver pending notes at every
   // hook boundary that can deliver guidance. Stop is the fast lane: its
-  // official decision:block + reason shape CONTINUES the conversation, so
-  // a fire-and-forget injection wakes the agent instead of waiting for
-  // the next user prompt (the Stop→waiting transition above is then
-  // corrected by the very next hook fire — honest, self-healing).
+  // official decision:block + reason asks the runtime to continue, while
+  // task state remains waiting until a subsequent hook proves it resumed.
   // SessionStart catches notes queued while the session was away.
-  // Claiming (claimed_at) IS the delivery receipt: the context was emitted
-  // to Claude Code in this very process. There is no daemon to time out a
+  // Claiming (claimed_at) is the single-consumer ownership receipt; the
+  // context was emitted to Claude Code in this process, but that alone is
+  // not evidence that the runtime resumed. There is no daemon to time out a
   // pending note — "still undelivered" is a read-side derivation
   // (pendingInjections + age), surfaced by the UI, never a stored state.
   let output: HookIngestResult["output"];

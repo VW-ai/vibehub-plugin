@@ -1,25 +1,27 @@
 import {
-  applyDistillation,
-  markSpecStale,
+  OperationDispatcher,
   readTask,
-  recordSpec,
   replaceScopePatterns,
-  retrieveKnowledge,
   saveTaskReport,
   type Db,
-  type DistillationManifest,
-  type SpecType,
 } from "@vibehub/core";
+import crypto from "node:crypto";
 
 export interface CapabilityContext {
   db: Db;
   repoId: number;
   taskId: string;
+  actor?: string;
+  requestId?: () => string;
   now?: () => string;
 }
 
 export function createCapabilities(ctx: CapabilityContext) {
   const now = (): string => ctx.now?.() ?? new Date().toISOString();
+  const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db).dispatch(operation,{
+    repoId:ctx.repoId,actor:ctx.actor??"mcp-agent",taskId:ctx.taskId,
+    requestId:requestId??ctx.requestId?.()??`mcp-${crypto.randomUUID()}`,now:now(),
+  },input);
   const requireTask = () => {
     const task = readTask(ctx.db, ctx.taskId);
     if (!task || task.repoId !== ctx.repoId) throw new Error(`missing task: ${ctx.taskId}`);
@@ -52,41 +54,12 @@ export function createCapabilities(ctx: CapabilityContext) {
       return { ...report, ...(report.done === null ? {} : { done: report.done }) };
     },
 
-    kbRetrieve(input: { query?: string; paths?: string[]; limit?: number }) {
-      return retrieveKnowledge(ctx.db, ctx.repoId, input);
+    dispatchOperation(operation:string,input:Record<string,unknown>={},requestId?:string) {
+      return dispatch(operation,input,requestId);
     },
 
-    kbRecord(input: {
-      type?: SpecType;
-      summary?: string;
-      detail?: string;
-      featureId?: string;
-      supersedes?: string;
-      marksStale?: string;
-    }) {
-      requireTask();
-      if (input.marksStale) {
-        if (input.type || input.summary || input.supersedes) {
-          throw new Error("marksStale is a standalone operation");
-        }
-        markSpecStale(ctx.db, input.marksStale, now());
-        return { markedStale: input.marksStale };
-      }
-      if (!input.type || !input.summary) {
-        throw new Error("type and summary are required when recording a fact");
-      }
-      return recordSpec(ctx.db, ctx.repoId, {
-        type: input.type,
-        summary: input.summary,
-        detail: input.detail ?? null,
-        ...(input.featureId ? { featureId: input.featureId } : {}),
-        ...(input.supersedes ? { supersedes: input.supersedes } : {}),
-      }, now());
-    },
-
-    kbApplyDistillation(manifest: DistillationManifest): { applied: true } {
-      applyDistillation(ctx.db, ctx.repoId, manifest, now());
-      return { applied: true };
+    dispatchKnowledge(operation:string,input:Record<string,unknown>={},requestId?:string) {
+      return dispatch(operation,input,requestId);
     },
 
     getManual(_input: { topic?: string } = {}) {

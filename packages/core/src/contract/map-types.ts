@@ -1,11 +1,6 @@
 /**
- * Map-screen contract types — moved into core as the canonical home
- * (decision-project-012: app depends on core, never the reverse).
- *
- * VERBATIM from workbench/app-demo/src/types.ts (M0's contract that grew out
- * of the UI). app-demo still holds its own copy until M1 slice ④ switches the
- * demo onto core; at that point the demo imports these and deletes its copy.
- * Until then: any edit here must be mirrored there.
+ * Canonical browser-safe map read-model contracts. The App imports these
+ * through `@vibehub/core/contracts`; core never depends on the App.
  */
 
 /* ── task state ─────────────────────────────────────────────────────────── */
@@ -41,7 +36,7 @@ export type ScopeMode = "write" | "read";
  */
 export interface ScopeDeclaration {
   mode: ScopeMode;
-  /** Territory the declaration points at (id into MapFixture.territories). */
+  /** Territory the declaration points at (id into MapSnapshot.territories). */
   territoryId: string;
   /** Optional sub-block within the territory (id into Territory.subBlocks). */
   subBlockId?: string;
@@ -81,7 +76,7 @@ export interface Task {
   signalTier: SignalTier;
   /**
    * Conflict is an ATTRIBUTE, not a sixth state (decision-project-020/021).
-   * Ids into MapFixture.conflicts. Empty array = no conflict.
+   * Ids into MapSnapshot.conflicts. Empty array = no conflict.
    */
   conflictIds: string[];
   /** Declared scopes, in declaration order. UI collapses overflow to +N. */
@@ -119,10 +114,10 @@ export interface SubBlock {
 
 /**
  * Presentation-only layout rect (percent of canvas). NOT a captured signal —
- * it is computed by the app's layout pass; fixtures carry the v8 hand-tuned
+ * it is computed by the app's layout pass; snapshots carry the v8 hand-tuned
  * values so S4 can hit screenshot-parity with the frozen baseline.
  */
-export interface DemoLayout {
+export interface TerritoryLayout {
   left: number; // percent
   top: number; // percent
   width: number; // percent
@@ -131,12 +126,12 @@ export interface DemoLayout {
 
 /**
  * Presentation-only sub-block offset INSIDE its territory, in px — v8 anchors
- * sub-blocks with fixed px offsets (viewport-independent), so the fixture
- * carries them verbatim for screenshot-parity. Same caveat as DemoLayout:
+ * sub-blocks with fixed px offsets (viewport-independent), so the snapshot
+ * carries them verbatim for screenshot-parity. Same caveat as TerritoryLayout:
  * NOT a captured signal; a real layout pass replaces this later.
  * (S4 reconciliation of the S3 percent approximation — see notes/map-main.md.)
  */
-export interface DemoSubOffset {
+export interface SubBlockLayoutOffset {
   left?: number; // px from territory left edge
   top?: number; // px from territory top edge
   right?: number; // px from territory right edge
@@ -152,12 +147,12 @@ export interface Territory {
   anchoredFileCount: number;
   subBlocks: SubBlock[];
   /** v8 hand-tuned rect; later replaced by a real layout algorithm. */
-  demoLayout?: DemoLayout;
-  /** Sub-block px offsets keyed by sub-block id (same caveat as demoLayout). */
-  demoSubLayout?: Record<string, DemoSubOffset>;
+  layout?: TerritoryLayout;
+  /** Sub-block px offsets keyed by sub-block id (same caveat as layout). */
+  subBlockLayout?: Record<string, SubBlockLayoutOffset>;
 }
 
-/* ── occupancy rollups (derived, but shipped in the fixture so the map is
+/* ── occupancy rollups (derived, but shipped in the snapshot so the map is
       renderable without re-deriving; each entry is a pure join of tasks ×
       scope declarations × footprints) ─────────────────────────────────── */
 
@@ -231,13 +226,13 @@ export interface RepoInfo {
   branchCount: number;
 }
 
-/* ── fixture root ───────────────────────────────────────────────────────── */
+/* ── snapshot root ───────────────────────────────────────────────────────── */
 
 /** Everything the map screen needs to render one frame. */
-export interface MapFixture {
+export interface MapSnapshot {
   /**
    * The "now" this snapshot was taken (ISO 8601). All relative ages
-   * ("12m", "42s ago") are computed against this, keeping demos
+   * ("12m", "42s ago") are computed against this, keeping previews
    * deterministic.
    */
   capturedAt: string;

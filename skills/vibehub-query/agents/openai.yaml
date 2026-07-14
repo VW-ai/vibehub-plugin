@@ -1,4 +1,4 @@
 interface:
   display_name: "VibeHub Query"
-  short_description: "Retrieve and synthesize governed project context"
-  default_prompt: "Use $vibehub-query to retrieve the project context needed for this task."
+  short_description: "Retrieve governed project context at useful depth"
+  default_prompt: "Use $vibehub-query to assemble the governed context needed for this task."

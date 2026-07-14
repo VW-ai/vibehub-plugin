@@ -20,9 +20,11 @@ dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
 - [decision-workbench-004] 队友 branch 映射语义:冲突候选=unmerged∧(无PR∨open)、basic 档 stalled/done、蒸馏前 Uncategorized 单地盘、detectedAt 首检保龄(active,2026-07-12 Wayne 逐条过审)
 - [decision-workbench-006] hook 清单矩阵:九事件接线/稳态逐 hook 注入=0/Stop decision:block 唤醒/robustness 不自建监听器(active,2026-07-12 Wayne 批准)
 - [decision-workbench-007] 微协议终稿:B1 四义务+manual 指针/B2 双分支/B3 locus 包装;Stop 使用官方 block wire format(active,2026-07-12 Wayne 批准)
-- [decision-workbench-008] MCP 六 capability = 确定性端点+质量闸;description 只留机械契约与轻量 skill 路由(active,2026-07-12 Wayne 批准)
+- [decision-workbench-008] MCP capability = 确定性端点+质量闸;v0.2 诚实面为 register_scope/self_report/kb_retrieve/kb_operation/distill_operation/get_manual,legacy kb_record/kb_apply_distillation 已移除;description 只留机械契约与轻量 skill 路由(active,2026-07-13 integrity clarification)
 - [decision-workbench-009] Claude plugin 三件套:hooks=when,MCP=deterministic capabilities,skills=how well;自然语言 skill 替代 codified workflow 是产品论题(active,2026-07-12 Wayne 批准)
 - [decision-workbench-010] **Intelligence ownership = skill**:hooks 只管 when,MCP/core 只管确定性原语+质量闸;首批至少 ingest/distill/query 三 skill;description 不得拼成分布式 workflow;engine dogfood 先于 Tauri 打包(active,2026-07-12 Wayne 开工确认)
+- [decision-workbench-011] **Headless runtime 是独立产品**:plugin+hooks+skills+MCP+CLI/core 自带 SQLite init 与完整 context 自循环;App 是可选 reader/intervention client;filesystem 仅 export;先保持 workbench subtree-ready,真实 dogfood 后再物理拆 repo(active,2026-07-12 Wayne 裁决)
+- [decision-workbench-012] **DB-native skill intelligence**:skills 管语义与渐进 workflow,hooks=when,MCP/CLI/core 经版本化 contracts+共享 dispatcher 管确定性 integrity;canonical promotion guarded/reviewed,distillation 机器 validate/finalize immutable candidate 后再 human review→CAS activation;unresolved 诚实保留,App/Tauri 非 engine gate(active,2026-07-13 forward-test 收口)
 
 ## Changes
 
@@ -32,6 +34,6 @@ dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
 - [change-2026-07-12-treemap-spike] Treemap spike:squarified 真布局替手调 demoLayout,蒸馏时算一次缓存(migration 003)
 - [change-2026-07-12-demo-live-read] M1 ④ 落地:demo 切真 SQLite 读(vite middleware 现场导出),本地 hook 任务合并,e2e 172 全绿
 - [change-2026-07-12-m2-integration-design] M2 第一批:设计块 A/B/C 落 draft(三卡点)+ 机械块 D(注入投递 Stop 唤醒/SessionStart 补送/pause 最严胜出/送达读侧语义;里程碑机械启发式 CJK 加权)
-- [change-2026-07-12-m2-skill-intelligence-spine] M2 redo checkpoint:Claude plugin/hooks + MCP 六 capability + ingest/distill/query skills + scope/commit/timeline/graph 读写骨架,本地 engine 链路验证通过
+- [change-2026-07-12-m2-skill-intelligence-spine] M2 redo checkpoint:Claude plugin/hooks + MCP deterministic capability surface + ingest/distill/query skills + scope/commit/timeline/graph 读写骨架,本地 engine 链路验证通过;2026-07-13 v0.2 移除两个必失败 legacy mutation 名,改走 canonical operation adapters
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。

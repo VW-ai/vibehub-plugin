@@ -1,12 +1,9 @@
 /**
- * Contract types — canonical home in core (decision-project-012; same
- * treatment as map-types.ts). VERBATIM from workbench/app-demo/src/panel-types.ts
- * except the ./types import path is retargeted to ./map-types.js. The demo
- * keeps its copy until M1 slice ④; edits must be mirrored until then.
+ * Canonical browser-safe task-panel read-model contracts.
  */
 /**
- * Task-panel data types — everything the panel (static/task-panel-s2.html,
- * the approved S2 artifact) renders. EXTENDS the map's types (./types.ts);
+ * Task-panel data types — everything the panel renders. Extends canonical
+ * map contracts from `map-types.ts`;
  * shared concepts (Task, TaskState, scopes, git facts) are imported, never
  * duplicated.
  *
@@ -28,7 +25,7 @@
  *
  * MILESTONE TIER IS DERIVED, NEVER STORED. decision-project-023 defines the
  * milestone档 as a mechanical whitelist (commit + state transition + user
- * actions; zero LLM judgment). Storing a flag would let fixtures lie about
+ * actions; zero LLM judgment). Storing a flag would let snapshots lie about
  * it. See isMilestone() in ./panel-derive.ts for the single derivation.
  */
 import type { Task, TaskState } from "./map-types.js";
@@ -137,16 +134,13 @@ export interface TestRunEvent extends TimelineEventBase {
 }
 
 /**
- * The user's mid-flight message from the intervention deck (023: 介入必入史,
- * both tiers, never hidden — constraint "用户的介入动作必入时间线").
- * SOURCE: the panel's own Send action; delivered through the next hook that
- * carries guidance. Stop uses decision:block + reason as the fast lane and
- * wakes the conversation; UserPromptSubmit/PostToolUse/SessionStart deliver
- * additionalContext as fallback boundaries.
+ * A queued message observed by a delivery hook. The earlier App-side queue
+ * fact is UserInterventionEvent; keeping both facts avoids claiming delivery
+ * merely because SQLite accepted a request.
  */
 export interface UserInjectionEvent extends TimelineEventBase {
   type: "user_injection";
-  /** Which deck mode sent it: continue-current-task guidance vs stop-first. */
+  /** Delivery mode observed by the hook. */
   mode: "inject" | "pause";
   /** Verbatim message. */
   text: string;
@@ -161,6 +155,18 @@ export interface UserInjectionEvent extends TimelineEventBase {
    * (decision-project-023: 介入必入两档).
    */
   classification?: "milestone" | "default";
+}
+
+/**
+ * The App-side write fact. Queueing/requesting is deliberately distinct
+ * from UserInjectionEvent, which is appended only when a hook observes the
+ * queued item at a delivery boundary.
+ */
+export interface UserInterventionEvent extends TimelineEventBase {
+  type: "user_intervention";
+  action: "inject" | "pause" | "ignore";
+  text: string;
+  requestId: string;
 }
 
 /**
@@ -202,7 +208,7 @@ export interface CrossReadNoticeEvent extends TimelineEventBase {
   type: "cross_read_notice";
   /** The shared file (repo-relative). */
   file: string;
-  /** The other concurrent task (id into MapFixture.tasks). */
+  /** The other concurrent task (id into MapSnapshot.tasks). */
   otherTaskId: string;
   /** Its title, denormalized so the panel renders standalone. */
   otherTaskTitle: string;
@@ -252,6 +258,7 @@ export type TimelineEvent =
   | FileReadEvent
   | TestRunEvent
   | UserInjectionEvent
+  | UserInterventionEvent
   | AgentAckEvent
   | QuestionEvent
   | CrossReadNoticeEvent
@@ -304,10 +311,10 @@ export interface TwistEvidence {
   acknowledgedByEventId?: string;
 }
 
-/* ── fixture root ───────────────────────────────────────────────────────── */
+/* ── snapshot root ───────────────────────────────────────────────────────── */
 
 /** Everything the task panel needs to render one frame. */
-export interface TaskPanelFixture {
+export interface TaskPanelSnapshot {
   /**
    * The "now" of the snapshot (ISO 8601). All ages ("12m", "3h", "2d")
    * derive from timestamps vs this — deterministic, no Date.now.
@@ -316,7 +323,8 @@ export interface TaskPanelFixture {
   capturedAt: string;
   /** The task itself — the map's own type, unchanged. */
   task: Task;
-  session: SessionIdentity;
+  /** Absent for captured/queued work that has not started a session. */
+  session?: SessionIdentity;
   /** Absent = footprint fully inside declared scope (no marker). */
   twist?: TwistEvidence;
   /** Chronological (ascending `at`). Milestone tier is DERIVED, see panel-derive. */

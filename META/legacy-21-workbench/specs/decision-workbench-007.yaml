@@ -7,10 +7,17 @@ intent:
     Wayne 2026-07-12 已批准 B1/B2/B3 与 locus。终稿见
     design-claude-code-integration.md §2 与 hook-ingest.ts。
 
+    **2026-07-13 MCP v0.2 澄清(现行约束):** B1 的沉淀义务现调用
+    `kb_operation`,传精确 canonical `kb.*` operation + input;蒸馏调用
+    `distill_operation`。可选顶层 `requestId` 只表达调用者指定的稳定 replay,
+    不进入 operation input;MCP transport correlation id 不得落为 repository
+    request identity。历史 v0.1 名 `kb_record` / `kb_apply_distillation` 已移除,
+    仅保留在带历史标记的档案文本中,不得作为当前指导。
+
     **四组与触发条件/预算/预期行为:**
     1. **B1 SessionStart 行为协议**(普通 session;每 session 一次,resume/compact
        重注):候选 A 命令式全款 ~110 tok / B 讲为什么 ~75 / C 极简铁四条 ~45。
-       预期:动手前 register_scope、陌生区前 kb_retrieve、决策当场 kb_record、
+       预期:动手前 register_scope、陌生区前 kb_retrieve、决策当场 kb_operation、
        方向变 self_report。
     2. **B1-meta 编排席角色**(SessionStart 且 VIBEHUB_SESSION_ROLE=meta,
        app 发射时设环境变量;M3+ 才有真消费者,文本先定):候选 A ~90 / B ~40。

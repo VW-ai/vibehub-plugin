@@ -50,6 +50,19 @@ intent:
     实时声明、注入是往运行中 agent 推消息、决策图是本地 SQLite 语义层——
     GitHub 没有"正在跑的 session"这个实体,PR/issue/commit 全是事后工件,
     无一承载事中态。三组全部自研,与 GitHub 零重叠。
+clarifications:
+  - date: "2026-07-13"
+    kind: "breaking_api_correction"
+    detail: |
+      ⑤E whole-branch integrity review 证明 `kb_record` 与
+      `kb_apply_distillation` 的已注册实现只会返回 unsupported_operation,
+      无法兑现本决策原拟的持久化承诺。MCP server v0.2 因而从 advertised
+      surface 移除这两个名称,不伪造 server-generated evidence/hash,也不绕过
+      versioned distillation run。当前六工具为 register_scope、self_report、
+      kb_retrieve、kb_operation、distill_operation、get_manual;写入分别经
+      canonical public operation contract,语义 workflow 继续由 ingest/distill
+      skills 持有。本 clarification 取代上文旧工具名/manifest 单事务入口的
+      当前适用性,保留原文作为 2026-07-12 设计演进记录。
 constraints:
   - kind: must
     rule: "description 只住 capability/机械契约/轻量 skill 路由;语义 workflow、查询策略与综合判断只住 skill 包(009/010)"

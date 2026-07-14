@@ -1,5 +1,0 @@
-# Marks app-demo as its own pnpm root so `pnpm install` here never resolves
-# up into the Vibehub monorepo workspace (keeps root pnpm-lock.yaml untouched;
-# the demo must stay standalone to drop into a Tauri WebView shell later).
-packages:
-  - "."

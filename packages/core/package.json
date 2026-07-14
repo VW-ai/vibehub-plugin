@@ -10,6 +10,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./contracts": {
+      "types": "./dist/contract/index.d.ts",
+      "default": "./dist/contract/index.js"
     }
   },
   "files": [
@@ -21,7 +25,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.0"
+    "better-sqlite3": "^11.8.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",

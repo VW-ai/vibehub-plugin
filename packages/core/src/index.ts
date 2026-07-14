@@ -2,15 +2,26 @@ export * from "./contract/map-types.js";
 export * from "./contract/panel-types.js";
 export * from "./contract/conflict-types.js";
 export * from "./contract/install-types.js";
+export * from "./contract/kb-types.js";
 export {
   defaultDbPath,
   openDb,
   resolveDbPath,
   vibehubHome,
   type Db,
+  CURRENT_SCHEMA_VERSION,
+  inspectDatabase,
+  withReadonlyDb,
+  type DatabaseInspection,
 } from "./db.js";
+export * from "./runtime-lifecycle.js";
 export * from "./activity-store.js";
-export * from "./graph-store.js";
+// GraphStore is a read-model compatibility facade after the KB v2 cutover.
+// Canonical/mapping writes are intentionally not part of the package API.
+export {
+  listTerritories, readTerritoryLayouts, countAnchoredFiles, featuresForFile,
+  readSpec, edgesFrom, getSetting, type SpecRow, type SpecType,
+} from "./graph-store.js";
 export {
   GitFacade,
   GhFacade,
@@ -38,8 +49,25 @@ export {
   type TeamSyncOptions,
   type TeamSyncResult,
 } from "./team-sync.js";
-export { exportTeamMapFixture } from "./fixture-export.js";
+export { exportTeamMapSnapshot } from "./snapshot-export.js";
+export {
+  RuntimeService,
+  resolveWorkbenchRepoRef,
+  type RuntimeServiceOptions,
+} from "./runtime-service.js";
 export { readTaskTimeline } from "./timeline-read.js";
+export {
+  canonicalConflictPair,
+  isConflictPairIgnored,
+  persistIgnoredConflictPair,
+  resolveConflictPair,
+} from "./conflict-ignore.js";
+export { readTaskPanelModel, readConflictDetailModel } from "./live-read-models.js";
+export {
+  applyIntervention,
+  InterventionTargetNotFoundError,
+  type ApplyInterventionInput,
+} from "./intervention-service.js";
 export {
   squarify,
   layoutTerritories,
@@ -57,17 +85,10 @@ export {
   replaceScopePatterns,
   type ScopePattern,
 } from "./scope-registry.js";
-export {
-  applyDistillation,
-  markSpecStale,
-  recordSpec,
-  retrieveKnowledge,
-  type DistillationManifest,
-  type RecordSpecInput,
-  type SpecRow,
-  type SpecType,
-  type KnowledgeResult,
-} from "./graph-store.js";
+export * from "./knowledge-service.js";
+export * from "./distillation-service.js";
+export * from "./operation-dispatcher.js";
+export * from "./operation-contracts.js";
 export {
   ingestHookEvent,
   lastAssistantText,

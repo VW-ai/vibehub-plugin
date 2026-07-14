@@ -4,6 +4,13 @@ state: active
 intent:
   summary: "产品形态 = Claude Code plugin 三件套:hooks(触发骨架,when)+ MCP server(确定性端点+质量闸,db 唯一读写门)+ skill 包(方法论,how well);产品论题 = 自然语言 skill 替代 codified workflow(用户可读可改可 fork,确定性代码收缩到必须机械处),dogfood 自证 + skill change 版本史反哺 workflow 设计;026 重塑的正确解读 = 触发模型换血(咒语→hook微指令/description/自发),方法论文本保留为 skill;蒸馏质量管道 = skill×server校验×人晨审 三层闸"
   detail: |
+    **2026-07-13 MCP v0.2 澄清(现行约束):** 所有 KB 写入通过
+    `kb_operation` 的 canonical `kb.*` contract,所有蒸馏 run 写入通过
+    `distill_operation` 的 canonical `distill.*` contract。两 adapter 的
+    可选顶层 `requestId` 仅用于显式 logical replay,不属于 operation input;
+    transport correlation id 永不持久化为 receipt identity。历史 v0.1 名
+    `kb_record` / `kb_apply_distillation` 只作历史记录,不得出现在现行 workflow。
+
     Wayne 2026-07-12 口述纠偏(对"MCP 工具=description+确定性脚本"两层
     框架的修正):"hook/etc 是触发我们的 skill 对 vibehub 数据库查询的
     节点;怎么查、改、读,本质上依然是 skill 的工作,或者 server 端
@@ -21,7 +28,7 @@ intent:
     **三件套解剖(一个 Claude Code plugin 装齐):**
     1. **hooks = 触发骨架(when)**:微指令在关键时刻点名该干什么
        (SessionStart 协议、越界提醒、注入送达);零方法论。
-    2. **MCP server = 确定性端点 + 质量闸**:kb_record 不是"单纯脚本"
+    2. **MCP server = 确定性端点 + 质量闸**:kb_operation 不是"单纯脚本"
        ——它是落库的唯一门,做 schema 校验、查重预检、supersede 链
        维护、anchor 存在性检查,不合格返回 warning/打回;工具返回值
        可携带下一步指引(server-driven workflow,pipeline 的确定性
@@ -56,7 +63,7 @@ intent:
 
     **对既有 draft 的牵动:**
     - 008(MCP 工具面):工具定位从"接口即全部"修正为"端点+质量闸";
-      kb_record description 增加对 ingest skill 的指路;
+      kb_operation description 增加对 ingest skill 的指路;
     - B1 协议四义务不变(义务是触发,方法论在 skill);
     - 块 E 范围追加:skill 包初版(vibehub-ingest / vibehub-distill /
       vibehub-query 至少三个)+ server 校验闸,与 MCP server 同批;
@@ -66,7 +73,7 @@ constraints:
   - kind: must
     rule: "skill 的触发者只能是 hook 微指令 / tool description / agent 自发;产品面不得出现用户咒语入口(026 不变)"
   - kind: must
-    rule: "kb_record/蒸馏落库必须过 server 机械校验闸;skill 不得绕过 MCP 直写 db"
+    rule: "KB 写入必须经 kb_operation、蒸馏写入必须经 distill_operation 的 server 机械校验闸;skill 不得绕过 MCP 直写 db"
   - kind: must_not
     rule: "MCP server / core 内禁止 LLM(013 不变);语义判断全部住 skill,由用户 agent 执行"
 indexing:
@@ -87,7 +94,7 @@ relations:
     detail: "『方法论文本蒸馏复用,驱动骨架从零新建』的正确解读:重塑触发模型,保留 skill 载体"
   - target: "decision-workbench-008"
     type: relates_to
-    detail: "工具定位修正:端点+质量闸;kb_record description 指路 ingest skill"
+    detail: "工具定位修正:端点+质量闸;kb_operation description 指路 ingest skill"
   - target: "decision-project-013"
     type: implements
     detail: "LLM 判断→skill prompt / 确定性算子→CLI(server) 的分界线在 plugin 三件套里的落位"

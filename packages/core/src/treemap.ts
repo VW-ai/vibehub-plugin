@@ -1,6 +1,6 @@
 /**
  * Squarified treemap — the real layout pass that replaces the v8 hand-tuned
- * demoLayout (contract map-types.ts: "later replaced by a real layout
+ * layout (contract map-types.ts: "later replaced by a real layout
  * algorithm"; handoff: 蒸馏时算一次缓存).
  *
  * Classic Bruls / Huizing / van Wijk (2000): greedily fill rows along the
@@ -12,7 +12,7 @@
  * (anchoredFileCount); a non-positive weight is a caller bug, not a layout
  * case, so it throws.
  */
-import type { DemoLayout } from "./contract/map-types.js";
+import type { TerritoryLayout } from "./contract/map-types.js";
 
 export interface TreemapItem {
   id: string;
@@ -130,7 +130,7 @@ export const DEFAULT_LAYOUT: Required<LayoutOptions> = {
 export function layoutTerritories(
   items: TreemapItem[],
   opts: LayoutOptions = {},
-): Map<string, DemoLayout> {
+): Map<string, TerritoryLayout> {
   const { margin, gapPct } = { ...DEFAULT_LAYOUT, ...opts };
   const canvas: Rect = {
     left: margin.left,
@@ -140,7 +140,7 @@ export function layoutTerritories(
   };
   const rects = squarify(items, canvas);
   const half = gapPct / 2;
-  const out = new Map<string, DemoLayout>();
+  const out = new Map<string, TerritoryLayout>();
   for (const [id, r] of rects) {
     out.set(id, {
       left: r.left + half,

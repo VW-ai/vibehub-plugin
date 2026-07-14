@@ -54,7 +54,7 @@
 [Vibehub] This repo runs Vibehub — your team's shared context layer. Protocol:
 1. Before your first edit, call register_scope: what you'll touch + one line on what you're doing.
 2. Before working in code you haven't touched this session, use the vibehub-query skill — decisions and constraints may bind it.
-3. The moment a design decision is made (by you or your user), call kb_record. Don't batch for later.
+3. The moment a design decision is made (by you or your user), call kb_operation with the canonical kb.* operation. Don't batch for later.
 4. If your direction changes, say so: self_report, one line.
 For the full picture of how Vibehub works, call get_manual — when you need it, not before starting work.
 Skipping these hides your work from your team.
@@ -81,18 +81,22 @@ Stop what you're doing: no new tool calls. Reply to this message, then wait for 
 
 **B1-meta(编排席)— DEFERRED**:消费者在 M3+ 操作舱,届时连场景一起过;机制先定(app 发射设 `VIBEHUB_SESSION_ROLE=meta`,hook CLI 读环境变量分流)。
 
-## §3 MCP server:端点 + 质量闸(已定案)
+## §3 MCP server:端点 + 质量闸(已定案;v0.2 current)
 
-五个日常工具 + `kb_apply_distillation` 批量写端点。**description 不是 intelligence 层**:只说能力、输入输出/机械约束,以及轻量路由到对应 skill;跨工具的『怎么查/怎么拆/怎么综合』只住 skill。server 是 db 唯一写门,落库过机械校验(schema/查重预检/supersede 链完整性/anchor 存在性),不合格返回 warning 打回;返回值只可携带机械事实,不得编排后续语义 workflow。
+v0.2 公开六个工具。**description 不是 intelligence 层**:只说能力、输入输出/机械约束,以及轻量路由到对应 skill;跨工具的『怎么查/怎么拆/怎么综合』只住 skill。server 是 db 唯一写门,落库过机械校验(schema/查重预检/supersede 链完整性/anchor 存在性),不合格返回 typed error 打回;返回值只可携带机械事实,不得编排后续语义 workflow。
 
 | 工具 | 一句话 | description 要点(全文见附表 B) |
 |---|---|---|
 | `register_scope` | 声明 write/read 地界 + 一句人话状态,同一动作双版本(022) | 开工第一次 edit 前调;漂移再调即替换;声明宽不罚(已知张力:wide 声明废掉越界提醒与冲突精度——v1 接受,记档非 bug) |
 | `self_report` | 一句话状态更新 | 计划变/大步完成/收到越界提醒后;区域也变了改调 register_scope |
 | `kb_retrieve` | 查决策图 | 碰陌生区前/架构选择前/用户问 why;按 topic 或 path;"cheap and local — when in doubt, call it" |
-| `kb_record` | 沉淀落库(唯一写门) | 决策发生当场记;无 delete,改错传 supersedes、废弃传 marks_stale;**实质性 ingest(整段讨论/会议记录)description 指路 ingest skill**;落 draft 态人晨审 promote |
+| `kb_operation` | canonical KB 查询/写入适配器 | 传精确 `kb.*` operation + input;写入须满足 evidence/versioned contract;**实质性 ingest(整段讨论/会议记录)由 description 指路 ingest skill**;落 draft 态人晨审 promote |
+| `distill_operation` | canonical distillation 适配器 | 传精确 `distill.*` operation + input;manifest 经 run protocol 单事务 apply;不做语义拆解 |
 | `get_manual` | agent-facing 手册(被动参考) | 系统全貌/用户看到什么/好公民准则;"don't read it up front for routine tasks" |
-| `kb_apply_distillation` | distill manifest 的原子 apply 门 | 批量校验 feature/anchor/relation 引用与 repo-relative path;单事务写入后重算 layout;不做语义拆解 |
+
+`kb_operation` 与 `distill_operation` 可选接收顶层 logical `requestId`,用于调用者明确要求的稳定 replay;该字段不进入 operation input。未提供时 server 生成 collision-resistant UUID。MCP transport 的 `extra.requestId` 只做传输关联,永不成为 repository receipt identity。
+
+**历史说明(v0.1,非现行协议):** `kb_record` 与 `kb_apply_distillation` 曾是设计名,已在 MCP v0.2 移除;现行调用不得使用。
 
 **GitHub-why-not(009 必答)**:scope registry / 注入 / 本地语义图全是"正在跑的 session"的事中态;GitHub 无 session 实体,PR/issue/commit 皆事后工件。零重叠。
 
@@ -102,7 +106,7 @@ Stop what you're doing: no new tool calls. Reply to this message, then wait for 
 
 | Skill | 方法论内容 | 来源复用 | 触发 |
 |---|---|---|---|
-| `vibehub-ingest` | 把一段讨论拆成 spec objects:七类型判定/查重(先 kb_retrieve)/relations/provenance/置信度,逐条经 kb_record 落库 | random-contexts + fr-ingest | kb_record description 指路;agent 自发 |
+| `vibehub-ingest` | 把一段讨论拆成 spec objects:七类型判定/查重(先 kb_retrieve)/relations/provenance/置信度,逐条经 kb_operation 落库 | random-contexts + fr-ingest | kb_operation description 指路;agent 自发 |
 | `vibehub-distill` | 冷启动"认识 repo"pipeline:扫描 → 提 feature → 锚定 → 逐步经 MCP 落库(026 唯一用户主动例外) | Room 19 蒸馏方法论 + fr-init | 用户按钮/`vibehub init --distill`(咒语按钮化,005) |
 | `vibehub-query` | 将当前任务/路径/why 问题形成查询,按需扩展或收窄,综合冲突、版本链与约束,输出可执行 context | prompt-gen/dev context-pull + Victor plugin 三档拉取 | SessionStart 路由/agent 自发;`kb_retrieve` 只是底层原语 |
 
@@ -121,7 +125,7 @@ Stop what you're doing: no new tool calls. Reply to this message, then wait for 
 
 **单元 = plugin 三件套一次成型,验收 = 我们自己在 Vibehub repo dogfood 跑通**(发射→采集→自报→检索→沉淀→注入送达→里程碑上时间线),PR 转正以 dogfood 为准,不以代码绿为准。顺序:
 
-1. MCP server(五个日常工具+kb_apply_distillation+校验闸,core 补 supersede 链/检索排序/scope matcher)
+1. MCP server(v0.2 六工具+校验闸,core 补 supersede 链/检索排序/scope matcher)
 2. skill 包初版(vibehub-ingest / vibehub-distill / vibehub-query)
 3. hooks wiring + `vibehub init`(装三件套)+ `vibehub inject`
 4. 微协议文本终稿接线 + 里程碑二值收敛
@@ -165,11 +169,17 @@ Query this repo's decision/constraint graph — the reasons behind how the code 
 ```
 schema:`{query?, paths?: string[], limit?: int=8}`,anyOf query/paths。
 
-**kb_record**:
+**kb_operation**:
 ```
-Record a decision, constraint or intent into the team graph THE MOMENT it happens — when your user rules something ("let's always X", "never Y", "we'll do A instead of B"), or when you make a design choice that future sessions must respect. Don't batch for later; don't wait to be asked. One entry = one fact. There is no delete: to correct an earlier entry, pass supersedes with its id; to mark one obsolete without replacement, pass marks_stale. For ingesting a whole discussion or meeting log, use the vibehub-ingest skill — it knows how to decompose. Recording is how your team stops re-deciding the same thing.
+Dispatch one canonical kb.* operation through the shared versioned contract. For ingesting a discussion or meeting log, use the vibehub-ingest skill to choose and compose operations; this adapter only validates and persists deterministic input. Supply a top-level requestId only when stable logical replay is intended. It is not part of the operation input.
 ```
-schema:`{type: decision|constraint|intent, summary(≤300), detail?, anchors?: string[], supersedes?, marks_stale?}`。
+schema:`{requestId?: canonical string(≤200), operation: string, input?: object}`。
+
+**distill_operation**:
+```
+Dispatch one canonical distill.* operation through the shared run protocol. Use vibehub-distill for semantic workflow; this adapter validates and persists deterministic mechanics. Supply a top-level requestId only when stable logical replay is intended. It is not part of the operation input.
+```
+schema:`{requestId?: canonical string(≤200), operation: string, input?: object}`。
 
 **get_manual**:
 ```

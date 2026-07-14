@@ -23,6 +23,7 @@ import type {
   DiagnosisSide,
 } from "./contract/conflict-types.js";
 import type { Db } from "./db.js";
+import { isConflictPairIgnored } from "./conflict-ignore.js";
 
 /* ── tasks ──────────────────────────────────────────────────────────────── */
 
@@ -313,7 +314,9 @@ export function readScopes(db: Db, taskId: string): ScopeDeclaration[] {
   const touched = db.prepare(
     `SELECT COUNT(DISTINCT f.path) AS n
      FROM footprints f
-     JOIN anchors a ON a.repo_id = f.repo_id AND a.file = f.path
+     JOIN repo_active_mapping active ON active.repo_id = f.repo_id
+     JOIN mapping_version_anchors a ON a.repo_id = active.repo_id
+       AND a.version_id = active.version_id AND a.file = f.path
      WHERE f.task_id = ? AND f.action = 'edit' AND a.feature_id = ?`,
   );
   return rows.map((r) => {
@@ -361,7 +364,10 @@ export interface ClaimedInjection {
 /**
  * Claim every pending injection for the task, FIFO — the hook 触发点回查
  * (decision-project-018). Atomic: claiming twice returns nothing the second
- * time, so two racing hooks can never double-deliver.
+ * time, so two racing hooks can never both emit. Important crash boundary:
+ * `claimed_at` proves ownership, not that stdout reached Claude. A process
+ * dying after this UPDATE but before emission leaves an intentionally
+ * ambiguous at-most-once receipt; no daemon exists to infer/replay delivery.
  */
 export function claimPendingInjections(
   db: Db,
@@ -387,8 +393,8 @@ export interface PendingInjection {
 
 /**
  * Read-side view of not-yet-delivered notes — the delivery-timeout story.
- * claimed_at doubles as the delivery receipt (set in the same process that
- * emitted the hook response), and with no daemon there is nothing to
+ * claimed_at is the claim receipt (the actual emission can remain ambiguous
+ * if that short-lived process crashes), and with no daemon there is nothing to
  * fire a timeout: "stuck" is DERIVED at read time from createdAt age (the
  * UI decides the threshold — e.g. session ended, or no hook fire since),
  * never stored (same discipline as "stalled" in state-machine.ts).
@@ -443,13 +449,14 @@ export function insertConflict(
 export function readConflict(db: Db, id: string): Conflict | null {
   const r = db
     .prepare(
-      `SELECT id, task_a, task_b, territory_id AS territoryId,
+      `SELECT id, repo_id AS repoId, task_a, task_b, territory_id AS territoryId,
               sub_block_id AS subBlockId, severity, detected_at AS detectedAt
-       FROM conflicts WHERE id = ?`,
+       FROM conflicts WHERE id = ? AND resolved_at IS NULL AND ignored = 0`,
     )
     .get(id) as
     | {
         id: string;
+        repoId: number;
         task_a: string;
         task_b: string;
         territoryId: string;
@@ -459,6 +466,7 @@ export function readConflict(db: Db, id: string): Conflict | null {
       }
     | undefined;
   if (!r) return null;
+  if (isConflictPairIgnored(db, r.repoId, [r.task_a, r.task_b])) return null;
   const symbols = db
     .prepare(`SELECT name FROM conflict_symbols WHERE conflict_id = ? ORDER BY seq`)
     .all(id) as Array<{ name: string }>;
@@ -471,6 +479,16 @@ export function readConflict(db: Db, id: string): Conflict | null {
     severity: r.severity,
     detectedAt: r.detectedAt,
   };
+}
+
+/** Active local conflicts only; ignored/resolved pairs never re-enter summaries. */
+export function listActiveConflicts(db: Db, repoId: number): Conflict[] {
+  const ids = db.prepare(
+    `SELECT id FROM conflicts
+     WHERE repo_id = ? AND resolved_at IS NULL AND ignored = 0
+     ORDER BY detected_at, id`,
+  ).all(repoId) as Array<{ id: string }>;
+  return ids.map((row) => readConflict(db, row.id)).filter((value): value is Conflict => value !== null);
 }
 
 export function saveDiagnosis(

@@ -43,6 +43,16 @@ intent:
       负责 glob→anchor→territory 的读侧派生,未匹配进灰区;
     - task 首次捕捉保存 `start_head_sha`;CommitEvent 只从
       `start_head_sha..HEAD` 读侧派生,稳定 id=`git:<sha>`,不吞历史提交。
+clarifications:
+  - date: "2026-07-13"
+    kind: "operation_surface_correction"
+    detail: |
+      当前 MCP v0.2 不再注册 kb_record/kb_apply_distillation。上文两项开工
+      契约与下方“distillation manifest 只经 kb_apply_distillation”约束由
+      decision-workbench-012 的 versioned operation contracts 取代:canonical
+      KB 写入经 kb_operation,distillation 必须经 distill_operation 的 run
+      pipeline;skill 仍不得直写 SQLite。此为诚实 surface 收口,不改变
+      intelligence ownership。
 constraints:
   - kind: must
     rule: "跨工具的语义 workflow、检索策略、拆解与综合判断必须完整归属 skill"

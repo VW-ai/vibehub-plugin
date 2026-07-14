@@ -12,6 +12,7 @@
  * - Zero LLM, zero invention: every return value is a verbatim git/gh fact.
  */
 import { spawnSync } from "node:child_process";
+import crypto from "node:crypto";
 import path from "node:path";
 import type { CommitEvent } from "./contract/panel-types.js";
 
@@ -38,6 +39,15 @@ function run(
   return { status: r.status, stdout: r.stdout ?? "", stderr: r.stderr ?? "" };
 }
 
+function runBuffer(
+  cmd: string,
+  args: string[],
+  cwd: string,
+): { status: number | null; stdout: Buffer; stderr: string } {
+  const r = spawnSync(cmd, args, { cwd, encoding: "buffer", maxBuffer: 64 * 1024 * 1024 });
+  return { status: r.status, stdout: r.stdout ?? Buffer.alloc(0), stderr: r.stderr?.toString("utf8") ?? "" };
+}
+
 /* ── plain-fact shapes ──────────────────────────────────────────────────── */
 
 export interface RemoteBranch {
@@ -62,6 +72,15 @@ export interface BranchFile {
   /** git --name-status letter: A/M/D/R/C/T (renames keep the new path). */
   changeKind: string;
 }
+
+export interface CommitInventoryRow {
+  path: string;
+  changeKind: "added" | "modified" | "renamed" | "deleted" | "unchanged";
+  previousPath?: string;
+  contentHash?: string;
+}
+
+const compareRepoPaths=(a:string,b:string):number=>Buffer.compare(Buffer.from(a,"utf8"),Buffer.from(b,"utf8"));
 
 export interface PrFact {
   number: number;
@@ -329,6 +348,30 @@ export class GitFacade {
     const r = run("git", ["rev-parse", "--verify", "HEAD"], anyPath);
     if (r.status !== 0) throw new GitError(["rev-parse", "HEAD"], r.status, r.stderr);
     return r.stdout.trim();
+  }
+
+  /** True only when the exact object id names a commit reachable in this repo's object store. */
+  static hasCommitAt(anyPath: string, commitSha: string): boolean {
+    if (!/^[0-9a-f]{40}$/.test(commitSha)) return false;
+    const r = run("git", ["cat-file", "-e", `${commitSha}^{commit}`], anyPath);
+    return r.status === 0;
+  }
+
+  /** Exact tracked-tree denominator and delta between two resolved commits. */
+  static commitInventory(anyPath: string, baseCommit: string, targetCommit: string): CommitInventoryRow[] {
+    const root = GitFacade.resolveRepoRoot(anyPath);
+    for (const commit of [baseCommit, targetCommit]) if (!GitFacade.hasCommitAt(root, commit)) throw new GitError(["cat-file", commit], 1, "commit not found");
+    const tree = runBuffer("git", ["ls-tree", "-r", "-z", targetCommit], root);
+    if (tree.status !== 0) throw new GitError(["ls-tree", targetCommit], tree.status, tree.stderr);
+    const targetEntries = tree.stdout.toString("utf8").split("\0").filter(Boolean).map(record=>{const tab=record.indexOf("\t");if(tab<0)throw new GitError(["ls-tree",targetCommit],1,"malformed tree entry");const [mode,type,object]=record.slice(0,tab).split(" ");return {mode:mode!,type:type!,object:object!,path:record.slice(tab+1)};}).sort((a,b)=>compareRepoPaths(a.path,b.path));
+    const diff = runBuffer("git", ["diff", "--name-status", "-z", "-M", baseCommit, targetCommit, "--"], root);
+    if (diff.status !== 0) throw new GitError(["diff", baseCommit, targetCommit], diff.status, diff.stderr);
+    const delta = new Map<string, Omit<CommitInventoryRow,"path">>(), parts=diff.stdout.toString("utf8").split("\0").filter(Boolean);
+    for(let i=0;i<parts.length;){const status=parts[i++]!;if(status.startsWith("R")){const previousPath=parts[i++]!,nextPath=parts[i++]!;delta.set(nextPath,{changeKind:"renamed",previousPath});}else{const relative=parts[i++]!;delta.set(relative,{changeKind:status.startsWith("A")?"added":status.startsWith("D")?"deleted":"modified"});}}
+    const rows:CommitInventoryRow[]=[];
+    for(const entry of targetEntries){const content=entry.type==="blob"?runBuffer("git",["cat-file","blob",entry.object],root):{status:0,stdout:Buffer.from(entry.object,"utf8"),stderr:""};if(content.status!==0)throw new GitError(["cat-file",entry.object],content.status,content.stderr);rows.push({path:entry.path,...(delta.get(entry.path)??{changeKind:"unchanged"}),contentHash:crypto.createHash("sha256").update(content.stdout).digest("hex")});}
+    for(const [relative,change] of delta)if(change.changeKind==="deleted")rows.push({path:relative,...change});
+    return rows.sort((a,b)=>compareRepoPaths(a.path,b.path));
   }
 
   /** Read-side commit events bounded by the task's captured HEAD. */

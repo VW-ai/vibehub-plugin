@@ -1,0 +1,436 @@
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import {
+  CURRENT_SCHEMA_VERSION,
+  inspectDatabase,
+  openDb,
+  withReadonlyDb,
+  resolveDbPath,
+} from "./db.js";
+import { GitFacade } from "./git-facade.js";
+import { getRepoByRoot, upsertRepo } from "./team-store.js";
+
+export type ManagedAssetRepairPolicy = "replace-managed" | "verify-only";
+
+export interface ManagedAssetDefinition {
+  /** Stable provenance label, normally builtin://... inside the release. */
+  source: string;
+  /** Absolute installed target owned by VibeHub. */
+  target: string;
+  content: string;
+  checksum: string;
+  version: string;
+  repairPolicy: ManagedAssetRepairPolicy;
+}
+
+export interface ManagedAssetManifest {
+  schemaVersion: 1;
+  releaseVersion: string;
+  assets: ManagedAssetDefinition[];
+}
+
+interface ManagedAssetState {
+  schemaVersion: 1;
+  releaseVersion: string;
+  assets: Array<{
+    source: string;
+    target: string;
+    checksum: string;
+    version: string;
+    repairPolicy: ManagedAssetRepairPolicy;
+  }>;
+}
+
+export type ManagedAssetStatus = "healthy" | "installed" | "repaired" | "conflict" | "missing";
+
+export interface ManagedAssetResult {
+  source: string;
+  target: string;
+  checksum: string;
+  version: string;
+  repairPolicy: ManagedAssetRepairPolicy;
+  status: ManagedAssetStatus;
+  actualChecksum?: string;
+  message?: string;
+}
+
+export interface InitRuntimeOptions {
+  repoPath: string;
+  dbPath?: string;
+  stateDir: string;
+  /** Canonical containment root for every managed target. */
+  allowedAssetRoot: string;
+  manifest: ManagedAssetManifest;
+  now?: () => Date;
+  /** Deterministic test seam for proving multi-file rollback. */
+  managedAssetFault?: (event: { phase: "before-target-rename" | "after-target-rename" | "before-ledger-rename" | "after-ledger-rename"; committedTargets: number; target: string }) => void;
+}
+
+export interface InitRuntimeResult {
+  ok: boolean;
+  dbPath: string;
+  schemaVersion: number;
+  repo: { id: number; root: string; slug: string | null; defaultBranch: string };
+  managedAssets: ManagedAssetResult[];
+  conflicts: ManagedAssetResult[];
+}
+
+export interface DoctorRuntimeResult {
+  schemaVersion: 1;
+  healthy: boolean;
+  db: {
+    status: "healthy" | "missing" | "unreadable" | "migration_required";
+    path: string;
+    schemaVersion: number | null;
+    expectedSchemaVersion: number;
+    sqliteVersion: string | null;
+    message?: string;
+  };
+  nativeDependency: { status: "healthy" | "unavailable"; module: "better-sqlite3"; message?: string };
+  repo: { status: "healthy" | "uninitialized" | "invalid"; root: string | null; id: number | null; message?: string };
+  managedAssets: { status: "healthy" | "unhealthy"; releaseVersion: string; assets: ManagedAssetResult[] };
+}
+
+export const sha256 = (content: string | Buffer): string =>
+  crypto.createHash("sha256").update(content).digest("hex");
+
+function statePath(stateDir: string): string {
+  return path.join(stateDir, "managed-assets.json");
+}
+
+function readState(stateDir: string): ManagedAssetState | null {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(statePath(stateDir), "utf8")) as ManagedAssetState;
+    return parsed.schemaVersion === 1 && Array.isArray(parsed.assets) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function stateOwns(state: ManagedAssetState | null, target: string): boolean {
+  return state?.assets.some((asset) => asset.target === target) ?? false;
+}
+
+function validateManifest(manifest: ManagedAssetManifest, allowedAssetRoot: string): { lexicalRoot: string; canonicalRoot: string } {
+  if (!path.isAbsolute(allowedAssetRoot)) throw new Error("allowed asset root must be absolute");
+  const rootStat = fs.lstatSync(allowedAssetRoot);
+  if (rootStat.isSymbolicLink() || !rootStat.isDirectory()) {
+    throw new Error("allowed asset root must be a real directory, not a symlink");
+  }
+  const canonicalRoot = fs.realpathSync(allowedAssetRoot);
+  const lexicalRoot = path.resolve(allowedAssetRoot);
+  const targets = new Set<string>();
+  for (const asset of manifest.assets) {
+    if (!path.isAbsolute(asset.target)) throw new Error(`managed asset target must be absolute: ${asset.target}`);
+    const normalized = path.resolve(asset.target);
+    const relative = path.relative(lexicalRoot, normalized);
+    if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative)) {
+      throw new Error(`managed asset target escapes allowed root: ${asset.target}`);
+    }
+    if (targets.has(normalized)) throw new Error(`duplicate managed asset target: ${asset.target}`);
+    targets.add(normalized);
+    if (sha256(asset.content) !== asset.checksum) {
+      throw new Error(`managed asset checksum does not match content: ${asset.source}`);
+    }
+  }
+  return { lexicalRoot, canonicalRoot };
+}
+
+type TargetProbe =
+  | { kind: "missing" }
+  | { kind: "regular"; checksum: string }
+  | { kind: "conflict"; message: string };
+
+function probeTarget(lexicalRoot: string, canonicalRoot: string, target: string): TargetProbe {
+  const relative = path.relative(lexicalRoot, path.resolve(target));
+  let cursor = lexicalRoot;
+  const parts = relative.split(path.sep);
+  for (let index = 0; index < parts.length - 1; index++) {
+    cursor = path.join(cursor, parts[index]!);
+    try {
+      const stat = fs.lstatSync(cursor);
+      if (stat.isSymbolicLink()) return { kind: "conflict", message: `symlink ancestor is forbidden: ${cursor}` };
+      if (!stat.isDirectory()) return { kind: "conflict", message: `non-directory ancestor is forbidden: ${cursor}` };
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") break;
+      return { kind: "conflict", message: `cannot inspect target ancestor: ${String(error)}` };
+    }
+  }
+  try {
+    const existingParent = fs.realpathSync(path.dirname(target));
+    const fromCanonical = path.relative(canonicalRoot, existingParent);
+    if (fromCanonical.startsWith("..") || path.isAbsolute(fromCanonical)) {
+      return { kind: "conflict", message: "managed target parent escapes allowed root" };
+    }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      return { kind: "conflict", message: `cannot canonicalize target parent: ${String(error)}` };
+    }
+  }
+  try {
+    const stat = fs.lstatSync(target);
+    if (stat.isSymbolicLink()) return { kind: "conflict", message: "managed target must not be a symlink" };
+    if (!stat.isFile()) return { kind: "conflict", message: "managed target exists but is not a regular file" };
+    const fd = fs.openSync(target, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
+    try {
+      const opened = fs.fstatSync(fd);
+      if (!opened.isFile()) return { kind: "conflict", message: "managed target is not a regular file" };
+      return { kind: "regular", checksum: sha256(fs.readFileSync(fd)) };
+    } finally {
+      fs.closeSync(fd);
+    }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return { kind: "missing" };
+    return { kind: "conflict", message: `managed target is unreadable: ${String(error)}` };
+  }
+}
+
+function inspectAssets(
+  stateDir: string,
+  manifest: ManagedAssetManifest,
+  allowedAssetRoot: string,
+  allowWrites: boolean,
+  fault?: InitRuntimeOptions["managedAssetFault"],
+): ManagedAssetResult[] {
+  const { lexicalRoot, canonicalRoot } = validateManifest(manifest, allowedAssetRoot);
+  const previous = readState(stateDir);
+  const results: ManagedAssetResult[] = [];
+  const writes: Array<{ asset: ManagedAssetDefinition; status: "installed" | "repaired"; previous: TargetProbe }> = [];
+
+  for (const asset of manifest.assets) {
+    const probe = probeTarget(lexicalRoot, canonicalRoot, asset.target);
+    const base = {
+      source: asset.source,
+      target: asset.target,
+      checksum: asset.checksum,
+      version: asset.version,
+      repairPolicy: asset.repairPolicy,
+    };
+    if (probe.kind === "conflict") {
+      results.push({ ...base, status: "conflict", message: probe.message });
+    } else if (probe.kind === "regular" && probe.checksum === asset.checksum) {
+      results.push({ ...base, status: "healthy", actualChecksum: probe.checksum });
+    } else if (probe.kind === "missing") {
+      if (allowWrites) writes.push({ asset, status: "installed", previous: probe });
+      else results.push({ ...base, status: "missing", message: "managed asset is missing" });
+    } else if (stateOwns(previous, asset.target) && asset.repairPolicy === "replace-managed") {
+      if (allowWrites) writes.push({ asset, status: "repaired", previous: probe });
+      else results.push({ ...base, status: "conflict", actualChecksum: probe.checksum, message: "managed asset differs from release content" });
+    } else {
+      results.push({
+        ...base,
+        status: "conflict",
+        actualChecksum: probe.checksum,
+        message: "existing file is not proven VibeHub-owned; left unchanged",
+      });
+    }
+  }
+
+  const hasConflict = results.some((result) => result.status === "conflict");
+  if (allowWrites && hasConflict) {
+    for (const write of writes) {
+      results.push({
+        source: write.asset.source,
+        target: write.asset.target,
+        checksum: write.asset.checksum,
+        version: write.asset.version,
+        repairPolicy: write.asset.repairPolicy,
+        status: "missing",
+        message: "not installed because another managed asset has a conflict",
+      });
+    }
+  } else if (allowWrites) {
+    const staged: Array<{ tmp: string; target: string; previous: TargetProbe; result: ManagedAssetResult }> = [];
+    let stagedState: { tmp: string; target: string } | undefined;
+    const committed: Array<{ target: string; backup?: string; installed: boolean }> = [];
+    let committedTargets = 0;
+    let ledgerCommit: { target: string; backup?: string; installed: boolean } | undefined;
+    const createdDirs = new Set<string>();
+    const ensureDir = (directory: string) => {
+      const missing: string[] = [];
+      let cursor = directory;
+      while (!fs.existsSync(cursor)) { missing.push(cursor); cursor = path.dirname(cursor); }
+      fs.mkdirSync(directory, { recursive: true });
+      for (const item of missing) createdDirs.add(item);
+    };
+    const cleanupDirs = () => {
+      for (const directory of [...createdDirs].sort((a,b)=>b.length-a.length)) {
+        try { fs.rmdirSync(directory); } catch { /* non-empty or already absent */ }
+      }
+    };
+    try {
+      // Stage every payload and the ledger before the first rename. Any
+      // permission/type/staging failure leaves all final targets untouched.
+      for (const write of writes) {
+        ensureDir(path.dirname(write.asset.target));
+        const tmp = `${write.asset.target}.vibehub-${process.pid}-${crypto.randomUUID()}.tmp`;
+        fs.writeFileSync(tmp, write.asset.content, { mode: 0o600, flag: "wx" });
+        staged.push({
+          tmp,
+          target: write.asset.target,
+          previous: write.previous,
+          result: {
+            source: write.asset.source,
+            target: write.asset.target,
+            checksum: write.asset.checksum,
+            actualChecksum: write.asset.checksum,
+            version: write.asset.version,
+            repairPolicy: write.asset.repairPolicy,
+            status: write.status,
+          },
+        });
+      }
+      const state: ManagedAssetState = {
+        schemaVersion: 1,
+        releaseVersion: manifest.releaseVersion,
+        assets: manifest.assets.map(({ content: _content, ...asset }) => asset),
+      };
+      ensureDir(stateDir);
+      const target = statePath(stateDir);
+      const tmp = `${target}.${process.pid}.tmp`;
+      fs.writeFileSync(tmp, JSON.stringify(state, null, 2) + "\n", { mode: 0o600, flag: "wx" });
+      stagedState = { tmp, target };
+      for (const item of staged) {
+        // Re-probe immediately before rename to reject a swapped symlink.
+        const current = probeTarget(lexicalRoot, canonicalRoot, item.target);
+        const unchanged = item.previous.kind === "missing"
+          ? current.kind === "missing"
+          : item.previous.kind === "regular" && current.kind === "regular" && item.previous.checksum === current.checksum;
+        if (!unchanged) {
+          throw new Error(`managed target changed during staging: ${item.target}`);
+        }
+        let backup: string | undefined;
+        if (current.kind === "regular") {
+          backup = `${item.target}.vibehub-${process.pid}-${crypto.randomUUID()}.bak`;
+          fs.renameSync(item.target, backup);
+        }
+        const commit = { target: item.target, backup, installed: false };
+        committed.push(commit);
+        fault?.({ phase: "before-target-rename", committedTargets, target: item.target });
+        fs.renameSync(item.tmp, item.target);
+        commit.installed = true;
+        committedTargets += 1;
+        fault?.({ phase: "after-target-rename", committedTargets, target: item.target });
+      }
+      fault?.({ phase: "before-ledger-rename", committedTargets, target: stagedState.target });
+      const ledgerBackup = fs.existsSync(stagedState.target)
+        ? `${stagedState.target}.vibehub-${process.pid}-${crypto.randomUUID()}.bak`
+        : undefined;
+      if (ledgerBackup) fs.renameSync(stagedState.target, ledgerBackup);
+      ledgerCommit = { target: stagedState.target, backup: ledgerBackup, installed: false };
+      fs.renameSync(stagedState.tmp, stagedState.target);
+      ledgerCommit.installed = true;
+      fault?.({ phase: "after-ledger-rename", committedTargets, target: stagedState.target });
+      stagedState = undefined;
+      for (const item of committed) if (item.backup) fs.rmSync(item.backup, { force: true });
+      if (ledgerCommit.backup) fs.rmSync(ledgerCommit.backup, { force: true });
+      results.push(...staged.map((item)=>item.result));
+    } catch (error) {
+      const rollbackErrors: unknown[] = [];
+      const restore = (action: () => void) => { try { action(); } catch (rollbackError) { rollbackErrors.push(rollbackError); } };
+      if (ledgerCommit?.installed) restore(()=>fs.rmSync(ledgerCommit!.target,{force:true}));
+      if (ledgerCommit?.backup) restore(()=>fs.renameSync(ledgerCommit!.backup!,ledgerCommit!.target));
+      for (const item of [...committed].reverse()) {
+        if (item.installed) restore(()=>fs.rmSync(item.target,{force:true}));
+        if (item.backup) restore(()=>fs.renameSync(item.backup!,item.target));
+      }
+      cleanupDirs();
+      if (rollbackErrors.length) throw new AggregateError([error,...rollbackErrors],"managed asset commit and rollback failed");
+      throw error;
+    } finally {
+      for (const item of staged) {
+        if (fs.existsSync(item.tmp)) fs.rmSync(item.tmp, { force: true });
+      }
+      if (stagedState && fs.existsSync(stagedState.tmp)) fs.rmSync(stagedState.tmp, { force: true });
+      for (const item of committed) if (item.backup && fs.existsSync(item.backup)) fs.rmSync(item.backup,{force:true});
+      if (ledgerCommit?.backup && fs.existsSync(ledgerCommit.backup)) fs.rmSync(ledgerCommit.backup,{force:true});
+      cleanupDirs();
+    }
+  }
+  return results.sort((a, b) => a.target.localeCompare(b.target));
+}
+
+export function initializeRuntime(options: InitRuntimeOptions): InitRuntimeResult {
+  const dbPath = resolveDbPath(options.dbPath);
+  const assets = inspectAssets(options.stateDir, options.manifest, options.allowedAssetRoot, true, options.managedAssetFault);
+  const conflicts = assets.filter((asset) => asset.status === "conflict");
+  const root = GitFacade.resolveRepoRoot(options.repoPath);
+  const git = new GitFacade(root);
+  const db = openDb(dbPath);
+  try {
+    const row = upsertRepo(
+      db,
+      root,
+      git.remoteSlug(),
+      git.defaultBranchOr(GitFacade.currentBranchAt(root) ?? "main"),
+      (options.now?.() ?? new Date()).toISOString(),
+    );
+    return {
+      ok: conflicts.length === 0,
+      dbPath,
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+      repo: { id: row.id, root: row.rootPath, slug: row.slug, defaultBranch: row.defaultBranch },
+      managedAssets: assets,
+      conflicts,
+    };
+  } finally {
+    db.close();
+  }
+}
+
+export function doctorRuntime(options: InitRuntimeOptions): DoctorRuntimeResult {
+  const dbPath = resolveDbPath(options.dbPath);
+  const inspected = inspectDatabase(dbPath);
+  const dbStatus = !inspected.exists
+    ? "missing" as const
+    : !inspected.readable
+      ? "unreadable" as const
+      : inspected.schemaVersion !== CURRENT_SCHEMA_VERSION
+        ? "migration_required" as const
+        : "healthy" as const;
+  let repo: DoctorRuntimeResult["repo"];
+  let root: string | null = null;
+  try {
+    root = GitFacade.resolveRepoRoot(options.repoPath);
+    if (dbStatus !== "healthy") {
+      repo = { status: "uninitialized", root, id: null, message: "database is not healthy" };
+    } else {
+      const repoRoot = root;
+      repo = withReadonlyDb(dbPath, (db) => {
+        const stored = getRepoByRoot(db, repoRoot);
+        return stored
+          ? { status: "healthy" as const, root: repoRoot, id: stored.id }
+          : { status: "uninitialized" as const, root: repoRoot, id: null, message: "repository has not been initialized" };
+      });
+    }
+  } catch (error) {
+    repo = { status: "invalid", root, id: null, message: error instanceof Error ? error.message : String(error) };
+  }
+  const assets = inspectAssets(options.stateDir, options.manifest, options.allowedAssetRoot, false);
+  const assetsHealthy = assets.every((asset) => asset.status === "healthy");
+  // Importing this module already loaded better-sqlite3 successfully. DB
+  // absence/corruption is reported separately and must not masquerade as a
+  // missing native dependency.
+  const nativeHealthy = true;
+  const result: DoctorRuntimeResult = {
+    schemaVersion: 1,
+    healthy: dbStatus === "healthy" && repo.status === "healthy" && assetsHealthy && nativeHealthy,
+    db: {
+      status: dbStatus,
+      path: dbPath,
+      schemaVersion: inspected.schemaVersion,
+      expectedSchemaVersion: inspected.expectedSchemaVersion,
+      sqliteVersion: inspected.sqliteVersion,
+      ...(inspected.error ? { message: inspected.error } : {}),
+    },
+    nativeDependency: { status: "healthy", module: "better-sqlite3" },
+    repo,
+    managedAssets: {
+      status: assetsHealthy ? "healthy" : "unhealthy",
+      releaseVersion: options.manifest.releaseVersion,
+      assets,
+    },
+  };
+  return result;
+}

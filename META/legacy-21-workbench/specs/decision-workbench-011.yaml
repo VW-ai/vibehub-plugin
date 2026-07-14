@@ -1,0 +1,80 @@
+spec_id: "decision-workbench-011"
+type: decision
+state: active
+intent:
+  summary: "Headless plugin/runtime 是可独立使用的产品:plugin+hooks+skills+MCP+CLI/core 自带 SQLite 初始化与完整 context 自循环;App 只是可选 reader/intervention client;filesystem/markdown 只做 export,不做第二 source of truth;先保持 workbench subtree 边界,dogfood 后再物理拆 repo"
+  detail: |
+    Wayne 2026-07-12 对 productionization 的产品边界裁决。用户只安装
+    Claude Code plugin 时也必须得到完整的持久 context 回路，而不是必须
+    启动 App 才有数据库或运行时:
+
+    - `vibehub init` 负责创建/迁移 `~/.vibehub/workbench.db`、安装/修复
+      hooks、MCP 与 skills;
+    - hooks/skills/MCP/CLI/core 构成 headless runtime,agent 可独立通过它
+      查询、沉淀、更新 context;
+    - App 消费同一 SQLite 的正式 read model,提供 observability 与
+      intervention,但不是 source of truth、daemon 或 runtime 前置条件;
+    - filesystem/markdown 只允许作为显式 export/portability 输出,不得在
+      SQLite 缺席时静默成为另一套存储后端;
+    - 当前先在 `workbench/` 单向依赖边界内 productionize,保持可经
+      `git subtree split` 独立发布;完成真实 dogfood 后再决定远端物理拆成
+      headless runtime repo 与 app repo,避免现在引入版本发布协调而打断闭环。
+
+    Production app 也必须遵守同一诚实性:runtime 不得 import canned fixture,
+    SQLite/bridge 缺失必须显示 typed setup/error state,不得回退 baseline;
+    尚未接线的介入动作必须 disabled/unsupported,不得显示 fake success。
+
+    **实现边界补充:**core 对外提供唯一 RuntimeService 形状的能力边界;
+    browser-safe `@vibehub/core/contracts` 只含 DTO + WorkbenchBridge wire
+    contract,不得 import Node/db/native/root index。Vite bridge 仅供
+    dev/test/dogfood,未来 Tauri bridge 实现同一协议;无 bridge 的 browser
+    build 显示 `bridge_unavailable`,不为此引入 daemon。介入由 core 单事务
+    application service 执行,requestId 幂等,inject-both 全成全败,Ignore
+    持久化;诊断生成仍等待外部模型单独授权。
+constraints:
+  - kind: must
+    rule: "只安装 plugin/headless runtime 时,SQLite context CRU 回路必须完整可用"
+  - kind: must
+    rule: "App 只通过 core/read-model bridge 消费同一 SQLite,不得复制业务逻辑或直接形成第二 source of truth"
+  - kind: must_not
+    rule: "filesystem/markdown 不得作为 SQLite 缺席时的静默 fallback 存储"
+  - kind: must_not
+    rule: "production runtime/bundle 不得 import canned fixtures 或把 dummy baseline 当成功路径"
+  - kind: must
+    rule: "物理拆 repo 前先保持 workbench subtree-ready 边界并完成真实 dogfood"
+  - kind: must
+    rule: "browser-safe contracts subpath 不得依赖 Node/db/native module;Vite/Tauri host 必须实现同一 WorkbenchBridge wire contract"
+  - kind: must_not
+    rule: "不得为 App bridge 引入 daemon 或 production loopback server"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [headless-runtime, plugin, sqlite, app, source-of-truth, subtree, production]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne 2026-07-12 productionization 与 standalone plugin 裁决"
+  produced_at: "2026-07-12"
+relations:
+  - target: "decision-project-012"
+    type: refines
+    detail: "保持 workbench 可 subtree split,先逻辑独立后物理拆 repo"
+  - target: "decision-project-014"
+    type: implements
+    detail: "SQLite 保持唯一 source of truth,filesystem 仅 export"
+  - target: "decision-project-016"
+    type: implements
+    detail: "App 非 daemon,退出不影响 headless runtime"
+  - target: "decision-project-025"
+    type: refines
+    detail: "明确 plugin/headless runtime 与 app consumer 的产品边界"
+  - target: "decision-workbench-010"
+    type: extends
+    detail: "skill intelligence layer 在无 App 时仍完整工作"
+anchors:
+  - file: "workbench/.claude-plugin/plugin.json"
+  - file: "workbench/packages/core/src/db.ts"
+  - file: "workbench/packages/cli/src/main.ts"
+  - file: "workbench/packages/mcp/src/server.ts"

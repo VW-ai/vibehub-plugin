@@ -1,0 +1,28 @@
+{
+  "name": "vibehub-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local-first VibeHub runtime, Claude Code integration, and optional workbench UI.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --filter @vibehub/core build && pnpm --filter @vibehub/cli build && pnpm --filter @vibehub/workbench-mcp build && pnpm --filter @vibehub/workbench-app build",
+    "typecheck": "pnpm --filter @vibehub/core typecheck && pnpm --filter @vibehub/cli typecheck && pnpm --filter @vibehub/workbench-mcp typecheck && pnpm --filter @vibehub/workbench-app typecheck",
+    "test": "pnpm --filter @vibehub/core test && pnpm --filter @vibehub/cli test && pnpm --filter @vibehub/workbench-mcp test && pnpm --filter @vibehub/workbench-app test",
+    "verify:bundle": "pnpm --filter @vibehub/workbench-app test:boundary",
+    "verify:artifact": "node scripts/verify-plugin-artifact.mjs",
+    "verify:isolated": "node scripts/verify-isolated-workbench.mjs",
+    "dogfood": "node scripts/run-local-dogfood.mjs",
+    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:bundle && pnpm verify:artifact && pnpm dogfood"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.8.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
+  }
+}

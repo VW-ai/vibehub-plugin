@@ -1,0 +1,110 @@
+spec_id: "decision-workbench-012"
+type: decision
+state: active
+intent:
+  summary: "DB-native skill intelligence 架构:skills 拥有语义 intelligence 与渐进 workflow;hooks=when;MCP/CLI/core 提供公开版本化 operation contract、共享 dispatcher 与确定性 integrity;canonical promotion guarded/reviewed,distillation 经机器 validate/finalize 产出 immutable candidate version,再由 human review 决定是否 CAS activation"
+  detail: |
+    M2 productionization ⑤A–⑤E 的实现与 fresh-agent forward tests 收口了
+    本地 knowledge/distillation engine 的正式边界:
+
+    - skills 拥有语义 intelligence、任务分解、检索/综合判断与渐进 workflow;
+      hooks 只决定 when;MCP、CLI 与 core 只实现确定性 mechanics、schema、
+      integrity boundary 与事实反馈。
+    - reviewed canonical KB(`sourceKind: canonical`)与 immutable distillation
+      candidates(`sourceKind: version_candidate`)、finalized mapping
+      (`sourceKind: distillation`,legacy migration 可为 `legacy_import`)是不同
+      truth layer。候选不得冒充现行真理。canonical promotion 是 guarded/
+      reviewed;validate/finalize 由 machine integrity 驱动,在无 hard blocker 时
+      允许 persisted review/unresolved findings 并产出 immutable candidate
+      version;human review 发生在 finalization 之后、CAS activation 之前,
+      activation/rollback 必须 CAS。
+    - `fr-*` 是 Feature Room ontology、lifecycle 与 spec→code 语义的权威来源。
+      ShadowRepo 只贡献 cold-start mechanics 假设,不得覆盖 WHY/WHAT truth,
+      也不得引入未经本项目证明的 numeric gates。stdlib/scripts 采用已在本地
+      skill package 证明有效的 progressive disclosure 形态。
+    - 所有 DB 访问只经过 public versioned operation contracts 与共享
+      OperationDispatcher。skill 禁止直写 SQL 或以 filesystem checkpoint
+      模拟状态;CLI/MCP 是同一 operation surface 的对称 adapter;requestId
+      在 repository 范围内唯一,成功、失败与并发路径都服从同一幂等绑定。
+    - 可分析但无法可靠归位的文件仍属于 inventory,必须带证据成为显式
+      unresolved review item;excluded 只表示 binary/generated/dependency/
+      oversize/nonregular/incremental unchanged/deleted 等封闭机械原因。在无
+      hard blocker 时机器可在不隐藏 unresolved 的前提下 validate/finalize
+      degraded version;之后由 human review 决定是否 CAS activate。
+    - deterministic inventory/versioning、immutable evidence/candidates、
+      checksum、CAS activation 与 human review 是不可越过的 integrity boundary。
+    - App 只是可选 observability/intervention consumer;Tauri packaging 不是
+      headless engine、skill intelligence 或 DB truth 的 gate。
+
+    Forward tests 覆盖 fresh ingest/query、TypeScript+Python cold-start、
+    incremental rename/delete、uncovered files、truth-layer isolation、关系语义、
+    review lifecycle、CAS/rollback、分页和跨 adapter identity。由测试暴露的
+    global request-ID binding、mixed-case/Unicode ordering、Git nonregular mode、
+    typed init error 与 MCP fallback-ID integration 均已修复并纳入回归。
+clarifications:
+  - date: "2026-07-13"
+    kind: "integrity_boundary_hardening"
+    detail: |
+      Repository receipt 的 canonical identity 明确为 operation + actor +
+      (taskId ?? null) + input,now 不参与。repoId/requestId 可寻址后,
+      validation、unsupported 与 typed handler error 都必须落 receipt 并精确
+      replay;缺少合法 repo/request address 的 context error 才可不记账。
+      MCP v0.2 只 advertised canonical kb_operation/distill_operation adapters,
+      删除必然 unsupported 的两个 legacy mutation 名。
+constraints:
+  - kind: must
+    rule: "语义判断、渐进式编排与 Feature Room 方法论必须完整归属 skills;hooks 只负责 when,MCP/CLI/core 只负责确定性 mechanics 与 integrity"
+  - kind: must
+    rule: "canonical KB、version_candidate 与 distillation/legacy_import mapping 必须保持显式 sourceKind 和 truth-layer 隔离;canonical promotion 必须 guarded/reviewed,distillation 必须 machine validate/finalize 后经 human review 才可 CAS activation"
+  - kind: must
+    rule: "Feature Room ontology/lifecycle/spec→code 语义以 fr-* 为权威;ShadowRepo 只可贡献 cold-start 假设,不得成为 WHY/WHAT truth 或 numeric gate"
+  - kind: must_not
+    rule: "skills 不得直写 SQL、直接访问 SQLite 或用 filesystem checkpoint 绕过 public versioned operation contracts 与共享 dispatcher"
+  - kind: must
+    rule: "CLI/MCP 必须对称暴露同一 operation contracts;requestId 必须按 repository 全局绑定并覆盖成功、失败与并发结果"
+  - kind: must
+    rule: "未知归位的可分析文件必须保留为带 evidence 的 explicit unresolved;机械 exclusions 必须闭集且带 reason"
+  - kind: must_not
+    rule: "无 hard blocker 时 machine validate/finalize 可保留 persisted review/unresolved findings 并产出 immutable candidate version;不得隐藏 unresolved disposition,human review 必须发生在 finalization 后、CAS activation 前"
+  - kind: must_not
+    rule: "App 或 Tauri packaging 不得成为 headless engine 与 DB-native skill intelligence 的运行或验收前置"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench"
+  tags: [db-native, skill-intelligence, feature-room, truth-layer, operation-contracts, distillation, review, cas]
+provenance:
+  source_type: implementation_verification
+  confidence: 1.0
+  source_ref: "M2 productionization ⑤A–⑤E implementation + fresh-agent forward tests,2026-07-13"
+  produced_at: "2026-07-13"
+relations:
+  - target: "decision-workbench-010"
+    type: refines
+    detail: "把 intelligence ownership 落成 DB-native progressive skills 与 deterministic operation boundary"
+  - target: "decision-workbench-011"
+    type: extends
+    detail: "明确 headless runtime 内 canonical KB、distillation versions 与 adapters 的 truth/integrity 边界"
+  - target: "decision-project-014"
+    type: implements
+    detail: "SQLite 继续作为唯一 source of truth,filesystem 仅作 artifact/export"
+  - target: "decision-project-026"
+    type: implements
+    detail: "以 ingest/query/distill/update/review progressive skills 实现自发 CRU 方法论"
+anchors:
+  - file: "workbench/skills/vibehub-ingest/SKILL.md"
+  - file: "workbench/skills/vibehub-query/SKILL.md"
+  - file: "workbench/skills/vibehub-distill/SKILL.md"
+  - file: "workbench/skills/vibehub-update/SKILL.md"
+  - file: "workbench/skills/vibehub-review/SKILL.md"
+  - file: "workbench/skills/_stdlib/ontology.md"
+  - file: "workbench/skills/scripts/inventory.mjs"
+  - file: "workbench/packages/core/src/knowledge-service.ts"
+  - file: "workbench/packages/core/src/distillation-service.ts"
+  - file: "workbench/packages/core/src/operation-contracts.ts"
+  - file: "workbench/packages/core/src/operation-dispatcher.ts"
+  - file: "workbench/packages/core/src/db.ts"
+  - file: "workbench/packages/cli/src/main.ts"
+  - file: "workbench/packages/mcp/src/capabilities.ts"
+  - file: "workbench/packages/mcp/src/server.ts"

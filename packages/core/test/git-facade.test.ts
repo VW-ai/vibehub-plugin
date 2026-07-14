@@ -85,6 +85,24 @@ describe("GitFacade on a scratch repo", () => {
     }
   });
 
+  it("handles symlink and gitlink commit inventory rows with stable content hashes", () => {
+    const isolated = makeScratchRepo();
+    try {
+      const baseline = git(isolated.work, "rev-parse", "HEAD").trim();
+      fs.symlinkSync("README.md", path.join(isolated.work, "linked.md"));
+      git(isolated.work, "add", "linked.md");
+      git(isolated.work, "update-index", "--add", "--cacheinfo", `160000,${baseline},vendor/submodule`);
+      git(isolated.work, "commit", "-m", "add non-regular entries");
+      const target = git(isolated.work, "rev-parse", "HEAD").trim();
+      expect(GitFacade.commitInventory(isolated.work, baseline, target)).toEqual(expect.arrayContaining([
+        expect.objectContaining({path:"linked.md",changeKind:"added",contentHash:expect.any(String)}),
+        expect.objectContaining({path:"vendor/submodule",changeKind:"added",contentHash:expect.any(String)}),
+      ]));
+    } finally {
+      isolated.cleanup();
+    }
+  });
+
   it("listRemoteBranches with a compare ref carries ahead/behind (git ≥ 2.41)", () => {
     const withCounts = facade.listRemoteBranches("main");
     const left = withCounts.find((b) => b.name === "feat/left")!;

@@ -1,13 +1,9 @@
 /**
- * Contract types — canonical home in core (decision-project-012; same
- * treatment as map-types.ts). VERBATIM from workbench/app-demo/src/conflict-types.ts
- * except the ./types import path is retargeted to ./map-types.js. The demo
- * keeps its copy until M1 slice ④; edits must be mirrored until then.
+ * Canonical browser-safe conflict-detail read-model contracts.
  */
 /**
  * Conflict-card data types — everything the adjudication card
- * (static/conflict-card-s2.html, the approved S2 artifact) renders.
- * EXTENDS the map's types (./types.ts): Conflict, Task, states, scopes and
+ * Extends canonical map contracts: Conflict, Task, states, scopes and
  * git facts are imported, never duplicated.
  *
  * SIGNAL DISCIPLINE (same hard rule as types.ts / panel-types.ts): every
@@ -48,7 +44,7 @@ import type { Conflict, Task } from "./map-types.js";
  * the shape is identical.
  */
 export interface SymbolTouch {
-  /** Which side (id into ConflictCardFixture.tasks / conflict.taskIds). */
+  /** Which side (id into ConflictCardSnapshot.tasks / conflict.taskIds). */
   taskId: string;
   action: "edit" | "read";
   /**
@@ -63,7 +59,7 @@ export interface SymbolTouch {
  * One row of the "Shared symbols" list — the enriched view of one entry in
  * Conflict.sharedSymbols (types.ts keeps the flat name list; this adds the
  * per-symbol provenance the card's tooltips show).
- * INVARIANT (checked by fixtures, asserted in S5): symbols[i].name ===
+ * INVARIANT (checked by snapshots, asserted in S5): symbols[i].name ===
  * conflict.sharedSymbols[i] — same names, same order, no divergence.
  */
 export interface SharedSymbolEvidence {
@@ -138,7 +134,7 @@ export interface DiagnosisProvenance {
 
 /**
  * The completed on-demand diagnosis (zone b's filled state). Absent from the
- * fixture ⇒ the dashed "no AI diagnosis yet" empty state.
+ * snapshot ⇒ the dashed "no AI diagnosis yet" empty state.
  */
 export interface ConflictDiagnosis {
   /** The bold verdict line, verbatim from the model. */
@@ -204,10 +200,10 @@ export type AdjudicationAction =
       kind: "ignore_pair";
     };
 
-/* ── fixture root ───────────────────────────────────────────────────────── */
+/* ── snapshot root ───────────────────────────────────────────────────────── */
 
 /** Everything the conflict card needs to render one frame, standalone. */
-export interface ConflictCardFixture {
+export interface ConflictCardSnapshot {
   /**
    * The "now" of the snapshot (ISO 8601). The header age ("8m") and the
    * pause-menu state ages derive from timestamps vs this — deterministic,

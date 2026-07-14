@@ -1,4 +1,4 @@
 interface:
   display_name: "VibeHub Distill"
-  short_description: "Distill a repository into a semantic project map"
-  default_prompt: "Use $vibehub-distill to build or refresh this repository's semantic map."
+  short_description: "Build a resumable repository knowledge map"
+  default_prompt: "Use $vibehub-distill to cold-start this repository into a reviewed VibeHub map."

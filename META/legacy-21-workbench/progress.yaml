@@ -1,5 +1,5 @@
 progress:
-  completion: 0.92
+  completion: 0.98
   milestones:
     - id: m1-map-main
       name: "Map main view (scope occupancy) — dynamize from approved v8"
@@ -61,6 +61,56 @@ progress:
       status: in_progress
       gate: true
       notes: "Redo checkpoint 完成,006–010 已裁为 active:Intelligence 单一归 skill;hooks=when,MCP/core=确定性原语+质量闸,description 不承载分布式 workflow。Claude plugin 三件套已落地(plugin manifest/hooks/MCP stdio/skills),MCP 六 capability(register_scope/self_report/kb_retrieve/kb_record/get_manual/kb_apply_distillation),首批 vibehub-ingest/distill/query 三 skill。Core 补齐 scope raw-glob registry+唯一 matcher、task start_head_sha、start..HEAD commit 读侧派生、stored hook+derived commit timeline、GraphStore 七类型/server id/stale+supersede/manifest 单事务 apply+retrieve,SQLite user_version 5;Stop 官方 decision:block+reason,SessionStart 路由 query/ingest,B2 每 scope 一次,locus 注入包装。实证:core 125 tests + MCP 5 tests,core/cli/MCP typecheck+build,plugin strict validate,MCP stdio list/call 与 CLI→SQLite→hook injection 本地探针全绿。仍 in_progress:补 vibehub init 与经明确外发授权后的真实 Claude dogfood;Tauri 打包后置。"
+    - id: m2p1-production-shape
+      name: "M2 productionization ①:headless repo/app/contracts 正式形态 + fixtures 隔离"
+      status: completed
+      gate: true
+      notes: "app-demo→正式 workbench/app 并入 root workspace;production entry 与 test harness/fixtures 物理分离,43MB 重复截图与废弃 static/notes 清退;App 类型镜像删除,统一 browser-safe @vibehub/core/contracts;Map/Panel/Conflict/Install roots 与 layout/export/CLI 全改正式 snapshot 命名;production graph gate 覆盖动态 chunk 且有负例。Core 125/125,App 44/44,typecheck/build/harness build/bundle scan 绿;独立 task review clean。Playwright 全套留最终综合验证。"
+    - id: m2p2-strict-real-boot
+      name: "M2 productionization ②:真实 SQLite 默认启动 + typed setup/error,零 dummy fallback"
+      status: completed
+      gate: true
+      notes: "RuntimeService.readWorkbenchSnapshot + production WorkbenchBridge 已接:显式 VIBEHUB_REPO 经 GitFacade canonicalize(相对路径/symlink/worktree→主 repo root),Vite host 仅 loopback dev/test/dogfood,无 cwd fallback/daemon/static JSON/canned fallback;hostless build=bridge_unavailable,DB missing/repo uninitialized/unsynced/internal error 分型可恢复,ok 才渲染真实 map。root workbench:dev/build/test 已加。Core 131 tests,App 49 tests,typecheck/build/boundary 绿;独立 task review clean。loopback E2E 因 sandbox EPERM 留最终 escalated 验证。"
+    - id: m2p3-live-read-intervention
+      name: "M2 productionization ③:真实 panel/timeline/conflict read model + InjectionQueue 介入"
+      status: completed
+      gate: true
+      notes: "RuntimeService 真实 panel/timeline/conflict read models 已接 SQLite/Git；degradation warning 与 fatal error 分离，basic conflict 明确 evidence_unavailable。事务介入支持 inject/pause/inject-both/ignore，(repo_id,request_id) 幂等、canonical pair 跨 local/team 忽略、queue/claim 语义不冒充 delivery；bridge 请求及完整嵌套 DTO 双向 runtime validation。Core 141 tests、App 55 tests、typecheck/build/boundary 绿；v6→v7 数据保全与双连接并发 claim 有实证；独立 review approved。"
+    - id: m2p4-init-dogfood
+      name: "M2 productionization ④:vibehub init + 正式文档 + 本 repo dogfood/bundle gate"
+      status: completed
+      gate: true
+      notes: "RuntimeService init/doctor、受管资源 manifest/checksum/ownership/atomic repair、CLI init/doctor/snapshot、standalone workbench workspace/docs/license 已完成。clean-HOME packaged CLI/hook/MCP/native SQLite、isolated subtree copy、真实 App bridge transport、init×2→scope/record/query→snapshot→介入→Stop→doctor dogfood 全绿。symlink 越界/全 manifest preflight/doctor 只读由独立 review 复现后修复并批准。Core 150、MCP 5、App 57。"
+    - id: m2p5a-kb-v2-migration
+      name: "M2 productionization ⑤A:Feature Room ontology v2 + additive import/read parity"
+      status: completed
+      gate: true
+      notes: "migration 008 additive v2 完成:canonical KB immutable revisions/evidence 与 mapping version 双层 truth、lossless legacy import/audit/quarantine、synthetic finalized active mapping、snapshot parity、legacy 表 DB-level freeze。active-only/sourceKind、repo-scoped lifecycle、cycle/path/layout/hierarchy edge cases 已经独立 review 修复并批准。Core 157、MCP 6、App 57。"
+    - id: m2p5b-kb-operations
+      name: "M2 productionization ⑤B:KnowledgeService + dispatcher + CLI/MCP parity"
+      status: completed
+      gate: true
+      notes: "KnowledgeService canonical reads/facets/history/evidence/anchors/relations/review 与 draft batch/lifecycle/amend/supersede 完成；17 operations 严格 runtime schemas，共享 OperationDispatcher envelope，CLI/MCP 对称 adapters，跨 worker idempotency 与 SQL 全局 ranked/bounded search 有实证。GraphStore 退为只读 facade，legacy writes 明确 unsupported。独立 review 经 11 项修复后批准。Core 156、CLI 2、MCP 6、App 57。"
+    - id: m2p5c-distillation-runs
+      name: "M2 productionization ⑤C:versioned/resumable DistillationService"
+      status: completed
+      gate: true
+      notes: "migration 010 + DistillationService 完成:resolved baseCommit/hash inventory、exact leaf scopes、lease generation/expiry、immutable candidates、finding-scoped audited correction、reconcile partition、finalize frozen projections/checksums/anchor diffs、CAS-only activate/rollback；全 mutation receipts 与 CLI/MCP parity。独立 review 经 12 项契约修复后批准。Core 177、CLI 4、MCP 8、App 57。"
+    - id: m2p5d-skill-intelligence
+      name: "M2 productionization ⑤D:progressive skill stdlib/scripts + ingest/query/distill/update/review"
+      status: completed
+      gate: true
+      notes: "按 fr-* ontology/lifecycle、谨慎吸收 ShadowRepo cold-start mechanics，完成 shared stdlib、五个 progressive skills、确定性 CLI wrappers、42-operation schema v4 input contracts 与 packaged validator。新增 explicit candidate/version reads、Git-tree-pinned true incremental carry-forward/rename/delete、combined bounded capture、strict canonical Unicode/path contract、Knowledge/Distillation direct-service guards。独立 review 经多轮 P1 修复后批准；Core 183、CLI 14、MCP 8、App 57，isolated artifact/dogfood 全绿。"
+    - id: m2p5e-forward-test
+      name: "M2 productionization ⑤E:fresh-agent forward tests + global package gate"
+      status: completed
+      gate: true
+      notes: "Fresh ingest/query、TypeScript+Python cold-start 与 incremental cases 通过；uncovered files 保持 explicit unresolved，relation semantics、truth-layer isolation、CAS/rollback 通过。Forward tests 发现并修复 global request-ID binding（含 failures/concurrency）、mixed-case/Unicode inventory ordering、Git nonregular modes、pagination/review lifecycle、typed init error、MCP fallback-ID integration。最终 local + isolated verify 通过：Core 191、CLI 20、MCP 9、App 57，bundle/artifact/dogfood green。"
+    - id: m2p5f-integrity-review-fixes
+      name: "M2 productionization ⑤F:whole-branch integrity review fixes"
+      status: completed
+      gate: true
+      notes: "Merge-blocking integrity wave:repository receipt 绑定 actor/task/input 且 validation/unsupported/typed errors 可重放；MCP v0.2 移除必失败 kb_record/kb_apply_distillation,canonical operation adapters 有成功 fixture；migration 014 为 intervention receipt backfill canonical input hash并返回 typed conflict；managed assets 跨 target+ledger commit 支持 deterministic mid-rename fault rollback,新装/修复均无 debris。验证证据见 .superpowers/sdd/whole-branch-fix-report.md。"
   commits:
     - hash: "d270f5e"
       date: "2026-07-12"

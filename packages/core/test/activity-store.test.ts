@@ -28,7 +28,7 @@ import {
   upsertTask,
   type TaskRow,
 } from "../src/activity-store.js";
-import { addAnchor, upsertFeature } from "../src/graph-store.js";
+import {seedActiveMapping} from "./kb-fixtures.js";
 import type { TimelineEvent } from "../src/contract/panel-types.js";
 import type { Conflict } from "../src/contract/map-types.js";
 
@@ -155,9 +155,7 @@ describe("ActivityStore (运行域)", () => {
 
   it("derives scope filesTouched from footprints × anchors (never stored)", () => {
     upsertTask(db, task("t1"));
-    upsertFeature(db, { id: "auth", repoId: 1, name: "Auth & Sessions", now: T(0) });
-    addAnchor(db, { repoId: 1, featureId: "auth", file: "src/auth/login.ts" });
-    addAnchor(db, { repoId: 1, featureId: "auth", file: "src/auth/token.ts" });
+    seedActiveMapping(db,1,[{id:"auth",name:"Auth & Sessions",anchors:[{file:"src/auth/login.ts"},{file:"src/auth/token.ts"}]}],T(0));
     setScopes(db, 1, "t1", [
       { mode: "write", territoryId: "auth", label: "auth" },
       { mode: "read", territoryId: "orders", label: "orders" },

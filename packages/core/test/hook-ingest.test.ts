@@ -269,8 +269,8 @@ describe("ingestHookEvent on a scratch repo", () => {
       reason: "[Vibehub] Message(s) from your user:\n- Also update the docs.",
     });
     expect(pendingInjections(db, taskBranch)).toEqual([]);
-    expect(readTask(db, taskBranch)?.state).toBe("running");
-    expect(r.stateAfter).toBe("running");
+    expect(readTask(db, taskBranch)?.state).toBe("waiting");
+    expect(r.stateAfter).toBe("waiting");
   });
 
   it("SessionStart delivers notes queued while the session was away", () => {

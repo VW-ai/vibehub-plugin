@@ -8,7 +8,7 @@
  *   vibehub hook <event>                              (M1 ③ — the heart)
  *   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>]
  *   vibehub team sync    [--repo <path>] [--db <path>] [--json]
- *   vibehub team fixture [--repo <path>] [--db <path>] [--out <file>]
+ *   vibehub team snapshot [--repo <path>] [--db <path>] [--out <file>]
  *
  * `vibehub hook` reads the Claude Code hook payload from stdin, does one
  * short-lived pass (write event → claim injection queue → exit 0) and
@@ -17,19 +17,24 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   enqueueInjection,
-  exportTeamMapFixture,
+  exportTeamMapSnapshot,
   GitFacade,
   ingestHookEvent,
   openDb,
   readTask,
   resolveDbPath,
+  RuntimeService,
+  OperationDispatcher,
+  OPERATION_EXIT_CLASS,
   syncTeamSnapshot,
   vibehubHome,
   type HookEventName,
   type HookPayload,
 } from "@vibehub/core";
+import { releaseAssetManifest, releaseAssetRoot } from "./managed-assets.js";
 
 interface Flags {
   repo: string;
@@ -57,10 +62,53 @@ function parseFlags(argv: string[]): Flags {
 }
 
 const USAGE = `usage:
+  vibehub init [--repo <path>] [--db <path>] [--json]
+  vibehub doctor --json [--repo <path>] [--db <path>]
+  vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
+  vibehub kb <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
+  vibehub distill <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop>
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
-  vibehub team fixture [--repo <path>] [--db <path>] [--out <file>]`;
+  vibehub team snapshot [--repo <path>] [--db <path>] [--out <file>]`;
+
+interface KbCliFlags {
+  db:string; repo:string; repoId?:number; actor?:string; taskId?:string; requestId:string;
+  input:Record<string,unknown>; json:boolean;
+}
+
+function parseKbFlags(argv:string[]):KbCliFlags {
+  let dbFlag:string|undefined; let repo=process.cwd(); let repoId:number|undefined;
+  let actor:string|undefined; let taskId:string|undefined; let requestId=`cli-${Date.now()}`;
+  let inputText:string|undefined; let json=false;
+  for(let i=0;i<argv.length;i++){
+    const flag=argv[i]; const take=()=>argv[++i];
+    if(flag==="--db")dbFlag=take(); else if(flag==="--repo")repo=take()??repo;
+    else if(flag==="--repo-id")repoId=Number(take()); else if(flag==="--actor")actor=take();
+    else if(flag==="--task")taskId=take(); else if(flag==="--request")requestId=take()??requestId;
+    else if(flag==="--input")inputText=take(); else if(flag==="--json")json=true;
+    else throw new Error(`unknown flag: ${flag}`);
+  }
+  if(inputText==="-"){const stdin=readStdin().trim();inputText=stdin||"{}";}
+  const input=inputText?JSON.parse(inputText) as Record<string,unknown>:{};
+  return {db:resolveDbPath(dbFlag),repo,repoId,actor,taskId,requestId,input,json};
+}
+
+function runOperation(group:"kb"|"distill",operation:string|undefined,argv:string[]):number {
+  let db:ReturnType<typeof openDb>|undefined;
+  try{
+    if(!operation)throw new Error("KB operation is required");
+    const flags=parseKbFlags(argv); if(!flags.json)throw new Error("kb operations require --json");
+    db=openDb(flags.db);
+    const root=GitFacade.resolveRepoRoot(flags.repo);
+    const row=flags.repoId?{id:flags.repoId}:db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(root) as {id:number}|undefined;
+    const repoId=row?.id??0;
+    const canonicalOperation=operation.startsWith("kb.")||operation.startsWith("distill.")?operation:`${group}.${operation}`;
+    const result=new OperationDispatcher(db).dispatch(canonicalOperation,{repoId,actor:flags.actor??"",taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
+    process.stdout.write(`${JSON.stringify(result)}\n`);
+    return result.ok?0:(OPERATION_EXIT_CLASS[result.error.code]??1);
+  }catch(error){const result={ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error),details:null,nextSafeActions:[`Run vibehub ${group} with --json and a valid JSON --input payload.`]}};process.stdout.write(`${JSON.stringify(result)}\n`);return 2;}finally{db?.close();}
+}
 
 const HOOK_EVENTS: ReadonlySet<string> = new Set([
   "SessionStart",
@@ -116,8 +164,31 @@ function runHook(eventArg: string | undefined, rest: string[]): number {
   return 0;
 }
 
-function main(argv: string[]): number {
+function stateDirFor(dbPath: string): string {
+  return process.env["VIBEHUB_STATE_DIR"] ?? path.dirname(dbPath);
+}
+
+function printSnapshot(flags: Flags): number {
+  const db = openDb(flags.db);
+  try {
+    const snapshot = exportTeamMapSnapshot(db, GitFacade.resolveRepoRoot(flags.repo));
+    const json = JSON.stringify(snapshot, null, 2);
+    if (flags.out) {
+      fs.mkdirSync(path.dirname(flags.out), { recursive: true });
+      fs.writeFileSync(flags.out, json + "\n");
+      console.error(`wrote ${flags.out}`);
+    } else {
+      console.log(json);
+    }
+    return 0;
+  } finally {
+    db.close();
+  }
+}
+
+export function main(argv: string[]): number {
   const [group, cmd, ...rest] = argv;
+  if (group === "kb" || group === "distill") return runOperation(group,cmd, rest);
   if (group === "hook") {
     return runHook(cmd, rest);
   }
@@ -165,6 +236,46 @@ function main(argv: string[]): number {
     }
     return 0;
   }
+
+  const topLevelFlags = (): Flags =>
+    parseFlags([cmd, ...rest].filter((value): value is string => value !== undefined));
+
+  if (group === "init") {
+    const flags = topLevelFlags();
+    const explicitPluginRoot=process.env["VIBEHUB_PLUGIN_ROOT"];
+    if(explicitPluginRoot&&!fs.existsSync(path.resolve(explicitPluginRoot))){
+      const result={ok:false,error:{code:"setup_error",message:"explicit plugin root does not exist",details:{pluginRoot:path.resolve(explicitPluginRoot)},nextSafeActions:["Create or install the plugin root, then retry with the same explicit path."]}};
+      if(flags.json)process.stdout.write(`${JSON.stringify(result)}\n`);else console.error(result.error.message);
+      return 2;
+    }
+    const result = new RuntimeService({ dbPath: flags.db }).initialize(
+      flags.repo,
+      stateDirFor(flags.db),
+      releaseAssetRoot(),
+      releaseAssetManifest(),
+    );
+    if (flags.json) console.log(JSON.stringify(result, null, 2));
+    else if (result.ok) console.log(`initialized ${result.repo.root} at ${result.dbPath}`);
+    else console.error(`initialization has ${result.conflicts.length} managed asset conflict(s); no conflicting file was overwritten`);
+    return result.ok ? 0 : 1;
+  }
+
+  if (group === "doctor") {
+    const flags = topLevelFlags();
+    const result = new RuntimeService({ dbPath: flags.db }).doctor(
+      flags.repo,
+      stateDirFor(flags.db),
+      releaseAssetRoot(),
+      releaseAssetManifest(),
+    );
+    console.log(JSON.stringify(result, null, 2));
+    return result.healthy ? 0 : 1;
+  }
+
+  if (group === "snapshot" || group === "inspect") {
+    return printSnapshot(topLevelFlags());
+  }
+
   if (group !== "team" || !cmd) {
     console.error(USAGE);
     return 2;
@@ -196,23 +307,28 @@ function main(argv: string[]): number {
     return 0;
   }
 
-  if (cmd === "fixture") {
-    const db = openDb(flags.db);
-    const fixture = exportTeamMapFixture(db, GitFacade.resolveRepoRoot(flags.repo));
-    db.close();
-    const json = JSON.stringify(fixture, null, 2);
-    if (flags.out) {
-      fs.mkdirSync(path.dirname(flags.out), { recursive: true });
-      fs.writeFileSync(flags.out, json + "\n");
-      console.error(`wrote ${flags.out}`);
-    } else {
-      console.log(json);
-    }
-    return 0;
+  if (cmd === "snapshot") {
+    return printSnapshot(flags);
   }
 
   console.error(USAGE);
   return 2;
 }
 
-process.exit(main(process.argv.slice(2)));
+function canonicalEntrypoint(value: string): string {
+  try {
+    return fs.realpathSync(value);
+  } catch {
+    return path.resolve(value);
+  }
+}
+
+if (
+  process.argv[1] &&
+  canonicalEntrypoint(process.argv[1]) === canonicalEntrypoint(fileURLToPath(import.meta.url))
+) {
+  // Let Node flush stdout/stderr before exiting. Skill wrappers capture the
+  // streams asynchronously so an immediate process.exit() could discard a
+  // final large JSON envelope.
+  process.exitCode = main(process.argv.slice(2));
+}

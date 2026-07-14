@@ -1,0 +1,639 @@
+/* Map screen styles — carried over from workbench-refs/reference-screen-v8.html
+   (the frozen approved baseline; v8 IS the parity target — do not "improve").
+   Values reference tokens.css variables only. Additions beyond v8 are marked
+   with a `S4:` comment and exist only for the scale-extremes snapshots /
+   dev snapshot switcher. */
+
+*{margin:0;padding:0;box-sizing:border-box}
+/* S4 (conflict-card): app-wide hidden guard. Any author display value
+   (flex/grid/inline-block) silently defeats the `hidden` attribute; this bug
+   class bit three times in the statics (.center, .dev — see iter-10 fork).
+   One global rule beats per-selector guards. */
+[hidden]{display:none!important}
+.bootstrap-state{max-width:52ch;padding:var(--sp-6);color:var(--ink-900)}
+.bootstrap-state h1{margin:var(--sp-2) 0 var(--sp-3);font-size:var(--fs-7);font-weight:600;letter-spacing:-.02em}
+.bootstrap-state p{color:var(--ink-500);line-height:1.6}
+.bootstrap-state .bootstrap-kicker{font-family:var(--mono);font-size:var(--fs-1);letter-spacing:.08em}
+.bootstrap-state button{margin-top:var(--sp-4);height:34px;padding:0 var(--sp-4);border:0;border-radius:var(--r-m);background:var(--ink-900);color:var(--paper);font:600 var(--fs-3) var(--sans);cursor:pointer}
+html,body{height:100%}
+body{background:linear-gradient(160deg,#e9e9e7,#e4e5e6);font-family:var(--sans);color:var(--ink-900);padding:var(--sp-6);-webkit-font-smoothing:antialiased}
+#root{height:100%;display:flex;align-items:center;justify-content:center}
+svg{vertical-align:-2px}
+
+/* S5: entry animations fill `backwards`, NOT `both` — their terminal keyframe
+   equals the natural state, so `both` only pins the element there forever:
+   it kept .window carrying an identity transform (which made it the containing
+   block for the fixed #tip → tooltip offset by the body padding) and kept
+   .terr/.task at opacity:1 (which silently defeated the correlate-hover dim). */
+.window{width:min(1320px,100%);height:min(820px,calc(100vh - 48px));background:var(--paper);border-radius:14px;box-shadow:0 22px 70px rgba(15,17,21,.28),0 2px 8px rgba(15,17,21,.12);overflow:hidden;display:flex;flex-direction:column;animation:winIn .5s var(--ease) backwards}
+@keyframes winIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+
+/* ── titlebar ── */
+.titlebar{height:44px;flex:none;display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-4);background:rgba(250,250,249,.92);border-bottom:1px solid var(--ink-150)}
+.lights{display:flex;gap:var(--sp-2)}
+.lights i{width:12px;height:12px;border-radius:50%}
+.lights i:nth-child(1){background:#f4635e}.lights i:nth-child(2){background:#f7bd45}.lights i:nth-child(3){background:#43c644}
+.wordmark{font-weight:650;font-size:var(--fs-4);letter-spacing:-.1px}
+.repo{height:24px;display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-700);background:var(--card);border-radius:var(--r-s);padding:0 10px;box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.repo:hover{box-shadow:var(--sh-2)}
+.repo .branch{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500)}
+.spacer{flex:1}
+.stat{height:22px;display:flex;align-items:center;gap:5px;font-size:var(--fs-2);font-weight:500;padding:0 10px;border-radius:11px;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
+.stat:hover{filter:brightness(.96)}
+.stat.need{background:var(--need-bg);color:var(--need-ink)}
+.stat.clash{background:var(--clash-bg);color:var(--clash-ink)}
+.stat.alive{background:var(--alive-bg);color:var(--alive-ink)}
+.fresh{display:flex;align-items:center;gap:6px;font-size:var(--fs-2);color:var(--ink-500);cursor:pointer}
+.fresh .dot{width:6px;height:6px;border-radius:50%;background:var(--alive)}
+/* S4: honest stale dot for never-fetched / offline data (guideline 4) */
+.fresh.stale .dot{background:var(--ink-300)}
+/* S4: dev-only snapshot switcher — chrome, not product UI */
+.snapshot-switch{height:22px;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500);background:var(--card);border:1px solid var(--ink-150);border-radius:var(--r-s);padding:0 4px;cursor:pointer}
+
+.main{flex:1;display:flex;min-height:0;position:relative}
+
+/* ── rail ── */
+.rail{width:300px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--ink-150);background:rgba(252,252,251,.7)}
+.tasks{flex:1;overflow:auto;padding:var(--sp-3) var(--sp-3) var(--sp-2)}
+.group{margin-bottom:var(--sp-3)}
+.group h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase;padding:0 var(--sp-1) 6px;display:flex;justify-content:space-between;line-height:1.4}
+.group h4 b{font-family:var(--mono);font-weight:500}
+.task{background:var(--card);border-radius:var(--r-m);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease),opacity var(--t-base) var(--ease);margin-bottom:6px;animation:rise .4s var(--ease) backwards}
+.task:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
+.task:active{transform:none;box-shadow:var(--sh-1)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.task .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.task h3{font-size:var(--fs-4);font-weight:600;letter-spacing:-.1px;line-height:1.45;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none}
+.pill{flex:none;height:18px;display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;border-radius:9px;padding:0 8px;cursor:help}
+.pill.need{background:var(--need-bg);color:var(--need-ink)}
+.pill.clash{background:var(--clash-bg);color:var(--clash-ink)}
+.pill.alive{background:var(--alive-bg);color:var(--alive-ink)}
+.pill.idle{background:var(--ink-100);color:var(--ink-500)}
+.pill.done{background:var(--ink-100);color:var(--ink-400)}
+/* chips: rows WRAP and every chip is visible — the card grows taller (rule
+   revision, Wayne 2026-07-12 live review; overrides v8's "one line + +N".
+   +N survives only as the >12-chip pathological fallback — see derive.ts
+   PATHOLOGICAL_MAX). Wrap responds live to the resizable rail width. */
+.task .row2{display:flex;flex-wrap:wrap;align-items:center;gap:var(--sp-1);margin-top:6px;min-width:0}
+.chip{flex:none;height:16px;display:inline-flex;align-items:center;font-family:var(--mono);font-size:var(--fs-1);padding:0 6px;border-radius:5px;cursor:help;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;line-height:16px}
+.chip.w{background:var(--alive-bg);color:var(--alive-ink)}
+.chip.r{box-shadow:inset 0 0 0 1px #c3d0e2;color:var(--read-ink)}
+/* branch chips: middle-truncated in derive.ts (head+tail both semantic), so
+   the 110px CSS cap lifts; tail-ellipsis stays only as the last-resort rung */
+.chip.n{background:var(--ink-100);color:var(--ink-500);max-width:100%}
+.chip.more{background:var(--ink-100);color:var(--ink-500);font-weight:600}
+.t-done{opacity:.55}
+/* S4: honest empty rail (N=0 rung) */
+.rail-empty{padding:var(--sp-4) var(--sp-3);font-size:var(--fs-3);color:var(--ink-400);line-height:1.6}
+.launch{margin:0 var(--sp-3) var(--sp-3);height:34px;flex:none;border:none;font-family:inherit;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease);display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
+.launch:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.launch:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+
+/* rev-1 (Wayne verdict 2026-07-12): resizable rail/canvas split. The divider
+   straddles the rail's existing 1px border with negative margins (net 0px of
+   layout — canvas geometry at the default 300px is byte-identical to v8).
+   Drag 240–480px, double-click resets 300, arrow keys ±16, width persists.
+   z-5 keeps it grabbable over territory edges AND over the modal scrim
+   (rev-2, verdict ④: the rail stays live while a panel/card is open, and
+   the divider is the rail's edge control — it never overlaps the 520px
+   right-anchored panel at the 480px clamp on ≥1280 viewports). Affordance:
+   an ink line materializes on hover/drag/focus. */
+.divider{flex:none;width:7px;margin:0 -3px;position:relative;z-index:5;cursor:col-resize;background:transparent}
+.divider::after{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;background:transparent;transition:background var(--t-fast) var(--ease)}
+.divider:hover::after,.divider.dragging::after{background:var(--ink-300);left:2px;width:3px;border-radius:2px}
+.divider:focus-visible{outline:none}
+.divider:focus-visible::after{background:rgba(25,27,31,.35);left:2px;width:3px;border-radius:2px}
+.main.rail-resizing{cursor:col-resize;user-select:none}
+@media (prefers-reduced-motion:reduce){.divider::after{transition:none}}
+
+/* ── canvas ── */
+.canvas{flex:1;position:relative;overflow:hidden}
+.canvas::before{content:"";position:absolute;inset:0;background:radial-gradient(1200px 700px at 70% -10%,rgba(255,255,255,.7),transparent 60%)}
+.grid{position:absolute;inset:0;background-image:radial-gradient(rgba(25,27,31,.05) 1px,transparent 1px);background-size:26px 26px}
+/* S5: territory field — at density it reserves the legend band (48px =
+   12 legend offset + 30 legend height + 6 clearance; see MapCanvas.tsx) so
+   percent layout compresses instead of running under the floating legend.
+   Baseline snapshots keep inset:0 → pixel-identical to v8. */
+.field{position:absolute;inset:0}
+.field.with-legend-band{bottom:48px}
+.terr{position:absolute;border-radius:var(--r-l);background:var(--ink-100);transition:opacity var(--t-base) var(--ease),box-shadow var(--t-base) var(--ease),transform var(--t-base) var(--ease);cursor:pointer;animation:terrIn .55s var(--ease) backwards}
+.terr:hover{box-shadow:inset 0 0 0 1.5px rgba(25,27,31,.14),var(--sh-2)}
+@keyframes terrIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+.terr .label{position:absolute;top:var(--sp-3);left:var(--sp-4);right:var(--sp-3);font-size:var(--fs-2);letter-spacing:.5px;color:var(--ink-500);font-weight:600;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.terr .foot{position:absolute;left:var(--sp-4);bottom:var(--sp-2);right:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+.terr .foot.need-ink{color:var(--need-ink)}
+.terr.w{background:linear-gradient(180deg,#e9f2ea,#e0ede2);box-shadow:inset 0 0 0 1px rgba(62,125,76,.13),var(--sh-1)}
+.terr.w .label{color:#4c7a57}
+.terr.r{background:var(--card);box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.32),var(--sh-1)}
+.terr.r .label{color:#5c7ba6}
+.terr.quiet .label{color:var(--ink-300)}
+/* S4: SPACE-tiny rung — small rects get a tighter label (long-name snapshots) */
+.terr.compact .label{left:var(--sp-3);top:var(--sp-2);letter-spacing:.3px}
+.terr.compact .foot{left:var(--sp-3);font-family:var(--mono)}
+.sub{position:absolute;height:26px;display:flex;align-items:center;gap:6px;border-radius:var(--r-s);background:rgba(255,255,255,.75);box-shadow:var(--sh-1);padding:0 10px;font-size:var(--fs-2);color:var(--ink-500);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease);white-space:nowrap;max-width:62%}
+.sub:hover{box-shadow:var(--sh-2)}
+.sub em{font-style:normal;overflow:hidden;text-overflow:ellipsis}
+.sub.w{background:#d9ecdc;color:var(--alive-ink);font-weight:500}
+.sub.clash{background:var(--clash-bg);color:var(--clash-ink);font-weight:600;box-shadow:inset 0 0 0 1px rgba(154,107,22,.22),var(--sh-1)}
+.sub.clash .cnt{flex:none;height:16px;display:inline-flex;align-items:center;background:var(--clash);color:#fff;font-size:var(--fs-1);font-weight:600;border-radius:8px;padding:0 7px;animation:breathe 2.8s var(--ease) infinite}
+@keyframes breathe{0%,100%{opacity:.82}50%{opacity:1}}
+
+/* correlate-hover: one dim value everywhere */
+.canvas.focus .terr{opacity:.14}
+.canvas.focus .terr.lit{opacity:1;box-shadow:inset 0 0 0 2px rgba(25,27,31,.3),0 4px 20px rgba(20,22,26,.14);transform:scale(1.012)}
+.canvas.focus .terr.lit .label{color:var(--ink-900)}
+.rail.dim .task{opacity:.3}
+.rail.dim .task.hot{opacity:1}
+
+/* legend = filter */
+.legend{position:absolute;left:var(--sp-4);bottom:var(--sp-3);display:flex;gap:var(--sp-1);background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-radius:var(--r-m);padding:var(--sp-1);font-size:var(--fs-2);color:var(--ink-500);box-shadow:var(--sh-1)}
+.legend span{height:22px;display:flex;align-items:center;gap:5px;padding:0 var(--sp-2);border-radius:var(--r-s);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.legend span:hover{background:var(--ink-100)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3.5px}
+.lg-w{background:#d9ecdc}.lg-r{box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.5);background:#fff}.lg-c{background:var(--clash-bg);box-shadow:inset 0 0 0 1px rgba(154,107,22,.3)}.lg-q{background:var(--ink-100)}
+
+/* S4: honest first-run empty state (N=0 rung) — dashed outline is allowed
+   ONLY here (LOOP.md taste profile: true empty-state placeholder) */
+.canvas-empty{position:absolute;inset:var(--sp-6);display:flex;align-items:center;justify-content:center}
+.canvas-empty .box{max-width:340px;border:1.5px dashed var(--ink-200);border-radius:var(--r-l);padding:var(--sp-6);text-align:center;color:var(--ink-400);font-size:var(--fs-3);line-height:1.6}
+.canvas-empty .box b{display:block;font-size:var(--fs-4);font-weight:600;color:var(--ink-500);margin-bottom:var(--sp-2)}
+
+/* tooltip: 260ms intent delay, instant hide */
+#tip{position:fixed;z-index:99;background:var(--ink-900);color:#f4f4f3;font-size:var(--fs-2);line-height:1.5;padding:7px 10px;border-radius:7px;max-width:270px;box-shadow:0 6px 24px rgba(15,17,21,.3);pointer-events:none;opacity:0;transition:opacity var(--t-fast) var(--ease);transform:translateY(2px)}
+#tip.on{opacity:1;transform:none}
+
+/* S5: keyboard parity — correlate-hover paths reachable without a mouse
+   (focus mirrors hover); ring only on :focus-visible so mouse use is clean */
+.task:focus-visible,.terr:focus-visible,.legend span:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.task:focus:not(:focus-visible),.terr:focus:not(:focus-visible),.legend span:focus:not(:focus-visible){outline:none}
+
+/* ════════════════════════════════════════════════════════════════════════
+   task-panel (m2, S4) — ported from static/task-panel-s2.html, the approved
+   S2 artifact. Values verbatim where the selector is panel-only; selectors
+   that would collide with map styles (.age, h2) are scoped under .panel /
+   .phead. .pill and .chip are shared with the map ON PURPOSE — S2 copied
+   them from v8 unchanged, one definition serves both surfaces. */
+
+/* map context while the panel is open: blur the canvas (S2: 1.5px) and put
+   a scrim over the CANVAS ONLY — rev-2 (Wayne verdict ④, "左栏不要变灰"):
+   the rail stays live and undimmed; the scrim's left edge = the rail width
+   (--rail-w, set inline on .main; defaults to 0 on scrim-only surfaces like
+   the first-run screen, where full coverage is unchanged). Clicking the
+   veiled map still closes. */
+.canvas.veiled{filter:blur(1.5px)}
+.scrim{position:absolute;top:0;right:0;bottom:0;left:var(--rail-w,0);background:rgba(25,27,31,.22);cursor:pointer;z-index:4;animation:scrimIn var(--t-base) var(--ease) backwards}
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}
+
+/* the panel: slides in over the map from the right, 520px (S2 verbatim) */
+.panel{position:absolute;top:0;right:0;bottom:0;width:520px;background:var(--card);display:flex;flex-direction:column;box-shadow:-1px 0 0 rgba(20,22,26,.06),-18px 0 48px rgba(15,17,21,.16);animation:panelIn var(--t-base) var(--ease) backwards;z-index:5}
+@keyframes panelIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+
+/* ── section 1: identity ── */
+.phead{flex:none;padding:var(--sp-4) var(--sp-4) var(--sp-3);border-bottom:1px solid var(--ink-150);background:rgba(252,252,251,.8)}
+.phead .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.phead h2{font-size:var(--fs-4);font-weight:650;letter-spacing:-.1px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.panel .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none;cursor:help}
+.pclose{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border:0;background:none;border-radius:var(--r-s);color:var(--ink-400);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.pclose:hover{background:var(--ink-100);color:var(--ink-700)}
+.meta{display:flex;align-items:center;gap:var(--sp-2);margin-top:6px;font-size:var(--fs-2);color:var(--ink-500);min-width:0;overflow:hidden}
+.meta .m{flex:none;cursor:help;white-space:nowrap}
+.meta .mono{font-family:var(--mono);font-size:var(--fs-1)}
+.meta .trunc{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.meta .sep{flex:none;width:3px;height:3px;border-radius:50%;background:var(--ink-300)}
+.scopes{display:flex;align-items:center;gap:var(--sp-1);margin-top:var(--sp-2);min-width:0;overflow:hidden}
+.twist{flex:none;height:16px;display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-1);font-weight:600;padding:0 6px;border-radius:5px;background:var(--clash-bg);color:var(--clash-ink);cursor:help;white-space:nowrap;line-height:16px}
+
+/* ── section 2: human timeline (the panel's only scroll region) ── */
+.tlbar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:var(--sp-2) var(--sp-4) var(--sp-1);position:relative;z-index:1;background:var(--card);transition:box-shadow var(--t-fast) var(--ease)}
+.tlbar.scrolled{box-shadow:0 1px 2px rgba(20,22,26,.08)}
+.tlbar h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase}
+.seg{display:flex;background:var(--ink-100);border-radius:var(--r-s);padding:2px}
+.seg button{height:18px;border:0;background:none;border-radius:4px;padding:0 var(--sp-2);font-size:var(--fs-1);font-weight:600;color:var(--ink-500);cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.seg button.on{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1)}
+.tl{flex:1;min-height:0;overflow:auto;padding:var(--sp-2) var(--sp-4) var(--sp-3)}
+.tl::-webkit-scrollbar,.tail::-webkit-scrollbar{width:8px}
+.tl::-webkit-scrollbar-thumb{background:var(--ink-200);border-radius:4px;border:2px solid var(--card);background-clip:padding-box}
+.tail::-webkit-scrollbar-thumb{background:#4a4d53;border-radius:4px;border:2px solid var(--ink-900);background-clip:padding-box}
+.tl::-webkit-scrollbar-track,.tail::-webkit-scrollbar-track{background:transparent}
+/* honest empty timeline (queued synthetic panels: no session, no history) */
+.tl-empty{padding:var(--sp-4) 0;font-size:var(--fs-3);color:var(--ink-400);line-height:1.6}
+.ev{display:flex;gap:var(--sp-2);padding:5px 0}
+.ev .t{width:34px;flex:none;text-align:right;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-300);line-height:1.7;cursor:help}
+.ev .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-200);margin-top:5px;flex:none}
+.ev.agent .dot{background:var(--alive)}
+.ev.user .dot{background:var(--read)}
+.ev.ask .dot{background:var(--need)}
+.ev .body{flex:1;min-width:0;font-size:var(--fs-3);line-height:1.55;color:var(--ink-700)}
+.ev .body b{color:var(--ink-900);font-weight:600}
+.ev.user .body{background:rgba(90,127,184,.07);border-radius:var(--r-s);padding:5px var(--sp-2)}
+.ev .who{font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;color:var(--read-ink);text-transform:uppercase;margin-bottom:1px}
+/* S2 called this .sub — renamed .subnote here because the MAP already owns
+   .sub (absolute-positioned sub-block chips) and would yank it out of flow */
+.ev .subnote{font-size:var(--fs-2);color:var(--ink-400);margin-top:2px}
+.ev.mech .body{color:var(--ink-400);font-size:var(--fs-2)}
+.ev.ask .body{background:var(--need-bg);border-radius:var(--r-s);padding:5px var(--sp-2)}
+.ev.ask .body b{color:var(--need-ink)}
+.ev.cross .body{font-size:var(--fs-2);color:var(--ink-400)}
+.ev.cross .dot{background:#fff;box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.5)}
+.ev .body .mono{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500)}
+/* collapsed file-change entry */
+.filestoggle{border:0;background:none;padding:0;font-size:var(--fs-3);color:var(--ink-700);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.filestoggle:hover{color:var(--ink-900)}
+.filestoggle .car{transition:transform var(--t-fast) var(--ease);color:var(--ink-400)}
+.files{display:none;margin-top:5px;font-family:var(--mono);font-size:var(--fs-1);line-height:1.9;color:var(--ink-500)}
+.files .out{color:var(--clash-ink);cursor:help}
+.ev.open .files{display:block}
+.ev.open .filestoggle .car{transform:rotate(90deg)}
+/* on-demand transcript tail */
+.tail{flex:none;display:none;margin:0 var(--sp-4) var(--sp-2);background:var(--ink-900);color:#b9beb1;border-radius:var(--r-s);font-family:var(--mono);font-size:var(--fs-1);line-height:1.8;padding:var(--sp-2) var(--sp-3);max-height:120px;overflow:auto;white-space:pre-wrap}
+.tail.show{display:block}
+
+/* ── section 3: intervention deck (pinned; never scrolls away) ── */
+.deck{flex:none;border-top:1px solid var(--ink-150);background:rgba(252,252,251,.8);padding:var(--sp-3) var(--sp-4) var(--sp-4)}
+.modes{display:flex;width:fit-content;background:var(--ink-100);border-radius:var(--r-s);padding:2px;margin-bottom:var(--sp-2)}
+.modes button{height:20px;border:0;background:none;border-radius:4px;padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:600;color:var(--ink-500);cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.modes button.on{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1)}
+.deck textarea{width:100%;height:52px;max-height:124px;resize:none;border:0;border-radius:var(--r-s);background:var(--card);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-150);padding:var(--sp-2) var(--sp-2);font-family:inherit;font-size:var(--fs-3);line-height:1.5;color:var(--ink-900);transition:box-shadow var(--t-fast) var(--ease)}
+.deck textarea::placeholder{color:var(--ink-400)}
+.deck textarea:focus{outline:none;box-shadow:var(--sh-2),inset 0 0 0 1.5px var(--ink-300)}
+.actions{display:flex;align-items:center;gap:var(--sp-1);margin-top:var(--sp-2)}
+.actions button{height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-2);font-size:var(--fs-3);font-weight:500;white-space:nowrap;cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+.actions .send{background:var(--ink-900);color:#fbfbfa;font-weight:600;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
+.actions .send:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.actions .send:active{transform:none}
+.actions .quiet{background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1);font-size:var(--fs-2)}
+.actions .quiet:hover{box-shadow:var(--sh-2)}
+.actions .quiet.on{color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-300)}
+.actions .gap{flex:1}
+.actions .term{background:none;color:var(--need-ink);box-shadow:none;font-weight:500;font-size:var(--fs-2)}
+.actions .term:hover{background:var(--need-bg)}
+
+/* keyboard parity on panel affordances (same rule as the map's) */
+.pclose:focus-visible,.filestoggle:focus-visible,.seg button:focus-visible,.modes button:focus-visible,.actions button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+
+/* ════════════════════════════════════════════════════════════════════════
+   conflict-card (m3, S4) — ported from static/conflict-card-s2.html, the
+   approved S2 artifact. Values verbatim; selectors that would collide with
+   map/panel styles are scoped under .modal (.age, .chip display, .actions
+   .ignore is additive). .pill / .actions button styles are shared with the
+   map + deck ON PURPOSE — S2 copied them from v8 unchanged. */
+
+/* centered 640px modal over the scrimmed map (.center sits inside .main,
+   same underlay language as the task panel; scrim z-4 → modal z-5).
+   rev-2 (verdict ④): centers within the CANVAS (left = --rail-w) so the
+   card never floats over the live rail. */
+.center{position:absolute;top:0;right:0;bottom:0;left:var(--rail-w,0);display:flex;align-items:center;justify-content:center;padding:var(--sp-6);pointer-events:none;z-index:5}
+.modal{pointer-events:auto;width:640px;max-width:100%;max-height:100%;background:var(--card);border-radius:var(--r-l);display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,17,21,.14),0 22px 70px rgba(15,17,21,.28);animation:cardIn var(--t-base) var(--ease) backwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+
+/* header */
+.chead{flex:none;padding:var(--sp-4) var(--sp-4) var(--sp-3);border-bottom:1px solid var(--ink-150);background:rgba(252,252,251,.8);border-radius:var(--r-l) var(--r-l) 0 0}
+.chead .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.chead h2{font-size:var(--fs-4);font-weight:650;letter-spacing:-.1px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.modal .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none;cursor:help}
+.crumb{display:flex;align-items:center;gap:var(--sp-2);margin-top:6px;font-size:var(--fs-2);color:var(--ink-500);min-width:0;overflow:hidden}
+.crumb .m{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+.crumb .mono{font-family:var(--mono);font-size:var(--fs-1)}
+.crumb .sep{flex:none;width:3px;height:3px;border-radius:50%;background:var(--ink-300)}
+
+/* grading strip — soft fill, no stripes. RED (W×W) borrows --need (push-
+   eligible = "needs you" channel); YELLOW (W×R) stays in --clash. */
+.grade{flex:none;display:flex;align-items:flex-start;gap:var(--sp-2);padding:var(--sp-2) var(--sp-4);font-size:var(--fs-2);line-height:1.5;cursor:help;position:relative;z-index:2;transition:box-shadow var(--t-fast) var(--ease)}
+.grade b{flex:none;font-family:var(--mono);font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;line-height:1.7}
+.grade.red{background:var(--need-bg);color:var(--need-ink)}
+.grade.yellow{background:var(--clash-bg);color:var(--clash-ink)}
+/* scroll-aware seams (task-panel S2 language): grade casts down when
+   scrolled past the top, footer casts up while more hides below */
+.grade.seam{box-shadow:0 1px 2px rgba(20,22,26,.08)}
+.cfoot{transition:box-shadow var(--t-fast) var(--ease)}
+.cfoot.seam{box-shadow:0 -1px 2px rgba(20,22,26,.08)}
+
+/* body — the modal's only scroll region */
+.cbody{flex:1;min-height:0;overflow:auto;padding:var(--sp-3) var(--sp-4)}
+.cbody::-webkit-scrollbar{width:8px}
+.cbody::-webkit-scrollbar-thumb{background:var(--ink-200);border-radius:4px;border:2px solid var(--card);background-clip:padding-box}
+.cbody::-webkit-scrollbar-track{background:transparent}
+.cbody h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase;margin-bottom:var(--sp-2);display:flex;align-items:center;justify-content:space-between;cursor:help}
+.cbody h4 .mono{font-family:var(--mono);font-weight:500;text-transform:none;letter-spacing:0}
+
+/* zone a1: the two task rows — rail-card hover language (v8 .task) since the
+   affordance is the same: click opens the task panel */
+.side{display:flex;align-items:center;gap:var(--sp-2);min-width:0;padding:var(--sp-2) var(--sp-3);background:rgba(252,252,251,.8);border-radius:var(--r-m);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease)}
+.side:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
+.side + .side{margin-top:6px}
+.side h3{font-size:var(--fs-3);font-weight:600;letter-spacing:-.1px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side .chips{flex:none;display:flex;align-items:center;gap:var(--sp-1)}
+/* S2 R1 fix #1: inline-block, not flex — text-overflow needs a block text
+   container to ellipsize (map chips keep v8's inline-flex; scoped here) */
+.modal .chip{display:inline-block;line-height:16px}
+
+/* zone a2: shared symbols */
+.shared{margin-top:var(--sp-3)}
+.sym{display:flex;align-items:center;gap:var(--sp-2);padding:3px 0;min-width:0}
+.sym .dot{flex:none;width:5px;height:5px;border-radius:50%;background:var(--ink-300)}
+.sym .name{font-family:var(--mono);font-size:var(--fs-2);color:var(--ink-700);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+.sym .who{flex:none;margin-left:auto;font-size:var(--fs-1);color:var(--ink-400);cursor:help;white-space:nowrap}
+.symtoggle{border:0;background:none;padding:3px 0 0;font-size:var(--fs-2);font-weight:600;color:var(--ink-500);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.symtoggle:hover{color:var(--ink-900)}
+.symtoggle .car{transition:transform var(--t-fast) var(--ease);color:var(--ink-400)}
+.shared.open .symtoggle .car{transform:rotate(90deg)}
+
+/* zone b: AI diagnosis */
+.diag{margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--ink-150)}
+.verdict{background:rgba(252,252,251,.8);border-radius:var(--r-m);box-shadow:var(--sh-1);padding:var(--sp-3);font-size:var(--fs-3);line-height:1.55;color:var(--ink-700)}
+.verdict b{color:var(--ink-900);font-weight:600}
+.verdict .vline{display:flex;gap:var(--sp-2);margin-top:6px}
+.verdict .vline .vk{flex:none;width:78px;font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;color:var(--ink-400);text-transform:uppercase;line-height:1.9;cursor:help}
+.verdict .vline .vt{flex:1;min-width:0}
+/* backtick tokens from the model render mono (iter-11 fork #4) */
+.verdict .code{font-family:var(--mono);font-size:var(--fs-2)}
+.prov{display:flex;align-items:center;gap:var(--sp-2);margin-top:var(--sp-1);font-size:var(--fs-1);color:var(--ink-400)}
+.prov .pdot{width:5px;height:5px;border-radius:50%;background:var(--alive);flex:none}
+/* staleness honesty: green dot only while the verdict matches reality */
+.prov.stale .pdot{background:var(--ink-300)}
+.prov .edits{color:var(--ink-500);font-weight:600;cursor:help}
+.prov .m{cursor:help}
+.prov button{border:0;background:none;padding:0;font-size:var(--fs-1);font-weight:600;color:var(--ink-500);cursor:pointer;margin-left:auto}
+.prov button:hover{color:var(--ink-900)}
+/* true empty state → dashed placeholder is sanctioned here */
+.diag-empty{border:1.5px dashed var(--ink-200);border-radius:var(--r-m);padding:var(--sp-4);text-align:center}
+.diag-empty p{font-size:var(--fs-3);color:var(--ink-500);line-height:1.55}
+.diag-empty .cap{font-size:var(--fs-2);color:var(--ink-400);margin-top:var(--sp-1)}
+.diag-empty .cap i{font-style:normal;font-weight:600}
+.diag-empty button{margin-top:var(--sp-3);height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-3);font-size:var(--fs-3);font-weight:600;background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.diag-empty button:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+
+/* zone c: adjudication footer (pinned; .actions styles shared with the deck) */
+.cfoot{flex:none;border-top:1px solid var(--ink-150);background:rgba(252,252,251,.8);padding:var(--sp-3) var(--sp-4) var(--sp-4);border-radius:0 0 var(--r-l) var(--r-l)}
+.cfoot textarea{width:100%;height:52px;max-height:124px;resize:none;border:0;border-radius:var(--r-s);background:var(--card);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-150);padding:var(--sp-2) var(--sp-2);font-family:inherit;font-size:var(--fs-3);line-height:1.5;color:var(--ink-900);transition:box-shadow var(--t-fast) var(--ease)}
+.cfoot textarea::placeholder{color:var(--ink-400)}
+.cfoot textarea:focus{outline:none;box-shadow:var(--sh-2),inset 0 0 0 1.5px var(--ink-300)}
+.actions .ignore{background:none;color:var(--ink-400);box-shadow:none;font-size:var(--fs-2)}
+.actions .ignore:hover{background:var(--ink-100);color:var(--ink-700)}
+
+/* S5: inline ignore-confirm (permanence gate — one modest confirm, in place,
+   never a browser dialog). Sits exactly where the ignore button sat. */
+.confirm{display:inline-flex;align-items:center;gap:var(--sp-1)}
+.confirm .q{font-size:var(--fs-2);color:var(--ink-700);font-weight:600;margin-right:var(--sp-1);white-space:nowrap}
+.confirm .doit{background:none;color:var(--clash-ink);box-shadow:inset 0 0 0 1px var(--ink-200);font-size:var(--fs-2);font-weight:600}
+.confirm .doit:hover{background:var(--clash-bg)}
+.confirm .keep{background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1);font-size:var(--fs-2)}
+.confirm .keep:hover{box-shadow:var(--sh-2)}
+
+/* S5: adjudication feedback band (preview stub) — replaces textarea+actions
+   after an action. Text pill first, neutral family (feedback ≠ task state:
+   the three semantic colors stay reserved). Entry uses the standard 200ms
+   curve; not persistent. */
+.fdbk{display:flex;align-items:flex-start;gap:var(--sp-2);min-height:52px;animation:fdbkIn var(--t-base) var(--ease) backwards}
+.fdbk .pill{cursor:help;margin-top:1px}
+.fdbk p{flex:1;font-size:var(--fs-3);line-height:1.5;color:var(--ink-700);margin:0}
+.fdbk .preview{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);background:var(--ink-100);border-radius:var(--r-s);padding:1px 5px;cursor:help;white-space:nowrap}
+.fdbk .quiet{flex:none;height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:500;background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.fdbk .quiet:hover{box-shadow:var(--sh-2)}
+@keyframes fdbkIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+/* S5: honest run/re-run stub note in zone b — no fake progress, just what
+   would happen; backtick tokens render mono like the verdict's. */
+.stubnote{margin-top:var(--sp-2);font-size:var(--fs-2);line-height:1.5;color:var(--ink-500);cursor:help;text-align:left}
+.stubnote .code{font-family:var(--mono);font-size:var(--fs-1)}
+
+/* pause split-button: the menu lists both tasks — the UI never presumes a side */
+.split{position:relative;display:inline-flex}
+.pmenu{position:absolute;bottom:32px;left:0;min-width:250px;background:var(--card);border-radius:var(--r-m);box-shadow:var(--sh-2),0 12px 34px rgba(15,17,21,.18);padding:var(--sp-1);z-index:5}
+.split.open > button{box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-300);color:var(--ink-900)}
+.pmenu button{display:flex;width:100%;align-items:center;gap:var(--sp-2);height:auto;padding:6px var(--sp-2);border-radius:var(--r-s);background:none;text-align:left;font-size:var(--fs-2);color:var(--ink-700)}
+.pmenu button:hover{background:var(--ink-100)}
+.pmenu button b{font-weight:600;color:var(--ink-900);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pmenu button .st{margin-left:auto;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+/* honest no-op: an already-waiting task stays clickable (hover-explainable,
+   never dead pixels) but drops to secondary ink */
+.pmenu button.noop b{color:var(--ink-500);font-weight:500}
+.split .car{transition:transform var(--t-fast) var(--ease);color:var(--ink-400);margin-left:4px}
+.split.open .car{transform:rotate(-90deg)}
+
+/* conflict-card openers get the app's keyboard-parity ring */
+.side:focus-visible,.stat:focus-visible,.sub:focus-visible,.task .pill:focus-visible,.symtoggle:focus-visible,.prov button:focus-visible,.diag-empty button:focus-visible,.pmenu button:focus-visible,.fdbk .quiet:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.side:focus:not(:focus-visible),.stat:focus:not(:focus-visible),.sub:focus:not(:focus-visible),.task .pill:focus:not(:focus-visible){outline:none}
+
+/* ════════════════════════════════════════════════════════════════════════
+   empty-install / first-run (m4, S4) — ported from the approved M0 artifact,
+   the approved S2 artifact. Values verbatim; collisions resolved:
+   - .rail-empty (map owns a plain version) → scoped .first-run .rail-empty;
+   - @keyframes breathe (map owns .82→1 for the clash counter) → the S2
+     install dots keep their own .4→1 amplitude as breathe-soft;
+   - .center / cardIn are shared with the conflict card ON PURPOSE (same
+     centered-over-canvas language). */
+
+/* titlebar: honest pre-connect state — nothing watched, nothing claimed */
+.norepo{display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-400);cursor:help}
+/* collapsed empty rail group: header only, quieter */
+.group.zero h4{color:var(--ink-300)}
+.group h4[data-tip]{cursor:help}
+/* Moment A rail: dashed true-empty placeholder (sanctioned here only) —
+   no launch button; connect is the screen's ONE primary action */
+.first-run .rail-empty{border:1.5px dashed var(--ink-200);border-radius:var(--r-m);padding:var(--sp-4);text-align:center;color:var(--ink-400);font-size:var(--fs-3);line-height:1.6;cursor:help}
+.first-run .rail-empty b{display:block;font-weight:600;color:var(--ink-500)}
+
+/* the connect card (Moments A/A′/A″), centered over the canvas via .center */
+.connect{pointer-events:auto;width:420px;max-width:100%;background:var(--card);border-radius:var(--r-l);box-shadow:var(--sh-2),0 12px 34px rgba(15,17,21,.1);padding:var(--sp-6);animation:cardIn var(--t-base) var(--ease) backwards}
+/* storyboard exit: reverse cardIn (200ms), then the hard swap */
+.connect.out{animation:cardOut var(--t-base) var(--ease) forwards}
+@keyframes cardOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(8px) scale(.99)}}
+.connect h2{font-size:var(--fs-4);font-weight:650;letter-spacing:-.1px;cursor:help}
+.connect .sub{margin-top:var(--sp-1);font-size:var(--fs-3);color:var(--ink-500);line-height:1.55}
+.connect .cta{margin-top:var(--sp-4);width:100%;height:34px;border:0;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14);transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
+.connect .cta:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.connect .cta:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+/* picked repo path: long paths keep their tail — leading ellipsis */
+.connect .path{margin-top:var(--sp-4);display:flex;align-items:center;gap:6px;height:26px;background:var(--ink-100);border-radius:var(--r-s);padding:0 var(--sp-2);min-width:0;cursor:help}
+.connect .path svg{flex:none;color:var(--ink-400)}
+.connect .path .p{flex:1;min-width:0;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl;text-align:left}
+.connect .path .p bdi{unicode-bidi:plaintext}
+/* checklist rows: what installing does / is doing / did / failed to do */
+.steps{margin-top:var(--sp-4);border-top:1px solid var(--ink-150);padding-top:var(--sp-3)}
+.step{display:flex;align-items:center;gap:var(--sp-2);padding:5px 0;font-size:var(--fs-3);color:var(--ink-700);cursor:help}
+.step .ic{flex:none;width:15px;height:15px;display:flex;align-items:center;justify-content:center;color:var(--ink-300)}
+.step .ic.done{color:var(--alive)}
+.step .st{flex:none;margin-left:auto;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+.step .st.done{color:var(--alive-ink)}
+.step.pend{color:var(--ink-400)}
+/* honest failed step: text status first (mono "failed"), need ink reinforces */
+.step .ic.fail{color:var(--need)}
+.step .st.fail{color:var(--need-ink);font-weight:600}
+.why{display:flex;align-items:center;gap:var(--sp-2);margin:2px 0 4px 23px;font-size:var(--fs-2);color:var(--ink-500);line-height:1.5;cursor:help}
+.why code{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-700);background:var(--ink-100);border-radius:4px;padding:1px 4px}
+.retry{flex:none;margin-left:auto;height:22px;border:0;border-radius:var(--r-s);padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:600;background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.retry:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+/* the ONE persistent animation while installing: the in-progress dot */
+.step .ic .busy{width:7px;height:7px;border-radius:50%;background:var(--alive);animation:breathe-soft 2.8s var(--ease) infinite}
+@keyframes breathe-soft{0%,100%{opacity:.4}50%{opacity:1}}
+.connect .local{margin-top:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);line-height:1.5;cursor:help}
+
+/* Moment B: guidance inside the uncategorized territory */
+.guide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-3);text-align:center;padding:var(--sp-6)}
+.guide p{font-size:var(--fs-3);color:var(--ink-500);line-height:1.55;cursor:help}
+.mapbtn{height:26px;border:0;border-radius:var(--r-s);padding:0 var(--sp-3);font-size:var(--fs-3);font-weight:600;background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.mapbtn:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+/* Moment C keeps the map action reachable, compact, top-right */
+.mapbtn.corner,.mapstat.corner{position:absolute;top:var(--sp-3);right:var(--sp-4)}
+/* mapping in progress: the button yields to an honest status chip; the
+   breathe dot is that state's ONE persistent animation */
+.mapstat{height:26px;display:inline-flex;align-items:center;gap:7px;border-radius:var(--r-s);padding:0 var(--sp-3);font-size:var(--fs-3);font-weight:600;background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200);cursor:pointer;border:0;font-family:inherit;transition:box-shadow var(--t-fast) var(--ease)}
+.mapstat:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+.mapstat .dot{width:7px;height:7px;border-radius:50%;background:var(--alive);animation:breathe-soft 2.8s var(--ease) infinite}
+.mapstat .t{font-family:var(--mono);font-size:var(--fs-1);font-weight:500;color:var(--ink-400)}
+
+/* Moment C: session footprints on the unmapped gray (fill = write) —
+   geometry comes from packFootprints, never hand-placed */
+.fp{position:absolute;border-radius:var(--r-m);background:linear-gradient(180deg,#e9f2ea,#e0ede2);box-shadow:inset 0 0 0 1px rgba(62,125,76,.13),var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),opacity var(--t-base) var(--ease),transform var(--t-base) var(--ease)}
+.fp:hover{box-shadow:inset 0 0 0 1.5px rgba(62,125,76,.3),var(--sh-2)}
+/* correlate-hover (S5): card ↔ footprint, the map's dim/lit language —
+   non-subjects dim to .14, the subject gets ring + scale. A collapsed
+   subject lights the +N chip instead (its block has no pixels) */
+.terr.quiet.fpfocus .fp{opacity:.14}
+.terr.quiet.fpfocus .fp.lit{opacity:1;box-shadow:inset 0 0 0 2px rgba(62,125,76,.4),var(--sh-2);transform:scale(1.012)}
+.terr.quiet.fpfocus .fp-chip{opacity:.14}
+.terr.quiet.fpfocus .fp-chip.hot{opacity:1;box-shadow:var(--sh-2);color:var(--ink-700)}
+.fp .who{position:absolute;top:var(--sp-2);left:var(--sp-3);right:var(--sp-3);font-size:var(--fs-2);font-weight:600;color:#4c7a57;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+/* display:block + font-family are load-bearing: the task panel owns bare
+   `.files` (display:none + mono, collapsed file-change entry) and would
+   swallow/restyle this — same collision class as .sub/.subnote */
+.fp .files{display:block;font-family:var(--sans);position:absolute;left:var(--sp-3);bottom:var(--sp-2);right:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+/* overflow ladder's last rung: "+N earlier sessions" chip, overlaid
+   bottom-right ABOVE the territory foot (iter-17 fork; S5 defines click) */
+.fp-chip{position:absolute;right:var(--sp-4);bottom:var(--sp-6);height:22px;border:0;border-radius:11px;padding:0 10px;font-family:var(--mono);font-size:var(--fs-1);font-weight:600;background:rgba(255,255,255,.85);color:var(--ink-500);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),opacity var(--t-base) var(--ease)}
+.fp-chip:hover{box-shadow:var(--sh-2);color:var(--ink-700)}
+/* the chip's listing popover (S5, fork iter-18): the collapsed sessions as
+   rows, oldest first — each opens its task panel. Anchored above the chip,
+   space yields back on Escape / outside click / re-click */
+.fp-pop{position:absolute;right:var(--sp-4);bottom:calc(var(--sp-6) + 22px + var(--sp-2));width:280px;max-height:216px;overflow-y:auto;background:var(--card);border-radius:var(--r-m);box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-200);padding:var(--sp-1);display:flex;flex-direction:column;animation:cardIn var(--t-base) var(--ease) backwards;z-index:3}
+.fp-pop .row{display:flex;align-items:center;gap:var(--sp-3);border:0;background:none;font-family:inherit;text-align:left;height:30px;flex:none;padding:0 var(--sp-2);border-radius:var(--r-s);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.fp-pop .row:hover{background:var(--ink-100)}
+.fp-pop .row .t{flex:1;min-width:0;font-size:var(--fs-3);font-weight:600;color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-pop .row .n{flex:none;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+
+/* storyboard entry: after the hard swap the connected chrome enters with the
+   200ms language, one stagger step (preview CTA path only — .enter is set then) */
+@keyframes chromeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:chromeIn var(--t-base) var(--ease) backwards}
+
+/* first-run keyboard parity: same system ring as everywhere else */
+.cta:focus-visible,.retry:focus-visible,.mapbtn:focus-visible,.mapstat:focus-visible,.fp-chip:focus-visible,.fp:focus-visible,.fp-pop .row:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.cta:focus:not(:focus-visible),.retry:focus:not(:focus-visible),.mapbtn:focus:not(:focus-visible),.mapstat:focus:not(:focus-visible),.fp-chip:focus:not(:focus-visible),.fp:focus:not(:focus-visible),.fp-pop .row:focus:not(:focus-visible){outline:none}
+
+/* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
+@media (prefers-reduced-motion: reduce){
+  .window,.task,.terr,.sub.clash .cnt,.panel,.scrim,.modal,.fdbk{animation:none}
+  .grade,.cfoot,.symtoggle .car,.split .car{transition:none}
+  .connect,.connect.out,.step .ic .busy,.mapstat .dot,.fp-pop,.first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:none}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   menubar (m5, S4) — ported from the approved M0 artifact.
+   Separate preview surface: .mbdesk replaces .window entirely (?menubar=).
+   Reused app vocabulary ON PURPOSE: .stat / .pill / .fresh (v8 language).
+   Renames vs the static to dodge app collisions: .div → .mb-div,
+   .foot → .mb-foot, .spacer → .mb-spacer. ═══════════════════════════════ */
+
+/* the desktop: subtle generic wallpaper (context scaffolding, not product) */
+.mbdesk{position:fixed;inset:0;overflow:hidden;font-family:var(--sans);color:var(--ink-900);
+  background:
+    radial-gradient(1100px 640px at 22% 118%, rgba(122,146,158,.34), transparent 62%),
+    radial-gradient(900px 560px at 84% -12%, rgba(255,255,255,.5), transparent 58%),
+    linear-gradient(158deg,#c8cdd0 0%,#b8c2c6 46%,#a9b6ba 100%)}
+.mbdesk button{font-family:inherit}
+.mbdesk button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.mbdesk button:focus:not(:focus-visible){outline:none}
+
+/* menubar strip: system-ish, generic shapes only */
+.mbdesk .menubar{position:relative;height:25px;display:flex;align-items:center;gap:var(--sp-4);padding:0 var(--sp-3);
+  background:rgba(250,250,249,.72);backdrop-filter:blur(18px);box-shadow:0 1px 0 rgba(20,22,26,.08);
+  font-size:var(--fs-3);color:var(--ink-900)}
+.mbdesk .os{display:flex;align-items:center;color:var(--ink-900);cursor:default}
+.mbdesk .appname{font-weight:650;cursor:default}
+.mbdesk .menus{display:flex;gap:var(--sp-4);color:var(--ink-700);cursor:default}
+.mb-spacer{flex:1}
+.mbdesk .status{display:flex;align-items:center;gap:2px;color:var(--ink-700)}
+.mbdesk .sit{height:21px;display:flex;align-items:center;padding:0 7px;border-radius:4px;cursor:default}
+.mbdesk .clock{padding:0 var(--sp-2);font-size:var(--fs-3);color:var(--ink-900);cursor:default;font-variant-numeric:tabular-nums}
+
+/* the Vibehub menubar item — the only live pixel in the strip */
+.vhitem{position:relative;height:21px;display:flex;align-items:center;padding:0 7px;border:0;border-radius:4px;
+  background:none;cursor:pointer;color:var(--ink-900);transition:background var(--t-fast) var(--ease)}
+.vhitem:hover{background:rgba(25,27,31,.08)}
+.vhitem.open{background:rgba(25,27,31,.14)}
+/* waiting badge: THE one persistent animation on this screen (breathe, shared
+   keyframes with the map's clash counter — same .82→1 / 2.8s language) */
+.vhitem .badge{position:absolute;top:-3px;right:-4px;min-width:14px;height:14px;display:flex;align-items:center;justify-content:center;
+  padding:0 4px;border-radius:7px;background:var(--need);color:#fff;font-size:var(--fs-1);font-weight:600;
+  font-family:var(--mono);line-height:1;box-shadow:0 0 0 1.5px rgba(250,250,249,.9);animation:breathe 2.8s var(--ease) infinite}
+/* stale badge: last-known count, no urgency claim — gray, no breathe */
+.vhitem .badge.stale{background:var(--ink-400);animation:none}
+
+/* dropdown (340px), anchored under the Vibehub item (right set inline by JS) */
+.drop{position:absolute;top:31px;width:340px;background:var(--card);border-radius:var(--r-m);
+  box-shadow:0 14px 44px rgba(15,17,21,.24),0 2px 8px rgba(15,17,21,.1),inset 0 0 0 .5px rgba(25,27,31,.06);
+  padding:var(--sp-2);animation:dropIn var(--t-base) var(--ease) backwards;z-index:5}
+@keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* repo line */
+.rline{display:flex;align-items:center;gap:6px;padding:var(--sp-1) var(--sp-2);min-width:0}
+.rline svg{flex:none;color:var(--ink-500)}
+.rline .name{font-size:var(--fs-3);font-weight:600;color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
+.rline .gap{flex:1}
+.rline .fresh{flex:none;gap:5px;cursor:help}
+
+/* stale honesty line (decision-github-002: never pretend real-time) */
+.stalenote{margin:2px var(--sp-2) var(--sp-1);font-size:var(--fs-2);color:var(--ink-500);line-height:1.5;cursor:help}
+
+/* counts: the app titlebar's .stat pills verbatim; button UA border off */
+.drop .counts{display:flex;gap:var(--sp-1);padding:var(--sp-1) var(--sp-2) var(--sp-2)}
+.drop .stat{border:0}
+
+.mb-div{height:1px;background:var(--ink-150);margin:0 var(--sp-2) var(--sp-2)}
+
+/* "Needs you" — v8 group header language */
+.drop .gh{display:flex;justify-content:space-between;font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;
+  color:var(--ink-400);text-transform:uppercase;padding:0 var(--sp-2) 6px;line-height:1.4;cursor:help}
+.drop .gh b{font-family:var(--mono);font-weight:500}
+
+/* top items needing you: one line each — pill, title (ellipsis), age */
+.drop .item{width:100%;display:flex;align-items:center;gap:var(--sp-2);min-width:0;padding:5px var(--sp-2);
+  border:0;background:none;text-align:left;border-radius:var(--r-s);cursor:pointer;
+  transition:background var(--t-fast) var(--ease)}
+.drop .item:hover{background:var(--ink-100)}
+.drop .item:active{background:var(--ink-150)}
+.drop .item .pill{cursor:pointer}
+.drop .item .t{flex:1;min-width:0;font-size:var(--fs-4);font-weight:600;letter-spacing:-.1px;line-height:1.45;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-900)}
+.drop .item .age{flex:none;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+/* overflow line: text-first, quiet */
+.drop .more{width:100%;border:0;background:none;text-align:left;display:block;padding:3px var(--sp-2) 5px;
+  font-size:var(--fs-2);color:var(--ink-500);border-radius:var(--r-s);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.drop .more:hover{background:var(--ink-100)}
+
+/* all-quiet line */
+.quietline{display:flex;align-items:center;gap:7px;padding:var(--sp-1) var(--sp-2) var(--sp-2);
+  font-size:var(--fs-3);color:var(--ink-500);line-height:1.5;cursor:help}
+.quietline svg{flex:none;color:var(--alive)}
+
+/* footer: quiet primary + secondary */
+.mb-foot{display:flex;gap:var(--sp-2);padding:0 var(--sp-1) var(--sp-1)}
+.mb-foot button{flex:1;height:28px;border:0;border-radius:var(--r-s);font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease)}
+.open-app{background:var(--ink-900);color:#fbfbfa;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+.open-app:hover{background:#26282e;box-shadow:0 2px 6px rgba(20,22,26,.2)}
+.open-app:active{box-shadow:0 1px 2px rgba(20,22,26,.18)}
+.start-task{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200)}
+.start-task:hover{box-shadow:var(--sh-2),inset 0 0 0 1px var(--ink-300)}
+.start-task:active{box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-200)}
+
+/* dev variant switcher placement (shared .snapshot-switch look) */
+.mb-switch{position:fixed;right:10px;bottom:10px;z-index:98}
+
+@media (prefers-reduced-motion: reduce){
+  .vhitem .badge,.drop{animation:none}
+  .vhitem,.drop .item,.drop .more,.mb-foot button{transition:none}
+}

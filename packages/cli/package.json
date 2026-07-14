@@ -11,15 +11,16 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node scripts/generate-operation-contracts.mjs && node scripts/copy-managed-assets.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@vibehub/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22",
+    "ajv": "^8.18.0",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   }
