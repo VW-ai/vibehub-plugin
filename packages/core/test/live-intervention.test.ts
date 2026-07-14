@@ -15,6 +15,7 @@ import {
   pendingInjections,
   readConflict,
   readTimeline,
+  replaceScopePatterns,
   RuntimeService,
   upsertRepo,
   upsertTask,
@@ -65,6 +66,30 @@ describe("live read models", () => {
       expect(result.data.session).toBeUndefined();
       expect(result.data.timeline).toEqual([]);
       expect(result.data.transcriptTail).toEqual([]);
+    }
+  });
+
+  it("does not report an in-scope edit as twist evidence", () => {
+    const fx = setup();
+    const db = openDb(fx.dbPath);
+    db.prepare(`DELETE FROM footprints WHERE task_id = ?`).run("task-a");
+    replaceScopePatterns(db, 1, "task-a", "auth", [
+      { mode: "write", glob: "src/auth/**" },
+    ]);
+    addFootprint(db, 1, {
+      taskId: "task-a", sessionId: null, path: "src/auth/login.ts", action: "edit", at: fx.now,
+    });
+    addFootprint(db, 1, {
+      taskId: "task-a", sessionId: null, path: "src/other.ts", action: "edit", at: fx.now,
+    });
+    db.close();
+
+    const result = new RuntimeService({ dbPath: fx.dbPath, now: () => new Date(fx.now) })
+      .readTaskPanel(fx.repo, "task-a");
+
+    expect(result.status).toBe("ok");
+    if (result.status === "ok") {
+      expect(result.data.twist?.offScopeFiles).toEqual(["src/other.ts"]);
     }
   });
 

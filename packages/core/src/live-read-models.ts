@@ -73,7 +73,7 @@ export function readTaskPanelModel(
     : [...new Set(readFootprints(db, taskId)
         .filter((footprint) => footprint.action === "edit")
         .map((footprint) => footprint.path)
-        .filter((file) => !patterns.some((pattern) => matchesScopePattern(file, pattern.glob))))];
+        .filter((file) => !patterns.some((pattern) => matchesScopePattern(pattern.glob, file))))];
   const acknowledgement = timeline.find(
     (event) => event.type === "self_report" && event.footprintCorroboration?.offScopeFiles.length,
   );
