@@ -103,7 +103,9 @@ VIBEHUB_REPO=/path/to/repository pnpm --filter @vibehub/workbench-app dev
 ## Verification
 
 ```bash
-# Build, typecheck, unit tests, production bundle scan, and plugin artifact smoke.
+# Build; typecheck; run unit tests; exercise the production main.tsx entry with
+# Playwright; scan the production bundle; verify the packaged plugin; then run
+# the headless dogfood flow.
 pnpm verify
 
 # Copy only workbench/ to a temporary directory, install from its own lockfile,
@@ -115,11 +117,21 @@ pnpm verify:isolated
 pnpm dogfood
 ```
 
-The production bundle gate rejects fixture imports—including dynamic chunks—and
-scans emitted JavaScript for fixture or canned-data markers. The artifact smoke
-deploys CLI and MCP production dependencies, starts from a clean temporary
-`HOME`, creates SQLite through the packaged native dependency, and runs sync and
-snapshot outside the source monorepo.
+The Playwright production lane boots the real `src/main.tsx` entry; the
+historical harness suite remains separate parity evidence. The production
+bundle gate rejects fixture imports—including dynamic chunks—and scans emitted
+JavaScript for fixture or canned-data markers. The artifact smoke validates the
+manifest, `hooks/hooks.json`, and `.mcp.json`; stages the CLI and MCP `dist`
+layouts those configs promise; expands `CLAUDE_PLUGIN_ROOT`; and invokes the
+configured hook and MCP commands. It also corrupts each configured executable
+path and requires the smoke to fail, proving the configs—not verifier-local
+shortcuts—are the invocation source. The remaining checks start from a clean
+temporary `HOME`, create SQLite through the packaged native dependency, and run
+sync and snapshot outside the source monorepo without starting the App.
+
+`pnpm verify:isolated` copies only this `workbench/` subtree, installs solely
+from its own workspace and lockfile, and invokes that same complete `verify`
+matrix.
 
 Set `VIBEHUB_KEEP_TMP=1` to retain a failed isolated copy or artifact for
 inspection. Set `VIBEHUB_OFFLINE=1` only when all required package tarballs are

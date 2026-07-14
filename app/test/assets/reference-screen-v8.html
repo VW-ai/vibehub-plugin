@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibehub — Reference · Map view v4</title>
+<style>
+:root{
+  /* ink ramp */
+  --ink-900:#191b1f; --ink-700:#3c3f45; --ink-500:#6b6f77; --ink-400:#8b8f97; --ink-300:#b4b7bd; --ink-200:#d9dade; --ink-150:#e7e8ea; --ink-100:#f0f0f1;
+  --paper:#f7f7f5; --card:#ffffff;
+  /* semantic (text ink deliberately darker than fill hue) */
+  --need:#c0392b; --need-bg:#f6e8e5; --need-ink:#9c3022;
+  --clash:#9a6b16; --clash-bg:#f4ecd9; --clash-ink:#775211;
+  --alive:#3e7d4c; --alive-bg:#e4efe6; --alive-ink:#2f6039;
+  --read:#5a7fb8;  --read-ink:#48699c;
+  /* elevation */
+  --sh-1:0 1px 2px rgba(20,22,26,.05);
+  --sh-2:0 1px 3px rgba(20,22,26,.07),0 4px 14px rgba(20,22,26,.06);
+  /* shape scale: exactly three radii */
+  --r-s:6px; --r-m:10px; --r-l:16px;
+  /* space scale: 4/8/12/16/24 only */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-6:24px;
+  /* type scale: exactly four sizes */
+  --fs-1:10px; --fs-2:11px; --fs-3:12px; --fs-4:13px;
+  /* motion: two durations, one curve */
+  --t-fast:120ms; --t-base:200ms; --ease:cubic-bezier(.25,.8,.3,1);
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:linear-gradient(160deg,#e9e9e7,#e4e5e6);font-family:var(--sans);color:var(--ink-900);display:flex;align-items:center;justify-content:center;padding:var(--sp-6);-webkit-font-smoothing:antialiased}
+svg{vertical-align:-2px}
+
+.window{width:min(1320px,100%);height:min(820px,calc(100vh - 48px));background:var(--paper);border-radius:14px;box-shadow:0 22px 70px rgba(15,17,21,.28),0 2px 8px rgba(15,17,21,.12);overflow:hidden;display:flex;flex-direction:column;animation:winIn .5s var(--ease) both}
+@keyframes winIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+
+/* ── titlebar ── */
+.titlebar{height:44px;flex:none;display:flex;align-items:center;gap:var(--sp-3);padding:0 var(--sp-4);background:rgba(250,250,249,.92);border-bottom:1px solid var(--ink-150)}
+.lights{display:flex;gap:var(--sp-2)}
+.lights i{width:12px;height:12px;border-radius:50%}
+.lights i:nth-child(1){background:#f4635e}.lights i:nth-child(2){background:#f7bd45}.lights i:nth-child(3){background:#43c644}
+.wordmark{font-weight:650;font-size:var(--fs-4);letter-spacing:-.1px}
+.repo{height:24px;display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-700);background:var(--card);border-radius:var(--r-s);padding:0 10px;box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
+.repo:hover{box-shadow:var(--sh-2)}
+.repo .branch{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500)}
+.spacer{flex:1}
+.stat{height:22px;display:flex;align-items:center;gap:5px;font-size:var(--fs-2);font-weight:500;padding:0 10px;border-radius:11px;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
+.stat:hover{filter:brightness(.96)}
+.stat.need{background:var(--need-bg);color:var(--need-ink)}
+.stat.clash{background:var(--clash-bg);color:var(--clash-ink)}
+.stat.alive{background:var(--alive-bg);color:var(--alive-ink)}
+.fresh{display:flex;align-items:center;gap:6px;font-size:var(--fs-2);color:var(--ink-500);cursor:pointer}
+.fresh .dot{width:6px;height:6px;border-radius:50%;background:var(--alive)}
+
+.main{flex:1;display:flex;min-height:0}
+
+/* ── rail ── */
+.rail{width:300px;flex:none;display:flex;flex-direction:column;border-right:1px solid var(--ink-150);background:rgba(252,252,251,.7)}
+.tasks{flex:1;overflow:auto;padding:var(--sp-3) var(--sp-3) var(--sp-2)}
+.group{margin-bottom:var(--sp-3)}
+.group h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase;padding:0 var(--sp-1) 6px;display:flex;justify-content:space-between;line-height:1.4}
+.group h4 b{font-family:var(--mono);font-weight:500}
+.task{background:var(--card);border-radius:var(--r-m);padding:var(--sp-2) var(--sp-3);box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);margin-bottom:6px;animation:rise .4s var(--ease) both}
+.task:hover{box-shadow:var(--sh-2);transform:translateY(-1px)}
+.task:active{transform:none;box-shadow:var(--sh-1)}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.task .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
+.task h3{font-size:var(--fs-4);font-weight:600;letter-spacing:-.1px;line-height:1.45;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none}
+.pill{flex:none;height:18px;display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;border-radius:9px;padding:0 8px;cursor:help}
+.pill.need{background:var(--need-bg);color:var(--need-ink)}
+.pill.clash{background:var(--clash-bg);color:var(--clash-ink)}
+.pill.alive{background:var(--alive-bg);color:var(--alive-ink)}
+.pill.idle{background:var(--ink-100);color:var(--ink-500)}
+.pill.done{background:var(--ink-100);color:var(--ink-400)}
+/* chips: one line, never wraps; overflow collapses to +N */
+.task .row2{display:flex;align-items:center;gap:var(--sp-1);margin-top:6px;min-width:0;overflow:hidden}
+.chip{flex:none;height:16px;display:inline-flex;align-items:center;font-family:var(--mono);font-size:var(--fs-1);padding:0 6px;border-radius:5px;cursor:help;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;line-height:16px}
+.chip.w{background:var(--alive-bg);color:var(--alive-ink)}
+.chip.r{box-shadow:inset 0 0 0 1px #c3d0e2;color:var(--read-ink)}
+.chip.n{background:var(--ink-100);color:var(--ink-500)}
+.chip.more{background:var(--ink-100);color:var(--ink-500);font-weight:600}
+.t-done{opacity:.55}
+.launch{margin:0 var(--sp-3) var(--sp-3);height:34px;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease);display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
+.launch:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
+.launch:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+
+/* ── canvas ── */
+.canvas{flex:1;position:relative;overflow:hidden}
+.canvas::before{content:"";position:absolute;inset:0;background:radial-gradient(1200px 700px at 70% -10%,rgba(255,255,255,.7),transparent 60%)}
+.grid{position:absolute;inset:0;background-image:radial-gradient(rgba(25,27,31,.05) 1px,transparent 1px);background-size:26px 26px}
+.terr{position:absolute;border-radius:var(--r-l);background:var(--ink-100);transition:opacity var(--t-base) var(--ease),box-shadow var(--t-base) var(--ease),transform var(--t-base) var(--ease);cursor:pointer;animation:terrIn .55s var(--ease) both}
+.terr:hover{box-shadow:inset 0 0 0 1.5px rgba(25,27,31,.14),var(--sh-2)}
+@keyframes terrIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+.terr .label{position:absolute;top:var(--sp-3);left:var(--sp-4);font-size:var(--fs-2);letter-spacing:.5px;color:var(--ink-500);font-weight:600;line-height:1.4}
+.terr .foot{position:absolute;left:var(--sp-4);bottom:var(--sp-2);right:var(--sp-3);font-size:var(--fs-2);color:var(--ink-400);cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5}
+.terr.w{background:linear-gradient(180deg,#e9f2ea,#e0ede2);box-shadow:inset 0 0 0 1px rgba(62,125,76,.13),var(--sh-1)}
+.terr.w .label{color:#4c7a57}
+.terr.r{background:var(--card);box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.32),var(--sh-1)}
+.terr.r .label{color:#5c7ba6}
+.terr.quiet .label{color:var(--ink-300)}
+.sub{position:absolute;height:26px;display:flex;align-items:center;gap:6px;border-radius:var(--r-s);background:rgba(255,255,255,.75);box-shadow:var(--sh-1);padding:0 10px;font-size:var(--fs-2);color:var(--ink-500);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease);white-space:nowrap;max-width:62%}
+.sub:hover{box-shadow:var(--sh-2)}
+.sub em{font-style:normal;overflow:hidden;text-overflow:ellipsis}
+.sub.w{background:#d9ecdc;color:var(--alive-ink);font-weight:500}
+.sub.clash{background:var(--clash-bg);color:var(--clash-ink);font-weight:600;box-shadow:inset 0 0 0 1px rgba(154,107,22,.22),var(--sh-1)}
+.sub.clash .cnt{flex:none;height:16px;display:inline-flex;align-items:center;background:var(--clash);color:#fff;font-size:var(--fs-1);font-weight:600;border-radius:8px;padding:0 7px;animation:breathe 2.8s var(--ease) infinite}
+@keyframes breathe{0%,100%{opacity:.82}50%{opacity:1}}
+
+/* correlate-hover: one dim value everywhere */
+.canvas.focus .terr{opacity:.14}
+.canvas.focus .terr.lit{opacity:1;box-shadow:inset 0 0 0 2px rgba(25,27,31,.3),0 4px 20px rgba(20,22,26,.14);transform:scale(1.012)}
+.canvas.focus .terr.lit .label{color:var(--ink-900)}
+.rail.dim .task{opacity:.3}
+.rail.dim .task.hot{opacity:1}
+
+/* legend = filter */
+.legend{position:absolute;left:var(--sp-4);bottom:var(--sp-3);display:flex;gap:var(--sp-1);background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-radius:var(--r-m);padding:var(--sp-1);font-size:var(--fs-2);color:var(--ink-500);box-shadow:var(--sh-1)}
+.legend span{height:22px;display:flex;align-items:center;gap:5px;padding:0 var(--sp-2);border-radius:var(--r-s);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.legend span:hover{background:var(--ink-100)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3.5px}
+.lg-w{background:#d9ecdc}.lg-r{box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.5);background:#fff}.lg-c{background:var(--clash-bg);box-shadow:inset 0 0 0 1px rgba(154,107,22,.3)}.lg-q{background:var(--ink-100)}
+
+/* tooltip: 260ms intent delay, instant hide */
+#tip{position:fixed;z-index:99;background:var(--ink-900);color:#f4f4f3;font-size:var(--fs-2);line-height:1.5;padding:7px 10px;border-radius:7px;max-width:270px;box-shadow:0 6px 24px rgba(15,17,21,.3);pointer-events:none;opacity:0;transition:opacity var(--t-fast) var(--ease);transform:translateY(2px)}
+#tip.on{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="titlebar">
+    <div class="lights"><i></i><i></i><i></i></div>
+    <div class="wordmark">Vibehub</div>
+    <div class="repo" data-tip="Switch repository · one window per repo">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg>
+      VW-ai/Vibehub <span class="branch">main · 6 branches</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="stat need" data-tip="One task is waiting on your input — click to jump to it">1 waiting</div>
+    <div class="stat clash" data-tip="Two tasks are writing the same symbol — click to open the conflict">1 conflict</div>
+    <div class="stat alive" data-tip="Tasks making progress. Nothing needed from you">3 running</div>
+    <div class="fresh" data-tip="Last git fetch + hook event · click to sync now"><span class="dot"></span>Synced 42s ago</div>
+  </div>
+
+  <div class="main">
+    <aside class="rail" id="rail">
+      <div class="tasks">
+        <div class="group">
+          <h4>Needs you <b>2</b></h4>
+          <div class="task" style="animation-delay:.05s" data-t="t-auth:w,t-store:r" onmouseenter="lite(this)" onmouseleave="unlite()">
+            <div class="row1"><span class="pill need" data-tip="Agent stopped and asked a question. Parked until you answer.">WAITING</span><h3>Refactor auth flow</h3><span class="age">12m</span></div>
+            <div class="row2"><span class="chip w" data-tip="Declared write scope: Auth &amp; Sessions · 6 files touched">w auth</span><span class="chip r" data-tip="Declared read scope: Storage Layer">r storage</span><span class="chip n" data-tip="branch vibehub/refactor-auth-flow · worktree ~/dev/vibehub">refactor-auth-flow</span></div>
+          </div>
+          <div class="task" style="animation-delay:.09s" data-t="t-pay:w,s-osm:w,t-notify:r" onmouseenter="lite(this)" onmouseleave="unlite()">
+            <div class="row1"><span class="pill clash" data-tip="Writing the same symbol as 'Cancel orders on timeout' (OrderStateMachine). Click to adjudicate.">CONFLICT</span><h3>Auto-retry failed payments</h3><span class="age">31m</span></div>
+            <div class="row2"><span class="chip w" data-tip="Declared write scope: Order state machine">w orders/osm</span><span class="chip r" data-tip="Declared read scope: Notifications">r notify</span><span class="chip more" data-tip="branch vibehub/auto-retry-failed-payments · reads Reconciliation, Build &amp; CI">+3</span></div>
+          </div>
+        </div>
+        <div class="group">
+          <h4>Running <b>3</b></h4>
+          <div class="task" style="animation-delay:.13s" data-t="t-pay:w,s-osm:w,t-store:r" onmouseenter="lite(this)" onmouseleave="unlite()">
+            <div class="row1"><span class="pill clash" data-tip="Other side of the same conflict — either card opens the same adjudication">CONFLICT</span><h3>Cancel orders on timeout</h3><span class="age">9m</span></div>
+            <div class="row2"><span class="chip w" data-tip="Declared write scope: Order state machine">w orders/osm</span><span class="chip r" data-tip="Declared read scope: Storage Layer">r storage</span><span class="chip n" data-tip="branch vibehub/cancel-orders-on-timeout">cancel-orders-on-timeout</span></div>
+          </div>
+          <div class="task" style="animation-delay:.17s" data-t="t-store:w,t-ci:r" onmouseenter="lite(this)" onmouseleave="unlite()">
+            <div class="row1"><span class="pill alive" data-tip="Agent actively producing — tool calls and edits flowing">RUNNING</span><h3>Migrate SQLite storage layer to GraphStore interface</h3><span class="age">23m</span></div>
+            <div class="row2"><span class="chip w" data-tip="Declared write scope: Storage Layer · 11 files">w storage</span><span class="chip r" data-tip="Declared read scope: Build &amp; CI">r ci</span><span class="chip n" data-tip="branch vibehub/migrate-sqlite-graphstore">migrate-sqlite-graphstore</span></div>
+          </div>
+          <div class="task" style="animation-delay:.21s" data-t="t-ci:w" onmouseenter="lite(this)" onmouseleave="unlite()">
+            <div class="row1"><span class="pill idle" data-tip="Process alive, no activity for 8 minutes. Probably stuck — worth a look.">STALLED</span><h3>Write e2e smoke tests</h3><span class="age">8m</span></div>
+            <div class="row2"><span class="chip w" data-tip="Declared write scope: Build &amp; CI">w ci</span><span class="chip n" data-tip="branch vibehub/e2e-smoke-tests">e2e-smoke-tests</span></div>
+          </div>
+        </div>
+        <div class="group">
+          <h4>Done today <b>1</b></h4>
+          <div class="task t-done" style="animation-delay:.25s" data-t="t-fe:w" onmouseenter="lite(this)" onmouseleave="unlite()">
+            <div class="row1"><span class="pill done" data-tip="PR #740 merged 09:40 — auto-closed. Click for the timeline.">DONE</span><h3>Reconnect SSE on drop</h3><span class="age">09:40</span></div>
+            <div class="row2"><span class="chip n" data-tip="Merged via PR #740, branch deleted">PR #740 merged</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="launch" data-tip="Assemble context and launch a Claude Code session on a new branch">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"/></svg>
+        Start a task
+      </div>
+    </aside>
+
+    <section class="canvas" id="cv">
+      <div class="grid"></div>
+
+      <div class="terr w" id="t-auth" style="left:3%;top:4.5%;width:27%;height:38%;animation-delay:.08s" data-tip="Auth &amp; Sessions · 14 anchored files · 1 task writing">
+        <div class="label">AUTH &amp; SESSIONS</div>
+        <div class="foot" style="color:var(--need-ink)" data-tip="'Refactor auth flow' asked which session-expiry policy to use. Waiting 12m — click to answer.">1 writing · waiting on you</div>
+      </div>
+
+      <div class="terr w" id="t-pay" style="left:32.5%;top:4.5%;width:37%;height:55%;animation-delay:.14s" data-tip="Payments &amp; Orders · 23 anchored files · 2 writing, 1 conflict">
+        <div class="label">PAYMENTS &amp; ORDERS</div>
+        <div class="sub clash" id="s-osm" style="left:16px;top:40px;" data-tip="OrderStateMachine — both tasks declared writes on 3 shared symbols. Click for evidence + AI diagnosis."><em>Order state machine</em><span class="cnt">2 writing</span></div>
+        <div class="sub" style="left:16px;top:76px;" data-tip="Payment channels · quiet today"><em>Payment channels</em></div>
+        <div class="sub" style="right:16px;bottom:40px;" data-tip="Reconciliation · quiet today"><em>Reconciliation</em></div>
+      </div>
+
+      <div class="terr w r" id="t-store" style="left:3%;top:46.5%;width:27%;height:46%;animation-delay:.2s" data-tip="Storage Layer · 18 anchored files · 1 writing, 2 reading">
+        <div class="label">STORAGE LAYER</div>
+        <div class="foot" data-tip="Writing: Migrate SQLite · Reading: Refactor auth flow, Cancel orders on timeout">1 writing · 2 reading</div>
+      </div>
+
+      <div class="terr r" id="t-notify" style="left:32.5%;top:63.5%;width:17.5%;height:29%;animation-delay:.26s" data-tip="Notifications · read-only today (Auto-retry failed payments)">
+        <div class="label">NOTIFICATIONS</div>
+        <div class="foot">1 reading</div>
+      </div>
+
+      <div class="terr w r" id="t-ci" style="left:52%;top:63.5%;width:17.5%;height:29%;animation-delay:.3s" data-tip="Build &amp; CI · writer stalled 8m — click the task for details">
+        <div class="label">BUILD &amp; CI</div>
+        <div class="foot">1 writing (stalled) · 1 reading</div>
+      </div>
+
+      <div class="terr quiet" id="t-fe" style="left:72.5%;top:4.5%;width:24.5%;height:88%;animation-delay:.34s" data-tip="Web UI · no active tasks · 1 finished today">
+        <div class="label">WEB UI</div>
+        <div class="foot">quiet · 1 done today</div>
+      </div>
+
+      <div class="legend">
+        <span onmouseenter="filt(['w'])" onmouseleave="unfilt()" data-tip="Territories with an active writer"><i class="lg-w"></i>writing</span>
+        <span onmouseenter="filt(['r'])" onmouseleave="unfilt()" data-tip="Territories being read"><i class="lg-r"></i>reading</span>
+        <span onmouseenter="filt(['clash'])" onmouseleave="unfilt()" data-tip="Two concurrent writers on the same symbol"><i class="lg-c"></i>conflict</span>
+        <span onmouseenter="filt(['quiet'])" onmouseleave="unfilt()" data-tip="No activity today"><i class="lg-q"></i>quiet</span>
+      </div>
+    </section>
+  </div>
+</div>
+<div id="tip"></div>
+
+<script>
+/* tooltip with 260ms intent delay, instant hide */
+var tip=document.getElementById('tip'), tipTimer=null;
+document.addEventListener('mouseover',function(e){
+  var n=e.target.closest('[data-tip]');
+  clearTimeout(tipTimer);
+  if(!n){tip.classList.remove('on');return}
+  tipTimer=setTimeout(function(){
+    tip.innerHTML=n.dataset.tip;
+    var r=n.getBoundingClientRect();
+    tip.style.left=Math.max(8,Math.min(r.left, innerWidth-286))+'px';
+    tip.style.top=(r.bottom+8>innerHeight-90 ? r.top-8-tip.offsetHeight : r.bottom+8)+'px';
+    tip.classList.add('on');
+  },260);
+});
+document.addEventListener('mouseout',function(e){ if(e.target.closest('[data-tip]')){clearTimeout(tipTimer);tip.classList.remove('on')} });
+
+function lite(el){
+  document.getElementById('cv').classList.add('focus');
+  document.getElementById('rail').classList.add('dim');
+  el.classList.add('hot');
+  (el.dataset.t||'').split(',').forEach(function(pair){
+    var id=pair.split(':')[0], n=document.getElementById(id);
+    if(n){ n.classList.add('lit'); var p=n.closest('.terr'); if(p&&p!==n)p.classList.add('lit'); }
+  });
+}
+function unlite(){
+  document.getElementById('cv').classList.remove('focus');
+  document.getElementById('rail').classList.remove('dim');
+  document.querySelectorAll('.hot,.lit').forEach(function(n){n.classList.remove('hot','lit')});
+}
+function filt(cls){
+  document.getElementById('cv').classList.add('focus');
+  document.getElementById('rail').classList.add('dim');
+  document.querySelectorAll('.terr').forEach(function(t){
+    var hit=cls.some(function(c){return t.classList.contains(c)||t.querySelector('.sub.'+c)});
+    if(hit)t.classList.add('lit');
+  });
+  document.querySelectorAll('.task').forEach(function(k){
+    var ids=(k.dataset.t||'');
+    var hit=cls.some(function(c){
+      if(c==='quiet')return false;
+      return ids.split(',').some(function(p){var n=document.getElementById(p.split(':')[0]);return n&&(n.classList.contains(c)||n.classList.contains('lit'))});
+    });
+    if(hit)k.classList.add('hot');
+  });
+}
+function unfilt(){unlite()}
+</script>
+</body>
+</html>

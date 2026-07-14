@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/generate-operation-contracts.mjs && node scripts/copy-managed-assets.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run"
   },
   "dependencies": {
     "@vibehub/core": "workspace:*"

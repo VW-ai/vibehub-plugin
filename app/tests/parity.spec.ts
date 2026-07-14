@@ -2,7 +2,7 @@ import { BASE } from "./env";
 /**
  * S4 screenshot-parity capture (LOOP.md mechanical gate):
  *  (a) React render of the v8-baseline fixture
- *  (b) the frozen static reference workbench-refs/reference-screen-v8.html
+ *  (b) the frozen static reference kept inside the publishable app subtree
  * both at 1280×800 (plus a 1440×900 React sanity shot and one shot per
  * extreme fixture so the scale paths demonstrably render).
  * Shots land in notes/shots/ and deltas are documented in notes/map-main.md.
@@ -14,7 +14,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SHOTS = resolve(HERE, "../notes/shots");
-const V8_STATIC = resolve(HERE, "../../../workbench-refs/reference-screen-v8.html");
+const V8_STATIC = resolve(HERE, "../test/assets/reference-screen-v8.html");
 
 test.beforeAll(() => {
   mkdirSync(SHOTS, { recursive: true });

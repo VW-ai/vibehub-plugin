@@ -57,6 +57,105 @@ function copy(relativePath) {
   cpSync(join(root, relativePath), join(artifact, relativePath), { recursive: true });
 }
 
+function readJson(path) {
+  try {
+    return JSON.parse(readFileSync(path, "utf8"));
+  } catch (error) {
+    throw new Error(`invalid packaged JSON at ${path}: ${error.message}`);
+  }
+}
+
+function expandPluginRoot(value, pluginRoot) {
+  if (typeof value !== "string") throw new Error("configured command values must be strings");
+  return value.replaceAll("${CLAUDE_PLUGIN_ROOT}", pluginRoot);
+}
+
+function readConfiguredEntrypoints(pluginRoot) {
+  const manifest = readJson(join(pluginRoot, ".claude-plugin/plugin.json"));
+  for (const field of ["name", "displayName", "version", "description", "license"]) {
+    if (typeof manifest[field] !== "string" || manifest[field].length === 0) {
+      throw new Error(`plugin manifest requires non-empty ${field}`);
+    }
+  }
+  if (!manifest.author || typeof manifest.author.name !== "string") {
+    throw new Error("plugin manifest requires author.name");
+  }
+
+  const hooksConfig = readJson(join(pluginRoot, "hooks/hooks.json"));
+  if (!hooksConfig.hooks || typeof hooksConfig.hooks !== "object" || Array.isArray(hooksConfig.hooks)) {
+    throw new Error("hooks/hooks.json requires a hooks object");
+  }
+  const hooks = [];
+  for (const [eventName, groups] of Object.entries(hooksConfig.hooks)) {
+    if (!Array.isArray(groups) || groups.length === 0) {
+      throw new Error(`hook event ${eventName} requires at least one group`);
+    }
+    for (const group of groups) {
+      if (!group || !Array.isArray(group.hooks) || group.hooks.length === 0) {
+        throw new Error(`hook event ${eventName} requires command hooks`);
+      }
+      for (const hook of group.hooks) {
+        if (hook?.type !== "command" || typeof hook.command !== "string" || !Array.isArray(hook.args) || !hook.args.every((arg) => typeof arg === "string")) {
+          throw new Error(`hook event ${eventName} has an invalid command shape`);
+        }
+        hooks.push({
+          eventName,
+          command: expandPluginRoot(hook.command, pluginRoot),
+          args: hook.args.map((arg) => expandPluginRoot(arg, pluginRoot)),
+        });
+      }
+    }
+  }
+  if (!hooks.some((hook) => hook.eventName === "SessionStart")) {
+    throw new Error("hooks/hooks.json must configure SessionStart");
+  }
+
+  const mcpConfig = readJson(join(pluginRoot, ".mcp.json"));
+  if (!mcpConfig.mcpServers || typeof mcpConfig.mcpServers !== "object" || Array.isArray(mcpConfig.mcpServers)) {
+    throw new Error(".mcp.json requires an mcpServers object");
+  }
+  const mcpEntries = Object.entries(mcpConfig.mcpServers);
+  if (mcpEntries.length === 0) throw new Error(".mcp.json requires at least one server");
+  const mcpServers = mcpEntries.map(([name, server]) => {
+    if (server?.type !== "stdio" || typeof server.command !== "string" || !Array.isArray(server.args) || !server.args.every((arg) => typeof arg === "string")) {
+      throw new Error(`MCP server ${name} has an invalid stdio command shape`);
+    }
+    return {
+      name,
+      command: expandPluginRoot(server.command, pluginRoot),
+      args: server.args.map((arg) => expandPluginRoot(arg, pluginRoot)),
+    };
+  });
+  return { hooks, mcpServers };
+}
+
+function assertConfiguredPaths(entries, pluginRoot) {
+  for (const entry of entries) {
+    for (const value of [entry.command, ...entry.args]) {
+      if (value.startsWith(`${pluginRoot}/`) && !existsSync(value)) {
+        throw new Error(`configured path does not exist: ${value}`);
+      }
+    }
+  }
+}
+
+function assertConfiguredPathFailure(configPath, mutate, invoke) {
+  const original = readFileSync(configPath, "utf8");
+  const config = JSON.parse(original);
+  mutate(config);
+  writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
+  let failed = false;
+  try {
+    invoke();
+  } catch (error) {
+    failed = true;
+    if (!String(error.message).includes("configured path does not exist")) throw error;
+  } finally {
+    writeFileSync(configPath, original);
+  }
+  if (!failed) throw new Error(`corrupt configured path unexpectedly passed: ${configPath}`);
+}
+
 function createArtifactCase(name, deployArgs) {
   const caseRoot = join(temp, "cases", name);
   const casePluginRoot = join(caseRoot, "plugin");
@@ -181,6 +280,7 @@ try {
     HOME: home,
     PATH: `${dirname(installedBin)}:${process.env.PATH ?? ""}`,
     LANG: process.env.LANG ?? "C.UTF-8",
+    CLAUDE_PLUGIN_ROOT: artifact,
     NODE_PATH: "",
     VIBEHUB_REPO: repo,
     VIBEHUB_PLUGIN_ROOT: casePluginRoot,
@@ -226,16 +326,23 @@ try {
   const skillPackage=JSON.parse(run("node",[join(casePluginRoot,"skills/scripts/validate-artifact.mjs"),"--package",join(casePluginRoot,"skills")],{cwd:repo,env:skillEnv,capture:true}));
   if(!skillPackage.valid)throw new Error("packaged skill resource graph is invalid");
 
-  const hookOutput = run(installedBin, ["hook", "SessionStart"], {
+  const hookInput = JSON.stringify({
+    session_id: "artifact-session",
     cwd: repo,
-    env: cleanEnv,
-    capture: true,
-    input: JSON.stringify({
-      session_id: "artifact-session",
-      cwd: repo,
-      hook_event_name: "SessionStart",
-    }),
+    hook_event_name: "SessionStart",
   });
+  const runConfiguredHook = () => {
+    const configured = readConfiguredEntrypoints(artifact);
+    assertConfiguredPaths(configured.hooks, artifact);
+    const hookCommand = configured.hooks.find((hook) => hook.eventName === "SessionStart");
+    return run(hookCommand.command, hookCommand.args, {
+      cwd: repo,
+      env: cleanEnv,
+      capture: true,
+      input: hookInput,
+    });
+  };
+  const hookOutput = runConfiguredHook();
   const hook = JSON.parse(hookOutput);
   if (!hook.hookSpecificOutput?.additionalContext?.includes("register_scope")) {
     throw new Error("packaged hook did not emit the VibeHub session protocol");
@@ -256,16 +363,41 @@ try {
     JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }),
     "",
   ].join("\n");
-  const mcpOutput = run(
-    "node",
-    [realpathSync(join(artifact, "packages/mcp/dist/stdio.js"))],
-    { cwd: repo, env: cleanEnv, capture: true, input: mcpInput, timeout: 10_000 },
-  );
+  const runConfiguredMcp = () => {
+    const configured = readConfiguredEntrypoints(artifact);
+    assertConfiguredPaths(configured.mcpServers, artifact);
+    const mcpCommand = configured.mcpServers.find((server) => server.name === "vibehub") ?? configured.mcpServers[0];
+    return run(mcpCommand.command, mcpCommand.args, {
+      cwd: repo,
+      env: cleanEnv,
+      capture: true,
+      input: mcpInput,
+      timeout: 10_000,
+    });
+  };
+  const mcpOutput = runConfiguredMcp();
   const mcpMessages = mcpOutput.split("\n").filter(Boolean).map((line) => JSON.parse(line));
   const toolList = mcpMessages.find((message) => message.id === 2)?.result?.tools;
   if (!Array.isArray(toolList) || !toolList.some((tool) => tool.name === "kb_retrieve")) {
     throw new Error("packaged MCP did not initialize and list deterministic capabilities");
   }
+
+  assertConfiguredPathFailure(
+    join(artifact, "hooks/hooks.json"),
+    (config) => {
+      const command = config.hooks.SessionStart[0].hooks[0];
+      command.args[0] = "${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/missing.js";
+    },
+    runConfiguredHook,
+  );
+  assertConfiguredPathFailure(
+    join(artifact, ".mcp.json"),
+    (config) => {
+      const server = config.mcpServers.vibehub ?? Object.values(config.mcpServers)[0];
+      server.args[0] = "${CLAUDE_PLUGIN_ROOT}/packages/mcp/dist/missing.js";
+    },
+    runConfiguredMcp,
+  );
 
   const syncOutput = run(installedBin, ["team", "sync", "--repo", repo, "--json"], {
     cwd: repo,

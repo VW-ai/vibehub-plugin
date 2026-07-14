@@ -140,7 +140,8 @@ try {
     /invalid method-specific bridge request/,
   );
 
-  const taskId = "branch:main";
+  const taskId = snapshot.tasks.find((task) => task.git?.branch === "main")?.id;
+  assert.ok(taskId, "dogfood snapshot must expose the captured main-branch task");
   const intervention = service.applyIntervention(repoRef, "dogfood-injection", {
     kind: "inject",
     taskId,

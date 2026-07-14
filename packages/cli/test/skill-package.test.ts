@@ -261,6 +261,27 @@ describe("production skill package",()=>{
     expect(gate).toContain("casePluginRoot");
   });
 
+  it("keeps packaging and verification representative of the published subtree",()=>{
+    const gate=fs.readFileSync(path.join(workbench,"scripts/verify-plugin-artifact.mjs"),"utf8");
+    const rootPackage=JSON.parse(fs.readFileSync(path.join(workbench,"package.json"),"utf8")) as {scripts:Record<string,string>};
+    const cliPackage=JSON.parse(fs.readFileSync(path.join(cliRoot,"package.json"),"utf8")) as {scripts:Record<string,string>};
+    const parity=fs.readFileSync(path.join(workbench,"app/tests/parity.spec.ts"),"utf8");
+    const verifyScript=rootPackage.scripts.verify??"";
+
+    expect(fs.existsSync(path.join(workbench,"app/test/assets/reference-screen-v8.html"))).toBe(true);
+    expect(parity).toContain("../test/assets/reference-screen-v8.html");
+    expect(parity).not.toContain("../../../workbench-refs");
+    expect(rootPackage.scripts["verify:e2e:production"]).toContain("test:e2e:production");
+    expect(verifyScript).toContain("verify:e2e:production");
+    expect(verifyScript.indexOf("verify:e2e:production")).toBeLessThan(verifyScript.indexOf("verify:artifact"));
+    expect(cliPackage.scripts.test).toBe("vitest run");
+    expect(gate).toContain('readJson(join(pluginRoot, "hooks/hooks.json"))');
+    expect(gate).toContain('readJson(join(pluginRoot, ".mcp.json"))');
+    expect(gate).toContain("CLAUDE_PLUGIN_ROOT");
+    expect(gate).toContain("assertConfiguredPathFailure");
+    expect(gate).not.toContain('realpathSync(join(artifact, "packages/mcp/dist/stdio.js"))');
+  });
+
   it("captures large dispatcher envelopes, maps errors/signals, and cleans temp files",async()=>{
     type Capture={kind:string;status:number|null;signal:string|null;stdout:string;stderr:string;observedBytes:number;retainedBytes:number;limit:number};
     const {captureCommand}=await import(path.join(skills,"scripts/_capture.mjs")) as {captureCommand:(command:string,args:string[],options:Record<string,unknown>)=>Promise<Capture>};
