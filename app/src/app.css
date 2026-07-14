@@ -34,16 +34,15 @@ svg{vertical-align:-2px}
 .lights i{width:12px;height:12px;border-radius:50%}
 .lights i:nth-child(1){background:#f4635e}.lights i:nth-child(2){background:#f7bd45}.lights i:nth-child(3){background:#43c644}
 .wordmark{font-weight:650;font-size:var(--fs-4);letter-spacing:-.1px}
-.repo{height:24px;display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-700);background:var(--card);border-radius:var(--r-s);padding:0 10px;box-shadow:var(--sh-1);cursor:pointer;transition:box-shadow var(--t-fast) var(--ease)}
-.repo:hover{box-shadow:var(--sh-2)}
+.repo{height:24px;display:flex;align-items:center;gap:6px;font-size:var(--fs-3);color:var(--ink-700);background:var(--card);border-radius:var(--r-s);padding:0 10px;box-shadow:var(--sh-1);cursor:default}
 .repo .branch{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500)}
 .spacer{flex:1}
-.stat{height:22px;display:flex;align-items:center;gap:5px;font-size:var(--fs-2);font-weight:500;padding:0 10px;border-radius:11px;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
+.stat{height:24px;display:flex;align-items:center;gap:5px;font-size:var(--fs-2);font-weight:500;padding:0 10px;border-radius:12px;cursor:pointer;transition:filter var(--t-fast) var(--ease)}
 .stat:hover{filter:brightness(.96)}
 .stat.need{background:var(--need-bg);color:var(--need-ink)}
 .stat.clash{background:var(--clash-bg);color:var(--clash-ink)}
 .stat.alive{background:var(--alive-bg);color:var(--alive-ink)}
-.fresh{display:flex;align-items:center;gap:6px;font-size:var(--fs-2);color:var(--ink-500);cursor:pointer}
+.fresh{display:flex;align-items:center;gap:6px;font-size:var(--fs-2);color:var(--ink-500);cursor:default}
 .fresh .dot{width:6px;height:6px;border-radius:50%;background:var(--alive)}
 /* S4: honest stale dot for never-fetched / offline data (guideline 4) */
 .fresh.stale .dot{background:var(--ink-300)}
@@ -89,6 +88,8 @@ svg{vertical-align:-2px}
 .launch{margin:0 var(--sp-3) var(--sp-3);height:34px;flex:none;border:none;font-family:inherit;border-radius:var(--r-m);background:var(--ink-900);color:#fbfbfa;font-size:var(--fs-3);font-weight:600;letter-spacing:.1px;cursor:pointer;transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),background var(--t-fast) var(--ease);display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
 .launch:hover{background:#26282e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,22,26,.2),0 6px 18px rgba(20,22,26,.18)}
 .launch:active{transform:none;box-shadow:0 1px 2px rgba(20,22,26,.18)}
+.launch:disabled{background:var(--ink-200);color:var(--ink-500);box-shadow:none;cursor:not-allowed;transform:none}
+.launch:disabled:hover{background:var(--ink-200);box-shadow:none;transform:none}
 
 /* rev-1 (Wayne verdict 2026-07-12): resizable rail/canvas split. The divider
    straddles the rail's existing 1px border with negative margins (net 0px of
@@ -103,7 +104,7 @@ svg{vertical-align:-2px}
 .divider::after{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;background:transparent;transition:background var(--t-fast) var(--ease)}
 .divider:hover::after,.divider.dragging::after{background:var(--ink-300);left:2px;width:3px;border-radius:2px}
 .divider:focus-visible{outline:none}
-.divider:focus-visible::after{background:rgba(25,27,31,.35);left:2px;width:3px;border-radius:2px}
+.divider:focus-visible::after{background:var(--read-ink);left:2px;width:3px;border-radius:2px}
 .main.rail-resizing{cursor:col-resize;user-select:none}
 @media (prefers-reduced-motion:reduce){.divider::after{transition:none}}
 
@@ -165,7 +166,7 @@ svg{vertical-align:-2px}
 
 /* S5: keyboard parity — correlate-hover paths reachable without a mouse
    (focus mirrors hover); ring only on :focus-visible so mouse use is clean */
-.task:focus-visible,.terr:focus-visible,.legend span:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.task:focus-visible,.terr:focus-visible,.legend span:focus-visible{outline:2px solid var(--read-ink);outline-offset:2px}
 .task:focus:not(:focus-visible),.terr:focus:not(:focus-visible),.legend span:focus:not(:focus-visible){outline:none}
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -194,7 +195,7 @@ svg{vertical-align:-2px}
 .phead .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
 .phead h2{font-size:var(--fs-4);font-weight:650;letter-spacing:-.1px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help}
 .panel .age{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);flex:none;cursor:help}
-.pclose{flex:none;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border:0;background:none;border-radius:var(--r-s);color:var(--ink-400);cursor:pointer;transition:background var(--t-fast) var(--ease)}
+.pclose{flex:none;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border:0;background:none;border-radius:var(--r-s);color:var(--ink-400);cursor:pointer;transition:background var(--t-fast) var(--ease)}
 .pclose:hover{background:var(--ink-100);color:var(--ink-700)}
 .meta{display:flex;align-items:center;gap:var(--sp-2);margin-top:6px;font-size:var(--fs-2);color:var(--ink-500);min-width:0;overflow:hidden}
 .meta .m{flex:none;cursor:help;white-space:nowrap}
@@ -209,7 +210,7 @@ svg{vertical-align:-2px}
 .tlbar.scrolled{box-shadow:0 1px 2px rgba(20,22,26,.08)}
 .tlbar h4{font-size:var(--fs-1);font-weight:600;letter-spacing:.8px;color:var(--ink-400);text-transform:uppercase}
 .seg{display:flex;background:var(--ink-100);border-radius:var(--r-s);padding:2px}
-.seg button{height:18px;border:0;background:none;border-radius:4px;padding:0 var(--sp-2);font-size:var(--fs-1);font-weight:600;color:var(--ink-500);cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.seg button{height:24px;border:0;background:none;border-radius:4px;padding:0 var(--sp-2);font-size:var(--fs-1);font-weight:600;color:var(--ink-500);cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .seg button.on{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1)}
 .tl{flex:1;min-height:0;overflow:auto;padding:var(--sp-2) var(--sp-4) var(--sp-3)}
 .tl::-webkit-scrollbar,.tail::-webkit-scrollbar{width:8px}
@@ -238,7 +239,7 @@ svg{vertical-align:-2px}
 .ev.cross .dot{background:#fff;box-shadow:inset 0 0 0 1.5px rgba(90,127,184,.5)}
 .ev .body .mono{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500)}
 /* collapsed file-change entry */
-.filestoggle{border:0;background:none;padding:0;font-size:var(--fs-3);color:var(--ink-700);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.filestoggle{min-height:24px;border:0;background:none;padding:0;font-size:var(--fs-3);color:var(--ink-700);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
 .filestoggle:hover{color:var(--ink-900)}
 .filestoggle .car{transition:transform var(--t-fast) var(--ease);color:var(--ink-400)}
 .files{display:none;margin-top:5px;font-family:var(--mono);font-size:var(--fs-1);line-height:1.9;color:var(--ink-500)}
@@ -252,7 +253,7 @@ svg{vertical-align:-2px}
 /* ── section 3: intervention deck (pinned; never scrolls away) ── */
 .deck{flex:none;border-top:1px solid var(--ink-150);background:rgba(252,252,251,.8);padding:var(--sp-3) var(--sp-4) var(--sp-4)}
 .modes{display:flex;width:fit-content;background:var(--ink-100);border-radius:var(--r-s);padding:2px;margin-bottom:var(--sp-2)}
-.modes button{height:20px;border:0;background:none;border-radius:4px;padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:600;color:var(--ink-500);cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.modes button{min-height:24px;border:0;background:none;border-radius:4px;padding:0 var(--sp-2);font-size:var(--fs-2);font-weight:600;color:var(--ink-500);cursor:pointer;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
 .modes button.on{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1)}
 .deck textarea{width:100%;height:52px;max-height:124px;resize:none;border:0;border-radius:var(--r-s);background:var(--card);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-150);padding:var(--sp-2) var(--sp-2);font-family:inherit;font-size:var(--fs-3);line-height:1.5;color:var(--ink-900);transition:box-shadow var(--t-fast) var(--ease)}
 .deck textarea::placeholder{color:var(--ink-400)}
@@ -266,11 +267,8 @@ svg{vertical-align:-2px}
 .actions .quiet:hover{box-shadow:var(--sh-2)}
 .actions .quiet.on{color:var(--ink-900);box-shadow:var(--sh-1),inset 0 0 0 1px var(--ink-300)}
 .actions .gap{flex:1}
-.actions .term{background:none;color:var(--need-ink);box-shadow:none;font-weight:500;font-size:var(--fs-2)}
-.actions .term:hover{background:var(--need-bg)}
-
 /* keyboard parity on panel affordances (same rule as the map's) */
-.pclose:focus-visible,.filestoggle:focus-visible,.seg button:focus-visible,.modes button:focus-visible,.actions button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.pclose:focus-visible,.snapshot-switch:focus-visible,.filestoggle:focus-visible,.seg button:focus-visible,.modes button:focus-visible,.actions button:focus-visible{outline:2px solid var(--read-ink);outline-offset:2px}
 
 /* ════════════════════════════════════════════════════════════════════════
    conflict-card (m3, S4) — ported from static/conflict-card-s2.html, the
@@ -413,7 +411,7 @@ svg{vertical-align:-2px}
 .split.open .car{transform:rotate(-90deg)}
 
 /* conflict-card openers get the app's keyboard-parity ring */
-.side:focus-visible,.stat:focus-visible,.sub:focus-visible,.task .pill:focus-visible,.symtoggle:focus-visible,.prov button:focus-visible,.diag-empty button:focus-visible,.pmenu button:focus-visible,.fdbk .quiet:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.side:focus-visible,.stat:focus-visible,.sub:focus-visible,.task .pill:focus-visible,.symtoggle:focus-visible,.prov button:focus-visible,.diag-empty button:focus-visible,.pmenu button:focus-visible,.fdbk .quiet:focus-visible{outline:2px solid var(--read-ink);outline-offset:2px}
 .side:focus:not(:focus-visible),.stat:focus:not(:focus-visible),.sub:focus:not(:focus-visible),.task .pill:focus:not(:focus-visible){outline:none}
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -519,7 +517,7 @@ svg{vertical-align:-2px}
 .first-run.enter .repo,.first-run.enter .fresh,.first-run.enter .stat,.first-run.enter .tasks,.first-run.enter .launch,.first-run.enter .terr{animation:chromeIn var(--t-base) var(--ease) backwards}
 
 /* first-run keyboard parity: same system ring as everywhere else */
-.cta:focus-visible,.retry:focus-visible,.mapbtn:focus-visible,.mapstat:focus-visible,.fp-chip:focus-visible,.fp:focus-visible,.fp-pop .row:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.cta:focus-visible,.retry:focus-visible,.mapbtn:focus-visible,.mapstat:focus-visible,.fp-chip:focus-visible,.fp:focus-visible,.fp-pop .row:focus-visible{outline:2px solid var(--read-ink);outline-offset:2px}
 .cta:focus:not(:focus-visible),.retry:focus:not(:focus-visible),.mapbtn:focus:not(:focus-visible),.mapstat:focus:not(:focus-visible),.fp-chip:focus:not(:focus-visible),.fp:focus:not(:focus-visible),.fp-pop .row:focus:not(:focus-visible){outline:none}
 
 /* motion honesty: breathing pill is the ONLY persistent animation; respect OS */
@@ -543,7 +541,7 @@ svg{vertical-align:-2px}
     radial-gradient(900px 560px at 84% -12%, rgba(255,255,255,.5), transparent 58%),
     linear-gradient(158deg,#c8cdd0 0%,#b8c2c6 46%,#a9b6ba 100%)}
 .mbdesk button{font-family:inherit}
-.mbdesk button:focus-visible{outline:2px solid rgba(25,27,31,.35);outline-offset:1px}
+.mbdesk button:focus-visible{outline:2px solid var(--read-ink);outline-offset:2px}
 .mbdesk button:focus:not(:focus-visible){outline:none}
 
 /* menubar strip: system-ish, generic shapes only */

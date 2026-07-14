@@ -69,7 +69,7 @@ export function InterventionDeck({ state, tailShown, onToggleTail, onSend }: Int
         <button
           type="button"
           className={mode === "pause" ? "on" : ""}
-          data-tip="Stop the agent first, then talk it through — it stays stopped until you press Resume"
+          data-tip="Queue a pause request for the agent's next hook boundary; pickup is recorded separately"
           onClick={() => setMode("pause")}
         >
           Pause &amp; think together
@@ -102,39 +102,6 @@ export function InterventionDeck({ state, tailShown, onToggleTail, onSend }: Int
           onClick={onToggleTail}
         >
           View transcript
-        </button>
-        <button
-          type="button"
-          className="quiet"
-          disabled
-          data-tip="Resume without answering — the agent will decide on its own and note that you passed"
-        >
-          Resume
-        </button>
-        <button
-          type="button"
-          className="quiet"
-          disabled
-          data-tip="Diagnosis generation is unsupported until external-model use is separately approved."
-        >
-          AI diagnosis
-        </button>
-        <button
-          type="button"
-          className="quiet"
-          disabled
-          data-tip="Accept the work as done: closes the task and hands the branch to your normal PR flow"
-        >
-          Mark done
-        </button>
-        <span className="gap" />
-        <button
-          type="button"
-          className="term"
-          disabled
-          data-tip="End the session. The branch and worktree stay on disk — nothing is deleted, you just stop paying attention to it."
-        >
-          Terminate
         </button>
       </div>
       {error && <p className="stubnote" role="alert">{error}</p>}

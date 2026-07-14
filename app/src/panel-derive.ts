@@ -225,9 +225,9 @@ export type DeckMode = "inject" | "pause";
 /** Placeholder narrates the contract of the selected mode (S2 behavior). */
 export function deckPlaceholder(state: TaskState, mode: DeckMode): string {
   if (mode === "pause")
-    return "It will stop first, then take your thoughts one by one — until you press Resume…";
+    return "Queue a pause request with your thoughts — a hook can claim it at the next turn boundary…";
   return state === "waiting"
-    ? "Answer its question, or give a new instruction — it is parked, so this lands immediately…"
+    ? "Answer its question, or give a new instruction — queue it for the next hook or turn boundary…"
     : "Give a new instruction — it folds in at the agent's next turn boundary…";
 }
 

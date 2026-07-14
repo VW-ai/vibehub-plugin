@@ -371,9 +371,19 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
           )}
         </section>
 
-        {/* zone b: AI diagnosis */}
+        {/* zone b: recorded diagnosis evidence. The fixture harness retains
+            its preview-only generation stub; production has no generation
+            bridge and therefore renders no actionable promise. */}
         <section className="diag">
-          <h4 data-tip={DIAG_H4_TIP}>AI diagnosis</h4>
+          <h4
+            data-tip={
+              onApply
+                ? "A previously recorded diagnosis, when available. This production surface cannot generate or refresh one."
+                : DIAG_H4_TIP
+            }
+          >
+            {onApply ? "Recorded diagnosis" : "AI diagnosis"}
+          </h4>
           {snapshot.diagnosis && prov ? (
             <>
               <div className="verdict">
@@ -403,15 +413,16 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
                     {prov.edits.text}
                   </span>
                 )}
-                <button
-                  type="button"
-                  disabled={Boolean(onApply)}
-                  data-tip={onApply ? "Diagnosis generation is unsupported until external-model use is separately approved." : prov.rerunTip}
-                  aria-pressed={stubNote}
-                  onClick={() => setStubNote((v) => !v)}
-                >
-                  Re-run
-                </button>
+                {!onApply && (
+                  <button
+                    type="button"
+                    data-tip={prov.rerunTip}
+                    aria-pressed={stubNote}
+                    onClick={() => setStubNote((v) => !v)}
+                  >
+                    Re-run
+                  </button>
+                )}
               </div>
               {stubNote && (
                 <p className="stubnote" data-tip={PREVIEW_TIP}>
@@ -422,25 +433,33 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
           ) : (
             // true empty state → dashed placeholder is sanctioned here
             <div className="diag-empty">
-              <p>{DIAG_EMPTY.p}</p>
-              <p className="cap">
-                {DIAG_EMPTY.capBefore}
-                <i>{DIAG_EMPTY.capEm}</i>
-                {DIAG_EMPTY.capAfter}
-              </p>
-              <button
-                type="button"
-                disabled={Boolean(onApply)}
-                data-tip={onApply ? "Diagnosis generation is unsupported until external-model use is separately approved." : DIAG_EMPTY.buttonTip}
-                aria-pressed={stubNote}
-                onClick={() => setStubNote((v) => !v)}
-              >
-                {DIAG_EMPTY.button}
-              </button>
-              {stubNote && (
-                <p className="stubnote" data-tip={PREVIEW_TIP}>
-                  {codeSpans(RUN_STUB)}
-                </p>
+              {onApply ? (
+                <>
+                  <p>No recorded diagnosis is available for this conflict.</p>
+                  <p className="cap">The static symbol evidence above remains available.</p>
+                </>
+              ) : (
+                <>
+                  <p>{DIAG_EMPTY.p}</p>
+                  <p className="cap">
+                    {DIAG_EMPTY.capBefore}
+                    <i>{DIAG_EMPTY.capEm}</i>
+                    {DIAG_EMPTY.capAfter}
+                  </p>
+                  <button
+                    type="button"
+                    data-tip={DIAG_EMPTY.buttonTip}
+                    aria-pressed={stubNote}
+                    onClick={() => setStubNote((v) => !v)}
+                  >
+                    {DIAG_EMPTY.button}
+                  </button>
+                  {stubNote && (
+                    <p className="stubnote" data-tip={PREVIEW_TIP}>
+                      {codeSpans(RUN_STUB)}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           )}

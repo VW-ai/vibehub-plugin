@@ -389,7 +389,7 @@ export const INJECT_TIP =
   "Queues this note to both tasks at their next turn boundary. Nothing is paused, nothing is interrupted.";
 
 export const PAUSE_TRIGGER_TIP =
-  "Park one task in a waiting state until you resume it — the other side continues. Pick which below.";
+  "Queue a pause request for one task at its next hook boundary. Pick which below.";
 
 export interface PauseRowView {
   task: Task;
@@ -411,10 +411,10 @@ export function pauseRows(f: ConflictCardSnapshot): PauseRowView[] {
       st: `${task.state} ${age}`,
       noop,
       tip: noop
-        ? `Already parked — it stopped to ask you a question at ${clockTime(
+        ? `Already waiting after asking you a question at ${clockTime(
             task.stateSince,
-          )}. Pausing a waiting task is a no-op.`
-        : `Parks ‘${task.title}’ at its next turn boundary. Resume anytime from its panel.`,
+          )}. Another pause request would be a no-op.`
+        : `Queues a pause request for ‘${task.title}’ at its next hook boundary; pickup is recorded separately.`,
     };
   });
 }
@@ -463,23 +463,23 @@ export function injectFeedback(note: string): FeedbackView {
     pill: "SENT",
     kind: "done",
     text: defaulted
-      ? "The Suggested line above is queued to both tasks, marked as AI-suggested — delivered at their next turn boundary."
-      : "Coordination note queued to both tasks — delivered at their next turn boundary. Neither side is interrupted.",
+      ? "The Suggested line above is queued to both tasks, marked as AI-suggested. Hook pickup and delivery remain separate later facts."
+      : "Coordination note queued to both tasks. Hook pickup and delivery remain separate later facts; neither side is interrupted.",
     tip: defaulted
-      ? "Empty note ⇒ the diagnosis’s Suggested line was sent verbatim, labeled as AI-suggested (never as your words)."
-      : "Both agents receive the same note when they next yield — nothing is paused, nothing is interrupted.",
+      ? "Empty note ⇒ the diagnosis’s Suggested line is queued verbatim, labeled as AI-suggested (never as your words)."
+      : "Both queue rows carry the same note; later hook evidence determines pickup — nothing is paused or interrupted.",
   };
 }
 
 export function pauseFeedback(f: ConflictCardSnapshot, task: Task): FeedbackView {
   const other = f.tasks.find((t) => t.id !== task.id);
   return {
-    pill: "PAUSING",
+    pill: "REQUESTED",
     kind: "idle",
-    text: `‘${task.title}’ will park at its next turn boundary — resume anytime from its panel.${
-      other ? ` ‘${other.title}’ keeps running.` : ""
+    text: `Pause requested for ‘${task.title}’ at its next hook boundary; pickup is not yet proven.${
+      other ? ` No pause was requested for ‘${other.title}’.` : ""
     }`,
-    tip: "Pause lands at the agent’s next yield, never mid-tool-call. The parked task holds its branch and worktree.",
+    tip: "This receipt records a queued boundary request, not a stopped process or completed delivery.",
   };
 }
 

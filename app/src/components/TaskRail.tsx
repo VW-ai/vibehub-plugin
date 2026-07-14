@@ -49,7 +49,7 @@ export function TaskRail({
         {groups.length === 0 ? (
           // N=0 rung: honest empty rail — no fake cards, just the truth.
           <div className="rail-empty">
-            No tasks yet. Start one below — it runs on its own branch.
+            No tasks yet. Task launch is unavailable in this build.
           </div>
         ) : (
           groups.map((g) => (
@@ -77,10 +77,11 @@ export function TaskRail({
       <button
         className="launch"
         type="button"
-        data-tip="Assemble context and launch a Claude Code session on a new branch"
+        disabled
+        data-tip="Unavailable until the Workbench bridge provides a task-launch contract"
       >
         <LaunchIcon />
-        Start a task
+        Start a task — unavailable
       </button>
     </aside>
   );

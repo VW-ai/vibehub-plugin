@@ -26,6 +26,7 @@ dogfood 闭环;Tauri/downloadable packaging 不作为前置条件。
 - [decision-workbench-011] **Headless runtime 是独立产品**:plugin+hooks+skills+MCP+CLI/core 自带 SQLite init 与完整 context 自循环;App 是可选 reader/intervention client;filesystem 仅 export;先保持 workbench subtree-ready,真实 dogfood 后再物理拆 repo(active,2026-07-12 Wayne 裁决)
 - [decision-workbench-012] **DB-native skill intelligence**:skills 管语义与渐进 workflow,hooks=when,MCP/CLI/core 经版本化 contracts+共享 dispatcher 管确定性 integrity;canonical promotion guarded/reviewed,distillation 机器 validate/finalize immutable candidate 后再 human review→CAS activation;unresolved 诚实保留,App/Tauri 非 engine gate(active,2026-07-13 forward-test 收口)
 - [decision-workbench-013] **Context-to-action workflow authority**:VibeHub 是 Claude Code/Codex 内的 context-to-action layer,不是开发中台;Task=独立 outcome,Run 承载 context/code authority,context-only 无 worktree、code-write Task 才 claim writer worktree;mechanical Run 可 append evidence/log/finding 但不可重定义 semantic truth;skill 判断 transition,hooks/MCP/core 触发并机械执行(active,2026-07-13 Wayne 批准;完整设计见 design-context-to-action-workflow.md)
+- [decision-workbench-014] **Workbench design authority = v8 spatial-workbench**:`workbench/app/**` 保留紧凑 cool-neutral/system-type/territory-map 语言;根 DESIGN.md 的 editorial/Fraunces/warm-cream/forest-only 方向不适用于该边界;accessibility、reduced-motion、production coverage 与诚实 affordance/copy 仍为硬约束(active,2026-07-14 Wayne 视觉对照后裁决)
 
 ## Changes
 

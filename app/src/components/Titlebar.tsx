@@ -42,7 +42,7 @@ export function Titlebar({
         <i />
       </div>
       <div className="wordmark">Vibehub</div>
-      <div className="repo" data-tip="Switch repository · one window per repo">
+      <div className="repo" data-tip="Repository shown in this window">
         <RepoIcon />
         {snapshot.repo.slug}{" "}
         <span className="branch">
@@ -79,7 +79,14 @@ export function Titlebar({
           </div>
         );
       })}
-      <div className={`fresh${fresh.stale ? " stale" : ""}`} data-tip={fresh.tip}>
+      <div
+        className={`fresh${fresh.stale ? " stale" : ""}`}
+        data-tip={
+          fresh.stale
+            ? `Last known repository freshness: ${fresh.text}`
+            : `Repository freshness: ${fresh.text}`
+        }
+      >
         <span className="dot" />
         {fresh.text}
       </div>

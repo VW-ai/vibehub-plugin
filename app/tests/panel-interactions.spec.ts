@@ -274,17 +274,17 @@ test("mode toggle switches the placeholder narration", async ({ page }) => {
   const inject = page.locator(".modes button", { hasText: "Inject without interrupting" });
   const pause = page.locator(".modes button", { hasText: "Pause & think together" });
   await expect(inject).toHaveClass(/on/);
-  // waiting task + inject mode: delivery is immediate (the agent is parked)
+  // waiting task + inject mode: queue acceptance is immediate; pickup is not.
   await expect(box).toHaveAttribute(
     "placeholder",
-    "Answer its question, or give a new instruction — it is parked, so this lands immediately…",
+    "Answer its question, or give a new instruction — queue it for the next hook or turn boundary…",
   );
   await pause.click();
   await expect(pause).toHaveClass(/on/);
   await expect(inject).not.toHaveClass(/on/);
   await expect(box).toHaveAttribute(
     "placeholder",
-    "It will stop first, then take your thoughts one by one — until you press Resume…",
+    "Queue a pause request with your thoughts — a hook can claim it at the next turn boundary…",
   );
   await inject.click();
   await expect(inject).toHaveClass(/on/);
@@ -307,10 +307,11 @@ test.describe("panel tooltips", () => {
   test("deck anchors carry real contracts, not lorem", async ({ page }) => {
     await openAuthPanel(page);
     const tip = page.locator("#tip");
-    await page.locator(".actions .term").hover();
+    await page.locator(".actions .quiet", { hasText: "View transcript" }).hover();
     await page.waitForTimeout(500);
     await expect(tip).toHaveClass(/on/);
-    await expect(tip).toContainText("The branch and worktree stay on disk");
+    await expect(tip).toContainText("Open the read-only transcript tail");
+    await expect(tip).toContainText("raw session feed behind this timeline");
     await page.locator(".seg button", { hasText: "Milestones" }).hover();
     await page.waitForTimeout(500);
     await expect(tip).toContainText("Milestones only");
@@ -433,15 +434,20 @@ test.describe("panel geometry (no overlap / no clipping)", () => {
       // deck pinned to the panel's bottom edge (padding is part of .deck)
       const deck = (await page.locator(".deck").boundingBox())!;
       expect(Math.abs(deck.y + deck.height - (panel.y + panel.height))).toBeLessThanOrEqual(1);
-      // the action row fits: every button fully inside the panel, and
-      // Terminate stays isolated from the main cluster (S2 rule: gap > 24px)
-      for (const btn of await page.locator(".actions button").all()) {
+      // The supported action row fits without relying on the removed
+      // mark-done/terminate affordances. Send + transcript are the complete
+      // action surface until bridge contracts exist for anything else.
+      const actions = page.locator(".actions button");
+      await expect(actions).toHaveCount(2);
+      await expect(actions.nth(0)).toHaveText("Send");
+      await expect(actions.nth(1)).toHaveText("View transcript");
+      for (const btn of await actions.all()) {
         const b = (await btn.boundingBox())!;
         expect(inside(b, panel)).toBe(true);
       }
-      const done = (await page.locator(".actions .quiet", { hasText: "Mark done" }).boundingBox())!;
-      const term = (await page.locator(".actions .term").boundingBox())!;
-      expect(term.x - (done.x + done.width)).toBeGreaterThan(24);
+      await expect(
+        page.locator(".actions button", { hasText: /Mark done|Terminate/ }),
+      ).toHaveCount(0);
     });
   }
 });

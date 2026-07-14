@@ -1,0 +1,55 @@
+spec_id: "decision-workbench-014"
+type: decision
+state: active
+intent:
+  summary: "Workbench 的设计权威是已批准的 v8 spatial-workbench 语言；根 DESIGN.md 的 editorial/Fraunces/暖奶油/forest 方向不适用于 workbench/app/**"
+  detail: |
+    Wayne 2026-07-14 在 B5 audit-fix 视觉对照后明确选择 v8，并说明个人反对
+    editorial 方向。该裁决不是临时保留旧样式，而是 Workbench 的正式设计
+    authority：它是紧凑、冷静、macOS-like 的空间协作/态势工具，依赖 territory
+    canvas、live rail、微型 system typography、cool neutrals、状态色、克制但可见的
+    elevation，以及 v8 已验证的 6/10/16px shape vocabulary。
+
+    根 `DESIGN.md` 仍可约束其他产品表面，直至另有项目级设计裁决；但其中
+    editorial-technical、Fraunces、warm cream、forest-only accent、无 entrance motion
+    等要求不得再被用于判定 `workbench/app/**` 不合规。`DESIGN.md` 必须显式指向
+    本 scoped authority，避免后续审计反复制造同一冲突。
+
+    保留 v8 不等于冻结缺陷。Workbench 仍必须：
+    - 不展示没有 bridge/capability 支持的可操作承诺；
+    - 对 queue/claim/emission 使用诚实文案，不承诺 pause 已停止或可 Resume；
+    - 保持 keyboard focus、真实 production entry、reduced-motion 和可读对比度；
+    - 视觉变化继续以 v8 parity 与 production behavior tests 为证据。
+constraints:
+  - kind: must
+    rule: "workbench/app/** 必须以已批准 v8 spatial-workbench baseline 为设计权威，保留其空间 map、live rail、紧凑 system typography、cool-neutral surface、状态色与 shape vocabulary"
+  - kind: must_not
+    rule: "不得把根 DESIGN.md 的 editorial/Fraunces/warm-cream/forest-only 方向迁移进 Workbench，或以该方向把 v8 视觉判为缺陷"
+  - kind: must
+    rule: "保留 v8 时仍必须满足 keyboard focus、可读对比度、prefers-reduced-motion、真实 production-path coverage 与诚实 affordance/copy"
+  - kind: must_not
+    rule: "UI 不得承诺未实现的 repository switching、task launch、Resume、terminate、mark-done 或已停止/已送达状态"
+  - kind: should
+    rule: "任何后续 Workbench 视觉变更应先证明不破坏 v8 parity、空间密度和 production controller 行为"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench-design"
+  tags: [v8, spatial-workbench, design-authority, non-editorial, honesty, accessibility]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne B5 design authority decision — 2026-07-14"
+  produced_at: "2026-07-14"
+relations:
+  - target: "decision-workbench-003"
+    type: extends
+    detail: "将 subject-first 状态语言置于正式 v8 visual authority 内"
+  - target: "decision-workbench-011"
+    type: refines
+    detail: "App 仍是 optional surface，但其视觉 authority 独立于 headless runtime"
+anchors:
+  - file: "workbench/app/src/tokens.css"
+  - file: "workbench/app/src/app.css"
+  - file: "DESIGN.md"

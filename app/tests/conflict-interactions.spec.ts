@@ -6,9 +6,9 @@ import { BASE } from "./env";
  *   1. every conflict fixture × every zone state renders (matrix, one
  *      expectation row per fixture — zone a grade/symbols, zone b
  *      done/empty/fresh/stale, zone c placeholder/menu/noop);
- *   2. adjudication actions produce their demo-stub feedback states
- *      (optimistic UI: SENT / PAUSING / IGNORED band with the honest
- *      "demo — no live session" disclosure), keyboard-reachable;
+ *   2. adjudication actions produce their preview feedback states
+ *      (optimistic UI: SENT / REQUESTED / IGNORED band with the honest
+ *      "preview — no live session" disclosure), keyboard-reachable;
  *   3. ignore-pair goes through one modest INLINE confirm (permanence
  *      gate — never a browser dialog); Escape priority: pause menu →
  *      ignore confirm → card;
@@ -195,7 +195,7 @@ test("conflict card gets the canvas-only scrim; the same pill toggles it closed"
   await expect(pill).toBeFocused(); // focus-return rules unchanged
 });
 
-/* ── 2. inject feedback (demo stub, keyboard-driven end to end) ───────── */
+/* ── 2. inject feedback (preview stub, keyboard-driven end to end) ──────── */
 
 test("inject with a typed note → SENT feedback, keyboard-reachable, close returns focus to the opener", async ({ page }) => {
   await openRedViaPill(page);
@@ -215,10 +215,11 @@ test("inject with a typed note → SENT feedback, keyboard-reachable, close retu
   await expect(page.locator(".cfoot textarea")).toHaveCount(0);
   await expect(page.locator(".actions")).toHaveCount(0);
 
-  // honesty disclosure: visible mono "demo" marker with the no-live-session tip
-  const demo = band.locator(".preview");
-  await expect(demo).toHaveText("demo");
-  await expect(demo).toHaveAttribute("data-tip", /no live session received this/);
+  // honesty disclosure: current v8 uses the visible mono "preview" marker;
+  // the tooltip carries the stronger no-live-session qualification.
+  const preview = band.locator(".preview");
+  await expect(preview).toHaveText("preview");
+  await expect(preview).toHaveAttribute("data-tip", /no live session received this/);
 
   // evidence zones stay readable behind the decision
   await expect(page.locator(".grade")).toBeVisible();
@@ -270,7 +271,7 @@ test("inject with an EMPTY note and NO diagnosis → nothing sent, the note fiel
 
 /* ── 3. pause feedback ────────────────────────────────────────────────── */
 
-test("pausing the running side (keyboard through the menu) → PAUSING feedback naming both sides", async ({ page }) => {
+test("pausing the running side (keyboard through the menu) → REQUESTED feedback naming both sides", async ({ page }) => {
   await openViaParam(page, "yellow-stale");
 
   // keyboard: Enter opens the menu, Tab reaches the first row, Enter picks it
@@ -284,11 +285,10 @@ test("pausing the running side (keyboard through the menu) → PAUSING feedback 
   const band = page.locator(".fdbk");
   await expect(band).toBeVisible();
   await expect(band).toHaveAttribute("data-kind", "pause_side");
-  await expect(band.locator(".pill")).toHaveText("PAUSING");
-  // names the parked side, promises the boundary, and says the other side
-  // keeps running — nothing is claimed to have already stopped
-  await expect(band.locator("p")).toContainText("will park at its next turn boundary");
-  await expect(band.locator("p")).toContainText("keeps running");
+  await expect(band.locator(".pill")).toHaveText("REQUESTED");
+  // names the requested side and boundary while withholding pickup/delivery.
+  await expect(band.locator("p")).toContainText("next hook boundary");
+  await expect(band.locator("p")).toContainText("pickup is not yet proven");
   await expect(band.locator(".preview")).toBeVisible();
   await expect(page.locator(".pmenu")).toHaveCount(0);
 });
@@ -340,8 +340,11 @@ test("confirming ignore → IGNORED feedback scoped to THIS pair; evidence stays
   await expect(band).toBeVisible();
   await expect(band).toHaveAttribute("data-kind", "ignore_pair");
   await expect(band.locator(".pill")).toHaveText("IGNORED");
-  await expect(band.locator("p")).toContainText("Order state machine");
-  await expect(band.locator("p")).toContainText("Any other overlap still will");
+  await expect(band.locator("p")).toContainText("This task/branch pair is silenced");
+  await expect(band.locator("p")).toContainText(
+    "equivalent conflicts between these two sides won’t surface again",
+  );
+  await expect(band.locator(".preview")).toHaveText("preview");
   await expect(band.locator(".preview")).toHaveAttribute("data-tip", /no live session/);
   // the card stays open — the user can still read what they just silenced
   await expect(page.locator(".modal")).toBeVisible();
@@ -363,7 +366,7 @@ test("one open decision at a time: pause menu and ignore confirm displace each o
 
 /* ── 5. run / re-run diagnosis stub (no fake progress) ────────────────── */
 
-test("Re-run toggles an honest demo note — no fake progress, verdict untouched", async ({ page }) => {
+test("Re-run toggles an honest preview note — no fake progress, verdict untouched", async ({ page }) => {
   await openViaParam(page, "yellow-stale");
   const rerun = page.locator(".prov button");
   const verdictBefore = await page.locator(".verdict b").first().textContent();
