@@ -189,6 +189,33 @@ describe("ingestHookEvent on a scratch repo", () => {
     });
   });
 
+  it("reads Stop transcript text before entering the immediate write transaction", () => {
+    const transcript = path.join(dir, "stop.jsonl");
+    fs.writeFileSync(transcript, JSON.stringify({
+      type: "assistant",
+      message: { role: "assistant", content: "Read outside the write lock." },
+    }) + "\n");
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const originalOpen = fs.openSync;
+    let observedTransaction = true;
+    const open = ((...args: Parameters<typeof fs.openSync>) => {
+      observedTransaction = db.inTransaction;
+      return originalOpen(...args);
+    }) as typeof fs.openSync;
+    fs.openSync = open;
+    try {
+      ingestHookEvent(db, "Stop", payload({ transcript_path: transcript }), {
+        now: () => T(1),
+      });
+    } finally {
+      fs.openSync = originalOpen;
+    }
+    expect(observedTransaction).toBe(false);
+    expect(readTimeline(db, taskBranch).find((e) => e.type === "self_report")).toMatchObject({
+      text: "Read outside the write lock.",
+    });
+  });
+
   it("records failure detail without fabricating a state transition", () => {
     ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
     const result = ingestHookEvent(
@@ -237,6 +264,107 @@ describe("ingestHookEvent on a scratch repo", () => {
       tool_input: { file_path: path.join(repo.work, "src/a.ts") },
     }), { now: () => T(3) });
     expect(r2.output).toBeUndefined();
+  });
+
+  it("resolves relative tool paths from payload cwd before enforcing the session boundary", () => {
+    const nested = path.join(repo.work, "src", "nested");
+    fs.mkdirSync(nested, { recursive: true });
+    ingestHookEvent(db, "SessionStart", payload({ cwd: nested }), { now: () => T(0) });
+
+    ingestHookEvent(db, "PostToolUse", payload({
+      cwd: nested,
+      tool_name: "Edit",
+      tool_input: { file_path: "local.ts" },
+    }), { now: () => T(1) });
+    ingestHookEvent(db, "PostToolUse", payload({
+      cwd: nested,
+      tool_name: "Read",
+      tool_input: { file_path: "../shared.ts" },
+    }), { now: () => T(2) });
+
+    expect(readFootprints(db, taskBranch)).toMatchObject([
+      { path: "src/nested/local.ts", action: "edit" },
+      { path: "src/shared.ts", action: "read" },
+    ]);
+    expect(() => ingestHookEvent(db, "PostToolUse", payload({
+      cwd: nested,
+      tool_name: "Edit",
+      tool_input: { file_path: "../../../outside.ts" },
+    }), { now: () => T(3) })).toThrow(/repo-relative|outside/);
+    expect(readFootprints(db, taskBranch)).toHaveLength(2);
+  });
+
+  it("rolls back claim and all hook writes after a deterministic post-claim DB failure", () => {
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    db.prepare(`UPDATE tasks SET state = 'waiting', state_since = ? WHERE id = ?`)
+      .run(T(0).toISOString(), taskBranch);
+    replaceScopePatterns(db, repoId, taskBranch, "auth", [
+      { mode: "write", glob: "src/auth/**" },
+    ]);
+    enqueueInjection(
+      db,
+      repoId,
+      taskBranch,
+      "inject",
+      "Preserve this message.",
+      T(1).toISOString(),
+    );
+    db.exec(`CREATE TRIGGER fail_hook_delivery
+      BEFORE INSERT ON events WHEN NEW.type = 'user_injection'
+      BEGIN SELECT RAISE(FAIL, 'forced post-claim hook failure'); END`);
+
+    expect(() =>
+      ingestHookEvent(
+        db,
+        "PostToolUse",
+        payload({
+          session_id: "sess-failing",
+          tool_name: "Edit",
+          tool_input: { file_path: "src/outside-scope.ts" },
+        }),
+        { now: () => T(2) },
+      ),
+    ).toThrow(/forced post-claim hook failure/);
+    // The waiting→running transition is inserted before delivery, so this
+    // proves an already-successful event write was rolled back too.
+    expect(readTimeline(db, taskBranch)).toEqual([]);
+    expect(readFootprints(db, taskBranch)).toEqual([]);
+    expect(readTask(db, taskBranch)?.lastEventAt).toBe(T(0).toISOString());
+    expect(readTask(db, taskBranch)?.state).toBe("waiting");
+    expect(db.prepare(`SELECT COUNT(*) AS n FROM sessions WHERE id = 'sess-failing'`).get())
+      .toEqual({ n: 0 });
+    expect(db.prepare(`SELECT reminded_at FROM scope_patterns WHERE task_id = ?`).all(taskBranch))
+      .toEqual([{ reminded_at: null }]);
+    expect(pendingInjections(db, taskBranch)).toMatchObject([
+      { mode: "inject", text: "Preserve this message." },
+    ]);
+
+    db.exec(`DROP TRIGGER fail_hook_delivery`);
+    const valid = ingestHookEvent(
+      db,
+      "PostToolUse",
+      payload({
+        session_id: "sess-failing",
+        tool_name: "Edit",
+        tool_input: { file_path: "src/outside-scope.ts" },
+      }),
+      { now: () => T(3) },
+    );
+    expect(valid.output?.hookSpecificOutput?.additionalContext).toContain(
+      "Preserve this message.",
+    );
+    expect(
+      readTimeline(db, taskBranch).filter((event) => event.type === "user_injection"),
+    ).toHaveLength(1);
+    expect(readFootprints(db, taskBranch)).toMatchObject([
+      { sessionId: "sess-failing", path: "src/outside-scope.ts", action: "edit" },
+    ]);
+    expect(db.prepare(`SELECT COUNT(*) AS n FROM sessions WHERE id = 'sess-failing'`).get())
+      .toEqual({ n: 1 });
+    expect(db.prepare(`SELECT reminded_at FROM scope_patterns WHERE task_id = ?`).all(taskBranch))
+      .toEqual([{ reminded_at: T(3).toISOString() }]);
+    expect(pendingInjections(db, taskBranch)).toEqual([]);
   });
 
   it("carries the panel locus into the delivery wrapper", () => {

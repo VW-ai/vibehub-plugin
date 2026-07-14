@@ -15,6 +15,7 @@
  */
 import fs from "node:fs";
 import crypto from "node:crypto";
+import path from "node:path";
 import type {
   StateTransitionEvent,
   TimelineEvent,
@@ -37,7 +38,10 @@ import type { Db } from "./db.js";
 import { GitFacade } from "./git-facade.js";
 import { nextState, type HookEventName } from "./state-machine.js";
 import { getRepoByRoot, upsertRepo } from "./team-store.js";
-import { claimOffScopeReminder } from "./scope-registry.js";
+import {
+  canonicalRepoPath,
+  claimOffScopeReminder,
+} from "./scope-registry.js";
 
 /** The fields Claude Code sends every hook (plus event-specific extras). */
 export interface HookPayload {
@@ -156,33 +160,66 @@ export function ingestHookEvent(
   // use). Branch/toplevel come from the SESSION's cwd (a worktree has its
   // own HEAD); repoRoot is the shared domain (decision-github-004).
   const ctx = GitFacade.sessionContextAt(payload.cwd);
+  const validatedToolPath = validatedPostToolPath(
+    hook,
+    payload,
+    ctx.toplevel,
+  );
+  // Transcript reads are filesystem I/O and can fall back to a full-file
+  // scan. Finish that work before BEGIN IMMEDIATE so a slow or unavailable
+  // transcript never extends the SQLite write-lock window.
+  const stopAssistantText = hook === "Stop"
+    ? payload.last_assistant_message ?? (
+        payload.transcript_path ? lastAssistantText(payload.transcript_path) : null
+      )
+    : null;
   // Slug/default-branch are stable repo facts — spawn for them only the
   // first time this repo is ever seen.
-  let repo = getRepoByRoot(db, ctx.repoRoot);
-  if (!repo) {
-    const git = new GitFacade(payload.cwd);
-    repo = upsertRepo(
-      db,
-      git.repoRoot,
-      git.remoteSlug(),
-      git.defaultBranchOr("main"),
-      nowIso,
-    );
-  }
-
+  const knownRepo = getRepoByRoot(db, ctx.repoRoot);
   const branch = ctx.branch ?? "detached";
-  const sessionToplevel = ctx.toplevel;
-  const existing = readTaskForBranch(db, repo.id, branch);
-  const taskId = existing?.id ?? taskIdForBranch(repo.id, branch);
-  const stateBefore = existing?.state ?? null;
-  const deliveryCapable =
-    hook === "UserPromptSubmit" ||
-    hook === "PostToolUse" ||
-    hook === "Stop" ||
-    hook === "SessionStart";
-  const claimed = deliveryCapable
-    ? claimPendingInjections(db, taskId, nowIso)
-    : [];
+  const knownTask = knownRepo
+    ? readTaskForBranch(db, knownRepo.id, branch)
+    : null;
+  const initialHeadSha =
+    knownTask?.startHeadSha ?? GitFacade.headShaAt(ctx.toplevel);
+  const newRepoFacts = knownRepo
+    ? null
+    : (() => {
+        const git = new GitFacade(payload.cwd);
+        return {
+          repoRoot: git.repoRoot,
+          repoKey: git.remoteSlug(),
+          defaultBranch: git.defaultBranchOr("main"),
+        };
+      })();
+
+  const transact = db.transaction((): HookIngestResult => {
+    let repo = getRepoByRoot(db, ctx.repoRoot);
+    if (!repo) {
+      if (!newRepoFacts) {
+        throw new Error(`repository disappeared during hook ingestion: ${ctx.repoRoot}`);
+      }
+      repo = upsertRepo(
+        db,
+        newRepoFacts.repoRoot,
+        newRepoFacts.repoKey,
+        newRepoFacts.defaultBranch,
+        nowIso,
+      );
+    }
+
+    const sessionToplevel = ctx.toplevel;
+    const existing = readTaskForBranch(db, repo.id, branch);
+    const taskId = existing?.id ?? taskIdForBranch(repo.id, branch);
+    const stateBefore = existing?.state ?? null;
+    const deliveryCapable =
+      hook === "UserPromptSubmit" ||
+      hook === "PostToolUse" ||
+      hook === "Stop" ||
+      hook === "SessionStart";
+    const claimed = deliveryCapable
+      ? claimPendingInjections(db, taskId, nowIso)
+      : [];
   // Claiming an injection proves queue ownership, not that the runtime has
   // resumed. Preserve the Stop-observed waiting state until a later hook
   // supplies independent runtime evidence.
@@ -203,7 +240,7 @@ export function ingestHookEvent(
     lastEventAt: nowIso,
     statusDetail: statusDetailFor(hook, payload, existing?.statusDetail ?? null),
     createdAt: existing?.createdAt ?? nowIso,
-    startHeadSha: existing?.startHeadSha ?? GitFacade.headShaAt(sessionToplevel),
+    startHeadSha: existing?.startHeadSha ?? initialHeadSha,
   });
 
   upsertSession(db, {
@@ -264,7 +301,7 @@ export function ingestHookEvent(
             ? "read"
             : null;
         if (action) {
-          const relativeFile = repoRelative(file, sessionToplevel);
+          const relativeFile = validatedToolPath!;
           addFootprint(db, repo.id, {
             taskId,
             sessionId: payload.session_id,
@@ -297,10 +334,9 @@ export function ingestHookEvent(
     case "Stop": {
       // The agent's own final turn text, verbatim from the transcript —
       // contract SelfReportEvent source. Nothing synthesized.
-      const text = payload.last_assistant_message ?? (
-        payload.transcript_path ? lastAssistantText(payload.transcript_path) : null
-      );
-      if (text) emit({ id: eid(), at: nowIso, type: "self_report", text });
+      if (stopAssistantText) {
+        emit({ id: eid(), at: nowIso, type: "self_report", text: stopAssistantText });
+      }
       break;
     }
     case "SessionStart":
@@ -366,7 +402,10 @@ export function ingestHookEvent(
     };
   }
 
-  return { taskId, eventTypesWritten: written, stateBefore, stateAfter, output };
+    return { taskId, eventTypesWritten: written, stateBefore, stateAfter, output };
+  });
+
+  return transact.immediate();
 }
 
 const SESSION_PROTOCOL = `[Vibehub] This repo runs Vibehub — your team's shared context layer. Protocol:
@@ -437,6 +476,20 @@ function statusDetailFor(
   return previous;
 }
 
-function repoRelative(file: string, repoRoot: string): string {
-  return file.startsWith(repoRoot + "/") ? file.slice(repoRoot.length + 1) : file;
+function validatedPostToolPath(
+  hook: HookEventName,
+  payload: HookPayload,
+  repoRoot: string,
+): string | null {
+  if (hook !== "PostToolUse" || !payload.tool_name) return null;
+  const action = EDIT_TOOLS.has(payload.tool_name)
+    ? "edit"
+    : payload.tool_name === "Read"
+      ? "read"
+      : null;
+  const file = payload.tool_input?.["file_path"];
+  if (!action || typeof file !== "string") return null;
+  const absolute = path.resolve(payload.cwd, file);
+  const relative = path.relative(repoRoot, absolute);
+  return canonicalRepoPath(relative);
 }

@@ -1,7 +1,9 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
+import { pathToFileURL } from "node:url";
 import { Worker } from "node:worker_threads";
 import { afterEach, describe, expect, it } from "vitest";
 import {
@@ -213,33 +215,92 @@ describe("transactional interventions", () => {
 });
 
 describe("injection claim boundary", () => {
-  it("has one winner under overlapping worker-thread SQLite contention", async () => {
+  it("has one successful emitter under overlapping worker-thread SQLite contention", async () => {
     const fx = setup();
+    execFileSync("git", ["checkout", "-b", "a"], { cwd: fx.repo.repoRoot });
     const writer = openDb(fx.dbPath);
     enqueueInjection(writer, 1, "task-a", "inject", "once", fx.now);
     writer.close();
     const barrier = new SharedArrayBuffer(4);
-    const modulePath = createRequire(import.meta.url).resolve("better-sqlite3");
+    // Compile the current source into the test's scratch directory so worker
+    // threads exercise this checkout, never an ignored/stale package dist.
+    const workerDist = fs.mkdtempSync(path.join(import.meta.dirname, ".worker-core-"));
+    roots.push(workerDist);
+    execFileSync(process.execPath, [
+      createRequire(import.meta.url).resolve("typescript/bin/tsc"),
+      "-p", path.resolve(import.meta.dirname, "../tsconfig.build.json"),
+      "--outDir", workerDist,
+      "--declaration", "false",
+    ]);
+    const coreUrl = pathToFileURL(path.join(workerDist, "index.js")).href;
     const source = `
       const { parentPort, workerData } = require('node:worker_threads');
-      const Database = require(workerData.modulePath);
-      const db = new Database(workerData.dbPath);
-      db.pragma('busy_timeout = 5000');
-      parentPort.postMessage({ ready: true });
-      Atomics.wait(new Int32Array(workerData.barrier), 0, 0);
-      const rows = db.prepare("UPDATE injections SET claimed_at = ? WHERE claimed_at IS NULL AND task_id = ? RETURNING id").all(workerData.now, 'task-a');
-      parentPort.postMessage({ count: rows.length });
-      db.close();
+      (async () => {
+        const { ingestHookEvent, openDb } = await import(workerData.coreUrl);
+        const db = openDb(workerData.dbPath);
+        parentPort.postMessage({ ready: true });
+        Atomics.wait(new Int32Array(workerData.barrier), 0, 0);
+        const result = ingestHookEvent(db, 'PostToolUse', {
+          session_id: workerData.sessionId,
+          cwd: workerData.cwd,
+          tool_name: 'Edit',
+          tool_input: { file_path: 'src/shared.ts' },
+        }, { now: () => new Date(workerData.now) });
+        parentPort.postMessage({ output: result.output });
+        db.close();
+      })().catch((error) => {
+        parentPort.postMessage({ error: error instanceof Error ? error.stack : String(error) });
+      });
     `;
-    const workers = [0, 1].map(() => new Worker(source, { eval: true, workerData: { dbPath: fx.dbPath, now: fx.now, modulePath, barrier } }));
-    await Promise.all(workers.map((worker) => new Promise<void>((resolve, reject) => {
-      worker.once("message", () => resolve()); worker.once("error", reject);
-    })));
-    const results = workers.map((worker) => new Promise<number>((resolve, reject) => {
-      worker.once("message", (message: { count: number }) => resolve(message.count)); worker.once("error", reject);
-    }));
+    const runs = [0, 1].map((index) => {
+      let markReady!: () => void;
+      let rejectReady!: (error: Error) => void;
+      let resolveResult!: (output: unknown) => void;
+      let rejectRun!: (error: Error) => void;
+      const ready = new Promise<void>((resolve, reject) => {
+        markReady = resolve;
+        rejectReady = reject;
+      });
+      const result = new Promise<unknown>((resolve, reject) => {
+        resolveResult = resolve;
+        rejectRun = reject;
+      });
+      void result.catch(() => {});
+      const worker = new Worker(source, {
+        eval: true,
+        workerData: {
+          dbPath: fx.dbPath, now: fx.now, cwd: fx.repo.repoRoot, coreUrl, barrier,
+          sessionId: `claim-worker-${index}`,
+        },
+      });
+      worker.on("message", (message: { ready?: boolean; output?: unknown; error?: string }) => {
+        if (message.ready) markReady();
+        else if (message.error) {
+          const error = new Error(message.error);
+          rejectReady(error);
+          rejectRun(error);
+        }
+        else resolveResult(message.output);
+      });
+      worker.once("error", (error) => {
+        rejectReady(error);
+        rejectRun(error);
+      });
+      return { worker, ready, result };
+    });
+    await Promise.all(runs.map((run) => run.ready));
     Atomics.store(new Int32Array(barrier), 0, 1); Atomics.notify(new Int32Array(barrier), 0, 2);
-    expect((await Promise.all(results)).sort()).toEqual([0, 1]);
-    await Promise.all(workers.map((worker) => worker.terminate()));
+    const outputs = await Promise.all(runs.map((run) => run.result));
+    expect(outputs.filter(Boolean)).toEqual([
+      expect.objectContaining({
+        hookSpecificOutput: expect.objectContaining({ additionalContext: expect.stringContaining("once") }),
+      }),
+    ]);
+    await Promise.all(runs.map((run) => run.worker.terminate()));
+    const check = openDb(fx.dbPath);
+    expect(readTimeline(check, "task-a")).toEqual([
+      expect.objectContaining({ type: "user_injection", text: "once" }),
+    ]);
+    check.close();
   });
 });
