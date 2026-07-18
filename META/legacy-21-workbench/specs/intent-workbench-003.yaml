@@ -1,0 +1,56 @@
+spec_id: "intent-workbench-003"
+type: intent
+state: active
+intent:
+  summary: "实施周期性 knowledge checkpoint：每隔若干 user turns 让 agent 复查自上次成功写入以来是否出现新的 durable context；语义判断与写入仍由模型+ingest skill 完成"
+  detail: |
+    Wayne 2026-07-18 明确要求先记录、后续实现。问题来自真实使用反馈：
+    用户经常以为 VibeHub 会记住讨论里的重要内容，但 agent 实际没有调用
+    knowledge write。
+
+    候选机制保持 prompt-first：
+    - hook 只做机械 cadence 与成功写入后的计数重置；
+    - 达到若干 user turns 后注入一条短 checkpoint，要求 agent 回看
+      自上次成功写入以来的对话；
+    - agent 判断是否形成新的 durable intent、decision、constraint、
+      contract、convention、context 或 change；
+    - 需要沉淀时调用 vibehub-ingest，由 skill 完成拆解、去重、placement
+      与 provenance；没有 durable change 时继续工作，不制造无意义记录。
+
+    本条只锁定“需要实现周期性检查”这一产品需求。具体 cadence、是否在
+    compact 边界补点、跨 session 如何延续、哪些成功 operation 重置计数，
+    留到实现设计时裁定。主会话 token 精确计数不是当前候选基础：优先使用
+    两端稳定提供的 turn/lifecycle evidence，避免解析不稳定 transcript 或把
+    语义 intelligence 下沉进 hook。
+constraints:
+  - kind: must
+    rule: "checkpoint 只能机械决定何时提醒；是否存在 durable knowledge、如何分类与写入必须由模型和 vibehub-ingest skill 判断"
+  - kind: must_not
+    rule: "不得把周期提醒实现成 hook 内的语义分类器、固定每轮写入，或依赖不稳定 transcript token 估算"
+  - kind: should
+    rule: "实现设计应优先评估 user-turn cadence、成功 knowledge write 后重置，以及 compact lifecycle 补点"
+indexing:
+  type: intent
+  priority: P1
+  layer: feature
+  domain: "workbench-context-cru"
+  tags: [knowledge-checkpoint, prompt-first, user-prompt-submit, ingest, context-cru, future]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.9
+  source_ref: "Wayne product discussion — 2026-07-18"
+  produced_by_agent: "random-contexts"
+  produced_at: "2026-07-18"
+relations:
+  - target: "decision-workbench-009"
+    type: extends
+    detail: "hook 只决定 when，skill 继续拥有 how well"
+  - target: "decision-workbench-010"
+    type: constrained_by
+    detail: "周期 checkpoint 不得把 intelligence 从 skill 下沉回 hook"
+  - target: "decision-workbench-012"
+    type: constrained_by
+    detail: "实际 knowledge write 仍须通过版本化 operation contracts 与 dispatcher"
+anchors:
+  - file: "workbench/hooks/hooks.json"
+  - file: "workbench/packages/core/src/hook-ingest.ts"

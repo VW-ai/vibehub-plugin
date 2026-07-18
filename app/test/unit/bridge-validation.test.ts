@@ -73,6 +73,8 @@ describe("bridge runtime validation", () => {
       affectedTaskIds: ["task"], acceptedAt: "2026-07-12T00:00:00.000Z",
     };
     expect(isAppliedIntervention(receipt)).toBe(true);
+    expect(isAppliedIntervention({ ...receipt, replayed: true })).toBe(true);
+    expect(isAppliedIntervention({ ...receipt, replayed: "yes" })).toBe(false);
     expect(isAppliedIntervention({ ...receipt, outcome: "invented" })).toBe(false);
     expect(isBridgeResult({ status: "ok", data: receipt }, isAppliedIntervention)).toBe(true);
     expect(isBridgeResult({ status: "ok", data: {} }, isAppliedIntervention)).toBe(false);

@@ -1,5 +1,5 @@
 progress:
-  completion: 0.98
+  completion: 0.78
   milestones:
     - id: m1-map-main
       name: "Map main view (scope occupancy) — dynamize from approved v8"
@@ -116,7 +116,144 @@ progress:
       status: completed
       gate: true
       notes: "独立审计 B1–B6 已按边界收口:task identity 以 repo-qualified opaque ID 隔离;hook claim/事件/状态在 immediate transaction 内原子化且 transcript I/O 在锁外;live scope matcher 参数方向修正;production main.tsx controller、typed intervention receipts 与 race/focus/modal/reduced-motion 行为有实测;decision-workbench-014 固定 v8 spatial-workbench 权威并移除虚假 affordance;isolated/artifact gates 执行真实 production entry、受管 hook/MCP 命令、corruption negative proofs 与完整 dogfood。B7 fresh verification:build/typecheck,unit 301/301,production E2E 25/25,historical E2E 171/171,bundle/artifact/dogfood,isolated full matrix,diff-check 全绿;最终对抗审查发现并修复 malformed hook flags 在 catch 前 exit 2,真实子进程钉死 hook exit 0 且非 hook 仍 exit 2,复审批准。真实 Claude 外发 dogfood 未执行且不冒充完成。"
+    - id: m2p6a-workflow-receipt-contract
+      name: "M2 activation ⑥A:typed workflow receipt contract + deterministic evidence projection"
+      status: completed
+      gate: true
+      estimated_files:
+        - "workbench/packages/core/src/contract/workflow-receipt.ts"
+        - "workbench/packages/core/src/contract/index.ts"
+        - "workbench/packages/core/test/workflow-receipt.test.ts"
+      estimated_lines: 180-260
+      depends_on: []
+      complexity_flags:
+        - "design_decisions"
+      open_questions: []
+      description: |
+        冻结 setup/query/ingest/distill/inject/checkpoint 共用的 activity、phase、
+        outcome、visibility、evidence 与 next-action 语言。receipt 只投影既有
+        operation/runtime/hook 事实，不建立第二套 workflow truth store。
+      notes: "WorkflowReceiptV1 browser-safe contract + runtime projectors 完成；42 operations 共用 canonical activity/effect map，operation/init/doctor/injection/claim 证据同构校验，update/review vocabulary 补齐。TUI renderer 有 five-section budget、ANSI/control 清理、CJK/emoji display-width wrap；intervention idempotent replay 保留原 outcome + replayed=true。独立 review 两轮修复后 APPROVED。Controller gates: Core 220/220、App 59/59、两端 typecheck、core build、diff-check 全绿。"
+    - id: m2p6b-repo-activation
+      name: "M2 activation ⑥B:repo activation primitives + managed instruction block + CLI"
+      status: pending
+      gate: true
+      estimated_files:
+        - "workbench/packages/core/src/project-activation.ts"
+        - "workbench/packages/core/src/runtime-service.ts"
+        - "workbench/packages/cli/src/main.ts"
+        - "workbench/packages/core/test/project-activation.test.ts"
+        - "workbench/packages/cli/test/setup-cli.test.ts"
+      estimated_lines: 350-500
+      depends_on:
+        - "m2p6a-workflow-receipt-contract"
+      complexity_flags:
+        - "error_handling_heavy"
+        - "design_decisions"
+      open_questions: []
+      description: |
+        在现有 init/doctor 上增加 setup inspect/apply/status 与幂等 managed-block
+        primitive，保留用户 AGENTS.md/CLAUDE.md 内容并诚实区分 Installed、
+        Connected、Activated。非 Git、marker 冲突、symlink、权限和 partial
+        failure 均返回可恢复的 typed result。
+    - id: m2p6c-setup-skill-claude
+      name: "M2 activation ⑥C:vibehub-setup skill + Claude onboarding vertical slice"
+      status: pending
+      gate: true
+      estimated_files:
+        - "workbench/skills/vibehub-setup/SKILL.md"
+        - "workbench/skills/vibehub-setup/references/onboarding-contract.md"
+        - "workbench/skills/vibehub-setup/references/claude-code.md"
+        - "workbench/skills/vibehub-setup/references/recovery.md"
+        - "workbench/packages/cli/test/skill-package.test.ts"
+      estimated_lines: 260-380
+      depends_on:
+        - "m2p6b-repo-activation"
+      complexity_flags:
+        - "prompt_engineering"
+      open_questions: []
+      description: |
+        skill 编排 inspect/apply/doctor/activation，fresh repo 进入自然积累，
+        existing repo 显式推荐且允许跳过 cold-start distill。用真实 Claude
+        session 证明 restart/handshake/query-or-ingest activation，不把 workflow
+        intelligence 拆回 hooks 或 MCP descriptions。
+    - id: m2p6d-knowledge-checkpoint
+      name: "M2 activation ⑥D:task-scoped periodic knowledge checkpoint"
+      status: pending
+      gate: true
+      estimated_files:
+        - "workbench/packages/core/src/db.ts"
+        - "workbench/packages/core/src/hook-ingest.ts"
+        - "workbench/packages/core/src/operation-dispatcher.ts"
+        - "workbench/packages/core/test/hook-ingest.test.ts"
+        - "workbench/packages/core/test/knowledge-service.test.ts"
+      estimated_lines: 220-340
+      depends_on:
+        - "m2p6a-workflow-receipt-contract"
+      complexity_flags:
+        - "error_handling_heavy"
+      open_questions: []
+      description: |
+        UserPromptSubmit 只做 prompt-id 去重与 task-scoped cadence；达到阈值时
+        注入短 checkpoint，成功 canonical knowledge mutation 后机械重置。
+        不解析 token/transcript，不在 hook 内判断 durable semantics，并保持
+        pause/injection 的现有严格优先级。
+    - id: m2p6e-codex-activation-parity
+      name: "M2 activation ⑥E:Codex workbench-native activation parity"
+      status: pending
+      gate: true
+      estimated_files:
+        - "workbench/skills/vibehub-setup/references/codex.md"
+        - "workbench/skills/vibehub-setup/agents/openai.yaml"
+        - "workbench/packages/cli/src/managed-assets.ts"
+        - "workbench/scripts/verify-plugin-artifact.mjs"
+      estimated_lines: 220-340
+      depends_on:
+        - "m2p6b-repo-activation"
+        - "m2p6c-setup-skill-claude"
+      complexity_flags:
+        - "first_of_kind"
+        - "error_handling_heavy"
+      open_questions: []
+      description: |
+        Codex 适配调用同一 activation primitives、SQLite、repo identity 与
+        receipt contract；能力缺口显式 degradation，不以 hack 伪造 Claude
+        hook parity，也不生成第二套 instruction/state vocabulary。
+    - id: m2p6f-presentation-rollout
+      name: "M2 activation ⑥F:cross-workflow presentation rollout"
+      status: pending
+      gate: true
+      estimated_files:
+        - "workbench/skills/_stdlib/reporting.md"
+        - "workbench/skills/vibehub-query/SKILL.md"
+        - "workbench/skills/vibehub-ingest/SKILL.md"
+        - "workbench/skills/vibehub-distill/SKILL.md"
+        - "workbench/app/src/"
+      estimated_lines: 300-480
+      depends_on:
+        - "m2p6a-workflow-receipt-contract"
+        - "m2p6c-setup-skill-claude"
+        - "m2p6d-knowledge-checkpoint"
+      complexity_flags:
+        - "prompt_engineering"
+        - "design_decisions"
+      open_questions: []
+      description: |
+        setup/query/ingest/distill/inject/checkpoint 统一使用 silent/brief/expanded
+        receipt 语言；Claude/Codex 走宿主文本 affordance，App 只富渲染同一事实。
+        最终 headless、App-off、fresh/existing 与双宿主 dogfood 全矩阵收口。
   commits:
+    - hash: "69e7b25"
+      date: "2026-07-18"
+      message: "[21-workbench] feat: add deterministic workflow receipt contract"
+      files_changed: 16
+      specs_affected:
+        - decision-workbench-015 (draft → active; onboarding contract)
+        - decision-workbench-016 (draft → active; interaction and presentation protocol)
+        - intent-workbench-003 (draft → active; implementation intent)
+        - change-2026-07-18-workflow-receipt-contract (created)
+      milestones_affected:
+        - m2p6a-workflow-receipt-contract (→ completed)
     - hash: "6cdea81"
       date: "2026-07-14"
       message: "[21-workbench] fix(audit/b6): make isolated and artifact gates representative"

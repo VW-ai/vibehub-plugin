@@ -1,0 +1,81 @@
+spec_id: "decision-workbench-016"
+type: decision
+state: active
+intent:
+  summary: "所有 VibeHub workflow 共用 Interaction & Presentation Protocol：结构化 receipt 是语义 source of truth，Claude/Codex 用宿主原生 affordance + 标准文本渲染，App 可富渲染；不追求自定义 TUI widget"
+  detail: |
+    Wayne 2026-07-18 认可为 setup、query、ingest、distill、inject、
+    checkpoint 等所有 VibeHub-triggered workflow 建立统一 presentation
+    protocol，给用户正式、可信、可观察的反馈。
+
+    宿主边界必须诚实：Claude Code/Codex plugin 可以使用 hook spinner/status、
+    tool/MCP result、warning/system message 与 agent Markdown/文本输出，但不能把
+    任意自定义 TUI widget 当作跨宿主可靠能力。因此“组件”定义为两层：
+    1. **结构化 receipt/event**：activity、phase、事实、结果、下一动作与可见性
+       等版本化语义；具体字段在实现设计中锁定；
+    2. **surface renderer**：Claude Code/Codex 使用宿主原生 affordance 与
+       标准化文本组件，Workbench App 消费同一 receipt 做更丰富的视觉呈现。
+
+    Presentation Protocol 必须回答用户的五个问题：
+    - VibeHub 正在做什么；
+    - 为什么此刻触发；
+    - 读取、写入或注入了什么；
+    - 是否真实成功，还是 skipped/failed/waiting；
+    - 用户接下来是否需要行动。
+
+    为避免新的噪音源，事件至少需要三档可见性语义：
+    - **silent**：普通 hook evidence、scope refresh、重复/无变化操作；
+    - **brief**：context injection、周期 checkpoint、成功 ingest 等值得形成
+      心智回路但不应打断工作的事件；
+    - **expanded**：setup、distill、失败、冲突、等待用户 review 等长流程或
+      需要行动的事件。
+
+    该 protocol 同时解决“用户以为 VibeHub 记了、实际没有”的信任缺口：
+    只有 deterministic persistence 成功后才能显示成功 receipt；计划、尝试、
+    queued、claimed 与 persisted 必须使用不同语义，不得用漂亮文本掩盖状态。
+constraints:
+  - kind: must
+    rule: "结构化 receipt/event 必须是所有 surface 的语义 source of truth；Claude、Codex、App 不得各自发明状态含义"
+  - kind: must
+    rule: "setup/query/ingest/distill/inject/checkpoint 等 VibeHub workflow 必须共享一致的 activity/phase/result/next-action 语言"
+  - kind: must
+    rule: "成功反馈只能由确定性成功证据驱动；queued、attempted、claimed、persisted、skipped、failed、waiting 必须诚实区分"
+  - kind: must
+    rule: "presentation 必须提供 silent/brief/expanded 或等价的可见性预算，避免所有高频 hook 都产生用户可见噪音"
+  - kind: must_not
+    rule: "不得把跨宿主产品体验建立在 Claude Code/Codex 未承诺的自定义 TUI widget、像素级布局或动态组件 API 上"
+  - kind: should
+    rule: "TUI 文本组件应在无 ANSI、窄终端、日志复制与 tool-result 折叠场景下仍可读；颜色只能增强，不能承载唯一语义"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench-presentation"
+  tags: [presentation-protocol, tui, receipts, observability, trust, claude-code, codex]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.95
+  source_ref: "Wayne TUI feedback and cross-workflow presentation discussion — 2026-07-18"
+  produced_by_agent: "random-contexts"
+  produced_at: "2026-07-18"
+relations:
+  - target: "decision-workbench-003"
+    type: extends
+    detail: "subject-first 状态语言扩展为跨 workflow presentation language"
+  - target: "decision-workbench-009"
+    type: constrained_by
+    detail: "presentation 不改变 hooks/MCP/skills 的 intelligence ownership"
+  - target: "decision-workbench-014"
+    type: relates_to
+    detail: "App renderer 继续服从 v8 design authority，但不改变 receipt 语义"
+  - target: "decision-workbench-015"
+    type: relates_to
+    detail: "onboarding 是 protocol 的第一条完整长流程"
+  - target: "intent-workbench-003"
+    type: relates_to
+    detail: "周期 checkpoint 使用 brief presentation 形成可观察反馈"
+anchors:
+  - file: "workbench/packages/core/src/contract/"
+  - file: "workbench/packages/mcp/src/"
+  - file: "workbench/skills/"
+  - file: "workbench/app/src/"

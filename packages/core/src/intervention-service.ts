@@ -74,7 +74,7 @@ export function applyIntervention(
         throw new InterventionIdempotencyConflictError("requestId was reused with a different intervention action, target, text, or behavior-affecting field");
       }
       const receipt = JSON.parse(prior.result) as AppliedIntervention;
-      return { ...receipt, outcome: "already_applied" };
+      return { ...receipt, replayed: true };
     }
 
     const base = {

@@ -1,0 +1,54 @@
+spec_id: "change-2026-07-18-workflow-receipt-contract"
+type: change
+state: active
+intent:
+  summary: "M2 activation ⑥A 完成：建立跨 workflow typed receipt contract 与 deterministic projectors，并修复 intervention replay 丢失原始 outcome"
+  detail: |
+    decision-workbench-016 的 Interaction & Presentation Protocol 第一条可运行
+    纵向切片完成。`WorkflowReceiptV1` 固定 setup/query/review/ingest/update/
+    distill/inject/checkpoint 的 activity、phase、outcome、visibility、typed
+    evidence 与 next action 语言；browser-safe contract 不依赖 Node/SQLite，
+    runtime projectors 才消费 OperationResult、init/doctor 与 injection facts。
+
+    42 个 canonical operations 通过同一份 exhaustive map 推导 activity/effect，
+    caller 不能把 read 冒充 persisted write。doctor、init、queue claim 与
+    intervention receipt 均从机械事实重算；generic non-injection intervention
+    不可进入 injection projector。TUI renderer 保证 Activity/Trigger/Effects/
+    Result/Next 五段始终存在，具备 bounded output、ANSI/control 清理与
+    CJK/emoji display-width wrapping。
+
+    Review 发现既有 idempotent intervention replay 会把 stale/no_op/unsupported
+    覆盖为 already_applied。本次从源头改为保留原 outcome，并用 `replayed:true`
+    表达重放；legacy already_applied 仅保留 wire compatibility。
+
+    Controller 验证：Core 220/220、App 59/59、core/app typecheck、core build 与
+    diff-check 全绿；独立 reviewer 最终 APPROVED。
+constraints:
+  - kind: must
+    rule: "Workflow receipt 只能投影既有 deterministic facts，不得成为第二套 workflow truth store"
+  - kind: must
+    rule: "persisted、returned、verified、queued、claimed 必须由 source-specific evidence 与 canonical operation/effect map 支撑"
+  - kind: must_not
+    rule: "不得把 injection queued/claimed 表述为 delivered 或 acknowledged"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench-presentation"
+  tags: [workflow-receipt, presentation-protocol, deterministic-evidence, browser-safe, intervention-replay]
+provenance:
+  source_type: implementation
+  confidence: 1.0
+  source_ref: "m2p6a implementation + independent review, 2026-07-18"
+relations:
+  - target: "decision-workbench-016"
+    type: implements
+    detail: "建立跨 workflow receipt 语义与 TUI renderer"
+  - target: "decision-workbench-015"
+    type: enables
+    detail: "为 Installed/Connected/Activated onboarding 提供诚实 presentation contract"
+anchors:
+  - file: "workbench/packages/core/src/contract/workflow-receipt.ts"
+  - file: "workbench/packages/core/src/workflow-receipt-projectors.ts"
+  - file: "workbench/packages/core/src/intervention-service.ts"
+  - file: "workbench/app/src/bridge-validation.ts"

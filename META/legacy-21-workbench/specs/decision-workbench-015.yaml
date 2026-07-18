@@ -1,0 +1,81 @@
+spec_id: "decision-workbench-015"
+type: decision
+state: active
+intent:
+  summary: "Workbench onboarding 以 agent-first 为 canonical 路径：机器级安装 plugin，项目内由独立 vibehub-setup skill 编排 init/instructions/doctor/activation；App 只提供同机制的图形入口"
+  detail: |
+    Wayne 2026-07-18 认可 onboarding 的完成定义与 agent-first 路径。
+
+    **Onboarding 完成不是“文件写完”**，而是用户进入一个 repo 并启动第一场
+    agent session 时，VibeHub 已绑定项目、协议已加载、hooks/MCP/skills 可用，
+    并在真实工作中完成过一次有效 context query 或 ingest。状态分三层：
+    1. **Installed**：VibeHub plugin 已在机器上安装并可被宿主发现；
+    2. **Connected**：当前 repo 已注册到本机 SQLite，project instructions、
+       hooks、MCP、skills 与 doctor 均健康；
+    3. **Activated**：真实工作中至少完成一次有效 query/ingest，用户获得过
+       可观察的 context 价值，而不只是技术检查全绿。
+
+    **Canonical 入口 = agent-first**：
+    - 用户机器上安装一次 plugin；
+    - 进入任意 repo，对 Claude Code/Codex 表达“为这个项目 setup VibeHub”；
+    - 独立 `vibehub-setup` skill 负责发现现状、编排步骤、解释冲突与恢复；
+    - CLI/core 负责 init、repo binding、幂等 instruction merge、doctor 等
+      确定性动作；
+    - App 读取同一状态并提供等价图形入口，不拥有第二套安装业务逻辑。
+
+    **项目类型分流**：
+    - fresh/空项目：不制造虚假 mapping；鼓励用户继续用熟悉的 Claude/Codex
+      brainstorm/plugin 工作流，或放入已有项目文档，VibeHub 随工作逐渐 build
+      context；
+    - 已有代码仓库：Connected 后显式推荐执行 `vibehub-distill` cold start，
+      让既有代码语义进入 context DB；
+    - cold-start distill 是模型驱动、用户可见且可跳过的步骤，不能偷偷塞进
+      确定性的 `vibehub init`。
+
+    `vibehub-setup` 应作为 plugin 内独立 skill 维护，并通过 references 渐进
+    加载 Claude Code/Codex、instruction files、recovery 与 onboarding
+    contract。AGENTS.md/CLAUDE.md 的 VibeHub section 必须由确定性、幂等、
+    不覆盖用户内容的 managed-block primitive 维护；skill 编排而不临场自由改写。
+constraints:
+  - kind: must
+    rule: "agent-first 是 canonical onboarding；App-first 只能是调用同一 core/CLI contract 的等价图形入口"
+  - kind: must
+    rule: "onboarding 必须区分 Installed、Connected、Activated，且 doctor green 不得冒充 Activated"
+  - kind: must
+    rule: "vibehub-setup skill 拥有 onboarding workflow；CLI/core 只提供幂等确定性 primitives 与 typed receipts"
+  - kind: must
+    rule: "fresh repo 与 existing-code repo 必须诚实分流；existing repo 推荐显式 cold-start distill，fresh repo 允许随工作自然积累 context"
+  - kind: must_not
+    rule: "不得把模型驱动 cold-start distillation 隐藏在 vibehub init 内，或为了通过 onboarding 制造虚假 knowledge write"
+  - kind: must_not
+    rule: "不得覆盖用户已有 AGENTS.md/CLAUDE.md；project instruction 变更必须幂等、可识别 VibeHub ownership 并支持升级"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "workbench-onboarding"
+  tags: [onboarding, agent-first, setup-skill, activation, cold-start, distill, instructions]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.95
+  source_ref: "Wayne onboarding product discussion — 2026-07-18"
+  produced_by_agent: "random-contexts"
+  produced_at: "2026-07-18"
+relations:
+  - target: "decision-workbench-010"
+    type: extends
+    detail: "setup intelligence 位于独立 skill，CLI/core 保持确定性"
+  - target: "decision-workbench-011"
+    type: refines
+    detail: "agent-first 贯彻 headless runtime 独立产品；App 是 optional client"
+  - target: "decision-workbench-012"
+    type: constrained_by
+    detail: "distill 与 knowledge writes 继续通过 DB-native contracts"
+  - target: "decision-workbench-016"
+    type: relates_to
+    detail: "onboarding 的每个可见阶段使用统一 presentation protocol"
+anchors:
+  - file: "workbench/packages/core/src/runtime-lifecycle.ts"
+  - file: "workbench/packages/cli/src/main.ts"
+  - file: "workbench/skills/"
+  - file: "workbench/app/src/install-derive.ts"

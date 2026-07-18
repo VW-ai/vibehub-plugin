@@ -132,7 +132,11 @@ describe("transactional interventions", () => {
     if (first.status === "ok" && second.status === "ok") {
       expect(first.data.outcome).toBe("applied");
       expect(first.data.injectionIds).toHaveLength(2);
-      expect(second.data).toMatchObject({ outcome: "already_applied", injectionIds: first.data.injectionIds });
+      expect(second.data).toMatchObject({
+        outcome: "applied",
+        replayed: true,
+        injectionIds: first.data.injectionIds,
+      });
     }
     const db = openDb(fx.dbPath);
     expect(pendingInjections(db, "task-a")).toHaveLength(1);
@@ -230,12 +234,29 @@ describe("transactional interventions", () => {
     expect(task.changes).toBe(1); db.close();
     const service = new RuntimeService({ dbPath: fx.dbPath, now: () => new Date(fx.now) });
     const paused = service.applyIntervention(fx.repo, "request-pause", { kind: "pause", taskId: "task-a", text: "wait" });
+    const pausedReplay = service.applyIntervention(fx.repo, "request-pause", { kind: "pause", taskId: "task-a", text: "wait" });
     const diagnosis = service.applyIntervention(fx.repo, "request-diag", { kind: "generate_diagnosis", conflictId: "conflict-1" });
+    const diagnosisReplay = service.applyIntervention(fx.repo, "request-diag", { kind: "generate_diagnosis", conflictId: "conflict-1" });
     expect(paused.status === "ok" && paused.data.outcome).toBe("no_op");
+    expect(pausedReplay.status === "ok" && pausedReplay.data).toMatchObject({ outcome: "no_op", replayed: true });
     expect(diagnosis.status === "ok" && diagnosis.data.outcome).toBe("unsupported");
+    expect(diagnosisReplay.status === "ok" && diagnosisReplay.data).toMatchObject({ outcome: "unsupported", replayed: true });
     const check = openDb(fx.dbPath);
     expect(pendingInjections(check, "task-a")).toHaveLength(0);
     check.close();
+  });
+
+  it("preserves stale on replay instead of laundering it into applied", () => {
+    const fx = setup();
+    const db = openDb(fx.dbPath);
+    db.prepare(`UPDATE tasks SET state = 'done' WHERE id = 'task-a'`).run();
+    db.close();
+    const service = new RuntimeService({ dbPath: fx.dbPath, now: () => new Date(fx.now) });
+    const intervention = { kind: "inject" as const, taskId: "task-a", text: "too late" };
+    const first = service.applyIntervention(fx.repo, "request-stale", intervention);
+    const replay = service.applyIntervention(fx.repo, "request-stale", intervention);
+    expect(first.status === "ok" && first.data.outcome).toBe("stale");
+    expect(replay.status === "ok" && replay.data).toMatchObject({ outcome: "stale", replayed: true });
   });
 });
 

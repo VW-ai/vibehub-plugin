@@ -39,6 +39,8 @@ export type WorkbenchIntervention =
 export interface AppliedIntervention {
   requestId: string;
   outcome: "applied" | "already_applied" | "no_op" | "stale" | "unsupported";
+  /** True when this response was replayed from the idempotency receipt. */
+  replayed?: boolean;
   injectionIds: number[];
   affectedTaskIds: string[];
   acceptedAt: string;

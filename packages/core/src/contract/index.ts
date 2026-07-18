@@ -5,3 +5,4 @@ export * from "./conflict-types.js";
 export * from "./install-types.js";
 export * from "./workbench-bridge.js";
 export * from "./kb-types.js";
+export * from "./workflow-receipt.js";

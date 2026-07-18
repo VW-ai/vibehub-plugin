@@ -202,7 +202,10 @@ const OUTCOMES = ["applied", "already_applied", "no_op", "stale", "unsupported"]
 export function isAppliedIntervention(value: unknown): value is AppliedIntervention {
   return record(value) && nonEmpty(value.requestId) && nonEmpty(value.acceptedAt)
     && oneOf(value.outcome, OUTCOMES) && Array.isArray(value.injectionIds)
-    && value.injectionIds.every(integer) && stringArray(value.affectedTaskIds)
+    && value.injectionIds.every((id) => integer(id) && id > 0)
+    && new Set(value.injectionIds).size === value.injectionIds.length
+    && stringArray(value.affectedTaskIds)
+    && optional(value.replayed, (item) => typeof item === "boolean")
     && optional(value.message, string);
 }
 
