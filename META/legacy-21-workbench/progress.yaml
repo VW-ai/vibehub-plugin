@@ -248,6 +248,15 @@ progress:
         最终 headless、App-off、fresh/existing 与双宿主 dogfood 全矩阵收口。
       notes: "Implementation checkpoint 完成：receipt 投影零生产消费者的缺口全面接通。Core：注入介入投影移入 browser-safe contract 层（App/Node 同源，无镜像类型），root 包补齐 workflow-receipt/workbench-bridge 导出。CLI：init/doctor 非 --json 渲染共享五段文本（终端宽度自适应、零 ANSI 依赖），inject 升级为 core applyIntervention 同一 idempotent ledger + 人类面 receipt/--json 机器面，setup 单行保留（presentation 归 skill）。Skills：reporting.md 成为五段标签+共享 outcome 词汇+成功需确定性证据+silent/brief/expanded 预算的 canonical，六 skill 全部挂接，setup Result 显式声明为 activation evidence states 服从同一预算。App：WorkbenchMap.apply 单点投影，ReceiptOutcome 统一 receipt 行（投影 outcome 领先+原始 outcome 括注），弱证据永不升级为 queued，ConflictCard QUEUED/REQUESTED 庆祝带门在投影 queued 上；只有强 queued evidence 才清空 task/conflict 草稿。两轮独立对抗 review 共修复 P1×1 + P2×7（含 reporting 措辞、union 镜像、inject 人类面、setup 双词汇、弱 pin、成功式 Trigger、弱证据草稿丢失），最终复审 APPROVED。Controller gates: Core 266/266、CLI 40/40、MCP 15/15、App 65/65、production E2E 27/27、package validator、production boundary、verify:artifact、typecheck/build、diff-check 全绿。Milestone 保持 in_progress：验收矩阵中的双宿主真实 dogfood 行（Claude restart/handshake + Codex host 安装实证）仍待用户授权执行，与 m2p6c/m2p6e 同一外发 gate。"
   commits:
+    - hash: "ae71422"
+      date: "2026-07-19"
+      message: "[21-workbench] feat: add native Codex activation adapter"
+      files_changed: 29
+      specs_affected:
+        - change-2026-07-18-codex-activation-parity (implementation evidence refreshed)
+        - decision-workbench-015 (native Codex onboarding path completed)
+      milestones_affected:
+        - m2p6e-codex-activation-parity (native adapter and real app-server MCP gate complete; interactive dogfood pending)
     - hash: "3b23c9c"
       date: "2026-07-18"
       message: "[21-workbench] feat: roll out workflow presentation protocol"
