@@ -1,0 +1,1043 @@
+<title>Spec 深钻对比 · 三个方向</title>
+<style>
+  /* ── v8 tokens, verbatim from workbench/app/src/tokens.css ───────────── */
+  :root{
+    --ink-900:#191b1f; --ink-700:#3c3f45; --ink-500:#6b6f77; --ink-400:#8b8f97;
+    --ink-300:#b4b7bd; --ink-200:#d9dade; --ink-150:#e7e8ea; --ink-100:#f0f0f1;
+    --paper:#f7f7f5; --card:#ffffff;
+    --need:#c0392b; --need-bg:#f6e8e5; --need-ink:#9c3022;
+    --clash:#9a6b16; --clash-bg:#f4ecd9; --clash-ink:#775211;
+    --alive:#3e7d4c; --alive-bg:#e4efe6; --alive-ink:#2f6039;
+    --read:#5a7fb8;  --read-ink:#48699c;
+    --sh-1:0 1px 2px rgba(20,22,26,.05);
+    --sh-2:0 1px 3px rgba(20,22,26,.07),0 4px 14px rgba(20,22,26,.06);
+    --r-s:6px; --r-m:10px; --r-l:16px;
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-6:24px;
+    --fs-1:10px; --fs-2:11px; --fs-3:12px; --fs-4:13px;
+    --t-fast:120ms; --t-base:200ms; --ease:cubic-bezier(.25,.8,.3,1);
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  /* The mocks are adjudicated in their canonical light world (v8 authority);
+     the page deliberately does not re-theme in dark mode. */
+  [hidden]{display:none!important}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--paper)}
+  body{font-family:var(--sans);color:var(--ink-900);background:var(--paper);
+    -webkit-font-smoothing:antialiased;padding:40px 24px 80px}
+  .wrap{max-width:1160px;margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-6)}
+
+  /* ── review-harness chrome (quiet; the mocks are the subject) ─────────── */
+  .intro h1{font-size:18px;font-weight:650;letter-spacing:-.2px}
+  .intro p{font-size:var(--fs-4);line-height:1.65;color:var(--ink-500);margin-top:var(--sp-2);max-width:72ch}
+  .intro .doctrine{display:inline-flex;align-items:center;gap:6px;margin-top:var(--sp-3);
+    font-family:var(--mono);font-size:var(--fs-2);color:var(--ink-500);
+    background:var(--ink-100);border-radius:var(--r-s);padding:4px 10px}
+  .tabs{display:flex;gap:var(--sp-2);border-bottom:1px solid var(--ink-200);padding-bottom:0}
+  .tabs button{appearance:none;border:0;background:none;font-family:var(--sans);
+    font-size:var(--fs-4);font-weight:550;color:var(--ink-500);padding:10px 14px 12px;
+    cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+    transition:color var(--t-fast) var(--ease)}
+  .tabs button:hover{color:var(--ink-700)}
+  .tabs button[aria-selected="true"]{color:var(--ink-900);border-bottom-color:var(--ink-900)}
+  .tabs button:focus-visible{outline:2px solid #48699c;outline-offset:-2px;border-radius:var(--r-s)}
+  .caption{font-size:var(--fs-4);line-height:1.65;color:var(--ink-700);max-width:76ch}
+  .caption b{font-weight:600}
+  .caption .q{display:block;margin-top:var(--sp-2);color:var(--ink-500)}
+  .caption .q::before{content:"拍板点 — ";font-weight:600;color:var(--ink-700)}
+
+  /* ── shared mock chrome (v8 idioms) ──────────────────────────────────── */
+  .window{background:var(--card);border-radius:var(--r-l);box-shadow:var(--sh-2);
+    overflow:hidden;border:1px solid var(--ink-150)}
+  .crumb{display:flex;align-items:center;gap:var(--sp-2);padding:10px var(--sp-4);
+    border-bottom:1px solid var(--ink-150);background:#fbfbfa}
+  .crumb .back{font-size:var(--fs-3);color:var(--ink-500);cursor:pointer}
+  .crumb .path{font-size:var(--fs-3);color:var(--ink-500)}
+  .crumb .path b{color:var(--ink-700);font-weight:550}
+  .head{padding:var(--sp-4) var(--sp-4) var(--sp-3);display:flex;flex-direction:column;gap:var(--sp-2)}
+  .kicker{font-size:var(--fs-1);font-weight:650;letter-spacing:.8px;color:var(--clash-ink)}
+  .head h2{font-size:15px;font-weight:650;letter-spacing:-.1px}
+  .head .sub{font-size:var(--fs-3);color:var(--ink-500);line-height:1.5}
+  .causes{display:flex;gap:6px;flex-wrap:wrap}
+  .pill{flex:none;height:18px;display:inline-flex;align-items:center;gap:4px;
+    font-size:var(--fs-1);font-weight:600;letter-spacing:.5px;border-radius:9px;
+    padding:0 8px;cursor:help}
+  .pill.clash{background:var(--clash-bg);color:var(--clash-ink)}
+  .pill.alive{background:var(--alive-bg);color:var(--alive-ink)}
+  .pill.idle{background:var(--ink-100);color:var(--ink-500)}
+  .chip{flex:none;height:16px;display:inline-flex;align-items:center;font-family:var(--mono);
+    font-size:var(--fs-1);padding:0 6px;border-radius:5px;cursor:help;white-space:nowrap;
+    line-height:16px;background:var(--ink-100);color:var(--ink-500)}
+  .chip.add{background:var(--alive-bg);color:var(--alive-ink)}
+  .chip.gone{background:var(--need-bg);color:var(--need-ink);text-decoration:line-through}
+  .chip.keep{box-shadow:inset 0 0 0 1px var(--ink-200);background:none}
+  .prov{display:flex;align-items:center;gap:var(--sp-2);padding:10px var(--sp-4);
+    border-top:1px solid var(--ink-150);font-family:var(--mono);font-size:var(--fs-1);
+    color:var(--ink-400);flex-wrap:wrap}
+  .prov .dot{width:5px;height:5px;border-radius:50%;background:var(--ink-300)}
+  .actions{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-3) var(--sp-4);
+    border-top:1px solid var(--ink-150);background:#fbfbfa}
+  .actions button{appearance:none;border:0;height:28px;padding:0 14px;border-radius:var(--r-s);
+    font-family:var(--sans);font-size:var(--fs-3);font-weight:550;cursor:pointer;
+    transition:filter var(--t-fast) var(--ease)}
+  .actions button:hover{filter:brightness(1.06)}
+  .actions .primary{background:var(--ink-900);color:#fbfbfa;font-weight:600;
+    box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)}
+  .actions .quiet{background:var(--card);color:var(--ink-700);box-shadow:var(--sh-1);
+    font-size:var(--fs-2)}
+  .actions .note{margin-left:auto;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);cursor:help}
+
+  /* ── diff language (shared by A and C) ───────────────────────────────── */
+  .panes{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--ink-150)}
+  .pane{padding:var(--sp-4);min-width:0}
+  .pane + .pane{border-left:1px solid var(--ink-150)}
+  .plate{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+  .plate .who{font-size:var(--fs-2);font-weight:650;letter-spacing:.4px}
+  .plate .meta{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);cursor:help}
+  .claim{font-size:var(--fs-4);line-height:1.75;color:var(--ink-700)}
+  .claim .lede{font-weight:600;color:var(--ink-900);display:block;margin-bottom:var(--sp-2)}
+  .claim code{font-family:var(--mono);font-size:var(--fs-2);background:var(--ink-100);
+    border-radius:4px;padding:1px 4px}
+  del{background:var(--need-bg);color:var(--need-ink);text-decoration:line-through;
+    text-decoration-color:rgba(156,48,34,.45);border-radius:3px;padding:0 2px;cursor:help}
+  ins{background:var(--alive-bg);color:var(--alive-ink);text-decoration:none;
+    border-radius:3px;padding:0 2px;cursor:help}
+  del[data-d],ins[data-d]{transition:box-shadow var(--t-fast) var(--ease)}
+  .lit{box-shadow:0 0 0 2px rgba(90,127,184,.55)}
+  .anchors{margin-top:var(--sp-4)}
+  .anchors h4{font-size:var(--fs-1);font-weight:650;letter-spacing:.8px;color:var(--ink-400);
+    margin-bottom:var(--sp-2)}
+  .anchors ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .anchors li{display:flex;align-items:center;gap:var(--sp-2)}
+  .anchors .file{font-family:var(--mono);font-size:var(--fs-2);color:var(--ink-700);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .anchors li.gone .file{color:var(--ink-400);text-decoration:line-through}
+  .tag{flex:none;font-family:var(--mono);font-size:var(--fs-1);border-radius:4px;
+    padding:1px 5px;cursor:help}
+  .tag.add{background:var(--alive-bg);color:var(--alive-ink)}
+  .tag.keep{background:var(--ink-100);color:var(--ink-500)}
+  .tag.role{box-shadow:inset 0 0 0 1px var(--ink-200);color:var(--ink-500)}
+
+  /* ── variant B: field cards ──────────────────────────────────────────── */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);padding:var(--sp-4);
+    border-top:1px solid var(--ink-150)}
+  .vcard{border:1px solid var(--ink-150);border-radius:var(--r-m);overflow:hidden;min-width:0}
+  .vcard .plate{padding:10px var(--sp-3);margin:0;background:#fbfbfa;
+    border-bottom:1px solid var(--ink-150)}
+  .field{padding:var(--sp-3);border-bottom:1px solid var(--ink-100)}
+  .field:last-child{border-bottom:0}
+  .field .fh{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:6px}
+  .field .fname{font-size:var(--fs-1);font-weight:650;letter-spacing:.8px;color:var(--ink-400)}
+  .field .fbody{font-size:var(--fs-3);line-height:1.65;color:var(--ink-700)}
+  .field.same .fbody{color:var(--ink-400)}
+  .field.changed{background:#fdfcf7}
+  .field .fbody mark{background:var(--alive-bg);color:var(--alive-ink);border-radius:3px;padding:0 2px}
+  .fchip{flex:none;font-family:var(--mono);font-size:var(--fs-1);border-radius:4px;
+    padding:1px 5px;cursor:help}
+  .fchip.changed{background:var(--clash-bg);color:var(--clash-ink)}
+  .fchip.same{background:var(--ink-100);color:var(--ink-400)}
+
+  /* ── variant C: narrative first ──────────────────────────────────────── */
+  .verdict{padding:var(--sp-4);border-top:1px solid var(--ink-150);display:flex;
+    flex-direction:column;gap:var(--sp-3)}
+  .verdict .line{font-size:14px;line-height:1.6;color:var(--ink-900);font-weight:550;max-width:64ch}
+  .verdict ul{list-style:none;display:flex;flex-direction:column;gap:var(--sp-2)}
+  .verdict li{display:flex;gap:var(--sp-2);font-size:var(--fs-3);line-height:1.6;color:var(--ink-700)}
+  .verdict li .b{flex:none;width:5px;height:5px;border-radius:50%;background:var(--ink-300);margin-top:7px}
+  .verdict li code{font-family:var(--mono);font-size:var(--fs-2);background:var(--ink-100);
+    border-radius:4px;padding:1px 4px}
+  details.fold{border-top:1px solid var(--ink-150)}
+  details.fold summary{list-style:none;cursor:pointer;padding:var(--sp-3) var(--sp-4);
+    font-size:var(--fs-3);font-weight:550;color:var(--read-ink);display:flex;
+    align-items:center;gap:var(--sp-2);transition:background var(--t-fast) var(--ease)}
+  details.fold summary:hover{background:#fbfbfa}
+  details.fold summary::-webkit-details-marker{display:none}
+  details.fold summary .tri{transition:transform var(--t-base) var(--ease);font-size:9px;color:var(--ink-400)}
+  details.fold[open] summary .tri{transform:rotate(90deg)}
+  details.fold .panes{border-top:1px solid var(--ink-100)}
+
+  /* ── variant F: converged information architecture ───────────────────── */
+  .fhead{padding:var(--sp-4);display:flex;flex-direction:column;gap:6px}
+  .fhead .fcrumb{font-size:var(--fs-2);color:var(--ink-400)}
+  .fhead .fcrumb b{color:var(--ink-500);font-weight:550}
+  .fhead h2{font-size:15px;font-weight:650;letter-spacing:-.1px}
+  .fhead .fsum{font-size:var(--fs-3);line-height:1.6;color:var(--ink-500);max-width:66ch}
+  .fhead details{margin-top:2px}
+  .fhead details summary{list-style:none;cursor:pointer;font-size:var(--fs-2);
+    color:var(--read-ink);display:inline-flex;align-items:center;gap:5px}
+  .fhead details summary::-webkit-details-marker{display:none}
+  .fhead details summary .tri{font-size:8px;color:var(--ink-400);transition:transform var(--t-base) var(--ease)}
+  .fhead details[open] summary .tri{transform:rotate(90deg)}
+  .fhead details blockquote{margin:8px 0 0;font-size:var(--fs-2);line-height:1.6;
+    color:var(--ink-500);border-left:2px solid var(--ink-200);padding-left:10px}
+  .fhead details .rprov{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);margin-top:3px}
+  .cmpbar{display:flex;align-items:center;gap:var(--sp-3);padding:10px var(--sp-4);
+    border-top:1px solid var(--ink-150);background:#fbfbfa}
+  .cmpbar .cl{font-size:var(--fs-1);font-weight:650;letter-spacing:.8px;color:var(--ink-400)}
+  .fgrid{display:grid;grid-template-columns:120px 1fr 1fr;border-top:1px solid var(--ink-150)}
+  .fg-c{padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--ink-100);min-width:0;
+    font-size:var(--fs-3);line-height:1.7;color:var(--ink-700)}
+  .fg-label{background:#fbfbfa;border-right:1px solid var(--ink-150);
+    display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding-top:14px}
+  .fg-label .n{font-size:var(--fs-1);font-weight:650;letter-spacing:.8px;color:var(--ink-400);
+    display:inline-flex;align-items:center;gap:5px}
+  .fg-label .n .also{width:5px;height:5px;border-radius:50%;background:var(--clash);cursor:help}
+  .st{font-family:var(--mono);font-size:var(--fs-1);border-radius:4px;padding:1px 5px;cursor:help}
+  .st.changed{background:var(--alive-bg);color:var(--alive-ink)}
+  .st.diverges{background:var(--clash-bg);color:var(--clash-ink)}
+  .st.same{background:var(--ink-100);color:var(--ink-400)}
+  .st.outline{background:none;box-shadow:inset 0 0 0 1px var(--ink-200);color:var(--ink-500)}
+  .fg-left{border-right:1px solid var(--ink-100)}
+  .fg-span{grid-column:2/4;color:var(--ink-400)}
+  .fg-head{padding:9px var(--sp-4);border-bottom:1px solid var(--ink-150);background:#fbfbfa;
+    display:flex;align-items:baseline;gap:var(--sp-2);min-width:0}
+  .fg-head .who{font-size:var(--fs-2);font-weight:650;letter-spacing:.4px;flex:none}
+  .fg-head .bchip2{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-500);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+  .ffoot{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-3) var(--sp-4);
+    border-top:1px solid var(--ink-150);background:#fbfbfa;flex-wrap:wrap}
+  .ffoot .fprov{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);
+    margin-left:auto;cursor:help}
+
+  /* ── variant E: row-aligned diff grid + multi-branch endpoints ───────── */
+  .divstrip{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;
+    padding:10px var(--sp-4);border-top:1px solid var(--ink-150);background:#fdfcf7}
+  .divstrip .t{font-size:var(--fs-3);font-weight:550;color:var(--ink-700)}
+  .fstate{flex:none;display:inline-flex;align-items:center;gap:5px;height:18px;
+    font-family:var(--mono);font-size:var(--fs-1);border-radius:9px;padding:0 8px;cursor:help}
+  .fstate .fn{font-weight:650;letter-spacing:.5px}
+  .fstate.diverge{background:var(--clash-bg);color:var(--clash-ink)}
+  .fstate.oneside{background:var(--alive-bg);color:var(--alive-ink)}
+  .fstate.allsame{background:var(--ink-100);color:var(--ink-500)}
+  .seg{display:inline-flex;background:var(--ink-100);border-radius:var(--r-s);padding:2px;gap:2px}
+  .seg button{appearance:none;border:0;background:none;font-family:var(--mono);
+    font-size:var(--fs-1);color:var(--ink-500);padding:4px 10px;border-radius:5px;
+    cursor:pointer;transition:all var(--t-fast) var(--ease)}
+  .seg button:hover{color:var(--ink-700)}
+  .seg button[aria-pressed="true"]{background:var(--card);color:var(--ink-900);box-shadow:var(--sh-1)}
+  .seg button:focus-visible{outline:2px solid #48699c;outline-offset:1px}
+  .dgrid{display:grid;grid-template-columns:84px 1fr 1fr;border-top:1px solid var(--ink-150)}
+  .dg-c{padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--ink-100);min-width:0;
+    font-size:var(--fs-3);line-height:1.7;color:var(--ink-700)}
+  .dg-label{background:#fbfbfa;border-right:1px solid var(--ink-150);
+    font-size:var(--fs-1);font-weight:650;letter-spacing:.8px;color:var(--ink-400);
+    display:flex;align-items:flex-start;padding-top:14px}
+  .dg-left{border-right:1px solid var(--ink-100)}
+  .dg-head{padding:10px var(--sp-4);border-bottom:1px solid var(--ink-150);background:#fbfbfa;
+    display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+  .dg-head .who{font-size:var(--fs-2);font-weight:650;letter-spacing:.4px}
+  .dg-head .bchip{font-family:var(--mono);font-size:var(--fs-1);background:var(--ink-100);
+    color:var(--ink-500);border-radius:5px;padding:1px 6px;cursor:help;max-width:200px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dg-head .meta{font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400);cursor:help}
+  .dg-c.samecell{color:var(--ink-400)}
+  .dg-c .samechip{font-family:var(--mono);font-size:var(--fs-1);background:var(--ink-100);
+    color:var(--ink-400);border-radius:4px;padding:1px 5px;margin-left:6px;cursor:help}
+  /* peer-divergence tint: no direction, no winner — blue, not green/red */
+  .dv{background:rgba(90,127,184,.14);color:var(--read-ink);border-radius:3px;padding:0 2px;cursor:help}
+  .dg-c .anchors{margin-top:0}
+
+  /* ── variant D: honest verdict layer ─────────────────────────────────── */
+  .fact-chip{flex:none;font-family:var(--mono);font-size:var(--fs-1);border-radius:4px;
+    padding:1px 5px;background:var(--ink-100);color:var(--ink-500);cursor:help;
+    margin-left:6px;white-space:nowrap}
+  .reading{margin:0 var(--sp-4) var(--sp-4);background:#fbfbfa;border:1px solid var(--ink-150);
+    border-radius:var(--r-m);padding:var(--sp-3)}
+  .reading .rk{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:6px}
+  .reading .rk .k{font-size:var(--fs-1);font-weight:650;letter-spacing:.8px;color:var(--ink-400)}
+  .reading .rk .interp{font-family:var(--mono);font-size:var(--fs-1);color:var(--clash-ink);
+    background:var(--clash-bg);border-radius:4px;padding:1px 5px;cursor:help}
+  .reading blockquote{font-size:var(--fs-3);line-height:1.65;color:var(--ink-700);
+    border-left:2px solid var(--ink-200);padding-left:10px;margin:0}
+  .reading .rprov{margin-top:6px;font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)}
+
+  @media (max-width:900px){
+    .panes,.cards{grid-template-columns:1fr}
+    .pane + .pane{border-left:0;border-top:1px solid var(--ink-150)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important}
+  }
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <h1>Spec 深钻对比 — 三个方向</h1>
+    <p>命题：第一层永不出现 spec（KB 隐身不变）；只在<b>深钻/比较时刻</b>，为"安心"按需显形一个
+       claim 级 side-by-side。场景用本周真事：<span style="font-family:var(--mono);font-size:12px">ae71422</span>
+       把 hook ingestion 拆成 host-neutral adapter 后，增量蒸馏对"hook 采集"这条 claim 提出了 r3 修订——
+       这正是"代码动了，知识跟不跟"的漂移审阅时刻。三个变体是同一时刻的三种呈现哲学。</p>
+    <span class="doctrine">invisible by default · revealed at the comparison moment</span>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="变体切换">
+    <button role="tab" aria-selected="true"  data-v="f">F · 收敛版</button>
+    <button role="tab" aria-selected="false" data-v="e">E · 行对齐 + 多分支</button>
+    <button role="tab" aria-selected="false" data-v="d">D · 合成</button>
+    <button role="tab" aria-selected="false" data-v="a">A · Ledger</button>
+    <button role="tab" aria-selected="false" data-v="b">B · 字段卡</button>
+    <button role="tab" aria-selected="false" data-v="c">C · 结论先行</button>
+  </nav>
+
+  <!-- ══════════ VARIANT F — converged IA: every fact exactly once ══════════ -->
+  <section data-panel="f">
+    <div class="window" role="dialog" aria-label="Claim comparison — hook capture">
+
+      <!-- layer 1 · header: where am I + what happened (one sentence, no pills) -->
+      <div class="fhead">
+        <p class="fcrumb">← <b>Hook capture</b> · drift</p>
+        <h2>How sessions report</h2>
+        <p class="fsum">Code under this claim was reorganized on two branches; each proposes a
+        revision. The active claim keeps governing until you review.</p>
+        <details>
+          <summary><span class="tri">▶</span>readings from the update runs<span style="font-family:var(--mono);color:var(--ink-300)">interpretation, not fact</span></summary>
+          <blockquote>"The adapter split generalizes ingestion to any host; the session-safety
+          contract is untouched."<span class="rprov" style="display:block">— update agent · run-0719a · ae71422</span></blockquote>
+          <blockquote>"Transcript tailing is now bounded and streaming; behavior under the write
+          lock is unchanged."<span class="rprov" style="display:block">— update agent · run-0719b · f1c2d3e</span></blockquote>
+        </details>
+      </div>
+
+      <!-- layer 2 · comparison bar: what am I comparing (the only control) -->
+      <div class="cmpbar">
+        <span class="cl">COMPARE</span>
+        <span class="seg" role="group" aria-label="Comparison endpoints">
+          <button aria-pressed="true"  data-mode="ba" title="Directional: what codex-adapter proposes against the governing claim">main ↔ codex-adapter</button>
+          <button aria-pressed="false" data-mode="bb" title="Directional: what hook-cleanup proposes against the governing claim">main ↔ hook-cleanup</button>
+          <button aria-pressed="false" data-mode="ab" title="Peer comparison: no direction, no winner — divergence in neutral blue">codex-adapter ↔ hook-cleanup</button>
+        </span>
+      </div>
+
+      <!-- layer 3 · the grid: ALL field-level truth lives here -->
+      <div data-dmode="ba">
+        <div class="fgrid">
+          <div class="fg-c fg-label" style="border-bottom-color:var(--ink-150);padding:0" aria-hidden="true"></div>
+          <div class="fg-head fg-left">
+            <span class="who" style="color:var(--ink-500)">ACTIVE</span>
+            <span class="bchip2" title="Revision 2 · cold-start distillation · governing since Jul 12">main · r2 · Jul 12</span>
+          </div>
+          <div class="fg-head">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="bchip2" title="Update run-0719a from this branch's checkout · commit ae71422 · awaiting review">vibehub/codex-adapter · r3a</span>
+          </div>
+
+          <div class="fg-c fg-label"><span class="n">CLAIM</span><span class="st changed" title="r3a rewrites this field">changed</span></div>
+          <div class="fg-c fg-left">Hook ingestion is <del data-d="f1" title="r3a rewords this">Claude Code–specific</del> and must never break a session.</div>
+          <div class="fg-c">Hook ingestion is <ins data-d="f1" title="was: Claude Code–specific">host-neutral</ins> and must never break a session.</div>
+
+          <div class="fg-c fg-label"><span class="n">HOW<span class="also" title="hook-cleanup also changes this field — switch to the peer comparison"></span></span><span class="st changed" title="r3a rewrites this field">changed</span></div>
+          <div class="fg-c fg-left">Reads <del data-d="f2" title="r3a rewords this">the Claude Code payload</del> from stdin; one short-lived pass; always exits 0. Transcript reads happen outside the write lock.</div>
+          <div class="fg-c">Reads <ins data-d="f2" title="was: the Claude Code payload">a host payload</ins> from stdin; <ins data-d="f3" title="new — the adapter layer from ae71422">Claude Code and Codex adapters translate it into one canonical hook event contract</ins>; one short-lived pass; always exits 0. Transcript reads happen outside the write lock.</div>
+
+          <div class="fg-c fg-label"><span class="n">ANCHORS<span class="also" title="hook-cleanup also changes this field — switch to the peer comparison"></span></span><span class="st changed" title="r3a adds 2 anchors and one role note">+2</span></div>
+          <div class="fg-c fg-left"><div class="anchors"><ul>
+            <li><span class="st same" title="File still exists; content hash drifted">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+            <li><span class="st same" title="Symbol unchanged">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+          </ul></div></div>
+          <div class="fg-c"><div class="anchors"><ul>
+            <li><span class="st same" title="Retained">kept</span><span class="file">packages/core/src/hook-ingest.ts</span><span class="st outline" title="Role change proposed by r3a">compat wrapper</span></li>
+            <li><span class="st same" title="Retained">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            <li><span class="st changed" title="New in r3a — canonical hook event contract">added</span><span class="file">packages/core/src/hook-protocol.ts</span></li>
+            <li><span class="st changed" title="New in r3a — Claude/Codex payload adapters">added</span><span class="file">packages/cli/src/hook-adapters.ts</span></li>
+          </ul></div></div>
+
+          <div class="fg-c fg-label" style="border-bottom:0"><span class="n">INVARIANT</span><span class="st same" title="Byte-identical across the active claim and both candidates — machine-checked">same ×3</span></div>
+          <div class="fg-c fg-span" style="border-bottom:0">A hook must never break the user's session — always exit 0.</div>
+        </div>
+      </div>
+
+      <div data-dmode="bb" hidden>
+        <div class="fgrid">
+          <div class="fg-c fg-label" style="border-bottom-color:var(--ink-150);padding:0" aria-hidden="true"></div>
+          <div class="fg-head fg-left">
+            <span class="who" style="color:var(--ink-500)">ACTIVE</span>
+            <span class="bchip2" title="Revision 2 · cold-start distillation · governing since Jul 12">main · r2 · Jul 12</span>
+          </div>
+          <div class="fg-head">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="bchip2" title="Update run-0719b from this branch's worktree · commit f1c2d3e · awaiting review">vibehub/hook-cleanup · r3b</span>
+          </div>
+
+          <div class="fg-c fg-label"><span class="n">CLAIM<span class="also" title="codex-adapter changes this field — switch endpoints to see it"></span></span><span class="st same" title="r3b does not change this field">same</span></div>
+          <div class="fg-c fg-span">Hook ingestion is Claude Code–specific and must never break a session.</div>
+
+          <div class="fg-c fg-label"><span class="n">HOW<span class="also" title="codex-adapter also changes this field — switch to the peer comparison"></span></span><span class="st changed" title="r3b rewrites transcript reading">changed</span></div>
+          <div class="fg-c fg-left">Reads the Claude Code payload from stdin; one short-lived pass; always exits 0. <del data-d="f4" title="r3b rewords this">Transcript reads happen outside the write lock.</del></div>
+          <div class="fg-c">Reads the Claude Code payload from stdin; one short-lived pass; always exits 0. <ins data-d="f4" title="was: Transcript reads happen outside the write lock.">Transcript tails stream through a bounded reader, outside the write lock.</ins></div>
+
+          <div class="fg-c fg-label"><span class="n">ANCHORS<span class="also" title="codex-adapter also changes this field — switch to the peer comparison"></span></span><span class="st changed" title="r3b adds one anchor">+1</span></div>
+          <div class="fg-c fg-left"><div class="anchors"><ul>
+            <li><span class="st same" title="File still exists">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+            <li><span class="st same" title="Symbol unchanged">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+          </ul></div></div>
+          <div class="fg-c"><div class="anchors"><ul>
+            <li><span class="st same" title="Retained">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+            <li><span class="st same" title="Retained">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            <li><span class="st changed" title="New in r3b — bounded transcript tail reader">added</span><span class="file">packages/core/src/transcript-reader.ts</span></li>
+          </ul></div></div>
+
+          <div class="fg-c fg-label" style="border-bottom:0"><span class="n">INVARIANT</span><span class="st same" title="Byte-identical across the active claim and both candidates — machine-checked">same ×3</span></div>
+          <div class="fg-c fg-span" style="border-bottom:0">A hook must never break the user's session — always exit 0.</div>
+        </div>
+      </div>
+
+      <div data-dmode="ab" hidden>
+        <div class="fgrid">
+          <div class="fg-c fg-label" style="border-bottom-color:var(--ink-150);padding:0" aria-hidden="true"></div>
+          <div class="fg-head fg-left">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="bchip2" title="Update run-0719a · commit ae71422 · awaiting review">vibehub/codex-adapter · r3a</span>
+          </div>
+          <div class="fg-head">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="bchip2" title="Update run-0719b · commit f1c2d3e · awaiting review">vibehub/hook-cleanup · r3b</span>
+          </div>
+
+          <div class="fg-c fg-label"><span class="n">CLAIM</span><span class="st diverges" title="The candidates disagree — no direction, no winner">diverges</span></div>
+          <div class="fg-c fg-left">Hook ingestion is <span class="dv" data-d="f5" title="The candidates disagree here">host-neutral</span> and must never break a session.</div>
+          <div class="fg-c">Hook ingestion is <span class="dv" data-d="f5" title="The candidates disagree here">Claude Code–specific</span> and must never break a session.</div>
+
+          <div class="fg-c fg-label"><span class="n">HOW</span><span class="st diverges" title="Both candidates rewrite this field, differently — reconcile in review">diverges</span></div>
+          <div class="fg-c fg-left">Reads <span class="dv" data-d="f6" title="The candidates disagree here">a host payload</span> from stdin; <span class="dv" data-d="f7" title="Only r3a adds the adapter sentence">adapters translate it into one canonical hook event contract</span>; one short-lived pass; always exits 0. <span class="dv" data-d="f8" title="The candidates disagree here">Transcript reads happen outside the write lock.</span></div>
+          <div class="fg-c">Reads <span class="dv" data-d="f6" title="The candidates disagree here">the Claude Code payload</span> from stdin; one short-lived pass; always exits 0. <span class="dv" data-d="f8" title="The candidates disagree here">Transcript tails stream through a bounded reader, outside the write lock.</span></div>
+
+          <div class="fg-c fg-label"><span class="n">ANCHORS</span><span class="st diverges" title="r3a adds 2 files; r3b adds a different one">diverges</span></div>
+          <div class="fg-c fg-left"><div class="anchors"><ul>
+            <li><span class="st same">kept</span><span class="file">packages/core/src/hook-ingest.ts</span><span class="st outline" title="Only r3a proposes this role change">compat wrapper</span></li>
+            <li><span class="st same">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            <li><span class="st diverges" title="Only in r3a">r3a only</span><span class="file">packages/core/src/hook-protocol.ts</span></li>
+            <li><span class="st diverges" title="Only in r3a">r3a only</span><span class="file">packages/cli/src/hook-adapters.ts</span></li>
+          </ul></div></div>
+          <div class="fg-c"><div class="anchors"><ul>
+            <li><span class="st same">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+            <li><span class="st same">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            <li><span class="st diverges" title="Only in r3b">r3b only</span><span class="file">packages/core/src/transcript-reader.ts</span></li>
+          </ul></div></div>
+
+          <div class="fg-c fg-label" style="border-bottom:0"><span class="n">INVARIANT</span><span class="st same" title="Byte-identical across both candidates and the active claim">same ×3</span></div>
+          <div class="fg-c fg-span" style="border-bottom:0">A hook must never break the user's session — always exit 0.</div>
+        </div>
+      </div>
+
+      <!-- layer 4 · footer: actions + identity, one bar -->
+      <div class="ffoot">
+        <button class="primary" style="height:28px;padding:0 14px;border-radius:var(--r-s);border:0;font-family:var(--sans);font-size:var(--fs-3);font-weight:600;background:var(--ink-900);color:#fbfbfa;cursor:pointer;box-shadow:0 1px 2px rgba(20,22,26,.18),0 3px 10px rgba(20,22,26,.14)" title="Assembles both candidates with their branch provenance and runs the review workflow in your agent — the App decides nothing by itself">Review in your agent</button>
+        <button class="quiet" style="height:28px;padding:0 14px;border-radius:var(--r-s);border:0;font-family:var(--sans);font-size:var(--fs-2);font-weight:550;background:var(--card);color:var(--ink-700);cursor:pointer;box-shadow:var(--sh-1)" title="Leave r2 governing; both candidates stay recorded">Keep current claim</button>
+        <button class="quiet" style="height:28px;padding:0 14px;border-radius:var(--r-s);border:0;font-family:var(--sans);font-size:var(--fs-2);font-weight:550;background:var(--card);color:var(--ink-700);cursor:pointer;box-shadow:var(--sh-1)" title="The code deltas are GitHub's job — opens ae71422 and f1c2d3e there">Open code diffs on GitHub</button>
+        <span class="fprov" title="Stable identity and producers — audit trail, never surfaced on the map">decision-hooks-004 · r2 governs · r3a run-0719a · r3b run-0719b · decides nothing by itself</span>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:16px">
+      <b>F · 收敛版。</b>对 E 的"乱"做图层纪律手术——<b>每个事实只出现一次，归属唯一图层</b>：
+      header 只剩一句机械结论（kicker、cause pills、verdict bullets、agreement 条全部裁掉）；
+      字段状态收进 grid 标签列（changed / diverges / same ×3 就地可见）；
+      <b>相同字段单格横贯，不再左右重复同一句话</b>；另一分支也动了某字段时，标签旁一颗琥珀小点提示
+      （悬停解释，点分段器切换）；agent 解读收进 header 的折叠行；chip 从 8 族收敛到 2 族
+      （状态 tag + 出身 chip）。横带从 7 条减到 4 条：header / compare / grid / footer。
+      <span class="q">这个收敛度对了吗？如果还乱，下一刀是砍掉 header 的结论句（让 grid 自己说话）；
+      如果收过头了，把 agreement 概览加回 COMPARE 条右侧。</span>
+    </p>
+  </section>
+
+  <!-- ══════════ VARIANT E — row-aligned side-by-side + multi-branch candidates ══════════ -->
+  <section data-panel="e" hidden>
+    <div class="window" role="dialog" aria-label="Claim comparison — hook capture">
+      <div class="crumb">
+        <span class="back" title="Back to the drift item in the needs-attention queue">←</span>
+        <span class="path"><b>Hook capture</b> · drift · two branches propose revisions</span>
+      </div>
+      <div class="head">
+        <span class="kicker">DRIFT · TWO BRANCHES PROPOSE REVISIONS</span>
+        <h2>How sessions report</h2>
+        <div class="causes">
+          <span class="pill clash" title="Update runs on two branches each propose a revision of this claim">2 candidates</span>
+          <span class="pill clash" title="The HOW and ANCHORS fields differ between the two candidates">fields diverge</span>
+          <span class="pill idle" title="The invariant sentence is byte-identical in the active claim and both candidates">invariant holds ×3</span>
+        </div>
+      </div>
+
+      <div class="verdict">
+        <p class="line">Two branches propose revisions to this claim. They agree the invariant
+        holds; they diverge on HOW and ANCHORS.</p>
+        <ul>
+          <li><span class="b"></span><span><code>vibehub/codex-adapter</code> broadens the claim to
+            host-neutral and adds the adapter layer.<span class="fact-chip" title="Candidate r3a from update run-0719a, commit ae71422">r3a</span></span></li>
+          <li><span class="b"></span><span><code>vibehub/hook-cleanup</code> keeps the Claude-specific
+            wording but reworks transcript reading.<span class="fact-chip" title="Candidate r3b from update run-0719b, commit f1c2d3e">r3b</span></span></li>
+          <li><span class="b"></span><span>INVARIANT is byte-identical across the active claim and both
+            candidates.<span class="fact-chip" title="Field-level comparison across all three revisions; machine-checked">byte-identical ×3</span></span></li>
+        </ul>
+      </div>
+
+      <div class="divstrip">
+        <span class="t" title="Field-level three-way state across ACTIVE, r3a, r3b — machine-derived">Field agreement</span>
+        <span class="fstate oneside" title="Only vibehub/codex-adapter changes this field"><span class="fn">CLAIM</span>codex-adapter only</span>
+        <span class="fstate diverge" title="Both candidates change this field, differently — the branches must reconcile"><span class="fn">HOW</span>diverges</span>
+        <span class="fstate diverge" title="codex-adapter adds 2 anchors; hook-cleanup adds 1 different anchor"><span class="fn">ANCHORS</span>diverges</span>
+        <span class="fstate allsame" title="Byte-identical across all three revisions"><span class="fn">INVARIANT</span>same everywhere</span>
+        <span style="margin-left:auto" class="seg" role="group" aria-label="Comparison endpoints">
+          <button aria-pressed="true"  data-mode="ba" title="Directional: what r3a proposes against the governing claim">ACTIVE ↔ codex-adapter</button>
+          <button aria-pressed="false" data-mode="bb" title="Directional: what r3b proposes against the governing claim">ACTIVE ↔ hook-cleanup</button>
+          <button aria-pressed="false" data-mode="ab" title="Peer comparison: no direction, no winner — divergence shown in neutral blue">codex-adapter ↔ hook-cleanup</button>
+        </span>
+      </div>
+
+      <!-- mode 1: ACTIVE ↔ codex-adapter (directional: red del / green ins) -->
+      <div data-dmode="ba">
+        <div class="dgrid">
+          <div class="dg-c dg-label" aria-hidden="true"></div>
+          <div class="dg-head dg-left">
+            <span class="who" style="color:var(--ink-500)">ACTIVE</span>
+            <span class="bchip" title="The revision governing this repo since activation">main · baseline</span>
+            <span class="meta" title="Revision 2, cold-start distillation, 2026-07-12">r2 · Jul 12</span>
+          </div>
+          <div class="dg-head">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="bchip" title="Produced from this branch's checkout by update run-0719a">vibehub/codex-adapter</span>
+            <span class="meta" title="Awaiting review; nothing governs until accepted">r3a · awaiting review</span>
+          </div>
+
+          <div class="dg-c dg-label">CLAIM</div>
+          <div class="dg-c dg-left">Hook ingestion is <del data-d="e1" title="r3a rewords this">Claude Code–specific</del> and must never break a session.</div>
+          <div class="dg-c">Hook ingestion is <ins data-d="e1" title="was: Claude Code–specific">host-neutral</ins> and must never break a session.</div>
+
+          <div class="dg-c dg-label">HOW</div>
+          <div class="dg-c dg-left">Reads <del data-d="e2" title="r3a rewords this">the Claude Code payload</del> from stdin; one short-lived pass; always exits 0. Transcript reads happen outside the write lock.</div>
+          <div class="dg-c">Reads <ins data-d="e2" title="was: the Claude Code payload">a host payload</ins> from stdin; <ins data-d="e3" title="new — the adapter layer from ae71422">Claude Code and Codex adapters translate it into one canonical hook event contract</ins>; one short-lived pass; always exits 0. Transcript reads happen outside the write lock.</div>
+
+          <div class="dg-c dg-label">ANCHORS</div>
+          <div class="dg-c dg-left"><div class="anchors"><ul>
+            <li><span class="tag keep" title="File still exists; content hash drifted">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+            <li><span class="tag keep" title="Symbol unchanged">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+          </ul></div></div>
+          <div class="dg-c"><div class="anchors"><ul>
+            <li><span class="tag keep" title="Retained">kept</span><span class="file">packages/core/src/hook-ingest.ts</span><span class="tag role" title="Role change proposed by r3a">now a compat wrapper</span></li>
+            <li><span class="tag keep" title="Retained">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            <li><span class="tag add" title="New in r3a — canonical hook event contract">added</span><span class="file">packages/core/src/hook-protocol.ts</span></li>
+            <li><span class="tag add" title="New in r3a — Claude/Codex payload adapters">added</span><span class="file">packages/cli/src/hook-adapters.ts</span></li>
+          </ul></div></div>
+
+          <div class="dg-c dg-label" style="border-bottom:0">INVARIANT</div>
+          <div class="dg-c dg-left samecell" style="border-bottom:0">A hook must never break the user's session — always exit 0.<span class="samechip" title="Byte-identical across r2 and r3a — machine-checked">same</span></div>
+          <div class="dg-c samecell" style="border-bottom:0">A hook must never break the user's session — always exit 0.<span class="samechip" title="Byte-identical across r2 and r3a — machine-checked">same</span></div>
+        </div>
+      </div>
+
+      <!-- mode 2: ACTIVE ↔ hook-cleanup (directional) -->
+      <div data-dmode="bb" hidden>
+        <div class="dgrid">
+          <div class="dg-c dg-label" aria-hidden="true"></div>
+          <div class="dg-head dg-left">
+            <span class="who" style="color:var(--ink-500)">ACTIVE</span>
+            <span class="bchip" title="The revision governing this repo since activation">main · baseline</span>
+            <span class="meta" title="Revision 2, cold-start distillation, 2026-07-12">r2 · Jul 12</span>
+          </div>
+          <div class="dg-head">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="bchip" title="Produced from this branch's worktree by update run-0719b">vibehub/hook-cleanup</span>
+            <span class="meta" title="Awaiting review; nothing governs until accepted">r3b · awaiting review</span>
+          </div>
+
+          <div class="dg-c dg-label">CLAIM</div>
+          <div class="dg-c dg-left samecell">Hook ingestion is Claude Code–specific and must never break a session.<span class="samechip" title="r3b does not change this field">same</span></div>
+          <div class="dg-c samecell">Hook ingestion is Claude Code–specific and must never break a session.<span class="samechip" title="r3b does not change this field">same</span></div>
+
+          <div class="dg-c dg-label">HOW</div>
+          <div class="dg-c dg-left">Reads the Claude Code payload from stdin; one short-lived pass; always exits 0. <del data-d="e4" title="r3b rewords this">Transcript reads happen outside the write lock.</del></div>
+          <div class="dg-c">Reads the Claude Code payload from stdin; one short-lived pass; always exits 0. <ins data-d="e4" title="was: Transcript reads happen outside the write lock.">Transcript tails stream through a bounded reader, outside the write lock.</ins></div>
+
+          <div class="dg-c dg-label">ANCHORS</div>
+          <div class="dg-c dg-left"><div class="anchors"><ul>
+            <li><span class="tag keep" title="File still exists">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+            <li><span class="tag keep" title="Symbol unchanged">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+          </ul></div></div>
+          <div class="dg-c"><div class="anchors"><ul>
+            <li><span class="tag keep" title="Retained">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+            <li><span class="tag keep" title="Retained">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            <li><span class="tag add" title="New in r3b — bounded transcript tail reader">added</span><span class="file">packages/core/src/transcript-reader.ts</span></li>
+          </ul></div></div>
+
+          <div class="dg-c dg-label" style="border-bottom:0">INVARIANT</div>
+          <div class="dg-c dg-left samecell" style="border-bottom:0">A hook must never break the user's session — always exit 0.<span class="samechip" title="Byte-identical across r2 and r3b">same</span></div>
+          <div class="dg-c samecell" style="border-bottom:0">A hook must never break the user's session — always exit 0.<span class="samechip" title="Byte-identical across r2 and r3b">same</span></div>
+        </div>
+      </div>
+
+      <!-- mode 3: codex-adapter ↔ hook-cleanup (peer: neutral blue, no winner) -->
+      <div data-dmode="ab" hidden>
+        <div class="dgrid">
+          <div class="dg-c dg-label" aria-hidden="true"></div>
+          <div class="dg-head dg-left">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="bchip" title="Update run-0719a from this branch's checkout">vibehub/codex-adapter</span>
+            <span class="meta">r3a · awaiting review</span>
+          </div>
+          <div class="dg-head">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="bchip" title="Update run-0719b from this branch's worktree">vibehub/hook-cleanup</span>
+            <span class="meta">r3b · awaiting review</span>
+          </div>
+
+          <div class="dg-c dg-label">CLAIM</div>
+          <div class="dg-c dg-left">Hook ingestion is <span class="dv" data-d="e5" title="The candidates disagree here — no direction, no winner">host-neutral</span> and must never break a session.</div>
+          <div class="dg-c">Hook ingestion is <span class="dv" data-d="e5" title="The candidates disagree here — no direction, no winner">Claude Code–specific</span> and must never break a session.</div>
+
+          <div class="dg-c dg-label">HOW</div>
+          <div class="dg-c dg-left">Reads <span class="dv" data-d="e6" title="The candidates disagree here">a host payload</span> from stdin; <span class="dv" data-d="e7" title="Only r3a has the adapter sentence">Claude Code and Codex adapters translate it into one canonical hook event contract</span>; one short-lived pass; always exits 0. <span class="dv" data-d="e8" title="The candidates disagree here">Transcript reads happen outside the write lock.</span></div>
+          <div class="dg-c">Reads <span class="dv" data-d="e6" title="The candidates disagree here">the Claude Code payload</span> from stdin; one short-lived pass; always exits 0. <span class="dv" data-d="e8" title="The candidates disagree here">Transcript tails stream through a bounded reader, outside the write lock.</span></div>
+
+          <div class="dg-c dg-label">ANCHORS</div>
+          <div class="dg-c dg-left"><div class="anchors"><ul>
+            <li><span class="tag keep">kept</span><span class="file">packages/core/src/hook-ingest.ts</span><span class="tag role" title="Only r3a proposes this role change">compat wrapper</span></li>
+            <li><span class="tag keep">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            <li><span class="tag add" title="Only in r3a">r3a only</span><span class="file">packages/core/src/hook-protocol.ts</span></li>
+            <li><span class="tag add" title="Only in r3a">r3a only</span><span class="file">packages/cli/src/hook-adapters.ts</span></li>
+          </ul></div></div>
+          <div class="dg-c"><div class="anchors"><ul>
+            <li><span class="tag keep">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+            <li><span class="tag keep">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            <li><span class="tag add" title="Only in r3b">r3b only</span><span class="file">packages/core/src/transcript-reader.ts</span></li>
+          </ul></div></div>
+
+          <div class="dg-c dg-label" style="border-bottom:0">INVARIANT</div>
+          <div class="dg-c dg-left samecell" style="border-bottom:0">A hook must never break the user's session — always exit 0.<span class="samechip" title="Byte-identical across r3a and r3b">same</span></div>
+          <div class="dg-c samecell" style="border-bottom:0">A hook must never break the user's session — always exit 0.<span class="samechip" title="Byte-identical across r3a and r3b">same</span></div>
+        </div>
+      </div>
+
+      <div class="prov">
+        <span title="The claim's stable identity — audit only, never on the map">claim decision-hooks-004</span><span class="dot"></span>
+        <span>r2 governs · r3a + r3b awaiting review</span><span class="dot"></span>
+        <span title="Candidate producers">run-0719a @ vibehub/codex-adapter · run-0719b @ vibehub/hook-cleanup</span><span class="dot"></span>
+        <span title="Evidence commits">ae71422 · f1c2d3e</span>
+      </div>
+
+      <div class="actions">
+        <button class="primary" title="Assembles the three-way comparison — both candidates, both branch provenances — and runs the review workflow in your agent">Review in your agent</button>
+        <button class="quiet" title="Leave r2 governing; both candidates stay recorded">Keep current claim</button>
+        <button class="quiet" title="Opens the two commits on GitHub">Open code diffs on GitHub</button>
+        <span class="note" title="Reconciling divergent candidates executes through $vibehub-review in your agent session">decides nothing by itself</span>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:16px">
+      <b>E · 行对齐 + 多分支。</b>两处升级：① 真正的 side-by-side diff——字段是<b>横贯两栏的行</b>，
+      左右格子天然对齐，视线可以横扫（D 的两张独立卡在长文本下会上下漂移）；
+      ② candidate 是 branch/worktree 归属的——端点板上挂 branch chip，右上分段器切换三种两两对比。
+      色语言按方向诚实：对 ACTIVE 比有方向（红删/绿增）；<b>candidate 互比无方向，用蓝色 differs，不预设赢家</b>。
+      Field agreement 条是机器推导的三方摘要（diverges / one-side / same everywhere），HOW 那颗 diverge 就是
+      "same claim changed on both branches" 语义冲突时刻的入口。
+      <span class="q">① 三种两两对比够不够，还是你想要真三栏（base|ours|theirs）？② candidate 互比的蓝色中立语言对不对？③ Field agreement 条放 diff 上方还是收进 verdict 区？</span>
+    </p>
+  </section>
+
+  <!-- ══════════ VARIANT D — synthesis: C skeleton + honest verdict + B cards + A anchors ══════════ -->
+  <section data-panel="d" hidden>
+    <div class="window" role="dialog" aria-label="Claim comparison — hook capture">
+      <div class="crumb">
+        <span class="back" title="Back to the drift item in the needs-attention queue">←</span>
+        <span class="path"><b>Hook capture</b> · drift · code moved under this claim</span>
+      </div>
+      <div class="head">
+        <span class="kicker">DRIFT · IS THE KNOWLEDGE STILL TRUE?</span>
+        <h2>How sessions report</h2>
+        <div class="causes">
+          <span class="pill clash" title="2 anchored files were split into 4 in commit ae71422">code moved</span>
+          <span class="pill alive" title="Incremental update run-0719a proposes revision r3; nothing changes until review">update proposed</span>
+        </div>
+      </div>
+
+      <!-- verdict layer, honesty-split: mechanical facts first, interpretation
+           quoted + provenance-labeled, never mixed -->
+      <div class="verdict">
+        <p class="line">Commit <code>ae71422</code> reorganized the code under this claim.
+        The update run proposes revision r3: wording broadened, two anchors added.</p>
+        <ul>
+          <li><span class="b"></span><span>The invariant sentence — always exit 0, never break a session —
+            is byte-identical in r2 and r3.<span class="fact-chip" title="Field-level comparison of the two revisions; machine-checked">byte-identical</span></span></li>
+          <li><span class="b"></span><span>Anchors: 2 kept, 2 added, 0 removed; one role note on
+            <code>hook-ingest.ts</code>.<span class="fact-chip" title="Anchor set diff between r2 and r3; machine-checked">+2 / −0</span></span></li>
+          <li><span class="b"></span><span>Claim wording changes in 2 places; the HOW field gains one
+            sentence.<span class="fact-chip" title="Word-level diff of the summary and detail fields; machine-checked">2 edits</span></span></li>
+        </ul>
+      </div>
+
+      <div class="reading">
+        <div class="rk">
+          <span class="k">UPDATE RUN'S READING</span>
+          <span class="interp" title="This sentence is the update agent's interpretation of the change — quoted verbatim, never presented as mechanical fact">interpretation, not fact</span>
+        </div>
+        <blockquote>"The adapter split generalizes hook ingestion to any host; the session-safety
+        contract is untouched. r2's Claude-only framing is now too narrow."</blockquote>
+        <p class="rprov" title="Who produced this reading, and from what evidence">read by your update agent · run-0719a · from commit ae71422</p>
+      </div>
+
+      <details class="fold" open>
+        <summary><span class="tri">▶</span>Compare the two revisions<span style="font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)">field by field</span></summary>
+        <div class="cards" style="border-top:1px solid var(--ink-100)">
+          <div class="vcard">
+            <div class="plate">
+              <span class="who" style="color:var(--ink-500)">ACTIVE</span>
+              <span class="meta" title="Produced by the cold-start distillation on 2026-07-12; governing since activation">r2 · cold start · Jul 12</span>
+            </div>
+            <div class="field changed">
+              <div class="fh"><span class="fname">CLAIM</span><span class="fchip changed" title="r3 rewrites this field">differs</span></div>
+              <p class="fbody">Hook ingestion is Claude Code–specific and must never break a session.</p>
+            </div>
+            <div class="field changed">
+              <div class="fh"><span class="fname">HOW</span><span class="fchip changed" title="r3 adds the adapter sentence">differs</span></div>
+              <p class="fbody">Reads the Claude Code payload from stdin; one short-lived pass; always exits 0. Transcript reads outside the write lock.</p>
+            </div>
+            <div class="field changed">
+              <div class="fh"><span class="fname">ANCHORS</span><span class="fchip changed" title="r3 adds two files">2 files</span></div>
+              <div class="anchors" style="margin-top:0">
+                <ul>
+                  <li><span class="tag keep" title="File still exists; content hash drifted since distillation">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+                  <li><span class="tag keep" title="Symbol still exists; unchanged">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="field same">
+              <div class="fh"><span class="fname">INVARIANT</span><span class="fchip same" title="Byte-identical across r2 and r3 — machine-checked">same</span></div>
+              <p class="fbody">A hook must never break the user's session — always exit 0.</p>
+            </div>
+          </div>
+
+          <div class="vcard" style="border-color:#cfe0d3">
+            <div class="plate">
+              <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+              <span class="meta" title="Proposed by incremental update run-0719a from commit ae71422; nothing changes until you review">r3 · update run · awaiting review</span>
+            </div>
+            <div class="field changed">
+              <div class="fh"><span class="fname">CLAIM</span><span class="fchip changed" title="Rewritten from r2">differs</span></div>
+              <p class="fbody">Hook ingestion is <mark title="was: Claude Code–specific">host-neutral</mark> and must never break a session.</p>
+            </div>
+            <div class="field changed">
+              <div class="fh"><span class="fname">HOW</span><span class="fchip changed" title="Adds the adapter layer">differs</span></div>
+              <p class="fbody">Reads <mark title="was: the Claude Code payload">a host payload</mark> from stdin; <mark title="new — the layer ae71422 added">Claude Code and Codex adapters translate it into one canonical hook event contract</mark>; one short-lived pass; always exits 0. Transcript reads outside the write lock.</p>
+            </div>
+            <div class="field changed">
+              <div class="fh"><span class="fname">ANCHORS</span><span class="fchip changed" title="Two additions, one role change">4 files</span></div>
+              <div class="anchors" style="margin-top:0">
+                <ul>
+                  <li><span class="tag keep" title="Retained">kept</span><span class="file">packages/core/src/hook-ingest.ts</span><span class="tag role" title="Role change proposed by r3">now a compat wrapper</span></li>
+                  <li><span class="tag keep" title="Retained">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+                  <li><span class="tag add" title="New in r3 — the canonical hook event contract">added</span><span class="file">packages/core/src/hook-protocol.ts</span></li>
+                  <li><span class="tag add" title="New in r3 — Claude/Codex payload adapters">added</span><span class="file">packages/cli/src/hook-adapters.ts</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="field same">
+              <div class="fh"><span class="fname">INVARIANT</span><span class="fchip same" title="Byte-identical across r2 and r3 — machine-checked">same</span></div>
+              <p class="fbody">A hook must never break the user's session — always exit 0.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <div class="prov">
+        <span title="The claim's stable identity — shown here for audit, never on the map">claim decision-hooks-004</span><span class="dot"></span>
+        <span>r2 → r3</span><span class="dot"></span>
+        <span title="Producer of the candidate revision">distill · incremental · run-0719a</span><span class="dot"></span>
+        <span title="The commit whose delta triggered this proposal">evidence commit ae71422</span>
+      </div>
+
+      <div class="actions">
+        <button class="primary" title="Assembles exactly this comparison as context and runs the review workflow in your agent — the App decides nothing by itself">Review in your agent</button>
+        <button class="quiet" title="Leave r2 governing; the candidate stays recorded and re-surfaces only on new evidence">Keep current claim</button>
+        <button class="quiet" title="The code delta itself is GitHub's job — opens ae71422 there">Open code diff on GitHub</button>
+        <span class="note" title="Accepting or rejecting the revision executes through $vibehub-review in your agent session; this surface only assembles the moment">decides nothing by itself</span>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:16px">
+      <b>D · 合成。</b>C 的结论先行骨架 + B 的字段卡视觉 + A 的 anchors 呈现，外加对"结论"的诚实重构：
+      结论层严格分两块——<b>机械事实区</b>（每条 bullet 都是机器可证的，右侧挂事实 chip：byte-identical、+2/−0、2 edits），
+      和<b>解读区</b>（update agent 的一句话原文引用，显式标注 "interpretation, not fact" + 出身 run/commit，永不冒充事实）。
+      "它承诺的没变"由 INVARIANT: same 的机械比对承担，不靠系统嘴说。字段卡默认展开（深钻时刻原文就该在场）。
+      <span class="q">结论层这样拆（机械事实 / 标注出身的解读 分离），是不是就是你那句"只不过结论——"想说的？解读区要不要默认收起？</span>
+    </p>
+  </section>
+
+  <!-- ══════════ VARIANT A — ledger (git-diff literal) ══════════ -->
+  <section data-panel="a" hidden>
+    <div class="window" role="dialog" aria-label="Claim comparison — hook capture">
+      <div class="crumb">
+        <span class="back" title="Back to the drift item in the needs-attention queue">←</span>
+        <span class="path"><b>Hook capture</b> · drift · code moved under this claim</span>
+      </div>
+      <div class="head">
+        <span class="kicker">DRIFT · IS THE KNOWLEDGE STILL TRUE?</span>
+        <h2>How sessions report — one claim, two versions</h2>
+        <div class="causes">
+          <span class="pill clash" title="2 anchored files were renamed/split in commit ae71422; the active claim still points at the old shape">code moved</span>
+          <span class="pill alive" title="The incremental update run proposes revision r3 from the new code reality">update proposed</span>
+          <span class="pill idle" title="Nothing the active claim promised was contradicted — this is a shape change, not a breach">not contradicted</span>
+        </div>
+      </div>
+
+      <div class="panes">
+        <div class="pane">
+          <div class="plate">
+            <span class="who" style="color:var(--ink-500)">ACTIVE</span>
+            <span class="meta" title="Revision 2, produced by the cold-start distillation on 2026-07-12; governing since activation">r2 · cold start · Jul 12</span>
+          </div>
+          <p class="claim">
+            <span class="lede">Hook ingestion is <del data-d="1" title="r3 rewords this">Claude Code–specific</del> and must never break a session.</span>
+            <code>vibehub hook &lt;event&gt;</code> reads <del data-d="2" title="r3 rewords this">the Claude Code payload</del> from stdin,
+            writes events and claims queued context in one short-lived pass, and always
+            exits 0 — a hook must never break the user's session. Transcript reads happen
+            outside the write lock.
+          </p>
+          <div class="anchors">
+            <h4>ANCHORS</h4>
+            <ul>
+              <li><span class="tag keep" title="File still exists; content hash drifted">kept</span><span class="file">packages/core/src/hook-ingest.ts</span></li>
+              <li><span class="tag keep" title="Symbol still exists; unchanged">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="pane">
+          <div class="plate">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="meta" title="Revision 3, proposed by incremental update run-0719a from commit ae71422; nothing changes until you review">r3 · update run · awaiting review</span>
+          </div>
+          <p class="claim">
+            <span class="lede">Hook ingestion is <ins data-d="1" title="was: Claude Code–specific">host-neutral</ins> and must never break a session.</span>
+            <code>vibehub hook &lt;event&gt;</code> reads <ins data-d="2" title="was: the Claude Code payload">a host payload</ins> from stdin<ins data-d="3" title="new sentence — the adapter layer added by ae71422">;
+            the Claude Code and Codex adapters translate it into one canonical hook event
+            contract before ingestion</ins>. The pass stays short-lived and always
+            exits 0 — a hook must never break the user's session. Transcript reads happen
+            outside the write lock.
+          </p>
+          <div class="anchors">
+            <h4>ANCHORS</h4>
+            <ul>
+              <li><span class="tag keep" title="Retained">kept</span><span class="file">packages/core/src/hook-ingest.ts</span><span class="tag role" title="Role change proposed by r3">now a compat wrapper</span></li>
+              <li><span class="tag keep" title="Retained">kept</span><span class="file">packages/cli/src/main.ts · runHook</span></li>
+              <li><span class="tag add" title="New in r3 — the canonical hook event contract">added</span><span class="file">packages/core/src/hook-protocol.ts</span></li>
+              <li><span class="tag add" title="New in r3 — Claude/Codex payload adapters">added</span><span class="file">packages/cli/src/hook-adapters.ts</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="prov">
+        <span title="The claim's stable identity — shown here for audit, never on the map">claim decision-hooks-004</span><span class="dot"></span>
+        <span>r2 → r3</span><span class="dot"></span>
+        <span title="Producer of the candidate revision">distill · incremental · run-0719a</span><span class="dot"></span>
+        <span title="The commit whose delta triggered this proposal">evidence commit ae71422</span><span class="dot"></span>
+        <span title="Diagnostic only — anchor content-hash agreement on kept anchors; not a gate">anchor agreement 2/2 kept</span>
+      </div>
+
+      <div class="actions">
+        <button class="primary" title="Assembles exactly this comparison as context and runs the review workflow in your agent — the App decides nothing by itself">Review in your agent</button>
+        <button class="quiet" title="Leave r2 governing; the candidate stays recorded and re-surfaces only on new evidence">Keep current claim</button>
+        <button class="quiet" title="The code delta itself is GitHub's job — opens ae71422 there">Open code diff on GitHub</button>
+        <span class="note" title="Accepting or rejecting the revision executes through $vibehub-review in your agent session; this surface only assembles the moment">decides nothing by itself</span>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:16px">
+      <b>A · Ledger。</b>最 git-diff 的一版：左右两栏、逐字 del/ins、anchors 增删同语言。
+      悬停任一处修改会点亮另一栏的对应片段（correlate）。安心感来自"一个字都没藏"。
+      代价：最像"在读 spec"，对 KB 隐身教义的让步最大。
+      <span class="q">逐字粒度是不是安心的必要条件？还是已经越过了"深钻"应有的克制？</span>
+    </p>
+  </section>
+
+  <!-- ══════════ VARIANT B — field cards ══════════ -->
+  <section data-panel="b" hidden>
+    <div class="window" role="dialog" aria-label="Claim comparison — hook capture">
+      <div class="crumb">
+        <span class="back" title="Back to the drift item in the needs-attention queue">←</span>
+        <span class="path"><b>Hook capture</b> · drift · code moved under this claim</span>
+      </div>
+      <div class="head">
+        <span class="kicker">DRIFT · IS THE KNOWLEDGE STILL TRUE?</span>
+        <h2>How sessions report — one claim, two versions</h2>
+        <div class="causes">
+          <span class="pill clash" title="2 anchored files were renamed/split in commit ae71422">code moved</span>
+          <span class="pill alive" title="The incremental update run proposes revision r3">update proposed</span>
+          <span class="pill idle" title="A shape change, not a breach">not contradicted</span>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="vcard">
+          <div class="plate">
+            <span class="who" style="color:var(--ink-500)">ACTIVE</span>
+            <span class="meta" title="Produced by the cold-start distillation on 2026-07-12">r2 · cold start · Jul 12</span>
+          </div>
+          <div class="field changed">
+            <div class="fh"><span class="fname">CLAIM</span><span class="fchip changed" title="r3 rewrites this field">differs</span></div>
+            <p class="fbody">Hook ingestion is Claude Code–specific and must never break a session.</p>
+          </div>
+          <div class="field changed">
+            <div class="fh"><span class="fname">HOW</span><span class="fchip changed" title="r3 adds the adapter sentence">differs</span></div>
+            <p class="fbody">Reads the Claude Code payload from stdin; one short-lived pass; always exits 0. Transcript reads outside the write lock.</p>
+          </div>
+          <div class="field changed">
+            <div class="fh"><span class="fname">ANCHORS</span><span class="fchip changed" title="r3 adds two files">2 files</span></div>
+            <p class="fbody" style="font-family:var(--mono);font-size:var(--fs-2)">core/hook-ingest.ts · cli/main.ts#runHook</p>
+          </div>
+          <div class="field same">
+            <div class="fh"><span class="fname">INVARIANT</span><span class="fchip same" title="Identical in both revisions">same</span></div>
+            <p class="fbody">A hook must never break the user's session — always exit 0.</p>
+          </div>
+        </div>
+
+        <div class="vcard" style="border-color:#cfe0d3">
+          <div class="plate">
+            <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+            <span class="meta" title="Proposed by incremental update run-0719a from commit ae71422">r3 · update run · awaiting review</span>
+          </div>
+          <div class="field changed">
+            <div class="fh"><span class="fname">CLAIM</span><span class="fchip changed" title="Rewritten from r2">differs</span></div>
+            <p class="fbody">Hook ingestion is <mark title="was: Claude Code–specific">host-neutral</mark> and must never break a session.</p>
+          </div>
+          <div class="field changed">
+            <div class="fh"><span class="fname">HOW</span><span class="fchip changed" title="Adds the adapter layer">differs</span></div>
+            <p class="fbody">Reads <mark title="was: the Claude Code payload">a host payload</mark> from stdin; <mark title="new — the layer ae71422 added">Claude Code and Codex adapters translate it into one canonical hook event contract</mark>; one short-lived pass; always exits 0. Transcript reads outside the write lock.</p>
+          </div>
+          <div class="field changed">
+            <div class="fh"><span class="fname">ANCHORS</span><span class="fchip changed" title="Two additions, one role change">4 files</span></div>
+            <p class="fbody" style="font-family:var(--mono);font-size:var(--fs-2)">core/hook-ingest.ts <span class="tag role" title="Role change proposed by r3">compat</span> · cli/main.ts#runHook · <mark>core/hook-protocol.ts</mark> · <mark>cli/hook-adapters.ts</mark></p>
+          </div>
+          <div class="field same">
+            <div class="fh"><span class="fname">INVARIANT</span><span class="fchip same" title="Identical in both revisions">same</span></div>
+            <p class="fbody">A hook must never break the user's session — always exit 0.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="prov">
+        <span title="Stable identity, audit only">claim decision-hooks-004</span><span class="dot"></span>
+        <span>r2 → r3</span><span class="dot"></span>
+        <span>distill · incremental · run-0719a</span><span class="dot"></span>
+        <span>evidence commit ae71422</span>
+      </div>
+
+      <div class="actions">
+        <button class="primary" title="Assembles this comparison as context and runs the review workflow in your agent">Review in your agent</button>
+        <button class="quiet" title="Leave r2 governing">Keep current claim</button>
+        <button class="quiet" title="Opens ae71422 on GitHub">Open code diff on GitHub</button>
+        <span class="note" title="Review executes through $vibehub-review in your agent session">decides nothing by itself</span>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:16px">
+      <b>B · 字段卡。</b>不做逐字 diff，把 claim 拆成固定字段（CLAIM / HOW / ANCHORS / INVARIANT）逐格对照：
+      变了的格子亮、没变的格子沉底——"INVARIANT: same" 那一格是安心感的主载体（<i>它承诺的没变</i>）。
+      读起来像对照两张档案卡，不像读 git。代价：句内改动只能 sentence 级高亮，细节安心不如 A。
+      <span class="q">"不变的部分被显式确认"是不是比"变的部分逐字可见"更接近你要的安心？</span>
+    </p>
+  </section>
+
+  <!-- ══════════ VARIANT C — narrative first ══════════ -->
+  <section data-panel="c" hidden>
+    <div class="window" role="dialog" aria-label="Claim comparison — hook capture">
+      <div class="crumb">
+        <span class="back" title="Back to the drift item in the needs-attention queue">←</span>
+        <span class="path"><b>Hook capture</b> · drift · code moved under this claim</span>
+      </div>
+      <div class="head">
+        <span class="kicker">DRIFT · IS THE KNOWLEDGE STILL TRUE?</span>
+        <h2>How sessions report</h2>
+      </div>
+
+      <div class="verdict">
+        <p class="line">The code under this claim was reorganized; nothing the claim promised
+        was contradicted. The update run proposes a broader wording and two new anchors.</p>
+        <ul>
+          <li><span class="b"></span><span>Commit <code>ae71422</code> split hook ingestion into a canonical
+            contract (<code>hook-protocol.ts</code>) plus per-host adapters (<code>hook-adapters.ts</code>).</span></li>
+          <li><span class="b"></span><span>The active claim says ingestion is <i>Claude Code–specific</i>;
+            the candidate says <i>host-neutral via adapters</i>. That is the entire semantic change.</span></li>
+          <li><span class="b"></span><span>The invariant — a hook always exits 0 and never breaks a
+            session — is identical in both revisions.</span></li>
+        </ul>
+      </div>
+
+      <details class="fold">
+        <summary><span class="tri">▶</span>Compare the two revisions verbatim<span style="font-family:var(--mono);font-size:var(--fs-1);color:var(--ink-400)">side-by-side</span></summary>
+        <div class="panes">
+          <div class="pane">
+            <div class="plate">
+              <span class="who" style="color:var(--ink-500)">ACTIVE</span>
+              <span class="meta">r2 · cold start · Jul 12</span>
+            </div>
+            <p class="claim">
+              <span class="lede">Hook ingestion is <del title="r3 rewords this">Claude Code–specific</del> and must never break a session.</span>
+              <code>vibehub hook &lt;event&gt;</code> reads <del title="r3 rewords this">the Claude Code payload</del> from stdin,
+              writes events and claims queued context in one short-lived pass, and always exits 0.
+            </p>
+          </div>
+          <div class="pane">
+            <div class="plate">
+              <span class="who" style="color:var(--alive-ink)">CANDIDATE</span>
+              <span class="meta">r3 · update run · awaiting review</span>
+            </div>
+            <p class="claim">
+              <span class="lede">Hook ingestion is <ins title="was: Claude Code–specific">host-neutral</ins> and must never break a session.</span>
+              <code>vibehub hook &lt;event&gt;</code> reads <ins title="was: the Claude Code payload">a host payload</ins> from stdin<ins title="new sentence">;
+              adapters translate it into one canonical hook event contract before ingestion</ins>,
+              in one short-lived pass, and always exits 0.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <div class="prov">
+        <span title="Stable identity, audit only">claim decision-hooks-004</span><span class="dot"></span>
+        <span>r2 → r3</span><span class="dot"></span>
+        <span>distill · incremental · run-0719a</span><span class="dot"></span>
+        <span>evidence commit ae71422</span>
+      </div>
+
+      <div class="actions">
+        <button class="primary" title="Assembles this comparison as context and runs the review workflow in your agent">Review in your agent</button>
+        <button class="quiet" title="Leave r2 governing">Keep current claim</button>
+        <button class="quiet" title="Opens ae71422 on GitHub">Open code diff on GitHub</button>
+        <span class="note" title="Review executes through $vibehub-review in your agent session">decides nothing by itself</span>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:16px">
+      <b>C · 结论先行。</b>最忠于"KB 隐身"的一版：先给一句机械可证的人话结论 + 三条 what-changed，
+      逐字对比折叠在 "Compare verbatim" 后面按需展开。默认视野里没有任何 spec 文本。
+      代价：安心感依赖用户信任那句结论——而"不信任正文才来深钻"的用户可能每次都会展开。
+      <span class="q">深钻时刻的默认应该是"给结论"还是"给原文"？如果多数人每次都展开，C 就只是 A 加了一次点击。</span>
+    </p>
+  </section>
+
+  <footer class="caption" style="border-top:1px solid var(--ink-200);padding-top:16px">
+    <b>共同骨架</b>（三版一致，先行拍板也可以）：入口只从 drift/conflict 队列进（第一层无 spec）；
+    标题永远是人话主题，claim 的稳定 ID 降级到 mono 底注；左右两侧永远标注诚实证据来源
+    （ACTIVE 的出身 vs CANDIDATE 的 run + commit）；主按钮是 agent-first 的
+    "Review in your agent"（App 自己不裁决，右下角 mono 注明 "decides nothing by itself"）；
+    代码 diff 永远跳 GitHub，不内嵌。悬停一切可解释（本页用原生 title 代替产品里的 260ms Tooltip）。
+  </footer>
+</div>
+
+<script>
+  // tab switcher
+  const tabs = document.querySelectorAll('.tabs button');
+  const panels = document.querySelectorAll('[data-panel]');
+  tabs.forEach(btn => btn.addEventListener('click', () => {
+    tabs.forEach(b => b.setAttribute('aria-selected', String(b === btn)));
+    panels.forEach(p => p.hidden = p.dataset.panel !== btn.dataset.v);
+  }));
+  // correlate: hovering a change lights its counterpart in the other pane
+  document.querySelectorAll('[data-d]').forEach(el => {
+    const peers = () => document.querySelectorAll(`[data-d="${el.dataset.d}"]`);
+    el.addEventListener('mouseenter', () => peers().forEach(p => p.classList.add('lit')));
+    el.addEventListener('mouseleave', () => peers().forEach(p => p.classList.remove('lit')));
+  });
+  // pairwise endpoint switchers (scoped per variant so E and F don't cross-toggle)
+  document.querySelectorAll('[data-panel]').forEach(section => {
+    const segBtns = section.querySelectorAll('.seg button');
+    const modes = section.querySelectorAll('[data-dmode]');
+    if (!segBtns.length) return;
+    segBtns.forEach(btn => btn.addEventListener('click', () => {
+      segBtns.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+      modes.forEach(m => m.hidden = m.dataset.dmode !== btn.dataset.mode);
+    }));
+  });
+</script>
