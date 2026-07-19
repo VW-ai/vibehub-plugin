@@ -123,7 +123,8 @@ test("successful conflict intervention refreshes map and conflict detail", async
     },
     applyIntervention: () => ({
       status: "ok",
-      data: receipt("applied", "Both queue rows were accepted atomically."),
+      // inject_both persists exactly two queue rows — strong evidence.
+      data: { ...receipt("applied", "Both queue rows were accepted atomically."), injectionIds: [41, 42] },
     }),
   });
 
@@ -363,4 +364,62 @@ test("conflict intervention clears an old receipt when the next bridge request f
   await expect(conflict.getByRole("alert")).toContainText("The second conflict request failed at the bridge.");
   await expect(conflict.getByRole("status")).toHaveCount(0);
   await expect(input).toHaveValue("Keep this second conflict draft");
+});
+
+test("receipt projection leads with queued only on strong evidence; weak evidence renders the raw outcome", async ({ page }) => {
+  const responses: AppliedIntervention[] = [
+    receipt("applied", "Queued for the next hook boundary."),
+    { ...receipt("applied", "Bridge accepted without persisted ids."), injectionIds: [] },
+  ];
+  let sends = 0;
+  await installProductionHost(page, {
+    applyIntervention: () => ({
+      status: "ok",
+      data: responses[Math.min(sends++, responses.length - 1)]!,
+    }),
+  });
+
+  await openProduction(page);
+  await taskCard(page, TASK_ID).click();
+  const panel = page.locator(".panel");
+  const input = panel.locator("textarea");
+
+  await input.fill("First — strong evidence");
+  await panel.getByRole("button", { name: "Send" }).click();
+  const strong = panel.getByRole("status");
+  await expect(strong).toContainText("queued");
+  await expect(strong).toContainText("applied");
+  await expect(strong).toContainText("Queued for the next hook boundary.");
+
+  await input.fill("Second — weak evidence");
+  await panel.getByRole("button", { name: "Send" }).click();
+  const weak = panel.getByRole("status");
+  await expect(weak).toContainText("Bridge accepted without persisted ids.");
+  await expect(weak).toContainText("applied");
+  await expect(weak).not.toContainText(/queued/i);
+  await expect(input).toHaveValue("Second — weak evidence");
+});
+
+test("conflict card never celebrates QUEUED on weak evidence — the receipt line carries the raw fact", async ({ page }) => {
+  await installProductionHost(page, {
+    applyIntervention: () => ({
+      status: "ok",
+      // A success outcome with no persisted queue ids is weak evidence.
+      data: { ...receipt("applied", "Accepted without persisted queue rows."), injectionIds: [] },
+    }),
+  });
+
+  await openProduction(page);
+  await conflictPill(page).click();
+  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
+  await conflict.locator("textarea").fill("Coordinate ownership before editing.");
+  await conflict.getByRole("button", { name: "Inject to both" }).click();
+
+  const status = conflict.getByRole("status");
+  await expect(status).toContainText("applied");
+  await expect(status).toContainText("Accepted without persisted queue rows.");
+  await expect(status).not.toContainText(/queued/i);
+  await expect(conflict).not.toContainText("QUEUED");
+  await expect(conflict).not.toContainText("SQLite accepted both queue rows");
+  await expect(conflict.locator("textarea")).toHaveValue("Coordinate ownership before editing.");
 });

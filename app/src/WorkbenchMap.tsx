@@ -8,8 +8,10 @@ import {
 } from "react";
 import type { AdjudicationAction, AppliedIntervention, ConflictCardSnapshot, MapSnapshot, Task, TaskPanelSnapshot, Territory, WorkbenchBridge, WorkbenchIntervention, WorkbenchRepoRef } from "@vibehub/core/contracts";
 import { highlightForLegend, highlightForTask, highlightForTerritory, type LegendKind } from "./derive";
+import { deriveInterventionNote, type InterventionReceiptNote } from "./receipt-note-derive";
 import { ConflictCard } from "./components/ConflictCard";
 import { MapCanvas } from "./components/MapCanvas";
+import { ReceiptOutcome } from "./components/ReceiptOutcome";
 import { TaskPanel } from "./components/TaskPanel";
 import { TaskRail } from "./components/TaskRail";
 import { Titlebar } from "./components/Titlebar";
@@ -26,10 +28,10 @@ type DetailError = {
   title: string;
   message: string;
   conflictId?: string;
-  receipt: AppliedIntervention | null;
+  receipt: InterventionReceiptNote | null;
 };
 type DetailTarget = { kind: "task" | "conflict"; id: string };
-type InterventionResponse = AppliedIntervention | string;
+type InterventionResponse = InterventionReceiptNote | string;
 
 function interventionAccepted(receipt: AppliedIntervention): boolean {
   return receipt.outcome === "applied" || receipt.outcome === "already_applied";
@@ -192,7 +194,9 @@ export function WorkbenchMap({ snapshot, bridge, repo }: { snapshot: MapSnapshot
     if (target && interventionAccepted(result.data) && ownsRequest(generation, target)) {
       await refreshAccepted(generation, target);
     }
-    return result.data;
+    // Project once at the one place holding both the intervention and its
+    // result; every surface renders this same receipt truth.
+    return deriveInterventionNote(intervention, result.data);
   };
   const applyConflict = async (action: AdjudicationAction): Promise<InterventionResponse> => {
     if (!conflict) return "Conflict is no longer open.";
@@ -269,9 +273,7 @@ export function WorkbenchMap({ snapshot, bridge, repo }: { snapshot: MapSnapshot
       {(loadingDetail || detailError) && <div className="center"><aside className="modal bootstrap-state" role="dialog">
         <h2>{loadingDetail ? "Loading details…" : detailError!.title}</h2>{detailError && <p>{detailError.message}</p>}
         {detailError?.receipt && <p role="status">
-          <b>{detailError.receipt.outcome}</b>
-          {detailError.receipt.message ? ` — ${detailError.receipt.message}` : " — No additional message."}{" "}
-          <time dateTime={detailError.receipt.acceptedAt}>{detailError.receipt.acceptedAt}</time>
+          <ReceiptOutcome note={detailError.receipt} />
         </p>}
         {detailError?.conflictId && <button type="button" onClick={() => void (async () => {
           const generation = requestGeneration.current;

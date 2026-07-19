@@ -50,7 +50,19 @@ test("pause production copy only claims a queued boundary request", async ({ pag
 });
 
 test("production conflict pause receipt claims request acceptance, not pickup or stop", async ({ page }) => {
-  await installProductionHost(page);
+  await installProductionHost(page, {
+    // One persisted pause queue row — strong evidence for the REQUESTED band.
+    applyIntervention: () => ({
+      status: "ok",
+      data: {
+        requestId: "ux-truth-pause",
+        outcome: "applied",
+        injectionIds: [7],
+        affectedTaskIds: ["task-auto-retry-payments"],
+        acceptedAt: "2026-07-13T18:24:00.000Z",
+      },
+    }),
+  });
   await openProduction(page);
   await page.locator('[data-task="task-auto-retry-payments"] .pill').click();
 

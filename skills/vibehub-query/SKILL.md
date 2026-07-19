@@ -73,6 +73,10 @@ node ../scripts/vh-kb.mjs <operation> --repo <root> --actor <id> --request <id> 
    your inference in separate fields.
 7. Return a context packet containing facts/spec IDs, conflicts, missing
    knowledge, implications, unresolved questions and source refs. Validate it.
+8. Present per the reporting contract's five-section protocol: brief when
+   the user asked for context, silent when this is a mechanical pull folded
+   into ongoing work. An empty or missing answer stays brief and honest —
+   a gap is information. A read never becomes a write claim.
 
 Never write knowledge during query. Route durable discoveries to
 `vibehub-ingest`; route stale/conflicting items to `vibehub-review`.

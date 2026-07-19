@@ -10,8 +10,8 @@ not mutate human-authored truth from code drift.
 
 ## Prerequisites
 
-1. Read `../_stdlib/orchestration.md`, `../_stdlib/db-operations.md`, and
-   `../_stdlib/quality-gates.md`.
+1. Read `../_stdlib/orchestration.md`, `../_stdlib/db-operations.md`,
+   `../_stdlib/quality-gates.md`, and `../_stdlib/reporting.md`.
 2. Read `../_stdlib/lifecycle.md` when deleted/changed anchors may make a
    canonical spec stale.
 3. Read `../_stdlib/provenance.md` before writing incremental candidates.
@@ -64,7 +64,9 @@ not mutate human-authored truth from code drift.
    active specs to `vibehub-review`. A code deletion is evidence for review, not
    permission to auto-stale or deprecate canonical truth.
 7. Activate only the reviewed finalized mapping with expected-current CAS.
-   Report carry-over and unresolved paths.
+   Report carry-over and unresolved paths with the expanded five-section
+   block from the reporting contract; incremental update runs are expanded
+   like distillation.
 
 Use `node ../scripts/vh-kb.mjs ...` and
 `node ../scripts/vh-distill.mjs ...`; inspect every dispatcher envelope.

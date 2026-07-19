@@ -1,0 +1,85 @@
+spec_id: "change-2026-07-18-presentation-rollout"
+type: change
+state: active
+intent:
+  summary: "M2p6f 完成：presentation protocol 推广到 setup/query/ingest/distill/inject/checkpoint——一份 WorkflowReceiptV1 真相驱动 CLI/skills/App 三面，弱证据永不升级为成功"
+  detail: |
+    decision-workbench-016 的跨 workflow rollout 落地。此前 receipt
+    contract/projectors 零生产消费者；本 change 接通全部真实 surface。
+
+    Core：projectInjectionInterventionReceipt 移入 browser-safe contract 层
+    （contract/workflow-receipt-projection.ts，仅依赖同层 contract；Node API
+    经 projectors re-export 保持不变；root 包补导出 workflow-receipt 与
+    workbench-bridge 合约）。App 与 Node 消费同一投影，无镜像类型。
+
+    CLI 人类面：init/doctor 非 --json 渲染共享 renderWorkflowReceiptText
+    五段文本（Activity/Trigger/Effects/Result/Next，宽度随终端、无 ANSI 依
+    赖）；--json 机器面原样保留；setup 子命令单行输出不动（presentation 归
+    setup skill）。vibehub inject 升级为经 core applyIntervention 的同一
+    idempotent request ledger（--request/--json），人类面渲染注入 receipt，
+    applied/already_applied 退出码 0。
+
+    Skills：_stdlib/reporting.md 扩展为 presentation 合约——五段标签、共享
+    outcome 词汇（禁止各 workflow 自造同义词；delivered/acknowledged 永不可
+    声明）、成功文案必须有确定性证据、silent/brief/expanded 预算与各
+    workflow 默认档（setup expanded、query brief/silent、ingest brief、
+    distill/update expanded、review brief/waiting-expanded、失败与 waiting
+    永不 silent）、checkpoint 提醒行为（无 durable 即 silent 无 filler）。
+    六个 skill 全部引用同一 stdlib；setup 的 Result 显式声明为 activation
+    evidence states 并服从同一 visibility 预算，消除双词汇漂移。
+
+    App：deriveInterventionNote 在 WorkbenchMap.apply 单点投影（同时握有
+    intervention 与 result），ReceiptOutcome 统一渲染 receipt 行（投影
+    outcome 领先 + 原始 outcome 括注 + message + 时间；.stubnote 语汇、零
+    emoji、v8 authority 不变）。弱证据（成功 outcome 无 persisted 注入 id）
+    投影拒绝时回退原始事实且永不显示 queued；ConflictCard 的 QUEUED/
+    REQUESTED 确认反馈带门在 receiptOutcome === "queued" 上——弱证据只留
+    receipt 事实行，不出庆祝带（对抗 review P1 修复）。生产 fixture 改为
+    诚实证据（inject_both 双 id、pause 单 id），新增强/弱证据双生产测试。
+    最终复审继续发现并修复两个 P2：CLI/App Trigger 改为不预判结果的
+    requested 措辞；task/conflict textarea 只有强 queued evidence 才清空，
+    stale/no_op/unsupported 与成功但无 persisted IDs 的弱证据均保留草稿。
+
+    Controller 验证：Core 266/266、CLI 40/40、MCP 15/15、App 65/65、
+    production E2E 27/27、package validator、production boundary、
+    verify:artifact、workspace typecheck/build、diff-check 全绿。两轮独立
+    对抗 review 共修复 P1×1 + P2×7，最终 verdict APPROVED。
+constraints:
+  - kind: must
+    rule: "所有 surface 的结果语义只能来自 WorkflowReceiptV1 投影或原始 dispatcher/bridge 事实；不得各自发明结果词汇"
+  - kind: must
+    rule: "成功文案（queued/persisted/verified 等）必须由确定性证据支撑；弱证据渲染原始 outcome 且永不升级"
+  - kind: must
+    rule: "五段标签与 silent/brief/expanded 预算以 _stdlib/reporting.md 为唯一 canonical 定义；失败与 waiting 永不 silent"
+  - kind: must_not
+    rule: "不得依赖自定义 TUI widget、像素布局或以颜色/ANSI 承载唯一语义；窄终端/无 ANSI/复制日志场景必须可读"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench-presentation"
+  tags: [presentation-rollout, receipt-truth, weak-evidence, visibility-budget, cli-receipts, app-render]
+provenance:
+  source_type: implementation
+  confidence: 1.0
+  source_ref: "m2p6f implementation + adversarial review, 2026-07-18"
+relations:
+  - target: "decision-workbench-016"
+    type: implements
+    detail: "protocol 全面 rollout：一份 receipt 真相、三档可见性、诚实 outcome 区分"
+  - target: "change-2026-07-18-workflow-receipt-contract"
+    type: builds_on
+    detail: "接通 M2p6a 冻结的 contract/projectors 到全部生产 surface"
+  - target: "change-2026-07-18-knowledge-checkpoint"
+    type: relates_to
+    detail: "checkpoint 提醒的 silent/brief 行为纳入共享 reporting 合约"
+  - target: "decision-workbench-014"
+    type: constrained_by
+    detail: "App 渲染保持 v8 spatial-workbench 语汇：.stubnote、零 emoji、无新 chrome"
+anchors:
+  - file: "workbench/packages/core/src/contract/workflow-receipt-projection.ts"
+  - file: "workbench/skills/_stdlib/reporting.md"
+  - file: "workbench/packages/cli/src/main.ts"
+  - file: "workbench/app/src/receipt-note-derive.ts"
+  - file: "workbench/app/src/components/ReceiptOutcome.tsx"
+  - file: "workbench/packages/cli/test/receipt-cli.test.ts"

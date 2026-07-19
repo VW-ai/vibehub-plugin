@@ -205,6 +205,33 @@ describe("production skill package",()=>{
     expect(all).toContain("not real Claude host proof");
   });
 
+  it("pins the shared presentation protocol across workflow skills",()=>{
+    const read=(relative:string)=>fs.readFileSync(path.join(skills,relative),"utf8");
+    const reporting=read("_stdlib/reporting.md");
+    for(const label of ["Activity:","Trigger:","Effects:","Result:","Next:"])expect(reporting).toContain(label);
+    for(const level of ["silent","brief","expanded"])expect(reporting).toContain(level);
+    expect(reporting).toContain("cannot prove delivered or acknowledged");
+    expect(reporting).toContain("Success copy requires deterministic success evidence");
+    expect(reporting).toContain("Failures and waiting states are never");
+    expect(reporting).toContain("no filler records");
+    expect(reporting).toContain("Do not invent per-workflow synonyms");
+    for(const name of entry){
+      expect(read(`${name}/SKILL.md`),name).toContain("_stdlib/reporting.md");
+    }
+    expect(read("vibehub-query/SKILL.md")).toContain("five-section protocol");
+    expect(read("vibehub-ingest/SKILL.md")).toContain("stay silent: no filler records");
+    expect(read("vibehub-distill/SKILL.md")).toContain("always expanded");
+    expect(read("vibehub-update/SKILL.md")).toContain("expanded five-section");
+    expect(read("vibehub-review/SKILL.md")).toContain("report the receipt as a brief");
+    expect(read("vibehub-setup/SKILL.md")).toContain("visibility budget applies");
+    // one receipt truth: no skill names the wire type or claims unprovable states
+    for(const name of entry){
+      const text=read(`${name}/SKILL.md`);
+      expect(text,name).not.toContain("WorkflowReceiptV1");
+      expect(text,name).not.toMatch(/\backnowledged\b/);
+    }
+  });
+
   it("keeps wrapper registries identical to dispatcher operation names",async()=>{
     const registry=await import(path.join(skills,"scripts/_dispatch.mjs")) as {KB:Set<string>;DISTILL:Set<string>};
     const expected=Object.keys(operationInputSchemas);

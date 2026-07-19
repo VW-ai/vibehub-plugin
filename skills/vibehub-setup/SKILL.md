@@ -16,6 +16,7 @@ own all project and runtime mutations.
 3. Read `references/codex.md` only when the active host is OpenAI Codex.
 4. Read `references/recovery.md` only on blocked, partial, conflict, missing
    executable, wrong-worktree, or failed activation evidence.
+5. Read `../_stdlib/reporting.md` before rendering the outcome report.
 
 ## Resolve the target and executable
 
@@ -97,7 +98,9 @@ parse stdout as JSON on exit 0 or 1. An exit code never replaces the
    ```
 
    Keep raw `ProjectActivationResultV1` available as evidence. Do not invent a
-   separate workflow wire receipt or claim richer TUI components.
+   separate workflow wire receipt or claim richer TUI components. Result uses
+   the setup evidence states from the activation result verbatim; the shared
+   reporting contract's visibility budget applies, and setup renders expanded.
 
 ## External-send boundary
 

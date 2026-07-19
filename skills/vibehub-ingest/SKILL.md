@@ -64,8 +64,11 @@ judgment here; persist only through dispatcher operations.
    ```
 
    Never fall back to per-spec writes or direct database access after rejection.
-8. Read `../_stdlib/reporting.md`; report written draft IDs, duplicates,
-   defaults, conflicts and unresolved mutations. Hand off to `vibehub-review`.
+8. Read `../_stdlib/reporting.md`; render the five-section block (brief on
+   success) reporting written draft IDs, duplicates, defaults, conflicts and
+   unresolved mutations — only after `ok:true` envelopes. When a checkpoint
+   reminder found nothing durable, stay silent: no filler records and no
+   block. Hand off to `vibehub-review`.
 
 ## Guardrails
 

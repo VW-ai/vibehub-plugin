@@ -444,6 +444,21 @@ describe("bounded plain renderer and browser-safe contract", () => {
     expect(source).not.toMatch(/node:|better-sqlite3|runtime-lifecycle|operation-dispatcher/);
   });
 
+  it("keeps the injection projection inside the browser-safe contract layer", async () => {
+    const source = fs.readFileSync(
+      new URL("../src/contract/workflow-receipt-projection.ts", import.meta.url),
+      "utf8",
+    );
+    expect(source).not.toMatch(/node:|better-sqlite3|runtime-lifecycle|operation-dispatcher|activity-store/);
+    const imports = [...source.matchAll(/from "([^"]+)"/g)].map((match) => match[1]);
+    expect(imports.length).toBeGreaterThan(0);
+    expect(imports.every((specifier) => specifier!.startsWith("./"))).toBe(true);
+    const contracts = await import("../src/contract/index.js");
+    const projectors = await import("../src/workflow-receipt-projectors.js");
+    expect(projectors.projectInjectionInterventionReceipt)
+      .toBe(contracts.projectInjectionInterventionReceipt);
+  });
+
   it("retains all five sections and an omission marker under maximal effects at width 20", () => {
     const receipt = projectOperationReceipt({
       trigger: "x".repeat(20_000),

@@ -7,7 +7,9 @@ import {
   type ReactNode,
 } from "react";
 import type { Task } from "@vibehub/core/contracts";
-import type { AdjudicationAction, AppliedIntervention, ConflictCardSnapshot } from "@vibehub/core/contracts";
+import type { AdjudicationAction, ConflictCardSnapshot } from "@vibehub/core/contracts";
+import type { InterventionReceiptNote } from "../receipt-note-derive";
+import { ReceiptOutcome } from "./ReceiptOutcome";
 import {
   BETWEEN_TIP,
   CLOSE_TIP,
@@ -93,7 +95,7 @@ export interface ConflictCardProps {
   /** Side rows open the task's panel (S2 tooltip promise, wired at S4). */
   onOpenTask: (task: Task) => void;
   /** Production callback. Absent only in the fixture harness. */
-  onApply?: (action: AdjudicationAction) => Promise<AppliedIntervention | string>;
+  onApply?: (action: AdjudicationAction) => Promise<InterventionReceiptNote | string>;
 }
 
 /**
@@ -120,7 +122,7 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
   /* S5: honest run/re-run stub note in zone b (toggles; no fake progress). */
   const [stubNote, setStubNote] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [receipt, setReceipt] = useState<AppliedIntervention | null>(null);
+  const [receipt, setReceipt] = useState<InterventionReceiptNote | null>(null);
   const [applying, setApplying] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
@@ -203,9 +205,13 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
       return;
     }
     setReceipt(response);
-    if (response.outcome === "applied" || response.outcome === "already_applied") {
+    if (response.receiptOutcome === "queued") {
       if (noteRef.current) noteRef.current.value = "";
-      if (response.outcome === "already_applied") {
+      // The confirmed celebration band requires the projected receipt
+      // outcome — a success without persisted queue ids (weak evidence)
+      // renders only the receipt line, never an upgraded QUEUED/REQUESTED
+      // claim (decision-workbench-016).
+      if (response.result.outcome === "already_applied") {
         setFeedback(null);
         return;
       }
@@ -470,8 +476,7 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
       <footer className={`cfoot${seams.bottom ? " seam" : ""}`}>
         {actionError && <p className="stubnote" role="alert">{actionError}</p>}
         {receipt && !feedback && <p className="stubnote" role="status">
-          <b>{receipt.outcome}</b>{receipt.message ? ` — ${receipt.message}` : " — No additional message."}{" "}
-          <time dateTime={receipt.acceptedAt}>{receipt.acceptedAt}</time>
+          <ReceiptOutcome note={receipt} />
         </p>}
         {feedback ? (
           <div
@@ -486,7 +491,7 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
             <p>
               {feedback.view.text}{" "}
               {!onApply && <span className="preview" data-tip={PREVIEW_TIP}>preview</span>}
-              {receipt && <><br /><b>{receipt.outcome}</b>{receipt.message ? ` — ${receipt.message}` : " — No additional message."}{" "}<time dateTime={receipt.acceptedAt}>{receipt.acceptedAt}</time></>}
+              {receipt && <><br /><ReceiptOutcome note={receipt} /></>}
             </p>
             <button
               type="button"

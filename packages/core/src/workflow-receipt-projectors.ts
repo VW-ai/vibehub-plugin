@@ -11,7 +11,6 @@ import {
   validateWorkflowReceiptStructure,
 } from "./contract/workflow-receipt.js";
 import type { CheckpointCadenceFacts } from "./knowledge-checkpoint.js";
-import type { WorkbenchIntervention, AppliedIntervention } from "./contract/workbench-bridge.js";
 import type { OperationName } from "./operation-contracts.js";
 import type { OperationMeta, OperationResult } from "./operation-dispatcher.js";
 import type { DoctorRuntimeResult, InitRuntimeResult } from "./runtime-lifecycle.js";
@@ -152,63 +151,13 @@ export function projectDoctorReceipt(input: DoctorReceiptInput): WorkflowReceipt
   });
 }
 
-type InjectionIntervention = Extract<
-  WorkbenchIntervention,
-  { kind: "inject" | "pause" | "inject_both" }
->;
-
-export interface InjectionInterventionReceiptInput {
-  trigger: string;
-  intervention: InjectionIntervention;
-  result: AppliedIntervention;
-}
-
-export function projectInjectionInterventionReceipt(
-  input: InjectionInterventionReceiptInput,
-): WorkflowReceiptV1 {
-  const canQueue = input.result.outcome === "applied" || input.result.outcome === "already_applied";
-  if (canQueue && !validIds(input.result.injectionIds, true)) {
-    throw new Error("queued intervention requires non-empty unique positive safe injection ids");
-  }
-  const expectedIds = input.intervention.kind === "inject_both" ? 2 : 1;
-  if (canQueue && input.result.injectionIds.length !== expectedIds) {
-    throw new Error(`${input.intervention.kind} requires exactly ${expectedIds} persisted injection ids`);
-  }
-  if (!canQueue && !validIds(input.result.injectionIds, false)) {
-    throw new Error("intervention result contains invalid injection ids");
-  }
-  const outcome = canQueue
-    ? "queued"
-    : input.result.outcome === "unsupported"
-      ? "failed"
-      : "skipped";
-  return checked({
-    schemaVersion: 1,
-    activity: "inject",
-    phase: "complete",
-    outcome,
-    visibility: outcome === "failed" ? "expanded" : "brief",
-    trigger: bounded(input.trigger),
-    evidence: [{
-      source: "applied_intervention",
-      effect: "injection",
-      outcome,
-      subject: input.intervention.kind === "inject_both"
-        ? `${input.intervention.kind} conflict ${input.intervention.conflictId}`
-        : `${input.intervention.kind} task ${input.intervention.taskId}`,
-      requestId: bounded(input.result.requestId),
-      originalKind: input.intervention.kind,
-      resultOutcome: input.result.outcome,
-      ...(input.result.replayed === undefined ? {} : { replayed: input.result.replayed }),
-      injectionIds: [...input.result.injectionIds],
-      ...(input.result.message ? { detail: bounded(input.result.message) } : {}),
-    }],
-    nextAction: outcome === "failed"
-      ? { required: true, instruction: bounded(input.result.message ?? "Use a supported injection intervention and retry.") }
-      : null,
-    at: input.result.acceptedAt,
-  });
-}
+// The applied-injection projection is browser-safe contract code so the App
+// can consume the same receipt truth; re-exported here to keep the Node API
+// surface unchanged.
+export {
+  projectInjectionInterventionReceipt,
+  type InjectionInterventionReceiptInput,
+} from "./contract/workflow-receipt-projection.js";
 
 export interface InjectionClaimReceiptInput {
   trigger: string;

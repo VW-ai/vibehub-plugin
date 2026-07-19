@@ -75,8 +75,10 @@ interpret semantics; core owns leases, accounting, validation and transactions.
 11. **Activate.** After explicit review, call `distill.activate` with the shown
     finalized version and `expectedCurrentVersion`. On CAS conflict, re-read
     status; never force. Rollback uses the same guarded operation.
-12. Read `../_stdlib/reporting.md`, validate the result artifact and report
-    unresolved/excluded/review items honestly.
+12. Read `../_stdlib/reporting.md`, validate the result artifact and render
+    the expanded five-section block reporting unresolved/excluded/review
+    items honestly; distillation runs are always expanded, and anything
+    waiting for review names the required action in Next.
 
 All operations use `node ../scripts/vh-distill.mjs <suffix> ...`. Never use SQL,
 filesystem checkpoints, additive whole-manifest writes, or automatic canonical

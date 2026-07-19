@@ -3,6 +3,8 @@ export * from "./contract/panel-types.js";
 export * from "./contract/conflict-types.js";
 export * from "./contract/install-types.js";
 export * from "./contract/kb-types.js";
+export * from "./contract/workbench-bridge.js";
+export * from "./contract/workflow-receipt.js";
 export {
   defaultDbPath,
   openDb,

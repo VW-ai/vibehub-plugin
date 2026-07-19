@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
-import type { AppliedIntervention, TaskState } from "@vibehub/core/contracts";
+import type { TaskState } from "@vibehub/core/contracts";
+import type { InterventionReceiptNote } from "../receipt-note-derive";
 import { deckPlaceholder, deckTextareaTip, type DeckMode } from "../panel-derive";
+import { ReceiptOutcome } from "./ReceiptOutcome";
 
 /** S2: autogrow floor / ceiling (6 lines of fs-3×1.5 + 2×8 padding). */
 const TEXTAREA_FLOOR_PX = 52;
@@ -10,11 +12,11 @@ export interface InterventionDeckProps {
   state: TaskState;
   tailShown: boolean;
   onToggleTail: () => void;
-  onSend?: (mode: DeckMode, text: string) => Promise<AppliedIntervention | string>;
+  onSend?: (mode: DeckMode, text: string) => Promise<InterventionReceiptNote | string>;
 }
 
-function accepted(receipt: AppliedIntervention): boolean {
-  return receipt.outcome === "applied" || receipt.outcome === "already_applied";
+function accepted(note: InterventionReceiptNote): boolean {
+  return note.receiptOutcome === "queued";
 }
 
 /**
@@ -27,7 +29,7 @@ function accepted(receipt: AppliedIntervention): boolean {
  */
 export function InterventionDeck({ state, tailShown, onToggleTail, onSend }: InterventionDeckProps) {
   const [mode, setMode] = useState<DeckMode>("inject");
-  const [receipt, setReceipt] = useState<AppliedIntervention | null>(null);
+  const [receipt, setReceipt] = useState<InterventionReceiptNote | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const boxRef = useRef<HTMLTextAreaElement>(null);
@@ -106,8 +108,7 @@ export function InterventionDeck({ state, tailShown, onToggleTail, onSend }: Int
       </div>
       {error && <p className="stubnote" role="alert">{error}</p>}
       {receipt && <p className="stubnote" role="status">
-        <b>{receipt.outcome}</b>{receipt.message ? ` — ${receipt.message}` : " — No additional message."}{" "}
-        <time dateTime={receipt.acceptedAt}>{receipt.acceptedAt}</time>
+        <ReceiptOutcome note={receipt} />
       </p>}
     </footer>
   );

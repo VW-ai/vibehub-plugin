@@ -225,7 +225,7 @@ progress:
       notes: "Implementation checkpoint 完成：references/codex.md progressive host reference（同一 setup 命令/receipts/SQLite/Git common-root identity/worktree binding；AGENTS.md managed block 即 Codex 原生指令面；DEFAULT_PROJECT_INSTRUCTION_BODY 保持不变）；capability matrix 一簇诚实降级（无 hook fires → 无 handshake/Connected/Activated、无 injection 投递、无 off-scope reminder、无 periodic checkpoint、任务 basic tier）；hooks 表述双向诚实——官方 Codex hooks 已文档化且本机有 trust-gated 实证，但 payload/output/attribution 未经 VibeHub 验证故不作证据，禁止未验证接线铸造归属 Claude 的假 handshake；跨宿主共享 DB 的 Activated 推进如实说明。SKILL.md 条件加载行 + step 6 宿主分流 + external-send Codex 边界。打包零代码变更（skills 整树 recursive）；validator 链接检查使缺 codex.md 结构性 fail（新增负例测试）；artifact gate 在 clean-HOME 部署树断言 honest-degradation 关键句。openai.yaml ×6 核对无需变更；managed-assets.ts 无需变更（recursive discovery 覆盖）。独立对抗 review APPROVED，3 个 P2（forbidden-wiring/单库 pins、gate 冗余断言、CLI 解析顺序措辞）按 reviewer 原方修复并复跑。Controller gates: validator、CLI 32/32、Core 265/265、MCP 15/15、App 59/59、typecheck/build、verify:artifact 全绿。Milestone 保持 in_progress：真实 Codex host dogfood（本机 skills/MCP 安装、fresh session 读 managed block、honest waiting status 实证）待用户授权执行。"
     - id: m2p6f-presentation-rollout
       name: "M2 activation ⑥F:cross-workflow presentation rollout"
-      status: pending
+      status: in_progress
       gate: true
       estimated_files:
         - "workbench/skills/_stdlib/reporting.md"
@@ -246,6 +246,7 @@ progress:
         setup/query/ingest/distill/inject/checkpoint 统一使用 silent/brief/expanded
         receipt 语言；Claude/Codex 走宿主文本 affordance，App 只富渲染同一事实。
         最终 headless、App-off、fresh/existing 与双宿主 dogfood 全矩阵收口。
+      notes: "Implementation checkpoint 完成：receipt 投影零生产消费者的缺口全面接通。Core：注入介入投影移入 browser-safe contract 层（App/Node 同源，无镜像类型），root 包补齐 workflow-receipt/workbench-bridge 导出。CLI：init/doctor 非 --json 渲染共享五段文本（终端宽度自适应、零 ANSI 依赖），inject 升级为 core applyIntervention 同一 idempotent ledger + 人类面 receipt/--json 机器面，setup 单行保留（presentation 归 skill）。Skills：reporting.md 成为五段标签+共享 outcome 词汇+成功需确定性证据+silent/brief/expanded 预算的 canonical，六 skill 全部挂接，setup Result 显式声明为 activation evidence states 服从同一预算。App：WorkbenchMap.apply 单点投影，ReceiptOutcome 统一 receipt 行（投影 outcome 领先+原始 outcome 括注），弱证据永不升级为 queued，ConflictCard QUEUED/REQUESTED 庆祝带门在投影 queued 上；只有强 queued evidence 才清空 task/conflict 草稿。两轮独立对抗 review 共修复 P1×1 + P2×7（含 reporting 措辞、union 镜像、inject 人类面、setup 双词汇、弱 pin、成功式 Trigger、弱证据草稿丢失），最终复审 APPROVED。Controller gates: Core 266/266、CLI 40/40、MCP 15/15、App 65/65、production E2E 27/27、package validator、production boundary、verify:artifact、typecheck/build、diff-check 全绿。Milestone 保持 in_progress：验收矩阵中的双宿主真实 dogfood 行（Claude restart/handshake + Codex host 安装实证）仍待用户授权执行，与 m2p6c/m2p6e 同一外发 gate。"
   commits:
     - hash: "368f018"
       date: "2026-07-18"

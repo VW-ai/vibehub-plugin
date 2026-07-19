@@ -18,13 +18,18 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import crypto from "node:crypto";
 import {
-  enqueueInjection,
+  applyIntervention,
   exportTeamMapSnapshot,
   GitFacade,
   ingestHookEvent,
   openDb,
+  projectDoctorReceipt,
+  projectInitReceipt,
+  projectInjectionInterventionReceipt,
   readTask,
+  renderWorkflowReceiptText,
   resolveDbPath,
   RuntimeService,
   OperationDispatcher,
@@ -33,6 +38,7 @@ import {
   vibehubHome,
   type HookEventName,
   type HookPayload,
+  type WorkbenchIntervention,
 } from "@vibehub/core";
 import { releaseAssetManifest, releaseAssetRoot } from "./managed-assets.js";
 
@@ -87,12 +93,12 @@ function parseSetupFlags(argv: string[]): Flags {
 const USAGE = `usage:
   vibehub init [--repo <path>] [--db <path>] [--json]
   vibehub setup inspect|apply|status [--repo <path>] [--db <path>] [--json]
-  vibehub doctor --json [--repo <path>] [--db <path>]
+  vibehub doctor [--json] [--repo <path>] [--db <path>]
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
   vibehub kb <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
   vibehub distill <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop>
-  vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--db <path>]
+  vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
   vibehub team snapshot [--repo <path>] [--db <path>] [--out <file>]`;
 
@@ -192,6 +198,15 @@ function stateDirFor(dbPath: string): string {
   return process.env["VIBEHUB_STATE_DIR"] ?? path.dirname(dbPath);
 }
 
+/**
+ * Human (non---json) surfaces render the shared workflow receipt as plain
+ * five-section text: same semantic truth as the JSON evidence, sized to the
+ * terminal, readable without ANSI (decision-workbench-016).
+ */
+function renderReceipt(receipt: Parameters<typeof renderWorkflowReceiptText>[0]): string {
+  return renderWorkflowReceiptText(receipt, { width: process.stdout.columns ?? 80 });
+}
+
 function printSnapshot(flags: Flags): number {
   const db = openDb(flags.db);
   try {
@@ -225,6 +240,8 @@ export function main(argv: string[]): number {
     let mode: "inject" | "pause" = "inject";
     let context: string | undefined;
     let dbFlag: string | undefined;
+    let requestId = `cli-inject-${crypto.randomUUID()}`;
+    let json = false;
     for (let i = 0; i < rest.length; i++) {
       const flag = rest[i];
       if (flag === "--mode") {
@@ -236,6 +253,8 @@ export function main(argv: string[]): number {
         mode = value;
       } else if (flag === "--context") context = rest[++i];
       else if (flag === "--db") dbFlag = rest[++i];
+      else if (flag === "--request") requestId = rest[++i] ?? requestId;
+      else if (flag === "--json") json = true;
       else {
         console.error(`unknown flag: ${flag}`);
         return 2;
@@ -244,21 +263,37 @@ export function main(argv: string[]): number {
     const db = openDb(resolveDbPath(dbFlag));
     try {
       const task = readTask(db, cmd);
-      if (!task) throw new Error(`unknown task: ${cmd}`);
-      const id = enqueueInjection(
+      if (!task) {
+        console.error(`unknown task: ${cmd}`);
+        return 2;
+      }
+      // The terminal path joins the same idempotent intervention boundary as
+      // the App bridge: one request ledger, one receipt truth.
+      const intervention: Extract<WorkbenchIntervention, { kind: "inject" | "pause" }> = {
+        kind: mode,
+        taskId: task.id,
+        text,
+        ...(context !== undefined ? { contextLocus: context } : {}),
+      };
+      const result = applyIntervention(
         db,
         task.repoId,
-        task.id,
-        mode,
-        text,
+        { requestId, intervention },
         new Date().toISOString(),
-        context,
       );
-      console.log(JSON.stringify({ id, taskId: task.id, mode }));
+      if (json) console.log(JSON.stringify(result));
+      else console.log(renderReceipt(projectInjectionInterventionReceipt({
+        trigger: "vibehub inject was requested from the terminal.",
+        intervention,
+        result,
+      })));
+      return result.outcome === "applied" || result.outcome === "already_applied" ? 0 : 1;
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : String(error));
+      return 2;
     } finally {
       db.close();
     }
-    return 0;
   }
 
   const topLevelFlags = (): Flags =>
@@ -342,8 +377,11 @@ export function main(argv: string[]): number {
       releaseAssetManifest(),
     );
     if (flags.json) console.log(JSON.stringify(result, null, 2));
-    else if (result.ok) console.log(`initialized ${result.repo.root} at ${result.dbPath}`);
-    else console.error(`initialization has ${result.conflicts.length} managed asset conflict(s); no conflicting file was overwritten`);
+    else console.log(renderReceipt(projectInitReceipt({
+      trigger: "vibehub init was invoked for this repository.",
+      result,
+      at: new Date().toISOString(),
+    })));
     return result.ok ? 0 : 1;
   }
 
@@ -355,7 +393,12 @@ export function main(argv: string[]): number {
       releaseAssetRoot(),
       releaseAssetManifest(),
     );
-    console.log(JSON.stringify(result, null, 2));
+    if (flags.json) console.log(JSON.stringify(result, null, 2));
+    else console.log(renderReceipt(projectDoctorReceipt({
+      trigger: "vibehub doctor was invoked for this repository.",
+      result,
+      at: new Date().toISOString(),
+    })));
     return result.healthy ? 0 : 1;
   }
 

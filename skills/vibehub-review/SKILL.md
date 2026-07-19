@@ -9,8 +9,8 @@ Make explicit human-governed lifecycle decisions. Never auto-promote or delete.
 
 ## Prerequisites
 
-1. Read `../_stdlib/lifecycle.md`, `../_stdlib/provenance.md`, and
-   `../_stdlib/db-operations.md`.
+1. Read `../_stdlib/lifecycle.md`, `../_stdlib/provenance.md`,
+   `../_stdlib/db-operations.md`, and `../_stdlib/reporting.md`.
 2. Read `../_stdlib/relations.md` for conflicts/supersession.
 3. Read `../_stdlib/ontology.md` for placement/type disputes.
 4. Read `../_stdlib/quality-gates.md` when reviewing a distillation version.
@@ -46,10 +46,12 @@ Make explicit human-governed lifecycle decisions. Never auto-promote or delete.
    node ../scripts/vh-kb.mjs <promote|amend|mark-stale|deprecate|supersede> --repo <root> --actor <id> --request <id> --input <decision.json>
    ```
 
-5. Re-read the spec/review queue and report the receipt. For finalized mapping
-   review, call `distill.version.get` and `distill.version.diff`, inspect content,
-   provenance/removals/conflicts, then make activation a separate explicit
-   `distill.activate` CAS operation.
+5. Re-read the spec/review queue and report the receipt as a brief
+   five-section block per the reporting contract; a queue still waiting for
+   review renders expanded with the required action in Next. For finalized
+   mapping review, call `distill.version.get` and `distill.version.diff`,
+   inspect content, provenance/removals/conflicts, then make activation a
+   separate explicit `distill.activate` CAS operation.
 
 There is no hard delete and no generic “reject” mutation: deprecate is the
 auditable terminal rejection. Never auto-promote based on confidence alone.
