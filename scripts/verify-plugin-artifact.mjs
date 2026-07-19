@@ -46,7 +46,8 @@ function run(command, args, options = {}) {
   const stdout = captureBase ? readFileSync(`${captureBase}.out`, "utf8") : "";
   const stderr = captureBase ? readFileSync(`${captureBase}.err`, "utf8") : "";
   if (result.error) throw result.error;
-  if (result.status !== 0) {
+  const allowedStatuses = options.allowedStatuses ?? [0];
+  if (!allowedStatuses.includes(result.status)) {
     const details = options.capture ? `\n${stdout}\n${stderr}` : "";
     throw new Error(`${command} ${args.join(" ")} failed with exit ${result.status}${details}`);
   }
@@ -293,6 +294,60 @@ try {
         capture: true,
       }),
     );
+  const invokeSetupJson = (args) =>
+    JSON.parse(
+      run(installedBin, args, {
+        cwd: repo,
+        env: cleanEnv,
+        capture: true,
+        allowedStatuses: [0, 1],
+      }),
+    );
+
+  const setupInspect = invokeSetupJson(["setup", "inspect", "--repo", repo, "--json"]);
+  if (
+    !setupInspect.ok ||
+    setupInspect.command !== "inspect" ||
+    setupInspect.outcome !== "changes_required" ||
+    !setupInspect.instructions.every((item) => item.changed)
+  ) {
+    throw new Error("packaged setup inspect did not report the clean checkout plan");
+  }
+  const setupApply = invokeSetupJson(["setup", "apply", "--repo", repo, "--json"]);
+  if (
+    !setupApply.ok ||
+    setupApply.command !== "apply" ||
+    setupApply.outcome !== "applied" ||
+    setupApply.activation.installed.state !== "proven"
+  ) {
+    throw new Error("packaged setup apply did not install the clean checkout");
+  }
+  const secondSetupApply = invokeSetupJson(["setup", "apply", "--repo", repo, "--json"]);
+  if (
+    !secondSetupApply.ok ||
+    secondSetupApply.outcome !== "unchanged" ||
+    secondSetupApply.instructions.some((item) => item.changed)
+  ) {
+    throw new Error("second packaged setup apply was not idempotent");
+  }
+  const secondSetupInspect = invokeSetupJson(["setup", "inspect", "--repo", repo, "--json"]);
+  if (
+    !secondSetupInspect.ok ||
+    secondSetupInspect.outcome !== "ready" ||
+    secondSetupInspect.instructions.some((item) => item.status !== "current" || item.changed)
+  ) {
+    throw new Error("second packaged setup inspect did not report a current checkout");
+  }
+  const setupStatus = invokeSetupJson(["setup", "status", "--repo", repo, "--json"]);
+  if (
+    setupStatus.ok ||
+    setupStatus.outcome !== "waiting" ||
+    setupStatus.activation.installed.state !== "proven" ||
+    setupStatus.activation.connected.state !== "not_proven" ||
+    setupStatus.activation.activated.state !== "not_proven"
+  ) {
+    throw new Error("packaged setup status did not wait honestly before a host handshake");
+  }
 
   const firstInit = invokeJson(["init", "--repo", repo, "--json"]);
   if (!firstInit.ok || firstInit.conflicts.length !== 0) {
@@ -421,7 +476,7 @@ try {
   if (homedir() === home) throw new Error("smoke HOME unexpectedly equals the developer HOME");
 
   console.log(
-    "plugin artifact: self-contained CLI/hooks/MCP; idempotent init, doctor, sync, snapshot, and clean-HOME native SQLite passed",
+    "plugin artifact: self-contained setup skill/CLI/hooks/MCP; idempotent setup/init, honest pre-handshake status, doctor, sync, snapshot, and clean-HOME native SQLite passed",
   );
 } finally {
   if (keep) console.log(`kept plugin artifact at ${artifact}`);

@@ -159,7 +159,7 @@ progress:
       notes: "独立 project-activation primitive + RuntimeService/CLI setup inspect|apply|status 完成。AGENTS.md/CLAUDE.md 仅拥有稳定 managed block，双文件全批 preflight、stage/rename、显式 commit point、精确 rollback 与 recovery backup；non-Git、marker、UTF-8、symlink/nonregular、TOCTOU mode、空/坏 manifest 均 typed 且零越权写。DB identity 保持 common repo root，instruction target 绑定当前 worktree toplevel。Installed 由非空健康 release manifest 证明；Connected 要求 current instructions 之后同 checkout 的真实 hooks-tier session；Activated 再要求 handshake 之后 operation-specific 有效 query/ingest receipt，时间门严格 >。独立 reviewer 三轮对抗修复后 APPROVED。Controller gates: Core 243/243、CLI 28/28、两端 typecheck/build、diff-check 全绿。"
     - id: m2p6c-setup-skill-claude
       name: "M2 activation ⑥C:vibehub-setup skill + Claude onboarding vertical slice"
-      status: pending
+      status: in_progress
       gate: true
       estimated_files:
         - "workbench/skills/vibehub-setup/SKILL.md"
@@ -178,6 +178,7 @@ progress:
         existing repo 显式推荐且允许跳过 cold-start distill。用真实 Claude
         session 证明 restart/handshake/query-or-ingest activation，不把 workflow
         intelligence 拆回 hooks 或 MCP descriptions。
+      notes: "Implementation checkpoint 完成：vibehub-setup skill + onboarding-contract/claude-code/recovery progressive references + OpenAI metadata；skill 固定 inspect→validated apply→status，所有 setup exit 0/1 解析 typed JSON，partial/blocked 立即停并保留 backup evidence。fresh/existing/ambiguous 由 tracked substantive files + history 的 skill-owned semantic classifier 分流；distill 可跳过，empty query/fake ingest 不得 Activated。Package validator 固定 canonical 六 entry 并拒绝第七项；artifact 使用 installed bin 在 clean HOME/temp repo 验证 inspect→apply→unchanged→current→pre-handshake waiting。双 reviewer修复后 APPROVED。Controller gates: CLI 31/31、typecheck/build、package validator、network-enabled representative artifact、diff-check 全绿。Milestone 保持 in_progress：真实 Claude host restart/handshake/query-or-ingest dogfood 仍需用户提供 target path 与外发授权。"
     - id: m2p6d-knowledge-checkpoint
       name: "M2 activation ⑥D:task-scoped periodic knowledge checkpoint"
       status: pending

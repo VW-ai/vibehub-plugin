@@ -10,7 +10,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -18,6 +18,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
+    expect(entry).toHaveLength(6);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -33,6 +34,40 @@ describe("production skill package",()=>{
     const target=path.join(copy,"vibehub-query","SKILL.md");fs.writeFileSync(target,fs.readFileSync(target,"utf8").replace("name: vibehub-query","name: wrong-name"));
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",copy],{encoding:"utf8"});
     expect(validation.status).toBe(2);expect(JSON.parse(validation.stdout)).toMatchObject({valid:false});
+  });
+
+  it("rejects malformed setup progressive-loading metadata",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-invalid-setup-skill-")),copy=path.join(temp,"skills");fs.cpSync(skills,copy,{recursive:true});
+    try {
+      const target=path.join(copy,"vibehub-setup","SKILL.md");
+      fs.writeFileSync(target,fs.readFileSync(target,"utf8").replace(
+        "Read `references/recovery.md` only",
+        "Read `references/recovery.md`",
+      ));
+      const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",copy],{encoding:"utf8"});
+      expect(validation.status).toBe(2);
+      expect(JSON.parse(validation.stdout)).toMatchObject({valid:false,errors:expect.arrayContaining([
+        expect.objectContaining({path:"vibehub-setup/SKILL.md",message:expect.stringContaining("conditionally loaded")}),
+      ])});
+    } finally {
+      fs.rmSync(temp,{recursive:true,force:true});
+    }
+  });
+
+  it("rejects a seventh top-level skill outside the canonical registry",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-extra-skill-")),copy=path.join(temp,"skills");fs.cpSync(skills,copy,{recursive:true});
+    try {
+      const extra=path.join(copy,"vibehub-extra");
+      fs.mkdirSync(extra);
+      fs.writeFileSync(path.join(extra,"SKILL.md"),"---\nname: vibehub-extra\ndescription: Use when testing an unexpected extra package entry.\n---\n");
+      const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",copy],{encoding:"utf8"});
+      expect(validation.status).toBe(2);
+      expect(JSON.parse(validation.stdout)).toMatchObject({valid:false,errors:expect.arrayContaining([
+        expect.objectContaining({path:"vibehub-extra",message:expect.stringContaining("canonical registry")}),
+      ])});
+    } finally {
+      fs.rmSync(temp,{recursive:true,force:true});
+    }
   });
 
   it("parses quoted colons and folded multiline YAML deterministically",()=>{
@@ -80,6 +115,62 @@ describe("production skill package",()=>{
     const exclusions=[...read("_stdlib/quality-gates.md").matchAll(/`(generated_or_dependency|binary_file|oversize_file|non_regular_file|incremental_unchanged|incremental_deleted)`/g)].map(match=>match[1]);
     expect(exclusions).toEqual(["generated_or_dependency","binary_file","oversize_file","non_regular_file","incremental_unchanged","incremental_deleted"]);
     expect(read("_stdlib/provenance.md")).toContain("`symbol: null` is invalid");
+  });
+
+  it("pins the setup workflow, activation proof, and presentation invariants",()=>{
+    const read=(relative:string)=>fs.readFileSync(path.join(skills,relative),"utf8");
+    const setup=read("vibehub-setup/SKILL.md");
+    const contract=read("vibehub-setup/references/onboarding-contract.md");
+    const claude=read("vibehub-setup/references/claude-code.md");
+    const recovery=read("vibehub-setup/references/recovery.md");
+    const all=[setup,contract,claude,recovery].join("\n");
+
+    expect(setup).toContain("`setup inspect --json`");
+    expect(setup).toContain("Parse its JSON even when it exits 1");
+    expect(setup).toContain("`setup apply --json`");
+    expect(setup).toContain("`setup status --json`");
+    expect(setup).toContain("For every command");
+    expect(setup).toContain("parse stdout as JSON on exit 0 or 1");
+    expect(setup).toContain("An exit code never replaces");
+    expect(setup).toContain("only when `ok:true`");
+    expect(setup).toContain("`outcome` is `applied` or `unchanged`");
+    expect(setup).toContain("`errors` is");
+    expect(setup).toContain("On `blocked`, `partial`, `unhealthy`");
+    expect(setup).toContain("every retained backup path");
+    expect(setup).toContain("fresh inspect");
+    expect(setup).toContain("never run status to");
+    expect(setup).toContain("Activity:");
+    expect(setup).toContain("Trigger:");
+    expect(setup).toContain("Effects:");
+    expect(setup).toContain("Result:");
+    expect(setup).toContain("Next:");
+    expect(setup).toContain("ProjectActivationResultV1");
+    expect(setup).not.toContain("WorkflowReceiptV1");
+    expect(contract).toContain("Installed");
+    expect(contract).toContain("Connected");
+    expect(contract).toContain("Activated");
+    expect(contract).toContain("$vibehub-distill");
+    expect(contract).toContain("$vibehub-query");
+    expect(contract).toContain("$vibehub-ingest");
+    expect(contract).toContain("empty query");
+    expect(contract).toContain("tracked substantive files");
+    expect(contract).toContain("repository history");
+    expect(contract).toContain("documentation-only");
+    expect(contract).toContain("scaffold-only");
+    expect(contract).toContain("Meaningful tracked implementation");
+    expect(contract).toContain("Mixed or uncertain");
+    expect(contract).toContain("observed");
+    expect(contract).toContain("semantic skill judgment");
+    expect(claude).toContain("restart Claude Code");
+    expect(claude).toContain("exact checkout");
+    expect(recovery).toContain("Never delete a retained recovery backup");
+    expect(all).toContain("Never run `git init`");
+    expect(all).toContain("Never download");
+    expect(all).toContain("managed markers");
+    expect(all).toContain("symlink");
+    expect(all).toContain("permission");
+    expect(all).toContain("user approval");
+    expect(all).toContain("not real Claude host proof");
   });
 
   it("keeps wrapper registries identical to dispatcher operation names",async()=>{

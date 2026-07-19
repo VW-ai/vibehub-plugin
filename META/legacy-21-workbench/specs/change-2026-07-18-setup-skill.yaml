@@ -1,0 +1,68 @@
+spec_id: "change-2026-07-18-setup-skill"
+type: change
+state: active
+intent:
+  summary: "M2 activation ⑥C implementation checkpoint：vibehub-setup skill 以 prompt-first intelligence 编排 repo activation，并进入真实 plugin artifact；真实 Claude dogfood gate 待执行"
+  detail: |
+    新增独立 vibehub-setup skill、OpenAI metadata，以及 onboarding contract、
+    Claude Code host procedure、recovery 三份 progressive references。Skill 固定
+    inspect-before-apply，并对 inspect/apply/status 的 exit 0/1 均解析完整
+    ProjectActivationResultV1。只有 ok applied/unchanged 且 errors 为空才继续
+    status；partial/blocked/unhealthy 立即停止，保留完整错误与 recovery backup，
+    用户修复后必须从 fresh inspect 重新开始。
+
+    fresh/existing/ambiguous 分流继续属于 skill intelligence：读取 tracked
+    substantive implementation 与 repository history；unborn/docs/scaffold-only
+    自然积累 context，existing code 显式推荐但允许跳过 cold-start distill，
+    混合证据列出信号并询问用户。空 query、失败或虚构 ingest 均不能推进
+    Activated。
+
+    Skill package validator 从 canonical 五 entry 升到六 entry，并要求 discovered
+    top-level vibehub-* 集合严格相等，未审计第七项会失败。Representative artifact
+    使用安装后的 CLI 和 clean HOME/temp Git repo 执行 inspect→apply→第二次
+    unchanged→inspect current→status waiting，证明 skill/resources/metadata 与
+    deterministic setup primitive 一起发布。真实 Claude restart、host handshake
+    与 meaningful query/ingest 仍要求用户提供 target path 和明确外发授权。
+
+    Controller 验证 CLI 31/31、typecheck/build、package validator、representative
+    artifact 与 diff-check 全绿；prompt/product 与 artifact 两位独立 reviewer
+    最终均 APPROVED。
+constraints:
+  - kind: must
+    rule: "onboarding sequencing、fresh/existing 判断与 recovery choice 位于 vibehub-setup skill，CLI/core 只保留确定性 primitive"
+  - kind: must
+    rule: "apply partial/blocked/unhealthy 必须停止并保留原 result/backup evidence，不得用后续 status 掩盖"
+  - kind: must
+    rule: "真实 Claude dogfood 必须有 exact target path 与用户外发授权；fixture/artifact 不得冒充 host proof"
+  - kind: must_not
+    rule: "不得自动 git init、下载/构建替代 CLI、直接改 managed markers/SQLite，或制造 query/ingest 推进 Activated"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench-onboarding"
+  tags: [setup-skill, prompt-first, progressive-loading, claude-code, artifact, dogfood]
+provenance:
+  source_type: implementation
+  confidence: 1.0
+  source_ref: "m2p6c implementation + dual independent review, 2026-07-18"
+relations:
+  - target: "decision-workbench-015"
+    type: implements
+    detail: "实现 agent-first onboarding 的 skill-owned canonical workflow"
+  - target: "decision-workbench-010"
+    type: constrained_by
+    detail: "semantic workflow 与分类 intelligence 保持在 skill"
+  - target: "decision-workbench-016"
+    type: implements
+    detail: "setup 使用 Activity/Trigger/Effects/Result/Next portable presentation"
+  - target: "change-2026-07-18-repo-activation"
+    type: builds_on
+    detail: "只编排既有 deterministic setup inspect/apply/status primitives"
+anchors:
+  - file: "workbench/skills/vibehub-setup/SKILL.md"
+  - file: "workbench/skills/vibehub-setup/references/onboarding-contract.md"
+  - file: "workbench/skills/vibehub-setup/references/claude-code.md"
+  - file: "workbench/skills/vibehub-setup/references/recovery.md"
+  - file: "workbench/packages/cli/test/skill-package.test.ts"
+  - file: "workbench/scripts/verify-plugin-artifact.mjs"

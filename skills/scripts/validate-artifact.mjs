@@ -11,7 +11,14 @@ function report(schema,errors,warnings=[]){const value={valid:errors.length===0,
 const args=process.argv.slice(2); const packageIndex=args.indexOf("--package");
 if(packageIndex>=0){
   const root=path.resolve(args[packageIndex+1]??path.resolve(here,"..")); const errors=[];
-  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review"];
+  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup"];
+  const actualSkills=fs.readdirSync(root,{withFileTypes:true})
+    .filter(entry=>entry.name.startsWith("vibehub-")&&entry.isDirectory())
+    .map(entry=>entry.name)
+    .sort();
+  const canonicalSkills=[...skills].sort();
+  for(const skill of canonicalSkills.filter(skill=>!actualSkills.includes(skill)))errors.push({path:skill,message:"canonical skill entry is missing from package root"});
+  for(const skill of actualSkills.filter(skill=>!canonicalSkills.includes(skill)))errors.push({path:skill,message:"unexpected skill entry is not in the canonical registry"});
   for(const skill of skills){
     for(const relative of ["SKILL.md","agents/openai.yaml"])if(!fs.existsSync(path.join(root,skill,relative)))errors.push({path:`${skill}/${relative}`,message:"missing referenced skill asset"});
     const skillPath=path.join(root,skill,"SKILL.md");if(!fs.existsSync(skillPath))continue;
