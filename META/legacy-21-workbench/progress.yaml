@@ -244,6 +244,16 @@ progress:
         receipt 语言；Claude/Codex 走宿主文本 affordance，App 只富渲染同一事实。
         最终 headless、App-off、fresh/existing 与双宿主 dogfood 全矩阵收口。
   commits:
+    - hash: "63634c3"
+      date: "2026-07-18"
+      message: "[21-workbench] feat: add repo activation and setup CLI"
+      files_changed: 9
+      specs_affected:
+        - decision-workbench-015 (implemented repo activation and onboarding evidence primitives)
+        - decision-workbench-016 (typed setup result semantics)
+        - change-2026-07-18-repo-activation (created)
+      milestones_affected:
+        - m2p6b-repo-activation (→ completed)
     - hash: "1f2824d"
       date: "2026-07-18"
       message: "[21-workbench] feat: add deterministic workflow receipt contract"
