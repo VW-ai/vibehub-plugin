@@ -1,0 +1,530 @@
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import type { Db } from "./db.js";
+import { resolveDbPath, withReadonlyDb } from "./db.js";
+import { GitFacade } from "./git-facade.js";
+import {
+  doctorRuntime,
+  initializeRuntime,
+  sha256,
+  type DoctorRuntimeResult,
+  type InitRuntimeOptions,
+  type InitRuntimeResult,
+} from "./runtime-lifecycle.js";
+import { getRepoByRoot } from "./team-store.js";
+export const PROJECT_INSTRUCTION_VERSION = "1";
+export const PROJECT_INSTRUCTION_START = "<!-- VIBEHUB:START -->";
+export const PROJECT_INSTRUCTION_END = "<!-- VIBEHUB:END -->";
+const VERSION_PREFIX = "<!-- VIBEHUB:VERSION";
+export const DEFAULT_PROJECT_INSTRUCTION_BODY = `## VibeHub
+
+This project uses VibeHub as its persistent context layer. Before non-trivial
+work, query the relevant project context. When durable intent, decisions,
+constraints, conventions, contracts, context, or changes emerge, use the
+VibeHub workflow skills to persist them. Treat VibeHub receipts as the source
+of truth for whether an operation was merely attempted or actually persisted.`;
+export type ActivationProofState = "proven" | "not_proven" | "blocked";
+export interface ActivationProof { state: ActivationProofState; evidence: string[] }
+export type ProjectInstructionStatus = "missing" | "append" | "upgrade" | "current" | "conflict";
+export interface ProjectInstructionResult {
+  file: "AGENTS.md" | "CLAUDE.md";
+  path: string;
+  status: ProjectInstructionStatus;
+  changed: boolean;
+  beforeChecksum: string | null;
+  afterChecksum: string | null;
+  message?: string;
+}
+export type ProjectActivationOutcome =
+  | "ready" | "waiting" | "changes_required" | "applied" | "unchanged"
+  | "blocked" | "partial" | "unhealthy";
+export interface ProjectActivationError {
+  code:
+    | "not_git_repository" | "invalid_instruction_content" | "instruction_conflict"
+    | "invalid_release_manifest"
+    | "instruction_staging_failed" | "instruction_commit_failed"
+    | "backup_cleanup_failed" | "runtime_failed";
+  message: string;
+  path?: string;
+}
+export interface ProjectActivationResultV1 {
+  schemaVersion: 1;
+  command: "inspect" | "apply" | "status";
+  ok: boolean;
+  outcome: ProjectActivationOutcome;
+  repo: { root: string | null; toplevel: string | null; status: "canonical" | "blocked" };
+  instructions: ProjectInstructionResult[];
+  runtime: DoctorRuntimeResult | null;
+  init: InitRuntimeResult | null;
+  activation: { installed: ActivationProof; connected: ActivationProof; activated: ActivationProof };
+  errors: ProjectActivationError[];
+}
+type ActivationFaultPhase =
+  | "before-stage" | "after-target-rename" | "before-final-verification"
+  | "before-backup-cleanup" | "before-doctor" | "before-runtime-init" | "before-proof";
+export interface ProjectActivationOptions extends InitRuntimeOptions {
+  instructionVersion?: string;
+  instructionBody?: string;
+  /** Deterministic failure seam; production callers omit it. */
+  instructionFault?: (event: {
+    phase: ActivationFaultPhase;
+    committedTargets: number;
+    target: string;
+  }) => void;
+}
+interface ProjectContext { root: string; toplevel: string }
+type FileProbe =
+  | { kind: "missing" }
+  | { kind: "regular"; content: Buffer; checksum: string; mode: number; dev: number; ino: number }
+  | { kind: "conflict"; message: string };
+interface InstructionPlan { result: ProjectInstructionResult; probe: FileProbe; desired: Buffer | null }
+const instructionFiles = ["AGENTS.md", "CLAUDE.md"] as const;
+function proof(state: ActivationProofState, evidence: string[]): ActivationProof {
+  return { state, evidence };
+}
+function failureResult(
+  command: ProjectActivationResultV1["command"],
+  error: ProjectActivationError,
+  context?: ProjectContext,
+  instructions: ProjectInstructionResult[] = [],
+  runtime: DoctorRuntimeResult | null = null,
+  init: InitRuntimeResult | null = null,
+  outcome: ProjectActivationOutcome = "blocked",
+): ProjectActivationResultV1 {
+  const blocked = proof("blocked", [error.message]);
+  return {
+    schemaVersion: 1, command, ok: false, outcome,
+    repo: { root: context?.root ?? null, toplevel: context?.toplevel ?? null, status: context ? "canonical" : "blocked" },
+    instructions, runtime, init,
+    activation: { installed: blocked, connected: blocked, activated: blocked },
+    errors: [error],
+  };
+}
+function contextAt(repoPath: string): ProjectContext {
+  try {
+    const context = GitFacade.sessionContextAt(repoPath);
+    return { root: context.repoRoot, toplevel: context.toplevel };
+  } catch {
+    // An unborn but valid Git repository has no HEAD for sessionContextAt.
+    const root = GitFacade.resolveRepoRoot(repoPath);
+    const toplevel = GitFacade.toplevelAt(repoPath);
+    if (!toplevel) throw new Error("git repository has no working-tree top level");
+    return { root, toplevel };
+  }
+}
+function safeContext(repoPath: string): ProjectContext | undefined {
+  try { return contextAt(repoPath); } catch { return undefined; }
+}
+function guarded(
+  command: ProjectActivationResultV1["command"],
+  options: ProjectActivationOptions,
+  run: () => ProjectActivationResultV1,
+): ProjectActivationResultV1 {
+  try { return run(); }
+  catch (error) {
+    const context = safeContext(options.repoPath);
+    return failureResult(command, {
+      code: context ? "runtime_failed" : "not_git_repository",
+      message: error instanceof Error ? error.message : String(error),
+    }, context);
+  }
+}
+function validateManagedContent(version: string, body: string): string | null {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(version)) {
+    return "instruction version must be a 1-64 character single-line safe token";
+  }
+  if (!body.trim() || body.length > 100_000) return "instruction body must be non-empty and at most 100000 characters";
+  for (const marker of [PROJECT_INSTRUCTION_START, PROJECT_INSTRUCTION_END, VERSION_PREFIX]) {
+    if (body.includes(marker)) return `instruction body collides with managed marker: ${marker}`;
+  }
+  return null;
+}
+function managedBlock(version: string, body: string): string {
+  return [PROJECT_INSTRUCTION_START, `${VERSION_PREFIX} ${version} -->`, body.trim(), PROJECT_INSTRUCTION_END].join("\n");
+}
+function count(text: string, needle: string): number {
+  let total = 0, cursor = 0;
+  while ((cursor = text.indexOf(needle, cursor)) !== -1) { total += 1; cursor += needle.length; }
+  return total;
+}
+function probeFile(target: string, toplevel: string): FileProbe {
+  if (path.dirname(target) !== toplevel) return { kind: "conflict", message: "instruction file must be at checkout root" };
+  try {
+    const root = fs.lstatSync(toplevel);
+    if (root.isSymbolicLink() || !root.isDirectory()) return { kind: "conflict", message: "checkout root must be a real directory" };
+    const stat = fs.lstatSync(target);
+    if (stat.isSymbolicLink()) return { kind: "conflict", message: "instruction file must not be a symlink" };
+    if (!stat.isFile()) return { kind: "conflict", message: "instruction target is not a regular file" };
+    const fd = fs.openSync(target, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
+    try {
+      const opened = fs.fstatSync(fd);
+      if (!opened.isFile()) return { kind: "conflict", message: "instruction target is not a regular file" };
+      const content = fs.readFileSync(fd);
+      return {
+        kind: "regular", content, checksum: sha256(content),
+        mode: opened.mode & 0o777, dev: opened.dev, ino: opened.ino,
+      };
+    } finally { fs.closeSync(fd); }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return { kind: "missing" };
+    return { kind: "conflict", message: `instruction file is unreadable: ${error instanceof Error ? error.message : String(error)}` };
+  }
+}
+function planFile(toplevel: string, file: typeof instructionFiles[number], block: string): InstructionPlan {
+  const target = path.join(toplevel, file);
+  const probe = probeFile(target, toplevel);
+  const base = {
+    file, path: target, changed: false,
+    beforeChecksum: probe.kind === "regular" ? probe.checksum : null,
+    afterChecksum: probe.kind === "regular" ? probe.checksum : null,
+  };
+  if (probe.kind === "conflict") return { probe, desired: null, result: { ...base, status: "conflict", message: probe.message } };
+  if (probe.kind === "missing") {
+    const desired = Buffer.from(`${block}\n`);
+    return { probe, desired, result: { ...base, status: "missing", changed: true, afterChecksum: sha256(desired) } };
+  }
+  const text = probe.content.toString("utf8");
+  if (!Buffer.from(text).equals(probe.content)) {
+    const message = "instruction file is not valid UTF-8";
+    return { probe: { kind: "conflict", message }, desired: null, result: { ...base, status: "conflict", message } };
+  }
+  const starts = count(text, PROJECT_INSTRUCTION_START), ends = count(text, PROJECT_INSTRUCTION_END);
+  if (starts === 0 && ends === 0) {
+    const desired = Buffer.from(`${text}${text && !text.endsWith("\n") ? "\n" : ""}${block}\n`);
+    return { probe, desired, result: { ...base, status: "append", changed: true, afterChecksum: sha256(desired) } };
+  }
+  const start = text.indexOf(PROJECT_INSTRUCTION_START), endStart = text.indexOf(PROJECT_INSTRUCTION_END);
+  if (starts !== 1 || ends !== 1 || start < 0 || endStart < start) {
+    const message = "managed markers must appear exactly once in an ordered pair";
+    return { probe, desired: null, result: { ...base, status: "conflict", message } };
+  }
+  const end = endStart + PROJECT_INSTRUCTION_END.length;
+  if (text.slice(start, end) === block) return { probe, desired: null, result: { ...base, status: "current" } };
+  const desired = Buffer.from(text.slice(0, start) + block + text.slice(end));
+  return { probe, desired, result: { ...base, status: "upgrade", changed: true, afterChecksum: sha256(desired) } };
+}
+function plansFor(context: ProjectContext, version: string, body: string): InstructionPlan[] {
+  const block = managedBlock(version, body);
+  return instructionFiles.map((file) => planFile(context.toplevel, file, block));
+}
+function sameProbe(expected: FileProbe, actual: FileProbe): boolean {
+  if (expected.kind === "missing") return actual.kind === "missing";
+  return expected.kind === "regular" && actual.kind === "regular"
+    && expected.checksum === actual.checksum && expected.mode === actual.mode
+    && expected.dev === actual.dev && expected.ino === actual.ino;
+}
+function actualInstructionResults(
+  initial: InstructionPlan[],
+  context: ProjectContext,
+  version: string,
+  body: string,
+): ProjectInstructionResult[] {
+  const current = plansFor(context, version, body);
+  return initial.map((before, index) => {
+    const now = probeFile(before.result.path, context.toplevel);
+    const changed = before.probe.kind === "missing"
+      ? now.kind === "regular"
+      : before.probe.kind === "regular"
+        ? now.kind !== "regular" || now.checksum !== before.probe.checksum
+        : false;
+    return {
+      ...(current[index]?.result ?? before.result),
+      changed,
+      beforeChecksum: before.probe.kind === "regular" ? before.probe.checksum : null,
+      afterChecksum: now.kind === "regular" ? now.checksum : null,
+    };
+  });
+}
+
+function nonEmptyArray(value: unknown): boolean { return Array.isArray(value) && value.length > 0; }
+function record(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+export function operationProvesContextValue(operation: string, data: unknown): boolean {
+  const row = record(data);
+  switch (operation) {
+    case "kb.feature.list":
+    case "kb.feature.suggest":
+      return nonEmptyArray(data);
+    case "kb.spec.search":
+      return nonEmptyArray(row?.["items"]);
+    case "kb.feature.get":
+    case "kb.spec.get":
+      return typeof row?.["id"] === "string" && row["id"].length > 0;
+    case "kb.relations":
+      return nonEmptyArray(row?.["edges"]);
+    case "kb.lineage":
+      return nonEmptyArray(row?.["chain"])
+        && (row!["chain"] as unknown[]).every((item) => typeof item === "string" && item.length > 0);
+    case "kb.anchors":
+      return nonEmptyArray(row?.["forward"]) || nonEmptyArray(row?.["reverse"]);
+    case "kb.draft.apply":
+      return row?.["operation"] === "draft_batch"
+        && typeof row["idempotencyKey"] === "string" && row["idempotencyKey"].length > 0
+        && nonEmptyArray(row["created"])
+        && (row["created"] as unknown[]).every((item) => typeof item === "string" && item.length > 0);
+    default:
+      return false;
+  }
+}
+const qualifyingOperations = new Set([
+  "kb.feature.list", "kb.feature.get", "kb.feature.suggest", "kb.spec.search", "kb.spec.get",
+  "kb.relations", "kb.lineage", "kb.anchors", "kb.draft.apply",
+]);
+function activationEvidence(dbPath: string, repoRoot: string, notBefore: string): string[] {
+  try {
+    return withReadonlyDb(dbPath, (db: Db) => {
+      const repo = getRepoByRoot(db, repoRoot);
+      if (!repo) return [];
+      const rows = db.prepare(
+        `SELECT request_id requestId,operation,outcome,created_at createdAt
+         FROM operation_request_receipts
+         WHERE repo_id=? AND outcome_kind='success' AND created_at>?
+         ORDER BY created_at,request_id`,
+      ).all(repo.id, notBefore) as Array<{ requestId: string; operation: string; outcome: string; createdAt: string }>;
+      return rows.flatMap((row) => {
+        if (!Number.isFinite(Date.parse(row.createdAt)) || Date.parse(row.createdAt) <= Date.parse(notBefore)) return [];
+        if (!qualifyingOperations.has(row.operation)) return [];
+        try {
+          const result = JSON.parse(row.outcome) as {
+            ok?: unknown; data?: unknown;
+            meta?: { operation?: unknown; repoId?: unknown; requestId?: unknown };
+          };
+          const identity = result.ok === true && result.meta?.operation === row.operation
+            && result.meta.repoId === repo.id && result.meta.requestId === row.requestId;
+          return identity && operationProvesContextValue(row.operation, result.data)
+            ? [`${row.operation}:${row.requestId}`] : [];
+        } catch { return []; }
+      });
+    });
+  } catch { return []; }
+}
+function instructionCutoff(instructions: ProjectInstructionResult[]): string {
+  const mtimes = instructions.map((item) => fs.statSync(item.path).mtimeMs);
+  return new Date(Math.max(...mtimes)).toISOString();
+}
+function canonicalPath(value: string): string {
+  try { return fs.realpathSync.native(value); } catch { return path.resolve(value); }
+}
+function hostHandshake(
+  dbPath: string,
+  repoRoot: string,
+  toplevel: string,
+  notBefore: string,
+): { id: string; startedAt: string } | null {
+  try {
+    return withReadonlyDb(dbPath, (db: Db) => {
+      const repo = getRepoByRoot(db, repoRoot);
+      if (!repo) return null;
+      const cutoff = Date.parse(notBefore);
+      const rows = db.prepare(
+        `SELECT s.id,s.started_at startedAt,t.worktree_path worktreePath
+         FROM sessions s JOIN tasks t ON t.id=s.task_id AND t.repo_id=s.repo_id
+         WHERE s.repo_id=? AND t.signal_tier='hooks' AND s.started_at>?
+         ORDER BY s.started_at,s.id`,
+      ).all(repo.id, notBefore) as Array<{ id: string; startedAt: string; worktreePath: string | null }>;
+      const checkout = canonicalPath(toplevel);
+      return rows.find((row) =>
+        Number.isFinite(Date.parse(row.startedAt))
+        && Date.parse(row.startedAt) > cutoff
+        && canonicalPath(row.worktreePath ?? repoRoot) === checkout) ?? null;
+    });
+  } catch { return null; }
+}
+
+function activationProofs(
+  runtime: DoctorRuntimeResult,
+  instructions: ProjectInstructionResult[],
+  dbPath: string,
+  repoRoot: string,
+  toplevel: string,
+  manifestAssets: number,
+): ProjectActivationResultV1["activation"] {
+  const installed = manifestAssets > 0
+    && runtime.nativeDependency.status === "healthy" && runtime.managedAssets.status === "healthy";
+  const blocks = instructions.length === 2 && instructions.every((item) => item.status === "current");
+  const baseConnected = installed && runtime.db.status === "healthy" && runtime.repo.status === "healthy" && blocks;
+  const handshake = baseConnected ? hostHandshake(dbPath, repoRoot, toplevel, instructionCutoff(instructions)) : null;
+  const connected = baseConnected && handshake !== null;
+  const value = connected ? activationEvidence(dbPath, repoRoot, handshake!.startedAt) : [];
+  return {
+    installed: installed
+      ? proof("proven", ["non-empty managed runtime manifest", "native dependency and managed assets healthy"])
+      : proof("not_proven", ["non-empty healthy managed runtime manifest required"]),
+    connected: connected
+      ? proof("proven", [
+          "runtime and instruction blocks healthy",
+          `host hook session observed:${handshake!.id}@${handshake!.startedAt}`,
+        ])
+      : proof("not_proven", ["host hook session has not been observed after the current instruction blocks"]),
+    activated: connected && value.length > 0
+      ? proof("proven", value)
+      : proof("not_proven", ["no qualifying successful context value receipt after host handshake"]),
+  };
+}
+
+function contentOrFailure(
+  command: ProjectActivationResultV1["command"],
+  options: ProjectActivationOptions,
+  context: ProjectContext,
+): { failure: ProjectActivationResultV1 } | { version: string; body: string } {
+  const version = options.instructionVersion ?? PROJECT_INSTRUCTION_VERSION;
+  const body = options.instructionBody ?? DEFAULT_PROJECT_INSTRUCTION_BODY;
+  const invalid = validateManagedContent(version, body);
+  return invalid
+    ? { failure: failureResult(command, { code: "invalid_instruction_content", message: invalid }, context) }
+    : { version, body };
+}
+function inspectUnsafe(command: "inspect" | "status", options: ProjectActivationOptions): ProjectActivationResultV1 {
+  const context = contextAt(options.repoPath);
+  if (!Array.isArray(options.manifest.assets) || options.manifest.assets.length === 0) {
+    return failureResult(command, {
+      code: "invalid_release_manifest", message: "release manifest must contain at least one managed asset",
+    }, context);
+  }
+  const content = contentOrFailure(command, options, context);
+  if ("failure" in content) return content.failure;
+  const plans = plansFor(context, content.version!, content.body!);
+  options.instructionFault?.({ phase: "before-doctor", committedTargets: 0, target: context.root });
+  const runtime = doctorRuntime({ ...options, repoPath: context.root });
+  options.instructionFault?.({ phase: "before-proof", committedTargets: 0, target: context.root });
+  const activation = activationProofs(runtime, plans.map((item) => item.result), resolveDbPath(options.dbPath), context.root, context.toplevel, options.manifest.assets.length);
+  const errors = plans.filter((item) => item.result.status === "conflict").map((item): ProjectActivationError => ({
+    code: "instruction_conflict", message: item.result.message ?? "instruction conflict", path: item.result.path,
+  }));
+  const changes = plans.some((item) => item.result.changed);
+  const outcome = errors.length ? "blocked"
+    : command === "status" ? activation.connected.state === "proven" ? "ready" : "waiting"
+      : changes ? "changes_required" : "ready";
+  return {
+    schemaVersion: 1, command, ok: (errors.length === 0 && command === "inspect") || outcome === "ready",
+    outcome, repo: { ...context, status: "canonical" },
+    instructions: plans.map((item) => item.result), runtime, init: null, activation, errors,
+  };
+}
+export function inspectProjectActivation(options: ProjectActivationOptions): ProjectActivationResultV1 {
+  return guarded("inspect", options, () => inspectUnsafe("inspect", options));
+}
+export function readProjectActivationStatus(options: ProjectActivationOptions): ProjectActivationResultV1 {
+  return guarded("status", options, () => inspectUnsafe("status", options));
+}
+
+function applyUnsafe(options: ProjectActivationOptions): ProjectActivationResultV1 {
+  const context = contextAt(options.repoPath), dbPath = resolveDbPath(options.dbPath);
+  if (!Array.isArray(options.manifest.assets) || options.manifest.assets.length === 0) {
+    return failureResult("apply", {
+      code: "invalid_release_manifest", message: "release manifest must contain at least one managed asset",
+    }, context);
+  }
+  const content = contentOrFailure("apply", options, context);
+  if ("failure" in content) return content.failure;
+  const plans = plansFor(context, content.version!, content.body!);
+  const conflicts = plans.filter((item) => item.result.status === "conflict");
+  if (conflicts.length) {
+    return failureResult("apply", {
+      code: "instruction_conflict", message: "one or more instruction files conflict",
+    }, context, plans.map((item) => item.result));
+  }
+  const writes = plans.filter((item): item is InstructionPlan & { desired: Buffer } => item.desired !== null);
+  const staged: Array<{ plan: InstructionPlan & { desired: Buffer }; tmp: string }> = [];
+  const committed: Array<{ target: string; backup?: string; installed: boolean }> = [];
+  let init: InitRuntimeResult | null = null, runtime: DoctorRuntimeResult | null = null;
+  let runtimeChanged = false, commitPoint = false;
+  let phase: "staging" | "runtime" | "commit" = "staging";
+  let finalResult: ProjectActivationResultV1 | undefined;
+  try {
+    for (const plan of writes) {
+      options.instructionFault?.({ phase: "before-stage", committedTargets: 0, target: plan.result.path });
+      const tmp = `${plan.result.path}.vibehub-${process.pid}-${crypto.randomUUID()}.tmp`;
+      fs.writeFileSync(tmp, plan.desired, { flag: "wx", mode: plan.probe.kind === "regular" ? plan.probe.mode : 0o644 });
+      staged.push({ plan, tmp });
+    }
+    phase = "runtime";
+    options.instructionFault?.({ phase: "before-doctor", committedTargets: 0, target: context.root });
+    const before = doctorRuntime({ ...options, repoPath: context.root });
+    if (!(before.healthy && writes.length === 0)) {
+      options.instructionFault?.({ phase: "before-runtime-init", committedTargets: 0, target: context.root });
+      runtimeChanged = true;
+      init = initializeRuntime({ ...options, repoPath: context.root });
+      if (!init.ok) throw new Error("runtime initialization reported managed asset conflicts");
+    }
+    phase = "commit";
+    let committedTargets = 0;
+    for (const item of staged) {
+      const current = probeFile(item.plan.result.path, context.toplevel);
+      if (!sameProbe(item.plan.probe, current)) throw new Error(`instruction target changed during staging: ${item.plan.result.path}`);
+      let backup: string | undefined;
+      if (current.kind === "regular") {
+        backup = `${item.plan.result.path}.vibehub-${process.pid}-${crypto.randomUUID()}.bak`;
+        fs.renameSync(item.plan.result.path, backup);
+      }
+      const commit = { target: item.plan.result.path, backup, installed: false };
+      committed.push(commit);
+      fs.renameSync(item.tmp, item.plan.result.path);
+      commit.installed = true;
+      options.instructionFault?.({ phase: "after-target-rename", committedTargets: ++committedTargets, target: item.plan.result.path });
+    }
+    options.instructionFault?.({ phase: "before-final-verification", committedTargets: committed.length, target: context.root });
+    const finalPlans = plansFor(context, content.version!, content.body!);
+    runtime = doctorRuntime({ ...options, repoPath: context.root });
+    if (!runtime.healthy || !finalPlans.every((item) => item.result.status === "current")) {
+      throw new Error("final setup verification failed");
+    }
+    options.instructionFault?.({ phase: "before-proof", committedTargets: committed.length, target: context.root });
+    const activation = activationProofs(runtime, finalPlans.map((item) => item.result), dbPath, context.root, context.toplevel, options.manifest.assets.length);
+    finalResult = {
+      schemaVersion: 1, command: "apply", ok: true,
+      outcome: writes.length || runtimeChanged ? "applied" : "unchanged",
+      repo: { ...context, status: "canonical" },
+      instructions: finalPlans.map((item) => ({ ...item.result, changed: writes.some((write) => write.result.path === item.result.path) })),
+      runtime, init, activation, errors: [],
+    };
+    commitPoint = true;
+  } catch (error) {
+    const rollbackErrors: string[] = [];
+    for (const item of [...committed].reverse()) {
+      try {
+        if (item.installed) fs.rmSync(item.target, { force: true });
+        if (item.backup) fs.renameSync(item.backup, item.target);
+      } catch (rollbackError) { rollbackErrors.push(String(rollbackError)); }
+    }
+    const message = `${error instanceof Error ? error.message : String(error)}${rollbackErrors.length ? `; rollback: ${rollbackErrors.join("; ")}` : ""}`;
+    return failureResult("apply", {
+      code: phase === "commit" ? "instruction_commit_failed"
+        : phase === "runtime" ? "runtime_failed" : "instruction_staging_failed",
+      message,
+    }, context, actualInstructionResults(plans, context, content.version!, content.body!), runtime, init, runtimeChanged ? "partial" : "blocked");
+  } finally {
+    for (const item of staged) {
+      try { if (fs.existsSync(item.tmp)) fs.rmSync(item.tmp, { force: true }); } catch { /* typed result owns final failures */ }
+    }
+    // No backup cleanup before the explicit commit point.
+    if (!commitPoint) {
+      // Successfully restored backups have already moved away; failed
+      // rollback backups remain untouched for manual recovery.
+    }
+  }
+
+  const cleanupErrors: ProjectActivationError[] = [];
+  for (const [index, item] of committed.entries()) {
+    if (!item.backup) continue;
+    try {
+      options.instructionFault?.({
+        phase: "before-backup-cleanup", committedTargets: index + 1, target: item.backup,
+      });
+      fs.rmSync(item.backup, { force: true });
+    } catch (error) {
+      cleanupErrors.push({
+        code: "backup_cleanup_failed",
+        message: `setup committed; recovery backup retained: ${error instanceof Error ? error.message : String(error)}`,
+        path: item.backup,
+      });
+    }
+  }
+  if (cleanupErrors.length) return { ...finalResult!, ok: false, outcome: "partial", errors: cleanupErrors };
+  return finalResult!;
+}
+export function applyProjectActivation(options: ProjectActivationOptions): ProjectActivationResultV1 {
+  return guarded("apply", options, () => applyUnsafe(options));
+}

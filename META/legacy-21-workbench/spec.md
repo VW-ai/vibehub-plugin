@@ -51,5 +51,6 @@ checkpoint → Codex parity → presentation rollout；Tauri/downloadable packag
 - [change-2026-07-13-context-to-action-workflow] 产品协议补全:Task=outcome、Run=authority、code-write 才 claim workspace;机械执行 append evidence 不改 semantic truth;skill 判断 workflow transition;现有 audit B1-B6 与后续 durable Task/Run implementation 分界
 - [change-2026-07-14-m2-audit-fix-closure] M2 productionization 审计 B1–B6 收口:repo-safe task identity、原子 hook 投递、正确 scope read、production App controller/receipts、v8 UX truth、representative artifact/isolated gates;B7 全矩阵验证通过
 - [change-2026-07-18-workflow-receipt-contract] activation ⑥A:跨 workflow typed receipt contract + deterministic projectors 落地；修复 intervention replay outcome laundering；browser-safe contract 与 core runtime projection 分层，独立 review APPROVED
+- [change-2026-07-18-repo-activation] activation ⑥B:setup inspect/apply/status + repo/worktree-safe managed instruction blocks；Installed→Connected→Activated 由 release、checkout-bound host handshake、post-handshake context value 的严格因果证据投影，独立 review APPROVED
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。

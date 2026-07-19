@@ -62,8 +62,31 @@ function parseFlags(argv: string[], failureMode: "exit" | "throw" = "exit"): Fla
   return { ...flags, db: resolveDbPath(dbFlag) };
 }
 
+function parseSetupFlags(argv: string[]): Flags {
+  let repo = process.cwd();
+  let dbFlag: string | undefined;
+  let json = false;
+  const seen = new Set<string>();
+  for (let index = 0; index < argv.length; index += 1) {
+    const flag = argv[index];
+    if (seen.has(flag ?? "")) throw new Error(`repeated flag: ${flag}`);
+    seen.add(flag ?? "");
+    if (flag === "--json") json = true;
+    else if (flag === "--repo" || flag === "--db") {
+      const value = argv[++index];
+      if (!value || value.startsWith("--")) throw new Error(`${flag} requires a value`);
+      if (flag === "--repo") repo = value;
+      else dbFlag = value;
+    } else {
+      throw new Error(`unknown flag: ${flag}`);
+    }
+  }
+  return { repo, db: resolveDbPath(dbFlag), json };
+}
+
 const USAGE = `usage:
   vibehub init [--repo <path>] [--db <path>] [--json]
+  vibehub setup inspect|apply|status [--repo <path>] [--db <path>] [--json]
   vibehub doctor --json [--repo <path>] [--db <path>]
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
   vibehub kb <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
@@ -240,6 +263,69 @@ export function main(argv: string[]): number {
 
   const topLevelFlags = (): Flags =>
     parseFlags([cmd, ...rest].filter((value): value is string => value !== undefined));
+
+  if (group === "setup") {
+    const wantsJson = [cmd, ...rest].includes("--json");
+    if (cmd !== "inspect" && cmd !== "apply" && cmd !== "status") {
+      if (wantsJson) {
+        process.stdout.write(`${JSON.stringify({
+          schemaVersion: 1,
+          ok: false,
+          error: { code: "validation_error", message: cmd === undefined || cmd === "--json" ? "setup subcommand is required" : `unknown setup subcommand: ${cmd}` },
+        })}\n`);
+      } else console.error(USAGE);
+      return 2;
+    }
+    let flags: Flags;
+    try {
+      flags = parseSetupFlags(rest);
+    } catch (error) {
+      const result = {
+        schemaVersion: 1,
+        command: cmd,
+        ok: false,
+        outcome: "blocked",
+        errors: [{ code: "validation_error", message: error instanceof Error ? error.message : String(error) }],
+      };
+      process.stdout.write(`${JSON.stringify(result)}\n`);
+      return 2;
+    }
+    const service = new RuntimeService({ dbPath: flags.db });
+    let result;
+    try {
+      const args = [
+        flags.repo,
+        stateDirFor(flags.db),
+        releaseAssetRoot(),
+        releaseAssetManifest(),
+      ] as const;
+      result = cmd === "inspect"
+        ? service.inspectProjectActivation(...args)
+        : cmd === "apply"
+          ? service.applyProjectActivation(...args)
+          : service.readProjectActivationStatus(...args);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const blocked = { state: "blocked", evidence: [message] };
+      const failed = {
+        schemaVersion: 1,
+        command: cmd,
+        ok: false,
+        outcome: "blocked",
+        repo: { root: null, toplevel: null, status: "blocked" },
+        instructions: [],
+        runtime: null,
+        init: null,
+        activation: { installed: blocked, connected: blocked, activated: blocked },
+        errors: [{ code: "runtime_failed", message }],
+      };
+      process.stdout.write(`${JSON.stringify(failed)}\n`);
+      return 1;
+    }
+    if (flags.json) process.stdout.write(`${JSON.stringify(result)}\n`);
+    else console.log(`${result.command}: ${result.outcome}`);
+    return result.ok ? 0 : 1;
+  }
 
   if (group === "init") {
     const flags = topLevelFlags();

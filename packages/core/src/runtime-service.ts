@@ -22,6 +22,13 @@ import {
   type InitRuntimeResult,
   type ManagedAssetManifest,
 } from "./runtime-lifecycle.js";
+import {
+  applyProjectActivation,
+  inspectProjectActivation,
+  readProjectActivationStatus,
+  type ProjectActivationOptions,
+  type ProjectActivationResultV1,
+} from "./project-activation.js";
 
 export interface RuntimeServiceOptions {
   dbPath?: string;
@@ -84,6 +91,37 @@ export class RuntimeService {
       manifest,
       now: this.#now,
     });
+  }
+
+  inspectProjectActivation(
+    repoPath: string,
+    stateDir: string,
+    allowedAssetRoot: string,
+    manifest: ManagedAssetManifest,
+  ): ProjectActivationResultV1 {
+    return inspectProjectActivation(this.#activationOptions(repoPath, stateDir, allowedAssetRoot, manifest));
+  }
+
+  applyProjectActivation(
+    repoPath: string,
+    stateDir: string,
+    allowedAssetRoot: string,
+    manifest: ManagedAssetManifest,
+    overrides: Pick<ProjectActivationOptions, "instructionVersion" | "instructionBody" | "instructionFault"> = {},
+  ): ProjectActivationResultV1 {
+    return applyProjectActivation({
+      ...this.#activationOptions(repoPath, stateDir, allowedAssetRoot, manifest),
+      ...overrides,
+    });
+  }
+
+  readProjectActivationStatus(
+    repoPath: string,
+    stateDir: string,
+    allowedAssetRoot: string,
+    manifest: ManagedAssetManifest,
+  ): ProjectActivationResultV1 {
+    return readProjectActivationStatus(this.#activationOptions(repoPath, stateDir, allowedAssetRoot, manifest));
   }
 
   readWorkbenchSnapshot(
@@ -203,5 +241,21 @@ export class RuntimeService {
     } finally {
       db?.close();
     }
+  }
+
+  #activationOptions(
+    repoPath: string,
+    stateDir: string,
+    allowedAssetRoot: string,
+    manifest: ManagedAssetManifest,
+  ): ProjectActivationOptions {
+    return {
+      repoPath,
+      dbPath: this.#dbPath,
+      stateDir,
+      allowedAssetRoot,
+      manifest,
+      now: this.#now,
+    };
   }
 }

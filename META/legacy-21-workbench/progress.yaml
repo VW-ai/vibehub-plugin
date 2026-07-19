@@ -136,7 +136,7 @@ progress:
       notes: "WorkflowReceiptV1 browser-safe contract + runtime projectors 完成；42 operations 共用 canonical activity/effect map，operation/init/doctor/injection/claim 证据同构校验，update/review vocabulary 补齐。TUI renderer 有 five-section budget、ANSI/control 清理、CJK/emoji display-width wrap；intervention idempotent replay 保留原 outcome + replayed=true。独立 review 两轮修复后 APPROVED。Controller gates: Core 220/220、App 59/59、两端 typecheck、core build、diff-check 全绿。"
     - id: m2p6b-repo-activation
       name: "M2 activation ⑥B:repo activation primitives + managed instruction block + CLI"
-      status: pending
+      status: completed
       gate: true
       estimated_files:
         - "workbench/packages/core/src/project-activation.ts"
@@ -156,6 +156,7 @@ progress:
         primitive，保留用户 AGENTS.md/CLAUDE.md 内容并诚实区分 Installed、
         Connected、Activated。非 Git、marker 冲突、symlink、权限和 partial
         failure 均返回可恢复的 typed result。
+      notes: "独立 project-activation primitive + RuntimeService/CLI setup inspect|apply|status 完成。AGENTS.md/CLAUDE.md 仅拥有稳定 managed block，双文件全批 preflight、stage/rename、显式 commit point、精确 rollback 与 recovery backup；non-Git、marker、UTF-8、symlink/nonregular、TOCTOU mode、空/坏 manifest 均 typed 且零越权写。DB identity 保持 common repo root，instruction target 绑定当前 worktree toplevel。Installed 由非空健康 release manifest 证明；Connected 要求 current instructions 之后同 checkout 的真实 hooks-tier session；Activated 再要求 handshake 之后 operation-specific 有效 query/ingest receipt，时间门严格 >。独立 reviewer 三轮对抗修复后 APPROVED。Controller gates: Core 243/243、CLI 28/28、两端 typecheck/build、diff-check 全绿。"
     - id: m2p6c-setup-skill-claude
       name: "M2 activation ⑥C:vibehub-setup skill + Claude onboarding vertical slice"
       status: pending

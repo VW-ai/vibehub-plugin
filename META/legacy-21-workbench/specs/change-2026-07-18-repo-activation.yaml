@@ -1,0 +1,60 @@
+spec_id: "change-2026-07-18-repo-activation"
+type: change
+state: active
+intent:
+  summary: "M2 activation ⑥B 完成：repo activation primitives、managed project instructions 与 setup CLI 以可恢复、worktree-safe、证据诚实的方式落地"
+  detail: |
+    Core 新增 setup inspect/apply/status typed boundary，CLI 仅负责参数与输出。
+    AGENTS.md/CLAUDE.md 保持 user-owned，VibeHub 只拥有稳定 marker 包围的 block；
+    append 与 upgrade 保留其余字节，current rerun 不写文件。两个目标先全量
+    preflight，再 stage/rename；显式 commit point 前保留全部 backup，故障精确
+    rollback，commit 后 cleanup failure 保留 recovery backup 并返回 partial。
+
+    Repo 的 DB identity 继续使用 git common root，instruction target 使用当前
+    session worktree toplevel，sibling worktree 不能互相证明连接。non-Git 不会
+    隐式 git init；marker 拓扑、内容注入、symlink/nonregular、UTF-8、TOCTOU、
+    permission/runtime/manifest failure 均返回完整 typed result。
+
+    三层状态不由同一事实冒充：Installed 要求非空且健康的 release manifest；
+    Connected 要求 current instruction blocks 之后、同 checkout、hooks-tier 的
+    host session；Activated 再要求该 handshake 之后有 operation-specific 的
+    有效 query/ingest value receipt。两个时间门均为严格 `>`，旧 session、
+    旧 receipt、空 query 与 sibling worktree evidence 均不能穿透。
+
+    Controller 验证 Core 243/243、CLI 28/28、core/cli typecheck 与 build、
+    diff-check 全绿；独立 reviewer 经三轮对抗修复后最终 APPROVED。
+constraints:
+  - kind: must
+    rule: "项目 instruction 文件保持 user-owned；VibeHub 只能替换自己 marker 包围的 block"
+  - kind: must
+    rule: "Connected 与 Activated 必须由 checkout-bound host handshake 和其后的有效 context value 分别证明"
+  - kind: must
+    rule: "instruction commit point 前任何失败不得丢失用户原文件；无法自动清理的 backup 必须保留并显式报告"
+  - kind: must_not
+    rule: "不得隐式 git init、用 sibling worktree session 证明当前 checkout，或用 doctor green 冒充 Activated"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench-onboarding"
+  tags: [repo-activation, setup-cli, managed-block, worktree, handshake, evidence]
+provenance:
+  source_type: implementation
+  confidence: 1.0
+  source_ref: "m2p6b implementation + three-round independent review, 2026-07-18"
+relations:
+  - target: "decision-workbench-015"
+    type: implements
+    detail: "实现 agent-first onboarding 的确定性 repo activation primitives 与三层状态证据"
+  - target: "decision-workbench-016"
+    type: constrained_by
+    detail: "所有 setup 结果使用 typed、诚实、可恢复的状态语言"
+  - target: "change-2026-07-18-workflow-receipt-contract"
+    type: builds_on
+    detail: "沿用 deterministic evidence projection 原则，不建立第二 truth store"
+anchors:
+  - file: "workbench/packages/core/src/project-activation.ts"
+  - file: "workbench/packages/core/src/runtime-service.ts"
+  - file: "workbench/packages/cli/src/main.ts"
+  - file: "workbench/packages/core/test/project-activation.test.ts"
+  - file: "workbench/packages/cli/test/setup-cli.test.ts"

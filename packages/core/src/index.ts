@@ -15,6 +15,7 @@ export {
   type DatabaseInspection,
 } from "./db.js";
 export * from "./runtime-lifecycle.js";
+export * from "./project-activation.js";
 export * from "./activity-store.js";
 // GraphStore is a read-model compatibility facade after the KB v2 cutover.
 // Canonical/mapping writes are intentionally not part of the package API.
