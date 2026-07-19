@@ -79,6 +79,12 @@ export {
   type LayoutOptions,
 } from "./treemap.js";
 export { nextState, type HookEventName } from "./state-machine.js";
+export {
+  type CanonicalHookEvent,
+  type CanonicalToolTouch,
+  type HookDeliveryDirective,
+  type HookHost,
+} from "./hook-protocol.js";
 export { classifyUserPrompt, type PromptClassification } from "./milestone.js";
 export {
   canonicalRepoPath,
@@ -93,9 +99,11 @@ export * from "./distillation-service.js";
 export * from "./operation-dispatcher.js";
 export * from "./operation-contracts.js";
 export {
+  ingestCanonicalHookEvent,
   ingestHookEvent,
   lastAssistantText,
   type HookPayload,
+  type CanonicalHookIngestResult,
   type HookIngestResult,
 } from "./hook-ingest.js";
 export {
@@ -103,6 +111,7 @@ export {
   DEFAULT_CHECKPOINT_CADENCE_TURNS,
   formatCheckpointReminder,
   recordUserPromptTurn,
+  readPromptReplayFacts,
   resolveCheckpointCadence,
   type CheckpointCadenceFacts,
   type CheckpointStatus,

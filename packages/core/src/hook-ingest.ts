@@ -38,10 +38,16 @@ import type { Db } from "./db.js";
 import { GitFacade } from "./git-facade.js";
 import {
   formatCheckpointReminder,
+  readPromptReplayFacts,
   recordUserPromptTurn,
   type CheckpointCadenceFacts,
 } from "./knowledge-checkpoint.js";
 import { nextState, type HookEventName } from "./state-machine.js";
+import type {
+  CanonicalHookEvent,
+  CanonicalToolTouch,
+  HookDeliveryDirective,
+} from "./hook-protocol.js";
 import { getRepoByRoot, upsertRepo } from "./team-store.js";
 import {
   canonicalRepoPath,
@@ -94,6 +100,15 @@ export interface HookIngestResult {
     decision?: "block";
     reason?: string;
   };
+}
+
+export interface CanonicalHookIngestResult {
+  taskId: string;
+  eventTypesWritten: string[];
+  stateBefore: TaskState | null;
+  stateAfter: TaskState;
+  checkpoint?: CheckpointCadenceFacts;
+  delivery?: HookDeliveryDirective;
 }
 
 const EDIT_TOOLS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
@@ -168,24 +183,51 @@ export function ingestHookEvent(
   payload: HookPayload,
   opts: { now?: () => Date } = {},
 ): HookIngestResult {
+  const toolTouches = legacyClaudeToolTouches(hook, payload);
+  const assistantText = hook === "Stop"
+    ? payload.last_assistant_message ?? (
+        payload.transcript_path ? lastAssistantText(payload.transcript_path) ?? undefined : undefined
+      )
+    : undefined;
+  const result = ingestCanonicalHookEvent(db, {
+    host: "claude-code",
+    eventName: hook,
+    sessionId: payload.session_id,
+    ...(payload.transcript_path ? { transcriptPath: payload.transcript_path } : {}),
+    cwd: payload.cwd,
+    ...(payload.prompt_id ? { promptIdentity: payload.prompt_id } : {}),
+    ...(payload.prompt ? { prompt: payload.prompt } : {}),
+    ...(payload.tool_name ? { toolName: payload.tool_name } : {}),
+    ...(toolTouches.length > 0 ? { toolTouches } : {}),
+    ...(payload.message ? { message: payload.message } : {}),
+    ...(payload.reason ? { reason: payload.reason } : {}),
+    ...(assistantText ? { assistantText } : {}),
+    ...(payload.error ? { error: payload.error } : {}),
+    ...(payload.error_details ? { errorDetails: payload.error_details } : {}),
+  }, opts);
+  const { delivery, ...legacyResult } = result;
+  return {
+    ...legacyResult,
+    ...(delivery ? { output: projectLegacyClaudeOutput(delivery) } : {}),
+  };
+}
+
+/**
+ * Canonical transactional boundary. Adapters must fully validate and
+ * normalize untrusted host payloads before calling this function.
+ */
+export function ingestCanonicalHookEvent(
+  db: Db,
+  payload: CanonicalHookEvent,
+  opts: { now?: () => Date } = {},
+): CanonicalHookIngestResult {
+  const hook = payload.eventName;
   const nowIso = (opts.now?.() ?? new Date()).toISOString();
   // One spawn for the session facts (hot path: this runs on every tool
   // use). Branch/toplevel come from the SESSION's cwd (a worktree has its
   // own HEAD); repoRoot is the shared domain (decision-github-004).
   const ctx = GitFacade.sessionContextAt(payload.cwd);
-  const validatedToolPath = validatedPostToolPath(
-    hook,
-    payload,
-    ctx.toplevel,
-  );
-  // Transcript reads are filesystem I/O and can fall back to a full-file
-  // scan. Finish that work before BEGIN IMMEDIATE so a slow or unavailable
-  // transcript never extends the SQLite write-lock window.
-  const stopAssistantText = hook === "Stop"
-    ? payload.last_assistant_message ?? (
-        payload.transcript_path ? lastAssistantText(payload.transcript_path) : null
-      )
-    : null;
+  const validatedToolTouches = validatedToolPaths(payload.toolTouches ?? [], payload.cwd, ctx.toplevel);
   // Slug/default-branch are stable repo facts — spawn for them only the
   // first time this repo is ever seen.
   const knownRepo = getRepoByRoot(db, ctx.repoRoot);
@@ -206,7 +248,7 @@ export function ingestHookEvent(
         };
       })();
 
-  const transact = db.transaction((): HookIngestResult => {
+  const transact = db.transaction((): CanonicalHookIngestResult => {
     let repo = getRepoByRoot(db, ctx.repoRoot);
     if (!repo) {
       if (!newRepoFacts) {
@@ -225,6 +267,27 @@ export function ingestHookEvent(
     const existing = readTaskForBranch(db, repo.id, branch);
     const taskId = existing?.id ?? taskIdForBranch(repo.id, branch);
     const stateBefore = existing?.state ?? null;
+    const replay = (
+      hook === "UserPromptSubmit" &&
+      existing &&
+      typeof payload.promptIdentity === "string" &&
+      payload.promptIdentity !== ""
+    )
+      ? readPromptReplayFacts(db, {
+          repoId: repo.id,
+          taskId,
+          promptId: payload.promptIdentity,
+        })
+      : null;
+    if (replay) {
+      return {
+        taskId,
+        eventTypesWritten: [],
+        stateBefore,
+        stateAfter: existing!.state,
+        checkpoint: replay,
+      };
+    }
     const deliveryCapable =
       hook === "UserPromptSubmit" ||
       hook === "PostToolUse" ||
@@ -257,19 +320,19 @@ export function ingestHookEvent(
   });
 
   upsertSession(db, {
-    id: payload.session_id,
+    id: payload.sessionId,
     repoId: repo.id,
     taskId,
-    agent: "Claude Code",
-    transcriptPath: payload.transcript_path ?? null,
-    startedAt: existingSessionStart(db, payload.session_id) ?? nowIso,
+    agent: payload.host === "codex" ? "Codex" : "Claude Code",
+    transcriptPath: payload.transcriptPath ?? null,
+    startedAt: existingSessionStart(db, payload.sessionId) ?? nowIso,
     endedAt: hook === "SessionEnd" ? nowIso : null,
     endReason: hook === "SessionEnd" ? mapEndReason(payload.reason) : null,
   });
 
   const written: string[] = [];
   const emit = (e: TimelineEvent): void => {
-    appendEvent(db, repo.id, taskId, payload.session_id, e);
+    appendEvent(db, repo.id, taskId, payload.sessionId, e);
     written.push(e.type);
   };
   const eid = (): string => crypto.randomUUID();
@@ -279,7 +342,7 @@ export function ingestHookEvent(
     case "UserPromptSubmit": {
       if (payload.prompt) {
         const hasLaunch = hasEvent(db, taskId, "launch");
-        const promptId = payload.prompt_id;
+        const promptId = payload.promptIdentity;
         emit(
           hasLaunch
             ? {
@@ -306,18 +369,12 @@ export function ingestHookEvent(
       break;
     }
     case "PostToolUse": {
-      const file = payload.tool_input?.["file_path"];
-      if (typeof file === "string" && payload.tool_name) {
-        const action = EDIT_TOOLS.has(payload.tool_name)
-          ? "edit"
-          : payload.tool_name === "Read"
-            ? "read"
-            : null;
-        if (action) {
-          const relativeFile = validatedToolPath!;
+      if (payload.toolName) {
+        for (const touch of validatedToolTouches) {
+          const { action, relativeFile } = touch;
           addFootprint(db, repo.id, {
             taskId,
-            sessionId: payload.session_id,
+            sessionId: payload.sessionId,
             path: relativeFile,
             action,
             at: nowIso,
@@ -347,8 +404,8 @@ export function ingestHookEvent(
     case "Stop": {
       // The agent's own final turn text, verbatim from the transcript —
       // contract SelfReportEvent source. Nothing synthesized.
-      if (stopAssistantText) {
-        emit({ id: eid(), at: nowIso, type: "self_report", text: stopAssistantText });
+      if (payload.assistantText) {
+        emit({ id: eid(), at: nowIso, type: "self_report", text: payload.assistantText });
       }
       break;
     }
@@ -385,7 +442,7 @@ export function ingestHookEvent(
   // not evidence that the runtime resumed. There is no daemon to time out a
   // pending note — "still undelivered" is a read-side derivation
   // (pendingInjections + age), surfaced by the UI, never a stored state.
-  let output: HookIngestResult["output"];
+  let delivery: HookDeliveryDirective | undefined;
   if (deliveryCapable) {
     if (claimed.length > 0) {
       for (const c of claimed) {
@@ -398,7 +455,7 @@ export function ingestHookEvent(
         });
       }
       if (hook === "Stop") {
-        output = { decision: "block", reason: formatDelivery(claimed) };
+        delivery = { kind: "continue_turn", reason: formatDelivery(claimed) };
       } else {
         conditionalContext.push(formatDelivery(claimed));
       }
@@ -409,19 +466,19 @@ export function ingestHookEvent(
   // delivery block so claimed interventions keep strict priority — an
   // eligible turn that is delivering them defers instead of firing, and a
   // pause is never contradicted in the same additionalContext. Prompts
-  // without a stable prompt_id (old hosts) are not counted at all: honest
+  // without a stable prompt identity (old hosts) are not counted at all: honest
   // degradation beats replay double-counting.
   let checkpoint: CheckpointCadenceFacts | undefined;
   if (
     hook === "UserPromptSubmit" &&
     payload.prompt &&
-    typeof payload.prompt_id === "string" &&
-    payload.prompt_id !== ""
+    typeof payload.promptIdentity === "string" &&
+    payload.promptIdentity !== ""
   ) {
     checkpoint = recordUserPromptTurn(db, {
       repoId: repo.id,
       taskId,
-      promptId: payload.prompt_id,
+      promptId: payload.promptIdentity,
       now: nowIso,
       deliveringInterventions: claimed.length > 0,
     });
@@ -431,12 +488,11 @@ export function ingestHookEvent(
   }
 
   if (hook === "SessionStart") conditionalContext.unshift(SESSION_PROTOCOL);
-  if (!output && conditionalContext.length > 0) {
-    output = {
-      hookSpecificOutput: {
-        hookEventName: hook,
-        additionalContext: conditionalContext.join("\n\n"),
-      },
+  if (!delivery && conditionalContext.length > 0) {
+    delivery = {
+      kind: "additional_context",
+      hookEventName: hook,
+      additionalContext: conditionalContext.join("\n\n"),
     };
   }
 
@@ -445,12 +501,37 @@ export function ingestHookEvent(
       eventTypesWritten: written,
       stateBefore,
       stateAfter,
-      output,
+      ...(delivery ? { delivery } : {}),
       ...(checkpoint ? { checkpoint } : {}),
     };
   });
 
   return transact.immediate();
+}
+
+function projectLegacyClaudeOutput(
+  delivery: HookDeliveryDirective,
+): NonNullable<HookIngestResult["output"]> {
+  return delivery.kind === "continue_turn"
+    ? { decision: "block", reason: delivery.reason }
+    : {
+        hookSpecificOutput: {
+          hookEventName: delivery.hookEventName,
+          additionalContext: delivery.additionalContext,
+        },
+      };
+}
+
+function legacyClaudeToolTouches(
+  hook: HookEventName,
+  payload: HookPayload,
+): CanonicalToolTouch[] {
+  if (hook !== "PostToolUse" || !payload.tool_name) return [];
+  const file = payload.tool_input?.["file_path"];
+  if (typeof file !== "string") return [];
+  if (EDIT_TOOLS.has(payload.tool_name)) return [{ action: "edit", path: file }];
+  if (payload.tool_name === "Read") return [{ action: "read", path: file }];
+  return [];
 }
 
 const SESSION_PROTOCOL = `[Vibehub] This repo runs Vibehub — your team's shared context layer. Protocol:
@@ -511,30 +592,33 @@ function mapEndReason(
 
 function statusDetailFor(
   hook: HookEventName,
-  payload: HookPayload,
+  payload: CanonicalHookEvent,
   previous: string | null,
 ): string | null {
   if (hook === "Notification" && payload.message) return payload.message;
   if ((hook === "PostToolUseFailure" || hook === "StopFailure") && payload.error) {
-    return payload.error_details ? `${payload.error}: ${payload.error_details}` : payload.error;
+    return payload.errorDetails ? `${payload.error}: ${payload.errorDetails}` : payload.error;
   }
   return previous;
 }
 
-function validatedPostToolPath(
-  hook: HookEventName,
-  payload: HookPayload,
+function validatedToolPaths(
+  touches: CanonicalToolTouch[],
+  cwd: string,
   repoRoot: string,
-): string | null {
-  if (hook !== "PostToolUse" || !payload.tool_name) return null;
-  const action = EDIT_TOOLS.has(payload.tool_name)
-    ? "edit"
-    : payload.tool_name === "Read"
-      ? "read"
-      : null;
-  const file = payload.tool_input?.["file_path"];
-  if (!action || typeof file !== "string") return null;
-  const absolute = path.resolve(payload.cwd, file);
-  const relative = path.relative(repoRoot, absolute);
-  return canonicalRepoPath(relative);
+): Array<{ action: "edit" | "read"; relativeFile: string }> {
+  // Host cwd may use an OS alias such as macOS /var → /private/var while
+  // git reports the canonical toplevel. Resolve the existing cwd first;
+  // touched files themselves may be newly added and therefore not exist.
+  let canonicalCwd: string;
+  try {
+    canonicalCwd = fs.realpathSync.native(cwd);
+  } catch {
+    canonicalCwd = path.resolve(cwd);
+  }
+  return touches.map((touch) => {
+    const absolute = path.resolve(canonicalCwd, touch.path);
+    const relative = path.relative(repoRoot, absolute);
+    return { action: touch.action, relativeFile: canonicalRepoPath(relative) };
+  });
 }

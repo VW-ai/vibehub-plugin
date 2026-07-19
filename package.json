@@ -11,10 +11,12 @@
     "test": "pnpm --filter @vibehub/core test && pnpm --filter @vibehub/cli test && pnpm --filter @vibehub/workbench-mcp test && pnpm --filter @vibehub/workbench-app test",
     "verify:bundle": "pnpm --filter @vibehub/workbench-app test:boundary",
     "verify:e2e:production": "pnpm --filter @vibehub/workbench-app test:e2e:production",
+    "build:codex-marketplace": "pnpm --filter @vibehub/core build && pnpm --filter @vibehub/cli build && pnpm --filter @vibehub/workbench-mcp build && node scripts/build-codex-marketplace.mjs",
     "verify:artifact": "node scripts/verify-plugin-artifact.mjs",
+    "verify:codex-plugin": "node scripts/verify-codex-plugin.mjs",
     "verify:isolated": "node scripts/verify-isolated-workbench.mjs",
     "dogfood": "node scripts/run-local-dogfood.mjs",
-    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:e2e:production && pnpm verify:bundle && pnpm verify:artifact && pnpm dogfood"
+    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:e2e:production && pnpm verify:bundle && pnpm verify:artifact && pnpm verify:codex-plugin && pnpm dogfood"
   },
   "engines": {
     "node": ">=20"

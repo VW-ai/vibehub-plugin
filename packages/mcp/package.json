@@ -9,6 +9,9 @@
   "bin": {
     "vibehub-mcp": "./dist/stdio.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",

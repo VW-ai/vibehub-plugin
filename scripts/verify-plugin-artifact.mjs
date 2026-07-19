@@ -1,24 +1,21 @@
 #!/usr/bin/env node
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import {
-  cpSync,
   closeSync,
   existsSync,
-  lstatSync,
   mkdtempSync,
   mkdirSync,
   openSync,
   readFileSync,
-  readlinkSync,
-  readdirSync,
   realpathSync,
   rmSync,
-  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { dirname, join, resolve } from "node:path";
+import { createInterface } from "node:readline";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { buildPluginArtifact } from "./build-plugin-artifact.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const temp = mkdtempSync(join(tmpdir(), "vibehub-plugin-artifact-"));
@@ -52,10 +49,6 @@ function run(command, args, options = {}) {
     throw new Error(`${command} ${args.join(" ")} failed with exit ${result.status}${details}`);
   }
   return stdout;
-}
-
-function copy(relativePath) {
-  cpSync(join(root, relativePath), join(artifact, relativePath), { recursive: true });
 }
 
 function readJson(path) {
@@ -130,6 +123,54 @@ function readConfiguredEntrypoints(pluginRoot) {
   return { hooks, mcpServers };
 }
 
+function assertCodexPackage(pluginRoot) {
+  const manifest = readJson(join(pluginRoot, ".codex-plugin/plugin.json"));
+  if (
+    manifest.name !== "vibehub" ||
+    manifest.skills !== "./skills/" ||
+    manifest.mcpServers !== "./codex/mcp.json" ||
+    manifest.hooks !== "./codex/hooks.json"
+  ) {
+    throw new Error("Codex manifest does not bind the shared skills and thin host configs");
+  }
+  const mcp = readJson(join(pluginRoot, "codex/mcp.json"));
+  const server = mcp.mcpServers?.vibehub;
+  const expectedMcpArg = "./packages/mcp/dist/stdio.js";
+  if (
+    server?.command !== "node" ||
+    server.cwd !== "." ||
+    JSON.stringify(server.args) !== JSON.stringify([expectedMcpArg]) ||
+    !existsSync(join(pluginRoot, expectedMcpArg))
+  ) {
+    throw new Error("Codex MCP config must resolve its installed relative entrypoint");
+  }
+  const hooks = readJson(join(pluginRoot, "codex/hooks.json")).hooks ?? {};
+  const eventNames = Object.keys(hooks).sort();
+  if (
+    JSON.stringify(eventNames) !==
+    JSON.stringify(["PostToolUse", "SessionStart", "UserPromptSubmit"].sort())
+  ) {
+    throw new Error(`unexpected Codex hook boundary: ${eventNames.join(", ")}`);
+  }
+  for (const forbidden of ["Stop", "SessionEnd"]) {
+    if (hooks[forbidden]) throw new Error(`Codex package must not claim ${forbidden} parity`);
+  }
+  for (const [eventName, groups] of Object.entries(hooks)) {
+    for (const group of groups) {
+      for (const hook of group.hooks ?? []) {
+        if (
+          hook?.type !== "command" ||
+          typeof hook.command !== "string" ||
+          !hook.command.includes(` hook ${eventName} --host codex`) ||
+          "args" in hook
+        ) {
+          throw new Error(`Codex ${eventName} must use one host-attributed command string`);
+        }
+      }
+    }
+  }
+}
+
 function assertConfiguredPaths(entries, pluginRoot) {
   for (const entry of entries) {
     for (const value of [entry.command, ...entry.args]) {
@@ -140,14 +181,14 @@ function assertConfiguredPaths(entries, pluginRoot) {
   }
 }
 
-function assertConfiguredPathFailure(configPath, mutate, invoke) {
+async function assertConfiguredPathFailure(configPath, mutate, invoke) {
   const original = readFileSync(configPath, "utf8");
   const config = JSON.parse(original);
   mutate(config);
   writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
   let failed = false;
   try {
-    invoke();
+    await invoke();
   } catch (error) {
     failed = true;
     if (!String(error.message).includes("configured path does not exist")) throw error;
@@ -155,6 +196,87 @@ function assertConfiguredPathFailure(configPath, mutate, invoke) {
     writeFileSync(configPath, original);
   }
   if (!failed) throw new Error(`corrupt configured path unexpectedly passed: ${configPath}`);
+}
+
+async function runMcpClient(command, args, { cwd, env, rootPath }) {
+  const child = spawn(command, args, {
+    cwd,
+    env,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  const lines = createInterface({ input: child.stdout });
+  let stderr = "";
+  child.stderr.setEncoding("utf8");
+  child.stderr.on("data", (chunk) => {
+    stderr += chunk;
+  });
+
+  const result = await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(`packaged MCP smoke timed out\n${stderr}`));
+    }, 10_000);
+    const finish = (callback) => {
+      clearTimeout(timeout);
+      lines.close();
+      callback();
+    };
+
+    lines.on("line", (line) => {
+      let message;
+      try {
+        message = JSON.parse(line);
+      } catch {
+        return;
+      }
+      if (message.method === "roots/list" && message.id !== undefined) {
+        child.stdin.write(
+          `${JSON.stringify({
+            jsonrpc: "2.0",
+            id: message.id,
+            result: {
+              roots: [{ uri: pathToFileURL(rootPath).href, name: "artifact-smoke" }],
+            },
+          })}\n`,
+        );
+        return;
+      }
+      if (message.id === 2) {
+        if (message.error) {
+          finish(() => reject(new Error(`packaged MCP tools/list failed: ${line}`)));
+        } else {
+          finish(() => resolve(message.result?.tools));
+        }
+      }
+    });
+    child.once("error", (error) => finish(() => reject(error)));
+    child.once("exit", (code, signal) => {
+      if (code !== null || signal !== "SIGTERM") {
+        finish(() =>
+          reject(
+            new Error(
+              `packaged MCP exited before tools/list (${code ?? signal})\n${stderr}`,
+            ),
+          ),
+        );
+      }
+    });
+
+    const send = (message) => child.stdin.write(`${JSON.stringify(message)}\n`);
+    send({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: "2025-03-26",
+        capabilities: { roots: { listChanged: false } },
+        clientInfo: { name: "artifact-smoke", version: "1.0.0" },
+      },
+    });
+    send({ jsonrpc: "2.0", method: "notifications/initialized" });
+    send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
+  });
+  child.kill("SIGTERM");
+  return result;
 }
 
 function createArtifactCase(name, deployArgs) {
@@ -180,86 +302,14 @@ function createArtifactCase(name, deployArgs) {
   return { caseRoot, casePluginRoot, home, repo, origin, installedBin };
 }
 
-function sanitizeAndAssertSelfContained(packageRoot) {
-  const modules = join(packageRoot, "node_modules");
-  if (!existsSync(modules)) throw new Error(`deployed package has no node_modules: ${packageRoot}`);
-  const artifactRoot = realpathSync(artifact);
-  const pending = [modules];
-  while (pending.length > 0) {
-    const current = pending.pop();
-    for (const entry of readdirSync(current)) {
-      const child = join(current, entry);
-      const stat = lstatSync(child);
-      if (stat.isSymbolicLink()) {
-        let resolved;
-        try {
-          resolved = realpathSync(child);
-        } catch (error) {
-          if (error?.code !== "ENOENT") throw error;
-          resolved = resolve(dirname(child), readlinkSync(child));
-          // macOS exposes /var as /private/var. Keep lexical checks aligned
-          // even for a deliberately broken/self-reference pnpm metadata link.
-          if (resolved.startsWith("/var/")) resolved = `/private${resolved}`;
-        }
-        if (relative(artifactRoot, resolved).startsWith("..")) {
-          if (child.includes("/node_modules/.pnpm/node_modules/@vibehub/")) {
-            unlinkSync(child);
-            continue;
-          }
-          throw new Error(`artifact dependency escapes package root: ${child} -> ${resolved}`);
-        }
-      } else if (stat.isDirectory()) {
-        pending.push(child);
-      }
-    }
-  }
-}
-
 try {
-  mkdirSync(artifact, { recursive: true });
-  for (const path of [".claude-plugin", ".mcp.json", "hooks", "skills", "LICENSE", "README.md"]) {
-    copy(path);
-  }
-
   const deployArgs = process.env.VIBEHUB_OFFLINE === "1" ? ["--offline"] : [];
-  run("pnpm", [
-    ...deployArgs,
-    "--filter",
-    "@vibehub/cli",
-    "--prod",
-    "deploy",
-    "--legacy",
-    join(artifact, "packages/cli"),
-  ]);
-  run("pnpm", [
-    ...deployArgs,
-    "--filter",
-    "@vibehub/workbench-mcp",
-    "--prod",
-    "deploy",
-    "--legacy",
-    join(artifact, "packages/mcp"),
-  ]);
-
-  // Legacy deploy leaves a pnpm metadata backlink for the package being
-  // deployed. It is not used at runtime, but retaining an absolute source
-  // workspace link would make the artifact fail the standalone guarantee.
-  for (const backlink of [
-    join(artifact, "packages/cli/node_modules/.pnpm/node_modules/@vibehub/cli"),
-    join(
-      artifact,
-      "packages/mcp/node_modules/.pnpm/node_modules/@vibehub/workbench-mcp",
-    ),
-  ]) {
-    try {
-      unlinkSync(backlink);
-    } catch (error) {
-      if (error?.code !== "ENOENT") throw error;
-    }
-  }
-
-  sanitizeAndAssertSelfContained(join(artifact, "packages/cli"));
-  sanitizeAndAssertSelfContained(join(artifact, "packages/mcp"));
+  buildPluginArtifact({
+    sourceRoot: root,
+    artifactRoot: artifact,
+    offline: deployArgs.length > 0,
+  });
+  assertCodexPackage(artifact);
 
   const { casePluginRoot, home, repo, origin, installedBin } = createArtifactCase(
     "default",
@@ -381,17 +431,18 @@ try {
   const skillPackage=JSON.parse(run("node",[join(casePluginRoot,"skills/scripts/validate-artifact.mjs"),"--package",join(casePluginRoot,"skills")],{cwd:repo,env:skillEnv,capture:true}));
   if(!skillPackage.valid)throw new Error("packaged skill resource graph is invalid");
 
-  // Codex onboarding path: the deployed managed tree must carry the Codex host
-  // reference with its honest-degradation contract. Registry completeness and
-  // per-skill openai.yaml metadata are already guaranteed by the packaged
-  // validator run above; this asserts the one content invariant it does not
-  // read.
+  // Codex onboarding path: the deployed managed tree must carry the exact
+  // bounded hook contract. Registry completeness and per-skill openai.yaml
+  // metadata are already guaranteed by the packaged validator run above.
   const codexReference = readFileSync(
     join(casePluginRoot, "skills/vibehub-setup/references/codex.md"),
     "utf8",
   );
-  if (!codexReference.includes("is the expected, correct, honest result")) {
-    throw new Error("packaged Codex onboarding reference lost its honest-degradation contract");
+  if (
+    !codexReference.includes("Connected requires a real, trusted Codex `SessionStart`") ||
+    !codexReference.includes("Intentionally absent from the Codex hook package")
+  ) {
+    throw new Error("packaged Codex onboarding reference lost its evidence boundary");
   }
 
   const hookInput = JSON.stringify({
@@ -416,41 +467,22 @@ try {
     throw new Error("packaged hook did not emit the VibeHub session protocol");
   }
 
-  const mcpInput = [
-    JSON.stringify({
-      jsonrpc: "2.0",
-      id: 1,
-      method: "initialize",
-      params: {
-        protocolVersion: "2025-03-26",
-        capabilities: {},
-        clientInfo: { name: "artifact-smoke", version: "1.0.0" },
-      },
-    }),
-    JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }),
-    JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }),
-    "",
-  ].join("\n");
-  const runConfiguredMcp = () => {
+  const runConfiguredMcp = async () => {
     const configured = readConfiguredEntrypoints(artifact);
     assertConfiguredPaths(configured.mcpServers, artifact);
     const mcpCommand = configured.mcpServers.find((server) => server.name === "vibehub") ?? configured.mcpServers[0];
-    return run(mcpCommand.command, mcpCommand.args, {
+    return runMcpClient(mcpCommand.command, mcpCommand.args, {
       cwd: repo,
       env: cleanEnv,
-      capture: true,
-      input: mcpInput,
-      timeout: 10_000,
+      rootPath: repo,
     });
   };
-  const mcpOutput = runConfiguredMcp();
-  const mcpMessages = mcpOutput.split("\n").filter(Boolean).map((line) => JSON.parse(line));
-  const toolList = mcpMessages.find((message) => message.id === 2)?.result?.tools;
+  const toolList = await runConfiguredMcp();
   if (!Array.isArray(toolList) || !toolList.some((tool) => tool.name === "kb_retrieve")) {
     throw new Error("packaged MCP did not initialize and list deterministic capabilities");
   }
 
-  assertConfiguredPathFailure(
+  await assertConfiguredPathFailure(
     join(artifact, "hooks/hooks.json"),
     (config) => {
       const command = config.hooks.SessionStart[0].hooks[0];
@@ -458,7 +490,7 @@ try {
     },
     runConfiguredHook,
   );
-  assertConfiguredPathFailure(
+  await assertConfiguredPathFailure(
     join(artifact, ".mcp.json"),
     (config) => {
       const server = config.mcpServers.vibehub ?? Object.values(config.mcpServers)[0];

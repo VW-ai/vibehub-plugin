@@ -23,7 +23,7 @@ import {
   applyIntervention,
   exportTeamMapSnapshot,
   GitFacade,
-  ingestHookEvent,
+  ingestCanonicalHookEvent,
   openDb,
   projectDoctorReceipt,
   projectInitReceipt,
@@ -37,10 +37,11 @@ import {
   syncTeamSnapshot,
   vibehubHome,
   type HookEventName,
-  type HookPayload,
+  type HookHost,
   type WorkbenchIntervention,
 } from "@vibehub/core";
 import { releaseAssetManifest, releaseAssetRoot } from "./managed-assets.js";
+import { adaptHookInput, projectHookOutput } from "./hook-adapters.js";
 
 interface Flags {
   repo: string;
@@ -97,7 +98,7 @@ const USAGE = `usage:
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
   vibehub kb <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
   vibehub distill <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
-  vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop>
+  vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop> [--host claude-code|codex]
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
   vibehub team snapshot [--repo <path>] [--db <path>] [--out <file>]`;
@@ -166,16 +167,35 @@ function readStdin(): string {
  * break the user's session; failures go to ~/.vibehub/hook.log.
  */
 function runHook(eventArg: string | undefined, rest: string[]): number {
+  let host: HookHost = "claude-code";
   try {
-    const dbPath = parseFlags(rest, "throw").db;
+    const filtered: string[] = [];
+    for (let index = 0; index < rest.length; index++) {
+      const flag = rest[index];
+      if (flag === "--host") {
+        const value = rest[++index];
+        if (value !== "claude-code" && value !== "codex") {
+          throw new Error("--host must be claude-code or codex");
+        }
+        host = value;
+      } else {
+        filtered.push(flag!);
+      }
+    }
+    const dbPath = parseFlags(filtered, "throw").db;
     const raw = readStdin();
-    const payload = JSON.parse(raw) as HookPayload;
-    const event = (eventArg ?? payload.hook_event_name) as HookEventName;
+    const payload = JSON.parse(raw) as unknown;
+    const payloadEvent = typeof payload === "object" && payload !== null
+      ? (payload as Record<string, unknown>)["hook_event_name"]
+      : undefined;
+    const event = (eventArg ?? payloadEvent) as HookEventName;
     if (!HOOK_EVENTS.has(event)) throw new Error(`unknown hook event: ${event}`);
+    const adapted = adaptHookInput(host, event, payload);
+    if (adapted.kind === "ignored") return 0;
     const db = openDb(dbPath);
     try {
-      const result = ingestHookEvent(db, event, payload);
-      if (result.output) console.log(JSON.stringify(result.output));
+      const result = ingestCanonicalHookEvent(db, adapted.event);
+      if (result.delivery) console.log(JSON.stringify(projectHookOutput(host, result.delivery)));
     } finally {
       db.close();
     }
@@ -185,7 +205,7 @@ function runHook(eventArg: string | undefined, rest: string[]): number {
       fs.mkdirSync(logDir, { recursive: true });
       fs.appendFileSync(
         path.join(logDir, "hook.log"),
-        `${new Date().toISOString()} ${eventArg ?? "?"} ${String(err)}\n`,
+        `${new Date().toISOString()} ${host}:${eventArg ?? "?"} ${String(err)}\n`,
       );
     } catch {
       // even logging must not fail the session

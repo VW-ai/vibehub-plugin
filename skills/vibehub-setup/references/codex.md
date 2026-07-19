@@ -1,91 +1,127 @@
 # OpenAI Codex host procedure
 
-Codex onboards the same project through the same deterministic receipts.
-Target the exact checkout and run the identical `setup inspect`,
-`setup apply`, and `setup status` commands with `--repo`; parse the same
-`ProjectActivationResultV1` evidence. One shared database (default
-`~/.vibehub/workbench.db`, or `VIBEHUB_DB`), one repository identity (the
-Git common root), the same worktree binding, and the same operation
-receipts. Never create a Codex-specific database, a second instruction
-vocabulary, or a second state language.
+Codex and Claude Code consume one VibeHub runtime. They share the same packaged
+skills, CLI, MCP server, SQLite database (default
+`~/.vibehub/workbench.db`, or `VIBEHUB_DB`), Git common-root repository
+identity, worktree binding, operation receipts, and activation vocabulary.
+Never create a Codex-specific database or a second instruction/state language.
 
-The managed block that setup owns in `AGENTS.md` is the Codex-facing
-project instruction. Codex builds its instruction chain from the checkout's
-`AGENTS.md` at session start, so after a changeful apply start a fresh
-Codex session in the exact checkout that was inspected and applied.
+The managed block that setup owns in `AGENTS.md` is the Codex-facing project
+instruction. Codex builds its instruction chain from the checkout at session
+start, so after a changeful apply start a fresh Codex session in the exact
+checkout that was inspected and applied.
 
-## Machine prerequisites (verify only; never install here)
+## Install the native Codex plugin from this source tree
 
-1. The CLI must be reachable through an explicit user-supplied path,
-   `VIBEHUB_BIN`, or as `vibehub` on PATH. `CLAUDE_PLUGIN_ROOT` does not
-   exist on Codex; do not depend on it.
-2. The six packaged vibehub skills must be present in the host's skills
-   location together with their sibling shared resource directories exactly
-   as packaged. Common locations include the repository or home
-   `.agents/skills` directory; some builds use the skills directory under
-   the Codex home. Follow the host's own documentation.
-3. The VibeHub MCP stdio server should be registered in the host MCP
-   configuration — for current Codex releases an `[mcp_servers.vibehub]`
-   entry in the Codex `config.toml`, running `node` with the absolute path
-   to the packaged MCP stdio entrypoint under the deployed plugin root (the
-   same entrypoint the packaged `.mcp.json` declares). Follow the host's
-   own documentation for exact registration syntax and trust approval.
-4. The session must be permitted to execute the CLI. If any prerequisite is
-   missing, stop and report it; machine onboarding is a user action.
+The source build creates a disposable local marketplace outside the authored
+plugin tree. It copies the shared skills once and deploys the same CLI/MCP
+runtime used by Claude Code; there is no second Codex implementation.
 
-## Evidence interpretation on Codex
+```bash
+pnpm build:codex-marketplace
+codex plugin marketplace add "$(pwd)/dist/codex-marketplace"
+codex plugin add vibehub@vibehub-local
+```
 
-Installed can be proven from Codex alone: it is host-independent. Connected
-requires a host lifecycle-hook session recorded after the current
-instruction blocks for the exact checkout, and this release packages and
-validates hook ingestion for Claude Code only. Therefore `setup status`
-reporting `waiting` with connected and activated `not_proven`
-is the expected, correct, honest result in a Codex-only environment. That
-state is waiting, not failure, and must never be "fixed".
+`build:codex-marketplace` rebuilds the shared core/CLI/MCP package `dist`
+directories and writes the marketplace under
+`workbench/dist/codex-marketplace`; it does not edit user HOME or a target
+project. The two `codex plugin` commands are the explicit machine-install step
+and update Codex's own local plugin state.
+After installation:
 
-Both hosts share one database and one activation state per repository. If
-Claude Code proves the handshake for this checkout, later qualifying
-context-value receipts advance Activated regardless of which host produced
-them. Never stage a Claude session or replay recorded hook events to
-simulate that path.
+1. Start a new Codex task in the target checkout so the plugin skills, MCP
+   server, and project instructions load together.
+2. Open `/hooks`, review the exact VibeHub plugin hook definitions, and trust
+   them. Installing or enabling a plugin does not automatically trust hooks;
+   changed hook definitions require review again.
+3. Ask Codex to use `$vibehub-setup` for the exact checkout. Let the skill run
+   the canonical `setup inspect`, `setup apply`, and `setup status` sequence.
 
-## Host capability matrix (this release)
+If the marketplace was already added, rebuilding it is safe. Re-run
+`codex plugin add vibehub@vibehub-local` to refresh Codex's installed copy,
+then start another new task.
+
+## Packaged host components
+
+- `.codex-plugin/plugin.json` points at the canonical `skills/` tree.
+- `codex/mcp.json` starts `./packages/mcp/dist/stdio.js` from plugin-root
+  `cwd: "."`. The shared MCP requests the Codex client's workspace roots and
+  derives repository identity from the one Git root; Claude/older clients
+  retain the inherited-project-cwd fallback. No absolute development path is
+  embedded.
+- `codex/hooks.json` invokes the shared CLI with `--host codex`. Codex supplies
+  `PLUGIN_ROOT` and compatibility `CLAUDE_PLUGIN_ROOT` to plugin hooks.
+- The packaged CLI remains available beneath
+  `packages/cli/dist/main.js`. The setup skill resolves it from its own
+  installed plugin root when no explicit `VIBEHUB_BIN` or PATH executable is
+  available.
+
+If the MCP server is disabled, hook trust is pending, the project is untrusted,
+or an enterprise policy permits managed hooks only, stop and report the exact
+host condition. Do not bypass hook trust or hand-write activation evidence.
+
+## Codex lifecycle evidence in this release
+
+The Codex adapter intentionally uses three documented mechanical events:
+
+| Event | VibeHub use |
+| --- | --- |
+| `SessionStart` | host-attributed session handshake, session protocol, pending context delivery |
+| `UserPromptSubmit` | user-turn evidence, task-scoped checkpoint cadence, pending context delivery |
+| `PostToolUse` matching `apply_patch` | successful edit footprints, off-scope reminder, pending context delivery |
+
+The adapter maps Codex `turn_id` to a host-namespaced prompt identity for
+idempotent checkpoint counting. `apply_patch` paths are mechanically extracted
+from the patch; VibeHub does not parse arbitrary Bash commands to guess reads or
+writes.
+
+Connected requires a real, trusted Codex `SessionStart` ingestion after the
+current instruction blocks for the exact checkout. Installed plugin files,
+synthetic hook fixtures, a marketplace receipt, or `/hooks` approval alone do
+not prove Connected. Activated still requires a later meaningful query or
+ingest receipt; hook activity alone does not prove context value.
+
+Immediately after install or before the first trusted SessionStart,
+`setup status` may correctly report `waiting` with Connected and Activated
+`not_proven`. Re-run it from the fresh trusted session; never rewrite the
+database to make the state advance.
+
+## Deliberate capability boundary
 
 Available on Codex now:
 
 - project instructions through the managed `AGENTS.md` block;
-- the six packaged workflow skills;
-- the MCP capabilities (`register_scope`, `self_report`, `kb_retrieve`,
-  `kb_operation`, `distill_operation`, `get_manual`);
-- the full CLI, including setup and knowledge/distillation operations with
-  real receipts.
+- all six packaged workflow skills and all six MCP capabilities;
+- the full CLI and the same deterministic operation receipts;
+- host-attributed session and user-turn evidence;
+- checkpoint reminders and queued context delivery at SessionStart or
+  UserPromptSubmit;
+- successful `apply_patch` edit footprints, off-scope reminders, and
+  post-edit delivery.
 
-Not available on Codex in this release (one honest cluster — no hook
-fires):
+Intentionally absent from the Codex hook package in this release:
 
-- hook session capture, so no host handshake and no Connected or Activated
-  proof from Codex alone;
-- injection and pause delivery at hook boundaries;
-- off-scope reminders;
-- the periodic knowledge checkpoint reminder;
-- automatic task state transitions — Codex-driven tasks appear at the
-  basic signal tier.
+- `Stop`: no stop-time self-report, waiting transition, or immediate
+  stop-boundary wake-up delivery;
+- `SessionEnd`: no automatic session close or `done` transition;
+- `Notification`: no automatic question event;
+- Claude-specific `PostToolUseFailure` and `StopFailure`;
+- inferred read footprints from Bash or hosted tools.
 
-Current Codex releases document their own lifecycle hooks, but VibeHub has
-not validated their payload mapping, output protocol, or session
-attribution, so they are not evidence in this release. The compensating
-discipline: the managed instruction block plus the skills already teach
-querying context before non-trivial work and capturing durable knowledge
-at decision time.
+These absences are a bounded signal downgrade, not a reason to add a watcher,
+poller, transcript parser, or semantic hook state machine. A Codex task can
+therefore remain `running` until later evidence makes the read side derive it
+as stale; report that limitation honestly.
 
 ## Forbidden on Codex
 
-- Do not tail host logs, watch files, poll for activity, or bridge events
-  to imitate hook capture.
-- Do not wire the hook CLI into Codex hook configuration in this release —
-  unvalidated payloads would create false handshake evidence attributed to
-  the wrong host.
-- Do not write sessions or receipts by hand, edit managed markers, or
-  present `not_proven` as proven.
-- When a capability is missing, say so; honest degradation is the
-  contract.
+- Do not tail host logs, watch files, poll for activity, or parse arbitrary
+  shell commands to imitate missing lifecycle evidence.
+- Do not add `Stop`, `SessionEnd`, or failure events to the Codex config until
+  their VibeHub semantics and attribution are separately validated.
+- Do not write sessions or receipts by hand, edit managed markers, bypass hook
+  trust, or present `not_proven` as proven.
+- Keep intelligence in the workflow skills. Hooks record mechanical facts and
+  deliver already-decided context; they do not decide what knowledge is
+  durable.

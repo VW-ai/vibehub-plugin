@@ -159,6 +159,46 @@ export function recordUserPromptTurn(
 }
 
 /**
+ * Read-only replay guard for the whole UserPromptSubmit hook boundary.
+ * A known prompt must be rejected before task/session state, timeline, or
+ * pending-injection claims can move.
+ */
+export function readPromptReplayFacts(
+  db: Db,
+  input: Pick<CheckpointTurnInput, "repoId" | "taskId" | "promptId">,
+): CheckpointCadenceFacts | null {
+  const seen = db.prepare(
+    `SELECT 1 FROM task_prompt_seen
+     WHERE repo_id = ? AND task_id = ? AND prompt_id = ?`,
+  ).get(input.repoId, input.taskId, input.promptId);
+  if (!seen) return null;
+
+  const row = db.prepare(
+    `SELECT counted_turns AS countedTurns, last_write_turn AS lastWriteTurn,
+            provenance_high_water AS provenanceHighWater
+     FROM task_prompt_cadence WHERE repo_id = ? AND task_id = ?`,
+  ).get(input.repoId, input.taskId) as {
+    countedTurns: number;
+    lastWriteTurn: number;
+    provenanceHighWater: number;
+  } | undefined;
+  if (!row) throw new Error(`missing checkpoint cadence for replay: ${input.taskId}`);
+
+  const maxProvenance = (db.prepare(
+    `SELECT COALESCE(MAX(id), 0) AS id FROM kb_provenance_events
+     WHERE repo_id = ? AND task_id = ?`,
+  ).get(input.repoId, input.taskId) as { id: number }).id;
+  const effectiveLastWrite =
+    maxProvenance > row.provenanceHighWater ? row.countedTurns : row.lastWriteTurn;
+  return {
+    status: "duplicate",
+    countedTurns: row.countedTurns,
+    turnsSinceLastWrite: row.countedTurns - effectiveLastWrite,
+    threshold: resolveCheckpointCadence(db, input.repoId),
+  };
+}
+
+/**
  * The injected reminder. It asks for judgment, never mandates a write —
  * "no durable knowledge" must stay a first-class outcome (no filler
  * records). The task id is embedded because the reset evidence is

@@ -18,8 +18,10 @@ export const operationEnvelopeResult = (value: ReturnType<ReturnType<typeof crea
   isError: !value.ok,
 });
 
-export function createWorkbenchMcpServer(context: CapabilityContext): McpServer {
-  const api = createCapabilities(context);
+export function createWorkbenchMcpServer(
+  context: CapabilityContext | PromiseLike<CapabilityContext>,
+): McpServer {
+  const api = async () => createCapabilities(await context);
   const server = new McpServer(
     { name: "vibehub-local", version: WORKBENCH_MCP_VERSION },
     { instructions: "Vibehub MCP exposes deterministic local capabilities. Semantic workflows live in vibehub skills." },
@@ -33,7 +35,7 @@ export function createWorkbenchMcpServer(context: CapabilityContext): McpServer 
       write: z.array(scopeItem).min(1),
       read: z.array(scopeItem).optional(),
     },
-  }, async (input) => result(api.registerScope(input)));
+  }, async (input) => result((await api()).registerScope(input)));
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[1], {
     title: "Update task status",
@@ -42,7 +44,7 @@ export function createWorkbenchMcpServer(context: CapabilityContext): McpServer 
       status: z.string().min(1).max(200),
       done: z.string().min(1).max(200).optional(),
     },
-  }, async (input) => result(api.selfReport(input)));
+  }, async (input) => result((await api()).selfReport(input)));
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[2], {
     title: "Run one deterministic knowledge query",
@@ -54,7 +56,7 @@ export function createWorkbenchMcpServer(context: CapabilityContext): McpServer 
       includeDrafts: z.boolean().optional(),
       includeHistory: z.boolean().optional(),
     },
-  }, async (input) => operationEnvelopeResult(api.dispatchKnowledge("kb.spec.search", input)));
+  }, async (input) => operationEnvelopeResult((await api()).dispatchKnowledge("kb.spec.search", input)));
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[3], {
     title: "Dispatch one canonical knowledge operation",
@@ -64,7 +66,7 @@ export function createWorkbenchMcpServer(context: CapabilityContext): McpServer 
       operation: z.string().min(1),
       input: z.record(z.string(), z.unknown()).optional(),
     },
-  }, async ({ operation, input, requestId }) => operationEnvelopeResult(api.dispatchKnowledge(operation, input ?? {}, requestId)));
+  }, async ({ operation, input, requestId }) => operationEnvelopeResult((await api()).dispatchKnowledge(operation, input ?? {}, requestId)));
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[4], {
     title: "Dispatch one deterministic distillation operation",
@@ -74,13 +76,13 @@ export function createWorkbenchMcpServer(context: CapabilityContext): McpServer 
       operation: z.string().min(1),
       input: z.record(z.string(), z.unknown()).optional(),
     },
-  }, async ({ operation, input, requestId }) => operationEnvelopeResult(api.dispatchOperation(operation, input ?? {}, requestId)));
+  }, async ({ operation, input, requestId }) => operationEnvelopeResult((await api()).dispatchOperation(operation, input ?? {}, requestId)));
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
     title: "Read the Vibehub agent manual",
     description: "Return reference material about component boundaries and available skills. Not required before routine work.",
     inputSchema: { topic: z.string().optional() },
-  }, async (input) => result(api.getManual(input)));
+  }, async (input) => result((await api()).getManual(input)));
 
   return server;
 }

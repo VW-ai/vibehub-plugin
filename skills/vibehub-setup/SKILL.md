@@ -29,6 +29,9 @@ own all project and runtime mutations.
    - an exact executable path explicitly supplied by the user;
    - a non-empty `VIBEHUB_BIN` already present in the host environment;
    - the existing `vibehub` found by `command -v vibehub`;
+   - the package root containing this active skill, only when that same root
+     contains `.codex-plugin/plugin.json` or `.claude-plugin/plugin.json` and
+     `packages/cli/dist/main.js`; invoke that entrypoint with `node`;
    - the plugin-local CLI entrypoint already present beneath
      `${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js`, invoked with `node`.
 3. Stop if none exists. Never download, install, build, search unrelated
@@ -69,9 +72,11 @@ parse stdout as JSON on exit 0 or 1. An exit code never replaces the
 6. After a changeful apply, or when Connected lacks a host handshake, follow
    the active host's reference procedure. For Claude Code, restart the host
    in the exact checkout, re-run status, and let only its deterministic
-   proof establish Connected. For OpenAI Codex, this release has no
-   validated lifecycle-hook signal: report the waiting status honestly and
-   never manufacture a handshake.
+   proof establish Connected. For OpenAI Codex, start a fresh task in the
+   exact checkout, review and trust the packaged hooks through `/hooks`, and
+   let only a real host-attributed SessionStart ingestion establish Connected.
+   Installation, hook trust, or a synthetic hook invocation alone is not a
+   handshake.
 7. Once Connected, classify the project semantically by inspecting tracked,
    substantive implementation files and repository history:
    - unborn history, documentation-only content, or scaffold-only tracked

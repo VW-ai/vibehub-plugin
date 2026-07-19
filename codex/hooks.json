@@ -1,0 +1,38 @@
+{
+  "description": "VibeHub mechanical lifecycle evidence for OpenAI Codex. Workflow intelligence remains in the packaged skills.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js\" hook SessionStart --host codex",
+            "statusMessage": "Loading VibeHub project context"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js\" hook UserPromptSubmit --host codex"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js\" hook PostToolUse --host codex"
+          }
+        ]
+      }
+    ]
+  }
+}

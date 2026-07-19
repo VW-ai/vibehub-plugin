@@ -648,6 +648,8 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
 
   it("never counts or fires a replayed prompt event (stable prompt identity)", () => {
     prompt(1);
+    const beforeReplay = readTimeline(db, taskBranch);
+    enqueueInjection(db, 1, taskBranch, "inject", "arrived after turn 1", T(2).toISOString());
     const dup = ingestHookEvent(
       db,
       "UserPromptSubmit",
@@ -657,6 +659,12 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
     expect(dup.checkpoint).toEqual({
       status: "duplicate", countedTurns: 1, turnsSinceLastWrite: 1, threshold: 3,
     });
+    expect(dup.eventTypesWritten).toEqual([]);
+    expect(readTimeline(db, taskBranch)).toEqual(beforeReplay);
+    expect(pendingInjections(db, taskBranch)).toMatchObject([
+      { text: "arrived after turn 1" },
+    ]);
+    db.prepare("DELETE FROM injections WHERE task_id = ?").run(taskBranch);
     prompt(3);
     const fired = prompt(4);
     expect(fired.checkpoint?.status).toBe("fired");

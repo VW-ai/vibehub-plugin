@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
@@ -17,7 +18,11 @@ import {
 } from "@vibehub/core";
 import { createCapabilities } from "../src/capabilities.js";
 import { createWorkbenchMcpServer, operationEnvelopeResult, WORKBENCH_MCP_TOOL_NAMES } from "../src/server.js";
-import { openRuntimeContext } from "../src/runtime.js";
+import {
+  openRuntimeContext,
+  openRuntimeContextForClient,
+  openRuntimeContextFromRoots,
+} from "../src/runtime.js";
 
 const NOW = "2026-07-12T10:00:00.000Z";
 const toolText = (value: unknown): string =>
@@ -226,5 +231,74 @@ describe("MCP runtime context", () => {
     expect(runtime.context.repoId).toBe(1);
     expect(readTask(runtime.context.db, runtime.context.taskId)?.startHeadSha).toMatch(/^[0-9a-f]{40}$/);
     runtime.close();
+  });
+
+  it("derives the same runtime from one MCP file root and rejects ambiguity", () => {
+    const dbPath = path.join(dir, "roots.db");
+    const runtime = openRuntimeContextFromRoots(
+      [{ uri: pathToFileURL(repo).href }],
+      dbPath,
+      () => NOW,
+    );
+    expect(runtime.context.repoId).toBe(1);
+    expect(readTask(runtime.context.db, runtime.context.taskId)?.branch).toBe("feat/runtime");
+    runtime.close();
+
+    const other = path.join(dir, "other");
+    execFileSync("git", ["clone", "-q", repo, other]);
+    expect(() => openRuntimeContextFromRoots([
+      { uri: pathToFileURL(repo).href },
+      { uri: pathToFileURL(other).href },
+    ], dbPath, () => NOW)).toThrow(/exactly one Git workspace root/);
+  });
+
+  it("falls back to inherited cwd only for explicit MethodNotFound or empty roots", async () => {
+    const unsupported = await openRuntimeContextForClient({
+      supportsRoots: false,
+      listRoots: async () => {
+        throw Object.assign(new Error("roots/list is unsupported"), { code: -32601 });
+      },
+      cwd: repo,
+      dbPath: path.join(dir, "unsupported.db"),
+      now: () => NOW,
+    });
+    expect(readTask(unsupported.context.db, unsupported.context.taskId)?.branch).toBe("feat/runtime");
+    unsupported.close();
+
+    const empty = await openRuntimeContextForClient({
+      supportsRoots: true,
+      listRoots: async () => [],
+      cwd: repo,
+      dbPath: path.join(dir, "empty.db"),
+      now: () => NOW,
+    });
+    expect(readTask(empty.context.db, empty.context.taskId)?.branch).toBe("feat/runtime");
+    empty.close();
+  });
+
+  it("accepts roots from Codex even when the host omits the advertised capability", async () => {
+    const runtime = await openRuntimeContextForClient({
+      supportsRoots: false,
+      listRoots: async () => [{ uri: pathToFileURL(repo).href }],
+      cwd: path.join(dir, "not-the-repo"),
+      dbPath: path.join(dir, "codex-roots.db"),
+      now: () => NOW,
+    });
+    expect(readTask(runtime.context.db, runtime.context.taskId)?.branch).toBe("feat/runtime");
+    runtime.close();
+  });
+
+  it("does not bind cwd when roots/list fails for any reason except unsupported", async () => {
+    const dbPath = path.join(dir, "failed-roots.db");
+    await expect(openRuntimeContextForClient({
+      supportsRoots: false,
+      listRoots: async () => {
+        throw new Error("roots/list timed out");
+      },
+      cwd: repo,
+      dbPath,
+      now: () => NOW,
+    })).rejects.toThrow(/roots\/list timed out/);
+    expect(fs.existsSync(dbPath)).toBe(false);
   });
 });
