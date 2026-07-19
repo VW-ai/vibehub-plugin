@@ -247,6 +247,16 @@ progress:
         receipt 语言；Claude/Codex 走宿主文本 affordance，App 只富渲染同一事实。
         最终 headless、App-off、fresh/existing 与双宿主 dogfood 全矩阵收口。
   commits:
+    - hash: "368f018"
+      date: "2026-07-18"
+      message: "[21-workbench] feat: add Codex activation parity"
+      files_changed: 7
+      specs_affected:
+        - change-2026-07-18-codex-activation-parity (created, active)
+        - decision-workbench-015 (Codex host branch of agent-first onboarding)
+        - decision-project-027 (premise staleness recorded; revision awaits Wayne review)
+      milestones_affected:
+        - m2p6e-codex-activation-parity (implementation checkpoint; real Codex host dogfood pending)
     - hash: "87e9e25"
       date: "2026-07-18"
       message: "[21-workbench] feat: add task-scoped knowledge checkpoints"
