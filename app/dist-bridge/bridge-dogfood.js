@@ -100,7 +100,7 @@ function isConflictCardSnapshot(value) {
 }
 const OUTCOMES = ["applied", "already_applied", "no_op", "stale", "unsupported"];
 function isAppliedIntervention(value) {
-  return record(value) && nonEmpty(value.requestId) && nonEmpty(value.acceptedAt) && oneOf(value.outcome, OUTCOMES) && Array.isArray(value.injectionIds) && value.injectionIds.every(integer) && stringArray(value.affectedTaskIds) && optional(value.message, string);
+  return record(value) && nonEmpty(value.requestId) && nonEmpty(value.acceptedAt) && oneOf(value.outcome, OUTCOMES) && Array.isArray(value.injectionIds) && value.injectionIds.every((id) => integer(id) && id > 0) && new Set(value.injectionIds).size === value.injectionIds.length && stringArray(value.affectedTaskIds) && optional(value.replayed, (item) => typeof item === "boolean") && optional(value.message, string);
 }
 const ERROR_STATUSES = [
   "db_missing",
