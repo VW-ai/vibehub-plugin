@@ -203,7 +203,7 @@ progress:
       notes: "migration 015（task_prompt_cadence/task_prompt_seen + provenance task 索引，升级库零计数无假 backfill）+ knowledge-checkpoint.ts 集中 config/算法/文案 + hook-ingest UserPromptSubmit 接线 + projectCheckpointReceipt。稳定 prompt_id 去重（缺失不计数，重放/重复注册永不双计双发）；重置证据 = kb_provenance_events per-(repo,task) 单调高水位（成功才写、失败回滚、幂等重放不写、distill 不写、未归属不重置）；同 fire 投递 claimed intervention 时 deferred 让路，pause 永不被 checkpoint 同 turn 干扰；提醒内嵌 opaque task id 闭合 CLI --task 归属回路；DEFAULT_CHECKPOINT_CADENCE_TURNS=8（tunable 待 dogfood）+ settings 严格十进制 override；fired→execute/attempted、deferred→prepare/skipped 均 brief，低于阈值零 receipt，投影不进 hook 进程。测试矩阵 14 hook 集成 + 3 config/migration + 4 receipt 全绿。对抗 review 一轮修复（task-id 归属 P1、措辞与 config 语法 P2）后 APPROVED。Controller gates: Core 265/265、CLI 31/31、MCP 15/15、App 59/59、typecheck/build 全绿。"
     - id: m2p6e-codex-activation-parity
       name: "M2 activation ⑥E:Codex workbench-native activation parity"
-      status: pending
+      status: in_progress
       gate: true
       estimated_files:
         - "workbench/skills/vibehub-setup/references/codex.md"
@@ -222,6 +222,7 @@ progress:
         Codex 适配调用同一 activation primitives、SQLite、repo identity 与
         receipt contract；能力缺口显式 degradation，不以 hack 伪造 Claude
         hook parity，也不生成第二套 instruction/state vocabulary。
+      notes: "Implementation checkpoint 完成：references/codex.md progressive host reference（同一 setup 命令/receipts/SQLite/Git common-root identity/worktree binding；AGENTS.md managed block 即 Codex 原生指令面；DEFAULT_PROJECT_INSTRUCTION_BODY 保持不变）；capability matrix 一簇诚实降级（无 hook fires → 无 handshake/Connected/Activated、无 injection 投递、无 off-scope reminder、无 periodic checkpoint、任务 basic tier）；hooks 表述双向诚实——官方 Codex hooks 已文档化且本机有 trust-gated 实证，但 payload/output/attribution 未经 VibeHub 验证故不作证据，禁止未验证接线铸造归属 Claude 的假 handshake；跨宿主共享 DB 的 Activated 推进如实说明。SKILL.md 条件加载行 + step 6 宿主分流 + external-send Codex 边界。打包零代码变更（skills 整树 recursive）；validator 链接检查使缺 codex.md 结构性 fail（新增负例测试）；artifact gate 在 clean-HOME 部署树断言 honest-degradation 关键句。openai.yaml ×6 核对无需变更；managed-assets.ts 无需变更（recursive discovery 覆盖）。独立对抗 review APPROVED，3 个 P2（forbidden-wiring/单库 pins、gate 冗余断言、CLI 解析顺序措辞）按 reviewer 原方修复并复跑。Controller gates: validator、CLI 32/32、Core 265/265、MCP 15/15、App 59/59、typecheck/build、verify:artifact 全绿。Milestone 保持 in_progress：真实 Codex host dogfood（本机 skills/MCP 安装、fresh session 读 managed block、honest waiting status 实证）待用户授权执行。"
     - id: m2p6f-presentation-rollout
       name: "M2 activation ⑥F:cross-workflow presentation rollout"
       status: pending

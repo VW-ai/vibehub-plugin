@@ -1,0 +1,84 @@
+spec_id: "change-2026-07-18-codex-activation-parity"
+type: change
+state: active
+intent:
+  summary: "M2p6e 完成：Codex activation parity——同一 SQLite/repo identity/setup primitives/evidence 定义，progressive codex.md host reference + 打包与 clean-HOME 验证，宿主能力差异诚实降级"
+  detail: |
+    vibehub-setup 新增 references/codex.md progressive host reference：Codex
+    走完全相同的 setup inspect/apply/status、同一 ProjectActivationResultV1、
+    同一 ~/.vibehub SQLite 与 Git common-root repo identity、同一 worktree
+    binding 与 operation receipts；不建第二数据库、不建第二 instruction/state
+    词汇。managed AGENTS.md block 即 Codex-facing project instruction（Codex
+    原生在 session start 读取），DEFAULT_PROJECT_INSTRUCTION_BODY 保持
+    host-neutral 不变（变更会推前 instruction cutoff、无谓地 un-prove 既有
+    Connected）。
+
+    证据诚实双向表述：Installed 可由 Codex 单独证明（host-independent）；
+    Connected 需要 hooks-tier host session——本 release 只打包并验证了
+    Claude Code 的 hook ingestion，因此 Codex-only 环境下 status 显示
+    waiting / not_proven 是预期且正确的结果。重要事实修正：官方 OpenAI 文档
+    现已记载 Codex lifecycle hooks（本机亦有 trust-gated .codex/hooks.json
+    实证），decision-project-027 的「Codex 缺 hook 挂点」前提已过时——但
+    payload mapping、output protocol 与 session attribution 未经 VibeHub
+    验证（hook-ingest 的 agent 归属硬编码 Claude Code），故本 release 明确
+    禁止把 hook CLI 接入 Codex hook 配置（未验证接线会铸造归属错误的假
+    handshake 证据）；未来的诚实接入点就是既有 vibehub hook ingestion 路径，
+    无需新词汇。跨宿主诚实：共享同一 DB，Claude handshake 之后任一宿主的
+    qualifying receipt 均可推进 Activated。
+
+    capability matrix 落在 codex.md：可用 = AGENTS.md 指令/六 skills/MCP 六
+    capability/完整 CLI；本 release 不可用（无 hook fires 一整簇）= session
+    捕获、injection/pause 投递、off-scope reminder、periodic knowledge
+    checkpoint、自动状态转移（Codex 任务为 basic tier）。禁止 file
+    watcher/log tail/轮询/手写 sessions。SKILL.md 增加条件加载行与 step 6
+    宿主分流；external-send boundary 对 Codex dogfood 同样生效。
+
+    打包：skills 整树 recursive 打包使 codex.md 自动进入 managed assets 与
+    artifact；package validator 的 SKILL.md 链接检查使「缺 codex.md 即
+    fail」成为结构性保证（新增负例测试钉死）；artifact gate 在 clean-HOME
+    部署树上断言 honest-degradation 关键句。openai.yaml ×6 经官方文档核对
+    无需变更。真实 Codex host dogfood（本机安装、fresh session 读取 managed
+    block、MCP/skill 调用、honest waiting status）显式保留 pending，等待
+    用户授权执行。
+
+    Controller 验证：package validator 通过、CLI 32/32、Core 265/265、MCP
+    15/15、App 59/59、typecheck/build、verify:artifact 全绿。独立对抗
+    review APPROVED（3 个 P2 硬化项——补 forbidden-wiring/单库 pins、去除
+    gate 冗余断言、CLI 解析顺序措辞——已按 reviewer 原方修复并复跑 gates）。
+constraints:
+  - kind: must
+    rule: "Codex 与 Claude 共用同一 SQLite、repo/worktree identity、setup primitives 与 Installed/Connected/Activated 定义；能力缺口只能诚实降级表述"
+  - kind: must
+    rule: "codex.md 对 Codex hooks 的表述必须双向诚实：既不称 Codex 无 hooks，也不暗示本 release 已验证支持"
+  - kind: must_not
+    rule: "不得以 file watcher、log tail、轮询或把 hook CLI 接入未验证的 Codex hook 配置伪造 handshake/session 证据"
+  - kind: must_not
+    rule: "不得创建 Codex 专属数据库或第二套 instruction/state 词汇"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench-onboarding"
+  tags: [codex, activation-parity, capability-matrix, honest-degradation, packaging, agents-md]
+provenance:
+  source_type: implementation
+  confidence: 1.0
+  source_ref: "m2p6e implementation + adversarial review APPROVED, 2026-07-18"
+relations:
+  - target: "decision-workbench-015"
+    type: implements
+    detail: "agent-first onboarding 的 Codex 宿主分支与 progressive reference"
+  - target: "decision-workbench-016"
+    type: implements
+    detail: "Codex 复用同一 receipt/presentation 词汇，不建平行状态语言"
+  - target: "change-2026-07-18-setup-skill"
+    type: builds_on
+    detail: "在既有 vibehub-setup skill 与 package validator 上增加 Codex 宿主路径"
+  - target: "decision-project-027"
+    type: relates_to
+    detail: "『Codex 缺 hook 挂点』前提已过时（官方 hooks 文档 + 本机 trust-gated 实证）；本 change 记录事实修正，027 正文修订留待 Wayne 晨审裁定"
+anchors:
+  - file: "workbench/skills/vibehub-setup/references/codex.md"
+  - file: "workbench/skills/vibehub-setup/SKILL.md"
+  - file: "workbench/scripts/verify-plugin-artifact.mjs"
+  - file: "workbench/packages/cli/test/skill-package.test.ts"

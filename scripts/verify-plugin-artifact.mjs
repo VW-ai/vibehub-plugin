@@ -381,6 +381,19 @@ try {
   const skillPackage=JSON.parse(run("node",[join(casePluginRoot,"skills/scripts/validate-artifact.mjs"),"--package",join(casePluginRoot,"skills")],{cwd:repo,env:skillEnv,capture:true}));
   if(!skillPackage.valid)throw new Error("packaged skill resource graph is invalid");
 
+  // Codex onboarding path: the deployed managed tree must carry the Codex host
+  // reference with its honest-degradation contract. Registry completeness and
+  // per-skill openai.yaml metadata are already guaranteed by the packaged
+  // validator run above; this asserts the one content invariant it does not
+  // read.
+  const codexReference = readFileSync(
+    join(casePluginRoot, "skills/vibehub-setup/references/codex.md"),
+    "utf8",
+  );
+  if (!codexReference.includes("is the expected, correct, honest result")) {
+    throw new Error("packaged Codex onboarding reference lost its honest-degradation contract");
+  }
+
   const hookInput = JSON.stringify({
     session_id: "artifact-session",
     cwd: repo,
@@ -476,7 +489,7 @@ try {
   if (homedir() === home) throw new Error("smoke HOME unexpectedly equals the developer HOME");
 
   console.log(
-    "plugin artifact: self-contained setup skill/CLI/hooks/MCP; idempotent setup/init, honest pre-handshake status, doctor, sync, snapshot, and clean-HOME native SQLite passed",
+    "plugin artifact: self-contained setup skill/CLI/hooks/MCP with Codex onboarding path; idempotent setup/init, honest pre-handshake status, doctor, sync, snapshot, and clean-HOME native SQLite passed",
   );
 } finally {
   if (keep) console.log(`kept plugin artifact at ${artifact}`);

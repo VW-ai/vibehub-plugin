@@ -13,7 +13,8 @@ own all project and runtime mutations.
 
 1. Always read `references/onboarding-contract.md` before any setup operation.
 2. Read `references/claude-code.md` only when the active host is Claude Code.
-3. Read `references/recovery.md` only on blocked, partial, conflict, missing
+3. Read `references/codex.md` only when the active host is OpenAI Codex.
+4. Read `references/recovery.md` only on blocked, partial, conflict, missing
    executable, wrong-worktree, or failed activation evidence.
 
 ## Resolve the target and executable
@@ -64,9 +65,12 @@ parse stdout as JSON on exit 0 or 1. An exit code never replaces the
    as JSON on exit 0 or 1. A repeated
    current setup should be idempotent and quiet: if apply reports `unchanged`,
    do not manufacture an effect or celebratory event.
-6. For Claude Code, after a changeful apply or when Connected lacks a host
-   handshake, follow the host restart procedure. Re-run status; only its
-   deterministic proof may establish Connected.
+6. After a changeful apply, or when Connected lacks a host handshake, follow
+   the active host's reference procedure. For Claude Code, restart the host
+   in the exact checkout, re-run status, and let only its deterministic
+   proof establish Connected. For OpenAI Codex, this release has no
+   validated lifecycle-hook signal: report the waiting status honestly and
+   never manufacture a handshake.
 7. Once Connected, classify the project semantically by inspecting tracked,
    substantive implementation files and repository history:
    - unborn history, documentation-only content, or scaffold-only tracked
@@ -100,7 +104,8 @@ parse stdout as JSON on exit 0 or 1. An exit code never replaces the
 Package tests, local fixtures, and synthetic hook events are not real Claude
 host proof. A real dogfood run requires explicit user approval and the exact
 target path before setup writes or host-triggered context leaves this
-development checkout.
+development checkout. The same approval boundary applies to a real Codex
+host run.
 
 ## Guardrails
 

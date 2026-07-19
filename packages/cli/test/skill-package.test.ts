@@ -54,6 +54,20 @@ describe("production skill package",()=>{
     }
   });
 
+  it("rejects a package missing the Codex host reference",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-missing-codex-")),copy=path.join(temp,"skills");fs.cpSync(skills,copy,{recursive:true});
+    try {
+      fs.rmSync(path.join(copy,"vibehub-setup","references","codex.md"));
+      const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",copy],{encoding:"utf8"});
+      expect(validation.status).toBe(2);
+      expect(JSON.parse(validation.stdout)).toMatchObject({valid:false,errors:expect.arrayContaining([
+        expect.objectContaining({path:"vibehub-setup/SKILL.md",message:expect.stringContaining("references/codex.md")}),
+      ])});
+    } finally {
+      fs.rmSync(temp,{recursive:true,force:true});
+    }
+  });
+
   it("rejects a seventh top-level skill outside the canonical registry",()=>{
     const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-extra-skill-")),copy=path.join(temp,"skills");fs.cpSync(skills,copy,{recursive:true});
     try {
@@ -123,7 +137,8 @@ describe("production skill package",()=>{
     const contract=read("vibehub-setup/references/onboarding-contract.md");
     const claude=read("vibehub-setup/references/claude-code.md");
     const recovery=read("vibehub-setup/references/recovery.md");
-    const all=[setup,contract,claude,recovery].join("\n");
+    const codex=read("vibehub-setup/references/codex.md");
+    const all=[setup,contract,claude,recovery,codex].join("\n");
 
     expect(setup).toContain("`setup inspect --json`");
     expect(setup).toContain("Parse its JSON even when it exits 1");
@@ -163,6 +178,23 @@ describe("production skill package",()=>{
     expect(contract).toContain("semantic skill judgment");
     expect(claude).toContain("restart Claude Code");
     expect(claude).toContain("exact checkout");
+    expect(setup).toContain("`references/codex.md` only when the active host is OpenAI Codex");
+    expect(setup).toContain("never manufacture a handshake");
+    expect(codex).toContain("Both hosts share one database");
+    expect(codex).toContain("one repository identity");
+    expect(codex).toContain("AGENTS.md");
+    expect(codex).toContain("VIBEHUB_BIN");
+    expect(codex).toContain("exact checkout");
+    expect(codex).toContain("validates hook ingestion for Claude Code only");
+    expect(codex).toContain("is the expected, correct, honest result");
+    expect(codex).toContain("waiting, not failure");
+    expect(codex).toContain("the periodic knowledge checkpoint reminder");
+    expect(codex).toContain("Do not tail host logs, watch files, poll for activity");
+    expect(codex).toContain("Do not wire the hook CLI into Codex hook configuration");
+    expect(codex).toContain("Never create a Codex-specific database");
+    expect(codex).toContain("Never stage a Claude session or replay recorded hook events");
+    expect(codex).not.toContain("WorkflowReceiptV1");
+    expect(codex).not.toContain("CLAUDE_PLUGIN_ROOT}");
     expect(recovery).toContain("Never delete a retained recovery backup");
     expect(all).toContain("Never run `git init`");
     expect(all).toContain("Never download");
