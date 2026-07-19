@@ -245,6 +245,14 @@ progress:
         receipt 语言；Claude/Codex 走宿主文本 affordance，App 只富渲染同一事实。
         最终 headless、App-off、fresh/existing 与双宿主 dogfood 全矩阵收口。
   commits:
+    - hash: "00bf5b4"
+      date: "2026-07-18"
+      message: "[21-workbench] feat: add skill-first project setup workflow"
+      files_changed: 11
+      specs_affected:
+        - change-2026-07-18-setup-skill (created, active implementation checkpoint)
+      milestones_affected:
+        - m2p6c-setup-skill-claude (implementation checkpoint; real Claude dogfood pending)
     - hash: "63634c3"
       date: "2026-07-18"
       message: "[21-workbench] feat: add repo activation and setup CLI"
