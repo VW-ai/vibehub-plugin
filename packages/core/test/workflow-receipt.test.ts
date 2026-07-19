@@ -9,11 +9,13 @@ import {
 } from "../src/contract/workflow-receipt.js";
 import {
   OPERATION_PRESENTATION,
+  projectCheckpointReceipt,
   projectDoctorReceipt,
   projectInjectionClaimReceipt,
   projectInjectionInterventionReceipt,
   projectOperationReceipt,
 } from "../src/workflow-receipt-projectors.js";
+import type { CheckpointCadenceFacts } from "../src/knowledge-checkpoint.js";
 
 const at = "2026-07-18T12:00:00.000Z";
 const success = (operation: string, data: unknown = {}) => ({
@@ -318,6 +320,91 @@ describe("strict receipt structure and safety matrix", () => {
       ...queued,
       evidence: [{ ...queued.evidence[0], injectionIds: [41, 42] }],
     }).ok).toBe(false);
+  });
+});
+
+describe("checkpoint receipt projection", () => {
+  const facts = (
+    status: CheckpointCadenceFacts["status"],
+    over: Partial<CheckpointCadenceFacts> = {},
+  ): CheckpointCadenceFacts => ({
+    status, countedTurns: 8, turnsSinceLastWrite: 8, threshold: 8, ...over,
+  });
+
+  it("projects a fired checkpoint as brief execute/attempted with turn evidence", () => {
+    const receipt = projectCheckpointReceipt({
+      trigger: "Cadence threshold reached on UserPromptSubmit.",
+      taskId: "task:abc",
+      facts: facts("fired"),
+      at,
+    });
+    expect(validateWorkflowReceiptStructure(receipt)).toEqual({ ok: true });
+    expect(receipt).toMatchObject({
+      activity: "checkpoint",
+      phase: "execute",
+      outcome: "attempted",
+      visibility: "brief",
+      nextAction: null,
+      evidence: [{
+        source: "checkpoint_hook",
+        effect: "none",
+        outcome: "attempted",
+        subject: "knowledge checkpoint for task task:abc",
+        userTurnCount: 8,
+        detail: "8 turns counted; threshold 8",
+      }],
+    });
+    const text = renderWorkflowReceiptText(receipt);
+    expect(text).toContain("turns=8");
+    for (const label of ["Activity:", "Trigger:", "Effects:", "Result:", "Next:"]) {
+      expect(text).toContain(label);
+    }
+  });
+
+  it("projects a deferred checkpoint as prepare/skipped that yielded to delivery", () => {
+    const receipt = projectCheckpointReceipt({
+      trigger: "Cadence threshold reached while delivering interventions.",
+      taskId: "task:abc",
+      facts: facts("deferred", { turnsSinceLastWrite: 5 }),
+      at,
+    });
+    expect(validateWorkflowReceiptStructure(receipt)).toEqual({ ok: true });
+    expect(receipt).toMatchObject({ phase: "prepare", outcome: "skipped", visibility: "brief" });
+    expect(receipt.evidence[0]).toMatchObject({
+      outcome: "skipped",
+      userTurnCount: 5,
+      detail: "yielded to intervention delivery; threshold 8",
+    });
+  });
+
+  it("refuses to project below-threshold heartbeats", () => {
+    for (const status of ["counted", "duplicate"] as const) {
+      expect(() => projectCheckpointReceipt({
+        trigger: "tick", taskId: "task:abc", facts: facts(status), at,
+      })).toThrow(/below-threshold/);
+    }
+  });
+
+  it("rejects hand-built checkpoint evidence that violates the safety matrix", () => {
+    const receipt = projectCheckpointReceipt({
+      trigger: "Cadence threshold reached.", taskId: "task:abc", facts: facts("fired"), at,
+    });
+    const negativeTurns = {
+      ...receipt,
+      evidence: [{ ...receipt.evidence[0]!, userTurnCount: -1 }],
+    };
+    expect(validateWorkflowReceiptStructure(negativeTurns).ok).toBe(false);
+    const wrongEffect = {
+      ...receipt,
+      evidence: [{ ...receipt.evidence[0]!, effect: "read" }],
+    };
+    expect(validateWorkflowReceiptStructure(wrongEffect).ok).toBe(false);
+    const upgradedOutcome = {
+      ...receipt,
+      outcome: "persisted",
+      evidence: [{ ...receipt.evidence[0]!, outcome: "persisted" }],
+    };
+    expect(validateWorkflowReceiptStructure(upgradedOutcome).ok).toBe(false);
   });
 });
 

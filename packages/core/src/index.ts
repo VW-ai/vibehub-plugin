@@ -96,4 +96,14 @@ export {
   type HookPayload,
   type HookIngestResult,
 } from "./hook-ingest.js";
+export {
+  CHECKPOINT_CADENCE_SETTING_KEY,
+  DEFAULT_CHECKPOINT_CADENCE_TURNS,
+  formatCheckpointReminder,
+  recordUserPromptTurn,
+  resolveCheckpointCadence,
+  type CheckpointCadenceFacts,
+  type CheckpointStatus,
+  type CheckpointTurnInput,
+} from "./knowledge-checkpoint.js";
 export * from "./workflow-receipt-projectors.js";

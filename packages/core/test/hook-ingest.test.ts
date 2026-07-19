@@ -22,6 +22,12 @@ import {
 import { readTaskPanelModel } from "../src/live-read-models.js";
 import { getRepoByRoot } from "../src/team-store.js";
 import { replaceScopePatterns } from "../src/scope-registry.js";
+import { setSetting } from "../src/graph-store.js";
+import {
+  CHECKPOINT_CADENCE_SETTING_KEY,
+} from "../src/knowledge-checkpoint.js";
+import { KnowledgeService, type DraftBatchInput, type MutationContext } from "../src/knowledge-service.js";
+import { OperationDispatcher } from "../src/operation-dispatcher.js";
 import { git, makeScratchRepo, type ScratchRepo } from "./helpers.js";
 
 const T = (m: number): Date => new Date(`2026-07-12T10:${String(m).padStart(2, "0")}:00.000Z`);
@@ -537,6 +543,346 @@ describe("ingestHookEvent repository ownership", () => {
       repoA.cleanup();
       repoB.cleanup();
     }
+  });
+});
+
+describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
+  let repo: ScratchRepo;
+  let dir: string;
+  let dbPath: string;
+  let db: Db;
+  let taskBranch: string;
+
+  const payload = (extra: Partial<HookPayload> = {}): HookPayload => ({
+    session_id: "sess-1",
+    cwd: repo.work,
+    ...extra,
+  });
+  const prompt = (n: number, extra: Partial<HookPayload> = {}) =>
+    ingestHookEvent(
+      db,
+      "UserPromptSubmit",
+      payload({ prompt: `turn ${n}`, prompt_id: `p-${n}`, ...extra }),
+      { now: () => T(n) },
+    );
+  const cadenceRow = (taskId: string) =>
+    db.prepare(
+      `SELECT counted_turns AS countedTurns, last_write_turn AS lastWriteTurn,
+              last_reminder_turn AS lastReminderTurn, provenance_high_water AS provenanceHighWater
+       FROM task_prompt_cadence WHERE task_id = ?`,
+    ).get(taskId) as {
+      countedTurns: number;
+      lastWriteTurn: number;
+      lastReminderTurn: number;
+      provenanceHighWater: number;
+    } | undefined;
+  const count = (table: string): number =>
+    (db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n;
+  const draftBatch = (key: string, specId: string): DraftBatchInput => ({
+    idempotencyKey: key,
+    specs: [{
+      id: specId,
+      type: "decision",
+      summary: "Use exponential backoff for login retries",
+      evidence: [{ sourceType: "chat", sourceRef: "turn:capture", exactQuote: "backoff decided" }],
+    }],
+  });
+  const mutationCtx = (requestId: string, minute: number, taskId?: string): MutationContext => ({
+    actor: "agent",
+    ...(taskId ? { taskId } : {}),
+    requestId,
+    now: T(minute).toISOString(),
+  });
+
+  beforeEach(() => {
+    repo = makeScratchRepo();
+    git(repo.work, "checkout", "-b", "vibehub/fix-login");
+    taskBranch = taskIdForBranch(1, "vibehub/fix-login");
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-checkpoint-"));
+    dbPath = path.join(dir, "t.db");
+    db = openDb(dbPath);
+    setSetting(db, CHECKPOINT_CADENCE_SETTING_KEY, "3");
+    ingestHookEvent(db, "SessionStart", payload(), { now: () => T(0) });
+  });
+  afterEach(() => {
+    db.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+    repo.cleanup();
+  });
+
+  it("stays silent below the threshold and reports counted facts", () => {
+    const first = prompt(1);
+    const second = prompt(2);
+    expect(first.checkpoint).toEqual({
+      status: "counted", countedTurns: 1, turnsSinceLastWrite: 1, threshold: 3,
+    });
+    expect(second.checkpoint).toEqual({
+      status: "counted", countedTurns: 2, turnsSinceLastWrite: 2, threshold: 3,
+    });
+    expect(first.output).toBeUndefined();
+    expect(second.output).toBeUndefined();
+  });
+
+  it("fires at the threshold and re-arms every threshold turns", () => {
+    prompt(1);
+    prompt(2);
+    const fired = prompt(3);
+    expect(fired.checkpoint).toEqual({
+      status: "fired", countedTurns: 3, turnsSinceLastWrite: 3, threshold: 3,
+    });
+    const ctx = fired.output?.hookSpecificOutput?.additionalContext ?? "";
+    expect(ctx).toContain(
+      "[Vibehub] Knowledge checkpoint: 3 user turns on this task with no knowledge captured yet",
+    );
+    expect(ctx).toContain("vibehub-ingest");
+    expect(ctx).toContain(`attribute the write to task ${taskBranch}`);
+    expect(ctx).toContain("do not create filler records");
+    expect(prompt(4).checkpoint?.status).toBe("counted");
+    expect(prompt(5).checkpoint?.status).toBe("counted");
+    const again = prompt(6);
+    expect(again.checkpoint).toEqual({
+      status: "fired", countedTurns: 6, turnsSinceLastWrite: 6, threshold: 3,
+    });
+    expect(again.output?.hookSpecificOutput?.additionalContext).toContain("6 user turns");
+  });
+
+  it("never counts or fires a replayed prompt event (stable prompt identity)", () => {
+    prompt(1);
+    const dup = ingestHookEvent(
+      db,
+      "UserPromptSubmit",
+      payload({ prompt: "turn 1", prompt_id: "p-1" }),
+      { now: () => T(2) },
+    );
+    expect(dup.checkpoint).toEqual({
+      status: "duplicate", countedTurns: 1, turnsSinceLastWrite: 1, threshold: 3,
+    });
+    prompt(3);
+    const fired = prompt(4);
+    expect(fired.checkpoint?.status).toBe("fired");
+    const replayAfterFire = ingestHookEvent(
+      db,
+      "UserPromptSubmit",
+      payload({ prompt: "turn 4", prompt_id: "p-4" }),
+      { now: () => T(5) },
+    );
+    expect(replayAfterFire.checkpoint?.status).toBe("duplicate");
+    expect(replayAfterFire.output).toBeUndefined();
+  });
+
+  it("does not count prompts without a stable prompt identity (honest degradation)", () => {
+    const noId = ingestHookEvent(
+      db, "UserPromptSubmit", payload({ prompt: "no id" }), { now: () => T(1) },
+    );
+    const garbageId = ingestHookEvent(
+      db,
+      "UserPromptSubmit",
+      payload({ prompt: "bad id", prompt_id: 42 as unknown as string }),
+      { now: () => T(2) },
+    );
+    expect(noId.checkpoint).toBeUndefined();
+    expect(garbageId.checkpoint).toBeUndefined();
+    expect(count("task_prompt_cadence")).toBe(0);
+    expect(count("task_prompt_seen")).toBe(0);
+    expect(readTimeline(db, taskBranch).filter((e) => e.type === "launch")).toHaveLength(1);
+  });
+
+  it("keeps cadence isolated per task, even reusing the same prompt ids", () => {
+    const wt = path.join(repo.root, "wt");
+    git(repo.work, "worktree", "add", "-b", "vibehub/wt-task", wt);
+    ingestHookEvent(db, "SessionStart", payload({ cwd: wt, session_id: "sess-wt" }), { now: () => T(0) });
+    prompt(1);
+    prompt(2);
+    const wtPrompt = ingestHookEvent(
+      db,
+      "UserPromptSubmit",
+      payload({ cwd: wt, session_id: "sess-wt", prompt: "wt turn", prompt_id: "p-1" }),
+      { now: () => T(3) },
+    );
+    expect(wtPrompt.checkpoint).toEqual({
+      status: "counted", countedTurns: 1, turnsSinceLastWrite: 1, threshold: 3,
+    });
+    const mainFired = prompt(4);
+    expect(mainFired.checkpoint?.status).toBe("fired");
+    expect(cadenceRow(taskIdForBranch(1, "vibehub/wt-task"))).toMatchObject({
+      countedTurns: 1, lastReminderTurn: 0,
+    });
+  });
+
+  it("keeps cadence isolated per repository for identical branch names", () => {
+    const repoB = makeScratchRepo();
+    try {
+      git(repoB.work, "checkout", "-b", "vibehub/fix-login");
+      const startB = ingestHookEvent(
+        db, "SessionStart", { session_id: "sess-b", cwd: repoB.work }, { now: () => T(0) },
+      );
+      const promptB = (n: number) => ingestHookEvent(
+        db,
+        "UserPromptSubmit",
+        { session_id: "sess-b", cwd: repoB.work, prompt: `b turn ${n}`, prompt_id: `p-${n}` },
+        { now: () => T(n) },
+      );
+      prompt(1);
+      prompt(2);
+      promptB(1);
+      promptB(2);
+      const firedA = prompt(3);
+      expect(firedA.checkpoint?.status).toBe("fired");
+      expect(startB.taskId).not.toBe(taskBranch);
+      expect(cadenceRow(startB.taskId)).toMatchObject({ countedTurns: 2, lastReminderTurn: 0 });
+      const firedB = promptB(5);
+      expect(firedB.checkpoint).toEqual({
+        status: "fired", countedTurns: 3, turnsSinceLastWrite: 3, threshold: 3,
+      });
+    } finally {
+      repoB.cleanup();
+    }
+  });
+
+  it("persists cadence across process restarts (same SQLite file)", () => {
+    prompt(1);
+    prompt(2);
+    db.close();
+    db = openDb(dbPath);
+    const fired = prompt(3);
+    expect(fired.checkpoint).toEqual({
+      status: "fired", countedTurns: 3, turnsSinceLastWrite: 3, threshold: 3,
+    });
+  });
+
+  it("resets mechanically after a successful canonical knowledge write", () => {
+    prompt(1);
+    prompt(2);
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    new KnowledgeService(db).applyDraftBatch(
+      repoId,
+      draftBatch("capture-1", "spec-checkpoint-1"),
+      mutationCtx("req-cp-1", 3, taskBranch),
+    );
+    const afterWrite = prompt(4);
+    expect(afterWrite.checkpoint).toEqual({
+      status: "counted", countedTurns: 3, turnsSinceLastWrite: 1, threshold: 3,
+    });
+    expect(cadenceRow(taskBranch)).toMatchObject({ lastWriteTurn: 2 });
+    prompt(5);
+    const fired = prompt(6);
+    expect(fired.checkpoint).toEqual({
+      status: "fired", countedTurns: 5, turnsSinceLastWrite: 3, threshold: 3,
+    });
+    expect(fired.output?.hookSpecificOutput?.additionalContext).toContain(
+      "3 user turns on this task since the last captured knowledge write",
+    );
+  });
+
+  it("does not reset on a failed write — the error receipt row is inert", () => {
+    prompt(1);
+    prompt(2);
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    const failed = new OperationDispatcher(db).dispatch(
+      "kb.draft.apply",
+      { repoId, actor: "agent", taskId: taskBranch, requestId: "req-bad", now: T(3).toISOString() },
+      { idempotencyKey: "bad", specs: [] },
+    );
+    expect(failed.ok).toBe(false);
+    expect(db.prepare(
+      `SELECT outcome_kind AS kind FROM operation_request_receipts WHERE request_id = 'req-bad'`,
+    ).get()).toEqual({ kind: "error" });
+    expect(count("kb_provenance_events")).toBe(0);
+    const fired = prompt(3);
+    expect(fired.checkpoint?.status).toBe("fired");
+  });
+
+  it("does not reset on an idempotent replay of a canonical write", () => {
+    prompt(1);
+    prompt(2);
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    const service = new KnowledgeService(db);
+    service.applyDraftBatch(
+      repoId, draftBatch("capture-1", "spec-checkpoint-1"), mutationCtx("req-1", 3, taskBranch),
+    );
+    prompt(4);
+    const provenanceBefore = count("kb_provenance_events");
+    service.applyDraftBatch(
+      repoId, draftBatch("capture-1", "spec-checkpoint-1"), mutationCtx("req-2", 5, taskBranch),
+    );
+    expect(count("kb_provenance_events")).toBe(provenanceBefore);
+    expect(prompt(6).checkpoint?.status).toBe("counted");
+    const fired = prompt(7);
+    expect(fired.checkpoint).toEqual({
+      status: "fired", countedTurns: 5, turnsSinceLastWrite: 3, threshold: 3,
+    });
+  });
+
+  it("ignores canonical writes not attributed to this task (other task or none)", () => {
+    prompt(1);
+    prompt(2);
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    const service = new KnowledgeService(db);
+    service.applyDraftBatch(
+      repoId, draftBatch("other-capture", "spec-other"), mutationCtx("req-other", 3, "task:elsewhere"),
+    );
+    service.mutate(
+      repoId,
+      "promote",
+      { specId: "spec-other", idempotencyKey: "promote-other" },
+      mutationCtx("req-promote", 4),
+    );
+    expect(count("kb_provenance_events")).toBeGreaterThan(0);
+    const fired = prompt(5);
+    expect(fired.checkpoint).toEqual({
+      status: "fired", countedTurns: 3, turnsSinceLastWrite: 3, threshold: 3,
+    });
+  });
+
+  it("defers to claimed interventions and a duplicate can never ride the same turn", () => {
+    prompt(1);
+    prompt(2);
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    enqueueInjection(db, repoId, taskBranch, "pause", "Stop — let's talk.", T(3).toISOString());
+    const paused = prompt(4);
+    const ctx = paused.output?.hookSpecificOutput?.additionalContext ?? "";
+    expect(ctx).toContain("[Vibehub] PAUSE from your user:");
+    expect(ctx).not.toContain("Knowledge checkpoint");
+    expect(paused.checkpoint?.status).toBe("deferred");
+    expect(cadenceRow(taskBranch)).toMatchObject({ lastReminderTurn: 0 });
+    const dup = ingestHookEvent(
+      db,
+      "UserPromptSubmit",
+      payload({ prompt: "turn 4", prompt_id: "p-4" }),
+      { now: () => T(5) },
+    );
+    expect(dup.checkpoint?.status).toBe("duplicate");
+    expect(dup.output).toBeUndefined();
+    const fired = prompt(6);
+    expect(fired.checkpoint).toEqual({
+      status: "fired", countedTurns: 4, turnsSinceLastWrite: 4, threshold: 3,
+    });
+    expect(fired.output?.hookSpecificOutput?.additionalContext).toContain("Knowledge checkpoint");
+  });
+
+  it("only injects text when firing — no knowledge rows are fabricated", () => {
+    prompt(1);
+    prompt(2);
+    const fired = prompt(3);
+    expect(fired.checkpoint?.status).toBe("fired");
+    expect(count("kb_specs")).toBe(0);
+    expect(count("kb_provenance_events")).toBe(0);
+    expect(count("kb_mutation_receipts")).toBe(0);
+  });
+
+  it("seeds the provenance high-water at first sight — old writes are baseline", () => {
+    const repoId = getRepoByRoot(db, repo.work)!.id;
+    new KnowledgeService(db).applyDraftBatch(
+      repoId, draftBatch("pre-existing", "spec-pre"), mutationCtx("req-pre", 0, taskBranch),
+    );
+    const first = prompt(1);
+    expect(first.checkpoint).toEqual({
+      status: "counted", countedTurns: 1, turnsSinceLastWrite: 1, threshold: 3,
+    });
+    expect(cadenceRow(taskBranch)).toMatchObject({ lastWriteTurn: 0 });
+    expect(cadenceRow(taskBranch)!.provenanceHighWater).toBeGreaterThan(0);
+    prompt(2);
+    expect(prompt(3).checkpoint?.status).toBe("fired");
   });
 });
 

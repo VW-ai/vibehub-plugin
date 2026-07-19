@@ -10,6 +10,7 @@ import {
   CANONICAL_OPERATION_PRESENTATION,
   validateWorkflowReceiptStructure,
 } from "./contract/workflow-receipt.js";
+import type { CheckpointCadenceFacts } from "./knowledge-checkpoint.js";
 import type { WorkbenchIntervention, AppliedIntervention } from "./contract/workbench-bridge.js";
 import type { OperationName } from "./operation-contracts.js";
 import type { OperationMeta, OperationResult } from "./operation-dispatcher.js";
@@ -236,6 +237,47 @@ export function projectInjectionClaimReceipt(input: InjectionClaimReceiptInput):
       hookEvent: bounded(input.hookEvent),
       injectionIds: input.claimed.map((item) => item.id),
       injectionModes: input.claimed.map((item) => item.mode),
+    }],
+    nextAction: null,
+    at: input.at,
+  });
+}
+
+export interface CheckpointReceiptInput {
+  trigger: string;
+  taskId: string;
+  /** Cadence facts from the hook; status must be "fired" or "deferred". */
+  facts: CheckpointCadenceFacts;
+  at: string;
+}
+
+/**
+ * Projects the brief checkpoint receipt from the hook's deterministic
+ * cadence facts. Below-threshold turns ("counted"/"duplicate") are
+ * heartbeats with no consumer — they never project a receipt.
+ */
+export function projectCheckpointReceipt(input: CheckpointReceiptInput): WorkflowReceiptV1 {
+  const { facts } = input;
+  if (facts.status !== "fired" && facts.status !== "deferred") {
+    throw new Error("below-threshold cadence turns do not project receipts");
+  }
+  const fired = facts.status === "fired";
+  return checked({
+    schemaVersion: 1,
+    activity: "checkpoint",
+    phase: fired ? "execute" : "prepare",
+    outcome: fired ? "attempted" : "skipped",
+    visibility: "brief",
+    trigger: bounded(input.trigger),
+    evidence: [{
+      source: "checkpoint_hook",
+      effect: "none",
+      outcome: fired ? "attempted" : "skipped",
+      subject: bounded(`knowledge checkpoint for task ${input.taskId}`),
+      userTurnCount: facts.turnsSinceLastWrite,
+      detail: fired
+        ? `${facts.countedTurns} turns counted; threshold ${facts.threshold}`
+        : `yielded to intervention delivery; threshold ${facts.threshold}`,
     }],
     nextAction: null,
     at: input.at,

@@ -998,6 +998,45 @@ const MIGRATIONS: string[] = [
   // migrate() also supports historical test/minimal databases that omit the
   // optional App domain or already carried an experimental input_hash column.
   ``,
+
+  // 015 — task-scoped user-turn cadence for the periodic knowledge
+  // checkpoint (intent-workbench-003). The hook counts deduplicated user
+  // prompts per (repo, task); a reminder fires when enough turns pass with
+  // no new canonical knowledge write. kb_provenance_events is the reset
+  // evidence: it is written only inside successful canonical KB mutations
+  // (failures roll back, idempotent replays return cached receipts without
+  // writing, distillation never writes it), so a per-task high-water mark
+  // over its monotonic rowids is mechanical success proof. The mark is
+  // seeded at first sight so pre-existing writes are baseline, never
+  // "recent". Upgraded databases start counting from zero — no backfill;
+  // historical turns are not reconstructed. task_prompt_seen is append-only
+  // dedup state (same growth class as events/footprints); writes without a
+  // task attribution (task_id NULL in provenance) never reset a
+  // task-scoped counter.
+  `
+  CREATE TABLE task_prompt_cadence (
+    repo_id INTEGER NOT NULL REFERENCES repos(id),
+    task_id TEXT NOT NULL REFERENCES tasks(id),
+    counted_turns INTEGER NOT NULL DEFAULT 0,
+    last_write_turn INTEGER NOT NULL DEFAULT 0,
+    last_reminder_turn INTEGER NOT NULL DEFAULT 0,
+    provenance_high_water INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (repo_id, task_id),
+    CHECK (counted_turns >= 0 AND last_write_turn <= counted_turns
+       AND last_reminder_turn <= counted_turns)
+  );
+
+  CREATE TABLE task_prompt_seen (
+    repo_id INTEGER NOT NULL REFERENCES repos(id),
+    task_id TEXT NOT NULL REFERENCES tasks(id),
+    prompt_id TEXT NOT NULL,
+    seen_at TEXT NOT NULL,
+    PRIMARY KEY (task_id, prompt_id)
+  );
+
+  CREATE INDEX idx_kb_provenance_task ON kb_provenance_events(task_id, id);
+  `,
 ];
 
 /** Stable schema version reported by `vibehub doctor --json`. */

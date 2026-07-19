@@ -53,5 +53,6 @@ checkpoint → Codex parity → presentation rollout；Tauri/downloadable packag
 - [change-2026-07-18-workflow-receipt-contract] activation ⑥A:跨 workflow typed receipt contract + deterministic projectors 落地；修复 intervention replay outcome laundering；browser-safe contract 与 core runtime projection 分层，独立 review APPROVED
 - [change-2026-07-18-repo-activation] activation ⑥B:setup inspect/apply/status + repo/worktree-safe managed instruction blocks；Installed→Connected→Activated 由 release、checkout-bound host handshake、post-handshake context value 的严格因果证据投影，独立 review APPROVED
 - [change-2026-07-18-setup-skill] activation ⑥C implementation checkpoint:vibehub-setup skill + progressive onboarding/Claude/recovery intelligence；packaged artifact 用 installed CLI 验证幂等 setup 与 pre-handshake waiting，里程碑等待真实 Claude dogfood 外发 gate
+- [change-2026-07-18-knowledge-checkpoint] activation ⑥D:task-scoped periodic knowledge checkpoint 落地——UserPromptSubmit 机械 cadence（prompt-id 去重、缺失不计数）、kb_provenance_events 高水位重置（failed/replay/未归属写入不重置）、pause/injection 严格优先、brief checkpoint receipt；提醒内嵌 task id 闭合 CLI 写入归属回路，独立 review APPROVED
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。

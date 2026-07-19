@@ -1,0 +1,73 @@
+spec_id: "change-2026-07-18-knowledge-checkpoint"
+type: change
+state: active
+intent:
+  summary: "M2p6d 完成：task-scoped periodic knowledge checkpoint 落地——UserPromptSubmit 机械 cadence + prompt-id 去重 + canonical-write 证据重置 + brief receipt"
+  detail: |
+    intent-workbench-003 的实现纵向切片完成。migration 015 新增
+    task_prompt_cadence / task_prompt_seen（(repo,task) 绑定、跨进程持久、
+    升级库从零计数不做假 backfill）与 kb_provenance_events 的 task 索引。
+
+    Hook 只拥有 when：UserPromptSubmit 内按稳定 prompt_id 去重计数（缺失
+    prompt_id 的老宿主诚实不计数，杜绝重放双计），阈值达到时注入一条
+    [Vibehub] Knowledge checkpoint 提醒。语义判断全部留给模型与
+    vibehub-ingest skill；hook 不解析 transcript、不估 token、不做语义分类。
+
+    重置证据 = kb_provenance_events 的 per-(repo,task) 单调高水位：该账本
+    只在确定性成功的 canonical KB mutation 内写入（失败随 SAVEPOINT 回滚、
+    幂等重放返回缓存 receipt 不写行、distillation 不写此表），因此
+    failed/skipped/duplicate/planned 写入都不能重置。未归属 task 的写入
+    （task_id NULL 或他 task）不重置本 task 计数；提醒文案内嵌 hook 侧
+    opaque task id，闭合 CLI skill 路径的 remind→capture→reset 回路
+    （对抗性 review 的 P1 修复）。
+
+    严格优先级保持：同一 fire 正在投递 claimed intervention（含 pause）时
+    checkpoint 让路（deferred，不占用 reminder 计数），复放事件永不
+    与 pause 同 turn 出现。cadence 配置集中在 knowledge-checkpoint.ts：
+    DEFAULT_CHECKPOINT_CADENCE_TURNS = 8（tunable、awaits dogfood
+    benchmark）+ settings key checkpoint.cadence.user_turns（repo 遮蔽
+    global，仅接受显式正十进制整数）。
+
+    projectCheckpointReceipt 从 cadence facts 投影 brief receipt：fired →
+    checkpoint/execute/attempted，deferred → checkpoint/prepare/skipped；
+    低于阈值的心跳不产生 receipt；投影不进 hook 进程（post-commit throw
+    不得吞掉注入投递）。
+
+    Controller 验证：Core 265/265、CLI 31/31、MCP 15/15、App 59/59、
+    workspace typecheck/build 全绿。独立对抗 review 一轮 CHANGES_REQUIRED
+    （task-id 归属 P1 + 措辞/config 语法 P2×2）修复后 APPROVED。
+constraints:
+  - kind: must
+    rule: "hook 只做机械 cadence 与去重；durable knowledge 判断、分类与写入必须由模型和 vibehub-ingest skill 完成"
+  - kind: must
+    rule: "只有确定性成功且归属当前 task 的 canonical knowledge mutation（kb_provenance_events 新行）才能重置 cadence"
+  - kind: must
+    rule: "checkpoint 注入必须让路于同 fire 的 claimed intervention 投递；pause 文案不得与 checkpoint 同 turn 出现"
+  - kind: must_not
+    rule: "不得解析 transcript、估算 token、在 hook 内实现语义分类器，或对缺失 prompt_id 的事件计数"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench-context-cru"
+  tags: [knowledge-checkpoint, cadence, prompt-dedup, provenance-reset, brief-receipt, hook-when]
+provenance:
+  source_type: implementation
+  confidence: 1.0
+  source_ref: "m2p6d implementation + adversarial review APPROVED, 2026-07-18"
+relations:
+  - target: "intent-workbench-003"
+    type: implements
+    detail: "周期性 knowledge checkpoint 的完整机械实现"
+  - target: "decision-workbench-010"
+    type: constrained_by
+    detail: "语义 intelligence 保持在 skill；hook 只管 when"
+  - target: "change-2026-07-18-workflow-receipt-contract"
+    type: builds_on
+    detail: "checkpoint receipt 使用既有 CheckpointHookEvidenceV1 与 brief visibility"
+anchors:
+  - file: "workbench/packages/core/src/knowledge-checkpoint.ts"
+  - file: "workbench/packages/core/src/hook-ingest.ts"
+  - file: "workbench/packages/core/src/db.ts"
+  - file: "workbench/packages/core/src/workflow-receipt-projectors.ts"
+  - file: "workbench/packages/core/test/knowledge-checkpoint.test.ts"

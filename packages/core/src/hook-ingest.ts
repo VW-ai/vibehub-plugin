@@ -36,6 +36,11 @@ import {
 import { classifyUserPrompt } from "./milestone.js";
 import type { Db } from "./db.js";
 import { GitFacade } from "./git-facade.js";
+import {
+  formatCheckpointReminder,
+  recordUserPromptTurn,
+  type CheckpointCadenceFacts,
+} from "./knowledge-checkpoint.js";
 import { nextState, type HookEventName } from "./state-machine.js";
 import { getRepoByRoot, upsertRepo } from "./team-store.js";
 import {
@@ -72,6 +77,14 @@ export interface HookIngestResult {
   eventTypesWritten: string[];
   stateBefore: TaskState | null;
   stateAfter: TaskState;
+  /**
+   * Knowledge-checkpoint cadence facts for this UserPromptSubmit fire
+   * (absent on other hooks and on prompts without a stable prompt_id).
+   * Deterministic facts only — receipt projection happens in surfaces,
+   * never inside the hook (a post-commit projector throw must not be able
+   * to swallow claimed-injection delivery).
+   */
+  checkpoint?: CheckpointCadenceFacts;
   /** Hook-protocol stdout object (injection delivery), if any. */
   output?: {
     hookSpecificOutput?: {
@@ -392,6 +405,31 @@ export function ingestHookEvent(
     }
   }
 
+  // Knowledge-checkpoint cadence (intent-workbench-003): counted after the
+  // delivery block so claimed interventions keep strict priority — an
+  // eligible turn that is delivering them defers instead of firing, and a
+  // pause is never contradicted in the same additionalContext. Prompts
+  // without a stable prompt_id (old hosts) are not counted at all: honest
+  // degradation beats replay double-counting.
+  let checkpoint: CheckpointCadenceFacts | undefined;
+  if (
+    hook === "UserPromptSubmit" &&
+    payload.prompt &&
+    typeof payload.prompt_id === "string" &&
+    payload.prompt_id !== ""
+  ) {
+    checkpoint = recordUserPromptTurn(db, {
+      repoId: repo.id,
+      taskId,
+      promptId: payload.prompt_id,
+      now: nowIso,
+      deliveringInterventions: claimed.length > 0,
+    });
+    if (checkpoint.status === "fired") {
+      conditionalContext.push(formatCheckpointReminder(checkpoint, taskId));
+    }
+  }
+
   if (hook === "SessionStart") conditionalContext.unshift(SESSION_PROTOCOL);
   if (!output && conditionalContext.length > 0) {
     output = {
@@ -402,7 +440,14 @@ export function ingestHookEvent(
     };
   }
 
-    return { taskId, eventTypesWritten: written, stateBefore, stateAfter, output };
+    return {
+      taskId,
+      eventTypesWritten: written,
+      stateBefore,
+      stateAfter,
+      output,
+      ...(checkpoint ? { checkpoint } : {}),
+    };
   });
 
   return transact.immediate();

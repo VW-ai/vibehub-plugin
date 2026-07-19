@@ -181,7 +181,7 @@ progress:
       notes: "Implementation checkpoint 完成：vibehub-setup skill + onboarding-contract/claude-code/recovery progressive references + OpenAI metadata；skill 固定 inspect→validated apply→status，所有 setup exit 0/1 解析 typed JSON，partial/blocked 立即停并保留 backup evidence。fresh/existing/ambiguous 由 tracked substantive files + history 的 skill-owned semantic classifier 分流；distill 可跳过，empty query/fake ingest 不得 Activated。Package validator 固定 canonical 六 entry 并拒绝第七项；artifact 使用 installed bin 在 clean HOME/temp repo 验证 inspect→apply→unchanged→current→pre-handshake waiting。双 reviewer修复后 APPROVED。Controller gates: CLI 31/31、typecheck/build、package validator、network-enabled representative artifact、diff-check 全绿。Milestone 保持 in_progress：真实 Claude host restart/handshake/query-or-ingest dogfood 仍需用户提供 target path 与外发授权。"
     - id: m2p6d-knowledge-checkpoint
       name: "M2 activation ⑥D:task-scoped periodic knowledge checkpoint"
-      status: pending
+      status: completed
       gate: true
       estimated_files:
         - "workbench/packages/core/src/db.ts"
@@ -200,6 +200,7 @@ progress:
         注入短 checkpoint，成功 canonical knowledge mutation 后机械重置。
         不解析 token/transcript，不在 hook 内判断 durable semantics，并保持
         pause/injection 的现有严格优先级。
+      notes: "migration 015（task_prompt_cadence/task_prompt_seen + provenance task 索引，升级库零计数无假 backfill）+ knowledge-checkpoint.ts 集中 config/算法/文案 + hook-ingest UserPromptSubmit 接线 + projectCheckpointReceipt。稳定 prompt_id 去重（缺失不计数，重放/重复注册永不双计双发）；重置证据 = kb_provenance_events per-(repo,task) 单调高水位（成功才写、失败回滚、幂等重放不写、distill 不写、未归属不重置）；同 fire 投递 claimed intervention 时 deferred 让路，pause 永不被 checkpoint 同 turn 干扰；提醒内嵌 opaque task id 闭合 CLI --task 归属回路；DEFAULT_CHECKPOINT_CADENCE_TURNS=8（tunable 待 dogfood）+ settings 严格十进制 override；fired→execute/attempted、deferred→prepare/skipped 均 brief，低于阈值零 receipt，投影不进 hook 进程。测试矩阵 14 hook 集成 + 3 config/migration + 4 receipt 全绿。对抗 review 一轮修复（task-id 归属 P1、措辞与 config 语法 P2）后 APPROVED。Controller gates: Core 265/265、CLI 31/31、MCP 15/15、App 59/59、typecheck/build 全绿。"
     - id: m2p6e-codex-activation-parity
       name: "M2 activation ⑥E:Codex workbench-native activation parity"
       status: pending
