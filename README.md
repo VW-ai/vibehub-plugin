@@ -17,10 +17,48 @@ isolation.
 
 ## Requirements
 
-- Node.js 20 or newer
+- Node.js 20 or newer for source builds
+- Node.js 24 LTS for public marketplace artifacts
 - pnpm 10.8.1
 - Git
 - Claude Code or OpenAI Codex for native plugin integration
+
+## Install from the public marketplace
+
+VibeHub publishes one self-contained marketplace channel for each supported
+operating-system and CPU pair. Node 24 is part of the channel because the
+packaged `better-sqlite3` binary is native.
+
+```bash
+node --version
+TARGET="$(node -p '`${process.platform}-${process.arch}-node${process.versions.node.split(".")[0]}`')"
+```
+
+The target must be one of `darwin-arm64-node24`, `darwin-x64-node24`,
+`linux-arm64-node24`, or `linux-x64-node24`.
+
+Install in Claude Code:
+
+```bash
+claude plugin marketplace add "https://github.com/VW-ai/vibehub-plugin.git#marketplace/${TARGET}"
+claude plugin install vibehub@vibehub
+```
+
+Install in OpenAI Codex:
+
+```bash
+codex plugin marketplace add VW-ai/vibehub-plugin --ref "marketplace/${TARGET}"
+codex plugin add vibehub@vibehub
+```
+
+Start a new task after installation and ask the host to use
+`$vibehub-setup`. For an immutable install or rollback, replace
+`marketplace/${TARGET}` with
+`marketplace/vVERSION/${TARGET}`, for example
+`marketplace/v0.1.0/darwin-arm64-node24`.
+
+See [the release policy](docs/RELEASE.md) for versioning, compatibility,
+release gates, upgrade, and rollback rules.
 
 ## Install from source
 
@@ -30,10 +68,6 @@ cd vibehub-plugin
 pnpm install --frozen-lockfile
 pnpm build
 ```
-
-The first public beta intentionally uses this source-built path. A direct
-hosted marketplace install will be documented only after a versioned release
-artifact, upgrade path, and rollback contract are published.
 
 Initialize a repository and verify the local runtime:
 
@@ -46,7 +80,7 @@ node packages/cli/dist/main.js doctor --repo /path/to/repository --json
 silently replace user-owned Claude configuration. Re-running it is safe; use
 `doctor --json` for machine-readable health and repair guidance.
 
-### Install in Claude Code
+### Build a local Claude Code marketplace
 
 Build the self-contained local marketplace, add it, then install VibeHub:
 
@@ -65,7 +99,7 @@ all six VibeHub workflow skills ship with that installed artifact. Start a new
 Claude Code session after installing, then ask Claude to use `$vibehub-setup`
 for the exact project checkout.
 
-### Install in OpenAI Codex
+### Build a local OpenAI Codex marketplace
 
 Build one disposable local marketplace from the same authored plugin tree:
 
