@@ -1,0 +1,57 @@
+spec_id: "change-2026-07-19-claude-marketplace"
+type: change
+state: active
+intent:
+  summary: "Claude Code marketplace release closure：源码构建正式自包含 marketplace，真实隔离 Claude CLI 从安装副本验证 hooks、MCP、setup 与 SQLite"
+  detail: |
+    为公开仓库与本机 dogfood 补齐 Claude Code 的正式安装路径。新增
+    `build:claude-marketplace`，复用 shared artifact builder，将 CLI、MCP、
+    skills、hooks 与 native SQLite production dependencies 部署到
+    `dist/claude-marketplace/plugins/vibehub`，并生成 marketplace manifest。
+
+    authored source tree 与 publishable artifact 明确分离：用户不能把缺少 dist
+    与 production dependencies 的 clean source root 冒充可安装插件；README
+    与 verifier 统一使用 generated marketplace。真实 Claude 2.1.177 在隔离
+    HOME/CLAUDE_CONFIG_DIR 中完成 strict validate、marketplace add、plugin
+    install，并从 Claude 返回的实际 installPath 执行 configured hook 与 MCP。
+
+    verifier 在任何 corrupt-path negative test 前证明 installPath 严格位于
+    隔离 config root 内，且不是 source artifact；Claude/Codex manifests 与
+    marketplace entry 的 name/version 被锁为同一发布身份。两轮独立复审修复
+    raw-source mismatch 与 install cache mutation 风险后 APPROVED。
+constraints:
+  - kind: must
+    rule: "Claude marketplace 必须安装 builder 生成的自包含 release artifact，不得把 authored workspace 当作 publishable plugin"
+  - kind: must
+    rule: "release gate 必须使用真实 Claude CLI add/install，并从宿主返回的隔离安装副本验证 hooks 与 MCP"
+  - kind: must
+    rule: "Claude marketplace、Claude manifest 与 Codex manifest 的 plugin name/version 必须一致"
+  - kind: must_not
+    rule: "negative tests 未证明 installPath 属于隔离 HOME 前不得修改任何安装文件"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "workbench-release"
+  tags: [claude-code, marketplace, artifact, distribution, release-gate, open-source]
+provenance:
+  source_type: implementation
+  confidence: 1.0
+  source_ref: "Claude marketplace builder + real isolated Claude CLI installation gate, 2026-07-19"
+  produced_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-011"
+    type: implements
+    detail: "headless runtime 以独立、自包含 plugin artifact 发布"
+  - target: "decision-workbench-015"
+    type: implements
+    detail: "机器级 plugin 安装成为 agent-first onboarding 的正式 Claude 入口"
+  - target: "change-2026-07-18-codex-activation-parity"
+    type: complements
+    detail: "Claude/Codex 两端现均有真实 marketplace ingestion 与 installed-runtime gate"
+anchors:
+  - file: "workbench/scripts/build-claude-marketplace.mjs"
+  - file: "workbench/scripts/build-plugin-artifact.mjs"
+  - file: "workbench/scripts/verify-plugin-artifact.mjs"
+  - file: "workbench/package.json"
+  - file: "workbench/README.md"

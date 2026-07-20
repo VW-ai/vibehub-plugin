@@ -56,5 +56,6 @@ checkpoint → Codex parity → presentation rollout；Tauri/downloadable packag
 - [change-2026-07-18-knowledge-checkpoint] activation ⑥D:task-scoped periodic knowledge checkpoint 落地——UserPromptSubmit 机械 cadence（prompt-id 去重、缺失不计数）、kb_provenance_events 高水位重置（failed/replay/未归属写入不重置）、pause/injection 严格优先、brief checkpoint receipt；提醒内嵌 task id 闭合 CLI 写入归属回路，独立 review APPROVED
 - [change-2026-07-18-codex-activation-parity] activation ⑥E Plan B native adapter checkpoint：Claude/Codex 共用 SQLite/repo identity/skills/MCP/receipts；host-neutral hook ingestion + Codex 原生插件已接入 SessionStart/UserPromptSubmit/PostToolUse(apply_patch)，真实隔离 plugin install、installed hook 与 MCP smoke 通过；Stop/SessionEnd 等保持诚实缺席；独立复审与 fresh interactive Codex task dogfood 仍 pending
 - [change-2026-07-18-presentation-rollout] activation ⑥F:presentation protocol 全面 rollout——receipt 投影入 browser-safe contract 层供 App/Node 共用、CLI init/doctor/inject 人类面渲染五段文本、reporting.md 成为五段+三档可见性 canonical、六 skill 挂接同一合约、App 单点投影+弱证据永不升级（强 queued evidence 才允许成功反馈与清空草稿）；两轮对抗 review 修复 P1×1+P2×7 后 APPROVED
+- [change-2026-07-19-claude-marketplace] Claude marketplace release closure：generated self-contained marketplace + 真实隔离 Claude CLI add/install + installed hook/MCP/setup/SQLite gate；raw source ≠ release artifact 与 installPath mutation safety 经两轮独立 review 后 APPROVED
 
 实现期决策以 draft spec 落 specs/,Wayne 晨审 promote。

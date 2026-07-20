@@ -12,14 +12,22 @@ import {
   writeFileSync,
 } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import {
+  delimiter,
+  dirname,
+  isAbsolute,
+  join,
+  relative,
+  resolve,
+} from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { buildPluginArtifact } from "./build-plugin-artifact.mjs";
+import { buildClaudeMarketplace } from "./build-claude-marketplace.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const temp = mkdtempSync(join(tmpdir(), "vibehub-plugin-artifact-"));
-const artifact = join(temp, "plugin");
+const marketplaceRoot = join(temp, "claude-marketplace");
+const artifact = join(marketplaceRoot, "plugins", "vibehub");
 const keep = process.env.VIBEHUB_KEEP_TMP === "1";
 let captureSeq = 0;
 
@@ -123,10 +131,49 @@ function readConfiguredEntrypoints(pluginRoot) {
   return { hooks, mcpServers };
 }
 
+function assertClaudeMarketplace(generatedMarketplaceRoot, pluginRoot) {
+  const marketplace = readJson(
+    join(generatedMarketplaceRoot, ".claude-plugin/marketplace.json"),
+  );
+  const manifest = readJson(join(pluginRoot, ".claude-plugin/plugin.json"));
+  const codexManifest = readJson(join(pluginRoot, ".codex-plugin/plugin.json"));
+  if (
+    marketplace.name !== "vibehub-local" ||
+    !marketplace.owner ||
+    typeof marketplace.owner.name !== "string"
+  ) {
+    throw new Error("Claude marketplace requires stable identity and owner");
+  }
+  if (!Array.isArray(marketplace.plugins) || marketplace.plugins.length !== 1) {
+    throw new Error("Claude marketplace must publish exactly one VibeHub plugin");
+  }
+  const entry = marketplace.plugins[0];
+  if (
+    entry.name !== manifest.name ||
+    entry.version !== manifest.version ||
+    codexManifest.name !== manifest.name ||
+    codexManifest.version !== manifest.version ||
+    entry.source !== "./plugins/vibehub"
+  ) {
+    throw new Error(
+      "Claude marketplace and both host manifests must share plugin identity and version",
+    );
+  }
+  const resolvedSource = realpathSync(resolve(generatedMarketplaceRoot, entry.source));
+  if (resolvedSource !== realpathSync(pluginRoot)) {
+    throw new Error(
+      "Claude marketplace source must resolve to its staged self-contained artifact",
+    );
+  }
+}
+
 function assertCodexPackage(pluginRoot) {
   const manifest = readJson(join(pluginRoot, ".codex-plugin/plugin.json"));
+  const claudeManifest = readJson(join(pluginRoot, ".claude-plugin/plugin.json"));
   if (
     manifest.name !== "vibehub" ||
+    manifest.name !== claudeManifest.name ||
+    manifest.version !== claudeManifest.version ||
     manifest.skills !== "./skills/" ||
     manifest.mcpServers !== "./codex/mcp.json" ||
     manifest.hooks !== "./codex/hooks.json"
@@ -304,12 +351,14 @@ function createArtifactCase(name, deployArgs) {
 
 try {
   const deployArgs = process.env.VIBEHUB_OFFLINE === "1" ? ["--offline"] : [];
-  buildPluginArtifact({
-    sourceRoot: root,
-    artifactRoot: artifact,
+  const claudeMarketplace = buildClaudeMarketplace({
+    outputRoot: marketplaceRoot,
     offline: deployArgs.length > 0,
   });
+  assertClaudeMarketplace(claudeMarketplace.outputRoot, artifact);
   assertCodexPackage(artifact);
+  const pluginManifest = readJson(join(artifact, ".claude-plugin/plugin.json"));
+  const pluginId = `${pluginManifest.name}@${claudeMarketplace.marketplaceName}`;
 
   const { casePluginRoot, home, repo, origin, installedBin } = createArtifactCase(
     "default",
@@ -317,6 +366,68 @@ try {
   );
   mkdirSync(home, { recursive: true });
   mkdirSync(repo, { recursive: true });
+  const claudeConfigDir = join(home, ".claude");
+  const claudeEnv = {
+    ...process.env,
+    HOME: home,
+    CLAUDE_CONFIG_DIR: claudeConfigDir,
+  };
+  run("claude", ["plugin", "validate", "--strict", marketplaceRoot], {
+    env: claudeEnv,
+    capture: true,
+  });
+  run(
+    "claude",
+    ["plugin", "marketplace", "add", marketplaceRoot, "--scope", "user"],
+    { env: claudeEnv, capture: true },
+  );
+  run(
+    "claude",
+    ["plugin", "install", pluginId, "--scope", "user"],
+    { env: claudeEnv, capture: true },
+  );
+  const installedPlugins = JSON.parse(
+    run("claude", ["plugin", "list", "--json"], {
+      env: claudeEnv,
+      capture: true,
+    }),
+  );
+  const installedClaude = installedPlugins.find(
+    (plugin) => plugin.id === pluginId,
+  );
+  if (
+    !installedClaude?.enabled ||
+    installedClaude.version !== pluginManifest.version ||
+    typeof installedClaude.installPath !== "string" ||
+    !existsSync(installedClaude.installPath)
+  ) {
+    throw new Error("real Claude CLI did not install the packaged marketplace plugin");
+  }
+  const installedClaudeRoot = realpathSync(installedClaude.installPath);
+  const isolatedConfigRoot = realpathSync(claudeConfigDir);
+  const installRelative = relative(isolatedConfigRoot, installedClaudeRoot);
+  if (
+    installRelative === "" ||
+    installRelative.startsWith("..") ||
+    isAbsolute(installRelative) ||
+    installedClaudeRoot === realpathSync(artifact)
+  ) {
+    throw new Error(
+      "Claude installPath must be an isolated copied install before mutation tests",
+    );
+  }
+  const installedManifest = readJson(
+    join(installedClaudeRoot, ".claude-plugin/plugin.json"),
+  );
+  if (
+    installedManifest.name !== pluginManifest.name ||
+    installedManifest.version !== pluginManifest.version
+  ) {
+    throw new Error("installed Claude manifest identity drifted from release artifact");
+  }
+  assertCodexPackage(installedClaudeRoot);
+  readConfiguredEntrypoints(installedClaudeRoot);
+
   run("git", ["init", "-q", "-b", "main"], { cwd: repo });
   run("git", ["config", "user.email", "artifact-smoke@vibehub.local"], { cwd: repo });
   run("git", ["config", "user.name", "VibeHub Artifact Smoke"], { cwd: repo });
@@ -329,9 +440,10 @@ try {
 
   const cleanEnv = {
     HOME: home,
-    PATH: `${dirname(installedBin)}:${process.env.PATH ?? ""}`,
+    PATH: `${dirname(installedBin)}${delimiter}${process.env.PATH ?? ""}`,
     LANG: process.env.LANG ?? "C.UTF-8",
-    CLAUDE_PLUGIN_ROOT: artifact,
+    CLAUDE_CONFIG_DIR: claudeConfigDir,
+    CLAUDE_PLUGIN_ROOT: installedClaudeRoot,
     NODE_PATH: "",
     VIBEHUB_REPO: repo,
     VIBEHUB_PLUGIN_ROOT: casePluginRoot,
@@ -451,8 +563,8 @@ try {
     hook_event_name: "SessionStart",
   });
   const runConfiguredHook = () => {
-    const configured = readConfiguredEntrypoints(artifact);
-    assertConfiguredPaths(configured.hooks, artifact);
+    const configured = readConfiguredEntrypoints(installedClaudeRoot);
+    assertConfiguredPaths(configured.hooks, installedClaudeRoot);
     const hookCommand = configured.hooks.find((hook) => hook.eventName === "SessionStart");
     return run(hookCommand.command, hookCommand.args, {
       cwd: repo,
@@ -468,8 +580,8 @@ try {
   }
 
   const runConfiguredMcp = async () => {
-    const configured = readConfiguredEntrypoints(artifact);
-    assertConfiguredPaths(configured.mcpServers, artifact);
+    const configured = readConfiguredEntrypoints(installedClaudeRoot);
+    assertConfiguredPaths(configured.mcpServers, installedClaudeRoot);
     const mcpCommand = configured.mcpServers.find((server) => server.name === "vibehub") ?? configured.mcpServers[0];
     return runMcpClient(mcpCommand.command, mcpCommand.args, {
       cwd: repo,
@@ -483,7 +595,7 @@ try {
   }
 
   await assertConfiguredPathFailure(
-    join(artifact, "hooks/hooks.json"),
+    join(installedClaudeRoot, "hooks/hooks.json"),
     (config) => {
       const command = config.hooks.SessionStart[0].hooks[0];
       command.args[0] = "${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/missing.js";
@@ -491,7 +603,7 @@ try {
     runConfiguredHook,
   );
   await assertConfiguredPathFailure(
-    join(artifact, ".mcp.json"),
+    join(installedClaudeRoot, ".mcp.json"),
     (config) => {
       const server = config.mcpServers.vibehub ?? Object.values(config.mcpServers)[0];
       server.args[0] = "${CLAUDE_PLUGIN_ROOT}/packages/mcp/dist/missing.js";
@@ -521,7 +633,7 @@ try {
   if (homedir() === home) throw new Error("smoke HOME unexpectedly equals the developer HOME");
 
   console.log(
-    "plugin artifact: self-contained setup skill/CLI/hooks/MCP with Codex onboarding path; idempotent setup/init, honest pre-handshake status, doctor, sync, snapshot, and clean-HOME native SQLite passed",
+    "plugin artifact: real Claude marketplace install plus self-contained setup skill/CLI/hooks/MCP with Codex onboarding path; idempotent setup/init, honest pre-handshake status, doctor, sync, snapshot, and clean-HOME native SQLite passed",
   );
 } finally {
   if (keep) console.log(`kept plugin artifact at ${artifact}`);

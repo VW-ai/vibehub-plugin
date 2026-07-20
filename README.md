@@ -34,9 +34,24 @@ node packages/cli/dist/main.js doctor --repo /path/to/repository --json
 silently replace user-owned Claude configuration. Re-running it is safe; use
 `doctor --json` for machine-readable health and repair guidance.
 
-Install this directory as a Claude Code plugin using Claude's local plugin
-workflow. The plugin manifest is `.claude-plugin/plugin.json`; hooks, MCP, and
-all six VibeHub workflow skills ship with the same directory.
+### Install in Claude Code
+
+Build the self-contained local marketplace, add it, then install VibeHub:
+
+```bash
+pnpm build:claude-marketplace
+claude plugin marketplace add "$(pwd)/dist/claude-marketplace"
+claude plugin install vibehub@vibehub-local
+```
+
+The builder rebuilds the shared package `dist` outputs and writes a generated
+marketplace under `dist/claude-marketplace`. Its source resolves to a staged,
+self-contained `plugins/vibehub` release artifact, never the authored tree or a
+parent monorepo. It does not edit `~/.claude` or any target project. The two
+explicit `claude plugin` commands perform the machine install. Hooks, MCP, and
+all six VibeHub workflow skills ship with that installed artifact. Start a new
+Claude Code session after installing, then ask Claude to use `$vibehub-setup`
+for the exact project checkout.
 
 ### Install in OpenAI Codex
 
@@ -157,16 +172,21 @@ The Playwright production lane boots the real `src/main.tsx` entry; the
 historical harness suite remains separate parity evidence. The production
 bundle gate rejects fixture imports—including dynamic chunks—and scans emitted
 JavaScript for fixture or canned-data markers. The artifact smoke validates the
-Claude manifest, `hooks/hooks.json`, and `.mcp.json`, plus the Codex manifest
-and thin host configs. One shared artifact builder stages the CLI, MCP, and
-skills once. The Claude smoke expands `CLAUDE_PLUGIN_ROOT` and invokes the
-configured hook and MCP commands; corrupt-path negatives prove the configs—not
-verifier-local shortcuts—are the invocation source. The Codex smoke builds a
-local marketplace, points a real installed `codex` CLI at isolated
+Claude marketplace and plugin manifests, `hooks/hooks.json`, and `.mcp.json`,
+plus the Codex manifest and thin host configs. One shared artifact builder
+stages the CLI, MCP, and skills once. In an isolated HOME, a real installed
+`claude` CLI must add the generated self-contained marketplace and install
+`vibehub@vibehub-local`; the smoke then expands the installed
+`CLAUDE_PLUGIN_ROOT` and invokes its configured hook and MCP commands.
+Corrupt-path negatives prove the configs—not verifier-local shortcuts—are the
+invocation source. The Codex smoke builds a local marketplace, points a real
+installed `codex` CLI at isolated
 `HOME`/`CODEX_HOME`, and requires marketplace plus plugin ingestion to succeed.
 It then starts a real `codex app-server` thread in an isolated Git repository
 and requires the installed VibeHub MCP status to reach `ready`; a verifier-local
 `node` launch is not accepted as host evidence.
+Release readiness requires both installed-host gates; passing one host's
+marketplace verification does not imply parity for the other.
 The remaining checks create SQLite through the packaged native dependency and
 run sync and snapshot outside the source monorepo without starting the App.
 
