@@ -1,11 +1,11 @@
 progress:
-  completion: 0.03
-  status: planning
+  completion: 0.45
+  status: in_progress
   milestones:
     - id: "lossless-round-trip"
       name: "SQLite semantic subset to YAML to clean SQLite"
-      status: planned
-      evidence: null
+      status: completed
+      evidence: "packages/core/test/git-semantic-store.test.ts — semantic digest, KnowledgeService query parity, byte-identical re-export, strict rejection and no-overwrite oracles"
     - id: "architecture-decision"
       name: "Canonical storage architecture decision"
       status: blocked
@@ -15,6 +15,6 @@ progress:
       status: blocked
       evidence: "Current SQLite source-of-truth decisions remain active."
   next:
-    - "Run a 0.5–1 day SQLite semantic subset → strict YAML → clean SQLite spike."
-    - "Compare identity, relations, revisions, active pointers and provenance byte-for-semantics."
+    - "Review the spike protocol and subset boundary adversarially before considering an architecture decision."
+    - "Decide explicitly whether Git/YAML merits a follow-on experiment; do not infer approval from the passing round-trip gate."
     - "Do not implement write-through or migration until an explicit architecture decision supersedes SQLite-only semantics."

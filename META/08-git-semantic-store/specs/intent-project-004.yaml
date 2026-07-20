@@ -59,3 +59,5 @@ anchors:
   - file: "packages/core/src/db.ts"
   - file: "packages/core/src/knowledge-service.ts"
   - file: "packages/core/src/distillation-service.ts"
+  - file: "packages/core/src/experimental/git-semantic-store/index.ts"
+  - file: "packages/core/test/git-semantic-store.test.ts"
