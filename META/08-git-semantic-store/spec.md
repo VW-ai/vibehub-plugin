@@ -69,6 +69,32 @@ state, receipts and all operational tables remain excluded; the experiment is
 not exported from the package root and has no CLI, MCP, App or hook wiring.
 SQLite remains canonical pending an explicit architecture review and decision.
 
+## Merge ergonomics spike — 2026-07-20
+
+Real Git three-way merge testing found that the v1 round-trip layout is not a
+viable collaboration layout. Its content-addressed entity paths and committed
+global manifest/digest make even unrelated spec edits conflict in
+`manifest.yaml`.
+
+A v2 candidate uses stable identity-derived entity paths and commits only
+immutable protocol metadata. Inventory, per-file content digests and the global
+semantic digest become deterministic projections of a checked-out Git tree or
+commit, suitable for validation and a local SQLite query cache.
+
+The real merge matrix establishes a useful PR boundary:
+
+- different specs merge automatically;
+- disjoint fields on one stable spec merge automatically and preserve both
+  edits;
+- same-field edits, concurrent revision numbers, lifecycle verdicts, relation
+  appends and delete-versus-amend remain explicit Git conflicts.
+
+A reusable team PR skill can orchestrate rebase, explanation, resolution and
+review, while deterministic validation/CI remains the enforcement authority.
+The v2 shape is not yet promoted: collision-safe durable provenance identity
+and branch/ref cache semantics remain open. Full evidence is recorded in
+`merge-ergonomics-spike.md`.
+
 # Canonical Specs
 
 - [intent-project-004] (draft) Explore Git/YAML for durable semantics while
