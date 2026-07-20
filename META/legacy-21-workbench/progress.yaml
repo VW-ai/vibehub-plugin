@@ -267,6 +267,14 @@ progress:
         add/install，并从 installed copy 验证 hooks、MCP、setup 与 SQLite。
       notes: "generated marketplace 与 authored source 分离；README 和 gate 使用同一 dist/claude-marketplace。真实 Claude 2.1.177 strict validate、隔离 marketplace add/install、installed hook/MCP/setup/SQLite 全绿；manifest identity/version 跨 Claude/Codex 锁定，installPath mutation safety 关闭；两轮 reviewer APPROVED。"
   commits:
+    - hash: "dfbe382"
+      date: "2026-07-19"
+      message: "[21-workbench] feat: add Claude marketplace release path"
+      files_changed: 7
+      specs_affected:
+        - change-2026-07-19-claude-marketplace (created; active)
+      milestones_affected:
+        - m2p6g-claude-marketplace (→ completed)
     - hash: "ae71422"
       date: "2026-07-19"
       message: "[21-workbench] feat: add native Codex activation adapter"
