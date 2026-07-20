@@ -1,0 +1,61 @@
+spec_id: "decision-project-028"
+type: decision
+state: draft
+intent:
+  summary: "Adopt Git v2 as durable semantic truth and retain SQLite for operational truth plus commit-keyed semantic caches"
+  detail: |
+    The completed architecture spikes support a split authority model. A strict
+    Git v2 semantic tree carries durable feature/spec/revision/evidence/anchor/
+    relation/provenance truth. SQLite remains canonical for operational state
+    and holds rebuildable semantic query caches keyed by repository identity,
+    commit SHA and derived semantic digest.
+
+    Stable identity-derived paths preserve useful native Git merge behavior.
+    Mutable global manifests and committed global digests are rejected as
+    collaboration hotspots. Branch commits are durable proposals; merged main
+    is shared semantic truth. Provenance uses collision-safe durable content
+    identity while SQLite integer IDs remain cache-local projections.
+
+    This decision is a review candidate only. Until explicitly promoted,
+    decision-project-014 remains active and SQLite remains canonical for all
+    semantic mutations.
+constraints:
+  - kind: must
+    rule: "Durable semantic entity paths derive from stable identity, while inventory and semantic digests derive from the selected Git tree or commit"
+  - kind: must
+    rule: "Every semantic read identifies its source ref and resolved commit; caches are isolated by repository, commit and semantic digest"
+  - kind: must
+    rule: "SQLite remains source of truth for sessions, hooks, events, queues, claims, leases, cadence, distillation runs and live projections"
+  - kind: must
+    rule: "A deterministic validator and CI enforce protocol and graph integrity independently of any PR skill"
+  - kind: must
+    rule: "Migration uses one reviewed authority cutover with writer freeze, parity proof, backup and rollback receipt"
+  - kind: must_not
+    rule: "Do not introduce semantic dual-write or silently union knowledge from different refs"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "git-semantic-store"
+  tags: [git, yaml, sqlite, cache, provenance, source-of-truth, architecture-review]
+provenance:
+  source_type: implementation_synthesis
+  confidence: 0.95
+  source_ref: "Lossless round-trip, real Git merge, and branch/ref cache spikes — 2026-07-19 to 2026-07-20"
+  produced_at: "2026-07-20"
+relations:
+  - target: "decision-project-014"
+    type: challenges
+    detail: "Would explicitly supersede SQLite semantic authority only if this draft is promoted after review."
+  - target: "contract-runtime-001"
+    type: constrained_by
+    detail: "The machine-level SQLite operational topology and canonical repository identity remain active."
+  - target: "intent-project-004"
+    type: implements
+anchors:
+  - file: "META/08-git-semantic-store/technical-review.md"
+  - file: "packages/core/src/experimental/git-semantic-store/index.ts"
+  - file: "packages/core/src/experimental/git-semantic-store/v2.ts"
+  - file: "packages/core/test/git-semantic-store.test.ts"
+  - file: "packages/core/test/git-semantic-merge-spike.test.ts"
+  - file: "packages/core/test/git-semantic-ref-cache.test.ts"

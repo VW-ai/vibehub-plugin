@@ -95,7 +95,29 @@ The v2 shape is not yet promoted: collision-safe durable provenance identity
 and branch/ref cache semantics remain open. Full evidence is recorded in
 `merge-ergonomics-spike.md`.
 
+## Branch/ref cache spike and review readiness — 2026-07-20
+
+The v2 follow-up closes the remaining technical research gates:
+
+- light reads resolve arbitrary refs to exact commits and use `git show`
+  without checkout mutation;
+- semantic diffs report stable spec identities between refs;
+- heavy queries build isolated SQLite caches keyed by repository identity,
+  commit SHA and derived semantic digest;
+- main and feature caches preserve their distinct KnowledgeService results;
+- cache hits reuse the same validated database;
+- v2 cache re-export reproduces the same semantic digest;
+- provenance durable IDs derive from canonical event content plus nullable spec
+  scope, independent of SQLite-local integer IDs.
+
+The architecture is now ready for technical review. `technical-review.md`
+contains the recommendation, requested decisions and autonomous overnight
+migration/rollback gates. `decision-project-028` is deliberately draft;
+`decision-project-014` remains active until explicit review promotion.
+
 # Canonical Specs
 
 - [intent-project-004] (draft) Explore Git/YAML for durable semantics while
   SQLite remains the approved canonical and operational store.
+- [decision-project-028] (draft) Adopt Git v2 for durable semantic truth while
+  retaining SQLite operational authority and commit-keyed semantic caches.

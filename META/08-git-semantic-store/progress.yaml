@@ -1,6 +1,6 @@
 progress:
-  completion: 0.65
-  status: in_progress
+  completion: 0.85
+  status: review
   milestones:
     - id: "lossless-round-trip"
       name: "SQLite semantic subset to YAML to clean SQLite"
@@ -10,15 +10,19 @@ progress:
       name: "Real Git merge matrix and reusable PR procedure boundary"
       status: completed
       evidence: "packages/core/test/git-semantic-merge-spike.test.ts and META/08-git-semantic-store/merge-ergonomics-spike.md — v1 global manifest hotspot rejected; v2 stable identity paths validated as the next candidate"
+    - id: "branch-ref-cache"
+      name: "Branch/ref light reads, commit-keyed SQLite cache and durable provenance identity"
+      status: completed
+      evidence: "packages/core/src/experimental/git-semantic-store/v2.ts and packages/core/test/git-semantic-ref-cache.test.ts — ref isolation, no-checkout reads, cache hits, query parity, v2 re-export digest equality and collision-safe provenance identity"
     - id: "architecture-decision"
       name: "Canonical storage architecture decision"
-      status: blocked
-      evidence: "Blocked until branch/ref cache semantics and collision-safe durable provenance identity are proven against the v2 candidate."
+      status: ready_for_review
+      evidence: "META/08-git-semantic-store/technical-review.md and draft decision-project-028"
     - id: "canonical-flip"
       name: "Git/YAML canonical write path"
       status: blocked
       evidence: "Current SQLite source-of-truth decisions remain active."
   next:
-    - "Prove branch/ref light reads and a commit-keyed local SQLite query cache using the v2 stable-identity/derived-index candidate."
-    - "Resolve collision-safe durable provenance identity for independently advancing branches."
+    - "Run technical review over decision-project-028 and the six requested decisions in technical-review.md."
+    - "After explicit promotion only, execute the autonomous migration gates with writer freeze, backup, parity proof and rollback receipt."
     - "Do not implement write-through or migration until an explicit architecture decision supersedes SQLite-only semantics."
