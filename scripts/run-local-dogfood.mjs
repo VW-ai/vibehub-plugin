@@ -68,6 +68,12 @@ try {
   assert.equal(firstInit.repo.id, secondInit.repo.id);
   assert.ok(secondInit.managedAssets.every((asset) => asset.status === "healthy"));
 
+  const setupApplied = JSON.parse(runCli(["setup", "apply", "--json"]));
+  assert.equal(setupApplied.ok, true, JSON.stringify(setupApplied));
+  assert.equal(setupApplied.activation.installed.state, "proven");
+  assert.equal(setupApplied.activation.connected.state, "not_proven");
+  assert.equal(setupApplied.activation.activated.state, "not_proven");
+
   const hookPayload = {
     session_id: "dogfood-session",
     cwd: repo,
@@ -75,15 +81,37 @@ try {
   };
   const startOutput = JSON.parse(runCli(["hook", "SessionStart"], JSON.stringify(hookPayload)));
   assert.match(startOutput.hookSpecificOutput.additionalContext, /register_scope/);
+  runCli(
+    ["hook", "UserPromptSubmit"],
+    JSON.stringify({
+      ...hookPayload,
+      hook_event_name: "UserPromptSubmit",
+      prompt_id: "dogfood-prompt",
+      prompt: "Exercise the real Live Shell dogfood.",
+    }),
+  );
+  const connectedSetup = JSON.parse(runCli(["setup", "status", "--json"]));
+  assert.equal(connectedSetup.activation.installed.state, "proven");
+  assert.equal(connectedSetup.activation.connected.state, "proven");
+  assert.equal(connectedSetup.activation.activated.state, "not_proven");
 
   const mcp = await import("../packages/mcp/dist/index.js");
-  const runtime = mcp.openRuntimeContext(repo, db, () => "2026-07-13T00:00:00.000Z");
+  const runtime = mcp.openRuntimeContext(repo, db, () => new Date().toISOString());
   let recorded;
   let retrieved;
   let distillation;
   try {
     const api = mcp.createCapabilities(runtime.context);
     assert.deepEqual(api.registerScope({ status: "dogfood", write: [{ glob: "README.md" }] }), { patterns: 1 });
+    runCli(
+      ["hook", "PostToolUse"],
+      JSON.stringify({
+        ...hookPayload,
+        hook_event_name: "PostToolUse",
+        tool_name: "Edit",
+        tool_input: { file_path: "README.md" },
+      }),
+    );
     recorded = api.dispatchKnowledge("kb.draft.apply", { idempotencyKey: "dogfood-record", specs: [{
       id: "context-dogfood", type: "context", summary: "Deterministic local dogfood fact",
       evidence: [{ sourceType: "dogfood", sourceRef: "dogfood:task", evidenceRef: "dogfood:task" }],
@@ -115,9 +143,18 @@ try {
   assert.equal(snapshot.repo.defaultBranch, "main");
 
   const core = await import("../packages/core/dist/index.js");
+  const runtimeService = await import("../packages/core/dist/runtime-service.js");
+  const managedAssets = await import("../packages/cli/dist/managed-assets.js");
   const appTransport = await import("../app/dist-bridge/bridge-dogfood.js");
-  const service = new core.RuntimeService({ dbPath: db });
-  const repoRef = core.resolveWorkbenchRepoRef(repo, "dogfood");
+  const service = new core.RuntimeService({
+    dbPath: db,
+    liveShellActivation: {
+      stateDir: path.dirname(db),
+      allowedAssetRoot: managedAssets.releaseAssetRoot(),
+      manifest: managedAssets.releaseAssetManifest(),
+    },
+  });
+  const repoRef = runtimeService.resolveLiveShellRepoRef(repo, "dogfood", "dogfood");
   const transportFetch = async (_input, init) => {
     try {
       const envelope = JSON.parse(String(init?.body ?? ""));
@@ -133,6 +170,40 @@ try {
   );
   const bridgeRead = await appBridge.getSnapshot(repoRef);
   assert.equal(bridgeRead.status, "ok");
+  const liveShellRead = await appBridge.getLiveShell(repoRef);
+  assert.equal(liveShellRead.status, "ok");
+  const liveShell = liveShellRead.data;
+  assert.deepEqual(liveShell.identity.data, repoRef);
+  assert.equal(liveShell.identity.data.repoRoot, fs.realpathSync(repo));
+  assert.equal(liveShell.identity.data.checkoutRoot, fs.realpathSync(repo));
+  assert.equal(liveShell.identity.data.host, "dogfood");
+  assert.equal(liveShell.activation.data.installed.state, "proven");
+  assert.equal(liveShell.activation.data.connected.state, "proven");
+  assert.equal(liveShell.activation.data.activated.state, "proven");
+  assert.ok(liveShell.activation.data.activated.evidence.some((item) => item.includes("dogfood-kb-draft-apply")));
+  assert.equal(liveShell.workspace.data.authorityModel, "beta_compatibility");
+  assert.equal(typeof liveShell.workspace.data.currentTask.id, "string");
+  assert.equal(liveShell.workspace.data.currentSession.id, hookPayload.session_id);
+  assert.equal(liveShell.workspace.data.currentSession.lifecycle, "active");
+  assert.ok(liveShell.workspace.data.declaredScope.some((scope) =>
+    scope.mode === "write" && scope.glob === "README.md"));
+  assert.ok(liveShell.workspace.data.observedFootprint.some((footprint) =>
+    footprint.path === "README.md" && footprint.access === "write"));
+  assert.ok(liveShell.workspace.data.timeline.length > 0);
+  const feedbackByRequest = new Map(liveShell.contextFeedback.data.flatMap((entry) => {
+    const evidence = entry.receipt.evidence.find((item) => item.source === "operation_result");
+    return evidence ? [[evidence.requestId, entry]] : [];
+  }));
+  assert.equal(feedbackByRequest.get("dogfood-kb-draft-apply")?.kind, "durable_mutation");
+  assert.equal(feedbackByRequest.get("dogfood-kb-draft-apply")?.receipt.outcome, "persisted");
+  assert.equal(feedbackByRequest.get("dogfood-kb-spec-search")?.kind, "retrieval");
+  assert.notEqual(feedbackByRequest.get("dogfood-kb-spec-search")?.receipt.outcome, "persisted");
+  const liveShellArtifact = process.env["VIBEHUB_DOGFOOD_LIVE_SHELL_JSON"];
+  if (liveShellArtifact) {
+    const artifactPath = path.resolve(liveShellArtifact);
+    fs.mkdirSync(path.dirname(artifactPath), { recursive: true });
+    fs.writeFileSync(artifactPath, `${JSON.stringify(liveShell, null, 2)}\n`);
+  }
   assert.throws(
     () => appTransport.dispatchWorkbenchEnvelope(
       { method: "getTaskPanel", request: repoRef }, repoRef, service,
@@ -169,6 +240,14 @@ try {
     distillation,
     snapshotTasks: snapshot.tasks.length,
     appBridgeStatus: bridgeRead.status,
+    liveShell: {
+      status: liveShellRead.status,
+      installed: liveShell.activation.data.installed.state,
+      connected: liveShell.activation.data.connected.state,
+      activated: liveShell.activation.data.activated.state,
+      contextKinds: [...new Set(liveShell.contextFeedback.data.map((entry) => entry.kind))],
+      artifact: liveShellArtifact ? path.resolve(liveShellArtifact) : null,
+    },
     stopDelivery: stopOutput.decision,
     doctor: doctor.healthy,
   }, null, 2));

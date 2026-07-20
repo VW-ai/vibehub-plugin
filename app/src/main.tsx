@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import type {
-  MapSnapshot,
+  LiveShellSnapshotV1,
   WorkbenchBridgeErrorStatus,
 } from "@vibehub/core/contracts";
 import "./tokens.css";
@@ -11,7 +11,7 @@ import { bridgeFromHost, requestInitialSnapshot } from "./workbench-host";
 
 type BootState =
   | { status: "loading" }
-  | { status: "ok"; snapshot: MapSnapshot }
+  | { status: "ok"; snapshot: LiveShellSnapshotV1 }
   | { status: WorkbenchBridgeErrorStatus; message: string };
 
 const TITLES: Record<WorkbenchBridgeErrorStatus, string> = {

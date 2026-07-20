@@ -6,7 +6,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import type { AdjudicationAction, AppliedIntervention, ConflictCardSnapshot, MapSnapshot, Task, TaskPanelSnapshot, Territory, WorkbenchBridge, WorkbenchIntervention, WorkbenchRepoRef } from "@vibehub/core/contracts";
+import type { AdjudicationAction, AppliedIntervention, ConflictCardSnapshot, LiveShellRepoRef, LiveShellSnapshotV1, MapSnapshot, Task, TaskPanelSnapshot, Territory, WorkbenchBridge, WorkbenchIntervention } from "@vibehub/core/contracts";
 import { highlightForLegend, highlightForTask, highlightForTerritory, type LegendKind } from "./derive";
 import { deriveInterventionNote, type InterventionReceiptNote } from "./receipt-note-derive";
 import { ConflictCard } from "./components/ConflictCard";
@@ -16,6 +16,9 @@ import { TaskPanel } from "./components/TaskPanel";
 import { TaskRail } from "./components/TaskRail";
 import { Titlebar } from "./components/Titlebar";
 import { Tooltip } from "./components/Tooltip";
+import { ActivationEvidenceStrip } from "./components/ActivationEvidenceStrip";
+import { ContextFeedbackDock } from "./components/ContextFeedbackDock";
+import { SectionEvidenceState } from "./components/SectionEvidenceState";
 
 const EMPTY_IDS = new Set<string>();
 const RAIL_MIN = 240;
@@ -32,6 +35,47 @@ type DetailError = {
 };
 type DetailTarget = { kind: "task" | "conflict"; id: string };
 type InterventionResponse = InterventionReceiptNote | string;
+
+const COVERAGE_LABELS = {
+  operation_request: "Operation request",
+  intervention_queue: "Intervention queue",
+  injection_claim: "Injection claim",
+  checkpoint: "Checkpoint",
+} as const;
+
+function WorkspaceEvidence({ shell }: { shell: LiveShellSnapshotV1 }) {
+  const workspace = shell.workspace.data;
+  if (!workspace) return <SectionEvidenceState section={shell.workspace} label="Workspace" />;
+  const reads = workspace.observedFootprint.filter((item) => item.access === "read").length;
+  const writes = workspace.observedFootprint.filter((item) => item.access === "write").length;
+  return <header className="workspace-evidence-bar">
+    <div className="workspace-facts">
+      <span><b>Task</b>{workspace.currentTask ? `${workspace.currentTask.title} · ${workspace.currentTask.state}` : "None observed"}</span>
+      <span><b>Session</b>{workspace.currentSession
+        ? `${workspace.currentSession.id} · ${workspace.currentSession.identity.agent} · ${workspace.currentSession.startedAt} · ${workspace.currentSession.lifecycle}`
+        : "None observed"}</span>
+      <span className="declared-scope"><b>Declared scope</b>{workspace.declaredScope.length === 0
+        ? "None registered"
+        : workspace.declaredScope.map((scope) => <code key={`${scope.mode}:${scope.glob}:${scope.label ?? ""}`}>
+            {scope.mode} · {scope.glob}{scope.label ? ` · ${scope.label}` : " · unlabeled"}
+          </code>)}</span>
+      <span><b>Observed</b>{reads} read · {writes} write</span>
+      <span><b>Timeline</b>{workspace.timeline.length}</span>
+      <span><b>Receipts</b>{workspace.receipts.length}</span>
+    </div>
+    <div className="coverage-facts" aria-label="Receipt coverage">
+      {(Object.keys(COVERAGE_LABELS) as Array<keyof typeof COVERAGE_LABELS>).map((source) => {
+        const coverage = workspace.receiptCoverage[source];
+        return <span key={source} data-availability={coverage.availability}>
+          <b>{COVERAGE_LABELS[source]}</b>
+          <em className="evidence-secondary">{coverage.availability} · {coverage.freshness}</em>
+          {coverage.recovery.map((item) => <small className="evidence-secondary" key={`${item.code}:${item.instruction}`}>{item.instruction}</small>)}
+        </span>;
+      })}
+    </div>
+    <SectionEvidenceState section={shell.workspace} label="Workspace" />
+  </header>;
+}
 
 function interventionAccepted(receipt: AppliedIntervention): boolean {
   return receipt.outcome === "applied" || receipt.outcome === "already_applied";
@@ -52,7 +96,7 @@ function loadRailWidth(): number {
 }
 
 /** Fixture-free production surface. Every detail and action crosses the host bridge. */
-export function WorkbenchMap({ snapshot, bridge, repo }: { snapshot: MapSnapshot; bridge: WorkbenchBridge; repo: WorkbenchRepoRef }) {
+function MapController({ snapshot, shell, onShellChange, bridge, repo }: { snapshot: MapSnapshot; shell: LiveShellSnapshotV1; onShellChange: (shell: LiveShellSnapshotV1) => void; bridge: WorkbenchBridge; repo: LiveShellRepoRef }) {
   const [current, setCurrent] = useState(snapshot);
   const [hoverTask, setHoverTask] = useState<Task | null>(null);
   const [hoverTerritory, setHoverTerritory] = useState<Territory | null>(null);
@@ -169,20 +213,28 @@ export function WorkbenchMap({ snapshot, bridge, repo }: { snapshot: MapSnapshot
   const refreshAccepted = async (generation: number, target: DetailTarget) => {
     if (target.kind === "task") {
       const [snapshotResult, detailResult] = await Promise.all([
-        bridge.getSnapshot(repo),
+        bridge.getLiveShell(repo),
         bridge.getTaskPanel({ ...repo, taskId: target.id }),
       ]);
       if (!ownsRequest(generation, target)) return;
-      if (snapshotResult.status === "ok") setCurrent(snapshotResult.data);
+      if (snapshotResult.status === "ok") {
+        onShellChange(snapshotResult.data);
+        const map = snapshotResult.data.workspace.data?.map;
+        if (map) setCurrent(map);
+      }
       if (detailResult.status === "ok") setPanel(detailResult.data);
       return;
     }
     const [snapshotResult, detailResult] = await Promise.all([
-      bridge.getSnapshot(repo),
+      bridge.getLiveShell(repo),
       bridge.getConflictDetail({ ...repo, conflictId: target.id }),
     ]);
     if (!ownsRequest(generation, target)) return;
-    if (snapshotResult.status === "ok") setCurrent(snapshotResult.data);
+    if (snapshotResult.status === "ok") {
+      onShellChange(snapshotResult.data);
+      const map = snapshotResult.data.workspace.data?.map;
+      if (map) setCurrent(map);
+    }
     if (detailResult.status === "ok") setConflict(detailResult.data);
   };
 
@@ -211,6 +263,9 @@ export function WorkbenchMap({ snapshot, bridge, repo }: { snapshot: MapSnapshot
 
   return <div className="window" data-source="workbench-bridge">
     <Titlebar snapshot={current} snapshotNames={[]} activeSnapshot="" onSnapshotChange={() => undefined} onConflictOpen={(id, opener) => void openConflict(id, opener)} />
+    <ActivationEvidenceStrip shell={shell} />
+    <section className="workspace-region" aria-label="Workspace evidence">
+    <WorkspaceEvidence shell={shell} />
     <div
       className={`main${railDragging ? " rail-resizing" : ""}`}
       style={{ "--rail-w": `${railWidth}px` } as CSSProperties}
@@ -288,6 +343,25 @@ export function WorkbenchMap({ snapshot, bridge, repo }: { snapshot: MapSnapshot
         })()}>Ignore this pair</button>}
         <button type="button" onClick={closeDetail}>Close</button>
       </aside></div>}
-    </div><Tooltip />
+    </div></section><ContextFeedbackDock shell={shell} /><Tooltip />
+  </div>;
+}
+
+/** Sole live-shell interaction controller. It never synthesizes workspace data. */
+export function WorkbenchMap({ snapshot, bridge, repo }: { snapshot: LiveShellSnapshotV1; bridge: WorkbenchBridge; repo: LiveShellRepoRef }) {
+  const [shell, setShell] = useState(snapshot);
+  const map = shell.workspace.data?.map ?? null;
+  if (map) return <MapController snapshot={map} shell={shell} onShellChange={setShell} bridge={bridge} repo={repo} />;
+  return <div className="window live-shell-empty" data-source="workbench-bridge">
+    <header className="titlebar" aria-label="Workbench titlebar">
+      <div className="lights" aria-hidden="true"><i /><i /><i /></div><span className="wordmark">VibeHub</span>
+    </header>
+    <ActivationEvidenceStrip shell={shell} />
+    <main className="workspace-unavailable" aria-label="Workspace evidence">
+      <h1>Workspace evidence unavailable</h1>
+      <p>No territory map was returned for this checkout. Nothing has been synthesized.</p>
+      <SectionEvidenceState section={shell.workspace} label="Workspace" />
+    </main>
+    <ContextFeedbackDock shell={shell} /><Tooltip />
   </div>;
 }

@@ -7,3 +7,4 @@ export * from "./workbench-bridge.js";
 export * from "./kb-types.js";
 export * from "./workflow-receipt.js";
 export * from "./workflow-receipt-projection.js";
+export * from "./live-shell.js";

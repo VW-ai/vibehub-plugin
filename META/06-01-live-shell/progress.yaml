@@ -1,19 +1,19 @@
 progress:
-  completion: 0.12
-  status: planning
+  completion: 0.88
+  status: active
   milestones:
     - id: "activation-view"
       name: "Project activation and exact-checkout status"
-      status: planned
-      evidence: null
+      status: completed
+      evidence: "LiveShellSnapshotV1 and the production Activation evidence strip expose canonical repoRoot, exact checkoutRoot, host, and separately proven Installed/Connected/Activated states with typed recovery."
     - id: "live-workspace"
       name: "Live Task, Run, session and scope workspace"
-      status: planned
-      evidence: null
+      status: completed
+      evidence: "The beta-compatibility workspace projects current task/session, canonical scope patterns, observed footprint, timeline, receipts, coverage and the existing TaskRail/territory/detail interactions without storage DTO leakage."
     - id: "context-feedback"
       name: "Read, captured, persisted and pending context feedback"
-      status: planned
-      evidence: null
+      status: completed
+      evidence: "The Context Feedback dock separates retrieval, operational capture, explicit proposal and durable mutation, preserving raw receipt outcomes and section availability/freshness/recovery."
   next:
-    - "Start immediately after the public repository is created and local dogfood begins."
-    - "Define the stable projection contract before adding new UI state."
+    - "Persist canonical injection-claim, checkpoint and handoff receipt sources before upgrading their coverage from unavailable or partial."
+    - "Continue daily dogfood against LiveShellSnapshotV1; keep alternate storage experiments behind this projection boundary."

@@ -5,7 +5,10 @@ import type {
   TaskPanelSnapshot,
   WorkbenchIntervention,
   WorkbenchRepoRef,
+  LiveShellRepoRef,
+  LiveShellSnapshotV1,
 } from "@vibehub/core/contracts";
+import { validateWorkflowReceiptStructure } from "@vibehub/core/contracts";
 
 type RecordValue = Record<string, unknown>;
 const record = (value: unknown): value is RecordValue =>
@@ -28,6 +31,12 @@ const TASK_STATES = ["queued", "running", "waiting", "stalled", "done"] as const
 export function isRepoRef(value: unknown): value is WorkbenchRepoRef {
   return record(value) && nonEmpty(value.repoKey) && nonEmpty(value.repoRoot)
     && value.repoRoot.startsWith("/");
+}
+
+export function isLiveShellRepoRef(value: unknown): value is LiveShellRepoRef {
+  return record(value) && exactKeys(value, ["repoKey", "repoRoot", "checkoutRoot", "host"])
+    && isRepoRef(value) && nonEmpty(value.checkoutRoot) && value.checkoutRoot.startsWith("/")
+    && nonEmpty(value.host);
 }
 
 export function isTaskPanelRequest(value: unknown): boolean {
@@ -211,7 +220,7 @@ export function isAppliedIntervention(value: unknown): value is AppliedIntervent
 
 const ERROR_STATUSES = [
   "db_missing", "repo_uninitialized", "unsynced", "not_found",
-  "evidence_unavailable", "bridge_unavailable", "internal_error",
+  "evidence_unavailable", "idempotency_conflict", "bridge_unavailable", "internal_error",
 ] as const;
 const WARNING_CODES = ["git_unavailable", "transcript_unavailable"] as const;
 
@@ -223,4 +232,99 @@ export function isBridgeResult(value: unknown, dataGuard: (data: unknown) => boo
         && oneOf(warning.code, WARNING_CODES) && nonEmpty(warning.message)));
   }
   return oneOf(value.status, ERROR_STATUSES) && nonEmpty(value.message);
+}
+
+const AVAILABILITY = ["available", "partial", "unavailable"] as const;
+const FRESHNESS = ["live", "stale", "unknown"] as const;
+const RECOVERY_CODES = [
+  "initialize_runtime", "sync_repository", "configure_activation", "inspect_activation",
+  "retry_read", "start_or_select_task", "inspect_receipt_coverage",
+] as const;
+
+function exactKeys(value: RecordValue, keys: readonly string[]): boolean {
+  const actual = Object.keys(value).sort();
+  return actual.length === keys.length && [...keys].sort().every((key, index) => key === actual[index]);
+}
+
+function isRecovery(value: unknown): boolean {
+  return record(value) && exactKeys(value, ["code", "instruction"])
+    && oneOf(value.code, RECOVERY_CODES) && nonEmpty(value.instruction);
+}
+
+function isSection(value: unknown, dataGuard: (data: unknown) => boolean): boolean {
+  return record(value) && exactKeys(value, ["availability", "freshness", "data", "recovery"])
+    && oneOf(value.availability, AVAILABILITY) && oneOf(value.freshness, FRESHNESS)
+    && Array.isArray(value.recovery) && value.recovery.every(isRecovery)
+    && (value.data === null ? value.availability !== "available" : dataGuard(value.data));
+}
+
+function isActivationProof(value: unknown): boolean {
+  return record(value) && exactKeys(value, ["state", "evidence"])
+    && oneOf(value.state, ["proven", "not_proven", "blocked"])
+    && stringArray(value.evidence);
+}
+
+function isActivation(value: unknown): boolean {
+  return record(value) && exactKeys(value, ["installed", "connected", "activated"])
+    && isActivationProof(value.installed) && isActivationProof(value.connected)
+    && isActivationProof(value.activated);
+}
+
+function isReceipt(value: unknown): boolean {
+  return validateWorkflowReceiptStructure(value).ok;
+}
+
+function isSession(value: unknown): boolean {
+  return record(value) && exactKeys(value, ["id", "startedAt", "endedAt", "lifecycle", "endReason", "identity"])
+    && nonEmpty(value.id) && nonEmpty(value.startedAt) && (value.endedAt === null || string(value.endedAt))
+    && oneOf(value.lifecycle, ["active", "ended"])
+    && (value.endReason === null || oneOf(value.endReason, ["context_limit", "user_ended", "completed"]))
+    && record(value.identity) && string(value.identity.agent)
+    && finiteNumber(value.identity.sessionOrdinal) && finiteNumber(value.identity.sessionCount)
+    && optional(value.identity.previousEndedAt, string)
+    && optional(value.identity.previousEndReason, (item) => oneOf(item, ["context_limit", "user_ended", "completed"]));
+}
+
+function isCoverage(value: unknown): boolean {
+  if (!record(value) || !exactKeys(value, ["operation_request", "intervention_queue", "injection_claim", "checkpoint"])) return false;
+  return Object.values(value).every((section) => isSection(section, (data) =>
+    record(data) && exactKeys(data, ["detail"]) && nonEmpty(data.detail)));
+}
+
+function isDeclaredScope(value: unknown): boolean {
+  return record(value) && exactKeys(value, ["mode", "glob", "label"])
+    && oneOf(value.mode, ["read", "write"]) && nonEmpty(value.glob)
+    && (value.label === null || nonEmpty(value.label));
+}
+
+function isWorkspace(value: unknown): boolean {
+  return record(value) && exactKeys(value, [
+    "authorityModel", "map", "currentTask", "currentSession", "declaredScope",
+    "observedFootprint", "timeline", "receipts", "receiptCoverage",
+  ]) && value.authorityModel === "beta_compatibility"
+    && (value.map === null || isMapSnapshot(value.map))
+    && (value.currentTask === null || isTask(value.currentTask))
+    && (value.currentSession === null || isSession(value.currentSession))
+    && Array.isArray(value.declaredScope) && value.declaredScope.every(isDeclaredScope)
+    && Array.isArray(value.observedFootprint) && value.observedFootprint.every((item) =>
+      record(item) && exactKeys(item, ["path", "access", "observedAt"])
+        && nonEmpty(item.path) && oneOf(item.access, ["read", "write"]) && nonEmpty(item.observedAt))
+    && Array.isArray(value.timeline) && value.timeline.every(isTimelineEvent)
+    && Array.isArray(value.receipts) && value.receipts.every(isReceipt)
+    && isCoverage(value.receiptCoverage);
+}
+
+function isContextEntry(value: unknown): boolean {
+  return record(value) && exactKeys(value, ["kind", "receipt"])
+    && oneOf(value.kind, ["retrieval", "operational_capture", "explicit_proposal", "durable_mutation"])
+    && isReceipt(value.receipt);
+}
+
+export function isLiveShellSnapshot(value: unknown): value is LiveShellSnapshotV1 {
+  return record(value) && exactKeys(value, ["schemaVersion", "capturedAt", "identity", "activation", "workspace", "contextFeedback"])
+    && value.schemaVersion === 1 && nonEmpty(value.capturedAt)
+    && isSection(value.identity, isLiveShellRepoRef)
+    && isSection(value.activation, isActivation)
+    && isSection(value.workspace, isWorkspace)
+    && isSection(value.contextFeedback, (data) => Array.isArray(data) && data.every(isContextEntry));
 }

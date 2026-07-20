@@ -1,6 +1,7 @@
 import type { ConflictCardSnapshot } from "./conflict-types.js";
 import type { MapSnapshot } from "./map-types.js";
 import type { TaskPanelSnapshot } from "./panel-types.js";
+import type { LiveShellRepoRef, LiveShellSnapshotV1 } from "./live-shell.js";
 
 /** Explicit repository identity; bridge calls never depend on process cwd. */
 export interface WorkbenchRepoRef {
@@ -49,6 +50,9 @@ export interface AppliedIntervention {
 
 /** Wire contract only. Native/development implementations are later tasks. */
 export interface WorkbenchBridge {
+  getLiveShell(
+    repo: LiveShellRepoRef,
+  ): Promise<WorkbenchBridgeResult<LiveShellSnapshotV1>>;
   getSnapshot(
     repo: WorkbenchRepoRef,
   ): Promise<WorkbenchBridgeResult<MapSnapshot>>;

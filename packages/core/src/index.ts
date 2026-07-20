@@ -5,6 +5,7 @@ export * from "./contract/install-types.js";
 export * from "./contract/kb-types.js";
 export * from "./contract/workbench-bridge.js";
 export * from "./contract/workflow-receipt.js";
+export * from "./contract/live-shell.js";
 export {
   defaultDbPath,
   openDb,
@@ -118,3 +119,4 @@ export {
   type CheckpointTurnInput,
 } from "./knowledge-checkpoint.js";
 export * from "./workflow-receipt-projectors.js";
+export * from "./live-shell-projector.js";

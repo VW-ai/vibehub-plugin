@@ -7,10 +7,13 @@ import {
   isConflictDetailRequest,
   isIntervention,
   isMapSnapshot,
+  isLiveShellRepoRef,
+  isLiveShellSnapshot,
   isRepoRef,
   isTaskPanelSnapshot,
   isTaskPanelRequest,
 } from "../../src/bridge-validation";
+import { liveShellBaseline } from "../fixtures";
 
 const repo = { repoKey: "repo", repoRoot: "/repo" };
 const task = {
@@ -49,10 +52,36 @@ describe("bridge runtime validation", () => {
   it("validates repo refs and method-specific ids", () => {
     expect(isRepoRef(repo)).toBe(true);
     expect(isRepoRef({ repoKey: "", repoRoot: "relative" })).toBe(false);
+    expect(isLiveShellRepoRef({ ...repo, checkoutRoot: "/repo/worktrees/live", host: "codex" })).toBe(true);
+    expect(isLiveShellRepoRef({ ...repo, checkoutRoot: "relative", host: "" })).toBe(false);
     expect(isTaskPanelRequest({ ...repo, taskId: "task" })).toBe(true);
     expect(isTaskPanelRequest({ ...repo, taskId: "" })).toBe(false);
     expect(isConflictDetailRequest({ ...repo, conflictId: "conflict" })).toBe(true);
     expect(isConflictDetailRequest({ ...repo })).toBe(false);
+  });
+
+  it("strictly validates live shell sections, receipts, and exact checkout identity", () => {
+    expect(isLiveShellSnapshot(liveShellBaseline)).toBe(true);
+    expect(isLiveShellSnapshot({ ...liveShellBaseline, synthetic: true })).toBe(false);
+    expect(isLiveShellSnapshot({
+      ...liveShellBaseline,
+      identity: { ...liveShellBaseline.identity, data: { ...liveShellBaseline.identity.data!, checkoutRoot: "relative" } },
+    })).toBe(false);
+    expect(isLiveShellSnapshot({
+      ...liveShellBaseline,
+      identity: { ...liveShellBaseline.identity, data: { ...liveShellBaseline.identity.data!, unexpected: "field" } },
+    })).toBe(false);
+    expect(isLiveShellSnapshot({
+      ...liveShellBaseline,
+      contextFeedback: { ...liveShellBaseline.contextFeedback, data: [{ ...liveShellBaseline.contextFeedback.data![0], kind: "invented" }] },
+    })).toBe(false);
+    expect(isLiveShellSnapshot({
+      ...liveShellBaseline,
+      workspace: {
+        ...liveShellBaseline.workspace,
+        data: { ...liveShellBaseline.workspace.data!, declaredScope: [{ mode: "write", territoryId: "app", label: "legacy DTO" }] },
+      },
+    })).toBe(false);
   });
 
   it("validates every intervention discriminant and required field", () => {
@@ -79,6 +108,7 @@ describe("bridge runtime validation", () => {
     expect(isBridgeResult({ status: "ok", data: receipt }, isAppliedIntervention)).toBe(true);
     expect(isBridgeResult({ status: "ok", data: {} }, isAppliedIntervention)).toBe(false);
     expect(isBridgeResult({ status: "internal_error", message: "bad" }, isMapSnapshot)).toBe(true);
+    expect(isBridgeResult({ status: "idempotency_conflict", message: "request reused" }, isMapSnapshot)).toBe(true);
     expect(isBridgeResult({ status: "internal_error" }, isMapSnapshot)).toBe(false);
   });
 

@@ -78,7 +78,7 @@ tree:
           - id: "06-01-live-shell"
             name: "Live Shell"
             type: feature
-            lifecycle: planning
+            lifecycle: active
             owner: Wayne
           - id: "06-02-territory-task-ux"
             name: "Territory and Task UX"

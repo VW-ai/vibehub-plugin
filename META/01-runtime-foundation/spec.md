@@ -10,6 +10,8 @@
 - SQLite lifecycle、schema migration 与 repo/worktree identity
 - versioned operation contracts、shared dispatcher、typed receipts
 - hook/event ingestion、runtime state、injection queue 与 projection/read models
+- browser-safe `LiveShellSnapshotV1` projection，按 section 独立表达
+  availability、freshness 与 typed recovery
 - 无 App、无 daemon、无云服务时仍完整工作
 
 ## Non-goals
@@ -32,3 +34,5 @@
 - `packages/mcp/src/`
 - `packages/core/src/db.ts`
 - `packages/core/src/workflow-receipt-projectors.ts`
+- `packages/core/src/live-shell-projector.ts`
+- `packages/core/src/contract/live-shell.ts`

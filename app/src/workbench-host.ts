@@ -2,10 +2,11 @@ import type {
   AppliedIntervention,
   ConflictCardSnapshot,
   MapSnapshot,
+  LiveShellRepoRef,
+  LiveShellSnapshotV1,
   TaskPanelSnapshot,
   WorkbenchBridge,
   WorkbenchBridgeResult,
-  WorkbenchRepoRef,
 } from "@vibehub/core/contracts";
 import {
   isAppliedIntervention,
@@ -14,6 +15,8 @@ import {
   isConflictCardSnapshot,
   isConflictDetailRequest,
   isMapSnapshot,
+  isLiveShellRepoRef,
+  isLiveShellSnapshot,
   isRepoRef,
   isTaskPanelRequest,
   isTaskPanelSnapshot,
@@ -21,7 +24,7 @@ import {
 
 export interface WorkbenchHostConfig {
   endpoint: string;
-  repo: WorkbenchRepoRef;
+  repo: LiveShellRepoRef;
 }
 
 declare global {
@@ -69,9 +72,10 @@ async function call<T>(
 export function bridgeFromHost(
   host: WorkbenchHostConfig | undefined,
   fetchImpl: typeof fetch = globalThis.fetch,
-): { bridge: WorkbenchBridge; repo: WorkbenchRepoRef } | null {
-  if (!host || !nonEmptyEndpoint(host.endpoint) || !isRepoRef(host.repo)) return null;
+): { bridge: WorkbenchBridge; repo: LiveShellRepoRef } | null {
+  if (!host || !nonEmptyEndpoint(host.endpoint) || !isLiveShellRepoRef(host.repo)) return null;
   const bridge: WorkbenchBridge = {
+    getLiveShell: (repo) => call<LiveShellSnapshotV1>(host.endpoint, "getLiveShell", repo, isLiveShellRepoRef, isLiveShellSnapshot, fetchImpl),
     getSnapshot: (repo) => call<MapSnapshot>(host.endpoint, "getSnapshot", repo, isRepoRef, isMapSnapshot, fetchImpl),
     getTaskPanel: (request) =>
       call<TaskPanelSnapshot>(host.endpoint, "getTaskPanel", request, isTaskPanelRequest, isTaskPanelSnapshot, fetchImpl),
@@ -96,7 +100,7 @@ const nonEmptyEndpoint = (value: unknown): value is string => typeof value === "
 
 export async function requestInitialSnapshot(
   host: WorkbenchHostConfig | undefined,
-): Promise<WorkbenchBridgeResult<MapSnapshot>> {
+): Promise<WorkbenchBridgeResult<LiveShellSnapshotV1>> {
   const connected = bridgeFromHost(host);
   if (!connected) {
     return {
@@ -105,5 +109,5 @@ export async function requestInitialSnapshot(
         "No native workbench host is connected. Open this build from the VibeHub app, or use the configured loopback development host.",
     };
   }
-  return connected.bridge.getSnapshot(connected.repo);
+  return connected.bridge.getLiveShell(connected.repo);
 }

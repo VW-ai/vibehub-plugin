@@ -3,6 +3,7 @@ import type {
   AppliedIntervention,
   ConflictCardSnapshot,
   MapSnapshot,
+  LiveShellSnapshotV1,
   TaskPanelSnapshot,
   WorkbenchBridgeResult,
 } from "@vibehub/core/contracts";
@@ -10,18 +11,20 @@ import type { WorkbenchHostConfig } from "../src/workbench-host";
 import {
   conflictOsmRedDiagnosed,
   panelForTask,
+  liveShellBaseline,
   v8Baseline,
 } from "../test/fixtures";
 
 const HOST_ENDPOINT = "/__production-host";
 const HOST: WorkbenchHostConfig = {
   endpoint: HOST_ENDPOINT,
-  repo: { repoKey: "production-e2e", repoRoot: "/tmp/production-e2e" },
+  repo: { repoKey: "production-e2e", repoRoot: "/tmp/production-e2e", checkoutRoot: "/tmp/production-e2e/worktrees/live-shell", host: "codex" },
 };
 
 type MaybePromise<T> = T | Promise<T>;
 
 export interface ProductionHostHandlers {
+  getLiveShell?: () => MaybePromise<WorkbenchBridgeResult<LiveShellSnapshotV1>>;
   getSnapshot?: () => MaybePromise<WorkbenchBridgeResult<MapSnapshot>>;
   getTaskPanel?: (
     taskId: string,
@@ -48,7 +51,15 @@ export async function installProductionHost(
       request?: { taskId?: string; conflictId?: string };
     };
     let result: unknown;
-    if (envelope.method === "getSnapshot") {
+    if (envelope.method === "getLiveShell") {
+      if (handlers.getLiveShell) result = await handlers.getLiveShell();
+      else if (handlers.getSnapshot) {
+        const mapResult = await handlers.getSnapshot();
+        result = mapResult.status === "ok"
+          ? { status: "ok", data: { ...liveShellBaseline, workspace: { ...liveShellBaseline.workspace, data: { ...liveShellBaseline.workspace.data!, map: mapResult.data } } } }
+          : mapResult;
+      } else result = { status: "ok", data: liveShellBaseline };
+    } else if (envelope.method === "getSnapshot") {
       result = await (handlers.getSnapshot?.() ?? { status: "ok", data: v8Baseline });
     } else if (envelope.method === "getTaskPanel") {
       const taskId = envelope.request?.taskId ?? "";
@@ -63,7 +74,7 @@ export async function installProductionHost(
         status: "ok",
         data: conflictOsmRedDiagnosed,
       });
-    } else {
+    } else if (envelope.method === "applyIntervention") {
       result = await (handlers.applyIntervention?.() ?? {
         status: "ok",
         data: {
@@ -74,6 +85,8 @@ export async function installProductionHost(
           acceptedAt: v8Baseline.capturedAt,
         },
       });
+    } else {
+      result = { status: "internal_error", message: `Unknown bridge method ${envelope.method}` };
     }
     await route.fulfill({
       status: 200,

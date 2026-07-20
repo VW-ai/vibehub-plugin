@@ -2,6 +2,8 @@ import type {
   AppliedIntervention,
   ConflictCardSnapshot,
   MapSnapshot,
+  LiveShellRepoRef,
+  LiveShellSnapshotV1,
   TaskPanelSnapshot,
   WorkbenchIntervention,
   WorkbenchRepoRef,
@@ -13,12 +15,15 @@ import {
   isConflictCardSnapshot,
   isConflictDetailRequest,
   isMapSnapshot,
+  isLiveShellRepoRef,
+  isLiveShellSnapshot,
   isRepoRef,
   isTaskPanelRequest,
   isTaskPanelSnapshot,
 } from "./bridge-validation";
 
 export interface BridgeRuntime {
+  readLiveShell(repo: LiveShellRepoRef): unknown;
   readWorkbenchSnapshot(repo: WorkbenchRepoRef): unknown;
   readTaskPanel(repo: WorkbenchRepoRef, taskId: string): unknown;
   readConflictDetail(repo: WorkbenchRepoRef, conflictId: string): unknown;
@@ -28,26 +33,33 @@ export interface BridgeRuntime {
 /** Shared Vite/dogfood wire dispatcher: validate request, dispatch, validate result. */
 export function dispatchWorkbenchEnvelope(
   envelope: unknown,
-  configuredRepo: WorkbenchRepoRef,
+  configuredRepo: LiveShellRepoRef,
   service: BridgeRuntime,
 ): unknown {
   if (typeof envelope !== "object" || envelope === null || Array.isArray(envelope)) {
     throw new Error("malformed bridge envelope");
   }
   const { method, request } = envelope as Record<string, unknown>;
-  const validRequest = method === "getSnapshot" ? isRepoRef(request)
+  const validRequest = method === "getLiveShell" ? isLiveShellRepoRef(request)
+    : method === "getSnapshot" ? isRepoRef(request)
     : method === "getTaskPanel" ? isTaskPanelRequest(request)
       : method === "getConflictDetail" ? isConflictDetailRequest(request)
         : method === "applyIntervention" ? isApplyInterventionRequest(request)
           : false;
   if (!validRequest || !isRepoRef(request)) throw new Error("invalid method-specific bridge request");
-  if (request.repoRoot !== configuredRepo.repoRoot || request.repoKey !== configuredRepo.repoKey) {
+  if (request.repoRoot !== configuredRepo.repoRoot || request.repoKey !== configuredRepo.repoKey
+    || (method === "getLiveShell" && (!isLiveShellRepoRef(request)
+      || request.checkoutRoot !== configuredRepo.checkoutRoot || request.host !== configuredRepo.host))) {
     throw new Error("bridge repository mismatch");
   }
 
   let result: unknown;
   let guard: (value: unknown) => boolean;
   switch (method) {
+    case "getLiveShell":
+      result = service.readLiveShell(configuredRepo);
+      guard = isLiveShellSnapshot;
+      break;
     case "getSnapshot":
       result = service.readWorkbenchSnapshot(configuredRepo);
       guard = isMapSnapshot;
@@ -71,6 +83,6 @@ export function dispatchWorkbenchEnvelope(
   }
   if (!isBridgeResult(result, guard)) throw new Error("core returned a malformed method-specific bridge response");
   return result as
-    | { status: "ok"; data: MapSnapshot | TaskPanelSnapshot | ConflictCardSnapshot | AppliedIntervention }
+    | { status: "ok"; data: LiveShellSnapshotV1 | MapSnapshot | TaskPanelSnapshot | ConflictCardSnapshot | AppliedIntervention }
     | { status: string; message: string };
 }

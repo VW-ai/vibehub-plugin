@@ -161,6 +161,7 @@ export function installFixtureByName(name: string): InstallSnapshot | null {
 }
 
 export { menubarQuiet, menubarStale, menubarOverload, menubarFlood };
+export { identityRecoveryLiveShell, liveShellBaseline, mappedPartialLiveShell, unavailableLiveShell } from "./live-shell";
 
 /**
  * Menubar-route fixtures (m5, S4) — plain MapSnapshots keyed by the approved
