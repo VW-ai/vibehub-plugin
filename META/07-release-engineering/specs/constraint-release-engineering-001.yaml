@@ -1,0 +1,36 @@
+spec_id: "constraint-release-engineering-001"
+type: constraint
+state: active
+intent:
+  summary: "A release is ready only when both real hosts consume a self-contained installed artifact in isolation"
+  detail: |
+    Unit tests and source-tree smoke tests are necessary but insufficient. The
+    release gate must exercise actual marketplace ingestion and installed
+    runtime behavior. Public distribution also requires full-history secret
+    scanning and fresh-clone install verification.
+constraints:
+  - kind: must
+    rule: "Claude and Codex plugin name/version must remain aligned"
+  - kind: must
+    rule: "Artifacts must be self-contained and stay within declared file-count and size budgets"
+  - kind: must
+    rule: "Public release must pass history scanning and fresh-clone installation"
+indexing:
+  type: constraint
+  priority: P0
+  layer: feature
+  domain: "release-engineering"
+  tags: [release, artifact, real-host, isolation, public]
+provenance:
+  source_type: migration_synthesis
+  confidence: 1.0
+  source_ref: "Current release scripts and legacy M2 productionization evidence"
+  produced_at: "2026-07-19"
+relations:
+  - target: "change-2026-07-19-claude-marketplace"
+    type: enforced_by
+  - target: "change-2026-07-18-codex-activation-parity"
+    type: enforced_by
+anchors:
+  - file: "scripts/verify-plugin-artifact.mjs"
+  - file: "scripts/verify-codex-plugin.mjs"

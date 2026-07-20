@@ -1,0 +1,12 @@
+progress:
+  completion: 1.0
+  status: completed
+  milestones:
+    - id: "m1-hooks"
+      name: "Claude lifecycle hooks and delivery protocol"
+      status: completed
+      evidence: "Lifecycle hook matrix, Stop wake-up and SessionStart protocol implemented and tested."
+    - id: "m2-marketplace"
+      name: "Self-contained Claude marketplace artifact"
+      status: completed
+      evidence: "Real isolated Claude CLI add/install validates installed hooks, MCP, setup and SQLite."

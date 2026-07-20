@@ -1,0 +1,12 @@
+progress:
+  completion: 0.87
+  status: active
+  milestones:
+    - id: "m1-skill-spine"
+      name: "Query/ingest/distill skill intelligence spine"
+      status: completed
+      evidence: "Six workflow skills use shared stdlib, contracts and deterministic CLI/MCP operations."
+    - id: "m2-dogfood-quality"
+      name: "Real-project retrieval and settlement quality"
+      status: in_progress
+      evidence: "Mechanics and gates are implemented; daily dogfood will drive methodology refinement."

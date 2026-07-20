@@ -1,0 +1,16 @@
+progress:
+  completion: 0.78
+  status: active
+  milestones:
+    - id: "m1-headless-beta"
+      name: "可独立使用的双宿主 headless runtime"
+      status: completed
+      evidence: "Claude/Codex 共用 SQLite、skills、MCP、CLI 与 receipts；隔离 artifact gates 已通过。"
+    - id: "m2-public-beta"
+      name: "公开仓库与真实项目 dogfood"
+      status: in_progress
+      evidence: "独立仓库迁移与 plugin-centric META 正在收口；真实宿主交互式 dogfood 待执行。"
+    - id: "m3-visible-product"
+      name: "可日常打开的 Workbench App"
+      status: planned
+      evidence: "现有 App 有 production controller 与真实 SQLite projection，待建立稳定 live shell。"

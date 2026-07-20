@@ -1,0 +1,45 @@
+spec_id: "intent-workbench-003"
+type: intent
+state: active
+intent:
+  summary: "周期性 knowledge checkpoint 检查尚未沉淀的 durable context；hook 只负责 task-scoped cadence"
+  detail: |
+    用户反馈表明，agent 可能讨论并采纳重要 intent/decision，却没有执行 knowledge
+    write。Checkpoint 每隔若干有效 user turns 注入短提醒，要求 agent 回看自
+    上次成功写入后的 task-scoped 对话，判断是否出现新的 durable semantics。
+
+    Hook 只实现 cadence、prompt-id dedupe、高水位与成功 canonical write 后重置。
+    是否需要写、如何分类、去重和 placement 继续由模型 + ingest skill 决定。
+    没有 durable change 时继续工作，不制造空记录。
+constraints:
+  - kind: must
+    rule: "Checkpoint 只能机械决定何时提醒；语义判断与写入必须由模型和 ingest skill 完成"
+  - kind: must
+    rule: "Cadence 必须按 task scope 计算，并仅由成功 canonical knowledge write 重置"
+  - kind: must_not
+    rule: "不得在 hook 中解析 transcript、估算 token 或实现语义分类器"
+indexing:
+  type: intent
+  priority: P0
+  layer: feature
+  domain: "context-cru"
+  tags: [checkpoint, cadence, durable-context, ingest, task-scope]
+provenance:
+  source_type: chat_extraction
+  confidence: 1.0
+  source_ref: "Wayne product discussion — 2026-07-18; implementation evidence — 2026-07-18"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/intent-workbench-003.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-010"
+    type: constrained_by
+    detail: "Intelligence remains in skills"
+  - target: "decision-project-026"
+    type: supports
+    detail: "Provides a prompt-first safety net for proactive CRU"
+anchors:
+  - file: "packages/core/src/knowledge-checkpoint.ts"
+  - file: "packages/core/src/hook-ingest.ts"
+  - file: "packages/core/test/knowledge-checkpoint.test.ts"

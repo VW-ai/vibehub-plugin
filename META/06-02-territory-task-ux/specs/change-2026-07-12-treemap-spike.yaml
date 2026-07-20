@@ -1,0 +1,30 @@
+spec_id: "change-2026-07-12-treemap-spike"
+type: change
+state: active
+intent:
+  summary: "Replaced hand-authored territory geometry with deterministic squarified layout"
+  detail: |
+    The spike implemented deterministic, area-proportional territory layout,
+    cached semantic territory geometry and occupancy rollup. This established
+    the production geometry primitive used by the spatial Workbench.
+constraints: []
+indexing:
+  type: change
+  priority: P1
+  layer: feature
+  domain: "territory-task-ux"
+  tags: [treemap, territory, layout, deterministic]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-12-treemap-spike.yaml"
+  produced_at: "2026-07-12"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "06-02-territory-task-ux"
+relations: []
+anchors:
+  - file: "packages/core/src/treemap.ts"
+    symbols: [squarify, layoutTerritories]
+  - file: "packages/core/src/graph-store.ts"
+  - file: "packages/core/src/snapshot-export.ts"

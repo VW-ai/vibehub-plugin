@@ -1,0 +1,37 @@
+spec_id: "change-2026-07-18-presentation-rollout"
+type: change
+state: active
+intent:
+  summary: "Rolled one evidence-backed presentation protocol across setup, query, ingest, distill, inject and checkpoint"
+  detail: |
+    CLI, skills and App project the same WorkflowReceiptV1 facts through
+    Activity, Trigger, Effects, Result and Next. Silent, brief and expanded
+    visibility budgets use host-native affordances and portable text. Weak
+    evidence never upgrades attempted, queued or claimed work into success.
+constraints:
+  - kind: must
+    rule: "All surfaces use shared receipt outcome vocabulary and deterministic evidence"
+  - kind: must
+    rule: "Failure and waiting states are never silent"
+  - kind: must_not
+    rule: "Do not depend on custom TUI widgets, ANSI color or pixel layout for unique meaning"
+indexing:
+  type: change
+  priority: P0
+  layer: project
+  domain: "workflow-presentation"
+  tags: [presentation, receipt, tui, cli, app]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-18-presentation-rollout.yaml"
+  produced_at: "2026-07-18"
+relations:
+  - target: "decision-workbench-016"
+    type: implements
+  - target: "change-2026-07-18-knowledge-checkpoint"
+    type: relates_to
+anchors:
+  - file: "packages/core/src/contract/workflow-receipt-projection.ts"
+  - file: "skills/_stdlib/reporting.md"
+  - file: "app/src/receipt-note-derive.ts"

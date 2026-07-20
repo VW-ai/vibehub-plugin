@@ -1,0 +1,31 @@
+spec_id: "change-2026-07-13-context-to-action-workflow"
+type: change
+state: active
+intent:
+  summary: "Established the Task/Run/worktree authority model and separated operational evidence from semantic truth"
+  detail: |
+    The 2026-07-13 design session extended VibeHub from context memory into a
+    host-agent context-to-action layer. It froze the Task/Run distinction,
+    context-only versus code-write authority, decision-boundary intervention,
+    skill-owned transitions and the rule that the App remains optional.
+constraints: []
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "task-run-authority"
+  tags: [context-to-action, task, run, worktree, evidence]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-13-context-to-action-workflow.yaml"
+  produced_at: "2026-07-13"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "05-01-task-run-authority"
+relations:
+  - target: "decision-workbench-013"
+    type: creates
+anchors:
+  - file: "META/legacy-21-workbench/design-context-to-action-workflow.md"
+  - file: "packages/core/src/activity-store.ts"

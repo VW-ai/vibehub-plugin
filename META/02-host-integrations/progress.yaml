@@ -1,0 +1,12 @@
+progress:
+  completion: 0.88
+  status: active
+  milestones:
+    - id: "m1-shared-contract"
+      name: "Host-neutral adapter contract"
+      status: completed
+      evidence: "Claude and Codex resolve to the same runtime, database, MCP, skills and receipt semantics."
+    - id: "m2-capability-matrix"
+      name: "Honest host capability matrix"
+      status: in_progress
+      evidence: "Claude lifecycle is broader; Codex has explicit native subset without fabricated hook parity."

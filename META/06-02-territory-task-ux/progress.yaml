@@ -1,0 +1,18 @@
+progress:
+  completion: 0.9
+  status: active
+  milestones:
+    - id: "territory-map"
+      name: "Dynamic territory map"
+      status: completed
+      evidence: "Deterministic treemap and production snapshot projection are implemented."
+    - id: "task-panel"
+      name: "Task timeline and intervention panel"
+      status: completed
+      evidence: "Timeline, scope, receipts and intervention controls have production-path tests."
+    - id: "conflict-card"
+      name: "Conflict adjudication card"
+      status: completed
+      evidence: "Conflict evidence and typed intervention outcomes are wired."
+  next:
+    - "Use these components inside the live shell instead of expanding the historical demo storyboard."

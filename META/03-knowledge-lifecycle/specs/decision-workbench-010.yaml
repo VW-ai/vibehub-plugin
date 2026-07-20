@@ -1,0 +1,45 @@
+spec_id: "decision-workbench-010"
+type: decision
+state: active
+intent:
+  summary: "Knowledge workflow intelligence belongs to skills; hooks=when，MCP/core=deterministic primitives and quality gates"
+  detail: |
+    Query、ingest、distill 是最小 intelligence spine，后续 review/update/setup
+    复用同一原则。Skills 通过 progressive context loading 读取 shared stdlib、
+    references、schemas 与 helper scripts；不要求 agent 每次临场发明 database
+    操作。
+
+    Hooks 只提供 lifecycle evidence 与 cadence；MCP/CLI/core 只验证并执行
+    versioned operations，返回 deterministic facts/receipts。Tool description
+    只能路由 skill，不能拼成分布式 workflow。
+constraints:
+  - kind: must
+    rule: "语义拆解、分类、placement、reconciliation 与 workflow sequencing 必须位于 skills"
+  - kind: must
+    rule: "所有 knowledge mutation 通过公开版本化 deterministic operations 与共享 dispatcher"
+  - kind: must_not
+    rule: "不得把 intelligence 拆散到 hooks、tool descriptions 或 core heuristics"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "knowledge-lifecycle"
+  tags: [skills, intelligence, progressive-loading, dispatcher, quality-gates]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne intelligence ownership decision — 2026-07-12"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-010.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "decision-project-013"
+    type: refines
+    detail: "Defines the LLM/deterministic boundary for knowledge workflows"
+anchors:
+  - file: "skills/_stdlib/"
+  - file: "skills/contracts/"
+  - file: "skills/scripts/"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/core/src/operation-contracts.ts"

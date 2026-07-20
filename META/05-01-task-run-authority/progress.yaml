@@ -1,0 +1,15 @@
+progress:
+  completion: 0.45
+  status: active
+  milestones:
+    - id: "authority-contract"
+      name: "Task / Run authority contract"
+      status: completed
+      evidence: "decision-workbench-013 defines Task, Run, context authority and worktree rules."
+    - id: "durable-authority"
+      name: "Durable workspace binding, writer lease and fencing"
+      status: planned
+      evidence: null
+  next:
+    - "Design durable Task identity separately from compatibility branch-derived task IDs."
+    - "Add transactional workspace binding, writer lease and monotonic fencing only when dogfood proves the need."

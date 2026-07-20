@@ -1,0 +1,34 @@
+spec_id: "change-2026-07-18-repo-activation"
+type: change
+state: active
+intent:
+  summary: "Implemented worktree-safe repository activation primitives and managed project instructions"
+  detail: |
+    Setup inspect/apply/status preserve user-owned AGENTS.md and CLAUDE.md,
+    replace only VibeHub managed blocks, preflight all writes and return typed
+    recovery evidence. Installed, Connected and Activated require distinct
+    artifact, checkout-bound handshake and meaningful context-value evidence.
+constraints:
+  - kind: must
+    rule: "VibeHub owns only its marked instruction block and must preserve all other user bytes"
+  - kind: must
+    rule: "Connected and Activated require exact-checkout evidence newer than the managed instructions"
+  - kind: must_not
+    rule: "Do not initialize Git implicitly or use sibling-worktree evidence"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "project-activation"
+  tags: [setup, managed-block, worktree, recovery]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-18-repo-activation.yaml"
+  produced_at: "2026-07-18"
+relations:
+  - target: "decision-workbench-015"
+    type: implements
+anchors:
+  - file: "packages/core/src/project-activation.ts"
+  - file: "packages/cli/src/main.ts"

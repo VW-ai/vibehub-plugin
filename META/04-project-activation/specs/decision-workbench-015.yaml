@@ -1,0 +1,49 @@
+spec_id: "decision-workbench-015"
+type: decision
+state: active
+intent:
+  summary: "Agent-first onboarding：机器级安装一次，exact checkout 由 vibehub-setup 编排 Installed → Connected → Activated"
+  detail: |
+    Canonical onboarding 在 Claude Code/Codex 中完成。Setup skill 发现现状、解释
+    冲突和 recovery，并调用 core/CLI 的 init、repo binding、managed instruction
+    merge、doctor 与 status primitives。App 只能提供同 contract 的图形入口。
+
+    Fresh repo 不制造虚假 mapping 或 knowledge write；existing-code repo 在
+    Connected 后显式推荐 cold-start distill。Activated 必须有真实 query/ingest
+    价值证据，不能由文件存在或 doctor green 冒充。
+constraints:
+  - kind: must
+    rule: "Onboarding 必须区分 Installed、Connected、Activated"
+  - kind: must
+    rule: "Setup workflow intelligence 位于 vibehub-setup skill；core/CLI 只提供幂等 primitives"
+  - kind: must_not
+    rule: "不得覆盖用户 AGENTS.md/CLAUDE.md；只能幂等维护 VibeHub-owned managed block"
+  - kind: must_not
+    rule: "不得把 cold-start distill 隐藏在 deterministic init 内"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "project-activation"
+  tags: [setup, onboarding, activation, repo-identity, managed-instructions]
+provenance:
+  source_type: chat_extraction
+  confidence: 1.0
+  source_ref: "Wayne onboarding decision — 2026-07-18"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-015.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-011"
+    type: realizes
+    detail: "Agent-first setup preserves headless product independence"
+  - target: "decision-workbench-016"
+    type: constrained_by
+    detail: "Setup uses the shared receipt/presentation protocol"
+anchors:
+  - file: "skills/vibehub-setup/SKILL.md"
+  - file: "skills/vibehub-setup/references/onboarding-contract.md"
+  - file: "packages/core/src/project-activation.ts"
+  - file: "packages/core/src/runtime-lifecycle.ts"
+  - file: "packages/cli/src/main.ts"

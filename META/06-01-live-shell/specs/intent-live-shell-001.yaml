@@ -1,0 +1,39 @@
+spec_id: "intent-live-shell-001"
+type: intent
+state: active
+intent:
+  summary: "Immediately after open source, build a daily dogfood shell for activation, live workspace and honest context feedback"
+  detail: |
+    The plugin runtime is usable, but the product needs a visible interactive
+    surface. The first App iteration should expose exact-checkout activation,
+    the current Task/Run/session/scope and the difference between context read,
+    captured evidence, proposed semantics and successfully persisted durable
+    context. It must consume stable projections so a later Git/YAML semantic
+    backend does not require rebuilding the UI.
+constraints:
+  - kind: must
+    rule: "Activation, live workspace and context feedback are the first post-open-source App scope"
+  - kind: must
+    rule: "The App must consume stable projections and receipts rather than storage-specific table shapes"
+  - kind: must_not
+    rule: "Captured evidence, attempted writes or queued injections must not be rendered as persisted durable context"
+indexing:
+  type: intent
+  priority: P0
+  layer: feature
+  domain: "workbench-live-shell"
+  tags: [dogfood, activation, workspace, context-feedback, projection]
+provenance:
+  source_type: chat_extraction
+  confidence: 1.0
+  source_ref: "Wayne open-source and frontend priority discussion — 2026-07-19"
+  produced_at: "2026-07-19"
+relations:
+  - target: "intent-project-004"
+    type: constrained_by
+    detail: "Storage pivot must remain behind a stable App projection."
+anchors:
+  - file: "app/src/main.tsx"
+  - file: "app/src/workbench-host.ts"
+  - file: "packages/core/src/snapshot-export.ts"
+  - file: "packages/core/src/contract/workflow-receipt.ts"

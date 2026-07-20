@@ -1,0 +1,14 @@
+room:
+  id: "02-host-integrations"
+  name: "Host Integrations"
+  parent: "00-project-room"
+  lifecycle: active
+  created_at: "2026-07-19"
+  updated_at: "2026-07-19"
+  owner: Wayne
+  contributors: []
+  prompt_test:
+    passable: false
+    last_tested: null
+    token_count: null
+  depends_on: ["01-runtime-foundation"]

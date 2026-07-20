@@ -1,0 +1,43 @@
+spec_id: "decision-project-025"
+type: decision
+state: active
+intent:
+  summary: "Core 承载唯一业务实现，CLI/MCP/host adapters 为薄壳，App 为 projection consumer"
+  detail: |
+    Runtime 按职责拆为 activity/knowledge/distillation/scope/intervention/state/
+    git/team/projection 等 core services。Hook CLI 是短命进程：记录 evidence、
+    检查可投递内容、输出宿主协议后退出。MCP 暴露确定性 capability；App
+    读取 core 生成的 live read model/snapshot。
+
+    原设计中的具体模块清单可随实现演进，但“业务逻辑只有一个 canonical
+    implementation point”保持不变。
+constraints:
+  - kind: must
+    rule: "Host adapters、CLI、MCP 与 App 不得复制 core 业务规则"
+  - kind: must
+    rule: "Hook 热路径必须短命、确定性且不得因 VibeHub 内部失败中断宿主工作"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "runtime-foundation"
+  tags: [core, adapters, sqlite, hook-cli, projection]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.95
+  source_ref: "Workbench service architecture — 2026-07-11"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/00-project-room/specs/decision-project-025.yaml"
+    migrated_at: "2026-07-19"
+    note: "保留 spec_id；将早期九模块/Tauri表述投影到已落地 package boundaries"
+relations:
+  - target: "decision-project-013"
+    type: implements
+    detail: "Library-first and thin-adapter architecture"
+anchors:
+  - file: "packages/core/src/"
+  - file: "packages/cli/src/hook-adapters.ts"
+  - file: "packages/mcp/src/capabilities.ts"
+  - file: "packages/core/src/live-read-models.ts"
+  - file: "packages/core/src/snapshot-export.ts"

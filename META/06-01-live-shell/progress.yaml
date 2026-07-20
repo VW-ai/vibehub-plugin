@@ -1,0 +1,19 @@
+progress:
+  completion: 0.12
+  status: planning
+  milestones:
+    - id: "activation-view"
+      name: "Project activation and exact-checkout status"
+      status: planned
+      evidence: null
+    - id: "live-workspace"
+      name: "Live Task, Run, session and scope workspace"
+      status: planned
+      evidence: null
+    - id: "context-feedback"
+      name: "Read, captured, persisted and pending context feedback"
+      status: planned
+      evidence: null
+  next:
+    - "Start immediately after the public repository is created and local dogfood begins."
+    - "Define the stable projection contract before adding new UI state."

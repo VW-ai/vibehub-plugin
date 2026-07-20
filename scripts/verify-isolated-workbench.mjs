@@ -46,7 +46,7 @@ try {
   run("pnpm", installArgs);
   run("pnpm", ["verify"]);
 
-  console.log(`isolated workbench: subtree-only install and complete verify matrix passed (${target})`);
+  console.log(`isolated repository: clean install and complete verify matrix passed (${target})`);
 } finally {
   if (keep) console.log(`kept isolated workbench at ${target}`);
   else rmSync(temp, { recursive: true, force: true });

@@ -1,0 +1,19 @@
+progress:
+  completion: 0.72
+  status: active
+  milestones:
+    - id: "scope-evidence"
+      name: "Scope declaration and footprint evidence"
+      status: completed
+      evidence: "Shared matcher, registered scopes and observed footprints are implemented."
+    - id: "intervention-receipts"
+      name: "Typed conflict intervention receipts"
+      status: completed
+      evidence: "Queue/claim/delivery outcomes use typed, replay-safe receipts."
+    - id: "resolution-followthrough"
+      name: "Resolution feedback and follow-through"
+      status: in_progress
+      evidence: "Resolution feedback is specified; longitudinal outcome statistics remain future work."
+  next:
+    - "Dogfood off-scope reminders and intervention delivery across both hosts."
+    - "Keep recommendations prompt-first; hard-block only authority/isolation violations."

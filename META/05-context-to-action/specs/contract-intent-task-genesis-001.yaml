@@ -1,0 +1,40 @@
+spec_id: "contract-intent-task-genesis-001"
+type: contract
+state: active
+intent:
+  summary: "Durable intent adoption is the semantic boundary for Task genesis or current-Task scope expansion"
+  detail: |
+    A durable intent may originate in the user's instruction or in an agent
+    proposal that the user adopts. Adoption, not authorship, gives it product
+    authority. The workflow skill decides whether the adopted intent creates a
+    new Task, expands the semantic scope of the current Task, or remains
+    context-only exploration. A created Task preserves provenance to the
+    adopted intent and its success criteria.
+constraints:
+  - kind: must
+    rule: "Agent-proposed intent has no durable authority until the user adopts it explicitly or unambiguously"
+  - kind: must
+    rule: "A materially independent outcome becomes a new Task; an increase within the current outcome becomes a scope update"
+  - kind: must
+    rule: "Task genesis must preserve intent/spec provenance and explicit success criteria"
+  - kind: must_not
+    rule: "Hooks must not classify semantic adoption or create Tasks from prompt cadence alone"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "context-to-action"
+  tags: [intent-adoption, task-genesis, scope-expansion, provenance, prompt-first]
+provenance:
+  source_type: chat_extraction
+  confidence: 1.0
+  source_ref: "Wayne product discussion: user intent, adopted agent proposals, intent settlement and Task creation"
+  produced_at: "2026-07-19"
+relations:
+  - target: "intent-context-to-action-001"
+    type: refines
+  - target: "decision-workbench-013"
+    type: constrained_by
+anchors:
+  - file: "skills/vibehub-ingest/SKILL.md"
+  - file: "skills/_stdlib/orchestration.md"

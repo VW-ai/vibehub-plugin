@@ -1,0 +1,37 @@
+spec_id: "change-2026-07-18-knowledge-checkpoint"
+type: change
+state: active
+intent:
+  summary: "Implemented task-scoped periodic knowledge checkpoints with mechanical cadence and skill-owned semantic judgment"
+  detail: |
+    UserPromptSubmit deduplicates stable prompt IDs and increments a persistent
+    per-task cadence. At the threshold it injects a short checkpoint reminder.
+    Only a successful canonical knowledge mutation for the same task resets the
+    counter. Claimed interventions and pause delivery take priority.
+constraints:
+  - kind: must
+    rule: "Hooks own cadence and deduplication only; durable semantic judgment and capture remain in the ingest skill"
+  - kind: must
+    rule: "Only deterministic same-task canonical persistence may reset cadence"
+  - kind: must_not
+    rule: "Do not parse transcripts, estimate tokens or classify knowledge inside the hook"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "context-cru"
+  tags: [checkpoint, cadence, prompt-dedup, prompt-first]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-18-knowledge-checkpoint.yaml"
+  produced_at: "2026-07-18"
+relations:
+  - target: "intent-workbench-003"
+    type: implements
+  - target: "decision-workbench-010"
+    type: constrained_by
+anchors:
+  - file: "packages/core/src/knowledge-checkpoint.ts"
+  - file: "packages/core/src/hook-ingest.ts"
+  - file: "packages/core/test/knowledge-checkpoint.test.ts"

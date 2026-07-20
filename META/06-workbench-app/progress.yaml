@@ -1,0 +1,19 @@
+progress:
+  completion: 0.68
+  status: active
+  milestones:
+    - id: "production-bridge"
+      name: "Production read/intervention bridge"
+      status: completed
+      evidence: "Production controller consumes browser-safe snapshots and typed intervention receipts."
+    - id: "live-shell"
+      name: "Daily dogfood live shell"
+      status: planned
+      evidence: null
+    - id: "territory-task-ux"
+      name: "Territory and Task interaction system"
+      status: completed
+      evidence: "Spatial map, task rail/panel, conflict card and production E2E gates exist."
+  next:
+    - "Build the post-open-source live shell as the first product iteration."
+    - "Keep storage changes behind stable read-model and receipt contracts."

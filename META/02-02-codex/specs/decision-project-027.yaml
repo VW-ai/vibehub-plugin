@@ -1,0 +1,46 @@
+spec_id: "decision-project-027"
+type: decision
+state: active
+intent:
+  summary: "Claude Code 与 Codex 共用 runtime，但按宿主真实 lifecycle 能力分档，不为 parity 发明 hack"
+  detail: |
+    原决策把 Codex 预估为只读感知档；实现期宿主已提供稳定 plugin、hooks 与 MCP
+    affordances，因此 Codex 现已原生接入 SessionStart、UserPromptSubmit 与
+    PostToolUse(apply_patch)，并使用同一 SQLite、repo identity、skills、MCP 与
+    receipts。
+
+    该演进不改变决策核心：能力矩阵必须以宿主真实协议为准。尚不存在的
+    Stop、SessionEnd、Notification、failure 或完整 tool lifecycle parity
+    不得通过轮询、wrapper process 或伪造 evidence 补齐。
+constraints:
+  - kind: must
+    rule: "Codex capability claims 必须由稳定宿主协议与 installed-artifact verification 支持"
+  - kind: must_not
+    rule: "不得为追求 Claude parity 引入轮询注入、包装进程或伪造 lifecycle evidence"
+  - kind: must
+    rule: "缺失能力必须在文档与 UI 中诚实表达"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "codex"
+  tags: [codex, claude-code, adapter, capability-matrix, honest-degradation]
+provenance:
+  source_type: migration_synthesis
+  confidence: 1.0
+  source_ref: "Wayne dual-host decision — 2026-07-11; native Codex adapter evidence — 2026-07-18"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/00-project-room/specs/decision-project-027.yaml"
+    migrated_at: "2026-07-19"
+    note: "保留 spec_id；原 Codex 感知档预估已被真实 native hook capabilities 部分 supersede"
+relations:
+  - target: "decision-workbench-009"
+    type: constrained_by
+    detail: "Both hosts retain the same hooks/MCP/skills responsibility split"
+anchors:
+  - file: ".codex-plugin/plugin.json"
+  - file: "codex/hooks.json"
+  - file: "codex/mcp.json"
+  - file: "packages/cli/src/hook-adapters.ts"
+  - file: "scripts/verify-codex-plugin.mjs"

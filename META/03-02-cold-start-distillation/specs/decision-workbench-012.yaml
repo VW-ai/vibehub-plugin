@@ -1,0 +1,45 @@
+spec_id: "decision-workbench-012"
+type: decision
+state: active
+intent:
+  summary: "Distillation 使用 DB-native staged workflow：skills 负责语义，deterministic runtime 校验并产出 immutable candidate，human review 后 CAS activation"
+  detail: |
+    Distill skill 负责 inventory interpretation、feature hypotheses、cross-scope
+    reconciliation 与 unresolved ambiguity。Core/CLI/MCP 负责公开版本化 contracts、
+    validation、finalization、immutable revision 与 activation compare-and-swap。
+
+    Canonical promotion 必须 guarded/reviewed。Distillation 中间运行态不等于
+    semantic truth；即使未来 Git/YAML 成为 durable semantic layer，也只有
+    finalize/review/activate 后的语义产物可进入 canonical store。
+constraints:
+  - kind: must
+    rule: "Distillation 必须先 validate/finalize immutable candidate，再由 review 决定 activation"
+  - kind: must
+    rule: "Activation 必须使用 CAS 或等价并发保护"
+  - kind: must
+    rule: "Unresolved ambiguity 必须显式保留，不得为完成率制造虚假确定性"
+  - kind: must_not
+    rule: "不得让 distillation 中间态直接成为 canonical knowledge"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "cold-start-distillation"
+  tags: [distillation, db-native, immutable-candidate, review, cas]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne DB-native intelligence decision — 2026-07-13"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-012.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "intent-project-004"
+    type: constrains
+    detail: "Storage pivot must preserve staged validation and promotion semantics"
+anchors:
+  - file: "packages/core/src/distillation-service.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "skills/vibehub-distill/SKILL.md"
+  - file: "skills/contracts/distillation-result.schema.json"

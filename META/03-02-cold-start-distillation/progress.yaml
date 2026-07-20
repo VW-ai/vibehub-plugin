@@ -1,0 +1,12 @@
+progress:
+  completion: 0.82
+  status: active
+  milestones:
+    - id: "m1-db-native-pipeline"
+      name: "DB-native staged distillation"
+      status: completed
+      evidence: "Inventory, candidate validation/finalization, immutable revision and CAS activation paths exist."
+    - id: "m2-real-repo-quality"
+      name: "Cold-start quality dogfood"
+      status: in_progress
+      evidence: "Pipeline is production-shaped; methodology quality requires repeated real-repo use."

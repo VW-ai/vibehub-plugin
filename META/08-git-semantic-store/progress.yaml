@@ -1,0 +1,20 @@
+progress:
+  completion: 0.03
+  status: planning
+  milestones:
+    - id: "lossless-round-trip"
+      name: "SQLite semantic subset to YAML to clean SQLite"
+      status: planned
+      evidence: null
+    - id: "architecture-decision"
+      name: "Canonical storage architecture decision"
+      status: blocked
+      evidence: "Blocked until the lossless round-trip spike is reviewed."
+    - id: "canonical-flip"
+      name: "Git/YAML canonical write path"
+      status: blocked
+      evidence: "Current SQLite source-of-truth decisions remain active."
+  next:
+    - "Run a 0.5–1 day SQLite semantic subset → strict YAML → clean SQLite spike."
+    - "Compare identity, relations, revisions, active pointers and provenance byte-for-semantics."
+    - "Do not implement write-through or migration until an explicit architecture decision supersedes SQLite-only semantics."

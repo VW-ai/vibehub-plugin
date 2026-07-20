@@ -1,0 +1,42 @@
+spec_id: "change-2026-07-18-codex-activation-parity"
+type: change
+state: active
+intent:
+  summary: "Added a thin native Codex adapter sharing the same runtime and a real isolated Codex marketplace gate"
+  detail: |
+    Claude and Codex share SQLite, repo/worktree identity, skills, MCP and
+    receipts. The Codex adapter only maps host events and output. Its default
+    package wires verified SessionStart, UserPromptSubmit and PostToolUse
+    apply_patch evidence; absent lifecycle events remain honestly absent.
+    Isolated verification installs the real marketplace, executes the installed
+    hook and proves the installed MCP reaches ready in a real Codex app-server.
+constraints:
+  - kind: must
+    rule: "Codex and Claude must share one runtime and one semantic contract"
+  - kind: must_not
+    rule: "Missing Codex lifecycle signals must not be fabricated with watchers, log tailing or transcript parsing"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "release-engineering"
+  tags: [codex, marketplace, adapter, isolated, capability-parity]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-18-codex-activation-parity.yaml"
+  produced_at: "2026-07-18"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "07-release-engineering"
+relations:
+  - target: "change-2026-07-19-claude-marketplace"
+    type: complements
+anchors:
+  - file: ".codex-plugin/plugin.json"
+  - file: "codex/hooks.json"
+  - file: "codex/mcp.json"
+  - file: "packages/core/src/hook-protocol.ts"
+  - file: "packages/cli/src/hook-adapters.ts"
+  - file: "scripts/verify-codex-plugin.mjs"
+  - file: "scripts/verify-plugin-artifact.mjs"

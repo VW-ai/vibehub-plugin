@@ -1,0 +1,43 @@
+spec_id: "decision-workbench-011"
+type: decision
+state: active
+intent:
+  summary: "Headless plugin/runtime 是可独立使用的产品；App 是 optional reader/intervention client"
+  detail: |
+    Plugin、hooks、skills、MCP、CLI/core 自带 SQLite 初始化与完整 context
+    lifecycle。用户不安装或不打开 App，也必须能 setup、query、ingest、distill、
+    update、review、inject 与 checkpoint。
+
+    App 消费同一 runtime 的稳定 projection，不能成为第二 source of truth，
+    也不能拥有只有 App 才能完成的基础 knowledge workflow。
+constraints:
+  - kind: must
+    rule: "Headless runtime 必须在无 App、无 daemon、无云服务的情况下独立工作"
+  - kind: must
+    rule: "App 必须消费 core projection/contract，不得直接复制 runtime 业务逻辑"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "runtime-foundation"
+  tags: [headless, local-first, sqlite, optional-app, runtime]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne headless runtime decision — 2026-07-12"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-011.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "intent-project-001"
+    type: realizes
+    detail: "Plugin-first runtime product shape"
+  - target: "decision-project-014"
+    type: constrained_by
+    detail: "SQLite remains current source of truth"
+anchors:
+  - file: "packages/core/src/runtime-service.ts"
+  - file: "packages/core/src/runtime-lifecycle.ts"
+  - file: "packages/cli/src/main.ts"
+  - file: "packages/mcp/src/runtime.ts"

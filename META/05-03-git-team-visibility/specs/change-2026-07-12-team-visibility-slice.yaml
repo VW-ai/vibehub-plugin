@@ -1,0 +1,35 @@
+spec_id: "change-2026-07-12-team-visibility-slice"
+type: change
+state: active
+intent:
+  summary: "Implemented the Git/GitHub to SQLite to Workbench team-visibility vertical slice"
+  detail: |
+    The first backend slice added GitFacade, GitHub PR discovery, team snapshot
+    tables, conflict candidate selection and a browser-safe map projection. It
+    proved that team visibility can run locally without a VibeHub cloud service.
+constraints: []
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "git-team-visibility"
+  tags: [git, github, sqlite, team-sync, local-first]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-12-team-visibility-slice.yaml"
+  produced_at: "2026-07-12"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "05-03-git-team-visibility"
+relations:
+  - target: "decision-workbench-004"
+    type: implements
+anchors:
+  - file: "packages/core/src/git-facade.ts"
+    symbols: [GitFacade, GhFacade, parseRemoteSlug]
+  - file: "packages/core/src/team-sync.ts"
+    symbols: [syncTeamSnapshot, selectConflictCandidates]
+  - file: "packages/core/src/snapshot-export.ts"
+  - file: "packages/core/src/db.ts"
+    symbols: [openDb, defaultDbPath]

@@ -1,4 +1,4 @@
-# VibeHub Workbench
+# VibeHub Plugin
 
 VibeHub is a local-first context runtime for coding agents. Native Claude Code
 and OpenAI Codex plugin manifests package one shared set of skills, one MCP
@@ -8,6 +8,12 @@ delivery.
 
 SQLite is the only source of truth. JSON or Markdown output is an export for
 people and tools, not a fallback database.
+
+By default one machine-level database at `~/.vibehub/workbench.db` serves many
+repositories and worktrees. Canonical Git repository identity and exact
+checkout bindings isolate their state; VibeHub does not create one SQLite file
+per project. `VIBEHUB_DB` is an explicit override for tests and advanced
+isolation.
 
 ## Requirements
 
@@ -19,9 +25,15 @@ people and tools, not a fallback database.
 ## Install from source
 
 ```bash
+git clone https://github.com/VW-ai/vibehub-plugin.git
+cd vibehub-plugin
 pnpm install --frozen-lockfile
 pnpm build
 ```
+
+The first public beta intentionally uses this source-built path. A direct
+hosted marketplace install will be documented only after a versioned release
+artifact, upgrade path, and rollback contract are published.
 
 Initialize a repository and verify the local runtime:
 
@@ -155,8 +167,8 @@ VIBEHUB_REPO=/path/to/repository pnpm --filter @vibehub/workbench-app dev
 # the headless dogfood flow.
 pnpm verify
 
-# Copy only workbench/ to a temporary directory, install from its own lockfile,
-# then run the full gate there. This is the subtree/repository split gate.
+# Copy the repository to a temporary directory, install from its own lockfile,
+# then run the full gate there. This is the clean standalone-repository gate.
 pnpm verify:isolated
 
 # Build the local Codex marketplace and verify that the installed Codex CLI
@@ -200,9 +212,9 @@ real local Codex ingestion are the release gates for those exact drift cases.
 Re-run the bundled preflight too; any finding outside this enumerated set still
 fails review.
 
-`pnpm verify:isolated` copies only this `workbench/` subtree, installs solely
-from its own workspace and lockfile, and invokes that same complete `verify`
-matrix.
+`pnpm verify:isolated` copies this repository without local build state,
+installs solely from its own workspace and lockfile, and invokes that same
+complete `verify` matrix.
 
 Set `VIBEHUB_KEEP_TMP=1` to retain a failed isolated copy or artifact for
 inspection. Set `VIBEHUB_OFFLINE=1` only when all required package tarballs are
@@ -210,10 +222,10 @@ already available in the pnpm store.
 
 ## Repository boundary
 
-Everything required by the future public repository lives under this directory.
-Code here must not import server-side VibeHub packages. Until dogfood validates
-the boundary, development remains in the monorepo and preserves history for a
-later `git subtree split`.
+This repository is the public product boundary. Code here must not import
+packages from the former VibeHub monorepo. The rewritten Git history preserves
+the development lineage of the original `workbench/` subtree and its Room 21
+governance archive.
 
 ## License
 

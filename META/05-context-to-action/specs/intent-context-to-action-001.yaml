@@ -1,0 +1,32 @@
+spec_id: "intent-context-to-action-001"
+type: intent
+state: active
+intent:
+  summary: "Use durable context to help the host agent plan the next action and execution topology without becoming a development control plane"
+  detail: |
+    The plugin should connect context CRU to Task creation, scope evolution,
+    delegation, worktree isolation, handoff and closeout. The model remains
+    prompt-first: skills decide what the situation means; deterministic runtime
+    primitives record and enforce only the minimum authority boundaries.
+constraints:
+  - kind: must
+    rule: "Claude Code and Codex remain the primary work surfaces; VibeHub augments their workflow"
+  - kind: must_not
+    rule: "The optional App must not become a prerequisite for Task execution or completion"
+indexing:
+  type: intent
+  priority: P0
+  layer: epic
+  domain: "context-to-action"
+  tags: [task, run, worktree, handoff, prompt-first]
+provenance:
+  source_type: migration_synthesis
+  confidence: 1.0
+  source_ref: "Legacy Room 21 context-to-action design and 2026-07-13 product decision"
+  produced_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-013"
+    type: summarized_by
+anchors:
+  - file: "packages/core/src/activity-store.ts"
+  - file: "packages/core/src/intervention-service.ts"

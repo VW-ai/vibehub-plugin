@@ -1,0 +1,18 @@
+progress:
+  completion: 0.85
+  status: active
+  milestones:
+    - id: "git-snapshot"
+      name: "Local Git/GitHub team snapshot"
+      status: completed
+      evidence: "GitFacade, team sync and SQLite team snapshot are implemented."
+    - id: "honest-mapping"
+      name: "Honest branch and conflict projection"
+      status: completed
+      evidence: "Only active unmerged branches are conflict candidates; pure-Git state never pretends to know agent runtime state."
+    - id: "dogfood-signal"
+      name: "Dogfood signal quality"
+      status: in_progress
+      evidence: null
+  next:
+    - "Evaluate usefulness and noise in real multi-branch dogfood."

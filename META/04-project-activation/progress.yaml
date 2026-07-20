@@ -1,0 +1,16 @@
+progress:
+  completion: 0.9
+  status: active
+  milestones:
+    - id: "m1-primitives"
+      name: "Repo/worktree-safe activation primitives"
+      status: completed
+      evidence: "Inspect/apply/status, managed instruction blocks and typed receipts are implemented."
+    - id: "m2-setup-skill"
+      name: "Agent-first setup skill"
+      status: completed
+      evidence: "Claude/Codex references and recovery guidance ship in the plugin artifact."
+    - id: "m3-interactive-dogfood"
+      name: "Fresh-project interactive activation"
+      status: planned
+      evidence: "Automated isolated activation gates are green; human end-to-end dogfood remains."

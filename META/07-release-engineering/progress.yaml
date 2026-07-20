@@ -1,0 +1,20 @@
+progress:
+  completion: 0.9
+  status: active
+  milestones:
+    - id: "claude-marketplace"
+      name: "Claude self-contained marketplace"
+      status: completed
+      evidence: "Real isolated Claude marketplace add/install validates installed hooks, MCP, setup and SQLite."
+    - id: "codex-marketplace"
+      name: "Codex self-contained marketplace"
+      status: completed
+      evidence: "Real isolated Codex marketplace install validates installed hooks and app-server MCP ready."
+    - id: "public-release"
+      name: "Public repository and fresh-clone dogfood"
+      status: in_progress
+      evidence: "History, plugin-centric META, standalone identity, secret scan and full release verification are complete; public push and fresh public clone remain."
+  next:
+    - "Run secret/history scan before publishing."
+    - "Verify both marketplaces from a fresh public clone."
+    - "Perform one real interactive Claude and Codex dogfood flow."

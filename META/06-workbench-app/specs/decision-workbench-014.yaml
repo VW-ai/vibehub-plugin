@@ -1,0 +1,37 @@
+spec_id: "decision-workbench-014"
+type: decision
+state: active
+intent:
+  summary: "The Workbench App design authority is the approved v8 spatial-workbench language"
+  detail: |
+    The App is a compact, cool-neutral, macOS-like spatial collaboration surface
+    built around a territory canvas, live rail, system typography, state color
+    and restrained elevation. Preserving this authority does not freeze defects:
+    keyboard focus, readable contrast, reduced motion, production-path coverage
+    and honest affordances remain hard requirements.
+constraints:
+  - kind: must
+    rule: "App UI must preserve the v8 spatial map, live rail, compact system typography and cool-neutral surface language"
+  - kind: must
+    rule: "Keyboard focus, contrast, reduced motion and production-path behavior must remain verified"
+  - kind: must_not
+    rule: "UI must not promise repository switching, task launch, resume, terminate or completion unless the bridge can prove the capability"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "workbench-app"
+  tags: [v8, spatial-workbench, design-authority, honesty, accessibility]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/decision-workbench-014.yaml"
+  produced_at: "2026-07-14"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "06-workbench-app"
+relations: []
+anchors:
+  - file: "app/src/tokens.css"
+  - file: "app/src/app.css"
+  - file: "app/src/WorkbenchMap.tsx"

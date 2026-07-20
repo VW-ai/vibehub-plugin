@@ -1,0 +1,41 @@
+spec_id: "decision-project-014"
+type: decision
+state: active
+intent:
+  summary: "当前 source of truth = SQLite；文件只是 projection/export，直至另有正式 supersede"
+  detail: |
+    当前实现以 SQLite 承载 semantic knowledge 与 operational state，并由 core
+    提供唯一读写门、schema migration、query/index 与 projection。
+
+    `intent-project-004` 正在探索 Git/YAML durable semantic layer，但仍是 draft。
+    在 lossless round-trip spike 与正式 architecture review 完成前，本决策保持
+    canonical；实现不得提前形成双写或隐式 source-of-truth flip。
+constraints:
+  - kind: must
+    rule: "当前所有 canonical knowledge mutation 继续通过 SQLite-backed deterministic operations"
+  - kind: must
+    rule: "任何 source-of-truth 切换必须显式 supersede 本决策"
+  - kind: must_not
+    rule: "不得让导出文件产生 SQLite 中不存在的 canonical truth"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "storage"
+  tags: [sqlite, source-of-truth, projection, migration-boundary]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne architecture decision — 2026-07-08; status reaffirmed 2026-07-19"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/00-project-room/specs/decision-project-014.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "intent-project-004"
+    type: challenged_by
+    detail: "Git/YAML remains a draft candidate pending proof and explicit supersession"
+anchors:
+  - file: "packages/core/src/db.ts"
+  - file: "packages/core/src/knowledge-service.ts"
+  - file: "packages/core/src/distillation-service.ts"

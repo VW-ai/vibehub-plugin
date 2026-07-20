@@ -1,0 +1,34 @@
+spec_id: "decision-workbench-003"
+type: decision
+state: active
+intent:
+  summary: "Use subject-first language for both single-subject tasks and multi-subject conflicts"
+  detail: |
+    A single-subject row is labeled by the Task. A multi-subject row is labeled
+    by the contested resource plus a participant-count pill; participants appear
+    on expansion. Attention counts treat each unresolved conflict pair as one
+    item rather than counting every participating Task.
+constraints:
+  - kind: must
+    rule: "Rows must identify their actual subject rather than reuse a Task-only label for multi-subject entities"
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "territory-task-ux"
+  tags: [subject-first, task, conflict, language, attention]
+provenance:
+  source_type: migrated_spec
+  confidence: 0.85
+  source_ref: "META/legacy-21-workbench/specs/decision-workbench-003.yaml"
+  produced_at: "2026-07-12"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "06-02-territory-task-ux"
+relations:
+  - target: "decision-workbench-014"
+    type: constrained_by
+anchors:
+  - file: "app/src/components/TaskRail.tsx"
+  - file: "app/src/components/ConflictCard.tsx"
+  - file: "app/src/components/Titlebar.tsx"

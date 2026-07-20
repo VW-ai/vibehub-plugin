@@ -4,10 +4,10 @@
   "description": "Local-first project context, governed knowledge workflows, and mechanical coding-agent activity capture.",
   "author": {
     "name": "VibeHub Team",
-    "url": "https://github.com/VW-ai/Vibehub"
+    "url": "https://github.com/VW-ai/vibehub-plugin"
   },
-  "homepage": "https://github.com/VW-ai/Vibehub",
-  "repository": "https://github.com/VW-ai/Vibehub",
+  "homepage": "https://github.com/VW-ai/vibehub-plugin",
+  "repository": "https://github.com/VW-ai/vibehub-plugin",
   "license": "Apache-2.0",
   "keywords": [
     "context",
@@ -30,7 +30,7 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/VW-ai/Vibehub",
+    "websiteURL": "https://github.com/VW-ai/vibehub-plugin",
     "defaultPrompt": [
       "Set up VibeHub for this project.",
       "Query VibeHub before changing this unfamiliar area.",

@@ -1,0 +1,28 @@
+spec_id: "decision-project-015"
+type: decision
+state: active
+intent:
+  summary: "开源 license = Apache-2.0"
+  detail: |
+    采用宽松且包含专利授权的 Apache-2.0，降低个人与企业采用门槛。公开仓库
+    根目录必须携带 LICENSE，发布 artifact 与源码使用同一许可边界。
+constraints:
+  - kind: must
+    rule: "公开源码与发布物必须保留 Apache-2.0 license notice"
+indexing:
+  type: decision
+  priority: P1
+  layer: epic
+  domain: "release"
+  tags: [open-source, license, apache-2.0]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne license decision — 2026-07-08"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/00-project-room/specs/decision-project-015.yaml"
+    migrated_at: "2026-07-19"
+relations: []
+anchors:
+  - file: "LICENSE"

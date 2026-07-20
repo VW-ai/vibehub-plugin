@@ -1,0 +1,35 @@
+spec_id: "contract-runtime-001"
+type: contract
+state: active
+intent:
+  summary: "One machine-level SQLite database isolates many repositories and worktrees through canonical identity"
+  detail: |
+    The default runtime database is ~/.vibehub/workbench.db. It is not one
+    database per repository. Repository and worktree identity partition all
+    durable knowledge, activity, cadence, receipts and operational authority
+    inside the shared local database. VIBEHUB_DB is an explicit override for
+    tests, isolation and advanced operation, not a second product topology.
+constraints:
+  - kind: must
+    rule: "Every repository-scoped read and write must resolve canonical Git common-root identity before accessing shared SQLite state"
+  - kind: must
+    rule: "Worktree-specific session and instruction evidence must remain bound to the exact checkout while repository knowledge shares the common-root identity"
+  - kind: must_not
+    rule: "Do not infer repository ownership from the process cwd when an explicit repo or host workspace root is available"
+indexing:
+  type: contract
+  priority: P0
+  layer: infra
+  domain: "runtime-foundation"
+  tags: [sqlite, topology, repository-identity, worktree, isolation]
+provenance:
+  source_type: implementation_synthesis
+  confidence: 1.0
+  source_ref: "Runtime database and Git identity implementation, reviewed for public repository migration"
+  produced_at: "2026-07-19"
+relations:
+  - target: "decision-project-014"
+    type: implements
+anchors:
+  - file: "packages/core/src/db.ts"
+  - file: "packages/core/src/git-facade.ts"

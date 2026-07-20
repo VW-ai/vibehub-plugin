@@ -1,0 +1,36 @@
+spec_id: "constraint-public-beta-001"
+type: constraint
+state: active
+intent:
+  summary: "Public beta installation is source-built until a versioned hosted marketplace artifact is published"
+  detail: |
+    The repository currently provides deterministic source-to-marketplace
+    builders for Claude Code and Codex. Users clone, install dependencies,
+    build the self-contained marketplace, then add and install it with the host
+    CLI. Documentation must not imply a zero-build hosted marketplace until a
+    release artifact and upgrade path are actually published.
+constraints:
+  - kind: must
+    rule: "Source installation documents exact prerequisites, build commands, host install commands and restart/trust steps"
+  - kind: must
+    rule: "A future hosted marketplace release must define version alignment, upgrade, rollback and supported host/runtime matrix"
+  - kind: must_not
+    rule: "Do not advertise direct marketplace installation from the authored Git tree while runtime dist and native dependencies are absent"
+indexing:
+  type: constraint
+  priority: P0
+  layer: epic
+  domain: "release-engineering"
+  tags: [public-beta, source-install, marketplace, release]
+provenance:
+  source_type: release_review
+  confidence: 1.0
+  source_ref: "Public repository readiness review, 2026-07-19"
+  produced_at: "2026-07-19"
+relations:
+  - target: "change-2026-07-19-claude-marketplace"
+    type: constrained_by
+anchors:
+  - file: "README.md"
+  - file: "scripts/build-claude-marketplace.mjs"
+  - file: "scripts/build-codex-marketplace.mjs"

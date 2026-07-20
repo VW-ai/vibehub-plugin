@@ -1,0 +1,43 @@
+spec_id: "decision-workbench-008"
+type: decision
+state: active
+intent:
+  summary: "MCP 提供确定性、可发现、带质量闸的 capabilities；knowledge workflow 由 skills 编排"
+  detail: |
+    当前 capability surface 包括 register_scope、self_report、kb_retrieve、
+    kb_operation、distill_operation 与 get_manual。Capability 负责 schema
+    validation、identity、transaction、integrity 与 factual receipt；它不替
+    agent 做语义判断。
+
+    Knowledge write 必须经过唯一 dispatcher/operation contract。不存在稳定
+    contract 的 mutation 不应以名字暴露成“看起来能写、实际必失败”的工具。
+constraints:
+  - kind: must
+    rule: "MCP capability schema、operation version 与 result evidence 必须可验证"
+  - kind: must
+    rule: "Canonical writes 必须通过共享 dispatcher，不得绕过 integrity boundary"
+  - kind: must_not
+    rule: "Tool description 不得复制完整 ingest/distill/query workflow"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "context-cru"
+  tags: [mcp, capabilities, operation-contracts, dispatcher, validation]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne MCP capability decision — 2026-07-12; v0.2 integrity clarification — 2026-07-13"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-008.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-010"
+    type: constrained_by
+    detail: "Skills retain workflow intelligence"
+anchors:
+  - file: "packages/mcp/src/capabilities.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/core/src/operation-contracts.ts"
+  - file: "skills/contracts/operation-contracts.json"

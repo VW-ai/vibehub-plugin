@@ -1,0 +1,34 @@
+spec_id: "decision-workbench-002"
+type: decision
+state: active
+intent:
+  summary: "Conflict resolution must produce user-visible feedback and retain evidence for outcome statistics"
+  detail: |
+    A resolved conflict must appear in timeline or notification feedback, and
+    resolution evidence should support daily, weekly and monthly value reporting.
+    Sending an intervention is not resolution: the system must distinguish
+    queueing from delivery and later observe whether the work actually converged.
+constraints:
+  - kind: must
+    rule: "Intervention receipts must distinguish queued or delivered instructions from verified resolution"
+  - kind: should
+    rule: "Resolution events should support aggregate outcome reporting without inventing semantic success"
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "scope-conflict-intervention"
+  tags: [conflict, intervention, feedback, receipts, outcomes]
+provenance:
+  source_type: migrated_spec
+  confidence: 0.85
+  source_ref: "META/legacy-21-workbench/specs/decision-workbench-002.yaml"
+  produced_at: "2026-07-12"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "05-02-scope-conflict-intervention"
+relations: []
+anchors:
+  - file: "packages/core/src/intervention-service.ts"
+  - file: "packages/core/src/conflict-ignore.ts"
+  - file: "packages/core/src/workflow-receipt-projectors.ts"

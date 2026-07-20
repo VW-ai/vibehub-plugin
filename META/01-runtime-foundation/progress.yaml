@@ -1,0 +1,12 @@
+progress:
+  completion: 0.9
+  status: active
+  milestones:
+    - id: "m1-core"
+      name: "Library-first core and SQLite runtime"
+      status: completed
+      evidence: "Core/CLI/MCP packages share deterministic services, migrations, dispatcher, repo identity, lifecycle and receipts."
+    - id: "m2-projection-contract"
+      name: "Stable App projection boundary"
+      status: in_progress
+      evidence: "Live read models and snapshot export exist; public contract must remain stable through future storage changes."

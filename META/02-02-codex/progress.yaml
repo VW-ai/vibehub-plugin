@@ -1,0 +1,12 @@
+progress:
+  completion: 0.86
+  status: active
+  milestones:
+    - id: "m1-native-adapter"
+      name: "Codex native thin adapter"
+      status: completed
+      evidence: "SessionStart, UserPromptSubmit and PostToolUse(apply_patch) reach the shared runtime."
+    - id: "m2-real-dogfood"
+      name: "Fresh interactive Codex project dogfood"
+      status: planned
+      evidence: "Isolated marketplace install, installed hook and app-server MCP ready are green; sustained human workflow remains to verify."

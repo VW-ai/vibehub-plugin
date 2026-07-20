@@ -1,0 +1,41 @@
+spec_id: "decision-workbench-006"
+type: decision
+state: active
+intent:
+  summary: "Claude hooks 使用官方生命周期；稳态逐 hook 注入为零，SessionStart 一次注入协议，Stop 可做可靠唤醒"
+  detail: |
+    Claude Code 适配覆盖宿主公开 hook matrix。普通 hook 只记录 mechanical
+    evidence；无条件行为协议仅在 SessionStart 注入一次。Queued context 在
+    可靠 boundary 投递，Stop 使用官方 block/reason wire format 唤醒。
+
+    Robustness 依赖宿主 hooks 与机械 evidence，不自建进程监听器或 transcript
+    parser。信号缺失时诚实降级，不伪造 stalled/ready 精度。
+constraints:
+  - kind: must
+    rule: "稳态高频 hooks 不得重复注入行为协议"
+  - kind: must
+    rule: "Stop 唤醒必须使用宿主官方 wire contract"
+  - kind: must_not
+    rule: "不得为生命周期补洞自建脆弱 session 监听器"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "claude-code"
+  tags: [hooks, session-start, stop, delivery, robustness]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne Claude hook matrix approval — 2026-07-12"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-006.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-007"
+    type: implemented_by
+    detail: "Delivery and micro-protocol wire semantics"
+anchors:
+  - file: "hooks/hooks.json"
+  - file: "packages/core/src/hook-ingest.ts"
+  - file: "packages/core/src/hook-protocol.ts"

@@ -1,0 +1,39 @@
+spec_id: "decision-project-013"
+type: decision
+state: active
+intent:
+  summary: "Library-first core + 薄 CLI/MCP adapters；LLM 语义判断全部位于 skills"
+  detail: |
+    所有确定性业务逻辑只在 packages/core 实现一次。CLI 服务 shell、human、agent
+    与 CI；MCP 服务宿主可发现的工具调用；两者只负责参数与结果适配。
+
+    Core、CLI、MCP 不直接调用 LLM API。语义分类、拆解、placement、workflow
+    sequencing 等 intelligence 位于 skills，并调用版本化 deterministic operations。
+constraints:
+  - kind: must
+    rule: "core/cli/mcp 内禁止直接调用 LLM API；需要语义判断的环节上浮 skills"
+  - kind: must
+    rule: "CLI 与 MCP 不得各自复制业务逻辑"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "architecture"
+  tags: [core, cli, mcp, skills, zero-llm, layering]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne architecture decision — 2026-07-08"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/00-project-room/specs/decision-project-013.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-010"
+    type: reinforced_by
+    detail: "Intelligence ownership further concentrates in skills"
+anchors:
+  - file: "packages/core/src/"
+  - file: "packages/cli/src/"
+  - file: "packages/mcp/src/"
+  - file: "skills/"

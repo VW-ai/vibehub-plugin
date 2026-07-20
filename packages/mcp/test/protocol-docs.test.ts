@@ -36,9 +36,8 @@ function expectPackagedProtocolDocs(root: string): void {
 }
 
 function governanceRootFor(root: string): string | null {
-  const candidate = path.dirname(root);
-  return fs.existsSync(path.join(candidate, "META/21-workbench"))
-    ? candidate
+  return fs.existsSync(path.join(root, "META/project.yaml"))
+    ? root
     : null;
 }
 
@@ -51,23 +50,31 @@ describe("MCP v0.2 active protocol documentation", () => {
     const repoRoot = governanceRootFor(workbenchRoot);
     if (repoRoot === null) return;
 
-    for (const relativePath of [
-      "META/21-workbench/design-claude-code-integration.md",
-      "META/21-workbench/specs/decision-workbench-007.yaml",
-      "META/21-workbench/specs/decision-workbench-009.yaml",
-    ]) expectLegacyNamesOnlyInHistory(repoRoot, relativePath);
+    expectLegacyNamesOnlyInHistory(
+      repoRoot,
+      "META/legacy-21-workbench/design-claude-code-integration.md",
+    );
 
-    const design = read(repoRoot, "META/21-workbench/design-claude-code-integration.md");
+    const design = read(repoRoot, "META/legacy-21-workbench/design-claude-code-integration.md");
     expect(design).toContain("§3 MCP server:端点 + 质量闸(已定案;v0.2 current)");
     expect(design).toContain("`kb_operation` 与 `distill_operation` 可选接收顶层 logical `requestId`");
     expect(design).toContain("`extra.requestId` 只做传输关联");
 
-    for (const decision of ["007", "009"]) {
-      const text = read(repoRoot, `META/21-workbench/specs/decision-workbench-${decision}.yaml`);
-      expect(text).toContain("2026-07-13 MCP v0.2 澄清(现行约束)");
-      expect(text).toContain("`kb_operation`");
-      expect(text).toContain("`distill_operation`");
-    }
+    const delivery = read(
+      repoRoot,
+      "META/02-01-claude-code/specs/decision-workbench-007.yaml",
+    );
+    expect(delivery).not.toMatch(legacyName);
+    expect(delivery).toContain("progressive manual");
+    expect(delivery).toContain("pause 优先");
+
+    const boundary = read(
+      repoRoot,
+      "META/02-host-integrations/specs/decision-workbench-009.yaml",
+    );
+    expect(boundary).not.toMatch(legacyName);
+    expect(boundary).toContain("MCP=deterministic capabilities");
+    expect(boundary).toContain("skills=how well");
   });
 
   it("supports a standalone workbench root without weakening packaged legacy checks", () => {
@@ -88,15 +95,15 @@ describe("MCP v0.2 active protocol documentation", () => {
 
   it("does not classify a repository with META but a missing required design as standalone", () => {
     const repo = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-protocol-governance-"));
-    const root = path.join(repo, "workbench");
+    const root = repo;
     try {
-      fs.mkdirSync(root);
-      fs.mkdirSync(path.join(repo, "META/21-workbench"), { recursive: true });
+      fs.mkdirSync(path.join(repo, "META"), { recursive: true });
+      fs.writeFileSync(path.join(repo, "META/project.yaml"), "project:\n  name: test\n");
 
       const governanceRoot = governanceRootFor(root);
       expect(governanceRoot).toBe(repo);
       if (governanceRoot === null) return;
-      expect(() => read(governanceRoot, "META/21-workbench/design-claude-code-integration.md"))
+      expect(() => read(governanceRoot, "META/legacy-21-workbench/design-claude-code-integration.md"))
         .toThrow(/ENOENT/);
     } finally {
       fs.rmSync(repo, { recursive: true, force: true });

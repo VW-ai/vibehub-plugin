@@ -1,0 +1,40 @@
+spec_id: "change-2026-07-19-plugin-repository-migration"
+type: change
+state: active
+intent:
+  summary: "Migrated the plugin/runtime and relevant governance history into the standalone vibehub-plugin repository"
+  detail: |
+    The filtered repository promotes the former workbench subtree to its root,
+    preserves the original Room 21 as an unindexed legacy archive, and adds an
+    18-Room plugin-centric canonical META. Standalone manifests, documentation,
+    governance tests and generated marketplace metadata now identify
+    VW-ai/vibehub-plugin. Full release verification passes from the filtered
+    repository before public push.
+constraints:
+  - kind: must
+    rule: "The canonical META is independent of the former monorepo while legacy Room 21 remains available only as provenance"
+  - kind: must
+    rule: "Rewritten history must be scanned for secrets and validated with git fsck before publication"
+  - kind: must_not
+    rule: "Do not describe the standalone repository as a future subtree split or silently skip governance checks"
+indexing:
+  type: change
+  priority: P0
+  layer: epic
+  domain: "release-engineering"
+  tags: [open-source, history-migration, feature-room, standalone]
+provenance:
+  source_type: implementation
+  confidence: 1.0
+  source_ref: "Standalone repository migration and independent reviews, 2026-07-19"
+  produced_at: "2026-07-19"
+relations:
+  - target: "constraint-public-beta-001"
+    type: constrained_by
+  - target: "change-2026-07-19-claude-marketplace"
+    type: builds_on
+anchors:
+  - file: "META/project.yaml"
+  - file: "META/00-project-room/_tree.yaml"
+  - file: "README.md"
+  - file: "packages/mcp/test/protocol-docs.test.ts"

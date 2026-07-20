@@ -25,7 +25,7 @@ codex plugin add vibehub@vibehub-local
 
 `build:codex-marketplace` rebuilds the shared core/CLI/MCP package `dist`
 directories and writes the marketplace under
-`workbench/dist/codex-marketplace`; it does not edit user HOME or a target
+`dist/codex-marketplace`; it does not edit user HOME or a target
 project. The two `codex plugin` commands are the explicit machine-install step
 and update Codex's own local plugin state.
 After installation:

@@ -89,7 +89,7 @@ const MIGRATIONS: string[] = [
   `,
 
   // 002 — the three-domain schema (M1 ②, decision-project-025), translated
-  // 1:1 from the five contract files (workbench/packages/core/src/contract/).
+  // 1:1 from the five contract files (packages/core/src/contract/).
   // Rule inherited from the contract: DERIVED IS NEVER STORED — no milestone
   // tier, no twist rows, no filesTouched counters, no layout geometry, no
   // session ordinals; those are all pure functions over these facts.

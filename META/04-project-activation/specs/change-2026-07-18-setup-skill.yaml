@@ -1,0 +1,36 @@
+spec_id: "change-2026-07-18-setup-skill"
+type: change
+state: active
+intent:
+  summary: "Implemented prompt-first setup intelligence as a progressive skill packaged for both hosts"
+  detail: |
+    The setup skill sequences inspect, apply and status; classifies fresh,
+    existing and ambiguous repositories; recommends optional cold-start
+    distillation; and stops on partial or blocked activation with recovery
+    evidence. Core and CLI remain deterministic primitives.
+constraints:
+  - kind: must
+    rule: "Repository classification, workflow sequencing and recovery choice remain skill intelligence"
+  - kind: must
+    rule: "A partial, blocked or unhealthy apply stops the workflow and preserves recovery evidence"
+  - kind: must_not
+    rule: "Do not fabricate query or ingest evidence to advance Activated"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "project-activation"
+  tags: [setup-skill, onboarding, prompt-first, progressive-loading]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-18-setup-skill.yaml"
+  produced_at: "2026-07-18"
+relations:
+  - target: "decision-workbench-015"
+    type: implements
+  - target: "change-2026-07-18-repo-activation"
+    type: builds_on
+anchors:
+  - file: "skills/vibehub-setup/SKILL.md"
+  - file: "skills/vibehub-setup/references/onboarding-contract.md"

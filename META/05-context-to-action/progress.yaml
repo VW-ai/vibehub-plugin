@@ -1,0 +1,19 @@
+progress:
+  completion: 0.58
+  status: active
+  milestones:
+    - id: "task-run-model"
+      name: "Task / Run authority model"
+      status: in_progress
+      evidence: "Task and Run authority are specified; durable writer lease/fencing remains future work."
+    - id: "intervention-loop"
+      name: "Scope conflict and intervention loop"
+      status: in_progress
+      evidence: "Scope evidence, conflict detection, injection and typed receipts exist; full workflow transitions remain skill-driven."
+    - id: "team-visibility"
+      name: "Git-backed team visibility"
+      status: completed
+      evidence: "Git/GitHub branch facts, conflict candidates and map projection are implemented."
+  next:
+    - "Dogfood the host-agent workflow before adding more mechanical state."
+    - "Keep App optional and preserve headless CLOSE semantics."

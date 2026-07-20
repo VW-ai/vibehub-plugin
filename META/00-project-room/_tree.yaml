@@ -1,0 +1,99 @@
+tree:
+  - id: "00-project-room"
+    name: "vibehub-plugin"
+    type: project
+    lifecycle: active
+    children:
+      - id: "01-runtime-foundation"
+        name: "Runtime Foundation"
+        type: epic
+        lifecycle: active
+        owner: Wayne
+        children: []
+      - id: "02-host-integrations"
+        name: "Host Integrations"
+        type: epic
+        lifecycle: active
+        owner: Wayne
+        children:
+          - id: "02-01-claude-code"
+            name: "Claude Code"
+            type: feature
+            lifecycle: completed
+            owner: Wayne
+          - id: "02-02-codex"
+            name: "Codex"
+            type: feature
+            lifecycle: active
+            owner: Wayne
+      - id: "03-knowledge-lifecycle"
+        name: "Knowledge Lifecycle"
+        type: epic
+        lifecycle: active
+        owner: Wayne
+        children:
+          - id: "03-01-context-cru"
+            name: "Context CRU"
+            type: feature
+            lifecycle: active
+            owner: Wayne
+          - id: "03-02-cold-start-distillation"
+            name: "Cold-start Distillation"
+            type: feature
+            lifecycle: active
+            owner: Wayne
+      - id: "04-project-activation"
+        name: "Project Activation"
+        type: epic
+        lifecycle: active
+        owner: Wayne
+        children: []
+      - id: "05-context-to-action"
+        name: "Context to Action"
+        type: epic
+        lifecycle: active
+        owner: Wayne
+        children:
+          - id: "05-01-task-run-authority"
+            name: "Task and Run Authority"
+            type: feature
+            lifecycle: active
+            owner: Wayne
+          - id: "05-02-scope-conflict-intervention"
+            name: "Scope, Conflict, and Intervention"
+            type: feature
+            lifecycle: active
+            owner: Wayne
+          - id: "05-03-git-team-visibility"
+            name: "Git Team Visibility"
+            type: feature
+            lifecycle: active
+            owner: Wayne
+      - id: "06-workbench-app"
+        name: "Workbench App"
+        type: epic
+        lifecycle: active
+        owner: Wayne
+        children:
+          - id: "06-01-live-shell"
+            name: "Live Shell"
+            type: feature
+            lifecycle: planning
+            owner: Wayne
+          - id: "06-02-territory-task-ux"
+            name: "Territory and Task UX"
+            type: feature
+            lifecycle: active
+            owner: Wayne
+      - id: "07-release-engineering"
+        name: "Release Engineering"
+        type: epic
+        lifecycle: active
+        owner: Wayne
+        children: []
+      - id: "08-git-semantic-store"
+        name: "Git Semantic Store"
+        type: epic
+        lifecycle: planning
+        owner: Wayne
+        children: []

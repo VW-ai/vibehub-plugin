@@ -1,0 +1,61 @@
+spec_id: "intent-project-004"
+type: intent
+state: draft
+intent:
+  summary: "Explore Git/YAML as the canonical layer for durable semantics while SQLite retains operational state and rebuildable projections"
+  detail: |
+    Candidate durable Git truth includes intent, decision, constraint,
+    convention, contract, feature/spec, evidence relations, Task definitions and
+    handoffs. SQLite continues to hold session and hook events, cadence,
+    injection claims, writer leases, Run state, real-time timeline, indexes and
+    materialized projections.
+
+    YAML is a strict protocol rather than free-form documentation: use a
+    JSON-compatible YAML 1.2 subset, schema_version, stable IDs, one entity per
+    file, no aliases/merge keys/custom tags, duplicate- and unknown-field
+    rejection, and deterministic serialization.
+
+    Candidate semantics are: uncommitted YAML is proposed/draft local state;
+    committed YAML is durable local truth; merged main is shared truth. This is
+    not approved. The first gate is a lossless SQLite semantic subset → YAML →
+    clean SQLite round trip. Only after review may a decision supersede the
+    current SQLite source-of-truth architecture.
+constraints:
+  - kind: must
+    rule: "Until explicitly promoted, this intent must not be interpreted as an approved migration; SQLite remains source of truth"
+  - kind: must
+    rule: "The first gate is a lossless semantic round trip including identity, relations, revisions, activation pointers and provenance"
+  - kind: must
+    rule: "Git may carry durable semantic truth only; operational events, leases, claims, cadence and distillation run state remain in SQLite"
+  - kind: must
+    rule: "Any YAML protocol must be versioned, strictly validated and deterministically serialized"
+  - kind: must_not
+    rule: "Do not translate all SQLite tables one-to-one into files"
+indexing:
+  type: intent
+  priority: P1
+  layer: feature
+  domain: "git-semantic-store"
+  tags: [git, yaml, semantics, sqlite, local-first, architecture-spike]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.9
+  source_ref: "Wayne Git-as-database / YAML discussion — 2026-07-19"
+  produced_at: "2026-07-19"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/00-project-room/specs/intent-project-004.yaml"
+    migrated_at: "2026-07-19"
+    migrated_to: "08-git-semantic-store"
+    note: "Original spec_id and draft state preserved."
+relations:
+  - target: "decision-project-014"
+    type: challenges
+    detail: "If approved, the current SQLite canonical source-of-truth decision must be explicitly superseded."
+  - target: "decision-workbench-012"
+    type: constrained_by
+    detail: "Skill intelligence and deterministic integrity contracts remain unchanged by storage choice."
+anchors:
+  - file: "packages/core/src/db.ts"
+  - file: "packages/core/src/knowledge-service.ts"
+  - file: "packages/core/src/distillation-service.ts"

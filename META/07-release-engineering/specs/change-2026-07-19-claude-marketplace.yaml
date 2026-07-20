@@ -1,0 +1,39 @@
+spec_id: "change-2026-07-19-claude-marketplace"
+type: change
+state: active
+intent:
+  summary: "Added a self-contained Claude marketplace and real isolated installed-runtime verification"
+  detail: |
+    The release builder packages CLI, MCP, skills, hooks and production native
+    dependencies. A real isolated Claude CLI validates the marketplace, installs
+    it, and executes configured hook, MCP and setup paths from the returned
+    install directory. Safety checks prove negative tests cannot mutate a real
+    user plugin cache.
+constraints:
+  - kind: must
+    rule: "Claude release verification must execute from the installed artifact, not the source tree"
+  - kind: must
+    rule: "Installed-path mutation tests must first prove the path belongs to the isolated host home"
+indexing:
+  type: change
+  priority: P0
+  layer: feature
+  domain: "release-engineering"
+  tags: [claude, marketplace, artifact, isolated, installed-runtime]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/change-2026-07-19-claude-marketplace.yaml"
+  produced_at: "2026-07-19"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "07-release-engineering"
+relations:
+  - target: "change-2026-07-18-codex-activation-parity"
+    type: complements
+anchors:
+  - file: "scripts/build-claude-marketplace.mjs"
+  - file: "scripts/build-plugin-artifact.mjs"
+  - file: "scripts/verify-plugin-artifact.mjs"
+  - file: "package.json"
+  - file: "README.md"

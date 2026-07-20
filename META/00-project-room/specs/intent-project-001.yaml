@@ -1,0 +1,51 @@
+spec_id: "intent-project-001"
+type: intent
+state: active
+intent:
+  summary: "开源 local-first plugin/runtime：结构化 knowledge base 为体，skills/plugin/MCP 为执行核，optional App 提供可见产品面"
+  detail: |
+    VibeHub 聚焦开发工作中的 context lifecycle。核心产品不是一个必须登录的
+    dashboard，也不是纯 CLI 工具，而是能在 Claude Code、Codex 等宿主内自然
+    工作的 plugin-first local runtime。
+
+    产品承诺是确保关键 durable semantics 不漏，并能在后续任务中正确 retrieve；
+    不承诺把完整 transcript 当作长期知识。Hook/session/tool evidence 可以保留在
+    operational layer，durable layer 只沉淀可复用的 intent、decision、
+    constraint、contract、convention、context、change 与 provenance。
+
+    Headless plugin/runtime 必须独立可用；Workbench App 是同一 runtime 上的
+    observability/intervention surface，用来让用户看见 context、task 与 agent
+    状态，并持续 dogfood 底层机制。
+constraints:
+  - kind: must
+    rule: "关键 durable semantics 的可靠 settlement 与 retrieval 是产品核心承诺"
+  - kind: must_not
+    rule: "不得把完整 transcript 归档或 App 存在作为 VibeHub 可用性的必要条件"
+  - kind: should_not
+    rule: "不得退化为纯 markdown 或只有 CLI 的产品形态；结构化 runtime 与可选交互面均属于路线"
+indexing:
+  type: intent
+  priority: P0
+  layer: epic
+  domain: "project"
+  tags: [local-first, open-source, plugin-first, durable-semantics, optional-app]
+provenance:
+  source_type: migration_synthesis
+  confidence: 1.0
+  source_ref: "Wayne local-first pivot (2026-07-05) + open-source scope clarification (2026-07-19)"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/00-project-room/specs/intent-project-001.yaml"
+    migrated_at: "2026-07-19"
+    note: "保留 spec_id；结合独立仓库 scope 与 durable-semantics 产品承诺收敛表述"
+relations:
+  - target: "decision-workbench-011"
+    type: realized_by
+    detail: "Headless runtime 是独立可用产品"
+  - target: "decision-workbench-016"
+    type: constrained_by
+    detail: "所有 surface 使用同一 receipt 语义"
+anchors:
+  - file: "README.md"
+  - file: "packages/core/src/"
+  - file: "skills/"

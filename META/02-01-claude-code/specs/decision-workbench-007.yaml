@@ -1,0 +1,40 @@
+spec_id: "decision-workbench-007"
+type: decision
+state: active
+intent:
+  summary: "Claude micro-protocol 只声明关键义务与 manual pointer；pause 优先于 inject，delivery 使用官方宿主包装"
+  detail: |
+    SessionStart 协议使用短、英文、带 `[VibeHub]` locus 的文本，告诉 agent
+    何时 retrieve、何时 settle durable context、何时遵守 task/scope 与在哪里
+    progressive-load manual。
+
+    同一 boundary 有多个消息时按最严格语义合并：pause 优先于 ordinary inject。
+    Stop 通过 decision:block + reason；其他支持的边界使用 additionalContext。
+constraints:
+  - kind: must
+    rule: "Micro-protocol 必须短、稳定、指向 progressive manual，不复制完整 skills"
+  - kind: must
+    rule: "同一 delivery boundary 中 pause 语义不得被普通 injection 稀释"
+  - kind: must
+    rule: "所有宿主可见系统消息使用一致的 [VibeHub] locus"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "claude-code"
+  tags: [micro-protocol, injection, pause, additional-context]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne micro-protocol approval — 2026-07-12"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-007.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-006"
+    type: implements
+    detail: "Defines hook delivery semantics"
+anchors:
+  - file: "packages/core/src/hook-protocol.ts"
+  - file: "packages/core/src/hook-ingest.ts"

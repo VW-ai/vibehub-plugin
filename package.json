@@ -1,8 +1,8 @@
 {
-  "name": "vibehub-workbench",
+  "name": "vibehub-plugin",
   "version": "0.1.0",
   "private": true,
-  "description": "Local-first VibeHub runtime, Claude Code integration, and optional workbench UI.",
+  "description": "Plugin-first local context runtime for Claude Code and Codex, with an optional Workbench App.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {

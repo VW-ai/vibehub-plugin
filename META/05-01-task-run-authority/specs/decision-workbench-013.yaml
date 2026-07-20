@@ -1,0 +1,52 @@
+spec_id: "decision-workbench-013"
+type: decision
+state: active
+intent:
+  summary: "Task is a durable outcome; Run bears context/code authority; only code-writing work claims a writer worktree"
+  detail: |
+    VibeHub operates inside Claude Code and Codex. A Task has independent
+    success criteria; a Run is one execution episode bound to that Task.
+    Context-only work binds a repo snapshot but does not require a worktree.
+    Code-writing work claims one canonical writer worktree. Task-to-workspace
+    ownership and Run-to-writer lease are distinct, and lease transfer requires
+    monotonic fencing so a stale Run cannot write after handoff.
+
+    Context authority distinguishes query, append operational evidence, propose
+    semantic candidates and promote semantic truth. Mechanical execution may
+    append commands, tests, outcomes and findings, but cannot redefine the
+    objective or promote semantics. Skills decide CONTINUE, EXPAND, DELEGATE,
+    HANDOFF and CLOSE; hooks and core only detect candidates and execute
+    deterministic, versioned primitives.
+constraints:
+  - kind: must
+    rule: "Task identity must be repo-scoped and stable; branch, session and agent process are evidence, not identity"
+  - kind: must
+    rule: "Context-only Runs must not be forced to create a worktree"
+  - kind: must
+    rule: "An active code-writing Task and writer worktree must be exclusive, with stale-writer fencing across handoff"
+  - kind: must
+    rule: "Context-only and non-PR Tasks must support headless CLOSE with actor and evidence"
+  - kind: must_not
+    rule: "Mechanical execution must not silently rewrite objectives, success criteria or canonical semantic truth"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "task-run-authority"
+  tags: [task, run, authority, worktree, lease, fencing, handoff]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/decision-workbench-013.yaml"
+  produced_at: "2026-07-13"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "05-01-task-run-authority"
+    note: "Original spec_id preserved; wording compacted without changing the approved authority model."
+relations:
+  - target: "intent-context-to-action-001"
+    type: implements
+anchors:
+  - file: "packages/core/src/activity-store.ts"
+  - file: "packages/core/src/runtime-service.ts"
+  - file: "packages/core/src/intervention-service.ts"

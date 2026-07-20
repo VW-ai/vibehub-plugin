@@ -1,0 +1,24 @@
+project:
+  name: "vibehub-plugin"
+  version: "0.1.0-beta"
+  description: "Plugin-first local context runtime for Claude Code and Codex, with an optional Workbench App."
+  created_at: "2026-07-19"
+  updated_at: "2026-07-19"
+  repository: "https://github.com/VW-ai/vibehub-plugin"
+  license: "Apache-2.0"
+  product_shape:
+    primary: "Headless plugin/runtime"
+    hosts: ["Claude Code", "Codex"]
+    optional_surface: "Workbench App"
+  tech_stack:
+    language: "TypeScript"
+    runtime: "Node.js"
+    package_manager: "pnpm"
+    database: "SQLite"
+    mcp: "@modelcontextprotocol/sdk"
+    app: "React + Vite"
+  source_migration:
+    repository: "VW-ai/Vibehub"
+    subtree: "workbench/"
+    legacy_room: "META/legacy-21-workbench"
+    migrated_at: "2026-07-19"

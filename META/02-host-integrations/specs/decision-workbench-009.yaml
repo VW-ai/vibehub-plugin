@@ -1,0 +1,43 @@
+spec_id: "decision-workbench-009"
+type: decision
+state: active
+intent:
+  summary: "Host plugin 三件套：hooks=when，MCP=deterministic capabilities，skills=how well"
+  detail: |
+    Hooks 只采集生命周期 evidence、提供机械 cadence 与可靠 delivery boundary；
+    MCP 暴露版本化确定性能力与质量闸；skills 承载用户可读、可改、可 fork 的
+    方法论与 workflow intelligence。
+
+    SessionStart 可注入短行为协议，但不得把完整 workflow 拆碎后分散塞入每个
+    hook 或 tool description。Description 只说明 capability、输入输出与轻量
+    routing。
+constraints:
+  - kind: must
+    rule: "Hooks 不得承担语义分类；MCP/core 不得承载自然语言 workflow intelligence"
+  - kind: must
+    rule: "完整方法论必须以 skill 为 canonical intelligence artifact"
+  - kind: must_not
+    rule: "不得通过高频 hook 重复注入长协议"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "host-integrations"
+  tags: [hooks, mcp, skills, prompt-first, intelligence-boundary]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne plugin architecture decision — 2026-07-12"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-009.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "decision-workbench-010"
+    type: refined_by
+    detail: "Skills own semantic intelligence"
+anchors:
+  - file: "hooks/hooks.json"
+  - file: "codex/hooks.json"
+  - file: "packages/mcp/src/capabilities.ts"
+  - file: "skills/"

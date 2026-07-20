@@ -1,0 +1,50 @@
+spec_id: "decision-project-026"
+type: decision
+state: active
+intent:
+  summary: "Context create/retrieve/update 默认由 agent 在真实工作中主动发生；冷启动 distill 是显式例外"
+  detail: |
+    用户不应需要记住知识库 CRUD 咒语。SessionStart 协议、MCP discoverability
+    与 agent intelligence 应促使模型在非平凡修改前 retrieve，在形成 durable
+    intent/decision/constraint 等时 settle，并在 truth 演进时 update/supersede。
+
+    “主动”描述 agent 的默认行为，不禁止用户显式 query 或要求沉淀。删除不是
+    默认 lifecycle；错误或过时语义优先以 stale/supersede 和 provenance 保留
+    演进链。所有 prompt 注入受 token/noise budget 约束。
+constraints:
+  - kind: must
+    rule: "Agent 应在需要时主动 retrieve，并在形成 durable semantics 时主动 settle"
+  - kind: must
+    rule: "Hook protocol 必须短且受注入预算约束"
+  - kind: should
+    rule: "知识更新优先使用 stale/supersede 与 version history，而非无痕删除"
+  - kind: must_not
+    rule: "不得要求用户把主动 CRUD 命令作为日常正确使用 VibeHub 的前提"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "context-cru"
+  tags: [retrieve, ingest, update, proactive, prompt-first, injection-budget]
+provenance:
+  source_type: migration_synthesis
+  confidence: 1.0
+  source_ref: "Wayne spontaneous CRU decision — 2026-07-11; prompt-first refinement — 2026-07-18"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/00-project-room/specs/decision-project-026.yaml"
+    migrated_at: "2026-07-19"
+    note: "保留 spec_id；修正早期『用户永不主动触发』的绝对表述为 agent-first default"
+relations:
+  - target: "decision-workbench-009"
+    type: constrained_by
+    detail: "Short protocol triggers full skill intelligence"
+  - target: "intent-workbench-003"
+    type: supported_by
+    detail: "Periodic checkpoint closes missed-settlement gaps"
+anchors:
+  - file: "skills/vibehub-query/SKILL.md"
+  - file: "skills/vibehub-ingest/SKILL.md"
+  - file: "skills/vibehub-update/SKILL.md"
+  - file: "hooks/hooks.json"
+  - file: "codex/hooks.json"

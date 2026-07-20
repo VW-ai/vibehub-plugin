@@ -1,0 +1,16 @@
+progress:
+  completion: 0.9
+  status: active
+  milestones:
+    - id: "m1-cru-workflows"
+      name: "Query, ingest, update and review"
+      status: completed
+      evidence: "Skills, scripts, schemas and deterministic dispatcher operations are packaged."
+    - id: "m2-periodic-checkpoint"
+      name: "Task-scoped periodic knowledge checkpoint"
+      status: completed
+      evidence: "Mechanical cadence, prompt-id dedupe, canonical-write reset and brief receipt implemented."
+    - id: "m3-commit-closeout"
+      name: "Commit-bound semantic closeout"
+      status: planned
+      evidence: "Commit is a strong provenance boundary, but not the only capture point."

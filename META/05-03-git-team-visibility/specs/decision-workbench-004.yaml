@@ -1,0 +1,36 @@
+spec_id: "decision-workbench-004"
+type: decision
+state: active
+intent:
+  summary: "Map teammate branches using only honest Git facts and restrict conflicts to active unmerged work"
+  detail: |
+    Conflict candidates are unmerged branches with no PR or an open PR. Closed
+    or merged work is not concurrent. A teammate branch visible only through Git
+    uses a deliberately weak signal tier and may expose ahead/merged/stale facts,
+    but never fabricated agent runtime state. Before distillation, unmatched
+    files remain under Uncategorized and conflict resources use file paths.
+constraints:
+  - kind: must
+    rule: "Pure-Git team rows must not synthesize running, waiting or done from absent host-agent evidence"
+  - kind: must
+    rule: "Conflict candidates must exclude closed or merged historical work"
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "git-team-visibility"
+  tags: [git, github, branch, conflict, honesty]
+provenance:
+  source_type: migrated_spec
+  confidence: 1.0
+  source_ref: "META/legacy-21-workbench/specs/decision-workbench-004.yaml"
+  produced_at: "2026-07-12"
+  migration:
+    migrated_at: "2026-07-19"
+    migrated_to: "05-03-git-team-visibility"
+    note: "Original Git-backed SQLite decision about team sync was omitted because it is no longer needed by this scoped mapping rule."
+relations: []
+anchors:
+  - file: "packages/core/src/team-sync.ts"
+    symbols: [selectConflictCandidates]
+  - file: "packages/core/src/snapshot-export.ts"

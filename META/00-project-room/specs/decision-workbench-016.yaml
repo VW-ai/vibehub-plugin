@@ -1,0 +1,40 @@
+spec_id: "decision-workbench-016"
+type: decision
+state: active
+intent:
+  summary: "所有 VibeHub workflows 共用 typed receipt 与 Activity / Trigger / Effects / Result / Next presentation protocol"
+  detail: |
+    结构化 receipt 是 Claude、Codex、CLI 与 App 的语义 source of truth。宿主端
+    使用原生 affordance + 标准化文本；App 可做富渲染，但不得改变状态含义。
+
+    Presentation 必须回答正在做什么、为何触发、读写/注入了什么、是否真实
+    成功以及用户是否需要行动。Visibility 使用 silent / brief / expanded 控噪。
+constraints:
+  - kind: must
+    rule: "所有 surface 必须消费同一结构化 receipt 语义"
+  - kind: must
+    rule: "queued、attempted、claimed、persisted、skipped、failed、waiting 必须诚实区分"
+  - kind: must_not
+    rule: "不得依赖 Claude/Codex 未承诺的自定义 TUI widget"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "presentation"
+  tags: [receipts, presentation, trust, tui, app]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.95
+  source_ref: "Wayne presentation protocol decision — 2026-07-18"
+  migration:
+    from_repository: "VW-ai/Vibehub"
+    from_path: "META/21-workbench/specs/decision-workbench-016.yaml"
+    migrated_at: "2026-07-19"
+relations:
+  - target: "intent-project-001"
+    type: supports
+    detail: "明确用户看见的 persistence 与 retrieval 证据"
+anchors:
+  - file: "packages/core/src/workflow-receipt-projectors.ts"
+  - file: "skills/_stdlib/reporting.md"
+  - file: "app/src/receipt-note-derive.ts"
