@@ -1,6 +1,6 @@
 progress:
-  completion: 0.85
-  status: review
+  completion: 1.0
+  status: completed
   milestones:
     - id: "lossless-round-trip"
       name: "SQLite semantic subset to YAML to clean SQLite"
@@ -16,13 +16,13 @@ progress:
       evidence: "packages/core/src/experimental/git-semantic-store/v2.ts and packages/core/test/git-semantic-ref-cache.test.ts — ref isolation, no-checkout reads, cache hits, query parity, v2 re-export digest equality and collision-safe provenance identity"
     - id: "architecture-decision"
       name: "Canonical storage architecture decision"
-      status: ready_for_review
-      evidence: "META/08-git-semantic-store/technical-review.md and draft decision-project-028"
+      status: completed
+      evidence: "Wayne approved all six review decisions; decision-project-028 is active and decision-project-014 is superseded."
     - id: "canonical-flip"
       name: "Git/YAML canonical write path"
-      status: blocked
-      evidence: "Current SQLite source-of-truth decisions remain active."
+      status: completed
+      evidence: "packages/core/src/git-semantic-store.ts, packages/core/src/operation-dispatcher.ts, packages/core/test/git-semantic-authority.test.ts and migration-receipt.yaml"
   next:
-    - "Run technical review over decision-project-028 and the six requested decisions in technical-review.md."
-    - "After explicit promotion only, execute the autonomous migration gates with writer freeze, backup, parity proof and rollback receipt."
-    - "Do not implement write-through or migration until an explicit architecture decision supersedes SQLite-only semantics."
+    - "Review and merge the dedicated migration PR; merged main then becomes shared semantic truth."
+    - "Package the reusable team PR procedure as a nested VibeHub skill."
+    - "Keep large-KB performance and YAML schema evolution deferred until evidence requires them."

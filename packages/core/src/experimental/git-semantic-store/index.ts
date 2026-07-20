@@ -1,5 +1,5 @@
 /**
- * Architecture spike only. SQLite remains canonical.
+ * Frozen v1 round-trip adapter retained for the production v2 importer.
  *
  * This module deliberately has no package-root export and no runtime/App/MCP
  * wiring. Export opens an explicit database path through the read-only door;

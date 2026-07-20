@@ -1,6 +1,6 @@
 spec_id: "decision-project-028"
 type: decision
-state: draft
+state: active
 intent:
   summary: "Adopt Git v2 as durable semantic truth and retain SQLite for operational truth plus commit-keyed semantic caches"
   detail: |
@@ -16,9 +16,9 @@ intent:
     is shared semantic truth. Provenance uses collision-safe durable content
     identity while SQLite integer IDs remain cache-local projections.
 
-    This decision is a review candidate only. Until explicitly promoted,
-    decision-project-014 remains active and SQLite remains canonical for all
-    semantic mutations.
+    Wayne approved all six review decisions on 2026-07-20. Repositories cut
+    over independently when their v2 protocol appears; this avoids a global
+    flag day and gives every repository one non-dual-write authority boundary.
 constraints:
   - kind: must
     rule: "Durable semantic entity paths derive from stable identity, while inventory and semantic digests derive from the selected Git tree or commit"
@@ -39,14 +39,14 @@ indexing:
   domain: "git-semantic-store"
   tags: [git, yaml, sqlite, cache, provenance, source-of-truth, architecture-review]
 provenance:
-  source_type: implementation_synthesis
-  confidence: 0.95
-  source_ref: "Lossless round-trip, real Git merge, and branch/ref cache spikes — 2026-07-19 to 2026-07-20"
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20"
   produced_at: "2026-07-20"
 relations:
   - target: "decision-project-014"
-    type: challenges
-    detail: "Would explicitly supersede SQLite semantic authority only if this draft is promoted after review."
+    type: supersedes
+    detail: "Git v2 now holds durable semantic authority for each repository after its explicit protocol cutover."
   - target: "contract-runtime-001"
     type: constrained_by
     detail: "The machine-level SQLite operational topology and canonical repository identity remain active."
@@ -56,6 +56,9 @@ anchors:
   - file: "META/08-git-semantic-store/technical-review.md"
   - file: "packages/core/src/experimental/git-semantic-store/index.ts"
   - file: "packages/core/src/experimental/git-semantic-store/v2.ts"
+  - file: "packages/core/src/git-semantic-store.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/cli/src/main.ts"
   - file: "packages/core/test/git-semantic-store.test.ts"
   - file: "packages/core/test/git-semantic-merge-spike.test.ts"
   - file: "packages/core/test/git-semantic-ref-cache.test.ts"

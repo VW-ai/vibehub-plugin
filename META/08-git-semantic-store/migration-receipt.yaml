@@ -1,0 +1,38 @@
+migration:
+  schema_version: 1
+  performed_at: "2026-07-20"
+  branch: "codex/git-semantic-store-spike"
+  source_commit: "54cdcde4613c4223b6e9a625c59eadfb8e566861"
+  authority:
+    previous: "SQLite-only under decision-project-014"
+    current: "repository-scoped Git v2 under decision-project-028"
+    marker: ".vibehub/semantic-store/v2/protocol.yaml"
+  source_preflight:
+    worktree_clean_at_start: true
+    branch_matched_remote_at_start: true
+    sqlite_schema_version: 14
+    target_repository_registered_in_default_db: false
+    target_semantic_rows: 0
+    unrelated_repository_rows_modified: false
+    live_backup_required: false
+    live_backup_reason: "No registered source rows existed for this repository, so the machine database was not mutated."
+  installed_store:
+    semantic_digest: "6c9a7017db096d27c85fd33eb81d338b4c082267a533b7780ea4b61eb5b6a95e"
+    features: 0
+    specs: 0
+    provenance_events: 0
+  gates:
+    strict_protocol_validation: passed
+    stable_path_validation: passed
+    clean_cache_rebuild: passed
+    digest_parity: passed
+    byte_reexport_parity: passed
+    compare_and_swap_abort: passed
+    durable_receipt_recovery: passed
+    workspace_build: passed
+    workspace_typecheck: passed
+    full_repository_validation: "passed — 415 tests (core 282, CLI 49, MCP 19, App 65)"
+  rollback:
+    preexisting_machine_database_changed: false
+    repository_boundary: "Remove or revert the authority-marker commit before the first semantic write."
+    after_semantic_writes: "Rebuild SQLite from the selected Git commit, prove digest and query parity, then revert the authority marker."

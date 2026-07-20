@@ -64,10 +64,9 @@ inventory mismatch, symlinks, invalid ordering and an existing target DB. The
 test oracle proves semantic digest equality, KnowledgeService query parity and
 byte-identical re-export after rebuilding a clean SQLite database.
 
-This result does **not** approve a storage migration. Mapping/distillation
-state, receipts and all operational tables remain excluded; the experiment is
-not exported from the package root and has no CLI, MCP, App or hook wiring.
-SQLite remains canonical pending an explicit architecture review and decision.
+At that point this result did **not** approve a storage migration.
+Mapping/distillation state, receipts and all operational tables remained
+excluded until the later v2 review and authority migration described below.
 
 ## Merge ergonomics spike — 2026-07-20
 
@@ -110,14 +109,34 @@ The v2 follow-up closes the remaining technical research gates:
 - provenance durable IDs derive from canonical event content plus nullable spec
   scope, independent of SQLite-local integer IDs.
 
-The architecture is now ready for technical review. `technical-review.md`
-contains the recommendation, requested decisions and autonomous overnight
-migration/rollback gates. `decision-project-028` is deliberately draft;
-`decision-project-014` remains active until explicit review promotion.
+The architecture review was approved on 2026-07-20. `decision-project-028` is
+active and explicitly supersedes `decision-project-014`.
+
+## Authority migration — 2026-07-20
+
+The production cutover is repository-scoped:
+
+- the presence of `.vibehub/semantic-store/v2/protocol.yaml` is the explicit
+  authority marker;
+- every `kb.*` operation materializes the selected worktree into an isolated
+  SQLite cache;
+- reads query only that cache, with operational mapping context copied in;
+- mutations run against a candidate cache, then atomically replace the Git
+  tree only after a semantic-digest compare-and-swap;
+- SQLite mutation receipts remain operational, while a minimum receipt proof
+  in durable provenance closes the post-Git/pre-receipt crash gap;
+- `vibehub kb migrate-store` creates a byte backup, holds a SQLite writer
+  freeze, proves import/re-export parity and emits a machine-readable receipt;
+- repositories without the authority marker remain on the legacy path until
+  their own reviewed migration, avoiding a global flag day.
+
+The plugin repository now carries an empty v2 protocol because its registered
+runtime KB subset is empty. Existing machine SQLite rows for unrelated
+repositories were inspected but not modified. See `migration-receipt.yaml`.
 
 # Canonical Specs
 
-- [intent-project-004] (draft) Explore Git/YAML for durable semantics while
-  SQLite remains the approved canonical and operational store.
-- [decision-project-028] (draft) Adopt Git v2 for durable semantic truth while
+- [intent-project-004] (active) Maintain Git/YAML durable semantics while
+  SQLite retains operational state and rebuildable caches.
+- [decision-project-028] (active) Adopt Git v2 for durable semantic truth while
   retaining SQLite operational authority and commit-keyed semantic caches.

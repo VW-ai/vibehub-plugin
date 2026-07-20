@@ -1,6 +1,6 @@
 spec_id: "intent-project-004"
 type: intent
-state: draft
+state: active
 intent:
   summary: "Explore Git/YAML as the canonical layer for durable semantics while SQLite retains operational state and rebuildable projections"
   detail: |

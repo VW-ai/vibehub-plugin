@@ -99,6 +99,26 @@ export * from "./distillation-service.js";
 export * from "./operation-dispatcher.js";
 export * from "./operation-contracts.js";
 export {
+  GIT_SEMANTIC_STORE_RELATIVE_PATH,
+  diffSemanticRefs,
+  durableProvenanceId,
+  exportGitSemanticStoreV2,
+  hasGitSemanticStore,
+  inspectGitSemanticStoreWorktree,
+  materializeSemanticCacheAtRef,
+  materializeSemanticCacheFromWorktree,
+  migrateSqliteSemanticStoreToGitV2,
+  readSpecAtRef,
+  replaceGitSemanticStoreV2,
+  stableSemanticPath,
+  type RefReadResult,
+  type RefSpecChange,
+  type SemanticCacheResult,
+  type V2ExportResult,
+  type WorktreeSemanticCacheResult,
+  type WorktreeSemanticStoreInspection,
+} from "./git-semantic-store.js";
+export {
   ingestCanonicalHookEvent,
   ingestHookEvent,
   lastAssistantText,

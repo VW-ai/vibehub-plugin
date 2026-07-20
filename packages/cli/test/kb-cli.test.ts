@@ -14,6 +14,14 @@ describe("vibehub kb JSON adapter",()=>{let dir:string,repo:string,dbPath:string
     expect(main(["kb","kb.spec.get","--json","--repo",repo,"--db",dbPath,"--actor","cli-test","--input",JSON.stringify({id:"missing"})])).toBe(3);expect(JSON.parse(stdout)).toMatchObject({ok:false,error:{code:"not_found"}});
     stdout="";expect(main(["kb","kb.status","--repo",repo,"--db",dbPath])).toBe(2);expect(JSON.parse(stdout)).toMatchObject({ok:false,error:{code:"validation_error"}});
   });
+  it("migrates one repository with a rollback backup and machine-readable receipt",()=>{let stdout="";vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
+    expect(main(["kb","migrate-store","--json","--repo",repo,"--db",dbPath])).toBe(0);
+    const receipt=JSON.parse(stdout);expect(receipt).toMatchObject({ok:true,data:{operation:"kb.migrate-store",repoId:1,featureCount:0,specCount:0}});
+    expect(fs.existsSync(receipt.data.backupPath)).toBe(true);expect(receipt.data.backupSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(fs.existsSync(path.join(repo,".vibehub/semantic-store/v2/protocol.yaml"))).toBe(true);
+    stdout="";expect(main(["kb","migrate-store","--json","--repo",repo,"--db",dbPath])).toBe(1);
+    expect(JSON.parse(stdout)).toMatchObject({ok:false,error:{code:"migration_failed"}});
+  });
   it("dispatches distillation with the identical shared JSON envelope",()=>{let stdout="";vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
     expect(main(["distill","run.start","--json","--repo",repo,"--db",dbPath,"--actor","cli-test","--task","task-1","--request","d1","--input",JSON.stringify({runId:"run-cli",mode:"cold",baseCommit:commit,skillHash:"s",configHash:"c"})])).toBe(0);
     expect(JSON.parse(stdout)).toMatchObject({ok:true,data:{runId:"run-cli",state:"collecting",baseCommit:commit},meta:{operation:"distill.run.start",requestId:"d1"}});

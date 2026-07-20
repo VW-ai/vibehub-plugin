@@ -2,7 +2,8 @@
 
 Date: 2026-07-20
 
-Review status: ready for architecture review; no canonical flip has occurred.
+Review status: approved by Wayne on 2026-07-20; repository-scoped canonical
+cutover implemented on `codex/git-semantic-store-spike`.
 
 ## Recommended architecture
 
@@ -112,8 +113,8 @@ Executable evidence:
 
 ## Autonomous overnight migration gates
 
-An overnight migration may begin only after the draft architecture decision is
-explicitly promoted. The autonomous run must use these gates:
+The architecture decision was explicitly promoted before implementation. Each
+repository migration uses these gates:
 
 ### Preflight
 
