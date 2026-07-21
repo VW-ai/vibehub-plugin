@@ -1,6 +1,8 @@
 # Knowledge ontology
 
-SQLite is canonical. Markdown/YAML is an explicit export, never a fallback.
+Canonicality comes from governed operation results, lifecycle state and source
+kind—not from a backing store or file format. Skills never infer authority by
+reading persistence files or tables directly.
 
 ## Entities
 

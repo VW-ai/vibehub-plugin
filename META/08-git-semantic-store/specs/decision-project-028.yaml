@@ -30,6 +30,8 @@ constraints:
   - kind: must
     rule: "A deterministic validator and CI enforce protocol and graph integrity independently of any PR skill"
   - kind: must
+    rule: "Workflow skills depend on stable semantic operations and governed lifecycle concepts, never semantic-store paths, file formats, cache topology or database implementation"
+  - kind: must
     rule: "Migration uses one reviewed authority cutover with writer freeze, parity proof, backup and rollback receipt"
   - kind: must_not
     rule: "Do not introduce semantic dual-write or silently union knowledge from different refs"

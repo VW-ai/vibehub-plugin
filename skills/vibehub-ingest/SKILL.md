@@ -11,7 +11,7 @@ judgment here; persist only through dispatcher operations.
 ## Prerequisites
 
 1. Read `../_stdlib/ontology.md` and `../_stdlib/provenance.md`.
-2. Read `../_stdlib/db-operations.md` before the first operation.
+2. Read `../_stdlib/operations.md` before the first operation.
 3. Read `../_stdlib/relations.md` only when a candidate depends on, conflicts
    with, relates to, or replaces another spec.
 4. Read `../_stdlib/lifecycle.md` only when evidence affects an existing spec.
@@ -63,7 +63,7 @@ judgment here; persist only through dispatcher operations.
    node ../scripts/vh-kb.mjs draft.apply --repo <root> --actor <id> --task <task> --request <id> --input <plan.json>
    ```
 
-   Never fall back to per-spec writes or direct database access after rejection.
+   Never fall back to per-spec writes or bypass the dispatcher after rejection.
 8. Read `../_stdlib/reporting.md`; render the five-section block (brief on
    success) reporting written draft IDs, duplicates, defaults, conflicts and
    unresolved mutations — only after `ok:true` envelopes. When a checkpoint

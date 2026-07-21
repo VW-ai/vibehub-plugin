@@ -22,6 +22,10 @@ progress:
       name: "Git/YAML canonical write path"
       status: completed
       evidence: "packages/core/src/git-semantic-store.ts, packages/core/src/operation-dispatcher.ts, packages/core/test/git-semantic-authority.test.ts and migration-receipt.yaml"
+    - id: "skill-package-boundary"
+      name: "Storage-agnostic intelligence and audited mechanical adapters"
+      status: completed
+      evidence: "META/08-git-semantic-store/skill-package-audit.md and packages/cli/test/skill-package.test.ts — every Skill, stdlib reference, method reference, script, contract and agent metadata audited"
   next:
     - "Review and merge the dedicated migration PR; merged main then becomes shared semantic truth."
     - "Package the reusable team PR procedure as a nested VibeHub skill."

@@ -75,6 +75,11 @@ A reusable team PR skill may be nested by architecture, distillation, incident
 and knowledge workflows. It handles rebase, revision allocation, conflict
 explanation, review briefs and PR procedure.
 
+Workflow skills consume stable `kb.*` and `distill.*` operations. They must not
+read semantic-store paths, persistence files, cache topology or database
+implementation. Storage authority is resolved below the dispatcher boundary,
+so changing that mechanism does not rewrite the intelligence layer.
+
 The skill is not the enforcement authority. A deterministic validator/CI gate
 must enforce canonical bytes, stable paths, schema, identities, revision
 pointers, relation/lineage integrity, provenance identity and the exclusion of

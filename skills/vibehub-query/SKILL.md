@@ -10,7 +10,7 @@ skill is read-only.
 
 ## Prerequisites
 
-1. Read `../_stdlib/db-operations.md` and `../_stdlib/reporting.md`.
+1. Read `../_stdlib/operations.md` and `../_stdlib/reporting.md`.
 2. Read `../_stdlib/ontology.md` for feature/spec/placement questions.
 3. Read `../_stdlib/relations.md` and `../_stdlib/lifecycle.md` only for lineage,
    conflicts, history, or governed dependency traversal.
