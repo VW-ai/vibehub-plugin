@@ -6,7 +6,7 @@ import os from "node:os";
 import path from "node:path";
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
-type Layout = "v1-content-addressed-manifest" | "v2-stable-identity-derived-index";
+type Layout = "content-addressed-manifest" | "stable-identity-derived-index";
 
 interface SpikeSpec {
   spec_id: string;
@@ -57,8 +57,8 @@ const removeStore = (root: string): void => {
 
 function writeStore(root: string, layout: Layout, specs: SpikeSpec[]): void {
   removeStore(root);
-  if (layout === "v1-content-addressed-manifest") {
-    const base = ".vibehub/semantic-store/v1";
+  if (layout === "content-addressed-manifest") {
+    const base = ".vibehub/semantic-store-manifest-prototype";
     const entries = specs.slice().sort((a, b) => a.spec_id < b.spec_id ? -1 : 1).map((spec) => {
       const bytes = serialize({ schema_version: 1, kind: "spec", ...spec });
       const sha256 = digest(bytes);
@@ -75,7 +75,7 @@ function writeStore(root: string, layout: Layout, specs: SpikeSpec[]): void {
     return;
   }
 
-  const base = ".vibehub/semantic-store/v2";
+  const base = ".vibehub/semantic-store";
   write(root, `${base}/protocol.yaml`, serialize({
     format: "vibehub.git-semantic-store",
     schema_version: 2,
@@ -167,10 +167,10 @@ function mergeScenario(
   return { clean: merged.status === 0, conflicts, root };
 }
 
-function readV2Spec(root: string, id: string): SpikeSpec {
+function readStableSpec(root: string, id: string): SpikeSpec {
   const bytes = fs.readFileSync(path.join(
     root,
-    ".vibehub/semantic-store/v2/specs",
+    ".vibehub/semantic-store/specs",
     idPath(id),
   ), "utf8");
   const parsed = JSON.parse(bytes) as SpikeSpec;
@@ -188,46 +188,46 @@ describe("Git semantic store merge ergonomics spike", () => {
     return result;
   };
 
-  it("proves the v1 global manifest conflicts even when branches change different specs", () => {
+  it("proves the manifest prototype global manifest conflicts even when branches change different specs", () => {
     const result = keep(mergeScenario(
-      "v1-content-addressed-manifest",
+      "content-addressed-manifest",
       (specs) => { specs[0]!.summary = "A changed on branch A"; },
       (specs) => { specs[1]!.summary = "B changed on branch B"; },
     ));
     expect(result.clean).toBe(false);
-    expect(result.conflicts).toContain(".vibehub/semantic-store/v1/manifest.yaml");
+    expect(result.conflicts).toContain(".vibehub/semantic-store-manifest-prototype/manifest.yaml");
   });
 
-  it("proves v1 content paths prevent same-spec disjoint-field three-way merge", () => {
+  it("proves manifest prototype content paths prevent same-spec disjoint-field three-way merge", () => {
     const result = keep(mergeScenario(
-      "v1-content-addressed-manifest",
+      "content-addressed-manifest",
       (specs) => { specs[0]!.summary = "summary changed on branch A"; },
       (specs) => { specs[0]!.evidence.push("evidence-from-branch-b"); },
     ));
     expect(result.clean).toBe(false);
-    expect(result.conflicts).toContain(".vibehub/semantic-store/v1/manifest.yaml");
+    expect(result.conflicts).toContain(".vibehub/semantic-store-manifest-prototype/manifest.yaml");
     expect(result.conflicts.some((file) => file.includes("/specs/"))).toBe(true);
   });
 
   it("proves stable identity paths with no committed global digest merge unrelated specs cleanly", () => {
     const result = keep(mergeScenario(
-      "v2-stable-identity-derived-index",
+      "stable-identity-derived-index",
       (specs) => { specs[0]!.summary = "A changed on branch A"; },
       (specs) => { specs[1]!.summary = "B changed on branch B"; },
     ));
     expect(result).toMatchObject({ clean: true, conflicts: [] });
-    expect(readV2Spec(result.root, "decision-a").summary).toBe("A changed on branch A");
-    expect(readV2Spec(result.root, "decision-b").summary).toBe("B changed on branch B");
+    expect(readStableSpec(result.root, "decision-a").summary).toBe("A changed on branch A");
+    expect(readStableSpec(result.root, "decision-b").summary).toBe("B changed on branch B");
   });
 
   it("lets Git merge disjoint fields on one stable spec and preserves both edits", () => {
     const result = keep(mergeScenario(
-      "v2-stable-identity-derived-index",
+      "stable-identity-derived-index",
       (specs) => { specs[0]!.summary = "summary changed on branch A"; },
       (specs) => { specs[0]!.evidence.push("evidence-from-branch-b"); },
     ));
     expect(result).toMatchObject({ clean: true, conflicts: [] });
-    const merged = readV2Spec(result.root, "decision-a");
+    const merged = readStableSpec(result.root, "decision-a");
     expect(merged.summary).toBe("summary changed on branch A");
     expect(merged.evidence).toEqual(["evidence-a", "evidence-from-branch-b"]);
   });
@@ -260,22 +260,22 @@ describe("Git semantic store merge ergonomics spike", () => {
       mutateB: (specs: SpikeSpec[]) => { specs[0]!.relations.push("relates_to:decision-b"); },
     },
   ])("surfaces $name as an explicit same-spec conflict for PR review", ({ mutateA, mutateB }) => {
-    const result = keep(mergeScenario("v2-stable-identity-derived-index", mutateA, mutateB));
+    const result = keep(mergeScenario("stable-identity-derived-index", mutateA, mutateB));
     expect(result.clean).toBe(false);
     expect(result.conflicts).toEqual([
-      `.vibehub/semantic-store/v2/specs/${idPath("decision-a")}`,
+      `.vibehub/semantic-store/specs/${idPath("decision-a")}`,
     ]);
   });
 
   it("surfaces delete-versus-amend as an explicit modify/delete conflict", () => {
     const result = keep(mergeScenario(
-      "v2-stable-identity-derived-index",
+      "stable-identity-derived-index",
       (specs) => { specs.splice(0, 1); },
       (specs) => { specs[0]!.summary = "amended while the other branch deletes"; },
     ));
     expect(result.clean).toBe(false);
     expect(result.conflicts).toEqual([
-      `.vibehub/semantic-store/v2/specs/${idPath("decision-a")}`,
+      `.vibehub/semantic-store/specs/${idPath("decision-a")}`,
     ]);
   });
 });

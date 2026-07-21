@@ -14,7 +14,7 @@ The experiment uses real repositories, branches, commits and `git merge`.
 
 ## Compared layouts
 
-### v1 round-trip layout
+### Manifest round-trip prototype
 
 ```text
 .vibehub/semantic-store/v1/
@@ -30,10 +30,10 @@ is not merge-friendly:
 - even branches editing different specs conflict in `manifest.yaml`;
 - the manifest becomes a repository-wide serialization point.
 
-### v2 merge candidate
+### Stable-identity merge candidate
 
 ```text
-.vibehub/semantic-store/v2/
+.vibehub/semantic-store/
   protocol.yaml                  # immutable protocol declaration only
   specs/sha256-<spec-id>.yaml    # stable path derived from stable identity
 ```
@@ -48,12 +48,12 @@ Candidate rules:
 - Git object integrity protects committed bytes; VibeHub validation protects
   protocol and semantic integrity.
 
-The v2 shape is a candidate discovered by this spike. It has not replaced the
-v1 round-trip prototype.
+The stable-identity shape is a candidate discovered by this spike. At this
+point in the research sequence, it had not replaced the manifest prototype.
 
 ## Real Git results
 
-| Concurrent change | v1 | v2 candidate | Required handling |
+| Concurrent change | Manifest prototype | Stable-identity candidate | Required handling |
 |---|---|---|---|
 | Different specs | Global manifest conflict | Clean merge | Automatic |
 | Same spec, disjoint fields | Path/manifest conflict | Clean merge preserving both edits | Automatic plus validator |
@@ -93,13 +93,13 @@ integrity, provenance integrity and exclusion of operational state.
 
 Repo-scoped provenance currently inherits SQLite integer event IDs. Independent
 branches can allocate the same next integer. A merge-friendly Git protocol
-therefore needs collision-safe durable provenance identity before the v2
-candidate can replace the v1 prototype. This should be addressed alongside the
+therefore needs collision-safe durable provenance identity before the
+stable-identity candidate can replace the manifest prototype. This should be addressed alongside the
 branch-aware cache spike, not hidden inside PR prose.
 
 ## Recommendation
 
-Carry the v2 stable-identity/derived-index shape into the next spike. Do not
-promote v1 content-addressed paths plus a mutable global manifest as the
+Carry the stable-identity/derived-index shape into the next spike. Do not
+promote content-addressed paths plus a mutable global manifest as the
 collaboration protocol. Next, prove branch/ref reads and a commit-keyed local
 SQLite cache while resolving durable provenance identity.

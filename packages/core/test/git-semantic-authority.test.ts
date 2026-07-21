@@ -10,9 +10,9 @@ import {
   OperationDispatcher,
   inspectGitSemanticStoreWorktree,
   materializeSemanticCacheFromWorktree,
-  migrateSqliteSemanticStoreToGitV2,
+  migrateSqliteSemanticStoreToGit,
   openDb,
-  replaceGitSemanticStoreV2,
+  replaceGitSemanticStore,
   stableSemanticPath,
   upsertRepo,
 } from "../src/index.js";
@@ -55,7 +55,7 @@ describe("Git semantic authority cutover", () => {
       VALUES (?, 'feature/auth', ?)`).run(row.id, NOW);
     db.close();
 
-    const migrated = migrateSqliteSemanticStoreToGitV2({
+    const migrated = migrateSqliteSemanticStoreToGit({
       sourceDbPath: dbPath,
       sourceRepoId: row.id,
       repoRoot: repo,
@@ -137,7 +137,7 @@ describe("Git semantic authority cutover", () => {
       error: { code: "idempotency_conflict" },
     });
     const storePath = path.join(repo, GIT_SEMANTIC_STORE_RELATIVE_PATH);
-    const heldStore = path.join(repo, ".vibehub", "semantic-store", "held-v2");
+    const heldStore = path.join(repo, ".vibehub", "held-semantic-store");
     fs.renameSync(storePath, heldStore);
     expect(dispatcher.dispatch("kb.status", {
       ...context,
@@ -195,7 +195,7 @@ describe("Git semantic authority cutover", () => {
       now: NOW,
     });
     db.close();
-    migrateSqliteSemanticStoreToGitV2({
+    migrateSqliteSemanticStoreToGit({
       sourceDbPath: dbPath,
       sourceRepoId: row.id,
       repoRoot: repo,
@@ -213,7 +213,7 @@ describe("Git semantic authority cutover", () => {
     document.revisions[0]!.summary = "Concurrent edit";
     fs.writeFileSync(specPath, `${JSON.stringify(document, null, 2)}\n`);
 
-    expect(() => replaceGitSemanticStoreV2({
+    expect(() => replaceGitSemanticStore({
       sourceDbPath: candidatePath,
       sourceRepoId: candidate.repoId,
       repoRoot: repo,
@@ -238,7 +238,7 @@ describe("Git semantic authority cutover", () => {
     const db = openDb(dbPath);
     const row = upsertRepo(db, repo, null, "main", NOW);
     db.close();
-    migrateSqliteSemanticStoreToGitV2({
+    migrateSqliteSemanticStoreToGit({
       sourceDbPath: dbPath,
       sourceRepoId: row.id,
       repoRoot: repo,

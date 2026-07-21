@@ -1,5 +1,5 @@
 /**
- * Git semantic store v2.
+ * Git semantic store.
  *
  * Git carries durable semantic truth. SQLite databases created here are
  * disposable, commit/worktree-scoped query caches.
@@ -9,34 +9,34 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import {
-  exportGitSemanticStore,
-  importGitSemanticStore,
+  exportGitSemanticStore as exportLegacyGitSemanticStore,
+  importGitSemanticStore as importLegacyGitSemanticStore,
   type ExportGitSemanticStoreOptions,
 } from "./experimental/git-semantic-store/index.js";
 import { inspectDatabase, withReadonlyDb } from "./db.js";
 
 const FORMAT = "vibehub.git-semantic-store";
-const V2_RELATIVE_PATH = ".vibehub/semantic-store/v2";
-const V1_RELATIVE_PATH = ".vibehub/semantic-store/v1";
+const STORE_RELATIVE_PATH = ".vibehub/semantic-store";
+const LEGACY_STORE_RELATIVE_PATH = ".vibehub/semantic-store/v1";
 const HASH = /^[0-9a-f]{64}$/;
 
-export const GIT_SEMANTIC_STORE_RELATIVE_PATH = V2_RELATIVE_PATH;
+export const GIT_SEMANTIC_STORE_RELATIVE_PATH = STORE_RELATIVE_PATH;
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 type Bag = Record<string, unknown>;
 
-interface V1Entry {
+interface LegacyEntry {
   id: string;
   file: string;
   sha256: string;
 }
 
-interface V1Manifest {
+interface LegacyManifest {
   schema_version: 1;
   format: typeof FORMAT;
   repository: { slug: string | null; default_branch: string; created_at: string };
-  features: V1Entry[];
-  specs: V1Entry[];
+  features: LegacyEntry[];
+  specs: LegacyEntry[];
   repo_provenance: Array<Bag & { event_id: number }>;
   semantic_digest: string;
 }
@@ -51,16 +51,16 @@ interface DurableProvenance extends Bag {
   payload: Json;
 }
 
-interface V2Protocol {
+interface SemanticStoreProtocol {
   schema_version: 2;
   format: typeof FORMAT;
   indexing: "stable-identity-paths";
   integrity: "derived-from-canonical-tree";
   provenance_identity: "sha256-canonical-event-v1";
-  repository: V1Manifest["repository"];
+  repository: LegacyManifest["repository"];
 }
 
-export interface V2ExportResult {
+export interface GitSemanticStoreExportResult {
   storePath: string;
   semanticDigest: string;
   featureCount: number;
@@ -96,7 +96,7 @@ const sha256 = (value: string | Buffer): string =>
 const canonicalize = (value: unknown): Json => {
   if (value === null || typeof value === "string" || typeof value === "boolean") return value;
   if (typeof value === "number") {
-    if (!Number.isFinite(value)) throw new Error("git semantic store v2: non-finite number");
+    if (!Number.isFinite(value)) throw new Error("git semantic store: non-finite number");
     return value;
   }
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -105,7 +105,7 @@ const canonicalize = (value: unknown): Json => {
       .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
       .map(([key, item]) => [key, canonicalize(item)]));
   }
-  throw new Error(`git semantic store v2: unsupported value ${typeof value}`);
+  throw new Error(`git semantic store: unsupported value ${typeof value}`);
 };
 
 const serialize = (value: unknown): string => `${JSON.stringify(canonicalize(value), null, 2)}\n`;
@@ -115,17 +115,17 @@ const parseCanonical = (bytes: string, label: string): unknown => {
   try {
     parsed = JSON.parse(bytes);
   } catch {
-    throw new Error(`git semantic store v2: invalid canonical JSON/YAML: ${label}`);
+    throw new Error(`git semantic store: invalid canonical JSON/YAML: ${label}`);
   }
   if (serialize(parsed) !== bytes) {
-    throw new Error(`git semantic store v2: non-canonical bytes: ${label}`);
+    throw new Error(`git semantic store: non-canonical bytes: ${label}`);
   }
   return parsed;
 };
 
 const bag = (value: unknown, label: string): Bag => {
   if (value === null || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`git semantic store v2: ${label} must be an object`);
+    throw new Error(`git semantic store: ${label} must be an object`);
   }
   return value as Bag;
 };
@@ -136,14 +136,14 @@ const exactBag = (value: unknown, keys: string[], label: string): Bag => {
   const expected = keys.slice().sort();
   if (actual.length !== expected.length ||
       actual.some((key, index) => key !== expected[index])) {
-    throw new Error(`git semantic store v2: ${label} has unknown or missing fields`);
+    throw new Error(`git semantic store: ${label} has unknown or missing fields`);
   }
   return result;
 };
 
 const string = (value: unknown, label: string): string => {
   if (typeof value !== "string" || value === "" || value !== value.trim()) {
-    throw new Error(`git semantic store v2: ${label} must be a canonical nonblank string`);
+    throw new Error(`git semantic store: ${label} must be a canonical nonblank string`);
   }
   return value;
 };
@@ -162,7 +162,7 @@ const resolveCommit = (repoRoot: string, ref: string): string => {
   const commit = runGit(repoRoot, [
     "rev-parse", "--verify", "--end-of-options", `${ref}^{commit}`,
   ]).trim();
-  if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error(`git semantic store v2: invalid commit for ${ref}`);
+  if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error(`git semantic store: invalid commit for ${ref}`);
   return commit;
 };
 
@@ -175,7 +175,7 @@ const stableFile = (kind: "features" | "specs", id: string): string =>
 export const stableSemanticPath = (
   kind: "features" | "specs",
   id: string,
-): string => `${V2_RELATIVE_PATH}/${stableFile(kind, id)}`;
+): string => `${STORE_RELATIVE_PATH}/${stableFile(kind, id)}`;
 
 const provenanceBody = (scope: string | null, event: Bag): Bag => {
   const { event_id: _ignored, durable_id: _existing, ...body } = event;
@@ -207,11 +207,11 @@ const fromDurableProvenance = (
   return { event_id: eventId, ...body };
 };
 
-const transformSpecToV2 = (value: unknown): Bag => {
+const transformSpecToCanonical = (value: unknown): Bag => {
   const spec = bag(value, "spec");
   const specId = string(spec.spec_id, "spec.spec_id");
   if (!Array.isArray(spec.provenance)) {
-    throw new Error(`git semantic store v2: spec provenance must be an array: ${specId}`);
+    throw new Error(`git semantic store: spec provenance must be an array: ${specId}`);
   }
   const provenance = spec.provenance.map((event) =>
     toDurableProvenance(specId, bag(event, "spec.provenance event")));
@@ -226,7 +226,7 @@ const transformSpecToV2 = (value: unknown): Bag => {
   };
 };
 
-const transformFeatureToV2 = (value: unknown): Bag => ({
+const transformFeatureToCanonical = (value: unknown): Bag => ({
   ...bag(value, "feature"),
   schema_version: 2,
 });
@@ -241,26 +241,26 @@ const inventoryDigest = (files: Array<{ path: string; bytes: string }>): string 
     .sort((left, right) => left.path < right.path ? -1 : left.path > right.path ? 1 : 0)
     .map((file) => ({ path: file.path, sha256: sha256(file.bytes) }))));
 
-export function exportGitSemanticStoreV2(
+export function exportGitSemanticStore(
   options: ExportGitSemanticStoreOptions,
-): V2ExportResult {
-  const finalStore = path.join(path.resolve(options.worktreeRoot), V2_RELATIVE_PATH);
+): GitSemanticStoreExportResult {
+  const finalStore = path.join(path.resolve(options.worktreeRoot), STORE_RELATIVE_PATH);
   if (fs.existsSync(finalStore)) {
-    throw new Error(`git semantic store v2: destination already exists: ${finalStore}`);
+    throw new Error(`git semantic store: destination already exists: ${finalStore}`);
   }
   const finalParent = path.dirname(finalStore);
   fs.mkdirSync(finalParent, { recursive: true });
-  const temp = fs.mkdtempSync(path.join(finalParent, ".v2-adapter-"));
-  const v1Worktree = path.join(temp, "v1-source");
-  const staging = path.join(temp, "v2");
-  fs.mkdirSync(v1Worktree, { recursive: true });
+  const temp = fs.mkdtempSync(path.join(finalParent, ".semantic-adapter-"));
+  const legacyWorktree = path.join(temp, "legacy-source");
+  const staging = path.join(temp, "store");
+  fs.mkdirSync(legacyWorktree, { recursive: true });
   try {
-    const exported = exportGitSemanticStore({ ...options, worktreeRoot: v1Worktree });
+    const exported = exportLegacyGitSemanticStore({ ...options, worktreeRoot: legacyWorktree });
     const manifest = parseCanonical(
       fs.readFileSync(path.join(exported.storePath, "manifest.yaml"), "utf8"),
-      "v1 manifest",
-    ) as V1Manifest;
-    const protocol: V2Protocol = {
+      "legacy manifest",
+    ) as LegacyManifest;
+    const protocol: SemanticStoreProtocol = {
       schema_version: 2,
       format: FORMAT,
       indexing: "stable-identity-paths",
@@ -275,7 +275,7 @@ export function exportGitSemanticStoreV2(
 
     for (const entry of manifest.features) {
       const source = path.join(exported.storePath, entry.file);
-      const document = transformFeatureToV2(parseCanonical(fs.readFileSync(source, "utf8"), entry.file));
+      const document = transformFeatureToCanonical(parseCanonical(fs.readFileSync(source, "utf8"), entry.file));
       const relative = stableFile("features", entry.id);
       const bytes = serialize(document);
       writeExclusive(path.join(staging, relative), bytes);
@@ -283,7 +283,7 @@ export function exportGitSemanticStoreV2(
     }
     for (const entry of manifest.specs) {
       const source = path.join(exported.storePath, entry.file);
-      const document = transformSpecToV2(parseCanonical(fs.readFileSync(source, "utf8"), entry.file));
+      const document = transformSpecToCanonical(parseCanonical(fs.readFileSync(source, "utf8"), entry.file));
       const relative = stableFile("specs", entry.id);
       const bytes = serialize(document);
       writeExclusive(path.join(staging, relative), bytes);
@@ -325,16 +325,16 @@ const validateRefSpec = (value: unknown, expectedId: string, label: string): Bag
     "revisions", "relations", "provenance",
   ], label);
   if (spec.schema_version !== 2 || spec.kind !== "spec" || spec.spec_id !== expectedId) {
-    throw new Error(`git semantic store v2: spec identity/protocol mismatch: ${label}`);
+    throw new Error(`git semantic store: spec identity/protocol mismatch: ${label}`);
   }
-  if (!Array.isArray(spec.provenance)) throw new Error(`git semantic store v2: missing provenance: ${label}`);
+  if (!Array.isArray(spec.provenance)) throw new Error(`git semantic store: missing provenance: ${label}`);
   for (const raw of spec.provenance) {
     const event = exactBag(raw, [
       "durable_id", "operation", "actor", "task_id", "request_id", "at", "payload",
     ], `${label}.provenance`);
     const durableId = string(event.durable_id, `${label}.provenance.durable_id`);
     if (!HASH.test(durableId) || durableId !== durableProvenanceId(expectedId, event)) {
-      throw new Error(`git semantic store v2: invalid durable provenance identity: ${label}`);
+      throw new Error(`git semantic store: invalid durable provenance identity: ${label}`);
     }
   }
   return spec;
@@ -347,17 +347,17 @@ const repoProvenanceFromDocument = (document: Bag, label: string): DurableProven
   ], label);
   const { schema_version, kind, ...raw } = validated;
   if (schema_version !== 2 || kind !== "repo_provenance") {
-    throw new Error(`git semantic store v2: invalid repo provenance protocol: ${label}`);
+    throw new Error(`git semantic store: invalid repo provenance protocol: ${label}`);
   }
   const event = raw as DurableProvenance;
   const durableId = string(event.durable_id, `${label}.durable_id`);
   if (!HASH.test(durableId) || durableId !== durableProvenanceId(null, event)) {
-    throw new Error(`git semantic store v2: invalid repo provenance identity: ${label}`);
+    throw new Error(`git semantic store: invalid repo provenance identity: ${label}`);
   }
   return event;
 };
 
-const validateProtocol = (value: unknown, label: string): V2Protocol => {
+const validateProtocol = (value: unknown, label: string): SemanticStoreProtocol => {
   const protocol = exactBag(value, [
     "schema_version", "format", "indexing", "integrity",
     "provenance_identity", "repository",
@@ -372,13 +372,13 @@ const validateProtocol = (value: unknown, label: string): V2Protocol => {
       (repository.slug !== null && typeof repository.slug !== "string") ||
       typeof repository.default_branch !== "string" ||
       typeof repository.created_at !== "string") {
-    throw new Error(`git semantic store v2: unsupported protocol: ${label}`);
+    throw new Error(`git semantic store: unsupported protocol: ${label}`);
   }
-  return protocol as unknown as V2Protocol;
+  return protocol as unknown as SemanticStoreProtocol;
 };
 
-const readProtocolAtCommit = (repoRoot: string, commit: string): V2Protocol => {
-  const file = `${V2_RELATIVE_PATH}/protocol.yaml`;
+const readProtocolAtCommit = (repoRoot: string, commit: string): SemanticStoreProtocol => {
+  const file = `${STORE_RELATIVE_PATH}/protocol.yaml`;
   return validateProtocol(parseCanonical(show(repoRoot, commit, file), `${commit}:${file}`), file);
 };
 
@@ -407,7 +407,7 @@ export function diffSemanticRefs(
   readProtocolAtCommit(repoRoot, base);
   readProtocolAtCommit(repoRoot, target);
   const raw = runGit(repoRoot, [
-    "diff", "--name-status", "-z", base, target, "--", `${V2_RELATIVE_PATH}/specs`,
+    "diff", "--name-status", "-z", base, target, "--", `${STORE_RELATIVE_PATH}/specs`,
   ]);
   const fields = raw.split("\0").filter(Boolean);
   const changes: RefSpecChange[] = [];
@@ -415,13 +415,13 @@ export function diffSemanticRefs(
     const status = fields[index++]!;
     const file = fields[index++]!;
     if (status.startsWith("R") || status.startsWith("C")) {
-      throw new Error("git semantic store v2: stable identity paths must not be renamed or copied");
+      throw new Error("git semantic store: stable identity paths must not be renamed or copied");
     }
     const sourceCommit = status.startsWith("D") ? base : target;
     const document = bag(parseCanonical(show(repoRoot, sourceCommit, file), `${sourceCommit}:${file}`), file);
     const specId = string(document.spec_id, `${file}.spec_id`);
     if (file !== stableSemanticPath("specs", specId)) {
-      throw new Error(`git semantic store v2: spec path does not match identity: ${file}`);
+      throw new Error(`git semantic store: spec path does not match identity: ${file}`);
     }
     changes.push({ status: changeStatus(status), specId, path: file });
   }
@@ -429,7 +429,7 @@ export function diffSemanticRefs(
 }
 
 interface RefInventory {
-  protocol: V2Protocol;
+  protocol: SemanticStoreProtocol;
   files: Array<{ path: string; bytes: string; document: Bag }>;
   semanticDigest: string;
 }
@@ -448,11 +448,11 @@ export interface WorktreeSemanticCacheResult extends WorktreeSemanticStoreInspec
 }
 
 const readRefInventory = (repoRoot: string, commit: string): RefInventory => {
-  const prefix = `${V2_RELATIVE_PATH}/`;
-  const names = runGit(repoRoot, ["ls-tree", "-r", "--name-only", "-z", commit, "--", V2_RELATIVE_PATH])
+  const prefix = `${STORE_RELATIVE_PATH}/`;
+  const names = runGit(repoRoot, ["ls-tree", "-r", "--name-only", "-z", commit, "--", STORE_RELATIVE_PATH])
     .split("\0").filter(Boolean).sort();
-  if (!names.includes(`${V2_RELATIVE_PATH}/protocol.yaml`)) {
-    throw new Error(`git semantic store v2: protocol missing at ${commit}`);
+  if (!names.includes(`${STORE_RELATIVE_PATH}/protocol.yaml`)) {
+    throw new Error(`git semantic store: protocol missing at ${commit}`);
   }
   const files = names.map((name) => {
     const bytes = show(repoRoot, commit, name);
@@ -473,12 +473,12 @@ const readRefInventory = (repoRoot: string, commit: string): RefInventory => {
       const id = string(feature.feature_id, `${file.path}.feature_id`);
       if (file.path !== stableFile("features", id) ||
           feature.schema_version !== 2 || feature.kind !== "feature") {
-        throw new Error(`git semantic store v2: invalid feature path/protocol: ${file.path}`);
+        throw new Error(`git semantic store: invalid feature path/protocol: ${file.path}`);
       }
     } else if (file.path.startsWith("specs/")) {
       const id = string(file.document.spec_id, `${file.path}.spec_id`);
       if (file.path !== stableFile("specs", id)) {
-        throw new Error(`git semantic store v2: invalid spec path: ${file.path}`);
+        throw new Error(`git semantic store: invalid spec path: ${file.path}`);
       }
       validateRefSpec(file.document, id, file.path);
     } else if (file.path.startsWith("provenance/")) {
@@ -486,10 +486,10 @@ const readRefInventory = (repoRoot: string, commit: string): RefInventory => {
       const durableId = string(event.durable_id, `${file.path}.durable_id`);
       if (file.path !== `provenance/sha256-${durableId}.yaml` ||
           durableId !== durableProvenanceId(null, event)) {
-        throw new Error(`git semantic store v2: invalid repo provenance: ${file.path}`);
+        throw new Error(`git semantic store: invalid repo provenance: ${file.path}`);
       }
     } else {
-      throw new Error(`git semantic store v2: unknown inventory entry: ${file.path}`);
+      throw new Error(`git semantic store: unknown inventory entry: ${file.path}`);
     }
   }
   return {
@@ -504,24 +504,24 @@ const regularFiles = (directory: string, root: string = directory): string[] => 
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     const absolute = path.join(directory, entry.name);
     if (entry.isSymbolicLink()) {
-      throw new Error(`git semantic store v2: symbolic links are forbidden: ${absolute}`);
+      throw new Error(`git semantic store: symbolic links are forbidden: ${absolute}`);
     }
     if (entry.isDirectory()) files.push(...regularFiles(absolute, root));
     else if (entry.isFile()) files.push(path.relative(root, absolute).split(path.sep).join("/"));
-    else throw new Error(`git semantic store v2: non-regular store entry: ${absolute}`);
+    else throw new Error(`git semantic store: non-regular store entry: ${absolute}`);
   }
   return files;
 };
 
 const readWorktreeInventory = (repoRootInput: string): RefInventory => {
   const repoRoot = path.resolve(repoRootInput);
-  const store = path.join(repoRoot, V2_RELATIVE_PATH);
+  const store = path.join(repoRoot, STORE_RELATIVE_PATH);
   if (!fs.statSync(store, { throwIfNoEntry: false })?.isDirectory()) {
-    throw new Error(`git semantic store v2: store missing: ${store}`);
+    throw new Error(`git semantic store: store missing: ${store}`);
   }
   const names = regularFiles(store).sort();
   if (!names.includes("protocol.yaml")) {
-    throw new Error(`git semantic store v2: protocol missing: ${store}`);
+    throw new Error(`git semantic store: protocol missing: ${store}`);
   }
   const files = names.map((relative) => {
     const bytes = fs.readFileSync(path.join(store, relative), "utf8");
@@ -542,12 +542,12 @@ const readWorktreeInventory = (repoRootInput: string): RefInventory => {
       const id = string(feature.feature_id, `${file.path}.feature_id`);
       if (file.path !== stableFile("features", id) ||
           feature.schema_version !== 2 || feature.kind !== "feature") {
-        throw new Error(`git semantic store v2: invalid feature path/protocol: ${file.path}`);
+        throw new Error(`git semantic store: invalid feature path/protocol: ${file.path}`);
       }
     } else if (file.path.startsWith("specs/")) {
       const id = string(file.document.spec_id, `${file.path}.spec_id`);
       if (file.path !== stableFile("specs", id)) {
-        throw new Error(`git semantic store v2: invalid spec path: ${file.path}`);
+        throw new Error(`git semantic store: invalid spec path: ${file.path}`);
       }
       validateRefSpec(file.document, id, file.path);
     } else if (file.path.startsWith("provenance/")) {
@@ -555,10 +555,10 @@ const readWorktreeInventory = (repoRootInput: string): RefInventory => {
       const durableId = string(event.durable_id, `${file.path}.durable_id`);
       if (file.path !== `provenance/sha256-${durableId}.yaml` ||
           durableId !== durableProvenanceId(null, event)) {
-        throw new Error(`git semantic store v2: invalid repo provenance: ${file.path}`);
+        throw new Error(`git semantic store: invalid repo provenance: ${file.path}`);
       }
     } else {
-      throw new Error(`git semantic store v2: unknown inventory entry: ${file.path}`);
+      throw new Error(`git semantic store: unknown inventory entry: ${file.path}`);
     }
   }
   return {
@@ -572,9 +572,9 @@ const readWorktreeInventory = (repoRootInput: string): RefInventory => {
 };
 
 export function hasGitSemanticStore(repoRoot: string): boolean {
-  return fs.statSync(path.join(path.resolve(repoRoot), V2_RELATIVE_PATH), {
+  return fs.statSync(path.join(path.resolve(repoRoot), STORE_RELATIVE_PATH, "protocol.yaml"), {
     throwIfNoEntry: false,
-  })?.isDirectory() === true;
+  })?.isFile() === true;
 }
 
 export function inspectGitSemanticStoreWorktree(
@@ -582,7 +582,7 @@ export function inspectGitSemanticStoreWorktree(
 ): WorktreeSemanticStoreInspection {
   const inventory = readWorktreeInventory(repoRoot);
   return {
-    storePath: path.join(path.resolve(repoRoot), V2_RELATIVE_PATH),
+    storePath: path.join(path.resolve(repoRoot), STORE_RELATIVE_PATH),
     semanticDigest: inventory.semanticDigest,
     featureCount: inventory.files.filter((file) => file.path.startsWith("features/")).length,
     specCount: inventory.files.filter((file) => file.path.startsWith("specs/")).length,
@@ -593,10 +593,10 @@ export function inspectGitSemanticStoreWorktree(
   };
 }
 
-const buildV1Adapter = (inventory: RefInventory, worktree: string): void => {
-  const store = path.join(worktree, V1_RELATIVE_PATH);
-  const featureEntries: V1Entry[] = [];
-  const specEntries: V1Entry[] = [];
+const buildLegacyAdapter = (inventory: RefInventory, worktree: string): void => {
+  const store = path.join(worktree, LEGACY_STORE_RELATIVE_PATH);
+  const featureEntries: LegacyEntry[] = [];
+  const specEntries: LegacyEntry[] = [];
   const provenance: Array<{ scope: string | null; event: DurableProvenance }> = [];
   fs.mkdirSync(path.join(store, "features"), { recursive: true });
   fs.mkdirSync(path.join(store, "specs"), { recursive: true });
@@ -616,7 +616,7 @@ const buildV1Adapter = (inventory: RefInventory, worktree: string): void => {
     } else if (file.path.startsWith("specs/")) {
       const specId = string(file.document.spec_id, "spec.spec_id");
       const rawEvents = file.document.provenance;
-      if (!Array.isArray(rawEvents)) throw new Error(`git semantic store v2: invalid provenance: ${specId}`);
+      if (!Array.isArray(rawEvents)) throw new Error(`git semantic store: invalid provenance: ${specId}`);
       for (const raw of rawEvents) provenance.push({
         scope: specId,
         event: raw as DurableProvenance,
@@ -662,7 +662,7 @@ const buildV1Adapter = (inventory: RefInventory, worktree: string): void => {
     specs: specEntries.map(({ id, sha256: contentHash }) => ({ id, sha256: contentHash })),
     repo_provenance: repoProvenance,
   }));
-  const manifest: V1Manifest = {
+  const manifest: LegacyManifest = {
     schema_version: 1,
     format: FORMAT,
     repository: inventory.protocol.repository,
@@ -686,8 +686,8 @@ export function materializeSemanticCacheFromWorktree(options: {
   try {
     const adapterWorktree = path.join(temp, "adapter");
     fs.mkdirSync(adapterWorktree, { recursive: true });
-    buildV1Adapter(inventory, adapterWorktree);
-    const imported = importGitSemanticStore({
+    buildLegacyAdapter(inventory, adapterWorktree);
+    const imported = importLegacyGitSemanticStore({
       worktreeRoot: adapterWorktree,
       targetDbPath: options.targetDbPath,
       targetRepoRootPath: repoRoot,
@@ -704,24 +704,24 @@ export function materializeSemanticCacheFromWorktree(options: {
   }
 }
 
-export function replaceGitSemanticStoreV2(options: {
+export function replaceGitSemanticStore(options: {
   sourceDbPath: string;
   sourceRepoId: number;
   repoRoot: string;
   expectedSemanticDigest: string;
-}): V2ExportResult {
+}): GitSemanticStoreExportResult {
   const repoRoot = path.resolve(options.repoRoot);
   const current = inspectGitSemanticStoreWorktree(repoRoot);
   if (current.semanticDigest !== options.expectedSemanticDigest) {
-    throw new Error("git semantic store v2: concurrent worktree semantic change");
+    throw new Error("git semantic store: concurrent worktree semantic change");
   }
-  const parent = path.join(repoRoot, ".vibehub", "semantic-store");
+  const actual = path.join(repoRoot, STORE_RELATIVE_PATH);
+  const parent = path.dirname(actual);
   const stagingRoot = fs.mkdtempSync(path.join(parent, ".authority-write-"));
-  const actual = path.join(repoRoot, V2_RELATIVE_PATH);
-  const backup = path.join(parent, `.v2-backup-${crypto.randomUUID()}`);
+  const backup = path.join(parent, `.semantic-backup-${crypto.randomUUID()}`);
   let movedCurrent = false;
   try {
-    const exported = exportGitSemanticStoreV2({
+    const exported = exportGitSemanticStore({
       dbPath: options.sourceDbPath,
       repoId: options.sourceRepoId,
       worktreeRoot: stagingRoot,
@@ -735,7 +735,7 @@ export function replaceGitSemanticStoreV2(options: {
     try {
       const installed = inspectGitSemanticStoreWorktree(repoRoot);
       if (installed.semanticDigest !== exported.semanticDigest) {
-        throw new Error("git semantic store v2: installed semantic digest mismatch");
+        throw new Error("git semantic store: installed semantic digest mismatch");
       }
     } catch (error) {
       fs.rmSync(actual, { recursive: true, force: true });
@@ -754,32 +754,32 @@ export function replaceGitSemanticStoreV2(options: {
   }
 }
 
-export function migrateSqliteSemanticStoreToGitV2(options: {
+export function migrateSqliteSemanticStoreToGit(options: {
   sourceDbPath: string;
   sourceRepoId: number;
   repoRoot: string;
-}): V2ExportResult {
+}): GitSemanticStoreExportResult {
   const repoRoot = path.resolve(options.repoRoot);
   if (hasGitSemanticStore(repoRoot)) {
-    throw new Error(`git semantic store v2: repository is already migrated: ${repoRoot}`);
+    throw new Error(`git semantic store: repository is already migrated: ${repoRoot}`);
   }
   if (runGit(repoRoot, ["status", "--porcelain=v1", "--untracked-files=all"]).trim() !== "") {
-    throw new Error("git semantic store v2: migration requires a clean worktree");
+    throw new Error("git semantic store: migration requires a clean worktree");
   }
   const sourceBytes = fs.statSync(path.resolve(options.sourceDbPath)).size;
   const space = fs.statfsSync(repoRoot);
   const availableBytes = Number(space.bavail) * Number(space.bsize);
   if (availableBytes < Math.max(sourceBytes * 3, 16 * 1024 * 1024)) {
-    throw new Error("git semantic store v2: insufficient disk space for migration proof");
+    throw new Error("git semantic store: insufficient disk space for migration proof");
   }
-  const parent = path.join(repoRoot, ".vibehub", "semantic-store");
+  const actual = path.join(repoRoot, STORE_RELATIVE_PATH);
+  const parent = path.dirname(actual);
   fs.mkdirSync(parent, { recursive: true });
   const stagingRoot = fs.mkdtempSync(path.join(parent, ".authority-migration-"));
   const proofRoot = fs.mkdtempSync(path.join(parent, ".authority-proof-"));
   const proofDb = path.join(proofRoot, "rebuilt.db");
-  const actual = path.join(repoRoot, V2_RELATIVE_PATH);
   try {
-    const exported = exportGitSemanticStoreV2({
+    const exported = exportGitSemanticStore({
       dbPath: options.sourceDbPath,
       repoId: options.sourceRepoId,
       worktreeRoot: stagingRoot,
@@ -789,23 +789,23 @@ export function migrateSqliteSemanticStoreToGitV2(options: {
       targetDbPath: proofDb,
     });
     if (rebuilt.semanticDigest !== exported.semanticDigest) {
-      throw new Error("git semantic store v2: migration cache digest mismatch");
+      throw new Error("git semantic store: migration cache digest mismatch");
     }
     const reexportRoot = path.join(proofRoot, "reexport");
     fs.mkdirSync(reexportRoot);
-    const reexported = exportGitSemanticStoreV2({
+    const reexported = exportGitSemanticStore({
       dbPath: proofDb,
       repoId: rebuilt.repoId,
       worktreeRoot: reexportRoot,
     });
     if (reexported.semanticDigest !== exported.semanticDigest) {
-      throw new Error("git semantic store v2: migration byte re-export mismatch");
+      throw new Error("git semantic store: migration byte re-export mismatch");
     }
     fs.renameSync(exported.storePath, actual);
     const installed = inspectGitSemanticStoreWorktree(repoRoot);
     if (installed.semanticDigest !== exported.semanticDigest) {
       fs.rmSync(actual, { recursive: true, force: true });
-      throw new Error("git semantic store v2: installed migration digest mismatch");
+      throw new Error("git semantic store: installed migration digest mismatch");
     }
     return { ...exported, storePath: actual };
   } finally {
@@ -830,7 +830,7 @@ export function materializeSemanticCacheAtRef(options: {
   if (fs.existsSync(dbPath)) {
     const inspection = inspectDatabase(dbPath);
     if (!inspection.readable || inspection.schemaVersion !== inspection.expectedSchemaVersion) {
-      throw new Error(`git semantic store v2: cache exists but is invalid: ${dbPath}`);
+      throw new Error(`git semantic store: cache exists but is invalid: ${dbPath}`);
     }
     const repoId = withReadonlyDb(dbPath, (db) =>
       (db.prepare("SELECT id FROM repos ORDER BY id LIMIT 1").get() as { id: number }).id);
@@ -849,10 +849,10 @@ export function materializeSemanticCacheAtRef(options: {
   try {
     const adapterWorktree = path.join(temp, "adapter");
     fs.mkdirSync(adapterWorktree, { recursive: true });
-    buildV1Adapter(inventory, adapterWorktree);
-    let imported: ReturnType<typeof importGitSemanticStore>;
+    buildLegacyAdapter(inventory, adapterWorktree);
+    let imported: ReturnType<typeof importLegacyGitSemanticStore>;
     try {
-      imported = importGitSemanticStore({
+      imported = importLegacyGitSemanticStore({
         worktreeRoot: adapterWorktree,
         targetDbPath: dbPath,
         targetRepoRootPath: repoRoot,

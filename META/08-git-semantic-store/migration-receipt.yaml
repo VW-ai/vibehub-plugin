@@ -5,8 +5,8 @@ migration:
   source_commit: "54cdcde4613c4223b6e9a625c59eadfb8e566861"
   authority:
     previous: "SQLite-only under decision-project-014"
-    current: "repository-scoped Git v2 under decision-project-028"
-    marker: ".vibehub/semantic-store/v2/protocol.yaml"
+    current: "repository-scoped Git semantic store under decision-project-028"
+    marker: ".vibehub/semantic-store/protocol.yaml"
   source_preflight:
     worktree_clean_at_start: true
     branch_matched_remote_at_start: true

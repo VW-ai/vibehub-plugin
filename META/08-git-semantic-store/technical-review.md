@@ -10,7 +10,7 @@ cutover implemented on `codex/git-semantic-store-spike`.
 Approve this direction:
 
 ```text
-Git v2 strict semantic tree
+Git semantic tree
   = durable semantic source of truth
 
 SQLite
@@ -24,10 +24,10 @@ current revision pointers and provenance. Sessions, hooks, events, queues,
 claims, leases, cadence, distillation runs, mapping runs and live projections
 remain SQLite-only.
 
-## v2 protocol shape
+## Canonical protocol shape
 
 ```text
-.vibehub/semantic-store/v2/
+.vibehub/semantic-store/
   protocol.yaml
   features/sha256-<feature-id>.yaml
   specs/sha256-<spec-id>.yaml
@@ -82,16 +82,16 @@ operational state.
 
 ## Evidence
 
-1. Lossless v1 gate:
+1. Lossless manifest-prototype gate:
    SQLite -> strict files -> clean SQLite preserves semantic digest,
    KnowledgeService queries and byte-identical re-export.
 2. Real Git merge matrix:
-   v1 global manifest is a conflict hotspot; stable v2 paths cleanly merge
+   the global manifest is a conflict hotspot; stable identity-derived paths cleanly merge
    unrelated specs and disjoint fields while surfacing semantic conflicts.
 3. Ref/cache spike:
    reads main and feature refs without checkout mutation, produces isolated
    commit-keyed caches, preserves branch-specific KnowledgeService results,
-   reuses cache hits and re-exports byte-equivalent v2 trees.
+   reuses cache hits and re-exports byte-equivalent semantic trees.
 4. Provenance spike:
    identical SQLite local integers on independent branches map to distinct
    durable IDs; local integer changes do not change durable identity.
@@ -104,7 +104,7 @@ Executable evidence:
 
 ## Review decisions requested
 
-1. Approve stable identity-derived v2 paths.
+1. Approve stable identity-derived paths.
 2. Approve derived inventory/digests instead of a committed mutable manifest.
 3. Approve `(repo, commit, semantic digest)` as the semantic cache key.
 4. Approve content-and-scope-derived durable provenance identity.
@@ -128,7 +128,7 @@ repository migration uses these gates:
 
 ### Build and prove
 
-- export v2 from the frozen SQLite snapshot;
+- export the canonical store from the frozen SQLite snapshot;
 - validate canonical protocol, stable paths, identities, graph integrity and
   operational-state exclusion;
 - materialize a clean SQLite cache from the exported commit;

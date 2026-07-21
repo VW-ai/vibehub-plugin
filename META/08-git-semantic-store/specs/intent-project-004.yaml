@@ -63,7 +63,7 @@ anchors:
   - file: "packages/core/test/git-semantic-store.test.ts"
   - file: "packages/core/test/git-semantic-merge-spike.test.ts"
   - file: "META/08-git-semantic-store/merge-ergonomics-spike.md"
-  - file: "packages/core/src/experimental/git-semantic-store/v2.ts"
+  - file: "packages/core/src/git-semantic-store.ts"
   - file: "packages/core/test/git-semantic-ref-cache.test.ts"
   - file: "META/08-git-semantic-store/technical-review.md"
   - file: "META/08-git-semantic-store/specs/decision-project-028.yaml"

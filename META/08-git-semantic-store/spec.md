@@ -1,24 +1,27 @@
 # 08-git-semantic-store — Git Semantic Store
 
-This room is an architecture exploration, not an approved migration.
+This room records the completed architecture spike and the approved,
+repository-scoped Git Semantic Store cutover.
 
-## Draft intent
+## Approved direction
 
-Durable semantic truth may move to strict, versioned YAML tracked by Git so
+Durable semantic truth lives in strict, versioned YAML tracked by Git so
 intent, decisions, constraints, specs, relations and provenance gain native
 diff, review, branch, merge and clone semantics.
 
-SQLite would remain the operational database for sessions, hooks, events,
+SQLite remains the operational database for sessions, hooks, events,
 checkpoint cadence, injection claims, writer leases, Run state, live timeline,
-indexes and materialized projections.
+indexes and materialized projections. It also hosts disposable semantic query
+caches materialized from an exact Git commit.
 
 ## Current authority
 
-**SQLite remains the source of truth.** Existing implementation and
-`decision-workbench-011/012` remain valid until a successful spike and explicit
-architecture review supersede them.
+For a repository containing `.vibehub/semantic-store/protocol.yaml`, Git is the
+durable semantic authority under `decision-project-028`. SQLite remains the
+operational authority. A repository without the marker stays on the legacy
+SQLite semantic path until its own explicit migration.
 
-## First gate
+## Historical first gate
 
 Prove a lossless round trip:
 
@@ -28,13 +31,13 @@ SQLite durable semantic subset
   → clean SQLite
 ```
 
-Identity, relations, revisions, activation pointers and provenance must rebuild
-without semantic loss. Until then:
+Identity, relations, revisions, activation pointers and provenance had to
+rebuild without semantic loss. During that gate the spike allowed:
 
 - no canonical write-through;
 - no one-table-per-file migration;
 - no hook/session/distillation-run state in Git;
-- no App dependency on a proposed YAML layout.
+- no App dependency on the proposed layout.
 
 ## Spike result — 2026-07-19
 
@@ -66,7 +69,7 @@ byte-identical re-export after rebuilding a clean SQLite database.
 
 At that point this result did **not** approve a storage migration.
 Mapping/distillation state, receipts and all operational tables remained
-excluded until the later v2 review and authority migration described below.
+excluded until the later stable-identity review and authority migration described below.
 
 ## Merge ergonomics spike — 2026-07-20
 
@@ -75,7 +78,7 @@ viable collaboration layout. Its content-addressed entity paths and committed
 global manifest/digest make even unrelated spec edits conflict in
 `manifest.yaml`.
 
-A v2 candidate uses stable identity-derived entity paths and commits only
+A stable-identity candidate uses identity-derived entity paths and commits only
 immutable protocol metadata. Inventory, per-file content digests and the global
 semantic digest become deterministic projections of a checked-out Git tree or
 commit, suitable for validation and a local SQLite query cache.
@@ -90,13 +93,13 @@ The real merge matrix establishes a useful PR boundary:
 
 A reusable team PR skill can orchestrate rebase, explanation, resolution and
 review, while deterministic validation/CI remains the enforcement authority.
-The v2 shape is not yet promoted: collision-safe durable provenance identity
+The stable-identity shape is not yet promoted: collision-safe durable provenance identity
 and branch/ref cache semantics remain open. Full evidence is recorded in
 `merge-ergonomics-spike.md`.
 
 ## Branch/ref cache spike and review readiness — 2026-07-20
 
-The v2 follow-up closes the remaining technical research gates:
+The stable-identity follow-up closes the remaining technical research gates:
 
 - light reads resolve arbitrary refs to exact commits and use `git show`
   without checkout mutation;
@@ -105,7 +108,7 @@ The v2 follow-up closes the remaining technical research gates:
   commit SHA and derived semantic digest;
 - main and feature caches preserve their distinct KnowledgeService results;
 - cache hits reuse the same validated database;
-- v2 cache re-export reproduces the same semantic digest;
+- semantic cache re-export reproduces the same semantic digest;
 - provenance durable IDs derive from canonical event content plus nullable spec
   scope, independent of SQLite-local integer IDs.
 
@@ -116,7 +119,7 @@ active and explicitly supersedes `decision-project-014`.
 
 The production cutover is repository-scoped:
 
-- the presence of `.vibehub/semantic-store/v2/protocol.yaml` is the explicit
+- the presence of `.vibehub/semantic-store/protocol.yaml` is the explicit
   authority marker;
 - every `kb.*` operation materializes the selected worktree into an isolated
   SQLite cache;
@@ -130,13 +133,13 @@ The production cutover is repository-scoped:
 - repositories without the authority marker remain on the legacy path until
   their own reviewed migration, avoiding a global flag day.
 
-The plugin repository now carries an empty v2 protocol because its registered
-runtime KB subset is empty. Existing machine SQLite rows for unrelated
+The plugin repository now carries an empty canonical protocol because its
+registered runtime KB subset is empty. Existing machine SQLite rows for unrelated
 repositories were inspected but not modified. See `migration-receipt.yaml`.
 
 # Canonical Specs
 
 - [intent-project-004] (active) Maintain Git/YAML durable semantics while
   SQLite retains operational state and rebuildable caches.
-- [decision-project-028] (active) Adopt Git v2 for durable semantic truth while
-  retaining SQLite operational authority and commit-keyed semantic caches.
+- [decision-project-028] (active) Adopt Git semantic store for durable semantic
+  truth while retaining SQLite operational authority and commit-keyed caches.

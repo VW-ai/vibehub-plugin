@@ -2,10 +2,10 @@ spec_id: "decision-project-028"
 type: decision
 state: active
 intent:
-  summary: "Adopt Git v2 as durable semantic truth and retain SQLite for operational truth plus commit-keyed semantic caches"
+  summary: "Adopt Git semantic store as durable semantic truth and retain SQLite for operational truth plus commit-keyed semantic caches"
   detail: |
     The completed architecture spikes support a split authority model. A strict
-    Git v2 semantic tree carries durable feature/spec/revision/evidence/anchor/
+    Git semantic tree carries durable feature/spec/revision/evidence/anchor/
     relation/provenance truth. SQLite remains canonical for operational state
     and holds rebuildable semantic query caches keyed by repository identity,
     commit SHA and derived semantic digest.
@@ -17,8 +17,9 @@ intent:
     identity while SQLite integer IDs remain cache-local projections.
 
     Wayne approved all six review decisions on 2026-07-20. Repositories cut
-    over independently when their v2 protocol appears; this avoids a global
-    flag day and gives every repository one non-dual-write authority boundary.
+    over independently when their canonical protocol appears; this avoids a
+    global flag day and gives every repository one non-dual-write authority
+    boundary.
 constraints:
   - kind: must
     rule: "Durable semantic entity paths derive from stable identity, while inventory and semantic digests derive from the selected Git tree or commit"
@@ -46,7 +47,7 @@ provenance:
 relations:
   - target: "decision-project-014"
     type: supersedes
-    detail: "Git v2 now holds durable semantic authority for each repository after its explicit protocol cutover."
+    detail: "Git semantic store now holds durable semantic authority for each repository after its explicit protocol cutover."
   - target: "contract-runtime-001"
     type: constrained_by
     detail: "The machine-level SQLite operational topology and canonical repository identity remain active."
@@ -55,7 +56,6 @@ relations:
 anchors:
   - file: "META/08-git-semantic-store/technical-review.md"
   - file: "packages/core/src/experimental/git-semantic-store/index.ts"
-  - file: "packages/core/src/experimental/git-semantic-store/v2.ts"
   - file: "packages/core/src/git-semantic-store.ts"
   - file: "packages/core/src/operation-dispatcher.ts"
   - file: "packages/cli/src/main.ts"

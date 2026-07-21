@@ -6,11 +6,11 @@ import path from "node:path";
 import {
   diffSemanticRefs,
   durableProvenanceId,
-  exportGitSemanticStoreV2,
+  exportGitSemanticStore,
   materializeSemanticCacheAtRef,
   readSpecAtRef,
   stableSemanticPath,
-} from "../src/experimental/git-semantic-store/v2.js";
+} from "../src/git-semantic-store.js";
 import { KnowledgeService, openDb, upsertRepo } from "../src/index.js";
 
 const NOW = "2026-07-20T08:00:00.000Z";
@@ -39,7 +39,7 @@ const canonical = (value: unknown): Json => {
 };
 const serialize = (value: unknown): string => `${JSON.stringify(canonical(value), null, 2)}\n`;
 
-describe("v2 branch/ref reads and commit-keyed semantic cache spike", () => {
+describe("branch/ref reads and commit-keyed semantic cache spike", () => {
   const roots: string[] = [];
   afterEach(() => roots.splice(0).forEach((root) =>
     fs.rmSync(root, { recursive: true, force: true })));
@@ -90,7 +90,7 @@ describe("v2 branch/ref reads and commit-keyed semantic cache spike", () => {
     }, { ...context, requestId: "request:promote" });
     db.close();
 
-    const exported = exportGitSemanticStoreV2({
+    const exported = exportGitSemanticStore({
       dbPath,
       repoId: repoRow.id,
       worktreeRoot: repo,
@@ -132,7 +132,7 @@ describe("v2 branch/ref reads and commit-keyed semantic cache spike", () => {
       const durableId = durableProvenanceId(null, { event_id: 7, ...event });
       const target = path.join(
         repo,
-        ".vibehub/semantic-store/v2/provenance",
+        ".vibehub/semantic-store/provenance",
         `sha256-${durableId}.yaml`,
       );
       fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -200,12 +200,12 @@ describe("v2 branch/ref reads and commit-keyed semantic cache spike", () => {
     const branchReexportRoot = path.join(root, "branch-reexport");
     fs.mkdirSync(mainReexportRoot);
     fs.mkdirSync(branchReexportRoot);
-    expect(exportGitSemanticStoreV2({
+    expect(exportGitSemanticStore({
       dbPath: mainCache.dbPath,
       repoId: mainCache.repoId,
       worktreeRoot: mainReexportRoot,
     }).semanticDigest).toBe(mainCache.semanticDigest);
-    expect(exportGitSemanticStoreV2({
+    expect(exportGitSemanticStore({
       dbPath: branchCache.dbPath,
       repoId: branchCache.repoId,
       worktreeRoot: branchReexportRoot,

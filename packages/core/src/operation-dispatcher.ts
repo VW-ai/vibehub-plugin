@@ -11,7 +11,7 @@ import {
   hasGitSemanticStore,
   inspectGitSemanticStoreWorktree,
   materializeSemanticCacheFromWorktree,
-  replaceGitSemanticStoreV2,
+  replaceGitSemanticStore,
 } from "./git-semantic-store.js";
 import { GitFacade } from "./git-facade.js";
 
@@ -130,13 +130,13 @@ export class OperationDispatcher {
     const authority=this.db.prepare(`SELECT format FROM repo_semantic_authority WHERE repo_id=?`).get(context.repoId) as {format:string}|undefined;
     if(hasGitSemanticStore(candidate)){
       const inspection=inspectGitSemanticStoreWorktree(candidate);
-      this.db.prepare(`INSERT INTO repo_semantic_authority(repo_id,format,initial_semantic_digest,cutover_at) VALUES(?,'git-v2',?,?) ON CONFLICT(repo_id) DO NOTHING`).run(
+      this.db.prepare(`INSERT INTO repo_semantic_authority(repo_id,format,initial_semantic_digest,cutover_at) VALUES(?,'git-semantic-store',?,?) ON CONFLICT(repo_id) DO NOTHING`).run(
         context.repoId,inspection.semanticDigest,context.now,
       );
       return candidate;
     }
     if(authority){
-      throw new KnowledgeError("semantic_store_missing","Git semantic authority is recorded but the current checkout has no v2 store",{repoId:context.repoId,checkout:candidate},["Switch to a commit containing .vibehub/semantic-store/v2 or restore the reviewed store before retrying."]);
+      throw new KnowledgeError("semantic_store_missing","Git semantic authority is recorded but the current checkout has no semantic store",{repoId:context.repoId,checkout:candidate},["Switch to a commit containing .vibehub/semantic-store or restore the reviewed store before retrying."]);
     }
     return null;
   }
@@ -156,7 +156,7 @@ export class OperationDispatcher {
       const data=handler(services,cacheContext,input);
       if(GIT_KB_MUTATIONS.has(operation)){
         cache.close();cache=undefined;
-        replaceGitSemanticStoreV2({
+        replaceGitSemanticStore({
           sourceDbPath:cachePath,
           sourceRepoId:materialized.repoId,
           repoRoot,
@@ -196,7 +196,7 @@ export class OperationDispatcher {
         }
       }finally{cache.close();}
       if(!changed)return;
-      replaceGitSemanticStoreV2({
+      replaceGitSemanticStore({
         sourceDbPath:cachePath,
         sourceRepoId:materialized.repoId,
         repoRoot,

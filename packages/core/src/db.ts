@@ -4,7 +4,7 @@
  * read while hooks write).
  *
  * SQLite is operational truth and the legacy authority for repositories that
- * have not crossed the decision-project-028 per-repository Git v2 boundary.
+ * have not crossed the decision-project-028 per-repository Git semantic store boundary.
  * One database holds every repo, scoped by repos.id (decision-project-025:
  * 同一 SQLite 按 repo 分域). This slice ships the TEAM-VISIBILITY subset of the 运行域/配置域
  * tables; M1 slice ② adds the full three-domain schema on top via the same
@@ -1040,12 +1040,12 @@ const MIGRATIONS: string[] = [
   `,
 
   // 016 — operational ledger for the repository-scoped Git semantic
-  // authority boundary. Once recorded, absence of the v2 tree is corruption
+  // authority boundary. Once recorded, absence of the semantic tree is corruption
   // or an old checkout and must never fall back to SQLite semantic writes.
   `
   CREATE TABLE repo_semantic_authority (
     repo_id INTEGER PRIMARY KEY REFERENCES repos(id),
-    format TEXT NOT NULL CHECK(format = 'git-v2'),
+    format TEXT NOT NULL CHECK(format = 'git-semantic-store'),
     initial_semantic_digest TEXT NOT NULL,
     cutover_at TEXT NOT NULL
   );

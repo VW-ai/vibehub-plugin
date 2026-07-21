@@ -1,4 +1,4 @@
-/** Canonical Feature Room ontology persisted by the v2 knowledge boundary. */
+/** Canonical Feature Room ontology persisted by the canonical knowledge boundary. */
 export const KB_SPEC_TYPES = [
   "intent", "decision", "constraint", "convention", "contract", "context", "change",
 ] as const;

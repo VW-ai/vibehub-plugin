@@ -18,7 +18,7 @@ describe("vibehub kb JSON adapter",()=>{let dir:string,repo:string,dbPath:string
     expect(main(["kb","migrate-store","--json","--repo",repo,"--db",dbPath])).toBe(0);
     const receipt=JSON.parse(stdout);expect(receipt).toMatchObject({ok:true,data:{operation:"kb.migrate-store",repoId:1,featureCount:0,specCount:0}});
     expect(fs.existsSync(receipt.data.backupPath)).toBe(true);expect(receipt.data.backupSha256).toMatch(/^[0-9a-f]{64}$/);
-    expect(fs.existsSync(path.join(repo,".vibehub/semantic-store/v2/protocol.yaml"))).toBe(true);
+    expect(fs.existsSync(path.join(repo,".vibehub/semantic-store/protocol.yaml"))).toBe(true);
     stdout="";expect(main(["kb","migrate-store","--json","--repo",repo,"--db",dbPath])).toBe(1);
     expect(JSON.parse(stdout)).toMatchObject({ok:false,error:{code:"migration_failed"}});
   });

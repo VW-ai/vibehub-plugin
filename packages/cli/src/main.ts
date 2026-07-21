@@ -25,7 +25,7 @@ import {
   exportTeamMapSnapshot,
   GitFacade,
   ingestCanonicalHookEvent,
-  migrateSqliteSemanticStoreToGitV2,
+  migrateSqliteSemanticStoreToGit,
   openDb,
   projectDoctorReceipt,
   projectInitReceipt,
@@ -163,13 +163,13 @@ function runSemanticMigration(argv:string[]):number{
     db.exec("BEGIN IMMEDIATE");locked=true;
     const after=Number(db.pragma("data_version",{simple:true}));
     if(after!==before)throw new Error("SQLite changed while the migration backup was being created");
-    const migrated=migrateSqliteSemanticStoreToGitV2({
+    const migrated=migrateSqliteSemanticStoreToGit({
       sourceDbPath:flags.db,
       sourceRepoId:repo.id,
       repoRoot:session.toplevel,
     });
     db.prepare(`INSERT INTO repo_semantic_authority(repo_id,format,initial_semantic_digest,cutover_at)
-      VALUES(?,'git-v2',?,?)`).run(repo.id,migrated.semanticDigest,new Date().toISOString());
+      VALUES(?,'git-semantic-store',?,?)`).run(repo.id,migrated.semanticDigest,new Date().toISOString());
     db.exec("COMMIT");locked=false;
     const receipt={
       schemaVersion:1,

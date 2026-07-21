@@ -1,5 +1,5 @@
 /**
- * Frozen v1 round-trip adapter retained for the production v2 importer.
+ * Frozen manifest-based round-trip adapter retained for canonical store import.
  *
  * This module deliberately has no package-root export and no runtime/App/MCP
  * wiring. Export opens an explicit database path through the read-only door;

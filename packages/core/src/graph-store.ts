@@ -1,4 +1,4 @@
-/** Read-only compatibility/read-model facade after the KB v2 cutover. */
+/** Read-only compatibility/read-model facade after the canonical KB cutover. */
 import type {TerritoryLayout,SubBlock,Territory} from "./contract/map-types.js";
 import type {Db} from "./db.js";import {canonicalRepoPath} from "./scope-registry.js";
 
