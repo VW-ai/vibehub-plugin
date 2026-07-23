@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.local/contracts/context-packet.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["need", "depth", "facts", "conflicts", "missing", "implications", "sources"],
+  "properties": {
+    "need": {"type": "string", "minLength": 1},
+    "depth": {"enum": ["L0", "L1", "L2", "L3"]},
+    "facts": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["specId", "state", "sourceKind", "summary"], "properties": {
+      "specId": {"type": "string", "minLength": 1}, "state": {"enum": ["draft", "active", "stale", "superseded", "deprecated"]},
+      "sourceKind": {"enum": ["canonical", "version_candidate"]}, "summary": {"type": "string"}, "inference": {"type": "boolean"}
+    }}},
+    "conflicts": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["specIds", "description"], "properties": {"specIds": {"type": "array", "minItems": 2, "items": {"type": "string"}}, "description": {"type": "string"}}}},
+    "missing": {"type": "array", "items": {"type": "string"}},
+    "implications": {"type": "array", "items": {"type": "string"}},
+    "unresolvedQuestions": {"type": "array", "items": {"type": "string"}},
+    "sources": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["specId", "sourceRefs"], "properties": {"specId": {"type": "string"}, "sourceRefs": {"type": "array", "items": {"type": "string"}}}}}
+  }
+}

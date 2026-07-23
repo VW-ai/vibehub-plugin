@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "vibehub",
+  "displayName": "VibeHub",
+  "version": "0.1.0",
+  "description": "Local team context: hook capture, governed knowledge skills, and deterministic MCP capabilities.",
+  "author": { "name": "VibeHub Team" },
+  "license": "Apache-2.0",
+  "keywords": ["context", "collaboration", "knowledge", "hooks", "mcp"]
+}
