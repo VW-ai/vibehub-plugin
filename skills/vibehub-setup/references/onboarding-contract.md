@@ -21,7 +21,8 @@ verbatim. A `not_proven` state is waiting, not failure and not success.
 Inspect before mutation, apply once with the same target and executable, then
 read status. Parse JSON on both zero and non-zero exits. The receipt is
 `ProjectActivationResultV1`; fields and checksums are facts owned by the CLI.
-Do not directly edit managed markers or the SQLite database.
+Do not directly edit managed markers or bypass runtime operations to alter
+persistent state.
 
 If the second apply is current, its expected result is unchanged and has no
 file effect. Repeated setup is maintenance, not another activation.

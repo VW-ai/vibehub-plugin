@@ -10,7 +10,7 @@ Make explicit human-governed lifecycle decisions. Never auto-promote or delete.
 ## Prerequisites
 
 1. Read `../_stdlib/lifecycle.md`, `../_stdlib/provenance.md`,
-   `../_stdlib/db-operations.md`, and `../_stdlib/reporting.md`.
+   `../_stdlib/operations.md`, and `../_stdlib/reporting.md`.
 2. Read `../_stdlib/relations.md` for conflicts/supersession.
 3. Read `../_stdlib/ontology.md` for placement/type disputes.
 4. Read `../_stdlib/quality-gates.md` when reviewing a distillation version.

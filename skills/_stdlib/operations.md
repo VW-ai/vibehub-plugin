@@ -1,13 +1,24 @@
-# Database operation boundary
+# Operation boundary
 
-Skills and scripts call `vibehub ... --json`; they never import SQLite/native
-drivers, issue SQL, or mutate files as storage. MCP tool `kb_operation` accepts
+Skills and scripts call `vibehub ... --json`; they never import storage
+drivers, query backing stores directly, or mutate persistence files. MCP tool `kb_operation` accepts
 the exact `kb.*` operation plus `input`; `distill_operation` accepts the exact
 `distill.*` operation plus `input`. Both return the same dispatcher envelope.
 `kb_retrieve` is only the focused `kb.spec.search` convenience adapter. MCP
 v0.2 exposes no legacy mutation aliases; route writes through these canonical
 adapters so evidence, task attribution, request identity, and version
 transactions remain enforceable.
+
+## Change boundary
+
+- `SKILL.md`, `_stdlib`, and domain references own semantic judgment and
+  workflow policy. A persistence migration alone must not require them to
+  change.
+- Contracts may change only when the public semantic operation or workflow
+  artifact changes—not when its implementation changes.
+- Scripts and setup host references are mechanical adapters. They may change
+  with CLI, MCP, packaging, or host integration while preserving the same
+  semantic operation boundary.
 
 ## Invocation
 

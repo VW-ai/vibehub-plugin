@@ -1,6 +1,6 @@
 spec_id: "intent-project-004"
 type: intent
-state: draft
+state: active
 intent:
   summary: "Explore Git/YAML as the canonical layer for durable semantics while SQLite retains operational state and rebuildable projections"
   detail: |
@@ -59,3 +59,11 @@ anchors:
   - file: "packages/core/src/db.ts"
   - file: "packages/core/src/knowledge-service.ts"
   - file: "packages/core/src/distillation-service.ts"
+  - file: "packages/core/src/experimental/git-semantic-store/index.ts"
+  - file: "packages/core/test/git-semantic-store.test.ts"
+  - file: "packages/core/test/git-semantic-merge-spike.test.ts"
+  - file: "META/08-git-semantic-store/merge-ergonomics-spike.md"
+  - file: "packages/core/src/git-semantic-store.ts"
+  - file: "packages/core/test/git-semantic-ref-cache.test.ts"
+  - file: "META/08-git-semantic-store/technical-review.md"
+  - file: "META/08-git-semantic-store/specs/decision-project-028.yaml"

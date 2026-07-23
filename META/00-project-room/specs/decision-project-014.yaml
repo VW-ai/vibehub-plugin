@@ -1,15 +1,16 @@
 spec_id: "decision-project-014"
 type: decision
-state: active
+state: superseded
 intent:
   summary: "当前 source of truth = SQLite；文件只是 projection/export，直至另有正式 supersede"
   detail: |
     当前实现以 SQLite 承载 semantic knowledge 与 operational state，并由 core
     提供唯一读写门、schema migration、query/index 与 projection。
 
-    `intent-project-004` 正在探索 Git/YAML durable semantic layer，但仍是 draft。
-    在 lossless round-trip spike 与正式 architecture review 完成前，本决策保持
-    canonical；实现不得提前形成双写或隐式 source-of-truth flip。
+    本决策记录 2026-07-20 以前的 SQLite-only authority。lossless round-trip、
+    Git merge、branch/ref cache 与 provenance identity 已完成验证；Wayne 随后
+    批准 decision-project-028。SQLite 继续承载 operational truth 和可重建
+    semantic cache，但不再是已迁移仓库的 durable semantic authority。
 constraints:
   - kind: must
     rule: "当前所有 canonical knowledge mutation 继续通过 SQLite-backed deterministic operations"
@@ -34,7 +35,10 @@ provenance:
 relations:
   - target: "intent-project-004"
     type: challenged_by
-    detail: "Git/YAML remains a draft candidate pending proof and explicit supersession"
+    detail: "The exploration completed and produced decision-project-028."
+  - target: "decision-project-028"
+    type: superseded_by
+    detail: "Explicitly superseded after technical review approval on 2026-07-20."
 anchors:
   - file: "packages/core/src/db.ts"
   - file: "packages/core/src/knowledge-service.ts"

@@ -21,9 +21,11 @@ import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
 import {
   applyIntervention,
+  CURRENT_SCHEMA_VERSION,
   exportTeamMapSnapshot,
   GitFacade,
   ingestCanonicalHookEvent,
+  migrateSqliteSemanticStoreToGit,
   openDb,
   projectDoctorReceipt,
   projectInitReceipt,
@@ -97,6 +99,7 @@ const USAGE = `usage:
   vibehub doctor [--json] [--repo <path>] [--db <path>]
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
   vibehub kb <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
+  vibehub kb migrate-store --json [--repo <path>] [--db <path>]
   vibehub distill <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop> [--host claude-code|codex]
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
@@ -131,14 +134,65 @@ function runOperation(group:"kb"|"distill",operation:string|undefined,argv:strin
     if(!operation)throw new Error("KB operation is required");
     const flags=parseKbFlags(argv); if(!flags.json)throw new Error("kb operations require --json");
     db=openDb(flags.db);
-    const root=GitFacade.resolveRepoRoot(flags.repo);
+    const session=GitFacade.sessionContextAt(flags.repo);
+    const root=session.repoRoot;
     const row=flags.repoId?{id:flags.repoId}:db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(root) as {id:number}|undefined;
     const repoId=row?.id??0;
     const canonicalOperation=operation.startsWith("kb.")||operation.startsWith("distill.")?operation:`${group}.${operation}`;
-    const result=new OperationDispatcher(db).dispatch(canonicalOperation,{repoId,actor:flags.actor??"",taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
+    const result=new OperationDispatcher(db,{repoRoot:session.toplevel}).dispatch(canonicalOperation,{repoId,actor:flags.actor??"",taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
     process.stdout.write(`${JSON.stringify(result)}\n`);
     return result.ok?0:(OPERATION_EXIT_CLASS[result.error.code]??1);
   }catch(error){const result={ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error),details:null,nextSafeActions:[`Run vibehub ${group} with --json and a valid JSON --input payload.`]}};process.stdout.write(`${JSON.stringify(result)}\n`);return 2;}finally{db?.close();}
+}
+
+function runSemanticMigration(argv:string[]):number{
+  const flags=parseFlags(argv,"throw");
+  if(!flags.json)throw new Error("kb migrate-store requires --json");
+  const session=GitFacade.sessionContextAt(flags.repo);
+  const db=openDb(flags.db);
+  let locked=false;
+  try{
+    const repo=db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(session.repoRoot) as {id:number}|undefined;
+    if(!repo)throw new Error("repository is not initialized in VibeHub; run vibehub init first");
+    const backupDirectory=path.join(path.dirname(flags.db),"backups","git-semantic-store");
+    fs.mkdirSync(backupDirectory,{recursive:true});
+    const stamp=new Date().toISOString().replaceAll(":","-");
+    const backupPath=path.join(backupDirectory,`${repo.id}-${stamp}.db`);
+    const before=Number(db.pragma("data_version",{simple:true}));
+    db.prepare("VACUUM INTO ?").run(backupPath);
+    db.exec("BEGIN IMMEDIATE");locked=true;
+    const after=Number(db.pragma("data_version",{simple:true}));
+    if(after!==before)throw new Error("SQLite changed while the migration backup was being created");
+    const migrated=migrateSqliteSemanticStoreToGit({
+      sourceDbPath:flags.db,
+      sourceRepoId:repo.id,
+      repoRoot:session.toplevel,
+    });
+    db.prepare(`INSERT INTO repo_semantic_authority(repo_id,format,initial_semantic_digest,cutover_at)
+      VALUES(?,'git-semantic-store',?,?)`).run(repo.id,migrated.semanticDigest,new Date().toISOString());
+    db.exec("COMMIT");locked=false;
+    const receipt={
+      schemaVersion:1,
+      operation:"kb.migrate-store",
+      repoId:repo.id,
+      repoRoot:session.repoRoot,
+      worktree:session.toplevel,
+      sourceSchemaVersion:CURRENT_SCHEMA_VERSION,
+      backupPath,
+      backupSha256:crypto.createHash("sha256").update(fs.readFileSync(backupPath)).digest("hex"),
+      semanticDigest:migrated.semanticDigest,
+      featureCount:migrated.featureCount,
+      specCount:migrated.specCount,
+      provenanceCount:migrated.provenanceCount,
+      storePath:migrated.storePath,
+    };
+    process.stdout.write(`${JSON.stringify({ok:true,data:receipt})}\n`);
+    return 0;
+  }catch(error){
+    if(locked){try{db.exec("ROLLBACK");}catch{/* preserve the original migration error */}}
+    process.stdout.write(`${JSON.stringify({ok:false,error:{code:"migration_failed",message:error instanceof Error?error.message:String(error)}})}\n`);
+    return 1;
+  }finally{db.close();}
 }
 
 const HOOK_EVENTS: ReadonlySet<string> = new Set([
@@ -247,6 +301,10 @@ function printSnapshot(flags: Flags): number {
 
 export function main(argv: string[]): number {
   const [group, cmd, ...rest] = argv;
+  if(group==="kb"&&cmd==="migrate-store"){
+    try{return runSemanticMigration(rest);}
+    catch(error){process.stdout.write(`${JSON.stringify({ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error)}})}\n`);return 2;}
+  }
   if (group === "kb" || group === "distill") return runOperation(group,cmd, rest);
   if (group === "hook") {
     return runHook(cmd, rest);

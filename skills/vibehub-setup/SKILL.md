@@ -52,7 +52,7 @@ parse stdout as JSON on exit 0 or 1. An exit code never replaces the
    `instructions`, `runtime`, `activation`, and `errors`; do not infer success
    from prose or exit status alone.
 2. If inspection is blocked or partial, stop and load recovery guidance. Never
-   edit managed markers, write the database, alter hooks, or repair files by
+   edit managed markers, rewrite persistent state, alter hooks, or repair files by
    hand.
 3. Before applying, explain the two owned targets, `AGENTS.md` and `CLAUDE.md`,
    and that only the VibeHub managed block may change. State any planned

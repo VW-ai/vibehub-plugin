@@ -12,7 +12,7 @@ do not split a condition from the behavior it qualifies.
 | Type | Positive test | Negative test |
 |---|---|---|
 | intent | states an outcome/purpose; “we want onboarding to work offline” | chosen implementation is a decision |
-| decision | selects among plausible alternatives; “use SQLite for local truth” | mandatory external boundary is a constraint |
+| decision | selects among plausible alternatives; “use a local transactional store for runtime truth” | mandatory external boundary is a constraint |
 | constraint | must/must-not limit independent of implementation preference | an observable interface shape is a contract |
 | contract | names caller/provider behavior, data, error, timing or compatibility promise | internal repeated style is a convention |
 | convention | repeatable team practice whose consistency is the value | one-time migration is a change |

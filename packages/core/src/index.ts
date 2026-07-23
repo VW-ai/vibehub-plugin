@@ -19,7 +19,7 @@ export {
 export * from "./runtime-lifecycle.js";
 export * from "./project-activation.js";
 export * from "./activity-store.js";
-// GraphStore is a read-model compatibility facade after the KB v2 cutover.
+// GraphStore is a read-model compatibility facade after the canonical KB cutover.
 // Canonical/mapping writes are intentionally not part of the package API.
 export {
   listTerritories, readTerritoryLayouts, countAnchoredFiles, featuresForFile,
@@ -98,6 +98,26 @@ export * from "./knowledge-service.js";
 export * from "./distillation-service.js";
 export * from "./operation-dispatcher.js";
 export * from "./operation-contracts.js";
+export {
+  GIT_SEMANTIC_STORE_RELATIVE_PATH,
+  diffSemanticRefs,
+  durableProvenanceId,
+  exportGitSemanticStore,
+  hasGitSemanticStore,
+  inspectGitSemanticStoreWorktree,
+  materializeSemanticCacheAtRef,
+  materializeSemanticCacheFromWorktree,
+  migrateSqliteSemanticStoreToGit,
+  readSpecAtRef,
+  replaceGitSemanticStore,
+  stableSemanticPath,
+  type RefReadResult,
+  type RefSpecChange,
+  type SemanticCacheResult,
+  type GitSemanticStoreExportResult,
+  type WorktreeSemanticCacheResult,
+  type WorktreeSemanticStoreInspection,
+} from "./git-semantic-store.js";
 export {
   ingestCanonicalHookEvent,
   ingestHookEvent,

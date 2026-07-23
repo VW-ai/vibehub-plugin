@@ -1,9 +1,19 @@
-import type { Db } from "./db.js";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { openDb, type Db } from "./db.js";
 import crypto from "node:crypto";
 import { z } from "zod";
 import { KnowledgeError, KnowledgeService, type DraftBatchInput } from "./knowledge-service.js";
 import { DistillationService, type CandidateInput, type DistillationStartInput, type InventoryRowInput, type ScopePlanInput } from "./distillation-service.js";
 import { operationContextSchema, operationInputSchemas, type OperationName } from "./operation-contracts.js";
+import {
+  hasGitSemanticStore,
+  inspectGitSemanticStoreWorktree,
+  materializeSemanticCacheFromWorktree,
+  replaceGitSemanticStore,
+} from "./git-semantic-store.js";
+import { GitFacade } from "./git-facade.js";
 
 export interface OperationContext { repoId:number; actor:string; taskId?:string; requestId:string; now:string }
 export interface OperationMeta { operation:string; repoId:number; requestId:string; at:string }
@@ -20,6 +30,8 @@ export const OPERATION_EXIT_CLASS:Record<string,number>={
   version_not_eligible:4, checksum_mismatch:5, cas_conflict:5,
   candidate_set_frozen:4, candidate_snapshot_mismatch:5,
   base_commit_not_found:4, correction_not_required:4, scope_not_implicated:4,
+  semantic_store_missing:5,
+  semantic_authority_requires_dispatcher:5,
 };
 
 interface Services {kb:KnowledgeService;distill:DistillationService}
@@ -71,7 +83,7 @@ const handlers:Record<OperationName,Handler>={
 
 export class OperationDispatcher {
   private readonly service:Services;
-  constructor(private readonly db:Db){this.service={kb:new KnowledgeService(db),distill:new DistillationService(db)};}
+  constructor(private readonly db:Db,private readonly options:{repoRoot?:string}={}){this.service={kb:new KnowledgeService(db),distill:new DistillationService(db)};}
   operations():string[]{return Object.keys(handlers).sort();}
   dispatch(operation:string,context:unknown,input:unknown={}):OperationResult{
     const address=receiptAddressSchema.safeParse(context);
@@ -94,8 +106,103 @@ export class OperationDispatcher {
     }
     const parsedInput=schema.safeParse(input);if(!parsedInput.success)throw validation(parsedInput.error.issues,"input");
     const c=parsedContext.data as OperationContext;const normalizedInput=parsedInput.data as Record<string,unknown>;
-    const data=DISTILL_MUTATIONS.has(operation)?this.dispatchDistillMutation(operation,c,normalizedInput,handler):handler(this.service,c,normalizedInput);
+    let data:unknown;
+    if(operation.startsWith("kb.")&&this.gitSemanticRoot(c)){
+      data=this.dispatchGitKnowledge(operation,c,normalizedInput,handler);
+    }else if(DISTILL_MUTATIONS.has(operation)){
+      data=this.dispatchDistillMutation(operation,c,normalizedInput,handler);
+      if(operation==="distill.finalize"&&this.gitSemanticRoot(c))this.syncGitFeatureIdentities(c,data);
+    }else data=handler(this.service,c,normalizedInput);
     return {ok:true,data,meta:{operation,repoId:c.repoId,requestId:c.requestId,at:c.now}};
+  }
+  private gitSemanticRoot(context:OperationContext):string|null{
+    const repo=this.db.prepare(`SELECT root_path rootPath FROM repos WHERE id=?`).get(context.repoId) as {rootPath:string}|undefined;
+    if(!repo)return null;
+    const task=context.taskId?this.db.prepare(`SELECT worktree_path worktreePath FROM tasks WHERE id=? AND repo_id=?`).get(context.taskId,context.repoId) as {worktreePath:string|null}|undefined:undefined;
+    let candidate=this.options.repoRoot??task?.worktreePath??repo.rootPath;
+    if(this.options.repoRoot){
+      const session=GitFacade.sessionContextAt(this.options.repoRoot);
+      if(fs.realpathSync(session.repoRoot)!==fs.realpathSync(repo.rootPath)){
+        throw new KnowledgeError("validation_error","dispatcher worktree does not belong to the addressed repository");
+      }
+      candidate=session.toplevel;
+    }
+    const authority=this.db.prepare(`SELECT format FROM repo_semantic_authority WHERE repo_id=?`).get(context.repoId) as {format:string}|undefined;
+    if(hasGitSemanticStore(candidate)){
+      const inspection=inspectGitSemanticStoreWorktree(candidate);
+      this.db.prepare(`INSERT INTO repo_semantic_authority(repo_id,format,initial_semantic_digest,cutover_at) VALUES(?,'git-semantic-store',?,?) ON CONFLICT(repo_id) DO NOTHING`).run(
+        context.repoId,inspection.semanticDigest,context.now,
+      );
+      return candidate;
+    }
+    if(authority){
+      throw new KnowledgeError("semantic_store_missing","Git semantic authority is recorded but the current checkout has no semantic store",{repoId:context.repoId,checkout:candidate},["Switch to a commit containing .vibehub/semantic-store or restore the reviewed store before retrying."]);
+    }
+    return null;
+  }
+  private dispatchGitKnowledge(operation:string,c:OperationContext,input:Record<string,unknown>,handler:Handler){
+    const repoRoot=this.gitSemanticRoot(c);
+    if(!repoRoot)throw new KnowledgeError("internal_error","Git semantic authority disappeared during dispatch");
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-git-authority-"));
+    const cachePath=path.join(temp,"semantic.db");
+    let cache:Db|undefined;
+    try{
+      const materialized=materializeSemanticCacheFromWorktree({repoRoot,targetDbPath:cachePath});
+      cache=openDb(cachePath);
+      copyOperationalKnowledgeContext(this.db,c.repoId,cache,materialized.repoId);
+      recoverDurableMutationReceipts(cache,materialized.repoId);
+      const services={kb:new KnowledgeService(cache),distill:new DistillationService(cache)};
+      const cacheContext={...c,repoId:materialized.repoId};
+      const data=handler(services,cacheContext,input);
+      if(GIT_KB_MUTATIONS.has(operation)){
+        cache.close();cache=undefined;
+        replaceGitSemanticStore({
+          sourceDbPath:cachePath,
+          sourceRepoId:materialized.repoId,
+          repoRoot,
+          expectedSemanticDigest:materialized.semanticDigest,
+        });
+        const receipts=openDb(cachePath);
+        try{copyMutationReceipts(receipts,materialized.repoId,this.db,c.repoId);}
+        finally{receipts.close();}
+      }
+      return data;
+    }finally{
+      cache?.close();
+      fs.rmSync(temp,{recursive:true,force:true});
+    }
+  }
+  private syncGitFeatureIdentities(c:OperationContext,result:unknown):void{
+    const repoRoot=this.gitSemanticRoot(c);
+    if(!repoRoot)throw new KnowledgeError("internal_error","Git semantic authority disappeared during feature finalization");
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-git-features-"));
+    try{
+      const cachePath=path.join(temp,"semantic.db");
+      const materialized=materializeSemanticCacheFromWorktree({repoRoot,targetDbPath:cachePath});
+      const cache=openDb(cachePath);
+      let changed=false;
+      try{
+        const existing=new Set((cache.prepare(`SELECT feature_id id FROM kb_features WHERE repo_id=?`).all(materialized.repoId) as Array<{id:string}>).map(row=>row.id));
+        const source=this.db.prepare(`SELECT feature_id id,created_at createdAt FROM kb_features WHERE repo_id=? ORDER BY feature_id`).all(c.repoId) as Array<{id:string;createdAt:string}>;
+        const added=source.filter(row=>!existing.has(row.id));
+        if(added.length){
+          const insert=cache.prepare(`INSERT INTO kb_features(repo_id,feature_id,created_at) VALUES(?,?,?)`);
+          for(const row of added)insert.run(materialized.repoId,row.id,row.createdAt);
+          cache.prepare(`INSERT INTO kb_provenance_events(repo_id,operation,spec_id,actor,task_id,request_id,at,payload) VALUES(?,? ,NULL,?,?,?,?,?)`).run(
+            materialized.repoId,"distill.finalize.features",c.actor,c.taskId??null,c.requestId,c.now,
+            JSON.stringify({features:added.map(row=>row.id),result}),
+          );
+          changed=true;
+        }
+      }finally{cache.close();}
+      if(!changed)return;
+      replaceGitSemanticStore({
+        sourceDbPath:cachePath,
+        sourceRepoId:materialized.repoId,
+        repoRoot,
+        expectedSemanticDigest:materialized.semanticDigest,
+      });
+    }finally{fs.rmSync(temp,{recursive:true,force:true});}
   }
   private dispatchRequest(operation:string,repoId:number,requestId:string,payloadHash:string,createdAt:string,invoke:()=>OperationResult){
     return this.db.transaction(()=>{
@@ -122,7 +229,58 @@ export class OperationDispatcher {
 }
 
 const DISTILL_MUTATIONS=new Set(["distill.run.start","distill.run.abort","distill.inventory.put","distill.inventory.seal","distill.scopes.plan","distill.scopes.claim","distill.scopes.complete","distill.scopes.fail","distill.scopes.retry","distill.scopes.correct","distill.candidates.put","distill.reconcile","distill.validate","distill.finalize","distill.activate","distill.rollback"]);
+const GIT_KB_MUTATIONS=new Set(["kb.draft.apply","kb.promote","kb.mark-stale","kb.deprecate","kb.amend","kb.supersede"]);
 function sortObject(value:unknown):unknown{return Array.isArray(value)?value.map(sortObject):value&&typeof value==="object"?Object.fromEntries(Object.entries(value).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>[k,sortObject(v)])):value;}
+
+function copyMutationReceipts(source:Db,sourceRepoId:number,target:Db,targetRepoId:number):void{
+  const rows=source.prepare(`SELECT operation,idempotency_key idempotencyKey,input_hash inputHash,result,created_at createdAt FROM kb_mutation_receipts WHERE repo_id=?`).all(sourceRepoId) as Array<{operation:string;idempotencyKey:string;inputHash:string;result:string;createdAt:string}>;
+  const insert=target.prepare(`INSERT INTO kb_mutation_receipts(repo_id,operation,idempotency_key,input_hash,result,created_at) VALUES(?,?,?,?,?,?) ON CONFLICT(repo_id,operation,idempotency_key) DO NOTHING`);
+  for(const row of rows)insert.run(targetRepoId,row.operation,row.idempotencyKey,row.inputHash,row.result,row.createdAt);
+}
+
+function recoverDurableMutationReceipts(db:Db,repoId:number):void{
+  const rows=db.prepare(`SELECT payload FROM kb_provenance_events WHERE repo_id=? ORDER BY id`).all(repoId) as Array<{payload:string}>;
+  const insert=db.prepare(`INSERT INTO kb_mutation_receipts(repo_id,operation,idempotency_key,input_hash,result,created_at) VALUES(?,?,?,?,?,?) ON CONFLICT(repo_id,operation,idempotency_key) DO NOTHING`);
+  for(const row of rows){
+    const payload=JSON.parse(row.payload) as { _receipt?: unknown };
+    if(!payload._receipt||typeof payload._receipt!=="object"||Array.isArray(payload._receipt))continue;
+    const receipt=payload._receipt as Record<string,unknown>;
+    if(typeof receipt.operation!=="string"||typeof receipt.idempotencyKey!=="string"||
+      typeof receipt.inputHash!=="string"||typeof receipt.createdAt!=="string"||
+      receipt.result===undefined)throw new KnowledgeError("internal_error","durable mutation receipt is malformed");
+    const result=JSON.stringify(receipt.result);
+    insert.run(repoId,receipt.operation,receipt.idempotencyKey,receipt.inputHash,result,receipt.createdAt);
+    const stored=db.prepare(`SELECT input_hash inputHash,result FROM kb_mutation_receipts WHERE repo_id=? AND operation=? AND idempotency_key=?`).get(repoId,receipt.operation,receipt.idempotencyKey) as {inputHash:string;result:string};
+    if(stored.inputHash!==receipt.inputHash||
+      hashCanonical(JSON.parse(stored.result))!==hashCanonical(receipt.result)){
+      throw new KnowledgeError("idempotency_conflict","durable and operational mutation receipts disagree",{operation:receipt.operation,idempotencyKey:receipt.idempotencyKey});
+    }
+  }
+}
+
+function copyOperationalKnowledgeContext(source:Db,sourceRepoId:number,target:Db,targetRepoId:number):void{
+  copyMutationReceipts(source,sourceRepoId,target,targetRepoId);
+  const active=source.prepare(`SELECT a.version_id versionId,a.activated_at activatedAt,v.state,v.source_kind sourceKind,v.checksum,v.created_at createdAt,v.finalized_at finalizedAt FROM repo_active_mapping a JOIN mapping_versions v ON v.repo_id=a.repo_id AND v.version_id=a.version_id WHERE a.repo_id=?`).get(sourceRepoId) as {versionId:string;activatedAt:string;state:string;sourceKind:string;checksum:string;createdAt:string;finalizedAt:string|null}|undefined;
+  if(!active)return;
+  target.prepare(`INSERT INTO mapping_versions(repo_id,version_id,state,source_kind,checksum,created_at,finalized_at) VALUES(?,?,?,?,?,?,?)`).run(targetRepoId,active.versionId,active.state,active.sourceKind,active.checksum,active.createdAt,active.finalizedAt);
+  const features=source.prepare(`SELECT feature_id featureId,parent_feature_id parentId,name,description,intent,lifecycle FROM mapping_version_features WHERE repo_id=? AND version_id=?`).all(sourceRepoId,active.versionId) as Array<{featureId:string;parentId:string|null;name:string;description:string|null;intent:string|null;lifecycle:string}>;
+  const pending=new Map(features.map(row=>[row.featureId,row]));
+  const inserted=new Set<string>();
+  const insertFeature=target.prepare(`INSERT INTO mapping_version_features(repo_id,version_id,feature_id,parent_feature_id,name,description,intent,lifecycle) VALUES(?,?,?,?,?,?,?,?)`);
+  while(pending.size){
+    let progress=false;
+    for(const [id,row] of pending){
+      if(row.parentId!==null&&!inserted.has(row.parentId))continue;
+      insertFeature.run(targetRepoId,active.versionId,id,row.parentId,row.name,row.description,row.intent,row.lifecycle);
+      pending.delete(id);inserted.add(id);progress=true;
+    }
+    if(!progress)throw new KnowledgeError("internal_error","active mapping feature hierarchy is cyclic or incomplete");
+  }
+  const anchors=source.prepare(`SELECT feature_id featureId,file,symbol,line_start lineStart,line_end lineEnd,content_hash contentHash FROM mapping_version_anchors WHERE repo_id=? AND version_id=?`).all(sourceRepoId,active.versionId) as Array<{featureId:string;file:string;symbol:string;lineStart:number|null;lineEnd:number|null;contentHash:string|null}>;
+  const insertAnchor=target.prepare(`INSERT INTO mapping_version_anchors(repo_id,version_id,feature_id,file,symbol,line_start,line_end,content_hash) VALUES(?,?,?,?,?,?,?,?)`);
+  for(const row of anchors)insertAnchor.run(targetRepoId,active.versionId,row.featureId,row.file,row.symbol,row.lineStart,row.lineEnd,row.contentHash);
+  target.prepare(`INSERT INTO repo_active_mapping(repo_id,version_id,activated_at) VALUES(?,?,?)`).run(targetRepoId,active.versionId,active.activatedAt);
+}
 
 const actorProbeSchema=z.object({actor:z.unknown().optional()}).passthrough();
 const receiptAddressSchema=z.object({repoId:operationContextSchema.shape.repoId,requestId:operationContextSchema.shape.requestId}).passthrough();
