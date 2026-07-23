@@ -37,6 +37,8 @@ jobs:
       - run: node scripts/verify-release-metadata.mjs "${GITHUB_REF_NAME}"
       - name: Install pinned host CLIs
         run: npm install --global "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" "@openai/codex@${CODEX_VERSION}"
+      - name: Install Playwright Chromium
+        run: pnpm --filter @vibehub/workbench-app exec playwright install --with-deps chromium
       - run: pnpm verify
 
   build-platform:
