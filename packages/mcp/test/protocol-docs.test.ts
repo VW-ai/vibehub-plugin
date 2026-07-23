@@ -28,7 +28,7 @@ function expectPackagedProtocolDocs(root: string): void {
   for (const absolute of markdownFiles(path.join(root, "skills"))) {
     expect(fs.readFileSync(absolute, "utf8"), path.relative(root, absolute)).not.toMatch(legacyName);
   }
-  const guidance = `${read(root, "README.md")}\n${read(root, "skills/_stdlib/db-operations.md")}`;
+  const guidance = `${read(root, "README.md")}\n${read(root, "skills/_stdlib/operations.md")}`;
   expect(guidance).toContain("`kb_operation`");
   expect(guidance).toContain("`distill_operation`");
   expect(guidance).toContain("optional top-level tool field");
