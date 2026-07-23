@@ -21,6 +21,7 @@ const STATIC_PLUGIN_PATHS = [
   "codex",
   "hooks",
   "skills",
+  "assets/brand",
   "LICENSE",
   "README.md",
 ];

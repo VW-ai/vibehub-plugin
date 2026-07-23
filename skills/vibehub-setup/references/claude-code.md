@@ -15,7 +15,7 @@ After restart:
 
 If status remains waiting, verify the user restarted Claude Code in the exact
 checkout and that the new session began after the current instruction blocks.
-Do not synthesize a hook event, edit session rows, or switch to another checkout
+Do not synthesize a hook event, forge session state, or switch to another checkout
 to make the proof pass.
 
 Real Claude host operation can send project context through configured tools.

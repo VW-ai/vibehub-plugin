@@ -11,6 +11,7 @@ export interface CapabilityContext {
   db: Db;
   repoId: number;
   taskId: string;
+  repoRoot?: string;
   actor?: string;
   requestId?: () => string;
   now?: () => string;
@@ -18,7 +19,7 @@ export interface CapabilityContext {
 
 export function createCapabilities(ctx: CapabilityContext) {
   const now = (): string => ctx.now?.() ?? new Date().toISOString();
-  const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db).dispatch(operation,{
+  const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db,{repoRoot:ctx.repoRoot}).dispatch(operation,{
     repoId:ctx.repoId,actor:ctx.actor??"mcp-agent",taskId:ctx.taskId,
     requestId:requestId??ctx.requestId?.()??`mcp-${crypto.randomUUID()}`,now:now(),
   },input);

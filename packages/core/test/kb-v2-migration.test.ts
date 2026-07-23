@@ -93,7 +93,7 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     raw.close();
 
     const db = openDb(file);
-    expect(CURRENT_SCHEMA_VERSION).toBe(15);
+    expect(CURRENT_SCHEMA_VERSION).toBe(16);
     expect(db.pragma("user_version", { simple: true })).toBe(CURRENT_SCHEMA_VERSION);
     expect(db.prepare(`SELECT repo_id, feature_id FROM kb_features WHERE feature_id = 'root' ORDER BY repo_id`).all())
       .toEqual([{ repo_id: 1, feature_id: "root" }, { repo_id: 2, feature_id: "root" }]);
@@ -139,7 +139,7 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
   it("upgrades v11 databases with immutable unresolved scope dispositions",()=>{
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-unresolved-migration-"));dirs.push(dir);
     const file=path.join(dir,"legacy-v11.db"),db=openDb(file);db.close();
-    const raw=new Database(file);raw.exec(`DROP TABLE IF EXISTS distill_scope_dispositions; DROP TABLE IF EXISTS operation_request_receipts; DROP TABLE IF EXISTS task_prompt_cadence; DROP TABLE IF EXISTS task_prompt_seen; DROP INDEX IF EXISTS idx_kb_provenance_task; PRAGMA user_version=11;`);raw.close();
+    const raw=new Database(file);raw.exec(`DROP TABLE IF EXISTS distill_scope_dispositions; DROP TABLE IF EXISTS operation_request_receipts; DROP TABLE IF EXISTS task_prompt_cadence; DROP TABLE IF EXISTS task_prompt_seen; DROP TABLE IF EXISTS repo_semantic_authority; DROP INDEX IF EXISTS idx_kb_provenance_task; PRAGMA user_version=11;`);raw.close();
     const upgraded=openDb(file);
     expect(upgraded.pragma("user_version",{simple:true})).toBe(CURRENT_SCHEMA_VERSION);
     expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='distill_scope_dispositions'`).get()).toEqual({name:"distill_scope_dispositions"});

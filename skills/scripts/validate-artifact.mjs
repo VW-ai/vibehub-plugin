@@ -44,6 +44,11 @@ if(packageIndex>=0){
   }
   for(const file of fs.readdirSync(path.join(root,"_stdlib")))if(!file.endsWith(".md"))errors.push({path:`_stdlib/${file}`,message:"stdlib contains a non-reference asset"});
   const markdown=[]; const walk=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory())walk(p);else if(e.name.endsWith(".md"))markdown.push(p);}};walk(root);
+  const forbiddenIntelligence=[
+    {pattern:new RegExp(`\\b${["sql","ite"].join("")}\\b`,"i"),message:"intelligence names a storage implementation"},
+    {pattern:new RegExp(`(?:\\.vibehub/${["semantic","store"].join("-")}|${["git","semantic","store"].join("-")}|${["semantic","store"].join("[- ]")}|protocol\\.yaml)`,"i"),message:"intelligence names the semantic persistence protocol"},
+  ];
+  for(const file of markdown){const source=fs.readFileSync(file,"utf8");for(const rule of forbiddenIntelligence)if(rule.pattern.test(source))errors.push({path:path.relative(root,file),message:rule.message});}
   const link=/`?((?:\.\.\/)*_stdlib\/[a-z0-9-]+\.md|(?:\.\.\/)*contracts\/[a-z0-9.-]+\.json|(?:\.\.\/)*scripts\/[a-z0-9_-]+\.mjs|references\/[a-z0-9-]+\.md)`?/g;
   for(const file of markdown){const text=fs.readFileSync(file,"utf8");for(const match of text.matchAll(link)){const target=path.resolve(path.dirname(file),match[1]);if(!fs.existsSync(target))errors.push({path:path.relative(root,file),message:`missing reference ${match[1]}`});}}
   const operations=new Set([...KB].map(x=>`kb.${x}`).concat([...DISTILL].map(x=>`distill.${x}`)));

@@ -70,6 +70,7 @@ export class KnowledgeService {
   constructor(private readonly db: Db) {}
 
   status(repoId: number) {
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.status",{});
     const states = this.db.prepare(`SELECT state, COUNT(*) AS count FROM kb_specs WHERE repo_id=? GROUP BY state`).all(repoId) as Array<{state:string;count:number}>;
     const active = this.db.prepare(`SELECT a.version_id AS versionId, v.source_kind AS sourceKind, v.created_at AS createdAt,
@@ -82,6 +83,7 @@ export class KnowledgeService {
   }
 
   listFeatures(repoId: number, input: { query?: string; path?: string; limit?: number; offset?:number } = {}) {
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.feature.list",input);
     optionalCanonical(input.query,"query",300);const q=input.query?.toLowerCase()??null;const p=input.path?canonicalPath(input.path,"path"):null;
     const version = this.activeVersion(repoId);
@@ -99,6 +101,7 @@ export class KnowledgeService {
   }
 
   getFeature(repoId: number, id: string) {
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.feature.get",{id});
     const found=this.db.prepare(`SELECT f.feature_id AS id,f.parent_feature_id AS parentId,f.name,f.description,f.intent,f.lifecycle,a.version_id AS activeMappingVersion,
       COUNT(DISTINCT ma.file) AS anchoredFileCount,COALESCE(json_group_array(DISTINCT ma.file) FILTER(WHERE ma.file IS NOT NULL),'[]') AS paths
@@ -118,6 +121,7 @@ export class KnowledgeService {
     domain?: string; layer?: string; includeDrafts?: boolean; includeHistory?: boolean; limit?: number;
     offset?:number;
   } = {}) {
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.spec.search",input);
     optionalCanonical(input.query,"query",300);input.paths?.forEach(value=>canonicalPath(value,"path"));input.tags?.forEach(value=>required(value,"tag",100));optionalCanonical(input.domain,"domain",200);optionalCanonical(input.layer,"layer",200);
     const allowed = new Set<KbSpecState>(["active"]);
@@ -165,6 +169,7 @@ export class KnowledgeService {
   }
 
   getSpec(repoId: number, id: string): Row {
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.spec.get",{id});
     const base=this.db.prepare(`SELECT s.spec_id AS id,s.feature_id AS featureId,s.state,s.current_revision AS revision,r.type,r.summary,r.detail,r.priority,r.layer,r.domain,r.tags,r.producer,r.produced_at AS producedAt,
       CASE WHEN f.feature_id IS NULL THEN 1 ELSE 0 END AS unplaced FROM kb_specs s JOIN kb_spec_revisions r ON r.repo_id=s.repo_id AND r.spec_id=s.spec_id AND r.revision=s.current_revision
@@ -186,6 +191,7 @@ export class KnowledgeService {
   }
 
   traverseRelations(repoId: number, input: {specId:string;direction?:"out"|"in"|"both";types?:KbRelationType[];depth?:number;limit?:number}) {
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.relations",input);
     const depth = Math.max(1, Math.min(input.depth ?? 1, 5)); const limit = Math.max(1, Math.min(input.limit ?? 100, 500));
     this.ensureSpec(repoId,input.specId); const seen=new Set([input.specId]);const edgeSeen=new Set<string>(); let frontier=[input.specId]; const edges:Array<Row>=[];
@@ -205,6 +211,7 @@ export class KnowledgeService {
   }
 
   resolveLineage(repoId:number,id:string,maxDepth=100){
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.lineage",{id,maxDepth});
     this.ensureSpec(repoId,id); const chain=[id]; const seen=new Set(chain); let current=id;let truncated=false;
     while(chain.length<=maxDepth){ const row=this.db.prepare(`SELECT to_spec_id AS id FROM kb_spec_relations WHERE repo_id=? AND from_spec_id=? AND type='supersedes' ORDER BY to_spec_id LIMIT 1`)
@@ -213,6 +220,7 @@ export class KnowledgeService {
   }
 
   anchors(repoId:number,input:{specId?:string;path?:string}){
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.anchors",input);
     if(input.specId)return {forward:this.currentAnchors(repoId,input.specId)};
     if(!input.path)throw new KnowledgeError("validation_error","specId or path is required"); const p=canonicalPath(input.path,"path");
@@ -222,6 +230,7 @@ export class KnowledgeService {
   }
 
   review(repoId:number,input:{kinds?:string[];limit?:number;offset?:number}={}){
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.review",input);
     const kinds=new Set(input.kinds??["low_confidence","conflict","stale","unplaced"]);const branches:string[]=[];const params:unknown[]=[];
     if(kinds.has("low_confidence")){branches.push(`SELECT 'low_confidence' kind,e.spec_id specId,NULL relatedSpecId,e.confidence confidence FROM kb_evidence e JOIN kb_specs s ON s.repo_id=e.repo_id AND s.spec_id=e.spec_id AND s.current_revision=e.revision WHERE e.repo_id=? AND s.state IN ('draft','active','stale') AND e.confidence IS NOT NULL AND e.confidence<0.6`);params.push(repoId);}
@@ -232,6 +241,7 @@ export class KnowledgeService {
   }
 
   previewIngest(repoId:number,input:{specs:Array<{summary:string;anchors?:KbAnchorInput[]}>}){
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeOperation("kb.ingest.preview",input);
     if(!Array.isArray(input.specs)||!input.specs.length||input.specs.length>100)throw new KnowledgeError("validation_error","specs must contain 1..100 items");
     return input.specs.map(candidate=>{ const summary=required(candidate.summary,"summary",300);const lexical=this.db.prepare(`SELECT s.spec_id AS specId,r.summary FROM kb_specs s JOIN kb_spec_revisions r
@@ -241,6 +251,7 @@ export class KnowledgeService {
   }
 
   applyDraftBatch(repoId:number,input:DraftBatchInput,ctx:MutationContext){
+    this.assertDispatcherAuthority(repoId);
     guardKnowledgeMutation("kb.draft.apply",repoId,input,ctx);
     this.validateContext(ctx,true); required(input.idempotencyKey,"idempotencyKey"); if(!Array.isArray(input.specs)||!input.specs.length)throw new KnowledgeError("validation_error","specs must not be empty");
     const inputHash=hash(input); const existing=this.receipt(repoId,"draft_batch",input.idempotencyKey,inputHash); if(existing)return existing;
@@ -248,13 +259,15 @@ export class KnowledgeService {
     for(const item of input.specs)for(const rel of item.relations??[])if(!ids.has(rel.toSpecId))this.ensureSpec(repoId,rel.toSpecId);
     this.validateRelationPlan(repoId,input.specs.flatMap(s=>(s.relations??[]).map(r=>({from:s.id,to:r.toSpecId,type:r.type}))));
     return this.db.transaction(()=>{ const again=this.receipt(repoId,"draft_batch",input.idempotencyKey,inputHash);if(again)return again;
-      for(const item of input.specs)this.insertDraft(repoId,item,ctx);
-      for(const item of input.specs)for(const r of item.relations??[])this.db.prepare(`INSERT INTO kb_spec_relations(repo_id,from_spec_id,to_spec_id,type,rationale,created_at) VALUES(?,?,?,?,?,?)`).run(repoId,item.id,r.toSpecId,r.type,r.rationale??null,ctx.now);
       const result={operation:"draft_batch",created:input.specs.map(s=>s.id),idempotencyKey:input.idempotencyKey,inputHash};
+      const receipt={operation:"draft_batch",idempotencyKey:input.idempotencyKey,inputHash,result,createdAt:ctx.now};
+      for(const item of input.specs)this.insertDraft(repoId,item,ctx,receipt);
+      for(const item of input.specs)for(const r of item.relations??[])this.db.prepare(`INSERT INTO kb_spec_relations(repo_id,from_spec_id,to_spec_id,type,rationale,created_at) VALUES(?,?,?,?,?,?)`).run(repoId,item.id,r.toSpecId,r.type,r.rationale??null,ctx.now);
       this.storeReceipt(repoId,"draft_batch",input.idempotencyKey,inputHash,result,ctx.now); return result; }).immediate();
   }
 
   mutate(repoId:number,operation:"promote"|"mark_stale"|"deprecate"|"amend"|"supersede",input:Record<string,unknown>,ctx:MutationContext){
+    this.assertDispatcherAuthority(repoId);
     const operationName=({promote:"kb.promote",mark_stale:"kb.mark-stale",deprecate:"kb.deprecate",amend:"kb.amend",supersede:"kb.supersede"} as const)[operation];guardKnowledgeMutation(operationName,repoId,input,ctx);
     this.validateContext(ctx,false); const key=required(input.idempotencyKey,"idempotencyKey"); const inputHash=hash(input); const cached=this.receipt(repoId,operation,key,inputHash);if(cached)return cached;
     return this.db.transaction(()=>{const again=this.receipt(repoId,operation,key,inputHash);if(again)return again;
@@ -267,10 +280,10 @@ export class KnowledgeService {
         this.db.prepare(`INSERT INTO kb_spec_relations(repo_id,from_spec_id,to_spec_id,type,rationale,created_at) VALUES(?,?,?,'supersedes',?,?)`)
           .run(repoId,id,replacement,typeof input.rationale==="string"?input.rationale:null,ctx.now); this.transition(repoId,id,"superseded",ctx); result={...result,replacementSpecId:replacement,state:"superseded"};
       } else { const target:KbSpecState=operation==="promote"?"active":operation==="mark_stale"?"stale":"deprecated"; this.transition(repoId,id,target,ctx);result={...result,state:target}; }
-      this.audit(repoId,operation,id,ctx,result);this.storeReceipt(repoId,operation,key,inputHash,result,ctx.now);return result;}).immediate();
+      this.audit(repoId,operation,id,ctx,{...result,_receipt:{operation,idempotencyKey:key,inputHash,result,createdAt:ctx.now}});this.storeReceipt(repoId,operation,key,inputHash,result,ctx.now);return result;}).immediate();
   }
 
-  private insertDraft(repoId:number,item:DraftSpecInput,ctx:MutationContext){
+  private insertDraft(repoId:number,item:DraftSpecInput,ctx:MutationContext,receipt:Record<string,unknown>){
     this.db.prepare(`INSERT INTO kb_specs(repo_id,spec_id,feature_id,state,current_revision,source_kind,created_at,updated_at) VALUES(?,?,?,'draft',1,'canonical',?,?)`)
       .run(repoId,item.id,item.featureId??null,ctx.now,ctx.now);
     this.db.prepare(`INSERT INTO kb_spec_revisions(repo_id,spec_id,revision,type,summary,detail,priority,layer,domain,tags,producer,produced_at) VALUES(?,?,1,?,?,?,?,?,?,?,?,?)`)
@@ -279,7 +292,7 @@ export class KnowledgeService {
       .run(repoId,e.id??`${item.id}:1:${i+1}`,item.id,1,e.sourceType,e.sourceRef,e.exactQuote??null,e.evidenceRef??null,e.contentHash??null,e.confidence??null,ctx.actor,ctx.now);
     for(const a of item.anchors??[]){const p=canonicalRepoPath(a.file);this.db.prepare(`INSERT INTO kb_spec_revision_anchors(repo_id,spec_id,revision,file,symbol,line_start,line_end,content_hash) VALUES(?,?,1,?,?,?,?,?)`)
       .run(repoId,item.id,p,a.symbol??"",a.lineStart??null,a.lineEnd??null,a.contentHash??null);this.db.prepare(`INSERT INTO kb_spec_current_anchors SELECT * FROM kb_spec_revision_anchors WHERE repo_id=? AND spec_id=? AND revision=1 AND file=? AND symbol=?`).run(repoId,item.id,p,a.symbol??"");}
-    this.audit(repoId,"draft_batch",item.id,ctx,{revision:1});
+    this.audit(repoId,"draft_batch",item.id,ctx,{revision:1,_receipt:receipt});
   }
 
   private amend(repoId:number,id:string,input:Record<string,unknown>,ctx:MutationContext){const cur=this.getSpec(repoId,id);const next=(cur.revision as number)+1;
@@ -310,6 +323,7 @@ export class KnowledgeService {
   private activeVersion(repoId:number){return (this.db.prepare(`SELECT version_id AS id FROM repo_active_mapping WHERE repo_id=?`).get(repoId) as {id:string}|undefined)?.id??null;}
   private featurePlacement(repoId:number,id:string){const v=this.activeVersion(repoId);return v?this.db.prepare(`SELECT feature_id FROM mapping_version_features WHERE repo_id=? AND version_id=? AND feature_id=? AND lifecycle='active'`).get(repoId,v,id):null;}
   private currentAnchors(repoId:number,id:string){return this.db.prepare(`SELECT file,symbol,line_start AS lineStart,line_end AS lineEnd,content_hash AS contentHash FROM kb_spec_current_anchors WHERE repo_id=? AND spec_id=? ORDER BY file,symbol`).all(repoId,id) as Array<{file:string;symbol:string;lineStart:number|null;lineEnd:number|null;contentHash:string|null}>;}
+  private assertDispatcherAuthority(repoId:number){if(this.db.prepare(`SELECT 1 FROM repo_semantic_authority WHERE repo_id=?`).get(repoId))throw new KnowledgeError("semantic_authority_requires_dispatcher","Git semantic authority requires the repository-aware OperationDispatcher",{repoId},["Route the operation through CLI, MCP, or OperationDispatcher with the current checkout root."]);}
 }
 
 function pathContains(query:string,anchor:string):boolean{return anchor===query||anchor.startsWith(query.endsWith("/")?query:`${query}/`)||query.startsWith(anchor.endsWith("/")?anchor:`${anchor}/`);}

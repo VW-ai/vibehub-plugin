@@ -94,9 +94,14 @@ describe("production skill package",()=>{
 
   it("keeps scripts and skills behind the dispatcher boundary",()=>{
     const text=files(skills).filter(x=>/\.(?:md|mjs)$/.test(x)).map(x=>fs.readFileSync(x,"utf8")).join("\n");
+    const intelligence=files(skills).filter(x=>/\.(?:md|yaml)$/.test(x)).map(x=>fs.readFileSync(x,"utf8")).join("\n");
+    const contracts=files(path.join(skills,"contracts")).map(x=>fs.readFileSync(x,"utf8")).join("\n");
     expect(text).not.toMatch(/kb_apply_distillation/);
     expect(text).not.toMatch(/better-sqlite3|node:sqlite|from\s+["']sqlite/);
     expect(text).not.toMatch(/\b(?:SELECT|INSERT|UPDATE|DELETE)\s+(?:FROM|INTO|SET)\b/i);
+    expect(intelligence).not.toMatch(/\bsqlite\b|workbench\.db|VIBEHUB_DB/i);
+    expect(intelligence).not.toMatch(/\.vibehub\/semantic|git-semantic-store|semantic[- ]store|protocol\.yaml/i);
+    expect(contracts).not.toMatch(/\.vibehub\/semantic|git-semantic-store|semantic[- ]store|protocol\.yaml/i);
     expect(text).not.toMatch(/(?:80%|5[-–]8 roots|10[-–]25 features|20[-–]30%)[^\n]*(?:must|required|gate|target)/i);
   });
 
@@ -107,7 +112,9 @@ describe("production skill package",()=>{
     expect(relations).toContain("Adjacency is not dependency evidence");
     expect(relations).toContain("`relates_to` or no edge");
 
-    const operations=read("_stdlib/db-operations.md");
+    const operations=read("_stdlib/operations.md");
+    expect(operations).toContain("Skills and scripts call `vibehub ... --json`");
+    expect(operations).toContain("never import storage");
     expect(operations).toContain("repository-wide request identity");
     expect(operations).toContain("requestId was reused with a different operation or canonical payload");
     expect(operations).toContain("`kb.anchors`");
@@ -181,7 +188,9 @@ describe("production skill package",()=>{
     expect(setup).toContain("`references/codex.md` only when the active host is OpenAI Codex");
     expect(setup).toContain("Never manufacture a query result, ingest write, host handshake");
     expect(codex).toContain("They share the same packaged");
-    expect(codex).toContain("SQLite database");
+    expect(codex).toContain("runtime state");
+    expect(codex).toContain("Never create");
+    expect(codex).toContain("host-specific state store");
     expect(codex).toContain("Git common-root repository");
     expect(codex).toContain("AGENTS.md");
     expect(codex).toContain("VIBEHUB_BIN");
@@ -193,7 +202,8 @@ describe("production skill package",()=>{
     expect(codex).toContain("`--host codex`");
     expect(codex).toContain("Do not tail host logs, watch files, poll for activity");
     expect(codex).toContain("Do not add `Stop`, `SessionEnd`, or failure events");
-    expect(codex).toContain("Never create a Codex-specific database");
+    expect(codex).toContain("Never create");
+    expect(codex).toContain("host-specific state store");
     expect(codex).toContain("Do not write sessions or receipts by hand");
     expect(codex).not.toContain("WorkflowReceiptV1");
     expect(recovery).toContain("Never delete a retained recovery backup");

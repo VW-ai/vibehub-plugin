@@ -10,7 +10,7 @@ not mutate human-authored truth from code drift.
 
 ## Prerequisites
 
-1. Read `../_stdlib/orchestration.md`, `../_stdlib/db-operations.md`,
+1. Read `../_stdlib/orchestration.md`, `../_stdlib/operations.md`,
    `../_stdlib/quality-gates.md`, and `../_stdlib/reporting.md`.
 2. Read `../_stdlib/lifecycle.md` when deleted/changed anchors may make a
    canonical spec stale.

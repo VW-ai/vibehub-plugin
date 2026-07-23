@@ -56,7 +56,7 @@ export function openRuntimeContext(
       });
     }
     return {
-      context: { db, repoId: repo.id, taskId },
+      context: { db, repoId: repo.id, taskId, repoRoot: session.toplevel },
       close: () => db.close(),
     };
   } catch (error) {

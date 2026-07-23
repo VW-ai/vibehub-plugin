@@ -11,7 +11,7 @@ interpret semantics; core owns leases, accounting, validation and transactions.
 ## Prerequisites
 
 1. Read `../_stdlib/ontology.md`, `../_stdlib/provenance.md`,
-   `../_stdlib/orchestration.md`, and `../_stdlib/db-operations.md`.
+   `../_stdlib/orchestration.md`, and `../_stdlib/operations.md`.
 2. Read `../_stdlib/quality-gates.md` before reconcile/retry/validate.
 3. Read `../_stdlib/relations.md` only when extracting or reconciling relations.
 4. Read `../_stdlib/lifecycle.md` before review/carry-over/activation.
@@ -24,7 +24,7 @@ interpret semantics; core owns leases, accounting, validation and transactions.
 ## Protocol
 
 1. **Preflight.** Resolve a real 40-character commit, project guidance, current
-   active mapping and existing run. Resume DB state first:
+   active mapping and existing run. Resume durable run state first:
    `distill.run.status` / `distill.run.resume`. Never recover from chat or temp
    artifacts.
 2. **Start.** Call `distill.run.start` with mode, base commit, skill/config
@@ -80,6 +80,6 @@ interpret semantics; core owns leases, accounting, validation and transactions.
     items honestly; distillation runs are always expanded, and anything
     waiting for review names the required action in Next.
 
-All operations use `node ../scripts/vh-distill.mjs <suffix> ...`. Never use SQL,
-filesystem checkpoints, additive whole-manifest writes, or automatic canonical
-promotion.
+All operations use `node ../scripts/vh-distill.mjs <suffix> ...`. Never bypass
+the dispatcher, create out-of-band checkpoints, perform additive whole-store
+writes, or automatically promote canonical knowledge.

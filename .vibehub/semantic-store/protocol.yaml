@@ -1,0 +1,12 @@
+{
+  "format": "vibehub.git-semantic-store",
+  "indexing": "stable-identity-paths",
+  "integrity": "derived-from-canonical-tree",
+  "provenance_identity": "sha256-canonical-event-v1",
+  "repository": {
+    "created_at": "2026-07-20T10:00:00.000Z",
+    "default_branch": "main",
+    "slug": "VW-ai/vibehub-plugin"
+  },
+  "schema_version": 2
+}

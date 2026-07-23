@@ -1,20 +1,32 @@
 progress:
-  completion: 0.03
-  status: planning
+  completion: 1.0
+  status: completed
   milestones:
     - id: "lossless-round-trip"
       name: "SQLite semantic subset to YAML to clean SQLite"
-      status: planned
-      evidence: null
+      status: completed
+      evidence: "packages/core/test/git-semantic-store.test.ts — semantic digest, KnowledgeService query parity, byte-identical re-export, strict rejection and no-overwrite oracles"
+    - id: "merge-ergonomics"
+      name: "Real Git merge matrix and reusable PR procedure boundary"
+      status: completed
+      evidence: "packages/core/test/git-semantic-merge-spike.test.ts and META/08-git-semantic-store/merge-ergonomics-spike.md — global manifest hotspot rejected; stable identity paths validated as the next candidate"
+    - id: "branch-ref-cache"
+      name: "Branch/ref light reads, commit-keyed SQLite cache and durable provenance identity"
+      status: completed
+      evidence: "packages/core/src/git-semantic-store.ts and packages/core/test/git-semantic-ref-cache.test.ts — ref isolation, no-checkout reads, cache hits, query parity, canonical re-export digest equality and collision-safe provenance identity"
     - id: "architecture-decision"
       name: "Canonical storage architecture decision"
-      status: blocked
-      evidence: "Blocked until the lossless round-trip spike is reviewed."
+      status: completed
+      evidence: "Wayne approved all six review decisions; decision-project-028 is active and decision-project-014 is superseded."
     - id: "canonical-flip"
       name: "Git/YAML canonical write path"
-      status: blocked
-      evidence: "Current SQLite source-of-truth decisions remain active."
+      status: completed
+      evidence: "packages/core/src/git-semantic-store.ts, packages/core/src/operation-dispatcher.ts, packages/core/test/git-semantic-authority.test.ts and migration-receipt.yaml"
+    - id: "skill-package-boundary"
+      name: "Storage-agnostic intelligence and audited mechanical adapters"
+      status: completed
+      evidence: "META/08-git-semantic-store/skill-package-audit.md and packages/cli/test/skill-package.test.ts — every Skill, stdlib reference, method reference, script, contract and agent metadata audited"
   next:
-    - "Run a 0.5–1 day SQLite semantic subset → strict YAML → clean SQLite spike."
-    - "Compare identity, relations, revisions, active pointers and provenance byte-for-semantics."
-    - "Do not implement write-through or migration until an explicit architecture decision supersedes SQLite-only semantics."
+    - "Review and merge the dedicated migration PR; merged main then becomes shared semantic truth."
+    - "Package the reusable team PR procedure as a nested VibeHub skill."
+    - "Keep large-KB performance and YAML schema evolution deferred until evidence requires them."

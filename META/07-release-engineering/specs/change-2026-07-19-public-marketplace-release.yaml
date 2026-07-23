@@ -1,0 +1,39 @@
+spec_id: "change-2026-07-19-public-marketplace-release"
+type: change
+state: active
+intent:
+  summary: "Publish versioned public Claude and Codex marketplaces from one verified artifact"
+  detail: |
+    A version tag builds Node 24 self-contained artifacts for macOS and Linux
+    on arm64 and x64. Every target must pass native SQLite loading and real
+    isolated Claude and Codex installation before immutable version branches,
+    stable channels, checksums, and a GitHub Release become public.
+constraints:
+  - kind: must
+    rule: "A public tag must equal the versions in package.json and both host manifests"
+  - kind: must
+    rule: "Every supported platform artifact must pass both host installers and native SQLite loading"
+  - kind: must
+    rule: "Stable marketplace refs update atomically only after every target passes"
+  - kind: must
+    rule: "Published tags and versioned marketplace refs are immutable"
+indexing:
+  type: change
+  priority: P0
+  layer: distribution
+  domain: "release-engineering"
+  tags: [release, marketplace, claude, codex, native, rollback]
+provenance:
+  source_type: authored_spec
+  confidence: 1.0
+  produced_at: "2026-07-19"
+relations:
+  - target: "change-2026-07-19-claude-marketplace"
+    type: extends
+anchors:
+  - file: ".github/workflows/release.yml"
+  - file: "scripts/build-release-marketplace.mjs"
+  - file: "scripts/verify-release-marketplace.mjs"
+  - file: "scripts/verify-release-hosts.mjs"
+  - file: "scripts/publish-marketplace-branches.sh"
+  - file: "docs/RELEASE.md"

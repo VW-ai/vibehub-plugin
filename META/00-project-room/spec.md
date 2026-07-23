@@ -35,6 +35,8 @@ context、change 等可复用语义进入 durable knowledge lifecycle。
 
 - [intent-project-004] 探索 Git/YAML 作为 durable semantic canonical layer；
   只有正式 supersede `decision-project-014` 后才可切换。
+- [decision-brand-logo-001] (draft) A Balanced 三块 territory 方案作为
+  VibeHub 正式 Logo 基准，并以本地 SVG 资产展示在 README。
 
 ## Repository Rules
 

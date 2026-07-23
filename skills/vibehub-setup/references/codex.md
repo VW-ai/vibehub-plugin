@@ -1,10 +1,9 @@
 # OpenAI Codex host procedure
 
 Codex and Claude Code consume one VibeHub runtime. They share the same packaged
-skills, CLI, MCP server, SQLite database (default
-`~/.vibehub/workbench.db`, or `VIBEHUB_DB`), Git common-root repository
-identity, worktree binding, operation receipts, and activation vocabulary.
-Never create a Codex-specific database or a second instruction/state language.
+skills, CLI, MCP server, runtime state, Git common-root repository identity,
+worktree binding, operation receipts, and activation vocabulary. Never create
+a host-specific state store or a second instruction/state language.
 
 The managed block that setup owns in `AGENTS.md` is the Codex-facing project
 instruction. Codex builds its instruction chain from the checkout at session
@@ -84,8 +83,8 @@ ingest receipt; hook activity alone does not prove context value.
 
 Immediately after install or before the first trusted SessionStart,
 `setup status` may correctly report `waiting` with Connected and Activated
-`not_proven`. Re-run it from the fresh trusted session; never rewrite the
-database to make the state advance.
+`not_proven`. Re-run it from the fresh trusted session; never rewrite
+persistent state to make the state advance.
 
 ## Deliberate capability boundary
 
