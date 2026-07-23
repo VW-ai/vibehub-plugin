@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "vibehub": {
+      "command": "node",
+      "args": [
+        "./packages/mcp/dist/stdio.js"
+      ],
+      "cwd": "."
+    }
+  }
+}

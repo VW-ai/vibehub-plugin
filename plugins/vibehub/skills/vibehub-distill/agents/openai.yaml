@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Distill"
+  short_description: "Build a resumable repository knowledge map"
+  default_prompt: "Use $vibehub-distill to cold-start this repository into a reviewed VibeHub map."

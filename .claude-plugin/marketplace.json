@@ -1,0 +1,31 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "vibehub",
+  "description": "VibeHub public marketplace for Claude Code.",
+  "version": "0.1.0",
+  "owner": {
+    "name": "VibeHub Team"
+  },
+  "plugins": [
+    {
+      "name": "vibehub",
+      "source": "./plugins/vibehub",
+      "description": "Local team context: hook capture, governed knowledge skills, and deterministic MCP capabilities.",
+      "version": "0.1.0",
+      "author": {
+        "name": "VibeHub Team"
+      },
+      "homepage": "https://github.com/VW-ai/vibehub-plugin",
+      "repository": "https://github.com/VW-ai/vibehub-plugin",
+      "license": "Apache-2.0",
+      "keywords": [
+        "context",
+        "collaboration",
+        "knowledge",
+        "hooks",
+        "mcp"
+      ],
+      "category": "development"
+    }
+  ]
+}

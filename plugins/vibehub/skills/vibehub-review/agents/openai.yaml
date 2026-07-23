@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Review"
+  short_description: "Review and govern draft or conflicting knowledge"
+  default_prompt: "Use $vibehub-review to inspect and resolve the current knowledge review queue."

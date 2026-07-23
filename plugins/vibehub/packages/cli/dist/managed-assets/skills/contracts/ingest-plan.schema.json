@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.local/contracts/ingest-plan.schema.json",
+  "title": "VibeHub ingest plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["idempotencyKey", "specs"],
+  "properties": {
+    "idempotencyKey": {"type": "string", "minLength": 1, "maxLength": 200},
+    "specs": {"type": "array", "minItems": 1, "maxItems": 100, "items": {"$ref": "#/$defs/spec"}}
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sourceType", "sourceRef"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 200},
+        "sourceType": {"type": "string", "minLength": 1, "maxLength": 200},
+        "sourceRef": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "exactQuote": {"type": "string", "maxLength": 20000},
+        "evidenceRef": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "contentHash": {"type": "string", "minLength": 1, "maxLength": 200},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "anyOf": [{"required": ["exactQuote"]}, {"required": ["evidenceRef"]}, {"required": ["contentHash"]}]
+    },
+    "anchor": {
+      "type": "object", "additionalProperties": false, "required": ["file"],
+      "dependentRequired": {"lineEnd": ["lineStart"]},
+      "properties": {
+        "file": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "symbol": {"type": "string", "maxLength": 500},
+        "lineStart": {"type": "integer", "minimum": 1},
+        "lineEnd": {"type": "integer", "minimum": 1},
+        "contentHash": {"type": "string", "maxLength": 200}
+      }
+    },
+    "relation": {
+      "type": "object", "additionalProperties": false, "required": ["toSpecId", "type"],
+      "properties": {
+        "toSpecId": {"type": "string", "minLength": 1, "maxLength": 200},
+        "type": {"enum": ["depends_on", "relates_to", "supersedes", "conflicts_with"]},
+        "rationale": {"type": "string", "maxLength": 20000}
+      }
+    },
+    "spec": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "type", "summary", "evidence"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 200},
+        "featureId": {"type": "string", "minLength": 1, "maxLength": 200},
+        "type": {"enum": ["intent", "decision", "constraint", "contract", "convention", "context", "change"]},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 300},
+        "detail": {"type": "string", "maxLength": 20000},
+        "priority": {"type": "string", "minLength": 1, "maxLength": 200},
+        "layer": {"type": "string", "minLength": 1, "maxLength": 200},
+        "domain": {"type": "string", "minLength": 1, "maxLength": 200},
+        "tags": {"type": "array", "maxItems": 50, "items": {"type": "string", "minLength": 1, "maxLength": 100}},
+        "evidence": {"type": "array", "minItems": 1, "maxItems": 50, "items": {"$ref": "#/$defs/evidence"}},
+        "anchors": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/anchor"}},
+        "relations": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/relation"}}
+      }
+    }
+  }
+}

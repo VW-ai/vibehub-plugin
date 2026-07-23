@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Update"
+  short_description: "Map code drift into a scoped incremental update"
+  default_prompt: "Use $vibehub-update to update the VibeHub map from this Git delta."

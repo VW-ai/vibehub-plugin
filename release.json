@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "vibehub",
+  "version": "0.1.0",
+  "target": "linux-arm64-node24",
+  "platform": "linux",
+  "arch": "arm64",
+  "node": {
+    "major": 24,
+    "abi": "137",
+    "version": "24.18.0"
+  },
+  "commit": "c155e46d1f1fbe57fa3657d313b43c5e5288f427"
+}
