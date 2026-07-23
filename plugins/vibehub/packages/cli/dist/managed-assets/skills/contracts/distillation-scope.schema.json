@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.local/contracts/distillation-scope.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["runId", "scopeId", "leaseToken", "generation", "files", "candidates", "coveredFiles", "unresolvedFiles"],
+  "properties": {
+    "runId": {"type": "string", "minLength": 1}, "scopeId": {"type": "string", "minLength": 1},
+    "leaseToken": {"type": "string", "minLength": 1}, "generation": {"type": "integer", "minimum": 1},
+    "files": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "coveredFiles": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "unresolvedFiles": {"type": "array", "uniqueItems": true, "items": {
+      "type": "object", "additionalProperties": false, "required": ["path", "reason"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 300},
+        "evidence": {"type": "array", "maxItems": 20, "items": {
+          "type": "object", "additionalProperties": false, "required": ["sourceRef"],
+          "properties": {
+            "sourceRef": {"type": "string", "minLength": 1, "maxLength": 2000},
+            "exactQuote": {"type": "string", "maxLength": 20000},
+            "evidenceRef": {"type": "string", "minLength": 1, "maxLength": 2000},
+            "contentHash": {"type": "string", "minLength": 1, "maxLength": 200},
+            "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+          },
+          "anyOf": [{"required": ["exactQuote"]}, {"required": ["evidenceRef"]}, {"required": ["contentHash"]}]
+        }}
+      }
+    }},
+    "candidates": {"type": "array", "items": {"type": "object"}},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  }
+}

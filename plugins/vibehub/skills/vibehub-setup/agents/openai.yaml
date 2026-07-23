@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Setup"
+  short_description: "Onboard and activate VibeHub in a project"
+  default_prompt: "Use $vibehub-setup to inspect, apply, and verify VibeHub onboarding for this exact project checkout."

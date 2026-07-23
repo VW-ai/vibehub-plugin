@@ -1,0 +1,20 @@
+{
+  "name": "vibehub",
+  "interface": {
+    "displayName": "VibeHub"
+  },
+  "plugins": [
+    {
+      "name": "vibehub",
+      "source": {
+        "source": "local",
+        "path": "./plugins/vibehub"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

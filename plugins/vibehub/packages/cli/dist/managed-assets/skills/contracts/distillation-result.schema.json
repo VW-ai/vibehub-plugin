@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.local/contracts/distillation-result.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["runId", "state", "accounting", "unresolvedDispositions", "findings", "reviewRequired"],
+  "properties": {
+    "runId": {"type": "string", "minLength": 1},
+    "state": {"enum": ["collecting", "running", "reconciling", "validated", "finalized", "aborted"]},
+    "versionId": {"type": ["string", "null"]},
+    "accounting": {"type": "object", "additionalProperties": false, "required": ["inventory", "excluded", "covered", "unresolved"], "properties": {
+      "inventory": {"type": "integer", "minimum": 0}, "excluded": {"type": "integer", "minimum": 0},
+      "covered": {"type": "integer", "minimum": 0}, "unresolved": {"type": "integer", "minimum": 0}
+    }},
+    "unresolvedDispositions": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["path", "scopeId", "reason"], "properties": {
+      "path": {"type": "string", "minLength": 1}, "scopeId": {"type": "string", "minLength": 1},
+      "reason": {"type": "string", "minLength": 1}, "evidence": {"type": "array", "items": {"type": "object"}}
+    }}},
+    "findings": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["severity", "code"], "properties": {
+      "severity": {"enum": ["hard", "retryable", "review", "experimental"]}, "code": {"type": "string"},
+      "subject": {"type": ["string", "null"]}, "details": {}
+    }}},
+    "reviewRequired": {"type": "boolean"},
+    "activation": {"type": ["object", "null"]}
+  }
+}
