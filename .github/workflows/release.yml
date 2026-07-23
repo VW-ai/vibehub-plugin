@@ -1,0 +1,125 @@
+name: Release public marketplaces
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-public-marketplaces
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 10.8.1
+  RELEASE_NODE_VERSION: 24
+  CLAUDE_CODE_VERSION: 2.1.177
+  CODEX_VERSION: 0.144.1
+
+jobs:
+  source-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/verify-release-metadata.mjs "${GITHUB_REF_NAME}"
+      - name: Install pinned host CLIs
+        run: npm install --global "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" "@openai/codex@${CODEX_VERSION}"
+      - run: pnpm verify
+
+  build-platform:
+    needs: source-gate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: darwin-arm64-node24
+          - runner: macos-15-intel
+            target: darwin-x64-node24
+          - runner: ubuntu-24.04-arm
+            target: linux-arm64-node24
+          - runner: ubuntu-24.04
+            target: linux-x64-node24
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/verify-release-metadata.mjs "${GITHUB_REF_NAME}"
+      - name: Build shared Claude and Codex marketplace
+        run: >-
+          pnpm build:release-marketplace --
+          --out "dist/release-${{ matrix.target }}"
+          --target "${{ matrix.target }}"
+          --commit "${GITHUB_SHA}"
+      - run: pnpm verify:release-marketplace -- "dist/release-${{ matrix.target }}"
+      - name: Verify both real host installers
+        run: |
+          npm install --global "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" "@openai/codex@${CODEX_VERSION}"
+          pnpm verify:release-hosts -- "dist/release-${{ matrix.target }}"
+          pnpm verify:artifact
+          pnpm verify:codex-plugin
+      - name: Package release archive
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          archive="vibehub-${version}-${{ matrix.target }}.tar.gz"
+          tar -czf "${archive}" -C "dist/release-${{ matrix.target }}" .
+          shasum -a 256 "${archive}" > "${archive}.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: marketplace-${{ matrix.target }}
+          path: |
+            vibehub-*-${{ matrix.target }}.tar.gz
+            vibehub-*-${{ matrix.target }}.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    needs: build-platform
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: marketplace-*
+          path: dist/publish
+          merge-multiple: true
+      - name: Stage immutable GitHub Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release create "${GITHUB_REF_NAME}" --verify-tag --generate-notes --draft
+          fi
+          find dist/publish -name '*.sha256' -type f -print0 | sort -z | xargs -0 cat > dist/publish/SHA256SUMS
+          gh release upload "${GITHUB_REF_NAME}" --clobber dist/publish/*.tar.gz dist/publish/*.tar.gz.sha256 dist/publish/SHA256SUMS
+      - name: Publish immutable and stable marketplace branches
+        run: bash scripts/publish-marketplace-branches.sh dist/publish "${GITHUB_REF_NAME}"
+      - name: Publish completed GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "${GITHUB_REF_NAME}" --draft=false
