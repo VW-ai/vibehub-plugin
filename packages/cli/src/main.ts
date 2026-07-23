@@ -22,11 +22,13 @@ import crypto from "node:crypto";
 import {
   applyIntervention,
   CURRENT_SCHEMA_VERSION,
+  commitSemanticCheckpoint,
   exportTeamMapSnapshot,
   GitFacade,
   ingestCanonicalHookEvent,
   migrateSqliteSemanticStoreToGit,
   openDb,
+  prepareSemanticCheckpoint,
   projectDoctorReceipt,
   projectInitReceipt,
   projectInjectionInterventionReceipt,
@@ -100,6 +102,8 @@ const USAGE = `usage:
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
   vibehub kb <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
   vibehub kb migrate-store --json [--repo <path>] [--db <path>]
+  vibehub checkpoint prepare --json [--repo <path>] [--protect <branch>]
+  vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
   vibehub distill <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop> [--host claude-code|codex]
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
@@ -193,6 +197,85 @@ function runSemanticMigration(argv:string[]):number{
     process.stdout.write(`${JSON.stringify({ok:false,error:{code:"migration_failed",message:error instanceof Error?error.message:String(error)}})}\n`);
     return 1;
   }finally{db.close();}
+}
+
+interface CheckpointCliFlags {
+  repo: string;
+  json: boolean;
+  input?: string;
+  actor?: string;
+  taskId?: string;
+  requestId: string;
+  protectedBranches: string[];
+}
+
+function parseCheckpointFlags(argv: string[]): CheckpointCliFlags {
+  let repo = process.cwd();
+  let json = false;
+  let input: string | undefined;
+  let actor: string | undefined;
+  let taskId: string | undefined;
+  let requestId = `checkpoint-${crypto.randomUUID()}`;
+  const protectedBranches: string[] = [];
+  for (let index = 0; index < argv.length; index += 1) {
+    const flag = argv[index];
+    const take = (): string => {
+      const value = argv[++index];
+      if (!value || value.startsWith("--")) throw new Error(`${flag} requires a value`);
+      return value;
+    };
+    if (flag === "--repo") repo = take();
+    else if (flag === "--json") json = true;
+    else if (flag === "--input") input = take();
+    else if (flag === "--actor") actor = take();
+    else if (flag === "--task") taskId = take();
+    else if (flag === "--request") requestId = take();
+    else if (flag === "--protect") protectedBranches.push(take());
+    else throw new Error(`unknown flag: ${flag}`);
+  }
+  if (!json) throw new Error("checkpoint operations require --json");
+  if (input === "-") input = readStdin().trim();
+  return { repo, json, input, actor, taskId, requestId, protectedBranches };
+}
+
+function runSemanticCheckpoint(
+  operation: string | undefined,
+  argv: string[],
+): number {
+  try {
+    if (operation !== "prepare" && operation !== "commit") {
+      throw new Error(`unknown checkpoint operation: ${operation ?? "(missing)"}`);
+    }
+    const flags = parseCheckpointFlags(argv);
+    const session = GitFacade.sessionContextAt(flags.repo);
+    const data = operation === "prepare"
+      ? prepareSemanticCheckpoint({
+        repoRoot: session.toplevel,
+        protectedBranches: flags.protectedBranches,
+      })
+      : commitSemanticCheckpoint({
+        repoRoot: session.toplevel,
+        receipt: JSON.parse(flags.input ?? "") as Parameters<
+          typeof commitSemanticCheckpoint
+        >[0]["receipt"],
+        actor: flags.actor ?? "",
+        ...(flags.taskId ? { taskId: flags.taskId } : {}),
+        requestId: flags.requestId,
+        now: new Date().toISOString(),
+        protectedBranches: flags.protectedBranches,
+      });
+    process.stdout.write(`${JSON.stringify({ ok: true, data })}\n`);
+    return 0;
+  } catch (error) {
+    process.stdout.write(`${JSON.stringify({
+      ok: false,
+      error: {
+        code: "checkpoint_blocked",
+        message: error instanceof Error ? error.message : String(error),
+      },
+    })}\n`);
+    return 1;
+  }
 }
 
 const HOOK_EVENTS: ReadonlySet<string> = new Set([
@@ -301,6 +384,7 @@ function printSnapshot(flags: Flags): number {
 
 export function main(argv: string[]): number {
   const [group, cmd, ...rest] = argv;
+  if (group === "checkpoint") return runSemanticCheckpoint(cmd, rest);
   if(group==="kb"&&cmd==="migrate-store"){
     try{return runSemanticMigration(rest);}
     catch(error){process.stdout.write(`${JSON.stringify({ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error)}})}\n`);return 2;}

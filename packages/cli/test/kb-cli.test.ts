@@ -28,4 +28,30 @@ describe("vibehub kb JSON adapter",()=>{let dir:string,repo:string,dbPath:string
     stdout="";expect(main(["distill","candidates.list","--json","--repo",repo,"--db",dbPath,"--actor","cli-test","--request","d2","--input",JSON.stringify({runId:"run-cli"})])).toBe(0);expect(JSON.parse(stdout)).toMatchObject({ok:true,data:{sourceKind:"version_candidate",selection:{runId:"run-cli"},total:0,items:[]},meta:{operation:"distill.candidates.list",requestId:"d2"}});
   });
   it("exposes selective retry through the same CLI operation boundary",()=>{const db=openDb(dbPath),s=new DistillationService(db),c={actor:"seed",taskId:"task",requestId:"seed",now:"2026-07-13T00:00:00.000Z"};s.start(1,{runId:"retry-cli",mode:"cold",baseCommit:commit,skillHash:"s",configHash:"c"},c);s.putInventory(1,{runId:"retry-cli",rows:[{path:"a.ts",classification:"included",contentHash:"h"}]},c);s.sealInventory(1,{runId:"retry-cli"},c);s.planScopes(1,{runId:"retry-cli",scopes:[{scopeId:"leaf",kind:"leaf",parentScopeId:null,files:["a.ts"]}]},c);const lease=s.claimScope(1,{runId:"retry-cli",workerId:"w",leaseSeconds:60},c)!;s.failScope(1,{runId:"retry-cli",scopeId:"leaf",leaseToken:lease.leaseToken,generation:lease.generation,reason:"lost"},c);s.reconcile(1,{runId:"retry-cli"},c);db.close();let stdout="";vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);expect(main(["distill","scopes.retry","--json","--repo",repo,"--db",dbPath,"--actor","cli-test","--task","task-1","--request","retry-1","--input",JSON.stringify({runId:"retry-cli",scopeId:"leaf",reason:"retry"})])).toBe(0);expect(JSON.parse(stdout)).toMatchObject({ok:true,data:{state:"pending",generation:2}});});
+  it("prepares and commits a receipt-bound semantic checkpoint",()=>{
+    let stdout="";
+    vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
+    expect(main(["kb","migrate-store","--json","--repo",repo,"--db",dbPath])).toBe(0);
+    vi.restoreAllMocks();
+    execFileSync("git",["add",".vibehub/semantic-store"],{cwd:repo});
+    execFileSync("git",["commit","-m","seed semantic store"],{cwd:repo});
+    execFileSync("git",["switch","-c","feat/checkpoint-cli"],{cwd:repo});
+    const protocolPath=path.join(repo,".vibehub/semantic-store/protocol.yaml");
+    const protocol=JSON.parse(fs.readFileSync(protocolPath,"utf8")) as {repository:{created_at:string}};
+    protocol.repository.created_at="2026-07-13T00:01:00.000Z";
+    fs.writeFileSync(protocolPath,`${JSON.stringify(protocol,null,2)}\n`);
+
+    stdout="";
+    vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
+    expect(main(["checkpoint","prepare","--json","--repo",repo])).toBe(0);
+    const receipt=JSON.parse(stdout).data;
+    expect(receipt).toMatchObject({branch:"feat/checkpoint-cli",changedPaths:[".vibehub/semantic-store/protocol.yaml"]});
+    vi.restoreAllMocks();
+
+    stdout="";
+    vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
+    expect(main(["checkpoint","commit","--json","--repo",repo,"--actor","agent:test","--task","task:test","--request","request:test","--input",JSON.stringify(receipt)])).toBe(0);
+    expect(JSON.parse(stdout)).toMatchObject({ok:true,data:{status:"committed",branch:"feat/checkpoint-cli"}});
+    expect(execFileSync("git",["show","--format=","--name-only","HEAD"],{cwd:repo,encoding:"utf8"}).trim()).toBe(".vibehub/semantic-store/protocol.yaml");
+  });
 });

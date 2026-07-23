@@ -26,7 +26,11 @@ progress:
       name: "Storage-agnostic intelligence and audited mechanical adapters"
       status: completed
       evidence: "META/08-git-semantic-store/skill-package-audit.md and packages/cli/test/skill-package.test.ts — every Skill, stdlib reference, method reference, script, contract and agent metadata audited"
+    - id: "semantic-checkpoint-pr"
+      name: "Receipt-bound semantic checkpoints and reusable nested PR procedure"
+      status: completed
+      evidence: "decision-project-029, semantic-checkpoint-pr-slice.md, packages/core/test/semantic-checkpoint.test.ts and skills/vibehub-pr"
   next:
     - "Review and merge the dedicated migration PR; merged main then becomes shared semantic truth."
-    - "Package the reusable team PR procedure as a nested VibeHub skill."
+    - "Review the stacked semantic checkpoint and PR procedure slice."
     - "Keep large-KB performance and YAML schema evolution deferred until evidence requires them."

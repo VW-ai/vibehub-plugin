@@ -1,0 +1,56 @@
+spec_id: "decision-project-029"
+type: decision
+state: active
+intent:
+  summary: "Commit durable knowledge through receipt-bound semantic checkpoints and package PR collaboration as a reusable nested skill"
+  detail: |
+    Semantic checkpointing is a two-phase, fail-closed operation. Prepare
+    validates a named non-protected branch and returns the exact HEAD,
+    semantic digest and changed semantic paths. Commit recomputes every fact,
+    builds a path-isolated candidate tree, validates its digest and advances
+    the branch with compare-and-swap.
+
+    VibeHub workflow skills request a checkpoint automatically only after a
+    coherent sequence of successful canonical knowledge mutations. The
+    reusable vibehub-pr skill owns PR preparation and semantic review
+    procedure, while deterministic core/CLI primitives own Git mutation and
+    validation. Other skills may delegate their PR phase without inheriting
+    persistence mechanics.
+constraints:
+  - kind: must
+    rule: "A semantic checkpoint commit requires an unchanged prepare receipt covering branch, HEAD, derived digest and exact semantic path set"
+  - kind: must
+    rule: "Checkpoint commits preserve unrelated staged and unstaged user work and include only validated semantic paths"
+  - kind: must
+    rule: "The default branch, main, master, caller-supplied protected branches, detached HEAD, conflicts, invalid trees and stale receipts fail before a branch ref advances"
+  - kind: must
+    rule: "PR procedure reports semantic and code changes separately and leaves merge authority with the reviewer"
+  - kind: must
+    rule: "Domain skills delegate PR workflow through a stable checkpoint/review contract; mechanical Git details remain in core, CLI and scripts"
+  - kind: must_not
+    rule: "Do not auto-merge, force-push, delete branches, commit operational state, or checkpoint failed/read-only workflows"
+indexing:
+  type: decision
+  priority: P0
+  layer: feature
+  domain: "git-semantic-store"
+  tags: [git, checkpoint, pull-request, skill, cas, provenance]
+provenance:
+  source_type: manual_input
+  confidence: 1.0
+  source_ref: "Wayne requested semantic checkpoint auto-commit plus a reusable PR procedure skill as the immediate next slice — 2026-07-22"
+  produced_at: "2026-07-22"
+relations:
+  - target: "decision-project-028"
+    type: constrained_by
+    detail: "Git remains durable semantic authority and operational state remains excluded."
+  - target: "intent-project-004"
+    type: implements
+anchors:
+  - file: "META/08-git-semantic-store/semantic-checkpoint-pr-slice.md"
+  - file: "packages/core/src/git-semantic-store.ts"
+  - file: "packages/core/test/semantic-checkpoint.test.ts"
+  - file: "packages/cli/src/main.ts"
+  - file: "skills/vibehub-pr/SKILL.md"
+  - file: "skills/vibehub-pr/references/review-procedure.md"
+  - file: "skills/scripts/vh-checkpoint.mjs"

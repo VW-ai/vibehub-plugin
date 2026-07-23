@@ -30,6 +30,25 @@ vibehub distill <suffix> --json --repo <root> --actor <id> --request <id> [--tas
 Use `--task` for draft/distillation writes. Read input from stdin or a stable
 JSON file through `../scripts/vh-kb.mjs` / `../scripts/vh-distill.mjs`.
 
+## Semantic checkpoints
+
+After one coherent sequence of successful canonical knowledge mutations,
+request a checkpoint automatically at the next stable workflow boundary:
+
+```text
+node ../scripts/vh-checkpoint.mjs prepare --repo <root> [--protect <branch>]
+node ../scripts/vh-checkpoint.mjs commit --repo <root> --actor <id> --task <id> --request <id> --input <receipt.json> [--protect <branch>]
+```
+
+Pass every repository-configured protected branch with `--protect`; the
+adapter always protects the default branch, `main`, and `master`. Prepare is
+read-only. Commit only the exact unchanged receipt. Treat `noop` as
+silent and keep working. On a protected branch, detached HEAD, conflict,
+invalid knowledge, or stale receipt, create no commit and surface the blocker.
+Do not checkpoint read-only queries, candidate/distillation operational state,
+failed mutations, or filler records. The adapter owns Git mechanics so entry
+skills remain unchanged when the implementation changes.
+
 ## Request identity and replay
 
 Treat `requestId` as a repository-wide request identity, not a counter local to
