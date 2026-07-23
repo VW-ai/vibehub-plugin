@@ -1,0 +1,43 @@
+spec_id: "decision-brand-logo-001"
+type: decision
+state: draft
+
+intent:
+  summary: "这里的，1吧"
+  detail: |
+    在 A Balanced、B Compact、C Signature 三个 Logo 精修方向中，选择
+    A Balanced（第 1 个）作为 VibeHub 的正式 Logo 基准。
+
+    该方向以三块独立 territory 为主体：两块 near-black territory 与一块
+    active green context territory。品牌不再强行把 V、code 或 intent 画成
+    字面符号；这些含义保留为品牌叙事。正式资产包括独立 mark 与横向
+    wordmark，并在 README 顶部展示。
+
+    实现证据已随提交 bd192b6e255491976ff7ad8ece3ae61abd73fd69
+    推送到 origin/main。
+
+    **Ingest note**: Room defaulted to 00-project-room because the identity is
+    project-wide rather than owned by one feature. Priority defaulted to P1.
+
+constraints: []
+
+indexing:
+  type: decision
+  priority: P1
+  layer: project
+  domain: "brand-identity"
+  tags: [logo, brand, identity, territory, active-context, readme]
+
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "User message on 2026-07-22 selecting option 1 (A Balanced), followed by request to save locally and add it to README"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-23T06:46:31Z"
+
+relations: []
+
+anchors:
+  - file: "assets/brand/vibehub-mark.svg"
+  - file: "assets/brand/vibehub-logo.svg"
+  - file: "README.md"
