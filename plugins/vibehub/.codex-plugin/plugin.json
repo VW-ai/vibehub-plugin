@@ -1,0 +1,41 @@
+{
+  "name": "vibehub",
+  "version": "0.1.0",
+  "description": "Local-first project context, governed knowledge workflows, and mechanical coding-agent activity capture.",
+  "author": {
+    "name": "VibeHub Team",
+    "url": "https://github.com/VW-ai/vibehub-plugin"
+  },
+  "homepage": "https://github.com/VW-ai/vibehub-plugin",
+  "repository": "https://github.com/VW-ai/vibehub-plugin",
+  "license": "Apache-2.0",
+  "keywords": [
+    "context",
+    "collaboration",
+    "knowledge",
+    "hooks",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./codex/mcp.json",
+  "hooks": "./codex/hooks.json",
+  "interface": {
+    "displayName": "VibeHub",
+    "shortDescription": "Shared project context for coding agents",
+    "longDescription": "Use one local SQLite context layer across Codex and Claude Code, with skill-owned knowledge workflows, deterministic MCP operations, and lifecycle evidence.",
+    "developerName": "VibeHub Team",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/VW-ai/vibehub-plugin",
+    "defaultPrompt": [
+      "Set up VibeHub for this project.",
+      "Query VibeHub before changing this unfamiliar area.",
+      "Capture the durable decisions from this discussion."
+    ],
+    "brandColor": "#3E7D4C"
+  }
+}

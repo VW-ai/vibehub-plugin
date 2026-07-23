@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.local/contracts/query-request.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["need", "depth"],
+  "properties": {
+    "need": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "depth": {"enum": ["L0", "L1", "L2", "L3"]},
+    "query": {"type": "string", "minLength": 1, "maxLength": 300},
+    "paths": {"type": "array", "maxItems": 50, "items": {"type": "string", "minLength": 1, "maxLength": 1000}},
+    "specIds": {"type": "array", "maxItems": 100, "items": {"type": "string", "minLength": 1, "maxLength": 200}},
+    "includeDrafts": {"type": "boolean", "default": false},
+    "candidateSelection": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["runId"], "properties": {"runId": {"type": "string", "minLength": 1, "maxLength": 200}}},
+        {"type": "object", "additionalProperties": false, "required": ["versionId"], "properties": {"versionId": {"type": "string", "minLength": 1, "maxLength": 200}}}
+      ]
+    },
+    "includeHistory": {"type": "boolean", "default": false},
+    "evidenceLimit": {"type": "integer", "minimum": 0, "maximum": 100}
+  }
+}

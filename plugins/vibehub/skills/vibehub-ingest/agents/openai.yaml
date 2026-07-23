@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Ingest"
+  short_description: "Capture evidence as governed draft knowledge"
+  default_prompt: "Use $vibehub-ingest to capture this evidence as reviewable VibeHub drafts."

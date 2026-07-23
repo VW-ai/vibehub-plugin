@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.local/contracts/validation-report.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["valid", "schema", "errors"],
+  "properties": {
+    "valid": {"type": "boolean"}, "schema": {"type": "string", "minLength": 1},
+    "errors": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["path", "message"], "properties": {"path": {"type": "string"}, "message": {"type": "string"}}}},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}
