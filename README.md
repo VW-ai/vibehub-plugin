@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/brand/vibehub-logo.svg" alt="VibeHub" width="420">
+</p>
+
 # VibeHub Plugin
 
 VibeHub is a local-first context runtime for coding agents. Native Claude Code
