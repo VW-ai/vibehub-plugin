@@ -77,6 +77,22 @@ if (
 ) {
   throw new Error("packaged host manifest versions do not match the release");
 }
+if (codexManifest.interface?.brandColor !== "#3E7D4C") {
+  throw new Error("Codex marketplace brand color does not match the VibeHub identity");
+}
+
+const packagedReadme = readFileSync(join(pluginRoot, "README.md"), "utf8");
+for (const brandAsset of [
+  "assets/brand/vibehub-logo.svg",
+  "assets/brand/vibehub-mark.svg",
+]) {
+  if (!existsSync(join(pluginRoot, brandAsset))) {
+    throw new Error(`packaged brand asset is missing: ${brandAsset}`);
+  }
+}
+if (!packagedReadme.includes("assets/brand/vibehub-logo.svg")) {
+  throw new Error("packaged README does not reference the packaged VibeHub logo");
+}
 
 for (const entrypoint of [
   "packages/cli/dist/main.js",

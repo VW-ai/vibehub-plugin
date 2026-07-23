@@ -13,3 +13,5 @@ Versioning.
 - Added public Node 24 marketplace release channels for macOS and Linux on
   arm64 and x64, with immutable rollback branches, GitHub Release archives,
   provenance, and SHA-256 checksums.
+- Added the VibeHub territory mark and wordmark to the repository README and
+  self-contained marketplace artifacts.
