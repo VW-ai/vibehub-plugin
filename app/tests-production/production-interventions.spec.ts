@@ -9,6 +9,7 @@ import { conflictOsmRedDiagnosed, panelForTask, v8Baseline } from "../test/fixtu
 import {
   conflictPill,
   installProductionHost,
+  openConflictDetail,
   openProduction,
   taskCard,
   wait,
@@ -130,14 +131,16 @@ test("successful conflict intervention refreshes map and conflict detail", async
 
   await openProduction(page);
   await conflictPill(page).click();
-  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
+  let conflict = await openConflictDetail(page);
   await conflict.locator("textarea").fill("Coordinate ownership before editing.");
   await conflict.getByRole("button", { name: "Inject to both" }).click();
 
-  const renderedReceipt = conflict.getByRole("status");
+  const renderedReceipt = page.getByRole("region", { name: "Conflict intervention receipt" });
   await expect(renderedReceipt).toContainText("applied");
   await expect(renderedReceipt).toContainText("Both queue rows were accepted atomically.");
   await expect(renderedReceipt).toContainText(ACCEPTED_AT);
+  await renderedReceipt.getByRole("button", { name: /Intervention recorded/ }).click();
+  conflict = await openConflictDetail(page);
   await expect(conflict).toContainText("Refreshed after adjudication.");
   await expect(taskCard(page, TASK_ID)).toContainText("Refactor auth — map refreshed");
   await expect.poll(() => snapshotReads).toBe(2);
@@ -353,7 +356,7 @@ test("conflict intervention clears an old receipt when the next bridge request f
 
   await openProduction(page);
   await conflictPill(page).click();
-  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
+  const conflict = await openConflictDetail(page);
   const input = conflict.locator("textarea");
   await input.fill("First conflict request");
   await conflict.getByRole("button", { name: "Inject to both" }).click();
@@ -362,7 +365,7 @@ test("conflict intervention clears an old receipt when the next bridge request f
   await input.fill("Keep this second conflict draft");
   await conflict.getByRole("button", { name: "Inject to both" }).click();
   await expect(conflict.getByRole("alert")).toContainText("The second conflict request failed at the bridge.");
-  await expect(conflict.getByRole("status")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Conflict intervention receipt" })).toHaveCount(0);
   await expect(input).toHaveValue("Keep this second conflict draft");
 });
 
@@ -411,7 +414,7 @@ test("conflict card never celebrates QUEUED on weak evidence — the receipt lin
 
   await openProduction(page);
   await conflictPill(page).click();
-  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
+  const conflict = await openConflictDetail(page);
   await conflict.locator("textarea").fill("Coordinate ownership before editing.");
   await conflict.getByRole("button", { name: "Inject to both" }).click();
 
@@ -419,7 +422,7 @@ test("conflict card never celebrates QUEUED on weak evidence — the receipt lin
   await expect(status).toContainText("applied");
   await expect(status).toContainText("Accepted without persisted queue rows.");
   await expect(status).not.toContainText(/queued/i);
-  await expect(conflict).not.toContainText("QUEUED");
-  await expect(conflict).not.toContainText("SQLite accepted both queue rows");
+  await expect(status).not.toContainText("QUEUED");
+  await expect(status).not.toContainText("SQLite accepted both queue rows");
   await expect(conflict.locator("textarea")).toHaveValue("Coordinate ownership before editing.");
 });

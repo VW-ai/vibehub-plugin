@@ -1,0 +1,57 @@
+spec_id: "decision-context-feedback-visibility-001"
+type: decision
+state: draft
+
+intent:
+  summary: "那我们是不是还可以可以选把整个context feedback part 给不展示，还有类似的这种operation呢？"
+  detail: |
+    Context Feedback should support view-only operations at three levels:
+    hide/show or collapse the entire dock into a summary; filter its retrieval,
+    operational capture, explicit proposal and durable mutation lanes; and
+    filter or expand individual receipts by outcome, time or Task.
+
+    The preferred default is a collapsed summary such as receipt count, durable
+    mutation count and waiting count. Failed, waiting and proposed evidence
+    should remain discoverable or surface automatically, while routine retrieval
+    and operational capture may stay collapsed. Display preferences may be
+    stored locally for the user.
+
+    These operations change presentation only. Hidden evidence is not deleted,
+    collapsed evidence is not acknowledged, and no view preference may change a
+    persisted, queued, activated or other receipt fact.
+
+    **Ingest note**: The target room was inferred as 06-01-live-shell, the type
+    as decision and priority as P1. No source anchor was supplied in the
+    discussion, so anchors remain empty until implementation is planned.
+
+constraints:
+  - kind: must
+    rule: "Users may hide, show or collapse the complete Context Feedback dock without changing its evidence."
+  - kind: must
+    rule: "Context Feedback may expose lane, outcome, time and Task filters plus per-receipt expansion."
+  - kind: must
+    rule: "Failed, waiting and proposed evidence must remain discoverable when routine evidence is collapsed."
+  - kind: must_not
+    rule: "Hiding, filtering or collapsing evidence must not delete it, acknowledge it or change any receipt or activation state."
+
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "workbench-live-shell"
+  tags: [context-feedback, visibility, filtering, collapse, view-preference]
+
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Live Shell Context Feedback visibility discussion — 2026-07-20"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-20T17:28:45Z"
+
+relations:
+  - target: "intent-live-shell-001"
+    type: constrained_by
+  - target: "decision-workbench-014"
+    type: constrained_by
+
+anchors: []

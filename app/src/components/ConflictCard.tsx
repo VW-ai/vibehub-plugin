@@ -92,6 +92,10 @@ function Caret() {
 export interface ConflictCardProps {
   snapshot: ConflictCardSnapshot;
   onClose: () => void;
+  /** Corner presentation collapses without dismissing the selected conflict. */
+  onCollapse?: () => void;
+  /** External receipt phase consumes the same canonical projected note. */
+  onReceipt?: (receipt: InterventionReceiptNote) => void;
   /** Side rows open the task's panel (S2 tooltip promise, wired at S4). */
   onOpenTask: (task: Task) => void;
   /** Production callback. Absent only in the fixture harness. */
@@ -107,7 +111,7 @@ export interface ConflictCardProps {
  * The parent (App) owns open/close; Escape is handled HERE so an open pause
  * menu swallows the first Escape (menu closes, card stays — S2 behavior).
  */
-export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: ConflictCardProps) {
+export function ConflictCard({ snapshot, onClose, onCollapse, onReceipt, onOpenTask, onApply }: ConflictCardProps) {
   const [symsOpen, setSymsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [seams, setSeams] = useState({ top: false, bottom: false });
@@ -126,12 +130,15 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
   const [applying, setApplying] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
+  const pauseTriggerRef = useRef<HTMLButtonElement>(null);
+  const ignoreTriggerRef = useRef<HTMLButtonElement>(null);
   const keepRef = useRef<HTMLButtonElement>(null);
   const fdbkCloseRef = useRef<HTMLButtonElement>(null);
   const menuOpenRef = useRef(menuOpen);
   menuOpenRef.current = menuOpen;
   const confirmRef = useRef(confirmIgnore);
   confirmRef.current = confirmIgnore;
+  const applyGeneration = useRef(0);
 
   /* scroll-aware seams (S2 R1 fix #3): grade casts down once scrolled past
      the top, footer casts up while content hides below; off when it fits.
@@ -160,13 +167,21 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
-      if (menuOpenRef.current) setMenuOpen(false);
-      else if (confirmRef.current) setConfirmIgnore(false);
+      if (menuOpenRef.current) {
+        e.preventDefault();
+        setMenuOpen(false);
+        window.requestAnimationFrame(() => pauseTriggerRef.current?.focus());
+      } else if (confirmRef.current) {
+        e.preventDefault();
+        setConfirmIgnore(false);
+        window.requestAnimationFrame(() => ignoreTriggerRef.current?.focus());
+      }
+      else if (onCollapse) onCollapse();
       else onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, onCollapse]);
 
   /* pause menu closes on any outside click (S2). */
   useEffect(() => {
@@ -197,14 +212,20 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
 
   const applyReal = async (action: AdjudicationAction, view: FeedbackView) => {
     if (!onApply) { setFeedback({ action, view }); return; }
+    const generation = ++applyGeneration.current;
     setApplying(true); setActionError(null); setReceipt(null);
     const response = await onApply(action);
+    if (generation !== applyGeneration.current) return;
     setApplying(false);
     if (typeof response === "string") {
       setActionError(response);
       return;
     }
     setReceipt(response);
+    if (onReceipt && response.receiptOutcome === "queued") {
+      onReceipt(response);
+      return;
+    }
     if (response.receiptOutcome === "queued") {
       if (noteRef.current) noteRef.current.value = "";
       // The confirmed celebration band requires the projected receipt
@@ -239,7 +260,10 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
 
   const pauseSide = (task: Task, noop: boolean) => {
     setMenuOpen(false);
-    if (noop) return; // pausing an already-waiting task does nothing (S2)
+    if (noop) {
+      window.requestAnimationFrame(() => pauseTriggerRef.current?.focus());
+      return; // pausing an already-waiting task does nothing (S2)
+    }
     const action: AdjudicationAction = { kind: "pause_side", taskId: task.id };
     void applyReal(action, pauseFeedback(snapshot, task));
   };
@@ -281,7 +305,13 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
           <span className="pill clash" data-tip={CONFLICT_PILL_TIP}>
             CONFLICT
           </span>
-          <h2 data-tip={titleTip(snapshot)}>{snapshot.crumb.resourceName}</h2>
+          <h2 data-tip={titleTip(snapshot)}>
+            {onCollapse
+              ? <button type="button" className="ctitle-collapse" data-corner-collapse aria-label="Collapse conflict details" aria-expanded="true" onClick={onCollapse}>
+                  {snapshot.crumb.resourceName}
+                </button>
+              : snapshot.crumb.resourceName}
+          </h2>
           <span className="age" data-tip={age.tip}>
             {age.text}
           </span>
@@ -519,6 +549,8 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
                 <button
                   type="button"
                   className="quiet"
+                  ref={pauseTriggerRef}
+                  disabled={applying}
                   data-tip={PAUSE_TRIGGER_TIP}
                   aria-haspopup="menu"
                   aria-expanded={menuOpen}
@@ -537,6 +569,7 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
                       <button
                         type="button"
                         role="menuitem"
+                        disabled={applying}
                         key={r.task.id}
                         className={r.noop ? "noop" : ""}
                         data-tip={r.tip}
@@ -556,6 +589,7 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
                   <button
                     type="button"
                     className="doit"
+                    disabled={applying}
                     data-tip={IGNORE_CONFIRM.confirmTip}
                     onClick={ignorePair}
                   >
@@ -564,9 +598,13 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
                   <button
                     type="button"
                     className="keep"
+                    disabled={applying}
                     ref={keepRef}
                     data-tip={IGNORE_CONFIRM.keepTip}
-                    onClick={() => setConfirmIgnore(false)}
+                    onClick={() => {
+                      setConfirmIgnore(false);
+                      window.requestAnimationFrame(() => ignoreTriggerRef.current?.focus());
+                    }}
                   >
                     {IGNORE_CONFIRM.keep}
                   </button>
@@ -575,6 +613,8 @@ export function ConflictCard({ snapshot, onClose, onOpenTask, onApply }: Conflic
                 <button
                   type="button"
                   className="ignore"
+                  ref={ignoreTriggerRef}
+                  disabled={applying}
                   data-tip={ignoreTip(snapshot)}
                   onClick={() => {
                     setMenuOpen(false); // one open decision at a time

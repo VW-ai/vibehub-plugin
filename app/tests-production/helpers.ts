@@ -110,6 +110,12 @@ export const taskCard = (page: Page, taskId: string) =>
 export const conflictPill = (page: Page) =>
   taskCard(page, "task-auto-retry-payments").locator(".pill");
 
+export async function openConflictDetail(page: Page) {
+  const signal = page.getByRole("region", { name: "Conflict signal" });
+  await signal.getByRole("button", { name: "Expand conflict details" }).click();
+  return page.getByRole("dialog", { name: /Conflict:/ });
+}
+
 export async function assertProductionEntryIsFixtureFree(page: Page): Promise<void> {
   const sources = await page.locator('script[type="module"][src]').evaluateAll((scripts) =>
     scripts.map((script) => (script as HTMLScriptElement).src),

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { installProductionHost, openProduction, taskCard } from "./helpers";
+import { installProductionHost, openConflictDetail, openProduction, taskCard } from "./helpers";
 
 test("unsupported production affordances are disabled or non-interactive", async ({ page }) => {
   await installProductionHost(page);
@@ -29,7 +29,7 @@ test("production conflict detail exposes recorded evidence without a diagnosis a
   await openProduction(page);
 
   await page.locator('[data-task="task-auto-retry-payments"] .pill').click();
-  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
+  const conflict = await openConflictDetail(page);
   await expect(conflict).toBeVisible();
   await expect(conflict.getByRole("heading", { name: "Recorded diagnosis" })).toBeVisible();
   await expect(conflict.getByRole("button", { name: /Run AI diagnosis|Re-run/i })).toHaveCount(0);
@@ -66,13 +66,13 @@ test("production conflict pause receipt claims request acceptance, not pickup or
   await openProduction(page);
   await page.locator('[data-task="task-auto-retry-payments"] .pill').click();
 
-  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
+  const conflict = await openConflictDetail(page);
   await conflict.getByRole("button", { name: "Pause one side" }).click();
   await conflict.getByRole("menuitem").filter({ hasNot: page.locator(".noop") }).first().click();
 
-  const status = conflict.getByRole("status");
-  await expect(status).toContainText("REQUESTED");
-  await expect(status).toContainText(/not shown as stopped/i);
+  const status = page.getByRole("region", { name: "Conflict intervention receipt" });
+  await expect(status).toContainText("queued");
+  await expect(status).toContainText("applied");
   await expect(status).not.toContainText(/delivered|picked up|has stopped/i);
 });
 
@@ -87,8 +87,14 @@ test("v8 production focus rings, compact targets, and reduced motion stay access
   await expect(conflictStat).toHaveCSS("outline-width", "2px");
   await conflictStat.press("Enter");
 
-  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
+  const conflict = await openConflictDetail(page);
   await expect(conflict).toHaveCSS("animation-name", "none");
+  const conflictSide = conflict.locator(".side").first();
+  const conflictSend = conflict.getByRole("button", { name: "Inject to both" });
+  await expect(conflictSide).toHaveCSS("transition-duration", "0s");
+  await expect(conflictSend).toHaveCSS("transition-duration", "0s");
+  await conflictSide.hover();
+  await expect(conflictSide).toHaveCSS("transform", "none");
   const close = conflict.getByRole("button", { name: "Close conflict card" });
   await close.focus();
   await expect(close).toHaveCSS("outline-color", "rgb(72, 105, 156)");

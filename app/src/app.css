@@ -369,6 +369,61 @@ svg{vertical-align:-2px}
 .modal{pointer-events:auto;width:640px;max-width:100%;max-height:100%;background:var(--card);border-radius:var(--r-l);display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(15,17,21,.14),0 22px 70px rgba(15,17,21,.28);animation:cardIn var(--t-base) var(--ease) backwards}
 @keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
 
+/* Corner Conflict Signal — one real conflict detail, progressively disclosed.
+   The layer begins at the canvas edge so no state can cover the live rail. */
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.corner-signal-layer{position:absolute;top:0;right:0;bottom:0;left:var(--rail-w,0);z-index:6;pointer-events:none;overflow:hidden}
+.corner-signal{position:absolute;pointer-events:auto;background:var(--card);color:var(--ink-900);box-shadow:0 1px 3px rgba(15,17,21,.14),0 16px 42px rgba(15,17,21,.22);animation:cornerIn var(--t-base) var(--ease) backwards}
+.corner-signal.compact{top:var(--sp-3);right:var(--sp-3);width:min(330px,calc(100% - 16px));border-radius:18px;padding:var(--sp-2);background:rgba(39,41,45,.96);color:rgba(255,255,255,.94);box-shadow:0 2px 6px rgba(15,17,21,.16),0 18px 42px rgba(15,17,21,.24);backdrop-filter:blur(18px) saturate(.9)}
+.corner-signal-title{display:flex;align-items:center;gap:var(--sp-1);min-width:0}
+.corner-drag,.corner-dismiss{flex:none;width:28px;height:28px;border:0;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;background:none;color:var(--ink-500);cursor:pointer}
+.corner-signal.compact .corner-drag,.corner-signal.compact .corner-dismiss{color:rgba(255,255,255,.5)}
+.corner-drag{cursor:grab;touch-action:none}
+.corner-drag:active{cursor:grabbing}
+.corner-drag:hover,.corner-dismiss:hover{background:var(--ink-100);color:var(--ink-900)}
+.corner-signal.compact .corner-drag:hover,.corner-signal.compact .corner-dismiss:hover{background:rgba(255,255,255,.08);color:#fff}
+.corner-expand{flex:1;min-width:0;display:flex;align-items:center;gap:var(--sp-2);border:0;background:none;text-align:left;color:inherit;cursor:pointer}
+.corner-expand>span:last-child{display:flex;flex-direction:column;min-width:0}
+.corner-expand b{font-size:var(--fs-3);font-weight:650;line-height:1.35}
+.corner-expand small{font-size:var(--fs-2);color:rgba(255,255,255,.58);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.corner-signal.compact .pill.clash{background:rgba(216,173,104,.14);color:#e4bf82;box-shadow:inset 0 0 0 1px rgba(216,173,104,.18)}
+.corner-signal.compact>p{margin:5px 30px 0 32px;font-size:var(--fs-2);line-height:1.35;color:rgba(255,255,255,.58);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.corner-signal.expanded{top:var(--sp-2);right:var(--sp-2);bottom:var(--sp-2);width:min(640px,calc(100% - 16px));min-height:0;background:transparent;box-shadow:none}
+.corner-signal.expanded>.modal{position:absolute;inset:0;width:100%;height:100%;min-height:0;max-height:none;overflow:hidden;animation:cornerPanelIn var(--t-base) var(--ease) backwards;transform-origin:top right}
+.corner-signal.expanded .chead{color:rgba(255,255,255,.94);background:rgba(39,41,45,.97);border-bottom-color:rgba(255,255,255,.08);border-radius:18px 18px var(--r-l) var(--r-l)}
+.corner-signal.expanded .chead .pill.clash{background:rgba(216,173,104,.14);color:#e4bf82;box-shadow:inset 0 0 0 1px rgba(216,173,104,.18)}
+.corner-signal.expanded .chead .age,.corner-signal.expanded .chead .crumb{color:rgba(255,255,255,.58)}
+.corner-signal.expanded .chead .pclose{color:rgba(255,255,255,.55)}
+.corner-signal.expanded .chead .pclose:hover{background:rgba(255,255,255,.08);color:#fff}
+.ctitle-collapse{width:100%;border:0;background:none;color:inherit;font:inherit;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.corner-signal.receipt{top:var(--sp-3);right:var(--sp-3);width:min(390px,calc(100% - 16px));border-radius:18px;padding:var(--sp-3);background:rgba(39,41,45,.97);color:rgba(255,255,255,.94);box-shadow:0 2px 6px rgba(15,17,21,.16),0 18px 42px rgba(15,17,21,.24)}
+.corner-signal.receipt header{display:flex;align-items:center;gap:var(--sp-2)}
+.corner-receipt-title{flex:1;min-width:0;display:flex;align-items:center;gap:var(--sp-2);border:0;background:none;color:inherit;text-align:left;cursor:pointer}
+.corner-receipt-title b{font-size:var(--fs-3)}
+.corner-signal.receipt .pill.alive{background:rgba(212,232,216,.92);color:#2f6540}
+.corner-signal.receipt .corner-dismiss{color:rgba(255,255,255,.55)}
+.corner-signal.receipt .corner-dismiss:hover{background:rgba(255,255,255,.08);color:#fff}
+.corner-signal.receipt>p{margin:var(--sp-2) 0;font-size:var(--fs-3);line-height:1.5;color:rgba(255,255,255,.62)}
+.corner-receipt-close{height:30px;border:1px solid rgba(255,255,255,.14);border-radius:var(--r-s);padding:0 var(--sp-3);background:rgba(255,255,255,.08);color:#fff;font:600 var(--fs-3) var(--sans);cursor:pointer}
+.corner-receipt-close:hover{background:rgba(255,255,255,.13)}
+.corner-drag:focus-visible,.corner-dismiss:focus-visible,.corner-expand:focus-visible,.ctitle-collapse:focus-visible,.corner-receipt-title:focus-visible,.corner-receipt-close:focus-visible{outline:2px solid var(--read-ink);outline-offset:2px}
+@keyframes cornerIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes cornerPanelIn{from{opacity:0;transform:scale(.99)}to{opacity:1;transform:none}}
+@media (max-width:900px){
+  .corner-signal.expanded .chead{padding:var(--sp-2) var(--sp-3)}
+  .corner-signal.expanded .grade{padding:6px var(--sp-3)}
+  .corner-signal.expanded .cfoot{padding:6px var(--sp-2) var(--sp-2)}
+  .corner-signal.expanded .cfoot textarea{height:40px}
+  .corner-signal.expanded .actions{flex-wrap:wrap}
+  .corner-signal.expanded .actions>.send,.corner-signal.expanded .actions>.split{flex:1 1 calc(50% - var(--sp-1))}
+  .corner-signal.expanded .actions>.send,.corner-signal.expanded .split>button{width:100%}
+  .corner-signal.expanded .actions .gap{display:none}
+  .corner-signal.expanded .actions>.ignore,.corner-signal.expanded .confirm{flex:1 0 100%}
+  .corner-signal.expanded .confirm{flex-wrap:wrap}
+  .corner-signal.expanded .confirm .q{flex:1 0 100%;margin-right:0}
+  .corner-signal.expanded .pmenu{right:0;left:auto;min-width:min(250px,calc(100vw - var(--rail-w,240px) - 48px));max-width:100%}
+}
+
 /* header */
 .chead{flex:none;padding:var(--sp-4) var(--sp-4) var(--sp-3);border-bottom:1px solid var(--ink-150);background:rgba(252,252,251,.8);border-radius:var(--r-l) var(--r-l) 0 0}
 .chead .row1{display:flex;align-items:center;gap:var(--sp-2);min-width:0}
@@ -721,6 +776,10 @@ svg{vertical-align:-2px}
 @media (prefers-reduced-motion: reduce){
   .vhitem .badge,.drop{animation:none}
   .vhitem,.drop .item,.drop .more,.mb-foot button{transition:none}
+  .corner-signal,.corner-signal.expanded>.modal{animation:none}
+  .corner-signal.expanded .side,.corner-signal.expanded .actions button,.corner-signal.expanded .symtoggle .car,.corner-signal.expanded .split .car,.corner-signal.expanded .grade,.corner-signal.expanded .cfoot{transition:none}
+  .corner-signal.expanded .fdbk{animation:none}
+  .corner-signal.expanded .side:hover,.corner-signal.expanded .actions .send:hover{transform:none}
 }
 
 /* Narrow task detail yields exactly to the live rail (late cascade guard). */

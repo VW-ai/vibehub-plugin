@@ -61,3 +61,8 @@ make the underlying mechanism visible without becoming the workflow authority.
 
 - [intent-live-shell-001] (active) Build the daily dogfood shell for activation,
   live workspace and honest context feedback.
+- [decision-context-feedback-visibility-001] (draft) Allow view-only hiding,
+  collapsing and filtering of Context Feedback without changing evidence truth.
+- [decision-live-shell-progressive-disclosure-001] (draft) Collapse healthy
+  status and evidence by default, reveal them for project context, inspection
+  or recovery, and distinguish workspace availability from evidence coverage.

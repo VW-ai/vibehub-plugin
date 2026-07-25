@@ -4,6 +4,7 @@ import {
   assertProductionEntryIsFixtureFree,
   conflictPill,
   installProductionHost,
+  openConflictDetail,
   openProduction,
   taskCard,
   wait,
@@ -23,19 +24,24 @@ async function expectAboveScrim(page: Page, surface: Locator) {
   expect(result.layerZ).toBeGreaterThan(result.scrimZ);
 }
 
-test("production conflict detail is centered above the canvas scrim", async ({ page }) => {
+test("production conflict detail stays in the corner canvas layer without a scrim", async ({ page }) => {
   await installProductionHost(page);
   await openProduction(page);
   await assertProductionEntryIsFixtureFree(page);
   await conflictPill(page).click();
-  const modal = page.locator(".center .modal");
+  const signal = page.getByRole("region", { name: "Conflict signal" });
+  await expect(signal).toBeVisible();
+  await expect(page.locator(".scrim")).toHaveCount(0);
+  const modal = await openConflictDetail(page);
   await expect(modal).toBeVisible();
-  await expectAboveScrim(page, modal);
   await wait(350);
-  const center = (await page.locator(".center").boundingBox())!;
+  const layer = (await page.locator(".corner-signal-layer").boundingBox())!;
+  const rail = (await page.locator(".rail").boundingBox())!;
   const box = (await modal.boundingBox())!;
-  expect(Math.abs(box.x + box.width / 2 - (center.x + center.width / 2))).toBeLessThan(1);
-  expect(Math.abs(box.y + box.height / 2 - (center.y + center.height / 2))).toBeLessThan(1);
+  expect(layer.x).toBeGreaterThanOrEqual(rail.x + rail.width - 1);
+  expect(box.x).toBeGreaterThanOrEqual(layer.x);
+  expect(box.x + box.width).toBeLessThanOrEqual(layer.x + layer.width);
+  expect(box.y + box.height).toBeLessThanOrEqual(layer.y + layer.height);
 });
 
 test("production detail error remains operable above scrim", async ({ page }) => {
@@ -103,9 +109,9 @@ test("task response cannot overwrite a later conflict selection", async ({ page 
   await openProduction(page);
   await taskCard(page, "task-refactor-auth").click();
   await conflictPill(page).click();
-  await expect(page.locator(".center .modal")).toBeVisible();
+  await expect(page.getByRole("region", { name: "Conflict signal" })).toBeVisible();
   await wait(350);
-  await expect(page.locator(".center .modal")).toBeVisible();
+  await expect(page.getByRole("region", { name: "Conflict signal" })).toBeVisible();
   await expect(page.locator(".panel")).toHaveCount(0);
 });
 
@@ -127,9 +133,9 @@ test("production conflict Escape restores exact pill focus", async ({ page }) =>
   const opener = conflictPill(page);
   await opener.focus();
   await page.keyboard.press("Enter");
-  await expect(page.locator(".center .modal")).toBeVisible();
+  await expect(page.getByRole("region", { name: "Conflict signal" })).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.locator(".modal")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Conflict signal" })).toHaveCount(0);
   await expect(opener).toBeFocused();
 });
 
@@ -139,7 +145,7 @@ test("task opened from conflict restores the durable conflict pill", async ({ pa
   const opener = conflictPill(page);
   await opener.focus();
   await page.keyboard.press("Enter");
-  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
+  const conflict = await openConflictDetail(page);
   await expect(conflict).toBeVisible();
   await conflict.locator(".side").first().click();
   const panel = page.locator(".panel");
@@ -155,16 +161,30 @@ test("production conflict child Escape takes priority before conflict close", as
   const opener = conflictPill(page);
   await opener.focus();
   await page.keyboard.press("Enter");
-  const conflict = page.getByRole("dialog", { name: /Conflict:/ });
-  await conflict.getByRole("button", { name: /Pause one side/ }).click();
+  const conflict = await openConflictDetail(page);
+  const pauseTrigger = conflict.getByRole("button", { name: /Pause one side/ });
+  await pauseTrigger.click();
   await expect(conflict.getByRole("menu")).toBeVisible();
 
   await page.keyboard.press("Escape");
   await expect(conflict.getByRole("menu")).toHaveCount(0);
   await expect(conflict).toBeVisible();
+  await expect(pauseTrigger).toBeFocused();
+
+  const ignoreTrigger = conflict.getByRole("button", { name: "Ignore this pair" });
+  await ignoreTrigger.click();
+  await expect(conflict.getByRole("group", { name: "Confirm ignore" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(conflict.getByRole("group", { name: "Confirm ignore" })).toHaveCount(0);
+  await expect(ignoreTrigger).toBeFocused();
 
   await page.keyboard.press("Escape");
   await expect(conflict).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Conflict signal" })).toBeVisible();
+  await expect(opener).not.toBeFocused();
+
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("region", { name: "Conflict signal" })).toHaveCount(0);
   await expect(opener).toBeFocused();
 });
 
@@ -180,9 +200,9 @@ test("production same task or conflict opener toggles the open surface closed", 
 
   const pill = conflictPill(page);
   await pill.click();
-  await expect(page.locator(".center .modal")).toBeVisible();
+  await expect(page.getByRole("region", { name: "Conflict signal" })).toBeVisible();
   await pill.click();
-  await expect(page.locator(".modal")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Conflict signal" })).toHaveCount(0);
   await expect(pill).toBeFocused();
 });
 

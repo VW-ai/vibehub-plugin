@@ -9,7 +9,7 @@ import {
 import type { AdjudicationAction, AppliedIntervention, ConflictCardSnapshot, LiveShellRepoRef, LiveShellSnapshotV1, MapSnapshot, Task, TaskPanelSnapshot, Territory, WorkbenchBridge, WorkbenchIntervention } from "@vibehub/core/contracts";
 import { highlightForLegend, highlightForTask, highlightForTerritory, type LegendKind } from "./derive";
 import { deriveInterventionNote, type InterventionReceiptNote } from "./receipt-note-derive";
-import { ConflictCard } from "./components/ConflictCard";
+import { CornerConflictSignal } from "./components/CornerConflictSignal";
 import { MapCanvas } from "./components/MapCanvas";
 import { ReceiptOutcome } from "./components/ReceiptOutcome";
 import { TaskPanel } from "./components/TaskPanel";
@@ -126,7 +126,7 @@ function MapController({ snapshot, shell, onShellChange, bridge, repo }: { snaps
     if (legend) return highlightForLegend(legend, current);
     return { litIds: EMPTY_IDS, hotTaskIds: EMPTY_IDS };
   }, [hoverTask, hoverTerritory, legend, current]);
-  const modalOpen = panel !== null || conflict !== null || detailError !== null || loadingDetail;
+  const modalOpen = panel !== null || detailError !== null || loadingDetail;
   const focused = !modalOpen && (hoverTask !== null || hoverTerritory !== null || legend !== null);
 
   const clearHovers = () => {
@@ -323,8 +323,8 @@ function MapController({ snapshot, shell, onShellChange, bridge, repo }: { snaps
       {modalOpen && <div className="scrim" onClick={closeDetail} />}
       {panel && <TaskPanel key={panel.task.id} panel={panel} map={current} onClose={closeDetail}
         onIntervention={(mode, text) => apply({ kind: mode, taskId: panel.task.id, text, contextLocus: `task:${panel.task.id}` })} />}
-      {conflict && <div className="center"><ConflictCard key={conflict.conflict.id} snapshot={conflict} onClose={closeDetail}
-        onOpenTask={(task) => void openTask(task)} onApply={applyConflict} /></div>}
+      {conflict && <CornerConflictSignal key={conflict.conflict.id} snapshot={conflict} onDismiss={closeDetail}
+        onOpenTask={(task) => void openTask(task)} onApply={applyConflict} />}
       {(loadingDetail || detailError) && <div className="center"><aside className="modal bootstrap-state" role="dialog">
         <h2>{loadingDetail ? "Loading details…" : detailError!.title}</h2>{detailError && <p>{detailError.message}</p>}
         {detailError?.receipt && <p role="status">

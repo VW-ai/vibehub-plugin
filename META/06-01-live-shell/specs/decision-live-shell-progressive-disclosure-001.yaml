@@ -1,0 +1,62 @@
+spec_id: "decision-live-shell-progressive-disclosure-001"
+type: decision
+state: draft
+
+intent:
+  summary: "我感觉包括像上面的live shell 的status part，对吧，也是可以收起来的，甚至我觉得像这些东西，默认就是不应该常驻的呀，对不对？"
+  detail: |
+    Live Shell status and detailed evidence should use progressive disclosure
+    rather than occupy the primary workspace continuously.
+
+    The normal shell should retain only a compact project-context bar with the
+    current repository/checkout and small Installed, Connected and Activated
+    indicators. The full identity, proof and recovery details should open when
+    the user switches the viewed project, explicitly inspects status, or when a
+    stale, unavailable or recovery-required condition needs attention.
+
+    Workspace availability and receipt coverage must be presented separately.
+    When Task, session, scope and footprint are live but some canonical receipts
+    are missing, the UI should say "Evidence coverage: partial" rather than
+    "Workspace: partial". The supporting text should name the unavailable claim,
+    checkpoint or handoff evidence so users do not interpret partial coverage as
+    a broken workspace.
+
+    **Ingest note**: The target room was inferred as 06-01-live-shell, the type
+    as decision and priority as P1. No implementation path was named, so anchors
+    remain empty until the draft is reviewed and planned.
+
+constraints:
+  - kind: must
+    rule: "Healthy Live Shell status and detailed proof should be collapsed by default into a compact project-context bar."
+  - kind: must
+    rule: "Project switching, explicit status inspection, stale evidence, unavailable evidence and recovery needs may reveal the full status surface."
+  - kind: must
+    rule: "Workspace availability must be distinguished from canonical receipt evidence coverage."
+  - kind: must
+    rule: "Partial evidence copy must identify the missing claim, checkpoint or handoff source."
+  - kind: must_not
+    rule: "The UI must not label a live workspace as partial merely because receipt coverage is incomplete."
+
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "workbench-live-shell"
+  tags: [progressive-disclosure, project-context, activation, evidence-coverage, status]
+
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Live Shell status density and Workspace partial discussion — 2026-07-20"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-20T17:34:24Z"
+
+relations:
+  - target: "intent-live-shell-001"
+    type: constrained_by
+  - target: "decision-context-feedback-visibility-001"
+    type: related_to
+  - target: "decision-workbench-014"
+    type: constrained_by
+
+anchors: []

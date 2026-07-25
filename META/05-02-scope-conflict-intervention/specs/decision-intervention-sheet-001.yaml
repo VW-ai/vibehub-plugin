@@ -1,0 +1,98 @@
+spec_id: "decision-intervention-sheet-001"
+type: decision
+state: draft
+
+intent:
+  summary: "我们把这里的decision sheet，给做好，从uiux，到产品，到后端的支持，我觉得就是一个很棒的事情了。小而完善>>>>多而丑陋。"
+  detail: |
+    The near-term intervention product should be one small, complete decision
+    surface rather than a broad, permanently visible Workbench application.
+    Normal work remains inside the host agent and natural-language stream.
+    VibeHub stays quiet until it observes a meaningful decision boundary, then
+    presents one bounded issue with the original authority, observed behavior,
+    reason for interruption, supporting evidence and available responses.
+
+    The initial trigger taxonomy distinguishes user adaptation, intentional
+    experiment, code-governance deviation and operational failure. These
+    categories explain why the event surfaced without pretending that every
+    difference is an error.
+
+    The vertical slice is only complete when product semantics, UI/UX and
+    backend receipts agree: detect a boundary, assemble typed evidence, deliver
+    a natural-language or thin visual prompt, accept a decision, persist the
+    correct outcome and show whether execution later converged.
+
+    The approved visual direction is a draggable Corner Signal rather than a
+    permanent dashboard or desktop character. Its compact dark "island" states
+    one bounded issue. Selecting the title expands the same island into a quiet
+    light decision surface; selecting the title again collapses it without
+    changing evidence. Dismiss is a separate presentation-only action. Evidence
+    stays folded until requested, and a confirmed decision contracts into a
+    compact receipt that can hand an exact prompt back to Codex or Claude.
+
+    Git identity follows the object being shown: a branch row names the branch
+    and does not substitute an abbreviated commit hash. Commit identity,
+    resolvable links and copy actions remain separate evidence objects.
+
+    **Implementation note**: Routed to Scope, Conflict, and Intervention
+    because this room owns intervention delivery and outcome evidence. The
+    first production slice uses already-projected conflict evidence. The more
+    general scope-deviation trigger remains gated on canonical trigger,
+    authority and observed-behavior receipts.
+
+constraints:
+  - kind: must
+    rule: "A decision sheet must represent one bounded decision boundary rather than a dashboard or activity feed"
+  - kind: must
+    rule: "The sheet must state what changed, why the user is being interrupted, the governing authority, typed evidence and available responses"
+  - kind: must
+    rule: "Trigger semantics must distinguish user adaptation, intentional experiment, code-governance deviation and operational failure"
+  - kind: must
+    rule: "The backend must preserve delivery, user decision, persistence and later verified outcome as distinct receipts"
+  - kind: must
+    rule: "The product must support a headless natural-language delivery path; a standalone Application cannot be required"
+  - kind: should
+    rule: "If a visual surface is provided, it should be a polished transient or on-demand sheet that returns the user to the host workflow after resolution"
+  - kind: must
+    rule: "The compact Corner Signal and expanded decision surface must be two states of one object; selecting the expanded title collapses it while dismiss remains a separate presentation-only action"
+  - kind: must
+    rule: "The compact state may be repositioned without making drag a prerequisite for any action, and its position must remain reachable after viewport changes"
+  - kind: must
+    rule: "Evidence disclosure, links and copy actions must preserve typed source facts; a branch name and a commit hash are distinct objects"
+  - kind: must
+    rule: "A scope-deviation label must remain unavailable unless the trigger, governing authority and observed behavior are linked by canonical evidence"
+  - kind: must_not
+    rule: "The decision sheet must not become a miniature permanent dashboard or expose internal rigor as visual clutter"
+  - kind: must_not
+    rule: "Queueing, claiming, doctor success, capture or an attempted mutation must not be presented as delivery, acknowledgement, activation, persistence or verified convergence"
+
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "scope-conflict-intervention"
+  tags: [decision-sheet, intervention, progressive-disclosure, headless, receipts, deviation]
+
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne product-scope discussion — 2026-07-23"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-23T01:26:13-07:00"
+
+relations:
+  - target: "intent-project-001"
+    type: constrained_by
+    detail: "The headless plugin/runtime remains independently useful and the App stays optional"
+  - target: "decision-workbench-002"
+    type: extends
+    detail: "The sheet exposes intervention evidence without conflating delivery with verified resolution"
+  - target: "decision-workbench-014"
+    type: constrained_by
+    detail: "Any visual delivery follows the approved restrained interaction authority without inheriting a dashboard scope"
+
+anchors:
+  - "app/src/components/CornerConflictSignal.tsx"
+  - "app/src/components/ConflictCard.tsx"
+  - "app/src/WorkbenchMap.tsx"
+  - "app/tests-production/production-corner-signal.spec.ts"
