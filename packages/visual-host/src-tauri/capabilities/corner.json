@@ -1,0 +1,6 @@
+{
+  "identifier": "corner-capability",
+  "description": "Allow only native dragging for the file-backed Corner Signal window.",
+  "windows": ["corner"],
+  "permissions": ["core:window:allow-start-dragging"]
+}

@@ -41,6 +41,10 @@ import {
   type HookEventName,
   type HookHost,
   type WorkbenchIntervention,
+  type VisualProjectionHost,
+  type VisualOpenWithRefreshResultV1,
+  VisualService,
+  VisualProjectionService,
 } from "@vibehub/core";
 import { releaseAssetManifest, releaseAssetRoot } from "./managed-assets.js";
 import { adaptHookInput, projectHookOutput } from "./hook-adapters.js";
@@ -103,6 +107,11 @@ const USAGE = `usage:
   vibehub distill <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop> [--host claude-code|codex]
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
+  vibehub visual status --json
+  vibehub visual refresh --repo <path> --host <claude-code|codex> --json
+  vibehub visual open [--repo <path> --host <claude-code|codex>] [--json]
+  vibehub visual enable|disable|quit [--json]
+  vibehub visual snooze <duration> [--json]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
   vibehub team snapshot [--repo <path>] [--db <path>] [--out <file>]`;
 
@@ -299,8 +308,124 @@ function printSnapshot(flags: Flags): number {
   }
 }
 
-export function main(argv: string[]): number {
+export interface MainDependencies {
+  visualService?: VisualService;
+  visualProjectionService?: Pick<VisualProjectionService, "refresh">;
+}
+
+export function main(argv: string[], dependencies: MainDependencies = {}): number {
   const [group, cmd, ...rest] = argv;
+  if (group === "visual") {
+    const known = new Set(["status", "refresh", "open", "enable", "disable", "snooze", "quit"]);
+    if (!cmd || !known.has(cmd)) {
+      const result = { schemaVersion: 1, command: cmd ?? null, ok: false, error: { code: "validation_error", message: "Unknown visual command." } };
+      process.stdout.write(`${JSON.stringify(result)}\n`);
+      return 2;
+    }
+    let visualFlags: ReturnType<typeof parseVisualFlags>;
+    try {
+      visualFlags = parseVisualFlags(cmd, rest);
+    } catch (error) {
+      process.stdout.write(`${JSON.stringify({
+        schemaVersion: 1,
+        command: cmd,
+        ok: false,
+        error: {
+          code: "validation_error",
+          message: error instanceof Error ? error.message : String(error),
+        },
+      })}\n`);
+      return 2;
+    }
+
+    let refresh: ReturnType<VisualProjectionService["refresh"]> | undefined;
+    if (cmd === "refresh" || (cmd === "open" && visualFlags.repo)) {
+      const projection = dependencies.visualProjectionService
+        ?? new VisualProjectionService();
+      refresh = projection.refresh({
+        repoPath: visualFlags.repo!,
+        host: visualFlags.host!,
+      });
+      if (cmd === "refresh") {
+        process.stdout.write(`${JSON.stringify(refresh)}\n`);
+        if (!refresh.ok) {
+          return refresh.error?.code === "invalid_repo"
+              || refresh.error?.code === "invalid_host"
+            ? 2
+            : 1;
+        }
+        return refresh.snapshot?.availability === "available" ? 0 : 1;
+      }
+      if (!refresh.ok) {
+        const result: VisualOpenWithRefreshResultV1 = {
+          schemaVersion: 1,
+          command: "open",
+          ok: false,
+          lifecycle: "not_attempted",
+          refresh,
+          projectionSelection: {
+            mode: "last_writer_selected",
+            requestedGeneration: null,
+            identity: null,
+          },
+          evidence: ["Visual host open was not attempted because projection refresh failed."],
+          error: {
+            code: "refresh_failed",
+            message: refresh.error?.message ?? "Projection refresh failed.",
+          },
+        };
+        process.stdout.write(`${JSON.stringify(result)}\n`);
+        return refresh.error?.code === "invalid_repo"
+            || refresh.error?.code === "invalid_host"
+          ? 2
+          : 1;
+      }
+    }
+
+    const service = dependencies.visualService ?? new VisualService({
+      settingsPath: process.env["VIBEHUB_VISUAL_SETTINGS"],
+      expectedHostVersion: process.env["VIBEHUB_VISUAL_HOST_VERSION"],
+    });
+    const result = cmd === "status" ? service.status()
+      : cmd === "open" ? service.open()
+        : cmd === "enable" ? service.enable()
+          : cmd === "disable" ? service.disable()
+            : cmd === "snooze" ? service.snooze(visualFlags.duration!)
+              : service.quit();
+    if (refresh && cmd === "open") {
+      const composite: VisualOpenWithRefreshResultV1 = {
+        schemaVersion: 1,
+        command: "open",
+        ok: result.ok,
+        lifecycle: "attempted",
+        refresh,
+        projectionSelection: {
+          mode: "last_writer_selected",
+          requestedGeneration: refresh.snapshot?.generation ?? null,
+          identity: refresh.snapshot?.identity.data ?? null,
+        },
+        open: result,
+        evidence: [
+          ...(refresh.snapshot
+            ? [`Requested projection generation ${refresh.snapshot.generation}; the native host selects the stable last writer at wake time.`]
+            : []),
+          ...result.evidence,
+        ],
+        ...(!result.ok ? {
+          error: {
+            code: "host_open_failed" as const,
+            message: result.error?.message ?? "Visual host open failed.",
+          },
+        } : {}),
+      };
+      process.stdout.write(`${JSON.stringify(composite)}\n`);
+    } else {
+      process.stdout.write(`${JSON.stringify(result)}\n`);
+    }
+    if (!result.ok) return result.error?.code === "invalid_duration" ? 2 : 1;
+    return ["degraded", "version_mismatch", "not_installed", "installed_not_running"].includes(result.status.lifecycle)
+      && cmd === "status" ? 1 : 0;
+  }
   if(group==="kb"&&cmd==="migrate-store"){
     try{return runSemanticMigration(rest);}
     catch(error){process.stdout.write(`${JSON.stringify({ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error)}})}\n`);return 2;}
@@ -521,6 +646,71 @@ export function main(argv: string[]): number {
 
   console.error(USAGE);
   return 2;
+}
+
+interface VisualCliFlags {
+  json: boolean;
+  repo?: string;
+  host?: VisualProjectionHost;
+  duration?: string;
+}
+
+function parseVisualFlags(command: string, argv: string[]): VisualCliFlags {
+  let json = false;
+  let repo: string | undefined;
+  let host: VisualProjectionHost | undefined;
+  let duration: string | undefined;
+  const seen = new Set<string>();
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index]!;
+    if (argument === "--json") {
+      if (seen.has(argument)) throw new Error("visual --json may be provided only once");
+      seen.add(argument);
+      json = true;
+      continue;
+    }
+    if (argument === "--repo" || argument === "--host") {
+      if (seen.has(argument)) throw new Error(`visual ${argument} may be provided only once`);
+      seen.add(argument);
+      const value = argv[++index];
+      if (!value || value.startsWith("--")) {
+        throw new Error(`visual ${argument} requires a value`);
+      }
+      if (argument === "--repo") repo = value;
+      else if (value === "claude-code" || value === "codex") host = value;
+      else throw new Error("visual --host must be claude-code or codex");
+      continue;
+    }
+    if (argument.startsWith("--")) throw new Error(`unknown visual flag: ${argument}`);
+    if (command !== "snooze" || duration !== undefined) {
+      throw new Error(`visual ${command} accepts no positional argument`);
+    }
+    duration = argument;
+  }
+
+  if (command === "status" && !json) throw new Error("visual status requires --json");
+  if (command === "refresh" && !json) throw new Error("visual refresh requires --json");
+  if (command === "snooze" && !duration) {
+    throw new Error("visual snooze requires one duration");
+  }
+  if (command !== "snooze" && duration !== undefined) {
+    throw new Error(`visual ${command} accepts no positional argument`);
+  }
+  if (command !== "refresh" && command !== "open" && (repo || host)) {
+    throw new Error(`visual ${command} does not accept --repo or --host`);
+  }
+  if (command === "refresh" && (!repo || !host)) {
+    throw new Error("visual refresh requires both --repo and --host");
+  }
+  if (command === "open" && Boolean(repo) !== Boolean(host)) {
+    throw new Error("visual open requires --repo and --host together");
+  }
+  return {
+    json,
+    ...(repo ? { repo } : {}),
+    ...(host ? { host } : {}),
+    ...(duration ? { duration } : {}),
+  };
 }
 
 function canonicalEntrypoint(value: string): string {

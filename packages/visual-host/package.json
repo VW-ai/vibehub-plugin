@@ -1,0 +1,25 @@
+{
+  "name": "@vibehub/visual-host",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Optional arm64-first macOS native visual host for VibeHub.",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "tauri": "tauri",
+    "native:check": "node ../../scripts/verify-visual-host-native.mjs",
+    "native:test": "node ../../scripts/verify-visual-host-native.mjs",
+    "native:build": "tauri build --target aarch64-apple-darwin --bundles app"
+  },
+  "dependencies": {
+    "@vibehub/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8"
+  }
+}

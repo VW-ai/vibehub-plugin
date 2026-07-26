@@ -6,6 +6,7 @@ export * from "./contract/kb-types.js";
 export * from "./contract/workbench-bridge.js";
 export * from "./contract/workflow-receipt.js";
 export * from "./contract/live-shell.js";
+export * from "./contract/visual.js";
 export {
   defaultDbPath,
   openDb,
@@ -140,3 +141,6 @@ export {
 } from "./knowledge-checkpoint.js";
 export * from "./workflow-receipt-projectors.js";
 export * from "./live-shell-projector.js";
+export * from "./visual-service.js";
+export * from "./visual-projection-service.js";
+export * from "./macos-visual-host.js";

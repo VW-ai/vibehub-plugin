@@ -1,6 +1,6 @@
 spec_id: "decision-intervention-sheet-001"
 type: decision
-state: draft
+state: active
 
 intent:
   summary: "我们把这里的decision sheet，给做好，从uiux，到产品，到后端的支持，我觉得就是一个很棒的事情了。小而完善>>>>多而丑陋。"
@@ -23,12 +23,13 @@ intent:
     correct outcome and show whether execution later converged.
 
     The approved visual direction is a draggable Corner Signal rather than a
-    permanent dashboard or desktop character. Its compact dark "island" states
-    one bounded issue. Selecting the title expands the same island into a quiet
-    light decision surface; selecting the title again collapses it without
-    changing evidence. Dismiss is a separate presentation-only action. Evidence
-    stays folded until requested, and a confirmed decision contracts into a
-    compact receipt that can hand an exact prompt back to Codex or Claude.
+    permanent dashboard or desktop character. Its compact cool-neutral surface
+    states one bounded issue without exposing implementation rigor in the
+    healthy state. Selecting the title expands the same object into a quiet
+    decision surface; selecting the title again collapses it without changing
+    evidence. Dismiss is a separate presentation-only action. Evidence stays
+    folded until requested, and a confirmed copy action hands an exact prompt
+    back to Codex or Claude without claiming a durable mutation.
 
     Git identity follows the object being shown: a branch row names the branch
     and does not substitute an abbreviated commit hash. Commit identity,
@@ -96,3 +97,7 @@ anchors:
   - "app/src/components/ConflictCard.tsx"
   - "app/src/WorkbenchMap.tsx"
   - "app/tests-production/production-corner-signal.spec.ts"
+  - "packages/core/src/visual-projection-service.ts"
+  - "packages/core/src/contract/visual.ts"
+  - "packages/visual-host/src/main.ts"
+  - "packages/visual-host/src-tauri/src/lib.rs"

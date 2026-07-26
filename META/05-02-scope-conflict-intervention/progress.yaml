@@ -1,5 +1,5 @@
 progress:
-  completion: 0.72
+  completion: 0.9
   status: active
   milestones:
     - id: "scope-evidence"
@@ -14,6 +14,11 @@ progress:
       name: "Resolution feedback and follow-through"
       status: in_progress
       evidence: "Resolution feedback is specified; longitudinal outcome statistics remain future work."
+    - id: "native-corner-signal"
+      name: "CLI-owned arm64 macOS Corner Signal"
+      status: completed
+      evidence: "CornerSignalSnapshotV1 projects one real conflict from canonical RuntimeService read models into a locked, atomic, browser-safe local copy. The optional arm64 Tauri host renders a draggable compact signal and focused decision sheet, exposes partial/stale recovery, and copies a confirmed coordination prompt without claiming persistence or mutation."
   next:
     - "Dogfood off-scope reminders and intervention delivery across both hosts."
     - "Keep recommendations prompt-first; hard-block only authority/isolation violations."
+    - "Add Developer ID signing, notarization and release-channel packaging before calling the macOS host generally distributable."

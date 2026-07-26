@@ -1,0 +1,56 @@
+{
+  "productName": "VibeHub",
+  "version": "0.1.0",
+  "identifier": "ai.vibehub.visual",
+  "build": {
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "withGlobalTauri": false,
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'"
+    },
+    "windows": [
+      {
+        "label": "corner",
+        "title": "VibeHub",
+        "width": 360,
+        "height": 126,
+        "minWidth": 360,
+        "minHeight": 126,
+        "maxWidth": 360,
+        "maxHeight": 620,
+        "resizable": false,
+        "maximizable": false,
+        "minimizable": false,
+        "closable": true,
+        "focus": false,
+        "focusable": true,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "visibleOnAllWorkspaces": true,
+        "skipTaskbar": true,
+        "shadow": true,
+        "preventOverflow": {
+          "width": 12,
+          "height": 12
+        }
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app"],
+    "category": "Utility",
+    "createUpdaterArtifacts": false,
+    "icon": ["icons/icon.png"],
+    "macOS": {
+      "minimumSystemVersion": "14.0",
+      "hardenedRuntime": true
+    }
+  }
+}

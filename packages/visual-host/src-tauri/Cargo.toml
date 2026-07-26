@@ -1,0 +1,21 @@
+[package]
+name = "vibehub-visual-host"
+version = "0.1.0"
+description = "Optional arm64-first macOS native visual host for VibeHub"
+authors = ["VibeHub"]
+license = "Apache-2.0"
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "vibehub_visual_host"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.5.3", features = [] }
+
+[dependencies]
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+tauri = { version = "2.9.5", features = ["macos-private-api", "tray-icon"] }
+tauri-plugin-single-instance = "2.4.3"
