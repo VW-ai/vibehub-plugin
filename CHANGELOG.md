@@ -3,6 +3,16 @@
 All notable VibeHub changes are recorded here. Versions follow Semantic
 Versioning.
 
+## 0.1.1
+
+- Added Git-backed semantic checkpoints and the packaged `vibehub-pr`
+  workflow for receipt-bound semantic commits and pull-request preparation.
+- Kept the public release line headless by moving unfinished Workbench UI
+  development off `main` and removing React, Vite, and Playwright from the
+  release workspace and gates.
+- Preserved the shared CLI, MCP, skills, hooks, and Claude/Codex marketplace
+  artifact while validating direct runtime reads in headless dogfood.
+
 ## 0.1.0
 
 - Added the local-first SQLite context runtime, CLI, MCP server, lifecycle

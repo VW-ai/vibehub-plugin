@@ -24,7 +24,7 @@ function expectLegacyNamesOnlyInHistory(root: string, relativePath: string): voi
 }
 
 function expectPackagedProtocolDocs(root: string): void {
-  expectLegacyNamesOnlyInHistory(root, "README.md");
+  expect(read(root, "README.md")).not.toMatch(legacyName);
   for (const absolute of markdownFiles(path.join(root, "skills"))) {
     expect(fs.readFileSync(absolute, "utf8"), path.relative(root, absolute)).not.toMatch(legacyName);
   }
@@ -87,7 +87,7 @@ describe("MCP v0.2 active protocol documentation", () => {
       expect(() => expectPackagedProtocolDocs(standalone)).not.toThrow();
 
       fs.appendFileSync(path.join(standalone, "README.md"), "\nUse kb_record for current writes.\n");
-      expect(() => expectPackagedProtocolDocs(standalone)).toThrow(/historical marker/);
+      expect(() => expectPackagedProtocolDocs(standalone)).toThrow();
     } finally {
       fs.rmSync(standalone, { recursive: true, force: true });
     }

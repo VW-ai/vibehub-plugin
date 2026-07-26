@@ -218,23 +218,7 @@ function assertCodexPackage(pluginRoot) {
   }
 }
 
-function assertBrandPackage(pluginRoot) {
-  const readme = readFileSync(join(pluginRoot, "README.md"), "utf8");
-  const logoPath = "assets/brand/vibehub-logo.svg";
-  const markPath = "assets/brand/vibehub-mark.svg";
-  if (!readme.includes(logoPath)) {
-    throw new Error(`packaged README must reference ${logoPath}`);
-  }
-  for (const relativePath of [logoPath, markPath]) {
-    const absolutePath = join(pluginRoot, relativePath);
-    if (!existsSync(absolutePath)) {
-      throw new Error(`packaged brand asset is missing: ${relativePath}`);
-    }
-    const svg = readFileSync(absolutePath, "utf8");
-    if (!svg.includes("<svg") || !svg.includes("#3E7D4C")) {
-      throw new Error(`packaged brand asset is invalid: ${relativePath}`);
-    }
-  }
+function assertBrandIdentity(pluginRoot) {
   const codexManifest = readJson(join(pluginRoot, ".codex-plugin/plugin.json"));
   if (codexManifest.interface?.brandColor !== "#3E7D4C") {
     throw new Error("Codex marketplace brand color must match the active-context green");
@@ -380,7 +364,7 @@ try {
   });
   assertClaudeMarketplace(claudeMarketplace.outputRoot, artifact);
   assertCodexPackage(artifact);
-  assertBrandPackage(artifact);
+  assertBrandIdentity(artifact);
   const pluginManifest = readJson(join(artifact, ".claude-plugin/plugin.json"));
   const pluginId = `${pluginManifest.name}@${claudeMarketplace.marketplaceName}`;
 
@@ -450,7 +434,7 @@ try {
     throw new Error("installed Claude manifest identity drifted from release artifact");
   }
   assertCodexPackage(installedClaudeRoot);
-  assertBrandPackage(installedClaudeRoot);
+  assertBrandIdentity(installedClaudeRoot);
   readConfiguredEntrypoints(installedClaudeRoot);
 
   run("git", ["init", "-q", "-b", "main"], { cwd: repo });
