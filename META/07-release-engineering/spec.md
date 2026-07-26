@@ -31,3 +31,7 @@ not claim lifecycle events that a host does not expose.
   source-built until a versioned hosted marketplace is published.
 - [change-2026-07-19-plugin-repository-migration] (active) Standalone history,
   plugin-centric META and public repository identity migration.
+- [decision-macos-visual-host-distribution-001] (draft) Bundle the signed and
+  notarized arm64 visual host with the platform marketplace artifact, install
+  it only through an explicit CLI action, and gate release on Apple Developer
+  Program enrollment.

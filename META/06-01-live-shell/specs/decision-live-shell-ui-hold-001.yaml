@@ -1,0 +1,48 @@
+spec_id: "decision-live-shell-ui-hold-001"
+type: decision
+state: draft
+
+intent:
+  summary: "我们这个branch UI开发我们先hold off"
+  detail: |
+    The arm64 Corner Signal branch is held at its current working, reviewed and
+    pushed state. Do not continue visual styling, interaction expansion or
+    application-surface development while the main runtime and product
+    foundation remain the higher-priority work.
+
+    Holding the branch does not revoke the accepted Corner Signal direction.
+    The existing implementation remains a resumable visual-host slice. Resume
+    UI work only after the core project work is sufficiently settled and the
+    team explicitly returns to this branch.
+constraints:
+  - kind: must
+    rule: "Preserve the current reviewed Corner Signal implementation as the restart point for future UI work"
+  - kind: must
+    rule: "Return near-term development attention to the main runtime and product foundation"
+  - kind: must_not
+    rule: "Do not interpret the hold as authorization to merge the feature branch into main"
+  - kind: must_not
+    rule: "Do not continue UI polish or add visual-host scope until the hold is explicitly lifted"
+
+indexing:
+  type: decision
+  priority: P1
+  layer: feature
+  domain: "live-shell"
+  tags: [ui, corner-signal, hold, sequencing, arm64]
+
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne branch sequencing decision, 2026-07-25"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-25"
+
+relations:
+  - target: "decision-macos-visual-host-distribution-001"
+    type: deferred_until
+
+anchors:
+  - file: "packages/visual-host"
+  - file: "packages/core/src/visual-service.ts"
+  - file: "packages/core/src/visual-projection-service.ts"

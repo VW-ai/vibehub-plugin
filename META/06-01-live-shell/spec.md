@@ -66,3 +66,6 @@ make the underlying mechanism visible without becoming the workflow authority.
 - [decision-live-shell-progressive-disclosure-001] (draft) Collapse healthy
   status and evidence by default, reveal them for project context, inspection
   or recovery, and distinguish workspace availability from evidence coverage.
+- [decision-live-shell-ui-hold-001] (draft) Hold further Corner Signal UI
+  development at the current reviewed branch state while main runtime and
+  product-foundation work takes priority.

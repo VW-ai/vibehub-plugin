@@ -1,0 +1,63 @@
+spec_id: "decision-macos-visual-host-distribution-001"
+type: decision
+state: draft
+
+intent:
+  summary: "记一下就是我们后面准备怎么样去分发,包括我们需要去注册这个事情"
+  detail: |
+    The planned open-source distribution path is to ship the signed arm64
+    VibeHub.app inside the platform-specific Claude and Codex marketplace
+    artifact. Installing the plugin downloads the visual host bytes, but does
+    not silently install, launch or keep the host resident.
+
+    On the first explicit `vibehub visual open` or enable action, the CLI should
+    verify the embedded host and install or upgrade it in the user's
+    `~/Applications/VibeHub.app`, then control its lifecycle. The plugin and
+    host remain one versioned release with checksums, bundle-identity checks and
+    rollback evidence.
+
+    Public macOS distribution is gated on enrolling in the Apple Developer
+    Program, obtaining a Developer ID Application certificate, signing the
+    arm64 app with hardened runtime, submitting it for Apple notarization and
+    validating the stapled artifact with Gatekeeper. Developer ID Installer is
+    unnecessary unless a later release adopts a `.pkg` installer.
+constraints:
+  - kind: must
+    rule: "The darwin-arm64 marketplace artifact carries the signed and notarized visual host as a version-aligned release asset"
+  - kind: must
+    rule: "Installation verifies checksum, bundle identifier, host version, arm64 architecture and Apple signature before replacing an existing host"
+  - kind: must
+    rule: "Visual-host installation and launch happen only after an explicit CLI or user action"
+  - kind: must
+    rule: "Developer Program enrollment, Developer ID Application signing, notarization and Gatekeeper verification are release prerequisites"
+  - kind: must_not
+    rule: "Do not advertise the macOS visual host as generally distributable while it is only ad-hoc signed"
+  - kind: must_not
+    rule: "Do not require a separate DMG download for the first plugin-bundled arm64 release"
+
+indexing:
+  type: decision
+  priority: P1
+  layer: distribution
+  domain: "release-engineering"
+  tags: [macos, arm64, developer-id, notarization, marketplace, visual-host]
+
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne macOS distribution and registration discussion, 2026-07-25"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-25"
+
+relations:
+  - target: "change-2026-07-19-public-marketplace-release"
+    type: extends
+  - target: "decision-live-shell-ui-hold-001"
+    type: resumes_after
+
+anchors:
+  - file: "packages/visual-host"
+  - file: "packages/core/src/macos-visual-host.ts"
+  - file: "scripts/build-plugin-artifact.mjs"
+  - file: "scripts/build-release-marketplace.mjs"
+  - file: ".github/workflows/release.yml"
