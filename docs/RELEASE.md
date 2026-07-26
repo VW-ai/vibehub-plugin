@@ -48,8 +48,8 @@ Every tag must pass all of these gates before anything public is updated:
 
 1. Version and tag equality.
 2. Frozen-lockfile install.
-3. Build, typecheck, unit, production E2E, bundle-boundary, isolated artifact,
-   Codex plugin, and dogfood verification through `pnpm verify`.
+3. Build, typecheck, unit, isolated artifact, Codex plugin, and headless
+   dogfood verification through `pnpm verify`.
 4. A native build on every supported target.
 5. Loading the packaged `better-sqlite3` binary and creating an in-memory
    database on that target.

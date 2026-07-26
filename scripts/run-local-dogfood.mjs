@@ -115,30 +115,10 @@ try {
   assert.equal(snapshot.repo.defaultBranch, "main");
 
   const core = await import("../packages/core/dist/index.js");
-  const appTransport = await import("../app/dist-bridge/bridge-dogfood.js");
   const service = new core.RuntimeService({ dbPath: db });
   const repoRef = core.resolveWorkbenchRepoRef(repo, "dogfood");
-  const transportFetch = async (_input, init) => {
-    try {
-      const envelope = JSON.parse(String(init?.body ?? ""));
-      const result = appTransport.dispatchWorkbenchEnvelope(envelope, repoRef, service);
-      return new Response(JSON.stringify(result), { status: 200, headers: { "content-type": "application/json" } });
-    } catch (error) {
-      return new Response(JSON.stringify({ status: "internal_error", message: String(error) }), { status: 200 });
-    }
-  };
-  const appBridge = appTransport.createWorkbenchBridge(
-    { endpoint: "http://127.0.0.1/__vibehub/workbench", repo: repoRef },
-    transportFetch,
-  );
-  const bridgeRead = await appBridge.getSnapshot(repoRef);
-  assert.equal(bridgeRead.status, "ok");
-  assert.throws(
-    () => appTransport.dispatchWorkbenchEnvelope(
-      { method: "getTaskPanel", request: repoRef }, repoRef, service,
-    ),
-    /invalid method-specific bridge request/,
-  );
+  const runtimeRead = service.readWorkbenchSnapshot(repoRef);
+  assert.equal(runtimeRead.status, "ok");
 
   const taskId = snapshot.tasks.find((task) => task.git?.branch === "main")?.id;
   assert.ok(taskId, "dogfood snapshot must expose the captured main-branch task");
@@ -168,7 +148,7 @@ try {
     retrievedSpecs: retrieved.data.length,
     distillation,
     snapshotTasks: snapshot.tasks.length,
-    appBridgeStatus: bridgeRead.status,
+    runtimeReadStatus: runtimeRead.status,
     stopDelivery: stopOutput.decision,
     doctor: doctor.healthy,
   }, null, 2));

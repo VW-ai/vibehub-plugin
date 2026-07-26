@@ -429,8 +429,8 @@ export function main(argv: string[]): number {
         console.error(`unknown task: ${cmd}`);
         return 2;
       }
-      // The terminal path joins the same idempotent intervention boundary as
-      // the App bridge: one request ledger, one receipt truth.
+      // Every terminal request joins the same idempotent intervention
+      // boundary: one request ledger, one receipt truth.
       const intervention: Extract<WorkbenchIntervention, { kind: "inject" | "pause" }> = {
         kind: mode,
         taskId: task.id,

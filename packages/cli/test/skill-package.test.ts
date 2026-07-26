@@ -459,15 +459,14 @@ describe("production skill package",()=>{
     const gate=fs.readFileSync(path.join(workbench,"scripts/verify-plugin-artifact.mjs"),"utf8");
     const rootPackage=JSON.parse(fs.readFileSync(path.join(workbench,"package.json"),"utf8")) as {scripts:Record<string,string>};
     const cliPackage=JSON.parse(fs.readFileSync(path.join(cliRoot,"package.json"),"utf8")) as {scripts:Record<string,string>};
-    const parity=fs.readFileSync(path.join(workbench,"app/tests/parity.spec.ts"),"utf8");
     const verifyScript=rootPackage.scripts.verify??"";
 
-    expect(fs.existsSync(path.join(workbench,"app/test/assets/reference-screen-v8.html"))).toBe(true);
-    expect(parity).toContain("../test/assets/reference-screen-v8.html");
-    expect(parity).not.toContain("../../../workbench-refs");
-    expect(rootPackage.scripts["verify:e2e:production"]).toContain("test:e2e:production");
-    expect(verifyScript).toContain("verify:e2e:production");
-    expect(verifyScript.indexOf("verify:e2e:production")).toBeLessThan(verifyScript.indexOf("verify:artifact"));
+    expect(fs.existsSync(path.join(workbench,"app/package.json"))).toBe(false);
+    expect(rootPackage.scripts.build).not.toContain("workbench-app");
+    expect(rootPackage.scripts.test).not.toContain("workbench-app");
+    expect(verifyScript).not.toContain("workbench-app");
+    expect(verifyScript).toContain("verify:artifact");
+    expect(verifyScript).toContain("verify:codex-plugin");
     expect(cliPackage.scripts.test).toBe("vitest run");
     expect(gate).toContain('readJson(join(pluginRoot, "hooks/hooks.json"))');
     expect(gate).toContain('readJson(join(pluginRoot, ".mcp.json"))');

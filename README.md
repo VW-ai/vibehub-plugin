@@ -6,9 +6,7 @@
 
 VibeHub is a local-first context runtime for coding agents. Native Claude Code
 and OpenAI Codex plugin manifests package one shared set of skills, one MCP
-server, one CLI, and one SQLite database. The browser workbench is an optional
-reader and intervention client: closing it never stops capture, retrieval, or
-delivery.
+server, one CLI, and one SQLite database.
 
 SQLite is the only source of truth. JSON or Markdown output is an export for
 people and tools, not a fallback database.
@@ -186,22 +184,10 @@ separate from operation `input`. Supply it only when the caller needs stable
 logical replay; otherwise the capability generates a collision-resistant UUID.
 MCP transport correlation IDs are never persisted as repository request IDs.
 
-## Optional workbench UI
-
-The current app host is for local development and dogfood. It is not a native
-downloadable build yet. Point it at one explicit repository; it reads the same
-SQLite runtime through the browser-safe bridge and never substitutes fixtures
-when the runtime is unavailable.
-
-```bash
-VIBEHUB_REPO=/path/to/repository pnpm --filter @vibehub/workbench-app dev
-```
-
 ## Verification
 
 ```bash
-# Build; typecheck; run unit tests; exercise the production main.tsx entry with
-# Playwright; scan the production bundle; verify the packaged plugin; then run
+# Build, typecheck, run unit tests, verify both packaged plugin hosts, and run
 # the headless dogfood flow.
 pnpm verify
 
@@ -213,20 +199,17 @@ pnpm verify:isolated
 # accepts and installs it in an isolated HOME/CODEX_HOME.
 pnpm verify:codex-plugin
 
-# Exercise init, hooks, MCP context CRU, snapshot/App bridge, and Stop delivery
+# Exercise init, hooks, MCP context CRU, runtime snapshot, and Stop delivery
 # against an isolated temporary Git repository and SQLite state.
 pnpm dogfood
 ```
 
-The Playwright production lane boots the real `src/main.tsx` entry; the
-historical harness suite remains separate parity evidence. The production
-bundle gate rejects fixture imports—including dynamic chunks—and scans emitted
-JavaScript for fixture or canned-data markers. The artifact smoke validates the
-Claude marketplace and plugin manifests, `hooks/hooks.json`, and `.mcp.json`,
-plus the Codex manifest and thin host configs. One shared artifact builder
-stages the CLI, MCP, and skills once. In an isolated HOME, a real installed
-`claude` CLI must add the generated self-contained marketplace and install
-`vibehub@vibehub-local`; the smoke then expands the installed
+The artifact smoke validates the Claude marketplace and plugin manifests,
+`hooks/hooks.json`, and `.mcp.json`, plus the Codex manifest and thin host
+configs. One shared artifact builder stages the CLI, MCP, and skills once. In
+an isolated HOME, a real installed `claude` CLI must add the generated
+self-contained marketplace and install `vibehub@vibehub-local`; the smoke then
+expands the installed
 `CLAUDE_PLUGIN_ROOT` and invokes its configured hook and MCP commands.
 Corrupt-path negatives prove the configs—not verifier-local shortcuts—are the
 invocation source. The Codex smoke builds a local marketplace, points a real
@@ -238,7 +221,7 @@ and requires the installed VibeHub MCP status to reach `ready`; a verifier-local
 Release readiness requires both installed-host gates; passing one host's
 marketplace verification does not imply parity for the other.
 The remaining checks create SQLite through the packaged native dependency and
-run sync and snapshot outside the source monorepo without starting the App.
+run sync and snapshot outside the source monorepo.
 
 The bundled `plugin-creator` preflight currently trails Codex 0.144.1 in three
 known ways: it rejects the documented `hooks` manifest field, requires
