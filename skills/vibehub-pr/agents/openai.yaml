@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub PR"
+  short_description: "Prepare and review semantic-aware pull requests"
+  default_prompt: "Use $vibehub-pr to prepare this branch for a semantic-aware pull request."

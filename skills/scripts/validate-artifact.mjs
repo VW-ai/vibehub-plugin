@@ -11,7 +11,7 @@ function report(schema,errors,warnings=[]){const value={valid:errors.length===0,
 const args=process.argv.slice(2); const packageIndex=args.indexOf("--package");
 if(packageIndex>=0){
   const root=path.resolve(args[packageIndex+1]??path.resolve(here,"..")); const errors=[];
-  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup"];
+  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr"];
   const actualSkills=fs.readdirSync(root,{withFileTypes:true})
     .filter(entry=>entry.name.startsWith("vibehub-")&&entry.isDirectory())
     .map(entry=>entry.name)
@@ -33,7 +33,7 @@ if(packageIndex>=0){
     const metadataPath=path.join(root,skill,"agents/openai.yaml");if(fs.existsSync(metadataPath)){
       let parsed;try{parsed=parseRestrictedYaml(fs.readFileSync(metadataPath,"utf8"));}catch(error){errors.push({path:`${skill}/agents/openai.yaml`,message:`invalid restricted YAML: ${error.message}`});parsed={};}
       const metadata=parsed.interface??{},display=metadata.display_name,short=metadata.short_description,prompt=metadata.default_prompt;
-      const expected=skill.split("-").map((part,index)=>index===0?"VibeHub":part[0].toUpperCase()+part.slice(1)).join(" ");
+      const expected=skill.split("-").map((part,index)=>index===0?"VibeHub":part==="pr"?"PR":part[0].toUpperCase()+part.slice(1)).join(" ");
       if(display!==expected)errors.push({path:`${skill}/agents/openai.yaml`,message:`display_name must deterministically equal ${expected}`});
       if(!short||short.length<25||short.length>64)errors.push({path:`${skill}/agents/openai.yaml`,message:"short_description must be 25..64 characters"});
       if(!prompt?.includes(`$${skill}`))errors.push({path:`${skill}/agents/openai.yaml`,message:"default_prompt must name the skill"});

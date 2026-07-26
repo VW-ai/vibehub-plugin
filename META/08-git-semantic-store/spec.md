@@ -137,9 +137,26 @@ The plugin repository now carries an empty canonical protocol because its
 registered runtime KB subset is empty. Existing machine SQLite rows for unrelated
 repositories were inspected but not modified. See `migration-receipt.yaml`.
 
+## Semantic checkpoints and reusable PR procedure — 2026-07-22
+
+Durable knowledge changes now cross an explicit two-phase checkpoint boundary.
+A read-only prepare receipt pins branch, HEAD, semantic digest and exact changed
+paths. Commit recomputes every fact, builds a path-isolated candidate tree in a
+temporary index, validates it and advances the branch with compare-and-swap.
+Unrelated staged and unstaged user work never enters the checkpoint commit.
+
+The built-in `vibehub-pr` skill packages branch sync, semantic conflict
+classification, deterministic validation and PR review-brief preparation. It
+can be nested by other workflow skills without exposing persistence mechanics.
+Merge, squash, force-push and branch deletion remain separate human-authorized
+actions. Full evidence is in `semantic-checkpoint-pr-slice.md` and
+`decision-project-029`.
+
 # Canonical Specs
 
 - [intent-project-004] (active) Maintain Git/YAML durable semantics while
   SQLite retains operational state and rebuildable caches.
 - [decision-project-028] (active) Adopt Git semantic store for durable semantic
   truth while retaining SQLite operational authority and commit-keyed caches.
+- [decision-project-029] (active) Use receipt-bound semantic checkpoints and a
+  reusable nested PR procedure skill.

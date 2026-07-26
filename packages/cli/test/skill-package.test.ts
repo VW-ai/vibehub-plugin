@@ -10,7 +10,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -18,7 +18,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
-    expect(entry).toHaveLength(6);
+    expect(entry).toHaveLength(7);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -68,7 +68,7 @@ describe("production skill package",()=>{
     }
   });
 
-  it("rejects a seventh top-level skill outside the canonical registry",()=>{
+  it("rejects an extra top-level skill outside the canonical registry",()=>{
     const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-extra-skill-")),copy=path.join(temp,"skills");fs.cpSync(skills,copy,{recursive:true});
     try {
       const extra=path.join(copy,"vibehub-extra");
@@ -243,6 +243,22 @@ describe("production skill package",()=>{
     }
   });
 
+  it("pins nested PR procedure and storage-independent checkpoint intelligence",()=>{
+    const read=(relative:string)=>fs.readFileSync(path.join(skills,relative),"utf8");
+    const operations=read("_stdlib/operations.md");
+    const pr=read("vibehub-pr/SKILL.md");
+    const procedure=read("vibehub-pr/references/review-procedure.md");
+    expect(operations).toContain("request a checkpoint automatically at the next stable workflow boundary");
+    expect(operations).toContain("../scripts/vh-checkpoint.mjs");
+    expect(operations).toContain("The adapter owns Git mechanics");
+    expect(pr).toContain("delegated PR phase");
+    expect(pr).toContain("Never merge, squash, force-push");
+    expect(pr).toContain("$vibehub-pr");
+    expect(procedure).toContain("preserve unrelated staged and unstaged work");
+    expect(procedure).toContain("Same field");
+    expect(procedure).toContain("The caller retains domain judgment");
+  });
+
   it("keeps wrapper registries identical to dispatcher operation names",async()=>{
     const registry=await import(path.join(skills,"scripts/_dispatch.mjs")) as {KB:Set<string>;DISTILL:Set<string>};
     const expected=Object.keys(operationInputSchemas);
@@ -403,6 +419,23 @@ describe("production skill package",()=>{
     const run=spawnSync(process.execPath,[path.join(packaged,"scripts/vh-kb.mjs"),"status","--repo",temp,"--actor","test","--request","clean"],{input:"{}",encoding:"utf8",env:{HOME:home,PATH:`${bin}:${process.env.PATH??""}`}});
     expect(run.status,run.stdout+run.stderr).toBe(0);
     expect(JSON.parse(run.stdout)).toMatchObject({ok:true,meta:{operation:"kb.status",requestId:"clean"}});
+  });
+
+  it("keeps checkpoint mechanics in the packaged adapter",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-checkpoint-wrapper-"));
+    const fake=path.join(temp,"vibehub");
+    fs.writeFileSync(fake,"#!/usr/bin/env node\nlet raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n");
+    fs.chmodSync(fake,0o755);
+    const receipt=JSON.stringify({schemaVersion:1,branch:"feat/x",headSha:"a",semanticDigest:"b",changedPaths:[]});
+    const run=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-checkpoint.mjs"),
+      "commit","--repo",temp,"--actor","agent:test","--request","request:test",
+    ],{input:receipt,encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      argv:["checkpoint","commit","--json","--repo",temp,"--actor","agent:test","--request","request:test","--input","-"],
+      raw:receipt,
+    });
   });
 
   it("normalizes empty stdin and a zero-byte input file to the same empty object",()=>{
