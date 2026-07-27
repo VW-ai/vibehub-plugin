@@ -2,17 +2,17 @@
 
 VibeHub publishes three public packages in dependency order:
 
-1. `@vibehub/core`
-2. `@vibehub/cli`
-3. `@vibehub/workbench-mcp`
+1. `@vw-ai/core`
+2. `@vw-ai/cli`
+3. `@vw-ai/workbench-mcp`
 
 They share one version with the VibeHub plugin and Git tag. Users do not need a
-global install; the CLI can be run as `npx @vibehub/cli`.
+global install; the CLI can be run as `npx @vw-ai/cli`.
 
 ## One-time npm setup
 
 The unscoped `vibehub` package belongs to an unrelated npm user. VibeHub uses
-the `@vibehub` organization scope instead.
+the `@vw-ai` organization scope instead.
 
 1. Sign in to npm and enable account-level two-factor authentication.
 2. Create or join the npm organization named `vibehub`.
@@ -48,17 +48,17 @@ After the first successful npm publication, install npm 11.15.0 or newer, sign
 in, and configure the same GitHub Actions workflow for every package:
 
 ```bash
-npm trust github @vibehub/core \
+npm trust github @vw-ai/core \
   --repo VW-ai/vibehub-plugin \
   --file npm-publish.yml \
   --allow-publish
 
-npm trust github @vibehub/cli \
+npm trust github @vw-ai/cli \
   --repo VW-ai/vibehub-plugin \
   --file npm-publish.yml \
   --allow-publish
 
-npm trust github @vibehub/workbench-mcp \
+npm trust github @vw-ai/workbench-mcp \
   --repo VW-ai/vibehub-plugin \
   --file npm-publish.yml \
   --allow-publish

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { sha256, type ManagedAssetManifest } from "@vibehub/core";
+import { sha256, type ManagedAssetManifest } from "@vw-ai/core";
 
 const RELEASE_VERSION = "0.1.0";
 function releaseFiles(root: string, relative = ""): string[] {

@@ -1,7 +1,7 @@
 {
-  "name": "@vibehub/cli",
+  "name": "@vw-ai/cli",
   "version": "0.2.0",
-  "description": "Vibehub workbench CLI — thin adapter over @vibehub/core (decision-project-013: zero LLM, zero business logic; parsing + output formatting only).",
+  "description": "Vibehub workbench CLI — thin adapter over @vw-ai/core (decision-project-013: zero LLM, zero business logic; parsing + output formatting only).",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -31,7 +31,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@vibehub/core": "workspace:*"
+    "@vw-ai/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22",

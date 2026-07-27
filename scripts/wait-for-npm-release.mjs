@@ -12,9 +12,9 @@ if (suppliedTag !== `v${identity.version}`) {
 }
 
 const packages = [
-  "@vibehub/core",
-  "@vibehub/cli",
-  "@vibehub/workbench-mcp",
+  "@vw-ai/core",
+  "@vw-ai/cli",
+  "@vw-ai/workbench-mcp",
 ];
 const deadline = Date.now() + 15 * 60_000;
 

@@ -109,9 +109,9 @@ export function buildReleaseMarketplace({
       channel: "npm",
       runtime: {
         packages: [
-          `@vibehub/core@${identity.version}`,
-          `@vibehub/cli@${identity.version}`,
-          `@vibehub/workbench-mcp@${identity.version}`,
+          `@vw-ai/core@${identity.version}`,
+          `@vw-ai/cli@${identity.version}`,
+          `@vw-ai/workbench-mcp@${identity.version}`,
         ],
       },
       commit,

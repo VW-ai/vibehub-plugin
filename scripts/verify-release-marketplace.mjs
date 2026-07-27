@@ -27,9 +27,9 @@ if (
   release.channel !== "npm" ||
   JSON.stringify(release.runtime?.packages) !==
     JSON.stringify([
-      `@vibehub/core@${identity.version}`,
-      `@vibehub/cli@${identity.version}`,
-      `@vibehub/workbench-mcp@${identity.version}`,
+      `@vw-ai/core@${identity.version}`,
+      `@vw-ai/cli@${identity.version}`,
+      `@vw-ai/workbench-mcp@${identity.version}`,
     ])
 ) {
   throw new Error("release provenance does not match the npm runtime identity");

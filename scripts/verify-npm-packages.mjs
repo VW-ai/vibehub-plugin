@@ -10,17 +10,17 @@ const repositoryUrl = "https://github.com/VW-ai/vibehub-plugin.git";
 const packages = [
   {
     directory: "packages/core",
-    expectedName: "@vibehub/core",
+    expectedName: "@vw-ai/core",
     expectedBin: null,
   },
   {
     directory: "packages/cli",
-    expectedName: "@vibehub/cli",
+    expectedName: "@vw-ai/cli",
     expectedBin: "vibehub",
   },
   {
     directory: "packages/mcp",
-    expectedName: "@vibehub/workbench-mcp",
+    expectedName: "@vw-ai/workbench-mcp",
     expectedBin: "vibehub-mcp",
   },
 ];
@@ -72,12 +72,12 @@ for (const entry of packages) {
   }
 }
 
-if (identity.cliPackage.dependencies?.["@vibehub/core"] !== "workspace:*") {
-  throw new Error("@vibehub/cli must depend on workspace:* @vibehub/core");
+if (identity.cliPackage.dependencies?.["@vw-ai/core"] !== "workspace:*") {
+  throw new Error("@vw-ai/cli must depend on workspace:* @vw-ai/core");
 }
-if (identity.mcpPackage.dependencies?.["@vibehub/core"] !== "workspace:*") {
+if (identity.mcpPackage.dependencies?.["@vw-ai/core"] !== "workspace:*") {
   throw new Error(
-    "@vibehub/workbench-mcp must depend on workspace:* @vibehub/core",
+    "@vw-ai/workbench-mcp must depend on workspace:* @vw-ai/core",
   );
 }
 

@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ingestHookEvent, openDb } from "@vibehub/core";
+import { ingestHookEvent, openDb } from "@vw-ai/core";
 import { main } from "../src/main.js";
 
 const roots: string[] = [];

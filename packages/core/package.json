@@ -1,5 +1,5 @@
 {
-  "name": "@vibehub/core",
+  "name": "@vw-ai/core",
   "version": "0.2.0",
   "description": "Vibehub workbench core — library-first, zero-LLM (decision-project-013/025). All real logic lives here; cli/mcp are thin adapters.",
   "license": "Apache-2.0",

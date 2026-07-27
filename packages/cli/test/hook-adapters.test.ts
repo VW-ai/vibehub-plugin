@@ -12,7 +12,7 @@ import {
   readFootprints,
   readTimeline,
   sessionIdentity,
-} from "@vibehub/core";
+} from "@vw-ai/core";
 import {
   adaptCodexHook,
   codexApplyPatchTouches,

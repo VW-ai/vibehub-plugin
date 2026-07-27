@@ -67,7 +67,7 @@ try {
   const core = join(
     installRoot,
     "node_modules",
-    "@vibehub",
+    "@vw-ai",
     "core",
     "dist",
     "index.js",
