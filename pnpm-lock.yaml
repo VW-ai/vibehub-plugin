@@ -13,7 +13,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@vw-ai/core':
+      '@vw-ai/vibehub-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -54,7 +54,7 @@ importers:
 
   packages/mcp:
     dependencies:
-      '@vw-ai/core':
+      '@vw-ai/vibehub-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

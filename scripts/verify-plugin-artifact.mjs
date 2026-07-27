@@ -25,13 +25,13 @@ const home = join(temp, "home");
 const repo = join(temp, "repo");
 const keep = process.env.VIBEHUB_KEEP_TMP === "1";
 const specs = JSON.stringify([
-  join(root, "dist", "npm", `vw-ai-core-${identity.version}.tgz`),
-  join(root, "dist", "npm", `vw-ai-cli-${identity.version}.tgz`),
+  join(root, "dist", "npm", `vw-ai-vibehub-core-${identity.version}.tgz`),
+  join(root, "dist", "npm", `vw-ai-vibehub-cli-${identity.version}.tgz`),
   join(
     root,
     "dist",
     "npm",
-    `vw-ai-workbench-mcp-${identity.version}.tgz`,
+    `vw-ai-vibehub-workbench-mcp-${identity.version}.tgz`,
   ),
 ]);
 
@@ -220,7 +220,7 @@ try {
     runtimeRoot,
     "node_modules",
     "@vw-ai",
-    "cli",
+    "vibehub-cli",
     "package.json",
   );
   const firstRuntimeMtime = statSync(cliManifest).mtimeMs;
@@ -253,9 +253,9 @@ try {
   }
 
   const runtimePackages = [
-    "@vw-ai/core",
-    "@vw-ai/cli",
-    "@vw-ai/workbench-mcp",
+    "@vw-ai/vibehub-core",
+    "@vw-ai/vibehub-cli",
+    "@vw-ai/vibehub-workbench-mcp",
   ];
   for (const name of runtimePackages) {
     const [scope, packageName] = name.split("/");

@@ -47,7 +47,9 @@ function runCli(args, input) {
   fs.closeSync(stdoutFd);fs.closeSync(stderrFd);
   const stdout=fs.readFileSync(`${captureBase}.out`,"utf8"),stderr=fs.readFileSync(`${captureBase}.err`,"utf8");
   if (result.status !== 0) {
-    throw new Error(`vibehub ${args.join(" ")} failed (${result.status}): ${stderr}`);
+    throw new Error(
+      `vibehub ${args.join(" ")} failed (${result.status}): ${stderr || stdout}`,
+    );
   }
   return stdout.trim();
 }

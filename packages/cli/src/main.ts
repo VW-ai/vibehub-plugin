@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * vibehub — thin CLI over @vw-ai/core (decision-project-013: the CLI does
+ * vibehub — thin CLI over @vw-ai/vibehub-core (decision-project-013: the CLI does
  * argument parsing and output formatting ONLY; every real operation is one
  * core call. Zero LLM, zero API keys.)
  *
@@ -43,7 +43,7 @@ import {
   type HookEventName,
   type HookHost,
   type WorkbenchIntervention,
-} from "@vw-ai/core";
+} from "@vw-ai/vibehub-core";
 import { releaseAssetManifest, releaseAssetRoot } from "./managed-assets.js";
 import { adaptHookInput, projectHookOutput } from "./hook-adapters.js";
 

@@ -3,9 +3,18 @@
 All notable VibeHub changes are recorded here. Versions follow Semantic
 Versioning.
 
+## 0.2.1
+
+- Renamed the public npm packages to `@vw-ai/vibehub-core`,
+  `@vw-ai/vibehub-cli`, and `@vw-ai/vibehub-workbench-mcp` so the shared
+  `@vw-ai` organization can publish multiple products without ambiguous
+  package names.
+
 ## 0.2.0
 
-- Added public npm packages for the core runtime, CLI, and MCP server.
+- Added the first public npm packages for the core runtime, CLI, and MCP
+  server. Their short-lived names were superseded by the product-qualified
+  names in 0.2.1.
 - Added tokenless npm publishing from GitHub Actions through npm Trusted
   Publishing (OIDC), with automatic provenance.
 - Bundled the MCP stdio runtime so unused HTTP adapter dependencies do not

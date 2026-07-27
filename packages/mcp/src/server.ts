@@ -1,11 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { operationContextSchema } from "@vw-ai/core";
+import { operationContextSchema } from "@vw-ai/vibehub-core";
 import { z } from "zod";
 import { createCapabilities, type CapabilityContext } from "./capabilities.js";
 
 const scopeItem = z.object({ glob: z.string().min(1), label: z.string().optional() });
 const logicalRequestId = operationContextSchema.shape.requestId.optional();
-export const WORKBENCH_MCP_VERSION = "0.2.0";
+export const WORKBENCH_MCP_VERSION = "0.2.1";
 export const WORKBENCH_MCP_TOOL_NAMES = [
   "register_scope", "self_report", "kb_retrieve", "kb_operation", "distill_operation", "get_manual",
 ] as const;

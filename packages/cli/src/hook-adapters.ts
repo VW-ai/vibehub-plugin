@@ -5,7 +5,7 @@ import {
   type HookDeliveryDirective,
   type HookEventName,
   type HookHost,
-} from "@vw-ai/core";
+} from "@vw-ai/vibehub-core";
 
 export type AdaptedHookInput =
   | { kind: "event"; event: CanonicalHookEvent }

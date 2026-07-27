@@ -33,20 +33,32 @@ const runtimeParent = dirname(runtimeRoot);
 const lockRoot = `${runtimeRoot}.installing`;
 const expected = [
   {
-    name: "@vw-ai/core",
-    manifest: join(runtimeRoot, "node_modules", "@vw-ai", "core", "package.json"),
-  },
-  {
-    name: "@vw-ai/cli",
-    manifest: join(runtimeRoot, "node_modules", "@vw-ai", "cli", "package.json"),
-  },
-  {
-    name: "@vw-ai/workbench-mcp",
+    name: "@vw-ai/vibehub-core",
     manifest: join(
       runtimeRoot,
       "node_modules",
       "@vw-ai",
-      "workbench-mcp",
+      "vibehub-core",
+      "package.json",
+    ),
+  },
+  {
+    name: "@vw-ai/vibehub-cli",
+    manifest: join(
+      runtimeRoot,
+      "node_modules",
+      "@vw-ai",
+      "vibehub-cli",
+      "package.json",
+    ),
+  },
+  {
+    name: "@vw-ai/vibehub-workbench-mcp",
+    manifest: join(
+      runtimeRoot,
+      "node_modules",
+      "@vw-ai",
+      "vibehub-workbench-mcp",
       "package.json",
     ),
   },
@@ -156,7 +168,7 @@ function ensureRuntime() {
       stage,
       "node_modules",
       "@vw-ai",
-      "core",
+      "vibehub-core",
       "dist",
       "index.js",
     );
@@ -202,12 +214,19 @@ try {
 
 const entrypoint =
   mode === "cli"
-    ? join(runtimeRoot, "node_modules", "@vw-ai", "cli", "dist", "main.js")
+    ? join(
+        runtimeRoot,
+        "node_modules",
+        "@vw-ai",
+        "vibehub-cli",
+        "dist",
+        "main.js",
+      )
     : join(
         runtimeRoot,
         "node_modules",
         "@vw-ai",
-        "workbench-mcp",
+        "vibehub-workbench-mcp",
         "dist",
         "stdio.js",
       );

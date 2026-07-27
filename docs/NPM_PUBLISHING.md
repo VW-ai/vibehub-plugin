@@ -2,12 +2,12 @@
 
 VibeHub publishes three public packages in dependency order:
 
-1. `@vw-ai/core`
-2. `@vw-ai/cli`
-3. `@vw-ai/workbench-mcp`
+1. `@vw-ai/vibehub-core`
+2. `@vw-ai/vibehub-cli`
+3. `@vw-ai/vibehub-workbench-mcp`
 
 They share one version with the VibeHub plugin and Git tag. Users do not need a
-global install; the CLI can be run as `npx @vw-ai/cli`.
+global install; the CLI can be run as `npx @vw-ai/vibehub-cli`.
 
 ## One-time npm setup
 
@@ -17,7 +17,7 @@ the `@vw-ai` organization scope instead.
 1. Sign in to npm and enable account-level two-factor authentication.
 2. Create or join the npm organization named `vw-ai`.
 3. Merge the npm distribution changes to `main`.
-4. Create the annotated `v0.2.0` tag locally, but do not push it yet.
+4. Create the annotated `v0.2.1` tag locally, but do not push it yet.
 5. Build, verify, and publish the first packages from that exact local tag.
 6. Configure Trusted Publishing for all three packages.
 7. Push the tag. The normal GitHub release workflows can now use OIDC.
@@ -30,14 +30,14 @@ From the tagged `main` commit:
 
 ```bash
 npm whoami
-git tag -a v0.2.0 -m "VibeHub v0.2.0"
+git tag -a v0.2.1 -m "VibeHub v0.2.1"
 pnpm install --frozen-lockfile
 pnpm verify
 pnpm pack:npm
-VIBEHUB_NPM_RELEASE_TAG=v0.2.0 pnpm publish:npm
+VIBEHUB_NPM_RELEASE_TAG=v0.2.1 pnpm publish:npm
 ```
 
-The publish command requires `v0.2.0` to exist locally and point to `HEAD`.
+The publish command requires `v0.2.1` to exist locally and point to `HEAD`.
 It publishes core, CLI, and MCP in dependency order and safely skips an
 already-published tarball only when its registry integrity exactly matches the
 local artifact.
@@ -48,17 +48,17 @@ After the first successful npm publication, install npm 11.15.0 or newer, sign
 in, and configure the same GitHub Actions workflow for every package:
 
 ```bash
-npm trust github @vw-ai/core \
+npm trust github @vw-ai/vibehub-core \
   --repo VW-ai/vibehub-plugin \
   --file npm-publish.yml \
   --allow-publish
 
-npm trust github @vw-ai/cli \
+npm trust github @vw-ai/vibehub-cli \
   --repo VW-ai/vibehub-plugin \
   --file npm-publish.yml \
   --allow-publish
 
-npm trust github @vw-ai/workbench-mcp \
+npm trust github @vw-ai/vibehub-workbench-mcp \
   --repo VW-ai/vibehub-plugin \
   --file npm-publish.yml \
   --allow-publish
@@ -83,7 +83,7 @@ Once all three connections are present:
 3. Push the release tag:
 
 ```bash
-git push origin v0.2.0
+git push origin v0.2.1
 ```
 
 ## Release behavior

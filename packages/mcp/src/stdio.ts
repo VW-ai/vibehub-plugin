@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { resolveDbPath } from "@vw-ai/core";
+import { resolveDbPath } from "@vw-ai/vibehub-core";
 import {
   openRuntimeContextForClient,
   type RuntimeContext,
