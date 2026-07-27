@@ -7,7 +7,7 @@ import {
   upsertRepo,
   upsertTask,
   type Db,
-} from "@vw-ai/core";
+} from "@vw-ai/vibehub-core";
 import { fileURLToPath } from "node:url";
 import type { CapabilityContext } from "./capabilities.js";
 

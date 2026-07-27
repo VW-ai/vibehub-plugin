@@ -16,9 +16,9 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const identity = readReleaseIdentity(root);
 const installRoot = mkdtempSync(join(tmpdir(), "vibehub-public-npm-"));
 const specs = [
-  `@vw-ai/core@${identity.version}`,
-  `@vw-ai/cli@${identity.version}`,
-  `@vw-ai/workbench-mcp@${identity.version}`,
+  `@vw-ai/vibehub-core@${identity.version}`,
+  `@vw-ai/vibehub-cli@${identity.version}`,
+  `@vw-ai/vibehub-workbench-mcp@${identity.version}`,
 ];
 
 function run(command, args, options = {}) {
@@ -58,7 +58,7 @@ try {
     installRoot,
     "node_modules",
     "@vw-ai",
-    "core",
+    "vibehub-core",
     "dist",
     "index.js",
   );

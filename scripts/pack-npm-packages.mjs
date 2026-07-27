@@ -15,19 +15,19 @@ const output = join(root, "dist", "npm");
 const identity = readReleaseIdentity(root);
 const packages = [
   {
-    name: "@vw-ai/core",
+    name: "@vw-ai/vibehub-core",
     directory: "packages/core",
-    archive: `vw-ai-core-${identity.version}.tgz`,
+    archive: `vw-ai-vibehub-core-${identity.version}.tgz`,
   },
   {
-    name: "@vw-ai/cli",
+    name: "@vw-ai/vibehub-cli",
     directory: "packages/cli",
-    archive: `vw-ai-cli-${identity.version}.tgz`,
+    archive: `vw-ai-vibehub-cli-${identity.version}.tgz`,
   },
   {
-    name: "@vw-ai/workbench-mcp",
+    name: "@vw-ai/vibehub-workbench-mcp",
     directory: "packages/mcp",
-    archive: `vw-ai-workbench-mcp-${identity.version}.tgz`,
+    archive: `vw-ai-vibehub-workbench-mcp-${identity.version}.tgz`,
   },
 ];
 

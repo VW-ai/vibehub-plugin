@@ -68,7 +68,7 @@ try {
     installRoot,
     "node_modules",
     "@vw-ai",
-    "core",
+    "vibehub-core",
     "dist",
     "index.js",
   );

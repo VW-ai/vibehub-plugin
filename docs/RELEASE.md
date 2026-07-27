@@ -67,8 +67,8 @@ drift, but must not silently change the certified minimum.
 ## Publication channels
 
 The npm publication workflow is defined in `.github/workflows/npm-publish.yml`.
-It publishes `@vw-ai/core`, `@vw-ai/cli`, and
-`@vw-ai/workbench-mcp` from an immutable release tag using npm Trusted
+It publishes `@vw-ai/vibehub-core`, `@vw-ai/vibehub-cli`, and
+`@vw-ai/vibehub-workbench-mcp` from an immutable release tag using npm Trusted
 Publishing. See `docs/NPM_PUBLISHING.md` for the first-release bootstrap and
 tokenless OIDC configuration.
 
@@ -103,7 +103,7 @@ GitHub Releases. There are no platform or per-release marketplace branches.
 6. Push the tag and wait for both release workflows.
 7. Verify the three npm packages and the universal GitHub Release archive.
 8. Install once from the repository marketplace on a clean machine and run
-   `npx @vw-ai/cli@VERSION doctor --json`.
+   `npx @vw-ai/vibehub-cli@VERSION doctor --json`.
 
 Do not publish manually around a failed gate. Fix the source, bump the version
 when the tag was already public, and rerun the complete process.

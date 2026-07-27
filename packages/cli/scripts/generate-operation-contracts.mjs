@@ -3,7 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
-import { operationAcceptanceConstructManifest, operationInputSchemas, operationRefinementManifest } from "@vw-ai/core";
+import { operationAcceptanceConstructManifest, operationInputSchemas, operationRefinementManifest } from "@vw-ai/vibehub-core";
 import { validateOperationContract, validateRuntimeRefinements } from "../../../skills/scripts/operation-contract-validator.mjs";
 
 const EXPECTED_INPUT_SCHEMA_HASH="a337e4239097e1f85cfea2e9e35d8159bd898162d252190542030f855c8eb82e";

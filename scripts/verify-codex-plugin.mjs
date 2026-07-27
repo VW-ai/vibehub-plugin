@@ -29,13 +29,13 @@ const runtimeRoot = join(
   `v${identity.version}`,
 );
 const runtimeSpecs = JSON.stringify([
-  join(root, "dist", "npm", `vw-ai-core-${identity.version}.tgz`),
-  join(root, "dist", "npm", `vw-ai-cli-${identity.version}.tgz`),
+  join(root, "dist", "npm", `vw-ai-vibehub-core-${identity.version}.tgz`),
+  join(root, "dist", "npm", `vw-ai-vibehub-cli-${identity.version}.tgz`),
   join(
     root,
     "dist",
     "npm",
-    `vw-ai-workbench-mcp-${identity.version}.tgz`,
+    `vw-ai-vibehub-workbench-mcp-${identity.version}.tgz`,
   ),
 ]);
 

@@ -1,6 +1,6 @@
 /**
  * Canonical browser-safe map read-model contracts. The App imports these
- * through `@vw-ai/core/contracts`; core never depends on the App.
+ * through `@vw-ai/vibehub-core/contracts`; core never depends on the App.
  */
 
 /* ── task state ─────────────────────────────────────────────────────────── */

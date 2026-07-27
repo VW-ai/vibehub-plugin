@@ -8,7 +8,7 @@ await build({
   platform: "node",
   format: "esm",
   target: "node20",
-  external: ["@vw-ai/core"],
+  external: ["@vw-ai/vibehub-core"],
   sourcemap: false,
   legalComments: "none",
 });
