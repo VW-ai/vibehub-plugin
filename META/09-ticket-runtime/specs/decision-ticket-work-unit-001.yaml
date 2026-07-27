@@ -13,10 +13,11 @@ intent:
     second work-unit lifecycle. Only a Ticket that satisfies the eventual
     executable contract may be claimed by a Run.
 
-    `task` remains available as ordinary language and as a compatibility term
-    used by host systems or legacy storage. It does not own a new canonical ID,
-    schema, lifecycle or state machine. Existing durable Tasks will require a
-    compatibility projection or migration into outcome-level Tickets.
+    `task` remains available as ordinary language or a host-system term. It
+    does not own a canonical ID, schema, lifecycle or state machine. This
+    project is early-stage: existing Task rows, branch-derived compatibility
+    state and task-shaped APIs do not create a migration obligation and may be
+    removed when the Ticket model lands.
 
     **Rationale**: The active Task definition and the proposed strict Ticket
     occupied nearly identical semantic space. Keeping both would force users,
@@ -24,9 +25,8 @@ intent:
     acceptance, scope, authority and closeout.
 
     **Deferred**: The Ticket contract, exact parent/visibility fields, direct
-    executability test, lifecycle and compatibility migration are separate
-    decisions. This decision fixes the ontology; it does not invent those
-    contracts prematurely.
+    executability test and lifecycle are separate decisions. This decision
+    fixes the ontology; it does not invent those contracts prematurely.
 
     **Claimed**: Codex 2026-07-27
 constraints:
@@ -40,6 +40,8 @@ constraints:
     rule: "Do not introduce a second formal Task schema, lifecycle or state machine"
   - kind: must_not
     rule: "Do not treat host or legacy use of the word task as canonical Ticket identity"
+  - kind: must_not
+    rule: "Do not spend product or runtime complexity preserving early-stage Task data or APIs"
 indexing:
   type: decision
   priority: P0
