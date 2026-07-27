@@ -21,8 +21,51 @@ intent:
     Task identity, and must define when a Ticket is directly executable by a
     Run.
 
-    This ticket is unresolved. The listed fields are inputs, not an approved
-    schema.
+    **Ratified partial contract — progressive maturity**
+
+    A Ticket receives a stable durable identity before it is executable. Its
+    definition maturity is a separate axis from its operational status:
+
+    - `outline`: a durable outcome/direction and graph position are known, but
+      the execution contract is intentionally incomplete.
+    - `specified`: scope, context, acceptance, and dependencies are materially
+      described, but one or more readiness validations remain unresolved.
+    - `executable`: every field and authority required to schedule a Run has
+      been validated.
+
+    Only an `executable`, unblocked Ticket may become READY or produce a Run.
+    Planning should create the widest honest graph of outline Tickets it can.
+    Planning Fog is reserved for regions where even a stable outcome or
+    direction cannot yet be named.
+
+    **Ratified partial contract — Agent-derived Tickets**
+
+    An Agent may create durable Tickets while planning or executing. A newly
+    discovered Ticket should attach to the earliest, coarsest ancestor Ticket
+    whose outcome truthfully contains that work. This is semantic containment,
+    not attachment by timestamp alone.
+
+    Each Agent-derived Ticket must preserve at least:
+
+    - its decomposition parent/ancestor;
+    - creation provenance, including the creating Agent and, when applicable,
+      the source Run;
+    - the discovery or decomposition reason.
+
+    Parentage expresses outcome containment; execution ordering remains an
+    explicit dependency relation.
+
+    **Next authority boundary to decide**
+
+    Creating a Ticket does not by itself decide whether the Agent may move it
+    to READY. The remaining question is whether an Agent-derived Ticket that is
+    executable, unblocked, inside the ancestor's authorized scope, and requires
+    no new human gate may enter READY automatically—or whether every
+    Agent-derived Ticket requires human review first.
+
+    This ticket remains unresolved. The maturity model and Agent creation rule
+    above are ratified, while the full field schema and readiness authority are
+    not yet approved.
 
     **Claimed**: Codex 2026-07-27
 constraints: []
