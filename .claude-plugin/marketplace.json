@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "vibehub",
   "description": "VibeHub plugins for Claude Code.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "owner": {
     "name": "VibeHub Team"
   },
@@ -11,7 +11,7 @@
       "name": "vibehub",
       "source": "./",
       "description": "Local team context: hook capture, governed knowledge skills, and deterministic MCP capabilities.",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "author": {
         "name": "VibeHub Team"
       },

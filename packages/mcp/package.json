@@ -1,6 +1,6 @@
 {
   "name": "@vw-ai/vibehub-workbench-mcp",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Local-first Vibehub MCP — deterministic capabilities and quality gates only.",
   "license": "Apache-2.0",
   "type": "module",
