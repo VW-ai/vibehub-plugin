@@ -15,7 +15,7 @@ The unscoped `vibehub` package belongs to an unrelated npm user. VibeHub uses
 the `@vw-ai` organization scope instead.
 
 1. Sign in to npm and enable account-level two-factor authentication.
-2. Create or join the npm organization named `vibehub`.
+2. Create or join the npm organization named `vw-ai`.
 3. Merge the npm distribution changes to `main`.
 4. Create the annotated `v0.2.0` tag locally, but do not push it yet.
 5. Build, verify, and publish the first packages from that exact local tag.
@@ -93,7 +93,7 @@ workflow:
 
 1. checks out the release tag;
 2. verifies every package and plugin version equals the tag;
-3. runs the complete build, typecheck, test, and dogfood suite;
+3. runs the package build, typecheck, test, metadata, and isolated-install checks;
 4. packs and uploads the exact npm tarballs;
 5. publishes core, CLI, and MCP in dependency order through OIDC.
 

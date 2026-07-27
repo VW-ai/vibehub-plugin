@@ -17,6 +17,7 @@
     "verify:release-metadata": "node scripts/verify-release-metadata.mjs",
     "verify:npm-install": "node scripts/verify-npm-install.mjs",
     "verify:npm-packages": "node scripts/verify-npm-packages.mjs",
+    "verify:npm-release": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:npm-packages && node scripts/pack-npm-packages.mjs && pnpm verify:npm-install",
     "verify:release-marketplace": "node scripts/verify-release-marketplace.mjs",
     "verify:release-hosts": "node scripts/verify-release-hosts.mjs",
     "verify:artifact": "node scripts/verify-plugin-artifact.mjs",
