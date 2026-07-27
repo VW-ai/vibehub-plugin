@@ -61,6 +61,7 @@ jobs:
         with:
           name: marketplace-${{ github.ref_name }}
           path: dist/release/
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
 
