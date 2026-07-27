@@ -55,17 +55,33 @@ intent:
     Parentage expresses outcome containment; execution ordering remains an
     explicit dependency relation.
 
-    **Next authority boundary to decide**
+    **Ratified partial contract — bounded self-expansion**
 
-    Creating a Ticket does not by itself decide whether the Agent may move it
-    to READY. The remaining question is whether an Agent-derived Ticket that is
-    executable, unblocked, inside the ancestor's authorized scope, and requires
-    no new human gate may enter READY automatically—or whether every
-    Agent-derived Ticket requires human review first.
+    The Ticket graph is plan-defined but execution-extensible. Planning fixes
+    the destination, coarse graph, known chains, decision gates, acceptance
+    boundaries, and delegated authority; it does not need to predict every leaf
+    Ticket before execution begins.
+
+    Agent graph mutations fall into three classes:
+
+    - `elaboration`: add detail to an existing Ticket when the new work shares
+      its acceptance and needs no independent scheduling or verification;
+    - `decomposition`: create a descendant Ticket when work inside the
+      ancestor's authorized outcome must be blocked, scheduled, executed, or
+      verified independently;
+    - `expansion`: create a proposed Ticket when the discovery would change an
+      outcome, non-goal, technical direction, budget, permission, external side
+      effect, or other human-controlled boundary.
+
+    An Agent-derived decomposition Ticket may enter READY without per-Ticket
+    human review only when it is necessary for the ancestor's accepted outcome,
+    remains within the ancestor's delegated scope and authority, introduces no
+    new human gate, and independently satisfies the `executable` and unblocked
+    invariants. Expansion Tickets remain proposals until human ratification.
 
     This ticket remains unresolved. The maturity model and Agent creation rule
-    above are ratified, while the full field schema and readiness authority are
-    not yet approved.
+    and bounded self-expansion authority above are ratified, while the full
+    field schema is not yet approved.
 
     **Claimed**: Codex 2026-07-27
 constraints: []
