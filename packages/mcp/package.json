@@ -1,5 +1,5 @@
 {
-  "name": "@vibehub/workbench-mcp",
+  "name": "@vw-ai/workbench-mcp",
   "version": "0.2.0",
   "description": "Local-first Vibehub MCP — deterministic capabilities and quality gates only.",
   "license": "Apache-2.0",
@@ -33,7 +33,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@vibehub/core": "workspace:*"
+    "@vw-ai/core": "workspace:*"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

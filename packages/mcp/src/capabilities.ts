@@ -4,7 +4,7 @@ import {
   replaceScopePatterns,
   saveTaskReport,
   type Db,
-} from "@vibehub/core";
+} from "@vw-ai/core";
 import crypto from "node:crypto";
 
 export interface CapabilityContext {

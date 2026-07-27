@@ -15,7 +15,7 @@ import {
   upsertRepo,
   upsertTask,
   type Db,
-} from "@vibehub/core";
+} from "@vw-ai/core";
 import { createCapabilities } from "../src/capabilities.js";
 import { createWorkbenchMcpServer, operationEnvelopeResult, WORKBENCH_MCP_TOOL_NAMES } from "../src/server.js";
 import {

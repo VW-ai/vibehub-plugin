@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { operationContextSchema } from "@vibehub/core";
+import { operationContextSchema } from "@vw-ai/core";
 import { z } from "zod";
 import { createCapabilities, type CapabilityContext } from "./capabilities.js";
 
