@@ -1,6 +1,6 @@
 {
   "name": "@vibehub/core",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Vibehub workbench core — library-first, zero-LLM (decision-project-013/025). All real logic lives here; cli/mcp are thin adapters.",
   "license": "Apache-2.0",
   "type": "module",
@@ -19,6 +19,21 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VW-ai/vibehub-plugin.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/VW-ai/vibehub-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/VW-ai/vibehub-plugin/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",

@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -16,10 +23,11 @@ if (!existsSync(marketplaceRoot)) {
 
 const temp = mkdtempSync(join(tmpdir(), "vibehub-release-hosts-"));
 
-function run(command, args, env) {
+function run(command, args, env, cwd = temp, input) {
   const result = spawnSync(command, args, {
-    cwd: temp,
+    cwd,
     env,
+    input,
     encoding: "utf8",
   });
   if (result.error) throw result.error;
@@ -64,6 +72,45 @@ try {
   ) {
     throw new Error("Claude did not install vibehub@vibehub from the release catalog");
   }
+  const installedRoot = realpathSync(claudePlugin.installPath);
+  const hooks = JSON.parse(
+    readFileSync(join(installedRoot, "hooks", "hooks.json"), "utf8"),
+  );
+  const session = hooks.hooks.SessionStart[0].hooks[0];
+  const repo = join(temp, "repo");
+  const runtimeRoot = join(temp, "public-npm-runtime");
+  mkdirSync(repo, { recursive: true });
+  run("git", ["init", "-q", "-b", "main"], claudeEnv, repo);
+  run(
+    "git",
+    ["-c", "user.email=release@vibehub.local", "-c", "user.name=VibeHub Release", "commit", "-q", "--allow-empty", "-m", "seed"],
+    claudeEnv,
+    repo,
+  );
+  const runtimeEnv = {
+    ...claudeEnv,
+    CLAUDE_PLUGIN_ROOT: installedRoot,
+    NPM_CONFIG_CACHE: join(temp, "npm-cache"),
+    VIBEHUB_RUNTIME_DIR: runtimeRoot,
+  };
+  const hookOutput = JSON.parse(
+    run(
+      session.command,
+      session.args.map((arg) =>
+        arg.replaceAll("${CLAUDE_PLUGIN_ROOT}", installedRoot),
+      ),
+      runtimeEnv,
+      repo,
+      JSON.stringify({
+        session_id: "public-release-verification",
+        cwd: repo,
+        hook_event_name: "SessionStart",
+      }),
+    ),
+  );
+  if (!hookOutput.hookSpecificOutput?.additionalContext?.includes("register_scope")) {
+    throw new Error("installed Claude plugin did not start the public npm runtime");
+  }
 
   const codexHome = join(temp, "codex-home");
   const codexUserHome = join(temp, "codex-user-home");
@@ -105,6 +152,7 @@ try {
       ok: true,
       marketplaceRoot,
       claude: "installed",
+      runtime: "public npm",
       codex: "installed",
     })}\n`,
   );

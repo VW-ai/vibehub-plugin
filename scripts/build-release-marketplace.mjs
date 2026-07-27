@@ -11,11 +11,7 @@ import {
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildPluginArtifact } from "./build-plugin-artifact.mjs";
-import {
-  readReleaseIdentity,
-  RELEASE_NODE_MAJOR,
-  targetFor,
-} from "./release-metadata.mjs";
+import { readReleaseIdentity } from "./release-metadata.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const GENERATED_MARKER = ".vibehub-release-marketplace";
@@ -23,23 +19,16 @@ const MARKETPLACE_NAME = "vibehub";
 
 function parseCli(argv) {
   let out = null;
-  let target = null;
   let commit = process.env.GITHUB_SHA ?? "local";
-  let offline = process.env.VIBEHUB_OFFLINE === "1";
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--") continue;
     if (arg === "--out") out = argv[++index] ?? "";
-    else if (arg === "--target") target = argv[++index] ?? "";
     else if (arg === "--commit") commit = argv[++index] ?? "";
-    else if (arg === "--offline") offline = true;
     else throw new Error(`unknown argument: ${arg}`);
   }
   if (!out) throw new Error("--out requires a path");
-  if (!target) {
-    target = targetFor(process.platform, process.arch, Number(process.versions.node.split(".")[0]));
-  }
-  return { out: resolve(out), target, commit, offline };
+  return { out: resolve(out), commit };
 }
 
 function assertReplaceable(outputRoot) {
@@ -62,28 +51,10 @@ function writeJson(path, value) {
 
 export function buildReleaseMarketplace({
   outputRoot,
-  target,
   commit = process.env.GITHUB_SHA ?? "local",
-  offline = process.env.VIBEHUB_OFFLINE === "1",
 } = {}) {
   if (!outputRoot) throw new Error("outputRoot is required");
   const identity = readReleaseIdentity(root);
-  const runtimeNodeMajor = Number(process.versions.node.split(".")[0]);
-  const expectedTarget = targetFor(
-    process.platform,
-    process.arch,
-    runtimeNodeMajor,
-  );
-  if (target !== expectedTarget) {
-    throw new Error(
-      `target ${target} does not match builder runtime ${expectedTarget}`,
-    );
-  }
-  if (runtimeNodeMajor !== RELEASE_NODE_MAJOR) {
-    throw new Error(
-      `public artifacts must be built with Node ${RELEASE_NODE_MAJOR}; current runtime is Node ${runtimeNodeMajor}`,
-    );
-  }
 
   const absoluteOutput = resolve(outputRoot);
   assertReplaceable(absoluteOutput);
@@ -91,7 +62,7 @@ export function buildReleaseMarketplace({
   const stage = mkdtempSync(join(dirname(absoluteOutput), ".vibehub-release-stage-"));
   try {
     const pluginRoot = join(stage, "plugins", "vibehub");
-    buildPluginArtifact({ sourceRoot: root, artifactRoot: pluginRoot, offline });
+    buildPluginArtifact({ sourceRoot: root, artifactRoot: pluginRoot });
 
     writeJson(join(stage, ".claude-plugin", "marketplace.json"), {
       $schema: "https://anthropic.com/claude-code/marketplace.schema.json",
@@ -132,16 +103,16 @@ export function buildReleaseMarketplace({
     });
 
     writeJson(join(stage, "release.json"), {
-      schemaVersion: 1,
+      schemaVersion: 2,
       name: identity.name,
       version: identity.version,
-      target,
-      platform: process.platform,
-      arch: process.arch,
-      node: {
-        major: runtimeNodeMajor,
-        abi: process.versions.modules,
-        version: process.versions.node,
+      channel: "npm",
+      runtime: {
+        packages: [
+          `@vibehub/core@${identity.version}`,
+          `@vibehub/cli@${identity.version}`,
+          `@vibehub/workbench-mcp@${identity.version}`,
+        ],
       },
       commit,
     });
@@ -154,7 +125,7 @@ export function buildReleaseMarketplace({
       outputRoot: absoluteOutput,
       pluginRoot: join(absoluteOutput, "plugins", "vibehub"),
       version: identity.version,
-      target,
+      channel: "npm",
     };
   } catch (error) {
     rmSync(stage, { recursive: true, force: true });
@@ -166,9 +137,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const options = parseCli(process.argv.slice(2));
   const result = buildReleaseMarketplace({
     outputRoot: options.out,
-    target: options.target,
     commit: options.commit,
-    offline: options.offline,
   });
   process.stdout.write(`${JSON.stringify({ ok: true, ...result })}\n`);
 }

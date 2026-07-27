@@ -3,7 +3,7 @@
     "vibehub": {
       "type": "stdio",
       "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/packages/mcp/dist/stdio.js"]
+      "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "mcp"]
     }
   }
 }

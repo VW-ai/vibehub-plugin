@@ -17,30 +17,25 @@ does not embed an LLM.
 
 ## Install
 
-Public marketplace builds require Node.js 24 and support:
-
-- macOS: arm64 and x64
-- Linux: arm64 and x64
-
-Set the marketplace target for your machine:
-
-```bash
-TARGET="$(node -p '`${process.platform}-${process.arch}-node${process.versions.node.split(".")[0]}`')"
-```
+Requires Node.js 20 or newer. No global npm install, platform target, or API key
+is required.
 
 ### Claude Code
 
 ```bash
-claude plugin marketplace add "https://github.com/VW-ai/vibehub-plugin.git#marketplace/${TARGET}"
+claude plugin marketplace add https://github.com/VW-ai/vibehub-plugin.git
 claude plugin install vibehub@vibehub
 ```
 
 ### OpenAI Codex
 
 ```bash
-codex plugin marketplace add VW-ai/vibehub-plugin --ref "marketplace/${TARGET}"
+codex plugin marketplace add VW-ai/vibehub-plugin
 codex plugin add vibehub@vibehub
 ```
+
+On first use, the plugin downloads its matching signed npm runtime into
+`~/.vibehub/runtime/npm/`. Later starts reuse that versioned local cache.
 
 ## Start
 
@@ -103,7 +98,7 @@ pnpm install --frozen-lockfile
 pnpm verify
 ```
 
-Source builds support Node.js 20 or newer and pnpm 10.8.1. The full verification
+Source builds use pnpm 10.8.1. The full verification
 gate builds and tests the CLI, MCP server, skills, real host installations, and
 the headless dogfood flow.
 
@@ -120,7 +115,8 @@ CLI、MCP、hooks 和知识工作流共用本机 SQLite，不需要 API key，�
 让宿主使用 `$vibehub-setup`；之后可以通过 `$vibehub-query` 查询上下文、
 用 `$vibehub-ingest` 保存长期决策，或用 `$vibehub-distill` 梳理已有项目。
 
-公开构建目前支持 Node.js 24，以及 macOS/Linux 的 arm64 和 x64 环境。
+安装需要 Node.js 20 或更新版本，不需要 `npm -g`，也不用选择系统或 CPU
+对应的 branch。首次使用会将与插件同版本的 npm runtime 缓存到本机。
 
 ## License
 

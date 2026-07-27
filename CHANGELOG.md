@@ -3,6 +3,16 @@
 All notable VibeHub changes are recorded here. Versions follow Semantic
 Versioning.
 
+## 0.2.0
+
+- Added public npm packages for the core runtime, CLI, and MCP server.
+- Added tokenless npm publishing from GitHub Actions through npm Trusted
+  Publishing (OIDC), with automatic provenance.
+- Bundled the MCP stdio runtime so unused HTTP adapter dependencies do not
+  enter the consumer installation tree.
+- Started the transition from platform-specific marketplace branches to a
+  thin, platform-neutral marketplace plugin backed by npm packages.
+
 ## 0.1.1
 
 - Added Git-backed semantic checkpoints and the packaged `vibehub-pr`

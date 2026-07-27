@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js\" hook SessionStart --host codex",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs\" cli hook SessionStart --host codex",
             "statusMessage": "Loading VibeHub project context"
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js\" hook UserPromptSubmit --host codex"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs\" cli hook UserPromptSubmit --host codex"
           }
         ]
       }
@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js\" hook PostToolUse --host codex"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs\" cli hook PostToolUse --host codex"
           }
         ]
       }

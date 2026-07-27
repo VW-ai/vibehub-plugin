@@ -1,0 +1,63 @@
+name: Publish npm packages
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 24
+  NPM_VERSION: 11.18.0
+  PNPM_VERSION: 10.8.1
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Require the release tag to belong to main
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor HEAD origin/main
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install npm with Trusted Publishing support
+        run: npm install --global "npm@${NPM_VERSION}"
+
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/verify-release-metadata.mjs "${{ github.ref_name }}"
+      - run: pnpm verify
+
+      - name: Preserve the exact npm tarballs
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-${{ github.ref_name }}
+          path: dist/npm/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish in dependency order
+        run: pnpm publish:npm
+        env:
+          VIBEHUB_NPM_RELEASE_TAG: ${{ github.ref_name }}

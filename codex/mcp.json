@@ -3,7 +3,8 @@
     "vibehub": {
       "command": "node",
       "args": [
-        "./packages/mcp/dist/stdio.js"
+        "./runtime/vibehub-runtime.mjs",
+        "mcp"
       ],
       "cwd": "."
     }

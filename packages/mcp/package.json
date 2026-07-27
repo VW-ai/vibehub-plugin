@@ -12,19 +12,35 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VW-ai/vibehub-plugin.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/VW-ai/vibehub-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/VW-ai/vibehub-plugin/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node scripts/bundle.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
-    "@vibehub/core": "workspace:*",
-    "zod": "^4.3.6"
+    "@vibehub/core": "workspace:*"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/node": "^22",
+    "esbuild": "^0.28.1",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "zod": "^4.3.6"
   }
 }
