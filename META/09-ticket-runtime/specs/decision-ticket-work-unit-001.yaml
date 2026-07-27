@@ -19,6 +19,8 @@ intent:
     - Ticket is only a stricter UI/protocol name for the existing Task entity.
 
     This ticket is unresolved. No candidate is ratified here.
+
+    **Claimed**: Codex 2026-07-27
 constraints: []
 indexing:
   type: decision
