@@ -37,6 +37,8 @@ context、change 等可复用语义进入 durable knowledge lifecycle。
   只有正式 supersede `decision-project-014` 后才可切换。
 - [decision-brand-logo-001] (draft) A Balanced 三块 territory 方案作为
   VibeHub 正式 Logo 基准，并以本地 SVG 资产展示在 README。
+- [intent-ticket-runtime-001] (draft) 把 durable semantic state 编译为严格的
+  Ticket Graph，并先在现有 Plugin 中建立可 dogfood 的最小执行闭环。
 
 ## Repository Rules
 

@@ -1,0 +1,37 @@
+spec_id: "decision-ticket-contract-001"
+type: decision
+state: draft
+intent:
+  summary: "什么最小 Ticket contract 才足以被独立调度、执行、验证和追溯？"
+  detail: |
+    **Question**: Freeze the smallest strict Ticket schema and its invariants.
+
+    Candidate fields discussed include identity, objective/outcome contract,
+    intent provenance, context bindings, dependencies, scope/non-goals,
+    constraints, acceptance, execution policy, permissions, human gates,
+    verifier, artifacts, evidence, and graph-mutation provenance.
+
+    The answer must separate durable Ticket identity from a Run-specific prompt
+    or context packet and must state which omissions prevent a Ticket from
+    becoming READY.
+
+    This ticket is unresolved. The listed fields are inputs, not an approved
+    schema.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, grilling, ticket, schema, contract]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.75
+  source_ref: "Strict Ticket hardness discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-ticket-work-unit-001"
+    type: depends_on
+    detail: "The schema depends on whether Ticket is the sole work identity or a distinct level below Task."
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"

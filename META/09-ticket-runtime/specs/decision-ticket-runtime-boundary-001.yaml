@@ -1,0 +1,45 @@
+spec_id: "decision-ticket-runtime-boundary-001"
+type: decision
+state: draft
+intent:
+  summary: "第一版 Ticket System 的 canonical writer、业务规则与执行入口分别应由 Plugin、共享 Core/Local Runtime、App 中谁拥有？"
+  detail: |
+    **Question**: Freeze the first physical ownership boundary without confusing
+    the tactical Plugin dogfood path with the strategic product architecture.
+
+    **Why now**: The existing project is plugin-first and headless. The explored
+    future shape gives the App a human control surface and a Local Runtime the
+    single operational state machine, while the Plugin becomes an Agent-side
+    adapter and semantic capability pack.
+
+    **Required result**:
+    - one canonical writer at every stage;
+    - no duplicated Ticket graph or lifecycle logic;
+    - an explicit migration path from the first Plugin slice;
+    - host-originated work remains possible;
+    - App-originated work does not require transport through a pre-installed
+      Plugin.
+
+    This ticket is unresolved. No ownership model is ratified here.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, grilling, plugin, local-runtime, app, authority]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.75
+  source_ref: "Plugin/App/Local Runtime architecture discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-workbench-011"
+    type: challenges
+    detail: "May refine the active headless Plugin/Runtime and optional App boundary."
+  - target: "decision-project-025"
+    type: relates_to
+    detail: "Must preserve the rule that core business logic is implemented once behind thin adapters."
+anchors:
+  - file: "packages/core"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"

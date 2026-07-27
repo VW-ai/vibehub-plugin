@@ -1,0 +1,38 @@
+spec_id: "decision-ticket-graph-lifecycle-001"
+type: decision
+state: draft
+intent:
+  summary: "Plan、Ticket Graph、Ticket 与 Run 分别拥有什么生命周期，谁可以怎样修改工作图？"
+  detail: |
+    **Question**: Define the legal operational transitions and graph-mutation
+    authority.
+
+    The answer must distinguish:
+    - Plan revision from the current executable graph;
+    - parent/child decomposition from execution dependency;
+    - Ticket state from Run state;
+    - automatic mutations from proposed graph diffs;
+    - verifier failure, human gate, retry, split, merge, supersede, cancel, and
+      emergent follow-up work;
+    - initial planning graph from the graph that actually executed.
+
+    This ticket is unresolved.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, grilling, graph, lifecycle, mutation, run]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.75
+  source_ref: "Ticket graph and state-machine discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-ticket-work-unit-001"
+    type: depends_on
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"

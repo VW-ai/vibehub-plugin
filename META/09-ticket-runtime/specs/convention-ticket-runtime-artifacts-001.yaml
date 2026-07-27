@@ -1,0 +1,37 @@
+spec_id: "convention-ticket-runtime-artifacts-001"
+type: convention
+state: draft
+intent:
+  summary: "要确保我们的所有关键的思考，不同级别的我们都沉淀了"
+  detail: |
+    Proposed working convention:
+
+    - Raw sessions and full tool traces remain cold provenance.
+    - High-fidelity, non-normative synthesis lives under this room's
+      `artifacts/` directory.
+    - Independently reviewable intent, decision, constraint, contract,
+      convention, context, and change claims live as draft specs until
+      explicitly promoted.
+    - `progress.yaml` records implementation milestones and evidence only after
+      the decision map is clear; it must not be used as a design-ticket ledger.
+
+    This preserves the loop from exploration to action without allowing an
+    assistant-generated synthesis to masquerade as user-ratified authority.
+constraints: []
+indexing:
+  type: convention
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [artifacts, provenance, knowledge-layering, loop-engineering]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne request to preserve key thinking at different levels — 2026-07-27"
+  produced_at: "2026-07-27"
+relations:
+  - target: "intent-ticket-runtime-001"
+    type: supports
+anchors:
+  - file: "META/09-ticket-runtime/spec.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"

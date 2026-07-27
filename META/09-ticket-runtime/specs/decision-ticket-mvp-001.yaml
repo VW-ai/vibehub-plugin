@@ -1,0 +1,59 @@
+spec_id: "decision-ticket-mvp-001"
+type: decision
+state: draft
+intent:
+  summary: "什么是可以立即在现有 Plugin 中实现并用来开发它自己的最小 Ticket dogfood 闭环？"
+  detail: |
+    **Question**: Turn the reviewed ontology into the first executable slice.
+
+    The earlier candidate loop was:
+
+    user intent
+    → query Feature Room
+    → create Plan and Ticket Graph
+    → human review
+    → select a ready Ticket
+    → compile bounded context
+    → execute a Run
+    → record artifacts and evidence
+    → verify Outcome
+    → complete, block, or derive follow-up work
+    → propose semantic closeout
+
+    The answer must name the first real feature developed through this loop,
+    define acceptance evidence for the Ticket System itself, and identify which
+    future Runtime/App capabilities remain stubs or adapters.
+
+    This ticket is unresolved; the loop above is a candidate, not a committed
+    implementation plan.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, grilling, mvp, dogfood, plugin]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.8
+  source_ref: "Wayne request to begin Plugin Ticket System development through loop engineering — 2026-07-27"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-ticket-runtime-boundary-001"
+    type: depends_on
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+  - target: "decision-ticket-context-binding-001"
+    type: depends_on
+  - target: "decision-ticket-graph-lifecycle-001"
+    type: depends_on
+  - target: "decision-ticket-workflow-role-001"
+    type: depends_on
+  - target: "decision-ticket-closeout-001"
+    type: depends_on
+  - target: "decision-ticket-storage-001"
+    type: depends_on
+anchors:
+  - file: "packages/core"
+  - file: "skills"
+  - file: "META/09-ticket-runtime/spec.md"

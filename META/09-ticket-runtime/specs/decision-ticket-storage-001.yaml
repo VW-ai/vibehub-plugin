@@ -1,0 +1,43 @@
+spec_id: "decision-ticket-storage-001"
+type: decision
+state: draft
+intent:
+  summary: "Plan、Ticket、Outcome、Run、Event、Artifact 与 Evidence 分别由 Git/YAML、SQLite、JSONL 或 artifact storage 中哪一层持有权威？"
+  detail: |
+    **Question**: Define storage and authority by semantic meaning rather than by
+    mirroring objects across every store.
+
+    Existing authority already uses `.vibehub/semantic-store/` for durable
+    semantic state and SQLite for operational state and projections. The
+    proposed Ticket records span both temperatures. The answer must avoid
+    namespace collision, split-brain writers, Git noise from high-frequency
+    transitions, and a second copy of Feature Room truth inside Ticket bodies.
+
+    This ticket is unresolved.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, grilling, storage, git, yaml, sqlite, jsonl]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.75
+  source_ref: "Ticket storage discussion and .vibehub correction in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-ticket-runtime-boundary-001"
+    type: depends_on
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+  - target: "decision-ticket-closeout-001"
+    type: depends_on
+  - target: "decision-project-028"
+    type: relates_to
+  - target: "decision-project-029"
+    type: relates_to
+anchors:
+  - file: ".vibehub/semantic-store/protocol.yaml"
+  - file: "packages/core/src/git-semantic-store.ts"
+  - file: "packages/core/src/db.ts"

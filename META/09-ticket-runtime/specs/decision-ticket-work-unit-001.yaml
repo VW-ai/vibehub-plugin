@@ -1,0 +1,39 @@
+spec_id: "decision-ticket-work-unit-001"
+type: decision
+state: draft
+intent:
+  summary: "Ticket 是否取代现有 Task 成为唯一正式工作原语，还是 Task 与 Ticket 表达不同的持久粒度？"
+  detail: |
+    **Question**: Decide the durable work-unit vocabulary before defining schema
+    or lifecycle.
+
+    **Why now**: Active META defines Task as an independently acceptable durable
+    outcome. The proposed strict Ticket is also a durable, schedulable,
+    verifiable outcome contract. Keeping both without a sharp distinction would
+    create two near-identical identities and two competing lifecycles.
+
+    **Known candidates**:
+    - Ticket supersedes formal Task; "task" returns to ordinary language.
+    - Task remains an outcome-level aggregate; Ticket is the executable child
+      contract.
+    - Ticket is only a stricter UI/protocol name for the existing Task entity.
+
+    This ticket is unresolved. No candidate is ratified here.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, grilling, ticket, task, ontology]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.75
+  source_ref: "Ticket/Task distinction discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-workbench-013"
+    type: challenges
+    detail: "The answer may preserve, refine, rename, or supersede the active Task definition."
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"

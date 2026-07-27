@@ -1,0 +1,37 @@
+spec_id: "decision-ticket-workflow-role-001"
+type: decision
+state: draft
+intent:
+  summary: "Workflow 在 Planning、Ticket contract 与 Run 之间究竟是什么：模板、版本化方法，还是图的一部分？"
+  detail: |
+    **Question**: Freeze Workflow's single product meaning so it does not remain
+    overloaded across skills, receipts, execution traces, and planning.
+
+    The explored distinction was:
+    - Workflow is a reusable method for a class of work;
+    - Plan/Ticket Graph is the project-specific compiled instance;
+    - Ticket is one schedulable contract;
+    - Run is one actual attempt using a Workflow version.
+
+    The answer must define what is durable, what is referenced by version, and
+    what becomes a Run-specific prompt or method invocation.
+
+    This ticket is unresolved; the explored distinction is not yet ratified.
+constraints: []
+indexing:
+  type: decision
+  priority: P1
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, grilling, workflow, plan, run]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.75
+  source_ref: "Workflow/Plan/Ticket/Run distinction in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+anchors:
+  - file: "skills"
+  - file: "packages/core/src/contract/workflow-receipt.ts"
