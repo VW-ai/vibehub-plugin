@@ -3,6 +3,14 @@
 All notable VibeHub changes are recorded here. Versions follow Semantic
 Versioning.
 
+## 0.2.2
+
+- Made npm release restarts compare normalized tar payloads, so identical
+  package contents built on different hosts are safely recognized even when
+  their gzip wrapper bytes differ.
+- Verified that the product-qualified packages publish through GitHub Actions
+  OIDC without an npm token or interactive browser authentication.
+
 ## 0.2.1
 
 - Renamed the public npm packages to `@vw-ai/vibehub-core`,

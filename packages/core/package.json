@@ -1,6 +1,6 @@
 {
   "name": "@vw-ai/vibehub-core",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Vibehub workbench core — library-first, zero-LLM (decision-project-013/025). All real logic lives here; cli/mcp are thin adapters.",
   "license": "Apache-2.0",
   "type": "module",

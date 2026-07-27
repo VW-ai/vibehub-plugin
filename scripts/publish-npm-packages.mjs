@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { gunzipSync } from "node:zlib";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const artifactRoot = join(root, "dist", "npm");
@@ -11,6 +12,14 @@ const manifest = JSON.parse(
   readFileSync(join(artifactRoot, "manifest.json"), "utf8"),
 );
 const releaseTag = process.env.VIBEHUB_NPM_RELEASE_TAG;
+
+function sha512(buffer) {
+  return createHash("sha512").update(buffer).digest("base64");
+}
+
+function tarPayloadIntegrity(archive) {
+  return `sha512-${sha512(gunzipSync(archive))}`;
+}
 
 if (releaseTag !== manifest.tag) {
   throw new Error(
@@ -47,24 +56,33 @@ for (const entry of manifest.packages) {
   if (lookup.status === 0) {
     const publishedVersion = JSON.parse(lookup.stdout);
     const archivePath = join(artifactRoot, entry.archive);
-    const localIntegrity = `sha512-${createHash("sha512")
-      .update(readFileSync(archivePath))
-      .digest("base64")}`;
+    const localArchive = readFileSync(archivePath);
+    const localIntegrity = `sha512-${sha512(localArchive)}`;
     const integrityLookup = spawnSync(
       "npm",
-      ["view", spec, "dist.integrity", "--json"],
+      ["view", spec, "dist.integrity", "dist.tarball", "--json"],
       { cwd: root, encoding: "utf8" },
     );
-    const publishedIntegrity =
-      integrityLookup.status === 0
-        ? JSON.parse(integrityLookup.stdout)
-        : null;
-    if (
-      publishedVersion !== entry.version ||
-      publishedIntegrity !== localIntegrity
-    ) {
+    const publishedDist =
+      integrityLookup.status === 0 ? JSON.parse(integrityLookup.stdout) : null;
+    let contentMatches = publishedDist?.["dist.integrity"] === localIntegrity;
+
+    if (!contentMatches && publishedDist?.["dist.tarball"]) {
+      const response = await fetch(publishedDist["dist.tarball"]);
+      if (!response.ok) {
+        throw new Error(
+          `could not download ${spec} for content verification: HTTP ${response.status}`,
+        );
+      }
+      const publishedArchive = Buffer.from(await response.arrayBuffer());
+      contentMatches =
+        tarPayloadIntegrity(publishedArchive) ===
+        tarPayloadIntegrity(localArchive);
+    }
+
+    if (publishedVersion !== entry.version || !contentMatches) {
       throw new Error(
-        `${spec} already exists but does not match the local release tarball`,
+        `${spec} already exists but does not match the local release contents`,
       );
     }
     process.stdout.write(`already published: ${spec}\n`);

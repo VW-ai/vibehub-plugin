@@ -1,6 +1,6 @@
 {
   "name": "vibehub-plugin",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "description": "Plugin-first local context runtime for Claude Code and Codex.",
   "license": "Apache-2.0",
