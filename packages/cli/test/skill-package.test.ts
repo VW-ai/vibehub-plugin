@@ -448,11 +448,12 @@ describe("production skill package",()=>{
     expect(JSON.parse(fromStdin.stdout).data.raw).toBe("{}");expect(JSON.parse(fromFile.stdout).data.raw).toBe("{}");
   });
 
-  it("requires the artifact gate to use a package-manager bin and a case-local managed root",()=>{
+  it("requires the artifact gate to exercise the thin versioned npm runtime",()=>{
     const gate=fs.readFileSync(path.join(workbench,"scripts/verify-plugin-artifact.mjs"),"utf8");
-    expect(gate).toContain("node_modules/.bin/vibehub");
-    expect(gate).not.toContain("writeFileSync(launcher");
-    expect(gate).toContain("casePluginRoot");
+    expect(gate).toContain('join(artifact, "runtime", "vibehub-runtime.mjs")');
+    expect(gate).toContain("VIBEHUB_RUNTIME_PACKAGE_SPECS");
+    expect(gate).toContain("thin runtime cache was not reused");
+    expect(gate).not.toContain('join(artifact, "packages")');
   });
 
   it("keeps packaging and verification representative of the published subtree",()=>{
@@ -468,10 +469,10 @@ describe("production skill package",()=>{
     expect(verifyScript).toContain("verify:artifact");
     expect(verifyScript).toContain("verify:codex-plugin");
     expect(cliPackage.scripts.test).toBe("vitest run");
-    expect(gate).toContain('readJson(join(pluginRoot, "hooks/hooks.json"))');
-    expect(gate).toContain('readJson(join(pluginRoot, ".mcp.json"))');
+    expect(gate).toContain('readJson(join(installedRoot, "hooks", "hooks.json"))');
+    expect(gate).toContain('readJson(join(installedRoot, ".mcp.json"))');
     expect(gate).toContain("CLAUDE_PLUGIN_ROOT");
-    expect(gate).toContain("assertConfiguredPathFailure");
+    expect(gate).toContain('tool.name === "kb_retrieve"');
     expect(gate).not.toContain('realpathSync(join(artifact, "packages/mcp/dist/stdio.js"))');
   });
 

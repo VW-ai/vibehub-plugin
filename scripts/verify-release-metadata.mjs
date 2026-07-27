@@ -3,8 +3,6 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   readReleaseIdentity,
-  RELEASE_NODE_MAJOR,
-  RELEASE_TARGETS,
 } from "./release-metadata.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -23,7 +21,6 @@ process.stdout.write(
     name: identity.name,
     version: identity.version,
     tag: `v${identity.version}`,
-    nodeMajor: RELEASE_NODE_MAJOR,
-    targets: RELEASE_TARGETS,
+    channel: "npm",
   })}\n`,
 );

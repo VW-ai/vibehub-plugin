@@ -18,9 +18,19 @@ export const operationEnvelopeResult = (value: ReturnType<ReturnType<typeof crea
   isError: !value.ok,
 });
 
+export interface WorkbenchMcpServer {
+  server: {
+    oninitialized?: () => void | Promise<void>;
+    getClientCapabilities(): { roots?: unknown } | undefined;
+    listRoots(): Promise<{ roots: Array<{ uri: string }> }>;
+  };
+  connect(transport: unknown): Promise<void>;
+  close(): Promise<void>;
+}
+
 export function createWorkbenchMcpServer(
   context: CapabilityContext | PromiseLike<CapabilityContext>,
-): McpServer {
+): WorkbenchMcpServer {
   const api = async () => createCapabilities(await context);
   const server = new McpServer(
     { name: "vibehub-local", version: WORKBENCH_MCP_VERSION },
@@ -84,5 +94,5 @@ export function createWorkbenchMcpServer(
     inputSchema: { topic: z.string().optional() },
   }, async (input) => result((await api()).getManual(input)));
 
-  return server;
+  return server as WorkbenchMcpServer;
 }

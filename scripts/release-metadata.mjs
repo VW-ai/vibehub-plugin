@@ -1,14 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-export const RELEASE_NODE_MAJOR = 24;
-export const RELEASE_TARGETS = Object.freeze([
-  "darwin-arm64-node24",
-  "darwin-x64-node24",
-  "linux-arm64-node24",
-  "linux-x64-node24",
-]);
-
 export function readJson(path) {
   try {
     return JSON.parse(readFileSync(path, "utf8"));
@@ -23,34 +15,48 @@ export function isSemver(version) {
   );
 }
 
-export function targetFor(platform, arch, nodeMajor = RELEASE_NODE_MAJOR) {
-  const target = `${platform}-${arch}-node${nodeMajor}`;
-  if (!RELEASE_TARGETS.includes(target)) {
-    throw new Error(
-      `unsupported release target ${target}; expected one of ${RELEASE_TARGETS.join(", ")}`,
-    );
-  }
-  return target;
-}
-
 export function readReleaseIdentity(root) {
   const rootPackage = readJson(join(root, "package.json"));
+  const corePackage = readJson(join(root, "packages", "core", "package.json"));
+  const cliPackage = readJson(join(root, "packages", "cli", "package.json"));
+  const mcpPackage = readJson(join(root, "packages", "mcp", "package.json"));
   const claudeManifest = readJson(
     join(root, ".claude-plugin", "plugin.json"),
   );
   const codexManifest = readJson(join(root, ".codex-plugin", "plugin.json"));
+  const claudeMarketplace = readJson(
+    join(root, ".claude-plugin", "marketplace.json"),
+  );
+  const codexMarketplace = readJson(
+    join(root, ".agents", "plugins", "marketplace.json"),
+  );
   const versions = new Set([
     rootPackage.version,
+    corePackage.version,
+    cliPackage.version,
+    mcpPackage.version,
     claudeManifest.version,
     codexManifest.version,
+    claudeMarketplace.version,
+    claudeMarketplace.plugins?.[0]?.version,
   ]);
   if (versions.size !== 1) {
     throw new Error(
-      `release versions differ: package=${rootPackage.version}, Claude=${claudeManifest.version}, Codex=${codexManifest.version}`,
+      `release versions differ: root=${rootPackage.version}, core=${corePackage.version}, CLI=${cliPackage.version}, MCP=${mcpPackage.version}, Claude=${claudeManifest.version}, Codex=${codexManifest.version}`,
     );
   }
   if (claudeManifest.name !== "vibehub" || codexManifest.name !== "vibehub") {
     throw new Error("both host manifests must use the stable plugin name vibehub");
+  }
+  if (
+    claudeMarketplace.name !== "vibehub" ||
+    claudeMarketplace.plugins?.[0]?.name !== "vibehub" ||
+    claudeMarketplace.plugins[0].source !== "./" ||
+    codexMarketplace.name !== "vibehub" ||
+    codexMarketplace.plugins?.[0]?.name !== "vibehub" ||
+    codexMarketplace.plugins[0].source?.path !== "."
+  ) {
+    throw new Error("root marketplace catalogs must publish the VibeHub plugin from main");
   }
   if (!isSemver(rootPackage.version)) {
     throw new Error(`release version is not SemVer: ${rootPackage.version}`);
@@ -59,7 +65,12 @@ export function readReleaseIdentity(root) {
     name: "vibehub",
     version: rootPackage.version,
     rootPackage,
+    corePackage,
+    cliPackage,
+    mcpPackage,
     claudeManifest,
     codexManifest,
+    claudeMarketplace,
+    codexMarketplace,
   };
 }

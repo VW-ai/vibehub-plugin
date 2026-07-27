@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { createRequire } from "node:module";
 import {
   existsSync,
   lstatSync,
@@ -9,11 +8,7 @@ import {
 } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  readJson,
-  readReleaseIdentity,
-  targetFor,
-} from "./release-metadata.mjs";
+import { readJson, readReleaseIdentity } from "./release-metadata.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const positional = process.argv.slice(2).filter((arg) => arg !== "--");
@@ -25,22 +20,19 @@ if (!positional[0] || positional.length !== 1) {
 const pluginRoot = join(marketplaceRoot, "plugins", "vibehub");
 const release = readJson(join(marketplaceRoot, "release.json"));
 const identity = readReleaseIdentity(root);
-const expectedTarget = targetFor(
-  process.platform,
-  process.arch,
-  Number(process.versions.node.split(".")[0]),
-);
-
 if (
+  release.schemaVersion !== 2 ||
   release.name !== identity.name ||
   release.version !== identity.version ||
-  release.target !== expectedTarget ||
-  release.platform !== process.platform ||
-  release.arch !== process.arch ||
-  release.node?.major !== Number(process.versions.node.split(".")[0]) ||
-  release.node?.abi !== process.versions.modules
+  release.channel !== "npm" ||
+  JSON.stringify(release.runtime?.packages) !==
+    JSON.stringify([
+      `@vibehub/core@${identity.version}`,
+      `@vibehub/cli@${identity.version}`,
+      `@vibehub/workbench-mcp@${identity.version}`,
+    ])
 ) {
-  throw new Error("release provenance does not match the verifier runtime or source identity");
+  throw new Error("release provenance does not match the npm runtime identity");
 }
 
 const claude = readJson(
@@ -81,12 +73,12 @@ if (codexManifest.interface?.brandColor !== "#3E7D4C") {
   throw new Error("Codex marketplace brand color does not match the VibeHub identity");
 }
 
-for (const entrypoint of [
-  "packages/cli/dist/main.js",
-  "packages/mcp/dist/stdio.js",
-]) {
-  if (!existsSync(join(pluginRoot, entrypoint))) {
-    throw new Error(`packaged entrypoint is missing: ${entrypoint}`);
+if (!existsSync(join(pluginRoot, "runtime", "vibehub-runtime.mjs"))) {
+  throw new Error("thin npm runtime launcher is missing");
+}
+for (const forbidden of ["packages", "node_modules"]) {
+  if (existsSync(join(pluginRoot, forbidden))) {
+    throw new Error(`thin release must not contain ${forbidden}`);
   }
 }
 
@@ -111,23 +103,12 @@ while (pending.length > 0) {
   }
 }
 
-const requireFromCli = createRequire(join(pluginRoot, "packages", "cli", "package.json"));
-const Database = requireFromCli("better-sqlite3");
-const database = new Database(":memory:");
-database.exec("CREATE TABLE release_smoke (ok INTEGER NOT NULL)");
-database.prepare("INSERT INTO release_smoke (ok) VALUES (?)").run(1);
-const row = database.prepare("SELECT ok FROM release_smoke").get();
-database.close();
-if (row?.ok !== 1) {
-  throw new Error("packaged better-sqlite3 failed the release smoke");
-}
-
 process.stdout.write(
   `${JSON.stringify({
     ok: true,
     marketplaceRoot,
     version: release.version,
-    target: release.target,
-    nativeDatabase: "loaded",
+    channel: release.channel,
+    artifact: "thin",
   })}\n`,
 );

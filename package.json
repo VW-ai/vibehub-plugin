@@ -1,34 +1,56 @@
 {
   "name": "vibehub-plugin",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "description": "Plugin-first local context runtime for Claude Code and Codex.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "build": "pnpm --filter @vibehub/core build && pnpm --filter @vibehub/cli build && pnpm --filter @vibehub/workbench-mcp build",
+    "pack:npm": "pnpm build && pnpm verify:npm-packages && node scripts/pack-npm-packages.mjs",
+    "publish:npm": "node scripts/publish-npm-packages.mjs",
     "typecheck": "pnpm --filter @vibehub/core typecheck && pnpm --filter @vibehub/cli typecheck && pnpm --filter @vibehub/workbench-mcp typecheck",
     "test": "pnpm --filter @vibehub/core test && pnpm --filter @vibehub/cli test && pnpm --filter @vibehub/workbench-mcp test",
-    "build:claude-marketplace": "pnpm --filter @vibehub/core build && pnpm --filter @vibehub/cli build && pnpm --filter @vibehub/workbench-mcp build && node scripts/build-claude-marketplace.mjs",
-    "build:codex-marketplace": "pnpm --filter @vibehub/core build && pnpm --filter @vibehub/cli build && pnpm --filter @vibehub/workbench-mcp build && node scripts/build-codex-marketplace.mjs",
-    "build:release-marketplace": "pnpm --filter @vibehub/core build && pnpm --filter @vibehub/cli build && pnpm --filter @vibehub/workbench-mcp build && node scripts/build-release-marketplace.mjs",
+    "build:claude-marketplace": "node scripts/build-claude-marketplace.mjs",
+    "build:codex-marketplace": "node scripts/build-codex-marketplace.mjs",
+    "build:release-marketplace": "node scripts/build-release-marketplace.mjs",
     "verify:release-metadata": "node scripts/verify-release-metadata.mjs",
+    "verify:npm-install": "node scripts/verify-npm-install.mjs",
+    "verify:npm-packages": "node scripts/verify-npm-packages.mjs",
     "verify:release-marketplace": "node scripts/verify-release-marketplace.mjs",
     "verify:release-hosts": "node scripts/verify-release-hosts.mjs",
     "verify:artifact": "node scripts/verify-plugin-artifact.mjs",
     "verify:codex-plugin": "node scripts/verify-codex-plugin.mjs",
     "verify:isolated": "node scripts/verify-isolated-workbench.mjs",
     "dogfood": "node scripts/run-local-dogfood.mjs",
-    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:artifact && pnpm verify:codex-plugin && pnpm dogfood"
+    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:npm-packages && node scripts/pack-npm-packages.mjs && pnpm verify:npm-install && pnpm verify:artifact && pnpm verify:codex-plugin && pnpm dogfood"
   },
   "engines": {
     "node": ">=20"
   },
   "packageManager": "pnpm@10.8.1",
   "pnpm": {
+    "overrides": {
+      "fast-uri": "3.1.4"
+    },
     "onlyBuiltDependencies": [
       "better-sqlite3",
       "esbuild"
     ]
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VW-ai/vibehub-plugin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/VW-ai/vibehub-plugin/issues"
+  },
+  "homepage": "https://github.com/VW-ai/vibehub-plugin#readme"
 }

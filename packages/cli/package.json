@@ -1,6 +1,6 @@
 {
   "name": "@vibehub/cli",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Vibehub workbench CLI — thin adapter over @vibehub/core (decision-project-013: zero LLM, zero business logic; parsing + output formatting only).",
   "license": "Apache-2.0",
   "type": "module",
@@ -10,6 +10,21 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VW-ai/vibehub-plugin.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/VW-ai/vibehub-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/VW-ai/vibehub-plugin/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/generate-operation-contracts.mjs && node scripts/copy-managed-assets.mjs",
     "typecheck": "tsc --noEmit",

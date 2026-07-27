@@ -9,13 +9,35 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline";
 import { buildCodexMarketplace } from "./build-codex-marketplace.mjs";
+import { readReleaseIdentity } from "./release-metadata.mjs";
 
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const identity = readReleaseIdentity(root);
 const temp = mkdtempSync(join(tmpdir(), "vibehub-codex-plugin-"));
 const keep = process.env.VIBEHUB_KEEP_TMP === "1";
+const runtimeRoot = join(
+  temp,
+  "home",
+  ".vibehub",
+  "runtime",
+  "npm",
+  `v${identity.version}`,
+);
+const runtimeSpecs = JSON.stringify([
+  join(root, "dist", "npm", `vibehub-core-${identity.version}.tgz`),
+  join(root, "dist", "npm", `vibehub-cli-${identity.version}.tgz`),
+  join(
+    root,
+    "dist",
+    "npm",
+    `vibehub-workbench-mcp-${identity.version}.tgz`,
+  ),
+]);
 
 function readJson(path) {
   try {
@@ -97,7 +119,7 @@ async function verifyCodexHostStartsMcp(codexBin, env, repo) {
           finish(() =>
             reject(
               new Error(
-                `Codex host failed to start VibeHub MCP: ${JSON.stringify(message.params)}`,
+                `Codex host failed to start VibeHub MCP: ${JSON.stringify(message.params)}\n${output.join("\n")}\n${stderr}`,
               ),
             ),
           );
@@ -137,7 +159,9 @@ async function verifyCodexHostStartsMcp(codexBin, env, repo) {
     });
   });
 
+  const exited = new Promise((resolveExit) => child.once("exit", resolveExit));
   child.kill("SIGTERM");
+  await exited;
   return result;
 }
 
@@ -157,7 +181,8 @@ function assertManifestAndConfigs(pluginRoot) {
   if (
     server?.command !== "node" ||
     server.cwd !== "." ||
-    JSON.stringify(server.args) !== JSON.stringify(["./packages/mcp/dist/stdio.js"])
+    JSON.stringify(server.args) !==
+      JSON.stringify(["./runtime/vibehub-runtime.mjs", "mcp"])
   ) {
     throw new Error("Codex MCP must use the installed relative entrypoint and plugin cwd");
   }
@@ -211,6 +236,9 @@ try {
     ...process.env,
     HOME: home,
     CODEX_HOME: codexHome,
+    NPM_CONFIG_CACHE: join(temp, "npm-cache"),
+    VIBEHUB_RUNTIME_DIR: runtimeRoot,
+    VIBEHUB_RUNTIME_PACKAGE_SPECS: runtimeSpecs,
   };
   const codexBin = process.env.CODEX_BIN || "codex";
   JSON.parse(

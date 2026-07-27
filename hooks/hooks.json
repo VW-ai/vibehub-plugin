@@ -7,7 +7,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "SessionStart"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "SessionStart"]
           }
         ]
       }
@@ -18,7 +18,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "UserPromptSubmit"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "UserPromptSubmit"]
           }
         ]
       }
@@ -30,7 +30,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "PostToolUse"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "PostToolUse"]
           }
         ]
       }
@@ -42,7 +42,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "Notification"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "Notification"]
           }
         ]
       }
@@ -53,7 +53,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "Stop"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "Stop"]
           }
         ]
       }
@@ -64,7 +64,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "SessionEnd"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "SessionEnd"]
           }
         ]
       }
@@ -75,7 +75,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "SubagentStart"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "SubagentStart"]
           }
         ]
       }
@@ -86,7 +86,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "SubagentStop"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "SubagentStop"]
           }
         ]
       }
@@ -98,7 +98,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "PostToolUseFailure"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "PostToolUseFailure"]
           }
         ]
       }
@@ -110,7 +110,7 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js", "hook", "StopFailure"]
+            "args": ["${CLAUDE_PLUGIN_ROOT}/runtime/vibehub-runtime.mjs", "cli", "hook", "StopFailure"]
           }
         ]
       }
