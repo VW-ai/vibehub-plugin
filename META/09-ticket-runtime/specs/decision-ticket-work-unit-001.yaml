@@ -1,41 +1,65 @@
 spec_id: "decision-ticket-work-unit-001"
 type: decision
-state: draft
+state: active
 intent:
-  summary: "Ticket 是否取代现有 Task 成为唯一正式工作原语，还是 Task 与 Ticket 表达不同的持久粒度？"
+  summary: "Ticket 取代 Task 成为 VibeHub 唯一正式工作原语；不同粒度使用同一种 Ticket 表达"
   detail: |
-    **Question**: Decide the durable work-unit vocabulary before defining schema
-    or lifecycle.
+    **Decision**: Ticket is the only canonical durable work unit. VibeHub does
+    not keep a separate formal Task entity above or beside it.
 
-    **Why now**: Active META defines Task as an independently acceptable durable
-    outcome. The proposed strict Ticket is also a durable, schedulable,
-    verifiable outcome contract. Keeping both without a sharp distinction would
-    create two near-identical identities and two competing lifecycles.
+    Human-visible outcome work and Agent-executable work use the same Ticket
+    identity and contract family. Parent/child decomposition, visibility and
+    execution dependencies express different levels without introducing a
+    second work-unit lifecycle. Only a Ticket that satisfies the eventual
+    executable contract may be claimed by a Run.
 
-    **Known candidates**:
-    - Ticket supersedes formal Task; "task" returns to ordinary language.
-    - Task remains an outcome-level aggregate; Ticket is the executable child
-      contract.
-    - Ticket is only a stricter UI/protocol name for the existing Task entity.
+    `task` remains available as ordinary language and as a compatibility term
+    used by host systems or legacy storage. It does not own a new canonical ID,
+    schema, lifecycle or state machine. Existing durable Tasks will require a
+    compatibility projection or migration into outcome-level Tickets.
 
-    This ticket is unresolved. No candidate is ratified here.
+    **Rationale**: The active Task definition and the proposed strict Ticket
+    occupied nearly identical semantic space. Keeping both would force users,
+    planners and runtime code to decide repeatedly which identity owns outcome,
+    acceptance, scope, authority and closeout.
+
+    **Deferred**: The Ticket contract, exact parent/visibility fields, direct
+    executability test, lifecycle and compatibility migration are separate
+    decisions. This decision fixes the ontology; it does not invent those
+    contracts prematurely.
 
     **Claimed**: Codex 2026-07-27
-constraints: []
+constraints:
+  - kind: must
+    rule: "Ticket is the only canonical durable work-unit identity"
+  - kind: must
+    rule: "Outcome-level and execution-level work use the same Ticket contract family"
+  - kind: must
+    rule: "A Run may claim only a Ticket that satisfies the eventual executable contract"
+  - kind: must_not
+    rule: "Do not introduce a second formal Task schema, lifecycle or state machine"
+  - kind: must_not
+    rule: "Do not treat host or legacy use of the word task as canonical Ticket identity"
 indexing:
   type: decision
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, ticket, task, ontology]
+  tags: [wayfinder, grilling, ticket, task, ontology, work-unit]
 provenance:
   source_type: chat_extraction
-  confidence: 0.75
-  source_ref: "Ticket/Task distinction discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  confidence: 0.85
+  source_ref: "Wayne ratified Ticket as the sole formal work primitive — Codex session 019fa272-202e-73a1-8b80-9abfbfee0790, 2026-07-27"
   produced_at: "2026-07-27"
 relations:
   - target: "decision-workbench-013"
-    type: challenges
-    detail: "The answer may preserve, refine, rename, or supersede the active Task definition."
+    type: relates_to
+    detail: "Makes the Task work-unit clause stale while preserving its Run/worktree authority rules as inputs to a successor contract."
+  - target: "contract-intent-task-genesis-001"
+    type: relates_to
+    detail: "Makes Task genesis stale; a future planning/Ticket genesis contract must replace it."
+  - target: "intent-context-to-action-001"
+    type: relates_to
+    detail: "Makes the Task-oriented wording stale while preserving context-to-action as the broader product direction."
 anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"

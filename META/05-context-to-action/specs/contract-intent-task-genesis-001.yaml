@@ -1,6 +1,6 @@
 spec_id: "contract-intent-task-genesis-001"
 type: contract
-state: active
+state: stale
 intent:
   summary: "Durable intent adoption is the semantic boundary for Task genesis or current-Task scope expansion"
   detail: |
@@ -10,6 +10,10 @@ intent:
     new Task, expands the semantic scope of the current Task, or remains
     context-only exploration. A created Task preserves provenance to the
     adopted intent and its success criteria.
+
+    Marked stale on 2026-07-27: `decision-ticket-work-unit-001` removes Task as
+    a canonical entity. Intent adoption remains a valid semantic boundary, but
+    Ticket genesis now requires a successor Planning/Ticket contract.
 constraints:
   - kind: must
     rule: "Agent-proposed intent has no durable authority until the user adopts it explicitly or unambiguously"
@@ -35,6 +39,9 @@ relations:
     type: refines
   - target: "decision-workbench-013"
     type: constrained_by
+  - target: "decision-ticket-work-unit-001"
+    type: relates_to
+    detail: "Ticket-only ontology invalidates the Task-genesis contract."
 anchors:
   - file: "skills/vibehub-ingest/SKILL.md"
   - file: "skills/_stdlib/orchestration.md"

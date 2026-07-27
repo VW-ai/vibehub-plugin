@@ -16,6 +16,17 @@ intent:
       emergent follow-up work;
     - initial planning graph from the graph that actually executed.
 
+    **New planning input from Wayne**: Planning may require human intervention
+    without forcing the system to fabricate a fully explicit downstream graph.
+    Technical research, technical decisions and frontend/design choices may
+    themselves be blocker Tickets. Work beyond such a blocker may remain a
+    directional planning frontier rather than a valid Ticket, then be compiled
+    or refined after the blocker resolves.
+
+    The answer must therefore decide whether the graph admits a non-executable
+    placeholder/fog object distinct from Ticket, how human review approves a
+    partial graph, and what event causes downstream planning to resume.
+
     This ticket is unresolved.
 constraints: []
 indexing:

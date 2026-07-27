@@ -35,24 +35,27 @@ existing spec.
 
 ## Decisions so far
 
-No Ticket Runtime design decision has been promoted yet. Existing active specs
-remain authoritative while this map is worked.
+- [decision-ticket-work-unit-001] (active) Ticket is the only canonical durable
+  work unit; outcome and execution granularity use the same Ticket contract
+  family, while `task` remains ordinary or compatibility vocabulary.
 
 ## Frontier
 
 These questions are currently unblocked:
 
-- [decision-ticket-work-unit-001] Does Ticket replace the formal Task
-  primitive, or do Task and Ticket represent different durable levels?
 - [decision-ticket-runtime-boundary-001] Which responsibilities and canonical
   writes belong to Plugin, shared Core/Local Runtime, and App in the first
   dogfood slice?
+- [decision-ticket-contract-001] What minimum contract makes a Ticket
+  independently schedulable, executable, verifiable, and traceable?
 
 ## Blocked
 
-- Ticket contract is blocked by the Ticket/Task work-unit decision.
-- Context binding, graph lifecycle, Workflow role, and closeout depend on a
-  stable Ticket contract.
+- Context binding, graph lifecycle, Workflow role, and closeout remain blocked
+  on a stable Ticket contract.
+- Graph lifecycle must also decide how human planning gates allow a partial
+  graph with directional fog beyond blocker Tickets, rather than fabricated
+  downstream Tickets.
 - Storage topology depends on both the runtime ownership boundary and the
   durable/operational meaning of Ticket records.
 - The first implementation slice depends on the preceding contracts; it must

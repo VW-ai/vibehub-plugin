@@ -15,6 +15,12 @@ intent:
     or context packet and must state which omissions prevent a Ticket from
     becoming READY.
 
+    `decision-ticket-work-unit-001` now fixes one invariant: outcome-level and
+    execution-level work use the same Ticket contract family. The contract must
+    therefore express decomposition and visibility without creating a second
+    Task identity, and must define when a Ticket is directly executable by a
+    Run.
+
     This ticket is unresolved. The listed fields are inputs, not an approved
     schema.
 constraints: []

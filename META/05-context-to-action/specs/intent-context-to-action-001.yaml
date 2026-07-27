@@ -1,6 +1,6 @@
 spec_id: "intent-context-to-action-001"
 type: intent
-state: active
+state: stale
 intent:
   summary: "Use durable context to help the host agent plan the next action and execution topology without becoming a development control plane"
   detail: |
@@ -8,6 +8,11 @@ intent:
     delegation, worktree isolation, handoff and closeout. The model remains
     prompt-first: skills decide what the situation means; deterministic runtime
     primitives record and enforce only the minimum authority boundaries.
+
+    Marked stale on 2026-07-27: context-to-action remains the broader product
+    direction, but `decision-ticket-work-unit-001` replaces the Task-oriented
+    execution vocabulary and the Ticket Runtime map is reconsidering the
+    plugin/App/control-plane boundary.
 constraints:
   - kind: must
     rule: "Claude Code and Codex remain the primary work surfaces; VibeHub augments their workflow"
@@ -27,6 +32,9 @@ provenance:
 relations:
   - target: "decision-workbench-013"
     type: summarized_by
+  - target: "decision-ticket-work-unit-001"
+    type: relates_to
+    detail: "Ticket-only ontology invalidates the Task-oriented wording."
 anchors:
   - file: "packages/core/src/activity-store.ts"
   - file: "packages/core/src/intervention-service.ts"

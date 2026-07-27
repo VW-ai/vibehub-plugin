@@ -1,6 +1,6 @@
 spec_id: "decision-workbench-013"
 type: decision
-state: active
+state: stale
 intent:
   summary: "Task is a durable outcome; Run bears context/code authority; only code-writing work claims a writer worktree"
   detail: |
@@ -17,6 +17,11 @@ intent:
     objective or promote semantics. Skills decide CONTINUE, EXPAND, DELEGATE,
     HANDOFF and CLOSE; hooks and core only detect candidates and execute
     deterministic, versioned primitives.
+
+    Marked stale on 2026-07-27: `decision-ticket-work-unit-001` replaces Task
+    with Ticket as the sole canonical work-unit identity. The Run, worktree,
+    lease, fencing and semantic-authority rules remain design inputs until a
+    successor Ticket/Run authority contract is reviewed.
 constraints:
   - kind: must
     rule: "Task identity must be repo-scoped and stable; branch, session and agent process are evidence, not identity"
@@ -46,6 +51,9 @@ provenance:
 relations:
   - target: "intent-context-to-action-001"
     type: implements
+  - target: "decision-ticket-work-unit-001"
+    type: relates_to
+    detail: "Ticket-only work-unit ontology makes the Task clauses stale."
 anchors:
   - file: "packages/core/src/activity-store.ts"
   - file: "packages/core/src/runtime-service.ts"
