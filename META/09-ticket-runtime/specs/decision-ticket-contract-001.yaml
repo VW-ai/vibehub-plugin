@@ -23,6 +23,8 @@ intent:
 
     This ticket is unresolved. The listed fields are inputs, not an approved
     schema.
+
+    **Claimed**: Codex 2026-07-27
 constraints: []
 indexing:
   type: decision
