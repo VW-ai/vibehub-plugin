@@ -1,0 +1,56 @@
+spec_id: "decision-ticket-intelligence-loop-001"
+type: decision
+state: active
+intent:
+  summary: "Agent 何时生成或修订 Ticket，并如何发现、选择和组合 Ticket intelligence Skills？"
+  detail: |
+    **Question**: Define the intelligent Ticket loop without turning it into a
+    mandatory end-to-end workflow.
+
+    The answer must decide:
+    - which scenes invite Ticket generation or revision, including explicit
+      planning, blocker resolution, execution discovery, validation findings,
+      and Run closeout;
+    - how the Agent distinguishes no durable work, elaboration, decomposition,
+      expansion, and Planning Fog before proposing a graph mutation;
+    - how the host Agent discovers and composes query/context, shape, validate,
+      and closeout intelligence;
+    - when invocation is explicitly requested, Agent-initiated, or merely
+      suggested by a hook;
+    - how authority gates prevent an intelligent loop from silently expanding
+      product, technical, permission, or risk boundaries;
+    - what minimum observable proposal or receipt lets the loop be inspected
+      and improved without encoding every reasoning step.
+
+    Exact operation schemas, graph transitions, context packet contents, and
+    closeout semantics remain owned by their focused Decision Tickets.
+
+    This ticket is unresolved.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, open, grilling, intelligence, skills, planning, ticket-generation]
+provenance:
+  source_type: manual_input
+  confidence: 0.85
+  source_ref: "Wayne asked how Tickets are generated and Ticket Skills are invoked — 2026-07-28"
+  produced_at: "2026-07-28"
+relations:
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+    detail: "Generation and invocation must preserve the ratified Ticket identity, maturity, authority, and validation contract."
+  - target: "decision-ticket-runtime-boundary-001"
+    type: depends_on
+    detail: "The intelligence loop composes Skills over the ratified Core-owned operation boundary."
+  - target: "decision-ticket-graph-lifecycle-001"
+    type: relates_to
+    detail: "Invocation policy proposes mutations whose legal lifecycle remains governed separately."
+  - target: "decision-ticket-workflow-role-001"
+    type: relates_to
+    detail: "Skill composition constrains what reusable Workflow may mean without resolving that ontology here."
+anchors:
+  - file: "skills"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md"

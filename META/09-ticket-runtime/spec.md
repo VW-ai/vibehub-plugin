@@ -47,14 +47,18 @@ belong in active Decision Tickets explicitly tagged `open`.
   outcome to one versioned Ticket definition, progresses through three
   intelligence handoffs under independent validation, uses flat verifiable
   acceptance, and derives maturity and operational state from linked facts.
+- [decision-ticket-runtime-boundary-001] (active) Core owns the one canonical
+  Ticket implementation; composable Skills own semantic intelligence, CLI/MCP
+  are thin peers, the first slice is in-process, and App/daemon remain clients
+  or hosts of the same Core.
 
 ## Frontier
 
 These questions are currently unblocked:
 
-- [decision-ticket-runtime-boundary-001] Which responsibilities and canonical
-  writes belong to Skills, Plugin adapters, MCP/CLI, shared Core/Local Runtime,
-  and App in the first dogfood slice?
+- [decision-ticket-intelligence-loop-001] When should an Agent generate or
+  revise Tickets, and how should it discover and compose Ticket Skills without
+  becoming trapped in a mandatory workflow?
 - [decision-ticket-context-binding-001] How does a Ticket declare and bind
   semantic context without freezing a giant Run prompt?
 - [decision-ticket-graph-lifecycle-001] How may planning and execution
@@ -68,8 +72,7 @@ These questions are currently unblocked:
 - Graph lifecycle must also decide how human planning gates allow a partial
   graph with directional fog beyond blocker Tickets, rather than fabricated
   downstream Tickets.
-- Storage topology depends on the runtime ownership boundary and closeout
-  semantics.
+- Storage topology remains blocked on closeout semantics.
 - The first implementation slice depends on the preceding contracts; it must
   not become the place where unresolved ontology is accidentally decided in
   code.
@@ -80,8 +83,6 @@ These questions are currently unblocked:
   territory/task Workbench UX.
 - How non-coding semantic providers such as MyLibrary should satisfy the same
   context-binding contract.
-- When the Local Runtime becomes a separately packaged process rather than a
-  library boundary inside this repository.
 - How planning quality will be evaluated by comparing the initial graph with
   the execution graph.
 
@@ -94,3 +95,6 @@ These questions are currently unblocked:
 - Full Linear/Jira/GitHub bidirectional synchronization is deferred.
 - Unattended scheduling, remote workers, and the Server/Team control plane are
   deferred until the local manual-control loop is proven.
+- [decision-ticket-runtime-boundary-001] A separately packaged Local Runtime
+  daemon is deferred until concurrency, subscriptions, background work, or
+  multi-client coordination justify it.
