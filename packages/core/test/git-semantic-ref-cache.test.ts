@@ -67,7 +67,7 @@ describe("branch/ref reads and commit-keyed semantic cache spike", () => {
       requestId: "request:draft",
       now: NOW,
     };
-    service.applyDraftBatch(repoRow.id, {
+    service.applySpecBatch(repoRow.id, {
       idempotencyKey: "draft",
       specs: [{
         id: "decision-auth",
@@ -84,10 +84,6 @@ describe("branch/ref reads and commit-keyed semantic cache spike", () => {
         anchors: [{ file: "src/auth.ts", symbol: "authenticate" }],
       }],
     }, context);
-    service.mutate(repoRow.id, "promote", {
-      specId: "decision-auth",
-      idempotencyKey: "promote",
-    }, { ...context, requestId: "request:promote" });
     db.close();
 
     const exported = exportGitSemanticStore({

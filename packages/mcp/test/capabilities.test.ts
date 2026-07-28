@@ -81,7 +81,7 @@ describe("local MCP deterministic capabilities", () => {
     expect(Object.values(registered).map((tool)=>tool.description??"").join("\n")).not.toMatch(/compatibility name|unsupported_operation/i);
     const ids=["mcp-kb-write","mcp-distill-start"];
     const api = createCapabilities({ db, repoId: 1, taskId: "branch:feat/mcp", actor:"mcp-test", requestId:()=>ids.shift()!, now: () => NOW });
-    const kb=api.dispatchKnowledge("kb.draft.apply",{idempotencyKey:"mcp-write",specs:[{id:"mcp-contract",type:"contract",summary:"MCP persists through the canonical dispatcher",evidence:[{sourceType:"test",sourceRef:"mcp",evidenceRef:"fixture"}]}]});
+    const kb=api.dispatchKnowledge("kb.spec.apply",{idempotencyKey:"mcp-write",specs:[{id:"mcp-contract",type:"contract",summary:"MCP persists through the canonical dispatcher",evidence:[{sourceType:"test",sourceRef:"mcp",evidenceRef:"fixture"}]}]});
     const distill=api.dispatchOperation("distill.run.start",{runId:"mcp-success",mode:"cold",baseCommit:commit,skillHash:"s",configHash:"c"});
     expect(kb).toMatchObject({ok:true});
     expect(distill).toMatchObject({ok:true,data:{state:"collecting"}});
@@ -196,7 +196,7 @@ describe("local MCP deterministic capabilities", () => {
     }, {});
     expect(api.dispatchKnowledge("kb.status", {})).toEqual(direct);
     expect(api.dispatchKnowledge("kb.spec.search", {})).toMatchObject({ok:false,error:{code:"idempotency_conflict"}});
-    expect(new OperationDispatcher(db).dispatch("kb.draft.apply", {
+    expect(new OperationDispatcher(db).dispatch("kb.spec.apply", {
       repoId: 1, actor: "mcp-test", requestId: "missing-task", now: NOW,
     }, { idempotencyKey: "x", specs: [{id:"x",type:"context",summary:"x",evidence:[{sourceType:"test",sourceRef:"t",evidenceRef:"t"}]}] })).toMatchObject({ ok: false, error: { code: "task_required" } });
     expect(operationEnvelopeResult(direct).isError).toBe(false);

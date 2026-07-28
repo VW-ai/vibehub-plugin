@@ -1,6 +1,6 @@
 ---
 name: vibehub-distill
-description: Cold-start or explicitly refresh a repository's VibeHub feature map and evidence-backed draft knowledge. Use for repository onboarding, resumable repository-to-feature/spec distillation, selective recovery of unresolved scopes, finalization and reviewed CAS activation; not for routine per-task scans.
+description: Cold-start or explicitly refresh a repository's VibeHub feature map and evidence-backed candidate knowledge. Use for repository onboarding, resumable repository-to-feature/spec distillation, selective recovery of unresolved scopes, finalization and reviewed CAS activation; not for routine per-task scans.
 ---
 
 # VibeHub Distill
@@ -82,4 +82,4 @@ interpret semantics; core owns leases, accounting, validation and transactions.
 
 All operations use `node ../scripts/vh-distill.mjs <suffix> ...`. Never bypass
 the dispatcher, create out-of-band checkpoints, perform additive whole-store
-writes, or automatically promote canonical knowledge.
+writes, or automatically overwrite canonical knowledge.

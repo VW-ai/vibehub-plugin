@@ -15,7 +15,7 @@
  * writing, and distillation never writes it, so a monotonic per-task
  * high-water mark over its rowids says, mechanically, "a canonical write
  * attributed to this task happened since we last looked". Writes without
- * a task attribution (e.g. `vibehub kb promote` without --task) do not
+ * a task attribution (e.g. `vibehub kb amend` without --task) do not
  * reset a task-scoped counter: an unattributed write proves nothing about
  * THIS task's conversation.
  *

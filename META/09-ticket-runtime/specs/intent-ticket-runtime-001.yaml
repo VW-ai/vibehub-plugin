@@ -1,14 +1,14 @@
 spec_id: "intent-ticket-runtime-001"
 type: intent
-state: draft
+state: active
 intent:
   summary: "把关于 Ticket 的想法一步一步沉淀到 META，再用它制定并驱动 Plugin 的 Ticket System 改造"
   detail: |
     Provisional destination: make the path from durable user intent and current
-    semantic state to a reviewable, executable Ticket Graph clear enough that
-    the existing Plugin can dogfood the first trustworthy loop.
+    semantic state to a machine-validated, executable Ticket Graph clear enough
+    that the existing Plugin can dogfood the first trustworthy loop.
 
-    The way is clear when the project has reviewed definitions and authority
+    The way is clear when the project has canonical definitions and authority
     boundaries for Plan, Ticket, Run, Gate, Outcome/Evidence, context binding,
     graph mutation, semantic closeout, storage, and the first implementation
     slice. The resulting contracts must be implementable without silently
@@ -20,7 +20,9 @@ constraints:
   - kind: must
     rule: "Preserve high-value intermediate reasoning without treating exploration artifacts as canonical truth"
   - kind: must
-    rule: "Use one reviewed decision map to drive the first Plugin dogfood loop"
+    rule: "Use one canonical decision map to drive the first Plugin dogfood loop"
+  - kind: must
+    rule: "Machine-validated Specs enter canonical knowledge as active; human intervention is reserved for explicit authority gates"
   - kind: must
     rule: "Any change to current Task/Run, plugin-first, App, or storage authority must explicitly relate to or supersede the existing active spec"
   - kind: must_not
@@ -33,7 +35,7 @@ indexing:
   tags: [ticket, planning, work-graph, loop-engineering, wayfinder]
 provenance:
   source_type: chat_extraction
-  confidence: 0.85
+  confidence: 0.95
   source_ref: "Wayne Ticket Runtime discussions in Codex sessions 019fa1de-8499-7e23-9576-c29db4d0168b and 019fa272-202e-73a1-8b80-9abfbfee0790"
   produced_at: "2026-07-27"
 relations:

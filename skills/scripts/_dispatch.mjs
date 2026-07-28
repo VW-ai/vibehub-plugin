@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { captureCommand } from "./_capture.mjs";
 
-export const KB = new Set(["status","feature.list","feature.get","feature.suggest","spec.search","spec.get","relations","lineage","anchors","review","ingest.preview","draft.apply","promote","mark-stale","deprecate","amend","supersede"]);
+export const KB = new Set(["status","feature.list","feature.get","feature.suggest","spec.search","spec.get","relations","lineage","anchors","review","ingest.preview","spec.apply","mark-stale","deprecate","amend","supersede"]);
 export const DISTILL = new Set(["run.start","run.status","run.resume","run.abort","inventory.put","inventory.get","inventory.diff","inventory.seal","scopes.plan","scopes.claim","scopes.complete","scopes.fail","scopes.retry","scopes.correct","candidates.put","candidates.get","candidates.list","baseline.get","version.get","version.diff","reconcile","validate","finalize","activate","rollback"]);
 
 function fail(message, code = "validation_error", exit = 2) {

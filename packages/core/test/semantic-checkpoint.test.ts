@@ -43,7 +43,7 @@ function setupRepository(root: string, withRelation = false): string {
     "INSERT INTO kb_features(repo_id, feature_id, created_at) VALUES (?, ?, ?)",
   ).run(row.id, "feature/checkpoint", NOW);
   if (withRelation) {
-    new KnowledgeService(db).applyDraftBatch(row.id, {
+    new KnowledgeService(db).applySpecBatch(row.id, {
       idempotencyKey: "seed-related-specs",
       specs: [
         {

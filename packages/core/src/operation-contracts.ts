@@ -29,7 +29,7 @@ export const evidenceSchema = z.object({
 export const anchorSchema = z.object({file:path,symbol:boundedString(500).optional(),lineStart:z.number().int().positive().optional(),lineEnd:z.number().int().positive().optional(),contentHash:canonicalString(200).optional()}).strict()
   .refine(x=>x.lineEnd===undefined||(x.lineStart!==undefined&&x.lineEnd>=x.lineStart),{message:"lineEnd requires lineStart and must not precede it"});
 const relationSchema=z.object({toSpecId:id,type:relationType,rationale:long.optional()}).strict();
-const draftSchema=z.object({id,featureId:id.optional(),type:specType,summary:short,detail:long.optional(),priority:id.optional(),layer:id.optional(),domain:id.optional(),tags:tags.optional(),evidence:z.array(evidenceSchema).min(1).max(50),anchors:z.array(anchorSchema).max(100).optional(),relations:z.array(relationSchema).max(100).optional()}).strict();
+const specSchema=z.object({id,featureId:id.optional(),type:specType,summary:short,detail:long.optional(),priority:id.optional(),layer:id.optional(),domain:id.optional(),tags:tags.optional(),evidence:z.array(evidenceSchema).min(1).max(50),anchors:z.array(anchorSchema).max(100).optional(),relations:z.array(relationSchema).max(100).optional()}).strict();
 const key=canonicalString(200);
 const mutationBase={specId:id,idempotencyKey:key};
 const runId=id;
@@ -68,12 +68,11 @@ export const operationInputSchemas = {
   "kb.anchors": z.union([z.object({specId:id}).strict(),z.object({path}).strict()]),
   "kb.review": z.object({kinds:z.array(z.enum(["low_confidence","conflict","stale","unplaced"])).max(4).optional(),limit:z.number().int().min(1).max(500).optional(),offset:z.number().int().min(0).max(100_000).optional()}).strict(),
   "kb.ingest.preview": z.object({specs:z.array(z.object({summary:short,anchors:z.array(anchorSchema).max(100).optional()}).strict()).min(1).max(100)}).strict(),
-  "kb.draft.apply": z.object({idempotencyKey:key,specs:z.array(draftSchema).min(1).max(100)}).strict(),
-  "kb.promote": z.object(mutationBase).strict(),
+  "kb.spec.apply": z.object({idempotencyKey:key,specs:z.array(specSchema).min(1).max(100)}).strict(),
   "kb.mark-stale": z.object(mutationBase).strict(),
   "kb.deprecate": z.object(mutationBase).strict(),
   "kb.amend": z.object({...mutationBase,type:specType.optional(),summary:short.optional(),detail:long.nullable().optional(),priority:id.nullable().optional(),layer:id.nullable().optional(),domain:id.nullable().optional(),tags:tags.optional(),featureId:id.nullable().optional(),evidence:z.array(evidenceSchema).min(1).max(50),anchors:z.array(anchorSchema).max(100).optional()}).strict(),
-  "kb.supersede": z.object({...mutationBase,replacementSpecId:id,promoteReplacement:z.boolean().optional(),rationale:long.optional()}).strict(),
+  "kb.supersede": z.object({...mutationBase,replacementSpecId:id,rationale:long.optional()}).strict(),
   "distill.run.start": z.object({runId,mode:z.enum(["cold","refresh","incremental"]),baseCommit:z.string().regex(/^[0-9a-f]{40}$/),skillHash:id,configHash:id,budget:z.record(z.string(),z.unknown()).optional()}).strict(),
   "distill.run.status": distillRun,
   "distill.run.resume": distillRun,
@@ -108,8 +107,8 @@ export const operationInputSchemas = {
  * source before publishing the artifact.
  */
 export const operationRefinementManifest = {
-  "evidence-content": {runtimeSites:1,operations:["kb.draft.apply","kb.amend"]},
-  "anchor-line-range": {runtimeSites:1,operations:["kb.ingest.preview","kb.draft.apply","kb.amend","distill.candidates.put"]},
+  "evidence-content": {runtimeSites:1,operations:["kb.spec.apply","kb.amend"]},
+  "anchor-line-range": {runtimeSites:1,operations:["kb.ingest.preview","kb.spec.apply","kb.amend","distill.candidates.put"]},
   "inventory-classification": {runtimeSites:1,operations:["distill.inventory.put"]},
   "inventory-included-no-reason": {runtimeSites:1,operations:["distill.inventory.put"]},
   "inventory-change-hash": {runtimeSites:1,operations:["distill.inventory.put"]},
@@ -142,9 +141,9 @@ export const operationAcceptanceConstructManifest = {
   union: 1,
   discriminatedUnion: 1,
   unknown: 1,
-  strict: 55,
+  strict: 54,
   safeExtend: 1,
-  optional: 90,
+  optional: 89,
   nullable: 9,
   check: 1,
   custom: 1,

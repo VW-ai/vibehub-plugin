@@ -1,10 +1,14 @@
 spec_id: "decision-ticket-contract-001"
 type: decision
-state: draft
+state: active
 intent:
   summary: "什么最小 Ticket contract 才足以被独立调度、执行、验证和追溯？"
   detail: |
     **Question**: Freeze the smallest strict Ticket schema and its invariants.
+
+    **Resolution status**: Open. This active Spec is the canonical evolving
+    record for already-settled Ticket invariants; `active` does not claim that
+    every remaining field decision below has been resolved.
 
     Candidate fields discussed include identity, objective/outcome contract,
     intent provenance, context bindings, dependencies, scope/non-goals,
@@ -111,9 +115,10 @@ intent:
     risk. Machine review may detect and route such a gate, but cannot grant the
     missing human authority.
 
-    The `draft → active` convention used by Feature Room Wayfind records whether
-    a planning decision has been ratified in META. It is a planning protocol,
-    not a proposed product Ticket lifecycle.
+    The former `draft → human review → active` Feature Room convention is not
+    the target for either product Tickets or canonical Specs. Open planning
+    questions should become Decision Tickets; the current Wayfind representation
+    remains transitional scaffolding until that separation exists.
 
     This ticket remains unresolved. The maturity model and Agent creation rule
     and bounded self-expansion authority and machine-first validation model
@@ -126,7 +131,7 @@ indexing:
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, ticket, schema, contract]
+  tags: [wayfinder, grilling, ticket, schema, contract, open-question]
 provenance:
   source_type: chat_extraction
   confidence: 0.75

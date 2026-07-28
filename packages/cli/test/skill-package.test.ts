@@ -301,12 +301,12 @@ describe("production skill package",()=>{
       ["kb.feature.get","top-level id rejects whitespace only"],
       ["kb.feature.get","top-level id measures raw padded length"],
       ["kb.feature.get","top-level id measures Unicode characters consistently"],
-      ["kb.draft.apply","nested summary rejects leading whitespace"],
+      ["kb.spec.apply","nested summary rejects leading whitespace"],
       ["kb.spec.search","array tag rejects whitespace only"],
     ] as const;
     for(const [operation,caseName] of regressions){const contract=artifact.operations[operation]!,fixture=contract.fixtures.negatives.find(x=>x.case===caseName)!;const run=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--operation",operation],{input:JSON.stringify(fixture.value),encoding:"utf8"});expect(run.status,`${operation}/${caseName}: ${run.stdout}`).toBe(2);}
     const unicodeId={id:"😀".repeat(200)},featureContract=artifact.operations["kb.feature.get"]!;expect(validateOperationContract(featureContract,unicodeId)).toMatchObject({valid:true});expect(operationInputSchemas["kb.feature.get"].safeParse(unicodeId).success).toBe(true);expect(dispatcher.dispatch("kb.feature.get",{repoId:row.id,actor:"fixture",requestId:"unicode-id",now},unicodeId)).toMatchObject({ok:false,error:{code:"not_found"}});
-    const longInput={idempotencyKey:"unicode-long",specs:[{id:"unicode-long",type:"context",summary:"Unicode boundary",evidence:[{sourceType:"fixture",sourceRef:"fixture:unicode",exactQuote:"😀".repeat(20_000)}]}]},longContract=artifact.operations["kb.draft.apply"]!;expect(validateOperationContract(longContract,longInput)).toMatchObject({valid:true});expect(operationInputSchemas["kb.draft.apply"].safeParse(longInput).success).toBe(true);expect(dispatcher.dispatch("kb.draft.apply",{repoId:row.id,actor:"fixture",taskId:"fixture-task",requestId:"unicode-long",now},longInput)).toMatchObject({ok:true});
+    const longInput={idempotencyKey:"unicode-long",specs:[{id:"unicode-long",type:"context",summary:"Unicode boundary",evidence:[{sourceType:"fixture",sourceRef:"fixture:unicode",exactQuote:"😀".repeat(20_000)}]}]},longContract=artifact.operations["kb.spec.apply"]!;expect(validateOperationContract(longContract,longInput)).toMatchObject({valid:true});expect(operationInputSchemas["kb.spec.apply"].safeParse(longInput).success).toBe(true);expect(dispatcher.dispatch("kb.spec.apply",{repoId:row.id,actor:"fixture",taskId:"fixture-task",requestId:"unicode-long",now},longInput)).toMatchObject({ok:true});
     expect(dispatcher.dispatch("kb.status",{repoId:row.id,actor:" ",requestId:"context-space",now},{})).toMatchObject({ok:false,error:{code:"actor_required"}});
     expect(dispatcher.dispatch("kb.status",{repoId:row.id,actor:"fixture",requestId:"context-date",now:"not-a-date"},{})).toMatchObject({ok:false,error:{code:"validation_error"}});
     db.close();

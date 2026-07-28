@@ -32,5 +32,5 @@ do not split a condition from the behavior it qualifies.
 - context vs decision: observed WHAT is context unless selection/rationale is
   authored. Never upgrade observed code into a decision.
 
-When no type passes positively, do not force a draft. Report unclassified
-evidence for review.
+When no type passes positively, do not force a Spec. Report unclassified
+evidence as a machine-review finding.

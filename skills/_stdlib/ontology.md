@@ -13,7 +13,8 @@ reading persistence files or tables directly.
   it as exactly one of: `intent`, `decision`, `constraint`, `contract`,
   `convention`, `context`, `change`.
 - A **version candidate** is inferred knowledge inside one distillation run. It
-  is not canonical truth and activation does not promote it.
+  is not canonical truth, and mapping activation does not turn it into a
+  canonical Spec.
 
 ## Type test
 

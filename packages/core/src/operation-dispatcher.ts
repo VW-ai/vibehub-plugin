@@ -4,7 +4,7 @@ import path from "node:path";
 import { openDb, type Db } from "./db.js";
 import crypto from "node:crypto";
 import { z } from "zod";
-import { KnowledgeError, KnowledgeService, type DraftBatchInput } from "./knowledge-service.js";
+import { KnowledgeError, KnowledgeService, type SpecBatchInput } from "./knowledge-service.js";
 import { DistillationService, type CandidateInput, type DistillationStartInput, type InventoryRowInput, type ScopePlanInput } from "./distillation-service.js";
 import { operationContextSchema, operationInputSchemas, type OperationName } from "./operation-contracts.js";
 import {
@@ -48,8 +48,7 @@ const handlers:Record<OperationName,Handler>={
   "kb.anchors":(s,c,i)=>s.kb.anchors(c.repoId,i),
   "kb.review":(s,c,i)=>s.kb.review(c.repoId,i),
   "kb.ingest.preview":(s,c,i)=>s.kb.previewIngest(c.repoId,i as Parameters<KnowledgeService["previewIngest"]>[1]),
-  "kb.draft.apply":(s,c,i)=>s.kb.applyDraftBatch(c.repoId,i as unknown as DraftBatchInput,mutation(c,true)),
-  "kb.promote":(s,c,i)=>s.kb.mutate(c.repoId,"promote",i,mutation(c,false)),
+  "kb.spec.apply":(s,c,i)=>s.kb.applySpecBatch(c.repoId,i as unknown as SpecBatchInput,mutation(c,true)),
   "kb.mark-stale":(s,c,i)=>s.kb.mutate(c.repoId,"mark_stale",i,mutation(c,false)),
   "kb.deprecate":(s,c,i)=>s.kb.mutate(c.repoId,"deprecate",i,mutation(c,false)),
   "kb.amend":(s,c,i)=>s.kb.mutate(c.repoId,"amend",i,mutation(c,false)),
@@ -229,7 +228,7 @@ export class OperationDispatcher {
 }
 
 const DISTILL_MUTATIONS=new Set(["distill.run.start","distill.run.abort","distill.inventory.put","distill.inventory.seal","distill.scopes.plan","distill.scopes.claim","distill.scopes.complete","distill.scopes.fail","distill.scopes.retry","distill.scopes.correct","distill.candidates.put","distill.reconcile","distill.validate","distill.finalize","distill.activate","distill.rollback"]);
-const GIT_KB_MUTATIONS=new Set(["kb.draft.apply","kb.promote","kb.mark-stale","kb.deprecate","kb.amend","kb.supersede"]);
+const GIT_KB_MUTATIONS=new Set(["kb.spec.apply","kb.mark-stale","kb.deprecate","kb.amend","kb.supersede"]);
 function sortObject(value:unknown):unknown{return Array.isArray(value)?value.map(sortObject):value&&typeof value==="object"?Object.fromEntries(Object.entries(value).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>[k,sortObject(v)])):value;}
 
 function copyMutationReceipts(source:Db,sourceRepoId:number,target:Db,targetRepoId:number):void{
@@ -287,7 +286,7 @@ const receiptAddressSchema=z.object({repoId:operationContextSchema.shape.repoId,
 function hashCanonical(value:unknown){return crypto.createHash("sha256").update(JSON.stringify(sortObject(value))).digest("hex");}
 function failure(error:unknown):OperationResult{const e=normalize(error);return {ok:false,error:{code:e.code,message:e.message,details:e.details,nextSafeActions:e.nextSafeActions}};}
 
-function mutation(c:OperationContext,taskRequired:boolean){if(taskRequired&&!c.taskId?.trim())throw new KnowledgeError("task_required","taskId is required for draft batch apply",null,["Associate the write with the current task."]);return {actor:c.actor,taskId:c.taskId,requestId:c.requestId,now:c.now};}
+function mutation(c:OperationContext,taskRequired:boolean){if(taskRequired&&!c.taskId?.trim())throw new KnowledgeError("task_required","taskId is required for active Spec batch apply",null,["Associate the write with the current task."]);return {actor:c.actor,taskId:c.taskId,requestId:c.requestId,now:c.now};}
 function req(v:unknown,name:string){if(typeof v!=="string"||!v.trim())throw new KnowledgeError("validation_error",`${name} is required`,{field:name});return v;}
 function normalize(error:unknown):KnowledgeError{if(error instanceof KnowledgeError)return error;const message=error instanceof Error?error.message:String(error);if(message.includes("FOREIGN KEY"))return new KnowledgeError("not_found","referenced entity does not exist",{cause:message});if(message.includes("UNIQUE"))return new KnowledgeError("already_exists","entity already exists",{cause:message});return new KnowledgeError("internal_error","knowledge operation failed",{cause:message},["Retry after inspecting database health."]);}
 function validation(issues:readonly {path:PropertyKey[];message:string;code:string}[],scope:string){return new KnowledgeError("validation_error",`invalid ${scope}`,{issues:issues.map(x=>({path:x.path.map(String),message:x.message,code:x.code}))},["Correct the malformed request and retry."]);}

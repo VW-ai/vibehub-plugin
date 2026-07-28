@@ -1,12 +1,12 @@
 ---
 name: vibehub-ingest
-description: Capture discussions, handoffs, reviews, notes, requirements, and implementation evidence as governed VibeHub draft knowledge. Use when durable intent, decisions, constraints, contracts, conventions, context, or changes must be decomposed, deduplicated, placed, preserved with provenance, and handed to human review.
+description: Capture discussions, handoffs, reviews, notes, requirements, and implementation evidence as machine-validated active VibeHub knowledge. Use when durable intent, decisions, constraints, contracts, conventions, context, or changes must be decomposed, deduplicated, placed, validated, and preserved with provenance.
 ---
 
 # VibeHub Ingest
 
-Convert messy evidence into an atomic, previewed draft batch. Keep semantic
-judgment here; persist only through dispatcher operations.
+Convert messy evidence into an atomic, previewed Spec batch. Keep semantic
+judgment and machine review here; persist only through dispatcher operations.
 
 ## Prerequisites
 
@@ -43,8 +43,8 @@ judgment here; persist only through dispatcher operations.
 5. Preserve exact quotes/source refs and anchors. Label inference. Ask at most
    two clarifying questions across an interactive batch: placement first, then
    genuinely ambiguous type/mutation. When invoked by a hook or other
-   noninteractive caller, ask none; choose the safest draft default and report
-   it for review.
+   noninteractive caller, ask none; choose explicit conservative defaults and
+   preserve them in provenance.
    Before adding any relation, apply the relations edge checklist. Use
    `depends_on` only when concrete necessity and direct breach evidence are
    shown. Adjacency, anchor overlap, co-mention, imports, or shared placement
@@ -57,21 +57,31 @@ judgment here; persist only through dispatcher operations.
 
    Reconcile exact lexical/anchor-overlap signals. Semantic similarity remains
    judgment, never a fabricated deterministic match.
-7. Apply all new drafts atomically with a stable idempotency key and task ID:
+7. Machine-review the candidate batch before writing. Verify atomicity, type,
+   source fidelity, evidence, duplicate/conflict signals, placement, relations,
+   and that no missing human authority is being fabricated. Reject candidates
+   that cannot honestly enter canonical knowledge.
+8. Apply all passing Specs atomically with a stable idempotency key and task ID.
+   The dispatcher performs strict validation and creates them directly active:
 
    ```text
-   node ../scripts/vh-kb.mjs draft.apply --repo <root> --actor <id> --task <task> --request <id> --input <plan.json>
+   node ../scripts/vh-kb.mjs spec.apply --repo <root> --actor <id> --task <task> --request <id> --input <plan.json>
    ```
 
    Never fall back to per-spec writes or bypass the dispatcher after rejection.
-8. Read `../_stdlib/reporting.md`; render the five-section block (brief on
-   success) reporting written draft IDs, duplicates, defaults, conflicts and
+9. Read `../_stdlib/reporting.md`; render the five-section block (brief on
+   success) reporting written active Spec IDs, validation findings, duplicates,
+   defaults, conflicts and
    unresolved mutations — only after `ok:true` envelopes. When a checkpoint
    reminder found nothing durable, stay silent: no filler records and no
-   block. Hand off to `vibehub-review`.
+   block. Route low-confidence, conflicting, stale, or unplaced active knowledge
+   to `vibehub-review`; ordinary activation needs no human handoff.
 
 ## Guardrails
 
-- Never promote, delete, or silently replace active human-authored knowledge.
-- Use amend/stale/supersede only through explicit review operations.
+- Never treat active as proof of human ratification. Provenance and evidence
+  carry authorship and support strength.
+- Never write a candidate that fails machine review or requires unresolved
+  product, technical, scope, permission, or risk authority.
+- Use amend/stale/supersede through their governed operations.
 - Never claim capture when the dispatcher envelope has `ok:false`.

@@ -5,11 +5,13 @@ export const KB_SPEC_TYPES = [
 export type KbSpecType = (typeof KB_SPEC_TYPES)[number];
 
 /**
- * Exact lifecycle (amendment creates a revision and does not move state):
+ * Exact lifecycle (amendment creates a revision and does not move state).
+ * Machine-validated creation starts at active. Draft is retained only for
+ * imported legacy data or an exceptional persisted authoring transaction:
  *
- * draft ──▶ active ──▶ stale ──▶ superseded
- *   └────────┴──────────┴──────▶ deprecated
- *              └──────────────▶ superseded
+ * active ──▶ stale ──▶ superseded
+ *   └──────────┴─────▶ deprecated
+ * draft ──▶ active|deprecated
  *
  * superseded and deprecated are terminal.
  */
@@ -25,8 +27,8 @@ export type KnowledgeSourceKind = "canonical" | "version_candidate";
 
 /**
  * Two independent truth layers:
- * canonical KB (reviewed identities + immutable revisions)
- *                  │ explicit promotion only
+ * canonical KB (machine-validated active identities + immutable revisions)
+ *                  │ no default human activation gate
  *                  ╳ mapping activation never mutates this layer
  * immutable mapping version ──CAS activate──▶ repo active mapping pointer
  */

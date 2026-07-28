@@ -1,15 +1,15 @@
 # 09-ticket-runtime — Ticket Runtime
 
 > Provisional destination: turn durable intent and semantic context into a
-> reviewable, executable Ticket Graph, then dogfood the smallest trustworthy
-> loop inside the existing Plugin before committing to the final App/Runtime
-> product shape.
+> machine-validated, executable Ticket Graph, then dogfood the smallest
+> trustworthy loop inside the existing Plugin before committing to the final
+> App/Runtime product shape.
 
 - **Intent**:
   [`specs/intent-ticket-runtime-001.yaml`](specs/intent-ticket-runtime-001.yaml)
 - **Exploration artifact**:
   [`artifacts/2026-07-27-ticket-runtime-exploration.md`](artifacts/2026-07-27-ticket-runtime-exploration.md)
-- **Artifact policy draft**:
+- **Artifact policy**:
   [`specs/convention-ticket-runtime-artifacts-001.yaml`](specs/convention-ticket-runtime-artifacts-001.yaml)
 
 ## What lives here
@@ -17,12 +17,12 @@
 This room is the planning and authority boundary for the proposed Ticket
 Runtime. It preserves the reasoning that led from context management to an
 executable work graph, charts the unresolved product and domain decisions, and
-will eventually hold the reviewed Ticket/Plan/Run/Gate/Outcome contracts.
+will eventually hold the canonical Ticket/Plan/Run/Gate/Outcome contracts.
 
 It does not silently rewrite the active Task/Run, plugin-first, App, or storage
 decisions in older rooms. A new decision changes those authorities only after
-it is reviewed, promoted, and explicitly related to or used to supersede the
-existing spec.
+its required authority gate is resolved and an active Spec explicitly relates
+to or supersedes the existing Spec.
 
 ## Material policy
 
@@ -30,8 +30,14 @@ existing spec.
 |---|---|---|
 | Raw conversation and tool trace | Codex session / external work log | Cold provenance; not checked into META |
 | Exploration synthesis | `artifacts/` | High-fidelity but non-normative |
-| Intent, decision, constraint, contract | `specs/` | Draft until explicitly promoted |
+| Intent, decision, constraint, contract | `specs/` | Canonical and active after machine validation; uncertainty and human gates are explicit |
 | Execution milestones and evidence | `progress.yaml` and linked artifacts | Added only after the relevant design decisions are clear |
+
+`active` means that a Spec is part of the live knowledge layer. It does not mean
+that every question mentioned by the Spec is resolved or that a human approved
+the text. Temporary authoring drafts are non-canonical; unresolved choices
+belong in Decision Tickets. The current draft Wayfind question files are
+transitional Ticket-shaped scaffolding, not the target Spec lifecycle.
 
 ## Decisions so far
 

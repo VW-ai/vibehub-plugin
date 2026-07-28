@@ -1,22 +1,35 @@
 spec_id: "convention-ticket-runtime-artifacts-001"
 type: convention
-state: draft
+state: active
 intent:
-  summary: "要确保我们的所有关键的思考，不同级别的我们都沉淀了"
+  summary: "关键思考按层沉淀；canonical Spec 经机器校验后直接 active"
   detail: |
-    Proposed working convention:
+    Active working convention:
 
     - Raw sessions and full tool traces remain cold provenance.
     - High-fidelity, non-normative synthesis lives under this room's
       `artifacts/` directory.
-    - Independently reviewable intent, decision, constraint, contract,
-      convention, context, and change claims live as draft specs until
-      explicitly promoted.
+    - Canonical intent, decision, constraint, contract, convention, context,
+      and change claims are written as `active` Specs after machine validation.
+      Persisted `draft → human review → active` is not the default ingestion
+      path.
+    - Uncertainty is explicit in provenance confidence, evidence, unresolved
+      questions, conflicts, or human-gate relations. It is not encoded by
+      placing every machine-authored Spec into a human approval queue.
+    - A temporary draft may exist inside an authoring transaction, but it is
+      not canonical knowledge and need not be persisted as a Spec.
+    - Work that still requires a product, technical, scope, permission, or risk
+      decision belongs in a Decision Ticket. Human authority is acquired by
+      resolving that gate, not by promoting an otherwise ordinary Spec.
     - `progress.yaml` records implementation milestones and evidence only after
       the decision map is clear; it must not be used as a design-ticket ledger.
 
-    This preserves the loop from exploration to action without allowing an
-    assistant-generated synthesis to masquerade as user-ratified authority.
+    The current Wayfind files that use draft Specs as open-question carriers are
+    transitional scaffolding until Ticket Runtime can represent those questions
+    as Tickets. They are not the target Spec lifecycle.
+
+    This preserves the loop from exploration to action while separating
+    knowledge availability, machine validation, and human authority.
 constraints: []
 indexing:
   type: convention
@@ -26,8 +39,8 @@ indexing:
   tags: [artifacts, provenance, knowledge-layering, loop-engineering]
 provenance:
   source_type: chat_extraction
-  confidence: 0.85
-  source_ref: "Wayne request to preserve key thinking at different levels — 2026-07-27"
+  confidence: 0.95
+  source_ref: "Wayne explicitly removed default draft/human-review activation for Specs — 2026-07-27"
   produced_at: "2026-07-27"
 relations:
   - target: "intent-ticket-runtime-001"

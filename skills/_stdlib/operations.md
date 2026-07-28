@@ -27,7 +27,7 @@ vibehub kb <suffix> --json --repo <root> --actor <id> --request <id> [--task <id
 vibehub distill <suffix> --json --repo <root> --actor <id> --request <id> [--task <id>] --input -
 ```
 
-Use `--task` for draft/distillation writes. Read input from stdin or a stable
+Use `--task` for Spec/distillation writes. Read input from stdin or a stable
 JSON file through `../scripts/vh-kb.mjs` / `../scripts/vh-distill.mjs`.
 
 ## Semantic checkpoints
@@ -59,7 +59,7 @@ optional top-level tool field, never inside `input`; omit it when replay is not
 needed so the capability generates a collision-resistant UUID. Never derive a
 repository request ID from an MCP transport correlation ID. Include stable task,
 stage, operation, and attempt information when humans need readable names, for
-example `task-184:ingest:draft-apply:01` or
+example `task-184:ingest:spec-apply:01` or
 `onboard-20260713:distill:inventory-seal:01`. Preview and apply are different
 logical invocations and get different IDs.
 
@@ -76,8 +76,8 @@ because a current table key would permit it.
 
 | Read | Mutation |
 |---|---|
-| `kb.status` | `kb.draft.apply` |
-| `kb.feature.list`, `kb.feature.get`, `kb.feature.suggest` | `kb.promote`, `kb.mark-stale`, `kb.deprecate` |
+| `kb.status` | `kb.spec.apply` |
+| `kb.feature.list`, `kb.feature.get`, `kb.feature.suggest` | `kb.mark-stale`, `kb.deprecate` |
 | `kb.spec.search`, `kb.spec.get` | `kb.amend`, `kb.supersede` |
 | `kb.relations`, `kb.lineage`, `kb.anchors`, `kb.review` | |
 | `kb.ingest.preview` | |
@@ -101,7 +101,9 @@ malformed/unsupported, `3` not-found/already-exists, `4` lifecycle/integrity,
 Never pass them directly to a strict dispatcher operation. Translate only the
 named fields documented by the entry skill, then validate against the generated
 `../contracts/operation-contracts.json`. `ingest-plan` intentionally matches
-the exact `kb.draft.apply` input and may be passed after validation.
+the exact `kb.spec.apply` input and may be passed after machine validation.
+Successful apply creates active canonical Specs; there is no ordinary
+promotion step.
 
 Candidate reads always select exactly one `runId` or finalized `versionId`.
 Version review uses `distill.version.get` plus `distill.version.diff`; counts in

@@ -6,7 +6,7 @@ import Ajv2020 from "ajv/dist/2020.js";
 import { operationAcceptanceConstructManifest, operationInputSchemas, operationRefinementManifest } from "@vw-ai/vibehub-core";
 import { validateOperationContract, validateRuntimeRefinements } from "../../../skills/scripts/operation-contract-validator.mjs";
 
-const EXPECTED_INPUT_SCHEMA_HASH="a337e4239097e1f85cfea2e9e35d8159bd898162d252190542030f855c8eb82e";
+const EXPECTED_INPUT_SCHEMA_HASH="f0295450d64e06a4396dd4e28c9956be6cf05225e5bd946a29f44d1ec6682439";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../../..");
 const ajv=new Ajv2020({allErrors:true,strict:false});
@@ -98,7 +98,7 @@ function addRepresentableRefinements(name,schema){
 
 function runtimeRefinementsFor(name){
   const rules=[];
-  if(["kb.ingest.preview","kb.draft.apply","kb.amend","distill.candidates.put"].includes(name))rules.push({id:"anchor-line-range",kind:"fieldCompare",matchFields:["lineStart","lineEnd"],leftField:"lineEnd",operator:"gte",rightField:"lineStart",message:"lineEnd must not precede lineStart"});
+  if(["kb.ingest.preview","kb.spec.apply","kb.amend","distill.candidates.put"].includes(name))rules.push({id:"anchor-line-range",kind:"fieldCompare",matchFields:["lineStart","lineEnd"],leftField:"lineEnd",operator:"gte",rightField:"lineStart",message:"lineEnd must not precede lineStart"});
   if(name==="distill.candidates.put")rules.push({id:"relation-distinct-endpoints",kind:"fieldCompare",matchFields:["fromKind","fromId","toKind","toId"],leftField:"fromId",operator:"notEqual",rightField:"toId",message:"relation endpoints must differ"});
   if(name==="distill.scopes.complete"){
     rules.push({id:"scope-completion-byte-budget",kind:"maxJsonBytes",maximum:1_048_576,message:"scope completion payload must not exceed 1 MiB"});
@@ -119,8 +119,8 @@ function positiveFixture(name){
     "kb.status":{},"kb.feature.list":{query:"two words"},"kb.feature.get":{id:"x".repeat(200)},"kb.feature.suggest":{},
     "kb.spec.search":{paths:["src/two words.ts"],tags:["two words"]},"kb.spec.get":{id:specId},"kb.relations":{specId},"kb.lineage":{id:specId},"kb.anchors":{specId},"kb.review":{},
     "kb.ingest.preview":{specs:[{summary:"Fixture fact"}]},
-    "kb.draft.apply":{idempotencyKey:key,specs:[{id:specId,type:"context",summary:"Fixture fact",evidence:[{sourceType:"fixture",sourceRef:"fixture:1",exactQuote:"quoted evidence",evidenceRef:"fixture:1"}]}]},
-    "kb.promote":{specId,idempotencyKey:key},"kb.mark-stale":{specId,idempotencyKey:key},"kb.deprecate":{specId,idempotencyKey:key},
+    "kb.spec.apply":{idempotencyKey:key,specs:[{id:specId,type:"context",summary:"Fixture fact",evidence:[{sourceType:"fixture",sourceRef:"fixture:1",exactQuote:"quoted evidence",evidenceRef:"fixture:1"}]}]},
+    "kb.mark-stale":{specId,idempotencyKey:key},"kb.deprecate":{specId,idempotencyKey:key},
     "kb.amend":{specId,idempotencyKey:key,evidence:[{sourceType:"fixture",sourceRef:"fixture:1",evidenceRef:"fixture:1"}]},
     "kb.supersede":{specId,idempotencyKey:key,replacementSpecId:"context-replacement"},
     "distill.run.start":{runId,mode:"cold",baseCommit:"0123456789abcdef0123456789abcdef01234567",skillHash:"skill",configHash:"config"},
@@ -165,10 +165,10 @@ function negativeFixtures(name,positive,input){
       fixture("lineEnd requires lineStart",{specs:[{summary:"x",anchors:[{file:"src/a.ts",lineEnd:2}]}]},["anchor-line-range"]),
       fixture("lineEnd must not precede lineStart",{specs:[{summary:"x",anchors:[{file:"src/a.ts",lineStart:3,lineEnd:2}]}]},["anchor-line-range"]),
     ],
-    "kb.draft.apply":[
+    "kb.spec.apply":[
       fixture("evidence requires content",{...positive,specs:[{...positive.specs?.[0],evidence:[{sourceType:"fixture",sourceRef:"fixture:1"}]}]},["evidence-content"]),
-      fixture("draft anchor lineEnd requires lineStart",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",lineEnd:2}]}]},["anchor-line-range"]),
-      fixture("draft anchor lineEnd order",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",lineStart:3,lineEnd:2}]}]},["anchor-line-range"]),
+      fixture("spec anchor lineEnd requires lineStart",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",lineEnd:2}]}]},["anchor-line-range"]),
+      fixture("spec anchor lineEnd order",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",lineStart:3,lineEnd:2}]}]},["anchor-line-range"]),
       fixture("nested summary rejects leading whitespace",{...positive,specs:[{...positive.specs?.[0],summary:" Fixture fact"}]}),
       fixture("nested evidence sourceRef rejects whitespace only",{...positive,specs:[{...positive.specs?.[0],evidence:[{sourceType:"fixture",sourceRef:" ",evidenceRef:"fixture:1"}]}]}),
       fixture("nested anchor contentHash rejects trailing whitespace",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",contentHash:"hash "}]}]}),
