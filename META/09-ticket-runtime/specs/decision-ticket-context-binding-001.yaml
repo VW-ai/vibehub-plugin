@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-context-binding-001"
 type: decision
-state: draft
+state: active
 intent:
   summary: "Ticket 如何绑定 Feature Room Spec revisions，并在 Run 时编译 bounded context packet？"
   detail: |
@@ -23,7 +23,7 @@ indexing:
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, context-binding, feature-room, revisions]
+  tags: [wayfinder, open, grilling, context-binding, feature-room, revisions]
 provenance:
   source_type: chat_extraction
   confidence: 0.75

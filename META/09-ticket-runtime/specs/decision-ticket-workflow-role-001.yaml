@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-workflow-role-001"
 type: decision
-state: draft
+state: active
 intent:
   summary: "Workflow 在 Planning、Ticket contract 与 Run 之间究竟是什么：模板、版本化方法，还是图的一部分？"
   detail: |
@@ -23,7 +23,7 @@ indexing:
   priority: P1
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, workflow, plan, run]
+  tags: [wayfinder, open, grilling, workflow, plan, run]
 provenance:
   source_type: chat_extraction
   confidence: 0.75

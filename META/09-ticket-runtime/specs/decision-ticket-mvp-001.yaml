@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-mvp-001"
 type: decision
-state: draft
+state: active
 intent:
   summary: "什么是可以立即在现有 Plugin 中实现并用来开发它自己的最小 Ticket dogfood 闭环？"
   detail: |
@@ -32,7 +32,7 @@ indexing:
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, mvp, dogfood, plugin]
+  tags: [wayfinder, open, grilling, mvp, dogfood, plugin]
 provenance:
   source_type: chat_extraction
   confidence: 0.8

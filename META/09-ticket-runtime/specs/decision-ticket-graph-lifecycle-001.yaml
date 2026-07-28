@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-graph-lifecycle-001"
 type: decision
-state: draft
+state: active
 intent:
   summary: "Plan、Ticket Graph、Ticket 与 Run 分别拥有什么生命周期，谁可以怎样修改工作图？"
   detail: |
@@ -34,7 +34,7 @@ indexing:
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, graph, lifecycle, mutation, run]
+  tags: [wayfinder, open, grilling, graph, lifecycle, mutation, run]
 provenance:
   source_type: chat_extraction
   confidence: 0.75

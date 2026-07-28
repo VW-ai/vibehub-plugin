@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-runtime-boundary-001"
 type: decision
-state: draft
+state: active
 intent:
   summary: "第一版 Ticket System 的 canonical writer、业务规则与执行入口分别应由 Plugin、共享 Core/Local Runtime、App 中谁拥有？"
   detail: |
@@ -20,6 +20,19 @@ intent:
     - App-originated work does not require transport through a pre-installed
       Plugin.
 
+    **New intelligence-boundary input — 2026-07-28**
+
+    The first Ticket System should not encode one heavy end-to-end workflow.
+    Skills should own composable intelligence for recognizing, generating,
+    retrieving, validating, executing, and tending Tickets. MCP and CLI should
+    be thin access adapters. Shared Core or the Local Runtime should own schemas,
+    graph integrity, idempotent writes, receipts, durable facts, and derived
+    projections.
+
+    This decision must freeze the minimum capability surface and identify where
+    determinism is required for integrity, replay, coordination, authority, or
+    scale rather than merely for format bridging.
+
     This ticket is unresolved. No ownership model is ratified here.
 constraints: []
 indexing:
@@ -27,7 +40,7 @@ indexing:
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, plugin, local-runtime, app, authority]
+  tags: [wayfinder, open, grilling, plugin, local-runtime, app, authority, intelligence, mcp, cli]
 provenance:
   source_type: chat_extraction
   confidence: 0.75
@@ -43,3 +56,4 @@ relations:
 anchors:
   - file: "packages/core"
   - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md"

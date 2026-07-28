@@ -47,7 +47,7 @@ indexing:
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, ticket, task, ontology, work-unit]
+  tags: [wayfinder, resolved, grilling, ticket, task, ontology, work-unit]
 provenance:
   source_type: chat_extraction
   confidence: 0.85

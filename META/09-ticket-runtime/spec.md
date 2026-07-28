@@ -36,34 +36,40 @@ to or supersedes the existing Spec.
 `active` means that a Spec is part of the live knowledge layer. It does not mean
 that every question mentioned by the Spec is resolved or that a human approved
 the text. Temporary authoring drafts are non-canonical; unresolved choices
-belong in Decision Tickets. The current draft Wayfind question files are
-transitional Ticket-shaped scaffolding, not the target Spec lifecycle.
+belong in active Decision Tickets explicitly tagged `open`.
 
 ## Decisions so far
 
 - [decision-ticket-work-unit-001] (active) Ticket is the only canonical durable
   work unit; outcome and execution granularity use the same Ticket contract
   family, while `task` remains ordinary or compatibility vocabulary.
+- [decision-ticket-contract-001] (active) Ticket Contract v0 binds a stable
+  outcome to one versioned Ticket definition, progresses through three
+  intelligence handoffs under independent validation, uses flat verifiable
+  acceptance, and derives maturity and operational state from linked facts.
 
 ## Frontier
 
 These questions are currently unblocked:
 
 - [decision-ticket-runtime-boundary-001] Which responsibilities and canonical
-  writes belong to Plugin, shared Core/Local Runtime, and App in the first
-  dogfood slice?
-- [decision-ticket-contract-001] What minimum contract makes a Ticket
-  independently schedulable, executable, verifiable, and traceable?
+  writes belong to Skills, Plugin adapters, MCP/CLI, shared Core/Local Runtime,
+  and App in the first dogfood slice?
+- [decision-ticket-context-binding-001] How does a Ticket declare and bind
+  semantic context without freezing a giant Run prompt?
+- [decision-ticket-graph-lifecycle-001] How may planning and execution
+  elaborate, decompose, propose, and tend the Ticket Graph?
+- [decision-ticket-workflow-role-001] Is Workflow a reusable method, a
+  versioned intelligence asset, or part of the graph?
 
 ## Blocked
 
-- Context binding, graph lifecycle, Workflow role, and closeout remain blocked
-  on a stable Ticket contract.
+- Closeout remains blocked on context binding and graph lifecycle.
 - Graph lifecycle must also decide how human planning gates allow a partial
   graph with directional fog beyond blocker Tickets, rather than fabricated
   downstream Tickets.
-- Storage topology depends on both the runtime ownership boundary and the
-  durable/operational meaning of Ticket records.
+- Storage topology depends on the runtime ownership boundary and closeout
+  semantics.
 - The first implementation slice depends on the preceding contracts; it must
   not become the place where unresolved ontology is accidentally decided in
   code.

@@ -6,9 +6,7 @@ intent:
   detail: |
     **Question**: Freeze the smallest strict Ticket schema and its invariants.
 
-    **Resolution status**: Open. This active Spec is the canonical evolving
-    record for already-settled Ticket invariants; `active` does not claim that
-    every remaining field decision below has been resolved.
+    **Resolution status**: Resolved. Ticket Contract v0 is ratified below.
 
     Candidate fields discussed include identity, objective/outcome contract,
     intent provenance, context bindings, dependencies, scope/non-goals,
@@ -24,6 +22,23 @@ intent:
     therefore express decomposition and visibility without creating a second
     Task identity, and must define when a Ticket is directly executable by a
     Run.
+
+    **Ratified partial contract — identity boundary**
+
+    A Ticket ID denotes one stable outcome promise, not a long-lived work
+    container whose intended result may be silently replaced.
+
+    The same Ticket may be revised to clarify its wording, add context, narrow
+    implementation choices, strengthen acceptance, or decompose contained work,
+    provided that completing the revised Ticket still fulfills the original
+    outcome promise.
+
+    A material change to the promised outcome, non-goal, human-controlled scope,
+    technical direction, authority, permission, or risk boundary requires a new
+    Ticket. The old Ticket remains durable and points to the replacement through
+    explicit supersession lineage; its ID is never recycled. Runs, descendants,
+    approvals, artifacts, and evidence produced under the old promise remain
+    attached to that historical Ticket.
 
     **Ratified partial contract — progressive maturity**
 
@@ -41,6 +56,132 @@ intent:
     Planning should create the widest honest graph of outline Tickets it can.
     Planning Fog is reserved for regions where even a stable outcome or
     direction cannot yet be named.
+
+    **Ratified partial contract — outline Ticket v0**
+
+    A canonical outline Ticket requires only:
+
+    - a stable durable Ticket ID;
+    - one outcome statement sharp enough to distinguish its promise from
+      another Ticket's promise;
+    - one containment parent, except for an explicitly top-level Ticket;
+    - creation provenance naming the creator, source Ticket/Run when applicable,
+      and the discovery or decomposition reason;
+    - mechanical creation time.
+
+    Scope, non-goals, constraints, context bindings, dependencies, acceptance,
+    authority requirements, permissions, execution policy, and verifiers may be
+    added as definition maturity increases. If even a stable outcome cannot yet
+    be named, the region remains Planning Fog rather than becoming an empty
+    Ticket.
+
+    Authored outline data does not include status, maturity, current Run,
+    progress percentage, assignee, priority, or workflow step. Those are
+    derived Runtime projections or optional upstream product organization, not
+    the minimum semantic Ticket identity.
+
+    **Ratified partial contract — specified intelligence handoff**
+
+    `specified` is determined by an intelligence handoff test rather than a
+    fixed percentage of populated fields: an Agent that did not participate in
+    the source discussion can read the Ticket and its referenced context,
+    understand the intended boundary, identify dependencies and authority
+    gates, and continue reliable planning or decomposition without reopening
+    the original conversation to discover what the user meant.
+
+    The handoff normally requires a materially described outcome, scope and
+    relevant non-goals, constraints, context requirements, known dependencies,
+    authority gates, and acceptance conditions. A validator judges their
+    semantic sufficiency; fields that genuinely do not apply need not be filled
+    with boilerplate.
+
+    A specified Ticket is not necessarily runnable. Verification details may
+    remain incomplete, a required gate or permission may be unsatisfied, context
+    may not yet compile into a Run packet, and dependencies may remain open.
+
+    **Ratified partial contract — executable Run handoff**
+
+    `executable` is determined by a Run handoff test: once external blockers are
+    removed, an execution Agent that did not participate in planning can read
+    the Ticket, bound context, and execution policy and begin a Run without
+    silently making an undelegated product, technical, scope, permission, or
+    risk decision.
+
+    This requires sufficiently explicit scope, non-goals, and constraints;
+    resolvable context; a feasible verifier and evidence requirement for every
+    acceptance criterion; defined permissions, allowed side effects, and
+    execution policy; modeled dependencies and human gates; explicit graph
+    mutation authority; and independent validation of the current revision.
+
+    Dependencies, permissions, or human gates may still be unsatisfied while
+    definition maturity is executable. Operational readiness remains derived
+    separately: only an executable Ticket whose blockers and required gates are
+    satisfied may project as `READY`.
+
+    **Ratified partial contract — derived maturity and independent validation**
+
+    Ticket authors propose and revise the contract; they do not directly grant
+    their own Ticket an `executable` maturity. A validator evaluates the current
+    Ticket revision against versioned readiness rules and derives `outline`,
+    `specified`, or `executable` from the fields and authority actually present.
+
+    Validation is independent and inspectable rather than necessarily
+    adversarial. Its receipt binds the Ticket ID and revision to the validator
+    and policy versions, check results, actionable findings, evidence, and
+    derived maturity. A readiness-affecting revision invalidates the prior
+    result and must be validated again.
+
+    The first implementation may run authoring and validation through the same
+    underlying model or process, but they remain separate roles with separate
+    inputs and outputs. Validators may verify that a required human gate was
+    satisfied; they may not grant the missing human authority themselves.
+
+    **Ratified partial contract — verifiable acceptance**
+
+    Acceptance criteria prove the Ticket's promised outcome rather than list
+    implementation steps. An outline Ticket may omit them, and a specified
+    Ticket may still have unresolved verification details. Before a Ticket can
+    derive `executable`, every acceptance criterion must identify a feasible
+    verification method and the evidence required to adjudicate it.
+
+    Verification may be automated or human. A criterion that requires human
+    judgment names an explicit human gate and approval evidence; it must not be
+    represented as if an Agent or validator could self-approve it.
+
+    Acceptance v0 is intentionally a flat list. Each item contains only a
+    stable local ID, one independently adjudicable outcome condition, its
+    verification method, and the evidence required. Parent Tickets verify their
+    aggregate outcome; child Tickets verify their independently scheduled local
+    outcome. Implementation steps that have no independent outcome and
+    acceptance remain elaboration inside a Ticket rather than becoming Tickets.
+
+    The first dogfood slice does not introduce nested Boolean acceptance trees,
+    weights, scoring, inheritance, partial-completion percentages, verifier
+    orchestration, or an acceptance DSL. Repeated real-world failures must
+    justify any later structure.
+
+    **Ratified partial contract — intelligence before workflow encoding**
+
+    Ticket structure exists to communicate the semantic contract and judgment
+    boundaries an Agent needs: the promised outcome, why it exists, what is in
+    and out, what evidence and authority apply, and how success can be known.
+    It must not become a serialization of every workflow transition or UI step.
+    Workflow consumes this intelligence contract; workflow mechanics are modeled
+    separately and may evolve without redefining what the Ticket means.
+
+    **Ratified partial contract — derived operational state**
+
+    `BLOCKED`, `READY`, `RUNNING`, and `DONE` are Runtime projections rather
+    than author-controlled Ticket fields. An Agent may revise the semantic
+    Ticket contract and produce validation, gate, Run, Outcome, and graph
+    mutation events; it may not directly declare the resulting operational
+    state.
+
+    Runtime derives the current state from durable facts including dependency
+    relations and outcomes, authority gates, validation results, active Runs,
+    and accepted completion evidence. The underlying events, receipts, and
+    materialized projections may be persisted for audit and query performance,
+    but a writable status label is never the source of truth.
 
     **Ratified partial contract — Agent-derived Tickets**
 
@@ -120,9 +261,32 @@ intent:
     questions should become Decision Tickets; the current Wayfind representation
     remains transitional scaffolding until that separation exists.
 
-    This ticket remains unresolved. The maturity model and Agent creation rule
-    and bounded self-expansion authority and machine-first validation model
-    above are ratified, while the full field schema is not yet approved.
+    **Resolved Ticket Contract v0**
+
+    The versioned Ticket definition contains:
+
+    - `schema_version`, `ticket_id`, and `revision`;
+    - the stable promised `outcome` and one containment `parent_id`, except for
+      an explicitly top-level Ticket;
+    - creation `provenance`;
+    - scope in/out, constraints, and context requirements or bindings;
+    - graph relations including `depends_on`;
+    - authority gates, permissions, allowed side effects, and graph-mutation
+      policy;
+    - the flat verifiable acceptance list defined above;
+    - execution policy.
+
+    ValidationReceipt, GateDecision, Run, Outcome/Evidence, and GraphMutation
+    remain separate linked records rather than mutable fields embedded in the
+    Ticket definition. Definition maturity, operational state, active Run, and
+    progress are derived projections and cannot be authored as source of truth.
+
+    Detailed context binding, graph lifecycle, Workflow semantics, storage, and
+    closeout remain delegated to their own Decision Tickets. They may refine
+    the representations around this contract but must preserve its identity,
+    authority, validation, and intelligence-handoff invariants.
+
+    Wayne ratified Ticket Contract v0 on 2026-07-28.
 
     **Claimed**: Codex 2026-07-27
 constraints: []
@@ -131,10 +295,10 @@ indexing:
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, grilling, ticket, schema, contract, open-question]
+  tags: [wayfinder, resolved, grilling, ticket, schema, contract]
 provenance:
   source_type: chat_extraction
-  confidence: 0.75
+  confidence: 0.95
   source_ref: "Strict Ticket hardness discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
   produced_at: "2026-07-27"
 relations:
