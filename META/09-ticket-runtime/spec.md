@@ -56,6 +56,13 @@ belong in active Decision Tickets explicitly tagged `open`.
   intelligence by scene, proceeds under delegated authority, and escalates
   experience/principle changes or deviations.
 
+## Planning conventions
+
+- [convention-ticket-backchain-forward-normalize-001] Ticket shaping
+  backchains necessary proof paths from observable outcomes, then normalizes
+  forward from current facts to remove orphan, duplicate, redundant, and
+  falsely serialized work before proposing the graph.
+
 ## Frontier
 
 These questions are currently unblocked:

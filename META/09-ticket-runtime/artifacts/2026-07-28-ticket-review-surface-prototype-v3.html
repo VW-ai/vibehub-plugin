@@ -1,0 +1,1854 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeHub Ticket Graph — Prototype 03</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #e8ecef;
+      --surface: rgba(248, 250, 251, 0.94);
+      --surface-solid: #f8fafb;
+      --ink: #242b31;
+      --muted: #68737c;
+      --quiet: #8a949c;
+      --line: rgba(95, 111, 123, 0.2);
+      --line-strong: rgba(83, 100, 112, 0.36);
+      --edge: #aeb9c0;
+      --edge-active: #596c79;
+      --selected: #526b7b;
+      --attention: #9b6b25;
+      --attention-soft: #f2e8d7;
+      --deviation: #a24d50;
+      --deviation-soft: #f2e0e1;
+      --shadow: 0 24px 70px rgba(45, 60, 71, 0.17), 0 3px 12px rgba(45, 60, 71, 0.08);
+      --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", "SF Mono", ui-monospace, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      overflow: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 72% 18%, rgba(255, 255, 255, 0.72), transparent 34%),
+        linear-gradient(145deg, #e3e8eb, var(--page) 52%, #e2e7ea);
+      font-family: var(--body);
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    textarea {
+      color: inherit;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid rgba(75, 101, 117, 0.55);
+      outline-offset: 2px;
+    }
+
+    .ambient-context {
+      position: fixed;
+      top: 28px;
+      left: 30px;
+      display: grid;
+      gap: 4px;
+      color: rgba(54, 65, 73, 0.58);
+      pointer-events: none;
+    }
+
+    .ambient-context strong {
+      font-size: 13px;
+      font-weight: 620;
+    }
+
+    .ambient-context span {
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .surface {
+      position: fixed;
+      z-index: 10;
+      right: 20px;
+      bottom: 20px;
+      width: 344px;
+      overflow: hidden;
+      border: 1px solid rgba(86, 102, 114, 0.21);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: 0 11px 34px rgba(45, 60, 71, 0.12);
+      backdrop-filter: blur(24px) saturate(115%);
+      transition: width 180ms ease, border-radius 180ms ease, box-shadow 180ms ease;
+    }
+
+    .surface.open {
+      width: min(1480px, calc(100vw - 32px));
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .signal {
+      position: relative;
+      z-index: 4;
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr) auto 16px;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      min-height: 52px;
+      padding: 8px 12px;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+
+    .signal:hover {
+      background: rgba(228, 233, 236, 0.48);
+    }
+
+    .signal-mark {
+      position: relative;
+      width: 15px;
+      height: 15px;
+      border: 1px solid rgba(67, 82, 92, 0.64);
+      border-radius: 5px;
+    }
+
+    .signal-mark::before,
+    .signal-mark::after {
+      position: absolute;
+      content: "";
+      height: 1px;
+      background: rgba(67, 82, 92, 0.64);
+      transform-origin: left center;
+    }
+
+    .signal-mark::before {
+      top: 4px;
+      left: 3px;
+      width: 8px;
+      transform: rotate(26deg);
+    }
+
+    .signal-mark::after {
+      top: 10px;
+      left: 3px;
+      width: 8px;
+      transform: rotate(-25deg);
+    }
+
+    .signal-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .signal-copy strong {
+      font-size: 13px;
+      font-weight: 640;
+    }
+
+    .signal-copy span {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 13px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .signal-attention {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      color: var(--attention);
+      font-size: 13px;
+      font-weight: 570;
+      white-space: nowrap;
+    }
+
+    .signal-attention::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--attention);
+      content: "";
+    }
+
+    .chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--quiet);
+      transition: transform 160ms ease;
+    }
+
+    .surface.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .sheet {
+      height: 0;
+      opacity: 0;
+      transition: height 190ms ease, opacity 120ms ease;
+    }
+
+    .surface.open .sheet {
+      height: min(850px, calc(100vh - 86px));
+      opacity: 1;
+    }
+
+    .sheet-inner {
+      position: relative;
+      display: grid;
+      grid-template-rows: 47px minmax(0, 1fr);
+      height: 100%;
+      border-top: 1px solid var(--line);
+    }
+
+    .toolbar {
+      position: relative;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: minmax(200px, 1fr) auto minmax(200px, 1fr);
+      gap: 14px;
+      align-items: center;
+      min-height: 47px;
+      padding: 0 12px 0 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(248, 250, 251, 0.76);
+    }
+
+    .toolbar-summary {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 13px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .view-switch {
+      display: inline-flex;
+      gap: 3px;
+      padding: 3px;
+      border-radius: 8px;
+      background: rgba(220, 226, 230, 0.58);
+    }
+
+    .view-button {
+      min-height: 27px;
+      padding: 4px 10px;
+      border: 0;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 560;
+    }
+
+    .view-button.active {
+      color: var(--ink);
+      background: rgba(250, 251, 252, 0.9);
+      box-shadow: 0 1px 3px rgba(53, 67, 77, 0.1);
+    }
+
+    .tool-row {
+      display: flex;
+      gap: 3px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .icon-button,
+    .fit-button {
+      display: inline-grid;
+      place-items: center;
+      min-width: 29px;
+      min-height: 29px;
+      padding: 0 7px;
+      border: 0;
+      border-radius: 7px;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .icon-button:hover,
+    .fit-button:hover,
+    .icon-button.active {
+      color: var(--ink);
+      background: rgba(219, 225, 229, 0.62);
+    }
+
+    .icon-button.active {
+      color: var(--attention);
+    }
+
+    .icon-button svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .fit-button {
+      font-size: 12px;
+      font-weight: 580;
+    }
+
+    .zoom-label {
+      min-width: 37px;
+      color: var(--quiet);
+      font-family: var(--mono);
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .content {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .graph-viewport {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background-color: rgba(238, 242, 244, 0.54);
+      background-image: radial-gradient(rgba(92, 108, 119, 0.19) 0.7px, transparent 0.8px);
+      background-position: 0 0;
+      background-size: 17px 17px;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .graph-viewport.dragging {
+      cursor: grabbing;
+    }
+
+    .graph-world {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1530px;
+      height: 860px;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    .deliverable-frame {
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(89, 105, 116, 0.2);
+      border-radius: 15px;
+      background: rgba(248, 250, 251, 0.2);
+      pointer-events: none;
+    }
+
+    .deliverable-ticket {
+      position: absolute;
+      z-index: 3;
+      top: 26px;
+      left: 28px;
+      display: inline-flex;
+      gap: 9px;
+      align-items: center;
+      padding: 5px 8px 5px 4px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      text-align: left;
+    }
+
+    .deliverable-ticket:hover {
+      background: rgba(221, 227, 230, 0.54);
+    }
+
+    .root-symbol {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .deliverable-copy {
+      display: grid;
+      gap: 1px;
+    }
+
+    .deliverable-copy strong {
+      font-size: 13px;
+      font-weight: 640;
+    }
+
+    .deliverable-copy span {
+      color: var(--quiet);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .direction-note {
+      position: absolute;
+      z-index: 2;
+      top: 37px;
+      right: 35px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--quiet);
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    .direction-note::after {
+      width: 42px;
+      height: 1px;
+      background: var(--line-strong);
+      box-shadow: 38px -2px 0 -1px var(--line-strong);
+      content: "";
+    }
+
+    .scenario-frame {
+      position: absolute;
+      z-index: 0;
+      left: 24px;
+      width: 1480px;
+      border-top: 1px solid rgba(92, 108, 119, 0.15);
+      border-bottom: 1px solid rgba(92, 108, 119, 0.1);
+      border-radius: 12px;
+      background: rgba(250, 251, 252, 0.27);
+      transition: opacity 110ms ease, background 110ms ease;
+      pointer-events: none;
+    }
+
+    .scenario-frame.path-active {
+      background: rgba(249, 251, 252, 0.56);
+    }
+
+    .scenario-label {
+      position: absolute;
+      z-index: 2;
+      left: 37px;
+      width: 126px;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+    }
+
+    .scenario-label:hover {
+      color: var(--ink);
+    }
+
+    .scenario-label strong,
+    .scenario-label span {
+      display: block;
+    }
+
+    .scenario-label strong {
+      margin-bottom: 3px;
+      font-size: 12px;
+      font-weight: 620;
+      line-height: 1.28;
+    }
+
+    .scenario-label span {
+      color: var(--quiet);
+      font-family: var(--mono);
+      font-size: 9px;
+    }
+
+    .edge-layer {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      width: 1530px;
+      height: 860px;
+      overflow: visible;
+    }
+
+    .edge-visible {
+      fill: none;
+      stroke: var(--edge);
+      stroke-linecap: round;
+      stroke-width: 1.35;
+      marker-end: url("#arrow");
+      transition: opacity 110ms ease, stroke 110ms ease, stroke-width 110ms ease;
+    }
+
+    .edge.cross .edge-visible {
+      opacity: 0.56;
+    }
+
+    .edge-hit {
+      fill: none;
+      stroke: transparent;
+      stroke-width: 12;
+      cursor: pointer;
+      pointer-events: stroke;
+    }
+
+    .edge:hover .edge-visible,
+    .edge.related .edge-visible,
+    .edge.selected .edge-visible {
+      stroke: var(--edge-active);
+      stroke-width: 2;
+      opacity: 1;
+    }
+
+    .graph-world.path-mode .edge:not(.related):not(.selected) .edge-visible {
+      opacity: 0.13;
+    }
+
+    .ticket-node {
+      position: absolute;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 15px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      width: 168px;
+      height: 57px;
+      padding: 7px 9px;
+      border: 1px solid rgba(90, 105, 116, 0.24);
+      border-radius: 9px;
+      background: rgba(249, 251, 252, 0.93);
+      box-shadow: 0 2px 7px rgba(43, 57, 67, 0.055);
+      text-align: left;
+      transition: opacity 110ms ease, border-color 110ms ease, box-shadow 110ms ease, transform 110ms ease;
+    }
+
+    .ticket-node:hover,
+    .ticket-node.related,
+    .ticket-node.selected {
+      border-color: rgba(74, 96, 110, 0.57);
+      box-shadow: 0 5px 15px rgba(43, 57, 67, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .ticket-node.selected {
+      box-shadow: 0 0 0 2px rgba(82, 107, 123, 0.17), 0 5px 15px rgba(43, 57, 67, 0.1);
+    }
+
+    .graph-world.path-mode .ticket-node:not(.related):not(.selected),
+    .graph-world.attention-mode .ticket-node:not(.human):not(.deviation) {
+      opacity: 0.2;
+    }
+
+    .ticket-node.outcome {
+      width: 180px;
+      height: 59px;
+      border-color: rgba(71, 91, 104, 0.4);
+      border-left-width: 2px;
+      background: rgba(245, 248, 249, 0.97);
+    }
+
+    .ticket-node.human {
+      border-color: rgba(155, 107, 37, 0.52);
+      background: rgba(248, 242, 231, 0.97);
+    }
+
+    .ticket-node.deviation {
+      border-color: rgba(162, 77, 80, 0.5);
+      background: rgba(248, 237, 238, 0.97);
+    }
+
+    .node-symbol {
+      position: relative;
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border: 1.5px solid #77848d;
+      border-radius: 50%;
+    }
+
+    .ticket-node.done .node-symbol {
+      border-color: #7c898f;
+      background: #7c898f;
+      box-shadow: inset 0 0 0 2px rgba(249, 251, 252, 0.88);
+    }
+
+    .ticket-node.running .node-symbol {
+      border-color: #5d7482;
+      border-width: 2px;
+      box-shadow: 0 0 0 3px rgba(93, 116, 130, 0.12);
+    }
+
+    .ticket-node.human .node-symbol {
+      border: 2px solid var(--attention);
+      border-radius: 2px;
+      transform: rotate(45deg);
+    }
+
+    .ticket-node.deviation .node-symbol {
+      border: 2px solid var(--deviation);
+      border-radius: 1px;
+      transform: rotate(45deg);
+    }
+
+    .ticket-node.outcome .node-symbol {
+      width: 11px;
+      height: 11px;
+      border: 3px double #657985;
+    }
+
+    .node-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .node-copy strong {
+      overflow: hidden;
+      display: -webkit-box;
+      font-size: 12px;
+      font-weight: 610;
+      line-height: 1.25;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .node-copy span {
+      overflow: hidden;
+      color: var(--quiet);
+      font-family: var(--mono);
+      font-size: 9px;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ticket-node.human .node-copy span {
+      color: var(--attention);
+      font-family: var(--body);
+      font-size: 11px;
+      font-weight: 590;
+    }
+
+    .ticket-node.deviation .node-copy span {
+      color: var(--deviation);
+      font-family: var(--body);
+      font-size: 11px;
+      font-weight: 590;
+    }
+
+    .overview {
+      position: absolute;
+      inset: 0;
+      display: none;
+      overflow: auto;
+      padding: 18px 22px 120px;
+      background: rgba(240, 244, 246, 0.68);
+    }
+
+    .overview.active {
+      display: block;
+    }
+
+    .overview-table {
+      min-width: 1090px;
+      border-top: 1px solid var(--line);
+    }
+
+    .overview-header,
+    .overview-row {
+      display: grid;
+      grid-template-columns: 190px repeat(6, minmax(130px, 1fr));
+      gap: 10px;
+      align-items: center;
+    }
+
+    .overview-header {
+      min-height: 36px;
+      color: var(--quiet);
+      font-size: 11px;
+    }
+
+    .overview-row {
+      min-height: 92px;
+      border-top: 1px solid rgba(95, 111, 123, 0.14);
+    }
+
+    .overview-scenario {
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+
+    .overview-scenario strong,
+    .overview-scenario span {
+      display: block;
+    }
+
+    .overview-scenario strong {
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 620;
+    }
+
+    .overview-scenario span {
+      color: var(--quiet);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .overview-cell {
+      display: grid;
+      gap: 5px;
+      align-content: center;
+      min-height: 62px;
+    }
+
+    .overview-node {
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr);
+      gap: 7px;
+      align-items: center;
+      width: 100%;
+      min-height: 32px;
+      padding: 5px 7px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      text-align: left;
+    }
+
+    .overview-node:hover,
+    .overview-node.selected {
+      background: rgba(221, 227, 230, 0.66);
+    }
+
+    .overview-node.human {
+      color: var(--attention);
+      background: rgba(242, 232, 215, 0.6);
+    }
+
+    .overview-node.deviation {
+      color: var(--deviation);
+      background: rgba(242, 224, 225, 0.65);
+    }
+
+    .overview-node i {
+      width: 6px;
+      height: 6px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .overview-node span {
+      overflow: hidden;
+      font-size: 12px;
+      font-weight: 560;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .detail-sheet {
+      position: absolute;
+      z-index: 8;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.75fr) minmax(300px, 0.8fr);
+      min-height: 0;
+      max-height: 0;
+      overflow: hidden;
+      border-top: 1px solid var(--line);
+      background: rgba(249, 250, 251, 0.97);
+      box-shadow: 0 -14px 38px rgba(48, 62, 72, 0.1);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: max-height 180ms ease, opacity 130ms ease, transform 180ms ease;
+    }
+
+    .detail-sheet.open {
+      min-height: 188px;
+      max-height: 230px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .detail-main {
+      display: grid;
+      align-content: start;
+      gap: 9px;
+      padding: 17px 20px;
+    }
+
+    .detail-heading {
+      display: flex;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .detail-kicker {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .detail-kicker i {
+      width: 7px;
+      height: 7px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .detail-kicker.attention {
+      color: var(--attention);
+      font-family: var(--body);
+      font-size: 12px;
+    }
+
+    .detail-kicker.deviation {
+      color: var(--deviation);
+      font-family: var(--body);
+      font-size: 12px;
+    }
+
+    .detail-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 650;
+      line-height: 1.3;
+    }
+
+    .detail-outcome {
+      max-width: 840px;
+      margin: 0;
+      color: #59646c;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .relation-summary {
+      color: var(--quiet);
+      font-size: 12px;
+    }
+
+    .trace-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 15px;
+      align-items: center;
+    }
+
+    .trace-action {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 2px 0;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      font-size: 12px;
+    }
+
+    .trace-action:hover {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .trace-action svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .detail-interact {
+      display: grid;
+      align-content: start;
+      gap: 9px;
+      padding: 17px 18px;
+      border-left: 1px solid var(--line);
+    }
+
+    .detail-interact label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .comment-box {
+      width: 100%;
+      min-height: 62px;
+      padding: 8px 9px;
+      resize: none;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(238, 242, 244, 0.7);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 7px;
+      justify-content: flex-end;
+    }
+
+    .text-button {
+      min-height: 29px;
+      padding: 4px 9px;
+      border: 0;
+      border-radius: 7px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 12px;
+      font-weight: 580;
+    }
+
+    .text-button:hover {
+      color: var(--ink);
+      background: rgba(218, 224, 228, 0.56);
+    }
+
+    .text-button.primary {
+      color: white;
+      background: var(--ink);
+    }
+
+    .edit-fields {
+      display: none;
+      gap: 7px;
+    }
+
+    .detail-sheet.editing .edit-fields {
+      display: grid;
+    }
+
+    .detail-sheet.editing .comment-mode {
+      display: none;
+    }
+
+    .edit-fields input,
+    .edit-fields textarea {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(238, 242, 244, 0.7);
+      font-size: 12px;
+    }
+
+    .edit-fields textarea {
+      min-height: 62px;
+      resize: none;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 30;
+      right: 28px;
+      bottom: 84px;
+      max-width: 340px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: var(--surface-solid);
+      background: rgba(36, 42, 48, 0.92);
+      box-shadow: 0 10px 28px rgba(36, 48, 58, 0.18);
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(7px);
+      transition: opacity 130ms ease, transform 130ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 780px) {
+      .ambient-context {
+        top: 17px;
+        left: 17px;
+      }
+
+      .surface,
+      .surface.open {
+        right: 8px;
+        bottom: 8px;
+        width: calc(100vw - 16px);
+      }
+
+      .surface.open .sheet {
+        height: calc(100vh - 69px);
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr auto;
+      }
+
+      .toolbar-summary,
+      .zoom-label,
+      #zoomOut,
+      #zoomIn {
+        display: none;
+      }
+
+      .view-switch {
+        justify-self: start;
+      }
+
+      .detail-sheet {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-sheet.open {
+        max-height: 440px;
+        overflow-y: auto;
+      }
+
+      .detail-interact {
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-context" aria-hidden="true">
+    <strong>VibeHub · Ticket Runtime</strong>
+    <span>codex/ticket-runtime-wayfind</span>
+  </div>
+
+  <section class="surface" id="surface" aria-label="Ticket graph signal">
+    <button class="signal" id="surfaceToggle" aria-expanded="false" aria-controls="ticketSheet">
+      <span class="signal-mark" aria-hidden="true"></span>
+      <span class="signal-copy">
+        <strong>Ticket graph</strong>
+        <span>5 outcomes · 29 tickets</span>
+      </span>
+      <span class="signal-attention">2 need you</span>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="m5 12 5-5 5 5"/>
+      </svg>
+    </button>
+
+    <div class="sheet" id="ticketSheet">
+      <div class="sheet-inner">
+        <div class="toolbar">
+          <span class="toolbar-summary">Direct dependencies, with outcome containment kept spatial.</span>
+          <div class="view-switch" aria-label="Ticket graph view">
+            <button class="view-button active" data-view="graph">Graph</button>
+            <button class="view-button" data-view="overview">Overview</button>
+          </div>
+          <div class="tool-row">
+            <button class="icon-button" id="attentionToggle" aria-label="Focus tickets that need attention" title="Focus attention">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <circle cx="12" cy="12" r="8"/>
+                <path d="M12 7v6M12 16.5v.5"/>
+              </svg>
+            </button>
+            <button class="icon-button" id="copyView" aria-label="Copy view link" title="Copy view link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="8" y="8" width="11" height="11" rx="2"/>
+                <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+              </svg>
+            </button>
+            <button class="icon-button" id="zoomOut" aria-label="Zoom out" title="Zoom out">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path d="M6 12h12"/>
+              </svg>
+            </button>
+            <span class="zoom-label" id="zoomLabel">100%</span>
+            <button class="icon-button" id="zoomIn" aria-label="Zoom in" title="Zoom in">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path d="M12 6v12M6 12h12"/>
+              </svg>
+            </button>
+            <button class="fit-button" id="fitGraph" type="button">Fit</button>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="graph-viewport" id="graphViewport" aria-label="Interactive Ticket dependency graph">
+            <div class="graph-world" id="graphWorld">
+              <div class="deliverable-frame"></div>
+              <button class="deliverable-ticket" id="deliverableTicket" type="button">
+                <span class="root-symbol">D</span>
+                <span class="deliverable-copy">
+                  <strong>Ship the Ticket orchestration loop</strong>
+                  <span>DEL-01 · top-level outcome</span>
+                </span>
+              </button>
+              <span class="direction-note">current facts toward outcomes</span>
+              <div id="scenarioFrames"></div>
+              <svg class="edge-layer" id="edgeLayer" viewBox="0 0 1530 860" aria-label="Ticket dependencies">
+                <defs>
+                  <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                    <path d="M0 0 8 4 0 8Z" fill="#aeb9c0"></path>
+                  </marker>
+                </defs>
+              </svg>
+              <div id="graphNodes"></div>
+            </div>
+          </div>
+
+          <section class="overview" id="overview" aria-label="Ticket overview">
+            <div class="overview-table">
+              <div class="overview-header" aria-hidden="true">
+                <span>Outcome</span>
+                <span>Discover</span>
+                <span>Plan</span>
+                <span>Build</span>
+                <span>Verify</span>
+                <span>Close</span>
+                <span>Scenario outcome</span>
+              </div>
+              <div id="overviewRows"></div>
+            </div>
+          </section>
+
+          <section class="detail-sheet" id="detailSheet" aria-live="polite">
+            <div class="detail-main">
+              <div class="detail-heading">
+                <div>
+                  <div class="detail-kicker" id="detailKicker"><i></i><span>TKT-108 · In progress</span></div>
+                  <h2 class="detail-title" id="detailTitle">Normalize the graph forward</h2>
+                </div>
+                <button class="icon-button" id="closeDetail" aria-label="Close detail" title="Close detail">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <path d="m7 7 10 10M17 7 7 17"/>
+                  </svg>
+                </button>
+              </div>
+              <p class="detail-outcome" id="detailOutcome">Every proposed Ticket is reachable, necessary, correctly related, and contributes to an observable scenario outcome.</p>
+              <div class="relation-summary" id="relationSummary">Parent SCN-01 · 1 prerequisite · unlocks 1 Ticket</div>
+              <div class="trace-row">
+                <button class="trace-action" id="copyTicket">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7.1l-1.1 1"/>
+                    <path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7.1l1.1-1"/>
+                  </svg>
+                  Copy link
+                </button>
+                <button class="trace-action" id="evidenceButton">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <path d="M5 4h10l4 4v12H5z"/>
+                    <path d="M15 4v5h4M8 13h8M8 16h6"/>
+                  </svg>
+                  <span id="evidenceLabel">2 evidence items</span>
+                </button>
+                <button class="trace-action" id="commitButton">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M3 12h6M15 12h6"/>
+                  </svg>
+                  <span id="commitLabel">commit 2c61248</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="detail-interact">
+              <div class="comment-mode">
+                <label for="commentInput" id="commentLabel">Comment on this Ticket</label>
+                <textarea class="comment-box" id="commentInput" placeholder="What should change?"></textarea>
+                <div class="detail-actions">
+                  <button class="text-button" id="editButton" type="button">Suggest edit</button>
+                  <button class="text-button primary" id="commentButton" type="button">Add comment</button>
+                </div>
+              </div>
+              <div class="edit-fields">
+                <input id="editTitle" aria-label="Proposed Ticket title">
+                <textarea id="editOutcome" aria-label="Proposed Ticket outcome"></textarea>
+                <div class="detail-actions">
+                  <button class="text-button" id="cancelEdit" type="button">Cancel</button>
+                  <button class="text-button primary" id="saveEdit" type="button">Propose change</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const WORLD_WIDTH = 1530;
+    const WORLD_HEIGHT = 860;
+    const phaseOrder = ["discover", "plan", "build", "verify", "close", "outcome"];
+    const initialHash = location.hash;
+
+    const scenarios = [
+      {
+        id: "SCN-01",
+        title: "A human can trust the plan",
+        y: 82,
+        height: 118,
+        tickets: [
+          { id: "TKT-104", x: 184, y: 126, title: "Name core scenarios", state: "done", phase: "discover", outcome: "The intended change is expressed as observable situations and outcomes rather than one static task description." },
+          { id: "TKT-106", x: 394, y: 126, title: "Backchain from outcomes", state: "done", phase: "plan", outcome: "Necessary facts, results, and decisions are synthesized backward from each scenario acceptance." },
+          { id: "TKT-108", x: 604, y: 126, title: "Normalize graph forward", state: "running", phase: "plan", outcome: "The proposed graph is reachable, necessary, de-duplicated, and correctly related when read from current facts." },
+          { id: "TKT-107", x: 814, y: 126, title: "Review or delegate", state: "human", phase: "plan", outcome: "The scenario plan receives human review or bounded delegation before execution begins." },
+          { id: "SCN-01", x: 1284, y: 123, title: "Plan is understandable", state: "blocked", phase: "outcome", kind: "outcome", outcome: "A person can see every necessary path, its decisions, and why each Ticket contributes to the deliverable." }
+        ]
+      },
+      {
+        id: "SCN-02",
+        title: "The Agent keeps moving",
+        y: 222,
+        height: 118,
+        tickets: [
+          { id: "TKT-120", x: 184, y: 266, title: "Bind agreed context", state: "done", phase: "discover", outcome: "The Agent receives relevant constraints and knowledge without one giant frozen prompt." },
+          { id: "TKT-122", x: 394, y: 266, title: "Choose ready work", state: "done", phase: "plan", outcome: "The next Ticket is selected from current dependencies, facts, and delegated authority." },
+          { id: "TKT-124", x: 604, y: 266, title: "Implement domain work", state: "running", phase: "build", outcome: "The Agent uses native tools and domain intelligence to produce the intended result." },
+          { id: "TKT-126", x: 814, y: 266, title: "Verify the result", state: "ready", phase: "verify", outcome: "Independent verification checks the result against observable acceptance." },
+          { id: "TKT-128", x: 1024, y: 266, title: "Tend the graph", state: "waiting", phase: "close", outcome: "Execution learning updates bounded follow-up work without changing the approved boundary." },
+          { id: "SCN-02", x: 1284, y: 263, title: "Agent progresses safely", state: "running", phase: "outcome", kind: "outcome", outcome: "Unblocked work progresses autonomously until a genuine authority or decision boundary is reached." }
+        ]
+      },
+      {
+        id: "SCN-03",
+        title: "Human decisions stay in place",
+        y: 362,
+        height: 138,
+        tickets: [
+          { id: "TKT-140", x: 184, y: 406, title: "Detect experience boundary", state: "done", phase: "discover", outcome: "The Agent recognizes that a choice would change the human-authorized experience." },
+          { id: "DEC-12", x: 394, y: 406, title: "Choose review hierarchy", state: "human", phase: "plan", outcome: "Choose how people understand and approve the Ticket workflow without turning it into a dashboard." },
+          { id: "TKT-143", x: 674, y: 382, title: "Replan affected path", state: "blocked", phase: "build", outcome: "The selected direction becomes a revised, executable dependency path." },
+          { id: "TKT-144", x: 674, y: 448, title: "Continue unaffected work", state: "running", phase: "build", outcome: "Independent delegated work keeps moving while the decision branch waits." },
+          { id: "SCN-03", x: 1284, y: 405, title: "Decisions route correctly", state: "blocked", phase: "outcome", kind: "outcome", outcome: "Human-owned choices block only the affected branch and resume it with explicit authority." }
+        ]
+      },
+      {
+        id: "SCN-04",
+        title: "Architecture drift is contained",
+        y: 522,
+        height: 118,
+        tickets: [
+          { id: "TKT-160", x: 184, y: 566, title: "Read governing principles", state: "done", phase: "discover", outcome: "The implementation is compared with the agreed Core-owned architecture." },
+          { id: "TKT-162", x: 394, y: 566, title: "Trace state writers", state: "done", phase: "build", outcome: "Evidence identifies every component writing canonical Ticket facts." },
+          { id: "DEV-03", x: 604, y: 566, title: "Resolve a second writer", state: "deviation", phase: "build", outcome: "Restore one canonical writer or explicitly revise the architecture principle." },
+          { id: "TKT-165", x: 814, y: 566, title: "Run parity checks", state: "ready", phase: "verify", outcome: "CLI, MCP, and direct Core behavior remain semantically identical." },
+          { id: "TKT-166", x: 1024, y: 566, title: "Record the resolution", state: "waiting", phase: "close", outcome: "The accepted correction or principle change remains traceable." },
+          { id: "SCN-04", x: 1284, y: 563, title: "Architecture stays coherent", state: "blocked", phase: "outcome", kind: "outcome", outcome: "A material deviation becomes visible and is resolved before the affected path closes." }
+        ]
+      },
+      {
+        id: "SCN-05",
+        title: "Work closes with evidence",
+        y: 662,
+        height: 118,
+        tickets: [
+          { id: "TKT-180", x: 184, y: 706, title: "Gather artifacts", state: "running", phase: "build", outcome: "The Run preserves the artifacts needed to evaluate its result." },
+          { id: "TKT-181", x: 394, y: 706, title: "Bind evidence", state: "ready", phase: "verify", outcome: "Each accepted outcome points to inspectable evidence." },
+          { id: "TKT-182", x: 604, y: 706, title: "Review the outcome", state: "ready", phase: "verify", outcome: "The result is independently assessed as proven, partial, or failed." },
+          { id: "TKT-184", x: 814, y: 706, title: "Record what happened", state: "waiting", phase: "close", outcome: "Durable facts support completion without a writable status declaration." },
+          { id: "TKT-185", x: 1024, y: 706, title: "Propose follow-up work", state: "waiting", phase: "close", outcome: "New learning becomes bounded follow-up Tickets or a closeout proposal." },
+          { id: "SCN-05", x: 1284, y: 703, title: "Outcome is proven", state: "waiting", phase: "outcome", kind: "outcome", outcome: "Completion is derived from accepted evidence and any remaining work is explicit." }
+        ]
+      }
+    ];
+
+    const rootTicket = {
+      id: "DEL-01",
+      title: "Ship the Ticket orchestration loop",
+      state: "running",
+      kind: "root",
+      outcome: "Durable intent compiles into a reviewable, executable, and evidence-backed Ticket Graph.",
+      parent: null,
+      evidence: 7,
+      commit: "2c61248"
+    };
+
+    const edges = [
+      { from: "TKT-104", to: "TKT-106", reason: "Named scenario outcomes are required before their acceptance can be backchained." },
+      { from: "TKT-106", to: "TKT-108", reason: "Backward synthesis must exist before the graph can be normalized from current facts." },
+      { from: "TKT-108", to: "TKT-107", reason: "The human reviews or delegates the cleaned graph, not an unnormalized path hypothesis." },
+      { from: "TKT-107", to: "SCN-01", reason: "Review or explicit delegation supplies authority for the scenario plan." },
+      { from: "TKT-120", to: "TKT-122", reason: "Ready work can be selected only after the current context is bound." },
+      { from: "TKT-122", to: "TKT-124", reason: "The selected READY Ticket supplies the bounded execution contract." },
+      { from: "TKT-124", to: "TKT-126", reason: "Verification evaluates the artifact and evidence produced by execution." },
+      { from: "TKT-126", to: "TKT-128", reason: "Graph tending uses verified execution learning rather than raw activity." },
+      { from: "TKT-128", to: "SCN-02", reason: "The loop progresses safely when execution learning is reflected in the graph." },
+      { from: "TKT-107", to: "TKT-122", cross: true, reason: "The approved or delegated plan unlocks scheduling of ready work." },
+      { from: "TKT-140", to: "DEC-12", reason: "Crossing the experience boundary requires an explicit human-owned decision." },
+      { from: "DEC-12", to: "TKT-143", reason: "The affected path cannot be replanned until the decision has authority." },
+      { from: "TKT-140", to: "TKT-144", reason: "Unaffected delegated work may continue after the boundary is isolated." },
+      { from: "TKT-143", to: "SCN-03", reason: "The affected branch must reflect the authorized direction." },
+      { from: "TKT-144", to: "SCN-03", reason: "Unrelated work contributes without waiting on the blocked branch." },
+      { from: "TKT-160", to: "TKT-162", reason: "The governing principle defines which state writes need tracing." },
+      { from: "TKT-162", to: "DEV-03", reason: "The trace provides evidence of the second canonical writer." },
+      { from: "DEV-03", to: "TKT-165", reason: "Parity is meaningful only after the deviation is corrected or authorized." },
+      { from: "TKT-165", to: "TKT-166", reason: "The resolution is recorded after parity is proven." },
+      { from: "TKT-166", to: "SCN-04", reason: "Traceable resolution proves the architecture branch is coherent." },
+      { from: "TKT-180", to: "TKT-181", reason: "Evidence binding needs concrete artifacts from the Run." },
+      { from: "TKT-181", to: "TKT-182", reason: "Outcome review adjudicates evidence already bound to acceptance." },
+      { from: "TKT-182", to: "TKT-184", reason: "The durable outcome records the independent review result." },
+      { from: "TKT-184", to: "TKT-185", reason: "Follow-up work is proposed from the recorded outcome and residual gaps." },
+      { from: "TKT-185", to: "SCN-05", reason: "The scenario closes when the outcome and any residual work are explicit." },
+      { from: "TKT-124", to: "TKT-180", cross: true, reason: "Execution artifacts feed the evidence closeout path." },
+      { from: "TKT-126", to: "TKT-182", cross: true, reason: "Verification findings are inputs to semantic outcome review." },
+      { from: "TKT-128", to: "TKT-185", cross: true, reason: "Graph tending and closeout reconcile the same bounded follow-up work." }
+    ];
+
+    const surface = document.querySelector("#surface");
+    const surfaceToggle = document.querySelector("#surfaceToggle");
+    const graphViewport = document.querySelector("#graphViewport");
+    const graphWorld = document.querySelector("#graphWorld");
+    const edgeLayer = document.querySelector("#edgeLayer");
+    const graphNodes = document.querySelector("#graphNodes");
+    const scenarioFrames = document.querySelector("#scenarioFrames");
+    const overview = document.querySelector("#overview");
+    const overviewRows = document.querySelector("#overviewRows");
+    const detailSheet = document.querySelector("#detailSheet");
+    const detailKicker = document.querySelector("#detailKicker");
+    const detailTitle = document.querySelector("#detailTitle");
+    const detailOutcome = document.querySelector("#detailOutcome");
+    const relationSummary = document.querySelector("#relationSummary");
+    const editTitle = document.querySelector("#editTitle");
+    const editOutcome = document.querySelector("#editOutcome");
+    const commentLabel = document.querySelector("#commentLabel");
+    const toast = document.querySelector("#toast");
+    const zoomLabel = document.querySelector("#zoomLabel");
+
+    const tickets = scenarios.flatMap((scenario) =>
+      scenario.tickets.map((ticket) => ({
+        ...ticket,
+        parent: ticket.kind === "outcome" ? "DEL-01" : scenario.id,
+        scenario: scenario.id,
+        evidence: ticket.kind === "outcome" ? 4 : Math.max(1, (ticket.id.length + ticket.title.length) % 4),
+        commit: ticket.state === "done" ? "4942462" : "2c61248"
+      }))
+    );
+
+    let currentView = "graph";
+    let selectedId = null;
+    let selectedEdge = null;
+    let attentionMode = false;
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let dragStart = null;
+    let toastTimer;
+
+    function ticketById(id) {
+      if (id === rootTicket.id) return rootTicket;
+      return tickets.find((ticket) => ticket.id === id);
+    }
+
+    function stateCopy(ticket) {
+      if (ticket.state === "human") return "Needs your decision";
+      if (ticket.state === "deviation") return "Deviation";
+      if (ticket.kind === "outcome") return "Scenario outcome";
+      if (ticket.kind === "root") return "Top-level outcome";
+      if (ticket.state === "done") return "Done";
+      if (ticket.state === "running") return "In progress";
+      if (ticket.state === "ready") return "Ready";
+      if (ticket.state === "blocked") return "Blocked";
+      return "Waiting";
+    }
+
+    function setOpen(open) {
+      surface.classList.toggle("open", open);
+      surfaceToggle.setAttribute("aria-expanded", String(open));
+      if (open) {
+        requestAnimationFrame(() => {
+          if (currentView === "graph") fitGraph();
+        });
+      } else {
+        closeDetail();
+      }
+      syncHash();
+    }
+
+    function syncHash() {
+      if (!surface.classList.contains("open")) {
+        history.replaceState(null, "", location.pathname);
+        return;
+      }
+      const params = new URLSearchParams();
+      params.set("view", currentView);
+      if (selectedId) params.set("ticket", selectedId);
+      if (selectedEdge !== null) params.set("relation", String(selectedEdge));
+      history.replaceState(null, "", `#${params.toString()}`);
+    }
+
+    function renderFrames() {
+      scenarioFrames.innerHTML = scenarios.map((scenario) => `
+        <div
+          class="scenario-frame"
+          data-frame="${scenario.id}"
+          style="top:${scenario.y}px;height:${scenario.height}px"
+        ></div>
+        <button
+          class="scenario-label"
+          data-scenario="${scenario.id}"
+          style="top:${scenario.y + 31}px"
+          type="button"
+          aria-label="Focus ${scenario.title}"
+        >
+          <strong>${scenario.title}</strong>
+          <span>${scenario.id} · outcome Ticket</span>
+        </button>
+      `).join("");
+
+      document.querySelectorAll("[data-scenario]").forEach((button) => {
+        button.addEventListener("mouseenter", () => highlightScenario(button.dataset.scenario));
+        button.addEventListener("mouseleave", restoreHighlight);
+        button.addEventListener("click", () => selectTicket(button.dataset.scenario));
+      });
+    }
+
+    function renderNodes() {
+      graphNodes.innerHTML = tickets.map((ticket) => `
+        <button
+          class="ticket-node ${ticket.state} ${ticket.kind || ""}"
+          data-ticket="${ticket.id}"
+          style="left:${ticket.x}px;top:${ticket.y}px"
+          type="button"
+          aria-label="${ticket.title}, ${stateCopy(ticket)}"
+        >
+          <span class="node-symbol" aria-hidden="true"></span>
+          <span class="node-copy">
+            <strong>${ticket.title}</strong>
+            <span>${ticket.state === "human" || ticket.state === "deviation" ? stateCopy(ticket) : ticket.id}</span>
+          </span>
+        </button>
+      `).join("");
+
+      document.querySelectorAll(".ticket-node").forEach((node) => {
+        node.addEventListener("mouseenter", () => highlightPath(node.dataset.ticket));
+        node.addEventListener("mouseleave", restoreHighlight);
+        node.addEventListener("click", () => selectTicket(node.dataset.ticket));
+      });
+    }
+
+    function nodeAnchor(id, side) {
+      const node = document.querySelector(`.ticket-node[data-ticket="${id}"]`);
+      const ticket = ticketById(id);
+      if (!node || !ticket) return { x: 0, y: 0 };
+      const width = ticket.kind === "outcome" ? 180 : 168;
+      const height = ticket.kind === "outcome" ? 59 : 57;
+      return {
+        x: ticket.x + (side === "right" ? width : 0),
+        y: ticket.y + height / 2
+      };
+    }
+
+    function edgePath(edge) {
+      const start = nodeAnchor(edge.from, "right");
+      const end = nodeAnchor(edge.to, "left");
+      const distance = Math.max(38, Math.abs(end.x - start.x) * 0.48);
+      const c1x = start.x + distance;
+      const c2x = end.x - distance;
+      return `M ${start.x} ${start.y} C ${c1x} ${start.y}, ${c2x} ${end.y}, ${end.x} ${end.y}`;
+    }
+
+    function renderEdges() {
+      const defs = edgeLayer.querySelector("defs").outerHTML;
+      edgeLayer.innerHTML = defs + edges.map((edge, index) => {
+        const path = edgePath(edge);
+        return `
+          <g class="edge ${edge.cross ? "cross" : ""}" data-edge="${index}">
+            <path class="edge-visible" d="${path}"></path>
+            <path class="edge-hit" d="${path}" tabindex="0" role="button" aria-label="${edge.from} unlocks ${edge.to}"></path>
+          </g>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".edge").forEach((group) => {
+        const open = () => selectRelation(Number(group.dataset.edge));
+        group.addEventListener("mouseenter", () => {
+          const edge = edges[Number(group.dataset.edge)];
+          highlightPair(edge.from, edge.to, Number(group.dataset.edge));
+        });
+        group.addEventListener("mouseleave", restoreHighlight);
+        group.addEventListener("click", open);
+        group.querySelector(".edge-hit").addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            open();
+          }
+        });
+      });
+    }
+
+    function renderOverview() {
+      overviewRows.innerHTML = scenarios.map((scenario) => {
+        const cells = phaseOrder.map((phase) => {
+          const matches = scenario.tickets.filter((ticket) => ticket.phase === phase);
+          return `
+            <div class="overview-cell">
+              ${matches.map((ticket) => `
+                <button class="overview-node ${ticket.state}" data-overview-ticket="${ticket.id}" type="button">
+                  <i aria-hidden="true"></i>
+                  <span>${ticket.title}</span>
+                </button>
+              `).join("")}
+            </div>
+          `;
+        }).join("");
+        return `
+          <div class="overview-row">
+            <button class="overview-scenario" data-overview-ticket="${scenario.id}" type="button">
+              <strong>${scenario.title}</strong>
+              <span>${scenario.id}</span>
+            </button>
+            ${cells}
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-overview-ticket]").forEach((button) => {
+        button.addEventListener("click", () => selectTicket(button.dataset.overviewTicket));
+      });
+    }
+
+    function ancestorsAndDescendants(id) {
+      const relatedNodes = new Set([id]);
+      const relatedEdges = new Set();
+      const upstreamQueue = [id];
+      const downstreamQueue = [id];
+      const visitedUpstream = new Set([id]);
+      const visitedDownstream = new Set([id]);
+
+      while (upstreamQueue.length) {
+        const current = upstreamQueue.shift();
+        edges.forEach((edge, index) => {
+          if (edge.to !== current) return;
+          relatedNodes.add(edge.from);
+          relatedEdges.add(index);
+          if (!visitedUpstream.has(edge.from)) {
+            visitedUpstream.add(edge.from);
+            upstreamQueue.push(edge.from);
+          }
+        });
+      }
+
+      while (downstreamQueue.length) {
+        const current = downstreamQueue.shift();
+        edges.forEach((edge, index) => {
+          if (edge.from !== current) return;
+          relatedNodes.add(edge.to);
+          relatedEdges.add(index);
+          if (!visitedDownstream.has(edge.to)) {
+            visitedDownstream.add(edge.to);
+            downstreamQueue.push(edge.to);
+          }
+        });
+      }
+
+      return { relatedNodes, relatedEdges };
+    }
+
+    function applyHighlight(relatedNodes, relatedEdges) {
+      graphWorld.classList.add("path-mode");
+      document.querySelectorAll(".ticket-node").forEach((node) => {
+        node.classList.toggle("related", relatedNodes.has(node.dataset.ticket));
+      });
+      document.querySelectorAll(".edge").forEach((edge) => {
+        edge.classList.toggle("related", relatedEdges.has(Number(edge.dataset.edge)));
+      });
+      scenarios.forEach((scenario) => {
+        const active = scenario.tickets.some((ticket) => relatedNodes.has(ticket.id));
+        document.querySelector(`[data-frame="${scenario.id}"]`)?.classList.toggle("path-active", active);
+      });
+    }
+
+    function highlightPath(id) {
+      const path = ancestorsAndDescendants(id);
+      applyHighlight(path.relatedNodes, path.relatedEdges);
+    }
+
+    function highlightScenario(id) {
+      const scenario = scenarios.find((item) => item.id === id);
+      if (!scenario) return;
+      const nodes = new Set(scenario.tickets.map((ticket) => ticket.id));
+      const edgeIds = new Set();
+      edges.forEach((edge, index) => {
+        if (nodes.has(edge.from) && nodes.has(edge.to)) edgeIds.add(index);
+      });
+      applyHighlight(nodes, edgeIds);
+    }
+
+    function highlightPair(from, to, edgeIndex) {
+      applyHighlight(new Set([from, to]), new Set([edgeIndex]));
+    }
+
+    function restoreHighlight() {
+      if (selectedId) {
+        highlightPath(selectedId);
+        return;
+      }
+      if (selectedEdge !== null) {
+        const edge = edges[selectedEdge];
+        highlightPair(edge.from, edge.to, selectedEdge);
+        return;
+      }
+      graphWorld.classList.remove("path-mode");
+      document.querySelectorAll(".related").forEach((item) => item.classList.remove("related"));
+      document.querySelectorAll(".scenario-frame").forEach((frame) => frame.classList.remove("path-active"));
+    }
+
+    function selectTicket(id) {
+      const ticket = ticketById(id);
+      if (!ticket) return;
+      if (selectedId === id && detailSheet.classList.contains("open")) {
+        closeDetail();
+        return;
+      }
+
+      selectedId = id;
+      selectedEdge = null;
+      detailSheet.classList.remove("editing");
+      document.querySelectorAll(".ticket-node").forEach((node) => {
+        node.classList.toggle("selected", node.dataset.ticket === id);
+      });
+      document.querySelectorAll(".overview-node, .overview-scenario").forEach((node) => {
+        node.classList.toggle("selected", node.dataset.overviewTicket === id);
+      });
+      document.querySelectorAll(".edge").forEach((edge) => edge.classList.remove("selected"));
+
+      detailKicker.className = "detail-kicker";
+      if (ticket.state === "human") detailKicker.classList.add("attention");
+      if (ticket.state === "deviation") detailKicker.classList.add("deviation");
+      detailKicker.querySelector("span").textContent = `${ticket.id} · ${stateCopy(ticket)}`;
+      detailTitle.textContent = ticket.title;
+      detailOutcome.textContent = ticket.outcome;
+
+      const inbound = edges.filter((edge) => edge.to === id).length;
+      const outbound = edges.filter((edge) => edge.from === id).length;
+      const parentCopy = ticket.parent ? `Parent ${ticket.parent}` : "Explicit top-level Ticket";
+      relationSummary.textContent = `${parentCopy} · ${inbound} prerequisite${inbound === 1 ? "" : "s"} · unlocks ${outbound} Ticket${outbound === 1 ? "" : "s"}`;
+      document.querySelector("#evidenceLabel").textContent = `${ticket.evidence || 0} evidence item${ticket.evidence === 1 ? "" : "s"}`;
+      document.querySelector("#commitLabel").textContent = `commit ${ticket.commit || "2c61248"}`;
+      commentLabel.textContent = "Comment on this Ticket";
+      editTitle.value = ticket.title;
+      editOutcome.value = ticket.outcome;
+      document.querySelector("#editButton").hidden = false;
+      detailSheet.classList.add("open");
+      highlightPath(id);
+      syncHash();
+    }
+
+    function selectRelation(index) {
+      const edge = edges[index];
+      selectedEdge = index;
+      selectedId = null;
+      detailSheet.classList.remove("editing");
+      document.querySelectorAll(".ticket-node, .overview-node, .overview-scenario").forEach((node) => node.classList.remove("selected"));
+      document.querySelectorAll(".edge").forEach((group) => {
+        group.classList.toggle("selected", Number(group.dataset.edge) === index);
+      });
+
+      detailKicker.className = "detail-kicker";
+      detailKicker.querySelector("span").textContent = `DIRECT DEPENDENCY · ${edge.from} → ${edge.to}`;
+      detailTitle.textContent = "Why this connection exists";
+      detailOutcome.textContent = edge.reason;
+      relationSummary.textContent = "Prerequisite → dependent · canonical direct edge · not a layout line";
+      document.querySelector("#evidenceLabel").textContent = "Relation rationale";
+      document.querySelector("#commitLabel").textContent = "Graph revision 7";
+      commentLabel.textContent = "Comment on this relation";
+      document.querySelector("#editButton").hidden = true;
+      detailSheet.classList.add("open");
+      highlightPair(edge.from, edge.to, index);
+      syncHash();
+    }
+
+    function closeDetail() {
+      selectedId = null;
+      selectedEdge = null;
+      detailSheet.classList.remove("open", "editing");
+      document.querySelectorAll(".selected, .related").forEach((item) => item.classList.remove("selected", "related"));
+      document.querySelectorAll(".scenario-frame").forEach((frame) => frame.classList.remove("path-active"));
+      graphWorld.classList.remove("path-mode");
+      syncHash();
+    }
+
+    function setView(view) {
+      currentView = view;
+      document.querySelectorAll("[data-view]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === view);
+      });
+      graphViewport.style.display = view === "graph" ? "block" : "none";
+      overview.classList.toggle("active", view === "overview");
+      document.querySelector("#zoomOut").disabled = view !== "graph";
+      document.querySelector("#zoomIn").disabled = view !== "graph";
+      document.querySelector("#fitGraph").disabled = view !== "graph";
+      if (view === "graph") requestAnimationFrame(fitGraph);
+      syncHash();
+    }
+
+    function applyTransform() {
+      graphWorld.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      zoomLabel.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    function fitGraph() {
+      if (!graphViewport.clientWidth || !graphViewport.clientHeight) return;
+      const horizontal = (graphViewport.clientWidth - 20) / WORLD_WIDTH;
+      const vertical = (graphViewport.clientHeight - 18) / WORLD_HEIGHT;
+      scale = Math.min(1, Math.max(0.58, Math.min(horizontal, vertical)));
+      panX = Math.round((graphViewport.clientWidth - WORLD_WIDTH * scale) / 2);
+      panY = Math.round((graphViewport.clientHeight - WORLD_HEIGHT * scale) / 2);
+      applyTransform();
+    }
+
+    function zoomBy(delta) {
+      const next = Math.min(1.35, Math.max(0.55, scale + delta));
+      const cx = graphViewport.clientWidth / 2;
+      const cy = graphViewport.clientHeight / 2;
+      const worldX = (cx - panX) / scale;
+      const worldY = (cy - panY) / scale;
+      scale = next;
+      panX = cx - worldX * scale;
+      panY = cy - worldY * scale;
+      applyTransform();
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function copyText(text, success) {
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(success)).catch(() => showToast(success));
+      } else {
+        showToast(success);
+      }
+    }
+
+    surfaceToggle.addEventListener("click", () => setOpen(!surface.classList.contains("open")));
+    document.querySelectorAll("[data-view]").forEach((button) => {
+      button.addEventListener("click", () => setView(button.dataset.view));
+    });
+    document.querySelector("#fitGraph").addEventListener("click", fitGraph);
+    document.querySelector("#zoomOut").addEventListener("click", () => zoomBy(-0.1));
+    document.querySelector("#zoomIn").addEventListener("click", () => zoomBy(0.1));
+    document.querySelector("#closeDetail").addEventListener("click", closeDetail);
+    document.querySelector("#deliverableTicket").addEventListener("click", () => selectTicket("DEL-01"));
+
+    document.querySelector("#attentionToggle").addEventListener("click", (event) => {
+      attentionMode = !attentionMode;
+      graphWorld.classList.toggle("attention-mode", attentionMode);
+      event.currentTarget.classList.toggle("active", attentionMode);
+      if (currentView === "overview") {
+        overview.querySelectorAll(".overview-node").forEach((node) => {
+          node.style.opacity = attentionMode && !node.classList.contains("human") && !node.classList.contains("deviation") ? "0.22" : "";
+        });
+      }
+    });
+
+    document.querySelector("#copyView").addEventListener("click", () => {
+      copyText(location.href, "View link copied");
+    });
+
+    document.querySelector("#copyTicket").addEventListener("click", () => {
+      copyText(location.href, "Link copied");
+    });
+
+    document.querySelector("#evidenceButton").addEventListener("click", () => {
+      showToast(selectedEdge !== null ? "Relation rationale is inspectable" : "Evidence trail opened");
+    });
+    document.querySelector("#commitButton").addEventListener("click", () => showToast("Commit opened"));
+    document.querySelector("#commentButton").addEventListener("click", () => {
+      const input = document.querySelector("#commentInput");
+      if (!input.value.trim()) {
+        showToast("Write a comment first");
+        input.focus();
+        return;
+      }
+      input.value = "";
+      showToast("Comment proposed · attributed to Wayne");
+    });
+    document.querySelector("#editButton").addEventListener("click", () => detailSheet.classList.add("editing"));
+    document.querySelector("#cancelEdit").addEventListener("click", () => detailSheet.classList.remove("editing"));
+    document.querySelector("#saveEdit").addEventListener("click", () => {
+      detailSheet.classList.remove("editing");
+      showToast("Ticket revision proposed · validation pending");
+    });
+
+    graphViewport.addEventListener("pointerdown", (event) => {
+      if (event.target.closest(".ticket-node, .edge, .scenario-label, .deliverable-ticket")) return;
+      dragStart = { x: event.clientX, y: event.clientY, panX, panY };
+      graphViewport.setPointerCapture(event.pointerId);
+      graphViewport.classList.add("dragging");
+    });
+    graphViewport.addEventListener("pointermove", (event) => {
+      if (!dragStart) return;
+      panX = dragStart.panX + event.clientX - dragStart.x;
+      panY = dragStart.panY + event.clientY - dragStart.y;
+      applyTransform();
+    });
+    graphViewport.addEventListener("pointerup", () => {
+      dragStart = null;
+      graphViewport.classList.remove("dragging");
+    });
+    graphViewport.addEventListener("wheel", (event) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      zoomBy(event.deltaY > 0 ? -0.06 : 0.06);
+    }, { passive: false });
+
+    window.addEventListener("resize", () => {
+      if (surface.classList.contains("open") && currentView === "graph") fitGraph();
+    });
+
+    renderFrames();
+    renderNodes();
+    renderEdges();
+    renderOverview();
+
+    const initialParams = new URLSearchParams(initialHash.replace(/^#/, ""));
+    const initialView = initialParams.get("view") === "overview" ? "overview" : "graph";
+    const initialTicket = initialParams.get("ticket");
+    const initialRelationValue = initialParams.get("relation");
+    const initialRelation = initialRelationValue === null ? null : Number(initialRelationValue);
+    if (initialHash) {
+      setView(initialView);
+      setOpen(true);
+      if (initialTicket && ticketById(initialTicket)) {
+        requestAnimationFrame(() => selectTicket(initialTicket));
+      } else if (initialRelation !== null && Number.isInteger(initialRelation) && edges[initialRelation]) {
+        requestAnimationFrame(() => selectRelation(initialRelation));
+      }
+    } else {
+      applyTransform();
+    }
+  </script>
+</body>
+</html>

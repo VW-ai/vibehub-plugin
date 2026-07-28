@@ -55,6 +55,44 @@ intent:
     Prototype 02 applies `constraint-project-quiet-intelligence-001`. It is
     awaiting live review and is not ratified.
 
+    **Wayne review of Prototype 02 — retain as Overview**
+
+    Prototype 02 improved whole-plan scanning, but its scenario-by-phase layout
+    still reads as a matrix rather than a real workflow. It does not make
+    Ticket dependencies, shared prerequisites, forks, joins, or cross-scenario
+    paths legible enough. The refined version may remain as an alternate
+    Overview, but the primary view should read more like an n8n/Dify dependency
+    canvas.
+
+    A healthy graph should contain no orphan Ticket. Every non-top-level Ticket
+    has a containment path to a scenario outcome or the overall deliverable.
+    Shared work may sit at the earliest common ancestor whose outcome contains
+    it and feed several scenario branches through explicit dependencies; being
+    shared does not make it standalone.
+
+    **Prototype 03 — Causal Ticket Graph**
+
+    `artifacts/2026-07-28-ticket-review-surface-prototype-v3.html` makes Graph
+    the default and retains a quieter Overview as the alternate projection.
+    Scenario outcomes are real coarse Ticket nodes rather than row labels.
+    Direct `depends_on` relations are visible left-to-right connectors;
+    containment is expressed through spatial scenario and deliverable frames
+    rather than a competing set of workflow arrows.
+
+    The canvas demonstrates cross-scenario dependencies, branch and join
+    behavior, in-place human decisions and deviations, pan/zoom/fit, clickable
+    relations with rationale, and causal-path reveal. Clicking a Ticket keeps
+    the graph visible while opening the same progressive detail, comment, edit,
+    evidence, and commit surface.
+
+    The sample planning branch also projects
+    `convention-ticket-backchain-forward-normalize-001`: synthesize necessary
+    paths backward from observable outcomes, then read forward from current
+    facts to remove duplicate, orphan, dead-end, redundant, and falsely
+    serialized work. The final canvas still reads in the execution direction.
+
+    Prototype 03 is awaiting live review and is not ratified.
+
     This ticket is unresolved.
 
     **Claimed**: Codex 2026-07-28
@@ -77,6 +115,9 @@ relations:
   - target: "decision-ticket-graph-lifecycle-001"
     type: relates_to
     detail: "Comments and edits will propose mutations whose legal lifecycle is governed separately."
+  - target: "convention-ticket-backchain-forward-normalize-001"
+    type: relates_to
+    detail: "The graph surface projects the causal result of backward synthesis followed by forward normalization."
   - target: "decision-workbench-011"
     type: challenges
     detail: "The prototype may refine the future App/Workbench projection without making App mandatory."
@@ -84,3 +125,4 @@ anchors:
   - file: "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype.html"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v2.html"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v3.html"
