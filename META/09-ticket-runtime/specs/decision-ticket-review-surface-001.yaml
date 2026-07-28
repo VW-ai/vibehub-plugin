@@ -21,6 +21,19 @@ intent:
     decide the information hierarchy and interaction contract before the final
     App or replacement of the existing Workbench UX is chosen.
 
+    **Prototype 01 — Review horizon**
+
+    `artifacts/2026-07-28-ticket-review-surface-prototype.html` is an interactive
+    standalone prototype. It separates the scenario/outcome review layer from
+    Agent-owned execution work with a visible “human review horizon”; product
+    decisions and architecture deviations cross that horizon into a focused
+    attention queue.
+
+    The prototype supports scenario switching, outcome-only versus full Ticket
+    views, Ticket inspection, local comment/edit demonstrations, and plan review
+    versus bounded delegation. It is a proposal awaiting live human reaction,
+    not a ratified UI or a persistence implementation.
+
     This ticket is unresolved.
 
     **Claimed**: Codex 2026-07-28
@@ -48,3 +61,4 @@ relations:
     detail: "The prototype may refine the future App/Workbench projection without making App mandatory."
 anchors:
   - file: "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype.html"
