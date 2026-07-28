@@ -34,6 +34,8 @@ intent:
     scale rather than merely for format bridging.
 
     This ticket is unresolved. No ownership model is ratified here.
+
+    **Claimed**: Codex 2026-07-28
 constraints: []
 indexing:
   type: decision
