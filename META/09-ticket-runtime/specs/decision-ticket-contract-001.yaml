@@ -79,9 +79,45 @@ intent:
     new human gate, and independently satisfies the `executable` and unblocked
     invariants. Expansion Tickets remain proposals until human ratification.
 
+    **Ratified partial contract — machine-first validation**
+
+    The product-level canonical Ticket lifecycle has no generic
+    `draft → human review → active` gate. A Ticket becomes a durable graph node
+    when its identity and minimum outline contract are recorded; incomplete
+    definition is expressed by `outline` or `specified` maturity rather than by
+    a review queue. `active` is not an approval result.
+
+    A temporary draft may exist inside an Agent's authoring transaction or UI
+    composition buffer, but it is not a canonical Ticket state and does not
+    require routine human review.
+
+    Machine review is the default contract-validation mechanism. It must emit
+    inspectable findings and evidence for at least:
+
+    - structural and schema validity;
+    - objective, scope, non-goal, and acceptance clarity;
+    - dependency and graph consistency;
+    - context, permission, and execution-policy completeness;
+    - verifier feasibility and readiness invariants.
+
+    Passing machine review may advance Ticket maturity and, when all other
+    readiness conditions hold, allow READY without human action. Failing review
+    leaves the Ticket at its current maturity with actionable findings; it does
+    not create a default human approval inbox.
+
+    Humans intervene only through an explicit authority or decision gate, such
+    as outcome or scope expansion, unresolved product or technical choice,
+    permission escalation, material external side effects, or policy-defined
+    risk. Machine review may detect and route such a gate, but cannot grant the
+    missing human authority.
+
+    The `draft → active` convention used by Feature Room Wayfind records whether
+    a planning decision has been ratified in META. It is a planning protocol,
+    not a proposed product Ticket lifecycle.
+
     This ticket remains unresolved. The maturity model and Agent creation rule
-    and bounded self-expansion authority above are ratified, while the full
-    field schema is not yet approved.
+    and bounded self-expansion authority and machine-first validation model
+    above are ratified, while the full field schema is not yet approved.
 
     **Claimed**: Codex 2026-07-27
 constraints: []
