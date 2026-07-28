@@ -22,6 +22,8 @@ intent:
     App or replacement of the existing Workbench UX is chosen.
 
     This ticket is unresolved.
+
+    **Claimed**: Codex 2026-07-28
 constraints: []
 indexing:
   type: decision
