@@ -1,0 +1,48 @@
+spec_id: "decision-ticket-review-surface-001"
+type: decision
+state: active
+intent:
+  summary: "什么样的项目级 HTML 能让人围绕场景 review Ticket Graph，同时查看、comment 和简单编辑全部 Tickets？"
+  detail: |
+    **Prototype question**: Establish the smallest useful human control surface
+    for the first Ticket dogfood loop.
+
+    The prototype should let a human:
+    - enter through scenario-level outcome Tickets rather than a flat task list;
+    - review or delegate the coarse plan and its major boundaries;
+    - see blockers, human decisions, and deviations immediately;
+    - progressively inspect every descendant Ticket without making each one an
+      approval unit;
+    - comment or propose simple edits with visible authorship and revision
+      effects.
+
+    The HTML is a project-scoped projection over canonical Ticket operations,
+    never an independent store or raw persistence editor. The prototype should
+    decide the information hierarchy and interaction contract before the final
+    App or replacement of the existing Workbench UX is chosen.
+
+    This ticket is unresolved.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, open, prototype, html, review, ticket-graph, ux]
+provenance:
+  source_type: manual_input
+  confidence: 0.85
+  source_ref: "Wayne proposed a per-project HTML Ticket visualization with comments and simple edits — 2026-07-28"
+  produced_at: "2026-07-28"
+relations:
+  - target: "decision-ticket-intelligence-loop-001"
+    type: depends_on
+    detail: "The surface projects the ratified scenario-first review and delegation behavior."
+  - target: "decision-ticket-graph-lifecycle-001"
+    type: relates_to
+    detail: "Comments and edits will propose mutations whose legal lifecycle is governed separately."
+  - target: "decision-workbench-011"
+    type: challenges
+    detail: "The prototype may refine the future App/Workbench projection without making App mandatory."
+anchors:
+  - file: "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml"

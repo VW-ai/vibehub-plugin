@@ -51,14 +51,18 @@ belong in active Decision Tickets explicitly tagged `open`.
   Ticket implementation; composable Skills own semantic intelligence, CLI/MCP
   are thin peers, the first slice is in-process, and App/daemon remain clients
   or hosts of the same Core.
+- [decision-ticket-intelligence-loop-001] (active) Human-understandable
+  scenario Tickets compile into one executable graph; the Agent composes
+  intelligence by scene, proceeds under delegated authority, and escalates
+  experience/principle changes or deviations.
 
 ## Frontier
 
 These questions are currently unblocked:
 
-- [decision-ticket-intelligence-loop-001] When should an Agent generate or
-  revise Tickets, and how should it discover and compose Ticket Skills without
-  becoming trapped in a mandatory workflow?
+- [decision-ticket-review-surface-001] What project-level HTML review surface
+  makes scenarios primary while keeping every Ticket inspectable, commentable,
+  and safely editable?
 - [decision-ticket-context-binding-001] How does a Ticket declare and bind
   semantic context without freezing a giant Run prompt?
 - [decision-ticket-graph-lifecycle-001] How may planning and execution
@@ -79,8 +83,6 @@ These questions are currently unblocked:
 
 ## Not yet specified (wayfind)
 
-- How the future user-facing Ticket Graph should project or replace the current
-  territory/task Workbench UX.
 - How non-coding semantic providers such as MyLibrary should satisfy the same
   context-binding contract.
 - How planning quality will be evaluated by comparing the initial graph with

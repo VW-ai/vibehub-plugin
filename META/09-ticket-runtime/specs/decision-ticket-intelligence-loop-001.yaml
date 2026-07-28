@@ -25,7 +25,96 @@ intent:
     Exact operation schemas, graph transitions, context packet contents, and
     closeout semantics remain owned by their focused Decision Tickets.
 
-    This ticket is unresolved.
+    **Wayne's product framing — 2026-07-28**
+
+    The first implementation should be driven by concrete user cases:
+
+    1. A human frames a situation and intended deliverable, then asks the Agent
+       to enter Ticket orchestration. The deliverable is normally expressed as
+       a small set of core user experiences or scenarios—often roughly five to
+       ten—not only as one static description. The Agent compiles them into a
+       coherent initial Ticket graph.
+    2. The human may review the orchestration before execution or explicitly
+       delegate that review. Under delegation, the Agent proceeds through the
+       graph autonomously until it reaches a genuine human blocker.
+    3. Within the approved experiences, product boundaries, architecture, and
+       design principles, the Agent owns technical decisions that have
+       sufficiently explicit engineering criteria. Difficulty alone does not
+       make a decision human-owned: database locking, schema mechanics, and
+       similar internal choices should normally stay delegated.
+    4. A choice that would define or alter the human-authorized user experience,
+       core product behavior, visual/product direction, or another
+       preference-bearing boundary creates a blocking decision Ticket for the
+       human rather than being silently selected by the Agent.
+    5. During execution, a material deviation from the approved user
+       experiences, technical architecture, or design principles creates a
+       visible deviation/decision Ticket and routes the affected branch back to
+       the human. Ordinary technical learning inside those boundaries is
+       handled autonomously by tending the graph.
+
+    The governing distinction is impact on an authorized experience or
+    principle, not whether a decision is “technical.” The approximate scenario
+    count is a planning heuristic, not a schema limit.
+
+    **Ratified partial behavior — review surface**
+
+    Human review should apply to the compact scenario/outcome plan, major
+    boundaries, and already-known human blockers—not to every generated leaf
+    Ticket or implementation choice. Review is an execution authority gate over
+    an active graph, not a `draft → active` lifecycle. Opting out grants bounded
+    authority to proceed until a later decision or deviation crosses the same
+    boundary.
+
+    Wayne ratified this review surface on 2026-07-28.
+
+    **Human control surface input**
+
+    Every project's Tickets should be visible through a lightweight HTML
+    projection. Its default view emphasizes the core scenarios/outcomes,
+    material blockers, human decisions, and deviations; implementation Tickets
+    remain inspectable through progressive disclosure. Visibility does not make
+    every Ticket a review unit.
+
+    Humans may leave comments and make simple edits from this surface. Those
+    interactions become attributed, versioned proposals or Ticket revisions
+    that pass through the same validation and authority boundary; the HTML must
+    not become a second source of truth or a raw storage editor.
+
+    “Scenario” is broader than a consumer user story. Its actor may be an end
+    user, operator, developer, service, or system. The invariant is an
+    understandable situation and observable intended outcome around which a
+    human can evaluate the plan.
+
+    **Ratified partial behavior — scenario representation**
+
+    In v0, a core scenario should be the human-facing projection of a coarse
+    outcome Ticket with descendant work, not a second canonical Scenario
+    entity. This preserves Ticket as the only work primitive while letting the
+    HTML render scenario-level Tickets differently from execution leaves.
+
+    Wayne ratified this scenario representation on 2026-07-28.
+
+    **Resolved intelligence loop**
+
+    Ticket orchestration begins from human-understandable scenarios/outcomes
+    and compiles a coarse graph before execution. Ticket Skills are invoked by
+    the host Agent at the scene where their intelligence is useful—shape during
+    planning or discovery, validate after definition changes, query/context
+    before acting, and closeout after a Run—rather than through one mandatory
+    workflow.
+
+    Human review or explicit delegation gates the scenario/outcome plan, not
+    every leaf. Within that authority, the Agent may generate, refine, and
+    execute Tickets and make objectively adjudicable technical decisions.
+    Changes to authorized experience, product logic, architecture, design
+    principles, permissions, or risk become visible blocking decision/deviation
+    Tickets. Hooks may surface a relevant scene but do not own orchestration.
+
+    Scenario-level outcomes remain coarse Tickets, so one graph supports both
+    human comprehension and Agent execution. The project HTML review surface is
+    delegated to its own prototype decision.
+
+    Wayne ratified the complete intelligence loop on 2026-07-28.
 
     **Claimed**: Codex 2026-07-28
 constraints: []
@@ -34,7 +123,7 @@ indexing:
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, open, grilling, intelligence, skills, planning, ticket-generation]
+  tags: [wayfinder, resolved, grilling, intelligence, skills, planning, ticket-generation]
 provenance:
   source_type: manual_input
   confidence: 0.85
