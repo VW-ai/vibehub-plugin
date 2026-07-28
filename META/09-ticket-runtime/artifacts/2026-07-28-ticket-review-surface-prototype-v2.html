@@ -1,0 +1,1168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeHub Ticket Signal — Prototype v2</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ground: #eef1f3;
+      --surface: rgba(250, 251, 252, 0.96);
+      --surface-solid: #fafbfc;
+      --ink: #242a30;
+      --muted: #77818a;
+      --faint: #aab2b8;
+      --line: #d9dee2;
+      --line-strong: #bdc5ca;
+      --active: #4f687a;
+      --attention: #a66d27;
+      --attention-wash: rgba(166, 109, 39, 0.10);
+      --deviation: #ae5c57;
+      --deviation-wash: rgba(174, 92, 87, 0.09);
+      --focus: #5c729f;
+      --shadow: 0 22px 64px rgba(36, 48, 58, 0.14);
+      --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-width: 320px;
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 78% 84%, rgba(90, 112, 128, 0.07), transparent 34%),
+        var(--ground);
+      font: 13px/1.45 var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    textarea {
+      color: inherit;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid rgba(92, 114, 159, 0.5);
+      outline-offset: 2px;
+    }
+
+    .ambient-context {
+      position: fixed;
+      top: 26px;
+      left: 30px;
+      display: grid;
+      gap: 5px;
+      color: var(--faint);
+      user-select: none;
+    }
+
+    .ambient-context strong {
+      color: #7f8991;
+      font-size: 13px;
+      font-weight: 590;
+    }
+
+    .ambient-context span {
+      font: 11px/1.3 var(--mono);
+    }
+
+    .surface {
+      position: fixed;
+      z-index: 5;
+      right: 22px;
+      bottom: 22px;
+      width: 292px;
+      overflow: hidden;
+      border: 1px solid rgba(157, 168, 176, 0.72);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 9px 28px rgba(36, 48, 58, 0.10);
+      backdrop-filter: blur(22px) saturate(0.82);
+      transition:
+        width 240ms cubic-bezier(.2,.76,.25,1),
+        border-radius 240ms ease,
+        box-shadow 240ms ease;
+    }
+
+    .surface.open {
+      width: min(1220px, calc(100vw - 44px));
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .signal {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      width: 100%;
+      min-height: 52px;
+      grid-template-columns: 18px minmax(0, 1fr) auto 18px;
+      gap: 9px;
+      align-items: center;
+      padding: 0 14px;
+      text-align: left;
+      border: 0;
+      background: transparent;
+    }
+
+    .signal:hover {
+      background: rgba(225, 230, 233, 0.35);
+    }
+
+    .signal-mark {
+      position: relative;
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+    }
+
+    .signal-mark::before {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--attention);
+      content: "";
+    }
+
+    .signal-copy {
+      min-width: 0;
+    }
+
+    .signal-copy strong {
+      display: block;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 620;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .signal-copy span {
+      display: none;
+      margin-top: 1px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .surface.open .signal-copy span {
+      display: block;
+    }
+
+    .signal-attention {
+      color: var(--attention);
+      font-size: 13px;
+      font-weight: 560;
+      white-space: nowrap;
+    }
+
+    .chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+      transition: transform 180ms ease;
+    }
+
+    .surface.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .sheet {
+      height: 0;
+      min-height: 0;
+      overflow: hidden;
+      border-top: 0 solid transparent;
+      opacity: 0;
+      transition:
+        height 260ms cubic-bezier(.2,.76,.25,1),
+        opacity 150ms ease,
+        border-color 180ms ease;
+    }
+
+    .surface.open .sheet {
+      height: min(760px, calc(100vh - 90px));
+      border-top-width: 1px;
+      border-top-color: var(--line);
+      opacity: 1;
+    }
+
+    .sheet-inner {
+      position: relative;
+      display: grid;
+      height: 100%;
+      grid-template-rows: auto minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .sheet-tools {
+      display: flex;
+      min-height: 43px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 0 15px 0 20px;
+      border-bottom: 1px solid rgba(217, 222, 226, 0.75);
+    }
+
+    .quiet-summary {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tool-row {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .icon-button {
+      display: inline-grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .icon-button:hover,
+    .icon-button.active {
+      color: var(--ink);
+      background: rgba(218, 224, 227, 0.55);
+    }
+
+    .icon-button.attention.active {
+      color: var(--attention);
+      background: var(--attention-wash);
+    }
+
+    .icon-button svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .workflow-scroll {
+      position: relative;
+      min-height: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-color: #c9d0d4 transparent;
+      scrollbar-width: thin;
+    }
+
+    .workflow {
+      min-width: 1080px;
+      padding: 0 18px 32px;
+    }
+
+    .stage-row,
+    .lane {
+      display: grid;
+      grid-template-columns: 190px repeat(5, minmax(164px, 1fr));
+    }
+
+    .stage-row {
+      position: sticky;
+      z-index: 4;
+      top: 0;
+      min-height: 48px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      background: rgba(250, 251, 252, 0.94);
+      backdrop-filter: blur(16px);
+    }
+
+    .stage-row > span {
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 520;
+    }
+
+    .stage-row .stage-label {
+      padding-left: 5px;
+      color: var(--faint);
+      font-weight: 480;
+    }
+
+    .lane {
+      position: relative;
+      min-height: 112px;
+      border-bottom: 1px solid rgba(217, 222, 226, 0.7);
+      transition: opacity 140ms ease;
+    }
+
+    .lane:last-child {
+      border-bottom: 0;
+    }
+
+    .lane::after {
+      position: absolute;
+      z-index: 0;
+      top: 55px;
+      right: 45px;
+      left: 208px;
+      height: 1px;
+      background: var(--line-strong);
+      content: "";
+    }
+
+    .lane.focused {
+      background: rgba(231, 235, 238, 0.28);
+    }
+
+    .workflow.lane-focus .lane:not(.focused),
+    .workflow.attention-focus .node:not(.needs-human):not(.deviation) {
+      opacity: 0.28;
+    }
+
+    .lane-title {
+      position: relative;
+      z-index: 2;
+      align-self: center;
+      justify-self: stretch;
+      padding: 12px 18px 12px 4px;
+      text-align: left;
+      border: 0;
+      background: transparent;
+    }
+
+    .lane-title:hover strong {
+      text-decoration: underline;
+      text-decoration-color: var(--line-strong);
+      text-underline-offset: 4px;
+    }
+
+    .lane-title strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-weight: 620;
+      line-height: 1.35;
+    }
+
+    .lane-title span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stage-cell {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      padding: 12px 10px 12px 18px;
+    }
+
+    .stage-cell.multiple {
+      align-content: center;
+      align-items: flex-start;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .node {
+      position: relative;
+      display: grid;
+      width: 100%;
+      max-width: 172px;
+      min-height: 42px;
+      grid-template-columns: 15px minmax(0, 1fr);
+      gap: 7px;
+      align-items: start;
+      padding: 5px 6px;
+      text-align: left;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      transition: background 120ms ease, opacity 120ms ease;
+    }
+
+    .node:hover,
+    .node.selected {
+      background: rgba(218, 224, 227, 0.56);
+    }
+
+    .node.needs-human:hover,
+    .node.needs-human.selected {
+      background: var(--attention-wash);
+    }
+
+    .node.deviation:hover,
+    .node.deviation.selected {
+      background: var(--deviation-wash);
+    }
+
+    .node-symbol {
+      position: relative;
+      display: block;
+      width: 10px;
+      height: 10px;
+      margin-top: 3px;
+      border: 1.5px solid var(--line-strong);
+      border-radius: 50%;
+      background: var(--surface-solid);
+    }
+
+    .node.done .node-symbol::after {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 4px;
+      height: 2px;
+      border-bottom: 1px solid var(--muted);
+      border-left: 1px solid var(--muted);
+      content: "";
+      transform: rotate(-45deg);
+    }
+
+    .node.running .node-symbol {
+      border-color: var(--active);
+    }
+
+    .node.running .node-symbol::after {
+      position: absolute;
+      inset: 2px;
+      border-radius: 50%;
+      background: var(--active);
+      content: "";
+    }
+
+    .node.needs-human .node-symbol {
+      border: 2px solid var(--attention);
+      box-shadow: 0 0 0 3px var(--attention-wash);
+    }
+
+    .node.deviation .node-symbol {
+      border: 2px solid var(--deviation);
+      border-radius: 2px;
+      box-shadow: 0 0 0 3px var(--deviation-wash);
+      transform: rotate(45deg);
+    }
+
+    .node-copy {
+      min-width: 0;
+    }
+
+    .node-copy strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 540;
+      line-height: 1.3;
+    }
+
+    .node.done .node-copy strong {
+      color: #737d85;
+    }
+
+    .node-copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--faint);
+      font: 10px/1.2 var(--mono);
+    }
+
+    .node.needs-human .node-copy span {
+      color: var(--attention);
+      font-family: var(--body);
+      font-size: 13px;
+    }
+
+    .node.deviation .node-copy span {
+      color: var(--deviation);
+      font-family: var(--body);
+      font-size: 13px;
+    }
+
+    .detail-sheet {
+      position: absolute;
+      z-index: 8;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      max-height: 0;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+      overflow: hidden;
+      border-top: 1px solid var(--line-strong);
+      background: rgba(250, 251, 252, 0.98);
+      box-shadow: 0 -18px 42px rgba(36, 48, 58, 0.10);
+      opacity: 0;
+      transform: translateY(18px);
+      transition:
+        max-height 200ms cubic-bezier(.2,.76,.25,1),
+        opacity 140ms ease,
+        transform 200ms cubic-bezier(.2,.76,.25,1);
+    }
+
+    .detail-sheet.open {
+      max-height: 270px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .detail-main {
+      min-width: 0;
+      padding: 19px 24px 20px;
+    }
+
+    .detail-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 10px;
+    }
+
+    .detail-kicker {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font: 10px/1.2 var(--mono);
+    }
+
+    .detail-kicker i {
+      width: 7px;
+      height: 7px;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+    }
+
+    .detail-kicker.attention {
+      color: var(--attention);
+      font-family: var(--body);
+      font-size: 13px;
+    }
+
+    .detail-kicker.attention i {
+      border: 2px solid var(--attention);
+    }
+
+    .detail-kicker.deviation {
+      color: var(--deviation);
+      font-family: var(--body);
+      font-size: 13px;
+    }
+
+    .detail-kicker.deviation i {
+      border: 2px solid var(--deviation);
+      border-radius: 1px;
+      transform: rotate(45deg);
+    }
+
+    .detail-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 630;
+      line-height: 1.35;
+    }
+
+    .detail-outcome {
+      max-width: 760px;
+      margin: 0 0 14px;
+      color: #59636b;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .trace-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 14px;
+      align-items: center;
+    }
+
+    .trace-action {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 2px 0;
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .trace-action:hover {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .trace-action svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .detail-interact {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 19px 20px;
+      border-left: 1px solid var(--line);
+    }
+
+    .detail-interact label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .comment-box {
+      width: 100%;
+      min-height: 66px;
+      padding: 9px 10px;
+      resize: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(238, 241, 243, 0.55);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .text-button {
+      min-height: 31px;
+      padding: 5px 9px;
+      border: 0;
+      border-radius: 7px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 560;
+    }
+
+    .text-button:hover {
+      color: var(--ink);
+      background: rgba(218, 224, 227, 0.52);
+    }
+
+    .text-button.primary {
+      color: white;
+      background: var(--ink);
+    }
+
+    .edit-fields {
+      display: none;
+      gap: 7px;
+    }
+
+    .detail-sheet.editing .edit-fields {
+      display: grid;
+    }
+
+    .detail-sheet.editing .comment-mode {
+      display: none;
+    }
+
+    .edit-fields input,
+    .edit-fields textarea {
+      width: 100%;
+      padding: 8px 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(238, 241, 243, 0.55);
+      font-size: 13px;
+    }
+
+    .edit-fields textarea {
+      min-height: 70px;
+      resize: none;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 20;
+      right: 28px;
+      bottom: 86px;
+      max-width: 340px;
+      padding: 9px 12px;
+      color: var(--surface-solid);
+      border-radius: 8px;
+      background: rgba(36, 42, 48, 0.92);
+      box-shadow: 0 10px 28px rgba(36, 48, 58, 0.18);
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(7px);
+      transition: opacity 130ms ease, transform 130ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 720px) {
+      .ambient-context {
+        top: 18px;
+        left: 18px;
+      }
+
+      .surface,
+      .surface.open {
+        right: 8px;
+        bottom: 8px;
+        width: calc(100vw - 16px);
+      }
+
+      .surface.open .sheet {
+        height: calc(100vh - 78px);
+      }
+
+      .signal-copy span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .sheet-tools {
+        padding-left: 14px;
+      }
+
+      .quiet-summary {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .detail-sheet {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-sheet.open {
+        max-height: 470px;
+        overflow-y: auto;
+      }
+
+      .detail-interact {
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-context" aria-hidden="true">
+    <strong>VibeHub · Ticket Runtime</strong>
+    <span>codex/ticket-runtime-wayfind</span>
+  </div>
+
+  <section class="surface" id="surface" aria-label="Ticket plan signal">
+    <button class="signal" id="surfaceToggle" aria-expanded="false" aria-controls="ticketSheet">
+      <span class="signal-mark" aria-hidden="true"></span>
+      <span class="signal-copy">
+        <strong>Ticket plan</strong>
+        <span>5 scenarios · 23 tickets</span>
+      </span>
+      <span class="signal-attention">2 need you</span>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="m5 12 5-5 5 5"/>
+      </svg>
+    </button>
+
+    <div class="sheet" id="ticketSheet">
+      <div class="sheet-inner">
+        <div class="sheet-tools">
+          <span class="quiet-summary">The whole plan, with human attention in place.</span>
+          <div class="tool-row">
+            <button class="icon-button attention" id="attentionToggle" aria-label="Focus tickets that need you" title="Focus tickets that need you">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <circle cx="12" cy="12" r="8"/>
+                <path d="M12 7v6M12 16.5v.5"/>
+              </svg>
+            </button>
+            <button class="icon-button" id="copyView" aria-label="Copy view link" title="Copy view link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="8" y="8" width="11" height="11" rx="2"/>
+                <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="workflow-scroll">
+          <div class="workflow" id="workflow">
+            <div class="stage-row" aria-hidden="true">
+              <span class="stage-label">Scenario</span>
+              <span>Understand</span>
+              <span>Shape</span>
+              <span>Build</span>
+              <span>Verify</span>
+              <span>Close</span>
+            </div>
+            <div id="lanes"></div>
+          </div>
+        </div>
+
+        <section class="detail-sheet" id="detailSheet" aria-live="polite">
+          <div class="detail-main">
+            <div class="detail-heading">
+              <div>
+                <div class="detail-kicker" id="detailKicker"><i></i><span>TKT-106 · In progress</span></div>
+                <h2 class="detail-title" id="detailTitle">Build the coarse Ticket Graph</h2>
+              </div>
+              <button class="icon-button" id="closeDetail" aria-label="Close ticket detail" title="Close detail">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="m7 7 10 10M17 7 7 17"/>
+                </svg>
+              </button>
+            </div>
+            <p class="detail-outcome" id="detailOutcome">Every scenario has a visible path through execution, with human-owned decisions kept in their original position.</p>
+            <div class="trace-row">
+              <button class="trace-action" id="copyTicket">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7.1l-1.1 1"/>
+                  <path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7.1l1.1-1"/>
+                </svg>
+                Copy ticket link
+              </button>
+              <button class="trace-action" id="evidenceButton">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="M5 4h10l4 4v12H5z"/>
+                  <path d="M15 4v5h4M8 13h8M8 16h6"/>
+                </svg>
+                <span id="evidenceLabel">3 evidence items</span>
+              </button>
+              <button class="trace-action" id="commitButton">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M3 12h6M15 12h6"/>
+                </svg>
+                <span id="commitLabel">commit 4942462</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="detail-interact">
+            <div class="comment-mode">
+              <label for="commentInput">Comment on this ticket</label>
+              <textarea class="comment-box" id="commentInput" placeholder="What should change?"></textarea>
+              <div class="detail-actions">
+                <button class="text-button" id="editButton" type="button">Suggest edit</button>
+                <button class="text-button primary" id="commentButton" type="button">Add comment</button>
+              </div>
+            </div>
+            <div class="edit-fields">
+              <input id="editTitle" aria-label="Proposed ticket title">
+              <textarea id="editOutcome" aria-label="Proposed ticket outcome"></textarea>
+              <div class="detail-actions">
+                <button class="text-button" id="cancelEdit" type="button">Cancel</button>
+                <button class="text-button primary" id="saveEdit" type="button">Propose change</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const phases = ["understand", "shape", "build", "verify", "close"];
+    const scenarios = [
+      {
+        id: "S-01",
+        title: "Turn intent into a graph",
+        note: "4 tickets",
+        tickets: [
+          { id: "TKT-104", phase: "understand", title: "Name core scenarios", state: "done", outcome: "The intended change is expressed as observable scenarios rather than one static task description." },
+          { id: "TKT-106", phase: "shape", title: "Build the coarse graph", state: "running", outcome: "Every scenario has a visible path through execution, with human-owned decisions kept in their original position." },
+          { id: "TKT-107", phase: "shape", title: "Review or delegate", state: "human", outcome: "The scenario plan receives human review or bounded delegation before execution begins." },
+          { id: "TKT-109", phase: "build", title: "Start ready work", state: "waiting", outcome: "The first unblocked Ticket begins without reopening already delegated decisions." }
+        ]
+      },
+      {
+        id: "S-02",
+        title: "Let the Agent keep moving",
+        note: "5 tickets",
+        tickets: [
+          { id: "TKT-120", phase: "understand", title: "Bind the agreed context", state: "done", outcome: "The Agent receives the scenario, constraints, and relevant project knowledge without a giant frozen prompt." },
+          { id: "TKT-122", phase: "shape", title: "Choose ready work", state: "done", outcome: "The next Ticket is selected from current facts, dependencies, and delegated authority." },
+          { id: "TKT-124", phase: "build", title: "Implement domain work", state: "running", outcome: "The Agent uses native tools and domain intelligence to produce the intended result." },
+          { id: "TKT-126", phase: "verify", title: "Check the result", state: "ready", outcome: "Independent verification assesses the result against observable acceptance." },
+          { id: "TKT-128", phase: "close", title: "Tend the graph", state: "waiting", outcome: "Execution learning refines follow-up work without changing the approved product boundary." }
+        ]
+      },
+      {
+        id: "S-03",
+        title: "Escalate a product decision",
+        note: "4 tickets",
+        tickets: [
+          { id: "TKT-140", phase: "understand", title: "Detect an experience boundary", state: "done", outcome: "The Agent recognizes that a choice would materially change the human-authorized experience." },
+          { id: "DEC-12", phase: "shape", title: "Choose review hierarchy", state: "human", outcome: "Choose how people understand and approve the Ticket workflow without turning it into a dashboard." },
+          { id: "TKT-143", phase: "build", title: "Replan the affected path", state: "blocked", outcome: "The selected direction is compiled into a revised execution path." },
+          { id: "TKT-144", phase: "build", title: "Continue unaffected work", state: "running", outcome: "Independent delegated work keeps moving while the decision branch waits." }
+        ]
+      },
+      {
+        id: "S-04",
+        title: "Catch architecture drift",
+        note: "5 tickets",
+        tickets: [
+          { id: "TKT-160", phase: "understand", title: "Read governing principles", state: "done", outcome: "The current implementation is compared with the agreed Core-owned architecture." },
+          { id: "TKT-162", phase: "build", title: "Trace state writes", state: "done", outcome: "Evidence identifies every component writing Ticket facts." },
+          { id: "DEV-03", phase: "build", title: "Resolve a second writer", state: "deviation", outcome: "Restore one canonical writer or explicitly revise the architecture principle." },
+          { id: "TKT-165", phase: "verify", title: "Run parity checks", state: "ready", outcome: "CLI, MCP, and direct Core behavior remain semantically identical." },
+          { id: "TKT-166", phase: "close", title: "Record the resolution", state: "waiting", outcome: "The accepted correction or principle change remains traceable." }
+        ]
+      },
+      {
+        id: "S-05",
+        title: "Close work with evidence",
+        note: "5 tickets",
+        tickets: [
+          { id: "TKT-180", phase: "build", title: "Gather artifacts", state: "running", outcome: "The Run preserves the artifacts needed to evaluate its result." },
+          { id: "TKT-181", phase: "verify", title: "Bind evidence", state: "ready", outcome: "Each accepted outcome points to inspectable evidence." },
+          { id: "TKT-182", phase: "verify", title: "Review the outcome", state: "ready", outcome: "The result is independently assessed as proven, partial, or failed." },
+          { id: "TKT-184", phase: "close", title: "Record what happened", state: "waiting", outcome: "Durable facts support completion without a writable status declaration." },
+          { id: "TKT-185", phase: "close", title: "Propose follow-up work", state: "waiting", outcome: "New learning becomes bounded follow-up Tickets or a closeout proposal." }
+        ]
+      }
+    ];
+
+    const surface = document.querySelector("#surface");
+    const surfaceToggle = document.querySelector("#surfaceToggle");
+    const workflow = document.querySelector("#workflow");
+    const lanes = document.querySelector("#lanes");
+    const detailSheet = document.querySelector("#detailSheet");
+    const detailKicker = document.querySelector("#detailKicker");
+    const detailTitle = document.querySelector("#detailTitle");
+    const detailOutcome = document.querySelector("#detailOutcome");
+    const editTitle = document.querySelector("#editTitle");
+    const editOutcome = document.querySelector("#editOutcome");
+    const toast = document.querySelector("#toast");
+    let selectedId = null;
+    let focusedLane = null;
+    let toastTimer;
+
+    function setOpen(open) {
+      surface.classList.toggle("open", open);
+      surfaceToggle.setAttribute("aria-expanded", String(open));
+      if (open) history.replaceState(null, "", "#open");
+      else history.replaceState(null, "", location.pathname);
+    }
+
+    function nodeStateCopy(ticket) {
+      if (ticket.state === "human") return "Needs you";
+      if (ticket.state === "deviation") return "Deviation";
+      return ticket.id;
+    }
+
+    function renderWorkflow() {
+      lanes.innerHTML = scenarios.map((scenario, laneIndex) => {
+        const cells = phases.map((phase) => {
+          const tickets = scenario.tickets.filter((ticket) => ticket.phase === phase);
+          return `
+            <div class="stage-cell ${tickets.length > 1 ? "multiple" : ""}">
+              ${tickets.map((ticket) => `
+                <button
+                  class="node ${ticket.state} ${ticket.state === "human" ? "needs-human" : ""}"
+                  data-ticket="${ticket.id}"
+                  data-lane="${laneIndex}"
+                  aria-label="${ticket.title}, ${nodeStateCopy(ticket)}"
+                >
+                  <span class="node-symbol" aria-hidden="true"></span>
+                  <span class="node-copy">
+                    <strong>${ticket.title}</strong>
+                    <span>${nodeStateCopy(ticket)}</span>
+                  </span>
+                </button>
+              `).join("")}
+            </div>
+          `;
+        }).join("");
+        return `
+          <div class="lane" data-lane-row="${laneIndex}">
+            <button class="lane-title" data-lane-title="${laneIndex}">
+              <strong>${scenario.title}</strong>
+              <span>${scenario.note}</span>
+            </button>
+            ${cells}
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".node").forEach((button) => {
+        button.addEventListener("click", () => selectTicket(button.dataset.ticket));
+        button.addEventListener("mouseenter", () => {
+          document.querySelector(`[data-lane-row="${button.dataset.lane}"]`)?.classList.add("focused");
+        });
+        button.addEventListener("mouseleave", () => {
+          if (focusedLane !== Number(button.dataset.lane)) {
+            document.querySelector(`[data-lane-row="${button.dataset.lane}"]`)?.classList.remove("focused");
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-lane-title]").forEach((button) => {
+        button.addEventListener("click", () => toggleLane(Number(button.dataset.laneTitle)));
+      });
+    }
+
+    function allTickets() {
+      return scenarios.flatMap((scenario) => scenario.tickets);
+    }
+
+    function selectTicket(id) {
+      if (selectedId === id && detailSheet.classList.contains("open")) {
+        closeDetail();
+        return;
+      }
+      const ticket = allTickets().find((item) => item.id === id);
+      if (!ticket) return;
+      selectedId = id;
+      document.querySelectorAll(".node").forEach((node) => {
+        node.classList.toggle("selected", node.dataset.ticket === id);
+      });
+
+      detailKicker.className = "detail-kicker";
+      if (ticket.state === "human") detailKicker.classList.add("attention");
+      if (ticket.state === "deviation") detailKicker.classList.add("deviation");
+      detailKicker.querySelector("span").textContent =
+        ticket.state === "human" ? "Needs your decision" :
+        ticket.state === "deviation" ? "Architecture deviation" :
+        `${ticket.id} · ${ticket.state === "running" ? "In progress" : ticket.state}`;
+      detailTitle.textContent = ticket.title;
+      detailOutcome.textContent = ticket.outcome;
+      editTitle.value = ticket.title;
+      editOutcome.value = ticket.outcome;
+      document.querySelector("#evidenceLabel").textContent =
+        ticket.state === "done" ? "4 evidence items" : "3 evidence items";
+      detailSheet.classList.remove("editing");
+      detailSheet.classList.add("open");
+    }
+
+    function closeDetail() {
+      selectedId = null;
+      detailSheet.classList.remove("open", "editing");
+      document.querySelectorAll(".node.selected").forEach((node) => node.classList.remove("selected"));
+    }
+
+    function toggleLane(index) {
+      const next = focusedLane === index ? null : index;
+      focusedLane = next;
+      workflow.classList.toggle("lane-focus", next !== null);
+      document.querySelectorAll(".lane").forEach((lane) => {
+        lane.classList.toggle("focused", Number(lane.dataset.laneRow) === next);
+      });
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+
+    surfaceToggle.addEventListener("click", () => setOpen(!surface.classList.contains("open")));
+    document.querySelector("#closeDetail").addEventListener("click", closeDetail);
+
+    document.querySelector("#attentionToggle").addEventListener("click", (event) => {
+      const active = workflow.classList.toggle("attention-focus");
+      event.currentTarget.classList.toggle("active", active);
+      event.currentTarget.setAttribute("aria-pressed", String(active));
+    });
+
+    document.querySelector("#copyView").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(location.href); }
+      catch { /* local file clipboard permissions may be unavailable */ }
+      showToast("View link copied.");
+    });
+
+    document.querySelector("#copyTicket").addEventListener("click", async () => {
+      const link = `${location.href.split("#")[0]}#ticket=${selectedId ?? ""}`;
+      try { await navigator.clipboard.writeText(link); }
+      catch { /* local file clipboard permissions may be unavailable */ }
+      showToast("Ticket link copied.");
+    });
+
+    document.querySelector("#evidenceButton").addEventListener("click", () => {
+      showToast("Evidence would open as a traced, bounded list.");
+    });
+
+    document.querySelector("#commitButton").addEventListener("click", () => {
+      showToast("Commit 4942462 · prototype(meta): add ticket review surface");
+    });
+
+    document.querySelector("#commentButton").addEventListener("click", () => {
+      const input = document.querySelector("#commentInput");
+      if (!input.value.trim()) {
+        input.focus();
+        showToast("Write a comment first.");
+        return;
+      }
+      input.value = "";
+      showToast("Comment added to this Ticket.");
+    });
+
+    document.querySelector("#editButton").addEventListener("click", () => {
+      detailSheet.classList.add("editing");
+      editTitle.focus();
+    });
+
+    document.querySelector("#cancelEdit").addEventListener("click", () => {
+      detailSheet.classList.remove("editing");
+    });
+
+    document.querySelector("#saveEdit").addEventListener("click", () => {
+      detailSheet.classList.remove("editing");
+      showToast("Change proposed. The original Ticket remains until validation.");
+    });
+
+    renderWorkflow();
+    const initialHash = location.hash;
+    if (initialHash === "#open" || initialHash.startsWith("#ticket=")) {
+      const requested = initialHash.startsWith("#ticket=") ? initialHash.slice(8) : null;
+      setOpen(true);
+      if (requested) selectTicket(requested);
+    }
+  </script>
+</body>
+</html>

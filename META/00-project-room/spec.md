@@ -30,6 +30,8 @@ context、change 等可复用语义进入 durable knowledge lifecycle。
 - [decision-workbench-016] 跨 workflow presentation protocol
 - [change-2026-07-18-presentation-rollout] presentation protocol 已接通
   setup/query/ingest/distill/inject/checkpoint 的真实 surfaces
+- [constraint-project-quiet-intelligence-001] Codex-like quiet intelligence：
+  轻、静、克制，但每个细节都能回应
 
 ## Draft Direction
 

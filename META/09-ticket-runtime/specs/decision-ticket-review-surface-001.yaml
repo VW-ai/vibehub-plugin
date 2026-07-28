@@ -34,6 +34,27 @@ intent:
     versus bounded delegation. It is a proposal awaiting live human reaction,
     not a ratified UI or a persistence implementation.
 
+    **Wayne review of Prototype 01 — rejected direction**
+
+    Prototype 01 split the Ticket graph, scenarios, and attention into several
+    dashboard-like regions. That obscured the whole workflow, made the surface
+    feel crowded, and left human-review Tickets detached from the place where
+    they occur. The required correction is one at-a-glance workflow in which
+    every Ticket remains visible and attention appears in situ.
+
+    **Prototype 02 — Quiet workflow signal**
+
+    `artifacts/2026-07-28-ticket-review-surface-prototype-v2.html` starts as one
+    quiet Corner Signal and expands that same object into a single workflow
+    sheet. All 23 Tickets remain visible across five scenario lanes; human
+    decisions and deviations surface semantically in their original workflow
+    position. Selecting a Ticket progressively opens its decision detail,
+    comments, edit proposal, evidence, and commit trace without replacing the
+    workflow.
+
+    Prototype 02 applies `constraint-project-quiet-intelligence-001`. It is
+    awaiting live review and is not ratified.
+
     This ticket is unresolved.
 
     **Claimed**: Codex 2026-07-28
@@ -62,3 +83,4 @@ relations:
 anchors:
   - file: "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype.html"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v2.html"

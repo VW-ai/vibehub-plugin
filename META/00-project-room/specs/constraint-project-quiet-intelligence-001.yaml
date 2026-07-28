@@ -1,0 +1,63 @@
+spec_id: "constraint-project-quiet-intelligence-001"
+type: constraint
+state: active
+intent:
+  summary: "Codex-like quiet intelligence：轻、静、克制，但每个细节都能回应。"
+  detail: |
+    This is VibeHub's product-wide interaction language across lightweight
+    surfaces. Desktop-specific spatial Workbench decisions may add constraints
+    for that App, but do not force every HTML or embedded surface to reproduce
+    desktop chrome.
+
+    - Cool-neutral: use cool neutrals, soft transparency, and low-contrast
+      depth; color communicates real semantic state rather than decoration.
+    - Few typography levels: rely primarily on two readable text sizes, then
+      create order through weight, whitespace, and position.
+    - One object, progressive disclosure: begin as a quiet Corner Signal;
+      clicking the same title expands a decision sheet and collapses it again.
+    - Everything is interactive: information may hover, expand, navigate, or
+      copy; commits and evidence remain traceable.
+    - Symbols before chrome: use icons, status points, connectors, and a visual
+      spine before adding nested cards, borders, or labels.
+    - Healthy state stays quiet: deviation, conflict, stale, recovery, or human
+      attention may surface; ordinary health does not occupy permanent space.
+    - Rigor underneath, not on the face: keep schema, authority, and proof
+      machinery below the default interface.
+    - Structured retreat, not another chat: natural-language streaming belongs
+      to the host Agent; VibeHub offers structured, non-streaming understanding
+      and decisions.
+    - Small and complete is better than broad and ugly: deepen the Corner Signal
+      and decision sheet before expanding into a heavy dashboard or App.
+
+    Product expression: VibeHub is not an App that demands continuous
+    attention; it appears quietly when something deserves attention.
+constraints:
+  - kind: must
+    rule: "Lightweight VibeHub surfaces must use the Codex-like quiet-intelligence hierarchy and disclose detail progressively."
+  - kind: must
+    rule: "Semantic color and persistent attention must be reserved for conditions that can change a human action."
+  - kind: must
+    rule: "The default surface must keep core text readable and preserve interaction, traceability, keyboard focus, and reduced motion."
+  - kind: must_not
+    rule: "Do not turn rigor into visible schema vocabulary, nested chrome, dense dashboards, or a second chat surface."
+indexing:
+  type: constraint
+  priority: P0
+  layer: project
+  domain: "interaction-design"
+  tags: [design-language, cool-neutral, progressive-disclosure, corner-signal, quiet-intelligence]
+provenance:
+  source_type: manual_input
+  confidence: 0.85
+  source_ref: "Wayne defined the Codex-like quiet-intelligence design language — 2026-07-28"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-28"
+relations:
+  - target: "decision-workbench-014"
+    type: relates_to
+    detail: "The product-wide language complements, but does not copy every desktop-specific v8 spatial Workbench constraint."
+  - target: "decision-ticket-review-surface-001"
+    type: relates_to
+    detail: "The Ticket HTML review prototype is the first lightweight consumer of this interaction language."
+anchors:
+  - file: "META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml"
