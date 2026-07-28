@@ -26,6 +26,8 @@ intent:
     closeout semantics remain owned by their focused Decision Tickets.
 
     This ticket is unresolved.
+
+    **Claimed**: Codex 2026-07-28
 constraints: []
 indexing:
   type: decision
