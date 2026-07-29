@@ -18,6 +18,11 @@ SQLite         = disposable live coordination, index, and cache
 The implementation pivot is planned in
 [`2026-07-29-ticket-git-native-skill-driven-pivot-plan.md`](artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md).
 
+The immediate code slice is frozen in
+[`2026-07-29-ticket-m1a-git-read-cut-handoff.md`](artifacts/2026-07-29-ticket-m1a-git-read-cut-handoff.md):
+one complete Git-document read path through Core, CLI, MCP, and the existing
+graph HTML, with no SQLite semantic replay.
+
 ## Canonical decisions
 
 ### Product and intelligence

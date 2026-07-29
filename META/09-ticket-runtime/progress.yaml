@@ -1,36 +1,32 @@
 progress:
-  completion: 0.5
+  completion: 0.1
   status: active
   milestones:
-    - id: "m1-ticket-review-read-kernel"
-      name: "Deterministic Ticket Review read kernel"
-      status: completed
-      completed_at: "2026-07-28"
-      evidence: "Dependency-light DTOs, opt-in strict schemas, internal source contract, deterministic projector, accepted 29-Ticket/35-relation fixture, and 26 focused contract tests."
-    - id: "m2-ticket-read-service-seam"
-      name: "Storage-agnostic Ticket source-provider seam and stateless read service"
-      status: completed
-      completed_at: "2026-07-28"
-      evidence: "Storage-agnostic Core seam, exact-snapshot source selection, three read-service responsibilities, cross-instance reconstruction tests, fail-closed no-graph/expired-snapshot behavior, strict provider/source boundaries, repository-scope forwarding, and 36 focused Ticket read tests."
-    - id: "m3-ticket-canonical-provider"
-      name: "Canonical Ticket outline/topology read-bootstrap provider and operation registration"
-      status: completed
-      completed_at: "2026-07-28"
-      evidence: "Independent Git-native Ticket store with immutable outline-compatible definition revisions and retained generations; per-file and aggregate bounded fail-closed reads; atomic-pointer concurrency; fresh-process reconstruction; cross-repository/worktree/incarnation isolation; filesystem reads outside the receipt transaction; content-addressed Ticket outcome payload deduplication; three Core operations; generated 44-operation contract; packaged Ticket wrapper; CLI and MCP parity tests."
-    - id: "m4-ticket-authoring-lifecycle"
-      name: "Ticket planning, writer CAS, and graph-mutation lifecycle"
+    - id: "m0-git-skill-authority-cut"
+      name: "Freeze the Git-native, Skill-driven authority cut"
       status: in_progress
-      evidence: "Core-internal pure outline-generation compiler and whole-generation Git publication substrate: atomic staged bootstrap, immutable no-replace revisions/generations, worktree-specific Git-admin writer arbitration, lock-held scope/head recheck, monotonic revision and no-implicit-removal guards, fsync-before-visibility ordering, retained exact generations, and focused fault/concurrency/symlink tests. The untracked operational lock is installed by atomic rename of a staged nonempty directory. Release claims owner-T as releasing-T, unlinks only that marker, then removes the canonical directory only if still empty; a successor's nonempty owner-U makes a stale removal fail harmlessly, while crash-empty state can be removed or atomically replaced. Public proposal submit/inspect/list and proposal-validation record/list/inspect bind exact snapshots, targets, proposal/candidate digests, repository incarnation, and task worktree through one Core/CLI/MCP spine; validation remains append-only claimed_unverified semantic evidence with contrary receipts preserved. The registered ticket.proposal.review.inspect operation derives eligibility and next action from the complete bounded validation-set digest/high-water/count. ticket.proposal.authority.decide accepts no caller-authored authority: only a non-serializable trusted host provider may return a host-authenticated principal, human-authority or delegation basis, and exact accepted passing validations. Bootstrap, expansion, declared human gates, and protected signals require a human basis; ordinary CLI/MCP has no provider and fails closed with trusted_authority_unavailable. The immutable decision closes the validation ledger. ticket.proposal.apply persists an immutable exact-candidate intent, enters the Git writer through an intent fence, commits a terminal published/reconciled SQLite application receipt, then releases the fence. A simulated receipt failure after Git visibility retains the exact fence; retry adopts it, recognizes current==candidate, records a reconciled receipt, and releases the lock. Cleanup after an already-committed receipt verifies the canonical head equals the candidate before claiming that exact fence; malformed or foreign fences, stale third heads, and mismatched immutable bindings fail closed. Ticket-readiness validation, explicit removal/supersession, complete Ticket definitions, and the broader execution lifecycle remain open."
-    - id: "m5-ticket-capability-authorities"
-      name: "Context, acceptance, Run, trace, and capability-currentness authorities"
+      evidence: "Successor decisions and the breaking pivot plan are active; the minimal protocol/Ticket graph fixture and implementation cut remain open."
+    - id: "m1a-git-ticket-read-cut"
+      name: "Git Ticket definition graph through Core, CLI, MCP, and read-only HTML"
       status: planned
-    - id: "m6-ticket-review-host"
-      name: "Interactive review host and trusted human decision bridge"
-      status: completed
-      completed_at: "2026-07-29"
-      evidence: "A foreground loopback-only one-proposal review host now projects a current exact candidate and the complete validation-set binding/summaries into a quiet zoomable orthogonal Ticket workflow, accepts only authorize/reject intent plus exact CAS bindings from the browser, derives the human-authority provider result inside the host, verifies the exact Core receipt before automatic application, and revokes the short-lived capability after rejection, successful application, or 30 minutes. A stale proposal fails closed: the canvas shows the current canonical graph rather than constructing a mixed candidate from a later head. Static assets are packaged with the CLI; the host, graph, Inspector, keyboard/mobile disclosure, and local-trust explanation were exercised in a disposable proposal. The boundary is intentionally cooperative same-OS-account trust, not cryptographic user-presence proof."
-    - id: "m7-ticket-dogfood-loop"
-      name: "Plan, execute, verify, and close one real feature through Tickets"
-      status: in_progress
-      evidence: "The first 10-Ticket/11-dependency execution-loop bootstrap is preserved as an exact proposal payload and human-readable scenario-lens plan. The same payload passed local schema validation, Core mechanical materialization in a disposable ledger, and an independent six-check semantic validation with only the required initial_plan_authority and experience_product signals. Submission to the repository's durable operational ledger, trusted human review, canonical publication, and execution of the graph remain pending."
-  commits: []
+      evidence: "The implementation handoff freezes the minimal protocol, exact source semantics, read cutover, deletion boundary, and P0 test matrix."
+    - id: "m1b-git-ticket-worktree-patch"
+      name: "Exact-base Ticket worktree patch and optional checkpoint"
+      status: planned
+    - id: "m2-ticket-planning-validation-skills"
+      name: "Skill-led planning, validation, and protected-boundary decisions"
+      status: planned
+    - id: "m3-git-native-review-intervention"
+      name: "Git-native comments, edits, decisions, and graph review"
+      status: planned
+    - id: "m4-ticket-execution-closeout"
+      name: "Execute, verify, and close one Ticket through Outcome and Evidence"
+      status: planned
+    - id: "m5-ticket-dogfood-clean-cut-proof"
+      name: "Complete one real dogfood loop and prove the legacy cut remains clean"
+      status: planned
+  next:
+    - "Implement the M1A Git read cut from the dated handoff."
+    - "Do not add another planning layer unless implementation exposes a real product boundary."
+  commits:
+    - "d92c99c docs(ticket): plan git-native skill-driven pivot"

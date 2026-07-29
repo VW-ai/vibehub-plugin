@@ -154,31 +154,42 @@ Work:
 
 - activate the successor decisions accompanying this plan;
 - mark the old storage/runtime/contract/lifecycle/MVP path superseded or stale;
-- add one invariant test fixture containing Ticket, relation, Proposal,
-  Validation, Decision, ApplicationReceipt, Outcome, and Evidence;
+- add one invariant test fixture containing the protocol, Tickets, and typed
+  relations; add the later semantic document fixtures with the Skills that
+  first need them;
 - document the old runtime as historical implementation evidence only.
 
 Acceptance:
 
 - no active Spec claims that SQLite owns Ticket semantic receipts;
 - no active Spec requires a mandatory containment parent;
-- the fixture can be understood without database or conversation history;
+- the Ticket graph fixture can be understood without database or conversation
+  history;
 - the pivot has an explicit no-migration and no-dual-write rule.
 
-### M1 — Build the Git Ticket ledger kernel
+### M1 — Build the Git Ticket definition-graph kernel
 
-Outcome: a fresh process reconstructs the full Ticket semantic world from one
-worktree or Git ref.
+Outcome: a fresh process reconstructs and validates the current Ticket
+definition graph from one worktree or Git ref. Proposal-to-Outcome document
+types enter through the real Skill use cases in M2–M4 rather than being
+pre-built as seven parallel services.
 
 Work:
 
-- define the small document schemas and stable path rules;
+- define `protocol.yaml`, the Ticket schema, embedded typed relations, and
+  stable path rules;
 - implement canonical parse/serialize, bounded safe reads, exact ref/worktree
   loading, derived inventory/graph digest, typed relation validation, and
   deterministic queries;
-- add atomic worktree writes with exact base/digest preconditions;
+- add validated bounded worktree patches with exact worktree, HEAD, graph
+  digest, and targeted Ticket-revision preconditions; validate the complete
+  prospective graph before writing and treat Git commit—not a local journal—as
+  the multi-file semantic atomic boundary;
 - extend semantic checkpoint validation/path isolation to the Ticket root;
-- adapt the existing review projector to the new reader.
+- adapt the existing review projector to the new reader;
+- cut the production read/HTML surface to the new ledger and remove the
+  generation/SQLite proposal, validation, authority, and apply backend rather
+  than exposing two semantic authorities.
 
 Acceptance:
 
@@ -188,7 +199,11 @@ Acceptance:
 - invalid schema, missing references, unsupported relation types, cycles where
   prohibited, duplicate IDs, and stale bases fail with actionable errors;
 - no production read falls back to SQLite or `.vibehub/ticket-store`;
+- no retired Ticket semantic operation or backend remains publicly reachable;
 - no internal generation or mutable latest pointer is required.
+
+The first complete read cut is specified in
+`artifacts/2026-07-29-ticket-m1a-git-read-cut-handoff.md`.
 
 ### M2 — Move planning, validation, and apply to Skills
 
@@ -221,20 +236,18 @@ Acceptance:
   or human-owned;
 - planning, validation, and apply perform no Ticket semantic SQLite read/write.
 
-### M3 — Make HTML a pure projection and review surface
+### M3 — Add Git-native review intervention
 
-Outcome: the accepted graph experience remains, with Git documents as its only
-semantic backing.
+Outcome: the read-only Git graph established in M1 becomes the structured
+human review and intervention surface without acquiring its own lifecycle.
 
 Work:
 
-- feed the current worktree/ref ledger into the existing graph projector;
 - make comments, simple edits, plan review, and decisions produce inspectable
   Git document patches;
-- remove trusted authority-provider minting and SQLite application receipt
-  verification from the host;
-- display committed ref/commit, dirty semantic changes, stale base, and human
-  blockers without turning the page into a dashboard.
+- show human blockers and protected decisions without turning the page into a
+  dashboard;
+- preserve the M1 Git-source and dirty/stale presentation.
 
 Acceptance:
 
@@ -272,7 +285,7 @@ Acceptance:
 - a protected deviation creates a visible decision/blocker and stops the
   affected path while independent work may continue.
 
-### M5 — Dogfood and remove the legacy semantic runtime
+### M5 — Dogfood and prove the cut is clean
 
 Outcome: one real Plugin feature completes through the new loop and the repo
 contains only one Ticket semantic model.
@@ -284,14 +297,10 @@ Work:
 - run plan → optional review/delegation → parallel execution → join →
   verification → Outcome/Evidence → follow-up/closeout;
 - exercise two worktrees and a branch switch;
-- cut CLI/MCP/HTML handlers to the Git ledger;
-- delete the five Ticket semantic SQLite table families, SQL triggers,
-  application-intent recovery, trusted-provider plumbing, generation publisher,
-  old operation schemas and generated contracts, obsolete CLI/MCP/host glue,
-  dead exports, and tests or fixtures that only prove the retired protocol;
-- remove unused imports, dependencies, feature flags, commented-out code,
-  compatibility shims, and active documentation that describes the retired
-  path;
+- audit that the M1 cut left no retired Ticket table, trigger, recovery path,
+  provider, service, operation, generated contract, adapter, export, test,
+  fixture, dependency, feature flag, compatibility shim, or active
+  documentation; delete any residual rather than waiving it;
 - retain or rewrite tests around final user scenarios.
 
 Acceptance:
@@ -317,18 +326,21 @@ Cleanup is part of the pivot, not a follow-up hygiene ticket. A legacy artifact
 may remain only when it is one of the dated META references intentionally kept
 for design provenance. Production source, schemas, generated files, package
 exports, adapters, tests, fixtures, and current documentation must describe and
-exercise only the new authority model after M5.
+exercise only the new authority model when M1A cuts production reads to the
+Git document ledger. M5 re-audits that boundary after the complete dogfood
+loop; it is not the first deletion point.
 
 ## Cutover rule
 
-This is a capability-by-capability code transition but a single authority
-model:
+This is one read-authority cut followed by capability growth:
 
 1. build and test the Git document path behind a non-production entry;
-2. switch a complete capability to Git;
-3. never dual-write that capability;
-4. once the full dogfood loop passes, delete the old semantic path in the same
-   pivot branch.
+2. switch the complete Ticket read/HTML capability to Git and delete the old
+   generation/SQLite semantic stack in the same M1A cut;
+3. add Git-native write capabilities through Skills without restoring the old
+   path or dual-writing;
+4. after the full dogfood loop passes, audit and remove any residual rather
+   than deferring the original cut.
 
 No SQLite Ticket data export, compatibility mapping, legacy generation reader,
 or long-lived feature flag is required.
