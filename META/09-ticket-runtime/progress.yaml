@@ -1,4 +1,33 @@
 progress:
-  completion: 0.0
-  milestones: []
+  completion: 0.3
+  status: active
+  milestones:
+    - id: "m1-ticket-review-read-kernel"
+      name: "Deterministic Ticket Review read kernel"
+      status: completed
+      completed_at: "2026-07-28"
+      evidence: "Dependency-light DTOs, opt-in strict schemas, internal source contract, deterministic projector, accepted 29-Ticket/35-relation fixture, and 26 focused contract tests."
+    - id: "m2-ticket-read-service-seam"
+      name: "Storage-agnostic Ticket source-provider seam and stateless read service"
+      status: completed
+      completed_at: "2026-07-28"
+      evidence: "Storage-agnostic Core seam, exact-snapshot source selection, three read-service responsibilities, cross-instance reconstruction tests, fail-closed no-graph/expired-snapshot behavior, strict provider/source boundaries, repository-scope forwarding, and 36 focused Ticket read tests."
+    - id: "m3-ticket-canonical-provider"
+      name: "Canonical Ticket outline/topology read-bootstrap provider and operation registration"
+      status: completed
+      completed_at: "2026-07-28"
+      evidence: "Independent Git-native Ticket store with immutable outline-compatible definition revisions and retained generations; per-file and aggregate bounded fail-closed reads; atomic-pointer concurrency; fresh-process reconstruction; cross-repository/worktree/incarnation isolation; filesystem reads outside the receipt transaction; content-addressed Ticket outcome payload deduplication; three Core operations; generated 44-operation contract; packaged Ticket wrapper; CLI and MCP parity tests."
+    - id: "m4-ticket-authoring-lifecycle"
+      name: "Ticket planning, writer CAS, and graph-mutation lifecycle"
+      status: in_progress
+      evidence: "Core-internal pure outline-generation compiler and authority-neutral publication-head CAS substrate: atomic staged bootstrap, immutable no-replace revisions/generations, worktree-local cross-process writer lock, lock-held scope/head recheck, monotonic revision and no-implicit-removal guards, fsync-before-visibility ordering, explicit post-rename commit uncertainty, retained exact generations, and focused fault/concurrency/symlink tests. The public submit-only proposal slice adds exact snapshot/target preconditions, repository-incarnation and task-worktree rechecks, a 4 MiB decoded logical-input budget with pre-parse CLI/Skill guards and bounded MCP framing, Core-generated identity/revision/time/proposal provenance, claimed-unverified creation attribution, forced initial-plan routing for bootstrap, mechanical complete-candidate review, and an immutable SQLite contribution committed with its operation receipt. Materialized creates/revisions expose compact previous-outcome/parent and added/removed dependency deltas rather than a full previous definition; complete output is capped at 8 MiB before persistence with split guidance. Proposal inspect/list and proposal-validation record/list/inspect are frozen on the same Core/CLI/MCP spine. The independent vibehub-ticket-validate Skill reads required context from the exact observed snapshot, uses snapshot-bound relationRef evidence for changed or retained existing relations, and records append-only claimed_unverified, validation_evidence_only contributions with no maturity effect, authority, apply authorization, or graph mutation. Contrary receipts coexist with no current/latest selection. Proposal application, Ticket-readiness validation, and trusted authority remain unregistered."
+    - id: "m5-ticket-capability-authorities"
+      name: "Context, acceptance, Run, trace, and capability-currentness authorities"
+      status: planned
+    - id: "m6-ticket-review-host"
+      name: "Interactive review host and trusted human decision bridge"
+      status: planned
+    - id: "m7-ticket-dogfood-loop"
+      name: "Plan, execute, verify, and close one real feature through Tickets"
+      status: planned
   commits: []

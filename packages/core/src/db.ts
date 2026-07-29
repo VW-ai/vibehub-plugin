@@ -1050,6 +1050,559 @@ const MIGRATIONS: string[] = [
     cutover_at TEXT NOT NULL
   );
   `,
+
+  // 017 — content-addressed payload storage for large immutable operation
+  // outcomes. Ticket read receipts keep their request identity in the ledger
+  // but share one immutable payload across equivalent refreshes.
+  `
+  CREATE TABLE operation_outcome_blobs (
+    digest TEXT PRIMARY KEY
+      CHECK(length(digest) = 64 AND digest NOT GLOB '*[^0-9a-f]*'),
+    outcome_kind TEXT NOT NULL CHECK(outcome_kind IN ('success','error')),
+    payload TEXT NOT NULL CHECK(json_valid(payload)),
+    byte_length INTEGER NOT NULL
+      CHECK(byte_length >= 0 AND byte_length = length(CAST(payload AS BLOB))),
+    created_at TEXT NOT NULL
+  );
+  ALTER TABLE operation_request_receipts
+    ADD COLUMN outcome_blob_digest TEXT
+      REFERENCES operation_outcome_blobs(digest)
+      CHECK(outcome_blob_digest IS NULL OR
+        (length(outcome_blob_digest) = 64 AND
+         outcome_blob_digest NOT GLOB '*[^0-9a-f]*'));
+  CREATE TRIGGER operation_outcome_blobs_immutable_update
+    BEFORE UPDATE ON operation_outcome_blobs
+    BEGIN SELECT RAISE(ABORT,'operation outcome blobs are immutable'); END;
+  CREATE TRIGGER operation_outcome_blobs_immutable_delete
+    BEFORE DELETE ON operation_outcome_blobs
+    BEGIN SELECT RAISE(ABORT,'operation outcome blobs are immutable'); END;
+  CREATE TRIGGER operation_request_receipt_blob_binding_insert
+    BEFORE INSERT ON operation_request_receipts
+    WHEN NEW.outcome_blob_digest IS NOT NULL AND (
+      NEW.operation NOT IN (
+        'ticket.graph.snapshot',
+        'ticket.subject.inspect',
+        'ticket.trace.list'
+      ) OR
+      COALESCE(json_type(NEW.outcome,'$.outcomeBlob') <> 'text',1) OR
+      COALESCE(json_extract(NEW.outcome,'$.outcomeBlob') <>
+        NEW.outcome_blob_digest,1) OR
+      NOT EXISTS (
+        SELECT 1 FROM operation_outcome_blobs b
+        WHERE b.digest=NEW.outcome_blob_digest
+          AND b.outcome_kind=NEW.outcome_kind
+      )
+    )
+    BEGIN SELECT RAISE(ABORT,'operation outcome blob binding is invalid'); END;
+  `,
+
+  // 018 — immutable, scope-bound Ticket proposal contributions. A proposal
+  // is review material only: this ledger carries no mutable approval/status
+  // field and cannot mutate the Git-native Ticket graph. Submission shares
+  // the dispatcher's SQLite transaction with its request receipt.
+  `
+  CREATE TABLE ticket_proposals (
+    sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+    repo_id INTEGER NOT NULL REFERENCES repos(id),
+    scope_ref TEXT NOT NULL
+      CHECK(length(scope_ref)=68 AND substr(scope_ref,1,4)='tps-' AND
+            substr(scope_ref,5) NOT GLOB '*[^0-9a-f]*'),
+    proposal_id TEXT NOT NULL
+      CHECK(length(proposal_id)=68 AND substr(proposal_id,1,4)='tgp-' AND
+            substr(proposal_id,5) NOT GLOB '*[^0-9a-f]*'),
+    proposal_digest TEXT NOT NULL
+      CHECK(length(proposal_digest)=64 AND
+            proposal_digest NOT GLOB '*[^0-9a-f]*'),
+    kind TEXT NOT NULL CHECK(kind IN ('comment','graph_change')),
+    observed_snapshot_id TEXT
+      CHECK(observed_snapshot_id IS NULL OR
+            (length(observed_snapshot_id)=68 AND
+             substr(observed_snapshot_id,1,4)='tgs-' AND
+             substr(observed_snapshot_id,5) NOT GLOB '*[^0-9a-f]*')),
+    repository_root TEXT NOT NULL CHECK(length(repository_root)>0),
+    worktree_root TEXT NOT NULL CHECK(length(worktree_root)>0),
+    repository_incarnation TEXT NOT NULL
+      CHECK(length(repository_incarnation)>0),
+    author TEXT NOT NULL CHECK(length(author)>0),
+    task_id TEXT REFERENCES tasks(id),
+    request_id TEXT NOT NULL CHECK(length(request_id)>0),
+    submitted_at TEXT NOT NULL CHECK(length(submitted_at)>0),
+    payload TEXT NOT NULL CHECK(json_valid(payload)),
+    byte_length INTEGER NOT NULL
+      CHECK(byte_length>=0 AND
+            byte_length=length(CAST(payload AS BLOB))),
+    UNIQUE(repo_id,proposal_id),
+    UNIQUE(repo_id,request_id),
+    CHECK(json_extract(payload,'$.schemaVersion')=1 AND
+          json_extract(payload,'$.proposalId')=proposal_id AND
+          json_extract(payload,'$.proposalDigest')=proposal_digest AND
+          json_extract(payload,'$.scopeRef')=scope_ref AND
+          json_extract(payload,'$.kind')=kind AND
+          json_extract(payload,'$.observedSnapshotId')
+            IS observed_snapshot_id AND
+          json_extract(payload,'$.submittedAt')=submitted_at AND
+          json_extract(payload,'$.proposer.kind')='claimed_actor' AND
+          json_extract(payload,'$.proposer.ref')=author AND
+          json_extract(payload,'$.effect')='review_contribution_only' AND
+          json_extract(payload,'$.graphMutationApplied')=0)
+  );
+  CREATE INDEX idx_ticket_proposals_scope_sequence
+    ON ticket_proposals(repo_id,scope_ref,sequence);
+  CREATE TRIGGER ticket_proposals_immutable_update
+    BEFORE UPDATE ON ticket_proposals
+    BEGIN SELECT RAISE(ABORT,'Ticket proposals are immutable'); END;
+  CREATE TRIGGER ticket_proposals_immutable_delete
+    BEFORE DELETE ON ticket_proposals
+    BEGIN SELECT RAISE(ABORT,'Ticket proposals are immutable'); END;
+
+  DROP TRIGGER operation_request_receipt_blob_binding_insert;
+  CREATE TRIGGER operation_request_receipt_blob_binding_insert
+    BEFORE INSERT ON operation_request_receipts
+    WHEN NEW.outcome_blob_digest IS NOT NULL AND (
+      NEW.operation NOT IN (
+        'ticket.graph.snapshot',
+        'ticket.subject.inspect',
+        'ticket.trace.list',
+        'ticket.proposal.submit'
+      ) OR
+      COALESCE(json_type(NEW.outcome,'$.outcomeBlob') <> 'text',1) OR
+      COALESCE(json_extract(NEW.outcome,'$.outcomeBlob') <>
+        NEW.outcome_blob_digest,1) OR
+      NOT EXISTS (
+        SELECT 1 FROM operation_outcome_blobs b
+        WHERE b.digest=NEW.outcome_blob_digest
+          AND b.outcome_kind=NEW.outcome_kind
+      )
+    )
+    BEGIN SELECT RAISE(ABORT,'operation outcome blob binding is invalid'); END;
+  `,
+
+  // 019 — queryable proposal ledger and append-only proposal-specific
+  // validation evidence. Migration refuses to bless any v18 proposal that
+  // exploited SQLite's NULL-valued CHECK behavior for absent JSON keys.
+  // Validation receipts bind one exact graph-change proposal/candidate and
+  // explicitly grant neither maturity nor application authority.
+  `
+  CREATE TRIGGER ticket_proposals_required_payload_insert
+    BEFORE INSERT ON ticket_proposals
+    WHEN
+      COALESCE(json_type(NEW.payload) <> 'object',1) OR
+      COALESCE(json_type(NEW.payload,'$.schemaVersion') <> 'integer',1) OR
+      COALESCE(json_extract(NEW.payload,'$.schemaVersion') <> 1,1) OR
+      COALESCE(json_type(NEW.payload,'$.proposalId') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,'$.proposalId') <>
+        NEW.proposal_id,1) OR
+      COALESCE(json_type(NEW.payload,'$.proposalDigest') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,'$.proposalDigest') <>
+        NEW.proposal_digest,1) OR
+      COALESCE(json_type(NEW.payload,'$.scopeRef') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,'$.scopeRef') <> NEW.scope_ref,1) OR
+      COALESCE(json_type(NEW.payload,'$.kind') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,'$.kind') <> NEW.kind,1) OR
+      (
+        NEW.observed_snapshot_id IS NULL AND
+        COALESCE(json_type(NEW.payload,'$.observedSnapshotId') <> 'null',1)
+      ) OR
+      (
+        NEW.observed_snapshot_id IS NOT NULL AND (
+          COALESCE(json_type(NEW.payload,'$.observedSnapshotId') <> 'text',1) OR
+          COALESCE(json_extract(NEW.payload,'$.observedSnapshotId') <>
+            NEW.observed_snapshot_id,1)
+        )
+      ) OR
+      COALESCE(json_type(NEW.payload,'$.submittedAt') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,'$.submittedAt') <>
+        NEW.submitted_at,1) OR
+      COALESCE(json_type(NEW.payload,'$.proposer') <> 'object',1) OR
+      COALESCE(json_type(NEW.payload,'$.proposer.kind') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,'$.proposer.kind') <>
+        'claimed_actor',1) OR
+      COALESCE(json_type(NEW.payload,'$.proposer.ref') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,'$.proposer.ref') <> NEW.author,1) OR
+      COALESCE(json_type(NEW.payload,'$.effect') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,'$.effect') <>
+        'review_contribution_only',1) OR
+      COALESCE(json_type(NEW.payload,'$.graphMutationApplied') <>
+        'false',1) OR
+      COALESCE(json_type(NEW.payload,'$.reviewRequirement') <>
+        'object',1) OR
+      COALESCE(json_type(NEW.payload,
+        '$.reviewRequirement.independentMachineValidation') <> 'text',1) OR
+      COALESCE(json_type(NEW.payload,
+        '$.reviewRequirement.authorityStatus') <> 'text',1) OR
+      COALESCE(json_extract(NEW.payload,
+        '$.reviewRequirement.authorityStatus') <> 'not_granted',1) OR
+      COALESCE(json_type(NEW.payload,
+        '$.reviewRequirement.routeHint') <> 'text',1) OR
+      COALESCE(json_type(NEW.payload,
+        '$.reviewRequirement.indicatedAuthoritySignals') <> 'array',1) OR
+      (
+        NEW.kind='comment' AND (
+          NEW.observed_snapshot_id IS NULL OR
+          COALESCE(json_type(NEW.payload,'$.subject') <> 'object',1) OR
+          COALESCE(json_type(NEW.payload,'$.body') <> 'text',1) OR
+          COALESCE(json_extract(NEW.payload,
+            '$.reviewRequirement.independentMachineValidation') <>
+            'not_applicable',1) OR
+          COALESCE(json_extract(NEW.payload,
+            '$.reviewRequirement.routeHint') <> 'comment_only',1) OR
+          COALESCE(json_array_length(NEW.payload,
+            '$.reviewRequirement.indicatedAuthoritySignals') <> 0,1)
+        )
+      ) OR
+      (
+        NEW.kind='graph_change' AND (
+          COALESCE(json_type(NEW.payload,'$.reason') <> 'text',1) OR
+          COALESCE(json_type(NEW.payload,'$.source')
+            NOT IN ('object','null'),1) OR
+          COALESCE(json_type(NEW.payload,'$.authorAssessment') <>
+            'object',1) OR
+          COALESCE(json_type(NEW.payload,'$.changes') <> 'array',1) OR
+          COALESCE(json_array_length(NEW.payload,'$.changes') < 1,1) OR
+          COALESCE(json_type(NEW.payload,'$.mechanicalReview') <>
+            'object',1) OR
+          COALESCE(json_extract(NEW.payload,
+            '$.mechanicalReview.status') <> 'passed',1) OR
+          COALESCE(json_type(NEW.payload,
+            '$.mechanicalReview.candidateDigest') <> 'text',1) OR
+          COALESCE(json_extract(NEW.payload,
+            '$.reviewRequirement.independentMachineValidation') <>
+            'required',1) OR
+          COALESCE(json_extract(NEW.payload,
+            '$.reviewRequirement.routeHint')
+            NOT IN ('delegated_application_candidate',
+                    'human_authority_indicated'),1)
+        )
+      )
+    BEGIN SELECT RAISE(ABORT,
+      'Ticket proposal payload is missing required bound fields'); END;
+
+  CREATE TABLE ticket_proposals_migration_019_guard (
+    invalid INTEGER NOT NULL CHECK(invalid=0)
+  );
+  INSERT INTO ticket_proposals_migration_019_guard(invalid)
+    SELECT 1
+    WHERE EXISTS (
+      SELECT 1 FROM ticket_proposals p
+      WHERE
+        COALESCE(json_type(p.payload) <> 'object',1) OR
+        COALESCE(json_type(p.payload,'$.schemaVersion') <> 'integer',1) OR
+        COALESCE(json_extract(p.payload,'$.schemaVersion') <> 1,1) OR
+        COALESCE(json_type(p.payload,'$.proposalId') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,'$.proposalId') <> p.proposal_id,1) OR
+        COALESCE(json_type(p.payload,'$.proposalDigest') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,'$.proposalDigest') <>
+          p.proposal_digest,1) OR
+        COALESCE(json_type(p.payload,'$.scopeRef') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,'$.scopeRef') <> p.scope_ref,1) OR
+        COALESCE(json_type(p.payload,'$.kind') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,'$.kind') <> p.kind,1) OR
+        (
+          p.observed_snapshot_id IS NULL AND
+          COALESCE(json_type(p.payload,'$.observedSnapshotId') <> 'null',1)
+        ) OR
+        (
+          p.observed_snapshot_id IS NOT NULL AND (
+            COALESCE(json_type(p.payload,'$.observedSnapshotId') <> 'text',1) OR
+            COALESCE(json_extract(p.payload,'$.observedSnapshotId') <>
+              p.observed_snapshot_id,1)
+          )
+        ) OR
+        COALESCE(json_type(p.payload,'$.submittedAt') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,'$.submittedAt') <> p.submitted_at,1) OR
+        COALESCE(json_type(p.payload,'$.proposer') <> 'object',1) OR
+        COALESCE(json_type(p.payload,'$.proposer.kind') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,'$.proposer.kind') <>
+          'claimed_actor',1) OR
+        COALESCE(json_type(p.payload,'$.proposer.ref') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,'$.proposer.ref') <> p.author,1) OR
+        COALESCE(json_type(p.payload,'$.effect') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,'$.effect') <>
+          'review_contribution_only',1) OR
+        COALESCE(json_type(p.payload,'$.graphMutationApplied') <> 'false',1) OR
+        COALESCE(json_type(p.payload,'$.reviewRequirement') <> 'object',1) OR
+        COALESCE(json_type(p.payload,
+          '$.reviewRequirement.independentMachineValidation') <> 'text',1) OR
+        COALESCE(json_type(p.payload,
+          '$.reviewRequirement.authorityStatus') <> 'text',1) OR
+        COALESCE(json_extract(p.payload,
+          '$.reviewRequirement.authorityStatus') <> 'not_granted',1) OR
+        COALESCE(json_type(p.payload,
+          '$.reviewRequirement.routeHint') <> 'text',1) OR
+        COALESCE(json_type(p.payload,
+          '$.reviewRequirement.indicatedAuthoritySignals') <> 'array',1) OR
+        (
+          p.kind='comment' AND (
+            p.observed_snapshot_id IS NULL OR
+            COALESCE(json_type(p.payload,'$.subject') <> 'object',1) OR
+            COALESCE(json_type(p.payload,'$.body') <> 'text',1) OR
+            COALESCE(json_extract(p.payload,
+              '$.reviewRequirement.independentMachineValidation') <>
+              'not_applicable',1) OR
+            COALESCE(json_extract(p.payload,
+              '$.reviewRequirement.routeHint') <> 'comment_only',1) OR
+            COALESCE(json_array_length(p.payload,
+              '$.reviewRequirement.indicatedAuthoritySignals') <> 0,1)
+          )
+        ) OR
+        (
+          p.kind='graph_change' AND (
+            COALESCE(json_type(p.payload,'$.reason') <> 'text',1) OR
+            COALESCE(json_type(p.payload,'$.source')
+              NOT IN ('object','null'),1) OR
+            COALESCE(json_type(p.payload,'$.authorAssessment') <>
+              'object',1) OR
+            COALESCE(json_type(p.payload,'$.changes') <> 'array',1) OR
+            COALESCE(json_array_length(p.payload,'$.changes') < 1,1) OR
+            COALESCE(json_type(p.payload,'$.mechanicalReview') <>
+              'object',1) OR
+            COALESCE(json_extract(p.payload,
+              '$.mechanicalReview.status') <> 'passed',1) OR
+            COALESCE(json_type(p.payload,
+              '$.mechanicalReview.candidateDigest') <> 'text',1) OR
+            COALESCE(json_extract(p.payload,
+              '$.reviewRequirement.independentMachineValidation') <>
+              'required',1) OR
+            COALESCE(json_extract(p.payload,
+              '$.reviewRequirement.routeHint')
+              NOT IN ('delegated_application_candidate',
+                      'human_authority_indicated'),1)
+          )
+        )
+    );
+  DROP TABLE ticket_proposals_migration_019_guard;
+
+  CREATE TABLE ticket_proposal_validation_receipts (
+    sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+    repo_id INTEGER NOT NULL REFERENCES repos(id),
+    scope_ref TEXT NOT NULL
+      CHECK(length(scope_ref)=68 AND substr(scope_ref,1,4)='tps-' AND
+            substr(scope_ref,5) NOT GLOB '*[^0-9a-f]*'),
+    validation_receipt_id TEXT NOT NULL
+      CHECK(length(validation_receipt_id)=68 AND
+            substr(validation_receipt_id,1,4)='tpv-' AND
+            substr(validation_receipt_id,5) NOT GLOB '*[^0-9a-f]*'),
+    validation_receipt_digest TEXT NOT NULL
+      CHECK(length(validation_receipt_digest)=64 AND
+            validation_receipt_digest NOT GLOB '*[^0-9a-f]*'),
+    proposal_id TEXT NOT NULL
+      CHECK(length(proposal_id)=68 AND substr(proposal_id,1,4)='tgp-' AND
+            substr(proposal_id,5) NOT GLOB '*[^0-9a-f]*'),
+    proposal_digest TEXT NOT NULL
+      CHECK(length(proposal_digest)=64 AND
+            proposal_digest NOT GLOB '*[^0-9a-f]*'),
+    observed_snapshot_id TEXT
+      CHECK(observed_snapshot_id IS NULL OR
+            (length(observed_snapshot_id)=68 AND
+             substr(observed_snapshot_id,1,4)='tgs-' AND
+             substr(observed_snapshot_id,5) NOT GLOB '*[^0-9a-f]*')),
+    candidate_digest TEXT NOT NULL
+      CHECK(length(candidate_digest)=64 AND
+            candidate_digest NOT GLOB '*[^0-9a-f]*'),
+    repository_root TEXT NOT NULL CHECK(length(repository_root)>0),
+    worktree_root TEXT NOT NULL CHECK(length(worktree_root)>0),
+    repository_incarnation TEXT NOT NULL
+      CHECK(length(repository_incarnation)>0),
+    author TEXT NOT NULL CHECK(length(author)>0),
+    task_id TEXT REFERENCES tasks(id),
+    request_id TEXT NOT NULL CHECK(length(request_id)>0),
+    recorded_at TEXT NOT NULL CHECK(length(recorded_at)>0),
+    validator_id TEXT NOT NULL CHECK(length(validator_id)>0),
+    validator_version TEXT NOT NULL CHECK(length(validator_version)>0),
+    validator_artifact_digest TEXT NOT NULL
+      CHECK(length(validator_artifact_digest)=64 AND
+            validator_artifact_digest NOT GLOB '*[^0-9a-f]*'),
+    policy_id TEXT NOT NULL CHECK(length(policy_id)>0),
+    policy_version TEXT NOT NULL CHECK(length(policy_version)>0),
+    policy_artifact_digest TEXT NOT NULL
+      CHECK(length(policy_artifact_digest)=64 AND
+            policy_artifact_digest NOT GLOB '*[^0-9a-f]*'),
+    conclusion TEXT NOT NULL
+      CHECK(conclusion IN ('passed','failed','inconclusive')),
+    check_count INTEGER NOT NULL CHECK(check_count=6),
+    finding_count INTEGER NOT NULL CHECK(finding_count>=0),
+    blocking_finding_count INTEGER NOT NULL
+      CHECK(blocking_finding_count>=0),
+    advisory_finding_count INTEGER NOT NULL
+      CHECK(advisory_finding_count>=0),
+    authority_signal_count INTEGER NOT NULL
+      CHECK(authority_signal_count>=0),
+    payload TEXT NOT NULL CHECK(json_valid(payload)),
+    byte_length INTEGER NOT NULL
+      CHECK(byte_length>=0 AND
+            byte_length=length(CAST(payload AS BLOB))),
+    UNIQUE(repo_id,validation_receipt_id),
+    UNIQUE(repo_id,request_id),
+    FOREIGN KEY(repo_id,proposal_id)
+      REFERENCES ticket_proposals(repo_id,proposal_id),
+    CHECK(blocking_finding_count+advisory_finding_count=finding_count)
+  );
+  CREATE INDEX idx_ticket_proposal_validations_scope_sequence
+    ON ticket_proposal_validation_receipts(repo_id,scope_ref,sequence);
+  CREATE INDEX idx_ticket_proposal_validations_proposal_sequence
+    ON ticket_proposal_validation_receipts(
+      repo_id,scope_ref,proposal_id,sequence
+    );
+  CREATE TRIGGER ticket_proposal_validation_receipts_immutable_update
+    BEFORE UPDATE ON ticket_proposal_validation_receipts
+    BEGIN SELECT RAISE(ABORT,
+      'Ticket proposal validation receipts are immutable'); END;
+  CREATE TRIGGER ticket_proposal_validation_receipts_immutable_delete
+    BEFORE DELETE ON ticket_proposal_validation_receipts
+    BEGIN SELECT RAISE(ABORT,
+      'Ticket proposal validation receipts are immutable'); END;
+  CREATE TRIGGER ticket_proposal_validation_receipts_binding_insert
+    BEFORE INSERT ON ticket_proposal_validation_receipts
+    WHEN
+      COALESCE(json_type(NEW.payload) <> 'object',1) OR
+      COALESCE(json_extract(NEW.payload,'$.schemaVersion') <> 1,1) OR
+      COALESCE(json_extract(NEW.payload,'$.kind') <>
+        'ticket_proposal_validation_receipt',1) OR
+      COALESCE(json_extract(NEW.payload,'$.validationReceiptId') <>
+        NEW.validation_receipt_id,1) OR
+      COALESCE(json_extract(NEW.payload,'$.validationReceiptDigest') <>
+        NEW.validation_receipt_digest,1) OR
+      COALESCE(json_extract(NEW.payload,'$.scopeRef') <> NEW.scope_ref,1) OR
+      COALESCE(json_extract(NEW.payload,'$.target.kind') <>
+        'ticket_graph_change_proposal',1) OR
+      COALESCE(json_extract(NEW.payload,'$.target.proposalId') <>
+        NEW.proposal_id,1) OR
+      COALESCE(json_extract(NEW.payload,'$.target.proposalDigest') <>
+        NEW.proposal_digest,1) OR
+      (
+        NEW.observed_snapshot_id IS NULL AND
+        COALESCE(json_type(NEW.payload,
+          '$.target.observedSnapshotId') <> 'null',1)
+      ) OR
+      (
+        NEW.observed_snapshot_id IS NOT NULL AND (
+          COALESCE(json_type(NEW.payload,
+            '$.target.observedSnapshotId') <> 'text',1) OR
+          COALESCE(json_extract(NEW.payload,
+            '$.target.observedSnapshotId') <> NEW.observed_snapshot_id,1)
+        )
+      ) OR
+      COALESCE(json_extract(NEW.payload,'$.target.candidateDigest') <>
+        NEW.candidate_digest,1) OR
+      COALESCE(json_extract(NEW.payload,'$.recordedAt') <>
+        NEW.recorded_at,1) OR
+      COALESCE(json_extract(NEW.payload,'$.producer.kind') <>
+        'claimed_machine_validator',1) OR
+      COALESCE(json_extract(NEW.payload,'$.producer.id') <>
+        NEW.validator_id,1) OR
+      COALESCE(json_extract(NEW.payload,'$.producer.version') <>
+        NEW.validator_version,1) OR
+      COALESCE(json_extract(NEW.payload,'$.producer.artifactDigest') <>
+        NEW.validator_artifact_digest,1) OR
+      COALESCE(json_extract(NEW.payload,'$.producer.trust') <>
+        'claimed_unverified',1) OR
+      COALESCE(json_extract(NEW.payload,'$.producer.invokedBy.kind') <>
+        'claimed_actor',1) OR
+      COALESCE(json_extract(NEW.payload,'$.producer.invokedBy.ref') <>
+        NEW.author,1) OR
+      COALESCE(json_extract(NEW.payload,'$.policy.id') <>
+        NEW.policy_id,1) OR
+      COALESCE(json_extract(NEW.payload,'$.policy.version') <>
+        NEW.policy_version,1) OR
+      COALESCE(json_extract(NEW.payload,'$.policy.artifactDigest') <>
+        NEW.policy_artifact_digest,1) OR
+      COALESCE(json_extract(NEW.payload,'$.policy.trust') <>
+        'claimed_unverified',1) OR
+      COALESCE(json_extract(NEW.payload,'$.conclusion') <>
+        NEW.conclusion,1) OR
+      COALESCE(json_type(NEW.payload,'$.checks') <> 'array',1) OR
+      COALESCE(json_array_length(NEW.payload,'$.checks') <>
+        NEW.check_count,1) OR
+      EXISTS (
+        SELECT 1 FROM json_each(NEW.payload,'$.checks') c
+        WHERE COALESCE(json_extract(c.value,'$.code') NOT IN (
+          'promise_preservation','containment_truth','dependency_truth',
+          'change_classification','delegated_scope','protected_boundaries'
+        ),1)
+      ) OR
+      COALESCE((
+        SELECT COUNT(DISTINCT json_extract(c.value,'$.code'))
+        FROM json_each(NEW.payload,'$.checks') c
+      ) <> 6,1) OR
+      COALESCE(json_type(NEW.payload,'$.findings') <> 'array',1) OR
+      COALESCE(json_array_length(NEW.payload,'$.findings') <>
+        NEW.finding_count,1) OR
+      EXISTS (
+        SELECT 1 FROM json_each(NEW.payload,'$.findings') f
+        WHERE COALESCE(json_extract(f.value,'$.impact')
+          NOT IN ('blocking','advisory'),1)
+      ) OR
+      COALESCE((
+        SELECT COUNT(*) FROM json_each(NEW.payload,'$.findings') f
+        WHERE json_extract(f.value,'$.impact')='blocking'
+      ) <> NEW.blocking_finding_count,1) OR
+      COALESCE((
+        SELECT COUNT(*) FROM json_each(NEW.payload,'$.findings') f
+        WHERE json_extract(f.value,'$.impact')='advisory'
+      ) <> NEW.advisory_finding_count,1) OR
+      COALESCE(json_type(NEW.payload,'$.indicatedAuthoritySignals') <>
+        'array',1) OR
+      COALESCE(json_array_length(NEW.payload,'$.indicatedAuthoritySignals') <>
+        NEW.authority_signal_count,1) OR
+      EXISTS (
+        SELECT 1 FROM json_each(
+          NEW.payload,'$.indicatedAuthoritySignals'
+        ) s
+        WHERE COALESCE(s.type <> 'text' OR s.value NOT IN (
+          'initial_plan_authority','experience_product',
+          'principle_deviation','permission_side_effect','risk_policy'
+        ),1)
+      ) OR
+      COALESCE(json_extract(NEW.payload,'$.effect') <>
+        'validation_evidence_only',1) OR
+      COALESCE(json_extract(NEW.payload,'$.maturityEffect') <> 'none',1) OR
+      COALESCE(json_type(NEW.payload,'$.authorityGranted') <> 'false',1) OR
+      COALESCE(json_type(NEW.payload,'$.applicationAuthorized') <>
+        'false',1) OR
+      COALESCE(json_type(NEW.payload,'$.graphMutationApplied') <>
+        'false',1) OR
+      NOT EXISTS (
+        SELECT 1 FROM ticket_proposals p
+        WHERE p.repo_id=NEW.repo_id
+          AND p.scope_ref=NEW.scope_ref
+          AND p.proposal_id=NEW.proposal_id
+          AND p.proposal_digest=NEW.proposal_digest
+          AND p.kind='graph_change'
+          AND p.observed_snapshot_id IS NEW.observed_snapshot_id
+          AND COALESCE(json_type(p.payload,
+            '$.mechanicalReview.candidateDigest')='text',0)
+          AND json_extract(p.payload,
+            '$.mechanicalReview.candidateDigest')=NEW.candidate_digest
+      )
+    BEGIN SELECT RAISE(ABORT,
+      'Ticket proposal validation receipt binding is invalid'); END;
+
+  DROP TRIGGER operation_request_receipt_blob_binding_insert;
+  CREATE TRIGGER operation_request_receipt_blob_binding_insert
+    BEFORE INSERT ON operation_request_receipts
+    WHEN NEW.outcome_blob_digest IS NOT NULL AND (
+      NEW.operation NOT IN (
+        'ticket.graph.snapshot',
+        'ticket.subject.inspect',
+        'ticket.trace.list',
+        'ticket.proposal.submit',
+        'ticket.proposal.inspect',
+        'ticket.proposal.list',
+        'ticket.proposal.validation.record',
+        'ticket.proposal.validation.list',
+        'ticket.proposal.validation.inspect'
+      ) OR
+      COALESCE(json_type(NEW.outcome,'$.outcomeBlob') <> 'text',1) OR
+      COALESCE(json_extract(NEW.outcome,'$.outcomeBlob') <>
+        NEW.outcome_blob_digest,1) OR
+      NOT EXISTS (
+        SELECT 1 FROM operation_outcome_blobs b
+        WHERE b.digest=NEW.outcome_blob_digest
+          AND b.outcome_kind=NEW.outcome_kind
+      )
+    )
+    BEGIN SELECT RAISE(ABORT,'operation outcome blob binding is invalid'); END;
+  `,
 ];
 
 /** Stable schema version reported by `vibehub doctor --json`. */
@@ -1096,11 +1649,16 @@ export function inspectDatabase(dbPath: string = defaultDbPath()): DatabaseInspe
 export function openDb(dbPath: string = defaultDbPath()): Db {
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
-  db.pragma("busy_timeout = 5000");
-  db.pragma("foreign_keys = ON");
-  migrate(db);
-  return db;
+  try {
+    db.pragma("journal_mode = WAL");
+    db.pragma("busy_timeout = 5000");
+    db.pragma("foreign_keys = ON");
+    migrate(db);
+    return db;
+  } catch (error) {
+    db.close();
+    throw error;
+  }
 }
 
 /** Strict read-only door for doctor/inspection. No mkdir, WAL pragma, or migration. */
@@ -1136,6 +1694,11 @@ export function withReadonlyDb<T>(dbPath: string, read: (db: Db) => T): T {
 
 function migrate(db: Db): void {
   const version = db.pragma("user_version", { simple: true }) as number;
+  if (version > MIGRATIONS.length) {
+    throw new Error(
+      `database schema version ${version} is newer than supported version ${MIGRATIONS.length}`,
+    );
+  }
   for (let v = version; v < MIGRATIONS.length; v++) {
     const apply = db.transaction(() => {
       db.exec(MIGRATIONS[v]!);

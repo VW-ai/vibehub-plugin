@@ -5,6 +5,10 @@ export * from "./contract/install-types.js";
 export * from "./contract/kb-types.js";
 export * from "./contract/workbench-bridge.js";
 export * from "./contract/workflow-receipt.js";
+export * from "./contract/ticket-review.js";
+export * from "./contract/ticket-proposal.js";
+export * from "./contract/ticket-review-schemas.js";
+export * from "./contract/ticket-proposal-schemas.js";
 export {
   defaultDbPath,
   openDb,
@@ -98,6 +102,30 @@ export * from "./knowledge-service.js";
 export * from "./distillation-service.js";
 export * from "./operation-dispatcher.js";
 export * from "./operation-contracts.js";
+export * from "./ticket-review-projector.js";
+export * from "./ticket-review-read-service.js";
+export * from "./ticket-review-resolver.js";
+export * from "./ticket-review-source.js";
+export {
+  GIT_TICKET_STORE_FORMAT,
+  GIT_TICKET_STORE_RELATIVE_PATH,
+  GIT_TICKET_STORE_SCHEMA_VERSION,
+  GitTicketReviewProjectionSourceProviderV0,
+  GitTicketStoreErrorV0,
+  gitTicketDefinitionRevisionV0Schema,
+  gitTicketGenerationDigestV0,
+  gitTicketGenerationRelativePathV0,
+  gitTicketGenerationV0Schema,
+  gitTicketLatestV0Schema,
+  gitTicketRevisionRelativePathV0,
+  gitTicketStoreProtocolV0Schema,
+  serializeGitTicketStoreDocumentV0,
+  type GitTicketDefinitionRevisionV0,
+  type GitTicketGenerationV0,
+  type GitTicketLatestV0,
+  type GitTicketStoreErrorCodeV0,
+  type GitTicketStoreProtocolV0,
+} from "./git-ticket-store.js";
 export {
   GIT_SEMANTIC_STORE_RELATIVE_PATH,
   diffSemanticRefs,

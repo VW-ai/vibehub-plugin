@@ -258,6 +258,17 @@ function presentationFor(operation: string): OperationPresentation {
 function returnedCounts(data: unknown): { returnedCount?: number; totalCount?: number } {
   if (Array.isArray(data)) return { returnedCount: data.length, totalCount: data.length };
   if (!isRecord(data)) return {};
+  const page = data["page"];
+  if (isRecord(page)
+    && Number.isSafeInteger(page["count"])
+    && Number(page["count"]) >= 0
+    && Number.isSafeInteger(page["totalItems"])
+    && Number(page["totalItems"]) >= 0) {
+    return {
+      returnedCount: Number(page["count"]),
+      totalCount: Number(page["totalItems"]),
+    };
+  }
   let returnedCount: number | undefined;
   for (const key of ["items", "matches", "results", "rows", "features", "specs"]) {
     const value = data[key];

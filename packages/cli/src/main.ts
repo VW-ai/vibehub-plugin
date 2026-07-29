@@ -38,6 +38,8 @@ import {
   RuntimeService,
   OperationDispatcher,
   OPERATION_EXIT_CLASS,
+  OPERATION_INPUT_BYTE_LIMITS,
+  operationInputSchemas,
   syncTeamSnapshot,
   vibehubHome,
   type HookEventName,
@@ -100,11 +102,12 @@ const USAGE = `usage:
   vibehub setup inspect|apply|status [--repo <path>] [--db <path>] [--json]
   vibehub doctor [--json] [--repo <path>] [--db <path>]
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
-  vibehub kb <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
+  vibehub kb <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub kb migrate-store --json [--repo <path>] [--db <path>]
   vibehub checkpoint prepare --json [--repo <path>] [--protect <branch>]
   vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
-  vibehub distill <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
+  vibehub distill <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
+  vibehub ticket <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop> [--host claude-code|codex]
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
@@ -115,39 +118,90 @@ interface KbCliFlags {
   input:Record<string,unknown>; json:boolean;
 }
 
-function parseKbFlags(argv:string[]):KbCliFlags {
+function parseKbFlags(
+  argv:string[],
+  maximumInputBytes?:number,
+):KbCliFlags {
   let dbFlag:string|undefined; let repo=process.cwd(); let repoId:number|undefined;
-  let actor:string|undefined; let taskId:string|undefined; let requestId=`cli-${Date.now()}`;
+  let actor:string|undefined; let taskId:string|undefined;
+  let requestId=`cli-${crypto.randomUUID()}`;
   let inputText:string|undefined; let json=false;
   for(let i=0;i<argv.length;i++){
-    const flag=argv[i]; const take=()=>argv[++i];
-    if(flag==="--db")dbFlag=take(); else if(flag==="--repo")repo=take()??repo;
-    else if(flag==="--repo-id")repoId=Number(take()); else if(flag==="--actor")actor=take();
-    else if(flag==="--task")taskId=take(); else if(flag==="--request")requestId=take()??requestId;
-    else if(flag==="--input")inputText=take(); else if(flag==="--json")json=true;
+    const flag=argv[i];
+    const takeRequired=()=>{
+      const value=argv[++i];
+      if(!value||value.startsWith("--"))throw new Error(`${flag} requires a value`);
+      return value;
+    };
+    if(flag==="--db")dbFlag=takeRequired(); else if(flag==="--repo")repo=takeRequired();
+    else if(flag==="--repo-id"){
+      const value=takeRequired();repoId=Number(value);
+      if(!Number.isSafeInteger(repoId)||repoId<1)throw new Error("--repo-id requires a positive integer");
+    }else if(flag==="--actor")actor=takeRequired();
+    else if(flag==="--task")taskId=takeRequired(); else if(flag==="--request")requestId=takeRequired();
+    else if(flag==="--input")inputText=takeRequired(); else if(flag==="--json")json=true;
     else throw new Error(`unknown flag: ${flag}`);
   }
-  if(inputText==="-"){const stdin=readStdin().trim();inputText=stdin||"{}";}
+  if(inputText==="-"){
+    const stdin=(maximumInputBytes === undefined
+      ? readStdin()
+      : readStdinBounded(maximumInputBytes)).trim();
+    inputText=stdin||"{}";
+  }else if(
+    inputText !== undefined
+    && maximumInputBytes !== undefined
+    && Buffer.byteLength(inputText,"utf8")>maximumInputBytes
+  ){
+    throw new Error(
+      `operation raw JSON input exceeds ${maximumInputBytes} bytes`,
+    );
+  }
   const input=inputText?JSON.parse(inputText) as Record<string,unknown>:{};
   return {db:resolveDbPath(dbFlag),repo,repoId,actor,taskId,requestId,input,json};
 }
 
-function runOperation(group:"kb"|"distill",operation:string|undefined,argv:string[]):number {
+function runOperation(
+  group:"kb"|"distill"|"ticket",
+  operation:string|undefined,
+  argv:string[],
+):number {
   let db:ReturnType<typeof openDb>|undefined;
   try{
-    if(!operation)throw new Error("KB operation is required");
-    const flags=parseKbFlags(argv); if(!flags.json)throw new Error("kb operations require --json");
+    if(!operation)throw new Error(`${group} operation is required`);
+    const familyPrefix=`${group}.`;
+    if(OPERATION_FAMILY_PREFIXES.some((prefix)=>operation.startsWith(prefix))
+      && !operation.startsWith(familyPrefix)){
+      throw new Error(`${operation} does not belong to the ${group} operation family`);
+    }
+    const canonicalOperation=operation.startsWith(familyPrefix)
+      ? operation
+      : `${group}.${operation}`;
+    if(!Object.prototype.hasOwnProperty.call(
+      operationInputSchemas,
+      canonicalOperation,
+    )){
+      throw new Error(`unsupported ${group} operation: ${operation}`);
+    }
+    const flags=parseKbFlags(
+      argv,
+      OPERATION_INPUT_BYTE_LIMITS[
+        canonicalOperation as keyof typeof OPERATION_INPUT_BYTE_LIMITS
+      ],
+    );
+    if(!flags.json)throw new Error(`${group} operations require --json`);
+    if(!flags.actor?.trim())throw new Error(`${group} operations require --actor <id>`);
     db=openDb(flags.db);
     const session=GitFacade.sessionContextAt(flags.repo);
     const root=session.repoRoot;
     const row=flags.repoId?{id:flags.repoId}:db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(root) as {id:number}|undefined;
     const repoId=row?.id??0;
-    const canonicalOperation=operation.startsWith("kb.")||operation.startsWith("distill.")?operation:`${group}.${operation}`;
-    const result=new OperationDispatcher(db,{repoRoot:session.toplevel}).dispatch(canonicalOperation,{repoId,actor:flags.actor??"",taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
+    const result=new OperationDispatcher(db,{repoRoot:session.toplevel}).dispatch(canonicalOperation,{repoId,actor:flags.actor,taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
     process.stdout.write(`${JSON.stringify(result)}\n`);
     return result.ok?0:(OPERATION_EXIT_CLASS[result.error.code]??1);
   }catch(error){const result={ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error),details:null,nextSafeActions:[`Run vibehub ${group} with --json and a valid JSON --input payload.`]}};process.stdout.write(`${JSON.stringify(result)}\n`);return 2;}finally{db?.close();}
 }
+
+const OPERATION_FAMILY_PREFIXES=["kb.","distill.","ticket."] as const;
 
 function runSemanticMigration(argv:string[]):number{
   const flags=parseFlags(argv,"throw");
@@ -299,6 +353,24 @@ function readStdin(): string {
   }
 }
 
+function readStdinBounded(maximumBytes: number): string {
+  const chunks: Buffer[] = [];
+  let byteLength = 0;
+  const buffer = Buffer.allocUnsafe(64 * 1024);
+  while (true) {
+    const count = fs.readSync(0, buffer, 0, buffer.length, null);
+    if (count === 0) break;
+    byteLength += count;
+    if (byteLength > maximumBytes) {
+      throw new Error(
+        `ticket proposal raw JSON input exceeds ${maximumBytes} bytes`,
+      );
+    }
+    chunks.push(Buffer.from(buffer.subarray(0, count)));
+  }
+  return Buffer.concat(chunks, byteLength).toString("utf8");
+}
+
 /**
  * The heart (decision-project-025). Exit 0 ALWAYS — a hook must never
  * break the user's session; failures go to ~/.vibehub/hook.log.
@@ -389,7 +461,9 @@ export function main(argv: string[]): number {
     try{return runSemanticMigration(rest);}
     catch(error){process.stdout.write(`${JSON.stringify({ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error)}})}\n`);return 2;}
   }
-  if (group === "kb" || group === "distill") return runOperation(group,cmd, rest);
+  if (group === "kb" || group === "distill" || group === "ticket") {
+    return runOperation(group,cmd, rest);
+  }
   if (group === "hook") {
     return runHook(cmd, rest);
   }

@@ -14,6 +14,14 @@
     "./contracts": {
       "types": "./dist/contract/index.d.ts",
       "default": "./dist/contract/index.js"
+    },
+    "./contracts/ticket-review-schemas": {
+      "types": "./dist/contract/ticket-review-schemas.d.ts",
+      "default": "./dist/contract/ticket-review-schemas.js"
+    },
+    "./contracts/ticket-proposal-schemas": {
+      "types": "./dist/contract/ticket-proposal-schemas.d.ts",
+      "default": "./dist/contract/ticket-proposal-schemas.js"
     }
   },
   "files": [
@@ -36,6 +44,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "pretest": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

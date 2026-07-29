@@ -3,7 +3,8 @@
 Skills and scripts call `vibehub ... --json`; they never import storage
 drivers, query backing stores directly, or mutate persistence files. MCP tool `kb_operation` accepts
 the exact `kb.*` operation plus `input`; `distill_operation` accepts the exact
-`distill.*` operation plus `input`. Both return the same dispatcher envelope.
+`distill.*` operation plus `input`; `ticket_operation` accepts one canonical
+`ticket.*` read or proposal contribution plus `input`. All return the same dispatcher envelope.
 `kb_retrieve` is only the focused `kb.spec.search` convenience adapter. MCP
 v0.2 exposes no legacy mutation aliases; route writes through these canonical
 adapters so evidence, task attribution, request identity, and version
@@ -25,10 +26,12 @@ transactions remain enforceable.
 ```text
 vibehub kb <suffix> --json --repo <root> --actor <id> --request <id> [--task <id>] --input -
 vibehub distill <suffix> --json --repo <root> --actor <id> --request <id> [--task <id>] --input -
+vibehub ticket <suffix> --json --repo <root> --actor <id> --request <id> [--task <id>] --input -
 ```
 
 Use `--task` for Spec/distillation writes. Read input from stdin or a stable
-JSON file through `../scripts/vh-kb.mjs` / `../scripts/vh-distill.mjs`.
+JSON file through `../scripts/vh-kb.mjs`, `../scripts/vh-distill.mjs`, or
+`../scripts/vh-ticket.mjs`.
 
 ## Semantic checkpoints
 
@@ -54,7 +57,8 @@ skills remain unchanged when the implementation changes.
 Treat `requestId` as a repository-wide request identity, not a counter local to
 a wrapper, worker, operation, or skill. Generate a canonical, unique ID for each
 logical invocation that requires stable retries and carry it unchanged through
-those retries. For MCP `kb_operation` / `distill_operation`, pass it only as the
+those retries. For MCP `kb_operation` / `distill_operation` /
+`ticket_operation`, pass it only as the
 optional top-level tool field, never inside `input`; omit it when replay is not
 needed so the capability generates a collision-resistant UUID. Never derive a
 repository request ID from an MCP transport correlation ID. Include stable task,
@@ -85,6 +89,9 @@ because a current table key would permit it.
 | `distill.baseline.get`, `distill.candidates.list`, `distill.candidates.get` | |
 | `distill.version.get`, `distill.version.diff` | |
 | `distill.inventory.get`, `distill.inventory.diff` | `distill.inventory.put`, `distill.inventory.seal` |
+| `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list` | `ticket.proposal.submit` |
+| `ticket.proposal.inspect`, `ticket.proposal.list` | `ticket.proposal.validation.record` |
+| `ticket.proposal.validation.inspect`, `ticket.proposal.validation.list` | |
 | | `distill.scopes.plan`, `distill.scopes.claim`, `distill.scopes.complete`, `distill.scopes.fail`, `distill.scopes.retry`, `distill.scopes.correct` |
 | | `distill.candidates.put`, `distill.reconcile`, `distill.validate`, `distill.finalize` |
 | | `distill.activate`, `distill.rollback` |
@@ -93,6 +100,22 @@ Inputs are strict. Read the corresponding JSON schema and the dispatcher error
 `nextSafeActions`; do not guess missing fields. Common exit classes: `2`
 malformed/unsupported, `3` not-found/already-exists, `4` lifecycle/integrity,
 `5` idempotency/lease/checksum/CAS conflict, `1` internal failure.
+
+`ticket.proposal.submit` persists an immutable review contribution bound to the
+observed Ticket snapshot. It does not mutate the Ticket graph, approve its own
+contents, grant authority, or turn the claimed actor into a trusted principal.
+Graph-change proposals still require independent machine validation and the
+separate authority/application path before they can affect canonical Tickets.
+The logical proposal and CLI/Skill raw JSON are each limited to 4 MiB; split a
+larger planning contribution instead of attempting one oversized submission.
+
+Use `ticket.proposal.inspect` and bounded `ticket.proposal.list` to read the
+immutable contribution ledger. Use `ticket.proposal.validation.record` only
+after an independent semantic review, then retrieve its immutable evidence with
+`ticket.proposal.validation.inspect` or `.list`. A validation receipt is claimed,
+unverified review evidence—even a passed receipt does not grant authority,
+authorize application, change Ticket maturity, select a current receipt, or
+mutate the graph. Validation input is limited to 1 MiB.
 
 ## Workflow artifacts are not operation inputs
 

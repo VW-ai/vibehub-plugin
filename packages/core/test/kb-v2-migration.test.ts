@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { computeMappingChecksum, CURRENT_SCHEMA_VERSION, openDb } from "../src/db.js";
 import { listTerritories, readSpec, readTerritoryLayouts } from "../src/graph-store.js";
+import { OperationDispatcher } from "../src/operation-dispatcher.js";
 
 const T0 = "2026-07-13T00:00:00.000Z";
 
@@ -93,7 +94,7 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     raw.close();
 
     const db = openDb(file);
-    expect(CURRENT_SCHEMA_VERSION).toBe(16);
+    expect(CURRENT_SCHEMA_VERSION).toBe(19);
     expect(db.pragma("user_version", { simple: true })).toBe(CURRENT_SCHEMA_VERSION);
     expect(db.prepare(`SELECT repo_id, feature_id FROM kb_features WHERE feature_id = 'root' ORDER BY repo_id`).all())
       .toEqual([{ repo_id: 1, feature_id: "root" }, { repo_id: 2, feature_id: "root" }]);
@@ -139,10 +140,11 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
   it("upgrades v11 databases with immutable unresolved scope dispositions",()=>{
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-unresolved-migration-"));dirs.push(dir);
     const file=path.join(dir,"legacy-v11.db"),db=openDb(file);db.close();
-    const raw=new Database(file);raw.exec(`DROP TABLE IF EXISTS distill_scope_dispositions; DROP TABLE IF EXISTS operation_request_receipts; DROP TABLE IF EXISTS task_prompt_cadence; DROP TABLE IF EXISTS task_prompt_seen; DROP TABLE IF EXISTS repo_semantic_authority; DROP INDEX IF EXISTS idx_kb_provenance_task; PRAGMA user_version=11;`);raw.close();
+    const raw=new Database(file);raw.exec(`DROP TABLE IF EXISTS ticket_proposal_validation_receipts; DROP TABLE IF EXISTS ticket_proposals; DROP TABLE IF EXISTS operation_request_receipts; DROP TABLE IF EXISTS operation_outcome_blobs; DROP TABLE IF EXISTS distill_scope_dispositions; DROP TABLE IF EXISTS task_prompt_cadence; DROP TABLE IF EXISTS task_prompt_seen; DROP TABLE IF EXISTS repo_semantic_authority; DROP INDEX IF EXISTS idx_kb_provenance_task; PRAGMA user_version=11;`);raw.close();
     const upgraded=openDb(file);
     expect(upgraded.pragma("user_version",{simple:true})).toBe(CURRENT_SCHEMA_VERSION);
     expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='distill_scope_dispositions'`).get()).toEqual({name:"distill_scope_dispositions"});
+    expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='operation_outcome_blobs'`).get()).toEqual({name:"operation_outcome_blobs"});
     upgraded.prepare(`INSERT INTO repos(root_path,default_branch,created_at) VALUES('/integrity','main',?)`).run(T0);
     const insertReceipt=upgraded.prepare(`INSERT INTO operation_request_receipts(repo_id,request_id,operation,payload_hash,outcome_kind,outcome,created_at) VALUES(1,?,'kb.status','hash','success',?,?)`);
     expect(()=>insertReceipt.run('missing-ok','{}',T0)).toThrow(/CHECK constraint/);
@@ -157,6 +159,186 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     expect(()=>insert.run('leaf','owned.ts',1,T0)).toThrow(/completed leaf generation/);
     expect(()=>insert.run('leaf','excluded.ts',2,T0)).toThrow(/completed leaf generation/);
     expect(insert.run('leaf','owned.ts',2,T0).changes).toBe(1);
+    upgraded.close();
+  });
+
+  it("upgrades v16 inline operation receipts without changing their replay",()=>{
+    const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-receipt-v16-"));dirs.push(dir);
+    const file=path.join(dir,"legacy-v16.db"),repoRoot=path.join(dir,"repo");
+    fs.mkdirSync(repoRoot);
+    let db=openDb(file);
+    db.prepare(`INSERT INTO repos(root_path,default_branch,created_at) VALUES(?,'main',?)`).run(repoRoot,T0);
+    const context={repoId:1,actor:"legacy-reader",requestId:"legacy-inline",now:T0};
+    const first=new OperationDispatcher(db).dispatch("kb.status",context,{});
+    expect(first).toMatchObject({ok:true});
+    db.close();
+
+    const raw=new Database(file);
+    raw.exec(`
+      DROP TABLE ticket_proposal_validation_receipts;
+      DROP TABLE ticket_proposals;
+      DROP TRIGGER operation_request_receipt_blob_binding_insert;
+      ALTER TABLE operation_request_receipts DROP COLUMN outcome_blob_digest;
+      DROP TABLE operation_outcome_blobs;
+      PRAGMA user_version=16;
+    `);
+    raw.close();
+
+    db=openDb(file);
+    expect(db.prepare(
+      `SELECT outcome_blob_digest outcomeBlobDigest
+       FROM operation_request_receipts
+       WHERE repo_id=1 AND request_id='legacy-inline'`,
+    ).get()).toEqual({outcomeBlobDigest:null});
+    expect(new OperationDispatcher(db).dispatch(
+      "kb.status",
+      context,
+      {},
+    )).toEqual(first);
+    const legacyEnvelope=JSON.stringify({
+      ok:true,
+      data:{states:{},unplaced:0},
+      meta:{
+        operation:"kb.status",
+        repoId:1,
+        requestId:"legacy-column-list",
+        at:T0,
+      },
+    });
+    expect(()=>db.prepare(
+      `INSERT INTO operation_request_receipts(
+         repo_id,request_id,operation,payload_hash,
+         outcome_kind,outcome,created_at
+       ) VALUES(1,'legacy-column-list','kb.status','hash','success',?,?)`,
+    ).run(legacyEnvelope,T0)).not.toThrow();
+    db.close();
+  });
+
+  it("refuses to bless v18 proposal rows with absent required JSON keys", () => {
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "vibehub-proposal-v18-corrupt-"),
+    );
+    dirs.push(dir);
+    const file = path.join(dir, "legacy-v18.db");
+    openDb(file).close();
+
+    const raw = new Database(file);
+    raw.exec(`
+      DROP TRIGGER ticket_proposals_required_payload_insert;
+      DROP TABLE ticket_proposal_validation_receipts;
+      PRAGMA user_version=18;
+    `);
+    raw.prepare(
+      `INSERT INTO repos(
+         root_path,default_branch,created_at
+       ) VALUES('/proposal-v18-corrupt','main',?)`,
+    ).run(T0);
+    const proposalId = `tgp-${"1".repeat(64)}`;
+    const proposalDigest = "2".repeat(64);
+    const scopeRef = `tps-${"3".repeat(64)}`;
+    // v18's table CHECK evaluates to NULL, and therefore passes, when a
+    // required payload key such as graphMutationApplied is absent.
+    const payload = JSON.stringify({
+      schemaVersion: 1,
+      proposalId,
+      proposalDigest,
+      scopeRef,
+      kind: "graph_change",
+      observedSnapshotId: null,
+      submittedAt: T0,
+      proposer: { kind: "claimed_actor", ref: "agent:legacy" },
+      effect: "review_contribution_only",
+    });
+    raw.prepare(
+      `INSERT INTO ticket_proposals(
+         repo_id,scope_ref,proposal_id,proposal_digest,kind,
+         observed_snapshot_id,repository_root,worktree_root,
+         repository_incarnation,author,request_id,submitted_at,
+         payload,byte_length
+       ) VALUES(1,?,?,?,'graph_change',NULL,'/proposal-v18-corrupt',
+                '/proposal-v18-corrupt','legacy-incarnation',
+                'agent:legacy','legacy-corrupt',?,?,?)`,
+    ).run(
+      scopeRef,
+      proposalId,
+      proposalDigest,
+      T0,
+      payload,
+      Buffer.byteLength(payload, "utf8"),
+    );
+    raw.close();
+
+    expect(() => openDb(file)).toThrow(/CHECK constraint failed/);
+    const inspect = new Database(file);
+    expect(inspect.pragma("user_version", { simple: true })).toBe(18);
+    expect(inspect.prepare(
+      `SELECT name FROM sqlite_master
+       WHERE type='table'
+         AND name='ticket_proposal_validation_receipts'`,
+    ).get()).toBeUndefined();
+    expect(inspect.prepare(
+      `SELECT name FROM sqlite_master
+       WHERE type='trigger'
+         AND name='ticket_proposals_required_payload_insert'`,
+    ).get()).toBeUndefined();
+    inspect.close();
+  });
+
+  it("upgrades valid v18 ledgers with strict proposal and validation guards", () => {
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "vibehub-proposal-v18-valid-"),
+    );
+    dirs.push(dir);
+    const file = path.join(dir, "legacy-v18.db");
+    openDb(file).close();
+    const raw = new Database(file);
+    raw.exec(`
+      DROP TRIGGER ticket_proposals_required_payload_insert;
+      DROP TABLE ticket_proposal_validation_receipts;
+      PRAGMA user_version=18;
+    `);
+    raw.close();
+
+    const upgraded = openDb(file);
+    expect(upgraded.pragma("user_version", { simple: true })).toBe(19);
+    expect(upgraded.prepare(
+      `SELECT name FROM sqlite_master
+       WHERE type='table'
+         AND name='ticket_proposal_validation_receipts'`,
+    ).get()).toEqual({ name: "ticket_proposal_validation_receipts" });
+    upgraded.prepare(
+      `INSERT INTO repos(
+         root_path,default_branch,created_at
+       ) VALUES('/proposal-v18-valid','main',?)`,
+    ).run(T0);
+    const payload = JSON.stringify({
+      schemaVersion: 1,
+      proposalId: `tgp-${"1".repeat(64)}`,
+      proposalDigest: "2".repeat(64),
+      scopeRef: `tps-${"3".repeat(64)}`,
+      kind: "graph_change",
+      observedSnapshotId: null,
+      submittedAt: T0,
+      proposer: { kind: "claimed_actor", ref: "agent:legacy" },
+      effect: "review_contribution_only",
+    });
+    expect(() => upgraded.prepare(
+      `INSERT INTO ticket_proposals(
+         repo_id,scope_ref,proposal_id,proposal_digest,kind,
+         observed_snapshot_id,repository_root,worktree_root,
+         repository_incarnation,author,request_id,submitted_at,
+         payload,byte_length
+       ) VALUES(1,?,?,?,'graph_change',NULL,'/proposal-v18-valid',
+                '/proposal-v18-valid','legacy-incarnation',
+                'agent:legacy','legacy-invalid',?,?,?)`,
+    ).run(
+      `tps-${"3".repeat(64)}`,
+      `tgp-${"1".repeat(64)}`,
+      "2".repeat(64),
+      T0,
+      payload,
+      Buffer.byteLength(payload, "utf8"),
+    )).toThrow(/missing required bound fields/);
     upgraded.close();
   });
 

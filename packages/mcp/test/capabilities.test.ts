@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -7,16 +8,30 @@ import { execFileSync } from "node:child_process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import {
+  GIT_TICKET_STORE_FORMAT,
+  GIT_TICKET_STORE_RELATIVE_PATH,
+  GIT_TICKET_STORE_SCHEMA_VERSION,
   OperationDispatcher,
   DistillationService,
+  deriveTicketReviewSnapshotIdV0,
+  gitTicketGenerationDigestV0,
+  gitTicketGenerationRelativePathV0,
+  gitTicketRevisionRelativePathV0,
   openDb,
+  operationInputSchemas,
   readTask,
   readScopePatterns,
+  serializeGitTicketStoreDocumentV0,
   upsertRepo,
   upsertTask,
   type Db,
+  type GitTicketDefinitionRevisionV0,
+  type TicketReviewProjectionSourceV0,
 } from "@vw-ai/vibehub-core";
-import { createCapabilities } from "../src/capabilities.js";
+import {
+  createCapabilities,
+  TICKET_OPERATION_NAMES,
+} from "../src/capabilities.js";
 import { createWorkbenchMcpServer, operationEnvelopeResult, WORKBENCH_MCP_TOOL_NAMES } from "../src/server.js";
 import {
   openRuntimeContext,
@@ -25,8 +40,107 @@ import {
 } from "../src/runtime.js";
 
 const NOW = "2026-07-12T10:00:00.000Z";
+const TICKET_STORE_ID = "ticket-store-0123456789abcdef0123456789abcdef";
 const toolText = (value: unknown): string =>
   (value as { content: Array<{ type: "text"; text: string }> }).content[0]!.text;
+
+const sha256 = (value: string | Buffer): string =>
+  crypto.createHash("sha256").update(value).digest("hex");
+
+function writeCanonicalTicketDocument(target: string, value: unknown): string {
+  const bytes = serializeGitTicketStoreDocumentV0(value);
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.writeFileSync(target, bytes);
+  return bytes;
+}
+
+function publishCanonicalTicketStore(repo: string): { snapshotId: string } {
+  const store = path.join(repo, GIT_TICKET_STORE_RELATIVE_PATH);
+  writeCanonicalTicketDocument(path.join(store, "protocol.yaml"), {
+    schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+    format: GIT_TICKET_STORE_FORMAT,
+    storeId: TICKET_STORE_ID,
+    indexing: "stable-ticket-revision-paths",
+    integrity: "immutable-generations-pointer-v1",
+    projector: "ticket-review-v0",
+  });
+
+  const definition: GitTicketDefinitionRevisionV0 = {
+    schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+    kind: "ticket_definition_revision",
+    ticketId: "TKT-MCP-001",
+    definitionRevision: 1,
+    created: {
+      at: NOW,
+      by: "agent:mcp-test",
+      reason: "Exercise the canonical MCP Ticket read path",
+      source: { kind: "plan", ref: "plan:mcp-ticket-operation" },
+    },
+    outcome: "Expose the canonical Ticket graph through MCP",
+    parentId: null,
+    dependsOn: [],
+    provenanceRefs: ["fixture:mcp-ticket-operation"],
+  };
+  const file = gitTicketRevisionRelativePathV0(
+    definition.ticketId,
+    definition.definitionRevision,
+  );
+  const definitionBytes = writeCanonicalTicketDocument(
+    path.join(store, file),
+    definition,
+  );
+  const entries = [{
+    ticketId: definition.ticketId,
+    definitionRevision: definition.definitionRevision,
+    file,
+    sha256: sha256(definitionBytes),
+  }];
+  const generationDigest = gitTicketGenerationDigestV0(
+    TICKET_STORE_ID,
+    entries,
+  );
+  const snapshotRevision = [
+    "ticket-generation",
+    TICKET_STORE_ID,
+    generationDigest,
+  ].join(":");
+  const source: TicketReviewProjectionSourceV0 = {
+    schemaVersion: 1,
+    snapshotRevision,
+    projectionWatermark: snapshotRevision,
+    ticketDefinitions: [{
+      ticketId: definition.ticketId,
+      definitionRevision: definition.definitionRevision,
+      outcome: definition.outcome,
+      provenanceRefs: [
+        `ticket-definition:${definition.ticketId}:revision:${definition.definitionRevision}`,
+        ...definition.provenanceRefs,
+      ],
+    }],
+    directUnlocks: [],
+    currentCapabilityProjections: [],
+    traceRecords: [],
+  };
+  const snapshotId = deriveTicketReviewSnapshotIdV0(source);
+  writeCanonicalTicketDocument(
+    path.join(store, gitTicketGenerationRelativePathV0(snapshotId)),
+    {
+      schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+      kind: "ticket_generation",
+      storeId: TICKET_STORE_ID,
+      snapshotId,
+      generationDigest,
+      tickets: entries,
+    },
+  );
+  writeCanonicalTicketDocument(path.join(store, "latest.yaml"), {
+    schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+    kind: "ticket_latest",
+    storeId: TICKET_STORE_ID,
+    snapshotId,
+  });
+  return { snapshotId };
+}
 
 describe("local MCP deterministic capabilities", () => {
   let dir: string;
@@ -88,9 +202,258 @@ describe("local MCP deterministic capabilities", () => {
     expect(operationEnvelopeResult(kb).isError).toBe(false);
   });
 
+  it("exposes Ticket review contributions and validation receipts with dispatcher parity", async () => {
+    const repo = path.join(dir, "repo");
+    const server = createWorkbenchMcpServer({
+      db,
+      repoId: 1,
+      taskId: "branch:feat/mcp",
+      repoRoot: repo,
+      actor: "mcp-test",
+      now: () => NOW,
+    });
+    const client = new Client({ name: "ticket-operation-test", version: "1.0.0" });
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+    await Promise.all([
+      server.connect(serverTransport),
+      client.connect(clientTransport),
+    ]);
+    try {
+      const listed = await client.listTools();
+      expect(listed.tools.map((tool) => tool.name)).toEqual([
+        ...WORKBENCH_MCP_TOOL_NAMES,
+      ]);
+      const ticketTool = listed.tools.find(
+        (tool) => tool.name === "ticket_operation",
+      );
+      const ticketSchema = ticketTool?.inputSchema as {
+        properties?: { operation?: { enum?: unknown[] } };
+      };
+      expect(ticketSchema.properties?.operation?.enum).toEqual([
+        ...TICKET_OPERATION_NAMES,
+      ]);
+      expect([...TICKET_OPERATION_NAMES].sort()).toEqual(
+        Object.keys(operationInputSchemas)
+          .filter((operation) => operation.startsWith("ticket."))
+          .sort(),
+      );
+      expect(TICKET_OPERATION_NAMES).toContain("ticket.proposal.inspect");
+      expect(TICKET_OPERATION_NAMES).toContain("ticket.proposal.list");
+      expect(TICKET_OPERATION_NAMES)
+        .toContain("ticket.proposal.validation.record");
+      expect(TICKET_OPERATION_NAMES)
+        .toContain("ticket.proposal.validation.inspect");
+      expect(TICKET_OPERATION_NAMES)
+        .toContain("ticket.proposal.validation.list");
+      expect(TICKET_OPERATION_NAMES as readonly string[])
+        .not.toContain("ticket.proposal.apply");
+      expect(ticketTool?.description).toMatch(
+        /do not apply graph mutations or grant authority/,
+      );
+
+      const unsupported = await client.callTool({
+        name: "ticket_operation",
+        arguments: { operation: "kb.status" },
+      });
+      expect(unsupported.isError).toBe(true);
+      expect(toolText(unsupported)).toMatch(/ticket\.graph\.snapshot/);
+
+      const absent = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.graph.snapshot",
+          requestId: "ticket-absent",
+        },
+      });
+      expect(absent.isError).toBe(true);
+      const absentEnvelope = JSON.parse(toolText(absent));
+      expect(absentEnvelope).toMatchObject({
+        ok: false,
+        error: { code: "not_found" },
+      });
+      expect(absentEnvelope).toEqual(
+        new OperationDispatcher(db, { repoRoot: repo }).dispatch(
+          "ticket.graph.snapshot",
+          {
+            repoId: 1,
+            actor: "mcp-test",
+            taskId: "branch:feat/mcp",
+            requestId: "ticket-absent",
+            now: NOW,
+          },
+          {},
+        ),
+      );
+
+      const proposalInput = {
+        schemaVersion: 1,
+        kind: "graph_change",
+        observedSnapshotId: null,
+        reason: "Shape the accepted MCP work",
+        authorAssessment: {
+          changeClass: "decomposition",
+          authoritySignals: [],
+          introducesHumanGate: false,
+          rationale: "The proposal stays inside the accepted outcome.",
+        },
+        changes: [{
+          op: "create",
+          localRef: "implementation",
+          definition: {
+            outcome: "Implement the accepted MCP behavior",
+            parent: null,
+            dependsOn: [],
+          },
+        }],
+      };
+      const proposal = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.proposal.submit",
+          requestId: "ticket-proposal-submit",
+          input: proposalInput,
+        },
+      });
+      expect(proposal.isError).toBe(false);
+      const proposalEnvelope = JSON.parse(toolText(proposal));
+      expect(proposalEnvelope).toMatchObject({
+        ok: true,
+        data: {
+          kind: "graph_change",
+          effect: "review_contribution_only",
+          graphMutationApplied: false,
+          reviewRequirement: {
+            authorityStatus: "not_granted",
+          },
+        },
+        meta: {
+          operation: "ticket.proposal.submit",
+          requestId: "ticket-proposal-submit",
+        },
+      });
+      expect(proposalEnvelope).toEqual(
+        new OperationDispatcher(db, { repoRoot: repo }).dispatch(
+          "ticket.proposal.submit",
+          {
+            repoId: 1,
+            actor: "mcp-test",
+            taskId: "branch:feat/mcp",
+            requestId: "ticket-proposal-submit",
+            now: NOW,
+          },
+          proposalInput,
+        ),
+      );
+      expect(db.prepare(
+        `SELECT COUNT(*) count FROM ticket_proposals`,
+      ).get()).toEqual({ count: 1 });
+      expect(fs.existsSync(path.join(
+        repo,
+        GIT_TICKET_STORE_RELATIVE_PATH,
+      ))).toBe(false);
+
+      const { snapshotId } = publishCanonicalTicketStore(repo);
+      const success = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.graph.snapshot",
+          requestId: "ticket-success",
+          input: { pageSize: 10 },
+        },
+      });
+      expect(success.isError).toBe(false);
+      const successEnvelope = JSON.parse(toolText(success));
+      expect(successEnvelope).toMatchObject({
+        ok: true,
+        data: {
+          snapshotId,
+          summary: { ticketCount: 1, directUnlockCount: 0 },
+          tickets: [{ ticketId: "TKT-MCP-001" }],
+        },
+        meta: {
+          operation: "ticket.graph.snapshot",
+          requestId: "ticket-success",
+        },
+      });
+      expect(successEnvelope).toEqual(
+        new OperationDispatcher(db, { repoRoot: repo }).dispatch(
+          "ticket.graph.snapshot",
+          {
+            repoId: 1,
+            actor: "mcp-test",
+            taskId: "branch:feat/mcp",
+            requestId: "ticket-success",
+            now: NOW,
+          },
+          { pageSize: 10 },
+        ),
+      );
+
+      const inspect = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.subject.inspect",
+          requestId: "ticket-inspect",
+          input: {
+            snapshotId,
+            subject: { kind: "ticket", ticketId: "TKT-MCP-001" },
+          },
+        },
+      });
+      const trace = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.trace.list",
+          requestId: "ticket-trace",
+          input: {
+            snapshotId,
+            subject: { kind: "ticket", ticketId: "TKT-MCP-001" },
+          },
+        },
+      });
+      expect(inspect.isError).toBe(false);
+      expect(trace.isError).toBe(false);
+      expect(JSON.parse(toolText(inspect))).toMatchObject({
+        ok: true,
+        meta: { operation: "ticket.subject.inspect" },
+      });
+      expect(JSON.parse(toolText(trace))).toMatchObject({
+        ok: true,
+        data: { records: [] },
+        meta: { operation: "ticket.trace.list" },
+      });
+    } finally {
+      await Promise.all([client.close(), server.close()]);
+    }
+  });
+
   it("canonical MCP reads preserve the exact dispatcher envelope", () => {
     const api=createCapabilities({db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",requestId:()=>"r-read",now:()=>NOW});
     expect(api.dispatchKnowledge("kb.spec.search",{query:"MCP"})).toEqual(new OperationDispatcher(db).dispatch("kb.spec.search",{repoId:1,actor:"mcp-test",taskId:"branch:feat/mcp",requestId:"r-read",now:NOW},{query:"MCP"}));
+  });
+
+  it("keeps direct capability dispatch inside its declared operation family", () => {
+    const api=createCapabilities({
+      db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",now:()=>NOW,
+    });
+    expect(api.dispatchKnowledge("distill.run.status",{runId:"x"})).toMatchObject({
+      ok:false,
+      error:{code:"unsupported_operation",details:{expectedPrefix:"kb."}},
+    });
+    expect(api.dispatchOperation("kb.status",{})).toMatchObject({
+      ok:false,
+      error:{code:"unsupported_operation",details:{expectedPrefix:"distill."}},
+    });
+    expect(api.dispatchTicket(
+      "kb.spec.apply" as unknown as typeof TICKET_OPERATION_NAMES[number],
+      {},
+    )).toMatchObject({
+      ok:false,
+      error:{
+        code:"unsupported_operation",
+        details:{operation:"kb.spec.apply"},
+      },
+    });
   });
 
   it("assigns a unique request id to each invocation when no id source is provided", () => {
@@ -166,6 +529,17 @@ describe("local MCP deterministic capabilities", () => {
       });
       expect(invalid.isError).toBe(true);
       expect(toolText(invalid)).toMatch(/requestId/i);
+
+      const kbEscape = await first.client.callTool({
+        name: "kb_operation",
+        arguments: { operation: "distill.run.status", input: { runId: "x" } },
+      });
+      const distillEscape = await first.client.callTool({
+        name: "distill_operation",
+        arguments: { operation: "kb.status" },
+      });
+      expect(kbEscape.isError).toBe(true);
+      expect(distillEscape.isError).toBe(true);
     } finally {
       await Promise.all([first.client.close(), second.client.close(), first.server.close(), second.server.close()]);
     }

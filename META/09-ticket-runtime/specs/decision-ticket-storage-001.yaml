@@ -13,19 +13,189 @@ intent:
     namespace collision, split-brain writers, Git noise from high-frequency
     transitions, and a second copy of Feature Room truth inside Ticket bodies.
 
-    This ticket is unresolved.
-constraints: []
+    **Resolved read-bootstrap boundary (2026-07-28)**:
+
+    The outline-compatible subset of Ticket definition revisions and published
+    dependency topology now has an independent Git-native read-bootstrap
+    authority at `.vibehub/ticket-store/`. It is not a namespace inside
+    `.vibehub/semantic-store/`, because the existing semantic store has a closed
+    inventory and whole-tree replacement semantics.
+
+    The V0 read authority contains:
+
+    - one protocol document with a stable store identity;
+    - immutable, stable-path outline revisions containing identity, creation
+      provenance, outcome, containment parent, dependencies, and provenance
+      references;
+    - immutable generation manifests binding exact definition checksums;
+    - one `latest.yaml` pointer naming the default published generation.
+
+    A generation is the complete supported whole-project Ticket definition and
+    explicit dependency inventory for one verified worktree. Retained
+    generations reconstruct exact review snapshots across process restarts and
+    later `latest` changes. The provider is read-only, follows no symbolic
+    links, applies a pre-parse bound to every file, and enforces the cumulative
+    aggregate generation bound fail-closed as files are read. It verifies
+    canonical bytes and checksums, tolerates an atomic latest-pointer
+    replacement as either complete old or complete new, and distinguishes
+    absent graphs, expired snapshots, corruption, and scope mismatch.
+
+    SQLite remains operational projection/receipt storage and now also holds
+    immutable proposal review contributions. It is not a fallback authority for
+    Ticket definitions or published topology. META Specs, legacy Task rows, and
+    prototype fixtures are likewise forbidden production fallbacks. Current
+    capability projections and trace records are honestly empty until their own
+    authorities exist.
+
+    This outline is not yet the complete ratified Ticket definition: scope,
+    acceptance, permissions, execution policy, and their maturity/lifecycle
+    rules are not persisted by this format.
+
+    **Still unresolved above the outline store**: complete definition storage,
+    proposal application, semantic definition CAS, trusted authority, retention
+    and GC,
+    Plan/Run/Outcome/Event/Artifact/Evidence authority, and selection of current
+    capability receipts. The internal publication-head CAS, local writer
+    arbitration, and fsync boundary are frozen separately below. Large Ticket
+    read outcome payloads are
+    content-addressed and deduplicated across immutable request receipts; each
+    receipt keeps only its small request binding and a payload digest. Quotas,
+    retention, and GC for request rows and distinct outcome blobs remain
+    unresolved: large-payload bytes grow with distinct canonical outcomes,
+    while fixed-size receipt metadata still grows with request count.
+    Therefore this broader storage Decision remains open even though the
+    canonical read bootstrap is frozen.
+
+    **Resolved writer-substrate boundary (2026-07-28)**:
+
+    The same independent store may now be advanced by one Core-owned,
+    authority-neutral generation publisher. Publication is whole-generation
+    rather than per-edge CRUD. It uses expected-snapshot CAS under an exclusive
+    worktree-local writer lock, installs canonical revision and generation
+    files immutably, bootstraps through atomic rename of one fully-synced
+    sibling store directory, and replaces `latest.yaml` atomically only for
+    later complete generations. File and containing-directory syncs make the
+    applicable rename the crash visibility boundary; a crash may leave
+    unreachable immutable objects but must not expose a partial generation.
+    If that rename succeeds but its parent sync fails, Core reports an explicit
+    commit-uncertain result with previous/candidate generation identities and
+    retains the writer lock for reconciliation through the read surface.
+    Every pre-existing lock fails closed in V0, even when its recorded process
+    appears dead. Automatic stale-lock stealing is deferred until fencing and
+    audit semantics exist, so a crashed writer may require explicit recovery
+    while canonical reads remain available.
+
+    Static symlinks and special files are rejected, but this V0 primitive
+    assumes the host prevents a hostile same-UID process from actively swapping
+    parent paths during filesystem calls. A stronger hostile-local-filesystem
+    boundary requires directory-relative primitives or an exclusive broker.
+
+    Existing Ticket creation provenance and revision bytes are immutable.
+    Definition revisions are monotonic without gaps, and the V0 writer rejects
+    implicit deletion by inventory omission. It remains a storage primitive,
+    not a public authoring command or evidence of semantic, mutation, or human
+    authority.
+
+    Still unresolved after this partial freeze: proposal application, complete
+    Ticket definition storage, explicit removal and supersession records,
+    trusted authority, SQLite-to-Git application-receipt ordering, fenced
+    stale-lock recovery, Git commit policy, remote/multi-host arbitration,
+    retention and GC, and all non-definition runtime fact authorities.
+
+    **Resolved immutable proposal-log boundary (2026-07-29)**:
+
+    SQLite is the canonical authority for submitted Ticket review
+    contributions. `ticket.proposal.submit` appends one immutable proposal
+    payload with stable Core-generated identity, digest, scope binding, claimed
+    author, and submission time. It has no mutable status and is neither a
+    Ticket definition nor a graph generation.
+
+    Proposal insertion and the shared idempotent operation request receipt
+    commit in the same SQLite transaction. Repository, worktree, and repository
+    incarnation are bound before replay, incarnation is rechecked around graph
+    loading, and task attribution binds the task's exact worktree. A successful
+    submission therefore cannot leave a proposal without its receipt or a
+    success receipt without its proposal.
+
+    Submission reads the exact observed Git Ticket snapshot and exact targeted
+    definition revisions, materializes Core-generated Ticket identities,
+    revisions, timestamps, and proposal provenance, and mechanically validates
+    a complete candidate under a 4 MiB decoded logical-input budget. CLI and
+    Skill reject oversized raw proposal JSON before parsing, and MCP applies
+    finite frame and proposal-envelope limits. Caller provenance is
+    rejected and caller-derived creation attribution is marked
+    claimed_unverified. It never calls the internal Git generation publisher,
+    so the Git authority stays unchanged.
+
+    The stored actor and authorAssessment are untrusted attribution and routing
+    claims. Bootstrap always indicates initial_plan_authority. Independent
+    semantic machine validation and trusted human authority remain separate
+    receipts. Technical difficulty alone does not require a human gate.
+
+    **Resolved proposal-query and validation-ledger boundary (2026-07-29)**:
+
+    SQLite also holds immutable proposal-validation contributions as a
+    proposal-specific semantic evidence ledger. Each record is bound to one
+    exact graph-change proposal and candidate digest, carries only
+    claimed_unverified producer/policy/actor attribution, and commits with its
+    idempotent operation receipt. It does not become Ticket definition,
+    readiness, authority, GateDecision, application, or graph-mutation truth.
+
+    Proposal and validation inspect/list operations are the only public read
+    boundary over these rows. Lists are bounded summaries under
+    scope/filter/high-water keyset cursors; direct SQLite access remains
+    forbidden. Multiple contrary validation records coexist, and no mutable
+    status, current/latest pointer, precedence, or automatic aggregation record
+    is stored.
+
+    Proposal application remains blocked because it spans both authorities. It
+    requires target-level and final publication-head CAS, trusted validation
+    and authority receipts, one complete candidate generation, the internal
+    publisher, and crash-consistent GraphMutation/ApplicationReceipt ordering
+    and reconciliation across SQLite and the Git visibility commit.
+constraints:
+  - kind: must
+    rule: "The outline-compatible Ticket definition subset and published dependency topology use the independent Git-native .vibehub/ticket-store read-bootstrap authority"
+  - kind: must
+    rule: "Published Ticket definition revisions and generation manifests are immutable; latest.yaml is the sole mutable read-bootstrap pointer"
+  - kind: must
+    rule: "Exact retained generations remain reconstructible by verified repository/worktree scope across process boundaries and later latest changes"
+  - kind: must_not
+    rule: "SQLite, META Specs, legacy Task rows, the review prototype, and test fixtures must not substitute for an absent or damaged Ticket store"
+  - kind: must_not
+    rule: "The read bootstrap and internal publication-head CAS do not imply public writer authority, semantic graph-mutation CAS, Run state, Outcome state, or capability-receipt currentness"
+  - kind: must
+    rule: "The Core generation publisher writes and syncs a complete generation before atomic bootstrap store-directory rename or, for later generations, atomic latest.yaml replacement under expected-snapshot CAS and one worktree-local writer lock"
+  - kind: must
+    rule: "Publication failure or crash before the applicable visibility rename leaves absence or the previous complete generation readable; post-rename sync uncertainty is explicit and fenced"
+  - kind: must_not
+    rule: "The storage publisher must not serve as a public authority bypass or infer removal from an omitted Ticket"
+  - kind: must
+    rule: "SQLite stores submitted Ticket proposals as immutable append-only review contributions and commits each proposal with its idempotent operation receipt in one transaction"
+  - kind: must_not
+    rule: "Proposal submission must not update .vibehub/ticket-store, expose a mutable proposal status, or turn SQLite into a fallback Ticket definition authority"
+  - kind: must
+    rule: "Proposal target preconditions bind the exact observed Git snapshot and definition revisions while Core generates identity, revision, time, and provenance fields"
+  - kind: must
+    rule: "SQLite stores proposal-validation contributions as an immutable append-only proposal-and-candidate-bound evidence ledger and commits each contribution with its idempotent operation receipt"
+  - kind: must
+    rule: "Proposal and validation lists expose bounded summaries under scope/filter/high-water cursors while complete immutable records require explicit inspection through Core"
+  - kind: must_not
+    rule: "The proposal-validation ledger must not store mutable status, a current/latest/winner pointer, Ticket readiness or maturity, authority, GateDecision, application, or graph-mutation truth"
+  - kind: must_not
+    rule: "Do not expose application until validation and authority receipts, target and publication CAS, and crash-consistent SQLite-to-Git application receipts are defined"
 indexing:
   type: decision
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, open, grilling, storage, git, yaml, sqlite, jsonl]
+  tags: [wayfinder, open, bootstrap-frozen, writer-substrate-frozen, proposal-log-frozen, proposal-validation-ledger-frozen, storage, git, yaml, sqlite, jsonl, cas]
 provenance:
   source_type: chat_extraction
-  confidence: 0.75
+  confidence: 0.92
   source_ref: "Ticket storage discussion and .vibehub correction in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
-  produced_at: "2026-07-27"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29"
 relations:
   - target: "decision-ticket-runtime-boundary-001"
     type: depends_on
@@ -38,6 +208,16 @@ relations:
   - target: "decision-project-029"
     type: relates_to
 anchors:
-  - file: ".vibehub/semantic-store/protocol.yaml"
-  - file: "packages/core/src/git-semantic-store.ts"
+  - file: "packages/core/src/git-ticket-store.ts"
+  - file: "packages/core/src/ticket-review-resolver.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/core/test/git-ticket-store.test.ts"
+  - file: "packages/core/test/git-ticket-publisher.test.ts"
+  - file: "packages/core/test/ticket-operation-dispatcher.test.ts"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-generation-publisher-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "packages/core/src/contract/ticket-proposal.ts"
   - file: "packages/core/src/db.ts"
+  - file: "packages/core/src/ticket-proposal-service.ts"
+  - file: "packages/core/test/ticket-proposal-service.test.ts"

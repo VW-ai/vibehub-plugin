@@ -1,13 +1,20 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { operationContextSchema } from "@vw-ai/vibehub-core";
 import { z } from "zod";
-import { createCapabilities, type CapabilityContext } from "./capabilities.js";
+import {
+  createCapabilities,
+  DISTILL_OPERATION_NAMES,
+  KB_OPERATION_NAMES,
+  TICKET_OPERATION_NAMES,
+  type CapabilityContext,
+} from "./capabilities.js";
 
 const scopeItem = z.object({ glob: z.string().min(1), label: z.string().optional() });
 const logicalRequestId = operationContextSchema.shape.requestId.optional();
 export const WORKBENCH_MCP_VERSION = "0.2.2";
 export const WORKBENCH_MCP_TOOL_NAMES = [
-  "register_scope", "self_report", "kb_retrieve", "kb_operation", "distill_operation", "get_manual",
+  "register_scope", "self_report", "kb_retrieve", "kb_operation",
+  "distill_operation", "ticket_operation", "get_manual",
 ] as const;
 
 const result = (value: unknown) => ({
@@ -73,7 +80,7 @@ export function createWorkbenchMcpServer(
     description: "Symmetric adapter over the shared OperationDispatcher. Returns the exact success/error envelope used by `vibehub kb ... --json`.",
     inputSchema: {
       requestId: logicalRequestId,
-      operation: z.string().min(1),
+      operation: z.enum(KB_OPERATION_NAMES as [string, ...string[]]),
       input: z.record(z.string(), z.unknown()).optional(),
     },
   }, async ({ operation, input, requestId }) => operationEnvelopeResult((await api()).dispatchKnowledge(operation, input ?? {}, requestId)));
@@ -83,12 +90,24 @@ export function createWorkbenchMcpServer(
     description: "Symmetric adapter over DistillationService through the shared OperationDispatcher. Skills own semantic choices; this tool only validates and persists run mechanics.",
     inputSchema: {
       requestId: logicalRequestId,
-      operation: z.string().min(1),
+      operation: z.enum(DISTILL_OPERATION_NAMES as [string, ...string[]]),
       input: z.record(z.string(), z.unknown()).optional(),
     },
   }, async ({ operation, input, requestId }) => operationEnvelopeResult((await api()).dispatchOperation(operation, input ?? {}, requestId)));
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
+    title: "Dispatch one canonical Ticket operation",
+    description: "Read Ticket review projections, submit or inspect immutable proposal contributions, and record or inspect independent machine-validation receipts through the shared OperationDispatcher. These operations do not apply graph mutations or grant authority.",
+    inputSchema: {
+      requestId: logicalRequestId,
+      operation: z.enum(TICKET_OPERATION_NAMES),
+      input: z.record(z.string(), z.unknown()).optional(),
+    },
+  }, async ({ operation, input, requestId }) => operationEnvelopeResult(
+    (await api()).dispatchTicket(operation, input ?? {}, requestId),
+  ));
+
+  server.registerTool(WORKBENCH_MCP_TOOL_NAMES[6], {
     title: "Read the Vibehub agent manual",
     description: "Return reference material about component boundaries and available skills. Not required before routine work.",
     inputSchema: { topic: z.string().optional() },

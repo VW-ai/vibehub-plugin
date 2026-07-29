@@ -24,9 +24,98 @@ intent:
     define acceptance evidence for the Ticket System itself, and identify which
     future Runtime/App capabilities remain stubs or adapters.
 
-    This ticket is unresolved; the loop above is a candidate, not a committed
-    implementation plan.
-constraints: []
+    **Unblocked contract-first slice — 2026-07-28**
+
+    `contract-ticket-review-operations-001` now makes one implementation slice
+    safe before the complete dogfood loop is resolved:
+
+    - dependency-light browser-safe Ticket review DTO types/constants with
+      explicit capability slots, while strict Zod schemas remain opt-in;
+    - strict input/output schemas for the three coherent read responsibilities,
+      with the canonical projection-source schema remaining internal;
+    - a deterministic pure projector over resolver-selected snapshot facts and
+      `currentCapabilityProjections`, represented by the accepted
+      29-Ticket/35-relation review fixture;
+    - negative contract tests proving that writable state, maturity, progress,
+      Scenario, layout, and arbitrary capability JSON cannot enter the Runtime.
+
+    `V0` names product maturity; its wire DTOs use `schemaVersion: 1`. The pure
+    projector validates exact snapshot/watermark and subject bindings but does
+    not infer currentness or supersession from append-only receipt history.
+    Ticket bindings include definition revision; relation capability and trace
+    bindings include relation reference plus both endpoints. Producer families
+    are restricted, deeper unfrozen payloads remain unavailable, available
+    GateDecision traces require verified authority receipts, and claimed actors
+    never authorize.
+
+    The read foundation now includes the canonical definition/topology
+    bootstrap at `.vibehub/ticket-store/`, a scoped filesystem provider with
+    retained exact generations, production dispatcher registration, generated
+    operation contracts, a packaged mechanical Ticket wrapper, and thin
+    CLI/MCP adapters. Ticket semantic Skills are not implemented by this slice.
+    It proves one honest end-to-end read path without choosing legal
+    proposal-application semantics.
+
+    The Core-internal outline generation compiler and publication-head CAS
+    substrate now exist, but they are deliberately unregistered and grant no
+    mutation authority.
+
+    **Submit-only proposal slice — 2026-07-29**
+
+    One narrow public authoring surface is now safe:
+    `ticket.proposal.submit` appends an immutable comment or graph-change
+    review contribution. Core binds exact snapshot and target revisions,
+    allocates identity/revision/time/provenance fields, mechanically validates
+    the complete candidate, and atomically records the proposal with its
+    idempotent operation receipt. Decoded logical input is capped at 4 MiB;
+    CLI and Skill enforce the same raw proposal limit before parsing, while
+    MCP bounds the complete proposal call separately. Caller provenance is
+    rejected and caller-derived creation attribution is marked
+    claimed_unverified. It does not modify the Git Ticket store.
+
+    The submitter actor and authorAssessment remain untrusted claims. A separate
+    machine validator must judge semantic promise preservation and delegated
+    scope. Human authority is separate again and is reserved for protected
+    initial-plan, experience/product, principle-deviation,
+    permission/side-effect, and risk/policy boundaries. Bootstrap always
+    indicates initial_plan_authority; technical difficulty alone is not a human
+    blocker.
+
+    **Proposal-query and independent-validation slice — 2026-07-29**
+
+    The next bounded slice adds proposal inspect/list plus proposal-validation
+    record/list/inspect through the same Core/CLI/MCP spine. Validation is
+    immutable claimed_unverified semantic evidence bound to one graph-change
+    proposal and candidate. The independent `vibehub-ticket-validate` Skill
+    inspects that proposal, evaluates promise_preservation, containment_truth,
+    dependency_truth, change_classification, delegated_scope, and
+    protected_boundaries, then records one contribution.
+
+    Contrary validation records coexist; V0 chooses no current/latest/winner.
+    This slice does not perform Ticket-readiness validation, derive maturity,
+    grant authority, record a GateDecision, authorize application, mutate the
+    graph, or expose the internal publisher.
+
+    App integration, proposal application, semantic definition CAS and
+    application receipts, capability/trace receipt currentness, trusted gate
+    authority, context compilation, Run/Evidence/Outcome writers, and semantic
+    closeout remain blocked on their existing decisions.
+
+    The full dogfood loop is still unresolved. The loop above remains a
+    candidate until it names the first feature developed through it and closes
+    the remaining lifecycle, context, closeout, workflow-role, and storage
+    gates.
+constraints:
+  - kind: must
+    rule: "The first public Ticket write records an immutable review contribution only and must not change the canonical Ticket Graph"
+  - kind: must_not
+    rule: "The MVP must not expose proposal application, trusted GateDecision recording, or the internal Git publisher as a public operation"
+  - kind: must
+    rule: "Machine validation and human authority remain separate from mechanical submission review, and technical difficulty alone does not require human intervention"
+  - kind: must
+    rule: "The proposal-query and validation slice exposes five bounded Core operations and an independent Skill whose records remain immutable claimed_unverified proposal/candidate evidence"
+  - kind: must_not
+    rule: "Proposal validation must not be conflated with Ticket readiness or maturity, select a current/latest receipt, grant authority, authorize application, or mutate the graph"
 indexing:
   type: decision
   priority: P0
@@ -37,8 +126,11 @@ provenance:
   source_type: chat_extraction
   confidence: 0.8
   source_ref: "Wayne request to begin Plugin Ticket System development through loop engineering — 2026-07-27"
-  produced_at: "2026-07-27"
+  produced_at: "2026-07-29"
 relations:
+  - target: "contract-ticket-review-operations-001"
+    type: depends_on
+    detail: "Unblocks the read DTO/schema/projector slice without pretending the full dogfood lifecycle is settled."
   - target: "decision-ticket-runtime-boundary-001"
     type: depends_on
   - target: "decision-ticket-contract-001"
@@ -55,5 +147,15 @@ relations:
     type: depends_on
 anchors:
   - file: "packages/core"
+  - file: "packages/core/src/git-ticket-store.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/core/src/contract/ticket-proposal.ts"
+  - file: "packages/core/src/ticket-proposal-service.ts"
+  - file: "packages/cli/src/main.ts"
+  - file: "packages/mcp/src/server.ts"
   - file: "skills"
   - file: "META/09-ticket-runtime/spec.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "skills/vibehub-ticket-validate/SKILL.md"
+  - file: "packages/core/test/ticket-proposal-service.test.ts"

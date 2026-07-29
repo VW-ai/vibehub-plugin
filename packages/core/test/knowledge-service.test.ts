@@ -1,7 +1,7 @@
 import {afterEach,beforeEach,describe,expect,it} from "vitest";
 import fs from "node:fs";import os from "node:os";import path from "node:path";
 import {Worker} from "node:worker_threads";import {vi} from "vitest";
-import {KnowledgeService,OperationDispatcher,openDb,upsertRepo,type Db,type OperationContext} from "../src/index.js";
+import {KnowledgeService,OperationDispatcher,UNKNOWN_OPERATION_INPUT_MAX_BYTES,openDb,upsertRepo,type Db,type OperationContext} from "../src/index.js";
 import {seedActiveMapping} from "./kb-fixtures.js";
 
 const NOW="2026-07-13T12:00:00.000Z";
@@ -126,6 +126,26 @@ describe("KnowledgeService canonical boundary",()=>{
     expect(dispatch.dispatch("legacy.removed",unsupported,{value:1})).toEqual(first);
     expect(dispatch.dispatch("legacy.removed",{...unsupported,actor:"other"},{value:1})).toMatchObject({ok:false,error:{code:"idempotency_conflict"}});
     expect(dispatch.dispatch("legacy.removed",unsupported,{value:2})).toMatchObject({ok:false,error:{code:"idempotency_conflict"}});
+  });
+
+  it("rejects oversized unknown-operation input before hashing or receipting",()=>{
+    const request={...ctx,requestId:"unknown-oversized"};
+    expect(dispatch.dispatch("ticket.proposal.apply",request,{
+      value:"x".repeat(UNKNOWN_OPERATION_INPUT_MAX_BYTES),
+    })).toMatchObject({
+      ok:false,
+      error:{
+        code:"validation_error",
+        details:{
+          operation:"ticket.proposal.apply",
+          maximumBytes:UNKNOWN_OPERATION_INPUT_MAX_BYTES,
+        },
+      },
+    });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM operation_request_receipts
+       WHERE request_id='unknown-oversized'`,
+    ).get()).toEqual({count:0});
   });
 
   it("does not receipt context failures without a usable repository receipt address",()=>{

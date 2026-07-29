@@ -1,11 +1,30 @@
 import {
   OperationDispatcher,
+  operationInputSchemas,
   readTask,
   replaceScopePatterns,
   saveTaskReport,
   type Db,
 } from "@vw-ai/vibehub-core";
 import crypto from "node:crypto";
+
+export const TICKET_OPERATION_NAMES = [
+  "ticket.graph.snapshot",
+  "ticket.subject.inspect",
+  "ticket.trace.list",
+  "ticket.proposal.submit",
+  "ticket.proposal.inspect",
+  "ticket.proposal.list",
+  "ticket.proposal.validation.record",
+  "ticket.proposal.validation.inspect",
+  "ticket.proposal.validation.list",
+] as const;
+export type TicketOperationName = typeof TICKET_OPERATION_NAMES[number];
+const TICKET_OPERATION_NAME_SET = new Set<string>(TICKET_OPERATION_NAMES);
+export const KB_OPERATION_NAMES = Object.keys(operationInputSchemas)
+  .filter((operation) => operation.startsWith("kb."));
+export const DISTILL_OPERATION_NAMES = Object.keys(operationInputSchemas)
+  .filter((operation) => operation.startsWith("distill."));
 
 export interface CapabilityContext {
   db: Db;
@@ -56,10 +75,28 @@ export function createCapabilities(ctx: CapabilityContext) {
     },
 
     dispatchOperation(operation:string,input:Record<string,unknown>={},requestId?:string) {
-      return dispatch(operation,input,requestId);
+      return dispatchFamily("distill",operation,input,requestId);
     },
 
     dispatchKnowledge(operation:string,input:Record<string,unknown>={},requestId?:string) {
+      return dispatchFamily("kb",operation,input,requestId);
+    },
+
+    dispatchTicket(operation:TicketOperationName,input:Record<string,unknown>={},requestId?:string) {
+      if(!TICKET_OPERATION_NAME_SET.has(operation)){
+        return {
+          ok:false as const,
+          error:{
+            code:"unsupported_operation",
+            message:`${operation} does not belong to the ticket operation family`,
+            details:{
+              operation,
+              expectedOperations:[...TICKET_OPERATION_NAMES],
+            },
+            nextSafeActions:["Choose a registered ticket operation."],
+          },
+        };
+      }
       return dispatch(operation,input,requestId);
     },
 
@@ -73,4 +110,24 @@ export function createCapabilities(ctx: CapabilityContext) {
       };
     },
   };
+
+  function dispatchFamily(
+    family:"kb"|"distill",
+    operation:string,
+    input:Record<string,unknown>,
+    requestId?:string,
+  ) {
+    if(operation.startsWith(`${family}.`)){
+      return dispatch(operation,input,requestId);
+    }
+    return {
+      ok:false as const,
+      error:{
+        code:"unsupported_operation",
+        message:`${operation} does not belong to the ${family} operation family`,
+        details:{operation,expectedPrefix:`${family}.`},
+        nextSafeActions:[`Choose a registered ${family} operation.`],
+      },
+    };
+  }
 }

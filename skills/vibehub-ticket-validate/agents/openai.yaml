@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Ticket Validate"
+  short_description: "Validate immutable Ticket graph proposals"
+  default_prompt: "Use $vibehub-ticket-validate to independently review an immutable Ticket proposal."

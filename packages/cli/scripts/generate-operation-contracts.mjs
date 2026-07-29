@@ -3,10 +3,22 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
-import { operationAcceptanceConstructManifest, operationInputSchemas, operationRefinementManifest } from "@vw-ai/vibehub-core";
-import { validateOperationContract, validateRuntimeRefinements } from "../../../skills/scripts/operation-contract-validator.mjs";
+import {
+  OPERATION_INPUT_BYTE_LIMITS,
+  TICKET_PROPOSAL_MAX_INPUT_BYTES,
+  TICKET_PROPOSAL_VALIDATION_CHECK_CODES,
+  TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES,
+  operationAcceptanceConstructManifest,
+  operationInputSchemas,
+  operationRefinementManifest,
+} from "@vw-ai/vibehub-core";
+import {
+  materializeOperationFixture,
+  validateOperationContract,
+  validateRuntimeRefinements,
+} from "../../../skills/scripts/operation-contract-validator.mjs";
 
-const EXPECTED_INPUT_SCHEMA_HASH="f0295450d64e06a4396dd4e28c9956be6cf05225e5bd946a29f44d1ec6682439";
+const EXPECTED_INPUT_SCHEMA_HASH="0b3fe08a62638633949e22587bc556cdf5441567edc3785256db26fdd6913653";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../../..");
 const ajv=new Ajv2020({allErrors:true,strict:false});
@@ -21,7 +33,7 @@ for(const [name,schema] of Object.entries(operationInputSchemas).sort(([a],[b])=
   const positive=positiveFixture(name);
   const negatives=negativeFixtures(name,positive,input);
   if(!negatives.length)throw new Error(`missing negative fixtures: ${name}`);
-  for(const fixture of negatives)if(!fixture.value||typeof fixture.value!=="object"||Array.isArray(fixture.value)||JSON.stringify(fixture.value)===JSON.stringify(positive)||!fixture.case||!Array.isArray(fixture.refinementIds))throw new Error(`trivial negative fixture: ${name}`);
+  for(const fixture of negatives)if(!fixture.value||typeof fixture.value!=="object"||Array.isArray(fixture.value)||!fixture.case||!Array.isArray(fixture.refinementIds))throw new Error(`trivial negative fixture: ${name}`);
   const runtimeRefinements=runtimeRefinementsFor(name);
   const validate=ajv.compile(input);
   for(const candidate of differentialStringCorpus(positive)){
@@ -40,15 +52,24 @@ for(const [name,schema] of Object.entries(operationInputSchemas).sort(([a],[b])=
     if(artifactValid||runtimeValid)throw new Error(`negative parity drift: ${name}/${fixture.case}: artifact=${artifactValid} runtime=${runtimeValid} schema=${JSON.stringify(schemaErrors)} refinements=${JSON.stringify(runtimeErrors)}`);
   }
   for(const [id,entry] of Object.entries(refinementMatrix))if(entry.operations.includes(name)&&!negatives.some(fixture=>fixture.refinementIds.includes(id)))throw new Error(`missing refinement fixture coverage: ${name}/${id}`);
-  operations[name]={input,runtimeRefinements,fixtures:{positive,negative:negatives[0].value,negativeCase:negatives[0].case,negatives}};
+  const publishedNegatives=negatives.map(publishFixture);
+  const contract={input,runtimeRefinements,fixtures:{positive,negative:negatives[0].value,negativeCase:negatives[0].case,negatives:publishedNegatives}};
+  for(const fixture of publishedNegatives.filter(candidate=>candidate.materializer)){
+    const materialized=materializeOperationFixture(contract,fixture);
+    const schemaValid=validate(materialized),runtimeErrors=[];validateRuntimeRefinements(runtimeRefinements,materialized,runtimeErrors);
+    const expectedRuntimeFailure=fixture.refinementIds.every(id=>runtimeErrors.some(error=>error.refinementId===id));
+    if(!schemaValid||!expectedRuntimeFailure||schema.safeParse(materialized).success||validateOperationContract(contract,materialized).valid)throw new Error(`generated negative fixture parity drift: ${name}/${fixture.case}`);
+  }
+  operations[name]=contract;
 }
 
 const inputSchemaHash=crypto.createHash("sha256").update(JSON.stringify(Object.fromEntries(Object.entries(operations).map(([name,contract])=>[name,contract.input])))).digest("hex");
 if(inputSchemaHash!==EXPECTED_INPUT_SCHEMA_HASH)throw new Error(`operation input acceptance fingerprint changed: expected ${EXPECTED_INPUT_SCHEMA_HASH}, got ${inputSchemaHash}; review the full serialized diff before updating the explicit fingerprint`);
 const registryHash=crypto.createHash("sha256").update(JSON.stringify(operations)).digest("hex");
 const artifact={
-  schemaVersion:4,registryHash,inputSchemaHash,
+  schemaVersion:5,registryHash,inputSchemaHash,
   dialect:"JSON Schema 2020-12 plus VibeHub runtimeRefinements/v1",
+  fixtureDialect:"literal value or generatedFixture/v1",
   scope:"Operation input contracts only. Operation context is validated separately by the runtime operationContextSchema at CLI/MCP adapter boundaries.",
   validationContract:"An input is valid only when both `input` JSON Schema and `runtimeRefinements` pass.",
   acceptanceConstructs:operationAcceptanceConstructManifest,
@@ -64,6 +85,17 @@ const artifact={
 };
 const target=path.join(root,"skills/contracts/operation-contracts.json");
 fs.writeFileSync(target,`${JSON.stringify(artifact,null,2)}\n`);
+const limitsTarget=path.join(root,"skills/scripts/generated-operation-limits.mjs");
+fs.writeFileSync(
+  limitsTarget,
+  [
+    "/** Generated by packages/cli/scripts/generate-operation-contracts.mjs. */",
+    `export const TICKET_PROPOSAL_MAX_INPUT_BYTES = ${TICKET_PROPOSAL_MAX_INPUT_BYTES};`,
+    `export const TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES = ${TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES};`,
+    `export const OPERATION_INPUT_BYTE_LIMITS = Object.freeze(${JSON.stringify(OPERATION_INPUT_BYTE_LIMITS, null, 2)});`,
+    "",
+  ].join("\n"),
+);
 console.log(`generated ${Object.keys(operations).length} operation contracts with audited refinements (${registryHash.slice(0,12)})`);
 
 /** Add only refinements that JSON Schema 2020-12 can express exactly. */
@@ -76,6 +108,11 @@ function addRepresentableRefinements(name,schema){
     }
     if(p.lineStart&&p.lineEnd){
       node.dependentRequired={...(node.dependentRequired??{}),lineEnd:["lineStart"]};
+    }
+    if(name.startsWith("ticket.proposal.")){
+      if(p.authoritySignals)p.authoritySignals.uniqueItems=true;
+      if(p.indicatedAuthoritySignals)p.indicatedAuthoritySignals.uniqueItems=true;
+      if(p.evidenceRefs)p.evidenceRefs.uniqueItems=true;
     }
     if(p.classification&&p.reason&&p.contentHash){
       node.allOf=[...(node.allOf??[]),
@@ -93,6 +130,9 @@ function addRepresentableRefinements(name,schema){
       {required:["versionId"],not:{required:["runId"]}},
     ];
   }
+  if(name==="ticket.trace.list"&&schema.properties?.kinds){
+    schema.properties.kinds.uniqueItems=true;
+  }
   return schema;
 }
 
@@ -103,6 +143,13 @@ function runtimeRefinementsFor(name){
   if(name==="distill.scopes.complete"){
     rules.push({id:"scope-completion-byte-budget",kind:"maxJsonBytes",maximum:1_048_576,message:"scope completion payload must not exceed 1 MiB"});
     rules.push({id:"scope-completion-evidence-budget",kind:"maxNestedArrayItems",parentField:"unresolvedFiles",childField:"evidence",maximum:200,message:"scope completion may contain at most 200 evidence entries"});
+  }
+  if(name==="ticket.proposal.submit"){
+    rules.push({id:"ticket-proposal-input-byte-budget",kind:"maxJsonBytes",maximum:TICKET_PROPOSAL_MAX_INPUT_BYTES,message:"Ticket proposal input must not exceed 4194304 JSON bytes"});
+  }
+  if(name==="ticket.proposal.validation.record"){
+    rules.push({id:"ticket-proposal-validation-input-byte-budget",kind:"maxJsonBytes",maximum:TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES,message:"Ticket proposal validation input must not exceed 1048576 JSON bytes"});
+    rules.push({id:"ticket-proposal-validation-coherence",kind:"ticketProposalValidationCoherence",codes:[...TICKET_PROPOSAL_VALIDATION_CHECK_CODES],message:"Ticket proposal validation checks and findings are incoherent"});
   }
   return rules;
 }
@@ -115,6 +162,9 @@ function walk(value,visit){
 
 function positiveFixture(name){
   const runId="fixture-run",specId="context-fixture",key="fixture-key",lease={runId,scopeId:"scope",leaseToken:"lease",generation:1};
+  const proposalId=`tgp-${"1".repeat(64)}`;
+  const proposalDigest="2".repeat(64);
+  const candidateDigest="3".repeat(64);
   const fixtures={
     "kb.status":{},"kb.feature.list":{query:"two words"},"kb.feature.get":{id:"x".repeat(200)},"kb.feature.suggest":{},
     "kb.spec.search":{paths:["src/two words.ts"],tags:["two words"]},"kb.spec.get":{id:specId},"kb.relations":{specId},"kb.lineage":{id:specId},"kb.anchors":{specId},"kb.review":{},
@@ -133,12 +183,274 @@ function positiveFixture(name){
     "distill.version.get":{versionId:"version"},"distill.version.diff":{versionId:"version"},
     "distill.reconcile":{runId},"distill.validate":{runId},"distill.finalize":{runId},
     "distill.activate":{targetVersionId:"version",expectedCurrentVersion:null,reason:"fixture"},"distill.rollback":{targetVersionId:"version",expectedCurrentVersion:null,reason:"fixture"},
+    "ticket.graph.snapshot":{},
+    "ticket.subject.inspect":{snapshotId:"tgs-fixture",subject:{kind:"ticket",ticketId:"TKT-1"}},
+    "ticket.trace.list":{snapshotId:"tgs-fixture",subject:{kind:"ticket",ticketId:"TKT-1"},kinds:["evidence"],limit:10},
+    "ticket.proposal.submit":{
+      schemaVersion:1,
+      kind:"graph_change",
+      observedSnapshotId:null,
+      reason:"Decompose the accepted outcome into executable work",
+      source:{kind:"plan",ref:"plan:fixture"},
+      authorAssessment:{
+        changeClass:"decomposition",
+        authoritySignals:[],
+        introducesHumanGate:false,
+        rationale:"The proposal stays within the delegated outcome.",
+      },
+      changes:[
+        {
+          op:"create",
+          localRef:"root",
+          definition:{
+            outcome:"Provide the accepted capability",
+            parent:null,
+            dependsOn:[],
+          },
+        },
+        {
+          op:"create",
+          localRef:"verification",
+          definition:{
+            outcome:"Verify the accepted capability",
+            parent:{kind:"local",localRef:"root"},
+            dependsOn:[{
+              target:{kind:"local",localRef:"root"},
+              rationale:"Verification follows implementation.",
+            }],
+          },
+        },
+      ],
+    },
+    "ticket.proposal.inspect":{proposalId},
+    "ticket.proposal.list":{kind:"graph_change",limit:25},
+    "ticket.proposal.validation.record":{
+      schemaVersion:1,
+      proposalId,
+      expectedProposalDigest:proposalDigest,
+      expectedCandidateDigest:candidateDigest,
+      validator:{
+        id:"vibehub-ticket-validate",
+        version:"1",
+        artifactDigest:"4".repeat(64),
+      },
+      policy:{
+        id:"vibehub-ticket-proposal-semantic-review",
+        version:"1",
+        artifactDigest:"5".repeat(64),
+      },
+      checks:TICKET_PROPOSAL_VALIDATION_CHECK_CODES.map((code,index)=>({
+        localRef:`check-${index+1}`,
+        code,
+        subject:{kind:"proposal"},
+        outcome:"passed",
+        summary:`${code} is preserved by the proposed candidate.`,
+        evidenceRefs:[`proposal:${proposalId}`],
+      })),
+      findings:[],
+      indicatedAuthoritySignals:[],
+    },
+    "ticket.proposal.validation.inspect":{
+      validationReceiptId:`tpv-${"6".repeat(64)}`,
+    },
+    "ticket.proposal.validation.list":{proposalId,limit:25},
   };
   if(!(name in fixtures))throw new Error(`missing positive operation fixture: ${name}`);
   return fixtures[name];
 }
 
 function negativeFixtures(name,positive,input){
+  if(name==="ticket.proposal.submit"){
+    return [
+      fixture("proposal schema version must be one",{...positive,schemaVersion:2}),
+      fixture("comment proposal requires an exact subject",{
+        schemaVersion:1,
+        kind:"comment",
+        observedSnapshotId:`tgs-${"0".repeat(64)}`,
+        body:"Please preserve the accepted outcome.",
+      }),
+      fixture("comment proposal rejects graph mutation fields",{
+        schemaVersion:1,
+        kind:"comment",
+        observedSnapshotId:`tgs-${"0".repeat(64)}`,
+        subject:{kind:"ticket",ticketId:"TKT-1",definitionRevision:1},
+        body:"Please preserve the accepted outcome.",
+        changes:[],
+      }),
+      fixture("graph proposal rejects malformed snapshot identity",{
+        ...positive,
+        observedSnapshotId:"tgs-fixture",
+      }),
+      fixture("graph proposal rejects caller-selected status",{
+        ...positive,
+        status:"approved",
+      }),
+      fixture("graph proposal rejects caller-authored provenance",{
+        ...positive,
+        changes:[{
+          ...positive.changes[0],
+          definition:{
+            ...positive.changes[0].definition,
+            provenanceRefs:["caller:forged"],
+          },
+        }],
+      }),
+      fixture("graph proposal requires at least one change",{
+        ...positive,
+        changes:[],
+      }),
+      fixture("revision precondition must be positive",{
+        ...positive,
+        changes:[{
+          op:"revise",
+          ticketId:"TKT-1",
+          expectedDefinitionRevision:0,
+          replacement:{
+            outcome:"Revise the accepted capability",
+            parent:null,
+            dependsOn:[],
+          },
+        }],
+      }),
+      fixture("revision precondition must stay within the frozen range",{
+        ...positive,
+        changes:[{
+          op:"revise",
+          ticketId:"TKT-1",
+          expectedDefinitionRevision:10_000_000_000,
+          replacement:{
+            outcome:"Revise the accepted capability",
+            parent:null,
+            dependsOn:[],
+          },
+        }],
+      }),
+      fixture("authority signal must be canonical",{
+        ...positive,
+        authorAssessment:{
+          ...positive.authorAssessment,
+          authoritySignals:["technical_difficulty"],
+        },
+      }),
+      fixture("authority signals must be unique",{
+        ...positive,
+        authorAssessment:{
+          ...positive.authorAssessment,
+          authoritySignals:["risk_policy","risk_policy"],
+        },
+      },["ticket-proposal-authority-signals-unique"]),
+      generatedFixture(
+        "proposal aggregate JSON byte budget",
+        positive,
+        {
+          kind:"ticket-proposal-budget/v1",
+          changeCount:200,
+          outcomeLength:20_000,
+          rationaleLength:1_000,
+        },
+        ["ticket-proposal-input-byte-budget"],
+      ),
+    ];
+  }
+  if(name==="ticket.proposal.inspect"){
+    return [
+      fixture("proposal id must use the canonical identity",{proposalId:"proposal-1"}),
+      fixture("proposal inspect rejects caller-selected status",{...positive,status:"approved"}),
+    ];
+  }
+  if(name==="ticket.proposal.list"){
+    return [
+      fixture("proposal list limit above maximum",{...positive,limit:101}),
+      fixture("proposal list kind must be canonical",{...positive,kind:"pending"}),
+      fixture("proposal list rejects plural kinds",{...positive,kinds:["graph_change"]}),
+      fixture("proposal list rejects caller-selected scope",{...positive,scopeRef:"tps-forged"}),
+    ];
+  }
+  if(name==="ticket.proposal.validation.record"){
+    return [
+      fixture("validation proposal digest must be lowercase sha256",{...positive,expectedProposalDigest:"not-a-digest"}),
+      fixture("validation requires every semantic check",{...positive,checks:positive.checks.slice(1)}),
+      fixture("validation checks must contain each code once",{
+        ...positive,
+        checks:positive.checks.map((check,index)=>index===1
+          ? {...check,code:positive.checks[0].code}
+          : check),
+      },["ticket-proposal-validation-coherence"]),
+      fixture("validation check local refs must be unique",{
+        ...positive,
+        checks:positive.checks.map((check,index)=>index===1
+          ? {...check,localRef:positive.checks[0].localRef}
+          : check),
+      },["ticket-proposal-validation-coherence"]),
+      fixture("validation evidence refs must be unique",{
+        ...positive,
+        checks:positive.checks.map((check,index)=>index===0
+          ? {...check,evidenceRefs:[check.evidenceRefs[0],check.evidenceRefs[0]]}
+          : check),
+      },["ticket-proposal-validation-evidence-refs-unique"]),
+      fixture("dependency validation subjects require an exact delta direction",{
+        ...positive,
+        checks:positive.checks.map((check,index)=>index===2
+          ? {
+              ...check,
+              subject:{
+                kind:"dependency_change",
+                prerequisiteTicketId:"TKT-1",
+                dependentTicketId:"TKT-2",
+              },
+            }
+          : check),
+      }),
+      fixture("validation finding local refs must be unique",{
+        ...positive,
+        findings:[0,1].map((index)=>({
+          localRef:"finding-duplicate",
+          checkLocalRef:positive.checks[index].localRef,
+          subject:{kind:"proposal"},
+          impact:"advisory",
+          code:"review_note",
+          summary:"Bounded review note.",
+          evidenceRefs:positive.checks[index].evidenceRefs,
+        })),
+      },["ticket-proposal-validation-coherence"]),
+      fixture("validation findings must target a same-input check",{
+        ...positive,
+        findings:[{
+          localRef:"finding-unbound",
+          checkLocalRef:"check-missing",
+          subject:{kind:"proposal"},
+          impact:"advisory",
+          code:"review_note",
+          summary:"This finding has no matching check.",
+          evidenceRefs:positive.checks[0].evidenceRefs,
+        }],
+      },["ticket-proposal-validation-coherence"]),
+      fixture("validation rejects caller-selected authority",{...positive,authorityGranted:true}),
+      fixture("validation authority signals must be unique",{...positive,indicatedAuthoritySignals:["risk_policy","risk_policy"]},["ticket-proposal-validation-authority-signals-unique"]),
+      generatedFixture(
+        "proposal validation aggregate JSON byte budget",
+        positive,
+        {
+          kind:"ticket-proposal-validation-budget/v1",
+          findingCount:60,
+          detailLength:20_000,
+        },
+        ["ticket-proposal-validation-input-byte-budget"],
+      ),
+    ];
+  }
+  if(name==="ticket.proposal.validation.inspect"){
+    return [
+      fixture("validation receipt id must use the canonical identity",{validationReceiptId:"receipt-1"}),
+      fixture("validation inspect rejects proposal selectors",{...positive,proposalId:`tgp-${"1".repeat(64)}`}),
+    ];
+  }
+  if(name==="ticket.proposal.validation.list"){
+    return [
+      fixture("validation list limit above maximum",{...positive,limit:101}),
+      fixture("validation list rejects mutable status filters",{...positive,status:"passed"}),
+    ];
+  }
   const explicit={
     "kb.feature.list":[fixture("limit below minimum",{limit:0})],
     "kb.feature.get":[
@@ -206,6 +518,19 @@ function negativeFixtures(name,positive,input){
     "distill.candidates.get":[fixture("both run and version selectors",{...positive,versionId:"version"},["candidate-selector-exactly-one"]),fixture("missing run and version selector",{kind:"feature",naturalId:"feature"},["candidate-selector-exactly-one"])],
     "distill.candidates.list":[fixture("both run and version selectors",{...positive,versionId:"version"},["candidate-selector-exactly-one"]),fixture("missing run and version selector",{},["candidate-selector-exactly-one"])],
     "distill.version.diff":[fixture("kind filter above maximum",{...positive,kinds:["feature","spec","anchor","feature"]})],
+    "ticket.graph.snapshot":[
+      fixture("page size below minimum",{pageSize:0}),
+      fixture("cursor rejects whitespace only",{cursor:" "}),
+    ],
+    "ticket.subject.inspect":[
+      fixture("snapshot id rejects leading whitespace",{...positive,snapshotId:" tgs-fixture"}),
+      fixture("subject discriminant branch rejects extra relation selector",{...positive,subject:{kind:"ticket",ticketId:"TKT-1",relationRef:"relation-1"}}),
+    ],
+    "ticket.trace.list":[
+      fixture("trace kinds must be unique",{...positive,kinds:["evidence","evidence"]},["ticket-trace-kinds-unique"]),
+      fixture("trace limit above maximum",{...positive,limit:201}),
+      fixture("trace subject rejects trailing whitespace",{...positive,subject:{kind:"ticket",ticketId:"TKT-1 "}}),
+    ],
   };
   if(explicit[name])return explicit[name];
   const value=structuredClone(positive);
@@ -216,6 +541,15 @@ function negativeFixtures(name,positive,input){
 }
 
 function fixture(caseName,value,refinementIds=[]){return {case:caseName,value,refinementIds};}
+function generatedFixture(caseName,positive,materializer,refinementIds=[]){
+  const descriptor={case:caseName,materializer,refinementIds};
+  return {...descriptor,value:materializeOperationFixture({fixtures:{positive}},descriptor)};
+}
+function publishFixture(fixture){
+  if(!fixture.materializer)return fixture;
+  const {value:_value,...published}=fixture;
+  return published;
+}
 
 function differentialStringCorpus(value){
   const variants=["x"," "," x","x ","x\n",...([40,100,101,200,201,300,301,500,501,1000,1001,2000,2001,20_000,20_001].map(n=>"😀".repeat(n)))];
@@ -239,6 +573,13 @@ function buildRefinementMatrix(){
     "candidate-selector-exactly-one":{representation:"json-schema",mechanism:"oneOf required runId/versionId with not"},
     "candidate-discriminated-union":{representation:"json-schema",mechanism:"oneOf strict kind-const branches"},
     "anchors-strict-union":{representation:"json-schema",mechanism:"anyOf strict single-property branches"},
+    "ticket-trace-kinds-unique":{representation:"json-schema",mechanism:"uniqueItems on kinds"},
+    "ticket-proposal-input-byte-budget":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 bounded structural maxJsonBytes"},
+    "ticket-proposal-authority-signals-unique":{representation:"json-schema",mechanism:"uniqueItems on authoritySignals"},
+    "ticket-proposal-validation-input-byte-budget":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 bounded structural maxJsonBytes"},
+    "ticket-proposal-validation-authority-signals-unique":{representation:"json-schema",mechanism:"uniqueItems on indicatedAuthoritySignals"},
+    "ticket-proposal-validation-evidence-refs-unique":{representation:"json-schema",mechanism:"uniqueItems on evidenceRefs"},
+    "ticket-proposal-validation-coherence":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 ticketProposalValidationCoherence"},
   };
   return Object.fromEntries(Object.entries(operationRefinementManifest).map(([id,entry])=>{
     if(!representation[id])throw new Error(`runtime refinement lacks artifact representation: ${id}`);

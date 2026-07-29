@@ -136,6 +136,12 @@ intent:
     inputs and outputs. Validators may verify that a required human gate was
     satisfied; they may not grant the missing human authority themselves.
 
+    The proposal-validation ledger introduced for immutable graph-change
+    proposals is a separate evidence family. It binds a proposal and its
+    mechanically materialized candidate, not the current canonical Ticket
+    revision, and therefore cannot derive Ticket maturity or satisfy this
+    Ticket-readiness ValidationReceipt.
+
     **Ratified partial contract — verifiable acceptance**
 
     Acceptance criteria prove the Ticket's promised outcome rather than list
@@ -307,3 +313,4 @@ relations:
     detail: "The schema depends on whether Ticket is the sole work identity or a distinct level below Task."
 anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"

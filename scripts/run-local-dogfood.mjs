@@ -97,7 +97,9 @@ try {
     assert.equal(retrieved.ok, true, JSON.stringify(retrieved));
     assert.ok(retrieved.data.items.some((fact) => fact.id === "context-dogfood"));
     let opSeq=0;const op=(operation,input)=>{const value=api.dispatchOperation(operation,input,`dogfood-distill-${++opSeq}`);assert.equal(value.ok,true,JSON.stringify(value));return value.data;};
-    const active=op("kb.status",{}).activeMapping?.versionId ?? null;
+    const status=api.dispatchKnowledge("kb.status",{},"dogfood-kb-status");
+    assert.equal(status.ok,true,JSON.stringify(status));
+    const active=status.data.activeMapping?.versionId ?? null;
     const baseCommit=run("git",["rev-parse","HEAD"],{cwd:repo}).trim();op("distill.run.start",{runId:"dogfood-distill",mode:"cold",baseCommit,skillHash:"dogfood-skill",configHash:"dogfood-config"});
     op("distill.inventory.put",{runId:"dogfood-distill",rows:[{path:"README.md",classification:"included",contentHash:"dogfood-readme"}]});
     op("distill.inventory.seal",{runId:"dogfood-distill"});

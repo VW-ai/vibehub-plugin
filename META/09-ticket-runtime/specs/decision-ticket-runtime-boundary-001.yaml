@@ -110,6 +110,22 @@ intent:
 
     Wayne ratified this composable intelligence surface on 2026-07-28.
 
+    **Resolved specialization — proposal validation evidence**
+
+    The first concrete `vibehub-ticket-validate` Skill independently reviews
+    one immutable graph-change proposal and records proposal/candidate-bound
+    semantic evidence through Core. Its producer, policy, and actor remain
+    claimed_unverified. It evaluates promise preservation, containment,
+    dependency truth, change classification, delegated scope, and protected
+    boundaries without granting authority or applying the proposal.
+
+    This proposal validator is not the Ticket-revision readiness validator
+    described above. It cannot derive outline/specified/executable maturity,
+    project READY, satisfy a GateDecision, or become a current validation
+    capability. The future Ticket-readiness validator remains a separate
+    intelligence and receipt contract so the two evidence subjects cannot be
+    conflated.
+
     **Ratified partial boundary — one deterministic operation surface**
 
     Every Skill, CLI command, MCP tool, future App action, and future daemon
@@ -180,3 +196,5 @@ anchors:
   - file: "packages/core"
   - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "skills/vibehub-ticket-validate/SKILL.md"
