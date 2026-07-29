@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-contract-001"
 type: decision
-state: active
+state: superseded
 intent:
   summary: "什么最小 Ticket contract 才足以被独立调度、执行、验证和追溯？"
   detail: |
@@ -308,6 +308,9 @@ provenance:
   source_ref: "Strict Ticket hardness discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
   produced_at: "2026-07-27"
 relations:
+  - target: "decision-ticket-contract-002"
+    type: superseded_by
+    detail: "The executable context contract remains, but mandatory parent hierarchy is removed in favor of typed relations."
   - target: "decision-ticket-work-unit-001"
     type: depends_on
     detail: "The schema depends on whether Ticket is the sole work identity or a distinct level below Task."

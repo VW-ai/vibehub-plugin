@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-runtime-boundary-001"
 type: decision
-state: active
+state: superseded
 intent:
   summary: "第一版 Ticket System 的 canonical writer、业务规则与执行入口分别应由 Plugin、共享 Core/Local Runtime、App 中谁拥有？"
   detail: |
@@ -186,6 +186,9 @@ provenance:
   source_ref: "Plugin/App/Local Runtime architecture discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
   produced_at: "2026-07-27"
 relations:
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: superseded_by
+    detail: "Skill now owns orchestration and semantic judgment; shared code is a deterministic document toolkit rather than the canonical workflow writer."
   - target: "decision-workbench-011"
     type: challenges
     detail: "May refine the active headless Plugin/Runtime and optional App boundary."

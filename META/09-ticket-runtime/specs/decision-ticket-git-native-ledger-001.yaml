@@ -1,0 +1,93 @@
+spec_id: "decision-ticket-git-native-ledger-001"
+type: decision
+state: active
+intent:
+  summary: "SQLite 应尽可能只放和语义无关的东西；从 Ticket proposal 到 receipt 都更适合作为随 Git 协作的文件。"
+  detail: |
+    **Decision**: Ticket Runtime returns to the repository-wide Git semantic
+    authority model already ratified by `decision-project-028`.
+
+    Git-tracked documents own every durable fact whose loss would change what
+    the project means or why an Agent should act:
+
+    - Ticket definitions and typed graph relations;
+    - planning proposals and comments;
+    - semantic validation findings;
+    - human or delegated decisions;
+    - graph-mutation/application receipts;
+    - Outcomes, accepted Evidence references, deviations, blockers,
+      supersession, and semantic closeout.
+
+    “Receipt” is classified by meaning. A receipt that proves a proposal was
+    validated, authorized, applied, or completed is semantic and belongs in
+    Git. A request retry marker, HTTP response cache, process journal, lease,
+    heartbeat, or browser capability is operational and may remain in SQLite.
+
+    The first protocol uses stable, reviewable documents under
+    `.vibehub/tickets/`. The exact schema may evolve, but it must not recreate
+    Git history through an internal immutable-generation store or mutable
+    `latest.yaml` pointer. Inventory and graph digests are derived from the
+    selected worktree or Git tree.
+
+    Authority is ref-relative:
+
+    - an uncommitted Ticket document is a pending local semantic change;
+    - a commit is durable truth for that branch;
+    - a pushed branch or pull request is a reviewable collaborative proposal;
+    - merged Git history determines shared project truth.
+
+    Readers identify the exact repository, worktree/ref, resolved commit when
+    applicable, and derived Ticket graph digest. They never silently union
+    semantic facts from different branches.
+
+    SQLite is a disposable operational accelerator. It may hold active Run
+    coordination, claims, leases, heartbeat, retries, local indexes,
+    commit/digest-keyed caches, file-watcher state, and UI sessions. Deleting
+    it may interrupt a live process, but checkout plus deterministic indexing
+    must recover every durable Ticket meaning, decision, outcome, and proof.
+
+    This project is early-stage. The existing SQLite Ticket proposal,
+    validation, authority, application-intent, and application-receipt ledgers
+    create no migration or compatibility obligation.
+constraints:
+  - kind: must
+    rule: "Git-tracked documents are the sole durable authority for Ticket definitions, relations, proposals, semantic validation, decisions, semantic receipts, Outcomes, and Evidence references"
+  - kind: must
+    rule: "Deleting the local SQLite database may lose live coordination but must not lose or change any durable Ticket meaning"
+  - kind: must
+    rule: "Every semantic read identifies one repository and one worktree/ref source plus its resolved commit or dirty-worktree graph digest"
+  - kind: must
+    rule: "Inventory and semantic digests derive from the selected Git tree or worktree rather than a committed mutable latest pointer"
+  - kind: must_not
+    rule: "Do not dual-write Ticket semantic facts to Git and SQLite"
+  - kind: must_not
+    rule: "Do not retain compatibility readers or migrate the early-stage SQLite Ticket ledgers"
+  - kind: must_not
+    rule: "Do not silently combine facts from different branches, refs, or worktrees"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [git, semantic-ledger, sqlite, worktree, branch, receipts, authority]
+provenance:
+  source_type: manual_input
+  confidence: 0.98
+  source_ref: "Wayne explicitly required SQLite to remain semantically neutral and Ticket proposal-through-receipt facts to follow Git — 2026-07-29"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29"
+relations:
+  - target: "decision-ticket-storage-001"
+    type: supersedes
+    detail: "Replaces the SQLite proposal/validation/authority/application ledger and internal generation authority."
+  - target: "decision-project-028"
+    type: depends_on
+    detail: "Applies the existing project-wide Git durable semantic authority model to Tickets."
+  - target: "decision-project-029"
+    type: relates_to
+    detail: "Ticket semantic checkpoints should reuse the existing ref/digest-bound collaboration discipline."
+anchors:
+  - file: ".vibehub/semantic-store/protocol.yaml"
+  - file: "packages/core/src/git-semantic-store.ts"
+  - file: "packages/core/src/git-ticket-store.ts"
+  - file: "packages/core/src/db.ts"

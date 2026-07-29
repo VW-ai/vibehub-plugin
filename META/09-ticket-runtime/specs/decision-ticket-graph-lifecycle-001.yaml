@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-graph-lifecycle-001"
 type: decision
-state: active
+state: superseded
 intent:
   summary: "Plan、Ticket Graph、Ticket 与 Run 分别拥有什么生命周期，谁可以怎样修改工作图？"
   detail: |
@@ -223,6 +223,9 @@ provenance:
   produced_by_agent: "ingest"
   produced_at: "2026-07-29"
 relations:
+  - target: "decision-ticket-graph-lifecycle-002"
+    type: superseded_by
+    detail: "Git documents and normal ref/commit semantics replace internal generations plus Git/SQLite fenced application."
   - target: "decision-ticket-work-unit-001"
     type: depends_on
   - target: "decision-ticket-contract-001"

@@ -30,7 +30,7 @@ provenance:
   source_ref: "Workflow/Plan/Ticket/Run distinction in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
   produced_at: "2026-07-27"
 relations:
-  - target: "decision-ticket-contract-001"
+  - target: "decision-ticket-contract-002"
     type: depends_on
 anchors:
   - file: "skills"

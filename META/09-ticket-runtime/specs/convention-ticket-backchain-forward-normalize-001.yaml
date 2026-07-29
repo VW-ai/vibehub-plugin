@@ -1,6 +1,6 @@
 spec_id: "convention-ticket-backchain-forward-normalize-001"
 type: convention
-state: active
+state: superseded
 intent:
   summary: "生成给某一个任务的 Tickets 时，可以用倒退的逻辑，倒推，然后从起点再来看起来 clean up。"
   detail: |
@@ -65,6 +65,9 @@ provenance:
   produced_by_agent: "ingest"
   produced_at: "2026-07-28"
 relations:
+  - target: "convention-ticket-backchain-forward-normalize-002"
+    type: superseded_by
+    detail: "The two-pass planning method remains, but the graph no longer requires containment parents."
   - target: "decision-ticket-contract-001"
     type: depends_on
     detail: "The two-pass convention preserves stable outcomes, containment, dependencies, acceptance, and Planning Fog boundaries."

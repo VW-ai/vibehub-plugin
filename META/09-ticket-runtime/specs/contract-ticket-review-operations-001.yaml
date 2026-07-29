@@ -1,6 +1,6 @@
 spec_id: "contract-ticket-review-operations-001"
 type: contract
-state: active
+state: stale
 intent:
   summary: "重点就是我们人看 Ticket，看的就是：这个执行完了，可以去执行哪一个了。"
   detail: |
@@ -437,6 +437,12 @@ provenance:
   produced_by_agent: "ingest"
   produced_at: "2026-07-29T20:00:00Z"
 relations:
+  - target: "decision-ticket-git-native-ledger-001"
+    type: challenged_by
+    detail: "Its SQLite proposal/validation/authority/application operations and cross-store receipts no longer match the durable authority boundary."
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: challenged_by
+    detail: "A successor operation contract must expose deterministic Git document capabilities without owning semantic workflow."
   - target: "decision-ticket-review-surface-001"
     type: depends_on
     detail: "The three reads cover the accepted whole-graph and progressive-inspection surface without inventing a dashboard API."

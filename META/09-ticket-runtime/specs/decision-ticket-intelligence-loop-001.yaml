@@ -129,6 +129,14 @@ intent:
 
     Wayne ratified the complete intelligence loop on 2026-07-28.
 
+    **Git-native Skill-driven clarification — 2026-07-29**
+
+    The loop is orchestrated by Skills over Git Ticket documents. Bundled
+    scripts provide deterministic reads, typed-graph validation, stale checks,
+    diffs, and bounded writes; they do not own the semantic workflow. Agent
+    decomposition attaches new Tickets through truthful typed relation paths,
+    not mandatory parent/ancestor hierarchy.
+
     **Claimed**: Codex 2026-07-28
 constraints: []
 indexing:
@@ -143,13 +151,13 @@ provenance:
   source_ref: "Wayne asked how Tickets are generated and Ticket Skills are invoked — 2026-07-28"
   produced_at: "2026-07-28"
 relations:
-  - target: "decision-ticket-contract-001"
+  - target: "decision-ticket-contract-002"
     type: depends_on
     detail: "Generation and invocation must preserve the ratified Ticket identity, maturity, authority, and validation contract."
-  - target: "decision-ticket-runtime-boundary-001"
+  - target: "decision-ticket-skill-driven-boundary-001"
     type: depends_on
-    detail: "The intelligence loop composes Skills over the ratified Core-owned operation boundary."
-  - target: "decision-ticket-graph-lifecycle-001"
+    detail: "The intelligence loop composes Skill-owned judgment over deterministic Git document capabilities."
+  - target: "decision-ticket-graph-lifecycle-002"
     type: relates_to
     detail: "Invocation policy proposes mutations whose legal lifecycle remains governed separately."
   - target: "decision-ticket-workflow-role-001"

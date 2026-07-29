@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-mvp-001"
 type: decision
-state: active
+state: superseded
 intent:
   summary: "什么是可以立即在现有 Plugin 中实现并用来开发它自己的最小 Ticket dogfood 闭环？"
   detail: |
@@ -197,6 +197,9 @@ provenance:
   source_ref: "Wayne request to begin Plugin Ticket System development through loop engineering — 2026-07-27"
   produced_at: "2026-07-29T20:00:00Z"
 relations:
+  - target: "decision-ticket-mvp-002"
+    type: superseded_by
+    detail: "The MVP is now Git documents plus Skills, deterministic scripts, graph HTML, and disposable runtime."
   - target: "contract-ticket-review-operations-001"
     type: depends_on
     detail: "Unblocks the read DTO/schema/projector slice without pretending the full dogfood lifecycle is settled."

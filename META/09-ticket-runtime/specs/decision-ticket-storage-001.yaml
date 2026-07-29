@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-storage-001"
 type: decision
-state: active
+state: superseded
 intent:
   summary: "Plan、Ticket、Outcome、Run、Event、Artifact 与 Evidence 分别由 Git/YAML、SQLite、JSONL 或 artifact storage 中哪一层持有权威？"
   detail: |
@@ -242,6 +242,9 @@ provenance:
   produced_by_agent: "ingest"
   produced_at: "2026-07-29"
 relations:
+  - target: "decision-ticket-git-native-ledger-001"
+    type: superseded_by
+    detail: "Ticket durable semantics now follow Git; SQLite is limited to disposable operational coordination and caches."
   - target: "decision-ticket-runtime-boundary-001"
     type: depends_on
   - target: "decision-ticket-contract-001"

@@ -155,7 +155,7 @@ intent:
     **Resolved review-surface decision**
 
     The v0 project review surface is one lightweight projection over canonical
-    Core reads and operations:
+    Ticket reads and operations:
 
     - the primary view is the complete direct-unlock Ticket Graph, read
       left-to-right as “what may execute next,” with deterministic pan, zoom,
@@ -171,8 +171,9 @@ intent:
     - progressive inspection keeps the graph visible and makes Ticket
       contracts, direct relation rationale, evidence, commits, comments, and
       simple edit proposals traceable;
-    - comments and edits are attributed versioned proposals through Core, not
-      writes to an HTML-owned store;
+    - comments and edits are attributed Git-native proposals or Ticket
+      document changes through deterministic operations, not writes to an
+      HTML-owned store;
     - graph layout is a derived, reproducible view artifact. Runtime state,
       selection, hover, or scenario lens changes must not move Tickets.
 
@@ -193,6 +194,13 @@ intent:
     Scenario facts. Stale proposals show the current canonical graph rather
     than a graph mislabeled with the old candidate digest.
 
+    **Git-native pivot clarification — 2026-07-29**
+
+    The graph, Inspector, layout, and interaction direction remain ratified.
+    Their data source becomes the current Git Ticket document ledger. The local
+    host no longer owns a trusted-provider/SQLite application workflow; review,
+    comments, edits, and decisions produce inspectable Git document changes.
+
     **Claimed**: Codex 2026-07-28
 constraints:
   - kind: must
@@ -204,7 +212,7 @@ constraints:
   - kind: must
     rule: "Graph layout is deterministic derived view state and does not reflow for Runtime state, hover, selection, or scenario-lens changes"
   - kind: must
-    rule: "Comments and simple edits become attributed versioned Core proposals rather than direct HTML or persistence writes"
+    rule: "Comments and simple edits become attributed Git-native proposals or Ticket document changes rather than HTML-owned or SQLite-only writes"
   - kind: must_not
     rule: "Do not detach blockers, human decisions, deviations, stale context, active Runs, or proof from the graph locus that owns them"
   - kind: must_not
@@ -224,10 +232,10 @@ relations:
   - target: "decision-ticket-intelligence-loop-001"
     type: depends_on
     detail: "The surface projects the ratified scenario-first review and delegation behavior."
-  - target: "decision-ticket-graph-lifecycle-001"
+  - target: "decision-ticket-graph-lifecycle-002"
     type: relates_to
     detail: "Comments and edits will propose mutations whose legal lifecycle is governed separately."
-  - target: "convention-ticket-backchain-forward-normalize-001"
+  - target: "convention-ticket-backchain-forward-normalize-002"
     type: relates_to
     detail: "The graph surface projects the causal result of backward synthesis followed by forward normalization."
   - target: "decision-workbench-011"

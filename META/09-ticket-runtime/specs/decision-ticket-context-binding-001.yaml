@@ -30,7 +30,7 @@ provenance:
   source_ref: "Semantic context binding discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
   produced_at: "2026-07-27"
 relations:
-  - target: "decision-ticket-contract-001"
+  - target: "decision-ticket-contract-002"
     type: depends_on
     detail: "Context binding is part of the strict Ticket contract."
   - target: "intent-context-to-action-001"

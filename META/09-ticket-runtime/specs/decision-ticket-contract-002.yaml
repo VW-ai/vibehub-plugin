@@ -1,0 +1,70 @@
+spec_id: "decision-ticket-contract-002"
+type: decision
+state: active
+intent:
+  summary: "Ticket 是 executable context package；Ticket 之间没有固有层级，只用关系表达。"
+  detail: |
+    **Decision**: Preserve the accepted Ticket promise and execution-handoff
+    contract while removing compulsory containment hierarchy.
+
+    A Ticket ID still binds one stable, independently meaningful outcome
+    promise. A fresh Agent with VibeHub must be able to read an executable
+    Ticket and its bound context and perform the correct work without reopening
+    the planning conversation. Acceptance proves its outcome rather than
+    enumerating implementation steps. Material promise changes create a new
+    Ticket with explicit lineage.
+
+    Ticket nodes are flat. No Ticket is required to have `parentId`, one
+    containment parent, or an ancestry-derived scenario. Planning,
+    dependencies, joins, decomposition, supersession, evidence, verification,
+    and contribution to a deliverable are represented by explicit typed
+    relations. The default execution projection emphasizes direct
+    dependency/unlock relations.
+
+    A scenario remains a derived human planning and review lens over relation
+    paths. A coarse integration or verification Ticket may prove a scenario,
+    but Scenario is neither a canonical entity nor a Ticket hierarchy.
+
+    The earlier outline/specified/executable intelligence handoff, machine-first
+    validation, verifiable acceptance, human authority boundaries, and bounded
+    Agent-created Ticket rules remain valid. “Belongs inside earlier work” now
+    means that the new Ticket has truthful typed relation paths to the
+    previously authorized outcomes; it does not require a tree parent.
+
+    The first protocol should keep the relation taxonomy small and evidence-led.
+    Exact relation names may be finalized with the Git document schema, but the
+    data model must remain a typed graph rather than a hidden tree.
+constraints:
+  - kind: must
+    rule: "A Ticket binds one stable outcome promise and enough bounded context, acceptance, authority, and execution policy for a fresh Agent handoff when executable"
+  - kind: must
+    rule: "Ticket-to-Ticket semantics use explicit typed relations and the execution view prioritizes direct dependency or unlock relations"
+  - kind: must
+    rule: "Agent-created Tickets preserve provenance and truthful relation paths to the authorized deliverable"
+  - kind: must_not
+    rule: "Do not require parentId, one containment parent, ancestry-derived scenario membership, or a nested Ticket hierarchy"
+  - kind: must_not
+    rule: "Do not make Scenario a second canonical object or silently identify it one-to-one with a Ticket"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket, contract, context-package, typed-relations, flat-graph, scenario]
+provenance:
+  source_type: manual_input
+  confidence: 0.96
+  source_ref: "Wayne defined Ticket as an executable context package and rejected Ticket hierarchy in favor of relations — 2026-07-28; reconciled during the Git-native pivot 2026-07-29"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29"
+relations:
+  - target: "decision-ticket-contract-001"
+    type: supersedes
+    detail: "Retains the execution-handoff contract while removing the contradictory mandatory parent hierarchy."
+  - target: "decision-ticket-work-unit-001"
+    type: depends_on
+  - target: "decision-ticket-review-surface-001"
+    type: relates_to
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html"

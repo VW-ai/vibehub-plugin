@@ -1,0 +1,67 @@
+spec_id: "decision-ticket-skill-driven-boundary-001"
+type: decision
+state: active
+intent:
+  summary: "Skill 可以包含脚本，但本质上还是 Skill 驱动。"
+  detail: |
+    **Decision**: Ticket is a Skill-operated Git collaboration protocol, not a
+    generic Runtime workflow engine.
+
+    Skills own scene recognition, orchestration, and semantic judgment:
+    planning from scenarios/outcomes, Ticket boundary selection, backchaining,
+    forward normalization, context choice, validation, execution guidance,
+    protected-boundary routing, deviation detection, and closeout.
+
+    A Skill may package and call scripts. Those scripts are its deterministic
+    hands: they read and query documents, validate schemas and typed DAG
+    relations, calculate digests, check stale bases, produce diffs, perform
+    bounded atomic writes, and project the graph for Agents or HTML. Scripts
+    report facts and enforce integrity; they do not decide the product meaning
+    of the next step or encode one mandatory proposal-to-receipt workflow.
+
+    Core libraries may implement those reusable mechanics once. CLI, MCP, the
+    local host, and HTML remain thin access or projection adapters. None owns a
+    second Ticket lifecycle, semantic database, or hidden authority model.
+
+    The system may expose stable operations for portability across Agents and
+    hosts, but those operations are capabilities composed by Skills rather
+    than the owner of Ticket intelligence.
+constraints:
+  - kind: must
+    rule: "Skills own Ticket scene selection, semantic judgment, and orchestration"
+  - kind: must
+    rule: "Bundled scripts and shared libraries own deterministic document reads, validation, digesting, diffing, atomic writes, and projection"
+  - kind: must
+    rule: "CLI, MCP, HTML, and any local host remain thin peers over the same deterministic capabilities"
+  - kind: must_not
+    rule: "Do not encode Ticket product judgment or one mandatory end-to-end workflow in Core, SQLite, or a daemon"
+  - kind: must_not
+    rule: "Do not create adapter-specific storage semantics or lifecycle rules"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [skills, scripts, intelligence, core, cli, mcp, html, architecture]
+provenance:
+  source_type: manual_input
+  confidence: 0.98
+  source_ref: "Wayne clarified that Ticket is fundamentally Skill-driven even when Skills include scripts — 2026-07-29"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29"
+relations:
+  - target: "decision-ticket-runtime-boundary-001"
+    type: supersedes
+    detail: "Replaces the Core-owned semantic workflow writer with Skill-owned orchestration over deterministic Git mechanics."
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+    detail: "Skills operate over the Git semantic ledger while SQLite remains operational only."
+  - target: "decision-ticket-intelligence-loop-001"
+    type: relates_to
+    detail: "Preserves its scene-specific intelligence and human-boundary decisions."
+anchors:
+  - file: "skills/vibehub-ticket-plan/SKILL.md"
+  - file: "skills/vibehub-ticket-validate/SKILL.md"
+  - file: "skills/vibehub-ticket-apply/SKILL.md"
+  - file: "skills/scripts"
+  - file: "packages/core/src/operation-dispatcher.ts"

@@ -1,0 +1,59 @@
+spec_id: "convention-ticket-backchain-forward-normalize-002"
+type: convention
+state: active
+intent:
+  summary: "生成 Tickets 时先从可验证结果倒推，再从当前事实向前清理；结果是一张有关系路径、没有层级要求的 DAG。"
+  detail: |
+    Ticket shaping uses `Backchain → Forward Normalize`.
+
+    Backchain begins from each observable deliverable or scenario acceptance
+    and asks what result, fact, proof, or authorized decision must exist
+    immediately before it can be established. It repeats until paths reach
+    current evidence, executable work, a genuine decision blocker, or honest
+    Planning Fog. Parallel necessary paths, joins, and shared prerequisites are
+    preserved.
+
+    Forward Normalize then reads from current facts toward each deliverable and
+    removes duplicates, orphan work, dead ends, redundant transitive edges, and
+    false serialization. It checks that every Ticket contributes through one
+    or more typed relation paths to an observable outcome and that each Ticket
+    has an independent scheduling, blocking, retry, authority, or verification
+    boundary.
+
+    This is a typed DAG, not a containment tree. Shared Tickets connect to every
+    relevant path through explicit relations. Scenario lenses are derived from
+    those paths. Work that lacks an independent boundary remains elaboration
+    inside a Ticket's executable context rather than becoming another node.
+
+    The Skill owns this reasoning. Scripts may validate graph references,
+    cycles, reachability, relation types, canonical ordering, and stale bases,
+    but they do not decide semantic usefulness.
+constraints:
+  - kind: must
+    rule: "A planned graph is checked both outcome-to-prerequisite and current-fact-to-outcome before execution"
+  - kind: must
+    rule: "Every Ticket contributes through explicit typed relation paths to at least one observable deliverable or accepted follow-up outcome"
+  - kind: must_not
+    rule: "Do not require a containment parent or fabricate Tickets for uncertain alternatives, implementation detail, or unknown downstream work"
+indexing:
+  type: convention
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket-generation, planning, backchain, normalization, typed-dag, intelligence]
+provenance:
+  source_type: manual_input
+  confidence: 0.95
+  source_ref: "Wayne ratified backward synthesis, forward cleanup, and a relationship-only Ticket graph — 2026-07-28; reconciled during pivot 2026-07-29"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29"
+relations:
+  - target: "convention-ticket-backchain-forward-normalize-001"
+    type: supersedes
+    detail: "Preserves the two-pass planning intelligence while removing compulsory parent hierarchy."
+  - target: "decision-ticket-contract-002"
+    type: depends_on
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: depends_on
+anchors:
+  - file: "skills/vibehub-ticket-plan/SKILL.md"

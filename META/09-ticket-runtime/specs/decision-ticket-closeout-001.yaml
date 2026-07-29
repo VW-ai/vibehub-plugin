@@ -33,7 +33,7 @@ provenance:
 relations:
   - target: "decision-ticket-context-binding-001"
     type: depends_on
-  - target: "decision-ticket-graph-lifecycle-001"
+  - target: "decision-ticket-graph-lifecycle-002"
     type: depends_on
   - target: "decision-workbench-010"
     type: relates_to
