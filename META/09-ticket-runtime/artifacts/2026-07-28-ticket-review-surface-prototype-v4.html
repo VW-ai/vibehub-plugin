@@ -1,0 +1,3002 @@
+<!doctype html>
+<!--
+  VibeHub preserved reference artifact
+  Room: META/09-ticket-runtime
+  Decision: decision-ticket-review-surface-001
+  Role: high-fidelity, non-normative reference for the v0 Ticket review surface
+  Source date: 2026-07-28
+
+  Keep this standalone HTML versioned with the decision it informed. Later
+  implementation may replace its code, but should preserve the interaction
+  contract or explicitly supersede the decision.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeHub Infinite Ticket Graph — Prototype 04</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #e7e8e6;
+      --canvas: #f3f4f2;
+      --surface: #f8f8f6;
+      --surface-solid: #f8f8f6;
+      --node: #fbfbfa;
+      --node-hover: #ffffff;
+      --ink: #202124;
+      --muted: #5e6268;
+      --quiet: #767a81;
+      --faint: #a5a8ad;
+      --line: rgba(24, 27, 31, 0.095);
+      --line-strong: rgba(24, 27, 31, 0.19);
+      --edge: #a2a8ac;
+      --edge-active: #666c71;
+      --running: #3f7187;
+      --proven: #56725c;
+      --attention: #98671f;
+      --attention-soft: #faf6ed;
+      --deviation: #a64d57;
+      --deviation-soft: #faf1f2;
+      --stale: #76677f;
+      --focus-ring: rgba(32, 33, 36, 0.14);
+      --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", sans-serif;
+      --font-address: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, "Cascadia Mono", monospace;
+      --display: var(--font-ui);
+      --body: var(--font-ui);
+      --mono: var(--font-address);
+      --weight-regular: 400;
+      --weight-ui: 400;
+      --weight-medium: 500;
+      --weight-semibold: 600;
+      --shadow: 0 18px 50px rgba(25, 27, 30, 0.15), 0 2px 6px rgba(25, 27, 30, 0.06);
+      --shadow-float: 0 10px 28px rgba(25, 27, 30, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--page);
+      font-family: var(--body);
+      font-size: 13px;
+      font-optical-sizing: auto;
+      font-synthesis: none;
+      font-weight: var(--weight-regular);
+      line-height: 1.45;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+      font-kerning: normal;
+      text-rendering: optimizeLegibility;
+    }
+
+    button,
+    input,
+    textarea {
+      color: inherit;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid rgba(32, 33, 36, 0.58);
+      outline-offset: 2px;
+    }
+
+    .ambient-context {
+      position: fixed;
+      top: 28px;
+      left: 30px;
+      display: grid;
+      gap: 4px;
+      color: rgba(48, 61, 69, 0.62);
+      pointer-events: none;
+    }
+
+    .ambient-context strong {
+      font-family: var(--display);
+      font-size: 12.5px;
+      font-weight: var(--weight-semibold);
+      line-height: 16px;
+      letter-spacing: -0.014em;
+    }
+
+    .ambient-context span {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      line-height: 15px;
+      font-variant-numeric: tabular-nums slashed-zero;
+      letter-spacing: 0;
+    }
+
+    .surface {
+      position: fixed;
+      z-index: 10;
+      right: 20px;
+      bottom: 20px;
+      width: 348px;
+      overflow: hidden;
+      border: 1px solid rgba(24, 27, 31, 0.16);
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      transition: width 180ms ease, border-radius 180ms ease, box-shadow 180ms ease;
+    }
+
+    .surface.open {
+      width: min(1510px, calc(100vw - 24px));
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .signal {
+      position: relative;
+      z-index: 7;
+      display: grid;
+      grid-template-columns: 19px minmax(0, 1fr) auto 16px;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      min-height: 48px;
+      padding: 7px 12px;
+      border: 0;
+      background: transparent;
+      text-align: left;
+    }
+
+    .signal:hover {
+      background: #eeeeec;
+    }
+
+    .signal-mark {
+      width: 16px;
+      height: 16px;
+      color: rgba(66, 82, 92, 0.72);
+    }
+
+    .signal-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .signal-copy strong {
+      font-family: var(--display);
+      font-size: 13px;
+      font-weight: var(--weight-semibold);
+      line-height: 17px;
+      letter-spacing: -0.01em;
+    }
+
+    .signal-copy span {
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: var(--weight-regular);
+      line-height: 16px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .signal-attention {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      color: var(--attention);
+      font-size: 12px;
+      font-weight: var(--weight-medium);
+      line-height: 16px;
+      white-space: nowrap;
+    }
+
+    .signal-attention::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--attention);
+      content: "";
+    }
+
+    .chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--quiet);
+      transition: transform 160ms ease;
+    }
+
+    .surface.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .sheet {
+      height: 0;
+      opacity: 0;
+      transition: height 190ms ease, opacity 120ms ease;
+    }
+
+    .surface.open .sheet {
+      height: min(900px, calc(100vh - 72px));
+      opacity: 1;
+    }
+
+    .sheet-inner {
+      position: relative;
+      display: grid;
+      grid-template-rows: 42px minmax(0, 1fr);
+      height: 100%;
+      border-top: 1px solid var(--line);
+    }
+
+    .toolbar {
+      position: relative;
+      z-index: 9;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+      gap: 14px;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 10px 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .toolbar-path {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      overflow: hidden;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .toolbar-path strong {
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: 12.5px;
+      font-weight: var(--weight-semibold);
+      line-height: 16px;
+      letter-spacing: -0.014em;
+    }
+
+    .toolbar-path span {
+      overflow: hidden;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      line-height: 14px;
+      font-variant-numeric: tabular-nums slashed-zero;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+    }
+
+    .toolbar-state {
+      color: var(--quiet);
+      font-size: 11px;
+      font-weight: var(--weight-ui);
+      line-height: 15px;
+      white-space: nowrap;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 3px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .icon-button,
+    .quiet-button {
+      display: inline-grid;
+      place-items: center;
+      min-width: 28px;
+      min-height: 28px;
+      padding: 0 7px;
+      border: 0;
+      border-radius: 5px;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .icon-button:hover,
+    .quiet-button:hover,
+    .icon-button.active {
+      color: var(--ink);
+      background: #eeeeec;
+    }
+
+    .icon-button.active {
+      color: var(--attention);
+    }
+
+    .quiet-button.active {
+      color: var(--ink);
+      background: #e8e8e5;
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .icon-button svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .quiet-button {
+      font-size: 11.75px;
+      font-weight: var(--weight-medium);
+      line-height: 15px;
+    }
+
+    .canvas {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      background: var(--canvas);
+      box-shadow: inset 0 1px 0 var(--line);
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .canvas.dragging {
+      cursor: grabbing;
+    }
+
+    .graph-world {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1px;
+      height: 1px;
+      overflow: visible;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    .edge-layer {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      width: 4400px;
+      height: 2400px;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .edge-visible {
+      fill: none;
+      stroke: var(--edge);
+      stroke-linecap: square;
+      stroke-linejoin: round;
+      stroke-width: 1.25;
+      marker-end: url("#arrow");
+      transition: opacity 110ms ease, stroke 110ms ease, stroke-width 110ms ease;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .edge-hit {
+      fill: none;
+      stroke: transparent;
+      stroke-linejoin: round;
+      stroke-width: 16;
+      cursor: pointer;
+      pointer-events: stroke;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .edge-visible,
+    .edge-hit {
+      stroke-linejoin: round;
+    }
+
+    .edge:hover .edge-visible,
+    .edge.related .edge-visible,
+    .edge.selected .edge-visible {
+      stroke: var(--edge-active);
+      stroke-width: 1.9;
+      opacity: 1;
+    }
+
+    .edge.running .edge-visible {
+      stroke: var(--running);
+      stroke-width: 1.75;
+    }
+
+    .edge.attention .edge-visible {
+      stroke: rgba(142, 90, 24, 0.82);
+    }
+
+    .graph-world.path-mode .edge:not(.related):not(.selected) .edge-visible {
+      opacity: 0.1;
+    }
+
+    .graph-world.hover-path.path-mode .edge:not(.related):not(.selected) .edge-visible {
+      opacity: 0.22;
+    }
+
+    .graph-world.lens-mode .edge:not(.lens-related):not(.selected) .edge-visible {
+      opacity: 0.08;
+    }
+
+    .ticket-node {
+      --proof: 0%;
+      --readiness-angle: 0deg;
+      --node-fill: var(--node);
+      position: absolute;
+      z-index: 3;
+      width: 230px;
+      height: 96px;
+      padding: 13px 15px 12px 18px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: var(--node-fill);
+      box-shadow: none;
+      text-align: left;
+      transform-origin: center;
+      transition: opacity 120ms ease, border-color 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+    }
+
+    .ticket-node:hover,
+    .ticket-node.related {
+      --node-fill: var(--node-hover);
+      border-color: rgba(32, 33, 36, 0.34);
+      box-shadow: none;
+    }
+
+    .ticket-node.selected {
+      z-index: 5;
+      --node-fill: var(--node-hover);
+      border-color: var(--edge-active);
+      outline: 0;
+      box-shadow: none;
+    }
+
+    .ticket-node.selected:focus-visible {
+      outline: 2px solid rgba(32, 33, 36, 0.58);
+      outline-offset: 2px;
+    }
+
+    .graph-world.path-mode .ticket-node:not(.related):not(.selected),
+    .graph-world.attention-mode .ticket-node:not(.human):not(.deviation):not(.stale) {
+      opacity: 0.16;
+      filter: grayscale(0.8);
+    }
+
+    .graph-world.hover-path.path-mode .ticket-node:not(.related):not(.selected) {
+      opacity: 0.34;
+      filter: grayscale(0.35);
+    }
+
+    .graph-world.lens-mode .ticket-node:not(.lens-related):not(.selected) {
+      opacity: 0.14;
+      filter: grayscale(0.84);
+    }
+
+    .node-heading {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .node-glyph {
+      position: relative;
+      flex: 0 0 auto;
+      width: 11px;
+      height: 11px;
+      margin-top: 3px;
+      border: 1.5px solid #73777c;
+      border-radius: 50%;
+    }
+
+    .ticket-node.running .node-glyph {
+      border: 2px solid var(--running);
+      box-shadow: none;
+    }
+
+    .ticket-node.ready .node-glyph {
+      border-color: var(--proven);
+    }
+
+    .ticket-node.done .node-glyph {
+      border-color: var(--proven);
+      background: var(--proven);
+      box-shadow: inset 0 0 0 2px var(--node-fill);
+    }
+
+    .ticket-node.human .node-glyph {
+      border: 2px solid var(--attention);
+      border-radius: 2px;
+      transform: rotate(45deg);
+    }
+
+    .ticket-node.deviation .node-glyph {
+      border: 2px solid var(--deviation);
+      border-radius: 1px;
+      transform: rotate(45deg);
+    }
+
+    .node-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .node-title {
+      overflow: hidden;
+      display: -webkit-box;
+      font-family: var(--display);
+      font-size: 13px;
+      font-weight: var(--weight-semibold);
+      line-height: 17px;
+      letter-spacing: -0.01em;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .node-id {
+      color: var(--quiet);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-regular);
+      line-height: 14px;
+      font-variant-numeric: tabular-nums slashed-zero;
+      letter-spacing: 0;
+    }
+
+    .state-copy {
+      margin-left: 4px;
+      color: var(--muted);
+      font-family: var(--body);
+      font-size: 10.5px;
+      font-weight: var(--weight-ui);
+      letter-spacing: 0;
+    }
+
+    .ticket-node.human .state-copy {
+      color: var(--attention);
+    }
+
+    .ticket-node.deviation .state-copy {
+      color: var(--deviation);
+    }
+
+    .ticket-node.running .state-copy {
+      color: var(--running);
+    }
+
+    .ticket-node.ready .state-copy,
+    .ticket-node.done .state-copy {
+      color: var(--proven);
+    }
+
+    .technical-row {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      margin: 8px 0 0 19px;
+      color: var(--quiet);
+      font-family: var(--body);
+      font-size: 10.5px;
+      font-weight: var(--weight-ui);
+      line-height: 14px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .technical-row span {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .technical-row i {
+      display: none;
+    }
+
+    .technical-row span + span::before {
+      margin-right: 2px;
+      color: var(--faint);
+      content: "·";
+    }
+
+    .technical-row .run-live {
+      color: var(--running);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-variant-numeric: tabular-nums slashed-zero;
+      letter-spacing: 0;
+    }
+
+    .outcome-copy {
+      display: none;
+      margin: 9px 0 0 19px;
+      color: var(--muted);
+      font-size: 11.25px;
+      line-height: 16px;
+    }
+
+    .proof-rail {
+      position: absolute;
+      right: 6px;
+      bottom: -1px;
+      left: 6px;
+      height: 2px;
+      overflow: hidden;
+      border-radius: 0;
+      background: var(--line);
+    }
+
+    .proof-rail::before {
+      display: block;
+      width: var(--proof);
+      height: 100%;
+      background: var(--proven);
+      content: "";
+    }
+
+    .readiness-port,
+    .runtime-port {
+      position: absolute;
+      z-index: 2;
+      border-radius: 50%;
+      background: var(--node-fill);
+    }
+
+    .readiness-port {
+      top: calc(50% - 9px);
+      left: -10px;
+      width: 18px;
+      height: 18px;
+      background:
+        radial-gradient(circle, var(--node-fill) 0 46%, transparent 49%),
+        conic-gradient(var(--proven) 0 var(--readiness-angle), rgba(86, 114, 92, 0.18) var(--readiness-angle) 360deg);
+      box-shadow: 0 0 0 1px rgba(50, 55, 61, 0.28), 0 0 0 4px var(--canvas);
+    }
+
+    .runtime-port {
+      top: calc(50% - 5px);
+      right: -6px;
+      width: 11px;
+      height: 11px;
+      border: 1.5px solid #73777c;
+      box-shadow: 0 0 0 3px var(--canvas);
+    }
+
+    .ticket-node.running .runtime-port {
+      border-color: var(--running);
+      box-shadow: 0 0 0 3px var(--canvas);
+    }
+
+    .ticket-node.running .runtime-port::after {
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--running);
+      content: "";
+    }
+
+    .ticket-node.done .runtime-port {
+      border-color: var(--proven);
+      background: var(--proven);
+      box-shadow: 0 0 0 3px var(--canvas), inset 0 0 0 2px var(--node-fill);
+    }
+
+    .ticket-node.ready .runtime-port {
+      border-color: var(--proven);
+    }
+
+    .ticket-node.human .runtime-port {
+      border-color: var(--attention);
+    }
+
+    .ticket-node.deviation .runtime-port {
+      border-color: var(--deviation);
+    }
+
+    .stale-notch {
+      position: absolute;
+      top: 14px;
+      right: -1px;
+      display: none;
+      width: 5px;
+      height: 12px;
+      border-radius: 2px 0 0 2px;
+      background: var(--stale);
+    }
+
+    .ticket-node.stale .stale-notch {
+      display: block;
+    }
+
+    .lod-constellation .ticket-node .node-copy,
+    .lod-constellation .ticket-node .technical-row,
+    .lod-constellation .ticket-node .proof-rail {
+      opacity: 0;
+    }
+
+    .lod-constellation .ticket-node {
+      border-color: var(--line-strong);
+      background: var(--node);
+      box-shadow: none;
+    }
+
+    .lod-constellation .ticket-node.human {
+      border-color: var(--line-strong);
+      background: var(--node);
+    }
+
+    .lod-constellation .ticket-node.deviation {
+      border-color: var(--line-strong);
+      background: var(--node);
+    }
+
+    .lod-constellation .edge-visible {
+      stroke-width: 1.15;
+      opacity: 0.72;
+    }
+
+    .lod-topology .technical-row,
+    .lod-topology .proof-rail,
+    .lod-topology .outcome-copy {
+      opacity: 0;
+    }
+
+    .lod-work .outcome-copy {
+      display: none;
+    }
+
+    .lod-inspect .outcome-copy {
+      display: none;
+    }
+
+    .canvas-controls {
+      position: absolute;
+      z-index: 8;
+      bottom: 13px;
+      left: 13px;
+      display: inline-flex;
+      gap: 2px;
+      align-items: center;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      box-shadow: none;
+    }
+
+    .canvas-controls button {
+      display: inline-grid;
+      place-items: center;
+      min-width: 29px;
+      height: 29px;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 4px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11.75px;
+      font-weight: var(--weight-medium);
+      line-height: 15px;
+    }
+
+    .canvas-controls button:hover {
+      color: var(--ink);
+      background: #eeeeec;
+    }
+
+    .canvas-controls .zoom-value {
+      min-width: 43px;
+      color: var(--quiet);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-regular);
+      line-height: 14px;
+      font-variant-numeric: tabular-nums slashed-zero;
+      text-align: center;
+    }
+
+    .canvas-hint {
+      position: absolute;
+      z-index: 5;
+      bottom: 18px;
+      left: 50%;
+      max-width: calc(100% - 500px);
+      overflow: hidden;
+      color: var(--quiet);
+      font-size: 10.75px;
+      font-weight: var(--weight-ui);
+      line-height: 14px;
+      pointer-events: none;
+      text-overflow: ellipsis;
+      transform: translateX(-50%);
+      transition: opacity 120ms ease;
+      white-space: nowrap;
+    }
+
+    .canvas.touched .canvas-hint {
+      opacity: 0;
+    }
+
+    .canvas:has(.inspector.open) .canvas-hint {
+      left: calc((100% - 372px) / 2);
+      max-width: calc(100% - 832px);
+    }
+
+    .lens-panel {
+      position: absolute;
+      z-index: 11;
+      top: 12px;
+      right: 12px;
+      display: grid;
+      gap: 3px;
+      width: 286px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      box-shadow: var(--shadow-float);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-7px);
+      transition: opacity 120ms ease, transform 150ms ease;
+    }
+
+    .lens-panel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .lens-panel-label {
+      padding: 5px 8px 7px;
+      color: var(--quiet);
+      font-size: 11px;
+      font-weight: var(--weight-medium);
+      line-height: 15px;
+      letter-spacing: -0.004em;
+    }
+
+    .lens-option {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      min-height: 34px;
+      padding: 6px 8px;
+      border: 0;
+      border-radius: 4px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 12px;
+      font-weight: var(--weight-ui);
+      line-height: 16px;
+      text-align: left;
+    }
+
+    .lens-option:hover,
+    .lens-option.active {
+      color: var(--ink);
+      background: #eeeeec;
+    }
+
+    .lens-option i {
+      width: 8px;
+      height: 8px;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .lens-option.active i {
+      background: currentColor;
+      box-shadow: inset 0 0 0 2px var(--surface-solid);
+    }
+
+    .minimap {
+      position: absolute;
+      z-index: 8;
+      right: 14px;
+      bottom: 14px;
+      width: 218px;
+      height: 132px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      box-shadow: none;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 130ms ease;
+    }
+
+    .minimap.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .minimap svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .minimap-node {
+      fill: #8c9095;
+    }
+
+    .minimap-node.scenario {
+      fill: var(--running);
+    }
+
+    .minimap-node.running {
+      fill: var(--running);
+    }
+
+    .minimap-node.ready,
+    .minimap-node.done {
+      fill: var(--proven);
+    }
+
+    .minimap-node.human {
+      fill: var(--attention);
+    }
+
+    .minimap-node.deviation {
+      fill: var(--deviation);
+    }
+
+    .minimap-node.stale {
+      stroke: var(--stale);
+      stroke-width: 1.5;
+    }
+
+    .minimap-edge {
+      stroke: rgba(70, 74, 79, 0.24);
+      stroke-width: 1;
+    }
+
+    .minimap-viewport {
+      fill: rgba(32, 33, 36, 0.035);
+      stroke: rgba(32, 33, 36, 0.42);
+      stroke-width: 1;
+      cursor: move;
+    }
+
+    .inspector {
+      position: absolute;
+      z-index: 12;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(372px, 100%);
+      overflow: auto;
+      border: 0;
+      border-left: 1px solid var(--line);
+      border-radius: 0;
+      background: var(--surface);
+      box-shadow: none;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(100%);
+      transition: opacity 120ms ease, transform 160ms ease;
+    }
+
+    .inspector.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .inspector-head {
+      position: sticky;
+      z-index: 2;
+      top: 0;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 16px 16px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .inspector-kicker {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-weight: var(--weight-regular);
+      line-height: 14px;
+      font-variant-numeric: tabular-nums slashed-zero;
+      letter-spacing: 0;
+    }
+
+    .inspector-kicker i {
+      width: 7px;
+      height: 7px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .inspector-kicker.attention {
+      color: var(--attention);
+      font-family: var(--body);
+      font-size: 11.5px;
+      font-weight: var(--weight-medium);
+      letter-spacing: -0.004em;
+    }
+
+    .inspector-kicker.deviation {
+      color: var(--deviation);
+      font-family: var(--body);
+      font-size: 11.5px;
+      font-weight: var(--weight-medium);
+      letter-spacing: -0.004em;
+    }
+
+    .inspector.running .inspector-kicker {
+      color: var(--running);
+    }
+
+    .inspector.ready .inspector-kicker,
+    .inspector.done .inspector-kicker {
+      color: var(--proven);
+    }
+
+    .inspector.stale .inspector-kicker {
+      color: var(--stale);
+    }
+
+    .inspector-title {
+      margin: 0;
+      font-family: var(--display);
+      font-size: 17px;
+      font-weight: var(--weight-semibold);
+      line-height: 22px;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+    }
+
+    .inspector-body {
+      display: block;
+      padding: 0 16px 16px;
+    }
+
+    .inspector-outcome {
+      margin: 0;
+      padding: 14px 0 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: var(--weight-regular);
+      line-height: 20px;
+      letter-spacing: -0.004em;
+    }
+
+    .instrument {
+      display: grid;
+      gap: 0;
+    }
+
+    .instrument-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      min-height: 36px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .instrument-row > span:first-child {
+      color: var(--quiet);
+      font-size: 11px;
+      font-weight: var(--weight-ui);
+      line-height: 16px;
+    }
+
+    .instrument-value {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      min-width: 0;
+      color: var(--ink);
+      font-size: 12.5px;
+      font-weight: var(--weight-ui);
+      line-height: 17px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mini-rail {
+      display: inline-flex;
+      gap: 3px;
+    }
+
+    .mini-rail i {
+      width: 18px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(92, 108, 119, 0.2);
+    }
+
+    .mini-rail i.filled {
+      background: var(--proven);
+    }
+
+    .coverage {
+      position: relative;
+      flex: 1;
+      max-width: 130px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(92, 108, 119, 0.17);
+    }
+
+    .coverage i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--proven);
+    }
+
+    .inspector.running .run-row .instrument-value {
+      color: var(--running);
+    }
+
+    .inspector.deviation .validation-row .instrument-value {
+      color: var(--deviation);
+    }
+
+    .instrument-value.tone-proof {
+      color: var(--proven);
+    }
+
+    .instrument-value.tone-deviation {
+      color: var(--deviation);
+    }
+
+    .inspector.stale .context-row .instrument-value {
+      color: var(--stale);
+    }
+
+    .inspector.stale .context-row .mini-rail i.filled {
+      background: var(--stale);
+    }
+
+    .scope-chain {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 6px;
+      align-items: center;
+      color: var(--muted);
+      font-family: var(--body);
+      font-size: 10.5px;
+      font-weight: var(--weight-regular);
+      line-height: 16px;
+      letter-spacing: 0;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .scope-chain .ticket-ref {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-variant-numeric: tabular-nums slashed-zero;
+      letter-spacing: 0;
+    }
+
+    .scope-chain .lens-copy {
+      flex-basis: 100%;
+      margin-top: 1px;
+      color: var(--quiet);
+    }
+
+    .scope-chain b {
+      color: var(--quiet);
+      font-weight: var(--weight-regular);
+    }
+
+    .trace-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .trace-button {
+      min-height: 26px;
+      padding: 4px 7px;
+      border: 0;
+      border-radius: 4px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11.5px;
+      font-weight: var(--weight-ui);
+      line-height: 15px;
+      transition: color 100ms ease, background-color 100ms ease;
+    }
+
+    .trace-button:first-child {
+      margin-left: -7px;
+    }
+
+    .trace-button:hover {
+      color: var(--ink);
+      background: #eeeeec;
+    }
+
+    #commitButton {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-variant-numeric: tabular-nums slashed-zero;
+    }
+
+    .comment-area {
+      display: grid;
+      gap: 8px;
+      padding-top: 14px;
+      border-top: 0;
+    }
+
+    .comment-area label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: var(--weight-ui);
+      line-height: 15px;
+    }
+
+    .comment-area textarea {
+      width: 100%;
+      min-height: 76px;
+      padding: 9px 10px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: #f1f1ef;
+      font-size: 12.5px;
+      font-weight: var(--weight-regular);
+      line-height: 18px;
+      letter-spacing: -0.004em;
+    }
+
+    .comment-area textarea:focus {
+      border-color: var(--line-strong);
+      background: var(--node-hover);
+    }
+
+    .inspector-actions {
+      display: flex;
+      gap: 7px;
+      justify-content: flex-end;
+    }
+
+    .text-button {
+      min-height: 30px;
+      padding: 5px 9px;
+      border: 0;
+      border-radius: 5px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 12px;
+      font-weight: var(--weight-medium);
+      line-height: 16px;
+      transition: color 100ms ease, background-color 100ms ease, border-color 100ms ease;
+    }
+
+    .text-button:hover {
+      color: var(--ink);
+      background: #eeeeec;
+    }
+
+    .text-button.primary {
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .comment-area.has-input .text-button.primary {
+      border-color: #293239;
+      color: white;
+      background: #293239;
+    }
+
+    .decision-action {
+      display: none;
+      width: 100%;
+      min-height: 34px;
+      margin-top: 12px;
+      border: 1px solid rgba(142, 90, 24, 0.4);
+      border-radius: 5px;
+      color: var(--attention);
+      background: var(--attention-soft);
+      font-size: 12px;
+      font-weight: var(--weight-medium);
+      line-height: 16px;
+      transition: color 100ms ease, background-color 100ms ease, border-color 100ms ease;
+    }
+
+    .inspector.human .decision-action {
+      display: block;
+    }
+
+    .decision-action:hover {
+      border-color: rgba(152, 103, 31, 0.58);
+      background: #f5eee0;
+    }
+
+    .comment-area.has-input .text-button.primary:hover {
+      background: #20282e;
+    }
+
+    :where(.quiet-button, .trace-button, .text-button):active {
+      background: #e6e6e3;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 30;
+      right: 28px;
+      bottom: 84px;
+      max-width: 340px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: var(--surface-solid);
+      background: rgba(36, 42, 48, 0.92);
+      box-shadow: 0 10px 28px rgba(36, 48, 58, 0.18);
+      font-size: 12px;
+      font-weight: var(--weight-ui);
+      line-height: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(7px);
+      transition: opacity 130ms ease, transform 130ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .canvas:has(.inspector.open) .minimap,
+    .canvas:has(.inspector.open) .lens-panel {
+      right: 384px;
+    }
+
+    @media (max-width: 760px) {
+      .ambient-context {
+        top: 17px;
+        left: 17px;
+      }
+
+      .surface,
+      .surface.open {
+        right: 8px;
+        bottom: 8px;
+        width: calc(100vw - 16px);
+      }
+
+      .surface.open .sheet {
+        height: calc(100vh - 69px);
+      }
+
+      .toolbar {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .toolbar-state {
+        display: none;
+      }
+
+      .toolbar-actions .quiet-button {
+        display: none;
+      }
+
+      .signal-attention {
+        gap: 0;
+        font-size: 0;
+      }
+
+      .canvas-hint {
+        display: none;
+      }
+
+      .inspector {
+        width: 100%;
+        border-left: 0;
+      }
+
+      .canvas:has(.inspector.open) .canvas-controls,
+      .canvas:has(.inspector.open) .minimap {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .canvas:has(.inspector.open) .lens-panel {
+        right: 8px;
+      }
+
+      .minimap {
+        width: 150px;
+        height: 96px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-context" aria-hidden="true">
+    <strong>VibeHub · Ticket Runtime</strong>
+    <span>codex/ticket-runtime-wayfind</span>
+  </div>
+
+  <section class="surface" id="surface" aria-label="Ticket graph signal">
+    <button class="signal" id="surfaceToggle" aria-expanded="false" aria-controls="ticketSheet">
+      <svg class="signal-mark" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+        <path d="M4.5 4.7 11.4 7.6M4.5 11.3 11.4 8.4"/>
+        <circle cx="3" cy="4" r="1.5"/>
+        <circle cx="3" cy="12" r="1.5"/>
+        <circle cx="13" cy="8" r="1.5"/>
+      </svg>
+      <span class="signal-copy">
+        <strong>Ticket graph</strong>
+        <span>29 tickets · 2 active runs</span>
+      </span>
+      <span class="signal-attention">2 need you</span>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="m5 12 5-5 5 5"/>
+      </svg>
+    </button>
+
+    <div class="sheet" id="ticketSheet">
+      <div class="sheet-inner">
+        <header class="toolbar">
+          <div class="toolbar-path">
+            <strong>Ticket graph</strong>
+            <span>/ TKT-001</span>
+          </div>
+          <span class="toolbar-state" id="toolbarState">29 tickets · 35 unlocks · revision 7</span>
+          <div class="toolbar-actions">
+            <button class="icon-button" id="attentionToggle" aria-label="Focus Tickets needing attention" title="Focus attention">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <circle cx="12" cy="12" r="8"/>
+                <path d="M12 7v6M12 16.5v.5"/>
+              </svg>
+            </button>
+            <button class="quiet-button" id="lensToggle" type="button" aria-expanded="false">Lens</button>
+            <button class="quiet-button" id="resetLayout" type="button">Re-layout</button>
+            <button class="icon-button" id="copyView" aria-label="Copy view link" title="Copy view link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <rect x="8" y="8" width="11" height="11" rx="2"/>
+                <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <main class="canvas" id="canvas" aria-label="Infinite Ticket dependency graph">
+          <div class="graph-world lod-topology" id="graphWorld">
+            <svg class="edge-layer" id="edgeLayer" viewBox="0 0 4400 2400" aria-label="Ticket unlock relations">
+              <defs>
+                <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M0 0 8 4 0 8Z" fill="context-stroke"></path>
+                </marker>
+              </defs>
+            </svg>
+            <div id="graphNodes"></div>
+          </div>
+
+          <div class="canvas-controls" aria-label="Canvas controls">
+            <button id="zoomOut" aria-label="Zoom out" title="Zoom out">−</button>
+            <span class="zoom-value" id="zoomValue">100%</span>
+            <button id="zoomIn" aria-label="Zoom in" title="Zoom in">+</button>
+            <button id="actualSize" type="button" title="Actual size">1:1</button>
+            <button id="fitGraph" type="button" title="Fit graph">Fit</button>
+          </div>
+
+          <span class="canvas-hint">Drag to pan · wheel to zoom · F to fit</span>
+
+          <div class="lens-panel" id="lensPanel" aria-label="Scenario review lenses">
+            <span class="lens-panel-label">Scenario lens · review only</span>
+            <div id="lensOptions"></div>
+          </div>
+
+          <div class="minimap" id="minimap" aria-label="Graph minimap">
+            <svg id="minimapSvg" viewBox="0 0 218 132"></svg>
+          </div>
+
+          <aside class="inspector" id="inspector" aria-live="polite">
+            <div class="inspector-head">
+              <div>
+                <div class="inspector-kicker" id="inspectorKicker"><i></i><span>TKT-124 · Running</span></div>
+                <h2 class="inspector-title" id="inspectorTitle">Implement domain work</h2>
+              </div>
+              <button class="icon-button" id="closeInspector" aria-label="Close inspector" title="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="m7 7 10 10M17 7 7 17"/>
+                </svg>
+              </button>
+            </div>
+            <div class="inspector-body">
+              <p class="inspector-outcome" id="inspectorOutcome">The Agent uses native tools and domain intelligence to produce the intended result.</p>
+
+              <div class="instrument" id="instrument">
+                <div class="instrument-row context-row">
+                  <span>Context packet</span>
+                  <div class="instrument-value">
+                    <span class="mini-rail" id="definitionRail"><i></i><i></i><i></i></span>
+                    <span id="definitionValue">Handoff valid</span>
+                  </div>
+                </div>
+                <div class="instrument-row dependency-row">
+                  <span>Dependencies</span>
+                  <div class="instrument-value" id="readinessValue">2 / 2 prerequisites satisfied</div>
+                </div>
+                <div class="instrument-row run-row">
+                  <span>Active Run</span>
+                  <div class="instrument-value" id="runValue">Run 7 · 04:18</div>
+                </div>
+                <div class="instrument-row acceptance-row">
+                  <span>Acceptance</span>
+                  <div class="instrument-value">
+                    <span class="coverage"><i id="coverageBar" style="width: 67%"></i></span>
+                    <span id="coverageValue">2 / 3 proven</span>
+                  </div>
+                </div>
+                <div class="instrument-row validation-row">
+                  <span>Validation</span>
+                  <div class="instrument-value tone-proof" id="validationValue">Passed · policy 0.3</div>
+                </div>
+              </div>
+
+              <div class="scope-chain" id="scopeChain">
+                <span class="ticket-ref">TKT-122</span><b>→</b><span class="ticket-ref">TKT-124</span><b>→</b><span class="ticket-ref">TKT-126</span>
+              </div>
+
+              <div class="trace-actions">
+                <button class="trace-button" id="evidenceButton">3 evidence items</button>
+                <button class="trace-button" id="commitButton">commit 070d17e</button>
+                <button class="trace-button" id="copyTicket">Copy link</button>
+              </div>
+
+              <button class="decision-action" id="decisionAction" type="button">Record the authorized direction</button>
+
+              <div class="comment-area">
+                <label for="commentInput" id="commentLabel">Comment on this Ticket</label>
+                <textarea id="commentInput" placeholder="What should change?"></textarea>
+                <div class="inspector-actions">
+                  <button class="text-button" id="suggestEdit" type="button">Suggest change</button>
+                  <button class="text-button primary" id="addComment" type="button">Add comment</button>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const initialHash = location.hash;
+    const MIN_ZOOM = 0.08;
+    const MAX_ZOOM = 2.4;
+    const NODE_SIZE = { width: 230, height: 96 };
+    const EDGE_RADIUS = 8;
+    const EDGE_STUB = 28;
+    const MIN_FORWARD_GAP = 72;
+    const LAYOUT = {
+      marginX: 150,
+      marginY: 130,
+      columnGap: 130,
+      rowGap: 88,
+      sweeps: 6
+    };
+
+    const tickets = [
+      {
+        id: "TKT-001", x: 3550, y: 960,
+        title: "Release the Ticket orchestration loop",
+        outcome: "Durable intent compiles into a reviewable, executable, and evidence-backed Ticket Graph.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 12], validation: "Passed · dependencies open", run: "No active Run",
+        evidence: 7, commit: "070d17e", reviewLens: "The complete orchestration experience works"
+      },
+      {
+        id: "TKT-090", x: 260, y: 650,
+        title: "Bind project context",
+        outcome: "The orchestration graph is shaped from the current intent, constraints, architecture, and project knowledge.",
+        state: "done", proof: 1,
+        acceptance: [2, 2], validation: "Passed · policy 0.3", run: "Run 1 · completed",
+        evidence: 3, commit: "1938ca4", reviewLens: "Shared prerequisite"
+      },
+      {
+        id: "TKT-100", x: 2850, y: 170,
+        title: "Validate plan legibility",
+        outcome: "A person can see every necessary path, its decisions, and why each Ticket contributes to the deliverable.",
+        state: "ready", proof: 0,
+        acceptance: [0, 4], validation: "Passed · context packet bound", run: "No active Run",
+        evidence: 4, commit: "070d17e", reviewLens: "A person can understand and authorize the plan"
+      },
+      {
+        id: "TKT-104", x: 240, y: 180,
+        title: "Name core outcomes",
+        outcome: "The intended change is expressed as observable outcomes rather than one static task description.",
+        state: "done", proof: 1,
+        acceptance: [2, 2], validation: "Passed · policy 0.3", run: "Run 2 · completed",
+        evidence: 3, commit: "4942462", reviewLens: "A person can understand and authorize the plan"
+      },
+      {
+        id: "TKT-106", x: 680, y: 250,
+        title: "Backchain from outcomes",
+        outcome: "Necessary facts, results, and decisions are synthesized backward from each outcome acceptance.",
+        state: "done", proof: 0.8,
+        acceptance: [2, 3], validation: "Passed with 1 note", run: "Run 3 · completed",
+        evidence: 2, commit: "070d17e", reviewLens: "A person can understand and authorize the plan"
+      },
+      {
+        id: "TKT-108", x: 1100, y: 140,
+        title: "Normalize graph forward",
+        outcome: "The proposed graph is reachable, necessary, de-duplicated, and correctly related when read from current facts.",
+        state: "done", proof: 0.8,
+        acceptance: [2, 3], validation: "Passed · policy 0.3", run: "Run 4 · completed",
+        evidence: 2, commit: "070d17e", reviewLens: "A person can understand and authorize the plan"
+      },
+      {
+        id: "TKT-107", x: 1580, y: 280,
+        title: "Review or delegate",
+        outcome: "The coarse outcome graph receives human review or bounded delegation before execution begins.",
+        state: "done", proof: 1,
+        acceptance: [2, 2], validation: "Passed · GateDecision recorded", run: "Run 5 · completed",
+        evidence: 2, commit: "070d17e", reviewLens: "A person can understand and authorize the plan"
+      },
+      {
+        id: "TKT-200", x: 3020, y: 570,
+        title: "Exercise safe Agent progression",
+        outcome: "Unblocked work progresses autonomously until a genuine authority or decision boundary is reached.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 5], validation: "Passed · dependency open", run: "No active Run",
+        evidence: 5, commit: "070d17e", reviewLens: "The Agent progresses safely"
+      },
+      {
+        id: "TKT-122", x: 950, y: 650,
+        title: "Choose ready work",
+        outcome: "The next Ticket is selected from current dependencies, facts, and delegated authority.",
+        state: "done", proof: 1,
+        acceptance: [2, 2], validation: "Passed · policy 0.3", run: "Run 6 · completed",
+        evidence: 2, commit: "070d17e", reviewLens: "The Agent progresses safely"
+      },
+      {
+        id: "TKT-124", x: 1420, y: 580,
+        title: "Implement domain work",
+        outcome: "The Agent uses native tools and domain intelligence to produce the intended result.",
+        state: "running", proof: 0.67,
+        acceptance: [2, 3], validation: "Passed · policy 0.3", run: "Run 7 · 04:18",
+        evidence: 3, commit: "070d17e", reviewLens: "The Agent progresses safely"
+      },
+      {
+        id: "TKT-126", x: 1850, y: 650,
+        title: "Verify the result",
+        outcome: "Independent verification checks the result against observable acceptance.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 3], validation: "Passed · dependency open", run: "No active Run",
+        evidence: 0, commit: "070d17e", reviewLens: "The Agent progresses safely"
+      },
+      {
+        id: "TKT-128", x: 2320, y: 530,
+        title: "Tend the graph",
+        outcome: "Execution learning updates bounded follow-up work without changing the approved boundary.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 2], validation: "Passed · context drift detected", run: "No active Run",
+        evidence: 0, commit: "070d17e", stale: true, reviewLens: "The Agent progresses safely"
+      },
+      {
+        id: "TKT-300", x: 2800, y: 990,
+        title: "Verify human decision routing",
+        outcome: "Human-owned choices block only the affected branch and resume it with explicit authority.",
+        state: "blocked", proof: 0,
+        acceptance: [0, 4], validation: "Passed · gate unsatisfied", run: "1 unaffected Run active",
+        evidence: 3, commit: "070d17e", reviewLens: "Human-owned choices route correctly"
+      },
+      {
+        id: "TKT-140", x: 600, y: 1020,
+        title: "Detect experience boundary",
+        outcome: "The Agent recognizes that a choice would change the human-authorized experience.",
+        state: "done", proof: 1,
+        acceptance: [2, 2], validation: "Passed · policy 0.3", run: "Run 8 · completed",
+        evidence: 3, commit: "070d17e", reviewLens: "Human-owned choices route correctly"
+      },
+      {
+        id: "TKT-312", x: 1120, y: 1030,
+        title: "Choose the review hierarchy",
+        outcome: "Choose how people understand and approve the Ticket Graph without turning it into a dashboard or second object model.",
+        state: "human", proof: 0.2,
+        acceptance: [0, 1], validation: "Valid · GateDecision missing", run: "No active Run",
+        evidence: 2, commit: "070d17e", reviewLens: "Human-owned choices route correctly"
+      },
+      {
+        id: "TKT-143", x: 1670, y: 890,
+        title: "Replan the affected path",
+        outcome: "The authorized direction becomes a revised, executable dependency path.",
+        state: "blocked", proof: 0,
+        acceptance: [0, 2], validation: "Passed · binding waits on TKT-312", run: "No active Run",
+        evidence: 0, commit: "070d17e", reviewLens: "Human-owned choices route correctly"
+      },
+      {
+        id: "TKT-144", x: 1700, y: 1160,
+        title: "Continue unaffected work",
+        outcome: "Independent delegated work keeps moving while the decision branch waits.",
+        state: "running", proof: 0.62,
+        acceptance: [2, 3], validation: "Passed · policy 0.3", run: "Run 9 · 01:42",
+        evidence: 2, commit: "070d17e", reviewLens: "Human-owned choices route correctly"
+      },
+      {
+        id: "TKT-400", x: 2980, y: 1400,
+        title: "Audit architecture coherence",
+        outcome: "A material deviation becomes visible and is resolved before the affected path closes.",
+        state: "blocked", proof: 0,
+        acceptance: [0, 5], validation: "Passed · deviation gate open", run: "No active Run",
+        evidence: 5, commit: "070d17e", reviewLens: "Architecture remains coherent"
+      },
+      {
+        id: "TKT-160", x: 400, y: 1500,
+        title: "Read governing principles",
+        outcome: "The implementation is compared with the agreed Core-owned architecture.",
+        state: "done", proof: 1,
+        acceptance: [2, 2], validation: "Passed · policy 0.3", run: "Run 10 · completed",
+        evidence: 2, commit: "070d17e", reviewLens: "Architecture remains coherent"
+      },
+      {
+        id: "TKT-162", x: 900, y: 1430,
+        title: "Trace canonical state writers",
+        outcome: "Evidence identifies every component writing canonical Ticket facts.",
+        state: "done", proof: 1,
+        acceptance: [3, 3], validation: "Passed · policy 0.3", run: "Run 11 · completed",
+        evidence: 4, commit: "070d17e", reviewLens: "Architecture remains coherent"
+      },
+      {
+        id: "TKT-407", x: 1420, y: 1510,
+        title: "Resolve the second writer",
+        outcome: "Restore one canonical writer or explicitly revise the architecture principle.",
+        state: "deviation", proof: 0.2,
+        acceptance: [0, 2], validation: "Failed · architecture conflict", run: "No active Run",
+        evidence: 4, commit: "070d17e", reviewLens: "Architecture remains coherent"
+      },
+      {
+        id: "TKT-165", x: 1950, y: 1400,
+        title: "Run adapter parity checks",
+        outcome: "CLI, MCP, and direct Core behavior remain semantically identical.",
+        state: "blocked", proof: 0.35,
+        acceptance: [1, 3], validation: "Passed · deviation gate open", run: "No active Run",
+        evidence: 2, commit: "070d17e", reviewLens: "Architecture remains coherent"
+      },
+      {
+        id: "TKT-166", x: 2450, y: 1480,
+        title: "Record the resolution",
+        outcome: "The accepted correction or principle change remains traceable.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 2], validation: "Passed · dependency open", run: "No active Run",
+        evidence: 0, commit: "070d17e", reviewLens: "Architecture remains coherent"
+      },
+      {
+        id: "TKT-500", x: 3050, y: 1840,
+        title: "Adjudicate completion evidence",
+        outcome: "Completion is derived from accepted evidence and any remaining work is explicit.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 5], validation: "Passed · evidence dependencies open", run: "No active Run",
+        evidence: 0, commit: "070d17e", reviewLens: "The delivered outcome is proven"
+      },
+      {
+        id: "TKT-180", x: 1900, y: 1900,
+        title: "Gather Run artifacts",
+        outcome: "The Run preserves the artifacts needed to evaluate its result.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 2], validation: "Passed · dependency open", run: "No active Run",
+        evidence: 0, commit: "070d17e", reviewLens: "The delivered outcome is proven"
+      },
+      {
+        id: "TKT-181", x: 2180, y: 1750,
+        title: "Bind evidence",
+        outcome: "Each accepted outcome points to inspectable evidence.",
+        state: "waiting", proof: 0.25,
+        acceptance: [1, 3], validation: "Passed · artifact dependency open", run: "No active Run",
+        evidence: 1, commit: "070d17e", reviewLens: "The delivered outcome is proven"
+      },
+      {
+        id: "TKT-182", x: 2450, y: 1900,
+        title: "Review the outcome",
+        outcome: "The result is independently assessed as proven, partial, or failed.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 3], validation: "Passed · waiting on evidence", run: "No active Run",
+        evidence: 0, commit: "070d17e", reviewLens: "The delivered outcome is proven"
+      },
+      {
+        id: "TKT-184", x: 2700, y: 1720,
+        title: "Record what happened",
+        outcome: "Durable facts support completion without a writable status declaration.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 2], validation: "Passed · dependencies open", run: "No active Run",
+        evidence: 0, commit: "070d17e", reviewLens: "The delivered outcome is proven"
+      },
+      {
+        id: "TKT-185", x: 2780, y: 2020,
+        title: "Propose follow-up work",
+        outcome: "New learning becomes bounded follow-up Tickets or a closeout proposal.",
+        state: "waiting", proof: 0,
+        acceptance: [0, 2], validation: "Passed · dependencies open", run: "No active Run",
+        evidence: 0, commit: "070d17e", reviewLens: "The delivered outcome is proven"
+      }
+    ];
+
+    const edges = [
+      { from: "TKT-090", to: "TKT-104", reason: "The current project context is required before the intended outcomes can be named." },
+      { from: "TKT-104", to: "TKT-106", reason: "Named outcomes are required before their acceptance can be backchained." },
+      { from: "TKT-090", to: "TKT-106", reason: "Backchaining must preserve current architecture and authority constraints." },
+      { from: "TKT-106", to: "TKT-108", reason: "Backward synthesis must exist before the graph can be normalized from current facts." },
+      { from: "TKT-108", to: "TKT-107", reason: "The human reviews or delegates the normalized graph, not an unclean path hypothesis." },
+      { from: "TKT-107", to: "TKT-100", attention: true, reason: "Review or explicit delegation supplies authority for the coarse plan outcome." },
+      { from: "TKT-090", to: "TKT-122", reason: "Ready work selection requires bound context." },
+      { from: "TKT-107", to: "TKT-122", attention: true, reason: "The approved or delegated graph unlocks scheduling." },
+      { from: "TKT-122", to: "TKT-124", running: true, reason: "The selected READY Ticket supplies the bounded execution contract." },
+      { from: "TKT-124", to: "TKT-126", running: true, reason: "Verification evaluates the artifact and evidence produced by execution." },
+      { from: "TKT-126", to: "TKT-128", reason: "Graph tending uses verified learning rather than raw activity." },
+      { from: "TKT-128", to: "TKT-200", reason: "The loop progresses safely when execution learning remains in the graph." },
+      { from: "TKT-140", to: "TKT-312", attention: true, reason: "Crossing the experience boundary requires an explicit human-owned decision." },
+      { from: "TKT-312", to: "TKT-143", attention: true, reason: "The affected path cannot be replanned until the decision has authority." },
+      { from: "TKT-140", to: "TKT-144", running: true, reason: "Unaffected delegated work may continue after the boundary is isolated." },
+      { from: "TKT-143", to: "TKT-300", reason: "The affected branch must reflect the authorized direction." },
+      { from: "TKT-144", to: "TKT-300", running: true, reason: "Unrelated work contributes without waiting on the blocked branch." },
+      { from: "TKT-160", to: "TKT-162", reason: "The governing principle defines which state writes need tracing." },
+      { from: "TKT-162", to: "TKT-407", reason: "The trace provides evidence of the second canonical writer." },
+      { from: "TKT-407", to: "TKT-165", reason: "Parity is meaningful only after the deviation is corrected or authorized." },
+      { from: "TKT-165", to: "TKT-166", reason: "The resolution is recorded after parity is proven." },
+      { from: "TKT-166", to: "TKT-400", reason: "Traceable resolution proves the architecture outcome." },
+      { from: "TKT-124", to: "TKT-180", running: true, reason: "Execution artifacts feed the evidence closeout path." },
+      { from: "TKT-180", to: "TKT-181", reason: "Evidence binding needs concrete artifacts from the Run." },
+      { from: "TKT-181", to: "TKT-182", reason: "Outcome review adjudicates evidence already bound to acceptance." },
+      { from: "TKT-126", to: "TKT-182", reason: "Verification findings are inputs to semantic outcome review." },
+      { from: "TKT-182", to: "TKT-184", reason: "The durable outcome records the independent review result." },
+      { from: "TKT-184", to: "TKT-185", reason: "Follow-up work is proposed from the recorded outcome and residual gaps." },
+      { from: "TKT-128", to: "TKT-185", reason: "Graph tending and closeout reconcile the same bounded follow-up work." },
+      { from: "TKT-185", to: "TKT-500", reason: "The outcome is complete when residual work is explicit." },
+      { from: "TKT-100", to: "TKT-001", reason: "The top-level deliverable requires a plan that a human can understand and authorize." },
+      { from: "TKT-200", to: "TKT-001", reason: "The top-level deliverable requires safe autonomous progress." },
+      { from: "TKT-300", to: "TKT-001", reason: "The top-level deliverable requires human-owned choices to route correctly." },
+      { from: "TKT-400", to: "TKT-001", reason: "The top-level deliverable requires architecture coherence." },
+      { from: "TKT-500", to: "TKT-001", reason: "The top-level deliverable requires an evidence-backed outcome." }
+    ];
+
+    const originalPositions = Object.fromEntries(tickets.map((ticket) => [ticket.id, { x: ticket.x, y: ticket.y }]));
+    const ticketMap = new Map(tickets.map((ticket) => [ticket.id, ticket]));
+    const reviewLenses = [
+      "The complete orchestration experience works",
+      "A person can understand and authorize the plan",
+      "The Agent progresses safely",
+      "Human-owned choices route correctly",
+      "Architecture remains coherent",
+      "The delivered outcome is proven"
+    ];
+
+    const surface = document.querySelector("#surface");
+    const surfaceToggle = document.querySelector("#surfaceToggle");
+    const canvas = document.querySelector("#canvas");
+    const graphWorld = document.querySelector("#graphWorld");
+    const graphNodes = document.querySelector("#graphNodes");
+    const edgeLayer = document.querySelector("#edgeLayer");
+    const minimap = document.querySelector("#minimap");
+    const minimapSvg = document.querySelector("#minimapSvg");
+    const inspector = document.querySelector("#inspector");
+    const toast = document.querySelector("#toast");
+    const zoomValue = document.querySelector("#zoomValue");
+    const lensPanel = document.querySelector("#lensPanel");
+    const lensToggle = document.querySelector("#lensToggle");
+    const lensOptions = document.querySelector("#lensOptions");
+    const commentInput = document.querySelector("#commentInput");
+    const commentArea = commentInput.closest(".comment-area");
+    document.querySelector("#toolbarState").textContent =
+      `${tickets.length} tickets · ${edges.length} unlocks · revision 7`;
+
+    let scale = 1;
+    let fitScale = 1;
+    let panX = 0;
+    let panY = 0;
+    let selectedId = null;
+    let selectedEdge = null;
+    let attentionMode = false;
+    let activeLens = null;
+    let panDrag = null;
+    let nodeDrag = null;
+    let minimapDrag = false;
+    let toastTimer;
+    let hoverTimer;
+
+    function sizeFor() {
+      return NODE_SIZE;
+    }
+
+    function stateCopy(ticket) {
+      if (ticket.state === "human") return "Needs your decision";
+      if (ticket.state === "deviation") return "Deviation";
+      if (ticket.state === "running") return "Running";
+      if (ticket.state === "done") return "Done";
+      if (ticket.state === "ready") return "Ready";
+      if (ticket.state === "blocked") return "Blocked";
+      return "Waiting";
+    }
+
+    function stateClasses(ticket) {
+      return [
+        ticket.state,
+        ticket.stale ? "stale" : ""
+      ].filter(Boolean).join(" ");
+    }
+
+    function stateMeta(ticket) {
+      if (ticket.state === "running") return ticket.run.replace(" · ", " ");
+      if (ticket.state === "human") return "Decision required";
+      if (ticket.state === "deviation") return "Validation failed";
+      if (ticket.state === "done") return `${ticket.evidence} evidence`;
+      return "";
+    }
+
+    function dependencyStats(id) {
+      const inbound = edges.filter((edge) => edge.to === id);
+      const satisfied = inbound.filter((edge) => ticketMap.get(edge.from)?.state === "done").length;
+      return {
+        inbound,
+        satisfied,
+        total: inbound.length,
+        ratio: inbound.length ? satisfied / inbound.length : 1
+      };
+    }
+
+    function renderNodes() {
+      graphNodes.innerHTML = tickets.map((ticket) => {
+        const dependencies = dependencyStats(ticket.id);
+        const angle = Math.round(dependencies.ratio * 360);
+        const proof = Math.round(ticket.proof * 100);
+        const dependencyCopy = dependencies.total
+          ? `${dependencies.satisfied}/${dependencies.total} deps`
+          : "entry";
+        const executionMeta = stateMeta(ticket);
+        return `
+          <button
+            class="ticket-node ${stateClasses(ticket)}"
+            data-ticket="${ticket.id}"
+            style="left:${ticket.x}px;top:${ticket.y}px;--readiness-angle:${angle}deg;--proof:${proof}%"
+            type="button"
+            aria-label="${ticket.title}, ${stateCopy(ticket)}"
+          >
+            <span class="readiness-port" title="${dependencies.satisfied}/${dependencies.total || 0} prerequisites done"></span>
+            <span class="runtime-port" title="${stateCopy(ticket)}"></span>
+            <span class="stale-notch" title="Definition may be stale"></span>
+            <span class="node-heading">
+              <i class="node-glyph" aria-hidden="true"></i>
+              <span class="node-copy">
+                <strong class="node-title">${ticket.title}</strong>
+                <span class="node-id">${ticket.id}<b class="state-copy">· ${stateCopy(ticket)}</b></span>
+              </span>
+            </span>
+            <span class="technical-row">
+              <span><i></i>${dependencyCopy}</span>
+              ${executionMeta ? `<span class="${ticket.state === "running" ? "run-live" : ""}"><i></i>${executionMeta}</span>` : ""}
+              <span><i></i>${ticket.acceptance[0]}/${ticket.acceptance[1]} proven</span>
+            </span>
+            <span class="outcome-copy">${ticket.outcome}</span>
+            <span class="proof-rail" title="${proof}% evidence coverage"></span>
+          </button>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".ticket-node").forEach((node) => {
+        node.addEventListener("pointerdown", startNodeDrag);
+        node.addEventListener("mouseenter", () => {
+          schedulePreview(() => highlightPath(node.dataset.ticket));
+        });
+        node.addEventListener("mouseleave", clearPreview);
+        node.addEventListener("dblclick", (event) => {
+          event.preventDefault();
+          focusTicket(node.dataset.ticket);
+        });
+      });
+    }
+
+    function anchorFor(id, side) {
+      const ticket = ticketMap.get(id);
+      const size = sizeFor(ticket);
+      return {
+        x: ticket.x + (side === "right" ? size.width : 0),
+        y: ticket.y + size.height / 2
+      };
+    }
+
+    function applyLayeredLayout() {
+      const outgoing = new Map(tickets.map((ticket) => [ticket.id, []]));
+      const indegree = new Map(tickets.map((ticket) => [ticket.id, 0]));
+
+      edges.forEach((edge) => {
+        outgoing.get(edge.from).push(edge.to);
+        indegree.set(edge.to, indegree.get(edge.to) + 1);
+      });
+      outgoing.forEach((targets) => targets.sort());
+
+      const ready = tickets
+        .filter((ticket) => indegree.get(ticket.id) === 0)
+        .map((ticket) => ticket.id)
+        .sort();
+      const topological = [];
+
+      while (ready.length) {
+        const id = ready.shift();
+        topological.push(id);
+        outgoing.get(id).forEach((target) => {
+          indegree.set(target, indegree.get(target) - 1);
+          if (indegree.get(target) === 0) {
+            ready.push(target);
+            ready.sort();
+          }
+        });
+      }
+
+      if (topological.length !== tickets.length) {
+        edges.forEach((edge) => {
+          edge.route = [];
+        });
+        return false;
+      }
+
+      const rankById = new Map(tickets.map((ticket) => [ticket.id, 0]));
+      topological.forEach((id) => {
+        outgoing.get(id).forEach((target) => {
+          rankById.set(target, Math.max(rankById.get(target), rankById.get(id) + 1));
+        });
+      });
+
+      const maxRank = Math.max(...rankById.values());
+      const layers = Array.from({ length: maxRank + 1 }, () => []);
+      const vertices = new Map();
+      const edgeChains = new Map();
+
+      tickets.forEach((ticket) => {
+        const seed = originalPositions[ticket.id];
+        const vertex = {
+          key: ticket.id,
+          ticket,
+          rank: rankById.get(ticket.id),
+          preferredY: seed.y + NODE_SIZE.height / 2,
+          predecessors: [],
+          successors: [],
+          order: 0,
+          centerX: 0,
+          centerY: 0
+        };
+        vertices.set(vertex.key, vertex);
+        layers[vertex.rank].push(vertex);
+      });
+
+      function connectLayoutVertices(from, to) {
+        from.successors.push(to);
+        to.predecessors.push(from);
+      }
+
+      edges.forEach((edge, edgeIndex) => {
+        const from = vertices.get(edge.from);
+        const to = vertices.get(edge.to);
+        const chain = [from];
+        const span = to.rank - from.rank;
+        const fromSeed = originalPositions[edge.from].y + NODE_SIZE.height / 2;
+        const toSeed = originalPositions[edge.to].y + NODE_SIZE.height / 2;
+        let previous = from;
+
+        for (let rank = from.rank + 1; rank < to.rank; rank += 1) {
+          const progress = (rank - from.rank) / span;
+          const dummy = {
+            key: `route-${edgeIndex}-${rank}`,
+            ticket: null,
+            rank,
+            preferredY: fromSeed + (toSeed - fromSeed) * progress,
+            predecessors: [],
+            successors: [],
+            order: 0,
+            centerX: 0,
+            centerY: 0
+          };
+          vertices.set(dummy.key, dummy);
+          layers[rank].push(dummy);
+          connectLayoutVertices(previous, dummy);
+          chain.push(dummy);
+          previous = dummy;
+        }
+
+        connectLayoutVertices(previous, to);
+        chain.push(to);
+        edgeChains.set(edgeIndex, chain);
+      });
+
+      layers.forEach((layer) => {
+        layer.sort((a, b) => a.preferredY - b.preferredY || a.key.localeCompare(b.key));
+        layer.forEach((vertex, index) => {
+          vertex.order = index;
+        });
+      });
+
+      for (let sweep = 0; sweep < LAYOUT.sweeps; sweep += 1) {
+        const downward = sweep % 2 === 0;
+        const ranks = downward
+          ? Array.from({ length: maxRank }, (_, index) => index + 1)
+          : Array.from({ length: maxRank }, (_, index) => maxRank - index - 1);
+
+        ranks.forEach((rank) => {
+          const layer = layers[rank];
+          const priorOrder = new Map(layer.map((vertex) => [vertex.key, vertex.order]));
+          const scoreFor = (vertex) => {
+            const neighbors = downward ? vertex.predecessors : vertex.successors;
+            if (!neighbors.length) return vertex.order;
+            return neighbors.reduce((sum, neighbor) => sum + neighbor.order, 0) / neighbors.length;
+          };
+
+          layer.sort((a, b) =>
+            scoreFor(a) - scoreFor(b) ||
+            priorOrder.get(a.key) - priorOrder.get(b.key) ||
+            a.preferredY - b.preferredY ||
+            a.key.localeCompare(b.key)
+          );
+          layer.forEach((vertex, index) => {
+            vertex.order = index;
+          });
+        });
+      }
+
+      const columnStep = NODE_SIZE.width + LAYOUT.columnGap;
+      const rowStep = NODE_SIZE.height + LAYOUT.rowGap;
+      const maxLayerSize = Math.max(...layers.map((layer) => layer.length));
+
+      layers.forEach((layer, rank) => {
+        const layerOffset = (maxLayerSize - layer.length) * rowStep / 2;
+        layer.forEach((vertex, index) => {
+          vertex.centerX = LAYOUT.marginX + rank * columnStep + NODE_SIZE.width / 2;
+          vertex.centerY = LAYOUT.marginY + layerOffset + index * rowStep + NODE_SIZE.height / 2;
+          if (vertex.ticket) {
+            vertex.ticket.x = vertex.centerX - NODE_SIZE.width / 2;
+            vertex.ticket.y = vertex.centerY - NODE_SIZE.height / 2;
+          }
+        });
+      });
+
+      edges.forEach((edge, edgeIndex) => {
+        const chain = edgeChains.get(edgeIndex);
+        const route = [];
+
+        for (let index = 0; index < chain.length - 1; index += 1) {
+          const from = chain[index];
+          const to = chain[index + 1];
+          const channelX =
+            LAYOUT.marginX +
+            from.rank * columnStep +
+            NODE_SIZE.width +
+            LAYOUT.columnGap / 2;
+          route.push(
+            { x: channelX, y: from.centerY },
+            { x: channelX, y: to.centerY }
+          );
+        }
+        edge.route = route;
+      });
+
+      return true;
+    }
+
+    function compactOrthogonalPoints(points) {
+      const deduplicated = points.filter((point, index) => {
+        const previous = points[index - 1];
+        return !previous || point.x !== previous.x || point.y !== previous.y;
+      });
+
+      return deduplicated.filter((point, index) => {
+        if (index === 0 || index === deduplicated.length - 1) return true;
+        const previous = deduplicated[index - 1];
+        const next = deduplicated[index + 1];
+        const vertical = previous.x === point.x && point.x === next.x;
+        const horizontal = previous.y === point.y && point.y === next.y;
+        return !vertical && !horizontal;
+      });
+    }
+
+    function roundedOrthogonalPath(points, radius = EDGE_RADIUS) {
+      const compact = compactOrthogonalPoints(points);
+      if (compact.length < 2) return "";
+
+      let path = `M ${compact[0].x} ${compact[0].y}`;
+
+      for (let index = 1; index < compact.length - 1; index += 1) {
+        const previous = compact[index - 1];
+        const corner = compact[index];
+        const next = compact[index + 1];
+        const incoming = Math.hypot(corner.x - previous.x, corner.y - previous.y);
+        const outgoing = Math.hypot(next.x - corner.x, next.y - corner.y);
+        const bend = Math.min(radius, incoming / 2, outgoing / 2);
+        const before = {
+          x: corner.x + (previous.x - corner.x) * bend / incoming,
+          y: corner.y + (previous.y - corner.y) * bend / incoming
+        };
+        const after = {
+          x: corner.x + (next.x - corner.x) * bend / outgoing,
+          y: corner.y + (next.y - corner.y) * bend / outgoing
+        };
+        path += ` L ${before.x} ${before.y}`;
+        path += ` Q ${corner.x} ${corner.y} ${after.x} ${after.y}`;
+      }
+
+      const end = compact[compact.length - 1];
+      return `${path} L ${end.x} ${end.y}`;
+    }
+
+    function pointsFor(edge) {
+      const start = anchorFor(edge.from, "right");
+      const end = anchorFor(edge.to, "left");
+      const route = edge.route?.map((point) => ({ ...point })) || [];
+      const routeIsUsable =
+        end.x - start.x >= MIN_FORWARD_GAP &&
+        route.length > 0 &&
+        route.every((point) => point.x > start.x + EDGE_STUB / 2 && point.x < end.x - EDGE_STUB / 2) &&
+        route.every((point, index) => index === 0 || point.x >= route[index - 1].x);
+
+      if (routeIsUsable) {
+        route[0].y = start.y;
+        route[route.length - 1].y = end.y;
+        return [start, ...route, end];
+      }
+
+      if (end.x - start.x >= MIN_FORWARD_GAP) {
+        if (Math.abs(end.y - start.y) < 0.5) return [start, end];
+        const channelX = Math.round(((start.x + end.x) / 2) / 8) * 8;
+        return [
+          start,
+          { x: channelX, y: start.y },
+          { x: channelX, y: end.y },
+          end
+        ];
+      }
+
+      const clearance = NODE_SIZE.height / 2 + 48;
+      const channelY = end.y >= start.y
+        ? Math.min(start.y, end.y) - clearance
+        : Math.max(start.y, end.y) + clearance;
+      return [
+        start,
+        { x: start.x + EDGE_STUB, y: start.y },
+        { x: start.x + EDGE_STUB, y: channelY },
+        { x: end.x - EDGE_STUB, y: channelY },
+        { x: end.x - EDGE_STUB, y: end.y },
+        end
+      ];
+    }
+
+    function pathFor(edge) {
+      return roundedOrthogonalPath(pointsFor(edge));
+    }
+
+    function syncEdgeLayerBounds() {
+      const bounds = graphBounds();
+      edgeLayer.style.left = `${bounds.minX}px`;
+      edgeLayer.style.top = `${bounds.minY}px`;
+      edgeLayer.style.width = `${bounds.width}px`;
+      edgeLayer.style.height = `${bounds.height}px`;
+      edgeLayer.setAttribute(
+        "viewBox",
+        `${bounds.minX} ${bounds.minY} ${bounds.width} ${bounds.height}`
+      );
+    }
+
+    function renderEdges() {
+      const defs = edgeLayer.querySelector("defs")?.outerHTML || `
+        <defs>
+          <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 8 4 0 8Z" fill="context-stroke"></path>
+          </marker>
+        </defs>
+      `;
+      edgeLayer.innerHTML = defs + edges.map((edge, index) => {
+        const path = pathFor(edge);
+        return `
+          <g class="edge ${edge.running ? "running" : ""} ${edge.attention ? "attention" : ""}" data-edge="${index}" style="pointer-events:auto">
+            <path class="edge-visible" d="${path}"></path>
+            <path class="edge-hit" d="${path}" tabindex="0" role="button" aria-label="${edge.from} unlocks ${edge.to}"></path>
+          </g>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".edge").forEach((group) => {
+        const index = Number(group.dataset.edge);
+        group.addEventListener("mouseenter", () => {
+          schedulePreview(() => highlightPair(index));
+        });
+        group.addEventListener("mouseleave", clearPreview);
+        group.addEventListener("click", (event) => {
+          event.stopPropagation();
+          selectEdge(index);
+        });
+        group.querySelector(".edge-hit").addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectEdge(index);
+          }
+        });
+      });
+      if (activeLens) applyLensClasses();
+      syncEdgeLayerBounds();
+    }
+
+    function graphBounds(ids = null) {
+      const included = ids ? tickets.filter((ticket) => ids.has(ticket.id)) : tickets;
+      const padding = 120;
+      const includedEdges = ids
+        ? edges.filter((edge) => ids.has(edge.from) && ids.has(edge.to))
+        : edges;
+      const routePoints = includedEdges.flatMap((edge) => pointsFor(edge));
+      const nodeMinX = included.map((ticket) => ticket.x);
+      const nodeMinY = included.map((ticket) => ticket.y);
+      const nodeMaxX = included.map((ticket) => ticket.x + sizeFor(ticket).width);
+      const nodeMaxY = included.map((ticket) => ticket.y + sizeFor(ticket).height);
+      const minX = Math.min(...nodeMinX, ...routePoints.map((point) => point.x)) - padding;
+      const minY = Math.min(...nodeMinY, ...routePoints.map((point) => point.y)) - padding;
+      const maxX = Math.max(...nodeMaxX, ...routePoints.map((point) => point.x)) + padding;
+      const maxY = Math.max(...nodeMaxY, ...routePoints.map((point) => point.y)) + padding;
+      return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY };
+    }
+
+    function applyTransform() {
+      graphWorld.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      zoomValue.textContent = `${Math.round(scale * 100)}%`;
+      updateLOD();
+      renderMinimap();
+      syncHash();
+    }
+
+    function updateLOD() {
+      graphWorld.classList.remove("lod-constellation", "lod-topology", "lod-work", "lod-inspect");
+      if (scale < 0.48) graphWorld.classList.add("lod-constellation");
+      else if (scale < 0.78) graphWorld.classList.add("lod-topology");
+      else if (scale < 1.15) graphWorld.classList.add("lod-work");
+      else graphWorld.classList.add("lod-inspect");
+    }
+
+    function frameBounds(bounds, requestedScale = null) {
+      const viewportWidth = canvas.clientWidth;
+      const viewportHeight = canvas.clientHeight;
+      const nextScale = requestedScale || Math.min(
+        (viewportWidth - 52) / bounds.width,
+        (viewportHeight - 52) / bounds.height
+      );
+      scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, nextScale));
+      panX = (viewportWidth - bounds.width * scale) / 2 - bounds.minX * scale;
+      panY = (viewportHeight - bounds.height * scale) / 2 - bounds.minY * scale;
+      applyTransform();
+    }
+
+    function fitGraph() {
+      const bounds = graphBounds();
+      const viewportWidth = canvas.clientWidth;
+      const viewportHeight = canvas.clientHeight;
+      fitScale = Math.min(
+        (viewportWidth - 52) / bounds.width,
+        (viewportHeight - 52) / bounds.height
+      );
+      frameBounds(bounds, fitScale);
+    }
+
+    function zoomAt(nextScale, screenX = canvas.clientWidth / 2, screenY = canvas.clientHeight / 2) {
+      const clamped = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, nextScale));
+      const worldX = (screenX - panX) / scale;
+      const worldY = (screenY - panY) / scale;
+      scale = clamped;
+      panX = screenX - worldX * scale;
+      panY = screenY - worldY * scale;
+      applyTransform();
+    }
+
+    function centerTicket(id, requestedScale = null) {
+      const ticket = ticketMap.get(id);
+      if (!ticket) return;
+      const size = sizeFor(ticket);
+      const focusScale = requestedScale || Math.max(1, Math.min(1.15, scale));
+      const dockWidth = inspector.classList.contains("open") ? inspector.offsetWidth : 0;
+      const availableWidth = canvas.clientWidth - dockWidth;
+      scale = focusScale;
+      panX = availableWidth / 2 - (ticket.x + size.width / 2) * scale;
+      panY = canvas.clientHeight / 2 - (ticket.y + size.height / 2) * scale;
+      applyTransform();
+    }
+
+    function focusTicket(id) {
+      selectTicket(id);
+      requestAnimationFrame(() => centerTicket(id));
+    }
+
+    function directedCone(id) {
+      const relatedNodes = new Set([id]);
+      const relatedEdges = new Set();
+      const upstreamQueue = [id];
+      const downstreamQueue = [id];
+      const visitedUp = new Set([id]);
+      const visitedDown = new Set([id]);
+
+      while (upstreamQueue.length) {
+        const current = upstreamQueue.shift();
+        edges.forEach((edge, index) => {
+          if (edge.to !== current) return;
+          relatedNodes.add(edge.from);
+          relatedEdges.add(index);
+          if (!visitedUp.has(edge.from)) {
+            visitedUp.add(edge.from);
+            upstreamQueue.push(edge.from);
+          }
+        });
+      }
+
+      while (downstreamQueue.length) {
+        const current = downstreamQueue.shift();
+        edges.forEach((edge, index) => {
+          if (edge.from !== current) return;
+          relatedNodes.add(edge.to);
+          relatedEdges.add(index);
+          if (!visitedDown.has(edge.to)) {
+            visitedDown.add(edge.to);
+            downstreamQueue.push(edge.to);
+          }
+        });
+      }
+
+      return { relatedNodes, relatedEdges };
+    }
+
+    function upstreamFor(ids) {
+      const relatedNodes = new Set(ids);
+      const relatedEdges = new Set();
+      const queue = [...ids];
+      while (queue.length) {
+        const current = queue.shift();
+        edges.forEach((edge, index) => {
+          if (edge.to !== current) return;
+          relatedEdges.add(index);
+          if (!relatedNodes.has(edge.from)) {
+            relatedNodes.add(edge.from);
+            queue.push(edge.from);
+          }
+        });
+      }
+      return { relatedNodes, relatedEdges };
+    }
+
+    function renderLensOptions() {
+      const options = [null, ...reviewLenses];
+      lensOptions.innerHTML = options.map((lens) => `
+        <button class="lens-option ${activeLens === lens ? "active" : ""}" type="button" data-lens="${lens || ""}">
+          <i aria-hidden="true"></i>
+          <span>${lens || "All execution"}</span>
+        </button>
+      `).join("");
+      lensOptions.querySelectorAll(".lens-option").forEach((option) => {
+        option.addEventListener("click", () => {
+          setLens(option.dataset.lens || null);
+          lensPanel.classList.remove("open");
+          lensToggle.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
+
+    function applyLensClasses() {
+      graphWorld.classList.toggle("lens-mode", Boolean(activeLens));
+      document.querySelectorAll(".ticket-node").forEach((node) => node.classList.remove("lens-related"));
+      document.querySelectorAll(".edge").forEach((edge) => edge.classList.remove("lens-related"));
+      if (activeLens) {
+        const seeds = tickets.filter((ticket) => ticket.reviewLens === activeLens).map((ticket) => ticket.id);
+        const lensGraph = upstreamFor(seeds);
+        document.querySelectorAll(".ticket-node").forEach((node) => {
+          node.classList.toggle("lens-related", lensGraph.relatedNodes.has(node.dataset.ticket));
+        });
+        document.querySelectorAll(".edge").forEach((edge) => {
+          edge.classList.toggle("lens-related", lensGraph.relatedEdges.has(Number(edge.dataset.edge)));
+        });
+      }
+    }
+
+    function setLens(lens) {
+      activeLens = lens;
+      applyLensClasses();
+      lensToggle.textContent = activeLens ? "Lens · on" : "Lens";
+      lensToggle.classList.toggle("active", Boolean(activeLens));
+      renderLensOptions();
+      syncHash();
+    }
+
+    function applyHighlight(nodes, edgeIds) {
+      graphWorld.classList.add("path-mode");
+      document.querySelectorAll(".ticket-node").forEach((node) => {
+        node.classList.toggle("related", nodes.has(node.dataset.ticket));
+      });
+      document.querySelectorAll(".edge").forEach((edge) => {
+        edge.classList.toggle("related", edgeIds.has(Number(edge.dataset.edge)));
+      });
+    }
+
+    function schedulePreview(callback) {
+      clearTimeout(hoverTimer);
+      if (selectedId || selectedEdge !== null) return;
+      hoverTimer = setTimeout(() => {
+        graphWorld.classList.add("hover-path");
+        callback();
+      }, 70);
+    }
+
+    function clearPreview() {
+      clearTimeout(hoverTimer);
+      graphWorld.classList.remove("hover-path");
+      restoreHighlight();
+    }
+
+    function highlightPath(id) {
+      const cone = directedCone(id);
+      applyHighlight(cone.relatedNodes, cone.relatedEdges);
+    }
+
+    function highlightPair(index) {
+      const edge = edges[index];
+      applyHighlight(new Set([edge.from, edge.to]), new Set([index]));
+    }
+
+    function restoreHighlight() {
+      if (selectedId) {
+        highlightPath(selectedId);
+        return;
+      }
+      if (selectedEdge !== null) {
+        highlightPair(selectedEdge);
+        return;
+      }
+      graphWorld.classList.remove("path-mode");
+      document.querySelectorAll(".related").forEach((item) => item.classList.remove("related"));
+    }
+
+    function executionNeighborhood(id) {
+      const prerequisites = edges.filter((edge) => edge.to === id).map((edge) => edge.from);
+      const unlocks = edges.filter((edge) => edge.from === id).map((edge) => edge.to);
+      return { prerequisites, unlocks };
+    }
+
+    function selectTicket(id) {
+      const ticket = ticketMap.get(id);
+      if (!ticket) return;
+      if (selectedId === id && inspector.classList.contains("open")) {
+        closeInspector();
+        return;
+      }
+
+      clearPreview();
+      selectedId = id;
+      selectedEdge = null;
+      inspector.className = `inspector open ${stateClasses(ticket)}`;
+      document.querySelectorAll(".ticket-node").forEach((node) => {
+        node.classList.toggle("selected", node.dataset.ticket === id);
+      });
+      document.querySelectorAll(".edge").forEach((edge) => edge.classList.remove("selected"));
+
+      const kicker = document.querySelector("#inspectorKicker");
+      kicker.className = "inspector-kicker";
+      if (ticket.state === "human") kicker.classList.add("attention");
+      if (ticket.state === "deviation") kicker.classList.add("deviation");
+      kicker.querySelector("span").textContent = `${ticket.id} · ${stateCopy(ticket)}`;
+      document.querySelector("#inspectorTitle").textContent = ticket.title;
+      document.querySelector("#inspectorOutcome").textContent = ticket.outcome;
+
+      document.querySelectorAll("#definitionRail i").forEach((rail, index) => {
+        rail.classList.toggle("filled", !ticket.stale || index === 0);
+      });
+      document.querySelector("#definitionValue").textContent =
+        ticket.stale ? "Recompile required" : "Handoff valid";
+
+      const dependencies = dependencyStats(id);
+      document.querySelector("#readinessValue").textContent =
+        dependencies.total
+          ? `${dependencies.satisfied} / ${dependencies.total} satisfied${dependencies.total - dependencies.satisfied ? ` · ${dependencies.total - dependencies.satisfied} blocking` : ""}`
+          : "Entry Ticket · no prerequisites";
+      document.querySelector("#runValue").textContent = ticket.run;
+      document.querySelector("#coverageBar").style.width = `${Math.round(ticket.proof * 100)}%`;
+      document.querySelector("#coverageValue").textContent = `${ticket.acceptance[0]} / ${ticket.acceptance[1]} proven`;
+      const validationValue = document.querySelector("#validationValue");
+      validationValue.textContent = ticket.validation;
+      validationValue.className =
+        `instrument-value ${ticket.validation.startsWith("Failed") ? "tone-deviation" : "tone-proof"}`;
+      const neighborhood = executionNeighborhood(id);
+      const prerequisiteCopy = neighborhood.prerequisites.length
+        ? neighborhood.prerequisites.map((item) => `<span class="ticket-ref">${item}</span>`).join("<b>+</b>")
+        : "<span>entry</span>";
+      const unlockCopy = neighborhood.unlocks.length
+        ? neighborhood.unlocks.map((item) => `<span class="ticket-ref">${item}</span>`).join("<b>+</b>")
+        : "<span>end</span>";
+      document.querySelector("#scopeChain").innerHTML =
+        `${prerequisiteCopy}<b>→</b><span class="ticket-ref">${ticket.id}</span><b>→</b>${unlockCopy}<span class="lens-copy">Lens · ${ticket.reviewLens}</span>`;
+      document.querySelector("#evidenceButton").textContent = `${ticket.evidence} evidence item${ticket.evidence === 1 ? "" : "s"}`;
+      document.querySelector("#commitButton").textContent = `commit ${ticket.commit}`;
+      document.querySelector("#commentLabel").textContent = "Comment on this Ticket";
+      highlightPath(id);
+      syncHash();
+    }
+
+    function selectEdge(index) {
+      const edge = edges[index];
+      clearPreview();
+      selectedEdge = index;
+      selectedId = null;
+      inspector.className = "inspector open";
+      document.querySelectorAll(".ticket-node").forEach((node) => node.classList.remove("selected"));
+      document.querySelectorAll(".edge").forEach((group) => {
+        group.classList.toggle("selected", Number(group.dataset.edge) === index);
+      });
+
+      const kicker = document.querySelector("#inspectorKicker");
+      kicker.className = "inspector-kicker";
+      kicker.querySelector("span").textContent = `DIRECT UNLOCK · ${edge.from} → ${edge.to}`;
+      document.querySelector("#inspectorTitle").textContent = "Why this connection exists";
+      document.querySelector("#inspectorOutcome").textContent = edge.reason;
+      document.querySelector("#definitionValue").textContent = "Canonical direct edge";
+      document.querySelectorAll("#definitionRail i").forEach((rail) => rail.classList.add("filled"));
+      document.querySelector("#readinessValue").textContent = "Source DONE is necessary for target READY";
+      document.querySelector("#runValue").textContent = edge.running ? "Active execution path" : "No Run identity on edge";
+      document.querySelector("#coverageBar").style.width = "100%";
+      document.querySelector("#coverageValue").textContent = "Rationale recorded";
+      document.querySelector("#validationValue").textContent = "Graph revision 7";
+      document.querySelector("#validationValue").className = "instrument-value";
+      document.querySelector("#scopeChain").innerHTML = `<span class="ticket-ref">${edge.from}</span><b>→</b><span class="ticket-ref">${edge.to}</span>`;
+      document.querySelector("#evidenceButton").textContent = "Relation rationale";
+      document.querySelector("#commitButton").textContent = "graph revision 7";
+      document.querySelector("#commentLabel").textContent = "Comment on this dependency";
+      highlightPair(index);
+      syncHash();
+    }
+
+    function closeInspector() {
+      selectedId = null;
+      selectedEdge = null;
+      inspector.className = "inspector";
+      document.querySelectorAll(".selected, .related").forEach((item) => item.classList.remove("selected", "related"));
+      graphWorld.classList.remove("path-mode");
+      syncHash();
+    }
+
+    function startNodeDrag(event) {
+      if (event.button !== 0) return;
+      markCanvasTouched();
+      event.stopPropagation();
+      const node = event.currentTarget;
+      const ticket = ticketMap.get(node.dataset.ticket);
+      node.setPointerCapture(event.pointerId);
+      nodeDrag = {
+        node,
+        ticket,
+        startX: event.clientX,
+        startY: event.clientY,
+        ticketX: ticket.x,
+        ticketY: ticket.y,
+        moved: false
+      };
+    }
+
+    function moveNodeDrag(event) {
+      if (!nodeDrag) return;
+      const dx = (event.clientX - nodeDrag.startX) / scale;
+      const dy = (event.clientY - nodeDrag.startY) / scale;
+      if (Math.abs(dx) + Math.abs(dy) > 4) nodeDrag.moved = true;
+      if (!nodeDrag.moved) return;
+      nodeDrag.ticket.x = nodeDrag.ticketX + dx;
+      nodeDrag.ticket.y = nodeDrag.ticketY + dy;
+      nodeDrag.node.style.left = `${nodeDrag.ticket.x}px`;
+      nodeDrag.node.style.top = `${nodeDrag.ticket.y}px`;
+      renderEdges();
+      renderMinimap();
+    }
+
+    function endNodeDrag() {
+      if (!nodeDrag) return;
+      const { ticket, moved } = nodeDrag;
+      nodeDrag = null;
+      if (!moved) selectTicket(ticket.id);
+      else showToast("View position updated · canonical graph unchanged");
+    }
+
+    function setOpen(open) {
+      surface.classList.toggle("open", open);
+      surfaceToggle.setAttribute("aria-expanded", String(open));
+      if (open) {
+        requestAnimationFrame(fitGraph);
+        setTimeout(() => {
+          const deepLinked = /(?:ticket|relation)=/.test(initialHash);
+          if (!deepLinked && !selectedId && selectedEdge === null) fitGraph();
+        }, 230);
+      }
+      else closeInspector();
+      syncHash();
+    }
+
+    function syncHash() {
+      if (!surface.classList.contains("open")) {
+        history.replaceState(null, "", location.pathname);
+        return;
+      }
+      const params = new URLSearchParams();
+      params.set("open", "1");
+      params.set("z", scale.toFixed(2));
+      if (selectedId) params.set("ticket", selectedId);
+      if (selectedEdge !== null) params.set("relation", String(selectedEdge));
+      if (activeLens) params.set("lens", reviewLenses.indexOf(activeLens).toString());
+      history.replaceState(null, "", `#${params.toString()}`);
+    }
+
+    function renderMinimap() {
+      if (!canvas.clientWidth || !canvas.clientHeight) return;
+      const bounds = graphBounds();
+      const width = 218;
+      const height = 132;
+      const mapScale = Math.min((width - 14) / bounds.width, (height - 14) / bounds.height);
+      const offsetX = (width - bounds.width * mapScale) / 2 - bounds.minX * mapScale;
+      const offsetY = (height - bounds.height * mapScale) / 2 - bounds.minY * mapScale;
+
+      const edgeMarkup = edges.map((edge) => {
+        const from = ticketMap.get(edge.from);
+        const to = ticketMap.get(edge.to);
+        const fromSize = sizeFor(from);
+        const toSize = sizeFor(to);
+        const x1 = (from.x + fromSize.width / 2) * mapScale + offsetX;
+        const y1 = (from.y + fromSize.height / 2) * mapScale + offsetY;
+        const x2 = (to.x + toSize.width / 2) * mapScale + offsetX;
+        const y2 = (to.y + toSize.height / 2) * mapScale + offsetY;
+        return `<line class="minimap-edge" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>`;
+      }).join("");
+
+      const nodeMarkup = tickets.map((ticket) => {
+        const size = sizeFor(ticket);
+        const x = ticket.x * mapScale + offsetX;
+        const y = ticket.y * mapScale + offsetY;
+        const w = Math.max(2, size.width * mapScale);
+        const h = Math.max(2, size.height * mapScale);
+        return `<rect class="minimap-node ${stateClasses(ticket)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5"></rect>`;
+      }).join("");
+
+      const visibleWorld = {
+        x: -panX / scale,
+        y: -panY / scale,
+        width: canvas.clientWidth / scale,
+        height: canvas.clientHeight / scale
+      };
+      const viewportMarkup = `
+        <rect
+          class="minimap-viewport"
+          x="${visibleWorld.x * mapScale + offsetX}"
+          y="${visibleWorld.y * mapScale + offsetY}"
+          width="${visibleWorld.width * mapScale}"
+          height="${visibleWorld.height * mapScale}"
+          rx="2"
+        ></rect>
+      `;
+
+      minimapSvg.innerHTML = edgeMarkup + nodeMarkup + viewportMarkup;
+      minimap.dataset.scale = mapScale;
+      minimap.dataset.offsetX = offsetX;
+      minimap.dataset.offsetY = offsetY;
+      minimap.classList.toggle("visible", scale > fitScale * 1.18);
+    }
+
+    function centerFromMinimap(event) {
+      const rect = minimap.getBoundingClientRect();
+      const mapScale = Number(minimap.dataset.scale);
+      const offsetX = Number(minimap.dataset.offsetX);
+      const offsetY = Number(minimap.dataset.offsetY);
+      const mapX = event.clientX - rect.left;
+      const mapY = event.clientY - rect.top;
+      const worldX = (mapX - offsetX) / mapScale;
+      const worldY = (mapY - offsetY) / mapScale;
+      panX = canvas.clientWidth / 2 - worldX * scale;
+      panY = canvas.clientHeight / 2 - worldY * scale;
+      applyTransform();
+    }
+
+    function resetLayout() {
+      applyLayeredLayout();
+      renderNodes();
+      renderEdges();
+      fitGraph();
+      showToast("Stable DAG layout restored");
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function markCanvasTouched() {
+      canvas.classList.add("touched");
+    }
+
+    function copyText(text, success) {
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(success)).catch(() => showToast(success));
+      } else {
+        showToast(success);
+      }
+    }
+
+    surfaceToggle.addEventListener("click", () => setOpen(!surface.classList.contains("open")));
+    document.querySelector("#zoomOut").addEventListener("click", () => {
+      markCanvasTouched();
+      zoomAt(scale / 1.2);
+    });
+    document.querySelector("#zoomIn").addEventListener("click", () => {
+      markCanvasTouched();
+      zoomAt(scale * 1.2);
+    });
+    document.querySelector("#actualSize").addEventListener("click", () => {
+      markCanvasTouched();
+      zoomAt(1);
+    });
+    document.querySelector("#fitGraph").addEventListener("click", () => {
+      markCanvasTouched();
+      fitGraph();
+    });
+    document.querySelector("#resetLayout").addEventListener("click", resetLayout);
+    document.querySelector("#closeInspector").addEventListener("click", closeInspector);
+    lensToggle.addEventListener("click", () => {
+      const open = !lensPanel.classList.contains("open");
+      lensPanel.classList.toggle("open", open);
+      lensToggle.setAttribute("aria-expanded", String(open));
+    });
+
+    document.querySelector("#attentionToggle").addEventListener("click", (event) => {
+      attentionMode = !attentionMode;
+      graphWorld.classList.toggle("attention-mode", attentionMode);
+      event.currentTarget.classList.toggle("active", attentionMode);
+    });
+
+    document.querySelector("#copyView").addEventListener("click", () => copyText(location.href, "View link copied"));
+    document.querySelector("#copyTicket").addEventListener("click", () => copyText(location.href, "Link copied"));
+    document.querySelector("#evidenceButton").addEventListener("click", () => showToast("Evidence trace opened"));
+    document.querySelector("#commitButton").addEventListener("click", () => showToast("Commit trace opened"));
+    document.querySelector("#suggestEdit").addEventListener("click", () => showToast("Ticket revision proposal opened"));
+    document.querySelector("#decisionAction").addEventListener("click", () => showToast("Decision receipt editor opened"));
+    commentInput.addEventListener("input", () => {
+      commentArea.classList.toggle("has-input", Boolean(commentInput.value.trim()));
+    });
+    document.querySelector("#addComment").addEventListener("click", () => {
+      if (!commentInput.value.trim()) {
+        showToast("Write a comment first");
+        commentInput.focus();
+        return;
+      }
+      commentInput.value = "";
+      commentArea.classList.remove("has-input");
+      showToast("Comment proposed · attributed to Wayne");
+    });
+
+    canvas.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || event.target.closest(".ticket-node, .edge, .canvas-controls, .minimap, .lens-panel, .inspector")) return;
+      markCanvasTouched();
+      if (inspector.classList.contains("open")) closeInspector();
+      panDrag = { x: event.clientX, y: event.clientY, panX, panY };
+      canvas.setPointerCapture(event.pointerId);
+      canvas.classList.add("dragging");
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      moveNodeDrag(event);
+      if (!panDrag) return;
+      panX = panDrag.panX + event.clientX - panDrag.x;
+      panY = panDrag.panY + event.clientY - panDrag.y;
+      applyTransform();
+    });
+
+    canvas.addEventListener("pointerup", () => {
+      endNodeDrag();
+      panDrag = null;
+      canvas.classList.remove("dragging");
+    });
+
+    canvas.addEventListener("pointercancel", () => {
+      nodeDrag = null;
+      panDrag = null;
+      canvas.classList.remove("dragging");
+    });
+
+    canvas.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      markCanvasTouched();
+      const rect = canvas.getBoundingClientRect();
+      const factor = Math.exp(-event.deltaY * 0.0015);
+      zoomAt(scale * factor, event.clientX - rect.left, event.clientY - rect.top);
+    }, { passive: false });
+
+    minimap.addEventListener("pointerdown", (event) => {
+      markCanvasTouched();
+      minimapDrag = true;
+      minimap.setPointerCapture(event.pointerId);
+      centerFromMinimap(event);
+    });
+    minimap.addEventListener("pointermove", (event) => {
+      if (minimapDrag) centerFromMinimap(event);
+    });
+    minimap.addEventListener("pointerup", () => {
+      minimapDrag = false;
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (!surface.classList.contains("open")) return;
+      if (event.key === "Escape") closeInspector();
+      if (event.key.toLowerCase() === "f" && !event.shiftKey) fitGraph();
+      if (event.key === "1") zoomAt(1);
+      if (event.key.toLowerCase() === "f" && event.shiftKey && selectedId) {
+        const cone = directedCone(selectedId);
+        frameBounds(graphBounds(cone.relatedNodes));
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (surface.classList.contains("open") && !selectedId && selectedEdge === null) fitGraph();
+    });
+
+    applyLayeredLayout();
+    renderNodes();
+    renderEdges();
+    renderLensOptions();
+    applyTransform();
+
+    const initialParams = new URLSearchParams(initialHash.replace(/^#/, ""));
+    const initialTicket = initialParams.get("ticket");
+    const initialRelationValue = initialParams.get("relation");
+    const initialRelation = initialRelationValue === null ? null : Number(initialRelationValue);
+    const initialLensValue = initialParams.get("lens");
+    const initialLensIndex = initialLensValue === null ? null : Number(initialLensValue);
+    if (initialHash) {
+      setOpen(true);
+      if (initialLensIndex !== null && Number.isInteger(initialLensIndex) && reviewLenses[initialLensIndex]) {
+        requestAnimationFrame(() => setLens(reviewLenses[initialLensIndex]));
+      }
+      if (initialTicket && ticketMap.has(initialTicket)) {
+        requestAnimationFrame(() => focusTicket(initialTicket));
+        setTimeout(() => {
+          if (selectedId === initialTicket) centerTicket(initialTicket, 1);
+        }, 260);
+      } else if (initialRelation !== null && Number.isInteger(initialRelation) && edges[initialRelation]) {
+        requestAnimationFrame(() => {
+          fitGraph();
+          selectEdge(initialRelation);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

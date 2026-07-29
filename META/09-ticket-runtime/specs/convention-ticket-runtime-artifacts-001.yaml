@@ -9,6 +9,17 @@ intent:
     - Raw sessions and full tool traces remain cold provenance.
     - High-fidelity, non-normative synthesis lives under this room's
       `artifacts/` directory.
+    - A decision-shaping reference artifact is repository-versioned when its
+      concrete form carries information that prose alone would lose. This
+      includes interactive HTML, diagrams, executable examples, and evaluation
+      fixtures used to converge a product or technical decision.
+    - Preserved reference artifacts use stable dated filenames and are linked
+      from the Specs they informed. A later artifact may supersede the working
+      direction, but earlier linked references are not silently deleted or
+      rewritten into a different historical proposal.
+    - Transient screenshots, browser profiles, generated previews, and tool
+      outputs remain outside the repository unless they carry independent
+      evidence that the preserved source artifact cannot reproduce.
     - Canonical intent, decision, constraint, contract, convention, context,
       and change claims are written as `active` Specs after machine validation.
       Persisted `draft → human review → active` is not the default ingestion
@@ -30,7 +41,15 @@ intent:
 
     This preserves the loop from exploration to action while separating
     knowledge availability, machine validation, and human authority.
-constraints: []
+constraints:
+  - kind: must
+    rule: "Decision-shaping reference artifacts whose concrete form carries non-prose information are versioned under the room artifacts directory"
+  - kind: must
+    rule: "Each preserved reference artifact is linked from the canonical Spec it informed"
+  - kind: must_not
+    rule: "Do not silently delete or historically rewrite a linked reference artifact when a later version supersedes its working direction"
+  - kind: must_not
+    rule: "Do not commit reproducible transient screenshots, browser profiles, or tool output merely because the source reference artifact was preserved"
 indexing:
   type: convention
   priority: P0

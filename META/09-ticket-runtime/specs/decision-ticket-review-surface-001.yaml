@@ -8,10 +8,11 @@ intent:
     for the first Ticket dogfood loop.
 
     The prototype should let a human:
-    - enter through scenario-level outcome Tickets rather than a flat task list;
+    - review through human-understandable scenario/outcome lenses rather than a
+      flat task list or a second canonical object model;
     - review or delegate the coarse plan and its major boundaries;
     - see blockers, human decisions, and deviations immediately;
-    - progressively inspect every descendant Ticket without making each one an
+    - progressively inspect every contributing Ticket without making each one an
       approval unit;
     - comment or propose simple edits with visible authorship and revision
       effects.
@@ -65,10 +66,10 @@ intent:
     canvas.
 
     A healthy graph should contain no orphan Ticket. Every non-top-level Ticket
-    has a containment path to a scenario outcome or the overall deliverable.
-    Shared work may sit at the earliest common ancestor whose outcome contains
-    it and feed several scenario branches through explicit dependencies; being
-    shared does not make it standalone.
+    contributes through explicit typed relation paths to a coarse outcome or
+    the overall deliverable. Shared work may feed several scenario lenses or
+    outcome paths through explicit dependencies; being shared does not make it
+    standalone or require a UI hierarchy.
 
     **Prototype 03 — Causal Ticket Graph**
 
@@ -91,18 +92,118 @@ intent:
     facts to remove duplicate, orphan, dead-end, redundant, and falsely
     serialized work. The final canvas still reads in the execution direction.
 
-    Prototype 03 is awaiting live review and is not ratified.
+    **Wayne review of Prototype 03 — causal graph retained, ontology refined**
 
-    This ticket is unresolved.
+    The primary human reading task is not “which scenario lane owns this
+    Ticket?” It is “when this Ticket finishes, what becomes executable next?”
+    The review surface should therefore make direct execution relations
+    primary and let a person read the graph in execution order.
+
+    A Ticket remains an executable context package: once executable and
+    unblocked, a fresh Agent with VibeHub should be able to read its contract
+    and bound context and perform the correct work. A scenario is instead a
+    planning and review lens through which a human constrains and validates the
+    graph. A coarse assembly or verification Ticket may prove that a scenario
+    has been achieved, but Scenario is neither a second canonical entity nor
+    automatically identical to one Ticket.
+
+    Tickets should not be presented as a nested UI hierarchy. Containment,
+    dependency, supersession, evidence, and other meanings remain explicit
+    typed relations. The default graph projects the direct unlock/dependency
+    relation; other relation types and scenario lenses refine inspection
+    without creating competing workflow arrows.
+
+    **Prototype 04 — Quiet execution instrument**
+
+    `artifacts/2026-07-28-ticket-review-surface-prototype-v4.html` is the
+    preserved high-fidelity reference artifact for the converged standalone
+    prototype. It starts as the same quiet Corner Signal and expands into one
+    zoomable, pannable execution canvas. The sample keeps all 29 Tickets and 35
+    direct unlock relations available at once, applies a deterministic
+    left-to-right layered layout with straight-first orthogonal routing, and
+    uses level of detail rather than lanes or pagination when the complete
+    graph is fit to the viewport.
+
+    Selecting one Ticket leaves the graph visible and docks one Inspector into
+    the canvas edge. The Inspector exposes the executable handoff, dependency
+    satisfaction, active Run, acceptance evidence, validation, relation
+    neighborhood, scenario lens, evidence, commit trace, comments, and edit
+    proposals. Selecting one relation exposes its direct-unlock rationale.
+    Scenario remains an optional review lens over the same stable layout and
+    never causes graph reflow.
+
+    Runtime dimensions remain visually independent:
+
+    - blue identifies an active Run and its actual execution spine;
+    - moss identifies dependency satisfaction, accepted evidence, proof, and
+      valid handoffs;
+    - ochre identifies a human authority boundary;
+    - rose identifies deviation, conflict, or failed validation;
+    - muted violet identifies stale context or a definition that must be
+      recompiled;
+    - hover, selection, and related-path focus remain neutral interaction
+      states rather than borrowing a Runtime color.
+
+    The fixed visual base is matte and near-monochrome. Tickets are bounded
+    execution objects, not floating dashboard cards; the readiness aperture
+    punctures the Ticket boundary as the one characteristic visual signature.
+    The Inspector is a structural split pane rather than a modal or floating
+    card. Healthy state stays quiet, while human decisions, deviations, active
+    Runs, proof, and stale context surface at the exact graph locus that owns
+    them.
+
+    **Resolved review-surface decision**
+
+    The v0 project review surface is one lightweight projection over canonical
+    Core reads and operations:
+
+    - the primary view is the complete direct-unlock Ticket Graph, read
+      left-to-right as “what may execute next,” with deterministic pan, zoom,
+      fit, minimap, and level-of-detail behavior;
+    - Tickets have no presentation hierarchy; scenario is a human planning and
+      review lens over related Tickets, while coarse verification or assembly
+      Tickets may anchor observable scenario completion;
+    - human review gates a coarse outcome plan and genuine authority
+      boundaries, not every executable Ticket;
+    - human decisions, deviations, stale context, active Runs, and proof remain
+      in situ and are redundantly encoded by shape, words, and restrained
+      semantic color;
+    - progressive inspection keeps the graph visible and makes Ticket
+      contracts, direct relation rationale, evidence, commits, comments, and
+      simple edit proposals traceable;
+    - comments and edits are attributed versioned proposals through Core, not
+      writes to an HTML-owned store;
+    - graph layout is a derived, reproducible view artifact. Runtime state,
+      selection, hover, or scenario lens changes must not move Tickets.
+
+    Prototype 04 fixes the current product and interaction direction. Exact
+    typography metrics, color values, spacing, and future host container remain
+    implementation details as long as they preserve this contract.
+
+    Wayne accepted this direction through iterative live review on 2026-07-28.
 
     **Claimed**: Codex 2026-07-28
-constraints: []
+constraints:
+  - kind: must
+    rule: "The default project review projection shows the complete direct-unlock Ticket Graph and makes what becomes executable next legible"
+  - kind: must
+    rule: "Selecting a Ticket or relation keeps the graph visible while progressively exposing its contract, rationale, evidence, and proposals"
+  - kind: must
+    rule: "Scenario remains a derived human planning/review lens over Tickets rather than a canonical Scenario entity or presentation hierarchy"
+  - kind: must
+    rule: "Graph layout is deterministic derived view state and does not reflow for Runtime state, hover, selection, or scenario-lens changes"
+  - kind: must
+    rule: "Comments and simple edits become attributed versioned Core proposals rather than direct HTML or persistence writes"
+  - kind: must_not
+    rule: "Do not detach blockers, human decisions, deviations, stale context, active Runs, or proof from the graph locus that owns them"
+  - kind: must_not
+    rule: "Do not make every visible Ticket an approval unit or recreate a dashboard of separate graph, scenario, and attention regions"
 indexing:
   type: decision
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, open, prototype, html, review, ticket-graph, ux]
+  tags: [wayfinder, resolved, prototype, html, review, ticket-graph, ux]
 provenance:
   source_type: manual_input
   confidence: 0.85
@@ -126,3 +227,4 @@ anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype.html"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v2.html"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v3.html"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html"

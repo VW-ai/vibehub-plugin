@@ -52,9 +52,14 @@ belong in active Decision Tickets explicitly tagged `open`.
   are thin peers, the first slice is in-process, and App/daemon remain clients
   or hosts of the same Core.
 - [decision-ticket-intelligence-loop-001] (active) Human-understandable
-  scenario Tickets compile into one executable graph; the Agent composes
-  intelligence by scene, proceeds under delegated authority, and escalates
-  experience/principle changes or deviations.
+  scenarios constrain and review one typed Ticket Graph without becoming a
+  second entity or hierarchy; the Agent composes intelligence by scene,
+  proceeds under delegated authority, and escalates experience/principle
+  changes or deviations.
+- [decision-ticket-review-surface-001] (active) The project review surface is
+  one complete direct-unlock Ticket Graph with stable pan/zoom layout, scenario
+  review lenses, in-situ authority/deviation/proof signals, and a docked
+  progressive Inspector whose comments and edits remain Core proposals.
 
 ## Planning conventions
 
@@ -67,9 +72,6 @@ belong in active Decision Tickets explicitly tagged `open`.
 
 These questions are currently unblocked:
 
-- [decision-ticket-review-surface-001] What project-level HTML review surface
-  makes scenarios primary while keeping every Ticket inspectable, commentable,
-  and safely editable?
 - [decision-ticket-context-binding-001] How does a Ticket declare and bind
   semantic context without freezing a giant Run prompt?
 - [decision-ticket-graph-lifecycle-001] How may planning and execution

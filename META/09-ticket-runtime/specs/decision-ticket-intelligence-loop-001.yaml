@@ -85,14 +85,26 @@ intent:
     understandable situation and observable intended outcome around which a
     human can evaluate the plan.
 
-    **Ratified partial behavior — scenario representation**
+    **Ratified clarification — scenario is a review lens, not a Ticket**
 
-    In v0, a core scenario should be the human-facing projection of a coarse
-    outcome Ticket with descendant work, not a second canonical Scenario
-    entity. This preserves Ticket as the only work primitive while letting the
-    HTML render scenario-level Tickets differently from execution leaves.
+    Scenario is the human planning, constraint, and validation boundary used to
+    understand whether the graph delivers an observable experience or system
+    outcome. It is not a second canonical entity, but it is also not
+    automatically identical to one coarse Ticket.
 
-    Wayne ratified this scenario representation on 2026-07-28.
+    Canonical graph nodes remain Tickets with independently meaningful
+    execution boundaries. Several related Tickets may jointly realize one
+    scenario; a coarse assembly, integration, or verification Ticket may prove
+    that the scenario is achieved. A coarse Ticket may therefore anchor a
+    scenario lens without creating a required one-to-one identity.
+
+    The Ticket UI remains a flat typed-relation graph rather than a nested
+    hierarchy. Scenario lenses select and explain relevant Tickets without
+    owning their lifecycle, changing their direct execution relations, or
+    causing layout reflow.
+
+    Wayne ratified this refinement while reviewing the causal Ticket Graph on
+    2026-07-28.
 
     **Resolved intelligence loop**
 
@@ -110,9 +122,10 @@ intent:
     principles, permissions, or risk become visible blocking decision/deviation
     Tickets. Hooks may surface a relevant scene but do not own orchestration.
 
-    Scenario-level outcomes remain coarse Tickets, so one graph supports both
-    human comprehension and Agent execution. The project HTML review surface is
-    delegated to its own prototype decision.
+    Scenario remains a human review lens over the same typed Ticket graph used
+    for Agent execution. Coarse Tickets may anchor or verify a scenario without
+    making Scenario a Ticket or introducing a second hierarchy. The project
+    HTML review surface is delegated to its resolved prototype decision.
 
     Wayne ratified the complete intelligence loop on 2026-07-28.
 
