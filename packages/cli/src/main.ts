@@ -48,6 +48,7 @@ import {
 } from "@vw-ai/vibehub-core";
 import { releaseAssetManifest, releaseAssetRoot } from "./managed-assets.js";
 import { adaptHookInput, projectHookOutput } from "./hook-adapters.js";
+import { launchTicketReviewHostCommand } from "./ticket-review-host.js";
 
 interface Flags {
   repo: string;
@@ -108,6 +109,7 @@ const USAGE = `usage:
   vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
   vibehub distill <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub ticket <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
+  vibehub ticket review --proposal <id> [--repo <path>] [--db <path>] [--port <port>] [--no-open] [--json]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop> [--host claude-code|codex]
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
@@ -457,6 +459,19 @@ function printSnapshot(flags: Flags): number {
 export function main(argv: string[]): number {
   const [group, cmd, ...rest] = argv;
   if (group === "checkpoint") return runSemanticCheckpoint(cmd, rest);
+  if (group === "ticket" && cmd === "review") {
+    try {
+      launchTicketReviewHostCommand(rest);
+      return 0;
+    } catch (error) {
+      process.stderr.write(
+        `Ticket review host failed: ${
+          error instanceof Error ? error.message : String(error)
+        }\n${USAGE}\n`,
+      );
+      return 2;
+    }
+  }
   if(group==="kb"&&cmd==="migrate-store"){
     try{return runSemanticMigration(rest);}
     catch(error){process.stdout.write(`${JSON.stringify({ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error)}})}\n`);return 2;}

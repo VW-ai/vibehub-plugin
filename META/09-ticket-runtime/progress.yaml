@@ -1,5 +1,5 @@
 progress:
-  completion: 0.4
+  completion: 0.5
   status: active
   milestones:
     - id: "m1-ticket-review-read-kernel"
@@ -26,8 +26,11 @@ progress:
       status: planned
     - id: "m6-ticket-review-host"
       name: "Interactive review host and trusted human decision bridge"
-      status: planned
+      status: completed
+      completed_at: "2026-07-29"
+      evidence: "A foreground loopback-only one-proposal review host now projects a current exact candidate and the complete validation-set binding/summaries into a quiet zoomable orthogonal Ticket workflow, accepts only authorize/reject intent plus exact CAS bindings from the browser, derives the human-authority provider result inside the host, verifies the exact Core receipt before automatic application, and revokes the short-lived capability after rejection, successful application, or 30 minutes. A stale proposal fails closed: the canvas shows the current canonical graph rather than constructing a mixed candidate from a later head. Static assets are packaged with the CLI; the host, graph, Inspector, keyboard/mobile disclosure, and local-trust explanation were exercised in a disposable proposal. The boundary is intentionally cooperative same-OS-account trust, not cryptographic user-presence proof."
     - id: "m7-ticket-dogfood-loop"
       name: "Plan, execute, verify, and close one real feature through Tickets"
-      status: planned
+      status: in_progress
+      evidence: "The first 10-Ticket/11-dependency execution-loop bootstrap is preserved as an exact proposal payload and human-readable scenario-lens plan. The same payload passed local schema validation, Core mechanical materialization in a disposable ledger, and an independent six-check semantic validation with only the required initial_plan_authority and experience_product signals. Submission to the repository's durable operational ledger, trusted human review, canonical publication, and execution of the graph remain pending."
   commits: []

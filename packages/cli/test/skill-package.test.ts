@@ -11,7 +11,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-validate","vibehub-ticket-apply"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-validate","vibehub-ticket-apply"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -19,7 +19,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
-    expect(entry).toHaveLength(9);
+    expect(entry).toHaveLength(10);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -121,10 +121,15 @@ describe("production skill package",()=>{
     expect(operations).toContain("`kb.anchors`");
     expect(operations).toContain("`distill.baseline.get`");
     expect(operations).toContain("`distill.version.get`");
+    expect(operations).toContain("`ticket.proposal.review.inspect`");
+    expect(operations).toContain("`ticket.proposal.authority.decide`");
+    expect(operations).toContain("`ticket.proposal.apply`");
     const dispatch=read("scripts/_dispatch.mjs");
     expect(dispatch).toContain('"proposal.review.inspect"');
     expect(dispatch).toContain('"proposal.authority.decide"');
     expect(dispatch).toContain('"proposal.apply"');
+    expect(dispatch).toContain('"../../../main.js"');
+    expect(dispatch).toContain('"../../packages/cli/dist/main.js"');
 
     const query=read("vibehub-query/SKILL.md");
     expect(query).toContain("`kb.status` plus paginated `kb.spec.search`");
@@ -172,8 +177,46 @@ describe("production skill package",()=>{
     expect(skill).toContain("proposal.review.inspect");
     expect(skill).toContain("`ticket.proposal.authority.decide`");
     expect(skill).toContain("`ticket.proposal.apply`");
-    expect(skill).toContain("A trusted host provider supplies");
-    expect(skill).toContain("Never add authority claims to input");
+    expect(skill).toContain(
+      "node ../scripts/vh-ticket-review.mjs --proposal <proposal-id> --repo <root>",
+    );
+    expect(skill).toMatch(/may not click, automate,\s+or\s+infer/);
+    expect(skill).toMatch(/caller JSON never gains an\s+authority field/);
+  });
+
+  it("packages honest outcome-first Ticket planning intelligence",()=>{
+    const skill=fs.readFileSync(
+      path.join(skills,"vibehub-ticket-plan","SKILL.md"),
+      "utf8",
+    );
+    expect(skill).toContain("Scenario is a");
+    expect(skill).toContain("non-canonical planning and review lens");
+    expect(skill).toContain("Backchain from each observable outcome");
+    expect(skill).toContain("Forward-normalize from current facts");
+    expect(skill).toContain("Stop honestly at an unknown frontier");
+    expect(skill).toContain("do not fabricate");
+    expect(skill).toContain("The result of this Skill is an inspectable proposal, not an approved plan");
+    expect(skill).toContain("$vibehub-ticket-validate");
+    expect(skill).toContain("$vibehub-ticket-apply");
+    expect(skill).toContain(
+      "node ../scripts/vh-ticket-review.mjs --proposal <id> --repo <root>",
+    );
+    const review=fs.readFileSync(
+      path.join(skills,"scripts","vh-ticket-review.mjs"),
+      "utf8",
+    );
+    expect(review).toContain("resolveVibehubInvocation");
+    expect(review).toContain('"ticket", "review"');
+  });
+
+  it("advertises Ticket orchestration from the Codex plugin surface",()=>{
+    const manifest=JSON.parse(fs.readFileSync(
+      path.join(workbench,".codex-plugin","plugin.json"),
+      "utf8",
+    ));
+    expect(manifest.interface.defaultPrompt).toContain(
+      "Plan this deliverable as an honest VibeHub Ticket graph.",
+    );
   });
 
   it("pins the setup workflow, activation proof, and presentation invariants",()=>{

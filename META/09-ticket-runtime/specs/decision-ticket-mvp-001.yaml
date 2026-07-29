@@ -136,16 +136,36 @@ intent:
     sequence, retries exact interrupted applications, and stops when trusted
     authority is unavailable instead of turning conversation text into proof.
 
-    App decision-surface integration, generic GateDecision recording,
+    **Local trusted human review slice — 2026-07-29**
+
+    `vibehub ticket review --proposal <id>` now provides the first foreground,
+    loopback-only, proposal-specific human review bridge. It projects a current
+    exact candidate and the complete validation-set binding/summaries as one
+    quiet zoomable direct-unlock graph. Browser input carries only
+    authorize/reject intent, rationale, and exact CAS bindings; the host
+    constructs the trusted provider result and verifies the matching Core
+    receipt before applying. Stale proposals display the current canonical
+    graph instead of constructing a false mixed candidate.
+
+    The capability expires after 30 minutes and closes after rejection or
+    successful application. An authorized-but-interrupted publication remains
+    recoverable only through the exact bound decision. The trust claim is
+    intentionally cooperative same-OS-account intent, not cryptographic user
+    presence, hostile same-UID isolation, or remote multi-user identity.
+
+    Stronger App/remote authentication, generic GateDecision recording,
     Ticket-readiness validation/currentness, complete Ticket definitions,
     capability/trace receipt currentness, context compilation,
     Run/Evidence/Outcome writers, explicit removal/supersession, and semantic
     closeout remain blocked on their existing decisions.
 
-    The full dogfood loop is still unresolved. The loop above remains a
-    candidate until it names the first feature developed through it and closes
-    the remaining lifecycle, context, closeout, workflow-role, and storage
-    gates.
+    The first dogfood target is now preserved as one 10-Ticket coarse proposal:
+    complete definition, context, maturity, claim, Run binding, evidence,
+    verified completion, deviation, an Agent entrypoint, and a real repository
+    proof. It has passed disposable mechanical and independent semantic
+    validation but remains a proposal until repository-ledger submission and
+    explicit human authority. The execution half of the loop is therefore
+    still unresolved.
 constraints:
   - kind: must
     rule: "The first public Ticket write records an immutable review contribution only and must not change the canonical Ticket Graph"
@@ -175,7 +195,7 @@ provenance:
   source_type: chat_extraction
   confidence: 0.8
   source_ref: "Wayne request to begin Plugin Ticket System development through loop engineering — 2026-07-27"
-  produced_at: "2026-07-29"
+  produced_at: "2026-07-29T20:00:00Z"
 relations:
   - target: "contract-ticket-review-operations-001"
     type: depends_on
@@ -207,8 +227,12 @@ anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-first-ticket-dogfood-plan.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-first-ticket-graph-proposal.json"
   - file: "skills/vibehub-ticket-validate/SKILL.md"
   - file: "skills/vibehub-ticket-apply/SKILL.md"
+  - file: "skills/vibehub-ticket-plan/SKILL.md"
   - file: "packages/core/src/contract/ticket-application.ts"
   - file: "packages/core/src/contract/ticket-application-schemas.ts"
   - file: "packages/core/src/ticket-application-service.ts"

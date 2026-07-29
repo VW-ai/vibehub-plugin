@@ -30,27 +30,45 @@ operations.
 
    - `validation_required`: stop application work and use
      `$vibehub-ticket-validate` to produce independent evidence.
-   - `authority_required`: construct `ticket.proposal.authority.decide` from
-     the packet's exact proposal, candidate, and validation-set digests.
+   - `authority_required`: follow the packet's required authority path. For
+     `human_authority`, launch the proposal-specific local review host described
+     below and leave the authorize/reject action to the human. For
+     `delegated_policy`, stop until a configured trusted policy host can supply
+     the exact delegation basis.
    - `application_ready`: construct `ticket.proposal.apply` from the exact
      proposal, candidate, authority-decision ID, and authority-decision digest.
    - `applied`: report the immutable application receipt; do not republish.
    - `comment_only`, `rejected`, or `stale`: report the reason and stop.
 
-3. Request authority, when directed:
+3. Open the trusted local human review surface, when directed:
 
    ```text
-   node ../scripts/vh-ticket.mjs proposal.authority.decide --repo <root> --actor <id> --request <id> --input <decision-request.json>
+   node ../scripts/vh-ticket-review.mjs --proposal <proposal-id> --repo <root>
    ```
 
-   The operation request only binds facts. A trusted host provider supplies
-   any authenticated principal, delegation or human-authority basis, and
-    disposition. If the operation returns `trusted_authority_unavailable`, stop
-    at that boundary and surface it to the human or trusted host. Never add authority claims to input
-    or infer approval from the actor name, conversation, validation result, or
-    this Skill.
+   The foreground loopback host reads the exact review packet, shows the
+   candidate graph and complete validation summaries, and supplies its
+   proposal-specific provider only after the human explicitly authorizes or
+   rejects. The wrapper prefers the repository's built CLI before any global
+   installation. The Agent may launch the host but may not click, automate, or
+   infer that decision. The ordinary CLI/MCP
+   `ticket.proposal.authority.decide` operation has no provider and should
+   continue to fail `trusted_authority_unavailable`; caller JSON never gains an
+   authority field. The current local host supports `human_authority` only and
+   must not substitute a browser click for delegated policy.
 
-4. Apply only an exact authorized decision:
+4. After the review-host process returns, inspect the review packet again with
+   a new request identity. The host normally auto-applies an authorization:
+
+   - `applied`: report the immutable decision and application receipts and
+     stop;
+   - `rejected` or `stale`: report the terminal boundary and stop;
+   - `authority_required`: no human decision was recorded before the host
+     closed or expired; stop without inference;
+   - `application_ready`: the decision is durable but publication still needs
+     exact recovery; continue below.
+
+5. Apply only an exact already-authorized recovery:
 
    ```text
    node ../scripts/vh-ticket.mjs proposal.apply --repo <root> --actor <id> --request <id> --input <application-request.json>
@@ -63,7 +81,7 @@ operations.
    application receipt directly. If apply returns `authority_required`,
    re-inspect the proposal and stop until an exact authorized decision exists.
 
-5. Inspect the review packet again with a new request identity. Report the
+6. Inspect the review packet again with a new request identity. Report the
    proposal binding, authority decision, publication status, resulting
    snapshot, and any remaining blocker.
 

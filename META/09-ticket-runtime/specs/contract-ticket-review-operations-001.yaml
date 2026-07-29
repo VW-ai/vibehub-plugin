@@ -24,8 +24,9 @@ intent:
     The packaged Ticket wrapper, CLI, and MCP now converge on the existing
     Core OperationDispatcher. Adapters do not own alternative semantics or
     persistence. Ticket semantic Skills remain a separate intelligence layer.
-    A future browser host uses a thin bridge rather than calling an
-    in-process library or store directly.
+    The browser surface now talks only to a thin local bridge. That bridge uses
+    the same OperationDispatcher and never calls operational or Ticket storage
+    directly.
 
     The first three read responsibilities and operation names are:
 
@@ -434,7 +435,7 @@ provenance:
   confidence: 0.9
   source_ref: "Wayne's Ticket execution-graph and review-surface decisions in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b — 2026-07-28"
   produced_by_agent: "ingest"
-  produced_at: "2026-07-29"
+  produced_at: "2026-07-29T20:00:00Z"
 relations:
   - target: "decision-ticket-review-surface-001"
     type: depends_on
@@ -462,6 +463,7 @@ anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html"
   - file: "skills/vibehub-ticket-validate/SKILL.md"
   - file: "skills/vibehub-ticket-apply/SKILL.md"

@@ -34,7 +34,8 @@
     "defaultPrompt": [
       "Set up VibeHub for this project.",
       "Query VibeHub before changing this unfamiliar area.",
-      "Capture the durable decisions from this discussion."
+      "Capture the durable decisions from this discussion.",
+      "Plan this deliverable as an honest VibeHub Ticket graph."
     ],
     "brandColor": "#3E7D4C"
   }

@@ -15,6 +15,11 @@
   [`artifacts/2026-07-29-proposal-query-validation-ledger.md`](artifacts/2026-07-29-proposal-query-validation-ledger.md)
 - **Trusted authority and application runtime**:
   [`artifacts/2026-07-29-ticket-proposal-application-runtime.md`](artifacts/2026-07-29-ticket-proposal-application-runtime.md)
+- **Live planning and local review entrypoints**:
+  [`artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md`](artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md)
+- **First Ticket dogfood plan and exact proposal**:
+  [`plan`](artifacts/2026-07-29-first-ticket-dogfood-plan.md) ·
+  [`proposal JSON`](artifacts/2026-07-29-first-ticket-graph-proposal.json)
 - **Artifact policy**:
   [`specs/convention-ticket-runtime-artifacts-001.yaml`](specs/convention-ticket-runtime-artifacts-001.yaml)
 
@@ -69,7 +74,10 @@ belong in active Decision Tickets explicitly tagged `open`.
 - [decision-ticket-review-surface-001] (active) The project review surface is
   one complete direct-unlock Ticket Graph with stable pan/zoom layout, scenario
   review lenses, in-situ authority/deviation/proof signals, and a docked
-  progressive Inspector whose comments and edits remain Core proposals.
+  progressive Inspector whose comments and edits remain Core proposals. The
+  first packaged live host now renders current proposal candidates and
+  validation summaries; stale proposals show the current canonical graph
+  rather than a falsely reconstructed candidate.
 - [decision-ticket-storage-001] (active, partially resolved) The
   outline-compatible Ticket definition subset and published dependency
   topology now use an independent Git-native `.vibehub/ticket-store/` read
@@ -101,11 +109,13 @@ belong in active Decision Tickets explicitly tagged `open`.
   dogfood slice now covers canonical Ticket reads, immutable proposal
   submission/query, independent proposal-validation evidence, proposal review,
   trusted authority resolution, and crash-reconcilable application through one
-  Core/CLI/MCP spine. Default CLI/MCP callers cannot mint authority: bootstrap
-  and every protected boundary remain blocked until a trusted host injects an
-  authenticated human authority provider. Ticket-readiness
-  validation/currentness, generic GateDecision recording, context compilation,
-  Run/Outcome writers, and semantic closeout remain open.
+  Core/CLI/MCP spine. Default CLI/MCP callers cannot mint authority; the first
+  foreground local host now provides a cooperative same-OS-account human
+  bridge for one exact proposal. The 10-Ticket first dogfood graph has passed
+  disposable mechanical and independent semantic validation but is not
+  canonical before durable submission and explicit human review.
+  Ticket-readiness validation/currentness, generic GateDecision recording,
+  context compilation, Run/Outcome writers, and semantic closeout remain open.
 
 ## Contracts
 
@@ -134,9 +144,11 @@ belong in active Decision Tickets explicitly tagged `open`.
   `ticket.proposal.authority.decide`, and `ticket.proposal.apply`. Review
   exposes the exact validation-set digest and next required action. Authority
   decisions can only come from a non-serializable trusted provider injected by
-  the host. Application input binds the exact authorized proposal, candidate,
-  and decision; Core creates and persists the immutable intent internally.
-  Generic GateDecision recording remains separate.
+  the host. The first browser surface reaches that same Core spine only through
+  its thin local review bridge and owns no storage semantics. Application input
+  binds the exact authorized proposal, candidate, and decision; Core creates
+  and persists the immutable intent internally. Generic GateDecision recording
+  remains separate.
 
 ## Planning conventions
 
@@ -250,9 +262,11 @@ validation ledger.
 
 The packaged `vibehub-ticket-apply` Skill is the thin intelligence layer over
 those operations. It follows the derived next action, invokes independent
-validation when needed, retries an exact interrupted application, and stops at
-an unavailable trusted-authority boundary. It never turns caller identity or
-conversation approval into an authority proof.
+validation when needed, launches the one-proposal local review host for a
+derived human-authority path, retries an exact interrupted application, and
+stops at an unavailable trusted-authority boundary. The Agent may open the
+surface but may not automate its human authorize/reject action. It never turns
+caller identity or conversation approval into an authority proof.
 
 Application first records an immutable intent containing the exact authorized
 candidate generation, base snapshot, candidate snapshot, and publication
@@ -286,8 +300,11 @@ root and operation registry; only Core's authorized application service may
 invoke its fenced path. The three authority/application operations are exposed
 through Core/CLI/MCP, but ordinary CLI/MCP construction injects no authority
 provider. It can inspect review state and request apply, but it cannot authorize
-bootstrap or a protected change by claiming a human actor. A trusted browser or
-other host decision bridge, Ticket-readiness validation/currentness,
+bootstrap or a protected change by claiming a human actor. A first cooperative
+same-OS-account browser bridge now supplies proposal-specific human authority
+with a short-lived loopback capability; it is not cryptographic user-presence
+proof or remote multi-user authentication. Stronger App/remote authentication,
+generic GateDecision recording, Ticket-readiness validation/currentness,
 current-capability selection, receipt/blob quotas and retention/GC, complete
 definition storage, and the wider Run/Outcome loop are the next gates.
 

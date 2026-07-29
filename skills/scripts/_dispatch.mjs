@@ -1,4 +1,6 @@
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { captureCommand } from "./_capture.mjs";
 import {
   OPERATION_INPUT_BYTE_LIMITS,
@@ -47,17 +49,50 @@ export async function run(group, registry, argv) {
     JSON.parse(raw);
   }
   catch(error){ fail(`invalid JSON input: ${error instanceof Error?error.message:String(error)}`); }
-  const binary=process.env.VIBEHUB_BIN || "vibehub";
-  const child=await captureCommand(binary,[group,operation,"--json",...forwarded,"--input","-"],{input:raw,env:process.env});
+  const invocation=resolveVibehubInvocation();
+  const child=await captureCommand(
+    invocation.command,
+    [...invocation.prefix,group,operation,"--json",...forwarded,"--input","-"],
+    {input:raw,env:process.env},
+  );
   if(child.kind==="overflow")fail(`vibehub CLI response exceeded ${child.limit} bytes`,"response_too_large",1);
   if(child.kind==="spawn_error")fail(`cannot execute vibehub CLI: ${child.error.message}`,"internal_error",1);
   if(child.kind==="signal")fail(`vibehub CLI terminated by signal ${child.signal}`,"cli_terminated",1);
   const output=child.stdout.trim();
-  try { JSON.parse(output); } catch { fail("vibehub CLI returned a non-JSON response","internal_error",1); }
+  try { JSON.parse(output); } catch {
+    const detail=diagnostic(child.stderr||child.stdout);
+    fail(
+      `vibehub CLI returned a non-JSON response${detail?`: ${detail}`:""}`,
+      "internal_error",
+      1,
+    );
+  }
   // Synchronous final emission makes an immediate, intentional process exit
   // safe even when the wrapper itself is captured through a pipe.
   fs.writeSync(1,`${output}\n`);
   process.exit(child.status);
+}
+
+export function resolveVibehubInvocation() {
+  if(process.env.VIBEHUB_BIN){
+    return {command:process.env.VIBEHUB_BIN,prefix:[]};
+  }
+  const here=path.dirname(fileURLToPath(import.meta.url));
+  const localCandidates=[
+    path.resolve(here,"../../../main.js"),
+    path.resolve(here,"../../packages/cli/dist/main.js"),
+  ];
+  const local=localCandidates.find(candidate=>fs.statSync(
+    candidate,
+    {throwIfNoEntry:false},
+  )?.isFile());
+  return local
+    ? {command:process.execPath,prefix:[local]}
+    : {command:"vibehub",prefix:[]};
+}
+
+function diagnostic(value) {
+  return value.trim().replace(/\s+/g," ").slice(0,400);
 }
 
 function readUtf8Input(inputPath, maximumBytes) {

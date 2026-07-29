@@ -91,7 +91,8 @@ because a current table key would permit it.
 | `distill.inventory.get`, `distill.inventory.diff` | `distill.inventory.put`, `distill.inventory.seal` |
 | `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list` | `ticket.proposal.submit` |
 | `ticket.proposal.inspect`, `ticket.proposal.list` | `ticket.proposal.validation.record` |
-| `ticket.proposal.validation.inspect`, `ticket.proposal.validation.list` | |
+| `ticket.proposal.validation.inspect`, `ticket.proposal.validation.list` | `ticket.proposal.authority.decide` |
+| `ticket.proposal.review.inspect` | `ticket.proposal.apply` |
 | | `distill.scopes.plan`, `distill.scopes.claim`, `distill.scopes.complete`, `distill.scopes.fail`, `distill.scopes.retry`, `distill.scopes.correct` |
 | | `distill.candidates.put`, `distill.reconcile`, `distill.validate`, `distill.finalize` |
 | | `distill.activate`, `distill.rollback` |
@@ -116,6 +117,17 @@ after an independent semantic review, then retrieve its immutable evidence with
 unverified review evidence—even a passed receipt does not grant authority,
 authorize application, change Ticket maturity, select a current receipt, or
 mutate the graph. Validation input is limited to 1 MiB.
+
+Use `ticket.proposal.review.inspect` to derive the exact next boundary from the
+complete immutable proposal and validation set. `ticket.proposal.authority.decide`
+accepts only proposal, candidate, and validation-set bindings; the public input
+never carries a principal, approval, delegation, disposition, or other
+authority claim. A trusted host provider supplies and authenticates the
+authority basis or the operation fails closed. `ticket.proposal.apply` accepts
+only the exact immutable authority-decision binding and reconciles interrupted
+publication through Core. Never treat a successful validation, a claimed
+actor, or a Skill as authority, and never edit operational decisions, intents,
+receipts, or Ticket data directly.
 
 ## Workflow artifacts are not operation inputs
 

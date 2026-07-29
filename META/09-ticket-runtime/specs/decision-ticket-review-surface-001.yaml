@@ -182,6 +182,17 @@ intent:
 
     Wayne accepted this direction through iterative live review on 2026-07-28.
 
+    **First live projection — 2026-07-29**
+
+    The CLI now packages a proposal-specific local host derived from Prototype
+    04 rather than preserving the HTML only as a static reference. It renders
+    current candidate outlines and direct unlocks with deterministic layered
+    layout, orthogonal edges, pan/zoom/fit, a working minimap, causal focus, and
+    one progressive Inspector. It exposes exact validation summaries and the
+    derived authority boundary without inventing readiness, Run, proof, or
+    Scenario facts. Stale proposals show the current canonical graph rather
+    than a graph mislabeled with the old candidate digest.
+
     **Claimed**: Codex 2026-07-28
 constraints:
   - kind: must
@@ -208,7 +219,7 @@ provenance:
   source_type: manual_input
   confidence: 0.85
   source_ref: "Wayne proposed a per-project HTML Ticket visualization with comments and simple edits — 2026-07-28"
-  produced_at: "2026-07-28"
+  produced_at: "2026-07-29T20:00:00Z"
 relations:
   - target: "decision-ticket-intelligence-loop-001"
     type: depends_on
@@ -228,3 +239,4 @@ anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v2.html"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v3.html"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md"
