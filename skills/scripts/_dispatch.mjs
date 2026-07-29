@@ -16,6 +16,9 @@ export const TICKET = new Set([
   "proposal.validation.record",
   "proposal.validation.inspect",
   "proposal.validation.list",
+  "proposal.review.inspect",
+  "proposal.authority.decide",
+  "proposal.apply",
 ]);
 
 function fail(message, code = "validation_error", exit = 2) {

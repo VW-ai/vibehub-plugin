@@ -121,6 +121,50 @@ export class GitFacade {
     return path.dirname(r.stdout.trim());
   }
 
+  /**
+   * Resolve a path inside this checkout's Git administrative directory.
+   *
+   * Unlike `--git-common-dir`, `--git-path` is worktree-aware: linked
+   * worktrees receive their own administrative path under
+   * `.git/worktrees/<name>`. Callers use this for operational state that must
+   * neither be tracked in the worktree nor shared by sibling worktrees.
+   */
+  static gitPathAt(anyPath: string, relativePath: string): string {
+    if (
+      typeof relativePath !== "string"
+      || relativePath.length === 0
+      || relativePath.includes("\0")
+      || relativePath.includes("\n")
+      || relativePath.includes("\r")
+      || path.isAbsolute(relativePath)
+      || relativePath.split(/[\\/]/u).includes("..")
+    ) {
+      throw new GitError(
+        ["rev-parse", "--git-path", relativePath],
+        null,
+        "invalid relative Git administrative path",
+      );
+    }
+    const args = [
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-path",
+      relativePath,
+    ];
+    const r = run("git", args, anyPath);
+    if (r.status !== 0) throw new GitError(args, r.status, r.stderr);
+    const result = r.stdout.trim();
+    if (
+      result.length === 0
+      || result.includes("\n")
+      || result.includes("\r")
+      || !path.isAbsolute(result)
+    ) {
+      throw new GitError(args, r.status, "git returned an invalid path");
+    }
+    return path.normalize(result);
+  }
+
   private git(args: string[]): string {
     const r = run("git", args, this.repoRoot);
     if (r.status !== 0) throw new GitError(args, r.status, r.stderr);

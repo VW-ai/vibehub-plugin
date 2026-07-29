@@ -5,6 +5,7 @@ import {
   replaceScopePatterns,
   saveTaskReport,
   type Db,
+  type TrustedTicketProposalAuthorityProviderV0,
 } from "@vw-ai/vibehub-core";
 import crypto from "node:crypto";
 
@@ -18,6 +19,9 @@ export const TICKET_OPERATION_NAMES = [
   "ticket.proposal.validation.record",
   "ticket.proposal.validation.inspect",
   "ticket.proposal.validation.list",
+  "ticket.proposal.review.inspect",
+  "ticket.proposal.authority.decide",
+  "ticket.proposal.apply",
 ] as const;
 export type TicketOperationName = typeof TICKET_OPERATION_NAMES[number];
 const TICKET_OPERATION_NAME_SET = new Set<string>(TICKET_OPERATION_NAMES);
@@ -34,11 +38,15 @@ export interface CapabilityContext {
   actor?: string;
   requestId?: () => string;
   now?: () => string;
+  ticketAuthorityProvider?: TrustedTicketProposalAuthorityProviderV0;
 }
 
 export function createCapabilities(ctx: CapabilityContext) {
   const now = (): string => ctx.now?.() ?? new Date().toISOString();
-  const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db,{repoRoot:ctx.repoRoot}).dispatch(operation,{
+  const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db,{
+    repoRoot:ctx.repoRoot,
+    ticketAuthorityProvider:ctx.ticketAuthorityProvider,
+  }).dispatch(operation,{
     repoId:ctx.repoId,actor:ctx.actor??"mcp-agent",taskId:ctx.taskId,
     requestId:requestId??ctx.requestId?.()??`mcp-${crypto.randomUUID()}`,now:now(),
   },input);

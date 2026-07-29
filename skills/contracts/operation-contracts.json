@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
-  "registryHash": "f1bc58a1d6647df752479b59183a9b29e9ce66a2d1586ad669467bf86c2c8808",
-  "inputSchemaHash": "0b3fe08a62638633949e22587bc556cdf5441567edc3785256db26fdd6913653",
+  "registryHash": "4a3d985ca79535656835e374e0b757b1fad2fdd25453098863d665051e638824",
+  "inputSchemaHash": "58e08816d39ec04fd29d610cdb493da3a9c7711ef38608a9b03034937e167bc3",
   "dialect": "JSON Schema 2020-12 plus VibeHub runtimeRefinements/v1",
   "fixtureDialect": "literal value or generatedFixture/v1",
   "scope": "Operation input contracts only. Operation context is validated separately by the runtime operationContextSchema at CLI/MCP adapter boundaries.",
@@ -25962,6 +25962,236 @@
         ]
       }
     },
+    "ticket.proposal.apply": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "number",
+            "const": 1
+          },
+          "proposalId": {
+            "type": "string",
+            "pattern": "^tgp-[0-9a-f]{64}$"
+          },
+          "expectedProposalDigest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "expectedCandidateDigest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "authorityDecisionId": {
+            "type": "string",
+            "pattern": "^tgd-[0-9a-f]{64}$"
+          },
+          "expectedAuthorityDecisionDigest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "proposalId",
+          "expectedProposalDigest",
+          "expectedCandidateDigest",
+          "authorityDecisionId",
+          "expectedAuthorityDecisionDigest"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "schemaVersion": 1,
+          "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+          "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+          "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+          "authorityDecisionId": "tgd-8888888888888888888888888888888888888888888888888888888888888888",
+          "expectedAuthorityDecisionDigest": "9999999999999999999999999999999999999999999999999999999999999999"
+        },
+        "negative": {
+          "schemaVersion": 2,
+          "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+          "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+          "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+          "authorityDecisionId": "tgd-8888888888888888888888888888888888888888888888888888888888888888",
+          "expectedAuthorityDecisionDigest": "9999999999999999999999999999999999999999999999999999999999999999"
+        },
+        "negativeCase": "proposal application schema version must be one",
+        "negatives": [
+          {
+            "case": "proposal application schema version must be one",
+            "value": {
+              "schemaVersion": 2,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "authorityDecisionId": "tgd-8888888888888888888888888888888888888888888888888888888888888888",
+              "expectedAuthorityDecisionDigest": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "proposal application authority decision id must be canonical",
+            "value": {
+              "schemaVersion": 1,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "authorityDecisionId": "decision-1",
+              "expectedAuthorityDecisionDigest": "9999999999999999999999999999999999999999999999999999999999999999"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "proposal application decision digest must be lowercase sha256",
+            "value": {
+              "schemaVersion": 1,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "authorityDecisionId": "tgd-8888888888888888888888888888888888888888888888888888888888888888",
+              "expectedAuthorityDecisionDigest": "not-a-digest"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "proposal application rejects caller-selected disposition",
+            "value": {
+              "schemaVersion": 1,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "authorityDecisionId": "tgd-8888888888888888888888888888888888888888888888888888888888888888",
+              "expectedAuthorityDecisionDigest": "9999999999999999999999999999999999999999999999999999999999999999",
+              "disposition": "authorized"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "proposal application rejects caller-asserted authority",
+            "value": {
+              "schemaVersion": 1,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "authorityDecisionId": "tgd-8888888888888888888888888888888888888888888888888888888888888888",
+              "expectedAuthorityDecisionDigest": "9999999999999999999999999999999999999999999999999999999999999999",
+              "authorityGranted": true
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.proposal.authority.decide": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "number",
+            "const": 1
+          },
+          "proposalId": {
+            "type": "string",
+            "pattern": "^tgp-[0-9a-f]{64}$"
+          },
+          "expectedProposalDigest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "expectedCandidateDigest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "expectedValidationSetDigest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "proposalId",
+          "expectedProposalDigest",
+          "expectedCandidateDigest",
+          "expectedValidationSetDigest"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "schemaVersion": 1,
+          "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+          "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+          "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+          "expectedValidationSetDigest": "7777777777777777777777777777777777777777777777777777777777777777"
+        },
+        "negative": {
+          "schemaVersion": 2,
+          "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+          "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+          "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+          "expectedValidationSetDigest": "7777777777777777777777777777777777777777777777777777777777777777"
+        },
+        "negativeCase": "authority decision schema version must be one",
+        "negatives": [
+          {
+            "case": "authority decision schema version must be one",
+            "value": {
+              "schemaVersion": 2,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "expectedValidationSetDigest": "7777777777777777777777777777777777777777777777777777777777777777"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "authority decision validation set digest must be lowercase sha256",
+            "value": {
+              "schemaVersion": 1,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "expectedValidationSetDigest": "not-a-digest"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "authority decision rejects caller-selected disposition",
+            "value": {
+              "schemaVersion": 1,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "expectedValidationSetDigest": "7777777777777777777777777777777777777777777777777777777777777777",
+              "disposition": "authorized"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "authority decision rejects caller-asserted principal",
+            "value": {
+              "schemaVersion": 1,
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "expectedProposalDigest": "2222222222222222222222222222222222222222222222222222222222222222",
+              "expectedCandidateDigest": "3333333333333333333333333333333333333333333333333333333333333333",
+              "expectedValidationSetDigest": "7777777777777777777777777777777777777777777777777777777777777777",
+              "principal": {
+                "kind": "human",
+                "ref": "caller:forged"
+              }
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
     "ticket.proposal.inspect": {
       "input": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -26087,6 +26317,49 @@
               "kind": "graph_change",
               "limit": 25,
               "scopeRef": "tps-forged"
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.proposal.review.inspect": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "proposalId": {
+            "type": "string",
+            "pattern": "^tgp-[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "proposalId"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "negative": {
+          "proposalId": "proposal-1"
+        },
+        "negativeCase": "proposal review id must use the canonical identity",
+        "negatives": [
+          {
+            "case": "proposal review id must use the canonical identity",
+            "value": {
+              "proposalId": "proposal-1"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "proposal review rejects caller-selected authority",
+            "value": {
+              "proposalId": "tgp-1111111111111111111111111111111111111111111111111111111111111111",
+              "authorityGranted": true
             },
             "refinementIds": []
           }

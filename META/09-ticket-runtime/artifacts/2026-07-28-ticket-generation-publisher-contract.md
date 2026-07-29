@@ -6,13 +6,13 @@ Status: active storage-substrate design for
 ## Boundary
 
 The first writer is a Core-owned, worktree-scoped persistence primitive for
-one complete outline-compatible Ticket generation. It is deliberately below
-the future mutation-application operation:
+one complete outline-compatible Ticket generation. It remains deliberately
+below the authorized mutation-application operation:
 
 ```mermaid
 flowchart LR
   Skill["Ticket shaping / validation Skills"]
-  Apply["Future authorized proposal application"]
+  Apply["Authorized proposal application"]
   Publisher["Core generation publisher V0"]
   Store[".vibehub/ticket-store"]
   Reads["Existing exact-generation reads"]
@@ -44,7 +44,7 @@ or converged on an already-current identical generation, and deterministic
 Ticket/relation counts.
 
 Definitions are supplied with explicit revisions because revision allocation
-belongs to the future mutation applier that understands the accepted proposal.
+belongs to the mutation applier that understands the accepted proposal.
 The publisher enforces, rather than invents, revision progression.
 
 ## Mechanical admissibility
@@ -67,20 +67,30 @@ cannot be smuggled in as omission from a complete generation.
 
 ## Compare-and-publish
 
-Publication is serialized by one exclusive, worktree-local writer lock. The
-publisher acquires the lock and then re-reads `latest.yaml`; checking before
-the lock is never sufficient.
+Publication is serialized by one exclusive operational lock directory under
+the worktree-specific Git administration path. It is not part of the tracked
+worktree. Acquisition writes and syncs one complete token-named owner record in
+a unique nonempty staging directory, then atomically renames that directory to
+the canonical lock location. The publisher acquires the lock and then re-reads
+`latest.yaml`; checking before the lock is never sufficient.
 
 - If current equals `expectedSnapshotId`, publication may proceed.
 - If current differs but already equals the exact candidate generation, the
   call returns `unchanged`; this is safe idempotent convergence.
 - Otherwise the call fails with a CAS conflict and does not move `latest`.
 
-The lock records a process/host owner for diagnosis. V0 never steals an
-existing lock automatically: a live, dead, malformed, or foreign-host owner
-all fail closed as writer-busy. Explicit stale-lock recovery is deferred until
-it has its own fencing and audit contract; this trades crash availability for
-the absence of an unsafe automatic takeover race.
+The owner record carries a process/host descriptor for diagnosis. V0 never
+steals an existing generic lock automatically: a live, dead, malformed,
+unfenced, or foreign-host owner fails closed as writer-busy. The only adoption
+path is the exact persisted application-intent fence described below.
+
+Release claims a token-specific marker rather than unlinking a shared lock
+file. The holder atomically renames exact `owner-T` to `releasing-T`, unlinks
+only `releasing-T`, then removes the canonical lock directory only if it is
+still empty. If a successor atomically installs nonempty `owner-U` first, the
+stale `rmdir` fails harmlessly. If release crashes after removing its marker,
+the empty canonical directory may be safely removed or atomically replaced by
+a staged acquisition.
 
 ## Commit point and crash shape
 
@@ -121,11 +131,33 @@ re-synced with their parent before they may support a new visibility commit.
 Unreachable immutable-object retention and GC remain unresolved. They are safe
 for reads but may consume disk until a later retention policy exists.
 
+## Application-owned fenced extension
+
+The trusted application layer now invokes a separate `publishFenced` path over
+this same mechanical substrate. Before publication it persists an immutable
+SQLite application intent containing the exact complete candidate, base and
+candidate snapshot IDs, store identity, and counts. The Git writer lock carries
+an application-intent ID, intent digest, and candidate snapshot fence and
+remains held after visibility advances.
+
+The application service records and commits the matching immutable SQLite
+application receipt before releasing that exact fence. If Git became visible
+but receipt persistence failed, retry may adopt only a byte-identical intent
+fence. Current candidate is re-verified and returned as `reconciled`; current
+base may resume the same publication; every malformed or foreign fence or
+third head fails closed. If the receipt already committed but release did not,
+cleanup may claim only that exact fence and only after the canonical Git head
+is verified equal to the candidate snapshot. This is narrower than generic
+stale-lock stealing and does not expose the publisher as a public operation.
+Full details are in
+`2026-07-29-ticket-proposal-application-runtime.md`.
+
 ## Filesystem threat boundary
 
-V0 rejects pre-existing symlinks and special files, confines resolved paths to
-the verified worktree, and coordinates conforming publishers through the
-exclusive writer lock. It is not a security boundary against a hostile
+V0 rejects pre-existing symlinks and special files, confines Ticket-store paths
+to the verified worktree and lock state to its worktree-specific Git
+administration path, and coordinates conforming publishers through the
+exclusive lock directory. It is not a security boundary against a hostile
 same-UID process actively swapping parent paths between the publisher's
 `lstat`, `open`, `link`, or `rename` calls. The host must prevent that form of
 concurrent workspace mutation.
@@ -137,16 +169,12 @@ outside this V0 storage substrate.
 
 ## Deferred above this primitive
 
-- proposal application (submit-only immutable review contributions are frozen
-  separately in
-  `2026-07-29-ticket-proposal-authority-contract.md`);
-- trusted principal and human GateDecision authority;
-- semantic promise-preservation and
-  elaboration/decomposition/expansion validation receipts;
+- the trusted browser/desktop human decision surface and generic GateDecision
+  authority (the proposal-specific host-provider contract is implemented);
 - explicit removal, supersession, cancel, split, merge, and prune mutations;
 - full Ticket Contract storage beyond the outline-compatible subset;
-- mutation receipt ordering with the SQLite request-receipt transaction;
-- fenced and auditable stale-lock recovery;
+- generic fenced and auditable stale-lock recovery outside one exact persisted
+  application intent;
 - Git commit policy and remote/multi-host writer coordination.
 
 These deferred concerns must compose over this publisher rather than bypassing

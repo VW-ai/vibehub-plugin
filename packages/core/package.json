@@ -22,6 +22,10 @@
     "./contracts/ticket-proposal-schemas": {
       "types": "./dist/contract/ticket-proposal-schemas.d.ts",
       "default": "./dist/contract/ticket-proposal-schemas.js"
+    },
+    "./contracts/ticket-application-schemas": {
+      "types": "./dist/contract/ticket-application-schemas.d.ts",
+      "default": "./dist/contract/ticket-application-schemas.js"
     }
   },
   "files": [

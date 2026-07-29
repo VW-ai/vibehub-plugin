@@ -45,6 +45,15 @@ import type {
 import {
   type ResolvedTicketReviewProjectionSourceProviderV0,
 } from "./ticket-review-resolver.js";
+import {
+  TicketProposalApplicationServiceV0,
+} from "./ticket-application-service.js";
+import type {
+  TicketProposalApplyInputV0,
+  TicketProposalAuthorityDecideInputV0,
+  TicketProposalReviewInputV0,
+  TrustedTicketProposalAuthorityProviderV0,
+} from "./contract/ticket-application.js";
 
 export interface OperationContext { repoId:number; actor:string; taskId?:string; requestId:string; now:string }
 export interface OperationMeta { operation:string; repoId:number; requestId:string; at:string }
@@ -69,6 +78,9 @@ export const OPERATION_EXIT_CLASS:Record<string,number>={
   ticket_store_publish_invalid:4, ticket_store_cas_conflict:5,
   ticket_store_revision_conflict:5, ticket_store_commit_uncertain:5,
   ticket_store_writer_busy:5,
+  trusted_authority_unavailable:5, authority_proof_invalid:5,
+  authority_required:4, authority_conflict:5,
+  application_in_progress:5, application_recovery_required:5,
 };
 
 interface Services {
@@ -76,6 +88,7 @@ interface Services {
   distill: DistillationService;
   ticket: TicketReviewReadServiceV0;
   ticketProposal: TicketProposalServiceV0;
+  ticketApplication: TicketProposalApplicationServiceV0;
 }
 type TicketDispatchScopeV0 = TicketProposalRepositoryScopeV0;
 type Handler=(
@@ -171,11 +184,30 @@ const handlers:Record<OperationName,Handler>={
       c,
       i as unknown as TicketProposalValidationListInputV0,
     ),
+  "ticket.proposal.review.inspect":(s,c,i,scope)=>
+    s.ticketApplication.review(
+      requiredTicketScope(scope),
+      c,
+      i as unknown as TicketProposalReviewInputV0,
+    ),
+  "ticket.proposal.authority.decide":(s,c,i,scope)=>
+    s.ticketApplication.decide(
+      requiredTicketScope(scope),
+      c,
+      i as unknown as TicketProposalAuthorityDecideInputV0,
+    ),
+  "ticket.proposal.apply":(s,c,i,scope)=>
+    s.ticketApplication.apply(
+      requiredTicketScope(scope),
+      c,
+      i as unknown as TicketProposalApplyInputV0,
+    ),
 };
 
 export interface OperationDispatcherOptions {
   repoRoot?: string;
   ticketReviewProvider?: ResolvedTicketReviewProjectionSourceProviderV0;
+  ticketAuthorityProvider?: TrustedTicketProposalAuthorityProviderV0;
 }
 
 export class OperationDispatcher {
@@ -192,6 +224,9 @@ export class OperationDispatcher {
           ?? new GitTicketReviewProjectionSourceProviderV0(),
       ),
       ticketProposal: new TicketProposalServiceV0(db),
+      ticketApplication: new TicketProposalApplicationServiceV0(db, {
+        authorityProvider: options.ticketAuthorityProvider,
+      }),
     };
   }
   operations():string[]{return Object.keys(handlers).sort();}
@@ -422,6 +457,7 @@ export class OperationDispatcher {
         distill:new DistillationService(cache),
         ticket:this.service.ticket,
         ticketProposal:this.service.ticketProposal,
+        ticketApplication:this.service.ticketApplication,
       };
       const cacheContext={...c,repoId:materialized.repoId};
       const data=handler(services,cacheContext,input);
@@ -499,6 +535,7 @@ export class OperationDispatcher {
       );
       let outcome:OperationResult;
       try{outcome=invoke();}catch(error){outcome=failure(error);}
+      if(leavesRetryableFailureUnreceipted(operation,outcome))return outcome;
       return this.db.transaction(()=>{
         const raced=this.readOperationReceipt(
           repoId,
@@ -852,7 +889,10 @@ function requiresTicketScope(operation:string):operation is
   | "ticket.proposal.list"
   | "ticket.proposal.validation.record"
   | "ticket.proposal.validation.inspect"
-  | "ticket.proposal.validation.list" {
+  | "ticket.proposal.validation.list"
+  | "ticket.proposal.review.inspect"
+  | "ticket.proposal.authority.decide"
+  | "ticket.proposal.apply" {
   return operation==="ticket.graph.snapshot"
     || operation==="ticket.subject.inspect"
     || operation==="ticket.trace.list"
@@ -861,15 +901,33 @@ function requiresTicketScope(operation:string):operation is
     || operation==="ticket.proposal.list"
     || operation==="ticket.proposal.validation.record"
     || operation==="ticket.proposal.validation.inspect"
-    || operation==="ticket.proposal.validation.list";
+    || operation==="ticket.proposal.validation.list"
+    || operation==="ticket.proposal.review.inspect"
+    || operation==="ticket.proposal.authority.decide"
+    || operation==="ticket.proposal.apply";
 }
 function evaluatesOutsideSqlite(operation:string):operation is
   | "ticket.graph.snapshot"
   | "ticket.subject.inspect"
-  | "ticket.trace.list" {
+  | "ticket.trace.list"
+  | "ticket.proposal.review.inspect"
+  | "ticket.proposal.authority.decide"
+  | "ticket.proposal.apply" {
   return operation==="ticket.graph.snapshot"
     || operation==="ticket.subject.inspect"
-    || operation==="ticket.trace.list";
+    || operation==="ticket.trace.list"
+    || operation==="ticket.proposal.review.inspect"
+    || operation==="ticket.proposal.authority.decide"
+    || operation==="ticket.proposal.apply";
+}
+function leavesRetryableFailureUnreceipted(
+  operation:string,
+  outcome:OperationResult,
+):boolean {
+  return !outcome.ok && (
+    operation==="ticket.proposal.authority.decide"
+    || operation==="ticket.proposal.apply"
+  );
 }
 function usesTicketOutcomeBlob(operation:string):boolean {
   return requiresTicketScope(operation);

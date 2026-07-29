@@ -24,8 +24,17 @@ import {
   type TicketProposalLedgerPageV0,
   type TicketProposalValidationLedgerPageV0,
   type TicketProposalValidationReceiptV0,
+  type TicketProposalReviewPacketV0,
+  type TicketProposalApplicationReceiptV0,
+  type TrustedTicketProposalAuthorityProviderV0,
   type TicketReviewProjectionSourceV0,
 } from "../src/index.js";
+import {
+  prepareGitTicketGenerationV0,
+} from "../src/git-ticket-store.js";
+import {
+  ticketProposalDomainDigestV0,
+} from "../src/ticket-proposal-service.js";
 import { git, makeScratchRepo, type ScratchRepo } from "./helpers.js";
 
 const NOW = "2026-07-28T12:00:00.000Z";
@@ -41,6 +50,28 @@ function writeCanonical(target: string, value: unknown): string {
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, bytes);
   return bytes;
+}
+
+function ticketWriterLockRoot(worktreeRoot: string): string {
+  return git(
+    worktreeRoot,
+    "rev-parse",
+    "--path-format=absolute",
+    "--git-path",
+    "vibehub/ticket-publisher-v1/lock",
+  ).trim();
+}
+
+function writeTicketWriterLock(
+  worktreeRoot: string,
+  value: { token: string } & Record<string, unknown>,
+): string {
+  const lockRoot = ticketWriterLockRoot(worktreeRoot);
+  fs.mkdirSync(lockRoot, { recursive: true });
+  return writeCanonical(
+    path.join(lockRoot, `owner-${value.token}.json`),
+    value,
+  );
 }
 
 function publishSingleTicket(
@@ -809,7 +840,772 @@ describe("Ticket operation dispatcher", () => {
        WHERE operation LIKE 'ticket.proposal.%'
          AND outcome_blob_digest IS NOT NULL`,
     ).get()).toEqual({ count: 6 });
-    expect(dispatcher.operations()).not.toContain("ticket.proposal.apply");
+    expect(dispatcher.operations()).toEqual(expect.arrayContaining([
+      "ticket.proposal.review.inspect",
+      "ticket.proposal.authority.decide",
+      "ticket.proposal.apply",
+    ]));
+  });
+
+  it("requires trusted human bootstrap authority then applies through a fenced publication", () => {
+    const repo = makeRepo();
+    const { db, repoId } = makeDb(repo);
+    const untrusted = new OperationDispatcher(db, { repoRoot: repo.work });
+    const submitted = untrusted.dispatch(
+      "ticket.proposal.submit",
+      context(repoId, "application-bootstrap-submit"),
+      bootstrapProposalInput(),
+    );
+    if (!submitted.ok) throw new Error("expected proposal submission");
+    const proposal = submitted.data as TicketGraphChangeProposalV0;
+    const recorded = untrusted.dispatch(
+      "ticket.proposal.validation.record",
+      context(repoId, "application-bootstrap-validation"),
+      passingProposalValidationInput(proposal),
+    );
+    if (!recorded.ok) throw new Error("expected proposal validation");
+    const validation = recorded.data as TicketProposalValidationReceiptV0;
+
+    const reviewed = untrusted.dispatch(
+      "ticket.proposal.review.inspect",
+      context(repoId, "application-bootstrap-review"),
+      { proposalId: proposal.proposalId },
+    );
+    if (!reviewed.ok) throw new Error("expected proposal review");
+    const packet = reviewed.data as TicketProposalReviewPacketV0;
+    expect(packet).toMatchObject({
+      eligibility: { status: "authority_required" },
+      nextAction: "request_authority_decision",
+      validationSet: { count: 1 },
+    });
+    expect(untrusted.dispatch(
+      "ticket.proposal.authority.decide",
+      context(repoId, "application-bootstrap-untrusted-decision"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        expectedValidationSetDigest: packet.validationSet.digest,
+      },
+    )).toMatchObject({
+      ok: false,
+      error: { code: "trusted_authority_unavailable" },
+    });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM ticket_proposal_authority_decisions`,
+    ).get()).toEqual({ count: 0 });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM operation_request_receipts
+       WHERE request_id='application-bootstrap-untrusted-decision'`,
+    ).get()).toEqual({ count: 0 });
+
+    const authorityProvider: TrustedTicketProposalAuthorityProviderV0 = {
+      decide(request) {
+        expect(request.requiredPath).toBe("human_authority");
+        expect(request.validationSet.digest).toBe(packet.validationSet.digest);
+        return {
+          disposition: "authorized",
+          provider: {
+            kind: "trusted_host_authority_provider",
+            id: "test.host-authority",
+            version: "1",
+            artifactDigest: "3".repeat(64),
+            trust: "host_injected",
+          },
+          principal: {
+            kind: "human",
+            ref: "human:test-reviewer",
+            authenticationContextDigest: "4".repeat(64),
+            trust: "host_authenticated",
+          },
+          basis: {
+            kind: "human_authority",
+            ref: "decision-sheet:test",
+            digest: "5".repeat(64),
+          },
+          acceptedValidations: [{
+            validationReceiptId: validation.validationReceiptId,
+            validationReceiptDigest: validation.validationReceiptDigest,
+          }],
+          resolvedAssessment: {
+            changeClass: "decomposition",
+            authoritySignals: ["initial_plan_authority"],
+          },
+          rationale: "The authenticated human accepted the foundational Ticket plan.",
+        };
+      },
+    };
+    const trusted = new OperationDispatcher(db, {
+      repoRoot: repo.work,
+      ticketAuthorityProvider: authorityProvider,
+    });
+    const decided = trusted.dispatch(
+      "ticket.proposal.authority.decide",
+      context(repoId, "application-bootstrap-trusted-decision"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        expectedValidationSetDigest: packet.validationSet.digest,
+      },
+    );
+    if (!decided.ok) {
+      throw new Error(`expected trusted authority decision: ${JSON.stringify(decided)}`);
+    }
+    expect(decided).toMatchObject({
+      ok: true,
+      data: {
+        disposition: "authorized",
+        requiredPath: "human_authority",
+        authorityGranted: true,
+        applicationAuthorized: true,
+        graphMutationApplied: false,
+      },
+    });
+    const decision = decided.data as {
+      authorityDecisionId: string;
+      authorityDecisionDigest: string;
+    };
+    expect(trusted.dispatch(
+      "ticket.proposal.validation.record",
+      context(repoId, "application-bootstrap-validation-after-decision"),
+      passingProposalValidationInput(proposal),
+    )).toMatchObject({
+      ok: false,
+      error: {
+        code: "invalid_state_transition",
+        details: {
+          proposalId: proposal.proposalId,
+          authorityDecisionId: decision.authorityDecisionId,
+          disposition: "authorized",
+        },
+      },
+    });
+    expect(db.prepare(
+      `SELECT COUNT(*) count
+       FROM ticket_proposal_validation_receipts
+       WHERE proposal_id=?`,
+    ).get(proposal.proposalId)).toEqual({ count: 1 });
+
+    db.exec(`
+      CREATE TRIGGER reject_first_ticket_application_receipt
+      BEFORE INSERT ON ticket_proposal_application_receipts
+      BEGIN SELECT RAISE(ABORT,'injected application receipt failure'); END;
+    `);
+    const interrupted = trusted.dispatch(
+      "ticket.proposal.apply",
+      context(repoId, "application-bootstrap-apply"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        authorityDecisionId: decision.authorityDecisionId,
+        expectedAuthorityDecisionDigest:
+          decision.authorityDecisionDigest,
+      },
+    );
+    expect(interrupted).toMatchObject({
+      ok: false,
+      error: { code: "internal_error" },
+    });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM ticket_proposal_application_intents`,
+    ).get()).toEqual({ count: 1 });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM ticket_proposal_application_receipts`,
+    ).get()).toEqual({ count: 0 });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM operation_request_receipts
+       WHERE request_id='application-bootstrap-apply'`,
+    ).get()).toEqual({ count: 0 });
+    expect(fs.existsSync(path.join(
+      repo.work,
+      GIT_TICKET_STORE_RELATIVE_PATH,
+    ))).toBe(true);
+    expect(fs.existsSync(ticketWriterLockRoot(repo.work))).toBe(true);
+
+    const originalIntentRow = db.prepare(
+      `SELECT application_intent_digest applicationIntentDigest,
+              candidate_snapshot_id candidateSnapshotId,
+              payload,candidate_definitions candidateDefinitions
+       FROM ticket_proposal_application_intents
+       WHERE proposal_id=?`,
+    ).get(proposal.proposalId) as {
+      applicationIntentDigest: string;
+      candidateSnapshotId: string;
+      payload: string;
+      candidateDefinitions: string;
+    };
+    const originalIntent = JSON.parse(originalIntentRow.payload) as {
+      applicationIntentDigest: string;
+      publication: {
+        storeId: string;
+        candidateSnapshotId: string;
+      };
+      [key: string]: unknown;
+    };
+    const originalDefinitions = JSON.parse(
+      originalIntentRow.candidateDefinitions,
+    ) as GitTicketDefinitionRevisionV0[];
+    const corruptDefinitions = originalDefinitions.map((
+      item,
+      index,
+    ) => index === 0
+      ? { ...item, outcome: `${item.outcome} — unauthorized substitution` }
+      : item);
+    const corruptPrepared = prepareGitTicketGenerationV0(
+      originalIntent.publication.storeId,
+      corruptDefinitions,
+    );
+    const {
+      applicationIntentDigest: _originalDigest,
+      ...originalIntentContent
+    } = originalIntent;
+    const corruptIntentContent = {
+      ...originalIntentContent,
+      publication: {
+        ...originalIntent.publication,
+        candidateSnapshotId: corruptPrepared.generation.snapshotId,
+      },
+    };
+    const corruptIntent = {
+      ...corruptIntentContent,
+      applicationIntentDigest: ticketProposalDomainDigestV0(
+        "vibehub.ticket-proposal-application-intent.v1",
+        corruptIntentContent,
+      ),
+    };
+    const corruptPayload = serializeGitTicketStoreDocumentV0(corruptIntent);
+    const corruptCandidateDefinitions =
+      serializeGitTicketStoreDocumentV0(corruptDefinitions);
+    db.exec(
+      "DROP TRIGGER ticket_proposal_application_intents_immutable_update",
+    );
+    db.prepare(
+      `UPDATE ticket_proposal_application_intents
+       SET application_intent_digest=?,candidate_snapshot_id=?,
+           payload=?,byte_length=?,
+           candidate_definitions=?,candidate_byte_length=?
+       WHERE proposal_id=?`,
+    ).run(
+      corruptIntent.applicationIntentDigest,
+      corruptPrepared.generation.snapshotId,
+      corruptPayload,
+      Buffer.byteLength(corruptPayload, "utf8"),
+      corruptCandidateDefinitions,
+      Buffer.byteLength(corruptCandidateDefinitions, "utf8"),
+      proposal.proposalId,
+    );
+    expect(trusted.dispatch(
+      "ticket.proposal.apply",
+      context(repoId, "application-bootstrap-corrupt-candidate"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        authorityDecisionId: decision.authorityDecisionId,
+        expectedAuthorityDecisionDigest:
+          decision.authorityDecisionDigest,
+      },
+    )).toMatchObject({
+      ok: false,
+      error: { code: "internal_error" },
+    });
+    db.prepare(
+      `UPDATE ticket_proposal_application_intents
+       SET application_intent_digest=?,candidate_snapshot_id=?,
+           payload=?,byte_length=?,
+           candidate_definitions=?,candidate_byte_length=?
+       WHERE proposal_id=?`,
+    ).run(
+      originalIntentRow.applicationIntentDigest,
+      originalIntentRow.candidateSnapshotId,
+      originalIntentRow.payload,
+      Buffer.byteLength(originalIntentRow.payload, "utf8"),
+      originalIntentRow.candidateDefinitions,
+      Buffer.byteLength(originalIntentRow.candidateDefinitions, "utf8"),
+      proposal.proposalId,
+    );
+    db.exec(`
+      CREATE TRIGGER ticket_proposal_application_intents_immutable_update
+      BEFORE UPDATE ON ticket_proposal_application_intents
+      BEGIN SELECT RAISE(ABORT,
+        'Ticket proposal application intents are immutable'); END;
+    `);
+
+    db.exec("DROP TRIGGER reject_first_ticket_application_receipt");
+    const applied = trusted.dispatch(
+      "ticket.proposal.apply",
+      context(repoId, "application-bootstrap-apply-reconcile"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        authorityDecisionId: decision.authorityDecisionId,
+        expectedAuthorityDecisionDigest:
+          decision.authorityDecisionDigest,
+      },
+    );
+    expect(applied).toMatchObject({
+      ok: true,
+      data: {
+        kind: "ticket_proposal_application_receipt",
+        target: { proposalId: proposal.proposalId },
+        publication: {
+          status: "reconciled",
+          previousSnapshotId: null,
+          ticketCount: 1,
+          directUnlockCount: 0,
+        },
+        effect: "ticket_graph_publication",
+        graphMutationApplied: true,
+      },
+    });
+    if (!applied.ok) throw new Error("expected proposal application");
+    const application = applied.data as TicketProposalApplicationReceiptV0;
+    expect(fs.existsSync(path.join(
+      repo.work,
+      GIT_TICKET_STORE_RELATIVE_PATH,
+    ))).toBe(true);
+    expect(fs.existsSync(ticketWriterLockRoot(repo.work))).toBe(false);
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM ticket_proposal_application_intents`,
+    ).get()).toEqual({ count: 1 });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM ticket_proposal_application_receipts`,
+    ).get()).toEqual({ count: 1 });
+
+    writeTicketWriterLock(repo.work, {
+      schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+      format: "vibehub.git-ticket-writer-lock",
+      token: crypto.randomUUID(),
+      pid: process.pid,
+      hostname: "post-commit-crash.test",
+      acquiredAt: NOW,
+      fence: {
+        applicationIntentId: application.applicationIntentId,
+        intentDigest: application.applicationIntentDigest,
+        candidateSnapshotId: application.publication.snapshotId,
+      },
+    });
+    expect(trusted.dispatch(
+      "ticket.proposal.apply",
+      context(repoId, "application-bootstrap-apply-release-stale-fence"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        authorityDecisionId: decision.authorityDecisionId,
+        expectedAuthorityDecisionDigest:
+          decision.authorityDecisionDigest,
+      },
+    )).toMatchObject({
+      ok: true,
+      data: {
+        applicationReceiptId: application.applicationReceiptId,
+      },
+    });
+    expect(fs.existsSync(ticketWriterLockRoot(repo.work))).toBe(false);
+
+    expect(trusted.dispatch(
+      "ticket.proposal.review.inspect",
+      context(repoId, "application-bootstrap-review-applied"),
+      { proposalId: proposal.proposalId },
+    )).toMatchObject({
+      ok: true,
+      data: {
+        eligibility: { status: "applied" },
+        application: {
+          applicationReceiptId: application.applicationReceiptId,
+        },
+        nextAction: "inspect_application",
+      },
+    });
+    expect(trusted.dispatch(
+      "ticket.graph.snapshot",
+      context(repoId, "application-bootstrap-graph"),
+      {},
+    )).toMatchObject({
+      ok: true,
+      data: {
+        snapshotId: application.publication.snapshotId,
+        summary: { ticketCount: 1 },
+      },
+    });
+  });
+
+  it("allows trusted delegated policy to apply an unprotected elaboration", () => {
+    const repo = makeRepo();
+    const published = publishSingleTicket(repo.work);
+    const { db, repoId } = makeDb(repo);
+    let acceptedValidation: TicketProposalValidationReceiptV0 | undefined;
+    const authorityProvider: TrustedTicketProposalAuthorityProviderV0 = {
+      decide(request) {
+        expect(request.requiredPath).toBe("delegated_policy");
+        expect(request.validationSet.validations).toHaveLength(1);
+        return {
+          disposition: "authorized",
+          provider: {
+            kind: "trusted_host_authority_provider",
+            id: "test.delegated-policy",
+            version: "1",
+            artifactDigest: "3".repeat(64),
+            trust: "host_injected",
+          },
+          principal: {
+            kind: "service",
+            ref: "service:test-policy",
+            authenticationContextDigest: "4".repeat(64),
+            trust: "host_authenticated",
+          },
+          basis: {
+            kind: "delegation",
+            ref: "accepted-plan:test",
+            digest: "5".repeat(64),
+          },
+          acceptedValidations: [{
+            validationReceiptId:
+              request.validationSet.validations[0]!.validationReceiptId,
+            validationReceiptDigest:
+              request.validationSet.validations[0]!.validationReceiptDigest,
+          }],
+          resolvedAssessment: {
+            changeClass: "elaboration",
+            authoritySignals: [],
+          },
+          rationale: "This remains inside the accepted technical boundary.",
+        };
+      },
+    };
+    const dispatcher = new OperationDispatcher(db, {
+      repoRoot: repo.work,
+      ticketAuthorityProvider: authorityProvider,
+    });
+    const submitted = dispatcher.dispatch(
+      "ticket.proposal.submit",
+      context(repoId, "delegated-application-submit"),
+      {
+        schemaVersion: 1,
+        kind: "graph_change",
+        observedSnapshotId: published.snapshotId,
+        reason: "Add executable detail without widening the accepted outcome",
+        source: { kind: "plan", ref: "plan:delegated-application" },
+        authorAssessment: {
+          changeClass: "elaboration",
+          authoritySignals: [],
+          introducesHumanGate: false,
+          rationale: "This is implementation detail inside the accepted plan.",
+        },
+        changes: [{
+          op: "revise",
+          ticketId: "TKT-001",
+          expectedDefinitionRevision: 1,
+          replacement: {
+            outcome:
+              "Expose the canonical Ticket graph through stable operations",
+            parent: null,
+            dependsOn: [],
+          },
+        }],
+      },
+    );
+    if (!submitted.ok) throw new Error("expected proposal submission");
+    const proposal = submitted.data as TicketGraphChangeProposalV0;
+    const validationResult = dispatcher.dispatch(
+      "ticket.proposal.validation.record",
+      context(repoId, "delegated-application-validation"),
+      passingProposalValidationInput(proposal),
+    );
+    if (!validationResult.ok) throw new Error("expected proposal validation");
+    acceptedValidation =
+      validationResult.data as TicketProposalValidationReceiptV0;
+    const reviewed = dispatcher.dispatch(
+      "ticket.proposal.review.inspect",
+      context(repoId, "delegated-application-review"),
+      { proposalId: proposal.proposalId },
+    );
+    if (!reviewed.ok) throw new Error("expected proposal review");
+    const packet = reviewed.data as TicketProposalReviewPacketV0;
+    expect(packet).toMatchObject({
+      eligibility: { status: "authority_required" },
+      nextAction: "request_authority_decision",
+    });
+
+    const decided = dispatcher.dispatch(
+      "ticket.proposal.authority.decide",
+      context(repoId, "delegated-application-decision"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        expectedValidationSetDigest: packet.validationSet.digest,
+      },
+    );
+    if (!decided.ok) throw new Error("expected delegated authority decision");
+    expect(decided).toMatchObject({
+      data: {
+        disposition: "authorized",
+        requiredPath: "delegated_policy",
+        principal: { kind: "service" },
+        basis: { kind: "delegation" },
+      },
+    });
+    const decision = decided.data as {
+      authorityDecisionId: string;
+      authorityDecisionDigest: string;
+    };
+    expect(acceptedValidation).toBeDefined();
+    const applied = dispatcher.dispatch(
+      "ticket.proposal.apply",
+      context(repoId, "delegated-application-apply"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        authorityDecisionId: decision.authorityDecisionId,
+        expectedAuthorityDecisionDigest:
+          decision.authorityDecisionDigest,
+      },
+    );
+    expect(applied).toMatchObject({
+      ok: true,
+      data: {
+        publication: {
+          status: "published",
+          previousSnapshotId: published.snapshotId,
+          ticketCount: 1,
+        },
+      },
+    });
+    expect(dispatcher.dispatch(
+      "ticket.graph.snapshot",
+      context(repoId, "delegated-application-graph"),
+      {},
+    )).toMatchObject({
+      ok: true,
+      data: {
+        tickets: [{
+          ticketId: "TKT-001",
+          definitionRevision: 2,
+          outcome:
+            "Expose the canonical Ticket graph through stable operations",
+        }],
+      },
+    });
+  });
+
+  it("does not let delegated policy erase a protected authority signal", () => {
+    const repo = makeRepo();
+    const published = publishSingleTicket(repo.work);
+    const { db, repoId } = makeDb(repo);
+    const dispatcher = new OperationDispatcher(db, {
+      repoRoot: repo.work,
+      ticketAuthorityProvider: {
+        decide(request) {
+          expect(request.requiredPath).toBe("human_authority");
+          const validation = request.validationSet.validations[0]!;
+          return {
+            disposition: "authorized",
+            provider: {
+              kind: "trusted_host_authority_provider",
+              id: "test.invalid-delegated-policy",
+              version: "1",
+              artifactDigest: "3".repeat(64),
+              trust: "host_injected",
+            },
+            principal: {
+              kind: "service",
+              ref: "service:test-policy",
+              authenticationContextDigest: "4".repeat(64),
+              trust: "host_authenticated",
+            },
+            basis: {
+              kind: "delegation",
+              ref: "accepted-plan:test",
+              digest: "5".repeat(64),
+            },
+            acceptedValidations: [{
+              validationReceiptId: validation.validationReceiptId,
+              validationReceiptDigest: validation.validationReceiptDigest,
+            }],
+            resolvedAssessment: {
+              changeClass: "elaboration",
+              authoritySignals: [],
+            },
+            rationale: "The service attempted to stay on its delegated path.",
+          };
+        },
+      },
+    });
+    const submitted = dispatcher.dispatch(
+      "ticket.proposal.submit",
+      context(repoId, "protected-delegation-submit"),
+      {
+        schemaVersion: 1,
+        kind: "graph_change",
+        observedSnapshotId: published.snapshotId,
+        reason: "Change a protected product experience",
+        authorAssessment: {
+          changeClass: "elaboration",
+          authoritySignals: ["experience_product"],
+          introducesHumanGate: false,
+          rationale: "The visible experience changes.",
+        },
+        changes: [{
+          op: "revise",
+          ticketId: "TKT-001",
+          expectedDefinitionRevision: 1,
+          replacement: {
+            outcome: "Expose a redesigned Ticket experience",
+            parent: null,
+            dependsOn: [],
+          },
+        }],
+      },
+    );
+    if (!submitted.ok) throw new Error("expected proposal submission");
+    const proposal = submitted.data as TicketGraphChangeProposalV0;
+    expect(dispatcher.dispatch(
+      "ticket.proposal.validation.record",
+      context(repoId, "protected-delegation-validation"),
+      passingProposalValidationInput(proposal),
+    )).toMatchObject({ ok: true });
+    const reviewed = dispatcher.dispatch(
+      "ticket.proposal.review.inspect",
+      context(repoId, "protected-delegation-review"),
+      { proposalId: proposal.proposalId },
+    );
+    if (!reviewed.ok) throw new Error("expected proposal review");
+    const packet = reviewed.data as TicketProposalReviewPacketV0;
+    expect(dispatcher.dispatch(
+      "ticket.proposal.authority.decide",
+      context(repoId, "protected-delegation-decision"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        expectedValidationSetDigest: packet.validationSet.digest,
+      },
+    )).toMatchObject({
+      ok: false,
+      error: { code: "authority_proof_invalid" },
+    });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM ticket_proposal_authority_decisions`,
+    ).get()).toEqual({ count: 0 });
+  });
+
+  it("does not hold a write transaction across trusted authority resolution", () => {
+    const repo = makeRepo();
+    const { db, repoId, dbPath } = makeDb(repo);
+    const untrusted = new OperationDispatcher(db, { repoRoot: repo.work });
+    const submitted = untrusted.dispatch(
+      "ticket.proposal.submit",
+      context(repoId, "authority-outside-transaction-submit"),
+      bootstrapProposalInput(),
+    );
+    if (!submitted.ok) throw new Error("expected proposal submission");
+    const proposal = submitted.data as TicketGraphChangeProposalV0;
+    const firstValidationResult = untrusted.dispatch(
+      "ticket.proposal.validation.record",
+      context(repoId, "authority-outside-transaction-validation-1"),
+      passingProposalValidationInput(proposal),
+    );
+    if (!firstValidationResult.ok) {
+      throw new Error("expected initial proposal validation");
+    }
+    const firstValidation =
+      firstValidationResult.data as TicketProposalValidationReceiptV0;
+    const reviewed = untrusted.dispatch(
+      "ticket.proposal.review.inspect",
+      context(repoId, "authority-outside-transaction-review"),
+      { proposalId: proposal.proposalId },
+    );
+    if (!reviewed.ok) throw new Error("expected proposal review");
+    const packet = reviewed.data as TicketProposalReviewPacketV0;
+
+    const trusted = new OperationDispatcher(db, {
+      repoRoot: repo.work,
+      ticketAuthorityProvider: {
+        decide() {
+          const concurrent = openDb(dbPath);
+          try {
+            expect(new OperationDispatcher(concurrent, {
+              repoRoot: repo.work,
+            }).dispatch(
+              "ticket.proposal.validation.record",
+              context(
+                repoId,
+                "authority-outside-transaction-validation-2",
+              ),
+              passingProposalValidationInput(proposal),
+            )).toMatchObject({ ok: true });
+          } finally {
+            concurrent.close();
+          }
+          return {
+            disposition: "authorized",
+            provider: {
+              kind: "trusted_host_authority_provider",
+              id: "test.concurrent-authority",
+              version: "1",
+              artifactDigest: "3".repeat(64),
+              trust: "host_injected",
+            },
+            principal: {
+              kind: "human",
+              ref: "human:test-reviewer",
+              authenticationContextDigest: "4".repeat(64),
+              trust: "host_authenticated",
+            },
+            basis: {
+              kind: "human_authority",
+              ref: "decision-sheet:test",
+              digest: "5".repeat(64),
+            },
+            acceptedValidations: [{
+              validationReceiptId: firstValidation.validationReceiptId,
+              validationReceiptDigest:
+                firstValidation.validationReceiptDigest,
+            }],
+            resolvedAssessment: {
+              changeClass: "decomposition",
+              authoritySignals: ["initial_plan_authority"],
+            },
+            rationale: "The original complete evidence set was accepted.",
+          };
+        },
+      },
+    });
+    expect(trusted.dispatch(
+      "ticket.proposal.authority.decide",
+      context(repoId, "authority-outside-transaction-decision"),
+      {
+        schemaVersion: 1,
+        proposalId: proposal.proposalId,
+        expectedProposalDigest: proposal.proposalDigest,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        expectedValidationSetDigest: packet.validationSet.digest,
+      },
+    )).toMatchObject({
+      ok: false,
+      error: { code: "cas_conflict" },
+    });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM ticket_proposal_validation_receipts`,
+    ).get()).toEqual({ count: 2 });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM ticket_proposal_authority_decisions`,
+    ).get()).toEqual({ count: 0 });
   });
 
   it("rolls back validation evidence when its operation receipt cannot persist", () => {

@@ -130,14 +130,14 @@ describe("KnowledgeService canonical boundary",()=>{
 
   it("rejects oversized unknown-operation input before hashing or receipting",()=>{
     const request={...ctx,requestId:"unknown-oversized"};
-    expect(dispatch.dispatch("ticket.proposal.apply",request,{
+    expect(dispatch.dispatch("ticket.proposal.future-unknown",request,{
       value:"x".repeat(UNKNOWN_OPERATION_INPUT_MAX_BYTES),
     })).toMatchObject({
       ok:false,
       error:{
         code:"validation_error",
         details:{
-          operation:"ticket.proposal.apply",
+          operation:"ticket.proposal.future-unknown",
           maximumBytes:UNKNOWN_OPERATION_INPUT_MAX_BYTES,
         },
       },

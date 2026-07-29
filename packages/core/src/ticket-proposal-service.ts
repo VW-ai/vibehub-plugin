@@ -69,6 +69,84 @@ export interface TicketProposalSubmitContextV0 {
 }
 
 /**
+ * Reconstruct the complete candidate represented by one immutable proposal.
+ *
+ * Application authority is intentionally outside this helper. It only
+ * replays already-materialized changes against the exact observed base and
+ * rechecks the candidate digest that validators and authority decisions bind.
+ */
+export function reconstructTicketProposalCandidateV0(
+  currentDefinitions: ReadonlyArray<GitTicketDefinitionRevisionV0>,
+  proposal: TicketGraphChangeProposalV0,
+): GitTicketDefinitionRevisionV0[] {
+  const currentById = new Map(currentDefinitions.map((definition) => [
+    definition.ticketId,
+    definition,
+  ]));
+  const candidateById = new Map(currentDefinitions.map((definition) => [
+    definition.ticketId,
+    definition,
+  ]));
+  for (const change of proposal.changes) {
+    const materialized = proposalGitDefinition(change.definition);
+    if (change.op === "create") {
+      if (currentById.has(change.ticketId)
+        || materialized.definitionRevision !== 1) {
+        throw conflict(
+          "a proposed Ticket creation no longer targets an absent identity",
+          { ticketId: change.ticketId },
+        );
+      }
+      candidateById.set(change.ticketId, materialized);
+      continue;
+    }
+    const current = currentById.get(change.ticketId);
+    if (current === undefined
+      || current.definitionRevision !== change.expectedDefinitionRevision
+      || current.outcome !== change.previousOutcome
+      || current.parentId !== change.previousParentId) {
+      throw conflict(
+        "a proposed Ticket revision no longer matches its exact base",
+        {
+          ticketId: change.ticketId,
+          expectedDefinitionRevision: change.expectedDefinitionRevision,
+          actualDefinitionRevision: current?.definitionRevision ?? null,
+        },
+      );
+    }
+    candidateById.set(change.ticketId, materialized);
+  }
+  const candidate = [...candidateById.values()]
+    .sort((left, right) =>
+      compareGitTicketCanonicalTextV0(left.ticketId, right.ticketId));
+  validateGitTicketRevisionTransitionV0(
+    [...currentDefinitions],
+    candidate,
+  );
+  const actualCandidateDigest = ticketProposalCandidateDigestV0(candidate);
+  if (actualCandidateDigest !== proposal.mechanicalReview.candidateDigest) {
+    throw corruptLedger(
+      "the materialized Ticket proposal candidate digest is inconsistent",
+      {
+        proposalId: proposal.proposalId,
+        expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
+        actualCandidateDigest,
+      },
+    );
+  }
+  return candidate;
+}
+
+export function ticketProposalCandidateDigestV0(
+  definitions: ReadonlyArray<GitTicketDefinitionRevisionV0>,
+): string {
+  return ticketProposalDomainDigestV0(
+    "vibehub.ticket-proposal-candidate.v1",
+    definitions,
+  );
+}
+
+/**
  * Records immutable review contributions without mutating the Ticket graph.
  *
  * The service performs mechanical preparation against one exact graph head so
@@ -293,8 +371,35 @@ export class TicketProposalServiceV0 {
         ["Re-inspect the proposal and record a new validation request."],
       );
     }
-    this.assertValidationSubjects(proposal, parsed);
     const scopeRef = proposalScopeRef(scope);
+    const authorityDecision = this.db.prepare(
+      `SELECT authority_decision_id authorityDecisionId,disposition
+       FROM ticket_proposal_authority_decisions
+       WHERE repo_id=? AND scope_ref=? AND proposal_id=?`,
+    ).get(
+      scope.repoId,
+      scopeRef,
+      proposal.proposalId,
+    ) as {
+      authorityDecisionId: string;
+      disposition: string;
+    } | undefined;
+    if (authorityDecision !== undefined) {
+      throw new KnowledgeError(
+        "invalid_state_transition",
+        "the proposal validation ledger is closed after its authority decision",
+        {
+          proposalId: proposal.proposalId,
+          authorityDecisionId: authorityDecision.authorityDecisionId,
+          disposition: authorityDecision.disposition,
+        },
+        [
+          "Inspect the existing authority decision.",
+          "Submit a new graph-change proposal if new validation evidence changes the candidate.",
+        ],
+      );
+    }
+    this.assertValidationSubjects(proposal, parsed);
     const validationReceiptId = `tpv-${domainDigest(
       "vibehub.ticket-proposal-validation-id.v1",
       { scopeRef, requestId: context.requestId },
@@ -1828,12 +1933,21 @@ function assertUnique(values: readonly string[], label: string): void {
 }
 
 function proposalScopeRef(scope: TicketProposalRepositoryScopeV0): string {
-  return `tps-${domainDigest("vibehub.ticket-proposal-scope.v1", {
+  return ticketProposalScopeRefV0(scope);
+}
+
+export function ticketProposalScopeRefV0(
+  scope: TicketProposalRepositoryScopeV0,
+): string {
+  return `tps-${ticketProposalDomainDigestV0(
+    "vibehub.ticket-proposal-scope.v1",
+    {
     repoId: scope.repoId,
     repositoryRoot: scope.repositoryRoot,
     worktreeRoot: scope.worktreeRoot,
     repositoryIncarnation: scope.repositoryIncarnation,
-  })}`;
+    },
+  )}`;
 }
 
 function proposalDigest(value: unknown): string {
@@ -1841,11 +1955,38 @@ function proposalDigest(value: unknown): string {
 }
 
 function domainDigest(domain: string, value: unknown): string {
+  return ticketProposalDomainDigestV0(domain, value);
+}
+
+export function ticketProposalDomainDigestV0(
+  domain: string,
+  value: unknown,
+): string {
   return crypto.createHash("sha256")
     .update(domain)
     .update("\0")
     .update(serializeGitTicketStoreDocumentV0(value))
     .digest("hex");
+}
+
+function proposalGitDefinition(
+  definition: TicketProposalMaterializedDefinitionV0,
+): GitTicketDefinitionRevisionV0 {
+  const {
+    trust: _trust,
+    ...created
+  } = definition.created;
+  return {
+    schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+    kind: "ticket_definition_revision",
+    ticketId: definition.ticketId,
+    definitionRevision: definition.definitionRevision,
+    created,
+    outcome: definition.outcome,
+    parentId: definition.parentId,
+    dependsOn: definition.dependsOn.map((dependency) => ({ ...dependency })),
+    provenanceRefs: [...definition.provenanceRefs],
+  };
 }
 
 function conflict(message: string, details: unknown): KnowledgeError {

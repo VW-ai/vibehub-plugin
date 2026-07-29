@@ -4,28 +4,27 @@ state: active
 intent:
   summary: "重点就是我们人看 Ticket，看的就是：这个执行完了，可以去执行哪一个了。"
   detail: |
-    **Resolution status**: Active for the read projection, immutable
-    submit-only proposal contribution, bounded proposal queries, and immutable
-    proposal-validation evidence. Proposal application and trusted GateDecision
-    recording remain explicitly blocked.
+    **Resolution status**: Active for the read projection, immutable proposal
+    contribution/query, immutable proposal-validation evidence, derived proposal
+    review, trusted host authority decisions, and fenced Git application.
+    Generic GateDecision recording remains a separate contract.
 
     `V0` names the product/contract maturity of this slice. The wire DTOs use
     integer `schemaVersion: 1`; these version axes are independent.
 
     This contract freezes the smallest coherent Core surface required by the
     accepted Ticket Review Surface: three graph reads, immutable proposal
-    contribution/query operations, and an append-only proposal-validation
-    ledger that cannot mutate the graph. It does not decide proposal
-    application, Context Binding, Closeout, trusted human authority, or storage
-    beyond the definition/topology authority and immutable proposal/validation
-    logs.
+    contribution/query operations, an append-only proposal-validation ledger,
+    trusted authority resolution, and crash-reconcilable application. It does
+    not decide Context Binding, Closeout, generic GateDecision recording,
+    complete Ticket definition storage, or the trusted host UI.
 
     **One shared read spine**
 
     The packaged Ticket wrapper, CLI, and MCP now converge on the existing
     Core OperationDispatcher. Adapters do not own alternative semantics or
-    persistence. Ticket semantic Skills remain a separate future intelligence
-    layer. A future browser host uses a thin bridge rather than calling an
+    persistence. Ticket semantic Skills remain a separate intelligence layer.
+    A future browser host uses a thin bridge rather than calling an
     in-process library or store directly.
 
     The first three read responsibilities and operation names are:
@@ -49,6 +48,16 @@ intent:
 
     - `ticket.proposal.submit`: append one immutable comment or graph-change
       review contribution without changing the Ticket Graph.
+
+    The proposal decision/application responsibilities are also registered:
+
+    - `ticket.proposal.review.inspect`: bind the complete validation set and
+      derive eligibility plus one next action;
+    - `ticket.proposal.authority.decide`: ask a host-injected trusted provider
+      for one immutable decision over the exact proposal/candidate/set;
+    - `ticket.proposal.apply`: persist an immutable application intent, publish
+      its exact complete candidate under a Git fence, and record one terminal
+      application receipt.
 
     The App bridge remains future work.
 
@@ -187,12 +196,12 @@ intent:
     Submission never invokes the internal Git generation publisher, so a successful submit cannot alter
     `.vibehub/ticket-store/`.
 
-    `ticket.gate.decision.record` still waits for a trusted host principal and
-    authority resolver. `ticket.proposal.apply` remains unregistered until it
-    can require independent validation, trusted delegation or human authority,
-    target-level and publication-head CAS, complete candidate validation, and a
-    crash-consistent GraphMutation/ApplicationReceipt across the SQLite and Git
-    commit boundaries.
+    Generic `ticket.gate.decision.record` still waits for its own gate-subject
+    contract. Proposal-specific authority and application now use the three
+    registered operations above. Public JSON binds immutable digests only; it
+    cannot contain a trusted principal, disposition, authority assertion, or
+    provider result. Those values enter Core only through a non-serializable
+    `TrustedTicketProposalAuthorityProviderV0` injected by a trusted host.
 
     Neither command may write status, maturity, progress, completion, Scenario
     CRUD, layout, raw JSON Patch, per-edge CRUD, or persistence directly.
@@ -293,20 +302,62 @@ intent:
     The proposal-ledger extension freezes bounded proposal inspect/list,
     proposal-validation record/list/inspect, and the independent
     `vibehub-ticket-validate` semantic intelligence boundary. Its implementation
-    must preserve the immutable ledger, claimed-unverified evidence, and
+    preserves the immutable ledger, claimed-unverified evidence, and
     no-current/latest rules above.
 
-    The read operations and internal outline publisher remain unchanged. App
-    integration, proposal application, trusted GateDecision recording,
+    The authority/application extension adds browser-safe contracts and strict
+    schemas for review, authority decision, immutable intent, and application
+    receipt; one Core service behind the dispatcher; three SQLite immutable
+    ledgers; and a fenced internal publisher path. Authority binds the complete
+    validation set by digest, high-water sequence, and count. An authorized
+    decision cites at least one exact passing validation without a blocking
+    finding; contrary receipts remain part of the bound set. Recording a
+    decision closes further validation for that proposal.
+
+    Core derives the required path conservatively. Bootstrap, expansion,
+    author-declared human gates, or any protected authority signal requires a
+    host-authenticated human and human-authority basis. Only non-protected
+    elaboration/decomposition may use a trusted delegation basis. Provider
+    assessment can strengthen but never downgrade proposal change class or
+    erase authority signals.
+
+    Application stores the exact candidate definitions and deterministic
+    publication facts before entering Git. Its writer-lock fence binds the
+    application intent ID, intent digest, and candidate snapshot and remains
+    held until the immutable SQLite application receipt commits. If Git
+    publication succeeded but receipt insertion failed, retry adopts only that
+    exact fence: current candidate records `reconciled`, original base resumes
+    publication, and any malformed or foreign fence or third head fails closed.
+    The operational lock directory lives in the worktree-specific Git
+    administration path. Release claims exact `owner-T` as `releasing-T`,
+    unlinks only that marker, then removes the canonical directory only if still
+    empty. A successor's nonempty `owner-U` makes stale removal fail harmlessly;
+    crash-empty state can be removed or atomically replaced. Completed-receipt
+    cleanup additionally verifies that the canonical Git head equals the
+    candidate before touching the exact owner or releasing marker. Successful
+    domain receipts make replay idempotent; failed authority/apply operation
+    outcomes are not cached as terminal receipts so changed trusted-host or
+    recovery conditions can be retried.
+
+    Default CLI/MCP construction passes no trusted authority provider. The
+    operations are visible, but a caller-selected actor cannot authorize
+    bootstrap or any protected change; authority resolution fails closed with
+    `trusted_authority_unavailable`. The `vibehub-ticket-apply` Skill follows
+    the derived next action, keeps caller identity separate from authority,
+    retries exact interrupted applications, and stops at an unavailable trusted
+    boundary rather than fabricating a principal or disposition. App
+    decision-surface integration,
     Ticket-readiness validation/currentness, complete Ticket definition
-    storage, and trusted human authority wait for the delegated decisions
-    above.
+    storage, generic GateDecision recording, and the wider execution lifecycle
+    remain open.
 
     The representative shapes, error boundary, exclusions, and acceptance tests
     are preserved in
     `artifacts/2026-07-28-ticket-review-operation-contract.md`; the proposal
     query/validation extension is preserved in
-    `artifacts/2026-07-29-proposal-query-validation-ledger.md`.
+    `artifacts/2026-07-29-proposal-query-validation-ledger.md`; authority and
+    application are preserved in
+    `artifacts/2026-07-29-ticket-proposal-application-runtime.md`.
 
     **Claimed**: Codex 2026-07-28
 constraints:
@@ -333,7 +384,7 @@ constraints:
   - kind: must
     rule: "The supported project graph is complete before presentation, and unsupported size fails explicitly rather than returning a silent partial graph"
   - kind: must
-    rule: "Current actor values provide claimed attribution only until a trusted principal and authority resolver are defined"
+    rule: "Current actor values always provide claimed attribution only; trusted proposal authority enters Core exclusively through a non-serializable host-injected provider"
   - kind: must
     rule: "ticket.proposal.submit binds exact snapshot and target preconditions, lets Core generate identity/revision/time/provenance fields, and commits the immutable proposal with its operation receipt in one SQLite transaction"
   - kind: must
@@ -354,20 +405,30 @@ constraints:
     rule: "Proposal semantic validation reads required existing Ticket and relation context at the exact observedSnapshotId, uses relationRef for retained-edge or changed-existing-relation evidence, never substitutes latest, and records missing context as inconclusive"
   - kind: must
     rule: "Contrary proposal-validation contributions coexist; V0 selects no current, latest, winning, superseding, revoked, or authoritative receipt"
+  - kind: must
+    rule: "ticket.proposal.review.inspect binds the complete validation ledger by digest/high-water/count and derives one eligibility/next action without mutable proposal status"
+  - kind: must
+    rule: "ticket.proposal.authority.decide accepts only immutable caller bindings and records a terminal decision returned by a host-injected trusted provider over the exact proposal, candidate, and complete validation set"
+  - kind: must
+    rule: "Bootstrap, expansion, introduced human gates, and any protected authority signal require a host-authenticated human authority basis; delegated policy is limited to non-protected elaboration/decomposition"
+  - kind: must
+    rule: "An authorized decision cites at least one exact passing non-blocking validation and closes further validation while preserving contrary receipts in the bound set"
+  - kind: must
+    rule: "ticket.proposal.apply persists an immutable exact-candidate intent before fenced Git publication and releases the exact writer fence only after the immutable application receipt commits"
+  - kind: must
+    rule: "Application retry adopts only the identical intent fence: current candidate reconciles, original base resumes, malformed or foreign fences and third heads fail closed, and completed-fence cleanup verifies the canonical head equals the candidate"
   - kind: must_not
     rule: "Do not expose writable status, maturity, progress, Scenario CRUD, layout state, raw JSON Patch, per-edge CRUD, generic completion, or direct persistence access"
   - kind: must_not
-    rule: "Do not register proposal application or GateDecision recording before semantic validation, target CAS, trusted authority, and crash-consistent receipt semantics make them implementable"
+    rule: "Do not claim App integration, capability-receipt currentness, generic GateDecision recording, or trusted human authority from operation registration or caller identity"
   - kind: must_not
-    rule: "Do not claim App integration, Ticket graph writer authority, proposal application, capability-receipt currentness, or trusted human authority from submit-only proposal persistence"
-  - kind: must_not
-    rule: "Do not let claimed_unverified proposal validation derive Ticket maturity/readiness, grant authority, satisfy a GateDecision, authorize application, mutate the graph, invoke the Git publisher, or register an apply operation"
+    rule: "Do not let claimed_unverified proposal validation by itself derive Ticket maturity/readiness, grant authority, satisfy a GateDecision, authorize application, mutate the graph, or invoke the Git publisher"
 indexing:
   type: contract
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [ticket, core, read-model, projection, proposal, validation-ledger, review-surface, cli, mcp]
+  tags: [ticket, core, read-model, projection, proposal, validation-ledger, trusted-authority, fenced-application, review-surface, cli, mcp]
 provenance:
   source_type: chat_extraction
   confidence: 0.9
@@ -386,7 +447,7 @@ relations:
     detail: "Preserves stable Ticket identity and separates definitions from derived Runtime projections."
   - target: "decision-ticket-graph-lifecycle-001"
     type: relates_to
-    detail: "Exact proposal target binding is frozen here; graph application, durable relation identity, and mutation receipts remain delegated."
+    detail: "Exact proposal binding, trusted authority, and fenced additive/revision application are frozen here; durable relation identity and explicit removal/supersession remain delegated."
   - target: "decision-ticket-context-binding-001"
     type: relates_to
     detail: "Context is an unavailable-or-receipted capability slot until binding and drift semantics are resolved."
@@ -400,9 +461,14 @@ anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-operation-contract.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html"
   - file: "skills/vibehub-ticket-validate/SKILL.md"
+  - file: "skills/vibehub-ticket-apply/SKILL.md"
   - file: "packages/core/src/contract/ticket-proposal.ts"
+  - file: "packages/core/src/contract/ticket-application.ts"
+  - file: "packages/core/src/contract/ticket-application-schemas.ts"
+  - file: "packages/core/src/ticket-application-service.ts"
   - file: "packages/core/src/ticket-proposal-service.ts"
   - file: "packages/core/src/operation-contracts.ts"
   - file: "packages/core/src/operation-dispatcher.ts"
@@ -413,6 +479,7 @@ anchors:
   - file: "packages/core/test/git-ticket-store.test.ts"
   - file: "packages/core/test/ticket-operation-dispatcher.test.ts"
   - file: "packages/core/test/ticket-proposal-service.test.ts"
+  - file: "packages/core/test/ticket-application-contract.test.ts"
   - file: "packages/cli/src/main.ts"
   - file: "packages/cli/test/ticket-cli.test.ts"
   - file: "packages/mcp/src/server.ts"

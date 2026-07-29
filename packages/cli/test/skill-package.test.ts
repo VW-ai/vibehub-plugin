@@ -11,7 +11,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-validate"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-validate","vibehub-ticket-apply"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -19,7 +19,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
-    expect(entry).toHaveLength(8);
+    expect(entry).toHaveLength(9);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -121,8 +121,10 @@ describe("production skill package",()=>{
     expect(operations).toContain("`kb.anchors`");
     expect(operations).toContain("`distill.baseline.get`");
     expect(operations).toContain("`distill.version.get`");
-    expect(read("scripts/_dispatch.mjs"))
-      .not.toContain('"proposal.apply"');
+    const dispatch=read("scripts/_dispatch.mjs");
+    expect(dispatch).toContain('"proposal.review.inspect"');
+    expect(dispatch).toContain('"proposal.authority.decide"');
+    expect(dispatch).toContain('"proposal.apply"');
 
     const query=read("vibehub-query/SKILL.md");
     expect(query).toContain("`kb.status` plus paginated `kb.spec.search`");
@@ -160,6 +162,18 @@ describe("production skill package",()=>{
     expect(skill).toContain(validatorDigest);
     expect(skill).toContain(policyDigest);
     expect(skill).toContain("Do not substitute fixture hashes");
+  });
+
+  it("packages the Ticket authority/application intelligence",()=>{
+    const skill=fs.readFileSync(
+      path.join(skills,"vibehub-ticket-apply","SKILL.md"),
+      "utf8",
+    );
+    expect(skill).toContain("proposal.review.inspect");
+    expect(skill).toContain("`ticket.proposal.authority.decide`");
+    expect(skill).toContain("`ticket.proposal.apply`");
+    expect(skill).toContain("A trusted host provider supplies");
+    expect(skill).toContain("Never add authority claims to input");
   });
 
   it("pins the setup workflow, activation proof, and presentation invariants",()=>{

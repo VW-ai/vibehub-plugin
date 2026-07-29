@@ -13,6 +13,8 @@
   [`artifacts/2026-07-29-ticket-proposal-authority-contract.md`](artifacts/2026-07-29-ticket-proposal-authority-contract.md)
 - **Proposal query and validation ledger contract**:
   [`artifacts/2026-07-29-proposal-query-validation-ledger.md`](artifacts/2026-07-29-proposal-query-validation-ledger.md)
+- **Trusted authority and application runtime**:
+  [`artifacts/2026-07-29-ticket-proposal-application-runtime.md`](artifacts/2026-07-29-ticket-proposal-application-runtime.md)
 - **Artifact policy**:
   [`specs/convention-ticket-runtime-artifacts-001.yaml`](specs/convention-ticket-runtime-artifacts-001.yaml)
 
@@ -73,15 +75,15 @@ belong in active Decision Tickets explicitly tagged `open`.
   topology now use an independent Git-native `.vibehub/ticket-store/` read
   authority. Immutable generations retain exact review snapshots; SQLite and
   META/Task/prototype data are not fallback Ticket definition authorities. A
-  Core-owned, authority-neutral whole-generation publisher freezes
-  worktree-local writer locking, expected-snapshot CAS, immutable installation,
-  and atomic visibility publication. SQLite now separately owns immutable
-  submitted review contributions and proposal-validation evidence committed
-  with their operation receipts; it does not become a Ticket Graph authority.
-  Proposal/validation reads are bounded Core operations, contrary validations
-  coexist without current/latest selection, and direct SQLite access remains
-  forbidden. Proposal application, complete definition storage, retention/GC,
-  and the remaining runtime fact authorities stay open.
+  Core-owned whole-generation publisher now has a fenced application path:
+  worktree-specific Git-admin writer arbitration, expected-snapshot CAS,
+  immutable installation, atomic visibility publication, and exact-intent
+  reconciliation. SQLite owns
+  immutable proposals, validation evidence, trusted authority decisions,
+  application intents, and terminal application receipts without becoming a
+  Ticket Graph definition authority. The Git writer fence remains held until
+  the matching SQLite application receipt commits. Complete definition
+  storage, retention/GC, and the remaining runtime fact authorities stay open.
 - [decision-ticket-graph-lifecycle-001] (active, partially resolved) The V0
   default review graph is the latest published complete generation in the
   verified worktree. Exact generation reads are immutable and retained. The
@@ -90,15 +92,20 @@ belong in active Decision Tickets explicitly tagged `open`.
   proposals are now immutable review contributions with exact snapshot/target
   binding and Core-generated materialization, but never mutate the graph.
   Proposal-specific semantic evidence is append-only, candidate-bound, and
-  never Ticket readiness, authority, or application. Proposal application,
-  partial planning frontiers, and execution lifecycle stay open.
+  never Ticket readiness or authority by itself. Trusted host authority can now
+  bind the complete validation ledger and authorize the exact candidate;
+  application persists an immutable intent, publishes through a fenced Git
+  CAS, and records a terminal published/reconciled receipt. Partial planning
+  frontiers, explicit removal/supersession, and execution lifecycle stay open.
 - [decision-ticket-mvp-001] (active, partially resolved) The contract-first
   dogfood slice now covers canonical Ticket reads, immutable proposal
-  submission/query, and independent proposal-validation evidence through one
-  Core/CLI/MCP spine plus a dedicated Skill. It deliberately stops before
-  proposal application, trusted GateDecision recording, Ticket-readiness
-  validation/currentness, context compilation, Run/Outcome writers, and
-  semantic closeout.
+  submission/query, independent proposal-validation evidence, proposal review,
+  trusted authority resolution, and crash-reconcilable application through one
+  Core/CLI/MCP spine. Default CLI/MCP callers cannot mint authority: bootstrap
+  and every protected boundary remain blocked until a trusted host injects an
+  authenticated human authority provider. Ticket-readiness
+  validation/currentness, generic GateDecision recording, context compilation,
+  Run/Outcome writers, and semantic closeout remain open.
 
 ## Contracts
 
@@ -122,8 +129,14 @@ belong in active Decision Tickets explicitly tagged `open`.
   observed snapshot, including existing relationship evidence by
   `relationRef`; it never substitutes latest. Multiple contrary records
   coexist; none is current, latest, Ticket readiness, authority, GateDecision,
-  application, or graph mutation. Proposal application and GateDecision
-  recording stay blocked.
+  application, or graph mutation by itself. Three further bounded operations
+  are now registered: `ticket.proposal.review.inspect`,
+  `ticket.proposal.authority.decide`, and `ticket.proposal.apply`. Review
+  exposes the exact validation-set digest and next required action. Authority
+  decisions can only come from a non-serializable trusted provider injected by
+  the host. Application input binds the exact authorized proposal, candidate,
+  and decision; Core creates and persists the immutable intent internally.
+  Generic GateDecision recording remains separate.
 
 ## Planning conventions
 
@@ -150,8 +163,8 @@ These questions are currently unblocked:
   graph with directional fog beyond blocker Tickets, rather than fabricated
   downstream Tickets.
 - Storage beyond the definition/topology authority and immutable
-  proposal/validation logs remains blocked on graph application, closeout, and
-  runtime-fact semantics.
+  proposal/validation/authority/application facts remains blocked on complete
+  Ticket definitions, closeout, and runtime-fact semantics.
 - The full dogfood implementation loop depends on the preceding contracts; it
   must not become the place where unresolved ontology is accidentally decided
   in code.
@@ -217,17 +230,66 @@ substitution. It records one `claimed_unverified`,
 `validation_evidence_only` contribution with no maturity effect, authority,
 application authorization, or graph mutation.
 
+The authority/application slice adds three registered operations:
+`ticket.proposal.review.inspect`,
+`ticket.proposal.authority.decide`, and `ticket.proposal.apply`. Review returns
+one proposal, the complete bounded validation ledger binding
+(`digest`, high-water sequence, and count), any terminal authority decision and
+application receipt, plus one derived eligibility/next action. Authority
+decision input contains schema version, proposal ID, and immutable expected
+proposal/candidate/validation-set digests only. The caller's actor and JSON
+input never contain a principal, disposition, or authority proof; Core accepts
+those only from a host-injected
+`TrustedTicketProposalAuthorityProviderV0`. Bootstrap, expansion, a declared
+human gate, or any protected authority signal requires an authenticated human
+authority basis. Non-protected elaboration/decomposition may use a trusted
+delegation basis. An authorized decision must cite at least one exact passing,
+non-blocking validation receipt, while contrary evidence remains bound in the
+complete set. Recording the immutable decision closes that proposal's
+validation ledger.
+
+The packaged `vibehub-ticket-apply` Skill is the thin intelligence layer over
+those operations. It follows the derived next action, invokes independent
+validation when needed, retries an exact interrupted application, and stops at
+an unavailable trusted-authority boundary. It never turns caller identity or
+conversation approval into an authority proof.
+
+Application first records an immutable intent containing the exact authorized
+candidate generation, base snapshot, candidate snapshot, and publication
+counts. Core then enters the Git publisher under a durable fence derived from
+that intent. The operational lock is an untracked directory in the
+worktree-specific Git administration path, installed by atomic rename from a
+fully written, nonempty staging directory. The writer fence is released only
+after the
+immutable SQLite application receipt commits: release first claims the exact
+`owner-T` marker to `releasing-T`, unlinks only that token-specific marker, then
+removes the canonical directory only if it is still empty. A successor's
+nonempty `owner-U` makes a stale removal fail harmlessly; a crash-empty
+canonical directory can be removed or atomically replaced by staged
+acquisition. If Git visibility advanced but receipt insertion did not, retry
+adopts only the byte-identical fence: current equals candidate reconciles,
+current equals base resumes publication, and every malformed or foreign fence
+or third head fails closed. Cleanup after an already-committed receipt is
+permitted only for the exact fence after verifying the canonical Git head
+equals its candidate. Successful receipts distinguish `published` from
+`reconciled`. Authority/application failures are not cached as terminal
+operation failures, so a later trusted-host or exact recovery retry can
+proceed; immutable domain receipts still make successful replay idempotent.
+
 Capability and trace inventories are currently empty rather than fabricated.
 META Specs, legacy Task rows, and v4 reference artifacts remain explicitly
 ineligible as production Ticket facts. The Core storage-level compiler and
 generation publisher described in
 `artifacts/2026-07-28-ticket-generation-publisher-contract.md` are now
-implemented and tested. They remain outside the package root and operation
-registry, so they cannot bypass future proposal application or authority. App
-bridge work, proposal application, trusted GateDecision recording,
-Ticket-readiness validation/currentness, application receipts,
-current-capability selection, receipt/blob quotas and retention/GC, and trusted
-human authority are the next gates.
+implemented and tested. The low-level publisher remains outside the package
+root and operation registry; only Core's authorized application service may
+invoke its fenced path. The three authority/application operations are exposed
+through Core/CLI/MCP, but ordinary CLI/MCP construction injects no authority
+provider. It can inspect review state and request apply, but it cannot authorize
+bootstrap or a protected change by claiming a human actor. A trusted browser or
+other host decision bridge, Ticket-readiness validation/currentness,
+current-capability selection, receipt/blob quotas and retention/GC, complete
+definition storage, and the wider Run/Outcome loop are the next gates.
 
 ## Not yet specified (wayfind)
 

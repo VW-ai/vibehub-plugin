@@ -8,15 +8,15 @@ integer `schemaVersion: 1`; these are separate version axes and clients must not
 derive either value from the other.
 
 This artifact translates the accepted Ticket Review Surface into the smallest
-Core read surface that can be frozen before graph mutation, Context Binding,
-Closeout, trusted principal authority, and storage beyond the read bootstrap
-are resolved.
+Core surface that can be frozen while Context Binding, Closeout, complete
+Ticket definitions, and the wider execution lifecycle remain unresolved.
 
 It also preserves the two product-level write intents exposed by the prototype:
 comment/suggest change and record an authorized direction. The first is now
 frozen as the submit-only immutable contribution defined in
-`2026-07-29-ticket-proposal-authority-contract.md`; proposal application and
-authorized direction recording remain blocked.
+`2026-07-29-ticket-proposal-authority-contract.md`; proposal-specific trusted
+authority and fenced application are implemented by
+`2026-07-29-ticket-proposal-application-runtime.md`.
 
 A red-team pass rejected an earlier five-operation draft because it assumed one
 global graph revision, treated caller-selected `actor` as trusted authority,
@@ -472,18 +472,23 @@ The caller actor and authorAssessment are untrusted claims. Independent machine
 validation and trusted human authority remain separate. Technical difficulty
 alone is not a human gate.
 
-`ticket.proposal.apply` remains blocked until semantic validation, trusted
-authority/delegation, target and publication CAS, and a crash-consistent
-GraphMutation/ApplicationReceipt compose across SQLite and Git.
+`ticket.proposal.review.inspect`, `ticket.proposal.authority.decide`, and
+`ticket.proposal.apply` now compose semantic validation, trusted
+authority/delegation, target and publication CAS, immutable intent, and a
+crash-reconcilable application receipt across SQLite and Git.
 
-Before GateDecision recording can be frozen:
+Proposal-specific authority now requires:
 
-- a host must supply a trusted principal rather than caller-selected `actor`;
-- an authority resolver must prove that principal may decide the named gate;
-- the Gate revision must declare the decision payload schema and required
-  authority evidence;
-- CAS must bind the gate/authority subject chosen by the gate contract, not an
-  assumed global graph revision.
+- a host-injected non-serializable provider supplying a trusted principal rather
+  than caller-selected `actor`;
+- a human-authority basis for bootstrap, expansion, introduced human gates, or
+  protected signals, and a trusted delegation basis only for non-protected
+  elaboration/decomposition;
+- the exact proposal/candidate and complete validation-set digest;
+- a passing, non-blocking accepted validation receipt;
+- an immutable application intent plus fenced publication and terminal receipt.
+
+Generic GateDecision recording for arbitrary gate subjects remains separate.
 
 Neither action directly writes status, maturity, progress, or completion.
 
@@ -506,8 +511,11 @@ The read slice adds only:
 `projection_invariant_failed` includes a typed cause. A direct-unlock cycle is
 one possible cause; layout must never conceal it. CLI exit classes are now
 fixed by the shared operation contract. Proposal submission reuses the shared
-validation, not-found, CAS/idempotency, and storage error boundary. Application
-authority, supersession, and cross-store commit errors stay unresolved.
+validation, not-found, CAS/idempotency, and storage error boundary. Authority
+and application add `trusted_authority_unavailable`,
+`authority_proof_invalid`, `authority_required`, `authority_conflict`,
+`application_in_progress`, and `application_recovery_required`. Explicit
+removal/supersession stays unresolved.
 
 ## Explicit exclusions
 
@@ -551,13 +559,23 @@ Safe and implemented now:
 12. browser-safe proposal DTOs, exact target preconditions, deterministic Core
     materialization, complete-candidate mechanical review, and immutable
     proposal persistence committed with the operation receipt;
-13. packaged wrapper, CLI, and MCP parity for `ticket.proposal.submit`.
+13. packaged wrapper, CLI, and MCP parity for proposal submit/query/validation;
+14. review packets bound to the complete validation-set
+    digest/high-water/count;
+15. host-injected trusted authority decisions with conservative protected-path
+    routing and terminal validation-ledger closure;
+16. immutable exact-candidate application intents, fenced Git publication, and
+    terminal `published`/`reconciled` receipts;
+17. recovery tests proving a Git-visible/SQLite-receipt failure retains the
+    exact fence and an exact retry reconciles before releasing it, plus
+    post-receipt cleanup that verifies the canonical head equals the candidate
+    before claiming only that completed fence.
 
 Not safe yet:
 
-- proposal application or trusted GateDecision recording;
-- public graph-writer authority and semantic application CAS (the separate
-  internal outline publication-head CAS is not an application authority);
+- a trusted browser/desktop human decision surface or generic GateDecision
+  recording;
+- explicit remove/supersede/cancel/split/merge/prune application;
 - current capability/trace selection from durable receipts;
 - App bridge and CLI/MCP/App parity;
 - relation mutation/CAS, arbitrary historical enumeration, or reads by a
@@ -566,8 +584,10 @@ Not safe yet:
 - quotas and retention/GC for request rows and distinct outcome blobs, plus
   remaining Plan/Run/Outcome/Event authority.
 
-No App bridge, writer authority, mutation CAS, trusted human principal, or
-capability-currentness resolver is claimed by this contract slice.
+No App decision bridge, generic GateDecision authority, or
+capability-currentness resolver is claimed by this contract slice. A trusted
+principal is available only when a host explicitly injects the provider;
+default CLI/MCP does not.
 
 ## Acceptance tests for the executable slice
 
@@ -580,7 +600,21 @@ capability-currentness resolver is claimed by this contract slice.
   candidate;
 - caller actor and authorAssessment never authorize application, and technical
   difficulty is not classified as a human gate;
-- no public proposal application or Git publisher operation is registered;
+- the three proposal review/authority/application operations are registered,
+  while the low-level Git publisher remains internal;
+- default CLI/MCP without a trusted provider fails authority resolution closed;
+- bootstrap/protected proposals require a host-authenticated human authority
+  basis, while delegated policy is limited to non-protected
+  elaboration/decomposition;
+- an authorized decision binds the complete validation set, cites one exact
+  passing non-blocking receipt, and closes further validation;
+- application persists the exact candidate intent before Git, retains the
+  matching writer fence until the SQLite receipt commits, and reconciles a
+  Git-visible/receipt-missing retry without accepting malformed or foreign
+  lock state or a third head;
+- completed-receipt cleanup verifies the canonical Git head equals the
+  candidate, claims exact `owner-T` as `releasing-T`, unlinks only that marker,
+  and removes the canonical directory only if it remains empty;
 
 - the v4 fixture projects 29 Tickets and 35 direct-unlock relations;
 - identical resolver-selected facts, `currentCapabilityProjections`, snapshot

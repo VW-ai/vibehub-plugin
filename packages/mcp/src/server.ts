@@ -97,7 +97,7 @@ export function createWorkbenchMcpServer(
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
     title: "Dispatch one canonical Ticket operation",
-    description: "Read Ticket review projections, submit or inspect immutable proposal contributions, and record or inspect independent machine-validation receipts through the shared OperationDispatcher. These operations do not apply graph mutations or grant authority.",
+    description: "Read Ticket projections and review packets, record immutable proposals or validation evidence, and invoke the trusted authority/application spine. MCP actor/input fields never mint human authority; authority decisions require a host-injected provider, and apply accepts only the exact immutable authority-decision binding.",
     inputSchema: {
       requestId: logicalRequestId,
       operation: z.enum(TICKET_OPERATION_NAMES),

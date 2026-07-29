@@ -7,5 +7,8 @@ export const OPERATION_INPUT_BYTE_LIMITS = Object.freeze({
   "ticket.proposal.list": 32768,
   "ticket.proposal.validation.record": 1048576,
   "ticket.proposal.validation.inspect": 16384,
-  "ticket.proposal.validation.list": 32768
+  "ticket.proposal.validation.list": 32768,
+  "ticket.proposal.review.inspect": 4096,
+  "ticket.proposal.authority.decide": 65536,
+  "ticket.proposal.apply": 65536
 });

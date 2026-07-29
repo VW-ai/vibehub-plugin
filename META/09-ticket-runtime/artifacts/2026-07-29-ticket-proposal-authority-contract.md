@@ -1,7 +1,9 @@
 # Ticket Proposal Submission Authority Contract V0
 
-Status: active contract for the submit-only review contribution slice governed
-by `decision-ticket-graph-lifecycle-001`,
+Status: active foundational contract for the submit-only review contribution
+slice, extended by
+`2026-07-29-ticket-proposal-application-runtime.md` and governed by
+`decision-ticket-graph-lifecycle-001`,
 `contract-ticket-review-operations-001`, and
 `decision-ticket-storage-001`.
 
@@ -18,22 +20,28 @@ flowchart LR
   Mechanical["Core mechanical review"]
   Proposal["Immutable SQLite proposal + operation receipt"]
   Semantic["Independent proposal validation ledger"]
-  Authority["Future trusted authority resolution"]
-  Apply["Blocked proposal application"]
+  Review["Derived review + complete set binding"]
+  Authority["Host-injected trusted authority"]
+  Apply["Fenced proposal application"]
   Publisher["Internal Git generation publisher"]
 
   Caller -->|"claimed attribution + candidate"| Submit
   Submit --> Mechanical
   Mechanical --> Proposal
   Proposal -->|"separate explicit review"| Semantic
-  Semantic -.-> Authority
-  Authority -.-> Apply
-  Apply -.-> Publisher
+  Proposal --> Review
+  Semantic --> Review
+  Review --> Authority
+  Authority --> Apply
+  Apply --> Publisher
 ```
 
 Solid edges are executable across the submit and proposal-validation ledger
-slices. Validation is a separate explicit action rather than a submit-time
-side effect. Dashed edges remain future work.
+slices and the subsequent trusted-authority/application slice. Validation is a
+separate explicit action rather than a submit-time side effect. This artifact
+continues to define the submission boundary; the authority, intent, fencing,
+and recovery details live in
+`2026-07-29-ticket-proposal-application-runtime.md`.
 
 The proposal has `effect: review_contribution_only` and
 `graphMutationApplied: false`. It is not a Ticket state, draft, approval,
@@ -148,29 +156,32 @@ claimed-unverified proposal/candidate evidence, not Ticket readiness,
 authority, or application. See
 `2026-07-29-proposal-query-validation-ledger.md`.
 
-## Why application remains blocked
+## Application extension now implemented
 
-There is no public `ticket.proposal.apply` operation in this slice. Safe
-application still requires all of the following:
+The required safety boundary is now implemented by three registered Core
+operations:
 
-- an immutable proposal and independent semantic validation receipt;
-- trusted authority/delegation receipts for every protected boundary;
-- exact target-level create-absence and revise-revision preconditions, plus
-  final publication-head CAS;
-- construction and validation of one complete candidate generation;
-- Core-only invocation of the internal generation publisher;
-- immutable GraphMutation/ApplicationReceipt semantics;
-- crash-consistent ordering and reconciliation across SQLite receipts and the
-  Git visibility commit.
+- `ticket.proposal.review.inspect` binds the exact complete validation set and
+  derives eligibility plus one next action;
+- `ticket.proposal.authority.decide` accepts only immutable caller bindings and
+  obtains principal, basis, disposition, and resolved assessment from a
+  non-serializable trusted host provider;
+- `ticket.proposal.apply` persists an immutable exact-candidate intent, invokes
+  the internal publisher under an intent fence, and records a terminal
+  `published` or `reconciled` application receipt before releasing that fence.
 
-Caller claims, machine review of structure, or the publisher's storage CAS
-cannot substitute for those requirements.
+Caller claims, mechanical review, validation evidence by itself, or the
+publisher's storage CAS still cannot substitute for authority. Bootstrap,
+expansion, introduced human gates, and protected signals require a
+host-authenticated human authority basis. Only non-protected
+elaboration/decomposition may use trusted delegation.
 
-The narrowest future unattended application candidate is a machine-validated
-descendant decomposition that stays inside an already delegated ancestor,
-preserves its promise, and introduces no new gate, permission, side effect, or
-risk boundary. Even that policy is not executable until the application
-authority and receipt boundary above exists.
+Default CLI/MCP construction supplies no authority provider, so registration
+does not create a self-approval path. Bootstrap remains blocked with
+`trusted_authority_unavailable` until a trusted host decision bridge injects
+the authenticated human provider. See
+`2026-07-29-ticket-proposal-application-runtime.md` for exact validation-set
+binding and crash recovery.
 
 ## Exclusions
 

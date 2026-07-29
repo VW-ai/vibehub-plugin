@@ -7,8 +7,10 @@ export * from "./contract/workbench-bridge.js";
 export * from "./contract/workflow-receipt.js";
 export * from "./contract/ticket-review.js";
 export * from "./contract/ticket-proposal.js";
+export * from "./contract/ticket-application.js";
 export * from "./contract/ticket-review-schemas.js";
 export * from "./contract/ticket-proposal-schemas.js";
+export * from "./contract/ticket-application-schemas.js";
 export {
   defaultDbPath,
   openDb,

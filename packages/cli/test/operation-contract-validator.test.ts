@@ -260,6 +260,9 @@ describe("packaged operation contract byte budget", () => {
       "ticket.proposal.list",
       "ticket.proposal.validation.inspect",
       "ticket.proposal.validation.list",
+      "ticket.proposal.review.inspect",
+      "ticket.proposal.authority.decide",
+      "ticket.proposal.apply",
     ] as const) {
       const maximum = OPERATION_INPUT_BYTE_LIMITS[operation];
       const rawRead = spawnSync(process.execPath, [
@@ -283,7 +286,7 @@ describe("packaged operation contract byte budget", () => {
     }
   });
 
-  it("freezes every validation subject branch and keeps apply absent", async () => {
+  it("freezes validation subjects and publishes authority/application inputs", async () => {
     const { validateOperationContract } = await import(validatorPath) as {
       validateOperationContract(
         contract: unknown,
@@ -295,9 +298,34 @@ describe("packaged operation contract byte budget", () => {
       "utf8",
     ));
     const operationNames = Object.keys(artifact.operations);
-    expect(operationNames).not.toContain("ticket.proposal.apply");
-    expect(Object.keys(operationInputSchemas))
-      .not.toContain("ticket.proposal.apply");
+    for (const operation of [
+      "ticket.proposal.review.inspect",
+      "ticket.proposal.authority.decide",
+      "ticket.proposal.apply",
+    ]) {
+      expect(operationNames).toContain(operation);
+      expect(Object.keys(operationInputSchemas)).toContain(operation);
+      expect(validateOperationContract(
+        artifact.operations[operation],
+        artifact.operations[operation].fixtures.positive,
+      )).toEqual({ valid: true, errors: [] });
+    }
+    expect(validateOperationContract(
+      artifact.operations["ticket.proposal.authority.decide"],
+      {
+        ...artifact.operations[
+          "ticket.proposal.authority.decide"
+        ].fixtures.positive,
+        disposition: "authorized",
+      },
+    ).valid).toBe(false);
+    expect(validateOperationContract(
+      artifact.operations["ticket.proposal.apply"],
+      {
+        ...artifact.operations["ticket.proposal.apply"].fixtures.positive,
+        authorityGranted: true,
+      },
+    ).valid).toBe(false);
 
     const contract = artifact.operations[
       "ticket.proposal.validation.record"

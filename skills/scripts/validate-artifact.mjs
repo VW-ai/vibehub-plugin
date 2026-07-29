@@ -17,7 +17,7 @@ function report(schema,errors,warnings=[]){const value={valid:errors.length===0,
 const args=process.argv.slice(2); const packageIndex=args.indexOf("--package");
 if(packageIndex>=0){
   const root=path.resolve(args[packageIndex+1]??path.resolve(here,"..")); const errors=[];
-  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-validate"];
+  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-validate","vibehub-ticket-apply"];
   const actualSkills=fs.readdirSync(root,{withFileTypes:true})
     .filter(entry=>entry.name.startsWith("vibehub-")&&entry.isDirectory())
     .map(entry=>entry.name)

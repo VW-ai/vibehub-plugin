@@ -245,10 +245,14 @@ describe("local MCP deterministic capabilities", () => {
         .toContain("ticket.proposal.validation.inspect");
       expect(TICKET_OPERATION_NAMES)
         .toContain("ticket.proposal.validation.list");
-      expect(TICKET_OPERATION_NAMES as readonly string[])
-        .not.toContain("ticket.proposal.apply");
+      expect(TICKET_OPERATION_NAMES)
+        .toContain("ticket.proposal.review.inspect");
+      expect(TICKET_OPERATION_NAMES)
+        .toContain("ticket.proposal.authority.decide");
+      expect(TICKET_OPERATION_NAMES)
+        .toContain("ticket.proposal.apply");
       expect(ticketTool?.description).toMatch(
-        /do not apply graph mutations or grant authority/,
+        /never mint human authority/,
       );
 
       const unsupported = await client.callTool({

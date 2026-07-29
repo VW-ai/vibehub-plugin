@@ -8,8 +8,11 @@ slice governed by `contract-ticket-review-operations-001`,
 ## Boundary
 
 This slice makes immutable proposal contributions and independent semantic
-reviews inspectable. It does not add proposal application, Ticket-readiness
-validation, trusted authority, or a mutable review lifecycle.
+reviews inspectable. By itself it grants no proposal application,
+Ticket-readiness, trusted authority, or mutable review lifecycle. The separate
+trusted authority/application layer consumes this immutable ledger without
+changing those properties; see
+`2026-07-29-ticket-proposal-application-runtime.md`.
 
 The five public operations are:
 
@@ -167,16 +170,22 @@ human approval. Every persisted contribution remains `claimed_unverified` with
 `authorityGranted`, `applicationAuthorized`, and `graphMutationApplied` remain
 false.
 
-## What remains blocked
+## Downstream authority and what remains blocked
 
-This ledger does not unblock `ticket.proposal.apply`. Application still
-requires a separately frozen policy that verifies the relevant semantic
-evidence, trusted delegation or human authority for every protected boundary,
-target and publication-head CAS, complete candidate validation, and
-crash-consistent GraphMutation/ApplicationReceipt ordering across SQLite and
-the Git visibility commit.
+The downstream application policy is now frozen and implemented without
+promoting this ledger into authority. It binds the complete validation set by
+digest/high-water/count, requires one exact passing non-blocking receipt for an
+authorized decision, preserves contrary receipts in the bound set, and obtains
+trusted principal/basis/disposition only from a host-injected provider.
+Application persists an immutable exact-candidate intent and uses an
+intent-fenced Git publication protocol with a terminal `published` or
+`reconciled` SQLite receipt.
 
-Trusted principal establishment, GateDecision recording, validation
-aggregation/currentness, Ticket-readiness ValidationReceipt storage, proposal
-and receipt retention/GC, and the complete Ticket definition authority remain
-separate decisions.
+Default CLI/MCP construction supplies no trusted provider, so bootstrap and
+protected changes still require a trusted host decision bridge; caller actor
+claims cannot grant that authority.
+
+Generic GateDecision recording, validation aggregation/currentness,
+Ticket-readiness ValidationReceipt storage, proposal and receipt retention/GC,
+the complete Ticket definition authority, and the broader execution lifecycle
+remain separate decisions.

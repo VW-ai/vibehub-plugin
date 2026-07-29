@@ -5,9 +5,9 @@
  * Published files are canonical JSON with a `.yaml` extension, matching the
  * repository's existing semantic-store convention. Ticket definition
  * revisions and generation manifests are immutable. `latest.yaml` is the only
- * mutable pointer. The publisher in this module is a storage primitive below
- * future proposal application; it is deliberately not an authoring operation
- * and grants no graph-mutation or human authority.
+ * mutable pointer. The publisher in this module is the storage primitive below
+ * Core's authorized proposal-application service; it is deliberately not an
+ * authoring operation and grants no graph-mutation or human authority itself.
  */
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -39,7 +39,12 @@ export const GIT_TICKET_STORE_SCHEMA_VERSION = 1;
 
 const PROTOCOL_FILE = "protocol.yaml";
 const LATEST_FILE = "latest.yaml";
-const WRITER_LOCK_FILE = ".ticket-store.publish.lock";
+const WRITER_CONTROL_RELATIVE_PATH = "vibehub/ticket-publisher-v1";
+const WRITER_LOCK_DIRECTORY = "lock";
+const WRITER_LOCK_STAGE_PREFIX = ".lock-stage-";
+const WRITER_LOCK_OWNER_PREFIX = "owner-";
+const WRITER_LOCK_RELEASING_PREFIX = "releasing-";
+const WRITER_LOCK_FILE_SUFFIX = ".json";
 const MAX_PROTOCOL_BYTES = 64 * 1024;
 const MAX_LATEST_BYTES = 64 * 1024;
 const MAX_GENERATION_BYTES = 2 * 1024 * 1024;
@@ -73,6 +78,11 @@ const revision = z.number().int().positive().max(REVISION_MAX);
 const digest = z.string().regex(SHA256);
 const storeId = z.string().regex(STORE_ID);
 const snapshotId = z.string().regex(SNAPSHOT_ID);
+const gitTicketPublicationFenceV0Schema = z.object({
+  applicationIntentId: canonicalString(300),
+  intentDigest: digest,
+  candidateSnapshotId: snapshotId,
+}).strict();
 
 const ticketDependencyV0Schema = z.object({
   ticketId,
@@ -140,6 +150,7 @@ const gitTicketWriterLockV0Schema = z.object({
   pid: z.number().int().positive(),
   hostname: canonicalString(300),
   acquiredAt: ticketReviewInstantV0Schema,
+  fence: gitTicketPublicationFenceV0Schema.optional(),
 }).strict();
 
 export type GitTicketDefinitionRevisionV0 =
@@ -189,6 +200,35 @@ export interface GitTicketGenerationPublishResultV0 {
   directUnlockCount: number;
 }
 
+export interface GitTicketPublicationFenceV0 {
+  applicationIntentId: string;
+  intentDigest: string;
+  candidateSnapshotId: string;
+}
+
+export interface GitTicketFencedGenerationPublishRequestV0 {
+  /**
+   * Exact publication base bound by the durable application intent.
+   * `null` means that the intent was prepared against an empty Ticket store.
+   */
+  expectedSnapshotId: string | null;
+  definitions: ReadonlyArray<GitTicketDefinitionRevisionV0>;
+  /**
+   * Deterministic store identity persisted by the application intent. It is
+   * used only when bootstrapping; an existing store keeps its own identity.
+   */
+  bootstrapStoreId: string;
+  fence: GitTicketPublicationFenceV0;
+}
+
+export interface GitTicketFencedGenerationPublishResultV0 {
+  status: "published" | "reconciled";
+  previousSnapshotId: string | null;
+  snapshotId: string;
+  ticketCount: number;
+  directUnlockCount: number;
+}
+
 /**
  * Exact, read-only authoring base for proposal preparation.
  *
@@ -207,6 +247,34 @@ export interface GitTicketAuthoringScopeV0
 extends TicketReviewRepositoryScopeV0 {
   /** Git common-directory identity resolved and later rechecked by Core. */
   repositoryIncarnation: string;
+}
+
+/**
+ * A fenced filesystem publication whose writer lock remains durable until the
+ * caller commits its matching application receipt.
+ */
+export class GitTicketFencedPublicationSessionV0 {
+  private released = false;
+
+  constructor(
+    readonly result: GitTicketFencedGenerationPublishResultV0,
+    private readonly control: GitTicketPublisherControlV0,
+    private readonly writerLock: GitTicketWriterLockV0,
+  ) {}
+
+  /**
+   * Release the exact fence after the caller's application transaction commits.
+   * Cleanup is idempotent and fails closed by retaining a lock it cannot prove
+   * it still owns.
+   */
+  release(): boolean {
+    if (this.released) return true;
+    this.released = releaseWriterLock(
+      this.control,
+      this.writerLock,
+    );
+    return this.released;
+  }
 }
 
 export type GitTicketStoreErrorCodeV0 =
@@ -470,12 +538,12 @@ export class GitTicketGenerationPublisherV0 {
       "expectedSnapshotId",
     );
     const worktreeRoot = resolveScope(scope);
-    const controlRoot = ensurePublisherControlRoot(worktreeRoot);
+    const control = ensurePublisherControlRoot(worktreeRoot);
     const storeRoot = path.join(
       worktreeRoot,
       GIT_TICKET_STORE_RELATIVE_PATH,
     );
-    const writerLock = acquireWriterLock(controlRoot);
+    const writerLock = acquireWriterLock(control);
     const commitState: GitTicketPublicationCommitStateV0 = {
       canonicalMemberInstalled: false,
       visibilityCommitted: false,
@@ -527,7 +595,6 @@ export class GitTicketGenerationPublisherV0 {
       if (state === null) {
         installInitialStore(
           worktreeRoot,
-          controlRoot,
           storeRoot,
           prepared,
           commitState,
@@ -575,8 +642,217 @@ export class GitTicketGenerationPublisherV0 {
       }
       throw error;
     } finally {
-      if (releaseLock) releaseWriterLock(controlRoot, writerLock);
+      if (releaseLock) releaseWriterLock(control, writerLock);
     }
+  }
+
+  /**
+   * Publish one exact application intent while retaining its durable writer
+   * fence. The caller MUST hold the matching SQLite `BEGIN IMMEDIATE`
+   * application transaction from durable-intent lookup through this method's
+   * return. That invariant is what makes adopting an exact, byte-valid stale
+   * fence safe: two live callers cannot concurrently resume the same intent.
+   *
+   * After recording and committing the immutable application receipt, the
+   * caller releases the returned session. Any thrown error deliberately keeps
+   * an acquired/adopted fence in place for exact reconciliation.
+   */
+  publishFenced(
+    scope: GitTicketAuthoringScopeV0,
+    request: GitTicketFencedGenerationPublishRequestV0,
+  ): GitTicketFencedPublicationSessionV0 {
+    const expectedSnapshotId = parsePublishValue(
+      snapshotId.nullable(),
+      request.expectedSnapshotId,
+      "expectedSnapshotId",
+    );
+    const bootstrapStoreId = parsePublishValue(
+      storeId,
+      request.bootstrapStoreId,
+      "bootstrapStoreId",
+    );
+    const fence = parsePublishValue(
+      gitTicketPublicationFenceV0Schema,
+      request.fence,
+      "fence",
+    );
+    const worktreeRoot = resolveScope(scope);
+    assertRepositoryIncarnation(scope);
+    const control = ensurePublisherControlRoot(worktreeRoot);
+    const storeRoot = path.join(
+      worktreeRoot,
+      GIT_TICKET_STORE_RELATIVE_PATH,
+    );
+    const writerLock = acquireOrAdoptFencedWriterLock(control, fence);
+    const commitState: GitTicketPublicationCommitStateV0 = {
+      canonicalMemberInstalled: false,
+      visibilityCommitted: false,
+    };
+
+    const lockedWorktreeRoot = resolveScope(scope);
+    assertRepositoryIncarnation(scope);
+    if (lockedWorktreeRoot !== worktreeRoot) {
+      throw scopeMismatch(
+        "Ticket worktree scope changed while acquiring the fenced writer lock",
+      );
+    }
+    assertWriterLockHeld(control, writerLock);
+    const state = resolveStore(worktreeRoot);
+    const storeIdentity = state?.protocol.storeId ?? bootstrapStoreId;
+    const prepared = prepareGitTicketGenerationV0(
+      storeIdentity,
+      request.definitions,
+    );
+    if (prepared.generation.snapshotId !== fence.candidateSnapshotId) {
+      throw publishInvalid(
+        "Fenced Ticket candidate does not match its application intent",
+        {
+          expectedCandidateSnapshotId: fence.candidateSnapshotId,
+          actualCandidateSnapshotId: prepared.generation.snapshotId,
+        },
+      );
+    }
+    const current = state === null ? null : loadLatestGeneration(state);
+    const currentSnapshotId = current?.snapshotId ?? null;
+
+    if (currentSnapshotId === fence.candidateSnapshotId) {
+      fsyncPublishedGeneration(
+        worktreeRoot,
+        prepared,
+      );
+      assertRepositoryIncarnation(scope);
+      assertWriterLockHeld(control, writerLock);
+      return new GitTicketFencedPublicationSessionV0(
+        {
+          status: "reconciled",
+          previousSnapshotId: expectedSnapshotId,
+          snapshotId: prepared.generation.snapshotId,
+          ticketCount: prepared.definitions.length,
+          directUnlockCount: prepared.relationCount,
+        },
+        control,
+        writerLock,
+      );
+    }
+    if (currentSnapshotId !== expectedSnapshotId) {
+      throw casConflict(
+        "Ticket publication head no longer matches the fenced application base",
+        {
+          expectedSnapshotId,
+          actualSnapshotId: currentSnapshotId,
+          candidateSnapshotId: prepared.generation.snapshotId,
+        },
+      );
+    }
+    validateGitTicketRevisionTransitionV0(
+      current?.definitions ?? [],
+      prepared.definitions,
+    );
+
+    if (state === null) {
+      installInitialStore(
+        worktreeRoot,
+        storeRoot,
+        prepared,
+        commitState,
+      );
+    } else {
+      for (const revisionArtifact of prepared.revisions) {
+        installImmutableDocument(
+          state,
+          revisionArtifact.file,
+          revisionArtifact.bytes,
+          MAX_TICKET_REVISION_BYTES,
+          commitState,
+          true,
+        );
+      }
+      installImmutableDocument(
+        state,
+        prepared.generationFile,
+        prepared.generationBytes,
+        MAX_GENERATION_BYTES,
+        commitState,
+        true,
+      );
+      replaceLatestPointer(
+        state,
+        prepared.latestBytes,
+        commitState,
+        {
+          previousSnapshotId: currentSnapshotId,
+          candidateSnapshotId: prepared.generation.snapshotId,
+        },
+      );
+    }
+
+    fsyncPublishedGeneration(
+      worktreeRoot,
+      prepared,
+    );
+    assertRepositoryIncarnation(scope);
+    assertWriterLockHeld(control, writerLock);
+    return new GitTicketFencedPublicationSessionV0(
+      {
+        status: "published",
+        previousSnapshotId: expectedSnapshotId,
+        snapshotId: prepared.generation.snapshotId,
+        ticketCount: prepared.definitions.length,
+        directUnlockCount: prepared.relationCount,
+      },
+      control,
+      writerLock,
+    );
+  }
+
+  /**
+   * Remove a fence left behind after its immutable application receipt
+   * committed but before the publishing process could release the lock.
+   *
+   * A missing lock or a different valid owner's lock is already safe. This
+   * method releases only a byte-valid lock carrying the exact completed fence
+   * while the exact candidate remains canonical. Malformed state or an exact
+   * fence over a different head fails closed.
+   */
+  releaseCompletedFence(
+    scope: GitTicketAuthoringScopeV0,
+    rawFence: GitTicketPublicationFenceV0,
+  ): boolean {
+    const fence = parsePublishValue(
+      gitTicketPublicationFenceV0Schema,
+      rawFence,
+      "fence",
+    );
+    const worktreeRoot = resolveScope(scope);
+    assertRepositoryIncarnation(scope);
+    const control = ensurePublisherControlRoot(worktreeRoot);
+    let inspected: InspectedGitTicketWriterLockV0 | null;
+    try {
+      inspected = inspectWriterLock(control);
+    } catch {
+      return false;
+    }
+    if (inspected === null) return true;
+    if (inspected.phase === "empty") {
+      return removeEmptyWriterLockDirectory(control);
+    }
+    if (inspected.value.fence === undefined
+      || serializeGitTicketStoreDocumentV0(inspected.value.fence)
+        !== serializeGitTicketStoreDocumentV0(fence)) {
+      return true;
+    }
+    try {
+      const store = resolveStore(worktreeRoot);
+      const current = store === null ? null : loadLatestGeneration(store);
+      if (current?.snapshotId !== fence.candidateSnapshotId) return false;
+    } catch {
+      return false;
+    }
+    assertRepositoryIncarnation(scope);
+    return releaseWriterLock(
+      control,
+      { token: inspected.token, bytes: inspected.bytes },
+    );
   }
 }
 
@@ -1092,6 +1368,23 @@ interface GitTicketWriterLockV0 {
   bytes: string;
 }
 
+interface GitTicketPublisherControlV0 {
+  gitAdminRoot: string;
+  root: string;
+}
+
+type InspectedGitTicketWriterLockV0 =
+  | (GitTicketWriterLockV0 & {
+    phase: "owner" | "releasing";
+    value: z.infer<typeof gitTicketWriterLockV0Schema>;
+  })
+  | {
+    phase: "empty";
+    token: null;
+    bytes: null;
+    value: null;
+  };
+
 function parsePublishValue<T>(
   schema: z.ZodType<T>,
   value: unknown,
@@ -1204,10 +1497,47 @@ function definitionContentWithoutRevision(
   return content;
 }
 
-function ensurePublisherControlRoot(worktreeRoot: string): string {
-  const controlRoot = path.join(worktreeRoot, ".vibehub");
-  ensureSafeDirectoryPath(worktreeRoot, controlRoot, ".vibehub");
-  return controlRoot;
+function ensurePublisherControlRoot(
+  worktreeRoot: string,
+): GitTicketPublisherControlV0 {
+  let rawGitAdminRoot: string;
+  let rawControlRoot: string;
+  try {
+    rawGitAdminRoot = GitFacade.gitPathAt(worktreeRoot, ".");
+    rawControlRoot = GitFacade.gitPathAt(
+      worktreeRoot,
+      WRITER_CONTROL_RELATIVE_PATH,
+    );
+  } catch (error) {
+    throw corrupt("Ticket publisher Git administrative path is unavailable", {
+      cause: error instanceof Error ? error.message : String(error),
+    });
+  }
+  const adminStat = fs.lstatSync(rawGitAdminRoot, { throwIfNoEntry: false });
+  if (
+    adminStat === undefined
+    || adminStat.isSymbolicLink()
+    || !adminStat.isDirectory()
+  ) {
+    throw corrupt(
+      "Ticket publisher Git administrative root must be a real directory",
+    );
+  }
+  const gitAdminRoot = fs.realpathSync(rawGitAdminRoot);
+  assertLexicallyContained(
+    gitAdminRoot,
+    rawControlRoot,
+    "Ticket publisher control root",
+  );
+  ensureSafeDirectoryPath(
+    gitAdminRoot,
+    rawControlRoot,
+    "Ticket publisher control root",
+  );
+  return {
+    gitAdminRoot,
+    root: fs.realpathSync(rawControlRoot),
+  };
 }
 
 function ensureSafeDirectoryPath(
@@ -1246,9 +1576,9 @@ function ensureSafeDirectoryPath(
 }
 
 function acquireWriterLock(
-  controlRoot: string,
+  control: GitTicketPublisherControlV0,
+  fence?: GitTicketPublicationFenceV0,
 ): GitTicketWriterLockV0 {
-  const lockPath = path.join(controlRoot, WRITER_LOCK_FILE);
   const lock = {
     schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
     format: WRITER_LOCK_FORMAT,
@@ -1256,86 +1586,527 @@ function acquireWriterLock(
     pid: process.pid,
     hostname: os.hostname(),
     acquiredAt: new Date().toISOString(),
+    ...(fence === undefined ? {} : { fence }),
   };
   const bytes = serializeGitTicketStoreDocumentV0(lock);
-  let descriptor: number;
+  const ownerFile = writerLockMemberName("owner", lock.token);
+  const stageRoot = path.join(
+    control.root,
+    `${WRITER_LOCK_STAGE_PREFIX}${lock.token}`,
+  );
+  const stagedOwner = path.join(stageRoot, ownerFile);
+  const lockRoot = path.join(control.root, WRITER_LOCK_DIRECTORY);
+  let descriptor: number | null = null;
+  let installed = false;
   try {
+    fs.mkdirSync(stageRoot, { mode: 0o700 });
     descriptor = fs.openSync(
-      lockPath,
+      stagedOwner,
       fs.constants.O_WRONLY
         | fs.constants.O_CREAT
         | fs.constants.O_EXCL
         | fs.constants.O_NOFOLLOW,
       0o600,
     );
-  } catch (error) {
-    if (isNodeError(error, "EEXIST")) {
-      throw writerBusy(
-        "Another Ticket generation publisher owns the worktree lock",
-        { file: path.join(".vibehub", WRITER_LOCK_FILE) },
-      );
-    }
-    throw corrupt("Ticket writer lock could not be acquired safely", {
-      cause: nodeErrorCode(error),
-    });
-  }
-  try {
     writeAll(descriptor, bytes);
     fs.fsyncSync(descriptor);
-  } catch (error) {
+    fs.closeSync(descriptor);
+    descriptor = null;
+    fsyncDirectory(
+      stageRoot,
+      control.root,
+      "staged Ticket writer lock",
+    );
     try {
-      fs.closeSync(descriptor);
-    } catch {
-      // Preserve the primary failure.
+      fs.renameSync(stageRoot, lockRoot);
+    } catch (error) {
+      if (isNodeError(error, "EEXIST")
+        || isNodeError(error, "ENOTEMPTY")) {
+        throw writerBusy(
+          "Another Ticket generation publisher owns the worktree lock",
+          { file: writerLockDisplayPath() },
+        );
+      }
+      throw error;
     }
-    safeUnlinkKnownPath(lockPath);
-    throw corrupt("Ticket writer lock could not be made durable", {
+    installed = true;
+    fsyncDirectory(
+      control.root,
+      control.gitAdminRoot,
+      "Ticket writer lock control root",
+    );
+    const inspected = inspectWriterLock(control);
+    if (
+      inspected === null
+      || inspected.phase !== "owner"
+      || inspected.token !== lock.token
+      || inspected.bytes !== bytes
+    ) {
+      throw corrupt(
+        "Ticket writer lock changed while it was being installed",
+      );
+    }
+    return { token: lock.token, bytes };
+  } catch (error) {
+    if (descriptor !== null) {
+      try {
+        fs.closeSync(descriptor);
+      } catch {
+        // Preserve the primary failure.
+      }
+    }
+    if (!installed) {
+      removeOwnedWriterLockStage(control, stageRoot, ownerFile);
+    }
+    if (error instanceof GitTicketStoreErrorV0) throw error;
+    throw corrupt("Ticket writer lock could not be acquired durably", {
       cause: nodeErrorCode(error),
     });
   }
-  fs.closeSync(descriptor);
-  fsyncDirectory(controlRoot, path.dirname(controlRoot), WRITER_LOCK_FILE);
-  return { token: lock.token, bytes };
+}
+
+function acquireOrAdoptFencedWriterLock(
+  control: GitTicketPublisherControlV0,
+  fence: GitTicketPublicationFenceV0,
+): GitTicketWriterLockV0 {
+  try {
+    return acquireWriterLock(control, fence);
+  } catch (error) {
+    if (!(error instanceof GitTicketStoreErrorV0)
+      || error.code !== "ticket_store_writer_busy") {
+      throw error;
+    }
+  }
+
+  let inspected: InspectedGitTicketWriterLockV0 | null;
+  try {
+    inspected = inspectWriterLock(control);
+    if (inspected === null || inspected.phase !== "owner") {
+      throw new Error("fenced writer lock disappeared during adoption");
+    }
+  } catch {
+    throw writerBusy(
+      "Existing Ticket writer lock is not an adoptable fenced publication",
+      { file: writerLockDisplayPath() },
+    );
+  }
+  if (inspected.value.fence === undefined
+    || serializeGitTicketStoreDocumentV0(inspected.value.fence)
+      !== serializeGitTicketStoreDocumentV0(fence)) {
+    throw writerBusy(
+      "Another Ticket application intent owns the worktree fence",
+      {
+        file: writerLockDisplayPath(),
+        applicationIntentId: fence.applicationIntentId,
+      },
+    );
+  }
+  return { token: inspected.token, bytes: inspected.bytes };
+}
+
+function assertWriterLockHeld(
+  control: GitTicketPublisherControlV0,
+  lock: GitTicketWriterLockV0,
+): void {
+  try {
+    const inspected = inspectWriterLock(control);
+    if (
+      inspected === null
+      || inspected.phase !== "owner"
+      || inspected.bytes !== lock.bytes
+      || inspected.token !== lock.token
+    ) {
+      throw new Error("writer lock identity changed");
+    }
+  } catch {
+    throw writerBusy(
+      "Fenced Ticket publisher no longer owns the exact writer lock",
+      { file: writerLockDisplayPath() },
+    );
+  }
 }
 
 function releaseWriterLock(
-  controlRoot: string,
+  control: GitTicketPublisherControlV0,
   lock: GitTicketWriterLockV0,
-): void {
-  const lockPath = path.join(controlRoot, WRITER_LOCK_FILE);
+): boolean {
   try {
-    const bytes = readOptionalBytes(
-      lockPath,
-      path.dirname(controlRoot),
-      MAX_PROTOCOL_BYTES,
-      WRITER_LOCK_FILE,
-    );
-    if (bytes === null || bytes !== lock.bytes) return;
-    const parsed = gitTicketWriterLockV0Schema.safeParse(
-      parseCanonicalBytes(bytes, WRITER_LOCK_FILE),
-    );
-    if (!parsed.success || parsed.data.token !== lock.token) return;
-    fs.unlinkSync(lockPath);
-    fsyncDirectory(controlRoot, path.dirname(controlRoot), WRITER_LOCK_FILE);
+    const inspected = inspectWriterLock(control);
+    if (inspected === null) {
+      return true;
+    }
+    if (inspected.phase === "empty") {
+      return removeEmptyWriterLockDirectory(control);
+    }
+    if (
+      inspected.bytes !== lock.bytes
+      || inspected.token !== lock.token
+    ) {
+      // Another valid owner can exist only after this owner ceased to be the
+      // canonical directory. Never touch the successor.
+      return true;
+    }
+    if (inspected.phase === "owner") {
+      const lockRoot = path.join(control.root, WRITER_LOCK_DIRECTORY);
+      const ownerPath = path.join(
+        lockRoot,
+        writerLockMemberName("owner", lock.token),
+      );
+      const releasingPath = path.join(
+        lockRoot,
+        writerLockMemberName("releasing", lock.token),
+      );
+      try {
+        fs.renameSync(ownerPath, releasingPath);
+        fsyncDirectory(
+          lockRoot,
+          control.root,
+          "claimed Ticket writer lock release",
+        );
+      } catch (error) {
+        if (!isNodeError(error, "ENOENT")) throw error;
+        const raced = inspectWriterLock(control);
+        if (
+          raced !== null
+          && raced.phase !== "empty"
+          && raced.bytes === lock.bytes
+          && raced.token === lock.token
+          && raced.phase === "releasing"
+        ) {
+          return removeReleasingWriterLockMember(control, lock);
+        }
+        return raced === null || raced.phase === "empty"
+          ? removeEmptyWriterLockDirectory(control)
+          : true;
+      }
+    }
+    return removeReleasingWriterLockMember(control, lock);
   } catch {
-    // The canonical pointer, not lock cleanup, defines publication success.
-    // A retained lock fails later writers closed until explicit recovery.
+    // The canonical pointer, not cleanup, defines publication success. Any
+    // state not proven to be this exact owner is retained and fails closed.
+    return false;
   }
+}
+
+function inspectWriterLock(
+  control: GitTicketPublisherControlV0,
+): InspectedGitTicketWriterLockV0 | null {
+  const lockRoot = path.join(control.root, WRITER_LOCK_DIRECTORY);
+  assertLexicallyContained(
+    control.root,
+    lockRoot,
+    "Ticket writer lock directory",
+  );
+  const lockStat = fs.lstatSync(lockRoot, { throwIfNoEntry: false });
+  if (lockStat === undefined) return null;
+  if (lockStat.isSymbolicLink() || !lockStat.isDirectory()) {
+    throw corrupt("Ticket writer lock must be a real directory", {
+      file: writerLockDisplayPath(),
+    });
+  }
+  assertContained(
+    control.root,
+    fs.realpathSync(lockRoot),
+    "Ticket writer lock directory",
+  );
+  const entries = fs.readdirSync(lockRoot, { withFileTypes: true });
+  if (entries.length === 0) {
+    return {
+      phase: "empty",
+      token: null,
+      bytes: null,
+      value: null,
+    };
+  }
+  if (entries.length !== 1) {
+    throw corrupt("Ticket writer lock directory has an invalid shape", {
+      file: writerLockDisplayPath(),
+    });
+  }
+  const entry = entries[0]!;
+  if (entry.isSymbolicLink() || !entry.isFile()) {
+    throw corrupt("Ticket writer lock owner must be a regular file", {
+      file: writerLockDisplayPath(),
+    });
+  }
+  const phase = entry.name.startsWith(WRITER_LOCK_OWNER_PREFIX)
+    ? "owner" as const
+    : entry.name.startsWith(WRITER_LOCK_RELEASING_PREFIX)
+      ? "releasing" as const
+      : null;
+  if (phase === null || !entry.name.endsWith(WRITER_LOCK_FILE_SUFFIX)) {
+    throw corrupt("Ticket writer lock owner has an invalid name", {
+      file: writerLockDisplayPath(),
+    });
+  }
+  const ownerPath = path.join(lockRoot, entry.name);
+  const bytes = readOptionalBytes(
+    ownerPath,
+    control.root,
+    MAX_PROTOCOL_BYTES,
+    `${WRITER_LOCK_DIRECTORY}/${entry.name}`,
+  );
+  if (bytes === null) {
+    throw corrupt("Ticket writer lock owner disappeared during inspection", {
+      file: writerLockDisplayPath(),
+    });
+  }
+  const result = gitTicketWriterLockV0Schema.safeParse(
+    parseCanonicalBytes(bytes, `${WRITER_LOCK_DIRECTORY}/${entry.name}`),
+  );
+  if (!result.success) {
+    throw corrupt("Ticket writer lock violates its schema", {
+      file: writerLockDisplayPath(),
+    });
+  }
+  if (entry.name !== writerLockMemberName(phase, result.data.token)) {
+    throw corrupt("Ticket writer lock filename does not bind its token", {
+      file: writerLockDisplayPath(),
+    });
+  }
+  return {
+    token: result.data.token,
+    bytes,
+    phase,
+    value: result.data,
+  };
+}
+
+function writerLockMemberName(
+  phase: "owner" | "releasing",
+  token: string,
+): string {
+  const prefix = phase === "owner"
+    ? WRITER_LOCK_OWNER_PREFIX
+    : WRITER_LOCK_RELEASING_PREFIX;
+  return `${prefix}${token}${WRITER_LOCK_FILE_SUFFIX}`;
+}
+
+function writerLockDisplayPath(): string {
+  return path.join(
+    "$GIT_DIR",
+    WRITER_CONTROL_RELATIVE_PATH,
+    WRITER_LOCK_DIRECTORY,
+  );
+}
+
+function removeReleasingWriterLockMember(
+  control: GitTicketPublisherControlV0,
+  lock: GitTicketWriterLockV0,
+): boolean {
+  const lockRoot = path.join(control.root, WRITER_LOCK_DIRECTORY);
+  const releasingPath = path.join(
+    lockRoot,
+    writerLockMemberName("releasing", lock.token),
+  );
+  try {
+    fs.unlinkSync(releasingPath);
+  } catch (error) {
+    if (!isNodeError(error, "ENOENT")) return false;
+  }
+  try {
+    fsyncDirectory(
+      lockRoot,
+      control.root,
+      "released Ticket writer lock directory",
+    );
+  } catch (error) {
+    if (!isNodeError(error, "ENOENT")) return false;
+  }
+  return removeEmptyWriterLockDirectory(control);
+}
+
+function removeEmptyWriterLockDirectory(
+  control: GitTicketPublisherControlV0,
+): boolean {
+  const lockRoot = path.join(control.root, WRITER_LOCK_DIRECTORY);
+  try {
+    fs.rmdirSync(lockRoot);
+    fsyncDirectory(
+      control.root,
+      control.gitAdminRoot,
+      "Ticket writer lock release completion",
+    );
+    return true;
+  } catch (error) {
+    if (isNodeError(error, "ENOENT")) return true;
+    if (isNodeError(error, "EEXIST")
+      || isNodeError(error, "ENOTEMPTY")) {
+      // A successor installed its complete, nonempty lock directory between
+      // the token-specific unlink and this rmdir. Prove that shape before
+      // treating the old owner's release as complete; malformed state remains
+      // fail-closed.
+      try {
+        const successor = inspectWriterLock(control);
+        return successor === null || successor.phase !== "empty";
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  }
+}
+
+function removeOwnedWriterLockStage(
+  control: GitTicketPublisherControlV0,
+  stageRoot: string,
+  ownerFile: string,
+): void {
+  try {
+    assertLexicallyContained(
+      control.root,
+      stageRoot,
+      "staged Ticket writer lock",
+    );
+    const stat = fs.lstatSync(stageRoot, { throwIfNoEntry: false });
+    if (stat === undefined || stat.isSymbolicLink() || !stat.isDirectory()) {
+      return;
+    }
+    assertContained(
+      control.root,
+      fs.realpathSync(stageRoot),
+      "staged Ticket writer lock",
+    );
+    const entries = fs.readdirSync(stageRoot, { withFileTypes: true });
+    if (
+      entries.length === 1
+      && entries[0]!.name === ownerFile
+      && !entries[0]!.isSymbolicLink()
+      && entries[0]!.isFile()
+    ) {
+      safeUnlinkKnownPath(path.join(stageRoot, ownerFile));
+    }
+    if (fs.readdirSync(stageRoot).length === 0) {
+      fs.rmdirSync(stageRoot);
+      fsyncDirectory(
+        control.root,
+        control.gitAdminRoot,
+        "Ticket writer lock staging cleanup",
+      );
+    }
+  } catch {
+    // Unknown stage debris is retained rather than cleaned unsafely.
+  }
+}
+
+function fsyncPublishedGeneration(
+  worktreeRoot: string,
+  prepared: PreparedGitTicketGenerationV0,
+): void {
+  const store = resolveStore(worktreeRoot);
+  if (store === null || store.protocol.storeId !== prepared.storeId) {
+    throw corrupt(
+      "Fenced Ticket candidate is not visible in its expected store",
+      { candidateSnapshotId: prepared.generation.snapshotId },
+    );
+  }
+  const current = loadLatestGeneration(store);
+  if (current?.snapshotId !== prepared.generation.snapshotId) {
+    throw commitUncertain(
+      "Fenced Ticket candidate is not the current publication head",
+      {
+        actualSnapshotId: current?.snapshotId ?? null,
+        candidateSnapshotId: prepared.generation.snapshotId,
+      },
+    );
+  }
+
+  const protocol: GitTicketStoreProtocolV0 = {
+    schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+    format: GIT_TICKET_STORE_FORMAT,
+    storeId: prepared.storeId,
+    indexing: "stable-ticket-revision-paths",
+    integrity: "immutable-generations-pointer-v1",
+    projector: "ticket-review-v0",
+  };
+  fsyncExactPublishedDocument(
+    store,
+    PROTOCOL_FILE,
+    serializeGitTicketStoreDocumentV0(protocol),
+    MAX_PROTOCOL_BYTES,
+  );
+  for (const revisionArtifact of prepared.revisions) {
+    fsyncExactPublishedDocument(
+      store,
+      revisionArtifact.file,
+      revisionArtifact.bytes,
+      MAX_TICKET_REVISION_BYTES,
+    );
+  }
+  fsyncExactPublishedDocument(
+    store,
+    prepared.generationFile,
+    prepared.generationBytes,
+    MAX_GENERATION_BYTES,
+  );
+  fsyncExactPublishedDocument(
+    store,
+    LATEST_FILE,
+    prepared.latestBytes,
+    MAX_LATEST_BYTES,
+  );
+  fsyncDirectory(
+    store.storeRoot,
+    worktreeRoot,
+    "fenced Ticket store root",
+  );
+  fsyncDirectory(
+    path.dirname(store.storeRoot),
+    worktreeRoot,
+    "fenced Ticket store parent",
+  );
+}
+
+function fsyncExactPublishedDocument(
+  store: ResolvedStore,
+  relative: string,
+  expectedBytes: string,
+  maximumBytes: number,
+): void {
+  const absolute = path.join(store.storeRoot, relative);
+  const actual = readOptionalBytes(
+    absolute,
+    store.worktreeRoot,
+    maximumBytes,
+    relative,
+  );
+  if (actual !== expectedBytes) {
+    throw corrupt(
+      "Fenced Ticket store member does not match the exact candidate",
+      { file: relative },
+    );
+  }
+  fsyncExistingRegularFile(
+    absolute,
+    store.worktreeRoot,
+    maximumBytes,
+    relative,
+  );
+  fsyncDirectory(
+    path.dirname(absolute),
+    store.worktreeRoot,
+    relative,
+  );
 }
 
 function installInitialStore(
   worktreeRoot: string,
-  controlRoot: string,
   finalStoreRoot: string,
   prepared: PreparedGitTicketGenerationV0,
   commitState: GitTicketPublicationCommitStateV0,
 ): void {
+  const storeParent = path.dirname(finalStoreRoot);
+  ensureSafeDirectoryPath(
+    worktreeRoot,
+    storeParent,
+    "Ticket store parent",
+  );
   const stageRoot = path.join(
-    controlRoot,
+    storeParent,
     `.ticket-store-stage-${crypto.randomUUID()}`,
   );
   fs.mkdirSync(stageRoot, { mode: 0o700 });
-  fsyncDirectory(controlRoot, worktreeRoot, "ticket store staging root");
+  fsyncDirectory(storeParent, worktreeRoot, "ticket store staging root");
   const protocol: GitTicketStoreProtocolV0 = {
     schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
     format: GIT_TICKET_STORE_FORMAT,
@@ -1398,7 +2169,7 @@ function installInitialStore(
     commitState.canonicalMemberInstalled = true;
     commitState.visibilityCommitted = true;
     try {
-      fsyncDirectory(controlRoot, worktreeRoot, "ticket store root");
+      fsyncDirectory(storeParent, worktreeRoot, "ticket store root");
     } catch (error) {
       throw commitUncertain(
         "Initial Ticket store became visible but its parent sync failed",

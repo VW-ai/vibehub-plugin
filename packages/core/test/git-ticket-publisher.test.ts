@@ -18,9 +18,12 @@ import {
 } from "../src/index.js";
 import {
   GitTicketGenerationPublisherV0,
+  gitTicketRepositoryIncarnationV0,
   prepareGitTicketGenerationV0,
+  type GitTicketAuthoringScopeV0,
+  type GitTicketFencedGenerationPublishRequestV0,
 } from "../src/git-ticket-store.js";
-import { makeScratchRepo, type ScratchRepo } from "./helpers.js";
+import { git, makeScratchRepo, type ScratchRepo } from "./helpers.js";
 
 const CREATED_AT = "2026-07-28T12:00:00.000Z";
 const STORE_ID = "ticket-store-0123456789abcdef0123456789abcdef";
@@ -65,6 +68,66 @@ function scopeFor(
   };
 }
 
+function authoringScopeFor(
+  worktreeRoot: string,
+  repoId = 1,
+): GitTicketAuthoringScopeV0 {
+  const scope = scopeFor(worktreeRoot, repoId);
+  return {
+    ...scope,
+    repositoryIncarnation: gitTicketRepositoryIncarnationV0(
+      scope.repositoryRoot,
+    ),
+  };
+}
+
+function writerLockRoot(worktreeRoot: string): string {
+  return GitFacade.gitPathAt(
+    worktreeRoot,
+    "vibehub/ticket-publisher-v1/lock",
+  );
+}
+
+function writerLockOwnerPath(worktreeRoot: string): string {
+  const root = writerLockRoot(worktreeRoot);
+  const entries = fs.readdirSync(root);
+  if (entries.length !== 1) {
+    throw new Error("expected one Ticket writer-lock owner");
+  }
+  return path.join(root, entries[0]!);
+}
+
+function readWriterLock(worktreeRoot: string): string {
+  return fs.readFileSync(writerLockOwnerPath(worktreeRoot), "utf8");
+}
+
+function fencedRequest(
+  definitions: GitTicketDefinitionRevisionV0[],
+  expectedSnapshotId: string | null,
+  input: {
+    applicationIntentId?: string;
+    intentDigest?: string;
+    storeId?: string;
+  } = {},
+): GitTicketFencedGenerationPublishRequestV0 {
+  const bootstrapStoreId = input.storeId ?? STORE_ID;
+  const prepared = prepareGitTicketGenerationV0(
+    bootstrapStoreId,
+    definitions,
+  );
+  return {
+    expectedSnapshotId,
+    definitions,
+    bootstrapStoreId,
+    fence: {
+      applicationIntentId: input.applicationIntentId
+        ?? "ticket-application-intent:test-001",
+      intentDigest: input.intentDigest ?? "a".repeat(64),
+      candidateSnapshotId: prepared.generation.snapshotId,
+    },
+  };
+}
+
 describe("Git Ticket outline generation preparation", () => {
   it("keeps the authority-neutral publisher outside the package root", () => {
     expect(publicCore).not.toHaveProperty("GitTicketGenerationPublisherV0");
@@ -79,6 +142,9 @@ describe("Git Ticket outline generation preparation", () => {
       "gitTicketRepositoryIncarnationV0",
     );
     expect(publicCore).not.toHaveProperty("TicketProposalServiceV0");
+    expect(publicCore).not.toHaveProperty(
+      "GitTicketFencedPublicationSessionV0",
+    );
   });
 
   it("compiles one deterministic canonical generation without filesystem state", () => {
@@ -181,12 +247,417 @@ describe("GitTicketGenerationPublisherV0", () => {
     });
     expect(observedBefore).toBe(true);
     expect(observedAfter).toBe(true);
-    expect(fs.existsSync(
-      path.join(repo.work, ".vibehub", ".ticket-store.publish.lock"),
-    )).toBe(false);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(false);
     expect(new GitTicketReviewProjectionSourceProviderV0()
       .loadSnapshot(scope, published.snapshotId)).toMatchObject({
       status: "available",
+    });
+  });
+
+  it("bootstraps deterministically and retains the exact fence until release", () => {
+    const repo = make();
+    const scope = authoringScopeFor(repo.work);
+    const definitions = [
+      definition({ id: "TKT-001" }),
+      definition({ id: "TKT-002", dependsOn: ["TKT-001"] }),
+    ];
+    const request = fencedRequest(definitions, null);
+    const lockRoot = writerLockRoot(repo.work);
+    const session = new GitTicketGenerationPublisherV0()
+      .publishFenced(scope, request);
+
+    expect(session.result).toEqual({
+      status: "published",
+      previousSnapshotId: null,
+      snapshotId: request.fence.candidateSnapshotId,
+      ticketCount: 2,
+      directUnlockCount: 1,
+    });
+    expect(JSON.parse(fs.readFileSync(
+      path.join(
+        repo.work,
+        GIT_TICKET_STORE_RELATIVE_PATH,
+        "protocol.yaml",
+      ),
+      "utf8",
+    ))).toMatchObject({ storeId: STORE_ID });
+    expect(JSON.parse(readWriterLock(repo.work))).toMatchObject({
+      fence: request.fence,
+    });
+    expect(writerLockRoot(repo.work).startsWith(
+      `${GitFacade.gitPathAt(repo.work, ".")}${path.sep}`,
+    )).toBe(true);
+    expect(git(repo.work, "status", "--short", "--untracked-files=all"))
+      .not.toContain("ticket-publisher");
+    expect(() => new GitTicketGenerationPublisherV0().publish(scope, {
+      expectedSnapshotId: request.fence.candidateSnapshotId,
+      definitions,
+    })).toThrowError(expect.objectContaining({
+      code: "ticket_store_writer_busy",
+    }));
+
+    session.release();
+    session.release();
+    expect(fs.existsSync(lockRoot)).toBe(false);
+  });
+
+  it("isolates operational writer locks between linked worktrees", () => {
+    const repo = make();
+    const linked = path.join(repo.root, "ticket-linked");
+    git(repo.work, "worktree", "add", "-b", "ticket-linked", linked);
+    const publisher = new GitTicketGenerationPublisherV0();
+    const mainRequest = fencedRequest(
+      [definition({ id: "TKT-001" })],
+      null,
+      { applicationIntentId: "ticket-application-intent:main-worktree" },
+    );
+    const linkedRequest = fencedRequest(
+      [definition({ id: "TKT-001" })],
+      null,
+      { applicationIntentId: "ticket-application-intent:linked-worktree" },
+    );
+
+    const mainSession = publisher.publishFenced(
+      authoringScopeFor(repo.work),
+      mainRequest,
+    );
+    const linkedSession = publisher.publishFenced(
+      authoringScopeFor(linked),
+      linkedRequest,
+    );
+
+    expect(writerLockRoot(repo.work)).not.toBe(writerLockRoot(linked));
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(true);
+    expect(fs.existsSync(writerLockRoot(linked))).toBe(true);
+    expect(mainSession.release()).toBe(true);
+    expect(linkedSession.release()).toBe(true);
+  });
+
+  it("ignores a partial staged lock left by a crashed acquirer", () => {
+    const repo = make();
+    const partialStage = GitFacade.gitPathAt(
+      repo.work,
+      `vibehub/ticket-publisher-v1/.lock-stage-${crypto.randomUUID()}`,
+    );
+    fs.mkdirSync(partialStage, { recursive: true });
+    fs.writeFileSync(path.join(partialStage, "partial"), "truncated");
+
+    const published = new GitTicketGenerationPublisherV0().publish(
+      scopeFor(repo.work),
+      {
+        expectedSnapshotId: null,
+        definitions: [definition({ id: "TKT-001" })],
+      },
+    );
+
+    expect(published.status).toBe("published");
+    expect(fs.existsSync(partialStage)).toBe(true);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(false);
+  });
+
+  it("adopts an exact fence and reconciles when its candidate is current", () => {
+    const repo = make();
+    const scope = authoringScopeFor(repo.work);
+    const request = fencedRequest(
+      [definition({ id: "TKT-001" })],
+      null,
+    );
+    const publisher = new GitTicketGenerationPublisherV0();
+    const firstSession = publisher.publishFenced(scope, request);
+    const lockRoot = writerLockRoot(repo.work);
+    const retainedLock = readWriterLock(repo.work);
+
+    const recoveredSession = publisher.publishFenced(scope, request);
+    expect(recoveredSession.result).toEqual({
+      status: "reconciled",
+      previousSnapshotId: null,
+      snapshotId: request.fence.candidateSnapshotId,
+      ticketCount: 1,
+      directUnlockCount: 0,
+    });
+    expect(readWriterLock(repo.work)).toBe(retainedLock);
+
+    recoveredSession.release();
+    firstSession.release();
+    expect(fs.existsSync(lockRoot)).toBe(false);
+
+    const receiptRecoverySession = publisher.publishFenced(scope, request);
+    expect(receiptRecoverySession.result.status).toBe("reconciled");
+    expect(fs.existsSync(lockRoot)).toBe(true);
+    receiptRecoverySession.release();
+  });
+
+  it("cannot let an old releaser remove a successor writer lock", () => {
+    const repo = make();
+    const scope = authoringScopeFor(repo.work);
+    const publisher = new GitTicketGenerationPublisherV0();
+    const firstRequest = fencedRequest(
+      [definition({ id: "TKT-001" })],
+      null,
+      { applicationIntentId: "ticket-application-intent:release-race-a" },
+    );
+    const firstSession = publisher.publishFenced(scope, firstRequest);
+    const firstOwnerPath = writerLockOwnerPath(repo.work);
+    const firstReleasingPath = path.join(
+      path.dirname(firstOwnerPath),
+      path.basename(firstOwnerPath).replace(/^owner-/u, "releasing-"),
+    );
+    const successorRequest = fencedRequest(
+      [
+        definition({ id: "TKT-001" }),
+        definition({ id: "TKT-002", dependsOn: ["TKT-001"] }),
+      ],
+      firstSession.result.snapshotId,
+      { applicationIntentId: "ticket-application-intent:release-race-b" },
+    );
+    const originalUnlink = fs.unlinkSync;
+    let successorSession:
+      | ReturnType<GitTicketGenerationPublisherV0["publishFenced"]>
+      | undefined;
+    vi.spyOn(fs, "unlinkSync").mockImplementation(((target) => {
+      originalUnlink(target);
+      if (
+        String(target) === firstReleasingPath
+        && successorSession === undefined
+      ) {
+        successorSession = publisher.publishFenced(scope, successorRequest);
+      }
+    }) as typeof fs.unlinkSync);
+
+    expect(firstSession.release()).toBe(true);
+    expect(successorSession?.result).toMatchObject({
+      status: "published",
+      snapshotId: successorRequest.fence.candidateSnapshotId,
+    });
+    expect(JSON.parse(readWriterLock(repo.work))).toMatchObject({
+      fence: successorRequest.fence,
+    });
+
+    vi.restoreAllMocks();
+    expect(successorSession?.release()).toBe(true);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(false);
+  });
+
+  it("does not release an exact completed fence over a different head", () => {
+    const repo = make();
+    const scope = authoringScopeFor(repo.work);
+    const publisher = new GitTicketGenerationPublisherV0();
+    const baseRequest = fencedRequest(
+      [definition({ id: "TKT-001" })],
+      null,
+      { applicationIntentId: "ticket-application-intent:cleanup-base" },
+    );
+    const baseSession = publisher.publishFenced(scope, baseRequest);
+    baseSession.release();
+    const candidateRequest = fencedRequest(
+      [
+        definition({ id: "TKT-001" }),
+        definition({ id: "TKT-002", dependsOn: ["TKT-001"] }),
+      ],
+      baseSession.result.snapshotId,
+      { applicationIntentId: "ticket-application-intent:cleanup-candidate" },
+    );
+    publisher.publishFenced(scope, candidateRequest);
+    const latestPath = path.join(
+      repo.work,
+      GIT_TICKET_STORE_RELATIVE_PATH,
+      "latest.yaml",
+    );
+    fs.writeFileSync(
+      latestPath,
+      serializeGitTicketStoreDocumentV0({
+        schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+        kind: "ticket_latest",
+        storeId: STORE_ID,
+        snapshotId: baseSession.result.snapshotId,
+      }),
+    );
+
+    expect(publisher.releaseCompletedFence(
+      scope,
+      candidateRequest.fence,
+    )).toBe(false);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(true);
+
+    fs.writeFileSync(
+      latestPath,
+      serializeGitTicketStoreDocumentV0({
+        schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
+        kind: "ticket_latest",
+        storeId: STORE_ID,
+        snapshotId: candidateRequest.fence.candidateSnapshotId,
+      }),
+    );
+    expect(publisher.releaseCompletedFence(
+      scope,
+      candidateRequest.fence,
+    )).toBe(true);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(false);
+  });
+
+  it("adopts an exact fence and resumes when its publication base is current", () => {
+    const repo = make();
+    const scope = authoringScopeFor(repo.work);
+    const publisher = new GitTicketGenerationPublisherV0();
+    const firstRequest = fencedRequest(
+      [definition({ id: "TKT-001" })],
+      null,
+      { applicationIntentId: "ticket-application-intent:base" },
+    );
+    const firstSession = publisher.publishFenced(scope, firstRequest);
+    firstSession.release();
+
+    const definitions = [
+      definition({
+        id: "TKT-001",
+        revision: 2,
+        outcome: "Deliver the recovered exact candidate",
+      }),
+      definition({ id: "TKT-002", dependsOn: ["TKT-001"] }),
+    ];
+    const request = fencedRequest(
+      definitions,
+      firstSession.result.snapshotId,
+      {
+        applicationIntentId: "ticket-application-intent:resume",
+        intentDigest: "b".repeat(64),
+      },
+    );
+    const latestPath = path.join(
+      repo.work,
+      GIT_TICKET_STORE_RELATIVE_PATH,
+      "latest.yaml",
+    );
+    const originalRename = fs.renameSync;
+    vi.spyOn(fs, "renameSync").mockImplementation(((source, target) => {
+      if (String(target) === latestPath) {
+        throw Object.assign(new Error("injected fenced latest fault"), {
+          code: "EIO",
+        });
+      }
+      originalRename(source, target);
+    }) as typeof fs.renameSync);
+
+    expect(() => publisher.publishFenced(scope, request)).toThrowError(
+      expect.objectContaining({ code: "ticket_store_corrupt" }),
+    );
+    vi.restoreAllMocks();
+    expect(new GitTicketReviewProjectionSourceProviderV0()
+      .loadLatest(scope)).toMatchObject({
+      status: "available",
+      source: {
+        ticketDefinitions: [
+          { ticketId: "TKT-001", definitionRevision: 1 },
+        ],
+      },
+    });
+
+    const recoveredSession = publisher.publishFenced(scope, request);
+    expect(recoveredSession.result).toMatchObject({
+      status: "published",
+      previousSnapshotId: firstSession.result.snapshotId,
+      snapshotId: request.fence.candidateSnapshotId,
+    });
+    recoveredSession.release();
+    expect(new GitTicketReviewProjectionSourceProviderV0()
+      .loadLatest(scope)).toMatchObject({
+      status: "available",
+      source: {
+        ticketDefinitions: [
+          { ticketId: "TKT-001", definitionRevision: 2 },
+          { ticketId: "TKT-002", definitionRevision: 1 },
+        ],
+      },
+    });
+  });
+
+  it("never adopts a foreign or malformed fenced writer lock", () => {
+    const repo = make();
+    const scope = authoringScopeFor(repo.work);
+    const publisher = new GitTicketGenerationPublisherV0();
+    const request = fencedRequest(
+      [definition({ id: "TKT-001" })],
+      null,
+    );
+    const ownerSession = publisher.publishFenced(scope, request);
+    const lockRoot = writerLockRoot(repo.work);
+    const ownerBytes = readWriterLock(repo.work);
+    const foreignRequest = {
+      ...request,
+      fence: {
+        ...request.fence,
+        applicationIntentId: "ticket-application-intent:foreign",
+      },
+    };
+
+    expect(() => publisher.publishFenced(
+      scope,
+      foreignRequest,
+    )).toThrowError(expect.objectContaining({
+      code: "ticket_store_writer_busy",
+    }));
+    expect(readWriterLock(repo.work)).toBe(ownerBytes);
+    ownerSession.release();
+
+    const malformedToken = crypto.randomUUID();
+    fs.mkdirSync(lockRoot);
+    const malformedOwner = path.join(
+      lockRoot,
+      `owner-${malformedToken}.json`,
+    );
+    fs.writeFileSync(malformedOwner, `${malformedToken}\n`);
+    expect(() => publisher.publishFenced(scope, request)).toThrowError(
+      expect.objectContaining({ code: "ticket_store_writer_busy" }),
+    );
+    expect(fs.readFileSync(malformedOwner, "utf8")).toMatch(/\n$/u);
+  });
+
+  it("retains its fence when neither the base nor candidate is current", () => {
+    const repo = make();
+    const scope = authoringScopeFor(repo.work);
+    const publisher = new GitTicketGenerationPublisherV0();
+    const baseRequest = fencedRequest(
+      [definition({ id: "TKT-001" })],
+      null,
+      { applicationIntentId: "ticket-application-intent:stale-base" },
+    );
+    const baseSession = publisher.publishFenced(scope, baseRequest);
+    baseSession.release();
+    const competing = publisher.publish(scope, {
+      expectedSnapshotId: baseSession.result.snapshotId,
+      definitions: [
+        definition({
+          id: "TKT-001",
+          revision: 2,
+          outcome: "A different already-published graph",
+        }),
+      ],
+    });
+    const staleRequest = fencedRequest(
+      [
+        definition({ id: "TKT-001" }),
+        definition({ id: "TKT-002", dependsOn: ["TKT-001"] }),
+      ],
+      baseSession.result.snapshotId,
+      {
+        applicationIntentId: "ticket-application-intent:stale-candidate",
+        intentDigest: "c".repeat(64),
+      },
+    );
+    const lockRoot = writerLockRoot(repo.work);
+
+    expect(() => publisher.publishFenced(scope, staleRequest)).toThrowError(
+      expect.objectContaining({
+        code: "ticket_store_cas_conflict",
+        details: {
+          expectedSnapshotId: baseSession.result.snapshotId,
+          actualSnapshotId: competing.snapshotId,
+          candidateSnapshotId: staleRequest.fence.candidateSnapshotId,
+        },
+      }),
+    );
+    expect(JSON.parse(readWriterLock(repo.work))).toMatchObject({
+      fence: staleRequest.fence,
     });
   });
 
@@ -235,9 +706,7 @@ describe("GitTicketGenerationPublisherV0", () => {
         ticketDefinitions: [{ ticketId: "TKT-001" }],
       },
     });
-    expect(fs.existsSync(
-      path.join(repo.work, ".vibehub", ".ticket-store.publish.lock"),
-    )).toBe(true);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(true);
   });
 
   it("publishes a monotonic second generation and retains the first", () => {
@@ -504,18 +973,20 @@ describe("GitTicketGenerationPublisherV0", () => {
     })).toThrowError(expect.objectContaining({
       code: "ticket_store_revision_conflict",
     }));
-    expect(fs.existsSync(
-      path.join(repo.work, ".vibehub", ".ticket-store.publish.lock"),
-    )).toBe(false);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(false);
   });
 
   it("fails closed on an existing writer lock", () => {
     const repo = make();
     const scope = scopeFor(repo.work);
-    const controlRoot = path.join(repo.work, ".vibehub");
-    fs.mkdirSync(controlRoot);
-    const lockPath = path.join(controlRoot, ".ticket-store.publish.lock");
-    fs.writeFileSync(lockPath, `${crypto.randomUUID()}\n`);
+    const lockRoot = writerLockRoot(repo.work);
+    const malformedToken = crypto.randomUUID();
+    fs.mkdirSync(lockRoot, { recursive: true });
+    const malformedOwner = path.join(
+      lockRoot,
+      `owner-${malformedToken}.json`,
+    );
+    fs.writeFileSync(malformedOwner, `${malformedToken}\n`);
 
     expect(() => new GitTicketGenerationPublisherV0().publish(scope, {
       expectedSnapshotId: null,
@@ -523,7 +994,7 @@ describe("GitTicketGenerationPublisherV0", () => {
     })).toThrowError(expect.objectContaining({
       code: "ticket_store_writer_busy",
     }));
-    expect(fs.readFileSync(lockPath, "utf8")).toMatch(/\n$/u);
+    expect(fs.readFileSync(malformedOwner, "utf8")).toMatch(/\n$/u);
     expect(fs.existsSync(
       path.join(repo.work, GIT_TICKET_STORE_RELATIVE_PATH),
     )).toBe(false);
@@ -570,9 +1041,7 @@ describe("GitTicketGenerationPublisherV0", () => {
         ticketDefinitions: [{ ticketId: "TKT-001" }],
       },
     });
-    expect(fs.existsSync(
-      path.join(repo.work, ".vibehub", ".ticket-store.publish.lock"),
-    )).toBe(true);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(true);
     expect(() => publisher.publish(scope, {
       expectedSnapshotId: first.snapshotId,
       definitions: [definition({ id: "TKT-001" })],
@@ -640,9 +1109,7 @@ describe("GitTicketGenerationPublisherV0", () => {
         ],
       },
     });
-    expect(fs.existsSync(
-      path.join(repo.work, ".vibehub", ".ticket-store.publish.lock"),
-    )).toBe(true);
+    expect(fs.existsSync(writerLockRoot(repo.work))).toBe(true);
   });
 
   it("does not follow a symlinked control directory outside the worktree", () => {

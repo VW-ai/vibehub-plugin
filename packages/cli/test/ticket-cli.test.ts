@@ -550,7 +550,7 @@ describe("vibehub ticket JSON adapter", () => {
     });
   });
 
-  it("rejects the absent proposal.apply operation before reading its input", () => {
+  it("recognizes proposal.apply and enforces its Core input budget", () => {
     const result = invoke([
       "ticket",
       "proposal.apply",
@@ -569,7 +569,7 @@ describe("vibehub ticket JSON adapter", () => {
       ok: false,
       error: {
         code: "validation_error",
-        message: "unsupported ticket operation: proposal.apply",
+        message: "operation raw JSON input exceeds 65536 bytes",
       },
     });
   });

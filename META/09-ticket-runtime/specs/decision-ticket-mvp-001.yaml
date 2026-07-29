@@ -57,8 +57,8 @@ intent:
     proposal-application semantics.
 
     The Core-internal outline generation compiler and publication-head CAS
-    substrate now exist, but they are deliberately unregistered and grant no
-    mutation authority.
+    substrate now exist. The low-level publisher remains deliberately
+    unregistered and grants no mutation authority on its own.
 
     **Submit-only proposal slice — 2026-07-29**
 
@@ -96,9 +96,50 @@ intent:
     grant authority, record a GateDecision, authorize application, mutate the
     graph, or expose the internal publisher.
 
-    App integration, proposal application, semantic definition CAS and
-    application receipts, capability/trace receipt currentness, trusted gate
-    authority, context compilation, Run/Evidence/Outcome writers, and semantic
+    **Trusted authority and fenced application slice — 2026-07-29**
+
+    This implemented slice registers `ticket.proposal.review.inspect`,
+    `ticket.proposal.authority.decide`, and `ticket.proposal.apply` through the
+    same Core/CLI/MCP operation spine. Review binds the complete bounded
+    validation ledger by digest, through-sequence, and count and exposes any
+    immutable decision/application receipt plus one derived next action.
+
+    Public operation JSON carries only immutable proposal, candidate,
+    validation-set, and decision bindings. It cannot carry a trusted principal,
+    disposition, or authority assertion. Core obtains those only from a
+    non-serializable `TrustedTicketProposalAuthorityProviderV0` injected by a
+    trusted host. Bootstrap, expansion, a declared human gate, and any
+    protected authority signal require a host-authenticated human and a
+    human-authority basis. Non-protected elaboration/decomposition may proceed
+    only with a trusted delegation basis. Authorization must accept at least
+    one exact passing, non-blocking validation receipt, while the decision
+    remains bound to the complete ledger including contrary receipts.
+
+    An authority decision is immutable and terminal for one exact proposal and
+    closes its validation ledger. Application first persists an immutable
+    intent containing the exact candidate definition inventory and publication
+    base/candidate identities. Core then invokes an internal fenced Git
+    publication path and retains its worktree-specific Git-admin writer fence
+    until the matching immutable SQLite application receipt commits. On retry
+    after Git became visible but receipt insertion failed, the exact intent
+    fence may be adopted: current candidate reconciles, current base resumes,
+    and a malformed or foreign fence or third head fails closed. Cleanup after
+    a committed receipt requires the exact fence and a canonical head equal to
+    its candidate.
+
+    Default CLI/MCP construction deliberately injects no authority provider.
+    It exposes the contract and review/apply path but cannot self-authorize a
+    bootstrap or protected change; authority resolution fails
+    `trusted_authority_unavailable` until a trusted host supplies the provider.
+    The public caller `actor` remains claimed attribution throughout. The
+    `vibehub-ticket-apply` Skill follows the derived review/authority/apply
+    sequence, retries exact interrupted applications, and stops when trusted
+    authority is unavailable instead of turning conversation text into proof.
+
+    App decision-surface integration, generic GateDecision recording,
+    Ticket-readiness validation/currentness, complete Ticket definitions,
+    capability/trace receipt currentness, context compilation,
+    Run/Evidence/Outcome writers, explicit removal/supersession, and semantic
     closeout remain blocked on their existing decisions.
 
     The full dogfood loop is still unresolved. The loop above remains a
@@ -108,20 +149,28 @@ intent:
 constraints:
   - kind: must
     rule: "The first public Ticket write records an immutable review contribution only and must not change the canonical Ticket Graph"
-  - kind: must_not
-    rule: "The MVP must not expose proposal application, trusted GateDecision recording, or the internal Git publisher as a public operation"
+  - kind: must
+    rule: "The MVP exposes proposal review, trusted authority resolution, and proposal application only through Core; the low-level Git publisher remains internal and authority-neutral"
   - kind: must
     rule: "Machine validation and human authority remain separate from mechanical submission review, and technical difficulty alone does not require human intervention"
   - kind: must
     rule: "The proposal-query and validation slice exposes five bounded Core operations and an independent Skill whose records remain immutable claimed_unverified proposal/candidate evidence"
   - kind: must_not
     rule: "Proposal validation must not be conflated with Ticket readiness or maturity, select a current/latest receipt, grant authority, authorize application, or mutate the graph"
+  - kind: must
+    rule: "Authority decisions bind the exact proposal, candidate, and complete validation ledger and can be produced only by a host-injected trusted authority provider, never by caller actor or operation JSON"
+  - kind: must
+    rule: "Bootstrap, expansion, declared human gates, and protected authority signals require a host-authenticated human authority basis; delegated policy is limited to non-protected elaboration or decomposition"
+  - kind: must
+    rule: "Application persists an immutable exact-candidate intent before fenced Git publication and releases the writer fence only after the immutable application receipt commits"
+  - kind: must_not
+    rule: "Default CLI/MCP adapters must not mint trusted human authority; without a trusted host provider authority resolution fails closed"
 indexing:
   type: decision
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, open, grilling, mvp, dogfood, plugin]
+  tags: [wayfinder, open, grilling, mvp, dogfood, plugin, trusted-authority, fenced-application]
 provenance:
   source_type: chat_extraction
   confidence: 0.8
@@ -157,5 +206,11 @@ anchors:
   - file: "META/09-ticket-runtime/spec.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
   - file: "skills/vibehub-ticket-validate/SKILL.md"
+  - file: "skills/vibehub-ticket-apply/SKILL.md"
+  - file: "packages/core/src/contract/ticket-application.ts"
+  - file: "packages/core/src/contract/ticket-application-schemas.ts"
+  - file: "packages/core/src/ticket-application-service.ts"
+  - file: "packages/core/test/ticket-application-contract.test.ts"
   - file: "packages/core/test/ticket-proposal-service.test.ts"

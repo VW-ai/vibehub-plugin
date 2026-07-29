@@ -20,6 +20,16 @@ import {
   TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE,
   TICKET_REVIEW_TRACE_KINDS,
 } from "./contract/ticket-review.js";
+import {
+  TICKET_PROPOSAL_APPLICATION_MAX_INPUT_BYTES,
+  TICKET_PROPOSAL_AUTHORITY_MAX_INPUT_BYTES,
+  TICKET_PROPOSAL_REVIEW_MAX_INPUT_BYTES,
+} from "./contract/ticket-application.js";
+import {
+  ticketProposalApplyInputV0Schema,
+  ticketProposalAuthorityDecideInputV0Schema,
+  ticketProposalReviewInputV0Schema,
+} from "./contract/ticket-application-schemas.js";
 
 // Public operation strings are canonical values, not normalization requests.
 // The absolute-end guard prevents JavaScript's `$` from accepting a final newline.
@@ -385,6 +395,10 @@ export const operationInputSchemas = {
     validationReceiptId: ticketProposalValidationReceiptId,
   }).strict(),
   "ticket.proposal.validation.list": ticketProposalValidationList,
+  "ticket.proposal.review.inspect": ticketProposalReviewInputV0Schema,
+  "ticket.proposal.authority.decide":
+    ticketProposalAuthorityDecideInputV0Schema,
+  "ticket.proposal.apply": ticketProposalApplyInputV0Schema,
 } as const;
 
 export const OPERATION_INPUT_BYTE_LIMITS = {
@@ -395,6 +409,10 @@ export const OPERATION_INPUT_BYTE_LIMITS = {
     TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES,
   "ticket.proposal.validation.inspect": 16 * 1024,
   "ticket.proposal.validation.list": 32 * 1024,
+  "ticket.proposal.review.inspect": TICKET_PROPOSAL_REVIEW_MAX_INPUT_BYTES,
+  "ticket.proposal.authority.decide":
+    TICKET_PROPOSAL_AUTHORITY_MAX_INPUT_BYTES,
+  "ticket.proposal.apply": TICKET_PROPOSAL_APPLICATION_MAX_INPUT_BYTES,
 } as const satisfies Partial<Record<keyof typeof operationInputSchemas, number>>;
 
 /** Unknown operation inputs are bounded before hashing for receipt replay. */

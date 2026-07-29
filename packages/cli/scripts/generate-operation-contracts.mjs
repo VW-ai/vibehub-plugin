@@ -18,7 +18,7 @@ import {
   validateRuntimeRefinements,
 } from "../../../skills/scripts/operation-contract-validator.mjs";
 
-const EXPECTED_INPUT_SCHEMA_HASH="0b3fe08a62638633949e22587bc556cdf5441567edc3785256db26fdd6913653";
+const EXPECTED_INPUT_SCHEMA_HASH="58e08816d39ec04fd29d610cdb493da3a9c7711ef38608a9b03034937e167bc3";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../../..");
 const ajv=new Ajv2020({allErrors:true,strict:false});
@@ -165,6 +165,9 @@ function positiveFixture(name){
   const proposalId=`tgp-${"1".repeat(64)}`;
   const proposalDigest="2".repeat(64);
   const candidateDigest="3".repeat(64);
+  const validationSetDigest="7".repeat(64);
+  const authorityDecisionId=`tgd-${"8".repeat(64)}`;
+  const authorityDecisionDigest="9".repeat(64);
   const fixtures={
     "kb.status":{},"kb.feature.list":{query:"two words"},"kb.feature.get":{id:"x".repeat(200)},"kb.feature.suggest":{},
     "kb.spec.search":{paths:["src/two words.ts"],tags:["two words"]},"kb.spec.get":{id:specId},"kb.relations":{specId},"kb.lineage":{id:specId},"kb.anchors":{specId},"kb.review":{},
@@ -254,6 +257,22 @@ function positiveFixture(name){
       validationReceiptId:`tpv-${"6".repeat(64)}`,
     },
     "ticket.proposal.validation.list":{proposalId,limit:25},
+    "ticket.proposal.review.inspect":{proposalId},
+    "ticket.proposal.authority.decide":{
+      schemaVersion:1,
+      proposalId,
+      expectedProposalDigest:proposalDigest,
+      expectedCandidateDigest:candidateDigest,
+      expectedValidationSetDigest:validationSetDigest,
+    },
+    "ticket.proposal.apply":{
+      schemaVersion:1,
+      proposalId,
+      expectedProposalDigest:proposalDigest,
+      expectedCandidateDigest:candidateDigest,
+      authorityDecisionId,
+      expectedAuthorityDecisionDigest:authorityDecisionDigest,
+    },
   };
   if(!(name in fixtures))throw new Error(`missing positive operation fixture: ${name}`);
   return fixtures[name];
@@ -449,6 +468,64 @@ function negativeFixtures(name,positive,input){
     return [
       fixture("validation list limit above maximum",{...positive,limit:101}),
       fixture("validation list rejects mutable status filters",{...positive,status:"passed"}),
+    ];
+  }
+  if(name==="ticket.proposal.review.inspect"){
+    return [
+      fixture("proposal review id must use the canonical identity",{
+        proposalId:"proposal-1",
+      }),
+      fixture("proposal review rejects caller-selected authority",{
+        ...positive,
+        authorityGranted:true,
+      }),
+    ];
+  }
+  if(name==="ticket.proposal.authority.decide"){
+    return [
+      fixture("authority decision schema version must be one",{
+        ...positive,
+        schemaVersion:2,
+      }),
+      fixture("authority decision validation set digest must be lowercase sha256",{
+        ...positive,
+        expectedValidationSetDigest:"not-a-digest",
+      }),
+      fixture("authority decision rejects caller-selected disposition",{
+        ...positive,
+        disposition:"authorized",
+      }),
+      fixture("authority decision rejects caller-asserted principal",{
+        ...positive,
+        principal:{
+          kind:"human",
+          ref:"caller:forged",
+        },
+      }),
+    ];
+  }
+  if(name==="ticket.proposal.apply"){
+    return [
+      fixture("proposal application schema version must be one",{
+        ...positive,
+        schemaVersion:2,
+      }),
+      fixture("proposal application authority decision id must be canonical",{
+        ...positive,
+        authorityDecisionId:"decision-1",
+      }),
+      fixture("proposal application decision digest must be lowercase sha256",{
+        ...positive,
+        expectedAuthorityDecisionDigest:"not-a-digest",
+      }),
+      fixture("proposal application rejects caller-selected disposition",{
+        ...positive,
+        disposition:"authorized",
+      }),
+      fixture("proposal application rejects caller-asserted authority",{
+        ...positive,
+        authorityGranted:true,
+      }),
     ];
   }
   const explicit={
