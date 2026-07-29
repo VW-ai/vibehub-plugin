@@ -56,15 +56,6 @@ export const CANONICAL_OPERATION_PRESENTATION = {
   "ticket.graph.snapshot": { activity: "review", effect: "read" },
   "ticket.subject.inspect": { activity: "review", effect: "read" },
   "ticket.trace.list": { activity: "review", effect: "read" },
-  "ticket.proposal.submit": { activity: "review", effect: "write" },
-  "ticket.proposal.inspect": { activity: "review", effect: "read" },
-  "ticket.proposal.list": { activity: "review", effect: "read" },
-  "ticket.proposal.validation.record": { activity: "review", effect: "write" },
-  "ticket.proposal.validation.inspect": { activity: "review", effect: "read" },
-  "ticket.proposal.validation.list": { activity: "review", effect: "read" },
-  "ticket.proposal.review.inspect": { activity: "review", effect: "read" },
-  "ticket.proposal.authority.decide": { activity: "review", effect: "write" },
-  "ticket.proposal.apply": { activity: "review", effect: "write" },
 } as const;
 
 export const WORKFLOW_PHASES = ["prepare", "execute", "complete"] as const;

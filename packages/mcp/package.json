@@ -28,7 +28,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node scripts/bundle.mjs",
+    "build": "node ../../scripts/clean-package-dist.mjs && tsc -p tsconfig.build.json && node scripts/bundle.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

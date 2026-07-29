@@ -112,7 +112,7 @@ describe("KnowledgeService canonical boundary",()=>{
     expect(dispatch.dispatch("kb.status",{...request,taskId:"task:2"},{})).toMatchObject({ok:false,error:{code:"idempotency_conflict"}});
   });
 
-  it("receipts malformed input and unsupported operations once repository identity is addressable",()=>{
+  it("receipts malformed registered input but never receipts unsupported operations",()=>{
     const malformed={...ctx,requestId:"malformed-reserved"};
     const bad=dispatch.dispatch("kb.feature.get",malformed,{id:""});
     expect(bad).toMatchObject({ok:false,error:{code:"validation_error"}});
@@ -124,8 +124,12 @@ describe("KnowledgeService canonical boundary",()=>{
     const first=dispatch.dispatch("legacy.removed",unsupported,{value:1});
     expect(first).toMatchObject({ok:false,error:{code:"unsupported_operation"}});
     expect(dispatch.dispatch("legacy.removed",unsupported,{value:1})).toEqual(first);
-    expect(dispatch.dispatch("legacy.removed",{...unsupported,actor:"other"},{value:1})).toMatchObject({ok:false,error:{code:"idempotency_conflict"}});
-    expect(dispatch.dispatch("legacy.removed",unsupported,{value:2})).toMatchObject({ok:false,error:{code:"idempotency_conflict"}});
+    expect(dispatch.dispatch("legacy.removed",{...unsupported,actor:"other"},{value:1})).toMatchObject({ok:false,error:{code:"unsupported_operation"}});
+    expect(dispatch.dispatch("legacy.removed",unsupported,{value:2})).toMatchObject({ok:false,error:{code:"unsupported_operation"}});
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM operation_request_receipts
+       WHERE request_id='unsupported-reserved'`,
+    ).get()).toEqual({count:0});
   });
 
   it("rejects oversized unknown-operation input before hashing or receipting",()=>{
@@ -135,10 +139,9 @@ describe("KnowledgeService canonical boundary",()=>{
     })).toMatchObject({
       ok:false,
       error:{
-        code:"validation_error",
+        code:"unsupported_operation",
         details:{
           operation:"ticket.proposal.future-unknown",
-          maximumBytes:UNKNOWN_OPERATION_INPUT_MAX_BYTES,
         },
       },
     });

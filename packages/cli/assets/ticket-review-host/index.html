@@ -4,17 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>VibeHub Ticket review</title>
+  <title>VibeHub Ticket graph</title>
   <link rel="stylesheet" href="/app.css">
   <script src="/app.js" defer></script>
 </head>
 <body>
   <div class="ambient-context" aria-hidden="true">
     <strong id="ambientProject">VibeHub</strong>
-    <span id="ambientBranch">loading review session</span>
+    <span id="ambientBranch">loading Git Ticket graph</span>
   </div>
 
-  <section class="surface open" id="surface" aria-label="Ticket graph review">
+  <section class="surface open" id="surface" aria-label="Ticket graph">
     <button
       class="signal"
       id="signal"
@@ -28,9 +28,9 @@
       </svg>
       <span class="signal-copy">
         <strong>Ticket graph</strong>
-        <span id="signalDetail">Loading exact proposal…</span>
+        <span id="signalDetail">Reading the current worktree…</span>
       </span>
-      <span class="signal-attention" id="signalAttention">Review</span>
+      <span class="signal-attention" id="signalAttention">Git</span>
       <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true">
         <path d="m4 6 4 4 4-4"/>
       </svg>
@@ -42,16 +42,26 @@
           <div class="toolbar-path">
             <strong id="projectName">Project</strong>
             <span>/</span>
-            <span id="proposalRef">proposal</span>
+            <button
+              class="source-ref"
+              id="sourceRef"
+              type="button"
+              title="Copy full worktree path"
+            >worktree</button>
           </div>
           <div class="toolbar-tools" aria-label="Graph controls">
             <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
             <button type="button" id="fitGraph">Fit</button>
             <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
           </div>
-          <button class="toolbar-state" id="reviewStatus" type="button">
+          <button
+            class="toolbar-state"
+            id="sourceStatus"
+            type="button"
+            title="Refresh from Git"
+          >
             <span class="state-dot" id="stateDot"></span>
-            <span id="stateLabel">Loading</span>
+            <span id="stateLabel">Reading</span>
           </button>
         </header>
 
@@ -63,77 +73,39 @@
                 <g id="nodeLayer"></g>
               </g>
             </svg>
-            <div class="canvas-hint" id="canvasHint">Drag to pan · scroll to zoom · select any Ticket</div>
+            <div class="canvas-hint">Drag to pan · scroll to zoom · select any Ticket</div>
             <svg
               class="minimap"
               id="minimap"
               role="button"
               tabindex="0"
               aria-label="Recenter graph from minimap"
+              preserveAspectRatio="xMidYMid meet"
             ></svg>
+            <div class="empty-state" id="emptyState" hidden>
+              <span class="empty-mark"></span>
+              <strong>No Tickets in this worktree</strong>
+              <span>Add documents under .vibehub/tickets/tickets.</span>
+            </div>
             <div class="loading-state" id="loadingState">
               <span class="loading-mark"></span>
-              <span>Binding the exact proposal and validation set</span>
+              <span>Reading one exact Git source</span>
             </div>
           </section>
 
           <aside class="inspector open" id="inspector" aria-label="Ticket inspector">
             <div class="inspector-head">
               <div>
-                <span class="eyebrow" id="inspectorEyebrow">Plan review</span>
-                <h1 id="inspectorTitle" tabindex="-1">Review the complete graph</h1>
+                <span class="eyebrow" id="inspectorEyebrow">Current graph</span>
+                <h1 id="inspectorTitle" tabindex="-1">The work that unlocks the outcome</h1>
               </div>
               <button class="icon-button" id="closeInspector" type="button" aria-label="Close inspector">×</button>
             </div>
-
             <div class="inspector-body">
               <p class="outcome" id="inspectorOutcome">
-                The candidate remains immutable while you inspect its direct unlock paths.
+                Select a Ticket to read its complete executable context package.
               </p>
-
-              <dl class="facts" id="facts">
-                <div><dt id="candidateLabel">Candidate</dt><dd id="candidateFact">—</dd></div>
-                <div><dt id="validationLabel">Validation</dt><dd id="validationFact">—</dd></div>
-                <div><dt id="authorityLabel">Authority</dt><dd id="authorityFact">—</dd></div>
-              </dl>
-
-              <section class="relation-list" id="relationSection" hidden>
-                <h2>Direct relations</h2>
-                <div id="relationList"></div>
-              </section>
-
-              <section class="validation-list" id="validationSection" hidden>
-                <h2>Validation summaries</h2>
-                <div id="validationList"></div>
-              </section>
-
-              <section class="decision" id="decisionSection">
-                <div class="decision-copy">
-                  <span class="eyebrow">Human authority</span>
-                  <h2 id="decisionTitle">Review before publication</h2>
-                  <p id="decisionDetail">Only this local host can turn your explicit decision into trusted authority.</p>
-                </div>
-                <label for="rationale">Decision rationale</label>
-                <textarea
-                  id="rationale"
-                  rows="4"
-                  maxlength="2000"
-                  placeholder="What did you review, and why is this direction acceptable or not?"
-                ></textarea>
-                <div class="decision-actions">
-                  <button class="secondary" id="rejectButton" type="button">Request changes</button>
-                  <button class="primary" id="authorizeButton" type="button" disabled>Authorize and publish</button>
-                </div>
-                <p class="decision-note" id="decisionNote">A rationale of at least 12 characters is required.</p>
-                <details class="trust-disclosure">
-                  <summary>Local trust boundary</summary>
-                  <p>
-                    This host treats an explicit action in the user-opened local
-                    browser as human intent. It does not defend against another
-                    process already controlling the same OS account.
-                  </p>
-                </details>
-              </section>
+              <div id="inspectorContent"></div>
             </div>
           </aside>
         </main>

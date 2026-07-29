@@ -94,7 +94,7 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     raw.close();
 
     const db = openDb(file);
-    expect(CURRENT_SCHEMA_VERSION).toBe(20);
+    expect(CURRENT_SCHEMA_VERSION).toBe(21);
     expect(db.pragma("user_version", { simple: true })).toBe(CURRENT_SCHEMA_VERSION);
     expect(db.prepare(`SELECT repo_id, feature_id FROM kb_features WHERE feature_id = 'root' ORDER BY repo_id`).all())
       .toEqual([{ repo_id: 1, feature_id: "root" }, { repo_id: 2, feature_id: "root" }]);
@@ -144,7 +144,7 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     const upgraded=openDb(file);
     expect(upgraded.pragma("user_version",{simple:true})).toBe(CURRENT_SCHEMA_VERSION);
     expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='distill_scope_dispositions'`).get()).toEqual({name:"distill_scope_dispositions"});
-    expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='operation_outcome_blobs'`).get()).toEqual({name:"operation_outcome_blobs"});
+    expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='operation_outcome_blobs'`).get()).toBeUndefined();
     upgraded.prepare(`INSERT INTO repos(root_path,default_branch,created_at) VALUES('/integrity','main',?)`).run(T0);
     const insertReceipt=upgraded.prepare(`INSERT INTO operation_request_receipts(repo_id,request_id,operation,payload_hash,outcome_kind,outcome,created_at) VALUES(1,?,'kb.status','hash','success',?,?)`);
     expect(()=>insertReceipt.run('missing-ok','{}',T0)).toThrow(/CHECK constraint/);
@@ -174,26 +174,12 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     db.close();
 
     const raw=new Database(file);
-    raw.exec(`
-      DROP TRIGGER IF EXISTS ticket_proposal_validations_closed_after_decision;
-      DROP TABLE ticket_proposal_application_receipts;
-      DROP TABLE ticket_proposal_application_intents;
-      DROP TABLE ticket_proposal_authority_decisions;
-      DROP TABLE ticket_proposal_validation_receipts;
-      DROP TABLE ticket_proposals;
-      DROP TRIGGER operation_request_receipt_blob_binding_insert;
-      ALTER TABLE operation_request_receipts DROP COLUMN outcome_blob_digest;
-      DROP TABLE operation_outcome_blobs;
-      PRAGMA user_version=16;
-    `);
+    raw.pragma("user_version=16");
     raw.close();
 
     db=openDb(file);
-    expect(db.prepare(
-      `SELECT outcome_blob_digest outcomeBlobDigest
-       FROM operation_request_receipts
-       WHERE repo_id=1 AND request_id='legacy-inline'`,
-    ).get()).toEqual({outcomeBlobDigest:null});
+    expect((db.pragma("table_info(operation_request_receipts)") as Array<{name:string}>)
+      .some((column)=>column.name==="outcome_blob_digest")).toBe(false);
     expect(new OperationDispatcher(db).dispatch(
       "kb.status",
       context,
@@ -218,711 +204,64 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     db.close();
   });
 
-  it("refuses to bless v18 proposal rows with absent required JSON keys", () => {
-    const dir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "vibehub-proposal-v18-corrupt-"),
-    );
-    dirs.push(dir);
-    const file = path.join(dir, "legacy-v18.db");
-    openDb(file).close();
+  it("removes the retired Ticket semantic runtime while preserving generic operation receipts",()=>{
+    const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-ticket-runtime-v20-"));dirs.push(dir);
+    const file=path.join(dir,"legacy-v20.db"),repoRoot=path.join(dir,"repo");
+    fs.mkdirSync(repoRoot);
+    let db=openDb(file);
+    db.prepare(`INSERT INTO repos(root_path,default_branch,created_at) VALUES(?,'main',?)`).run(repoRoot,T0);
+    const context={repoId:1,actor:"legacy-reader",requestId:"preserved-receipt",now:T0};
+    const first=new OperationDispatcher(db).dispatch("kb.status",context,{});
+    db.close();
 
-    const raw = new Database(file);
+    const raw=new Database(file);
     raw.exec(`
-      DROP TRIGGER IF EXISTS ticket_proposal_validations_closed_after_decision;
-      DROP TABLE ticket_proposal_application_receipts;
-      DROP TABLE ticket_proposal_application_intents;
-      DROP TABLE ticket_proposal_authority_decisions;
-      DROP TRIGGER ticket_proposals_required_payload_insert;
-      DROP TABLE ticket_proposal_validation_receipts;
-      PRAGMA user_version=18;
+      CREATE TABLE operation_outcome_blobs(digest TEXT PRIMARY KEY);
+      ALTER TABLE operation_request_receipts ADD COLUMN outcome_blob_digest TEXT;
+      CREATE TABLE ticket_proposals(id TEXT PRIMARY KEY);
+      CREATE TABLE ticket_proposal_validation_receipts(id TEXT PRIMARY KEY);
+      CREATE TABLE ticket_proposal_authority_decisions(id TEXT PRIMARY KEY);
+      CREATE TABLE ticket_proposal_application_intents(id TEXT PRIMARY KEY);
+      CREATE TABLE ticket_proposal_application_receipts(id TEXT PRIMARY KEY);
+      PRAGMA user_version=20;
     `);
     raw.prepare(
-      `INSERT INTO repos(
-         root_path,default_branch,created_at
-       ) VALUES('/proposal-v18-corrupt','main',?)`,
-    ).run(T0);
-    const proposalId = `tgp-${"1".repeat(64)}`;
-    const proposalDigest = "2".repeat(64);
-    const scopeRef = `tps-${"3".repeat(64)}`;
-    // v18's table CHECK evaluates to NULL, and therefore passes, when a
-    // required payload key such as graphMutationApplied is absent.
-    const payload = JSON.stringify({
-      schemaVersion: 1,
-      proposalId,
-      proposalDigest,
-      scopeRef,
-      kind: "graph_change",
-      observedSnapshotId: null,
-      submittedAt: T0,
-      proposer: { kind: "claimed_actor", ref: "agent:legacy" },
-      effect: "review_contribution_only",
-    });
-    raw.prepare(
-      `INSERT INTO ticket_proposals(
-         repo_id,scope_ref,proposal_id,proposal_digest,kind,
-         observed_snapshot_id,repository_root,worktree_root,
-         repository_incarnation,author,request_id,submitted_at,
-         payload,byte_length
-       ) VALUES(1,?,?,?,'graph_change',NULL,'/proposal-v18-corrupt',
-                '/proposal-v18-corrupt','legacy-incarnation',
-                'agent:legacy','legacy-corrupt',?,?,?)`,
-    ).run(
-      scopeRef,
-      proposalId,
-      proposalDigest,
-      T0,
-      payload,
-      Buffer.byteLength(payload, "utf8"),
-    );
+      `INSERT INTO operation_request_receipts(
+         repo_id,request_id,operation,payload_hash,
+         outcome_kind,outcome,created_at,outcome_blob_digest
+       ) VALUES(1,'retired-ticket-receipt','ticket.proposal.apply',
+         'legacy-ticket-payload','success',?,?,'legacy-ticket-blob')`,
+    ).run(JSON.stringify({
+      ok: true,
+      data: { applied: true },
+      meta: {
+        operation: "ticket.proposal.apply",
+        repoId: 1,
+        requestId: "retired-ticket-receipt",
+        at: T0,
+      },
+    }), T0);
     raw.close();
 
-    expect(() => openDb(file)).toThrow(/CHECK constraint failed/);
-    const inspect = new Database(file);
-    expect(inspect.pragma("user_version", { simple: true })).toBe(18);
-    expect(inspect.prepare(
-      `SELECT name FROM sqlite_master
-       WHERE type='table'
-         AND name='ticket_proposal_validation_receipts'`,
-    ).get()).toBeUndefined();
-    expect(inspect.prepare(
-      `SELECT name FROM sqlite_master
-       WHERE type='trigger'
-         AND name='ticket_proposals_required_payload_insert'`,
-    ).get()).toBeUndefined();
-    inspect.close();
-  });
-
-  it("upgrades valid v18 ledgers with strict proposal and validation guards", () => {
-    const dir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "vibehub-proposal-v18-valid-"),
-    );
-    dirs.push(dir);
-    const file = path.join(dir, "legacy-v18.db");
-    openDb(file).close();
-    const raw = new Database(file);
-    raw.exec(`
-      DROP TRIGGER IF EXISTS ticket_proposal_validations_closed_after_decision;
-      DROP TABLE ticket_proposal_application_receipts;
-      DROP TABLE ticket_proposal_application_intents;
-      DROP TABLE ticket_proposal_authority_decisions;
-      DROP TRIGGER ticket_proposals_required_payload_insert;
-      DROP TABLE ticket_proposal_validation_receipts;
-      PRAGMA user_version=18;
-    `);
-    raw.close();
-
-    const upgraded = openDb(file);
-    expect(upgraded.pragma("user_version", { simple: true })).toBe(20);
-    expect(upgraded.prepare(
-      `SELECT name FROM sqlite_master
-       WHERE type='table'
-         AND name='ticket_proposal_validation_receipts'`,
-    ).get()).toEqual({ name: "ticket_proposal_validation_receipts" });
-    upgraded.prepare(
-      `INSERT INTO repos(
-         root_path,default_branch,created_at
-       ) VALUES('/proposal-v18-valid','main',?)`,
-    ).run(T0);
-    const payload = JSON.stringify({
-      schemaVersion: 1,
-      proposalId: `tgp-${"1".repeat(64)}`,
-      proposalDigest: "2".repeat(64),
-      scopeRef: `tps-${"3".repeat(64)}`,
-      kind: "graph_change",
-      observedSnapshotId: null,
-      submittedAt: T0,
-      proposer: { kind: "claimed_actor", ref: "agent:legacy" },
-      effect: "review_contribution_only",
-    });
-    expect(() => upgraded.prepare(
-      `INSERT INTO ticket_proposals(
-         repo_id,scope_ref,proposal_id,proposal_digest,kind,
-         observed_snapshot_id,repository_root,worktree_root,
-         repository_incarnation,author,request_id,submitted_at,
-         payload,byte_length
-       ) VALUES(1,?,?,?,'graph_change',NULL,'/proposal-v18-valid',
-                '/proposal-v18-valid','legacy-incarnation',
-                'agent:legacy','legacy-invalid',?,?,?)`,
-    ).run(
-      `tps-${"3".repeat(64)}`,
-      `tgp-${"1".repeat(64)}`,
-      "2".repeat(64),
-      T0,
-      payload,
-      Buffer.byteLength(payload, "utf8"),
-    )).toThrow(/missing required bound fields/);
-    upgraded.close();
-  });
-
-  it("upgrades v19 with a closed authority decision and crash-reconcilable application ledger", () => {
-    const dir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "vibehub-ticket-application-v19-"),
-    );
-    dirs.push(dir);
-    const file = path.join(dir, "legacy-v19.db");
-    openDb(file).close();
-    const raw = new Database(file);
-    raw.exec(`
-      DROP TRIGGER ticket_proposal_validations_closed_after_decision;
-      DROP TABLE ticket_proposal_application_receipts;
-      DROP TABLE ticket_proposal_application_intents;
-      DROP TABLE ticket_proposal_authority_decisions;
-      PRAGMA user_version=19;
-    `);
-    raw.close();
-
-    const db = openDb(file);
-    expect(db.pragma("user_version", { simple: true })).toBe(20);
+    db=openDb(file);
+    expect(new OperationDispatcher(db).dispatch("kb.status",context,{})).toEqual(first);
     expect(db.prepare(
-      `SELECT name FROM sqlite_master
-       WHERE type='table' AND name LIKE 'ticket_proposal_%'
-       ORDER BY name`,
-    ).all()).toEqual([
-      { name: "ticket_proposal_application_intents" },
-      { name: "ticket_proposal_application_receipts" },
-      { name: "ticket_proposal_authority_decisions" },
-      { name: "ticket_proposal_validation_receipts" },
-      { name: "ticket_proposals" },
-    ]);
-    const blobBinding = db.prepare(
-      `SELECT sql FROM sqlite_master
-       WHERE type='trigger'
-         AND name='operation_request_receipt_blob_binding_insert'`,
-    ).get() as { sql: string };
-    expect(blobBinding.sql).toContain("'ticket.proposal.review.inspect'");
-    expect(blobBinding.sql).toContain("'ticket.proposal.authority.decide'");
-    expect(blobBinding.sql).toContain("'ticket.proposal.apply'");
-
-    db.prepare(
-      `INSERT INTO repos(
-         root_path,default_branch,created_at
-       ) VALUES('/ticket-application-v19','main',?)`,
-    ).run(T0);
-    const scopeRef = `tps-${"1".repeat(64)}`;
-    const proposalId = `tgp-${"2".repeat(64)}`;
-    const proposalDigest = "3".repeat(64);
-    const candidateDigest = "4".repeat(64);
-    const repositoryIncarnation = "ticket-application-incarnation";
-    const proposal = {
-      schemaVersion: 1,
-      proposalId,
-      proposalDigest,
-      scopeRef,
-      kind: "graph_change",
-      observedSnapshotId: null,
-      submittedAt: T0,
-      proposer: { kind: "claimed_actor", ref: "agent:migration-test" },
-      reason: "exercise the terminal authority and application ledger",
-      source: null,
-      authorAssessment: {},
-      changes: [{}],
-      mechanicalReview: { status: "passed", candidateDigest },
-      reviewRequirement: {
-        independentMachineValidation: "required",
-        authorityStatus: "not_granted",
-        routeHint: "human_authority_indicated",
-        indicatedAuthoritySignals: ["initial_plan_authority"],
-      },
-      effect: "review_contribution_only",
-      graphMutationApplied: false,
-    };
-    const proposalPayload = JSON.stringify(proposal);
-    db.prepare(
-      `INSERT INTO ticket_proposals(
-         repo_id,scope_ref,proposal_id,proposal_digest,kind,
-         observed_snapshot_id,repository_root,worktree_root,
-         repository_incarnation,author,request_id,submitted_at,
-         payload,byte_length
-       ) VALUES(
-         1,@scopeRef,@proposalId,@proposalDigest,'graph_change',
-         NULL,'/ticket-application-v19','/ticket-application-v19',
-         @repositoryIncarnation,'agent:migration-test','proposal-request',
-         @submittedAt,@payload,@byteLength
-       )`,
-    ).run({
-      scopeRef,
-      proposalId,
-      proposalDigest,
-      repositoryIncarnation,
-      submittedAt: T0,
-      payload: proposalPayload,
-      byteLength: Buffer.byteLength(proposalPayload, "utf8"),
-    });
-
-    const validationReceiptId = `tpv-${"5".repeat(64)}`;
-    const validationReceiptDigest = "6".repeat(64);
-    const validatorArtifactDigest = "7".repeat(64);
-    const policyArtifactDigest = "8".repeat(64);
-    const checks = [
-      "promise_preservation",
-      "containment_truth",
-      "dependency_truth",
-      "change_classification",
-      "delegated_scope",
-      "protected_boundaries",
-    ].map((code) => ({ code, outcome: "passed" }));
-    const validation = {
-      schemaVersion: 1,
-      kind: "ticket_proposal_validation_receipt",
-      validationReceiptId,
-      validationReceiptDigest,
-      scopeRef,
-      target: {
-        kind: "ticket_graph_change_proposal",
-        proposalId,
-        proposalDigest,
-        observedSnapshotId: null,
-        candidateDigest,
-      },
-      recordedAt: T0,
-      producer: {
-        kind: "claimed_machine_validator",
-        id: "migration-validator",
-        version: "1",
-        artifactDigest: validatorArtifactDigest,
-        trust: "claimed_unverified",
-        invokedBy: { kind: "claimed_actor", ref: "agent:migration-test" },
-      },
-      policy: {
-        id: "migration-policy",
-        version: "1",
-        artifactDigest: policyArtifactDigest,
-        trust: "claimed_unverified",
-      },
-      conclusion: "passed",
-      checks,
-      findings: [],
-      indicatedAuthoritySignals: ["initial_plan_authority"],
-      effect: "validation_evidence_only",
-      maturityEffect: "none",
-      authorityGranted: false,
-      applicationAuthorized: false,
-      graphMutationApplied: false,
-    };
-    const insertValidation = db.prepare(
-      `INSERT INTO ticket_proposal_validation_receipts(
-         repo_id,scope_ref,validation_receipt_id,
-         validation_receipt_digest,proposal_id,proposal_digest,
-         observed_snapshot_id,candidate_digest,repository_root,
-         worktree_root,repository_incarnation,author,request_id,
-         recorded_at,validator_id,validator_version,
-         validator_artifact_digest,policy_id,policy_version,
-         policy_artifact_digest,conclusion,check_count,finding_count,
-         blocking_finding_count,advisory_finding_count,
-         authority_signal_count,payload,byte_length
-       ) VALUES(
-         1,@scopeRef,@validationReceiptId,@validationReceiptDigest,
-         @proposalId,@proposalDigest,NULL,@candidateDigest,
-         '/ticket-application-v19','/ticket-application-v19',
-         @repositoryIncarnation,'agent:migration-test',@requestId,@recordedAt,
-         'migration-validator','1',@validatorArtifactDigest,
-         'migration-policy','1',@policyArtifactDigest,
-         'passed',6,0,0,0,1,@payload,@byteLength
-       )`,
-    );
-    const validationPayload = JSON.stringify(validation);
-    insertValidation.run({
-      scopeRef,
-      validationReceiptId,
-      validationReceiptDigest,
-      proposalId,
-      proposalDigest,
-      candidateDigest,
-      repositoryIncarnation,
-      requestId: "validation-request",
-      recordedAt: T0,
-      validatorArtifactDigest,
-      policyArtifactDigest,
-      payload: validationPayload,
-      byteLength: Buffer.byteLength(validationPayload, "utf8"),
-    });
-    const validationThroughSequence = (db.prepare(
-      `SELECT sequence FROM ticket_proposal_validation_receipts
-       WHERE repo_id=1 AND validation_receipt_id=?`,
-    ).get(validationReceiptId) as { sequence: number }).sequence;
-
-    const authorityDecisionId = `tgd-${"9".repeat(64)}`;
-    const authorityDecisionDigest = "a".repeat(64);
-    const validationSetDigest = "b".repeat(64);
-    const providerArtifactDigest = "c".repeat(64);
-    const authenticationContextDigest = "d".repeat(64);
-    const basisDigest = "e".repeat(64);
-    const acceptedValidations = [{
-      validationReceiptId,
-      validationReceiptDigest,
-    }];
-    const authoritySignals = ["initial_plan_authority"];
-    const decision = {
-      schemaVersion: 1,
-      kind: "ticket_proposal_authority_decision",
-      authorityDecisionId,
-      authorityDecisionDigest,
-      scopeRef,
-      target: {
-        kind: "ticket_graph_change_proposal",
-        proposalId,
-        proposalDigest,
-        observedSnapshotId: null,
-        candidateDigest,
-      },
-      validationSet: {
-        digest: validationSetDigest,
-        throughSequence: validationThroughSequence,
-        count: 1,
-        accepted: acceptedValidations,
-      },
-      requiredPath: "human_authority",
-      disposition: "authorized",
-      decidedAt: T0,
-      provider: {
-        kind: "trusted_host_authority_provider",
-        id: "migration-authority",
-        version: "1",
-        artifactDigest: providerArtifactDigest,
-        trust: "host_injected",
-      },
-      principal: {
-        kind: "human",
-        ref: "human:migration-test",
-        authenticationContextDigest,
-        trust: "host_authenticated",
-      },
-      basis: {
-        kind: "human_authority",
-        ref: "approval:migration-test",
-        digest: basisDigest,
-      },
-      resolvedAssessment: {
-        changeClass: "expansion",
-        authoritySignals,
-      },
-      rationale: "human authority accepted the validated exact candidate",
-      effect: "authority_decision_only",
-      maturityEffect: "none",
-      authorityGranted: true,
-      applicationAuthorized: true,
-      graphMutationApplied: false,
-    };
-    const insertDecision = db.prepare(
-      `INSERT INTO ticket_proposal_authority_decisions(
-         repo_id,scope_ref,authority_decision_id,
-         authority_decision_digest,proposal_id,proposal_digest,
-         observed_snapshot_id,candidate_digest,validation_set_digest,
-         validation_through_sequence,validation_set_count,
-         accepted_validations,required_path,disposition,provider_kind,
-         provider_id,provider_version,provider_artifact_digest,
-         provider_trust,principal_kind,principal_ref,
-         principal_authentication_context_digest,principal_trust,
-         basis_kind,basis_ref,basis_digest,resolved_change_class,
-         resolved_authority_signals,authority_signal_count,rationale,
-         request_id,decided_at,payload,byte_length
-       ) VALUES(
-         1,@scopeRef,@authorityDecisionId,@authorityDecisionDigest,
-         @proposalId,@proposalDigest,NULL,@candidateDigest,
-         @validationSetDigest,@validationThroughSequence,1,
-         @acceptedValidations,'human_authority','authorized',
-         'trusted_host_authority_provider','migration-authority','1',
-         @providerArtifactDigest,'host_injected',@principalKind,
-         @principalRef,@authenticationContextDigest,
-         'host_authenticated','human_authority','approval:migration-test',
-         @basisDigest,'expansion',@authoritySignals,1,
-         'human authority accepted the validated exact candidate',
-         'authority-request',@decidedAt,@payload,@byteLength
-       )`,
-    );
-    const invalidDecisionPayload = JSON.stringify({
-      ...decision,
-      basis: undefined,
-    });
-    expect(() => insertDecision.run({
-      scopeRef,
-      authorityDecisionId,
-      authorityDecisionDigest,
-      proposalId,
-      proposalDigest,
-      candidateDigest,
-      validationSetDigest,
-      validationThroughSequence,
-      acceptedValidations: JSON.stringify(acceptedValidations),
-      providerArtifactDigest,
-      principalKind: "human",
-      principalRef: "human:migration-test",
-      authenticationContextDigest,
-      basisDigest,
-      authoritySignals: JSON.stringify(authoritySignals),
-      decidedAt: T0,
-      payload: invalidDecisionPayload,
-      byteLength: Buffer.byteLength(invalidDecisionPayload, "utf8"),
-    })).toThrow(/authority decision binding is invalid/);
-    const invalidDecisionMaturityPayload = JSON.stringify({
-      ...decision,
-      maturityEffect: "granted",
-    });
-    expect(() => insertDecision.run({
-      scopeRef,
-      authorityDecisionId,
-      authorityDecisionDigest,
-      proposalId,
-      proposalDigest,
-      candidateDigest,
-      validationSetDigest,
-      validationThroughSequence,
-      acceptedValidations: JSON.stringify(acceptedValidations),
-      providerArtifactDigest,
-      principalKind: "human",
-      principalRef: "human:migration-test",
-      authenticationContextDigest,
-      basisDigest,
-      authoritySignals: JSON.stringify(authoritySignals),
-      decidedAt: T0,
-      payload: invalidDecisionMaturityPayload,
-      byteLength: Buffer.byteLength(invalidDecisionMaturityPayload, "utf8"),
-    })).toThrow(/authority decision binding is invalid/);
-    const invalidHumanPrincipalPayload = JSON.stringify({
-      ...decision,
-      principal: {
-        ...decision.principal,
-        kind: "service",
-        ref: "service:migration-test",
-      },
-    });
-    expect(() => insertDecision.run({
-      scopeRef,
-      authorityDecisionId,
-      authorityDecisionDigest,
-      proposalId,
-      proposalDigest,
-      candidateDigest,
-      validationSetDigest,
-      validationThroughSequence,
-      acceptedValidations: JSON.stringify(acceptedValidations),
-      providerArtifactDigest,
-      principalKind: "service",
-      principalRef: "service:migration-test",
-      authenticationContextDigest,
-      basisDigest,
-      authoritySignals: JSON.stringify(authoritySignals),
-      decidedAt: T0,
-      payload: invalidHumanPrincipalPayload,
-      byteLength: Buffer.byteLength(invalidHumanPrincipalPayload, "utf8"),
-    })).toThrow(/CHECK constraint failed/);
-    const decisionPayload = JSON.stringify(decision);
-    insertDecision.run({
-      scopeRef,
-      authorityDecisionId,
-      authorityDecisionDigest,
-      proposalId,
-      proposalDigest,
-      candidateDigest,
-      validationSetDigest,
-      validationThroughSequence,
-      acceptedValidations: JSON.stringify(acceptedValidations),
-      providerArtifactDigest,
-      principalKind: "human",
-      principalRef: "human:migration-test",
-      authenticationContextDigest,
-      basisDigest,
-      authoritySignals: JSON.stringify(authoritySignals),
-      decidedAt: T0,
-      payload: decisionPayload,
-      byteLength: Buffer.byteLength(decisionPayload, "utf8"),
-    });
-
-    const lateValidationReceiptId = `tpv-${"f".repeat(64)}`;
-    const lateValidationReceiptDigest = "0".repeat(64);
-    const lateValidation = {
-      ...validation,
-      validationReceiptId: lateValidationReceiptId,
-      validationReceiptDigest: lateValidationReceiptDigest,
-    };
-    const lateValidationPayload = JSON.stringify(lateValidation);
-    expect(() => insertValidation.run({
-      scopeRef,
-      validationReceiptId: lateValidationReceiptId,
-      validationReceiptDigest: lateValidationReceiptDigest,
-      proposalId,
-      proposalDigest,
-      candidateDigest,
-      repositoryIncarnation,
-      requestId: "late-validation-request",
-      recordedAt: T0,
-      validatorArtifactDigest,
-      policyArtifactDigest,
-      payload: lateValidationPayload,
-      byteLength: Buffer.byteLength(lateValidationPayload, "utf8"),
-    })).toThrow(/validation set is closed/);
-
-    const applicationIntentId = `tai-${"1".repeat(64)}`;
-    const applicationIntentDigest = "2".repeat(64);
-    const storeId = `ticket-store-${"3".repeat(32)}`;
-    const candidateSnapshotId = `tgs-${"4".repeat(64)}`;
-    const candidateDefinitions = JSON.stringify([{ id: "ticket-a" }]);
-    const intent = {
-      schemaVersion: 1,
-      kind: "ticket_proposal_application_intent",
-      applicationIntentId,
-      applicationIntentDigest,
-      scopeRef,
-      target: {
-        kind: "ticket_graph_change_proposal",
-        proposalId,
-        proposalDigest,
-        observedSnapshotId: null,
-        candidateDigest,
-      },
-      authorityDecision: {
-        authorityDecisionId,
-        authorityDecisionDigest,
-      },
-      preparedAt: T0,
-      publication: {
-        baseSnapshotId: null,
-        storeId,
-        candidateSnapshotId,
-        candidateDigest,
-        ticketCount: 1,
-        directUnlockCount: 0,
-      },
-      effect: "pending_canonical_graph_publication",
-      maturityEffect: "none",
-      graphMutationApplied: false,
-    };
-    const insertApplicationIntent = db.prepare(
-      `INSERT INTO ticket_proposal_application_intents(
-         repo_id,scope_ref,application_intent_id,
-         application_intent_digest,authority_decision_id,
-         authority_decision_digest,proposal_id,proposal_digest,
-         observed_snapshot_id,candidate_digest,repository_incarnation,
-         base_snapshot_id,store_id,candidate_snapshot_id,ticket_count,
-         direct_unlock_count,candidate_definitions,candidate_byte_length,
-         request_id,prepared_at,payload,byte_length
-       ) VALUES(
-         1,@scopeRef,@applicationIntentId,@applicationIntentDigest,
-         @authorityDecisionId,@authorityDecisionDigest,@proposalId,
-         @proposalDigest,NULL,@candidateDigest,@repositoryIncarnation,
-         NULL,@storeId,@candidateSnapshotId,1,0,@candidateDefinitions,
-         @candidateByteLength,'application-intent-request',@preparedAt,
-         @payload,@byteLength
-       )`,
-    );
-    const applicationIntentInsertArgs = (payload: string) => ({
-      scopeRef,
-      applicationIntentId,
-      applicationIntentDigest,
-      authorityDecisionId,
-      authorityDecisionDigest,
-      proposalId,
-      proposalDigest,
-      candidateDigest,
-      repositoryIncarnation,
-      storeId,
-      candidateSnapshotId,
-      candidateDefinitions,
-      candidateByteLength: Buffer.byteLength(candidateDefinitions, "utf8"),
-      preparedAt: T0,
-      payload,
-      byteLength: Buffer.byteLength(payload, "utf8"),
-    });
-    const invalidIntentMaturityPayload = JSON.stringify({
-      ...intent,
-      maturityEffect: "granted",
-    });
-    expect(() => insertApplicationIntent.run(
-      applicationIntentInsertArgs(invalidIntentMaturityPayload),
-    )).toThrow(/application intent binding is invalid/);
-    const intentPayload = JSON.stringify(intent);
-    insertApplicationIntent.run(applicationIntentInsertArgs(intentPayload));
-
-    const applicationReceiptId = `tar-${"5".repeat(64)}`;
-    const applicationReceiptDigest = "6".repeat(64);
-    const receipt = {
-      schemaVersion: 1,
-      kind: "ticket_proposal_application_receipt",
-      applicationReceiptId,
-      applicationReceiptDigest,
-      scopeRef,
-      applicationIntentId,
-      applicationIntentDigest,
-      authorityDecision: {
-        authorityDecisionId,
-        authorityDecisionDigest,
-      },
-      target: {
-        kind: "ticket_graph_change_proposal",
-        proposalId,
-        proposalDigest,
-        observedSnapshotId: null,
-        candidateDigest,
-      },
-      recordedAt: T0,
-      publication: {
-        status: "published",
-        previousSnapshotId: null,
-        snapshotId: candidateSnapshotId,
-        ticketCount: 1,
-        directUnlockCount: 0,
-      },
-      effect: "ticket_graph_publication",
-      maturityEffect: "none",
-      graphMutationApplied: true,
-    };
-    const insertApplicationReceipt = db.prepare(
-      `INSERT INTO ticket_proposal_application_receipts(
-         repo_id,scope_ref,application_receipt_id,
-         application_receipt_digest,application_intent_id,
-         application_intent_digest,authority_decision_id,
-         authority_decision_digest,proposal_id,proposal_digest,
-         observed_snapshot_id,candidate_digest,publication_status,
-         previous_snapshot_id,snapshot_id,ticket_count,
-         direct_unlock_count,request_id,recorded_at,payload,byte_length
-       ) VALUES(
-         1,@scopeRef,@applicationReceiptId,@applicationReceiptDigest,
-         @applicationIntentId,@applicationIntentDigest,
-         @authorityDecisionId,@authorityDecisionDigest,@proposalId,
-         @proposalDigest,NULL,@candidateDigest,'published',NULL,
-         @candidateSnapshotId,1,0,'application-receipt-request',
-         @recordedAt,@payload,@byteLength
-       )`,
-    );
-    const applicationReceiptInsertArgs = (payload: string) => ({
-      scopeRef,
-      applicationReceiptId,
-      applicationReceiptDigest,
-      applicationIntentId,
-      applicationIntentDigest,
-      authorityDecisionId,
-      authorityDecisionDigest,
-      proposalId,
-      proposalDigest,
-      candidateDigest,
-      candidateSnapshotId,
-      recordedAt: T0,
-      payload,
-      byteLength: Buffer.byteLength(payload, "utf8"),
-    });
-    const invalidReceiptMaturityPayload = JSON.stringify({
-      ...receipt,
-      maturityEffect: "granted",
-    });
-    expect(() => insertApplicationReceipt.run(
-      applicationReceiptInsertArgs(invalidReceiptMaturityPayload),
-    )).toThrow(/application receipt binding is invalid/);
-    const receiptPayload = JSON.stringify(receipt);
-    insertApplicationReceipt.run(
-      applicationReceiptInsertArgs(receiptPayload),
-    );
-
-    expect(() => db.prepare(
-      `UPDATE ticket_proposal_authority_decisions
-       SET rationale=rationale WHERE repo_id=1`,
-    ).run()).toThrow(/authority decisions are immutable/);
-    expect(() => db.prepare(
-      `DELETE FROM ticket_proposal_application_intents WHERE repo_id=1`,
-    ).run()).toThrow(/application intents are immutable/);
-    expect(() => db.prepare(
-      `UPDATE ticket_proposal_application_receipts
-       SET recorded_at=recorded_at WHERE repo_id=1`,
-    ).run()).toThrow(/application receipts are immutable/);
+      `SELECT COUNT(*) count FROM operation_request_receipts
+       WHERE operation LIKE 'ticket.%'`,
+    ).get()).toEqual({count:0});
+    const retiredTables=[
+      "operation_outcome_blobs",
+      "ticket_proposals",
+      "ticket_proposal_validation_receipts",
+      "ticket_proposal_authority_decisions",
+      "ticket_proposal_application_intents",
+      "ticket_proposal_application_receipts",
+    ];
+    expect(db.prepare(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name IN (${retiredTables.map(()=>"?").join(",")})`,
+    ).all(...retiredTables)).toEqual([]);
+    expect((db.pragma("table_info(operation_request_receipts)") as Array<{name:string}>)
+      .some((column)=>column.name==="outcome_blob_digest")).toBe(false);
     expect(db.prepare(`PRAGMA foreign_key_check`).all()).toEqual([]);
     db.close();
   });

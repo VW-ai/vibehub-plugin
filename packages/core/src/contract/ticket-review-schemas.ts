@@ -13,10 +13,13 @@ import {
   type TicketGraphSnapshotRequestV0,
   type TicketReviewCapabilitySlotV0,
   type TicketReviewCapabilitySummaryV0,
+  type TicketReviewDependsOnRelationV0,
+  type TicketReviewExecutableContextV0,
   type TicketReviewPageV0,
   type TicketReviewProjectionHeaderV0,
   type TicketReviewRelationProjectionV0,
   type TicketReviewSnapshotSummaryV0,
+  type TicketReviewSourceMetadataV0,
   type TicketReviewSubjectRefV0,
   type TicketReviewTicketProjectionV0,
   type TicketReviewTraceRecordV0,
@@ -40,7 +43,7 @@ const canonicalString = (maxLength: number) => boundedString(maxLength).refine(
 
 const opaqueRef = canonicalString(300);
 const ticketId = canonicalString(200);
-const positiveRevision = z.number().int().positive();
+const sha256Digest = z.string().regex(/^sha256:[0-9a-f]{64}$/);
 const nonnegativeInteger = z.number().int().nonnegative();
 const longText = boundedString(20_000);
 export const ticketReviewInstantV0Schema = z.iso.datetime({ offset: true }).refine(
@@ -164,9 +167,9 @@ const relationCapabilitiesSchema = z.object(
 export const ticketReviewTicketProjectionV0Schema:
 z.ZodType<TicketReviewTicketProjectionV0> = z.object({
   ticketId,
-  definitionRevision: positiveRevision,
+  ticketRevision: sha256Digest,
   outcome: canonicalString(20_000),
-  provenanceRefs: z.array(opaqueRef).max(20),
+  provenanceRefs: z.array(canonicalString(4_096)).max(200),
   capabilities: ticketCapabilitiesSchema,
   relationCounts: z.object({
     prerequisites: nonnegativeInteger,
@@ -181,7 +184,7 @@ z.ZodType<TicketReviewRelationProjectionV0> = z.object({
   prerequisiteTicketId: ticketId,
   dependentTicketId: ticketId,
   rationale: longText.optional(),
-  provenanceRefs: z.array(opaqueRef).max(20),
+  provenanceRefs: z.array(canonicalString(4_096)).max(200),
   capabilities: relationCapabilitiesSchema,
   traceCount: nonnegativeInteger.max(TICKET_REVIEW_MAX_TRACE_RECORDS),
 }).strict();
@@ -200,6 +203,34 @@ const ticketReviewPageV0Schema: z.ZodType<TicketReviewPageV0> = z.object({
   totalItems: nonnegativeInteger,
 }).strict();
 
+export const ticketReviewSourceMetadataV0Schema:
+z.ZodType<TicketReviewSourceMetadataV0> = z.discriminatedUnion("mode", [
+    z.object({
+      mode: z.literal("worktree"),
+      repositoryRoot: canonicalString(4_000),
+      repositoryIncarnation: opaqueRef,
+      resolvedCommit: z.string().regex(/^[0-9a-f]{40,64}$/),
+      graphDigest: sha256Digest,
+      sourceToken: opaqueRef,
+      worktreeIdentity: opaqueRef,
+      worktreeRoot: canonicalString(4_000),
+      branch: canonicalString(500).nullable(),
+      committedGraphDigest: sha256Digest.nullable(),
+      semanticDirty: z.boolean(),
+      dirtyPaths: z.array(canonicalString(2_000)).max(1_000),
+      dirtyPathsTruncated: z.boolean(),
+    }).strict(),
+    z.object({
+      mode: z.literal("ref"),
+      repositoryRoot: canonicalString(4_000),
+      repositoryIncarnation: opaqueRef,
+      resolvedCommit: z.string().regex(/^[0-9a-f]{40,64}$/),
+      graphDigest: sha256Digest,
+      sourceToken: opaqueRef,
+      requestedRef: canonicalString(500),
+    }).strict(),
+  ]);
+
 const projectionHeaderShape = {
   schemaVersion: z.literal(TICKET_REVIEW_SCHEMA_VERSION),
   projectorVersion: canonicalString(200),
@@ -207,6 +238,7 @@ const projectionHeaderShape = {
   snapshotRevision: opaqueRef,
   projectionWatermark: opaqueRef,
   topologyDigest: z.string().regex(/^sha256:[0-9a-f]{64}$/),
+  source: ticketReviewSourceMetadataV0Schema,
 } satisfies z.ZodRawShape;
 
 type ProjectionHeaderShapeOutput = z.infer<z.ZodObject<typeof projectionHeaderShape>>;
@@ -301,9 +333,72 @@ z.ZodType<TicketSubjectInspectRequestV0> = z.object({
 const inspectedTicketSubjectSchema = z.object({
   kind: z.literal("ticket"),
   ticket: ticketReviewTicketProjectionV0Schema,
+  contextPackage: z.object({
+    outcome: canonicalString(20_000),
+    context: boundedString(65_536),
+    acceptance: z.array(z.object({
+      acceptanceId: canonicalString(200),
+      criterion: canonicalString(8_192),
+    }).strict()).max(200),
+    constraints: z.array(canonicalString(8_192)).max(200),
+    contextRefs: z.array(z.object({
+      ref: canonicalString(4_096),
+      purpose: canonicalString(4_096),
+    }).strict()).max(200),
+    relations: z.array(z.object({
+      relationRef: opaqueRef,
+      type: z.literal("depends_on"),
+      targetTicketId: ticketId,
+      rationale: longText.optional(),
+    }).strict() satisfies z.ZodType<TicketReviewDependsOnRelationV0>)
+      .max(TICKET_REVIEW_MAX_RELATIONS),
+    provenanceRefs: z.array(canonicalString(4_096)).max(200),
+  }).strict() satisfies z.ZodType<TicketReviewExecutableContextV0>,
   prerequisiteRelationRefs: z.array(opaqueRef).max(TICKET_REVIEW_MAX_RELATIONS),
   dependentRelationRefs: z.array(opaqueRef).max(TICKET_REVIEW_MAX_RELATIONS),
 }).strict().superRefine((value, context) => {
+  if (value.contextPackage.outcome !== value.ticket.outcome) {
+    context.addIssue({
+      code: "custom",
+      path: ["contextPackage", "outcome"],
+      message: "must equal the projected Ticket outcome",
+    });
+  }
+  if (!hasUniqueValues(
+    value.contextPackage.acceptance.map((item) => item.acceptanceId),
+  )) {
+    context.addIssue({
+      code: "custom",
+      path: ["contextPackage", "acceptance"],
+      message: "acceptance IDs must be unique",
+    });
+  }
+  if (!hasUniqueValues(
+    value.contextPackage.contextRefs.map((item) => item.ref),
+  )) {
+    context.addIssue({
+      code: "custom",
+      path: ["contextPackage", "contextRefs"],
+      message: "context refs must be unique",
+    });
+  }
+  if (!hasUniqueValues(
+    value.contextPackage.relations.map((item) => item.relationRef),
+  )) {
+    context.addIssue({
+      code: "custom",
+      path: ["contextPackage", "relations"],
+      message: "relation refs must be unique",
+    });
+  }
+  if (value.contextPackage.relations.length
+    !== value.ticket.relationCounts.prerequisites) {
+    context.addIssue({
+      code: "custom",
+      path: ["contextPackage", "relations"],
+      message: "must contain every authored depends_on relation",
+    });
+  }
   if (value.prerequisiteRelationRefs.length !== value.ticket.relationCounts.prerequisites) {
     context.addIssue({
       code: "custom",
@@ -365,7 +460,7 @@ z.ZodType<TicketReviewTraceSubjectV0> = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("ticket"),
     ticketId,
-    boundDefinitionRevision: positiveRevision,
+    boundTicketRevision: sha256Digest,
   }).strict(),
   z.object({
     kind: z.literal("relation"),
@@ -426,12 +521,11 @@ z.ZodType<TicketReviewTraceRecordV0> = z.object({
   availability: z.enum(["available", "unavailable"]),
 }).strict().superRefine((value, context) => {
   if (value.producer.kind === "claimed_actor"
-    && value.kind !== "proposal"
     && value.kind !== "artifact") {
     context.addIssue({
       code: "custom",
       path: ["producer", "kind"],
-      message: "claimed_actor may only produce proposal or artifact trace records",
+      message: "claimed_actor may only produce artifact trace records",
     });
   }
   if (value.kind === "gate_decision" && value.producer.kind !== "authority_receipt") {

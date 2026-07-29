@@ -5,7 +5,6 @@ import {
   BoundedStdioServerTransport,
   MCP_STDIO_MAX_MESSAGE_BYTES,
   MCP_STDIO_OPERATION_ENVELOPE_ALLOWANCE_BYTES,
-  MCP_STDIO_TICKET_PROPOSAL_MAX_MESSAGE_BYTES,
 } from "../src/bounded-stdio.js";
 
 const ping = (id: number) => JSON.stringify({
@@ -89,12 +88,12 @@ describe("BoundedStdioServerTransport", () => {
     });
     const operations = [
       {
-        id: "proposal-1",
-        operation: "ticket.proposal.submit",
+        id: "snapshot-1",
+        operation: "ticket.graph.snapshot",
       },
       {
-        id: "validation-1",
-        operation: "ticket.proposal.validation.record",
+        id: "inspect-1",
+        operation: "ticket.subject.inspect",
       },
     ];
     const requests = operations.map(({ id, operation }) => JSON.stringify({
@@ -166,7 +165,7 @@ describe("BoundedStdioServerTransport", () => {
     const transport = new BoundedStdioServerTransport(input, output, {
       maximumMessageBytes: request.length,
       operationInputByteLimits: {
-        "ticket.proposal.submit": 64,
+        "ticket.graph.snapshot": 64,
       },
       operationEnvelopeAllowanceBytes: 0,
     });
@@ -198,7 +197,7 @@ describe("BoundedStdioServerTransport", () => {
     const transport = new BoundedStdioServerTransport(input, output, {
       maximumMessageBytes: request.length,
       operationInputByteLimits: {
-        "ticket.proposal.submit": 64,
+        "ticket.subject.inspect": 64,
       },
       operationEnvelopeAllowanceBytes: 0,
     });
@@ -290,11 +289,6 @@ describe("BoundedStdioServerTransport", () => {
     expect(MCP_STDIO_MAX_MESSAGE_BYTES).toBe(64 * 1024 * 1024);
     expect(MCP_STDIO_OPERATION_ENVELOPE_ALLOWANCE_BYTES)
       .toBe(1024 * 1024);
-    expect(MCP_STDIO_TICKET_PROPOSAL_MAX_MESSAGE_BYTES)
-      .toBe(
-        OPERATION_INPUT_BYTE_LIMITS["ticket.proposal.submit"]
-        + MCP_STDIO_OPERATION_ENVELOPE_ALLOWANCE_BYTES,
-      );
     const production = new BoundedStdioServerTransport(
       new PassThrough(),
       new PassThrough(),
@@ -310,14 +304,9 @@ describe("BoundedStdioServerTransport", () => {
     expect([...productionBudgets.keys()].sort()).toEqual(
       Object.keys(OPERATION_INPUT_BYTE_LIMITS).sort(),
     );
-    expect(productionBudgets.get("ticket.proposal.validation.record"))
-      .toEqual({
-        maximumInputBytes:
-          OPERATION_INPUT_BYTE_LIMITS["ticket.proposal.validation.record"],
-        maximumMessageBytes:
-          OPERATION_INPUT_BYTE_LIMITS["ticket.proposal.validation.record"]
-          + MCP_STDIO_OPERATION_ENVELOPE_ALLOWANCE_BYTES,
-      });
+    expect(productionBudgets.size).toBe(
+      Object.keys(OPERATION_INPUT_BYTE_LIMITS).length,
+    );
     expect(() => new BoundedStdioServerTransport(
       new PassThrough(),
       new PassThrough(),
@@ -329,23 +318,23 @@ describe("BoundedStdioServerTransport", () => {
       {
         maximumMessageBytes: 8,
         operationInputByteLimits: {
-          "ticket.proposal.validation.record": 9,
+          "ticket.subject.inspect": 9,
         },
         operationEnvelopeAllowanceBytes: 0,
       },
     )).toThrow(
-      "wire budget for ticket.proposal.validation.record must not exceed maximumMessageBytes",
+      "wire budget for ticket.subject.inspect must not exceed maximumMessageBytes",
     );
     expect(() => new BoundedStdioServerTransport(
       new PassThrough(),
       new PassThrough(),
       {
         operationInputByteLimits: {
-          "ticket.proposal.submit": 0,
+          "ticket.graph.snapshot": 0,
         },
       },
     )).toThrow(
-      "operationInputByteLimits[\"ticket.proposal.submit\"] must be a positive safe integer",
+      "operationInputByteLimits[\"ticket.graph.snapshot\"] must be a positive safe integer",
     );
     expect(() => new BoundedStdioServerTransport(
       new PassThrough(),

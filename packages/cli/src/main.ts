@@ -109,7 +109,7 @@ const USAGE = `usage:
   vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
   vibehub distill <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub ticket <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
-  vibehub ticket review --proposal <id> [--repo <path>] [--db <path>] [--port <port>] [--no-open] [--json]
+  vibehub ticket review [--repo <path>] [--db <path>] [--port <port>] [--no-open] [--json]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop> [--host claude-code|codex]
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
@@ -196,7 +196,10 @@ function runOperation(
     const session=GitFacade.sessionContextAt(flags.repo);
     const root=session.repoRoot;
     const row=flags.repoId?{id:flags.repoId}:db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(root) as {id:number}|undefined;
-    const repoId=row?.id??0;
+    const isTicketRead = canonicalOperation === "ticket.graph.snapshot"
+      || canonicalOperation === "ticket.subject.inspect"
+      || canonicalOperation === "ticket.trace.list";
+    const repoId=row?.id??(isTicketRead ? 1 : 0);
     const result=new OperationDispatcher(db,{repoRoot:session.toplevel}).dispatch(canonicalOperation,{repoId,actor:flags.actor,taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
     process.stdout.write(`${JSON.stringify(result)}\n`);
     return result.ok?0:(OPERATION_EXIT_CLASS[result.error.code]??1);
@@ -365,7 +368,7 @@ function readStdinBounded(maximumBytes: number): string {
     byteLength += count;
     if (byteLength > maximumBytes) {
       throw new Error(
-        `ticket proposal raw JSON input exceeds ${maximumBytes} bytes`,
+        `operation raw JSON input exceeds ${maximumBytes} bytes`,
       );
     }
     chunks.push(Buffer.from(buffer.subarray(0, count)));

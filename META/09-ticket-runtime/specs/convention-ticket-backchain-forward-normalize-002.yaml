@@ -56,4 +56,4 @@ relations:
   - target: "decision-ticket-skill-driven-boundary-001"
     type: depends_on
 anchors:
-  - file: "skills/vibehub-ticket-plan/SKILL.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md"

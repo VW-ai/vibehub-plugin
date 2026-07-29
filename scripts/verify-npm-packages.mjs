@@ -1,5 +1,10 @@
 #!/usr/bin/env node
-import { accessSync, constants, readFileSync } from "node:fs";
+import {
+  accessSync,
+  constants,
+  readdirSync,
+  readFileSync,
+} from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readReleaseIdentity } from "./release-metadata.mjs";
@@ -24,6 +29,24 @@ const packages = [
     expectedBin: "vibehub-mcp",
   },
 ];
+const retiredCoreArtifactPrefixes = [
+  "dist/git-ticket-store.",
+  "dist/ticket-proposal-service.",
+  "dist/ticket-application-service.",
+  "dist/contract/ticket-proposal",
+  "dist/contract/ticket-application",
+];
+
+function listFiles(directory, prefix = "") {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+    return entry.isDirectory()
+      ? listFiles(join(directory, entry.name), relativePath)
+      : entry.isFile()
+        ? [relativePath]
+        : [];
+  });
+}
 
 for (const entry of packages) {
   const packageRoot = join(root, entry.directory);
@@ -57,6 +80,19 @@ for (const entry of packages) {
   }
   if (!manifest.files?.includes("dist")) {
     throw new Error(`${manifest.name} must publish only its built dist surface`);
+  }
+
+  if (entry.expectedName === "@vw-ai/vibehub-core") {
+    const builtArtifacts = listFiles(join(packageRoot, "dist"))
+      .map((artifact) => `dist/${artifact}`);
+    const retiredArtifact = builtArtifacts.find((artifact) =>
+      retiredCoreArtifactPrefixes.some((prefix) =>
+        artifact.startsWith(prefix)));
+    if (retiredArtifact) {
+      throw new Error(
+        `@vw-ai/vibehub-core dist contains retired Ticket backend artifact ${retiredArtifact}`,
+      );
+    }
   }
 
   accessSync(join(packageRoot, "README.md"), constants.R_OK);

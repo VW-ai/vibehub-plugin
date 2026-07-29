@@ -1,15 +1,15 @@
 progress:
-  completion: 0.1
+  completion: 0.3
   status: active
   milestones:
     - id: "m0-git-skill-authority-cut"
       name: "Freeze the Git-native, Skill-driven authority cut"
-      status: in_progress
-      evidence: "Successor decisions and the breaking pivot plan are active; the minimal protocol/Ticket graph fixture and implementation cut remain open."
+      status: complete
+      evidence: "Successor decisions, the breaking pivot plan, and the no-migration/no-dual-authority boundary are active."
     - id: "m1a-git-ticket-read-cut"
       name: "Git Ticket definition graph through Core, CLI, MCP, and read-only HTML"
-      status: planned
-      evidence: "The implementation handoff freezes the minimal protocol, exact source semantics, read cutover, deletion boundary, and P0 test matrix."
+      status: complete
+      evidence: "The Git ledger kernel, three pure read operations, CLI/MCP/HTML cutover, legacy authority deletion, and P0 test matrix are implemented; see the dated implementation artifact."
     - id: "m1b-git-ticket-worktree-patch"
       name: "Exact-base Ticket worktree patch and optional checkpoint"
       status: planned
@@ -26,7 +26,8 @@ progress:
       name: "Complete one real dogfood loop and prove the legacy cut remains clean"
       status: planned
   next:
-    - "Implement the M1A Git read cut from the dated handoff."
-    - "Do not add another planning layer unless implementation exposes a real product boundary."
+    - "Design and implement the M1B exact-source-bound Ticket worktree patch primitive."
+    - "Dogfood that primitive through one real Skill-led Ticket graph change before defining later semantic document types."
   commits:
     - "d92c99c docs(ticket): plan git-native skill-driven pivot"
+    - "eb0590c docs(ticket): prepare git read authority cut"

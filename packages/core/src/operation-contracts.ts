@@ -1,35 +1,10 @@
 import { z } from "zod";
 import { KB_RELATION_TYPES, KB_SPEC_STATES, KB_SPEC_TYPES } from "./contract/kb-types.js";
 import {
-  TICKET_PROPOSAL_AUTHORITY_SIGNALS,
-  TICKET_PROPOSAL_CHANGE_CLASSES,
-  TICKET_PROPOSAL_MAX_CHANGES,
-  TICKET_PROPOSAL_MAX_DEPENDENCIES_PER_CHANGE,
-  TICKET_PROPOSAL_MAX_INPUT_BYTES,
-  TICKET_PROPOSAL_MAX_PAGE_SIZE,
-  TICKET_PROPOSAL_SCHEMA_VERSION,
-  TICKET_PROPOSAL_VALIDATION_CHECK_CODES,
-  TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES,
-  TICKET_PROPOSAL_VALIDATION_MAX_PAGE_SIZE,
-  TICKET_PROPOSAL_VALIDATION_SCHEMA_VERSION,
-  isJsonValueWithinByteBudgetV0,
-  isTicketProposalInputWithinBudgetV0,
-} from "./contract/ticket-proposal.js";
-import {
   TICKET_REVIEW_MAX_PAGE_SIZE,
   TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE,
   TICKET_REVIEW_TRACE_KINDS,
 } from "./contract/ticket-review.js";
-import {
-  TICKET_PROPOSAL_APPLICATION_MAX_INPUT_BYTES,
-  TICKET_PROPOSAL_AUTHORITY_MAX_INPUT_BYTES,
-  TICKET_PROPOSAL_REVIEW_MAX_INPUT_BYTES,
-} from "./contract/ticket-application.js";
-import {
-  ticketProposalApplyInputV0Schema,
-  ticketProposalAuthorityDecideInputV0Schema,
-  ticketProposalReviewInputV0Schema,
-} from "./contract/ticket-application-schemas.js";
 
 // Public operation strings are canonical values, not normalization requests.
 // The absolute-end guard prevents JavaScript's `$` from accepting a final newline.
@@ -47,13 +22,6 @@ const specState = z.enum(KB_SPEC_STATES);
 const relationType = z.enum(KB_RELATION_TYPES);
 const ticketOpaqueRef = canonicalString(300);
 const ticketId = canonicalString(200);
-const ticketSnapshotId = z.string().regex(/^tgs-[0-9a-f]{64}$/);
-const ticketProposalId = z.string().regex(/^tgp-[0-9a-f]{64}$/);
-const ticketProposalValidationReceiptId = z.string()
-  .regex(/^tpv-[0-9a-f]{64}$/);
-const sha256Digest = z.string().regex(/^[0-9a-f]{64}$/);
-const ticketDefinitionRevision = z.number().int().positive()
-  .max(9_999_999_999);
 const ticketReviewSubject = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("ticket"), ticketId }).strict(),
   z.object({ kind: z.literal("relation"), relationRef: ticketOpaqueRef }).strict(),
@@ -63,230 +31,6 @@ const ticketTraceKinds = z.array(z.enum(TICKET_REVIEW_TRACE_KINDS))
   .refine((kinds) => new Set(kinds).size === kinds.length, {
     message: "trace kinds must be unique",
   });
-const ticketProposalSource = z.object({
-  kind: z.enum(["ticket", "run", "plan", "conversation", "other"]),
-  ref: canonicalString(300),
-}).strict();
-const ticketProposalExactSubject = z.discriminatedUnion("kind", [
-  z.object({
-    kind: z.literal("ticket"),
-    ticketId,
-    definitionRevision: ticketDefinitionRevision,
-  }).strict(),
-  z.object({
-    kind: z.literal("relation"),
-    relationRef: ticketOpaqueRef,
-    prerequisiteTicketId: ticketId,
-    dependentTicketId: ticketId,
-  }).strict(),
-]);
-const ticketProposalDefinitionRef = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("ticket"), ticketId }).strict(),
-  z.object({ kind: z.literal("local"), localRef: id }).strict(),
-]);
-const ticketProposalDependency = z.object({
-  target: ticketProposalDefinitionRef,
-  rationale: boundedString(20_000).optional(),
-}).strict();
-const ticketProposalDefinitionBody = z.object({
-  outcome: canonicalString(20_000),
-  parent: ticketProposalDefinitionRef.nullable(),
-  dependsOn: z.array(ticketProposalDependency)
-    .max(TICKET_PROPOSAL_MAX_DEPENDENCIES_PER_CHANGE),
-}).strict();
-const ticketProposalGraphChange = z.discriminatedUnion("op", [
-  z.object({
-    op: z.literal("create"),
-    localRef: id,
-    definition: ticketProposalDefinitionBody,
-  }).strict(),
-  z.object({
-    op: z.literal("revise"),
-    ticketId,
-    expectedDefinitionRevision: ticketDefinitionRevision,
-    replacement: ticketProposalDefinitionBody,
-  }).strict(),
-]);
-const ticketProposalAuthorAssessment = z.object({
-  changeClass: z.enum(TICKET_PROPOSAL_CHANGE_CLASSES),
-  authoritySignals: z.array(z.enum(TICKET_PROPOSAL_AUTHORITY_SIGNALS))
-    .max(TICKET_PROPOSAL_AUTHORITY_SIGNALS.length)
-    .refine((signals) => new Set(signals).size === signals.length, {
-      message: "authority signals must be unique",
-    }),
-  introducesHumanGate: z.boolean(),
-  rationale: canonicalString(20_000),
-}).strict();
-const ticketProposalSubmit = z.discriminatedUnion("kind", [
-  z.object({
-    schemaVersion: z.literal(TICKET_PROPOSAL_SCHEMA_VERSION),
-    kind: z.literal("comment"),
-    observedSnapshotId: ticketSnapshotId,
-    subject: ticketProposalExactSubject,
-    body: canonicalString(20_000),
-  }).strict(),
-  z.object({
-    schemaVersion: z.literal(TICKET_PROPOSAL_SCHEMA_VERSION),
-    kind: z.literal("graph_change"),
-    observedSnapshotId: ticketSnapshotId.nullable(),
-    reason: canonicalString(2_000),
-    source: ticketProposalSource.optional(),
-    authorAssessment: ticketProposalAuthorAssessment,
-    changes: z.array(ticketProposalGraphChange)
-      .min(1)
-      .max(TICKET_PROPOSAL_MAX_CHANGES),
-  }).strict(),
-]).refine(isTicketProposalInputWithinBudgetV0, {
-  message: `Ticket proposal input must not exceed ${TICKET_PROPOSAL_MAX_INPUT_BYTES} JSON bytes`,
-});
-const ticketProposalList = z.object({
-  kind: z.enum(["comment", "graph_change"]).optional(),
-  observedSnapshotId: ticketSnapshotId.nullable().optional(),
-  cursor: canonicalString(2_000).optional(),
-  limit: z.number().int().min(1).max(TICKET_PROPOSAL_MAX_PAGE_SIZE).optional(),
-}).strict();
-const ticketProposalValidationSubject = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("proposal") }).strict(),
-  z.object({
-    kind: z.literal("ticket_change"),
-    ticketId,
-    definitionRevision: ticketDefinitionRevision,
-  }).strict(),
-  z.object({
-    kind: z.literal("dependency_change"),
-    change: z.enum(["added", "removed"]),
-    prerequisiteTicketId: ticketId,
-    dependentTicketId: ticketId,
-  }).strict(),
-]);
-const ticketProposalValidationDescriptor = z.object({
-  id,
-  version: canonicalString(100),
-  artifactDigest: sha256Digest,
-}).strict();
-const ticketProposalValidationEvidenceRefs = z.array(canonicalString(2_000))
-  .min(1)
-  .max(50)
-  .refine((refs) => new Set(refs).size === refs.length, {
-    message: "evidence refs must be unique",
-  });
-const ticketProposalValidationCheck = z.object({
-  localRef: id,
-  code: z.enum(TICKET_PROPOSAL_VALIDATION_CHECK_CODES),
-  subject: ticketProposalValidationSubject,
-  outcome: z.enum(["passed", "failed", "inconclusive"]),
-  summary: canonicalString(500),
-  evidenceRefs: ticketProposalValidationEvidenceRefs,
-}).strict();
-const ticketProposalValidationFinding = z.object({
-  localRef: id,
-  checkLocalRef: id,
-  subject: ticketProposalValidationSubject,
-  impact: z.enum(["blocking", "advisory"]),
-  code: canonicalString(100),
-  summary: canonicalString(500),
-  detail: boundedString(20_000).optional(),
-  evidenceRefs: ticketProposalValidationEvidenceRefs,
-  suggestedAction: canonicalString(2_000).optional(),
-}).strict();
-const ticketProposalValidationRecord = z.object({
-  schemaVersion: z.literal(TICKET_PROPOSAL_VALIDATION_SCHEMA_VERSION),
-  proposalId: ticketProposalId,
-  expectedProposalDigest: sha256Digest,
-  expectedCandidateDigest: sha256Digest,
-  validator: ticketProposalValidationDescriptor,
-  policy: ticketProposalValidationDescriptor,
-  checks: z.array(ticketProposalValidationCheck)
-    .length(TICKET_PROPOSAL_VALIDATION_CHECK_CODES.length),
-  findings: z.array(ticketProposalValidationFinding).max(200),
-  indicatedAuthoritySignals: z.array(z.enum(TICKET_PROPOSAL_AUTHORITY_SIGNALS))
-    .max(TICKET_PROPOSAL_AUTHORITY_SIGNALS.length)
-    .refine((signals) => new Set(signals).size === signals.length, {
-      message: "authority signals must be unique",
-    }),
-}).strict().superRefine((input, context) => {
-  if (new Set(input.checks.map((check) => check.localRef)).size
-    !== input.checks.length) {
-    context.addIssue({
-      code: "custom",
-      path: ["checks"],
-      message: "check localRef values must be unique",
-    });
-  }
-  const codes = new Set(input.checks.map((check) => check.code));
-  if (codes.size !== TICKET_PROPOSAL_VALIDATION_CHECK_CODES.length
-    || TICKET_PROPOSAL_VALIDATION_CHECK_CODES.some(
-      (code) => !codes.has(code),
-    )) {
-    context.addIssue({
-      code: "custom",
-      path: ["checks"],
-      message: "checks must contain every frozen proposal validation code once",
-    });
-  }
-  if (new Set(input.findings.map((finding) => finding.localRef)).size
-    !== input.findings.length) {
-    context.addIssue({
-      code: "custom",
-      path: ["findings"],
-      message: "finding localRef values must be unique",
-    });
-  }
-  const checks = new Map(input.checks.map((check) => [
-    check.localRef,
-    check,
-  ]));
-  const blockingByCheck = new Map<string, number>();
-  input.findings.forEach((finding, index) => {
-    const check = checks.get(finding.checkLocalRef);
-    if (check === undefined) {
-      context.addIssue({
-        code: "custom",
-        path: ["findings", index, "checkLocalRef"],
-        message: "must reference a validation check in the same receipt",
-      });
-      return;
-    }
-    if (finding.impact === "blocking") {
-      blockingByCheck.set(
-        finding.checkLocalRef,
-        (blockingByCheck.get(finding.checkLocalRef) ?? 0) + 1,
-      );
-      if (check.outcome === "passed") {
-        context.addIssue({
-          code: "custom",
-          path: ["findings", index, "impact"],
-          message: "a passed check cannot carry a blocking finding",
-        });
-      }
-    }
-  });
-  input.checks.forEach((check, index) => {
-    if (check.outcome !== "passed"
-      && (blockingByCheck.get(check.localRef) ?? 0) === 0) {
-      context.addIssue({
-        code: "custom",
-        path: ["checks", index, "outcome"],
-        message: "failed or inconclusive checks require a blocking finding",
-      });
-    }
-  });
-}).refine(
-  (input) => isJsonValueWithinByteBudgetV0(
-    input,
-    TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES,
-  ),
-  {
-    message: `Ticket proposal validation input must not exceed ${TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES} JSON bytes`,
-  },
-);
-const ticketProposalValidationList = z.object({
-  proposalId: ticketProposalId,
-  cursor: canonicalString(2_000).optional(),
-  limit: z.number().int().min(1)
-    .max(TICKET_PROPOSAL_VALIDATION_MAX_PAGE_SIZE)
-    .optional(),
-}).strict();
 
 export const operationContextSchema = z.object({
   repoId: z.number().int().positive(), actor: id, taskId: id.optional(), requestId: id,
@@ -387,36 +131,27 @@ export const operationInputSchemas = {
       .max(TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE)
       .optional(),
   }).strict(),
-  "ticket.proposal.submit": ticketProposalSubmit,
-  "ticket.proposal.inspect": z.object({ proposalId: ticketProposalId }).strict(),
-  "ticket.proposal.list": ticketProposalList,
-  "ticket.proposal.validation.record": ticketProposalValidationRecord,
-  "ticket.proposal.validation.inspect": z.object({
-    validationReceiptId: ticketProposalValidationReceiptId,
-  }).strict(),
-  "ticket.proposal.validation.list": ticketProposalValidationList,
-  "ticket.proposal.review.inspect": ticketProposalReviewInputV0Schema,
-  "ticket.proposal.authority.decide":
-    ticketProposalAuthorityDecideInputV0Schema,
-  "ticket.proposal.apply": ticketProposalApplyInputV0Schema,
 } as const;
 
-export const OPERATION_INPUT_BYTE_LIMITS = {
-  "ticket.proposal.submit": TICKET_PROPOSAL_MAX_INPUT_BYTES,
-  "ticket.proposal.inspect": 16 * 1024,
-  "ticket.proposal.list": 32 * 1024,
-  "ticket.proposal.validation.record":
-    TICKET_PROPOSAL_VALIDATION_MAX_INPUT_BYTES,
-  "ticket.proposal.validation.inspect": 16 * 1024,
-  "ticket.proposal.validation.list": 32 * 1024,
-  "ticket.proposal.review.inspect": TICKET_PROPOSAL_REVIEW_MAX_INPUT_BYTES,
-  "ticket.proposal.authority.decide":
-    TICKET_PROPOSAL_AUTHORITY_MAX_INPUT_BYTES,
-  "ticket.proposal.apply": TICKET_PROPOSAL_APPLICATION_MAX_INPUT_BYTES,
-} as const satisfies Partial<Record<keyof typeof operationInputSchemas, number>>;
+export const OPERATION_INPUT_BYTE_LIMITS = {} as const satisfies Partial<
+  Record<keyof typeof operationInputSchemas, number>
+>;
 
 /** Unknown operation inputs are bounded before hashing for receipt replay. */
 export const UNKNOWN_OPERATION_INPUT_MAX_BYTES = 64 * 1024;
+
+function isJsonValueWithinByteBudget(
+  value: unknown,
+  maximumBytes: number,
+): boolean {
+  try {
+    const encoded = JSON.stringify(value);
+    return encoded !== undefined
+      && new TextEncoder().encode(encoded).byteLength <= maximumBytes;
+  } catch {
+    return false;
+  }
+}
 
 export function isOperationInputWithinBudget(
   operation: string,
@@ -426,10 +161,10 @@ export function isOperationInputWithinBudget(
     operation as keyof typeof OPERATION_INPUT_BYTE_LIMITS
   ];
   if (maximum !== undefined) {
-    return isJsonValueWithinByteBudgetV0(input, maximum);
+    return isJsonValueWithinByteBudget(input, maximum);
   }
   return Object.prototype.hasOwnProperty.call(operationInputSchemas, operation)
-    || isJsonValueWithinByteBudgetV0(
+    || isJsonValueWithinByteBudget(
       input,
       UNKNOWN_OPERATION_INPUT_MAX_BYTES,
     );
@@ -457,12 +192,6 @@ export const operationRefinementManifest = {
   "candidate-discriminated-union": {runtimeSites:0,operations:["distill.candidates.put"]},
   "anchors-strict-union": {runtimeSites:0,operations:["kb.anchors"]},
   "ticket-trace-kinds-unique": {runtimeSites:1,operations:["ticket.trace.list"]},
-  "ticket-proposal-input-byte-budget": {runtimeSites:1,operations:["ticket.proposal.submit"]},
-  "ticket-proposal-authority-signals-unique": {runtimeSites:1,operations:["ticket.proposal.submit"]},
-  "ticket-proposal-validation-input-byte-budget": {runtimeSites:1,operations:["ticket.proposal.validation.record"]},
-  "ticket-proposal-validation-authority-signals-unique": {runtimeSites:1,operations:["ticket.proposal.validation.record"]},
-  "ticket-proposal-validation-evidence-refs-unique": {runtimeSites:1,operations:["ticket.proposal.validation.record"]},
-  "ticket-proposal-validation-coherence": {runtimeSites:1,operations:["ticket.proposal.validation.record"]},
 } as const;
 
 /**
@@ -478,15 +207,15 @@ export const operationAcceptanceConstructManifest = {
   default: 0,
   catch: 0,
   coerce: 0,
-  regex: 7,
+  regex: 3,
   isoDatetime: 1,
   union: 1,
-  discriminatedUnion: 7,
+  discriminatedUnion: 2,
   unknown: 1,
-  strict: 82,
+  strict: 59,
   safeExtend: 1,
-  optional: 104,
-  nullable: 12,
+  optional: 94,
+  nullable: 9,
   check: 1,
   custom: 1,
   meta: 1,
@@ -495,7 +224,7 @@ export const operationAcceptanceConstructManifest = {
   lowercase: 0,
   uppercase: 0,
   nonempty: 0,
-  length: 1,
+  length: 0,
   any: 0,
 } as const;
 

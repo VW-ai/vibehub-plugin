@@ -8,6 +8,7 @@ import {
 import {
   ticketReviewCapabilitySummaryV0Schema,
   ticketReviewInstantV0Schema,
+  ticketReviewSourceMetadataV0Schema,
   ticketReviewTraceRecordV0Schema,
 } from "./contract/ticket-review-schemas.js";
 
@@ -23,15 +24,25 @@ const canonicalString = (maxLength: number) => boundedString(maxLength)
   });
 const opaqueRef = canonicalString(300);
 const ticketId = canonicalString(200);
-const revision = z.number().int().positive();
-const provenanceRefs = z.array(opaqueRef).max(20);
+const sha256Digest = z.string().regex(/^sha256:[0-9a-f]{64}$/);
+const provenanceRefs = z.array(canonicalString(4_096)).max(200);
 
 export const TICKET_REVIEW_MAX_CURRENT_CAPABILITY_PROJECTIONS = 25_000;
 
 export const ticketReviewDefinitionFactV0Schema = z.object({
   ticketId,
-  definitionRevision: revision,
+  ticketRevision: sha256Digest,
   outcome: canonicalString(20_000),
+  context: boundedString(65_536),
+  acceptance: z.array(z.object({
+    acceptanceId: canonicalString(200),
+    criterion: canonicalString(8_192),
+  }).strict()).max(200),
+  constraints: z.array(canonicalString(8_192)).max(200),
+  contextRefs: z.array(z.object({
+    ref: canonicalString(4_096),
+    purpose: canonicalString(4_096),
+  }).strict()).max(200),
   provenanceRefs: provenanceRefs.optional(),
 }).strict();
 
@@ -72,7 +83,7 @@ const runtimeProducer = z.object({
 const ticketSubject = z.object({
   kind: z.literal("ticket"),
   ticketId,
-  definitionRevision: revision,
+  ticketRevision: sha256Digest,
 }).strict();
 
 const relationSubject = z.object({
@@ -160,6 +171,7 @@ export const ticketReviewProjectionSourceV0Schema = z.object({
   schemaVersion: z.literal(TICKET_REVIEW_SCHEMA_VERSION),
   snapshotRevision: opaqueRef,
   projectionWatermark: opaqueRef,
+  source: ticketReviewSourceMetadataV0Schema,
   ticketDefinitions: z.array(ticketReviewDefinitionFactV0Schema)
     .max(TICKET_REVIEW_MAX_TICKETS),
   directUnlocks: z.array(ticketReviewDirectUnlockFactV0Schema)

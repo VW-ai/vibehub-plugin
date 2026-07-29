@@ -9,181 +9,152 @@
  */
 import type { TicketReviewProjectionSourceV0 } from "../../src/ticket-review-source.js";
 
-export const ticketReviewV4Source = {
+const legacyTicketReviewV4Source = {
   schemaVersion: 1,
   snapshotRevision: "ticket-review-v4",
   projectionWatermark: "ticket-review-v4:watermark",
   ticketDefinitions: [
     {
       ticketId: "TKT-001",
-      definitionRevision: 1,
       outcome:
         "Durable intent compiles into a reviewable, executable, and evidence-backed Ticket Graph.",
     },
     {
       ticketId: "TKT-090",
-      definitionRevision: 1,
       outcome:
         "The orchestration graph is shaped from the current intent, constraints, architecture, and project knowledge.",
     },
     {
       ticketId: "TKT-100",
-      definitionRevision: 1,
       outcome:
         "A person can see every necessary path, its decisions, and why each Ticket contributes to the deliverable.",
     },
     {
       ticketId: "TKT-104",
-      definitionRevision: 1,
       outcome:
         "The intended change is expressed as observable outcomes rather than one static task description.",
     },
     {
       ticketId: "TKT-106",
-      definitionRevision: 1,
       outcome:
         "Necessary facts, results, and decisions are synthesized backward from each outcome acceptance.",
     },
     {
       ticketId: "TKT-108",
-      definitionRevision: 1,
       outcome:
         "The proposed graph is reachable, necessary, de-duplicated, and correctly related when read from current facts.",
     },
     {
       ticketId: "TKT-107",
-      definitionRevision: 1,
       outcome:
         "The coarse outcome graph receives human review or bounded delegation before execution begins.",
     },
     {
       ticketId: "TKT-200",
-      definitionRevision: 1,
       outcome:
         "Unblocked work progresses autonomously until a genuine authority or decision boundary is reached.",
     },
     {
       ticketId: "TKT-122",
-      definitionRevision: 1,
       outcome:
         "The next Ticket is selected from current dependencies, facts, and delegated authority.",
     },
     {
       ticketId: "TKT-124",
-      definitionRevision: 1,
       outcome:
         "The Agent uses native tools and domain intelligence to produce the intended result.",
     },
     {
       ticketId: "TKT-126",
-      definitionRevision: 1,
       outcome:
         "Independent verification checks the result against observable acceptance.",
     },
     {
       ticketId: "TKT-128",
-      definitionRevision: 1,
       outcome:
         "Execution learning updates bounded follow-up work without changing the approved boundary.",
     },
     {
       ticketId: "TKT-300",
-      definitionRevision: 1,
       outcome:
         "Human-owned choices block only the affected branch and resume it with explicit authority.",
     },
     {
       ticketId: "TKT-140",
-      definitionRevision: 1,
       outcome:
         "The Agent recognizes that a choice would change the human-authorized experience.",
     },
     {
       ticketId: "TKT-312",
-      definitionRevision: 1,
       outcome:
         "Choose how people understand and approve the Ticket Graph without turning it into a dashboard or second object model.",
     },
     {
       ticketId: "TKT-143",
-      definitionRevision: 1,
       outcome:
         "The authorized direction becomes a revised, executable dependency path.",
     },
     {
       ticketId: "TKT-144",
-      definitionRevision: 1,
       outcome:
         "Independent delegated work keeps moving while the decision branch waits.",
     },
     {
       ticketId: "TKT-400",
-      definitionRevision: 1,
       outcome:
         "A material deviation becomes visible and is resolved before the affected path closes.",
     },
     {
       ticketId: "TKT-160",
-      definitionRevision: 1,
       outcome:
         "The implementation is compared with the agreed Core-owned architecture.",
     },
     {
       ticketId: "TKT-162",
-      definitionRevision: 1,
       outcome:
         "Evidence identifies every component writing canonical Ticket facts.",
     },
     {
       ticketId: "TKT-407",
-      definitionRevision: 1,
       outcome:
         "Restore one canonical writer or explicitly revise the architecture principle.",
     },
     {
       ticketId: "TKT-165",
-      definitionRevision: 1,
       outcome:
         "CLI, MCP, and direct Core behavior remain semantically identical.",
     },
     {
       ticketId: "TKT-166",
-      definitionRevision: 1,
       outcome:
         "The accepted correction or principle change remains traceable.",
     },
     {
       ticketId: "TKT-500",
-      definitionRevision: 1,
       outcome:
         "Completion is derived from accepted evidence and any remaining work is explicit.",
     },
     {
       ticketId: "TKT-180",
-      definitionRevision: 1,
       outcome:
         "The Run preserves the artifacts needed to evaluate its result.",
     },
     {
       ticketId: "TKT-181",
-      definitionRevision: 1,
       outcome: "Each accepted outcome points to inspectable evidence.",
     },
     {
       ticketId: "TKT-182",
-      definitionRevision: 1,
       outcome:
         "The result is independently assessed as proven, partial, or failed.",
     },
     {
       ticketId: "TKT-184",
-      definitionRevision: 1,
       outcome:
         "Durable facts support completion without a writable status declaration.",
     },
     {
       ticketId: "TKT-185",
-      definitionRevision: 1,
       outcome:
         "New learning becomes bounded follow-up Tickets or a closeout proposal.",
     },
@@ -432,4 +403,44 @@ export const ticketReviewV4Source = {
   ],
   currentCapabilityProjections: [],
   traceRecords: [],
-} satisfies TicketReviewProjectionSourceV0;
+};
+
+export const ticketReviewV4Source: TicketReviewProjectionSourceV0 = {
+  schemaVersion: 2,
+  snapshotRevision: legacyTicketReviewV4Source.snapshotRevision,
+  projectionWatermark: legacyTicketReviewV4Source.projectionWatermark,
+  source: {
+    mode: "worktree",
+    repositoryRoot: "/fixture/repository",
+    repositoryIncarnation: "fixture-repository-v1",
+    resolvedCommit: "a".repeat(40),
+    graphDigest: `sha256:${"b".repeat(64)}`,
+    sourceToken: "fixture-ticket-source-v4",
+    worktreeIdentity: "fixture-worktree-v1",
+    worktreeRoot: "/fixture/repository",
+    branch: "main",
+    committedGraphDigest: `sha256:${"b".repeat(64)}`,
+    semanticDirty: false,
+    dirtyPaths: [],
+    dirtyPathsTruncated: false,
+  },
+  ticketDefinitions: legacyTicketReviewV4Source.ticketDefinitions.map((item) => ({
+    ticketId: item.ticketId,
+    ticketRevision: `sha256:${"c".repeat(64)}`,
+    outcome: item.outcome,
+    context: `Executable context for ${item.ticketId}.`,
+    acceptance: [{
+      acceptanceId: "fixture-acceptance",
+      criterion: `${item.ticketId} produces its observable outcome.`,
+    }],
+    constraints: ["Preserve the accepted Ticket dependency boundary."],
+    contextRefs: [{
+      ref: "META/09-ticket-runtime/spec.md",
+      purpose: "Ticket runtime contract",
+    }],
+    provenanceRefs: [],
+  })),
+  directUnlocks: legacyTicketReviewV4Source.directUnlocks,
+  currentCapabilityProjections: [],
+  traceRecords: [],
+};

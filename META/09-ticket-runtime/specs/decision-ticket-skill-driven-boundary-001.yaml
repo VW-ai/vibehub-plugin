@@ -60,8 +60,6 @@ relations:
     type: relates_to
     detail: "Preserves its scene-specific intelligence and human-boundary decisions."
 anchors:
-  - file: "skills/vibehub-ticket-plan/SKILL.md"
-  - file: "skills/vibehub-ticket-validate/SKILL.md"
-  - file: "skills/vibehub-ticket-apply/SKILL.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md"
   - file: "skills/scripts"
   - file: "packages/core/src/operation-dispatcher.ts"

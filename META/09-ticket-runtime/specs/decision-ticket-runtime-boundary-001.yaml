@@ -200,4 +200,3 @@ anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
-  - file: "skills/vibehub-ticket-validate/SKILL.md"

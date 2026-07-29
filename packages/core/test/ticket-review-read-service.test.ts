@@ -15,10 +15,9 @@ import {
 import { ticketReviewV4Source } from "./fixtures/ticket-review-v4.js";
 
 const scope: TicketReviewRepositoryScopeV0 = {
-  repoId: 7,
-  repositoryRoot: "/repo",
   worktreeRoot: "/repo",
 };
+const TICKET_REVISION = `sha256:${"c".repeat(64)}`;
 
 function captureError(
   run: () => unknown,
@@ -120,7 +119,7 @@ describe("TicketReviewReadServiceV0", () => {
     expect(captureError(
       () => noGraph.graphSnapshot(scope),
       "not_found",
-    ).details).toEqual({ repoId: 7 });
+    ).details).toEqual({ worktreeRoot: "/repo" });
     expect(captureError(
       () => noGraph.subjectInspect(scope, {
         snapshotId: "tgs-unavailable",
@@ -128,7 +127,7 @@ describe("TicketReviewReadServiceV0", () => {
       }),
       "snapshot_expired",
     ).details).toEqual({
-      repoId: 7,
+      worktreeRoot: "/repo",
       snapshotId: "tgs-unavailable",
     });
   });
@@ -174,7 +173,7 @@ describe("TicketReviewReadServiceV0", () => {
         subject: {
           kind: "ticket",
           ticketId: "TKT-124",
-          boundDefinitionRevision: 1,
+          boundTicketRevision: TICKET_REVISION,
         },
         producer: { kind: "system", ref: "fixture-system" },
         occurredAt: "2026-07-28T12:00:01.000Z",
@@ -189,7 +188,7 @@ describe("TicketReviewReadServiceV0", () => {
         subject: {
           kind: "ticket",
           ticketId: "TKT-124",
-          boundDefinitionRevision: 1,
+          boundTicketRevision: TICKET_REVISION,
         },
         producer: { kind: "system", ref: "fixture-system" },
         occurredAt: "2026-07-28T12:00:00.000Z",
@@ -349,11 +348,7 @@ describe("TicketReviewReadServiceV0", () => {
   it("forwards repository scope and requires provider-partitioned snapshots", () => {
     const snapshot = projectTicketGraphSnapshotV0(ticketReviewV4Source);
     const scopeKey = (value: TicketReviewRepositoryScopeV0): string =>
-      JSON.stringify([
-        value.repoId,
-        value.repositoryRoot,
-        value.worktreeRoot,
-      ]);
+      value.worktreeRoot;
     const sourceByScope = new Map([
       [scopeKey(scope), ticketReviewV4Source],
     ]);
@@ -376,8 +371,6 @@ describe("TicketReviewReadServiceV0", () => {
       },
     });
     const otherScope: TicketReviewRepositoryScopeV0 = {
-      repoId: 8,
-      repositoryRoot: "/other-repo",
       worktreeRoot: "/other-repo",
     };
 

@@ -17,7 +17,7 @@ function report(schema,errors,warnings=[]){const value={valid:errors.length===0,
 const args=process.argv.slice(2); const packageIndex=args.indexOf("--package");
 if(packageIndex>=0){
   const root=path.resolve(args[packageIndex+1]??path.resolve(here,"..")); const errors=[];
-  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-validate","vibehub-ticket-apply"];
+  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr"];
   const actualSkills=fs.readdirSync(root,{withFileTypes:true})
     .filter(entry=>entry.name.startsWith("vibehub-")&&entry.isDirectory())
     .map(entry=>entry.name)
@@ -66,7 +66,7 @@ if(packageIndex>=0){
     if(artifact.fixtureDialect!=="literal value or generatedFixture/v1")errors.push({path:"contracts/operation-contracts.json",message:"operation fixture dialect is missing or stale"});
     if(!artifact.scope?.includes("Operation input contracts only"))errors.push({path:"contracts/operation-contracts.json",message:"operation contract must declare its input-only scope"});
     if(!artifact.validationContract?.includes("runtimeRefinements"))errors.push({path:"contracts/operation-contracts.json",message:"operation validation contract must require runtimeRefinements"});
-    const expectedConstructs={trim:0,transform:0,preprocess:0,pipe:0,default:0,catch:0,coerce:0,regex:7,isoDatetime:1,union:1,discriminatedUnion:7,unknown:1,strict:82,safeExtend:1,optional:104,nullable:12,check:1,custom:1,meta:1,overwrite:0,normalize:0,lowercase:0,uppercase:0,nonempty:0,length:1,any:0};
+    const expectedConstructs={trim:0,transform:0,preprocess:0,pipe:0,default:0,catch:0,coerce:0,regex:3,isoDatetime:1,union:1,discriminatedUnion:2,unknown:1,strict:59,safeExtend:1,optional:94,nullable:9,check:1,custom:1,meta:1,overwrite:0,normalize:0,lowercase:0,uppercase:0,nonempty:0,length:0,any:0};
     if(JSON.stringify(artifact.acceptanceConstructs)!==JSON.stringify(expectedConstructs))errors.push({path:"contracts/operation-contracts.json",message:"operation acceptance construct audit is missing or stale"});
     const registryHash=crypto.createHash("sha256").update(JSON.stringify(artifact.operations??{})).digest("hex");if(registryHash!==artifact.registryHash)errors.push({path:"contracts/operation-contracts.json",message:"operation registry hash does not match operations"});
     const inputSchemaHash=crypto.createHash("sha256").update(JSON.stringify(Object.fromEntries(Object.entries(artifact.operations??{}).map(([name,contract])=>[name,contract.input])))).digest("hex");if(inputSchemaHash!==artifact.inputSchemaHash)errors.push({path:"contracts/operation-contracts.json",message:"operation input acceptance hash does not match serialized schemas"});

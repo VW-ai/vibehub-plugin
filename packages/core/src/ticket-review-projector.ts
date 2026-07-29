@@ -16,6 +16,7 @@ import {
   type TicketReviewCapabilitySlotV0,
   type TicketReviewCapabilitySummaryV0,
   type TicketReviewRelationProjectionV0,
+  type TicketReviewSourceMetadataV0,
   type TicketReviewSubjectRefV0,
   type TicketReviewTicketProjectionV0,
   type TicketReviewTraceRecordV0,
@@ -57,7 +58,7 @@ export type TicketReviewProjectionInvariantCause =
   | "self_relation"
   | "direct_unlock_cycle"
   | "unknown_trace_ticket"
-  | "future_trace_definition_revision"
+  | "trace_ticket_revision_mismatch"
   | "unknown_trace_relation"
   | "trace_relation_binding_mismatch"
   | "capability_projection_boundary_mismatch"
@@ -88,6 +89,7 @@ interface ProjectionHeader {
   snapshotRevision: string;
   projectionWatermark: string;
   topologyDigest: string;
+  source: TicketReviewSourceMetadataV0;
 }
 
 interface FullProjection {
@@ -97,6 +99,10 @@ interface FullProjection {
   relations: TicketReviewRelationProjectionV0[];
   lenses: TicketReviewCapabilitySlotV0;
   traceRecords: TicketReviewTraceRecordV0[];
+  definitionsById: Map<
+    string,
+    TicketReviewProjectionSourceV0["ticketDefinitions"][number]
+  >;
 }
 
 const unavailable = (): TicketReviewCapabilitySlotV0 => ({
@@ -269,6 +275,13 @@ function normalizeSource(
   const ticketDefinitions = source.ticketDefinitions
     .map((definition) => ({
       ...definition,
+      acceptance: [...definition.acceptance]
+        .map((item) => ({ ...item }))
+        .sort((left, right) =>
+          compare(left.acceptanceId, right.acceptanceId)),
+      contextRefs: [...definition.contextRefs]
+        .map((item) => ({ ...item }))
+        .sort((left, right) => compare(left.ref, right.ref)),
       provenanceRefs: normalizeSet(
         definition.provenanceRefs,
         "Ticket provenance reference",
@@ -276,6 +289,20 @@ function normalizeSource(
       ),
     }))
     .sort((left, right) => compare(left.ticketId, right.ticketId));
+  for (const definition of ticketDefinitions) {
+    assertUnique(
+      definition.acceptance.map((item) => item.acceptanceId),
+      "duplicate_projection_set_member",
+      "Ticket acceptance ID",
+      { ticketId: definition.ticketId },
+    );
+    assertUnique(
+      definition.contextRefs.map((item) => item.ref),
+      "duplicate_projection_set_member",
+      "Ticket context reference",
+      { ticketId: definition.ticketId },
+    );
+  }
   const directUnlocks = source.directUnlocks
     .map((relation) => ({
       ...relation,
@@ -328,6 +355,12 @@ function normalizeSource(
     schemaVersion: source.schemaVersion,
     snapshotRevision: source.snapshotRevision,
     projectionWatermark: source.projectionWatermark,
+    source: source.source.mode === "worktree"
+      ? {
+          ...source.source,
+          dirtyPaths: [...source.source.dirtyPaths].sort(compare),
+        }
+      : source.source,
     ticketDefinitions,
     directUnlocks,
     currentCapabilityProjections,
@@ -608,17 +641,17 @@ function buildProjection(sourceValue: unknown): FullProjection {
           { recordRef: trace.recordRef, ticketId: trace.subject.ticketId },
         );
       }
-      if (trace.subject.boundDefinitionRevision
-        > definition.definitionRevision) {
+      if (trace.subject.boundTicketRevision
+        !== definition.ticketRevision) {
         failInvariant(
-          "future_trace_definition_revision",
-          "trace is bound to a future Ticket definition revision",
+          "trace_ticket_revision_mismatch",
+          "trace is not bound to the visible Ticket revision",
           {
             recordRef: trace.recordRef,
             ticketId: trace.subject.ticketId,
-            boundDefinitionRevision:
-              trace.subject.boundDefinitionRevision,
-            visibleDefinitionRevision: definition.definitionRevision,
+            boundTicketRevision:
+              trace.subject.boundTicketRevision,
+            visibleTicketRevision: definition.ticketRevision,
           },
         );
       }
@@ -744,17 +777,17 @@ function buildProjection(sourceValue: unknown): FullProjection {
           },
         );
       }
-      if (definition.definitionRevision
-        !== projection.subject.definitionRevision) {
+      if (definition.ticketRevision
+        !== projection.subject.ticketRevision) {
         failInvariant(
           "capability_ticket_revision_mismatch",
           "current capability projection does not match the visible Ticket definition revision",
           {
             producerReceiptRef: projection.producerReceiptRef,
             ticketId: definition.ticketId,
-            boundDefinitionRevision:
-              projection.subject.definitionRevision,
-            visibleDefinitionRevision: definition.definitionRevision,
+            boundTicketRevision:
+              projection.subject.ticketRevision,
+            visibleTicketRevision: definition.ticketRevision,
           },
         );
       }
@@ -800,7 +833,7 @@ function buildProjection(sourceValue: unknown): FullProjection {
   const ticketProjections = definitions.map(
     (definition): TicketReviewTicketProjectionV0 => ({
       ticketId: definition.ticketId,
-      definitionRevision: definition.definitionRevision,
+      ticketRevision: definition.ticketRevision,
       outcome: definition.outcome,
       provenanceRefs: definition.provenanceRefs ?? [],
       capabilities: ticketCapabilities.get(definition.ticketId)!,
@@ -836,7 +869,16 @@ function buildProjection(sourceValue: unknown): FullProjection {
   })}`;
   const snapshotId = `tgs-${digest({
     projectorVersion: TICKET_REVIEW_PROJECTOR_VERSION,
-    source,
+    sourceToken: source.source.sourceToken,
+    source: {
+      schemaVersion: source.schemaVersion,
+      snapshotRevision: source.snapshotRevision,
+      projectionWatermark: source.projectionWatermark,
+      ticketDefinitions: source.ticketDefinitions,
+      directUnlocks: source.directUnlocks,
+      currentCapabilityProjections: source.currentCapabilityProjections,
+      traceRecords: source.traceRecords,
+    },
   })}`;
   const header: ProjectionHeader = {
     schemaVersion: TICKET_REVIEW_SCHEMA_VERSION,
@@ -845,6 +887,7 @@ function buildProjection(sourceValue: unknown): FullProjection {
     snapshotRevision: source.snapshotRevision,
     projectionWatermark: source.projectionWatermark,
     topologyDigest,
+    source: source.source,
   };
   return {
     header,
@@ -858,6 +901,7 @@ function buildProjection(sourceValue: unknown): FullProjection {
     relations: relationProjections,
     lenses: snapshotCapabilities.lenses,
     traceRecords,
+    definitionsById: definitionById,
   };
 }
 
@@ -973,6 +1017,25 @@ export function inspectTicketReviewSubjectV0(
       subject: {
         kind: "ticket",
         ticket,
+        contextPackage: {
+          outcome: ticket.outcome,
+          context: full.definitionsById.get(ticketId)!.context,
+          acceptance: full.definitionsById.get(ticketId)!.acceptance,
+          constraints: full.definitionsById.get(ticketId)!.constraints,
+          contextRefs: full.definitionsById.get(ticketId)!.contextRefs,
+          relations: full.relations
+            .filter((relation) =>
+              relation.dependentTicketId === ticket.ticketId)
+            .map((relation) => ({
+              relationRef: relation.relationRef,
+              type: "depends_on" as const,
+              targetTicketId: relation.prerequisiteTicketId,
+              ...(relation.rationale === undefined
+                ? {}
+                : { rationale: relation.rationale }),
+            })),
+          provenanceRefs: ticket.provenanceRefs,
+        },
         prerequisiteRelationRefs: full.relations
           .filter((relation) =>
             relation.dependentTicketId === ticket.ticketId)

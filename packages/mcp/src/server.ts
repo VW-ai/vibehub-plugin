@@ -97,7 +97,7 @@ export function createWorkbenchMcpServer(
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
     title: "Dispatch one canonical Ticket operation",
-    description: "Read Ticket projections and review packets, record immutable proposals or validation evidence, and invoke the trusted authority/application spine. MCP actor/input fields never mint human authority; authority decisions require a host-injected provider, and apply accepts only the exact immutable authority-decision binding.",
+    description: "Read the current Git-native Ticket graph, inspect one executable context package, or list its trace. Ticket semantics come from the trusted workspace path, never SQLite.",
     inputSchema: {
       requestId: logicalRequestId,
       operation: z.enum(TICKET_OPERATION_NAMES),

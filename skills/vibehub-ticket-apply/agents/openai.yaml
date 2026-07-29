@@ -1,4 +1,0 @@
-interface:
-  display_name: "VibeHub Ticket Apply"
-  short_description: "Review and apply authorized Ticket proposals"
-  default_prompt: "Use $vibehub-ticket-apply to review and safely apply an authorized Ticket proposal."

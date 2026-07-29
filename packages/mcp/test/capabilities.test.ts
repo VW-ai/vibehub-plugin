@@ -1,38 +1,30 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { execFileSync } from "node:child_process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import {
-  GIT_TICKET_STORE_FORMAT,
-  GIT_TICKET_STORE_RELATIVE_PATH,
-  GIT_TICKET_STORE_SCHEMA_VERSION,
   OperationDispatcher,
-  DistillationService,
-  deriveTicketReviewSnapshotIdV0,
-  gitTicketGenerationDigestV0,
-  gitTicketGenerationRelativePathV0,
-  gitTicketRevisionRelativePathV0,
   openDb,
   operationInputSchemas,
-  readTask,
   readScopePatterns,
-  serializeGitTicketStoreDocumentV0,
+  readTask,
   upsertRepo,
   upsertTask,
   type Db,
-  type GitTicketDefinitionRevisionV0,
-  type TicketReviewProjectionSourceV0,
 } from "@vw-ai/vibehub-core";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   createCapabilities,
   TICKET_OPERATION_NAMES,
 } from "../src/capabilities.js";
-import { createWorkbenchMcpServer, operationEnvelopeResult, WORKBENCH_MCP_TOOL_NAMES } from "../src/server.js";
+import {
+  createWorkbenchMcpServer,
+  operationEnvelopeResult,
+  WORKBENCH_MCP_TOOL_NAMES,
+} from "../src/server.js";
 import {
   openRuntimeContext,
   openRuntimeContextForClient,
@@ -40,123 +32,48 @@ import {
 } from "../src/runtime.js";
 
 const NOW = "2026-07-12T10:00:00.000Z";
-const TICKET_STORE_ID = "ticket-store-0123456789abcdef0123456789abcdef";
 const toolText = (value: unknown): string =>
   (value as { content: Array<{ type: "text"; text: string }> }).content[0]!.text;
 
-const sha256 = (value: string | Buffer): string =>
-  crypto.createHash("sha256").update(value).digest("hex");
-
-function writeCanonicalTicketDocument(target: string, value: unknown): string {
-  const bytes = serializeGitTicketStoreDocumentV0(value);
-  fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.writeFileSync(target, bytes);
-  return bytes;
-}
-
-function publishCanonicalTicketStore(repo: string): { snapshotId: string } {
-  const store = path.join(repo, GIT_TICKET_STORE_RELATIVE_PATH);
-  writeCanonicalTicketDocument(path.join(store, "protocol.yaml"), {
-    schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
-    format: GIT_TICKET_STORE_FORMAT,
-    storeId: TICKET_STORE_ID,
-    indexing: "stable-ticket-revision-paths",
-    integrity: "immutable-generations-pointer-v1",
-    projector: "ticket-review-v0",
-  });
-
-  const definition: GitTicketDefinitionRevisionV0 = {
-    schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
-    kind: "ticket_definition_revision",
-    ticketId: "TKT-MCP-001",
-    definitionRevision: 1,
-    created: {
-      at: NOW,
-      by: "agent:mcp-test",
-      reason: "Exercise the canonical MCP Ticket read path",
-      source: { kind: "plan", ref: "plan:mcp-ticket-operation" },
-    },
-    outcome: "Expose the canonical Ticket graph through MCP",
-    parentId: null,
-    dependsOn: [],
-    provenanceRefs: ["fixture:mcp-ticket-operation"],
-  };
-  const file = gitTicketRevisionRelativePathV0(
-    definition.ticketId,
-    definition.definitionRevision,
-  );
-  const definitionBytes = writeCanonicalTicketDocument(
-    path.join(store, file),
-    definition,
-  );
-  const entries = [{
-    ticketId: definition.ticketId,
-    definitionRevision: definition.definitionRevision,
-    file,
-    sha256: sha256(definitionBytes),
-  }];
-  const generationDigest = gitTicketGenerationDigestV0(
-    TICKET_STORE_ID,
-    entries,
-  );
-  const snapshotRevision = [
-    "ticket-generation",
-    TICKET_STORE_ID,
-    generationDigest,
-  ].join(":");
-  const source: TicketReviewProjectionSourceV0 = {
-    schemaVersion: 1,
-    snapshotRevision,
-    projectionWatermark: snapshotRevision,
-    ticketDefinitions: [{
-      ticketId: definition.ticketId,
-      definitionRevision: definition.definitionRevision,
-      outcome: definition.outcome,
-      provenanceRefs: [
-        `ticket-definition:${definition.ticketId}:revision:${definition.definitionRevision}`,
-        ...definition.provenanceRefs,
-      ],
-    }],
-    directUnlocks: [],
-    currentCapabilityProjections: [],
-    traceRecords: [],
-  };
-  const snapshotId = deriveTicketReviewSnapshotIdV0(source);
-  writeCanonicalTicketDocument(
-    path.join(store, gitTicketGenerationRelativePathV0(snapshotId)),
-    {
-      schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
-      kind: "ticket_generation",
-      storeId: TICKET_STORE_ID,
-      snapshotId,
-      generationDigest,
-      tickets: entries,
-    },
-  );
-  writeCanonicalTicketDocument(path.join(store, "latest.yaml"), {
-    schemaVersion: GIT_TICKET_STORE_SCHEMA_VERSION,
-    kind: "ticket_latest",
-    storeId: TICKET_STORE_ID,
-    snapshotId,
-  });
-  return { snapshotId };
-}
-
 describe("local MCP deterministic capabilities", () => {
   let dir: string;
+  let repo: string;
   let db: Db;
   let commit: string;
 
   beforeEach(() => {
     dir = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-mcp-"));
-    const repo=path.join(dir,"repo");fs.mkdirSync(repo);execFileSync("git",["init","-q"],{cwd:repo});execFileSync("git",["config","user.name","Test"],{cwd:repo});execFileSync("git",["config","user.email","test@example.com"],{cwd:repo});fs.writeFileSync(path.join(repo,"README.md"),"test\n");execFileSync("git",["add","README.md"],{cwd:repo});execFileSync("git",["commit","-qm","initial"],{cwd:repo});commit=execFileSync("git",["rev-parse","HEAD"],{cwd:repo,encoding:"utf8"}).trim();
+    repo = path.join(dir, "repo");
+    fs.mkdirSync(repo);
+    execFileSync("git", ["init", "-q"], { cwd: repo });
+    execFileSync("git", ["config", "user.name", "Test"], { cwd: repo });
+    execFileSync("git", ["config", "user.email", "test@example.com"], {
+      cwd: repo,
+    });
+    fs.writeFileSync(path.join(repo, "README.md"), "test\n");
+    execFileSync("git", ["add", "README.md"], { cwd: repo });
+    execFileSync("git", ["commit", "-qm", "initial"], { cwd: repo });
+    commit = execFileSync("git", ["rev-parse", "HEAD"], {
+      cwd: repo,
+      encoding: "utf8",
+    }).trim();
     db = openDb(path.join(dir, "t.db"));
     upsertRepo(db, repo, null, "main", NOW);
     upsertTask(db, {
-      id: "branch:feat/mcp", repoId: 1, title: "mcp", state: "running",
-      signalTier: "hooks", branch: "feat/mcp", worktreePath: null,
-      prNumber: null, prState: null, stateSince: NOW, lastEventAt: NOW,
-      statusDetail: null, createdAt: NOW, startHeadSha: "abc123",
+      id: "branch:feat/mcp",
+      repoId: 1,
+      title: "mcp",
+      state: "running",
+      signalTier: "hooks",
+      branch: "feat/mcp",
+      worktreePath: null,
+      prNumber: null,
+      prState: null,
+      stateSince: NOW,
+      lastEventAt: NOW,
+      statusDetail: null,
+      createdAt: NOW,
+      startHeadSha: commit,
     });
   });
 
@@ -166,198 +83,134 @@ describe("local MCP deterministic capabilities", () => {
   });
 
   it("register_scope stores raw globs rather than territory ids", () => {
-    const api = createCapabilities({ db, repoId: 1, taskId: "branch:feat/mcp", now: () => NOW });
+    const api = createCapabilities({
+      db,
+      repoId: 1,
+      taskId: "branch:feat/mcp",
+      now: () => NOW,
+    });
     api.registerScope({
       status: "building MCP",
-      write: [{ glob: "workbench/packages/mcp/**", label: "MCP" }],
-      read: [{ glob: "META/21-workbench/**" }],
+      write: [{ glob: "packages/mcp/**", label: "MCP" }],
+      read: [{ glob: "META/09-ticket-runtime/**" }],
     });
-    expect(readScopePatterns(db, "branch:feat/mcp").map((p) => p.glob)).toEqual([
-      "workbench/packages/mcp/**", "META/21-workbench/**",
-    ]);
+    expect(readScopePatterns(db, "branch:feat/mcp").map((item) => item.glob))
+      .toEqual(["packages/mcp/**", "META/09-ticket-runtime/**"]);
   });
 
   it("resolves task capabilities only inside the owning repository", () => {
-    const other = upsertRepo(db, path.join(dir, "other"), null, "main", NOW);
-    const owner = createCapabilities({ db, repoId: 1, taskId: "branch:feat/mcp", now: () => NOW });
-    const nonOwner = createCapabilities({ db, repoId: other.id, taskId: "branch:feat/mcp", now: () => NOW });
-
-    expect(owner.selfReport({ status: "owned" })).toMatchObject({ status: "owned" });
-    expect(() => nonOwner.selfReport({ status: "not-owned" })).toThrow(/missing task/);
+    const other = upsertRepo(
+      db,
+      path.join(dir, "other"),
+      null,
+      "main",
+      NOW,
+    );
+    const owner = createCapabilities({
+      db,
+      repoId: 1,
+      taskId: "branch:feat/mcp",
+      now: () => NOW,
+    });
+    const nonOwner = createCapabilities({
+      db,
+      repoId: other.id,
+      taskId: "branch:feat/mcp",
+      now: () => NOW,
+    });
+    expect(owner.selfReport({ status: "owned" }))
+      .toMatchObject({ status: "owned" });
+    expect(() => nonOwner.selfReport({ status: "not-owned" }))
+      .toThrow(/missing task/);
   });
 
-  it("advertises only honest tools and canonical mutation adapters have successful fixtures", () => {
-    const server=createWorkbenchMcpServer({db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",now:()=>NOW});
-    const registered=(server as unknown as {_registeredTools:Record<string,{description?:string}>})._registeredTools;
-    expect(Object.keys(registered)).toEqual([...WORKBENCH_MCP_TOOL_NAMES]);
-    expect(registered).not.toHaveProperty("kb_record");
-    expect(registered).not.toHaveProperty("kb_apply_distillation");
-    expect(Object.values(registered).map((tool)=>tool.description??"").join("\n")).not.toMatch(/compatibility name|unsupported_operation/i);
-    const ids=["mcp-kb-write","mcp-distill-start"];
-    const api = createCapabilities({ db, repoId: 1, taskId: "branch:feat/mcp", actor:"mcp-test", requestId:()=>ids.shift()!, now: () => NOW });
-    const kb=api.dispatchKnowledge("kb.spec.apply",{idempotencyKey:"mcp-write",specs:[{id:"mcp-contract",type:"contract",summary:"MCP persists through the canonical dispatcher",evidence:[{sourceType:"test",sourceRef:"mcp",evidenceRef:"fixture"}]}]});
-    const distill=api.dispatchOperation("distill.run.start",{runId:"mcp-success",mode:"cold",baseCommit:commit,skillHash:"s",configHash:"c"});
-    expect(kb).toMatchObject({ok:true});
-    expect(distill).toMatchObject({ok:true,data:{state:"collecting"}});
-    expect(operationEnvelopeResult(kb).isError).toBe(false);
-  });
-
-  it("exposes Ticket review contributions and validation receipts with dispatcher parity", async () => {
-    const repo = path.join(dir, "repo");
+  it("advertises only honest tools and canonical adapters", () => {
     const server = createWorkbenchMcpServer({
       db,
       repoId: 1,
       taskId: "branch:feat/mcp",
+      actor: "mcp-test",
+      now: () => NOW,
+    });
+    const registered = (server as unknown as {
+      _registeredTools: Record<string, { description?: string }>;
+    })._registeredTools;
+    expect(Object.keys(registered)).toEqual([...WORKBENCH_MCP_TOOL_NAMES]);
+    expect(registered).not.toHaveProperty("kb_record");
+    expect(Object.values(registered).map((tool) => tool.description ?? "")
+      .join("\n")).not.toMatch(/compatibility name|trusted authority/i);
+    const api = createCapabilities({
+      db,
+      repoId: 1,
+      taskId: "branch:feat/mcp",
+      actor: "mcp-test",
+      requestId: () => "mcp-kb-write",
+      now: () => NOW,
+    });
+    const kb = api.dispatchKnowledge("kb.spec.apply", {
+      idempotencyKey: "mcp-write",
+      specs: [{
+        id: "mcp-contract",
+        type: "contract",
+        summary: "MCP persists through the canonical dispatcher",
+        evidence: [{
+          sourceType: "test",
+          sourceRef: "mcp",
+          evidenceRef: "fixture",
+        }],
+      }],
+    });
+    expect(kb).toMatchObject({ ok: true });
+    expect(operationEnvelopeResult(kb).isError).toBe(false);
+  });
+
+  it("exposes only three Git-native Ticket reads without repo/task rows", async () => {
+    writeTicketLedger(repo);
+    execFileSync("git", ["add", ".vibehub/tickets"], { cwd: repo });
+    execFileSync("git", ["commit", "-qm", "ticket ledger"], { cwd: repo });
+    const ticketDb = openDb(path.join(dir, "ticket-only.db"));
+    const server = createWorkbenchMcpServer({
+      db: ticketDb,
+      repoId: 1,
+      taskId: "missing-task",
       repoRoot: repo,
       actor: "mcp-test",
       now: () => NOW,
     });
-    const client = new Client({ name: "ticket-operation-test", version: "1.0.0" });
-    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+    const client = new Client({
+      name: "ticket-operation-test",
+      version: "1.0.0",
+    });
+    const [clientTransport, serverTransport] =
+      InMemoryTransport.createLinkedPair();
     await Promise.all([
       server.connect(serverTransport),
       client.connect(clientTransport),
     ]);
     try {
       const listed = await client.listTools();
-      expect(listed.tools.map((tool) => tool.name)).toEqual([
-        ...WORKBENCH_MCP_TOOL_NAMES,
-      ]);
       const ticketTool = listed.tools.find(
         (tool) => tool.name === "ticket_operation",
       );
       const ticketSchema = ticketTool?.inputSchema as {
         properties?: { operation?: { enum?: unknown[] } };
       };
-      expect(ticketSchema.properties?.operation?.enum).toEqual([
-        ...TICKET_OPERATION_NAMES,
+      expect(TICKET_OPERATION_NAMES).toEqual([
+        "ticket.graph.snapshot",
+        "ticket.subject.inspect",
+        "ticket.trace.list",
       ]);
+      expect(ticketSchema.properties?.operation?.enum)
+        .toEqual([...TICKET_OPERATION_NAMES]);
       expect([...TICKET_OPERATION_NAMES].sort()).toEqual(
         Object.keys(operationInputSchemas)
           .filter((operation) => operation.startsWith("ticket."))
           .sort(),
       );
-      expect(TICKET_OPERATION_NAMES).toContain("ticket.proposal.inspect");
-      expect(TICKET_OPERATION_NAMES).toContain("ticket.proposal.list");
-      expect(TICKET_OPERATION_NAMES)
-        .toContain("ticket.proposal.validation.record");
-      expect(TICKET_OPERATION_NAMES)
-        .toContain("ticket.proposal.validation.inspect");
-      expect(TICKET_OPERATION_NAMES)
-        .toContain("ticket.proposal.validation.list");
-      expect(TICKET_OPERATION_NAMES)
-        .toContain("ticket.proposal.review.inspect");
-      expect(TICKET_OPERATION_NAMES)
-        .toContain("ticket.proposal.authority.decide");
-      expect(TICKET_OPERATION_NAMES)
-        .toContain("ticket.proposal.apply");
-      expect(ticketTool?.description).toMatch(
-        /never mint human authority/,
-      );
+      expect(ticketTool?.description).toMatch(/Git-native Ticket graph/);
+      expect(ticketTool?.description).not.toMatch(/proposal|authority|apply/i);
 
-      const unsupported = await client.callTool({
-        name: "ticket_operation",
-        arguments: { operation: "kb.status" },
-      });
-      expect(unsupported.isError).toBe(true);
-      expect(toolText(unsupported)).toMatch(/ticket\.graph\.snapshot/);
-
-      const absent = await client.callTool({
-        name: "ticket_operation",
-        arguments: {
-          operation: "ticket.graph.snapshot",
-          requestId: "ticket-absent",
-        },
-      });
-      expect(absent.isError).toBe(true);
-      const absentEnvelope = JSON.parse(toolText(absent));
-      expect(absentEnvelope).toMatchObject({
-        ok: false,
-        error: { code: "not_found" },
-      });
-      expect(absentEnvelope).toEqual(
-        new OperationDispatcher(db, { repoRoot: repo }).dispatch(
-          "ticket.graph.snapshot",
-          {
-            repoId: 1,
-            actor: "mcp-test",
-            taskId: "branch:feat/mcp",
-            requestId: "ticket-absent",
-            now: NOW,
-          },
-          {},
-        ),
-      );
-
-      const proposalInput = {
-        schemaVersion: 1,
-        kind: "graph_change",
-        observedSnapshotId: null,
-        reason: "Shape the accepted MCP work",
-        authorAssessment: {
-          changeClass: "decomposition",
-          authoritySignals: [],
-          introducesHumanGate: false,
-          rationale: "The proposal stays inside the accepted outcome.",
-        },
-        changes: [{
-          op: "create",
-          localRef: "implementation",
-          definition: {
-            outcome: "Implement the accepted MCP behavior",
-            parent: null,
-            dependsOn: [],
-          },
-        }],
-      };
-      const proposal = await client.callTool({
-        name: "ticket_operation",
-        arguments: {
-          operation: "ticket.proposal.submit",
-          requestId: "ticket-proposal-submit",
-          input: proposalInput,
-        },
-      });
-      expect(proposal.isError).toBe(false);
-      const proposalEnvelope = JSON.parse(toolText(proposal));
-      expect(proposalEnvelope).toMatchObject({
-        ok: true,
-        data: {
-          kind: "graph_change",
-          effect: "review_contribution_only",
-          graphMutationApplied: false,
-          reviewRequirement: {
-            authorityStatus: "not_granted",
-          },
-        },
-        meta: {
-          operation: "ticket.proposal.submit",
-          requestId: "ticket-proposal-submit",
-        },
-      });
-      expect(proposalEnvelope).toEqual(
-        new OperationDispatcher(db, { repoRoot: repo }).dispatch(
-          "ticket.proposal.submit",
-          {
-            repoId: 1,
-            actor: "mcp-test",
-            taskId: "branch:feat/mcp",
-            requestId: "ticket-proposal-submit",
-            now: NOW,
-          },
-          proposalInput,
-        ),
-      );
-      expect(db.prepare(
-        `SELECT COUNT(*) count FROM ticket_proposals`,
-      ).get()).toEqual({ count: 1 });
-      expect(fs.existsSync(path.join(
-        repo,
-        GIT_TICKET_STORE_RELATIVE_PATH,
-      ))).toBe(false);
-
-      const { snapshotId } = publishCanonicalTicketStore(repo);
-      const success = await client.callTool({
+      const graphResult = await client.callTool({
         name: "ticket_operation",
         arguments: {
           operation: "ticket.graph.snapshot",
@@ -365,33 +218,26 @@ describe("local MCP deterministic capabilities", () => {
           input: { pageSize: 10 },
         },
       });
-      expect(success.isError).toBe(false);
-      const successEnvelope = JSON.parse(toolText(success));
-      expect(successEnvelope).toMatchObject({
+      expect(graphResult.isError).toBe(false);
+      const graph = JSON.parse(toolText(graphResult));
+      expect(graph).toMatchObject({
         ok: true,
         data: {
-          snapshotId,
-          summary: { ticketCount: 1, directUnlockCount: 0 },
-          tickets: [{ ticketId: "TKT-MCP-001" }],
+          schemaVersion: 2,
+          source: {
+            mode: "worktree",
+            semanticDirty: false,
+          },
+          tickets: [{
+            ticketId: "read-ticket-graph",
+            ticketRevision: expect.any(String),
+          }],
         },
         meta: {
           operation: "ticket.graph.snapshot",
           requestId: "ticket-success",
         },
       });
-      expect(successEnvelope).toEqual(
-        new OperationDispatcher(db, { repoRoot: repo }).dispatch(
-          "ticket.graph.snapshot",
-          {
-            repoId: 1,
-            actor: "mcp-test",
-            taskId: "branch:feat/mcp",
-            requestId: "ticket-success",
-            now: NOW,
-          },
-          { pageSize: 10 },
-        ),
-      );
 
       const inspect = await client.callTool({
         name: "ticket_operation",
@@ -399,284 +245,197 @@ describe("local MCP deterministic capabilities", () => {
           operation: "ticket.subject.inspect",
           requestId: "ticket-inspect",
           input: {
-            snapshotId,
-            subject: { kind: "ticket", ticketId: "TKT-MCP-001" },
-          },
-        },
-      });
-      const trace = await client.callTool({
-        name: "ticket_operation",
-        arguments: {
-          operation: "ticket.trace.list",
-          requestId: "ticket-trace",
-          input: {
-            snapshotId,
-            subject: { kind: "ticket", ticketId: "TKT-MCP-001" },
+            snapshotId: graph.data.snapshotId,
+            subject: {
+              kind: "ticket",
+              ticketId: "read-ticket-graph",
+            },
           },
         },
       });
       expect(inspect.isError).toBe(false);
-      expect(trace.isError).toBe(false);
       expect(JSON.parse(toolText(inspect))).toMatchObject({
         ok: true,
-        meta: { operation: "ticket.subject.inspect" },
-      });
-      expect(JSON.parse(toolText(trace))).toMatchObject({
-        ok: true,
-        data: { records: [] },
-        meta: { operation: "ticket.trace.list" },
-      });
-    } finally {
-      await Promise.all([client.close(), server.close()]);
-    }
-  });
-
-  it("canonical MCP reads preserve the exact dispatcher envelope", () => {
-    const api=createCapabilities({db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",requestId:()=>"r-read",now:()=>NOW});
-    expect(api.dispatchKnowledge("kb.spec.search",{query:"MCP"})).toEqual(new OperationDispatcher(db).dispatch("kb.spec.search",{repoId:1,actor:"mcp-test",taskId:"branch:feat/mcp",requestId:"r-read",now:NOW},{query:"MCP"}));
-  });
-
-  it("keeps direct capability dispatch inside its declared operation family", () => {
-    const api=createCapabilities({
-      db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",now:()=>NOW,
-    });
-    expect(api.dispatchKnowledge("distill.run.status",{runId:"x"})).toMatchObject({
-      ok:false,
-      error:{code:"unsupported_operation",details:{expectedPrefix:"kb."}},
-    });
-    expect(api.dispatchOperation("kb.status",{})).toMatchObject({
-      ok:false,
-      error:{code:"unsupported_operation",details:{expectedPrefix:"distill."}},
-    });
-    expect(api.dispatchTicket(
-      "kb.spec.apply" as unknown as typeof TICKET_OPERATION_NAMES[number],
-      {},
-    )).toMatchObject({
-      ok:false,
-      error:{
-        code:"unsupported_operation",
-        details:{operation:"kb.spec.apply"},
-      },
-    });
-  });
-
-  it("assigns a unique request id to each invocation when no id source is provided", () => {
-    const api=createCapabilities({db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",now:()=>NOW});
-    const status=api.dispatchKnowledge("kb.status",{});
-    const search=api.dispatchKnowledge("kb.spec.search",{});
-    expect(status).toMatchObject({ok:true});
-    expect(search).toMatchObject({ok:true});
-    if(!status.ok||!search.ok)throw new Error("expected successful capability envelopes");
-    expect(status.meta.requestId).not.toBe(search.meta.requestId);
-    const explicit=api.dispatchKnowledge("kb.status",{},"explicit-replay");
-    expect(api.dispatchKnowledge("kb.status",{},"explicit-replay")).toEqual(explicit);
-  });
-
-  it("separates MCP transport correlation from explicit logical replay ids", async () => {
-    const connectSession = async (name: string) => {
-      const server = createWorkbenchMcpServer({
-        db, repoId: 1, taskId: "branch:feat/mcp", actor: "mcp-test", now: () => NOW,
-      });
-      const client = new Client({ name, version: "1.0.0" });
-      const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
-      await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
-      return { client, server };
-    };
-    const first = await connectSession("first-session");
-    const second = await connectSession("second-session");
-    try {
-      const retrieve = await first.client.callTool({
-        name: "kb_retrieve", arguments: { query: "nothing-yet" },
-      });
-      const status = await second.client.callTool({
-        name: "kb_operation", arguments: { operation: "kb.status" },
-      });
-      expect(retrieve.isError).not.toBe(true);
-      expect(status.isError).not.toBe(true);
-      const retrieveEnvelope = JSON.parse(toolText(retrieve));
-      const statusEnvelope = JSON.parse(toolText(status));
-      expect(retrieveEnvelope.meta.requestId).toMatch(/^mcp-[0-9a-f-]{36}$/);
-      expect(statusEnvelope.meta.requestId).toMatch(/^mcp-[0-9a-f-]{36}$/);
-      expect(statusEnvelope.meta.requestId).not.toBe(retrieveEnvelope.meta.requestId);
-
-      const explicitArguments = { operation: "kb.status", requestId: "logical-replay-1" };
-      const explicit = await first.client.callTool({ name: "kb_operation", arguments: explicitArguments });
-      const replay = await second.client.callTool({ name: "kb_operation", arguments: explicitArguments });
-      expect(replay).toEqual(explicit);
-      expect(JSON.parse(toolText(explicit))).toMatchObject({
-        ok: true, meta: { requestId: "logical-replay-1" },
-      });
-
-      const explicitDistill = await first.client.callTool({
-        name: "distill_operation",
-        arguments: {
-          operation: "distill.run.start", requestId: "logical-distill-1",
-          input: { runId: "registered-handler-run", mode: "cold", baseCommit: commit, skillHash: "s", configHash: "c" },
+        data: {
+          subject: {
+            kind: "ticket",
+            contextPackage: {
+              context: "Read current Ticket documents directly from Git.",
+            },
+          },
         },
       });
-      expect(JSON.parse(toolText(explicitDistill))).toMatchObject({
-        ok: true, meta: { requestId: "logical-distill-1" },
-      });
 
-      const conflict = await second.client.callTool({
-        name: "kb_operation",
-        arguments: { ...explicitArguments, input: { unexpected: "changed" } },
-      });
-      expect(conflict.isError).toBe(true);
-      expect(JSON.parse(toolText(conflict))).toMatchObject({
-        ok: false, error: { code: "idempotency_conflict" },
-      });
-
-      const invalid = await first.client.callTool({
-        name: "distill_operation",
-        arguments: { operation: "distill.run.status", requestId: " padded ", input: { runId: "x" } },
-      });
-      expect(invalid.isError).toBe(true);
-      expect(toolText(invalid)).toMatch(/requestId/i);
-
-      const kbEscape = await first.client.callTool({
-        name: "kb_operation",
-        arguments: { operation: "distill.run.status", input: { runId: "x" } },
-      });
-      const distillEscape = await first.client.callTool({
-        name: "distill_operation",
-        arguments: { operation: "kb.status" },
-      });
-      expect(kbEscape.isError).toBe(true);
-      expect(distillEscape.isError).toBe(true);
+      expect(ticketDb.prepare(
+        `SELECT COUNT(*) count
+           FROM operation_request_receipts
+          WHERE operation LIKE 'ticket.%'`,
+      ).get()).toEqual({ count: 0 });
+      expect(readTask(ticketDb, "missing-task")).toBeNull();
     } finally {
-      await Promise.all([first.client.close(), second.client.close(), first.server.close(), second.server.close()]);
+      await Promise.all([client.close(), server.close()]);
+      ticketDb.close();
     }
   });
 
-  it("distillation MCP is byte-semantic parity with the shared dispatcher",()=>{
-    const ids=["distill-status","distill-candidates"];const api=createCapabilities({db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",requestId:()=>ids.shift()!,now:()=>NOW});
-    const input={runId:"mcp-run",mode:"cold",baseCommit:commit,skillHash:"s",configHash:"c"};
-    const expected=new OperationDispatcher(db).dispatch("distill.run.start",{repoId:1,actor:"mcp-test",taskId:"branch:feat/mcp",requestId:"distill-start",now:NOW},input);
-    expect(expected).toMatchObject({ok:true});
-    expect(api.dispatchOperation("distill.run.status",{runId:"mcp-run"})).toEqual(new OperationDispatcher(db).dispatch("distill.run.status",{repoId:1,actor:"mcp-test",taskId:"branch:feat/mcp",requestId:"distill-status",now:NOW},{runId:"mcp-run"}));
-    expect(api.dispatchOperation("distill.candidates.list",{runId:"mcp-run"})).toEqual(new OperationDispatcher(db).dispatch("distill.candidates.list",{repoId:1,actor:"mcp-test",taskId:"branch:feat/mcp",requestId:"distill-candidates",now:NOW},{runId:"mcp-run"}));
-  });
-  it("routes selective retry and resolved baseCommit through MCP parity",()=>{const c={actor:"seed",taskId:"branch:feat/mcp",requestId:"seed",now:NOW},s=new DistillationService(db);s.start(1,{runId:"retry-mcp",mode:"cold",baseCommit:commit,skillHash:"s",configHash:"c"},c);s.putInventory(1,{runId:"retry-mcp",rows:[{path:"a.ts",classification:"included",contentHash:"h"}]},c);s.sealInventory(1,{runId:"retry-mcp"},c);s.planScopes(1,{runId:"retry-mcp",scopes:[{scopeId:"leaf",kind:"leaf",parentScopeId:null,files:["a.ts"]}]},c);const lease=s.claimScope(1,{runId:"retry-mcp",workerId:"w",leaseSeconds:60},c)!;s.failScope(1,{runId:"retry-mcp",scopeId:"leaf",leaseToken:lease.leaseToken,generation:lease.generation,reason:"lost"},c);s.reconcile(1,{runId:"retry-mcp"},c);const api=createCapabilities({db,repoId:1,taskId:"branch:feat/mcp",actor:"mcp-test",requestId:()=>"retry-mcp-1",now:()=>NOW}),input={runId:"retry-mcp",scopeId:"leaf",reason:"retry"};expect(api.dispatchOperation("distill.scopes.retry",input)).toEqual(new OperationDispatcher(db).dispatch("distill.scopes.retry",{repoId:1,actor:"mcp-test",taskId:"branch:feat/mcp",requestId:"retry-mcp-1",now:NOW},input));});
-
-  it("self_report stores a one-line status and get_manual stays reference-only", () => {
-    const api = createCapabilities({ db, repoId: 1, taskId: "branch:feat/mcp", now: () => NOW });
-    expect(api.selfReport({ status: "MCP spine is green", done: "scope registry" })).toEqual({
-      status: "MCP spine is green", done: "scope registry", reportedAt: NOW,
+  it("keeps direct capability dispatch inside its operation family", () => {
+    const api = createCapabilities({
+      db,
+      repoId: 1,
+      taskId: "branch:feat/mcp",
+      actor: "mcp-test",
+      now: () => NOW,
     });
-    expect(api.getManual({ topic: "skills" }).text).toContain("skills own semantic workflow");
+    expect(api.dispatchKnowledge(
+      "distill.run.status",
+      { runId: "x" },
+    )).toMatchObject({
+      ok: false,
+      error: {
+        code: "unsupported_operation",
+        details: { expectedPrefix: "kb." },
+      },
+    });
+    expect(api.dispatchTicket(
+      "ticket.proposal.submit" as never,
+      {},
+    )).toMatchObject({
+      ok: false,
+      error: {
+        code: "unsupported_operation",
+        details: { expectedOperations: [...TICKET_OPERATION_NAMES] },
+      },
+    });
   });
 
-  it("MCP dispatch is the same operation envelope and preserves actor/task requirements", () => {
-    const api = createCapabilities({ db, repoId: 1, taskId: "branch:feat/mcp", actor: "mcp-test", requestId: () => "same-request", now: () => NOW });
-    const direct = new OperationDispatcher(db).dispatch("kb.status", {
-      repoId: 1, actor: "mcp-test", taskId: "branch:feat/mcp", requestId: "same-request", now: NOW,
-    }, {});
-    expect(api.dispatchKnowledge("kb.status", {})).toEqual(direct);
-    expect(api.dispatchKnowledge("kb.spec.search", {})).toMatchObject({ok:false,error:{code:"idempotency_conflict"}});
-    expect(new OperationDispatcher(db).dispatch("kb.spec.apply", {
-      repoId: 1, actor: "mcp-test", requestId: "missing-task", now: NOW,
-    }, { idempotencyKey: "x", specs: [{id:"x",type:"context",summary:"x",evidence:[{sourceType:"test",sourceRef:"t",evidenceRef:"t"}]}] })).toMatchObject({ ok: false, error: { code: "task_required" } });
-    expect(operationEnvelopeResult(direct).isError).toBe(false);
-    expect(operationEnvelopeResult(api.dispatchKnowledge("kb.nope", {})).isError).toBe(true);
-  });
-});
-
-describe("MCP runtime context", () => {
-  let repo: string;
-  let dir: string;
-
-  beforeEach(() => {
-    dir = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-mcp-runtime-"));
-    repo = path.join(dir, "repo");
-    fs.mkdirSync(repo);
-    execFileSync("git", ["init", "-b", "main"], { cwd: repo });
-    execFileSync("git", ["config", "user.email", "test@example.com"], { cwd: repo });
-    execFileSync("git", ["config", "user.name", "Test"], { cwd: repo });
-    fs.writeFileSync(path.join(repo, "README.md"), "test\n");
-    execFileSync("git", ["add", "README.md"], { cwd: repo });
-    execFileSync("git", ["commit", "-m", "initial"], { cwd: repo });
-    execFileSync("git", ["checkout", "-b", "feat/runtime"], { cwd: repo });
+  it("preserves exact dispatcher envelopes for canonical reads", () => {
+    const api = createCapabilities({
+      db,
+      repoId: 1,
+      taskId: "branch:feat/mcp",
+      actor: "mcp-test",
+      requestId: () => "r-read",
+      now: () => NOW,
+    });
+    expect(api.dispatchKnowledge("kb.spec.search", { query: "MCP" })).toEqual(
+      new OperationDispatcher(db).dispatch(
+        "kb.spec.search",
+        {
+          repoId: 1,
+          actor: "mcp-test",
+          taskId: "branch:feat/mcp",
+          requestId: "r-read",
+          now: NOW,
+        },
+        { query: "MCP" },
+      ),
+    );
   });
 
-  afterEach(() => {
-    fs.rmSync(dir, { recursive: true, force: true });
+  it("self_report remains task-scoped and the manual is reference-only", () => {
+    const api = createCapabilities({
+      db,
+      repoId: 1,
+      taskId: "branch:feat/mcp",
+      now: () => NOW,
+    });
+    expect(api.selfReport({
+      status: "MCP ready",
+      done: "Ticket read cut",
+    })).toMatchObject({
+      status: "MCP ready",
+      done: "Ticket read cut",
+    });
+    expect(api.getManual().text).toMatch(/skills own semantic workflow/);
   });
 
-  it("derives repo and task from the server cwd without a second config source", () => {
-    const runtime = openRuntimeContext(repo, path.join(dir, "runtime.db"), () => NOW);
-    expect(runtime.context.taskId).toMatch(/^task:[0-9a-f]+$/);
-    expect(runtime.context.repoId).toBe(1);
-    expect(readTask(runtime.context.db, runtime.context.taskId)?.startHeadSha).toMatch(/^[0-9a-f]{40}$/);
-    runtime.close();
+  it("derives repo and task from the server cwd", () => {
+    const runtime = openRuntimeContext(repo, path.join(dir, "runtime.db"));
+    try {
+      expect(runtime.context.repoRoot).toBe(fs.realpathSync(repo));
+      expect(runtime.context.repoId).toBe(1);
+      expect(readTask(runtime.context.db, runtime.context.taskId))
+        .toMatchObject({ repoId: 1 });
+    } finally {
+      runtime.close();
+    }
   });
 
-  it("derives the same runtime from one MCP file root and rejects ambiguity", () => {
-    const dbPath = path.join(dir, "roots.db");
+  it("derives one MCP file root and rejects ambiguity", () => {
     const runtime = openRuntimeContextFromRoots(
       [{ uri: pathToFileURL(repo).href }],
-      dbPath,
-      () => NOW,
+      path.join(dir, "roots.db"),
     );
-    expect(runtime.context.repoId).toBe(1);
-    expect(readTask(runtime.context.db, runtime.context.taskId)?.branch).toBe("feat/runtime");
-    runtime.close();
-
-    const other = path.join(dir, "other");
-    execFileSync("git", ["clone", "-q", repo, other]);
+    try {
+      expect(runtime.context.repoRoot).toBe(fs.realpathSync(repo));
+    } finally {
+      runtime.close();
+    }
+    const otherRepo = path.join(dir, "other-repo");
+    fs.mkdirSync(otherRepo);
+    execFileSync("git", ["init", "-q"], { cwd: otherRepo });
+    execFileSync("git", ["config", "user.name", "Test"], { cwd: otherRepo });
+    execFileSync("git", ["config", "user.email", "test@example.com"], {
+      cwd: otherRepo,
+    });
+    fs.writeFileSync(path.join(otherRepo, "README.md"), "other\n");
+    execFileSync("git", ["add", "README.md"], { cwd: otherRepo });
+    execFileSync("git", ["commit", "-qm", "initial"], { cwd: otherRepo });
     expect(() => openRuntimeContextFromRoots([
       { uri: pathToFileURL(repo).href },
-      { uri: pathToFileURL(other).href },
-    ], dbPath, () => NOW)).toThrow(/exactly one Git workspace root/);
+      { uri: pathToFileURL(otherRepo).href },
+    ], path.join(dir, "ambiguous.db"))).toThrow(/exactly one Git workspace root/);
   });
 
-  it("falls back to inherited cwd only for explicit MethodNotFound or empty roots", async () => {
-    const unsupported = await openRuntimeContextForClient({
-      supportsRoots: false,
-      listRoots: async () => {
-        throw Object.assign(new Error("roots/list is unsupported"), { code: -32601 });
-      },
-      cwd: repo,
-      dbPath: path.join(dir, "unsupported.db"),
-      now: () => NOW,
-    });
-    expect(readTask(unsupported.context.db, unsupported.context.taskId)?.branch).toBe("feat/runtime");
-    unsupported.close();
-
-    const empty = await openRuntimeContextForClient({
-      supportsRoots: true,
-      listRoots: async () => [],
-      cwd: repo,
-      dbPath: path.join(dir, "empty.db"),
-      now: () => NOW,
-    });
-    expect(readTask(empty.context.db, empty.context.taskId)?.branch).toBe("feat/runtime");
-    empty.close();
-  });
-
-  it("accepts roots from Codex even when the host omits the advertised capability", async () => {
+  it("falls back to cwd only for explicit roots/list MethodNotFound", async () => {
     const runtime = await openRuntimeContextForClient({
       supportsRoots: false,
-      listRoots: async () => [{ uri: pathToFileURL(repo).href }],
-      cwd: path.join(dir, "not-the-repo"),
-      dbPath: path.join(dir, "codex-roots.db"),
-      now: () => NOW,
-    });
-    expect(readTask(runtime.context.db, runtime.context.taskId)?.branch).toBe("feat/runtime");
-    runtime.close();
-  });
-
-  it("does not bind cwd when roots/list fails for any reason except unsupported", async () => {
-    const dbPath = path.join(dir, "failed-roots.db");
-    await expect(openRuntimeContextForClient({
-      supportsRoots: false,
       listRoots: async () => {
-        throw new Error("roots/list timed out");
+        throw Object.assign(new Error("unsupported"), { code: -32601 });
       },
       cwd: repo,
-      dbPath,
-      now: () => NOW,
-    })).rejects.toThrow(/roots\/list timed out/);
-    expect(fs.existsSync(dbPath)).toBe(false);
+      dbPath: path.join(dir, "fallback.db"),
+    });
+    try {
+      expect(runtime.context.repoRoot).toBe(fs.realpathSync(repo));
+    } finally {
+      runtime.close();
+    }
+    await expect(openRuntimeContextForClient({
+      supportsRoots: true,
+      listRoots: async () => {
+        throw Object.assign(new Error("broken"), { code: -32603 });
+      },
+      cwd: repo,
+      dbPath: path.join(dir, "no-fallback.db"),
+    })).rejects.toThrow("broken");
   });
 });
+
+function writeTicketLedger(repo: string): void {
+  const ledger = path.join(repo, ".vibehub", "tickets");
+  const tickets = path.join(ledger, "tickets");
+  fs.mkdirSync(tickets, { recursive: true });
+  fs.writeFileSync(path.join(ledger, "protocol.yaml"), [
+    "schema_version: 1",
+    "kind: ticket_protocol",
+    "format: vibehub.ticket-ledger",
+    "",
+  ].join("\n"));
+  fs.writeFileSync(path.join(tickets, "read-ticket-graph.yaml"), [
+    "schema_version: 1",
+    "kind: ticket",
+    "ticket_id: read-ticket-graph",
+    "outcome: Read the current Ticket graph",
+    "context: Read current Ticket documents directly from Git.",
+    "acceptance:",
+    "  - acceptance_id: mcp",
+    "    criterion: MCP returns the same graph as Core.",
+    "constraints: []",
+    "context_refs: []",
+    "relations: []",
+    "provenance_refs:",
+    "  - test:mcp",
+    "",
+  ].join("\n"));
+}

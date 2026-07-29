@@ -1,3 +1,13 @@
+import {
+  TicketLedgerError,
+  loadTicketLedgerFromWorktree,
+  projectTicketLedgerForReview,
+} from "./ticket-ledger/index.js";
+import { deriveTicketReviewSnapshotIdV0 } from "./ticket-review-projector.js";
+import {
+  type TicketReviewProjectionSourceV0,
+} from "./ticket-review-source.js";
+
 /**
  * Storage-agnostic source boundary for Ticket Review V0.
  *
@@ -6,17 +16,14 @@
  * `currentCapabilityProjections` have already been selected for the exact
  * snapshot revision and projection watermark.
  *
- * The default production implementation is the independent Git-native Ticket
- * store. META specs, legacy Task rows, prototypes, and test fixtures remain
- * forbidden as production fallbacks when that store is absent.
+ * The default production implementation reads `.vibehub/tickets` directly
+ * from the trusted worktree supplied by the host. SQLite repository/task rows,
+ * legacy generations, META specs, prototypes, and test fixtures are forbidden
+ * as production fallbacks.
  */
 
 export interface TicketReviewRepositoryScopeV0 {
-  /** Repository identity resolved by Core, never selected by operation input. */
-  repoId: number;
-  /** Canonical root of the registered repository. */
-  repositoryRoot: string;
-  /** Checkout/worktree whose repository identity Core already verified. */
+  /** Canonical trusted checkout/worktree bound by the host adapter. */
   worktreeRoot: string;
 }
 
@@ -46,10 +53,8 @@ export interface ResolvedTicketReviewProjectionSourceProviderV0 {
   /**
    * Load the provider's default coherent whole-project graph.
    *
-   * The Git-native V0 authority defines this as the latest published,
-   * whole-project generation in the verified worktree. Other providers must
-   * define an equally explicit lifecycle rather than letting the projector
-   * infer one.
+   * The Git-native authority defines this as one coherent read of the current
+   * worktree ledger, including uncommitted Ticket semantics.
    */
   loadLatest(
     scope: TicketReviewRepositoryScopeV0,
@@ -66,11 +71,60 @@ export interface ResolvedTicketReviewProjectionSourceProviderV0 {
    * well as `snapshotId`; a globally keyed snapshot cache can transplant valid
    * facts and repo-path targets into the wrong checkout. The source shape is
    * structurally validated but does not self-authenticate repository
-   * provenance. The production provider therefore verifies the complete Git
-   * scope and reconstructs immutable generations from the addressed worktree.
+   * provenance. The production provider reloads the addressed worktree and
+   * succeeds only while the complete source token still derives the requested
+   * public snapshot.
    */
   loadSnapshot(
     scope: TicketReviewRepositoryScopeV0,
     snapshotId: string,
   ): TicketReviewSnapshotSourceLoadV0;
+}
+
+/**
+ * Current-worktree production provider. Exact historical reads are explicit
+ * ledger ref loads; the review API reloads the current worktree and expires an
+ * old snapshot as soon as its complete source changes.
+ */
+export class GitTicketLedgerReviewProjectionSourceProviderV0
+implements ResolvedTicketReviewProjectionSourceProviderV0 {
+  loadLatest(
+    scope: TicketReviewRepositoryScopeV0,
+  ): TicketReviewLatestSourceLoadV0 {
+    try {
+      return {
+        status: "available",
+        source: projectTicketLedgerForReview(
+          loadTicketLedgerFromWorktree(scope.worktreeRoot),
+        ),
+      };
+    } catch (error) {
+      if (error instanceof TicketLedgerError
+        && error.code === "ledger_missing") {
+        return { status: "no_ticket_graph" };
+      }
+      throw error;
+    }
+  }
+
+  loadSnapshot(
+    scope: TicketReviewRepositoryScopeV0,
+    snapshotId: string,
+  ): TicketReviewSnapshotSourceLoadV0 {
+    let source: TicketReviewProjectionSourceV0;
+    try {
+      source = projectTicketLedgerForReview(
+        loadTicketLedgerFromWorktree(scope.worktreeRoot),
+      );
+    } catch (error) {
+      if (error instanceof TicketLedgerError
+        && error.code === "ledger_missing") {
+        return { status: "snapshot_expired" };
+      }
+      throw error;
+    }
+    return deriveTicketReviewSnapshotIdV0(source) === snapshotId
+      ? { status: "available", source }
+      : { status: "snapshot_expired" };
+  }
 }

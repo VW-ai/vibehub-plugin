@@ -232,18 +232,9 @@ relations:
     type: depends_on
 anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"
-  - file: "packages/core/src/git-ticket-store.ts"
   - file: "packages/core/src/ticket-review-read-service.ts"
-  - file: "packages/core/test/git-ticket-store.test.ts"
-  - file: "packages/core/test/git-ticket-publisher.test.ts"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-generation-publisher-contract.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
-  - file: "packages/core/src/contract/ticket-proposal.ts"
-  - file: "packages/core/src/contract/ticket-application.ts"
-  - file: "packages/core/src/ticket-application-service.ts"
-  - file: "packages/core/src/ticket-proposal-service.ts"
-  - file: "packages/core/test/ticket-proposal-service.test.ts"
-  - file: "packages/core/test/ticket-application-contract.test.ts"
   - file: "packages/core/test/ticket-operation-dispatcher.test.ts"

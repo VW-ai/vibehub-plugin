@@ -137,7 +137,7 @@ function latestSource(
     throw new TicketReviewProjectionError(
       "not_found",
       "the repository has no canonical Ticket graph to review",
-      { repoId: scope.repoId },
+      { worktreeRoot: scope.worktreeRoot },
     );
   }
   return invalidProviderResult("loadLatest", load);
@@ -155,7 +155,7 @@ function snapshotSource(
     throw new TicketReviewProjectionError(
       "snapshot_expired",
       "the bound Ticket review snapshot can no longer be reconstructed",
-      { repoId: scope.repoId, snapshotId },
+      { worktreeRoot: scope.worktreeRoot, snapshotId },
     );
   }
   return invalidProviderResult("loadSnapshot", load);
@@ -177,7 +177,7 @@ function projectExactSnapshot<T>(
       "snapshot_expired",
       "the bound Ticket review snapshot can no longer be reconstructed",
       {
-        repoId: scope.repoId,
+        worktreeRoot: scope.worktreeRoot,
         snapshotId,
         cause: "resolved_source_does_not_match_snapshot",
       },

@@ -219,10 +219,7 @@ relations:
     type: depends_on
 anchors:
   - file: "packages/core"
-  - file: "packages/core/src/git-ticket-store.ts"
   - file: "packages/core/src/operation-dispatcher.ts"
-  - file: "packages/core/src/contract/ticket-proposal.ts"
-  - file: "packages/core/src/ticket-proposal-service.ts"
   - file: "packages/cli/src/main.ts"
   - file: "packages/mcp/src/server.ts"
   - file: "skills"
@@ -233,11 +230,3 @@ anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-first-ticket-dogfood-plan.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-first-ticket-graph-proposal.json"
-  - file: "skills/vibehub-ticket-validate/SKILL.md"
-  - file: "skills/vibehub-ticket-apply/SKILL.md"
-  - file: "skills/vibehub-ticket-plan/SKILL.md"
-  - file: "packages/core/src/contract/ticket-application.ts"
-  - file: "packages/core/src/contract/ticket-application-schemas.ts"
-  - file: "packages/core/src/ticket-application-service.ts"
-  - file: "packages/core/test/ticket-application-contract.test.ts"
-  - file: "packages/core/test/ticket-proposal-service.test.ts"

@@ -20,12 +20,12 @@
     signalDetail: document.querySelector("#signalDetail"),
     signalAttention: document.querySelector("#signalAttention"),
     projectName: document.querySelector("#projectName"),
-    proposalRef: document.querySelector("#proposalRef"),
+    sourceRef: document.querySelector("#sourceRef"),
     ambientProject: document.querySelector("#ambientProject"),
     ambientBranch: document.querySelector("#ambientBranch"),
     stateDot: document.querySelector("#stateDot"),
     stateLabel: document.querySelector("#stateLabel"),
-    reviewStatus: document.querySelector("#reviewStatus"),
+    sourceStatus: document.querySelector("#sourceStatus"),
     workspace: document.querySelector(".workspace"),
     canvas: document.querySelector("#canvas"),
     graph: document.querySelector("#graph"),
@@ -33,29 +33,14 @@
     edgeLayer: document.querySelector("#edgeLayer"),
     nodeLayer: document.querySelector("#nodeLayer"),
     minimap: document.querySelector("#minimap"),
+    emptyState: document.querySelector("#emptyState"),
     loadingState: document.querySelector("#loadingState"),
     inspector: document.querySelector("#inspector"),
     closeInspector: document.querySelector("#closeInspector"),
     inspectorEyebrow: document.querySelector("#inspectorEyebrow"),
     inspectorTitle: document.querySelector("#inspectorTitle"),
     inspectorOutcome: document.querySelector("#inspectorOutcome"),
-    candidateFact: document.querySelector("#candidateFact"),
-    candidateLabel: document.querySelector("#candidateLabel"),
-    validationFact: document.querySelector("#validationFact"),
-    validationLabel: document.querySelector("#validationLabel"),
-    authorityFact: document.querySelector("#authorityFact"),
-    authorityLabel: document.querySelector("#authorityLabel"),
-    relationSection: document.querySelector("#relationSection"),
-    relationList: document.querySelector("#relationList"),
-    validationSection: document.querySelector("#validationSection"),
-    validationList: document.querySelector("#validationList"),
-    decisionSection: document.querySelector("#decisionSection"),
-    decisionTitle: document.querySelector("#decisionTitle"),
-    decisionDetail: document.querySelector("#decisionDetail"),
-    rationale: document.querySelector("#rationale"),
-    rejectButton: document.querySelector("#rejectButton"),
-    authorizeButton: document.querySelector("#authorizeButton"),
-    decisionNote: document.querySelector("#decisionNote"),
+    inspectorContent: document.querySelector("#inspectorContent"),
     toast: document.querySelector("#toast"),
   };
 
@@ -64,12 +49,14 @@
   let state = null;
   let positions = new Map();
   let selected = null;
+  let lastFocusedSubject = null;
+  let graphRequest = 0;
+  let subjectRequest = 0;
   let panX = 0;
   let panY = 0;
   let scale = 1;
   let dragging = null;
   let suppressCanvasClick = false;
-  let lastFocusedSubject = null;
   let toastTimer = null;
 
   function svg(tag, attributes = {}) {
@@ -80,66 +67,89 @@
     return element;
   }
 
-  async function api(path, options = {}) {
+  async function api(path) {
     if (!token) {
-      throw new Error("The local review capability is missing. Open the exact link printed by VibeHub.");
+      throw new Error(
+        "The local Ticket capability is missing. Open the exact link printed by VibeHub.",
+      );
     }
     const response = await fetch(path, {
-      ...options,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...(options.body ? { "Content-Type": "application/json" } : {}),
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
     const envelope = await response.json();
     if (!response.ok || !envelope.ok) {
-      throw new Error(envelope?.error?.message || `Review host returned ${response.status}`);
+      throw new Error(
+        envelope?.error?.message || `Ticket host returned ${response.status}`,
+      );
     }
     return envelope.data;
   }
 
   async function refresh(message) {
+    const request = ++graphRequest;
+    subjectRequest += 1;
     setBusy(true);
     try {
-      state = await api("/api/state");
-      render();
+      const nextState = await api("/api/state");
+      if (request !== graphRequest) return;
+      subjectRequest += 1;
+      state = nextState;
+      selected = null;
+      positions = layoutGraph(state.graph.tickets, state.graph.relations);
+      renderChrome();
+      renderGraph();
+      renderMinimap();
+      renderGraphInspector();
+      requestAnimationFrame(frameGraph);
       if (message) showToast(message);
     } catch (error) {
+      if (request !== graphRequest) return;
       renderError(error);
     } finally {
-      setBusy(false);
+      if (request === graphRequest) setBusy(false);
     }
   }
 
-  function render() {
-    const graph = state.graph;
-    positions = layoutGraph(graph.tickets, graph.relations);
-    renderChrome();
-    renderGraph();
-    renderMinimap();
-    renderPlanInspector();
-    requestAnimationFrame(frameGraph);
-  }
-
   function renderChrome() {
-    const { project, proposal, review, graph } = state;
+    const { project, graph } = state;
+    const { source } = graph;
+    const commit = source.resolvedCommit
+      ? source.resolvedCommit.slice(0, 8)
+      : "unborn";
+    const worktree = worktreeBasename(source.worktreeRoot);
     elements.projectName.textContent = project.name;
     elements.ambientProject.textContent = project.name;
-    elements.ambientBranch.textContent = `${project.branch} · local trusted review`;
-    elements.proposalRef.textContent = shortRef(proposal.proposalId);
+    elements.ambientBranch.textContent =
+      `${worktree} · ${project.branch} · ${commit} · Git Ticket ledger`;
+    elements.sourceRef.textContent =
+      `${worktree} · ${project.branch}@${commit}`;
+    elements.sourceRef.title =
+      `${source.worktreeRoot}\nWorktree ${source.worktreeIdentity}\nClick to copy full path`;
+    elements.sourceRef.setAttribute(
+      "aria-label",
+      `Worktree ${worktree}. Copy full path.`,
+    );
     elements.signalDetail.textContent =
       `${graph.tickets.length} Tickets · ${graph.relations.length} direct unlocks`;
-    const tone = statusTone(review.eligibility.status);
     elements.signalAttention.textContent =
-      humanStatus(review.eligibility.status);
-    elements.signalAttention.className = `signal-attention ${tone}`.trim();
-    elements.stateDot.className = `state-dot ${tone}`.trim();
-    elements.stateLabel.textContent = humanStatus(review.eligibility.status);
+      source.semanticDirty ? "Local" : "Git";
+    elements.signalAttention.className =
+      `signal-attention${source.semanticDirty ? " dirty" : ""}`;
+    elements.stateDot.className =
+      `state-dot${source.semanticDirty ? " dirty" : ""}`;
+    elements.stateLabel.textContent =
+      source.semanticDirty
+        ? `${dirtyPathCount(source)} local change`
+          + `${source.dirtyPaths.length === 1 && !source.dirtyPathsTruncated ? "" : "s"}`
+        : "Exact Git source";
+    elements.emptyState.hidden = graph.tickets.length !== 0;
+    elements.minimap.hidden = graph.tickets.length === 0;
   }
 
   function renderGraph() {
     elements.edgeLayer.replaceChildren();
     elements.nodeLayer.replaceChildren();
+    if (!state) return;
     const related = selected ? causalCone(selected) : null;
 
     for (const relation of state.graph.relations) {
@@ -149,34 +159,32 @@
       const group = svg("g", {
         class: classes(
           "edge",
-          selected?.kind === "relation" && selected.id === relation.relationRef ? "selected" : "",
+          selected?.kind === "relation" && selected.id === relation.relationRef
+            ? "selected"
+            : "",
           related?.relations.has(relation.relationRef) ? "related" : "",
           related && !related.relations.has(relation.relationRef) ? "dimmed" : "",
         ),
         role: "button",
         tabindex: "0",
-        "aria-label": `${relation.prerequisiteTicketId} unlocks ${relation.dependentTicketId}`,
+        "aria-label":
+          `${relation.prerequisiteTicketId} unlocks ${relation.dependentTicketId}`,
       });
       group.dataset.relationRef = relation.relationRef;
       const geometry = edgeGeometry(from, to, relation.relationRef);
-      const visible = svg("path", {
-        class: "edge-visible",
-        d: geometry.path,
-      });
-      const arrow = svg("path", {
-        class: "edge-arrow",
-        d: geometry.arrow,
-      });
-      const hit = svg("path", { class: "edge-hit", d: geometry.path });
-      group.append(visible, arrow, hit);
+      group.append(
+        svg("path", { class: "edge-visible", d: geometry.path }),
+        svg("path", { class: "edge-arrow", d: geometry.arrow }),
+        svg("path", { class: "edge-hit", d: geometry.path }),
+      );
       group.addEventListener("click", (event) => {
         event.stopPropagation();
-        selectRelation(relation.relationRef);
+        void selectRelation(relation.relationRef);
       });
       group.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          selectRelation(relation.relationRef, true);
+          void selectRelation(relation.relationRef, true);
         }
       });
       elements.edgeLayer.append(group);
@@ -185,18 +193,21 @@
     for (const ticket of state.graph.tickets) {
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
-      const isSelected = selected?.kind === "ticket" && selected.id === ticket.ticketId;
+      const isSelected =
+        selected?.kind === "ticket" && selected.id === ticket.ticketId;
       const group = svg("g", {
         class: classes(
           "ticket-node",
-          ticket.state,
           isSelected ? "selected" : "",
           related && !related.nodes.has(ticket.ticketId) ? "dimmed" : "",
         ),
         transform: `translate(${position.x} ${position.y})`,
         role: "button",
         tabindex: "0",
-        "aria-label": `${ticket.ticketId}. ${ticket.outcome}. ${ticket.relationCounts.prerequisites} prerequisites, ${ticket.relationCounts.dependents} unlocks.`,
+        "aria-label":
+          `${ticket.ticketId}. ${ticket.outcome}. `
+          + `${ticket.relationCounts.prerequisites} prerequisites, `
+          + `${ticket.relationCounts.dependents} unlocks.`,
       });
       group.dataset.ticketId = ticket.ticketId;
       group.append(
@@ -218,18 +229,7 @@
       const id = svg("text", { class: "ticket-id", x: 15, y: 23 });
       id.textContent = shortTicketId(ticket.ticketId);
       group.append(id);
-      if (ticket.state !== "existing") {
-        const change = svg("text", {
-          class: "ticket-change",
-          x: NODE.width - 14,
-          y: 23,
-          "text-anchor": "end",
-        });
-        change.textContent = ticket.state;
-        group.append(change);
-      }
-      const lines = wrap(ticket.outcome, 38, 3);
-      lines.forEach((line, index) => {
+      wrap(ticket.outcome, 38, 3).forEach((line, index) => {
         const text = svg("text", {
           class: "ticket-outcome",
           x: 15,
@@ -244,13 +244,18 @@
         y: NODE.height - 12,
       });
       meta.textContent =
-        `${ticket.relationCounts.prerequisites} in · ${ticket.relationCounts.dependents} out · r${ticket.definitionRevision}`;
+        `${ticket.relationCounts.prerequisites} in · `
+        + `${ticket.relationCounts.dependents} out · `
+        + shortDigest(ticket.ticketRevision);
       group.append(meta);
       group.addEventListener("click", (event) => {
         event.stopPropagation();
-        selectTicket(ticket.ticketId);
+        void selectTicket(ticket.ticketId);
       });
-      group.addEventListener("keydown", (event) => onNodeKey(event, ticket.ticketId));
+      group.addEventListener(
+        "keydown",
+        (event) => onNodeKey(event, ticket.ticketId),
+      );
       elements.nodeLayer.append(group);
     }
     applyTransform();
@@ -260,7 +265,11 @@
     elements.minimap.replaceChildren();
     const bounds = graphBounds();
     if (!bounds) return;
-    elements.minimap.setAttribute("viewBox", `${bounds.x - 20} ${bounds.y - 20} ${bounds.width + 40} ${bounds.height + 40}`);
+    elements.minimap.setAttribute(
+      "viewBox",
+      `${bounds.x - 20} ${bounds.y - 20} `
+      + `${bounds.width + 40} ${bounds.height + 40}`,
+    );
     for (const relation of state.graph.relations) {
       const from = positions.get(relation.prerequisiteTicketId);
       const to = positions.get(relation.dependentTicketId);
@@ -286,242 +295,437 @@
         "stroke-width": 3,
       }));
     }
-    elements.minimap.append(svg("rect", {
-      class: "minimap-viewport",
-    }));
+    elements.minimap.append(svg("rect", { class: "minimap-viewport" }));
     updateMinimapViewport();
   }
 
-  function renderPlanInspector() {
-    const { proposal, review, graph } = state;
-    const stale = review.eligibility.status === "stale";
-    const applied = review.eligibility.status === "applied";
-    const appliedSnapshot = review.application?.publication.snapshotId ?? null;
-    const showingAppliedSnapshot =
-      appliedSnapshot !== null && graph.snapshotId === appliedSnapshot;
+  function renderGraphInspector() {
+    if (!state) return;
+    subjectRequest += 1;
     selected = null;
     elements.workspace.classList.remove("inspector-closed");
     elements.inspector.classList.add("open");
-    elements.candidateLabel.textContent = stale
-      ? "Stale proposal"
-      : applied
-        ? "Applied proposal"
-        : "Candidate";
-    elements.validationLabel.textContent = "Validation";
-    elements.authorityLabel.textContent = "Authority";
-    elements.decisionSection.hidden = false;
-    elements.decisionSection.classList.toggle(
-      "complete",
-      review.eligibility.status === "applied",
+    elements.inspectorEyebrow.textContent = "Current graph";
+    elements.inspectorTitle.textContent = "The work that unlocks the outcome";
+    elements.inspectorOutcome.textContent =
+      `This exact worktree source contains ${state.graph.tickets.length} `
+      + `Tickets and ${state.graph.relations.length} direct unlock relations. `
+      + "Select any Ticket to read the context a fresh Agent receives.";
+    elements.inspectorContent.replaceChildren(
+      facts([
+        ["Source", sourceLabel(state.graph.source)],
+        [
+          "Worktree",
+          copyableWorktree(state.graph.source),
+        ],
+        ["Commit", state.graph.source.resolvedCommit || "unborn HEAD"],
+        ["Graph", state.graph.source.graphDigest],
+        [
+          "Local state",
+          state.graph.source.semanticDirty
+            ? `${dirtyPathCount(state.graph.source)} semantic path changes`
+              + `${state.graph.source.dirtyPathsTruncated ? " · list truncated" : ""}`
+            : "matches committed Ticket semantics",
+        ],
+      ]),
     );
-    elements.inspectorEyebrow.textContent = "Plan review";
-    elements.inspectorTitle.textContent = proposal.reason;
-    elements.inspectorOutcome.textContent = stale
-      ? `This proposal no longer matches the canonical Ticket head. The canvas shows the current canonical graph (${graph.tickets.length} Tickets, ${graph.relations.length} direct unlock relations), not a reconstructed candidate. Replan against the current snapshot.`
-      : applied
-        ? showingAppliedSnapshot
-          ? `This proposal published the canonical snapshot shown on the canvas (${graph.tickets.length} Ticket outlines, ${graph.relations.length} direct unlock relations). Publication does not claim execution maturity.`
-          : `This proposal published ${shortRef(appliedSnapshot)}. The canvas shows the newer current canonical head ${shortRef(graph.snapshotId)}, not the historical candidate.`
-        : `This immutable candidate contains ${graph.tickets.length} Ticket outlines and ${graph.relations.length} direct unlock relations. Scenario is a review lens; publication does not claim execution maturity.`;
-    elements.candidateFact.textContent = `${shortDigest(proposal.candidateDigest)} · ${proposal.createdTicketCount} new · ${proposal.revisedTicketCount} revised`;
-    elements.validationFact.textContent =
-      review.validations.length === 0
-        ? "No complete passing validation"
-        : `${review.validations.length} receipt${review.validations.length === 1 ? "" : "s"} · ${shortDigest(review.validationSet.digest)}`;
-    elements.authorityFact.textContent =
-      review.decision
-        ? `${review.decision.disposition} · ${review.decision.requiredPath}`
-        : review.requiredPath ?? "not resolved";
-    elements.relationSection.hidden = true;
-    renderValidationEvidence(review.validations);
-    renderDecision();
-  }
-
-  function renderValidationEvidence(validations) {
-    elements.validationList.replaceChildren();
-    elements.validationSection.hidden = validations.length === 0;
-    for (const validation of validations) {
-      const record = document.createElement("details");
-      record.className = `validation-record ${validation.conclusion}`;
-      const summary = document.createElement("summary");
-      const validator = document.createElement("strong");
-      validator.textContent =
-        `${validation.validator.id}@${validation.validator.version}`;
-      const conclusion = document.createElement("span");
-      conclusion.textContent = validation.conclusion;
-      summary.append(validator, conclusion);
-
-      const facts = document.createElement("dl");
-      appendFact(
-        facts,
-        "Receipt",
-        `${shortRef(validation.validationReceiptId)} · ${shortDigest(validation.validationReceiptDigest)}`,
+    if (state.graph.source.semanticDirty) {
+      const pendingPaths = state.graph.source.dirtyPaths.map(
+        (item) => ({ title: item }),
       );
-      appendFact(
-        facts,
-        "Checks",
-        `${validation.checkCount} · ${validation.blockingFindingCount} blocking · ${validation.advisoryFindingCount} advisory`,
-      );
-      appendFact(
-        facts,
-        "Policy",
-        `${validation.policy.id}@${validation.policy.version}`,
-      );
-      appendFact(facts, "Trust", validation.validator.trust);
-      record.append(summary, facts);
-      elements.validationList.append(record);
-    }
-  }
-
-  function appendFact(list, label, value) {
-    const row = document.createElement("div");
-    const term = document.createElement("dt");
-    const definition = document.createElement("dd");
-    term.textContent = label;
-    definition.textContent = value;
-    row.append(term, definition);
-    list.append(row);
-  }
-
-  function renderDecision() {
-    const { review, proposal, controls, graph } = state;
-    const appliedSnapshot = review.application?.publication.snapshotId ?? null;
-    const showingAppliedSnapshot =
-      appliedSnapshot !== null && graph.snapshotId === appliedSnapshot;
-    const rationaleValid = elements.rationale.value.trim().length >= 12;
-    elements.decisionSection.classList.toggle(
-      "complete",
-      review.eligibility.status === "applied",
-    );
-    elements.rejectButton.hidden = !controls.canDecide;
-    elements.authorizeButton.hidden = !(controls.canDecide || controls.canApply);
-    elements.rationale.hidden = !controls.canDecide;
-    document.querySelector('label[for="rationale"]').hidden = !controls.canDecide;
-
-    if (review.eligibility.status === "applied") {
-      elements.decisionTitle.textContent = "Canonical graph published";
-      elements.decisionDetail.textContent = showingAppliedSnapshot
-        ? `The exact candidate is the canonical snapshot shown as ${shortRef(appliedSnapshot)}.`
-        : `This proposal published ${shortRef(appliedSnapshot)}; the canvas now shows current head ${shortRef(graph.snapshotId)}.`;
-      elements.decisionNote.textContent = "Authority and publication receipts are immutable.";
-    } else if (review.eligibility.status === "validation_required") {
-      elements.decisionTitle.textContent = "Independent validation required";
-      elements.decisionDetail.textContent =
-        "Use VibeHub Ticket Validate against this exact proposal before requesting human authority.";
-      elements.decisionNote.textContent = review.eligibility.reasons.join(" ");
-    } else if (review.eligibility.status === "authority_required") {
-      if (review.requiredPath === "delegated_policy") {
-        elements.decisionTitle.textContent = "Delegated policy required";
-        elements.decisionDetail.textContent =
-          "This local human surface cannot invent or substitute a durable delegated-policy basis.";
-        elements.decisionNote.textContent =
-          "Resolve this proposal through a configured trusted policy provider.";
-      } else {
-        elements.decisionTitle.textContent = "Review before publication";
-        elements.decisionDetail.textContent =
-          "Your explicit local decision will bind the complete validation set. Caller identity and page JSON cannot mint authority.";
-        elements.authorizeButton.textContent =
-          controls.decisionLabel || "Authorize and publish";
-        elements.authorizeButton.disabled = !rationaleValid;
-        elements.rejectButton.disabled = !rationaleValid;
-        elements.decisionNote.textContent = rationaleValid
-          ? "The decision is exact, terminal, and proposal-specific."
-          : "A rationale of at least 12 characters is required.";
+      if (state.graph.source.dirtyPathsTruncated) {
+        pendingPaths.push({
+          title: `${dirtyPathCount(state.graph.source)} paths`,
+          detail: "Additional changed paths are not shown.",
+        });
       }
-    } else if (review.eligibility.status === "application_ready") {
-      elements.decisionTitle.textContent = "Authorized and ready to publish";
-      elements.decisionDetail.textContent =
-        "The trusted decision already binds this candidate and validation set.";
-      elements.authorizeButton.textContent = controls.decisionLabel || "Publish authorized graph";
-      elements.authorizeButton.disabled = false;
-      elements.decisionNote.textContent = "Publication is crash-reconcilable and idempotent.";
-    } else {
-      elements.decisionTitle.textContent = humanStatus(review.eligibility.status);
-      elements.decisionDetail.textContent = review.eligibility.reasons.join(" ");
-      elements.decisionNote.textContent = "This proposal cannot advance from its current state.";
+      elements.inspectorContent.append(
+        section(
+          "Pending local semantics",
+          list(
+            pendingPaths,
+            (item) => item,
+            "code-ref",
+          ),
+        ),
+      );
     }
   }
 
-  function selectTicket(ticketId, focusInspector = false) {
-    const ticket = state.graph.tickets.find((item) => item.ticketId === ticketId);
+  async function selectTicket(ticketId, focusInspector = false) {
+    const ticket = state.graph.tickets.find(
+      (item) => item.ticketId === ticketId,
+    );
     if (!ticket) return;
+    const request = ++subjectRequest;
+    const snapshotId = state.graph.snapshotId;
     selected = { kind: "ticket", id: ticketId };
     lastFocusedSubject = selected;
-    elements.workspace.classList.remove("inspector-closed");
-    elements.inspector.classList.add("open");
+    openInspector();
     elements.inspectorEyebrow.textContent =
-      `Ticket · ${ticket.state} · ${shortTicketId(ticket.ticketId)}`;
+      `Ticket · ${shortTicketId(ticket.ticketId)}`;
+    elements.inspectorTitle.textContent = ticket.outcome;
+    elements.inspectorOutcome.textContent = "Reading executable context…";
+    elements.inspectorContent.replaceChildren(
+      facts([
+        ["Revision", ticket.ticketRevision],
+        [
+          "Topology",
+          `${ticket.relationCounts.prerequisites} prerequisites · `
+          + `${ticket.relationCounts.dependents} unlocks`,
+        ],
+      ]),
+    );
+    renderGraph();
+    try {
+      const query = subjectQuery(snapshotId, {
+        kind: "ticket",
+        ticketId,
+      });
+      const [inspection, trace] = await Promise.all([
+        api(`/api/subject?${query}`),
+        api(`/api/trace?${query}`).catch(() => null),
+      ]);
+      if (!isCurrentSubjectResponse(
+        request,
+        snapshotId,
+        { kind: "ticket", ticketId },
+        inspection,
+        trace,
+      )) return;
+      renderTicketInspection(inspection, trace);
+      if (focusInspector) elements.inspectorTitle.focus();
+    } catch (error) {
+      if (!isCurrentSubjectRequest(request, snapshotId)) return;
+      elements.inspectorOutcome.textContent = error.message;
+      showToast(error.message);
+    }
+  }
+
+  function renderTicketInspection(inspection, trace) {
+    const subject = inspection.subject;
+    if (subject?.kind !== "ticket") {
+      throw new Error("Ticket inspector received the wrong subject.");
+    }
+    const ticket = subject.ticket;
+    const contextPackage =
+      subject.contextPackage ?? inspection.contextPackage ?? {};
+    elements.inspectorEyebrow.textContent =
+      `Ticket · ${shortTicketId(ticket.ticketId)}`;
     elements.inspectorTitle.textContent = ticket.outcome;
     elements.inspectorOutcome.textContent =
-      "This proposal carries an outline definition. Executable context and runtime capability facts are not available yet.";
-    elements.candidateLabel.textContent = "Definition";
-    elements.validationLabel.textContent = "Capability";
-    elements.authorityLabel.textContent = "Topology";
-    elements.candidateFact.textContent =
-      `${ticket.ticketId} · r${ticket.definitionRevision}`;
-    elements.validationFact.textContent = "outline only";
-    elements.authorityFact.textContent =
-      `${ticket.relationCounts.prerequisites} prerequisites · ${ticket.relationCounts.dependents} unlocks`;
-    renderRelations(ticketId);
-    elements.validationSection.hidden = true;
-    elements.decisionSection.hidden = true;
-    renderGraph();
-    if (focusInspector) elements.inspectorTitle.focus();
+      contextPackage.context || "No additional context was recorded.";
+    const content = document.createDocumentFragment();
+    content.append(facts([
+      ["Revision", ticket.ticketRevision],
+      [
+        "Topology",
+        `${ticket.relationCounts.prerequisites} prerequisites · `
+        + `${ticket.relationCounts.dependents} unlocks`,
+      ],
+      ["Source", sourceLabel(inspection.source || state.graph.source)],
+    ]));
+    appendSection(
+      content,
+      "Acceptance",
+      list(
+        contextPackage.acceptance || [],
+        (item) => ({
+          title: item.acceptanceId,
+          detail: item.criterion,
+        }),
+      ),
+    );
+    appendSection(
+      content,
+      "Constraints",
+      list(
+        contextPackage.constraints || [],
+        (item) => ({ detail: item }),
+      ),
+    );
+    appendSection(
+      content,
+      "Context references",
+      list(
+        contextPackage.contextRefs || [],
+        (item) => ({ title: item.ref, detail: item.purpose }),
+        "code-ref",
+      ),
+    );
+    appendSection(
+      content,
+      "Typed relations",
+      relationList(contextPackage.relations || []),
+    );
+    appendSection(
+      content,
+      "Provenance",
+      list(
+        contextPackage.provenanceRefs || ticket.provenanceRefs || [],
+        (item) => ({ title: item }),
+        "code-ref",
+      ),
+    );
+    appendSection(
+      content,
+      "Trace",
+      list(
+        trace?.records || [],
+        (item) => ({
+          title: item.summary,
+          detail: `${item.kind} · ${item.occurredAt}`,
+        }),
+      ),
+    );
+    elements.inspectorContent.replaceChildren(content);
   }
 
-  function selectRelation(relationRef, focusInspector = false) {
-    const relation = state.graph.relations.find((item) => item.relationRef === relationRef);
+  async function selectRelation(relationRef, focusInspector = false) {
+    const relation = state.graph.relations.find(
+      (item) => item.relationRef === relationRef,
+    );
     if (!relation) return;
+    const request = ++subjectRequest;
+    const snapshotId = state.graph.snapshotId;
     selected = { kind: "relation", id: relationRef };
     lastFocusedSubject = selected;
-    elements.workspace.classList.remove("inspector-closed");
-    elements.inspector.classList.add("open");
+    openInspector();
     elements.inspectorEyebrow.textContent = "Direct unlock";
     elements.inspectorTitle.textContent =
-      `${shortTicketId(relation.prerequisiteTicketId)} → ${shortTicketId(relation.dependentTicketId)}`;
+      `${shortTicketId(relation.prerequisiteTicketId)} → `
+      + shortTicketId(relation.dependentTicketId);
     elements.inspectorOutcome.textContent =
-      relation.rationale || "No additional rationale was attached to this direct dependency.";
-    elements.candidateLabel.textContent = "Relation";
-    elements.validationLabel.textContent = "Direction";
-    elements.authorityLabel.textContent = "Change";
-    elements.candidateFact.textContent = shortRef(relation.relationRef);
-    elements.validationFact.textContent =
-      `${relation.prerequisiteTicketId} → ${relation.dependentTicketId}`;
-    elements.authorityFact.textContent = relation.state;
-    elements.relationSection.hidden = true;
-    elements.validationSection.hidden = true;
-    elements.decisionSection.hidden = true;
+      relation.rationale || "Direct execution dependency.";
+    elements.inspectorContent.replaceChildren(
+      facts([
+        ["Relation", relation.relationRef],
+        ["From", relation.prerequisiteTicketId],
+        ["To", relation.dependentTicketId],
+      ]),
+    );
     renderGraph();
-    if (focusInspector) elements.inspectorTitle.focus();
+    try {
+      const query = subjectQuery(snapshotId, {
+        kind: "relation",
+        relationRef,
+      });
+      const [inspection, trace] = await Promise.all([
+        api(`/api/subject?${query}`),
+        api(`/api/trace?${query}`).catch(() => null),
+      ]);
+      if (!isCurrentSubjectResponse(
+        request,
+        snapshotId,
+        { kind: "relation", relationRef },
+        inspection,
+        trace,
+      )) return;
+      renderRelationInspection(inspection, trace);
+      if (focusInspector) elements.inspectorTitle.focus();
+    } catch (error) {
+      if (!isCurrentSubjectRequest(request, snapshotId)) return;
+      elements.inspectorOutcome.textContent = error.message;
+      showToast(error.message);
+    }
   }
 
-  function renderRelations(ticketId) {
-    elements.relationList.replaceChildren();
-    const relations = state.graph.relations.filter(
-      (relation) =>
-        relation.prerequisiteTicketId === ticketId
-        || relation.dependentTicketId === ticketId,
+  function renderRelationInspection(inspection, trace) {
+    const subject = inspection.subject;
+    if (subject?.kind !== "relation") {
+      throw new Error("Relation inspector received the wrong subject.");
+    }
+    const relation = subject.relation;
+    elements.inspectorEyebrow.textContent = "Direct unlock";
+    elements.inspectorTitle.textContent =
+      `${shortTicketId(relation.prerequisiteTicketId)} → `
+      + shortTicketId(relation.dependentTicketId);
+    elements.inspectorOutcome.textContent =
+      relation.rationale || "Direct execution dependency.";
+    const content = document.createDocumentFragment();
+    content.append(facts([
+      ["Relation", relation.relationRef],
+      ["From", relation.prerequisiteTicketId],
+      ["To", relation.dependentTicketId],
+      ["Source", sourceLabel(inspection.source || state.graph.source)],
+    ]));
+    appendSection(
+      content,
+      "Provenance",
+      list(
+        relation.provenanceRefs || [],
+        (item) => ({ title: item }),
+        "code-ref",
+      ),
     );
-    elements.relationSection.hidden = relations.length === 0;
+    appendSection(
+      content,
+      "Trace",
+      list(
+        trace?.records || [],
+        (item) => ({
+          title: item.summary,
+          detail: `${item.kind} · ${item.occurredAt}`,
+        }),
+      ),
+    );
+    elements.inspectorContent.replaceChildren(content);
+  }
+
+  function subjectQuery(snapshotId, subject) {
+    const query = new URLSearchParams({
+      snapshotId,
+      kind: subject.kind,
+    });
+    if (subject.kind === "ticket") {
+      query.set("ticketId", subject.ticketId);
+    } else {
+      query.set("relationRef", subject.relationRef);
+    }
+    return query.toString();
+  }
+
+  function isCurrentSubjectRequest(request, snapshotId) {
+    return request === subjectRequest
+      && state?.graph.snapshotId === snapshotId;
+  }
+
+  function isCurrentSubjectResponse(
+    request,
+    snapshotId,
+    subject,
+    inspection,
+    trace,
+  ) {
+    const inspectedSubject = inspection?.subject;
+    const identityMatches = subject.kind === "ticket"
+      ? inspectedSubject?.kind === "ticket"
+        && inspectedSubject.ticket?.ticketId === subject.ticketId
+      : inspectedSubject?.kind === "relation"
+        && inspectedSubject.relation?.relationRef === subject.relationRef;
+    return isCurrentSubjectRequest(request, snapshotId)
+      && inspection?.snapshotId === snapshotId
+      && (trace === null || trace?.snapshotId === snapshotId)
+      && identityMatches;
+  }
+
+  function openInspector() {
+    elements.workspace.classList.remove("inspector-closed");
+    elements.inspector.classList.add("open");
+  }
+
+  function closeInspector() {
+    const restore = selected ?? lastFocusedSubject;
+    subjectRequest += 1;
+    selected = null;
+    elements.inspector.classList.remove("open");
+    elements.workspace.classList.add("inspector-closed");
+    renderGraph();
+    requestAnimationFrame(() => focusGraphSubject(restore));
+  }
+
+  function focusGraphSubject(subject) {
+    if (!subject) return;
+    const selector = subject.kind === "ticket"
+      ? `[data-ticket-id="${CSS.escape(subject.id)}"]`
+      : `[data-relation-ref="${CSS.escape(subject.id)}"]`;
+    elements.graph.querySelector(selector)?.focus();
+  }
+
+  function facts(items) {
+    const list = document.createElement("dl");
+    list.className = "facts";
+    for (const [label, value] of items) {
+      const row = document.createElement("div");
+      const term = document.createElement("dt");
+      const definition = document.createElement("dd");
+      term.textContent = label;
+      if (value && typeof value === "object" && value.copyValue) {
+        const button = document.createElement("button");
+        button.className = "copy-fact";
+        button.type = "button";
+        button.textContent = value.text;
+        button.title = value.title;
+        button.setAttribute("aria-label", value.ariaLabel);
+        button.addEventListener(
+          "click",
+          () => void copyText(value.copyValue, value.copiedLabel),
+        );
+        definition.append(button);
+      } else {
+        definition.textContent = value;
+      }
+      row.append(term, definition);
+      list.append(row);
+    }
+    return list;
+  }
+
+  function section(title, child) {
+    const wrapper = document.createElement("section");
+    wrapper.className = "inspector-section";
+    const heading = document.createElement("h2");
+    heading.textContent = title;
+    wrapper.append(heading, child);
+    return wrapper;
+  }
+
+  function appendSection(fragment, title, child) {
+    if (child === null) return;
+    fragment.append(section(title, child));
+  }
+
+  function list(items, project, className = "") {
+    if (!items.length) return null;
+    const result = document.createElement("ul");
+    result.className = "quiet-list";
+    for (const item of items) {
+      const projected = project(item);
+      const row = document.createElement("li");
+      if (className) row.classList.add(className);
+      if (projected.title) {
+        const title = document.createElement("strong");
+        title.textContent = projected.title;
+        row.append(title);
+      }
+      if (projected.detail) {
+        const detail = document.createElement("span");
+        detail.textContent = projected.detail;
+        row.append(detail);
+      }
+      result.append(row);
+    }
+    return result;
+  }
+
+  function relationList(relations) {
+    if (!relations.length) return null;
+    const wrapper = document.createElement("div");
+    wrapper.className = "quiet-list";
     for (const relation of relations) {
       const row = document.createElement("button");
       row.type = "button";
       row.className = "relation-row";
-      const address = document.createElement("strong");
-      const incoming = relation.dependentTicketId === ticketId;
-      const otherTicket = incoming
-        ? relation.prerequisiteTicketId
-        : relation.dependentTicketId;
-      address.textContent =
-        `${incoming ? "requires" : "unlocks"} ${shortTicketId(otherTicket)}`;
-      address.title =
-        `${relation.prerequisiteTicketId} → ${relation.dependentTicketId}`;
-      const rationale = document.createElement("span");
-      rationale.textContent = relation.rationale || "Direct execution dependency";
-      row.append(address, rationale);
-      row.addEventListener("click", () => selectRelation(relation.relationRef));
-      elements.relationList.append(row);
+      const title = document.createElement("strong");
+      title.textContent =
+        `${relation.type} → ${shortTicketId(relation.targetTicketId)}`;
+      const detail = document.createElement("span");
+      detail.textContent = relation.rationale || relation.targetTicketId;
+      row.append(title, detail);
+      const projected = state.graph.relations.find(
+        (candidate) => candidate.relationRef === relation.relationRef,
+      );
+      if (projected) {
+        row.addEventListener(
+          "click",
+          () => void selectRelation(projected.relationRef),
+        );
+      } else {
+        row.disabled = true;
+      }
+      wrapper.append(row);
     }
+    return wrapper;
   }
 
   function layoutGraph(tickets, relations) {
@@ -531,12 +735,23 @@
     const indegree = new Map(ids.map((id) => [id, 0]));
     for (const relation of relations) {
       if (!outgoing.has(relation.prerequisiteTicketId)
-        || !incoming.has(relation.dependentTicketId)) continue;
-      outgoing.get(relation.prerequisiteTicketId).push(relation.dependentTicketId);
-      incoming.get(relation.dependentTicketId).push(relation.prerequisiteTicketId);
-      indegree.set(relation.dependentTicketId, indegree.get(relation.dependentTicketId) + 1);
+        || !incoming.has(relation.dependentTicketId)) {
+        continue;
+      }
+      outgoing
+        .get(relation.prerequisiteTicketId)
+        .push(relation.dependentTicketId);
+      incoming
+        .get(relation.dependentTicketId)
+        .push(relation.prerequisiteTicketId);
+      indegree.set(
+        relation.dependentTicketId,
+        indegree.get(relation.dependentTicketId) + 1,
+      );
     }
-    for (const values of [...outgoing.values(), ...incoming.values()]) values.sort();
+    for (const values of [...outgoing.values(), ...incoming.values()]) {
+      values.sort();
+    }
     const rank = new Map(ids.map((id) => [id, 0]));
     const queue = ids.filter((id) => indegree.get(id) === 0);
     const visited = [];
@@ -545,13 +760,16 @@
       const id = queue.shift();
       visited.push(id);
       for (const dependent of outgoing.get(id)) {
-        rank.set(dependent, Math.max(rank.get(dependent), rank.get(id) + 1));
+        rank.set(
+          dependent,
+          Math.max(rank.get(dependent), rank.get(id) + 1),
+        );
         indegree.set(dependent, indegree.get(dependent) - 1);
         if (indegree.get(dependent) === 0) queue.push(dependent);
       }
     }
     if (visited.length !== ids.length) {
-      throw new Error("The candidate graph contains a cycle and cannot be laid out.");
+      throw new Error("The Ticket graph contains a cycle and cannot be laid out.");
     }
     const layers = new Map();
     for (const id of ids) {
@@ -559,21 +777,28 @@
       if (!layers.has(layer)) layers.set(layer, []);
       layers.get(layer).push(id);
     }
-    const orderedLayers = [...layers.entries()].sort((a, b) => a[0] - b[0]);
+    const orderedLayers = [...layers.entries()]
+      .sort((left, right) => left[0] - right[0]);
     const indexMap = () => new Map(
-      orderedLayers.flatMap(([, layer]) => layer.map((id, index) => [id, index])),
+      orderedLayers.flatMap(
+        ([, layer]) => layer.map((id, index) => [id, index]),
+      ),
     );
     for (let sweep = 0; sweep < LAYOUT.sweeps; sweep += 1) {
       const forward = sweep % 2 === 0;
-      const sequence = forward ? orderedLayers : [...orderedLayers].reverse();
+      const sequence = forward
+        ? orderedLayers
+        : [...orderedLayers].reverse();
       const indices = indexMap();
       for (const [, layer] of sequence) {
         layer.sort((left, right) => {
-          const leftNeighbors = forward ? incoming.get(left) : outgoing.get(left);
-          const rightNeighbors = forward ? incoming.get(right) : outgoing.get(right);
-          const leftScore = barycenter(leftNeighbors, indices);
-          const rightScore = barycenter(rightNeighbors, indices);
-          return leftScore - rightScore || left.localeCompare(right);
+          const leftNeighbors =
+            forward ? incoming.get(left) : outgoing.get(left);
+          const rightNeighbors =
+            forward ? incoming.get(right) : outgoing.get(right);
+          return barycenter(leftNeighbors, indices)
+            - barycenter(rightNeighbors, indices)
+            || left.localeCompare(right);
         });
       }
     }
@@ -581,7 +806,8 @@
     for (const [layerIndex, layer] of orderedLayers) {
       layer.forEach((id, row) => {
         result.set(id, {
-          x: LAYOUT.marginX + layerIndex * (NODE.width + LAYOUT.columnGap),
+          x: LAYOUT.marginX
+            + layerIndex * (NODE.width + LAYOUT.columnGap),
           y: LAYOUT.marginY + row * (NODE.height + LAYOUT.rowGap),
         });
       });
@@ -591,7 +817,10 @@
 
   function barycenter(neighbors, indices) {
     if (!neighbors.length) return Number.MAX_SAFE_INTEGER;
-    return neighbors.reduce((sum, id) => sum + (indices.get(id) ?? 0), 0) / neighbors.length;
+    return neighbors.reduce(
+      (sum, id) => sum + (indices.get(id) ?? 0),
+      0,
+    ) / neighbors.length;
   }
 
   function edgeGeometry(from, to, relationRef) {
@@ -600,7 +829,8 @@
     const x2 = to.x - 2;
     const y2 = to.y + NODE.height / 2;
     const arrow =
-      `M ${x2 - 7} ${y2 - 3.5} L ${x2} ${y2} L ${x2 - 7} ${y2 + 3.5} Z`;
+      `M ${x2 - 7} ${y2 - 3.5} L ${x2} ${y2} `
+      + `L ${x2 - 7} ${y2 + 3.5} Z`;
     if (Math.abs(y2 - y1) < 1) {
       return { path: `M ${x1} ${y1} H ${x2}`, arrow };
     }
@@ -631,56 +861,60 @@
     const values = [...positions.values()];
     const minX = Math.min(...values.map((value) => value.x));
     const minY = Math.min(...values.map((value) => value.y));
-    const maxX = Math.max(...values.map((value) => value.x + NODE.width));
-    const maxY = Math.max(...values.map((value) => value.y + NODE.height));
-    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+    const maxX = Math.max(
+      ...values.map((value) => value.x + NODE.width),
+    );
+    const maxY = Math.max(
+      ...values.map((value) => value.y + NODE.height),
+    );
+    return {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
   }
 
   function fitGraph() {
     const bounds = graphBounds();
     if (!bounds) return;
-    const rect = elements.canvas.getBoundingClientRect();
+    const { width, height } = visibleCanvasViewport();
     const padding = 74;
     scale = clamp(
       Math.min(
-        (rect.width - padding * 2) / bounds.width,
-        (rect.height - padding * 2) / bounds.height,
+        (width - padding * 2) / bounds.width,
+        (height - padding * 2) / bounds.height,
       ),
       MIN_SCALE,
       1.2,
     );
-    panX = (rect.width - bounds.width * scale) / 2 - bounds.x * scale;
-    panY = (rect.height - bounds.height * scale) / 2 - bounds.y * scale;
+    panX = (width - bounds.width * scale) / 2 - bounds.x * scale;
+    panY = (height - bounds.height * scale) / 2 - bounds.y * scale;
     applyTransform();
   }
 
   function frameGraph() {
     const bounds = graphBounds();
     if (!bounds) return;
-    const rect = elements.canvas.getBoundingClientRect();
-    const mobileInspector =
-      window.innerWidth <= 760 && elements.inspector.classList.contains("open");
-    const visibleHeight = mobileInspector
-      ? Math.max(180, rect.height * 0.38)
-      : rect.height;
+    const { width, height } = visibleCanvasViewport();
     const padding = 58;
     const fitScale = Math.min(
-      (rect.width - padding * 2) / bounds.width,
-      (visibleHeight - padding * 2) / bounds.height,
+      (width - padding * 2) / bounds.width,
+      (height - padding * 2) / bounds.height,
     );
     scale = clamp(Math.max(fitScale, 0.64), MIN_SCALE, 1);
-    panX = bounds.width * scale <= rect.width - padding * 2
-      ? (rect.width - bounds.width * scale) / 2 - bounds.x * scale
+    panX = bounds.width * scale <= width - padding * 2
+      ? (width - bounds.width * scale) / 2 - bounds.x * scale
       : padding - bounds.x * scale;
     panY =
-      (visibleHeight - bounds.height * scale) / 2 - bounds.y * scale;
+      (height - bounds.height * scale) / 2 - bounds.y * scale;
     applyTransform();
   }
 
   function zoomAt(nextScale, x, y) {
-    const rect = elements.canvas.getBoundingClientRect();
-    const screenX = x ?? rect.width / 2;
-    const screenY = y ?? rect.height / 2;
+    const { width, height } = visibleCanvasViewport();
+    const screenX = x ?? width / 2;
+    const screenY = y ?? height / 2;
     const worldX = (screenX - panX) / scale;
     const worldY = (screenY - panY) / scale;
     scale = clamp(nextScale, MIN_SCALE, MAX_SCALE);
@@ -690,24 +924,57 @@
   }
 
   function applyTransform() {
-    elements.world.setAttribute("transform", `translate(${panX} ${panY}) scale(${scale})`);
+    elements.world.setAttribute(
+      "transform",
+      `translate(${panX} ${panY}) scale(${scale})`,
+    );
     elements.graph.classList.toggle("lod-low", scale < 0.48);
     updateMinimapViewport();
+  }
+
+  function visibleCanvasViewport() {
+    const canvasRect = elements.canvas.getBoundingClientRect();
+    const mobileInspector =
+      window.innerWidth <= 760
+      && elements.inspector.classList.contains("open");
+    const inspectorHeight = mobileInspector
+      ? elements.inspector.getBoundingClientRect().height
+      : 0;
+    return {
+      width: canvasRect.width,
+      height: Math.max(120, canvasRect.height - inspectorHeight),
+    };
   }
 
   function updateMinimapViewport() {
     const viewport = elements.minimap.querySelector(".minimap-viewport");
     if (!viewport || scale <= 0) return;
-    const rect = elements.canvas.getBoundingClientRect();
+    const { width, height } = visibleCanvasViewport();
     viewport.setAttribute("x", String(-panX / scale));
     viewport.setAttribute("y", String(-panY / scale));
-    viewport.setAttribute("width", String(rect.width / scale));
-    viewport.setAttribute("height", String(rect.height / scale));
+    viewport.setAttribute("width", String(width / scale));
+    viewport.setAttribute("height", String(height / scale));
+  }
+
+  function minimapWorldPoint(clientX, clientY) {
+    const matrix = elements.minimap.getScreenCTM();
+    const viewBox = elements.minimap.viewBox.baseVal;
+    if (!matrix || viewBox.width <= 0 || viewBox.height <= 0) return null;
+    const point = elements.minimap.createSVGPoint();
+    point.x = clientX;
+    point.y = clientY;
+    const world = point.matrixTransform(matrix.inverse());
+    return {
+      x: clamp(world.x, viewBox.x, viewBox.x + viewBox.width),
+      y: clamp(world.y, viewBox.y, viewBox.y + viewBox.height),
+    };
   }
 
   function causalCone(subject) {
     const selectedRelation = subject.kind === "relation"
-      ? state.graph.relations.find((item) => item.relationRef === subject.id)
+      ? state.graph.relations.find(
+        (item) => item.relationRef === subject.id,
+      )
       : null;
     const upstreamSeed = subject.kind === "ticket"
       ? subject.id
@@ -718,7 +985,10 @@
     const upstream = directionalCone(upstreamSeed, "upstream");
     const downstream = directionalCone(downstreamSeed, "downstream");
     const nodes = new Set([...upstream.nodes, ...downstream.nodes]);
-    const relations = new Set([...upstream.relations, ...downstream.relations]);
+    const relations = new Set([
+      ...upstream.relations,
+      ...downstream.relations,
+    ]);
     if (selectedRelation) relations.add(selectedRelation.relationRef);
     return { nodes, relations };
   }
@@ -750,7 +1020,7 @@
   function onNodeKey(event, ticketId) {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      selectTicket(ticketId, true);
+      void selectTicket(ticketId, true);
       return;
     }
     if (event.key === "Escape") {
@@ -768,127 +1038,75 @@
       ? relation?.prerequisiteTicketId
       : relation?.dependentTicketId;
     if (!target) return;
-    elements.nodeLayer.querySelector(`[data-ticket-id="${CSS.escape(target)}"]`)?.focus();
-  }
-
-  async function decide(action) {
-    const rationale = elements.rationale.value.trim();
-    if (rationale.length < 12) {
-      showToast("Write a decision rationale first");
-      return;
-    }
-    setBusy(true);
-    try {
-      state = await api("/api/decision", {
-        method: "POST",
-        body: JSON.stringify({
-          action,
-          rationale,
-          expectedProposalDigest: state.proposal.proposalDigest,
-          expectedCandidateDigest: state.proposal.candidateDigest,
-          expectedValidationSetDigest: state.review.validationSet.digest,
-        }),
-      });
-      selected = null;
-      render();
-      showToast(action === "authorize" ? "Graph authorized and published" : "Plan rejected with rationale");
-    } catch (error) {
-      showToast(error.message);
-      await refresh();
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function applyAuthorized() {
-    const decision = state.review.decision;
-    if (!decision || decision.disposition !== "authorized") return;
-    setBusy(true);
-    try {
-      state = await api("/api/apply", {
-        method: "POST",
-        body: JSON.stringify({
-          expectedProposalDigest: state.proposal.proposalDigest,
-          expectedCandidateDigest: state.proposal.candidateDigest,
-          authorityDecisionId: decision.authorityDecisionId,
-          expectedAuthorityDecisionDigest: decision.authorityDecisionDigest,
-        }),
-      });
-      selected = null;
-      render();
-      showToast("Authorized graph published");
-    } catch (error) {
-      showToast(error.message);
-      await refresh();
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  function closeInspector() {
-    const restore = selected ?? lastFocusedSubject;
-    selected = null;
-    elements.inspector.classList.remove("open");
-    elements.workspace.classList.add("inspector-closed");
-    elements.decisionSection.hidden = false;
-    renderGraph();
-    requestAnimationFrame(() => focusGraphSubject(restore));
-  }
-
-  function focusGraphSubject(subject) {
-    if (!subject) return;
-    const selector = subject.kind === "ticket"
-      ? `[data-ticket-id="${CSS.escape(subject.id)}"]`
-      : `[data-relation-ref="${CSS.escape(subject.id)}"]`;
-    elements.graph.querySelector(selector)?.focus();
+    elements.nodeLayer
+      .querySelector(`[data-ticket-id="${CSS.escape(target)}"]`)
+      ?.focus();
   }
 
   function setBusy(busy) {
     elements.loadingState.hidden = !busy;
-    const status = state?.review?.eligibility?.status;
-    const rationaleMissing = elements.rationale.value.trim().length < 12;
-    elements.authorizeButton.disabled = busy
-      || (status === "authority_required" && rationaleMissing)
-      || (status !== "authority_required" && status !== "application_ready");
-    elements.rejectButton.disabled = busy
-      || status !== "authority_required"
-      || rationaleMissing;
+    elements.sourceStatus.disabled = busy;
   }
 
   function renderError(error) {
     elements.loadingState.hidden = true;
     elements.stateDot.className = "state-dot error";
     elements.stateLabel.textContent = "Unavailable";
+    elements.signalAttention.textContent = "Error";
+    elements.signalAttention.className = "signal-attention error";
     elements.signalDetail.textContent = error.message;
-    elements.inspectorTitle.textContent = "Review host unavailable";
+    elements.inspectorTitle.textContent = "Ticket graph unavailable";
     elements.inspectorOutcome.textContent = error.message;
-    elements.decisionSection.hidden = true;
+    elements.inspectorContent.replaceChildren();
   }
 
   function showToast(message) {
     elements.toast.textContent = message;
     elements.toast.classList.add("visible");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => elements.toast.classList.remove("visible"), 2400);
+    toastTimer = setTimeout(
+      () => elements.toast.classList.remove("visible"),
+      2400,
+    );
   }
 
-  function humanStatus(status) {
-    return ({
-      validation_required: "Validation required",
-      authority_required: "Needs your decision",
-      application_ready: "Ready to publish",
-      applied: "Published",
-      rejected: "Changes requested",
-      stale: "Stale proposal",
-      comment_only: "Comment",
-    })[status] || status;
+  function sourceLabel(source) {
+    if (!source) return "unknown";
+    const commit = source.resolvedCommit
+      ? source.resolvedCommit.slice(0, 8)
+      : "unborn";
+    return `${worktreeBasename(source.worktreeRoot)} · ${commit}`
+      + `${source.semanticDirty ? " · local changes" : ""}`;
   }
 
-  function statusTone(status) {
-    if (status === "applied") return "healthy";
-    if (status === "rejected") return "error";
-    if (status === "stale") return "stale";
-    return "";
+  function dirtyPathCount(source) {
+    return `${source.dirtyPaths.length}${source.dirtyPathsTruncated ? "+" : ""}`;
+  }
+
+  function worktreeBasename(worktreeRoot) {
+    const normalized = String(worktreeRoot || "worktree")
+      .replace(/[\\/]+$/u, "");
+    return normalized.split(/[\\/]/u).at(-1) || "worktree";
+  }
+
+  function copyableWorktree(source) {
+    const worktree = worktreeBasename(source.worktreeRoot);
+    return {
+      text: worktree,
+      title: `${source.worktreeRoot}\nWorktree ${source.worktreeIdentity}\nClick to copy full path`,
+      ariaLabel: `Worktree ${worktree}. Copy full path.`,
+      copyValue: source.worktreeRoot,
+      copiedLabel: "Worktree path copied",
+    };
+  }
+
+  async function copyText(value, copiedLabel) {
+    try {
+      await navigator.clipboard.writeText(value);
+      showToast(copiedLabel);
+    } catch {
+      showToast("Copy unavailable · full path is in the hover detail");
+    }
   }
 
   function wrap(text, width, maximumLines) {
@@ -930,12 +1148,12 @@
     }
     if (segments.some((segment) => segment.trim())) {
       let finalLine = lines.at(-1) ?? "";
-      while (finalLine
-        && displayUnits(`${finalLine}…`) > width) {
+      while (finalLine && displayUnits(`${finalLine}…`) > width) {
         finalLine = Array.from(finalLine).slice(0, -1).join("");
       }
       if (lines.length === 0) lines.push("…");
-      else lines[lines.length - 1] = `${finalLine.replace(/[.…]*$/, "")}…`;
+      else lines[lines.length - 1] =
+        `${finalLine.replace(/[.…]*$/, "")}…`;
     }
     return lines;
   }
@@ -943,7 +1161,9 @@
   function displayUnits(value) {
     return Array.from(value).reduce(
       (total, character) =>
-        total + (/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Emoji_Presentation}]/u.test(character) ? 2 : 1),
+        total
+        + (/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Emoji_Presentation}]/u
+          .test(character) ? 2 : 1),
       0,
     );
   }
@@ -953,15 +1173,16 @@
   }
 
   function shortDigest(value) {
-    return `${value.slice(0, 8)}…${value.slice(-5)}`;
-  }
-
-  function shortRef(value) {
-    return value.length > 28 ? `${value.slice(0, 16)}…${value.slice(-8)}` : value;
+    const digest = value.startsWith("sha256:") ? value.slice(7) : value;
+    return digest.length > 13
+      ? `${digest.slice(0, 8)}…${digest.slice(-4)}`
+      : digest;
   }
 
   function shortTicketId(value) {
-    return `T·${value.slice(-7)}`;
+    return value.length > 28
+      ? `${value.slice(0, 16)}…${value.slice(-8)}`
+      : value;
   }
 
   function clamp(value, minimum, maximum) {
@@ -975,42 +1196,43 @@
     elements.sheet.inert = !open;
     if (!open && elements.sheet.contains(document.activeElement)) {
       elements.signal.focus();
-    } else if (open && !elements.inspector.classList.contains("open")) {
-      renderPlanInspector();
+    } else if (open) {
       requestAnimationFrame(frameGraph);
     }
   });
-  elements.reviewStatus.addEventListener("click", () => {
+  elements.sourceStatus.addEventListener(
+    "click",
+    () => void refresh("Graph refreshed from Git"),
+  );
+  elements.sourceRef.addEventListener("click", () => {
     if (!state) return;
-    renderPlanInspector();
-    renderGraph();
-    requestAnimationFrame(frameGraph);
+    void copyText(
+      state.graph.source.worktreeRoot,
+      "Worktree path copied",
+    );
   });
   document.querySelector("#fitGraph").addEventListener("click", fitGraph);
-  document.querySelector("#zoomIn").addEventListener("click", () => zoomAt(scale * 1.18));
-  document.querySelector("#zoomOut").addEventListener("click", () => zoomAt(scale / 1.18));
+  document
+    .querySelector("#zoomIn")
+    .addEventListener("click", () => zoomAt(scale * 1.18));
+  document
+    .querySelector("#zoomOut")
+    .addEventListener("click", () => zoomAt(scale / 1.18));
   elements.closeInspector.addEventListener("click", closeInspector);
-  elements.rationale.addEventListener("input", renderDecision);
-  elements.rejectButton.addEventListener("click", () => decide("reject"));
-  elements.authorizeButton.addEventListener("click", () => {
-    if (state.review.eligibility.status === "application_ready") {
-      void applyAuthorized();
-    } else {
-      void decide("authorize");
-    }
-  });
   elements.canvas.addEventListener("click", () => {
     if (suppressCanvasClick) {
       suppressCanvasClick = false;
       return;
     }
     if (selected) {
-      renderPlanInspector();
+      renderGraphInspector();
       renderGraph();
     }
   });
   elements.canvas.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || event.target.closest(".ticket-node, .edge")) return;
+    if (event.button !== 0 || event.target.closest(".ticket-node, .edge")) {
+      return;
+    }
     dragging = {
       x: event.clientX,
       y: event.clientY,
@@ -1052,19 +1274,17 @@
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && selected) closeInspector();
   });
-  window.addEventListener("resize", () => requestAnimationFrame(frameGraph));
+  window.addEventListener(
+    "resize",
+    () => requestAnimationFrame(frameGraph),
+  );
   elements.minimap.addEventListener("click", (event) => {
     event.stopPropagation();
-    const bounds = graphBounds();
-    if (!bounds) return;
-    const rect = elements.minimap.getBoundingClientRect();
+    const point = minimapWorldPoint(event.clientX, event.clientY);
+    if (!point) return;
     const canvasRect = elements.canvas.getBoundingClientRect();
-    const worldX =
-      bounds.x - 20 + ((event.clientX - rect.left) / rect.width) * (bounds.width + 40);
-    const worldY =
-      bounds.y - 20 + ((event.clientY - rect.top) / rect.height) * (bounds.height + 40);
-    panX = canvasRect.width / 2 - worldX * scale;
-    panY = canvasRect.height / 2 - worldY * scale;
+    panX = canvasRect.width / 2 - point.x * scale;
+    panY = canvasRect.height / 2 - point.y * scale;
     applyTransform();
   });
   elements.minimap.addEventListener("keydown", (event) => {

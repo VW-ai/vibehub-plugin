@@ -114,7 +114,23 @@ they are not migration inputs or current runtime facts.
 
 ## Current implementation status
 
-The new decisions are canonical; the production code has not yet completed the
-cutover. Until the pivot milestones pass, existing Ticket proposal/application
-code should be treated as a superseded implementation path, not as the target
-architecture.
+M1A—the Git read authority cut—is implemented:
+
+- `.vibehub/tickets/protocol.yaml` plus flat Ticket YAML documents are the only
+  production Ticket graph source;
+- Core, CLI, MCP, and the HTML host expose the same three pure reads;
+- the graph HTML is intentionally read-only while retaining full topology,
+  pan/zoom/fit, minimap, causal focus, and executable-context inspection;
+- Ticket reads require no SQLite repository/task identity and create no
+  operation receipts;
+- the early-stage generation store, proposal/application services, semantic
+  SQLite tables, write operations, and three obsolete Ticket Skills are
+  retired.
+
+The next implementation boundary is M1B: one validated, exact-source-bound
+worktree patch capability for Skills. Planning, semantic validation, decisions,
+and closeout documents should be designed through that dogfood loop rather
+than restored as a fixed workflow.
+
+Implementation evidence and the deletion ledger are recorded in
+[`2026-07-29-ticket-m1a-git-read-cut-implementation.md`](artifacts/2026-07-29-ticket-m1a-git-read-cut-implementation.md).

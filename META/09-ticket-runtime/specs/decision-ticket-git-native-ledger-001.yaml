@@ -89,5 +89,8 @@ relations:
 anchors:
   - file: ".vibehub/semantic-store/protocol.yaml"
   - file: "packages/core/src/git-semantic-store.ts"
-  - file: "packages/core/src/git-ticket-store.ts"
+  - file: "packages/core/src/ticket-ledger/contract.ts"
+  - file: "packages/core/src/ticket-ledger/codec.ts"
+  - file: "packages/core/src/ticket-ledger/reader.ts"
+  - file: "packages/core/src/ticket-ledger/projection.ts"
   - file: "packages/core/src/db.ts"

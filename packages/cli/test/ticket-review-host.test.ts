@@ -1,612 +1,367 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
+import http from "node:http";
 import os from "node:os";
 import path from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-  OperationDispatcher,
-  openDb,
-  upsertRepo,
-  type TicketGraphChangeProposalV0,
-  type TicketProposalAuthorityDecisionReceiptV0,
-  type TicketProposalReviewPacketV0,
-} from "@vw-ai/vibehub-core";
-import { afterEach, describe, expect, it } from "vitest";
-import {
-  assertLocalDecisionReceipt,
   parseTicketReviewHostFlags,
   startTicketReviewHost,
-  ticketReviewGraphDisplayMode,
-  trustedLocalDecisionProvider,
   type TicketReviewHostHandle,
 } from "../src/ticket-review-host.js";
 
-const NOW = "2026-07-29T20:00:00.000Z";
+const NOW = "2026-07-29T12:00:00.000Z";
 
-describe("local Ticket review host", () => {
-  const roots: string[] = [];
+describe("read-only Git Ticket review host", () => {
+  let root: string;
+  let repo: string;
+  let dbPath: string;
   const hosts: TicketReviewHostHandle[] = [];
+
+  beforeEach(() => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), "vh-ticket-host-"));
+    repo = path.join(root, "repo");
+    dbPath = path.join(root, "runtime.db");
+    fs.mkdirSync(repo);
+    execFileSync("git", ["init", "-q"], { cwd: repo });
+    execFileSync("git", ["config", "user.name", "Test"], { cwd: repo });
+    execFileSync("git", ["config", "user.email", "test@example.com"], {
+      cwd: repo,
+    });
+    writeTicketLedger(repo);
+    execFileSync("git", ["add", ".vibehub/tickets"], { cwd: repo });
+    execFileSync("git", ["commit", "-qm", "ticket ledger"], { cwd: repo });
+  });
 
   afterEach(async () => {
     await Promise.all(hosts.splice(0).map((host) => host.close()));
-    for (const root of roots.splice(0)) {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
+    fs.rmSync(root, { recursive: true, force: true });
   });
 
-  it("parses the explicit one-proposal launch boundary", () => {
+  it("opens the current worktree without a proposal selector", () => {
     expect(parseTicketReviewHostFlags([
-      "--proposal",
-      "tgp-test",
       "--repo",
-      "/tmp/repo",
+      repo,
       "--db",
-      "/tmp/review.sqlite",
+      dbPath,
       "--port",
-      "4312",
-      "--open",
+      "4321",
+      "--no-open",
       "--json",
-    ])).toMatchObject({
-      proposalId: "tgp-test",
-      repo: "/tmp/repo",
-      db: "/tmp/review.sqlite",
-      port: 4312,
-      open: true,
+    ])).toEqual({
+      repo,
+      db: dbPath,
+      port: 4321,
+      open: false,
       json: true,
     });
-    expect(() => parseTicketReviewHostFlags([])).toThrow(
-      "--proposal is required",
-    );
     expect(() => parseTicketReviewHostFlags([
       "--proposal",
-      "tgp-test",
-      "--principal",
-      "human:forged",
-    ])).toThrow("unknown flag: --principal");
-    expect(parseTicketReviewHostFlags([
-      "--proposal",
-      "tgp-default-open",
-    ]).open).toBe(true);
-    expect(parseTicketReviewHostFlags([
-      "--proposal",
-      "tgp-manual",
-      "--no-open",
-    ]).open).toBe(false);
-
-    expect(ticketReviewGraphDisplayMode({
-      eligibilityStatus: "authority_required",
-      hasApplication: false,
-      hasCurrentGraph: true,
-      candidateBaseMatches: true,
-    })).toBe("candidate");
-    expect(ticketReviewGraphDisplayMode({
-      eligibilityStatus: "authority_required",
-      hasApplication: false,
-      hasCurrentGraph: true,
-      candidateBaseMatches: false,
-    })).toBe("unavailable");
-    expect(ticketReviewGraphDisplayMode({
-      eligibilityStatus: "stale",
-      hasApplication: false,
-      hasCurrentGraph: true,
-      candidateBaseMatches: false,
-    })).toBe("canonical");
-    expect(ticketReviewGraphDisplayMode({
-      eligibilityStatus: "stale",
-      hasApplication: false,
-      hasCurrentGraph: false,
-      candidateBaseMatches: false,
-    })).toBe("unavailable");
-    expect(ticketReviewGraphDisplayMode({
-      eligibilityStatus: "applied",
-      hasApplication: true,
-      hasCurrentGraph: true,
-      candidateBaseMatches: false,
-    })).toBe("canonical");
+      "retired",
+    ])).toThrow("unknown flag: --proposal");
+    expect(() => parseTicketReviewHostFlags([
+      "--port",
+      "65536",
+    ])).toThrow("--port must be an integer between 0 and 65535");
   });
 
-  it("verifies the exact Core authority receipt without a listener", () => {
-    const fixture = seedValidatedBootstrap();
-    const db = openDb(fixture.dbPath);
-    const row = db.prepare(
-      `SELECT id FROM repos WHERE root_path = ?`,
-    ).get(fixture.repo) as { id: number };
-    const dispatcher = new OperationDispatcher(db, {
-      repoRoot: fixture.repo,
-    });
-    const reviewed = dispatcher.dispatch(
-      "ticket.proposal.review.inspect",
-      context(row.id, "review-host:pure-review"),
-      { proposalId: fixture.proposal.proposalId },
-    );
-    expect(reviewed.ok).toBe(true);
-    if (!reviewed.ok) throw new Error(reviewed.error.message);
-    const packet = reviewed.data as TicketProposalReviewPacketV0;
-    const sessionId = "pure-receipt-boundary";
-    const token = "e".repeat(43);
-    const rationale =
-      "I reviewed this exact bootstrap candidate and its validation set.";
-    const provider = trustedLocalDecisionProvider({
-      sessionId,
-      token,
-      action: "authorize",
-      rationale,
-      expectedProposalId: fixture.proposal.proposalId,
-      expectedProposalDigest: fixture.proposal.proposalDigest,
-      expectedCandidateDigest:
-        fixture.proposal.mechanicalReview.candidateDigest,
-      expectedValidationSetDigest: packet.validationSet.digest,
-    });
-    const decided = new OperationDispatcher(db, {
-      repoRoot: fixture.repo,
-      ticketAuthorityProvider: provider,
-    }).dispatch(
-      "ticket.proposal.authority.decide",
-      context(row.id, "review-host:pure-decision"),
-      {
-        schemaVersion: 1,
-        proposalId: fixture.proposal.proposalId,
-        expectedProposalDigest: fixture.proposal.proposalDigest,
-        expectedCandidateDigest:
-          fixture.proposal.mechanicalReview.candidateDigest,
-        expectedValidationSetDigest: packet.validationSet.digest,
-      },
-    );
-    expect(decided.ok).toBe(true);
-    if (!decided.ok) throw new Error(decided.error.message);
-    const decision =
-      decided.data as TicketProposalAuthorityDecisionReceiptV0;
-    expect(() => assertLocalDecisionReceipt(decision, {
-      sessionId,
-      token,
-      action: "authorize",
-      rationale,
-      packet,
-    })).not.toThrow();
-
-    const foreign = structuredClone(decision);
-    foreign.target.candidateDigest = "f".repeat(64);
-    expect(() => assertLocalDecisionReceipt(foreign, {
-      sessionId,
-      token,
-      action: "authorize",
-      rationale,
-      packet,
-    })).toThrow("Another terminal authority decision");
-    db.close();
-  });
-
-  it("rejects unauthenticated, cross-origin, and authority-shaped browser input", async () => {
-    const fixture = seedValidatedBootstrap();
+  it("serves one current Git graph and complete executable context", async () => {
     const host = startTicketReviewHost({
-      repoRoot: fixture.repo,
-      dbPath: fixture.dbPath,
-      proposalId: fixture.proposal.proposalId,
-      token: "a".repeat(43),
+      repoRoot: repo,
+      dbPath,
+      now: () => NOW,
+      token: "t".repeat(32),
     });
     hosts.push(host);
-    const ready = await host.ready;
-
-    expect((await fetch(`${ready.origin}/api/state`)).status).toBe(401);
-
-    const stateResponse = await fetch(`${ready.origin}/api/state`, {
-      headers: bearer(host.token),
-    });
-    expect(stateResponse.status).toBe(200);
-    const stateEnvelope = await stateResponse.json() as {
-      data: {
-        proposal: {
-          proposalDigest: string;
-          candidateDigest: string;
-        };
-        review: {
-          validationSet: { digest: string };
-        };
-      };
-    };
-    const decision = {
-      action: "authorize",
-      rationale: "I reviewed the complete initial graph.",
-      expectedProposalDigest: stateEnvelope.data.proposal.proposalDigest,
-      expectedCandidateDigest: stateEnvelope.data.proposal.candidateDigest,
-      expectedValidationSetDigest:
-        stateEnvelope.data.review.validationSet.digest,
-    };
-
-    expect((await fetch(`${ready.origin}/api/state`, {
-      headers: {
-        ...bearer(host.token),
-        Host: `localhost:${ready.port}`,
-      },
-    })).status).toBe(403);
-
-    expect((await fetch(`${ready.origin}/api/decision`, {
-      method: "POST",
-      headers: {
-        ...bearer(host.token),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(decision),
-    })).status).toBe(403);
-
-    expect((await fetch(`${ready.origin}/api/decision`, {
-      method: "POST",
-      headers: {
-        ...bearer(host.token),
-        "Content-Type": "application/json",
-        Origin: "https://attacker.example",
-      },
-      body: JSON.stringify(decision),
-    })).status).toBe(403);
-
-    expect((await fetch(`${ready.origin}/api/decision`, {
-      method: "POST",
-      headers: {
-        ...bearer(host.token),
-        "Content-Type": "application/json",
-        Origin: ready.origin,
-      },
-      body: JSON.stringify({
-        ...decision,
-        principal: {
-          kind: "human",
-          ref: "human:forged",
-        },
-      }),
-    })).status).toBe(400);
-
-    const db = openDb(fixture.dbPath);
-    expect(db.prepare(
-      `SELECT COUNT(*) count FROM ticket_proposal_authority_decisions`,
-    ).get()).toEqual({ count: 0 });
-    db.close();
-    expect(fs.existsSync(
-      path.join(fixture.repo, ".vibehub", "ticket-store"),
-    )).toBe(false);
-  });
-
-  it("turns one explicit local human decision into an exact authority receipt and canonical graph", async () => {
-    const fixture = seedValidatedBootstrap();
-    const host = startTicketReviewHost({
-      repoRoot: fixture.repo,
-      dbPath: fixture.dbPath,
-      proposalId: fixture.proposal.proposalId,
-      token: "b".repeat(43),
-    });
-    hosts.push(host);
-    const ready = await host.ready;
-    const before = await getState(ready.origin, host.token);
-
-    expect(before.graph).toMatchObject({
-      source: "proposal_candidate",
-      tickets: [
-        expect.objectContaining({ state: "created" }),
-        expect.objectContaining({ state: "created" }),
-      ],
-      relations: [
-        expect.objectContaining({ state: "created" }),
-      ],
-    });
-    expect(before.review).toMatchObject({
-      eligibility: { status: "authority_required" },
-      nextAction: "request_authority_decision",
-      requiredPath: "human_authority",
-      validationSet: { count: 1 },
-    });
-
-    const response = await fetch(`${ready.origin}/api/decision`, {
-      method: "POST",
-      headers: {
-        ...bearer(host.token),
-        "Content-Type": "application/json",
-        Origin: ready.origin,
-      },
-      body: JSON.stringify({
-        action: "authorize",
-        rationale:
-          "I reviewed every Ticket and direct unlock path in this initial plan.",
-        expectedProposalDigest: before.proposal.proposalDigest,
-        expectedCandidateDigest: before.proposal.candidateDigest,
-        expectedValidationSetDigest: before.review.validationSet.digest,
-      }),
-    });
-    expect(response.status).toBe(200);
-    const envelope = await response.json() as {
-      ok: boolean;
-      data: {
-        graph: { source: string; tickets: unknown[]; relations: unknown[] };
-        review: {
-          eligibility: { status: string };
-          decision: {
-            disposition: string;
-            principal: { kind: string; ref: string; trust: string };
-            basis: { kind: string };
-          };
-          application: {
-            publication: { status: string; snapshotId: string };
-          };
-        };
-      };
-    };
-    expect(envelope).toMatchObject({
+    const { origin } = await host.ready;
+    const state = await readJson(`${origin}/api/state`, host.token);
+    expect(state).toMatchObject({
       ok: true,
       data: {
+        schemaVersion: 2,
+        project: {
+          repositoryRoot: fs.realpathSync(repo),
+          worktreeRoot: fs.realpathSync(repo),
+        },
         graph: {
-          source: "canonical",
-          tickets: [{ state: "existing" }, { state: "existing" }],
-          relations: [{ state: "existing" }],
-        },
-        review: {
-          eligibility: { status: "applied" },
-          decision: {
-            disposition: "authorized",
-            principal: {
-              kind: "human",
-              ref: expect.stringMatching(/^local-os-user:/),
-              trust: "host_authenticated",
-            },
-            basis: { kind: "human_authority" },
+          source: {
+            mode: "worktree",
+            worktreeRoot: fs.realpathSync(repo),
+            worktreeIdentity: expect.any(String),
+            semanticDirty: false,
           },
-          application: {
-            publication: {
-              status: "published",
-              snapshotId: expect.stringMatching(/^tgs-/),
-            },
-          },
+          tickets: expect.arrayContaining([
+            expect.objectContaining({
+              ticketId: "implement-api",
+              ticketRevision: expect.any(String),
+              outcome: "Expose the accepted API",
+            }),
+          ]),
+          relations: [
+            expect.objectContaining({
+              prerequisiteTicketId: "design-schema",
+              dependentTicketId: "implement-api",
+            }),
+          ],
         },
       },
     });
-
-    const db = openDb(fixture.dbPath);
-    expect(db.prepare(
-      `SELECT provider_id providerId,principal_kind principalKind,
-              basis_kind basisKind,disposition
-       FROM ticket_proposal_authority_decisions`,
-    ).get()).toEqual({
-      providerId: "vibehub.local-ticket-review-host",
-      principalKind: "human",
-      basisKind: "human_authority",
-      disposition: "authorized",
-    });
-    expect(db.prepare(
-      `SELECT COUNT(*) count FROM ticket_proposal_application_receipts`,
-    ).get()).toEqual({ count: 1 });
-    db.close();
-    expect(fs.existsSync(
-      path.join(fixture.repo, ".vibehub", "ticket-store", "latest.yaml"),
-    )).toBe(true);
-    await host.closed;
-    await expect(fetch(`${ready.origin}/api/state`, {
-      headers: bearer(host.token),
-    })).rejects.toThrow();
-  });
-
-  it("records rejection without publication and revokes the terminal capability", async () => {
-    const fixture = seedValidatedBootstrap();
-    const host = startTicketReviewHost({
-      repoRoot: fixture.repo,
-      dbPath: fixture.dbPath,
-      proposalId: fixture.proposal.proposalId,
-      token: "c".repeat(43),
-    });
-    hosts.push(host);
-    const ready = await host.ready;
-    const before = await getState(ready.origin, host.token);
-
-    const response = await fetch(`${ready.origin}/api/decision`, {
-      method: "POST",
-      headers: {
-        ...bearer(host.token),
-        "Content-Type": "application/json",
-        Origin: ready.origin,
-      },
-      body: JSON.stringify({
-        action: "reject",
-        rationale:
-          "The graph needs a narrower execution boundary before publication.",
-        expectedProposalDigest: before.proposal.proposalDigest,
-        expectedCandidateDigest: before.proposal.candidateDigest,
-        expectedValidationSetDigest: before.review.validationSet.digest,
-      }),
-    });
-    expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({
+    const snapshotId = state.data.graph.snapshotId as string;
+    const subject = await readJson(
+      `${origin}/api/subject?${new URLSearchParams({
+        snapshotId,
+        kind: "ticket",
+        ticketId: "implement-api",
+      })}`,
+      host.token,
+    );
+    expect(subject).toMatchObject({
       ok: true,
       data: {
-        review: {
-          eligibility: { status: "rejected" },
-          decision: { disposition: "rejected" },
-          application: null,
+        schemaVersion: 2,
+        subject: {
+          kind: "ticket",
+          ticket: {
+            ticketId: "implement-api",
+            ticketRevision: expect.any(String),
+          },
+          contextPackage: {
+            context: "Implement the endpoint against the accepted schema.",
+            acceptance: [{
+              acceptanceId: "response",
+              criterion: "The endpoint returns the canonical response.",
+            }],
+            relations: [{
+              type: "depends_on",
+              targetTicketId: "design-schema",
+            }],
+          },
         },
       },
     });
-    await host.closed;
-
-    const db = openDb(fixture.dbPath);
-    expect(db.prepare(
-      `SELECT disposition FROM ticket_proposal_authority_decisions`,
-    ).get()).toEqual({ disposition: "rejected" });
-    expect(db.prepare(
-      `SELECT COUNT(*) count FROM ticket_proposal_application_receipts`,
-    ).get()).toEqual({ count: 0 });
-    db.close();
-    expect(fs.existsSync(
-      path.join(fixture.repo, ".vibehub", "ticket-store"),
-    )).toBe(false);
-    await expect(fetch(`${ready.origin}/api/state`, {
-      headers: bearer(host.token),
-    })).rejects.toThrow();
   });
 
-  it("expires and closes an unused local decision capability", async () => {
-    const fixture = seedValidatedBootstrap();
+  it("reports the branch from each fresh graph source after startup", async () => {
     const host = startTicketReviewHost({
-      repoRoot: fixture.repo,
-      dbPath: fixture.dbPath,
-      proposalId: fixture.proposal.proposalId,
-      token: "d".repeat(43),
-      tokenLifetimeMs: 10,
+      repoRoot: repo,
+      dbPath,
+      token: "b".repeat(32),
     });
     hosts.push(host);
-    const ready = await host.ready;
-    await host.closed;
-    await expect(fetch(`${ready.origin}/api/state`, {
-      headers: bearer(host.token),
-    })).rejects.toThrow();
+    const { origin } = await host.ready;
 
-    const db = openDb(fixture.dbPath);
-    expect(db.prepare(
-      `SELECT COUNT(*) count FROM ticket_proposal_authority_decisions`,
-    ).get()).toEqual({ count: 0 });
-    db.close();
+    const initial = await readJson(`${origin}/api/state`, host.token);
+    expect(initial.data.project.branch).toBe(initial.data.graph.source.branch);
+
+    execFileSync("git", ["switch", "-q", "-c", "after-host-start"], {
+      cwd: repo,
+    });
+    const switched = await readJson(`${origin}/api/state`, host.token);
+    expect(switched.data.project.branch).toBe("after-host-start");
+    expect(switched.data.graph.source.branch).toBe("after-host-start");
+
+    execFileSync("git", ["switch", "--detach", "-q"], { cwd: repo });
+    const detached = await readJson(`${origin}/api/state`, host.token);
+    expect(detached.data.graph.source.branch).toBeNull();
+    expect(detached.data.project.branch).toBe("detached");
   });
 
-  function seedValidatedBootstrap(): {
-    root: string;
-    repo: string;
-    dbPath: string;
-    proposal: TicketGraphChangeProposalV0;
-  } {
-    const root = fs.realpathSync(
-      fs.mkdtempSync(path.join(os.tmpdir(), "vh-ticket-review-host-")),
+  it("collects the maximum contract-sized graph without exhausting its page budget", async () => {
+    writeMaximumTicketLedger(repo);
+    const host = startTicketReviewHost({
+      repoRoot: repo,
+      dbPath,
+      token: "m".repeat(32),
+    });
+    hosts.push(host);
+    const { origin } = await host.ready;
+
+    const state = await readJson(`${origin}/api/state`, host.token);
+    expect(state.data.graph.tickets).toHaveLength(1_000);
+    expect(state.data.graph.relations).toHaveLength(5_000);
+  }, 30_000);
+
+  it("keeps the loopback bearer boundary and exposes no mutation route", async () => {
+    const host = startTicketReviewHost({
+      repoRoot: repo,
+      dbPath,
+      token: "s".repeat(32),
+    });
+    hosts.push(host);
+    const { origin, port } = await host.ready;
+
+    const health = await fetch(`${origin}/health`);
+    expect(health.status).toBe(200);
+    expect(await health.json()).toEqual({ ok: true, schemaVersion: 2 });
+
+    const unauthenticated = await fetch(`${origin}/api/state`);
+    expect(unauthenticated.status).toBe(401);
+    expect(await unauthenticated.json()).toMatchObject({
+      error: { code: "unauthorized" },
+    });
+
+    const decision = await fetch(`${origin}/api/decision`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${host.token}` },
+    });
+    expect(decision.status).toBe(404);
+    const apply = await fetch(`${origin}/api/apply`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${host.token}` },
+    });
+    expect(apply.status).toBe(404);
+
+    const foreignHost = await rawRequest(port, {
+      Host: "attacker.invalid",
+    });
+    expect(foreignHost.status).toBe(403);
+    expect(JSON.parse(foreignHost.body)).toMatchObject({
+      error: { code: "host_rejected" },
+    });
+
+    const html = await (await fetch(`${origin}/`)).text();
+    const script = await (await fetch(`${origin}/app.js`)).text();
+    const styles = await (await fetch(`${origin}/app.css`)).text();
+    expect(html).not.toMatch(/authorize|decision rationale|validation/i);
+    expect(html).toContain('class="source-ref"');
+    expect(html).toContain('preserveAspectRatio="xMidYMid meet"');
+    expect(script).not.toMatch(/\/api\/(?:decision|apply)/);
+    expect(script).toContain("copyableWorktree(state.graph.source)");
+    expect(script).toContain("navigator.clipboard.writeText(value)");
+    expect(script).toContain("isCurrentSubjectResponse(");
+    expect(script).toContain("inspection?.snapshotId === snapshotId");
+    expect(script).toContain("inspectedSubject.ticket?.ticketId === subject.ticketId");
+    expect(script).toContain(
+      "inspectedSubject.relation?.relationRef === subject.relationRef",
     );
-    roots.push(root);
-    const repo = makeRepository(root);
-    const dbPath = path.join(root, "operational.sqlite");
-    const db = openDb(dbPath);
-    const row = upsertRepo(db, repo, null, "main", NOW);
-    const dispatcher = new OperationDispatcher(db, { repoRoot: repo });
-    const submitted = dispatcher.dispatch(
-      "ticket.proposal.submit",
-      context(row.id, "review-host:submit"),
-      {
-        schemaVersion: 1,
-        kind: "graph_change",
-        observedSnapshotId: null,
-        reason: "Bootstrap the first live Ticket review path",
-        source: {
-          kind: "plan",
-          ref: "plan:ticket-review-host",
-        },
-        authorAssessment: {
-          changeClass: "decomposition",
-          authoritySignals: ["initial_plan_authority"],
-          introducesHumanGate: false,
-          rationale:
-            "The initial graph requires explicit human review before publication.",
-        },
-        changes: [
-          {
-            op: "create",
-            localRef: "plan",
-            definition: {
-              outcome: "A person can review the complete initial Ticket graph.",
-              parent: null,
-              dependsOn: [],
-            },
-          },
-          {
-            op: "create",
-            localRef: "publish",
-            definition: {
-              outcome:
-                "The reviewed initial Ticket graph becomes canonical without caller-forged authority.",
-              parent: null,
-              dependsOn: [{
-                target: { kind: "local", localRef: "plan" },
-                rationale:
-                  "The graph must be reviewed before it can be published.",
-              }],
-            },
-          },
-        ],
-      },
+    expect(script).toMatch(
+      /function renderGraphInspector\(\) \{\s*if \(!state\) return;\s*subjectRequest \+= 1;/,
     );
-    if (!submitted.ok) {
-      throw new Error(`proposal failed: ${JSON.stringify(submitted)}`);
-    }
-    const proposal = submitted.data as TicketGraphChangeProposalV0;
-    const validation = dispatcher.dispatch(
-      "ticket.proposal.validation.record",
-      context(row.id, "review-host:validation"),
-      passingValidation(proposal),
+    expect(script).toContain("dirtyPathsTruncated");
+    expect(script).toContain("Additional changed paths are not shown.");
+    expect(script).toContain("minimapWorldPoint(event.clientX, event.clientY)");
+    expect(script).toContain("elements.minimap.getScreenCTM()");
+    expect(script).toContain("point.matrixTransform(matrix.inverse())");
+    expect(script).toContain("visibleCanvasViewport()");
+    expect(script).toContain("layoutGraph");
+    expect(script).toContain("minimap");
+    expect(script).toContain("causalCone");
+    expect(styles).toContain("grid-template-rows: auto minmax(0, 1fr)");
+    expect(styles).toContain("overflow-wrap: anywhere");
+    expect(styles).not.toContain("height: calc(100% - 87px)");
+    expect(styles).toMatch(
+      /@media \(max-width: 760px\)[\s\S]*?\.toolbar-tools \{\s*padding: 1px;/,
     );
-    if (!validation.ok) {
-      throw new Error(`validation failed: ${JSON.stringify(validation)}`);
-    }
-    db.close();
-    return { root, repo, dbPath, proposal };
-  }
+    expect(styles).not.toMatch(/\.toolbar-tools \{\s*display: none;/);
+  });
 });
 
-function passingValidation(proposal: TicketGraphChangeProposalV0) {
-  return {
-    schemaVersion: 1,
-    proposalId: proposal.proposalId,
-    expectedProposalDigest: proposal.proposalDigest,
-    expectedCandidateDigest: proposal.mechanicalReview.candidateDigest,
-    validator: {
-      id: "vibehub-ticket-validate",
-      version: "1",
-      artifactDigest: "1".repeat(64),
-    },
-    policy: {
-      id: "vibehub-ticket-proposal-semantic-review",
-      version: "1",
-      artifactDigest: "2".repeat(64),
-    },
-    checks: [
-      "promise_preservation",
-      "containment_truth",
-      "dependency_truth",
-      "change_classification",
-      "delegated_scope",
-      "protected_boundaries",
-    ].map((code, index) => ({
-      localRef: `check-${index + 1}`,
-      code,
-      subject: { kind: "proposal" },
-      outcome: "passed",
-      summary: `${code} is supported by the exact initial candidate.`,
-      evidenceRefs: [`proposal:${proposal.proposalId}`],
-    })),
-    findings: [],
-    indicatedAuthoritySignals: ["initial_plan_authority"],
-  };
+function writeTicketLedger(repo: string): void {
+  const ledger = path.join(repo, ".vibehub", "tickets");
+  const tickets = path.join(ledger, "tickets");
+  fs.mkdirSync(tickets, { recursive: true });
+  fs.writeFileSync(path.join(ledger, "protocol.yaml"), [
+    "schema_version: 1",
+    "kind: ticket_protocol",
+    "format: vibehub.ticket-ledger",
+    "",
+  ].join("\n"));
+  fs.writeFileSync(path.join(tickets, "design-schema.yaml"), [
+    "schema_version: 1",
+    "kind: ticket",
+    "ticket_id: design-schema",
+    "outcome: Design the accepted schema",
+    "context: Freeze the smallest schema needed by the API.",
+    "acceptance: []",
+    "constraints: []",
+    "context_refs: []",
+    "relations: []",
+    "provenance_refs: []",
+    "",
+  ].join("\n"));
+  fs.writeFileSync(path.join(tickets, "implement-api.yaml"), [
+    "schema_version: 1",
+    "kind: ticket",
+    "ticket_id: implement-api",
+    "outcome: Expose the accepted API",
+    "context: Implement the endpoint against the accepted schema.",
+    "acceptance:",
+    "  - acceptance_id: response",
+    "    criterion: The endpoint returns the canonical response.",
+    "constraints:",
+    "  - Keep transport concerns outside the domain model.",
+    "context_refs:",
+    "  - ref: META/api.md",
+    "    purpose: Accepted API behavior",
+    "relations:",
+    "  - type: depends_on",
+    "    target_ticket_id: design-schema",
+    "    rationale: The endpoint follows the schema.",
+    "provenance_refs:",
+    "  - plan:api",
+    "",
+  ].join("\n"));
 }
 
-function context(repoId: number, requestId: string) {
-  return {
-    repoId,
-    actor: "agent:ticket-planner",
-    requestId,
-    now: NOW,
-  };
+function writeMaximumTicketLedger(repo: string): void {
+  const tickets = path.join(repo, ".vibehub", "tickets", "tickets");
+  fs.rmSync(tickets, { recursive: true, force: true });
+  fs.mkdirSync(tickets, { recursive: true });
+  for (let index = 0; index < 1_000; index += 1) {
+    const ticketId = `ticket-${String(index).padStart(4, "0")}`;
+    const prerequisiteOffsets = Array.from(
+      { length: Math.min(index, 5) },
+      (_, offset) => offset + 1,
+    );
+    if (index >= 6 && index <= 20) prerequisiteOffsets.push(6);
+    const relations = prerequisiteOffsets.flatMap((offset) => [
+      "  - type: depends_on",
+      `    target_ticket_id: ticket-${String(index - offset).padStart(4, "0")}`,
+    ]);
+    fs.writeFileSync(path.join(tickets, `${ticketId}.yaml`), [
+      "schema_version: 1",
+      "kind: ticket",
+      `ticket_id: ${ticketId}`,
+      `outcome: Complete ${ticketId}`,
+      `context: Execute ${ticketId} against its prerequisites.`,
+      "acceptance: []",
+      "constraints: []",
+      "context_refs: []",
+      ...(relations.length === 0 ? ["relations: []"] : ["relations:", ...relations]),
+      "provenance_refs: []",
+      "",
+    ].join("\n"));
+  }
 }
 
-function makeRepository(parent: string): string {
-  const repository = path.join(parent, "repo");
-  fs.mkdirSync(repository);
-  execFileSync("git", ["init", "-b", "main"], { cwd: repository });
-  execFileSync("git", ["config", "user.name", "Ticket Review Host Test"], {
-    cwd: repository,
+async function readJson(url: string, token: string): Promise<any> {
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  execFileSync("git", ["config", "user.email", "review-host@example.test"], {
-    cwd: repository,
-  });
-  fs.writeFileSync(path.join(repository, "README.md"), "review host\n");
-  execFileSync("git", ["add", "README.md"], { cwd: repository });
-  execFileSync("git", ["commit", "-m", "initial"], { cwd: repository });
-  return fs.realpathSync(repository);
+  expect(response.status).toBe(200);
+  return response.json();
 }
 
-function bearer(token: string): Record<string, string> {
-  return { Authorization: `Bearer ${token}` };
-}
-
-async function getState(origin: string, token: string): Promise<any> {
-  const response = await fetch(`${origin}/api/state`, {
-    headers: bearer(token),
+async function rawRequest(
+  port: number,
+  headers: Record<string, string>,
+): Promise<{ status: number; body: string }> {
+  return new Promise((resolve, reject) => {
+    const request = http.request({
+      host: "127.0.0.1",
+      port,
+      path: "/health",
+      method: "GET",
+      headers,
+    }, (response) => {
+      const chunks: Buffer[] = [];
+      response.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+      response.on("end", () => resolve({
+        status: response.statusCode ?? 0,
+        body: Buffer.concat(chunks).toString("utf8"),
+      }));
+    });
+    request.once("error", reject);
+    request.end();
   });
-  if (!response.ok) throw new Error(`state failed: ${response.status}`);
-  return ((await response.json()) as { data: unknown }).data;
 }

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -11,7 +10,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-validate","vibehub-ticket-apply"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -19,7 +18,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
-    expect(entry).toHaveLength(10);
+    expect(entry).toHaveLength(7);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -121,13 +120,16 @@ describe("production skill package",()=>{
     expect(operations).toContain("`kb.anchors`");
     expect(operations).toContain("`distill.baseline.get`");
     expect(operations).toContain("`distill.version.get`");
-    expect(operations).toContain("`ticket.proposal.review.inspect`");
-    expect(operations).toContain("`ticket.proposal.authority.decide`");
-    expect(operations).toContain("`ticket.proposal.apply`");
+    expect(operations).toContain("`ticket.graph.snapshot`");
+    expect(operations).toContain("`ticket.subject.inspect`");
+    expect(operations).toContain("`ticket.trace.list`");
+    expect(operations).toContain("Ticket reads are deliberately outside persisted request replay");
+    expect(operations).not.toContain("`ticket.proposal.");
     const dispatch=read("scripts/_dispatch.mjs");
-    expect(dispatch).toContain('"proposal.review.inspect"');
-    expect(dispatch).toContain('"proposal.authority.decide"');
-    expect(dispatch).toContain('"proposal.apply"');
+    expect(dispatch).toContain('"graph.snapshot"');
+    expect(dispatch).toContain('"subject.inspect"');
+    expect(dispatch).toContain('"trace.list"');
+    expect(dispatch).not.toContain('"proposal.');
     expect(dispatch).toContain('"../../../main.js"');
     expect(dispatch).toContain('"../../packages/cli/dist/main.js"');
 
@@ -148,65 +150,14 @@ describe("production skill package",()=>{
     expect(read("_stdlib/provenance.md")).toContain("`symbol: null` is invalid");
   });
 
-  it("binds the Ticket validator descriptors to packaged frozen artifacts",()=>{
-    const root=path.join(skills,"vibehub-ticket-validate");
-    const skill=fs.readFileSync(path.join(root,"SKILL.md"),"utf8");
-    const digest=(relative:string)=>crypto.createHash("sha256")
-      .update(fs.readFileSync(path.join(root,relative)))
-      .digest("hex");
-    const validatorDigest=digest("references/validator-profile-v1.md");
-    const policyDigest=digest(
-      "references/proposal-validation-policy-v1.md",
-    );
-    expect(validatorDigest).toBe(
-      "578541ee161a9c1134cce20d7137ac336317f1db1bd573ad2888461794add438",
-    );
-    expect(policyDigest).toBe(
-      "c02806b436408e925536509669be7c05510f3c6126f86fb7dd6fee47d59f465c",
-    );
-    expect(skill).toContain(validatorDigest);
-    expect(skill).toContain(policyDigest);
-    expect(skill).toContain("Do not substitute fixture hashes");
-  });
-
-  it("packages the Ticket authority/application intelligence",()=>{
-    const skill=fs.readFileSync(
-      path.join(skills,"vibehub-ticket-apply","SKILL.md"),
-      "utf8",
-    );
-    expect(skill).toContain("proposal.review.inspect");
-    expect(skill).toContain("`ticket.proposal.authority.decide`");
-    expect(skill).toContain("`ticket.proposal.apply`");
-    expect(skill).toContain(
-      "node ../scripts/vh-ticket-review.mjs --proposal <proposal-id> --repo <root>",
-    );
-    expect(skill).toMatch(/may not click, automate,\s+or\s+infer/);
-    expect(skill).toMatch(/caller JSON never gains an\s+authority field/);
-  });
-
-  it("packages honest outcome-first Ticket planning intelligence",()=>{
-    const skill=fs.readFileSync(
-      path.join(skills,"vibehub-ticket-plan","SKILL.md"),
-      "utf8",
-    );
-    expect(skill).toContain("Scenario is a");
-    expect(skill).toContain("non-canonical planning and review lens");
-    expect(skill).toContain("Backchain from each observable outcome");
-    expect(skill).toContain("Forward-normalize from current facts");
-    expect(skill).toContain("Stop honestly at an unknown frontier");
-    expect(skill).toContain("do not fabricate");
-    expect(skill).toContain("The result of this Skill is an inspectable proposal, not an approved plan");
-    expect(skill).toContain("$vibehub-ticket-validate");
-    expect(skill).toContain("$vibehub-ticket-apply");
-    expect(skill).toContain(
-      "node ../scripts/vh-ticket-review.mjs --proposal <id> --repo <root>",
-    );
+  it("packages the read-only Ticket graph wrapper",()=>{
     const review=fs.readFileSync(
       path.join(skills,"scripts","vh-ticket-review.mjs"),
       "utf8",
     );
     expect(review).toContain("resolveVibehubInvocation");
     expect(review).toContain('"ticket", "review"');
+    expect(review).not.toMatch(/proposal|decision|apply/i);
   });
 
   it("advertises Ticket orchestration from the Codex plugin surface",()=>{
@@ -393,14 +344,12 @@ describe("production skill package",()=>{
       ["ticket.trace.list","trace kinds must be unique"],
     ] as const;
     for(const [operation,caseName] of regressions){const contract=artifact.operations[operation]!,fixture=contract.fixtures.negatives.find(x=>x.case===caseName)!;const run=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--operation",operation],{input:JSON.stringify(materializeOperationFixture(contract,fixture)),encoding:"utf8"});expect(run.status,`${operation}/${caseName}: ${run.stdout}`).toBe(2);}
-    const proposalContract=artifact.operations["ticket.proposal.submit"]!,budgetFixture=proposalContract.fixtures.negatives.find(fixture=>fixture.case==="proposal aggregate JSON byte budget")!;
-    expect(budgetFixture).not.toHaveProperty("value");
-    expect(JSON.stringify(budgetFixture).length).toBeLessThan(300);
-    expect(Buffer.byteLength(JSON.stringify(materializeOperationFixture(proposalContract,budgetFixture)))).toBeGreaterThan(4*1024*1024);
-    const validationContract=artifact.operations["ticket.proposal.validation.record"]!,validationBudgetFixture=validationContract.fixtures.negatives.find(fixture=>fixture.case==="proposal validation aggregate JSON byte budget")!;
-    expect(validationBudgetFixture).not.toHaveProperty("value");
-    expect(JSON.stringify(validationBudgetFixture).length).toBeLessThan(300);
-    expect(Buffer.byteLength(JSON.stringify(materializeOperationFixture(validationContract,validationBudgetFixture)))).toBeGreaterThan(1024*1024);
+    expect(Object.keys(artifact.operations).filter(operation=>operation.startsWith("ticket."))).toEqual([
+      "ticket.graph.snapshot",
+      "ticket.subject.inspect",
+      "ticket.trace.list",
+    ]);
+    expect(JSON.stringify(artifact)).not.toContain("ticket.proposal.");
     const unicodeId={id:"😀".repeat(200)},featureContract=artifact.operations["kb.feature.get"]!;expect(validateOperationContract(featureContract,unicodeId)).toMatchObject({valid:true});expect(operationInputSchemas["kb.feature.get"].safeParse(unicodeId).success).toBe(true);expect(dispatcher.dispatch("kb.feature.get",{repoId:row.id,actor:"fixture",requestId:"unicode-id",now},unicodeId)).toMatchObject({ok:false,error:{code:"not_found"}});
     const longInput={idempotencyKey:"unicode-long",specs:[{id:"unicode-long",type:"context",summary:"Unicode boundary",evidence:[{sourceType:"fixture",sourceRef:"fixture:unicode",exactQuote:"😀".repeat(20_000)}]}]},longContract=artifact.operations["kb.spec.apply"]!;expect(validateOperationContract(longContract,longInput)).toMatchObject({valid:true});expect(operationInputSchemas["kb.spec.apply"].safeParse(longInput).success).toBe(true);expect(dispatcher.dispatch("kb.spec.apply",{repoId:row.id,actor:"fixture",taskId:"fixture-task",requestId:"unicode-long",now},longInput)).toMatchObject({ok:true});
     expect(dispatcher.dispatch("kb.status",{repoId:row.id,actor:" ",requestId:"context-space",now},{})).toMatchObject({ok:false,error:{code:"actor_required"}});
@@ -537,77 +486,29 @@ describe("production skill package",()=>{
     });
   });
 
-  it("forwards complex Ticket proposals and bounds their raw input",()=>{
-    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-proposal-wrapper-"));
+  it("forwards the read-only review host and rejects retired Ticket writes",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-review-wrapper-"));
     const fake=path.join(temp,"vibehub");
-    fs.writeFileSync(fake,"#!/usr/bin/env node\nlet raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n");
+    fs.writeFileSync(fake,"#!/usr/bin/env node\nprocess.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2)}}));\n");
     fs.chmodSync(fake,0o755);
-    const input=JSON.stringify({
-      schemaVersion:1,
-      kind:"graph_change",
-      observedSnapshotId:null,
-      reason:"Shape executable work",
-      authorAssessment:{
-        changeClass:"decomposition",
-        authoritySignals:[],
-        introducesHumanGate:false,
-        rationale:"Stay within the accepted outcome.",
-      },
-      changes:[{
-        op:"create",
-        localRef:"implementation",
-        definition:{
-          outcome:"Implement the accepted behavior",
-          parent:null,
-          dependsOn:[],
-        },
-      }],
+    const review=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-ticket-review.mjs"),
+      "--repo",temp,"--no-open","--json",
+    ],{encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(review.status,review.stdout+review.stderr).toBe(0);
+    expect(JSON.parse(review.stdout).data).toEqual({
+      argv:["ticket","review","--repo",temp,"--no-open","--json"],
     });
-    const forwarded=spawnSync(process.execPath,[
-      path.join(skills,"scripts/vh-ticket.mjs"),
-      "proposal.submit","--repo",temp,"--actor","agent:test",
-    ],{input,encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
-    expect(forwarded.status,forwarded.stdout+forwarded.stderr).toBe(0);
-    expect(JSON.parse(forwarded.stdout).data).toMatchObject({
-      argv:["ticket","proposal.submit","--json","--repo",temp,"--actor","agent:test","--input","-"],
-      raw:input,
-    });
-
-    const maximum=4*1024*1024,oversized=path.join(temp,"oversized.json");
-    fs.writeFileSync(oversized,`${" ".repeat(maximum)}{}`);
     const rejected=spawnSync(process.execPath,[
       path.join(skills,"scripts/vh-ticket.mjs"),
-      "proposal.submit","--input",oversized,"--actor","agent:test",
+      "proposal.submit","--actor","agent:test",
     ],{encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
     expect(rejected.status,rejected.stdout+rejected.stderr).toBe(2);
     expect(JSON.parse(rejected.stdout)).toMatchObject({
       ok:false,
       error:{
         code:"validation_error",
-        message:`invalid JSON input: operation raw JSON input exceeds ${maximum} bytes`,
-      },
-    });
-
-    const validationMaximum=1024*1024;
-    const oversizedValidation=path.join(temp,"oversized-validation.json");
-    fs.writeFileSync(
-      oversizedValidation,
-      `${" ".repeat(validationMaximum)}{}`,
-    );
-    const validationRejected=spawnSync(process.execPath,[
-      path.join(skills,"scripts/vh-ticket.mjs"),
-      "proposal.validation.record","--input",oversizedValidation,
-      "--actor","agent:test",
-    ],{encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
-    expect(
-      validationRejected.status,
-      validationRejected.stdout+validationRejected.stderr,
-    ).toBe(2);
-    expect(JSON.parse(validationRejected.stdout)).toMatchObject({
-      ok:false,
-      error:{
-        code:"validation_error",
-        message:`invalid JSON input: operation raw JSON input exceeds ${validationMaximum} bytes`,
+        message:"unsupported ticket operation: proposal.submit",
       },
     });
   });

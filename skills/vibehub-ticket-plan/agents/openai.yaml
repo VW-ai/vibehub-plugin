@@ -1,4 +1,0 @@
-interface:
-  display_name: "VibeHub Ticket Plan"
-  short_description: "Shape honest executable Ticket graph proposals"
-  default_prompt: "Use $vibehub-ticket-plan to turn this outcome into an honest coarse Ticket graph proposal."

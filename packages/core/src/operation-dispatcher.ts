@@ -21,39 +21,16 @@ import {
   replaceGitSemanticStore,
 } from "./git-semantic-store.js";
 import { GitFacade } from "./git-facade.js";
-import {
-  GitTicketReviewProjectionSourceProviderV0,
-  GitTicketStoreErrorV0,
-  gitTicketRepositoryIncarnationV0,
-} from "./git-ticket-store.js";
+import { TicketLedgerError } from "./ticket-ledger/index.js";
 import {
   TicketReviewProjectionError,
 } from "./ticket-review-projector.js";
 import { TicketReviewReadServiceV0 } from "./ticket-review-read-service.js";
 import {
-  TicketProposalServiceV0,
-  type TicketProposalRepositoryScopeV0,
-} from "./ticket-proposal-service.js";
-import type {
-  TicketProposalInspectInputV0,
-  TicketProposalListInputV0,
-  TicketProposalSubmitInputV0,
-  TicketProposalValidationInspectInputV0,
-  TicketProposalValidationListInputV0,
-  TicketProposalValidationRecordInputV0,
-} from "./contract/ticket-proposal.js";
-import {
+  GitTicketLedgerReviewProjectionSourceProviderV0,
   type ResolvedTicketReviewProjectionSourceProviderV0,
+  type TicketReviewRepositoryScopeV0,
 } from "./ticket-review-resolver.js";
-import {
-  TicketProposalApplicationServiceV0,
-} from "./ticket-application-service.js";
-import type {
-  TicketProposalApplyInputV0,
-  TicketProposalAuthorityDecideInputV0,
-  TicketProposalReviewInputV0,
-  TrustedTicketProposalAuthorityProviderV0,
-} from "./contract/ticket-application.js";
 
 export interface OperationContext { repoId:number; actor:string; taskId?:string; requestId:string; now:string }
 export interface OperationMeta { operation:string; repoId:number; requestId:string; at:string }
@@ -73,24 +50,19 @@ export const OPERATION_EXIT_CLASS:Record<string,number>={
   semantic_store_missing:5,
   semantic_authority_requires_dispatcher:5,
   invalid_snapshot:2, snapshot_expired:3, projection_too_large:4,
-  projection_invariant_failed:1, ticket_store_corrupt:5,
-  ticket_store_scope_mismatch:2,
-  ticket_store_publish_invalid:4, ticket_store_cas_conflict:5,
-  ticket_store_revision_conflict:5, ticket_store_commit_uncertain:5,
-  ticket_store_writer_busy:5,
-  trusted_authority_unavailable:5, authority_proof_invalid:5,
-  authority_required:4, authority_conflict:5,
-  application_in_progress:5, application_recovery_required:5,
+  projection_invariant_failed:1,
+  ticket_ledger_missing:3, ticket_ledger_invalid_document:4,
+  ticket_ledger_invalid_graph:4, ticket_ledger_unmerged:5,
+  ticket_ledger_source_changed:5, ticket_ledger_ref_not_found:3,
+  ticket_ledger_io:5, ticket_ledger_scope_mismatch:2,
 };
 
 interface Services {
   kb: KnowledgeService;
   distill: DistillationService;
   ticket: TicketReviewReadServiceV0;
-  ticketProposal: TicketProposalServiceV0;
-  ticketApplication: TicketProposalApplicationServiceV0;
 }
-type TicketDispatchScopeV0 = TicketProposalRepositoryScopeV0;
+type TicketDispatchScopeV0 = TicketReviewRepositoryScopeV0;
 type Handler=(
   service: Services,
   ctx: OperationContext,
@@ -151,63 +123,11 @@ const handlers:Record<OperationName,Handler>={
     requiredTicketScope(scope),
     i,
   ),
-  "ticket.proposal.submit":(s,c,i,scope)=>s.ticketProposal.submit(
-    requiredTicketScope(scope),
-    c,
-    i as unknown as TicketProposalSubmitInputV0,
-  ),
-  "ticket.proposal.inspect":(s,c,i,scope)=>s.ticketProposal.inspect(
-    requiredTicketScope(scope),
-    c,
-    i as unknown as TicketProposalInspectInputV0,
-  ),
-  "ticket.proposal.list":(s,c,i,scope)=>s.ticketProposal.list(
-    requiredTicketScope(scope),
-    c,
-    i as unknown as TicketProposalListInputV0,
-  ),
-  "ticket.proposal.validation.record":(s,c,i,scope)=>
-    s.ticketProposal.recordValidation(
-      requiredTicketScope(scope),
-      c,
-      i as unknown as TicketProposalValidationRecordInputV0,
-    ),
-  "ticket.proposal.validation.inspect":(s,c,i,scope)=>
-    s.ticketProposal.inspectValidation(
-      requiredTicketScope(scope),
-      c,
-      i as unknown as TicketProposalValidationInspectInputV0,
-    ),
-  "ticket.proposal.validation.list":(s,c,i,scope)=>
-    s.ticketProposal.listValidations(
-      requiredTicketScope(scope),
-      c,
-      i as unknown as TicketProposalValidationListInputV0,
-    ),
-  "ticket.proposal.review.inspect":(s,c,i,scope)=>
-    s.ticketApplication.review(
-      requiredTicketScope(scope),
-      c,
-      i as unknown as TicketProposalReviewInputV0,
-    ),
-  "ticket.proposal.authority.decide":(s,c,i,scope)=>
-    s.ticketApplication.decide(
-      requiredTicketScope(scope),
-      c,
-      i as unknown as TicketProposalAuthorityDecideInputV0,
-    ),
-  "ticket.proposal.apply":(s,c,i,scope)=>
-    s.ticketApplication.apply(
-      requiredTicketScope(scope),
-      c,
-      i as unknown as TicketProposalApplyInputV0,
-    ),
 };
 
 export interface OperationDispatcherOptions {
   repoRoot?: string;
   ticketReviewProvider?: ResolvedTicketReviewProjectionSourceProviderV0;
-  ticketAuthorityProvider?: TrustedTicketProposalAuthorityProviderV0;
 }
 
 export class OperationDispatcher {
@@ -221,16 +141,15 @@ export class OperationDispatcher {
       distill: new DistillationService(db),
       ticket: new TicketReviewReadServiceV0(
         options.ticketReviewProvider
-          ?? new GitTicketReviewProjectionSourceProviderV0(),
+          ?? new GitTicketLedgerReviewProjectionSourceProviderV0(),
       ),
-      ticketProposal: new TicketProposalServiceV0(db),
-      ticketApplication: new TicketProposalApplicationServiceV0(db, {
-        authorityProvider: options.ticketAuthorityProvider,
-      }),
     };
   }
   operations():string[]{return Object.keys(handlers).sort();}
   dispatch(operation:string,context:unknown,input:unknown={}):OperationResult{
+    if(!isRegisteredOperation(operation)){
+      return failure(unsupportedOperation(operation));
+    }
     const address=receiptAddressSchema.safeParse(context);
     if(address.success){
       const raw=context as Record<string,unknown>;
@@ -246,23 +165,13 @@ export class OperationDispatcher {
             ["Reduce the input size or split it into bounded requests."],
           );
         }
-        const ticketInputSchema = operationInputSchemas[
-          operation as OperationName
-        ];
-        const ticketScope = requiresTicketScope(operation)
-          && operationContextSchema.safeParse(context).success
-          && ticketInputSchema?.safeParse(input).success
-          ? this.resolveTicketScope(
-              address.data.repoId,
-              typeof raw.taskId === "string" ? raw.taskId : undefined,
-              operation.startsWith("ticket.proposal."),
-            )
-          : undefined;
+        if(isTicketReadOperation(operation)){
+          return this.invoke(operation,context,input);
+        }
         const payloadHash=hashCanonical({
           actor:raw.actor??null,
           taskId:raw.taskId??null,
           input,
-          ...(ticketScope ? { ticketScope } : {}),
         });
         return this.dispatchRequest(
           operation,
@@ -270,8 +179,7 @@ export class OperationDispatcher {
           address.data.requestId,
           payloadHash,
           typeof raw.now==="string"?raw.now:"1970-01-01T00:00:00.000Z",
-          ()=>this.invoke(operation,context,input,ticketScope),
-          evaluatesOutsideSqlite(operation),
+          ()=>this.invoke(operation,context,input),
         );
       }
       catch(error){return failure(error);}
@@ -285,7 +193,7 @@ export class OperationDispatcher {
     resolvedTicketScope?: TicketDispatchScopeV0,
   ):OperationResult{
     const schema=operationInputSchemas[operation as OperationName];const handler=handlers[operation as OperationName];
-    if(!schema||!handler)throw new KnowledgeError("unsupported_operation",`unsupported operation: ${operation}`,{operation},["List dispatcher operations and choose a registered operation."]);
+    if(!schema||!handler)throw unsupportedOperation(operation);
     const parsedContext=operationContextSchema.safeParse(context);
     if(!parsedContext.success){
       const actorProbe=actorProbeSchema.safeParse(context);
@@ -305,116 +213,32 @@ export class OperationDispatcher {
       c,
       normalizedInput,
       requiresTicketScope(operation)
-        ? resolvedTicketScope ?? this.resolveTicketScope(
-            c.repoId,
-            c.taskId,
-            operation.startsWith("ticket.proposal."),
-          )
+        ? resolvedTicketScope ?? this.resolveTicketScope()
         : undefined,
     );
     return {ok:true,data,meta:{operation,repoId:c.repoId,requestId:c.requestId,at:c.now}};
   }
-  private resolveTicketScope(
-    repoId: number,
-    taskId?: string,
-    bindTaskWorktree = false,
-  ): TicketDispatchScopeV0 {
-    const repo=this.db.prepare(
-      `SELECT root_path rootPath FROM repos WHERE id=?`,
-    ).get(repoId) as {rootPath:string}|undefined;
-    if(!repo){
+  private resolveTicketScope(): TicketDispatchScopeV0 {
+    const candidate=this.options.repoRoot;
+    if(!candidate){
       throw new KnowledgeError(
-        "not_found",
-        "the addressed repository is not registered",
-        {repoId},
-        ["Initialize VibeHub for this repository before reading Tickets."],
+        "ticket_ledger_scope_mismatch",
+        "Ticket reads require a trusted worktree path from the host adapter",
+        null,
+        ["Construct the dispatcher with the current trusted repoRoot."],
       );
     }
-    const task=taskId
-      ? this.db.prepare(
-          `SELECT worktree_path worktreePath FROM tasks
-           WHERE id=? AND repo_id=?`,
-        ).get(taskId,repoId) as {worktreePath:string|null}|undefined
-      : undefined;
-    if(taskId && !task){
-      throw new KnowledgeError(
-        "ticket_store_scope_mismatch",
-        "the addressed task does not belong to this repository",
-        {repoId,taskId},
-        ["Use the current repository task identity or omit taskId for a repository read."],
-      );
-    }
-    const candidate=this.options.repoRoot??task?.worktreePath??repo.rootPath;
-    let repositoryRoot:string;
-    let session:ReturnType<typeof GitFacade.sessionContextAt>;
     try{
-      repositoryRoot=fs.realpathSync(repo.rootPath);
-      session=GitFacade.sessionContextAt(candidate);
+      const session=GitFacade.sessionContextAt(candidate);
+      return {worktreeRoot:fs.realpathSync(session.toplevel)};
     }catch{
       throw new KnowledgeError(
-        "ticket_store_scope_mismatch",
+        "ticket_ledger_scope_mismatch",
         "Ticket read scope is not a readable Git worktree",
-        {repoId},
-        ["Use a checkout belonging to the initialized repository."],
+        {worktreeRoot:candidate},
+        ["Use a readable Git checkout as repoRoot."],
       );
     }
-    let sessionRepositoryRoot:string;
-    let worktreeRoot:string;
-    let repositoryIncarnation:string;
-    try{
-      sessionRepositoryRoot=fs.realpathSync(session.repoRoot);
-      worktreeRoot=fs.realpathSync(session.toplevel);
-      repositoryIncarnation=gitTicketRepositoryIncarnationV0(
-        sessionRepositoryRoot,
-      );
-    }catch{
-      throw new KnowledgeError(
-        "ticket_store_scope_mismatch",
-        "Git returned an unreadable Ticket repository identity",
-        {repoId},
-        ["Reinitialize VibeHub if the repository was replaced in place."],
-      );
-    }
-    if(sessionRepositoryRoot!==repositoryRoot){
-      throw new KnowledgeError(
-        "ticket_store_scope_mismatch",
-        "dispatcher worktree does not belong to the addressed repository",
-        {repoId,repositoryRoot,worktreeRoot},
-        ["Use matching --repo and --repo-id values."],
-      );
-    }
-    if(bindTaskWorktree && task?.worktreePath){
-      let taskWorktreeRoot:string;
-      try{
-        taskWorktreeRoot=fs.realpathSync(task.worktreePath);
-      }catch{
-        throw new KnowledgeError(
-          "ticket_store_scope_mismatch",
-          "the proposal task worktree is no longer readable",
-          {repoId,taskId,taskWorktreePath:task.worktreePath},
-          ["Repair the task worktree binding or use its current checkout."],
-        );
-      }
-      if(taskWorktreeRoot!==worktreeRoot){
-        throw new KnowledgeError(
-          "ticket_store_scope_mismatch",
-          "the proposal checkout does not match the task worktree",
-          {
-            repoId,
-            taskId,
-            taskWorktreeRoot,
-            proposalWorktreeRoot:worktreeRoot,
-          },
-          ["Submit from the checkout bound to the addressed task."],
-        );
-      }
-    }
-    return {
-      repoId,
-      repositoryRoot,
-      worktreeRoot,
-      repositoryIncarnation,
-    };
   }
   private gitSemanticRoot(context:OperationContext):string|null{
     const repo=this.db.prepare(`SELECT root_path rootPath FROM repos WHERE id=?`).get(context.repoId) as {rootPath:string}|undefined;
@@ -456,8 +280,6 @@ export class OperationDispatcher {
         kb:new KnowledgeService(cache),
         distill:new DistillationService(cache),
         ticket:this.service.ticket,
-        ticketProposal:this.service.ticketProposal,
-        ticketApplication:this.service.ticketApplication,
       };
       const cacheContext={...c,repoId:materialized.repoId};
       const data=handler(services,cacheContext,input);
@@ -518,48 +340,7 @@ export class OperationDispatcher {
     payloadHash:string,
     createdAt:string,
     invoke:()=>OperationResult,
-    evaluateOutsideTransaction=false,
   ){
-    if(evaluateOutsideTransaction){
-      const prior=this.readOperationReceipt(
-        repoId,
-        requestId,
-        operation,
-        payloadHash,
-      );
-      if(prior)return replayOperationReceipt(
-        prior,
-        operation,
-        payloadHash,
-        requestId,
-      );
-      let outcome:OperationResult;
-      try{outcome=invoke();}catch(error){outcome=failure(error);}
-      if(leavesRetryableFailureUnreceipted(operation,outcome))return outcome;
-      return this.db.transaction(()=>{
-        const raced=this.readOperationReceipt(
-          repoId,
-          requestId,
-          operation,
-          payloadHash,
-        );
-        if(raced)return replayOperationReceipt(
-          raced,
-          operation,
-          payloadHash,
-          requestId,
-        );
-        this.insertOperationReceipt(
-          operation,
-          repoId,
-          requestId,
-          payloadHash,
-          createdAt,
-          outcome,
-        );
-        return outcome;
-      }).immediate();
-    }
     return this.db.transaction(()=>{
       const prior=this.readOperationReceipt(
         repoId,
@@ -603,71 +384,11 @@ export class OperationDispatcher {
     const row=this.db.prepare(
       `SELECT r.repo_id repoId,r.request_id requestId,r.operation,
               r.payload_hash payloadHash,r.outcome_kind outcomeKind,
-              r.outcome,r.created_at createdAt,
-              r.outcome_blob_digest outcomeBlobDigest
+              r.outcome,r.created_at createdAt
        FROM operation_request_receipts r
        WHERE r.repo_id=? AND r.request_id=?`,
     ).get(repoId,requestId) as OperationReceiptRow|undefined;
-    if(!row||row.outcomeBlobDigest===null
-      ||row.operation!==attemptedOperation
-      ||row.payloadHash!==attemptedPayloadHash){
-      return row;
-    }
-    const blob=this.db.prepare(
-      `SELECT outcome_kind outcomeKind,payload,byte_length byteLength
-       FROM operation_outcome_blobs WHERE digest=?`,
-    ).get(row.outcomeBlobDigest) as OperationOutcomeBlobRow|undefined;
-    const invalidBlob=():never=>{
-      throw new KnowledgeError(
-        "internal_error",
-        "operation receipt outcome blob is missing or inconsistent",
-        {repoId,requestId,outcomeBlobDigest:row.outcomeBlobDigest},
-        ["Restore the operational database from a consistent backup."],
-      );
-    };
-    if(!blob)return invalidBlob();
-    if(!usesTicketOutcomeBlob(row.operation)
-      ||blob.outcomeKind!==row.outcomeKind
-      ||Buffer.byteLength(blob.payload,"utf8")!==blob.byteLength){
-      invalidBlob();
-    }
-    const blobPayload=blob.payload;
-    let stub:unknown;
-    let payload:unknown;
-    try{
-      stub=JSON.parse(row.outcome);
-      payload=JSON.parse(blobPayload);
-    }catch{invalidBlob();}
-    if(!stub||typeof stub!=="object"||Array.isArray(stub)
-      ||Object.keys(stub).sort().join(",")!=="ok,outcomeBlob"
-      ||(stub as Record<string,unknown>).ok!==(row.outcomeKind==="success")
-      ||(stub as Record<string,unknown>).outcomeBlob!==row.outcomeBlobDigest
-      ||JSON.stringify(sortObject(payload))!==blobPayload
-      ||operationOutcomeBlobDigest(row.outcomeKind,blobPayload)
-        !==row.outcomeBlobDigest){
-      invalidBlob();
-    }
-    const outcome:OperationResult=row.outcomeKind==="success"
-      ? {
-          ok:true,
-          data:payload,
-          meta:{
-            operation:row.operation,
-            repoId:row.repoId,
-            requestId:row.requestId,
-            at:row.createdAt,
-          },
-        }
-      : {
-          ok:false,
-          error:payload as {
-            code:string;
-            message:string;
-            details:unknown;
-            nextSafeActions:string[];
-          },
-        };
-    return {...row,outcome:JSON.stringify(outcome)};
+    return row;
   }
   private insertOperationReceipt(
     operation:string,
@@ -677,65 +398,19 @@ export class OperationDispatcher {
     createdAt:string,
     outcome:OperationResult,
   ):void{
-    let persistedOutcome=JSON.stringify(outcome);
-    let outcomeBlobDigest:string|null=null;
-    if(usesTicketOutcomeBlob(operation)){
-      const outcomeKind=outcome.ok?"success":"error";
-      const payload=outcome.ok?outcome.data:outcome.error;
-      const payloadText=JSON.stringify(sortObject(payload));
-      if(payloadText===undefined){
-        throw new KnowledgeError(
-          "internal_error",
-          "Ticket operation produced a non-serializable outcome payload",
-        );
-      }
-      outcomeBlobDigest=operationOutcomeBlobDigest(outcomeKind,payloadText);
-      this.db.prepare(
-        `INSERT INTO operation_outcome_blobs(
-           digest,outcome_kind,payload,byte_length,created_at
-         ) VALUES(?,?,?,?,?)
-         ON CONFLICT(digest) DO NOTHING`,
-      ).run(
-        outcomeBlobDigest,
-        outcomeKind,
-        payloadText,
-        Buffer.byteLength(payloadText,"utf8"),
-        createdAt,
-      );
-      const stored=this.db.prepare(
-        `SELECT outcome_kind outcomeKind,payload
-         FROM operation_outcome_blobs WHERE digest=?`,
-      ).get(outcomeBlobDigest) as {
-        outcomeKind:"success"|"error";
-        payload:string;
-      }|undefined;
-      if(!stored||stored.outcomeKind!==outcomeKind||stored.payload!==payloadText){
-        throw new KnowledgeError(
-          "internal_error",
-          "operation outcome blob digest collision or corruption",
-          {outcomeBlobDigest},
-          ["Restore the operational database from a consistent backup."],
-        );
-      }
-      persistedOutcome=JSON.stringify({
-        ok:outcome.ok,
-        outcomeBlob:outcomeBlobDigest,
-      });
-    }
     this.db.prepare(
       `INSERT INTO operation_request_receipts(
          repo_id,request_id,operation,payload_hash,
-         outcome_kind,outcome,created_at,outcome_blob_digest
-       ) VALUES(?,?,?,?,?,?,?,?)`,
+         outcome_kind,outcome,created_at
+       ) VALUES(?,?,?,?,?,?,?)`,
     ).run(
       repoId,
       requestId,
       operation,
       payloadHash,
       outcome.ok?"success":"error",
-      persistedOutcome,
+      JSON.stringify(outcome),
       createdAt,
-      outcomeBlobDigest,
     );
   }
   private dispatchDistillMutation(operation:string,c:OperationContext,input:Record<string,unknown>,handler:Handler){const stable=(value:unknown):string=>JSON.stringify(sortObject(value));const inputHash=crypto.createHash("sha256").update(stable({input,actor:c.actor,taskId:c.taskId??null})).digest("hex");return this.db.transaction(()=>{const prior=this.db.prepare(`SELECT input_hash inputHash,result FROM distill_mutation_receipts WHERE repo_id=? AND operation=? AND request_id=?`).get(c.repoId,operation,c.requestId) as {inputHash:string;result:string}|undefined;if(prior){if(prior.inputHash!==inputHash)throw new KnowledgeError("idempotency_conflict","requestId was reused with different mutation input",{operation,requestId:c.requestId},["Use a new requestId for a different mutation."]);return JSON.parse(prior.result);}const result=handler(this.service,c,input);this.db.prepare(`INSERT INTO distill_mutation_receipts(repo_id,operation,request_id,input_hash,result,created_at) VALUES(?,?,?,?,?,?)`).run(c.repoId,operation,c.requestId,inputHash,stable(result),c.now);return result;}).immediate();}
@@ -751,12 +426,6 @@ interface OperationReceiptRow {
   outcomeKind:"success"|"error";
   outcome:string;
   createdAt:string;
-  outcomeBlobDigest:string|null;
-}
-interface OperationOutcomeBlobRow {
-  outcomeKind:"success"|"error";
-  payload:string;
-  byteLength:number;
 }
 function replayOperationReceipt(
   prior:OperationReceiptRow,
@@ -833,18 +502,19 @@ function copyOperationalKnowledgeContext(source:Db,sourceRepoId:number,target:Db
 const actorProbeSchema=z.object({actor:z.unknown().optional()}).passthrough();
 const receiptAddressSchema=z.object({repoId:operationContextSchema.shape.repoId,requestId:operationContextSchema.shape.requestId}).passthrough();
 function hashCanonical(value:unknown){return crypto.createHash("sha256").update(JSON.stringify(sortObject(value))).digest("hex");}
-function operationOutcomeBlobDigest(
-  outcomeKind:"success"|"error",
-  payloadText:string,
-):string{
-  return crypto.createHash("sha256")
-    .update("vibehub.operation-outcome-blob.v1\0")
-    .update(outcomeKind)
-    .update("\0")
-    .update(payloadText)
-    .digest("hex");
-}
 function failure(error:unknown):OperationResult{const e=normalize(error);return {ok:false,error:{code:e.code,message:e.message,details:e.details,nextSafeActions:e.nextSafeActions}};}
+function isRegisteredOperation(operation:string):operation is OperationName{
+  return Object.hasOwn(operationInputSchemas,operation)
+    &&Object.hasOwn(handlers,operation);
+}
+function unsupportedOperation(operation:string):KnowledgeError{
+  return new KnowledgeError(
+    "unsupported_operation",
+    `unsupported operation: ${operation}`,
+    {operation},
+    ["List dispatcher operations and choose a registered operation."],
+  );
+}
 
 function mutation(c:OperationContext,taskRequired:boolean){if(taskRequired&&!c.taskId?.trim())throw new KnowledgeError("task_required","taskId is required for active Spec batch apply",null,["Associate the write with the current task."]);return {actor:c.actor,taskId:c.taskId,requestId:c.requestId,now:c.now};}
 function req(v:unknown,name:string){if(typeof v!=="string"||!v.trim())throw new KnowledgeError("validation_error",`${name} is required`,{field:name});return v;}
@@ -858,20 +528,30 @@ function normalize(error:unknown):KnowledgeError{
       ticketReviewNextSafeActions(error.code),
     );
   }
-  if(error instanceof GitTicketStoreErrorV0){
-    const nextSafeActions = error.code==="ticket_store_scope_mismatch"
-      ? ["Use a verified worktree belonging to the addressed repository."]
-      : error.code==="ticket_store_cas_conflict"
-        ? ["Refresh ticket.graph.snapshot and submit against its current snapshotId."]
-        : error.code==="ticket_store_publish_invalid"
-          ||error.code==="ticket_store_revision_conflict"
-          ? ["Correct the proposed Ticket definitions or relations and submit a new proposal."]
-          : ["Restore or republish the reviewed Ticket store generation before retrying."];
+  if(error instanceof TicketLedgerError){
+    const code = error.code === "ledger_missing"
+      ? "ticket_ledger_missing"
+      : error.code === "source_changed_during_read"
+        ? "ticket_ledger_source_changed"
+        : error.code === "ref_not_found"
+          ? "ticket_ledger_ref_not_found"
+          : error.code === "invalid_document"
+            || error.code === "invalid_path"
+            || error.code === "file_too_large"
+            || error.code === "ledger_too_large"
+            || error.code === "unsupported_file"
+            || error.code === "symlink"
+            ? "ticket_ledger_invalid_document"
+            : error.code === "invalid_graph"
+              ? "ticket_ledger_invalid_graph"
+              : error.code === "unmerged"
+                ? "ticket_ledger_unmerged"
+                : "ticket_ledger_io";
     return new KnowledgeError(
-      error.code,
+      code,
       error.message,
       error.details,
-      nextSafeActions,
+      ["Inspect and repair `.vibehub/tickets`, then retry the read."],
     );
   }
   const message=error instanceof Error?error.message:String(error);
@@ -884,53 +564,18 @@ function requiresTicketScope(operation:string):operation is
   | "ticket.graph.snapshot"
   | "ticket.subject.inspect"
   | "ticket.trace.list"
-  | "ticket.proposal.submit"
-  | "ticket.proposal.inspect"
-  | "ticket.proposal.list"
-  | "ticket.proposal.validation.record"
-  | "ticket.proposal.validation.inspect"
-  | "ticket.proposal.validation.list"
-  | "ticket.proposal.review.inspect"
-  | "ticket.proposal.authority.decide"
-  | "ticket.proposal.apply" {
+{
   return operation==="ticket.graph.snapshot"
     || operation==="ticket.subject.inspect"
-    || operation==="ticket.trace.list"
-    || operation==="ticket.proposal.submit"
-    || operation==="ticket.proposal.inspect"
-    || operation==="ticket.proposal.list"
-    || operation==="ticket.proposal.validation.record"
-    || operation==="ticket.proposal.validation.inspect"
-    || operation==="ticket.proposal.validation.list"
-    || operation==="ticket.proposal.review.inspect"
-    || operation==="ticket.proposal.authority.decide"
-    || operation==="ticket.proposal.apply";
+    || operation==="ticket.trace.list";
 }
-function evaluatesOutsideSqlite(operation:string):operation is
+function isTicketReadOperation(operation:string):operation is
   | "ticket.graph.snapshot"
   | "ticket.subject.inspect"
-  | "ticket.trace.list"
-  | "ticket.proposal.review.inspect"
-  | "ticket.proposal.authority.decide"
-  | "ticket.proposal.apply" {
+  | "ticket.trace.list" {
   return operation==="ticket.graph.snapshot"
     || operation==="ticket.subject.inspect"
-    || operation==="ticket.trace.list"
-    || operation==="ticket.proposal.review.inspect"
-    || operation==="ticket.proposal.authority.decide"
-    || operation==="ticket.proposal.apply";
-}
-function leavesRetryableFailureUnreceipted(
-  operation:string,
-  outcome:OperationResult,
-):boolean {
-  return !outcome.ok && (
-    operation==="ticket.proposal.authority.decide"
-    || operation==="ticket.proposal.apply"
-  );
-}
-function usesTicketOutcomeBlob(operation:string):boolean {
-  return requiresTicketScope(operation);
+    || operation==="ticket.trace.list";
 }
 function requiredTicketScope(
   scope:TicketDispatchScopeV0|undefined,
@@ -946,13 +591,13 @@ function ticketReviewNextSafeActions(code:string):string[]{
     return ["Correct the Ticket selector or restart from ticket.graph.snapshot."];
   }
   if(code==="not_found"){
-    return ["Publish a canonical Ticket generation for this worktree."];
+    return ["Create `.vibehub/tickets/protocol.yaml` and at least one valid Ticket document."];
   }
   if(code==="snapshot_expired"){
     return ["Refresh ticket.graph.snapshot and retry against its new snapshotId."];
   }
   if(code==="projection_too_large"){
-    return ["Reduce the published Ticket graph below the declared V0 capacity."];
+    return ["Reduce the Ticket ledger below the declared review capacity."];
   }
-  return ["Inspect and repair the canonical Ticket generation or its projection receipts."];
+  return ["Inspect and repair the Git-native Ticket documents in this worktree."];
 }

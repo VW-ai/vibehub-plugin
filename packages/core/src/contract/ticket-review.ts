@@ -5,8 +5,8 @@
  * through the opt-in `./contracts/ticket-review-schemas` package subpath.
  */
 
-export const TICKET_REVIEW_SCHEMA_VERSION = 1 as const;
-export const TICKET_REVIEW_PROJECTOR_VERSION = "ticket-review-v0" as const;
+export const TICKET_REVIEW_SCHEMA_VERSION = 2 as const;
+export const TICKET_REVIEW_PROJECTOR_VERSION = "ticket-review-v1" as const;
 export const TICKET_REVIEW_DEFAULT_PAGE_SIZE = 200;
 export const TICKET_REVIEW_MAX_PAGE_SIZE = 200;
 export const TICKET_REVIEW_MAX_TICKETS = 1_000;
@@ -45,7 +45,6 @@ export const TICKET_REVIEW_TRACE_KINDS = [
   "outcome",
   "evidence",
   "artifact",
-  "proposal",
   "mutation_receipt",
   "context_binding",
 ] as const;
@@ -58,6 +57,58 @@ export type TicketReviewSnapshotCapabilityV0 =
   typeof TICKET_REVIEW_SNAPSHOT_CAPABILITIES[number];
 export type TicketReviewTraceKindV0 =
   typeof TICKET_REVIEW_TRACE_KINDS[number];
+
+export interface TicketReviewAcceptanceV0 {
+  acceptanceId: string;
+  criterion: string;
+}
+
+export interface TicketReviewContextRefV0 {
+  ref: string;
+  purpose: string;
+}
+
+export interface TicketReviewDependsOnRelationV0 {
+  relationRef: string;
+  type: "depends_on";
+  targetTicketId: string;
+  rationale?: string;
+}
+
+export interface TicketReviewExecutableContextV0 {
+  outcome: string;
+  context: string;
+  acceptance: TicketReviewAcceptanceV0[];
+  constraints: string[];
+  contextRefs: TicketReviewContextRefV0[];
+  relations: TicketReviewDependsOnRelationV0[];
+  provenanceRefs: string[];
+}
+
+interface TicketReviewSourceMetadataBaseV0 {
+  repositoryRoot: string;
+  repositoryIncarnation: string;
+  resolvedCommit: string;
+  graphDigest: string;
+  sourceToken: string;
+}
+
+export type TicketReviewSourceMetadataV0 =
+  | TicketReviewSourceMetadataBaseV0 & {
+      mode: "worktree";
+      worktreeIdentity: string;
+      worktreeRoot: string;
+      branch: string | null;
+      committedGraphDigest: string | null;
+      semanticDirty: boolean;
+      dirtyPaths: string[];
+      dirtyPathsTruncated: boolean;
+    }
+  | TicketReviewSourceMetadataBaseV0 & {
+      mode: "ref";
+      resolvedCommit: string;
+      requestedRef: string;
+    };
 
 export type TicketReviewSubjectRefV0 =
   | {
@@ -103,7 +154,7 @@ export type TicketReviewRelationCapabilitiesV0 = Record<
 
 export interface TicketReviewTicketProjectionV0 {
   ticketId: string;
-  definitionRevision: number;
+  ticketRevision: string;
   outcome: string;
   provenanceRefs: string[];
   capabilities: TicketReviewTicketCapabilitiesV0;
@@ -144,6 +195,7 @@ export interface TicketReviewProjectionHeaderV0 {
   snapshotRevision: string;
   projectionWatermark: string;
   topologyDigest: string;
+  source: TicketReviewSourceMetadataV0;
 }
 
 export interface TicketGraphSnapshotRequestV0 {
@@ -170,6 +222,7 @@ export type TicketReviewInspectedSubjectV0 =
   | {
       kind: "ticket";
       ticket: TicketReviewTicketProjectionV0;
+      contextPackage: TicketReviewExecutableContextV0;
       prerequisiteRelationRefs: string[];
       dependentRelationRefs: string[];
     }
@@ -187,7 +240,7 @@ export type TicketReviewTraceSubjectV0 =
   | {
       kind: "ticket";
       ticketId: string;
-      boundDefinitionRevision: number;
+      boundTicketRevision: string;
     }
   | {
       kind: "relation";

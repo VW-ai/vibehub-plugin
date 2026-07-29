@@ -77,6 +77,7 @@ relations:
     type: relates_to
 anchors:
   - file: "packages/core/src/git-facade.ts"
-  - file: "packages/core/src/git-ticket-store.ts"
-  - file: "packages/core/src/ticket-application-service.ts"
-  - file: "packages/core/src/ticket-proposal-service.ts"
+  - file: "packages/core/src/ticket-ledger/reader.ts"
+  - file: "packages/core/src/ticket-ledger/projection.ts"
+  - file: "packages/core/src/ticket-review-resolver.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"

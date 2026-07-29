@@ -80,7 +80,49 @@ export interface CommitInventoryRow {
   contentHash?: string;
 }
 
+export interface GitTreeFile {
+  path: string;
+  mode: string;
+  objectType: string;
+  objectId: string;
+  sizeBytes: number | null;
+}
+
+export interface GitStatusPath {
+  path: string;
+  indexStatus: string;
+  worktreeStatus: string;
+  originalPath?: string;
+  unmerged: boolean;
+}
+
 const compareRepoPaths=(a:string,b:string):number=>Buffer.compare(Buffer.from(a,"utf8"),Buffer.from(b,"utf8"));
+
+const repositoryRelativePath = (value: string, label: string): string => {
+  if (
+    value.length === 0
+    || value.includes("\0")
+    || value.includes("\n")
+    || value.includes("\r")
+    || value.includes("\\")
+    || path.posix.isAbsolute(value)
+    || path.posix.normalize(value) !== value
+    || value.split("/").includes("..")
+  ) {
+    throw new GitError([label, value], null, "invalid repository-relative path");
+  }
+  return value;
+};
+
+const exactCommit = (value: string): boolean =>
+  /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/u.test(value);
+
+const statusIsUnmerged = (indexStatus: string, worktreeStatus: string): boolean =>
+  indexStatus === "U"
+  || worktreeStatus === "U"
+  || ["DD", "AU", "UD", "UA", "DU", "AA", "UU"].includes(
+    `${indexStatus}${worktreeStatus}`,
+  );
 
 export interface PrFact {
   number: number;
@@ -119,6 +161,27 @@ export class GitFacade {
       throw new GitError(["rev-parse", "--git-common-dir"], r.status, r.stderr);
     }
     return path.dirname(r.stdout.trim());
+  }
+
+  /** Canonical common Git directory shared by every linked worktree. */
+  static commonDirAt(anyPath: string): string {
+    const args = [
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-common-dir",
+    ];
+    const r = run("git", args, anyPath);
+    if (r.status !== 0) throw new GitError(args, r.status, r.stderr);
+    const result = r.stdout.trim();
+    if (
+      result.length === 0
+      || result.includes("\n")
+      || result.includes("\r")
+      || !path.isAbsolute(result)
+    ) {
+      throw new GitError(args, r.status, "git returned an invalid common directory");
+    }
+    return path.normalize(result);
   }
 
   /**
@@ -394,9 +457,157 @@ export class GitFacade {
     return r.stdout.trim();
   }
 
+  /** Resolve an arbitrary ref to one exact commit without changing checkout state. */
+  static resolveCommitAt(anyPath: string, ref: string): string {
+    if (
+      typeof ref !== "string"
+      || ref.trim().length === 0
+      || ref.includes("\0")
+      || ref.includes("\n")
+      || ref.includes("\r")
+    ) {
+      throw new GitError(
+        ["rev-parse", "--verify", String(ref)],
+        null,
+        "invalid Git ref",
+      );
+    }
+    const args = [
+      "rev-parse",
+      "--verify",
+      "--end-of-options",
+      `${ref}^{commit}`,
+    ];
+    const r = run("git", args, anyPath);
+    if (r.status !== 0) throw new GitError(args, r.status, r.stderr);
+    const commit = r.stdout.trim();
+    if (!exactCommit(commit)) {
+      throw new GitError(args, r.status, "git returned an invalid commit id");
+    }
+    return commit;
+  }
+
+  /** List every tree entry below one literal path at an already-resolved commit. */
+  static listTreeFilesAt(
+    anyPath: string,
+    commit: string,
+    pathspec: string,
+  ): GitTreeFile[] {
+    if (!exactCommit(commit) || !GitFacade.hasCommitAt(anyPath, commit)) {
+      throw new GitError(["ls-tree", commit], 1, "commit not found");
+    }
+    const relative = repositoryRelativePath(pathspec, "ls-tree");
+    const args = [
+      "ls-tree",
+      "-r",
+      "-l",
+      "-z",
+      "--full-tree",
+      commit,
+      "--",
+      `:(top,literal)${relative}`,
+    ];
+    const r = runBuffer("git", args, anyPath);
+    if (r.status !== 0) throw new GitError(args, r.status, r.stderr);
+    const files: GitTreeFile[] = [];
+    for (const record of r.stdout.toString("utf8").split("\0").filter(Boolean)) {
+      const tab = record.indexOf("\t");
+      if (tab < 0) throw new GitError(args, r.status, "malformed ls-tree entry");
+      const [mode, objectType, objectId, rawSize] =
+        record.slice(0, tab).trim().split(/\s+/u);
+      const filePath = record.slice(tab + 1);
+      const sizeBytes = rawSize === "-" ? null : Number(rawSize);
+      if (
+        !mode
+        || !objectType
+        || !objectId
+        || !rawSize
+        || !filePath
+        || (sizeBytes !== null
+          && (!Number.isSafeInteger(sizeBytes) || sizeBytes < 0))
+      ) {
+        throw new GitError(args, r.status, "malformed ls-tree entry");
+      }
+      files.push({ path: filePath, mode, objectType, objectId, sizeBytes });
+    }
+    return files.sort((left, right) => compareRepoPaths(left.path, right.path));
+  }
+
+  /** Read one repository-relative blob from an exact commit. */
+  static readFileAtCommit(
+    anyPath: string,
+    commit: string,
+    repositoryRelativeFile: string,
+  ): Buffer {
+    if (!exactCommit(commit) || !GitFacade.hasCommitAt(anyPath, commit)) {
+      throw new GitError(["cat-file", commit], 1, "commit not found");
+    }
+    const relative = repositoryRelativePath(
+      repositoryRelativeFile,
+      "cat-file",
+    );
+    const object = `${commit}:${relative}`;
+    const args = ["cat-file", "blob", object];
+    const r = runBuffer("git", args, anyPath);
+    if (r.status !== 0) throw new GitError(args, r.status, r.stderr);
+    return r.stdout;
+  }
+
+  /**
+   * Return tracked, untracked, deleted, renamed, and conflicted paths below
+   * one literal worktree path. The call is scoped to `anyPath` rather than the
+   * common repository root so sibling worktrees cannot leak into the result.
+   */
+  static statusPathsAt(anyPath: string, pathspec: string): GitStatusPath[] {
+    const relative = repositoryRelativePath(pathspec, "status");
+    const args = [
+      "status",
+      "--porcelain=v1",
+      "-z",
+      "--untracked-files=all",
+      "--ignore-submodules=all",
+      "--",
+      `:(top,literal)${relative}`,
+    ];
+    const r = runBuffer("git", args, anyPath);
+    if (r.status !== 0) throw new GitError(args, r.status, r.stderr);
+    const records = r.stdout.toString("utf8").split("\0");
+    const paths: GitStatusPath[] = [];
+    for (let index = 0; index < records.length; index += 1) {
+      const record = records[index]!;
+      if (record.length === 0) continue;
+      if (record.length < 4 || record[2] !== " ") {
+        throw new GitError(args, r.status, "malformed porcelain status entry");
+      }
+      const indexStatus = record[0]!;
+      const worktreeStatus = record[1]!;
+      const filePath = record.slice(3);
+      const renamed =
+        indexStatus === "R"
+        || indexStatus === "C"
+        || worktreeStatus === "R"
+        || worktreeStatus === "C";
+      const originalPath = renamed ? records[index + 1] : undefined;
+      if (renamed) index += 1;
+      if (filePath.length === 0 || (renamed && !originalPath)) {
+        throw new GitError(args, r.status, "malformed porcelain rename entry");
+      }
+      paths.push({
+        path: filePath,
+        indexStatus,
+        worktreeStatus,
+        ...(originalPath === undefined ? {} : { originalPath }),
+        unmerged: statusIsUnmerged(indexStatus, worktreeStatus),
+      });
+    }
+    return paths.sort((left, right) =>
+      compareRepoPaths(left.path, right.path)
+      || compareRepoPaths(left.originalPath ?? "", right.originalPath ?? ""));
+  }
+
   /** True only when the exact object id names a commit reachable in this repo's object store. */
   static hasCommitAt(anyPath: string, commitSha: string): boolean {
-    if (!/^[0-9a-f]{40}$/.test(commitSha)) return false;
+    if (!exactCommit(commitSha)) return false;
     const r = run("git", ["cat-file", "-e", `${commitSha}^{commit}`], anyPath);
     return r.status === 0;
   }

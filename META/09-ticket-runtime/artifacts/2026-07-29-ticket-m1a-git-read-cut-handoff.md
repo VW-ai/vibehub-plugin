@@ -1,9 +1,11 @@
 # Ticket M1A implementation handoff: Git read cut
 
 Date: 2026-07-29
-Status: ready to implement
+Status: implemented
 Parent plan:
 `2026-07-29-ticket-git-native-skill-driven-pivot-plan.md`
+Closure:
+`2026-07-29-ticket-m1a-git-read-cut-implementation.md`
 
 ## Outcome
 

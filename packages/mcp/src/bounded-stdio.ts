@@ -26,11 +26,6 @@ export const MCP_STDIO_MAX_MESSAGE_BYTES = 64 * 1024 * 1024;
  */
 export const MCP_STDIO_OPERATION_ENVELOPE_ALLOWANCE_BYTES = 1024 * 1024;
 
-/** Retained as the named production wire limit for proposal submissions. */
-export const MCP_STDIO_TICKET_PROPOSAL_MAX_MESSAGE_BYTES =
-  OPERATION_INPUT_BYTE_LIMITS["ticket.proposal.submit"]
-  + MCP_STDIO_OPERATION_ENVELOPE_ALLOWANCE_BYTES;
-
 export interface BoundedStdioServerTransportOptions {
   maximumMessageBytes?: number;
   operationInputByteLimits?: Readonly<Record<string, number>>;
@@ -89,7 +84,7 @@ export class BoundedStdioServerTransport implements Transport {
       envelopeAllowanceBytes,
       "operationEnvelopeAllowanceBytes",
     );
-    const inputByteLimits =
+    const inputByteLimits: Readonly<Record<string, number>> =
       options.operationInputByteLimits ?? OPERATION_INPUT_BYTE_LIMITS;
     for (const [operation, maximumInputBytes] of Object.entries(
       inputByteLimits,

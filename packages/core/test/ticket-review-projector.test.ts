@@ -25,6 +25,9 @@ import {
 import { ticketReviewV4Source } from "./fixtures/ticket-review-v4.js";
 
 const AT = "2026-07-28T12:00:00-07:00";
+const REVISION_A = `sha256:${"c".repeat(64)}`;
+const REVISION_B = `sha256:${"d".repeat(64)}`;
+const REVISION_C = `sha256:${"e".repeat(64)}`;
 
 function cloneSource(): TicketReviewProjectionSourceV0 {
   return structuredClone(ticketReviewV4Source);
@@ -53,7 +56,7 @@ function makeTicketTrace(
     subject: {
       kind: "ticket",
       ticketId: "TKT-124",
-      boundDefinitionRevision: 1,
+      boundTicketRevision: REVISION_A,
     },
     producer: { kind: "system", ref: "fixture-system" },
     occurredAt: AT,
@@ -106,7 +109,7 @@ function makeTicketValidationProjection(
     subject: {
       kind: "ticket",
       ticketId: "TKT-124",
-      definitionRevision: 1,
+      ticketRevision: REVISION_A,
     },
     capability: "validation",
     summary: {
@@ -291,7 +294,7 @@ describe("Ticket review projector", () => {
       .toBe(true);
     expect(ticket.subject).toMatchObject({
       kind: "ticket",
-      ticket: { ticketId: "TKT-124", definitionRevision: 1 },
+      ticket: { ticketId: "TKT-124", ticketRevision: REVISION_A },
     });
 
     const relation = inspectTicketReviewSubjectV0(ticketReviewV4Source, {
@@ -469,7 +472,7 @@ describe("Ticket review projector", () => {
     if (revisionProjection.subject.kind !== "ticket") {
       throw new Error("fixture must be ticket-bound");
     }
-    revisionProjection.subject.definitionRevision = 2;
+    revisionProjection.subject.ticketRevision = REVISION_B;
     wrongRevision.currentCapabilityProjections.push(revisionProjection);
     expect(captureError(
       () => projectTicketGraphSnapshotV0(wrongRevision),
@@ -515,7 +518,7 @@ describe("Ticket review projector", () => {
   it("keeps topology identity independent of definition and snapshot-local relation identity", () => {
     const source = cloneSource();
     const baseline = projectTicketGraphSnapshotV0(source);
-    source.ticketDefinitions[0]!.definitionRevision += 1;
+    source.ticketDefinitions[0]!.ticketRevision = REVISION_B;
     source.directUnlocks[0]!.relationRef =
       "snapshot-local-relation:renamed";
     source.projectionWatermark =
@@ -524,6 +527,33 @@ describe("Ticket review projector", () => {
     const changed = projectTicketGraphSnapshotV0(source);
     expect(changed.snapshotId).not.toBe(baseline.snapshotId);
     expect(changed.topologyDigest).toBe(baseline.topologyDigest);
+  });
+
+  it("keeps display-only Git metadata out of snapshot identity", () => {
+    const baselineSource = cloneSource();
+    const baseline = projectTicketGraphSnapshotV0(baselineSource);
+    const displayChanged = cloneSource();
+    if (displayChanged.source.mode !== "worktree") {
+      throw new Error("fixture must use a worktree source");
+    }
+    displayChanged.source.branch = "renamed-branch";
+    displayChanged.source.semanticDirty = true;
+    displayChanged.source.dirtyPaths = [
+      ".vibehub/tickets/tickets/read-authority.yaml",
+    ];
+    displayChanged.source.dirtyPathsTruncated = true;
+
+    const changed = projectTicketGraphSnapshotV0(displayChanged);
+    expect(changed.snapshotId).toBe(baseline.snapshotId);
+    expect(changed.source).toMatchObject({
+      branch: "renamed-branch",
+      semanticDirty: true,
+      dirtyPathsTruncated: true,
+    });
+
+    displayChanged.source.sourceToken = "fixture-ticket-source-v4-new";
+    expect(projectTicketGraphSnapshotV0(displayChanged).snapshotId)
+      .not.toBe(baseline.snapshotId);
   });
 
   it("keeps inspect and trace strictly bound to the visible snapshot", () => {
@@ -736,23 +766,23 @@ describe("Ticket review projector", () => {
     expect(traces.records[0]!.targets).toHaveLength(3);
   });
 
-  it("displays historical ticket traces and rejects future-bound revisions", () => {
-    const historical = cloneSource();
-    const ticket = historical.ticketDefinitions.find(
+  it("accepts exact ticket trace revisions and rejects mismatched revisions", () => {
+    const exact = cloneSource();
+    const ticket = exact.ticketDefinitions.find(
       (definition) => definition.ticketId === "TKT-124",
     )!;
-    ticket.definitionRevision = 2;
-    historical.traceRecords.push(makeTicketTrace({
-      recordRef: "trace:historical-revision",
+    ticket.ticketRevision = REVISION_B;
+    exact.traceRecords.push(makeTicketTrace({
+      recordRef: "trace:exact-revision",
       subject: {
         kind: "ticket",
         ticketId: "TKT-124",
-        boundDefinitionRevision: 1,
+        boundTicketRevision: REVISION_B,
       },
     }));
 
-    const snapshot = projectTicketGraphSnapshotV0(historical);
-    const traces = listTicketReviewTraceV0(historical, {
+    const snapshot = projectTicketGraphSnapshotV0(exact);
+    const traces = listTicketReviewTraceV0(exact, {
       snapshotId: snapshot.snapshotId,
       subject: { kind: "ticket", ticketId: "TKT-124" },
     });
@@ -760,25 +790,25 @@ describe("Ticket review projector", () => {
     expect(traces.records[0]!.subject).toEqual({
       kind: "ticket",
       ticketId: "TKT-124",
-      boundDefinitionRevision: 1,
+      boundTicketRevision: REVISION_B,
     });
 
-    const future = structuredClone(historical);
-    future.traceRecords.push(makeTicketTrace({
-      recordRef: "trace:future-revision",
+    const mismatched = structuredClone(exact);
+    mismatched.traceRecords.push(makeTicketTrace({
+      recordRef: "trace:mismatched-revision",
       subject: {
         kind: "ticket",
         ticketId: "TKT-124",
-        boundDefinitionRevision: 3,
+        boundTicketRevision: REVISION_C,
       },
     }));
     expect(captureError(
-      () => projectTicketGraphSnapshotV0(future),
+      () => projectTicketGraphSnapshotV0(mismatched),
       "projection_invariant_failed",
     ).details).toMatchObject({
-      cause: "future_trace_definition_revision",
-      boundDefinitionRevision: 3,
-      visibleDefinitionRevision: 2,
+      cause: "trace_ticket_revision_mismatch",
+      boundTicketRevision: REVISION_C,
+      visibleTicketRevision: REVISION_B,
     });
   });
 
@@ -854,8 +884,12 @@ describe("Ticket review projector", () => {
         { length: count },
         (_, index) => ({
           ticketId: `capacity-${index.toString().padStart(4, "0")}`,
-          definitionRevision: 1,
+          ticketRevision: REVISION_A,
           outcome: `Capacity fixture ${index}`,
+          context: "",
+          acceptance: [],
+          constraints: [],
+          contextRefs: [],
         }),
       );
       tooManyTickets.directUnlocks = [];
