@@ -1,5 +1,5 @@
 progress:
-  completion: 0.68
+  completion: 0.78
   status: active
   milestones:
     - id: "m0-git-skill-authority-cut"
@@ -29,7 +29,9 @@ progress:
       evidence: "Strict Git Review and Decision documents, full semantic-ledger identity, exact-source no-replace writers, public Review/Decision operations, current/historical/unverified trace projection, capability-scoped secure host, quiet Inspector interventions, active-session authority attestation, and Skill intelligence handoff are implemented in b0d8b1f411950b0adc5f610956890c8221986f60. The independently validated eight-Ticket truth-boundary revision was applied through ticket.worktree.patch, reloaded at 11 Tickets and 11 direct relations with graph digest sha256:8d126f52313d97fd7ed529ae6e52847a3d426d3fcf6d22b9420979f385e94992, and path-exact checkpointed in 802111ca57d1916a96dd425fa2c40108600be333; see the dated M3 implementation artifact."
     - id: "m3-5-durable-decision-attestation"
       name: "Durable cross-process human Decision attestation"
-      status: planned
+      status: completed
+      completed_at: "2026-07-30T14:26:57-07:00"
+      evidence: "The installed Ticket Review Skill and production loopback host now enroll a named local WebAuthn authority, require user presence and verification for plan-review and protected-boundary Decisions, append exact detached Git receipts, and let fresh CLI/MCP/Skill processes verify them against a dynamically reread repo-external trust registry. Complete repository/worktree/checkout/Decision/scope binding, tamper/replay/expiry/revocation failure, Decision-first recovery, protected UI exposure, release packaging, and adversarial tests are implemented in dbc60dc3fbc22995060a0ee1e6768602c928470c. The independently validated implementation settlement updated the M3.5 Ticket without changing topology, producing 11 Tickets and 11 direct relations at graph digest sha256:deb8bbe622fff55343016cae043e0792a0b7a6c6dcb330a28e9ffdc7ca2421a9 and was path-exact checkpointed in e8f2afd23d5651b3a90442f5d92e02ee2559720c; see the dated M3.5 implementation artifact."
     - id: "m4-ticket-execution-closeout"
       name: "Execute, verify, and close one Ticket through Outcome and Evidence"
       status: planned
@@ -37,9 +39,9 @@ progress:
       name: "Complete one real dogfood loop and prove the legacy cut remains clean"
       status: planned
   next:
-    - "Plan and implement the newly exposed durable Decision-attestation prerequisite so a fresh host or Skill process can verify exact human authority without trusting editable YAML, SQLite, or a previous in-memory session."
-    - "Then advance M4 from ticket-execution-closeout-ready after the exact context-binding and closeout decisions are durably resolved; implement execution, Outcome, Evidence, and semantic closeout without adding a generic workflow engine."
-    - "Route ticket-context-binding-decided, ticket-closeout-contract-decided, and ticket-dogfood-target-authorized to the repository owner or designated human authority; do not advance their gated M4 or M5 paths until the exact decisions are durably ratified."
+    - "Prepare concrete option and evidence packets for ticket-context-binding-decided, ticket-closeout-contract-decided, and ticket-dogfood-target-authorized, then let the repository owner ratify each exact protected choice through the installed WebAuthn review surface; do not ask the human to decide objectively adjudicable implementation details."
+    - "Advance M4 from ticket-execution-closeout-ready only after the exact context-binding and closeout successors are current, machine-valid, and durably human-attested; implement execution, Outcome, Evidence, and semantic closeout without adding a generic workflow engine."
+    - "Use the independently authorized bounded Plugin feature for M5, prove the full graph through a real parallel-path join, and retain SQLite only for disposable live execution state."
   commits:
     - "d92c99c docs(ticket): plan git-native skill-driven pivot"
     - "eb0590c docs(ticket): prepare git read authority cut"
@@ -50,3 +52,5 @@ progress:
     - "f73680c fix(ticket): resolve local checkpoint cli"
     - "b0d8b1f feat(ticket): add git-native review interventions"
     - "802111c chore(vibehub): ticket checkpoint"
+    - "dbc60dc feat(ticket): add durable human decision attestation"
+    - "e8f2afd chore(vibehub): ticket checkpoint"

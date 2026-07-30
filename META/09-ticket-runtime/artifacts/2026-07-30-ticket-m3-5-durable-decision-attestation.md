@@ -1,4 +1,4 @@
-# Ticket M3.5 design: durable human Decision attestation
+# Ticket M3.5 implementation: durable human Decision attestation
 
 ## Outcome
 
@@ -177,3 +177,21 @@ continues to bind its socket to loopback only.
   intentionally stopped before a real Touch ID/passkey prompt; automated host
   integration tests use a real P-256 signature fixture rather than claiming a
   human gesture occurred.
+
+## Settlement
+
+The implementation is committed in
+`dbc60dc3fbc22995060a0ee1e6768602c928470c`.
+
+The exact one-Ticket implementation settlement candidate had SHA-256
+`7f89f1145f90f25712b6d3877815101f13ed28a7580c2ca0bb76570fd1c98ddb`.
+An independent Ticket Validation pass bound it to the fresh committed source,
+inspected the changed Ticket, its direct predecessor and dependent, and their
+empty traces, and returned `passed` with `delegated` authority and no material
+finding. The public writer applied the unchanged candidate at Ticket revision
+`sha256:58fd43058b27687a199f57fed5ecff790335fd6f1fde40e85a321d755d5c7565`.
+
+The settled graph remains 11 Tickets and 11 direct relations at graph digest
+`sha256:deb8bbe622fff55343016cae043e0792a0b7a6c6dcb330a28e9ffdc7ca2421a9`.
+The exact changed Ticket path was checkpointed in
+`e8f2afd23d5651b3a90442f5d92e02ee2559720c`.

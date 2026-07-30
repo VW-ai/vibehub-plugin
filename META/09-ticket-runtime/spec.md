@@ -15,7 +15,7 @@ HTML           = human projection and intervention surface
 SQLite         = disposable live coordination, index, and cache
 ```
 
-The implementation pivot is planned in
+The implementation pivot began from
 [`2026-07-29-ticket-git-native-skill-driven-pivot-plan.md`](artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md).
 
 M1A established the complete Git-document read path through Core, CLI, MCP,
@@ -30,6 +30,12 @@ M2 now adds the first Skill intelligence over that hand:
 Planning shapes a flat executable graph through Backchain and Forward
 Normalize; an independent semantic validator returns graph validity separately
 from human execution authority.
+
+M3 adds strict Git-native Review and Decision facts plus the structured graph
+intervention surface. M3.5 adds durable WebAuthn human authority: the
+authenticator retains the private key, a repo-external registry supplies
+revocable public trust, detached Git receipts bind one exact Decision, and
+fresh CLI, MCP, or Skill processes verify it independently.
 
 ## Canonical decisions
 
@@ -79,9 +85,10 @@ from human execution authority.
   only an exact active-host attestation may project a gate. Skills decide how
   non-authoritative review context changes a candidate.
 - [`contract-ticket-durable-decision-attestation-001`](specs/contract-ticket-durable-decision-attestation-001.yaml):
-  a new M3.5 boundary must let a fresh host or Agent verify one exact human
-  Decision without trusting editable YAML, SQLite, or a previous process, and
-  must supply the real installed-plugin identity and review entrypoint.
+  M3.5 lets a fresh host or Agent verify one exact WebAuthn-attested human
+  Decision without trusting editable YAML, SQLite, browser claims, or a
+  previous process. The installed review entrypoint supports enrollment,
+  plan review, protected-boundary Decisions, re-attestation, and revocation.
 
 ### Human surface
 
@@ -110,9 +117,6 @@ from human execution authority.
 
 ## Open focused decisions
 
-- [`contract-ticket-durable-decision-attestation-001`](specs/contract-ticket-durable-decision-attestation-001.yaml):
-  the required trust and recovery properties are fixed; focused research must
-  choose the smallest local signing/identity ceremony and production adapter.
 - [`decision-ticket-context-binding-001`](specs/decision-ticket-context-binding-001.yaml):
   exact Feature Room and repository context compilation.
 - [`decision-ticket-workflow-role-001`](specs/decision-ticket-workflow-role-001.yaml):
@@ -219,9 +223,8 @@ M3—the Git-native review intervention loop—is implemented:
   evidence; only the exact Decision written or explicitly re-attested by the
   active trusted host session projects as execution authority, and that
   in-memory receipt never enters SQLite;
-- the default CLI graph host is truly read-only, while the host API can expose
-  only the intervention actions covered by an injected trusted grant; the real
-  installed-plugin adapter remains M3.5;
+- the M3 default graph host is read-only without trusted capabilities, while
+  the host API exposes only intervention actions covered by an injected grant;
 - current and historical facts project to their graph, Ticket, or relation
   loci without changing graph topology or layout;
 - the complete direct-unlock canvas remains primary, with quiet progressive
@@ -235,13 +238,41 @@ M3—the Git-native review intervention loop—is implemented:
 Review remains optional intelligence rather than a mandatory activation stage.
 Adversarial review established that editable Decision YAML cannot authenticate
 its own human authority. M3 therefore fails closed with active-session
-attestation, and a new M3.5 Ticket owns durable cross-process attestation before
-protected context-binding and closeout Decisions can truthfully unblock M4.
+attestation. M3.5 now supplies durable cross-process attestation before
+protected context-binding and closeout Decisions truthfully unblock M4.
 The independently validated truth-boundary candidate was applied as 11 Tickets
 and 11 direct relations at graph digest
 `sha256:8d126f52313d97fd7ed529ae6e52847a3d426d3fcf6d22b9420979f385e94992`
 and path-exact checkpointed in
 `802111ca57d1916a96dd425fa2c40108600be333`.
+
+M3.5 is implemented:
+
+- the installed Ticket Review Skill resolves the versioned Plugin runtime and
+  opens one exact worktree graph;
+- enrollment and every Decision or revocation require WebAuthn user presence
+  and user verification;
+- the private key remains in the authenticator, while an owned 0700/0600
+  repo-external registry stores only public verification and revocation facts;
+- append-only Git attestation receipts bind the complete Decision, principal,
+  repository incarnation, worktree, branch or detached commit, graph or Ticket
+  subject, protected boundary and selection or delegated scope, origin,
+  credential, nonce, and validity window;
+- raw Decisions remain current-unverified without a current exact receipt;
+  fresh Core, CLI, MCP, and Skill readers dynamically reread revocation state;
+- the production Inspector exposes both plan-review and protected-boundary
+  ceremonies without accepting browser-supplied authority, time, path, or
+  proof fields.
+
+Implementation commit `dbc60dc3fbc22995060a0ee1e6768602c928470c`
+passes 529 package tests, complete typechecks/builds, npm package verification,
+Skill validation, and release-marketplace verification. Its independently
+validated one-Ticket settlement keeps 11 Tickets and 11 direct relations at
+graph digest
+`sha256:deb8bbe622fff55343016cae043e0792a0b7a6c6dcb330a28e9ffdc7ca2421a9`
+and is path-exact checkpointed in
+`e8f2afd23d5651b3a90442f5d92e02ee2559720c`.
+
 Execution, Outcome, Evidence, and closeout remain M4.
 
 The first real write also exposed a host-integration boundary: the Agent
@@ -263,3 +294,4 @@ Implementation evidence is recorded in:
 - [`First Git Ticket Graph validated candidate`](artifacts/2026-07-29-first-git-ticket-graph-validated-candidate.json)
 - [`Ticket M3 Git-native review intervention`](artifacts/2026-07-30-ticket-m3-git-review-intervention.md)
 - [`Ticket M3/M3.5 authority-boundary validated candidate`](artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json)
+- [`Ticket M3.5 durable Decision attestation`](artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md)
