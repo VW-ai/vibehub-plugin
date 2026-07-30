@@ -71,8 +71,8 @@ export function resolveVibehubInvocation() {
   }
   const here=path.dirname(fileURLToPath(import.meta.url));
   const localCandidates=[
-    path.resolve(here,"../../../main.js"),
     path.resolve(here,"../../packages/cli/dist/main.js"),
+    path.resolve(here,"../../../main.js"),
   ];
   const local=localCandidates.find(candidate=>fs.statSync(
     candidate,

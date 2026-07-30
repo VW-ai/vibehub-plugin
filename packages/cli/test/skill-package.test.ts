@@ -594,6 +594,82 @@ describe("production skill package",()=>{
     });
   });
 
+  it("prefers the packaged local CLI for checkpoint over PATH",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-checkpoint-local-"));
+    const packaged=path.join(temp,"managed-assets","skills");
+    const home=path.join(temp,"home");
+    const bin=path.join(temp,"bin");
+    fs.cpSync(skills,packaged,{recursive:true});
+    fs.mkdirSync(home);
+    fs.mkdirSync(bin);
+    fs.writeFileSync(
+      path.join(temp,"main.js"),
+      "let raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n",
+    );
+    const stale=path.join(bin,"vibehub");
+    fs.writeFileSync(stale,"#!/bin/sh\nprintf '%s\\n' 'PATH fallback used'\n");
+    fs.chmodSync(stale,0o755);
+    const selection=JSON.stringify({source:{},changedPaths:[]});
+    const env={
+      ...process.env,
+      HOME:home,
+      PATH:`${bin}:${process.env.PATH??""}`,
+      VIBEHUB_BIN:undefined,
+    };
+    const run=spawnSync(process.execPath,[
+      path.join(packaged,"scripts/vh-checkpoint.mjs"),
+      "prepare","--scope","ticket","--repo",temp,
+    ],{input:selection,encoding:"utf8",env});
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      argv:[
+        "checkpoint","prepare","--json","--scope","ticket","--repo",temp,
+        "--input","-",
+      ],
+      raw:selection,
+    });
+  });
+
+  it("prefers the source-tree local CLI for checkpoint over PATH",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-checkpoint-source-"));
+    const scripts=path.join(temp,"skills","scripts");
+    const localCli=path.join(temp,"packages","cli","dist","main.js");
+    const bin=path.join(temp,"bin");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(localCli),{recursive:true});
+    fs.mkdirSync(bin);
+    fs.writeFileSync(
+      localCli,
+      "let raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n",
+    );
+    fs.writeFileSync(
+      path.join(temp,"main.js"),
+      "process.stdout.write(JSON.stringify({ok:true,data:{wrongCandidate:true}}));\n",
+    );
+    const stale=path.join(bin,"vibehub");
+    fs.writeFileSync(stale,"#!/bin/sh\nprintf '%s\\n' 'PATH fallback used'\n");
+    fs.chmodSync(stale,0o755);
+    const selection=JSON.stringify({source:{},changedPaths:[]});
+    const env={
+      ...process.env,
+      PATH:`${bin}:${process.env.PATH??""}`,
+      VIBEHUB_BIN:undefined,
+    };
+    const run=spawnSync(process.execPath,[
+      path.join(scripts,"vh-checkpoint.mjs"),
+      "prepare","--scope","ticket","--repo",temp,
+    ],{input:selection,encoding:"utf8",env});
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      argv:[
+        "checkpoint","prepare","--json","--scope","ticket","--repo",temp,
+        "--input","-",
+      ],
+      raw:selection,
+    });
+  });
+
   it("normalizes empty stdin and a zero-byte input file to the same empty object",()=>{
     const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-empty-wrapper-")),input=path.join(temp,"empty.json"),fake=path.join(temp,"vibehub");
     fs.writeFileSync(input,"");

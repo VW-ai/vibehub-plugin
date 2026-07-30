@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import { captureCommand } from "./_capture.mjs";
+import { resolveVibehubInvocation } from "./_dispatch.mjs";
 
 const CHECKPOINT_INPUT_MAX_BYTES = 1024 * 1024;
 
@@ -51,10 +52,17 @@ if (needsInput) {
   }
 }
 
-const binary = process.env.VIBEHUB_BIN || "vibehub";
+const invocation = resolveVibehubInvocation();
 const child = await captureCommand(
-  binary,
-  ["checkpoint", operation, "--json", ...forwarded, ...(needsInput ? ["--input", "-"] : [])],
+  invocation.command,
+  [
+    ...invocation.prefix,
+    "checkpoint",
+    operation,
+    "--json",
+    ...forwarded,
+    ...(needsInput ? ["--input", "-"] : []),
+  ],
   { input, env: process.env },
 );
 if (child.kind === "overflow") fail(`vibehub CLI response exceeded ${child.limit} bytes`, "response_too_large", 1);
@@ -64,10 +72,19 @@ const output = child.stdout.trim();
 try {
   JSON.parse(output);
 } catch {
-  fail("vibehub CLI returned a non-JSON response", "internal_error", 1);
+  const detail = diagnostic(child.stderr || child.stdout);
+  fail(
+    `vibehub CLI returned a non-JSON response${detail ? `: ${detail}` : ""}`,
+    "internal_error",
+    1,
+  );
 }
 fs.writeSync(1, `${output}\n`);
 process.exit(child.status);
+
+function diagnostic(value) {
+  return value.trim().replace(/\s+/g, " ").slice(0, 400);
+}
 
 function readUtf8Bounded(inputFile, maximumBytes) {
   const ownsDescriptor = inputFile !== "-";
