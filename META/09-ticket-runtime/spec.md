@@ -25,6 +25,12 @@ frozen by
 an exact-source-bound, full-document worktree patch with no SQLite semantic
 replay and no embedded workflow judgment.
 
+M2 now adds the first Skill intelligence over that hand:
+[`contract-ticket-planning-validation-skills-001`](specs/contract-ticket-planning-validation-skills-001.yaml).
+Planning shapes a flat executable graph through Backchain and Forward
+Normalize; an independent semantic validator returns graph validity separately
+from human execution authority.
+
 ## Canonical decisions
 
 ### Product and intelligence
@@ -62,6 +68,10 @@ replay and no embedded workflow judgment.
   exact worktree, HEAD, semantic graph, raw ledger inventory, and targeted
   Ticket revisions; validates the complete prospective graph; and leaves one
   verified dirty-worktree change for optional separate checkpointing.
+- [`contract-ticket-planning-validation-skills-001`](specs/contract-ticket-planning-validation-skills-001.yaml):
+  two composable Skills own plan shaping and independent semantic validation.
+  Passing graph definitions enter the current graph directly; review and
+  protected decisions gate execution rather than activation.
 
 ### Human surface
 
@@ -97,9 +107,10 @@ replay and no embedded workflow judgment.
   engine.
 - [`decision-ticket-closeout-001`](specs/decision-ticket-closeout-001.yaml):
   final Outcome/Evidence adjudication and semantic closeout.
-- The M2 planning/validation Skill contract must now be derived by dogfooding
-  the active patch rather than reconstructing the stale SQLite-backed
-  [`contract-ticket-review-operations-001`](specs/contract-ticket-review-operations-001.yaml).
+- The first validated M2 graph must still be reconciled to a fresh Ticket
+  source and applied through the active patch; the stale SQLite-backed
+  [`contract-ticket-review-operations-001`](specs/contract-ticket-review-operations-001.yaml)
+  is not an implementation source.
 
 ## Historical implementation artifacts
 
@@ -158,12 +169,32 @@ M1B—the exact-source Git worktree patch—is also implemented:
 - Skills still own why to mutate, semantic validation, review/authority
   boundaries, and whether later semantic document types are needed.
 
-The next implementation boundary is M2: use the patch to plan, validate, and
-apply the first real flat Ticket graph from Skill intelligence. Proposal,
-Validation, Decision, and closeout documents should be introduced from that
-dogfood need rather than restored as a fixed workflow.
+The M2 Skill package is implemented:
+
+- `vibehub-ticket-plan` recognizes planning and graph-tending scenes,
+  backchains from observable outcomes, forward-normalizes direct dependencies,
+  preserves Planning Fog, and builds one exact patch candidate;
+- `vibehub-ticket-validate` independently judges the complete prospective
+  graph and reports `passed`, `failed`, or `inconclusive` separately from
+  delegated, review, protected-decision, or Planning Fog authority;
+- the nine-entrypoint Skill package, focused suite, CLI build, and managed
+  artifact copy pass;
+- a fresh planning Agent and separate validator completed a real
+  fail-revise-pass loop over a seven-Ticket graph.
+
+The validated graph is preserved as a dated exact-bound artifact, but it is not
+canonical yet. The public patch could not acquire its required short-lived Git
+writer lock under the current sandbox approval policy, and no direct Ticket
+file edit was used as a workaround. M2 therefore remains in progress until the
+candidate is reconciled to a fresh source, independently revalidated, and
+successfully applied.
+
+Proposal, Validation, Decision, and closeout documents should be introduced
+from later dogfood need rather than restored as a fixed workflow.
 
 Implementation evidence is recorded in:
 
 - [`Ticket M1A Git read authority cut`](artifacts/2026-07-29-ticket-m1a-git-read-cut-implementation.md)
 - [`Ticket M1B exact-source worktree patch`](artifacts/2026-07-29-ticket-m1b-git-worktree-patch-implementation.md)
+- [`Ticket M2 planning and independent validation Skills`](artifacts/2026-07-29-ticket-m2-planning-validation-skills.md)
+- [`First Git Ticket Graph validated candidate`](artifacts/2026-07-29-first-git-ticket-graph-validated-candidate.json)

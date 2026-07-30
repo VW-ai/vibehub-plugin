@@ -1,5 +1,5 @@
 progress:
-  completion: 0.45
+  completion: 0.58
   status: active
   milestones:
     - id: "m0-git-skill-authority-cut"
@@ -16,7 +16,8 @@ progress:
       evidence: "The receiptless ticket.worktree.patch capability binds raw inventory plus semantic source and targeted revisions, validates the full prospective graph and encoded capacity, uses descriptor-bounded physical reads, performs per-file atomic installation with synchronous conditional rollback, reload-verifies the target digest, and returns a checkpointSelection without auto-committing; the public generated contract validates complete Ticket documents and the optional checkpoint verifies raw candidate inventory; see the dated M1B implementation artifact."
     - id: "m2-ticket-planning-validation-skills"
       name: "Skill-led planning, validation, and protected-boundary decisions"
-      status: planned
+      status: in_progress
+      evidence: "The Planning and independent Validation Skills, package registry, focused tests, and a real fail-revise-pass seven-Ticket candidate are implemented. The exact candidate passed mechanical and independent semantic validation, but the public canonical patch remains unapplied because the environment rejected permission to create its short-lived Git writer lock."
     - id: "m3-git-native-review-intervention"
       name: "Git-native comments, edits, decisions, and graph review"
       status: planned
@@ -27,8 +28,8 @@ progress:
       name: "Complete one real dogfood loop and prove the legacy cut remains clean"
       status: planned
   next:
-    - "Implement the M2 planning and semantic-validation Skill intelligence over ticket.worktree.patch rather than adding workflow policy to Core."
-    - "Dogfood one real flat Ticket graph through backchaining, forward normalization, exact patching, and optional human review before defining later semantic document types."
+    - "Reload and independently revalidate the preserved seven-Ticket candidate against a fresh source, then apply it only through ticket.worktree.patch when the short-lived Git writer lock is explicitly permitted."
+    - "Review the active graph's outcome paths and protected decisions before advancing M3 or executing a gated path."
   commits:
     - "d92c99c docs(ticket): plan git-native skill-driven pivot"
     - "eb0590c docs(ticket): prepare git read authority cut"

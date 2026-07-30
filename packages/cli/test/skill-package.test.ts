@@ -10,7 +10,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-validate"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -18,7 +18,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
-    expect(entry).toHaveLength(7);
+    expect(entry).toHaveLength(9);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -170,6 +170,35 @@ describe("production skill package",()=>{
     expect(manifest.interface.defaultPrompt).toContain(
       "Plan this deliverable as an honest VibeHub Ticket graph.",
     );
+  });
+
+  it("keeps Ticket planning semantic, independent, and Git-native",()=>{
+    const read=(relative:string)=>fs.readFileSync(path.join(skills,relative),"utf8");
+    const plan=[
+      read("vibehub-ticket-plan/SKILL.md"),
+      read("vibehub-ticket-plan/references/planning-method.md"),
+    ].join("\n");
+    const validate=[
+      read("vibehub-ticket-validate/SKILL.md"),
+      read("vibehub-ticket-validate/references/validation-rubric.md"),
+    ].join("\n");
+    expect(plan).toContain("Backchain");
+    expect(plan).toContain("forward");
+    expect(plan).toContain("Planning Fog");
+    expect(plan).toContain("`review-plan`");
+    expect(plan).toContain("`auto-apply-unless-human-gate`");
+    expect(plan).toContain("$vibehub-ticket-validate");
+    expect(plan).toContain("ticket.worktree.patch");
+    expect(plan).toContain("same-context observations");
+    expect(plan).toContain("cannot authorize apply");
+    expect(plan).not.toMatch(/\bparent(?:Id)?\b/);
+    expect(validate).toContain("separate Agent context");
+    expect(validate).toContain("fresh Agent");
+    expect(validate).toContain("`passed`");
+    expect(validate).toContain("`human_decision_required`");
+    expect(validate).toContain("return `inconclusive` for application");
+    expect(validate).toContain("Do not rewrite the candidate");
+    expect(validate).not.toContain("vh-ticket.mjs worktree.patch");
   });
 
   it("pins the setup workflow, activation proof, and presentation invariants",()=>{

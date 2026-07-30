@@ -13,22 +13,28 @@ intent:
     They are not mandatory stages for every mutation. A Skill decides which
     facts are needed from the change class and authority boundary:
 
-    - delegated clarification or decomposition may be validated and applied
-      directly with a compact semantic receipt;
-    - an initial plan, experience/product change, architecture or principle
-      deviation, permission/side-effect escalation, or policy/risk boundary
-      creates an explicit proposal and blocking human Decision;
+    - delegated clarification or decomposition may be independently validated
+      and applied directly without manufacturing a semantic receipt;
+    - an initial plan may enter the current graph after machine validation;
+      human review or explicit delegation gates execution of that active graph,
+      not Ticket activation;
+    - a candidate that would select or alter an experience/product choice,
+      accepted architecture or principle, permission/side effect, or
+      policy/risk boundary preserves the unresolved question as a blocker and
+      creates an explicit Proposal or human Decision only when that durable
+      comparison or answer exists;
     - inconclusive validation or honest Planning Fog remains visible rather
       than fabricating downstream Tickets.
 
     Deterministic scripts bind a mutation to the observed Git HEAD when
     committed, the current graph digest, and every targeted Ticket revision.
-    They fail stale changes before writing. A successful apply updates the
-    affected Ticket documents and its semantic receipt as one validated
-    worktree change set. Normal Git commit, merge, and conflict semantics carry
-    collaboration and history; there is no parallel `latest.yaml` generation,
-    SQLite application intent, cross-store writer fence, or SQLite terminal
-    receipt.
+    They fail stale changes before writing. A successful patch updates the
+    affected Ticket documents as one validated worktree change set. A semantic
+    receipt document is created only when its causal meaning is independently
+    useful; it is not a patch stage. Normal Git commit, merge, and conflict
+    semantics carry collaboration and history; there is no parallel
+    `latest.yaml` generation, SQLite application intent, cross-store writer
+    fence, or SQLite terminal receipt.
 
     Each worktree reads its checked-out Ticket world. Same-named branches or
     Tickets in sibling worktrees may proceed independently. SQLite Run state
@@ -46,6 +52,8 @@ constraints:
   - kind: must
     rule: "Proposal, Validation, Decision, and semantic Receipt documents are created according to semantic need and authority, not as a mandatory fixed workflow"
   - kind: must
+    rule: "Machine-validated initial plans may enter the current graph directly; human review or delegation gates execution rather than Ticket activation"
+  - kind: must
     rule: "A successful graph change leaves a Git-readable causal record sufficient to reconstruct why the current Ticket world exists"
   - kind: must
     rule: "Local Run coordination binds exact worktree plus HEAD or dirty graph digest and Ticket revision; branch switches stale or suspend it"
@@ -61,8 +69,8 @@ indexing:
   tags: [git, lifecycle, proposal, validation, decision, receipt, worktree, run]
 provenance:
   source_type: manual_input
-  confidence: 0.95
-  source_ref: "Wayne required Ticket documents to follow Git across branches/worktrees and rejected semantic SQLite authority — 2026-07-29"
+  confidence: 0.98
+  source_ref: "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29"
   produced_by_agent: "ingest"
   produced_at: "2026-07-29"
 relations:
