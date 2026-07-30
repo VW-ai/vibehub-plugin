@@ -17,7 +17,6 @@ import {
   TICKET_REVIEW_MAX_TRACE_RECORDS,
   TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE,
   TicketLedgerError,
-  ticketDecisionAttestationChallenge,
   ticketDecisionDocumentDigest,
   ticketDecisionRecordRequest,
   openDb,
@@ -32,12 +31,11 @@ import {
   type TicketReviewSourceMetadataV0,
 } from "@vw-ai/vibehub-core";
 import {
-  TicketWebAuthnAuthorityError,
-  TicketWebAuthnAuthorityRegistry,
+  TicketLocalDecisionAuthority,
+  TicketLocalDecisionAuthorityError,
   ticketDecisionAttestationTrustProfileResolver,
-  type TicketWebAuthnAuthorityProfileV1,
-  type TicketWebAuthnVerifiedPresenceV1,
-} from "./ticket-webauthn-authority.js";
+  type TicketLocalDecisionAuthorityProfileV1,
+} from "./ticket-local-decision-authority.js";
 
 const LOOPBACK_HOST = "127.0.0.1";
 const HOST_SCHEMA_VERSION = 3 as const;
@@ -46,9 +44,6 @@ const MAX_STATE_PAGES = Math.ceil(
     / TICKET_REVIEW_MAX_PAGE_SIZE,
 );
 const DEFAULT_TOKEN_LIFETIME_MS = 30 * 60 * 1_000;
-const CEREMONY_LIFETIME_MS = 2 * 60 * 1_000;
-const DECISION_ATTESTATION_LIFETIME_MS = 30 * 60 * 1_000;
-const WEBAUTHN_TIMEOUT_MS = 90 * 1_000;
 const REVIEW_BODY_MAX_BYTES = 512 * 1024;
 const DECISION_BODY_MAX_BYTES = 128 * 1024;
 const MAX_TRACE_PAGES = Math.ceil(
@@ -97,34 +92,31 @@ type TicketReviewHostReviewCapability =
       attribution: "host_attested";
     };
 
-type TicketWebAuthnAuthorityRegistryLike = Pick<
-  TicketWebAuthnAuthorityRegistry,
+type TicketLocalDecisionAuthorityLike = Pick<
+  TicketLocalDecisionAuthority,
   | "listProfiles"
-  | "createRegistrationOptions"
-  | "verifyRegistration"
-  | "createAuthenticationOptions"
-  | "verifyAuthentication"
-  | "revoke"
+  | "ensureProfile"
+  | "signEnvelope"
+  | "revokeRepository"
 >;
 
 type TicketReviewHostAuthorityCapability =
   | { status: "unavailable" }
-  | { status: "unenrolled" }
   | {
       status: "active";
       profileId: string;
       principalId: string;
-      credentialFingerprint: string;
+      keyFingerprint: string;
     };
 
 interface TicketReviewHostInterventions {
   review: TicketReviewHostReviewCapability;
   planReview:
     | { available: false }
-    | { available: true; ceremony?: "direct" | "webauthn" };
+    | { available: true };
   protectedDecision:
     | { available: false }
-    | { available: true; ceremony: "webauthn" };
+    | { available: true };
   protectedBoundaries: Array<{
     ticketId: string;
     ticketRevision: string;
@@ -177,10 +169,10 @@ export interface TicketReviewHostOptions {
    */
   ticketDecisionAuthority?: TicketDecisionAuthorityGrant;
   /**
-   * Optional host-owned WebAuthn authority registry. Production launchers
-   * provide this; deterministic tests may inject a structural implementation.
+   * Optional install-local Decision signer. Production launchers provide it;
+   * deterministic tests may inject a structural implementation.
    */
-  ticketWebAuthnAuthorityRegistry?: TicketWebAuthnAuthorityRegistryLike;
+  ticketLocalDecisionAuthority?: TicketLocalDecisionAuthorityLike;
 }
 
 export interface TicketReviewHostHandle {
@@ -201,48 +193,6 @@ interface HostRuntime {
   repositoryRoot: string;
   worktreeRoot: string;
 }
-
-interface PendingCeremonyBase {
-  ceremonyId: string;
-  challenge: string;
-  origin: string;
-  repositoryIncarnation: string;
-  expiresAtEpochMs: number;
-}
-
-interface PendingEnrollmentCeremony extends PendingCeremonyBase {
-  kind: "enrollment";
-  principalId: string;
-  authorityBasis: "repository_owner";
-  authorityRef: string;
-}
-
-interface PendingDecisionCeremony extends PendingCeremonyBase {
-  kind: "decision";
-  profile: TicketWebAuthnAuthorityProfileV1;
-  input: Record<string, unknown>;
-  expectedSource: ReturnType<
-    typeof ticketDecisionRecordRequest
-  >["expectedSource"];
-  authority: TicketDecisionAuthorityContext;
-  decidedAt: string;
-  prepared: {
-    documentPath: string;
-    decisionId: string;
-    digest: string;
-  };
-  envelope: TicketDecisionAttestationEnvelope;
-}
-
-interface PendingRevocationCeremony extends PendingCeremonyBase {
-  kind: "revocation";
-  profile: TicketWebAuthnAuthorityProfileV1;
-}
-
-type PendingCeremony =
-  | PendingEnrollmentCeremony
-  | PendingDecisionCeremony
-  | PendingRevocationCeremony;
 
 export function parseTicketReviewHostFlags(
   argv: string[],
@@ -291,13 +241,13 @@ export function parseTicketReviewHostFlags(
 
 export function launchTicketReviewHostCommand(argv: string[]): void {
   const flags = parseTicketReviewHostFlags(argv);
-  const ticketWebAuthnAuthorityRegistry =
-    new TicketWebAuthnAuthorityRegistry();
+  const ticketLocalDecisionAuthority =
+    new TicketLocalDecisionAuthority();
   const host = startTicketReviewHost({
     repoRoot: flags.repo,
     dbPath: flags.db,
     port: flags.port,
-    ticketWebAuthnAuthorityRegistry,
+    ticketLocalDecisionAuthority,
   });
   void host.ready.then(({ url, origin, port }) => {
     if (flags.json) {
@@ -314,7 +264,7 @@ export function launchTicketReviewHostCommand(argv: string[]): void {
         "Ticket graph is ready\n"
         + (flags.open
           ? "The local structured graph is opening in your browser.\n"
-          : `${url}\nThe link is a short-lived local host capability; human Decisions still require an authenticator.\n`)
+          : `${url}\nThe link is a short-lived local approval capability; keep it private.\n`)
         + "Keep this terminal open; press Ctrl-C to stop.\n",
       );
     }
@@ -342,11 +292,48 @@ export function startTicketReviewHost(
     throw new Error("Ticket review host token must contain at least 32 bytes");
   }
   if (
-    options.ticketReviewAttribution !== undefined
+    options.ticketDecisionAuthority !== undefined
+    && options.ticketLocalDecisionAuthority !== undefined
+  ) {
+    throw new Error(
+      "Ticket review host must use either injected Decision authority or local Decision signer",
+    );
+  }
+  let localAuthorityProfile:
+    TicketLocalDecisionAuthorityProfileV1 | undefined;
+  if (options.ticketLocalDecisionAuthority !== undefined) {
+    try {
+      const session = GitFacade.sessionContextAt(options.repoRoot);
+      const snapshot = loadTicketLedgerFromWorktree(session.toplevel);
+      if (
+        snapshot.source.mode === "worktree"
+        && snapshot.source.branch !== null
+      ) {
+        localAuthorityProfile =
+          options.ticketLocalDecisionAuthority.ensureProfile(
+            snapshot.source.repositoryIncarnation,
+          );
+      }
+    } catch {
+      // External authority failure must not hide the read-only Ticket graph.
+      // Protected writes remain unavailable and fail closed.
+    }
+  }
+  const ticketReviewAttribution =
+    options.ticketReviewAttribution
+    ?? (localAuthorityProfile === undefined
+      ? undefined
+      : {
+          actorId: localAuthorityProfile.principalId,
+          actorKind: "human" as const,
+          attribution: "host_attested" as const,
+        });
+  if (
+    ticketReviewAttribution !== undefined
     && options.ticketDecisionAuthority !== undefined
     && (
-      options.ticketReviewAttribution.actorKind !== "human"
-      || options.ticketReviewAttribution.actorId
+      ticketReviewAttribution.actorKind !== "human"
+      || ticketReviewAttribution.actorId
         !== options.ticketDecisionAuthority.authority.principal_id
     )
   ) {
@@ -354,20 +341,12 @@ export function startTicketReviewHost(
       "Ticket review attribution and Decision authority must bind the same human",
     );
   }
-  if (
-    options.ticketDecisionAuthority !== undefined
-    && options.ticketWebAuthnAuthorityRegistry !== undefined
-  ) {
-    throw new Error(
-      "Ticket review host must use either injected Decision authority or WebAuthn authority",
-    );
-  }
   const now = options.now ?? (() => new Date().toISOString());
   const runtime = openHostRuntime(options.repoRoot, options.dbPath, {
-    ticketReviewAttribution: options.ticketReviewAttribution,
+    ticketReviewAttribution,
     ticketDecisionAuthority: options.ticketDecisionAuthority,
-    ticketWebAuthnAuthorityRegistry:
-      options.ticketWebAuthnAuthorityRegistry,
+    ticketLocalDecisionAuthority:
+      options.ticketLocalDecisionAuthority,
   });
   const assetRoot = options.assetRoot ?? defaultAssetRoot();
   assertAssets(assetRoot);
@@ -376,12 +355,11 @@ export function startTicketReviewHost(
   let requestSequence = 0;
   let origin: string | null = null;
   let closed = false;
-  const pendingCeremonies = new Map<string, PendingCeremony>();
   let resolveClosed!: () => void;
   const closedPromise = new Promise<void>((resolve) => {
     resolveClosed = resolve;
   });
-  const hostActor = options.ticketReviewAttribution?.actorId
+  const hostActor = ticketReviewAttribution?.actorId
     ?? options.ticketDecisionAuthority?.authority.principal_id
     ?? "ticket-review-host";
   const operationContext = () => ({
@@ -435,7 +413,13 @@ export function startTicketReviewHost(
             relations: [...relations.values()],
           },
           interventions: interventionCapabilities(
-            options,
+            {
+              ticketReviewAttribution,
+              ticketDecisionAuthority: options.ticketDecisionAuthority,
+              ticketLocalDecisionAuthority:
+                options.ticketLocalDecisionAuthority,
+              localAuthorityProfile,
+            },
             data.source,
             tickets,
           ),
@@ -552,7 +536,7 @@ export function startTicketReviewHost(
   };
 
   const appendReview = (body: unknown): unknown => {
-    if (options.ticketReviewAttribution?.actorKind !== "human") {
+    if (ticketReviewAttribution?.actorKind !== "human") {
       throw new HostHttpError(
         409,
         "ticket_attribution_unavailable",
@@ -575,163 +559,11 @@ export function startTicketReviewHost(
       body,
     ));
 
-  const requireWebAuthnRegistry =
-    (): TicketWebAuthnAuthorityRegistryLike => {
-      if (options.ticketWebAuthnAuthorityRegistry === undefined) {
-        throw new HostHttpError(
-          409,
-          "ticket_webauthn_unavailable",
-          "This Ticket host was not started with a WebAuthn authority registry.",
-        );
-      }
-      return options.ticketWebAuthnAuthorityRegistry;
-    };
-
-  const requirePublicOrigin = (): string => {
-    if (origin === null) {
-      throw new HostHttpError(
-        503,
-        "host_not_ready",
-        "The Ticket review host is not ready for a WebAuthn ceremony.",
-      );
-    }
-    return origin;
-  };
-
-  const activeProfileForRepository = (
-    repositoryIncarnation: string,
-  ): TicketWebAuthnAuthorityProfileV1 | null => {
-    const profiles = requireWebAuthnRegistry().listProfiles().filter(
-      (profile) =>
-        profile.repositoryIncarnation === repositoryIncarnation
-        && profile.revokedAt === null,
-    );
-    if (profiles.length > 1) {
-      throw new HostHttpError(
-        409,
-        "ticket_webauthn_authority_ambiguous",
-        "More than one active WebAuthn authority is bound to this repository.",
-        { profileIds: profiles.map((profile) => profile.profileId) },
-        ["Revoke all but one authority before recording a Decision."],
-      );
-    }
-    return profiles[0] ?? null;
-  };
-
-  const rememberCeremony = <T extends PendingCeremony>(
-    ceremony: Omit<T, "ceremonyId" | "expiresAtEpochMs">,
-  ): T => {
-    pruneExpiredCeremonies(pendingCeremonies);
-    const pending = {
-      ...ceremony,
-      ceremonyId: crypto.randomBytes(32).toString("base64url"),
-      expiresAtEpochMs: Date.now() + CEREMONY_LIFETIME_MS,
-    } as T;
-    pendingCeremonies.set(pending.ceremonyId, pending);
-    return pending;
-  };
-
-  const takeCeremony = <Kind extends PendingCeremony["kind"]>(
-    ceremonyId: string,
-    expectedKind: Kind,
-  ): Extract<PendingCeremony, { kind: Kind }> => {
-    const pending = pendingCeremonies.get(ceremonyId);
-    pendingCeremonies.delete(ceremonyId);
-    if (
-      pending === undefined
-      || pending.kind !== expectedKind
-      || pending.expiresAtEpochMs <= Date.now()
-    ) {
-      throw new HostHttpError(
-        409,
-        "ticket_webauthn_ceremony_expired",
-        "This one-use WebAuthn ceremony is unavailable or expired.",
-        null,
-        ["Refresh the current Ticket source and begin a new ceremony."],
-      );
-    }
-    return pending as Extract<PendingCeremony, { kind: Kind }>;
-  };
-
-  const createEnrollmentChallenge = async (
+  const recordLocalDecision = (
     body: unknown,
-  ): Promise<unknown> => {
-    const input = enrollmentChallengeBody(body);
-    const registry = requireWebAuthnRegistry();
-    const snapshot = loadTicketLedgerFromWorktree(runtime.worktreeRoot);
-    if (activeProfileForRepository(
-      snapshot.source.repositoryIncarnation,
-    ) !== null) {
-      throw new HostHttpError(
-        409,
-        "ticket_webauthn_authority_exists",
-        "This repository already has one active WebAuthn authority.",
-      );
-    }
-    const issuedAt = requireInstant(now(), "host clock");
-    const authorityBasis = "repository_owner" as const;
-    const authorityRef =
-      `vibehub:repository-owner:${snapshot.source.repositoryIncarnation}`;
-    const challenge = hostCeremonyChallenge({
-      kind: "ticket_authority_enrollment",
-      principalId: input.principalId,
-      authorityBasis,
-      authorityRef,
-      repositoryIncarnation: snapshot.source.repositoryIncarnation,
-      origin: requirePublicOrigin(),
-      issuedAt,
-      nonce: crypto.randomBytes(32).toString("base64url"),
-    });
-    const pending = rememberCeremony<PendingEnrollmentCeremony>({
-      kind: "enrollment",
-      challenge,
-      origin: requirePublicOrigin(),
-      repositoryIncarnation: snapshot.source.repositoryIncarnation,
-      principalId: input.principalId,
-      authorityBasis,
-      authorityRef,
-    });
-    const registrationOptions = await registry.createRegistrationOptions({
-      principalId: pending.principalId,
-      authorityBasis: pending.authorityBasis,
-      authorityRef: pending.authorityRef,
-      repositoryIncarnation: pending.repositoryIncarnation,
-      challenge: pending.challenge,
-      timeoutMs: WEBAUTHN_TIMEOUT_MS,
-    });
-    return {
-      ceremonyId: pending.ceremonyId,
-      options: registrationOptions,
-    };
-  };
-
-  const completeEnrollment = async (body: unknown): Promise<unknown> => {
-    const input = ceremonyCompletionBody(body);
-    const pending = takeCeremony(input.ceremonyId, "enrollment");
-    assertCeremonyRepository(runtime.worktreeRoot, pending);
-    const profile = await requireWebAuthnRegistry().verifyRegistration({
-      principalId: pending.principalId,
-      authorityBasis: pending.authorityBasis,
-      authorityRef: pending.authorityRef,
-      repositoryIncarnation: pending.repositoryIncarnation,
-      challenge: pending.challenge,
-      origin: pending.origin,
-      response: input.credential as unknown as Parameters<
-        TicketWebAuthnAuthorityRegistryLike["verifyRegistration"]
-      >[0]["response"],
-    });
-    return {
-      authority: {
-        profileId: profile.profileId,
-        principalId: profile.principalId,
-        credentialFingerprint: profile.keyFingerprint,
-      },
-    };
-  };
-
-  const createDecisionChallenge = async (
-    body: unknown,
-  ): Promise<unknown> => {
+  ): unknown => {
+    const localAuthority = options.ticketLocalDecisionAuthority;
+    const profile = localAuthorityProfile;
     const parsed = operationInputSchemas[
       "ticket.decision.record"
     ].safeParse(body);
@@ -750,14 +582,35 @@ export function startTicketReviewHost(
       );
     }
     const snapshot = loadTicketLedgerFromWorktree(runtime.worktreeRoot);
-    const profile = activeProfileForRepository(
-      snapshot.source.repositoryIncarnation,
-    );
-    if (profile === null) {
+    if (
+      snapshot.source.mode !== "worktree"
+      || snapshot.source.branch === null
+    ) {
       throw new HostHttpError(
         409,
-        "ticket_webauthn_authority_unenrolled",
-        "Enroll one WebAuthn authority before recording a Ticket Decision.",
+        "ticket_decision_detached_checkout_unsupported",
+        "Durable Ticket Decisions require a named branch checkout.",
+        null,
+        [
+          "Switch this worktree to a named branch, refresh the graph, and confirm the Decision again.",
+        ],
+      );
+    }
+    if (localAuthority === undefined || profile === undefined) {
+      throw new HostHttpError(
+        409,
+        "ticket_local_authority_unavailable",
+        "This Ticket host was not started with a local Decision signer.",
+      );
+    }
+    if (
+      profile.repositoryIncarnation
+      !== snapshot.source.repositoryIncarnation
+    ) {
+      throw new HostHttpError(
+        409,
+        "ticket_local_authority_changed",
+        "This Ticket host is bound to a different repository authority.",
       );
     }
     const input = parsed.data as Record<string, unknown>;
@@ -774,64 +627,24 @@ export function startTicketReviewHost(
       snapshot,
       profile,
       prepared,
-      origin: requirePublicOrigin(),
       issuedAt: decidedAt,
     });
-    const challenge = ticketDecisionAttestationChallenge(envelope);
-    const pending = rememberCeremony<PendingDecisionCeremony>({
-      kind: "decision",
-      challenge,
-      origin: requirePublicOrigin(),
+    const signed = localAuthority.signEnvelope({
       repositoryIncarnation: snapshot.source.repositoryIncarnation,
-      profile,
-      input,
-      expectedSource: request.expectedSource,
-      authority,
-      decidedAt,
-      prepared: {
-        documentPath: prepared.documentPath,
-        decisionId: prepared.document.decision_id,
-        digest: prepared.digest,
-      },
       envelope,
+      expectedProfileId: profile.profileId,
     });
-    const authenticationOptions =
-      await requireWebAuthnRegistry().createAuthenticationOptions({
-        profileId: profile.profileId,
-        challenge,
-        timeoutMs: WEBAUTHN_TIMEOUT_MS,
-      });
-    return {
-      ceremonyId: pending.ceremonyId,
-      options: authenticationOptions,
-    };
-  };
-
-  const completeDecision = async (body: unknown): Promise<unknown> => {
-    const input = ceremonyCompletionBody(body);
-    const pending = takeCeremony(input.ceremonyId, "decision");
-    assertCeremonyRepository(runtime.worktreeRoot, pending);
-    const presence =
-      await requireWebAuthnRegistry().verifyAuthentication({
-        profileId: pending.profile.profileId,
-        challenge: pending.challenge,
-        origin: pending.origin,
-        response: input.credential as unknown as Parameters<
-          TicketWebAuthnAuthorityRegistryLike["verifyAuthentication"]
-        >[0]["response"],
-      });
-    assertVerifiedPresence(pending, presence);
-
+    assertSameLocalAuthorityProfile(profile, signed.profile);
     const grant: TicketDecisionAuthorityGrant = {
-      authority: pending.authority,
-      scopes: [decisionAuthorityScope(pending.envelope)],
+      authority,
+      scopes: [decisionAuthorityScope(envelope)],
     };
     const decisionDispatcher = new OperationDispatcher(runtime.db, {
       repoRoot: runtime.worktreeRoot,
       ticketDecisionAuthority: grant,
       ticketDecisionAttestationTrustProfiles:
         ticketDecisionAttestationTrustProfileResolver(
-          requireWebAuthnRegistry(),
+          localAuthority,
         ),
     });
     const decision = requireOperationData<{
@@ -847,24 +660,24 @@ export function startTicketReviewHost(
       "ticket.decision.record",
       {
         repoId: runtime.repoId,
-        actor: pending.profile.principalId,
+        actor: profile.principalId,
         requestId:
           `ticket-review-host:${sessionId}:${++requestSequence}`,
-        now: pending.decidedAt,
+        now: decidedAt,
       },
-      pending.input,
+      input,
     ));
     if (
-      decision.decision.documentPath !== pending.prepared.documentPath
+      decision.decision.documentPath !== prepared.documentPath
       || decision.decision.document.decision_id
-        !== pending.prepared.decisionId
+        !== prepared.document.decision_id
       || ticketDecisionDocumentDigest(decision.decision.document)
-        !== pending.prepared.digest
+        !== prepared.digest
     ) {
       throw new HostHttpError(
         409,
         "ticket_decision_changed",
-        "The exact Ticket Decision changed after human verification.",
+        "The exact Ticket Decision changed after local confirmation.",
       );
     }
     const attestation = appendTicketDecisionAttestation({
@@ -878,13 +691,8 @@ export function startTicketReviewHost(
           semanticLedgerDigest: string;
         },
         attestation: {
-          ...pending.envelope,
-          webauthn: {
-            ...pending.envelope.webauthn,
-            client_data_json: presence.assertion.clientDataJSON,
-            authenticator_data: presence.assertion.authenticatorData,
-            signature: presence.assertion.signature,
-          },
+          ...envelope,
+          signature: signed.signature,
         },
       },
     });
@@ -911,72 +719,6 @@ export function startTicketReviewHost(
     };
   };
 
-  const createRevocationChallenge = async (
-    body: unknown,
-  ): Promise<unknown> => {
-    emptyBody(body, "WebAuthn authority revocation");
-    const snapshot = loadTicketLedgerFromWorktree(runtime.worktreeRoot);
-    const profile = activeProfileForRepository(
-      snapshot.source.repositoryIncarnation,
-    );
-    if (profile === null) {
-      throw new HostHttpError(
-        409,
-        "ticket_webauthn_authority_unenrolled",
-        "This repository has no active WebAuthn authority to revoke.",
-      );
-    }
-    const issuedAt = requireInstant(now(), "host clock");
-    const challenge = hostCeremonyChallenge({
-      kind: "ticket_authority_revocation",
-      profileId: profile.profileId,
-      credentialFingerprint: profile.keyFingerprint,
-      repositoryIncarnation: snapshot.source.repositoryIncarnation,
-      origin: requirePublicOrigin(),
-      issuedAt,
-      nonce: crypto.randomBytes(32).toString("base64url"),
-    });
-    const pending = rememberCeremony<PendingRevocationCeremony>({
-      kind: "revocation",
-      challenge,
-      origin: requirePublicOrigin(),
-      repositoryIncarnation: snapshot.source.repositoryIncarnation,
-      profile,
-    });
-    const authenticationOptions =
-      await requireWebAuthnRegistry().createAuthenticationOptions({
-        profileId: profile.profileId,
-        challenge,
-        timeoutMs: WEBAUTHN_TIMEOUT_MS,
-      });
-    return {
-      ceremonyId: pending.ceremonyId,
-      options: authenticationOptions,
-    };
-  };
-
-  const completeRevocation = async (body: unknown): Promise<unknown> => {
-    const input = ceremonyCompletionBody(body);
-    const pending = takeCeremony(input.ceremonyId, "revocation");
-    assertCeremonyRepository(runtime.worktreeRoot, pending);
-    const profile = await requireWebAuthnRegistry().revoke({
-      profileId: pending.profile.profileId,
-      challenge: pending.challenge,
-      origin: pending.origin,
-      response: input.credential as unknown as Parameters<
-        TicketWebAuthnAuthorityRegistryLike["revoke"]
-      >[0]["response"],
-    });
-    return {
-      authority: {
-        profileId: profile.profileId,
-        principalId: profile.principalId,
-        credentialFingerprint: profile.keyFingerprint,
-        status: "revoked",
-      },
-    };
-  };
-
   const server = http.createServer((request, response) => {
     void routeRequest({
       request,
@@ -989,13 +731,9 @@ export function startTicketReviewHost(
       inspectSubject,
       listTrace,
       appendReview,
-      recordDecision,
-      createEnrollmentChallenge,
-      completeEnrollment,
-      createDecisionChallenge,
-      completeDecision,
-      createRevocationChallenge,
-      completeRevocation,
+      submitDecision: options.ticketLocalDecisionAuthority === undefined
+        ? recordDecision
+        : recordLocalDecision,
     }).catch((error) => {
       writeError(response, error);
     });
@@ -1007,7 +745,6 @@ export function startTicketReviewHost(
     clearTimeout(expiryTimer);
     if (closed) return;
     closed = true;
-    pendingCeremonies.clear();
     runtime.db.close();
     resolveClosed();
   });
@@ -1019,7 +756,6 @@ export function startTicketReviewHost(
         if (!closed) {
           closed = true;
           clearTimeout(expiryTimer);
-          pendingCeremonies.clear();
           runtime.db.close();
           resolveClosed();
         }
@@ -1032,9 +768,8 @@ export function startTicketReviewHost(
           fail(new Error("Ticket review host did not receive a TCP address"));
           return;
         }
-        // WebAuthn treats `localhost` as a secure-context RP ID. Keep the
-        // socket bound to 127.0.0.1 while publishing the canonical localhost
-        // origin used by every human-presence ceremony.
+        // Keep the socket on loopback while publishing a stable localhost
+        // origin for Host and Origin checks.
         origin = `http://localhost:${address.port}`;
         resolve({
           origin,
@@ -1069,8 +804,11 @@ function interventionCapabilities(
     TicketReviewHostOptions,
     | "ticketReviewAttribution"
     | "ticketDecisionAuthority"
-    | "ticketWebAuthnAuthorityRegistry"
-  >,
+    | "ticketLocalDecisionAuthority"
+  > & {
+    localAuthorityProfile?:
+      TicketLocalDecisionAuthorityProfileV1;
+  },
   source: TicketSourceMetadata,
   tickets: ReadonlyMap<string, HostGraphNode>,
 ): TicketReviewHostInterventions {
@@ -1088,36 +826,26 @@ function interventionCapabilities(
   let authority: TicketReviewHostAuthorityCapability = {
     status: "unavailable",
   };
-  let webauthnPlanReview:
-    | { available: false }
-    | { available: true; ceremony: "webauthn" } = { available: false };
-  let webauthnProtectedDecision:
-    | { available: false }
-    | { available: true; ceremony: "webauthn" } = { available: false };
-  if (options.ticketWebAuthnAuthorityRegistry !== undefined) {
+  let localDecisionAvailable = false;
+  if (
+    options.ticketLocalDecisionAuthority !== undefined
+    && options.localAuthorityProfile !== undefined
+  ) {
     try {
-      const active = options.ticketWebAuthnAuthorityRegistry.listProfiles()
+      const active = options.ticketLocalDecisionAuthority.listProfiles()
         .filter((profile) =>
-          profile.repositoryIncarnation === source.repositoryIncarnation
+          profile.profileId === options.localAuthorityProfile?.profileId
+          && profile.repositoryIncarnation === source.repositoryIncarnation
           && profile.revokedAt === null);
-      if (active.length === 0) {
-        authority = { status: "unenrolled" };
-      } else if (active.length === 1) {
+      if (active.length === 1) {
         const profile = active[0]!;
         authority = {
           status: "active",
           profileId: profile.profileId,
           principalId: profile.principalId,
-          credentialFingerprint: profile.keyFingerprint,
+          keyFingerprint: profile.keyFingerprint,
         };
-        webauthnPlanReview = {
-          available: true,
-          ceremony: "webauthn",
-        };
-        webauthnProtectedDecision = {
-          available: true,
-          ceremony: "webauthn",
-        };
+        localDecisionAvailable = source.branch !== null;
       }
     } catch {
       // Invalid or unavailable external trust state fails closed.
@@ -1136,9 +864,12 @@ function interventionCapabilities(
         scope.decisionType === "plan_review"
         && scope.graphDigest === source.graphDigest,
     )
+      || localDecisionAvailable
       ? { available: true }
-      : webauthnPlanReview,
-    protectedDecision: webauthnProtectedDecision,
+      : { available: false },
+    protectedDecision: localDecisionAvailable
+      ? { available: true }
+      : { available: false },
     protectedBoundaries,
     authority,
   };
@@ -1150,8 +881,8 @@ function openHostRuntime(
   trust: {
     ticketReviewAttribution?: TicketReviewHostAttribution;
     ticketDecisionAuthority?: TicketDecisionAuthorityGrant;
-    ticketWebAuthnAuthorityRegistry?:
-      TicketWebAuthnAuthorityRegistryLike;
+    ticketLocalDecisionAuthority?:
+      TicketLocalDecisionAuthorityLike;
   },
 ): HostRuntime {
   const session = GitFacade.sessionContextAt(cwd);
@@ -1166,12 +897,12 @@ function openHostRuntime(
       ...(trust.ticketDecisionAuthority === undefined
         ? {}
         : { ticketDecisionAuthority: trust.ticketDecisionAuthority }),
-      ...(trust.ticketWebAuthnAuthorityRegistry === undefined
+      ...(trust.ticketLocalDecisionAuthority === undefined
         ? {}
         : {
             ticketDecisionAttestationTrustProfiles:
               ticketDecisionAttestationTrustProfileResolver(
-                trust.ticketWebAuthnAuthorityRegistry,
+                trust.ticketLocalDecisionAuthority,
               ),
           }),
     }),
@@ -1192,13 +923,7 @@ async function routeRequest(input: {
   inspectSubject: (url: URL) => unknown;
   listTrace: (url: URL) => unknown;
   appendReview: (body: unknown) => unknown;
-  recordDecision: (body: unknown) => unknown;
-  createEnrollmentChallenge: (body: unknown) => Promise<unknown>;
-  completeEnrollment: (body: unknown) => Promise<unknown>;
-  createDecisionChallenge: (body: unknown) => Promise<unknown>;
-  completeDecision: (body: unknown) => Promise<unknown>;
-  createRevocationChallenge: (body: unknown) => Promise<unknown>;
-  completeRevocation: (body: unknown) => Promise<unknown>;
+  submitDecision: (body: unknown) => unknown;
 }): Promise<void> {
   const {
     request,
@@ -1211,13 +936,7 @@ async function routeRequest(input: {
     inspectSubject,
     listTrace,
     appendReview,
-    recordDecision,
-    createEnrollmentChallenge,
-    completeEnrollment,
-    createDecisionChallenge,
-    completeDecision,
-    createRevocationChallenge,
-    completeRevocation,
+    submitDecision,
   } = input;
   applySecurityHeaders(response);
   const url = new URL(request.url ?? "/", origin ?? "http://127.0.0.1");
@@ -1260,191 +979,14 @@ async function routeRequest(input: {
       writeJson(response, 200, { ok: true, data: appendReview(body) });
       return;
     }
-    if (
-      request.method === "POST"
-      && url.pathname === "/api/authority/enroll/challenge"
-    ) {
-      assertOrigin(request, origin);
-      const body = await readJsonBody(request, DECISION_BODY_MAX_BYTES);
-      writeJson(response, 200, {
-        ok: true,
-        data: await createEnrollmentChallenge(body),
-      });
-      return;
-    }
-    if (
-      request.method === "POST"
-      && url.pathname === "/api/authority/enroll/complete"
-    ) {
-      assertOrigin(request, origin);
-      const body = await readJsonBody(request, DECISION_BODY_MAX_BYTES);
-      writeJson(response, 200, {
-        ok: true,
-        data: await completeEnrollment(body),
-      });
-      return;
-    }
-    if (
-      request.method === "POST"
-      && url.pathname === "/api/decision/challenge"
-    ) {
-      assertOrigin(request, origin);
-      const body = await readJsonBody(request, DECISION_BODY_MAX_BYTES);
-      writeJson(response, 200, {
-        ok: true,
-        data: await createDecisionChallenge(body),
-      });
-      return;
-    }
-    if (
-      request.method === "POST"
-      && url.pathname === "/api/decision/complete"
-    ) {
-      assertOrigin(request, origin);
-      const body = await readJsonBody(request, DECISION_BODY_MAX_BYTES);
-      writeJson(response, 200, {
-        ok: true,
-        data: await completeDecision(body),
-      });
-      return;
-    }
-    if (
-      request.method === "POST"
-      && url.pathname === "/api/authority/revoke/challenge"
-    ) {
-      assertOrigin(request, origin);
-      const body = await readJsonBody(request, DECISION_BODY_MAX_BYTES);
-      writeJson(response, 200, {
-        ok: true,
-        data: await createRevocationChallenge(body),
-      });
-      return;
-    }
-    if (
-      request.method === "POST"
-      && url.pathname === "/api/authority/revoke/complete"
-    ) {
-      assertOrigin(request, origin);
-      const body = await readJsonBody(request, DECISION_BODY_MAX_BYTES);
-      writeJson(response, 200, {
-        ok: true,
-        data: await completeRevocation(body),
-      });
-      return;
-    }
     if (request.method === "POST" && url.pathname === "/api/decision") {
       assertOrigin(request, origin);
       const body = await readJsonBody(request, DECISION_BODY_MAX_BYTES);
-      writeJson(response, 200, { ok: true, data: recordDecision(body) });
+      writeJson(response, 200, { ok: true, data: submitDecision(body) });
       return;
     }
   }
   throw new HostHttpError(404, "not_found", "Route not found.");
-}
-
-function enrollmentChallengeBody(body: unknown): {
-  principalId: string;
-} {
-  const value = plainObject(body, "WebAuthn enrollment request");
-  assertExactKeys(value, ["principalId"], "WebAuthn enrollment request");
-  const principalId = value.principalId;
-  if (
-    typeof principalId !== "string"
-    || principalId.length === 0
-    || principalId !== principalId.trim()
-    || [...principalId].length > 256
-  ) {
-    throw new HostHttpError(
-      400,
-      "validation_error",
-      "principalId must be non-empty trimmed text of at most 256 characters.",
-    );
-  }
-  return { principalId };
-}
-
-function ceremonyCompletionBody(body: unknown): {
-  ceremonyId: string;
-  credential: Record<string, unknown>;
-} {
-  const value = plainObject(body, "WebAuthn ceremony completion");
-  assertExactKeys(
-    value,
-    ["ceremonyId", "credential"],
-    "WebAuthn ceremony completion",
-  );
-  if (
-    typeof value.ceremonyId !== "string"
-    || !/^[A-Za-z0-9_-]{32,128}$/u.test(value.ceremonyId)
-  ) {
-    throw new HostHttpError(
-      400,
-      "validation_error",
-      "ceremonyId is invalid.",
-    );
-  }
-  return {
-    ceremonyId: value.ceremonyId,
-    credential: plainObject(
-      value.credential,
-      "WebAuthn credential response",
-    ),
-  };
-}
-
-function emptyBody(body: unknown, label: string): void {
-  const value = plainObject(body, label);
-  assertExactKeys(value, [], label);
-}
-
-function plainObject(
-  value: unknown,
-  label: string,
-): Record<string, unknown> {
-  if (
-    typeof value !== "object"
-    || value === null
-    || Array.isArray(value)
-    || Object.getPrototypeOf(value) !== Object.prototype
-  ) {
-    throw new HostHttpError(
-      400,
-      "validation_error",
-      `${label} must be a JSON object.`,
-    );
-  }
-  return value as Record<string, unknown>;
-}
-
-function assertExactKeys(
-  value: Record<string, unknown>,
-  expected: readonly string[],
-  label: string,
-): void {
-  const actual = Object.keys(value).sort();
-  const wanted = [...expected].sort();
-  if (
-    actual.length !== wanted.length
-    || actual.some((key, index) => key !== wanted[index])
-  ) {
-    throw new HostHttpError(
-      400,
-      "validation_error",
-      `${label} contains unsupported fields.`,
-      { expectedFields: wanted, actualFields: actual },
-    );
-  }
-}
-
-function pruneExpiredCeremonies(
-  ceremonies: Map<string, PendingCeremony>,
-): void {
-  const current = Date.now();
-  for (const [ceremonyId, pending] of ceremonies) {
-    if (pending.expiresAtEpochMs <= current) {
-      ceremonies.delete(ceremonyId);
-    }
-  }
 }
 
 function requireInstant(value: string, label: string): string {
@@ -1459,19 +1001,8 @@ function requireInstant(value: string, label: string): string {
   return new Date(timestamp).toISOString();
 }
 
-function hostCeremonyChallenge(
-  value: Readonly<Record<string, unknown>>,
-): string {
-  return crypto.createHash("sha256")
-    .update(JSON.stringify({
-      schemaVersion: 1,
-      ...value,
-    }))
-    .digest("base64url");
-}
-
 function decisionAuthority(
-  profile: TicketWebAuthnAuthorityProfileV1,
+  profile: TicketLocalDecisionAuthorityProfileV1,
 ): TicketDecisionAuthorityContext {
   return {
     principal_id: profile.principalId,
@@ -1484,9 +1015,8 @@ function decisionAuthority(
 
 function decisionAttestationEnvelope(input: {
   snapshot: ReturnType<typeof loadTicketLedgerFromWorktree>;
-  profile: TicketWebAuthnAuthorityProfileV1;
+  profile: TicketLocalDecisionAuthorityProfileV1;
   prepared: ReturnType<typeof prepareTicketDecisionForSnapshot>;
-  origin: string;
   issuedAt: string;
 }): TicketDecisionAttestationEnvelope {
   if (input.snapshot.source.mode !== "worktree") {
@@ -1494,6 +1024,17 @@ function decisionAttestationEnvelope(input: {
       409,
       "ticket_source_not_worktree",
       "Durable Ticket Decision attestation requires a worktree source.",
+    );
+  }
+  if (input.snapshot.source.branch === null) {
+    throw new HostHttpError(
+      409,
+      "ticket_decision_detached_checkout_unsupported",
+      "Durable Ticket Decisions require a named branch checkout.",
+      null,
+      [
+        "Switch this worktree to a named branch, refresh the graph, and confirm the Decision again.",
+      ],
     );
   }
   const document = input.prepared.document;
@@ -1540,32 +1081,22 @@ function decisionAttestationEnvelope(input: {
       repository_root: input.snapshot.source.repositoryRoot,
       worktree_identity: input.snapshot.source.worktreeIdentity,
       worktree_root: input.snapshot.source.worktreeRoot,
-      checkout: input.snapshot.source.branch === null
-        ? {
-            mode: "detached",
-            commit: input.snapshot.source.resolvedCommit,
-          }
-        : {
-            mode: "branch",
-            branch: input.snapshot.source.branch,
-          },
+      checkout: {
+        mode: "branch",
+        branch: input.snapshot.source.branch,
+      },
     },
     scope,
-    credential: {
-      credential_id: input.profile.credentialId,
-      fingerprint: input.profile.keyFingerprint,
+    signer: {
+      key_id: input.profile.keyId,
+      key_fingerprint: input.profile.keyFingerprint,
+      algorithm: "Ed25519",
     },
-    webauthn: {
-      rp_id: input.profile.rpId,
-      origin: input.origin,
-      algorithm: input.profile.algorithm,
+    confirmation: {
+      method: "plugin_host_click",
     },
     nonce: crypto.randomBytes(32).toString("base64url"),
     issued_at: input.issuedAt,
-    not_before: input.issuedAt,
-    expires_at: new Date(
-      Date.parse(input.issuedAt) + DECISION_ATTESTATION_LIFETIME_MS,
-    ).toISOString(),
   };
 }
 
@@ -1585,91 +1116,25 @@ function decisionAuthorityScope(
       };
 }
 
-function assertCeremonyRepository(
-  worktreeRoot: string,
-  pending: PendingCeremony,
-): void {
-  const snapshot = loadTicketLedgerFromWorktree(worktreeRoot);
-  if (
-    snapshot.source.mode !== "worktree"
-    || snapshot.source.repositoryIncarnation
-      !== pending.repositoryIncarnation
-  ) {
-    throw new HostHttpError(
-      409,
-      "ticket_webauthn_repository_changed",
-      "The repository identity changed during the WebAuthn ceremony.",
-    );
-  }
-  if (pending.kind !== "decision") return;
-  const actualSource = {
-    sourceToken: snapshot.source.sourceToken,
-    worktreeIdentity: snapshot.source.worktreeIdentity,
-    resolvedCommit: snapshot.source.resolvedCommit,
-    graphDigest: `sha256:${snapshot.source.graphDigest}`,
-    semanticLedgerDigest: `sha256:${snapshot.source.semanticLedgerDigest}`,
-  };
-  if (
-    Object.keys(actualSource).some((field) =>
-      actualSource[field as keyof typeof actualSource]
-      !== pending.expectedSource[
-        field as keyof typeof pending.expectedSource
-      ])
-  ) {
-    throw new HostHttpError(
-      409,
-      "ticket_ledger_stale_source",
-      "The exact Ticket source changed during human verification.",
-      { expected: pending.expectedSource, actual: actualSource },
-      ["Refresh the graph and begin a new Decision ceremony."],
-    );
-  }
-  const checkout = pending.envelope.repository.checkout;
-  const checkoutMatches = checkout.mode === "branch"
-    ? snapshot.source.branch === checkout.branch
-    : snapshot.source.branch === null
-      && snapshot.source.resolvedCommit === checkout.commit;
-  if (
-    !checkoutMatches
-    || snapshot.source.repositoryRoot
-      !== pending.envelope.repository.repository_root
-    || snapshot.source.worktreeIdentity
-      !== pending.envelope.repository.worktree_identity
-    || snapshot.source.worktreeRoot
-      !== pending.envelope.repository.worktree_root
-  ) {
-    throw new HostHttpError(
-      409,
-      "ticket_webauthn_checkout_changed",
-      "The worktree or checkout changed during human verification.",
-      null,
-      ["Return to the reviewed worktree and begin a new Decision ceremony."],
-    );
-  }
-}
-
-function assertVerifiedPresence(
-  pending: PendingDecisionCeremony,
-  presence: TicketWebAuthnVerifiedPresenceV1,
+function assertSameLocalAuthorityProfile(
+  prepared: TicketLocalDecisionAuthorityProfileV1,
+  signed: TicketLocalDecisionAuthorityProfileV1,
 ): void {
   if (
-    presence.challenge !== pending.challenge
-    || presence.origin !== pending.origin
-    || presence.userVerified !== true
-    || presence.profile.profileId !== pending.profile.profileId
-    || presence.profile.repositoryIncarnation
-      !== pending.repositoryIncarnation
-    || presence.profile.principalId !== pending.profile.principalId
-    || presence.profile.authorityBasis !== pending.profile.authorityBasis
-    || presence.profile.authorityRef !== pending.profile.authorityRef
-    || presence.profile.credentialId !== pending.profile.credentialId
-    || presence.profile.keyFingerprint !== pending.profile.keyFingerprint
-    || presence.assertion.credentialId !== pending.profile.credentialId
+    signed.profileId !== prepared.profileId
+    || signed.repositoryIncarnation !== prepared.repositoryIncarnation
+    || signed.principalId !== prepared.principalId
+    || signed.authorityBasis !== prepared.authorityBasis
+    || signed.authorityRef !== prepared.authorityRef
+    || signed.keyId !== prepared.keyId
+    || signed.keyFingerprint !== prepared.keyFingerprint
+    || signed.algorithm !== prepared.algorithm
+    || signed.revokedAt !== null
   ) {
     throw new HostHttpError(
       409,
-      "ticket_webauthn_identity_changed",
-      "The verified WebAuthn authority did not match the prepared Decision.",
+      "ticket_local_authority_changed",
+      "The local Decision signer changed while the exact Decision was prepared.",
     );
   }
 }
@@ -1715,12 +1180,6 @@ function staticAsset(
   }
   if (pathname === "/app.js") {
     return { file: "app.js", contentType: "text/javascript; charset=utf-8" };
-  }
-  if (pathname === "/webauthn.js") {
-    return {
-      file: "webauthn.js",
-      contentType: "text/javascript; charset=utf-8",
-    };
   }
   return null;
 }
@@ -1905,18 +1364,18 @@ function writeError(response: http.ServerResponse, error: unknown): void {
     });
     return;
   }
-  if (error instanceof TicketWebAuthnAuthorityError) {
+  if (error instanceof TicketLocalDecisionAuthorityError) {
     writeJson(
       response,
       error.code === "invalid_input" ? 400 : 409,
       {
         ok: false,
         error: {
-          code: `ticket_webauthn_${error.code}`,
+          code: `ticket_local_authority_${error.code}`,
           message: error.message,
           details: null,
           nextSafeActions: [
-            "Refresh the current Ticket source and begin a new ceremony.",
+            "Refresh the current Ticket source and confirm the Decision again.",
           ],
         },
       },
@@ -1937,7 +1396,7 @@ function writeError(response: http.ServerResponse, error: unknown): void {
         message: error.message,
         details: error.details,
         nextSafeActions: [
-          "Refresh the current Ticket source and begin a new ceremony.",
+          "Refresh the current Ticket source and confirm the Decision again.",
         ],
       },
     });
@@ -1973,7 +1432,7 @@ function defaultAssetRoot(): string {
 }
 
 function assertAssets(assetRoot: string): void {
-  for (const file of ["index.html", "app.css", "app.js", "webauthn.js"]) {
+  for (const file of ["index.html", "app.css", "app.js"]) {
     if (!fs.statSync(
       managedAssetPath(assetRoot, file),
       { throwIfNoEntry: false },
@@ -1984,18 +1443,7 @@ function assertAssets(assetRoot: string): void {
 }
 
 function managedAssetPath(assetRoot: string, file: string): string {
-  const managed = path.join(assetRoot, file);
-  if (
-    file !== "webauthn.js"
-    || fs.statSync(managed, { throwIfNoEntry: false })?.isFile()
-  ) {
-    return managed;
-  }
-  const moduleRoot = path.dirname(fileURLToPath(import.meta.url));
-  return path.resolve(
-    moduleRoot,
-    "../node_modules/@simplewebauthn/browser/dist/bundle/index.umd.min.js",
-  );
+  return path.join(assetRoot, file);
 }
 
 function openBrowser(url: string): void {

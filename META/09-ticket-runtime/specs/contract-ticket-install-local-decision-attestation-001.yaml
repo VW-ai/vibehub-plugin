@@ -1,0 +1,121 @@
+spec_id: "contract-ticket-install-local-decision-attestation-001"
+type: contract
+state: active
+intent:
+  summary: "Fresh host 与 fresh Agent 如何在不声称 WebAuthn、biometric 或 named-human presence 的前提下，验证一次 Plugin-host click 所确认的 exact Decision？"
+  detail: |
+    M3.6 keeps the useful durable-receipt boundary from M3.5 while removing the
+    WebAuthn ceremony and its stronger-than-needed human-presence claim. One
+    explicit click in the installed Plugin review host confirms one exact
+    Decision. The host signs that Decision with a repository-scoped,
+    installation-local Ed25519 key whose private material and public trust
+    registry live outside Git and SQLite.
+
+    The detached Git receipt binds the exact canonical Decision document and
+    digest, authority attribution, repository incarnation and roots, worktree,
+    named branch, protected subject, disposition and granted scope. Detached
+    checkouts remain readable but cannot create durable Decisions because a
+    commit would immediately change their commit identity. The receipt also
+    records the signer key ID and fingerprint, the
+    `plugin_host_click` confirmation method, a nonce, and issuance time.
+    Signature bytes are the fixed domain
+    `vibehub.ticket-decision-attestation.v1\0` followed by the canonical
+    envelope without the signature.
+
+    Fresh Core, CLI, MCP, and Skill readers resolve the public profile from the
+    repo-external registry for every verification. A missing, mismatched, or
+    revoked profile; any Decision, checkout, repository, worktree, subject, or
+    scope mismatch; or an invalid signature fails closed. Receipts do not
+    expire. They remain usable only while their exact bound facts are current
+    and their signing profile is not revoked.
+
+    This is intentionally local-installation authority, not proof of a named
+    person. `confirmation.method: plugin_host_click` records what the trusted
+    Plugin host says happened; it is not biometric verification, WebAuthn user
+    verification, or cryptographic proof of human presence. The profile's
+    human-shaped authority fields preserve the Decision contract as a
+    `designated_human` host assertion but identify
+    `local-installation:<profileId>`, not an individual or repository owner.
+
+    The threat model protects against repository-only mutation, Git or SQLite
+    fabrication, stale checkout reuse, receipt tamper, and fresh-process trust
+    confusion. It does not protect against an arbitrary process running as the
+    same OS user that can read or invoke the installation key, a compromised
+    Plugin/runtime, or compromise of the local OS account. Those stronger
+    threats require an OS-backed or remote authority and are explicitly outside
+    this contract.
+constraints:
+  - kind: must
+    rule: "One explicit Plugin-host click produces at most one exact Decision and its detached attestation; no default draft or second review ceremony is required"
+  - kind: must
+    rule: "The signer is a repository-scoped installation-local Ed25519 profile, keyed by repository incarnation, whose private key and trust registry live outside Git and SQLite"
+  - kind: must
+    rule: "The signed envelope binds the exact Decision ID, path, digest, designated-human host attribution, repository incarnation and roots, worktree identity and root, named branch, subject, disposition, and granted scope"
+  - kind: must
+    rule: "The signed envelope also binds signer key ID and fingerprint, algorithm Ed25519, confirmation method plugin_host_click, a fresh nonce, and issued_at; the signature is canonical base64url over the fixed domain-separated canonical envelope"
+  - kind: must
+    rule: "Fresh and already-running readers dynamically reread the repo-external public trust registry for each verification so missing, mismatched, or revoked profiles fail closed without a restart"
+  - kind: must
+    rule: "A Decision written without its matching receipt after interruption remains inspectable current-unverified evidence and never projects protected execution authority"
+  - kind: must
+    rule: "The receipt has no not_before, expires_at, or TTL semantics; a subject or checkout change requires a newly bound Decision, while profile revocation invalidates prior receipts"
+  - kind: must
+    rule: "Detached checkouts remain readable but durable Decision controls are unavailable and direct writes fail closed until the worktree is on a named branch"
+  - kind: must
+    rule: "Revoked profiles remain inspectable, the next named-branch host may rotate to one new active profile, and a dead authority-writer lock is recovered only after its recorded process no longer exists while a non-semantic process-releasing mutex excludes concurrent recoverers"
+  - kind: must
+    rule: "A running host remains bound to its startup profile and fails closed after revocation; it cannot rotate from an old browser form or direct request, and only a subsequent named-branch host startup provisions the replacement"
+  - kind: must
+    rule: "The non-semantic SQLite mutex is owner-only before SQLite opens it, and the complete owner record is fsynced before atomic no-replace publication so process exit cannot leave an empty canonical lock"
+  - kind: must_not
+    rule: "Do not describe plugin_host_click as WebAuthn, biometric verification, named-human identity, or cryptographic proof of human presence"
+  - kind: must_not
+    rule: "Do not let editable Git documents, SQLite rows, browser-supplied identity or proof fields, OS usernames, Git authors, or previous in-memory state mint or preserve authority"
+  - kind: must_not
+    rule: "Do not treat the local SQLite writer mutex as Ticket meaning, identity, trust material, or durable authority"
+  - kind: must_not
+    rule: "Do not claim resistance to arbitrary same-UID key access, Plugin/runtime compromise, or local OS-account compromise"
+  - kind: must_not
+    rule: "Do not expand the mechanism into remote authentication, generic workflow policy, or mandatory human review for Agent-owned technical choices"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket, decision, authority, attestation, ed25519, plugin, git, worktree]
+provenance:
+  source_type: implementation_review
+  confidence: 0.99
+  source_ref: "Install-local Ed25519 Decision authority pivot — 2026-07-30"
+  produced_by_agent: "implementation"
+  produced_at: "2026-07-30T14:56:25-07:00"
+relations:
+  - target: "contract-ticket-durable-decision-attestation-001"
+    type: supersedes
+    detail: "Preserves exact durable cross-process verification while replacing the WebAuthn ceremony, expiry, and named-human-presence claim."
+  - target: "contract-ticket-git-review-interventions-001"
+    type: depends_on
+    detail: "Supplies durable authority for the exact Git-native Decision facts introduced by M3."
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+    detail: "Keeps the signed receipt in Git while the signing key and revocable public trust remain repo-external."
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: depends_on
+    detail: "Exposes verified authority evidence to Skills without moving semantic judgment into Core."
+  - target: "decision-ticket-context-binding-001"
+    type: relates_to
+    detail: "Protected context-binding may use this exact local-installation receipt without treating it as named-human identity."
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md"
+  - file: "packages/core/src/ticket-ledger/contract.ts"
+  - file: "packages/core/src/ticket-ledger/codec.ts"
+  - file: "packages/core/src/ticket-ledger/writer.ts"
+  - file: "packages/core/src/ticket-decision-attestation.ts"
+  - file: "packages/core/src/ticket-decision-trust-store.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/cli/src/ticket-local-decision-authority.ts"
+  - file: "packages/cli/src/ticket-review-host.ts"
+  - file: "packages/cli/src/main.ts"
+  - file: "packages/mcp/src/runtime.ts"
+  - file: "skills/vibehub-ticket-review/SKILL.md"

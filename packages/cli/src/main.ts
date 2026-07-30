@@ -24,7 +24,7 @@ import {
   CURRENT_SCHEMA_VERSION,
   commitSemanticCheckpoint,
   commitTicketCheckpoint,
-  FileTicketDecisionAttestationTrustProfileResolverV0,
+  FileTicketDecisionLocalSignatureTrustProfileResolverV0,
   exportTeamMapSnapshot,
   GitFacade,
   ingestCanonicalHookEvent,
@@ -210,7 +210,7 @@ function runOperation(
     const result=new OperationDispatcher(db,{
       repoRoot:session.toplevel,
       ticketDecisionAttestationTrustProfiles:
-        new FileTicketDecisionAttestationTrustProfileResolverV0(),
+        new FileTicketDecisionLocalSignatureTrustProfileResolverV0(),
     }).dispatch(canonicalOperation,{repoId,actor:flags.actor,taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
     process.stdout.write(`${JSON.stringify(result)}\n`);
     return result.ok?0:(OPERATION_EXIT_CLASS[result.error.code]??1);

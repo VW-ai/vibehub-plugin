@@ -32,10 +32,11 @@ Normalize; an independent semantic validator returns graph validity separately
 from human execution authority.
 
 M3 adds strict Git-native Review and Decision facts plus the structured graph
-intervention surface. M3.5 adds durable WebAuthn human authority: the
-authenticator retains the private key, a repo-external registry supplies
-revocable public trust, detached Git receipts bind one exact Decision, and
-fresh CLI, MCP, or Skill processes verify it independently.
+intervention surface. M3.5 historically established durable WebAuthn-backed
+receipts. M3.6 preserves their exact Git binding and fresh-process verification
+while replacing the ceremony with one explicit Plugin-host click and a
+repository-scoped, installation-local Ed25519 key. The result makes no
+biometric or named-human-presence claim.
 
 ## Canonical decisions
 
@@ -82,13 +83,18 @@ fresh CLI, MCP, or Skill processes verify it independently.
   comments, complete Ticket edit proposals, plan reviews, and protected
   Decisions are exact-subject Git facts. Browser attribution is host-bound;
   durable Decision YAML is evidence rather than self-authenticating authority;
-  only an exact active-host attestation may project a gate. Skills decide how
+  only an exact currently verified install-local receipt or deliberately
+  session-only injected attestation may project a gate. Skills decide how
   non-authoritative review context changes a candidate.
+- [`contract-ticket-install-local-decision-attestation-001`](specs/contract-ticket-install-local-decision-attestation-001.yaml):
+  M3.6 lets a fresh host or Agent verify one exact Decision after one explicit
+  Plugin-host click. A repository-scoped installation-local Ed25519 key lives
+  outside Git and SQLite; exact detached receipts have no expiry and are
+  dynamically revocable. The click is a host assertion, not WebAuthn,
+  biometric proof, or named-human identity.
 - [`contract-ticket-durable-decision-attestation-001`](specs/contract-ticket-durable-decision-attestation-001.yaml):
-  M3.5 lets a fresh host or Agent verify one exact WebAuthn-attested human
-  Decision without trusting editable YAML, SQLite, browser claims, or a
-  previous process. The installed review entrypoint supports enrollment,
-  plan review, protected-boundary Decisions, re-attestation, and revocation.
+  the superseded M3.5 WebAuthn contract remains historical provenance for the
+  first durable-receipt boundary.
 
 ### Human surface
 
@@ -237,8 +243,9 @@ M3—the Git-native review intervention loop—is implemented:
 
 Review remains optional intelligence rather than a mandatory activation stage.
 Adversarial review established that editable Decision YAML cannot authenticate
-its own human authority. M3 therefore fails closed with active-session
-attestation. M3.5 now supplies durable cross-process attestation before
+its own authority. M3 therefore fails closed with active-session attestation.
+M3.5 historically supplied the first durable cross-process attestation. M3.6
+now supplies the active, honestly scoped local-installation authority before
 protected context-binding and closeout Decisions truthfully unblock M4.
 The independently validated truth-boundary candidate was applied as 11 Tickets
 and 11 direct relations at graph digest
@@ -273,6 +280,31 @@ graph digest
 and is path-exact checkpointed in
 `e8f2afd23d5651b3a90442f5d92e02ee2559720c`.
 
+M3.6 is implemented in the current working tree, pending commit:
+
+- the WebAuthn ceremony is replaced by one explicit Plugin-host Decision click;
+- one repository-scoped Ed25519 profile stores its private key and revocable
+  public trust outside Git and SQLite;
+- detached Git receipts retain the exact Decision, repository, worktree,
+  named-branch checkout, subject, disposition, scope, signer, confirmation,
+  nonce, and issuance bindings; detached checkouts stay readable but cannot
+  record durable Decisions;
+- signatures cover the fixed domain-separated canonical envelope and have no
+  expiry window;
+- fresh and already-running Core, CLI, MCP, and Skill readers dynamically
+  reread the external registry, so revocation and mismatch fail closed;
+- revoked profiles remain inspectable, the next named-branch host rotates to
+  one new active profile while the revoked running host stays fail-closed, and
+  a non-semantic process-releasing SQLite writer mutex serializes stale
+  owner-record recovery; the complete owner record is atomically published so
+  a crash cannot leave an empty canonical lock;
+- `plugin_host_click` is an honest host assertion, not WebAuthn, biometric
+  verification, named-human identity, or resistance to arbitrary same-UID or
+  Plugin compromise.
+
+No M3.6 commit SHA is recorded until the implementation and successor metadata
+are committed.
+
 Execution, Outcome, Evidence, and closeout remain M4.
 
 The first real write also exposed a host-integration boundary: the Agent
@@ -295,3 +327,4 @@ Implementation evidence is recorded in:
 - [`Ticket M3 Git-native review intervention`](artifacts/2026-07-30-ticket-m3-git-review-intervention.md)
 - [`Ticket M3/M3.5 authority-boundary validated candidate`](artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json)
 - [`Ticket M3.5 durable Decision attestation`](artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md)
+- [`Ticket M3.6 install-local Decision authority pivot`](artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md)

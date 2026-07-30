@@ -14,7 +14,6 @@ import {
   prepareTicketCheckpoint,
   prepareTicketDecisionForSnapshot,
   recordTicketDecision,
-  ticketDecisionAttestationChallenge,
   ticketDecisionAttestationDocumentPath,
   ticketDecisionDocumentDigest,
   type TicketDecisionAttestationDocumentPayload,
@@ -177,15 +176,10 @@ const attestationPayload = (
       repository_root: snapshot.source.repositoryRoot,
       worktree_identity: snapshot.source.worktreeIdentity,
       worktree_root: snapshot.source.worktreeRoot,
-      checkout: snapshot.source.branch === null
-        ? {
-            mode: "detached" as const,
-            commit: snapshot.source.resolvedCommit,
-          }
-        : {
-            mode: "branch" as const,
-            branch: snapshot.source.branch,
-          },
+      checkout: {
+        mode: "branch" as const,
+        branch: snapshot.source.branch ?? "detached-not-supported",
+      },
     },
     scope: {
       scope_type: "protected_boundary" as const,
@@ -195,34 +189,18 @@ const attestationPayload = (
       disposition: decision.document.disposition,
       selection: overrides.selection ?? decision.document.selection!,
     },
-    credential: {
-      credential_id: Buffer.from("credential-1").toString("base64url"),
-      fingerprint: "a".repeat(64),
+    signer: {
+      key_id: `tdk-${"a".repeat(64)}`,
+      key_fingerprint: "a".repeat(64),
+      algorithm: "Ed25519" as const,
     },
-    webauthn: {
-      rp_id: "localhost" as const,
-      origin: "http://localhost:43123",
-      algorithm: "ES256" as const,
-    },
+    confirmation: { method: "plugin_host_click" as const },
     nonce: Buffer.alloc(16, 7).toString("base64url"),
     issued_at: "2026-07-30T23:01:00.000Z",
-    not_before: "2026-07-30T23:01:00.000Z",
-    expires_at: "2026-07-31T00:01:00.000Z",
   };
-  const challenge = ticketDecisionAttestationChallenge(envelope);
   return {
     ...envelope,
-    webauthn: {
-      ...envelope.webauthn,
-      client_data_json: Buffer.from(JSON.stringify({
-        type: "webauthn.get",
-        challenge,
-        origin: envelope.webauthn.origin,
-        crossOrigin: false,
-      })).toString("base64url"),
-      authenticator_data: Buffer.alloc(37, 1).toString("base64url"),
-      signature: Buffer.alloc(64, 2).toString("base64url"),
-    },
+    signature: Buffer.alloc(64, 2).toString("base64url"),
   };
 };
 

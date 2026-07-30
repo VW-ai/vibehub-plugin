@@ -1936,15 +1936,17 @@ const assertAttestationDecisionBinding = (
     );
   }
 
-  const expectedCheckout = snapshot.source.branch === null
-    ? {
-        mode: "detached" as const,
-        commit: snapshot.source.resolvedCommit,
-      }
-    : {
-        mode: "branch" as const,
-        branch: snapshot.source.branch,
-      };
+  if (snapshot.source.branch === null) {
+    throw new TicketLedgerError(
+      "stale_source",
+      "Durable Ticket decision attestations require a named branch checkout",
+      { decisionId: decision.document.decision_id },
+    );
+  }
+  const expectedCheckout = {
+    mode: "branch" as const,
+    branch: snapshot.source.branch,
+  };
   const expectedRepository = {
     repository_incarnation: snapshot.source.repositoryIncarnation,
     repository_root: snapshot.source.repositoryRoot,

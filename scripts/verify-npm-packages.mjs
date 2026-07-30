@@ -94,6 +94,31 @@ for (const entry of packages) {
       );
     }
   }
+  if (entry.expectedName === "@vw-ai/vibehub-cli") {
+    const builtArtifacts = listFiles(join(packageRoot, "dist"))
+      .map((artifact) => `dist/${artifact}`);
+    for (const requiredArtifact of [
+      "dist/ticket-local-decision-authority.js",
+      "dist/ticket-review-host/index.html",
+      "dist/ticket-review-host/app.css",
+      "dist/ticket-review-host/app.js",
+    ]) {
+      if (!builtArtifacts.includes(requiredArtifact)) {
+        throw new Error(
+          `@vw-ai/vibehub-cli dist is missing ${requiredArtifact}`,
+        );
+      }
+    }
+    if (
+      builtArtifacts.includes("dist/ticket-review-host/webauthn.js")
+      || Object.keys(manifest.dependencies ?? {}).some((dependency) =>
+        dependency.startsWith("@simplewebauthn/"))
+    ) {
+      throw new Error(
+        "@vw-ai/vibehub-cli must not ship the retired WebAuthn ceremony",
+      );
+    }
+  }
 
   accessSync(join(packageRoot, "README.md"), constants.R_OK);
 

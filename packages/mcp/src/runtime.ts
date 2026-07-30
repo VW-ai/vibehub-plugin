@@ -1,5 +1,5 @@
 import {
-  FileTicketDecisionAttestationTrustProfileResolverV0,
+  FileTicketDecisionLocalSignatureTrustProfileResolverV0,
   GitFacade,
   getRepoByRoot,
   openDb,
@@ -63,7 +63,7 @@ export function openRuntimeContext(
         taskId,
         repoRoot: session.toplevel,
         ticketDecisionAttestationTrustProfiles:
-          new FileTicketDecisionAttestationTrustProfileResolverV0(),
+          new FileTicketDecisionLocalSignatureTrustProfileResolverV0(),
       },
       close: () => db.close(),
     };

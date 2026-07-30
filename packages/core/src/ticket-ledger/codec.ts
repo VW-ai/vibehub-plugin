@@ -547,16 +547,10 @@ const attestationEnvelopeCandidate = (
   authority: candidate.authority,
   repository: candidate.repository,
   scope: candidate.scope,
-  credential: candidate.credential,
-  webauthn: {
-    rp_id: candidate.webauthn.rp_id,
-    origin: candidate.webauthn.origin,
-    algorithm: candidate.webauthn.algorithm,
-  },
+  signer: candidate.signer,
+  confirmation: candidate.confirmation,
   nonce: candidate.nonce,
   issued_at: candidate.issued_at,
-  not_before: candidate.not_before,
-  expires_at: candidate.expires_at,
 });
 
 const parseAttestationEnvelope = (
@@ -636,12 +630,10 @@ const normalizeAttestationEnvelope = (
         : { ...value.repository.checkout },
     },
     scope,
-    credential: { ...value.credential },
-    webauthn: { ...value.webauthn },
+    signer: { ...value.signer },
+    confirmation: { ...value.confirmation },
     nonce: value.nonce,
     issued_at: normalizeInstant(value.issued_at),
-    not_before: normalizeInstant(value.not_before),
-    expires_at: normalizeInstant(value.expires_at),
   };
 };
 
@@ -654,20 +646,25 @@ export const normalizeTicketDecisionAttestationEnvelope = (
 ): TicketDecisionAttestationEnvelope =>
   normalizeAttestationEnvelope(candidate, label);
 
-export const ticketDecisionAttestationChallenge = (
+const TICKET_DECISION_ATTESTATION_SIGNING_DOMAIN = Buffer.from(
+  "vibehub.ticket-decision-attestation.v1\0",
+  "utf8",
+);
+
+export const ticketDecisionAttestationSigningBytes = (
   candidate:
     | TicketDecisionAttestationEnvelope
     | TicketDecisionAttestationDocumentPayload
     | TicketDecisionAttestationDocument,
-): string => {
+): Buffer => {
   const envelope = normalizeAttestationEnvelope(
     candidate,
-    "Ticket decision attestation challenge envelope",
+    "Ticket decision attestation signing envelope",
   );
-  return Buffer.from(
-    sha256(canonicalTicketLedgerValue(envelope)),
-    "hex",
-  ).toString("base64url");
+  return Buffer.concat([
+    TICKET_DECISION_ATTESTATION_SIGNING_DOMAIN,
+    Buffer.from(canonicalTicketLedgerValue(envelope), "utf8"),
+  ]);
 };
 
 const parseAttestationPayload = (
@@ -686,63 +683,6 @@ const parseAttestationPayload = (
   return parsed.data;
 };
 
-const assertAttestationClientData = (
-  payload: TicketDecisionAttestationDocumentPayload,
-  label: string,
-): void => {
-  const bytes = Buffer.from(payload.webauthn.client_data_json, "base64url");
-  const source = bytes.toString("utf8");
-  if (!Buffer.from(source, "utf8").equals(bytes)) {
-    throw new TicketLedgerError(
-      "invalid_document",
-      `${label}.webauthn.client_data_json is not valid UTF-8`,
-      { label },
-    );
-  }
-  let value: unknown;
-  try {
-    value = JSON.parse(source);
-  } catch (cause) {
-    throw new TicketLedgerError(
-      "invalid_document",
-      `${label}.webauthn.client_data_json is not valid JSON`,
-      { label },
-      { cause },
-    );
-  }
-  if (
-    typeof value !== "object"
-    || value === null
-    || Array.isArray(value)
-  ) {
-    throw new TicketLedgerError(
-      "invalid_document",
-      `${label}.webauthn.client_data_json must decode to an object`,
-      { label },
-    );
-  }
-  const clientData = value as Record<string, unknown>;
-  const expectedChallenge = ticketDecisionAttestationChallenge(payload);
-  if (
-    clientData.type !== "webauthn.get"
-    || clientData.challenge !== expectedChallenge
-    || clientData.origin !== payload.webauthn.origin
-    || clientData.crossOrigin !== false
-  ) {
-    throw new TicketLedgerError(
-      "invalid_document",
-      `${label}.webauthn.client_data_json does not bind the exact attestation envelope`,
-      {
-        label,
-        expectedType: "webauthn.get",
-        expectedChallenge,
-        expectedOrigin: payload.webauthn.origin,
-        expectedCrossOrigin: false,
-      },
-    );
-  }
-};
-
 const normalizeAttestationPayload = (
   candidate: unknown,
   label: string,
@@ -751,14 +691,8 @@ const normalizeAttestationPayload = (
   const envelope = normalizeAttestationEnvelope(value, label);
   const normalized: TicketDecisionAttestationDocumentPayload = {
     ...envelope,
-    webauthn: {
-      ...envelope.webauthn,
-      client_data_json: value.webauthn.client_data_json,
-      authenticator_data: value.webauthn.authenticator_data,
-      signature: value.webauthn.signature,
-    },
+    signature: value.signature,
   };
-  assertAttestationClientData(normalized, label);
   return normalized;
 };
 

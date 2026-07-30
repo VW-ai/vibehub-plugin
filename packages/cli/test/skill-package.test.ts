@@ -167,6 +167,55 @@ describe("production skill package",()=>{
     expect(review).not.toMatch(/proposal|decision|apply/i);
   });
 
+  it("keeps Ticket review confirmation local, explicit, and receipt-bound",()=>{
+    const review=fs.readFileSync(
+      path.join(skills,"vibehub-ticket-review","SKILL.md"),
+      "utf8",
+    );
+    expect(review).toContain("one explicit confirmation");
+    expect(review).toContain("install-local signing authority");
+    expect(review).toContain("exact detached authority receipt");
+    expect(review).toContain(
+      "short-lived browser link as an approval capability",
+    );
+    expect(review).toContain("does not prove biometric presence");
+    expect(review).not.toMatch(/WebAuthn|authenticator|human presence/i);
+  });
+
+  it("ships one direct Decision submission without a browser ceremony",()=>{
+    const cliRoot=path.resolve(workbench,"packages","cli");
+    const html=fs.readFileSync(
+      path.join(cliRoot,"assets","ticket-review-host","index.html"),
+      "utf8",
+    );
+    const app=fs.readFileSync(
+      path.join(cliRoot,"assets","ticket-review-host","app.js"),
+      "utf8",
+    );
+    const copy=fs.readFileSync(
+      path.join(cliRoot,"scripts","copy-managed-assets.mjs"),
+      "utf8",
+    );
+    const manifest=JSON.parse(fs.readFileSync(
+      path.join(cliRoot,"package.json"),
+      "utf8",
+    ));
+    expect(html).not.toContain("/webauthn.js");
+    expect(app).toContain('route: "/api/decision"');
+    expect(app).toContain("Recording exact decision…");
+    expect(app).toContain("`Receipt · ${receiptPath}`");
+    expect(app).not.toMatch(
+      /SimpleWebAuthn|webauthn-|\/api\/decision\/challenge/,
+    );
+    expect(copy).not.toContain("@simplewebauthn");
+    expect(manifest.dependencies).not.toHaveProperty(
+      "@simplewebauthn/browser",
+    );
+    expect(manifest.dependencies).not.toHaveProperty(
+      "@simplewebauthn/server",
+    );
+  });
+
   it("advertises Ticket orchestration from the Codex plugin surface",()=>{
     const manifest=JSON.parse(fs.readFileSync(
       path.join(workbench,".codex-plugin","plugin.json"),

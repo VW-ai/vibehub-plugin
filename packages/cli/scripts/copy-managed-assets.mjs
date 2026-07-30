@@ -32,15 +32,3 @@ fs.cpSync(
   reviewHostOutputRoot,
   { recursive: true },
 );
-fs.copyFileSync(
-  path.join(
-    packageRoot,
-    "node_modules",
-    "@simplewebauthn",
-    "browser",
-    "dist",
-    "bundle",
-    "index.umd.min.js",
-  ),
-  path.join(reviewHostOutputRoot, "webauthn.js"),
-);

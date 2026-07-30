@@ -112,20 +112,20 @@ export {
 export * from "./ticket-review-source.js";
 export * from "./ticket-ledger/index.js";
 export {
-  DurableWebAuthnTicketDecisionAttestationVerifierV0,
-  type DurableWebAuthnTicketDecisionAttestationVerifierOptionsV0,
-  type TicketDecisionAttestationTrustProfileLookupV0,
-  type TicketDecisionAttestationTrustProfileResolverV0,
-  type TicketDecisionAttestationTrustProfileV0,
+  DurableLocalSignatureTicketDecisionAttestationVerifierV0,
+  type DurableLocalSignatureTicketDecisionAttestationVerifierOptionsV0,
+  type TicketDecisionLocalSignatureTrustProfileLookupV0,
+  type TicketDecisionLocalSignatureTrustProfileResolverV0,
+  type TicketDecisionLocalSignatureTrustProfileV0,
   type TicketDecisionAttestationUnverifiedReasonV0,
   type TicketDecisionAttestationVerificationV0,
   type TicketDecisionAttestationVerifierV0,
 } from "./ticket-decision-attestation.js";
 export {
-  FileTicketDecisionAttestationTrustProfileResolverV0,
+  FileTicketDecisionLocalSignatureTrustProfileResolverV0,
   TicketDecisionAuthorityTrustStoreError,
-  defaultTicketDecisionAuthorityRegistryPath,
-  type FileTicketDecisionAttestationTrustProfileResolverOptionsV0,
+  defaultTicketDecisionLocalSignatureRegistryPath,
+  type FileTicketDecisionLocalSignatureTrustProfileResolverOptionsV0,
 } from "./ticket-decision-trust-store.js";
 export {
   GIT_SEMANTIC_STORE_RELATIVE_PATH,

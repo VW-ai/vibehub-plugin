@@ -296,24 +296,6 @@ const base64UrlSchema = (
       `must be canonical base64url encoding at least ${minimumBytes} bytes`,
   });
 
-const exactLocalhostOriginSchema = z.string()
-  .max(2_048)
-  .refine((value) => {
-    try {
-      const parsed = new URL(value);
-      return (parsed.protocol === "http:" || parsed.protocol === "https:")
-        && parsed.hostname === "localhost"
-        && parsed.username === ""
-        && parsed.password === ""
-        && parsed.origin === value;
-    } catch {
-      return false;
-    }
-  }, {
-    message:
-      "must be an exact http(s) localhost origin without path, query, or fragment",
-  });
-
 const ticketDecisionAttestationAuthoritySchema = z.object({
   principal_id: boundedText(512),
   principal_kind: z.literal("human"),
@@ -321,19 +303,10 @@ const ticketDecisionAttestationAuthoritySchema = z.object({
   basis_ref: boundedText(2_048),
 }).strict();
 
-const ticketDecisionAttestationCheckoutSchema = z.discriminatedUnion(
-  "mode",
-  [
-    z.object({
-      mode: z.literal("branch"),
-      branch: boundedText(1_024),
-    }).strict(),
-    z.object({
-      mode: z.literal("detached"),
-      commit: gitCommitSchema,
-    }).strict(),
-  ],
-);
+const ticketDecisionAttestationCheckoutSchema = z.object({
+  mode: z.literal("branch"),
+  branch: boundedText(1_024),
+}).strict();
 
 const ticketDecisionAttestationScopeSchema = z.discriminatedUnion(
   "scope_type",
@@ -412,15 +385,22 @@ const ticketDecisionAttestationRepositorySchema = z.object({
   checkout: ticketDecisionAttestationCheckoutSchema,
 }).strict();
 
-const ticketDecisionAttestationCredentialSchema = z.object({
-  credential_id: base64UrlSchema(4_096),
-  fingerprint: sha256DigestSchema,
-}).strict();
+const ticketDecisionAttestationSignerSchema = z.object({
+  key_id: z.string().regex(/^tdk-[0-9a-f]{64}$/u),
+  key_fingerprint: sha256DigestSchema,
+  algorithm: z.literal("Ed25519"),
+}).strict().superRefine((value, context) => {
+  if (value.key_id !== `tdk-${value.key_fingerprint}`) {
+    context.addIssue({
+      code: "custom",
+      path: ["key_id"],
+      message: "must be derived from key_fingerprint",
+    });
+  }
+});
 
-const ticketDecisionAttestationWebAuthnEnvelopeSchema = z.object({
-  rp_id: z.literal("localhost"),
-  origin: exactLocalhostOriginSchema,
-  algorithm: z.literal("ES256"),
+const ticketDecisionAttestationConfirmationSchema = z.object({
+  method: z.literal("plugin_host_click"),
 }).strict();
 
 const ticketDecisionAttestationEnvelopeShape = {
@@ -430,49 +410,23 @@ const ticketDecisionAttestationEnvelopeShape = {
   authority: ticketDecisionAttestationAuthoritySchema,
   repository: ticketDecisionAttestationRepositorySchema,
   scope: ticketDecisionAttestationScopeSchema,
-  credential: ticketDecisionAttestationCredentialSchema,
-  webauthn: ticketDecisionAttestationWebAuthnEnvelopeSchema,
+  signer: ticketDecisionAttestationSignerSchema,
+  confirmation: ticketDecisionAttestationConfirmationSchema,
   nonce: base64UrlSchema(128, 16),
   issued_at: instantSchema,
-  not_before: instantSchema,
-  expires_at: instantSchema,
 } satisfies z.ZodRawShape;
-
-const addAttestationTimeIssues = (
-  value: { issued_at: string; not_before: string; expires_at: string },
-  context: z.RefinementCtx,
-): void => {
-  const issuedAt = Date.parse(value.issued_at);
-  const notBefore = Date.parse(value.not_before);
-  const expiresAt = Date.parse(value.expires_at);
-  if (notBefore > issuedAt) {
-    context.addIssue({
-      code: "custom",
-      path: ["not_before"],
-      message: "must not be later than issued_at",
-    });
-  }
-  if (expiresAt <= issuedAt) {
-    context.addIssue({
-      code: "custom",
-      path: ["expires_at"],
-      message: "must be later than issued_at",
-    });
-  }
-};
 
 export const ticketDecisionAttestationEnvelopeSchema = z.object(
   ticketDecisionAttestationEnvelopeShape,
-).strict().superRefine(addAttestationTimeIssues);
+).strict();
 
 export const ticketDecisionAttestationDocumentPayloadSchema = z.object({
   ...ticketDecisionAttestationEnvelopeShape,
-  webauthn: ticketDecisionAttestationWebAuthnEnvelopeSchema.extend({
-    client_data_json: base64UrlSchema(32 * 1_024, 2),
-    authenticator_data: base64UrlSchema(16 * 1_024, 37),
-    signature: base64UrlSchema(8 * 1_024, 8),
-  }).strict(),
-}).strict().superRefine(addAttestationTimeIssues);
+  signature: base64UrlSchema(256, 64).refine(
+    (value) => Buffer.from(value, "base64url").byteLength === 64,
+    { message: "must encode one Ed25519 signature" },
+  ),
+}).strict();
 
 export const ticketDecisionAttestationDocumentSchema =
   ticketDecisionAttestationDocumentPayloadSchema.safeExtend({
@@ -496,12 +450,7 @@ export type TicketDecisionAttestationDocument = z.infer<
 export type TicketDecisionAttestationScope =
   TicketDecisionAttestationDocument["scope"];
 export type TicketDecisionAttestationEnvelope =
-  Omit<TicketDecisionAttestationDocumentPayload, "webauthn"> & {
-    webauthn: Pick<
-      TicketDecisionAttestationDocumentPayload["webauthn"],
-      "rp_id" | "origin" | "algorithm"
-    >;
-  };
+  Omit<TicketDecisionAttestationDocumentPayload, "signature">;
 type WithoutField<T, Field extends PropertyKey> =
   T extends unknown ? Omit<T, Field> : never;
 export type TicketReviewDocumentPayload =

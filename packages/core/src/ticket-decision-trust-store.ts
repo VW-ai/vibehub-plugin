@@ -3,8 +3,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
-  type TicketDecisionAttestationTrustProfileResolverV0,
-  type TicketDecisionAttestationTrustProfileV0,
+  type TicketDecisionLocalSignatureTrustProfileResolverV0,
+  type TicketDecisionLocalSignatureTrustProfileV0,
 } from "./ticket-decision-attestation.js";
 
 const REGISTRY_SCHEMA_VERSION = 1 as const;
@@ -12,59 +12,40 @@ const MAX_REGISTRY_BYTES = 2 * 1024 * 1024;
 const MAX_PROFILES = 128;
 const REGISTRY_FILE_MODE = 0o600;
 const REGISTRY_DIRECTORY_MODE = 0o700;
-const PROFILE_ID_PATTERN = /^twa-[0-9a-f]{64}$/u;
+const PROFILE_ID_PATTERN = /^tla-[0-9a-f]{64}$/u;
+const KEY_ID_PATTERN = /^tdk-[0-9a-f]{64}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
-const BASE64URL_PATTERN = /^[A-Za-z0-9_-]+$/u;
 const PROFILE_KEYS = [
   "profileId",
+  "keyId",
   "keyFingerprint",
   "principalId",
   "principalKind",
   "authorityBasis",
   "authorityRef",
   "repositoryIncarnation",
-  "rpId",
   "algorithm",
-  "credentialId",
-  "publicKeyCose",
   "publicKeySpkiPem",
-  "transports",
-  "counter",
-  "lastAssertionDigest",
   "createdAt",
   "revokedAt",
 ] as const;
-const TRANSPORTS = new Set([
-  "ble",
-  "cable",
-  "hybrid",
-  "internal",
-  "nfc",
-  "smart-card",
-  "usb",
-]);
 
 interface TicketDecisionAuthorityRegistryProfileV1 {
   profileId: string;
+  keyId: string;
   keyFingerprint: string;
   principalId: string;
   principalKind: "human";
   authorityBasis: "repository_owner" | "designated_human";
   authorityRef: string;
   repositoryIncarnation: string;
-  rpId: "localhost";
-  algorithm: "ES256";
-  credentialId: string;
-  publicKeyCose: string;
+  algorithm: "Ed25519";
   publicKeySpkiPem: string;
-  transports: string[];
-  counter: number;
-  lastAssertionDigest: string | null;
   createdAt: string;
   revokedAt: string | null;
 }
 
-export interface FileTicketDecisionAttestationTrustProfileResolverOptionsV0 {
+export interface FileTicketDecisionLocalSignatureTrustProfileResolverOptionsV0 {
   registryPath?: string;
 }
 
@@ -75,14 +56,15 @@ export class TicketDecisionAuthorityTrustStoreError extends Error {
   }
 }
 
-export function defaultTicketDecisionAuthorityRegistryPath(
+export function defaultTicketDecisionLocalSignatureRegistryPath(
   homeDirectory = os.homedir(),
 ): string {
   return path.join(
     homeDirectory,
     ".vibehub",
     "trust",
-    "decision-authorities.v1.json",
+    "decision-authority.v1",
+    "registry.json",
   );
 }
 
@@ -91,28 +73,29 @@ export function defaultTicketDecisionAuthorityRegistryPath(
  * OS-owned trust registry. The file is reread for every lookup so revocation
  * affects already-running CLI/MCP processes without a restart.
  */
-export class FileTicketDecisionAttestationTrustProfileResolverV0
-implements TicketDecisionAttestationTrustProfileResolverV0 {
+export class FileTicketDecisionLocalSignatureTrustProfileResolverV0
+implements TicketDecisionLocalSignatureTrustProfileResolverV0 {
   readonly registryPath: string;
 
   constructor(
     options:
-    FileTicketDecisionAttestationTrustProfileResolverOptionsV0 = {},
+    FileTicketDecisionLocalSignatureTrustProfileResolverOptionsV0 = {},
   ) {
     this.registryPath = path.resolve(
-      options.registryPath ?? defaultTicketDecisionAuthorityRegistryPath(),
+      options.registryPath
+        ?? defaultTicketDecisionLocalSignatureRegistryPath(),
     );
   }
 
   resolveProfile(lookup: {
-    credentialId: string;
-    credentialFingerprint: string;
+    keyId: string;
+    keyFingerprint: string;
     repositoryIncarnation: string;
-  }): TicketDecisionAttestationTrustProfileV0 | null {
+  }): TicketDecisionLocalSignatureTrustProfileV0 | null {
     const profiles = readRegistryProfiles(this.registryPath);
     const matches = profiles.filter((profile) =>
-      profile.credentialId === lookup.credentialId
-      && profile.keyFingerprint === lookup.credentialFingerprint
+      profile.keyId === lookup.keyId
+      && profile.keyFingerprint === lookup.keyFingerprint
       && profile.repositoryIncarnation === lookup.repositoryIncarnation
     );
     if (matches.length > 1) {
@@ -124,14 +107,15 @@ implements TicketDecisionAttestationTrustProfileResolverV0 {
     return profile === undefined
       ? null
       : {
-          credentialId: profile.credentialId,
-          credentialFingerprint: profile.keyFingerprint,
+          keyId: profile.keyId,
+          keyFingerprint: profile.keyFingerprint,
           publicKeySpkiPem: profile.publicKeySpkiPem,
           principalId: profile.principalId,
           principalKind: "human",
           basis: profile.authorityBasis,
           basisRef: profile.authorityRef,
           repositoryIncarnation: profile.repositoryIncarnation,
+          createdAt: profile.createdAt,
           revokedAt: profile.revokedAt,
         };
   }
@@ -201,21 +185,20 @@ const validateRegistry = (
   }
   const profiles = document.profiles.map(validateProfile);
   const profileIds = new Set<string>();
-  const credentialIds = new Set<string>();
-  const fingerprints = new Set<string>();
+  const scopedKeys = new Set<string>();
   for (const profile of profiles) {
+    const scopedKey =
+      `${profile.repositoryIncarnation}\0${profile.keyId}`;
     if (
       profileIds.has(profile.profileId)
-      || credentialIds.has(profile.credentialId)
-      || fingerprints.has(profile.keyFingerprint)
+      || scopedKeys.has(scopedKey)
     ) {
       throw new TicketDecisionAuthorityTrustStoreError(
         "Ticket Decision authority registry contains duplicate profiles",
       );
     }
     profileIds.add(profile.profileId);
-    credentialIds.add(profile.credentialId);
-    fingerprints.add(profile.keyFingerprint);
+    scopedKeys.add(scopedKey);
   }
   if (
     profiles.some((profile, index) =>
@@ -235,6 +218,7 @@ const validateProfile = (
   const profile = plainObject(value, "authority profile");
   exactKeys(profile, PROFILE_KEYS, "authority profile");
   const profileId = text(profile.profileId, "profileId", 68);
+  const keyId = text(profile.keyId, "keyId", 68);
   const keyFingerprint = text(
     profile.keyFingerprint,
     "keyFingerprint",
@@ -247,61 +231,23 @@ const validateProfile = (
     "repositoryIncarnation",
     512,
   );
-  const credentialId = base64url(
-    profile.credentialId,
-    "credentialId",
-    1_024,
-  );
-  const publicKeyCose = base64url(
-    profile.publicKeyCose,
-    "publicKeyCose",
-    4_096,
-  );
   if (
     !PROFILE_ID_PATTERN.test(profileId)
+    || !KEY_ID_PATTERN.test(keyId)
     || !SHA256_PATTERN.test(keyFingerprint)
+    || !/^repo-[0-9a-f]{64}$/u.test(repositoryIncarnation)
     || profile.principalKind !== "human"
     || (
       profile.authorityBasis !== "repository_owner"
       && profile.authorityBasis !== "designated_human"
     )
-    || profile.rpId !== "localhost"
-    || profile.algorithm !== "ES256"
+    || profile.algorithm !== "Ed25519"
     || typeof profile.publicKeySpkiPem !== "string"
     || profile.publicKeySpkiPem.length < 1
     || profile.publicKeySpkiPem.length > 4_096
-    || !Array.isArray(profile.transports)
-    || !Number.isSafeInteger(profile.counter)
-    || (profile.counter as number) < 0
-    || (profile.counter as number) > 0xffff_ffff
-    || (
-      profile.lastAssertionDigest !== null
-      && (
-        typeof profile.lastAssertionDigest !== "string"
-        || !SHA256_PATTERN.test(profile.lastAssertionDigest)
-      )
-    )
   ) {
     throw new TicketDecisionAuthorityTrustStoreError(
       "Ticket Decision authority profile is invalid",
-    );
-  }
-  const transports = profile.transports.map((transport) => {
-    if (typeof transport !== "string" || !TRANSPORTS.has(transport)) {
-      throw new TicketDecisionAuthorityTrustStoreError(
-        "Ticket Decision authority profile has an invalid transport",
-      );
-    }
-    return transport;
-  });
-  if (
-    new Set(transports).size !== transports.length
-    || transports.some((transport, index) =>
-      index > 0 && transports[index - 1]! >= transport
-    )
-  ) {
-    throw new TicketDecisionAuthorityTrustStoreError(
-      "Ticket Decision authority transports must be unique and sorted",
     );
   }
   const createdAt = timestamp(profile.createdAt, "createdAt");
@@ -323,14 +269,10 @@ const validateProfile = (
     );
   }
   if (
-    publicKey.asymmetricKeyType !== "ec"
-    || (
-      publicKey.asymmetricKeyDetails?.namedCurve !== "prime256v1"
-      && publicKey.asymmetricKeyDetails?.namedCurve !== "P-256"
-    )
+    publicKey.asymmetricKeyType !== "ed25519"
   ) {
     throw new TicketDecisionAuthorityTrustStoreError(
-      "Ticket Decision authority public key must be P-256",
+      "Ticket Decision authority public key must be Ed25519",
     );
   }
   const fingerprint = crypto.createHash("sha256").update(
@@ -341,18 +283,18 @@ const validateProfile = (
       "Ticket Decision authority fingerprint does not match its public key",
     );
   }
+  if (keyId !== `tdk-${keyFingerprint}`) {
+    throw new TicketDecisionAuthorityTrustStoreError(
+      "Ticket Decision authority key identity is invalid",
+    );
+  }
   const identity = {
-    principalId,
-    principalKind: "human",
-    authorityBasis: profile.authorityBasis,
-    authorityRef,
-    repositoryIncarnation,
-    rpId: "localhost",
-    algorithm: "ES256",
-    credentialId,
+    keyId,
     keyFingerprint,
+    repositoryIncarnation,
+    algorithm: "Ed25519",
   };
-  const expectedProfileId = `twa-${crypto.createHash("sha256")
+  const expectedProfileId = `tla-${crypto.createHash("sha256")
     .update(JSON.stringify(identity))
     .digest("hex")}`;
   if (profileId !== expectedProfileId) {
@@ -360,22 +302,25 @@ const validateProfile = (
       "Ticket Decision authority profile identity is invalid",
     );
   }
+  if (
+    principalId !== `local-installation:${profileId}`
+    || authorityRef !== `vibehub:local-installation:${profileId}`
+  ) {
+    throw new TicketDecisionAuthorityTrustStoreError(
+      "Ticket Decision authority local installation binding is invalid",
+    );
+  }
   return {
     profileId,
+    keyId,
     keyFingerprint,
     principalId,
     principalKind: "human",
     authorityBasis: profile.authorityBasis,
     authorityRef,
     repositoryIncarnation,
-    rpId: "localhost",
-    algorithm: "ES256",
-    credentialId,
-    publicKeyCose,
+    algorithm: "Ed25519",
     publicKeySpkiPem: profile.publicKeySpkiPem,
-    transports,
-    counter: profile.counter as number,
-    lastAssertionDigest: profile.lastAssertionDigest,
     createdAt,
     revokedAt,
   };
@@ -433,30 +378,6 @@ const text = (
     );
   }
   return value;
-};
-
-const base64url = (
-  value: unknown,
-  label: string,
-  maximumBytes: number,
-): string => {
-  const encoded = text(value, label, maximumBytes * 2);
-  if (!BASE64URL_PATTERN.test(encoded) || encoded.includes("=")) {
-    throw new TicketDecisionAuthorityTrustStoreError(
-      `Ticket Decision authority ${label} is not base64url`,
-    );
-  }
-  const decoded = Buffer.from(encoded, "base64url");
-  if (
-    decoded.length < 1
-    || decoded.length > maximumBytes
-    || decoded.toString("base64url") !== encoded
-  ) {
-    throw new TicketDecisionAuthorityTrustStoreError(
-      `Ticket Decision authority ${label} is not canonical base64url`,
-    );
-  }
-  return encoded;
 };
 
 const timestamp = (value: unknown, label: string): string => {

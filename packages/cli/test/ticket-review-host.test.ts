@@ -1,5 +1,4 @@
 import { execFileSync } from "node:child_process";
-import crypto, { type KeyObject } from "node:crypto";
 import fs from "node:fs";
 import http from "node:http";
 import os from "node:os";
@@ -14,10 +13,9 @@ import {
   startTicketReviewHost,
   type TicketReviewHostHandle,
 } from "../src/ticket-review-host.js";
-import type {
-  TicketWebAuthnAuthorityProfileV1,
-  TicketWebAuthnVerifiedPresenceV1,
-} from "../src/ticket-webauthn-authority.js";
+import {
+  TicketLocalDecisionAuthority,
+} from "../src/ticket-local-decision-authority.js";
 
 const NOW = "2026-07-29T12:00:00.000Z";
 
@@ -262,11 +260,19 @@ describe("Git Ticket review host", () => {
     const html = await (await fetch(`${origin}/`)).text();
     const script = await (await fetch(`${origin}/app.js`)).text();
     const styles = await (await fetch(`${origin}/app.css`)).text();
+    const retiredWebAuthnAsset = await fetch(`${origin}/webauthn.js`);
+    expect(retiredWebAuthnAsset.status).toBe(404);
     expect(html).not.toMatch(/authorize|decision rationale|validation/i);
+    expect(html).not.toContain("/webauthn.js");
     expect(html).toContain('class="source-ref"');
     expect(html).toContain('preserveAspectRatio="xMidYMid meet"');
     expect(script).toContain('route: "/api/review"');
     expect(script).toContain('route: "/api/decision"');
+    expect(script).toContain("Recording exact decision…");
+    expect(script).toContain("`Receipt · ${receiptPath}`");
+    expect(script).not.toMatch(
+      /SimpleWebAuthn|webauthn-|\/api\/decision\/challenge/,
+    );
     expect(script).not.toMatch(/\/api\/apply/);
     expect(script).toContain("semanticLedgerDigest: source.semanticLedgerDigest");
     expect(script).toContain("Your draft is preserved");
@@ -568,87 +574,101 @@ describe("Git Ticket review host", () => {
     });
   });
 
-  it("runs a one-use WebAuthn ceremony and keeps authority outside browser claims", async () => {
-    const ceremonyNow = new Date().toISOString();
-    const registry = new DeterministicWebAuthnRegistry();
+  it("records one local-signed Decision and exposes its receipt to a fresh host", async () => {
+    const decisionNow = new Date().toISOString();
+    const registryPath = path.join(
+      fs.realpathSync(root),
+      "trust",
+      "decision-authority.v1",
+      "registry.json",
+    );
+    const authority = new TicketLocalDecisionAuthority({
+      registryPath,
+      now: () => decisionNow,
+    });
     const host = startTicketReviewHost({
       repoRoot: repo,
       dbPath,
-      now: () => ceremonyNow,
+      now: () => decisionNow,
       token: "a".repeat(32),
-      ticketWebAuthnAuthorityRegistry: registry as any,
+      ticketLocalDecisionAuthority: authority,
     });
     hosts.push(host);
     const { origin } = await host.ready;
 
-    const unenrolled = await readJson(
-      `${origin}/api/state`,
-      host.token,
+    const active = await readJson(`${origin}/api/state`, host.token);
+    const profile = authority.listProfiles().find(
+      (candidate) => candidate.revokedAt === null,
     );
-    expect(unenrolled.data.interventions).toMatchObject({
-      authority: { status: "unenrolled" },
-      planReview: { available: false },
-      protectedDecision: { available: false },
+    expect(profile).toBeDefined();
+    if (profile === undefined) {
+      throw new Error("expected one active local Decision profile");
+    }
+    expect(active.data.interventions).toMatchObject({
+      review: {
+        available: true,
+        actorKind: "human",
+        attribution: "host_attested",
+      },
+      authority: {
+        status: "active",
+        principalId: profile.principalId,
+        keyFingerprint: profile.keyFingerprint,
+      },
+      planReview: { available: true },
+      protectedDecision: { available: true },
     });
 
-    const forgedEnrollment = await postJson(
-      `${origin}/api/authority/enroll/challenge`,
+    for (const retiredRoute of [
+      "/api/authority/enroll/challenge",
+      "/api/authority/enroll/complete",
+      "/api/decision/challenge",
+      "/api/decision/complete",
+      "/api/authority/revoke/challenge",
+      "/api/authority/revoke/complete",
+    ]) {
+      const retired = await postJson(
+        `${origin}${retiredRoute}`,
+        host.token,
+        origin,
+        {},
+      );
+      expect(retired.status, retiredRoute).toBe(404);
+    }
+
+    const attributedReview = await postJson(
+      `${origin}/api/review`,
       host.token,
       origin,
       {
-        principalId: "human:repository-owner",
-        authorityBasis: "designated_human",
+        expectedSource: mutationSource(active.data.graph.source),
+        review: {
+          type: "comment",
+          subject: {
+            kind: "graph",
+            graphDigest: active.data.graph.source.graphDigest,
+          },
+          body: "The local signer also binds review attribution.",
+        },
       },
     );
-    expect(forgedEnrollment.status).toBe(400);
-    expect(await forgedEnrollment.json()).toMatchObject({
-      error: { code: "validation_error" },
-    });
-
-    const enrollmentChallenge = await postJson(
-      `${origin}/api/authority/enroll/challenge`,
-      host.token,
-      origin,
-      { principalId: "human:repository-owner" },
-    );
-    expect(enrollmentChallenge.status).toBe(200);
-    const enrollment = (await enrollmentChallenge.json() as any).data;
-    const enrollmentComplete = await postJson(
-      `${origin}/api/authority/enroll/complete`,
-      host.token,
-      origin,
-      {
-        ceremonyId: enrollment.ceremonyId,
-        credential: { id: "deterministic-registration" },
-      },
-    );
-    expect(enrollmentComplete.status).toBe(200);
-    expect(await enrollmentComplete.json()).toMatchObject({
+    expect(attributedReview.status).toBe(200);
+    expect(await attributedReview.json()).toMatchObject({
       data: {
-        authority: {
-          principalId: "human:repository-owner",
-          credentialFingerprint: registry.keyFingerprint,
+        review: {
+          document: {
+            author: {
+              actor_id: profile.principalId,
+              actor_kind: "human",
+              attribution: "host_attested",
+            },
+          },
         },
       },
     });
 
-    const active = await readJson(`${origin}/api/state`, host.token);
-    expect(active.data.interventions).toMatchObject({
-      authority: {
-        status: "active",
-        principalId: "human:repository-owner",
-        credentialFingerprint: registry.keyFingerprint,
-      },
-      planReview: {
-        available: true,
-        ceremony: "webauthn",
-      },
-      protectedDecision: {
-        available: true,
-        ceremony: "webauthn",
-      },
-    });
-    const source = active.data.graph.source;
+    const reviewed = await readJson(`${origin}/api/state`, host.token);
+    const source = reviewed.data.graph.source;
     const decisionInput = {
       expectedSource: mutationSource(source),
       decision: {
@@ -663,7 +683,7 @@ describe("Git Ticket review host", () => {
       },
     };
     const forgedDecision = await postJson(
-      `${origin}/api/decision/challenge`,
+      `${origin}/api/decision`,
       host.token,
       origin,
       {
@@ -672,6 +692,7 @@ describe("Git Ticket review host", () => {
           principalId: "browser-forgery",
         },
         decidedAt: "2099-01-01T00:00:00.000Z",
+        signature: "browser-forgery",
       },
     );
     expect(forgedDecision.status).toBe(400);
@@ -679,35 +700,24 @@ describe("Git Ticket review host", () => {
       error: { code: "validation_error" },
     });
 
-    const decisionChallenge = await postJson(
-      `${origin}/api/decision/challenge`,
+    const recorded = await postJson(
+      `${origin}/api/decision`,
       host.token,
       origin,
       decisionInput,
     );
-    expect(decisionChallenge.status).toBe(200);
-    const preparedDecision = (await decisionChallenge.json() as any).data;
-    const decisionComplete = await postJson(
-      `${origin}/api/decision/complete`,
-      host.token,
-      origin,
-      {
-        ceremonyId: preparedDecision.ceremonyId,
-        credential: { id: "deterministic-assertion" },
-      },
-    );
-    expect(decisionComplete.status).toBe(200);
-    const completed = await decisionComplete.json() as any;
+    expect(recorded.status).toBe(200);
+    const completed = await recorded.json() as any;
     expect(completed).toMatchObject({
       ok: true,
       data: {
         decision: {
           document: {
             authority: {
-              principal_id: "human:repository-owner",
-              basis: "repository_owner",
+              principal_id: profile.principalId,
+              basis: "designated_human",
             },
-            decided_at: ceremonyNow,
+            decided_at: decisionNow,
           },
         },
         attestation: {
@@ -716,16 +726,18 @@ describe("Git Ticket review host", () => {
           ),
           document: {
             authority: {
-              principal_id: "human:repository-owner",
+              principal_id: profile.principalId,
             },
-            credential: {
-              fingerprint: registry.keyFingerprint,
+            signer: {
+              key_id: profile.keyId,
+              key_fingerprint: profile.keyFingerprint,
+              algorithm: "Ed25519",
             },
-            issued_at: ceremonyNow,
-            not_before: ceremonyNow,
-            expires_at: new Date(
-              Date.parse(ceremonyNow) + 30 * 60 * 1_000,
-            ).toISOString(),
+            confirmation: {
+              method: "plugin_host_click",
+            },
+            issued_at: decisionNow,
+            signature: expect.stringMatching(/^[A-Za-z0-9_-]+$/u),
           },
         },
       },
@@ -735,13 +747,29 @@ describe("Git Ticket review host", () => {
     expect(ledger.attestations).toHaveLength(1);
     expect(ledger.attestations[0]?.document.decision.document_digest)
       .toBe(completed.data.attestation.document.decision.document_digest);
-    const verifiedState = await readJson(`${origin}/api/state`, host.token);
+    await host.close();
+    const freshHost = startTicketReviewHost({
+      repoRoot: repo,
+      dbPath: path.join(root, "fresh-runtime.db"),
+      now: () => decisionNow,
+      token: "f".repeat(32),
+      ticketLocalDecisionAuthority: new TicketLocalDecisionAuthority({
+        registryPath,
+        now: () => decisionNow,
+      }),
+    });
+    hosts.push(freshHost);
+    const freshReady = await freshHost.ready;
+    const verifiedState = await readJson(
+      `${freshReady.origin}/api/state`,
+      freshHost.token,
+    );
     const verifiedTrace = await readJson(
-      `${origin}/api/trace?${new URLSearchParams({
+      `${freshReady.origin}/api/trace?${new URLSearchParams({
         snapshotId: verifiedState.data.graph.snapshotId,
         kind: "graph",
       })}`,
-      host.token,
+      freshHost.token,
     );
     expect(verifiedTrace.data.records).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -754,18 +782,22 @@ describe("Git Ticket review host", () => {
       }),
     ]));
 
-    const replay = await postJson(
-      `${origin}/api/decision/complete`,
-      host.token,
-      origin,
+    const stale = await postJson(
+      `${freshReady.origin}/api/decision`,
+      freshHost.token,
+      freshReady.origin,
       {
-        ceremonyId: preparedDecision.ceremonyId,
-        credential: { id: "deterministic-assertion" },
+        ...decisionInput,
+        decision: {
+          ...decisionInput.decision,
+          disposition: "request_changes",
+          rationale: "This stale source must not authorize a new Decision.",
+        },
       },
     );
-    expect(replay.status).toBe(409);
-    expect(await replay.json()).toMatchObject({
-      error: { code: "ticket_webauthn_ceremony_expired" },
+    expect(stale.status).toBe(409);
+    expect(await stale.json()).toMatchObject({
+      error: { code: "ticket_ledger_stale_source" },
     });
     expect(loadTicketLedgerFromWorktree(repo).attestations).toHaveLength(1);
 
@@ -793,23 +825,11 @@ describe("Git Ticket review host", () => {
         resolutionRefs: [],
       },
     };
-    const protectedChallenge = await postJson(
-      `${origin}/api/decision/challenge`,
-      host.token,
-      origin,
-      protectedInput,
-    );
-    expect(protectedChallenge.status).toBe(200);
-    const preparedProtected =
-      (await protectedChallenge.json() as any).data;
     const protectedComplete = await postJson(
-      `${origin}/api/decision/complete`,
-      host.token,
-      origin,
-      {
-        ceremonyId: preparedProtected.ceremonyId,
-        credential: { id: "deterministic-protected-assertion" },
-      },
+      `${freshReady.origin}/api/decision`,
+      freshHost.token,
+      freshReady.origin,
+      protectedInput,
     );
     expect(protectedComplete.status).toBe(200);
     const protectedCompleted = await protectedComplete.json() as any;
@@ -844,16 +864,16 @@ describe("Git Ticket review host", () => {
     expect(loadTicketLedgerFromWorktree(repo).decisions).toHaveLength(2);
     expect(loadTicketLedgerFromWorktree(repo).attestations).toHaveLength(2);
     const protectedState = await readJson(
-      `${origin}/api/state`,
-      host.token,
+      `${freshReady.origin}/api/state`,
+      freshHost.token,
     );
     const protectedTrace = await readJson(
-      `${origin}/api/trace?${new URLSearchParams({
+      `${freshReady.origin}/api/trace?${new URLSearchParams({
         snapshotId: protectedState.data.graph.snapshotId,
         kind: "ticket",
         ticketId: "implement-api",
       })}`,
-      host.token,
+      freshHost.token,
     );
     expect(protectedTrace.data.records).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -867,47 +887,22 @@ describe("Git Ticket review host", () => {
       }),
     ]));
 
-    const revokeChallenge = await postJson(
-      `${origin}/api/authority/revoke/challenge`,
-      host.token,
-      origin,
-      {},
-    );
-    expect(revokeChallenge.status).toBe(200);
-    const revoke = (await revokeChallenge.json() as any).data;
-    const revoked = await postJson(
-      `${origin}/api/authority/revoke/complete`,
-      host.token,
-      origin,
-      {
-        ceremonyId: revoke.ceremonyId,
-        credential: { id: "deterministic-revocation" },
-      },
-    );
-    expect(revoked.status).toBe(200);
-    expect(await revoked.json()).toMatchObject({
-      data: {
-        authority: {
-          status: "revoked",
-          principalId: "human:repository-owner",
-        },
-      },
-    });
+    authority.revokeRepository(profile.repositoryIncarnation);
     const afterRevocation = await readJson(
-      `${origin}/api/state`,
-      host.token,
+      `${freshReady.origin}/api/state`,
+      freshHost.token,
     );
     expect(afterRevocation.data.interventions).toMatchObject({
-      authority: { status: "unenrolled" },
+      authority: { status: "unavailable" },
       planReview: { available: false },
       protectedDecision: { available: false },
     });
     const revokedTrace = await readJson(
-      `${origin}/api/trace?${new URLSearchParams({
+      `${freshReady.origin}/api/trace?${new URLSearchParams({
         snapshotId: afterRevocation.data.graph.snapshotId,
         kind: "graph",
       })}`,
-      host.token,
+      freshHost.token,
     );
     expect(revokedTrace.data.records).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -920,12 +915,12 @@ describe("Git Ticket review host", () => {
       }),
     ]));
     const revokedProtectedTrace = await readJson(
-      `${origin}/api/trace?${new URLSearchParams({
+      `${freshReady.origin}/api/trace?${new URLSearchParams({
         snapshotId: afterRevocation.data.graph.snapshotId,
         kind: "ticket",
         ticketId: "implement-api",
       })}`,
-      host.token,
+      freshHost.token,
     );
     expect(revokedProtectedTrace.data.records).toEqual(
       expect.arrayContaining([
@@ -941,6 +936,141 @@ describe("Git Ticket review host", () => {
       ]),
     );
     expect(loadTicketLedgerFromWorktree(repo).attestations).toHaveLength(2);
+    const revokedDecision = await postJson(
+      `${freshReady.origin}/api/decision`,
+      freshHost.token,
+      freshReady.origin,
+      {
+        expectedSource: mutationSource(afterRevocation.data.graph.source),
+        decision: {
+          type: "protected_boundary",
+          subject: {
+            kind: "ticket",
+            ticketId: "design-schema",
+            ticketRevision: afterRevocation.data.graph.tickets.find(
+              (ticket: { ticketId: string }) =>
+                ticket.ticketId === "design-schema",
+            ).ticketRevision,
+          },
+          boundary: "Choose the schema naming convention.",
+          disposition: "resolve",
+          selection: "Use stable snake_case names.",
+          rationale: "A revoked running host must not rotate itself.",
+          resolutionRefs: [],
+        },
+      },
+    );
+    expect(revokedDecision.status).toBe(409);
+    expect(await revokedDecision.json()).toMatchObject({
+      error: { code: "ticket_local_authority_profile_revoked" },
+    });
+    expect(authority.listProfiles().filter(
+      (candidate) => candidate.revokedAt === null,
+    )).toHaveLength(0);
+    expect(loadTicketLedgerFromWorktree(repo).decisions).toHaveLength(2);
+    expect(loadTicketLedgerFromWorktree(repo).attestations).toHaveLength(2);
+    await freshHost.close();
+    const rotatedHost = startTicketReviewHost({
+      repoRoot: repo,
+      dbPath: path.join(root, "rotated-runtime.db"),
+      now: () => decisionNow,
+      token: "r".repeat(32),
+      ticketLocalDecisionAuthority: new TicketLocalDecisionAuthority({
+        registryPath,
+        now: () => decisionNow,
+      }),
+    });
+    hosts.push(rotatedHost);
+    const rotatedReady = await rotatedHost.ready;
+    const rotatedState = await readJson(
+      `${rotatedReady.origin}/api/state`,
+      rotatedHost.token,
+    );
+    expect(rotatedState.data.interventions).toMatchObject({
+      authority: {
+        status: "active",
+        profileId: expect.any(String),
+      },
+      planReview: { available: true },
+      protectedDecision: { available: true },
+    });
+    expect(rotatedState.data.interventions.authority.profileId)
+      .not.toBe(profile.profileId);
+    const rotatedTrace = await readJson(
+      `${rotatedReady.origin}/api/trace?${new URLSearchParams({
+        snapshotId: rotatedState.data.graph.snapshotId,
+        kind: "graph",
+      })}`,
+      rotatedHost.token,
+    );
+    expect(rotatedTrace.data.records).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: "artifact",
+        status: "current_unverified",
+        producer: {
+          kind: "receipt",
+          ref: completed.data.decision.document.decision_id,
+        },
+      }),
+    ]));
+  }, 20_000);
+
+  it("keeps a detached checkout readable while durable Decisions fail closed", async () => {
+    execFileSync("git", ["switch", "--detach", "-q"], { cwd: repo });
+    const registryPath = path.join(
+      fs.realpathSync(root),
+      "detached-trust",
+      "decision-authority.v1",
+      "registry.json",
+    );
+    const host = startTicketReviewHost({
+      repoRoot: repo,
+      dbPath,
+      now: () => NOW,
+      token: "d".repeat(32),
+      ticketLocalDecisionAuthority: new TicketLocalDecisionAuthority({
+        registryPath,
+        now: () => NOW,
+      }),
+    });
+    hosts.push(host);
+    const { origin } = await host.ready;
+    const state = await readJson(`${origin}/api/state`, host.token);
+    expect(state.data.graph.source.branch).toBeNull();
+    expect(state.data.interventions).toMatchObject({
+      review: { available: false },
+      planReview: { available: false },
+      protectedDecision: { available: false },
+      authority: { status: "unavailable" },
+    });
+
+    const decision = await postJson(
+      `${origin}/api/decision`,
+      host.token,
+      origin,
+      {
+        expectedSource: mutationSource(state.data.graph.source),
+        decision: {
+          type: "plan_review",
+          subject: {
+            kind: "graph",
+            graphDigest: state.data.graph.source.graphDigest,
+          },
+          disposition: "approve_execution",
+          rationale: "Detached checkouts cannot persist this authority.",
+          resolutionRefs: [],
+        },
+      },
+    );
+    expect(decision.status).toBe(409);
+    expect(await decision.json()).toMatchObject({
+      error: {
+        code: "ticket_decision_detached_checkout_unsupported",
+      },
+    });
+    expect(loadTicketLedgerFromWorktree(repo).decisions).toEqual([]);
+    expect(loadTicketLedgerFromWorktree(repo).attestations).toEqual([]);
+    expect(fs.existsSync(registryPath)).toBe(false);
   });
 
   it("rejects unauthenticated, cross-origin, non-JSON, oversized, malformed, and stale writes", async () => {
@@ -1047,170 +1177,6 @@ describe("Git Ticket review host", () => {
     });
   });
 });
-
-class DeterministicWebAuthnRegistry {
-  private profiles: TicketWebAuthnAuthorityProfileV1[] = [];
-  private readonly privateKey: KeyObject;
-  private readonly publicKeySpkiPem: string;
-  readonly keyFingerprint: string;
-  private readonly credentialId: string;
-
-  constructor() {
-    const pair = crypto.generateKeyPairSync("ec", {
-      namedCurve: "P-256",
-    });
-    this.privateKey = pair.privateKey;
-    this.publicKeySpkiPem = pair.publicKey.export({
-      type: "spki",
-      format: "pem",
-    }).toString();
-    this.keyFingerprint = crypto.createHash("sha256").update(
-      pair.publicKey.export({ type: "spki", format: "der" }),
-    ).digest("hex");
-    this.credentialId = crypto.createHash("sha256")
-      .update(this.publicKeySpkiPem)
-      .digest("base64url");
-  }
-
-  listProfiles(): TicketWebAuthnAuthorityProfileV1[] {
-    return this.profiles.map((profile) => ({
-      ...profile,
-      transports: [...profile.transports],
-    }));
-  }
-
-  async createRegistrationOptions(request: {
-    challenge: string;
-  }): Promise<Record<string, unknown>> {
-    return {
-      challenge: request.challenge,
-      rp: { id: "localhost", name: "Vibehub Ticket Decisions" },
-      user: {
-        id: "deterministic-user",
-        name: "human:repository-owner",
-        displayName: "human:repository-owner",
-      },
-    };
-  }
-
-  async verifyRegistration(request: {
-    principalId: string;
-    authorityBasis: "repository_owner" | "designated_human";
-    authorityRef: string;
-    repositoryIncarnation: string;
-  }): Promise<TicketWebAuthnAuthorityProfileV1> {
-    const profile: TicketWebAuthnAuthorityProfileV1 = {
-      profileId: `twa-${"0".repeat(64)}`,
-      keyFingerprint: this.keyFingerprint,
-      principalId: request.principalId,
-      principalKind: "human",
-      authorityBasis: request.authorityBasis,
-      authorityRef: request.authorityRef,
-      repositoryIncarnation: request.repositoryIncarnation,
-      rpId: "localhost",
-      algorithm: "ES256",
-      credentialId: this.credentialId,
-      publicKeyCose: Buffer.from("deterministic-public-key")
-        .toString("base64url"),
-      publicKeySpkiPem: this.publicKeySpkiPem,
-      transports: ["internal"],
-      counter: 0,
-      lastAssertionDigest: null,
-      createdAt: NOW,
-      revokedAt: null,
-    };
-    this.profiles = [profile];
-    return { ...profile, transports: [...profile.transports] };
-  }
-
-  async createAuthenticationOptions(request: {
-    challenge: string;
-  }): Promise<Record<string, unknown>> {
-    return {
-      challenge: request.challenge,
-      rpId: "localhost",
-      userVerification: "required",
-    };
-  }
-
-  async verifyAuthentication(request: {
-    profileId: string;
-    challenge: string;
-    origin: string;
-  }): Promise<TicketWebAuthnVerifiedPresenceV1> {
-    const index = this.profiles.findIndex(
-      (profile) => profile.profileId === request.profileId,
-    );
-    const profile = this.profiles[index];
-    if (profile === undefined || profile.revokedAt !== null) {
-      throw new Error("deterministic authority is unavailable");
-    }
-    const clientDataJSON = Buffer.from(JSON.stringify({
-      type: "webauthn.get",
-      challenge: request.challenge,
-      origin: request.origin,
-      crossOrigin: false,
-    }));
-    const authenticatorData = Buffer.alloc(37);
-    crypto.createHash("sha256").update("localhost").digest()
-      .copy(authenticatorData, 0);
-    authenticatorData[32] = 0x05;
-    authenticatorData.writeUInt32BE(profile.counter + 1, 33);
-    const signature = crypto.sign(
-      "sha256",
-      Buffer.concat([
-        authenticatorData,
-        crypto.createHash("sha256").update(clientDataJSON).digest(),
-      ]),
-      this.privateKey,
-    );
-    const assertionDigest = crypto.createHash("sha256").update(
-      Buffer.concat([clientDataJSON, authenticatorData, signature]),
-    ).digest("hex");
-    const updated: TicketWebAuthnAuthorityProfileV1 = {
-      ...profile,
-      counter: profile.counter + 1,
-      lastAssertionDigest: assertionDigest,
-      transports: [...profile.transports],
-    };
-    this.profiles[index] = updated;
-    return {
-      profile: { ...updated, transports: [...updated.transports] },
-      verifiedAt: NOW,
-      challenge: request.challenge,
-      origin: request.origin,
-      rpId: "localhost",
-      userVerified: true,
-      counter: updated.counter,
-      assertionDigest,
-      assertion: {
-        credentialId: updated.credentialId,
-        clientDataJSON: clientDataJSON.toString("base64url"),
-        authenticatorData: authenticatorData.toString("base64url"),
-        signature: signature.toString("base64url"),
-        userHandle: null,
-      },
-    };
-  }
-
-  async revoke(request: {
-    profileId: string;
-    challenge: string;
-    origin: string;
-  }): Promise<TicketWebAuthnAuthorityProfileV1> {
-    const presence = await this.verifyAuthentication(request);
-    const index = this.profiles.findIndex(
-      (profile) => profile.profileId === request.profileId,
-    );
-    const revoked = {
-      ...presence.profile,
-      revokedAt: NOW,
-      transports: [...presence.profile.transports],
-    };
-    this.profiles[index] = revoked;
-    return { ...revoked, transports: [...revoked.transports] };
-  }
-}
 
 function writeTicketLedger(repo: string): void {
   const ledger = path.join(repo, ".vibehub", "tickets");

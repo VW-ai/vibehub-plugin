@@ -29,34 +29,33 @@ intent:
       boundary, then records resolve or decline.
 
     Review identity, path, time, and attribution are host-owned fields. Public
-    JSON cannot claim them. Review writes from the browser require a
-    host-attested human. Decisions require a non-serializable host-bound human
-    grant covering the exact graph or Ticket-revision-and-boundary scope. The
-    default CLI review host binds neither and is therefore truly read-only. A
-    trusted embedding may inject exact capabilities, and the host projects only
-    the intervention controls they cover. The real installed-plugin adapter is
-    a separate durable-attestation boundary.
+    JSON cannot claim them. The installed CLI review host provisions or reuses
+    one repository-scoped installation-local profile outside Git and SQLite,
+    derives its host attribution from that profile, and exposes one explicit
+    submit for exact graph or Ticket-revision-and-boundary Decisions. A trusted
+    embedding may instead inject exact session capabilities, and the host
+    projects only the intervention controls the active path covers.
 
     A durable Decision document records exact human intent and evidence; it
     does not authenticate itself. Raw Git content therefore projects as a
-    current-but-unverified artifact. Only a Decision written or explicitly
-    re-attested by the current trusted host session receives an in-memory
-    authority receipt. That receipt binds the repository incarnation,
-    worktree, branch, exact path and ID, and complete canonical Decision
-    digest, and it expires with the host session. Restart, sibling worktree,
-    branch change, expiry, or document tampering fails closed. An exact-intent
-    no-op may re-attest only through a new explicit human operation. The
-    registry is disposable and never enters SQLite. Durable cross-session
-    authority requires a future signed attestation rather than trusting
-    self-authored YAML.
+    current-but-unverified artifact. The installed host appends a detached
+    Ed25519 receipt that binds the complete Decision plus repository
+    incarnation, worktree, checkout, exact path and ID, subject, scope, signer,
+    confirmation method, nonce, and issuance time. A fresh reader dynamically
+    resolves the public profile from the repo-external registry and verifies
+    the exact signature. The receipt has no time-based expiry; restart
+    succeeds while the exact binding remains current, whereas sibling
+    worktree, checkout or subject change, revocation, or document tampering
+    fails closed. The older injected-grant path remains session-only.
 
     Currentness is mechanical and locus-specific. Graph facts compare the exact
     graph digest; Ticket facts compare Ticket ID and revision; relation facts
     compare relation reference, endpoints, and dependent Ticket revision.
     Historical and current-unverified facts remain inspectable but cannot
-    authorize work. Only a current Decision verified by the active trusted
-    session and projected as `gate_decision` with an `authority_receipt` is
-    authoritative. Comments never mutate the graph.
+    authorize work. Only a current Decision with an exact dynamically verified
+    durable receipt, or the deliberately session-only injected equivalent,
+    projects as `gate_decision` with an `authority_receipt`. Comments never
+    mutate the graph.
     A current `ticket_edit` becomes input to a newly authored candidate, which
     must still pass independent semantic validation before
     `ticket.worktree.patch`.
@@ -86,11 +85,11 @@ constraints:
   - kind: must
     rule: "Every intervention binds one exact current graph, Ticket revision, or relation locus and fails visibly when stale"
   - kind: must
-    rule: "Browser identity and Decision authority come only from a trusted host; public payloads cannot claim either"
+    rule: "Browser identity and Decision authority come only from the installed or deliberately injected trusted host path; public payloads cannot claim either"
   - kind: must
-    rule: "A raw durable Decision is evidence, not self-authenticating authority; only an exact unexpired trusted-session attestation may project it as a gate"
+    rule: "A raw durable Decision is evidence, not self-authenticating authority; only an exact currently verified durable receipt or session-only injected attestation may project it as a gate"
   - kind: must
-    rule: "The default CLI host remains read-only, and a trusted host displays only interventions covered by its bound capabilities"
+    rule: "The installed CLI host uses its repository-scoped install-local authority; if that authority is unavailable, protected writes fail closed rather than borrowing browser, OS, Git, SQLite, or repository identity"
   - kind: must
     rule: "Comments are non-mutating context; edit proposals require fresh candidate authorship and independent validation before Ticket patching"
   - kind: must
@@ -108,7 +107,7 @@ indexing:
 provenance:
   source_type: implementation
   confidence: 0.99
-  source_ref: "M3 Git-native Ticket review intervention implementation and adversarial review — 2026-07-30"
+  source_ref: "M3 Git-native Ticket review intervention plus M3.6 install-local authority pivot — 2026-07-30"
   produced_by_agent: "implementation"
   produced_at: "2026-07-30T20:30:42Z"
 relations:
@@ -129,12 +128,14 @@ relations:
     detail: "Extends planning and validation intelligence to current and historical Review facts."
 anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json"
   - file: "packages/core/src/ticket-ledger/contract.ts"
   - file: "packages/core/src/ticket-ledger/writer.ts"
   - file: "packages/core/src/ticket-ledger/projection.ts"
   - file: "packages/core/src/operation-dispatcher.ts"
   - file: "packages/cli/src/ticket-review-host.ts"
+  - file: "packages/cli/src/ticket-local-decision-authority.ts"
   - file: "packages/cli/assets/ticket-review-host/app.js"
   - file: "skills/vibehub-ticket-plan/SKILL.md"
   - file: "skills/vibehub-ticket-validate/SKILL.md"

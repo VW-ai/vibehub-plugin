@@ -5,7 +5,7 @@ import {
   replaceScopePatterns,
   saveTaskReport,
   type Db,
-  type TicketDecisionAttestationTrustProfileResolverV0,
+  type TicketDecisionLocalSignatureTrustProfileResolverV0,
 } from "@vw-ai/vibehub-core";
 import crypto from "node:crypto";
 
@@ -33,7 +33,7 @@ export interface CapabilityContext {
   requestId?: () => string;
   now?: () => string;
   ticketDecisionAttestationTrustProfiles?:
-    TicketDecisionAttestationTrustProfileResolverV0;
+    TicketDecisionLocalSignatureTrustProfileResolverV0;
 }
 
 export function createCapabilities(ctx: CapabilityContext) {

@@ -203,17 +203,23 @@ intent:
 
     **M3 live intervention surface — 2026-07-30**
 
-    The current graph host now projects durable Git-native Review and Decision
-    facts at their exact graph, Ticket, or relation loci. Current and historical
-    traces remain distinct. Comments and complete Ticket edit proposals appear
-    only when the embedding plugin binds a host-attested human; plan and
-    protected-boundary controls appear only for exact host-bound authority
-    scopes. The default CLI host therefore remains truly read-only.
+    The graph host now projects durable Git-native Review and Decision facts at
+    their exact graph, Ticket, or relation loci. Current and historical traces
+    remain distinct. M3 first established exact injected session capabilities;
+    M3.6 completes the installed path with a repository-scoped install-local
+    authority. The installed host exposes comments, complete Ticket edit
+    proposals, graph plan review, and Ticket protected-boundary Decisions.
+    One explicit Decision submit freezes the exact current subject and scope,
+    writes the Decision, and appends its detached Ed25519 receipt.
 
     Durable Decision YAML records the exact choice but cannot authenticate
-    itself. A raw or restart-reconstructed Decision stays visible as
-    current-unverified evidence; only an exact unexpired attestation from the
-    active trusted host session projects it as executable authority.
+    itself. A raw Decision stays visible as current-unverified evidence. A
+    fresh reader projects executable authority only after dynamically
+    verifying the exact signed receipt against the repo-external profile. The
+    receipt has no time-based expiry; source change, tamper, profile mismatch,
+    or revocation retreats to current-unverified. The host click proves an
+    action by the local Plugin installation, not WebAuthn, biometric presence,
+    or named-human identity.
 
     Review stays progressive and in situ: one disclosure row opens inside the
     existing Inspector, trace failure does not hide executable context, stale

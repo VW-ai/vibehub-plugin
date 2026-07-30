@@ -38,9 +38,9 @@ import {
 } from "./ticket-ledger/index.js";
 import {
   CompositeTicketDecisionAttestationVerifierV0,
-  DurableWebAuthnTicketDecisionAttestationVerifierV0,
+  DurableLocalSignatureTicketDecisionAttestationVerifierV0,
   InMemoryTicketDecisionSessionAttestationRegistryV0,
-  type TicketDecisionAttestationTrustProfileResolverV0,
+  type TicketDecisionLocalSignatureTrustProfileResolverV0,
 } from "./ticket-decision-attestation.js";
 import {
   TicketReviewProjectionError,
@@ -196,12 +196,12 @@ export interface OperationDispatcherOptions {
   ticketReviewAttribution?: TicketReviewHostAttribution;
   ticketDecisionAuthority?: TicketDecisionAuthorityGrant;
   /**
-   * Host-owned, dynamically resolved WebAuthn trust profiles. The resolver
+   * Host-owned, dynamically resolved local-signature trust profiles. The resolver
    * must read outside repository/SQLite/browser authority and is consulted on
    * every Ticket read so revocation takes effect without restarting.
    */
   ticketDecisionAttestationTrustProfiles?:
-    TicketDecisionAttestationTrustProfileResolverV0;
+    TicketDecisionLocalSignatureTrustProfileResolverV0;
 }
 
 export class OperationDispatcher {
@@ -218,7 +218,7 @@ export class OperationDispatcher {
       options.ticketDecisionAttestationTrustProfiles === undefined
         ? this.ticketDecisionAttestations
         : new CompositeTicketDecisionAttestationVerifierV0([
-            new DurableWebAuthnTicketDecisionAttestationVerifierV0({
+            new DurableLocalSignatureTicketDecisionAttestationVerifierV0({
               trustProfiles:
                 options.ticketDecisionAttestationTrustProfiles,
             }),

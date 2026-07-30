@@ -1,13 +1,12 @@
 import crypto from "node:crypto";
-import { TextDecoder } from "node:util";
 import {
   type TicketReviewTraceRecordV0,
 } from "./contract/ticket-review.js";
 import {
   canonicalTicketLedgerValue,
   projectTicketLedgerForReview,
-  ticketDecisionAttestationChallenge,
   ticketDecisionAttestationDocumentPath,
+  ticketDecisionAttestationSigningBytes,
   ticketDecisionDocumentDigest,
   type TicketDecisionAttestationDocument,
   type TicketDecisionAttestationEnvelope,
@@ -22,13 +21,6 @@ import {
 } from "./ticket-review-source.js";
 
 const DEFAULT_DECISION_ATTESTATION_TTL_MS = 30 * 60 * 1_000;
-const WEBAUTHN_RP_ID = "localhost";
-const WEBAUTHN_TYPE = "webauthn.get";
-const AUTHENTICATOR_DATA_MIN_BYTES = 37;
-const AUTHENTICATOR_FLAGS_OFFSET = 32;
-const AUTHENTICATOR_FLAG_USER_PRESENT = 0x01;
-const AUTHENTICATOR_FLAG_USER_VERIFIED = 0x04;
-const utf8 = new TextDecoder("utf-8", { fatal: true });
 
 export type TicketDecisionAttestationUnverifiedReasonV0 =
   | "source_not_worktree"
@@ -44,24 +36,16 @@ export type TicketDecisionAttestationUnverifiedReasonV0 =
   | "profile_unavailable"
   | "profile_mismatch"
   | "profile_revoked"
-  | "not_yet_valid"
+  | "timestamp_binding_mismatch"
+  | "signing_key_invalid"
   | "expired"
-  | "webauthn_policy_mismatch"
-  | "client_data_invalid"
-  | "challenge_mismatch"
-  | "origin_mismatch"
-  | "cross_origin"
-  | "rp_id_hash_mismatch"
-  | "user_presence_required"
-  | "user_verification_required"
-  | "credential_public_key_invalid"
   | "signature_invalid";
 
 export type TicketDecisionAttestationVerificationV0 =
   | {
       status: "verified";
       verificationRef: string;
-      source: "durable_webauthn" | "host_session";
+      source: "durable_local_signature" | "host_session";
     }
   | {
       status: "unverified";
@@ -76,9 +60,9 @@ export interface TicketDecisionAttestationVerifierV0 {
   ): TicketDecisionAttestationVerificationV0;
 }
 
-export interface TicketDecisionAttestationTrustProfileLookupV0 {
-  credentialId: string;
-  credentialFingerprint: string;
+export interface TicketDecisionLocalSignatureTrustProfileLookupV0 {
+  keyId: string;
+  keyFingerprint: string;
   repositoryIncarnation: string;
 }
 
@@ -86,15 +70,16 @@ export interface TicketDecisionAttestationTrustProfileLookupV0 {
  * Host-owned trust material. It must be resolved from outside the repository,
  * SQLite ledger cache, browser state, and local bearer-token namespace.
  */
-export interface TicketDecisionAttestationTrustProfileV0 {
-  credentialId: string;
-  credentialFingerprint: string;
+export interface TicketDecisionLocalSignatureTrustProfileV0 {
+  keyId: string;
+  keyFingerprint: string;
   publicKeySpkiPem: string;
   principalId: string;
   principalKind: "human";
   basis: "repository_owner" | "designated_human";
   basisRef: string;
   repositoryIncarnation: string;
+  createdAt: string;
   revokedAt: string | null;
 }
 
@@ -103,15 +88,14 @@ export interface TicketDecisionAttestationTrustProfileV0 {
  * not turn a once-read profile into a process-lifetime authority cache:
  * revocation has to affect already-running readers.
  */
-export interface TicketDecisionAttestationTrustProfileResolverV0 {
+export interface TicketDecisionLocalSignatureTrustProfileResolverV0 {
   resolveProfile(
-    lookup: TicketDecisionAttestationTrustProfileLookupV0,
-  ): TicketDecisionAttestationTrustProfileV0 | null;
+    lookup: TicketDecisionLocalSignatureTrustProfileLookupV0,
+  ): TicketDecisionLocalSignatureTrustProfileV0 | null;
 }
 
-export interface DurableWebAuthnTicketDecisionAttestationVerifierOptionsV0 {
-  trustProfiles: TicketDecisionAttestationTrustProfileResolverV0;
-  now?: () => number;
+export interface DurableLocalSignatureTicketDecisionAttestationVerifierOptionsV0 {
+  trustProfiles: TicketDecisionLocalSignatureTrustProfileResolverV0;
 }
 
 export interface TicketDecisionSessionAttestationRegistryOptionsV0 {
@@ -135,9 +119,6 @@ interface TicketDecisionSessionAttestationV0 {
 
 const sha256 = (value: string | Buffer): string =>
   crypto.createHash("sha256").update(value).digest("hex");
-
-const sha256Bytes = (value: string | Buffer): Buffer =>
-  crypto.createHash("sha256").update(value).digest();
 
 const compareText = (left: string, right: string): number =>
   Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"));
@@ -229,16 +210,10 @@ const exactAttestationEnvelope = (
             }),
       }
     : { ...document.scope },
-  credential: { ...document.credential },
-  webauthn: {
-    rp_id: document.webauthn.rp_id,
-    origin: document.webauthn.origin,
-    algorithm: document.webauthn.algorithm,
-  },
+  signer: { ...document.signer },
+  confirmation: { ...document.confirmation },
   nonce: document.nonce,
   issued_at: document.issued_at,
-  not_before: document.not_before,
-  expires_at: document.expires_at,
 });
 
 const decodeCanonicalBase64Url = (value: string): Buffer | null => {
@@ -259,10 +234,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isTrustProfile = (
   value: unknown,
-): value is TicketDecisionAttestationTrustProfileV0 =>
+): value is TicketDecisionLocalSignatureTrustProfileV0 =>
   isRecord(value)
-  && typeof value["credentialId"] === "string"
-  && typeof value["credentialFingerprint"] === "string"
+  && typeof value["keyId"] === "string"
+  && typeof value["keyFingerprint"] === "string"
   && typeof value["publicKeySpkiPem"] === "string"
   && typeof value["principalId"] === "string"
   && value["principalKind"] === "human"
@@ -272,30 +247,14 @@ const isTrustProfile = (
   )
   && typeof value["basisRef"] === "string"
   && typeof value["repositoryIncarnation"] === "string"
+  && typeof value["createdAt"] === "string"
   && (
     value["revokedAt"] === null
     || typeof value["revokedAt"] === "string"
   );
 
-const equalBytes = (left: Buffer, right: Buffer): boolean =>
-  left.byteLength === right.byteLength
-    && crypto.timingSafeEqual(left, right);
-
 const compareCanonical = (left: unknown, right: unknown): boolean =>
   canonicalTicketLedgerValue(left) === canonicalTicketLedgerValue(right);
-
-const isExactLocalhostOrigin = (value: string): boolean => {
-  try {
-    const parsed = new URL(value);
-    return (parsed.protocol === "http:" || parsed.protocol === "https:")
-      && parsed.hostname === WEBAUTHN_RP_ID
-      && parsed.username === ""
-      && parsed.password === ""
-      && parsed.origin === value;
-  } catch {
-    return false;
-  }
-};
 
 const attestationCandidates = (
   snapshot: TicketLedgerSnapshot,
@@ -322,19 +281,15 @@ const attestationCandidates = (
  * profile that the host resolves dynamically from outside the repository.
  *
  * The repository receipt never supplies its own verification key. Its
- * credential fields are only selectors and claims, all of which must match
+ * signer fields are only selectors and claims, all of which must match
  * the independently resolved profile.
  */
-export class DurableWebAuthnTicketDecisionAttestationVerifierV0
+export class DurableLocalSignatureTicketDecisionAttestationVerifierV0
 implements TicketDecisionAttestationVerifierV0 {
-  private readonly now: () => number;
-
   constructor(
     private readonly options:
-    DurableWebAuthnTicketDecisionAttestationVerifierOptionsV0,
-  ) {
-    this.now = options.now ?? Date.now;
-  }
+    DurableLocalSignatureTicketDecisionAttestationVerifierOptionsV0,
+  ) {}
 
   verify(
     snapshot: TicketLedgerSnapshot,
@@ -434,11 +389,7 @@ implements TicketDecisionAttestationVerifierV0 {
     }
     if (
       snapshot.source.branch === null
-        ? document.repository.checkout.mode !== "detached"
-          || document.repository.checkout.commit
-            !== snapshot.source.resolvedCommit
-        : document.repository.checkout.mode !== "branch"
-          || document.repository.checkout.branch !== snapshot.source.branch
+      || document.repository.checkout.branch !== snapshot.source.branch
     ) {
       return unverified("checkout_binding_mismatch", attestation);
     }
@@ -447,30 +398,20 @@ implements TicketDecisionAttestationVerifierV0 {
     }
 
     const issuedAt = Date.parse(document.issued_at);
-    const notBefore = Date.parse(document.not_before);
-    const expiresAt = Date.parse(document.expires_at);
     const decidedAt = Date.parse(decision.document.decided_at);
-    const now = this.now();
     if (
       !Number.isFinite(issuedAt)
-      || !Number.isFinite(notBefore)
-      || !Number.isFinite(expiresAt)
       || !Number.isFinite(decidedAt)
       || issuedAt < decidedAt
-      || now < issuedAt
-      || now < notBefore
     ) {
-      return unverified("not_yet_valid", attestation);
-    }
-    if (now >= expiresAt) {
-      return unverified("expired", attestation);
+      return unverified("timestamp_binding_mismatch", attestation);
     }
 
-    let profile: TicketDecisionAttestationTrustProfileV0 | null;
+    let profile: TicketDecisionLocalSignatureTrustProfileV0 | null;
     try {
       profile = this.options.trustProfiles.resolveProfile({
-        credentialId: document.credential.credential_id,
-        credentialFingerprint: document.credential.fingerprint,
+        keyId: document.signer.key_id,
+        keyFingerprint: document.signer.key_fingerprint,
         repositoryIncarnation:
           document.repository.repository_incarnation,
       });
@@ -484,9 +425,8 @@ implements TicketDecisionAttestationVerifierV0 {
       return unverified("profile_mismatch", attestation);
     }
     if (
-      profile.credentialId !== document.credential.credential_id
-      || profile.credentialFingerprint
-        !== document.credential.fingerprint
+      profile.keyId !== document.signer.key_id
+      || profile.keyFingerprint !== document.signer.key_fingerprint
       || profile.principalId !== document.authority.principal_id
       || profile.principalKind !== document.authority.principal_kind
       || profile.basis !== document.authority.basis
@@ -496,117 +436,47 @@ implements TicketDecisionAttestationVerifierV0 {
     ) {
       return unverified("profile_mismatch", attestation);
     }
+    const profileCreatedAt = Date.parse(profile.createdAt);
+    if (
+      !Number.isFinite(profileCreatedAt)
+      || issuedAt < profileCreatedAt
+    ) {
+      return unverified("profile_mismatch", attestation);
+    }
     if (profile.revokedAt !== null) {
       return unverified("profile_revoked", attestation);
-    }
-
-    const clientDataBytes = decodeCanonicalBase64Url(
-      document.webauthn.client_data_json,
-    );
-    const authenticatorData = decodeCanonicalBase64Url(
-      document.webauthn.authenticator_data,
-    );
-    const signature = decodeCanonicalBase64Url(
-      document.webauthn.signature,
-    );
-    if (
-      clientDataBytes === null
-      || authenticatorData === null
-      || authenticatorData.byteLength < AUTHENTICATOR_DATA_MIN_BYTES
-      || signature === null
-    ) {
-      return unverified("client_data_invalid", attestation);
-    }
-    if (
-      document.webauthn.rp_id !== WEBAUTHN_RP_ID
-      || document.webauthn.algorithm !== "ES256"
-      || !isExactLocalhostOrigin(document.webauthn.origin)
-    ) {
-      return unverified("webauthn_policy_mismatch", attestation);
-    }
-
-    let clientData: unknown;
-    try {
-      clientData = JSON.parse(utf8.decode(clientDataBytes));
-    } catch {
-      return unverified("client_data_invalid", attestation);
-    }
-    if (
-      !isRecord(clientData)
-      || clientData["type"] !== WEBAUTHN_TYPE
-      || typeof clientData["challenge"] !== "string"
-      || typeof clientData["origin"] !== "string"
-      || typeof clientData["crossOrigin"] !== "boolean"
-    ) {
-      return unverified("client_data_invalid", attestation);
-    }
-    let expectedChallenge: string;
-    try {
-      expectedChallenge = ticketDecisionAttestationChallenge(
-        exactAttestationEnvelope(document),
-      );
-    } catch {
-      return unverified("challenge_mismatch", attestation);
-    }
-    if (clientData["challenge"] !== expectedChallenge) {
-      return unverified("challenge_mismatch", attestation);
-    }
-    if (clientData["origin"] !== document.webauthn.origin) {
-      return unverified("origin_mismatch", attestation);
-    }
-    if (clientData["crossOrigin"] !== false) {
-      return unverified("cross_origin", attestation);
-    }
-
-    const expectedRpIdHash = sha256Bytes(WEBAUTHN_RP_ID);
-    if (!equalBytes(
-      authenticatorData.subarray(0, expectedRpIdHash.byteLength),
-      expectedRpIdHash,
-    )) {
-      return unverified("rp_id_hash_mismatch", attestation);
-    }
-    const flags = authenticatorData[AUTHENTICATOR_FLAGS_OFFSET]!;
-    if ((flags & AUTHENTICATOR_FLAG_USER_PRESENT) === 0) {
-      return unverified("user_presence_required", attestation);
-    }
-    if ((flags & AUTHENTICATOR_FLAG_USER_VERIFIED) === 0) {
-      return unverified("user_verification_required", attestation);
     }
 
     let publicKey: crypto.KeyObject;
     try {
       publicKey = crypto.createPublicKey(profile.publicKeySpkiPem);
-      const details = publicKey.asymmetricKeyDetails;
-      if (
-        publicKey.asymmetricKeyType !== "ec"
-        || (details?.namedCurve !== "prime256v1"
-          && details?.namedCurve !== "P-256")
-      ) {
-        return unverified(
-          "credential_public_key_invalid",
-          attestation,
-        );
+      if (publicKey.asymmetricKeyType !== "ed25519") {
+        return unverified("signing_key_invalid", attestation);
       }
       const spki = publicKey.export({
         type: "spki",
         format: "der",
       });
-      if (sha256(spki) !== profile.credentialFingerprint) {
-        return unverified(
-          "credential_public_key_invalid",
-          attestation,
-        );
+      if (sha256(spki) !== profile.keyFingerprint) {
+        return unverified("signing_key_invalid", attestation);
       }
     } catch {
-      return unverified("credential_public_key_invalid", attestation);
+      return unverified("signing_key_invalid", attestation);
     }
 
-    const signedBytes = Buffer.concat([
-      authenticatorData,
-      sha256Bytes(clientDataBytes),
-    ]);
+    const signature = decodeCanonicalBase64Url(document.signature);
+    if (signature === null || signature.byteLength !== 64) {
+      return unverified("signature_invalid", attestation);
+    }
     try {
-      if (!crypto.verify("sha256", signedBytes, publicKey, signature)) {
+      if (!crypto.verify(
+        null,
+        ticketDecisionAttestationSigningBytes(
+          exactAttestationEnvelope(document),
+        ),
+        publicKey,
+        signature,
+      )) {
         return unverified("signature_invalid", attestation);
       }
     } catch {
@@ -615,7 +485,7 @@ implements TicketDecisionAttestationVerifierV0 {
     return {
       status: "verified",
       verificationRef: document.attestation_id,
-      source: "durable_webauthn",
+      source: "durable_local_signature",
     };
   }
 }

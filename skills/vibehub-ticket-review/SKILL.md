@@ -26,14 +26,17 @@ review into another chat transcript.
 2. Let the human read the graph in execution order: what is ready, what blocks
    it, and what completing a Ticket unlocks. Use the Inspector for the complete
    executable context and traceable evidence.
-3. Treat only interventions the host actually exposes as available. When the
-   graph needs its first human Decision, let the named human enroll one local
-   WebAuthn authority from the review surface. Enrollment, every Decision,
-   re-attestation, and revocation require an explicit authenticator gesture;
-   the browser link alone is never authority.
-4. A Decision challenge freezes the exact current Ticket source and proposed
-   Decision. If the source moves or the ceremony expires, refresh and ask for
-   a new gesture. Never retry by editing a Decision or attestation YAML file.
+3. Treat only interventions the host actually exposes as available. A Decision
+   requires one explicit confirmation in the installed Plugin host. The browser
+   submits only the Decision content; the host freezes the exact current Ticket
+   source, signs it with the install-local signing authority, and writes the
+   exact detached authority receipt.
+   Durable Decision controls require a named branch. A detached checkout stays
+   readable; switch that worktree to a named branch and refresh before asking
+   for a durable confirmation.
+4. If the source moves or the install-local signature cannot be verified,
+   refresh and ask the human to confirm the exact Decision again. Never retry
+   by editing a Decision or authority-receipt YAML file.
 5. Treat a hidden or unavailable control as unavailable; it is not an
    invitation to edit Ticket YAML directly.
 6. After a human intervention, refresh Ticket facts before planning or
@@ -46,9 +49,13 @@ review into another chat transcript.
 ## Guardrails
 
 - Bind one host to one exact worktree. Restart it after switching worktrees.
-- Treat the URL fragment as a short-lived local capability, never human
-  identity or Decision authority.
+- Treat the short-lived browser link as an approval capability and keep it
+  private. It is neither durable identity nor a receipt; durable authority
+  begins only when the installed host signs one exact confirmed Decision.
 - Treat only a fresh-process-verified `authority_receipt` as an active Decision.
   Raw Decision YAML remains inspectable `current_unverified` intent.
+- The receipt proves that the install-local VibeHub authority signed the exact
+  host-confirmed action. It does not prove biometric presence or identify which
+  person used the local browser.
 - Never claim the human viewed, understood, or approved anything without a
   durable fact that proves the corresponding action.

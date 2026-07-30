@@ -2,36 +2,32 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import {
-  FileTicketDecisionAttestationTrustProfileResolverV0,
-  TicketDecisionAuthorityTrustStoreError,
-} from "../src/ticket-decision-trust-store.js";
 import { afterEach, describe, expect, it } from "vitest";
+import {
+  FileTicketDecisionLocalSignatureTrustProfileResolverV0,
+  TicketDecisionAuthorityTrustStoreError,
+  defaultTicketDecisionLocalSignatureRegistryPath,
+} from "../src/ticket-decision-trust-store.js";
 
 const CREATED_AT = "2026-07-30T18:00:00.000Z";
 const REVOKED_AT = "2026-07-30T19:00:00.000Z";
 
 interface RegistryFixture {
   profileId: string;
+  keyId: string;
   keyFingerprint: string;
   principalId: string;
   principalKind: "human";
   authorityBasis: "repository_owner";
   authorityRef: string;
   repositoryIncarnation: string;
-  rpId: "localhost";
-  algorithm: "ES256";
-  credentialId: string;
-  publicKeyCose: string;
+  algorithm: "Ed25519";
   publicKeySpkiPem: string;
-  transports: string[];
-  counter: number;
-  lastAssertionDigest: string | null;
   createdAt: string;
   revokedAt: string | null;
 }
 
-describe("file Ticket Decision authority trust resolver", () => {
+describe("file Ticket Decision local-signature trust resolver", () => {
   const roots: string[] = [];
 
   afterEach(() => {
@@ -53,10 +49,8 @@ describe("file Ticket Decision authority trust resolver", () => {
     const trust = path.join(root, "trust");
     fs.mkdirSync(trust, { mode: 0o700 });
     fs.chmodSync(trust, 0o700);
-    const registryPath = path.join(trust, "authorities.json");
-    const { publicKey } = crypto.generateKeyPairSync("ec", {
-      namedCurve: "prime256v1",
-    });
+    const registryPath = path.join(trust, "registry.json");
+    const { publicKey } = crypto.generateKeyPairSync("ed25519");
     const publicKeySpkiPem = publicKey.export({
       type: "spki",
       format: "pem",
@@ -64,38 +58,28 @@ describe("file Ticket Decision authority trust resolver", () => {
     const keyFingerprint = crypto.createHash("sha256").update(
       publicKey.export({ type: "spki", format: "der" }),
     ).digest("hex");
-    const credentialId = Buffer.from(
-      crypto.randomBytes(32),
-    ).toString("base64url");
+    const keyId = `tdk-${keyFingerprint}`;
+    const repositoryIncarnation = `repo-${"a".repeat(64)}`;
     const identity = {
-      principalId: "wayne",
-      principalKind: "human",
-      authorityBasis: "repository_owner",
-      authorityRef: "repo-owner:wayne",
-      repositoryIncarnation: "repo-incarnation-1",
-      rpId: "localhost",
-      algorithm: "ES256",
-      credentialId,
+      keyId,
       keyFingerprint,
+      repositoryIncarnation,
+      algorithm: "Ed25519",
     };
+    const profileId = `tla-${crypto.createHash("sha256")
+      .update(JSON.stringify(identity))
+      .digest("hex")}`;
     const profile: RegistryFixture = {
-      profileId: `twa-${crypto.createHash("sha256")
-        .update(JSON.stringify(identity))
-        .digest("hex")}`,
+      profileId,
+      keyId,
       keyFingerprint,
-      principalId: "wayne",
+      principalId: `local-installation:${profileId}`,
       principalKind: "human",
       authorityBasis: "repository_owner",
-      authorityRef: "repo-owner:wayne",
-      repositoryIncarnation: "repo-incarnation-1",
-      rpId: "localhost",
-      algorithm: "ES256",
-      credentialId,
-      publicKeyCose: Buffer.from("fixture-cose").toString("base64url"),
+      authorityRef: `vibehub:local-installation:${profileId}`,
+      repositoryIncarnation,
+      algorithm: "Ed25519",
       publicKeySpkiPem,
-      transports: ["internal"],
-      counter: 0,
-      lastAssertionDigest: null,
       createdAt: CREATED_AT,
       revokedAt: null,
     };
@@ -115,40 +99,43 @@ describe("file Ticket Decision authority trust resolver", () => {
     fs.chmodSync(registryPath, 0o600);
   };
 
-  it("returns null when the external registry does not exist", () => {
-    const { registryPath } = fixture();
+  it("uses the install-local registry path and returns null when absent", () => {
+    expect(defaultTicketDecisionLocalSignatureRegistryPath("/tmp/home"))
+      .toBe("/tmp/home/.vibehub/trust/decision-authority.v1/registry.json");
+    const { registryPath, profile } = fixture();
     const resolver =
-      new FileTicketDecisionAttestationTrustProfileResolverV0({
+      new FileTicketDecisionLocalSignatureTrustProfileResolverV0({
         registryPath,
       });
     expect(resolver.resolveProfile({
-      credentialId: "missing",
-      credentialFingerprint: "0".repeat(64),
-      repositoryIncarnation: "repo-incarnation-1",
+      keyId: profile.keyId,
+      keyFingerprint: profile.keyFingerprint,
+      repositoryIncarnation: profile.repositoryIncarnation,
     })).toBeNull();
   });
 
-  it("resolves exact trust and rereads revocation dynamically", () => {
+  it("resolves exact Ed25519 trust and rereads revocation dynamically", () => {
     const { registryPath, profile } = fixture();
     writeRegistry(registryPath, [profile]);
     const resolver =
-      new FileTicketDecisionAttestationTrustProfileResolverV0({
+      new FileTicketDecisionLocalSignatureTrustProfileResolverV0({
         registryPath,
       });
     const lookup = {
-      credentialId: profile.credentialId,
-      credentialFingerprint: profile.keyFingerprint,
+      keyId: profile.keyId,
+      keyFingerprint: profile.keyFingerprint,
       repositoryIncarnation: profile.repositoryIncarnation,
     };
     expect(resolver.resolveProfile(lookup)).toEqual({
-      credentialId: profile.credentialId,
-      credentialFingerprint: profile.keyFingerprint,
+      keyId: profile.keyId,
+      keyFingerprint: profile.keyFingerprint,
       publicKeySpkiPem: profile.publicKeySpkiPem,
       principalId: profile.principalId,
       principalKind: "human",
       basis: "repository_owner",
       basisRef: profile.authorityRef,
       repositoryIncarnation: profile.repositoryIncarnation,
+      createdAt: CREATED_AT,
       revokedAt: null,
     });
     writeRegistry(registryPath, [{ ...profile, revokedAt: REVOKED_AT }]);
@@ -157,32 +144,36 @@ describe("file Ticket Decision authority trust resolver", () => {
     });
   });
 
-  it("fails closed when authorityRef changes without a new identity", () => {
+  it("rejects key, profile, principal, and authority identity substitution", () => {
     const { registryPath, profile } = fixture();
-    writeRegistry(registryPath, [{
-      ...profile,
-      authorityRef: "repo-owner:attacker",
-    }]);
     const resolver =
-      new FileTicketDecisionAttestationTrustProfileResolverV0({
+      new FileTicketDecisionLocalSignatureTrustProfileResolverV0({
         registryPath,
       });
-    expect(() => resolver.resolveProfile({
-      credentialId: profile.credentialId,
-      credentialFingerprint: profile.keyFingerprint,
-      repositoryIncarnation: profile.repositoryIncarnation,
-    })).toThrow(TicketDecisionAuthorityTrustStoreError);
+    for (const changed of [
+      { ...profile, keyId: `tdk-${"1".repeat(64)}` },
+      { ...profile, profileId: `tla-${"1".repeat(64)}` },
+      { ...profile, principalId: "local-installation:attacker" },
+      { ...profile, authorityRef: "vibehub:local-installation:attacker" },
+    ]) {
+      writeRegistry(registryPath, [changed]);
+      expect(() => resolver.resolveProfile({
+        keyId: profile.keyId,
+        keyFingerprint: profile.keyFingerprint,
+        repositoryIncarnation: profile.repositoryIncarnation,
+      })).toThrow(TicketDecisionAuthorityTrustStoreError);
+    }
   });
 
   it("rejects broad permissions, symlink ancestors, and schema ambiguity", () => {
     const { root, registryPath, profile } = fixture();
     const lookup = {
-      credentialId: profile.credentialId,
-      credentialFingerprint: profile.keyFingerprint,
+      keyId: profile.keyId,
+      keyFingerprint: profile.keyFingerprint,
       repositoryIncarnation: profile.repositoryIncarnation,
     };
     const resolver =
-      new FileTicketDecisionAttestationTrustProfileResolverV0({
+      new FileTicketDecisionLocalSignatureTrustProfileResolverV0({
         registryPath,
       });
     writeRegistry(registryPath, [profile]);
@@ -201,7 +192,7 @@ describe("file Ticket Decision authority trust resolver", () => {
     const linkedTrust = path.join(root, "linked-trust");
     fs.symlinkSync(path.dirname(registryPath), linkedTrust, "dir");
     const linkedResolver =
-      new FileTicketDecisionAttestationTrustProfileResolverV0({
+      new FileTicketDecisionLocalSignatureTrustProfileResolverV0({
         registryPath: path.join(linkedTrust, path.basename(registryPath)),
       });
     expect(() => linkedResolver.resolveProfile(lookup)).toThrow(

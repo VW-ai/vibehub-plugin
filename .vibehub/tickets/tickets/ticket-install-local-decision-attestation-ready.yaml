@@ -1,0 +1,60 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-install-local-decision-attestation-ready
+outcome: On a named branch, the installed Plugin records one explicit host-confirmed Decision and detached install-local Ed25519 receipt that a fresh authorized process can verify across restart without Touch ID, passkeys, WebAuthn, expiry, or trust in repository-editable identity fields.
+context: This M3.6 successor implements the repository human's explicit pivot away from the completed M3.5 WebAuthn outcome without rewriting that historical Ticket identity. On first named-branch use, the installed host provisions or reuses one repository-scoped Ed25519 profile outside Git and SQLite. The browser submits only Decision content through a short-lived private approval capability. One Record decision submit freezes the current repository, worktree, named branch, subject, and scope; assigns a local-installation principal with designated_human host attribution; writes the Decision; and appends its detached signed receipt. A fresh Plugin, CLI, MCP, or Skill process dynamically rereads the external profile and verifies the exact signature and current binding. Receipts have no time validity window. Raw or interrupted Decisions remain current_unverified; tamper, stale source, mismatch, or revocation fails closed. Revoked profiles remain historical and the next named-branch host rotates to one new active profile. Detached checkouts remain readable but durable Decision controls are unavailable because committing an exact detached-commit receipt would invalidate it. This proves continuity of one local Plugin installation and its host assertion, not WebAuthn, biometric presence, a named person's identity, repository-owner identity, or resistance to arbitrary same-UID, Plugin-runtime, private-key, or OS-account compromise.
+acceptance:
+  - acceptance_id: bounded-threat-claim
+    criterion: Repository, Ticket YAML, Decision YAML, SQLite, browser-field, and Git-author edits cannot fabricate or widen an accepted receipt without the install-local private key; no claim is made against arbitrary same-UID processes, Plugin-runtime compromise, private-key theft, or OS-account compromise.
+  - acceptance_id: detached-read-only-retreat
+    criterion: A detached checkout can still open and inspect the complete Ticket graph, but durable Decision controls are unavailable and direct Decision requests fail without creating a profile, Decision, or receipt.
+  - acceptance_id: exact-named-branch-binding
+    criterion: The signature binds the complete Decision digest, ID and path, designated-human host attribution, repository incarnation and roots, worktree identity and root, named branch, graph digest or Ticket revision, boundary, disposition, selection or delegated scope, signer key and fingerprint, confirmation method, nonce, and issuance time.
+  - acceptance_id: failure-and-interruption-retreat
+    criterion: Decision tamper, stale repository, worktree, branch, subject or scope, missing or mismatched profile, invalid signature, and revocation fail closed; interruption after the Decision but before the receipt leaves inspectable current_unverified evidence.
+  - acceptance_id: fresh-process-no-expiry-verification
+    criterion: A newly started Plugin, CLI, MCP, or Skill verifies the unchanged exact receipt without prior process memory or SQLite, and current time neither activates nor expires it.
+  - acceptance_id: local-authority-recovery
+    criterion: Authority files remain outside Git and SQLite with strict directory, file, and no-symlink checks; a dead owner-record lock recovers only after its process no longer exists; revocation preserves the old profile and the next named-branch host rotates to exactly one active replacement.
+  - acceptance_id: real-disk-integration
+    criterion: Integration tests exercise a real disk-backed authority through POST /api/decision, host shutdown, a new authority object and host, fresh receipt verification, revocation, rotation, and detached-checkout retreat.
+  - acceptance_id: single-confirmation-entrypoint
+    criterion: The installed graph Inspector records an exact plan or protected-boundary Decision plus detached receipt from one normal Record decision submit, with no enrollment, Touch ID, passkey, WebAuthn, draft review, or second signing ceremony.
+constraints:
+  - The private key and public trust registry live outside the governed repository and disposable SQLite database.
+  - Git carries the exact Decision and detached receipt, but editable Git bytes alone cannot mint accepted authority.
+  - The browser bearer is a short-lived approval capability that must remain private; it is not identity, signing material, or a durable receipt.
+  - principal_kind human and basis designated_human record the Plugin host's semantic assertion, not cryptographic proof of a named person or repository owner.
+  - Durable Decisions require a named branch; do not invent a detached-commit binding that self-invalidates on commit.
+  - Do not add a mandatory review lifecycle, remote identity platform, generic workflow policy, or human review for objectively adjudicable Agent-owned technical choices.
+  - Do not expose the private key or signing method to browser JavaScript, Ticket YAML, MCP, or a public caller-controlled CLI operation.
+context_refs:
+  - ref: META/09-ticket-runtime/artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md
+    purpose: Records the approved product pivot, exact flow, recovery behavior, deliberate limits, and verification evidence.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml
+    purpose: Preserves the superseded M3.5 WebAuthn contract rather than mutating its outcome identity.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml
+    purpose: Defines the active install-local authority, exact binding, no-expiry, named-branch, revocation, and fail-closed contract.
+  - ref: packages/cli/src/ticket-local-decision-authority.ts
+    purpose: Owns repository-scoped Ed25519 provisioning, external storage, signing, lock recovery, revocation, and rotation.
+  - ref: packages/cli/src/ticket-review-host.ts
+    purpose: Owns the installed single-submit Decision path, exact host-controlled fields, detached retreat, and Decision-then-receipt recovery.
+  - ref: packages/core/src/ticket-decision-attestation.ts
+    purpose: Dynamically verifies the exact durable signature and projects only current accepted authority.
+  - ref: packages/core/src/ticket-decision-trust-store.ts
+    purpose: Strictly resolves repository-external public profiles for fresh and already-running readers.
+  - ref: packages/core/src/ticket-ledger
+    purpose: Owns strict Decision and receipt documents, safe writers, exact digests, and current source binding.
+  - ref: skills/vibehub-ticket-review/SKILL.md
+    purpose: Defines the installed human confirmation entrypoint, named-branch retreat, and honest authority guardrails.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-durable-decision-attestation-ready
+    rationale: The M3.6 successor preserves the exact durable cross-process receipt boundary proven by M3.5 while replacing its WebAuthn ceremony, time window, and identity claim.
+provenance_refs:
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md
+  - META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml
+  - META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml
+  - conversation:2026-07-30-install-local-pivot-approved
+  - ticket-m3-6:install-local-authority-pivot
