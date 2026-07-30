@@ -2,7 +2,7 @@ schema_version: 1
 kind: ticket
 ticket_id: ticket-durable-decision-attestation-ready
 outcome: The installed Plugin can record one explicit human Decision whose exact authority any fresh authorized process can verify across restart without trusting repository-editable YAML, SQLite, browser state, OS username, Git author, or prior process memory.
-context: "M3 deliberately stops at a fail-closed same-dispatcher attestation: raw Decision YAML preserves intent and evidence, while the trusted session registry can temporarily promote only the exact document it wrote and re-read. The production vibehub ticket review launcher supplies neither a trusted human principal nor durable authority, and each Skill invocation starts a fresh dispatcher that correctly sees current_unverified. Implement the smallest local Plugin-owned attestation mechanism that closes this boundary. It must provide a real installed human action, bind the full canonical Decision and its exact repository incarnation, worktree, branch or detached commit, graph or Ticket subject, protected boundary, selection or delegated scope, principal, and validity window, and let a fresh process verify that evidence independently. The technical mechanism may be chosen against objective security and portability criteria; this Ticket does not preselect a keychain, signature format, helper process, or IPC design."
+context: M3 deliberately stopped at fail-closed same-dispatcher authority. M3.5 closes that boundary with explicit WebAuthn user verification, a repo-external public trust registry, append-only Git attestation receipts, complete repository/worktree/checkout/subject/scope binding, and dynamic fresh-process verification. The installed review host now supports enrollment, graph plan review, Ticket protected-boundary Decisions, re-attestation by repeating the exact current Decision, and verified revocation without turning the local bearer, YAML, SQLite, Git authorship, or browser fields into authority. The private key remains in the authenticator. Raw Decision YAML remains inspectable intent and projects as current_unverified whenever its exact receipt is missing, stale, expired, revoked, tampered, or bound elsewhere. This is intentionally a narrow local Decision-attestation mechanism rather than a daemon, remote identity platform, generic workflow engine, or mandatory review lifecycle.
 acceptance:
   - acceptance_id: bounded-local-mechanism
     criterion: The implementation remains a narrow Decision-attestation boundary rather than a generic workflow engine, remote identity platform, SQLite semantic authority, or mandatory review lifecycle, and includes adversarial integration tests through the installed entrypoint and fresh process.
@@ -24,24 +24,32 @@ constraints:
   - Do not weaken exact-subject currentness, independent Ticket validation, or the distinction between Decision intent and authority.
   - Prefer the smallest local, inspectable mechanism that satisfies the acceptance criteria; avoid premature remote identity or multi-user infrastructure.
 context_refs:
-  - ref: META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md
-    purpose: Records the implemented mechanism, adversarial evidence, and concrete production and cross-process gaps.
+  - ref: META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md
+    purpose: Records the implemented trust boundary, protocol, recovery behavior, deliberate limits, and verification evidence.
   - ref: META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml
     purpose: Defines the required cross-process authority, trust-root, binding, and fail-closed contract.
   - ref: META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml
-    purpose: Defines the M3 same-session boundary this Ticket must extend without weakening.
+    purpose: Defines the M3 same-session boundary extended without weakening.
   - ref: packages/cli/src/ticket-review-host.ts
-    purpose: Contains the installed launcher and trusted embedding seam that must become a real Plugin-owned human entrypoint.
+    purpose: Provides the installed two-phase human ceremony for plan review and protected-boundary Decisions.
+  - ref: packages/cli/src/ticket-webauthn-authority.ts
+    purpose: Owns explicit registration, assertion, counter, replay, registry, and verified revocation mechanics.
   - ref: packages/core/src/ticket-decision-attestation.ts
-    purpose: Contains the current private process-local registry and exact binding model to preserve or supersede.
+    purpose: Verifies complete durable WebAuthn receipt binding and projects only current accepted authority.
+  - ref: packages/core/src/ticket-decision-trust-store.ts
+    purpose: Rereads and strictly validates the repo-external authority registry for every fresh verification.
   - ref: skills/vibehub-ticket-plan/SKILL.md
-    purpose: Defines how a fresh planner consumes authority receipts and preserves unverified boundaries.
+    purpose: Defines how a fresh planner consumes current authority receipts and preserves unverified boundaries.
+  - ref: skills/vibehub-ticket-review/SKILL.md
+    purpose: Provides the installed Skill entrypoint and human/Agent authority guardrails.
 relations:
   - type: depends_on
     target_ticket_id: ticket-git-review-intervention-ready
-    rationale: Durable attestation must extend the strict Decision documents, projection, host security boundary, and fail-closed same-session model already established by M3.
+    rationale: Durable attestation extends the strict Decision documents, projection, host security boundary, and fail-closed same-session model established by M3.
 provenance_refs:
-  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md
   - META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml
   - META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml
+  - commit:dbc60dc3fbc22995060a0ee1e6768602c928470c
   - ticket-m3-5:authority-boundary
+  - ticket-m3-5:implemented
