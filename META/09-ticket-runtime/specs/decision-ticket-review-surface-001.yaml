@@ -201,6 +201,26 @@ intent:
     host no longer owns a trusted-provider/SQLite application workflow; review,
     comments, edits, and decisions produce inspectable Git document changes.
 
+    **M3 live intervention surface — 2026-07-30**
+
+    The current graph host now projects durable Git-native Review and Decision
+    facts at their exact graph, Ticket, or relation loci. Current and historical
+    traces remain distinct. Comments and complete Ticket edit proposals appear
+    only when the embedding plugin binds a host-attested human; plan and
+    protected-boundary controls appear only for exact host-bound authority
+    scopes. The default CLI host therefore remains truly read-only.
+
+    Durable Decision YAML records the exact choice but cannot authenticate
+    itself. A raw or restart-reconstructed Decision stays visible as
+    current-unverified evidence; only an exact unexpired attestation from the
+    active trusted host session projects it as executable authority.
+
+    Review stays progressive and in situ: one disclosure row opens inside the
+    existing Inspector, trace failure does not hide executable context, stale
+    refresh preserves the user's draft, and a successful intervention exposes
+    its durable Git path. The host remains a projection over canonical
+    operations rather than an HTML-owned editor or another chat.
+
     **Claimed**: Codex 2026-07-28
 constraints:
   - kind: must
@@ -227,7 +247,7 @@ provenance:
   source_type: manual_input
   confidence: 0.85
   source_ref: "Wayne proposed a per-project HTML Ticket visualization with comments and simple edits — 2026-07-28"
-  produced_at: "2026-07-29T20:00:00Z"
+  produced_at: "2026-07-30T20:30:42Z"
 relations:
   - target: "decision-ticket-intelligence-loop-001"
     type: depends_on
@@ -248,3 +268,7 @@ anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v3.html"
   - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html"
   - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md"
+  - file: "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md"
+  - file: "packages/cli/src/ticket-review-host.ts"
+  - file: "packages/cli/assets/ticket-review-host/app.js"

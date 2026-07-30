@@ -1,0 +1,606 @@
+{
+  "expectedSource": {
+    "sourceToken": "tls-03828c57f323215b1bd7260f5961c5ffe9f52e11834fec07188d5d3236f211ab",
+    "worktreeIdentity": "worktree-98442bcd68c07ac1d12b51609a35e716dde91eb4fc8d292033eea3381e8f45f5",
+    "resolvedCommit": "b0d8b1f411950b0adc5f610956890c8221986f60",
+    "graphDigest": "sha256:95f3a9b631864e71e02d5466696d0ab0877ebce62b8424f4952ae564ba87f094",
+    "semanticLedgerDigest": "sha256:704f61440a50700b431645060dcca8ac30e82cdf0a353e0264b58225018bf469"
+  },
+  "changes": [
+    {
+      "op": "put",
+      "ticketId": "ticket-context-binding-decided",
+      "expectedTicketRevision": "sha256:513c68fdb3814e7ee1c9dcd98df9298393b21b371d266aea6d248b12a6548342",
+      "document": {
+        "schema_version": 1,
+        "kind": "ticket",
+        "ticket_id": "ticket-context-binding-decided",
+        "outcome": "The repository has an accepted exact Feature Room and repository context-binding contract that lets a Ticket revision compile a bounded execution packet and fail closed on missing, stale, ambiguous, or oversized required context.",
+        "context": "decision-ticket-context-binding-001 remains an unresolved P0 question and blocks a trustworthy fresh-Agent execution handoff. The decision must identify exact Spec revisions, mapping identity, repository source, dependency facts, and the reason each binding is required; define drift and invalidation; and connect execution evidence back to governing semantics. This is a protected architecture and product-semantics decision. An Agent may prepare options and objective evidence but must not silently ratify one. Before this Ticket can accept a successor, the installed Plugin must be able to preserve and independently verify the exact human ratification across a fresh process; repository-editable Decision YAML or an in-memory host receipt is not sufficient authority. The first contract should exploit Feature Room guarantees rather than generalizing prematurely.",
+        "acceptance": [
+          {
+            "acceptance_id": "packet-boundary",
+            "criterion": "The contract defines deterministic packet contents and bounds, required versus optional facts, and fail-closed behavior for missing, stale, ambiguous, conflicting, or oversized context."
+          },
+          {
+            "acceptance_id": "semantic-linkage",
+            "criterion": "The contract explains how an execution attempt and its evidence bind back to the exact Ticket, Feature Room facts, mapping, and repository source the Agent received."
+          },
+          {
+            "acceptance_id": "successor-ratified",
+            "criterion": "An exact successor resolves decision-ticket-context-binding-001, passes machine validation, and carries durable human-attestation evidence that a fresh authorized process independently verifies against that exact successor, principal, repository, worktree, ref, boundary, selection, revision bindings, drift rules, and rationale."
+          }
+        ],
+        "constraints": [
+          "Feature Room is the first semantic provider; future extensibility must not weaken its available guarantees.",
+          "Conversation memory cannot satisfy a missing durable binding.",
+          "The contract must preserve Git worktree and branch semantic isolation.",
+          "Execution cannot proceed by treating an explored option, repository-editable Decision claim, or process-local receipt as an accepted decision."
+        ],
+        "context_refs": [
+          {
+            "ref": "META/09-ticket-runtime/specs/decision-ticket-context-binding-001.yaml",
+            "purpose": "Owns the unresolved protected context-binding question."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+            "purpose": "Requires a fresh-Agent executable context package."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+            "purpose": "Defines the fresh-process authority evidence that must exist before this protected successor can be ratified."
+          },
+          {
+            "ref": "skills/_stdlib/ontology.md",
+            "purpose": "Defines canonical Specs, revisions, placement, and source-kind semantics."
+          },
+          {
+            "ref": "skills/vibehub-query/SKILL.md",
+            "purpose": "Defines governed context retrieval and truth-layer distinctions."
+          }
+        ],
+        "relations": [
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-durable-decision-attestation-ready",
+            "rationale": "This protected contract cannot be accepted truthfully until its exact human ratification remains independently verifiable after the trusted host process exits."
+          }
+        ],
+        "provenance_refs": [
+          "META/09-ticket-runtime/spec.md",
+          "META/09-ticket-runtime/specs/decision-ticket-context-binding-001.yaml",
+          "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+          "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml"
+        ]
+      }
+    },
+    {
+      "op": "put",
+      "ticketId": "ticket-git-review-intervention-ready",
+      "expectedTicketRevision": "sha256:c907d2506a5ec5f721b9fad11e082f8f21985d30e034cefa60843bb0fa733a69",
+      "document": {
+        "schema_version": 1,
+        "kind": "ticket",
+        "ticket_id": "ticket-git-review-intervention-ready",
+        "outcome": "The Ticket graph has a Git-native review and intervention foundation that preserves attributed comments and edit proposals durably, projects raw Decisions without trusting them, and can grant exact Decision authority only inside one explicitly trusted host session.",
+        "context": "M1A provides the complete direct-unlock graph and deterministic interactions; M2 provides exact-source planning and independent semantic validation. M3 assembles four independently verifiable results: the strict review ledger kernel, subject-local projection, a secure progressive host surface, and Skill reconciliation of edits and Decision evidence. Comments, edit proposals, and Decision intent survive as inspectable Git facts. Raw Decision YAML is never self-authenticating: a fresh process projects it as current_unverified. Only the same trusted dispatcher session that wrote and re-read the exact canonical Decision may issue a short-lived authority receipt. The installed vibehub ticket review launcher intentionally remains read-only until a real Plugin-owned human entrypoint and cross-process attestation exist in ticket-durable-decision-attestation-ready. This Ticket does not claim durable authority after restart, Run readiness, accepted completion, or proof.",
+        "acceptance": [
+          {
+            "acceptance_id": "disposable-runtime-proof",
+            "criterion": "After deletion of disposable state, a fresh process reconstructs every durable comment, edit proposal, Decision intent, subject binding, and current-versus-historical status from Git; every raw current Decision remains current_unverified until independently attested."
+          },
+          {
+            "acceptance_id": "git-native-interventions",
+            "criterion": "The public operations can create attributed comments and complete edit proposals as inspectable exact-source Git changes, while a trusted embedding can additionally record an exact plan or protected-boundary Decision; applying an edit still requires fresh Planning, independent Validation, and ticket.worktree.patch."
+          },
+          {
+            "acceptance_id": "projection-preserved",
+            "criterion": "Complete graph visibility, direct-unlock reading, deterministic layout, pan, zoom, fit, minimap, causal focus, and progressive inspection remain intact before and after interventions."
+          },
+          {
+            "acceptance_id": "session-authority-boundary",
+            "criterion": "Source or subject drift blocks advancement, claimed contribution attribution grants no authority, raw Decision YAML never grants authority, and only an exact full-document receipt bound to the current trusted dispatcher session can project a Decision as a temporary gate."
+          }
+        ],
+        "constraints": [
+          "HTML is a projection and intervention surface, never a source of truth or raw persistence editor.",
+          "Do not restore the retired trusted-provider, generation, SQLite authority, or mandatory proposal-to-receipt workflow.",
+          "Runtime state, selection, hover, and scenario lenses must not alter deterministic graph layout.",
+          "Healthy state remains quiet while blockers, decisions, deviations, stale context, Runs, and proof stay attached to their graph locus.",
+          "M3 must not claim that repository-editable YAML, OS username, Git author, browser bearer, SQLite, or process-local memory is durable human authority.",
+          "M3 must not invent readiness, completion, Outcome, Evidence, context binding, or closeout semantics."
+        ],
+        "context_refs": [
+          {
+            "ref": "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html",
+            "purpose": "Preserves the accepted interaction and visual reference."
+          },
+          {
+            "ref": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+            "purpose": "Records the implemented M3 boundary, verification evidence, and intentionally unresolved production authority handoff."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml",
+            "purpose": "Defines the Git review facts and same-session authority boundary implemented by M3."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/contract-ticket-planning-validation-skills-001.yaml",
+            "purpose": "Defines the implemented exact-source planning, independent validation, and execution-authority gate this intervention surface must reuse."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml",
+            "purpose": "Governs the accepted graph experience and intervention boundary."
+          },
+          {
+            "ref": "packages/cli/assets/ticket-review-host",
+            "purpose": "Contains the deterministic graph projection and progressive intervention controls."
+          }
+        ],
+        "relations": [
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-review-host-interventions-ready",
+            "rationale": "The integrated M3 foundation requires a secure browser surface and trusted embedding boundary that read back through canonical Git projection."
+          },
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-review-intelligence-handoff-ready",
+            "rationale": "The integrated M3 foundation requires review facts to feed Planning and Validation intelligence without bypassing it or trusting raw Decisions."
+          }
+        ],
+        "provenance_refs": [
+          "META/09-ticket-runtime/progress.yaml",
+          "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml",
+          "META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml",
+          "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+          "ticket-m3:decompose"
+        ]
+      }
+    },
+    {
+      "op": "put",
+      "ticketId": "ticket-review-ledger-kernel-ready",
+      "expectedTicketRevision": "sha256:7300c17863dcc2483295adc352620fe5324f7e5db69f7c9158ea2ced966322ac",
+      "document": {
+        "schema_version": 1,
+        "kind": "ticket",
+        "ticket_id": "ticket-review-ledger-kernel-ready",
+        "outcome": "The Git Ticket ledger strictly reads and atomically records exact-source ReviewContribution and Decision documents with stable subject identity, honest authority claims, and no change to Ticket definition identity.",
+        "context": "M3 needs durable review facts without turning Ticket YAML, HTML, or SQLite into a review database. ReviewContribution is append-only, distinguishes comment from ticket_edit, binds a graph, Ticket revision, or stable relation subject, and carries a complete proposed replacement Ticket rather than a raw patch. Decision records plan_review or protected_boundary intent for one exact subject. Its document preserves the claimed human principal, basis, scope, selection, and rationale as durable evidence, but repository-editable YAML is not self-authenticating authority. Generic adapters fail closed for Decision writes. A trusted dispatcher can write, reload, compare the complete canonical document, and issue only a short-lived process-local attestation. Keep graphDigest scoped to normalized Ticket definitions and topology, the semantic-ledger digest over durable Ticket facts, and the physical source token over the complete ledger inventory. Reuse one writer lock, stale-source checks, safe YAML and file rules, atomic no-replace install, conditional rollback, reload verification, size limits, and exact checkpoint selection.",
+        "acceptance": [
+          {
+            "acceptance_id": "authority-separated",
+            "criterion": "Claimed comment or edit attribution never grants execution authority; raw Decision documents project only as intent and evidence, while a gate additionally requires an exact short-lived receipt minted after the trusted dispatcher reloads and matches the complete canonical Decision."
+          },
+          {
+            "acceptance_id": "digest-separation",
+            "criterion": "Adding a ReviewContribution or Decision changes the semantic-ledger digest and physical source token while leaving the Ticket graph digest, topology digest, Ticket revisions, and deterministic layout inputs unchanged."
+          },
+          {
+            "acceptance_id": "exact-atomic-writers",
+            "criterion": "ticket.review.append and ticket.decision.record reject stale source, subject drift, conflicting identity, invalid authority, oversized documents, unsafe paths, and publisher races with zero partial semantic writes; success leaves one reload-verified Git worktree change and an exact optional checkpoint selection."
+          },
+          {
+            "acceptance_id": "strict-review-documents",
+            "criterion": "Strict codecs and path rules accept only bounded ReviewContribution and Decision documents at deterministic safe paths and reject unknown fields, invalid unions, duplicate identities, traversal, symlinks, special files, malformed complete Ticket replacements, and aggregate ledger overflow."
+          }
+        ],
+        "constraints": [
+          "Do not broaden ticket.worktree.patch into a generic document or raw-path writer.",
+          "Comments and edit proposals must not change the referenced Ticket revision or become authored Ticket status.",
+          "Do not add SQLite Ticket semantic writes, latest pointers, timestamp winner selection, auto-commit, or a mandatory proposal lifecycle.",
+          "A conflicting Decision for the same exact subject must fail or form an ordinary Git conflict rather than silently overwrite the earlier answer.",
+          "A durable Decision claim and a process-local authority receipt are distinct facts; neither may be mislabeled as cross-process attestation."
+        ],
+        "context_refs": [
+          {
+            "ref": "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml",
+            "purpose": "Defines the strict review ledger and same-session Decision authority boundary."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+            "purpose": "Defines optional Git-native review and decision facts without a fixed lifecycle."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml",
+            "purpose": "Requires attributed comments, edit proposals, and decisions without UI-owned persistence."
+          },
+          {
+            "ref": "packages/core/src/ticket-ledger",
+            "purpose": "Owns the strict Git ledger, digests, exact writers, checkpoint boundary, and safe file rules."
+          },
+          {
+            "ref": "packages/core/src/ticket-decision-attestation.ts",
+            "purpose": "Owns the non-exported process-local attestation registry and exact binding checks."
+          }
+        ],
+        "relations": [],
+        "provenance_refs": [
+          "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml",
+          "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml",
+          "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+          "ticket-git-review-intervention-ready"
+        ]
+      }
+    },
+    {
+      "op": "put",
+      "ticketId": "ticket-review-facts-projected",
+      "expectedTicketRevision": "sha256:1913c1906836ca081f47c5752619e729068a1cc40401794376238a8a297b95c4",
+      "document": {
+        "schema_version": 1,
+        "kind": "ticket",
+        "ticket_id": "ticket-review-facts-projected",
+        "outcome": "Current and historical ReviewContribution and Decision facts are reconstructed from Git and projected at their exact graph, Ticket, or relation locus without changing graph topology or layout.",
+        "context": "Project durable review documents mechanically into subject-local trace and attention data. Comments and edit proposals show attribution, body or bounded field diff, source binding, record path, and current versus historical status. A raw current Decision always projects as an artifact with a typed repository-path reference and current_unverified authority state. It becomes gate_decision only when the same trusted dispatcher supplies an unexpired authority receipt bound to the exact complete Decision document, repository incarnation, worktree, branch or detached commit, subject, session, and digest. Restart, tampering, source mismatch, branch or worktree mismatch, and expiry retreat to unverified. Relation subjects bind stable semantic facts rather than a source token that includes their own trace. Page trace reads honestly and keep graphDigest and layout inputs independent of review facts.",
+        "acceptance": [
+          {
+            "acceptance_id": "authority-trace-boundary",
+            "criterion": "Claimed contributions and raw Decision YAML never project as gate authority; only an exact current same-session authority receipt may promote the matching Decision to gate_decision, and restart or mismatch fails closed to current_unverified."
+          },
+          {
+            "acceptance_id": "decision-detail-trace",
+            "criterion": "Decision projection preserves a typed durable record path and the structured plan disposition, delegated boundaries, protected boundary, selection, and resolution references needed to verify the complete document without deriving authority from display text."
+          },
+          {
+            "acceptance_id": "layout-invariance",
+            "criterion": "Adding, selecting, filtering, attesting, expiring, or staling review facts changes no Ticket coordinates, direct unlock relations, pan, zoom, fit, minimap geometry, or causal-cone layout."
+          },
+          {
+            "acceptance_id": "stable-relation-binding",
+            "criterion": "A persisted relation review remains verifiable without self-referencing the full inventory source token and becomes historical when its endpoints, dependent Ticket revision, or direct relation meaning changes."
+          },
+          {
+            "acceptance_id": "subject-local-trace",
+            "criterion": "Ticket, relation, and graph inspection reconstructs matching comment, edit proposal, plan review, and protected Decision facts from Git with exact record references, attribution, authority state, and current or historical status."
+          }
+        ],
+        "constraints": [
+          "Projection is derived read state and owns no mutable review lifecycle.",
+          "Do not infer Ticket readiness, completion, accepted Evidence, or downstream eligibility in M3.",
+          "Healthy graphs remain quiet; comments, decisions, stale bindings, conflicts, and unverified authority appear only at their subject locus.",
+          "Never promote a Decision from repository bytes alone."
+        ],
+        "context_refs": [
+          {
+            "ref": "packages/core/src/contract/ticket-review-schemas.ts",
+            "purpose": "Contains the browser-safe structured trace schemas and authority-receipt requirements."
+          },
+          {
+            "ref": "packages/core/src/ticket-ledger/projection.ts",
+            "purpose": "Projects the Git definition graph and attaches bounded review traces without changing topology."
+          },
+          {
+            "ref": "packages/core/src/ticket-review-projector.ts",
+            "purpose": "Defines current trace binding, raw Decision retreat, and projection rules."
+          },
+          {
+            "ref": "packages/core/src/ticket-decision-attestation.ts",
+            "purpose": "Defines the exact process-local receipt binding used only by trusted dispatcher sessions."
+          }
+        ],
+        "relations": [
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-review-ledger-kernel-ready",
+            "rationale": "Projection requires strict durable ReviewContribution and Decision facts, stable identities and digests, plus the explicit distinction between raw evidence and session authority."
+          }
+        ],
+        "provenance_refs": [
+          "META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml",
+          "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml",
+          "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+          "ticket-git-review-intervention-ready"
+        ]
+      }
+    },
+    {
+      "op": "put",
+      "ticketId": "ticket-review-host-interventions-ready",
+      "expectedTicketRevision": "sha256:2eae21f286bd20816ef4742aee161e2060fc362560c7be77751004039ef09634",
+      "document": {
+        "schema_version": 1,
+        "kind": "ticket",
+        "ticket_id": "ticket-review-host-interventions-ready",
+        "outcome": "The loopback Ticket graph host provides secure progressive Review operations and a trusted embedding boundary for exact same-session Decisions, while the installed default launcher remains honestly read-only.",
+        "context": "Extend the accepted loopback bearer host and progressive Inspector rather than creating a dashboard or raw YAML editor. Browser requests may submit only the subject, review or decision choice, body, proposed Ticket fields, and rationale. The host injects actor attribution and any exact Decision authority from its trusted launch context; browser-supplied identity or scope is ignored or rejected. Bounded same-origin JSON routes enforce Content-Type, body limits, abort handling, bearer and Host checks, exact Origin, stale-source errors, and no CORS. Comments and edit proposals remain available under trusted or claimed Agent attribution; Decisions fail closed without a matching human grant. A simple edit records a complete proposal and never calls ticket.worktree.patch directly. Inspector drafts survive stale responses and successful actions reload from Git. The injectable trusted-host path and adversarial tests establish the M3 mechanism, but the production vibehub ticket review launcher supplies no human identity or Decision authority and therefore remains read-only until ticket-durable-decision-attestation-ready implements the installed Plugin entrypoint.",
+        "acceptance": [
+          {
+            "acceptance_id": "browser-cannot-mint-authority",
+            "criterion": "Browser-supplied principal, actor kind, authority basis, trust, or scope is rejected or ignored; a Decision succeeds only when the embedding host supplied an exact matching human authority grant before the request."
+          },
+          {
+            "acceptance_id": "trusted-embedding-actions",
+            "criterion": "Focused integration tests prove that a trusted embedding can record an attributed comment, a complete simple edit proposal, an exact plan review or bounded delegation, and an exact protected-boundary Decision, with each success read back from a named Git document."
+          },
+          {
+            "acceptance_id": "default-launcher-retreat",
+            "criterion": "The installed default launcher exposes the complete graph and progressive Inspector without fabricating attribution or authority; unavailable write actions remain visibly read-only rather than borrowing browser bearer, OS username, Git author, or implicit local identity."
+          },
+          {
+            "acceptance_id": "quiet-progressive-ui",
+            "criterion": "Review controls live inside the existing progressive Inspector, preserve unsent drafts and independent trace errors, use restrained semantic color and existing typography, and introduce no page, modal, lane hierarchy, or graph reflow."
+          },
+          {
+            "acceptance_id": "secure-write-capability",
+            "criterion": "Unauthenticated, foreign-Host, cross-origin, wrong-content-type, oversized, malformed, aborted, stale, unsupported, or authority-inadequate write requests fail without a semantic file change."
+          }
+        ],
+        "constraints": [
+          "The bearer grants access to the local host but is not attribution or protected-decision authority.",
+          "Keep the honest v0 trust claim to a cooperative local same-OS-account session; do not claim remote or hostile same-UID authentication.",
+          "Use text-safe DOM rendering and bounded field diffs; do not render submitted HTML or arbitrary Markdown.",
+          "Do not auto-commit, push, apply a Ticket edit, or grant future unbounded delegation from the HTML.",
+          "Do not present an injectable constructor used by tests as the installed Plugin human-authority entrypoint."
+        ],
+        "context_refs": [
+          {
+            "ref": "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html",
+            "purpose": "Preserves the accepted interaction and visual reference, including review controls."
+          },
+          {
+            "ref": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+            "purpose": "Records the tested host mechanism and the intentionally missing production authority adapter."
+          },
+          {
+            "ref": "packages/cli/assets/ticket-review-host",
+            "purpose": "Contains the deterministic graph and progressive Inspector implementation."
+          },
+          {
+            "ref": "packages/cli/src/ticket-review-host.ts",
+            "purpose": "Owns the loopback host, bearer capability, read and write routes, trusted injection boundary, and default launcher."
+          }
+        ],
+        "relations": [
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-review-facts-projected",
+            "rationale": "The host must read back every recorded intervention and authority state through canonical Git projection rather than UI-owned state."
+          }
+        ],
+        "provenance_refs": [
+          "META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml",
+          "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+          "ticket-git-review-intervention-ready"
+        ]
+      }
+    },
+    {
+      "op": "put",
+      "ticketId": "ticket-review-intelligence-handoff-ready",
+      "expectedTicketRevision": "sha256:4a2b803232222d027ad51abdd08cf253700b424cce3338154e360a0dab63fe47",
+      "document": {
+        "schema_version": 1,
+        "kind": "ticket",
+        "ticket_id": "ticket-review-intelligence-handoff-ready",
+        "outcome": "Ticket Planning and Validation Skills reconcile current Git-native review facts against one fresh snapshot, apply edit proposals only through independent validation, and refuse to treat unverified Decision claims as authority.",
+        "context": "Review facts are causal inputs to Skill judgment, not a replacement workflow. Planning and Validation refresh one coherent graph, inspect every affected subject and trace, follow each typed repository-path target, and read the complete durable document. A ticket_edit remains a proposed full replacement: Planning re-understands it against fresh truth, authors a new exact candidate, preserves the review record in provenance when retained, and delegates the unchanged candidate to an independent validator before ticket.worktree.patch. Comments never mutate the graph. A Decision supplies authority only when the current trace is gate_decision from an authority_receipt and its complete document matches the exact graph or Ticket subject and recorded scope. Generic fresh CLI processes see raw Decisions as current_unverified and preserve the blocker or Planning Fog; durable cross-process handoff belongs to ticket-durable-decision-attestation-ready. Recording any review fact changes the semantic source, so candidates captured before that fact are stale.",
+        "acceptance": [
+          {
+            "acceptance_id": "decision-scope-preserved",
+            "criterion": "Skills use a Decision only when a current authority_receipt binds the exact graph or Ticket subject, complete durable document, principal, disposition, and recorded boundary; raw, stale, conflicting, insufficient-authority, declined, or request_changes Decisions grant nothing."
+          },
+          {
+            "acceptance_id": "fresh-process-retreat",
+            "criterion": "A newly started generic CLI or Skill process projects repository Decisions as current_unverified, never reconstructs process-local authority from YAML, SQLite, browser state, OS identity, or a prior host session, and preserves an honest blocker."
+          },
+          {
+            "acceptance_id": "fresh-edit-reconciliation",
+            "criterion": "Given a current edit proposal, Planning reloads the complete graph and trace, reads the exact Review document, reconciles the replacement against fresh truth, and produces a new exact candidate whose applied Ticket provenance references the review record."
+          },
+          {
+            "acceptance_id": "independent-validation-preserved",
+            "criterion": "An edit proposal cannot change a Ticket until a semantically independent validator passes the unchanged fresh candidate and ticket.worktree.patch accepts its exact current source."
+          },
+          {
+            "acceptance_id": "no-mandatory-review-workflow",
+            "criterion": "Agent-owned refinements within delegated boundaries may still plan, validate, and patch directly without manufacturing a ReviewContribution or Decision."
+          }
+        ],
+        "constraints": [
+          "Keep semantic judgment in Skills and exact source, schema, and write mechanics in public operations.",
+          "Do not create a generic proposal/apply Skill, auto-accept reviewer text, or mechanically replace stale source tokens.",
+          "A trace summary is not the complete authority scope; Skills must verify the named durable document.",
+          "M3 does not decide execution readiness, Outcome, Evidence, closeout, or Feature Room context compilation."
+        ],
+        "context_refs": [
+          {
+            "ref": "META/09-ticket-runtime/specs/contract-ticket-planning-validation-skills-001.yaml",
+            "purpose": "Defines the M2 intelligence and no-mandatory-proposal boundary that this handoff preserves."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml",
+            "purpose": "Defines current versus historical review facts and the same-session authority receipt boundary."
+          },
+          {
+            "ref": "skills/vibehub-ticket-plan/SKILL.md",
+            "purpose": "Owns graph shaping, review reconciliation, authority routing, fresh-source candidate creation, and independent validation delegation."
+          },
+          {
+            "ref": "skills/vibehub-ticket-validate/SKILL.md",
+            "purpose": "Owns independent review of the complete prospective graph and exact Decision document verification."
+          }
+        ],
+        "relations": [
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-review-facts-projected",
+            "rationale": "Skills need canonical projected reads, exact subject currentness, typed record references, and explicit verified versus unverified authority state before review facts can be used."
+          }
+        ],
+        "provenance_refs": [
+          "META/09-ticket-runtime/specs/contract-ticket-planning-validation-skills-001.yaml",
+          "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml",
+          "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+          "ticket-git-review-intervention-ready"
+        ]
+      }
+    },
+    {
+      "op": "put",
+      "ticketId": "ticket-runtime-loop-proven",
+      "expectedTicketRevision": "sha256:204f4ecedf2492b43185ccb1c703efc90a0c9877770dc43ac3a9019dacc1c36f",
+      "document": {
+        "schema_version": 1,
+        "kind": "ticket",
+        "ticket_id": "ticket-runtime-loop-proven",
+        "outcome": "One authorized real Plugin feature has completed through the Git-native Ticket loop from planning and review or delegation through execution, verification, Outcome, Evidence, follow-up closeout, and clean recovery without any retired Ticket semantic authority.",
+        "context": "This is the final M5 composition and verification boundary. After the authorized dogfood target is known, the planning Skill should refine that target into its own smallest truthful Ticket paths rather than this Ticket guessing implementation leaves. The proof must use only the Git-native ledger, Skills, deterministic operations, graph HTML, and disposable live coordination. It must demonstrate real composition, worktree isolation, durable completion after database loss, and the absence of surviving production compatibility paths. Dated META artifacts may remain as provenance; active code, contracts, adapters, tests, fixtures, exports, and documentation must describe only the new authority model.",
+        "acceptance": [
+          {
+            "acceptance_id": "clean-cut-proof",
+            "criterion": "Repository search, typechecking, package tests, packaged-file inspection, and graph-HTML verification find no retired Ticket table, trigger, generation, latest pointer, semantic SQLite service, trusted provider, cross-store fence, operation, adapter, export, fixture, compatibility shim, or active documentation path."
+          },
+          {
+            "acceptance_id": "composition-proof",
+            "criterion": "The dogfood graph exercises at least two genuinely independent work paths and a real join; no false serialization or fabricated parallelism is introduced."
+          },
+          {
+            "acceptance_id": "deviation-path",
+            "criterion": "Focused integration evidence proves that a protected deviation remains unresolved and visible, routes the required decision or follow-up work, and cannot falsely complete or unlock its affected path."
+          },
+          {
+            "acceptance_id": "real-loop",
+            "criterion": "The authorized feature is planned, machine-validated, reviewed or explicitly delegated, executed through truthful dependency paths, independently verified, and closed with Git-readable Outcome and accepted Evidence."
+          },
+          {
+            "acceptance_id": "recovery-proof",
+            "criterion": "Deleting the disposable database and rebuilding local indexes preserves the same semantic graph, accepted completion, Evidence, decisions, and downstream eligibility."
+          },
+          {
+            "acceptance_id": "worktree-proof",
+            "criterion": "Two worktrees at different sources remain semantically isolated, and a branch switch or relevant Ticket edit makes the bound execution stale or suspended rather than transferring it."
+          }
+        ],
+        "constraints": [
+          "The full proof uses no retired proposal, validation, authority, application, generation, or SQLite semantic backend.",
+          "Git remains the sole durable Ticket semantic authority; SQLite remains disposable live coordination, indexing, and cache.",
+          "No migration, dual-write, generic workflow engine, global scheduler, hidden auto-merge, force-push, or branch deletion is introduced.",
+          "Historical dated META artifacts may remain only as explicit provenance, not active architecture."
+        ],
+        "context_refs": [
+          {
+            "ref": "META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md",
+            "purpose": "Defines M5 execution, recovery, worktree, and legacy-audit proof."
+          },
+          {
+            "ref": "META/09-ticket-runtime/spec.md",
+            "purpose": "States the current accepted Ticket Runtime direction and completed M1 boundary."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml",
+            "purpose": "Defines the complete dogfood and clean-cut promise."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml",
+            "purpose": "Requires the graph HTML to continue satisfying the human review use case."
+          }
+        ],
+        "relations": [
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-dogfood-target-authorized",
+            "rationale": "The plan cannot choose or execute the product scope of the first real dogfood feature without owner authorization."
+          },
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-execution-closeout-ready",
+            "rationale": "A real end-to-end proof requires exact execution, verification, durable Outcome and Evidence, and honest success or deviation behavior."
+          }
+        ],
+        "provenance_refs": [
+          "META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md",
+          "META/09-ticket-runtime/progress.yaml",
+          "META/09-ticket-runtime/spec.md",
+          "META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml"
+        ]
+      }
+    },
+    {
+      "op": "put",
+      "ticketId": "ticket-durable-decision-attestation-ready",
+      "expectedTicketRevision": null,
+      "document": {
+        "schema_version": 1,
+        "kind": "ticket",
+        "ticket_id": "ticket-durable-decision-attestation-ready",
+        "outcome": "The installed Plugin can record one explicit human Decision whose exact authority any fresh authorized process can verify across restart without trusting repository-editable YAML, SQLite, browser state, OS username, Git author, or prior process memory.",
+        "context": "M3 deliberately stops at a fail-closed same-dispatcher attestation: raw Decision YAML preserves intent and evidence, while the trusted session registry can temporarily promote only the exact document it wrote and re-read. The production vibehub ticket review launcher supplies neither a trusted human principal nor durable authority, and each Skill invocation starts a fresh dispatcher that correctly sees current_unverified. Implement the smallest local Plugin-owned attestation mechanism that closes this boundary. It must provide a real installed human action, bind the full canonical Decision and its exact repository incarnation, worktree, branch or detached commit, graph or Ticket subject, protected boundary, selection or delegated scope, principal, and validity window, and let a fresh process verify that evidence independently. The technical mechanism may be chosen against objective security and portability criteria; this Ticket does not preselect a keychain, signature format, helper process, or IPC design.",
+        "acceptance": [
+          {
+            "acceptance_id": "fresh-process-verification",
+            "criterion": "After the trusted UI host and writer process exit, a newly started Plugin or Skill process independently verifies the exact attested Decision and projects it as authority only for its bound current subject and scope."
+          },
+          {
+            "acceptance_id": "installed-human-entrypoint",
+            "criterion": "The shipped Plugin exposes a real explicit human review or protected-decision action that supplies a named principal and produces the attestation; constructor injection available only to tests or embedders does not satisfy this criterion."
+          },
+          {
+            "acceptance_id": "exact-complete-binding",
+            "criterion": "Verification binds the complete canonical Decision digest, decision ID and path, principal, authority basis, repository incarnation, worktree identity, branch or detached commit, graph digest or Ticket revision, boundary, selection or delegated scope, and validity state."
+          },
+          {
+            "acceptance_id": "untrusted-writer-cannot-mint",
+            "criterion": "A process that can freely edit the repository, Ticket YAML, Decision YAML, SQLite database, Git author metadata, browser request, or local bearer cannot mint or widen accepted human authority without the Plugin trust root."
+          },
+          {
+            "acceptance_id": "failure-and-recovery-matrix",
+            "criterion": "Restart, tampering, replay into another repository, worktree, branch, commit, subject, boundary, principal or scope, expiry, and revocation fail closed; recovery requires a new explicit human action and leaves prior evidence inspectable."
+          },
+          {
+            "acceptance_id": "bounded-local-mechanism",
+            "criterion": "The implementation remains a narrow Decision-attestation boundary rather than a generic workflow engine, remote identity platform, SQLite semantic authority, or mandatory review lifecycle, and includes adversarial integration tests through the installed entrypoint and fresh process."
+          }
+        ],
+        "constraints": [
+          "The trust root and authority proof must not be writable solely through the governed repository or disposable database.",
+          "Git remains the durable collaboration and evidence substrate, but editable Git bytes alone cannot authenticate the human principal.",
+          "The loopback bearer grants local host access only and cannot become Decision authority.",
+          "Preserve branch and worktree semantic isolation and fail closed on detached or ambiguous source identity.",
+          "Do not weaken exact-subject currentness, independent Ticket validation, or the distinction between Decision intent and authority.",
+          "Prefer the smallest local, inspectable mechanism that satisfies the acceptance criteria; avoid premature remote identity or multi-user infrastructure."
+        ],
+        "context_refs": [
+          {
+            "ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+            "purpose": "Defines the required cross-process authority, trust-root, binding, and fail-closed contract."
+          },
+          {
+            "ref": "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml",
+            "purpose": "Defines the M3 same-session boundary this Ticket must extend without weakening."
+          },
+          {
+            "ref": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+            "purpose": "Records the implemented mechanism, adversarial evidence, and concrete production and cross-process gaps."
+          },
+          {
+            "ref": "packages/core/src/ticket-decision-attestation.ts",
+            "purpose": "Contains the current private process-local registry and exact binding model to preserve or supersede."
+          },
+          {
+            "ref": "packages/cli/src/ticket-review-host.ts",
+            "purpose": "Contains the installed launcher and trusted embedding seam that must become a real Plugin-owned human entrypoint."
+          },
+          {
+            "ref": "skills/vibehub-ticket-plan/SKILL.md",
+            "purpose": "Defines how a fresh planner consumes authority receipts and preserves unverified boundaries."
+          }
+        ],
+        "relations": [
+          {
+            "type": "depends_on",
+            "target_ticket_id": "ticket-git-review-intervention-ready",
+            "rationale": "Durable attestation must extend the strict Decision documents, projection, host security boundary, and fail-closed same-session model already established by M3."
+          }
+        ],
+        "provenance_refs": [
+          "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml",
+          "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+          "ticket-m3-5:authority-boundary"
+        ]
+      }
+    }
+  ]
+}

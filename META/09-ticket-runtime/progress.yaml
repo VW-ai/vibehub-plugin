@@ -1,25 +1,34 @@
 progress:
-  completion: 0.60
+  completion: 0.68
   status: active
   milestones:
     - id: "m0-git-skill-authority-cut"
       name: "Freeze the Git-native, Skill-driven authority cut"
-      status: complete
+      status: completed
+      completed_at: "2026-07-29T14:03:43-07:00"
       evidence: "Successor decisions, the breaking pivot plan, and the no-migration/no-dual-authority boundary are active."
     - id: "m1a-git-ticket-read-cut"
       name: "Git Ticket definition graph through Core, CLI, MCP, and read-only HTML"
-      status: complete
+      status: completed
+      completed_at: "2026-07-29T15:45:44-07:00"
       evidence: "The Git ledger kernel, three pure read operations, CLI/MCP/HTML cutover, legacy authority deletion, and P0 test matrix are implemented; see the dated implementation artifact."
     - id: "m1b-git-ticket-worktree-patch"
       name: "Exact-source Ticket worktree patch with separate optional checkpoint handoff"
-      status: complete
+      status: completed
+      completed_at: "2026-07-29T17:39:01-07:00"
       evidence: "The receiptless ticket.worktree.patch capability binds raw inventory plus semantic source and targeted revisions, validates the full prospective graph and encoded capacity, uses descriptor-bounded physical reads, performs per-file atomic installation with synchronous conditional rollback, reload-verifies the target digest, and returns a checkpointSelection without auto-committing; the public generated contract validates complete Ticket documents and the optional checkpoint verifies raw candidate inventory; see the dated M1B implementation artifact."
     - id: "m2-ticket-planning-validation-skills"
       name: "Skill-led planning, validation, and protected-boundary decisions"
-      status: complete
+      status: completed
+      completed_at: "2026-07-29T22:59:59-07:00"
       evidence: "The Planning and independent Validation Skills, package registry, focused tests, and real fail-revise-pass loop are implemented. After fresh semantic reconciliation removed the already-satisfied planning-validation Ticket, the resulting six-Ticket candidate passed mechanical and independent semantic validation with human_decision_required and no material findings, was applied through ticket.worktree.patch, reloaded at graph digest sha256:f7e89de4cd1fc1e51226223ad89b4f03dfc1bf389579b2ab8c2a5ac036dfda39, and was path-exact checkpointed in b427ca6e2b1d9c24ad88fd4a34dee438afdab62e."
     - id: "m3-git-native-review-intervention"
       name: "Git-native comments, edits, decisions, and graph review"
+      status: completed
+      completed_at: "2026-07-30T13:31:41-07:00"
+      evidence: "Strict Git Review and Decision documents, full semantic-ledger identity, exact-source no-replace writers, public Review/Decision operations, current/historical/unverified trace projection, capability-scoped secure host, quiet Inspector interventions, active-session authority attestation, and Skill intelligence handoff are implemented in b0d8b1f411950b0adc5f610956890c8221986f60. The independently validated eight-Ticket truth-boundary revision was applied through ticket.worktree.patch, reloaded at 11 Tickets and 11 direct relations with graph digest sha256:8d126f52313d97fd7ed529ae6e52847a3d426d3fcf6d22b9420979f385e94992, and path-exact checkpointed in 802111ca57d1916a96dd425fa2c40108600be333; see the dated M3 implementation artifact."
+    - id: "m3-5-durable-decision-attestation"
+      name: "Durable cross-process human Decision attestation"
       status: planned
     - id: "m4-ticket-execution-closeout"
       name: "Execute, verify, and close one Ticket through Outcome and Evidence"
@@ -28,7 +37,8 @@ progress:
       name: "Complete one real dogfood loop and prove the legacy cut remains clean"
       status: planned
   next:
-    - "Advance M3 from ticket-git-review-intervention-ready as the independent current frontier, preserving the graph as a pure Git projection while adding attributed Git-native interventions."
+    - "Plan and implement the newly exposed durable Decision-attestation prerequisite so a fresh host or Skill process can verify exact human authority without trusting editable YAML, SQLite, or a previous in-memory session."
+    - "Then advance M4 from ticket-execution-closeout-ready after the exact context-binding and closeout decisions are durably resolved; implement execution, Outcome, Evidence, and semantic closeout without adding a generic workflow engine."
     - "Route ticket-context-binding-decided, ticket-closeout-contract-decided, and ticket-dogfood-target-authorized to the repository owner or designated human authority; do not advance their gated M4 or M5 paths until the exact decisions are durably ratified."
   commits:
     - "d92c99c docs(ticket): plan git-native skill-driven pivot"
@@ -38,3 +48,5 @@ progress:
     - "0e234da feat(ticket): add planning and validation skills"
     - "b427ca6 chore(vibehub): ticket checkpoint"
     - "f73680c fix(ticket): resolve local checkpoint cli"
+    - "b0d8b1f feat(ticket): add git-native review interventions"
+    - "802111c chore(vibehub): ticket checkpoint"

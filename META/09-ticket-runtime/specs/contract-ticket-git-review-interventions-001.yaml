@@ -1,0 +1,140 @@
+spec_id: "contract-ticket-git-review-interventions-001"
+type: contract
+state: active
+intent:
+  summary: "Git-native comments、edit proposals 和 exact human Decisions 如何进入 Ticket semantic ledger？"
+  detail: |
+    M3 adds durable intervention facts without turning review into a mandatory
+    Ticket lifecycle.
+
+    The canonical ledger remains `.vibehub/tickets/`. Ticket definitions stay
+    under `tickets/`; append-only Reviews live under
+    `reviews/<subject-digest>/`; stable exact-subject Decisions live under
+    `decisions/`. `graphDigest` continues to identify only Ticket definitions
+    and direct topology. `semanticLedgerDigest` identifies the complete
+    normalized Ticket, Review, and Decision meaning. The opaque source token
+    additionally binds the complete raw inventory, so formatting, mode, or
+    comment changes stale an older writer even when normalized meaning is
+    unchanged.
+
+    Four durable intervention facts are supported:
+
+    - `comment` binds an exact graph digest, Ticket revision, or relation tuple
+      and adds non-authoritative context;
+    - `ticket_edit` binds an exact Ticket revision and carries one complete
+      replacement Ticket as a proposal, not a canonical Ticket mutation;
+    - `plan_review` binds one exact graph digest and records approve,
+      bounded-delegation, or request-changes disposition;
+    - `protected_boundary` binds one exact Ticket revision and one exact
+      boundary, then records resolve or decline.
+
+    Review identity, path, time, and attribution are host-owned fields. Public
+    JSON cannot claim them. Review writes from the browser require a
+    host-attested human. Decisions require a non-serializable host-bound human
+    grant covering the exact graph or Ticket-revision-and-boundary scope. The
+    default CLI review host binds neither and is therefore truly read-only. A
+    trusted embedding may inject exact capabilities, and the host projects only
+    the intervention controls they cover. The real installed-plugin adapter is
+    a separate durable-attestation boundary.
+
+    A durable Decision document records exact human intent and evidence; it
+    does not authenticate itself. Raw Git content therefore projects as a
+    current-but-unverified artifact. Only a Decision written or explicitly
+    re-attested by the current trusted host session receives an in-memory
+    authority receipt. That receipt binds the repository incarnation,
+    worktree, branch, exact path and ID, and complete canonical Decision
+    digest, and it expires with the host session. Restart, sibling worktree,
+    branch change, expiry, or document tampering fails closed. An exact-intent
+    no-op may re-attest only through a new explicit human operation. The
+    registry is disposable and never enters SQLite. Durable cross-session
+    authority requires a future signed attestation rather than trusting
+    self-authored YAML.
+
+    Currentness is mechanical and locus-specific. Graph facts compare the exact
+    graph digest; Ticket facts compare Ticket ID and revision; relation facts
+    compare relation reference, endpoints, and dependent Ticket revision.
+    Historical and current-unverified facts remain inspectable but cannot
+    authorize work. Only a current Decision verified by the active trusted
+    session and projected as `gate_decision` with an `authority_receipt` is
+    authoritative. Comments never mutate the graph.
+    A current `ticket_edit` becomes input to a newly authored candidate, which
+    must still pass independent semantic validation before
+    `ticket.worktree.patch`.
+
+    Review and Decision writers share the worktree writer lock, exact source
+    CAS, bounded prospective-ledger validation, atomic no-replace publication,
+    post-write verification, and explicit recovery evidence. Checkpointing may
+    select Ticket, Review, and Decision paths and records both graph and
+    semantic-ledger digests, while preserving unrelated staged or dirty work.
+
+    The graph host keeps the complete deterministic direct-unlock layout,
+    pan/zoom/fit, minimap, and progressive Inspector. Trace failure is visible
+    but does not hide executable context. Current and historical facts remain
+    distinct. Review forms appear only for trusted capabilities, preserve
+    drafts across stale refresh, and name the durable Git document after a
+    successful write.
+
+    Planning and Validation Skills refresh the complete graph plus
+    same-snapshot traces before judgment. They treat comments as context,
+    reconcile current edit proposals into fresh candidates with Review
+    provenance, honor only current exact authority receipts, retain historical
+    facts as non-authoritative evidence, and never invent a mandatory review
+    gate.
+constraints:
+  - kind: must
+    rule: "Durable Review and Decision meaning follows Git and is reconstructible without SQLite"
+  - kind: must
+    rule: "Every intervention binds one exact current graph, Ticket revision, or relation locus and fails visibly when stale"
+  - kind: must
+    rule: "Browser identity and Decision authority come only from a trusted host; public payloads cannot claim either"
+  - kind: must
+    rule: "A raw durable Decision is evidence, not self-authenticating authority; only an exact unexpired trusted-session attestation may project it as a gate"
+  - kind: must
+    rule: "The default CLI host remains read-only, and a trusted host displays only interventions covered by its bound capabilities"
+  - kind: must
+    rule: "Comments are non-mutating context; edit proposals require fresh candidate authorship and independent validation before Ticket patching"
+  - kind: must
+    rule: "Historical Reviews and Decisions remain traceable but cannot authorize current execution"
+  - kind: must_not
+    rule: "Do not make Review, Decision, or human promotion a mandatory activation workflow for every Ticket"
+  - kind: must_not
+    rule: "Do not let HTML, SQLite, caller-supplied identity, or self-authored authority fields become trusted Ticket authority"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [git, review, comments, edit-proposal, decision, authority, trace, html, skills]
+provenance:
+  source_type: implementation
+  confidence: 0.99
+  source_ref: "M3 Git-native Ticket review intervention implementation and adversarial review — 2026-07-30"
+  produced_by_agent: "implementation"
+  produced_at: "2026-07-30T20:30:42Z"
+relations:
+  - target: "contract-ticket-git-worktree-patch-001"
+    type: depends_on
+    detail: "Reuses the exact-source Git writer and separate checkpoint boundary."
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+    detail: "Reviews and Decisions are durable Git semantic facts while SQLite remains disposable."
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: depends_on
+    detail: "Skills interpret review facts; Core owns only strict deterministic mechanics."
+  - target: "decision-ticket-review-surface-001"
+    type: depends_on
+    detail: "Implements the accepted complete graph plus progressive intervention Inspector."
+  - target: "contract-ticket-planning-validation-skills-001"
+    type: relates_to
+    detail: "Extends planning and validation intelligence to current and historical Review facts."
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json"
+  - file: "packages/core/src/ticket-ledger/contract.ts"
+  - file: "packages/core/src/ticket-ledger/writer.ts"
+  - file: "packages/core/src/ticket-ledger/projection.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/cli/src/ticket-review-host.ts"
+  - file: "packages/cli/assets/ticket-review-host/app.js"
+  - file: "skills/vibehub-ticket-plan/SKILL.md"
+  - file: "skills/vibehub-ticket-validate/SKILL.md"

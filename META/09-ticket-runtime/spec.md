@@ -72,6 +72,16 @@ from human execution authority.
   two composable Skills own plan shaping and independent semantic validation.
   Passing graph definitions enter the current graph directly; review and
   protected decisions gate execution rather than activation.
+- [`contract-ticket-git-review-interventions-001`](specs/contract-ticket-git-review-interventions-001.yaml):
+  comments, complete Ticket edit proposals, plan reviews, and protected
+  Decisions are exact-subject Git facts. Browser attribution is host-bound;
+  durable Decision YAML is evidence rather than self-authenticating authority;
+  only an exact active-host attestation may project a gate. Skills decide how
+  non-authoritative review context changes a candidate.
+- [`contract-ticket-durable-decision-attestation-001`](specs/contract-ticket-durable-decision-attestation-001.yaml):
+  a new M3.5 boundary must let a fresh host or Agent verify one exact human
+  Decision without trusting editable YAML, SQLite, or a previous process, and
+  must supply the real installed-plugin identity and review entrypoint.
 
 ### Human surface
 
@@ -100,6 +110,9 @@ from human execution authority.
 
 ## Open focused decisions
 
+- [`contract-ticket-durable-decision-attestation-001`](specs/contract-ticket-durable-decision-attestation-001.yaml):
+  the required trust and recovery properties are fixed; focused research must
+  choose the smallest local signing/identity ceremony and production adapter.
 - [`decision-ticket-context-binding-001`](specs/decision-ticket-context-binding-001.yaml):
   exact Feature Room and repository context compilation.
 - [`decision-ticket-workflow-role-001`](specs/decision-ticket-workflow-role-001.yaml):
@@ -191,6 +204,46 @@ was applied through `ticket.worktree.patch`, reloaded at graph digest
 and path-exact checkpointed as
 `b427ca6e2b1d9c24ad88fd4a34dee438afdab62e`. M2 is complete.
 
+M3—the Git-native review intervention loop—is implemented:
+
+- strict Review and Decision documents live beside Ticket definitions in the
+  Git semantic ledger without changing Ticket-only `graphDigest`;
+- `semanticLedgerDigest` and raw-inventory `sourceToken` bind the full ledger,
+  and Review/Decision writers reuse the exact-source worktree lock,
+  no-replace publication, verification, recovery, and path-exact checkpoint;
+- public `ticket.review.append` and `ticket.decision.record` operations accept
+  exact content and subjects but no caller identity, time, path, or authority;
+- comments and Ticket edits require a host-attested human in the browser;
+  Decisions additionally require exact host-bound human authority;
+- raw or freshly reconstructed Decision YAML remains current-unverified
+  evidence; only the exact Decision written or explicitly re-attested by the
+  active trusted host session projects as execution authority, and that
+  in-memory receipt never enters SQLite;
+- the default CLI graph host is truly read-only, while the host API can expose
+  only the intervention actions covered by an injected trusted grant; the real
+  installed-plugin adapter remains M3.5;
+- current and historical facts project to their graph, Ticket, or relation
+  loci without changing graph topology or layout;
+- the complete direct-unlock canvas remains primary, with quiet progressive
+  Review controls inside the Inspector, visible trace failures, stale-draft
+  preservation, and named durable write targets;
+- Planning and Validation Skills refresh same-snapshot review facts, treat
+  comments as context, reconcile current edit proposals into fresh candidates,
+  read complete durable Review and Decision documents, and honor only current
+  exact trusted-session authority receipts.
+
+Review remains optional intelligence rather than a mandatory activation stage.
+Adversarial review established that editable Decision YAML cannot authenticate
+its own human authority. M3 therefore fails closed with active-session
+attestation, and a new M3.5 Ticket owns durable cross-process attestation before
+protected context-binding and closeout Decisions can truthfully unblock M4.
+The independently validated truth-boundary candidate was applied as 11 Tickets
+and 11 direct relations at graph digest
+`sha256:8d126f52313d97fd7ed529ae6e52847a3d426d3fcf6d22b9420979f385e94992`
+and path-exact checkpointed in
+`802111ca57d1916a96dd425fa2c40108600be333`.
+Execution, Outcome, Evidence, and closeout remain M4.
+
 The first real write also exposed a host-integration boundary: the Agent
 sandbox may reject an arbitrary Node adapter's otherwise authorized `.git`
 lock and checkpoint writes even though the same exact public operation succeeds
@@ -208,3 +261,5 @@ Implementation evidence is recorded in:
 - [`Ticket M1B exact-source worktree patch`](artifacts/2026-07-29-ticket-m1b-git-worktree-patch-implementation.md)
 - [`Ticket M2 planning and independent validation Skills`](artifacts/2026-07-29-ticket-m2-planning-validation-skills.md)
 - [`First Git Ticket Graph validated candidate`](artifacts/2026-07-29-first-git-ticket-graph-validated-candidate.json)
+- [`Ticket M3 Git-native review intervention`](artifacts/2026-07-30-ticket-m3-git-review-intervention.md)
+- [`Ticket M3/M3.5 authority-boundary validated candidate`](artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json)

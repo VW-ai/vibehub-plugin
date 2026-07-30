@@ -1,0 +1,84 @@
+spec_id: "contract-ticket-durable-decision-attestation-001"
+type: contract
+state: active
+intent:
+  summary: "Fresh host 与 fresh Agent 如何验证一个 exact human Decision，而不信任可编辑 YAML？"
+  detail: |
+    A Decision document is durable intent and evidence, not a
+    self-authenticating authority receipt. M3 may attest one exact Decision
+    inside the trusted host process that received the human action, but that
+    capability correctly disappears on restart, branch or worktree change,
+    expiry, or document tamper. Independent CLI Skill invocations therefore
+    see raw Decisions as current-unverified evidence and must preserve the
+    protected boundary.
+
+    Before execution and closeout can use protected Decisions across fresh
+    processes, VibeHub needs one small durable attestation boundary. A trusted
+    human ceremony in a real installed-plugin entrypoint must attest the exact
+    canonical Decision document, authority principal, repository incarnation,
+    governed ref or branch, subject, and scope. A fresh host or Agent must be
+    able to verify that attestation without SQLite, a previous process, or
+    caller-supplied authority fields. Arbitrary repository write access must
+    not be sufficient to mint it.
+
+    The implementation may use a signed Git-adjacent receipt, host identity,
+    OS-backed key, or another narrow mechanism after focused research. It must
+    define trust-root enrollment, explicit human presence, expiry or
+    revocation, replay behavior, worktree and branch isolation, and recovery.
+    It must also provide the real production adapter that binds the review host
+    to that trusted identity; constructor options and tests alone are not a
+    user-facing integration.
+
+    Keep the mechanism scoped to Decision authority. Comments and edit
+    proposals remain ordinary attributed Git facts, and Ticket planning,
+    validation, graph layout, execution scheduling, Outcome, and Evidence do
+    not belong in an authentication subsystem.
+constraints:
+  - kind: must
+    rule: "A fresh process verifies the exact canonical Decision, principal, repository, ref or branch, subject, and granted scope without trusting editable Decision fields"
+  - kind: must
+    rule: "The trust root and signing authority are not stored as writable Git or SQLite semantics available to the Agent"
+  - kind: must
+    rule: "The installed plugin has a real explicit human entrypoint for attribution, review, Decision, re-attestation, expiry, and revocation"
+  - kind: must
+    rule: "Restart, sibling worktree, branch mismatch, replay, expiry, revocation, and any Decision-content tamper fail closed and remain inspectable"
+  - kind: must
+    rule: "Verified authority composes with same-snapshot Ticket reads and remains separate from semantic validity, readiness, and completion"
+  - kind: must_not
+    rule: "Do not treat a raw YAML authority claim, browser bearer, OS username, Git author string, previous in-memory registry, or SQLite row as sufficient human authority"
+  - kind: must_not
+    rule: "Do not expand the solution into remote authentication, a generic workflow engine, or mandatory review for Agent-owned technical choices"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket, decision, authority, attestation, trust, git, plugin, worktree]
+provenance:
+  source_type: implementation_review
+  confidence: 0.99
+  source_ref: "M3 adversarial authority review — 2026-07-30"
+  produced_by_agent: "implementation-review"
+  produced_at: "2026-07-30T20:30:42Z"
+relations:
+  - target: "contract-ticket-git-review-interventions-001"
+    type: depends_on
+    detail: "Extends session-only Decision attestation into a fresh-process authority handoff."
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+    detail: "Keeps intent and evidence Git-native while separating the external trust root."
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: depends_on
+    detail: "Supplies authority evidence to Skills without moving semantic judgment into Core."
+  - target: "decision-ticket-context-binding-001"
+    type: relates_to
+    detail: "Protected context-binding cannot unblock fresh execution until its human ratification is verifiable."
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json"
+  - file: ".vibehub/tickets/tickets/ticket-durable-decision-attestation-ready.yaml"
+  - file: "packages/core/src/ticket-decision-attestation.ts"
+  - file: "packages/core/src/ticket-ledger/projection.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/cli/src/ticket-review-host.ts"
+  - file: "skills/vibehub-ticket-plan/SKILL.md"
