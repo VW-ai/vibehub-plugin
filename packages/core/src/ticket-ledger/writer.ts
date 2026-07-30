@@ -6,6 +6,7 @@ import { GitFacade } from "../git-facade.js";
 import {
   TICKET_LEDGER_MAX_BYTES,
   TICKET_LEDGER_MAX_PATCH_CHANGES,
+  TICKET_LEDGER_ATTESTATION_MAX_BYTES,
   TICKET_LEDGER_DECISION_MAX_BYTES,
   TICKET_LEDGER_PROTOCOL_MAX_BYTES,
   TICKET_LEDGER_RELATIVE_PATH,
@@ -14,10 +15,13 @@ import {
   TICKET_LEDGER_TICKET_MAX_BYTES,
   TicketLedgerError,
   ticketDecisionDocumentSchema,
+  ticketDecisionAttestationDocumentPayloadSchema,
   ticketDocumentSchema,
   ticketReviewSubjectSchema,
   type TicketDecisionDocument,
   type TicketDecisionDocumentPayload,
+  type TicketDecisionAttestationDocument,
+  type TicketDecisionAttestationDocumentPayload,
   type TicketDocument,
   type TicketLedgerPatchChange,
   type TicketLedgerPatchRequest,
@@ -32,12 +36,16 @@ import {
 import {
   canonicalTicketLedgerValue,
   createTicketDecisionDocument,
+  createTicketDecisionAttestationDocument,
   createTicketReviewDocument,
   encodeTicketDecisionDocument,
+  encodeTicketDecisionAttestationDocument,
   encodeTicketDocument,
   encodeTicketReviewDocument,
   normalizeTicketDocument,
   ticketDecisionDocumentPath,
+  ticketDecisionAttestationDocumentPath,
+  ticketDecisionDocumentDigest,
   ticketDocumentPath,
   ticketLedgerDocumentMaxBytes,
   ticketRelationId,
@@ -175,7 +183,9 @@ const readPhysicalFile = (
         ? TICKET_LEDGER_REVIEW_MAX_BYTES
         : documentPath.includes("/decisions/")
           ? TICKET_LEDGER_DECISION_MAX_BYTES
-          : TICKET_LEDGER_TICKET_MAX_BYTES;
+          : documentPath.includes("/attestations/")
+            ? TICKET_LEDGER_ATTESTATION_MAX_BYTES
+            : TICKET_LEDGER_TICKET_MAX_BYTES;
     if (opened.size > maxBytes) {
       throw new TicketLedgerError(
         "file_too_large",
@@ -380,6 +390,7 @@ const prepareChanges = (
     })),
     reviews: snapshot.reviews,
     decisions: snapshot.decisions,
+    attestations: snapshot.attestations,
   });
   return {
     changes: prepared.sort((left, right) =>
@@ -470,6 +481,23 @@ const assertProspectiveByteCapacity = (
         {
           decisionId: decision.document.decision_id,
           documentPath: decision.documentPath,
+        },
+      );
+    }
+    totalBytes += physical.bytes.byteLength;
+  }
+  for (const attestation of snapshot.attestations) {
+    const physical = readPhysicalFile(
+      path.join(worktreeRoot, ...attestation.documentPath.split("/")),
+      attestation.documentPath,
+    );
+    if (physical === null) {
+      throw new TicketLedgerError(
+        "source_changed_during_read",
+        `Attestation ${attestation.document.attestation_id} disappeared during patch capacity validation`,
+        {
+          attestationId: attestation.document.attestation_id,
+          documentPath: attestation.documentPath,
         },
       );
     }
@@ -940,6 +968,11 @@ const decisionRecordRequestSchema = z.object({
   ]),
 }).strict();
 
+const decisionAttestationAppendRequestSchema = z.object({
+  expectedSource: semanticMutationSourceSchema,
+  attestation: ticketDecisionAttestationDocumentPayloadSchema,
+}).strict();
+
 export type TicketReviewAuthorContext = TicketReviewDocument["author"];
 export type TicketDecisionAuthorityContext =
   TicketDecisionDocument["authority"];
@@ -949,6 +982,9 @@ export type TicketReviewAppendRequest = z.input<
 >;
 export type TicketDecisionRecordRequest = z.input<
   typeof decisionRecordRequestSchema
+>;
+export type TicketDecisionAttestationAppendRequest = z.input<
+  typeof decisionAttestationAppendRequestSchema
 >;
 
 export interface TicketReviewAppendResult {
@@ -981,9 +1017,25 @@ export interface TicketDecisionRecordResult {
   };
 }
 
+export interface TicketDecisionAttestationAppendResult {
+  status: "applied" | "noop";
+  before: TicketLedgerPatchSource;
+  after: TicketLedgerPatchSource;
+  changedPaths: readonly string[];
+  attestation: {
+    documentPath: string;
+    document: TicketDecisionAttestationDocument;
+  };
+  checkpointSelection: {
+    source: TicketLedgerPatchSource;
+    changedPaths: readonly string[];
+  };
+}
+
 type SemanticAppendDocument =
   | TicketReviewDocument
-  | TicketDecisionDocument;
+  | TicketDecisionDocument
+  | TicketDecisionAttestationDocument;
 
 interface PreparedSemanticAppend {
   documentPath: string;
@@ -1024,6 +1076,26 @@ const parseDecisionRecordRequest = (
     throw new TicketLedgerError(
       "invalid_document",
       "Ticket decision record request is invalid",
+      {
+        issues: parsed.error.issues.slice(0, 16).map((issue) => ({
+          path: issue.path.map(String),
+          code: issue.code,
+          message: issue.message,
+        })),
+      },
+    );
+  }
+  return parsed.data;
+};
+
+const parseDecisionAttestationAppendRequest = (
+  value: TicketDecisionAttestationAppendRequest,
+): z.output<typeof decisionAttestationAppendRequestSchema> => {
+  const parsed = decisionAttestationAppendRequestSchema.safeParse(value);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      "Ticket decision attestation append request is invalid",
       {
         issues: parsed.error.issues.slice(0, 16).map((issue) => ({
           path: issue.path.map(String),
@@ -1102,6 +1174,8 @@ const semanticAppendAtPath = (
     review.documentPath === documentPath)?.document
   ?? snapshot.decisions.find((decision) =>
     decision.documentPath === documentPath)?.document
+  ?? snapshot.attestations.find((attestation) =>
+    attestation.documentPath === documentPath)?.document
   ?? null;
 
 const sameCanonicalDocument = (
@@ -1149,6 +1223,15 @@ const validateProspectiveSemanticAppend = (
           },
         ]
       : snapshot.decisions,
+    attestations: "attestation_id" in prepared.document
+      ? [
+          ...snapshot.attestations,
+          {
+            documentPath: prepared.documentPath,
+            document: prepared.document,
+          },
+        ]
+      : snapshot.attestations,
   });
   if (content.graphDigest !== snapshot.graphDigest) {
     throw new TicketLedgerError(
@@ -1173,6 +1256,8 @@ const assertProspectiveSemanticAppendByteCapacity = (
     ...snapshot.tickets.map((ticket) => ticket.documentPath),
     ...snapshot.reviews.map((review) => review.documentPath),
     ...snapshot.decisions.map((decision) => decision.documentPath),
+    ...snapshot.attestations.map((attestation) =>
+      attestation.documentPath),
   ];
   let totalBytes = replacementBytes.byteLength;
   for (const documentPath of documentPaths) {
@@ -1205,6 +1290,8 @@ const semanticSnapshotDocumentPaths = (
   ...snapshot.tickets.map((ticket) => ticket.documentPath),
   ...snapshot.reviews.map((review) => review.documentPath),
   ...snapshot.decisions.map((decision) => decision.documentPath),
+  ...snapshot.attestations.map((attestation) =>
+    attestation.documentPath),
 ];
 
 const captureSemanticPhysicalInventory = (
@@ -1329,7 +1416,7 @@ const removeEmptyDirectories = (directories: readonly string[]): void => {
 const semanticAppend = (options: {
   worktreeRoot: string;
   expectedSource: TicketLedgerPatchSource;
-  subject: TicketReviewSubject;
+  assertCurrent: (snapshot: TicketLedgerSnapshot) => void;
   prepare: (snapshot: TicketLedgerSnapshot) => PreparedSemanticAppend;
   equivalent: (
     existing: SemanticAppendDocument,
@@ -1362,7 +1449,7 @@ const semanticAppend = (options: {
   try {
     const beforeSnapshot = loadTicketLedgerFromWorktree(worktreeRoot);
     assertExpectedSource(beforeSnapshot, options.expectedSource);
-    assertCurrentReviewSubject(beforeSnapshot, options.subject);
+    options.assertCurrent(beforeSnapshot);
     const before = patchSource(beforeSnapshot);
     const prepared = options.prepare(beforeSnapshot);
     const existing = semanticAppendAtPath(
@@ -1423,7 +1510,7 @@ const semanticAppend = (options: {
 
     const rechecked = loadTicketLedgerFromWorktree(worktreeRoot);
     assertExpectedSource(rechecked, options.expectedSource);
-    assertCurrentReviewSubject(rechecked, options.subject);
+    options.assertCurrent(rechecked);
     const recheckedPrepared = options.prepare(rechecked);
     if (
       recheckedPrepared.documentPath !== prepared.documentPath
@@ -1595,7 +1682,9 @@ export function appendTicketReview(options: {
   const result = semanticAppend({
     worktreeRoot: options.worktreeRoot,
     expectedSource: request.expectedSource,
-    subject,
+    assertCurrent(snapshot) {
+      assertCurrentReviewSubject(snapshot, subject);
+    },
     prepare(snapshot) {
       const common = {
         schema_version: TICKET_LEDGER_SCHEMA_VERSION,
@@ -1665,6 +1754,78 @@ export function appendTicketReview(options: {
   };
 }
 
+export interface PreparedTicketDecision {
+  documentPath: string;
+  document: TicketDecisionDocument;
+  digest: string;
+}
+
+export function prepareTicketDecisionForSnapshot(options: {
+  snapshot: TicketLedgerSnapshot;
+  request: TicketDecisionRecordRequest;
+  authority: TicketDecisionAuthorityContext;
+  decidedAt: string;
+}): PreparedTicketDecision {
+  const request = parseDecisionRecordRequest(options.request);
+  assertExpectedSource(options.snapshot, request.expectedSource);
+  assertCurrentReviewSubject(options.snapshot, request.decision.subject);
+  const common = {
+    schema_version: TICKET_LEDGER_SCHEMA_VERSION,
+    kind: "ticket_decision" as const,
+    rationale: request.decision.rationale,
+    resolution_refs: request.decision.resolution_refs,
+    authority: options.authority,
+    decided_at: options.decidedAt,
+  };
+  const payload: TicketDecisionDocumentPayload =
+    request.decision.decision_type === "plan_review"
+      ? {
+          ...common,
+          decision_type: "plan_review",
+          subject: request.decision.subject,
+          disposition: request.decision.disposition,
+          ...(request.decision.delegated_boundaries === undefined
+            ? {}
+            : {
+                delegated_boundaries:
+                  request.decision.delegated_boundaries,
+              }),
+        }
+      : {
+          ...common,
+          decision_type: "protected_boundary",
+          subject: request.decision.subject,
+          boundary: request.decision.boundary,
+          disposition: request.decision.disposition,
+          ...(request.decision.selection === undefined
+            ? {}
+            : { selection: request.decision.selection }),
+        };
+  const candidate = createTicketDecisionDocument(payload);
+  const documentPath = ticketDecisionDocumentPath(candidate);
+  const existing = options.snapshot.decisions.find((decision) =>
+    decision.documentPath === documentPath)?.document;
+  if (existing !== undefined) {
+    if (!sameDecisionIntent(existing, candidate)) {
+      throw new TicketLedgerError(
+        "document_conflict",
+        `A different Ticket Decision already occupies ${documentPath}`,
+        { documentPath, decisionId: candidate.decision_id },
+      );
+    }
+    return {
+      documentPath,
+      document: existing,
+      digest: ticketDecisionDocumentDigest(existing),
+    };
+  }
+  return {
+    documentPath,
+    document: candidate,
+    digest: ticketDecisionDocumentDigest(candidate),
+  };
+}
+
 export function recordTicketDecision(options: {
   worktreeRoot: string;
   request: TicketDecisionRecordRequest;
@@ -1676,45 +1837,20 @@ export function recordTicketDecision(options: {
   const result = semanticAppend({
     worktreeRoot: options.worktreeRoot,
     expectedSource: request.expectedSource,
-    subject,
-    prepare() {
-      const common = {
-        schema_version: TICKET_LEDGER_SCHEMA_VERSION,
-        kind: "ticket_decision" as const,
-        rationale: request.decision.rationale,
-        resolution_refs: request.decision.resolution_refs,
+    assertCurrent(snapshot) {
+      assertCurrentReviewSubject(snapshot, subject);
+    },
+    prepare(snapshot) {
+      const prepared = prepareTicketDecisionForSnapshot({
+        snapshot,
+        request,
         authority: options.authority,
-        decided_at: options.decidedAt,
-      };
-      const payload: TicketDecisionDocumentPayload =
-        request.decision.decision_type === "plan_review"
-          ? {
-              ...common,
-              decision_type: "plan_review",
-              subject: request.decision.subject,
-              disposition: request.decision.disposition,
-              ...(request.decision.delegated_boundaries === undefined
-                ? {}
-                : {
-                    delegated_boundaries:
-                      request.decision.delegated_boundaries,
-                  }),
-            }
-          : {
-              ...common,
-              decision_type: "protected_boundary",
-              subject: request.decision.subject,
-              boundary: request.decision.boundary,
-              disposition: request.decision.disposition,
-              ...(request.decision.selection === undefined
-                ? {}
-                : { selection: request.decision.selection }),
-            };
-      const document = createTicketDecisionDocument(payload);
+        decidedAt: options.decidedAt,
+      });
       return {
-        documentPath: ticketDecisionDocumentPath(document),
-        document,
-        bytes: encodeTicketDecisionDocument(document),
+        documentPath: prepared.documentPath,
+        document: prepared.document,
+        bytes: encodeTicketDecisionDocument(prepared.document),
       };
     },
     equivalent(existing, candidate) {
@@ -1736,6 +1872,195 @@ export function recordTicketDecision(options: {
     after: result.after,
     changedPaths: result.changedPaths,
     decision: {
+      documentPath: result.prepared.documentPath,
+      document,
+    },
+    checkpointSelection: {
+      source: result.after,
+      changedPaths: result.changedPaths,
+    },
+  };
+}
+
+const assertAttestationDecisionBinding = (
+  snapshot: TicketLedgerSnapshot,
+  attestation: TicketDecisionAttestationDocument,
+): void => {
+  if (snapshot.source.mode !== "worktree") {
+    throw new TicketLedgerError(
+      "invalid_path",
+      "Ticket decision attestation requires a worktree source",
+    );
+  }
+  const decision = snapshot.decisions.find((candidate) =>
+    candidate.document.decision_id === attestation.decision.decision_id
+    && candidate.documentPath === attestation.decision.document_path);
+  if (decision === undefined) {
+    throw new TicketLedgerError(
+      "stale_subject",
+      "Ticket decision attestation does not reference a current Decision document",
+      {
+        decisionId: attestation.decision.decision_id,
+        documentPath: attestation.decision.document_path,
+      },
+    );
+  }
+  const decisionDigest = ticketDecisionDocumentDigest(decision.document);
+  if (attestation.decision.document_digest !== decisionDigest) {
+    throw new TicketLedgerError(
+      "stale_subject",
+      "Ticket decision attestation digest does not match the complete canonical Decision",
+      {
+        decisionId: decision.document.decision_id,
+        expectedDecisionDigest: decisionDigest,
+        actualDecisionDigest: attestation.decision.document_digest,
+      },
+    );
+  }
+  assertCurrentReviewSubject(snapshot, decision.document.subject);
+
+  const expectedAuthority = {
+    principal_id: decision.document.authority.principal_id,
+    principal_kind: decision.document.authority.principal_kind,
+    basis: decision.document.authority.basis,
+    basis_ref: decision.document.authority.basis_ref,
+  };
+  if (
+    canonicalTicketLedgerValue(attestation.authority)
+    !== canonicalTicketLedgerValue(expectedAuthority)
+  ) {
+    throw new TicketLedgerError(
+      "stale_subject",
+      "Ticket decision attestation authority does not match the Decision",
+      { decisionId: decision.document.decision_id },
+    );
+  }
+
+  const expectedCheckout = snapshot.source.branch === null
+    ? {
+        mode: "detached" as const,
+        commit: snapshot.source.resolvedCommit,
+      }
+    : {
+        mode: "branch" as const,
+        branch: snapshot.source.branch,
+      };
+  const expectedRepository = {
+    repository_incarnation: snapshot.source.repositoryIncarnation,
+    repository_root: snapshot.source.repositoryRoot,
+    worktree_identity: snapshot.source.worktreeIdentity,
+    worktree_root: snapshot.source.worktreeRoot,
+    checkout: expectedCheckout,
+  };
+  if (
+    canonicalTicketLedgerValue(attestation.repository)
+    !== canonicalTicketLedgerValue(expectedRepository)
+  ) {
+    throw new TicketLedgerError(
+      "stale_source",
+      "Ticket decision attestation repository or checkout binding is not current",
+      {
+        decisionId: decision.document.decision_id,
+        expectedRepository,
+        actualRepository: attestation.repository,
+      },
+    );
+  }
+
+  const expectedScope = decision.document.decision_type === "plan_review"
+    ? {
+        scope_type: "plan_review" as const,
+        graph_digest: decision.document.subject.graph_digest,
+        disposition: decision.document.disposition,
+        ...(decision.document.delegated_boundaries === undefined
+          ? {}
+          : {
+              delegated_boundaries:
+                decision.document.delegated_boundaries,
+            }),
+      }
+    : {
+        scope_type: "protected_boundary" as const,
+        ticket_id: decision.document.subject.ticket_id,
+        ticket_revision: decision.document.subject.ticket_revision,
+        boundary: decision.document.boundary,
+        disposition: decision.document.disposition,
+        ...(decision.document.selection === undefined
+          ? {}
+          : { selection: decision.document.selection }),
+      };
+  if (
+    canonicalTicketLedgerValue(attestation.scope)
+    !== canonicalTicketLedgerValue(expectedScope)
+  ) {
+    throw new TicketLedgerError(
+      "stale_subject",
+      "Ticket decision attestation scope does not match the complete Decision",
+      {
+        decisionId: decision.document.decision_id,
+        expectedScope,
+        actualScope: attestation.scope,
+      },
+    );
+  }
+  if (
+    Date.parse(attestation.issued_at)
+    < Date.parse(decision.document.decided_at)
+  ) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      "Ticket decision attestation cannot predate its Decision",
+      {
+        decisionId: decision.document.decision_id,
+        decidedAt: decision.document.decided_at,
+        issuedAt: attestation.issued_at,
+      },
+    );
+  }
+};
+
+export function appendTicketDecisionAttestation(options: {
+  worktreeRoot: string;
+  request: TicketDecisionAttestationAppendRequest;
+}): TicketDecisionAttestationAppendResult {
+  const request = parseDecisionAttestationAppendRequest(options.request);
+  const normalized =
+    createTicketDecisionAttestationDocument(request.attestation);
+  const result = semanticAppend({
+    worktreeRoot: options.worktreeRoot,
+    expectedSource: request.expectedSource,
+    assertCurrent(snapshot) {
+      assertAttestationDecisionBinding(snapshot, normalized);
+    },
+    prepare(snapshot) {
+      const document =
+        createTicketDecisionAttestationDocument(request.attestation);
+      assertAttestationDecisionBinding(snapshot, document);
+      return {
+        documentPath: ticketDecisionAttestationDocumentPath(document),
+        document,
+        bytes: encodeTicketDecisionAttestationDocument(document),
+      };
+    },
+    equivalent(existing, candidate) {
+      return "attestation_id" in existing
+        && "attestation_id" in candidate
+        && sameCanonicalDocument(existing, candidate);
+    },
+  });
+  const document = result.prepared.document;
+  if (!("attestation_id" in document)) {
+    throw new TicketLedgerError(
+      "write_verification_failed",
+      "Ticket decision attestation append returned another document kind",
+    );
+  }
+  return {
+    status: result.status,
+    before: result.before,
+    after: result.after,
+    changedPaths: result.changedPaths,
+    attestation: {
       documentPath: result.prepared.documentPath,
       document,
     },

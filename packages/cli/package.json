@@ -27,10 +27,13 @@
   },
   "scripts": {
     "build": "node ../../scripts/clean-package-dist.mjs && tsc -p tsconfig.build.json && node scripts/generate-operation-contracts.mjs && node scripts/copy-managed-assets.mjs",
+    "pretest": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.2",
     "@vw-ai/vibehub-core": "workspace:*"
   },
   "devDependencies": {

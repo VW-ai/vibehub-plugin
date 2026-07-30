@@ -5,6 +5,7 @@ import {
   replaceScopePatterns,
   saveTaskReport,
   type Db,
+  type TicketDecisionAttestationTrustProfileResolverV0,
 } from "@vw-ai/vibehub-core";
 import crypto from "node:crypto";
 
@@ -31,12 +32,16 @@ export interface CapabilityContext {
   actor?: string;
   requestId?: () => string;
   now?: () => string;
+  ticketDecisionAttestationTrustProfiles?:
+    TicketDecisionAttestationTrustProfileResolverV0;
 }
 
 export function createCapabilities(ctx: CapabilityContext) {
   const now = (): string => ctx.now?.() ?? new Date().toISOString();
   const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db,{
     repoRoot:ctx.repoRoot,
+    ticketDecisionAttestationTrustProfiles:
+      ctx.ticketDecisionAttestationTrustProfiles,
   }).dispatch(operation,{
     repoId:ctx.repoId,actor:ctx.actor??"mcp-agent",taskId:ctx.taskId,
     requestId:requestId??ctx.requestId?.()??`mcp-${crypto.randomUUID()}`,now:now(),

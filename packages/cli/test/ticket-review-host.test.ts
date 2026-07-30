@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import crypto, { type KeyObject } from "node:crypto";
 import fs from "node:fs";
 import http from "node:http";
 import os from "node:os";
@@ -13,6 +14,10 @@ import {
   startTicketReviewHost,
   type TicketReviewHostHandle,
 } from "../src/ticket-review-host.js";
+import type {
+  TicketWebAuthnAuthorityProfileV1,
+  TicketWebAuthnVerifiedPresenceV1,
+} from "../src/ticket-webauthn-authority.js";
 
 const NOW = "2026-07-29T12:00:00.000Z";
 
@@ -104,7 +109,7 @@ describe("Git Ticket review host", () => {
     expect(state).toMatchObject({
       ok: true,
       data: {
-        schemaVersion: 2,
+        schemaVersion: 3,
         project: {
           repositoryRoot: fs.realpathSync(repo),
           worktreeRoot: fs.realpathSync(repo),
@@ -224,7 +229,7 @@ describe("Git Ticket review host", () => {
     const health = await fetch(`${origin}/health`);
     expect(health.status).toBe(200);
     expect(health.headers.get("access-control-allow-origin")).toBeNull();
-    expect(await health.json()).toEqual({ ok: true, schemaVersion: 2 });
+    expect(await health.json()).toEqual({ ok: true, schemaVersion: 3 });
 
     const unauthenticated = await fetch(`${origin}/api/state`);
     expect(unauthenticated.status).toBe(401);
@@ -563,6 +568,381 @@ describe("Git Ticket review host", () => {
     });
   });
 
+  it("runs a one-use WebAuthn ceremony and keeps authority outside browser claims", async () => {
+    const ceremonyNow = new Date().toISOString();
+    const registry = new DeterministicWebAuthnRegistry();
+    const host = startTicketReviewHost({
+      repoRoot: repo,
+      dbPath,
+      now: () => ceremonyNow,
+      token: "a".repeat(32),
+      ticketWebAuthnAuthorityRegistry: registry as any,
+    });
+    hosts.push(host);
+    const { origin } = await host.ready;
+
+    const unenrolled = await readJson(
+      `${origin}/api/state`,
+      host.token,
+    );
+    expect(unenrolled.data.interventions).toMatchObject({
+      authority: { status: "unenrolled" },
+      planReview: { available: false },
+      protectedDecision: { available: false },
+    });
+
+    const forgedEnrollment = await postJson(
+      `${origin}/api/authority/enroll/challenge`,
+      host.token,
+      origin,
+      {
+        principalId: "human:repository-owner",
+        authorityBasis: "designated_human",
+      },
+    );
+    expect(forgedEnrollment.status).toBe(400);
+    expect(await forgedEnrollment.json()).toMatchObject({
+      error: { code: "validation_error" },
+    });
+
+    const enrollmentChallenge = await postJson(
+      `${origin}/api/authority/enroll/challenge`,
+      host.token,
+      origin,
+      { principalId: "human:repository-owner" },
+    );
+    expect(enrollmentChallenge.status).toBe(200);
+    const enrollment = (await enrollmentChallenge.json() as any).data;
+    const enrollmentComplete = await postJson(
+      `${origin}/api/authority/enroll/complete`,
+      host.token,
+      origin,
+      {
+        ceremonyId: enrollment.ceremonyId,
+        credential: { id: "deterministic-registration" },
+      },
+    );
+    expect(enrollmentComplete.status).toBe(200);
+    expect(await enrollmentComplete.json()).toMatchObject({
+      data: {
+        authority: {
+          principalId: "human:repository-owner",
+          credentialFingerprint: registry.keyFingerprint,
+        },
+      },
+    });
+
+    const active = await readJson(`${origin}/api/state`, host.token);
+    expect(active.data.interventions).toMatchObject({
+      authority: {
+        status: "active",
+        principalId: "human:repository-owner",
+        credentialFingerprint: registry.keyFingerprint,
+      },
+      planReview: {
+        available: true,
+        ceremony: "webauthn",
+      },
+      protectedDecision: {
+        available: true,
+        ceremony: "webauthn",
+      },
+    });
+    const source = active.data.graph.source;
+    const decisionInput = {
+      expectedSource: mutationSource(source),
+      decision: {
+        type: "plan_review",
+        subject: {
+          kind: "graph",
+          graphDigest: source.graphDigest,
+        },
+        disposition: "approve_execution",
+        rationale: "The exact reviewed graph is ready to execute.",
+        resolutionRefs: [],
+      },
+    };
+    const forgedDecision = await postJson(
+      `${origin}/api/decision/challenge`,
+      host.token,
+      origin,
+      {
+        ...decisionInput,
+        authority: {
+          principalId: "browser-forgery",
+        },
+        decidedAt: "2099-01-01T00:00:00.000Z",
+      },
+    );
+    expect(forgedDecision.status).toBe(400);
+    expect(await forgedDecision.json()).toMatchObject({
+      error: { code: "validation_error" },
+    });
+
+    const decisionChallenge = await postJson(
+      `${origin}/api/decision/challenge`,
+      host.token,
+      origin,
+      decisionInput,
+    );
+    expect(decisionChallenge.status).toBe(200);
+    const preparedDecision = (await decisionChallenge.json() as any).data;
+    const decisionComplete = await postJson(
+      `${origin}/api/decision/complete`,
+      host.token,
+      origin,
+      {
+        ceremonyId: preparedDecision.ceremonyId,
+        credential: { id: "deterministic-assertion" },
+      },
+    );
+    expect(decisionComplete.status).toBe(200);
+    const completed = await decisionComplete.json() as any;
+    expect(completed).toMatchObject({
+      ok: true,
+      data: {
+        decision: {
+          document: {
+            authority: {
+              principal_id: "human:repository-owner",
+              basis: "repository_owner",
+            },
+            decided_at: ceremonyNow,
+          },
+        },
+        attestation: {
+          documentPath: expect.stringMatching(
+            /^\.vibehub\/tickets\/attestations\/tdc-[0-9a-f]{64}\/tda-[0-9a-f]{64}\.yaml$/u,
+          ),
+          document: {
+            authority: {
+              principal_id: "human:repository-owner",
+            },
+            credential: {
+              fingerprint: registry.keyFingerprint,
+            },
+            issued_at: ceremonyNow,
+            not_before: ceremonyNow,
+            expires_at: new Date(
+              Date.parse(ceremonyNow) + 30 * 60 * 1_000,
+            ).toISOString(),
+          },
+        },
+      },
+    });
+    const ledger = loadTicketLedgerFromWorktree(repo);
+    expect(ledger.decisions).toHaveLength(1);
+    expect(ledger.attestations).toHaveLength(1);
+    expect(ledger.attestations[0]?.document.decision.document_digest)
+      .toBe(completed.data.attestation.document.decision.document_digest);
+    const verifiedState = await readJson(`${origin}/api/state`, host.token);
+    const verifiedTrace = await readJson(
+      `${origin}/api/trace?${new URLSearchParams({
+        snapshotId: verifiedState.data.graph.snapshotId,
+        kind: "graph",
+      })}`,
+      host.token,
+    );
+    expect(verifiedTrace.data.records).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: "gate_decision",
+        status: "current",
+        producer: {
+          kind: "authority_receipt",
+          ref: completed.data.attestation.document.attestation_id,
+        },
+      }),
+    ]));
+
+    const replay = await postJson(
+      `${origin}/api/decision/complete`,
+      host.token,
+      origin,
+      {
+        ceremonyId: preparedDecision.ceremonyId,
+        credential: { id: "deterministic-assertion" },
+      },
+    );
+    expect(replay.status).toBe(409);
+    expect(await replay.json()).toMatchObject({
+      error: { code: "ticket_webauthn_ceremony_expired" },
+    });
+    expect(loadTicketLedgerFromWorktree(repo).attestations).toHaveLength(1);
+
+    const protectedTicket = verifiedState.data.graph.tickets.find(
+      (ticket: { ticketId: string }) => ticket.ticketId === "implement-api",
+    );
+    expect(protectedTicket).toBeDefined();
+    const protectedRevision = protectedTicket.ticketRevision.replace(
+      /^sha256:/u,
+      "",
+    );
+    const protectedInput = {
+      expectedSource: mutationSource(verifiedState.data.graph.source),
+      decision: {
+        type: "protected_boundary",
+        subject: {
+          kind: "ticket",
+          ticketId: protectedTicket.ticketId,
+          ticketRevision: protectedTicket.ticketRevision,
+        },
+        boundary: "Choose the user-visible API conflict behavior.",
+        disposition: "resolve",
+        selection: "Return one stable conflict response.",
+        rationale: "Clients need one explicit observable contract.",
+        resolutionRefs: [],
+      },
+    };
+    const protectedChallenge = await postJson(
+      `${origin}/api/decision/challenge`,
+      host.token,
+      origin,
+      protectedInput,
+    );
+    expect(protectedChallenge.status).toBe(200);
+    const preparedProtected =
+      (await protectedChallenge.json() as any).data;
+    const protectedComplete = await postJson(
+      `${origin}/api/decision/complete`,
+      host.token,
+      origin,
+      {
+        ceremonyId: preparedProtected.ceremonyId,
+        credential: { id: "deterministic-protected-assertion" },
+      },
+    );
+    expect(protectedComplete.status).toBe(200);
+    const protectedCompleted = await protectedComplete.json() as any;
+    expect(protectedCompleted).toMatchObject({
+      ok: true,
+      data: {
+        decision: {
+          document: {
+            decision_type: "protected_boundary",
+            subject: {
+              kind: "ticket",
+              ticket_id: "implement-api",
+              ticket_revision: protectedRevision,
+            },
+            boundary: protectedInput.decision.boundary,
+            selection: protectedInput.decision.selection,
+          },
+        },
+        attestation: {
+          document: {
+            scope: {
+              scope_type: "protected_boundary",
+              ticket_id: "implement-api",
+              ticket_revision: protectedRevision,
+              boundary: protectedInput.decision.boundary,
+              selection: protectedInput.decision.selection,
+            },
+          },
+        },
+      },
+    });
+    expect(loadTicketLedgerFromWorktree(repo).decisions).toHaveLength(2);
+    expect(loadTicketLedgerFromWorktree(repo).attestations).toHaveLength(2);
+    const protectedState = await readJson(
+      `${origin}/api/state`,
+      host.token,
+    );
+    const protectedTrace = await readJson(
+      `${origin}/api/trace?${new URLSearchParams({
+        snapshotId: protectedState.data.graph.snapshotId,
+        kind: "ticket",
+        ticketId: "implement-api",
+      })}`,
+      host.token,
+    );
+    expect(protectedTrace.data.records).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: "gate_decision",
+        status: "current",
+        producer: {
+          kind: "authority_receipt",
+          ref:
+            protectedCompleted.data.attestation.document.attestation_id,
+        },
+      }),
+    ]));
+
+    const revokeChallenge = await postJson(
+      `${origin}/api/authority/revoke/challenge`,
+      host.token,
+      origin,
+      {},
+    );
+    expect(revokeChallenge.status).toBe(200);
+    const revoke = (await revokeChallenge.json() as any).data;
+    const revoked = await postJson(
+      `${origin}/api/authority/revoke/complete`,
+      host.token,
+      origin,
+      {
+        ceremonyId: revoke.ceremonyId,
+        credential: { id: "deterministic-revocation" },
+      },
+    );
+    expect(revoked.status).toBe(200);
+    expect(await revoked.json()).toMatchObject({
+      data: {
+        authority: {
+          status: "revoked",
+          principalId: "human:repository-owner",
+        },
+      },
+    });
+    const afterRevocation = await readJson(
+      `${origin}/api/state`,
+      host.token,
+    );
+    expect(afterRevocation.data.interventions).toMatchObject({
+      authority: { status: "unenrolled" },
+      planReview: { available: false },
+      protectedDecision: { available: false },
+    });
+    const revokedTrace = await readJson(
+      `${origin}/api/trace?${new URLSearchParams({
+        snapshotId: afterRevocation.data.graph.snapshotId,
+        kind: "graph",
+      })}`,
+      host.token,
+    );
+    expect(revokedTrace.data.records).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: "artifact",
+        status: "current_unverified",
+        producer: {
+          kind: "receipt",
+          ref: completed.data.decision.document.decision_id,
+        },
+      }),
+    ]));
+    const revokedProtectedTrace = await readJson(
+      `${origin}/api/trace?${new URLSearchParams({
+        snapshotId: afterRevocation.data.graph.snapshotId,
+        kind: "ticket",
+        ticketId: "implement-api",
+      })}`,
+      host.token,
+    );
+    expect(revokedProtectedTrace.data.records).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "artifact",
+          status: "current_unverified",
+          producer: {
+            kind: "receipt",
+            ref:
+              protectedCompleted.data.decision.document.decision_id,
+          },
+        }),
+      ]),
+    );
+    expect(loadTicketLedgerFromWorktree(repo).attestations).toHaveLength(2);
+  });
+
   it("rejects unauthenticated, cross-origin, non-JSON, oversized, malformed, and stale writes", async () => {
     const host = startTicketReviewHost({
       repoRoot: repo,
@@ -667,6 +1047,170 @@ describe("Git Ticket review host", () => {
     });
   });
 });
+
+class DeterministicWebAuthnRegistry {
+  private profiles: TicketWebAuthnAuthorityProfileV1[] = [];
+  private readonly privateKey: KeyObject;
+  private readonly publicKeySpkiPem: string;
+  readonly keyFingerprint: string;
+  private readonly credentialId: string;
+
+  constructor() {
+    const pair = crypto.generateKeyPairSync("ec", {
+      namedCurve: "P-256",
+    });
+    this.privateKey = pair.privateKey;
+    this.publicKeySpkiPem = pair.publicKey.export({
+      type: "spki",
+      format: "pem",
+    }).toString();
+    this.keyFingerprint = crypto.createHash("sha256").update(
+      pair.publicKey.export({ type: "spki", format: "der" }),
+    ).digest("hex");
+    this.credentialId = crypto.createHash("sha256")
+      .update(this.publicKeySpkiPem)
+      .digest("base64url");
+  }
+
+  listProfiles(): TicketWebAuthnAuthorityProfileV1[] {
+    return this.profiles.map((profile) => ({
+      ...profile,
+      transports: [...profile.transports],
+    }));
+  }
+
+  async createRegistrationOptions(request: {
+    challenge: string;
+  }): Promise<Record<string, unknown>> {
+    return {
+      challenge: request.challenge,
+      rp: { id: "localhost", name: "Vibehub Ticket Decisions" },
+      user: {
+        id: "deterministic-user",
+        name: "human:repository-owner",
+        displayName: "human:repository-owner",
+      },
+    };
+  }
+
+  async verifyRegistration(request: {
+    principalId: string;
+    authorityBasis: "repository_owner" | "designated_human";
+    authorityRef: string;
+    repositoryIncarnation: string;
+  }): Promise<TicketWebAuthnAuthorityProfileV1> {
+    const profile: TicketWebAuthnAuthorityProfileV1 = {
+      profileId: `twa-${"0".repeat(64)}`,
+      keyFingerprint: this.keyFingerprint,
+      principalId: request.principalId,
+      principalKind: "human",
+      authorityBasis: request.authorityBasis,
+      authorityRef: request.authorityRef,
+      repositoryIncarnation: request.repositoryIncarnation,
+      rpId: "localhost",
+      algorithm: "ES256",
+      credentialId: this.credentialId,
+      publicKeyCose: Buffer.from("deterministic-public-key")
+        .toString("base64url"),
+      publicKeySpkiPem: this.publicKeySpkiPem,
+      transports: ["internal"],
+      counter: 0,
+      lastAssertionDigest: null,
+      createdAt: NOW,
+      revokedAt: null,
+    };
+    this.profiles = [profile];
+    return { ...profile, transports: [...profile.transports] };
+  }
+
+  async createAuthenticationOptions(request: {
+    challenge: string;
+  }): Promise<Record<string, unknown>> {
+    return {
+      challenge: request.challenge,
+      rpId: "localhost",
+      userVerification: "required",
+    };
+  }
+
+  async verifyAuthentication(request: {
+    profileId: string;
+    challenge: string;
+    origin: string;
+  }): Promise<TicketWebAuthnVerifiedPresenceV1> {
+    const index = this.profiles.findIndex(
+      (profile) => profile.profileId === request.profileId,
+    );
+    const profile = this.profiles[index];
+    if (profile === undefined || profile.revokedAt !== null) {
+      throw new Error("deterministic authority is unavailable");
+    }
+    const clientDataJSON = Buffer.from(JSON.stringify({
+      type: "webauthn.get",
+      challenge: request.challenge,
+      origin: request.origin,
+      crossOrigin: false,
+    }));
+    const authenticatorData = Buffer.alloc(37);
+    crypto.createHash("sha256").update("localhost").digest()
+      .copy(authenticatorData, 0);
+    authenticatorData[32] = 0x05;
+    authenticatorData.writeUInt32BE(profile.counter + 1, 33);
+    const signature = crypto.sign(
+      "sha256",
+      Buffer.concat([
+        authenticatorData,
+        crypto.createHash("sha256").update(clientDataJSON).digest(),
+      ]),
+      this.privateKey,
+    );
+    const assertionDigest = crypto.createHash("sha256").update(
+      Buffer.concat([clientDataJSON, authenticatorData, signature]),
+    ).digest("hex");
+    const updated: TicketWebAuthnAuthorityProfileV1 = {
+      ...profile,
+      counter: profile.counter + 1,
+      lastAssertionDigest: assertionDigest,
+      transports: [...profile.transports],
+    };
+    this.profiles[index] = updated;
+    return {
+      profile: { ...updated, transports: [...updated.transports] },
+      verifiedAt: NOW,
+      challenge: request.challenge,
+      origin: request.origin,
+      rpId: "localhost",
+      userVerified: true,
+      counter: updated.counter,
+      assertionDigest,
+      assertion: {
+        credentialId: updated.credentialId,
+        clientDataJSON: clientDataJSON.toString("base64url"),
+        authenticatorData: authenticatorData.toString("base64url"),
+        signature: signature.toString("base64url"),
+        userHandle: null,
+      },
+    };
+  }
+
+  async revoke(request: {
+    profileId: string;
+    challenge: string;
+    origin: string;
+  }): Promise<TicketWebAuthnAuthorityProfileV1> {
+    const presence = await this.verifyAuthentication(request);
+    const index = this.profiles.findIndex(
+      (profile) => profile.profileId === request.profileId,
+    );
+    const revoked = {
+      ...presence.profile,
+      revokedAt: NOW,
+      transports: [...presence.profile.transports],
+    };
+    this.profiles[index] = revoked;
+    return { ...revoked, transports: [...revoked.transports] };
+  }
+}
 
 function writeTicketLedger(repo: string): void {
   const ledger = path.join(repo, ".vibehub", "tickets");

@@ -76,9 +76,13 @@ relations:
 anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md"
   - file: ".vibehub/tickets/tickets/ticket-durable-decision-attestation-ready.yaml"
   - file: "packages/core/src/ticket-decision-attestation.ts"
+  - file: "packages/core/src/ticket-decision-trust-store.ts"
   - file: "packages/core/src/ticket-ledger/projection.ts"
   - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/cli/src/ticket-webauthn-authority.ts"
   - file: "packages/cli/src/ticket-review-host.ts"
+  - file: "skills/vibehub-ticket-review/SKILL.md"
   - file: "skills/vibehub-ticket-plan/SKILL.md"

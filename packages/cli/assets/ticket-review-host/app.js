@@ -966,9 +966,24 @@
     const interventions = state.interventions || {
       review: { available: false },
       planReview: { available: false },
+      protectedDecision: { available: false },
       protectedBoundaries: [],
+      authority: { status: "unavailable" },
     };
     const actions = [];
+    const authority = interventions.authority || { status: "unavailable" };
+    if (subject.kind === "graph" && authority.status === "unenrolled") {
+      const enrollmentKey = reviewDraftKey("authority-enroll", subject);
+      actions.push(
+        actionDisclosure(
+          "Enroll decision authority",
+          "Bind one named human to this repository with Touch ID, Windows Hello, or a FIDO2 key.",
+          "◇",
+          enrollmentKey,
+          () => authorityEnrollmentForm(subject, enrollmentKey),
+        ),
+      );
+    }
     const canReview = interventions.review?.available === true;
     if (canReview) {
       const commentKey = reviewDraftKey("comment", subject);
@@ -1017,24 +1032,41 @@
         ),
       );
     }
+    if (subject.kind === "graph" && authority.status === "active") {
+      const revokeKey = reviewDraftKey("authority-revoke", subject);
+      actions.push(
+        actionDisclosure(
+          "Revoke decision authority",
+          `Stop trusting ${authority.principalId || "this credential"} after one verified human action.`,
+          "×",
+          revokeKey,
+          () => authorityRevocationForm(subject, revokeKey),
+        ),
+      );
+    }
     if (subject.kind === "ticket") {
       const boundaries = (interventions.protectedBoundaries || [])
         .filter((item) =>
           item.ticketId === subject.ticketId
           && item.ticketRevision === subject.ticketRevision)
         .map((item) => item.boundary);
-      if (boundaries.length) {
+      const protectedDecision = interventions.protectedDecision
+        || { available: false };
+      if (boundaries.length || protectedDecision.available === true) {
         const boundaryKey = reviewDraftKey("protected-boundary", subject);
         actions.push(
           actionDisclosure(
             "Decide boundary",
-            "Resolve one exact product or design choice.",
+            "Resolve one exact product, design, or architecture choice.",
             "◇",
             boundaryKey,
             () => protectedDecisionForm(
               subject,
               boundaries,
               boundaryKey,
+              protectedDecision.ceremony === "webauthn"
+                ? "webauthn-decision"
+                : "direct",
             ),
           ),
         );
@@ -1245,6 +1277,10 @@
         const delegatedBoundaries = lineValues(boundaries.value);
         return {
           route: "/api/decision",
+          ceremony:
+            state.interventions?.planReview?.ceremony === "webauthn"
+              ? "webauthn-decision"
+              : "direct",
           payload: {
             expectedSource: mutationSource(),
             decision: {
@@ -1264,11 +1300,63 @@
     });
   }
 
-  function protectedDecisionForm(subject, boundaries, draftKey) {
-    const boundary = selectControl(
-      boundaries.map((item) => [item, item]),
-      "boundary",
-    );
+  function authorityEnrollmentForm(subject, draftKey) {
+    const principalId = textareaControl({
+      name: "principalId",
+      rows: 2,
+      placeholder: "A stable named principal, for example human:wayne",
+      required: true,
+    });
+    return mutationForm({
+      draftKey,
+      fields: [
+        field("Principal", principalId),
+      ],
+      submitLabel: "Enroll with authenticator",
+      submit: () => ({
+        ceremony: "webauthn-enrollment",
+        payload: {
+          principalId: principalId.value.trim(),
+        },
+        subject,
+      }),
+    });
+  }
+
+  function authorityRevocationForm(subject, draftKey) {
+    return mutationForm({
+      draftKey,
+      fields: [
+        quietMessage(
+          "Revocation takes effect for fresh processes immediately. Existing Git receipts remain visible evidence.",
+        ),
+      ],
+      submitLabel: "Verify and revoke",
+      submit: () => ({
+        ceremony: "webauthn-revocation",
+        payload: {},
+        subject,
+      }),
+    });
+  }
+
+  function protectedDecisionForm(
+    subject,
+    boundaries,
+    draftKey,
+    ceremony = "direct",
+  ) {
+    const boundary = boundaries.length
+      ? selectControl(
+        boundaries.map((item) => [item, item]),
+        "boundary",
+      )
+      : textareaControl({
+        name: "boundary",
+        rows: 3,
+        placeholder: "The exact protected product, design, or architecture choice",
+        required: true,
+      });
     const disposition = selectControl([
       ["resolve", "Resolve"],
       ["decline", "Decline to resolve"],
@@ -1301,15 +1389,18 @@
         selectionField,
         field("Rationale", rationale),
       ],
-      submitLabel: "Record decision",
+      submitLabel: ceremony === "webauthn-decision"
+        ? "Verify and record decision"
+        : "Record decision",
       submit: () => ({
         route: "/api/decision",
+        ceremony,
         payload: {
           expectedSource: mutationSource(),
           decision: {
             type: "protected_boundary",
             subject,
-            boundary: boundary.value,
+            boundary: boundary.value.trim(),
             disposition: disposition.value,
             ...(disposition.value === "resolve"
               ? { selection: selection.value.trim() }
@@ -1386,6 +1477,7 @@
 
   async function performMutation({
     route,
+    ceremony = "direct",
     payload,
     subject,
     draftKey,
@@ -1395,14 +1487,22 @@
   }) {
     button.disabled = true;
     form.setAttribute("aria-busy", "true");
-    setStatus("Writing one exact Git review fact…");
+    setStatus(
+      ceremony === "direct"
+        ? "Writing one exact Git review fact…"
+        : "Preparing one exact human verification…",
+    );
     try {
-      const result = await api(route, {
-        method: "POST",
-        body: payload,
+      const result = await executeMutation({
+        route,
+        ceremony,
+        payload,
+        setStatus,
       });
       const documentPath =
-        result.review?.documentPath
+        result.attestation?.documentPath
+        || result.authority?.profileId
+        || result.review?.documentPath
         || result.decision?.documentPath
         || "Git review ledger";
       drafts.delete(draftKey);
@@ -1445,6 +1545,81 @@
         form.removeAttribute("aria-busy");
       }
     }
+  }
+
+  async function executeMutation({
+    route,
+    ceremony,
+    payload,
+    setStatus,
+  }) {
+    if (ceremony === "direct") {
+      return api(route, {
+        method: "POST",
+        body: payload,
+      });
+    }
+    const browser = globalThis.SimpleWebAuthnBrowser;
+    if (!browser) {
+      throw new Error(
+        "This browser could not load the local WebAuthn adapter. Restart the installed review host.",
+      );
+    }
+    if (ceremony === "webauthn-enrollment") {
+      const challenge = await api("/api/authority/enroll/challenge", {
+        method: "POST",
+        body: payload,
+      });
+      setStatus("Confirm enrollment with your authenticator…");
+      const credential = await browser.startRegistration({
+        optionsJSON: challenge.options,
+      });
+      setStatus("Verifying the enrolled human authority…");
+      return api("/api/authority/enroll/complete", {
+        method: "POST",
+        body: {
+          ceremonyId: challenge.ceremonyId,
+          credential,
+        },
+      });
+    }
+    if (ceremony === "webauthn-decision") {
+      const challenge = await api("/api/decision/challenge", {
+        method: "POST",
+        body: payload,
+      });
+      setStatus("Confirm this exact Decision with your authenticator…");
+      const credential = await browser.startAuthentication({
+        optionsJSON: challenge.options,
+      });
+      setStatus("Verifying and recording the exact Decision…");
+      return api("/api/decision/complete", {
+        method: "POST",
+        body: {
+          ceremonyId: challenge.ceremonyId,
+          credential,
+        },
+      });
+    }
+    if (ceremony === "webauthn-revocation") {
+      const challenge = await api("/api/authority/revoke/challenge", {
+        method: "POST",
+        body: payload,
+      });
+      setStatus("Confirm revocation with your authenticator…");
+      const credential = await browser.startAuthentication({
+        optionsJSON: challenge.options,
+      });
+      setStatus("Revoking the enrolled authority…");
+      return api("/api/authority/revoke/complete", {
+        method: "POST",
+        body: {
+          ceremonyId: challenge.ceremonyId,
+          credential,
+        },
+      });
+    }
+    throw new Error("The Ticket host exposed an unknown human ceremony.");
   }
 
   async function restoreSubject(subject, preserveAction) {

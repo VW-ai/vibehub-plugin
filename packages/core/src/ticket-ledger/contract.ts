@@ -8,10 +8,12 @@ export const TICKET_LEDGER_PROTOCOL_MAX_BYTES = 16 * 1024;
 export const TICKET_LEDGER_TICKET_MAX_BYTES = 256 * 1024;
 export const TICKET_LEDGER_REVIEW_MAX_BYTES = 384 * 1024;
 export const TICKET_LEDGER_DECISION_MAX_BYTES = 64 * 1024;
+export const TICKET_LEDGER_ATTESTATION_MAX_BYTES = 128 * 1024;
 export const TICKET_LEDGER_MAX_BYTES = 8 * 1024 * 1024;
 export const TICKET_LEDGER_MAX_TICKETS = 1_000;
 export const TICKET_LEDGER_MAX_REVIEWS = 5_000;
 export const TICKET_LEDGER_MAX_DECISIONS = 2_000;
+export const TICKET_LEDGER_MAX_ATTESTATIONS = 2_000;
 export const TICKET_LEDGER_MAX_RELATIONS = 5_000;
 export const TICKET_LEDGER_MAX_PATCH_CHANGES = 1_000;
 export const TICKET_LEDGER_MAX_DIRTY_PATHS = 128;
@@ -43,6 +45,7 @@ const gitCommitSchema = z.string().regex(/^[0-9a-f]{40,64}$/u);
 const relationRefSchema = z.string().regex(/^trl-[0-9a-f]{64}$/u);
 const reviewIdSchema = z.string().regex(/^trv-[0-9a-f]{64}$/u);
 const decisionIdSchema = z.string().regex(/^tdc-[0-9a-f]{64}$/u);
+const attestationIdSchema = z.string().regex(/^tda-[0-9a-f]{64}$/u);
 const instantSchema = z.iso.datetime({ offset: true }).refine(
   (value) => Number.isFinite(Date.parse(value)),
   { message: "must be a representable ISO datetime" },
@@ -270,6 +273,212 @@ export const ticketDecisionDocumentSchema = z.discriminatedUnion(
   }
 });
 
+const base64UrlSchema = (
+  maximumCharacters: number,
+  minimumBytes = 1,
+) => z.string()
+  .min(1)
+  .max(maximumCharacters)
+  .regex(
+    /^[A-Za-z0-9_-]+$/u,
+    "must be unpadded base64url",
+  )
+  .refine((value) => {
+    try {
+      const bytes = Buffer.from(value, "base64url");
+      return bytes.byteLength >= minimumBytes
+        && bytes.toString("base64url") === value;
+    } catch {
+      return false;
+    }
+  }, {
+    message:
+      `must be canonical base64url encoding at least ${minimumBytes} bytes`,
+  });
+
+const exactLocalhostOriginSchema = z.string()
+  .max(2_048)
+  .refine((value) => {
+    try {
+      const parsed = new URL(value);
+      return (parsed.protocol === "http:" || parsed.protocol === "https:")
+        && parsed.hostname === "localhost"
+        && parsed.username === ""
+        && parsed.password === ""
+        && parsed.origin === value;
+    } catch {
+      return false;
+    }
+  }, {
+    message:
+      "must be an exact http(s) localhost origin without path, query, or fragment",
+  });
+
+const ticketDecisionAttestationAuthoritySchema = z.object({
+  principal_id: boundedText(512),
+  principal_kind: z.literal("human"),
+  basis: z.enum(["repository_owner", "designated_human"]),
+  basis_ref: boundedText(2_048),
+}).strict();
+
+const ticketDecisionAttestationCheckoutSchema = z.discriminatedUnion(
+  "mode",
+  [
+    z.object({
+      mode: z.literal("branch"),
+      branch: boundedText(1_024),
+    }).strict(),
+    z.object({
+      mode: z.literal("detached"),
+      commit: gitCommitSchema,
+    }).strict(),
+  ],
+);
+
+const ticketDecisionAttestationScopeSchema = z.discriminatedUnion(
+  "scope_type",
+  [
+    z.object({
+      scope_type: z.literal("plan_review"),
+      graph_digest: sha256DigestSchema,
+      disposition: z.enum([
+        "approve_execution",
+        "delegate_within_boundaries",
+        "request_changes",
+      ]),
+      delegated_boundaries: z.array(boundedText(8_192)).max(128).optional(),
+    }).strict(),
+    z.object({
+      scope_type: z.literal("protected_boundary"),
+      ticket_id: identifierSchema,
+      ticket_revision: sha256DigestSchema,
+      boundary: boundedText(20_000),
+      disposition: z.enum(["resolve", "decline"]),
+      selection: boundedText(20_000).optional(),
+    }).strict(),
+  ],
+).superRefine((value, context) => {
+  if (value.scope_type === "plan_review") {
+    const boundaries = value.delegated_boundaries;
+    if (
+      value.disposition === "delegate_within_boundaries"
+      && (boundaries === undefined || boundaries.length === 0)
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["delegated_boundaries"],
+        message: "must be non-empty for delegated execution",
+      });
+    }
+    if (
+      value.disposition !== "delegate_within_boundaries"
+      && boundaries !== undefined
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["delegated_boundaries"],
+        message: "is only allowed for delegated execution",
+      });
+    }
+    return;
+  }
+  if (value.disposition === "resolve" && value.selection === undefined) {
+    context.addIssue({
+      code: "custom",
+      path: ["selection"],
+      message: "must be present for a resolved protected boundary",
+    });
+  }
+  if (value.disposition === "decline" && value.selection !== undefined) {
+    context.addIssue({
+      code: "custom",
+      path: ["selection"],
+      message: "is not allowed for a declined protected boundary",
+    });
+  }
+});
+
+const ticketDecisionAttestationDecisionSchema = z.object({
+  decision_id: decisionIdSchema,
+  document_path: boundedText(4_096),
+  document_digest: sha256DigestSchema,
+}).strict();
+
+const ticketDecisionAttestationRepositorySchema = z.object({
+  repository_incarnation: z.string().regex(/^repo-[0-9a-f]{64}$/u),
+  repository_root: boundedText(4_096),
+  worktree_identity: z.string().regex(/^worktree-[0-9a-f]{64}$/u),
+  worktree_root: boundedText(4_096),
+  checkout: ticketDecisionAttestationCheckoutSchema,
+}).strict();
+
+const ticketDecisionAttestationCredentialSchema = z.object({
+  credential_id: base64UrlSchema(4_096),
+  fingerprint: sha256DigestSchema,
+}).strict();
+
+const ticketDecisionAttestationWebAuthnEnvelopeSchema = z.object({
+  rp_id: z.literal("localhost"),
+  origin: exactLocalhostOriginSchema,
+  algorithm: z.literal("ES256"),
+}).strict();
+
+const ticketDecisionAttestationEnvelopeShape = {
+  schema_version: z.literal(TICKET_LEDGER_SCHEMA_VERSION),
+  kind: z.literal("ticket_decision_attestation"),
+  decision: ticketDecisionAttestationDecisionSchema,
+  authority: ticketDecisionAttestationAuthoritySchema,
+  repository: ticketDecisionAttestationRepositorySchema,
+  scope: ticketDecisionAttestationScopeSchema,
+  credential: ticketDecisionAttestationCredentialSchema,
+  webauthn: ticketDecisionAttestationWebAuthnEnvelopeSchema,
+  nonce: base64UrlSchema(128, 16),
+  issued_at: instantSchema,
+  not_before: instantSchema,
+  expires_at: instantSchema,
+} satisfies z.ZodRawShape;
+
+const addAttestationTimeIssues = (
+  value: { issued_at: string; not_before: string; expires_at: string },
+  context: z.RefinementCtx,
+): void => {
+  const issuedAt = Date.parse(value.issued_at);
+  const notBefore = Date.parse(value.not_before);
+  const expiresAt = Date.parse(value.expires_at);
+  if (notBefore > issuedAt) {
+    context.addIssue({
+      code: "custom",
+      path: ["not_before"],
+      message: "must not be later than issued_at",
+    });
+  }
+  if (expiresAt <= issuedAt) {
+    context.addIssue({
+      code: "custom",
+      path: ["expires_at"],
+      message: "must be later than issued_at",
+    });
+  }
+};
+
+export const ticketDecisionAttestationEnvelopeSchema = z.object(
+  ticketDecisionAttestationEnvelopeShape,
+).strict().superRefine(addAttestationTimeIssues);
+
+export const ticketDecisionAttestationDocumentPayloadSchema = z.object({
+  ...ticketDecisionAttestationEnvelopeShape,
+  webauthn: ticketDecisionAttestationWebAuthnEnvelopeSchema.extend({
+    client_data_json: base64UrlSchema(32 * 1_024, 2),
+    authenticator_data: base64UrlSchema(16 * 1_024, 37),
+    signature: base64UrlSchema(8 * 1_024, 8),
+  }).strict(),
+}).strict().superRefine(addAttestationTimeIssues);
+
+export const ticketDecisionAttestationDocumentSchema =
+  ticketDecisionAttestationDocumentPayloadSchema.safeExtend({
+    attestation_id: attestationIdSchema,
+  });
+
 export type TicketLedgerProtocol = z.infer<typeof ticketLedgerProtocolSchema>;
 export type TicketAcceptance = z.infer<typeof ticketAcceptanceSchema>;
 export type TicketContextRef = z.infer<typeof ticketContextRefSchema>;
@@ -278,6 +487,21 @@ export type TicketDocument = z.infer<typeof ticketDocumentSchema>;
 export type TicketReviewSubject = z.infer<typeof ticketReviewSubjectSchema>;
 export type TicketReviewDocument = z.infer<typeof ticketReviewDocumentSchema>;
 export type TicketDecisionDocument = z.infer<typeof ticketDecisionDocumentSchema>;
+export type TicketDecisionAttestationDocumentPayload = z.infer<
+  typeof ticketDecisionAttestationDocumentPayloadSchema
+>;
+export type TicketDecisionAttestationDocument = z.infer<
+  typeof ticketDecisionAttestationDocumentSchema
+>;
+export type TicketDecisionAttestationScope =
+  TicketDecisionAttestationDocument["scope"];
+export type TicketDecisionAttestationEnvelope =
+  Omit<TicketDecisionAttestationDocumentPayload, "webauthn"> & {
+    webauthn: Pick<
+      TicketDecisionAttestationDocumentPayload["webauthn"],
+      "rp_id" | "origin" | "algorithm"
+    >;
+  };
 type WithoutField<T, Field extends PropertyKey> =
   T extends unknown ? Omit<T, Field> : never;
 export type TicketReviewDocumentPayload =
@@ -295,6 +519,7 @@ export interface TicketLedgerCandidate {
   tickets: readonly TicketLedgerDocumentCandidate[];
   reviews?: readonly TicketLedgerDocumentCandidate[];
   decisions?: readonly TicketLedgerDocumentCandidate[];
+  attestations?: readonly TicketLedgerDocumentCandidate[];
 }
 
 export interface TicketLedgerTicket {
@@ -313,11 +538,17 @@ export interface TicketLedgerDecision {
   document: TicketDecisionDocument;
 }
 
+export interface TicketLedgerDecisionAttestation {
+  documentPath: string;
+  document: TicketDecisionAttestationDocument;
+}
+
 export interface TicketLedgerContent {
   protocol: TicketLedgerProtocol;
   tickets: readonly TicketLedgerTicket[];
   reviews: readonly TicketLedgerReview[];
   decisions: readonly TicketLedgerDecision[];
+  attestations: readonly TicketLedgerDecisionAttestation[];
   graphDigest: string;
   semanticLedgerDigest: string;
 }

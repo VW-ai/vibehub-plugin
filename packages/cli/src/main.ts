@@ -24,6 +24,7 @@ import {
   CURRENT_SCHEMA_VERSION,
   commitSemanticCheckpoint,
   commitTicketCheckpoint,
+  FileTicketDecisionAttestationTrustProfileResolverV0,
   exportTeamMapSnapshot,
   GitFacade,
   ingestCanonicalHookEvent,
@@ -206,7 +207,11 @@ function runOperation(
       || canonicalOperation === "ticket.review.append"
       || canonicalOperation === "ticket.decision.record";
     const repoId=row?.id??(isGitNativeTicketOperation ? 1 : 0);
-    const result=new OperationDispatcher(db,{repoRoot:session.toplevel}).dispatch(canonicalOperation,{repoId,actor:flags.actor,taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
+    const result=new OperationDispatcher(db,{
+      repoRoot:session.toplevel,
+      ticketDecisionAttestationTrustProfiles:
+        new FileTicketDecisionAttestationTrustProfileResolverV0(),
+    }).dispatch(canonicalOperation,{repoId,actor:flags.actor,taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
     process.stdout.write(`${JSON.stringify(result)}\n`);
     return result.ok?0:(OPERATION_EXIT_CLASS[result.error.code]??1);
   }catch(error){const result={ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error),details:null,nextSafeActions:[`Run vibehub ${group} with --json and a valid JSON --input payload.`]}};process.stdout.write(`${JSON.stringify(result)}\n`);return 2;}finally{db?.close();}

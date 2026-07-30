@@ -76,6 +76,15 @@ if (codexManifest.interface?.brandColor !== "#3E7D4C") {
 if (!existsSync(join(pluginRoot, "runtime", "vibehub-runtime.mjs"))) {
   throw new Error("thin npm runtime launcher is missing");
 }
+for (const relativePath of [
+  join("skills", "vibehub-ticket-review", "SKILL.md"),
+  join("skills", "vibehub-ticket-review", "agents", "openai.yaml"),
+  join("skills", "scripts", "vh-ticket-review.mjs"),
+]) {
+  if (!existsSync(join(pluginRoot, relativePath))) {
+    throw new Error(`Ticket review Skill release asset is missing: ${relativePath}`);
+  }
+}
 for (const forbidden of ["packages", "node_modules"]) {
   if (existsSync(join(pluginRoot, forbidden))) {
     throw new Error(`thin release must not contain ${forbidden}`);

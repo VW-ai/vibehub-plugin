@@ -2,7 +2,7 @@
 import { spawn } from "node:child_process";
 import { resolveVibehubInvocation } from "./_dispatch.mjs";
 
-const invocation = resolveVibehubInvocation();
+const invocation = resolveVibehubInvocation({ allowPluginRuntime: true });
 const child = spawn(
   invocation.command,
   [...invocation.prefix, "ticket", "review", ...process.argv.slice(2)],

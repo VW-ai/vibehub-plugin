@@ -37,7 +37,10 @@ import {
   type TicketReviewSubject,
 } from "./ticket-ledger/index.js";
 import {
+  CompositeTicketDecisionAttestationVerifierV0,
+  DurableWebAuthnTicketDecisionAttestationVerifierV0,
   InMemoryTicketDecisionSessionAttestationRegistryV0,
+  type TicketDecisionAttestationTrustProfileResolverV0,
 } from "./ticket-decision-attestation.js";
 import {
   TicketReviewProjectionError,
@@ -192,6 +195,13 @@ export interface OperationDispatcherOptions {
   ticketReviewProvider?: ResolvedTicketReviewProjectionSourceProviderV0;
   ticketReviewAttribution?: TicketReviewHostAttribution;
   ticketDecisionAuthority?: TicketDecisionAuthorityGrant;
+  /**
+   * Host-owned, dynamically resolved WebAuthn trust profiles. The resolver
+   * must read outside repository/SQLite/browser authority and is consulted on
+   * every Ticket read so revocation takes effect without restarting.
+   */
+  ticketDecisionAttestationTrustProfiles?:
+    TicketDecisionAttestationTrustProfileResolverV0;
 }
 
 export class OperationDispatcher {
@@ -204,13 +214,23 @@ export class OperationDispatcher {
   ) {
     this.ticketDecisionAttestations =
       new InMemoryTicketDecisionSessionAttestationRegistryV0();
+    const ticketDecisionAttestationVerifier =
+      options.ticketDecisionAttestationTrustProfiles === undefined
+        ? this.ticketDecisionAttestations
+        : new CompositeTicketDecisionAttestationVerifierV0([
+            new DurableWebAuthnTicketDecisionAttestationVerifierV0({
+              trustProfiles:
+                options.ticketDecisionAttestationTrustProfiles,
+            }),
+            this.ticketDecisionAttestations,
+          ]);
     this.service = {
       kb: new KnowledgeService(db),
       distill: new DistillationService(db),
       ticket: new TicketReviewReadServiceV0(
         options.ticketReviewProvider
           ?? createTrustedTicketLedgerReviewProjectionSourceProviderV0(
-            this.ticketDecisionAttestations,
+            ticketDecisionAttestationVerifier,
           ),
       ),
     };
@@ -794,7 +814,7 @@ function ticketReviewAppendRequest(
   };
 }
 
-function ticketDecisionRecordRequest(
+export function ticketDecisionRecordRequest(
   input:Record<string,unknown>,
 ):TicketDecisionRecordRequest {
   const decision=input.decision as {

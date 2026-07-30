@@ -11,11 +11,13 @@ import {
 import {
   TICKET_LEDGER_FORMAT,
   TICKET_LEDGER_MAX_BYTES,
+  TICKET_LEDGER_MAX_ATTESTATIONS,
   TICKET_LEDGER_MAX_DECISIONS,
   TICKET_LEDGER_MAX_RELATIONS,
   TICKET_LEDGER_MAX_REVIEWS,
   TICKET_LEDGER_MAX_TICKETS,
   TICKET_LEDGER_DECISION_MAX_BYTES,
+  TICKET_LEDGER_ATTESTATION_MAX_BYTES,
   TICKET_LEDGER_PROTOCOL_MAX_BYTES,
   TICKET_LEDGER_RELATIVE_PATH,
   TICKET_LEDGER_REVIEW_MAX_BYTES,
@@ -23,6 +25,9 @@ import {
   TICKET_LEDGER_TICKET_MAX_BYTES,
   TicketLedgerError,
   ticketDecisionDocumentSchema,
+  ticketDecisionAttestationDocumentPayloadSchema,
+  ticketDecisionAttestationDocumentSchema,
+  ticketDecisionAttestationEnvelopeSchema,
   ticketDocumentSchema,
   ticketLedgerProtocolSchema,
   ticketReviewDocumentSchema,
@@ -30,10 +35,14 @@ import {
   type TicketContextRef,
   type TicketDecisionDocument,
   type TicketDecisionDocumentPayload,
+  type TicketDecisionAttestationDocument,
+  type TicketDecisionAttestationDocumentPayload,
+  type TicketDecisionAttestationEnvelope,
   type TicketDocument,
   type TicketLedgerCandidate,
   type TicketLedgerContent,
   type TicketLedgerDecision,
+  type TicketLedgerDecisionAttestation,
   type TicketLedgerProtocol,
   type TicketLedgerReview,
   type TicketLedgerTicket,
@@ -519,6 +528,284 @@ export const normalizeTicketDecisionDocument = (
   return normalized;
 };
 
+export const ticketDecisionDocumentDigest = (
+  candidate: unknown,
+): string =>
+  sha256(canonicalTicketLedgerValue(
+    normalizeTicketDecisionDocument(candidate),
+  ));
+
+const attestationEnvelopeCandidate = (
+  candidate:
+    | TicketDecisionAttestationEnvelope
+    | TicketDecisionAttestationDocumentPayload
+    | TicketDecisionAttestationDocument,
+): unknown => ({
+  schema_version: candidate.schema_version,
+  kind: candidate.kind,
+  decision: candidate.decision,
+  authority: candidate.authority,
+  repository: candidate.repository,
+  scope: candidate.scope,
+  credential: candidate.credential,
+  webauthn: {
+    rp_id: candidate.webauthn.rp_id,
+    origin: candidate.webauthn.origin,
+    algorithm: candidate.webauthn.algorithm,
+  },
+  nonce: candidate.nonce,
+  issued_at: candidate.issued_at,
+  not_before: candidate.not_before,
+  expires_at: candidate.expires_at,
+});
+
+const parseAttestationEnvelope = (
+  candidate: unknown,
+  label: string,
+): TicketDecisionAttestationEnvelope => {
+  const parsed = ticketDecisionAttestationEnvelopeSchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} is invalid: ${formatZodIssues(parsed.error.issues)}`,
+      { label },
+    );
+  }
+  return parsed.data;
+};
+
+const normalizeAttestationEnvelope = (
+  candidate:
+    | TicketDecisionAttestationEnvelope
+    | TicketDecisionAttestationDocumentPayload
+    | TicketDecisionAttestationDocument,
+  label: string,
+): TicketDecisionAttestationEnvelope => {
+  const value = parseAttestationEnvelope(
+    attestationEnvelopeCandidate(candidate),
+    label,
+  );
+  const scope = value.scope.scope_type === "plan_review"
+    ? {
+        scope_type: "plan_review" as const,
+        graph_digest: value.scope.graph_digest,
+        disposition: value.scope.disposition,
+        ...(value.scope.delegated_boundaries === undefined
+          ? {}
+          : {
+              delegated_boundaries: normalizeUniqueText(
+                value.scope.delegated_boundaries,
+                "delegated_boundaries",
+              ),
+            }),
+      }
+    : {
+        scope_type: "protected_boundary" as const,
+        ticket_id: value.scope.ticket_id,
+        ticket_revision: value.scope.ticket_revision,
+        boundary: normalizeText(value.scope.boundary),
+        disposition: value.scope.disposition,
+        ...(value.scope.selection === undefined
+          ? {}
+          : { selection: normalizeText(value.scope.selection) }),
+      };
+  return {
+    schema_version: TICKET_LEDGER_SCHEMA_VERSION,
+    kind: "ticket_decision_attestation",
+    decision: {
+      decision_id: value.decision.decision_id,
+      document_path: normalizeText(value.decision.document_path),
+      document_digest: value.decision.document_digest,
+    },
+    authority: {
+      principal_id: normalizeText(value.authority.principal_id),
+      principal_kind: "human",
+      basis: value.authority.basis,
+      basis_ref: normalizeText(value.authority.basis_ref),
+    },
+    repository: {
+      repository_incarnation: value.repository.repository_incarnation,
+      repository_root: normalizeText(value.repository.repository_root),
+      worktree_identity: value.repository.worktree_identity,
+      worktree_root: normalizeText(value.repository.worktree_root),
+      checkout: value.repository.checkout.mode === "branch"
+        ? {
+            mode: "branch",
+            branch: normalizeText(value.repository.checkout.branch),
+          }
+        : { ...value.repository.checkout },
+    },
+    scope,
+    credential: { ...value.credential },
+    webauthn: { ...value.webauthn },
+    nonce: value.nonce,
+    issued_at: normalizeInstant(value.issued_at),
+    not_before: normalizeInstant(value.not_before),
+    expires_at: normalizeInstant(value.expires_at),
+  };
+};
+
+export const normalizeTicketDecisionAttestationEnvelope = (
+  candidate:
+    | TicketDecisionAttestationEnvelope
+    | TicketDecisionAttestationDocumentPayload
+    | TicketDecisionAttestationDocument,
+  label = "Ticket decision attestation envelope",
+): TicketDecisionAttestationEnvelope =>
+  normalizeAttestationEnvelope(candidate, label);
+
+export const ticketDecisionAttestationChallenge = (
+  candidate:
+    | TicketDecisionAttestationEnvelope
+    | TicketDecisionAttestationDocumentPayload
+    | TicketDecisionAttestationDocument,
+): string => {
+  const envelope = normalizeAttestationEnvelope(
+    candidate,
+    "Ticket decision attestation challenge envelope",
+  );
+  return Buffer.from(
+    sha256(canonicalTicketLedgerValue(envelope)),
+    "hex",
+  ).toString("base64url");
+};
+
+const parseAttestationPayload = (
+  candidate: unknown,
+  label: string,
+): TicketDecisionAttestationDocumentPayload => {
+  const parsed =
+    ticketDecisionAttestationDocumentPayloadSchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} is invalid: ${formatZodIssues(parsed.error.issues)}`,
+      { label },
+    );
+  }
+  return parsed.data;
+};
+
+const assertAttestationClientData = (
+  payload: TicketDecisionAttestationDocumentPayload,
+  label: string,
+): void => {
+  const bytes = Buffer.from(payload.webauthn.client_data_json, "base64url");
+  const source = bytes.toString("utf8");
+  if (!Buffer.from(source, "utf8").equals(bytes)) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label}.webauthn.client_data_json is not valid UTF-8`,
+      { label },
+    );
+  }
+  let value: unknown;
+  try {
+    value = JSON.parse(source);
+  } catch (cause) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label}.webauthn.client_data_json is not valid JSON`,
+      { label },
+      { cause },
+    );
+  }
+  if (
+    typeof value !== "object"
+    || value === null
+    || Array.isArray(value)
+  ) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label}.webauthn.client_data_json must decode to an object`,
+      { label },
+    );
+  }
+  const clientData = value as Record<string, unknown>;
+  const expectedChallenge = ticketDecisionAttestationChallenge(payload);
+  if (
+    clientData.type !== "webauthn.get"
+    || clientData.challenge !== expectedChallenge
+    || clientData.origin !== payload.webauthn.origin
+    || clientData.crossOrigin !== false
+  ) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label}.webauthn.client_data_json does not bind the exact attestation envelope`,
+      {
+        label,
+        expectedType: "webauthn.get",
+        expectedChallenge,
+        expectedOrigin: payload.webauthn.origin,
+        expectedCrossOrigin: false,
+      },
+    );
+  }
+};
+
+const normalizeAttestationPayload = (
+  candidate: unknown,
+  label: string,
+): TicketDecisionAttestationDocumentPayload => {
+  const value = parseAttestationPayload(candidate, label);
+  const envelope = normalizeAttestationEnvelope(value, label);
+  const normalized: TicketDecisionAttestationDocumentPayload = {
+    ...envelope,
+    webauthn: {
+      ...envelope.webauthn,
+      client_data_json: value.webauthn.client_data_json,
+      authenticator_data: value.webauthn.authenticator_data,
+      signature: value.webauthn.signature,
+    },
+  };
+  assertAttestationClientData(normalized, label);
+  return normalized;
+};
+
+const attestationIdentity = (
+  document: TicketDecisionAttestationDocumentPayload,
+): string =>
+  `tda-${sha256(canonicalTicketLedgerValue(document))}`;
+
+export const createTicketDecisionAttestationDocument = (
+  candidate: TicketDecisionAttestationDocumentPayload,
+  label = "Ticket decision attestation payload",
+): TicketDecisionAttestationDocument => {
+  const payload = normalizeAttestationPayload(candidate, label);
+  return {
+    ...payload,
+    attestation_id: attestationIdentity(payload),
+  };
+};
+
+export const normalizeTicketDecisionAttestationDocument = (
+  candidate: unknown,
+  label = "Ticket decision attestation document",
+): TicketDecisionAttestationDocument => {
+  const parsed = ticketDecisionAttestationDocumentSchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} is invalid: ${formatZodIssues(parsed.error.issues)}`,
+      { label },
+    );
+  }
+  const { attestation_id: _attestationId, ...payload } = parsed.data;
+  const normalized = createTicketDecisionAttestationDocument(payload, label);
+  if (parsed.data.attestation_id !== normalized.attestation_id) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} attestation_id does not match its normalized content`,
+      {
+        label,
+        attestationId: parsed.data.attestation_id,
+        expectedAttestationId: normalized.attestation_id,
+      },
+    );
+  }
+  return normalized;
+};
+
 export const ticketDocumentPath = (ticketId: string): string => {
   const parsed = ticketDocumentSchema.shape.ticket_id.safeParse(ticketId);
   if (!parsed.success) {
@@ -554,6 +841,33 @@ export const ticketDecisionDocumentPath = (
     ticketDecisionSubjectDigest(document)
   }.yaml`;
 
+export const ticketDecisionAttestationDocumentPath = (
+  document: Pick<
+    TicketDecisionAttestationDocument,
+    "attestation_id" | "decision"
+  >,
+): string => {
+  const decisionId = document.decision.decision_id;
+  const attestationId = document.attestation_id;
+  if (!/^tdc-[0-9a-f]{64}$/u.test(decisionId)) {
+    throw new TicketLedgerError(
+      "invalid_path",
+      `Invalid Decision ID for attestation path: ${decisionId}`,
+      { decisionId },
+    );
+  }
+  if (!/^tda-[0-9a-f]{64}$/u.test(attestationId)) {
+    throw new TicketLedgerError(
+      "invalid_path",
+      `Invalid attestation ID for document path: ${attestationId}`,
+      { attestationId },
+    );
+  }
+  return `${TICKET_LEDGER_RELATIVE_PATH}/attestations/${
+    decisionId
+  }/${attestationId}.yaml`;
+};
+
 export const ticketRevision = (document: TicketDocument): string =>
   sha256(canonicalTicketLedgerValue(document));
 
@@ -578,6 +892,17 @@ export const encodeTicketReviewDocument = (candidate: unknown): Buffer =>
 export const encodeTicketDecisionDocument = (candidate: unknown): Buffer =>
   Buffer.from(
     stringify(normalizeTicketDecisionDocument(candidate), {
+      lineWidth: 0,
+      version: "1.2",
+    }),
+    "utf8",
+  );
+
+export const encodeTicketDecisionAttestationDocument = (
+  candidate: unknown,
+): Buffer =>
+  Buffer.from(
+    stringify(normalizeTicketDecisionAttestationDocument(candidate), {
       lineWidth: 0,
       version: "1.2",
     }),
@@ -815,17 +1140,61 @@ export const validateTicketLedger = (
   decisions.sort((left, right) =>
     compareText(left.document.decision_id, right.document.decision_id));
 
+  const attestationCandidates = candidate.attestations ?? [];
+  if (attestationCandidates.length > TICKET_LEDGER_MAX_ATTESTATIONS) {
+    throw new TicketLedgerError(
+      "ledger_too_large",
+      `Ticket ledger contains more than ${TICKET_LEDGER_MAX_ATTESTATIONS} decision attestations`,
+      { attestationCount: attestationCandidates.length },
+    );
+  }
+  const attestations: TicketLedgerDecisionAttestation[] =
+    attestationCandidates.map(({ documentPath, document }) => {
+      const normalized = normalizeTicketDecisionAttestationDocument(
+        document,
+        documentPath,
+      );
+      const expectedPath =
+        ticketDecisionAttestationDocumentPath(normalized);
+      if (documentPath !== expectedPath) {
+        throw new TicketLedgerError(
+          "invalid_path",
+          `Attestation ${normalized.attestation_id} must be stored at ${expectedPath}`,
+          {
+            documentPath,
+            expectedPath,
+            decisionId: normalized.decision.decision_id,
+            attestationId: normalized.attestation_id,
+          },
+        );
+      }
+      return { documentPath, document: normalized };
+    });
+  uniqueBy(
+    attestations,
+    (attestation) => attestation.document.attestation_id,
+    "Ticket decision attestation ledger",
+  );
+  attestations.sort((left, right) =>
+    compareText(
+      left.document.attestation_id,
+      right.document.attestation_id,
+    ));
+
   const semanticLedgerDigest = sha256(canonicalTicketLedgerValue({
     protocol,
     tickets: tickets.map((ticket) => ticket.document),
     reviews: reviews.map((review) => review.document),
     decisions: decisions.map((decision) => decision.document),
+    attestations: attestations.map((attestation) =>
+      attestation.document),
   }));
   return {
     protocol,
     tickets,
     reviews,
     decisions,
+    attestations,
     graphDigest,
     semanticLedgerDigest,
   };
@@ -980,6 +1349,8 @@ export const decodeTicketLedger = (
   const ticketPrefix = `${TICKET_LEDGER_RELATIVE_PATH}/tickets/`;
   const reviewPrefix = `${TICKET_LEDGER_RELATIVE_PATH}/reviews/`;
   const decisionPrefix = `${TICKET_LEDGER_RELATIVE_PATH}/decisions/`;
+  const attestationPrefix =
+    `${TICKET_LEDGER_RELATIVE_PATH}/attestations/`;
   const ticketFiles = documentFiles.filter((file) =>
     file.documentPath.startsWith(ticketPrefix));
   if (ticketFiles.length > TICKET_LEDGER_MAX_TICKETS) {
@@ -1031,7 +1402,30 @@ export const decodeTicketLedger = (
       TICKET_LEDGER_DECISION_MAX_BYTES,
     ),
   }));
-  return validateTicketLedger({ protocol, tickets, reviews, decisions });
+  const attestationFiles = documentFiles.filter((file) =>
+    file.documentPath.startsWith(attestationPrefix));
+  if (attestationFiles.length > TICKET_LEDGER_MAX_ATTESTATIONS) {
+    throw new TicketLedgerError(
+      "ledger_too_large",
+      `Ticket ledger contains more than ${TICKET_LEDGER_MAX_ATTESTATIONS} attestation files`,
+      { attestationCount: attestationFiles.length },
+    );
+  }
+  const attestations = attestationFiles.map((file) => ({
+    documentPath: file.documentPath,
+    document: parseYamlDocument(
+      file.bytes,
+      file.documentPath,
+      TICKET_LEDGER_ATTESTATION_MAX_BYTES,
+    ),
+  }));
+  return validateTicketLedger({
+    protocol,
+    tickets,
+    reviews,
+    decisions,
+    attestations,
+  });
 };
 
 export const ticketLedgerSourceToken = (
@@ -1096,6 +1490,15 @@ export const isTicketLedgerDocumentPath = (
     const fileName = repositoryRelativePath.slice(decisionPrefix.length);
     return /^[0-9a-f]{64}\.yaml$/u.test(fileName);
   }
+  const attestationPrefix =
+    `${TICKET_LEDGER_RELATIVE_PATH}/attestations/`;
+  if (repositoryRelativePath.startsWith(attestationPrefix)) {
+    const relative = repositoryRelativePath.slice(attestationPrefix.length);
+    const segments = relative.split("/");
+    return segments.length === 2
+      && /^tdc-[0-9a-f]{64}$/u.test(segments[0]!)
+      && /^tda-[0-9a-f]{64}\.yaml$/u.test(segments[1]!);
+  }
   return false;
 };
 
@@ -1113,6 +1516,13 @@ export const ticketLedgerDocumentMaxBytes = (
   }
   if (documentPath.startsWith(`${TICKET_LEDGER_RELATIVE_PATH}/decisions/`)) {
     return TICKET_LEDGER_DECISION_MAX_BYTES;
+  }
+  if (
+    documentPath.startsWith(
+      `${TICKET_LEDGER_RELATIVE_PATH}/attestations/`,
+    )
+  ) {
+    return TICKET_LEDGER_ATTESTATION_MAX_BYTES;
   }
   throw new TicketLedgerError(
     "invalid_path",

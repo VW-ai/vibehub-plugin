@@ -10,7 +10,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-validate"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-review","vibehub-ticket-validate"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -18,7 +18,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
-    expect(entry).toHaveLength(9);
+    expect(entry).toHaveLength(10);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -571,6 +571,80 @@ describe("production skill package",()=>{
         code:"validation_error",
         message:"unsupported ticket operation: proposal.submit",
       },
+    });
+  });
+
+  it("prefers the installed plugin runtime for Ticket review over PATH",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-review-runtime-"));
+    const plugin=path.join(temp,"plugin");
+    const scripts=path.join(plugin,"skills","scripts");
+    const runtime=path.join(plugin,"runtime","vibehub-runtime.mjs");
+    const bin=path.join(temp,"bin");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(runtime),{recursive:true});
+    fs.mkdirSync(bin);
+    fs.writeFileSync(
+      runtime,
+      "process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2)}}));\n",
+    );
+    const stale=path.join(bin,"vibehub");
+    fs.writeFileSync(stale,"#!/bin/sh\nprintf '%s\\n' 'PATH fallback used'\n");
+    fs.chmodSync(stale,0o755);
+    const run=spawnSync(process.execPath,[
+      path.join(scripts,"vh-ticket-review.mjs"),
+      "--repo",temp,"--no-open","--json",
+    ],{
+      encoding:"utf8",
+      env:{
+        ...process.env,
+        PATH:`${bin}:${process.env.PATH??""}`,
+        VIBEHUB_BIN:undefined,
+      },
+    });
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data.argv).toEqual([
+      "cli","ticket","review","--repo",temp,"--no-open","--json",
+    ]);
+  });
+
+  it("prefers the source-tree CLI for Ticket review over runtime and PATH",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-review-source-"));
+    const scripts=path.join(temp,"skills","scripts");
+    const localCli=path.join(temp,"packages","cli","dist","main.js");
+    const runtime=path.join(temp,"runtime","vibehub-runtime.mjs");
+    const bin=path.join(temp,"bin");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(localCli),{recursive:true});
+    fs.mkdirSync(path.dirname(runtime),{recursive:true});
+    fs.mkdirSync(bin);
+    fs.writeFileSync(
+      localCli,
+      "process.stdout.write(JSON.stringify({ok:true,data:{source:'checkout',argv:process.argv.slice(2)}}));\n",
+    );
+    fs.writeFileSync(
+      runtime,
+      "process.stdout.write(JSON.stringify({ok:true,data:{source:'runtime'}}));\n",
+    );
+    const stale=path.join(bin,"vibehub");
+    fs.writeFileSync(stale,"#!/bin/sh\nprintf '%s\\n' 'PATH fallback used'\n");
+    fs.chmodSync(stale,0o755);
+    const run=spawnSync(process.execPath,[
+      path.join(scripts,"vh-ticket-review.mjs"),
+      "--repo",temp,"--no-open","--json",
+    ],{
+      encoding:"utf8",
+      env:{
+        ...process.env,
+        PATH:`${bin}:${process.env.PATH??""}`,
+        VIBEHUB_BIN:undefined,
+      },
+    });
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      source:"checkout",
+      argv:["ticket","review","--repo",temp,"--no-open","--json"],
     });
   });
 

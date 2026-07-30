@@ -67,7 +67,9 @@ export async function run(group, registry, argv) {
   process.exit(child.status);
 }
 
-export function resolveVibehubInvocation() {
+export function resolveVibehubInvocation({
+  allowPluginRuntime = false,
+} = {}) {
   if(process.env.VIBEHUB_BIN){
     return {command:process.env.VIBEHUB_BIN,prefix:[]};
   }
@@ -80,9 +82,14 @@ export function resolveVibehubInvocation() {
     candidate,
     {throwIfNoEntry:false},
   )?.isFile());
-  return local
-    ? {command:process.execPath,prefix:[local]}
-    : {command:"vibehub",prefix:[]};
+  if(local)return {command:process.execPath,prefix:[local]};
+  if(allowPluginRuntime){
+    const runtime=path.resolve(here,"../../runtime/vibehub-runtime.mjs");
+    if(fs.statSync(runtime,{throwIfNoEntry:false})?.isFile()){
+      return {command:process.execPath,prefix:[runtime,"cli"]};
+    }
+  }
+  return {command:"vibehub",prefix:[]};
 }
 
 function diagnostic(value) {

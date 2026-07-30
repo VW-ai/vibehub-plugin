@@ -8,6 +8,7 @@ import {
 } from "../git-facade.js";
 import {
   TICKET_LEDGER_MAX_BYTES,
+  TICKET_LEDGER_MAX_ATTESTATIONS,
   TICKET_LEDGER_MAX_DECISIONS,
   TICKET_LEDGER_MAX_DIRTY_PATHS,
   TICKET_LEDGER_MAX_REVIEWS,
@@ -287,6 +288,7 @@ const readWorktreeInventory = (worktreeRoot: string): InventoryFile[] => {
       entry.name === "tickets"
       || entry.name === "reviews"
       || entry.name === "decisions"
+      || entry.name === "attestations"
     ) {
       if (entry.isSymbolicLink()) {
         throw new TicketLedgerError(
@@ -480,6 +482,92 @@ const readWorktreeInventory = (worktreeRoot: string): InventoryFile[] => {
     }
   }
 
+  const attestationsDirectory = path.join(ledgerRoot, "attestations");
+  if (fs.existsSync(attestationsDirectory)) {
+    ensureDirectory(attestationsDirectory, false);
+    let decisionEntries: fs.Dirent[];
+    try {
+      decisionEntries = fs.readdirSync(attestationsDirectory, {
+        withFileTypes: true,
+      });
+    } catch (cause) {
+      throw new TicketLedgerError(
+        "io",
+        `Cannot list Ticket decision attestations at ${attestationsDirectory}`,
+        { path: attestationsDirectory },
+        { cause },
+      );
+    }
+    if (decisionEntries.length > TICKET_LEDGER_MAX_ATTESTATIONS) {
+      throw new TicketLedgerError(
+        "ledger_too_large",
+        `Ticket ledger contains more than ${TICKET_LEDGER_MAX_ATTESTATIONS} attestation Decision directories`,
+        { attestationDecisionCount: decisionEntries.length },
+      );
+    }
+    let attestationCount = 0;
+    for (const decisionEntry of decisionEntries) {
+      const decisionPath =
+        `${TICKET_LEDGER_RELATIVE_PATH}/attestations/${decisionEntry.name}`;
+      if (decisionEntry.isSymbolicLink()) {
+        throw new TicketLedgerError(
+          "symlink",
+          `Ticket attestation Decision directory cannot be a symlink: ${decisionPath}`,
+          { documentPath: decisionPath },
+        );
+      }
+      if (
+        !decisionEntry.isDirectory()
+        || !/^tdc-[0-9a-f]{64}$/u.test(decisionEntry.name)
+      ) {
+        unsupportedPath(decisionPath);
+      }
+      const decisionDirectory = path.join(
+        attestationsDirectory,
+        decisionEntry.name,
+      );
+      ensureDirectory(decisionDirectory, false);
+      let attestationEntries: fs.Dirent[];
+      try {
+        attestationEntries = fs.readdirSync(decisionDirectory, {
+          withFileTypes: true,
+        });
+      } catch (cause) {
+        throw new TicketLedgerError(
+          "io",
+          `Cannot list Ticket attestations at ${decisionDirectory}`,
+          { path: decisionDirectory },
+          { cause },
+        );
+      }
+      attestationCount += attestationEntries.length;
+      if (attestationCount > TICKET_LEDGER_MAX_ATTESTATIONS) {
+        throw new TicketLedgerError(
+          "ledger_too_large",
+          `Ticket ledger contains more than ${TICKET_LEDGER_MAX_ATTESTATIONS} attestation files`,
+          { attestationCount },
+        );
+      }
+      for (const entry of attestationEntries) {
+        const documentPath = `${decisionPath}/${entry.name}`;
+        if (entry.isSymbolicLink()) {
+          throw new TicketLedgerError(
+            "symlink",
+            `Ticket decision attestation cannot be a symlink: ${documentPath}`,
+            { documentPath },
+          );
+        }
+        if (!entry.isFile() || !isTicketLedgerDocumentPath(documentPath)) {
+          unsupportedPath(documentPath);
+        }
+        addFile(readRegularFile(
+          path.join(decisionDirectory, entry.name),
+          documentPath,
+        ));
+      }
+    }
+  }
+
   return inventory.sort((left, right) =>
     Buffer.compare(
       Buffer.from(left.documentPath, "utf8"),
@@ -555,6 +643,7 @@ const treeInventoryAtCommit = (
     > TICKET_LEDGER_MAX_TICKETS
       + TICKET_LEDGER_MAX_REVIEWS
       + TICKET_LEDGER_MAX_DECISIONS
+      + TICKET_LEDGER_MAX_ATTESTATIONS
       + 1
   ) {
     throw new TicketLedgerError(

@@ -1,4 +1,5 @@
 import {
+  FileTicketDecisionAttestationTrustProfileResolverV0,
   GitFacade,
   getRepoByRoot,
   openDb,
@@ -56,7 +57,14 @@ export function openRuntimeContext(
       });
     }
     return {
-      context: { db, repoId: repo.id, taskId, repoRoot: session.toplevel },
+      context: {
+        db,
+        repoId: repo.id,
+        taskId,
+        repoRoot: session.toplevel,
+        ticketDecisionAttestationTrustProfiles:
+          new FileTicketDecisionAttestationTrustProfileResolverV0(),
+      },
       close: () => db.close(),
     };
   } catch (error) {
