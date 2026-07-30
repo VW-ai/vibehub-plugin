@@ -2,20 +2,22 @@ schema_version: 1
 kind: ticket
 ticket_id: ticket-context-binding-decided
 outcome: The repository has an accepted exact Feature Room and repository context-binding contract that lets a Ticket revision compile a bounded execution packet and fail closed on missing, stale, ambiguous, or oversized required context.
-context: decision-ticket-context-binding-001 remains an unresolved P0 question and blocks a trustworthy fresh-Agent execution handoff. The decision must identify exact Spec revisions, mapping identity, repository source, dependency facts, and the reason each binding is required; define drift and invalidation; and connect execution evidence back to governing semantics. This is a protected architecture and product-semantics decision. An Agent may prepare options and objective evidence but must not silently ratify one. The first contract should exploit Feature Room guarantees rather than generalizing prematurely.
+context: decision-ticket-context-binding-001 remains an unresolved P0 question and blocks a trustworthy fresh-Agent execution handoff. The decision must identify exact Spec revisions, mapping identity, repository source, dependency facts, and the reason each binding is required; define drift and invalidation; and connect execution evidence back to governing semantics. This is a protected architecture and product-semantics decision. An Agent may prepare options and objective evidence but must not silently ratify one. Before this Ticket can accept a successor, the installed Plugin must be able to preserve and independently verify the exact human ratification across a fresh process; repository-editable Decision YAML or an in-memory host receipt is not sufficient authority. The first contract should exploit Feature Room guarantees rather than generalizing prematurely.
 acceptance:
   - acceptance_id: packet-boundary
     criterion: The contract defines deterministic packet contents and bounds, required versus optional facts, and fail-closed behavior for missing, stale, ambiguous, conflicting, or oversized context.
   - acceptance_id: semantic-linkage
     criterion: The contract explains how an execution attempt and its evidence bind back to the exact Ticket, Feature Room facts, mapping, and repository source the Agent received.
   - acceptance_id: successor-ratified
-    criterion: An exact successor resolves decision-ticket-context-binding-001, passes machine validation, and has separate durable evidence that the repository owner or designated human authority ratified that exact successor and its recorded identities, revision bindings, drift rules, and rationale.
+    criterion: An exact successor resolves decision-ticket-context-binding-001, passes machine validation, and carries durable human-attestation evidence that a fresh authorized process independently verifies against that exact successor, principal, repository, worktree, ref, boundary, selection, revision bindings, drift rules, and rationale.
 constraints:
   - Feature Room is the first semantic provider; future extensibility must not weaken its available guarantees.
   - Conversation memory cannot satisfy a missing durable binding.
   - The contract must preserve Git worktree and branch semantic isolation.
-  - Execution cannot proceed by treating an explored option as an accepted decision.
+  - Execution cannot proceed by treating an explored option, repository-editable Decision claim, or process-local receipt as an accepted decision.
 context_refs:
+  - ref: META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml
+    purpose: Defines the fresh-process authority evidence that must exist before this protected successor can be ratified.
   - ref: META/09-ticket-runtime/specs/decision-ticket-context-binding-001.yaml
     purpose: Owns the unresolved protected context-binding question.
   - ref: META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml
@@ -24,8 +26,12 @@ context_refs:
     purpose: Defines canonical Specs, revisions, placement, and source-kind semantics.
   - ref: skills/vibehub-query/SKILL.md
     purpose: Defines governed context retrieval and truth-layer distinctions.
-relations: []
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-durable-decision-attestation-ready
+    rationale: This protected contract cannot be accepted truthfully until its exact human ratification remains independently verifiable after the trusted host process exits.
 provenance_refs:
   - META/09-ticket-runtime/spec.md
+  - META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml
   - META/09-ticket-runtime/specs/decision-ticket-context-binding-001.yaml
   - META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml

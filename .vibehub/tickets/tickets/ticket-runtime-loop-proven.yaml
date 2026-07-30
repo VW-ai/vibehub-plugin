@@ -37,9 +37,6 @@ relations:
   - type: depends_on
     target_ticket_id: ticket-execution-closeout-ready
     rationale: A real end-to-end proof requires exact execution, verification, durable Outcome and Evidence, and honest success or deviation behavior.
-  - type: depends_on
-    target_ticket_id: ticket-git-review-intervention-ready
-    rationale: The complete proof must preserve the accepted human graph review and Git-native intervention experience.
 provenance_refs:
   - META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md
   - META/09-ticket-runtime/progress.yaml
