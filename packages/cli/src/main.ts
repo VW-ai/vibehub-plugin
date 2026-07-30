@@ -23,12 +23,14 @@ import {
   applyIntervention,
   CURRENT_SCHEMA_VERSION,
   commitSemanticCheckpoint,
+  commitTicketCheckpoint,
   exportTeamMapSnapshot,
   GitFacade,
   ingestCanonicalHookEvent,
   migrateSqliteSemanticStoreToGit,
   openDb,
   prepareSemanticCheckpoint,
+  prepareTicketCheckpoint,
   projectDoctorReceipt,
   projectInitReceipt,
   projectInjectionInterventionReceipt,
@@ -105,8 +107,8 @@ const USAGE = `usage:
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
   vibehub kb <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub kb migrate-store --json [--repo <path>] [--db <path>]
-  vibehub checkpoint prepare --json [--repo <path>] [--protect <branch>]
-  vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
+  vibehub checkpoint prepare --json [--scope semantic|ticket] [--input <selection-json>] [--repo <path>] [--protect <branch>]
+  vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--scope semantic|ticket] [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
   vibehub distill <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub ticket <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub ticket review [--repo <path>] [--db <path>] [--port <port>] [--no-open] [--json]
@@ -196,10 +198,12 @@ function runOperation(
     const session=GitFacade.sessionContextAt(flags.repo);
     const root=session.repoRoot;
     const row=flags.repoId?{id:flags.repoId}:db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(root) as {id:number}|undefined;
-    const isTicketRead = canonicalOperation === "ticket.graph.snapshot"
+    const isGitNativeTicketOperation =
+      canonicalOperation === "ticket.graph.snapshot"
       || canonicalOperation === "ticket.subject.inspect"
-      || canonicalOperation === "ticket.trace.list";
-    const repoId=row?.id??(isTicketRead ? 1 : 0);
+      || canonicalOperation === "ticket.trace.list"
+      || canonicalOperation === "ticket.worktree.patch";
+    const repoId=row?.id??(isGitNativeTicketOperation ? 1 : 0);
     const result=new OperationDispatcher(db,{repoRoot:session.toplevel}).dispatch(canonicalOperation,{repoId,actor:flags.actor,taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
     process.stdout.write(`${JSON.stringify(result)}\n`);
     return result.ok?0:(OPERATION_EXIT_CLASS[result.error.code]??1);
@@ -261,6 +265,7 @@ function runSemanticMigration(argv:string[]):number{
 interface CheckpointCliFlags {
   repo: string;
   json: boolean;
+  scope: "semantic" | "ticket";
   input?: string;
   actor?: string;
   taskId?: string;
@@ -268,9 +273,12 @@ interface CheckpointCliFlags {
   protectedBranches: string[];
 }
 
+const CHECKPOINT_INPUT_MAX_BYTES = 1024 * 1024;
+
 function parseCheckpointFlags(argv: string[]): CheckpointCliFlags {
   let repo = process.cwd();
   let json = false;
+  let scope: "semantic" | "ticket" = "semantic";
   let input: string | undefined;
   let actor: string | undefined;
   let taskId: string | undefined;
@@ -285,6 +293,13 @@ function parseCheckpointFlags(argv: string[]): CheckpointCliFlags {
     };
     if (flag === "--repo") repo = take();
     else if (flag === "--json") json = true;
+    else if (flag === "--scope") {
+      const value = take();
+      if (value !== "semantic" && value !== "ticket") {
+        throw new Error("--scope must be semantic or ticket");
+      }
+      scope = value;
+    }
     else if (flag === "--input") input = take();
     else if (flag === "--actor") actor = take();
     else if (flag === "--task") taskId = take();
@@ -293,11 +308,29 @@ function parseCheckpointFlags(argv: string[]): CheckpointCliFlags {
     else throw new Error(`unknown flag: ${flag}`);
   }
   if (!json) throw new Error("checkpoint operations require --json");
-  if (input === "-") input = readStdin().trim();
-  return { repo, json, input, actor, taskId, requestId, protectedBranches };
+  if (input === "-") {
+    input = readStdinBounded(CHECKPOINT_INPUT_MAX_BYTES).trim();
+  } else if (
+    input !== undefined
+    && Buffer.byteLength(input, "utf8") > CHECKPOINT_INPUT_MAX_BYTES
+  ) {
+    throw new Error(
+      `checkpoint raw JSON input exceeds ${CHECKPOINT_INPUT_MAX_BYTES} bytes`,
+    );
+  }
+  return {
+    repo,
+    json,
+    scope,
+    input,
+    actor,
+    taskId,
+    requestId,
+    protectedBranches,
+  };
 }
 
-function runSemanticCheckpoint(
+function runCheckpoint(
   operation: string | undefined,
   argv: string[],
 ): number {
@@ -307,22 +340,46 @@ function runSemanticCheckpoint(
     }
     const flags = parseCheckpointFlags(argv);
     const session = GitFacade.sessionContextAt(flags.repo);
-    const data = operation === "prepare"
-      ? prepareSemanticCheckpoint({
-        repoRoot: session.toplevel,
-        protectedBranches: flags.protectedBranches,
-      })
-      : commitSemanticCheckpoint({
-        repoRoot: session.toplevel,
-        receipt: JSON.parse(flags.input ?? "") as Parameters<
-          typeof commitSemanticCheckpoint
-        >[0]["receipt"],
-        actor: flags.actor ?? "",
-        ...(flags.taskId ? { taskId: flags.taskId } : {}),
-        requestId: flags.requestId,
-        now: new Date().toISOString(),
-        protectedBranches: flags.protectedBranches,
-      });
+    const needsInput = operation === "commit" || flags.scope === "ticket";
+    const parsedInput = needsInput
+      ? JSON.parse(flags.input ?? "") as unknown
+      : undefined;
+    const data = flags.scope === "ticket"
+      ? operation === "prepare"
+        ? prepareTicketCheckpoint({
+            repoRoot: session.toplevel,
+            checkpointSelection: parsedInput as Parameters<
+              typeof prepareTicketCheckpoint
+            >[0]["checkpointSelection"],
+            protectedBranches: flags.protectedBranches,
+          })
+        : commitTicketCheckpoint({
+            repoRoot: session.toplevel,
+            receipt: parsedInput as Parameters<
+              typeof commitTicketCheckpoint
+            >[0]["receipt"],
+            actor: flags.actor ?? "",
+            ...(flags.taskId ? { taskId: flags.taskId } : {}),
+            requestId: flags.requestId,
+            now: new Date().toISOString(),
+            protectedBranches: flags.protectedBranches,
+          })
+      : operation === "prepare"
+        ? prepareSemanticCheckpoint({
+            repoRoot: session.toplevel,
+            protectedBranches: flags.protectedBranches,
+          })
+        : commitSemanticCheckpoint({
+            repoRoot: session.toplevel,
+            receipt: parsedInput as Parameters<
+              typeof commitSemanticCheckpoint
+            >[0]["receipt"],
+            actor: flags.actor ?? "",
+            ...(flags.taskId ? { taskId: flags.taskId } : {}),
+            requestId: flags.requestId,
+            now: new Date().toISOString(),
+            protectedBranches: flags.protectedBranches,
+          });
     process.stdout.write(`${JSON.stringify({ ok: true, data })}\n`);
     return 0;
   } catch (error) {
@@ -461,7 +518,7 @@ function printSnapshot(flags: Flags): number {
 
 export function main(argv: string[]): number {
   const [group, cmd, ...rest] = argv;
-  if (group === "checkpoint") return runSemanticCheckpoint(cmd, rest);
+  if (group === "checkpoint") return runCheckpoint(cmd, rest);
   if (group === "ticket" && cmd === "review") {
     try {
       launchTicketReviewHostCommand(rest);

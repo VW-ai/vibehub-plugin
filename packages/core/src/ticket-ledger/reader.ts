@@ -21,9 +21,12 @@ import {
 import {
   decodeTicketLedger,
   isTicketLedgerDocumentPath,
+  ticketLedgerCheckpointInventoryDigest,
+  ticketLedgerInventoryDigest,
   ticketLedgerSourceToken,
   type TicketLedgerFile,
 } from "./codec.js";
+import { readTicketLedgerFileBounded } from "./file-io.js";
 
 interface InventoryFile extends TicketLedgerFile {
   mode: number | string;
@@ -148,17 +151,37 @@ const readRegularFile = (
   documentPath: string,
 ): InventoryFile => {
   const noFollow = fs.constants.O_NOFOLLOW ?? 0;
+  const nonBlock = fs.constants.O_NONBLOCK ?? 0;
   let descriptor: number | null = null;
   try {
-    descriptor = fs.openSync(
-      absolutePath,
-      fs.constants.O_RDONLY | noFollow,
-    );
-    const stat = fs.fstatSync(descriptor);
-    if (!stat.isFile()) {
+    const before = fs.lstatSync(absolutePath);
+    if (before.isSymbolicLink()) {
+      throw new TicketLedgerError(
+        "symlink",
+        `Ticket ledger document cannot be a symlink: ${documentPath}`,
+        { documentPath },
+      );
+    }
+    if (!before.isFile()) {
       throw new TicketLedgerError(
         "unsupported_file",
         `Ticket ledger document is not a regular file: ${documentPath}`,
+        { documentPath },
+      );
+    }
+    descriptor = fs.openSync(
+      absolutePath,
+      fs.constants.O_RDONLY | noFollow | nonBlock,
+    );
+    const stat = fs.fstatSync(descriptor);
+    if (
+      !stat.isFile()
+      || stat.dev !== before.dev
+      || stat.ino !== before.ino
+    ) {
+      throw new TicketLedgerError(
+        "unsupported_file",
+        `Ticket ledger document changed type or identity while opening: ${documentPath}`,
         { documentPath },
       );
     }
@@ -175,7 +198,11 @@ const readRegularFile = (
     return {
       documentPath,
       mode: stat.mode & 0o7777,
-      bytes: fs.readFileSync(descriptor),
+      bytes: readTicketLedgerFileBounded(
+        descriptor,
+        documentPath,
+        maxBytes,
+      ),
     };
   } catch (cause) {
     if (cause instanceof TicketLedgerError) throw cause;
@@ -614,12 +641,15 @@ export const loadTicketLedgerFromWorktree = (
     );
   }
   const dirty = dirtyPaths(stable.status);
+  const checkpointInventoryDigest =
+    ticketLedgerCheckpointInventoryDigest(stable.inventory);
   const sourceToken = ticketLedgerSourceToken({
     mode: "worktree",
     repositoryIncarnation: repository.repositoryIncarnation,
     worktreeIdentity,
     resolvedCommit: stable.head,
     graphDigest: content.graphDigest,
+    inventoryDigest: ticketLedgerInventoryDigest(stable.inventory),
   });
 
   return {
@@ -633,6 +663,7 @@ export const loadTicketLedgerFromWorktree = (
       resolvedCommit: stable.head,
       graphDigest: content.graphDigest,
       committedGraphDigest,
+      checkpointInventoryDigest,
       semanticDirty: committedGraphDigest !== content.graphDigest,
       dirtyPaths: dirty.paths,
       dirtyPathsTruncated: dirty.truncated,
@@ -660,12 +691,16 @@ export const loadTicketLedgerAtRef = (
     }
     throw cause;
   }
-  const content = readContentAtCommit(repositoryPath, resolvedCommit);
+  const inventory = treeInventoryAtCommit(repositoryPath, resolvedCommit);
+  const content = decodeTicketLedger(inventory);
+  const checkpointInventoryDigest =
+    ticketLedgerCheckpointInventoryDigest(inventory);
   const sourceToken = ticketLedgerSourceToken({
     mode: "ref",
     repositoryIncarnation: repository.repositoryIncarnation,
     resolvedCommit,
     graphDigest: content.graphDigest,
+    inventoryDigest: ticketLedgerInventoryDigest(inventory),
   });
   return {
     ...content,
@@ -675,6 +710,7 @@ export const loadTicketLedgerAtRef = (
       requestedRef: ref,
       resolvedCommit,
       graphDigest: content.graphDigest,
+      checkpointInventoryDigest,
       sourceToken,
     },
   };

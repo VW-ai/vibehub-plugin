@@ -3,6 +3,7 @@ import path from "node:path";
 import {
   isScalar,
   parseAllDocuments,
+  stringify,
   visit,
   type Document,
   type ParsedNode,
@@ -40,6 +41,10 @@ type Json =
 export interface TicketLedgerFile {
   documentPath: string;
   bytes: Buffer;
+}
+
+export interface TicketLedgerPhysicalFile extends TicketLedgerFile {
+  mode: number | string;
 }
 
 const sha256 = (value: string | Buffer): string =>
@@ -237,6 +242,54 @@ export const ticketDocumentPath = (ticketId: string): string => {
 
 export const ticketRevision = (document: TicketDocument): string =>
   sha256(canonicalTicketLedgerValue(document));
+
+export const encodeTicketDocument = (candidate: unknown): Buffer =>
+  Buffer.from(
+    stringify(normalizeTicketDocument(candidate), {
+      lineWidth: 0,
+      version: "1.2",
+    }),
+    "utf8",
+  );
+
+export const ticketLedgerInventoryDigest = (
+  files: readonly TicketLedgerPhysicalFile[],
+): string =>
+  sha256(canonicalTicketLedgerValue({
+    schema_version: TICKET_LEDGER_SCHEMA_VERSION,
+    format: TICKET_LEDGER_FORMAT,
+    kind: "ticket_ledger_physical_inventory",
+    files: [...files]
+      .sort((left, right) => compareText(left.documentPath, right.documentPath))
+      .map((file) => ({
+        document_path: file.documentPath,
+        mode: String(file.mode),
+        byte_digest: sha256(file.bytes),
+    })),
+  }));
+
+const gitTreeMode = (mode: number | string): string => {
+  if (typeof mode === "number") {
+    return (mode & 0o111) === 0 ? "100644" : "100755";
+  }
+  return mode === "100755" ? "100755" : "100644";
+};
+
+export const ticketLedgerCheckpointInventoryDigest = (
+  files: readonly TicketLedgerPhysicalFile[],
+): string =>
+  sha256(canonicalTicketLedgerValue({
+    schema_version: TICKET_LEDGER_SCHEMA_VERSION,
+    format: TICKET_LEDGER_FORMAT,
+    kind: "ticket_ledger_git_checkpoint_inventory",
+    files: [...files]
+      .sort((left, right) => compareText(left.documentPath, right.documentPath))
+      .map((file) => ({
+        document_path: file.documentPath,
+        git_mode: gitTreeMode(file.mode),
+        byte_digest: sha256(file.bytes),
+      })),
+  }));
 
 export const ticketRelationId = (
   subjectTicketId: string,
@@ -521,12 +574,14 @@ export const ticketLedgerSourceToken = (
       worktreeIdentity: string;
       resolvedCommit: string;
       graphDigest: string;
+      inventoryDigest: string;
     }
     | {
       mode: "ref";
       repositoryIncarnation: string;
       resolvedCommit: string;
       graphDigest: string;
+      inventoryDigest: string;
     },
 ): string =>
   `tls-${sha256(canonicalTicketLedgerValue({

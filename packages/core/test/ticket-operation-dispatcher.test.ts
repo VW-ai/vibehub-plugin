@@ -122,12 +122,14 @@ describe("Ticket operation dispatcher Git read cut", () => {
       "ticket.graph.snapshot",
       "ticket.subject.inspect",
       "ticket.trace.list",
+      "ticket.worktree.patch",
     ]));
     expect(dispatcher.operations().filter((name) =>
       name.startsWith("ticket."))).toEqual([
       "ticket.graph.snapshot",
       "ticket.subject.inspect",
       "ticket.trace.list",
+      "ticket.worktree.patch",
     ]);
 
     const graph = dispatcher.dispatch(
@@ -233,6 +235,79 @@ describe("Ticket operation dispatcher Git read cut", () => {
       .toMatchObject({
         outcome: "A dirty edit is immediately authoritative.",
       });
+    expect(db.prepare(
+      `SELECT COUNT(*) count FROM operation_request_receipts
+       WHERE operation LIKE 'ticket.%'`,
+    ).get()).toEqual({ count: 0 });
+  });
+
+  it("applies an exact-base patch without DB identity or receipt replay", () => {
+    const { db, dispatcher } = setup();
+    const graph = dispatcher.dispatch(
+      "ticket.graph.snapshot",
+      context("patch-base"),
+      {},
+    );
+    if (!graph.ok) throw new Error(JSON.stringify(graph));
+    const page = graph.data as {
+      source: {
+        sourceToken: string;
+        worktreeIdentity: string;
+        resolvedCommit: string;
+        graphDigest: string;
+      };
+      tickets: Array<{ ticketId: string; ticketRevision: string }>;
+    };
+    const target = page.tickets.find((ticket) =>
+      ticket.ticketId === "read-authority");
+    if (target === undefined) throw new Error("missing patch target");
+    const input = {
+      expectedSource: {
+        sourceToken: page.source.sourceToken,
+        worktreeIdentity: page.source.worktreeIdentity,
+        resolvedCommit: page.source.resolvedCommit,
+        graphDigest: page.source.graphDigest,
+      },
+      changes: [{
+        op: "put",
+        ticketId: "read-authority",
+        expectedTicketRevision: target.ticketRevision,
+        document: {
+          schema_version: 1,
+          kind: "ticket",
+          ticket_id: "read-authority",
+          outcome: "The Skill can safely change the Git Ticket graph.",
+          context: "Use the exact worktree patch capability.",
+          acceptance: [],
+          constraints: [],
+          context_refs: [],
+          relations: [],
+          provenance_refs: ["META/09-ticket-runtime/spec.md"],
+        },
+      }],
+    };
+    const request = context("same-patch-request");
+    expect(dispatcher.dispatch(
+      "ticket.worktree.patch",
+      request,
+      input,
+    )).toMatchObject({
+      ok: true,
+      data: {
+        status: "applied",
+        changedPaths: [
+          ".vibehub/tickets/tickets/read-authority.yaml",
+        ],
+      },
+    });
+    expect(dispatcher.dispatch(
+      "ticket.worktree.patch",
+      request,
+      input,
+    )).toMatchObject({
+      ok: false,
+      error: { code: "ticket_ledger_stale_source" },
+    });
     expect(db.prepare(
       `SELECT COUNT(*) count FROM operation_request_receipts
        WHERE operation LIKE 'ticket.%'`,

@@ -9,6 +9,7 @@ export const TICKET_LEDGER_TICKET_MAX_BYTES = 256 * 1024;
 export const TICKET_LEDGER_MAX_BYTES = 8 * 1024 * 1024;
 export const TICKET_LEDGER_MAX_TICKETS = 1_000;
 export const TICKET_LEDGER_MAX_RELATIONS = 5_000;
+export const TICKET_LEDGER_MAX_PATCH_CHANGES = 1_000;
 export const TICKET_LEDGER_MAX_DIRTY_PATHS = 128;
 export const TICKET_LEDGER_STABLE_READ_ATTEMPTS = 3;
 
@@ -24,8 +25,14 @@ const identifierSchema = z
 const boundedText = (max: number) =>
   z
     .string()
-    .max(max)
-    .refine((value) => value.trim().length > 0, "must not be blank");
+    .check(z.custom<string>(
+      (value) =>
+        typeof value === "string"
+        && [...value].length <= max,
+      { message: `must contain at most ${max} Unicode characters` },
+    ))
+    .meta({ maxLength: max })
+    .regex(/^(?=[\s\S]*\S)[\s\S]*$/u, "must not be blank");
 
 export const ticketLedgerProtocolSchema = z
   .object({
@@ -106,6 +113,7 @@ interface TicketLedgerSourceBase {
   resolvedCommit: string;
   graphDigest: string;
   sourceToken: string;
+  checkpointInventoryDigest: string;
 }
 
 export interface TicketLedgerWorktreeSource extends TicketLedgerSourceBase {
@@ -132,6 +140,61 @@ export interface TicketLedgerSnapshot extends TicketLedgerContent {
   source: TicketLedgerSource;
 }
 
+export interface TicketLedgerPatchExpectedSource {
+  sourceToken: string;
+  worktreeIdentity: string;
+  resolvedCommit: string;
+  graphDigest: string;
+}
+
+export type TicketLedgerPatchChange =
+  | {
+      op: "put";
+      ticketId: string;
+      expectedTicketRevision: string | null;
+      document: unknown;
+    }
+  | {
+      op: "delete";
+      ticketId: string;
+      expectedTicketRevision: string;
+    };
+
+export interface TicketLedgerPatchRequest {
+  expectedSource: TicketLedgerPatchExpectedSource;
+  changes: readonly TicketLedgerPatchChange[];
+}
+
+export interface TicketLedgerPatchSource {
+  sourceToken: string;
+  worktreeIdentity: string;
+  resolvedCommit: string;
+  graphDigest: string;
+}
+
+export interface TicketLedgerPatchTicketResult {
+  op: "put" | "delete";
+  ticketId: string;
+  documentPath: string;
+  beforeTicketRevision: string | null;
+  afterTicketRevision: string | null;
+  changed: boolean;
+}
+
+export interface TicketLedgerCheckpointSelection {
+  source: TicketLedgerPatchSource;
+  changedPaths: readonly string[];
+}
+
+export interface TicketLedgerPatchResult {
+  status: "applied" | "noop";
+  before: TicketLedgerPatchSource;
+  after: TicketLedgerPatchSource;
+  changedPaths: readonly string[];
+  tickets: readonly TicketLedgerPatchTicketResult[];
+  checkpointSelection: TicketLedgerCheckpointSelection;
+}
+
 export type TicketLedgerErrorCode =
   | "ledger_missing"
   | "invalid_path"
@@ -143,6 +206,11 @@ export type TicketLedgerErrorCode =
   | "symlink"
   | "unmerged"
   | "source_changed_during_read"
+  | "stale_source"
+  | "stale_ticket_revision"
+  | "duplicate_change"
+  | "writer_busy"
+  | "write_verification_failed"
   | "ref_not_found"
   | "git_error"
   | "io";

@@ -123,12 +123,14 @@ describe("production skill package",()=>{
     expect(operations).toContain("`ticket.graph.snapshot`");
     expect(operations).toContain("`ticket.subject.inspect`");
     expect(operations).toContain("`ticket.trace.list`");
-    expect(operations).toContain("Ticket reads are deliberately outside persisted request replay");
+    expect(operations).toContain("Git-native Ticket operations are deliberately outside persisted request");
+    expect(operations).toContain("`ticket.worktree.patch`");
     expect(operations).not.toContain("`ticket.proposal.");
     const dispatch=read("scripts/_dispatch.mjs");
     expect(dispatch).toContain('"graph.snapshot"');
     expect(dispatch).toContain('"subject.inspect"');
     expect(dispatch).toContain('"trace.list"');
+    expect(dispatch).toContain('"worktree.patch"');
     expect(dispatch).not.toContain('"proposal.');
     expect(dispatch).toContain('"../../../main.js"');
     expect(dispatch).toContain('"../../packages/cli/dist/main.js"');
@@ -348,6 +350,7 @@ describe("production skill package",()=>{
       "ticket.graph.snapshot",
       "ticket.subject.inspect",
       "ticket.trace.list",
+      "ticket.worktree.patch",
     ]);
     expect(JSON.stringify(artifact)).not.toContain("ticket.proposal.");
     const unicodeId={id:"😀".repeat(200)},featureContract=artifact.operations["kb.feature.get"]!;expect(validateOperationContract(featureContract,unicodeId)).toMatchObject({valid:true});expect(operationInputSchemas["kb.feature.get"].safeParse(unicodeId).success).toBe(true);expect(dispatcher.dispatch("kb.feature.get",{repoId:row.id,actor:"fixture",requestId:"unicode-id",now},unicodeId)).toMatchObject({ok:false,error:{code:"not_found"}});
@@ -527,6 +530,38 @@ describe("production skill package",()=>{
     expect(JSON.parse(run.stdout).data).toEqual({
       argv:["checkpoint","commit","--json","--repo",temp,"--actor","agent:test","--request","request:test","--input","-"],
       raw:receipt,
+    });
+    const selection=JSON.stringify({source:{},changedPaths:[]});
+    const ticketPrepare=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-checkpoint.mjs"),
+      "prepare","--scope","ticket","--repo",temp,
+    ],{input:selection,encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(
+      ticketPrepare.status,
+      ticketPrepare.stdout+ticketPrepare.stderr,
+    ).toBe(0);
+    expect(JSON.parse(ticketPrepare.stdout).data).toEqual({
+      argv:[
+        "checkpoint","prepare","--json","--scope","ticket","--repo",temp,
+        "--input","-",
+      ],
+      raw:selection,
+    });
+    const oversized=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-checkpoint.mjs"),
+      "commit","--repo",temp,"--actor","agent:test",
+    ],{
+      input:JSON.stringify({value:"x".repeat(1024*1024)}),
+      encoding:"utf8",
+      env:{...process.env,VIBEHUB_BIN:fake},
+    });
+    expect(oversized.status,oversized.stdout+oversized.stderr).toBe(2);
+    expect(JSON.parse(oversized.stdout)).toMatchObject({
+      ok:false,
+      error:{
+        code:"validation_error",
+        message:expect.stringContaining("checkpoint raw JSON input exceeds"),
+      },
     });
   });
 

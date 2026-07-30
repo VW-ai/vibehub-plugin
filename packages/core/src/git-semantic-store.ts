@@ -15,6 +15,12 @@ import {
   type ExportGitSemanticStoreOptions,
 } from "./experimental/git-semantic-store/index.js";
 import { inspectDatabase, withReadonlyDb } from "./db.js";
+import {
+  commitGitCheckpoint,
+  prepareGitCheckpoint,
+  type GitCheckpointReceipt,
+  type GitCheckpointScope,
+} from "./git-checkpoint.js";
 
 const FORMAT = "vibehub.git-semantic-store";
 const STORE_RELATIVE_PATH = ".vibehub/semantic-store";
@@ -184,17 +190,6 @@ const runGit = (repoRoot: string, args: string[]): string => execFileSync("git",
     GIT_CONFIG_GLOBAL: "/dev/null",
     GIT_CONFIG_SYSTEM: "/dev/null",
   },
-});
-
-const runGitWith = (
-  repoRoot: string,
-  args: string[],
-  options: { env?: NodeJS.ProcessEnv; input?: string } = {},
-): string => execFileSync("git", args, {
-  cwd: repoRoot,
-  encoding: "utf8",
-  env: { ...process.env, ...options.env },
-  ...(options.input === undefined ? {} : { input: options.input }),
 });
 
 const resolveCommit = (repoRoot: string, ref: string): string => {
@@ -945,214 +940,71 @@ export function materializeSemanticCacheAtRef(options: {
   }
 }
 
-const checkpointStatusPaths = (repoRoot: string): {
-  changedPaths: string[];
-  unmergedPaths: string[];
-} => {
-  const output = runGit(repoRoot, [
-    "status",
-    "--porcelain=v1",
-    "-z",
-    "--untracked-files=all",
-    "--no-renames",
-    "--",
-    STORE_RELATIVE_PATH,
-  ]);
-  const changedPaths: string[] = [];
-  const unmergedPaths: string[] = [];
-  for (const record of output.split("\0").filter(Boolean)) {
-    if (record.length < 4 || record[2] !== " ") {
-      throw new Error("semantic checkpoint: malformed Git status record");
-    }
-    const status = record.slice(0, 2);
-    const relative = record.slice(3);
-    if (relative !== STORE_RELATIVE_PATH &&
-        !relative.startsWith(`${STORE_RELATIVE_PATH}/`)) {
-      throw new Error(`semantic checkpoint: path escaped semantic store: ${relative}`);
-    }
-    changedPaths.push(relative);
-    if (status.includes("U") ||
-        ["AA", "DD", "AU", "UA", "DU", "UD"].includes(status)) {
-      unmergedPaths.push(relative);
-    }
-  }
-  return {
-    changedPaths: [...new Set(changedPaths)].sort(),
-    unmergedPaths: [...new Set(unmergedPaths)].sort(),
-  };
+const semanticCheckpointScope: GitCheckpointScope = {
+  label: "semantic checkpoint",
+  relativeRoot: STORE_RELATIVE_PATH,
+  commitSubject: "chore(vibehub): semantic checkpoint",
+  reflogMessage: "vibehub semantic checkpoint",
+  digestTrailer: "VibeHub-Semantic-Digest",
+  inspectWorktree(repoRoot) {
+    const inventory = readWorktreeInventory(repoRoot);
+    proveSemanticInventory(inventory, repoRoot);
+    return { digest: inventory.semanticDigest };
+  },
+  inspectCommit(repoRoot, commitSha) {
+    const inventory = readRefInventory(repoRoot, commitSha);
+    proveSemanticInventory(inventory, repoRoot);
+    return { digest: inventory.semanticDigest };
+  },
 };
 
-const currentCheckpointBranch = (repoRoot: string): string => {
-  let branch: string;
-  try {
-    branch = runGit(repoRoot, ["symbolic-ref", "--quiet", "--short", "HEAD"]).trim();
-  } catch {
-    throw new Error("semantic checkpoint: detached HEAD is not committable");
-  }
-  if (!branch || /[\r\n]/.test(branch)) {
-    throw new Error("semantic checkpoint: invalid current branch");
-  }
-  return branch;
-};
+const semanticReceiptFromGit = (
+  receipt: GitCheckpointReceipt,
+): SemanticCheckpointReceipt => ({
+  schemaVersion: 1,
+  branch: receipt.branch,
+  headSha: receipt.headSha,
+  semanticDigest: receipt.digest,
+  changedPaths: receipt.changedPaths,
+});
 
-const protectedCheckpointBranches = (
-  repoRoot: string,
-  additional: readonly string[],
-): Set<string> => {
-  const protectedNames = new Set(["main", "master", ...additional]);
-  try {
-    const remoteHead = runGit(
-      repoRoot,
-      ["symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD"],
-    ).trim().replace(/^origin\//, "");
-    if (remoteHead) protectedNames.add(remoteHead);
-  } catch {
-    // main/master remain protected when a repository has no remote HEAD.
-  }
-  return protectedNames;
-};
-
-const checkpointValue = (value: string | undefined, label: string): string => {
-  if (typeof value !== "string" || !value.trim() || /[\r\n]/.test(value)) {
-    throw new Error(`semantic checkpoint: ${label} must be a nonblank single-line string`);
-  }
-  return value.trim();
-};
+const semanticReceiptToGit = (
+  receipt: SemanticCheckpointReceipt,
+): GitCheckpointReceipt => ({
+  schemaVersion: receipt.schemaVersion,
+  branch: receipt.branch,
+  headSha: receipt.headSha,
+  digest: receipt.semanticDigest,
+  changedPaths: receipt.changedPaths,
+});
 
 export function prepareSemanticCheckpoint(options: {
   repoRoot: string;
   protectedBranches?: string[];
 }): SemanticCheckpointReceipt {
-  const repoRoot = path.resolve(options.repoRoot);
-  const branch = currentCheckpointBranch(repoRoot);
-  if (protectedCheckpointBranches(repoRoot, options.protectedBranches ?? []).has(branch)) {
-    throw new Error(`semantic checkpoint: protected branch is not committable: ${branch}`);
-  }
-  const headSha = resolveCommit(repoRoot, "HEAD");
-  const inventory = readWorktreeInventory(repoRoot);
-  proveSemanticInventory(inventory, repoRoot);
-  const status = checkpointStatusPaths(repoRoot);
-  if (status.unmergedPaths.length > 0) {
-    throw new Error(
-      `semantic checkpoint: unresolved semantic conflicts: ${status.unmergedPaths.join(", ")}`,
-    );
-  }
-  return {
-    schemaVersion: 1,
-    branch,
-    headSha,
-    semanticDigest: inventory.semanticDigest,
-    changedPaths: status.changedPaths,
-  };
+  return semanticReceiptFromGit(prepareGitCheckpoint({
+    repoRoot: options.repoRoot,
+    scope: semanticCheckpointScope,
+    protectedBranches: options.protectedBranches,
+  }));
 }
-
-const sameCheckpointReceipt = (
-  expected: SemanticCheckpointReceipt,
-  actual: SemanticCheckpointReceipt,
-): boolean =>
-  expected.schemaVersion === 1 &&
-  expected.branch === actual.branch &&
-  expected.headSha === actual.headSha &&
-  expected.semanticDigest === actual.semanticDigest &&
-  expected.changedPaths.length === actual.changedPaths.length &&
-  expected.changedPaths.every((item, index) => item === actual.changedPaths[index]);
 
 export function commitSemanticCheckpoint(
   options: SemanticCheckpointCommitOptions,
 ): SemanticCheckpointResult {
-  const repoRoot = path.resolve(options.repoRoot);
-  const actor = checkpointValue(options.actor, "actor");
-  const requestId = checkpointValue(options.requestId, "requestId");
-  const now = checkpointValue(options.now, "now");
-  const taskId = options.taskId === undefined
-    ? undefined
-    : checkpointValue(options.taskId, "taskId");
-  const current = prepareSemanticCheckpoint({
-    repoRoot,
+  const result = commitGitCheckpoint({
+    repoRoot: options.repoRoot,
+    scope: semanticCheckpointScope,
+    receipt: semanticReceiptToGit(options.receipt),
+    actor: options.actor,
+    taskId: options.taskId,
+    requestId: options.requestId,
+    now: options.now,
     protectedBranches: options.protectedBranches,
   });
-  if (!sameCheckpointReceipt(options.receipt, current)) {
-    throw new Error("semantic checkpoint: receipt is stale");
-  }
-  if (current.changedPaths.length === 0) {
-    return {
-      status: "noop",
-      branch: current.branch,
-      beforeHeadSha: current.headSha,
-      commitSha: current.headSha,
-      semanticDigest: current.semanticDigest,
-      changedPaths: [],
-    };
-  }
-
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-checkpoint-index-"));
-  const indexPath = path.join(temp, "index");
-  const indexEnv = { GIT_INDEX_FILE: indexPath };
-  let commitSha: string | undefined;
-  try {
-    runGitWith(repoRoot, ["read-tree", current.headSha], { env: indexEnv });
-    runGitWith(repoRoot, ["add", "-A", "--", ...current.changedPaths], { env: indexEnv });
-    const tree = runGitWith(repoRoot, ["write-tree"], { env: indexEnv }).trim();
-    const message = [
-      "chore(vibehub): semantic checkpoint",
-      "",
-      `VibeHub-Actor: ${actor}`,
-      ...(taskId ? [`VibeHub-Task: ${taskId}`] : []),
-      `VibeHub-Request: ${requestId}`,
-      `VibeHub-Semantic-Digest: ${current.semanticDigest}`,
-      `VibeHub-Checkpoint-At: ${now}`,
-      "",
-    ].join("\n");
-    commitSha = runGitWith(
-      repoRoot,
-      ["commit-tree", tree, "-p", current.headSha],
-      { env: indexEnv, input: message },
-    ).trim();
-    const candidate = readRefInventory(repoRoot, commitSha);
-    if (candidate.semanticDigest !== current.semanticDigest) {
-      throw new Error("semantic checkpoint: candidate commit digest mismatch");
-    }
-    proveSemanticInventory(candidate, repoRoot);
-    runGitWith(repoRoot, [
-      "update-ref",
-      "-m",
-      "vibehub semantic checkpoint",
-      `refs/heads/${current.branch}`,
-      commitSha,
-      current.headSha,
-    ]);
-    try {
-      runGitWith(repoRoot, ["reset", "-q", "HEAD", "--", ...current.changedPaths]);
-    } catch (error) {
-      try {
-        runGitWith(repoRoot, [
-          "update-ref",
-          "-m",
-          "rollback failed vibehub semantic checkpoint",
-          `refs/heads/${current.branch}`,
-          current.headSha,
-          commitSha,
-        ]);
-      } catch {
-        throw new Error(
-          "semantic checkpoint: commit succeeded but index reconciliation and rollback failed",
-          { cause: error },
-        );
-      }
-      throw error;
-    }
-    if (resolveCommit(repoRoot, "HEAD") !== commitSha) {
-      throw new Error("semantic checkpoint: branch did not advance to candidate commit");
-    }
-    return {
-      status: "committed",
-      branch: current.branch,
-      beforeHeadSha: current.headSha,
-      commitSha,
-      semanticDigest: current.semanticDigest,
-      changedPaths: current.changedPaths,
-    };
-  } finally {
-    fs.rmSync(temp, { recursive: true, force: true });
-  }
+  const { digest, ...checkpoint } = result;
+  return {
+    ...checkpoint,
+    semanticDigest: digest,
+  };
 }

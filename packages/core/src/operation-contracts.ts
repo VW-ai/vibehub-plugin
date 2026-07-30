@@ -5,6 +5,7 @@ import {
   TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE,
   TICKET_REVIEW_TRACE_KINDS,
 } from "./contract/ticket-review.js";
+import { ticketDocumentSchema } from "./ticket-ledger/contract.js";
 
 // Public operation strings are canonical values, not normalization requests.
 // The absolute-end guard prevents JavaScript's `$` from accepting a final newline.
@@ -22,6 +23,32 @@ const specState = z.enum(KB_SPEC_STATES);
 const relationType = z.enum(KB_RELATION_TYPES);
 const ticketOpaqueRef = canonicalString(300);
 const ticketId = canonicalString(200);
+const ticketPatchId = boundedString(96)
+  .min(1)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u);
+const ticketPatchSha256 = z.string().regex(/^sha256:[0-9a-f]{64}$/u);
+const ticketPatchSourceToken = z.string().regex(/^tls-[0-9a-f]{64}$/u);
+const ticketPatchWorktreeIdentity = z.string()
+  .regex(/^worktree-[0-9a-f]{64}$/u);
+const ticketPatchCommit = z.string()
+  .regex(/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/u);
+const ticketPatchPutChange = z.object({
+  op: z.literal("put"),
+  ticketId: ticketPatchId,
+  expectedTicketRevision: ticketPatchSha256.nullable(),
+  document: ticketDocumentSchema,
+}).strict().refine(
+  (change) => change.ticketId === change.document.ticket_id,
+  { message: "patch Ticket ID must match document.ticket_id" },
+);
+const ticketPatchChange = z.discriminatedUnion("op", [
+  ticketPatchPutChange,
+  z.object({
+    op: z.literal("delete"),
+    ticketId: ticketPatchId,
+    expectedTicketRevision: ticketPatchSha256,
+  }).strict(),
+]);
 const ticketReviewSubject = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("ticket"), ticketId }).strict(),
   z.object({ kind: z.literal("relation"), relationRef: ticketOpaqueRef }).strict(),
@@ -131,9 +158,22 @@ export const operationInputSchemas = {
       .max(TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE)
       .optional(),
   }).strict(),
+  "ticket.worktree.patch": z.object({
+    expectedSource: z.object({
+      sourceToken: ticketPatchSourceToken,
+      worktreeIdentity: ticketPatchWorktreeIdentity,
+      resolvedCommit: ticketPatchCommit,
+      graphDigest: ticketPatchSha256,
+    }).strict(),
+    changes: z.array(ticketPatchChange)
+      .min(1)
+      .max(1_000),
+  }).strict(),
 } as const;
 
-export const OPERATION_INPUT_BYTE_LIMITS = {} as const satisfies Partial<
+export const OPERATION_INPUT_BYTE_LIMITS = {
+  "ticket.worktree.patch": 10 * 1024 * 1024,
+} as const satisfies Partial<
   Record<keyof typeof operationInputSchemas, number>
 >;
 
@@ -192,6 +232,7 @@ export const operationRefinementManifest = {
   "candidate-discriminated-union": {runtimeSites:0,operations:["distill.candidates.put"]},
   "anchors-strict-union": {runtimeSites:0,operations:["kb.anchors"]},
   "ticket-trace-kinds-unique": {runtimeSites:1,operations:["ticket.trace.list"]},
+  "ticket-patch-id-match": {runtimeSites:1,operations:["ticket.worktree.patch"]},
 } as const;
 
 /**
@@ -207,15 +248,15 @@ export const operationAcceptanceConstructManifest = {
   default: 0,
   catch: 0,
   coerce: 0,
-  regex: 3,
+  regex: 8,
   isoDatetime: 1,
   union: 1,
-  discriminatedUnion: 2,
+  discriminatedUnion: 3,
   unknown: 1,
-  strict: 59,
+  strict: 63,
   safeExtend: 1,
   optional: 94,
-  nullable: 9,
+  nullable: 10,
   check: 1,
   custom: 1,
   meta: 1,

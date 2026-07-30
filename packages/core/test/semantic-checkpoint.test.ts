@@ -180,6 +180,51 @@ describe("semantic checkpoint commits", () => {
     expect(git(repo, "rev-parse", "HEAD").trim()).toBe(before);
   });
 
+  it("preserves the v1 global-only Git identity behavior", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-checkpoint-"));
+    roots.push(root);
+    const repo = setupRepository(root);
+    git(repo, "switch", "-c", "feat/global-checkpoint-identity");
+    git(repo, "config", "--unset", "user.name");
+    git(repo, "config", "--unset", "user.email");
+    changeProtocol(repo, "2026-07-22T08:04:30.000Z");
+    const globalConfig = path.join(root, "global.gitconfig");
+    fs.writeFileSync(globalConfig, [
+      "[user]",
+      "\tname = Global Checkpoint User",
+      "\temail = global-checkpoint@example.test",
+      "",
+    ].join("\n"));
+
+    const previousGlobal = process.env["GIT_CONFIG_GLOBAL"];
+    const previousSystem = process.env["GIT_CONFIG_SYSTEM"];
+    process.env["GIT_CONFIG_GLOBAL"] = globalConfig;
+    process.env["GIT_CONFIG_SYSTEM"] = "/dev/null";
+    try {
+      const receipt = prepareSemanticCheckpoint({ repoRoot: repo });
+      expect(commitSemanticCheckpoint({
+        repoRoot: repo,
+        receipt,
+        actor: "agent:codex",
+        requestId: "request:global-identity",
+        now: NOW,
+      })).toMatchObject({ status: "committed" });
+    } finally {
+      if (previousGlobal === undefined) {
+        delete process.env["GIT_CONFIG_GLOBAL"];
+      } else {
+        process.env["GIT_CONFIG_GLOBAL"] = previousGlobal;
+      }
+      if (previousSystem === undefined) {
+        delete process.env["GIT_CONFIG_SYSTEM"];
+      } else {
+        process.env["GIT_CONFIG_SYSTEM"] = previousSystem;
+      }
+    }
+    expect(git(repo, "show", "-s", "--format=%an <%ae>", "HEAD").trim())
+      .toBe("Global Checkpoint User <global-checkpoint@example.test>");
+  });
+
   it("rejects a canonical tree whose cross-spec graph cannot be rebuilt", () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "vibehub-checkpoint-"));
     roots.push(root);

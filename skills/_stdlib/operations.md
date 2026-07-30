@@ -4,7 +4,7 @@ Skills and scripts call `vibehub ... --json`; they never import storage
 drivers, query backing stores directly, or mutate persistence files. MCP tool `kb_operation` accepts
 the exact `kb.*` operation plus `input`; `distill_operation` accepts the exact
 `distill.*` operation plus `input`; `ticket_operation` accepts one canonical
-`ticket.*` read plus `input`. All return the same dispatcher envelope.
+`ticket.*` capability plus `input`. All return the same dispatcher envelope.
 `kb_retrieve` is only the focused `kb.spec.search` convenience adapter. MCP
 v0.2 exposes no legacy mutation aliases; route writes through these canonical
 adapters so evidence, task attribution, request identity, and version
@@ -52,6 +52,18 @@ Do not checkpoint read-only queries, candidate/distillation operational state,
 failed mutations, or filler records. The adapter owns Git mechanics so entry
 skills remain unchanged when the implementation changes.
 
+Ticket patches do not checkpoint implicitly. When the calling Skill wants one,
+pass the patch result's exact `checkpointSelection` through the same adapter:
+
+```text
+node ../scripts/vh-checkpoint.mjs prepare --scope ticket --repo <root> --input <selection.json> [--protect <branch>]
+node ../scripts/vh-checkpoint.mjs commit --scope ticket --repo <root> --actor <id> --task <id> --request <id> --input <receipt.json> [--protect <branch>]
+```
+
+This commits only the selected Ticket paths through an isolated index after
+revalidating the candidate Ticket ledger. It remains a separate optional Git
+boundary; `ticket.worktree.patch` itself never creates a commit.
+
 ## Request identity and replay
 
 Treat `requestId` as a repository-wide request identity, not a counter local to
@@ -75,9 +87,9 @@ operation input's `idempotencyKey`: reuse that key only for the identical
 business mutation. Do not reuse any request ID for another operation merely
 because a current table key would permit it.
 
-Ticket reads are deliberately outside persisted request replay. Each invocation
-observes the addressed repository source again, so a branch switch or local
-Ticket edit cannot be hidden behind an older response.
+Git-native Ticket operations are deliberately outside persisted request
+replay. Each invocation observes the addressed worktree again, so a branch
+switch or local Ticket edit cannot be hidden behind an older response.
 
 ## Registry
 
@@ -92,7 +104,7 @@ Ticket edit cannot be hidden behind an older response.
 | `distill.baseline.get`, `distill.candidates.list`, `distill.candidates.get` | |
 | `distill.version.get`, `distill.version.diff` | |
 | `distill.inventory.get`, `distill.inventory.diff` | `distill.inventory.put`, `distill.inventory.seal` |
-| `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list` | |
+| `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list` | `ticket.worktree.patch` |
 | | `distill.scopes.plan`, `distill.scopes.claim`, `distill.scopes.complete`, `distill.scopes.fail`, `distill.scopes.retry`, `distill.scopes.correct` |
 | | `distill.candidates.put`, `distill.reconcile`, `distill.validate`, `distill.finalize` |
 | | `distill.activate`, `distill.rollback` |
@@ -102,12 +114,13 @@ Inputs are strict. Read the corresponding JSON schema and the dispatcher error
 malformed/unsupported, `3` not-found/already-exists, `4` lifecycle/integrity,
 `5` idempotency/lease/checksum/CAS conflict, `1` internal failure.
 
-The Ticket surface is read-only in this release. Use
-`ticket.graph.snapshot` for topology, `ticket.subject.inspect` for the complete
-executable context package of one Ticket, and `ticket.trace.list` for the
-currently available trace projection. Planning and mutation return only when a
-validated Skill-facing change boundary exists; do not improvise retired
-proposal or apply operations.
+Use `ticket.graph.snapshot` for topology, `ticket.subject.inspect` for the
+complete executable context package of one Ticket, and `ticket.trace.list` for
+the currently available trace projection. `ticket.worktree.patch` is the one
+mechanical write hand: copy its exact source and Ticket revisions from the
+latest snapshot, submit bounded full-document puts/deletes, and let Core
+validate the complete prospective graph. It never plans, auto-commits, writes
+a persisted Ticket replay receipt, or revives retired proposal/apply operations.
 
 ## Workflow artifacts are not operation inputs
 

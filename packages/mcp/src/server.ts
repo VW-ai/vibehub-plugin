@@ -97,7 +97,7 @@ export function createWorkbenchMcpServer(
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
     title: "Dispatch one canonical Ticket operation",
-    description: "Read the current Git-native Ticket graph, inspect one executable context package, or list its trace. Ticket semantics come from the trusted workspace path, never SQLite.",
+    description: "Read the current Git-native Ticket graph or apply one validated exact-base worktree patch. Ticket semantics come from the trusted workspace path, never SQLite; Skills own planning and judgment.",
     inputSchema: {
       requestId: logicalRequestId,
       operation: z.enum(TICKET_OPERATION_NAMES),

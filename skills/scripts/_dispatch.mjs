@@ -12,6 +12,7 @@ export const TICKET = new Set([
   "graph.snapshot",
   "subject.inspect",
   "trace.list",
+  "worktree.patch",
 ]);
 
 function fail(message, code = "validation_error", exit = 2) {

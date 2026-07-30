@@ -116,7 +116,7 @@ describe("packaged operation contract validation", () => {
     expect(schemaPropertyRead).toBe(false);
   });
 
-  it("publishes only the three Git-native Ticket read contracts", async () => {
+  it("publishes only the Git-native Ticket read and patch contracts", async () => {
     const { validateOperationContract } = await import(validatorPath) as {
       validateOperationContract(
         contract: unknown,
@@ -130,6 +130,7 @@ describe("packaged operation contract validation", () => {
       "ticket.graph.snapshot",
       "ticket.subject.inspect",
       "ticket.trace.list",
+      "ticket.worktree.patch",
     ]);
     expect(ticketOperations).toEqual(
       Object.keys(operationInputSchemas)
@@ -146,6 +147,14 @@ describe("packaged operation contract validation", () => {
           .toBe(false);
       }
     }
+    const patchNegativeCases = artifact.operations[
+      "ticket.worktree.patch"
+    ].fixtures.negatives.map((fixture: { case: string }) => fixture.case);
+    expect(patchNegativeCases).toEqual(expect.arrayContaining([
+      "patch put requires a complete Ticket document",
+      "patch Ticket document is closed",
+      "patch Ticket key must match document ID",
+    ]));
     expect(JSON.stringify(artifact)).not.toMatch(/ticket\.proposal/);
   });
 

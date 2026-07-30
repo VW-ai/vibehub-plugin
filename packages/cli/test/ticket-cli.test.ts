@@ -11,7 +11,7 @@ interface Invocation {
   envelope: Record<string, any>;
 }
 
-describe("vibehub ticket Git read adapter", () => {
+describe("vibehub ticket Git-native adapter", () => {
   let root: string;
   let repo: string;
   let dbPath: string;
@@ -180,6 +180,213 @@ describe("vibehub ticket Git read adapter", () => {
         nextCursor: null,
       },
     });
+  });
+
+  it("applies an exact-base worktree patch without repository initialization", () => {
+    const graph = invoke([
+      "ticket",
+      "graph.snapshot",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-test",
+      "--request",
+      "ticket-patch:base",
+    ]);
+    const source = graph.envelope.data.source as Record<string, string>;
+    const target = (graph.envelope.data.tickets as Array<Record<string, string>>)
+      .find((ticket) => ticket.ticketId === "implement-api");
+    if (!target) throw new Error("missing implement-api");
+    const patched = invoke([
+      "ticket",
+      "worktree.patch",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-test",
+      "--request",
+      "ticket-patch:apply",
+      "--input",
+      JSON.stringify({
+        expectedSource: {
+          sourceToken: source.sourceToken,
+          worktreeIdentity: source.worktreeIdentity,
+          resolvedCommit: source.resolvedCommit,
+          graphDigest: source.graphDigest,
+        },
+        changes: [{
+          op: "put",
+          ticketId: "implement-api",
+          expectedTicketRevision: target.ticketRevision,
+          document: {
+            schema_version: 1,
+            kind: "ticket",
+            ticket_id: "implement-api",
+            outcome: "Expose the exact-base API",
+            context: "Apply the Skill-authored full Ticket document.",
+            acceptance: [],
+            constraints: [],
+            context_refs: [],
+            relations: [{
+              type: "depends_on",
+              target_ticket_id: "design-schema",
+            }],
+            provenance_refs: [],
+          },
+        }],
+      }),
+    ]);
+    expect(patched.status).toBe(0);
+    expect(patched.envelope).toMatchObject({
+      ok: true,
+      data: {
+        status: "applied",
+        changedPaths: [
+          ".vibehub/tickets/tickets/implement-api.yaml",
+        ],
+      },
+      meta: { operation: "ticket.worktree.patch" },
+    });
+    const refreshed = invoke([
+      "ticket",
+      "graph.snapshot",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-test",
+      "--request",
+      "ticket-patch:refreshed",
+    ]);
+    expect(refreshed.envelope.data.tickets).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ticketId: "implement-api",
+        outcome: "Expose the exact-base API",
+      }),
+    ]));
+  });
+
+  it("optionally checkpoints only the exact Ticket patch selection", () => {
+    execFileSync("git", ["switch", "-c", "feat/ticket-checkpoint"], {
+      cwd: repo,
+    });
+    const graph = invoke([
+      "ticket",
+      "graph.snapshot",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-test",
+    ]);
+    const source = graph.envelope.data.source as Record<string, string>;
+    const target = (graph.envelope.data.tickets as Array<Record<string, string>>)
+      .find((ticket) => ticket.ticketId === "implement-api");
+    if (!target) throw new Error("missing implement-api");
+    const patch = invoke([
+      "ticket",
+      "worktree.patch",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-test",
+      "--input",
+      JSON.stringify({
+        expectedSource: {
+          sourceToken: source.sourceToken,
+          worktreeIdentity: source.worktreeIdentity,
+          resolvedCommit: source.resolvedCommit,
+          graphDigest: source.graphDigest,
+        },
+        changes: [{
+          op: "put",
+          ticketId: "implement-api",
+          expectedTicketRevision: target.ticketRevision,
+          document: {
+            schema_version: 1,
+            kind: "ticket",
+            ticket_id: "implement-api",
+            outcome: "Checkpoint this exact Ticket update",
+            context: "Keep checkpointing separate from worktree mutation.",
+            acceptance: [],
+            constraints: [],
+            context_refs: [],
+            relations: [{
+              type: "depends_on",
+              target_ticket_id: "design-schema",
+            }],
+            provenance_refs: [],
+          },
+        }],
+      }),
+    ]);
+    const prepared = invoke([
+      "checkpoint",
+      "prepare",
+      "--scope",
+      "ticket",
+      "--json",
+      "--repo",
+      repo,
+      "--input",
+      JSON.stringify(patch.envelope.data.checkpointSelection),
+    ]);
+    expect(prepared.status).toBe(0);
+    expect(prepared.envelope).toMatchObject({
+      ok: true,
+      data: {
+        branch: "feat/ticket-checkpoint",
+        changedPaths: [
+          ".vibehub/tickets/tickets/implement-api.yaml",
+        ],
+      },
+    });
+    const committed = invoke([
+      "checkpoint",
+      "commit",
+      "--scope",
+      "ticket",
+      "--json",
+      "--repo",
+      repo,
+      "--actor",
+      "cli-test",
+      "--task",
+      "ticket-checkpoint-test",
+      "--request",
+      "ticket-checkpoint-test:commit",
+      "--input",
+      JSON.stringify(prepared.envelope.data),
+    ]);
+    expect(committed.status).toBe(0);
+    expect(committed.envelope).toMatchObject({
+      ok: true,
+      data: {
+        status: "committed",
+        branch: "feat/ticket-checkpoint",
+        changedPaths: [
+          ".vibehub/tickets/tickets/implement-api.yaml",
+        ],
+      },
+    });
+    expect(execFileSync(
+      "git",
+      ["show", "--format=", "--name-only", "HEAD"],
+      { cwd: repo, encoding: "utf8" },
+    ).trim()).toBe(".vibehub/tickets/tickets/implement-api.yaml");
   });
 
   it("does not register retired proposal operations", () => {

@@ -408,6 +408,31 @@ describe("Ticket ledger reader", () => {
     );
   });
 
+  it("rejects a protocol FIFO before opening it", () => {
+    const repository = initializeRepository();
+    roots.push(repository);
+    const protocolPath = path.join(
+      repository,
+      ...`${TICKET_LEDGER_RELATIVE_PATH}/protocol.yaml`.split("/"),
+    );
+    fs.rmSync(protocolPath);
+    execFileSync("mkfifo", [protocolPath]);
+
+    const output = execFileSync(
+      process.execPath,
+      [
+        path.resolve("test/fixtures/ticket-ledger-read-worker.mjs"),
+        repository,
+      ],
+      {
+        cwd: path.resolve("."),
+        encoding: "utf8",
+        timeout: 2_000,
+      },
+    );
+    expect(output.trim()).toBe("unsupported_file");
+  });
+
   it("fails after bounded retries when capture facts keep changing", () => {
     const repository = initializeRepository();
     roots.push(repository);

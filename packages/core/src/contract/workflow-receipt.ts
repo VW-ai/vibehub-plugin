@@ -56,6 +56,7 @@ export const CANONICAL_OPERATION_PRESENTATION = {
   "ticket.graph.snapshot": { activity: "review", effect: "read" },
   "ticket.subject.inspect": { activity: "review", effect: "read" },
   "ticket.trace.list": { activity: "review", effect: "read" },
+  "ticket.worktree.patch": { activity: "update", effect: "write" },
 } as const;
 
 export const WORKFLOW_PHASES = ["prepare", "execute", "complete"] as const;

@@ -18,10 +18,12 @@ SQLite         = disposable live coordination, index, and cache
 The implementation pivot is planned in
 [`2026-07-29-ticket-git-native-skill-driven-pivot-plan.md`](artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md).
 
-The immediate code slice is frozen in
-[`2026-07-29-ticket-m1a-git-read-cut-handoff.md`](artifacts/2026-07-29-ticket-m1a-git-read-cut-handoff.md):
-one complete Git-document read path through Core, CLI, MCP, and the existing
-graph HTML, with no SQLite semantic replay.
+M1A established the complete Git-document read path through Core, CLI, MCP,
+and the existing graph HTML. M1B now adds the one deterministic mutation hand
+frozen by
+[`contract-ticket-git-worktree-patch-001`](specs/contract-ticket-git-worktree-patch-001.yaml):
+an exact-source-bound, full-document worktree patch with no SQLite semantic
+replay and no embedded workflow judgment.
 
 ## Canonical decisions
 
@@ -55,6 +57,11 @@ graph HTML, with no SQLite semantic replay.
 - [`decision-ticket-mvp-002`](specs/decision-ticket-mvp-002.yaml):
   the first dogfood loop is Git documents + Skills + deterministic scripts +
   graph HTML + disposable runtime.
+- [`contract-ticket-git-worktree-patch-001`](specs/contract-ticket-git-worktree-patch-001.yaml):
+  Skills receive one receiptless `ticket.worktree.patch` hand. It binds the
+  exact worktree, HEAD, semantic graph, raw ledger inventory, and targeted
+  Ticket revisions; validates the complete prospective graph; and leaves one
+  verified dirty-worktree change for optional separate checkpointing.
 
 ### Human surface
 
@@ -71,6 +78,9 @@ graph HTML, with no SQLite semantic replay.
 
 - Each worktree reads the Ticket documents in its checked-out Git tree.
 - Dirty Ticket documents are pending local semantic changes.
+- The opaque worktree source token also binds ledger paths, modes, and raw
+  bytes, so formatting-only or comment-only edits stale an old write even when
+  normalized Ticket semantics have not changed.
 - Commits are durable branch truth; push/PR exposes collaborative proposals.
 - SQLite Run state binds exact worktree, HEAD or dirty graph digest, Ticket ID,
   and Ticket revision.
@@ -87,10 +97,9 @@ graph HTML, with no SQLite semantic replay.
   engine.
 - [`decision-ticket-closeout-001`](specs/decision-ticket-closeout-001.yaml):
   final Outcome/Evidence adjudication and semantic closeout.
-- A successor deterministic operation contract is still needed for the Git
-  document protocol; the previous SQLite-backed
-  [`contract-ticket-review-operations-001`](specs/contract-ticket-review-operations-001.yaml)
-  is stale.
+- The M2 planning/validation Skill contract must now be derived by dogfooding
+  the active patch rather than reconstructing the stale SQLite-backed
+  [`contract-ticket-review-operations-001`](specs/contract-ticket-review-operations-001.yaml).
 
 ## Historical implementation artifacts
 
@@ -127,10 +136,34 @@ M1A—the Git read authority cut—is implemented:
   SQLite tables, write operations, and three obsolete Ticket Skills are
   retired.
 
-The next implementation boundary is M1B: one validated, exact-source-bound
-worktree patch capability for Skills. Planning, semantic validation, decisions,
-and closeout documents should be designed through that dogfood loop rather
-than restored as a fixed workflow.
+M1B—the exact-source Git worktree patch—is also implemented:
 
-Implementation evidence and the deletion ledger are recorded in
-[`2026-07-29-ticket-m1a-git-read-cut-implementation.md`](artifacts/2026-07-29-ticket-m1a-git-read-cut-implementation.md).
+- `ticket.worktree.patch` creates, replaces, or deletes complete Ticket
+  documents from one exact source and exact targeted revisions;
+- the opaque source token binds raw inventory in addition to normalized
+  semantics, preventing silent overwrite of formatting, comment, or mode
+  changes;
+- Core validates the complete prospective graph before canonical writes,
+  installs each file atomically, and reloads the target graph for digest
+  verification;
+- multi-file and crash atomicity are not claimed; synchronous partial failure
+  attempts conditional rollback, while Git commit remains the durable
+  multi-file semantic boundary;
+- reads and writes remain receiptless with respect to SQLite and are evaluated
+  from current Git state on every call;
+- protocol-only seed is a valid empty graph; a missing protocol is not
+  auto-created by the patch;
+- the result returns a precise `checkpointSelection`, but checkpointing is an
+  optional separate action and never an implicit patch stage;
+- Skills still own why to mutate, semantic validation, review/authority
+  boundaries, and whether later semantic document types are needed.
+
+The next implementation boundary is M2: use the patch to plan, validate, and
+apply the first real flat Ticket graph from Skill intelligence. Proposal,
+Validation, Decision, and closeout documents should be introduced from that
+dogfood need rather than restored as a fixed workflow.
+
+Implementation evidence is recorded in:
+
+- [`Ticket M1A Git read authority cut`](artifacts/2026-07-29-ticket-m1a-git-read-cut-implementation.md)
+- [`Ticket M1B exact-source worktree patch`](artifacts/2026-07-29-ticket-m1b-git-worktree-patch-implementation.md)

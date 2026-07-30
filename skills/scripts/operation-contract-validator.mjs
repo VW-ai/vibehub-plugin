@@ -41,6 +41,21 @@ export function validateRuntimeRefinements(refinements,value,errors=[]){
       if(count>rule.maximum)errors.push({path:`$.${rule.parentField}`,message:rule.message,refinementId:rule.id});
       continue;
     }
+    if(rule.kind==="nestedFieldCompare"){
+      if(!objects){objects=[];walkObjects(value,"$",objects);}
+      for(const {value:object,path} of objects){
+        if(!rule.matchFields.every(field=>Object.hasOwn(object,field)))continue;
+        const nested=object[rule.rightObjectField];
+        const right=nested&&typeof nested==="object"&&!Array.isArray(nested)
+          ? nested[rule.rightField]
+          : undefined;
+        const valid=rule.operator==="equal"
+          ? object[rule.leftField]===right
+          : false;
+        if(!valid)errors.push({path,message:rule.message,refinementId:rule.id});
+      }
+      continue;
+    }
     if(rule.kind!=="fieldCompare"){errors.push({path:"$",message:`unsupported runtime refinement ${rule.kind}`,refinementId:rule.id});continue;}
     if(!objects){objects=[];walkObjects(value,"$",objects);}
     for(const {value:object,path} of objects){

@@ -1,5 +1,5 @@
 progress:
-  completion: 0.3
+  completion: 0.45
   status: active
   milestones:
     - id: "m0-git-skill-authority-cut"
@@ -11,8 +11,9 @@ progress:
       status: complete
       evidence: "The Git ledger kernel, three pure read operations, CLI/MCP/HTML cutover, legacy authority deletion, and P0 test matrix are implemented; see the dated implementation artifact."
     - id: "m1b-git-ticket-worktree-patch"
-      name: "Exact-base Ticket worktree patch and optional checkpoint"
-      status: planned
+      name: "Exact-source Ticket worktree patch with separate optional checkpoint handoff"
+      status: complete
+      evidence: "The receiptless ticket.worktree.patch capability binds raw inventory plus semantic source and targeted revisions, validates the full prospective graph and encoded capacity, uses descriptor-bounded physical reads, performs per-file atomic installation with synchronous conditional rollback, reload-verifies the target digest, and returns a checkpointSelection without auto-committing; the public generated contract validates complete Ticket documents and the optional checkpoint verifies raw candidate inventory; see the dated M1B implementation artifact."
     - id: "m2-ticket-planning-validation-skills"
       name: "Skill-led planning, validation, and protected-boundary decisions"
       status: planned
@@ -26,8 +27,8 @@ progress:
       name: "Complete one real dogfood loop and prove the legacy cut remains clean"
       status: planned
   next:
-    - "Design and implement the M1B exact-source-bound Ticket worktree patch primitive."
-    - "Dogfood that primitive through one real Skill-led Ticket graph change before defining later semantic document types."
+    - "Implement the M2 planning and semantic-validation Skill intelligence over ticket.worktree.patch rather than adding workflow policy to Core."
+    - "Dogfood one real flat Ticket graph through backchaining, forward normalization, exact patching, and optional human review before defining later semantic document types."
   commits:
     - "d92c99c docs(ticket): plan git-native skill-driven pivot"
     - "eb0590c docs(ticket): prepare git read authority cut"

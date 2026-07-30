@@ -164,7 +164,7 @@ describe("local MCP deterministic capabilities", () => {
     expect(operationEnvelopeResult(kb).isError).toBe(false);
   });
 
-  it("exposes only three Git-native Ticket reads without repo/task rows", async () => {
+  it("exposes Git-native Ticket reads and exact patching without repo/task rows", async () => {
     writeTicketLedger(repo);
     execFileSync("git", ["add", ".vibehub/tickets"], { cwd: repo });
     execFileSync("git", ["commit", "-qm", "ticket ledger"], { cwd: repo });
@@ -199,6 +199,7 @@ describe("local MCP deterministic capabilities", () => {
         "ticket.graph.snapshot",
         "ticket.subject.inspect",
         "ticket.trace.list",
+        "ticket.worktree.patch",
       ]);
       expect(ticketSchema.properties?.operation?.enum)
         .toEqual([...TICKET_OPERATION_NAMES]);
@@ -208,7 +209,8 @@ describe("local MCP deterministic capabilities", () => {
           .sort(),
       );
       expect(ticketTool?.description).toMatch(/Git-native Ticket graph/);
-      expect(ticketTool?.description).not.toMatch(/proposal|authority|apply/i);
+      expect(ticketTool?.description).toMatch(/exact-base worktree patch/i);
+      expect(ticketTool?.description).not.toMatch(/proposal|authority/i);
 
       const graphResult = await client.callTool({
         name: "ticket_operation",
@@ -263,6 +265,50 @@ describe("local MCP deterministic capabilities", () => {
               context: "Read current Ticket documents directly from Git.",
             },
           },
+        },
+      });
+
+      const patch = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.worktree.patch",
+          requestId: "ticket-patch",
+          input: {
+            expectedSource: {
+              sourceToken: graph.data.source.sourceToken,
+              worktreeIdentity: graph.data.source.worktreeIdentity,
+              resolvedCommit: graph.data.source.resolvedCommit,
+              graphDigest: graph.data.source.graphDigest,
+            },
+            changes: [{
+              op: "put",
+              ticketId: "read-ticket-graph",
+              expectedTicketRevision:
+                graph.data.tickets[0].ticketRevision,
+              document: {
+                schema_version: 1,
+                kind: "ticket",
+                ticket_id: "read-ticket-graph",
+                outcome: "Patch the current Ticket graph exactly",
+                context: "Use the trusted MCP workspace path.",
+                acceptance: [],
+                constraints: [],
+                context_refs: [],
+                relations: [],
+                provenance_refs: [],
+              },
+            }],
+          },
+        },
+      });
+      expect(patch.isError).toBe(false);
+      expect(JSON.parse(toolText(patch))).toMatchObject({
+        ok: true,
+        data: {
+          status: "applied",
+          changedPaths: [
+            ".vibehub/tickets/tickets/read-ticket-graph.yaml",
+          ],
         },
       });
 

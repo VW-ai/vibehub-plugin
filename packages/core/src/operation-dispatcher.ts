@@ -21,7 +21,11 @@ import {
   replaceGitSemanticStore,
 } from "./git-semantic-store.js";
 import { GitFacade } from "./git-facade.js";
-import { TicketLedgerError } from "./ticket-ledger/index.js";
+import {
+  TicketLedgerError,
+  applyTicketWorktreePatch,
+  type TicketLedgerPatchRequest,
+} from "./ticket-ledger/index.js";
 import {
   TicketReviewProjectionError,
 } from "./ticket-review-projector.js";
@@ -54,6 +58,8 @@ export const OPERATION_EXIT_CLASS:Record<string,number>={
   ticket_ledger_missing:3, ticket_ledger_invalid_document:4,
   ticket_ledger_invalid_graph:4, ticket_ledger_unmerged:5,
   ticket_ledger_source_changed:5, ticket_ledger_ref_not_found:3,
+  ticket_ledger_stale_source:5, ticket_ledger_stale_ticket:5,
+  ticket_ledger_writer_busy:5, ticket_ledger_write_unverified:5,
   ticket_ledger_io:5, ticket_ledger_scope_mismatch:2,
 };
 
@@ -123,6 +129,10 @@ const handlers:Record<OperationName,Handler>={
     requiredTicketScope(scope),
     i,
   ),
+  "ticket.worktree.patch":(_s,_c,i,scope)=>applyTicketWorktreePatch({
+    worktreeRoot:requiredTicketScope(scope).worktreeRoot,
+    request:i as unknown as TicketLedgerPatchRequest,
+  }),
 };
 
 export interface OperationDispatcherOptions {
@@ -165,7 +175,7 @@ export class OperationDispatcher {
             ["Reduce the input size or split it into bounded requests."],
           );
         }
-        if(isTicketReadOperation(operation)){
+        if(isReceiptlessGitTicketOperation(operation)){
           return this.invoke(operation,context,input);
         }
         const payloadHash=hashCanonical({
@@ -223,7 +233,7 @@ export class OperationDispatcher {
     if(!candidate){
       throw new KnowledgeError(
         "ticket_ledger_scope_mismatch",
-        "Ticket reads require a trusted worktree path from the host adapter",
+        "Ticket operations require a trusted worktree path from the host adapter",
         null,
         ["Construct the dispatcher with the current trusted repoRoot."],
       );
@@ -234,7 +244,7 @@ export class OperationDispatcher {
     }catch{
       throw new KnowledgeError(
         "ticket_ledger_scope_mismatch",
-        "Ticket read scope is not a readable Git worktree",
+        "Ticket operation scope is not a readable Git worktree",
         {worktreeRoot:candidate},
         ["Use a readable Git checkout as repoRoot."],
       );
@@ -533,6 +543,14 @@ function normalize(error:unknown):KnowledgeError{
       ? "ticket_ledger_missing"
       : error.code === "source_changed_during_read"
         ? "ticket_ledger_source_changed"
+        : error.code === "stale_source"
+          ? "ticket_ledger_stale_source"
+          : error.code === "stale_ticket_revision"
+            ? "ticket_ledger_stale_ticket"
+            : error.code === "writer_busy"
+              ? "ticket_ledger_writer_busy"
+              : error.code === "write_verification_failed"
+                ? "ticket_ledger_write_unverified"
         : error.code === "ref_not_found"
           ? "ticket_ledger_ref_not_found"
           : error.code === "invalid_document"
@@ -541,17 +559,34 @@ function normalize(error:unknown):KnowledgeError{
             || error.code === "ledger_too_large"
             || error.code === "unsupported_file"
             || error.code === "symlink"
+            || error.code === "duplicate_change"
             ? "ticket_ledger_invalid_document"
             : error.code === "invalid_graph"
               ? "ticket_ledger_invalid_graph"
               : error.code === "unmerged"
                 ? "ticket_ledger_unmerged"
                 : "ticket_ledger_io";
+    const nextSafeActions = error.code === "writer_busy"
+      ? [
+          "Wait for the active Ticket writer to finish; if it crashed, verify no writer is running before removing the reported worktree lock.",
+        ]
+      : error.code === "write_verification_failed"
+        ? [
+            "Inspect `git diff -- .vibehub/tickets` and the reported paths before rebuilding a patch from a fresh snapshot.",
+          ]
+        : error.code === "stale_source"
+          || error.code === "stale_ticket_revision"
+          ? [
+              "Refresh ticket.graph.snapshot, rebuild the exact patch, and retry.",
+            ]
+          : [
+              "Inspect and repair `.vibehub/tickets`, then retry the read.",
+            ];
     return new KnowledgeError(
       code,
       error.message,
       error.details,
-      ["Inspect and repair `.vibehub/tickets`, then retry the read."],
+      nextSafeActions,
     );
   }
   const message=error instanceof Error?error.message:String(error);
@@ -564,18 +599,22 @@ function requiresTicketScope(operation:string):operation is
   | "ticket.graph.snapshot"
   | "ticket.subject.inspect"
   | "ticket.trace.list"
+  | "ticket.worktree.patch"
 {
   return operation==="ticket.graph.snapshot"
     || operation==="ticket.subject.inspect"
-    || operation==="ticket.trace.list";
+    || operation==="ticket.trace.list"
+    || operation==="ticket.worktree.patch";
 }
-function isTicketReadOperation(operation:string):operation is
+function isReceiptlessGitTicketOperation(operation:string):operation is
   | "ticket.graph.snapshot"
   | "ticket.subject.inspect"
-  | "ticket.trace.list" {
+  | "ticket.trace.list"
+  | "ticket.worktree.patch" {
   return operation==="ticket.graph.snapshot"
     || operation==="ticket.subject.inspect"
-    || operation==="ticket.trace.list";
+    || operation==="ticket.trace.list"
+    || operation==="ticket.worktree.patch";
 }
 function requiredTicketScope(
   scope:TicketDispatchScopeV0|undefined,
@@ -591,7 +630,7 @@ function ticketReviewNextSafeActions(code:string):string[]{
     return ["Correct the Ticket selector or restart from ticket.graph.snapshot."];
   }
   if(code==="not_found"){
-    return ["Create `.vibehub/tickets/protocol.yaml` and at least one valid Ticket document."];
+    return ["Initialize `.vibehub/tickets/protocol.yaml`; a protocol-only empty graph is valid."];
   }
   if(code==="snapshot_expired"){
     return ["Refresh ticket.graph.snapshot and retry against its new snapshotId."];

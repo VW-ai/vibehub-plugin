@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
-  "registryHash": "ace5a4ec47d80f072ed234e0be0ad3f1c473d77b6551e59a31937fb69e282dcb",
-  "inputSchemaHash": "0f09779ba08e18ff10b0634579d75292f51bb6281eb7997282246f68dcd07a46",
+  "registryHash": "a9799c1db5d8e212aa905785822a98aa936c02f950d48cdb22724d6fd207a36a",
+  "inputSchemaHash": "0c671ece2e97a4817ec256c1bd8005afe317fd3f9689b44f7362a7ddb4698859",
   "dialect": "JSON Schema 2020-12 plus VibeHub runtimeRefinements/v1",
   "fixtureDialect": "literal value or generatedFixture/v1",
   "scope": "Operation input contracts only. Operation context is validated separately by the runtime operationContextSchema at CLI/MCP adapter boundaries.",
@@ -14,15 +14,15 @@
     "default": 0,
     "catch": 0,
     "coerce": 0,
-    "regex": 3,
+    "regex": 8,
     "isoDatetime": 1,
     "union": 1,
-    "discriminatedUnion": 2,
+    "discriminatedUnion": 3,
     "unknown": 1,
-    "strict": 59,
+    "strict": 63,
     "safeExtend": 1,
     "optional": 94,
-    "nullable": 9,
+    "nullable": 10,
     "check": 1,
     "custom": 1,
     "meta": 1,
@@ -159,6 +159,14 @@
       ],
       "representation": "json-schema",
       "mechanism": "uniqueItems on kinds"
+    },
+    "ticket-patch-id-match": {
+      "runtimeSites": 1,
+      "operations": [
+        "ticket.worktree.patch"
+      ],
+      "representation": "runtime-refinement",
+      "mechanism": "runtimeRefinements/v1 nestedFieldCompare equal"
     }
   },
   "envelope": {
@@ -26185,6 +26193,530 @@
               "limit": 10
             },
             "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.worktree.patch": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "expectedSource": {
+            "type": "object",
+            "properties": {
+              "sourceToken": {
+                "type": "string",
+                "pattern": "^tls-[0-9a-f]{64}$"
+              },
+              "worktreeIdentity": {
+                "type": "string",
+                "pattern": "^worktree-[0-9a-f]{64}$"
+              },
+              "resolvedCommit": {
+                "type": "string",
+                "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+              },
+              "graphDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "sourceToken",
+              "worktreeIdentity",
+              "resolvedCommit",
+              "graphDigest"
+            ],
+            "additionalProperties": false
+          },
+          "changes": {
+            "minItems": 1,
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "op": {
+                      "type": "string",
+                      "const": "put"
+                    },
+                    "ticketId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "maxLength": 96
+                    },
+                    "expectedTicketRevision": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^sha256:[0-9a-f]{64}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "document": {
+                      "type": "object",
+                      "properties": {
+                        "schema_version": {
+                          "type": "number",
+                          "const": 1
+                        },
+                        "kind": {
+                          "type": "string",
+                          "const": "ticket"
+                        },
+                        "ticket_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 96,
+                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                        },
+                        "outcome": {
+                          "type": "string",
+                          "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                          "maxLength": 16384
+                        },
+                        "context": {
+                          "type": "string",
+                          "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                          "maxLength": 65536
+                        },
+                        "acceptance": {
+                          "maxItems": 128,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "acceptance_id": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 96,
+                                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                              },
+                              "criterion": {
+                                "type": "string",
+                                "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                                "maxLength": 8192
+                              }
+                            },
+                            "required": [
+                              "acceptance_id",
+                              "criterion"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "constraints": {
+                          "maxItems": 128,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                            "maxLength": 8192
+                          }
+                        },
+                        "context_refs": {
+                          "maxItems": 128,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "ref": {
+                                "type": "string",
+                                "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                                "maxLength": 4096
+                              },
+                              "purpose": {
+                                "type": "string",
+                                "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                                "maxLength": 4096
+                              }
+                            },
+                            "required": [
+                              "ref",
+                              "purpose"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "relations": {
+                          "maxItems": 256,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "const": "depends_on"
+                              },
+                              "target_ticket_id": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 96,
+                                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                              },
+                              "rationale": {
+                                "type": "string",
+                                "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                                "maxLength": 4096
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "target_ticket_id"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "provenance_refs": {
+                          "maxItems": 128,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                            "maxLength": 4096
+                          }
+                        }
+                      },
+                      "required": [
+                        "schema_version",
+                        "kind",
+                        "ticket_id",
+                        "outcome",
+                        "context",
+                        "acceptance",
+                        "constraints",
+                        "context_refs",
+                        "relations",
+                        "provenance_refs"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "op",
+                    "ticketId",
+                    "expectedTicketRevision",
+                    "document"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "op": {
+                      "type": "string",
+                      "const": "delete"
+                    },
+                    "ticketId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                      "maxLength": 96
+                    },
+                    "expectedTicketRevision": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "op",
+                    "ticketId",
+                    "expectedTicketRevision"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "expectedSource",
+          "changes"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [
+        {
+          "id": "ticket-patch-id-match",
+          "kind": "nestedFieldCompare",
+          "matchFields": [
+            "ticketId",
+            "document"
+          ],
+          "leftField": "ticketId",
+          "operator": "equal",
+          "rightObjectField": "document",
+          "rightField": "ticket_id",
+          "message": "patch Ticket ID must match document.ticket_id"
+        }
+      ],
+      "fixtures": {
+        "positive": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+          },
+          "changes": [
+            {
+              "op": "put",
+              "ticketId": "fixture-ticket",
+              "expectedTicketRevision": null,
+              "document": {
+                "schema_version": 1,
+                "kind": "ticket",
+                "ticket_id": "fixture-ticket",
+                "outcome": "Create the fixture Ticket",
+                "context": "Exercise the exact-base patch contract.",
+                "acceptance": [],
+                "constraints": [],
+                "context_refs": [],
+                "relations": [],
+                "provenance_refs": []
+              }
+            }
+          ]
+        },
+        "negative": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+          },
+          "changes": []
+        },
+        "negativeCase": "patch requires at least one change",
+        "negatives": [
+          {
+            "case": "patch requires at least one change",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+              },
+              "changes": []
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "patch source token must be exact",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "latest",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+              },
+              "changes": [
+                {
+                  "op": "put",
+                  "ticketId": "fixture-ticket",
+                  "expectedTicketRevision": null,
+                  "document": {
+                    "schema_version": 1,
+                    "kind": "ticket",
+                    "ticket_id": "fixture-ticket",
+                    "outcome": "Create the fixture Ticket",
+                    "context": "Exercise the exact-base patch contract.",
+                    "acceptance": [],
+                    "constraints": [],
+                    "context_refs": [],
+                    "relations": [],
+                    "provenance_refs": []
+                  }
+                }
+              ]
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "patch Ticket ID must be canonical",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+              },
+              "changes": [
+                {
+                  "op": "put",
+                  "ticketId": "Ticket 1",
+                  "expectedTicketRevision": null,
+                  "document": {
+                    "schema_version": 1,
+                    "kind": "ticket",
+                    "ticket_id": "fixture-ticket",
+                    "outcome": "Create the fixture Ticket",
+                    "context": "Exercise the exact-base patch contract.",
+                    "acceptance": [],
+                    "constraints": [],
+                    "context_refs": [],
+                    "relations": [],
+                    "provenance_refs": []
+                  }
+                }
+              ]
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "patch change discriminant is closed",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+              },
+              "changes": [
+                {
+                  "op": "merge",
+                  "ticketId": "fixture-ticket",
+                  "expectedTicketRevision": null,
+                  "document": {
+                    "schema_version": 1,
+                    "kind": "ticket",
+                    "ticket_id": "fixture-ticket",
+                    "outcome": "Create the fixture Ticket",
+                    "context": "Exercise the exact-base patch contract.",
+                    "acceptance": [],
+                    "constraints": [],
+                    "context_refs": [],
+                    "relations": [],
+                    "provenance_refs": []
+                  }
+                }
+              ]
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "patch create revision must be null or sha256",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+              },
+              "changes": [
+                {
+                  "op": "put",
+                  "ticketId": "fixture-ticket",
+                  "expectedTicketRevision": "none",
+                  "document": {
+                    "schema_version": 1,
+                    "kind": "ticket",
+                    "ticket_id": "fixture-ticket",
+                    "outcome": "Create the fixture Ticket",
+                    "context": "Exercise the exact-base patch contract.",
+                    "acceptance": [],
+                    "constraints": [],
+                    "context_refs": [],
+                    "relations": [],
+                    "provenance_refs": []
+                  }
+                }
+              ]
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "patch put requires a complete Ticket document",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+              },
+              "changes": [
+                {
+                  "op": "put",
+                  "ticketId": "fixture-ticket",
+                  "expectedTicketRevision": null,
+                  "document": {}
+                }
+              ]
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "patch Ticket document is closed",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+              },
+              "changes": [
+                {
+                  "op": "put",
+                  "ticketId": "fixture-ticket",
+                  "expectedTicketRevision": null,
+                  "document": {
+                    "schema_version": 1,
+                    "kind": "ticket",
+                    "ticket_id": "fixture-ticket",
+                    "outcome": "Create the fixture Ticket",
+                    "context": "Exercise the exact-base patch contract.",
+                    "acceptance": [],
+                    "constraints": [],
+                    "context_refs": [],
+                    "relations": [],
+                    "provenance_refs": [],
+                    "extra": true
+                  }
+                }
+              ]
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "patch Ticket key must match document ID",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+              },
+              "changes": [
+                {
+                  "op": "put",
+                  "ticketId": "fixture-ticket",
+                  "expectedTicketRevision": null,
+                  "document": {
+                    "schema_version": 1,
+                    "kind": "ticket",
+                    "ticket_id": "other-ticket",
+                    "outcome": "Create the fixture Ticket",
+                    "context": "Exercise the exact-base patch contract.",
+                    "acceptance": [],
+                    "constraints": [],
+                    "context_refs": [],
+                    "relations": [],
+                    "provenance_refs": []
+                  }
+                }
+              ]
+            },
+            "refinementIds": [
+              "ticket-patch-id-match"
+            ]
           }
         ]
       }

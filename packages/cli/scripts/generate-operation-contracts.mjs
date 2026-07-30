@@ -15,7 +15,7 @@ import {
   validateRuntimeRefinements,
 } from "../../../skills/scripts/operation-contract-validator.mjs";
 
-const EXPECTED_INPUT_SCHEMA_HASH="0f09779ba08e18ff10b0634579d75292f51bb6281eb7997282246f68dcd07a46";
+const EXPECTED_INPUT_SCHEMA_HASH="0c671ece2e97a4817ec256c1bd8005afe317fd3f9689b44f7362a7ddb4698859";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../../..");
 const ajv=new Ajv2020({allErrors:true,strict:false});
@@ -130,6 +130,7 @@ function runtimeRefinementsFor(name){
   const rules=[];
   if(["kb.ingest.preview","kb.spec.apply","kb.amend","distill.candidates.put"].includes(name))rules.push({id:"anchor-line-range",kind:"fieldCompare",matchFields:["lineStart","lineEnd"],leftField:"lineEnd",operator:"gte",rightField:"lineStart",message:"lineEnd must not precede lineStart"});
   if(name==="distill.candidates.put")rules.push({id:"relation-distinct-endpoints",kind:"fieldCompare",matchFields:["fromKind","fromId","toKind","toId"],leftField:"fromId",operator:"notEqual",rightField:"toId",message:"relation endpoints must differ"});
+  if(name==="ticket.worktree.patch")rules.push({id:"ticket-patch-id-match",kind:"nestedFieldCompare",matchFields:["ticketId","document"],leftField:"ticketId",operator:"equal",rightObjectField:"document",rightField:"ticket_id",message:"patch Ticket ID must match document.ticket_id"});
   if(name==="distill.scopes.complete"){
     rules.push({id:"scope-completion-byte-budget",kind:"maxJsonBytes",maximum:1_048_576,message:"scope completion payload must not exceed 1 MiB"});
     rules.push({id:"scope-completion-evidence-budget",kind:"maxNestedArrayItems",parentField:"unresolvedFiles",childField:"evidence",maximum:200,message:"scope completion may contain at most 200 evidence entries"});
@@ -166,6 +167,31 @@ function positiveFixture(name){
     "ticket.graph.snapshot":{},
     "ticket.subject.inspect":{snapshotId:"tgs-fixture",subject:{kind:"ticket",ticketId:"TKT-1"}},
     "ticket.trace.list":{snapshotId:"tgs-fixture",subject:{kind:"ticket",ticketId:"TKT-1"},kinds:["evidence"],limit:10},
+    "ticket.worktree.patch":{
+      expectedSource:{
+        sourceToken:`tls-${"1".repeat(64)}`,
+        worktreeIdentity:`worktree-${"2".repeat(64)}`,
+        resolvedCommit:"3".repeat(40),
+        graphDigest:`sha256:${"4".repeat(64)}`,
+      },
+      changes:[{
+        op:"put",
+        ticketId:"fixture-ticket",
+        expectedTicketRevision:null,
+        document:{
+          schema_version:1,
+          kind:"ticket",
+          ticket_id:"fixture-ticket",
+          outcome:"Create the fixture Ticket",
+          context:"Exercise the exact-base patch contract.",
+          acceptance:[],
+          constraints:[],
+          context_refs:[],
+          relations:[],
+          provenance_refs:[],
+        },
+      }],
+    },
   };
   if(!(name in fixtures))throw new Error(`missing positive operation fixture: ${name}`);
   return fixtures[name];
@@ -252,6 +278,16 @@ function negativeFixtures(name,positive,input){
       fixture("trace limit above maximum",{...positive,limit:201}),
       fixture("trace subject rejects trailing whitespace",{...positive,subject:{kind:"ticket",ticketId:"TKT-1 "}}),
     ],
+    "ticket.worktree.patch":[
+      fixture("patch requires at least one change",{...positive,changes:[]}),
+      fixture("patch source token must be exact",{...positive,expectedSource:{...positive.expectedSource,sourceToken:"latest"}}),
+      fixture("patch Ticket ID must be canonical",{...positive,changes:[{...positive.changes?.[0],ticketId:"Ticket 1"}]}),
+      fixture("patch change discriminant is closed",{...positive,changes:[{...positive.changes?.[0],op:"merge"}]}),
+      fixture("patch create revision must be null or sha256",{...positive,changes:[{...positive.changes?.[0],expectedTicketRevision:"none"}]}),
+      fixture("patch put requires a complete Ticket document",{...positive,changes:[{...positive.changes?.[0],document:{}}]}),
+      fixture("patch Ticket document is closed",{...positive,changes:[{...positive.changes?.[0],document:{...positive.changes?.[0].document,extra:true}}]}),
+      fixture("patch Ticket key must match document ID",{...positive,changes:[{...positive.changes?.[0],document:{...positive.changes?.[0].document,ticket_id:"other-ticket"}}]},["ticket-patch-id-match"]),
+    ],
   };
   if(explicit[name])return explicit[name];
   const value=structuredClone(positive);
@@ -291,6 +327,7 @@ function buildRefinementMatrix(){
     "scope-completion-evidence-budget":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 maxNestedArrayItems"},
     "candidate-evidence-content":{representation:"json-schema",mechanism:"anyOf required exactQuote/evidenceRef/contentHash"},
     "relation-distinct-endpoints":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 fieldCompare notEqual"},
+    "ticket-patch-id-match":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 nestedFieldCompare equal"},
     "candidate-selector-exactly-one":{representation:"json-schema",mechanism:"oneOf required runId/versionId with not"},
     "candidate-discriminated-union":{representation:"json-schema",mechanism:"oneOf strict kind-const branches"},
     "anchors-strict-union":{representation:"json-schema",mechanism:"anyOf strict single-property branches"},
@@ -331,9 +368,11 @@ function assertAcceptanceConstructAudit(){
 function assertSerializedStringAcceptance(operation,input){
   const canonical="^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])";
   const canonicalPath="^(?!\\s)(?!\\/)(?!.*(?:^|\\/)\\.{1,2}(?:\\/|$))(?!.*\\/\\/)(?!.*\\\\)(?!.*\\/$)[\\s\\S]*\\S$(?![\\s\\S])";
+  const canonicalTicketId="^[a-z0-9]+(?:-[a-z0-9]+)*$";
+  const nonBlank="^(?=[\\s\\S]*\\S)[\\s\\S]*$";
   walk(input,node=>{
     if(node?.type!=="string"||node.maxLength===undefined)return;
     if(node.maxLength===20_000||node.maxLength===500)return;
-    if(node.pattern!==canonical&&node.pattern!==canonicalPath)throw new Error(`serialized string acceptance drift: ${operation} has bounded non-canonical string ${JSON.stringify(node)}`);
+    if(![canonical,canonicalPath,canonicalTicketId,nonBlank].includes(node.pattern))throw new Error(`serialized string acceptance drift: ${operation} has bounded non-canonical string ${JSON.stringify(node)}`);
   });
 }
