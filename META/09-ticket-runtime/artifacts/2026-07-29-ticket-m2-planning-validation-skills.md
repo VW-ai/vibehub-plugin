@@ -1,7 +1,7 @@
 # Ticket M2 implementation: planning and independent semantic validation
 
 Date: 2026-07-29
-Status: Skill implementation complete; first canonical graph write pending
+Status: Complete; first canonical six-Ticket graph applied and checkpointed
 Contract:
 [`contract-ticket-planning-validation-skills-001`](../specs/contract-ticket-planning-validation-skills-001.yaml)
 
@@ -111,26 +111,52 @@ with SHA-256
 It is historical exact-bound evidence, not a replayable input after HEAD or the
 Ticket source changes.
 
-## Canonical write status
+## Canonical write completion
 
-The public patch was invoked with the unchanged validated candidate. The
-sandboxed call failed before any Ticket file changed because it could not
-create the short-lived worktree writer lock under `.git`. The required
-escalation was rejected by the current approval policy. No direct YAML edit or
-indirect workaround was attempted.
+After the M2 implementation commit changed HEAD, a fresh snapshot made the
+historical exact-bound seven-Ticket candidate non-replayable. A new planning
+Agent therefore reconciled semantics rather than mechanically replacing source
+tokens. It removed `ticket-planning-validation-ready`, whose outcome was
+already established by commit
+`0e234da2e08126f5fbaf0a1b91fb7c4bf1baaa8f`, and refreshed the remaining six
+current-work Tickets.
 
-Consequently:
+The reconciled candidate passed the public mechanical contract and independent
+semantic validation:
 
-- the Skill implementation and real planning/validation loop are proven;
-- `.vibehub/tickets` still contains only the protocol document;
-- the seven-Ticket graph is not yet canonical;
-- M2 remains in progress until a fresh source-bound candidate is applied
-  through `ticket.worktree.patch`.
+- candidate SHA-256:
+  `587c4e14c19f19db1dc160915aa1dbad4bf2799cae7814f74033ee8ea7038984`;
+- semantic verdict: `passed`;
+- authority: `human_decision_required`;
+- material findings: none.
 
-After any commit changes HEAD, the stored candidate's four source fields must
-be refreshed through a new snapshot, the semantic candidate reconciled, and
-independent validation rerun. Replacing source tokens mechanically is
-forbidden.
+The public `ticket.worktree.patch` applied the candidate and reload verified six
+Tickets and five relations at graph digest
+`sha256:f7e89de4cd1fc1e51226223ad89b4f03dfc1bf389579b2ab8c2a5ac036dfda39`.
+The returned exact six-path checkpoint selection was committed as
+`b427ca6e2b1d9c24ad88fd4a34dee438afdab62e`.
+
+The original seven-Ticket candidate remains historical fail-revise-pass
+evidence. The committed six-Ticket graph is current branch truth. M2 is
+complete.
+
+## Dogfood host-boundary findings
+
+The sandboxed Agent process could read and validate the graph but could not
+receive permission to create the public writer's short-lived `.git` lock or
+the checkpoint's isolated Git index. Explicitly approved invocations from the
+user's shell succeeded unchanged. This proves a host capability mismatch, not
+a reason to relocate the lock, weaken exact-source safety, hand-edit Ticket
+YAML, or move durable semantics out of Git. A future first-class constrained
+Ticket tool can expose the exact worktree, source token, paths, and lock effect
+to the host approval layer without granting a general Node process `.git`
+write access.
+
+The same run found that `vh-checkpoint.mjs` selected an unrelated old
+`vibehub` TUI from PATH while the other wrappers preferred their colocated
+repository or packaged CLI. The checkpoint wrapper now reuses the shared
+resolver, preserves explicit `VIBEHUB_BIN` precedence, and has regression
+coverage for both source-tree and packaged layouts.
 
 ## Verification evidence
 
@@ -145,18 +171,25 @@ The following checks passed:
 - public `ticket.worktree.patch` input validation for both candidate revisions;
 - two independent semantic validation passes demonstrating one real
   fail-revise-pass loop;
+- fresh reconciliation followed by independent semantic validation with no
+  material findings;
+- public patch reload verification of six Tickets and five relations;
+- path-exact Ticket checkpoint commit
+  `b427ca6e2b1d9c24ad88fd4a34dee438afdab62e`;
+- checkpoint wrapper resolution tests for source-tree and packaged local CLI
+  precedence over PATH;
 - `git diff --check`.
 
-The existing wrapper and generated operation contract were sufficient; no new
-Core workflow logic or deterministic script was needed.
+No new Core workflow logic was needed. The checkpoint adapter required only
+the shared local-CLI resolution behavior already used by the operation
+wrappers.
 
 ## Next boundary
 
-1. Obtain explicit permission for the public operation's short-lived `.git`
-   writer lock.
-2. Reload the current graph, reconcile the seven semantic documents to the
-   fresh source, and rerun independent validation.
-3. Apply through `ticket.worktree.patch`, reload all seven Tickets, and
-   optionally checkpoint only the returned exact Ticket paths.
-4. Review the active outcome graph and protected decisions before executing
-   their dependent paths.
+1. Advance M3 from `ticket-git-review-intervention-ready`, which is an
+   independent current frontier.
+2. Obtain durable human ratification for `ticket-context-binding-decided`,
+   `ticket-closeout-contract-decided`, and
+   `ticket-dogfood-target-authorized`.
+3. Keep M4 and M5 dependent paths gated until their exact protected decisions
+   are accepted.

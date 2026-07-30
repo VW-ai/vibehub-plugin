@@ -107,10 +107,6 @@ from human execution authority.
   engine.
 - [`decision-ticket-closeout-001`](specs/decision-ticket-closeout-001.yaml):
   final Outcome/Evidence adjudication and semantic closeout.
-- The first validated M2 graph must still be reconciled to a fresh Ticket
-  source and applied through the active patch; the stale SQLite-backed
-  [`contract-ticket-review-operations-001`](specs/contract-ticket-review-operations-001.yaml)
-  is not an implementation source.
 
 ## Historical implementation artifacts
 
@@ -182,12 +178,26 @@ The M2 Skill package is implemented:
 - a fresh planning Agent and separate validator completed a real
   fail-revise-pass loop over a seven-Ticket graph.
 
-The validated graph is preserved as a dated exact-bound artifact, but it is not
-canonical yet. The public patch could not acquire its required short-lived Git
-writer lock under the current sandbox approval policy, and no direct Ticket
-file edit was used as a workaround. M2 therefore remains in progress until the
-candidate is reconciled to a fresh source, independently revalidated, and
-successfully applied.
+After the Skill package commit changed HEAD, a fresh planning Agent
+semantically reconciled the historical seven-Ticket candidate to current
+repository truth. It removed `ticket-planning-validation-ready` because M2 had
+already established that outcome, refreshed the remaining six Ticket
+definitions, and passed independent validation with
+`human_decision_required` and no material findings. The exact candidate
+(SHA-256
+`587c4e14c19f19db1dc160915aa1dbad4bf2799cae7814f74033ee8ea7038984`)
+was applied through `ticket.worktree.patch`, reloaded at graph digest
+`sha256:f7e89de4cd1fc1e51226223ad89b4f03dfc1bf389579b2ab8c2a5ac036dfda39`,
+and path-exact checkpointed as
+`b427ca6e2b1d9c24ad88fd4a34dee438afdab62e`. M2 is complete.
+
+The first real write also exposed a host-integration boundary: the Agent
+sandbox may reject an arbitrary Node adapter's otherwise authorized `.git`
+lock and checkpoint writes even though the same exact public operation succeeds
+from the user's shell. This is not Ticket authority and must not be worked
+around by weakening the Git lock or writing Ticket YAML directly. The
+checkpoint wrapper now reuses the shared local-CLI resolver so a repository or
+packaged CLI wins over an unrelated PATH binary.
 
 Proposal, Validation, Decision, and closeout documents should be introduced
 from later dogfood need rather than restored as a fixed workflow.

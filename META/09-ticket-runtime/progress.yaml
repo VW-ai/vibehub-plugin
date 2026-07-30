@@ -1,5 +1,5 @@
 progress:
-  completion: 0.58
+  completion: 0.60
   status: active
   milestones:
     - id: "m0-git-skill-authority-cut"
@@ -16,8 +16,8 @@ progress:
       evidence: "The receiptless ticket.worktree.patch capability binds raw inventory plus semantic source and targeted revisions, validates the full prospective graph and encoded capacity, uses descriptor-bounded physical reads, performs per-file atomic installation with synchronous conditional rollback, reload-verifies the target digest, and returns a checkpointSelection without auto-committing; the public generated contract validates complete Ticket documents and the optional checkpoint verifies raw candidate inventory; see the dated M1B implementation artifact."
     - id: "m2-ticket-planning-validation-skills"
       name: "Skill-led planning, validation, and protected-boundary decisions"
-      status: in_progress
-      evidence: "The Planning and independent Validation Skills, package registry, focused tests, and a real fail-revise-pass seven-Ticket candidate are implemented. The exact candidate passed mechanical and independent semantic validation, but the public canonical patch remains unapplied because the environment rejected permission to create its short-lived Git writer lock."
+      status: complete
+      evidence: "The Planning and independent Validation Skills, package registry, focused tests, and real fail-revise-pass loop are implemented. After fresh semantic reconciliation removed the already-satisfied planning-validation Ticket, the resulting six-Ticket candidate passed mechanical and independent semantic validation with human_decision_required and no material findings, was applied through ticket.worktree.patch, reloaded at graph digest sha256:f7e89de4cd1fc1e51226223ad89b4f03dfc1bf389579b2ab8c2a5ac036dfda39, and was path-exact checkpointed in b427ca6e2b1d9c24ad88fd4a34dee438afdab62e."
     - id: "m3-git-native-review-intervention"
       name: "Git-native comments, edits, decisions, and graph review"
       status: planned
@@ -28,8 +28,13 @@ progress:
       name: "Complete one real dogfood loop and prove the legacy cut remains clean"
       status: planned
   next:
-    - "Reload and independently revalidate the preserved seven-Ticket candidate against a fresh source, then apply it only through ticket.worktree.patch when the short-lived Git writer lock is explicitly permitted."
-    - "Review the active graph's outcome paths and protected decisions before advancing M3 or executing a gated path."
+    - "Advance M3 from ticket-git-review-intervention-ready as the independent current frontier, preserving the graph as a pure Git projection while adding attributed Git-native interventions."
+    - "Route ticket-context-binding-decided, ticket-closeout-contract-decided, and ticket-dogfood-target-authorized to the repository owner or designated human authority; do not advance their gated M4 or M5 paths until the exact decisions are durably ratified."
   commits:
     - "d92c99c docs(ticket): plan git-native skill-driven pivot"
     - "eb0590c docs(ticket): prepare git read authority cut"
+    - "487b6b3 feat(ticket): cut reads to git-native ledger"
+    - "ee6bd44 feat(ticket): add exact worktree patch capability"
+    - "0e234da feat(ticket): add planning and validation skills"
+    - "b427ca6 chore(vibehub): ticket checkpoint"
+    - "f73680c fix(ticket): resolve local checkpoint cli"
