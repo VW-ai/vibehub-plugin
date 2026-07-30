@@ -1,0 +1,31 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-dogfood-target-authorized
+outcome: The repository owner has authorized one bounded real Plugin feature, its observable acceptance, non-goals, protected boundaries, and review policy as the target of the first complete Ticket Runtime dogfood loop.
+context: The active MVP requires one real Plugin feature to complete through the loop, but the accepted sources do not select that feature. Choosing it defines product scope and therefore cannot be silently delegated by this plan. The target should be small enough to finish, meaningful beyond a synthetic fixture, and capable of exercising truthful independent work paths and a join without manufacturing graph complexity. The decision should record whether the resulting plan requires review before execution or delegates review until a genuine protected blocker.
+acceptance:
+  - acceptance_id: executable-boundary
+    criterion: The selection records observable acceptance, scope, non-goals, allowed product and architecture boundaries, permissions or side effects, material risks, and known human decisions.
+  - acceptance_id: owner-selection
+    criterion: The repository owner identifies one real Plugin-facing outcome and records why it is the appropriate bounded first dogfood target.
+  - acceptance_id: parallel-join-fit
+    criterion: The selected target naturally supports at least two independently schedulable work paths and one genuine join; a target that would require fabricated parallelism is not authorized for this dogfood proof.
+  - acceptance_id: review-policy
+    criterion: The owner explicitly selects review-plan or bounded delegation so execution authority is unambiguous without relying on the planning conversation.
+constraints:
+  - Do not substitute a synthetic fixture or isolated API demonstration for a real Plugin feature.
+  - Do not choose implementation details that remain objectively adjudicable engineering decisions.
+  - Do not expand the authorized Git-native pivot, restore legacy compatibility, or introduce deferred daemon, remote-authentication, or multi-host scope.
+  - Do not fabricate parallel work solely to satisfy a graph shape.
+context_refs:
+  - ref: META/09-ticket-runtime/progress.yaml
+    purpose: Records M5 as the remaining real dogfood and clean-cut proof.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml
+    purpose: Governs human plan review, delegation, and protected product boundaries.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml
+    purpose: Requires one real Plugin feature to prove the first complete loop.
+relations: []
+provenance_refs:
+  - META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md
+  - META/09-ticket-runtime/spec.md
+  - META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml

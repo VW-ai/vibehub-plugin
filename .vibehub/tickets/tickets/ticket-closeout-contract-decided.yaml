@@ -1,0 +1,36 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-closeout-contract-decided
+outcome: The repository has an accepted Git-native closeout contract that distinguishes attempted, partial, failed, successful, and deviated outcomes; binds accepted evidence to Ticket acceptance; and proposes follow-up semantic work without granting itself authority to mutate canonical knowledge.
+context: decision-ticket-closeout-001 remains an unresolved P0 question. Its answer must establish Evidence and verifier authority, Outcome forms, follow-up Ticket derivation, semantic-closeout proposals, and trace cooling. DONE or an Agent-authored success statement cannot itself establish accepted completion or authorize canonical knowledge mutation. The contract depends on the exact context-binding decision because evidence is meaningful only against the governing Ticket and semantic facts supplied to execution. It must preserve the Git-native lifecycle and keep live Run coordination disposable.
+acceptance:
+  - acceptance_id: acceptance-adjudication
+    criterion: Every Ticket acceptance condition has an evidence and adjudication rule that identifies verifier versus human authority and cannot be satisfied by executor self-assertion.
+  - acceptance_id: semantic-closeout-boundary
+    criterion: Closeout can propose create, amend, stale, supersede, or follow-up effects while requiring the governing knowledge authority to perform any canonical mutation.
+  - acceptance_id: successor-ratified
+    criterion: An exact successor resolves decision-ticket-closeout-001, passes machine validation, and has separate durable evidence that the repository owner or designated human authority ratified that exact successor and its explicit Outcome, Evidence, verification, deviation, and follow-up semantics.
+  - acceptance_id: terminal-forms
+    criterion: Successful, partial, failed, stale, and deviated attempts remain durably distinguishable, and only accepted current evidence can establish completion or unlock downstream work.
+constraints:
+  - Outcome, accepted Evidence references, deviations, blockers, and semantic closeout are Git-readable durable facts.
+  - Leases, heartbeat, retries, and live progress may remain disposable operational facts.
+  - DONE is not semantic authority.
+  - Detailed traces cool into bounded retrievable history rather than normal execution context.
+context_refs:
+  - ref: META/09-ticket-runtime/specs/decision-ticket-closeout-001.yaml
+    purpose: Owns the unresolved closeout and evidence question.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-git-native-ledger-001.yaml
+    purpose: Requires durable Ticket semantics and proof to remain in Git.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml
+    purpose: Governs Git-native semantic lifecycle and optional document types.
+  - ref: skills/_stdlib/lifecycle.md
+    purpose: Defines canonical knowledge mutation authority outside Ticket completion.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-context-binding-decided
+    rationale: Evidence and Outcome can be adjudicated only after the exact governing Ticket, semantic facts, mapping, and repository source are defined.
+provenance_refs:
+  - META/09-ticket-runtime/spec.md
+  - META/09-ticket-runtime/specs/decision-ticket-closeout-001.yaml
+  - META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml
