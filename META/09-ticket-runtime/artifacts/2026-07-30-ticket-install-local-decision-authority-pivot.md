@@ -209,7 +209,9 @@ durable receipt and demonstrated the exact binding, external trust, dynamic
 revocation, and fresh-process properties. M3.6 supersedes only its ceremony,
 expiry, and identity claim. It does not rewrite that evidence.
 
-No commit SHA is recorded for M3.6 yet. Execution, Outcome, Evidence, and
+Implementation commit `dd771df13185fc472ade73d6962b3e3e8be78403`
+contains the runtime, installed surface, Skill, successor contract, and
+independently validated 12-Ticket graph. Execution, Outcome, Evidence, and
 semantic closeout remain the next Ticket Runtime milestone after the exact
 protected context-binding and closeout choices are ratified through the
 installed Plugin-host surface.

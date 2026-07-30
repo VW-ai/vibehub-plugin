@@ -36,7 +36,7 @@ progress:
       name: "Install-local Ed25519 Decision authority pivot"
       status: completed
       completed_at: "2026-07-30T14:56:25-07:00"
-      evidence: "The current working tree replaces the M3.5 WebAuthn ceremony with one explicit Plugin-host click and a repository-scoped installation-local Ed25519 key outside Git and SQLite. Exact detached Decision/repository/worktree/named-branch/scope receipts support fresh-process verification and dynamic recognition of registry revocation, remove expiry, and make no biometric, named-human, or repository-owner identity claim. Detached checkouts remain readable but durable Decisions fail closed; a revoked running host stays bound and fail-closed while the next named-branch host rotates; a non-semantic process-releasing SQLite writer mutex serializes dead owner-record recovery, and complete owner records publish atomically. The threat model honestly excludes arbitrary same-UID, Plugin/runtime, and local OS-account compromise. Implementation and successor documentation are complete pending commit; no M3.6 commit SHA is recorded."
+      evidence: "Commit dd771df13185fc472ade73d6962b3e3e8be78403 replaces the M3.5 WebAuthn ceremony with one explicit Plugin-host click and a repository-scoped installation-local Ed25519 key outside Git and SQLite. Exact detached Decision/repository/worktree/named-branch/scope receipts support fresh-process verification and dynamic recognition of registry revocation, remove expiry, and make no biometric, named-human, or repository-owner identity claim. Detached checkouts remain readable but durable Decisions fail closed; a revoked running host stays bound and fail-closed while the next named-branch host rotates; a non-semantic process-releasing SQLite writer mutex serializes dead owner-record recovery, and complete owner records publish atomically. The threat model honestly excludes arbitrary same-UID, Plugin/runtime, and local OS-account compromise. The independently validated successor graph preserves the historical M3.5 outcome, adds a distinct M3.6 Ticket, and contains 12 Tickets and 12 direct relations at graph digest sha256:09d0081f034778d293e4563b0a45bb411c1e2e1baf714cb1d9c8abe20f247be2."
     - id: "m4-ticket-execution-closeout"
       name: "Execute, verify, and close one Ticket through Outcome and Evidence"
       status: planned
@@ -59,3 +59,4 @@ progress:
     - "802111c chore(vibehub): ticket checkpoint"
     - "dbc60dc feat(ticket): add durable human decision attestation"
     - "e8f2afd chore(vibehub): ticket checkpoint"
+    - "dd771df feat(ticket): replace passkeys with install-local authority"

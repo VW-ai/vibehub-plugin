@@ -280,7 +280,8 @@ graph digest
 and is path-exact checkpointed in
 `e8f2afd23d5651b3a90442f5d92e02ee2559720c`.
 
-M3.6 is implemented in the current working tree, pending commit:
+M3.6 is implemented in
+`dd771df13185fc472ade73d6962b3e3e8be78403`:
 
 - the WebAuthn ceremony is replaced by one explicit Plugin-host Decision click;
 - one repository-scoped Ed25519 profile stores its private key and revocable
@@ -302,8 +303,12 @@ M3.6 is implemented in the current working tree, pending commit:
   verification, named-human identity, or resistance to arbitrary same-UID or
   Plugin compromise.
 
-No M3.6 commit SHA is recorded until the implementation and successor metadata
-are committed.
+Core 414/414, CLI 100/100, and MCP 23/23 tests pass, together with complete
+typechecks/builds, npm package verification, and thin release-marketplace
+verification. The independently validated successor graph preserves the
+historical M3.5 outcome and inserts the distinct M3.6 Ticket on the path to
+context binding, producing 12 Tickets and 12 direct relations at graph digest
+`sha256:09d0081f034778d293e4563b0a45bb411c1e2e1baf714cb1d9c8abe20f247be2`.
 
 Execution, Outcome, Evidence, and closeout remain M4.
 
