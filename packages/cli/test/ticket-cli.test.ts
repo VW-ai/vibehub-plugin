@@ -49,7 +49,7 @@ describe("vibehub ticket Git-native adapter", () => {
     expect(result.envelope).toMatchObject({
       ok: true,
       data: {
-        schemaVersion: 2,
+        schemaVersion: 3,
         source: {
           mode: "worktree",
           worktreeRoot: repo,
@@ -91,7 +91,7 @@ describe("vibehub ticket Git-native adapter", () => {
       expect(result.status).toBe(0);
       expect(result.envelope).toMatchObject({
         ok: true,
-        data: { schemaVersion: 2 },
+        data: { schemaVersion: 3 },
       });
     }
   });
@@ -219,6 +219,7 @@ describe("vibehub ticket Git-native adapter", () => {
           worktreeIdentity: source.worktreeIdentity,
           resolvedCommit: source.resolvedCommit,
           graphDigest: source.graphDigest,
+          semanticLedgerDigest: source.semanticLedgerDigest,
         },
         changes: [{
           op: "put",
@@ -242,7 +243,7 @@ describe("vibehub ticket Git-native adapter", () => {
         }],
       }),
     ]);
-    expect(patched.status).toBe(0);
+    expect(patched.status, JSON.stringify(patched.envelope)).toBe(0);
     expect(patched.envelope).toMatchObject({
       ok: true,
       data: {
@@ -310,6 +311,7 @@ describe("vibehub ticket Git-native adapter", () => {
           worktreeIdentity: source.worktreeIdentity,
           resolvedCommit: source.resolvedCommit,
           graphDigest: source.graphDigest,
+          semanticLedgerDigest: source.semanticLedgerDigest,
         },
         changes: [{
           op: "put",
@@ -387,6 +389,112 @@ describe("vibehub ticket Git-native adapter", () => {
       ["show", "--format=", "--name-only", "HEAD"],
       { cwd: repo, encoding: "utf8" },
     ).trim()).toBe(".vibehub/tickets/tickets/implement-api.yaml");
+  });
+
+  it("appends claimed Agent reviews and fails closed for human Decisions", () => {
+    const graph = invoke([
+      "ticket",
+      "graph.snapshot",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-reviewer",
+      "--request",
+      "ticket-intervention:base",
+    ]);
+    const source = graph.envelope.data.source as Record<string, string>;
+    const expectedSource = {
+      sourceToken: source.sourceToken,
+      worktreeIdentity: source.worktreeIdentity,
+      resolvedCommit: source.resolvedCommit,
+      graphDigest: source.graphDigest,
+      semanticLedgerDigest: source.semanticLedgerDigest,
+    };
+    const review = invoke([
+      "ticket",
+      "review.append",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-reviewer",
+      "--request",
+      "ticket-intervention:comment",
+      "--input",
+      JSON.stringify({
+        expectedSource,
+        review: {
+          type: "comment",
+          subject: {
+            kind: "graph",
+            graphDigest: source.graphDigest,
+          },
+          body: "The exact graph is ready for implementation.",
+        },
+      }),
+    ]);
+    expect(review.status, JSON.stringify(review.envelope)).toBe(0);
+    expect(review.envelope).toMatchObject({
+      ok: true,
+      data: {
+        status: "applied",
+        review: {
+          document: {
+            kind: "ticket_review",
+            review_type: "comment",
+            author: {
+              actor_id: "cli-reviewer",
+              actor_kind: "agent",
+              attribution: "claimed",
+            },
+          },
+        },
+      },
+      meta: { operation: "ticket.review.append" },
+    });
+
+    const decision = invoke([
+      "ticket",
+      "decision.record",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-reviewer",
+      "--request",
+      "ticket-intervention:decision",
+      "--input",
+      JSON.stringify({
+        expectedSource,
+        decision: {
+          type: "plan_review",
+          subject: {
+            kind: "graph",
+            graphDigest: source.graphDigest,
+          },
+          disposition: "approve_execution",
+          rationale: "The graph is executable.",
+          resolutionRefs: [],
+        },
+      }),
+    ]);
+    expect(decision.status).toBe(5);
+    expect(decision.envelope).toMatchObject({
+      ok: false,
+      error: {
+        code: "ticket_authority_unavailable",
+        nextSafeActions: [
+          expect.stringMatching(/trusted review host/i),
+        ],
+      },
+    });
   });
 
   it("does not register retired proposal operations", () => {

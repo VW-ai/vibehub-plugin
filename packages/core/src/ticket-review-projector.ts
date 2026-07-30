@@ -511,12 +511,16 @@ function matchesSubject(
   trace: TicketReviewTraceRecordV0,
   subject: TicketReviewSubjectRefV0,
 ): boolean {
-  if (subject.kind === "ticket") {
-    return trace.subject.kind === "ticket"
-      && trace.subject.ticketId === subject.ticketId;
+  const traceSubject = trace.subject;
+  if (subject.kind === "graph") {
+    return traceSubject.kind === "graph";
   }
-  return trace.subject.kind === "relation"
-    && trace.subject.relationRef === subject.relationRef;
+  if (subject.kind === "ticket") {
+    return traceSubject.kind === "ticket"
+      && traceSubject.ticketId === subject.ticketId;
+  }
+  return traceSubject.kind === "relation"
+    && traceSubject.relationRef === subject.relationRef;
 }
 
 function slotKey(
@@ -632,25 +636,27 @@ function buildProjection(sourceValue: unknown): FullProjection {
   );
   const traceRecords = source.traceRecords;
   for (const trace of traceRecords) {
-    if (trace.subject.kind === "ticket") {
-      const definition = definitionById.get(trace.subject.ticketId);
+    const traceSubject = trace.subject;
+    if (traceSubject.kind === "graph") continue;
+    if (traceSubject.kind === "ticket") {
+      const definition = definitionById.get(traceSubject.ticketId);
       if (!definition) {
         failInvariant(
           "unknown_trace_ticket",
           "trace references an unknown Ticket",
-          { recordRef: trace.recordRef, ticketId: trace.subject.ticketId },
+          { recordRef: trace.recordRef, ticketId: traceSubject.ticketId },
         );
       }
-      if (trace.subject.boundTicketRevision
+      if (traceSubject.boundTicketRevision
         !== definition.ticketRevision) {
         failInvariant(
           "trace_ticket_revision_mismatch",
           "trace is not bound to the visible Ticket revision",
           {
             recordRef: trace.recordRef,
-            ticketId: trace.subject.ticketId,
+            ticketId: traceSubject.ticketId,
             boundTicketRevision:
-              trace.subject.boundTicketRevision,
+              traceSubject.boundTicketRevision,
             visibleTicketRevision: definition.ticketRevision,
           },
         );
@@ -662,27 +668,28 @@ function buildProjection(sourceValue: unknown): FullProjection {
       continue;
     }
 
-    const relation = relationByRef.get(trace.subject.relationRef);
+    const relation = relationByRef.get(traceSubject.relationRef);
     if (!relation) {
       failInvariant(
         "unknown_trace_relation",
         "trace references an unknown snapshot relation",
         {
           recordRef: trace.recordRef,
-          relationRef: trace.subject.relationRef,
+          relationRef: traceSubject.relationRef,
         },
       );
     }
-    if (trace.subject.sourceRevision !== source.snapshotRevision
-      || trace.subject.prerequisiteTicketId
+    if ((traceSubject.sourceRevision !== undefined
+      && traceSubject.sourceRevision !== source.snapshotRevision)
+      || traceSubject.prerequisiteTicketId
         !== relation.prerequisiteTicketId
-      || trace.subject.dependentTicketId !== relation.dependentTicketId) {
+      || traceSubject.dependentTicketId !== relation.dependentTicketId) {
       failInvariant(
         "trace_relation_binding_mismatch",
         "trace relation binding does not match the visible snapshot relation",
         {
           recordRef: trace.recordRef,
-          relationRef: trace.subject.relationRef,
+          relationRef: traceSubject.relationRef,
         },
       );
     }
@@ -1000,6 +1007,17 @@ export function inspectTicketReviewSubjectV0(
   );
   const full = buildProjection(sourceValue);
   assertSnapshot(full, request.snapshotId);
+  if (request.subject.kind === "graph") {
+    return assertOutput(ticketSubjectInspectionV0Schema, {
+      ...full.header,
+      subject: {
+        kind: "graph",
+        summary: full.summary,
+        traceCount: full.traceRecords.filter((trace) =>
+          trace.subject.kind === "graph").length,
+      },
+    }, "ticket.subject.inspect output");
+  }
   if (request.subject.kind === "ticket") {
     const ticketId = request.subject.ticketId;
     const ticket = full.tickets.find(
@@ -1078,7 +1096,9 @@ export function listTicketReviewTraceV0(
   const scopeDigest = ticketTraceScopeDigest(request);
   const full = buildProjection(sourceValue);
   assertSnapshot(full, request.snapshotId);
-  if (request.subject.kind === "ticket") {
+  if (request.subject.kind === "graph") {
+    // The graph locus is always present for a valid bound snapshot.
+  } else if (request.subject.kind === "ticket") {
     const ticketId = request.subject.ticketId;
     if (!full.tickets.some(
       (ticket) => ticket.ticketId === ticketId,

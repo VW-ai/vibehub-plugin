@@ -22,6 +22,7 @@ import {
   type TicketReviewSourceMetadataV0,
   type TicketReviewSubjectRefV0,
   type TicketReviewTicketProjectionV0,
+  type TicketReviewTraceDecisionV0,
   type TicketReviewTraceRecordV0,
   type TicketReviewTraceSubjectV0,
   type TicketReviewTraceTargetV0,
@@ -97,6 +98,9 @@ function isOpaqueNonNavigationRef(value: string): boolean {
 
 export const ticketReviewSubjectRefV0Schema: z.ZodType<TicketReviewSubjectRefV0> =
   z.discriminatedUnion("kind", [
+    z.object({
+      kind: z.literal("graph"),
+    }).strict(),
     z.object({
       kind: z.literal("ticket"),
       ticketId,
@@ -211,11 +215,13 @@ z.ZodType<TicketReviewSourceMetadataV0> = z.discriminatedUnion("mode", [
       repositoryIncarnation: opaqueRef,
       resolvedCommit: z.string().regex(/^[0-9a-f]{40,64}$/),
       graphDigest: sha256Digest,
+      semanticLedgerDigest: sha256Digest.optional(),
       sourceToken: opaqueRef,
       worktreeIdentity: opaqueRef,
       worktreeRoot: canonicalString(4_000),
       branch: canonicalString(500).nullable(),
       committedGraphDigest: sha256Digest.nullable(),
+      committedSemanticLedgerDigest: sha256Digest.nullable().optional(),
       semanticDirty: z.boolean(),
       dirtyPaths: z.array(canonicalString(2_000)).max(1_000),
       dirtyPathsTruncated: z.boolean(),
@@ -226,6 +232,7 @@ z.ZodType<TicketReviewSourceMetadataV0> = z.discriminatedUnion("mode", [
       repositoryIncarnation: opaqueRef,
       resolvedCommit: z.string().regex(/^[0-9a-f]{40,64}$/),
       graphDigest: sha256Digest,
+      semanticLedgerDigest: sha256Digest.optional(),
       sourceToken: opaqueRef,
       requestedRef: canonicalString(500),
     }).strict(),
@@ -446,10 +453,17 @@ const inspectedRelationSubjectSchema = z.object({
   relation: ticketReviewRelationProjectionV0Schema,
 }).strict();
 
+const inspectedGraphSubjectSchema = z.object({
+  kind: z.literal("graph"),
+  summary: ticketReviewSnapshotSummaryV0Schema,
+  traceCount: nonnegativeInteger.max(TICKET_REVIEW_MAX_TRACE_RECORDS),
+}).strict();
+
 export const ticketSubjectInspectionV0Schema:
 z.ZodType<TicketSubjectInspectionV0> = z.object({
   ...projectionHeaderShape,
   subject: z.union([
+    inspectedGraphSubjectSchema,
     inspectedTicketSubjectSchema,
     inspectedRelationSubjectSchema,
   ]),
@@ -458,13 +472,16 @@ z.ZodType<TicketSubjectInspectionV0> = z.object({
 export const ticketReviewTraceSubjectV0Schema:
 z.ZodType<TicketReviewTraceSubjectV0> = z.discriminatedUnion("kind", [
   z.object({
+    kind: z.literal("graph"),
+  }).strict(),
+  z.object({
     kind: z.literal("ticket"),
     ticketId,
     boundTicketRevision: sha256Digest,
   }).strict(),
   z.object({
     kind: z.literal("relation"),
-    sourceRevision: opaqueRef,
+    sourceRevision: opaqueRef.optional(),
     relationRef: opaqueRef,
     prerequisiteTicketId: ticketId,
     dependentTicketId: ticketId,
@@ -502,6 +519,82 @@ z.ZodType<TicketReviewTraceTargetV0> = z.discriminatedUnion("kind", [
   opaqueTargetSchema,
 ]);
 
+export const ticketReviewTraceDecisionV0Schema:
+z.ZodType<TicketReviewTraceDecisionV0> = z.discriminatedUnion(
+  "decisionType",
+  [
+    z.object({
+      decisionType: z.literal("plan_review"),
+      disposition: z.enum([
+        "approve_execution",
+        "delegate_within_boundaries",
+        "request_changes",
+      ]),
+      delegatedBoundaries: z.array(canonicalString(8_192))
+        .max(128)
+        .refine(hasUniqueValues, {
+          message: "must contain unique boundaries",
+        })
+        .optional(),
+      resolutionRefs: z.array(canonicalString(4_096))
+        .max(128)
+        .refine(hasUniqueValues, {
+          message: "must contain unique references",
+        }),
+    }).strict(),
+    z.object({
+      decisionType: z.literal("protected_boundary"),
+      boundary: canonicalString(20_000),
+      disposition: z.enum(["resolve", "decline"]),
+      selection: canonicalString(20_000).optional(),
+      resolutionRefs: z.array(canonicalString(4_096))
+        .max(128)
+        .refine(hasUniqueValues, {
+          message: "must contain unique references",
+        }),
+    }).strict(),
+  ],
+).superRefine((value, context) => {
+  if (value.decisionType === "plan_review") {
+    const boundaries = value.delegatedBoundaries;
+    if (
+      value.disposition === "delegate_within_boundaries"
+      && (boundaries === undefined || boundaries.length === 0)
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["delegatedBoundaries"],
+        message: "must be non-empty for delegated execution",
+      });
+    }
+    if (
+      value.disposition !== "delegate_within_boundaries"
+      && boundaries !== undefined
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["delegatedBoundaries"],
+        message: "is only allowed for delegated execution",
+      });
+    }
+    return;
+  }
+  if (value.disposition === "resolve" && value.selection === undefined) {
+    context.addIssue({
+      code: "custom",
+      path: ["selection"],
+      message: "must be present for a resolved protected boundary",
+    });
+  }
+  if (value.disposition === "decline" && value.selection !== undefined) {
+    context.addIssue({
+      code: "custom",
+      path: ["selection"],
+      message: "is not allowed for a declined protected boundary",
+    });
+  }
+});
+
 export const ticketReviewTraceRecordV0Schema:
 z.ZodType<TicketReviewTraceRecordV0> = z.object({
   recordRef: opaqueRef,
@@ -516,6 +609,7 @@ z.ZodType<TicketReviewTraceRecordV0> = z.object({
   summary: canonicalString(500),
   body: longText.optional(),
   status: canonicalString(100).optional(),
+  decision: ticketReviewTraceDecisionV0Schema.optional(),
   crossReferences: z.array(opaqueRef).max(50),
   targets: z.array(ticketReviewTraceTargetV0Schema).max(20),
   availability: z.enum(["available", "unavailable"]),
@@ -543,6 +637,27 @@ z.ZodType<TicketReviewTraceRecordV0> = z.object({
       message: `${value.kind} trace records require a receipt producer`,
     });
   }
+  if (
+    value.decision !== undefined
+    && value.subkind !== value.decision.decisionType
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["decision", "decisionType"],
+      message: "must match the trace record subkind",
+    });
+  }
+  if (
+    value.decision !== undefined
+    && value.producer.kind !== "receipt"
+    && value.producer.kind !== "authority_receipt"
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["producer", "kind"],
+      message: "Decision details require a receipt producer",
+    });
+  }
 });
 
 export const ticketTraceListRequestV0Schema:
@@ -568,6 +683,9 @@ function traceMatchesSubject(
   if (subject.kind === "ticket") {
     return trace.subject.kind === "ticket"
       && trace.subject.ticketId === subject.ticketId;
+  }
+  if (subject.kind === "graph") {
+    return trace.subject.kind === "graph";
   }
   return trace.subject.kind === "relation"
     && trace.subject.relationRef === subject.relationRef;
@@ -619,6 +737,7 @@ z.ZodType<TicketTraceListPageV0> = z.object({
       });
     }
     if (record.subject.kind === "relation"
+      && record.subject.sourceRevision !== undefined
       && record.subject.sourceRevision !== value.snapshotRevision) {
       context.addIssue({
         code: "custom",

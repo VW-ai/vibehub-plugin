@@ -6,8 +6,17 @@ import {
   TICKET_LEDGER_TICKET_MAX_BYTES,
   TICKET_LEDGER_RELATIVE_PATH,
   TicketLedgerError,
+  createTicketDecisionDocument,
+  createTicketReviewDocument,
   decodeTicketLedger,
+  encodeTicketDecisionDocument,
+  encodeTicketReviewDocument,
+  isTicketLedgerDocumentPath,
+  normalizeTicketDecisionDocument,
+  normalizeTicketReviewDocument,
+  ticketDecisionDocumentPath,
   ticketDocumentPath,
+  ticketReviewDocumentPath,
   ticketRelationId,
   validateTicketLedger,
   type TicketLedgerFile,
@@ -101,6 +110,344 @@ acceptance:
     expect(first.graphDigest).toBe(reordered.graphDigest);
     expect(first.tickets[0]!.ticketRevision)
       .toBe(reordered.tickets[0]!.ticketRevision);
+  });
+
+  it("keeps review facts out of Ticket identity and graph topology", () => {
+    const ticketFile = bytes(
+      ticketDocumentPath("read-cut"),
+      ticket("read-cut"),
+    );
+    const base = ledger(ticketFile);
+    const subject = {
+      kind: "ticket" as const,
+      ticket_id: "read-cut",
+      ticket_revision: base.tickets[0]!.ticketRevision,
+    };
+    const review = createTicketReviewDocument({
+      schema_version: 1,
+      kind: "ticket_review",
+      review_type: "comment",
+      subject,
+      observed: {
+        resolved_commit: "a".repeat(40),
+        graph_digest: base.graphDigest,
+      },
+      author: {
+        actor_id: "Wayne",
+        actor_kind: "human",
+        attribution: "claimed",
+      },
+      body: "Please preserve the direct-unlock reading.",
+      occurred_at: "2026-07-30T18:00:00Z",
+    });
+    const withReview = ledger(
+      ticketFile,
+      {
+        documentPath: ticketReviewDocumentPath(
+          review.subject,
+          review.review_id,
+        ),
+        bytes: encodeTicketReviewDocument(review),
+      },
+    );
+
+    expect(withReview.graphDigest).toBe(base.graphDigest);
+    expect(withReview.tickets[0]!.ticketRevision)
+      .toBe(base.tickets[0]!.ticketRevision);
+    expect(withReview.semanticLedgerDigest)
+      .not.toBe(base.semanticLedgerDigest);
+    expect(withReview.reviews).toEqual([expect.objectContaining({
+      document: review,
+    })]);
+  });
+
+  it("derives append-only review and subject-stable decision identities", () => {
+    const base = ledger(bytes(
+      ticketDocumentPath("read-cut"),
+      ticket("read-cut"),
+    ));
+    const ticketSubject = {
+      kind: "ticket" as const,
+      ticket_id: "read-cut",
+      ticket_revision: base.tickets[0]!.ticketRevision,
+    };
+    const edit = createTicketReviewDocument({
+      schema_version: 1,
+      kind: "ticket_review",
+      review_type: "ticket_edit",
+      subject: ticketSubject,
+      observed: {
+        resolved_commit: "b".repeat(40),
+        graph_digest: base.graphDigest,
+      },
+      author: {
+        actor_id: "codex",
+        actor_kind: "agent",
+        attribution: "host_attested",
+      },
+      body: "Tighten the observable outcome.",
+      occurred_at: "2026-07-30T18:01:02.123-07:00",
+      expected_ticket_revision: ticketSubject.ticket_revision,
+      replacement_ticket: {
+        schema_version: 1,
+        kind: "ticket",
+        ticket_id: "read-cut",
+        outcome: "Deliver a tighter read cut",
+        context: "Context for read-cut",
+        acceptance: [],
+        constraints: [],
+        context_refs: [],
+        relations: [],
+        provenance_refs: [],
+      },
+      rationale: "The existing outcome is ambiguous.",
+    });
+    expect(edit.review_id).toMatch(/^trv-[0-9a-f]{64}$/u);
+    expect(edit.occurred_at).toBe("2026-07-31T01:01:02.123Z");
+    expect(ticketReviewDocumentPath(edit.subject, edit.review_id))
+      .toMatch(/\/reviews\/[0-9a-f]{64}\/trv-[0-9a-f]{64}\.yaml$/u);
+
+    const protectedDecision = createTicketDecisionDocument({
+      schema_version: 1,
+      kind: "ticket_decision",
+      decision_type: "protected_boundary",
+      subject: ticketSubject,
+      boundary: "Which primary interaction should ship?",
+      disposition: "resolve",
+      selection: "Keep the graph-first interaction.",
+      rationale: "It directly exposes what may execute next.",
+      resolution_refs: ["META/review.yaml"],
+      authority: {
+        principal_id: "wayne",
+        principal_kind: "human",
+        basis: "repository_owner",
+        basis_ref: "local-host/session-1",
+        attestation: "host_bound_local",
+      },
+      decided_at: "2026-07-30T18:03:00Z",
+    });
+    const otherBoundary = createTicketDecisionDocument({
+      ...Object.fromEntries(
+        Object.entries(protectedDecision)
+          .filter(([key]) => key !== "decision_id"),
+      ),
+      boundary: "Which typography should ship?",
+    } as Parameters<typeof createTicketDecisionDocument>[0]);
+
+    expect(protectedDecision.decision_id)
+      .toMatch(/^tdc-[0-9a-f]{64}$/u);
+    expect(ticketDecisionDocumentPath(protectedDecision))
+      .not.toBe(ticketDecisionDocumentPath(otherBoundary));
+    expect(encodeTicketDecisionDocument(protectedDecision).toString("utf8"))
+      .toContain("kind: ticket_decision");
+    expect(normalizeTicketDecisionDocument(protectedDecision))
+      .toEqual(protectedDecision);
+  });
+
+  it("rejects forged identities, malformed edit bindings, and unsafe review paths", () => {
+    const base = ledger(bytes(
+      ticketDocumentPath("read-cut"),
+      ticket("read-cut"),
+    ));
+    const subject = {
+      kind: "ticket" as const,
+      ticket_id: "read-cut",
+      ticket_revision: base.tickets[0]!.ticketRevision,
+    };
+    const review = createTicketReviewDocument({
+      schema_version: 1,
+      kind: "ticket_review",
+      review_type: "comment",
+      subject,
+      observed: {
+        resolved_commit: "c".repeat(40),
+        graph_digest: base.graphDigest,
+      },
+      author: {
+        actor_id: "reviewer",
+        actor_kind: "human",
+        attribution: "claimed",
+      },
+      body: "One exact review contribution.",
+      occurred_at: "2026-07-30T18:04:00Z",
+    });
+    expectCode(
+      () => normalizeTicketReviewDocument({
+        ...review,
+        review_id: `trv-${"f".repeat(64)}`,
+      }),
+      "invalid_document",
+    );
+    expectCode(
+      () => normalizeTicketReviewDocument({
+        ...review,
+        review_type: "ticket_edit",
+        expected_ticket_revision: "d".repeat(64),
+        replacement_ticket: {
+          schema_version: 1,
+          kind: "ticket",
+          ticket_id: "other",
+          outcome: "Wrong target",
+          context: "Wrong target",
+          acceptance: [],
+          constraints: [],
+          context_refs: [],
+          relations: [],
+          provenance_refs: [],
+        },
+        rationale: "Invalid bindings",
+      }),
+      "invalid_document",
+    );
+    expect(isTicketLedgerDocumentPath(
+      `${TICKET_LEDGER_RELATIVE_PATH}/reviews/../${review.review_id}.yaml`,
+    )).toBe(false);
+    expect(isTicketLedgerDocumentPath(
+      `${TICKET_LEDGER_RELATIVE_PATH}/reviews/${
+        "a".repeat(64)
+      }/nested/${review.review_id}.yaml`,
+    )).toBe(false);
+    expectCode(
+      () => ledger(
+        bytes(ticketDocumentPath("read-cut"), ticket("read-cut")),
+        {
+          documentPath:
+            `${TICKET_LEDGER_RELATIVE_PATH}/reviews/${
+              "a".repeat(64)
+            }/${review.review_id}.yaml`,
+          bytes: encodeTicketReviewDocument(review),
+        },
+      ),
+      "invalid_path",
+    );
+  });
+
+  it("requires host-bound human authority and exact decision union fields", () => {
+    const graphSubject = {
+      kind: "graph" as const,
+      graph_digest: "a".repeat(64),
+    };
+    const valid = createTicketDecisionDocument({
+      schema_version: 1,
+      kind: "ticket_decision",
+      decision_type: "plan_review",
+      subject: graphSubject,
+      disposition: "delegate_within_boundaries",
+      delegated_boundaries: ["Ticket implementation within accepted UX"],
+      rationale: "Delegate the mechanically constrained implementation.",
+      resolution_refs: [],
+      authority: {
+        principal_id: "wayne",
+        principal_kind: "human",
+        basis: "repository_owner",
+        basis_ref: "local-host/session-2",
+        attestation: "host_bound_local",
+      },
+      decided_at: "2026-07-30T18:05:00Z",
+    });
+    expect(valid.decision_type).toBe("plan_review");
+
+    for (const invalid of [
+      {
+        ...valid,
+        decision_id: `tdc-${"0".repeat(64)}`,
+      },
+      {
+        ...valid,
+        authority: {
+          ...valid.authority,
+          principal_kind: "agent",
+        },
+      },
+      {
+        ...valid,
+        authority: {
+          ...valid.authority,
+          attestation: "claimed",
+        },
+      },
+      {
+        ...valid,
+        delegated_boundaries: [],
+      },
+      {
+        ...valid,
+        disposition: "approve_execution",
+      },
+    ]) {
+      expectCode(
+        () => normalizeTicketDecisionDocument(invalid),
+        "invalid_document",
+      );
+    }
+  });
+
+  it("binds graph and relation reviews to stable semantic subjects", () => {
+    const relationRef = ticketRelationId("dependent", {
+      type: "depends_on",
+      target_ticket_id: "prerequisite",
+    });
+    const relationReview = createTicketReviewDocument({
+      schema_version: 1,
+      kind: "ticket_review",
+      review_type: "comment",
+      subject: {
+        kind: "relation",
+        relation_ref: relationRef,
+        prerequisite_ticket_id: "prerequisite",
+        dependent_ticket_id: "dependent",
+        dependent_ticket_revision: "b".repeat(64),
+      },
+      observed: {
+        resolved_commit: "c".repeat(40),
+        graph_digest: "d".repeat(64),
+      },
+      author: {
+        actor_id: "codex",
+        actor_kind: "agent",
+        attribution: "claimed",
+      },
+      body: "This direct dependency is unnecessarily serialized.",
+      occurred_at: "2026-07-30T18:06:00Z",
+    });
+    expect(relationReview.subject.kind).toBe("relation");
+
+    expectCode(
+      () => createTicketReviewDocument({
+        ...Object.fromEntries(
+          Object.entries(relationReview)
+            .filter(([key]) => key !== "review_id"),
+        ),
+        subject: {
+          ...relationReview.subject,
+          relation_ref: `trl-${"f".repeat(64)}`,
+        },
+      } as Parameters<typeof createTicketReviewDocument>[0]),
+      "invalid_document",
+    );
+    expectCode(
+      () => createTicketReviewDocument({
+        schema_version: 1,
+        kind: "ticket_review",
+        review_type: "comment",
+        subject: {
+          kind: "graph",
+          graph_digest: "a".repeat(64),
+        },
+        observed: {
+          resolved_commit: "c".repeat(40),
+          graph_digest: "b".repeat(64),
+        },
+        author: {
+          actor_id: "reviewer",
+          actor_kind: "human",
+          attribution: "claimed",
+        },
+        body: "Review a mismatched graph.",
+        occurred_at: "2026-07-30T18:07:00Z",
+      }),
+      "invalid_document",
+    );
   });
 
   it("normalizes identity-keyed collections but preserves constraint order", () => {

@@ -116,7 +116,7 @@ describe("packaged operation contract validation", () => {
     expect(schemaPropertyRead).toBe(false);
   });
 
-  it("publishes only the Git-native Ticket read and patch contracts", async () => {
+  it("publishes only the canonical Git-native Ticket contracts", async () => {
     const { validateOperationContract } = await import(validatorPath) as {
       validateOperationContract(
         contract: unknown,
@@ -127,14 +127,17 @@ describe("packaged operation contract validation", () => {
     const ticketOperations = Object.keys(artifact.operations)
       .filter((operation) => operation.startsWith("ticket."));
     expect(ticketOperations).toEqual([
+      "ticket.decision.record",
       "ticket.graph.snapshot",
+      "ticket.review.append",
       "ticket.subject.inspect",
       "ticket.trace.list",
       "ticket.worktree.patch",
     ]);
     expect(ticketOperations).toEqual(
       Object.keys(operationInputSchemas)
-        .filter((operation) => operation.startsWith("ticket.")),
+        .filter((operation) => operation.startsWith("ticket."))
+        .sort(),
     );
     for (const operation of ticketOperations) {
       const contract = artifact.operations[operation];
@@ -155,6 +158,16 @@ describe("packaged operation contract validation", () => {
       "patch Ticket document is closed",
       "patch Ticket key must match document ID",
     ]));
+    expect(artifact.operations["ticket.review.append"].fixtures.negatives)
+      .toEqual(expect.arrayContaining([
+        expect.objectContaining({ case: "review type is closed" }),
+      ]));
+    expect(artifact.operations["ticket.decision.record"].fixtures.negatives)
+      .toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          case: "plan approval rejects delegated boundaries",
+        }),
+      ]));
     expect(JSON.stringify(artifact)).not.toMatch(/ticket\.proposal/);
   });
 

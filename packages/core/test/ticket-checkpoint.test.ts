@@ -60,6 +60,7 @@ const expectedSource = (
     worktreeIdentity: snapshot.source.worktreeIdentity,
     resolvedCommit: snapshot.source.resolvedCommit,
     graphDigest: `sha256:${snapshot.graphDigest}`,
+    semanticLedgerDigest: `sha256:${snapshot.semanticLedgerDigest}`,
   };
 };
 
@@ -172,7 +173,7 @@ describe("Ticket checkpoint", () => {
       .toBe("code.ts");
     expect(git(repository, "diff", "--name-only").trim()).toBe("README.md");
     expect(git(repository, "show", "-s", "--format=%B", "HEAD")).toContain(
-      `VibeHub-Ticket-Graph-Digest: ${receipt.graphDigest}`,
+      `VibeHub-Ticket-Semantic-Ledger-Digest: ${receipt.semanticLedgerDigest}`,
     );
     expect(`sha256:${loadTicketLedgerAtRef(repository, "HEAD").graphDigest}`)
       .toBe(receipt.graphDigest);

@@ -202,7 +202,9 @@ function runOperation(
       canonicalOperation === "ticket.graph.snapshot"
       || canonicalOperation === "ticket.subject.inspect"
       || canonicalOperation === "ticket.trace.list"
-      || canonicalOperation === "ticket.worktree.patch";
+      || canonicalOperation === "ticket.worktree.patch"
+      || canonicalOperation === "ticket.review.append"
+      || canonicalOperation === "ticket.decision.record";
     const repoId=row?.id??(isGitNativeTicketOperation ? 1 : 0);
     const result=new OperationDispatcher(db,{repoRoot:session.toplevel}).dispatch(canonicalOperation,{repoId,actor:flags.actor,taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
     process.stdout.write(`${JSON.stringify(result)}\n`);

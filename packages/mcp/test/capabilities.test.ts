@@ -200,6 +200,8 @@ describe("local MCP deterministic capabilities", () => {
         "ticket.subject.inspect",
         "ticket.trace.list",
         "ticket.worktree.patch",
+        "ticket.review.append",
+        "ticket.decision.record",
       ]);
       expect(ticketSchema.properties?.operation?.enum)
         .toEqual([...TICKET_OPERATION_NAMES]);
@@ -210,7 +212,8 @@ describe("local MCP deterministic capabilities", () => {
       );
       expect(ticketTool?.description).toMatch(/Git-native Ticket graph/);
       expect(ticketTool?.description).toMatch(/exact-base worktree patch/i);
-      expect(ticketTool?.description).not.toMatch(/proposal|authority/i);
+      expect(ticketTool?.description).toMatch(/fail closed/i);
+      expect(ticketTool?.description).toMatch(/trusted host/i);
 
       const graphResult = await client.callTool({
         name: "ticket_operation",
@@ -225,7 +228,7 @@ describe("local MCP deterministic capabilities", () => {
       expect(graph).toMatchObject({
         ok: true,
         data: {
-          schemaVersion: 2,
+          schemaVersion: 3,
           source: {
             mode: "worktree",
             semanticDirty: false,
@@ -279,6 +282,8 @@ describe("local MCP deterministic capabilities", () => {
               worktreeIdentity: graph.data.source.worktreeIdentity,
               resolvedCommit: graph.data.source.resolvedCommit,
               graphDigest: graph.data.source.graphDigest,
+              semanticLedgerDigest:
+                graph.data.source.semanticLedgerDigest,
             },
             changes: [{
               op: "put",
@@ -310,6 +315,91 @@ describe("local MCP deterministic capabilities", () => {
             ".vibehub/tickets/tickets/read-ticket-graph.yaml",
           ],
         },
+      });
+
+      const refreshed = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.graph.snapshot",
+          requestId: "ticket-after-patch",
+          input: { pageSize: 10 },
+        },
+      });
+      const refreshedGraph = JSON.parse(toolText(refreshed));
+      const review = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.review.append",
+          requestId: "ticket-comment",
+          input: {
+            expectedSource: {
+              sourceToken: refreshedGraph.data.source.sourceToken,
+              worktreeIdentity:
+                refreshedGraph.data.source.worktreeIdentity,
+              resolvedCommit: refreshedGraph.data.source.resolvedCommit,
+              graphDigest: refreshedGraph.data.source.graphDigest,
+              semanticLedgerDigest:
+                refreshedGraph.data.source.semanticLedgerDigest,
+            },
+            review: {
+              type: "comment",
+              subject: {
+                kind: "graph",
+                graphDigest: refreshedGraph.data.source.graphDigest,
+              },
+              body: "The exact graph is ready for implementation.",
+            },
+          },
+        },
+      });
+      expect(review.isError).toBe(false);
+      expect(JSON.parse(toolText(review))).toMatchObject({
+        ok: true,
+        data: {
+          review: {
+            document: {
+              author: {
+                actor_id: "mcp-test",
+                actor_kind: "agent",
+                attribution: "claimed",
+              },
+            },
+          },
+        },
+      });
+
+      const decision = await client.callTool({
+        name: "ticket_operation",
+        arguments: {
+          operation: "ticket.decision.record",
+          requestId: "ticket-decision",
+          input: {
+            expectedSource: {
+              sourceToken: refreshedGraph.data.source.sourceToken,
+              worktreeIdentity:
+                refreshedGraph.data.source.worktreeIdentity,
+              resolvedCommit: refreshedGraph.data.source.resolvedCommit,
+              graphDigest: refreshedGraph.data.source.graphDigest,
+              semanticLedgerDigest:
+                refreshedGraph.data.source.semanticLedgerDigest,
+            },
+            decision: {
+              type: "plan_review",
+              subject: {
+                kind: "graph",
+                graphDigest: refreshedGraph.data.source.graphDigest,
+              },
+              disposition: "approve_execution",
+              rationale: "The graph is executable.",
+              resolutionRefs: [],
+            },
+          },
+        },
+      });
+      expect(decision.isError).toBe(true);
+      expect(JSON.parse(toolText(decision))).toMatchObject({
+        ok: false,
+        error: { code: "ticket_authority_unavailable" },
       });
 
       expect(ticketDb.prepare(

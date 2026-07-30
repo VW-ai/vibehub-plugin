@@ -6,10 +6,31 @@ the wrong work unit or make the graph misleading.
 ## Source and candidate binding
 
 - Confirm the candidate is tied to one current worktree source, graph digest,
-  and exact target revisions.
+  semantic-ledger digest, and exact target revisions.
 - Treat source drift as a new planning fact, not a token-replacement exercise.
 - Confirm creates target absent IDs and replacements preserve the observed
   full document unless the candidate intentionally changes a field.
+- Load projected graph, Ticket, relation, Review, and Decision facts from one
+  exact snapshot. A stale subject, expired snapshot, missing referenced Review
+  document, or failed trace page makes the source inconclusive rather than
+  silently complete.
+
+## Review-driven candidate truth
+
+- Treat a comment as non-mutating input. It may identify a defect but cannot
+  itself require a field change, grant authority, or prove that a candidate is
+  valid.
+- For a current `ticket_edit`, compare its complete proposed replacement with
+  the current Ticket and the newly authored candidate. Confirm that Planning
+  reconciled fresh graph facts rather than copying the proposal mechanically.
+- Require a Review-driven replacement Ticket to preserve the exact Review
+  `recordRef` in provenance. Confirm that the candidate source was captured
+  after the Review write; a pre-Review source token or semantic-ledger digest
+  is stale.
+- Validate the unchanged fresh candidate independently. The Review author,
+  replacement body, or host-attested attribution is not a semantic verdict.
+- Historical Review facts remain causal context only. Do not transplant a
+  proposal from an old Ticket revision onto the current Ticket.
 
 ## Outcome promise
 
@@ -83,6 +104,25 @@ Confirm that the candidate does not silently define or alter:
 
 A coherent blocker Ticket may preserve such a question without answering it.
 Objectively adjudicable internal engineering choices remain delegated.
+
+Recognize human authority only from a projected current `gate_decision` whose
+producer is an `authority_receipt`:
+
+- Read the complete durable Decision document at the trace's typed
+  `repo_path` target. Require its `decision_id`, exact subject, authority
+  principal, decision type, and disposition to agree with the current trace
+  and snapshot. Treat `delegated_boundaries`, `boundary`, `selection`, and
+  `resolution_refs` as usable only from that verified document; summary text
+  is never an authority scope.
+- `plan_review` binds one exact graph digest. `approve_execution` covers that
+  graph; `delegate_within_boundaries` covers only the recorded boundaries;
+  `request_changes` requires a new candidate and does not authorize execution.
+- `protected_boundary` binds one exact Ticket revision and recorded question.
+  `resolve` supplies only its recorded selection; `decline` leaves the answer
+  unresolved.
+- Historical Decision artifacts remain inspectable but non-authoritative.
+  Claimed or host-attested Review attribution is not a Decision, and a
+  Decision for another graph, revision, boundary, or scope grants nothing.
 
 Require honest Planning Fog when a blocker or discovery must resolve before
 downstream detail is knowable. Allow a coarse downstream Ticket only when its

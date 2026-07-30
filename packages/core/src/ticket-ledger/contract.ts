@@ -6,8 +6,12 @@ export const TICKET_LEDGER_RELATIVE_PATH = ".vibehub/tickets" as const;
 
 export const TICKET_LEDGER_PROTOCOL_MAX_BYTES = 16 * 1024;
 export const TICKET_LEDGER_TICKET_MAX_BYTES = 256 * 1024;
+export const TICKET_LEDGER_REVIEW_MAX_BYTES = 384 * 1024;
+export const TICKET_LEDGER_DECISION_MAX_BYTES = 64 * 1024;
 export const TICKET_LEDGER_MAX_BYTES = 8 * 1024 * 1024;
 export const TICKET_LEDGER_MAX_TICKETS = 1_000;
+export const TICKET_LEDGER_MAX_REVIEWS = 5_000;
+export const TICKET_LEDGER_MAX_DECISIONS = 2_000;
 export const TICKET_LEDGER_MAX_RELATIONS = 5_000;
 export const TICKET_LEDGER_MAX_PATCH_CHANGES = 1_000;
 export const TICKET_LEDGER_MAX_DIRTY_PATHS = 128;
@@ -33,6 +37,22 @@ const boundedText = (max: number) =>
     ))
     .meta({ maxLength: max })
     .regex(/^(?=[\s\S]*\S)[\s\S]*$/u, "must not be blank");
+
+const sha256DigestSchema = z.string().regex(/^[0-9a-f]{64}$/u);
+const gitCommitSchema = z.string().regex(/^[0-9a-f]{40,64}$/u);
+const relationRefSchema = z.string().regex(/^trl-[0-9a-f]{64}$/u);
+const reviewIdSchema = z.string().regex(/^trv-[0-9a-f]{64}$/u);
+const decisionIdSchema = z.string().regex(/^tdc-[0-9a-f]{64}$/u);
+const instantSchema = z.iso.datetime({ offset: true }).refine(
+  (value) => Number.isFinite(Date.parse(value)),
+  { message: "must be a representable ISO datetime" },
+).refine(
+  (value) => {
+    const fraction = value.match(/\.(\d+)/u);
+    return fraction === null || fraction[1]!.length <= 3;
+  },
+  { message: "must use no more than millisecond precision" },
+);
 
 export const ticketLedgerProtocolSchema = z
   .object({
@@ -79,11 +99,191 @@ export const ticketDocumentSchema = z
   })
   .strict();
 
+export const ticketReviewSubjectSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("graph"),
+    graph_digest: sha256DigestSchema,
+  }).strict(),
+  z.object({
+    kind: z.literal("ticket"),
+    ticket_id: identifierSchema,
+    ticket_revision: sha256DigestSchema,
+  }).strict(),
+  z.object({
+    kind: z.literal("relation"),
+    relation_ref: relationRefSchema,
+    prerequisite_ticket_id: identifierSchema,
+    dependent_ticket_id: identifierSchema,
+    dependent_ticket_revision: sha256DigestSchema,
+  }).strict(),
+]);
+
+const ticketReviewObservedSchema = z.object({
+  resolved_commit: gitCommitSchema,
+  graph_digest: sha256DigestSchema,
+}).strict();
+
+const ticketReviewAuthorSchema = z.object({
+  actor_id: boundedText(512),
+  actor_kind: z.enum(["human", "agent"]),
+  attribution: z.enum(["claimed", "host_attested"]),
+}).strict();
+
+const ticketReviewCommonShape = {
+  schema_version: z.literal(TICKET_LEDGER_SCHEMA_VERSION),
+  kind: z.literal("ticket_review"),
+  review_id: reviewIdSchema,
+  subject: ticketReviewSubjectSchema,
+  observed: ticketReviewObservedSchema,
+  author: ticketReviewAuthorSchema,
+  body: boundedText(20_000),
+  occurred_at: instantSchema,
+} satisfies z.ZodRawShape;
+
+export const ticketReviewDocumentSchema = z.discriminatedUnion("review_type", [
+  z.object({
+    ...ticketReviewCommonShape,
+    review_type: z.literal("comment"),
+  }).strict(),
+  z.object({
+    ...ticketReviewCommonShape,
+    review_type: z.literal("ticket_edit"),
+    expected_ticket_revision: sha256DigestSchema,
+    replacement_ticket: ticketDocumentSchema,
+    rationale: boundedText(20_000),
+  }).strict(),
+]).superRefine((value, context) => {
+  if (
+    value.subject.kind === "graph"
+    && value.subject.graph_digest !== value.observed.graph_digest
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["subject", "graph_digest"],
+      message: "must equal observed.graph_digest",
+    });
+  }
+  if (value.review_type !== "ticket_edit") return;
+  if (value.subject.kind !== "ticket") {
+    context.addIssue({
+      code: "custom",
+      path: ["subject", "kind"],
+      message: "ticket_edit must bind an exact Ticket subject",
+    });
+    return;
+  }
+  if (value.expected_ticket_revision !== value.subject.ticket_revision) {
+    context.addIssue({
+      code: "custom",
+      path: ["expected_ticket_revision"],
+      message: "must equal subject.ticket_revision",
+    });
+  }
+  if (value.replacement_ticket.ticket_id !== value.subject.ticket_id) {
+    context.addIssue({
+      code: "custom",
+      path: ["replacement_ticket", "ticket_id"],
+      message: "must equal subject.ticket_id",
+    });
+  }
+});
+
+const ticketDecisionAuthoritySchema = z.object({
+  principal_id: boundedText(512),
+  principal_kind: z.literal("human"),
+  basis: z.enum(["repository_owner", "designated_human"]),
+  basis_ref: boundedText(2_048),
+  attestation: z.literal("host_bound_local"),
+}).strict();
+
+const ticketDecisionCommonShape = {
+  schema_version: z.literal(TICKET_LEDGER_SCHEMA_VERSION),
+  kind: z.literal("ticket_decision"),
+  decision_id: decisionIdSchema,
+  rationale: boundedText(20_000),
+  resolution_refs: z.array(boundedText(4_096)).max(128),
+  authority: ticketDecisionAuthoritySchema,
+  decided_at: instantSchema,
+} satisfies z.ZodRawShape;
+
+export const ticketDecisionDocumentSchema = z.discriminatedUnion(
+  "decision_type",
+  [
+    z.object({
+      ...ticketDecisionCommonShape,
+      decision_type: z.literal("plan_review"),
+      subject: ticketReviewSubjectSchema.options[0],
+      disposition: z.enum([
+        "approve_execution",
+        "delegate_within_boundaries",
+        "request_changes",
+      ]),
+      delegated_boundaries: z.array(boundedText(8_192)).max(128).optional(),
+    }).strict(),
+    z.object({
+      ...ticketDecisionCommonShape,
+      decision_type: z.literal("protected_boundary"),
+      subject: ticketReviewSubjectSchema.options[1],
+      boundary: boundedText(20_000),
+      disposition: z.enum(["resolve", "decline"]),
+      selection: boundedText(20_000).optional(),
+    }).strict(),
+  ],
+).superRefine((value, context) => {
+  if (value.decision_type === "plan_review") {
+    const boundaries = value.delegated_boundaries;
+    if (
+      value.disposition === "delegate_within_boundaries"
+      && (boundaries === undefined || boundaries.length === 0)
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["delegated_boundaries"],
+        message: "must be non-empty for delegated execution",
+      });
+    }
+    if (
+      value.disposition !== "delegate_within_boundaries"
+      && boundaries !== undefined
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["delegated_boundaries"],
+        message: "is only allowed for delegated execution",
+      });
+    }
+    return;
+  }
+  if (value.disposition === "resolve" && value.selection === undefined) {
+    context.addIssue({
+      code: "custom",
+      path: ["selection"],
+      message: "must be present for a resolved protected boundary",
+    });
+  }
+  if (value.disposition === "decline" && value.selection !== undefined) {
+    context.addIssue({
+      code: "custom",
+      path: ["selection"],
+      message: "is not allowed for a declined protected boundary",
+    });
+  }
+});
+
 export type TicketLedgerProtocol = z.infer<typeof ticketLedgerProtocolSchema>;
 export type TicketAcceptance = z.infer<typeof ticketAcceptanceSchema>;
 export type TicketContextRef = z.infer<typeof ticketContextRefSchema>;
 export type TicketRelation = z.infer<typeof ticketRelationSchema>;
 export type TicketDocument = z.infer<typeof ticketDocumentSchema>;
+export type TicketReviewSubject = z.infer<typeof ticketReviewSubjectSchema>;
+export type TicketReviewDocument = z.infer<typeof ticketReviewDocumentSchema>;
+export type TicketDecisionDocument = z.infer<typeof ticketDecisionDocumentSchema>;
+type WithoutField<T, Field extends PropertyKey> =
+  T extends unknown ? Omit<T, Field> : never;
+export type TicketReviewDocumentPayload =
+  WithoutField<TicketReviewDocument, "review_id">;
+export type TicketDecisionDocumentPayload =
+  WithoutField<TicketDecisionDocument, "decision_id">;
 
 export interface TicketLedgerDocumentCandidate {
   documentPath: string;
@@ -93,6 +293,8 @@ export interface TicketLedgerDocumentCandidate {
 export interface TicketLedgerCandidate {
   protocol: unknown;
   tickets: readonly TicketLedgerDocumentCandidate[];
+  reviews?: readonly TicketLedgerDocumentCandidate[];
+  decisions?: readonly TicketLedgerDocumentCandidate[];
 }
 
 export interface TicketLedgerTicket {
@@ -101,10 +303,23 @@ export interface TicketLedgerTicket {
   document: TicketDocument;
 }
 
+export interface TicketLedgerReview {
+  documentPath: string;
+  document: TicketReviewDocument;
+}
+
+export interface TicketLedgerDecision {
+  documentPath: string;
+  document: TicketDecisionDocument;
+}
+
 export interface TicketLedgerContent {
   protocol: TicketLedgerProtocol;
   tickets: readonly TicketLedgerTicket[];
+  reviews: readonly TicketLedgerReview[];
+  decisions: readonly TicketLedgerDecision[];
   graphDigest: string;
+  semanticLedgerDigest: string;
 }
 
 interface TicketLedgerSourceBase {
@@ -112,6 +327,7 @@ interface TicketLedgerSourceBase {
   repositoryIncarnation: string;
   resolvedCommit: string;
   graphDigest: string;
+  semanticLedgerDigest: string;
   sourceToken: string;
   checkpointInventoryDigest: string;
 }
@@ -122,6 +338,7 @@ export interface TicketLedgerWorktreeSource extends TicketLedgerSourceBase {
   worktreeRoot: string;
   branch: string | null;
   committedGraphDigest: string | null;
+  committedSemanticLedgerDigest: string | null;
   semanticDirty: boolean;
   dirtyPaths: readonly string[];
   dirtyPathsTruncated: boolean;
@@ -145,6 +362,7 @@ export interface TicketLedgerPatchExpectedSource {
   worktreeIdentity: string;
   resolvedCommit: string;
   graphDigest: string;
+  semanticLedgerDigest: string;
 }
 
 export type TicketLedgerPatchChange =
@@ -170,6 +388,7 @@ export interface TicketLedgerPatchSource {
   worktreeIdentity: string;
   resolvedCommit: string;
   graphDigest: string;
+  semanticLedgerDigest: string;
 }
 
 export interface TicketLedgerPatchTicketResult {
@@ -207,7 +426,9 @@ export type TicketLedgerErrorCode =
   | "unmerged"
   | "source_changed_during_read"
   | "stale_source"
+  | "stale_subject"
   | "stale_ticket_revision"
+  | "document_conflict"
   | "duplicate_change"
   | "writer_busy"
   | "write_verification_failed"

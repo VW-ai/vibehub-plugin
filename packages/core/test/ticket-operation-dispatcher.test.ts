@@ -126,7 +126,9 @@ describe("Ticket operation dispatcher Git read cut", () => {
     ]));
     expect(dispatcher.operations().filter((name) =>
       name.startsWith("ticket."))).toEqual([
+      "ticket.decision.record",
       "ticket.graph.snapshot",
+      "ticket.review.append",
       "ticket.subject.inspect",
       "ticket.trace.list",
       "ticket.worktree.patch",
@@ -139,7 +141,7 @@ describe("Ticket operation dispatcher Git read cut", () => {
     );
     if (!graph.ok) throw new Error(JSON.stringify(graph));
     expect(graph.data).toMatchObject({
-      schemaVersion: 2,
+      schemaVersion: 3,
       source: {
         mode: "worktree",
         semanticDirty: true,
@@ -255,6 +257,7 @@ describe("Ticket operation dispatcher Git read cut", () => {
         worktreeIdentity: string;
         resolvedCommit: string;
         graphDigest: string;
+        semanticLedgerDigest: string;
       };
       tickets: Array<{ ticketId: string; ticketRevision: string }>;
     };
@@ -267,6 +270,7 @@ describe("Ticket operation dispatcher Git read cut", () => {
         worktreeIdentity: page.source.worktreeIdentity,
         resolvedCommit: page.source.resolvedCommit,
         graphDigest: page.source.graphDigest,
+        semanticLedgerDigest: page.source.semanticLedgerDigest,
       },
       changes: [{
         op: "put",

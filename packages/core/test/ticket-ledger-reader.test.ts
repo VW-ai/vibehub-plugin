@@ -5,11 +5,18 @@ import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { GitFacade } from "../src/git-facade.js";
 import {
+  TICKET_LEDGER_MAX_REVIEWS,
   TICKET_LEDGER_RELATIVE_PATH,
   TicketLedgerError,
+  createTicketDecisionDocument,
+  createTicketReviewDocument,
+  encodeTicketDecisionDocument,
+  encodeTicketReviewDocument,
   loadTicketLedgerAtRef,
   loadTicketLedgerFromWorktree,
+  ticketDecisionDocumentPath,
   ticketDocumentPath,
+  ticketReviewDocumentPath,
 } from "../src/ticket-ledger/index.js";
 
 const git = (cwd: string, ...args: string[]): string =>
@@ -235,6 +242,110 @@ describe("Ticket ledger reader", () => {
     }
   });
 
+  it("recovers durable review and decision facts from Git without changing the graph", () => {
+    const repository = initializeRepository();
+    roots.push(repository);
+    const committed = loadTicketLedgerAtRef(repository, "HEAD");
+    const ticketRevision = committed.tickets[0]!.ticketRevision;
+    const review = createTicketReviewDocument({
+      schema_version: 1,
+      kind: "ticket_review",
+      review_type: "comment",
+      subject: {
+        kind: "ticket",
+        ticket_id: "read-cut",
+        ticket_revision: ticketRevision,
+      },
+      observed: {
+        resolved_commit: committed.source.resolvedCommit,
+        graph_digest: committed.graphDigest,
+      },
+      author: {
+        actor_id: "reviewer",
+        actor_kind: "human",
+        attribution: "claimed",
+      },
+      body: "Keep the exact-source read boundary visible.",
+      occurred_at: "2026-07-30T18:10:00Z",
+    });
+    const decision = createTicketDecisionDocument({
+      schema_version: 1,
+      kind: "ticket_decision",
+      decision_type: "plan_review",
+      subject: {
+        kind: "graph",
+        graph_digest: committed.graphDigest,
+      },
+      disposition: "approve_execution",
+      rationale: "The plan preserves the accepted direct-unlock reading.",
+      resolution_refs: [review.review_id],
+      authority: {
+        principal_id: "wayne",
+        principal_kind: "human",
+        basis: "repository_owner",
+        basis_ref: "local-host/session-1",
+        attestation: "host_bound_local",
+      },
+      decided_at: "2026-07-30T18:11:00Z",
+    });
+    const reviewPath = ticketReviewDocumentPath(
+      review.subject,
+      review.review_id,
+    );
+    const decisionPath = ticketDecisionDocumentPath(decision);
+    write(
+      repository,
+      reviewPath,
+      encodeTicketReviewDocument(review).toString("utf8"),
+    );
+    write(
+      repository,
+      decisionPath,
+      encodeTicketDecisionDocument(decision).toString("utf8"),
+    );
+
+    const dirty = loadTicketLedgerFromWorktree(repository);
+    expect(dirty.graphDigest).toBe(committed.graphDigest);
+    expect(dirty.tickets[0]!.ticketRevision).toBe(ticketRevision);
+    expect(dirty.semanticLedgerDigest)
+      .not.toBe(committed.semanticLedgerDigest);
+    expect(dirty.reviews.map((item) => item.document.review_id))
+      .toEqual([review.review_id]);
+    expect(dirty.decisions.map((item) => item.document.decision_id))
+      .toEqual([decision.decision_id]);
+    expect(dirty.source.sourceToken)
+      .not.toBe(committed.source.sourceToken);
+    if (dirty.source.mode === "worktree") {
+      expect(dirty.source.semanticDirty).toBe(true);
+      expect(dirty.source.committedGraphDigest).toBe(committed.graphDigest);
+      expect(dirty.source.committedSemanticLedgerDigest)
+        .toBe(committed.semanticLedgerDigest);
+      expect(dirty.source.dirtyPaths).toEqual([decisionPath, reviewPath]);
+    }
+
+    git(repository, "add", reviewPath, decisionPath);
+    git(repository, "commit", "-m", "record exact review facts");
+    const recovered = loadTicketLedgerAtRef(repository, "HEAD");
+    expect(recovered.graphDigest).toBe(committed.graphDigest);
+    expect(recovered.semanticLedgerDigest).toBe(dirty.semanticLedgerDigest);
+    expect(recovered.reviews[0]!.document).toEqual(review);
+    expect(recovered.decisions[0]!.document).toEqual(decision);
+
+    fs.appendFileSync(
+      path.join(repository, ...reviewPath.split("/")),
+      "# physical formatting only\n",
+    );
+    const formattingOnly = loadTicketLedgerFromWorktree(repository);
+    expect(formattingOnly.semanticLedgerDigest)
+      .toBe(recovered.semanticLedgerDigest);
+    expect(formattingOnly.source.sourceToken)
+      .not.toBe(recovered.source.sourceToken);
+    if (formattingOnly.source.mode === "worktree") {
+      expect(formattingOnly.source.semanticDirty).toBe(false);
+      expect(formattingOnly.source.dirtyPaths).toEqual([reviewPath]);
+    }
+  });
+
   it("includes untracked Tickets and committed deletions only in the worktree graph", () => {
     const repository = initializeRepository();
     roots.push(repository);
@@ -405,6 +516,53 @@ describe("Ticket ledger reader", () => {
     expectCode(
       () => loadTicketLedgerFromWorktree(repository),
       "unsupported_file",
+    );
+  });
+
+  it("rejects symlinked review directories and nested extra paths", () => {
+    const repository = initializeRepository();
+    roots.push(repository);
+    const reviewsRoot = path.join(
+      repository,
+      ...`${TICKET_LEDGER_RELATIVE_PATH}/reviews`.split("/"),
+    );
+    fs.symlinkSync(path.join(repository, "README.md"), reviewsRoot);
+    expectCode(
+      () => loadTicketLedgerFromWorktree(repository),
+      "symlink",
+    );
+
+    fs.rmSync(reviewsRoot);
+    write(
+      repository,
+      `${TICKET_LEDGER_RELATIVE_PATH}/reviews/${
+        "a".repeat(64)
+      }/nested/extra.yaml`,
+      "not a review\n",
+    );
+    expectCode(
+      () => loadTicketLedgerFromWorktree(repository),
+      "unsupported_file",
+    );
+  });
+
+  it("bounds empty review subject directories before scanning them", () => {
+    const repository = initializeRepository();
+    roots.push(repository);
+    const reviewsRoot = path.join(
+      repository,
+      ...`${TICKET_LEDGER_RELATIVE_PATH}/reviews`.split("/"),
+    );
+    for (let index = 0; index <= TICKET_LEDGER_MAX_REVIEWS; index += 1) {
+      fs.mkdirSync(path.join(
+        reviewsRoot,
+        index.toString(16).padStart(64, "0"),
+      ), { recursive: true });
+    }
+
+    expectCode(
+      () => loadTicketLedgerFromWorktree(repository),
+      "ledger_too_large",
     );
   });
 

@@ -406,7 +406,7 @@ const legacyTicketReviewV4Source = {
 };
 
 export const ticketReviewV4Source: TicketReviewProjectionSourceV0 = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   snapshotRevision: legacyTicketReviewV4Source.snapshotRevision,
   projectionWatermark: legacyTicketReviewV4Source.projectionWatermark,
   source: {

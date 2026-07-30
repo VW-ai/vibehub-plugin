@@ -104,7 +104,7 @@ switch or local Ticket edit cannot be hidden behind an older response.
 | `distill.baseline.get`, `distill.candidates.list`, `distill.candidates.get` | |
 | `distill.version.get`, `distill.version.diff` | |
 | `distill.inventory.get`, `distill.inventory.diff` | `distill.inventory.put`, `distill.inventory.seal` |
-| `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list` | `ticket.worktree.patch` |
+| `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list` | `ticket.worktree.patch`, `ticket.review.append`, `ticket.decision.record` |
 | | `distill.scopes.plan`, `distill.scopes.claim`, `distill.scopes.complete`, `distill.scopes.fail`, `distill.scopes.retry`, `distill.scopes.correct` |
 | | `distill.candidates.put`, `distill.reconcile`, `distill.validate`, `distill.finalize` |
 | | `distill.activate`, `distill.rollback` |
@@ -121,6 +121,16 @@ mechanical write hand: copy its exact source and Ticket revisions from the
 latest snapshot, submit bounded full-document puts/deletes, and let Core
 validate the complete prospective graph. It never plans, auto-commits, writes
 a persisted Ticket replay receipt, or revives retired proposal/apply operations.
+
+Use `ticket.review.append` to append a Git-native comment or complete Ticket
+edit proposal against an exact current subject. Generic CLI, MCP, and Skill
+wrappers attribute these reviews to the calling Agent as claimed facts; a
+trusted host may separately inject host-attested attribution.
+`ticket.decision.record` records an exact-subject human Decision, but the
+generic adapters intentionally inject no Decision authority. Calls through
+those adapters therefore fail closed with `ticket_authority_unavailable`;
+only a trusted host with a matching human principal and exact authority scope
+may record the Decision. Neither operation silently changes a Ticket.
 
 ## Workflow artifacts are not operation inputs
 

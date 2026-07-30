@@ -81,6 +81,7 @@ const expectedSource = (
     worktreeIdentity: snapshot.source.worktreeIdentity,
     resolvedCommit: snapshot.source.resolvedCommit,
     graphDigest: `sha256:${snapshot.graphDigest}`,
+    semanticLedgerDigest: `sha256:${snapshot.semanticLedgerDigest}`,
   };
 };
 

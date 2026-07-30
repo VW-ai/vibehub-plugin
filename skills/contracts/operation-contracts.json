@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
-  "registryHash": "a9799c1db5d8e212aa905785822a98aa936c02f950d48cdb22724d6fd207a36a",
-  "inputSchemaHash": "0c671ece2e97a4817ec256c1bd8005afe317fd3f9689b44f7362a7ddb4698859",
+  "registryHash": "e4862f6943abae33ce35c5e28ce0f0be778e3e0cceba96c988cd8bd334cf4834",
+  "inputSchemaHash": "8bbb045781ef72d20624622884200fb4d99370ac2f86d3669dd3814c43e92f40",
   "dialect": "JSON Schema 2020-12 plus VibeHub runtimeRefinements/v1",
   "fixtureDialect": "literal value or generatedFixture/v1",
   "scope": "Operation input contracts only. Operation context is validated separately by the runtime operationContextSchema at CLI/MCP adapter boundaries.",
@@ -14,12 +14,12 @@
     "default": 0,
     "catch": 0,
     "coerce": 0,
-    "regex": 8,
+    "regex": 9,
     "isoDatetime": 1,
-    "union": 1,
-    "discriminatedUnion": 3,
+    "union": 2,
+    "discriminatedUnion": 5,
     "unknown": 1,
-    "strict": 63,
+    "strict": 76,
     "safeExtend": 1,
     "optional": 94,
     "nullable": 10,
@@ -25878,6 +25878,517 @@
         ]
       }
     },
+    "ticket.decision.record": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "expectedSource": {
+            "type": "object",
+            "properties": {
+              "sourceToken": {
+                "type": "string",
+                "pattern": "^tls-[0-9a-f]{64}$"
+              },
+              "worktreeIdentity": {
+                "type": "string",
+                "pattern": "^worktree-[0-9a-f]{64}$"
+              },
+              "resolvedCommit": {
+                "type": "string",
+                "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+              },
+              "graphDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "semanticLedgerDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "sourceToken",
+              "worktreeIdentity",
+              "resolvedCommit",
+              "graphDigest",
+              "semanticLedgerDigest"
+            ],
+            "additionalProperties": false
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "plan_review"
+                  },
+                  "subject": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "graph"
+                      },
+                      "graphDigest": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "graphDigest"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "disposition": {
+                    "type": "string",
+                    "const": "approve_execution"
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "resolutionRefs": {
+                    "maxItems": 128,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 4096
+                    }
+                  }
+                },
+                "required": [
+                  "type",
+                  "subject",
+                  "disposition",
+                  "rationale",
+                  "resolutionRefs"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "plan_review"
+                  },
+                  "subject": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "graph"
+                      },
+                      "graphDigest": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "graphDigest"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "disposition": {
+                    "type": "string",
+                    "const": "delegate_within_boundaries"
+                  },
+                  "delegatedBoundaries": {
+                    "minItems": 1,
+                    "maxItems": 128,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 8192
+                    }
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "resolutionRefs": {
+                    "maxItems": 128,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 4096
+                    }
+                  }
+                },
+                "required": [
+                  "type",
+                  "subject",
+                  "disposition",
+                  "delegatedBoundaries",
+                  "rationale",
+                  "resolutionRefs"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "plan_review"
+                  },
+                  "subject": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "graph"
+                      },
+                      "graphDigest": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "graphDigest"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "disposition": {
+                    "type": "string",
+                    "const": "request_changes"
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "resolutionRefs": {
+                    "maxItems": 128,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 4096
+                    }
+                  }
+                },
+                "required": [
+                  "type",
+                  "subject",
+                  "disposition",
+                  "rationale",
+                  "resolutionRefs"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "protected_boundary"
+                  },
+                  "subject": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "ticket"
+                      },
+                      "ticketId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                        "maxLength": 96
+                      },
+                      "ticketRevision": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "ticketId",
+                      "ticketRevision"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "boundary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "disposition": {
+                    "type": "string",
+                    "const": "resolve"
+                  },
+                  "selection": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "resolutionRefs": {
+                    "maxItems": 128,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 4096
+                    }
+                  }
+                },
+                "required": [
+                  "type",
+                  "subject",
+                  "boundary",
+                  "disposition",
+                  "selection",
+                  "rationale",
+                  "resolutionRefs"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "protected_boundary"
+                  },
+                  "subject": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "ticket"
+                      },
+                      "ticketId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                        "maxLength": 96
+                      },
+                      "ticketRevision": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "ticketId",
+                      "ticketRevision"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "boundary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "disposition": {
+                    "type": "string",
+                    "const": "decline"
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "resolutionRefs": {
+                    "maxItems": 128,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 4096
+                    }
+                  }
+                },
+                "required": [
+                  "type",
+                  "subject",
+                  "boundary",
+                  "disposition",
+                  "rationale",
+                  "resolutionRefs"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "expectedSource",
+          "decision"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "decision": {
+            "type": "plan_review",
+            "subject": {
+              "kind": "graph",
+              "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+            },
+            "disposition": "approve_execution",
+            "rationale": "The reviewed graph has a bounded execution path.",
+            "resolutionRefs": []
+          }
+        },
+        "negative": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "latest"
+          },
+          "decision": {
+            "type": "plan_review",
+            "subject": {
+              "kind": "graph",
+              "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+            },
+            "disposition": "approve_execution",
+            "rationale": "The reviewed graph has a bounded execution path.",
+            "resolutionRefs": []
+          }
+        },
+        "negativeCase": "decision source semantic digest must be exact",
+        "negatives": [
+          {
+            "case": "decision source semantic digest must be exact",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "latest"
+              },
+              "decision": {
+                "type": "plan_review",
+                "subject": {
+                  "kind": "graph",
+                  "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                },
+                "disposition": "approve_execution",
+                "rationale": "The reviewed graph has a bounded execution path.",
+                "resolutionRefs": []
+              }
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "decision type is closed",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "decision": {
+                "type": "comment",
+                "subject": {
+                  "kind": "graph",
+                  "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                },
+                "disposition": "approve_execution",
+                "rationale": "The reviewed graph has a bounded execution path.",
+                "resolutionRefs": []
+              }
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "plan approval rejects delegated boundaries",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "decision": {
+                "type": "plan_review",
+                "subject": {
+                  "kind": "graph",
+                  "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                },
+                "disposition": "approve_execution",
+                "rationale": "The reviewed graph has a bounded execution path.",
+                "resolutionRefs": [],
+                "delegatedBoundaries": [
+                  "Do not broaden scope."
+                ]
+              }
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "decision rationale rejects whitespace only",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "decision": {
+                "type": "plan_review",
+                "subject": {
+                  "kind": "graph",
+                  "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                },
+                "disposition": "approve_execution",
+                "rationale": " ",
+                "resolutionRefs": []
+              }
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
     "ticket.graph.snapshot": {
       "input": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -25922,6 +26433,476 @@
         ]
       }
     },
+    "ticket.review.append": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "expectedSource": {
+            "type": "object",
+            "properties": {
+              "sourceToken": {
+                "type": "string",
+                "pattern": "^tls-[0-9a-f]{64}$"
+              },
+              "worktreeIdentity": {
+                "type": "string",
+                "pattern": "^worktree-[0-9a-f]{64}$"
+              },
+              "resolvedCommit": {
+                "type": "string",
+                "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+              },
+              "graphDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "semanticLedgerDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "sourceToken",
+              "worktreeIdentity",
+              "resolvedCommit",
+              "graphDigest",
+              "semanticLedgerDigest"
+            ],
+            "additionalProperties": false
+          },
+          "review": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "comment"
+                  },
+                  "subject": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "graph"
+                          },
+                          "graphDigest": {
+                            "type": "string",
+                            "pattern": "^sha256:[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "graphDigest"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "ticket"
+                          },
+                          "ticketId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                            "maxLength": 96
+                          },
+                          "ticketRevision": {
+                            "type": "string",
+                            "pattern": "^sha256:[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "ticketId",
+                          "ticketRevision"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "relation"
+                          },
+                          "relationRef": {
+                            "type": "string",
+                            "pattern": "^trl-[0-9a-f]{64}$"
+                          },
+                          "prerequisiteTicketId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                            "maxLength": 96
+                          },
+                          "dependentTicketId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                            "maxLength": 96
+                          },
+                          "dependentTicketRevision": {
+                            "type": "string",
+                            "pattern": "^sha256:[0-9a-f]{64}$"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "relationRef",
+                          "prerequisiteTicketId",
+                          "dependentTicketId",
+                          "dependentTicketRevision"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  }
+                },
+                "required": [
+                  "type",
+                  "subject",
+                  "body"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "ticket_edit"
+                  },
+                  "subject": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "ticket"
+                      },
+                      "ticketId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                        "maxLength": 96
+                      },
+                      "ticketRevision": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "ticketId",
+                      "ticketRevision"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  },
+                  "replacementTicket": {
+                    "type": "object",
+                    "properties": {
+                      "schema_version": {
+                        "type": "number",
+                        "const": 1
+                      },
+                      "kind": {
+                        "type": "string",
+                        "const": "ticket"
+                      },
+                      "ticket_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 96,
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                      },
+                      "outcome": {
+                        "type": "string",
+                        "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                        "maxLength": 16384
+                      },
+                      "context": {
+                        "type": "string",
+                        "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                        "maxLength": 65536
+                      },
+                      "acceptance": {
+                        "maxItems": 128,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "acceptance_id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 96,
+                              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                            },
+                            "criterion": {
+                              "type": "string",
+                              "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                              "maxLength": 8192
+                            }
+                          },
+                          "required": [
+                            "acceptance_id",
+                            "criterion"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "constraints": {
+                        "maxItems": 128,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                          "maxLength": 8192
+                        }
+                      },
+                      "context_refs": {
+                        "maxItems": 128,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "ref": {
+                              "type": "string",
+                              "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                              "maxLength": 4096
+                            },
+                            "purpose": {
+                              "type": "string",
+                              "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                              "maxLength": 4096
+                            }
+                          },
+                          "required": [
+                            "ref",
+                            "purpose"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "relations": {
+                        "maxItems": 256,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "const": "depends_on"
+                            },
+                            "target_ticket_id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 96,
+                              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                            },
+                            "rationale": {
+                              "type": "string",
+                              "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                              "maxLength": 4096
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "target_ticket_id"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "provenance_refs": {
+                        "maxItems": 128,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^(?=[\\s\\S]*\\S)[\\s\\S]*$",
+                          "maxLength": 4096
+                        }
+                      }
+                    },
+                    "required": [
+                      "schema_version",
+                      "kind",
+                      "ticket_id",
+                      "outcome",
+                      "context",
+                      "acceptance",
+                      "constraints",
+                      "context_refs",
+                      "relations",
+                      "provenance_refs"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 20000
+                  }
+                },
+                "required": [
+                  "type",
+                  "subject",
+                  "body",
+                  "replacementTicket",
+                  "rationale"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "expectedSource",
+          "review"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "review": {
+            "type": "comment",
+            "subject": {
+              "kind": "graph",
+              "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+            },
+            "body": "The exact graph is ready for focused review."
+          }
+        },
+        "negative": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "latest"
+          },
+          "review": {
+            "type": "comment",
+            "subject": {
+              "kind": "graph",
+              "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+            },
+            "body": "The exact graph is ready for focused review."
+          }
+        },
+        "negativeCase": "review source semantic digest must be exact",
+        "negatives": [
+          {
+            "case": "review source semantic digest must be exact",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "latest"
+              },
+              "review": {
+                "type": "comment",
+                "subject": {
+                  "kind": "graph",
+                  "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                },
+                "body": "The exact graph is ready for focused review."
+              }
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "review type is closed",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "review": {
+                "type": "approval",
+                "subject": {
+                  "kind": "graph",
+                  "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                },
+                "body": "The exact graph is ready for focused review."
+              }
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "review subject is exact",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "review": {
+                "type": "comment",
+                "subject": {
+                  "kind": "graph"
+                },
+                "body": "The exact graph is ready for focused review."
+              }
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "review body rejects whitespace only",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "review": {
+                "type": "comment",
+                "subject": {
+                  "kind": "graph",
+                  "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                },
+                "body": " "
+              }
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
     "ticket.subject.inspect": {
       "input": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -25935,6 +26916,19 @@
           },
           "subject": {
             "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "graph"
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": false
+              },
               {
                 "type": "object",
                 "properties": {
@@ -26041,6 +27035,19 @@
           },
           "subject": {
             "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "graph"
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": false
+              },
               {
                 "type": "object",
                 "properties": {
@@ -26220,13 +27227,18 @@
               "graphDigest": {
                 "type": "string",
                 "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "semanticLedgerDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
               }
             },
             "required": [
               "sourceToken",
               "worktreeIdentity",
               "resolvedCommit",
-              "graphDigest"
+              "graphDigest",
+              "semanticLedgerDigest"
             ],
             "additionalProperties": false
           },
@@ -26463,7 +27475,8 @@
             "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
             "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
             "resolvedCommit": "3333333333333333333333333333333333333333",
-            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
           },
           "changes": [
             {
@@ -26490,7 +27503,8 @@
             "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
             "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
             "resolvedCommit": "3333333333333333333333333333333333333333",
-            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
           },
           "changes": []
         },
@@ -26503,7 +27517,8 @@
                 "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
                 "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
                 "resolvedCommit": "3333333333333333333333333333333333333333",
-                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
               },
               "changes": []
             },
@@ -26516,7 +27531,8 @@
                 "sourceToken": "latest",
                 "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
                 "resolvedCommit": "3333333333333333333333333333333333333333",
-                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
               },
               "changes": [
                 {
@@ -26547,7 +27563,8 @@
                 "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
                 "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
                 "resolvedCommit": "3333333333333333333333333333333333333333",
-                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
               },
               "changes": [
                 {
@@ -26578,7 +27595,8 @@
                 "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
                 "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
                 "resolvedCommit": "3333333333333333333333333333333333333333",
-                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
               },
               "changes": [
                 {
@@ -26609,7 +27627,8 @@
                 "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
                 "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
                 "resolvedCommit": "3333333333333333333333333333333333333333",
-                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
               },
               "changes": [
                 {
@@ -26640,7 +27659,8 @@
                 "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
                 "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
                 "resolvedCommit": "3333333333333333333333333333333333333333",
-                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
               },
               "changes": [
                 {
@@ -26660,7 +27680,8 @@
                 "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
                 "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
                 "resolvedCommit": "3333333333333333333333333333333333333333",
-                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
               },
               "changes": [
                 {
@@ -26692,7 +27713,8 @@
                 "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
                 "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
                 "resolvedCommit": "3333333333333333333333333333333333333333",
-                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
               },
               "changes": [
                 {

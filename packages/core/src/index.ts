@@ -102,7 +102,13 @@ export * from "./operation-dispatcher.js";
 export * from "./operation-contracts.js";
 export * from "./ticket-review-projector.js";
 export * from "./ticket-review-read-service.js";
-export * from "./ticket-review-resolver.js";
+export {
+  GitTicketLedgerReviewProjectionSourceProviderV0,
+  type ResolvedTicketReviewProjectionSourceProviderV0,
+  type TicketReviewLatestSourceLoadV0,
+  type TicketReviewRepositoryScopeV0,
+  type TicketReviewSnapshotSourceLoadV0,
+} from "./ticket-review-resolver.js";
 export * from "./ticket-review-source.js";
 export * from "./ticket-ledger/index.js";
 export {

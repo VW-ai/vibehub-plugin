@@ -13,6 +13,8 @@ export const TICKET = new Set([
   "subject.inspect",
   "trace.list",
   "worktree.patch",
+  "review.append",
+  "decision.record",
 ]);
 
 function fail(message, code = "validation_error", exit = 2) {

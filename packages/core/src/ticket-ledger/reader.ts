@@ -8,12 +8,12 @@ import {
 } from "../git-facade.js";
 import {
   TICKET_LEDGER_MAX_BYTES,
+  TICKET_LEDGER_MAX_DECISIONS,
   TICKET_LEDGER_MAX_DIRTY_PATHS,
+  TICKET_LEDGER_MAX_REVIEWS,
   TICKET_LEDGER_MAX_TICKETS,
-  TICKET_LEDGER_PROTOCOL_MAX_BYTES,
   TICKET_LEDGER_RELATIVE_PATH,
   TICKET_LEDGER_STABLE_READ_ATTEMPTS,
-  TICKET_LEDGER_TICKET_MAX_BYTES,
   TicketLedgerError,
   type TicketLedgerContent,
   type TicketLedgerSnapshot,
@@ -22,6 +22,7 @@ import {
   decodeTicketLedger,
   isTicketLedgerDocumentPath,
   ticketLedgerCheckpointInventoryDigest,
+  ticketLedgerDocumentMaxBytes,
   ticketLedgerInventoryDigest,
   ticketLedgerSourceToken,
   type TicketLedgerFile,
@@ -185,9 +186,7 @@ const readRegularFile = (
         { documentPath },
       );
     }
-    const maxBytes = documentPath.endsWith("/protocol.yaml")
-      ? TICKET_LEDGER_PROTOCOL_MAX_BYTES
-      : TICKET_LEDGER_TICKET_MAX_BYTES;
+    const maxBytes = ticketLedgerDocumentMaxBytes(documentPath);
     if (stat.size > maxBytes) {
       throw new TicketLedgerError(
         "file_too_large",
@@ -284,16 +283,25 @@ const readWorktreeInventory = (worktreeRoot: string): InventoryFile[] => {
       ));
       continue;
     }
-    if (entry.name === "tickets") {
+    if (
+      entry.name === "tickets"
+      || entry.name === "reviews"
+      || entry.name === "decisions"
+    ) {
       if (entry.isSymbolicLink()) {
         throw new TicketLedgerError(
           "symlink",
-          "Ticket ledger Ticket directory cannot be a symlink",
-          { documentPath: `${TICKET_LEDGER_RELATIVE_PATH}/tickets` },
+          `Ticket ledger ${entry.name} directory cannot be a symlink`,
+          {
+            documentPath:
+              `${TICKET_LEDGER_RELATIVE_PATH}/${entry.name}`,
+          },
         );
       }
       if (!entry.isDirectory()) {
-        unsupportedPath(`${TICKET_LEDGER_RELATIVE_PATH}/tickets`);
+        unsupportedPath(
+          `${TICKET_LEDGER_RELATIVE_PATH}/${entry.name}`,
+        );
       }
       continue;
     }
@@ -338,6 +346,135 @@ const readWorktreeInventory = (worktreeRoot: string): InventoryFile[] => {
       }
       addFile(readRegularFile(
         path.join(ticketsDirectory, entry.name),
+        documentPath,
+      ));
+    }
+  }
+
+  const reviewsDirectory = path.join(ledgerRoot, "reviews");
+  if (fs.existsSync(reviewsDirectory)) {
+    ensureDirectory(reviewsDirectory, false);
+    let subjectEntries: fs.Dirent[];
+    try {
+      subjectEntries = fs.readdirSync(reviewsDirectory, {
+        withFileTypes: true,
+      });
+    } catch (cause) {
+      throw new TicketLedgerError(
+        "io",
+        `Cannot list Ticket review subjects at ${reviewsDirectory}`,
+        { path: reviewsDirectory },
+        { cause },
+      );
+    }
+    if (subjectEntries.length > TICKET_LEDGER_MAX_REVIEWS) {
+      throw new TicketLedgerError(
+        "ledger_too_large",
+        `Ticket ledger contains more than ${TICKET_LEDGER_MAX_REVIEWS} review subject directories`,
+        { reviewSubjectCount: subjectEntries.length },
+      );
+    }
+    let reviewCount = 0;
+    for (const subjectEntry of subjectEntries) {
+      const subjectPath =
+        `${TICKET_LEDGER_RELATIVE_PATH}/reviews/${subjectEntry.name}`;
+      if (subjectEntry.isSymbolicLink()) {
+        throw new TicketLedgerError(
+          "symlink",
+          `Ticket review subject directory cannot be a symlink: ${subjectPath}`,
+          { documentPath: subjectPath },
+        );
+      }
+      if (
+        !subjectEntry.isDirectory()
+        || !/^[0-9a-f]{64}$/u.test(subjectEntry.name)
+      ) {
+        unsupportedPath(subjectPath);
+      }
+      const subjectDirectory = path.join(
+        reviewsDirectory,
+        subjectEntry.name,
+      );
+      ensureDirectory(subjectDirectory, false);
+      let reviewEntries: fs.Dirent[];
+      try {
+        reviewEntries = fs.readdirSync(subjectDirectory, {
+          withFileTypes: true,
+        });
+      } catch (cause) {
+        throw new TicketLedgerError(
+          "io",
+          `Cannot list Ticket reviews at ${subjectDirectory}`,
+          { path: subjectDirectory },
+          { cause },
+        );
+      }
+      reviewCount += reviewEntries.length;
+      if (reviewCount > TICKET_LEDGER_MAX_REVIEWS) {
+        throw new TicketLedgerError(
+          "ledger_too_large",
+          `Ticket ledger contains more than ${TICKET_LEDGER_MAX_REVIEWS} review files`,
+          { reviewCount },
+        );
+      }
+      for (const entry of reviewEntries) {
+        const documentPath = `${subjectPath}/${entry.name}`;
+        if (entry.isSymbolicLink()) {
+          throw new TicketLedgerError(
+            "symlink",
+            `Ticket review cannot be a symlink: ${documentPath}`,
+            { documentPath },
+          );
+        }
+        if (!entry.isFile() || !isTicketLedgerDocumentPath(documentPath)) {
+          unsupportedPath(documentPath);
+        }
+        addFile(readRegularFile(
+          path.join(subjectDirectory, entry.name),
+          documentPath,
+        ));
+      }
+    }
+  }
+
+  const decisionsDirectory = path.join(ledgerRoot, "decisions");
+  if (fs.existsSync(decisionsDirectory)) {
+    ensureDirectory(decisionsDirectory, false);
+    let decisionEntries: fs.Dirent[];
+    try {
+      decisionEntries = fs.readdirSync(decisionsDirectory, {
+        withFileTypes: true,
+      });
+    } catch (cause) {
+      throw new TicketLedgerError(
+        "io",
+        `Cannot list Ticket decisions at ${decisionsDirectory}`,
+        { path: decisionsDirectory },
+        { cause },
+      );
+    }
+    if (decisionEntries.length > TICKET_LEDGER_MAX_DECISIONS) {
+      throw new TicketLedgerError(
+        "ledger_too_large",
+        `Ticket ledger contains more than ${TICKET_LEDGER_MAX_DECISIONS} decision files`,
+        { decisionCount: decisionEntries.length },
+      );
+    }
+    for (const entry of decisionEntries) {
+      const documentPath =
+        `${TICKET_LEDGER_RELATIVE_PATH}/decisions/${entry.name}`;
+      if (entry.isSymbolicLink()) {
+        throw new TicketLedgerError(
+          "symlink",
+          `Ticket decision cannot be a symlink: ${documentPath}`,
+          { documentPath },
+        );
+      }
+      if (!entry.isFile() || !isTicketLedgerDocumentPath(documentPath)) {
+        unsupportedPath(documentPath);
+      }
+      addFile(readRegularFile(
+        path.join(decisionsDirectory, entry.name),
         documentPath,
       ));
     }
@@ -413,7 +550,13 @@ const treeInventoryAtCommit = (
       { commit },
     );
   }
-  if (entries.length > TICKET_LEDGER_MAX_TICKETS + 1) {
+  if (
+    entries.length
+    > TICKET_LEDGER_MAX_TICKETS
+      + TICKET_LEDGER_MAX_REVIEWS
+      + TICKET_LEDGER_MAX_DECISIONS
+      + 1
+  ) {
     throw new TicketLedgerError(
       "ledger_too_large",
       `Ticket ledger contains more than ${TICKET_LEDGER_MAX_TICKETS} Ticket files`,
@@ -447,9 +590,7 @@ const treeInventoryAtCommit = (
       );
     }
     if (!isTicketLedgerDocumentPath(entry.path)) unsupportedPath(entry.path);
-    const maxBytes = entry.path.endsWith("/protocol.yaml")
-      ? TICKET_LEDGER_PROTOCOL_MAX_BYTES
-      : TICKET_LEDGER_TICKET_MAX_BYTES;
+    const maxBytes = ticketLedgerDocumentMaxBytes(entry.path);
     if (entry.sizeBytes === null || entry.sizeBytes > maxBytes) {
       throw new TicketLedgerError(
         "file_too_large",
@@ -610,15 +751,18 @@ export const loadTicketLedgerFromWorktree = (
   const content = decodeTicketLedger(stable.inventory);
 
   let committedGraphDigest: string | null;
+  let committedSemanticLedgerDigest: string | null;
   try {
-    committedGraphDigest =
-      readContentAtCommit(worktreeRoot, stable.head).graphDigest;
+    const committed = readContentAtCommit(worktreeRoot, stable.head);
+    committedGraphDigest = committed.graphDigest;
+    committedSemanticLedgerDigest = committed.semanticLedgerDigest;
   } catch (cause) {
     if (
       cause instanceof TicketLedgerError
       && cause.code === "ledger_missing"
     ) {
       committedGraphDigest = null;
+      committedSemanticLedgerDigest = null;
     } else {
       throw cause;
     }
@@ -649,6 +793,7 @@ export const loadTicketLedgerFromWorktree = (
     worktreeIdentity,
     resolvedCommit: stable.head,
     graphDigest: content.graphDigest,
+    semanticLedgerDigest: content.semanticLedgerDigest,
     inventoryDigest: ticketLedgerInventoryDigest(stable.inventory),
   });
 
@@ -662,9 +807,12 @@ export const loadTicketLedgerFromWorktree = (
       branch: GitFacade.currentBranchAt(worktreeRoot),
       resolvedCommit: stable.head,
       graphDigest: content.graphDigest,
+      semanticLedgerDigest: content.semanticLedgerDigest,
       committedGraphDigest,
+      committedSemanticLedgerDigest,
       checkpointInventoryDigest,
-      semanticDirty: committedGraphDigest !== content.graphDigest,
+      semanticDirty:
+        committedSemanticLedgerDigest !== content.semanticLedgerDigest,
       dirtyPaths: dirty.paths,
       dirtyPathsTruncated: dirty.truncated,
       sourceToken,
@@ -700,6 +848,7 @@ export const loadTicketLedgerAtRef = (
     repositoryIncarnation: repository.repositoryIncarnation,
     resolvedCommit,
     graphDigest: content.graphDigest,
+    semanticLedgerDigest: content.semanticLedgerDigest,
     inventoryDigest: ticketLedgerInventoryDigest(inventory),
   });
   return {
@@ -710,6 +859,7 @@ export const loadTicketLedgerAtRef = (
       requestedRef: ref,
       resolvedCommit,
       graphDigest: content.graphDigest,
+      semanticLedgerDigest: content.semanticLedgerDigest,
       checkpointInventoryDigest,
       sourceToken,
     },

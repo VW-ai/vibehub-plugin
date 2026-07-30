@@ -5,8 +5,8 @@
  * through the opt-in `./contracts/ticket-review-schemas` package subpath.
  */
 
-export const TICKET_REVIEW_SCHEMA_VERSION = 2 as const;
-export const TICKET_REVIEW_PROJECTOR_VERSION = "ticket-review-v1" as const;
+export const TICKET_REVIEW_SCHEMA_VERSION = 3 as const;
+export const TICKET_REVIEW_PROJECTOR_VERSION = "ticket-review-v2" as const;
 export const TICKET_REVIEW_DEFAULT_PAGE_SIZE = 200;
 export const TICKET_REVIEW_MAX_PAGE_SIZE = 200;
 export const TICKET_REVIEW_MAX_TICKETS = 1_000;
@@ -90,6 +90,7 @@ interface TicketReviewSourceMetadataBaseV0 {
   repositoryIncarnation: string;
   resolvedCommit: string;
   graphDigest: string;
+  semanticLedgerDigest?: string;
   sourceToken: string;
 }
 
@@ -100,6 +101,7 @@ export type TicketReviewSourceMetadataV0 =
       worktreeRoot: string;
       branch: string | null;
       committedGraphDigest: string | null;
+      committedSemanticLedgerDigest?: string | null;
       semanticDirty: boolean;
       dirtyPaths: string[];
       dirtyPathsTruncated: boolean;
@@ -111,6 +113,9 @@ export type TicketReviewSourceMetadataV0 =
     };
 
 export type TicketReviewSubjectRefV0 =
+  | {
+      kind: "graph";
+    }
   | {
       kind: "ticket";
       ticketId: string;
@@ -220,6 +225,11 @@ export interface TicketSubjectInspectRequestV0 {
 
 export type TicketReviewInspectedSubjectV0 =
   | {
+      kind: "graph";
+      summary: TicketReviewSnapshotSummaryV0;
+      traceCount: number;
+    }
+  | {
       kind: "ticket";
       ticket: TicketReviewTicketProjectionV0;
       contextPackage: TicketReviewExecutableContextV0;
@@ -238,13 +248,16 @@ export interface TicketSubjectInspectionV0
 
 export type TicketReviewTraceSubjectV0 =
   | {
+      kind: "graph";
+    }
+  | {
       kind: "ticket";
       ticketId: string;
       boundTicketRevision: string;
     }
   | {
       kind: "relation";
-      sourceRevision: string;
+      sourceRevision?: string;
       relationRef: string;
       prerequisiteTicketId: string;
       dependentTicketId: string;
@@ -278,6 +291,24 @@ export type TicketReviewTraceTargetV0 =
       target: string;
     };
 
+export type TicketReviewTraceDecisionV0 =
+  | {
+      decisionType: "plan_review";
+      disposition:
+        | "approve_execution"
+        | "delegate_within_boundaries"
+        | "request_changes";
+      delegatedBoundaries?: string[];
+      resolutionRefs: string[];
+    }
+  | {
+      decisionType: "protected_boundary";
+      boundary: string;
+      disposition: "resolve" | "decline";
+      selection?: string;
+      resolutionRefs: string[];
+    };
+
 export interface TicketReviewTraceRecordV0 {
   recordRef: string;
   kind: TicketReviewTraceKindV0;
@@ -288,6 +319,7 @@ export interface TicketReviewTraceRecordV0 {
   summary: string;
   body?: string;
   status?: string;
+  decision?: TicketReviewTraceDecisionV0;
   crossReferences: string[];
   targets: TicketReviewTraceTargetV0[];
   availability: "available" | "unavailable";

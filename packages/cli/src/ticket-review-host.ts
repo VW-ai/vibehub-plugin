@@ -10,10 +10,14 @@ import {
   TICKET_REVIEW_MAX_PAGE_SIZE,
   TICKET_REVIEW_MAX_RELATIONS,
   TICKET_REVIEW_MAX_TICKETS,
+  TICKET_REVIEW_MAX_TRACE_RECORDS,
+  TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE,
   openDb,
   resolveDbPath,
   type Db,
   type OperationResult,
+  type TicketDecisionAuthorityGrant,
+  type TicketReviewHostAttribution,
   type TicketReviewSourceMetadataV0,
 } from "@vw-ai/vibehub-core";
 
@@ -24,6 +28,12 @@ const MAX_STATE_PAGES = Math.ceil(
     / TICKET_REVIEW_MAX_PAGE_SIZE,
 );
 const DEFAULT_TOKEN_LIFETIME_MS = 30 * 60 * 1_000;
+const REVIEW_BODY_MAX_BYTES = 512 * 1024;
+const DECISION_BODY_MAX_BYTES = 128 * 1024;
+const MAX_TRACE_PAGES = Math.ceil(
+  TICKET_REVIEW_MAX_TRACE_RECORDS
+    / TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE,
+);
 
 type TicketSourceMetadata = Extract<
   TicketReviewSourceMetadataV0,
@@ -50,12 +60,30 @@ interface HostGraphRelation {
 }
 
 interface GraphSnapshotPage {
-  schemaVersion: 2;
+  schemaVersion: 3;
   snapshotId: string;
   source: TicketSourceMetadata;
   tickets: HostGraphNode[];
   relations: HostGraphRelation[];
   nextCursor: string | null;
+}
+
+type TicketReviewHostReviewCapability =
+  | { available: false }
+  | {
+      available: true;
+      actorKind: "human" | "agent";
+      attribution: "host_attested";
+    };
+
+interface TicketReviewHostInterventions {
+  review: TicketReviewHostReviewCapability;
+  planReview: { available: boolean };
+  protectedBoundaries: Array<{
+    ticketId: string;
+    ticketRevision: string;
+    boundary: string;
+  }>;
 }
 
 export interface TicketReviewHostState {
@@ -72,6 +100,7 @@ export interface TicketReviewHostState {
     tickets: HostGraphNode[];
     relations: HostGraphRelation[];
   };
+  interventions: TicketReviewHostInterventions;
 }
 
 export interface TicketReviewHostLaunchFlags {
@@ -90,6 +119,16 @@ export interface TicketReviewHostOptions {
   now?: () => string;
   token?: string;
   tokenLifetimeMs?: number;
+  /**
+   * V0 trust model: the embedding same-OS-account process attests this
+   * reviewer. The browser cannot supply or override it.
+   */
+  ticketReviewAttribution?: TicketReviewHostAttribution;
+  /**
+   * Optional exact Decision authority from the embedding process.
+   * Without it, Decision writes fail closed.
+   */
+  ticketDecisionAuthority?: TicketDecisionAuthorityGrant;
 }
 
 export interface TicketReviewHostHandle {
@@ -205,8 +244,24 @@ export function startTicketReviewHost(
   if (Buffer.byteLength(token, "utf8") < 32) {
     throw new Error("Ticket review host token must contain at least 32 bytes");
   }
+  if (
+    options.ticketReviewAttribution !== undefined
+    && options.ticketDecisionAuthority !== undefined
+    && (
+      options.ticketReviewAttribution.actorKind !== "human"
+      || options.ticketReviewAttribution.actorId
+        !== options.ticketDecisionAuthority.authority.principal_id
+    )
+  ) {
+    throw new Error(
+      "Ticket review attribution and Decision authority must bind the same human",
+    );
+  }
   const now = options.now ?? (() => new Date().toISOString());
-  const runtime = openHostRuntime(options.repoRoot, options.dbPath);
+  const runtime = openHostRuntime(options.repoRoot, options.dbPath, {
+    ticketReviewAttribution: options.ticketReviewAttribution,
+    ticketDecisionAuthority: options.ticketDecisionAuthority,
+  });
   const assetRoot = options.assetRoot ?? defaultAssetRoot();
   assertAssets(assetRoot);
   const sessionId = crypto.randomUUID();
@@ -218,9 +273,12 @@ export function startTicketReviewHost(
   const closedPromise = new Promise<void>((resolve) => {
     resolveClosed = resolve;
   });
+  const hostActor = options.ticketReviewAttribution?.actorId
+    ?? options.ticketDecisionAuthority?.authority.principal_id
+    ?? "ticket-review-host";
   const operationContext = () => ({
     repoId: runtime.repoId,
-    actor: "ticket-review-host",
+    actor: hostActor,
     requestId: `ticket-review-host:${sessionId}:${++requestSequence}`,
     now: now(),
   });
@@ -268,6 +326,11 @@ export function startTicketReviewHost(
             tickets: [...tickets.values()],
             relations: [...relations.values()],
           },
+          interventions: interventionCapabilities(
+            options,
+            data.source,
+            tickets,
+          ),
         };
       }
       cursor = data.nextCursor;
@@ -282,16 +345,18 @@ export function startTicketReviewHost(
   const inspectSubject = (url: URL): unknown => {
     const snapshotId = requiredQuery(url, "snapshotId");
     const kind = requiredQuery(url, "kind");
-    const subject = kind === "ticket"
-      ? { kind, ticketId: requiredQuery(url, "ticketId") }
-      : kind === "relation"
-        ? { kind, relationRef: requiredQuery(url, "relationRef") }
-        : null;
+    const subject = kind === "graph"
+      ? { kind }
+      : kind === "ticket"
+        ? { kind, ticketId: requiredQuery(url, "ticketId") }
+        : kind === "relation"
+          ? { kind, relationRef: requiredQuery(url, "relationRef") }
+          : null;
     if (subject === null) {
       throw new HostHttpError(
         400,
         "invalid_subject",
-        "Subject kind must be ticket or relation.",
+        "Subject kind must be graph, ticket, or relation.",
       );
     }
     return requireOperationData(runtime.dispatcher.dispatch(
@@ -304,24 +369,103 @@ export function startTicketReviewHost(
   const listTrace = (url: URL): unknown => {
     const snapshotId = requiredQuery(url, "snapshotId");
     const kind = requiredQuery(url, "kind");
-    const subject = kind === "ticket"
-      ? { kind, ticketId: requiredQuery(url, "ticketId") }
-      : kind === "relation"
-        ? { kind, relationRef: requiredQuery(url, "relationRef") }
-        : null;
+    const subject = kind === "graph"
+      ? { kind }
+      : kind === "ticket"
+        ? { kind, ticketId: requiredQuery(url, "ticketId") }
+        : kind === "relation"
+          ? { kind, relationRef: requiredQuery(url, "relationRef") }
+          : null;
     if (subject === null) {
       throw new HostHttpError(
         400,
         "invalid_subject",
-        "Subject kind must be ticket or relation.",
+        "Subject kind must be graph, ticket, or relation.",
+      );
+    }
+    let cursor: string | undefined;
+    let first: Record<string, unknown> | null = null;
+    const records: unknown[] = [];
+    for (let page = 0; page < MAX_TRACE_PAGES; page += 1) {
+      const data = requireOperationData<Record<string, unknown>>(
+        runtime.dispatcher.dispatch(
+          "ticket.trace.list",
+          operationContext(),
+          {
+            snapshotId,
+            subject,
+            limit: TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE,
+            ...(cursor === undefined ? {} : { cursor }),
+          },
+        ),
+      );
+      if (data.snapshotId !== snapshotId) {
+        throw new HostHttpError(
+          409,
+          "snapshot_changed",
+          "The Ticket trace changed while it was being read. Refresh the page.",
+        );
+      }
+      if (!Array.isArray(data.records)) {
+        throw new HostHttpError(
+          500,
+          "invalid_trace_projection",
+          "The Ticket trace projection returned invalid records.",
+        );
+      }
+      first ??= data;
+      records.push(...data.records);
+      if (data.nextCursor === null) {
+        return {
+          ...first,
+          records,
+          page: {
+            offset: 0,
+            count: records.length,
+            totalItems: records.length,
+          },
+          nextCursor: null,
+        };
+      }
+      if (typeof data.nextCursor !== "string" || data.nextCursor.length === 0) {
+        throw new HostHttpError(
+          500,
+          "invalid_trace_projection",
+          "The Ticket trace projection returned an invalid cursor.",
+        );
+      }
+      cursor = data.nextCursor;
+    }
+    throw new HostHttpError(
+      413,
+      "trace_too_large",
+      "The Ticket trace exceeded the review host page budget.",
+    );
+  };
+
+  const appendReview = (body: unknown): unknown => {
+    if (options.ticketReviewAttribution?.actorKind !== "human") {
+      throw new HostHttpError(
+        409,
+        "ticket_attribution_unavailable",
+        "This Ticket host is read-only because no trusted human reviewer was bound.",
+        null,
+        ["Open the review surface from a plugin host with trusted attribution."],
       );
     }
     return requireOperationData(runtime.dispatcher.dispatch(
-      "ticket.trace.list",
+      "ticket.review.append",
       operationContext(),
-      { snapshotId, subject, limit: 200 },
+      body,
     ));
   };
+
+  const recordDecision = (body: unknown): unknown =>
+    requireOperationData(runtime.dispatcher.dispatch(
+      "ticket.decision.record",
+      operationContext(),
+      body,
+    ));
 
   const server = http.createServer((request, response) => {
     void routeRequest({
@@ -334,6 +478,8 @@ export function startTicketReviewHost(
       readGraph,
       inspectSubject,
       listTrace,
+      appendReview,
+      recordDecision,
     }).catch((error) => {
       writeError(response, error);
     });
@@ -397,12 +543,65 @@ export function startTicketReviewHost(
   };
 }
 
-function openHostRuntime(cwd: string, dbPath: string): HostRuntime {
+function interventionCapabilities(
+  options: Pick<
+    TicketReviewHostOptions,
+    "ticketReviewAttribution" | "ticketDecisionAuthority"
+  >,
+  source: TicketSourceMetadata,
+  tickets: ReadonlyMap<string, HostGraphNode>,
+): TicketReviewHostInterventions {
+  const grant = options.ticketDecisionAuthority;
+  const protectedBoundaries = grant?.scopes.flatMap((scope) => {
+    if (scope.decisionType !== "protected_boundary") return [];
+    const ticket = tickets.get(scope.ticketId);
+    if (ticket?.ticketRevision !== scope.ticketRevision) return [];
+    return [{
+      ticketId: scope.ticketId,
+      ticketRevision: scope.ticketRevision,
+      boundary: scope.boundary,
+    }];
+  }) ?? [];
+  return {
+    review: options.ticketReviewAttribution?.actorKind !== "human"
+      ? { available: false }
+      : {
+          available: true,
+          actorKind: options.ticketReviewAttribution.actorKind,
+          attribution: options.ticketReviewAttribution.attribution,
+        },
+    planReview: {
+      available: grant?.scopes.some(
+        (scope) =>
+          scope.decisionType === "plan_review"
+          && scope.graphDigest === source.graphDigest,
+      ) ?? false,
+    },
+    protectedBoundaries,
+  };
+}
+
+function openHostRuntime(
+  cwd: string,
+  dbPath: string,
+  trust: {
+    ticketReviewAttribution?: TicketReviewHostAttribution;
+    ticketDecisionAuthority?: TicketDecisionAuthorityGrant;
+  },
+): HostRuntime {
   const session = GitFacade.sessionContextAt(cwd);
   const db = openDb(dbPath);
   return {
     db,
-    dispatcher: new OperationDispatcher(db, { repoRoot: session.toplevel }),
+    dispatcher: new OperationDispatcher(db, {
+      repoRoot: session.toplevel,
+      ...(trust.ticketReviewAttribution === undefined
+        ? {}
+        : { ticketReviewAttribution: trust.ticketReviewAttribution }),
+      ...(trust.ticketDecisionAuthority === undefined
+        ? {}
+        : { ticketDecisionAuthority: trust.ticketDecisionAuthority }),
+    }),
     repoId: 1,
     repositoryRoot: session.repoRoot,
     worktreeRoot: session.toplevel,
@@ -419,6 +618,8 @@ async function routeRequest(input: {
   readGraph: () => TicketReviewHostState;
   inspectSubject: (url: URL) => unknown;
   listTrace: (url: URL) => unknown;
+  appendReview: (body: unknown) => unknown;
+  recordDecision: (body: unknown) => unknown;
 }): Promise<void> {
   const {
     request,
@@ -430,6 +631,8 @@ async function routeRequest(input: {
     readGraph,
     inspectSubject,
     listTrace,
+    appendReview,
+    recordDecision,
   } = input;
   applySecurityHeaders(response);
   const url = new URL(request.url ?? "/", origin ?? "http://127.0.0.1");
@@ -450,7 +653,7 @@ async function routeRequest(input: {
       throw new HostHttpError(
         410,
         "session_expired",
-        "This local read capability expired. Start a new Ticket review host.",
+        "This local Ticket capability expired. Start a new review host.",
       );
     }
     assertBearer(request, token);
@@ -466,6 +669,18 @@ async function routeRequest(input: {
       writeJson(response, 200, { ok: true, data: listTrace(url) });
       return;
     }
+    if (request.method === "POST" && url.pathname === "/api/review") {
+      assertOrigin(request, origin);
+      const body = await readJsonBody(request, REVIEW_BODY_MAX_BYTES);
+      writeJson(response, 200, { ok: true, data: appendReview(body) });
+      return;
+    }
+    if (request.method === "POST" && url.pathname === "/api/decision") {
+      assertOrigin(request, origin);
+      const body = await readJsonBody(request, DECISION_BODY_MAX_BYTES);
+      writeJson(response, 200, { ok: true, data: recordDecision(body) });
+      return;
+    }
   }
   throw new HostHttpError(404, "not_found", "Route not found.");
 }
@@ -477,6 +692,7 @@ function requireOperationData<T = unknown>(result: OperationResult): T {
     result.error.code,
     result.error.message,
     result.error.details,
+    result.error.nextSafeActions,
   );
 }
 
@@ -563,6 +779,109 @@ function assertBearer(
   }
 }
 
+function assertOrigin(
+  request: http.IncomingMessage,
+  expectedOrigin: string | null,
+): void {
+  if (
+    expectedOrigin === null
+    || request.headers.origin !== expectedOrigin
+  ) {
+    throw new HostHttpError(
+      403,
+      "origin_rejected",
+      "The write request did not originate from this Ticket review host.",
+    );
+  }
+}
+
+async function readJsonBody(
+  request: http.IncomingMessage,
+  maximumBytes: number,
+): Promise<unknown> {
+  if (request.headers["content-type"] !== "application/json") {
+    throw new HostHttpError(
+      415,
+      "unsupported_media_type",
+      "Ticket review writes require Content-Type: application/json.",
+    );
+  }
+  const declaredLength = request.headers["content-length"];
+  if (declaredLength !== undefined) {
+    if (!/^(?:0|[1-9][0-9]*)$/u.test(declaredLength)) {
+      throw new HostHttpError(
+        400,
+        "invalid_content_length",
+        "Content-Length must be a canonical non-negative integer.",
+      );
+    }
+    if (Number(declaredLength) > maximumBytes) {
+      throw new HostHttpError(
+        413,
+        "body_too_large",
+        "The Ticket review write body exceeds the allowed size.",
+      );
+    }
+  }
+  const chunks: Buffer[] = [];
+  let received = 0;
+  await new Promise<void>((resolve, reject) => {
+    const cleanup = (): void => {
+      request.off("data", onData);
+      request.off("end", onEnd);
+      request.off("aborted", onAborted);
+      request.off("error", onError);
+    };
+    const fail = (error: unknown): void => {
+      cleanup();
+      request.resume();
+      reject(error);
+    };
+    const onData = (chunk: Buffer | string): void => {
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      received += bytes.byteLength;
+      if (received > maximumBytes) {
+        fail(new HostHttpError(
+          413,
+          "body_too_large",
+          "The Ticket review write body exceeds the allowed size.",
+        ));
+        return;
+      }
+      chunks.push(bytes);
+    };
+    const onEnd = (): void => {
+      cleanup();
+      resolve();
+    };
+    const onAborted = (): void => {
+      cleanup();
+      reject(new HostHttpError(
+        400,
+        "request_aborted",
+        "The Ticket review write request was aborted.",
+      ));
+    };
+    const onError = (error: Error): void => {
+      cleanup();
+      reject(error);
+    };
+    request.on("data", onData);
+    request.once("end", onEnd);
+    request.once("aborted", onAborted);
+    request.once("error", onError);
+  });
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8")) as unknown;
+  } catch {
+    throw new HostHttpError(
+      400,
+      "malformed_json",
+      "The Ticket review write body is not valid JSON.",
+    );
+  }
+}
+
 function writeJson(
   response: http.ServerResponse,
   status: number,
@@ -586,6 +905,7 @@ function writeError(response: http.ServerResponse, error: unknown): void {
         code: error.code,
         message: error.message,
         details: error.details,
+        nextSafeActions: error.nextSafeActions,
       },
     });
     return;
@@ -606,6 +926,7 @@ class HostHttpError extends Error {
     readonly code: string,
     message: string,
     readonly details: unknown = null,
+    readonly nextSafeActions: readonly string[] = [],
   ) {
     super(message);
   }

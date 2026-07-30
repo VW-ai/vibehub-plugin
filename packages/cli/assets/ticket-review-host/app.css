@@ -52,7 +52,9 @@ body {
 }
 
 button,
-textarea {
+textarea,
+select,
+input {
   font: inherit;
 }
 
@@ -61,7 +63,10 @@ button {
 }
 
 button:focus-visible,
-[tabindex]:focus-visible {
+[tabindex]:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+input:focus-visible {
   outline: 2px solid rgba(71, 120, 213, 0.5);
   outline-offset: 2px;
 }
@@ -618,6 +623,14 @@ button:focus-visible,
   white-space: pre-wrap;
 }
 
+.quiet-message {
+  color: var(--ink-faint) !important;
+}
+
+.quiet-message.error {
+  color: var(--red) !important;
+}
+
 .quiet-list {
   display: grid;
   gap: 7px;
@@ -659,6 +672,296 @@ button:focus-visible,
 .code-ref {
   font-family: var(--mono);
   overflow-wrap: anywhere;
+}
+
+.trace-list {
+  position: relative;
+  display: grid;
+  gap: 0;
+}
+
+.trace-list::before {
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  left: 3px;
+  width: 1px;
+  background: var(--line);
+  content: "";
+}
+
+.trace-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 7px minmax(0, 1fr);
+  gap: 10px;
+  padding: 7px 0 10px;
+}
+
+.trace-marker {
+  position: relative;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  margin-top: 4px;
+  border: 1px solid rgba(71, 120, 213, 0.55);
+  border-radius: 50%;
+  background: #fbfcfe;
+}
+
+.trace-row.historical .trace-marker {
+  border-color: rgba(74, 81, 89, 0.32);
+  background: #f2f3f4;
+}
+
+.trace-copy {
+  min-width: 0;
+}
+
+.trace-copy > strong {
+  display: block;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 580;
+  line-height: 1.4;
+}
+
+.trace-row.historical .trace-copy > strong {
+  color: var(--ink-soft);
+}
+
+.trace-meta {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-faint);
+  font: 10px/1.4 var(--mono);
+  overflow-wrap: anywhere;
+}
+
+.trace-copy > p {
+  margin-top: 6px;
+  color: var(--ink-soft);
+}
+
+.trace-decision {
+  display: grid;
+  grid-template-columns: minmax(70px, auto) minmax(0, 1fr);
+  gap: 4px 10px;
+  margin: 7px 0 0;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.trace-decision dt {
+  color: var(--ink-faint);
+}
+
+.trace-decision dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.trace-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.trace-targets button,
+.trace-targets a {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--ink-faint);
+  background: transparent;
+  cursor: copy;
+  font: 10px/1.3 var(--mono);
+  text-overflow: ellipsis;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.trace-targets button:hover,
+.trace-targets a:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.review-rail {
+  position: relative;
+  border-top: 1px solid var(--line);
+}
+
+.review-action {
+  border-bottom: 1px solid var(--line);
+}
+
+.review-action summary {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 13px;
+  gap: 8px;
+  align-items: center;
+  min-height: 48px;
+  padding: 7px 2px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.review-action summary::-webkit-details-marker {
+  display: none;
+}
+
+.review-action summary:hover .review-action-copy strong,
+.review-action[open] .review-action-copy strong {
+  color: var(--ink);
+}
+
+.review-action-mark {
+  display: grid;
+  width: 14px;
+  height: 14px;
+  place-content: center;
+  color: var(--blue);
+  font: 600 13px/1 var(--mono);
+}
+
+.review-action-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.review-action-copy strong {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 590;
+}
+
+.review-action-copy span {
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-action-chevron {
+  color: var(--ink-faint);
+  font-size: 17px;
+  line-height: 1;
+  transform: rotate(0);
+  transition: transform 120ms ease;
+}
+
+.review-action[open] .review-action-chevron {
+  transform: rotate(90deg);
+}
+
+.review-form {
+  display: grid;
+  gap: 12px;
+  padding: 6px 2px 15px 24px;
+}
+
+.review-field {
+  display: grid;
+  gap: 5px;
+  color: var(--ink-faint);
+  font: 10px/1.25 var(--mono);
+  letter-spacing: 0.025em;
+}
+
+.review-field textarea,
+.review-field select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(27, 31, 36, 0.13);
+  border-radius: 6px;
+  color: var(--ink);
+  background: rgba(249, 250, 251, 0.78);
+  font: 12px/1.5 var(--ui);
+  letter-spacing: 0;
+}
+
+.review-field textarea {
+  min-height: 58px;
+  padding: 8px 9px;
+  resize: vertical;
+}
+
+.review-field select {
+  height: 33px;
+  padding: 0 8px;
+}
+
+.review-field textarea:hover,
+.review-field select:hover {
+  border-color: var(--line-strong);
+}
+
+.review-field textarea:focus,
+.review-field select:focus {
+  border-color: rgba(71, 120, 213, 0.48);
+  background: rgba(252, 252, 252, 0.98);
+}
+
+.review-field textarea::placeholder {
+  color: #9a9fa5;
+}
+
+.review-form-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.review-form-status {
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-faint);
+  font: 10px/1.4 var(--mono);
+  overflow-wrap: anywhere;
+}
+
+.review-form-status.error {
+  color: var(--red);
+}
+
+.review-form-status.success {
+  color: var(--blue);
+}
+
+.review-form-status.attention {
+  color: var(--amber);
+}
+
+.review-submit {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(27, 31, 36, 0.18);
+  border-radius: 6px;
+  color: #f7f9fc;
+  background: #303741;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 590;
+}
+
+.review-submit:hover {
+  background: #242a31;
+}
+
+.review-submit:disabled {
+  cursor: wait;
+  opacity: 0.54;
 }
 
 .loading-state,

@@ -15,7 +15,7 @@ import {
   validateRuntimeRefinements,
 } from "../../../skills/scripts/operation-contract-validator.mjs";
 
-const EXPECTED_INPUT_SCHEMA_HASH="0c671ece2e97a4817ec256c1bd8005afe317fd3f9689b44f7362a7ddb4698859";
+const EXPECTED_INPUT_SCHEMA_HASH="8bbb045781ef72d20624622884200fb4d99370ac2f86d3669dd3814c43e92f40";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../../..");
 const ajv=new Ajv2020({allErrors:true,strict:false});
@@ -146,6 +146,13 @@ function walk(value,visit){
 
 function positiveFixture(name){
   const runId="fixture-run",specId="context-fixture",key="fixture-key",lease={runId,scopeId:"scope",leaseToken:"lease",generation:1};
+  const ticketSource={
+    sourceToken:`tls-${"1".repeat(64)}`,
+    worktreeIdentity:`worktree-${"2".repeat(64)}`,
+    resolvedCommit:"3".repeat(40),
+    graphDigest:`sha256:${"4".repeat(64)}`,
+    semanticLedgerDigest:`sha256:${"5".repeat(64)}`,
+  };
   const fixtures={
     "kb.status":{},"kb.feature.list":{query:"two words"},"kb.feature.get":{id:"x".repeat(200)},"kb.feature.suggest":{},
     "kb.spec.search":{paths:["src/two words.ts"],tags:["two words"]},"kb.spec.get":{id:specId},"kb.relations":{specId},"kb.lineage":{id:specId},"kb.anchors":{specId},"kb.review":{},
@@ -168,12 +175,7 @@ function positiveFixture(name){
     "ticket.subject.inspect":{snapshotId:"tgs-fixture",subject:{kind:"ticket",ticketId:"TKT-1"}},
     "ticket.trace.list":{snapshotId:"tgs-fixture",subject:{kind:"ticket",ticketId:"TKT-1"},kinds:["evidence"],limit:10},
     "ticket.worktree.patch":{
-      expectedSource:{
-        sourceToken:`tls-${"1".repeat(64)}`,
-        worktreeIdentity:`worktree-${"2".repeat(64)}`,
-        resolvedCommit:"3".repeat(40),
-        graphDigest:`sha256:${"4".repeat(64)}`,
-      },
+      expectedSource:ticketSource,
       changes:[{
         op:"put",
         ticketId:"fixture-ticket",
@@ -191,6 +193,30 @@ function positiveFixture(name){
           provenance_refs:[],
         },
       }],
+    },
+    "ticket.review.append":{
+      expectedSource:ticketSource,
+      review:{
+        type:"comment",
+        subject:{
+          kind:"graph",
+          graphDigest:ticketSource.graphDigest,
+        },
+        body:"The exact graph is ready for focused review.",
+      },
+    },
+    "ticket.decision.record":{
+      expectedSource:ticketSource,
+      decision:{
+        type:"plan_review",
+        subject:{
+          kind:"graph",
+          graphDigest:ticketSource.graphDigest,
+        },
+        disposition:"approve_execution",
+        rationale:"The reviewed graph has a bounded execution path.",
+        resolutionRefs:[],
+      },
     },
   };
   if(!(name in fixtures))throw new Error(`missing positive operation fixture: ${name}`);
@@ -287,6 +313,18 @@ function negativeFixtures(name,positive,input){
       fixture("patch put requires a complete Ticket document",{...positive,changes:[{...positive.changes?.[0],document:{}}]}),
       fixture("patch Ticket document is closed",{...positive,changes:[{...positive.changes?.[0],document:{...positive.changes?.[0].document,extra:true}}]}),
       fixture("patch Ticket key must match document ID",{...positive,changes:[{...positive.changes?.[0],document:{...positive.changes?.[0].document,ticket_id:"other-ticket"}}]},["ticket-patch-id-match"]),
+    ],
+    "ticket.review.append":[
+      fixture("review source semantic digest must be exact",{...positive,expectedSource:{...positive.expectedSource,semanticLedgerDigest:"latest"}}),
+      fixture("review type is closed",{...positive,review:{...positive.review,type:"approval"}}),
+      fixture("review subject is exact",{...positive,review:{...positive.review,subject:{kind:"graph"}}}),
+      fixture("review body rejects whitespace only",{...positive,review:{...positive.review,body:" "}}),
+    ],
+    "ticket.decision.record":[
+      fixture("decision source semantic digest must be exact",{...positive,expectedSource:{...positive.expectedSource,semanticLedgerDigest:"latest"}}),
+      fixture("decision type is closed",{...positive,decision:{...positive.decision,type:"comment"}}),
+      fixture("plan approval rejects delegated boundaries",{...positive,decision:{...positive.decision,delegatedBoundaries:["Do not broaden scope."]}}),
+      fixture("decision rationale rejects whitespace only",{...positive,decision:{...positive.decision,rationale:" "}}),
     ],
   };
   if(explicit[name])return explicit[name];

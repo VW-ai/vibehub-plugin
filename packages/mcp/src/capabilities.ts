@@ -13,6 +13,8 @@ export const TICKET_OPERATION_NAMES = [
   "ticket.subject.inspect",
   "ticket.trace.list",
   "ticket.worktree.patch",
+  "ticket.review.append",
+  "ticket.decision.record",
 ] as const;
 export type TicketOperationName = typeof TICKET_OPERATION_NAMES[number];
 const TICKET_OPERATION_NAME_SET = new Set<string>(TICKET_OPERATION_NAMES);

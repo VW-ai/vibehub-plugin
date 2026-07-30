@@ -125,12 +125,17 @@ describe("production skill package",()=>{
     expect(operations).toContain("`ticket.trace.list`");
     expect(operations).toContain("Git-native Ticket operations are deliberately outside persisted request");
     expect(operations).toContain("`ticket.worktree.patch`");
+    expect(operations).toContain("`ticket.review.append`");
+    expect(operations).toContain("`ticket.decision.record`");
+    expect(operations).toContain("ticket_authority_unavailable");
     expect(operations).not.toContain("`ticket.proposal.");
     const dispatch=read("scripts/_dispatch.mjs");
     expect(dispatch).toContain('"graph.snapshot"');
     expect(dispatch).toContain('"subject.inspect"');
     expect(dispatch).toContain('"trace.list"');
     expect(dispatch).toContain('"worktree.patch"');
+    expect(dispatch).toContain('"review.append"');
+    expect(dispatch).toContain('"decision.record"');
     expect(dispatch).not.toContain('"proposal.');
     expect(dispatch).toContain('"../../../main.js"');
     expect(dispatch).toContain('"../../packages/cli/dist/main.js"');
@@ -189,6 +194,19 @@ describe("production skill package",()=>{
     expect(plan).toContain("`auto-apply-unless-human-gate`");
     expect(plan).toContain("$vibehub-ticket-validate");
     expect(plan).toContain("ticket.worktree.patch");
+    expect(plan).toContain("`ticket.trace.list`");
+    expect(plan).toContain("`semanticLedgerDigest`");
+    expect(plan).toContain("a `comment` is non-mutating input");
+    expect(plan).toContain("current `ticket_edit`");
+    expect(plan).toContain("Review `recordRef`");
+    expect(plan).toContain("current `gate_decision`");
+    expect(plan).toContain("Historical comments, proposals, and Decisions");
+    expect(plan).toContain("non-authoritative");
+    expect(plan).toContain("stop visibly");
+    expect(plan).toContain("optional causal inputs, not mandatory workflow stages");
+    expect(plan).toContain("public patch directly");
+    expect(plan).toContain("never use");
+    expect(plan).toContain("captured before that fact was written");
     expect(plan).toContain("same-context observations");
     expect(plan).toContain("cannot authorize apply");
     expect(plan).not.toMatch(/\bparent(?:Id)?\b/);
@@ -197,6 +215,15 @@ describe("production skill package",()=>{
     expect(validate).toContain("`passed`");
     expect(validate).toContain("`human_decision_required`");
     expect(validate).toContain("return `inconclusive` for application");
+    expect(validate).toContain("`ticket.trace.list`");
+    expect(validate).toContain("`semanticLedgerDigest`");
+    expect(validate).toContain("comments are non-mutating input");
+    expect(validate).toContain("current `ticket_edit`");
+    expect(validate).toContain("Review `recordRef`");
+    expect(validate).toContain("current `gate_decision`");
+    expect(validate).toContain("Historical facts remain reviewable but non-authoritative");
+    expect(validate).toContain("producer is an `authority_receipt`");
+    expect(validate).toContain("surface the failure");
     expect(validate).toContain("Do not rewrite the candidate");
     expect(validate).not.toContain("vh-ticket.mjs worktree.patch");
   });
@@ -376,7 +403,9 @@ describe("production skill package",()=>{
     ] as const;
     for(const [operation,caseName] of regressions){const contract=artifact.operations[operation]!,fixture=contract.fixtures.negatives.find(x=>x.case===caseName)!;const run=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--operation",operation],{input:JSON.stringify(materializeOperationFixture(contract,fixture)),encoding:"utf8"});expect(run.status,`${operation}/${caseName}: ${run.stdout}`).toBe(2);}
     expect(Object.keys(artifact.operations).filter(operation=>operation.startsWith("ticket."))).toEqual([
+      "ticket.decision.record",
       "ticket.graph.snapshot",
+      "ticket.review.append",
       "ticket.subject.inspect",
       "ticket.trace.list",
       "ticket.worktree.patch",

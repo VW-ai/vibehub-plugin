@@ -58,6 +58,9 @@
   let dragging = null;
   let suppressCanvasClick = false;
   let toastTimer = null;
+  const drafts = new Map();
+  const draftNotices = new Map();
+  let activeActionKey = null;
 
   function svg(tag, attributes = {}) {
     const element = document.createElementNS(SVG, tag);
@@ -67,20 +70,35 @@
     return element;
   }
 
-  async function api(path) {
+  async function api(path, options = {}) {
     if (!token) {
       throw new Error(
         "The local Ticket capability is missing. Open the exact link printed by VibeHub.",
       );
     }
+    const body = options.body === undefined
+      ? undefined
+      : JSON.stringify(options.body);
     const response = await fetch(path, {
-      headers: { Authorization: `Bearer ${token}` },
+      method: options.method ?? "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        ...(body === undefined
+          ? {}
+          : { "Content-Type": "application/json" }),
+      },
+      ...(body === undefined ? {} : { body }),
     });
     const envelope = await response.json();
     if (!response.ok || !envelope.ok) {
-      throw new Error(
+      const error = new Error(
         envelope?.error?.message || `Ticket host returned ${response.status}`,
       );
+      error.code = envelope?.error?.code || "host_error";
+      error.status = response.status;
+      error.details = envelope?.error?.details ?? null;
+      throw error;
     }
     return envelope.data;
   }
@@ -102,9 +120,11 @@
       renderGraphInspector();
       requestAnimationFrame(frameGraph);
       if (message) showToast(message);
+      return true;
     } catch (error) {
       if (request !== graphRequest) return;
       renderError(error);
+      return false;
     } finally {
       if (request === graphRequest) setBusy(false);
     }
@@ -301,7 +321,8 @@
 
   function renderGraphInspector() {
     if (!state) return;
-    subjectRequest += 1;
+    const request = ++subjectRequest;
+    const snapshotId = state.graph.snapshotId;
     selected = null;
     elements.workspace.classList.remove("inspector-closed");
     elements.inspector.classList.add("open");
@@ -311,7 +332,8 @@
       `This exact worktree source contains ${state.graph.tickets.length} `
       + `Tickets and ${state.graph.relations.length} direct unlock relations. `
       + "Select any Ticket to read the context a fresh Agent receives.";
-    elements.inspectorContent.replaceChildren(
+    const content = document.createDocumentFragment();
+    content.append(
       facts([
         ["Source", sourceLabel(state.graph.source)],
         [
@@ -339,7 +361,7 @@
           detail: "Additional changed paths are not shown.",
         });
       }
-      elements.inspectorContent.append(
+      content.append(
         section(
           "Pending local semantics",
           list(
@@ -350,13 +372,59 @@
         ),
       );
     }
+    const workspace = reviewWorkspace({
+      kind: "graph",
+      graphDigest: state.graph.source.graphDigest,
+    });
+    if (workspace) content.append(workspace);
+    const traceSection = section(
+      "Trace",
+      quietMessage("Reading review facts…"),
+    );
+    traceSection.dataset.trace = "graph";
+    content.append(traceSection);
+    elements.inspectorContent.replaceChildren(content);
+    void loadGraphTrace(request, snapshotId, traceSection);
   }
 
-  async function selectTicket(ticketId, focusInspector = false) {
+  async function loadGraphTrace(request, snapshotId, traceSection) {
+    try {
+      const query = subjectQuery(snapshotId, { kind: "graph" });
+      const [inspection, trace] = await Promise.all([
+        api(`/api/subject?${query}`),
+        api(`/api/trace?${query}`),
+      ]);
+      if (!isCurrentSubjectResponse(
+        request,
+        snapshotId,
+        { kind: "graph" },
+        inspection,
+        trace,
+      )) return;
+      traceSection.replaceChildren(
+        sectionHeading("Trace"),
+        traceList(trace.records || []),
+      );
+    } catch (error) {
+      if (!isCurrentSubjectRequest(request, snapshotId)) return;
+      traceSection.replaceChildren(
+        sectionHeading("Trace"),
+        quietMessage(error.message, "error"),
+      );
+      showToast(error.message);
+    }
+  }
+
+  async function selectTicket(
+    ticketId,
+    focusInspector = false,
+    preserveAction = false,
+  ) {
     const ticket = state.graph.tickets.find(
       (item) => item.ticketId === ticketId,
     );
     if (!ticket) return;
+    if (!preserveAction) activeActionKey = null;
     const request = ++subjectRequest;
     const snapshotId = state.graph.snapshotId;
     selected = { kind: "ticket", id: ticketId };
@@ -382,18 +450,21 @@
         kind: "ticket",
         ticketId,
       });
-      const [inspection, trace] = await Promise.all([
-        api(`/api/subject?${query}`),
-        api(`/api/trace?${query}`).catch(() => null),
-      ]);
+      const inspection = await api(`/api/subject?${query}`);
       if (!isCurrentSubjectResponse(
         request,
         snapshotId,
         { kind: "ticket", ticketId },
         inspection,
-        trace,
+        null,
       )) return;
-      renderTicketInspection(inspection, trace);
+      const traceSection = renderTicketInspection(inspection);
+      void loadSubjectTrace(
+        request,
+        snapshotId,
+        { kind: "ticket", ticketId },
+        traceSection,
+      );
       if (focusInspector) elements.inspectorTitle.focus();
     } catch (error) {
       if (!isCurrentSubjectRequest(request, snapshotId)) return;
@@ -402,7 +473,7 @@
     }
   }
 
-  function renderTicketInspection(inspection, trace) {
+  function renderTicketInspection(inspection) {
     const subject = inspection.subject;
     if (subject?.kind !== "ticket") {
       throw new Error("Ticket inspector received the wrong subject.");
@@ -467,25 +538,31 @@
         "code-ref",
       ),
     );
-    appendSection(
-      content,
+    const traceSection = section(
       "Trace",
-      list(
-        trace?.records || [],
-        (item) => ({
-          title: item.summary,
-          detail: `${item.kind} · ${item.occurredAt}`,
-        }),
-      ),
+      quietMessage("Reading review facts…"),
     );
+    traceSection.dataset.trace = "ticket";
+    content.append(traceSection);
+    const workspace = reviewWorkspace(
+      exactTicketSubject(ticket),
+      { contextPackage },
+    );
+    if (workspace) content.append(workspace);
     elements.inspectorContent.replaceChildren(content);
+    return traceSection;
   }
 
-  async function selectRelation(relationRef, focusInspector = false) {
+  async function selectRelation(
+    relationRef,
+    focusInspector = false,
+    preserveAction = false,
+  ) {
     const relation = state.graph.relations.find(
       (item) => item.relationRef === relationRef,
     );
     if (!relation) return;
+    if (!preserveAction) activeActionKey = null;
     const request = ++subjectRequest;
     const snapshotId = state.graph.snapshotId;
     selected = { kind: "relation", id: relationRef };
@@ -510,18 +587,21 @@
         kind: "relation",
         relationRef,
       });
-      const [inspection, trace] = await Promise.all([
-        api(`/api/subject?${query}`),
-        api(`/api/trace?${query}`).catch(() => null),
-      ]);
+      const inspection = await api(`/api/subject?${query}`);
       if (!isCurrentSubjectResponse(
         request,
         snapshotId,
         { kind: "relation", relationRef },
         inspection,
-        trace,
+        null,
       )) return;
-      renderRelationInspection(inspection, trace);
+      const traceSection = renderRelationInspection(inspection);
+      void loadSubjectTrace(
+        request,
+        snapshotId,
+        { kind: "relation", relationRef },
+        traceSection,
+      );
       if (focusInspector) elements.inspectorTitle.focus();
     } catch (error) {
       if (!isCurrentSubjectRequest(request, snapshotId)) return;
@@ -530,7 +610,7 @@
     }
   }
 
-  function renderRelationInspection(inspection, trace) {
+  function renderRelationInspection(inspection) {
     const subject = inspection.subject;
     if (subject?.kind !== "relation") {
       throw new Error("Relation inspector received the wrong subject.");
@@ -558,18 +638,54 @@
         "code-ref",
       ),
     );
-    appendSection(
-      content,
+    const traceSection = section(
       "Trace",
-      list(
-        trace?.records || [],
-        (item) => ({
-          title: item.summary,
-          detail: `${item.kind} · ${item.occurredAt}`,
-        }),
-      ),
+      quietMessage("Reading review facts…"),
     );
+    traceSection.dataset.trace = "relation";
+    content.append(traceSection);
+    const workspace = reviewWorkspace(exactRelationSubject(relation));
+    if (workspace) content.append(workspace);
     elements.inspectorContent.replaceChildren(content);
+    return traceSection;
+  }
+
+  async function loadSubjectTrace(
+    request,
+    snapshotId,
+    subject,
+    traceSection,
+  ) {
+    try {
+      const trace = await api(
+        `/api/trace?${subjectQuery(snapshotId, subject)}`,
+      );
+      if (
+        !isCurrentSubjectRequest(request, snapshotId)
+        || trace?.snapshotId !== snapshotId
+        || !traceSubjectMatches(subject, trace?.subject)
+      ) return;
+      traceSection.replaceChildren(
+        sectionHeading("Trace"),
+        traceList(trace.records || []),
+      );
+    } catch (error) {
+      if (!isCurrentSubjectRequest(request, snapshotId)) return;
+      traceSection.replaceChildren(
+        sectionHeading("Trace"),
+        quietMessage(error.message, "error"),
+      );
+      showToast(error.message);
+    }
+  }
+
+  function traceSubjectMatches(expected, actual) {
+    if (expected.kind !== actual?.kind) return false;
+    if (expected.kind === "graph") return true;
+    if (expected.kind === "ticket") {
+      return expected.ticketId === actual.ticketId;
+    }
+    return expected.relationRef === actual.relationRef;
   }
 
   function subjectQuery(snapshotId, subject) {
@@ -579,7 +695,7 @@
     });
     if (subject.kind === "ticket") {
       query.set("ticketId", subject.ticketId);
-    } else {
+    } else if (subject.kind === "relation") {
       query.set("relationRef", subject.relationRef);
     }
     return query.toString();
@@ -598,11 +714,13 @@
     trace,
   ) {
     const inspectedSubject = inspection?.subject;
-    const identityMatches = subject.kind === "ticket"
-      ? inspectedSubject?.kind === "ticket"
-        && inspectedSubject.ticket?.ticketId === subject.ticketId
-      : inspectedSubject?.kind === "relation"
-        && inspectedSubject.relation?.relationRef === subject.relationRef;
+    const identityMatches = subject.kind === "graph"
+      ? inspectedSubject?.kind === "graph"
+      : subject.kind === "ticket"
+        ? inspectedSubject?.kind === "ticket"
+          && inspectedSubject.ticket?.ticketId === subject.ticketId
+        : inspectedSubject?.kind === "relation"
+          && inspectedSubject.relation?.relationRef === subject.relationRef;
     return isCurrentSubjectRequest(request, snapshotId)
       && inspection?.snapshotId === snapshotId
       && (trace === null || trace?.snapshotId === snapshotId)
@@ -618,6 +736,7 @@
     const restore = selected ?? lastFocusedSubject;
     subjectRequest += 1;
     selected = null;
+    activeActionKey = null;
     elements.inspector.classList.remove("open");
     elements.workspace.classList.add("inspector-closed");
     renderGraph();
@@ -726,6 +845,774 @@
       wrapper.append(row);
     }
     return wrapper;
+  }
+
+  function sectionHeading(title) {
+    const heading = document.createElement("h2");
+    heading.textContent = title;
+    return heading;
+  }
+
+  function quietMessage(message, tone = "") {
+    const paragraph = document.createElement("p");
+    paragraph.className = classes("quiet-message", tone);
+    paragraph.textContent = message;
+    return paragraph;
+  }
+
+  function traceList(records) {
+    if (!records.length) {
+      return quietMessage("No review facts are bound to this exact subject.");
+    }
+    const result = document.createElement("div");
+    result.className = "trace-list";
+    for (const record of records) {
+      const row = document.createElement("article");
+      const historical = String(record.status || "").startsWith("historical");
+      row.className = classes("trace-row", historical ? "historical" : "");
+
+      const marker = document.createElement("span");
+      marker.className = "trace-marker";
+      marker.setAttribute("aria-hidden", "true");
+
+      const copy = document.createElement("div");
+      copy.className = "trace-copy";
+      const title = document.createElement("strong");
+      title.textContent = record.summary;
+      const meta = document.createElement("span");
+      meta.className = "trace-meta";
+      meta.textContent = [
+        record.subkind || record.kind,
+        record.status || "recorded",
+        formatInstant(record.occurredAt),
+      ].join(" · ");
+      copy.append(title, meta);
+      const decision = traceDecisionDetails(record.decision);
+      if (decision) copy.append(decision);
+      if (record.body) {
+        const body = document.createElement("p");
+        body.textContent = record.body;
+        copy.append(body);
+      }
+      const targets = traceTargets(record.targets || []);
+      if (targets) copy.append(targets);
+      row.append(marker, copy);
+      result.append(row);
+    }
+    return result;
+  }
+
+  function traceDecisionDetails(decision) {
+    if (!decision) return null;
+    const details = document.createElement("dl");
+    details.className = "trace-decision";
+    const append = (label, value) => {
+      if (
+        value === undefined
+        || value === null
+        || value === ""
+        || (Array.isArray(value) && value.length === 0)
+      ) return;
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const definition = document.createElement("dd");
+      definition.textContent = Array.isArray(value)
+        ? value.join("\n")
+        : value;
+      details.append(term, definition);
+    };
+    append("Decision", decision.disposition);
+    if (decision.decisionType === "protected_boundary") {
+      append("Boundary", decision.boundary);
+      append("Selection", decision.selection);
+    } else {
+      append("Delegated boundaries", decision.delegatedBoundaries);
+    }
+    append("Resolution refs", decision.resolutionRefs);
+    return details;
+  }
+
+  function traceTargets(targets) {
+    if (!targets.length) return null;
+    const wrapper = document.createElement("div");
+    wrapper.className = "trace-targets";
+    for (const target of targets) {
+      if (target.kind === "url") {
+        const link = document.createElement("a");
+        link.href = target.target;
+        link.target = "_blank";
+        link.rel = "noreferrer";
+        link.textContent = target.label;
+        link.title = target.target;
+        wrapper.append(link);
+        continue;
+      }
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = target.label;
+      button.title = target.target;
+      button.addEventListener(
+        "click",
+        () => void copyText(target.target, `${target.label} copied`),
+      );
+      wrapper.append(button);
+    }
+    return wrapper;
+  }
+
+  function reviewWorkspace(subject, options = {}) {
+    const rail = document.createElement("div");
+    rail.className = "review-rail";
+    const interventions = state.interventions || {
+      review: { available: false },
+      planReview: { available: false },
+      protectedBoundaries: [],
+    };
+    const actions = [];
+    const canReview = interventions.review?.available === true;
+    if (canReview) {
+      const commentKey = reviewDraftKey("comment", subject);
+      actions.push(
+        actionDisclosure(
+          "Comment",
+          subject.kind === "graph"
+            ? "Attach context without changing the plan."
+            : subject.kind === "ticket"
+              ? "Attach context to this exact Ticket revision."
+              : "Attach context to this exact direct unlock.",
+          "·",
+          commentKey,
+          () => commentForm(subject, commentKey),
+        ),
+      );
+      if (subject.kind === "ticket") {
+        const editKey = reviewDraftKey("ticket-edit", subject);
+        actions.push(
+          actionDisclosure(
+            "Propose edit",
+            "Preserve the Ticket; record a replacement context package.",
+            "↗",
+            editKey,
+            () => ticketEditForm(
+              subject,
+              options.contextPackage || {},
+              editKey,
+            ),
+          ),
+        );
+      }
+    }
+    if (
+      subject.kind === "graph"
+      && interventions.planReview?.available === true
+    ) {
+      const planKey = reviewDraftKey("plan", subject);
+      actions.push(
+        actionDisclosure(
+          "Review plan",
+          "Record one exact, host-authorized graph decision.",
+          "◇",
+          planKey,
+          () => planDecisionForm(subject, planKey),
+        ),
+      );
+    }
+    if (subject.kind === "ticket") {
+      const boundaries = (interventions.protectedBoundaries || [])
+        .filter((item) =>
+          item.ticketId === subject.ticketId
+          && item.ticketRevision === subject.ticketRevision)
+        .map((item) => item.boundary);
+      if (boundaries.length) {
+        const boundaryKey = reviewDraftKey("protected-boundary", subject);
+        actions.push(
+          actionDisclosure(
+            "Decide boundary",
+            "Resolve one exact product or design choice.",
+            "◇",
+            boundaryKey,
+            () => protectedDecisionForm(
+              subject,
+              boundaries,
+              boundaryKey,
+            ),
+          ),
+        );
+      }
+    }
+    if (!actions.length) return null;
+    rail.append(...actions);
+    return section("Review", rail);
+  }
+
+  function reviewDraftKey(action, subject) {
+    const locus = subject.kind === "graph"
+      ? "graph"
+      : subject.kind === "ticket"
+        ? `ticket:${subject.ticketId}`
+        : `relation:${subject.relationRef}`;
+    return `${action}:${locus}`;
+  }
+
+  function actionDisclosure(
+    label,
+    detail,
+    symbol,
+    draftKey,
+    buildForm,
+  ) {
+    const disclosure = document.createElement("details");
+    disclosure.className = "review-action";
+    const summary = document.createElement("summary");
+    const mark = document.createElement("span");
+    mark.className = "review-action-mark";
+    mark.textContent = symbol;
+    mark.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("span");
+    copy.className = "review-action-copy";
+    const title = document.createElement("strong");
+    title.textContent = label;
+    const hint = document.createElement("span");
+    hint.textContent = detail;
+    copy.append(title, hint);
+    const chevron = document.createElement("span");
+    chevron.className = "review-action-chevron";
+    chevron.textContent = "›";
+    chevron.setAttribute("aria-hidden", "true");
+    summary.append(mark, copy, chevron);
+    disclosure.append(summary);
+    const ensureForm = () => {
+      if (disclosure.childElementCount === 1) {
+        disclosure.append(buildForm());
+      }
+    };
+    disclosure.addEventListener("toggle", () => {
+      if (!disclosure.open) {
+        if (activeActionKey === draftKey) activeActionKey = null;
+        return;
+      }
+      activeActionKey = draftKey;
+      const parent = disclosure.parentElement;
+      if (parent) {
+        for (const sibling of parent.children) {
+          if (sibling !== disclosure && sibling.matches("details[open]")) {
+            sibling.open = false;
+          }
+        }
+      }
+      ensureForm();
+    });
+    if (activeActionKey === draftKey) {
+      disclosure.open = true;
+      ensureForm();
+    }
+    return disclosure;
+  }
+
+  function commentForm(subject, draftKey) {
+    const body = textareaControl({
+      name: "body",
+      rows: 4,
+      placeholder: "What should the next Agent understand?",
+      required: true,
+    });
+    return mutationForm({
+      draftKey,
+      fields: [
+        field("Comment", body),
+      ],
+      submitLabel: "Record comment",
+      submit: () => ({
+        route: "/api/review",
+        payload: {
+          expectedSource: mutationSource(),
+          review: {
+            type: "comment",
+            subject,
+            body: body.value.trim(),
+          },
+        },
+        subject,
+      }),
+    });
+  }
+
+  function ticketEditForm(subject, contextPackage, draftKey) {
+    const outcome = textareaControl({
+      name: "outcome",
+      rows: 2,
+      value: contextPackage.outcome || "",
+      required: true,
+    });
+    const context = textareaControl({
+      name: "context",
+      rows: 5,
+      value: contextPackage.context || "",
+      required: true,
+    });
+    const body = textareaControl({
+      name: "body",
+      rows: 3,
+      placeholder: "Summarize the change for the next Agent.",
+      required: true,
+    });
+    const rationale = textareaControl({
+      name: "rationale",
+      rows: 3,
+      placeholder: "Why does this make the package more executable?",
+      required: true,
+    });
+    return mutationForm({
+      draftKey,
+      fields: [
+        field("Outcome", outcome),
+        field("Context", context),
+        field("Review note", body),
+        field("Rationale", rationale),
+      ],
+      submitLabel: "Record proposal",
+      submit: ({ setStatus }) => {
+        const nextOutcome = outcome.value.trim();
+        const nextContext = context.value.trim();
+        if (
+          nextOutcome === (contextPackage.outcome || "")
+          && nextContext === (contextPackage.context || "")
+        ) {
+          setStatus(
+            "Change the outcome or context before recording an edit.",
+            "error",
+          );
+          outcome.focus();
+          return null;
+        }
+        return {
+          route: "/api/review",
+          payload: {
+            expectedSource: mutationSource(),
+            review: {
+              type: "ticket_edit",
+              subject,
+              body: body.value.trim(),
+              rationale: rationale.value.trim(),
+              replacementTicket: replacementTicket(
+                subject.ticketId,
+                contextPackage,
+                nextOutcome,
+                nextContext,
+              ),
+            },
+          },
+          subject,
+        };
+      },
+    });
+  }
+
+  function planDecisionForm(subject, draftKey) {
+    const disposition = selectControl([
+      ["approve_execution", "Approve execution"],
+      ["delegate_within_boundaries", "Delegate within boundaries"],
+      ["request_changes", "Request changes"],
+    ], "disposition");
+    const boundaries = textareaControl({
+      name: "delegatedBoundaries",
+      rows: 3,
+      placeholder: "One boundary per line",
+    });
+    const boundaryField = field("Delegated boundaries", boundaries);
+    const rationale = textareaControl({
+      name: "rationale",
+      rows: 4,
+      placeholder: "Why is this the right decision for this exact graph?",
+      required: true,
+    });
+    const syncFields = () => {
+      const delegated = disposition.value === "delegate_within_boundaries";
+      boundaryField.hidden = !delegated;
+      boundaries.required = delegated;
+    };
+    disposition.addEventListener("change", syncFields);
+    syncFields();
+    return mutationForm({
+      draftKey,
+      fields: [
+        field("Decision", disposition),
+        boundaryField,
+        field("Rationale", rationale),
+      ],
+      submitLabel: "Record decision",
+      submit: () => {
+        const delegatedBoundaries = lineValues(boundaries.value);
+        return {
+          route: "/api/decision",
+          payload: {
+            expectedSource: mutationSource(),
+            decision: {
+              type: "plan_review",
+              subject,
+              disposition: disposition.value,
+              ...(disposition.value === "delegate_within_boundaries"
+                ? { delegatedBoundaries }
+                : {}),
+              rationale: rationale.value.trim(),
+              resolutionRefs: [],
+            },
+          },
+          subject,
+        };
+      },
+    });
+  }
+
+  function protectedDecisionForm(subject, boundaries, draftKey) {
+    const boundary = selectControl(
+      boundaries.map((item) => [item, item]),
+      "boundary",
+    );
+    const disposition = selectControl([
+      ["resolve", "Resolve"],
+      ["decline", "Decline to resolve"],
+    ], "disposition");
+    const selection = textareaControl({
+      name: "selection",
+      rows: 3,
+      placeholder: "The selected direction",
+      required: true,
+    });
+    const selectionField = field("Selection", selection);
+    const rationale = textareaControl({
+      name: "rationale",
+      rows: 4,
+      placeholder: "Why is this the right human choice?",
+      required: true,
+    });
+    const syncFields = () => {
+      const resolves = disposition.value === "resolve";
+      selectionField.hidden = !resolves;
+      selection.required = resolves;
+    };
+    disposition.addEventListener("change", syncFields);
+    syncFields();
+    return mutationForm({
+      draftKey,
+      fields: [
+        field("Protected boundary", boundary),
+        field("Decision", disposition),
+        selectionField,
+        field("Rationale", rationale),
+      ],
+      submitLabel: "Record decision",
+      submit: () => ({
+        route: "/api/decision",
+        payload: {
+          expectedSource: mutationSource(),
+          decision: {
+            type: "protected_boundary",
+            subject,
+            boundary: boundary.value,
+            disposition: disposition.value,
+            ...(disposition.value === "resolve"
+              ? { selection: selection.value.trim() }
+              : {}),
+            rationale: rationale.value.trim(),
+            resolutionRefs: [],
+          },
+        },
+        subject,
+      }),
+    });
+  }
+
+  function mutationForm({
+    draftKey,
+    fields,
+    submitLabel,
+    submit,
+  }) {
+    const form = document.createElement("form");
+    form.className = "review-form";
+    form.append(...fields);
+    const footer = document.createElement("div");
+    footer.className = "review-form-footer";
+    const status = document.createElement("p");
+    status.className = "review-form-status";
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+    const button = document.createElement("button");
+    button.type = "submit";
+    button.className = "review-submit";
+    button.textContent = submitLabel;
+    footer.append(status, button);
+    form.append(footer);
+
+    const setStatus = (message, tone = "") => {
+      status.textContent = message;
+      status.className = classes("review-form-status", tone);
+    };
+    restoreFormDraft(form, draftKey);
+    const notice = draftNotices.get(draftKey);
+    if (notice) setStatus(notice, "attention");
+    const persist = () => {
+      saveFormDraft(form, draftKey);
+      if (draftNotices.has(draftKey)) {
+        draftNotices.delete(draftKey);
+        setStatus("");
+      }
+    };
+    form.addEventListener("input", persist);
+    form.addEventListener("change", persist);
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      saveFormDraft(form, draftKey);
+      let mutation;
+      try {
+        mutation = submit({ setStatus });
+      } catch (error) {
+        setStatus(error.message, "error");
+        return;
+      }
+      if (mutation === null) return;
+      void performMutation({
+        ...mutation,
+        draftKey,
+        form,
+        button,
+        setStatus,
+      });
+    });
+    return form;
+  }
+
+  async function performMutation({
+    route,
+    payload,
+    subject,
+    draftKey,
+    form,
+    button,
+    setStatus,
+  }) {
+    button.disabled = true;
+    form.setAttribute("aria-busy", "true");
+    setStatus("Writing one exact Git review fact…");
+    try {
+      const result = await api(route, {
+        method: "POST",
+        body: payload,
+      });
+      const documentPath =
+        result.review?.documentPath
+        || result.decision?.documentPath
+        || "Git review ledger";
+      drafts.delete(draftKey);
+      draftNotices.delete(draftKey);
+      if (activeActionKey === draftKey) activeActionKey = null;
+      setStatus(`Recorded · ${documentPath}`, "success");
+      showToast(`Recorded · ${documentPath}`);
+      const refreshed = await refresh();
+      if (!refreshed) {
+        elements.inspectorTitle.textContent =
+          "Review recorded; graph refresh failed";
+        elements.inspectorOutcome.textContent =
+          `The durable fact is at ${documentPath}. Refresh before retrying.`;
+        showToast(`Recorded at ${documentPath} · refresh failed`);
+        return;
+      }
+      await restoreSubject(subject, false);
+    } catch (error) {
+      const stale = String(error.code || "").includes("stale")
+        || String(error.code || "").includes("source_changed");
+      if (!stale) {
+        setStatus(error.message, "error");
+        return;
+      }
+      const notice =
+        "Source refreshed. Your draft is preserved; recheck it before recording.";
+      draftNotices.set(draftKey, notice);
+      activeActionKey = draftKey;
+      setStatus("The source changed. Refreshing without losing your draft…");
+      const refreshed = await refresh();
+      if (refreshed) {
+        await restoreSubject(subject, true);
+        showToast("Source refreshed · draft preserved");
+      } else {
+        showToast("Refresh failed · draft preserved in this page");
+      }
+    } finally {
+      if (form.isConnected) {
+        button.disabled = false;
+        form.removeAttribute("aria-busy");
+      }
+    }
+  }
+
+  async function restoreSubject(subject, preserveAction) {
+    if (subject.kind === "ticket") {
+      if (state.graph.tickets.some(
+        (ticket) => ticket.ticketId === subject.ticketId,
+      )) {
+        await selectTicket(subject.ticketId, false, preserveAction);
+      }
+      return;
+    }
+    if (subject.kind === "relation") {
+      if (state.graph.relations.some(
+        (relation) => relation.relationRef === subject.relationRef,
+      )) {
+        await selectRelation(subject.relationRef, false, preserveAction);
+      }
+    }
+  }
+
+  function saveFormDraft(form, draftKey) {
+    const draft = {};
+    for (const control of form.querySelectorAll("[name]")) {
+      draft[control.name] = control.value;
+    }
+    drafts.set(draftKey, draft);
+  }
+
+  function restoreFormDraft(form, draftKey) {
+    const draft = drafts.get(draftKey);
+    if (!draft) return;
+    for (const control of form.querySelectorAll("[name]")) {
+      if (Object.prototype.hasOwnProperty.call(draft, control.name)) {
+        control.value = draft[control.name];
+        control.dispatchEvent(new Event("change"));
+      }
+    }
+  }
+
+  function field(label, control) {
+    const wrapper = document.createElement("label");
+    wrapper.className = "review-field";
+    const text = document.createElement("span");
+    text.textContent = label;
+    wrapper.append(text, control);
+    return wrapper;
+  }
+
+  function textareaControl({
+    name,
+    rows,
+    value = "",
+    placeholder = "",
+    required = false,
+  }) {
+    const control = document.createElement("textarea");
+    control.name = name;
+    control.rows = rows;
+    control.value = value;
+    control.placeholder = placeholder;
+    control.required = required;
+    control.spellcheck = true;
+    return control;
+  }
+
+  function selectControl(options, name) {
+    const control = document.createElement("select");
+    control.name = name;
+    for (const [value, label] of options) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      control.append(option);
+    }
+    return control;
+  }
+
+  function mutationSource() {
+    const source = state?.graph?.source;
+    if (
+      source?.mode !== "worktree"
+      || !source.semanticLedgerDigest
+    ) {
+      throw new Error(
+        "This graph source cannot accept durable review facts. Refresh it.",
+      );
+    }
+    return {
+      sourceToken: source.sourceToken,
+      worktreeIdentity: source.worktreeIdentity,
+      resolvedCommit: source.resolvedCommit,
+      graphDigest: source.graphDigest,
+      semanticLedgerDigest: source.semanticLedgerDigest,
+    };
+  }
+
+  function exactTicketSubject(ticket) {
+    return {
+      kind: "ticket",
+      ticketId: ticket.ticketId,
+      ticketRevision: ticket.ticketRevision,
+    };
+  }
+
+  function exactRelationSubject(relation) {
+    const dependent = state.graph.tickets.find(
+      (ticket) => ticket.ticketId === relation.dependentTicketId,
+    );
+    if (!dependent) {
+      throw new Error("The direct unlock has no visible dependent Ticket.");
+    }
+    return {
+      kind: "relation",
+      relationRef: relation.relationRef,
+      prerequisiteTicketId: relation.prerequisiteTicketId,
+      dependentTicketId: relation.dependentTicketId,
+      dependentTicketRevision: dependent.ticketRevision,
+    };
+  }
+
+  function replacementTicket(
+    ticketId,
+    contextPackage,
+    outcome,
+    context,
+  ) {
+    return {
+      schema_version: 1,
+      kind: "ticket",
+      ticket_id: ticketId,
+      outcome,
+      context,
+      acceptance: (contextPackage.acceptance || []).map((item) => ({
+        acceptance_id: item.acceptanceId,
+        criterion: item.criterion,
+      })),
+      constraints: [...(contextPackage.constraints || [])],
+      context_refs: (contextPackage.contextRefs || []).map((item) => ({
+        ref: item.ref,
+        purpose: item.purpose,
+      })),
+      relations: (contextPackage.relations || []).map((relation) => ({
+        type: relation.type,
+        target_ticket_id: relation.targetTicketId,
+        ...(relation.rationale
+          ? { rationale: relation.rationale }
+          : {}),
+      })),
+      provenance_refs: [...(contextPackage.provenanceRefs || [])],
+    };
+  }
+
+  function lineValues(value) {
+    return value
+      .split(/\r?\n/u)
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
+
+  function formatInstant(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.valueOf())) return value;
+    return new Intl.DateTimeFormat(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(date);
   }
 
   function layoutGraph(tickets, relations) {
@@ -1225,6 +2112,7 @@
       return;
     }
     if (selected) {
+      activeActionKey = null;
       renderGraphInspector();
       renderGraph();
     }

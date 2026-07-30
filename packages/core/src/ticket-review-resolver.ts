@@ -2,7 +2,12 @@ import {
   TicketLedgerError,
   loadTicketLedgerFromWorktree,
   projectTicketLedgerForReview,
+  type TicketLedgerSnapshot,
 } from "./ticket-ledger/index.js";
+import {
+  projectTicketLedgerForTrustedDecisionHostV0,
+  type TicketDecisionAttestationVerifierV0,
+} from "./ticket-decision-attestation.js";
 import { deriveTicketReviewSnapshotIdV0 } from "./ticket-review-projector.js";
 import {
   type TicketReviewProjectionSourceV0,
@@ -81,6 +86,52 @@ export interface ResolvedTicketReviewProjectionSourceProviderV0 {
   ): TicketReviewSnapshotSourceLoadV0;
 }
 
+type TicketLedgerReviewProjectorV0 = (
+  snapshot: TicketLedgerSnapshot,
+) => TicketReviewProjectionSourceV0;
+
+const loadLatestTicketLedgerSource = (
+  scope: TicketReviewRepositoryScopeV0,
+  projector: TicketLedgerReviewProjectorV0,
+): TicketReviewLatestSourceLoadV0 => {
+  try {
+    return {
+      status: "available",
+      source: projector(
+        loadTicketLedgerFromWorktree(scope.worktreeRoot),
+      ),
+    };
+  } catch (error) {
+    if (error instanceof TicketLedgerError
+      && error.code === "ledger_missing") {
+      return { status: "no_ticket_graph" };
+    }
+    throw error;
+  }
+};
+
+const loadTicketLedgerSnapshotSource = (
+  scope: TicketReviewRepositoryScopeV0,
+  snapshotId: string,
+  projector: TicketLedgerReviewProjectorV0,
+): TicketReviewSnapshotSourceLoadV0 => {
+  let source: TicketReviewProjectionSourceV0;
+  try {
+    source = projector(
+      loadTicketLedgerFromWorktree(scope.worktreeRoot),
+    );
+  } catch (error) {
+    if (error instanceof TicketLedgerError
+      && error.code === "ledger_missing") {
+      return { status: "snapshot_expired" };
+    }
+    throw error;
+  }
+  return deriveTicketReviewSnapshotIdV0(source) === snapshotId
+    ? { status: "available", source }
+    : { status: "snapshot_expired" };
+};
+
 /**
  * Current-worktree production provider. Exact historical reads are explicit
  * ledger ref loads; the review API reloads the current worktree and expires an
@@ -91,40 +142,37 @@ implements ResolvedTicketReviewProjectionSourceProviderV0 {
   loadLatest(
     scope: TicketReviewRepositoryScopeV0,
   ): TicketReviewLatestSourceLoadV0 {
-    try {
-      return {
-        status: "available",
-        source: projectTicketLedgerForReview(
-          loadTicketLedgerFromWorktree(scope.worktreeRoot),
-        ),
-      };
-    } catch (error) {
-      if (error instanceof TicketLedgerError
-        && error.code === "ledger_missing") {
-        return { status: "no_ticket_graph" };
-      }
-      throw error;
-    }
+    return loadLatestTicketLedgerSource(
+      scope,
+      projectTicketLedgerForReview,
+    );
   }
 
   loadSnapshot(
     scope: TicketReviewRepositoryScopeV0,
     snapshotId: string,
   ): TicketReviewSnapshotSourceLoadV0 {
-    let source: TicketReviewProjectionSourceV0;
-    try {
-      source = projectTicketLedgerForReview(
-        loadTicketLedgerFromWorktree(scope.worktreeRoot),
-      );
-    } catch (error) {
-      if (error instanceof TicketLedgerError
-        && error.code === "ledger_missing") {
-        return { status: "snapshot_expired" };
-      }
-      throw error;
-    }
-    return deriveTicketReviewSnapshotIdV0(source) === snapshotId
-      ? { status: "available", source }
-      : { status: "snapshot_expired" };
+    return loadTicketLedgerSnapshotSource(
+      scope,
+      snapshotId,
+      projectTicketLedgerForReview,
+    );
   }
+}
+
+/**
+ * Internal trusted-host construction path. This factory is intentionally not
+ * exported from the Core package root.
+ */
+export function createTrustedTicketLedgerReviewProjectionSourceProviderV0(
+  verifier: TicketDecisionAttestationVerifierV0,
+): ResolvedTicketReviewProjectionSourceProviderV0 {
+  const projector = (snapshot: TicketLedgerSnapshot) =>
+    projectTicketLedgerForTrustedDecisionHostV0(snapshot, verifier);
+  return {
+    loadLatest: (scope) =>
+      loadLatestTicketLedgerSource(scope, projector),
+    loadSnapshot: (scope, snapshotId) =>
+      loadTicketLedgerSnapshotSource(scope, snapshotId, projector),
+  };
 }

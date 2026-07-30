@@ -24,7 +24,7 @@ const COMMIT_ID = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/u;
 const GRAPH_DIGEST = /^sha256:[0-9a-f]{64}$/u;
 const SOURCE_TOKEN = /^tls-[0-9a-f]{64}$/u;
 const WORKTREE_IDENTITY = /^worktree-[0-9a-f]{64}$/u;
-const TICKET_DOCUMENT_PREFIX = `${TICKET_LEDGER_RELATIVE_PATH}/tickets/`;
+const TICKET_PROTOCOL_PATH = `${TICKET_LEDGER_RELATIVE_PATH}/protocol.yaml`;
 
 export interface TicketCheckpointReceipt {
   schemaVersion: 1;
@@ -33,6 +33,7 @@ export interface TicketCheckpointReceipt {
   sourceToken: string;
   worktreeIdentity: string;
   graphDigest: string;
+  semanticLedgerDigest: string;
   checkpointInventoryDigest: string;
   changedPaths: string[];
 }
@@ -43,6 +44,7 @@ export interface TicketCheckpointResult {
   beforeHeadSha: string;
   commitSha: string;
   graphDigest: string;
+  semanticLedgerDigest: string;
   changedPaths: string[];
 }
 
@@ -78,6 +80,7 @@ const patchSource = (
     worktreeIdentity: snapshot.source.worktreeIdentity,
     resolvedCommit: snapshot.source.resolvedCommit,
     graphDigest: sha256Ref(snapshot.graphDigest),
+    semanticLedgerDigest: sha256Ref(snapshot.semanticLedgerDigest),
   };
 };
 
@@ -118,6 +121,7 @@ const parseSelection = (
     || !WORKTREE_IDENTITY.test(source.worktreeIdentity)
     || !COMMIT_ID.test(source.resolvedCommit)
     || !GRAPH_DIGEST.test(source.graphDigest)
+    || !GRAPH_DIGEST.test(source.semanticLedgerDigest)
   ) {
     throw new TicketLedgerError(
       "invalid_document",
@@ -138,12 +142,12 @@ const parseSelection = (
   const changedPaths = selection.changedPaths.map((documentPath) => {
     if (
       typeof documentPath !== "string"
-      || !documentPath.startsWith(TICKET_DOCUMENT_PREFIX)
       || !isTicketLedgerDocumentPath(documentPath)
+      || documentPath === TICKET_PROTOCOL_PATH
     ) {
       throw new TicketLedgerError(
         "invalid_path",
-        `Ticket checkpoint path is not a Ticket document: ${String(documentPath)}`,
+        `Ticket checkpoint path is not a mutable semantic document: ${String(documentPath)}`,
         { documentPath },
       );
     }
@@ -183,7 +187,7 @@ const ticketCheckpointScope: GitCheckpointScope = {
   relativeRoot: TICKET_LEDGER_RELATIVE_PATH,
   commitSubject: "chore(vibehub): ticket checkpoint",
   reflogMessage: "vibehub ticket checkpoint",
-  digestTrailer: "VibeHub-Ticket-Graph-Digest",
+  digestTrailer: "VibeHub-Ticket-Semantic-Ledger-Digest",
   inspectWorktree(repoRoot) {
     const snapshot = loadTicketLedgerFromWorktree(repoRoot);
     if (snapshot.source.mode !== "worktree") {
@@ -193,7 +197,7 @@ const ticketCheckpointScope: GitCheckpointScope = {
       );
     }
     return {
-      digest: sha256Ref(snapshot.graphDigest),
+      digest: sha256Ref(snapshot.semanticLedgerDigest),
       sourceIdentity: sha256Ref(
         snapshot.source.checkpointInventoryDigest,
       ),
@@ -202,7 +206,7 @@ const ticketCheckpointScope: GitCheckpointScope = {
   inspectCommit(repoRoot, commitSha) {
     const snapshot = loadTicketLedgerAtRef(repoRoot, commitSha);
     return {
-      digest: sha256Ref(snapshot.graphDigest),
+      digest: sha256Ref(snapshot.semanticLedgerDigest),
       sourceIdentity: sha256Ref(
         snapshot.source.checkpointInventoryDigest,
       ),
@@ -224,7 +228,7 @@ const prepareAtWorktree = (
     scope: ticketCheckpointScope,
     protectedBranches,
     expectedHeadSha: selection.source.resolvedCommit,
-    expectedDigest: selection.source.graphDigest,
+    expectedDigest: selection.source.semanticLedgerDigest,
     expectedSourceIdentity: sha256Ref(
       snapshot.source.checkpointInventoryDigest,
     ),
@@ -239,7 +243,8 @@ const prepareAtWorktree = (
       receipt.sourceIdentity
       ?? sha256Ref(snapshot.source.checkpointInventoryDigest),
     worktreeIdentity: selection.source.worktreeIdentity,
-    graphDigest: receipt.digest,
+    graphDigest: selection.source.graphDigest,
+    semanticLedgerDigest: receipt.digest,
     changedPaths: receipt.changedPaths,
   };
 };
@@ -273,6 +278,7 @@ const sameTicketReceipt = (
     === actual.checkpointInventoryDigest
   && expected.worktreeIdentity === actual.worktreeIdentity
   && expected.graphDigest === actual.graphDigest
+  && expected.semanticLedgerDigest === actual.semanticLedgerDigest
   && sameStrings(expected.changedPaths, actual.changedPaths);
 
 const selectionFromReceipt = (
@@ -283,6 +289,7 @@ const selectionFromReceipt = (
     worktreeIdentity: receipt.worktreeIdentity,
     resolvedCommit: receipt.headSha,
     graphDigest: receipt.graphDigest,
+    semanticLedgerDigest: receipt.semanticLedgerDigest,
   },
   changedPaths: receipt.changedPaths,
 });
@@ -293,7 +300,7 @@ const gitReceipt = (
   schemaVersion: receipt.schemaVersion,
   branch: receipt.branch,
   headSha: receipt.headSha,
-  digest: receipt.graphDigest,
+  digest: receipt.semanticLedgerDigest,
   sourceIdentity: receipt.checkpointInventoryDigest,
   changedPaths: receipt.changedPaths,
 });
@@ -321,13 +328,14 @@ export function commitTicketCheckpoint(
     now: options.now,
     protectedBranches: options.protectedBranches,
     expectedHeadSha: selection.source.resolvedCommit,
-    expectedDigest: selection.source.graphDigest,
+    expectedDigest: selection.source.semanticLedgerDigest,
     expectedSourceIdentity: current.checkpointInventoryDigest,
     expectedChangedPaths: selection.changedPaths,
   });
   const { digest, ...checkpoint } = result;
   return {
     ...checkpoint,
-    graphDigest: digest,
+    graphDigest: current.graphDigest,
+    semanticLedgerDigest: digest,
   };
 }
