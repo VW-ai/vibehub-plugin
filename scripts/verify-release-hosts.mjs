@@ -267,11 +267,14 @@ try {
   const codexRuntimeEnv = {
     ...codexEnv,
     NPM_CONFIG_CACHE: join(temp, "npm-cache"),
-    VIBEHUB_RUNTIME_DIR: join(temp, "codex-public-npm-runtime"),
+    VIBEHUB_RUNTIME_DIR: join(
+      codexEnv.HOME,
+      ".vibehub",
+      "runtime",
+      "npm",
+      `v${release.version}`,
+    ),
   };
-  await verifyCodexHostStartsMcp(codexBin, codexRuntimeEnv, repo, {
-    timeoutMs: 600_000,
-  });
   const codexHooks = JSON.parse(
     readFileSync(join(codexInstalledRoot, "codex", "hooks.json"), "utf8"),
   );
@@ -306,6 +309,9 @@ try {
       "installed Codex plugin did not emit the shared SessionStart protocol",
     );
   }
+  await verifyCodexHostStartsMcp(codexBin, codexRuntimeEnv, repo, {
+    timeoutMs: 600_000,
+  });
 
   process.stdout.write(
     `${JSON.stringify({
