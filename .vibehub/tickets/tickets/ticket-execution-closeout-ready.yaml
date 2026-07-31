@@ -2,7 +2,7 @@ schema_version: 1
 kind: ticket
 ticket_id: ticket-execution-closeout-ready
 outcome: A fresh Agent can select one currently eligible Ticket, receive its exact bounded context, execute against an exact worktree and Ticket revision, and leave Git-native Outcome and Evidence that either establishes accepted completion and direct downstream eligibility or preserves a visible unresolved deviation.
-context: M2 now provides exact-source planning and independent semantic validation, and the reconciled Git lifecycle lets passing graph definitions enter the current graph while review or delegation gates execution. This Ticket is the stable M4 integration boundary. Implementation detail may be decomposed after the context-binding and closeout contracts are accepted, but the promised result is fixed. A small execution and closeout Skill should compose current Ticket reads, governed context retrieval, exact Run binding, evidence reporting, verification, and graph tending without becoming a generic scheduler. Claims, leases, heartbeat, retries, and live progress may be disposable; Ticket meaning, accepted completion, Evidence references, deviations, blockers, and follow-up work must survive deletion of that runtime state. The success and deviation paths are both required, but ordinary technical choices remain delegated.
+context: This Ticket is the stable M4 product integration boundary and now consumes the accepted context-binding and closeout contracts. A small ticket-run Skill discovers the Git-derived READY frontier, compiles one exact bounded ContextBinding, and claims a worktree-local disposable Run. It records Evidence but cannot certify its own acceptance. A separate ticket-closeout Skill verifies the exact attempt and appends a Git Outcome whose successful form alone derives DONE and direct downstream eligibility. Branch or governing Ticket drift stales the live attempt; ordinary implementation edits remain part of the bound attempt. SQLite may lose claims and heartbeat without losing Ticket meaning. Real Plugin-feature dogfood is explicitly post-merge M5 and is not an M4 implementation gate.
 acceptance:
   - acceptance_id: evidence-without-self-certification
     criterion: The executor can persist bounded artifacts and Evidence references, but only the accepted verifier or human authority defined by the closeout contract can satisfy acceptance and establish completion.
@@ -21,16 +21,16 @@ constraints:
   - Do not infer readiness or completion from authored status fields or executor prose.
   - Protected product, architecture, principle, permission, side-effect, policy, or risk deviations stop the affected path while independent work may continue.
 context_refs:
+  - ref: META/09-ticket-runtime/specs/contract-ticket-closeout-001.yaml
+    purpose: Defines Evidence, independent Outcome adjudication, completion, deviation, and follow-up semantics.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml
+    purpose: Defines exact execution packet compilation and fail-closed context behavior.
   - ref: META/09-ticket-runtime/specs/contract-ticket-planning-validation-skills-001.yaml
-    purpose: Defines the implemented planning, independent-validation, and execution-authority boundary this execution Skill composes.
-  - ref: META/09-ticket-runtime/specs/decision-ticket-closeout-001.yaml
-    purpose: Names the Outcome, Evidence, and semantic-closeout decision this implementation must consume.
-  - ref: META/09-ticket-runtime/specs/decision-ticket-context-binding-001.yaml
-    purpose: Names the context-compilation decision this implementation must consume.
+    purpose: Defines planning, independent-validation, and execution-authority boundaries this execution loop composes.
   - ref: META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml
     purpose: Governs exact worktree Run binding and durable completion reconstruction.
-  - ref: META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml
-    purpose: Defines the first complete Git-native Skill-driven dogfood loop.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
+    purpose: Separates M4 implementation and conformance from post-merge real dogfood.
 relations:
   - type: depends_on
     target_ticket_id: ticket-closeout-contract-decided
@@ -38,4 +38,7 @@ relations:
 provenance_refs:
   - META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md
   - META/09-ticket-runtime/progress.yaml
-  - META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml
+  - META/09-ticket-runtime/specs/contract-ticket-closeout-001.yaml
+  - META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml
+  - META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
+  - conversation:2026-07-30-mr-ready-no-dogfood

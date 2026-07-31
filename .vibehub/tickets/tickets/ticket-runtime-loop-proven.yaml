@@ -2,7 +2,7 @@ schema_version: 1
 kind: ticket
 ticket_id: ticket-runtime-loop-proven
 outcome: One authorized real Plugin feature has completed through the Git-native Ticket loop from planning and review or delegation through execution, verification, Outcome, Evidence, follow-up closeout, and clean recovery without any retired Ticket semantic authority.
-context: This is the final M5 composition and verification boundary. After the authorized dogfood target is known, the planning Skill should refine that target into its own smallest truthful Ticket paths rather than this Ticket guessing implementation leaves. The proof must use only the Git-native ledger, Skills, deterministic operations, graph HTML, and disposable live coordination. It must demonstrate real composition, worktree isolation, durable completion after database loss, and the absence of surviving production compatibility paths. Dated META artifacts may remain as provenance; active code, contracts, adapters, tests, fixtures, exports, and documentation must describe only the new authority model.
+context: This is the post-merge M5 real-project composition proof. It begins only after ticket-runtime-mr-ready establishes the shipped runtime and after the repository owner authorizes one bounded Plugin feature. Planning then refines the target into its smallest truthful Ticket paths. The proof uses the released Git ledger, Skills, deterministic operations, graph HTML, and disposable coordination to validate natural parallel paths, a real join, worktree isolation, recovery, deviation handling, and continued clean-cut integrity. It is intentionally not a prerequisite for the Ticket Runtime MR.
 acceptance:
   - acceptance_id: clean-cut-proof
     criterion: Repository search, typechecking, package tests, packaged-file inspection, and graph-HTML verification find no retired Ticket table, trigger, generation, latest pointer, semantic SQLite service, trusted provider, cross-store fence, operation, adapter, export, fixture, compatibility shim, or active documentation path.
@@ -10,6 +10,8 @@ acceptance:
     criterion: The dogfood graph exercises at least two genuinely independent work paths and a real join; no false serialization or fabricated parallelism is introduced.
   - acceptance_id: deviation-path
     criterion: Focused integration evidence proves that a protected deviation remains unresolved and visible, routes the required decision or follow-up work, and cannot falsely complete or unlock its affected path.
+  - acceptance_id: mr-baseline-preserved
+    criterion: The post-merge dogfood starts from the reviewed installed runtime; any required correction is made explicitly and re-verifies the affected MR gate before the real-loop proof may succeed.
   - acceptance_id: real-loop
     criterion: The authorized feature is planned, machine-validated, reviewed or explicitly delegated, executed through truthful dependency paths, independently verified, and closed with Git-readable Outcome and accepted Evidence.
   - acceptance_id: recovery-proof
@@ -23,22 +25,23 @@ constraints:
   - Historical dated META artifacts may remain only as explicit provenance, not active architecture.
 context_refs:
   - ref: META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md
-    purpose: Defines M5 execution, recovery, worktree, and legacy-audit proof.
-  - ref: META/09-ticket-runtime/spec.md
-    purpose: States the current accepted Ticket Runtime direction and completed M1 boundary.
+    purpose: Defines the original real-loop, recovery, worktree, and legacy-audit proof.
+  - ref: META/09-ticket-runtime/progress.yaml
+    purpose: Records this real feature proof as post-merge M5.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
+    purpose: Requires the released MR-ready runtime before real dogfood begins.
   - ref: META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml
-    purpose: Defines the complete dogfood and clean-cut promise.
+    purpose: Preserves the original complete real dogfood promise.
   - ref: META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml
     purpose: Requires the graph HTML to continue satisfying the human review use case.
 relations:
   - type: depends_on
     target_ticket_id: ticket-dogfood-target-authorized
     rationale: The plan cannot choose or execute the product scope of the first real dogfood feature without owner authorization.
-  - type: depends_on
-    target_ticket_id: ticket-execution-closeout-ready
-    rationale: A real end-to-end proof requires exact execution, verification, durable Outcome and Evidence, and honest success or deviation behavior.
 provenance_refs:
   - META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md
   - META/09-ticket-runtime/progress.yaml
   - META/09-ticket-runtime/spec.md
+  - META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
   - META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml
+  - conversation:2026-07-30-mr-ready-no-dogfood

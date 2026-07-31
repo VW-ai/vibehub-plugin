@@ -1,0 +1,42 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-runtime-mr-ready
+outcome: Ticket Runtime is ready for merge review with the complete installed Git-native execution and closeout surface, synthetic end-to-end conformance, release packaging, and a clean removal of retired compatibility paths.
+context: This is the MR gate, not a real-project dogfood Ticket. It composes the finished M4 execution/closeout outcome with the already shipped review and install-local Decision surface, then proves the public Core, CLI, MCP, Skills, and quiet graph HTML agree. A bounded synthetic repository test exercises root readiness, exact context, claim, Evidence, independent successful closeout, direct dependent unlock, join blocking, non-success/deviation, stale binding, sibling-worktree isolation, and recovery after deleting SQLite. Package and marketplace verification, Node support, public metadata, reviewer map, and repository hygiene close the boundary. The later M5 dogfood depends on this Ticket.
+acceptance:
+  - acceptance_id: complete-loop-conformance
+    criterion: A synthetic temporary repository proves READY root to ContextBinding to Run to Evidence to independent successful Outcome to only-direct-dependent READY, including a genuine all-prerequisites join.
+  - acceptance_id: failure-and-isolation
+    criterion: Focused tests prove partial, failed, stale, and deviated Outcomes do not unlock; self-certification and mismatched evidence fail; branch or Ticket drift stales; sibling worktrees remain isolated.
+  - acceptance_id: git-recovery
+    criterion: Deleting disposable SQLite after closeout reconstructs the same Ticket graph, Evidence, Outcome, DONE state, deviation visibility, and downstream eligibility from Git.
+  - acceptance_id: installed-surfaces
+    criterion: Core, CLI, MCP, ticket-run and ticket-closeout Skills, generated operation contracts, and graph HTML expose the same bounded runtime facts without a daemon or hidden workflow engine.
+  - acceptance_id: release-and-hygiene
+    criterion: Build, typecheck, package tests, npm tarball checks, marketplace checks, installed-skill verification, reviewer map, and clean-cut searches pass with no retired migration shell, dead compatibility API, active WebAuthn claim, local absolute path, or pending-commit status.
+constraints:
+  - Do not require or claim real Plugin-feature dogfood before MR review.
+  - Use a synthetic conformance repository only as implementation proof; preserve real dogfood as a distinct post-merge promise.
+  - Git owns durable Ticket semantics; SQLite owns only disposable worktree-local Run coordination.
+  - Do not introduce a daemon, generic scheduler, global cross-worktree lock, compatibility migration, or semantic dual-write.
+  - Do not stage or rewrite unrelated user-owned working-tree changes.
+context_refs:
+  - ref: META/09-ticket-runtime/progress.yaml
+    purpose: Tracks M4 implementation, MR gates, and deferred M5.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
+    purpose: Defines the exact MR-ready versus post-merge dogfood boundary.
+  - ref: packages/core/test/ticket-execution-conformance.test.ts
+    purpose: Contains the bounded semantic, recovery, isolation, and direct-unlock conformance proof.
+  - ref: scripts/verify-release-marketplace.mjs
+    purpose: Verifies the installed Plugin and Skill surface.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-execution-closeout-ready
+    rationale: MR readiness requires the complete M4 execution, Evidence, independent Outcome, and direct-unlock loop.
+  - type: depends_on
+    target_ticket_id: ticket-install-local-decision-attestation-ready
+    rationale: The shipped MR surface includes the already settled installed protected-decision entrypoint and fresh-process authority boundary.
+provenance_refs:
+  - META/09-ticket-runtime/progress.yaml
+  - META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
+  - conversation:2026-07-30-mr-ready-no-dogfood

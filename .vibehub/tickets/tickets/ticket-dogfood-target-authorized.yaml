@@ -2,7 +2,7 @@ schema_version: 1
 kind: ticket
 ticket_id: ticket-dogfood-target-authorized
 outcome: The repository owner has authorized one bounded real Plugin feature, its observable acceptance, non-goals, protected boundaries, and review policy as the target of the first complete Ticket Runtime dogfood loop.
-context: The active MVP requires one real Plugin feature to complete through the loop, but the accepted sources do not select that feature. Choosing it defines product scope and therefore cannot be silently delegated by this plan. The target should be small enough to finish, meaningful beyond a synthetic fixture, and capable of exercising truthful independent work paths and a join without manufacturing graph complexity. The decision should record whether the resulting plan requires review before execution or delegates review until a genuine protected blocker.
+context: This product-scope selection is deliberately deferred until after the Ticket Runtime MR is ready or merged. Choosing the first real Plugin feature remains a protected product decision and cannot be silently delegated. The later target should be small but meaningful, expose observable acceptance, and naturally exercise independent paths and a join without manufacturing graph complexity. Nothing in this Ticket blocks implementation, automated conformance, packaging, or review of M4.
 acceptance:
   - acceptance_id: executable-boundary
     criterion: The selection records observable acceptance, scope, non-goals, allowed product and architecture boundaries, permissions or side effects, material risks, and known human decisions.
@@ -19,13 +19,20 @@ constraints:
   - Do not fabricate parallel work solely to satisfy a graph shape.
 context_refs:
   - ref: META/09-ticket-runtime/progress.yaml
-    purpose: Records M5 as the remaining real dogfood and clean-cut proof.
+    purpose: Records real dogfood as post-merge M5 rather than an MR gate.
   - ref: META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml
     purpose: Governs human plan review, delegation, and protected product boundaries.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
+    purpose: Defines the explicit separation between M4 MR readiness and M5 dogfood.
   - ref: META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml
-    purpose: Requires one real Plugin feature to prove the first complete loop.
-relations: []
+    purpose: Preserves the original complete dogfood promise as historical scope.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-runtime-mr-ready
+    rationale: Selecting and authorizing a real dogfood target begins only after the complete runtime is ready for merge review; it cannot gate implementation of that runtime.
 provenance_refs:
   - META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md
   - META/09-ticket-runtime/spec.md
+  - META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
   - META/09-ticket-runtime/specs/decision-ticket-mvp-002.yaml
+  - conversation:2026-07-30-mr-ready-no-dogfood
