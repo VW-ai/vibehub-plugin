@@ -7,7 +7,7 @@ acceptance:
   - acceptance_id: evidence-without-self-certification
     criterion: The executor can persist bounded artifacts and Evidence references, but only the accepted verifier or human authority defined by the closeout contract can satisfy acceptance and establish completion.
   - acceptance_id: exact-run-binding
-    criterion: Every execution attempt binds repository and worktree identity, HEAD or dirty graph digest, Ticket ID and revision, context identity, and acting Agent; a branch switch or relevant Ticket edit stales or suspends it.
+    criterion: Every execution attempt binds repository and worktree identity, execution-start branch, HEAD and non-ledger source digest, Ticket ID and revision, ContextBinding identity and digest, acting Agent, and lease generation; a branch switch or governing Ticket or binding edit makes it stale while ordinary implementation edits remain part of the bound attempt.
   - acceptance_id: fresh-agent-entry
     criterion: A fresh Agent with repository access and no planning conversation discovers an eligible Ticket and starts correctly from its Ticket document, direct prerequisites, accepted bindings, and compiled context packet.
   - acceptance_id: recovery-after-db-loss
