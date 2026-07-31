@@ -26,7 +26,7 @@ import { setSetting } from "../src/graph-store.js";
 import {
   CHECKPOINT_CADENCE_SETTING_KEY,
 } from "../src/knowledge-checkpoint.js";
-import { KnowledgeService, type DraftBatchInput, type MutationContext } from "../src/knowledge-service.js";
+import { KnowledgeService, type SpecBatchInput, type MutationContext } from "../src/knowledge-service.js";
 import { OperationDispatcher } from "../src/operation-dispatcher.js";
 import { git, makeScratchRepo, type ScratchRepo } from "./helpers.js";
 
@@ -578,7 +578,7 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
     } | undefined;
   const count = (table: string): number =>
     (db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n;
-  const draftBatch = (key: string, specId: string): DraftBatchInput => ({
+  const draftBatch = (key: string, specId: string): SpecBatchInput => ({
     idempotencyKey: key,
     specs: [{
       id: specId,
@@ -762,7 +762,7 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
     prompt(1);
     prompt(2);
     const repoId = getRepoByRoot(db, repo.work)!.id;
-    new KnowledgeService(db).applyDraftBatch(
+    new KnowledgeService(db).applySpecBatch(
       repoId,
       draftBatch("capture-1", "spec-checkpoint-1"),
       mutationCtx("req-cp-1", 3, taskBranch),
@@ -787,7 +787,7 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
     prompt(2);
     const repoId = getRepoByRoot(db, repo.work)!.id;
     const failed = new OperationDispatcher(db).dispatch(
-      "kb.draft.apply",
+      "kb.spec.apply",
       { repoId, actor: "agent", taskId: taskBranch, requestId: "req-bad", now: T(3).toISOString() },
       { idempotencyKey: "bad", specs: [] },
     );
@@ -805,12 +805,12 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
     prompt(2);
     const repoId = getRepoByRoot(db, repo.work)!.id;
     const service = new KnowledgeService(db);
-    service.applyDraftBatch(
+    service.applySpecBatch(
       repoId, draftBatch("capture-1", "spec-checkpoint-1"), mutationCtx("req-1", 3, taskBranch),
     );
     prompt(4);
     const provenanceBefore = count("kb_provenance_events");
-    service.applyDraftBatch(
+    service.applySpecBatch(
       repoId, draftBatch("capture-1", "spec-checkpoint-1"), mutationCtx("req-2", 5, taskBranch),
     );
     expect(count("kb_provenance_events")).toBe(provenanceBefore);
@@ -826,15 +826,15 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
     prompt(2);
     const repoId = getRepoByRoot(db, repo.work)!.id;
     const service = new KnowledgeService(db);
-    service.applyDraftBatch(
+    service.applySpecBatch(
       repoId, draftBatch("other-capture", "spec-other"), mutationCtx("req-other", 3, "task:elsewhere"),
     );
-    service.mutate(
-      repoId,
-      "promote",
-      { specId: "spec-other", idempotencyKey: "promote-other" },
-      mutationCtx("req-promote", 4),
-    );
+    service.mutate(repoId, "amend", {
+      specId: "spec-other",
+      detail: "Updated outside the current task",
+      evidence: [{ sourceType: "test", sourceRef: "other-task", exactQuote: "updated" }],
+      idempotencyKey: "amend-other",
+    }, mutationCtx("req-amend", 4));
     expect(count("kb_provenance_events")).toBeGreaterThan(0);
     const fired = prompt(5);
     expect(fired.checkpoint).toEqual({
@@ -880,7 +880,7 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
 
   it("seeds the provenance high-water at first sight — old writes are baseline", () => {
     const repoId = getRepoByRoot(db, repo.work)!.id;
-    new KnowledgeService(db).applyDraftBatch(
+    new KnowledgeService(db).applySpecBatch(
       repoId, draftBatch("pre-existing", "spec-pre"), mutationCtx("req-pre", 0, taskBranch),
     );
     const first = prompt(1);

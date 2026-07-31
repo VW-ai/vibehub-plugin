@@ -1,0 +1,39 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-review-intelligence-handoff-ready
+outcome: Ticket Planning and Validation Skills reconcile current Git-native review facts against one fresh snapshot, apply edit proposals only through independent validation, and refuse to treat unverified Decision claims as authority.
+context: "Review facts are causal inputs to Skill judgment, not a replacement workflow. Planning and Validation refresh one coherent graph, inspect every affected subject and trace, follow each typed repository-path target, and read the complete durable document. A ticket_edit remains a proposed full replacement: Planning re-understands it against fresh truth, authors a new exact candidate, preserves the review record in provenance when retained, and delegates the unchanged candidate to an independent validator before ticket.worktree.patch. Comments never mutate the graph. A Decision supplies authority only when the current trace is gate_decision from an authority_receipt and its complete document matches the exact graph or Ticket subject and recorded scope. Generic fresh CLI processes see raw Decisions as current_unverified and preserve the blocker or Planning Fog; durable cross-process handoff belongs to ticket-durable-decision-attestation-ready. Recording any review fact changes the semantic source, so candidates captured before that fact are stale."
+acceptance:
+  - acceptance_id: decision-scope-preserved
+    criterion: Skills use a Decision only when a current authority_receipt binds the exact graph or Ticket subject, complete durable document, principal, disposition, and recorded boundary; raw, stale, conflicting, insufficient-authority, declined, or request_changes Decisions grant nothing.
+  - acceptance_id: fresh-edit-reconciliation
+    criterion: Given a current edit proposal, Planning reloads the complete graph and trace, reads the exact Review document, reconciles the replacement against fresh truth, and produces a new exact candidate whose applied Ticket provenance references the review record.
+  - acceptance_id: fresh-process-retreat
+    criterion: A newly started generic CLI or Skill process projects repository Decisions as current_unverified, never reconstructs process-local authority from YAML, SQLite, browser state, OS identity, or a prior host session, and preserves an honest blocker.
+  - acceptance_id: independent-validation-preserved
+    criterion: An edit proposal cannot change a Ticket until a semantically independent validator passes the unchanged fresh candidate and ticket.worktree.patch accepts its exact current source.
+  - acceptance_id: no-mandatory-review-workflow
+    criterion: Agent-owned refinements within delegated boundaries may still plan, validate, and patch directly without manufacturing a ReviewContribution or Decision.
+constraints:
+  - Keep semantic judgment in Skills and exact source, schema, and write mechanics in public operations.
+  - Do not create a generic proposal/apply Skill, auto-accept reviewer text, or mechanically replace stale source tokens.
+  - A trace summary is not the complete authority scope; Skills must verify the named durable document.
+  - M3 does not decide execution readiness, Outcome, Evidence, closeout, or Feature Room context compilation.
+context_refs:
+  - ref: META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml
+    purpose: Defines current versus historical review facts and the same-session authority receipt boundary.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-planning-validation-skills-001.yaml
+    purpose: Defines the M2 intelligence and no-mandatory-proposal boundary that this handoff preserves.
+  - ref: skills/vibehub-ticket-plan/SKILL.md
+    purpose: Owns graph shaping, review reconciliation, authority routing, fresh-source candidate creation, and independent validation delegation.
+  - ref: skills/vibehub-ticket-validate/SKILL.md
+    purpose: Owns independent review of the complete prospective graph and exact Decision document verification.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-review-facts-projected
+    rationale: Skills need canonical projected reads, exact subject currentness, typed record references, and explicit verified versus unverified authority state before review facts can be used.
+provenance_refs:
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md
+  - META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml
+  - META/09-ticket-runtime/specs/contract-ticket-planning-validation-skills-001.yaml
+  - ticket-git-review-intervention-ready

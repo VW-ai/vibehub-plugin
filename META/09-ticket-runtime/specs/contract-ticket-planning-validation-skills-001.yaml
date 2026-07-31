@@ -1,0 +1,109 @@
+spec_id: "contract-ticket-planning-validation-skills-001"
+type: contract
+state: active
+intent:
+  summary: "Ticket planning and semantic validation are two composable Skills over one exact Git worktree patch, not a proposal workflow."
+  detail: |
+    **Contract**: M2 exposes two intelligence entrypoints:
+    `vibehub-ticket-plan` and `vibehub-ticket-validate`.
+
+    The Planning Skill recognizes explicit orchestration, blocker resolution,
+    execution discovery, deviation, and bounded graph-tending scenes. It
+    distinguishes no durable work, elaboration, decomposition, expansion,
+    decision blockers, and Planning Fog. It backchains from observable
+    outcomes, then reads forward from current facts to remove duplicate
+    outcomes, orphan work, dead ends, transitive convenience edges, and false
+    serialization. A node exists only when it has an independent scheduling,
+    blocking, retry, authority, or verification boundary.
+
+    The candidate is the exact `ticket.worktree.patch` input: one current
+    worktree source plus complete Ticket documents and exact replacement
+    revisions or absence. There is no separate mandatory Proposal object or
+    generic Apply Skill in this cut. Deterministic scripts validate the public
+    input contract; a semantically independent invocation then evaluates the
+    complete prospective graph.
+
+    The Validation Skill receives raw deliverable evidence, current Git facts,
+    and the candidate without the planner's intended verdict. It checks stable
+    outcome identity, fresh-Agent context sufficiency, acceptance as proof,
+    direct dependency truth, graph coverage, Ticket granularity, delegated
+    scope, honest Planning Fog, and protected boundaries. Its semantic verdict
+    is `passed`, `failed`, or `inconclusive`. It reports authority separately
+    as delegated, review before execution, human decision required, or
+    Planning Fog.
+
+    A protected signal is not automatically a semantic failure. A passing plan
+    may represent an unresolved human choice as a blocking Ticket and may be
+    written into the current graph so it is inspectable. The dependent path
+    cannot execute until the choice is resolved. Initial plan review similarly
+    gates execution authority over an active graph; it is not a
+    draft-to-active lifecycle.
+
+    `review-plan` applies the machine-validated graph and pauses execution for
+    human review. `auto-apply-unless-human-gate` applies the same kind of graph
+    and continues only inside delegated, unblocked paths. Internal technical
+    choices with objective engineering criteria remain Agent-owned.
+
+    The validator does not mutate, grant authority, checkpoint, or declare a
+    Ticket operationally ready or complete. Outcome, Evidence, Run
+    currentness, and durable Decision semantics remain later focused cuts.
+    Any patch is still applied only through the exact-source public capability,
+    and checkpointing remains a separate optional Git action.
+constraints:
+  - kind: must
+    rule: "Planning uses Backchain followed by Forward Normalize and creates only Tickets with independent execution boundaries"
+  - kind: must
+    rule: "Every planned Ticket is a complete bounded context package for a fresh Agent and contributes through direct dependency paths to an observable outcome"
+  - kind: must
+    rule: "One semantically independent validation pass reviews the complete prospective graph before an exact candidate is applied"
+  - kind: must
+    rule: "Semantic validity and human execution authority are reported separately"
+  - kind: must
+    rule: "A stale source causes replanning and revalidation rather than mechanical token replacement"
+  - kind: must_not
+    rule: "Do not persist Scenario as a second canonical object or introduce Ticket hierarchy"
+  - kind: must_not
+    rule: "Do not invent speculative downstream Tickets to conceal Planning Fog"
+  - kind: must_not
+    rule: "Do not restore mandatory Proposal, Validation, Decision, Apply, or activation stages"
+  - kind: must_not
+    rule: "Do not infer operational readiness, accepted completion, or Run evidence sufficiency from definition validation"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [skills, planning, validation, backchain, graph, authority, git]
+provenance:
+  source_type: implementation
+  confidence: 0.98
+  source_ref: "M2 Planning and Validation Skill implementation and forward test — 2026-07-29"
+  produced_by_agent: "implementation"
+  produced_at: "2026-07-29"
+relations:
+  - target: "decision-ticket-contract-002"
+    type: depends_on
+    detail: "Preserves Ticket as a stable executable context package in a flat relation graph."
+  - target: "convention-ticket-backchain-forward-normalize-002"
+    type: depends_on
+    detail: "Makes the two-pass shaping method executable as Skill intelligence."
+  - target: "decision-ticket-intelligence-loop-001"
+    type: depends_on
+    detail: "Implements Agent graph tending and protected-boundary routing without a mandatory workflow."
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: depends_on
+    detail: "Keeps semantic judgment in Skills and deterministic mechanics in the shared operation surface."
+  - target: "contract-ticket-git-worktree-patch-001"
+    type: depends_on
+    detail: "Uses the exact-source worktree patch as the sole Ticket definition mutation hand."
+  - target: "decision-ticket-graph-lifecycle-002"
+    type: depends_on
+    detail: "Initial plan review is an execution-authority gate over the active Git graph, while optional causal documents remain scene-driven."
+anchors:
+  - file: "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml"
+  - file: "skills/vibehub-ticket-plan/SKILL.md"
+  - file: "skills/vibehub-ticket-plan/references/planning-method.md"
+  - file: "skills/vibehub-ticket-validate/SKILL.md"
+  - file: "skills/vibehub-ticket-validate/references/validation-rubric.md"
+  - file: "packages/cli/test/skill-package.test.ts"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-m2-planning-validation-skills.md"

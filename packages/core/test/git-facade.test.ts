@@ -65,6 +65,197 @@ describe("GitFacade on a scratch repo", () => {
     expect(GitFacade.headShaAt(wtPath)).toBe(git(wtPath, "rev-parse", "HEAD").trim());
   });
 
+  it("binds an execution start to HEAD and exact non-ledger worktree bytes", () => {
+    const isolated = makeScratchRepo();
+    try {
+      fs.mkdirSync(
+        path.join(isolated.work, ".vibehub", "tickets"),
+        { recursive: true },
+      );
+      fs.writeFileSync(
+        path.join(isolated.work, ".vibehub", "tickets", "protocol.yaml"),
+        "semantic one\n",
+      );
+      const clean = GitFacade.worktreeSourceSnapshotAt(
+        isolated.work,
+        [".vibehub/tickets"],
+      );
+      isolated.write("src/local.ts", "one\n");
+      const dirty = GitFacade.worktreeSourceSnapshotAt(
+        isolated.work,
+        [".vibehub/tickets"],
+      );
+      expect(dirty.sourceDigest).not.toBe(clean.sourceDigest);
+      expect(dirty.changedPaths).toContain("src/local.ts");
+
+      fs.writeFileSync(
+        path.join(isolated.work, ".vibehub", "tickets", "protocol.yaml"),
+        "semantic two\n",
+      );
+      const semanticOnly = GitFacade.worktreeSourceSnapshotAt(
+        isolated.work,
+        [".vibehub/tickets"],
+      );
+      expect(semanticOnly.sourceDigest).toBe(dirty.sourceDigest);
+      expect(semanticOnly.changedPaths)
+        .not.toContain(".vibehub/tickets/protocol.yaml");
+
+      isolated.write("src/local.ts", "two\n");
+      expect(GitFacade.worktreeSourceSnapshotAt(
+        isolated.work,
+        [".vibehub/tickets"],
+      ).sourceDigest).not.toBe(dirty.sourceDigest);
+    } finally {
+      isolated.cleanup();
+    }
+  });
+
+  it("binds staged index blobs and modes when worktree bytes and MM flags match", () => {
+    const isolated = makeScratchRepo();
+    try {
+      const statusForSource = () =>
+        GitFacade.statusPathsAt(isolated.work, ".")
+          .find((entry) => entry.path === "src/shared.ts");
+
+      isolated.write("src/shared.ts", "staged one\n");
+      git(isolated.work, "add", "src/shared.ts");
+      isolated.write("src/shared.ts", "worktree bytes\n");
+      expect(statusForSource()).toMatchObject({
+        indexStatus: "M",
+        worktreeStatus: "M",
+      });
+      const firstBlob = git(
+        isolated.work,
+        "ls-files",
+        "--stage",
+        "--",
+        "src/shared.ts",
+      ).trim();
+      const firstSnapshot = GitFacade.worktreeSourceSnapshotAt(isolated.work);
+
+      isolated.write("src/shared.ts", "staged two\n");
+      git(isolated.work, "add", "src/shared.ts");
+      isolated.write("src/shared.ts", "worktree bytes\n");
+      expect(statusForSource()).toMatchObject({
+        indexStatus: "M",
+        worktreeStatus: "M",
+      });
+      const secondBlob = git(
+        isolated.work,
+        "ls-files",
+        "--stage",
+        "--",
+        "src/shared.ts",
+      ).trim();
+      const secondSnapshot = GitFacade.worktreeSourceSnapshotAt(isolated.work);
+
+      expect(fs.readFileSync(
+        path.join(isolated.work, "src/shared.ts"),
+        "utf8",
+      )).toBe("worktree bytes\n");
+      expect(firstBlob).not.toBe(secondBlob);
+      expect(secondSnapshot.sourceDigest).not.toBe(firstSnapshot.sourceDigest);
+
+      isolated.write("src/shared.ts", "staged mode\n");
+      git(isolated.work, "add", "src/shared.ts");
+      git(isolated.work, "update-index", "--chmod=-x", "src/shared.ts");
+      isolated.write("src/shared.ts", "worktree bytes\n");
+      fs.utimesSync(
+        path.join(isolated.work, "src/shared.ts"),
+        new Date(2_000_000_000_000),
+        new Date(2_000_000_000_000),
+      );
+      expect(statusForSource()).toMatchObject({
+        indexStatus: "M",
+        worktreeStatus: "M",
+      });
+      const nonExecutableEntry = git(
+        isolated.work,
+        "ls-files",
+        "--stage",
+        "--",
+        "src/shared.ts",
+      ).trim();
+      const nonExecutableObjectId = nonExecutableEntry.split(" ")[1]!;
+      const nonExecutableSnapshot =
+        GitFacade.worktreeSourceSnapshotAt(isolated.work);
+
+      git(
+        isolated.work,
+        "update-index",
+        "--cacheinfo",
+        `100755,${nonExecutableObjectId},src/shared.ts`,
+      );
+      fs.utimesSync(
+        path.join(isolated.work, "src/shared.ts"),
+        new Date(2_000_000_010_000),
+        new Date(2_000_000_010_000),
+      );
+      expect(statusForSource()).toMatchObject({
+        indexStatus: "M",
+        worktreeStatus: "M",
+      });
+      const executableEntry = git(
+        isolated.work,
+        "ls-files",
+        "--stage",
+        "--",
+        "src/shared.ts",
+      ).trim();
+      const executableSnapshot =
+        GitFacade.worktreeSourceSnapshotAt(isolated.work);
+
+      expect(nonExecutableEntry).toMatch(/^100644 [0-9a-f]+ 0\t/);
+      expect(executableEntry).toMatch(/^100755 [0-9a-f]+ 0\t/);
+      expect(executableEntry.split(" ")[1])
+        .toBe(nonExecutableObjectId);
+      expect(executableSnapshot.sourceDigest)
+        .not.toBe(nonExecutableSnapshot.sourceDigest);
+    } finally {
+      isolated.cleanup();
+    }
+  });
+
+  it("reads the index owned by the current linked worktree", () => {
+    const isolated = makeScratchRepo();
+    try {
+      const linked = path.join(isolated.root, "linked-source");
+      git(
+        isolated.work,
+        "worktree",
+        "add",
+        "-b",
+        "feat/linked-source",
+        linked,
+      );
+      const writeLinked = (content: string) =>
+        fs.writeFileSync(path.join(linked, "src/shared.ts"), content);
+
+      writeLinked("linked staged\n");
+      git(linked, "add", "src/shared.ts");
+      writeLinked("shared worktree bytes\n");
+      const beforeMainIndexChange =
+        GitFacade.worktreeSourceSnapshotAt(linked);
+
+      isolated.write("src/shared.ts", "main staged\n");
+      git(isolated.work, "add", "src/shared.ts");
+      isolated.write("src/shared.ts", "main worktree\n");
+      const afterMainIndexChange =
+        GitFacade.worktreeSourceSnapshotAt(linked);
+
+      expect(afterMainIndexChange.sourceDigest)
+        .toBe(beforeMainIndexChange.sourceDigest);
+
+      writeLinked("linked staged two\n");
+      git(linked, "add", "src/shared.ts");
+      writeLinked("shared worktree bytes\n");
+      expect(GitFacade.worktreeSourceSnapshotAt(linked).sourceDigest)
+        .not.toBe(beforeMainIndexChange.sourceDigest);
+    } finally {
+      isolated.cleanup();
+    }
+  });
+
   it("derives only commits after the task baseline with stable git ids", () => {
     const isolated = makeScratchRepo();
     try {

@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "kind": "graph_change",
+  "observedSnapshotId": null,
+  "reason": "Bootstrap the first coarse execution-loop graph for the Feature Room-ratified Ticket Runtime. A fresh Agent with no planning-conversation history must be able to claim exactly the next eligible Ticket, act from sufficient bounded durable context, persist run-bound evidence, and either unlock downstream work after accepted verification or preserve an actionable deviation without false completion. The repository has no canonical Ticket store. Complete Ticket Contract semantics, scenario-as-lens review, machine-first validation, and bounded Agent decomposition are accepted; exact context binding, Runtime storage, claim arbitration, closeout, and technical implementation remain Planning Fog inside these stable outcome boundaries rather than speculative leaf Tickets.",
+  "source": {
+    "kind": "plan",
+    "ref": "META/09-ticket-runtime/artifacts/2026-07-29-first-ticket-dogfood-plan.md"
+  },
+  "authorAssessment": {
+    "changeClass": "decomposition",
+    "authoritySignals": [
+      "initial_plan_authority",
+      "experience_product"
+    ],
+    "introducesHumanGate": true,
+    "rationale": "This is the repository's bootstrap Ticket plan and defines the Agent-facing product contract for Ticket definition, context, readiness, claim, execution, evidence, completion, deviation, and end-to-end orchestration. It decomposes the accepted deliverable without choosing unresolved technical implementations. Human review is required because no prior plan authority exists and the graph fixes core experience and protected-deviation boundaries."
+  },
+  "changes": [
+    {
+      "op": "create",
+      "localRef": "dogfood-execution-loop-proven",
+      "definition": {
+        "outcome": "In this repository, a fresh Agent with VibeHub but no planning-conversation history completes a real dogfood run by discovering and claiming exactly the next eligible canonical Ticket, acting from sufficient bounded durable context, recording a run-bound result, and deterministically reaching one of two honest outcomes: accepted verification completes the Ticket and unlocks only eligible downstream work, or deviation remains visible and raises the required bounded review work without false completion.",
+        "parent": null,
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "agent-execution-entrypoint"
+            },
+            "rationale": "The aggregate dogfood outcome cannot be proven until one integrated Agent entrypoint composes the complete success and deviation paths."
+          }
+        ]
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "complete-ticket-definition",
+      "definition": {
+        "outcome": "Canonical immutable Ticket revisions can persist the complete ratified Ticket Contract v0—stable outcome and containment, provenance, scope and non-goals, constraints, context requirements and bindings, direct dependencies, authority gates, permissions and allowed side effects, graph-mutation policy, flat verifiable acceptance, and execution policy—without accepting authored maturity, readiness, assignee, progress, or workflow status as truth.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": []
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "ticket-maturity-currentness",
+      "definition": {
+        "outcome": "An independent validator emits an inspectable receipt bound to the exact Ticket revision, validation policy, findings, and evidence; Runtime derives outline, specified, or executable maturity only from the current applicable receipt, invalidates readiness-affecting revisions, and fails closed on missing evidence or unsatisfied human authority instead of accepting author self-certification.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "complete-ticket-definition"
+            },
+            "rationale": "Maturity can be judged only after the complete semantic contract and its exact revision are durably representable."
+          }
+        ]
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "bounded-context-package",
+      "definition": {
+        "outcome": "For an exact canonical Ticket revision, the runtime can deterministically compile a size-bounded context package containing its accepted outcome and execution contract, direct prerequisite facts, exact relevant Feature Room and repository bindings, required evidence and authority, and allowed next operations; missing, stale, ambiguous, or oversized required context fails closed rather than being filled from conversation memory.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "complete-ticket-definition"
+            },
+            "rationale": "The compiler needs a complete revisioned Ticket contract that names the context, authority, acceptance, permission, and execution requirements it must resolve."
+          }
+        ]
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "ready-ticket-claim",
+      "definition": {
+        "outcome": "Runtime derives the next claimable canonical Tickets from current facts and exposes a conflict-safe claim boundary: only a currently executable Ticket with satisfied direct prerequisites and authority gates and no incompatible active Run can be claimed, concurrent attempts cannot both succeed, and each successful claim binds the exact Ticket revision and observed graph generation it authorized.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "ticket-maturity-currentness"
+            },
+            "rationale": "Claim eligibility must consume independently derived current executable maturity rather than an authored readiness label."
+          }
+        ]
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "claimed-run-binding",
+      "definition": {
+        "outcome": "A fresh Agent can start or idempotently resume one durable execution Run only from a valid Ticket claim, receiving the exact compiled context package while the Run records immutable bindings to the Ticket revision, graph generation, claim, context-package identity, and acting Agent.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "ready-ticket-claim"
+            },
+            "rationale": "Without a conflict-safe claim, a Run could start blocked work or create competing authoritative executions for one Ticket."
+          },
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "bounded-context-package"
+            },
+            "rationale": "Without an exact context-package binding, the Run cannot prove which accepted contract and governed facts the fresh Agent received."
+          }
+        ]
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "durable-run-evidence",
+      "definition": {
+        "outcome": "An executing Agent can persist a bounded traceable result for its claimed Run that distinguishes attempted, persisted, independently verified, partial, failed, and successful claims; every artifact and evidence reference binds to the exact Run and Ticket revision, and the Agent's contribution cannot by itself assert completion or trusted authority.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "claimed-run-binding"
+            },
+            "rationale": "Without an immutable Run binding, evidence can be replayed against or misattributed to a different Ticket contract and cannot support a trustworthy terminal result."
+          }
+        ]
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "verified-completion-unlocks",
+      "definition": {
+        "outcome": "When the accepted verifier confirms that a Run's evidence satisfies every acceptance condition for the exact current Ticket revision, canonical completion is recorded exactly once and readiness is recomputed so only Tickets whose direct prerequisites and other gates are now satisfied become claimable; failed, partial, stale, or merely persisted evidence unlocks nothing.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "durable-run-evidence"
+            },
+            "rationale": "Completion and downstream unlocks require durable run-bound evidence whose verification can be independently adjudicated."
+          }
+        ]
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "deviation-remains-actionable",
+      "definition": {
+        "outcome": "When execution cannot preserve the accepted outcome, architecture, product principle, permission or risk boundary, or current plan, the Run records a durable deviation at the owning Ticket and proposes the bounded decomposition, expansion, blocker, or human decision required next while leaving the original Ticket visibly unresolved; unknown downstream work remains Planning Fog until the blocker is resolved.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "durable-run-evidence"
+            },
+            "rationale": "Without a durable run-bound result channel, a deviation becomes untraceable prose and cannot reliably block false completion or support a follow-up graph proposal."
+          }
+        ]
+      }
+    },
+    {
+      "op": "create",
+      "localRef": "agent-execution-entrypoint",
+      "definition": {
+        "outcome": "One discoverable Agent-facing Ticket orchestration entrypoint coordinates next-work discovery, claim, context delivery, Run start or resume, evidence reporting, and the verified-completion or deviation branch through canonical operations and stable request identities, without synthesizing authority, hiding Planning Fog, or swallowing a waiting human decision.",
+        "parent": {
+          "kind": "local",
+          "localRef": "dogfood-execution-loop-proven"
+        },
+        "dependsOn": [
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "verified-completion-unlocks"
+            },
+            "rationale": "Without the successful terminal transition, the entrypoint cannot complete the promised path from accepted evidence to newly eligible work."
+          },
+          {
+            "target": {
+              "kind": "local",
+              "localRef": "deviation-remains-actionable"
+            },
+            "rationale": "Without the deviation transition, the entrypoint would hide, misclassify, or falsely complete executions that leave the accepted plan."
+          }
+        ]
+      }
+    }
+  ]
+}

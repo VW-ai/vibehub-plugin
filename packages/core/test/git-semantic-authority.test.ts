@@ -91,7 +91,7 @@ describe("Git semantic authority cutover", () => {
         }],
       }],
     };
-    expect(dispatcher.dispatch("kb.draft.apply", context, input)).toMatchObject({
+    expect(dispatcher.dispatch("kb.spec.apply", context, input)).toMatchObject({
       ok: true,
       data: { created: ["decision-auth"] },
     });
@@ -115,7 +115,7 @@ describe("Git semantic authority cutover", () => {
       .toThrow(/repository-aware OperationDispatcher/);
 
     operational.prepare(`DELETE FROM kb_mutation_receipts WHERE repo_id=?`).run(row.id);
-    expect(dispatcher.dispatch("kb.draft.apply", {
+    expect(dispatcher.dispatch("kb.spec.apply", {
       ...context,
       requestId: "request:recovered-retry",
     }, input)).toMatchObject({
@@ -123,7 +123,7 @@ describe("Git semantic authority cutover", () => {
       data: { created: ["decision-auth"] },
     });
 
-    expect(dispatcher.dispatch("kb.draft.apply", {
+    expect(dispatcher.dispatch("kb.spec.apply", {
       ...context,
       requestId: "request:conflict",
     }, {
@@ -175,7 +175,7 @@ describe("Git semantic authority cutover", () => {
     db.prepare(`INSERT INTO kb_features(repo_id,feature_id,created_at)
       VALUES (?, 'feature/auth', ?)`).run(row.id, NOW);
     const service = new KnowledgeService(db);
-    service.applyDraftBatch(row.id, {
+    service.applySpecBatch(row.id, {
       idempotencyKey: "seed",
       specs: [{
         id: "decision-auth",

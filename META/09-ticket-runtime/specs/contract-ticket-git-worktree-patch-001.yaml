@@ -1,0 +1,144 @@
+spec_id: "contract-ticket-git-worktree-patch-001"
+type: contract
+state: active
+intent:
+  summary: "Ticket mutation is one receiptless, exact-source-bound worktree patch capability; Skills decide why and when to use it."
+  detail: |
+    **Contract**: `ticket.worktree.patch` is the sole M1B Ticket definition
+    mutation capability. It is a deterministic hand for Skills, not a
+    proposal/application workflow or a source of semantic judgment.
+
+    The host supplies one trusted Git worktree. The request cannot choose an
+    arbitrary writable path. Callers first read the current worktree Ticket
+    source and then bind all four exact-source fields:
+
+    - opaque `sourceToken`;
+    - `worktreeIdentity`;
+    - `resolvedCommit`;
+    - semantic `graphDigest`.
+
+    The source token includes a physical inventory digest over canonical
+    Ticket-ledger paths, file modes, and raw byte digests. Consequently a
+    comment-only, formatting-only, or mode-only edit invalidates an old patch
+    request even when its normalized Ticket graph digest and individual
+    Ticket revisions are unchanged. The graph digest remains the normalized
+    semantic identity; the source token is the stricter overwrite guard.
+
+    A request contains a bounded non-empty set of unique Ticket changes.
+    `put` supplies one complete Ticket document and an expected Ticket
+    revision; `null` means the Ticket must be absent. `delete` supplies the
+    existing Ticket ID and its required revision. Paths are always derived
+    from the validated Ticket ID. The operation cannot mutate
+    `protocol.yaml`.
+
+    A protocol-only ledger is a valid empty graph and is the bootstrap base
+    for new Ticket plans. The patch requires an existing valid
+    `.vibehub/tickets/protocol.yaml`; it does not invent a missing ledger or
+    make the first Ticket mandatory.
+
+    Under one worktree-local writer lock, Core loads the current ledger,
+    checks the complete expected source and every targeted revision,
+    materializes the complete prospective graph in memory, and runs the
+    existing strict schema, path, capacity, endpoint, duplicate, self-edge,
+    and dependency-cycle validation before touching canonical Ticket files.
+    It stages deterministic YAML outside the canonical ledger, reloads and
+    rechecks the exact base, verifies each target preimage immediately before
+    installation, atomically renames each replacement or explicitly removes
+    each deletion, then reloads the ledger and requires the computed target
+    graph digest.
+
+    Atomicity is deliberately narrow and honest. Each file replacement is
+    atomic, but a multi-file patch is not a filesystem transaction and is not
+    crash-atomic. A synchronous failure after installation begins attempts
+    reverse rollback only while every installed path still has the exact
+    candidate physical revision. If safe rollback cannot be proven, the
+    operation fails with affected paths and requires inspection of
+    `git diff -- .vibehub/tickets`. There is no durable local semantic
+    journal. Git commit is the multi-file semantic checkpoint.
+
+    A successful result reports `applied` or `noop`, before/after exact
+    sources, changed paths, per-Ticket before/after revisions, and a
+    `checkpointSelection`. It leaves the verified Ticket changes in the
+    worktree and does not commit automatically. An optional Ticket checkpoint
+    is a separate explicit capability: it may consume the exact post-patch
+    source and changed-path selection, but it is not a stage of this mutation
+    transaction.
+
+    The three Git Ticket reads and this write evaluate the addressed worktree
+    on every invocation. They create, consult, and replay no SQLite operation
+    receipt. Retrying an old request after raw inventory, HEAD, graph, or a
+    targeted Ticket changes must evaluate the new source and fail stale rather
+    than replay an earlier success.
+
+    Skills own planning, decomposition, forward normalization, semantic
+    validation, protected-boundary decisions, and whether a proposal,
+    Validation, Decision, semantic Receipt, Outcome, or Evidence document is
+    useful. Core, CLI, and MCP expose only the same bounded mechanical patch;
+    this contract introduces no mandatory lifecycle and no hidden Ticket
+    intelligence.
+constraints:
+  - kind: must
+    rule: "The host supplies one trusted Git worktree; the public request cannot select an arbitrary writable filesystem path"
+  - kind: must
+    rule: "Every patch binds source token, worktree identity, resolved commit, graph digest, and the expected revision or absence of every targeted Ticket"
+  - kind: must
+    rule: "The opaque source token binds ledger paths, file modes, and raw bytes so non-semantic physical edits cannot be overwritten silently"
+  - kind: must
+    rule: "Every put is a complete validated Ticket document, every delete is explicit, and all canonical paths derive from Ticket identity"
+  - kind: must
+    rule: "The complete prospective Ticket graph is validated before any canonical Ticket path is changed"
+  - kind: must
+    rule: "The post-write ledger is reloaded and must match the precomputed target graph digest"
+  - kind: must
+    rule: "A synchronous partial failure attempts conditional rollback and reports affected paths when safe restoration cannot be proven"
+  - kind: must
+    rule: "The operation evaluates Git on every call and creates, reads, and replays no SQLite request receipt"
+  - kind: must
+    rule: "A protocol-only ledger remains a valid empty Ticket graph and the patch requires that protocol to exist"
+  - kind: must_not
+    rule: "Do not claim multi-file or crash atomicity; per-file atomic installation and Git commit are distinct boundaries"
+  - kind: must_not
+    rule: "Do not mutate protocol.yaml, auto-commit, or make checkpointing an implicit patch stage"
+  - kind: must_not
+    rule: "Do not encode planning, semantic validation, authority, review, or closeout policy in Core, CLI, MCP, or the patch operation"
+  - kind: must_not
+    rule: "Do not restore SQLite Ticket semantics, request-receipt replay, internal generations, latest.yaml, or a local semantic journal"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [git, worktree, patch, exact-source, raw-inventory, receiptless, skills]
+provenance:
+  source_type: implementation
+  confidence: 0.99
+  source_ref: "M1B exact-source Git-native worktree patch implementation and authority review — 2026-07-29"
+  produced_by_agent: "implementation"
+  produced_at: "2026-07-29"
+relations:
+  - target: "contract-ticket-review-operations-001"
+    type: supersedes
+    detail: "Replaces the retired SQLite proposal/application mutation workflow with one Git-native Skill-facing patch."
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+    detail: "Git documents remain the sole durable Ticket semantic authority."
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: depends_on
+    detail: "The operation is a deterministic hand while Skills own meaning and orchestration."
+  - target: "decision-ticket-graph-lifecycle-002"
+    type: depends_on
+    detail: "The mutation fails stale against exact worktree, commit, graph, and Ticket identities."
+anchors:
+  - file: "packages/core/src/ticket-ledger/contract.ts"
+  - file: "packages/core/src/ticket-ledger/codec.ts"
+  - file: "packages/core/src/ticket-ledger/file-io.ts"
+  - file: "packages/core/src/ticket-ledger/reader.ts"
+  - file: "packages/core/src/ticket-ledger/writer.ts"
+  - file: "packages/core/src/ticket-ledger/checkpoint.ts"
+  - file: "packages/core/src/git-checkpoint.ts"
+  - file: "packages/core/src/operation-contracts.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/cli/src/main.ts"
+  - file: "packages/mcp/src/capabilities.ts"
+  - file: "skills/_stdlib/operations.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-m1b-git-worktree-patch-implementation.md"

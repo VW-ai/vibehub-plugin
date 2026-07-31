@@ -2,10 +2,17 @@
 
 VibeHub is a context-to-action layer inside Claude Code and Codex, not a
 development control plane. It helps the host agent retrieve and settle durable
-context, define a Task, select an execution topology, and leave inspectable
-evidence.
+context, historically define a Task, select an execution topology, and leave
+inspectable evidence. The Ticket Runtime map is designing the successor model.
 
-## Active model
+## Ontology transition
+
+`decision-ticket-work-unit-001` now makes Ticket the sole canonical durable
+work unit. The Task-shaped model below remains compatibility and historical
+context until the Ticket contract, Planning contract and successor Run
+authority are promoted.
+
+## Previous active model (compatibility)
 
 - A **Task** is a durable outcome with success criteria.
 - A **Run** is an execution episode with explicit context and code authority.
@@ -37,7 +44,8 @@ decision and implementation checkpoint are migrated into
 
 ## Canonical Specs
 
-- [intent-context-to-action-001] (active) Context should drive action without
-  turning VibeHub into a development control plane.
-- [contract-intent-task-genesis-001] (active) User-authored or user-adopted
-  durable intent becomes a new Task or an explicit current-Task scope update.
+- [intent-context-to-action-001] (stale) Context-to-action remains the broader
+  direction, but its Task and product-boundary wording awaits a Ticket Runtime
+  successor.
+- [contract-intent-task-genesis-001] (stale) Intent adoption remains relevant,
+  but Task genesis awaits a successor Planning/Ticket contract.

@@ -1,0 +1,67 @@
+spec_id: "decision-ticket-work-unit-001"
+type: decision
+state: active
+intent:
+  summary: "Ticket 取代 Task 成为 VibeHub 唯一正式工作原语；不同粒度使用同一种 Ticket 表达"
+  detail: |
+    **Decision**: Ticket is the only canonical durable work unit. VibeHub does
+    not keep a separate formal Task entity above or beside it.
+
+    Human-visible outcome work and Agent-executable work use the same Ticket
+    identity and contract family. Parent/child decomposition, visibility and
+    execution dependencies express different levels without introducing a
+    second work-unit lifecycle. Only a Ticket that satisfies the eventual
+    executable contract may be claimed by a Run.
+
+    `task` remains available as ordinary language or a host-system term. It
+    does not own a canonical ID, schema, lifecycle or state machine. This
+    project is early-stage: existing Task rows, branch-derived compatibility
+    state and task-shaped APIs do not create a migration obligation and may be
+    removed when the Ticket model lands.
+
+    **Rationale**: The active Task definition and the proposed strict Ticket
+    occupied nearly identical semantic space. Keeping both would force users,
+    planners and runtime code to decide repeatedly which identity owns outcome,
+    acceptance, scope, authority and closeout.
+
+    **Deferred**: The Ticket contract, exact parent/visibility fields, direct
+    executability test and lifecycle are separate decisions. This decision
+    fixes the ontology; it does not invent those contracts prematurely.
+
+    **Claimed**: Codex 2026-07-27
+constraints:
+  - kind: must
+    rule: "Ticket is the only canonical durable work-unit identity"
+  - kind: must
+    rule: "Outcome-level and execution-level work use the same Ticket contract family"
+  - kind: must
+    rule: "A Run may claim only a Ticket that satisfies the eventual executable contract"
+  - kind: must_not
+    rule: "Do not introduce a second formal Task schema, lifecycle or state machine"
+  - kind: must_not
+    rule: "Do not treat host or legacy use of the word task as canonical Ticket identity"
+  - kind: must_not
+    rule: "Do not spend product or runtime complexity preserving early-stage Task data or APIs"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, resolved, grilling, ticket, task, ontology, work-unit]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Wayne ratified Ticket as the sole formal work primitive — Codex session 019fa272-202e-73a1-8b80-9abfbfee0790, 2026-07-27"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-workbench-013"
+    type: relates_to
+    detail: "Makes the Task work-unit clause stale while preserving its Run/worktree authority rules as inputs to a successor contract."
+  - target: "contract-intent-task-genesis-001"
+    type: relates_to
+    detail: "Makes Task genesis stale; a future planning/Ticket genesis contract must replace it."
+  - target: "intent-context-to-action-001"
+    type: relates_to
+    detail: "Makes the Task-oriented wording stale while preserving context-to-action as the broader product direction."
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"

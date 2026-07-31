@@ -4,9 +4,16 @@ import path from "node:path";
 import { openDb, type Db } from "./db.js";
 import crypto from "node:crypto";
 import { z } from "zod";
-import { KnowledgeError, KnowledgeService, type DraftBatchInput } from "./knowledge-service.js";
+import { KnowledgeError, KnowledgeService, type SpecBatchInput } from "./knowledge-service.js";
 import { DistillationService, type CandidateInput, type DistillationStartInput, type InventoryRowInput, type ScopePlanInput } from "./distillation-service.js";
-import { operationContextSchema, operationInputSchemas, type OperationName } from "./operation-contracts.js";
+import {
+  OPERATION_INPUT_BYTE_LIMITS,
+  UNKNOWN_OPERATION_INPUT_MAX_BYTES,
+  isOperationInputWithinBudget,
+  operationContextSchema,
+  operationInputSchemas,
+  type OperationName,
+} from "./operation-contracts.js";
 import {
   hasGitSemanticStore,
   inspectGitSemanticStoreWorktree,
@@ -14,6 +21,46 @@ import {
   replaceGitSemanticStore,
 } from "./git-semantic-store.js";
 import { GitFacade } from "./git-facade.js";
+import {
+  TicketLedgerError,
+  appendTicketReview,
+  applyTicketWorktreePatch,
+  loadTicketLedgerFromWorktree,
+  recordTicketDecision,
+  type TicketDecisionAuthorityContext,
+  type TicketDecisionRecordResult,
+  type TicketDecisionRecordRequest,
+  type TicketDocument,
+  type TicketLedgerPatchRequest,
+  type TicketReviewAuthorContext,
+  type TicketReviewAppendRequest,
+  type TicketReviewSubject,
+} from "./ticket-ledger/index.js";
+import {
+  CompositeTicketDecisionAttestationVerifierV0,
+  DurableLocalSignatureTicketDecisionAttestationVerifierV0,
+  InMemoryTicketDecisionSessionAttestationRegistryV0,
+  type TicketDecisionLocalSignatureTrustProfileResolverV0,
+} from "./ticket-decision-attestation.js";
+import {
+  TicketReviewProjectionError,
+} from "./ticket-review-projector.js";
+import { TicketReviewReadServiceV0 } from "./ticket-review-read-service.js";
+import {
+  TicketExecutionError,
+  TicketExecutionService,
+  isTicketRunLeaseFailure,
+  type AppendTicketCloseoutInput,
+  type AppendTicketEvidenceInput,
+  type ClaimTicketExecutionInput,
+  type CompileTicketContextInput,
+  type TicketRunCredentials,
+} from "./ticket-execution-service.js";
+import {
+  createTrustedTicketLedgerReviewProjectionSourceProviderV0,
+  type ResolvedTicketReviewProjectionSourceProviderV0,
+  type TicketReviewRepositoryScopeV0,
+} from "./ticket-review-resolver.js";
 
 export interface OperationContext { repoId:number; actor:string; taskId?:string; requestId:string; now:string }
 export interface OperationMeta { operation:string; repoId:number; requestId:string; at:string }
@@ -32,10 +79,41 @@ export const OPERATION_EXIT_CLASS:Record<string,number>={
   base_commit_not_found:4, correction_not_required:4, scope_not_implicated:4,
   semantic_store_missing:5,
   semantic_authority_requires_dispatcher:5,
+  invalid_snapshot:2, snapshot_expired:3, projection_too_large:4,
+  projection_invariant_failed:1,
+  ticket_ledger_missing:3, ticket_ledger_invalid_document:4,
+  ticket_ledger_invalid_graph:4, ticket_ledger_unmerged:5,
+  ticket_ledger_source_changed:5, ticket_ledger_ref_not_found:3,
+  ticket_ledger_stale_source:5, ticket_ledger_stale_ticket:5,
+  ticket_ledger_stale_subject:5, ticket_ledger_document_conflict:5,
+  ticket_ledger_writer_busy:5, ticket_ledger_write_unverified:5,
+  ticket_ledger_io:5, ticket_ledger_scope_mismatch:2,
+  ticket_not_ready:4, ticket_already_done:4,
+  ticket_binding_not_found:3, ticket_binding_mismatch:5,
+  ticket_run_actor_mismatch:5, ticket_run_still_active:4,
+  ticket_run_stale:5, ticket_run_invalid_input:2,
+  ticket_run_claim_conflict:5, ticket_run_not_found:3,
+  ticket_run_stale_generation:5, ticket_run_invalid_token:5,
+  ticket_run_lease_expired:5, ticket_run_lease_released:4,
+  ticket_run_release_conflict:5,
+  ticket_authority_unavailable:5, ticket_authority_scope_mismatch:5,
+  ticket_attribution_mismatch:5,
 };
 
-interface Services {kb:KnowledgeService;distill:DistillationService}
-type Handler=(service:Services,ctx:OperationContext,input:Record<string,unknown>)=>unknown;
+interface Services {
+  kb: KnowledgeService;
+  distill: DistillationService;
+  ticket: TicketReviewReadServiceV0;
+  ticketExecution: TicketExecutionService;
+}
+type TicketDispatchScopeV0 = TicketReviewRepositoryScopeV0;
+type Handler=(
+  service: Services,
+  ctx: OperationContext,
+  input: Record<string, unknown>,
+  ticketScope?: TicketDispatchScopeV0,
+  dispatcherOptions?: OperationDispatcherOptions,
+) => unknown;
 const handlers:Record<OperationName,Handler>={
   "kb.status":(s,c)=>s.kb.status(c.repoId),
   "kb.feature.list":(s,c,i)=>s.kb.listFeatures(c.repoId,i),
@@ -48,8 +126,7 @@ const handlers:Record<OperationName,Handler>={
   "kb.anchors":(s,c,i)=>s.kb.anchors(c.repoId,i),
   "kb.review":(s,c,i)=>s.kb.review(c.repoId,i),
   "kb.ingest.preview":(s,c,i)=>s.kb.previewIngest(c.repoId,i as Parameters<KnowledgeService["previewIngest"]>[1]),
-  "kb.draft.apply":(s,c,i)=>s.kb.applyDraftBatch(c.repoId,i as unknown as DraftBatchInput,mutation(c,true)),
-  "kb.promote":(s,c,i)=>s.kb.mutate(c.repoId,"promote",i,mutation(c,false)),
+  "kb.spec.apply":(s,c,i)=>s.kb.applySpecBatch(c.repoId,i as unknown as SpecBatchInput,mutation(c,true)),
   "kb.mark-stale":(s,c,i)=>s.kb.mutate(c.repoId,"mark_stale",i,mutation(c,false)),
   "kb.deprecate":(s,c,i)=>s.kb.mutate(c.repoId,"deprecate",i,mutation(c,false)),
   "kb.amend":(s,c,i)=>s.kb.mutate(c.repoId,"amend",i,mutation(c,false)),
@@ -79,25 +156,207 @@ const handlers:Record<OperationName,Handler>={
   "distill.finalize":(s,c,i)=>s.distill.finalize(c.repoId,i as {runId:string},mutation(c,true)),
   "distill.activate":(s,c,i)=>s.distill.activate(c.repoId,i as {targetVersionId:string;expectedCurrentVersion:string|null;reason:string},mutation(c,true)),
   "distill.rollback":(s,c,i)=>s.distill.rollback(c.repoId,i as {targetVersionId:string;expectedCurrentVersion:string|null;reason:string},mutation(c,true)),
+  "ticket.graph.snapshot":(s,_c,i,scope)=>s.ticket.graphSnapshot(
+    requiredTicketScope(scope),
+    i,
+  ),
+  "ticket.subject.inspect":(s,_c,i,scope)=>s.ticket.subjectInspect(
+    requiredTicketScope(scope),
+    i,
+  ),
+  "ticket.trace.list":(s,_c,i,scope)=>s.ticket.traceList(
+    requiredTicketScope(scope),
+    i,
+  ),
+  "ticket.worktree.patch":(_s,_c,i,scope)=>applyTicketWorktreePatch({
+    worktreeRoot:requiredTicketScope(scope).worktreeRoot,
+    request:i as unknown as TicketLedgerPatchRequest,
+  }),
+  "ticket.review.append":(_s,c,i,scope,options)=>appendTicketReview({
+    worktreeRoot:requiredTicketScope(scope).worktreeRoot,
+    request:ticketReviewAppendRequest(i),
+    author:ticketReviewAuthor(c,options),
+    occurredAt:c.now,
+  }),
+  "ticket.decision.record":(_s,c,i,scope,options)=>recordTicketDecision({
+    worktreeRoot:requiredTicketScope(scope).worktreeRoot,
+    request:ticketDecisionRecordRequest(i),
+    authority:ticketDecisionAuthority(c,i,options),
+    decidedAt:c.now,
+  }),
+  "ticket.frontier.read":(s,c,_i,scope)=>s.ticketExecution.frontier(
+    c.repoId,
+    requiredTicketScope(scope).worktreeRoot,
+    c.now,
+  ),
+  "ticket.context.compile":(s,c,i,scope)=>s.ticketExecution.compileContext(
+    requiredTicketScope(scope).worktreeRoot,
+    i as unknown as CompileTicketContextInput,
+    c.now,
+  ),
+  "ticket.run.claim":(s,c,i,scope)=>s.ticketExecution.claim(
+    c.repoId,
+    requiredTicketScope(scope).worktreeRoot,
+    c.actor,
+    c.now,
+    i as unknown as ClaimTicketExecutionInput,
+  ),
+  "ticket.run.heartbeat":(s,c,i,scope)=>s.ticketExecution.heartbeat(
+    c.repoId,
+    requiredTicketScope(scope).worktreeRoot,
+    c.actor,
+    c.now,
+    i as unknown as TicketRunCredentials & {leaseSeconds:number},
+  ),
+  "ticket.run.release":(s,c,i,scope)=> {
+    requiredTicketScope(scope);
+    return s.ticketExecution.release(
+      c.repoId,
+      c.actor,
+      c.now,
+      i as unknown as TicketRunCredentials & {
+        reason:"lease_released"|"stale_binding"|"superseded"|"operator_cancelled";
+      },
+    );
+  },
+  "ticket.evidence.append":(s,c,i,scope)=>s.ticketExecution.appendEvidence(
+    c.repoId,
+    requiredTicketScope(scope).worktreeRoot,
+    c.actor,
+    c.now,
+    i as unknown as AppendTicketEvidenceInput,
+  ),
+  "ticket.closeout.append":(s,c,i,scope,options)=>
+    s.ticketExecution.appendCloseout(
+      c.repoId,
+      requiredTicketScope(scope).worktreeRoot,
+      ticketExecutionVerifier(c,options),
+      c.now,
+      i as unknown as AppendTicketCloseoutInput,
+    ),
 };
+
+export interface TicketReviewHostAttribution {
+  actorId: string;
+  actorKind: "human" | "agent";
+  attribution: "host_attested";
+}
+
+export type TicketDecisionAuthorityScope =
+  | {
+      decisionType: "plan_review";
+      graphDigest: string;
+    }
+  | {
+      decisionType: "protected_boundary";
+      ticketId: string;
+      ticketRevision: string;
+      boundary: string;
+    };
+
+export interface TicketDecisionAuthorityGrant {
+  authority: TicketDecisionAuthorityContext;
+  scopes: readonly TicketDecisionAuthorityScope[];
+}
+
+export interface OperationDispatcherOptions {
+  repoRoot?: string;
+  ticketReviewProvider?: ResolvedTicketReviewProjectionSourceProviderV0;
+  ticketReviewAttribution?: TicketReviewHostAttribution;
+  ticketDecisionAuthority?: TicketDecisionAuthorityGrant;
+  /**
+   * Host-owned, dynamically resolved local-signature trust profiles. The resolver
+   * must read outside repository/SQLite/browser authority and is consulted on
+   * every Ticket read so revocation takes effect without restarting.
+   */
+  ticketDecisionAttestationTrustProfiles?:
+    TicketDecisionLocalSignatureTrustProfileResolverV0;
+}
 
 export class OperationDispatcher {
   private readonly service:Services;
-  constructor(private readonly db:Db,private readonly options:{repoRoot?:string}={}){this.service={kb:new KnowledgeService(db),distill:new DistillationService(db)};}
+  private readonly ticketDecisionAttestations:
+    InMemoryTicketDecisionSessionAttestationRegistryV0;
+  constructor(
+    private readonly db: Db,
+    private readonly options: OperationDispatcherOptions = {},
+  ) {
+    this.ticketDecisionAttestations =
+      new InMemoryTicketDecisionSessionAttestationRegistryV0();
+    const ticketDecisionAttestationVerifier =
+      options.ticketDecisionAttestationTrustProfiles === undefined
+        ? this.ticketDecisionAttestations
+        : new CompositeTicketDecisionAttestationVerifierV0([
+            new DurableLocalSignatureTicketDecisionAttestationVerifierV0({
+              trustProfiles:
+                options.ticketDecisionAttestationTrustProfiles,
+            }),
+            this.ticketDecisionAttestations,
+          ]);
+    this.service = {
+      kb: new KnowledgeService(db),
+      distill: new DistillationService(db),
+      ticket: new TicketReviewReadServiceV0(
+        options.ticketReviewProvider
+          ?? createTrustedTicketLedgerReviewProjectionSourceProviderV0(
+            ticketDecisionAttestationVerifier,
+          ),
+      ),
+      ticketExecution: new TicketExecutionService(
+        db,
+        ticketDecisionAttestationVerifier,
+      ),
+    };
+  }
   operations():string[]{return Object.keys(handlers).sort();}
   dispatch(operation:string,context:unknown,input:unknown={}):OperationResult{
+    if(!isRegisteredOperation(operation)){
+      return failure(unsupportedOperation(operation));
+    }
     const address=receiptAddressSchema.safeParse(context);
     if(address.success){
       const raw=context as Record<string,unknown>;
-      const payloadHash=hashCanonical({actor:raw.actor??null,taskId:raw.taskId??null,input});
-      try{return this.dispatchRequest(operation,address.data.repoId,address.data.requestId,payloadHash,typeof raw.now==="string"?raw.now:"1970-01-01T00:00:00.000Z",()=>this.invoke(operation,context,input));}
+      try{
+        if(!isOperationInputWithinBudget(operation,input)){
+          const maximumBytes = OPERATION_INPUT_BYTE_LIMITS[
+            operation as keyof typeof OPERATION_INPUT_BYTE_LIMITS
+          ] ?? UNKNOWN_OPERATION_INPUT_MAX_BYTES;
+          throw new KnowledgeError(
+            "validation_error",
+            "operation input exceeds its safe JSON byte budget",
+            {operation,maximumBytes},
+            ["Reduce the input size or split it into bounded requests."],
+          );
+        }
+        if(isReceiptlessGitTicketOperation(operation)){
+          return this.invoke(operation,context,input);
+        }
+        const payloadHash=hashCanonical({
+          actor:raw.actor??null,
+          taskId:raw.taskId??null,
+          input,
+        });
+        return this.dispatchRequest(
+          operation,
+          address.data.repoId,
+          address.data.requestId,
+          payloadHash,
+          typeof raw.now==="string"?raw.now:"1970-01-01T00:00:00.000Z",
+          ()=>this.invoke(operation,context,input),
+        );
+      }
       catch(error){return failure(error);}
     }
     try{return this.invoke(operation,context,input);}catch(error){return failure(error);}
   }
-  private invoke(operation:string,context:unknown,input:unknown):OperationResult{
+  private invoke(
+    operation:string,
+    context:unknown,
+    input:unknown,
+    resolvedTicketScope?: TicketDispatchScopeV0,
+  ):OperationResult{
     const schema=operationInputSchemas[operation as OperationName];const handler=handlers[operation as OperationName];
-    if(!schema||!handler)throw new KnowledgeError("unsupported_operation",`unsupported operation: ${operation}`,{operation},["List dispatcher operations and choose a registered operation."]);
+    if(!schema||!handler)throw unsupportedOperation(operation);
     const parsedContext=operationContextSchema.safeParse(context);
     if(!parsedContext.success){
       const actorProbe=actorProbeSchema.safeParse(context);
@@ -112,8 +371,63 @@ export class OperationDispatcher {
     }else if(DISTILL_MUTATIONS.has(operation)){
       data=this.dispatchDistillMutation(operation,c,normalizedInput,handler);
       if(operation==="distill.finalize"&&this.gitSemanticRoot(c))this.syncGitFeatureIdentities(c,data);
-    }else data=handler(this.service,c,normalizedInput);
+    }else{
+      const ticketScope=requiresTicketScope(operation)
+        ? resolvedTicketScope ?? this.resolveTicketScope()
+        : undefined;
+      data=handler(
+        this.service,
+        c,
+        normalizedInput,
+        ticketScope,
+        this.options,
+      );
+      if(operation==="ticket.decision.record"&&ticketScope!==undefined){
+        this.attestRecordedTicketDecision(
+          ticketScope,
+          data as TicketDecisionRecordResult,
+        );
+      }
+    }
     return {ok:true,data,meta:{operation,repoId:c.repoId,requestId:c.requestId,at:c.now}};
+  }
+  private attestRecordedTicketDecision(
+    scope:TicketDispatchScopeV0,
+    result:TicketDecisionRecordResult,
+  ):void {
+    try{
+      const snapshot=loadTicketLedgerFromWorktree(scope.worktreeRoot);
+      this.ticketDecisionAttestations.attest(
+        snapshot,
+        result.decision,
+      );
+    }catch{
+      // Session authority is a fail-closed operational capability. The durable
+      // Decision write remains successful even if this host cannot attest its
+      // exact post-write snapshot; subsequent reads expose it as unverified.
+    }
+  }
+  private resolveTicketScope(): TicketDispatchScopeV0 {
+    const candidate=this.options.repoRoot;
+    if(!candidate){
+      throw new KnowledgeError(
+        "ticket_ledger_scope_mismatch",
+        "Ticket operations require a trusted worktree path from the host adapter",
+        null,
+        ["Construct the dispatcher with the current trusted repoRoot."],
+      );
+    }
+    try{
+      const session=GitFacade.sessionContextAt(candidate);
+      return {worktreeRoot:fs.realpathSync(session.toplevel)};
+    }catch{
+      throw new KnowledgeError(
+        "ticket_ledger_scope_mismatch",
+        "Ticket operation scope is not a readable Git worktree",
+        {worktreeRoot:candidate},
+        ["Use a readable Git checkout as repoRoot."],
+      );
+    }
   }
   private gitSemanticRoot(context:OperationContext):string|null{
     const repo=this.db.prepare(`SELECT root_path rootPath FROM repos WHERE id=?`).get(context.repoId) as {rootPath:string}|undefined;
@@ -151,7 +465,12 @@ export class OperationDispatcher {
       cache=openDb(cachePath);
       copyOperationalKnowledgeContext(this.db,c.repoId,cache,materialized.repoId);
       recoverDurableMutationReceipts(cache,materialized.repoId);
-      const services={kb:new KnowledgeService(cache),distill:new DistillationService(cache)};
+      const services={
+        kb:new KnowledgeService(cache),
+        distill:new DistillationService(cache),
+        ticket:this.service.ticket,
+        ticketExecution:this.service.ticketExecution,
+      };
       const cacheContext={...c,repoId:materialized.repoId};
       const data=handler(services,cacheContext,input);
       if(GIT_KB_MUTATIONS.has(operation)){
@@ -204,13 +523,27 @@ export class OperationDispatcher {
       });
     }finally{fs.rmSync(temp,{recursive:true,force:true});}
   }
-  private dispatchRequest(operation:string,repoId:number,requestId:string,payloadHash:string,createdAt:string,invoke:()=>OperationResult){
+  private dispatchRequest(
+    operation:string,
+    repoId:number,
+    requestId:string,
+    payloadHash:string,
+    createdAt:string,
+    invoke:()=>OperationResult,
+  ){
     return this.db.transaction(()=>{
-      const prior=this.db.prepare(`SELECT operation,payload_hash payloadHash,outcome_kind outcomeKind,outcome FROM operation_request_receipts WHERE repo_id=? AND request_id=?`).get(repoId,requestId) as {operation:string;payloadHash:string;outcomeKind:"success"|"error";outcome:string}|undefined;
-      if(prior){
-        if(prior.operation!==operation||prior.payloadHash!==payloadHash)throw new KnowledgeError("idempotency_conflict","requestId was reused with a different operation, actor, task, or canonical input",{requestId,originalOperation:prior.operation,attemptedOperation:operation},["Use a new requestId for a different logical invocation."]);
-        return JSON.parse(prior.outcome) as OperationResult;
-      }
+      const prior=this.readOperationReceipt(
+        repoId,
+        requestId,
+        operation,
+        payloadHash,
+      );
+      if(prior)return replayOperationReceipt(
+        prior,
+        operation,
+        payloadHash,
+        requestId,
+      );
       this.db.exec("SAVEPOINT operation_request_handler");
       let outcome:OperationResult;
       try{
@@ -221,15 +554,89 @@ export class OperationDispatcher {
         this.db.exec("RELEASE SAVEPOINT operation_request_handler");
         outcome=failure(error);
       }
-      this.db.prepare(`INSERT INTO operation_request_receipts(repo_id,request_id,operation,payload_hash,outcome_kind,outcome,created_at) VALUES(?,?,?,?,?,?,?)`).run(repoId,requestId,operation,payloadHash,outcome.ok?"success":"error",JSON.stringify(outcome),createdAt);
+      this.insertOperationReceipt(
+        operation,
+        repoId,
+        requestId,
+        payloadHash,
+        createdAt,
+        outcome,
+      );
       return outcome;
     }).immediate();
+  }
+  private readOperationReceipt(
+    repoId:number,
+    requestId:string,
+    attemptedOperation:string,
+    attemptedPayloadHash:string,
+  ):OperationReceiptRow|undefined{
+    const row=this.db.prepare(
+      `SELECT r.repo_id repoId,r.request_id requestId,r.operation,
+              r.payload_hash payloadHash,r.outcome_kind outcomeKind,
+              r.outcome,r.created_at createdAt
+       FROM operation_request_receipts r
+       WHERE r.repo_id=? AND r.request_id=?`,
+    ).get(repoId,requestId) as OperationReceiptRow|undefined;
+    return row;
+  }
+  private insertOperationReceipt(
+    operation:string,
+    repoId:number,
+    requestId:string,
+    payloadHash:string,
+    createdAt:string,
+    outcome:OperationResult,
+  ):void{
+    this.db.prepare(
+      `INSERT INTO operation_request_receipts(
+         repo_id,request_id,operation,payload_hash,
+         outcome_kind,outcome,created_at
+       ) VALUES(?,?,?,?,?,?,?)`,
+    ).run(
+      repoId,
+      requestId,
+      operation,
+      payloadHash,
+      outcome.ok?"success":"error",
+      JSON.stringify(outcome),
+      createdAt,
+    );
   }
   private dispatchDistillMutation(operation:string,c:OperationContext,input:Record<string,unknown>,handler:Handler){const stable=(value:unknown):string=>JSON.stringify(sortObject(value));const inputHash=crypto.createHash("sha256").update(stable({input,actor:c.actor,taskId:c.taskId??null})).digest("hex");return this.db.transaction(()=>{const prior=this.db.prepare(`SELECT input_hash inputHash,result FROM distill_mutation_receipts WHERE repo_id=? AND operation=? AND request_id=?`).get(c.repoId,operation,c.requestId) as {inputHash:string;result:string}|undefined;if(prior){if(prior.inputHash!==inputHash)throw new KnowledgeError("idempotency_conflict","requestId was reused with different mutation input",{operation,requestId:c.requestId},["Use a new requestId for a different mutation."]);return JSON.parse(prior.result);}const result=handler(this.service,c,input);this.db.prepare(`INSERT INTO distill_mutation_receipts(repo_id,operation,request_id,input_hash,result,created_at) VALUES(?,?,?,?,?,?)`).run(c.repoId,operation,c.requestId,inputHash,stable(result),c.now);return result;}).immediate();}
 }
 
 const DISTILL_MUTATIONS=new Set(["distill.run.start","distill.run.abort","distill.inventory.put","distill.inventory.seal","distill.scopes.plan","distill.scopes.claim","distill.scopes.complete","distill.scopes.fail","distill.scopes.retry","distill.scopes.correct","distill.candidates.put","distill.reconcile","distill.validate","distill.finalize","distill.activate","distill.rollback"]);
-const GIT_KB_MUTATIONS=new Set(["kb.draft.apply","kb.promote","kb.mark-stale","kb.deprecate","kb.amend","kb.supersede"]);
+const GIT_KB_MUTATIONS=new Set(["kb.spec.apply","kb.mark-stale","kb.deprecate","kb.amend","kb.supersede"]);
+interface OperationReceiptRow {
+  repoId:number;
+  requestId:string;
+  operation:string;
+  payloadHash:string;
+  outcomeKind:"success"|"error";
+  outcome:string;
+  createdAt:string;
+}
+function replayOperationReceipt(
+  prior:OperationReceiptRow,
+  operation:string,
+  payloadHash:string,
+  requestId:string,
+):OperationResult{
+  if(prior.operation!==operation||prior.payloadHash!==payloadHash){
+    throw new KnowledgeError(
+      "idempotency_conflict",
+      "requestId was reused with a different operation, actor, task, canonical input, or repository scope",
+      {
+        requestId,
+        originalOperation:prior.operation,
+        attemptedOperation:operation,
+      },
+      ["Use a new requestId for a different logical invocation."],
+    );
+  }
+  return JSON.parse(prior.outcome) as OperationResult;
+}
 function sortObject(value:unknown):unknown{return Array.isArray(value)?value.map(sortObject):value&&typeof value==="object"?Object.fromEntries(Object.entries(value).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>[k,sortObject(v)])):value;}
 
 function copyMutationReceipts(source:Db,sourceRepoId:number,target:Db,targetRepoId:number):void{
@@ -286,8 +693,448 @@ const actorProbeSchema=z.object({actor:z.unknown().optional()}).passthrough();
 const receiptAddressSchema=z.object({repoId:operationContextSchema.shape.repoId,requestId:operationContextSchema.shape.requestId}).passthrough();
 function hashCanonical(value:unknown){return crypto.createHash("sha256").update(JSON.stringify(sortObject(value))).digest("hex");}
 function failure(error:unknown):OperationResult{const e=normalize(error);return {ok:false,error:{code:e.code,message:e.message,details:e.details,nextSafeActions:e.nextSafeActions}};}
+function isRegisteredOperation(operation:string):operation is OperationName{
+  return Object.hasOwn(operationInputSchemas,operation)
+    &&Object.hasOwn(handlers,operation);
+}
+function unsupportedOperation(operation:string):KnowledgeError{
+  return new KnowledgeError(
+    "unsupported_operation",
+    `unsupported operation: ${operation}`,
+    {operation},
+    ["List dispatcher operations and choose a registered operation."],
+  );
+}
 
-function mutation(c:OperationContext,taskRequired:boolean){if(taskRequired&&!c.taskId?.trim())throw new KnowledgeError("task_required","taskId is required for draft batch apply",null,["Associate the write with the current task."]);return {actor:c.actor,taskId:c.taskId,requestId:c.requestId,now:c.now};}
+function mutation(c:OperationContext,taskRequired:boolean){if(taskRequired&&!c.taskId?.trim())throw new KnowledgeError("task_required","taskId is required for active Spec batch apply",null,["Associate the write with the current task."]);return {actor:c.actor,taskId:c.taskId,requestId:c.requestId,now:c.now};}
 function req(v:unknown,name:string){if(typeof v!=="string"||!v.trim())throw new KnowledgeError("validation_error",`${name} is required`,{field:name});return v;}
-function normalize(error:unknown):KnowledgeError{if(error instanceof KnowledgeError)return error;const message=error instanceof Error?error.message:String(error);if(message.includes("FOREIGN KEY"))return new KnowledgeError("not_found","referenced entity does not exist",{cause:message});if(message.includes("UNIQUE"))return new KnowledgeError("already_exists","entity already exists",{cause:message});return new KnowledgeError("internal_error","knowledge operation failed",{cause:message},["Retry after inspecting database health."]);}
+function normalize(error:unknown):KnowledgeError{
+  if(error instanceof KnowledgeError)return error;
+  if(error instanceof TicketExecutionError){
+    const code = error.code === "not_ready"
+      ? "ticket_not_ready"
+      : error.code === "already_done"
+        ? "ticket_already_done"
+        : error.code === "binding_not_found"
+          ? "ticket_binding_not_found"
+          : error.code === "binding_mismatch"
+            ? "ticket_binding_mismatch"
+            : error.code === "run_actor_mismatch"
+              ? "ticket_run_actor_mismatch"
+              : error.code === "run_still_active"
+                ? "ticket_run_still_active"
+                : "ticket_run_stale";
+    return new KnowledgeError(
+      code,
+      error.message,
+      error.details,
+      ticketExecutionNextSafeActions(code),
+    );
+  }
+  if(isTicketRunLeaseFailure(error)){
+    const code=`ticket_run_${error.code}`;
+    return new KnowledgeError(
+      code,
+      error.message,
+      error.details,
+      ticketExecutionNextSafeActions(code),
+    );
+  }
+  if(error instanceof TicketReviewProjectionError){
+    return new KnowledgeError(
+      error.code,
+      error.message,
+      error.details,
+      ticketReviewNextSafeActions(error.code),
+    );
+  }
+  if(error instanceof TicketLedgerError){
+    const code = error.code === "ledger_missing"
+      ? "ticket_ledger_missing"
+      : error.code === "source_changed_during_read"
+        ? "ticket_ledger_source_changed"
+        : error.code === "stale_source"
+          ? "ticket_ledger_stale_source"
+          : error.code === "stale_ticket_revision"
+            ? "ticket_ledger_stale_ticket"
+            : error.code === "stale_subject"
+              ? "ticket_ledger_stale_subject"
+              : error.code === "document_conflict"
+                ? "ticket_ledger_document_conflict"
+            : error.code === "writer_busy"
+              ? "ticket_ledger_writer_busy"
+              : error.code === "write_verification_failed"
+                ? "ticket_ledger_write_unverified"
+        : error.code === "ref_not_found"
+          ? "ticket_ledger_ref_not_found"
+          : error.code === "invalid_document"
+            || error.code === "invalid_path"
+            || error.code === "file_too_large"
+            || error.code === "ledger_too_large"
+            || error.code === "unsupported_file"
+            || error.code === "symlink"
+            || error.code === "duplicate_change"
+            ? "ticket_ledger_invalid_document"
+            : error.code === "invalid_graph"
+              ? "ticket_ledger_invalid_graph"
+              : error.code === "unmerged"
+                ? "ticket_ledger_unmerged"
+                : "ticket_ledger_io";
+    const nextSafeActions = error.code === "writer_busy"
+      ? [
+          "Wait for the active Ticket writer to finish; if it crashed, verify no writer is running before removing the reported worktree lock.",
+        ]
+      : error.code === "write_verification_failed"
+        ? [
+            "Inspect `git diff -- .vibehub/tickets` and the reported paths before rebuilding a patch from a fresh snapshot.",
+          ]
+      : error.code === "stale_source"
+          || error.code === "stale_ticket_revision"
+          || error.code === "stale_subject"
+          ? [
+              "Refresh ticket.graph.snapshot, rebuild the exact patch, and retry.",
+            ]
+          : error.code === "document_conflict"
+            ? [
+                "Inspect the existing Git-native review or Decision document; do not overwrite a conflicting exact subject.",
+              ]
+          : [
+              "Inspect and repair `.vibehub/tickets`, then retry the read.",
+            ];
+    return new KnowledgeError(
+      code,
+      error.message,
+      error.details,
+      nextSafeActions,
+    );
+  }
+  const message=error instanceof Error?error.message:String(error);
+  if(message.includes("FOREIGN KEY"))return new KnowledgeError("not_found","referenced entity does not exist",{cause:message});
+  if(message.includes("UNIQUE"))return new KnowledgeError("already_exists","entity already exists",{cause:message});
+  return new KnowledgeError("internal_error","knowledge operation failed",{cause:message},["Retry after inspecting database health."]);
+}
 function validation(issues:readonly {path:PropertyKey[];message:string;code:string}[],scope:string){return new KnowledgeError("validation_error",`invalid ${scope}`,{issues:issues.map(x=>({path:x.path.map(String),message:x.message,code:x.code}))},["Correct the malformed request and retry."]);}
+function requiresTicketScope(operation:string):operation is
+  | "ticket.graph.snapshot"
+  | "ticket.subject.inspect"
+  | "ticket.trace.list"
+  | "ticket.worktree.patch"
+  | "ticket.review.append"
+  | "ticket.decision.record"
+  | "ticket.frontier.read"
+  | "ticket.context.compile"
+  | "ticket.run.claim"
+  | "ticket.run.heartbeat"
+  | "ticket.run.release"
+  | "ticket.evidence.append"
+  | "ticket.closeout.append"
+{
+  return operation==="ticket.graph.snapshot"
+    || operation==="ticket.subject.inspect"
+    || operation==="ticket.trace.list"
+    || operation==="ticket.worktree.patch"
+    || operation==="ticket.review.append"
+    || operation==="ticket.decision.record"
+    || operation==="ticket.frontier.read"
+    || operation==="ticket.context.compile"
+    || operation==="ticket.run.claim"
+    || operation==="ticket.run.heartbeat"
+    || operation==="ticket.run.release"
+    || operation==="ticket.evidence.append"
+    || operation==="ticket.closeout.append";
+}
+function isReceiptlessGitTicketOperation(operation:string):operation is
+  | "ticket.graph.snapshot"
+  | "ticket.subject.inspect"
+  | "ticket.trace.list"
+  | "ticket.worktree.patch"
+  | "ticket.review.append"
+  | "ticket.decision.record"
+  | "ticket.frontier.read"
+  | "ticket.context.compile"
+  | "ticket.run.claim"
+  | "ticket.run.heartbeat"
+  | "ticket.run.release"
+  | "ticket.evidence.append"
+  | "ticket.closeout.append" {
+  return operation==="ticket.graph.snapshot"
+    || operation==="ticket.subject.inspect"
+    || operation==="ticket.trace.list"
+    || operation==="ticket.worktree.patch"
+    || operation==="ticket.review.append"
+    || operation==="ticket.decision.record"
+    || operation==="ticket.frontier.read"
+    || operation==="ticket.context.compile"
+    || operation==="ticket.run.claim"
+    || operation==="ticket.run.heartbeat"
+    || operation==="ticket.run.release"
+    || operation==="ticket.evidence.append"
+    || operation==="ticket.closeout.append";
+}
+function requiredTicketScope(
+  scope:TicketDispatchScopeV0|undefined,
+):TicketDispatchScopeV0 {
+  if(scope)return scope;
+  throw new KnowledgeError(
+    "internal_error",
+    "Ticket operation reached its handler without a verified repository scope",
+  );
+}
+
+type PublicTicketMutationSubject =
+  | {kind:"graph";graphDigest:string}
+  | {kind:"ticket";ticketId:string;ticketRevision:string}
+  | {
+      kind:"relation";
+      relationRef:string;
+      prerequisiteTicketId:string;
+      dependentTicketId:string;
+      dependentTicketRevision:string;
+    };
+
+const rawSha256 = (value:string):string => value.slice("sha256:".length);
+
+function durableTicketMutationSubject(
+  value:unknown,
+):TicketReviewSubject {
+  const subject=value as PublicTicketMutationSubject;
+  if(subject.kind==="graph"){
+    return {kind:"graph",graph_digest:rawSha256(subject.graphDigest)};
+  }
+  if(subject.kind==="ticket"){
+    return {
+      kind:"ticket",
+      ticket_id:subject.ticketId,
+      ticket_revision:rawSha256(subject.ticketRevision),
+    };
+  }
+  return {
+    kind:"relation",
+    relation_ref:subject.relationRef,
+    prerequisite_ticket_id:subject.prerequisiteTicketId,
+    dependent_ticket_id:subject.dependentTicketId,
+    dependent_ticket_revision:rawSha256(subject.dependentTicketRevision),
+  };
+}
+
+function ticketReviewAppendRequest(
+  input:Record<string,unknown>,
+):TicketReviewAppendRequest {
+  const review=input.review as {
+    type:"comment"|"ticket_edit";
+    subject:PublicTicketMutationSubject;
+    body:string;
+    replacementTicket?:TicketDocument;
+    rationale?:string;
+  };
+  const subject=durableTicketMutationSubject(review.subject);
+  return {
+    expectedSource:input.expectedSource as TicketLedgerPatchRequest["expectedSource"],
+    review:review.type==="comment"
+      ? {
+          review_type:"comment",
+          subject,
+          body:review.body,
+        }
+      : {
+          review_type:"ticket_edit",
+          subject,
+          body:review.body,
+          replacement_ticket:review.replacementTicket!,
+          rationale:review.rationale!,
+        },
+  };
+}
+
+export function ticketDecisionRecordRequest(
+  input:Record<string,unknown>,
+):TicketDecisionRecordRequest {
+  const decision=input.decision as {
+    type:"plan_review"|"protected_boundary";
+    subject:PublicTicketMutationSubject;
+    disposition:
+      |"approve_execution"
+      |"delegate_within_boundaries"
+      |"request_changes"
+      |"resolve"
+      |"decline";
+    delegatedBoundaries?:string[];
+    boundary?:string;
+    selection?:string;
+    rationale:string;
+    resolutionRefs:string[];
+  };
+  const subject=durableTicketMutationSubject(decision.subject);
+  return {
+    expectedSource:input.expectedSource as TicketLedgerPatchRequest["expectedSource"],
+    decision:decision.type==="plan_review"
+      ? {
+          decision_type:"plan_review",
+          subject,
+          disposition:decision.disposition as
+            |"approve_execution"
+            |"delegate_within_boundaries"
+            |"request_changes",
+          ...(decision.delegatedBoundaries===undefined
+            ?{}
+            :{delegated_boundaries:decision.delegatedBoundaries}),
+          rationale:decision.rationale,
+          resolution_refs:decision.resolutionRefs,
+        }
+      : {
+          decision_type:"protected_boundary",
+          subject,
+          boundary:decision.boundary!,
+          disposition:decision.disposition as "resolve"|"decline",
+          ...(decision.selection===undefined
+            ?{}
+            :{selection:decision.selection}),
+          rationale:decision.rationale,
+          resolution_refs:decision.resolutionRefs,
+        },
+  } as TicketDecisionRecordRequest;
+}
+
+function ticketReviewAuthor(
+  context:OperationContext,
+  options:OperationDispatcherOptions|undefined,
+):TicketReviewAuthorContext {
+  const attribution=options?.ticketReviewAttribution;
+  if(attribution===undefined){
+    return {
+      actor_id:context.actor,
+      actor_kind:"agent",
+      attribution:"claimed",
+    };
+  }
+  if(attribution.actorId!==context.actor){
+    throw new KnowledgeError(
+      "ticket_attribution_mismatch",
+      "Trusted Ticket review attribution does not match the operation actor",
+      {actor:context.actor,attributedActor:attribution.actorId},
+      ["Restart the review host with one matching trusted reviewer identity."],
+    );
+  }
+  return {
+    actor_id:attribution.actorId,
+    actor_kind:attribution.actorKind,
+    attribution:attribution.attribution,
+  };
+}
+
+function ticketExecutionVerifier(
+  context:OperationContext,
+  options:OperationDispatcherOptions|undefined,
+) {
+  const author=ticketReviewAuthor(context,options);
+  return {
+    actor_kind:author.actor_kind,
+    actor_ref:author.actor_id,
+  } as const;
+}
+
+function ticketDecisionAuthority(
+  context:OperationContext,
+  input:Record<string,unknown>,
+  options:OperationDispatcherOptions|undefined,
+):TicketDecisionAuthorityContext {
+  const grant=options?.ticketDecisionAuthority;
+  if(grant===undefined){
+    throw new KnowledgeError(
+      "ticket_authority_unavailable",
+      "Ticket Decisions require a trusted host-bound human authority grant",
+      null,
+      ["Use a trusted review host configured for this exact Decision subject."],
+    );
+  }
+  if(grant.authority.principal_id!==context.actor){
+    throw new KnowledgeError(
+      "ticket_authority_scope_mismatch",
+      "Ticket Decision actor does not match the trusted human principal",
+      {
+        actor:context.actor,
+        principalId:grant.authority.principal_id,
+      },
+      ["Restart the review host under the matching trusted human principal."],
+    );
+  }
+  const decision=input.decision as {
+    type:"plan_review"|"protected_boundary";
+    subject:PublicTicketMutationSubject;
+    boundary?:string;
+  };
+  const matched=grant.scopes.some((scope)=>{
+    if(
+      decision.type==="plan_review"
+      &&scope.decisionType==="plan_review"
+      &&decision.subject.kind==="graph"
+    ){
+      return scope.graphDigest===decision.subject.graphDigest;
+    }
+    return decision.type==="protected_boundary"
+      &&scope.decisionType==="protected_boundary"
+      &&decision.subject.kind==="ticket"
+      &&scope.ticketId===decision.subject.ticketId
+      &&scope.ticketRevision===decision.subject.ticketRevision
+      &&scope.boundary===decision.boundary;
+  });
+  if(!matched){
+    throw new KnowledgeError(
+      "ticket_authority_scope_mismatch",
+      "Trusted human authority does not cover this exact Ticket Decision",
+      {
+        decisionType:decision.type,
+        subject:decision.subject,
+        boundary:decision.boundary??null,
+      },
+      ["Use a review host grant bound to this exact graph or protected boundary."],
+    );
+  }
+  return grant.authority;
+}
+
+function ticketReviewNextSafeActions(code:string):string[]{
+  if(code==="validation_error"||code==="invalid_snapshot"){
+    return ["Correct the Ticket selector or restart from ticket.graph.snapshot."];
+  }
+  if(code==="not_found"){
+    return ["Initialize `.vibehub/tickets/protocol.yaml`; a protocol-only empty graph is valid."];
+  }
+  if(code==="snapshot_expired"){
+    return ["Refresh ticket.graph.snapshot and retry against its new snapshotId."];
+  }
+  if(code==="projection_too_large"){
+    return ["Reduce the Ticket ledger below the declared review capacity."];
+  }
+  return ["Inspect and repair the Git-native Ticket documents in this worktree."];
+}
+
+function ticketExecutionNextSafeActions(code:string):string[]{
+  if(code==="ticket_not_ready"){
+    return ["Read ticket.frontier.read and execute an eligible Ticket whose prerequisites are DONE."];
+  }
+  if(code==="ticket_already_done"){
+    return ["Refresh ticket.frontier.read and continue with a newly unlocked dependent Ticket."];
+  }
+  if(code==="ticket_binding_not_found"||code==="ticket_binding_mismatch"){
+    return ["Refresh ticket.frontier.read, compile a fresh exact context binding, and retry."];
+  }
+  if(code==="ticket_run_claim_conflict"){
+    return ["Inspect ticket.frontier.read; wait for, heartbeat, or explicitly release the current executor lease."];
+  }
+  if(code==="ticket_run_still_active"){
+    return ["Have the executor release its lease before an independent verifier appends closeout."];
+  }
+  if(
+    code==="ticket_run_stale"
+    ||code==="ticket_run_stale_generation"
+    ||code==="ticket_run_lease_expired"
+    ||code==="ticket_run_lease_released"
+  ){
+    return ["Refresh ticket.frontier.read and claim the current Ticket revision with a fresh context binding."];
+  }
+  if(code==="ticket_run_actor_mismatch"||code==="ticket_run_invalid_token"){
+    return ["Use the exact executor identity and one-time bearer returned by ticket.run.claim."];
+  }
+  return ["Inspect ticket.frontier.read and retry from the current Git-native Ticket facts."];
+}

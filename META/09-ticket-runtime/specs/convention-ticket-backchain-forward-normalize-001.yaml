@@ -1,0 +1,83 @@
+spec_id: "convention-ticket-backchain-forward-normalize-001"
+type: convention
+state: superseded
+intent:
+  summary: "生成给某一个任务的 Tickets 时，可以用倒退的逻辑，倒推，然后从起点再来看起来 clean up。"
+  detail: |
+    Ticket shaping uses a bounded two-pass reasoning pattern:
+    `Backchain → Forward Normalize`.
+
+    Backchain begins from each human-understandable scenario/outcome and its
+    observable acceptance. It asks which result, fact, or authorized decision
+    must already exist immediately before that acceptance can be proven, then
+    repeats until the path reaches current evidence, an executable frontier, a
+    decision blocker, or honest Planning Fog.
+
+    Backchaining may expose several necessary parallel branches or several
+    candidate path hypotheses. Work that is independently required belongs in
+    one DAG. Alternative paths remain proposals behind the decision that
+    selects among them; an unknown region is not fabricated into empty Tickets.
+
+    Forward Normalize then reads from current facts toward the outcomes and
+    checks:
+
+    - every Ticket is reachable and contributes to at least one ancestor
+      acceptance;
+    - duplicated outcomes and shared prerequisites across backward paths are
+      reconciled;
+    - unnecessary serialization and transitive dependency edges are removed;
+    - independent parallelism, joins, human gates, and blockers are preserved;
+    - work without an independent scheduling, blocking, verification,
+      permission, or retry boundary returns to parent elaboration;
+    - outcome, verifier, authority, or retry boundaries that should be
+      independent are split;
+    - no orphan or dead-end Ticket remains in the proposed graph.
+
+    Containment and execution dependency remain different semantics. Every
+    non-top-level Ticket has exactly one truthful containment parent. Scenario
+    membership is derived from that ancestry. A cross-scenario shared Ticket
+    attaches to the earliest common ancestor whose outcome contains it, then
+    feeds the affected branches through explicit dependencies.
+
+    This pattern belongs to Ticket shaping intelligence. It produces a bounded
+    graph proposal with rationale, acceptance coverage, blockers, frontiers,
+    and proposed merge/prune/redirect mutations. Independent validation judges
+    the proposal; Core enforces graph integrity, revision compare-and-swap,
+    authority, and atomic application. It is not a mandatory end-to-end
+    workflow or a second writable graph model.
+constraints:
+  - kind: must
+    rule: "A proposed Ticket Graph must be checked in both outcome-to-prerequisite and current-fact-to-outcome directions before execution authority is requested."
+  - kind: must
+    rule: "Every non-top-level Ticket must have one truthful containment path and contribute to an ancestor outcome."
+  - kind: must_not
+    rule: "Do not turn uncertain alternatives, implementation steps, or unknown downstream regions into canonical Tickets merely to make the graph look complete."
+indexing:
+  type: convention
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket-generation, planning, backchain, normalization, graph, intelligence]
+provenance:
+  source_type: manual_input
+  confidence: 0.85
+  source_ref: "Wayne proposed backward Ticket synthesis followed by forward cleanup — 2026-07-28"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-28"
+relations:
+  - target: "convention-ticket-backchain-forward-normalize-002"
+    type: superseded_by
+    detail: "The two-pass planning method remains, but the graph no longer requires containment parents."
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+    detail: "The two-pass convention preserves stable outcomes, containment, dependencies, acceptance, and Planning Fog boundaries."
+  - target: "decision-ticket-intelligence-loop-001"
+    type: relates_to
+    detail: "Backchain and Forward Normalize refine the shape intelligence used when the host Agent compiles a coarse graph."
+  - target: "decision-ticket-graph-lifecycle-001"
+    type: relates_to
+    detail: "The convention proposes graph changes without deciding the still-open legal mutation lifecycle."
+anchors:
+  - file: "META/09-ticket-runtime/specs/decision-ticket-contract-001.yaml"
+  - file: "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml"
+  - file: "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-001.yaml"

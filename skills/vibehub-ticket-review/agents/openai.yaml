@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Ticket Review"
+  short_description: "Open the local structured Ticket graph review"
+  default_prompt: "Use $vibehub-ticket-review to open this worktree's Ticket graph for structured human review."

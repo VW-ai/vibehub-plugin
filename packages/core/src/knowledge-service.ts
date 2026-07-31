@@ -34,12 +34,12 @@ export interface KbAnchorInput {
   file: string; symbol?: string; lineStart?: number; lineEnd?: number; contentHash?: string;
 }
 export interface KbRelationInput { toSpecId: string; type: KbRelationType; rationale?: string }
-export interface DraftSpecInput {
+export interface SpecInput {
   id: string; featureId?: string; type: KbSpecType; summary: string; detail?: string;
   priority?: string; layer?: string; domain?: string; tags?: string[];
   evidence: KbEvidenceInput[]; anchors?: KbAnchorInput[]; relations?: KbRelationInput[];
 }
-export interface DraftBatchInput { idempotencyKey: string; specs: DraftSpecInput[] }
+export interface SpecBatchInput { idempotencyKey: string; specs: SpecInput[] }
 
 // better-sqlite3 has no row-shape inference; each query below fixes its own
 // aliases and this internal bag is immediately projected into public DTOs.
@@ -250,41 +250,48 @@ export class KnowledgeService {
       const overlap=anchors.length?this.db.prepare(`SELECT spec_id AS specId,file,symbol FROM kb_spec_current_anchors WHERE repo_id=? AND (${anchors.map(()=>`(file=? AND symbol=?)`).join(" OR ")}) LIMIT 100`).all(repoId,...anchors.flatMap(a=>[a.file,a.symbol])):[]; return {summary,signals:{exactLexical:lexical.slice(0,25),exactAnchorOverlap:overlap}}; });
   }
 
-  applyDraftBatch(repoId:number,input:DraftBatchInput,ctx:MutationContext){
+  applySpecBatch(repoId:number,input:SpecBatchInput,ctx:MutationContext){
     this.assertDispatcherAuthority(repoId);
-    guardKnowledgeMutation("kb.draft.apply",repoId,input,ctx);
+    guardKnowledgeMutation("kb.spec.apply",repoId,input,ctx);
     this.validateContext(ctx,true); required(input.idempotencyKey,"idempotencyKey"); if(!Array.isArray(input.specs)||!input.specs.length)throw new KnowledgeError("validation_error","specs must not be empty");
-    const inputHash=hash(input); const existing=this.receipt(repoId,"draft_batch",input.idempotencyKey,inputHash); if(existing)return existing;
-    const ids=new Set<string>(); for(const item of input.specs){ this.validateDraft(repoId,item); if(ids.has(item.id))throw new KnowledgeError("validation_error",`duplicate spec id: ${item.id}`);ids.add(item.id); }
+    const inputHash=hash(input); const existing=this.receipt(repoId,"spec_batch",input.idempotencyKey,inputHash); if(existing)return existing;
+    const ids=new Set<string>(); for(const item of input.specs){ this.validateSpecInput(repoId,item); if(ids.has(item.id))throw new KnowledgeError("validation_error",`duplicate spec id: ${item.id}`);ids.add(item.id); }
     for(const item of input.specs)for(const rel of item.relations??[])if(!ids.has(rel.toSpecId))this.ensureSpec(repoId,rel.toSpecId);
     this.validateRelationPlan(repoId,input.specs.flatMap(s=>(s.relations??[]).map(r=>({from:s.id,to:r.toSpecId,type:r.type}))));
-    return this.db.transaction(()=>{ const again=this.receipt(repoId,"draft_batch",input.idempotencyKey,inputHash);if(again)return again;
-      const result={operation:"draft_batch",created:input.specs.map(s=>s.id),idempotencyKey:input.idempotencyKey,inputHash};
-      const receipt={operation:"draft_batch",idempotencyKey:input.idempotencyKey,inputHash,result,createdAt:ctx.now};
-      for(const item of input.specs)this.insertDraft(repoId,item,ctx,receipt);
+    return this.db.transaction(()=>{ const again=this.receipt(repoId,"spec_batch",input.idempotencyKey,inputHash);if(again)return again;
+      const result={
+        operation:"spec_batch",
+        state:"active",
+        validation:{status:"passed",checks:["schema","evidence","anchors","relations"]},
+        created:input.specs.map(s=>s.id),
+        idempotencyKey:input.idempotencyKey,
+        inputHash,
+      };
+      const receipt={operation:"spec_batch",idempotencyKey:input.idempotencyKey,inputHash,result,createdAt:ctx.now};
+      for(const item of input.specs)this.insertSpec(repoId,item,ctx,receipt);
       for(const item of input.specs)for(const r of item.relations??[])this.db.prepare(`INSERT INTO kb_spec_relations(repo_id,from_spec_id,to_spec_id,type,rationale,created_at) VALUES(?,?,?,?,?,?)`).run(repoId,item.id,r.toSpecId,r.type,r.rationale??null,ctx.now);
-      this.storeReceipt(repoId,"draft_batch",input.idempotencyKey,inputHash,result,ctx.now); return result; }).immediate();
+      this.storeReceipt(repoId,"spec_batch",input.idempotencyKey,inputHash,result,ctx.now); return result; }).immediate();
   }
 
-  mutate(repoId:number,operation:"promote"|"mark_stale"|"deprecate"|"amend"|"supersede",input:Record<string,unknown>,ctx:MutationContext){
+  mutate(repoId:number,operation:"mark_stale"|"deprecate"|"amend"|"supersede",input:Record<string,unknown>,ctx:MutationContext){
     this.assertDispatcherAuthority(repoId);
-    const operationName=({promote:"kb.promote",mark_stale:"kb.mark-stale",deprecate:"kb.deprecate",amend:"kb.amend",supersede:"kb.supersede"} as const)[operation];guardKnowledgeMutation(operationName,repoId,input,ctx);
+    const operationName=({mark_stale:"kb.mark-stale",deprecate:"kb.deprecate",amend:"kb.amend",supersede:"kb.supersede"} as const)[operation];guardKnowledgeMutation(operationName,repoId,input,ctx);
     this.validateContext(ctx,false); const key=required(input.idempotencyKey,"idempotencyKey"); const inputHash=hash(input); const cached=this.receipt(repoId,operation,key,inputHash);if(cached)return cached;
     return this.db.transaction(()=>{const again=this.receipt(repoId,operation,key,inputHash);if(again)return again;
       const id=required(input.specId,"specId"); const current=this.specState(repoId,id); let result:Record<string,unknown>={operation,specId:id};
       if(operation==="amend"){const revision=this.amend(repoId,id,input,ctx);result={...result,revision,state:current.state};}
       else if(operation==="supersede"){const replacement=required(input.replacementSpecId,"replacementSpecId");const target=this.specState(repoId,replacement);
-        if(target.state==="draft" && input.promoteReplacement===true){this.transition(repoId,replacement,"active",ctx);this.audit(repoId,"promote",replacement,ctx,{state:"active",via:"supersede"});} else if(target.state!=="active")throw new KnowledgeError("replacement_not_active","replacement must be active or explicitly promoted in this transaction",{replacement,state:target.state});
+        if(target.state!=="active")throw new KnowledgeError("replacement_not_active","replacement must already be an active canonical Spec",{replacement,state:target.state});
         if(!["active","stale"].includes(current.state))throw new KnowledgeError("invalid_state_transition",`cannot supersede ${current.state} spec`,{id,state:current.state});
         this.validateRelationPlan(repoId,[{from:id,to:replacement,type:"supersedes"}]);
         this.db.prepare(`INSERT INTO kb_spec_relations(repo_id,from_spec_id,to_spec_id,type,rationale,created_at) VALUES(?,?,?,'supersedes',?,?)`)
           .run(repoId,id,replacement,typeof input.rationale==="string"?input.rationale:null,ctx.now); this.transition(repoId,id,"superseded",ctx); result={...result,replacementSpecId:replacement,state:"superseded"};
-      } else { const target:KbSpecState=operation==="promote"?"active":operation==="mark_stale"?"stale":"deprecated"; this.transition(repoId,id,target,ctx);result={...result,state:target}; }
+      } else { const target:KbSpecState=operation==="mark_stale"?"stale":"deprecated"; this.transition(repoId,id,target,ctx);result={...result,state:target}; }
       this.audit(repoId,operation,id,ctx,{...result,_receipt:{operation,idempotencyKey:key,inputHash,result,createdAt:ctx.now}});this.storeReceipt(repoId,operation,key,inputHash,result,ctx.now);return result;}).immediate();
   }
 
-  private insertDraft(repoId:number,item:DraftSpecInput,ctx:MutationContext,receipt:Record<string,unknown>){
-    this.db.prepare(`INSERT INTO kb_specs(repo_id,spec_id,feature_id,state,current_revision,source_kind,created_at,updated_at) VALUES(?,?,?,'draft',1,'canonical',?,?)`)
+  private insertSpec(repoId:number,item:SpecInput,ctx:MutationContext,receipt:Record<string,unknown>){
+    this.db.prepare(`INSERT INTO kb_specs(repo_id,spec_id,feature_id,state,current_revision,source_kind,created_at,updated_at) VALUES(?,?,?,'active',1,'canonical',?,?)`)
       .run(repoId,item.id,item.featureId??null,ctx.now,ctx.now);
     this.db.prepare(`INSERT INTO kb_spec_revisions(repo_id,spec_id,revision,type,summary,detail,priority,layer,domain,tags,producer,produced_at) VALUES(?,?,1,?,?,?,?,?,?,?,?,?)`)
       .run(repoId,item.id,item.type,item.summary,item.detail??null,item.priority??null,item.layer??null,item.domain??null,JSON.stringify(item.tags??[]),ctx.actor,ctx.now);
@@ -292,7 +299,7 @@ export class KnowledgeService {
       .run(repoId,e.id??`${item.id}:1:${i+1}`,item.id,1,e.sourceType,e.sourceRef,e.exactQuote??null,e.evidenceRef??null,e.contentHash??null,e.confidence??null,ctx.actor,ctx.now);
     for(const a of item.anchors??[]){const p=canonicalRepoPath(a.file);this.db.prepare(`INSERT INTO kb_spec_revision_anchors(repo_id,spec_id,revision,file,symbol,line_start,line_end,content_hash) VALUES(?,?,1,?,?,?,?,?)`)
       .run(repoId,item.id,p,a.symbol??"",a.lineStart??null,a.lineEnd??null,a.contentHash??null);this.db.prepare(`INSERT INTO kb_spec_current_anchors SELECT * FROM kb_spec_revision_anchors WHERE repo_id=? AND spec_id=? AND revision=1 AND file=? AND symbol=?`).run(repoId,item.id,p,a.symbol??"");}
-    this.audit(repoId,"draft_batch",item.id,ctx,{revision:1,_receipt:receipt});
+    this.audit(repoId,"spec_batch",item.id,ctx,{revision:1,state:"active",validation:"passed",_receipt:receipt});
   }
 
   private amend(repoId:number,id:string,input:Record<string,unknown>,ctx:MutationContext){const cur=this.getSpec(repoId,id);const next=(cur.revision as number)+1;
@@ -308,7 +315,7 @@ export class KnowledgeService {
     const featureId=input.featureId===undefined?cur.featureId:input.featureId;optionalCanonical(featureId,"featureId",200);if(featureId!==null&&featureId!==undefined&&!this.db.prepare(`SELECT 1 FROM kb_features WHERE repo_id=? AND feature_id=?`).get(repoId,featureId))throw new KnowledgeError("not_found",`feature not found: ${String(featureId)}`);
     this.db.prepare(`UPDATE kb_specs SET current_revision=?,feature_id=?,updated_at=? WHERE repo_id=? AND spec_id=?`).run(next,featureId,ctx.now,repoId,id);return next;}
 
-  private validateDraft(repoId:number,item:DraftSpecInput){required(item.id,"id",200);oneOf(item.type,KB_SPEC_TYPES,"type");required(item.summary,"summary",300);optionalCanonical(item.featureId,"featureId",200);optionalCanonical(item.priority,"priority",200);optionalCanonical(item.layer,"layer",200);optionalCanonical(item.domain,"domain",200);if(item.detail!==undefined&&[...item.detail].length>20_000)throw new KnowledgeError("validation_error","detail exceeds its character bound");if(item.tags!==undefined&&(!Array.isArray(item.tags)||item.tags.length>50||item.tags.some(x=>{try{required(x,"tag",100);return false;}catch{return true;}})))throw new KnowledgeError("validation_error","tags must be canonical bounded strings");if(this.db.prepare(`SELECT 1 FROM kb_specs WHERE repo_id=? AND spec_id=?`).get(repoId,item.id))throw new KnowledgeError("already_exists",`spec exists: ${item.id}`);
+  private validateSpecInput(repoId:number,item:SpecInput){required(item.id,"id",200);oneOf(item.type,KB_SPEC_TYPES,"type");required(item.summary,"summary",300);optionalCanonical(item.featureId,"featureId",200);optionalCanonical(item.priority,"priority",200);optionalCanonical(item.layer,"layer",200);optionalCanonical(item.domain,"domain",200);if(item.detail!==undefined&&[...item.detail].length>20_000)throw new KnowledgeError("validation_error","detail exceeds its character bound");if(item.tags!==undefined&&(!Array.isArray(item.tags)||item.tags.length>50||item.tags.some(x=>{try{required(x,"tag",100);return false;}catch{return true;}})))throw new KnowledgeError("validation_error","tags must be canonical bounded strings");if(this.db.prepare(`SELECT 1 FROM kb_specs WHERE repo_id=? AND spec_id=?`).get(repoId,item.id))throw new KnowledgeError("already_exists",`spec exists: ${item.id}`);
     if(item.featureId&&!this.db.prepare(`SELECT 1 FROM kb_features WHERE repo_id=? AND feature_id=?`).get(repoId,item.featureId))throw new KnowledgeError("not_found",`feature not found: ${item.featureId}`);if(!Array.isArray(item.evidence)||!item.evidence.length)throw new KnowledgeError("validation_error",`evidence required for ${item.id}`);item.evidence.forEach(e=>this.validateEvidence(e));item.anchors?.forEach(a=>this.validateAnchor(a));item.relations?.forEach(r=>{oneOf(r.type,KB_RELATION_TYPES,"relation type");required(r.toSpecId,"relation.toSpecId",200);if(r.rationale!==undefined&&[...r.rationale].length>20_000)throw new KnowledgeError("validation_error","relation rationale exceeds its character bound");});}
   private validateEvidence(e:KbEvidenceInput){optionalCanonical(e.id,"evidence.id",200);required(e.sourceType,"sourceType",200);required(e.sourceRef,"sourceRef",2000);optionalCanonical(e.evidenceRef,"evidenceRef",2000);optionalCanonical(e.contentHash,"contentHash",200);if(e.exactQuote!==undefined&&[...e.exactQuote].length>20_000)throw new KnowledgeError("validation_error","exactQuote exceeds its character bound");if(e.exactQuote===undefined&&e.evidenceRef===undefined&&e.contentHash===undefined)throw new KnowledgeError("validation_error","evidence needs exactQuote, evidenceRef, or contentHash");if(e.confidence!==undefined&&(e.confidence<0||e.confidence>1))throw new KnowledgeError("validation_error","confidence must be between 0 and 1");}
   private validateAnchor(a:KbAnchorInput){canonicalPath(a.file,"anchor.file");optionalCanonical(a.contentHash,"anchor.contentHash",200);if(a.symbol!==undefined&&[...a.symbol].length>500)throw new KnowledgeError("validation_error","anchor symbol exceeds its character bound");if(a.lineStart!==undefined&&a.lineStart<1)throw new KnowledgeError("validation_error","lineStart must be positive");if(a.lineEnd!==undefined&&(a.lineStart===undefined||a.lineEnd<a.lineStart))throw new KnowledgeError("validation_error","lineEnd requires lineStart and must not precede it");}

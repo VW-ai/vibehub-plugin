@@ -1,0 +1,77 @@
+spec_id: "contract-ticket-context-binding-001"
+type: contract
+state: active
+intent:
+  summary: "A Ticket execution starts from one bounded, exact, fail-closed context binding rather than conversation memory or a mutable latest pointer."
+  detail: |
+    The v0 compiler binds the current Ticket revision and graph, exact direct
+    prerequisite Outcomes, dynamically verified relevant current Decisions
+    and their exact authority receipts, repository/worktree/branch identity,
+    the execution-start code source, and every authored context reference.
+    Repository file and directory references are expanded deterministically
+    into bounded UTF-8 files with path, byte length, and content digest.
+    Missing, ambiguous, overlapping, symlinked, special, binary, changing, or
+    oversized required context fails closed. Git administration paths and the
+    semantic Ticket ledger cannot be copied back into the generic file packet:
+    Ticket, Decision, receipt, prerequisite Outcome, and graph identity enter
+    through their first-class binding fields. Claim recompiles the authored
+    context manifest before execution begins, so an ignored-file change that
+    Git status cannot see still invalidates the binding.
+
+    The Git ContextBinding stores the exact manifest and packet digest. The
+    operation response supplies the bounded contents to the fresh Agent.
+    ContextBinding is a semantic fact; live ownership and heartbeat remain
+    disposable Run coordination. Feature Room v0 is consumed through its
+    checked-in Specs, mapping artifacts, and provenance refs. A generic
+    provider framework is deliberately deferred. Decision verification stays
+    dynamic after closeout: revoked or otherwise non-current authority keeps
+    the recorded binding and Outcome traceable but withdraws operational DONE
+    and downstream eligibility.
+constraints:
+  - kind: must
+    rule: "Bind exact Ticket ID and revision, graph digest, direct prerequisite successful Outcomes, dynamically verified relevant Decisions and exact verification refs, repository incarnation, worktree identity, branch, starting HEAD, and non-ledger worktree source digest including dirty worktree bytes, staged blob IDs, and modes"
+  - kind: must
+    rule: "Resolve authored context references as canonical repository-relative regular UTF-8 files or bounded directories and preserve purpose, path, digest, and byte length"
+  - kind: must
+    rule: "Fail closed on stale Ticket/source, unresolved prerequisites, unverified, revoked, tampered, changed, or non-authorizing relevant Decision authority, missing or overlapping paths, symlinks, special or binary files, source movement, and declared capacity overflow"
+  - kind: must
+    rule: "Reject any case-folded .git path segment and any generic context ref that names, descends from, or contains .vibehub/tickets; bind Ticket, graph, Decision, verification, and prerequisite Outcome semantics only through first-class fields"
+  - kind: must
+    rule: "Before claim, recompile the current authored context references and require their exact ordered manifest and content digest to match the stored ContextBinding, including ignored files and new files inside referenced directories"
+  - kind: must
+    rule: "Revalidate bound Decision authority for current operational completion and downstream eligibility without deleting the durable ContextBinding or Outcome when authority is withdrawn"
+  - kind: must
+    rule: "Apply the current forbidden-context-ref policy when deriving operational DONE and downstream eligibility; preserve raw historical facts but withdraw operational completion for a now-invalid binding"
+  - kind: must
+    rule: "Persist the bounded manifest and packet digest in Git while returning file contents only in the compiled execution packet"
+  - kind: must_not
+    rule: "Do not treat conversation memory, SQLite, a mutable latest pointer, or an unverified review claim as required execution context"
+  - kind: must_not
+    rule: "Do not generalize v0 into a provider marketplace or copy the whole repository into every ContextBinding"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket, execution, context, git, worktree, feature-room]
+provenance:
+  source_type: implementation_design
+  confidence: 0.98
+  source_ref: "M4 MR-ready context-binding settlement — 2026-07-30"
+  produced_by_agent: "implementation"
+  produced_at: "2026-07-30"
+relations:
+  - target: "decision-ticket-context-binding-001"
+    type: supersedes
+    detail: "Resolves the open question as an objectively adjudicable Agent-owned technical contract; no human ratification gate is required."
+  - target: "decision-ticket-contract-002"
+    type: depends_on
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+  - target: "decision-ticket-graph-lifecycle-002"
+    type: depends_on
+anchors:
+  - file: "packages/core/src/ticket-context-compiler.ts"
+  - file: "packages/core/src/git-facade.ts"
+  - file: "packages/core/src/ticket-ledger"
+  - file: "skills/vibehub-ticket-run/SKILL.md"

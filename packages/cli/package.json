@@ -1,7 +1,7 @@
 {
   "name": "@vw-ai/vibehub-cli",
   "version": "0.3.0",
-  "description": "Vibehub workbench CLI — thin adapter over @vw-ai/vibehub-core (decision-project-013: zero LLM, zero business logic; parsing + output formatting only).",
+  "description": "VibeHub local CLI and installed host adapter for deterministic project context, Ticket operations, and lifecycle evidence.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -26,15 +26,18 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node scripts/generate-operation-contracts.mjs && node scripts/copy-managed-assets.mjs",
+    "build": "node ../../scripts/clean-package-dist.mjs && tsc -p tsconfig.build.json && node scripts/generate-operation-contracts.mjs && node scripts/copy-managed-assets.mjs",
+    "pretest": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
-    "@vw-ai/vibehub-core": "workspace:*"
+    "@vw-ai/vibehub-core": "workspace:*",
+    "better-sqlite3": "^11.8.0"
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/better-sqlite3": "^7.6.12",
     "ajv": "^8.18.0",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"

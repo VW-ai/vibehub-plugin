@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Ticket Validate"
+  short_description: "Independently validate executable Ticket graphs"
+  default_prompt: "Use $vibehub-ticket-validate to independently validate this Ticket graph or exact patch candidate."

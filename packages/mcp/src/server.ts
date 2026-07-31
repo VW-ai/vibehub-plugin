@@ -1,13 +1,20 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { operationContextSchema } from "@vw-ai/vibehub-core";
 import { z } from "zod";
-import { createCapabilities, type CapabilityContext } from "./capabilities.js";
+import {
+  createCapabilities,
+  DISTILL_OPERATION_NAMES,
+  KB_OPERATION_NAMES,
+  TICKET_OPERATION_NAMES,
+  type CapabilityContext,
+} from "./capabilities.js";
 
 const scopeItem = z.object({ glob: z.string().min(1), label: z.string().optional() });
 const logicalRequestId = operationContextSchema.shape.requestId.optional();
 export const WORKBENCH_MCP_VERSION = "0.3.0";
 export const WORKBENCH_MCP_TOOL_NAMES = [
-  "register_scope", "self_report", "kb_retrieve", "kb_operation", "distill_operation", "get_manual",
+  "register_scope", "self_report", "kb_retrieve", "kb_operation",
+  "distill_operation", "ticket_operation", "get_manual",
 ] as const;
 
 const result = (value: unknown) => ({
@@ -22,6 +29,7 @@ export interface WorkbenchMcpServer {
   server: {
     oninitialized?: () => void | Promise<void>;
     getClientCapabilities(): { roots?: unknown } | undefined;
+    getClientVersion(): { name: string; version: string } | undefined;
     listRoots(): Promise<{ roots: Array<{ uri: string }> }>;
   };
   connect(transport: unknown): Promise<void>;
@@ -31,7 +39,10 @@ export interface WorkbenchMcpServer {
 export function createWorkbenchMcpServer(
   context: CapabilityContext | PromiseLike<CapabilityContext>,
 ): WorkbenchMcpServer {
-  const api = async () => createCapabilities(await context);
+  // Resolve capabilities once per MCP connection so its claimed actor remains
+  // stable for every operation in that session, including Run credentials.
+  const capabilities = Promise.resolve(context).then(createCapabilities);
+  const api = async () => capabilities;
   const server = new McpServer(
     { name: "vibehub-local", version: WORKBENCH_MCP_VERSION },
     { instructions: "Vibehub MCP exposes deterministic local capabilities. Semantic workflows live in vibehub skills." },
@@ -73,7 +84,7 @@ export function createWorkbenchMcpServer(
     description: "Symmetric adapter over the shared OperationDispatcher. Returns the exact success/error envelope used by `vibehub kb ... --json`.",
     inputSchema: {
       requestId: logicalRequestId,
-      operation: z.string().min(1),
+      operation: z.enum(KB_OPERATION_NAMES as [string, ...string[]]),
       input: z.record(z.string(), z.unknown()).optional(),
     },
   }, async ({ operation, input, requestId }) => operationEnvelopeResult((await api()).dispatchKnowledge(operation, input ?? {}, requestId)));
@@ -83,12 +94,24 @@ export function createWorkbenchMcpServer(
     description: "Symmetric adapter over DistillationService through the shared OperationDispatcher. Skills own semantic choices; this tool only validates and persists run mechanics.",
     inputSchema: {
       requestId: logicalRequestId,
-      operation: z.string().min(1),
+      operation: z.enum(DISTILL_OPERATION_NAMES as [string, ...string[]]),
       input: z.record(z.string(), z.unknown()).optional(),
     },
   }, async ({ operation, input, requestId }) => operationEnvelopeResult((await api()).dispatchOperation(operation, input ?? {}, requestId)));
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
+    title: "Dispatch one canonical Ticket operation",
+    description: "Read the current Git-native Ticket graph, compile exact execution context, coordinate a bounded Run, append evidence or independent closeout, apply one validated exact-base worktree patch, or append review facts. Ticket Decisions fail closed unless a trusted host injects exact human authority; the generic MCP runtime never does. Ticket semantics come from the trusted workspace path, never SQLite; Skills own planning and judgment.",
+    inputSchema: {
+      requestId: logicalRequestId,
+      operation: z.enum(TICKET_OPERATION_NAMES),
+      input: z.record(z.string(), z.unknown()).optional(),
+    },
+  }, async ({ operation, input, requestId }) => operationEnvelopeResult(
+    (await api()).dispatchTicket(operation, input ?? {}, requestId),
+  ));
+
+  server.registerTool(WORKBENCH_MCP_TOOL_NAMES[6], {
     title: "Read the Vibehub agent manual",
     description: "Return reference material about component boundaries and available skills. Not required before routine work.",
     inputSchema: { topic: z.string().optional() },

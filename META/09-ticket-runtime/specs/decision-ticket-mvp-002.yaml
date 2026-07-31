@@ -1,0 +1,75 @@
+spec_id: "decision-ticket-mvp-002"
+type: decision
+state: superseded
+intent:
+  summary: "第一版 Ticket dogfood 是 Git documents + Skills + deterministic scripts + graph HTML + disposable runtime，而不是一套重型发布服务。"
+  detail: |
+    **Decision**: The pivot is a breaking early-stage replacement, not a
+    compatibility migration.
+
+    The first complete dogfood loop consists of:
+
+    1. a small Git document protocol that reconstructs Tickets, typed
+       relations, proposals, validation, decisions, Outcomes, and Evidence;
+    2. planning, validation, apply, execution, and closeout Skills whose bundled
+       scripts provide deterministic mechanics;
+    3. the accepted graph HTML as a pure projection and review/edit surface;
+    4. optional disposable SQLite coordination for live Runs and caches;
+    5. one real Plugin feature completed through the loop.
+
+    Existing graph projection, layout, Skill reasoning, Git scope utilities,
+    canonical validation, and stale-digest checks should be reused. The
+    SQLite semantic ledgers, generation/latest protocol, trusted-provider
+    authority bridge, cross-store recovery fence, and their compatibility
+    obligations must be removed rather than left behind as deprecated or
+    unreachable compatibility code.
+
+    Implementation follows
+    `artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md`.
+constraints:
+  - kind: must
+    rule: "The MVP proves plan, optional human review or delegation, execution, validation, Outcome, Evidence, and follow-up work through Git-readable facts"
+  - kind: must
+    rule: "A fresh Agent and a fresh process can reconstruct the complete semantic loop without the local SQLite database"
+  - kind: must
+    rule: "The accepted graph UI remains usable while becoming a pure Git-document projection"
+  - kind: must
+    rule: "The pivot is incomplete until retired Ticket DB schema, services, operation contracts, adapters, exports, generated glue, tests, fixtures, and active documentation are deleted or deliberately rewritten for the Git-native path"
+  - kind: must_not
+    rule: "Do not implement compatibility migration, semantic dual-write, a generic workflow engine, daemon hosting, remote authentication, or multi-host arbitration in this pivot"
+  - kind: must_not
+    rule: "Do not leave deprecated code paths, unused tables or triggers, dead exports, commented-out implementations, or legacy compatibility shells after cutover"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [mvp, dogfood, git, skills, html, disposable-runtime, breaking-pivot]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.92
+  source_ref: "Wayne requested ingestion and planning of the Git-native Skill-driven Ticket pivot — 2026-07-29"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29"
+relations:
+  - target: "decision-ticket-mr-ready-boundary-001"
+    type: superseded_by
+    detail: "The implementation boundary is now M4 MR readiness; this decision's real Plugin-feature proof remains post-merge M5."
+  - target: "decision-ticket-mvp-001"
+    type: supersedes
+    detail: "Replaces the trusted-host and cross-store application MVP."
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: depends_on
+  - target: "decision-ticket-contract-002"
+    type: depends_on
+  - target: "decision-ticket-graph-lifecycle-002"
+    type: depends_on
+  - target: "decision-ticket-review-surface-001"
+    type: depends_on
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md"
+  - file: "skills"
+  - file: "packages/core"
+  - file: "packages/cli/assets/ticket-review-host"

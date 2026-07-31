@@ -76,6 +76,37 @@ if (codexManifest.interface?.brandColor !== "#3E7D4C") {
 if (!existsSync(join(pluginRoot, "runtime", "vibehub-runtime.mjs"))) {
   throw new Error("thin npm runtime launcher is missing");
 }
+for (const relativePath of [
+  join("skills", "vibehub-ticket-plan", "SKILL.md"),
+  join("skills", "vibehub-ticket-plan", "agents", "openai.yaml"),
+  join("skills", "vibehub-ticket-validate", "SKILL.md"),
+  join("skills", "vibehub-ticket-validate", "agents", "openai.yaml"),
+  join("skills", "vibehub-ticket-review", "SKILL.md"),
+  join("skills", "vibehub-ticket-review", "agents", "openai.yaml"),
+  join("skills", "vibehub-ticket-run", "SKILL.md"),
+  join("skills", "vibehub-ticket-run", "agents", "openai.yaml"),
+  join("skills", "vibehub-ticket-closeout", "SKILL.md"),
+  join("skills", "vibehub-ticket-closeout", "agents", "openai.yaml"),
+  join("skills", "scripts", "vh-ticket.mjs"),
+  join("skills", "scripts", "vh-ticket-review.mjs"),
+]) {
+  if (!existsSync(join(pluginRoot, relativePath))) {
+    throw new Error(`Ticket Skill release asset is missing: ${relativePath}`);
+  }
+}
+for (const relativePath of [
+  join("docs", "assets", "ticket-system", "ticket-graph-overview.jpg"),
+  join("docs", "assets", "ticket-system", "ticket-execution-inspector.jpg"),
+]) {
+  const image = join(pluginRoot, relativePath);
+  if (!existsSync(image)) {
+    throw new Error(`Ticket README image is missing: ${relativePath}`);
+  }
+  const bytes = readFileSync(image);
+  if (bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff) {
+    throw new Error(`Ticket README image is not a JPEG: ${relativePath}`);
+  }
+}
 for (const forbidden of ["packages", "node_modules"]) {
   if (existsSync(join(pluginRoot, forbidden))) {
     throw new Error(`thin release must not contain ${forbidden}`);

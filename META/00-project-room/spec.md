@@ -14,9 +14,10 @@ context、change 等可复用语义进入 durable knowledge lifecycle。
 
 ## Current Architecture
 
-- SQLite 仍是当前 canonical source of truth。
-- Git/YAML semantic store 是 draft exploration；在无损 round-trip spike 与
-  正式评审通过前，不改变现行读写契约。
+- Git/YAML 是 durable knowledge 与 Ticket semantics 的 canonical source of
+  truth；branch、worktree、commit 与 merge 保持协作语义。
+- SQLite 只保存运行协调、hook/event evidence、可重建 projection/cache 与尚未
+  切入 Git authority 的 legacy repository state；它不拥有 Ticket meaning。
 - Claude Code 与 Codex 使用同一 core、knowledge database、skills、MCP、
   repo/worktree identity 与 typed receipt contract。
 - App 通过稳定 projection/read model 消费运行时，不能直接拥有第二套业务逻辑。
@@ -25,18 +26,23 @@ context、change 等可复用语义进入 durable knowledge lifecycle。
 
 - [intent-project-001] 开源 local-first plugin/runtime 的产品定位
 - [decision-project-013] library-first core + 薄 CLI/MCP adapter
-- [decision-project-014] 当前 SQLite source of truth
+- [decision-project-028] per-repository Git semantic authority 与 SQLite
+  operational/cache boundary
 - [decision-project-015] Apache-2.0
 - [decision-workbench-016] 跨 workflow presentation protocol
 - [change-2026-07-18-presentation-rollout] presentation protocol 已接通
   setup/query/ingest/distill/inject/checkpoint 的真实 surfaces
+- [constraint-project-quiet-intelligence-001] Codex-like quiet intelligence：
+  轻、静、克制，但每个细节都能回应
 
-## Draft Direction
+## Active Direction
 
-- [intent-project-004] 探索 Git/YAML 作为 durable semantic canonical layer；
-  只有正式 supersede `decision-project-014` 后才可切换。
+- [intent-project-004] 已通过 `decision-project-028` 落地为 per-repository
+  Git/YAML durable semantic authority。
 - [decision-brand-logo-001] (draft) A Balanced 三块 territory 方案作为
   VibeHub 正式 Logo 基准，并以本地 SVG 资产展示在 README。
+- [intent-ticket-runtime-001] 把 durable semantic state 编译为严格的 Ticket
+  Graph；M4 先达到 MR-ready，真实 Plugin feature dogfood 延后到 M5。
 
 ## Repository Rules
 

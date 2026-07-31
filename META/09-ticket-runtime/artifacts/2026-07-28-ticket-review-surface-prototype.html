@@ -1,0 +1,1674 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ticket Runtime — Scenario Review Prototype</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --canvas: #e8eef1;
+      --paper: #f8faf9;
+      --paper-strong: #ffffff;
+      --ink: #13212b;
+      --muted: #667681;
+      --line: #c7d2d8;
+      --line-strong: #91a2ac;
+      --blue: #2856d8;
+      --blue-soft: #dfe7ff;
+      --teal: #237a78;
+      --teal-soft: #dff1ee;
+      --amber: #b97012;
+      --amber-soft: #faebcc;
+      --coral: #c84e45;
+      --coral-soft: #fae2df;
+      --shadow: 0 18px 50px rgba(35, 56, 68, 0.10);
+      --display: "Avenir Next", "Segoe UI Variable Display", "Segoe UI", sans-serif;
+      --body: "Avenir Next", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 320px;
+      background: var(--canvas);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(108, 134, 146, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108, 134, 146, 0.08) 1px, transparent 1px),
+        var(--canvas);
+      background-size: 24px 24px;
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(40, 86, 216, 0.28);
+      outline-offset: 2px;
+    }
+
+    .app {
+      width: min(1580px, calc(100% - 32px));
+      margin: 16px auto;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto auto;
+      gap: 24px;
+      align-items: center;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(248, 250, 249, 0.96);
+    }
+
+    .brand {
+      display: flex;
+      gap: 13px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      left: 7px;
+      right: 7px;
+      height: 2px;
+      background: var(--ink);
+      transform-origin: left center;
+    }
+
+    .brand-mark::before {
+      top: 12px;
+      transform: rotate(18deg);
+    }
+
+    .brand-mark::after {
+      bottom: 11px;
+      transform: rotate(-18deg);
+    }
+
+    .eyebrow {
+      margin: 0 0 3px;
+      color: var(--muted);
+      font: 650 10px/1.2 var(--mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .project-name {
+      margin: 0;
+      overflow: hidden;
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 720;
+      letter-spacing: -0.02em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .plan-meta {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      color: var(--muted);
+      font: 600 11px/1.2 var(--mono);
+    }
+
+    .plan-meta strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .button {
+      min-height: 38px;
+      padding: 9px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 9px;
+      background: var(--paper-strong);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+    }
+
+    .button:hover {
+      border-color: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    .button.primary {
+      border-color: var(--blue);
+      color: white;
+      background: var(--blue);
+    }
+
+    .button.ghost {
+      background: transparent;
+    }
+
+    .button.small {
+      min-height: 31px;
+      padding: 6px 9px;
+      font-size: 11px;
+    }
+
+    .status-strip {
+      display: flex;
+      min-height: 38px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 9px 22px;
+      color: #183a3a;
+      border-bottom: 1px solid #bddbd6;
+      background: var(--teal-soft);
+      font-size: 12px;
+    }
+
+    .status-strip strong {
+      margin-right: 7px;
+    }
+
+    .status-strip .signal {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .status-strip .signal::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+      content: "";
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 250px minmax(560px, 1fr) 310px;
+      min-height: 760px;
+    }
+
+    .scenario-rail {
+      padding: 22px 15px 18px;
+      border-right: 1px solid var(--line);
+      background: #f2f6f6;
+    }
+
+    .rail-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 7px 14px;
+    }
+
+    .rail-head h2,
+    .attention-head h2 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: 13px;
+      font-weight: 760;
+      letter-spacing: -0.01em;
+    }
+
+    .count {
+      color: var(--muted);
+      font: 650 10px/1 var(--mono);
+    }
+
+    .scenario-list {
+      display: grid;
+      gap: 5px;
+    }
+
+    .scenario-button {
+      position: relative;
+      display: grid;
+      width: 100%;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      padding: 12px 10px;
+      text-align: left;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .scenario-button:hover {
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .scenario-button[aria-current="true"] {
+      border-color: #a9b7bd;
+      background: var(--paper-strong);
+      box-shadow: 0 7px 24px rgba(35, 56, 68, 0.08);
+    }
+
+    .scenario-button[aria-current="true"]::before {
+      position: absolute;
+      top: 9px;
+      bottom: 9px;
+      left: -5px;
+      width: 3px;
+      border-radius: 3px;
+      background: var(--blue);
+      content: "";
+    }
+
+    .scenario-number {
+      padding-top: 2px;
+      color: var(--muted);
+      font: 700 10px/1.25 var(--mono);
+    }
+
+    .scenario-copy strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      line-height: 1.28;
+    }
+
+    .scenario-copy span {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .dot.amber {
+      background: var(--amber);
+    }
+
+    .dot.coral {
+      background: var(--coral);
+    }
+
+    .rail-summary {
+      margin: 20px 7px 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .rail-summary p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .agent-decisions {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      color: var(--teal);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .agent-decisions svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .workspace {
+      min-width: 0;
+      background: var(--paper-strong);
+    }
+
+    .scenario-deck {
+      padding: 29px 32px 27px;
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 84% 22%, rgba(40, 86, 216, 0.08), transparent 30%),
+        var(--paper-strong);
+    }
+
+    .scenario-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 15px;
+    }
+
+    .scenario-id {
+      color: var(--blue);
+      font: 750 11px/1 var(--mono);
+      letter-spacing: 0.06em;
+    }
+
+    .badge {
+      display: inline-flex;
+      min-height: 24px;
+      align-items: center;
+      padding: 4px 8px;
+      border: 1px solid #b6c4ca;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.75);
+      font: 700 10px/1 var(--mono);
+      text-transform: uppercase;
+    }
+
+    .badge.ready {
+      color: #185f58;
+      border-color: #9dcec5;
+      background: var(--teal-soft);
+    }
+
+    .badge.attention {
+      color: #8f4d08;
+      border-color: #e2c37f;
+      background: var(--amber-soft);
+    }
+
+    .scenario-title {
+      max-width: 760px;
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(29px, 3.2vw, 45px);
+      font-weight: 740;
+      letter-spacing: -0.045em;
+      line-height: 1.04;
+    }
+
+    .scenario-promise {
+      max-width: 760px;
+      margin: 15px 0 24px;
+      color: #42545f;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .scenario-contract {
+      display: grid;
+      grid-template-columns: 0.8fr 1fr 1.2fr;
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--line);
+    }
+
+    .contract-cell {
+      min-height: 88px;
+      padding: 14px;
+      background: rgba(248, 250, 249, 0.96);
+    }
+
+    .contract-cell span {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font: 700 9px/1 var(--mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .contract-cell p {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.42;
+    }
+
+    .graph-panel {
+      position: relative;
+      min-height: 440px;
+      padding: 0 32px 36px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(119, 142, 153, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(119, 142, 153, 0.08) 1px, transparent 1px),
+        #fbfcfc;
+      background-size: 22px 22px;
+    }
+
+    .horizon {
+      position: relative;
+      display: flex;
+      height: 64px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .horizon::before {
+      position: absolute;
+      right: -32px;
+      bottom: 0;
+      left: -32px;
+      height: 2px;
+      background: var(--blue);
+      content: "";
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: draw-horizon 700ms cubic-bezier(.2,.75,.25,1) 120ms forwards;
+    }
+
+    .horizon-label {
+      position: relative;
+      z-index: 1;
+      padding-right: 10px;
+      color: var(--blue);
+      background: #fbfcfc;
+      font: 760 10px/1 var(--mono);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .horizon-note {
+      position: relative;
+      z-index: 1;
+      padding-left: 10px;
+      color: var(--muted);
+      background: #fbfcfc;
+      font-size: 10px;
+    }
+
+    @keyframes draw-horizon {
+      to { transform: scaleX(1); }
+    }
+
+    .graph-toolbar {
+      display: flex;
+      min-height: 56px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .graph-toolbar h3 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: 13px;
+    }
+
+    .view-toggle {
+      display: flex;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #eef3f4;
+    }
+
+    .view-toggle button {
+      padding: 5px 9px;
+      border: 0;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .view-toggle button[aria-pressed="true"] {
+      color: var(--ink);
+      background: white;
+      box-shadow: 0 2px 8px rgba(35, 56, 68, 0.12);
+    }
+
+    .ticket-flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(140px, 1fr));
+      gap: 46px;
+      padding: 18px 0 8px;
+    }
+
+    .ticket-column {
+      position: relative;
+      min-width: 0;
+    }
+
+    .ticket-column:not(:last-child)::after {
+      position: absolute;
+      top: 34px;
+      left: calc(100% + 7px);
+      width: 32px;
+      height: 1px;
+      background: var(--line-strong);
+      content: "";
+    }
+
+    .ticket-column:not(:last-child)::before {
+      position: absolute;
+      z-index: 1;
+      top: 30px;
+      right: -40px;
+      width: 7px;
+      height: 7px;
+      border-top: 1px solid var(--line-strong);
+      border-right: 1px solid var(--line-strong);
+      content: "";
+      transform: rotate(45deg);
+    }
+
+    .ticket {
+      width: 100%;
+      padding: 13px;
+      text-align: left;
+      border: 1px solid #aebcc3;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 6px 18px rgba(35, 56, 68, 0.06);
+      cursor: pointer;
+      transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+    }
+
+    .ticket:hover,
+    .ticket.selected {
+      border-color: var(--blue);
+      box-shadow: 0 8px 24px rgba(40, 86, 216, 0.13);
+      transform: translateY(-2px);
+    }
+
+    .ticket-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 9px;
+    }
+
+    .ticket-id {
+      color: var(--muted);
+      font: 700 9px/1 var(--mono);
+    }
+
+    .ticket-state {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      color: var(--teal);
+      font: 720 9px/1 var(--mono);
+      text-transform: uppercase;
+    }
+
+    .ticket-state::before {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+
+    .ticket-state.blocked {
+      color: var(--amber);
+    }
+
+    .ticket-title {
+      display: block;
+      min-height: 32px;
+      font-size: 12px;
+      font-weight: 760;
+      line-height: 1.33;
+    }
+
+    .ticket-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--muted);
+      font: 650 9px/1 var(--mono);
+    }
+
+    .leaf-stack {
+      display: grid;
+      max-height: 0;
+      gap: 6px;
+      margin-top: 9px;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 250ms ease, opacity 180ms ease;
+    }
+
+    .graph-panel.show-leaves .leaf-stack {
+      max-height: 220px;
+      opacity: 1;
+    }
+
+    .leaf-ticket {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 9px 10px;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #43545f;
+      background: rgba(248, 250, 249, 0.94);
+      cursor: pointer;
+      font-size: 10px;
+      line-height: 1.3;
+    }
+
+    .leaf-ticket:hover {
+      border-color: var(--line-strong);
+      color: var(--ink);
+    }
+
+    .leaf-ticket code {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font: 650 8px/1.45 var(--mono);
+    }
+
+    .attention {
+      padding: 22px 18px;
+      border-left: 1px solid var(--line);
+      background: #f4f7f7;
+    }
+
+    .attention-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 13px;
+      padding: 0 3px;
+    }
+
+    .attention-count {
+      display: inline-flex;
+      min-width: 22px;
+      height: 22px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #8f4d08;
+      background: var(--amber-soft);
+      font: 750 10px/1 var(--mono);
+    }
+
+    .attention-list {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .attention-item {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ddc58f;
+      border-radius: 10px;
+      background: #fffaf0;
+      cursor: pointer;
+    }
+
+    .attention-item.deviation {
+      border-color: #e0aaa5;
+      background: #fff7f6;
+    }
+
+    .attention-item:hover {
+      border-color: var(--ink);
+    }
+
+    .attention-item .type {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 7px;
+      color: var(--amber);
+      font: 750 9px/1 var(--mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .attention-item.deviation .type {
+      color: var(--coral);
+    }
+
+    .attention-item strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .attention-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .inspector {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+    }
+
+    .inspector-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #edf2f3;
+    }
+
+    .inspector-head span {
+      color: var(--muted);
+      font: 750 9px/1 var(--mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .icon-button {
+      display: inline-grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: white;
+      cursor: pointer;
+    }
+
+    .icon-button:hover {
+      border-color: var(--ink);
+    }
+
+    .icon-button svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .inspector-body {
+      padding: 14px;
+    }
+
+    .inspector-body code {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue);
+      font: 720 9px/1 var(--mono);
+    }
+
+    .inspector-title {
+      margin: 0 0 12px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .inspector-outcome {
+      margin: 0 0 13px;
+      color: #4e5f69;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .inspector-facts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 0 0 15px;
+    }
+
+    .inspector-facts div {
+      padding: 8px;
+      border-radius: 7px;
+      background: #f1f5f5;
+    }
+
+    .inspector-facts dt {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font: 700 8px/1 var(--mono);
+      text-transform: uppercase;
+    }
+
+    .inspector-facts dd {
+      margin: 0;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .comment-thread {
+      padding-top: 13px;
+      border-top: 1px solid var(--line);
+    }
+
+    .comment-thread h3 {
+      margin: 0 0 10px;
+      font-size: 11px;
+    }
+
+    .comment {
+      display: grid;
+      grid-template-columns: 23px 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .avatar {
+      display: grid;
+      width: 23px;
+      height: 23px;
+      place-items: center;
+      border-radius: 50%;
+      color: white;
+      background: var(--ink);
+      font: 750 8px/1 var(--mono);
+    }
+
+    .comment p {
+      margin: 0;
+      color: #465863;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .comment p strong {
+      color: var(--ink);
+    }
+
+    .comment-form {
+      display: grid;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .comment-form textarea,
+    .edit-form input,
+    .edit-form textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: #fafcfc;
+    }
+
+    .comment-form textarea {
+      min-height: 66px;
+      padding: 9px;
+      resize: vertical;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .comment-form button {
+      justify-self: end;
+    }
+
+    .edit-form {
+      display: none;
+      gap: 8px;
+      padding: 14px;
+      border-top: 1px solid var(--line);
+      background: #f8faf9;
+    }
+
+    .edit-form.open {
+      display: grid;
+    }
+
+    .edit-form label {
+      color: var(--muted);
+      font: 700 8px/1 var(--mono);
+      text-transform: uppercase;
+    }
+
+    .edit-form input,
+    .edit-form textarea {
+      padding: 8px;
+      font-size: 10px;
+    }
+
+    .edit-form textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .prototype-note {
+      padding: 12px 20px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: #edf2f3;
+      font: 600 9px/1.4 var(--mono);
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 20;
+      right: 24px;
+      bottom: 24px;
+      max-width: 340px;
+      padding: 13px 15px;
+      color: white;
+      border-radius: 10px;
+      background: var(--ink);
+      box-shadow: 0 12px 30px rgba(19, 33, 43, 0.25);
+      font-size: 11px;
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1180px) {
+      .layout {
+        grid-template-columns: 220px minmax(500px, 1fr);
+      }
+
+      .attention {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+        gap: 18px;
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+
+      .attention-head {
+        grid-column: 1 / -1;
+        margin-bottom: -4px;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .app {
+        width: min(100% - 16px, 680px);
+        max-width: calc(100vw - 16px);
+        margin: 8px auto;
+        border-radius: 12px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .plan-meta {
+        display: none;
+      }
+
+      .top-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+
+      .top-actions .button {
+        min-width: 0;
+        padding-right: 8px;
+        padding-left: 8px;
+        white-space: normal;
+      }
+
+      .status-strip {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      .scenario-rail {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .scenario-list {
+        width: 100%;
+        grid-auto-columns: minmax(210px, 75%);
+        grid-auto-flow: column;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+      }
+
+      .scenario-button {
+        scroll-snap-align: start;
+      }
+
+      .rail-summary {
+        display: none;
+      }
+
+      .scenario-deck,
+      .graph-panel {
+        min-width: 0;
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+
+      .scenario-kicker {
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .scenario-title,
+      .scenario-promise {
+        overflow-wrap: anywhere;
+      }
+
+      .scenario-contract {
+        grid-template-columns: 1fr;
+      }
+
+      .ticket-flow {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .ticket-column:not(:last-child)::after,
+      .ticket-column:not(:last-child)::before {
+        display: none;
+      }
+
+      .attention {
+        display: block;
+      }
+
+      .attention-list {
+        margin-bottom: 14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <p class="eyebrow">Ticket orchestration</p>
+          <p class="project-name">VibeHub · Ticket Runtime dogfood</p>
+        </div>
+      </div>
+      <div class="plan-meta" aria-label="Plan metadata">
+        <span>PLAN <strong>rev 07</strong></span>
+        <span>SCENARIOS <strong>5</strong></span>
+        <span>TICKETS <strong>23</strong></span>
+      </div>
+      <div class="top-actions">
+        <button class="button ghost" id="delegateButton">Delegate &amp; run</button>
+        <button class="button primary" id="approveButton">Approve scenario plan</button>
+      </div>
+    </header>
+
+    <div class="status-strip" id="statusStrip">
+      <span class="signal"><strong>Ready for your review.</strong> Two boundaries need attention; 17 implementation decisions remain delegated.</span>
+      <span>Only the scenario plan is waiting on you.</span>
+    </div>
+
+    <div class="layout">
+      <nav class="scenario-rail" aria-label="Core scenarios">
+        <div class="rail-head">
+          <h2>Core scenarios</h2>
+          <span class="count">5 / 5</span>
+        </div>
+        <div class="scenario-list" id="scenarioList">
+          <button class="scenario-button" data-scenario="orchestrate" aria-current="true">
+            <span class="scenario-number">S-01</span>
+            <span class="scenario-copy">
+              <strong>Turn intent into an executable graph</strong>
+              <span><i class="dot"></i>Ready for review</span>
+            </span>
+          </button>
+          <button class="scenario-button" data-scenario="delegate" aria-current="false">
+            <span class="scenario-number">S-02</span>
+            <span class="scenario-copy">
+              <strong>Delegate and keep moving</strong>
+              <span><i class="dot"></i>Ready</span>
+            </span>
+          </button>
+          <button class="scenario-button" data-scenario="decision" aria-current="false">
+            <span class="scenario-number">S-03</span>
+            <span class="scenario-copy">
+              <strong>Escalate a product decision</strong>
+              <span><i class="dot amber"></i>1 decision</span>
+            </span>
+          </button>
+          <button class="scenario-button" data-scenario="drift" aria-current="false">
+            <span class="scenario-number">S-04</span>
+            <span class="scenario-copy">
+              <strong>Detect architecture drift</strong>
+              <span><i class="dot coral"></i>1 deviation</span>
+            </span>
+          </button>
+          <button class="scenario-button" data-scenario="closeout" aria-current="false">
+            <span class="scenario-number">S-05</span>
+            <span class="scenario-copy">
+              <strong>Close work with evidence</strong>
+              <span><i class="dot"></i>Specified</span>
+            </span>
+          </button>
+        </div>
+        <div class="rail-summary">
+          <p>People review the intended reality. The Agent owns the implementation path until a boundary changes.</p>
+          <div class="agent-decisions">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>
+              <circle cx="12" cy="12" r="4"/>
+            </svg>
+            17 agent-owned decisions
+          </div>
+        </div>
+      </nav>
+
+      <main class="workspace">
+        <section class="scenario-deck" aria-labelledby="scenarioTitle">
+          <div class="scenario-kicker">
+            <span class="scenario-id" id="scenarioId">SCENARIO S-01 · OUTCOME TKT-104</span>
+            <span class="badge ready" id="scenarioBadge">Ready for review</span>
+          </div>
+          <h1 class="scenario-title" id="scenarioTitle">Turn a shared product intent into an executable Ticket Graph.</h1>
+          <p class="scenario-promise" id="scenarioPromise">When Wayne and the Agent understand what should change, the Agent produces a compact scenario plan and a traceable execution graph without inventing unresolved product choices.</p>
+          <div class="scenario-contract">
+            <div class="contract-cell">
+              <span>Actor</span>
+              <p id="scenarioActor">Project owner + Agent</p>
+            </div>
+            <div class="contract-cell">
+              <span>Starting situation</span>
+              <p id="scenarioStart">A feature direction is understood well enough to orchestrate.</p>
+            </div>
+            <div class="contract-cell">
+              <span>Observable success</span>
+              <p id="scenarioSuccess">A reviewable coarse graph preserves the experience, exposes human blockers, and gives the Agent executable next work.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="graph-panel" id="graphPanel" aria-labelledby="graphTitle">
+          <div class="horizon">
+            <span class="horizon-label">Human review horizon</span>
+            <span class="horizon-note">Only changed experiences and principles cross this line</span>
+          </div>
+          <div class="graph-toolbar">
+            <h3 id="graphTitle">Execution path</h3>
+            <div class="view-toggle" aria-label="Ticket detail level">
+              <button type="button" data-view="outcomes" aria-pressed="true">Outcome path</button>
+              <button type="button" data-view="all" aria-pressed="false">All tickets</button>
+            </div>
+          </div>
+          <div class="ticket-flow" id="ticketFlow" aria-live="polite"></div>
+        </section>
+      </main>
+
+      <aside class="attention" aria-label="Human attention and ticket inspector">
+        <div class="attention-head">
+          <h2>Needs human attention</h2>
+          <span class="attention-count">2</span>
+        </div>
+        <div class="attention-list">
+          <button class="attention-item" data-special="DEC-12">
+            <span class="type">Decision blocker</span>
+            <strong>Choose the scenario review hierarchy</strong>
+            <p>Changes how people understand and approve the product plan.</p>
+          </button>
+          <button class="attention-item deviation" data-special="DEV-03">
+            <span class="type">Architecture deviation</span>
+            <strong>Graph renderer is becoming a second state owner</strong>
+            <p>Proposed implementation no longer matches the Core-owned boundary.</p>
+          </button>
+        </div>
+
+        <section class="inspector" aria-labelledby="inspectorTitle">
+          <div class="inspector-head">
+            <span>Selected ticket</span>
+            <button class="icon-button" id="editButton" aria-label="Edit selected ticket" title="Edit selected ticket">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M4 20h4l11-11-4-4L4 16v4Z"/>
+                <path d="m13.5 6.5 4 4"/>
+              </svg>
+            </button>
+          </div>
+          <div class="inspector-body">
+            <code id="inspectorId">TKT-106 · rev 03</code>
+            <h2 class="inspector-title" id="inspectorTitle">Generate the coarse Ticket Graph</h2>
+            <p class="inspector-outcome" id="inspectorOutcome">The scenario outcomes are decomposed into a bounded graph with explicit dependencies and known human blockers.</p>
+            <dl class="inspector-facts">
+              <div>
+                <dt>Maturity</dt>
+                <dd id="inspectorMaturity">Executable</dd>
+              </div>
+              <div>
+                <dt>Authority</dt>
+                <dd id="inspectorAuthority">Delegated</dd>
+              </div>
+            </dl>
+            <div class="comment-thread">
+              <h3>Comments</h3>
+              <div id="comments">
+                <div class="comment">
+                  <span class="avatar">WW</span>
+                  <p><strong>Wayne</strong> Keep the scenario layer compact. I do not need to approve each leaf.</p>
+                </div>
+              </div>
+              <form class="comment-form" id="commentForm">
+                <label class="eyebrow" for="commentInput">Add a comment</label>
+                <textarea id="commentInput" placeholder="Point at an outcome, boundary, or missing scenario…"></textarea>
+                <button class="button small" type="submit">Add comment</button>
+              </form>
+            </div>
+          </div>
+          <form class="edit-form" id="editForm">
+            <label for="editTitle">Ticket title</label>
+            <input id="editTitle" type="text">
+            <label for="editOutcome">Outcome</label>
+            <textarea id="editOutcome"></textarea>
+            <div class="edit-actions">
+              <button class="button small ghost" type="button" id="cancelEdit">Cancel</button>
+              <button class="button small primary" type="submit">Propose revision</button>
+            </div>
+          </form>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="prototype-note">
+      Interactive prototype · Comments and edits are local demonstrations of attributed proposals, not direct canonical writes.
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const scenarios = {
+      orchestrate: {
+        id: "SCENARIO S-01 · OUTCOME TKT-104",
+        badge: "Ready for review",
+        badgeTone: "ready",
+        title: "Turn a shared product intent into an executable Ticket Graph.",
+        promise: "When Wayne and the Agent understand what should change, the Agent produces a compact scenario plan and a traceable execution graph without inventing unresolved product choices.",
+        actor: "Project owner + Agent",
+        start: "A feature direction is understood well enough to orchestrate.",
+        success: "A reviewable coarse graph preserves the experience, exposes human blockers, and gives the Agent executable next work.",
+        tickets: [
+          {
+            id: "TKT-105", state: "done", title: "Name the core scenario outcomes", meta: "3 acceptance checks",
+            outcome: "The intended experience is expressed as a small set of observable scenarios.", maturity: "Executable", authority: "Delegated",
+            leaves: [["TKT-105.1", "Extract actors and starting situations"], ["TKT-105.2", "Write observable outcomes"]]
+          },
+          {
+            id: "TKT-106", state: "ready", title: "Generate the coarse Ticket Graph", meta: "3 descendants",
+            outcome: "The scenario outcomes are decomposed into a bounded graph with explicit dependencies and known human blockers.", maturity: "Executable", authority: "Delegated",
+            leaves: [["TKT-106.1", "Model containment and dependencies"], ["TKT-106.2", "Bind acceptance evidence"], ["TKT-106.3", "Detect human-owned decisions"]]
+          },
+          {
+            id: "TKT-107", state: "blocked", title: "Review or delegate the scenario plan", meta: "Human gate",
+            outcome: "The scenario-level plan has human authority to begin execution or an explicit delegation receipt.", maturity: "Executable", authority: "Human gate",
+            leaves: [["TKT-107.1", "Record review comments"], ["TKT-107.2", "Issue plan authority receipt"]]
+          }
+        ]
+      },
+      delegate: {
+        id: "SCENARIO S-02 · OUTCOME TKT-120",
+        badge: "Ready",
+        badgeTone: "ready",
+        title: "Delegate the plan and let the Agent keep moving.",
+        promise: "After the owner delegates the scenario plan, the Agent chooses and executes technical work without repeatedly asking for decisions it already owns.",
+        actor: "Project owner",
+        start: "A scenario plan is reviewable and its human boundaries are explicit.",
+        success: "The Agent advances ready Tickets autonomously and returns only when authority, experience, or principle boundaries change.",
+        tickets: [
+          {
+            id: "TKT-121", state: "done", title: "Record bounded delegation", meta: "Gate satisfied",
+            outcome: "A durable receipt identifies what the Agent may decide and execute.", maturity: "Executable", authority: "Human-granted",
+            leaves: [["TKT-121.1", "Bind delegated scenarios"], ["TKT-121.2", "Bind architecture principles"]]
+          },
+          {
+            id: "TKT-122", state: "running", title: "Select the next ready outcome", meta: "Run RUN-31",
+            outcome: "The Agent selects work whose dependencies and authority are satisfied.", maturity: "Executable", authority: "Delegated",
+            leaves: [["TKT-122.1", "Compile bounded context"], ["TKT-122.2", "Start revision-bound Run"]]
+          },
+          {
+            id: "TKT-123", state: "ready", title: "Tend the graph from learning", meta: "Agent-owned",
+            outcome: "Technical learning refines the graph without changing the approved experience.", maturity: "Specified", authority: "Delegated",
+            leaves: [["TKT-123.1", "Classify discovered work"], ["TKT-123.2", "Validate graph proposal"]]
+          }
+        ]
+      },
+      decision: {
+        id: "SCENARIO S-03 · OUTCOME TKT-140",
+        badge: "Needs decision",
+        badgeTone: "attention",
+        title: "Escalate a decision that changes the experienced product.",
+        promise: "When implementation reaches a preference-bearing product choice, the Agent preserves momentum elsewhere and raises one clear decision instead of guessing.",
+        actor: "Agent → project owner",
+        start: "A valid technical path branches into materially different user experiences.",
+        success: "The affected branch pauses behind a decision Ticket while independent delegated work remains available.",
+        tickets: [
+          {
+            id: "TKT-141", state: "done", title: "Detect an experience boundary", meta: "Finding VAL-42",
+            outcome: "The Agent identifies that the choice changes the human-authorized product experience.", maturity: "Executable", authority: "Delegated",
+            leaves: [["TKT-141.1", "Compare against scenario contract"], ["TKT-141.2", "Describe affected outcomes"]]
+          },
+          {
+            id: "DEC-12", state: "blocked", title: "Choose the review hierarchy", meta: "Human decision",
+            outcome: "The owner chooses whether scenarios lead with outcomes, actors, or system boundaries.", maturity: "Specified", authority: "Human gate",
+            leaves: [["DEC-12.A", "Outcome-first direction"], ["DEC-12.B", "Actor-first direction"]]
+          },
+          {
+            id: "TKT-143", state: "blocked", title: "Resume the affected branch", meta: "Depends on DEC-12",
+            outcome: "The selected product direction is compiled back into executable Tickets.", maturity: "Outline", authority: "Pending",
+            leaves: [["TKT-143.1", "Revise scenario contract"], ["TKT-143.2", "Revalidate descendants"]]
+          }
+        ]
+      },
+      drift: {
+        id: "SCENARIO S-04 · OUTCOME TKT-160",
+        badge: "Deviation open",
+        badgeTone: "attention",
+        title: "Catch implementation drift before it becomes the architecture.",
+        promise: "When the evolving implementation crosses an approved architecture or design principle, the Agent records the deviation and makes the change visible.",
+        actor: "Execution Agent + validator",
+        start: "A locally convenient implementation no longer matches a governing principle.",
+        success: "The drift is either corrected autonomously or explicitly accepted by the human who owns the principle.",
+        tickets: [
+          {
+            id: "TKT-161", state: "done", title: "Compare implementation evidence", meta: "5 anchors",
+            outcome: "Current code evidence is compared with the approved Core-owned boundary.", maturity: "Executable", authority: "Delegated",
+            leaves: [["TKT-161.1", "Trace state writes"], ["TKT-161.2", "Verify adapter ownership"]]
+          },
+          {
+            id: "DEV-03", state: "blocked", title: "Resolve a second state owner", meta: "Architecture deviation",
+            outcome: "The team restores one canonical writer or explicitly revises the architecture principle.", maturity: "Specified", authority: "Human gate",
+            leaves: [["DEV-03.1", "Return writes to Core"], ["DEV-03.2", "Propose architecture revision"]]
+          },
+          {
+            id: "TKT-163", state: "ready", title: "Continue unaffected work", meta: "2 safe branches",
+            outcome: "Independent Tickets continue while the deviating branch is blocked.", maturity: "Executable", authority: "Delegated",
+            leaves: [["TKT-163.1", "Finish read projection"], ["TKT-163.2", "Add parity tests"]]
+          }
+        ]
+      },
+      closeout: {
+        id: "SCENARIO S-05 · OUTCOME TKT-180",
+        badge: "Specified",
+        badgeTone: "ready",
+        title: "Close work with evidence, not a status declaration.",
+        promise: "After a Run, the Agent evaluates evidence against each accepted outcome and leaves the graph more accurate than it found it.",
+        actor: "Execution Agent + validator",
+        start: "A Run has produced artifacts, observations, and verification evidence.",
+        success: "Outcome evidence supports derived completion, while gaps and discoveries become bounded follow-up work.",
+        tickets: [
+          {
+            id: "TKT-181", state: "ready", title: "Bind evidence to acceptance", meta: "4 criteria",
+            outcome: "Every acceptance condition points to inspectable evidence from the current Run.", maturity: "Executable", authority: "Delegated",
+            leaves: [["TKT-181.1", "Verify artifact identities"], ["TKT-181.2", "Attach test evidence"]]
+          },
+          {
+            id: "TKT-182", state: "ready", title: "Adjudicate the outcome", meta: "Validator required",
+            outcome: "The result is classified as proven, partial, or failed without self-declaring status.", maturity: "Executable", authority: "Delegated",
+            leaves: [["TKT-182.1", "Run independent validation"], ["TKT-182.2", "Record Outcome"]]
+          },
+          {
+            id: "TKT-183", state: "ready", title: "Propose follow-up work", meta: "0 current blockers",
+            outcome: "New learning becomes a bounded graph proposal or semantic closeout proposal.", maturity: "Specified", authority: "Delegated",
+            leaves: [["TKT-183.1", "Classify discoveries"], ["TKT-183.2", "Tend affected scenarios"]]
+          }
+        ]
+      }
+    };
+
+    const specialTickets = {
+      "DEC-12": {
+        id: "DEC-12 · rev 02",
+        title: "Choose the scenario review hierarchy",
+        outcome: "Select the information hierarchy people use to understand and authorize the scenario plan.",
+        maturity: "Specified",
+        authority: "Human gate"
+      },
+      "DEV-03": {
+        id: "DEV-03 · rev 01",
+        title: "Graph renderer is becoming a second state owner",
+        outcome: "Restore the Core-owned writer boundary or explicitly authorize a change to the architecture principle.",
+        maturity: "Specified",
+        authority: "Human gate"
+      }
+    };
+
+    let currentScenario = "orchestrate";
+    let selectedTicket = scenarios.orchestrate.tickets[1];
+    let toastTimer;
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+    function stateLabel(state) {
+      return {
+        done: "Done",
+        ready: "Ready",
+        running: "Running",
+        blocked: "Blocked"
+      }[state] || state;
+    }
+
+    function renderTickets() {
+      const data = scenarios[currentScenario];
+      $("#ticketFlow").innerHTML = data.tickets.map((ticket, index) => `
+        <div class="ticket-column">
+          <button class="ticket ${selectedTicket.id === ticket.id ? "selected" : ""}" data-ticket-index="${index}">
+            <span class="ticket-head">
+              <span class="ticket-id">${ticket.id}</span>
+              <span class="ticket-state ${ticket.state === "blocked" ? "blocked" : ""}">${stateLabel(ticket.state)}</span>
+            </span>
+            <span class="ticket-title">${ticket.title}</span>
+            <span class="ticket-foot"><span>${ticket.meta}</span><span>›</span></span>
+          </button>
+          <div class="leaf-stack">
+            ${ticket.leaves.map((leaf) => `
+              <button class="leaf-ticket" data-parent-index="${index}" data-leaf-id="${leaf[0]}" data-leaf-title="${leaf[1]}">
+                <code>${leaf[0]}</code><span>${leaf[1]}</span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+
+      $$("[data-ticket-index]").forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedTicket = data.tickets[Number(button.dataset.ticketIndex)];
+          renderTickets();
+          renderInspector(selectedTicket);
+        });
+      });
+
+      $$(".leaf-ticket").forEach((button) => {
+        button.addEventListener("click", () => {
+          const parent = data.tickets[Number(button.dataset.parentIndex)];
+          renderInspector({
+            id: button.dataset.leafId,
+            title: button.dataset.leafTitle,
+            outcome: `This leaf contributes to “${parent.title}” and remains inside its delegated outcome boundary.`,
+            maturity: "Specified",
+            authority: parent.authority
+          });
+        });
+      });
+    }
+
+    function renderScenario(key) {
+      currentScenario = key;
+      const data = scenarios[key];
+      selectedTicket = data.tickets[1];
+      $("#scenarioId").textContent = data.id;
+      $("#scenarioBadge").textContent = data.badge;
+      $("#scenarioBadge").className = `badge ${data.badgeTone}`;
+      $("#scenarioTitle").textContent = data.title;
+      $("#scenarioPromise").textContent = data.promise;
+      $("#scenarioActor").textContent = data.actor;
+      $("#scenarioStart").textContent = data.start;
+      $("#scenarioSuccess").textContent = data.success;
+      $$(".scenario-button").forEach((button) => {
+        button.setAttribute("aria-current", String(button.dataset.scenario === key));
+      });
+      renderTickets();
+      renderInspector(selectedTicket);
+    }
+
+    function renderInspector(ticket) {
+      $("#inspectorId").textContent = ticket.id.includes("rev") ? ticket.id : `${ticket.id} · current revision`;
+      $("#inspectorTitle").textContent = ticket.title;
+      $("#inspectorOutcome").textContent = ticket.outcome;
+      $("#inspectorMaturity").textContent = ticket.maturity;
+      $("#inspectorAuthority").textContent = ticket.authority;
+      $("#editTitle").value = ticket.title;
+      $("#editOutcome").value = ticket.outcome;
+      $("#editForm").classList.remove("open");
+    }
+
+    function showToast(message) {
+      const toast = $("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3300);
+    }
+
+    $$(".scenario-button").forEach((button) => {
+      button.addEventListener("click", () => renderScenario(button.dataset.scenario));
+    });
+
+    $$(".view-toggle button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const showAll = button.dataset.view === "all";
+        $("#graphPanel").classList.toggle("show-leaves", showAll);
+        $$(".view-toggle button").forEach((item) => {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+      });
+    });
+
+    $$(".attention-item").forEach((button) => {
+      button.addEventListener("click", () => renderInspector(specialTickets[button.dataset.special]));
+    });
+
+    $("#editButton").addEventListener("click", () => {
+      $("#editForm").classList.toggle("open");
+      if ($("#editForm").classList.contains("open")) $("#editTitle").focus();
+    });
+
+    $("#cancelEdit").addEventListener("click", () => $("#editForm").classList.remove("open"));
+
+    $("#editForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      $("#inspectorTitle").textContent = $("#editTitle").value;
+      $("#inspectorOutcome").textContent = $("#editOutcome").value;
+      $("#editForm").classList.remove("open");
+      showToast("Revision proposed. Validation and authority checks would run before the canonical Ticket changes.");
+    });
+
+    $("#commentForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = $("#commentInput");
+      const text = input.value.trim();
+      if (!text) {
+        showToast("Write a comment before adding it.");
+        input.focus();
+        return;
+      }
+      const comment = document.createElement("div");
+      comment.className = "comment";
+      const avatar = document.createElement("span");
+      avatar.className = "avatar";
+      avatar.textContent = "WW";
+      const body = document.createElement("p");
+      const author = document.createElement("strong");
+      author.textContent = "Wayne ";
+      body.append(author, document.createTextNode(text));
+      comment.append(avatar, body);
+      $("#comments").append(comment);
+      input.value = "";
+      showToast("Comment added to this prototype. A real surface would record an attributed comment event.");
+    });
+
+    $("#approveButton").addEventListener("click", () => {
+      $("#statusStrip").innerHTML = "<span class=\"signal\"><strong>Scenario plan approved.</strong> Ready Tickets may begin once their local gates are satisfied.</span><span>Authority receipt · PLAN rev 07</span>";
+      showToast("Scenario plan approved. Leaf Tickets did not require individual approval.");
+    });
+
+    $("#delegateButton").addEventListener("click", () => {
+      $("#statusStrip").innerHTML = "<span class=\"signal\"><strong>Plan delegated.</strong> The Agent may proceed until a product decision or deviation crosses the review horizon.</span><span>Bounded delegation · PLAN rev 07</span>";
+      showToast("Delegation recorded. The Agent can keep moving inside the approved scenarios and principles.");
+    });
+
+    renderScenario("orchestrate");
+  </script>
+</body>
+</html>

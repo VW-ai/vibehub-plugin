@@ -93,6 +93,28 @@ describe("operation receipt projection", () => {
     }).evidence[0]).toMatchObject({ returnedCount: 2, totalCount: 100 });
   });
 
+  it("projects Ticket page counts without exposing the Ticket schema", () => {
+    expect(projectOperationReceipt({
+      result: {
+        ok: true,
+        data: {
+          snapshotId: "tgs-snapshot",
+          page: { offset: 20, count: 5, totalItems: 42 },
+        },
+        meta: {
+          operation: "ticket.graph.snapshot",
+          repoId: 1,
+          requestId: "ticket-page",
+          at,
+        },
+      },
+      trigger: "review Ticket graph",
+    }).evidence[0]).toMatchObject({
+      returnedCount: 5,
+      totalCount: 42,
+    });
+  });
+
   it("rejects unknown operations and mismatched success provenance", () => {
     expect(() => projectOperationReceipt({
       trigger: "test",

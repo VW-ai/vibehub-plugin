@@ -1,0 +1,491 @@
+spec_id: "contract-ticket-review-operations-001"
+type: contract
+state: stale
+intent:
+  summary: "重点就是我们人看 Ticket，看的就是：这个执行完了，可以去执行哪一个了。"
+  detail: |
+    **Supersession note — 2026-07-29**: This contract is retained as design
+    provenance, but its SQLite proposal/validation/authority/application
+    operations and generation-backed read source are retired. M1A preserves
+    only the three read responsibilities—graph snapshot, subject inspection,
+    and trace listing—on the Git-native Ticket ledger with wire schema v2.
+    A successor mutation contract will be written from the Skill-facing Git
+    patch boundary rather than reviving the workflow below.
+
+    `V0` names the product/contract maturity of this slice. The wire DTOs use
+    integer `schemaVersion: 1`; these version axes are independent.
+
+    This contract freezes the smallest coherent Core surface required by the
+    accepted Ticket Review Surface: three graph reads, immutable proposal
+    contribution/query operations, an append-only proposal-validation ledger,
+    trusted authority resolution, and crash-reconcilable application. It does
+    not decide Context Binding, Closeout, generic GateDecision recording,
+    complete Ticket definition storage, or the trusted host UI.
+
+    **One shared read spine**
+
+    The packaged Ticket wrapper, CLI, and MCP now converge on the existing
+    Core OperationDispatcher. Adapters do not own alternative semantics or
+    persistence. Ticket semantic Skills remain a separate intelligence layer.
+    The browser surface now talks only to a thin local bridge. That bridge uses
+    the same OperationDispatcher and never calls operational or Ticket storage
+    directly.
+
+    The first three read responsibilities and operation names are:
+
+    - `ticket.graph.snapshot`: load one coherent, bounded whole-project
+      direct-unlock projection;
+    - `ticket.subject.inspect`: inspect one snapshot-visible Ticket or one
+      snapshot-scoped relation without replacing the graph;
+    - `ticket.trace.list`: read display-complete trace records as of the same
+      projection watermark.
+
+    Full executable input/output schemas are implemented as an explicit opt-in
+    validation surface. A storage-agnostic Core source-provider seam and
+    stateless read service implement the three responsibilities. The operation
+    names are registered with the shared dispatcher, generated contract
+    artifact, packaged Ticket wrapper, CLI `ticket` group, and MCP
+    `ticket_operation` tool.
+
+    One separate write responsibility is now registered through those same
+    adapters:
+
+    - `ticket.proposal.submit`: append one immutable comment or graph-change
+      review contribution without changing the Ticket Graph.
+
+    The proposal decision/application responsibilities are also registered:
+
+    - `ticket.proposal.review.inspect`: bind the complete validation set and
+      derive eligibility plus one next action;
+    - `ticket.proposal.authority.decide`: ask a host-injected trusted provider
+      for one immutable decision over the exact proposal/candidate/set;
+    - `ticket.proposal.apply`: persist an immutable application intent, publish
+      its exact complete candidate under a Git fence, and record one terminal
+      application receipt.
+
+    The App bridge remains future work.
+
+    The public `/contracts` entry remains dependency-light TypeScript
+    types/constants and does not import Zod or Node Runtime code. Strict Zod
+    schemas use an explicit schema entry point. The canonical projection-source
+    schema is an internal Core seam, not a public write contract.
+
+    **Opaque snapshot, not a hidden graph model**
+
+    A snapshot has an opaque `snapshotRevision` and `projectionWatermark`.
+    These names do not imply one canonical global graph revision, historical
+    graph addressing, durable relation revisions, or a choice between Plan,
+    proposed, current executable, initial, and executed graph identities.
+    Those remain with `decision-ticket-graph-lifecycle-001`.
+
+    Pagination is allowed only as transport: every page remains bound to the
+    same snapshot and watermark, and the client buffers the supported project
+    graph before presenting it as complete. Snapshot/cursor identity survives
+    separate in-process CLI or MCP invocations without daemon affinity. Above a
+    declared V0 capacity boundary, Core fails explicitly rather than silently
+    presenting a partial graph.
+
+    Relations have a `relationRef` unique within a snapshot and explicitly name
+    prerequisite and dependent Ticket endpoints. A relation deep link includes
+    both snapshot and relation references. Durable relation identity, revision,
+    comments, and mutations are not frozen here.
+
+    **Resolver-selected facts, projections, and capability slots**
+
+    Prototype shorthands such as `human`, `deviation`, `waiting`, `running`,
+    `done`, `stale`, and `proof` are not writable Ticket states. Selection,
+    hover, filters, lenses, pan/zoom, node positions, and edge routes are view
+    state.
+
+    The canonical Git provider supplies
+    `currentCapabilityProjections` for the exact `snapshotRevision` and
+    `projectionWatermark` before invoking the pure projector. In this bootstrap
+    every capability remains honestly unavailable because no currentness
+    authority exists yet. The projector does not consume append-only receipt
+    history and never infers currentness, supersession, revocation, or
+    precedence. It validates any resolver-selected set and fails closed on
+    ambiguity or mismatched binding.
+
+    Ticket projections and Ticket capabilities bind both `ticketId` and
+    `definitionRevision`. Relation projections, relation capabilities, and
+    relation traces bind `relationRef`, `prerequisiteTicketId`, and
+    `dependentTicketId`, as well as the snapshot revision and watermark where
+    applicable. A relation reference alone cannot transplant data across
+    snapshot sources.
+
+    Semantic judgments are supplied only by Skills/validators; validation
+    judgments by validators; and active Run/execution-spine observations by
+    the Runtime. Producer eligibility does not freeze a payload. Every
+    available capability uses a strict, bounded, capability-scoped
+    presentation envelope (`label`, optional `detail`/`count`, and references)
+    with unknown keys rejected. It is not arbitrary JSON and cannot carry
+    Scenario, layout, progress, or generic state. Deeper capability-specific
+    payloads remain unavailable in V0.
+
+    Core validates binding and structure; it does not infer semantic answers.
+
+    The implemented provider seam accepts only one atomic, already-resolved
+    projection source. It has separate `loadLatest` and `loadSnapshot`
+    responsibilities and strict result envelopes. Its default production
+    implementation reads the independent Git-native Ticket store: immutable
+    definition revisions, immutable retained generation manifests, and one
+    latest pointer. The read service validates request selectors before source
+    access, resolves later graph pages and detail reads by their exact
+    `snapshotId`, and never substitutes a new source for an unavailable old
+    snapshot. Failure to reconstruct that exact source is `snapshot_expired`.
+
+    META Specs, legacy Task rows, the v4 HTML, and the structured v4 fixture are
+    explicitly ineligible as production fallbacks. They do not establish
+    canonical Ticket identity, graph lifecycle, projection currentness, or
+    durable snapshot reconstruction.
+
+    Core forwards a verified repository/worktree scope to every provider call.
+    The production provider partitions latest and snapshot lookup by that
+    complete scope, safely opens bounded canonical files without following
+    symbolic links, validates checksums and graph invariants, and reconstructs
+    retained snapshots in a fresh process after `latest` changes. Dispatcher
+    receipt hashes also bind the verified scope and local Git repository
+    incarnation before replay. Cross-worktree replay, foreign repositories, and
+    same-path repository replacement are rejected. Filesystem projection runs
+    outside the short SQLite receipt transaction.
+
+    `ticket.subject.inspect` and `ticket.trace.list` are strictly as-of the
+    bound snapshot. They never mix live-head facts into an older canvas.
+    Refresh means reading a new snapshot.
+
+    Trace targets are typed. URLs allow only absolute HTTP(S); repository paths
+    are canonical repository-relative paths that a future host must resolve
+    with real-path containment under the repository root; opaque targets are
+    display/copy references and never hrefs. An available `gate_decision` trace
+    must cite a verified authority receipt bound to the decision and subject.
+    A claimed actor may be shown as attribution but never authorizes the gate.
+
+    **Submit-only proposal boundary**
+
+    `ticket.proposal.submit` is now executable because its only effect is one
+    immutable review contribution in SQLite. A comment binds an exact
+    snapshot-visible Ticket revision or relation tuple. A graph-change proposal
+    binds an exact observed snapshot, create-absence and
+    revise-expected-revision preconditions, and complete replacement definition
+    bodies. It cannot submit raw JSON Patch, per-edge CRUD, implicit deletion,
+    whole-store replacement, or writable status/maturity/progress.
+
+    Core generates proposal identity and digest, scope binding, new Ticket IDs,
+    definition revisions, timestamps, and proposal provenance. Caller
+    actor/reason/source attribution remains claimed_unverified, caller
+    provenance references are rejected, and decoded logical input is capped
+    at 4 MiB. CLI and Skill enforce the same raw proposal limit before
+    parsing; MCP caps all raw frames at 64 MiB and identified proposal calls
+    at 5 MiB including the tool envelope. Core resolves local references and mechanically verifies the
+    complete candidate graph, endpoints, cycles, bounds, ordering, and revision
+    transitions. Passing that review does not publish the candidate: every result explicitly states
+    `review_contribution_only` and `graphMutationApplied: false`.
+
+    The request `actor` remains claimed attribution. `authorAssessment`,
+    including its elaboration/decomposition/expansion class and authority
+    signals, is untrusted routing input. It cannot self-validate a proposal or
+    grant authority.
+
+    Independent semantic machine validation remains a separate receipt. Human
+    authority remains separate again and is indicated only for initial-plan,
+    experience/product, principle-deviation, permission/side-effect, or
+    risk/policy boundaries. Bootstrap always indicates initial_plan_authority;
+    untrusted authorAssessment cannot mark it delegated. Technical difficulty
+    alone is not a human gate. Core may expose a route hint, but the hint is not
+    an application decision.
+
+    Proposal payload insertion and its shared idempotent operation receipt occur
+    in the same SQLite transaction. Repository incarnation is rechecked around
+    graph-head loading and task attribution binds the task's exact worktree.
+    Submission never invokes the internal Git generation publisher, so a successful submit cannot alter
+    `.vibehub/ticket-store/`.
+
+    Generic `ticket.gate.decision.record` still waits for its own gate-subject
+    contract. Proposal-specific authority and application now use the three
+    registered operations above. Public JSON binds immutable digests only; it
+    cannot contain a trusted principal, disposition, authority assertion, or
+    provider result. Those values enter Core only through a non-serializable
+    `TrustedTicketProposalAuthorityProviderV0` injected by a trusted host.
+
+    Neither command may write status, maturity, progress, completion, Scenario
+    CRUD, layout, raw JSON Patch, per-edge CRUD, or persistence directly.
+
+    **Bounded proposal-query and validation-evidence boundary**
+
+    Five additional operations are frozen through the same shared dispatcher
+    and adapter spine:
+
+    - `ticket.proposal.inspect`;
+    - `ticket.proposal.list`;
+    - `ticket.proposal.validation.record`;
+    - `ticket.proposal.validation.list`;
+    - `ticket.proposal.validation.inspect`.
+
+    Proposal inspect returns one exact immutable contribution. Proposal list
+    returns bounded summaries under a scope/filter-bound high-water cursor;
+    complete payloads require explicit inspection. Both preserve the stored
+    snapshot, target, digest, candidate, mechanical-review, and
+    claimed-attribution boundaries without synthesizing a mutable proposal
+    status or comparing the contribution with the live graph head.
+
+    Materialized graph-change outputs remain compact. Creates expose the
+    allocated Ticket, complete new definition, and an added-only dependency
+    delta. Revisions expose the complete replacement plus previousOutcome,
+    previousParentId, and exact added/removed dependency deltas; they do not
+    embed a complete previousDefinition. The complete materialized proposal
+    output is capped at 8 MiB before persistence. Overflow fails closed with
+    guidance to split the change into smaller bounded proposals, and an
+    oversized corrupt stored record is never returned by inspection.
+
+    Proposal validation is candidate-specific semantic evidence for an
+    immutable graph-change proposal. It binds the exact proposal and candidate
+    digests and evaluates promise_preservation, containment_truth,
+    dependency_truth, change_classification, delegated_scope, and
+    protected_boundaries. The validator producer, policy, and actor remain
+    claimed_unverified. This is not the Ticket-revision ValidationReceipt used
+    to derive outline/specified/executable maturity, and it cannot grant
+    authority, satisfy a GateDecision, authorize application, or mutate the
+    graph.
+
+    Validation contributions are append-only. Multiple validators may record
+    contrary assessments against the same proposal and all remain inspectable.
+    V0 has no current/latest/winner, supersession, revocation, quorum,
+    precedence, or automatic aggregation rule. List pagination watermarks
+    provide transport consistency only and do not imply semantic currentness.
+
+    The independent `vibehub-ticket-validate` Skill inspects one immutable
+    graph-change proposal and resolves required prior-state context only from
+    its exact observedSnapshotId. It inspects affected existing Tickets,
+    parents, and dependency endpoints at that snapshot; when retained-edge
+    evidence or a changed existing relation is relevant, it uses the
+    relationRef discovered from the exact-snapshot Ticket projection to inspect
+    that exact relation. It never substitutes current/latest context. Missing
+    context produces an inconclusive blocking finding. The Skill judges the six
+    semantic questions and calls `ticket.proposal.validation.record`. It never
+    trusts authorAssessment, self-authorizes, records a GateDecision, applies
+    the proposal, or invokes the internal Git publisher.
+
+    **Executable implementation slice**
+
+    The safe read kernel includes:
+
+    - dependency-light browser-safe review DTOs/constants with explicit
+      available/unavailable capability slots;
+    - opt-in strict input/output schemas for the three reads and an internal
+      canonical source schema;
+    - a deterministic pure projector over resolver-selected snapshot facts and
+      `currentCapabilityProjections`;
+    - a structured fixture extracted from the accepted
+      29-Ticket/35-relation prototype;
+    - tests for coherence, deterministic ordering, unsupported capabilities,
+      and rejection of authored state/progress/scenario/layout fields.
+
+    The same slice now also includes:
+
+    - a repository-scoped, storage-agnostic resolved-source provider interface
+      with a Git-native production provider;
+    - a stateless Core read service that maps the three responsibilities to
+      `loadLatest` or exact `loadSnapshot` calls;
+    - cross-service-instance reconstruction, no-graph, expired-snapshot,
+      selector-validation, strict provider-envelope, and
+      no-latest-substitution tests;
+    - immutable retained generations with corruption and unsafe-file rejection;
+    - production dispatcher registration with repository/worktree-bound replay;
+    - generated operation contracts, packaged Ticket wrapper, CLI and MCP
+      adapters with byte-semantic parity tests.
+
+    The submit-only addition includes:
+
+    - dependency-light proposal DTOs and strict generated operation input;
+    - exact comment-subject and graph-change target binding;
+    - deterministic Core materialization and mechanical candidate review;
+    - an immutable append-only proposal store committed atomically with the
+      operation receipt;
+    - the same packaged wrapper, CLI, and MCP adapter path as the reads.
+
+    The proposal-ledger extension freezes bounded proposal inspect/list,
+    proposal-validation record/list/inspect, and the independent
+    `vibehub-ticket-validate` semantic intelligence boundary. Its implementation
+    preserves the immutable ledger, claimed-unverified evidence, and
+    no-current/latest rules above.
+
+    The authority/application extension adds browser-safe contracts and strict
+    schemas for review, authority decision, immutable intent, and application
+    receipt; one Core service behind the dispatcher; three SQLite immutable
+    ledgers; and a fenced internal publisher path. Authority binds the complete
+    validation set by digest, high-water sequence, and count. An authorized
+    decision cites at least one exact passing validation without a blocking
+    finding; contrary receipts remain part of the bound set. Recording a
+    decision closes further validation for that proposal.
+
+    Core derives the required path conservatively. Bootstrap, expansion,
+    author-declared human gates, or any protected authority signal requires a
+    host-authenticated human and human-authority basis. Only non-protected
+    elaboration/decomposition may use a trusted delegation basis. Provider
+    assessment can strengthen but never downgrade proposal change class or
+    erase authority signals.
+
+    Application stores the exact candidate definitions and deterministic
+    publication facts before entering Git. Its writer-lock fence binds the
+    application intent ID, intent digest, and candidate snapshot and remains
+    held until the immutable SQLite application receipt commits. If Git
+    publication succeeded but receipt insertion failed, retry adopts only that
+    exact fence: current candidate records `reconciled`, original base resumes
+    publication, and any malformed or foreign fence or third head fails closed.
+    The operational lock directory lives in the worktree-specific Git
+    administration path. Release claims exact `owner-T` as `releasing-T`,
+    unlinks only that marker, then removes the canonical directory only if still
+    empty. A successor's nonempty `owner-U` makes stale removal fail harmlessly;
+    crash-empty state can be removed or atomically replaced. Completed-receipt
+    cleanup additionally verifies that the canonical Git head equals the
+    candidate before touching the exact owner or releasing marker. Successful
+    domain receipts make replay idempotent; failed authority/apply operation
+    outcomes are not cached as terminal receipts so changed trusted-host or
+    recovery conditions can be retried.
+
+    Default CLI/MCP construction passes no trusted authority provider. The
+    operations are visible, but a caller-selected actor cannot authorize
+    bootstrap or any protected change; authority resolution fails closed with
+    `trusted_authority_unavailable`. The `vibehub-ticket-apply` Skill follows
+    the derived next action, keeps caller identity separate from authority,
+    retries exact interrupted applications, and stops at an unavailable trusted
+    boundary rather than fabricating a principal or disposition. App
+    decision-surface integration,
+    Ticket-readiness validation/currentness, complete Ticket definition
+    storage, generic GateDecision recording, and the wider execution lifecycle
+    remain open.
+
+    The representative shapes, error boundary, exclusions, and acceptance tests
+    are preserved in
+    `artifacts/2026-07-28-ticket-review-operation-contract.md`; the proposal
+    query/validation extension is preserved in
+    `artifacts/2026-07-29-proposal-query-validation-ledger.md`; authority and
+    application are preserved in
+    `artifacts/2026-07-29-ticket-proposal-application-runtime.md`.
+
+    **Claimed**: Codex 2026-07-28
+constraints:
+  - kind: must
+    rule: "The first executable surface contains a coherent graph snapshot, subject inspection, trace listing, and an immutable submit-only review contribution that cannot mutate the graph"
+  - kind: must
+    rule: "Every snapshot-bound page and read remains at one opaque snapshot revision and projection watermark without implying a canonical global graph-revision model"
+  - kind: must
+    rule: "The projector consumes currentCapabilityProjections already selected by a canonical provider at the exact snapshot revision and projection watermark; it never infers currentness or supersession from receipt history"
+  - kind: must
+    rule: "The Core read service validates selectors before source access and uses the Git-native production provider to resolve every snapshot-bound page or detail read from the exact reconstructible generation"
+  - kind: must
+    rule: "Every provider lookup receives Core-resolved repository/worktree scope and a canonical provider partitions snapshot identity by that complete scope; the generic source shape alone does not prove repository provenance"
+  - kind: must
+    rule: "Ticket capability bindings include ticketId and definitionRevision; relation capability and trace bindings include relationRef, both Ticket endpoints, and their snapshot source boundary"
+  - kind: must
+    rule: "Available capabilities use a strict bounded capability-scoped presentation envelope and allowed producer families; deeper unfrozen payloads remain unavailable"
+  - kind: must
+    rule: "Available gate_decision traces cite verified authority receipts; claimed actors provide attribution only and never authority"
+  - kind: must
+    rule: "Trace URL targets allow only HTTP(S), repository paths remain canonical repo-relative references subject to host containment, and opaque targets are never hrefs"
+  - kind: must
+    rule: "Public contracts remain dependency-light types and constants, strict Zod schemas are explicit opt-in, and the canonical projection-source schema remains internal"
+  - kind: must
+    rule: "The supported project graph is complete before presentation, and unsupported size fails explicitly rather than returning a silent partial graph"
+  - kind: must
+    rule: "Current actor values always provide claimed attribution only; trusted proposal authority enters Core exclusively through a non-serializable host-injected provider"
+  - kind: must
+    rule: "ticket.proposal.submit binds exact snapshot and target preconditions, lets Core generate identity/revision/time/provenance fields, and commits the immutable proposal with its operation receipt in one SQLite transaction"
+  - kind: must
+    rule: "Graph-change submission mechanically validates a complete candidate but returns review_contribution_only with graphMutationApplied false and never invokes the Git generation publisher"
+  - kind: must
+    rule: "Independent machine validation and trusted human authority remain distinct from submit-time mechanical review; technical difficulty alone is not a human gate"
+  - kind: must
+    rule: "Proposal input is aggregate-bounded, caller provenance is rejected, claimed creation attribution is marked unverified, bootstrap indicates initial_plan_authority, and repository/task worktree identity is rechecked before persistence"
+  - kind: must
+    rule: "ticket.proposal.inspect and ticket.proposal.list expose immutable scope-bound proposal facts through bounded Core reads without direct SQLite access, mutable review status, live-head substitution, or authority inference"
+  - kind: must
+    rule: "Materialized proposal outputs carry compact previousOutcome/previousParentId and exact dependencyDelta evidence rather than previousDefinition, and fail before persistence above the 8 MiB output budget with guidance to split the proposal"
+  - kind: must
+    rule: "ticket.proposal.validation.record/list/inspect form an append-only proposal-and-candidate-bound semantic evidence ledger whose producer, policy, and actor remain claimed_unverified"
+  - kind: must
+    rule: "Proposal validation evaluates promise_preservation, containment_truth, dependency_truth, change_classification, delegated_scope, and protected_boundaries without becoming Ticket-readiness validation"
+  - kind: must
+    rule: "Proposal semantic validation reads required existing Ticket and relation context at the exact observedSnapshotId, uses relationRef for retained-edge or changed-existing-relation evidence, never substitutes latest, and records missing context as inconclusive"
+  - kind: must
+    rule: "Contrary proposal-validation contributions coexist; V0 selects no current, latest, winning, superseding, revoked, or authoritative receipt"
+  - kind: must
+    rule: "ticket.proposal.review.inspect binds the complete validation ledger by digest/high-water/count and derives one eligibility/next action without mutable proposal status"
+  - kind: must
+    rule: "ticket.proposal.authority.decide accepts only immutable caller bindings and records a terminal decision returned by a host-injected trusted provider over the exact proposal, candidate, and complete validation set"
+  - kind: must
+    rule: "Bootstrap, expansion, introduced human gates, and any protected authority signal require a host-authenticated human authority basis; delegated policy is limited to non-protected elaboration/decomposition"
+  - kind: must
+    rule: "An authorized decision cites at least one exact passing non-blocking validation and closes further validation while preserving contrary receipts in the bound set"
+  - kind: must
+    rule: "ticket.proposal.apply persists an immutable exact-candidate intent before fenced Git publication and releases the exact writer fence only after the immutable application receipt commits"
+  - kind: must
+    rule: "Application retry adopts only the identical intent fence: current candidate reconciles, original base resumes, malformed or foreign fences and third heads fail closed, and completed-fence cleanup verifies the canonical head equals the candidate"
+  - kind: must_not
+    rule: "Do not expose writable status, maturity, progress, Scenario CRUD, layout state, raw JSON Patch, per-edge CRUD, generic completion, or direct persistence access"
+  - kind: must_not
+    rule: "Do not claim App integration, capability-receipt currentness, generic GateDecision recording, or trusted human authority from operation registration or caller identity"
+  - kind: must_not
+    rule: "Do not let claimed_unverified proposal validation by itself derive Ticket maturity/readiness, grant authority, satisfy a GateDecision, authorize application, mutate the graph, or invoke the Git publisher"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket, core, read-model, projection, proposal, validation-ledger, trusted-authority, fenced-application, review-surface, cli, mcp]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.9
+  source_ref: "Wayne's Ticket execution-graph and review-surface decisions in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b — 2026-07-28"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29T20:00:00Z"
+relations:
+  - target: "decision-ticket-git-native-ledger-001"
+    type: challenged_by
+    detail: "Its SQLite proposal/validation/authority/application operations and cross-store receipts no longer match the durable authority boundary."
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: challenged_by
+    detail: "A successor operation contract must expose deterministic Git document capabilities without owning semantic workflow."
+  - target: "decision-ticket-review-surface-001"
+    type: depends_on
+    detail: "The three reads cover the accepted whole-graph and progressive-inspection surface without inventing a dashboard API."
+  - target: "decision-ticket-runtime-boundary-001"
+    type: depends_on
+    detail: "Reuses the one Core operation spine and keeps semantic judgment in Skills/validators."
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+    detail: "Preserves stable Ticket identity and separates definitions from derived Runtime projections."
+  - target: "decision-ticket-graph-lifecycle-001"
+    type: relates_to
+    detail: "Exact proposal binding, trusted authority, and fenced additive/revision application are frozen here; durable relation identity and explicit removal/supersession remain delegated."
+  - target: "decision-ticket-context-binding-001"
+    type: relates_to
+    detail: "Context is an unavailable-or-receipted capability slot until binding and drift semantics are resolved."
+  - target: "decision-ticket-closeout-001"
+    type: relates_to
+    detail: "Acceptance, Evidence, and Outcome are unavailable-or-receipted capability slots until closeout is resolved."
+  - target: "decision-ticket-storage-001"
+    type: relates_to
+    detail: "The projector remains storage-agnostic while the default provider implements the frozen Git-native definition/topology read bootstrap."
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-m1a-git-read-cut-implementation.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-operation-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html"
+  - file: "packages/core/src/ticket-ledger/index.ts"
+  - file: "packages/core/src/operation-contracts.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/core/src/ticket-review-resolver.ts"
+  - file: "packages/core/src/ticket-review-read-service.ts"
+  - file: "packages/core/test/ticket-review-read-service.test.ts"
+  - file: "packages/core/test/ticket-operation-dispatcher.test.ts"
+  - file: "packages/cli/src/main.ts"
+  - file: "packages/cli/test/ticket-cli.test.ts"
+  - file: "packages/mcp/src/server.ts"
+  - file: "packages/mcp/src/bounded-stdio.ts"
+  - file: "packages/mcp/test/capabilities.test.ts"
+  - file: "packages/mcp/test/bounded-stdio.test.ts"
+  - file: "skills/scripts/_dispatch.mjs"

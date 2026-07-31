@@ -1,5 +1,11 @@
 import { z } from "zod";
 import { KB_RELATION_TYPES, KB_SPEC_STATES, KB_SPEC_TYPES } from "./contract/kb-types.js";
+import {
+  TICKET_REVIEW_MAX_PAGE_SIZE,
+  TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE,
+  TICKET_REVIEW_TRACE_KINDS,
+} from "./contract/ticket-review.js";
+import { ticketDocumentSchema } from "./ticket-ledger/contract.js";
 
 // Public operation strings are canonical values, not normalization requests.
 // The absolute-end guard prevents JavaScript's `$` from accepting a final newline.
@@ -15,6 +21,144 @@ const tags = z.array(canonicalString(100)).max(50);
 const specType = z.enum(KB_SPEC_TYPES);
 const specState = z.enum(KB_SPEC_STATES);
 const relationType = z.enum(KB_RELATION_TYPES);
+const ticketOpaqueRef = canonicalString(300);
+const ticketId = canonicalString(200);
+const ticketPatchId = boundedString(96)
+  .min(1)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u);
+const ticketPatchSha256 = z.string().regex(/^sha256:[0-9a-f]{64}$/u);
+const ticketPatchSourceToken = z.string().regex(/^tls-[0-9a-f]{64}$/u);
+const ticketPatchWorktreeIdentity = z.string()
+  .regex(/^worktree-[0-9a-f]{64}$/u);
+const ticketPatchCommit = z.string()
+  .regex(/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/u);
+const ticketMutationSource = z.object({
+  sourceToken: ticketPatchSourceToken,
+  worktreeIdentity: ticketPatchWorktreeIdentity,
+  resolvedCommit: ticketPatchCommit,
+  graphDigest: ticketPatchSha256,
+  semanticLedgerDigest: ticketPatchSha256,
+}).strict();
+const ticketMutationGraphSubject = z.object({
+  kind: z.literal("graph"),
+  graphDigest: ticketPatchSha256,
+}).strict();
+const ticketMutationTicketSubject = z.object({
+  kind: z.literal("ticket"),
+  ticketId: ticketPatchId,
+  ticketRevision: ticketPatchSha256,
+}).strict();
+const ticketMutationRelationSubject = z.object({
+  kind: z.literal("relation"),
+  relationRef: z.string().regex(/^trl-[0-9a-f]{64}$/u),
+  prerequisiteTicketId: ticketPatchId,
+  dependentTicketId: ticketPatchId,
+  dependentTicketRevision: ticketPatchSha256,
+}).strict();
+const ticketMutationSubject = z.discriminatedUnion("kind", [
+  ticketMutationGraphSubject,
+  ticketMutationTicketSubject,
+  ticketMutationRelationSubject,
+]);
+const ticketReviewMutation = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("comment"),
+    subject: ticketMutationSubject,
+    body: canonicalString(20_000),
+  }).strict(),
+  z.object({
+    type: z.literal("ticket_edit"),
+    subject: ticketMutationTicketSubject,
+    body: canonicalString(20_000),
+    replacementTicket: ticketDocumentSchema,
+    rationale: canonicalString(20_000),
+  }).strict(),
+]);
+const ticketDecisionMutation = z.union([
+  z.object({
+    type: z.literal("plan_review"),
+    subject: ticketMutationGraphSubject,
+    disposition: z.literal("approve_execution"),
+    rationale: canonicalString(20_000),
+    resolutionRefs: z.array(canonicalString(4_096)).max(128),
+  }).strict(),
+  z.object({
+    type: z.literal("plan_review"),
+    subject: ticketMutationGraphSubject,
+    disposition: z.literal("delegate_within_boundaries"),
+    delegatedBoundaries: z.array(canonicalString(8_192)).min(1).max(128),
+    rationale: canonicalString(20_000),
+    resolutionRefs: z.array(canonicalString(4_096)).max(128),
+  }).strict(),
+  z.object({
+    type: z.literal("plan_review"),
+    subject: ticketMutationGraphSubject,
+    disposition: z.literal("request_changes"),
+    rationale: canonicalString(20_000),
+    resolutionRefs: z.array(canonicalString(4_096)).max(128),
+  }).strict(),
+  z.object({
+    type: z.literal("protected_boundary"),
+    subject: ticketMutationTicketSubject,
+    boundary: canonicalString(20_000),
+    disposition: z.literal("resolve"),
+    selection: canonicalString(20_000),
+    rationale: canonicalString(20_000),
+    resolutionRefs: z.array(canonicalString(4_096)).max(128),
+  }).strict(),
+  z.object({
+    type: z.literal("protected_boundary"),
+    subject: ticketMutationTicketSubject,
+    boundary: canonicalString(20_000),
+    disposition: z.literal("decline"),
+    rationale: canonicalString(20_000),
+    resolutionRefs: z.array(canonicalString(4_096)).max(128),
+  }).strict(),
+]);
+const ticketPatchPutChange = z.object({
+  op: z.literal("put"),
+  ticketId: ticketPatchId,
+  expectedTicketRevision: ticketPatchSha256.nullable(),
+  document: ticketDocumentSchema,
+}).strict().refine(
+  (change) => change.ticketId === change.document.ticket_id,
+  { message: "patch Ticket ID must match document.ticket_id" },
+);
+const ticketPatchChange = z.discriminatedUnion("op", [
+  ticketPatchPutChange,
+  z.object({
+    op: z.literal("delete"),
+    ticketId: ticketPatchId,
+    expectedTicketRevision: ticketPatchSha256,
+  }).strict(),
+]);
+const ticketReviewSubject = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("graph") }).strict(),
+  z.object({ kind: z.literal("ticket"), ticketId }).strict(),
+  z.object({ kind: z.literal("relation"), relationRef: ticketOpaqueRef }).strict(),
+]);
+const ticketTraceKinds = z.array(z.enum(TICKET_REVIEW_TRACE_KINDS))
+  .max(TICKET_REVIEW_TRACE_KINDS.length)
+  .refine((kinds) => new Set(kinds).size === kinds.length, {
+    message: "trace kinds must be unique",
+  });
+const ticketRunLease = z.object({
+  runId: ticketOpaqueRef,
+  generation: z.number().int().positive(),
+  leaseToken: canonicalString(512),
+}).strict();
+const ticketEvidenceReference = z.object({
+  kind: z.enum(["repo_path", "git_commit"]),
+  label: canonicalString(512),
+  target: canonicalString(4_096),
+  digest: ticketPatchSha256.optional(),
+}).strict();
+const ticketAcceptanceAdjudication = z.object({
+  acceptanceId: ticketPatchId,
+  disposition: z.enum(["accepted", "rejected", "unresolved"]),
+  evidenceRefs: z.array(ticketOpaqueRef).max(128),
+  rationale: canonicalString(20_000),
+}).strict();
 
 export const operationContextSchema = z.object({
   repoId: z.number().int().positive(), actor: id, taskId: id.optional(), requestId: id,
@@ -29,7 +173,7 @@ export const evidenceSchema = z.object({
 export const anchorSchema = z.object({file:path,symbol:boundedString(500).optional(),lineStart:z.number().int().positive().optional(),lineEnd:z.number().int().positive().optional(),contentHash:canonicalString(200).optional()}).strict()
   .refine(x=>x.lineEnd===undefined||(x.lineStart!==undefined&&x.lineEnd>=x.lineStart),{message:"lineEnd requires lineStart and must not precede it"});
 const relationSchema=z.object({toSpecId:id,type:relationType,rationale:long.optional()}).strict();
-const draftSchema=z.object({id,featureId:id.optional(),type:specType,summary:short,detail:long.optional(),priority:id.optional(),layer:id.optional(),domain:id.optional(),tags:tags.optional(),evidence:z.array(evidenceSchema).min(1).max(50),anchors:z.array(anchorSchema).max(100).optional(),relations:z.array(relationSchema).max(100).optional()}).strict();
+const specSchema=z.object({id,featureId:id.optional(),type:specType,summary:short,detail:long.optional(),priority:id.optional(),layer:id.optional(),domain:id.optional(),tags:tags.optional(),evidence:z.array(evidenceSchema).min(1).max(50),anchors:z.array(anchorSchema).max(100).optional(),relations:z.array(relationSchema).max(100).optional()}).strict();
 const key=canonicalString(200);
 const mutationBase={specId:id,idempotencyKey:key};
 const runId=id;
@@ -68,12 +212,11 @@ export const operationInputSchemas = {
   "kb.anchors": z.union([z.object({specId:id}).strict(),z.object({path}).strict()]),
   "kb.review": z.object({kinds:z.array(z.enum(["low_confidence","conflict","stale","unplaced"])).max(4).optional(),limit:z.number().int().min(1).max(500).optional(),offset:z.number().int().min(0).max(100_000).optional()}).strict(),
   "kb.ingest.preview": z.object({specs:z.array(z.object({summary:short,anchors:z.array(anchorSchema).max(100).optional()}).strict()).min(1).max(100)}).strict(),
-  "kb.draft.apply": z.object({idempotencyKey:key,specs:z.array(draftSchema).min(1).max(100)}).strict(),
-  "kb.promote": z.object(mutationBase).strict(),
+  "kb.spec.apply": z.object({idempotencyKey:key,specs:z.array(specSchema).min(1).max(100)}).strict(),
   "kb.mark-stale": z.object(mutationBase).strict(),
   "kb.deprecate": z.object(mutationBase).strict(),
   "kb.amend": z.object({...mutationBase,type:specType.optional(),summary:short.optional(),detail:long.nullable().optional(),priority:id.nullable().optional(),layer:id.nullable().optional(),domain:id.nullable().optional(),tags:tags.optional(),featureId:id.nullable().optional(),evidence:z.array(evidenceSchema).min(1).max(50),anchors:z.array(anchorSchema).max(100).optional()}).strict(),
-  "kb.supersede": z.object({...mutationBase,replacementSpecId:id,promoteReplacement:z.boolean().optional(),rationale:long.optional()}).strict(),
+  "kb.supersede": z.object({...mutationBase,replacementSpecId:id,rationale:long.optional()}).strict(),
   "distill.run.start": z.object({runId,mode:z.enum(["cold","refresh","incremental"]),baseCommit:z.string().regex(/^[0-9a-f]{40}$/),skillHash:id,configHash:id,budget:z.record(z.string(),z.unknown()).optional()}).strict(),
   "distill.run.status": distillRun,
   "distill.run.resume": distillRun,
@@ -99,7 +242,151 @@ export const operationInputSchemas = {
   "distill.finalize": distillRun,
   "distill.activate": z.object({targetVersionId:id,expectedCurrentVersion:id.nullable(),reason:short}).strict(),
   "distill.rollback": z.object({targetVersionId:id,expectedCurrentVersion:id.nullable(),reason:short}).strict(),
+  "ticket.graph.snapshot": z.object({
+    cursor: canonicalString(2_000).optional(),
+    pageSize: z.number().int().min(1).max(TICKET_REVIEW_MAX_PAGE_SIZE).optional(),
+  }).strict(),
+  "ticket.subject.inspect": z.object({
+    snapshotId: ticketOpaqueRef,
+    subject: ticketReviewSubject,
+  }).strict(),
+  "ticket.trace.list": z.object({
+    snapshotId: ticketOpaqueRef,
+    subject: ticketReviewSubject,
+    kinds: ticketTraceKinds.optional(),
+    cursor: canonicalString(2_000).optional(),
+    limit: z.number().int().min(1)
+      .max(TICKET_REVIEW_MAX_TRACE_RECORDS_PER_PAGE)
+      .optional(),
+  }).strict(),
+  "ticket.worktree.patch": z.object({
+    expectedSource: ticketMutationSource,
+    changes: z.array(ticketPatchChange)
+      .min(1)
+      .max(1_000),
+  }).strict(),
+  "ticket.review.append": z.object({
+    expectedSource: ticketMutationSource,
+    review: ticketReviewMutation,
+  }).strict(),
+  "ticket.decision.record": z.object({
+    expectedSource: ticketMutationSource,
+    decision: ticketDecisionMutation,
+  }).strict(),
+  "ticket.frontier.read": z.object({}).strict(),
+  "ticket.context.compile": z.object({
+    expectedSource: ticketMutationSource,
+    ticketId: ticketPatchId,
+    expectedTicketRevision: ticketPatchSha256,
+  }).strict(),
+  "ticket.run.claim": z.object({
+    expectedSource: ticketMutationSource,
+    ticketId: ticketPatchId,
+    expectedTicketRevision: ticketPatchSha256,
+    contextBindingId: ticketOpaqueRef,
+    contextBindingDigest: ticketPatchSha256,
+    leaseSeconds: z.number().int().min(15).max(3_600),
+  }).strict(),
+  "ticket.run.heartbeat": z.object({
+    ...ticketRunLease.shape,
+    leaseSeconds: z.number().int().min(15).max(3_600),
+  }).strict(),
+  "ticket.run.release": z.object({
+    ...ticketRunLease.shape,
+    reason: z.enum([
+      "lease_released",
+      "stale_binding",
+      "superseded",
+      "operator_cancelled",
+    ]),
+  }).strict(),
+  "ticket.evidence.append": z.object({
+    expectedSource: ticketMutationSource,
+    run: ticketRunLease,
+    acceptanceId: ticketPatchId,
+    evidenceType: z.enum([
+      "test",
+      "inspection",
+      "artifact",
+      "commit",
+      "runtime_observation",
+    ]),
+    summary: canonicalString(20_000),
+    references: z.array(ticketEvidenceReference).min(1).max(128),
+  }).strict(),
+  "ticket.closeout.append": z.object({
+    expectedSource: ticketMutationSource,
+    runId: ticketOpaqueRef,
+    generation: z.number().int().positive(),
+    terminalForm: z.enum([
+      "successful",
+      "partial",
+      "failed",
+      "deviated",
+      "stale",
+    ]),
+    executorReport: canonicalString(20_000),
+    acceptance: z.array(ticketAcceptanceAdjudication).max(128),
+    followUpTicketRefs: z.array(ticketPatchId).max(128),
+    semanticCloseoutRefs: z.array(z.discriminatedUnion("kind", [
+      z.object({
+        kind: z.literal("review"),
+        reviewId: ticketOpaqueRef,
+      }).strict(),
+      z.object({
+        kind: z.literal("decision"),
+        decisionId: ticketOpaqueRef,
+      }).strict(),
+      z.object({
+        kind: z.literal("decision_attestation"),
+        attestationId: ticketOpaqueRef,
+      }).strict(),
+    ])).max(128),
+  }).strict(),
 } as const;
+
+export const OPERATION_INPUT_BYTE_LIMITS = {
+  "ticket.worktree.patch": 10 * 1024 * 1024,
+  "ticket.review.append": 512 * 1024,
+  "ticket.decision.record": 128 * 1024,
+  "ticket.evidence.append": 512 * 1024,
+  "ticket.closeout.append": 512 * 1024,
+} as const satisfies Partial<
+  Record<keyof typeof operationInputSchemas, number>
+>;
+
+/** Unknown operation inputs are bounded before hashing for receipt replay. */
+export const UNKNOWN_OPERATION_INPUT_MAX_BYTES = 64 * 1024;
+
+function isJsonValueWithinByteBudget(
+  value: unknown,
+  maximumBytes: number,
+): boolean {
+  try {
+    const encoded = JSON.stringify(value);
+    return encoded !== undefined
+      && new TextEncoder().encode(encoded).byteLength <= maximumBytes;
+  } catch {
+    return false;
+  }
+}
+
+export function isOperationInputWithinBudget(
+  operation: string,
+  input: unknown,
+): boolean {
+  const maximum = OPERATION_INPUT_BYTE_LIMITS[
+    operation as keyof typeof OPERATION_INPUT_BYTE_LIMITS
+  ];
+  if (maximum !== undefined) {
+    return isJsonValueWithinByteBudget(input, maximum);
+  }
+  return Object.prototype.hasOwnProperty.call(operationInputSchemas, operation)
+    || isJsonValueWithinByteBudget(
+      input,
+      UNKNOWN_OPERATION_INPUT_MAX_BYTES,
+    );
+}
 
 /**
  * Audited cross-field rules that Zod's JSON Schema conversion cannot preserve
@@ -108,8 +395,8 @@ export const operationInputSchemas = {
  * source before publishing the artifact.
  */
 export const operationRefinementManifest = {
-  "evidence-content": {runtimeSites:1,operations:["kb.draft.apply","kb.amend"]},
-  "anchor-line-range": {runtimeSites:1,operations:["kb.ingest.preview","kb.draft.apply","kb.amend","distill.candidates.put"]},
+  "evidence-content": {runtimeSites:1,operations:["kb.spec.apply","kb.amend"]},
+  "anchor-line-range": {runtimeSites:1,operations:["kb.ingest.preview","kb.spec.apply","kb.amend","distill.candidates.put"]},
   "inventory-classification": {runtimeSites:1,operations:["distill.inventory.put"]},
   "inventory-included-no-reason": {runtimeSites:1,operations:["distill.inventory.put"]},
   "inventory-change-hash": {runtimeSites:1,operations:["distill.inventory.put"]},
@@ -122,6 +409,8 @@ export const operationRefinementManifest = {
   "candidate-selector-exactly-one": {runtimeSites:2,operations:["distill.candidates.get","distill.candidates.list"]},
   "candidate-discriminated-union": {runtimeSites:0,operations:["distill.candidates.put"]},
   "anchors-strict-union": {runtimeSites:0,operations:["kb.anchors"]},
+  "ticket-trace-kinds-unique": {runtimeSites:1,operations:["ticket.trace.list"]},
+  "ticket-patch-id-match": {runtimeSites:1,operations:["ticket.worktree.patch"]},
 } as const;
 
 /**
@@ -137,15 +426,15 @@ export const operationAcceptanceConstructManifest = {
   default: 0,
   catch: 0,
   coerce: 0,
-  regex: 3,
+  regex: 9,
   isoDatetime: 1,
-  union: 1,
-  discriminatedUnion: 1,
+  union: 2,
+  discriminatedUnion: 6,
   unknown: 1,
-  strict: 55,
+  strict: 89,
   safeExtend: 1,
-  optional: 90,
-  nullable: 9,
+  optional: 95,
+  nullable: 10,
   check: 1,
   custom: 1,
   meta: 1,

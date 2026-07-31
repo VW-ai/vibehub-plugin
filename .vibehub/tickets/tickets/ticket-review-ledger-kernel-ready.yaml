@@ -1,0 +1,38 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-review-ledger-kernel-ready
+outcome: The Git Ticket ledger strictly reads and atomically records exact-source ReviewContribution and Decision documents with stable subject identity, honest authority claims, and no change to Ticket definition identity.
+context: M3 needs durable review facts without turning Ticket YAML, HTML, or SQLite into a review database. ReviewContribution is append-only, distinguishes comment from ticket_edit, binds a graph, Ticket revision, or stable relation subject, and carries a complete proposed replacement Ticket rather than a raw patch. Decision records plan_review or protected_boundary intent for one exact subject. Its document preserves the claimed human principal, basis, scope, selection, and rationale as durable evidence, but repository-editable YAML is not self-authenticating authority. Generic adapters fail closed for Decision writes. A trusted dispatcher can write, reload, compare the complete canonical document, and issue only a short-lived process-local attestation. Keep graphDigest scoped to normalized Ticket definitions and topology, the semantic-ledger digest over durable Ticket facts, and the physical source token over the complete ledger inventory. Reuse one writer lock, stale-source checks, safe YAML and file rules, atomic no-replace install, conditional rollback, reload verification, size limits, and exact checkpoint selection.
+acceptance:
+  - acceptance_id: authority-separated
+    criterion: Claimed comment or edit attribution never grants execution authority; raw Decision documents project only as intent and evidence, while a gate additionally requires an exact short-lived receipt minted after the trusted dispatcher reloads and matches the complete canonical Decision.
+  - acceptance_id: digest-separation
+    criterion: Adding a ReviewContribution or Decision changes the semantic-ledger digest and physical source token while leaving the Ticket graph digest, topology digest, Ticket revisions, and deterministic layout inputs unchanged.
+  - acceptance_id: exact-atomic-writers
+    criterion: ticket.review.append and ticket.decision.record reject stale source, subject drift, conflicting identity, invalid authority, oversized documents, unsafe paths, and publisher races with zero partial semantic writes; success leaves one reload-verified Git worktree change and an exact optional checkpoint selection.
+  - acceptance_id: strict-review-documents
+    criterion: Strict codecs and path rules accept only bounded ReviewContribution and Decision documents at deterministic safe paths and reject unknown fields, invalid unions, duplicate identities, traversal, symlinks, special files, malformed complete Ticket replacements, and aggregate ledger overflow.
+constraints:
+  - Do not broaden ticket.worktree.patch into a generic document or raw-path writer.
+  - Comments and edit proposals must not change the referenced Ticket revision or become authored Ticket status.
+  - Do not add SQLite Ticket semantic writes, latest pointers, timestamp winner selection, auto-commit, or a mandatory proposal lifecycle.
+  - A conflicting Decision for the same exact subject must fail or form an ordinary Git conflict rather than silently overwrite the earlier answer.
+  - A durable Decision claim and a process-local authority receipt are distinct facts; neither may be mislabeled as cross-process attestation.
+context_refs:
+  - ref: META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml
+    purpose: Defines the strict review ledger and same-session Decision authority boundary.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml
+    purpose: Defines optional Git-native review and decision facts without a fixed lifecycle.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml
+    purpose: Requires attributed comments, edit proposals, and decisions without UI-owned persistence.
+  - ref: packages/core/src/ticket-decision-attestation.ts
+    purpose: Owns the non-exported process-local attestation registry and exact binding checks.
+  - ref: packages/core/src/ticket-ledger
+    purpose: Owns the strict Git ledger, digests, exact writers, checkpoint boundary, and safe file rules.
+relations: []
+provenance_refs:
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md
+  - META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml
+  - META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml
+  - META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml
+  - ticket-git-review-intervention-ready

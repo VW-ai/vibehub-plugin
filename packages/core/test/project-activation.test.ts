@@ -251,14 +251,14 @@ describe("project activation primitives", () => {
       ["kb.relations", { edges: [{ fromSpecId: "a" }] }, { root: "a", edges: [] }],
       ["kb.lineage", { chain: ["a"] }, { chain: [] }],
       ["kb.anchors", { forward: [{ file: "a.ts" }] }, { forward: [] }],
-      ["kb.draft.apply", { operation: "draft_batch", idempotencyKey: "k", created: ["s"] }, null],
+      ["kb.spec.apply", { operation: "spec_batch", idempotencyKey: "k", created: ["s"] }, null],
     ];
     for (const [operation, positive, negative] of cases) {
       expect(operationProvesContextValue(operation, positive), `${operation} positive`).toBe(true);
       expect(operationProvesContextValue(operation, negative), `${operation} negative`).toBe(false);
     }
     expect(operationProvesContextValue("kb.status", { total: 99, items: [{ id: "x" }] })).toBe(false);
-    expect(operationProvesContextValue("kb.draft.apply", { operation: "draft_batch", idempotencyKey: "k", created: [] })).toBe(false);
+    expect(operationProvesContextValue("kb.spec.apply", { operation: "spec_batch", idempotencyKey: "k", created: [] })).toBe(false);
   });
   it.each([
     { instructionVersion: "bad\nversion", instructionBody: "safe" },

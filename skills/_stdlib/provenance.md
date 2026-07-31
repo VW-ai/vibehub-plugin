@@ -1,6 +1,6 @@
 # Provenance and evidence
 
-Every draft or candidate needs immutable evidence with a source reference and
+Every canonical Spec or distillation candidate needs immutable evidence with a source reference and
 at least one of: exact quote, evidence reference, or content hash.
 
 Use exact quotes for authored decisions and constraints. For code evidence,

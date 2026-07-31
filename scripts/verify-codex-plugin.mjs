@@ -74,6 +74,19 @@ function assertManifestAndConfigs(pluginRoot) {
   ) {
     throw new Error("Codex manifest does not point at the shared skills and host configs");
   }
+  const defaultPrompts = manifest.interface?.defaultPrompt;
+  if (
+    !Array.isArray(defaultPrompts) ||
+    defaultPrompts.length < 1 ||
+    defaultPrompts.length > 3 ||
+    defaultPrompts.some(
+      (prompt) => typeof prompt !== "string" || prompt.trim().length === 0,
+    )
+  ) {
+    throw new Error(
+      "Codex defaultPrompt must contain one to three non-empty prompts",
+    );
+  }
 
   const mcp = readJson(join(pluginRoot, "codex", "mcp.json"));
   const server = mcp.mcpServers?.vibehub;

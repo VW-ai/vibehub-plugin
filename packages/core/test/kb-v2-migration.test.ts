@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { computeMappingChecksum, CURRENT_SCHEMA_VERSION, openDb } from "../src/db.js";
 import { listTerritories, readSpec, readTerritoryLayouts } from "../src/graph-store.js";
+import { OperationDispatcher } from "../src/operation-dispatcher.js";
 
 const T0 = "2026-07-13T00:00:00.000Z";
 
@@ -93,7 +94,7 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     raw.close();
 
     const db = openDb(file);
-    expect(CURRENT_SCHEMA_VERSION).toBe(16);
+    expect(CURRENT_SCHEMA_VERSION).toBe(22);
     expect(db.pragma("user_version", { simple: true })).toBe(CURRENT_SCHEMA_VERSION);
     expect(db.prepare(`SELECT repo_id, feature_id FROM kb_features WHERE feature_id = 'root' ORDER BY repo_id`).all())
       .toEqual([{ repo_id: 1, feature_id: "root" }, { repo_id: 2, feature_id: "root" }]);
@@ -139,10 +140,11 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
   it("upgrades v11 databases with immutable unresolved scope dispositions",()=>{
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-unresolved-migration-"));dirs.push(dir);
     const file=path.join(dir,"legacy-v11.db"),db=openDb(file);db.close();
-    const raw=new Database(file);raw.exec(`DROP TABLE IF EXISTS distill_scope_dispositions; DROP TABLE IF EXISTS operation_request_receipts; DROP TABLE IF EXISTS task_prompt_cadence; DROP TABLE IF EXISTS task_prompt_seen; DROP TABLE IF EXISTS repo_semantic_authority; DROP INDEX IF EXISTS idx_kb_provenance_task; PRAGMA user_version=11;`);raw.close();
+    const raw=new Database(file);raw.exec(`DROP TABLE IF EXISTS ticket_runs; DROP TABLE IF EXISTS operation_request_receipts; DROP TABLE IF EXISTS distill_scope_dispositions; DROP TABLE IF EXISTS task_prompt_cadence; DROP TABLE IF EXISTS task_prompt_seen; DROP TABLE IF EXISTS repo_semantic_authority; DROP INDEX IF EXISTS idx_kb_provenance_task; PRAGMA user_version=11;`);raw.close();
     const upgraded=openDb(file);
     expect(upgraded.pragma("user_version",{simple:true})).toBe(CURRENT_SCHEMA_VERSION);
     expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='distill_scope_dispositions'`).get()).toEqual({name:"distill_scope_dispositions"});
+    expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='ticket_runs'`).get()).toEqual({name:"ticket_runs"});
     upgraded.prepare(`INSERT INTO repos(root_path,default_branch,created_at) VALUES('/integrity','main',?)`).run(T0);
     const insertReceipt=upgraded.prepare(`INSERT INTO operation_request_receipts(repo_id,request_id,operation,payload_hash,outcome_kind,outcome,created_at) VALUES(1,?,'kb.status','hash','success',?,?)`);
     expect(()=>insertReceipt.run('missing-ok','{}',T0)).toThrow(/CHECK constraint/);
@@ -158,6 +160,72 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     expect(()=>insert.run('leaf','excluded.ts',2,T0)).toThrow(/completed leaf generation/);
     expect(insert.run('leaf','owned.ts',2,T0).changes).toBe(1);
     upgraded.close();
+  });
+
+  it("upgrades v16 with disposable Ticket run leases without changing generic receipt replay",()=>{
+    const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-receipt-v16-"));dirs.push(dir);
+    const file=path.join(dir,"legacy-v16.db"),repoRoot=path.join(dir,"repo");
+    fs.mkdirSync(repoRoot);
+    let db=openDb(file);
+    db.prepare(`INSERT INTO repos(root_path,default_branch,created_at) VALUES(?,'main',?)`).run(repoRoot,T0);
+    const context={repoId:1,actor:"legacy-reader",requestId:"legacy-inline",now:T0};
+    const first=new OperationDispatcher(db).dispatch("kb.status",context,{});
+    expect(first).toMatchObject({ok:true});
+    db.close();
+
+    const raw=new Database(file);
+    raw.exec(`DROP TABLE ticket_runs; PRAGMA user_version=16;`);
+    raw.close();
+
+    db=openDb(file);
+    expect(db.prepare(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='ticket_runs'`,
+    ).get()).toEqual({name:"ticket_runs"});
+    expect(new OperationDispatcher(db).dispatch(
+      "kb.status",
+      context,
+      {},
+    )).toEqual(first);
+    const legacyEnvelope=JSON.stringify({
+      ok:true,
+      data:{states:{},unplaced:0},
+      meta:{
+        operation:"kb.status",
+        repoId:1,
+        requestId:"legacy-column-list",
+        at:T0,
+      },
+    });
+    expect(()=>db.prepare(
+      `INSERT INTO operation_request_receipts(
+         repo_id,request_id,operation,payload_hash,
+         outcome_kind,outcome,created_at
+       ) VALUES(1,'legacy-column-list','kb.status','hash','success',?,?)`,
+    ).run(legacyEnvelope,T0)).not.toThrow();
+    db.close();
+  });
+
+  it("advances an already-clean v21 database to the disposable Run schema",()=>{
+    const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-ticket-run-v21-"));dirs.push(dir);
+    const file=path.join(dir,"clean-v21.db");
+    let db=openDb(file);
+    db.close();
+
+    const raw=new Database(file);
+    raw.exec(`DROP TABLE ticket_runs; PRAGMA user_version=21;`);
+    raw.close();
+
+    db=openDb(file);
+    expect(db.pragma("user_version",{simple:true})).toBe(22);
+    expect(db.prepare(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='ticket_runs'`,
+    ).get()).toEqual({name:"ticket_runs"});
+    expect(db.prepare(
+      `SELECT name FROM sqlite_master
+       WHERE type IN ('table','trigger')
+         AND name LIKE 'ticket_proposal_%'`,
+    ).all()).toEqual([]);
+    db.close();
   });
 
   it("cuts map/spec readers to the active v2 mapping without changing the legacy snapshot shape", () => {

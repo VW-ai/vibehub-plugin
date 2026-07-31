@@ -1050,6 +1050,58 @@ const MIGRATIONS: string[] = [
     cutover_at TEXT NOT NULL
   );
   `,
+
+  // 017–021 — previously published schema-version positions. They remain
+  // empty in the clean-cut schema solely to keep user_version monotonic; no
+  // retired Ticket table, trigger, receipt, or compatibility runtime is
+  // recreated.
+  ``,
+  ``,
+  ``,
+  ``,
+  ``,
+
+  // 022 — disposable Ticket execution leases. This table coordinates one
+  // current executor for an exact repo/worktree/Ticket revision. It contains
+  // no Ticket status, outcome, evidence, acceptance, or other semantic fact;
+  // deleting the database merely forgets transient ownership.
+  `
+  CREATE TABLE ticket_runs (
+    repo_id INTEGER NOT NULL REFERENCES repos(id),
+    worktree_identity TEXT NOT NULL,
+    run_id TEXT NOT NULL,
+    ticket_id TEXT NOT NULL,
+    ticket_revision TEXT NOT NULL,
+    context_binding_id TEXT NOT NULL,
+    context_binding_digest TEXT NOT NULL,
+    actor TEXT NOT NULL,
+    start_source_digest TEXT NOT NULL,
+    start_branch TEXT NOT NULL,
+    start_head_sha TEXT NOT NULL,
+    lease_generation INTEGER NOT NULL,
+    token_hash TEXT NOT NULL,
+    claimed_at TEXT NOT NULL,
+    heartbeat_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    released_at TEXT,
+    release_reason TEXT,
+    PRIMARY KEY (repo_id, run_id),
+    CHECK (lease_generation > 0),
+    CHECK (length(token_hash) = 64),
+    CHECK (expires_at > claimed_at),
+    CHECK (
+      (released_at IS NULL AND release_reason IS NULL) OR
+      (released_at IS NOT NULL AND release_reason IS NOT NULL)
+    )
+  );
+
+  CREATE UNIQUE INDEX idx_ticket_runs_unreleased_claim
+    ON ticket_runs(repo_id, worktree_identity, ticket_id, ticket_revision)
+    WHERE released_at IS NULL;
+  CREATE INDEX idx_ticket_runs_current
+    ON ticket_runs(repo_id, worktree_identity, expires_at)
+    WHERE released_at IS NULL;
+  `,
 ];
 
 /** Stable schema version reported by `vibehub doctor --json`. */
@@ -1096,11 +1148,16 @@ export function inspectDatabase(dbPath: string = defaultDbPath()): DatabaseInspe
 export function openDb(dbPath: string = defaultDbPath()): Db {
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
-  db.pragma("busy_timeout = 5000");
-  db.pragma("foreign_keys = ON");
-  migrate(db);
-  return db;
+  try {
+    db.pragma("journal_mode = WAL");
+    db.pragma("busy_timeout = 5000");
+    db.pragma("foreign_keys = ON");
+    migrate(db);
+    return db;
+  } catch (error) {
+    db.close();
+    throw error;
+  }
 }
 
 /** Strict read-only door for doctor/inspection. No mkdir, WAL pragma, or migration. */
@@ -1136,6 +1193,11 @@ export function withReadonlyDb<T>(dbPath: string, read: (db: Db) => T): T {
 
 function migrate(db: Db): void {
   const version = db.pragma("user_version", { simple: true }) as number;
+  if (version > MIGRATIONS.length) {
+    throw new Error(
+      `database schema version ${version} is newer than supported version ${MIGRATIONS.length}`,
+    );
+  }
   for (let v = version; v < MIGRATIONS.length; v++) {
     const apply = db.transaction(() => {
       db.exec(MIGRATIONS[v]!);

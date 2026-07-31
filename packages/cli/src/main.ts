@@ -23,12 +23,15 @@ import {
   applyIntervention,
   CURRENT_SCHEMA_VERSION,
   commitSemanticCheckpoint,
+  commitTicketCheckpoint,
+  FileTicketDecisionLocalSignatureTrustProfileResolverV0,
   exportTeamMapSnapshot,
   GitFacade,
   ingestCanonicalHookEvent,
   migrateSqliteSemanticStoreToGit,
   openDb,
   prepareSemanticCheckpoint,
+  prepareTicketCheckpoint,
   projectDoctorReceipt,
   projectInitReceipt,
   projectInjectionInterventionReceipt,
@@ -38,7 +41,10 @@ import {
   RuntimeService,
   OperationDispatcher,
   OPERATION_EXIT_CLASS,
+  OPERATION_INPUT_BYTE_LIMITS,
+  operationInputSchemas,
   syncTeamSnapshot,
+  upsertRepo,
   vibehubHome,
   type HookEventName,
   type HookHost,
@@ -46,6 +52,7 @@ import {
 } from "@vw-ai/vibehub-core";
 import { releaseAssetManifest, releaseAssetRoot } from "./managed-assets.js";
 import { adaptHookInput, projectHookOutput } from "./hook-adapters.js";
+import { launchTicketReviewHostCommand } from "./ticket-review-host.js";
 import {
   installVibeHubHosts,
   type HostSelection,
@@ -106,11 +113,13 @@ const USAGE = `usage:
   vibehub setup inspect|apply|status [--repo <path>] [--db <path>] [--json]
   vibehub doctor [--json] [--repo <path>] [--db <path>]
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
-  vibehub kb <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
+  vibehub kb <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub kb migrate-store --json [--repo <path>] [--db <path>]
-  vibehub checkpoint prepare --json [--repo <path>] [--protect <branch>]
-  vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
-  vibehub distill <operation> --json [--input <json>] [--actor <id>] [--task <id>] [--request <id>]
+  vibehub checkpoint prepare --json [--scope semantic|ticket] [--input <selection-json>] [--repo <path>] [--protect <branch>]
+  vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--scope semantic|ticket] [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
+  vibehub distill <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
+  vibehub ticket <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
+  vibehub ticket review [--repo <path>] [--db <path>] [--port <port>] [--no-open] [--json]
   vibehub hook <SessionStart|UserPromptSubmit|PostToolUse|PostToolUseFailure|Notification|Stop|StopFailure|SessionEnd|SubagentStart|SubagentStop> [--host claude-code|codex]
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
@@ -240,39 +249,155 @@ interface KbCliFlags {
   input:Record<string,unknown>; json:boolean;
 }
 
-function parseKbFlags(argv:string[]):KbCliFlags {
+const SQLITE_FREE_TICKET_OPERATIONS = new Set([
+  "ticket.graph.snapshot",
+  "ticket.subject.inspect",
+  "ticket.trace.list",
+  "ticket.worktree.patch",
+  "ticket.review.append",
+  "ticket.decision.record",
+  "ticket.context.compile",
+]);
+
+const ALL_GIT_NATIVE_TICKET_OPERATIONS = new Set([
+  ...SQLITE_FREE_TICKET_OPERATIONS,
+  "ticket.frontier.read",
+  "ticket.run.claim",
+  "ticket.run.heartbeat",
+  "ticket.run.release",
+  "ticket.evidence.append",
+  "ticket.closeout.append",
+]);
+
+function parseKbFlags(
+  argv:string[],
+  maximumInputBytes?:number,
+):KbCliFlags {
   let dbFlag:string|undefined; let repo=process.cwd(); let repoId:number|undefined;
-  let actor:string|undefined; let taskId:string|undefined; let requestId=`cli-${Date.now()}`;
+  let actor:string|undefined; let taskId:string|undefined;
+  let requestId=`cli-${crypto.randomUUID()}`;
   let inputText:string|undefined; let json=false;
   for(let i=0;i<argv.length;i++){
-    const flag=argv[i]; const take=()=>argv[++i];
-    if(flag==="--db")dbFlag=take(); else if(flag==="--repo")repo=take()??repo;
-    else if(flag==="--repo-id")repoId=Number(take()); else if(flag==="--actor")actor=take();
-    else if(flag==="--task")taskId=take(); else if(flag==="--request")requestId=take()??requestId;
-    else if(flag==="--input")inputText=take(); else if(flag==="--json")json=true;
+    const flag=argv[i];
+    const takeRequired=()=>{
+      const value=argv[++i];
+      if(!value||value.startsWith("--"))throw new Error(`${flag} requires a value`);
+      return value;
+    };
+    if(flag==="--db")dbFlag=takeRequired(); else if(flag==="--repo")repo=takeRequired();
+    else if(flag==="--repo-id"){
+      const value=takeRequired();repoId=Number(value);
+      if(!Number.isSafeInteger(repoId)||repoId<1)throw new Error("--repo-id requires a positive integer");
+    }else if(flag==="--actor")actor=takeRequired();
+    else if(flag==="--task")taskId=takeRequired(); else if(flag==="--request")requestId=takeRequired();
+    else if(flag==="--input")inputText=takeRequired(); else if(flag==="--json")json=true;
     else throw new Error(`unknown flag: ${flag}`);
   }
-  if(inputText==="-"){const stdin=readStdin().trim();inputText=stdin||"{}";}
+  if(inputText==="-"){
+    const stdin=(maximumInputBytes === undefined
+      ? readStdin()
+      : readStdinBounded(maximumInputBytes)).trim();
+    inputText=stdin||"{}";
+  }else if(
+    inputText !== undefined
+    && maximumInputBytes !== undefined
+    && Buffer.byteLength(inputText,"utf8")>maximumInputBytes
+  ){
+    throw new Error(
+      `operation raw JSON input exceeds ${maximumInputBytes} bytes`,
+    );
+  }
   const input=inputText?JSON.parse(inputText) as Record<string,unknown>:{};
   return {db:resolveDbPath(dbFlag),repo,repoId,actor,taskId,requestId,input,json};
 }
 
-function runOperation(group:"kb"|"distill",operation:string|undefined,argv:string[]):number {
+function runOperation(
+  group:"kb"|"distill"|"ticket",
+  operation:string|undefined,
+  argv:string[],
+):number {
   let db:ReturnType<typeof openDb>|undefined;
   try{
-    if(!operation)throw new Error("KB operation is required");
-    const flags=parseKbFlags(argv); if(!flags.json)throw new Error("kb operations require --json");
-    db=openDb(flags.db);
+    if(!operation)throw new Error(`${group} operation is required`);
+    const familyPrefix=`${group}.`;
+    if(OPERATION_FAMILY_PREFIXES.some((prefix)=>operation.startsWith(prefix))
+      && !operation.startsWith(familyPrefix)){
+      throw new Error(`${operation} does not belong to the ${group} operation family`);
+    }
+    const canonicalOperation=operation.startsWith(familyPrefix)
+      ? operation
+      : `${group}.${operation}`;
+    if(!Object.prototype.hasOwnProperty.call(
+      operationInputSchemas,
+      canonicalOperation,
+    )){
+      throw new Error(`unsupported ${group} operation: ${operation}`);
+    }
+    const flags=parseKbFlags(
+      argv,
+      OPERATION_INPUT_BYTE_LIMITS[
+        canonicalOperation as keyof typeof OPERATION_INPUT_BYTE_LIMITS
+      ],
+    );
+    if(!flags.json)throw new Error(`${group} operations require --json`);
+    if(!flags.actor?.trim())throw new Error(`${group} operations require --actor <id>`);
     const session=GitFacade.sessionContextAt(flags.repo);
+    const sqliteFree=SQLITE_FREE_TICKET_OPERATIONS.has(canonicalOperation);
+    db=openDb(sqliteFree ? ":memory:" : flags.db);
     const root=session.repoRoot;
-    const row=flags.repoId?{id:flags.repoId}:db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(root) as {id:number}|undefined;
-    const repoId=row?.id??0;
-    const canonicalOperation=operation.startsWith("kb.")||operation.startsWith("distill.")?operation:`${group}.${operation}`;
-    const result=new OperationDispatcher(db,{repoRoot:session.toplevel}).dispatch(canonicalOperation,{repoId,actor:flags.actor??"",taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
+    type RepoAddress={id:number;rootPath:string};
+    let row=flags.repoId
+      ? db.prepare(
+        `SELECT id,root_path AS rootPath FROM repos WHERE id=?`,
+      ).get(flags.repoId) as RepoAddress|undefined
+      : db.prepare(
+        `SELECT id,root_path AS rootPath FROM repos WHERE root_path=?`,
+      ).get(root) as RepoAddress|undefined;
+    if (
+      row !== undefined
+      && !sqliteFree
+      && ALL_GIT_NATIVE_TICKET_OPERATIONS.has(canonicalOperation)
+      && fs.realpathSync(row.rootPath) !== fs.realpathSync(root)
+    ) {
+      throw new Error("--repo-id does not belong to the trusted Ticket repository");
+    }
+    if (
+      row === undefined
+      && !sqliteFree
+      && ALL_GIT_NATIVE_TICKET_OPERATIONS.has(canonicalOperation)
+      && flags.repoId === undefined
+    ) {
+      row=upsertRepo(
+        db,
+        root,
+        path.basename(root),
+        session.branch ?? "detached",
+        new Date().toISOString(),
+      );
+    }
+    if (
+      row === undefined
+      && !sqliteFree
+      && ALL_GIT_NATIVE_TICKET_OPERATIONS.has(canonicalOperation)
+    ) {
+      throw new Error("--repo-id does not identify an initialized repository");
+    }
+    const repoId=row?.id??(
+      ALL_GIT_NATIVE_TICKET_OPERATIONS.has(canonicalOperation)
+        ? flags.repoId ?? 1
+        : 0
+    );
+    const result=new OperationDispatcher(db,{
+      repoRoot:session.toplevel,
+      ticketDecisionAttestationTrustProfiles:
+        new FileTicketDecisionLocalSignatureTrustProfileResolverV0(),
+    }).dispatch(canonicalOperation,{repoId,actor:flags.actor,taskId:flags.taskId,requestId:flags.requestId,now:new Date().toISOString()},flags.input);
     process.stdout.write(`${JSON.stringify(result)}\n`);
     return result.ok?0:(OPERATION_EXIT_CLASS[result.error.code]??1);
   }catch(error){const result={ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error),details:null,nextSafeActions:[`Run vibehub ${group} with --json and a valid JSON --input payload.`]}};process.stdout.write(`${JSON.stringify(result)}\n`);return 2;}finally{db?.close();}
 }
+
+const OPERATION_FAMILY_PREFIXES=["kb.","distill.","ticket."] as const;
 
 function runSemanticMigration(argv:string[]):number{
   const flags=parseFlags(argv,"throw");
@@ -327,6 +452,7 @@ function runSemanticMigration(argv:string[]):number{
 interface CheckpointCliFlags {
   repo: string;
   json: boolean;
+  scope: "semantic" | "ticket";
   input?: string;
   actor?: string;
   taskId?: string;
@@ -334,9 +460,12 @@ interface CheckpointCliFlags {
   protectedBranches: string[];
 }
 
+const CHECKPOINT_INPUT_MAX_BYTES = 1024 * 1024;
+
 function parseCheckpointFlags(argv: string[]): CheckpointCliFlags {
   let repo = process.cwd();
   let json = false;
+  let scope: "semantic" | "ticket" = "semantic";
   let input: string | undefined;
   let actor: string | undefined;
   let taskId: string | undefined;
@@ -351,6 +480,13 @@ function parseCheckpointFlags(argv: string[]): CheckpointCliFlags {
     };
     if (flag === "--repo") repo = take();
     else if (flag === "--json") json = true;
+    else if (flag === "--scope") {
+      const value = take();
+      if (value !== "semantic" && value !== "ticket") {
+        throw new Error("--scope must be semantic or ticket");
+      }
+      scope = value;
+    }
     else if (flag === "--input") input = take();
     else if (flag === "--actor") actor = take();
     else if (flag === "--task") taskId = take();
@@ -359,11 +495,29 @@ function parseCheckpointFlags(argv: string[]): CheckpointCliFlags {
     else throw new Error(`unknown flag: ${flag}`);
   }
   if (!json) throw new Error("checkpoint operations require --json");
-  if (input === "-") input = readStdin().trim();
-  return { repo, json, input, actor, taskId, requestId, protectedBranches };
+  if (input === "-") {
+    input = readStdinBounded(CHECKPOINT_INPUT_MAX_BYTES).trim();
+  } else if (
+    input !== undefined
+    && Buffer.byteLength(input, "utf8") > CHECKPOINT_INPUT_MAX_BYTES
+  ) {
+    throw new Error(
+      `checkpoint raw JSON input exceeds ${CHECKPOINT_INPUT_MAX_BYTES} bytes`,
+    );
+  }
+  return {
+    repo,
+    json,
+    scope,
+    input,
+    actor,
+    taskId,
+    requestId,
+    protectedBranches,
+  };
 }
 
-function runSemanticCheckpoint(
+function runCheckpoint(
   operation: string | undefined,
   argv: string[],
 ): number {
@@ -373,22 +527,46 @@ function runSemanticCheckpoint(
     }
     const flags = parseCheckpointFlags(argv);
     const session = GitFacade.sessionContextAt(flags.repo);
-    const data = operation === "prepare"
-      ? prepareSemanticCheckpoint({
-        repoRoot: session.toplevel,
-        protectedBranches: flags.protectedBranches,
-      })
-      : commitSemanticCheckpoint({
-        repoRoot: session.toplevel,
-        receipt: JSON.parse(flags.input ?? "") as Parameters<
-          typeof commitSemanticCheckpoint
-        >[0]["receipt"],
-        actor: flags.actor ?? "",
-        ...(flags.taskId ? { taskId: flags.taskId } : {}),
-        requestId: flags.requestId,
-        now: new Date().toISOString(),
-        protectedBranches: flags.protectedBranches,
-      });
+    const needsInput = operation === "commit" || flags.scope === "ticket";
+    const parsedInput = needsInput
+      ? JSON.parse(flags.input ?? "") as unknown
+      : undefined;
+    const data = flags.scope === "ticket"
+      ? operation === "prepare"
+        ? prepareTicketCheckpoint({
+            repoRoot: session.toplevel,
+            checkpointSelection: parsedInput as Parameters<
+              typeof prepareTicketCheckpoint
+            >[0]["checkpointSelection"],
+            protectedBranches: flags.protectedBranches,
+          })
+        : commitTicketCheckpoint({
+            repoRoot: session.toplevel,
+            receipt: parsedInput as Parameters<
+              typeof commitTicketCheckpoint
+            >[0]["receipt"],
+            actor: flags.actor ?? "",
+            ...(flags.taskId ? { taskId: flags.taskId } : {}),
+            requestId: flags.requestId,
+            now: new Date().toISOString(),
+            protectedBranches: flags.protectedBranches,
+          })
+      : operation === "prepare"
+        ? prepareSemanticCheckpoint({
+            repoRoot: session.toplevel,
+            protectedBranches: flags.protectedBranches,
+          })
+        : commitSemanticCheckpoint({
+            repoRoot: session.toplevel,
+            receipt: parsedInput as Parameters<
+              typeof commitSemanticCheckpoint
+            >[0]["receipt"],
+            actor: flags.actor ?? "",
+            ...(flags.taskId ? { taskId: flags.taskId } : {}),
+            requestId: flags.requestId,
+            now: new Date().toISOString(),
+            protectedBranches: flags.protectedBranches,
+          });
     process.stdout.write(`${JSON.stringify({ ok: true, data })}\n`);
     return 0;
   } catch (error) {
@@ -422,6 +600,24 @@ function readStdin(): string {
   } catch {
     return "";
   }
+}
+
+function readStdinBounded(maximumBytes: number): string {
+  const chunks: Buffer[] = [];
+  let byteLength = 0;
+  const buffer = Buffer.allocUnsafe(64 * 1024);
+  while (true) {
+    const count = fs.readSync(0, buffer, 0, buffer.length, null);
+    if (count === 0) break;
+    byteLength += count;
+    if (byteLength > maximumBytes) {
+      throw new Error(
+        `operation raw JSON input exceeds ${maximumBytes} bytes`,
+      );
+    }
+    chunks.push(Buffer.from(buffer.subarray(0, count)));
+  }
+  return Buffer.concat(chunks, byteLength).toString("utf8");
 }
 
 /**
@@ -524,12 +720,27 @@ export function main(argv: string[]): number {
     }
     return runHostInstall(rest);
   }
-  if (group === "checkpoint") return runSemanticCheckpoint(cmd, rest);
+  if (group === "checkpoint") return runCheckpoint(cmd, rest);
+  if (group === "ticket" && cmd === "review") {
+    try {
+      launchTicketReviewHostCommand(rest);
+      return 0;
+    } catch (error) {
+      process.stderr.write(
+        `Ticket review host failed: ${
+          error instanceof Error ? error.message : String(error)
+        }\n${USAGE}\n`,
+      );
+      return 2;
+    }
+  }
   if(group==="kb"&&cmd==="migrate-store"){
     try{return runSemanticMigration(rest);}
     catch(error){process.stdout.write(`${JSON.stringify({ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error)}})}\n`);return 2;}
   }
-  if (group === "kb" || group === "distill") return runOperation(group,cmd, rest);
+  if (group === "kb" || group === "distill" || group === "ticket") {
+    return runOperation(group,cmd, rest);
+  }
   if (group === "hook") {
     return runHook(cmd, rest);
   }

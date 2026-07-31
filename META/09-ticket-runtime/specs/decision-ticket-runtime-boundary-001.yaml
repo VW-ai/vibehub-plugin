@@ -1,0 +1,202 @@
+spec_id: "decision-ticket-runtime-boundary-001"
+type: decision
+state: superseded
+intent:
+  summary: "第一版 Ticket System 的 canonical writer、业务规则与执行入口分别应由 Plugin、共享 Core/Local Runtime、App 中谁拥有？"
+  detail: |
+    **Question**: Freeze the first physical ownership boundary without confusing
+    the tactical Plugin dogfood path with the strategic product architecture.
+
+    **Why now**: The existing project is plugin-first and headless. The explored
+    future shape gives the App a human control surface and a Local Runtime the
+    single operational state machine, while the Plugin becomes an Agent-side
+    adapter and semantic capability pack.
+
+    **Required result**:
+    - one canonical writer at every stage;
+    - no duplicated Ticket graph or lifecycle logic;
+    - an explicit migration path from the first Plugin slice;
+    - host-originated work remains possible;
+    - App-originated work does not require transport through a pre-installed
+      Plugin.
+
+    **New intelligence-boundary input — 2026-07-28**
+
+    The first Ticket System should not encode one heavy end-to-end workflow.
+    Skills should own composable intelligence for recognizing, generating,
+    retrieving, validating, executing, and tending Tickets. MCP and CLI should
+    be thin access adapters. Shared Core or the Local Runtime should own schemas,
+    graph integrity, idempotent writes, receipts, durable facts, and derived
+    projections.
+
+    This decision must freeze the minimum capability surface and identify where
+    determinism is required for integrity, replay, coordination, authority, or
+    scale rather than merely for format bridging.
+
+    **Ratified partial boundary — Core-owned, initially in-process**
+
+    The canonical Ticket writer is one shared Core Ticket Runtime service, not
+    the Plugin, a Skill, MCP, CLI, or App. Core owns the versioned operation
+    contracts, semantic validation, authority checks, graph invariants,
+    idempotent mutations, receipts, persistence transactions, and derived
+    projections.
+
+    The first dogfood slice instantiates this service in-process from thin CLI
+    or MCP adapters and does not require a long-running daemon. Skills may judge
+    and propose Ticket mutations, but canonical changes pass through Core
+    operations. The Plugin distributes intelligence and adapters; the App is an
+    optional client of the same operations and projections.
+
+    A future Local Runtime daemon may host the same Core service when
+    concurrency, subscriptions, background work, or multi-client coordination
+    justify a resident process. Hosting topology may change without moving or
+    duplicating the canonical business implementation.
+
+    Wayne ratified this root ownership boundary on 2026-07-28.
+
+    **Ratified partial boundary — judgment and admissibility**
+
+    Core ownership must not turn open-ended semantic judgment into a hard-coded
+    workflow. The proposed responsibility split is:
+
+    - composable Ticket Skills judge meaning: whether intent is a durable Ticket
+      or Planning Fog, whether new work is elaboration/decomposition/expansion,
+      whether an outcome remains the same promise, what context matters, and
+      what acceptance or follow-up work is semantically sufficient;
+    - an independently invoked validation Skill reviews the current Ticket
+      revision for the `specified` or `executable` intelligence handoff and
+      emits an inspectable, revision-bound ValidationReceipt;
+    - Core judges admissibility: strict schema, identity and revision CAS,
+      parent/dependency existence and cycles, authority and gate evidence,
+      receipt binding, idempotency, atomic graph mutation, and derived
+      projections.
+
+    Core may reject malformed, stale, unauthorized, or internally inconsistent
+    facts. It must not decide through embedded heuristics that an outcome is
+    good, a decomposition is useful, or an acceptance condition is meaningful.
+    There is no writable `set-status`, `set-maturity`, or generic `complete`
+    operation.
+
+    Wayne ratified this judgment/admissibility boundary on 2026-07-28.
+
+    **Ratified partial boundary — composable intelligence surface**
+
+    The first public intelligence surface should be a small set of
+    scene-specific capabilities rather than one `vibehub-ticket` skill that
+    owns the whole intent-to-completion workflow. Capability names remain
+    provisional:
+
+    - `ticket-query/context`: choose the cheapest sufficient graph/context
+      depth, distinguish facts from inference, and expose blockers, conflicts,
+      drift, and missing knowledge without writing;
+    - `ticket-shape`: recognize Ticket versus elaboration versus Planning Fog
+      and form or revise one Ticket or bounded graph proposal, including
+      decomposition/expansion classification;
+    - `ticket-validate`: independently assess the specified/executable
+      intelligence handoff and emit a revision-bound ValidationReceipt;
+    - `ticket-closeout`: adjudicate one Run's evidence and Outcome, then propose
+      bounded follow-up Tickets, graph changes, or semantic closeout without
+      directly granting their authority.
+
+    There is no generic `ticket-execute` intelligence skill in v0. The host
+    Agent already owns execution and composes native reasoning, tools, and
+    domain skills. A thin Run shell starts or claims the Run, binds context,
+    records artifacts/evidence, and invokes closeout; it does not prescribe how
+    the domain work is performed.
+
+    Shared classifiers and references may support several skills without
+    becoming another end-to-end workflow. Exact graph mutation and closeout
+    semantics remain delegated to their existing Decision Tickets.
+
+    Wayne ratified this composable intelligence surface on 2026-07-28.
+
+    **Resolved specialization — proposal validation evidence**
+
+    The first concrete `vibehub-ticket-validate` Skill independently reviews
+    one immutable graph-change proposal and records proposal/candidate-bound
+    semantic evidence through Core. Its producer, policy, and actor remain
+    claimed_unverified. It evaluates promise preservation, containment,
+    dependency truth, change classification, delegated scope, and protected
+    boundaries without granting authority or applying the proposal.
+
+    This proposal validator is not the Ticket-revision readiness validator
+    described above. It cannot derive outline/specified/executable maturity,
+    project READY, satisfy a GateDecision, or become a current validation
+    capability. The future Ticket-readiness validator remains a separate
+    intelligence and receipt contract so the two evidence subjects cannot be
+    conflated.
+
+    **Ratified partial boundary — one deterministic operation surface**
+
+    Every Skill, CLI command, MCP tool, future App action, and future daemon
+    request should converge on one versioned Ticket operation registry in Core.
+    CLI and MCP are transport peers over the same names, strict inputs, result
+    envelopes, error classes, and receipts; neither owns aliases with different
+    semantics or performs hidden business mutations.
+
+    The minimum capability groups are:
+
+    - bounded reads of Ticket definitions, graph position, frontier, lineage,
+      validation, gates, Runs, Outcomes, and Evidence;
+    - atomic definition/graph proposals that create or revise a bounded set of
+      Tickets and relations under revision CAS, plus explicit supersession;
+    - append-only authority facts such as ValidationReceipt and GateDecision;
+    - append-only execution facts such as Run start/claim, Artifact/Evidence,
+      and Outcome.
+
+    Core derives maturity and operational projections from those facts. No
+    adapter exposes direct status/maturity/progress assignment, generic
+    completion, raw JSON patch, per-edge graph writes, or direct storage access.
+
+    Exact operation names and schemas may be frozen during the dependent graph,
+    context, and closeout decisions. The current candidate shape is one generic
+    `vibehub ticket <operation> --json` CLI entry and one generic
+    `ticket_operation` MCP tool, both dispatching the same Core registry.
+
+    Wayne ratified this operation/adaptor boundary on 2026-07-28.
+
+    **Resolved boundary**
+
+    The first dogfood implementation extends the existing shared Core and
+    operation dispatcher. Core is the only canonical business implementation
+    and writer; CLI and MCP remain equivalent thin transports; the Plugin
+    distributes composable intelligence and adapters; the optional App consumes
+    the same operations and projections.
+
+    Ticket meaning stays in Skills and independent validation, while Core
+    enforces admissibility and derives state from durable facts. The first slice
+    runs Core in-process. A future daemon may host the same implementation
+    without becoming a second owner. Exact graph, context, closeout, operation
+    schema, and Skill-invocation behavior remain delegated to their own
+    Decision Tickets.
+
+    Wayne ratified the complete runtime boundary on 2026-07-28.
+
+    **Claimed**: Codex 2026-07-28
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, resolved, grilling, plugin, local-runtime, app, authority, intelligence, mcp, cli]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.85
+  source_ref: "Plugin/App/Local Runtime architecture discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_at: "2026-07-27"
+relations:
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: superseded_by
+    detail: "Skill now owns orchestration and semantic judgment; shared code is a deterministic document toolkit rather than the canonical workflow writer."
+  - target: "decision-workbench-011"
+    type: challenges
+    detail: "May refine the active headless Plugin/Runtime and optional App boundary."
+  - target: "decision-project-025"
+    type: relates_to
+    detail: "Must preserve the rule that core business logic is implemented once behind thin adapters."
+anchors:
+  - file: "packages/core"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"

@@ -3,7 +3,8 @@
 Skills and scripts call `vibehub ... --json`; they never import storage
 drivers, query backing stores directly, or mutate persistence files. MCP tool `kb_operation` accepts
 the exact `kb.*` operation plus `input`; `distill_operation` accepts the exact
-`distill.*` operation plus `input`. Both return the same dispatcher envelope.
+`distill.*` operation plus `input`; `ticket_operation` accepts one canonical
+`ticket.*` capability plus `input`. All return the same dispatcher envelope.
 `kb_retrieve` is only the focused `kb.spec.search` convenience adapter. MCP
 v0.2 exposes no legacy mutation aliases; route writes through these canonical
 adapters so evidence, task attribution, request identity, and version
@@ -25,10 +26,18 @@ transactions remain enforceable.
 ```text
 vibehub kb <suffix> --json --repo <root> --actor <id> --request <id> [--task <id>] --input -
 vibehub distill <suffix> --json --repo <root> --actor <id> --request <id> [--task <id>] --input -
+vibehub ticket <suffix> --json --repo <root> --actor <id> --request <id> [--task <id>] --input -
 ```
 
-Use `--task` for draft/distillation writes. Read input from stdin or a stable
-JSON file through `../scripts/vh-kb.mjs` / `../scripts/vh-distill.mjs`.
+Use `--task` for Spec/distillation writes. Read input from stdin or a stable
+JSON file through `../scripts/vh-kb.mjs`, `../scripts/vh-distill.mjs`, or
+`../scripts/vh-ticket.mjs`.
+
+The packaged wrappers prefer an explicit `VIBEHUB_BIN`, then the current source
+tree CLI, then the installed Plugin's versioned runtime launcher, and finally a
+`vibehub` executable on `PATH`. This keeps an installed thin Plugin usable
+without a separate global CLI while preventing an unrelated PATH binary from
+shadowing its own runtime.
 
 ## Semantic checkpoints
 
@@ -49,6 +58,18 @@ Do not checkpoint read-only queries, candidate/distillation operational state,
 failed mutations, or filler records. The adapter owns Git mechanics so entry
 skills remain unchanged when the implementation changes.
 
+Ticket patches do not checkpoint implicitly. When the calling Skill wants one,
+pass the patch result's exact `checkpointSelection` through the same adapter:
+
+```text
+node ../scripts/vh-checkpoint.mjs prepare --scope ticket --repo <root> --input <selection.json> [--protect <branch>]
+node ../scripts/vh-checkpoint.mjs commit --scope ticket --repo <root> --actor <id> --task <id> --request <id> --input <receipt.json> [--protect <branch>]
+```
+
+This commits only the selected Ticket paths through an isolated index after
+revalidating the candidate Ticket ledger. It remains a separate optional Git
+boundary; `ticket.worktree.patch` itself never creates a commit.
+
 ## Request identity and replay
 
 Treat `requestId` as a repository-wide request identity, not a counter local to
@@ -59,7 +80,7 @@ optional top-level tool field, never inside `input`; omit it when replay is not
 needed so the capability generates a collision-resistant UUID. Never derive a
 repository request ID from an MCP transport correlation ID. Include stable task,
 stage, operation, and attempt information when humans need readable names, for
-example `task-184:ingest:draft-apply:01` or
+example `task-184:ingest:spec-apply:01` or
 `onboard-20260713:distill:inventory-seal:01`. Preview and apply are different
 logical invocations and get different IDs.
 
@@ -72,12 +93,20 @@ operation input's `idempotencyKey`: reuse that key only for the identical
 business mutation. Do not reuse any request ID for another operation merely
 because a current table key would permit it.
 
+Git-native Ticket operations are deliberately outside persisted request
+replay. Each invocation observes the addressed worktree again, so a branch
+switch or local Ticket edit cannot be hidden behind an older response.
+`ticket.run.claim` likewise returns its bearer lease token once and never
+persists or replays that token through a generic operation receipt. Preserve
+the live response only for the bounded Run; a lost token cannot be recovered
+from VibeHub.
+
 ## Registry
 
 | Read | Mutation |
 |---|---|
-| `kb.status` | `kb.draft.apply` |
-| `kb.feature.list`, `kb.feature.get`, `kb.feature.suggest` | `kb.promote`, `kb.mark-stale`, `kb.deprecate` |
+| `kb.status` | `kb.spec.apply` |
+| `kb.feature.list`, `kb.feature.get`, `kb.feature.suggest` | `kb.mark-stale`, `kb.deprecate` |
 | `kb.spec.search`, `kb.spec.get` | `kb.amend`, `kb.supersede` |
 | `kb.relations`, `kb.lineage`, `kb.anchors`, `kb.review` | |
 | `kb.ingest.preview` | |
@@ -85,6 +114,7 @@ because a current table key would permit it.
 | `distill.baseline.get`, `distill.candidates.list`, `distill.candidates.get` | |
 | `distill.version.get`, `distill.version.diff` | |
 | `distill.inventory.get`, `distill.inventory.diff` | `distill.inventory.put`, `distill.inventory.seal` |
+| `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list`, `ticket.frontier.read` | `ticket.context.compile`, `ticket.run.claim`, `ticket.run.heartbeat`, `ticket.run.release`, `ticket.evidence.append`, `ticket.closeout.append`, `ticket.worktree.patch`, `ticket.review.append`, `ticket.decision.record` |
 | | `distill.scopes.plan`, `distill.scopes.claim`, `distill.scopes.complete`, `distill.scopes.fail`, `distill.scopes.retry`, `distill.scopes.correct` |
 | | `distill.candidates.put`, `distill.reconcile`, `distill.validate`, `distill.finalize` |
 | | `distill.activate`, `distill.rollback` |
@@ -94,6 +124,37 @@ Inputs are strict. Read the corresponding JSON schema and the dispatcher error
 malformed/unsupported, `3` not-found/already-exists, `4` lifecycle/integrity,
 `5` idempotency/lease/checksum/CAS conflict, `1` internal failure.
 
+Use `ticket.graph.snapshot` for topology, `ticket.subject.inspect` for one
+complete Ticket definition plus its graph context, and `ticket.trace.list` for
+the currently available trace projection. Only `ticket.context.compile`
+freezes and returns the exact bounded execution packet. `ticket.worktree.patch` is the one
+mechanical write hand: copy its exact source and Ticket revisions from the
+latest snapshot, submit bounded full-document puts/deletes, and let Core
+validate the complete prospective graph. It never plans, auto-commits, writes
+a persisted Ticket replay receipt, or revives retired proposal/apply operations.
+
+Use `ticket.review.append` to append a Git-native comment or complete Ticket
+edit proposal against an exact current subject. Generic CLI, MCP, and Skill
+wrappers attribute these reviews to the calling Agent as claimed facts; a
+trusted host may separately inject host-attested attribution.
+`ticket.decision.record` records an exact-subject human Decision, but the
+generic adapters intentionally inject no Decision authority. Calls through
+those adapters therefore fail closed with `ticket_authority_unavailable`;
+only a trusted host with a matching human principal and exact authority scope
+may record the Decision. Neither operation silently changes a Ticket.
+
+Use `ticket.frontier.read` to derive the current ready, blocked, active, and
+attention frontier. `ticket.context.compile` freezes the exact Ticket revision,
+acceptance set, repository identity, and bounded context references before
+execution. `ticket.run.claim`, `ticket.run.heartbeat`, and
+`ticket.run.release` provide disposable coordination only; a claim never
+changes the Ticket promise or proves completion. Append acceptance-linked proof
+with `ticket.evidence.append`. An independent Agent appends the terminal
+adjudication with `ticket.closeout.append`; only a current `successful`
+closeout whose every current acceptance is accepted can unlock dependents.
+`partial`, `failed`, `deviated`, and `stale` closeouts remain visible and
+unlock nothing.
+
 ## Workflow artifacts are not operation inputs
 
 `query-request`, `context-packet`, `distillation-scope`,
@@ -101,7 +162,9 @@ malformed/unsupported, `3` not-found/already-exists, `4` lifecycle/integrity,
 Never pass them directly to a strict dispatcher operation. Translate only the
 named fields documented by the entry skill, then validate against the generated
 `../contracts/operation-contracts.json`. `ingest-plan` intentionally matches
-the exact `kb.draft.apply` input and may be passed after validation.
+the exact `kb.spec.apply` input and may be passed after machine validation.
+Successful apply creates active canonical Specs; there is no ordinary
+promotion step.
 
 Candidate reads always select exactly one `runId` or finalized `versionId`.
 Version review uses `distill.version.get` plus `distill.version.diff`; counts in

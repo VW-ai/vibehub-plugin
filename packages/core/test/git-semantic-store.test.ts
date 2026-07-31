@@ -91,7 +91,7 @@ function seedSemanticSubset(db: Db): number {
       (repo_id, operation, spec_id, actor, task_id, request_id, at, payload)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
     provenance.run(
-      repo.id, "kb.draft.apply", "decision-old", "alice", "task:1", "req:1", T0,
+      repo.id, "kb.spec.apply", "decision-old", "alice", "task:1", "req:1", T0,
       `{"z":1,"a":{"later":false,"first":true}}`,
     );
     provenance.run(
@@ -103,7 +103,7 @@ function seedSemanticSubset(db: Db): number {
       `{"source":"legacy"}`,
     );
     provenance.run(
-      other.id, "kb.draft.apply", "decision-old", "other", null, "req:other", T0,
+      other.id, "kb.spec.apply", "decision-old", "other", null, "req:other", T0,
       `{"other":true}`,
     );
 
@@ -112,7 +112,7 @@ function seedSemanticSubset(db: Db): number {
       VALUES (?, ?, ?)`).run(repo.id, T0, T1);
     db.prepare(`INSERT INTO kb_mutation_receipts
       (repo_id, operation, idempotency_key, input_hash, result, created_at)
-      VALUES (?, 'kb.draft.apply', 'receipt', 'hash', '{"ok":true}', ?)`).run(repo.id, T0);
+      VALUES (?, 'kb.spec.apply', 'receipt', 'hash', '{"ok":true}', ?)`).run(repo.id, T0);
   })();
   return repo.id;
 }

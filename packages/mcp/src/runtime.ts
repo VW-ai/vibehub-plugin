@@ -1,4 +1,5 @@
 import {
+  FileTicketDecisionLocalSignatureTrustProfileResolverV0,
   GitFacade,
   getRepoByRoot,
   openDb,
@@ -10,6 +11,10 @@ import {
 } from "@vw-ai/vibehub-core";
 import { fileURLToPath } from "node:url";
 import type { CapabilityContext } from "./capabilities.js";
+import {
+  createMcpSessionActor,
+  type McpClientIdentity,
+} from "./session-actor.js";
 
 export interface RuntimeContext {
   context: CapabilityContext;
@@ -21,6 +26,7 @@ export function openRuntimeContext(
   cwd: string,
   dbPath: string,
   now: () => string = () => new Date().toISOString(),
+  actor: string = createMcpSessionActor(),
 ): RuntimeContext {
   const db: Db = openDb(dbPath);
   try {
@@ -56,7 +62,15 @@ export function openRuntimeContext(
       });
     }
     return {
-      context: { db, repoId: repo.id, taskId, repoRoot: session.toplevel },
+      context: {
+        db,
+        repoId: repo.id,
+        taskId,
+        repoRoot: session.toplevel,
+        actor,
+        ticketDecisionAttestationTrustProfiles:
+          new FileTicketDecisionLocalSignatureTrustProfileResolverV0(),
+      },
       close: () => db.close(),
     };
   } catch (error) {
@@ -69,6 +83,7 @@ export function openRuntimeContextFromRoots(
   roots: Array<{ uri: string }>,
   dbPath: string,
   now: () => string = () => new Date().toISOString(),
+  actor: string = createMcpSessionActor(),
 ): RuntimeContext {
   const candidates = new Map<string, string>();
   for (const root of roots) {
@@ -85,7 +100,7 @@ export function openRuntimeContextFromRoots(
       `VibeHub MCP requires exactly one Git workspace root; found ${candidates.size}`,
     );
   }
-  return openRuntimeContext([...candidates.values()][0]!, dbPath, now);
+  return openRuntimeContext([...candidates.values()][0]!, dbPath, now, actor);
 }
 
 export async function openRuntimeContextForClient(input: {
@@ -94,7 +109,13 @@ export async function openRuntimeContextForClient(input: {
   cwd: string;
   dbPath: string;
   now?: () => string;
+  clientInfo?: McpClientIdentity;
+  sessionId?: string;
 }): Promise<RuntimeContext> {
+  const actor = createMcpSessionActor({
+    clientInfo: input.clientInfo,
+    sessionId: input.sessionId,
+  });
   let roots: Array<{ uri: string }>;
   try {
     roots = await input.listRoots();
@@ -110,11 +131,11 @@ export async function openRuntimeContextForClient(input: {
       "code" in error
     ) ? (error as { code?: unknown }).code : undefined;
     if (!input.supportsRoots && code === -32601) {
-      return openRuntimeContext(input.cwd, input.dbPath, input.now);
+      return openRuntimeContext(input.cwd, input.dbPath, input.now, actor);
     }
     throw error;
   }
   return roots.length > 0
-    ? openRuntimeContextFromRoots(roots, input.dbPath, input.now)
-    : openRuntimeContext(input.cwd, input.dbPath, input.now);
+    ? openRuntimeContextFromRoots(roots, input.dbPath, input.now, actor)
+    : openRuntimeContext(input.cwd, input.dbPath, input.now, actor);
 }

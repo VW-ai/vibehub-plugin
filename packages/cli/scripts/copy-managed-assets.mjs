@@ -5,6 +5,11 @@ import { fileURLToPath } from "node:url";
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pluginRoot = path.resolve(packageRoot, "../..");
 const outputRoot = path.join(packageRoot, "dist", "managed-assets");
+const reviewHostOutputRoot = path.join(
+  packageRoot,
+  "dist",
+  "ticket-review-host",
+);
 const assets = [
   ".claude-plugin/plugin.json",
   ".mcp.json",
@@ -20,3 +25,10 @@ for (const relative of assets) {
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.cpSync(path.join(pluginRoot, relative), target, { recursive: true });
 }
+
+fs.rmSync(reviewHostOutputRoot, { recursive: true, force: true });
+fs.cpSync(
+  path.join(packageRoot, "assets", "ticket-review-host"),
+  reviewHostOutputRoot,
+  { recursive: true },
+);

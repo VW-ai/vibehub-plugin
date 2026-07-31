@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Ticket Plan"
+  short_description: "Shape deliverables into executable Ticket graphs"
+  default_prompt: "Use $vibehub-ticket-plan to plan this deliverable as an honest executable Ticket graph."

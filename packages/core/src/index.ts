@@ -5,6 +5,8 @@ export * from "./contract/install-types.js";
 export * from "./contract/kb-types.js";
 export * from "./contract/workbench-bridge.js";
 export * from "./contract/workflow-receipt.js";
+export * from "./contract/ticket-review.js";
+export * from "./contract/ticket-review-schemas.js";
 export {
   defaultDbPath,
   openDb,
@@ -98,6 +100,36 @@ export * from "./knowledge-service.js";
 export * from "./distillation-service.js";
 export * from "./operation-dispatcher.js";
 export * from "./operation-contracts.js";
+export * from "./ticket-review-projector.js";
+export * from "./ticket-review-read-service.js";
+export * from "./ticket-context-compiler.js";
+export * from "./ticket-execution-service.js";
+export {
+  GitTicketLedgerReviewProjectionSourceProviderV0,
+  type ResolvedTicketReviewProjectionSourceProviderV0,
+  type TicketReviewLatestSourceLoadV0,
+  type TicketReviewRepositoryScopeV0,
+  type TicketReviewSnapshotSourceLoadV0,
+} from "./ticket-review-resolver.js";
+export * from "./ticket-review-source.js";
+export * from "./ticket-run-store.js";
+export * from "./ticket-ledger/index.js";
+export {
+  DurableLocalSignatureTicketDecisionAttestationVerifierV0,
+  type DurableLocalSignatureTicketDecisionAttestationVerifierOptionsV0,
+  type TicketDecisionLocalSignatureTrustProfileLookupV0,
+  type TicketDecisionLocalSignatureTrustProfileResolverV0,
+  type TicketDecisionLocalSignatureTrustProfileV0,
+  type TicketDecisionAttestationUnverifiedReasonV0,
+  type TicketDecisionAttestationVerificationV0,
+  type TicketDecisionAttestationVerifierV0,
+} from "./ticket-decision-attestation.js";
+export {
+  FileTicketDecisionLocalSignatureTrustProfileResolverV0,
+  TicketDecisionAuthorityTrustStoreError,
+  defaultTicketDecisionLocalSignatureRegistryPath,
+  type FileTicketDecisionLocalSignatureTrustProfileResolverOptionsV0,
+} from "./ticket-decision-trust-store.js";
 export {
   GIT_SEMANTIC_STORE_RELATIVE_PATH,
   diffSemanticRefs,

@@ -1,0 +1,47 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-git-review-intervention-ready
+outcome: The Ticket graph has a Git-native review and intervention foundation that preserves attributed comments and edit proposals durably, projects raw Decisions without trusting them, and can grant exact Decision authority only inside one explicitly trusted host session.
+context: "M1A provides the complete direct-unlock graph and deterministic interactions; M2 provides exact-source planning and independent semantic validation. M3 assembles four independently verifiable results: the strict review ledger kernel, subject-local projection, a secure progressive host surface, and Skill reconciliation of edits and Decision evidence. Comments, edit proposals, and Decision intent survive as inspectable Git facts. Raw Decision YAML is never self-authenticating: a fresh process projects it as current_unverified. Only the same trusted dispatcher session that wrote and re-read the exact canonical Decision may issue a short-lived authority receipt. The installed vibehub ticket review launcher intentionally remains read-only until a real Plugin-owned human entrypoint and cross-process attestation exist in ticket-durable-decision-attestation-ready. This Ticket does not claim durable authority after restart, Run readiness, accepted completion, or proof."
+acceptance:
+  - acceptance_id: disposable-runtime-proof
+    criterion: After deletion of disposable state, a fresh process reconstructs every durable comment, edit proposal, Decision intent, subject binding, and current-versus-historical status from Git; every raw current Decision remains current_unverified until independently attested.
+  - acceptance_id: git-native-interventions
+    criterion: The public operations can create attributed comments and complete edit proposals as inspectable exact-source Git changes, while a trusted embedding can additionally record an exact plan or protected-boundary Decision; applying an edit still requires fresh Planning, independent Validation, and ticket.worktree.patch.
+  - acceptance_id: projection-preserved
+    criterion: Complete graph visibility, direct-unlock reading, deterministic layout, pan, zoom, fit, minimap, causal focus, and progressive inspection remain intact before and after interventions.
+  - acceptance_id: session-authority-boundary
+    criterion: Source or subject drift blocks advancement, claimed contribution attribution grants no authority, raw Decision YAML never grants authority, and only an exact full-document receipt bound to the current trusted dispatcher session can project a Decision as a temporary gate.
+constraints:
+  - HTML is a projection and intervention surface, never a source of truth or raw persistence editor.
+  - Do not restore the retired trusted-provider, generation, SQLite authority, or mandatory proposal-to-receipt workflow.
+  - Runtime state, selection, hover, and scenario lenses must not alter deterministic graph layout.
+  - Healthy state remains quiet while blockers, decisions, deviations, stale context, Runs, and proof stay attached to their graph locus.
+  - M3 must not claim that repository-editable YAML, OS username, Git author, browser bearer, SQLite, or process-local memory is durable human authority.
+  - M3 must not invent readiness, completion, Outcome, Evidence, context binding, or closeout semantics.
+context_refs:
+  - ref: META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html
+    purpose: Preserves the accepted interaction and visual reference.
+  - ref: META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md
+    purpose: Records the implemented M3 boundary, verification evidence, and intentionally unresolved production authority handoff.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml
+    purpose: Defines the Git review facts and same-session authority boundary implemented by M3.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-planning-validation-skills-001.yaml
+    purpose: Defines the implemented exact-source planning, independent validation, and execution-authority gate this intervention surface must reuse.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml
+    purpose: Governs the accepted graph experience and intervention boundary.
+  - ref: packages/cli/assets/ticket-review-host
+    purpose: Contains the deterministic graph projection and progressive intervention controls.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-review-host-interventions-ready
+    rationale: The integrated M3 foundation requires a secure browser surface and trusted embedding boundary that read back through canonical Git projection.
+  - type: depends_on
+    target_ticket_id: ticket-review-intelligence-handoff-ready
+    rationale: The integrated M3 foundation requires review facts to feed Planning and Validation intelligence without bypassing it or trusting raw Decisions.
+provenance_refs:
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md
+  - META/09-ticket-runtime/progress.yaml
+  - META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml
+  - META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml
+  - ticket-m3:decompose

@@ -259,8 +259,8 @@ export function operationProvesContextValue(operation: string, data: unknown): b
         && (row!["chain"] as unknown[]).every((item) => typeof item === "string" && item.length > 0);
     case "kb.anchors":
       return nonEmptyArray(row?.["forward"]) || nonEmptyArray(row?.["reverse"]);
-    case "kb.draft.apply":
-      return row?.["operation"] === "draft_batch"
+    case "kb.spec.apply":
+      return row?.["operation"] === "spec_batch"
         && typeof row["idempotencyKey"] === "string" && row["idempotencyKey"].length > 0
         && nonEmptyArray(row["created"])
         && (row["created"] as unknown[]).every((item) => typeof item === "string" && item.length > 0);
@@ -270,7 +270,7 @@ export function operationProvesContextValue(operation: string, data: unknown): b
 }
 const qualifyingOperations = new Set([
   "kb.feature.list", "kb.feature.get", "kb.feature.suggest", "kb.spec.search", "kb.spec.get",
-  "kb.relations", "kb.lineage", "kb.anchors", "kb.draft.apply",
+  "kb.relations", "kb.lineage", "kb.anchors", "kb.spec.apply",
 ]);
 function activationEvidence(dbPath: string, repoRoot: string, notBefore: string): string[] {
   try {

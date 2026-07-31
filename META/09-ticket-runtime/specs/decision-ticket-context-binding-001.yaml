@@ -1,0 +1,44 @@
+spec_id: "decision-ticket-context-binding-001"
+type: decision
+state: superseded
+intent:
+  summary: "Ticket 如何绑定 Feature Room Spec revisions，并在 Run 时编译 bounded context packet？"
+  detail: |
+    **Question**: Define the contract between the Ticket Runtime and durable
+    semantic providers.
+
+    The first implementation should center Feature Room: exact Spec identity,
+    revision, mapping context, dependency artifacts, repository snapshot, and
+    the reason each binding is required. It must define drift detection,
+    invalidation/replanning, and how execution evidence links back to governing
+    semantics.
+
+    The design may allow future providers, but should not generalize away the
+    stronger guarantees available from Feature Room.
+
+    This historical question is resolved by
+    `contract-ticket-context-binding-001`.
+constraints: []
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, resolved, context-binding, feature-room, revisions]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.75
+  source_ref: "Semantic context binding discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_at: "2026-07-27"
+relations:
+  - target: "contract-ticket-context-binding-001"
+    type: superseded_by
+    detail: "The Agent-owned M4 contract settles exact bounded repository and Feature Room context compilation."
+  - target: "decision-ticket-contract-002"
+    type: depends_on
+    detail: "Context binding is part of the strict Ticket contract."
+  - target: "intent-context-to-action-001"
+    type: relates_to
+anchors:
+  - file: "skills/vibehub-query/SKILL.md"
+  - file: "skills/_stdlib/ontology.md"

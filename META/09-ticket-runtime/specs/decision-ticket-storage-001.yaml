@@ -1,0 +1,266 @@
+spec_id: "decision-ticket-storage-001"
+type: decision
+state: superseded
+intent:
+  summary: "Plan、Ticket、Outcome、Run、Event、Artifact 与 Evidence 分别由 Git/YAML、SQLite、JSONL 或 artifact storage 中哪一层持有权威？"
+  detail: |
+    **Question**: Define storage and authority by semantic meaning rather than by
+    mirroring objects across every store.
+
+    Existing authority already uses `.vibehub/semantic-store/` for durable
+    semantic state and SQLite for operational state and projections. The
+    proposed Ticket records span both temperatures. The answer must avoid
+    namespace collision, split-brain writers, Git noise from high-frequency
+    transitions, and a second copy of Feature Room truth inside Ticket bodies.
+
+    **Resolved read-bootstrap boundary (2026-07-28)**:
+
+    The outline-compatible subset of Ticket definition revisions and published
+    dependency topology now has an independent Git-native read-bootstrap
+    authority at `.vibehub/ticket-store/`. It is not a namespace inside
+    `.vibehub/semantic-store/`, because the existing semantic store has a closed
+    inventory and whole-tree replacement semantics.
+
+    The V0 read authority contains:
+
+    - one protocol document with a stable store identity;
+    - immutable, stable-path outline revisions containing identity, creation
+      provenance, outcome, containment parent, dependencies, and provenance
+      references;
+    - immutable generation manifests binding exact definition checksums;
+    - one `latest.yaml` pointer naming the default published generation.
+
+    A generation is the complete supported whole-project Ticket definition and
+    explicit dependency inventory for one verified worktree. Retained
+    generations reconstruct exact review snapshots across process restarts and
+    later `latest` changes. The provider is read-only, follows no symbolic
+    links, applies a pre-parse bound to every file, and enforces the cumulative
+    aggregate generation bound fail-closed as files are read. It verifies
+    canonical bytes and checksums, tolerates an atomic latest-pointer
+    replacement as either complete old or complete new, and distinguishes
+    absent graphs, expired snapshots, corruption, and scope mismatch.
+
+    SQLite remains operational projection/receipt storage and now also holds
+    immutable proposal review contributions. It is not a fallback authority for
+    Ticket definitions or published topology. META Specs, legacy Task rows, and
+    prototype fixtures are likewise forbidden production fallbacks. Current
+    capability projections and trace records are honestly empty until their own
+    authorities exist.
+
+    This outline is not yet the complete ratified Ticket definition: scope,
+    acceptance, permissions, execution policy, and their maturity/lifecycle
+    rules are not persisted by this format.
+
+    **Still unresolved above the outline store**: complete definition storage,
+    retention and GC,
+    Plan/Run/Outcome/Event/Artifact/Evidence authority, and selection of current
+    capability receipts. The internal publication-head CAS, local writer
+    arbitration, and fsync boundary are frozen separately below. Large Ticket
+    read outcome payloads are
+    content-addressed and deduplicated across immutable request receipts; each
+    receipt keeps only its small request binding and a payload digest. Quotas,
+    retention, and GC for request rows and distinct outcome blobs remain
+    unresolved: large-payload bytes grow with distinct canonical outcomes,
+    while fixed-size receipt metadata still grows with request count.
+    Therefore this broader storage Decision remains open even though the
+    canonical read bootstrap is frozen.
+
+    **Resolved writer-substrate boundary (2026-07-28)**:
+
+    The same independent store may now be advanced by one Core-owned,
+    authority-neutral generation publisher. Publication is whole-generation
+    rather than per-edge CRUD. It uses expected-snapshot CAS under an exclusive
+    untracked lock directory in the worktree-specific Git administration path.
+    Acquisition atomically renames a fully written, nonempty staging directory
+    into the canonical lock location. The publisher installs canonical revision and
+    generation files immutably, bootstraps through atomic rename of one
+    fully-synced sibling store directory, and replaces `latest.yaml` atomically
+    only for later complete generations. File and containing-directory syncs
+    make the applicable rename the crash visibility boundary; a crash may leave
+    unreachable immutable objects but must not expose a partial generation. If
+    that rename succeeds but its parent sync fails, Core reports an explicit
+    commit-uncertain result with previous/candidate generation identities and
+    retains the writer lock for reconciliation through the read surface.
+    Malformed, unfenced, or foreign lock state fails closed. Automatic generic
+    stale-owner stealing remains deferred; only the exact persisted
+    application-intent recovery described below may adopt or clean a fence.
+
+    Static symlinks and special files are rejected, but this V0 primitive
+    assumes the host prevents a hostile same-UID process from actively swapping
+    parent paths during filesystem calls. A stronger hostile-local-filesystem
+    boundary requires directory-relative primitives or an exclusive broker.
+
+    Existing Ticket creation provenance and revision bytes are immutable.
+    Definition revisions are monotonic without gaps, and the V0 writer rejects
+    implicit deletion by inventory omission. It remains a storage primitive,
+    not a public authoring command or evidence of semantic, mutation, or human
+    authority.
+
+    Still unresolved after this partial freeze: complete Ticket definition
+    storage, explicit removal and supersession records, generic stale-lock
+    recovery outside an exact application intent, Git commit policy,
+    remote/multi-host arbitration, retention and GC, and all non-definition
+    runtime fact authorities.
+
+    **Resolved immutable proposal-log boundary (2026-07-29)**:
+
+    SQLite is the canonical authority for submitted Ticket review
+    contributions. `ticket.proposal.submit` appends one immutable proposal
+    payload with stable Core-generated identity, digest, scope binding, claimed
+    author, and submission time. It has no mutable status and is neither a
+    Ticket definition nor a graph generation.
+
+    Proposal insertion and the shared idempotent operation request receipt
+    commit in the same SQLite transaction. Repository, worktree, and repository
+    incarnation are bound before replay, incarnation is rechecked around graph
+    loading, and task attribution binds the task's exact worktree. A successful
+    submission therefore cannot leave a proposal without its receipt or a
+    success receipt without its proposal.
+
+    Submission reads the exact observed Git Ticket snapshot and exact targeted
+    definition revisions, materializes Core-generated Ticket identities,
+    revisions, timestamps, and proposal provenance, and mechanically validates
+    a complete candidate under a 4 MiB decoded logical-input budget. CLI and
+    Skill reject oversized raw proposal JSON before parsing, and MCP applies
+    finite frame and proposal-envelope limits. Caller provenance is
+    rejected and caller-derived creation attribution is marked
+    claimed_unverified. It never calls the internal Git generation publisher,
+    so the Git authority stays unchanged.
+
+    The stored actor and authorAssessment are untrusted attribution and routing
+    claims. Bootstrap always indicates initial_plan_authority. Independent
+    semantic machine validation and trusted human authority remain separate
+    receipts. Technical difficulty alone does not require a human gate.
+
+    **Resolved proposal-query and validation-ledger boundary (2026-07-29)**:
+
+    SQLite also holds immutable proposal-validation contributions as a
+    proposal-specific semantic evidence ledger. Each record is bound to one
+    exact graph-change proposal and candidate digest, carries only
+    claimed_unverified producer/policy/actor attribution, and commits with its
+    idempotent operation receipt. It does not become Ticket definition,
+    readiness, authority, GateDecision, application, or graph-mutation truth.
+
+    Proposal and validation inspect/list operations are the only public read
+    boundary over these rows. Lists are bounded summaries under
+    scope/filter/high-water keyset cursors; direct SQLite access remains
+    forbidden. Multiple contrary validation records coexist, and no mutable
+    status, current/latest pointer, precedence, or automatic aggregation record
+    is stored.
+
+    **Resolved trusted authority and application-ledger boundary (2026-07-29)**:
+
+    SQLite now also owns three immutable record families:
+
+    - one terminal authority decision for an exact proposal/candidate and the
+      complete bounded validation-set digest/high-water/count;
+    - one application intent retaining the exact complete candidate
+      definitions, repository incarnation, base and candidate snapshot IDs,
+      deterministic store ID, and publication counts needed for recovery;
+    - one terminal application receipt binding that intent and authority
+      decision to a `published` or `reconciled` Git generation.
+
+    The authority decision is accepted only from a non-serializable trusted
+    provider injected by the host. Its provider descriptor, host-authenticated
+    principal, human-authority or delegation basis, resolved assessment, and
+    exact accepted passing validation refs are persisted and digest-bound.
+    Caller actor and operation JSON cannot mint any of those fields. Once the
+    decision commits, the proposal-validation ledger is closed by both Core
+    checks and a SQLite trigger.
+
+    The application service persists the intent before publication. It then
+    enters the Git publisher with a writer-lock fence containing the application
+    intent identity, intent digest, and candidate snapshot. That exact fence is
+    held through Git visibility and released only after the SQLite application
+    receipt transaction commits. A retry after Git publication but before
+    receipt persistence may adopt only byte-identical fence facts: current
+    candidate reconciles, original base resumes, and a malformed or foreign
+    fence or third head fails closed. Normal release first atomically renames
+    exact `owner-T` to `releasing-T`, unlinks only that token-specific marker,
+    then removes the canonical directory only if still empty. A successor's
+    nonempty `owner-U` makes stale removal fail harmlessly; crash-empty state can
+    be removed or atomically replaced by staged acquisition. Cleanup after a
+    committed receipt may claim only its exact fence and only after verifying
+    the canonical Git head equals the candidate. This gives one recoverable
+    cross-store protocol without pretending SQLite is the Ticket definition
+    authority.
+
+    Authority and application operations are registered through Core/CLI/MCP,
+    but default CLI/MCP construction injects no authority provider. It can
+    expose review and application contracts but cannot self-authorize bootstrap
+    or protected changes. A trusted host decision bridge remains required for
+    authenticated human authority.
+constraints:
+  - kind: must
+    rule: "The outline-compatible Ticket definition subset and published dependency topology use the independent Git-native .vibehub/ticket-store read-bootstrap authority"
+  - kind: must
+    rule: "Published Ticket definition revisions and generation manifests are immutable; latest.yaml is the sole mutable read-bootstrap pointer"
+  - kind: must
+    rule: "Exact retained generations remain reconstructible by verified repository/worktree scope across process boundaries and later latest changes"
+  - kind: must_not
+    rule: "SQLite, META Specs, legacy Task rows, the review prototype, and test fixtures must not substitute for an absent or damaged Ticket store"
+  - kind: must_not
+    rule: "The read bootstrap and internal publication-head CAS do not imply public writer authority, semantic graph-mutation CAS, Run state, Outcome state, or capability-receipt currentness"
+  - kind: must
+    rule: "The Core generation publisher writes and syncs a complete generation before atomic bootstrap store-directory rename or, for later generations, atomic latest.yaml replacement under expected-snapshot CAS and one lock directory atomically installed in the worktree-specific Git administration path"
+  - kind: must
+    rule: "Publication failure or crash before the applicable visibility rename leaves absence or the previous complete generation readable; post-rename sync uncertainty is explicit and fenced"
+  - kind: must_not
+    rule: "The storage publisher must not serve as a public authority bypass or infer removal from an omitted Ticket"
+  - kind: must
+    rule: "SQLite stores submitted Ticket proposals as immutable append-only review contributions and commits each proposal with its idempotent operation receipt in one transaction"
+  - kind: must_not
+    rule: "Proposal submission must not update .vibehub/ticket-store, expose a mutable proposal status, or turn SQLite into a fallback Ticket definition authority"
+  - kind: must
+    rule: "Proposal target preconditions bind the exact observed Git snapshot and definition revisions while Core generates identity, revision, time, and provenance fields"
+  - kind: must
+    rule: "SQLite stores proposal-validation contributions as an immutable append-only proposal-and-candidate-bound evidence ledger and commits each contribution with its idempotent operation receipt"
+  - kind: must
+    rule: "Proposal and validation lists expose bounded summaries under scope/filter/high-water cursors while complete immutable records require explicit inspection through Core"
+  - kind: must_not
+    rule: "The proposal-validation ledger must not store mutable status, a current/latest/winner pointer, Ticket readiness or maturity, authority, GateDecision, application, or graph-mutation truth"
+  - kind: must
+    rule: "SQLite stores immutable authority decisions, exact-candidate application intents, and terminal published/reconciled application receipts without becoming the Ticket definition authority"
+  - kind: must
+    rule: "A trusted authority decision binds the complete validation set and closes that proposal's validation ledger"
+  - kind: must
+    rule: "The Git writer fence binds one immutable application intent and remains held until the matching SQLite application receipt commits"
+  - kind: must
+    rule: "Cross-store retry may adopt only an exact matching intent fence, must fail closed on malformed or foreign state or a third publication head, and may clean a completed exact fence only after verifying the canonical head equals its candidate"
+  - kind: must_not
+    rule: "Default CLI/MCP callers and caller-authored actor/input fields must not create trusted authority; bootstrap remains blocked without a trusted host provider"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, open, bootstrap-frozen, writer-substrate-frozen, proposal-log-frozen, proposal-validation-ledger-frozen, authority-application-ledger-frozen, storage, git, yaml, sqlite, jsonl, cas]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.92
+  source_ref: "Ticket storage discussion and .vibehub correction in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29"
+relations:
+  - target: "decision-ticket-git-native-ledger-001"
+    type: superseded_by
+    detail: "Ticket durable semantics now follow Git; SQLite is limited to disposable operational coordination and caches."
+  - target: "decision-ticket-runtime-boundary-001"
+    type: depends_on
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+  - target: "decision-ticket-closeout-001"
+    type: depends_on
+  - target: "decision-project-028"
+    type: relates_to
+  - target: "decision-project-029"
+    type: relates_to
+anchors:
+  - file: "packages/core/src/ticket-review-resolver.ts"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/core/test/ticket-operation-dispatcher.test.ts"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-generation-publisher-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
+  - file: "packages/core/src/db.ts"

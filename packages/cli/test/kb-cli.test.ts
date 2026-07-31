@@ -10,6 +10,10 @@ describe("vibehub kb JSON adapter",()=>{let dir:string,repo:string,dbPath:string
     expect(main(["kb","kb.status","--json","--repo",repo,"--db",dbPath,"--actor","cli-test","--request","r1"])).toBe(0);
     const envelope=JSON.parse(stdout);expect(envelope).toMatchObject({ok:true,data:{states:{},unplaced:0},meta:{operation:"kb.status",repoId:1,requestId:"r1"}});expect(err).not.toHaveBeenCalled();expect(write).toHaveBeenCalledTimes(1);
   });
+  it("generates collision-resistant logical request ids when omitted",()=>{let stdout="";vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
+    expect(main(["kb","kb.status","--json","--repo",repo,"--db",dbPath,"--actor","cli-test"])).toBe(0);
+    expect(JSON.parse(stdout).meta.requestId).toMatch(/^cli-[0-9a-f-]{36}$/);
+  });
   it("uses stable error exit classes and keeps parser errors on stdout",()=>{let stdout="";vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
     expect(main(["kb","kb.spec.get","--json","--repo",repo,"--db",dbPath,"--actor","cli-test","--input",JSON.stringify({id:"missing"})])).toBe(3);expect(JSON.parse(stdout)).toMatchObject({ok:false,error:{code:"not_found"}});
     stdout="";expect(main(["kb","kb.status","--repo",repo,"--db",dbPath])).toBe(2);expect(JSON.parse(stdout)).toMatchObject({ok:false,error:{code:"validation_error"}});

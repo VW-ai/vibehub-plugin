@@ -1,0 +1,39 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-review-host-interventions-ready
+outcome: The loopback Ticket graph host provides secure progressive Review operations and a trusted embedding boundary for exact same-session Decisions, while the installed default launcher remains honestly read-only.
+context: Extend the accepted loopback bearer host and progressive Inspector rather than creating a dashboard or raw YAML editor. Browser requests may submit only the subject, review or decision choice, body, proposed Ticket fields, and rationale. The host injects actor attribution and any exact Decision authority from its trusted launch context; browser-supplied identity or scope is ignored or rejected. Bounded same-origin JSON routes enforce Content-Type, body limits, abort handling, bearer and Host checks, exact Origin, stale-source errors, and no CORS. Comments and edit proposals remain available under trusted or claimed Agent attribution; Decisions fail closed without a matching human grant. A simple edit records a complete proposal and never calls ticket.worktree.patch directly. Inspector drafts survive stale responses and successful actions reload from Git. The injectable trusted-host path and adversarial tests establish the M3 mechanism, but the production vibehub ticket review launcher supplies no human identity or Decision authority and therefore remains read-only until ticket-durable-decision-attestation-ready implements the installed Plugin entrypoint.
+acceptance:
+  - acceptance_id: browser-cannot-mint-authority
+    criterion: Browser-supplied principal, actor kind, authority basis, trust, or scope is rejected or ignored; a Decision succeeds only when the embedding host supplied an exact matching human authority grant before the request.
+  - acceptance_id: default-launcher-retreat
+    criterion: The installed default launcher exposes the complete graph and progressive Inspector without fabricating attribution or authority; unavailable write actions remain visibly read-only rather than borrowing browser bearer, OS username, Git author, or implicit local identity.
+  - acceptance_id: quiet-progressive-ui
+    criterion: Review controls live inside the existing progressive Inspector, preserve unsent drafts and independent trace errors, use restrained semantic color and existing typography, and introduce no page, modal, lane hierarchy, or graph reflow.
+  - acceptance_id: secure-write-capability
+    criterion: Unauthenticated, foreign-Host, cross-origin, wrong-content-type, oversized, malformed, aborted, stale, unsupported, or authority-inadequate write requests fail without a semantic file change.
+  - acceptance_id: trusted-embedding-actions
+    criterion: Focused integration tests prove that a trusted embedding can record an attributed comment, a complete simple edit proposal, an exact plan review or bounded delegation, and an exact protected-boundary Decision, with each success read back from a named Git document.
+constraints:
+  - The bearer grants access to the local host but is not attribution or protected-decision authority.
+  - Keep the honest v0 trust claim to a cooperative local same-OS-account session; do not claim remote or hostile same-UID authentication.
+  - Use text-safe DOM rendering and bounded field diffs; do not render submitted HTML or arbitrary Markdown.
+  - Do not auto-commit, push, apply a Ticket edit, or grant future unbounded delegation from the HTML.
+  - Do not present an injectable constructor used by tests as the installed Plugin human-authority entrypoint.
+context_refs:
+  - ref: META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html
+    purpose: Preserves the accepted interaction and visual reference, including review controls.
+  - ref: META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md
+    purpose: Records the tested host mechanism and the intentionally missing production authority adapter.
+  - ref: packages/cli/assets/ticket-review-host
+    purpose: Contains the deterministic graph and progressive Inspector implementation.
+  - ref: packages/cli/src/ticket-review-host.ts
+    purpose: Owns the loopback host, bearer capability, read and write routes, trusted injection boundary, and default launcher.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-review-facts-projected
+    rationale: The host must read back every recorded intervention and authority state through canonical Git projection rather than UI-owned state.
+provenance_refs:
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md
+  - META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml
+  - ticket-git-review-intervention-ready

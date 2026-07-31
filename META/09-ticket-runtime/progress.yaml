@@ -1,0 +1,67 @@
+progress:
+  completion: 1.0
+  status: active
+  milestones:
+    - id: "m0-git-skill-authority-cut"
+      name: "Freeze the Git-native, Skill-driven authority cut"
+      status: completed
+      completed_at: "2026-07-29T14:03:43-07:00"
+      evidence: "Successor decisions, the breaking pivot plan, and the no-migration/no-dual-authority boundary are active."
+    - id: "m1a-git-ticket-read-cut"
+      name: "Git Ticket definition graph through Core, CLI, MCP, and read-only HTML"
+      status: completed
+      completed_at: "2026-07-29T15:45:44-07:00"
+      evidence: "The Git ledger kernel, three pure read operations, CLI/MCP/HTML cutover, legacy authority deletion, and P0 test matrix are implemented; see the dated implementation artifact."
+    - id: "m1b-git-ticket-worktree-patch"
+      name: "Exact-source Ticket worktree patch with separate optional checkpoint handoff"
+      status: completed
+      completed_at: "2026-07-29T17:39:01-07:00"
+      evidence: "The receiptless ticket.worktree.patch capability binds raw inventory plus semantic source and targeted revisions, validates the full prospective graph and encoded capacity, uses descriptor-bounded physical reads, performs per-file atomic installation with synchronous conditional rollback, reload-verifies the target digest, and returns a checkpointSelection without auto-committing; the public generated contract validates complete Ticket documents and the optional checkpoint verifies raw candidate inventory; see the dated M1B implementation artifact."
+    - id: "m2-ticket-planning-validation-skills"
+      name: "Skill-led planning, validation, and protected-boundary decisions"
+      status: completed
+      completed_at: "2026-07-29T22:59:59-07:00"
+      evidence: "The Planning and independent Validation Skills, package registry, focused tests, and real fail-revise-pass loop are implemented. After fresh semantic reconciliation removed the already-satisfied planning-validation Ticket, the resulting six-Ticket candidate passed mechanical and independent semantic validation with human_decision_required and no material findings, was applied through ticket.worktree.patch, reloaded at graph digest sha256:f7e89de4cd1fc1e51226223ad89b4f03dfc1bf389579b2ab8c2a5ac036dfda39, and was path-exact checkpointed in b427ca6e2b1d9c24ad88fd4a34dee438afdab62e."
+    - id: "m3-git-native-review-intervention"
+      name: "Git-native comments, edits, decisions, and graph review"
+      status: completed
+      completed_at: "2026-07-30T13:31:41-07:00"
+      evidence: "Strict Git Review and Decision documents, full semantic-ledger identity, exact-source no-replace writers, public Review/Decision operations, current/historical/unverified trace projection, capability-scoped secure host, quiet Inspector interventions, active-session authority attestation, and Skill intelligence handoff are implemented in b0d8b1f411950b0adc5f610956890c8221986f60. The independently validated eight-Ticket truth-boundary revision was applied through ticket.worktree.patch, reloaded at 11 Tickets and 11 direct relations with graph digest sha256:8d126f52313d97fd7ed529ae6e52847a3d426d3fcf6d22b9420979f385e94992, and path-exact checkpointed in 802111ca57d1916a96dd425fa2c40108600be333; see the dated M3 implementation artifact."
+    - id: "m3-5-durable-decision-attestation"
+      name: "Durable cross-process human Decision attestation"
+      status: completed
+      completed_at: "2026-07-30T14:26:57-07:00"
+      evidence: "The installed Ticket Review Skill and production loopback host now enroll a named local WebAuthn authority, require user presence and verification for plan-review and protected-boundary Decisions, append exact detached Git receipts, and let fresh CLI/MCP/Skill processes verify them against a dynamically reread repo-external trust registry. Complete repository/worktree/checkout/Decision/scope binding, tamper/replay/expiry/revocation failure, Decision-first recovery, protected UI exposure, release packaging, and adversarial tests are implemented in dbc60dc3fbc22995060a0ee1e6768602c928470c. The independently validated implementation settlement updated the M3.5 Ticket without changing topology, producing 11 Tickets and 11 direct relations at graph digest sha256:deb8bbe622fff55343016cae043e0792a0b7a6c6dcb330a28e9ffdc7ca2421a9 and was path-exact checkpointed in e8f2afd23d5651b3a90442f5d92e02ee2559720c; see the dated M3.5 implementation artifact."
+    - id: "m3-6-install-local-decision-authority"
+      name: "Install-local Ed25519 Decision authority pivot"
+      status: completed
+      completed_at: "2026-07-30T14:56:25-07:00"
+      evidence: "Commit dd771df13185fc472ade73d6962b3e3e8be78403 replaces the M3.5 WebAuthn ceremony with one explicit Plugin-host click and a repository-scoped installation-local Ed25519 key outside Git and SQLite. Exact detached Decision/repository/worktree/named-branch/scope receipts support fresh-process verification and dynamic recognition of registry revocation, remove expiry, and make no biometric, named-human, or repository-owner identity claim. Detached checkouts remain readable but durable Decisions fail closed; a revoked running host stays bound and fail-closed while the next named-branch host rotates; a non-semantic process-releasing SQLite writer mutex serializes dead owner-record recovery, and complete owner records publish atomically. The threat model honestly excludes arbitrary same-UID, Plugin/runtime, and local OS-account compromise. The independently validated successor graph preserves the historical M3.5 outcome, adds a distinct M3.6 Ticket, and contains 12 Tickets and 12 direct relations at graph digest sha256:09d0081f034778d293e4563b0a45bb411c1e2e1baf714cb1d9c8abe20f247be2."
+    - id: "m4-ticket-execution-closeout"
+      name: "Execute, verify, and close one Ticket through Outcome and Evidence"
+      status: completed
+      completed_at: "2026-07-30T19:28:33-07:00"
+      evidence: "The MR-ready M4 runtime is complete without real-project dogfood: seven public execution operations, exact Git ContextBinding and staged-index identity, claim-time ignored-context recompilation, disposable worktree-local Run leases, bounded Evidence, independent single-terminal Outcome closeout, dynamic Decision-authority withdrawal, direct unlock/join derivation, CLI/MCP/Skill/HTML projection, and thin installed-runtime fallback are implemented. Final focused adversarial review returned ACCEPT; workspace typechecks, Core 450/450, CLI 105/105, MCP 25/25, npm package/tarball verification, release metadata, thin marketplace, real Claude/Codex host installation, artifact runtime/MCP startup, Codex plugin verification, Skill validation, and clean-cut searches passed. The final four-Ticket truth candidate c6fdc8f0c3f9aa236b572a18329b161ea255adaef69df28713faecdeae4263fa passed independent semantic validation, reloaded at 13 Tickets and 13 direct relations with graph digest sha256:14c552cd926a2ed0a21f3dab27a40357cf138c487cda5f8ede50b2c1ee9865e1, and was path-exact checkpointed in 85c7eb4e1be386a4022579d5168c7953bcc9d996. The final public npm audit was not repeated because it requires separate authorization to disclose dependency metadata; dependency manifests are unchanged, and real isolated artifact/host installation passed."
+    - id: "m5-ticket-dogfood-clean-cut-proof"
+      name: "Complete one real dogfood loop and prove the legacy cut remains clean"
+      status: planned
+  next:
+    - "After merge, choose a bounded real Plugin feature for M5 and prove the graph through the shipped runtime; this dogfood is follow-up evidence, not an M4 or MR gate."
+  commits:
+    - "d92c99c docs(ticket): plan git-native skill-driven pivot"
+    - "eb0590c docs(ticket): prepare git read authority cut"
+    - "487b6b3 feat(ticket): cut reads to git-native ledger"
+    - "ee6bd44 feat(ticket): add exact worktree patch capability"
+    - "0e234da feat(ticket): add planning and validation skills"
+    - "b427ca6 chore(vibehub): ticket checkpoint"
+    - "f73680c fix(ticket): resolve local checkpoint cli"
+    - "b0d8b1f feat(ticket): add git-native review interventions"
+    - "802111c chore(vibehub): ticket checkpoint"
+    - "dbc60dc feat(ticket): add durable human decision attestation"
+    - "e8f2afd chore(vibehub): ticket checkpoint"
+    - "dd771df feat(ticket): replace passkeys with install-local authority"
+    - "80add4c chore(vibehub): ticket checkpoint"
+    - "1ee7235 chore(vibehub): ticket checkpoint"
+    - "f871632 chore(vibehub): ticket checkpoint"
+    - "85c7eb4 chore(vibehub): ticket checkpoint"
+    - "5da323c feat(ticket): complete execution and closeout runtime"

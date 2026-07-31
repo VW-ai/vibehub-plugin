@@ -1,11 +1,36 @@
 import {
   OperationDispatcher,
+  operationInputSchemas,
   readTask,
   replaceScopePatterns,
   saveTaskReport,
   type Db,
+  type TicketDecisionLocalSignatureTrustProfileResolverV0,
 } from "@vw-ai/vibehub-core";
 import crypto from "node:crypto";
+import { createMcpSessionActor } from "./session-actor.js";
+
+export const TICKET_OPERATION_NAMES = [
+  "ticket.graph.snapshot",
+  "ticket.subject.inspect",
+  "ticket.trace.list",
+  "ticket.frontier.read",
+  "ticket.context.compile",
+  "ticket.run.claim",
+  "ticket.run.heartbeat",
+  "ticket.run.release",
+  "ticket.evidence.append",
+  "ticket.closeout.append",
+  "ticket.worktree.patch",
+  "ticket.review.append",
+  "ticket.decision.record",
+] as const;
+export type TicketOperationName = typeof TICKET_OPERATION_NAMES[number];
+const TICKET_OPERATION_NAME_SET = new Set<string>(TICKET_OPERATION_NAMES);
+export const KB_OPERATION_NAMES = Object.keys(operationInputSchemas)
+  .filter((operation) => operation.startsWith("kb."));
+export const DISTILL_OPERATION_NAMES = Object.keys(operationInputSchemas)
+  .filter((operation) => operation.startsWith("distill."));
 
 export interface CapabilityContext {
   db: Db;
@@ -15,12 +40,22 @@ export interface CapabilityContext {
   actor?: string;
   requestId?: () => string;
   now?: () => string;
+  ticketDecisionAttestationTrustProfiles?:
+    TicketDecisionLocalSignatureTrustProfileResolverV0;
 }
 
 export function createCapabilities(ctx: CapabilityContext) {
   const now = (): string => ctx.now?.() ?? new Date().toISOString();
-  const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db,{repoRoot:ctx.repoRoot}).dispatch(operation,{
-    repoId:ctx.repoId,actor:ctx.actor??"mcp-agent",taskId:ctx.taskId,
+  // Capture one fallback per capability session. Production injects an actor
+  // derived from the MCP connection; direct legacy consumers still get a
+  // stable, non-global attribution instead of sharing one global identity.
+  const actor = ctx.actor?.trim() || createMcpSessionActor();
+  const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db,{
+    repoRoot:ctx.repoRoot,
+    ticketDecisionAttestationTrustProfiles:
+      ctx.ticketDecisionAttestationTrustProfiles,
+  }).dispatch(operation,{
+    repoId:ctx.repoId,actor,taskId:ctx.taskId,
     requestId:requestId??ctx.requestId?.()??`mcp-${crypto.randomUUID()}`,now:now(),
   },input);
   const requireTask = () => {
@@ -56,10 +91,28 @@ export function createCapabilities(ctx: CapabilityContext) {
     },
 
     dispatchOperation(operation:string,input:Record<string,unknown>={},requestId?:string) {
-      return dispatch(operation,input,requestId);
+      return dispatchFamily("distill",operation,input,requestId);
     },
 
     dispatchKnowledge(operation:string,input:Record<string,unknown>={},requestId?:string) {
+      return dispatchFamily("kb",operation,input,requestId);
+    },
+
+    dispatchTicket(operation:TicketOperationName,input:Record<string,unknown>={},requestId?:string) {
+      if(!TICKET_OPERATION_NAME_SET.has(operation)){
+        return {
+          ok:false as const,
+          error:{
+            code:"unsupported_operation",
+            message:`${operation} does not belong to the ticket operation family`,
+            details:{
+              operation,
+              expectedOperations:[...TICKET_OPERATION_NAMES],
+            },
+            nextSafeActions:["Choose a registered ticket operation."],
+          },
+        };
+      }
       return dispatch(operation,input,requestId);
     },
 
@@ -69,8 +122,30 @@ export function createCapabilities(ctx: CapabilityContext) {
           "Vibehub keeps team context local. Hooks trigger at the right time; " +
           "skills own semantic workflow; MCP capabilities validate and persist mechanical facts. " +
           "Use vibehub-query for context pulls, vibehub-ingest for discussions, and " +
-          "vibehub-distill for first-run repository mapping.",
+          "vibehub-distill for first-run repository mapping. Use vibehub-ticket-plan " +
+          "to shape work, vibehub-ticket-run to execute one ready Ticket, and " +
+          "vibehub-ticket-closeout for independent acceptance adjudication.",
       };
     },
   };
+
+  function dispatchFamily(
+    family:"kb"|"distill",
+    operation:string,
+    input:Record<string,unknown>,
+    requestId?:string,
+  ) {
+    if(operation.startsWith(`${family}.`)){
+      return dispatch(operation,input,requestId);
+    }
+    return {
+      ok:false as const,
+      error:{
+        code:"unsupported_operation",
+        message:`${operation} does not belong to the ${family} operation family`,
+        details:{operation,expectedPrefix:`${family}.`},
+        nextSafeActions:[`Choose a registered ${family} operation.`],
+      },
+    };
+  }
 }

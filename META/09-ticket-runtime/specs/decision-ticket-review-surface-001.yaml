@@ -1,0 +1,280 @@
+spec_id: "decision-ticket-review-surface-001"
+type: decision
+state: active
+intent:
+  summary: "什么样的项目级 HTML 能让人围绕场景 review Ticket Graph，同时查看、comment 和简单编辑全部 Tickets？"
+  detail: |
+    **Prototype question**: Establish the smallest useful human control surface
+    for the first Ticket dogfood loop.
+
+    The prototype should let a human:
+    - review through human-understandable scenario/outcome lenses rather than a
+      flat task list or a second canonical object model;
+    - review or delegate the coarse plan and its major boundaries;
+    - see blockers, human decisions, and deviations immediately;
+    - progressively inspect every contributing Ticket without making each one an
+      approval unit;
+    - comment or propose simple edits with visible authorship and revision
+      effects.
+
+    The HTML is a project-scoped projection over canonical Ticket operations,
+    never an independent store or raw persistence editor. The prototype should
+    decide the information hierarchy and interaction contract before the final
+    App or replacement of the existing Workbench UX is chosen.
+
+    **Prototype 01 — Review horizon**
+
+    `artifacts/2026-07-28-ticket-review-surface-prototype.html` is an interactive
+    standalone prototype. It separates the scenario/outcome review layer from
+    Agent-owned execution work with a visible “human review horizon”; product
+    decisions and architecture deviations cross that horizon into a focused
+    attention queue.
+
+    The prototype supports scenario switching, outcome-only versus full Ticket
+    views, Ticket inspection, local comment/edit demonstrations, and plan review
+    versus bounded delegation. It is a proposal awaiting live human reaction,
+    not a ratified UI or a persistence implementation.
+
+    **Wayne review of Prototype 01 — rejected direction**
+
+    Prototype 01 split the Ticket graph, scenarios, and attention into several
+    dashboard-like regions. That obscured the whole workflow, made the surface
+    feel crowded, and left human-review Tickets detached from the place where
+    they occur. The required correction is one at-a-glance workflow in which
+    every Ticket remains visible and attention appears in situ.
+
+    **Prototype 02 — Quiet workflow signal**
+
+    `artifacts/2026-07-28-ticket-review-surface-prototype-v2.html` starts as one
+    quiet Corner Signal and expands that same object into a single workflow
+    sheet. All 23 Tickets remain visible across five scenario lanes; human
+    decisions and deviations surface semantically in their original workflow
+    position. Selecting a Ticket progressively opens its decision detail,
+    comments, edit proposal, evidence, and commit trace without replacing the
+    workflow.
+
+    Prototype 02 applies `constraint-project-quiet-intelligence-001`. It is
+    awaiting live review and is not ratified.
+
+    **Wayne review of Prototype 02 — retain as Overview**
+
+    Prototype 02 improved whole-plan scanning, but its scenario-by-phase layout
+    still reads as a matrix rather than a real workflow. It does not make
+    Ticket dependencies, shared prerequisites, forks, joins, or cross-scenario
+    paths legible enough. The refined version may remain as an alternate
+    Overview, but the primary view should read more like an n8n/Dify dependency
+    canvas.
+
+    A healthy graph should contain no orphan Ticket. Every non-top-level Ticket
+    contributes through explicit typed relation paths to a coarse outcome or
+    the overall deliverable. Shared work may feed several scenario lenses or
+    outcome paths through explicit dependencies; being shared does not make it
+    standalone or require a UI hierarchy.
+
+    **Prototype 03 — Causal Ticket Graph**
+
+    `artifacts/2026-07-28-ticket-review-surface-prototype-v3.html` makes Graph
+    the default and retains a quieter Overview as the alternate projection.
+    Scenario outcomes are real coarse Ticket nodes rather than row labels.
+    Direct `depends_on` relations are visible left-to-right connectors;
+    containment is expressed through spatial scenario and deliverable frames
+    rather than a competing set of workflow arrows.
+
+    The canvas demonstrates cross-scenario dependencies, branch and join
+    behavior, in-place human decisions and deviations, pan/zoom/fit, clickable
+    relations with rationale, and causal-path reveal. Clicking a Ticket keeps
+    the graph visible while opening the same progressive detail, comment, edit,
+    evidence, and commit surface.
+
+    The sample planning branch also projects
+    `convention-ticket-backchain-forward-normalize-001`: synthesize necessary
+    paths backward from observable outcomes, then read forward from current
+    facts to remove duplicate, orphan, dead-end, redundant, and falsely
+    serialized work. The final canvas still reads in the execution direction.
+
+    **Wayne review of Prototype 03 — causal graph retained, ontology refined**
+
+    The primary human reading task is not “which scenario lane owns this
+    Ticket?” It is “when this Ticket finishes, what becomes executable next?”
+    The review surface should therefore make direct execution relations
+    primary and let a person read the graph in execution order.
+
+    A Ticket remains an executable context package: once executable and
+    unblocked, a fresh Agent with VibeHub should be able to read its contract
+    and bound context and perform the correct work. A scenario is instead a
+    planning and review lens through which a human constrains and validates the
+    graph. A coarse assembly or verification Ticket may prove that a scenario
+    has been achieved, but Scenario is neither a second canonical entity nor
+    automatically identical to one Ticket.
+
+    Tickets should not be presented as a nested UI hierarchy. Containment,
+    dependency, supersession, evidence, and other meanings remain explicit
+    typed relations. The default graph projects the direct unlock/dependency
+    relation; other relation types and scenario lenses refine inspection
+    without creating competing workflow arrows.
+
+    **Prototype 04 — Quiet execution instrument**
+
+    `artifacts/2026-07-28-ticket-review-surface-prototype-v4.html` is the
+    preserved high-fidelity reference artifact for the converged standalone
+    prototype. It starts as the same quiet Corner Signal and expands into one
+    zoomable, pannable execution canvas. The sample keeps all 29 Tickets and 35
+    direct unlock relations available at once, applies a deterministic
+    left-to-right layered layout with straight-first orthogonal routing, and
+    uses level of detail rather than lanes or pagination when the complete
+    graph is fit to the viewport.
+
+    Selecting one Ticket leaves the graph visible and docks one Inspector into
+    the canvas edge. The Inspector exposes the executable handoff, dependency
+    satisfaction, active Run, acceptance evidence, validation, relation
+    neighborhood, scenario lens, evidence, commit trace, comments, and edit
+    proposals. Selecting one relation exposes its direct-unlock rationale.
+    Scenario remains an optional review lens over the same stable layout and
+    never causes graph reflow.
+
+    Runtime dimensions remain visually independent:
+
+    - blue identifies an active Run and its actual execution spine;
+    - moss identifies dependency satisfaction, accepted evidence, proof, and
+      valid handoffs;
+    - ochre identifies a human authority boundary;
+    - rose identifies deviation, conflict, or failed validation;
+    - muted violet identifies stale context or a definition that must be
+      recompiled;
+    - hover, selection, and related-path focus remain neutral interaction
+      states rather than borrowing a Runtime color.
+
+    The fixed visual base is matte and near-monochrome. Tickets are bounded
+    execution objects, not floating dashboard cards; the readiness aperture
+    punctures the Ticket boundary as the one characteristic visual signature.
+    The Inspector is a structural split pane rather than a modal or floating
+    card. Healthy state stays quiet, while human decisions, deviations, active
+    Runs, proof, and stale context surface at the exact graph locus that owns
+    them.
+
+    **Resolved review-surface decision**
+
+    The v0 project review surface is one lightweight projection over canonical
+    Ticket reads and operations:
+
+    - the primary view is the complete direct-unlock Ticket Graph, read
+      left-to-right as “what may execute next,” with deterministic pan, zoom,
+      fit, minimap, and level-of-detail behavior;
+    - Tickets have no presentation hierarchy; scenario is a human planning and
+      review lens over related Tickets, while coarse verification or assembly
+      Tickets may anchor observable scenario completion;
+    - human review gates a coarse outcome plan and genuine authority
+      boundaries, not every executable Ticket;
+    - human decisions, deviations, stale context, active Runs, and proof remain
+      in situ and are redundantly encoded by shape, words, and restrained
+      semantic color;
+    - progressive inspection keeps the graph visible and makes Ticket
+      contracts, direct relation rationale, evidence, commits, comments, and
+      simple edit proposals traceable;
+    - comments and edits are attributed Git-native proposals or Ticket
+      document changes through deterministic operations, not writes to an
+      HTML-owned store;
+    - graph layout is a derived, reproducible view artifact. Runtime state,
+      selection, hover, or scenario lens changes must not move Tickets.
+
+    Prototype 04 fixes the current product and interaction direction. Exact
+    typography metrics, color values, spacing, and future host container remain
+    implementation details as long as they preserve this contract.
+
+    Wayne accepted this direction through iterative live review on 2026-07-28.
+
+    **First live projection — 2026-07-29**
+
+    The CLI now packages a proposal-specific local host derived from Prototype
+    04 rather than preserving the HTML only as a static reference. It renders
+    current candidate outlines and direct unlocks with deterministic layered
+    layout, orthogonal edges, pan/zoom/fit, a working minimap, causal focus, and
+    one progressive Inspector. It exposes exact validation summaries and the
+    derived authority boundary without inventing readiness, Run, proof, or
+    Scenario facts. Stale proposals show the current canonical graph rather
+    than a graph mislabeled with the old candidate digest.
+
+    **Git-native pivot clarification — 2026-07-29**
+
+    The graph, Inspector, layout, and interaction direction remain ratified.
+    Their data source becomes the current Git Ticket document ledger. The local
+    host no longer owns a trusted-provider/SQLite application workflow; review,
+    comments, edits, and decisions produce inspectable Git document changes.
+
+    **M3 live intervention surface — 2026-07-30**
+
+    The graph host now projects durable Git-native Review and Decision facts at
+    their exact graph, Ticket, or relation loci. Current and historical traces
+    remain distinct. M3 first established exact injected session capabilities;
+    M3.6 completes the installed path with a repository-scoped install-local
+    authority. The installed host exposes comments, complete Ticket edit
+    proposals, graph plan review, and Ticket protected-boundary Decisions.
+    One explicit Decision submit freezes the exact current subject and scope,
+    writes the Decision, and appends its detached Ed25519 receipt.
+
+    Durable Decision YAML records the exact choice but cannot authenticate
+    itself. A raw Decision stays visible as current-unverified evidence. A
+    fresh reader projects executable authority only after dynamically
+    verifying the exact signed receipt against the repo-external profile. The
+    receipt has no time-based expiry; source change, tamper, profile mismatch,
+    or revocation retreats to current-unverified. The host click proves an
+    action by the local Plugin installation, not WebAuthn, biometric presence,
+    or named-human identity.
+
+    Review stays progressive and in situ: one disclosure row opens inside the
+    existing Inspector, trace failure does not hide executable context, stale
+    refresh preserves the user's draft, and a successful intervention exposes
+    its durable Git path. The host remains a projection over canonical
+    operations rather than an HTML-owned editor or another chat.
+
+    **Claimed**: Codex 2026-07-28
+constraints:
+  - kind: must
+    rule: "The default project review projection shows the complete direct-unlock Ticket Graph and makes what becomes executable next legible"
+  - kind: must
+    rule: "Selecting a Ticket or relation keeps the graph visible while progressively exposing its contract, rationale, evidence, and proposals"
+  - kind: must
+    rule: "Scenario remains a derived human planning/review lens over Tickets rather than a canonical Scenario entity or presentation hierarchy"
+  - kind: must
+    rule: "Graph layout is deterministic derived view state and does not reflow for Runtime state, hover, selection, or scenario-lens changes"
+  - kind: must
+    rule: "Comments and simple edits become attributed Git-native proposals or Ticket document changes rather than HTML-owned or SQLite-only writes"
+  - kind: must_not
+    rule: "Do not detach blockers, human decisions, deviations, stale context, active Runs, or proof from the graph locus that owns them"
+  - kind: must_not
+    rule: "Do not make every visible Ticket an approval unit or recreate a dashboard of separate graph, scenario, and attention regions"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, resolved, prototype, html, review, ticket-graph, ux]
+provenance:
+  source_type: manual_input
+  confidence: 0.85
+  source_ref: "Wayne proposed a per-project HTML Ticket visualization with comments and simple edits — 2026-07-28"
+  produced_at: "2026-07-30T20:30:42Z"
+relations:
+  - target: "decision-ticket-intelligence-loop-001"
+    type: depends_on
+    detail: "The surface projects the ratified scenario-first review and delegation behavior."
+  - target: "decision-ticket-graph-lifecycle-002"
+    type: relates_to
+    detail: "Comments and edits will propose mutations whose legal lifecycle is governed separately."
+  - target: "convention-ticket-backchain-forward-normalize-002"
+    type: relates_to
+    detail: "The graph surface projects the causal result of backward synthesis followed by forward normalization."
+  - target: "decision-workbench-011"
+    type: challenges
+    detail: "The prototype may refine the future App/Workbench projection without making App mandatory."
+anchors:
+  - file: "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype.html"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v2.html"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v3.html"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md"
+  - file: "META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md"
+  - file: "packages/cli/src/ticket-review-host.ts"
+  - file: "packages/cli/assets/ticket-review-host/app.js"

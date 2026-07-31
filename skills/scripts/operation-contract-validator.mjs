@@ -1,16 +1,38 @@
 /** Dependency-free validator for the generated operation contract dialect. */
 export function validateOperationContract(contract,value){
   const errors=[];
+  const byteBudgets=(contract.runtimeRefinements??[]).filter(rule=>rule.kind==="maxJsonBytes");
+  validateRuntimeRefinements(byteBudgets,value,errors);
+  if(errors.length>0)return {valid:false,errors};
   validateJsonSchema(contract.input,value,"$",contract.input,errors);
-  if(errors.length===0)validateRuntimeRefinements(contract.runtimeRefinements??[],value,errors);
+  if(errors.length===0)validateRuntimeRefinements(
+    (contract.runtimeRefinements??[]).filter(rule=>rule.kind!=="maxJsonBytes"),
+    value,
+    errors,
+  );
   return {valid:errors.length===0,errors};
 }
 
+/**
+ * Resolve a literal or compact generated fixture from operation-contracts.
+ * Generated descriptors are strict and bounded so artifact validation cannot
+ * be turned into an unbounded allocator.
+ */
+export function materializeOperationFixture(_contract,fixture){
+  const hasValue=Object.hasOwn(fixture??{},"value");
+  const hasMaterializer=Object.hasOwn(fixture??{},"materializer");
+  if(hasValue===hasMaterializer)throw new Error("fixture must contain exactly one of value or materializer");
+  if(hasValue)return fixture.value;
+  const descriptor=fixture.materializer;
+  if(!descriptor||typeof descriptor!=="object"||Array.isArray(descriptor))throw new Error("fixture materializer must be an object");
+  throw new Error(`unsupported fixture materializer ${descriptor.kind??""}`);
+}
+
 export function validateRuntimeRefinements(refinements,value,errors=[]){
-  const objects=[];walkObjects(value,"$",objects);
+  let objects;
   for(const rule of refinements){
     if(rule.kind==="maxJsonBytes"){
-      if(new TextEncoder().encode(JSON.stringify(value)).byteLength>rule.maximum)errors.push({path:"$",message:rule.message,refinementId:rule.id});
+      if(!isJsonWithinByteBudget(value,rule.maximum))errors.push({path:"$",message:rule.message,refinementId:rule.id});
       continue;
     }
     if(rule.kind==="maxNestedArrayItems"){
@@ -19,7 +41,23 @@ export function validateRuntimeRefinements(refinements,value,errors=[]){
       if(count>rule.maximum)errors.push({path:`$.${rule.parentField}`,message:rule.message,refinementId:rule.id});
       continue;
     }
+    if(rule.kind==="nestedFieldCompare"){
+      if(!objects){objects=[];walkObjects(value,"$",objects);}
+      for(const {value:object,path} of objects){
+        if(!rule.matchFields.every(field=>Object.hasOwn(object,field)))continue;
+        const nested=object[rule.rightObjectField];
+        const right=nested&&typeof nested==="object"&&!Array.isArray(nested)
+          ? nested[rule.rightField]
+          : undefined;
+        const valid=rule.operator==="equal"
+          ? object[rule.leftField]===right
+          : false;
+        if(!valid)errors.push({path,message:rule.message,refinementId:rule.id});
+      }
+      continue;
+    }
     if(rule.kind!=="fieldCompare"){errors.push({path:"$",message:`unsupported runtime refinement ${rule.kind}`,refinementId:rule.id});continue;}
+    if(!objects){objects=[];walkObjects(value,"$",objects);}
     for(const {value:object,path} of objects){
       if(!rule.matchFields.every(field=>Object.hasOwn(object,field)))continue;
       const left=object[rule.leftField],right=object[rule.rightField];
@@ -28,6 +66,72 @@ export function validateRuntimeRefinements(refinements,value,errors=[]){
     }
   }
   return errors;
+}
+
+/** Exact, early-exit JSON UTF-8 budget check without building serialized JSON. */
+export function isJsonWithinByteBudget(value,maximum){
+  if(!Number.isSafeInteger(maximum)||maximum<0)return false;
+  let remaining=maximum;
+  const consume=bytes=>(remaining-=bytes)>=0;
+  const consumeString=text=>{
+    if(!consume(2))return false;
+    for(let index=0;index<text.length;index++){
+      const code=text.charCodeAt(index);
+      if(code===0x22||code===0x5c){if(!consume(2))return false;}
+      else if(code===0x08||code===0x09||code===0x0a||code===0x0c||code===0x0d){if(!consume(2))return false;}
+      else if(code<=0x1f){if(!consume(6))return false;}
+      else if(code<=0x7f){if(!consume(1))return false;}
+      else if(code<=0x7ff){if(!consume(2))return false;}
+      else if(code>=0xd800&&code<=0xdbff){
+        const next=text.charCodeAt(index+1);
+        if(next>=0xdc00&&next<=0xdfff){index++;if(!consume(4))return false;}
+        else if(!consume(6))return false;
+      }else if(code>=0xdc00&&code<=0xdfff){if(!consume(6))return false;}
+      else if(!consume(3))return false;
+    }
+    return true;
+  };
+  const active=new WeakSet();
+  const frames=[{kind:"value",value}];
+  try{
+    while(frames.length){
+      const frame=frames.pop();
+      if(frame.kind==="array"){
+        if(frame.index>=frame.value.length){active.delete(frame.value);if(!consume(1))return false;continue;}
+        if(frame.index>0&&!consume(1))return false;
+        const child=frame.value[frame.index];
+        frames.push({...frame,index:frame.index+1},{kind:"value",value:child});
+        continue;
+      }
+      if(frame.kind==="object"){
+        let entry=frame.keys.next();
+        while(!entry.done&&!Object.prototype.propertyIsEnumerable.call(frame.value,entry.value))entry=frame.keys.next();
+        if(entry.done){active.delete(frame.value);if(!consume(1))return false;continue;}
+        if(frame.wroteProperty&&!consume(1))return false;
+        if(!consumeString(entry.value)||!consume(1))return false;
+        const child=frame.value[entry.value];
+        frames.push({...frame,wroteProperty:true},{kind:"value",value:child});
+        continue;
+      }
+      const item=frame.value;
+      if(item===null){if(!consume(4))return false;}
+      else if(typeof item==="string"){if(!consumeString(item))return false;}
+      else if(typeof item==="boolean"){if(!consume(item?4:5))return false;}
+      else if(typeof item==="number"){
+        const encoded=Number.isFinite(item)?JSON.stringify(item):"null";
+        if(!encoded||!consume(encoded.length))return false;
+      }else if(Array.isArray(item)){
+        if(active.has(item)||!consume(1))return false;
+        active.add(item);frames.push({kind:"array",value:item,index:0});
+      }else if(typeof item==="object"){
+        const prototype=Object.getPrototypeOf(item);
+        if((prototype!==Object.prototype&&prototype!==null)||active.has(item)||!consume(1))return false;
+        active.add(item);
+        frames.push({kind:"object",value:item,keys:(function*(){for(const key in item)yield key;})(),wroteProperty:false});
+      }else return false;
+    }
+  }catch{return false;}
+  return true;
 }
 
 function walkObjects(value,path,out){

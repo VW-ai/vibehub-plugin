@@ -1,0 +1,240 @@
+spec_id: "decision-ticket-graph-lifecycle-001"
+type: decision
+state: superseded
+intent:
+  summary: "Plan、Ticket Graph、Ticket 与 Run 分别拥有什么生命周期，谁可以怎样修改工作图？"
+  detail: |
+    **Question**: Define the legal operational transitions and graph-mutation
+    authority.
+
+    The answer must distinguish:
+    - Plan revision from the current executable graph;
+    - parent/child decomposition from execution dependency;
+    - Ticket state from Run state;
+    - automatic mutations from proposed graph diffs;
+    - verifier failure, human gate, retry, split, merge, supersede, cancel, and
+      emergent follow-up work;
+    - initial planning graph from the graph that actually executed.
+
+    **New planning input from Wayne**: Planning may require human intervention
+    without forcing the system to fabricate a fully explicit downstream graph.
+    Technical research, technical decisions and frontend/design choices may
+    themselves be blocker Tickets. Work beyond such a blocker may remain a
+    directional planning frontier rather than a valid Ticket, then be compiled
+    or refined after the blocker resolves.
+
+    The answer must therefore decide whether the graph admits a non-executable
+    placeholder/fog object distinct from Ticket, how human review approves a
+    partial graph, and what event causes downstream planning to resume.
+
+    **Frozen read semantics (2026-07-28)**:
+
+    The default V0 review graph is the latest published whole-project
+    generation in the verified worktree. A generation contains versioned Ticket
+    definitions and only explicit direct dependency edges. Review snapshots are
+    immutable and retained independently from the moving `latest` pointer, so
+    pagination, inspection, and trace reads never substitute a newer graph.
+
+    This is a read identity and lifecycle decision only. Every stored outline
+    explicitly carries `parentId`: `null` marks a top-level Ticket and every
+    semantically contained Ticket names one parent. Parentage expresses outcome
+    containment, not execution order or a UI hierarchy; execution order remains
+    an explicit dependency relation. This read slice does not decide Plan
+    revisions, directional frontiers, proposed diffs, semantic mutation
+    authority/CAS, split/merge/supersede/cancel behavior, Run state, or the
+    initial-versus-executed graph comparison. The storage-only
+    publication-head CAS frozen below is narrower than those unresolved
+    lifecycle semantics.
+
+    **Frozen storage-level publication substrate (2026-07-28)**:
+
+    Core may persist one complete outline-compatible candidate generation
+    through an authority-neutral publisher below the authorized
+    proposal-application service. The publisher accepts an exact expected current snapshot
+    (`null` means expected absence), serializes writers through an untracked
+    operational lock directory in the worktree-specific Git administration
+    path, rechecks current after acquiring that lock, validates the entire
+    candidate graph, installs immutable revision/generation documents, and
+    exposes only complete generations. The complete lock directory is installed
+    by atomic rename from a fully written, nonempty staging directory. Bootstrap
+    atomically renames a fully-synced sibling store directory into place; later
+    publication atomically replaces `latest.yaml`. Those respective renames are
+    the only visibility commit points.
+
+    A candidate identical to the already-current generation converges as an
+    unchanged success even when the original expected snapshot is stale; every
+    non-identical stale expectation fails CAS without moving the pointer.
+    New Tickets start at revision 1, changed definitions advance exactly one
+    revision, unchanged definitions reuse their current revision, and creation
+    provenance is immutable. The V0 publisher rejects omission of any current
+    Ticket, because removal, prune, cancel, merge, and supersession cannot be
+    inferred from absence.
+
+    This publisher is not a public Ticket operation and grants no semantic or
+    human authority. Promise preservation, mutation classification, validation
+    receipts, and trusted authority are resolved above it before the application
+    service may invoke its fenced path. Explicit removal/supersession, partial
+    Planning Fog, Run state, and initial-versus-executed comparison remain
+    unresolved.
+
+    **Frozen proposal-submission boundary (2026-07-29)**:
+
+    `ticket.proposal.submit` may now record an immutable, scope-bound review
+    contribution without advancing the current graph. Comment proposals bind
+    an exact snapshot-visible Ticket revision or relation tuple. Graph-change
+    proposals bind the exact observed snapshot, use create-absence and
+    revise-expected-revision preconditions, and describe complete replacement
+    definition bodies rather than raw patches or per-edge mutations.
+
+    Core allocates proposal identity and digest, new Ticket IDs, definition
+    revisions, timestamps, and proposal provenance. Caller actor/reason/source
+    attribution is explicitly claimed_unverified, and callers cannot inject
+    provenance references. It resolves proposal-local references and
+    mechanically validates the complete candidate topology and revision
+    transitions under a 4 MiB decoded logical-input budget, with pre-parse
+    raw guards in CLI/Skill and bounded MCP framing, but it does not invoke
+    the internal generation publisher.
+    Submission therefore has `review_contribution_only` effect and never
+    creates a canonical draft, mutates the graph, or grants authority.
+
+    Any human or Agent may submit. The request actor and authorAssessment are
+    claimed attribution and routing input only. Independent machine validation
+    must separately judge promise preservation, truthful containment,
+    elaboration/decomposition/expansion, and delegated scope. Human authority
+    is separately required only for protected experience/product,
+    principle-deviation, permission/side-effect, risk/policy, or initial-plan
+    boundaries. Bootstrap mechanically indicates initial_plan_authority;
+    untrusted authorAssessment cannot route the foundational plan as delegated.
+    Technical difficulty by itself is not a human gate.
+
+    **Frozen proposal-query and semantic-evidence boundary (2026-07-29)**:
+
+    `ticket.proposal.inspect` and `ticket.proposal.list` expose immutable,
+    scope-bound proposal facts through bounded Core reads. They do not create a
+    mutable proposal lifecycle, compare a stored proposal with the live graph
+    head, or infer approval/application status.
+
+    A graph-change proposal may receive multiple append-only
+    proposal-validation contributions. Each binds the exact proposal and
+    mechanically materialized candidate and remains claimed_unverified semantic
+    evidence. The ledger deliberately chooses no current/latest/winning receipt:
+    contrary assessments coexist and none grants maturity, authority,
+    GateDecision satisfaction, application eligibility, or graph mutation.
+    Proposal validation is separate from Ticket-revision readiness validation.
+
+    **Frozen trusted authority and application boundary (2026-07-29)**:
+
+    Three further operations are now registered through Core:
+    `ticket.proposal.review.inspect`,
+    `ticket.proposal.authority.decide`, and `ticket.proposal.apply`. Review
+    reconstructs the exact graph-change candidate, loads the complete bounded
+    validation ledger, and binds that set by digest, high-water sequence, and
+    count. It reports one derived eligibility/next action without creating
+    mutable proposal status.
+
+    Authority-decision operation input contains schema version, proposal ID,
+    and immutable expected proposal/candidate/validation-set digests only. The
+    caller cannot serialize a principal, disposition, or authority proof. Those
+    values must come from a non-serializable trusted provider injected by the
+    host. Core conservatively unions proposal, validation, and provider
+    authority signals and never permits a provider to downgrade change class.
+    Bootstrap, expansion, an introduced human gate, or any protected signal
+    requires a host-authenticated human with a human-authority basis. Only
+    non-protected elaboration/decomposition may use a trusted delegation basis.
+    Authorization cites at least one exact passing validation without a blocking
+    finding and remains bound to the complete set, including contrary receipts.
+    The immutable decision is terminal for one proposal and closes its
+    validation ledger.
+
+    Application rechecks the exact proposal/candidate and authorized decision,
+    then stores an immutable intent containing the complete candidate
+    definitions, base snapshot, deterministic store/candidate identity, and
+    counts. Under one SQLite immediate transaction it invokes the Git publisher
+    with a durable fence derived from that intent. The fence remains in place
+    until the immutable application receipt commits. If Git visibility changed
+    but receipt persistence failed, retry may adopt only the identical intent
+    fence: a current candidate is `reconciled`, the original base may resume,
+    and a malformed or foreign fence or third graph head fails closed. Release
+    atomically claims exact `owner-T` as `releasing-T`, unlinks only that marker,
+    then removes the canonical directory only if still empty. A successor's
+    nonempty `owner-U` makes stale removal fail harmlessly; crash-empty state can
+    be removed or atomically replaced by staged acquisition. Cleanup after a
+    committed receipt additionally requires the canonical Git head to equal the
+    intent candidate. Successful receipts are immutable, terminal publication
+    facts and make replay idempotent.
+
+    This resolves additive/revision proposal application, not the entire graph
+    lifecycle. Removal, cancel, merge, split, prune, supersession, partial
+    Planning Fog, Ticket readiness, Run state, and initial-versus-executed
+    comparison remain open. The default CLI/MCP adapters inject no trusted
+    authority provider, so bootstrap and protected proposals still require a
+    trusted host decision bridge; caller actor claims cannot unlock them.
+constraints:
+  - kind: must
+    rule: "The default V0 review graph is the latest published complete generation for the verified worktree"
+  - kind: must
+    rule: "Every later page and subject read stays bound to its exact immutable generation rather than substituting latest"
+  - kind: must
+    rule: "Every outline explicitly uses parentId null for top-level or one parent for outcome containment; execution order is represented separately by explicit dependency relations"
+  - kind: must_not
+    rule: "Read-generation identity must not be interpreted as graph mutation authority, Run state, or a fully resolved downstream plan"
+  - kind: must
+    rule: "The storage-level publisher rechecks expected latest under one exclusive lock directory atomically installed in the worktree-specific Git administration path and advances visibility only through atomic bootstrap store-directory rename or, for later generations, atomic replacement of latest.yaml"
+  - kind: must
+    rule: "A changed existing definition advances exactly one revision while an unchanged definition reuses its exact revision; new definitions begin at revision 1"
+  - kind: must_not
+    rule: "The V0 publisher must not interpret omitted Tickets as removal or expose authority-neutral publication as an authorized graph-mutation operation"
+  - kind: must
+    rule: "ticket.proposal.submit records an immutable review contribution bound to the exact observed snapshot and target revisions without advancing the canonical Ticket Graph"
+  - kind: must
+    rule: "Core allocates proposal identity, new Ticket identity, revisions, timestamps, and creation provenance and mechanically validates the complete proposed candidate"
+  - kind: must_not
+    rule: "Claimed actor, authorAssessment, mechanical review, or proposal route hints must not grant semantic or human authority"
+  - kind: must
+    rule: "Bootstrap proposals mechanically indicate initial_plan_authority, caller provenance is not accepted, and claimed creation attribution remains explicitly unverified"
+  - kind: must
+    rule: "Independent machine validation and trusted human authority remain separate receipts; technical difficulty alone does not create a human gate"
+  - kind: must
+    rule: "Proposal query reads preserve immutable snapshot/target/digest bindings without creating proposal state, and proposal-validation receipts bind one exact graph-change proposal and candidate"
+  - kind: must
+    rule: "All contrary proposal-validation contributions remain in the append-only ledger; no current, latest, winning, or authoritative validation is derived in V0"
+  - kind: must
+    rule: "Proposal authority decisions bind the exact proposal/candidate and complete validation set, come only from a host-injected trusted provider, and close the validation ledger once recorded"
+  - kind: must
+    rule: "Bootstrap, expansion, introduced human gates, and protected authority signals require an authenticated human authority basis; only non-protected elaboration/decomposition may use delegated policy"
+  - kind: must
+    rule: "Proposal application persists an immutable exact-candidate intent before fenced Git publication and keeps the exact writer fence until a matching immutable application receipt commits"
+  - kind: must
+    rule: "Crash recovery adopts only the identical application-intent fence: current candidate reconciles, original base resumes, malformed or foreign fences and third heads fail closed, and completed-fence cleanup additionally verifies the canonical head equals the candidate"
+  - kind: must_not
+    rule: "Caller actor, operation JSON, mechanical review, or claimed_unverified validation must not mint a trusted principal or authority decision"
+  - kind: must_not
+    rule: "Proposal validation must not be interpreted as Ticket readiness, maturity, authority, GateDecision satisfaction, application, or graph mutation"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, open, read-semantics-frozen, publisher-substrate-frozen, proposal-submission-frozen, proposal-validation-frozen, authority-application-frozen, graph, lifecycle, mutation, run, cas]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.88
+  source_ref: "Ticket graph and state-machine discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
+  produced_by_agent: "ingest"
+  produced_at: "2026-07-29"
+relations:
+  - target: "decision-ticket-graph-lifecycle-002"
+    type: superseded_by
+    detail: "Git documents and normal ref/commit semantics replace internal generations plus Git/SQLite fenced application."
+  - target: "decision-ticket-work-unit-001"
+    type: depends_on
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+anchors:
+  - file: "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md"
+  - file: "packages/core/src/ticket-review-read-service.ts"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-28-ticket-generation-publisher-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
+  - file: "packages/core/test/ticket-operation-dispatcher.test.ts"

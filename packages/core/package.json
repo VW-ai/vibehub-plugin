@@ -14,6 +14,10 @@
     "./contracts": {
       "types": "./dist/contract/index.d.ts",
       "default": "./dist/contract/index.js"
+    },
+    "./contracts/ticket-review-schemas": {
+      "types": "./dist/contract/ticket-review-schemas.d.ts",
+      "default": "./dist/contract/ticket-review-schemas.js"
     }
   },
   "files": [
@@ -35,12 +39,14 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "node ../../scripts/clean-package-dist.mjs && tsc -p tsconfig.build.json",
+    "pretest": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
     "better-sqlite3": "^11.8.0",
+    "yaml": "^2.8.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {

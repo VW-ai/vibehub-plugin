@@ -1,0 +1,232 @@
+spec_id: "decision-ticket-mvp-001"
+type: decision
+state: superseded
+intent:
+  summary: "什么是可以立即在现有 Plugin 中实现并用来开发它自己的最小 Ticket dogfood 闭环？"
+  detail: |
+    **Question**: Turn the reviewed ontology into the first executable slice.
+
+    The earlier candidate loop was:
+
+    user intent
+    → query Feature Room
+    → create Plan and Ticket Graph
+    → human review
+    → select a ready Ticket
+    → compile bounded context
+    → execute a Run
+    → record artifacts and evidence
+    → verify Outcome
+    → complete, block, or derive follow-up work
+    → propose semantic closeout
+
+    The answer must name the first real feature developed through this loop,
+    define acceptance evidence for the Ticket System itself, and identify which
+    future Runtime/App capabilities remain stubs or adapters.
+
+    **Unblocked contract-first slice — 2026-07-28**
+
+    `contract-ticket-review-operations-001` now makes one implementation slice
+    safe before the complete dogfood loop is resolved:
+
+    - dependency-light browser-safe Ticket review DTO types/constants with
+      explicit capability slots, while strict Zod schemas remain opt-in;
+    - strict input/output schemas for the three coherent read responsibilities,
+      with the canonical projection-source schema remaining internal;
+    - a deterministic pure projector over resolver-selected snapshot facts and
+      `currentCapabilityProjections`, represented by the accepted
+      29-Ticket/35-relation review fixture;
+    - negative contract tests proving that writable state, maturity, progress,
+      Scenario, layout, and arbitrary capability JSON cannot enter the Runtime.
+
+    `V0` names product maturity; its wire DTOs use `schemaVersion: 1`. The pure
+    projector validates exact snapshot/watermark and subject bindings but does
+    not infer currentness or supersession from append-only receipt history.
+    Ticket bindings include definition revision; relation capability and trace
+    bindings include relation reference plus both endpoints. Producer families
+    are restricted, deeper unfrozen payloads remain unavailable, available
+    GateDecision traces require verified authority receipts, and claimed actors
+    never authorize.
+
+    The read foundation now includes the canonical definition/topology
+    bootstrap at `.vibehub/ticket-store/`, a scoped filesystem provider with
+    retained exact generations, production dispatcher registration, generated
+    operation contracts, a packaged mechanical Ticket wrapper, and thin
+    CLI/MCP adapters. Ticket semantic Skills are not implemented by this slice.
+    It proves one honest end-to-end read path without choosing legal
+    proposal-application semantics.
+
+    The Core-internal outline generation compiler and publication-head CAS
+    substrate now exist. The low-level publisher remains deliberately
+    unregistered and grants no mutation authority on its own.
+
+    **Submit-only proposal slice — 2026-07-29**
+
+    One narrow public authoring surface is now safe:
+    `ticket.proposal.submit` appends an immutable comment or graph-change
+    review contribution. Core binds exact snapshot and target revisions,
+    allocates identity/revision/time/provenance fields, mechanically validates
+    the complete candidate, and atomically records the proposal with its
+    idempotent operation receipt. Decoded logical input is capped at 4 MiB;
+    CLI and Skill enforce the same raw proposal limit before parsing, while
+    MCP bounds the complete proposal call separately. Caller provenance is
+    rejected and caller-derived creation attribution is marked
+    claimed_unverified. It does not modify the Git Ticket store.
+
+    The submitter actor and authorAssessment remain untrusted claims. A separate
+    machine validator must judge semantic promise preservation and delegated
+    scope. Human authority is separate again and is reserved for protected
+    initial-plan, experience/product, principle-deviation,
+    permission/side-effect, and risk/policy boundaries. Bootstrap always
+    indicates initial_plan_authority; technical difficulty alone is not a human
+    blocker.
+
+    **Proposal-query and independent-validation slice — 2026-07-29**
+
+    The next bounded slice adds proposal inspect/list plus proposal-validation
+    record/list/inspect through the same Core/CLI/MCP spine. Validation is
+    immutable claimed_unverified semantic evidence bound to one graph-change
+    proposal and candidate. The independent `vibehub-ticket-validate` Skill
+    inspects that proposal, evaluates promise_preservation, containment_truth,
+    dependency_truth, change_classification, delegated_scope, and
+    protected_boundaries, then records one contribution.
+
+    Contrary validation records coexist; V0 chooses no current/latest/winner.
+    This slice does not perform Ticket-readiness validation, derive maturity,
+    grant authority, record a GateDecision, authorize application, mutate the
+    graph, or expose the internal publisher.
+
+    **Trusted authority and fenced application slice — 2026-07-29**
+
+    This implemented slice registers `ticket.proposal.review.inspect`,
+    `ticket.proposal.authority.decide`, and `ticket.proposal.apply` through the
+    same Core/CLI/MCP operation spine. Review binds the complete bounded
+    validation ledger by digest, through-sequence, and count and exposes any
+    immutable decision/application receipt plus one derived next action.
+
+    Public operation JSON carries only immutable proposal, candidate,
+    validation-set, and decision bindings. It cannot carry a trusted principal,
+    disposition, or authority assertion. Core obtains those only from a
+    non-serializable `TrustedTicketProposalAuthorityProviderV0` injected by a
+    trusted host. Bootstrap, expansion, a declared human gate, and any
+    protected authority signal require a host-authenticated human and a
+    human-authority basis. Non-protected elaboration/decomposition may proceed
+    only with a trusted delegation basis. Authorization must accept at least
+    one exact passing, non-blocking validation receipt, while the decision
+    remains bound to the complete ledger including contrary receipts.
+
+    An authority decision is immutable and terminal for one exact proposal and
+    closes its validation ledger. Application first persists an immutable
+    intent containing the exact candidate definition inventory and publication
+    base/candidate identities. Core then invokes an internal fenced Git
+    publication path and retains its worktree-specific Git-admin writer fence
+    until the matching immutable SQLite application receipt commits. On retry
+    after Git became visible but receipt insertion failed, the exact intent
+    fence may be adopted: current candidate reconciles, current base resumes,
+    and a malformed or foreign fence or third head fails closed. Cleanup after
+    a committed receipt requires the exact fence and a canonical head equal to
+    its candidate.
+
+    Default CLI/MCP construction deliberately injects no authority provider.
+    It exposes the contract and review/apply path but cannot self-authorize a
+    bootstrap or protected change; authority resolution fails
+    `trusted_authority_unavailable` until a trusted host supplies the provider.
+    The public caller `actor` remains claimed attribution throughout. The
+    `vibehub-ticket-apply` Skill follows the derived review/authority/apply
+    sequence, retries exact interrupted applications, and stops when trusted
+    authority is unavailable instead of turning conversation text into proof.
+
+    **Local trusted human review slice — 2026-07-29**
+
+    `vibehub ticket review --proposal <id>` now provides the first foreground,
+    loopback-only, proposal-specific human review bridge. It projects a current
+    exact candidate and the complete validation-set binding/summaries as one
+    quiet zoomable direct-unlock graph. Browser input carries only
+    authorize/reject intent, rationale, and exact CAS bindings; the host
+    constructs the trusted provider result and verifies the matching Core
+    receipt before applying. Stale proposals display the current canonical
+    graph instead of constructing a false mixed candidate.
+
+    The capability expires after 30 minutes and closes after rejection or
+    successful application. An authorized-but-interrupted publication remains
+    recoverable only through the exact bound decision. The trust claim is
+    intentionally cooperative same-OS-account intent, not cryptographic user
+    presence, hostile same-UID isolation, or remote multi-user identity.
+
+    Stronger App/remote authentication, generic GateDecision recording,
+    Ticket-readiness validation/currentness, complete Ticket definitions,
+    capability/trace receipt currentness, context compilation,
+    Run/Evidence/Outcome writers, explicit removal/supersession, and semantic
+    closeout remain blocked on their existing decisions.
+
+    The first dogfood target is now preserved as one 10-Ticket coarse proposal:
+    complete definition, context, maturity, claim, Run binding, evidence,
+    verified completion, deviation, an Agent entrypoint, and a real repository
+    proof. It has passed disposable mechanical and independent semantic
+    validation but remains a proposal until repository-ledger submission and
+    explicit human authority. The execution half of the loop is therefore
+    still unresolved.
+constraints:
+  - kind: must
+    rule: "The first public Ticket write records an immutable review contribution only and must not change the canonical Ticket Graph"
+  - kind: must
+    rule: "The MVP exposes proposal review, trusted authority resolution, and proposal application only through Core; the low-level Git publisher remains internal and authority-neutral"
+  - kind: must
+    rule: "Machine validation and human authority remain separate from mechanical submission review, and technical difficulty alone does not require human intervention"
+  - kind: must
+    rule: "The proposal-query and validation slice exposes five bounded Core operations and an independent Skill whose records remain immutable claimed_unverified proposal/candidate evidence"
+  - kind: must_not
+    rule: "Proposal validation must not be conflated with Ticket readiness or maturity, select a current/latest receipt, grant authority, authorize application, or mutate the graph"
+  - kind: must
+    rule: "Authority decisions bind the exact proposal, candidate, and complete validation ledger and can be produced only by a host-injected trusted authority provider, never by caller actor or operation JSON"
+  - kind: must
+    rule: "Bootstrap, expansion, declared human gates, and protected authority signals require a host-authenticated human authority basis; delegated policy is limited to non-protected elaboration or decomposition"
+  - kind: must
+    rule: "Application persists an immutable exact-candidate intent before fenced Git publication and releases the writer fence only after the immutable application receipt commits"
+  - kind: must_not
+    rule: "Default CLI/MCP adapters must not mint trusted human authority; without a trusted host provider authority resolution fails closed"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [wayfinder, open, grilling, mvp, dogfood, plugin, trusted-authority, fenced-application]
+provenance:
+  source_type: chat_extraction
+  confidence: 0.8
+  source_ref: "Wayne request to begin Plugin Ticket System development through loop engineering — 2026-07-27"
+  produced_at: "2026-07-29T20:00:00Z"
+relations:
+  - target: "decision-ticket-mvp-002"
+    type: superseded_by
+    detail: "The MVP is now Git documents plus Skills, deterministic scripts, graph HTML, and disposable runtime."
+  - target: "contract-ticket-review-operations-001"
+    type: depends_on
+    detail: "Unblocks the read DTO/schema/projector slice without pretending the full dogfood lifecycle is settled."
+  - target: "decision-ticket-runtime-boundary-001"
+    type: depends_on
+  - target: "decision-ticket-contract-001"
+    type: depends_on
+  - target: "decision-ticket-context-binding-001"
+    type: depends_on
+  - target: "decision-ticket-graph-lifecycle-001"
+    type: depends_on
+  - target: "decision-ticket-workflow-role-001"
+    type: depends_on
+  - target: "decision-ticket-closeout-001"
+    type: depends_on
+  - target: "decision-ticket-storage-001"
+    type: depends_on
+anchors:
+  - file: "packages/core"
+  - file: "packages/core/src/operation-dispatcher.ts"
+  - file: "packages/cli/src/main.ts"
+  - file: "packages/mcp/src/server.ts"
+  - file: "skills"
+  - file: "META/09-ticket-runtime/spec.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-authority-contract.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-proposal-query-validation-ledger.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-proposal-application-runtime.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-ticket-review-host-and-planning-entrypoint.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-first-ticket-dogfood-plan.md"
+  - file: "META/09-ticket-runtime/artifacts/2026-07-29-first-ticket-graph-proposal.json"

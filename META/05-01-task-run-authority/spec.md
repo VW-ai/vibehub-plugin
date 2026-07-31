@@ -2,15 +2,17 @@
 
 This room owns the durable execution model.
 
-## Decision
+## Ontology transition
 
-`decision-workbench-013` remains active:
+`decision-workbench-013` is stale as of 2026-07-27 because
+`decision-ticket-work-unit-001` replaces Task with Ticket as the sole canonical
+work unit. Its remaining Run/worktree authority rules are preserved as design
+inputs, not silently discarded:
 
-- Task = independent outcome and success criteria.
 - Run = one execution episode with explicit context/code authority.
 - Context-only Runs need no worktree.
-- A code-writing Task has at most one active writer worktree.
-- Task-to-workspace ownership and Run-to-writer lease are distinct.
+- Code-writing work needs one active writer worktree.
+- Workspace ownership and Run-to-writer lease remain distinct.
 - A handoff must make stale writers unable to continue.
 - Mechanical Runs append operational evidence but cannot redefine semantic truth.
 
@@ -29,6 +31,8 @@ provide.
 
 ## Canonical Specs
 
-- [decision-workbench-013] (active) Task, Run, worktree and handoff authority.
+- [decision-workbench-013] (stale) Historical Task, Run, worktree and handoff
+  authority; Task clauses are invalidated and remaining authority rules await a
+  Ticket/Run successor.
 - [change-2026-07-13-context-to-action-workflow] (active) Product workflow and
   authority boundary implementation checkpoint.

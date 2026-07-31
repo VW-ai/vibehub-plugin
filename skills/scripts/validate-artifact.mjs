@@ -3,15 +3,21 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { KB, DISTILL } from "./_dispatch.mjs";
-import { validateOperationContract } from "./operation-contract-validator.mjs";
+import { KB, DISTILL, TICKET } from "./_dispatch.mjs";
+import {
+  OPERATION_INPUT_BYTE_LIMITS,
+} from "./generated-operation-limits.mjs";
+import {
+  materializeOperationFixture,
+  validateOperationContract,
+} from "./operation-contract-validator.mjs";
 
 const here=path.dirname(fileURLToPath(import.meta.url)); const contracts=path.resolve(here,"../contracts");
 function report(schema,errors,warnings=[]){const value={valid:errors.length===0,schema,errors,warnings};process.stdout.write(`${JSON.stringify(value)}\n`);process.exit(value.valid?0:2);}
 const args=process.argv.slice(2); const packageIndex=args.indexOf("--package");
 if(packageIndex>=0){
   const root=path.resolve(args[packageIndex+1]??path.resolve(here,"..")); const errors=[];
-  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr"];
+  const skills=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-review","vibehub-ticket-validate","vibehub-ticket-run","vibehub-ticket-closeout"];
   const actualSkills=fs.readdirSync(root,{withFileTypes:true})
     .filter(entry=>entry.name.startsWith("vibehub-")&&entry.isDirectory())
     .map(entry=>entry.name)
@@ -51,21 +57,27 @@ if(packageIndex>=0){
   for(const file of markdown){const source=fs.readFileSync(file,"utf8");for(const rule of forbiddenIntelligence)if(rule.pattern.test(source))errors.push({path:path.relative(root,file),message:rule.message});}
   const link=/`?((?:\.\.\/)*_stdlib\/[a-z0-9-]+\.md|(?:\.\.\/)*contracts\/[a-z0-9.-]+\.json|(?:\.\.\/)*scripts\/[a-z0-9_-]+\.mjs|references\/[a-z0-9-]+\.md)`?/g;
   for(const file of markdown){const text=fs.readFileSync(file,"utf8");for(const match of text.matchAll(link)){const target=path.resolve(path.dirname(file),match[1]);if(!fs.existsSync(target))errors.push({path:path.relative(root,file),message:`missing reference ${match[1]}`});}}
-  const operations=new Set([...KB].map(x=>`kb.${x}`).concat([...DISTILL].map(x=>`distill.${x}`)));
-  for(const file of markdown){const source=fs.readFileSync(file,"utf8");for(const match of source.matchAll(/`((?:kb|distill)\.[a-z.-]+)`/g))if(!operations.has(match[1]))errors.push({path:path.relative(root,file),message:`unknown dispatcher operation ${match[1]}`});}
+  const operations=new Set([...KB].map(x=>`kb.${x}`).concat([...DISTILL].map(x=>`distill.${x}`),[...TICKET].map(x=>`ticket.${x}`)));
+  for(const file of markdown){const source=fs.readFileSync(file,"utf8");for(const match of source.matchAll(/`((?:kb|distill|ticket)\.[a-z.-]+)`/g))if(!operations.has(match[1]))errors.push({path:path.relative(root,file),message:`unknown dispatcher operation ${match[1]}`});}
   const operationArtifactPath=path.join(root,"contracts/operation-contracts.json");
   if(fs.existsSync(operationArtifactPath)){
     const artifact=JSON.parse(fs.readFileSync(operationArtifactPath,"utf8"));
-    if(artifact.schemaVersion!==4)errors.push({path:"contracts/operation-contracts.json",message:"operation contract schemaVersion must be 4"});
+    if(artifact.schemaVersion!==5)errors.push({path:"contracts/operation-contracts.json",message:"operation contract schemaVersion must be 5"});
+    if(artifact.fixtureDialect!=="literal value or generatedFixture/v1")errors.push({path:"contracts/operation-contracts.json",message:"operation fixture dialect is missing or stale"});
     if(!artifact.scope?.includes("Operation input contracts only"))errors.push({path:"contracts/operation-contracts.json",message:"operation contract must declare its input-only scope"});
     if(!artifact.validationContract?.includes("runtimeRefinements"))errors.push({path:"contracts/operation-contracts.json",message:"operation validation contract must require runtimeRefinements"});
-    const expectedConstructs={trim:0,transform:0,preprocess:0,pipe:0,default:0,catch:0,coerce:0,regex:3,isoDatetime:1,union:1,discriminatedUnion:1,unknown:1,strict:55,safeExtend:1,optional:90,nullable:9,check:1,custom:1,meta:1,overwrite:0,normalize:0,lowercase:0,uppercase:0,nonempty:0,length:0,any:0};
+    const expectedConstructs={trim:0,transform:0,preprocess:0,pipe:0,default:0,catch:0,coerce:0,regex:9,isoDatetime:1,union:2,discriminatedUnion:6,unknown:1,strict:89,safeExtend:1,optional:95,nullable:10,check:1,custom:1,meta:1,overwrite:0,normalize:0,lowercase:0,uppercase:0,nonempty:0,length:0,any:0};
     if(JSON.stringify(artifact.acceptanceConstructs)!==JSON.stringify(expectedConstructs))errors.push({path:"contracts/operation-contracts.json",message:"operation acceptance construct audit is missing or stale"});
     const registryHash=crypto.createHash("sha256").update(JSON.stringify(artifact.operations??{})).digest("hex");if(registryHash!==artifact.registryHash)errors.push({path:"contracts/operation-contracts.json",message:"operation registry hash does not match operations"});
     const inputSchemaHash=crypto.createHash("sha256").update(JSON.stringify(Object.fromEntries(Object.entries(artifact.operations??{}).map(([name,contract])=>[name,contract.input])))).digest("hex");if(inputSchemaHash!==artifact.inputSchemaHash)errors.push({path:"contracts/operation-contracts.json",message:"operation input acceptance hash does not match serialized schemas"});
     for(const [operation,contract] of Object.entries(artifact.operations??{})){
       const positive=validateOperationContract(contract,contract.fixtures?.positive);if(!positive.valid)errors.push({path:`contracts/operation-contracts.json:${operation}`,message:"positive fixture fails packaged validator"});
-      for(const fixture of contract.fixtures?.negatives??[]){const negative=validateOperationContract(contract,fixture.value);if(negative.valid)errors.push({path:`contracts/operation-contracts.json:${operation}`,message:`negative fixture passes packaged validator: ${fixture.case}`});}
+      for(const fixture of contract.fixtures?.negatives??[]){
+        let value;
+        try{value=materializeOperationFixture(contract,fixture);}
+        catch(error){errors.push({path:`contracts/operation-contracts.json:${operation}`,message:`invalid fixture descriptor ${fixture.case}: ${error instanceof Error?error.message:String(error)}`});continue;}
+        const negative=validateOperationContract(contract,value);if(negative.valid)errors.push({path:`contracts/operation-contracts.json:${operation}`,message:`negative fixture passes packaged validator: ${fixture.case}`});
+      }
     }
   }else errors.push({path:"contracts/operation-contracts.json",message:"missing generated operation contracts"});
   report("skill-package",errors);
@@ -75,7 +87,16 @@ if(operationIndex>=0){
   const operation=args[operationIndex+1],inputIndex=args.indexOf("--input"),inputPath=inputIndex>=0?args[inputIndex+1]??"-":"-";
   const artifact=JSON.parse(fs.readFileSync(path.join(contracts,"operation-contracts.json"),"utf8")),contract=artifact.operations?.[operation];
   if(!contract)report(`operation:${operation??""}`,[{path:"$",message:"unknown operation contract"}]);
-  let value;try{value=JSON.parse(inputPath==="-"?fs.readFileSync(0,"utf8"):fs.readFileSync(inputPath,"utf8"));}catch(error){report(`operation:${operation}`,[{path:"$",message:`invalid JSON: ${error instanceof Error?error.message:String(error)}`}]);}
+  const byteBudget=(contract.runtimeRefinements??[])
+    .filter(rule=>rule.kind==="maxJsonBytes")
+    .sort((left,right)=>left.maximum-right.maximum)[0];
+  const rawMaximum=OPERATION_INPUT_BYTE_LIMITS[operation]
+    ?? byteBudget?.maximum;
+  let raw;
+  try{raw=readUtf8Bounded(inputPath,rawMaximum);}
+  catch(error){report(`operation:${operation}`,[{path:"$",message:`cannot read JSON input: ${error instanceof Error?error.message:String(error)}`}]);}
+  if(!raw.ok)report(`operation:${operation}`,[{path:"$",message:`raw JSON input exceeds ${rawMaximum} bytes`,refinementId:byteBudget?.id??"operation-input-byte-budget"}]);
+  let value;try{value=JSON.parse(raw.text);}catch(error){report(`operation:${operation}`,[{path:"$",message:`invalid JSON: ${error instanceof Error?error.message:String(error)}`}]);}
   const result=validateOperationContract(contract,value);report(`operation:${operation}`,result.errors);
 }
 let schemaName,inputPath="-";
@@ -106,6 +127,23 @@ function validateWorkflowRefinements(file,value,errors){
     if(new Set(paths).size!==paths.length)errors.push({path:"$.unresolvedDispositions",message:"unresolved disposition paths must be unique"});
     if(paths.length!==accounting.unresolved)errors.push({path:"$.unresolvedDispositions",message:"disposition count must equal accounting.unresolved"});
   }
+}
+
+function readUtf8Bounded(inputPath,maximum){
+  const ownsDescriptor=inputPath!=="-",descriptor=ownsDescriptor?fs.openSync(inputPath,"r"):0;
+  const chunks=[];let total=0;
+  try{
+    const buffer=Buffer.allocUnsafe(64*1024);
+    while(true){
+      const allowance=maximum===undefined?buffer.length:Math.min(buffer.length,maximum-total+1);
+      const count=fs.readSync(descriptor,buffer,0,allowance,null);
+      if(count===0)break;
+      total+=count;
+      if(maximum!==undefined&&total>maximum)return {ok:false};
+      chunks.push(Buffer.from(buffer.subarray(0,count)));
+    }
+  }finally{if(ownsDescriptor)fs.closeSync(descriptor);}
+  return {ok:true,text:Buffer.concat(chunks,total).toString("utf8")};
 }
 
 function validate(s,v,p,root,errors){

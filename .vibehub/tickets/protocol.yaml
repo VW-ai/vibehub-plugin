@@ -1,0 +1,3 @@
+schema_version: 1
+kind: ticket_protocol
+format: vibehub.ticket-ledger

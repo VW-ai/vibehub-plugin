@@ -1,0 +1,44 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-execution-closeout-ready
+outcome: A fresh Agent can select one currently eligible Ticket, receive its exact bounded context, execute against an exact worktree and Ticket revision, and leave Git-native Outcome and Evidence that either establishes accepted completion and direct downstream eligibility or preserves a visible unresolved deviation.
+context: This Ticket is the stable M4 product integration boundary and now consumes the accepted context-binding and closeout contracts. A small ticket-run Skill discovers the Git-derived frontier, keeps unverified, revoked, tampered, changed, or non-authorizing relevant Decisions operationally BLOCKED, compiles one exact bounded ContextBinding, and claims a worktree-local disposable Run only after exact context recompilation. It records bounded Evidence but cannot certify its own acceptance. A separate ticket-closeout Skill verifies the exact attempt and appends the single terminal Git Outcome for that Ticket subject, Run ID, and generation; successful form alone derives DONE and direct downstream eligibility while its binding and authority stay current. CLI accepts an explicit actor, while MCP derives stable distinct claimed actor refs per connection so executor and verifier sessions cannot collapse onto one global identity. Branch, governing Ticket, bound Decision authority, forbidden context policy, ignored context bytes, or execution-start index drift stales or blocks the attempt as appropriate; ordinary implementation edits after claim remain part of the bound attempt. SQLite may lose claims and heartbeat without losing Ticket meaning. Real Plugin-feature dogfood is explicitly post-merge M5 and is not an M4 implementation gate.
+acceptance:
+  - acceptance_id: evidence-without-self-certification
+    criterion: The executor can persist bounded artifacts and Evidence references, but Evidence cannot certify itself; only a different verifier who independently adjudicates every acceptance against matching Evidence may record a successful Outcome and establish completion.
+  - acceptance_id: exact-run-binding
+    criterion: Every execution attempt binds repository and worktree identity, execution-start branch, HEAD, dirty non-ledger worktree bytes and modes, staged blob IDs and modes, Ticket ID and revision, ContextBinding identity and digest, exact compiled context including ignored files, verified relevant Decision receipts, acting Agent, and lease generation; branch, governing Ticket, binding, Decision authority, forbidden-ref policy, ignored context, or index drift makes it stale while ordinary implementation edits after claim remain part of the bound attempt.
+  - acceptance_id: fresh-agent-entry
+    criterion: A fresh Agent with repository access and no planning conversation discovers the honest operational frontier, cannot execute through an unverified or non-authorizing Decision, and starts correctly from its Ticket document, direct prerequisites, accepted binding, and compiled context packet.
+  - acceptance_id: recovery-after-db-loss
+    criterion: After deleting disposable Run state and rebuilding local indexes, the same Ticket graph, accepted completion, Outcome, Evidence, blocker, and downstream eligibility are reconstructed from Git.
+  - acceptance_id: success-and-deviation
+    criterion: Accepted current evidence makes only direct dependents with all prerequisites and gates satisfied eligible; one exact Run generation cannot hold conflicting terminal Outcomes; and partial, failed, stale, or deviated work unlocks nothing and leaves an actionable blocker or follow-up path.
+constraints:
+  - Implement a small composable execution and closeout Skill, not a daemon, generic workflow engine, or global scheduler.
+  - SQLite may coordinate live attempts but owns no durable Ticket semantics.
+  - Do not introduce global cross-worktree locking or silently transfer a Run across branch or Ticket changes.
+  - Do not infer readiness or completion from authored status fields or executor prose.
+  - Protected product, architecture, principle, permission, side-effect, policy, or risk deviations stop the affected path while independent work may continue.
+context_refs:
+  - ref: META/09-ticket-runtime/specs/contract-ticket-closeout-001.yaml
+    purpose: Defines Evidence, independent Outcome adjudication, completion, deviation, and follow-up semantics.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml
+    purpose: Defines exact execution packet compilation and fail-closed context behavior.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-planning-validation-skills-001.yaml
+    purpose: Defines planning, independent-validation, and execution-authority boundaries this execution loop composes.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml
+    purpose: Governs exact worktree Run binding and durable completion reconstruction.
+  - ref: META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
+    purpose: Separates M4 implementation and conformance from post-merge real dogfood.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-closeout-contract-decided
+    rationale: The implementation cannot truthfully derive completion, deviation, Evidence acceptance, or follow-up work until the closeout contract is accepted.
+provenance_refs:
+  - META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md
+  - META/09-ticket-runtime/progress.yaml
+  - META/09-ticket-runtime/specs/contract-ticket-closeout-001.yaml
+  - META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml
+  - META/09-ticket-runtime/specs/decision-ticket-mr-ready-boundary-001.yaml
+  - conversation:2026-07-30-mr-ready-no-dogfood

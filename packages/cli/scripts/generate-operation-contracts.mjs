@@ -3,10 +3,19 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
-import { operationAcceptanceConstructManifest, operationInputSchemas, operationRefinementManifest } from "@vw-ai/vibehub-core";
-import { validateOperationContract, validateRuntimeRefinements } from "../../../skills/scripts/operation-contract-validator.mjs";
+import {
+  OPERATION_INPUT_BYTE_LIMITS,
+  operationAcceptanceConstructManifest,
+  operationInputSchemas,
+  operationRefinementManifest,
+} from "@vw-ai/vibehub-core";
+import {
+  materializeOperationFixture,
+  validateOperationContract,
+  validateRuntimeRefinements,
+} from "../../../skills/scripts/operation-contract-validator.mjs";
 
-const EXPECTED_INPUT_SCHEMA_HASH="a337e4239097e1f85cfea2e9e35d8159bd898162d252190542030f855c8eb82e";
+const EXPECTED_INPUT_SCHEMA_HASH="1d77dda56a6135f5413a6e3a2cbd7ccfc9113eb535a12c4ed29f4a864bbdbf30";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../../..");
 const ajv=new Ajv2020({allErrors:true,strict:false});
@@ -21,7 +30,7 @@ for(const [name,schema] of Object.entries(operationInputSchemas).sort(([a],[b])=
   const positive=positiveFixture(name);
   const negatives=negativeFixtures(name,positive,input);
   if(!negatives.length)throw new Error(`missing negative fixtures: ${name}`);
-  for(const fixture of negatives)if(!fixture.value||typeof fixture.value!=="object"||Array.isArray(fixture.value)||JSON.stringify(fixture.value)===JSON.stringify(positive)||!fixture.case||!Array.isArray(fixture.refinementIds))throw new Error(`trivial negative fixture: ${name}`);
+  for(const fixture of negatives)if(!fixture.value||typeof fixture.value!=="object"||Array.isArray(fixture.value)||!fixture.case||!Array.isArray(fixture.refinementIds))throw new Error(`trivial negative fixture: ${name}`);
   const runtimeRefinements=runtimeRefinementsFor(name);
   const validate=ajv.compile(input);
   for(const candidate of differentialStringCorpus(positive)){
@@ -40,15 +49,24 @@ for(const [name,schema] of Object.entries(operationInputSchemas).sort(([a],[b])=
     if(artifactValid||runtimeValid)throw new Error(`negative parity drift: ${name}/${fixture.case}: artifact=${artifactValid} runtime=${runtimeValid} schema=${JSON.stringify(schemaErrors)} refinements=${JSON.stringify(runtimeErrors)}`);
   }
   for(const [id,entry] of Object.entries(refinementMatrix))if(entry.operations.includes(name)&&!negatives.some(fixture=>fixture.refinementIds.includes(id)))throw new Error(`missing refinement fixture coverage: ${name}/${id}`);
-  operations[name]={input,runtimeRefinements,fixtures:{positive,negative:negatives[0].value,negativeCase:negatives[0].case,negatives}};
+  const publishedNegatives=negatives.map(publishFixture);
+  const contract={input,runtimeRefinements,fixtures:{positive,negative:negatives[0].value,negativeCase:negatives[0].case,negatives:publishedNegatives}};
+  for(const fixture of publishedNegatives.filter(candidate=>candidate.materializer)){
+    const materialized=materializeOperationFixture(contract,fixture);
+    const schemaValid=validate(materialized),runtimeErrors=[];validateRuntimeRefinements(runtimeRefinements,materialized,runtimeErrors);
+    const expectedRuntimeFailure=fixture.refinementIds.every(id=>runtimeErrors.some(error=>error.refinementId===id));
+    if(!schemaValid||!expectedRuntimeFailure||schema.safeParse(materialized).success||validateOperationContract(contract,materialized).valid)throw new Error(`generated negative fixture parity drift: ${name}/${fixture.case}`);
+  }
+  operations[name]=contract;
 }
 
 const inputSchemaHash=crypto.createHash("sha256").update(JSON.stringify(Object.fromEntries(Object.entries(operations).map(([name,contract])=>[name,contract.input])))).digest("hex");
 if(inputSchemaHash!==EXPECTED_INPUT_SCHEMA_HASH)throw new Error(`operation input acceptance fingerprint changed: expected ${EXPECTED_INPUT_SCHEMA_HASH}, got ${inputSchemaHash}; review the full serialized diff before updating the explicit fingerprint`);
 const registryHash=crypto.createHash("sha256").update(JSON.stringify(operations)).digest("hex");
 const artifact={
-  schemaVersion:4,registryHash,inputSchemaHash,
+  schemaVersion:5,registryHash,inputSchemaHash,
   dialect:"JSON Schema 2020-12 plus VibeHub runtimeRefinements/v1",
+  fixtureDialect:"literal value or generatedFixture/v1",
   scope:"Operation input contracts only. Operation context is validated separately by the runtime operationContextSchema at CLI/MCP adapter boundaries.",
   validationContract:"An input is valid only when both `input` JSON Schema and `runtimeRefinements` pass.",
   acceptanceConstructs:operationAcceptanceConstructManifest,
@@ -64,6 +82,15 @@ const artifact={
 };
 const target=path.join(root,"skills/contracts/operation-contracts.json");
 fs.writeFileSync(target,`${JSON.stringify(artifact,null,2)}\n`);
+const limitsTarget=path.join(root,"skills/scripts/generated-operation-limits.mjs");
+fs.writeFileSync(
+  limitsTarget,
+  [
+    "/** Generated by packages/cli/scripts/generate-operation-contracts.mjs. */",
+    `export const OPERATION_INPUT_BYTE_LIMITS = Object.freeze(${JSON.stringify(OPERATION_INPUT_BYTE_LIMITS, null, 2)});`,
+    "",
+  ].join("\n"),
+);
 console.log(`generated ${Object.keys(operations).length} operation contracts with audited refinements (${registryHash.slice(0,12)})`);
 
 /** Add only refinements that JSON Schema 2020-12 can express exactly. */
@@ -93,13 +120,17 @@ function addRepresentableRefinements(name,schema){
       {required:["versionId"],not:{required:["runId"]}},
     ];
   }
+  if(name==="ticket.trace.list"&&schema.properties?.kinds){
+    schema.properties.kinds.uniqueItems=true;
+  }
   return schema;
 }
 
 function runtimeRefinementsFor(name){
   const rules=[];
-  if(["kb.ingest.preview","kb.draft.apply","kb.amend","distill.candidates.put"].includes(name))rules.push({id:"anchor-line-range",kind:"fieldCompare",matchFields:["lineStart","lineEnd"],leftField:"lineEnd",operator:"gte",rightField:"lineStart",message:"lineEnd must not precede lineStart"});
+  if(["kb.ingest.preview","kb.spec.apply","kb.amend","distill.candidates.put"].includes(name))rules.push({id:"anchor-line-range",kind:"fieldCompare",matchFields:["lineStart","lineEnd"],leftField:"lineEnd",operator:"gte",rightField:"lineStart",message:"lineEnd must not precede lineStart"});
   if(name==="distill.candidates.put")rules.push({id:"relation-distinct-endpoints",kind:"fieldCompare",matchFields:["fromKind","fromId","toKind","toId"],leftField:"fromId",operator:"notEqual",rightField:"toId",message:"relation endpoints must differ"});
+  if(name==="ticket.worktree.patch")rules.push({id:"ticket-patch-id-match",kind:"nestedFieldCompare",matchFields:["ticketId","document"],leftField:"ticketId",operator:"equal",rightObjectField:"document",rightField:"ticket_id",message:"patch Ticket ID must match document.ticket_id"});
   if(name==="distill.scopes.complete"){
     rules.push({id:"scope-completion-byte-budget",kind:"maxJsonBytes",maximum:1_048_576,message:"scope completion payload must not exceed 1 MiB"});
     rules.push({id:"scope-completion-evidence-budget",kind:"maxNestedArrayItems",parentField:"unresolvedFiles",childField:"evidence",maximum:200,message:"scope completion may contain at most 200 evidence entries"});
@@ -115,12 +146,24 @@ function walk(value,visit){
 
 function positiveFixture(name){
   const runId="fixture-run",specId="context-fixture",key="fixture-key",lease={runId,scopeId:"scope",leaseToken:"lease",generation:1};
+  const ticketRun={
+    runId:`trn-${"6".repeat(64)}`,
+    generation:1,
+    leaseToken:"vht_fixture-bearer",
+  };
+  const ticketSource={
+    sourceToken:`tls-${"1".repeat(64)}`,
+    worktreeIdentity:`worktree-${"2".repeat(64)}`,
+    resolvedCommit:"3".repeat(40),
+    graphDigest:`sha256:${"4".repeat(64)}`,
+    semanticLedgerDigest:`sha256:${"5".repeat(64)}`,
+  };
   const fixtures={
     "kb.status":{},"kb.feature.list":{query:"two words"},"kb.feature.get":{id:"x".repeat(200)},"kb.feature.suggest":{},
     "kb.spec.search":{paths:["src/two words.ts"],tags:["two words"]},"kb.spec.get":{id:specId},"kb.relations":{specId},"kb.lineage":{id:specId},"kb.anchors":{specId},"kb.review":{},
     "kb.ingest.preview":{specs:[{summary:"Fixture fact"}]},
-    "kb.draft.apply":{idempotencyKey:key,specs:[{id:specId,type:"context",summary:"Fixture fact",evidence:[{sourceType:"fixture",sourceRef:"fixture:1",exactQuote:"quoted evidence",evidenceRef:"fixture:1"}]}]},
-    "kb.promote":{specId,idempotencyKey:key},"kb.mark-stale":{specId,idempotencyKey:key},"kb.deprecate":{specId,idempotencyKey:key},
+    "kb.spec.apply":{idempotencyKey:key,specs:[{id:specId,type:"context",summary:"Fixture fact",evidence:[{sourceType:"fixture",sourceRef:"fixture:1",exactQuote:"quoted evidence",evidenceRef:"fixture:1"}]}]},
+    "kb.mark-stale":{specId,idempotencyKey:key},"kb.deprecate":{specId,idempotencyKey:key},
     "kb.amend":{specId,idempotencyKey:key,evidence:[{sourceType:"fixture",sourceRef:"fixture:1",evidenceRef:"fixture:1"}]},
     "kb.supersede":{specId,idempotencyKey:key,replacementSpecId:"context-replacement"},
     "distill.run.start":{runId,mode:"cold",baseCommit:"0123456789abcdef0123456789abcdef01234567",skillHash:"skill",configHash:"config"},
@@ -133,6 +176,97 @@ function positiveFixture(name){
     "distill.version.get":{versionId:"version"},"distill.version.diff":{versionId:"version"},
     "distill.reconcile":{runId},"distill.validate":{runId},"distill.finalize":{runId},
     "distill.activate":{targetVersionId:"version",expectedCurrentVersion:null,reason:"fixture"},"distill.rollback":{targetVersionId:"version",expectedCurrentVersion:null,reason:"fixture"},
+    "ticket.graph.snapshot":{},
+    "ticket.subject.inspect":{snapshotId:"tgs-fixture",subject:{kind:"ticket",ticketId:"TKT-1"}},
+    "ticket.trace.list":{snapshotId:"tgs-fixture",subject:{kind:"ticket",ticketId:"TKT-1"},kinds:["evidence"],limit:10},
+    "ticket.worktree.patch":{
+      expectedSource:ticketSource,
+      changes:[{
+        op:"put",
+        ticketId:"fixture-ticket",
+        expectedTicketRevision:null,
+        document:{
+          schema_version:1,
+          kind:"ticket",
+          ticket_id:"fixture-ticket",
+          outcome:"Create the fixture Ticket",
+          context:"Exercise the exact-base patch contract.",
+          acceptance:[],
+          constraints:[],
+          context_refs:[],
+          relations:[],
+          provenance_refs:[],
+        },
+      }],
+    },
+    "ticket.review.append":{
+      expectedSource:ticketSource,
+      review:{
+        type:"comment",
+        subject:{
+          kind:"graph",
+          graphDigest:ticketSource.graphDigest,
+        },
+        body:"The exact graph is ready for focused review.",
+      },
+    },
+    "ticket.decision.record":{
+      expectedSource:ticketSource,
+      decision:{
+        type:"plan_review",
+        subject:{
+          kind:"graph",
+          graphDigest:ticketSource.graphDigest,
+        },
+        disposition:"approve_execution",
+        rationale:"The reviewed graph has a bounded execution path.",
+        resolutionRefs:[],
+      },
+    },
+    "ticket.frontier.read":{},
+    "ticket.context.compile":{
+      expectedSource:ticketSource,
+      ticketId:"fixture-ticket",
+      expectedTicketRevision:`sha256:${"7".repeat(64)}`,
+    },
+    "ticket.run.claim":{
+      expectedSource:ticketSource,
+      ticketId:"fixture-ticket",
+      expectedTicketRevision:`sha256:${"7".repeat(64)}`,
+      contextBindingId:`tcb-${"8".repeat(64)}`,
+      contextBindingDigest:`sha256:${"9".repeat(64)}`,
+      leaseSeconds:300,
+    },
+    "ticket.run.heartbeat":{...ticketRun,leaseSeconds:300},
+    "ticket.run.release":{...ticketRun,reason:"lease_released"},
+    "ticket.evidence.append":{
+      expectedSource:ticketSource,
+      run:ticketRun,
+      acceptanceId:"observable-result",
+      evidenceType:"test",
+      summary:"The focused conformance test passed.",
+      references:[{
+        kind:"repo_path",
+        label:"Conformance report",
+        target:"artifacts/conformance.json",
+        digest:`sha256:${"a".repeat(64)}`,
+      }],
+    },
+    "ticket.closeout.append":{
+      expectedSource:ticketSource,
+      runId:ticketRun.runId,
+      generation:ticketRun.generation,
+      terminalForm:"successful",
+      executorReport:"Implemented the bounded Ticket outcome.",
+      acceptance:[{
+        acceptanceId:"observable-result",
+        disposition:"accepted",
+        evidenceRefs:[`tev-${"b".repeat(64)}`],
+        rationale:"The independent verifier accepted the exact evidence.",
+      }],
+      followUpTicketRefs:[],
+      semanticCloseoutRefs:[],
+    },
   };
   if(!(name in fixtures))throw new Error(`missing positive operation fixture: ${name}`);
   return fixtures[name];
@@ -165,10 +299,10 @@ function negativeFixtures(name,positive,input){
       fixture("lineEnd requires lineStart",{specs:[{summary:"x",anchors:[{file:"src/a.ts",lineEnd:2}]}]},["anchor-line-range"]),
       fixture("lineEnd must not precede lineStart",{specs:[{summary:"x",anchors:[{file:"src/a.ts",lineStart:3,lineEnd:2}]}]},["anchor-line-range"]),
     ],
-    "kb.draft.apply":[
+    "kb.spec.apply":[
       fixture("evidence requires content",{...positive,specs:[{...positive.specs?.[0],evidence:[{sourceType:"fixture",sourceRef:"fixture:1"}]}]},["evidence-content"]),
-      fixture("draft anchor lineEnd requires lineStart",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",lineEnd:2}]}]},["anchor-line-range"]),
-      fixture("draft anchor lineEnd order",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",lineStart:3,lineEnd:2}]}]},["anchor-line-range"]),
+      fixture("spec anchor lineEnd requires lineStart",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",lineEnd:2}]}]},["anchor-line-range"]),
+      fixture("spec anchor lineEnd order",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",lineStart:3,lineEnd:2}]}]},["anchor-line-range"]),
       fixture("nested summary rejects leading whitespace",{...positive,specs:[{...positive.specs?.[0],summary:" Fixture fact"}]}),
       fixture("nested evidence sourceRef rejects whitespace only",{...positive,specs:[{...positive.specs?.[0],evidence:[{sourceType:"fixture",sourceRef:" ",evidenceRef:"fixture:1"}]}]}),
       fixture("nested anchor contentHash rejects trailing whitespace",{...positive,specs:[{...positive.specs?.[0],anchors:[{file:"src/a.ts",contentHash:"hash "}]}]}),
@@ -206,6 +340,68 @@ function negativeFixtures(name,positive,input){
     "distill.candidates.get":[fixture("both run and version selectors",{...positive,versionId:"version"},["candidate-selector-exactly-one"]),fixture("missing run and version selector",{kind:"feature",naturalId:"feature"},["candidate-selector-exactly-one"])],
     "distill.candidates.list":[fixture("both run and version selectors",{...positive,versionId:"version"},["candidate-selector-exactly-one"]),fixture("missing run and version selector",{},["candidate-selector-exactly-one"])],
     "distill.version.diff":[fixture("kind filter above maximum",{...positive,kinds:["feature","spec","anchor","feature"]})],
+    "ticket.graph.snapshot":[
+      fixture("page size below minimum",{pageSize:0}),
+      fixture("cursor rejects whitespace only",{cursor:" "}),
+    ],
+    "ticket.subject.inspect":[
+      fixture("snapshot id rejects leading whitespace",{...positive,snapshotId:" tgs-fixture"}),
+      fixture("subject discriminant branch rejects extra relation selector",{...positive,subject:{kind:"ticket",ticketId:"TKT-1",relationRef:"relation-1"}}),
+    ],
+    "ticket.trace.list":[
+      fixture("trace kinds must be unique",{...positive,kinds:["evidence","evidence"]},["ticket-trace-kinds-unique"]),
+      fixture("trace limit above maximum",{...positive,limit:201}),
+      fixture("trace subject rejects trailing whitespace",{...positive,subject:{kind:"ticket",ticketId:"TKT-1 "}}),
+    ],
+    "ticket.context.compile":[
+      fixture("context Ticket revision must be exact",{...positive,expectedTicketRevision:"latest"}),
+      fixture("context Ticket ID must be canonical",{...positive,ticketId:"Fixture Ticket"}),
+    ],
+    "ticket.run.claim":[
+      fixture("claim lease below minimum",{...positive,leaseSeconds:14}),
+      fixture("claim context binding digest must be exact",{...positive,contextBindingDigest:"latest"}),
+    ],
+    "ticket.run.heartbeat":[
+      fixture("heartbeat lease above maximum",{...positive,leaseSeconds:3601}),
+      fixture("heartbeat generation must be positive",{...positive,generation:0}),
+    ],
+    "ticket.run.release":[
+      fixture("release reason is closed",{...positive,reason:"done"}),
+      fixture("release bearer rejects whitespace only",{...positive,leaseToken:" "}),
+    ],
+    "ticket.evidence.append":[
+      fixture("evidence requires at least one reference",{...positive,references:[]}),
+      fixture("evidence type is closed",{...positive,evidenceType:"claim"}),
+    ],
+    "ticket.closeout.append":[
+      fixture("closeout terminal form is closed",{...positive,terminalForm:"done"}),
+      fixture("closeout acceptance disposition is closed",{
+        ...positive,
+        acceptance:[{...positive.acceptance?.[0],disposition:"passed"}],
+      }),
+    ],
+    "ticket.worktree.patch":[
+      fixture("patch requires at least one change",{...positive,changes:[]}),
+      fixture("patch source token must be exact",{...positive,expectedSource:{...positive.expectedSource,sourceToken:"latest"}}),
+      fixture("patch Ticket ID must be canonical",{...positive,changes:[{...positive.changes?.[0],ticketId:"Ticket 1"}]}),
+      fixture("patch change discriminant is closed",{...positive,changes:[{...positive.changes?.[0],op:"merge"}]}),
+      fixture("patch create revision must be null or sha256",{...positive,changes:[{...positive.changes?.[0],expectedTicketRevision:"none"}]}),
+      fixture("patch put requires a complete Ticket document",{...positive,changes:[{...positive.changes?.[0],document:{}}]}),
+      fixture("patch Ticket document is closed",{...positive,changes:[{...positive.changes?.[0],document:{...positive.changes?.[0].document,extra:true}}]}),
+      fixture("patch Ticket key must match document ID",{...positive,changes:[{...positive.changes?.[0],document:{...positive.changes?.[0].document,ticket_id:"other-ticket"}}]},["ticket-patch-id-match"]),
+    ],
+    "ticket.review.append":[
+      fixture("review source semantic digest must be exact",{...positive,expectedSource:{...positive.expectedSource,semanticLedgerDigest:"latest"}}),
+      fixture("review type is closed",{...positive,review:{...positive.review,type:"approval"}}),
+      fixture("review subject is exact",{...positive,review:{...positive.review,subject:{kind:"graph"}}}),
+      fixture("review body rejects whitespace only",{...positive,review:{...positive.review,body:" "}}),
+    ],
+    "ticket.decision.record":[
+      fixture("decision source semantic digest must be exact",{...positive,expectedSource:{...positive.expectedSource,semanticLedgerDigest:"latest"}}),
+      fixture("decision type is closed",{...positive,decision:{...positive.decision,type:"comment"}}),
+      fixture("plan approval rejects delegated boundaries",{...positive,decision:{...positive.decision,delegatedBoundaries:["Do not broaden scope."]}}),
+      fixture("decision rationale rejects whitespace only",{...positive,decision:{...positive.decision,rationale:" "}}),
+    ],
   };
   if(explicit[name])return explicit[name];
   const value=structuredClone(positive);
@@ -216,6 +412,15 @@ function negativeFixtures(name,positive,input){
 }
 
 function fixture(caseName,value,refinementIds=[]){return {case:caseName,value,refinementIds};}
+function generatedFixture(caseName,positive,materializer,refinementIds=[]){
+  const descriptor={case:caseName,materializer,refinementIds};
+  return {...descriptor,value:materializeOperationFixture({fixtures:{positive}},descriptor)};
+}
+function publishFixture(fixture){
+  if(!fixture.materializer)return fixture;
+  const {value:_value,...published}=fixture;
+  return published;
+}
 
 function differentialStringCorpus(value){
   const variants=["x"," "," x","x ","x\n",...([40,100,101,200,201,300,301,500,501,1000,1001,2000,2001,20_000,20_001].map(n=>"😀".repeat(n)))];
@@ -236,9 +441,11 @@ function buildRefinementMatrix(){
     "scope-completion-evidence-budget":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 maxNestedArrayItems"},
     "candidate-evidence-content":{representation:"json-schema",mechanism:"anyOf required exactQuote/evidenceRef/contentHash"},
     "relation-distinct-endpoints":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 fieldCompare notEqual"},
+    "ticket-patch-id-match":{representation:"runtime-refinement",mechanism:"runtimeRefinements/v1 nestedFieldCompare equal"},
     "candidate-selector-exactly-one":{representation:"json-schema",mechanism:"oneOf required runId/versionId with not"},
     "candidate-discriminated-union":{representation:"json-schema",mechanism:"oneOf strict kind-const branches"},
     "anchors-strict-union":{representation:"json-schema",mechanism:"anyOf strict single-property branches"},
+    "ticket-trace-kinds-unique":{representation:"json-schema",mechanism:"uniqueItems on kinds"},
   };
   return Object.fromEntries(Object.entries(operationRefinementManifest).map(([id,entry])=>{
     if(!representation[id])throw new Error(`runtime refinement lacks artifact representation: ${id}`);
@@ -275,9 +482,11 @@ function assertAcceptanceConstructAudit(){
 function assertSerializedStringAcceptance(operation,input){
   const canonical="^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])";
   const canonicalPath="^(?!\\s)(?!\\/)(?!.*(?:^|\\/)\\.{1,2}(?:\\/|$))(?!.*\\/\\/)(?!.*\\\\)(?!.*\\/$)[\\s\\S]*\\S$(?![\\s\\S])";
+  const canonicalTicketId="^[a-z0-9]+(?:-[a-z0-9]+)*$";
+  const nonBlank="^(?=[\\s\\S]*\\S)[\\s\\S]*$";
   walk(input,node=>{
     if(node?.type!=="string"||node.maxLength===undefined)return;
     if(node.maxLength===20_000||node.maxLength===500)return;
-    if(node.pattern!==canonical&&node.pattern!==canonicalPath)throw new Error(`serialized string acceptance drift: ${operation} has bounded non-canonical string ${JSON.stringify(node)}`);
+    if(![canonical,canonicalPath,canonicalTicketId,nonBlank].includes(node.pattern))throw new Error(`serialized string acceptance drift: ${operation} has bounded non-canonical string ${JSON.stringify(node)}`);
   });
 }

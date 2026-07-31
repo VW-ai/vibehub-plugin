@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { resolveDbPath } from "@vw-ai/vibehub-core";
 import {
   openRuntimeContextForClient,
   type RuntimeContext,
 } from "./runtime.js";
+import {
+  BoundedStdioServerTransport,
+} from "./bounded-stdio.js";
 import { createWorkbenchMcpServer } from "./server.js";
 
 let runtime: RuntimeContext | null = null;
@@ -22,6 +24,7 @@ server.server.oninitialized = async () => {
       listRoots: async () => (await server.server.listRoots()).roots,
       cwd: process.cwd(),
       dbPath: resolveDbPath(),
+      clientInfo: server.server.getClientVersion(),
     });
     resolveContext(runtime.context);
   } catch (error) {
@@ -38,4 +41,11 @@ const close = async (): Promise<void> => {
 process.once("SIGINT", () => void close().finally(() => process.exit(0)));
 process.once("SIGTERM", () => void close().finally(() => process.exit(0)));
 
-await server.connect(new StdioServerTransport());
+const transport = new BoundedStdioServerTransport();
+transport.onfatal = (error) => {
+  process.stderr.write(`${error.message}\n`);
+  process.exitCode = 1;
+  void close();
+};
+
+await server.connect(transport);

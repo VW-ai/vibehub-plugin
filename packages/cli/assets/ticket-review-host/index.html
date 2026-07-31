@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>VibeHub Ticket graph</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="ambient-context" aria-hidden="true">
+    <strong id="ambientProject">VibeHub</strong>
+    <span id="ambientBranch">loading Git Ticket graph</span>
+  </div>
+
+  <section class="surface open" id="surface" aria-label="Ticket graph">
+    <button
+      class="signal"
+      id="signal"
+      type="button"
+      aria-expanded="true"
+      aria-controls="sheet"
+    >
+      <svg class="signal-mark" viewBox="0 0 18 18" aria-hidden="true">
+        <path d="M3 5.5h4.2L9 3.7l1.8 1.8H15v7h-4.2L9 14.3l-1.8-1.8H3z"/>
+        <circle cx="9" cy="9" r="1.2"/>
+      </svg>
+      <span class="signal-copy">
+        <strong>Ticket graph</strong>
+        <span id="signalDetail">Reading the current worktree…</span>
+      </span>
+      <span class="signal-attention" id="signalAttention">Git</span>
+      <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="m4 6 4 4 4-4"/>
+      </svg>
+    </button>
+
+    <div class="sheet" id="sheet">
+      <div class="sheet-inner">
+        <header class="toolbar">
+          <div class="toolbar-path">
+            <strong id="projectName">Project</strong>
+            <span>/</span>
+            <button
+              class="source-ref"
+              id="sourceRef"
+              type="button"
+              title="Copy full worktree path"
+            >worktree</button>
+          </div>
+          <div class="toolbar-tools" aria-label="Graph controls">
+            <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
+            <button type="button" id="fitGraph">Fit</button>
+            <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
+          </div>
+          <button
+            class="toolbar-state"
+            id="sourceStatus"
+            type="button"
+            title="Refresh from Git"
+          >
+            <span class="state-dot" id="stateDot"></span>
+            <span id="stateLabel">Reading</span>
+          </button>
+        </header>
+
+        <main class="workspace">
+          <section class="canvas" id="canvas" aria-label="Ticket dependency graph">
+            <svg id="graph" role="group" aria-label="Direct unlock graph">
+              <g id="world">
+                <g id="edgeLayer"></g>
+                <g id="nodeLayer"></g>
+              </g>
+            </svg>
+            <div class="canvas-hint">Drag to pan · scroll to zoom · select any Ticket</div>
+            <svg
+              class="minimap"
+              id="minimap"
+              role="button"
+              tabindex="0"
+              aria-label="Recenter graph from minimap"
+              preserveAspectRatio="xMidYMid meet"
+            ></svg>
+            <div class="empty-state" id="emptyState" hidden>
+              <span class="empty-mark"></span>
+              <strong>No Tickets in this worktree</strong>
+              <span>No Ticket definitions are present in this Git source.</span>
+            </div>
+            <div class="loading-state" id="loadingState">
+              <span class="loading-mark"></span>
+              <span>Reading one exact Git source</span>
+            </div>
+          </section>
+
+          <aside class="inspector open" id="inspector" aria-label="Ticket inspector">
+            <div class="inspector-head">
+              <div>
+                <span class="eyebrow" id="inspectorEyebrow">Current graph</span>
+                <h1 id="inspectorTitle" tabindex="-1">The work that unlocks the outcome</h1>
+              </div>
+              <button class="icon-button" id="closeInspector" type="button" aria-label="Close inspector">×</button>
+            </div>
+            <div class="inspector-body">
+              <p class="outcome" id="inspectorOutcome">
+                Select a Ticket to inspect its current state, context, and trace.
+              </p>
+              <div id="inspectorContent"></div>
+            </div>
+          </aside>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

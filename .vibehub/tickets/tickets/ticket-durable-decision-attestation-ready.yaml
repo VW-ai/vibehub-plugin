@@ -1,0 +1,53 @@
+schema_version: 1
+kind: ticket
+ticket_id: ticket-durable-decision-attestation-ready
+outcome: The installed Plugin can record one explicit human Decision whose exact authority any fresh authorized process can verify across restart without trusting repository-editable YAML, SQLite, browser state, OS username, Git author, or prior process memory.
+context: This Ticket preserves the completed M3.5 WebAuthn implementation boundary as historical evidence; it is not the active product contract after the explicitly approved M3.6 pivot. ticket-install-local-decision-attestation-ready owns the successor behavior and context-binding depends on that new identity. M3 deliberately stopped at fail-closed same-dispatcher authority. M3.5 closed that boundary with explicit WebAuthn user verification, a repo-external public trust registry, append-only Git attestation receipts, complete repository/worktree/checkout/subject/scope binding, and dynamic fresh-process verification. The installed review host supported enrollment, graph plan review, Ticket protected-boundary Decisions, re-attestation by repeating the exact current Decision, and verified revocation without turning the local bearer, YAML, SQLite, Git authorship, or browser fields into authority. The private key remained in the authenticator. Raw Decision YAML remained inspectable intent and projected as current_unverified whenever its exact receipt was missing, stale, expired, revoked, tampered, or bound elsewhere. This historical Ticket is intentionally retained rather than rewritten into the new outcome.
+acceptance:
+  - acceptance_id: bounded-local-mechanism
+    criterion: The implementation remains a narrow Decision-attestation boundary rather than a generic workflow engine, remote identity platform, SQLite semantic authority, or mandatory review lifecycle, and includes adversarial integration tests through the installed entrypoint and fresh process.
+  - acceptance_id: exact-complete-binding
+    criterion: Verification binds the complete canonical Decision digest, decision ID and path, principal, authority basis, repository incarnation, worktree identity, branch or detached commit, graph digest or Ticket revision, boundary, selection or delegated scope, and validity state.
+  - acceptance_id: failure-and-recovery-matrix
+    criterion: Restart, tampering, replay into another repository, worktree, branch, commit, subject, boundary, principal or scope, expiry, and revocation fail closed; recovery requires a new explicit human action and leaves prior evidence inspectable.
+  - acceptance_id: fresh-process-verification
+    criterion: After the trusted UI host and writer process exit, a newly started Plugin or Skill process independently verifies the exact attested Decision and projects it as authority only for its bound current subject and scope.
+  - acceptance_id: installed-human-entrypoint
+    criterion: The shipped Plugin exposes a real explicit human review or protected-decision action that supplies a named principal and produces the attestation; constructor injection available only to tests or embedders does not satisfy this criterion.
+  - acceptance_id: untrusted-writer-cannot-mint
+    criterion: A process that can freely edit the repository, Ticket YAML, Decision YAML, SQLite database, Git author metadata, browser request, or local bearer cannot mint or widen accepted human authority without the Plugin trust root.
+constraints:
+  - The trust root and authority proof must not be writable solely through the governed repository or disposable database.
+  - Git remains the durable collaboration and evidence substrate, but editable Git bytes alone cannot authenticate the human principal.
+  - The loopback bearer grants local host access only and cannot become Decision authority.
+  - Preserve branch and worktree semantic isolation and fail closed on detached or ambiguous source identity.
+  - Do not weaken exact-subject currentness, independent Ticket validation, or the distinction between Decision intent and authority.
+  - Prefer the smallest local, inspectable mechanism that satisfies the acceptance criteria; avoid premature remote identity or multi-user infrastructure.
+context_refs:
+  - ref: META/09-ticket-runtime/artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md
+    purpose: Explains why the active product moved to a separate install-local successor Ticket instead of rewriting this outcome.
+  - ref: META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md
+    purpose: Records the historical M3.5 WebAuthn trust boundary, protocol, recovery behavior, deliberate limits, and verification evidence.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml
+    purpose: Preserves the superseded M3.5 cross-process authority contract.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-git-review-interventions-001.yaml
+    purpose: Defines the M3 same-session boundary historically extended by this Ticket.
+  - ref: META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml
+    purpose: Defines the active successor contract owned by ticket-install-local-decision-attestation-ready.
+  - ref: skills/vibehub-ticket-plan/SKILL.md
+    purpose: Defines how a fresh planner consumes current authority receipts and preserves unverified boundaries.
+  - ref: skills/vibehub-ticket-review/SKILL.md
+    purpose: Provides the currently installed review entrypoint and active authority guardrails.
+relations:
+  - type: depends_on
+    target_ticket_id: ticket-git-review-intervention-ready
+    rationale: The historical M3.5 durable attestation outcome extended the strict Decision documents, projection, host security boundary, and fail-closed same-session model established by M3.
+provenance_refs:
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md
+  - META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md
+  - META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml
+  - META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml
+  - commit:dbc60dc3fbc22995060a0ee1e6768602c928470c
+  - conversation:2026-07-30-install-local-pivot-approved
+  - ticket-m3-5:authority-boundary
+  - ticket-m3-5:implemented

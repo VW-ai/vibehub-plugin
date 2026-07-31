@@ -10,7 +10,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-review","vibehub-ticket-validate","vibehub-ticket-run","vibehub-ticket-closeout"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -18,7 +18,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
-    expect(entry).toHaveLength(7);
+    expect(entry).toHaveLength(12);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -120,6 +120,25 @@ describe("production skill package",()=>{
     expect(operations).toContain("`kb.anchors`");
     expect(operations).toContain("`distill.baseline.get`");
     expect(operations).toContain("`distill.version.get`");
+    expect(operations).toContain("`ticket.graph.snapshot`");
+    expect(operations).toContain("`ticket.subject.inspect`");
+    expect(operations).toContain("`ticket.trace.list`");
+    expect(operations).toContain("Git-native Ticket operations are deliberately outside persisted request");
+    expect(operations).toContain("`ticket.worktree.patch`");
+    expect(operations).toContain("`ticket.review.append`");
+    expect(operations).toContain("`ticket.decision.record`");
+    expect(operations).toContain("ticket_authority_unavailable");
+    expect(operations).not.toContain("`ticket.proposal.");
+    const dispatch=read("scripts/_dispatch.mjs");
+    expect(dispatch).toContain('"graph.snapshot"');
+    expect(dispatch).toContain('"subject.inspect"');
+    expect(dispatch).toContain('"trace.list"');
+    expect(dispatch).toContain('"worktree.patch"');
+    expect(dispatch).toContain('"review.append"');
+    expect(dispatch).toContain('"decision.record"');
+    expect(dispatch).not.toContain('"proposal.');
+    expect(dispatch).toContain('"../../../main.js"');
+    expect(dispatch).toContain('"../../packages/cli/dist/main.js"');
 
     const query=read("vibehub-query/SKILL.md");
     expect(query).toContain("`kb.status` plus paginated `kb.spec.search`");
@@ -136,6 +155,165 @@ describe("production skill package",()=>{
     const exclusions=[...read("_stdlib/quality-gates.md").matchAll(/`(generated_or_dependency|binary_file|oversize_file|non_regular_file|incremental_unchanged|incremental_deleted)`/g)].map(match=>match[1]);
     expect(exclusions).toEqual(["generated_or_dependency","binary_file","oversize_file","non_regular_file","incremental_unchanged","incremental_deleted"]);
     expect(read("_stdlib/provenance.md")).toContain("`symbol: null` is invalid");
+  });
+
+  it("packages the read-only Ticket graph wrapper",()=>{
+    const review=fs.readFileSync(
+      path.join(skills,"scripts","vh-ticket-review.mjs"),
+      "utf8",
+    );
+    expect(review).toContain("resolveVibehubInvocation");
+    expect(review).toContain('"ticket", "review"');
+    expect(review).not.toMatch(/proposal|decision|apply/i);
+  });
+
+  it("keeps Ticket review confirmation local, explicit, and receipt-bound",()=>{
+    const review=fs.readFileSync(
+      path.join(skills,"vibehub-ticket-review","SKILL.md"),
+      "utf8",
+    );
+    expect(review).toContain("one explicit confirmation");
+    expect(review).toContain("install-local signing authority");
+    expect(review).toContain("exact detached authority receipt");
+    expect(review).toContain(
+      "short-lived browser link as an approval capability",
+    );
+    expect(review).toContain("does not prove biometric presence");
+    expect(review).not.toMatch(/WebAuthn|authenticator|human presence/i);
+  });
+
+  it("ships one direct Decision submission without a browser ceremony",()=>{
+    const cliRoot=path.resolve(workbench,"packages","cli");
+    const html=fs.readFileSync(
+      path.join(cliRoot,"assets","ticket-review-host","index.html"),
+      "utf8",
+    );
+    const app=fs.readFileSync(
+      path.join(cliRoot,"assets","ticket-review-host","app.js"),
+      "utf8",
+    );
+    const copy=fs.readFileSync(
+      path.join(cliRoot,"scripts","copy-managed-assets.mjs"),
+      "utf8",
+    );
+    const manifest=JSON.parse(fs.readFileSync(
+      path.join(cliRoot,"package.json"),
+      "utf8",
+    ));
+    expect(html).not.toContain("/webauthn.js");
+    expect(app).toContain('route: "/api/decision"');
+    expect(app).toContain("Recording exact decision…");
+    expect(app).toContain("`Receipt · ${receiptPath}`");
+    expect(app).not.toMatch(
+      /SimpleWebAuthn|webauthn-|\/api\/decision\/challenge/,
+    );
+    expect(copy).not.toContain("@simplewebauthn");
+    expect(manifest.dependencies).not.toHaveProperty(
+      "@simplewebauthn/browser",
+    );
+    expect(manifest.dependencies).not.toHaveProperty(
+      "@simplewebauthn/server",
+    );
+  });
+
+  it("advertises Ticket orchestration from the Codex plugin surface",()=>{
+    const manifest=JSON.parse(fs.readFileSync(
+      path.join(workbench,".codex-plugin","plugin.json"),
+      "utf8",
+    ));
+    expect(manifest.interface.defaultPrompt).toContain(
+      "Plan this deliverable as an honest VibeHub Ticket graph.",
+    );
+  });
+
+  it("keeps Ticket planning semantic, independent, and Git-native",()=>{
+    const read=(relative:string)=>fs.readFileSync(path.join(skills,relative),"utf8");
+    const plan=[
+      read("vibehub-ticket-plan/SKILL.md"),
+      read("vibehub-ticket-plan/references/planning-method.md"),
+    ].join("\n");
+    const validate=[
+      read("vibehub-ticket-validate/SKILL.md"),
+      read("vibehub-ticket-validate/references/validation-rubric.md"),
+    ].join("\n");
+    expect(plan).toContain("Backchain");
+    expect(plan).toContain("forward");
+    expect(plan).toContain("Planning Fog");
+    expect(plan).toContain("`review-plan`");
+    expect(plan).toContain("`auto-apply-unless-human-gate`");
+    expect(plan).toContain("$vibehub-ticket-validate");
+    expect(plan).toContain("ticket.worktree.patch");
+    expect(plan).toContain("`ticket.trace.list`");
+    expect(plan).toContain("`semanticLedgerDigest`");
+    expect(plan).toContain("a `comment` is non-mutating input");
+    expect(plan).toContain("current `ticket_edit`");
+    expect(plan).toContain("Review `recordRef`");
+    expect(plan).toContain("current `gate_decision`");
+    expect(plan).toContain("Historical comments, proposals, and Decisions");
+    expect(plan).toContain("non-authoritative");
+    expect(plan).toContain("stop visibly");
+    expect(plan).toContain("optional causal inputs, not mandatory workflow stages");
+    expect(plan).toContain("public patch directly");
+    expect(plan).toContain("never use");
+    expect(plan).toContain("captured before that fact was written");
+    expect(plan).toContain("same-context observations");
+    expect(plan).toContain("cannot authorize apply");
+    expect(plan).not.toMatch(/\bparent(?:Id)?\b/);
+    expect(validate).toContain("separate Agent context");
+    expect(validate).toContain("fresh Agent");
+    expect(validate).toContain("`passed`");
+    expect(validate).toContain("`human_decision_required`");
+    expect(validate).toContain("return `inconclusive` for application");
+    expect(validate).toContain("`ticket.trace.list`");
+    expect(validate).toContain("`semanticLedgerDigest`");
+    expect(validate).toContain("comments are non-mutating input");
+    expect(validate).toContain("current `ticket_edit`");
+    expect(validate).toContain("Review `recordRef`");
+    expect(validate).toContain("current `gate_decision`");
+    expect(validate).toContain("Historical facts remain reviewable but non-authoritative");
+    expect(validate).toContain("producer is an `authority_receipt`");
+    expect(validate).toContain("surface the failure");
+    expect(validate).toContain("Do not rewrite the candidate");
+    expect(validate).not.toContain("vh-ticket.mjs worktree.patch");
+  });
+
+  it("ships bounded Ticket execution and independent closeout intelligence",()=>{
+    const read=(relative:string)=>fs.readFileSync(path.join(skills,relative),"utf8");
+    const run=read("vibehub-ticket-run/SKILL.md");
+    const closeout=read("vibehub-ticket-closeout/SKILL.md");
+    for(const operation of [
+      "ticket.frontier.read",
+      "ticket.context.compile",
+      "ticket.run.claim",
+      "ticket.run.heartbeat",
+      "ticket.run.release",
+      "ticket.evidence.append",
+    ])expect(run).toContain(operation);
+    expect(run).toContain("fresh Agent");
+    expect(run).toMatch(/every current\s+acceptance criterion/);
+    expect(run).toContain("$vibehub-ticket-plan");
+    expect(run).toContain("$vibehub-ticket-review");
+    expect(run).toContain("executor cannot certify its own completion");
+    expect(run).toContain("before changing the graph");
+    expect(run).not.toMatch(/manual YAML/i);
+    expect(closeout).toContain("separate Agent context");
+    expect(closeout).toContain("ticket.closeout.append");
+    for(const terminal of [
+      "`successful`",
+      "`partial`",
+      "`failed`",
+      "`deviated`",
+      "`stale`",
+    ])expect(closeout).toContain(terminal);
+    expect(closeout).toContain("unlock nothing");
+    expect(closeout).toContain("semantic knowledge effects as proposals");
+    expect(closeout).toContain("Do not change the graph before appending");
+    expect(closeout).toContain("historical-binding `stale` path");
+    expect(closeout).toContain("historical binding; never mix");
+    expect(closeout).toMatch(
+      /current\s+authorized\s+successful\s+closeout\s+is\s+`DONE`/,
+    );
+    expect(closeout).not.toMatch(/manual YAML/i);
   });
 
   it("pins the setup workflow, activation proof, and presentation invariants",()=>{
@@ -260,19 +438,24 @@ describe("production skill package",()=>{
   });
 
   it("keeps wrapper registries identical to dispatcher operation names",async()=>{
-    const registry=await import(path.join(skills,"scripts/_dispatch.mjs")) as {KB:Set<string>;DISTILL:Set<string>};
+    const registry=await import(path.join(skills,"scripts/_dispatch.mjs")) as {KB:Set<string>;DISTILL:Set<string>;TICKET:Set<string>};
     const expected=Object.keys(operationInputSchemas);
     expect([...registry.KB].map(x=>`kb.${x}`).sort()).toEqual(expected.filter(x=>x.startsWith("kb.")).sort());
     expect([...registry.DISTILL].map(x=>`distill.${x}`).sort()).toEqual(expected.filter(x=>x.startsWith("distill.")).sort());
+    expect([...registry.TICKET].map(x=>`ticket.${x}`).sort()).toEqual(expected.filter(x=>x.startsWith("ticket.")).sort());
   });
 
   it("keeps generated operation contracts and every refinement fixture executable through the packaged validator and dispatcher",async()=>{
-    type Negative={case:string;value:unknown;refinementIds:string[]};type Contract={input:object;runtimeRefinements:unknown[];fixtures:{positive:unknown;negative:unknown;negativeCase:string;negatives:Negative[]}};
-    const artifact=JSON.parse(fs.readFileSync(path.join(skills,"contracts/operation-contracts.json"),"utf8")) as {validationContract:string;acceptanceConstructs:Record<string,number>;refinementMatrix:Record<string,{operations:string[]}>;operations:Record<string,Contract>};
+    type Negative={case:string;value?:unknown;materializer?:Record<string,unknown>;refinementIds:string[]};type Contract={input:object;runtimeRefinements:unknown[];fixtures:{positive:unknown;negative:unknown;negativeCase:string;negatives:Negative[]}};
+    const artifact=JSON.parse(fs.readFileSync(path.join(skills,"contracts/operation-contracts.json"),"utf8")) as {schemaVersion:number;fixtureDialect:string;validationContract:string;acceptanceConstructs:Record<string,number>;refinementMatrix:Record<string,{operations:string[]}>;operations:Record<string,Contract>};
     expect(Object.keys(artifact.operations).sort()).toEqual(Object.keys(operationInputSchemas).sort());
+    expect(artifact).toMatchObject({schemaVersion:5,fixtureDialect:"literal value or generatedFixture/v1"});
     expect(artifact.validationContract).toContain("runtimeRefinements");
     expect(artifact.acceptanceConstructs).toEqual(operationAcceptanceConstructManifest);
-    const {validateOperationContract}=await import(path.join(skills,"scripts/operation-contract-validator.mjs")) as {validateOperationContract:(contract:Contract,value:unknown)=>{valid:boolean;errors:unknown[]}};
+    const {materializeOperationFixture,validateOperationContract}=await import(path.join(skills,"scripts/operation-contract-validator.mjs")) as {
+      materializeOperationFixture:(contract:Contract,fixture:Negative)=>unknown;
+      validateOperationContract:(contract:Contract,value:unknown)=>{valid:boolean;errors:unknown[]};
+    };
     const ajv=new Ajv2020({allErrors:true,strict:false});
     const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-operation-contract-")),repo=path.join(temp,"repo");fs.mkdirSync(repo);expect(spawnSync("git",["init","-q",repo]).status).toBe(0);
     const db=openDb(path.join(temp,"db.sqlite"));const now="2026-01-01T00:00:00.000Z",row=upsertRepo(db,repo,"fixture/repo","main",now),dispatcher=new OperationDispatcher(db);
@@ -286,10 +469,11 @@ describe("production skill package",()=>{
       if(!positive.ok)expect(positive.error.code,`${operation} positive dispatcher fixture`).not.toBe("validation_error");
       expect(contract.fixtures.negatives.length,`${operation} negatives`).toBeGreaterThan(0);
       for(const [index,fixture] of contract.fixtures.negatives.entries()){
+        const value=materializeOperationFixture(contract,fixture);
         expect(fixture.case.length,`${operation} negative case`).toBeGreaterThan(5);
-        expect(validateOperationContract(contract,fixture.value),`${operation}/${fixture.case} packaged artifact validator`).toMatchObject({valid:false});
-        expect(schema.safeParse(fixture.value).success,`${operation}/${fixture.case} runtime schema`).toBe(false);
-        const negative=dispatcher.dispatch(operation,{repoId:row.id,actor:"fixture",taskId:"fixture-task",requestId:`negative-${operation}-${index}`,now},fixture.value);
+        expect(validateOperationContract(contract,value),`${operation}/${fixture.case} packaged artifact validator`).toMatchObject({valid:false});
+        expect(schema.safeParse(value).success,`${operation}/${fixture.case} runtime schema`).toBe(false);
+        const negative=dispatcher.dispatch(operation,{repoId:row.id,actor:"fixture",taskId:"fixture-task",requestId:`negative-${operation}-${index}`,now},value);
         expect(negative,`${operation}/${fixture.case} dispatcher`).toMatchObject({ok:false,error:{code:"validation_error"}});
       }
       for(const [id,matrix] of Object.entries(artifact.refinementMatrix))if(matrix.operations.includes(operation))expect(contract.fixtures.negatives.some(fixture=>fixture.refinementIds.includes(id)),`${operation}/${id} refinement coverage`).toBe(true);
@@ -301,12 +485,29 @@ describe("production skill package",()=>{
       ["kb.feature.get","top-level id rejects whitespace only"],
       ["kb.feature.get","top-level id measures raw padded length"],
       ["kb.feature.get","top-level id measures Unicode characters consistently"],
-      ["kb.draft.apply","nested summary rejects leading whitespace"],
+      ["kb.spec.apply","nested summary rejects leading whitespace"],
       ["kb.spec.search","array tag rejects whitespace only"],
+      ["ticket.trace.list","trace kinds must be unique"],
     ] as const;
-    for(const [operation,caseName] of regressions){const contract=artifact.operations[operation]!,fixture=contract.fixtures.negatives.find(x=>x.case===caseName)!;const run=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--operation",operation],{input:JSON.stringify(fixture.value),encoding:"utf8"});expect(run.status,`${operation}/${caseName}: ${run.stdout}`).toBe(2);}
+    for(const [operation,caseName] of regressions){const contract=artifact.operations[operation]!,fixture=contract.fixtures.negatives.find(x=>x.case===caseName)!;const run=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--operation",operation],{input:JSON.stringify(materializeOperationFixture(contract,fixture)),encoding:"utf8"});expect(run.status,`${operation}/${caseName}: ${run.stdout}`).toBe(2);}
+    expect(Object.keys(artifact.operations).filter(operation=>operation.startsWith("ticket."))).toEqual([
+      "ticket.closeout.append",
+      "ticket.context.compile",
+      "ticket.decision.record",
+      "ticket.evidence.append",
+      "ticket.frontier.read",
+      "ticket.graph.snapshot",
+      "ticket.review.append",
+      "ticket.run.claim",
+      "ticket.run.heartbeat",
+      "ticket.run.release",
+      "ticket.subject.inspect",
+      "ticket.trace.list",
+      "ticket.worktree.patch",
+    ]);
+    expect(JSON.stringify(artifact)).not.toContain("ticket.proposal.");
     const unicodeId={id:"😀".repeat(200)},featureContract=artifact.operations["kb.feature.get"]!;expect(validateOperationContract(featureContract,unicodeId)).toMatchObject({valid:true});expect(operationInputSchemas["kb.feature.get"].safeParse(unicodeId).success).toBe(true);expect(dispatcher.dispatch("kb.feature.get",{repoId:row.id,actor:"fixture",requestId:"unicode-id",now},unicodeId)).toMatchObject({ok:false,error:{code:"not_found"}});
-    const longInput={idempotencyKey:"unicode-long",specs:[{id:"unicode-long",type:"context",summary:"Unicode boundary",evidence:[{sourceType:"fixture",sourceRef:"fixture:unicode",exactQuote:"😀".repeat(20_000)}]}]},longContract=artifact.operations["kb.draft.apply"]!;expect(validateOperationContract(longContract,longInput)).toMatchObject({valid:true});expect(operationInputSchemas["kb.draft.apply"].safeParse(longInput).success).toBe(true);expect(dispatcher.dispatch("kb.draft.apply",{repoId:row.id,actor:"fixture",taskId:"fixture-task",requestId:"unicode-long",now},longInput)).toMatchObject({ok:true});
+    const longInput={idempotencyKey:"unicode-long",specs:[{id:"unicode-long",type:"context",summary:"Unicode boundary",evidence:[{sourceType:"fixture",sourceRef:"fixture:unicode",exactQuote:"😀".repeat(20_000)}]}]},longContract=artifact.operations["kb.spec.apply"]!;expect(validateOperationContract(longContract,longInput)).toMatchObject({valid:true});expect(operationInputSchemas["kb.spec.apply"].safeParse(longInput).success).toBe(true);expect(dispatcher.dispatch("kb.spec.apply",{repoId:row.id,actor:"fixture",taskId:"fixture-task",requestId:"unicode-long",now},longInput)).toMatchObject({ok:true});
     expect(dispatcher.dispatch("kb.status",{repoId:row.id,actor:" ",requestId:"context-space",now},{})).toMatchObject({ok:false,error:{code:"actor_required"}});
     expect(dispatcher.dispatch("kb.status",{repoId:row.id,actor:"fixture",requestId:"context-date",now:"not-a-date"},{})).toMatchObject({ok:false,error:{code:"validation_error"}});
     db.close();
@@ -421,6 +622,196 @@ describe("production skill package",()=>{
     expect(JSON.parse(run.stdout)).toMatchObject({ok:true,meta:{operation:"kb.status",requestId:"clean"}});
   });
 
+  it("forwards Ticket reads and runtime mutations through one thin wrapper",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-wrapper-"));
+    const fake=path.join(temp,"vibehub");
+    fs.writeFileSync(fake,"#!/usr/bin/env node\nlet raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n");
+    fs.chmodSync(fake,0o755);
+    const input=JSON.stringify({pageSize:25});
+    const run=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-ticket.mjs"),
+      "graph.snapshot","--repo",temp,"--actor","agent:test","--request","ticket:graph:1",
+    ],{input,encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      argv:[
+        "ticket","graph.snapshot","--json","--repo",temp,"--actor","agent:test",
+        "--request","ticket:graph:1","--input","-",
+      ],
+      raw:input,
+    });
+    const closeoutInput=JSON.stringify({
+      expectedSource:{sourceToken:"tls-fixture"},
+      runId:"run-fixture",
+    });
+    const closeout=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-ticket.mjs"),
+      "closeout.append","--repo",temp,"--actor","agent:closer",
+      "--request","ticket:closeout:1",
+    ],{input:closeoutInput,encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(closeout.status,closeout.stdout+closeout.stderr).toBe(0);
+    expect(JSON.parse(closeout.stdout).data).toEqual({
+      argv:[
+        "ticket","closeout.append","--json","--repo",temp,
+        "--actor","agent:closer","--request","ticket:closeout:1",
+        "--input","-",
+      ],
+      raw:closeoutInput,
+    });
+  });
+
+  it("uses the installed thin runtime for Ticket reads and mutations without a global CLI",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-runtime-"));
+    const plugin=path.join(temp,"plugin");
+    const scripts=path.join(plugin,"skills","scripts");
+    const runtime=path.join(plugin,"runtime","vibehub-runtime.mjs");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(runtime),{recursive:true});
+    fs.writeFileSync(
+      runtime,
+      "let raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n",
+    );
+    const invoke=(operation:string,input:string)=>spawnSync(process.execPath,[
+      path.join(scripts,"vh-ticket.mjs"),
+      operation,"--repo",temp,"--actor","agent:installed",
+      "--request",`installed:${operation}`,
+    ],{
+      input,
+      encoding:"utf8",
+      env:{
+        HOME:path.join(temp,"home"),
+        PATH:"/usr/bin:/bin",
+        VIBEHUB_BIN:undefined,
+      },
+    });
+    const frontier=invoke("frontier.read","{}");
+    expect(frontier.status,frontier.stdout+frontier.stderr).toBe(0);
+    expect(JSON.parse(frontier.stdout).data).toEqual({
+      argv:[
+        "cli","ticket","frontier.read","--json","--repo",temp,
+        "--actor","agent:installed","--request","installed:frontier.read",
+        "--input","-",
+      ],
+      raw:"{}",
+    });
+    const closeoutInput=JSON.stringify({
+      expectedSource:{sourceToken:"tls-fixture"},
+      runId:"run-fixture",
+    });
+    const closeout=invoke("closeout.append",closeoutInput);
+    expect(closeout.status,closeout.stdout+closeout.stderr).toBe(0);
+    expect(JSON.parse(closeout.stdout).data).toEqual({
+      argv:[
+        "cli","ticket","closeout.append","--json","--repo",temp,
+        "--actor","agent:installed","--request","installed:closeout.append",
+        "--input","-",
+      ],
+      raw:closeoutInput,
+    });
+  });
+
+  it("forwards the read-only review host and rejects retired Ticket writes",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-review-wrapper-"));
+    const fake=path.join(temp,"vibehub");
+    fs.writeFileSync(fake,"#!/usr/bin/env node\nprocess.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2)}}));\n");
+    fs.chmodSync(fake,0o755);
+    const review=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-ticket-review.mjs"),
+      "--repo",temp,"--no-open","--json",
+    ],{encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(review.status,review.stdout+review.stderr).toBe(0);
+    expect(JSON.parse(review.stdout).data).toEqual({
+      argv:["ticket","review","--repo",temp,"--no-open","--json"],
+    });
+    const rejected=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-ticket.mjs"),
+      "proposal.submit","--actor","agent:test",
+    ],{encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(rejected.status,rejected.stdout+rejected.stderr).toBe(2);
+    expect(JSON.parse(rejected.stdout)).toMatchObject({
+      ok:false,
+      error:{
+        code:"validation_error",
+        message:"unsupported ticket operation: proposal.submit",
+      },
+    });
+  });
+
+  it("prefers the installed plugin runtime for Ticket review over PATH",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-review-runtime-"));
+    const plugin=path.join(temp,"plugin");
+    const scripts=path.join(plugin,"skills","scripts");
+    const runtime=path.join(plugin,"runtime","vibehub-runtime.mjs");
+    const bin=path.join(temp,"bin");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(runtime),{recursive:true});
+    fs.mkdirSync(bin);
+    fs.writeFileSync(
+      runtime,
+      "process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2)}}));\n",
+    );
+    const stale=path.join(bin,"vibehub");
+    fs.writeFileSync(stale,"#!/bin/sh\nprintf '%s\\n' 'PATH fallback used'\n");
+    fs.chmodSync(stale,0o755);
+    const run=spawnSync(process.execPath,[
+      path.join(scripts,"vh-ticket-review.mjs"),
+      "--repo",temp,"--no-open","--json",
+    ],{
+      encoding:"utf8",
+      env:{
+        ...process.env,
+        PATH:`${bin}:${process.env.PATH??""}`,
+        VIBEHUB_BIN:undefined,
+      },
+    });
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data.argv).toEqual([
+      "cli","ticket","review","--repo",temp,"--no-open","--json",
+    ]);
+  });
+
+  it("prefers the source-tree CLI for Ticket review over runtime and PATH",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-review-source-"));
+    const scripts=path.join(temp,"skills","scripts");
+    const localCli=path.join(temp,"packages","cli","dist","main.js");
+    const runtime=path.join(temp,"runtime","vibehub-runtime.mjs");
+    const bin=path.join(temp,"bin");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(localCli),{recursive:true});
+    fs.mkdirSync(path.dirname(runtime),{recursive:true});
+    fs.mkdirSync(bin);
+    fs.writeFileSync(
+      localCli,
+      "process.stdout.write(JSON.stringify({ok:true,data:{source:'checkout',argv:process.argv.slice(2)}}));\n",
+    );
+    fs.writeFileSync(
+      runtime,
+      "process.stdout.write(JSON.stringify({ok:true,data:{source:'runtime'}}));\n",
+    );
+    const stale=path.join(bin,"vibehub");
+    fs.writeFileSync(stale,"#!/bin/sh\nprintf '%s\\n' 'PATH fallback used'\n");
+    fs.chmodSync(stale,0o755);
+    const run=spawnSync(process.execPath,[
+      path.join(scripts,"vh-ticket-review.mjs"),
+      "--repo",temp,"--no-open","--json",
+    ],{
+      encoding:"utf8",
+      env:{
+        ...process.env,
+        PATH:`${bin}:${process.env.PATH??""}`,
+        VIBEHUB_BIN:undefined,
+      },
+    });
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      source:"checkout",
+      argv:["ticket","review","--repo",temp,"--no-open","--json"],
+    });
+  });
+
   it("keeps checkpoint mechanics in the packaged adapter",()=>{
     const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-checkpoint-wrapper-"));
     const fake=path.join(temp,"vibehub");
@@ -435,6 +826,149 @@ describe("production skill package",()=>{
     expect(JSON.parse(run.stdout).data).toEqual({
       argv:["checkpoint","commit","--json","--repo",temp,"--actor","agent:test","--request","request:test","--input","-"],
       raw:receipt,
+    });
+    const selection=JSON.stringify({source:{},changedPaths:[]});
+    const ticketPrepare=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-checkpoint.mjs"),
+      "prepare","--scope","ticket","--repo",temp,
+    ],{input:selection,encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(
+      ticketPrepare.status,
+      ticketPrepare.stdout+ticketPrepare.stderr,
+    ).toBe(0);
+    expect(JSON.parse(ticketPrepare.stdout).data).toEqual({
+      argv:[
+        "checkpoint","prepare","--json","--scope","ticket","--repo",temp,
+        "--input","-",
+      ],
+      raw:selection,
+    });
+    const oversized=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-checkpoint.mjs"),
+      "commit","--repo",temp,"--actor","agent:test",
+    ],{
+      input:JSON.stringify({value:"x".repeat(1024*1024)}),
+      encoding:"utf8",
+      env:{...process.env,VIBEHUB_BIN:fake},
+    });
+    expect(oversized.status,oversized.stdout+oversized.stderr).toBe(2);
+    expect(JSON.parse(oversized.stdout)).toMatchObject({
+      ok:false,
+      error:{
+        code:"validation_error",
+        message:expect.stringContaining("checkpoint raw JSON input exceeds"),
+      },
+    });
+  });
+
+  it("prefers the packaged local CLI for checkpoint over PATH",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-checkpoint-local-"));
+    const packaged=path.join(temp,"managed-assets","skills");
+    const home=path.join(temp,"home");
+    const bin=path.join(temp,"bin");
+    fs.cpSync(skills,packaged,{recursive:true});
+    fs.mkdirSync(home);
+    fs.mkdirSync(bin);
+    fs.writeFileSync(
+      path.join(temp,"main.js"),
+      "let raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n",
+    );
+    const stale=path.join(bin,"vibehub");
+    fs.writeFileSync(stale,"#!/bin/sh\nprintf '%s\\n' 'PATH fallback used'\n");
+    fs.chmodSync(stale,0o755);
+    const selection=JSON.stringify({source:{},changedPaths:[]});
+    const env={
+      ...process.env,
+      HOME:home,
+      PATH:`${bin}:${process.env.PATH??""}`,
+      VIBEHUB_BIN:undefined,
+    };
+    const run=spawnSync(process.execPath,[
+      path.join(packaged,"scripts/vh-checkpoint.mjs"),
+      "prepare","--scope","ticket","--repo",temp,
+    ],{input:selection,encoding:"utf8",env});
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      argv:[
+        "checkpoint","prepare","--json","--scope","ticket","--repo",temp,
+        "--input","-",
+      ],
+      raw:selection,
+    });
+  });
+
+  it("prefers the source-tree local CLI for checkpoint over PATH",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-checkpoint-source-"));
+    const scripts=path.join(temp,"skills","scripts");
+    const localCli=path.join(temp,"packages","cli","dist","main.js");
+    const bin=path.join(temp,"bin");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(localCli),{recursive:true});
+    fs.mkdirSync(bin);
+    fs.writeFileSync(
+      localCli,
+      "let raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n",
+    );
+    fs.writeFileSync(
+      path.join(temp,"main.js"),
+      "process.stdout.write(JSON.stringify({ok:true,data:{wrongCandidate:true}}));\n",
+    );
+    const stale=path.join(bin,"vibehub");
+    fs.writeFileSync(stale,"#!/bin/sh\nprintf '%s\\n' 'PATH fallback used'\n");
+    fs.chmodSync(stale,0o755);
+    const selection=JSON.stringify({source:{},changedPaths:[]});
+    const env={
+      ...process.env,
+      PATH:`${bin}:${process.env.PATH??""}`,
+      VIBEHUB_BIN:undefined,
+    };
+    const run=spawnSync(process.execPath,[
+      path.join(scripts,"vh-checkpoint.mjs"),
+      "prepare","--scope","ticket","--repo",temp,
+    ],{input:selection,encoding:"utf8",env});
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      argv:[
+        "checkpoint","prepare","--json","--scope","ticket","--repo",temp,
+        "--input","-",
+      ],
+      raw:selection,
+    });
+  });
+
+  it("uses the installed thin runtime for Ticket checkpoint without a global CLI",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-checkpoint-runtime-"));
+    const plugin=path.join(temp,"plugin");
+    const scripts=path.join(plugin,"skills","scripts");
+    const runtime=path.join(plugin,"runtime","vibehub-runtime.mjs");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(runtime),{recursive:true});
+    fs.writeFileSync(
+      runtime,
+      "let raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n",
+    );
+    const selection=JSON.stringify({source:{},changedPaths:[]});
+    const run=spawnSync(process.execPath,[
+      path.join(scripts,"vh-checkpoint.mjs"),
+      "prepare","--scope","ticket","--repo",temp,
+    ],{
+      input:selection,
+      encoding:"utf8",
+      env:{
+        HOME:path.join(temp,"home"),
+        PATH:"/usr/bin:/bin",
+        VIBEHUB_BIN:undefined,
+      },
+    });
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      argv:[
+        "cli","checkpoint","prepare","--json","--scope","ticket",
+        "--repo",temp,"--input","-",
+      ],
+      raw:selection,
     });
   });
 

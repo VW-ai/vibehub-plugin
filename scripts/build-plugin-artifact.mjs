@@ -15,6 +15,7 @@ const STATIC_PLUGIN_PATHS = [
   ".codex-plugin",
   ".mcp.json",
   "codex",
+  "docs/assets/ticket-system",
   "hooks",
   "runtime",
   "skills",
