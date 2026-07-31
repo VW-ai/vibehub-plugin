@@ -1,0 +1,46 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "phase-is-explicit",
+      "criterion": "README states near the product introduction that architecture construction is complete, the current phase is real-use dogfooding, and speculative parity or pre-emptive capability work is out of scope."
+    },
+    {
+      "acceptance_id": "feedback-loop-is-actionable",
+      "criterion": "README gives a concise workflow in which real development uses Ticket, Evidence, and independent Outcome; explicit durable decisions become Context; and observed friction or missing capability becomes a focused Ticket rather than an up-front framework."
+    },
+    {
+      "acceptance_id": "existing-contract-remains-consistent",
+      "criterion": "README remains consistent with the Skill-first Git-YAML architecture, retains the no-CLI/MCP/runtime and no-persistent-cache contract, and repository validation plus artifact verification still pass."
+    }
+  ],
+  "constraints": [
+    "Keep the README concise and user-facing.",
+    "Do not add a dogfood subsystem, lifecycle state, telemetry framework, or speculative roadmap.",
+    "Do not change runtime code or schemas for this documentation Ticket."
+  ],
+  "context": "The Skill-first cleanup is complete and independently closed. The owner confirmed that this version should now be dogfooded and asked to update the README. This is documentation of the current operating phase, not a new lifecycle stage or a request to build more runtime machinery.",
+  "context_refs": [
+    {
+      "purpose": "Current product-phase authority and observed-gap policy.",
+      "ref": ".vibehub/context/decision-dogfood-only-phase.yaml"
+    },
+    {
+      "purpose": "Binding Skill-first and speed-first architecture decision.",
+      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Exact public documentation surface to update.",
+      "ref": "README.md"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The public README makes the current dogfood-only product phase and its real-use feedback loop immediately clear without implying more platform construction.",
+  "provenance_refs": [
+    "conversation:2026-07-31-dogfood-phase",
+    "conversation:2026-07-31-readme-update",
+    "context:decision-dogfood-only-phase"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-document-dogfood-phase"
+}

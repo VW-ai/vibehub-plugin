@@ -1,0 +1,36 @@
+{
+  "context_id": "decision-dogfood-only-phase",
+  "detail": "The architecture pivot and deletion-first cleanup are complete. The next product phase is real-use dogfooding, not speculative capability construction or parity work. Normal development should run through the explicit Ticket, Evidence, and independent Outcome cycle; durable decisions should be explicitly captured as Context. When real use exposes friction, a missing capability, or a failure, record that observed gap as a focused Ticket and rebuild only what the evidence requires. Version bump and release packaging are release tasks and do not block dogfooding.",
+  "evidence": [
+    {
+      "note": "The repository owner immediately requested that this dogfood-phase guidance be reflected in the README.",
+      "ref": "conversation:2026-07-31-readme-update"
+    },
+    {
+      "note": "The speed-first cleanup Ticket was independently closed successfully before entering dogfood.",
+      "ref": "commit:03648c8"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-07-31T22:39:58Z",
+    "quote": "我们理论上，这个新version，只需要dogfood了是不是",
+    "ref": "conversation:2026-07-31-dogfood-phase"
+  },
+  "state": "active",
+  "summary": "The Skill-first VibeHub has entered a dogfood-only validation phase",
+  "tags": [
+    "dogfood",
+    "product-phase",
+    "speed-first",
+    "tickets"
+  ],
+  "type": "decision"
+}

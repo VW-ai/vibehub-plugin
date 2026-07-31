@@ -3,6 +3,21 @@
 VibeHub is a lightweight plugin for Ticket-driven development with durable,
 Git-native project Context.
 
+## Current phase: dogfood
+
+The architecture pivot is complete. This version is now in a dogfood-only
+validation phase: use it for real development, observe where it helps or
+fails, and do not pre-emptively rebuild deleted layers or pursue a runtime
+parity checklist.
+
+For each real deliverable, start with a Ticket, develop against its acceptance
+criteria, record acceptance-linked Evidence, and let an independent Agent write
+the Outcome. Capture durable decisions as Context only when explicitly asked
+or when the Ticket exposes a fact that must survive across work. When real use
+reveals friction or a missing capability, open a focused Ticket with the
+observed failure and desired outcome; that evidence, not speculation, is the
+reason to extend the product.
+
 The product has two layers:
 
 - **Tickets drive development.** A deliverable becomes a checked-in Ticket with
