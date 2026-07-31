@@ -1,6 +1,6 @@
 {
   "created_at": "2026-07-31T17:23:53.966Z",
-  "current_revision": 2,
+  "current_revision": 3,
   "feature_id": "00-project-room",
   "kind": "spec",
   "provenance": [
@@ -58,6 +58,32 @@
         "state": "active"
       },
       "request_id": "minimal-core-amend-20260731-01",
+      "task_id": "product-architecture-simplification"
+    },
+    {
+      "actor": "codex-digest-cache-boundary",
+      "at": "2026-07-31T21:42:15.541Z",
+      "durable_id": "000cb8dfcfb836b64277fd4afd4057da7af78bd50c4984daad767fe8f0a4efe3",
+      "operation": "amend",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T21:42:15.541Z",
+          "idempotencyKey": "decision-project-013-no-digest-cache-cli-mcp-20260731-v3",
+          "inputHash": "fec3e66fc7d10c20ec923a878903edeb68849761e1b48cdf3721586620ad1d6b",
+          "operation": "amend",
+          "result": {
+            "operation": "amend",
+            "revision": 3,
+            "specId": "decision-project-013",
+            "state": "active"
+          }
+        },
+        "operation": "amend",
+        "revision": 3,
+        "specId": "decision-project-013",
+        "state": "active"
+      },
+      "request_id": "digest-cache-boundary-amend-20260731-01",
       "task_id": "product-architecture-simplification"
     }
   ],
@@ -227,11 +253,86 @@
         "no-mcp"
       ],
       "type": "decision"
+    },
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/cli/src",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/mcp/src",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "VibeHub 是 lightweight Plugin，不以拥有 Core、CLI、MCP、自定义 operation runtime 或持久 digest cache 为产品目标。Agent 可以通过宿主文件工具和 Git 直接读取、编辑 Git-native Ticket/Context YAML；不能因为已有工具存在就把所有读写强制路由进工具。\n\n最小确定性能力只保留删除后会造成明确产品破坏的部分：\n- 共享 YAML schema validation，保证 Agent、CI、GitHub projection 与前端 visualization 对同一数据合约解释一致；\n- Ticket graph 的 ID、relation endpoint、dependency cycle、acceptance/evidence 引用等结构完整性验证；\n- 真正需要稳定 diff 时的 deterministic normalization/serialization；\n- 前端或 GitHub surface 无法自行安全重建时所需的轻量 read-only projection。\n\nGit 本身拥有 branch/worktree 隔离、commit history、non-fast-forward push rejection、merge conflict 与 PR review。产品按 one Agent/writer per worktree 设计，不为本来就不安全的 same-worktree concurrent writers 重建第二套并发系统。因此 layered sourceToken/graphDigest/semanticLedgerDigest CAS、SQLite Run lease/heartbeat/generation、ContextBinding 内容编译与复制、installation-local Ed25519 Decision attestation、通用 operation dispatcher、CLI/MCP adapter 都不再是默认必需组件。CLI 与 MCP 应从产品和运行时必经路径删除；只有未来出现一个无法由 Skills、宿主文件能力、Git/GitHub 或 schema validation 覆盖的具体用户失败场景，并有回归测试时，才重新引入对应能力。\n\n这里的 digest cache 仅指 UI 的临时性能优化：UI 第一次读取 YAML 并构建图后，可在进程内记住内容指纹和派生 projection；下一次刷新若指纹未变，就跳过重复 parse/layout/render。它不是另一份数据，不是语义事实，不参与写入权限、CAS、currentness、同步或完成判定，也不需要数据库、CLI、MCP 或服务端。v0 默认不实现这个 cache：已提交视图可直接用 Git commit SHA/ref 识别变化，dirty worktree 直接重新读取 YAML；只有 profiling 证明解析或布局成为真实瓶颈后，才允许添加可随进程退出而丢弃的内存 cache。验证过程中临时计算 hash 不等于建立 cache。\n\nSkills 继续拥有规划、语义判断和工作流编排；小型 validator/render helper 可以作为 Skill bundled scripts、库函数或 CI commands 存在，而不形成长期运行时、独立产品 CLI 或用户必须理解的工具层。",
+      "domain": "architecture",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "decision-project-013:3:1",
+          "evidence_ref": null,
+          "exact_quote": "这cache是啥意思。cli mcp没必要就删了是对的",
+          "produced_at": "2026-07-31T21:42:15.541Z",
+          "producer": "codex-digest-cache-boundary",
+          "source_ref": "conversation:2026-07-31-digest-cache-boundary",
+          "source_type": "user_instruction"
+        },
+        {
+          "confidence": 0.9,
+          "content_hash": null,
+          "evidence_id": "decision-project-013:3:2",
+          "evidence_ref": "Committed views already have Git commit/ref change identity; dirty worktree Ticket graphs can be reparsed directly. No measured v0 parse/layout bottleneck justifies a persistent digest cache or its runtime dependencies.",
+          "exact_quote": null,
+          "produced_at": "2026-07-31T21:42:15.541Z",
+          "producer": "codex-digest-cache-boundary",
+          "source_ref": "architecture-review:2026-07-31-digest-cache-boundary",
+          "source_type": "agent_technical_judgment"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-31T21:42:15.541Z",
+      "producer": "codex-digest-cache-boundary",
+      "revision": 3,
+      "summary": "不设强制通用 Core/CLI/MCP；v0 不设持久 digest cache，只保留保护 YAML、Ticket 图和可视化互操作的最小验证能力",
+      "tags": [
+        "plugin",
+        "minimal-kernel",
+        "schema",
+        "git",
+        "skills",
+        "no-cli",
+        "no-mcp",
+        "no-persistent-cache"
+      ],
+      "type": "decision"
     }
   ],
   "schema_version": 2,
   "source_kind": "canonical",
   "spec_id": "decision-project-013",
   "state": "active",
-  "updated_at": "2026-07-31T21:34:31.113Z"
+  "updated_at": "2026-07-31T21:42:15.541Z"
 }
