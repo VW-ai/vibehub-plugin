@@ -1,6 +1,6 @@
 {
   "created_at": "2026-07-31T17:23:53.966Z",
-  "current_revision": 1,
+  "current_revision": 2,
   "feature_id": "03-01-context-cru",
   "kind": "spec",
   "provenance": [
@@ -33,6 +33,32 @@
       },
       "request_id": "canonical-spec-migration-20260731-v1",
       "task_id": "canonical-spec-migration-20260731"
+    },
+    {
+      "actor": "codex",
+      "at": "2026-07-31T18:24:00.937Z",
+      "durable_id": "ad99a2f64a2b8ad15b64413abf2522240ea07dbf66d8757b3c99b6d19ace5651",
+      "operation": "amend",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T18:24:00.937Z",
+          "idempotencyKey": "ticket-first-runtime-pivot:checkpoint-dual-mode:v1",
+          "inputHash": "de83bb139b57caf243c2677e264d9f78f608ce2666c959abdf92a7cba6056381",
+          "operation": "amend",
+          "result": {
+            "operation": "amend",
+            "revision": 2,
+            "specId": "intent-workbench-003",
+            "state": "active"
+          }
+        },
+        "operation": "amend",
+        "revision": 2,
+        "specId": "intent-workbench-003",
+        "state": "active"
+      },
+      "request_id": "ticket-first-ingest-amend-20260731-01",
+      "task_id": "ticket-first-runtime-pivot"
     }
   ],
   "relations": [
@@ -136,11 +162,96 @@
         "task-scope"
       ],
       "type": "intent"
+    },
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/core/src/hook-ingest.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/knowledge-checkpoint.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/test/hook-ingest.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/test/knowledge-checkpoint.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Agent 可能讨论并采纳重要 intent/decision，却没有执行 canonical knowledge write。所有仓库继续按 task scope 机械记录 deduplicated user-turn cadence，并仅由归属于该 task 的成功 canonical knowledge write 重置。\n\n没有 canonical Ticket ledger 的 checkout 保留周期性 knowledge reminder 安全网：到达 cadence 后注入短提醒，由模型 + vibehub-ingest 判断是否存在 durable semantics；没有 durable change 时继续工作，不制造空记录。\n\n存在 .vibehub/tickets/protocol.yaml 的 Ticket-managed checkout 在同一 cadence 记录 shadow checkpoint 并推进 reminder high-water，但不向正在执行的 Ticket Run 注入通用提醒。Ticket Plan、Run Evidence 与独立 closeout 提供主要工作边界；当规划或执行暴露 project-wide knowledge gap 时仍使用 vibehub-query，当 intent、decision、constraint、contract、convention、context 或 change 应跨 Ticket 治理时仍使用 vibehub-ingest。Shadow mode 是对运行噪音的调整，不得削弱 canonical validation、provenance、placement、conflict、stale 或 receipt 质量语义。\n\nHook 只实现 ledger presence 检测、cadence、prompt-id dedupe、高水位与成功 canonical write 后重置。不得解析 transcript、估算 token 或执行语义分类；语义判断继续由 Skills 完成。",
+      "domain": "context-cru",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "intent-workbench-003:2:1",
+          "evidence_ref": null,
+          "exact_quote": "我希望就是，这种改造，不要损害我们的context layer 的质量",
+          "produced_at": "2026-07-31T18:24:00.937Z",
+          "producer": "codex",
+          "source_ref": "conversation:2026-07-31-ticket-first-runtime-pivot",
+          "source_type": "user_instruction"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:6b529923bab09edd5c09cb5a77b5b7ebfe54aacec2994298069cb95ec999a0ed",
+          "evidence_id": "intent-workbench-003:2:2",
+          "evidence_ref": null,
+          "exact_quote": null,
+          "produced_at": "2026-07-31T18:24:00.937Z",
+          "producer": "codex",
+          "source_ref": "packages/core/src/knowledge-checkpoint.ts",
+          "source_type": "implementation"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:c5c205f77d4162ce74fab683c9e10eb0c996cfefc6283f6b0f5444ebc52138fd",
+          "evidence_id": "intent-workbench-003:2:3",
+          "evidence_ref": null,
+          "exact_quote": null,
+          "produced_at": "2026-07-31T18:24:00.937Z",
+          "producer": "codex",
+          "source_ref": "packages/core/src/hook-ingest.ts",
+          "source_type": "implementation"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-31T18:24:00.937Z",
+      "producer": "codex",
+      "revision": 2,
+      "summary": "Knowledge checkpoint 保持 task-scoped cadence：context-only 注入提醒，Ticket-managed 只记录 shadow checkpoint，Context Layer 质量门槛不变",
+      "tags": [
+        "checkpoint",
+        "cadence",
+        "durable-context",
+        "ingest",
+        "task-scope",
+        "ticket-run",
+        "shadow-mode"
+      ],
+      "type": "intent"
     }
   ],
   "schema_version": 2,
   "source_kind": "canonical",
   "spec_id": "intent-workbench-003",
   "state": "active",
-  "updated_at": "2026-07-31T17:23:53.966Z"
+  "updated_at": "2026-07-31T18:24:00.937Z"
 }
