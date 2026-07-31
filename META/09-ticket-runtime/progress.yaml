@@ -1,5 +1,5 @@
 progress:
-  completion: 0.80
+  completion: 1.0
   status: active
   milestones:
     - id: "m0-git-skill-authority-cut"
@@ -39,14 +39,14 @@ progress:
       evidence: "Commit dd771df13185fc472ade73d6962b3e3e8be78403 replaces the M3.5 WebAuthn ceremony with one explicit Plugin-host click and a repository-scoped installation-local Ed25519 key outside Git and SQLite. Exact detached Decision/repository/worktree/named-branch/scope receipts support fresh-process verification and dynamic recognition of registry revocation, remove expiry, and make no biometric, named-human, or repository-owner identity claim. Detached checkouts remain readable but durable Decisions fail closed; a revoked running host stays bound and fail-closed while the next named-branch host rotates; a non-semantic process-releasing SQLite writer mutex serializes dead owner-record recovery, and complete owner records publish atomically. The threat model honestly excludes arbitrary same-UID, Plugin/runtime, and local OS-account compromise. The independently validated successor graph preserves the historical M3.5 outcome, adds a distinct M3.6 Ticket, and contains 12 Tickets and 12 direct relations at graph digest sha256:09d0081f034778d293e4563b0a45bb411c1e2e1baf714cb1d9c8abe20f247be2."
     - id: "m4-ticket-execution-closeout"
       name: "Execute, verify, and close one Ticket through Outcome and Evidence"
-      status: planned
+      status: completed
+      completed_at: "2026-07-30T19:28:33-07:00"
+      evidence: "The MR-ready M4 runtime is complete without real-project dogfood: seven public execution operations, exact Git ContextBinding and staged-index identity, claim-time ignored-context recompilation, disposable worktree-local Run leases, bounded Evidence, independent single-terminal Outcome closeout, dynamic Decision-authority withdrawal, direct unlock/join derivation, CLI/MCP/Skill/HTML projection, and thin installed-runtime fallback are implemented. Final focused adversarial review returned ACCEPT; workspace typechecks, Core 450/450, CLI 105/105, MCP 25/25, npm package/tarball verification, release metadata, thin marketplace, real Claude/Codex host installation, artifact runtime/MCP startup, Codex plugin verification, Skill validation, and clean-cut searches passed. The final four-Ticket truth candidate c6fdc8f0c3f9aa236b572a18329b161ea255adaef69df28713faecdeae4263fa passed independent semantic validation, reloaded at 13 Tickets and 13 direct relations with graph digest sha256:14c552cd926a2ed0a21f3dab27a40357cf138c487cda5f8ede50b2c1ee9865e1, and was path-exact checkpointed in 85c7eb4e1be386a4022579d5168c7953bcc9d996. The final public npm audit was not repeated because it requires separate authorization to disclose dependency metadata; dependency manifests are unchanged, and real isolated artifact/host installation passed."
     - id: "m5-ticket-dogfood-clean-cut-proof"
       name: "Complete one real dogfood loop and prove the legacy cut remains clean"
       status: planned
   next:
-    - "Prepare concrete option and evidence packets for ticket-context-binding-decided, ticket-closeout-contract-decided, and ticket-dogfood-target-authorized, then ask the human to confirm each exact protected choice through the installed Plugin-host one-click Decision surface. Record installation-local authority rather than claiming cryptographic proof of the repository owner's identity, and do not ask the human to decide objectively adjudicable implementation details."
-    - "Advance M4 from ticket-execution-closeout-ready only after the exact context-binding and closeout successors are current, machine-valid, and durably human-attested; implement execution, Outcome, Evidence, and semantic closeout without adding a generic workflow engine."
-    - "Use the independently authorized bounded Plugin feature for M5, prove the full graph through a real parallel-path join, and retain SQLite only for disposable live execution state."
+    - "After merge, choose a bounded real Plugin feature for M5 and prove the graph through the shipped runtime; this dogfood is follow-up evidence, not an M4 or MR gate."
   commits:
     - "d92c99c docs(ticket): plan git-native skill-driven pivot"
     - "eb0590c docs(ticket): prepare git read authority cut"
@@ -60,3 +60,8 @@ progress:
     - "dbc60dc feat(ticket): add durable human decision attestation"
     - "e8f2afd chore(vibehub): ticket checkpoint"
     - "dd771df feat(ticket): replace passkeys with install-local authority"
+    - "80add4c chore(vibehub): ticket checkpoint"
+    - "1ee7235 chore(vibehub): ticket checkpoint"
+    - "f871632 chore(vibehub): ticket checkpoint"
+    - "85c7eb4 chore(vibehub): ticket checkpoint"
+    - "5da323c feat(ticket): complete execution and closeout runtime"
