@@ -1,6 +1,6 @@
 {
   "name": "vibehub-plugin",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "description": "Plugin-first local context runtime for Claude Code and Codex.",
   "license": "Apache-2.0",
@@ -20,11 +20,13 @@
     "verify:npm-release": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:npm-packages && node scripts/pack-npm-packages.mjs && pnpm verify:npm-install",
     "verify:release-marketplace": "node scripts/verify-release-marketplace.mjs",
     "verify:release-hosts": "node scripts/verify-release-hosts.mjs",
+    "verify:host-installer": "node scripts/verify-host-installer.mjs",
+    "verify:runtime-concurrency": "node scripts/verify-runtime-concurrency.mjs",
     "verify:artifact": "node scripts/verify-plugin-artifact.mjs",
     "verify:codex-plugin": "node scripts/verify-codex-plugin.mjs",
     "verify:isolated": "node scripts/verify-isolated-workbench.mjs",
     "dogfood": "node scripts/run-local-dogfood.mjs",
-    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:npm-packages && node scripts/pack-npm-packages.mjs && pnpm verify:npm-install && pnpm verify:artifact && pnpm verify:codex-plugin && pnpm dogfood"
+    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm verify:npm-packages && node scripts/pack-npm-packages.mjs && pnpm verify:npm-install && pnpm verify:artifact && pnpm verify:codex-plugin && pnpm verify:host-installer && pnpm verify:runtime-concurrency && pnpm dogfood"
   },
   "engines": {
     "node": ">=20"

@@ -3,6 +3,18 @@
 All notable VibeHub changes are recorded here. Versions follow Semantic
 Versioning.
 
+## 0.3.0
+
+- Added one authenticated, idempotent private-release installer for Claude Code
+  and OpenAI Codex through `vibehub host install`.
+- Extended release verification so the complete host install and public npm
+  runtime run on every certified macOS/Linux architecture, including a real
+  Codex MCP startup.
+- Bounded first-use npm runtime installation so a restricted network cannot
+  leave a host process waiting indefinitely.
+- Made release publication content-bound and rerun-safe: npm artifacts must
+  match the tag build, and a published GitHub Release is never overwritten.
+
 ## 0.2.2
 
 - Made npm release restarts compare normalized tar payloads, so identical

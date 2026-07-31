@@ -16,14 +16,14 @@ const packages = [
   "@vw-ai/vibehub-cli",
   "@vw-ai/vibehub-workbench-mcp",
 ];
-const deadline = Date.now() + 15 * 60_000;
+const deadline = Date.now() + 25 * 60_000;
 
 while (Date.now() < deadline) {
   const missing = packages.filter((name) => {
     const result = spawnSync(
       "npm",
       ["view", `${name}@${identity.version}`, "dist.integrity", "--json"],
-      { encoding: "utf8" },
+      { encoding: "utf8", timeout: 60_000 },
     );
     if (result.status !== 0) return true;
     try {
@@ -44,7 +44,7 @@ while (Date.now() < deadline) {
     process.exit(0);
   }
   process.stderr.write(`waiting for npm: ${missing.join(", ")}\n`);
-  await new Promise((resolveWait) => setTimeout(resolveWait, 5_000));
+  await new Promise((resolveWait) => setTimeout(resolveWait, 10_000));
 }
 
 throw new Error(`timed out waiting for VibeHub ${identity.version} on npm`);

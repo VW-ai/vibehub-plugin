@@ -50,22 +50,18 @@ close out → unlock direct dependents.**
 
 ## Install
 
-Requires Node.js 20 or newer. No global npm install, platform target, or API key
-is required.
-
-### Claude Code
+Requires Node.js 20 or newer and GitHub CLI access to this private repository.
+No global npm install, platform target, or API key is required.
 
 ```bash
-claude plugin marketplace add https://github.com/VW-ai/vibehub-plugin.git
-claude plugin install vibehub@vibehub
+gh auth login --hostname github.com
+npx -y @vw-ai/vibehub-cli@latest host install
 ```
 
-### OpenAI Codex
-
-```bash
-codex plugin marketplace add VW-ai/vibehub-plugin
-codex plugin add vibehub@vibehub
-```
+The installer detects Claude Code and Codex. Use `--hosts all` to require both.
+It downloads and verifies the matching immutable GitHub Release rather than
+following a moving branch. By default, it selects the latest published
+release; use `--version X.Y.Z` to pin one.
 
 ### CLI only
 
@@ -83,10 +79,17 @@ On first use, the plugin downloads its version-matched npm runtime into
 public packages are released through npm Trusted Publishing with registry
 signatures and SLSA provenance attestations.
 
+See [installation and update details](docs/INSTALL.md).
+
 ## Start with Tickets
 
-Open a new Claude Code session or Codex task in the repository you want to
-connect, then ask the host:
+Open a new session in the repository you want to connect. In Claude Code, run:
+
+```text
+/vibehub:vibehub-setup
+```
+
+In Codex, ask:
 
 ```text
 Use $vibehub-setup for this repository.
@@ -194,27 +197,9 @@ Evidence 和 Outcome 跟着 Git branch/worktree；本地 SQLite 保存 governed
 project knowledge 与可丢弃的运行协调状态。系统不需要 API key，也不会在运行
 时内置调用 LLM。
 
-VibeHub 通过两个 host marketplace 和 npm 发布。通过 Claude Code 安装：
-
-```bash
-claude plugin marketplace add https://github.com/VW-ai/vibehub-plugin.git
-claude plugin install vibehub@vibehub
-```
-
-通过 OpenAI Codex 安装：
-
-```bash
-codex plugin marketplace add VW-ai/vibehub-plugin
-codex plugin add vibehub@vibehub
-```
-
-也可以只运行 CLI：
-
-```bash
-npx @vw-ai/vibehub-cli doctor --repo /path/to/repository --json
-```
-
-安装完成后，在目标仓库的新会话中使用 `$vibehub-setup`，然后用
+安装时先用 GitHub CLI 登录有权访问本私有仓库的账号，再运行上面的一行
+installer。安装完成后，在目标仓库的新会话中，Claude Code 使用
+`/vibehub:vibehub-setup`，Codex 使用 `$vibehub-setup`。然后用
 `$vibehub-ticket-plan` 生成可执行 Ticket 图、用 `$vibehub-ticket-review`
 查看全图，再让 `$vibehub-ticket-run` 执行下一个 READY Ticket。执行结束后由
 另一个 Agent 使用 `$vibehub-ticket-closeout` 独立验证。Context Layer 仍可通过

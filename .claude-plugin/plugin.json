@@ -2,8 +2,8 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "vibehub",
   "displayName": "VibeHub",
-  "version": "0.2.2",
-  "description": "Git-native project semantics, governed knowledge skills, local lifecycle evidence, and deterministic MCP capabilities.",
+  "version": "0.3.0",
+  "description": "Git-native executable Ticket graphs, governed project context, and deterministic lifecycle evidence for Claude Code and Codex.",
   "author": { "name": "VibeHub Team" },
   "license": "Apache-2.0",
   "keywords": ["context", "collaboration", "knowledge", "hooks", "mcp"]

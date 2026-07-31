@@ -1,7 +1,7 @@
 {
   "name": "vibehub",
-  "version": "0.2.2",
-  "description": "Local-first project context, governed knowledge workflows, and mechanical coding-agent activity capture.",
+  "version": "0.3.0",
+  "description": "Git-native executable Ticket graphs, governed project context, and deterministic lifecycle evidence for Claude Code and Codex.",
   "author": {
     "name": "VibeHub Team",
     "url": "https://github.com/VW-ai/vibehub-plugin"
@@ -21,7 +21,7 @@
   "hooks": "./codex/hooks.json",
   "interface": {
     "displayName": "VibeHub",
-    "shortDescription": "Shared project context for coding agents",
+    "shortDescription": "Executable Ticket graphs for coding agents",
     "longDescription": "Use Git-native durable semantics with skill-owned intelligence, deterministic CLI/MCP operations, disposable local coordination, and lifecycle evidence across Codex and Claude Code.",
     "developerName": "VibeHub Team",
     "category": "Developer Tools",

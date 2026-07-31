@@ -6,7 +6,7 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-vibehub
@@ -15,13 +15,13 @@ concurrency:
 env:
   PNPM_VERSION: 10.8.1
   RELEASE_NODE_VERSION: 24
-  CLAUDE_CODE_VERSION: 2.1.177
+  CLAUDE_CODE_VERSION: 2.1.220
   CODEX_VERSION: 0.144.1
 
 jobs:
   source-gate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
         with:
@@ -65,6 +65,13 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-source-${{ github.ref_name }}
+          path: dist/npm/
+          if-no-files-found: error
+          retention-days: 30
+
   verify-public-runtime:
     needs: source-gate
     strategy:
@@ -76,50 +83,168 @@ jobs:
           - runner: ubuntu-24.04-arm
           - runner: ubuntu-24.04
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: marketplace-${{ github.ref_name }}
+          path: dist/release
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-source-${{ github.ref_name }}
+          path: dist/npm
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.RELEASE_NODE_VERSION }}
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
+      - name: Install pinned host CLIs
+        run: npm install --global "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" "@openai/codex@${CODEX_VERSION}"
       - run: node scripts/wait-for-npm-release.mjs "${GITHUB_REF_NAME}"
+      - name: Require published npm packages to match this tag's artifacts
+        run: node scripts/verify-published-npm-artifacts.mjs dist/npm "${GITHUB_REF_NAME}"
       - run: node scripts/verify-public-npm-runtime.mjs
+      - name: Verify the real installer with Claude and Codex
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          node scripts/verify-release-hosts.mjs dist/release \
+            --installer-package "@vw-ai/vibehub-cli@${version}"
 
-  publish:
+  prepare-release:
     needs: verify-public-runtime
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    outputs:
+      publish_needed: ${{ steps.release.outputs.publish_needed }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: actions/download-artifact@v4
         with:
           name: marketplace-${{ github.ref_name }}
           path: dist/release
 
-      - name: Install pinned host CLIs
-        run: npm install --global "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" "@openai/codex@${CODEX_VERSION}"
-
-      - name: Verify real host installation against the public npm runtime
-        run: node scripts/verify-release-hosts.mjs dist/release
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          package-manager-cache: false
 
       - name: Package the universal marketplace archive
         run: |
           version="${GITHUB_REF_NAME#v}"
           archive="vibehub-${version}-marketplace.tar.gz"
-          tar -czf "${archive}" -C dist/release .
+          source_date_epoch="$(git show -s --format=%ct HEAD)"
+          tar \
+            --sort=name \
+            --mtime="@${source_date_epoch}" \
+            --owner=0 \
+            --group=0 \
+            --numeric-owner \
+            -czf "${archive}" \
+            -C dist/release .
           shasum -a 256 "${archive}" > "${archive}.sha256"
 
-      - name: Publish the GitHub Release
+      - name: Prepare the private GitHub Release
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if ! gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+          if release_is_draft="$(gh release view "${GITHUB_REF_NAME}" --json isDraft --jq '.isDraft' 2>/dev/null)"; then
+            :
+          else
             gh release create "${GITHUB_REF_NAME}" --verify-tag --generate-notes --draft
+            release_is_draft=true
           fi
-          gh release upload "${GITHUB_REF_NAME}" --clobber vibehub-*-marketplace.tar.gz vibehub-*-marketplace.tar.gz.sha256
-          gh release edit "${GITHUB_REF_NAME}" --draft=false
+
+          version="${GITHUB_REF_NAME#v}"
+          archive="vibehub-${version}-marketplace.tar.gz"
+          checksum="${archive}.sha256"
+          if [ "${release_is_draft}" = "true" ]; then
+            gh release upload "${GITHUB_REF_NAME}" --clobber "${archive}" "${checksum}"
+            echo "publish_needed=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "publish_needed=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+          mkdir -p dist/private-release
+          gh release download "${GITHUB_REF_NAME}" \
+            --dir dist/private-release \
+            --pattern "${archive}" \
+            --pattern "${checksum}"
+
+      - name: Verify the downloaded private-release assets
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          archive="vibehub-${version}-marketplace.tar.gz"
+          checksum="${archive}.sha256"
+          node scripts/verify-github-release-assets.mjs \
+            "${archive}" \
+            "${checksum}" \
+            "dist/private-release/${archive}" \
+            "dist/private-release/${checksum}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: private-release-${{ github.ref_name }}
+          path: dist/private-release/
+          if-no-files-found: error
+          retention-days: 1
+
+  verify-private-installer:
+    needs: prepare-release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-source-${{ github.ref_name }}
+          path: dist/npm
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: private-release-${{ github.ref_name }}
+          path: dist/private-release
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.RELEASE_NODE_VERSION }}
+          package-manager-cache: false
+
+      - name: Verify the authenticated private-release artifact through the installer
+        run: >-
+          node scripts/verify-private-release-installer.mjs
+          "${GITHUB_REF_NAME}"
+          dist/npm
+          dist/private-release
+
+  publish-release:
+    needs:
+      - prepare-release
+      - verify-private-installer
+    if: needs.prepare-release.outputs.publish_needed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Publish the verified GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release edit "${GITHUB_REF_NAME}"
+          --repo "${GITHUB_REPOSITORY}"
+          --draft=false
