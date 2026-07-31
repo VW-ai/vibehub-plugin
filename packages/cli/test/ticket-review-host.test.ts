@@ -94,7 +94,7 @@ describe("Git Ticket review host", () => {
     );
   });
 
-  it("serves one current Git graph and complete executable context", async () => {
+  it("serves one current Git graph with recorded context and operational state", async () => {
     const host = startTicketReviewHost({
       repoRoot: repo,
       dbPath,
@@ -121,9 +121,37 @@ describe("Git Ticket review host", () => {
           },
           tickets: expect.arrayContaining([
             expect.objectContaining({
+              ticketId: "design-schema",
+              capabilities: expect.objectContaining({
+                operational: expect.objectContaining({
+                  availability: "available",
+                  producerReceiptRef: expect.any(String),
+                  summary: {
+                    label: "READY",
+                    detail: "All direct prerequisites have accepted current Outcomes",
+                    references: [],
+                  },
+                }),
+              }),
+            }),
+            expect.objectContaining({
               ticketId: "implement-api",
               ticketRevision: expect.any(String),
               outcome: "Expose the accepted API",
+              capabilities: expect.objectContaining({
+                operational: expect.objectContaining({
+                  availability: "available",
+                  producerReceiptRef: expect.any(String),
+                  summary: {
+                    label: "BLOCKED",
+                    detail: "Waiting for 1 prerequisite",
+                    references: [{
+                      ref: "design-schema",
+                      label: "Blocking prerequisite",
+                    }],
+                  },
+                }),
+              }),
             }),
           ]),
           relations: [
@@ -158,6 +186,17 @@ describe("Git Ticket review host", () => {
           ticket: {
             ticketId: "implement-api",
             ticketRevision: expect.any(String),
+            capabilities: {
+              operational: {
+                availability: "available",
+                summary: {
+                  label: "BLOCKED",
+                  references: [{
+                    ref: "design-schema",
+                  }],
+                },
+              },
+            },
           },
           contextPackage: {
             context: "Implement the endpoint against the accepted schema.",
@@ -264,6 +303,12 @@ describe("Git Ticket review host", () => {
     expect(retiredWebAuthnAsset.status).toBe(404);
     expect(html).not.toMatch(/authorize|decision rationale|validation/i);
     expect(html).not.toContain("/webauthn.js");
+    expect(html).not.toMatch(
+      /complete executable context|\.vibehub\/tickets\/tickets|add documents/i,
+    );
+    expect(html).toContain(
+      "Select a Ticket to inspect its current state, context, and trace.",
+    );
     expect(html).toContain('class="source-ref"');
     expect(html).toContain('preserveAspectRatio="xMidYMid meet"');
     expect(script).toContain('route: "/api/review"');
@@ -280,6 +325,19 @@ describe("Git Ticket review host", () => {
     expect(script).toContain("activeActionKey = draftKey");
     expect(script).toContain("traceSubjectMatches");
     expect(script).toContain("traceDecisionDetails(record.decision)");
+    expect(script).toContain("ticketOperationalState(ticket)");
+    expect(script).toContain("executionStateView(ticket)");
+    expect(script).toContain('"READY"');
+    expect(script).toContain('"DONE"');
+    expect(script).toContain('"BLOCKED"');
+    expect(script).toContain('"DEVIATED"');
+    expect(script).toContain('record.kind !== "outcome"');
+    expect(script).not.toMatch(
+      /context a fresh Agent receives|Reading executable context|Reading review facts|No review facts/i,
+    );
+    expect(styles).toContain(".ticket-node.state-deviated");
+    expect(styles).toContain(".execution-state.state-done");
+    expect(styles).toContain(".trace-row.trace-deviated");
     expect(script).toContain('append("Boundary", decision.boundary)');
     expect(script).toContain('append("Selection", decision.selection)');
     expect(script).toContain(

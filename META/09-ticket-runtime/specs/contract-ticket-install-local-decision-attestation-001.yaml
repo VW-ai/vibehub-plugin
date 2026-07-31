@@ -102,9 +102,9 @@ relations:
   - target: "decision-ticket-skill-driven-boundary-001"
     type: depends_on
     detail: "Exposes verified authority evidence to Skills without moving semantic judgment into Core."
-  - target: "decision-ticket-context-binding-001"
+  - target: "contract-ticket-context-binding-001"
     type: relates_to
-    detail: "Protected context-binding may use this exact local-installation receipt without treating it as named-human identity."
+    detail: "The context-binding mechanics are Agent-owned; only a genuine protected product, permission, or material-risk Decision discovered around execution may use this receipt."
 anchors:
   - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md"
   - file: "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md"

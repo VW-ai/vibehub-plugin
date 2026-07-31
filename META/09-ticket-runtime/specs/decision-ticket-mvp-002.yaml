@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-mvp-002"
 type: decision
-state: active
+state: superseded
 intent:
   summary: "第一版 Ticket dogfood 是 Git documents + Skills + deterministic scripts + graph HTML + disposable runtime，而不是一套重型发布服务。"
   detail: |
@@ -52,6 +52,9 @@ provenance:
   produced_by_agent: "ingest"
   produced_at: "2026-07-29"
 relations:
+  - target: "decision-ticket-mr-ready-boundary-001"
+    type: superseded_by
+    detail: "The implementation boundary is now M4 MR readiness; this decision's real Plugin-feature proof remains post-merge M5."
   - target: "decision-ticket-mvp-001"
     type: supersedes
     detail: "Replaces the trusted-host and cross-store application MVP."

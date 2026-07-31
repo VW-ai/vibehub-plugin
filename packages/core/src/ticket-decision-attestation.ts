@@ -11,14 +11,20 @@ import {
   type TicketDecisionAttestationDocument,
   type TicketDecisionAttestationEnvelope,
   type TicketDecisionAttestationScope,
+  type TicketContextBindingDocument,
   type TicketLedgerDecision,
   type TicketLedgerDecisionAttestation,
+  type TicketLedgerContextBinding,
   type TicketLedgerSnapshot,
+  type TicketLedgerTicket,
   type TicketLedgerWorktreeSource,
 } from "./ticket-ledger/index.js";
 import {
   type TicketReviewProjectionSourceV0,
 } from "./ticket-review-source.js";
+import {
+  assertTicketContextRefsExecutable,
+} from "./ticket-context-compiler.js";
 
 const DEFAULT_DECISION_ATTESTATION_TTL_MS = 30 * 60 * 1_000;
 
@@ -57,7 +63,270 @@ export interface TicketDecisionAttestationVerifierV0 {
   verify(
     snapshot: TicketLedgerSnapshot,
     decision: TicketLedgerDecision,
+    expectedVerificationRef?: string,
   ): TicketDecisionAttestationVerificationV0;
+}
+
+export type TicketExecutionDecisionAuthorityIssueReasonV0 =
+  | TicketDecisionAttestationUnverifiedReasonV0
+  | "decision_set_changed"
+  | "decision_binding_changed"
+  | "verification_binding_changed"
+  | "non_authorizing_disposition"
+  | "context_ref_policy_changed";
+
+export interface TicketExecutionDecisionAuthorityIssueV0 {
+  reason: TicketExecutionDecisionAuthorityIssueReasonV0;
+  message: string;
+  decisionId: string | null;
+  decisionType: string | null;
+  disposition: string | null;
+  verificationRef: string | null;
+}
+
+export interface TicketExecutionVerifiedDecisionV0 {
+  decision: TicketLedgerDecision;
+  verification: Extract<
+    TicketDecisionAttestationVerificationV0,
+    { status: "verified" }
+  >;
+}
+
+export type TicketExecutionDecisionAuthorityVerificationV0 =
+  | {
+      status: "verified";
+      decisions: readonly TicketExecutionVerifiedDecisionV0[];
+    }
+  | {
+      status: "unverified";
+      issue: TicketExecutionDecisionAuthorityIssueV0;
+    };
+
+export interface TicketExecutionDecisionAuthorityProjectionV0 {
+  contextBindings: readonly TicketLedgerContextBinding[];
+  issuesByContextBinding: ReadonlyMap<
+    string,
+    TicketExecutionDecisionAuthorityIssueV0
+  >;
+}
+
+const relevantExecutionDecisions = (
+  snapshot: TicketLedgerSnapshot,
+  ticket: TicketLedgerTicket,
+): TicketLedgerDecision[] =>
+  snapshot.decisions.filter(({ document }) => {
+    if (document.subject.kind === "graph") {
+      return document.subject.graph_digest === snapshot.graphDigest;
+    }
+    return document.subject.kind === "ticket"
+      && document.subject.ticket_id === ticket.document.ticket_id
+      && document.subject.ticket_revision === ticket.ticketRevision;
+  }).sort((left, right) =>
+    compareText(left.document.decision_id, right.document.decision_id));
+
+const decisionAuthorizesExecution = (
+  decision: TicketLedgerDecision,
+): boolean => decision.document.decision_type === "plan_review"
+  ? decision.document.disposition !== "request_changes"
+  : decision.document.disposition === "resolve";
+
+const authorityIssue = (
+  reason: TicketExecutionDecisionAuthorityIssueReasonV0,
+  message: string,
+  decision?: TicketLedgerDecision,
+  verificationRef?: string,
+): TicketExecutionDecisionAuthorityVerificationV0 => ({
+  status: "unverified",
+  issue: {
+    reason,
+    message,
+    decisionId: decision?.document.decision_id ?? null,
+    decisionType: decision?.document.decision_type ?? null,
+    disposition: decision?.document.disposition ?? null,
+    verificationRef: verificationRef ?? null,
+  },
+});
+
+/**
+ * Resolves the exact current Decision authority set for one Ticket. A bound
+ * ContextBinding must name every currently relevant Decision, its exact
+ * document digest, and the exact verification receipt that is still trusted
+ * now. Repository bytes remain evidence; current execution authority does not.
+ */
+export function verifyTicketExecutionDecisionAuthorityV0(
+  snapshot: TicketLedgerSnapshot,
+  ticket: TicketLedgerTicket,
+  verifier: TicketDecisionAttestationVerifierV0,
+  boundDecisions?: ReadonlyArray<
+    TicketContextBindingDocument["relevant_decisions"][number]
+  >,
+): TicketExecutionDecisionAuthorityVerificationV0 {
+  const decisions = relevantExecutionDecisions(snapshot, ticket);
+  if (
+    boundDecisions !== undefined
+    && boundDecisions.length !== decisions.length
+  ) {
+    return authorityIssue(
+      "decision_set_changed",
+      `Ticket ${ticket.document.ticket_id} Decision authority set changed`,
+    );
+  }
+
+  const verified: TicketExecutionVerifiedDecisionV0[] = [];
+  for (const decision of decisions) {
+    const bound = boundDecisions?.find((candidate) =>
+      candidate.decision_id === decision.document.decision_id);
+    const decisionDigest = ticketDecisionDocumentDigest(
+      decision.document,
+    );
+    if (
+      boundDecisions !== undefined
+      && (
+        bound === undefined
+        || bound.decision_digest !== decisionDigest
+      )
+    ) {
+      return authorityIssue(
+        "decision_binding_changed",
+        `Ticket ${ticket.document.ticket_id} Decision authority binding changed`,
+        decision,
+        bound?.verification.verification_ref,
+      );
+    }
+    const verification = verifier.verify(
+      snapshot,
+      decision,
+      bound?.verification.verification_ref,
+    );
+    if (verification.status !== "verified") {
+      return authorityIssue(
+        verification.reason,
+        `Ticket ${ticket.document.ticket_id} has a relevant Decision without current authority`,
+        decision,
+        bound?.verification.verification_ref
+          ?? verification.attestationId,
+      );
+    }
+    if (
+      bound !== undefined
+      && (
+        verification.verificationRef
+          !== bound.verification.verification_ref
+        || verification.source !== bound.verification.source
+      )
+    ) {
+      return authorityIssue(
+        "verification_binding_changed",
+        `Ticket ${ticket.document.ticket_id} Decision authority receipt changed`,
+        decision,
+        bound.verification.verification_ref,
+      );
+    }
+    if (!decisionAuthorizesExecution(decision)) {
+      return authorityIssue(
+        "non_authorizing_disposition",
+        `Ticket ${ticket.document.ticket_id} has a relevant Decision that does not authorize execution`,
+        decision,
+        verification.verificationRef,
+      );
+    }
+    verified.push({ decision, verification });
+  }
+  return { status: "verified", decisions: verified };
+}
+
+/**
+ * Builds the authority-aware operational view without deleting or rewriting
+ * any Git-native semantic fact. Invalid ContextBindings are absent only from
+ * the current execution projection, so their Outcomes remain traceable while
+ * no longer satisfying DONE or unlocking dependents.
+ */
+export function projectTicketExecutionDecisionAuthorityV0(
+  snapshot: TicketLedgerSnapshot,
+  verifier: TicketDecisionAttestationVerifierV0,
+): TicketExecutionDecisionAuthorityProjectionV0 {
+  const tickets = new Map(snapshot.tickets.map((ticket) => [
+    ticket.document.ticket_id,
+    ticket,
+  ]));
+  const contextBindings: TicketLedgerContextBinding[] = [];
+  const issuesByContextBinding = new Map<
+    string,
+    TicketExecutionDecisionAuthorityIssueV0
+  >();
+  for (const binding of snapshot.contextBindings) {
+    const ticket = tickets.get(binding.document.subject.ticket_id);
+    if (
+      ticket === undefined
+      || ticket.ticketRevision !== binding.document.subject.ticket_revision
+    ) {
+      // Historical bindings are never candidates for the current successful
+      // Outcome and remain harmless in the mechanical derivation.
+      contextBindings.push(binding);
+      continue;
+    }
+    try {
+      assertTicketContextRefsExecutable(ticket.document.context_refs);
+      assertTicketContextRefsExecutable([
+        ...binding.document.context_entries.map((entry) => ({
+          ref: entry.ref,
+          purpose: entry.purpose,
+        })),
+        ...binding.document.context_entries.flatMap((entry) =>
+          entry.files.map((file) => ({
+            ref: file.repository_path,
+            purpose: `Compiled file for ${entry.ref}`,
+          }))),
+      ]);
+      const expectedContextRefs = [...ticket.document.context_refs]
+        .sort((left, right) => compareText(left.ref, right.ref));
+      const boundContextRefs = binding.document.context_entries
+        .map((entry) => ({
+          ref: entry.ref,
+          purpose: entry.purpose,
+        }))
+        .sort((left, right) => compareText(left.ref, right.ref));
+      if (
+        canonicalTicketLedgerValue(expectedContextRefs)
+        !== canonicalTicketLedgerValue(boundContextRefs)
+      ) {
+        throw new Error(
+          "ContextBinding does not exactly cover the current Ticket context refs",
+        );
+      }
+    } catch (error) {
+      issuesByContextBinding.set(
+        binding.document.context_binding_id,
+        {
+          reason: "context_ref_policy_changed",
+          message:
+            `Ticket ${ticket.document.ticket_id} context reference policy changed: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          decisionId: null,
+          decisionType: null,
+          disposition: null,
+          verificationRef: null,
+        },
+      );
+      continue;
+    }
+    const authority = verifyTicketExecutionDecisionAuthorityV0(
+      snapshot,
+      ticket,
+      verifier,
+      binding.document.relevant_decisions,
+    );
+    if (authority.status === "verified") {
+      contextBindings.push(binding);
+      continue;
+    }
+    issuesByContextBinding.set(
+      binding.document.context_binding_id,
+      authority.issue,
+    );
+  }
+  return { contextBindings, issuesByContextBinding };
 }
 
 export interface TicketDecisionLocalSignatureTrustProfileLookupV0 {
@@ -259,13 +528,21 @@ const compareCanonical = (left: unknown, right: unknown): boolean =>
 const attestationCandidates = (
   snapshot: TicketLedgerSnapshot,
   decision: TicketLedgerDecision,
+  expectedVerificationRef?: string,
 ): TicketLedgerDecisionAttestation[] =>
   snapshot.attestations
     .filter((attestation) =>
-      attestation.document.decision.decision_id
-        === decision.document.decision_id
-      || attestation.document.decision.document_path
-        === decision.documentPath)
+      (
+        attestation.document.decision.decision_id
+          === decision.document.decision_id
+        || attestation.document.decision.document_path
+          === decision.documentPath
+      )
+      && (
+        expectedVerificationRef === undefined
+        || attestation.document.attestation_id
+          === expectedVerificationRef
+      ))
     .sort((left, right) => {
       const byId = compareText(
         left.document.attestation_id,
@@ -294,6 +571,7 @@ implements TicketDecisionAttestationVerifierV0 {
   verify(
     snapshot: TicketLedgerSnapshot,
     decision: TicketLedgerDecision,
+    expectedVerificationRef?: string,
   ): TicketDecisionAttestationVerificationV0 {
     if (snapshot.source.mode !== "worktree") {
       return unverified("source_not_worktree");
@@ -310,7 +588,11 @@ implements TicketDecisionAttestationVerifierV0 {
       return unverified("decision_not_durable");
     }
 
-    const candidates = attestationCandidates(snapshot, decision);
+    const candidates = attestationCandidates(
+      snapshot,
+      decision,
+      expectedVerificationRef,
+    );
     if (candidates.length === 0) {
       return unverified("attestation_not_found");
     }
@@ -500,14 +782,28 @@ implements TicketDecisionAttestationVerifierV0 {
   verify(
     snapshot: TicketLedgerSnapshot,
     decision: TicketLedgerDecision,
+    expectedVerificationRef?: string,
   ): TicketDecisionAttestationVerificationV0 {
     let firstFailure: TicketDecisionAttestationVerificationV0 | undefined;
+    let lastFailure: TicketDecisionAttestationVerificationV0 | undefined;
     for (const verifier of this.verifiers) {
-      const result = verifier.verify(snapshot, decision);
+      const result = verifier.verify(
+        snapshot,
+        decision,
+        expectedVerificationRef,
+      );
       if (result.status === "verified") return result;
       firstFailure ??= result;
+      lastFailure = result;
     }
-    return firstFailure ?? unverified("attestation_not_found");
+    // Durable receipt refs (`tda-`) are handled by the first verifier in the
+    // production composite, while process-local refs (`tdsa-`) are handled by
+    // the session registry that follows it. Preserve the relevant verifier's
+    // exact expired/identity failure instead of masking it with an unrelated
+    // durable `attestation_not_found`.
+    return expectedVerificationRef?.startsWith("tdsa-") === true
+      ? lastFailure ?? unverified("attestation_not_found")
+      : firstFailure ?? unverified("attestation_not_found");
   }
 }
 
@@ -579,6 +875,7 @@ implements TicketDecisionAttestationVerifierV0 {
   verify(
     snapshot: TicketLedgerSnapshot,
     decision: TicketLedgerDecision,
+    expectedVerificationRef?: string,
   ): TicketDecisionAttestationVerificationV0 {
     const key = decisionAttestationKey(snapshot, decision);
     if (key === null || snapshot.source.mode !== "worktree") {
@@ -586,6 +883,12 @@ implements TicketDecisionAttestationVerifierV0 {
     }
     const entry = this.entries.get(key);
     if (entry === undefined) return unverified("attestation_not_found");
+    if (
+      expectedVerificationRef !== undefined
+      && entry.receiptRef !== expectedVerificationRef
+    ) {
+      return unverified("attestation_identity_mismatch");
+    }
     const now = this.now();
     if (entry.expiresAt <= now) {
       this.entries.delete(key);
@@ -613,24 +916,19 @@ implements TicketDecisionAttestationVerifierV0 {
       source: "host_session",
     };
   }
-
-  /** Backward-compatible convenience for internal callers. */
-  verificationRef(
-    snapshot: TicketLedgerSnapshot,
-    decision: TicketLedgerDecision,
-  ): string | null {
-    const result = this.verify(snapshot, decision);
-    return result.status === "verified"
-      ? result.verificationRef
-      : null;
-  }
 }
 
 export function projectTicketLedgerForTrustedDecisionHostV0(
   snapshot: TicketLedgerSnapshot,
   verifier: TicketDecisionAttestationVerifierV0,
 ): TicketReviewProjectionSourceV0 {
-  const source = projectTicketLedgerForReview(snapshot);
+  const executionAuthority =
+    projectTicketExecutionDecisionAuthorityV0(snapshot, verifier);
+  const source = projectTicketLedgerForReview(snapshot, {
+    contextBindings: executionAuthority.contextBindings,
+    issuesByContextBinding:
+      executionAuthority.issuesByContextBinding,
+  });
   const decisions = new Map(snapshot.decisions.map((decision) => [
     decision.document.decision_id,
     decision,

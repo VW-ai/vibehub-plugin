@@ -34,16 +34,16 @@ only far enough to compare the relevant design claims.
 
 Primary local entities consulted:
 
-- `/Users/waynewang/MyLibrary/library/entities/intelligence-as-skill.md`
-- `/Users/waynewang/MyLibrary/library/entities/matt-pocock.md`
-- `/Users/waynewang/MyLibrary/library/entities/matt-pocock-skills-repo.md`
-- `/Users/waynewang/MyLibrary/library/entities/MyLibrary.md`
-- `/Users/waynewang/MyLibrary/library/entities/Vibehub.md`
-- `/Users/waynewang/MyLibrary/library/entities/Robin.md`
-- `/Users/waynewang/MyLibrary/library/entities/determinism-boundary.md`
-- `/Users/waynewang/MyLibrary/library/entities/skill-harness-engineering.md`
-- `/Users/waynewang/MyLibrary/library/entities/skill-battlefield.md`
-- `/Users/waynewang/lib-skill/_stdlib/relations-vocabulary.md`
+- MyLibrary entity `intelligence-as-skill`
+- MyLibrary entity `matt-pocock`
+- MyLibrary entity `matt-pocock-skills-repo`
+- MyLibrary entity `MyLibrary`
+- MyLibrary entity `Vibehub`
+- MyLibrary entity `Robin`
+- MyLibrary entity `determinism-boundary`
+- MyLibrary entity `skill-harness-engineering`
+- MyLibrary entity `skill-battlefield`
+- lib-skill shared `relations-vocabulary`
 
 ## Emerging boundary
 

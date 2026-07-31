@@ -9,9 +9,12 @@
   --line-strong: rgba(27, 31, 36, 0.22);
   --blue: #4778d5;
   --blue-soft: #e8effc;
+  --green: #3f7b66;
+  --green-soft: #e6f0eb;
   --amber: #a46d22;
   --amber-soft: #f6ecda;
   --red: #b14b50;
+  --red-soft: #f5e8e9;
   --shadow:
     0 1px 1px rgba(18, 23, 29, 0.05),
     0 16px 48px rgba(18, 23, 29, 0.13);
@@ -165,6 +168,11 @@ input:focus-visible {
   background: var(--amber-soft);
 }
 
+.signal-attention.deviated {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
 .signal-attention.error {
   color: var(--red);
 }
@@ -316,6 +324,11 @@ input:focus-visible {
   box-shadow: 0 0 0 3px rgba(164, 109, 34, 0.13);
 }
 
+.state-dot.deviated {
+  background: var(--red);
+  box-shadow: 0 0 0 3px rgba(177, 75, 80, 0.13);
+}
+
 .state-dot.error {
   background: var(--red);
   box-shadow: 0 0 0 3px rgba(177, 75, 80, 0.13);
@@ -384,6 +397,31 @@ input:focus-visible {
   vector-effect: non-scaling-stroke;
 }
 
+.minimap-node {
+  fill: #fbfbfa;
+  stroke: #6b6f75;
+}
+
+.minimap-node.state-ready {
+  fill: #f1f5fc;
+  stroke: var(--blue);
+}
+
+.minimap-node.state-done {
+  fill: #eff5f2;
+  stroke: var(--green);
+}
+
+.minimap-node.state-blocked {
+  fill: #f2f3f4;
+  stroke: #7f8790;
+}
+
+.minimap-node.state-deviated {
+  fill: #f8eeee;
+  stroke: var(--red);
+}
+
 .ticket-node,
 .edge {
   cursor: pointer;
@@ -416,6 +454,30 @@ input:focus-visible {
   vector-effect: non-scaling-stroke;
 }
 
+.ticket-node.state-ready .ticket-aperture {
+  fill: var(--blue-soft);
+  stroke: var(--blue);
+}
+
+.ticket-node.state-done .ticket-aperture {
+  fill: var(--green-soft);
+  stroke: var(--green);
+}
+
+.ticket-node.state-blocked .ticket-aperture {
+  fill: #eef0f2;
+  stroke: #7f8790;
+}
+
+.ticket-node.state-deviated .ticket-boundary {
+  stroke: rgba(177, 75, 80, 0.72);
+}
+
+.ticket-node.state-deviated .ticket-aperture {
+  fill: var(--red-soft);
+  stroke: var(--red);
+}
+
 .ticket-node.selected .ticket-aperture {
   fill: var(--blue);
   stroke: var(--blue);
@@ -435,6 +497,27 @@ input:focus-visible {
 .ticket-meta {
   fill: #8b9198;
   font: 10px/1 var(--mono);
+}
+
+.ticket-state {
+  font: 620 9px/1 var(--mono);
+  letter-spacing: 0.055em;
+}
+
+.ticket-node.state-ready .ticket-state {
+  fill: var(--blue);
+}
+
+.ticket-node.state-done .ticket-state {
+  fill: var(--green);
+}
+
+.ticket-node.state-blocked .ticket-state {
+  fill: #747b84;
+}
+
+.ticket-node.state-deviated .ticket-state {
+  fill: var(--red);
 }
 
 .edge-visible {
@@ -631,6 +714,87 @@ input:focus-visible {
   color: var(--red) !important;
 }
 
+.execution-state {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+}
+
+.execution-state-mark {
+  width: 7px;
+  height: 7px;
+  margin-top: 4px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.execution-state-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.execution-state-copy strong {
+  font: 620 10px/1.35 var(--mono);
+  letter-spacing: 0.055em;
+}
+
+.execution-state-copy span {
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.execution-state.state-ready {
+  color: var(--blue);
+}
+
+.execution-state.state-done {
+  color: var(--green);
+}
+
+.execution-state.state-blocked {
+  color: #747b84;
+}
+
+.execution-state.state-deviated {
+  color: var(--red);
+}
+
+.execution-state.state-ready .execution-state-mark,
+.execution-state.state-done .execution-state-mark,
+.execution-state.state-deviated .execution-state-mark {
+  background: currentColor;
+}
+
+.execution-state-references {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+.execution-state-references button {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 4px;
+  color: var(--ink-faint);
+  background: rgba(25, 30, 36, 0.045);
+  cursor: pointer;
+  font: 10px/1.35 var(--mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.execution-state-references button:hover {
+  color: var(--ink);
+  background: rgba(25, 30, 36, 0.075);
+}
+
 .quiet-list {
   display: grid;
   gap: 7px;
@@ -712,6 +876,21 @@ input:focus-visible {
 .trace-row.historical .trace-marker {
   border-color: rgba(74, 81, 89, 0.32);
   background: #f2f3f4;
+}
+
+.trace-row.trace-done .trace-marker {
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.trace-row.trace-blocked .trace-marker {
+  border-color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.trace-row.trace-deviated .trace-marker {
+  border-color: var(--red);
+  background: var(--red);
 }
 
 .trace-copy {

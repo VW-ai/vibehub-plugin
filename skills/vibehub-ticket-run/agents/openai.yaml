@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Ticket Run"
+  short_description: "Execute one ready Ticket with exact context"
+  default_prompt: "Use $vibehub-ticket-run to execute the next ready Ticket safely."

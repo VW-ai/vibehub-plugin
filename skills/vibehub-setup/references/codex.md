@@ -22,11 +22,11 @@ codex plugin marketplace add "$(pwd)/dist/codex-marketplace"
 codex plugin add vibehub@vibehub-local
 ```
 
-`build:codex-marketplace` rebuilds the shared core/CLI/MCP package `dist`
-directories and writes the marketplace under
-`dist/codex-marketplace`; it does not edit user HOME or a target
-project. The two `codex plugin` commands are the explicit machine-install step
-and update Codex's own local plugin state.
+`build:codex-marketplace` writes a thin marketplace under
+`dist/codex-marketplace`; the installed Plugin's versioned runtime launcher
+loads the shared core/CLI/MCP packages. The build does not edit user HOME or a
+target project. The two `codex plugin` commands are the explicit
+machine-install step and update Codex's own local plugin state.
 After installation:
 
 1. Start a new Codex task in the target checkout so the plugin skills, MCP
@@ -44,17 +44,17 @@ then start another new task.
 ## Packaged host components
 
 - `.codex-plugin/plugin.json` points at the canonical `skills/` tree.
-- `codex/mcp.json` starts `./packages/mcp/dist/stdio.js` from plugin-root
-  `cwd: "."`. The shared MCP requests the Codex client's workspace roots and
-  derives repository identity from the one Git root; Claude/older clients
-  retain the inherited-project-cwd fallback. No absolute development path is
-  embedded.
+- `codex/mcp.json` starts `./runtime/vibehub-runtime.mjs mcp` from plugin-root
+  `cwd: "."`. The launcher resolves the version-matched shared MCP package,
+  which requests the Codex client's workspace roots and derives repository
+  identity from the one Git root; Claude/older clients retain the
+  inherited-project-cwd fallback. No absolute development path is embedded.
 - `codex/hooks.json` invokes the shared CLI with `--host codex`. Codex supplies
   `PLUGIN_ROOT` and compatibility `CLAUDE_PLUGIN_ROOT` to plugin hooks.
-- The packaged CLI remains available beneath
-  `packages/cli/dist/main.js`. The setup skill resolves it from its own
-  installed plugin root when no explicit `VIBEHUB_BIN` or PATH executable is
-  available.
+- The thin Plugin's CLI remains available through
+  `runtime/vibehub-runtime.mjs cli`. Packaged Skill wrappers resolve that
+  launcher from their own installed Plugin root when no explicit
+  `VIBEHUB_BIN` or source-tree CLI is available.
 
 If the MCP server is disabled, hook trust is pending, the project is untrusted,
 or an enterprise policy permits managed hooks only, stop and report the exact
@@ -91,7 +91,7 @@ persistent state to make the state advance.
 Available on Codex now:
 
 - project instructions through the managed `AGENTS.md` block;
-- all six packaged workflow skills and all six MCP capabilities;
+- all packaged workflow skills and the shared MCP tool surface;
 - the full CLI and the same deterministic operation receipts;
 - host-attributed session and user-turn evidence;
 - checkpoint reminders and queued context delivery at SessionStart or

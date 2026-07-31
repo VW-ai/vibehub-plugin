@@ -24,6 +24,7 @@ server.server.oninitialized = async () => {
       listRoots: async () => (await server.server.listRoots()).roots,
       cwd: process.cwd(),
       dbPath: resolveDbPath(),
+      clientInfo: server.server.getClientVersion(),
     });
     resolveContext(runtime.context);
   } catch (error) {

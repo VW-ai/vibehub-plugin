@@ -1051,18 +1051,57 @@ const MIGRATIONS: string[] = [
   );
   `,
 
-  // 017–020 — retired Ticket semantic-runtime migration slots. The slots stay
-  // empty so an existing operational DB can advance to migration 021 without
-  // replaying or recreating the removed semantic schema.
+  // 017–021 — previously published schema-version positions. They remain
+  // empty in the clean-cut schema solely to keep user_version monotonic; no
+  // retired Ticket table, trigger, receipt, or compatibility runtime is
+  // recreated.
+  ``,
   ``,
   ``,
   ``,
   ``,
 
-  // 021 — remove the retired early-stage Ticket semantic runtime. Ticket
-  // definitions and every durable Ticket fact now follow Git documents;
-  // SQLite retains only generic operational coordination.
-  ``,
+  // 022 — disposable Ticket execution leases. This table coordinates one
+  // current executor for an exact repo/worktree/Ticket revision. It contains
+  // no Ticket status, outcome, evidence, acceptance, or other semantic fact;
+  // deleting the database merely forgets transient ownership.
+  `
+  CREATE TABLE ticket_runs (
+    repo_id INTEGER NOT NULL REFERENCES repos(id),
+    worktree_identity TEXT NOT NULL,
+    run_id TEXT NOT NULL,
+    ticket_id TEXT NOT NULL,
+    ticket_revision TEXT NOT NULL,
+    context_binding_id TEXT NOT NULL,
+    context_binding_digest TEXT NOT NULL,
+    actor TEXT NOT NULL,
+    start_source_digest TEXT NOT NULL,
+    start_branch TEXT NOT NULL,
+    start_head_sha TEXT NOT NULL,
+    lease_generation INTEGER NOT NULL,
+    token_hash TEXT NOT NULL,
+    claimed_at TEXT NOT NULL,
+    heartbeat_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    released_at TEXT,
+    release_reason TEXT,
+    PRIMARY KEY (repo_id, run_id),
+    CHECK (lease_generation > 0),
+    CHECK (length(token_hash) = 64),
+    CHECK (expires_at > claimed_at),
+    CHECK (
+      (released_at IS NULL AND release_reason IS NULL) OR
+      (released_at IS NOT NULL AND release_reason IS NOT NULL)
+    )
+  );
+
+  CREATE UNIQUE INDEX idx_ticket_runs_unreleased_claim
+    ON ticket_runs(repo_id, worktree_identity, ticket_id, ticket_revision)
+    WHERE released_at IS NULL;
+  CREATE INDEX idx_ticket_runs_current
+    ON ticket_runs(repo_id, worktree_identity, expires_at)
+    WHERE released_at IS NULL;
+  `,
 ];
 
 /** Stable schema version reported by `vibehub doctor --json`. */
@@ -1164,64 +1203,10 @@ function migrate(db: Db): void {
       db.exec(MIGRATIONS[v]!);
       if (v === 7) importLegacyGraphV2(db);
       if (v === 13) migrateInterventionReceiptHashes(db);
-      if (v === 20) removeRetiredTicketSemanticRuntime(db);
       db.pragma(`user_version = ${v + 1}`);
     });
     apply();
   }
-}
-
-function removeRetiredTicketSemanticRuntime(db: Db): void {
-  db.exec(`
-    DROP TRIGGER IF EXISTS operation_request_receipt_blob_binding_insert;
-
-    DROP TABLE IF EXISTS ticket_proposal_application_receipts;
-    DROP TABLE IF EXISTS ticket_proposal_application_intents;
-    DROP TABLE IF EXISTS ticket_proposal_authority_decisions;
-    DROP TABLE IF EXISTS ticket_proposal_validation_receipts;
-    DROP TABLE IF EXISTS ticket_proposals;
-  `);
-
-  const receiptColumns = db.pragma(
-    "table_info(operation_request_receipts)",
-  ) as Array<{ name: string }>;
-  if (receiptColumns.some((column) => column.name === "outcome_blob_digest")) {
-    db.exec(`
-      CREATE TABLE operation_request_receipts_v21 (
-        repo_id INTEGER NOT NULL REFERENCES repos(id),
-        request_id TEXT NOT NULL,
-        operation TEXT NOT NULL,
-        payload_hash TEXT NOT NULL,
-        outcome_kind TEXT NOT NULL CHECK(outcome_kind IN ('success','error')),
-        outcome TEXT NOT NULL CHECK(json_valid(outcome)),
-        created_at TEXT NOT NULL,
-        PRIMARY KEY(repo_id,request_id),
-        CHECK(COALESCE(json_type(outcome,'$.ok') IN ('true','false'),0) AND
-          ((outcome_kind='success' AND json_extract(outcome,'$.ok')=1) OR
-           (outcome_kind='error' AND json_extract(outcome,'$.ok')=0)))
-      );
-      INSERT INTO operation_request_receipts_v21(
-        repo_id,request_id,operation,payload_hash,outcome_kind,outcome,created_at
-      )
-      SELECT
-        repo_id,request_id,operation,payload_hash,outcome_kind,outcome,created_at
-      FROM operation_request_receipts
-      WHERE operation NOT LIKE 'ticket.%';
-      DROP TABLE operation_request_receipts;
-      ALTER TABLE operation_request_receipts_v21
-        RENAME TO operation_request_receipts;
-      CREATE TRIGGER operation_request_receipts_immutable_update
-        BEFORE UPDATE ON operation_request_receipts
-        BEGIN SELECT RAISE(ABORT,
-          'operation request receipts are immutable'); END;
-      CREATE TRIGGER operation_request_receipts_immutable_delete
-        BEFORE DELETE ON operation_request_receipts
-        BEGIN SELECT RAISE(ABORT,
-          'operation request receipts are immutable'); END;
-    `);
-  }
-
-  db.exec("DROP TABLE IF EXISTS operation_outcome_blobs");
 }
 
 function migrateInterventionReceiptHashes(db: Db): void {

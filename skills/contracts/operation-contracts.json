@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
-  "registryHash": "e4862f6943abae33ce35c5e28ce0f0be778e3e0cceba96c988cd8bd334cf4834",
-  "inputSchemaHash": "8bbb045781ef72d20624622884200fb4d99370ac2f86d3669dd3814c43e92f40",
+  "registryHash": "3d6a58e09c70254dbb4ee9c0a1445bff24798d271f8b9f88f94939c295264b83",
+  "inputSchemaHash": "1d77dda56a6135f5413a6e3a2cbd7ccfc9113eb535a12c4ed29f4a864bbdbf30",
   "dialect": "JSON Schema 2020-12 plus VibeHub runtimeRefinements/v1",
   "fixtureDialect": "literal value or generatedFixture/v1",
   "scope": "Operation input contracts only. Operation context is validated separately by the runtime operationContextSchema at CLI/MCP adapter boundaries.",
@@ -17,11 +17,11 @@
     "regex": 9,
     "isoDatetime": 1,
     "union": 2,
-    "discriminatedUnion": 5,
+    "discriminatedUnion": 6,
     "unknown": 1,
-    "strict": 76,
+    "strict": 89,
     "safeExtend": 1,
-    "optional": 94,
+    "optional": 95,
     "nullable": 10,
     "check": 1,
     "custom": 1,
@@ -25878,6 +25878,438 @@
         ]
       }
     },
+    "ticket.closeout.append": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "expectedSource": {
+            "type": "object",
+            "properties": {
+              "sourceToken": {
+                "type": "string",
+                "pattern": "^tls-[0-9a-f]{64}$"
+              },
+              "worktreeIdentity": {
+                "type": "string",
+                "pattern": "^worktree-[0-9a-f]{64}$"
+              },
+              "resolvedCommit": {
+                "type": "string",
+                "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+              },
+              "graphDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "semanticLedgerDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "sourceToken",
+              "worktreeIdentity",
+              "resolvedCommit",
+              "graphDigest",
+              "semanticLedgerDigest"
+            ],
+            "additionalProperties": false
+          },
+          "runId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+            "maxLength": 300
+          },
+          "generation": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "terminalForm": {
+            "type": "string",
+            "enum": [
+              "successful",
+              "partial",
+              "failed",
+              "deviated",
+              "stale"
+            ]
+          },
+          "executorReport": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+            "maxLength": 20000
+          },
+          "acceptance": {
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "acceptanceId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                  "maxLength": 96
+                },
+                "disposition": {
+                  "type": "string",
+                  "enum": [
+                    "accepted",
+                    "rejected",
+                    "unresolved"
+                  ]
+                },
+                "evidenceRefs": {
+                  "maxItems": 128,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                    "maxLength": 300
+                  }
+                },
+                "rationale": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                  "maxLength": 20000
+                }
+              },
+              "required": [
+                "acceptanceId",
+                "disposition",
+                "evidenceRefs",
+                "rationale"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "followUpTicketRefs": {
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 96
+            }
+          },
+          "semanticCloseoutRefs": {
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "review"
+                    },
+                    "reviewId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 300
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "reviewId"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "decision"
+                    },
+                    "decisionId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 300
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "decisionId"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "decision_attestation"
+                    },
+                    "attestationId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                      "maxLength": 300
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "attestationId"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "expectedSource",
+          "runId",
+          "generation",
+          "terminalForm",
+          "executorReport",
+          "acceptance",
+          "followUpTicketRefs",
+          "semanticCloseoutRefs"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+          "generation": 1,
+          "terminalForm": "successful",
+          "executorReport": "Implemented the bounded Ticket outcome.",
+          "acceptance": [
+            {
+              "acceptanceId": "observable-result",
+              "disposition": "accepted",
+              "evidenceRefs": [
+                "tev-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              ],
+              "rationale": "The independent verifier accepted the exact evidence."
+            }
+          ],
+          "followUpTicketRefs": [],
+          "semanticCloseoutRefs": []
+        },
+        "negative": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+          "generation": 1,
+          "terminalForm": "done",
+          "executorReport": "Implemented the bounded Ticket outcome.",
+          "acceptance": [
+            {
+              "acceptanceId": "observable-result",
+              "disposition": "accepted",
+              "evidenceRefs": [
+                "tev-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+              ],
+              "rationale": "The independent verifier accepted the exact evidence."
+            }
+          ],
+          "followUpTicketRefs": [],
+          "semanticCloseoutRefs": []
+        },
+        "negativeCase": "closeout terminal form is closed",
+        "negatives": [
+          {
+            "case": "closeout terminal form is closed",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+              "generation": 1,
+              "terminalForm": "done",
+              "executorReport": "Implemented the bounded Ticket outcome.",
+              "acceptance": [
+                {
+                  "acceptanceId": "observable-result",
+                  "disposition": "accepted",
+                  "evidenceRefs": [
+                    "tev-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                  ],
+                  "rationale": "The independent verifier accepted the exact evidence."
+                }
+              ],
+              "followUpTicketRefs": [],
+              "semanticCloseoutRefs": []
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "closeout acceptance disposition is closed",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+              "generation": 1,
+              "terminalForm": "successful",
+              "executorReport": "Implemented the bounded Ticket outcome.",
+              "acceptance": [
+                {
+                  "acceptanceId": "observable-result",
+                  "disposition": "passed",
+                  "evidenceRefs": [
+                    "tev-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+                  ],
+                  "rationale": "The independent verifier accepted the exact evidence."
+                }
+              ],
+              "followUpTicketRefs": [],
+              "semanticCloseoutRefs": []
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.context.compile": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "expectedSource": {
+            "type": "object",
+            "properties": {
+              "sourceToken": {
+                "type": "string",
+                "pattern": "^tls-[0-9a-f]{64}$"
+              },
+              "worktreeIdentity": {
+                "type": "string",
+                "pattern": "^worktree-[0-9a-f]{64}$"
+              },
+              "resolvedCommit": {
+                "type": "string",
+                "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+              },
+              "graphDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "semanticLedgerDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "sourceToken",
+              "worktreeIdentity",
+              "resolvedCommit",
+              "graphDigest",
+              "semanticLedgerDigest"
+            ],
+            "additionalProperties": false
+          },
+          "ticketId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "expectedTicketRevision": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "expectedSource",
+          "ticketId",
+          "expectedTicketRevision"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "ticketId": "fixture-ticket",
+          "expectedTicketRevision": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        },
+        "negative": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "ticketId": "fixture-ticket",
+          "expectedTicketRevision": "latest"
+        },
+        "negativeCase": "context Ticket revision must be exact",
+        "negatives": [
+          {
+            "case": "context Ticket revision must be exact",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "ticketId": "fixture-ticket",
+              "expectedTicketRevision": "latest"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "context Ticket ID must be canonical",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "ticketId": "Fixture Ticket",
+              "expectedTicketRevision": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
     "ticket.decision.record": {
       "input": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -26383,6 +26815,270 @@
                 "rationale": " ",
                 "resolutionRefs": []
               }
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.evidence.append": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "expectedSource": {
+            "type": "object",
+            "properties": {
+              "sourceToken": {
+                "type": "string",
+                "pattern": "^tls-[0-9a-f]{64}$"
+              },
+              "worktreeIdentity": {
+                "type": "string",
+                "pattern": "^worktree-[0-9a-f]{64}$"
+              },
+              "resolvedCommit": {
+                "type": "string",
+                "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+              },
+              "graphDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "semanticLedgerDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "sourceToken",
+              "worktreeIdentity",
+              "resolvedCommit",
+              "graphDigest",
+              "semanticLedgerDigest"
+            ],
+            "additionalProperties": false
+          },
+          "run": {
+            "type": "object",
+            "properties": {
+              "runId": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                "maxLength": 300
+              },
+              "generation": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "leaseToken": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                "maxLength": 512
+              }
+            },
+            "required": [
+              "runId",
+              "generation",
+              "leaseToken"
+            ],
+            "additionalProperties": false
+          },
+          "acceptanceId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "evidenceType": {
+            "type": "string",
+            "enum": [
+              "test",
+              "inspection",
+              "artifact",
+              "commit",
+              "runtime_observation"
+            ]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+            "maxLength": 20000
+          },
+          "references": {
+            "minItems": 1,
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "repo_path",
+                    "git_commit"
+                  ]
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                  "maxLength": 512
+                },
+                "target": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+                  "maxLength": 4096
+                },
+                "digest": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "kind",
+                "label",
+                "target"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "expectedSource",
+          "run",
+          "acceptanceId",
+          "evidenceType",
+          "summary",
+          "references"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "run": {
+            "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+            "generation": 1,
+            "leaseToken": "vht_fixture-bearer"
+          },
+          "acceptanceId": "observable-result",
+          "evidenceType": "test",
+          "summary": "The focused conformance test passed.",
+          "references": [
+            {
+              "kind": "repo_path",
+              "label": "Conformance report",
+              "target": "artifacts/conformance.json",
+              "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ]
+        },
+        "negative": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "run": {
+            "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+            "generation": 1,
+            "leaseToken": "vht_fixture-bearer"
+          },
+          "acceptanceId": "observable-result",
+          "evidenceType": "test",
+          "summary": "The focused conformance test passed.",
+          "references": []
+        },
+        "negativeCase": "evidence requires at least one reference",
+        "negatives": [
+          {
+            "case": "evidence requires at least one reference",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "run": {
+                "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+                "generation": 1,
+                "leaseToken": "vht_fixture-bearer"
+              },
+              "acceptanceId": "observable-result",
+              "evidenceType": "test",
+              "summary": "The focused conformance test passed.",
+              "references": []
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "evidence type is closed",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "run": {
+                "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+                "generation": 1,
+                "leaseToken": "vht_fixture-bearer"
+              },
+              "acceptanceId": "observable-result",
+              "evidenceType": "claim",
+              "summary": "The focused conformance test passed.",
+              "references": [
+                {
+                  "kind": "repo_path",
+                  "label": "Conformance report",
+                  "target": "artifacts/conformance.json",
+                  "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              ]
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.frontier.read": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {},
+        "negative": {
+          "_unexpected": true
+        },
+        "negativeCase": "strict object rejects extra property",
+        "negatives": [
+          {
+            "case": "strict object rejects extra property",
+            "value": {
+              "_unexpected": true
             },
             "refinementIds": []
           }
@@ -26897,6 +27593,305 @@
                 },
                 "body": " "
               }
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.run.claim": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "expectedSource": {
+            "type": "object",
+            "properties": {
+              "sourceToken": {
+                "type": "string",
+                "pattern": "^tls-[0-9a-f]{64}$"
+              },
+              "worktreeIdentity": {
+                "type": "string",
+                "pattern": "^worktree-[0-9a-f]{64}$"
+              },
+              "resolvedCommit": {
+                "type": "string",
+                "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+              },
+              "graphDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "semanticLedgerDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "sourceToken",
+              "worktreeIdentity",
+              "resolvedCommit",
+              "graphDigest",
+              "semanticLedgerDigest"
+            ],
+            "additionalProperties": false
+          },
+          "ticketId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "maxLength": 96
+          },
+          "expectedTicketRevision": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "contextBindingId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+            "maxLength": 300
+          },
+          "contextBindingDigest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "leaseSeconds": {
+            "type": "integer",
+            "minimum": 15,
+            "maximum": 3600
+          }
+        },
+        "required": [
+          "expectedSource",
+          "ticketId",
+          "expectedTicketRevision",
+          "contextBindingId",
+          "contextBindingDigest",
+          "leaseSeconds"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "ticketId": "fixture-ticket",
+          "expectedTicketRevision": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+          "contextBindingId": "tcb-8888888888888888888888888888888888888888888888888888888888888888",
+          "contextBindingDigest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+          "leaseSeconds": 300
+        },
+        "negative": {
+          "expectedSource": {
+            "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+            "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+            "resolvedCommit": "3333333333333333333333333333333333333333",
+            "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          },
+          "ticketId": "fixture-ticket",
+          "expectedTicketRevision": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+          "contextBindingId": "tcb-8888888888888888888888888888888888888888888888888888888888888888",
+          "contextBindingDigest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+          "leaseSeconds": 14
+        },
+        "negativeCase": "claim lease below minimum",
+        "negatives": [
+          {
+            "case": "claim lease below minimum",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "ticketId": "fixture-ticket",
+              "expectedTicketRevision": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+              "contextBindingId": "tcb-8888888888888888888888888888888888888888888888888888888888888888",
+              "contextBindingDigest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+              "leaseSeconds": 14
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "claim context binding digest must be exact",
+            "value": {
+              "expectedSource": {
+                "sourceToken": "tls-1111111111111111111111111111111111111111111111111111111111111111",
+                "worktreeIdentity": "worktree-2222222222222222222222222222222222222222222222222222222222222222",
+                "resolvedCommit": "3333333333333333333333333333333333333333",
+                "graphDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "semanticLedgerDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+              },
+              "ticketId": "fixture-ticket",
+              "expectedTicketRevision": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+              "contextBindingId": "tcb-8888888888888888888888888888888888888888888888888888888888888888",
+              "contextBindingDigest": "latest",
+              "leaseSeconds": 300
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.run.heartbeat": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+            "maxLength": 300
+          },
+          "generation": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "leaseToken": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+            "maxLength": 512
+          },
+          "leaseSeconds": {
+            "type": "integer",
+            "minimum": 15,
+            "maximum": 3600
+          }
+        },
+        "required": [
+          "runId",
+          "generation",
+          "leaseToken",
+          "leaseSeconds"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+          "generation": 1,
+          "leaseToken": "vht_fixture-bearer",
+          "leaseSeconds": 300
+        },
+        "negative": {
+          "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+          "generation": 1,
+          "leaseToken": "vht_fixture-bearer",
+          "leaseSeconds": 3601
+        },
+        "negativeCase": "heartbeat lease above maximum",
+        "negatives": [
+          {
+            "case": "heartbeat lease above maximum",
+            "value": {
+              "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+              "generation": 1,
+              "leaseToken": "vht_fixture-bearer",
+              "leaseSeconds": 3601
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "heartbeat generation must be positive",
+            "value": {
+              "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+              "generation": 0,
+              "leaseToken": "vht_fixture-bearer",
+              "leaseSeconds": 300
+            },
+            "refinementIds": []
+          }
+        ]
+      }
+    },
+    "ticket.run.release": {
+      "input": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+            "maxLength": 300
+          },
+          "generation": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "leaseToken": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(?!\\s)[\\s\\S]*\\S$(?![\\s\\S])",
+            "maxLength": 512
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "lease_released",
+              "stale_binding",
+              "superseded",
+              "operator_cancelled"
+            ]
+          }
+        },
+        "required": [
+          "runId",
+          "generation",
+          "leaseToken",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "runtimeRefinements": [],
+      "fixtures": {
+        "positive": {
+          "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+          "generation": 1,
+          "leaseToken": "vht_fixture-bearer",
+          "reason": "lease_released"
+        },
+        "negative": {
+          "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+          "generation": 1,
+          "leaseToken": "vht_fixture-bearer",
+          "reason": "done"
+        },
+        "negativeCase": "release reason is closed",
+        "negatives": [
+          {
+            "case": "release reason is closed",
+            "value": {
+              "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+              "generation": 1,
+              "leaseToken": "vht_fixture-bearer",
+              "reason": "done"
+            },
+            "refinementIds": []
+          },
+          {
+            "case": "release bearer rejects whitespace only",
+            "value": {
+              "runId": "trn-6666666666666666666666666666666666666666666666666666666666666666",
+              "generation": 1,
+              "leaseToken": " ",
+              "reason": "lease_released"
             },
             "refinementIds": []
           }

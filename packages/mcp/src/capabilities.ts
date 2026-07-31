@@ -8,11 +8,19 @@ import {
   type TicketDecisionLocalSignatureTrustProfileResolverV0,
 } from "@vw-ai/vibehub-core";
 import crypto from "node:crypto";
+import { createMcpSessionActor } from "./session-actor.js";
 
 export const TICKET_OPERATION_NAMES = [
   "ticket.graph.snapshot",
   "ticket.subject.inspect",
   "ticket.trace.list",
+  "ticket.frontier.read",
+  "ticket.context.compile",
+  "ticket.run.claim",
+  "ticket.run.heartbeat",
+  "ticket.run.release",
+  "ticket.evidence.append",
+  "ticket.closeout.append",
   "ticket.worktree.patch",
   "ticket.review.append",
   "ticket.decision.record",
@@ -38,12 +46,16 @@ export interface CapabilityContext {
 
 export function createCapabilities(ctx: CapabilityContext) {
   const now = (): string => ctx.now?.() ?? new Date().toISOString();
+  // Capture one fallback per capability session. Production injects an actor
+  // derived from the MCP connection; direct legacy consumers still get a
+  // stable, non-global attribution instead of sharing one global identity.
+  const actor = ctx.actor?.trim() || createMcpSessionActor();
   const dispatch=(operation:string,input:Record<string,unknown>,requestId?:string)=>new OperationDispatcher(ctx.db,{
     repoRoot:ctx.repoRoot,
     ticketDecisionAttestationTrustProfiles:
       ctx.ticketDecisionAttestationTrustProfiles,
   }).dispatch(operation,{
-    repoId:ctx.repoId,actor:ctx.actor??"mcp-agent",taskId:ctx.taskId,
+    repoId:ctx.repoId,actor,taskId:ctx.taskId,
     requestId:requestId??ctx.requestId?.()??`mcp-${crypto.randomUUID()}`,now:now(),
   },input);
   const requireTask = () => {
@@ -110,7 +122,9 @@ export function createCapabilities(ctx: CapabilityContext) {
           "Vibehub keeps team context local. Hooks trigger at the right time; " +
           "skills own semantic workflow; MCP capabilities validate and persist mechanical facts. " +
           "Use vibehub-query for context pulls, vibehub-ingest for discussions, and " +
-          "vibehub-distill for first-run repository mapping.",
+          "vibehub-distill for first-run repository mapping. Use vibehub-ticket-plan " +
+          "to shape work, vibehub-ticket-run to execute one ready Ticket, and " +
+          "vibehub-ticket-closeout for independent acceptance adjudication.",
       };
     },
   };

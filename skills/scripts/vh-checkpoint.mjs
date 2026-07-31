@@ -52,7 +52,7 @@ if (needsInput) {
   }
 }
 
-const invocation = resolveVibehubInvocation();
+const invocation = resolveVibehubInvocation({ allowPluginRuntime: true });
 const child = await captureCommand(
   invocation.command,
   [

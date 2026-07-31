@@ -126,9 +126,16 @@ describe("Ticket operation dispatcher Git read cut", () => {
     ]));
     expect(dispatcher.operations().filter((name) =>
       name.startsWith("ticket."))).toEqual([
+      "ticket.closeout.append",
+      "ticket.context.compile",
       "ticket.decision.record",
+      "ticket.evidence.append",
+      "ticket.frontier.read",
       "ticket.graph.snapshot",
       "ticket.review.append",
+      "ticket.run.claim",
+      "ticket.run.heartbeat",
+      "ticket.run.release",
       "ticket.subject.inspect",
       "ticket.trace.list",
       "ticket.worktree.patch",

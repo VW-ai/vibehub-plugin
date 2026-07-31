@@ -47,6 +47,16 @@ import {
 } from "./ticket-review-projector.js";
 import { TicketReviewReadServiceV0 } from "./ticket-review-read-service.js";
 import {
+  TicketExecutionError,
+  TicketExecutionService,
+  isTicketRunLeaseFailure,
+  type AppendTicketCloseoutInput,
+  type AppendTicketEvidenceInput,
+  type ClaimTicketExecutionInput,
+  type CompileTicketContextInput,
+  type TicketRunCredentials,
+} from "./ticket-execution-service.js";
+import {
   createTrustedTicketLedgerReviewProjectionSourceProviderV0,
   type ResolvedTicketReviewProjectionSourceProviderV0,
   type TicketReviewRepositoryScopeV0,
@@ -78,6 +88,14 @@ export const OPERATION_EXIT_CLASS:Record<string,number>={
   ticket_ledger_stale_subject:5, ticket_ledger_document_conflict:5,
   ticket_ledger_writer_busy:5, ticket_ledger_write_unverified:5,
   ticket_ledger_io:5, ticket_ledger_scope_mismatch:2,
+  ticket_not_ready:4, ticket_already_done:4,
+  ticket_binding_not_found:3, ticket_binding_mismatch:5,
+  ticket_run_actor_mismatch:5, ticket_run_still_active:4,
+  ticket_run_stale:5, ticket_run_invalid_input:2,
+  ticket_run_claim_conflict:5, ticket_run_not_found:3,
+  ticket_run_stale_generation:5, ticket_run_invalid_token:5,
+  ticket_run_lease_expired:5, ticket_run_lease_released:4,
+  ticket_run_release_conflict:5,
   ticket_authority_unavailable:5, ticket_authority_scope_mismatch:5,
   ticket_attribution_mismatch:5,
 };
@@ -86,6 +104,7 @@ interface Services {
   kb: KnowledgeService;
   distill: DistillationService;
   ticket: TicketReviewReadServiceV0;
+  ticketExecution: TicketExecutionService;
 }
 type TicketDispatchScopeV0 = TicketReviewRepositoryScopeV0;
 type Handler=(
@@ -165,6 +184,56 @@ const handlers:Record<OperationName,Handler>={
     authority:ticketDecisionAuthority(c,i,options),
     decidedAt:c.now,
   }),
+  "ticket.frontier.read":(s,c,_i,scope)=>s.ticketExecution.frontier(
+    c.repoId,
+    requiredTicketScope(scope).worktreeRoot,
+    c.now,
+  ),
+  "ticket.context.compile":(s,c,i,scope)=>s.ticketExecution.compileContext(
+    requiredTicketScope(scope).worktreeRoot,
+    i as unknown as CompileTicketContextInput,
+    c.now,
+  ),
+  "ticket.run.claim":(s,c,i,scope)=>s.ticketExecution.claim(
+    c.repoId,
+    requiredTicketScope(scope).worktreeRoot,
+    c.actor,
+    c.now,
+    i as unknown as ClaimTicketExecutionInput,
+  ),
+  "ticket.run.heartbeat":(s,c,i,scope)=>s.ticketExecution.heartbeat(
+    c.repoId,
+    requiredTicketScope(scope).worktreeRoot,
+    c.actor,
+    c.now,
+    i as unknown as TicketRunCredentials & {leaseSeconds:number},
+  ),
+  "ticket.run.release":(s,c,i,scope)=> {
+    requiredTicketScope(scope);
+    return s.ticketExecution.release(
+      c.repoId,
+      c.actor,
+      c.now,
+      i as unknown as TicketRunCredentials & {
+        reason:"lease_released"|"stale_binding"|"superseded"|"operator_cancelled";
+      },
+    );
+  },
+  "ticket.evidence.append":(s,c,i,scope)=>s.ticketExecution.appendEvidence(
+    c.repoId,
+    requiredTicketScope(scope).worktreeRoot,
+    c.actor,
+    c.now,
+    i as unknown as AppendTicketEvidenceInput,
+  ),
+  "ticket.closeout.append":(s,c,i,scope,options)=>
+    s.ticketExecution.appendCloseout(
+      c.repoId,
+      requiredTicketScope(scope).worktreeRoot,
+      ticketExecutionVerifier(c,options),
+      c.now,
+      i as unknown as AppendTicketCloseoutInput,
+    ),
 };
 
 export interface TicketReviewHostAttribution {
@@ -232,6 +301,10 @@ export class OperationDispatcher {
           ?? createTrustedTicketLedgerReviewProjectionSourceProviderV0(
             ticketDecisionAttestationVerifier,
           ),
+      ),
+      ticketExecution: new TicketExecutionService(
+        db,
+        ticketDecisionAttestationVerifier,
       ),
     };
   }
@@ -396,6 +469,7 @@ export class OperationDispatcher {
         kb:new KnowledgeService(cache),
         distill:new DistillationService(cache),
         ticket:this.service.ticket,
+        ticketExecution:this.service.ticketExecution,
       };
       const cacheContext={...c,repoId:materialized.repoId};
       const data=handler(services,cacheContext,input);
@@ -636,6 +710,36 @@ function mutation(c:OperationContext,taskRequired:boolean){if(taskRequired&&!c.t
 function req(v:unknown,name:string){if(typeof v!=="string"||!v.trim())throw new KnowledgeError("validation_error",`${name} is required`,{field:name});return v;}
 function normalize(error:unknown):KnowledgeError{
   if(error instanceof KnowledgeError)return error;
+  if(error instanceof TicketExecutionError){
+    const code = error.code === "not_ready"
+      ? "ticket_not_ready"
+      : error.code === "already_done"
+        ? "ticket_already_done"
+        : error.code === "binding_not_found"
+          ? "ticket_binding_not_found"
+          : error.code === "binding_mismatch"
+            ? "ticket_binding_mismatch"
+            : error.code === "run_actor_mismatch"
+              ? "ticket_run_actor_mismatch"
+              : error.code === "run_still_active"
+                ? "ticket_run_still_active"
+                : "ticket_run_stale";
+    return new KnowledgeError(
+      code,
+      error.message,
+      error.details,
+      ticketExecutionNextSafeActions(code),
+    );
+  }
+  if(isTicketRunLeaseFailure(error)){
+    const code=`ticket_run_${error.code}`;
+    return new KnowledgeError(
+      code,
+      error.message,
+      error.details,
+      ticketExecutionNextSafeActions(code),
+    );
+  }
   if(error instanceof TicketReviewProjectionError){
     return new KnowledgeError(
       error.code,
@@ -717,13 +821,27 @@ function requiresTicketScope(operation:string):operation is
   | "ticket.worktree.patch"
   | "ticket.review.append"
   | "ticket.decision.record"
+  | "ticket.frontier.read"
+  | "ticket.context.compile"
+  | "ticket.run.claim"
+  | "ticket.run.heartbeat"
+  | "ticket.run.release"
+  | "ticket.evidence.append"
+  | "ticket.closeout.append"
 {
   return operation==="ticket.graph.snapshot"
     || operation==="ticket.subject.inspect"
     || operation==="ticket.trace.list"
     || operation==="ticket.worktree.patch"
     || operation==="ticket.review.append"
-    || operation==="ticket.decision.record";
+    || operation==="ticket.decision.record"
+    || operation==="ticket.frontier.read"
+    || operation==="ticket.context.compile"
+    || operation==="ticket.run.claim"
+    || operation==="ticket.run.heartbeat"
+    || operation==="ticket.run.release"
+    || operation==="ticket.evidence.append"
+    || operation==="ticket.closeout.append";
 }
 function isReceiptlessGitTicketOperation(operation:string):operation is
   | "ticket.graph.snapshot"
@@ -731,13 +849,27 @@ function isReceiptlessGitTicketOperation(operation:string):operation is
   | "ticket.trace.list"
   | "ticket.worktree.patch"
   | "ticket.review.append"
-  | "ticket.decision.record" {
+  | "ticket.decision.record"
+  | "ticket.frontier.read"
+  | "ticket.context.compile"
+  | "ticket.run.claim"
+  | "ticket.run.heartbeat"
+  | "ticket.run.release"
+  | "ticket.evidence.append"
+  | "ticket.closeout.append" {
   return operation==="ticket.graph.snapshot"
     || operation==="ticket.subject.inspect"
     || operation==="ticket.trace.list"
     || operation==="ticket.worktree.patch"
     || operation==="ticket.review.append"
-    || operation==="ticket.decision.record";
+    || operation==="ticket.decision.record"
+    || operation==="ticket.frontier.read"
+    || operation==="ticket.context.compile"
+    || operation==="ticket.run.claim"
+    || operation==="ticket.run.heartbeat"
+    || operation==="ticket.run.release"
+    || operation==="ticket.evidence.append"
+    || operation==="ticket.closeout.append";
 }
 function requiredTicketScope(
   scope:TicketDispatchScopeV0|undefined,
@@ -890,6 +1022,17 @@ function ticketReviewAuthor(
   };
 }
 
+function ticketExecutionVerifier(
+  context:OperationContext,
+  options:OperationDispatcherOptions|undefined,
+) {
+  const author=ticketReviewAuthor(context,options);
+  return {
+    actor_kind:author.actor_kind,
+    actor_ref:author.actor_id,
+  } as const;
+}
+
 function ticketDecisionAuthority(
   context:OperationContext,
   input:Record<string,unknown>,
@@ -964,4 +1107,34 @@ function ticketReviewNextSafeActions(code:string):string[]{
     return ["Reduce the Ticket ledger below the declared review capacity."];
   }
   return ["Inspect and repair the Git-native Ticket documents in this worktree."];
+}
+
+function ticketExecutionNextSafeActions(code:string):string[]{
+  if(code==="ticket_not_ready"){
+    return ["Read ticket.frontier.read and execute an eligible Ticket whose prerequisites are DONE."];
+  }
+  if(code==="ticket_already_done"){
+    return ["Refresh ticket.frontier.read and continue with a newly unlocked dependent Ticket."];
+  }
+  if(code==="ticket_binding_not_found"||code==="ticket_binding_mismatch"){
+    return ["Refresh ticket.frontier.read, compile a fresh exact context binding, and retry."];
+  }
+  if(code==="ticket_run_claim_conflict"){
+    return ["Inspect ticket.frontier.read; wait for, heartbeat, or explicitly release the current executor lease."];
+  }
+  if(code==="ticket_run_still_active"){
+    return ["Have the executor release its lease before an independent verifier appends closeout."];
+  }
+  if(
+    code==="ticket_run_stale"
+    ||code==="ticket_run_stale_generation"
+    ||code==="ticket_run_lease_expired"
+    ||code==="ticket_run_lease_released"
+  ){
+    return ["Refresh ticket.frontier.read and claim the current Ticket revision with a fresh context binding."];
+  }
+  if(code==="ticket_run_actor_mismatch"||code==="ticket_run_invalid_token"){
+    return ["Use the exact executor identity and one-time bearer returned by ticket.run.claim."];
+  }
+  return ["Inspect ticket.frontier.read and retry from the current Git-native Ticket facts."];
 }

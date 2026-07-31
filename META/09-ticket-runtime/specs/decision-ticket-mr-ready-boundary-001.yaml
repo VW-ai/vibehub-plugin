@@ -1,0 +1,51 @@
+spec_id: "decision-ticket-mr-ready-boundary-001"
+type: decision
+state: active
+intent:
+  summary: "Ticket Runtime reaches MR-ready when the synthetic M4 execution/closeout conformance loop and release gates pass; real Plugin-feature dogfood moves to post-merge M5."
+  detail: |
+    The implementation branch does not have to dogfood unfinished Ticket
+    Runtime in order to finish Ticket Runtime. MR-ready requires the complete
+    shipped execution surface: derived frontier, exact ContextBinding,
+    disposable Run lease, Git Evidence, independent Outcome closeout, direct
+    downstream unlock, Skill/CLI/MCP/HTML projection, DB-loss recovery, source
+    staleness behavior, package/release verification, and a clean removal of
+    retired compatibility code.
+
+    One bounded synthetic repository conformance test proves the root-to-
+    dependent loop without making the feature validate itself as a real
+    project. The existing real Plugin-feature dogfood target and multi-path
+    proof remain useful post-merge M5 work and depend on this MR-ready runtime.
+constraints:
+  - kind: must
+    rule: "M4 implementation, adversarial tests, installed assets, package verification, clean-cut search, and reviewer map are MR gates"
+  - kind: must
+    rule: "The conformance fixture covers success, non-success/deviation, stale binding, direct unlock, join blocking, worktree isolation, and DB deletion recovery"
+  - kind: must
+    rule: "M5 real Plugin-feature dogfood starts only after the MR-ready runtime exists and does not block this MR"
+  - kind: must_not
+    rule: "Do not weaken the shipped runtime merely to avoid dogfood, or claim a real-project proof from the synthetic conformance fixture"
+indexing:
+  type: decision
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket, m4, mr-ready, conformance, dogfood, m5]
+provenance:
+  source_type: direct_user_instruction
+  confidence: 1.0
+  source_ref: "Wayne: 不需要在ticket开发时dogfood。我们先把ticket功能做到MR ready — 2026-07-30"
+  produced_by_agent: "implementation"
+  produced_at: "2026-07-30"
+relations:
+  - target: "decision-ticket-mvp-002"
+    type: supersedes
+    detail: "Preserves the full dogfood promise as post-merge M5 while defining the smaller MR-ready boundary."
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+  - target: "decision-ticket-skill-driven-boundary-001"
+    type: depends_on
+anchors:
+  - file: "META/09-ticket-runtime/progress.yaml"
+  - file: "packages/core/test"
+  - file: "scripts/verify-release-marketplace.mjs"

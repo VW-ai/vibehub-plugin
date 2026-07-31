@@ -3,7 +3,7 @@
   "name": "vibehub",
   "displayName": "VibeHub",
   "version": "0.2.2",
-  "description": "Local team context: hook capture, governed knowledge skills, and deterministic MCP capabilities.",
+  "description": "Git-native project semantics, governed knowledge skills, local lifecycle evidence, and deterministic MCP capabilities.",
   "author": { "name": "VibeHub Team" },
   "license": "Apache-2.0",
   "keywords": ["context", "collaboration", "knowledge", "hooks", "mcp"]

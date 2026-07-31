@@ -142,6 +142,23 @@ const ticketTraceKinds = z.array(z.enum(TICKET_REVIEW_TRACE_KINDS))
   .refine((kinds) => new Set(kinds).size === kinds.length, {
     message: "trace kinds must be unique",
   });
+const ticketRunLease = z.object({
+  runId: ticketOpaqueRef,
+  generation: z.number().int().positive(),
+  leaseToken: canonicalString(512),
+}).strict();
+const ticketEvidenceReference = z.object({
+  kind: z.enum(["repo_path", "git_commit"]),
+  label: canonicalString(512),
+  target: canonicalString(4_096),
+  digest: ticketPatchSha256.optional(),
+}).strict();
+const ticketAcceptanceAdjudication = z.object({
+  acceptanceId: ticketPatchId,
+  disposition: z.enum(["accepted", "rejected", "unresolved"]),
+  evidenceRefs: z.array(ticketOpaqueRef).max(128),
+  rationale: canonicalString(20_000),
+}).strict();
 
 export const operationContextSchema = z.object({
   repoId: z.number().int().positive(), actor: id, taskId: id.optional(), requestId: id,
@@ -256,12 +273,84 @@ export const operationInputSchemas = {
     expectedSource: ticketMutationSource,
     decision: ticketDecisionMutation,
   }).strict(),
+  "ticket.frontier.read": z.object({}).strict(),
+  "ticket.context.compile": z.object({
+    expectedSource: ticketMutationSource,
+    ticketId: ticketPatchId,
+    expectedTicketRevision: ticketPatchSha256,
+  }).strict(),
+  "ticket.run.claim": z.object({
+    expectedSource: ticketMutationSource,
+    ticketId: ticketPatchId,
+    expectedTicketRevision: ticketPatchSha256,
+    contextBindingId: ticketOpaqueRef,
+    contextBindingDigest: ticketPatchSha256,
+    leaseSeconds: z.number().int().min(15).max(3_600),
+  }).strict(),
+  "ticket.run.heartbeat": z.object({
+    ...ticketRunLease.shape,
+    leaseSeconds: z.number().int().min(15).max(3_600),
+  }).strict(),
+  "ticket.run.release": z.object({
+    ...ticketRunLease.shape,
+    reason: z.enum([
+      "lease_released",
+      "stale_binding",
+      "superseded",
+      "operator_cancelled",
+    ]),
+  }).strict(),
+  "ticket.evidence.append": z.object({
+    expectedSource: ticketMutationSource,
+    run: ticketRunLease,
+    acceptanceId: ticketPatchId,
+    evidenceType: z.enum([
+      "test",
+      "inspection",
+      "artifact",
+      "commit",
+      "runtime_observation",
+    ]),
+    summary: canonicalString(20_000),
+    references: z.array(ticketEvidenceReference).min(1).max(128),
+  }).strict(),
+  "ticket.closeout.append": z.object({
+    expectedSource: ticketMutationSource,
+    runId: ticketOpaqueRef,
+    generation: z.number().int().positive(),
+    terminalForm: z.enum([
+      "successful",
+      "partial",
+      "failed",
+      "deviated",
+      "stale",
+    ]),
+    executorReport: canonicalString(20_000),
+    acceptance: z.array(ticketAcceptanceAdjudication).max(128),
+    followUpTicketRefs: z.array(ticketPatchId).max(128),
+    semanticCloseoutRefs: z.array(z.discriminatedUnion("kind", [
+      z.object({
+        kind: z.literal("review"),
+        reviewId: ticketOpaqueRef,
+      }).strict(),
+      z.object({
+        kind: z.literal("decision"),
+        decisionId: ticketOpaqueRef,
+      }).strict(),
+      z.object({
+        kind: z.literal("decision_attestation"),
+        attestationId: ticketOpaqueRef,
+      }).strict(),
+    ])).max(128),
+  }).strict(),
 } as const;
 
 export const OPERATION_INPUT_BYTE_LIMITS = {
   "ticket.worktree.patch": 10 * 1024 * 1024,
   "ticket.review.append": 512 * 1024,
   "ticket.decision.record": 128 * 1024,
+  "ticket.evidence.append": 512 * 1024,
+  "ticket.closeout.append": 512 * 1024,
 } as const satisfies Partial<
   Record<keyof typeof operationInputSchemas, number>
 >;
@@ -340,11 +429,11 @@ export const operationAcceptanceConstructManifest = {
   regex: 9,
   isoDatetime: 1,
   union: 2,
-  discriminatedUnion: 5,
+  discriminatedUnion: 6,
   unknown: 1,
-  strict: 76,
+  strict: 89,
   safeExtend: 1,
-  optional: 94,
+  optional: 95,
   nullable: 10,
   check: 1,
   custom: 1,

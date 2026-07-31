@@ -33,6 +33,12 @@ Use `--task` for Spec/distillation writes. Read input from stdin or a stable
 JSON file through `../scripts/vh-kb.mjs`, `../scripts/vh-distill.mjs`, or
 `../scripts/vh-ticket.mjs`.
 
+The packaged wrappers prefer an explicit `VIBEHUB_BIN`, then the current source
+tree CLI, then the installed Plugin's versioned runtime launcher, and finally a
+`vibehub` executable on `PATH`. This keeps an installed thin Plugin usable
+without a separate global CLI while preventing an unrelated PATH binary from
+shadowing its own runtime.
+
 ## Semantic checkpoints
 
 After one coherent sequence of successful canonical knowledge mutations,
@@ -90,6 +96,10 @@ because a current table key would permit it.
 Git-native Ticket operations are deliberately outside persisted request
 replay. Each invocation observes the addressed worktree again, so a branch
 switch or local Ticket edit cannot be hidden behind an older response.
+`ticket.run.claim` likewise returns its bearer lease token once and never
+persists or replays that token through a generic operation receipt. Preserve
+the live response only for the bounded Run; a lost token cannot be recovered
+from VibeHub.
 
 ## Registry
 
@@ -104,7 +114,7 @@ switch or local Ticket edit cannot be hidden behind an older response.
 | `distill.baseline.get`, `distill.candidates.list`, `distill.candidates.get` | |
 | `distill.version.get`, `distill.version.diff` | |
 | `distill.inventory.get`, `distill.inventory.diff` | `distill.inventory.put`, `distill.inventory.seal` |
-| `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list` | `ticket.worktree.patch`, `ticket.review.append`, `ticket.decision.record` |
+| `ticket.graph.snapshot`, `ticket.subject.inspect`, `ticket.trace.list`, `ticket.frontier.read` | `ticket.context.compile`, `ticket.run.claim`, `ticket.run.heartbeat`, `ticket.run.release`, `ticket.evidence.append`, `ticket.closeout.append`, `ticket.worktree.patch`, `ticket.review.append`, `ticket.decision.record` |
 | | `distill.scopes.plan`, `distill.scopes.claim`, `distill.scopes.complete`, `distill.scopes.fail`, `distill.scopes.retry`, `distill.scopes.correct` |
 | | `distill.candidates.put`, `distill.reconcile`, `distill.validate`, `distill.finalize` |
 | | `distill.activate`, `distill.rollback` |
@@ -114,9 +124,10 @@ Inputs are strict. Read the corresponding JSON schema and the dispatcher error
 malformed/unsupported, `3` not-found/already-exists, `4` lifecycle/integrity,
 `5` idempotency/lease/checksum/CAS conflict, `1` internal failure.
 
-Use `ticket.graph.snapshot` for topology, `ticket.subject.inspect` for the
-complete executable context package of one Ticket, and `ticket.trace.list` for
-the currently available trace projection. `ticket.worktree.patch` is the one
+Use `ticket.graph.snapshot` for topology, `ticket.subject.inspect` for one
+complete Ticket definition plus its graph context, and `ticket.trace.list` for
+the currently available trace projection. Only `ticket.context.compile`
+freezes and returns the exact bounded execution packet. `ticket.worktree.patch` is the one
 mechanical write hand: copy its exact source and Ticket revisions from the
 latest snapshot, submit bounded full-document puts/deletes, and let Core
 validate the complete prospective graph. It never plans, auto-commits, writes
@@ -131,6 +142,18 @@ generic adapters intentionally inject no Decision authority. Calls through
 those adapters therefore fail closed with `ticket_authority_unavailable`;
 only a trusted host with a matching human principal and exact authority scope
 may record the Decision. Neither operation silently changes a Ticket.
+
+Use `ticket.frontier.read` to derive the current ready, blocked, active, and
+attention frontier. `ticket.context.compile` freezes the exact Ticket revision,
+acceptance set, repository identity, and bounded context references before
+execution. `ticket.run.claim`, `ticket.run.heartbeat`, and
+`ticket.run.release` provide disposable coordination only; a claim never
+changes the Ticket promise or proves completion. Append acceptance-linked proof
+with `ticket.evidence.append`. An independent Agent appends the terminal
+adjudication with `ticket.closeout.append`; only a current `successful`
+closeout whose every current acceptance is accepted can unlock dependents.
+`partial`, `failed`, `deviated`, and `stale` closeouts remain visible and
+unlock nothing.
 
 ## Workflow artifacts are not operation inputs
 

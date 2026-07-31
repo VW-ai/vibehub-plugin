@@ -17,6 +17,7 @@ import {
   ticketDecisionAttestationDocumentPath,
   ticketDecisionAttestationSigningBytes,
   ticketDecisionDocumentDigest,
+  upsertRepo,
   type Db,
   type TicketDecisionAttestationDocument,
   type TicketDecisionAttestationDocumentPayload,
@@ -31,8 +32,11 @@ import {
   type TicketReviewSubject,
 } from "../src/index.js";
 import {
+  CompositeTicketDecisionAttestationVerifierV0,
   DurableLocalSignatureTicketDecisionAttestationVerifierV0,
+  InMemoryTicketDecisionSessionAttestationRegistryV0,
   projectTicketLedgerForTrustedDecisionHostV0,
+  verifyTicketExecutionDecisionAuthorityV0,
   type TicketDecisionLocalSignatureTrustProfileResolverV0,
   type TicketDecisionLocalSignatureTrustProfileV0,
 } from "../src/ticket-decision-attestation.js";
@@ -65,6 +69,25 @@ const ticketDocument = (): TicketDocument => ({
   constraints: ["Preserve the protected product boundary."],
   context_refs: [],
   relations: [],
+  provenance_refs: [],
+});
+
+const dependentTicketDocument = (): TicketDocument => ({
+  schema_version: 1,
+  kind: "ticket",
+  ticket_id: "publish-client",
+  outcome: "Publish the client after the reviewed API is complete",
+  context: "Proceed only from a currently authorized API Outcome.",
+  acceptance: [{
+    acceptance_id: "client-published",
+    criterion: "The client is published against the reviewed API.",
+  }],
+  constraints: ["Do not bypass Decision revocation through an old Outcome."],
+  context_refs: [],
+  relations: [{
+    type: "depends_on",
+    target_ticket_id: "implement-api",
+  }],
   provenance_refs: [],
 });
 
@@ -169,7 +192,11 @@ interface DecisionFixture {
   now: number;
 }
 
-const setupDecision = (): DecisionFixture => {
+const setupDecision = (
+  decisionForm:
+    | "resolved_boundary"
+    | "request_changes_plan" = "resolved_boundary",
+): DecisionFixture => {
   const repository = fs.mkdtempSync(
     path.join(os.tmpdir(), "vibehub-durable-attestation-"),
   );
@@ -209,15 +236,26 @@ const setupDecision = (): DecisionFixture => {
     worktreeRoot: repository,
     request: {
       expectedSource: expectedSource(beforeDecision),
-      decision: {
-        decision_type: "protected_boundary",
-        subject: ticketSubject(beforeDecision),
-        boundary: "Choose the public compatibility policy.",
-        disposition: "resolve",
-        selection: "Preserve backwards compatibility.",
-        rationale: "This boundary requires explicit human intent.",
-        resolution_refs: [],
-      },
+      decision: decisionForm === "resolved_boundary"
+        ? {
+            decision_type: "protected_boundary",
+            subject: ticketSubject(beforeDecision),
+            boundary: "Choose the public compatibility policy.",
+            disposition: "resolve",
+            selection: "Preserve backwards compatibility.",
+            rationale: "This boundary requires explicit human intent.",
+            resolution_refs: [],
+          }
+        : {
+            decision_type: "plan_review",
+            subject: {
+              kind: "graph",
+              graph_digest: beforeDecision.graphDigest,
+            },
+            disposition: "request_changes",
+            rationale: "The graph needs another planning pass.",
+            resolution_refs: [],
+          },
     },
     authority: signer.authority,
     decidedAt: new Date(now - 10_000).toISOString(),
@@ -232,8 +270,18 @@ const setupDecision = (): DecisionFixture => {
 const exactScope = (
   decision: TicketLedgerDecision,
 ): TicketDecisionAttestationScope => {
-  if (decision.document.decision_type !== "protected_boundary") {
-    throw new Error("expected protected Decision");
+  if (decision.document.decision_type === "plan_review") {
+    return {
+      scope_type: "plan_review",
+      graph_digest: decision.document.subject.graph_digest,
+      disposition: decision.document.disposition,
+      ...(decision.document.delegated_boundaries === undefined
+        ? {}
+        : {
+            delegated_boundaries:
+              decision.document.delegated_boundaries,
+          }),
+    };
   }
   return {
     scope_type: "protected_boundary",
@@ -659,5 +707,931 @@ describe("durable local-signature Ticket Decision attestation", () => {
         kind: "artifact",
         status: "current_unverified",
       });
+  });
+
+  it("fails Ticket context compilation closed for raw, revoked, and tampered Decision authority", () => {
+    const cases: Array<{
+      name: string;
+      prepare: (
+        fixture: DecisionFixture,
+      ) => {
+        profile: () => TicketDecisionLocalSignatureTrustProfileV0 | null;
+      };
+      reason: string;
+    }> = [
+      {
+        name: "raw",
+        prepare: () => ({ profile: () => null }),
+        reason: "attestation_not_found",
+      },
+      {
+        name: "revoked",
+        prepare: (fixture) => {
+          const receipt = signAttestation(
+            fixture.snapshot,
+            fixture.decision,
+            fixture.signer,
+            new Date(fixture.now - 5_000).toISOString(),
+          );
+          const { attestation_id: _attestationId, ...payload } = receipt;
+          appendTicketDecisionAttestation({
+            worktreeRoot: fixture.repository,
+            request: {
+              expectedSource: expectedSource(fixture.snapshot),
+              attestation: payload,
+            },
+          });
+          return {
+            profile: () => ({
+              ...fixture.signer.profile,
+              revokedAt: new Date(fixture.now).toISOString(),
+            }),
+          };
+        },
+        reason: "profile_revoked",
+      },
+      {
+        name: "tampered",
+        prepare: (fixture) => {
+          const receipt = cloneAttestation(signAttestation(
+            fixture.snapshot,
+            fixture.decision,
+            fixture.signer,
+            new Date(fixture.now - 5_000).toISOString(),
+          ), (value) => {
+            value.signature = Buffer.alloc(64, 11).toString("base64url");
+          });
+          const { attestation_id: _attestationId, ...payload } = receipt;
+          appendTicketDecisionAttestation({
+            worktreeRoot: fixture.repository,
+            request: {
+              expectedSource: expectedSource(fixture.snapshot),
+              attestation: payload,
+            },
+          });
+          return { profile: () => fixture.signer.profile };
+        },
+        reason: "signature_invalid",
+      },
+    ];
+
+    for (const testCase of cases) {
+      const fixture = setupDecision();
+      roots.push(fixture.repository);
+      const prepared = testCase.prepare(fixture);
+      const db = openDb(path.join(
+        fixture.repository,
+        `${testCase.name}-runtime.sqlite`,
+      ));
+      dbs.push(db);
+      const repo = upsertRepo(
+        db,
+        fixture.repository,
+        `fixture/${testCase.name}`,
+        "main",
+        new Date(fixture.now).toISOString(),
+      );
+      const dispatcher = new OperationDispatcher(db, {
+        repoRoot: fixture.repository,
+        ...(testCase.name === "raw"
+          ? {}
+          : {
+              ticketDecisionAttestationTrustProfiles:
+                resolver(prepared.profile),
+            }),
+      });
+      const frontier = dispatcher.dispatch("ticket.frontier.read", {
+        repoId: repo.id,
+        actor: "agent:executor",
+        requestId: `${testCase.name}:frontier`,
+        now: new Date(fixture.now).toISOString(),
+      }, {});
+      if (!frontier.ok) throw new Error(JSON.stringify(frontier));
+      const data = frontier.data as {
+        source: TicketLedgerPatchExpectedSource;
+        tickets: Array<{
+          ticketId: string;
+          ticketRevision: string;
+          status: string;
+          semanticStatus: string;
+          decisionBlocker: {
+            reason: string;
+            decisionId: string;
+          } | null;
+        }>;
+      };
+      const ticket = data.tickets[0];
+      if (ticket === undefined) throw new Error("missing frontier Ticket");
+      expect(ticket, testCase.name).toMatchObject({
+        status: "BLOCKED",
+        semanticStatus: "READY",
+        decisionBlocker: {
+          decisionId: fixture.decision.document.decision_id,
+          reason: testCase.reason,
+        },
+      });
+      const compiled = dispatcher.dispatch("ticket.context.compile", {
+        repoId: repo.id,
+        actor: "agent:executor",
+        requestId: `${testCase.name}:compile`,
+        now: new Date(fixture.now + 1_000).toISOString(),
+      }, {
+        expectedSource: data.source,
+        ticketId: ticket.ticketId,
+        expectedTicketRevision: ticket.ticketRevision,
+      });
+      expect(compiled, testCase.name).toMatchObject({
+        ok: false,
+        error: {
+          code: "ticket_not_ready",
+          details: {
+            decisionId: fixture.decision.document.decision_id,
+            reason: testCase.reason,
+          },
+        },
+      });
+      expect(loadTicketLedgerFromWorktree(fixture.repository).contextBindings)
+        .toEqual([]);
+    }
+  });
+
+  it("keeps a verified request-changes Decision as an explicit frontier blocker", () => {
+    const fixture = setupDecision("request_changes_plan");
+    roots.push(fixture.repository);
+    const receipt = signAttestation(
+      fixture.snapshot,
+      fixture.decision,
+      fixture.signer,
+      new Date(fixture.now - 5_000).toISOString(),
+    );
+    const { attestation_id: _AttestationId, ...payload } = receipt;
+    appendTicketDecisionAttestation({
+      worktreeRoot: fixture.repository,
+      request: {
+        expectedSource: expectedSource(fixture.snapshot),
+        attestation: payload,
+      },
+    });
+    const db = openDb(path.join(fixture.repository, "request-changes.sqlite"));
+    dbs.push(db);
+    const repo = upsertRepo(
+      db,
+      fixture.repository,
+      "fixture/request-changes",
+      "main",
+      new Date(fixture.now).toISOString(),
+    );
+    const dispatcher = new OperationDispatcher(db, {
+      repoRoot: fixture.repository,
+      ticketDecisionAttestationTrustProfiles:
+        resolver(() => fixture.signer.profile),
+    });
+    const frontier = dispatcher.dispatch("ticket.frontier.read", {
+      repoId: repo.id,
+      actor: "agent:executor",
+      requestId: "request-changes:frontier",
+      now: new Date(fixture.now).toISOString(),
+    }, {});
+    expect(frontier).toMatchObject({
+      ok: true,
+      data: {
+        counts: { BLOCKED: 1, READY: 0 },
+        tickets: [{
+          ticketId: "implement-api",
+          status: "BLOCKED",
+          semanticStatus: "READY",
+          decisionBlocker: {
+            kind: "decision_authority",
+            decisionId: fixture.decision.document.decision_id,
+            decisionType: "plan_review",
+            reason: "non_authorizing_disposition",
+            disposition: "request_changes",
+          },
+        }],
+      },
+    });
+  });
+
+  it("binds an exact durable verification into the packet and remains claimable by a fresh dispatcher", () => {
+    const fixture = setupDecision();
+    roots.push(fixture.repository);
+    const receipt = signAttestation(
+      fixture.snapshot,
+      fixture.decision,
+      fixture.signer,
+      new Date(fixture.now - 5_000).toISOString(),
+    );
+    const { attestation_id: _attestationId, ...payload } = receipt;
+    appendTicketDecisionAttestation({
+      worktreeRoot: fixture.repository,
+      request: {
+        expectedSource: expectedSource(fixture.snapshot),
+        attestation: payload,
+      },
+    });
+    const db = openDb(path.join(fixture.repository, "execution.sqlite"));
+    dbs.push(db);
+    const repo = upsertRepo(
+      db,
+      fixture.repository,
+      "fixture/fresh-execution",
+      "main",
+      new Date(fixture.now).toISOString(),
+    );
+    const options = {
+      repoRoot: fixture.repository,
+      ticketDecisionAttestationTrustProfiles:
+        resolver(() => fixture.signer.profile),
+    };
+    const compiler = new OperationDispatcher(db, options);
+    const frontier = compiler.dispatch("ticket.frontier.read", {
+      repoId: repo.id,
+      actor: "agent:compiler",
+      requestId: "durable:frontier",
+      now: new Date(fixture.now).toISOString(),
+    }, {});
+    if (!frontier.ok) throw new Error(JSON.stringify(frontier));
+    const data = frontier.data as {
+      source: TicketLedgerPatchExpectedSource;
+      tickets: Array<{ ticketId: string; ticketRevision: string }>;
+    };
+    const ticket = data.tickets[0];
+    if (ticket === undefined) throw new Error("missing frontier Ticket");
+    const compiled = compiler.dispatch("ticket.context.compile", {
+      repoId: repo.id,
+      actor: "agent:compiler",
+      requestId: "durable:compile",
+      now: new Date(fixture.now + 1_000).toISOString(),
+    }, {
+      expectedSource: data.source,
+      ticketId: ticket.ticketId,
+      expectedTicketRevision: ticket.ticketRevision,
+    });
+    if (!compiled.ok) throw new Error(JSON.stringify(compiled));
+    const compilation = compiled.data as {
+      packet: {
+        decisions: Array<{
+          decisionDigest: string;
+          verification: {
+            source: string;
+            verificationRef: string;
+          };
+        }>;
+      };
+      contextBinding: {
+        documentDigest: string;
+        document: {
+          context_binding_id: string;
+          relevant_decisions: Array<{
+            decision_id: string;
+            decision_digest: string;
+            verification: {
+              source: string;
+              verification_ref: string;
+            };
+          }>;
+        };
+      };
+    };
+    const decisionDigest =
+      ticketDecisionDocumentDigest(fixture.decision.document);
+    expect(compilation.packet.decisions).toEqual([expect.objectContaining({
+      decisionDigest: `sha256:${decisionDigest}`,
+      verification: {
+        source: "durable_local_signature",
+        verificationRef: receipt.attestation_id,
+      },
+    })]);
+    expect(
+      compilation.contextBinding.document.relevant_decisions,
+    ).toEqual([{
+      decision_id: fixture.decision.document.decision_id,
+      decision_digest: decisionDigest,
+      verification: {
+        source: "durable_local_signature",
+        verification_ref: receipt.attestation_id,
+      },
+    }]);
+
+    const afterCompilation =
+      loadTicketLedgerFromWorktree(fixture.repository);
+    let reattestation: TicketDecisionAttestationDocument | undefined;
+    for (let attempt = 0; attempt < 256; attempt += 1) {
+      const candidate = signAttestation(
+        afterCompilation,
+        fixture.decision,
+        fixture.signer,
+        new Date(fixture.now + 1_500).toISOString(),
+      );
+      if (candidate.attestation_id < receipt.attestation_id) {
+        reattestation = candidate;
+        break;
+      }
+    }
+    if (reattestation === undefined) {
+      throw new Error("could not derive an earlier re-attestation id");
+    }
+    const {
+      attestation_id: _ReattestationId,
+      ...reattestationPayload
+    } = reattestation;
+    appendTicketDecisionAttestation({
+      worktreeRoot: fixture.repository,
+      request: {
+        expectedSource: expectedSource(afterCompilation),
+        attestation: reattestationPayload,
+      },
+    });
+
+    const fresh = new OperationDispatcher(db, options);
+    const current = fresh.dispatch("ticket.frontier.read", {
+      repoId: repo.id,
+      actor: "agent:fresh-executor",
+      requestId: "durable:fresh-frontier",
+      now: new Date(fixture.now + 2_000).toISOString(),
+    }, {});
+    if (!current.ok) throw new Error(JSON.stringify(current));
+    const claimed = fresh.dispatch("ticket.run.claim", {
+      repoId: repo.id,
+      actor: "agent:fresh-executor",
+      requestId: "durable:fresh-claim",
+      now: new Date(fixture.now + 2_000).toISOString(),
+    }, {
+      expectedSource: (current.data as { source: unknown }).source,
+      ticketId: ticket.ticketId,
+      expectedTicketRevision: ticket.ticketRevision,
+      contextBindingId:
+        compilation.contextBinding.document.context_binding_id,
+      contextBindingDigest: compilation.contextBinding.documentDigest,
+      leaseSeconds: 300,
+    });
+    expect(claimed).toMatchObject({
+      ok: true,
+      data: {
+        ticketId: "implement-api",
+        actor: "agent:fresh-executor",
+      },
+    });
+  });
+
+  it("invalidates an already-compiled binding when durable authority is revoked", () => {
+    const fixture = setupDecision();
+    roots.push(fixture.repository);
+    const receipt = signAttestation(
+      fixture.snapshot,
+      fixture.decision,
+      fixture.signer,
+      new Date(fixture.now - 5_000).toISOString(),
+    );
+    const { attestation_id: _attestationId, ...payload } = receipt;
+    appendTicketDecisionAttestation({
+      worktreeRoot: fixture.repository,
+      request: {
+        expectedSource: expectedSource(fixture.snapshot),
+        attestation: payload,
+      },
+    });
+    let liveProfile = fixture.signer.profile;
+    const db = openDb(path.join(fixture.repository, "revocation.sqlite"));
+    dbs.push(db);
+    const repo = upsertRepo(
+      db,
+      fixture.repository,
+      "fixture/revocation",
+      "main",
+      new Date(fixture.now).toISOString(),
+    );
+    const options = {
+      repoRoot: fixture.repository,
+      ticketDecisionAttestationTrustProfiles:
+        resolver(() => liveProfile),
+    };
+    const compiler = new OperationDispatcher(db, options);
+    const frontier = compiler.dispatch("ticket.frontier.read", {
+      repoId: repo.id,
+      actor: "agent:compiler",
+      requestId: "revocation:frontier",
+      now: new Date(fixture.now).toISOString(),
+    }, {});
+    if (!frontier.ok) throw new Error(JSON.stringify(frontier));
+    const data = frontier.data as {
+      source: TicketLedgerPatchExpectedSource;
+      tickets: Array<{ ticketId: string; ticketRevision: string }>;
+    };
+    const ticket = data.tickets[0];
+    if (ticket === undefined) throw new Error("missing frontier Ticket");
+    const compiled = compiler.dispatch("ticket.context.compile", {
+      repoId: repo.id,
+      actor: "agent:compiler",
+      requestId: "revocation:compile",
+      now: new Date(fixture.now + 1_000).toISOString(),
+    }, {
+      expectedSource: data.source,
+      ticketId: ticket.ticketId,
+      expectedTicketRevision: ticket.ticketRevision,
+    });
+    if (!compiled.ok) throw new Error(JSON.stringify(compiled));
+    const binding = compiled.data as {
+      contextBinding: {
+        documentDigest: string;
+        document: { context_binding_id: string };
+      };
+    };
+
+    liveProfile = {
+      ...liveProfile,
+      revokedAt: new Date(fixture.now + 2_000).toISOString(),
+    };
+    const fresh = new OperationDispatcher(db, options);
+    const current = fresh.dispatch("ticket.frontier.read", {
+      repoId: repo.id,
+      actor: "agent:executor",
+      requestId: "revocation:current",
+      now: new Date(fixture.now + 2_000).toISOString(),
+    }, {});
+    if (!current.ok) throw new Error(JSON.stringify(current));
+    const claimed = fresh.dispatch("ticket.run.claim", {
+      repoId: repo.id,
+      actor: "agent:executor",
+      requestId: "revocation:claim",
+      now: new Date(fixture.now + 2_000).toISOString(),
+    }, {
+      expectedSource: (current.data as { source: unknown }).source,
+      ticketId: ticket.ticketId,
+      expectedTicketRevision: ticket.ticketRevision,
+      contextBindingId:
+        binding.contextBinding.document.context_binding_id,
+      contextBindingDigest: binding.contextBinding.documentDigest,
+      leaseSeconds: 300,
+    });
+    expect(claimed).toMatchObject({
+      ok: false,
+      error: {
+        code: "ticket_run_stale",
+        details: {
+          decisionId: fixture.decision.document.decision_id,
+          reason: "profile_revoked",
+        },
+      },
+    });
+  });
+
+  it("requires the exact live host-session receipt for an operational Decision binding", () => {
+    const fixture = setupDecision();
+    roots.push(fixture.repository);
+    let now = fixture.now;
+    const registry =
+      new InMemoryTicketDecisionSessionAttestationRegistryV0({
+        now: () => now,
+        ttlMs: 1_000,
+      });
+    expect(registry.attest(fixture.snapshot, fixture.decision)).toBe(true);
+    const live = registry.verify(fixture.snapshot, fixture.decision);
+    if (live.status !== "verified") {
+      throw new Error("missing live host-session receipt");
+    }
+    const ticket = fixture.snapshot.tickets[0];
+    if (ticket === undefined) throw new Error("missing fixture Ticket");
+    const bound = [{
+      decision_id: fixture.decision.document.decision_id,
+      decision_digest:
+        ticketDecisionDocumentDigest(fixture.decision.document),
+      verification: {
+        source: "host_session" as const,
+        verification_ref: live.verificationRef,
+      },
+    }];
+    const verifier = new CompositeTicketDecisionAttestationVerifierV0([
+      new DurableLocalSignatureTicketDecisionAttestationVerifierV0({
+        trustProfiles: resolver(() => null),
+      }),
+      registry,
+    ]);
+    expect(verifyTicketExecutionDecisionAuthorityV0(
+      fixture.snapshot,
+      ticket,
+      verifier,
+      bound,
+    )).toMatchObject({ status: "verified" });
+    expect(verifyTicketExecutionDecisionAuthorityV0(
+      fixture.snapshot,
+      ticket,
+      verifier,
+      [{
+        ...bound[0]!,
+        verification: {
+          source: "host_session",
+          verification_ref: `tdsa-${"0".repeat(64)}`,
+        },
+      }],
+    )).toMatchObject({
+      status: "unverified",
+      issue: { reason: "attestation_identity_mismatch" },
+    });
+
+    now += 1_001;
+    expect(verifyTicketExecutionDecisionAuthorityV0(
+      fixture.snapshot,
+      ticket,
+      verifier,
+      bound,
+    )).toMatchObject({
+      status: "unverified",
+      issue: { reason: "expired" },
+    });
+    const freshRegistry =
+      new InMemoryTicketDecisionSessionAttestationRegistryV0();
+    expect(verifyTicketExecutionDecisionAuthorityV0(
+      fixture.snapshot,
+      ticket,
+      freshRegistry,
+      bound,
+    )).toMatchObject({
+      status: "unverified",
+      issue: { reason: "attestation_not_found" },
+    });
+  });
+
+  it("withdraws DONE and downstream readiness after Decision revocation while preserving the Git Outcome trace", () => {
+    const fixture = setupDecision();
+    roots.push(fixture.repository);
+    applyTicketWorktreePatch({
+      worktreeRoot: fixture.repository,
+      request: {
+        expectedSource: expectedSource(fixture.snapshot),
+        changes: [{
+          op: "put",
+          ticketId: "publish-client",
+          expectedTicketRevision: null,
+          document: dependentTicketDocument(),
+        }],
+      },
+    });
+    const expanded = loadTicketLedgerFromWorktree(fixture.repository);
+    const decision = expanded.decisions.find((candidate) =>
+      candidate.document.decision_id
+        === fixture.decision.document.decision_id);
+    if (decision === undefined) throw new Error("missing expanded Decision");
+    const receipt = signAttestation(
+      expanded,
+      decision,
+      fixture.signer,
+      new Date(fixture.now - 5_000).toISOString(),
+    );
+    const { attestation_id: _attestationId, ...payload } = receipt;
+    appendTicketDecisionAttestation({
+      worktreeRoot: fixture.repository,
+      request: {
+        expectedSource: expectedSource(expanded),
+        attestation: payload,
+      },
+    });
+
+    let liveProfile = fixture.signer.profile;
+    const trustProfiles = resolver(() => liveProfile);
+    const db = openDb(path.join(
+      fixture.repository,
+      "outcome-revocation.sqlite",
+    ));
+    dbs.push(db);
+    const repo = upsertRepo(
+      db,
+      fixture.repository,
+      "fixture/outcome-revocation",
+      "main",
+      new Date(fixture.now).toISOString(),
+    );
+    const dispatcher = new OperationDispatcher(db, {
+      repoRoot: fixture.repository,
+      ticketDecisionAttestationTrustProfiles: trustProfiles,
+    });
+    const dispatch = (
+      operation: string,
+      requestId: string,
+      actor: string,
+      nowOffset: number,
+      input: unknown,
+    ) => dispatcher.dispatch(operation, {
+      repoId: repo.id,
+      actor,
+      requestId,
+      now: new Date(fixture.now + nowOffset).toISOString(),
+    }, input);
+    const successful = <T>(result: ReturnType<typeof dispatch>): T => {
+      if (!result.ok) throw new Error(JSON.stringify(result.error));
+      return result.data as T;
+    };
+
+    const initial = successful<{
+      source: TicketLedgerPatchExpectedSource;
+      tickets: Array<{
+        ticketId: string;
+        ticketRevision: string;
+        status: string;
+      }>;
+    }>(dispatch(
+      "ticket.frontier.read",
+      "outcome-revocation:frontier",
+      "agent:executor",
+      0,
+      {},
+    ));
+    const root = initial.tickets.find((ticket) =>
+      ticket.ticketId === "implement-api");
+    if (root === undefined) throw new Error("missing root Ticket");
+    expect(root.status).toBe("READY");
+    const compiled = successful<{
+      contextBinding: {
+        documentDigest: string;
+        document: { context_binding_id: string };
+      };
+    }>(dispatch(
+      "ticket.context.compile",
+      "outcome-revocation:compile",
+      "agent:executor",
+      1_000,
+      {
+        expectedSource: initial.source,
+        ticketId: root.ticketId,
+        expectedTicketRevision: root.ticketRevision,
+      },
+    ));
+    const afterCompile = successful<{
+      source: TicketLedgerPatchExpectedSource;
+    }>(dispatch(
+      "ticket.frontier.read",
+      "outcome-revocation:after-compile",
+      "agent:executor",
+      2_000,
+      {},
+    ));
+    const run = successful<{
+      runId: string;
+      generation: number;
+      leaseToken: string;
+    }>(dispatch(
+      "ticket.run.claim",
+      "outcome-revocation:claim",
+      "agent:executor",
+      2_000,
+      {
+        expectedSource: afterCompile.source,
+        ticketId: root.ticketId,
+        expectedTicketRevision: root.ticketRevision,
+        contextBindingId:
+          compiled.contextBinding.document.context_binding_id,
+        contextBindingDigest: compiled.contextBinding.documentDigest,
+        leaseSeconds: 300,
+      },
+    ));
+    const runCredentials = {
+      runId: run.runId,
+      generation: run.generation,
+      leaseToken: run.leaseToken,
+    };
+    const evidenceSource = successful<{
+      source: TicketLedgerPatchExpectedSource;
+    }>(dispatch(
+      "ticket.frontier.read",
+      "outcome-revocation:evidence-source",
+      "agent:executor",
+      3_000,
+      {},
+    ));
+    const evidence = successful<{
+      evidence: { document: { evidence_id: string } };
+    }>(dispatch(
+      "ticket.evidence.append",
+      "outcome-revocation:evidence",
+      "agent:executor",
+      3_000,
+      {
+        expectedSource: evidenceSource.source,
+        run: runCredentials,
+        acceptanceId: "api-observable",
+        evidenceType: "inspection",
+        summary: "The reviewed API is observable in the fixture.",
+        references: [{
+          kind: "repo_path",
+          label: "Fixture API",
+          target: "README.md",
+        }],
+      },
+    ));
+    successful(dispatch(
+      "ticket.run.release",
+      "outcome-revocation:release",
+      "agent:executor",
+      4_000,
+      {
+        ...runCredentials,
+        reason: "lease_released",
+      },
+    ));
+    const closeoutSource = successful<{
+      source: TicketLedgerPatchExpectedSource;
+    }>(dispatch(
+      "ticket.frontier.read",
+      "outcome-revocation:closeout-source",
+      "agent:verifier",
+      5_000,
+      {},
+    ));
+    successful(dispatch(
+      "ticket.closeout.append",
+      "outcome-revocation:closeout",
+      "agent:verifier",
+      5_000,
+      {
+        expectedSource: closeoutSource.source,
+        runId: run.runId,
+        generation: run.generation,
+        terminalForm: "successful",
+        executorReport: "Implemented the exact reviewed API.",
+        acceptance: [{
+          acceptanceId: "api-observable",
+          disposition: "accepted",
+          evidenceRefs: [evidence.evidence.document.evidence_id],
+          rationale: "The independent verifier inspected the API.",
+        }],
+        followUpTicketRefs: [],
+        semanticCloseoutRefs: [],
+      },
+    ));
+
+    const completed = successful<{
+      tickets: Array<{
+        ticketId: string;
+        status: string;
+      }>;
+    }>(dispatch(
+      "ticket.frontier.read",
+      "outcome-revocation:completed",
+      "agent:reader",
+      6_000,
+      {},
+    ));
+    expect(completed.tickets.find((ticket) =>
+      ticket.ticketId === "implement-api")).toMatchObject({
+        status: "DONE",
+      });
+    expect(completed.tickets.find((ticket) =>
+      ticket.ticketId === "publish-client")).toMatchObject({
+        status: "READY",
+      });
+
+    liveProfile = {
+      ...liveProfile,
+      revokedAt: new Date(fixture.now + 7_000).toISOString(),
+    };
+    db.close();
+    dbs.splice(dbs.indexOf(db), 1);
+    const freshDb = openDb(path.join(
+      fixture.repository,
+      "outcome-revocation-fresh.sqlite",
+    ));
+    dbs.push(freshDb);
+    const freshRepo = upsertRepo(
+      freshDb,
+      fixture.repository,
+      "fixture/outcome-revocation",
+      "main",
+      new Date(fixture.now + 8_000).toISOString(),
+    );
+    const fresh = new OperationDispatcher(freshDb, {
+      repoRoot: fixture.repository,
+      ticketDecisionAttestationTrustProfiles: trustProfiles,
+    });
+    const revoked = fresh.dispatch("ticket.frontier.read", {
+      repoId: freshRepo.id,
+      actor: "agent:fresh-reader",
+      requestId: "outcome-revocation:fresh-frontier",
+      now: new Date(fixture.now + 8_000).toISOString(),
+    }, {});
+    if (!revoked.ok) throw new Error(JSON.stringify(revoked.error));
+    const revokedFrontier = revoked.data as {
+      source: TicketLedgerPatchExpectedSource;
+      tickets: Array<{
+        ticketId: string;
+        ticketRevision: string;
+        status: string;
+        semanticStatus: string;
+        blockingTicketIds: string[];
+        currentOutcomeId: string | null;
+        decisionBlocker: {
+          reason: string;
+          decisionId: string;
+        } | null;
+      }>;
+    };
+    expect(revokedFrontier.tickets.find((ticket) =>
+      ticket.ticketId === "implement-api")).toMatchObject({
+        status: "BLOCKED",
+        semanticStatus: "DONE",
+        currentOutcomeId: null,
+        decisionBlocker: {
+          decisionId: decision.document.decision_id,
+          reason: "profile_revoked",
+        },
+      });
+    const dependent = revokedFrontier.tickets.find((ticket) =>
+      ticket.ticketId === "publish-client");
+    expect(dependent).toMatchObject({
+      status: "BLOCKED",
+      semanticStatus: "READY",
+      blockingTicketIds: ["implement-api"],
+      currentOutcomeId: null,
+      decisionBlocker: null,
+    });
+    if (dependent === undefined) throw new Error("missing dependent Ticket");
+
+    expect(fresh.dispatch("ticket.context.compile", {
+      repoId: freshRepo.id,
+      actor: "agent:fresh-reader",
+      requestId: "outcome-revocation:dependent-compile",
+      now: new Date(fixture.now + 9_000).toISOString(),
+    }, {
+      expectedSource: revokedFrontier.source,
+      ticketId: dependent.ticketId,
+      expectedTicketRevision: dependent.ticketRevision,
+    })).toMatchObject({
+      ok: false,
+      error: {
+        code: "ticket_not_ready",
+        details: {
+          blockingTicketIds: ["implement-api"],
+        },
+      },
+    });
+    expect(fresh.dispatch("ticket.run.claim", {
+      repoId: freshRepo.id,
+      actor: "agent:fresh-reader",
+      requestId: "outcome-revocation:old-binding-claim",
+      now: new Date(fixture.now + 9_000).toISOString(),
+    }, {
+      expectedSource: revokedFrontier.source,
+      ticketId: root.ticketId,
+      expectedTicketRevision: root.ticketRevision,
+      contextBindingId:
+        compiled.contextBinding.document.context_binding_id,
+      contextBindingDigest: compiled.contextBinding.documentDigest,
+      leaseSeconds: 300,
+    })).toMatchObject({
+      ok: false,
+      error: {
+        code: "ticket_run_stale",
+        details: {
+          decisionId: decision.document.decision_id,
+          reason: "profile_revoked",
+        },
+      },
+    });
+
+    const durableVerifier =
+      new DurableLocalSignatureTicketDecisionAttestationVerifierV0({
+        trustProfiles,
+      });
+    const snapshot =
+      loadTicketLedgerFromWorktree(fixture.repository);
+    expect(snapshot.outcomes).toEqual([
+      expect.objectContaining({
+        document: expect.objectContaining({
+          terminal_form: "successful",
+        }),
+      }),
+    ]);
+    const trusted = projectTicketLedgerForTrustedDecisionHostV0(
+      snapshot,
+      durableVerifier,
+    );
+    expect(trusted.currentCapabilityProjections.find((projection) =>
+      projection.capability === "operational"
+      && projection.subject.kind === "ticket"
+      && projection.subject.ticketId === "implement-api"))
+      .toMatchObject({
+        summary: {
+          label: "BLOCKED",
+          detail: "Recorded Outcome is not operational: profile_revoked",
+        },
+      });
+    expect(trusted.currentCapabilityProjections.find((projection) =>
+      projection.capability === "operational"
+      && projection.subject.kind === "ticket"
+      && projection.subject.ticketId === "publish-client"))
+      .toMatchObject({
+        summary: {
+          label: "BLOCKED",
+          detail: "Waiting for 1 prerequisite",
+        },
+      });
+    expect(trusted.traceRecords.find((record) =>
+      record.kind === "outcome"
+      && record.subkind === "successful")).toBeDefined();
+    const mechanical = projectTicketLedgerForReview(snapshot);
+    expect(mechanical.currentCapabilityProjections.find((projection) =>
+      projection.capability === "operational"
+      && projection.subject.kind === "ticket"
+      && projection.subject.ticketId === "implement-api"))
+      .toMatchObject({ summary: { label: "DONE" } });
   });
 });

@@ -15,7 +15,7 @@ import {
   validateRuntimeRefinements,
 } from "../../../skills/scripts/operation-contract-validator.mjs";
 
-const EXPECTED_INPUT_SCHEMA_HASH="8bbb045781ef72d20624622884200fb4d99370ac2f86d3669dd3814c43e92f40";
+const EXPECTED_INPUT_SCHEMA_HASH="1d77dda56a6135f5413a6e3a2cbd7ccfc9113eb535a12c4ed29f4a864bbdbf30";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../../..");
 const ajv=new Ajv2020({allErrors:true,strict:false});
@@ -146,6 +146,11 @@ function walk(value,visit){
 
 function positiveFixture(name){
   const runId="fixture-run",specId="context-fixture",key="fixture-key",lease={runId,scopeId:"scope",leaseToken:"lease",generation:1};
+  const ticketRun={
+    runId:`trn-${"6".repeat(64)}`,
+    generation:1,
+    leaseToken:"vht_fixture-bearer",
+  };
   const ticketSource={
     sourceToken:`tls-${"1".repeat(64)}`,
     worktreeIdentity:`worktree-${"2".repeat(64)}`,
@@ -217,6 +222,50 @@ function positiveFixture(name){
         rationale:"The reviewed graph has a bounded execution path.",
         resolutionRefs:[],
       },
+    },
+    "ticket.frontier.read":{},
+    "ticket.context.compile":{
+      expectedSource:ticketSource,
+      ticketId:"fixture-ticket",
+      expectedTicketRevision:`sha256:${"7".repeat(64)}`,
+    },
+    "ticket.run.claim":{
+      expectedSource:ticketSource,
+      ticketId:"fixture-ticket",
+      expectedTicketRevision:`sha256:${"7".repeat(64)}`,
+      contextBindingId:`tcb-${"8".repeat(64)}`,
+      contextBindingDigest:`sha256:${"9".repeat(64)}`,
+      leaseSeconds:300,
+    },
+    "ticket.run.heartbeat":{...ticketRun,leaseSeconds:300},
+    "ticket.run.release":{...ticketRun,reason:"lease_released"},
+    "ticket.evidence.append":{
+      expectedSource:ticketSource,
+      run:ticketRun,
+      acceptanceId:"observable-result",
+      evidenceType:"test",
+      summary:"The focused conformance test passed.",
+      references:[{
+        kind:"repo_path",
+        label:"Conformance report",
+        target:"artifacts/conformance.json",
+        digest:`sha256:${"a".repeat(64)}`,
+      }],
+    },
+    "ticket.closeout.append":{
+      expectedSource:ticketSource,
+      runId:ticketRun.runId,
+      generation:ticketRun.generation,
+      terminalForm:"successful",
+      executorReport:"Implemented the bounded Ticket outcome.",
+      acceptance:[{
+        acceptanceId:"observable-result",
+        disposition:"accepted",
+        evidenceRefs:[`tev-${"b".repeat(64)}`],
+        rationale:"The independent verifier accepted the exact evidence.",
+      }],
+      followUpTicketRefs:[],
+      semanticCloseoutRefs:[],
     },
   };
   if(!(name in fixtures))throw new Error(`missing positive operation fixture: ${name}`);
@@ -303,6 +352,33 @@ function negativeFixtures(name,positive,input){
       fixture("trace kinds must be unique",{...positive,kinds:["evidence","evidence"]},["ticket-trace-kinds-unique"]),
       fixture("trace limit above maximum",{...positive,limit:201}),
       fixture("trace subject rejects trailing whitespace",{...positive,subject:{kind:"ticket",ticketId:"TKT-1 "}}),
+    ],
+    "ticket.context.compile":[
+      fixture("context Ticket revision must be exact",{...positive,expectedTicketRevision:"latest"}),
+      fixture("context Ticket ID must be canonical",{...positive,ticketId:"Fixture Ticket"}),
+    ],
+    "ticket.run.claim":[
+      fixture("claim lease below minimum",{...positive,leaseSeconds:14}),
+      fixture("claim context binding digest must be exact",{...positive,contextBindingDigest:"latest"}),
+    ],
+    "ticket.run.heartbeat":[
+      fixture("heartbeat lease above maximum",{...positive,leaseSeconds:3601}),
+      fixture("heartbeat generation must be positive",{...positive,generation:0}),
+    ],
+    "ticket.run.release":[
+      fixture("release reason is closed",{...positive,reason:"done"}),
+      fixture("release bearer rejects whitespace only",{...positive,leaseToken:" "}),
+    ],
+    "ticket.evidence.append":[
+      fixture("evidence requires at least one reference",{...positive,references:[]}),
+      fixture("evidence type is closed",{...positive,evidenceType:"claim"}),
+    ],
+    "ticket.closeout.append":[
+      fixture("closeout terminal form is closed",{...positive,terminalForm:"done"}),
+      fixture("closeout acceptance disposition is closed",{
+        ...positive,
+        acceptance:[{...positive.acceptance?.[0],disposition:"passed"}],
+      }),
     ],
     "ticket.worktree.patch":[
       fixture("patch requires at least one change",{...positive,changes:[]}),

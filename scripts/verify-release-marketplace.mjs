@@ -79,10 +79,15 @@ if (!existsSync(join(pluginRoot, "runtime", "vibehub-runtime.mjs"))) {
 for (const relativePath of [
   join("skills", "vibehub-ticket-review", "SKILL.md"),
   join("skills", "vibehub-ticket-review", "agents", "openai.yaml"),
+  join("skills", "vibehub-ticket-run", "SKILL.md"),
+  join("skills", "vibehub-ticket-run", "agents", "openai.yaml"),
+  join("skills", "vibehub-ticket-closeout", "SKILL.md"),
+  join("skills", "vibehub-ticket-closeout", "agents", "openai.yaml"),
+  join("skills", "scripts", "vh-ticket.mjs"),
   join("skills", "scripts", "vh-ticket-review.mjs"),
 ]) {
   if (!existsSync(join(pluginRoot, relativePath))) {
-    throw new Error(`Ticket review Skill release asset is missing: ${relativePath}`);
+    throw new Error(`Ticket Skill release asset is missing: ${relativePath}`);
   }
 }
 for (const forbidden of ["packages", "node_modules"]) {

@@ -12,6 +12,13 @@ export const TICKET = new Set([
   "graph.snapshot",
   "subject.inspect",
   "trace.list",
+  "frontier.read",
+  "context.compile",
+  "run.claim",
+  "run.heartbeat",
+  "run.release",
+  "evidence.append",
+  "closeout.append",
   "worktree.patch",
   "review.append",
   "decision.record",
@@ -43,7 +50,7 @@ export async function run(group, registry, argv) {
     JSON.parse(raw);
   }
   catch(error){ fail(`invalid JSON input: ${error instanceof Error?error.message:String(error)}`); }
-  const invocation=resolveVibehubInvocation();
+  const invocation=resolveVibehubInvocation({allowPluginRuntime:true});
   const child=await captureCommand(
     invocation.command,
     [...invocation.prefix,group,operation,"--json",...forwarded,"--input","-"],

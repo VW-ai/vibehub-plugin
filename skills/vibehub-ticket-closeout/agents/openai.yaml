@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Ticket Closeout"
+  short_description: "Independently verify and close one Ticket"
+  default_prompt: "Use $vibehub-ticket-closeout to independently adjudicate a completed Ticket."

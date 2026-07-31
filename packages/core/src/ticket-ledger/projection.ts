@@ -5,13 +5,19 @@ import {
 } from "../contract/ticket-review.js";
 import {
   type TicketReviewProjectionSourceV0,
+  type TicketReviewCurrentCapabilityProjectionV0,
 } from "../ticket-review-source.js";
 import {
+  deriveTicketLedgerState,
   ticketRelationId,
 } from "./codec.js";
 import {
+  type TicketContextBindingDocument,
   type TicketDecisionDocument,
+  type TicketEvidenceDocument,
+  type TicketLedgerContextBinding,
   type TicketLedgerSnapshot,
+  type TicketOutcomeDocument,
   type TicketReviewDocument,
   type TicketReviewSubject,
 } from "./contract.js";
@@ -180,6 +186,270 @@ const decisionTraceRecord = (
   };
 };
 
+const executionSubject = (
+  snapshot: TicketLedgerSnapshot,
+  subject: { ticket_id: string; ticket_revision: string },
+): {
+  subject: TicketReviewTraceSubjectV0;
+  current: boolean;
+} => {
+  const ticket = snapshot.tickets.find((candidate) =>
+    candidate.document.ticket_id === subject.ticket_id);
+  return {
+    subject: {
+      kind: "ticket",
+      ticketId: subject.ticket_id,
+      boundTicketRevision: sha256Ref(subject.ticket_revision),
+    },
+    current: ticket?.ticketRevision === subject.ticket_revision,
+  };
+};
+
+const contextBindingTraceRecord = (
+  snapshot: TicketLedgerSnapshot,
+  item: {
+    documentPath: string;
+    document: TicketContextBindingDocument;
+  },
+): TicketReviewTraceRecordV0 => {
+  const locus = executionSubject(snapshot, item.document.subject);
+  return {
+    recordRef: item.document.context_binding_id,
+    kind: "context_binding",
+    subkind: "compiled_context",
+    subject: locus.subject,
+    producer: {
+      kind: "system",
+      ref: item.document.context_binding_id,
+    },
+    occurredAt: item.document.compiled_at,
+    summary: `Compiled ${item.document.context_entries.length} bounded context ${
+      item.document.context_entries.length === 1 ? "entry" : "entries"
+    }`,
+    status: locus.current ? "current" : "historical",
+    crossReferences: [
+      sha256Ref(item.document.graph_digest),
+      item.document.packet_digest,
+      item.document.repository.repository_source_digest,
+      ...item.document.successful_prerequisite_outcomes.map(
+        (reference) => reference.outcome_id,
+      ),
+      ...item.document.relevant_decisions.map(
+        (reference) => reference.decision_id,
+      ),
+      ...item.document.relevant_decisions.map(
+        (reference) => reference.verification.verification_ref,
+      ),
+    ],
+    targets: [{
+      kind: "repo_path",
+      label: "Context binding",
+      target: item.documentPath,
+    }],
+    availability: "available",
+  };
+};
+
+const evidenceTraceRecord = (
+  snapshot: TicketLedgerSnapshot,
+  item: {
+    documentPath: string;
+    document: TicketEvidenceDocument;
+  },
+): TicketReviewTraceRecordV0 => {
+  const locus = executionSubject(snapshot, item.document.subject);
+  return {
+    recordRef: item.document.evidence_id,
+    kind: "evidence",
+    subkind: item.document.evidence_type,
+    subject: locus.subject,
+    producer: {
+      kind: "receipt",
+      ref: item.document.evidence_id,
+    },
+    occurredAt: item.document.produced_at,
+    summary: item.document.summary,
+    status: `${locus.current ? "current" : "historical"}:${
+      item.document.acceptance_id
+    }`,
+    crossReferences: [
+      item.document.context_binding.context_binding_id,
+      item.document.run.run_id,
+      item.document.acceptance_id,
+      ...item.document.references.map((reference) => reference.target),
+    ],
+    targets: [
+      {
+        kind: "repo_path",
+        label: "Evidence document",
+        target: item.documentPath,
+      },
+      ...item.document.references.map((reference) =>
+        reference.reference_type === "repo_path"
+          ? {
+              kind: "repo_path" as const,
+              label: reference.label,
+              target: reference.target,
+            }
+          : {
+              kind: "opaque" as const,
+              label: reference.label,
+              target: reference.target,
+            }),
+    ],
+    availability: "available",
+  };
+};
+
+const outcomeTraceRecord = (
+  snapshot: TicketLedgerSnapshot,
+  item: {
+    documentPath: string;
+    document: TicketOutcomeDocument;
+  },
+): TicketReviewTraceRecordV0 => {
+  const locus = executionSubject(snapshot, item.document.subject);
+  return {
+    recordRef: item.document.outcome_id,
+    kind: "outcome",
+    subkind: item.document.terminal_form,
+    subject: locus.subject,
+    producer: {
+      kind: "receipt",
+      ref: item.document.verifier.actor_ref,
+    },
+    occurredAt: item.document.closed_at,
+    summary: `${item.document.terminal_form} Outcome verified by ${
+      truncate(item.document.verifier.actor_ref, 180)
+    }`,
+    body: item.document.executor_report,
+    status: locus.current
+      ? item.document.terminal_form
+      : `historical_${item.document.terminal_form}`,
+    crossReferences: [
+      item.document.context_binding.context_binding_id,
+      item.document.run.run_id,
+      ...item.document.acceptance.flatMap((acceptance) =>
+        acceptance.evidence_refs.map((reference) => reference.evidence_id)),
+      ...item.document.follow_up_ticket_refs,
+    ],
+    targets: [{
+      kind: "repo_path",
+      label: "Outcome document",
+      target: item.documentPath,
+    }],
+    availability: "available",
+  };
+};
+
+const operationalCapabilityProjections = (
+  snapshot: TicketLedgerSnapshot,
+  options?: TicketLedgerOperationalProjectionOptionsV0,
+): TicketReviewCurrentCapabilityProjectionV0[] => {
+  const watermark = sha256Ref(snapshot.semanticLedgerDigest);
+  const operationalLedger = options === undefined
+    ? snapshot
+    : {
+        tickets: snapshot.tickets,
+        contextBindings: options.contextBindings,
+        outcomes: snapshot.outcomes,
+      };
+  const semanticState = new Map(
+    deriveTicketLedgerState(snapshot).map((state) => [
+      state.ticketId,
+      state,
+    ]),
+  );
+  return deriveTicketLedgerState(operationalLedger).map((state) => {
+    const rawState = semanticState.get(state.ticketId);
+    const rawOutcome = rawState?.currentSuccessfulOutcome ?? null;
+    const authorityIssue = rawOutcome === null
+      || state.currentSuccessfulOutcome !== null
+      ? undefined
+      : options?.issuesByContextBinding.get(
+          rawOutcome.document.context_binding.context_binding_id,
+        );
+    const operationalStatus = authorityIssue === undefined
+      ? state.status
+      : "BLOCKED";
+    const currentDeviation = snapshot.outcomes
+      .filter((outcome) =>
+        outcome.document.subject.ticket_id === state.ticketId
+        && outcome.document.subject.ticket_revision === state.ticketRevision
+        && outcome.document.terminal_form === "deviated")
+      .sort((left, right) =>
+        right.document.closed_at.localeCompare(left.document.closed_at))[0];
+    const occurredAt = state.currentSuccessfulOutcome?.document.closed_at
+      ?? (authorityIssue === undefined ? undefined : rawOutcome?.document.closed_at)
+      ?? currentDeviation?.document.closed_at
+      ?? "1970-01-01T00:00:00.000Z";
+    const references = authorityIssue !== undefined
+      ? [
+          {
+            ref: rawOutcome?.document.outcome_id
+              ?? state.ticketId,
+            label: "Outcome without current Decision authority",
+          },
+          ...(authorityIssue.decisionId === null
+            ? []
+            : [{
+                ref: authorityIssue.decisionId,
+                label: "Decision requiring current authority",
+              }]),
+        ]
+      : state.currentSuccessfulOutcome === null
+        ? state.blockingTicketIds.map((ticketId) => ({
+            ref: ticketId,
+            label: "Blocking prerequisite",
+          }))
+      : [{
+          ref: state.currentSuccessfulOutcome.document.outcome_id,
+          label: "Accepted Outcome",
+        }];
+    return {
+      producerReceiptRef:
+        `${snapshot.source.sourceToken}:${state.ticketId}:operational`,
+      producedAt: occurredAt,
+      snapshotRevision: snapshot.source.sourceToken,
+      projectionWatermark: watermark,
+      summary: {
+        label: operationalStatus,
+        detail: authorityIssue !== undefined
+          ? `Recorded Outcome is not operational: ${authorityIssue.reason}`
+          : state.status === "BLOCKED"
+          ? `Waiting for ${state.blockingTicketIds.length} prerequisite${
+              state.blockingTicketIds.length === 1 ? "" : "s"
+            }`
+          : state.status === "DONE"
+            ? "Accepted current Outcome"
+            : state.status === "DEVIATED"
+              ? "Current execution deviation requires attention"
+              : "All direct prerequisites have accepted current Outcomes",
+        references,
+      },
+      producer: {
+        kind: "runtime",
+        id: "git-ticket-ledger",
+        version: "1",
+      },
+      subject: {
+        kind: "ticket",
+        ticketId: state.ticketId,
+        ticketRevision: sha256Ref(state.ticketRevision),
+      },
+      capability: "operational",
+    };
+  });
+};
+
+export interface TicketLedgerOperationalProjectionOptionsV0 {
+  contextBindings: readonly TicketLedgerContextBinding[];
+  issuesByContextBinding: ReadonlyMap<string, {
+    reason: string;
+    decisionId: string | null;
+  }>;
+}
+
 /**
  * Mechanical adapter from one validated Git Ticket ledger snapshot into the
  * storage-agnostic review source. It adds no readiness, workflow, or planning
@@ -187,6 +457,7 @@ const decisionTraceRecord = (
  */
 export function projectTicketLedgerForReview(
   snapshot: TicketLedgerSnapshot,
+  operational?: TicketLedgerOperationalProjectionOptionsV0,
 ): TicketReviewProjectionSourceV0 {
   const source = snapshot.source.mode === "worktree"
     ? {
@@ -254,12 +525,19 @@ export function projectTicketLedgerForReview(
           : { rationale: relation.rationale }),
         provenanceRefs: [...ticket.document.provenance_refs],
       }))),
-    currentCapabilityProjections: [],
+    currentCapabilityProjections:
+      operationalCapabilityProjections(snapshot, operational),
     traceRecords: [
       ...snapshot.reviews.map((review) =>
         reviewTraceRecord(snapshot, review)),
       ...snapshot.decisions.map((decision) =>
         decisionTraceRecord(snapshot, decision)),
+      ...snapshot.contextBindings.map((binding) =>
+        contextBindingTraceRecord(snapshot, binding)),
+      ...snapshot.evidence.map((item) =>
+        evidenceTraceRecord(snapshot, item)),
+      ...snapshot.outcomes.map((outcome) =>
+        outcomeTraceRecord(snapshot, outcome)),
     ],
   };
 }

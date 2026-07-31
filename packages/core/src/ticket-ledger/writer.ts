@@ -4,24 +4,32 @@ import path from "node:path";
 import { z } from "zod";
 import { GitFacade } from "../git-facade.js";
 import {
+  assertRepositoryPathExcludesGitAdministration,
+} from "../ticket-context-compiler.js";
+import {
   TICKET_LEDGER_MAX_BYTES,
   TICKET_LEDGER_MAX_PATCH_CHANGES,
-  TICKET_LEDGER_ATTESTATION_MAX_BYTES,
-  TICKET_LEDGER_DECISION_MAX_BYTES,
-  TICKET_LEDGER_PROTOCOL_MAX_BYTES,
   TICKET_LEDGER_RELATIVE_PATH,
-  TICKET_LEDGER_REVIEW_MAX_BYTES,
   TICKET_LEDGER_SCHEMA_VERSION,
   TICKET_LEDGER_TICKET_MAX_BYTES,
   TicketLedgerError,
   ticketDecisionDocumentSchema,
   ticketDecisionAttestationDocumentPayloadSchema,
+  ticketContextBindingDocumentSchema,
+  ticketEvidenceDocumentSchema,
+  ticketOutcomeDocumentSchema,
   ticketDocumentSchema,
   ticketReviewSubjectSchema,
   type TicketDecisionDocument,
   type TicketDecisionDocumentPayload,
   type TicketDecisionAttestationDocument,
   type TicketDecisionAttestationDocumentPayload,
+  type TicketContextBindingDocument,
+  type TicketContextBindingDocumentPayload,
+  type TicketEvidenceDocument,
+  type TicketEvidenceDocumentPayload,
+  type TicketOutcomeDocument,
+  type TicketOutcomeDocumentPayload,
   type TicketDocument,
   type TicketLedgerPatchChange,
   type TicketLedgerPatchRequest,
@@ -35,16 +43,30 @@ import {
 } from "./contract.js";
 import {
   canonicalTicketLedgerValue,
+  currentSuccessfulOutcomeForTicket,
   createTicketDecisionDocument,
   createTicketDecisionAttestationDocument,
+  createTicketContextBindingDocument,
+  createTicketEvidenceDocument,
+  createTicketOutcomeDocument,
   createTicketReviewDocument,
   encodeTicketDecisionDocument,
   encodeTicketDecisionAttestationDocument,
+  encodeTicketContextBindingDocument,
+  encodeTicketEvidenceDocument,
+  encodeTicketOutcomeDocument,
   encodeTicketDocument,
   encodeTicketReviewDocument,
   normalizeTicketDocument,
   ticketDecisionDocumentPath,
   ticketDecisionAttestationDocumentPath,
+  ticketContextBindingDocumentPath,
+  ticketContextBindingDocumentDigest,
+  ticketAcceptanceCriterionDigest,
+  ticketEvidenceDocumentPath,
+  ticketEvidenceDocumentDigest,
+  ticketOutcomeDocumentPath,
+  ticketOutcomeDocumentDigest,
   ticketDecisionDocumentDigest,
   ticketDocumentPath,
   ticketLedgerDocumentMaxBytes,
@@ -105,6 +127,50 @@ interface InstalledChange {
 
 const sha256 = (value: string | Buffer): string =>
   crypto.createHash("sha256").update(value).digest("hex");
+const TICKET_LEDGER_REFERENCED_FILE_MAX_BYTES = 4 * 1024 * 1024;
+
+const repositoryAbsolutePath = (
+  worktreeRoot: string,
+  repositoryPath: string,
+): string => {
+  if (
+    path.posix.normalize(repositoryPath) !== repositoryPath
+    || repositoryPath.startsWith("/")
+    || repositoryPath.endsWith("/")
+    || repositoryPath.includes("\\")
+    || repositoryPath.split("/").some((segment) =>
+      segment.length === 0 || segment === "." || segment === "..")
+  ) {
+    throw new TicketLedgerError(
+      "invalid_path",
+      `Repository path is not one normalized relative POSIX path: ${repositoryPath}`,
+      { repositoryPath },
+    );
+  }
+  let current = worktreeRoot;
+  for (const segment of repositoryPath.split("/")) {
+    current = path.join(current, segment);
+    let stat: fs.Stats;
+    try {
+      stat = fs.lstatSync(current);
+    } catch (cause) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Repository path does not resolve: ${repositoryPath}`,
+        { repositoryPath },
+        { cause },
+      );
+    }
+    if (stat.isSymbolicLink()) {
+      throw new TicketLedgerError(
+        "symlink",
+        `Repository path cannot traverse a symlink: ${repositoryPath}`,
+        { repositoryPath },
+      );
+    }
+  }
+  return current;
+};
 
 const sha256Ref = (value: string): string => `sha256:${value}`;
 const rawSha256 = (value: string): string => value.slice("sha256:".length);
@@ -177,15 +243,7 @@ const readPhysicalFile = (
         { documentPath },
       );
     }
-    const maxBytes = documentPath.endsWith("/protocol.yaml")
-      ? TICKET_LEDGER_PROTOCOL_MAX_BYTES
-      : documentPath.includes("/reviews/")
-        ? TICKET_LEDGER_REVIEW_MAX_BYTES
-        : documentPath.includes("/decisions/")
-          ? TICKET_LEDGER_DECISION_MAX_BYTES
-          : documentPath.includes("/attestations/")
-            ? TICKET_LEDGER_ATTESTATION_MAX_BYTES
-            : TICKET_LEDGER_TICKET_MAX_BYTES;
+    const maxBytes = ticketLedgerDocumentMaxBytes(documentPath);
     if (opened.size > maxBytes) {
       throw new TicketLedgerError(
         "file_too_large",
@@ -391,6 +449,9 @@ const prepareChanges = (
     reviews: snapshot.reviews,
     decisions: snapshot.decisions,
     attestations: snapshot.attestations,
+    contextBindings: snapshot.contextBindings,
+    evidence: snapshot.evidence,
+    outcomes: snapshot.outcomes,
   });
   return {
     changes: prepared.sort((left, right) =>
@@ -498,6 +559,57 @@ const assertProspectiveByteCapacity = (
         {
           attestationId: attestation.document.attestation_id,
           documentPath: attestation.documentPath,
+        },
+      );
+    }
+    totalBytes += physical.bytes.byteLength;
+  }
+  for (const binding of snapshot.contextBindings) {
+    const physical = readPhysicalFile(
+      path.join(worktreeRoot, ...binding.documentPath.split("/")),
+      binding.documentPath,
+    );
+    if (physical === null) {
+      throw new TicketLedgerError(
+        "source_changed_during_read",
+        `Context binding ${binding.document.context_binding_id} disappeared during patch capacity validation`,
+        {
+          contextBindingId: binding.document.context_binding_id,
+          documentPath: binding.documentPath,
+        },
+      );
+    }
+    totalBytes += physical.bytes.byteLength;
+  }
+  for (const item of snapshot.evidence) {
+    const physical = readPhysicalFile(
+      path.join(worktreeRoot, ...item.documentPath.split("/")),
+      item.documentPath,
+    );
+    if (physical === null) {
+      throw new TicketLedgerError(
+        "source_changed_during_read",
+        `Evidence ${item.document.evidence_id} disappeared during patch capacity validation`,
+        {
+          evidenceId: item.document.evidence_id,
+          documentPath: item.documentPath,
+        },
+      );
+    }
+    totalBytes += physical.bytes.byteLength;
+  }
+  for (const outcome of snapshot.outcomes) {
+    const physical = readPhysicalFile(
+      path.join(worktreeRoot, ...outcome.documentPath.split("/")),
+      outcome.documentPath,
+    );
+    if (physical === null) {
+      throw new TicketLedgerError(
+        "source_changed_during_read",
+        `Outcome ${outcome.document.outcome_id} disappeared during patch capacity validation`,
+        {
+          outcomeId: outcome.document.outcome_id,
+          documentPath: outcome.documentPath,
         },
       );
     }
@@ -973,6 +1085,30 @@ const decisionAttestationAppendRequestSchema = z.object({
   attestation: ticketDecisionAttestationDocumentPayloadSchema,
 }).strict();
 
+const contextBindingAppendRequestSchema = z.object({
+  expectedSource: semanticMutationSourceSchema,
+  contextBinding: ticketContextBindingDocumentSchema.omit({
+    context_binding_id: true,
+    compiled_at: true,
+  }),
+}).strict();
+
+const evidenceAppendRequestSchema = z.object({
+  expectedSource: semanticMutationSourceSchema,
+  evidence: ticketEvidenceDocumentSchema.omit({
+    evidence_id: true,
+    produced_at: true,
+  }),
+}).strict();
+
+const outcomeAppendRequestSchema = z.object({
+  expectedSource: semanticMutationSourceSchema,
+  outcome: ticketOutcomeDocumentSchema.omit({
+    outcome_id: true,
+    closed_at: true,
+  }),
+}).strict();
+
 export type TicketReviewAuthorContext = TicketReviewDocument["author"];
 export type TicketDecisionAuthorityContext =
   TicketDecisionDocument["authority"];
@@ -985,6 +1121,15 @@ export type TicketDecisionRecordRequest = z.input<
 >;
 export type TicketDecisionAttestationAppendRequest = z.input<
   typeof decisionAttestationAppendRequestSchema
+>;
+export type TicketContextBindingAppendRequest = z.input<
+  typeof contextBindingAppendRequestSchema
+>;
+export type TicketEvidenceAppendRequest = z.input<
+  typeof evidenceAppendRequestSchema
+>;
+export type TicketOutcomeAppendRequest = z.input<
+  typeof outcomeAppendRequestSchema
 >;
 
 export interface TicketReviewAppendResult {
@@ -1032,10 +1177,58 @@ export interface TicketDecisionAttestationAppendResult {
   };
 }
 
+export interface TicketContextBindingAppendResult {
+  status: "applied" | "noop";
+  before: TicketLedgerPatchSource;
+  after: TicketLedgerPatchSource;
+  changedPaths: readonly string[];
+  contextBinding: {
+    documentPath: string;
+    document: TicketContextBindingDocument;
+  };
+  checkpointSelection: {
+    source: TicketLedgerPatchSource;
+    changedPaths: readonly string[];
+  };
+}
+
+export interface TicketEvidenceAppendResult {
+  status: "applied" | "noop";
+  before: TicketLedgerPatchSource;
+  after: TicketLedgerPatchSource;
+  changedPaths: readonly string[];
+  evidence: {
+    documentPath: string;
+    document: TicketEvidenceDocument;
+  };
+  checkpointSelection: {
+    source: TicketLedgerPatchSource;
+    changedPaths: readonly string[];
+  };
+}
+
+export interface TicketOutcomeAppendResult {
+  status: "applied" | "noop";
+  before: TicketLedgerPatchSource;
+  after: TicketLedgerPatchSource;
+  changedPaths: readonly string[];
+  outcome: {
+    documentPath: string;
+    document: TicketOutcomeDocument;
+  };
+  checkpointSelection: {
+    source: TicketLedgerPatchSource;
+    changedPaths: readonly string[];
+  };
+}
+
 type SemanticAppendDocument =
   | TicketReviewDocument
   | TicketDecisionDocument
-  | TicketDecisionAttestationDocument;
+  | TicketDecisionAttestationDocument
+  | TicketContextBindingDocument
+  | TicketEvidenceDocument
+  | TicketOutcomeDocument;
 
 interface PreparedSemanticAppend {
   documentPath: string;
@@ -1096,6 +1289,66 @@ const parseDecisionAttestationAppendRequest = (
     throw new TicketLedgerError(
       "invalid_document",
       "Ticket decision attestation append request is invalid",
+      {
+        issues: parsed.error.issues.slice(0, 16).map((issue) => ({
+          path: issue.path.map(String),
+          code: issue.code,
+          message: issue.message,
+        })),
+      },
+    );
+  }
+  return parsed.data;
+};
+
+const parseContextBindingAppendRequest = (
+  value: TicketContextBindingAppendRequest,
+): z.output<typeof contextBindingAppendRequestSchema> => {
+  const parsed = contextBindingAppendRequestSchema.safeParse(value);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      "Ticket context binding append request is invalid",
+      {
+        issues: parsed.error.issues.slice(0, 16).map((issue) => ({
+          path: issue.path.map(String),
+          code: issue.code,
+          message: issue.message,
+        })),
+      },
+    );
+  }
+  return parsed.data;
+};
+
+const parseEvidenceAppendRequest = (
+  value: TicketEvidenceAppendRequest,
+): z.output<typeof evidenceAppendRequestSchema> => {
+  const parsed = evidenceAppendRequestSchema.safeParse(value);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      "Ticket evidence append request is invalid",
+      {
+        issues: parsed.error.issues.slice(0, 16).map((issue) => ({
+          path: issue.path.map(String),
+          code: issue.code,
+          message: issue.message,
+        })),
+      },
+    );
+  }
+  return parsed.data;
+};
+
+const parseOutcomeAppendRequest = (
+  value: TicketOutcomeAppendRequest,
+): z.output<typeof outcomeAppendRequestSchema> => {
+  const parsed = outcomeAppendRequestSchema.safeParse(value);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      "Ticket outcome append request is invalid",
       {
         issues: parsed.error.issues.slice(0, 16).map((issue) => ({
           path: issue.path.map(String),
@@ -1176,6 +1429,12 @@ const semanticAppendAtPath = (
     decision.documentPath === documentPath)?.document
   ?? snapshot.attestations.find((attestation) =>
     attestation.documentPath === documentPath)?.document
+  ?? snapshot.contextBindings.find((binding) =>
+    binding.documentPath === documentPath)?.document
+  ?? snapshot.evidence.find((item) =>
+    item.documentPath === documentPath)?.document
+  ?? snapshot.outcomes.find((outcome) =>
+    outcome.documentPath === documentPath)?.document
   ?? null;
 
 const sameCanonicalDocument = (
@@ -1232,11 +1491,38 @@ const validateProspectiveSemanticAppend = (
           },
         ]
       : snapshot.attestations,
+    contextBindings: "context_binding_id" in prepared.document
+      ? [
+          ...snapshot.contextBindings,
+          {
+            documentPath: prepared.documentPath,
+            document: prepared.document,
+          },
+        ]
+      : snapshot.contextBindings,
+    evidence: "evidence_id" in prepared.document
+      ? [
+          ...snapshot.evidence,
+          {
+            documentPath: prepared.documentPath,
+            document: prepared.document,
+          },
+        ]
+      : snapshot.evidence,
+    outcomes: "outcome_id" in prepared.document
+      ? [
+          ...snapshot.outcomes,
+          {
+            documentPath: prepared.documentPath,
+            document: prepared.document,
+          },
+        ]
+      : snapshot.outcomes,
   });
   if (content.graphDigest !== snapshot.graphDigest) {
     throw new TicketLedgerError(
       "write_verification_failed",
-      "A review fact unexpectedly changed Ticket graph identity",
+      "A semantic fact unexpectedly changed Ticket graph identity",
       {
         beforeGraphDigest: sha256Ref(snapshot.graphDigest),
         afterGraphDigest: sha256Ref(content.graphDigest),
@@ -1258,6 +1544,9 @@ const assertProspectiveSemanticAppendByteCapacity = (
     ...snapshot.decisions.map((decision) => decision.documentPath),
     ...snapshot.attestations.map((attestation) =>
       attestation.documentPath),
+    ...snapshot.contextBindings.map((binding) => binding.documentPath),
+    ...snapshot.evidence.map((item) => item.documentPath),
+    ...snapshot.outcomes.map((outcome) => outcome.documentPath),
   ];
   let totalBytes = replacementBytes.byteLength;
   for (const documentPath of documentPaths) {
@@ -1292,6 +1581,9 @@ const semanticSnapshotDocumentPaths = (
   ...snapshot.decisions.map((decision) => decision.documentPath),
   ...snapshot.attestations.map((attestation) =>
     attestation.documentPath),
+  ...snapshot.contextBindings.map((binding) => binding.documentPath),
+  ...snapshot.evidence.map((item) => item.documentPath),
+  ...snapshot.outcomes.map((outcome) => outcome.documentPath),
 ];
 
 const captureSemanticPhysicalInventory = (
@@ -1416,7 +1708,10 @@ const removeEmptyDirectories = (directories: readonly string[]): void => {
 const semanticAppend = (options: {
   worktreeRoot: string;
   expectedSource: TicketLedgerPatchSource;
-  assertCurrent: (snapshot: TicketLedgerSnapshot) => void;
+  assertCurrent: (
+    snapshot: TicketLedgerSnapshot,
+    transientSourceExclusions?: readonly string[],
+  ) => void;
   prepare: (snapshot: TicketLedgerSnapshot) => PreparedSemanticAppend;
   equivalent: (
     existing: SemanticAppendDocument,
@@ -1449,7 +1744,7 @@ const semanticAppend = (options: {
   try {
     const beforeSnapshot = loadTicketLedgerFromWorktree(worktreeRoot);
     assertExpectedSource(beforeSnapshot, options.expectedSource);
-    options.assertCurrent(beforeSnapshot);
+    options.assertCurrent(beforeSnapshot, []);
     const before = patchSource(beforeSnapshot);
     const prepared = options.prepare(beforeSnapshot);
     const existing = semanticAppendAtPath(
@@ -1510,7 +1805,11 @@ const semanticAppend = (options: {
 
     const rechecked = loadTicketLedgerFromWorktree(worktreeRoot);
     assertExpectedSource(rechecked, options.expectedSource);
-    options.assertCurrent(rechecked);
+    const transientSourcePath = path.relative(
+      worktreeRoot,
+      stagingRoot,
+    ).split(path.sep).join("/");
+    options.assertCurrent(rechecked, [transientSourcePath]);
     const recheckedPrepared = options.prepare(rechecked);
     if (
       recheckedPrepared.documentPath !== prepared.documentPath
@@ -2065,6 +2364,576 @@ export function appendTicketDecisionAttestation(options: {
     attestation: {
       documentPath: result.prepared.documentPath,
       document,
+    },
+    checkpointSelection: {
+      source: result.after,
+      changedPaths: result.changedPaths,
+    },
+  };
+}
+
+const assertCurrentExecutionSubject = (
+  snapshot: TicketLedgerSnapshot,
+  subject: { ticket_id: string; ticket_revision: string },
+): TicketDocument => {
+  const ticket = snapshot.tickets.find((candidate) =>
+    candidate.document.ticket_id === subject.ticket_id);
+  if (
+    ticket === undefined
+    || ticket.ticketRevision !== subject.ticket_revision
+  ) {
+    throw new TicketLedgerError(
+      "stale_subject",
+      `Ticket execution subject ${subject.ticket_id} is no longer current`,
+      {
+        ticketId: subject.ticket_id,
+        expectedTicketRevision: sha256Ref(subject.ticket_revision),
+        actualTicketRevision: ticket === undefined
+          ? null
+          : sha256Ref(ticket.ticketRevision),
+      },
+    );
+  }
+  return ticket.document;
+};
+
+const assertContextBindingCurrent = (
+  snapshot: TicketLedgerSnapshot,
+  binding: TicketContextBindingDocument,
+  transientSourceExclusions: readonly string[] = [],
+): void => {
+  if (snapshot.source.mode !== "worktree") {
+    throw new TicketLedgerError(
+      "invalid_path",
+      "Ticket context binding requires a worktree source",
+    );
+  }
+  if (snapshot.source.branch === null) {
+    throw new TicketLedgerError(
+      "stale_source",
+      "Ticket execution requires a named branch checkout",
+      { ticketId: binding.subject.ticket_id },
+    );
+  }
+  const ticket = assertCurrentExecutionSubject(snapshot, binding.subject);
+  if (binding.graph_digest !== snapshot.graphDigest) {
+    throw new TicketLedgerError(
+      "stale_source",
+      "Ticket context binding graph is no longer current",
+      {
+        expectedGraphDigest: sha256Ref(binding.graph_digest),
+        actualGraphDigest: sha256Ref(snapshot.graphDigest),
+      },
+    );
+  }
+  const expectedRepository = {
+    repository_incarnation: snapshot.source.repositoryIncarnation,
+    worktree_identity: snapshot.source.worktreeIdentity,
+    branch: snapshot.source.branch,
+    resolved_commit: snapshot.source.resolvedCommit,
+  };
+  const actualRepository = {
+    repository_incarnation:
+      binding.repository.repository_incarnation,
+    worktree_identity: binding.repository.worktree_identity,
+    branch: binding.repository.branch,
+    resolved_commit: binding.repository.resolved_commit,
+  };
+  if (
+    canonicalTicketLedgerValue(expectedRepository)
+    !== canonicalTicketLedgerValue(actualRepository)
+  ) {
+    throw new TicketLedgerError(
+      "stale_source",
+      "Ticket context binding repository identity is no longer current",
+      { expectedRepository, actualRepository },
+    );
+  }
+  const currentRepositorySource = GitFacade.worktreeSourceSnapshotAt(
+    snapshot.source.worktreeRoot,
+    [TICKET_LEDGER_RELATIVE_PATH, ...transientSourceExclusions],
+  );
+  if (
+    currentRepositorySource.headSha !== binding.repository.resolved_commit
+    || currentRepositorySource.branch !== binding.repository.branch
+    || currentRepositorySource.sourceDigest
+      !== binding.repository.repository_source_digest
+  ) {
+    throw new TicketLedgerError(
+      "stale_source",
+      "Ticket context binding repository source digest is no longer current",
+      {
+        expected: {
+          branch: binding.repository.branch,
+          headSha: binding.repository.resolved_commit,
+          sourceDigest: binding.repository.repository_source_digest,
+        },
+        actual: currentRepositorySource,
+      },
+    );
+  }
+
+  const expectedAcceptance = ticket.acceptance.map((acceptance) => ({
+    acceptance_id: acceptance.acceptance_id,
+    criterion_digest:
+      ticketAcceptanceCriterionDigest(acceptance.criterion),
+  })).sort((left, right) => compareText(
+    left.acceptance_id,
+    right.acceptance_id,
+  ));
+  if (
+    canonicalTicketLedgerValue(binding.acceptance)
+    !== canonicalTicketLedgerValue(expectedAcceptance)
+  ) {
+    throw new TicketLedgerError(
+      "stale_subject",
+      "Ticket context binding acceptance snapshot does not match the current Ticket",
+      { ticketId: binding.subject.ticket_id },
+    );
+  }
+  const expectedContextRefs = ticket.context_refs.map((reference) => ({
+    ref: reference.ref,
+    purpose: reference.purpose,
+  })).sort((left, right) => compareText(left.ref, right.ref));
+  const actualContextRefs = binding.context_entries.map((entry) => ({
+    ref: entry.ref,
+    purpose: entry.purpose,
+  }));
+  if (
+    canonicalTicketLedgerValue(actualContextRefs)
+    !== canonicalTicketLedgerValue(expectedContextRefs)
+  ) {
+    throw new TicketLedgerError(
+      "stale_subject",
+      "Ticket context binding entries do not exactly cover current context_refs",
+      { ticketId: binding.subject.ticket_id },
+    );
+  }
+
+  for (const entry of binding.context_entries) {
+    const refPath = repositoryAbsolutePath(
+      snapshot.source.worktreeRoot,
+      entry.ref,
+    );
+    let refStat: fs.Stats;
+    try {
+      refStat = fs.lstatSync(refPath);
+    } catch (cause) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Context reference ${entry.ref} does not resolve`,
+        { ticketId: binding.subject.ticket_id, ref: entry.ref },
+        { cause },
+      );
+    }
+    if (refStat.isSymbolicLink()) {
+      throw new TicketLedgerError(
+        "symlink",
+        `Context reference cannot be a symlink: ${entry.ref}`,
+        { ticketId: binding.subject.ticket_id, ref: entry.ref },
+      );
+    }
+    const expectedKind = refStat.isFile()
+      ? "repo_file"
+      : refStat.isDirectory()
+        ? "repo_directory"
+        : null;
+    if (expectedKind === null || expectedKind !== entry.source_kind) {
+      throw new TicketLedgerError(
+        "unsupported_file",
+        `Context reference ${entry.ref} does not match its declared source kind`,
+        {
+          ticketId: binding.subject.ticket_id,
+          ref: entry.ref,
+          expectedKind,
+          actualKind: entry.source_kind,
+        },
+      );
+    }
+    for (const file of entry.files) {
+      if (
+        entry.source_kind === "repo_file"
+          ? file.repository_path !== entry.ref
+          : !file.repository_path.startsWith(`${entry.ref}/`)
+      ) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Compiled context file ${file.repository_path} is outside ${entry.ref}`,
+          { ref: entry.ref, repositoryPath: file.repository_path },
+        );
+      }
+      const absolutePath = repositoryAbsolutePath(
+        snapshot.source.worktreeRoot,
+        file.repository_path,
+      );
+      let stat: fs.Stats;
+      let bytes: Buffer;
+      try {
+        stat = fs.lstatSync(absolutePath);
+        if (stat.isSymbolicLink() || !stat.isFile()) {
+          throw new TicketLedgerError(
+            stat.isSymbolicLink() ? "symlink" : "unsupported_file",
+            `Compiled context path is not a regular file: ${file.repository_path}`,
+            { repositoryPath: file.repository_path },
+          );
+        }
+        if (
+          stat.size !== file.byte_length
+          || stat.size > 256 * 1024
+        ) {
+          throw new TicketLedgerError(
+            "stale_source",
+            `Compiled context file size changed or exceeds its bound: ${file.repository_path}`,
+            {
+              repositoryPath: file.repository_path,
+              expectedByteLength: file.byte_length,
+              actualByteLength: stat.size,
+              maxBytes: 256 * 1024,
+            },
+          );
+        }
+        bytes = fs.readFileSync(absolutePath);
+      } catch (cause) {
+        if (cause instanceof TicketLedgerError) throw cause;
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Compiled context file does not resolve: ${file.repository_path}`,
+          { repositoryPath: file.repository_path },
+          { cause },
+        );
+      }
+      const actualDigest = `sha256:${sha256(bytes)}`;
+      if (
+        bytes.byteLength !== file.byte_length
+        || actualDigest !== file.file_digest
+      ) {
+        throw new TicketLedgerError(
+          "stale_source",
+          `Compiled context file changed: ${file.repository_path}`,
+          {
+            repositoryPath: file.repository_path,
+            expectedByteLength: file.byte_length,
+            actualByteLength: bytes.byteLength,
+            expectedDigest: file.file_digest,
+            actualDigest,
+          },
+        );
+      }
+    }
+  }
+
+  const expectedPrerequisites = ticket.relations.map((relation) => {
+    const outcome = currentSuccessfulOutcomeForTicket(
+      snapshot,
+      relation.target_ticket_id,
+    );
+    if (outcome === null) {
+      throw new TicketLedgerError(
+        "stale_subject",
+        `Ticket ${ticket.ticket_id} has an incomplete prerequisite`,
+        {
+          ticketId: ticket.ticket_id,
+          prerequisiteTicketId: relation.target_ticket_id,
+        },
+      );
+    }
+    return {
+      ticket_id: relation.target_ticket_id,
+      outcome_id: outcome.document.outcome_id,
+      outcome_digest: ticketOutcomeDocumentDigest(outcome.document),
+    };
+  }).sort((left, right) => compareText(left.ticket_id, right.ticket_id));
+  if (
+    canonicalTicketLedgerValue(
+      binding.successful_prerequisite_outcomes,
+    )
+    !== canonicalTicketLedgerValue(expectedPrerequisites)
+  ) {
+    throw new TicketLedgerError(
+      "stale_subject",
+      "Ticket context binding does not bind the exact current successful prerequisite Outcomes",
+      { ticketId: ticket.ticket_id },
+    );
+  }
+};
+
+const assertEvidenceReferencesResolve = (
+  worktreeRoot: string,
+  evidence: TicketEvidenceDocument,
+): void => {
+  for (const reference of evidence.references) {
+    if (reference.reference_type === "git_commit") {
+      let resolved: string;
+      try {
+        resolved = GitFacade.resolveCommitAt(worktreeRoot, reference.target);
+      } catch (cause) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Evidence commit does not resolve: ${reference.target}`,
+          { evidenceId: evidence.evidence_id, target: reference.target },
+          { cause },
+        );
+      }
+      if (resolved !== reference.target) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Evidence commit must be one exact resolved commit: ${reference.target}`,
+          {
+            evidenceId: evidence.evidence_id,
+            target: reference.target,
+            resolved,
+          },
+        );
+      }
+      continue;
+    }
+    assertRepositoryPathExcludesGitAdministration(reference.target, {
+      evidenceId: evidence.evidence_id,
+      target: reference.target,
+    });
+    const absolutePath = repositoryAbsolutePath(
+      worktreeRoot,
+      reference.target,
+    );
+    let stat: fs.Stats;
+    let bytes: Buffer | null = null;
+    try {
+      stat = fs.lstatSync(absolutePath);
+      if (stat.isSymbolicLink() || !stat.isFile()) {
+        throw new TicketLedgerError(
+          stat.isSymbolicLink() ? "symlink" : "unsupported_file",
+          `Evidence repository path is not a regular file: ${reference.target}`,
+          { evidenceId: evidence.evidence_id, target: reference.target },
+        );
+      }
+      if (
+        reference.digest !== undefined
+        && stat.size > TICKET_LEDGER_REFERENCED_FILE_MAX_BYTES
+      ) {
+        throw new TicketLedgerError(
+          "file_too_large",
+          `Evidence repository path exceeds its digest verification bound: ${reference.target}`,
+          {
+            evidenceId: evidence.evidence_id,
+            target: reference.target,
+            byteLength: stat.size,
+            maxBytes: TICKET_LEDGER_REFERENCED_FILE_MAX_BYTES,
+          },
+        );
+      }
+      if (reference.digest !== undefined) {
+        bytes = fs.readFileSync(absolutePath);
+      }
+    } catch (cause) {
+      if (cause instanceof TicketLedgerError) throw cause;
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Evidence repository path does not resolve: ${reference.target}`,
+        { evidenceId: evidence.evidence_id, target: reference.target },
+        { cause },
+      );
+    }
+    if (
+      reference.digest !== undefined
+      && bytes !== null
+      && reference.digest !== `sha256:${sha256(bytes)}`
+    ) {
+      throw new TicketLedgerError(
+        "stale_source",
+        `Evidence repository path digest changed: ${reference.target}`,
+        {
+          evidenceId: evidence.evidence_id,
+          target: reference.target,
+          expectedDigest: reference.digest,
+          actualDigest: `sha256:${sha256(bytes)}`,
+        },
+      );
+    }
+  }
+};
+
+const withoutTimestamp = (
+  document: SemanticAppendDocument,
+): Record<string, unknown> => {
+  const timestampField = document.kind === "ticket_context_binding"
+    ? "compiled_at"
+    : document.kind === "ticket_evidence"
+      ? "produced_at"
+      : document.kind === "ticket_outcome"
+        ? "closed_at"
+        : null;
+  return Object.fromEntries(Object.entries(document).filter(([key]) =>
+    key !== timestampField));
+};
+
+const sameTimestampIndependentIntent = (
+  left: SemanticAppendDocument,
+  right: SemanticAppendDocument,
+): boolean =>
+  left.kind === right.kind
+  && canonicalTicketLedgerValue(withoutTimestamp(left))
+    === canonicalTicketLedgerValue(withoutTimestamp(right));
+
+export function appendTicketContextBinding(options: {
+  worktreeRoot: string;
+  request: TicketContextBindingAppendRequest;
+  compiledAt: string;
+}): TicketContextBindingAppendResult {
+  const request = parseContextBindingAppendRequest(options.request);
+  const payload = {
+    ...request.contextBinding,
+    compiled_at: options.compiledAt,
+  } as TicketContextBindingDocumentPayload;
+  const preparedDocument = createTicketContextBindingDocument(payload);
+  const result = semanticAppend({
+    worktreeRoot: options.worktreeRoot,
+    expectedSource: request.expectedSource,
+    assertCurrent(snapshot, transientSourceExclusions = []) {
+      assertContextBindingCurrent(
+        snapshot,
+        preparedDocument,
+        transientSourceExclusions,
+      );
+    },
+    prepare(snapshot) {
+      const document = createTicketContextBindingDocument(payload);
+      return {
+        documentPath: ticketContextBindingDocumentPath(document),
+        document,
+        bytes: encodeTicketContextBindingDocument(document),
+      };
+    },
+    equivalent: sameTimestampIndependentIntent,
+  });
+  if (!("context_binding_id" in result.prepared.document)) {
+    throw new TicketLedgerError(
+      "write_verification_failed",
+      "Ticket context binding append returned another document kind",
+    );
+  }
+  return {
+    status: result.status,
+    before: result.before,
+    after: result.after,
+    changedPaths: result.changedPaths,
+    contextBinding: {
+      documentPath: result.prepared.documentPath,
+      document: result.prepared.document,
+    },
+    checkpointSelection: {
+      source: result.after,
+      changedPaths: result.changedPaths,
+    },
+  };
+}
+
+export function appendTicketEvidence(options: {
+  worktreeRoot: string;
+  request: TicketEvidenceAppendRequest;
+  producedAt: string;
+}): TicketEvidenceAppendResult {
+  const request = parseEvidenceAppendRequest(options.request);
+  const payload = {
+    ...request.evidence,
+    produced_at: options.producedAt,
+  } as TicketEvidenceDocumentPayload;
+  const preparedDocument = createTicketEvidenceDocument(payload);
+  const assertCurrent = (snapshot: TicketLedgerSnapshot): void => {
+    assertCurrentExecutionSubject(snapshot, preparedDocument.subject);
+    if (snapshot.source.mode !== "worktree") {
+      throw new TicketLedgerError(
+        "invalid_path",
+        "Ticket evidence append requires a worktree source",
+      );
+    }
+    assertEvidenceReferencesResolve(
+      snapshot.source.worktreeRoot,
+      preparedDocument,
+    );
+  };
+  const result = semanticAppend({
+    worktreeRoot: options.worktreeRoot,
+    expectedSource: request.expectedSource,
+    assertCurrent,
+    prepare(snapshot) {
+      const document = createTicketEvidenceDocument(payload);
+      assertCurrent(snapshot);
+      return {
+        documentPath: ticketEvidenceDocumentPath(document),
+        document,
+        bytes: encodeTicketEvidenceDocument(document),
+      };
+    },
+    equivalent: sameTimestampIndependentIntent,
+  });
+  if (!("evidence_id" in result.prepared.document)) {
+    throw new TicketLedgerError(
+      "write_verification_failed",
+      "Ticket evidence append returned another document kind",
+    );
+  }
+  return {
+    status: result.status,
+    before: result.before,
+    after: result.after,
+    changedPaths: result.changedPaths,
+    evidence: {
+      documentPath: result.prepared.documentPath,
+      document: result.prepared.document,
+    },
+    checkpointSelection: {
+      source: result.after,
+      changedPaths: result.changedPaths,
+    },
+  };
+}
+
+export function appendTicketOutcome(options: {
+  worktreeRoot: string;
+  request: TicketOutcomeAppendRequest;
+  closedAt: string;
+}): TicketOutcomeAppendResult {
+  const request = parseOutcomeAppendRequest(options.request);
+  const payload = {
+    ...request.outcome,
+    closed_at: options.closedAt,
+  } as TicketOutcomeDocumentPayload;
+  const preparedDocument = createTicketOutcomeDocument(payload);
+  const result = semanticAppend({
+    worktreeRoot: options.worktreeRoot,
+    expectedSource: request.expectedSource,
+    assertCurrent(snapshot) {
+      if (preparedDocument.terminal_form !== "stale") {
+        assertCurrentExecutionSubject(snapshot, preparedDocument.subject);
+      }
+    },
+    prepare(snapshot) {
+      const document = createTicketOutcomeDocument(payload);
+      if (document.terminal_form !== "stale") {
+        assertCurrentExecutionSubject(snapshot, document.subject);
+      }
+      return {
+        documentPath: ticketOutcomeDocumentPath(document),
+        document,
+        bytes: encodeTicketOutcomeDocument(document),
+      };
+    },
+    equivalent: sameTimestampIndependentIntent,
+  });
+  if (!("outcome_id" in result.prepared.document)) {
+    throw new TicketLedgerError(
+      "write_verification_failed",
+      "Ticket outcome append returned another document kind",
+    );
+  }
+  return {
+    status: result.status,
+    before: result.before,
+    after: result.after,
+    changedPaths: result.changedPaths,
+    outcome: {
+      documentPath: result.prepared.documentPath,
+      document: result.prepared.document,
     },
     checkpointSelection: {
       source: result.after,

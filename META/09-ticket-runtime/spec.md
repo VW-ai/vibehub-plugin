@@ -38,6 +38,12 @@ while replacing the ceremony with one explicit Plugin-host click and a
 repository-scoped, installation-local Ed25519 key. The result makes no
 biometric or named-human-presence claim.
 
+M4 adds the complete MR-ready execution loop without requiring the unfinished
+runtime to dogfood itself: derived frontier, exact bounded ContextBinding,
+disposable Run leases, executor-authored Git Evidence, independent Outcome
+closeout, direct downstream unlock, and quiet operational projection. Real
+Plugin-feature dogfood is post-merge M5 evidence.
+
 ## Canonical decisions
 
 ### Product and intelligence
@@ -67,9 +73,10 @@ biometric or named-human-presence claim.
   Git ref/commit/worktree semantics own graph history and collaboration.
   Proposal, Validation, Decision, and Receipt documents exist when their
   meaning is needed, not as mandatory stages.
-- [`decision-ticket-mvp-002`](specs/decision-ticket-mvp-002.yaml):
-  the first dogfood loop is Git documents + Skills + deterministic scripts +
-  graph HTML + disposable runtime.
+- [`decision-ticket-mr-ready-boundary-001`](specs/decision-ticket-mr-ready-boundary-001.yaml):
+  M4 reaches MR-ready through a bounded synthetic execution/closeout
+  conformance loop and release gates; real Plugin-feature dogfood moves to
+  post-merge M5.
 - [`contract-ticket-git-worktree-patch-001`](specs/contract-ticket-git-worktree-patch-001.yaml):
   Skills receive one receiptless `ticket.worktree.patch` hand. It binds the
   exact worktree, HEAD, semantic graph, raw ledger inventory, and targeted
@@ -95,6 +102,14 @@ biometric or named-human-presence claim.
 - [`contract-ticket-durable-decision-attestation-001`](specs/contract-ticket-durable-decision-attestation-001.yaml):
   the superseded M3.5 WebAuthn contract remains historical provenance for the
   first durable-receipt boundary.
+- [`contract-ticket-context-binding-001`](specs/contract-ticket-context-binding-001.yaml):
+  execution compiles one exact, bounded, fail-closed repository and Feature
+  Room context packet. This objectively adjudicable technical contract is
+  Agent-owned rather than a protected human decision.
+- [`contract-ticket-closeout-001`](specs/contract-ticket-closeout-001.yaml):
+  executor Evidence cannot self-certify; a different verifier records the
+  terminal Outcome, and only a current successful Outcome derives DONE and
+  direct downstream eligibility.
 
 ### Human surface
 
@@ -115,21 +130,18 @@ biometric or named-human-presence claim.
   bytes, so formatting-only or comment-only edits stale an old write even when
   normalized Ticket semantics have not changed.
 - Commits are durable branch truth; push/PR exposes collaborative proposals.
-- SQLite Run state binds exact worktree, HEAD or dirty graph digest, Ticket ID,
-  and Ticket revision.
+- SQLite Run state binds repository identity, exact worktree, branch,
+  execution-start HEAD and non-ledger source digest, Ticket revision,
+  ContextBinding, actor, and lease generation.
 - Branch switches or relevant Ticket edits stale/suspend an old Run.
 - Deleting SQLite may lose a heartbeat or claim, but never Ticket meaning,
   decisions, accepted completion, or evidence.
 
 ## Open focused decisions
 
-- [`decision-ticket-context-binding-001`](specs/decision-ticket-context-binding-001.yaml):
-  exact Feature Room and repository context compilation.
 - [`decision-ticket-workflow-role-001`](specs/decision-ticket-workflow-role-001.yaml):
   reusable method/intelligence assets without introducing a generic workflow
   engine.
-- [`decision-ticket-closeout-001`](specs/decision-ticket-closeout-001.yaml):
-  final Outcome/Evidence adjudication and semantic closeout.
 
 ## Historical implementation artifacts
 
@@ -245,8 +257,11 @@ Review remains optional intelligence rather than a mandatory activation stage.
 Adversarial review established that editable Decision YAML cannot authenticate
 its own authority. M3 therefore fails closed with active-session attestation.
 M3.5 historically supplied the first durable cross-process attestation. M3.6
-now supplies the active, honestly scoped local-installation authority before
-protected context-binding and closeout Decisions truthfully unblock M4.
+now supplies the active, honestly scoped local-installation authority whenever
+a genuine protected product or permission boundary needs durable confirmation.
+Subsequent M4 analysis classified context binding and closeout mechanics as
+objectively adjudicable Agent-owned contracts, so neither carries a manufactured
+human-ratification gate.
 The independently validated truth-boundary candidate was applied as 11 Tickets
 and 11 direct relations at graph digest
 `sha256:8d126f52313d97fd7ed529ae6e52847a3d426d3fcf6d22b9420979f385e94992`
@@ -310,7 +325,46 @@ historical M3.5 outcome and inserts the distinct M3.6 Ticket on the path to
 context binding, producing 12 Tickets and 12 direct relations at graph digest
 `sha256:09d0081f034778d293e4563b0a45bb411c1e2e1baf714cb1d9c8abe20f247be2`.
 
-Execution, Outcome, Evidence, and closeout remain M4.
+M4 execution and independent closeout are implemented on the branch:
+
+- `ticket.frontier.read` derives READY, RUNNING, DONE, BLOCKED, DEVIATED, and
+  STALE from current Git facts, dynamically verified Decision authority, and
+  disposable live Runs;
+- `ticket.context.compile` deterministically expands bounded repository
+  references, binds the exact staged index state plus verified Decision
+  receipts, rejects Git administration paths and the semantic Ticket ledger as
+  generic file context—including through a containing directory—and appends
+  the exact ContextBinding manifest to Git;
+- `ticket.run.claim` recompiles that exact context before work begins, so
+  ignored-file changes and new ignored files inside a referenced directory
+  cannot bypass source staleness;
+- claim, heartbeat, and release use short-lived SQLite leases whose deletion
+  loses no Ticket meaning or accepted completion;
+- executor-authored Evidence over ordinary symlink-free worktree paths and
+  independently adjudicated Outcomes append as exact Git facts; Evidence
+  cannot cite Git administration paths, one exact Run generation admits only
+  one terminal Outcome, and successful Outcomes unlock direct dependents only
+  while their bound Decision authority remains dynamically current;
+- the Run and Closeout Skills orchestrate the seven public operations while
+  keeping semantic judgment in Skill intelligence rather than a generic
+  workflow engine;
+- CLI, MCP, and the HTML graph expose the same operational truth, with healthy
+  state quiet and deviations elevated; MCP uses one stable claimed actor per
+  connection so executor and verifier sessions do not collapse into one
+  global identity;
+- installed Ticket and checkpoint wrappers prefer their own bundled runtime
+  before PATH, so the thin marketplace artifact remains callable without a
+  separately installed global CLI;
+- bounded conformance fixtures cover success, a real two-path join,
+  partial/failed retry, deviation blocking, stale historical attempts,
+  replacement Runs, source movement, staged-index differences, raw/revoked/
+  tampered or post-closeout-revoked Decision authority, semantic-ledger
+  context-ref exclusion, ignored-context mutation, Git-administration
+  exclusion, conflicting terminal closeout, and SQLite deletion recovery.
+
+M4 MR readiness is intentionally established without real-project dogfood.
+The bounded Plugin-feature proof remains M5 after merge and must not be
+retroactively claimed from the synthetic fixture.
 
 The first real write also exposed a host-integration boundary: the Agent
 sandbox may reject an arbitrary Node adapter's otherwise authorized `.git`
@@ -333,3 +387,4 @@ Implementation evidence is recorded in:
 - [`Ticket M3/M3.5 authority-boundary validated candidate`](artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json)
 - [`Ticket M3.5 durable Decision attestation`](artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md)
 - [`Ticket M3.6 install-local Decision authority pivot`](artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md)
+- [`Ticket M4 execution and independent closeout`](artifacts/2026-07-30-ticket-m4-execution-closeout.md)

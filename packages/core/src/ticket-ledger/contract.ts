@@ -9,11 +9,17 @@ export const TICKET_LEDGER_TICKET_MAX_BYTES = 256 * 1024;
 export const TICKET_LEDGER_REVIEW_MAX_BYTES = 384 * 1024;
 export const TICKET_LEDGER_DECISION_MAX_BYTES = 64 * 1024;
 export const TICKET_LEDGER_ATTESTATION_MAX_BYTES = 128 * 1024;
+export const TICKET_LEDGER_CONTEXT_BINDING_MAX_BYTES = 512 * 1024;
+export const TICKET_LEDGER_EVIDENCE_MAX_BYTES = 128 * 1024;
+export const TICKET_LEDGER_OUTCOME_MAX_BYTES = 256 * 1024;
 export const TICKET_LEDGER_MAX_BYTES = 8 * 1024 * 1024;
 export const TICKET_LEDGER_MAX_TICKETS = 1_000;
 export const TICKET_LEDGER_MAX_REVIEWS = 5_000;
 export const TICKET_LEDGER_MAX_DECISIONS = 2_000;
 export const TICKET_LEDGER_MAX_ATTESTATIONS = 2_000;
+export const TICKET_LEDGER_MAX_CONTEXT_BINDINGS = 2_000;
+export const TICKET_LEDGER_MAX_EVIDENCE = 5_000;
+export const TICKET_LEDGER_MAX_OUTCOMES = 2_000;
 export const TICKET_LEDGER_MAX_RELATIONS = 5_000;
 export const TICKET_LEDGER_MAX_PATCH_CHANGES = 1_000;
 export const TICKET_LEDGER_MAX_DIRTY_PATHS = 128;
@@ -41,11 +47,15 @@ const boundedText = (max: number) =>
     .regex(/^(?=[\s\S]*\S)[\s\S]*$/u, "must not be blank");
 
 const sha256DigestSchema = z.string().regex(/^[0-9a-f]{64}$/u);
+const sha256RefSchema = z.string().regex(/^sha256:[0-9a-f]{64}$/u);
 const gitCommitSchema = z.string().regex(/^[0-9a-f]{40,64}$/u);
 const relationRefSchema = z.string().regex(/^trl-[0-9a-f]{64}$/u);
 const reviewIdSchema = z.string().regex(/^trv-[0-9a-f]{64}$/u);
 const decisionIdSchema = z.string().regex(/^tdc-[0-9a-f]{64}$/u);
 const attestationIdSchema = z.string().regex(/^tda-[0-9a-f]{64}$/u);
+const contextBindingIdSchema = z.string().regex(/^tcb-[0-9a-f]{64}$/u);
+const evidenceIdSchema = z.string().regex(/^tev-[0-9a-f]{64}$/u);
+const outcomeIdSchema = z.string().regex(/^tout-[0-9a-f]{64}$/u);
 const instantSchema = z.iso.datetime({ offset: true }).refine(
   (value) => Number.isFinite(Date.parse(value)),
   { message: "must be a representable ISO datetime" },
@@ -433,6 +443,201 @@ export const ticketDecisionAttestationDocumentSchema =
     attestation_id: attestationIdSchema,
   });
 
+const ticketExecutionSubjectSchema = z.object({
+  ticket_id: identifierSchema,
+  ticket_revision: sha256DigestSchema,
+}).strict();
+
+const ticketExecutionActorSchema = z.object({
+  actor_kind: z.enum(["agent", "human"]),
+  actor_ref: boundedText(512),
+}).strict();
+
+const ticketExecutionRunSchema = z.object({
+  run_id: identifierSchema,
+  generation: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+  executor: ticketExecutionActorSchema,
+  started_source_digest: sha256RefSchema,
+}).strict();
+
+const repositoryPathSchema = z.string()
+  .min(1)
+  .max(4_096)
+  .refine((value) =>
+    !value.startsWith("/")
+    && !value.endsWith("/")
+    && !value.includes("\\")
+    && !value.includes("\0")
+    && value.split("/").every((segment) =>
+      segment.length > 0 && segment !== "." && segment !== ".."), {
+    message: "must be one normalized repository-relative POSIX path",
+  });
+
+const ticketContextBindingRepositorySchema = z.object({
+  repository_incarnation: z.string().regex(/^repo-[0-9a-f]{64}$/u),
+  worktree_identity: z.string().regex(/^worktree-[0-9a-f]{64}$/u),
+  branch: boundedText(1_024),
+  resolved_commit: gitCommitSchema,
+  repository_source_digest: sha256RefSchema,
+}).strict();
+
+const ticketContextBindingAcceptanceSchema = z.object({
+  acceptance_id: identifierSchema,
+  criterion_digest: sha256DigestSchema,
+}).strict();
+
+const ticketContextBindingFileSchema = z.object({
+  repository_path: repositoryPathSchema,
+  file_digest: sha256RefSchema,
+  byte_length: z.number().int().min(0).max(256 * 1024),
+}).strict();
+
+const ticketContextBindingEntrySchema = z.object({
+  ref: boundedText(4_096),
+  purpose: boundedText(4_096),
+  source_kind: z.enum(["repo_file", "repo_directory"]),
+  files: z.array(ticketContextBindingFileSchema).min(1).max(256),
+}).strict();
+
+const ticketSuccessfulPrerequisiteOutcomeRefSchema = z.object({
+  ticket_id: identifierSchema,
+  outcome_id: outcomeIdSchema,
+  outcome_digest: sha256DigestSchema,
+}).strict();
+
+const ticketDecisionRefSchema = z.object({
+  decision_id: decisionIdSchema,
+  decision_digest: sha256DigestSchema,
+  verification: z.discriminatedUnion("source", [
+    z.object({
+      source: z.literal("durable_local_signature"),
+      verification_ref: attestationIdSchema,
+    }).strict(),
+    z.object({
+      source: z.literal("host_session"),
+      verification_ref: z.string().regex(/^tdsa-[0-9a-f]{64}$/u),
+    }).strict(),
+  ]),
+}).strict();
+
+const ticketContextBindingShape = {
+  schema_version: z.literal(TICKET_LEDGER_SCHEMA_VERSION),
+  kind: z.literal("ticket_context_binding"),
+  context_binding_id: contextBindingIdSchema,
+  subject: ticketExecutionSubjectSchema,
+  graph_digest: sha256DigestSchema,
+  repository: ticketContextBindingRepositorySchema,
+  acceptance: z.array(ticketContextBindingAcceptanceSchema).max(128),
+  context_entries: z.array(ticketContextBindingEntrySchema).max(128),
+  successful_prerequisite_outcomes:
+    z.array(ticketSuccessfulPrerequisiteOutcomeRefSchema).max(256),
+  relevant_decisions: z.array(ticketDecisionRefSchema).max(128),
+  packet_digest: sha256DigestSchema,
+  compiled_at: instantSchema,
+} satisfies z.ZodRawShape;
+
+export const ticketContextBindingDocumentSchema = z.object(
+  ticketContextBindingShape,
+).strict();
+
+const ticketContextBindingRefSchema = z.object({
+  context_binding_id: contextBindingIdSchema,
+  document_digest: sha256DigestSchema,
+  packet_digest: sha256DigestSchema,
+}).strict();
+
+const ticketEvidenceReferenceSchema = z.discriminatedUnion("reference_type", [
+  z.object({
+    reference_type: z.literal("repo_path"),
+    label: boundedText(512),
+    target: repositoryPathSchema,
+    digest: sha256RefSchema.optional(),
+  }).strict(),
+  z.object({
+    reference_type: z.literal("git_commit"),
+    label: boundedText(512),
+    target: gitCommitSchema,
+    digest: sha256RefSchema.optional(),
+  }).strict(),
+]);
+
+const ticketEvidenceShape = {
+  schema_version: z.literal(TICKET_LEDGER_SCHEMA_VERSION),
+  kind: z.literal("ticket_evidence"),
+  evidence_id: evidenceIdSchema,
+  subject: ticketExecutionSubjectSchema,
+  context_binding: ticketContextBindingRefSchema,
+  run: ticketExecutionRunSchema,
+  acceptance_id: identifierSchema,
+  evidence_type: z.enum([
+    "test",
+    "inspection",
+    "artifact",
+    "commit",
+    "runtime_observation",
+  ]),
+  summary: boundedText(20_000),
+  references: z.array(ticketEvidenceReferenceSchema).min(1).max(128),
+  produced_at: instantSchema,
+} satisfies z.ZodRawShape;
+
+export const ticketEvidenceDocumentSchema = z.object(
+  ticketEvidenceShape,
+).strict();
+
+const ticketOutcomeEvidenceRefSchema = z.object({
+  evidence_id: evidenceIdSchema,
+  evidence_digest: sha256DigestSchema,
+}).strict();
+
+const ticketOutcomeAcceptanceSchema = z.object({
+  acceptance_id: identifierSchema,
+  adjudication: z.enum(["accepted", "rejected", "unresolved"]),
+  evidence_refs: z.array(ticketOutcomeEvidenceRefSchema).max(128),
+  rationale: boundedText(20_000),
+}).strict();
+
+const ticketSemanticCloseoutRefSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("review"),
+    review_id: reviewIdSchema,
+  }).strict(),
+  z.object({
+    kind: z.literal("decision"),
+    decision_id: decisionIdSchema,
+  }).strict(),
+  z.object({
+    kind: z.literal("decision_attestation"),
+    attestation_id: attestationIdSchema,
+  }).strict(),
+]);
+
+const ticketOutcomeShape = {
+  schema_version: z.literal(TICKET_LEDGER_SCHEMA_VERSION),
+  kind: z.literal("ticket_outcome"),
+  outcome_id: outcomeIdSchema,
+  subject: ticketExecutionSubjectSchema,
+  context_binding: ticketContextBindingRefSchema,
+  run: ticketExecutionRunSchema,
+  terminal_form: z.enum([
+    "successful",
+    "partial",
+    "failed",
+    "deviated",
+    "stale",
+  ]),
+  executor_report: boundedText(40_000),
+  acceptance: z.array(ticketOutcomeAcceptanceSchema).max(128),
+  verifier: ticketExecutionActorSchema,
+  follow_up_ticket_refs: z.array(identifierSchema).max(128),
+  semantic_closeout_refs: z.array(ticketSemanticCloseoutRefSchema).max(128),
+  closed_at: instantSchema,
+} satisfies z.ZodRawShape;
+
+export const ticketOutcomeDocumentSchema = z.object(
+  ticketOutcomeShape,
+).strict();
+
 export type TicketLedgerProtocol = z.infer<typeof ticketLedgerProtocolSchema>;
 export type TicketAcceptance = z.infer<typeof ticketAcceptanceSchema>;
 export type TicketContextRef = z.infer<typeof ticketContextRefSchema>;
@@ -451,12 +656,28 @@ export type TicketDecisionAttestationScope =
   TicketDecisionAttestationDocument["scope"];
 export type TicketDecisionAttestationEnvelope =
   Omit<TicketDecisionAttestationDocumentPayload, "signature">;
+export type TicketExecutionSubject =
+  z.infer<typeof ticketExecutionSubjectSchema>;
+export type TicketExecutionActor = z.infer<typeof ticketExecutionActorSchema>;
+export type TicketExecutionRun = z.infer<typeof ticketExecutionRunSchema>;
+export type TicketContextBindingDocument =
+  z.infer<typeof ticketContextBindingDocumentSchema>;
+export type TicketEvidenceDocument =
+  z.infer<typeof ticketEvidenceDocumentSchema>;
+export type TicketOutcomeDocument =
+  z.infer<typeof ticketOutcomeDocumentSchema>;
 type WithoutField<T, Field extends PropertyKey> =
   T extends unknown ? Omit<T, Field> : never;
 export type TicketReviewDocumentPayload =
   WithoutField<TicketReviewDocument, "review_id">;
 export type TicketDecisionDocumentPayload =
   WithoutField<TicketDecisionDocument, "decision_id">;
+export type TicketContextBindingDocumentPayload =
+  Omit<TicketContextBindingDocument, "context_binding_id">;
+export type TicketEvidenceDocumentPayload =
+  Omit<TicketEvidenceDocument, "evidence_id">;
+export type TicketOutcomeDocumentPayload =
+  Omit<TicketOutcomeDocument, "outcome_id">;
 
 export interface TicketLedgerDocumentCandidate {
   documentPath: string;
@@ -469,6 +690,9 @@ export interface TicketLedgerCandidate {
   reviews?: readonly TicketLedgerDocumentCandidate[];
   decisions?: readonly TicketLedgerDocumentCandidate[];
   attestations?: readonly TicketLedgerDocumentCandidate[];
+  contextBindings?: readonly TicketLedgerDocumentCandidate[];
+  evidence?: readonly TicketLedgerDocumentCandidate[];
+  outcomes?: readonly TicketLedgerDocumentCandidate[];
 }
 
 export interface TicketLedgerTicket {
@@ -492,12 +716,30 @@ export interface TicketLedgerDecisionAttestation {
   document: TicketDecisionAttestationDocument;
 }
 
+export interface TicketLedgerContextBinding {
+  documentPath: string;
+  document: TicketContextBindingDocument;
+}
+
+export interface TicketLedgerEvidence {
+  documentPath: string;
+  document: TicketEvidenceDocument;
+}
+
+export interface TicketLedgerOutcome {
+  documentPath: string;
+  document: TicketOutcomeDocument;
+}
+
 export interface TicketLedgerContent {
   protocol: TicketLedgerProtocol;
   tickets: readonly TicketLedgerTicket[];
   reviews: readonly TicketLedgerReview[];
   decisions: readonly TicketLedgerDecision[];
   attestations: readonly TicketLedgerDecisionAttestation[];
+  contextBindings: readonly TicketLedgerContextBinding[];
+  evidence: readonly TicketLedgerEvidence[];
+  outcomes: readonly TicketLedgerOutcome[];
   graphDigest: string;
   semanticLedgerDigest: string;
 }

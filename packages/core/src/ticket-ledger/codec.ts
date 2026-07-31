@@ -12,12 +12,18 @@ import {
   TICKET_LEDGER_FORMAT,
   TICKET_LEDGER_MAX_BYTES,
   TICKET_LEDGER_MAX_ATTESTATIONS,
+  TICKET_LEDGER_MAX_CONTEXT_BINDINGS,
   TICKET_LEDGER_MAX_DECISIONS,
+  TICKET_LEDGER_MAX_EVIDENCE,
+  TICKET_LEDGER_MAX_OUTCOMES,
   TICKET_LEDGER_MAX_RELATIONS,
   TICKET_LEDGER_MAX_REVIEWS,
   TICKET_LEDGER_MAX_TICKETS,
   TICKET_LEDGER_DECISION_MAX_BYTES,
   TICKET_LEDGER_ATTESTATION_MAX_BYTES,
+  TICKET_LEDGER_CONTEXT_BINDING_MAX_BYTES,
+  TICKET_LEDGER_EVIDENCE_MAX_BYTES,
+  TICKET_LEDGER_OUTCOME_MAX_BYTES,
   TICKET_LEDGER_PROTOCOL_MAX_BYTES,
   TICKET_LEDGER_RELATIVE_PATH,
   TICKET_LEDGER_REVIEW_MAX_BYTES,
@@ -28,6 +34,9 @@ import {
   ticketDecisionAttestationDocumentPayloadSchema,
   ticketDecisionAttestationDocumentSchema,
   ticketDecisionAttestationEnvelopeSchema,
+  ticketContextBindingDocumentSchema,
+  ticketEvidenceDocumentSchema,
+  ticketOutcomeDocumentSchema,
   ticketDocumentSchema,
   ticketLedgerProtocolSchema,
   ticketReviewDocumentSchema,
@@ -38,11 +47,20 @@ import {
   type TicketDecisionAttestationDocument,
   type TicketDecisionAttestationDocumentPayload,
   type TicketDecisionAttestationEnvelope,
+  type TicketContextBindingDocument,
+  type TicketContextBindingDocumentPayload,
+  type TicketEvidenceDocument,
+  type TicketEvidenceDocumentPayload,
+  type TicketOutcomeDocument,
+  type TicketOutcomeDocumentPayload,
   type TicketDocument,
   type TicketLedgerCandidate,
   type TicketLedgerContent,
   type TicketLedgerDecision,
   type TicketLedgerDecisionAttestation,
+  type TicketLedgerContextBinding,
+  type TicketLedgerEvidence,
+  type TicketLedgerOutcome,
   type TicketLedgerProtocol,
   type TicketLedgerReview,
   type TicketLedgerTicket,
@@ -740,6 +758,417 @@ export const normalizeTicketDecisionAttestationDocument = (
   return normalized;
 };
 
+const normalizeExecutionActor = <
+  T extends { actor_kind: "agent" | "human"; actor_ref: string },
+>(actor: T): T => ({
+  ...actor,
+  actor_ref: normalizeText(actor.actor_ref),
+});
+
+const normalizeExecutionRun = <
+  T extends {
+    run_id: string;
+    generation: number;
+    executor: { actor_kind: "agent" | "human"; actor_ref: string };
+    started_source_digest: string;
+  },
+>(run: T): T => ({
+  ...run,
+  executor: normalizeExecutionActor(run.executor),
+});
+
+const parseContextBindingCandidate = (
+  candidate: unknown,
+  label: string,
+): TicketContextBindingDocument => {
+  const parsed = ticketContextBindingDocumentSchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} is invalid: ${formatZodIssues(parsed.error.issues)}`,
+      { label },
+    );
+  }
+  return parsed.data;
+};
+
+const normalizeContextBindingPayload = (
+  value: TicketContextBindingDocument,
+): TicketContextBindingDocumentPayload => {
+  const acceptance = value.acceptance.map((item) => ({ ...item }));
+  uniqueBy(
+    acceptance,
+    (item) => item.acceptance_id,
+    "context binding acceptance",
+  );
+  acceptance.sort((left, right) =>
+    compareText(left.acceptance_id, right.acceptance_id));
+
+  const contextEntries = value.context_entries.map((entry) => {
+    const files = entry.files.map((file) => ({ ...file }));
+    uniqueBy(
+      files,
+      (file) => file.repository_path,
+      `context binding entry ${entry.ref} files`,
+    );
+    files.sort((left, right) =>
+      compareText(left.repository_path, right.repository_path));
+    return {
+      ref: normalizeText(entry.ref),
+      purpose: normalizeText(entry.purpose),
+      source_kind: entry.source_kind,
+      files,
+    };
+  });
+  uniqueBy(
+    contextEntries,
+    (entry) => entry.ref,
+    "context binding entries",
+  );
+  contextEntries.sort((left, right) => compareText(left.ref, right.ref));
+
+  const prerequisiteOutcomes =
+    value.successful_prerequisite_outcomes.map((item) => ({ ...item }));
+  uniqueBy(
+    prerequisiteOutcomes,
+    (item) => item.ticket_id,
+    "successful prerequisite outcomes",
+  );
+  uniqueBy(
+    prerequisiteOutcomes,
+    (item) => item.outcome_id,
+    "successful prerequisite outcomes",
+  );
+  prerequisiteOutcomes.sort((left, right) =>
+    compareText(left.ticket_id, right.ticket_id));
+
+  const relevantDecisions = value.relevant_decisions.map((item) => ({
+    ...item,
+  }));
+  uniqueBy(
+    relevantDecisions,
+    (item) => item.decision_id,
+    "context binding decisions",
+  );
+  relevantDecisions.sort((left, right) =>
+    compareText(left.decision_id, right.decision_id));
+
+  return {
+    schema_version: TICKET_LEDGER_SCHEMA_VERSION,
+    kind: "ticket_context_binding",
+    subject: { ...value.subject },
+    graph_digest: value.graph_digest,
+    repository: {
+      ...value.repository,
+      branch: normalizeText(value.repository.branch),
+    },
+    acceptance,
+    context_entries: contextEntries,
+    successful_prerequisite_outcomes: prerequisiteOutcomes,
+    relevant_decisions: relevantDecisions,
+    packet_digest: value.packet_digest,
+    compiled_at: normalizeInstant(value.compiled_at),
+  };
+};
+
+const withoutContextBindingTime = (
+  payload: TicketContextBindingDocumentPayload,
+): Omit<TicketContextBindingDocumentPayload, "compiled_at"> => {
+  const { compiled_at: _compiledAt, ...identity } = payload;
+  return identity;
+};
+
+export const createTicketContextBindingDocument = (
+  candidate: TicketContextBindingDocumentPayload,
+  label = "Ticket context binding payload",
+): TicketContextBindingDocument => {
+  const parsed = parseContextBindingCandidate({
+    ...candidate,
+    context_binding_id: `tcb-${"0".repeat(64)}`,
+  }, label);
+  const payload = normalizeContextBindingPayload(parsed);
+  return {
+    ...payload,
+    context_binding_id: `tcb-${sha256(canonicalTicketLedgerValue(
+      withoutContextBindingTime(payload),
+    ))}`,
+  };
+};
+
+export const normalizeTicketContextBindingDocument = (
+  candidate: unknown,
+  label = "Ticket context binding document",
+): TicketContextBindingDocument => {
+  const parsed = parseContextBindingCandidate(candidate, label);
+  const { context_binding_id: _contextBindingId, ...payload } = parsed;
+  const normalized = createTicketContextBindingDocument(payload, label);
+  if (parsed.context_binding_id !== normalized.context_binding_id) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} context_binding_id does not match its normalized intent`,
+      {
+        label,
+        contextBindingId: parsed.context_binding_id,
+        expectedContextBindingId: normalized.context_binding_id,
+      },
+    );
+  }
+  return normalized;
+};
+
+export const ticketContextBindingDocumentDigest = (
+  candidate: unknown,
+): string => sha256(canonicalTicketLedgerValue(
+  normalizeTicketContextBindingDocument(candidate),
+));
+
+const parseEvidenceCandidate = (
+  candidate: unknown,
+  label: string,
+): TicketEvidenceDocument => {
+  const parsed = ticketEvidenceDocumentSchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} is invalid: ${formatZodIssues(parsed.error.issues)}`,
+      { label },
+    );
+  }
+  return parsed.data;
+};
+
+const normalizeEvidencePayload = (
+  value: TicketEvidenceDocument,
+): TicketEvidenceDocumentPayload => {
+  const references = value.references.map((reference) => ({
+    ...reference,
+    label: normalizeText(reference.label),
+  }));
+  uniqueBy(
+    references,
+    (reference) => `${reference.reference_type}\0${reference.target}`,
+    "evidence references",
+  );
+  references.sort((left, right) => compareText(
+    `${left.reference_type}\0${left.target}`,
+    `${right.reference_type}\0${right.target}`,
+  ));
+  return {
+    schema_version: TICKET_LEDGER_SCHEMA_VERSION,
+    kind: "ticket_evidence",
+    subject: { ...value.subject },
+    context_binding: { ...value.context_binding },
+    run: normalizeExecutionRun(value.run),
+    acceptance_id: value.acceptance_id,
+    evidence_type: value.evidence_type,
+    summary: normalizeText(value.summary),
+    references,
+    produced_at: normalizeInstant(value.produced_at),
+  };
+};
+
+const withoutEvidenceTime = (
+  payload: TicketEvidenceDocumentPayload,
+): Omit<TicketEvidenceDocumentPayload, "produced_at"> => {
+  const { produced_at: _producedAt, ...identity } = payload;
+  return identity;
+};
+
+export const createTicketEvidenceDocument = (
+  candidate: TicketEvidenceDocumentPayload,
+  label = "Ticket evidence payload",
+): TicketEvidenceDocument => {
+  const parsed = parseEvidenceCandidate({
+    ...candidate,
+    evidence_id: `tev-${"0".repeat(64)}`,
+  }, label);
+  const payload = normalizeEvidencePayload(parsed);
+  return {
+    ...payload,
+    evidence_id: `tev-${sha256(canonicalTicketLedgerValue(
+      withoutEvidenceTime(payload),
+    ))}`,
+  };
+};
+
+export const normalizeTicketEvidenceDocument = (
+  candidate: unknown,
+  label = "Ticket evidence document",
+): TicketEvidenceDocument => {
+  const parsed = parseEvidenceCandidate(candidate, label);
+  const { evidence_id: _evidenceId, ...payload } = parsed;
+  const normalized = createTicketEvidenceDocument(payload, label);
+  if (parsed.evidence_id !== normalized.evidence_id) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} evidence_id does not match its normalized intent`,
+      {
+        label,
+        evidenceId: parsed.evidence_id,
+        expectedEvidenceId: normalized.evidence_id,
+      },
+    );
+  }
+  return normalized;
+};
+
+export const ticketEvidenceDocumentDigest = (
+  candidate: unknown,
+): string => sha256(canonicalTicketLedgerValue(
+  normalizeTicketEvidenceDocument(candidate),
+));
+
+const parseOutcomeCandidate = (
+  candidate: unknown,
+  label: string,
+): TicketOutcomeDocument => {
+  const parsed = ticketOutcomeDocumentSchema.safeParse(candidate);
+  if (!parsed.success) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} is invalid: ${formatZodIssues(parsed.error.issues)}`,
+      { label },
+    );
+  }
+  return parsed.data;
+};
+
+const semanticCloseoutRefKey = (
+  reference: TicketOutcomeDocument["semantic_closeout_refs"][number],
+): string => reference.kind === "review"
+  ? `review\0${reference.review_id}`
+  : reference.kind === "decision"
+    ? `decision\0${reference.decision_id}`
+    : `decision_attestation\0${reference.attestation_id}`;
+
+const normalizeOutcomePayload = (
+  value: TicketOutcomeDocument,
+): TicketOutcomeDocumentPayload => {
+  const acceptance = value.acceptance.map((item) => {
+    const evidenceRefs = item.evidence_refs.map((reference) => ({
+      ...reference,
+    }));
+    uniqueBy(
+      evidenceRefs,
+      (reference) => reference.evidence_id,
+      `outcome acceptance ${item.acceptance_id} evidence`,
+    );
+    evidenceRefs.sort((left, right) =>
+      compareText(left.evidence_id, right.evidence_id));
+    return {
+      acceptance_id: item.acceptance_id,
+      adjudication: item.adjudication,
+      evidence_refs: evidenceRefs,
+      rationale: normalizeText(item.rationale),
+    };
+  });
+  uniqueBy(
+    acceptance,
+    (item) => item.acceptance_id,
+    "outcome acceptance",
+  );
+  acceptance.sort((left, right) =>
+    compareText(left.acceptance_id, right.acceptance_id));
+
+  const followUpTicketRefs = [...value.follow_up_ticket_refs];
+  uniqueBy(
+    followUpTicketRefs,
+    (reference) => reference,
+    "follow-up Ticket references",
+  );
+  followUpTicketRefs.sort(compareText);
+
+  const semanticCloseoutRefs = value.semantic_closeout_refs.map(
+    (reference) => ({ ...reference }),
+  );
+  uniqueBy(
+    semanticCloseoutRefs,
+    semanticCloseoutRefKey,
+    "semantic closeout references",
+  );
+  semanticCloseoutRefs.sort((left, right) =>
+    compareText(semanticCloseoutRefKey(left), semanticCloseoutRefKey(right)));
+
+  return {
+    schema_version: TICKET_LEDGER_SCHEMA_VERSION,
+    kind: "ticket_outcome",
+    subject: { ...value.subject },
+    context_binding: { ...value.context_binding },
+    run: normalizeExecutionRun(value.run),
+    terminal_form: value.terminal_form,
+    executor_report: normalizeText(value.executor_report),
+    acceptance,
+    verifier: normalizeExecutionActor(value.verifier),
+    follow_up_ticket_refs: followUpTicketRefs,
+    semantic_closeout_refs: semanticCloseoutRefs,
+    closed_at: normalizeInstant(value.closed_at),
+  };
+};
+
+const withoutOutcomeTime = (
+  payload: TicketOutcomeDocumentPayload,
+): Omit<TicketOutcomeDocumentPayload, "closed_at"> => {
+  const { closed_at: _closedAt, ...identity } = payload;
+  return identity;
+};
+
+const outcomeExecutionIdentityKey = (
+  document: Pick<
+    TicketOutcomeDocument,
+    "subject" | "run"
+  >,
+): string => canonicalTicketLedgerValue({
+  subject: document.subject,
+  run: {
+    run_id: document.run.run_id,
+    generation: document.run.generation,
+  },
+});
+
+export const createTicketOutcomeDocument = (
+  candidate: TicketOutcomeDocumentPayload,
+  label = "Ticket outcome payload",
+): TicketOutcomeDocument => {
+  const parsed = parseOutcomeCandidate({
+    ...candidate,
+    outcome_id: `tout-${"0".repeat(64)}`,
+  }, label);
+  const payload = normalizeOutcomePayload(parsed);
+  return {
+    ...payload,
+    outcome_id: `tout-${sha256(canonicalTicketLedgerValue(
+      withoutOutcomeTime(payload),
+    ))}`,
+  };
+};
+
+export const normalizeTicketOutcomeDocument = (
+  candidate: unknown,
+  label = "Ticket outcome document",
+): TicketOutcomeDocument => {
+  const parsed = parseOutcomeCandidate(candidate, label);
+  const { outcome_id: _outcomeId, ...payload } = parsed;
+  const normalized = createTicketOutcomeDocument(payload, label);
+  if (parsed.outcome_id !== normalized.outcome_id) {
+    throw new TicketLedgerError(
+      "invalid_document",
+      `${label} outcome_id does not match its normalized intent`,
+      {
+        label,
+        outcomeId: parsed.outcome_id,
+        expectedOutcomeId: normalized.outcome_id,
+      },
+    );
+  }
+  return normalized;
+};
+
+export const ticketOutcomeDocumentDigest = (
+  candidate: unknown,
+): string => sha256(canonicalTicketLedgerValue(
+  normalizeTicketOutcomeDocument(candidate),
+));
+
 export const ticketDocumentPath = (ticketId: string): string => {
   const parsed = ticketDocumentSchema.shape.ticket_id.safeParse(ticketId);
   if (!parsed.success) {
@@ -802,8 +1231,61 @@ export const ticketDecisionAttestationDocumentPath = (
   }/${attestationId}.yaml`;
 };
 
+const ticketScopedSemanticDocumentPath = (
+  directory: "context-bindings" | "evidence" | "outcomes",
+  ticketId: string,
+  documentId: string,
+  expectedId: RegExp,
+): string => {
+  ticketDocumentPath(ticketId);
+  if (!expectedId.test(documentId)) {
+    throw new TicketLedgerError(
+      "invalid_path",
+      `Invalid ${directory} document ID for path: ${documentId}`,
+      { ticketId, documentId },
+    );
+  }
+  return `${TICKET_LEDGER_RELATIVE_PATH}/${directory}/${
+    ticketId
+  }/${documentId}.yaml`;
+};
+
+export const ticketContextBindingDocumentPath = (
+  document: Pick<
+    TicketContextBindingDocument,
+    "context_binding_id" | "subject"
+  >,
+): string => ticketScopedSemanticDocumentPath(
+  "context-bindings",
+  document.subject.ticket_id,
+  document.context_binding_id,
+  /^tcb-[0-9a-f]{64}$/u,
+);
+
+export const ticketEvidenceDocumentPath = (
+  document: Pick<TicketEvidenceDocument, "evidence_id" | "subject">,
+): string => ticketScopedSemanticDocumentPath(
+  "evidence",
+  document.subject.ticket_id,
+  document.evidence_id,
+  /^tev-[0-9a-f]{64}$/u,
+);
+
+export const ticketOutcomeDocumentPath = (
+  document: Pick<TicketOutcomeDocument, "outcome_id" | "subject">,
+): string => ticketScopedSemanticDocumentPath(
+  "outcomes",
+  document.subject.ticket_id,
+  document.outcome_id,
+  /^tout-[0-9a-f]{64}$/u,
+);
+
 export const ticketRevision = (document: TicketDocument): string =>
   sha256(canonicalTicketLedgerValue(document));
+
+export const ticketAcceptanceCriterionDigest = (
+  criterion: string,
+): string => sha256(canonicalTicketLedgerValue(normalizeText(criterion)));
 
 export const encodeTicketDocument = (candidate: unknown): Buffer =>
   Buffer.from(
@@ -837,6 +1319,39 @@ export const encodeTicketDecisionAttestationDocument = (
 ): Buffer =>
   Buffer.from(
     stringify(normalizeTicketDecisionAttestationDocument(candidate), {
+      lineWidth: 0,
+      version: "1.2",
+    }),
+    "utf8",
+  );
+
+export const encodeTicketContextBindingDocument = (
+  candidate: unknown,
+): Buffer =>
+  Buffer.from(
+    stringify(normalizeTicketContextBindingDocument(candidate), {
+      lineWidth: 0,
+      version: "1.2",
+    }),
+    "utf8",
+  );
+
+export const encodeTicketEvidenceDocument = (
+  candidate: unknown,
+): Buffer =>
+  Buffer.from(
+    stringify(normalizeTicketEvidenceDocument(candidate), {
+      lineWidth: 0,
+      version: "1.2",
+    }),
+    "utf8",
+  );
+
+export const encodeTicketOutcomeDocument = (
+  candidate: unknown,
+): Buffer =>
+  Buffer.from(
+    stringify(normalizeTicketOutcomeDocument(candidate), {
       lineWidth: 0,
       version: "1.2",
     }),
@@ -1115,6 +1630,494 @@ export const validateTicketLedger = (
       right.document.attestation_id,
     ));
 
+  const contextBindingCandidates = candidate.contextBindings ?? [];
+  if (
+    contextBindingCandidates.length > TICKET_LEDGER_MAX_CONTEXT_BINDINGS
+  ) {
+    throw new TicketLedgerError(
+      "ledger_too_large",
+      `Ticket ledger contains more than ${TICKET_LEDGER_MAX_CONTEXT_BINDINGS} context bindings`,
+      { contextBindingCount: contextBindingCandidates.length },
+    );
+  }
+  const contextBindings: TicketLedgerContextBinding[] =
+    contextBindingCandidates.map(({ documentPath, document }) => {
+      const normalized =
+        normalizeTicketContextBindingDocument(document, documentPath);
+      const expectedPath = ticketContextBindingDocumentPath(normalized);
+      if (documentPath !== expectedPath) {
+        throw new TicketLedgerError(
+          "invalid_path",
+          `Context binding ${normalized.context_binding_id} must be stored at ${expectedPath}`,
+          {
+            documentPath,
+            expectedPath,
+            contextBindingId: normalized.context_binding_id,
+          },
+        );
+      }
+      return { documentPath, document: normalized };
+    });
+  uniqueBy(
+    contextBindings,
+    (binding) => binding.document.context_binding_id,
+    "Ticket context binding ledger",
+  );
+  contextBindings.sort((left, right) => compareText(
+    left.document.context_binding_id,
+    right.document.context_binding_id,
+  ));
+
+  const evidenceCandidates = candidate.evidence ?? [];
+  if (evidenceCandidates.length > TICKET_LEDGER_MAX_EVIDENCE) {
+    throw new TicketLedgerError(
+      "ledger_too_large",
+      `Ticket ledger contains more than ${TICKET_LEDGER_MAX_EVIDENCE} evidence documents`,
+      { evidenceCount: evidenceCandidates.length },
+    );
+  }
+  const evidence: TicketLedgerEvidence[] = evidenceCandidates.map(
+    ({ documentPath, document }) => {
+      const normalized = normalizeTicketEvidenceDocument(
+        document,
+        documentPath,
+      );
+      const expectedPath = ticketEvidenceDocumentPath(normalized);
+      if (documentPath !== expectedPath) {
+        throw new TicketLedgerError(
+          "invalid_path",
+          `Evidence ${normalized.evidence_id} must be stored at ${expectedPath}`,
+          {
+            documentPath,
+            expectedPath,
+            evidenceId: normalized.evidence_id,
+          },
+        );
+      }
+      return { documentPath, document: normalized };
+    },
+  );
+  uniqueBy(
+    evidence,
+    (item) => item.document.evidence_id,
+    "Ticket evidence ledger",
+  );
+  evidence.sort((left, right) =>
+    compareText(left.document.evidence_id, right.document.evidence_id));
+
+  const outcomeCandidates = candidate.outcomes ?? [];
+  if (outcomeCandidates.length > TICKET_LEDGER_MAX_OUTCOMES) {
+    throw new TicketLedgerError(
+      "ledger_too_large",
+      `Ticket ledger contains more than ${TICKET_LEDGER_MAX_OUTCOMES} outcome documents`,
+      { outcomeCount: outcomeCandidates.length },
+    );
+  }
+  const outcomes: TicketLedgerOutcome[] = outcomeCandidates.map(
+    ({ documentPath, document }) => {
+      const normalized = normalizeTicketOutcomeDocument(
+        document,
+        documentPath,
+      );
+      const expectedPath = ticketOutcomeDocumentPath(normalized);
+      if (documentPath !== expectedPath) {
+        throw new TicketLedgerError(
+          "invalid_path",
+          `Outcome ${normalized.outcome_id} must be stored at ${expectedPath}`,
+          {
+            documentPath,
+            expectedPath,
+            outcomeId: normalized.outcome_id,
+          },
+        );
+      }
+      return { documentPath, document: normalized };
+    },
+  );
+  uniqueBy(
+    outcomes,
+    (outcome) => outcome.document.outcome_id,
+    "Ticket outcome ledger",
+  );
+  const outcomesByExecutionIdentity = new Map<
+    string,
+    TicketLedgerOutcome
+  >();
+  for (const outcome of outcomes) {
+    const executionIdentity =
+      outcomeExecutionIdentityKey(outcome.document);
+    const existing = outcomesByExecutionIdentity.get(executionIdentity);
+    if (existing !== undefined) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        "A Ticket execution can have only one terminal Outcome",
+        {
+          ticketId: outcome.document.subject.ticket_id,
+          ticketRevision: outcome.document.subject.ticket_revision,
+          contextBindingId:
+            outcome.document.context_binding.context_binding_id,
+          runId: outcome.document.run.run_id,
+          generation: outcome.document.run.generation,
+          existingContextBindingId:
+            existing.document.context_binding.context_binding_id,
+          conflictingContextBindingId:
+            outcome.document.context_binding.context_binding_id,
+          existingOutcomeId: existing.document.outcome_id,
+          conflictingOutcomeId: outcome.document.outcome_id,
+        },
+      );
+    }
+    outcomesByExecutionIdentity.set(executionIdentity, outcome);
+  }
+  outcomes.sort((left, right) =>
+    compareText(left.document.outcome_id, right.document.outcome_id));
+
+  const ticketsById = new Map(tickets.map((ticket) => [
+    ticket.document.ticket_id,
+    ticket,
+  ]));
+  const decisionsById = new Map(decisions.map((decision) => [
+    decision.document.decision_id,
+    decision,
+  ]));
+  const reviewsById = new Map(reviews.map((review) => [
+    review.document.review_id,
+    review,
+  ]));
+  const attestationsById = new Map(attestations.map((attestation) => [
+    attestation.document.attestation_id,
+    attestation,
+  ]));
+  const bindingsById = new Map(contextBindings.map((binding) => [
+    binding.document.context_binding_id,
+    binding,
+  ]));
+  const evidenceById = new Map(evidence.map((item) => [
+    item.document.evidence_id,
+    item,
+  ]));
+  const outcomesById = new Map(outcomes.map((outcome) => [
+    outcome.document.outcome_id,
+    outcome,
+  ]));
+
+  for (const binding of contextBindings) {
+    const document = binding.document;
+    if (!ticketsById.has(document.subject.ticket_id)) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Context binding ${document.context_binding_id} references a missing Ticket`,
+        {
+          contextBindingId: document.context_binding_id,
+          ticketId: document.subject.ticket_id,
+        },
+      );
+    }
+    for (const reference of document.relevant_decisions) {
+      const decision = decisionsById.get(reference.decision_id);
+      if (
+        decision === undefined
+        || ticketDecisionDocumentDigest(decision.document)
+          !== reference.decision_digest
+      ) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Context binding ${document.context_binding_id} has an unresolved Decision reference`,
+          {
+            contextBindingId: document.context_binding_id,
+            decisionId: reference.decision_id,
+          },
+        );
+      }
+      if (reference.verification.source === "durable_local_signature") {
+        const attestation = attestationsById.get(
+          reference.verification.verification_ref,
+        );
+        if (
+          attestation === undefined
+          || attestation.document.decision.decision_id
+            !== reference.decision_id
+          || attestation.document.decision.document_digest
+            !== reference.decision_digest
+        ) {
+          throw new TicketLedgerError(
+            "invalid_document",
+            `Context binding ${document.context_binding_id} has an unresolved durable Decision verification`,
+            {
+              contextBindingId: document.context_binding_id,
+              decisionId: reference.decision_id,
+              verificationRef:
+                reference.verification.verification_ref,
+            },
+          );
+        }
+      }
+      if (
+        Date.parse(decision.document.decided_at)
+        > Date.parse(document.compiled_at)
+      ) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Context binding ${document.context_binding_id} predates a referenced Decision`,
+          {
+            contextBindingId: document.context_binding_id,
+            decisionId: reference.decision_id,
+          },
+        );
+      }
+    }
+  }
+
+  for (const item of evidence) {
+    const document = item.document;
+    const binding = bindingsById.get(
+      document.context_binding.context_binding_id,
+    );
+    if (
+      binding === undefined
+      || ticketContextBindingDocumentDigest(binding.document)
+        !== document.context_binding.document_digest
+      || binding.document.packet_digest
+        !== document.context_binding.packet_digest
+      || canonicalTicketLedgerValue(binding.document.subject)
+        !== canonicalTicketLedgerValue(document.subject)
+    ) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Evidence ${document.evidence_id} has an unresolved or mismatched context binding`,
+        {
+          evidenceId: document.evidence_id,
+          contextBindingId: document.context_binding.context_binding_id,
+        },
+      );
+    }
+    if (
+      document.run.started_source_digest
+      !== binding.document.repository.repository_source_digest
+    ) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Evidence ${document.evidence_id} run source does not match its context binding`,
+        { evidenceId: document.evidence_id },
+      );
+    }
+    if (!binding.document.acceptance.some((acceptance) =>
+      acceptance.acceptance_id === document.acceptance_id)) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Evidence ${document.evidence_id} references an unknown acceptance condition`,
+        {
+          evidenceId: document.evidence_id,
+          acceptanceId: document.acceptance_id,
+        },
+      );
+    }
+    if (
+      Date.parse(document.produced_at)
+      < Date.parse(binding.document.compiled_at)
+    ) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Evidence ${document.evidence_id} predates its context binding`,
+        { evidenceId: document.evidence_id },
+      );
+    }
+  }
+
+  for (const outcome of outcomes) {
+    const document = outcome.document;
+    const binding = bindingsById.get(
+      document.context_binding.context_binding_id,
+    );
+    if (
+      binding === undefined
+      || ticketContextBindingDocumentDigest(binding.document)
+        !== document.context_binding.document_digest
+      || binding.document.packet_digest
+        !== document.context_binding.packet_digest
+      || canonicalTicketLedgerValue(binding.document.subject)
+        !== canonicalTicketLedgerValue(document.subject)
+      || document.run.started_source_digest
+        !== binding.document.repository.repository_source_digest
+    ) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Outcome ${document.outcome_id} has an unresolved or mismatched context binding`,
+        {
+          outcomeId: document.outcome_id,
+          contextBindingId: document.context_binding.context_binding_id,
+        },
+      );
+    }
+    if (
+      canonicalTicketLedgerValue(document.run.executor)
+      === canonicalTicketLedgerValue(document.verifier)
+    ) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Outcome ${document.outcome_id} executor cannot verify itself`,
+        { outcomeId: document.outcome_id },
+      );
+    }
+    const expectedAcceptanceIds = binding.document.acceptance.map(
+      (acceptance) => acceptance.acceptance_id,
+    );
+    const actualAcceptanceIds = document.acceptance.map(
+      (acceptance) => acceptance.acceptance_id,
+    );
+    if (
+      canonicalTicketLedgerValue(expectedAcceptanceIds)
+      !== canonicalTicketLedgerValue(actualAcceptanceIds)
+    ) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Outcome ${document.outcome_id} must adjudicate every bound acceptance condition exactly once`,
+        {
+          outcomeId: document.outcome_id,
+          expectedAcceptanceIds,
+          actualAcceptanceIds,
+        },
+      );
+    }
+    for (const adjudication of document.acceptance) {
+      if (
+        adjudication.adjudication === "accepted"
+        && adjudication.evidence_refs.length === 0
+      ) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Accepted outcome condition ${adjudication.acceptance_id} requires evidence`,
+          {
+            outcomeId: document.outcome_id,
+            acceptanceId: adjudication.acceptance_id,
+          },
+        );
+      }
+      for (const reference of adjudication.evidence_refs) {
+        const resolved = evidenceById.get(reference.evidence_id);
+        if (
+          resolved === undefined
+          || ticketEvidenceDocumentDigest(resolved.document)
+            !== reference.evidence_digest
+          || resolved.document.acceptance_id
+            !== adjudication.acceptance_id
+          || canonicalTicketLedgerValue(resolved.document.subject)
+            !== canonicalTicketLedgerValue(document.subject)
+          || canonicalTicketLedgerValue(resolved.document.context_binding)
+            !== canonicalTicketLedgerValue(document.context_binding)
+          || canonicalTicketLedgerValue(resolved.document.run)
+            !== canonicalTicketLedgerValue(document.run)
+        ) {
+          throw new TicketLedgerError(
+            "invalid_document",
+            `Outcome ${document.outcome_id} has unresolved or mismatched evidence`,
+            {
+              outcomeId: document.outcome_id,
+              acceptanceId: adjudication.acceptance_id,
+              evidenceId: reference.evidence_id,
+            },
+          );
+        }
+        if (
+          Date.parse(resolved.document.produced_at)
+          > Date.parse(document.closed_at)
+        ) {
+          throw new TicketLedgerError(
+            "invalid_document",
+            `Outcome ${document.outcome_id} predates referenced evidence`,
+            {
+              outcomeId: document.outcome_id,
+              evidenceId: reference.evidence_id,
+            },
+          );
+        }
+      }
+    }
+    if (
+      document.terminal_form === "successful"
+      && document.acceptance.some((adjudication) =>
+        adjudication.adjudication !== "accepted")
+    ) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Successful Outcome ${document.outcome_id} must accept every condition`,
+        { outcomeId: document.outcome_id },
+      );
+    }
+    for (const ticketId of document.follow_up_ticket_refs) {
+      if (!ticketsById.has(ticketId)) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Outcome ${document.outcome_id} references a missing follow-up Ticket`,
+          { outcomeId: document.outcome_id, ticketId },
+        );
+      }
+    }
+    for (const reference of document.semantic_closeout_refs) {
+      const resolves = reference.kind === "review"
+        ? reviewsById.has(reference.review_id)
+        : reference.kind === "decision"
+          ? decisionsById.has(reference.decision_id)
+          : attestationsById.has(reference.attestation_id);
+      if (!resolves) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Outcome ${document.outcome_id} has an unresolved semantic closeout reference`,
+          {
+            outcomeId: document.outcome_id,
+            reference: semanticCloseoutRefKey(reference),
+          },
+        );
+      }
+    }
+    if (Date.parse(document.closed_at) < Date.parse(binding.document.compiled_at)) {
+      throw new TicketLedgerError(
+        "invalid_document",
+        `Outcome ${document.outcome_id} predates its context binding`,
+        { outcomeId: document.outcome_id },
+      );
+    }
+  }
+
+  for (const binding of contextBindings) {
+    for (
+      const reference
+      of binding.document.successful_prerequisite_outcomes
+    ) {
+      const outcome = outcomesById.get(reference.outcome_id);
+      if (
+        outcome === undefined
+        || outcome.document.subject.ticket_id !== reference.ticket_id
+        || outcome.document.terminal_form !== "successful"
+        || ticketOutcomeDocumentDigest(outcome.document)
+          !== reference.outcome_digest
+      ) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Context binding ${binding.document.context_binding_id} has an unresolved successful prerequisite Outcome`,
+          {
+            contextBindingId: binding.document.context_binding_id,
+            ticketId: reference.ticket_id,
+            outcomeId: reference.outcome_id,
+          },
+        );
+      }
+      if (
+        Date.parse(outcome.document.closed_at)
+        > Date.parse(binding.document.compiled_at)
+      ) {
+        throw new TicketLedgerError(
+          "invalid_document",
+          `Context binding ${binding.document.context_binding_id} predates a prerequisite Outcome`,
+          {
+            contextBindingId: binding.document.context_binding_id,
+            outcomeId: reference.outcome_id,
+          },
+        );
+      }
+    }
+  }
+
   const semanticLedgerDigest = sha256(canonicalTicketLedgerValue({
     protocol,
     tickets: tickets.map((ticket) => ticket.document),
@@ -1122,6 +2125,9 @@ export const validateTicketLedger = (
     decisions: decisions.map((decision) => decision.document),
     attestations: attestations.map((attestation) =>
       attestation.document),
+    context_bindings: contextBindings.map((binding) => binding.document),
+    evidence: evidence.map((item) => item.document),
+    outcomes: outcomes.map((outcome) => outcome.document),
   }));
   return {
     protocol,
@@ -1129,9 +2135,198 @@ export const validateTicketLedger = (
     reviews,
     decisions,
     attestations,
+    contextBindings,
+    evidence,
+    outcomes,
     graphDigest,
     semanticLedgerDigest,
   };
+};
+
+export type TicketLedgerDerivedStatus =
+  | "READY"
+  | "DONE"
+  | "BLOCKED"
+  | "DEVIATED";
+
+export interface TicketLedgerDerivedTicketState {
+  ticketId: string;
+  ticketRevision: string;
+  status: TicketLedgerDerivedStatus;
+  blockingTicketIds: readonly string[];
+  currentSuccessfulOutcome: TicketLedgerOutcome | null;
+}
+
+const currentSuccessfulOutcomes = (
+  ledger: Pick<
+    TicketLedgerContent,
+    "tickets" | "contextBindings" | "outcomes"
+  >,
+): Map<string, TicketLedgerOutcome[]> => {
+  const tickets = new Map(ledger.tickets.map((ticket) => [
+    ticket.document.ticket_id,
+    ticket,
+  ]));
+  const bindings = new Map(ledger.contextBindings.map((binding) => [
+    binding.document.context_binding_id,
+    binding,
+  ]));
+  const outcomeExecutionCounts = new Map<string, number>();
+  for (const outcome of ledger.outcomes) {
+    const executionIdentity =
+      outcomeExecutionIdentityKey(outcome.document);
+    outcomeExecutionCounts.set(
+      executionIdentity,
+      (outcomeExecutionCounts.get(executionIdentity) ?? 0) + 1,
+    );
+  }
+  const outcomesByTicket = new Map<string, TicketLedgerOutcome[]>();
+  for (const outcome of ledger.outcomes) {
+    if (outcome.document.terminal_form !== "successful") continue;
+    if (
+      outcomeExecutionCounts.get(
+        outcomeExecutionIdentityKey(outcome.document),
+      ) !== 1
+    ) {
+      // validateTicketLedger rejects this corruption. Keep derived views
+      // fail-closed as well if a caller bypasses ledger validation.
+      continue;
+    }
+    const ticketId = outcome.document.subject.ticket_id;
+    const list = outcomesByTicket.get(ticketId) ?? [];
+    list.push(outcome);
+    outcomesByTicket.set(ticketId, list);
+  }
+  for (const list of outcomesByTicket.values()) {
+    list.sort((left, right) => {
+      const byTime = compareText(
+        right.document.closed_at,
+        left.document.closed_at,
+      );
+      return byTime !== 0
+        ? byTime
+        : compareText(
+            right.document.outcome_id,
+            left.document.outcome_id,
+          );
+    });
+  }
+
+  const memo = new Map<string, TicketLedgerOutcome[]>();
+  const visiting = new Set<string>();
+  const resolve = (ticketId: string): TicketLedgerOutcome[] => {
+    const cached = memo.get(ticketId);
+    if (cached !== undefined) return cached;
+    if (visiting.has(ticketId)) return [];
+    visiting.add(ticketId);
+    const ticket = tickets.get(ticketId);
+    if (ticket === undefined) {
+      visiting.delete(ticketId);
+      memo.set(ticketId, []);
+      return [];
+    }
+    const prerequisites = ticket.document.relations
+      .map((relation) => relation.target_ticket_id)
+      .sort(compareText);
+    const currentPrerequisiteOutcomes = new Map(
+      prerequisites.map((prerequisiteId) => [
+        prerequisiteId,
+        resolve(prerequisiteId)[0] ?? null,
+      ]),
+    );
+    const expectedAcceptance = ticket.document.acceptance
+      .map((acceptance) => ({
+        acceptance_id: acceptance.acceptance_id,
+        criterion_digest:
+          ticketAcceptanceCriterionDigest(acceptance.criterion),
+      }))
+      .sort((left, right) =>
+        compareText(left.acceptance_id, right.acceptance_id));
+    const current = (outcomesByTicket.get(ticketId) ?? []).find((outcome) => {
+      if (
+        outcome.document.subject.ticket_revision !== ticket.ticketRevision
+      ) {
+        return false;
+      }
+      const binding = bindings.get(
+        outcome.document.context_binding.context_binding_id,
+      );
+      if (
+        binding === undefined
+        || canonicalTicketLedgerValue(binding.document.subject)
+          !== canonicalTicketLedgerValue(outcome.document.subject)
+        || canonicalTicketLedgerValue(binding.document.acceptance)
+          !== canonicalTicketLedgerValue(expectedAcceptance)
+      ) {
+        return false;
+      }
+      const references =
+        binding.document.successful_prerequisite_outcomes;
+      if (
+        references.length !== prerequisites.length
+        || !references.every((reference, index) =>
+          reference.ticket_id === prerequisites[index]
+          && currentPrerequisiteOutcomes.get(reference.ticket_id)
+            ?.document.outcome_id === reference.outcome_id)
+      ) {
+        return false;
+      }
+      return true;
+    });
+    visiting.delete(ticketId);
+    const selected = current === undefined ? [] : [current];
+    memo.set(ticketId, selected);
+    return selected;
+  };
+
+  for (const ticketId of tickets.keys()) resolve(ticketId);
+  return memo;
+};
+
+export const currentSuccessfulOutcomeForTicket = (
+  ledger: Pick<
+    TicketLedgerContent,
+    "tickets" | "contextBindings" | "outcomes"
+  >,
+  ticketId: string,
+): TicketLedgerOutcome | null =>
+  currentSuccessfulOutcomes(ledger).get(ticketId)?.[0] ?? null;
+
+export const deriveTicketLedgerState = (
+  ledger: Pick<
+    TicketLedgerContent,
+    "tickets" | "contextBindings" | "outcomes"
+  >,
+): readonly TicketLedgerDerivedTicketState[] => {
+  const successful = currentSuccessfulOutcomes(ledger);
+  return ledger.tickets.map((ticket) => {
+    const ticketId = ticket.document.ticket_id;
+    const currentSuccessfulOutcome = successful.get(ticketId)?.[0] ?? null;
+    const blockingTicketIds = ticket.document.relations
+      .map((relation) => relation.target_ticket_id)
+      .filter((prerequisiteId) =>
+        (successful.get(prerequisiteId)?.length ?? 0) === 0)
+      .sort(compareText);
+    const hasCurrentDeviation = ledger.outcomes.some((outcome) =>
+      outcome.document.subject.ticket_id === ticketId
+      && outcome.document.subject.ticket_revision === ticket.ticketRevision
+      && outcome.document.terminal_form === "deviated");
+    const status: TicketLedgerDerivedStatus =
+      currentSuccessfulOutcome !== null
+        ? "DONE"
+        : hasCurrentDeviation
+          ? "DEVIATED"
+          : blockingTicketIds.length === 0
+            ? "READY"
+            : "BLOCKED";
+    return {
+      ticketId,
+      ticketRevision: ticket.ticketRevision,
+      status,
+      blockingTicketIds,
+      currentSuccessfulOutcome,
+    };
+  });
 };
 
 const parseYamlDocument = (
@@ -1285,6 +2480,10 @@ export const decodeTicketLedger = (
   const decisionPrefix = `${TICKET_LEDGER_RELATIVE_PATH}/decisions/`;
   const attestationPrefix =
     `${TICKET_LEDGER_RELATIVE_PATH}/attestations/`;
+  const contextBindingPrefix =
+    `${TICKET_LEDGER_RELATIVE_PATH}/context-bindings/`;
+  const evidencePrefix = `${TICKET_LEDGER_RELATIVE_PATH}/evidence/`;
+  const outcomePrefix = `${TICKET_LEDGER_RELATIVE_PATH}/outcomes/`;
   const ticketFiles = documentFiles.filter((file) =>
     file.documentPath.startsWith(ticketPrefix));
   if (ticketFiles.length > TICKET_LEDGER_MAX_TICKETS) {
@@ -1353,12 +2552,66 @@ export const decodeTicketLedger = (
       TICKET_LEDGER_ATTESTATION_MAX_BYTES,
     ),
   }));
+  const contextBindingFiles = documentFiles.filter((file) =>
+    file.documentPath.startsWith(contextBindingPrefix));
+  if (contextBindingFiles.length > TICKET_LEDGER_MAX_CONTEXT_BINDINGS) {
+    throw new TicketLedgerError(
+      "ledger_too_large",
+      `Ticket ledger contains more than ${TICKET_LEDGER_MAX_CONTEXT_BINDINGS} context binding files`,
+      { contextBindingCount: contextBindingFiles.length },
+    );
+  }
+  const contextBindings = contextBindingFiles.map((file) => ({
+    documentPath: file.documentPath,
+    document: parseYamlDocument(
+      file.bytes,
+      file.documentPath,
+      TICKET_LEDGER_CONTEXT_BINDING_MAX_BYTES,
+    ),
+  }));
+  const evidenceFiles = documentFiles.filter((file) =>
+    file.documentPath.startsWith(evidencePrefix));
+  if (evidenceFiles.length > TICKET_LEDGER_MAX_EVIDENCE) {
+    throw new TicketLedgerError(
+      "ledger_too_large",
+      `Ticket ledger contains more than ${TICKET_LEDGER_MAX_EVIDENCE} evidence files`,
+      { evidenceCount: evidenceFiles.length },
+    );
+  }
+  const evidence = evidenceFiles.map((file) => ({
+    documentPath: file.documentPath,
+    document: parseYamlDocument(
+      file.bytes,
+      file.documentPath,
+      TICKET_LEDGER_EVIDENCE_MAX_BYTES,
+    ),
+  }));
+  const outcomeFiles = documentFiles.filter((file) =>
+    file.documentPath.startsWith(outcomePrefix));
+  if (outcomeFiles.length > TICKET_LEDGER_MAX_OUTCOMES) {
+    throw new TicketLedgerError(
+      "ledger_too_large",
+      `Ticket ledger contains more than ${TICKET_LEDGER_MAX_OUTCOMES} outcome files`,
+      { outcomeCount: outcomeFiles.length },
+    );
+  }
+  const outcomes = outcomeFiles.map((file) => ({
+    documentPath: file.documentPath,
+    document: parseYamlDocument(
+      file.bytes,
+      file.documentPath,
+      TICKET_LEDGER_OUTCOME_MAX_BYTES,
+    ),
+  }));
   return validateTicketLedger({
     protocol,
     tickets,
     reviews,
     decisions,
     attestations,
+    contextBindings,
+    evidence,
+    outcomes,
   });
 };
 
@@ -1433,6 +2686,25 @@ export const isTicketLedgerDocumentPath = (
       && /^tdc-[0-9a-f]{64}$/u.test(segments[0]!)
       && /^tda-[0-9a-f]{64}\.yaml$/u.test(segments[1]!);
   }
+  const scopedSemanticDirectories = [
+    ["context-bindings", /^tcb-[0-9a-f]{64}\.yaml$/u],
+    ["evidence", /^tev-[0-9a-f]{64}\.yaml$/u],
+    ["outcomes", /^tout-[0-9a-f]{64}\.yaml$/u],
+  ] as const;
+  for (const [directory, filePattern] of scopedSemanticDirectories) {
+    const prefix = `${TICKET_LEDGER_RELATIVE_PATH}/${directory}/`;
+    if (!repositoryRelativePath.startsWith(prefix)) continue;
+    const segments = repositoryRelativePath.slice(prefix.length).split("/");
+    if (segments.length !== 2 || !filePattern.test(segments[1]!)) {
+      return false;
+    }
+    try {
+      ticketDocumentPath(segments[0]!);
+      return true;
+    } catch {
+      return false;
+    }
+  }
   return false;
 };
 
@@ -1457,6 +2729,19 @@ export const ticketLedgerDocumentMaxBytes = (
     )
   ) {
     return TICKET_LEDGER_ATTESTATION_MAX_BYTES;
+  }
+  if (
+    documentPath.startsWith(
+      `${TICKET_LEDGER_RELATIVE_PATH}/context-bindings/`,
+    )
+  ) {
+    return TICKET_LEDGER_CONTEXT_BINDING_MAX_BYTES;
+  }
+  if (documentPath.startsWith(`${TICKET_LEDGER_RELATIVE_PATH}/evidence/`)) {
+    return TICKET_LEDGER_EVIDENCE_MAX_BYTES;
+  }
+  if (documentPath.startsWith(`${TICKET_LEDGER_RELATIVE_PATH}/outcomes/`)) {
+    return TICKET_LEDGER_OUTCOME_MAX_BYTES;
   }
   throw new TicketLedgerError(
     "invalid_path",

@@ -1,6 +1,6 @@
 spec_id: "decision-ticket-closeout-001"
 type: decision
-state: active
+state: superseded
 intent:
   summary: "Run 的 Artifact、Evidence 与 Outcome 如何关闭 Ticket，并提出但不越权执行 Semantic Closeout？"
   detail: |
@@ -17,20 +17,24 @@ intent:
     - which detailed traces cool into retrievable history rather than normal
       context.
 
-    This ticket is unresolved.
+    This historical question is resolved by
+    `contract-ticket-closeout-001`.
 constraints: []
 indexing:
   type: decision
   priority: P0
   layer: epic
   domain: "ticket-runtime"
-  tags: [wayfinder, open, grilling, outcome, evidence, verification, semantic-closeout]
+  tags: [wayfinder, resolved, outcome, evidence, verification, semantic-closeout]
 provenance:
   source_type: chat_extraction
   confidence: 0.75
   source_ref: "Outcome/Evidence/Semantic Closeout discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b"
   produced_at: "2026-07-27"
 relations:
+  - target: "contract-ticket-closeout-001"
+    type: superseded_by
+    detail: "The M4 contract settles independent Evidence adjudication, Outcome forms, and semantic-closeout authority."
   - target: "decision-ticket-context-binding-001"
     type: depends_on
   - target: "decision-ticket-graph-lifecycle-002"

@@ -59,6 +59,13 @@ export const CANONICAL_OPERATION_PRESENTATION = {
   "ticket.worktree.patch": { activity: "update", effect: "write" },
   "ticket.review.append": { activity: "review", effect: "write" },
   "ticket.decision.record": { activity: "review", effect: "write" },
+  "ticket.frontier.read": { activity: "review", effect: "read" },
+  "ticket.context.compile": { activity: "review", effect: "write" },
+  "ticket.run.claim": { activity: "update", effect: "write" },
+  "ticket.run.heartbeat": { activity: "update", effect: "write" },
+  "ticket.run.release": { activity: "update", effect: "write" },
+  "ticket.evidence.append": { activity: "update", effect: "write" },
+  "ticket.closeout.append": { activity: "review", effect: "write" },
 } as const;
 
 export const WORKFLOW_PHASES = ["prepare", "execute", "complete"] as const;

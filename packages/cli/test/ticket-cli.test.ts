@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { CURRENT_SCHEMA_VERSION, openDb } from "@vw-ai/vibehub-core";
 import { main } from "../src/main.js";
 
 interface Invocation {
@@ -68,6 +69,66 @@ describe("vibehub ticket Git-native adapter", () => {
       },
     });
     expect(result.raw).toBe(`${JSON.stringify(result.envelope)}\n`);
+    expect(fs.existsSync(dbPath)).toBe(false);
+  });
+
+  it("keeps pure Git Ticket reads independent of an incompatible local DB", () => {
+    const future = openDb(dbPath);
+    future.pragma(`user_version = ${CURRENT_SCHEMA_VERSION + 1}`);
+    future.close();
+
+    const result = invoke([
+      "ticket",
+      "graph.snapshot",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-test",
+      "--request",
+      "ticket-future-db",
+    ]);
+    expect(result.status).toBe(0);
+    expect(result.envelope).toMatchObject({
+      ok: true,
+      data: { source: { worktreeRoot: repo } },
+    });
+  });
+
+  it("provisions only operational repository identity for Run-aware frontier", () => {
+    expect(fs.existsSync(dbPath)).toBe(false);
+    const result = invoke([
+      "ticket",
+      "frontier.read",
+      "--json",
+      "--repo",
+      repo,
+      "--db",
+      dbPath,
+      "--actor",
+      "cli-test",
+      "--request",
+      "ticket-frontier",
+    ]);
+    expect(result.status).toBe(0);
+    expect(result.envelope).toMatchObject({
+      ok: true,
+      data: {
+        tickets: expect.arrayContaining([
+          expect.objectContaining({
+            ticketId: "design-schema",
+            status: "READY",
+          }),
+        ]),
+      },
+    });
+    const db = openDb(dbPath);
+    expect(db.prepare(
+      `SELECT root_path AS rootPath FROM repos`,
+    ).all()).toEqual([{ rootPath: repo }]);
+    db.close();
   });
 
   it("accepts both group-relative and fully-qualified read names", () => {
@@ -96,7 +157,7 @@ describe("vibehub ticket Git-native adapter", () => {
     }
   });
 
-  it("returns the complete executable context package and an empty M1A trace", () => {
+  it("returns the complete Ticket definition context and an empty M1A trace", () => {
     const graph = invoke([
       "ticket",
       "graph.snapshot",

@@ -1,0 +1,72 @@
+spec_id: "contract-ticket-closeout-001"
+type: contract
+state: active
+intent:
+  summary: "Evidence is executor-authored, Outcome is independently adjudicated, and only a successful current Outcome completes a Ticket and unlocks direct dependents."
+  detail: |
+    An executor may append bounded Evidence against one exact Ticket revision,
+    ContextBinding, Run generation, and acceptance ID. Evidence never
+    self-certifies acceptance. A different verifier closes the attempt with
+    one append-only Outcome that records the terminal form, executor report,
+    per-acceptance disposition and Evidence refs, follow-up Ticket refs, and
+    any semantic-closeout proposal refs.
+
+    `successful` is valid only when every acceptance in the current Ticket
+    revision is present exactly once, accepted, and supported by matching
+    Evidence. `partial`, `failed`, `deviated`, and `stale` remain visible but
+    complete nothing. One exact Ticket subject, Run ID, and generation can
+    have only one terminal Outcome; equivalent delivery is idempotent and a
+    conflicting closeout fails closed. Completion and downstream eligibility
+    are derived from current Git facts plus the ContextBinding's dynamically
+    verified Decision authority. Later revocation keeps the successful Outcome
+    as a durable trace fact but withdraws operational DONE and downstream
+    eligibility. Deleting SQLite loses only live Run coordination. Canonical
+    Feature Room mutation still belongs to its governing knowledge lifecycle;
+    Ticket closeout may reference a proposal but cannot perform it implicitly.
+constraints:
+  - kind: must
+    rule: "Evidence binds exact Ticket revision, ContextBinding digest and packet, Run identity and generation, executor, execution-start source, and one acceptance ID"
+  - kind: must
+    rule: "Evidence repository refs resolve only to ordinary worktree files through symlink-free paths and reject every case-folded .git administration segment"
+  - kind: must
+    rule: "Outcome binds the same exact attempt and records successful, partial, failed, deviated, or stale without collapsing those forms"
+  - kind: must
+    rule: "Allow only one terminal Outcome per exact Ticket subject, Run ID, and generation; replay equivalent closeout idempotently and reject any conflicting terminal fact"
+  - kind: must
+    rule: "The verifier differs from the executor, adjudicates every current acceptance, and cites only matching Evidence"
+  - kind: must
+    rule: "Only one valid successful current Outcome derives DONE; only direct dependents whose every prerequisite is DONE derive READY"
+  - kind: must
+    rule: "Treat a successful Outcome as operationally current only while its exact ContextBinding and bound Decision verification remain current; preserve the fact but fail closed after revocation, expiry, tampering, or receipt mismatch"
+  - kind: must
+    rule: "Git alone reconstructs completion, Evidence, deviations, and eligibility after disposable DB loss"
+  - kind: must_not
+    rule: "Do not add an authored status field, generic set-complete operation, executor self-certification, or SQLite semantic completion"
+  - kind: must_not
+    rule: "Do not let closeout silently mutate canonical Feature Room knowledge"
+indexing:
+  type: contract
+  priority: P0
+  layer: epic
+  domain: "ticket-runtime"
+  tags: [ticket, outcome, evidence, closeout, verification, git]
+provenance:
+  source_type: implementation_design
+  confidence: 0.98
+  source_ref: "M4 MR-ready closeout settlement — 2026-07-30"
+  produced_by_agent: "implementation"
+  produced_at: "2026-07-30"
+relations:
+  - target: "decision-ticket-closeout-001"
+    type: supersedes
+    detail: "Resolves the open technical question without manufacturing a protected human decision."
+  - target: "contract-ticket-context-binding-001"
+    type: depends_on
+  - target: "decision-ticket-git-native-ledger-001"
+    type: depends_on
+  - target: "decision-ticket-graph-lifecycle-002"
+    type: depends_on
+anchors:
+  - file: "packages/core/src/ticket-ledger"
+  - file: "packages/core/src/ticket-execution-service.ts"
+  - file: "skills/vibehub-ticket-closeout/SKILL.md"

@@ -102,6 +102,8 @@ export * from "./operation-dispatcher.js";
 export * from "./operation-contracts.js";
 export * from "./ticket-review-projector.js";
 export * from "./ticket-review-read-service.js";
+export * from "./ticket-context-compiler.js";
+export * from "./ticket-execution-service.js";
 export {
   GitTicketLedgerReviewProjectionSourceProviderV0,
   type ResolvedTicketReviewProjectionSourceProviderV0,
@@ -110,6 +112,7 @@ export {
   type TicketReviewSnapshotSourceLoadV0,
 } from "./ticket-review-resolver.js";
 export * from "./ticket-review-source.js";
+export * from "./ticket-run-store.js";
 export * from "./ticket-ledger/index.js";
 export {
   DurableLocalSignatureTicketDecisionAttestationVerifierV0,

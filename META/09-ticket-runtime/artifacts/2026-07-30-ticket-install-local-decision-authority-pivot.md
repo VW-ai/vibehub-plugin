@@ -1,8 +1,8 @@
 # Ticket M3.6 — Install-local Decision authority pivot
 
 Date: 2026-07-30
-Status: implementation and successor documentation complete in the working
-tree; commit pending
+Status: implementation and successor documentation committed in
+`dd771df13185fc472ade73d6962b3e3e8be78403`
 
 ## Outcome
 
@@ -211,7 +211,8 @@ expiry, and identity claim. It does not rewrite that evidence.
 
 Implementation commit `dd771df13185fc472ade73d6962b3e3e8be78403`
 contains the runtime, installed surface, Skill, successor contract, and
-independently validated 12-Ticket graph. Execution, Outcome, Evidence, and
-semantic closeout remain the next Ticket Runtime milestone after the exact
-protected context-binding and closeout choices are ratified through the
-installed Plugin-host surface.
+independently validated 12-Ticket graph. At this historical boundary,
+context-binding and closeout were still modeled as protected questions.
+M4 later superseded that classification with Agent-owned technical contracts;
+the installed authority remains available for genuine product, permission, and
+material-risk Decisions rather than gating those mechanics.

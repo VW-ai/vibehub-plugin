@@ -9,9 +9,12 @@ import {
 import {
   TICKET_LEDGER_MAX_BYTES,
   TICKET_LEDGER_MAX_ATTESTATIONS,
+  TICKET_LEDGER_MAX_CONTEXT_BINDINGS,
   TICKET_LEDGER_MAX_DECISIONS,
   TICKET_LEDGER_MAX_DIRTY_PATHS,
   TICKET_LEDGER_MAX_REVIEWS,
+  TICKET_LEDGER_MAX_EVIDENCE,
+  TICKET_LEDGER_MAX_OUTCOMES,
   TICKET_LEDGER_MAX_TICKETS,
   TICKET_LEDGER_RELATIVE_PATH,
   TICKET_LEDGER_STABLE_READ_ATTEMPTS,
@@ -289,6 +292,9 @@ const readWorktreeInventory = (worktreeRoot: string): InventoryFile[] => {
       || entry.name === "reviews"
       || entry.name === "decisions"
       || entry.name === "attestations"
+      || entry.name === "context-bindings"
+      || entry.name === "evidence"
+      || entry.name === "outcomes"
     ) {
       if (entry.isSymbolicLink()) {
         throw new TicketLedgerError(
@@ -568,6 +574,103 @@ const readWorktreeInventory = (worktreeRoot: string): InventoryFile[] => {
     }
   }
 
+  const readTicketScopedDocuments = (
+    directoryName: "context-bindings" | "evidence" | "outcomes",
+    maximumDocuments: number,
+  ): void => {
+    const categoryDirectory = path.join(ledgerRoot, directoryName);
+    if (!fs.existsSync(categoryDirectory)) return;
+    ensureDirectory(categoryDirectory, false);
+    let ticketEntries: fs.Dirent[];
+    try {
+      ticketEntries = fs.readdirSync(categoryDirectory, {
+        withFileTypes: true,
+      });
+    } catch (cause) {
+      throw new TicketLedgerError(
+        "io",
+        `Cannot list Ticket ${directoryName} subjects at ${categoryDirectory}`,
+        { path: categoryDirectory },
+        { cause },
+      );
+    }
+    if (ticketEntries.length > TICKET_LEDGER_MAX_TICKETS) {
+      throw new TicketLedgerError(
+        "ledger_too_large",
+        `Ticket ledger contains more than ${TICKET_LEDGER_MAX_TICKETS} ${directoryName} subject directories`,
+        { directoryName, subjectCount: ticketEntries.length },
+      );
+    }
+    let documentCount = 0;
+    for (const ticketEntry of ticketEntries) {
+      const ticketPath =
+        `${TICKET_LEDGER_RELATIVE_PATH}/${directoryName}/${ticketEntry.name}`;
+      if (ticketEntry.isSymbolicLink()) {
+        throw new TicketLedgerError(
+          "symlink",
+          `Ticket ${directoryName} subject directory cannot be a symlink: ${ticketPath}`,
+          { documentPath: ticketPath },
+        );
+      }
+      if (
+        !ticketEntry.isDirectory()
+        || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(ticketEntry.name)
+      ) {
+        unsupportedPath(ticketPath);
+      }
+      const ticketDirectory = path.join(
+        categoryDirectory,
+        ticketEntry.name,
+      );
+      ensureDirectory(ticketDirectory, false);
+      let entries: fs.Dirent[];
+      try {
+        entries = fs.readdirSync(ticketDirectory, {
+          withFileTypes: true,
+        });
+      } catch (cause) {
+        throw new TicketLedgerError(
+          "io",
+          `Cannot list Ticket ${directoryName} documents at ${ticketDirectory}`,
+          { path: ticketDirectory },
+          { cause },
+        );
+      }
+      documentCount += entries.length;
+      if (documentCount > maximumDocuments) {
+        throw new TicketLedgerError(
+          "ledger_too_large",
+          `Ticket ledger contains more than ${maximumDocuments} ${directoryName} documents`,
+          { directoryName, documentCount },
+        );
+      }
+      for (const entry of entries) {
+        const documentPath = `${ticketPath}/${entry.name}`;
+        if (entry.isSymbolicLink()) {
+          throw new TicketLedgerError(
+            "symlink",
+            `Ticket ${directoryName} document cannot be a symlink: ${documentPath}`,
+            { documentPath },
+          );
+        }
+        if (!entry.isFile() || !isTicketLedgerDocumentPath(documentPath)) {
+          unsupportedPath(documentPath);
+        }
+        addFile(readRegularFile(
+          path.join(ticketDirectory, entry.name),
+          documentPath,
+        ));
+      }
+    }
+  };
+
+  readTicketScopedDocuments(
+    "context-bindings",
+    TICKET_LEDGER_MAX_CONTEXT_BINDINGS,
+  );
+  readTicketScopedDocuments("evidence", TICKET_LEDGER_MAX_EVIDENCE);
+  readTicketScopedDocuments("outcomes", TICKET_LEDGER_MAX_OUTCOMES);
+
   return inventory.sort((left, right) =>
     Buffer.compare(
       Buffer.from(left.documentPath, "utf8"),
@@ -644,6 +747,9 @@ const treeInventoryAtCommit = (
       + TICKET_LEDGER_MAX_REVIEWS
       + TICKET_LEDGER_MAX_DECISIONS
       + TICKET_LEDGER_MAX_ATTESTATIONS
+      + TICKET_LEDGER_MAX_CONTEXT_BINDINGS
+      + TICKET_LEDGER_MAX_EVIDENCE
+      + TICKET_LEDGER_MAX_OUTCOMES
       + 1
   ) {
     throw new TicketLedgerError(

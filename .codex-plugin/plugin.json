@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "VibeHub",
     "shortDescription": "Shared project context for coding agents",
-    "longDescription": "Use one local SQLite context layer across Codex and Claude Code, with skill-owned knowledge workflows, deterministic MCP operations, and lifecycle evidence.",
+    "longDescription": "Use Git-native durable semantics with skill-owned intelligence, deterministic CLI/MCP operations, disposable local coordination, and lifecycle evidence across Codex and Claude Code.",
     "developerName": "VibeHub Team",
     "category": "Developer Tools",
     "capabilities": [

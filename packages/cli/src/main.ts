@@ -44,6 +44,7 @@ import {
   OPERATION_INPUT_BYTE_LIMITS,
   operationInputSchemas,
   syncTeamSnapshot,
+  upsertRepo,
   vibehubHome,
   type HookEventName,
   type HookHost,
@@ -123,6 +124,26 @@ interface KbCliFlags {
   input:Record<string,unknown>; json:boolean;
 }
 
+const SQLITE_FREE_TICKET_OPERATIONS = new Set([
+  "ticket.graph.snapshot",
+  "ticket.subject.inspect",
+  "ticket.trace.list",
+  "ticket.worktree.patch",
+  "ticket.review.append",
+  "ticket.decision.record",
+  "ticket.context.compile",
+]);
+
+const ALL_GIT_NATIVE_TICKET_OPERATIONS = new Set([
+  ...SQLITE_FREE_TICKET_OPERATIONS,
+  "ticket.frontier.read",
+  "ticket.run.claim",
+  "ticket.run.heartbeat",
+  "ticket.run.release",
+  "ticket.evidence.append",
+  "ticket.closeout.append",
+]);
+
 function parseKbFlags(
   argv:string[],
   maximumInputBytes?:number,
@@ -195,18 +216,52 @@ function runOperation(
     );
     if(!flags.json)throw new Error(`${group} operations require --json`);
     if(!flags.actor?.trim())throw new Error(`${group} operations require --actor <id>`);
-    db=openDb(flags.db);
     const session=GitFacade.sessionContextAt(flags.repo);
+    const sqliteFree=SQLITE_FREE_TICKET_OPERATIONS.has(canonicalOperation);
+    db=openDb(sqliteFree ? ":memory:" : flags.db);
     const root=session.repoRoot;
-    const row=flags.repoId?{id:flags.repoId}:db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(root) as {id:number}|undefined;
-    const isGitNativeTicketOperation =
-      canonicalOperation === "ticket.graph.snapshot"
-      || canonicalOperation === "ticket.subject.inspect"
-      || canonicalOperation === "ticket.trace.list"
-      || canonicalOperation === "ticket.worktree.patch"
-      || canonicalOperation === "ticket.review.append"
-      || canonicalOperation === "ticket.decision.record";
-    const repoId=row?.id??(isGitNativeTicketOperation ? 1 : 0);
+    type RepoAddress={id:number;rootPath:string};
+    let row=flags.repoId
+      ? db.prepare(
+        `SELECT id,root_path AS rootPath FROM repos WHERE id=?`,
+      ).get(flags.repoId) as RepoAddress|undefined
+      : db.prepare(
+        `SELECT id,root_path AS rootPath FROM repos WHERE root_path=?`,
+      ).get(root) as RepoAddress|undefined;
+    if (
+      row !== undefined
+      && !sqliteFree
+      && ALL_GIT_NATIVE_TICKET_OPERATIONS.has(canonicalOperation)
+      && fs.realpathSync(row.rootPath) !== fs.realpathSync(root)
+    ) {
+      throw new Error("--repo-id does not belong to the trusted Ticket repository");
+    }
+    if (
+      row === undefined
+      && !sqliteFree
+      && ALL_GIT_NATIVE_TICKET_OPERATIONS.has(canonicalOperation)
+      && flags.repoId === undefined
+    ) {
+      row=upsertRepo(
+        db,
+        root,
+        path.basename(root),
+        session.branch ?? "detached",
+        new Date().toISOString(),
+      );
+    }
+    if (
+      row === undefined
+      && !sqliteFree
+      && ALL_GIT_NATIVE_TICKET_OPERATIONS.has(canonicalOperation)
+    ) {
+      throw new Error("--repo-id does not identify an initialized repository");
+    }
+    const repoId=row?.id??(
+      ALL_GIT_NATIVE_TICKET_OPERATIONS.has(canonicalOperation)
+        ? flags.repoId ?? 1
+        : 0
+    );
     const result=new OperationDispatcher(db,{
       repoRoot:session.toplevel,
       ticketDecisionAttestationTrustProfiles:

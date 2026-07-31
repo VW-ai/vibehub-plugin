@@ -1,7 +1,7 @@
 {
   "name": "@vw-ai/vibehub-cli",
   "version": "0.2.2",
-  "description": "Vibehub workbench CLI — thin adapter over @vw-ai/vibehub-core (decision-project-013: zero LLM, zero business logic; parsing + output formatting only).",
+  "description": "VibeHub local CLI and installed host adapter for deterministic project context, Ticket operations, and lifecycle evidence.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {

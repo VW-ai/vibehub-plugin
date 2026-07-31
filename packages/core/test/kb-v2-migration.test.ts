@@ -94,7 +94,7 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     raw.close();
 
     const db = openDb(file);
-    expect(CURRENT_SCHEMA_VERSION).toBe(21);
+    expect(CURRENT_SCHEMA_VERSION).toBe(22);
     expect(db.pragma("user_version", { simple: true })).toBe(CURRENT_SCHEMA_VERSION);
     expect(db.prepare(`SELECT repo_id, feature_id FROM kb_features WHERE feature_id = 'root' ORDER BY repo_id`).all())
       .toEqual([{ repo_id: 1, feature_id: "root" }, { repo_id: 2, feature_id: "root" }]);
@@ -140,11 +140,11 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
   it("upgrades v11 databases with immutable unresolved scope dispositions",()=>{
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-unresolved-migration-"));dirs.push(dir);
     const file=path.join(dir,"legacy-v11.db"),db=openDb(file);db.close();
-    const raw=new Database(file);raw.exec(`DROP TRIGGER IF EXISTS ticket_proposal_validations_closed_after_decision; DROP TABLE IF EXISTS ticket_proposal_application_receipts; DROP TABLE IF EXISTS ticket_proposal_application_intents; DROP TABLE IF EXISTS ticket_proposal_authority_decisions; DROP TABLE IF EXISTS ticket_proposal_validation_receipts; DROP TABLE IF EXISTS ticket_proposals; DROP TABLE IF EXISTS operation_request_receipts; DROP TABLE IF EXISTS operation_outcome_blobs; DROP TABLE IF EXISTS distill_scope_dispositions; DROP TABLE IF EXISTS task_prompt_cadence; DROP TABLE IF EXISTS task_prompt_seen; DROP TABLE IF EXISTS repo_semantic_authority; DROP INDEX IF EXISTS idx_kb_provenance_task; PRAGMA user_version=11;`);raw.close();
+    const raw=new Database(file);raw.exec(`DROP TABLE IF EXISTS ticket_runs; DROP TABLE IF EXISTS operation_request_receipts; DROP TABLE IF EXISTS distill_scope_dispositions; DROP TABLE IF EXISTS task_prompt_cadence; DROP TABLE IF EXISTS task_prompt_seen; DROP TABLE IF EXISTS repo_semantic_authority; DROP INDEX IF EXISTS idx_kb_provenance_task; PRAGMA user_version=11;`);raw.close();
     const upgraded=openDb(file);
     expect(upgraded.pragma("user_version",{simple:true})).toBe(CURRENT_SCHEMA_VERSION);
     expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='distill_scope_dispositions'`).get()).toEqual({name:"distill_scope_dispositions"});
-    expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='operation_outcome_blobs'`).get()).toBeUndefined();
+    expect(upgraded.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='ticket_runs'`).get()).toEqual({name:"ticket_runs"});
     upgraded.prepare(`INSERT INTO repos(root_path,default_branch,created_at) VALUES('/integrity','main',?)`).run(T0);
     const insertReceipt=upgraded.prepare(`INSERT INTO operation_request_receipts(repo_id,request_id,operation,payload_hash,outcome_kind,outcome,created_at) VALUES(1,?,'kb.status','hash','success',?,?)`);
     expect(()=>insertReceipt.run('missing-ok','{}',T0)).toThrow(/CHECK constraint/);
@@ -162,7 +162,7 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     upgraded.close();
   });
 
-  it("upgrades v16 inline operation receipts without changing their replay",()=>{
+  it("upgrades v16 with disposable Ticket run leases without changing generic receipt replay",()=>{
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-receipt-v16-"));dirs.push(dir);
     const file=path.join(dir,"legacy-v16.db"),repoRoot=path.join(dir,"repo");
     fs.mkdirSync(repoRoot);
@@ -174,12 +174,13 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     db.close();
 
     const raw=new Database(file);
-    raw.pragma("user_version=16");
+    raw.exec(`DROP TABLE ticket_runs; PRAGMA user_version=16;`);
     raw.close();
 
     db=openDb(file);
-    expect((db.pragma("table_info(operation_request_receipts)") as Array<{name:string}>)
-      .some((column)=>column.name==="outcome_blob_digest")).toBe(false);
+    expect(db.prepare(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='ticket_runs'`,
+    ).get()).toEqual({name:"ticket_runs"});
     expect(new OperationDispatcher(db).dispatch(
       "kb.status",
       context,
@@ -204,65 +205,26 @@ describe("migration 008 — canonical KB and immutable mapping boundary", () => 
     db.close();
   });
 
-  it("removes the retired Ticket semantic runtime while preserving generic operation receipts",()=>{
-    const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-ticket-runtime-v20-"));dirs.push(dir);
-    const file=path.join(dir,"legacy-v20.db"),repoRoot=path.join(dir,"repo");
-    fs.mkdirSync(repoRoot);
+  it("advances an already-clean v21 database to the disposable Run schema",()=>{
+    const dir=fs.mkdtempSync(path.join(os.tmpdir(),"vibehub-ticket-run-v21-"));dirs.push(dir);
+    const file=path.join(dir,"clean-v21.db");
     let db=openDb(file);
-    db.prepare(`INSERT INTO repos(root_path,default_branch,created_at) VALUES(?,'main',?)`).run(repoRoot,T0);
-    const context={repoId:1,actor:"legacy-reader",requestId:"preserved-receipt",now:T0};
-    const first=new OperationDispatcher(db).dispatch("kb.status",context,{});
     db.close();
 
     const raw=new Database(file);
-    raw.exec(`
-      CREATE TABLE operation_outcome_blobs(digest TEXT PRIMARY KEY);
-      ALTER TABLE operation_request_receipts ADD COLUMN outcome_blob_digest TEXT;
-      CREATE TABLE ticket_proposals(id TEXT PRIMARY KEY);
-      CREATE TABLE ticket_proposal_validation_receipts(id TEXT PRIMARY KEY);
-      CREATE TABLE ticket_proposal_authority_decisions(id TEXT PRIMARY KEY);
-      CREATE TABLE ticket_proposal_application_intents(id TEXT PRIMARY KEY);
-      CREATE TABLE ticket_proposal_application_receipts(id TEXT PRIMARY KEY);
-      PRAGMA user_version=20;
-    `);
-    raw.prepare(
-      `INSERT INTO operation_request_receipts(
-         repo_id,request_id,operation,payload_hash,
-         outcome_kind,outcome,created_at,outcome_blob_digest
-       ) VALUES(1,'retired-ticket-receipt','ticket.proposal.apply',
-         'legacy-ticket-payload','success',?,?,'legacy-ticket-blob')`,
-    ).run(JSON.stringify({
-      ok: true,
-      data: { applied: true },
-      meta: {
-        operation: "ticket.proposal.apply",
-        repoId: 1,
-        requestId: "retired-ticket-receipt",
-        at: T0,
-      },
-    }), T0);
+    raw.exec(`DROP TABLE ticket_runs; PRAGMA user_version=21;`);
     raw.close();
 
     db=openDb(file);
-    expect(new OperationDispatcher(db).dispatch("kb.status",context,{})).toEqual(first);
+    expect(db.pragma("user_version",{simple:true})).toBe(22);
     expect(db.prepare(
-      `SELECT COUNT(*) count FROM operation_request_receipts
-       WHERE operation LIKE 'ticket.%'`,
-    ).get()).toEqual({count:0});
-    const retiredTables=[
-      "operation_outcome_blobs",
-      "ticket_proposals",
-      "ticket_proposal_validation_receipts",
-      "ticket_proposal_authority_decisions",
-      "ticket_proposal_application_intents",
-      "ticket_proposal_application_receipts",
-    ];
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='ticket_runs'`,
+    ).get()).toEqual({name:"ticket_runs"});
     expect(db.prepare(
-      `SELECT name FROM sqlite_master WHERE type='table' AND name IN (${retiredTables.map(()=>"?").join(",")})`,
-    ).all(...retiredTables)).toEqual([]);
-    expect((db.pragma("table_info(operation_request_receipts)") as Array<{name:string}>)
-      .some((column)=>column.name==="outcome_blob_digest")).toBe(false);
-    expect(db.prepare(`PRAGMA foreign_key_check`).all()).toEqual([]);
+      `SELECT name FROM sqlite_master
+       WHERE type IN ('table','trigger')
+         AND name LIKE 'ticket_proposal_%'`,
+    ).all()).toEqual([]);
     db.close();
   });
 

@@ -12,6 +12,12 @@
   };
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
+  const TICKET_STATES = new Set([
+    "READY",
+    "DONE",
+    "BLOCKED",
+    "DEVIATED",
+  ]);
 
   const elements = {
     surface: document.querySelector("#surface"),
@@ -133,6 +139,9 @@
   function renderChrome() {
     const { project, graph } = state;
     const { source } = graph;
+    const deviatedCount = graph.tickets.filter(
+      (ticket) => ticketOperationalState(ticket)?.label === "DEVIATED",
+    ).length;
     const commit = source.resolvedCommit
       ? source.resolvedCommit.slice(0, 8)
       : "unborn";
@@ -151,14 +160,22 @@
     );
     elements.signalDetail.textContent =
       `${graph.tickets.length} Tickets · ${graph.relations.length} direct unlocks`;
-    elements.signalAttention.textContent =
-      source.semanticDirty ? "Local" : "Git";
+    elements.signalAttention.textContent = deviatedCount > 0
+      ? `${deviatedCount} deviated`
+      : source.semanticDirty ? "Local" : "Git";
     elements.signalAttention.className =
-      `signal-attention${source.semanticDirty ? " dirty" : ""}`;
+      `signal-attention${
+        deviatedCount > 0 ? " deviated" : source.semanticDirty ? " dirty" : ""
+      }`;
     elements.stateDot.className =
-      `state-dot${source.semanticDirty ? " dirty" : ""}`;
-    elements.stateLabel.textContent =
-      source.semanticDirty
+      `state-dot${
+        deviatedCount > 0 ? " deviated" : source.semanticDirty ? " dirty" : ""
+      }`;
+    elements.stateLabel.textContent = deviatedCount > 0
+      ? `${deviatedCount} execution deviation${
+          deviatedCount === 1 ? "" : "s"
+        }`
+      : source.semanticDirty
         ? `${dirtyPathCount(source)} local change`
           + `${source.dirtyPaths.length === 1 && !source.dirtyPathsTruncated ? "" : "s"}`
         : "Exact Git source";
@@ -213,6 +230,7 @@
     for (const ticket of state.graph.tickets) {
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
+      const operational = ticketOperationalState(ticket);
       const isSelected =
         selected?.kind === "ticket" && selected.id === ticket.ticketId;
       const group = svg("g", {
@@ -220,6 +238,7 @@
           "ticket-node",
           isSelected ? "selected" : "",
           related && !related.nodes.has(ticket.ticketId) ? "dimmed" : "",
+          operational ? `state-${operational.key}` : "",
         ),
         transform: `translate(${position.x} ${position.y})`,
         role: "button",
@@ -227,7 +246,10 @@
         "aria-label":
           `${ticket.ticketId}. ${ticket.outcome}. `
           + `${ticket.relationCounts.prerequisites} prerequisites, `
-          + `${ticket.relationCounts.dependents} unlocks.`,
+          + `${ticket.relationCounts.dependents} unlocks.`
+          + (operational
+            ? ` ${operational.label}. ${operational.detail || ""}`
+            : ""),
       });
       group.dataset.ticketId = ticket.ticketId;
       group.append(
@@ -265,9 +287,18 @@
       });
       meta.textContent =
         `${ticket.relationCounts.prerequisites} in · `
-        + `${ticket.relationCounts.dependents} out · `
-        + shortDigest(ticket.ticketRevision);
+        + `${ticket.relationCounts.dependents} out`;
       group.append(meta);
+      if (operational) {
+        const status = svg("text", {
+          class: "ticket-state",
+          x: NODE.width - 15,
+          y: NODE.height - 12,
+          "text-anchor": "end",
+        });
+        status.textContent = operational.label;
+        group.append(status);
+      }
       group.addEventListener("click", (event) => {
         event.stopPropagation();
         void selectTicket(ticket.ticketId);
@@ -303,15 +334,20 @@
         "stroke-width": 4,
       }));
     }
-    for (const position of positions.values()) {
+    for (const ticket of state.graph.tickets) {
+      const position = positions.get(ticket.ticketId);
+      if (!position) continue;
+      const operational = ticketOperationalState(ticket);
       elements.minimap.append(svg("rect", {
+        class: classes(
+          "minimap-node",
+          operational ? `state-${operational.key}` : "",
+        ),
         x: position.x,
         y: position.y,
         width: NODE.width,
         height: NODE.height,
         rx: 7,
-        fill: "#fbfbfa",
-        stroke: "#6b6f75",
         "stroke-width": 3,
       }));
     }
@@ -331,7 +367,8 @@
     elements.inspectorOutcome.textContent =
       `This exact worktree source contains ${state.graph.tickets.length} `
       + `Tickets and ${state.graph.relations.length} direct unlock relations. `
-      + "Select any Ticket to read the context a fresh Agent receives.";
+      + "Select any Ticket to inspect its current Git-derived state, recorded "
+      + "context, and trace.";
     const content = document.createDocumentFragment();
     content.append(
       facts([
@@ -379,7 +416,7 @@
     if (workspace) content.append(workspace);
     const traceSection = section(
       "Trace",
-      quietMessage("Reading review facts…"),
+      quietMessage("Reading Git trace…"),
     );
     traceSection.dataset.trace = "graph";
     content.append(traceSection);
@@ -433,7 +470,7 @@
     elements.inspectorEyebrow.textContent =
       `Ticket · ${shortTicketId(ticket.ticketId)}`;
     elements.inspectorTitle.textContent = ticket.outcome;
-    elements.inspectorOutcome.textContent = "Reading executable context…";
+    elements.inspectorOutcome.textContent = "Reading current Ticket facts…";
     elements.inspectorContent.replaceChildren(
       facts([
         ["Revision", ticket.ticketRevision],
@@ -496,6 +533,10 @@
       ],
       ["Source", sourceLabel(inspection.source || state.graph.source)],
     ]));
+    const operational = executionStateView(ticket);
+    if (operational) {
+      content.append(section("Current state", operational));
+    }
     appendSection(
       content,
       "Acceptance",
@@ -540,7 +581,7 @@
     );
     const traceSection = section(
       "Trace",
-      quietMessage("Reading review facts…"),
+      quietMessage("Reading Git trace…"),
     );
     traceSection.dataset.trace = "ticket";
     content.append(traceSection);
@@ -640,7 +681,7 @@
     );
     const traceSection = section(
       "Trace",
-      quietMessage("Reading review facts…"),
+      quietMessage("Reading Git trace…"),
     );
     traceSection.dataset.trace = "relation";
     content.append(traceSection);
@@ -862,14 +903,19 @@
 
   function traceList(records) {
     if (!records.length) {
-      return quietMessage("No review facts are bound to this exact subject.");
+      return quietMessage("No Git trace facts are bound to this exact subject.");
     }
     const result = document.createElement("div");
     result.className = "trace-list";
     for (const record of records) {
       const row = document.createElement("article");
       const historical = String(record.status || "").startsWith("historical");
-      row.className = classes("trace-row", historical ? "historical" : "");
+      const tone = historical ? "" : traceTone(record);
+      row.className = classes(
+        "trace-row",
+        historical ? "historical" : "",
+        tone ? `trace-${tone}` : "",
+      );
 
       const marker = document.createElement("span");
       marker.className = "trace-marker";
@@ -900,6 +946,99 @@
       result.append(row);
     }
     return result;
+  }
+
+  function ticketOperationalState(ticket) {
+    const slot = ticket?.capabilities?.operational;
+    if (slot?.availability !== "available") return null;
+    const label = String(slot.summary?.label || "").toUpperCase();
+    if (!TICKET_STATES.has(label)) return null;
+    return {
+      label,
+      key: label.toLowerCase(),
+      detail: slot.summary?.detail || "",
+      references: Array.isArray(slot.summary?.references)
+        ? slot.summary.references
+        : [],
+    };
+  }
+
+  function executionStateView(ticket) {
+    const operational = ticketOperationalState(ticket);
+    if (!operational) return null;
+    const wrapper = document.createElement("div");
+    wrapper.className = classes(
+      "execution-state",
+      `state-${operational.key}`,
+    );
+    wrapper.setAttribute(
+      "aria-label",
+      `${operational.label}. ${operational.detail}`,
+    );
+
+    const marker = document.createElement("span");
+    marker.className = "execution-state-mark";
+    marker.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("div");
+    copy.className = "execution-state-copy";
+    const label = document.createElement("strong");
+    label.textContent = operational.label;
+    copy.append(label);
+    if (operational.detail) {
+      const detail = document.createElement("span");
+      detail.textContent = operational.detail;
+      copy.append(detail);
+    }
+    wrapper.append(marker, copy);
+
+    const references = executionStateReferences(operational.references);
+    if (references) wrapper.append(references);
+    return wrapper;
+  }
+
+  function executionStateReferences(references) {
+    if (!references.length) return null;
+    const wrapper = document.createElement("div");
+    wrapper.className = "execution-state-references";
+    for (const reference of references) {
+      const button = document.createElement("button");
+      const linkedTicket = state.graph.tickets.find(
+        (ticket) => ticket.ticketId === reference.ref,
+      );
+      button.type = "button";
+      button.textContent = reference.label
+        ? `${reference.label} · ${compactReference(reference.ref)}`
+        : compactReference(reference.ref);
+      button.title = reference.ref;
+      if (linkedTicket) {
+        button.addEventListener(
+          "click",
+          () => void selectTicket(linkedTicket.ticketId, true),
+        );
+      } else {
+        button.addEventListener(
+          "click",
+          () => void copyText(reference.ref, "Reference copied"),
+        );
+      }
+      wrapper.append(button);
+    }
+    return wrapper;
+  }
+
+  function compactReference(value) {
+    if (value.length <= 38) return value;
+    return `${value.slice(0, 22)}…${value.slice(-10)}`;
+  }
+
+  function traceTone(record) {
+    if (record.kind !== "outcome") return "";
+    const terminal = String(record.subkind || record.status || "")
+      .replace(/^historical_/u, "");
+    if (terminal === "successful") return "done";
+    if (terminal === "deviated" || terminal === "failed") return "deviated";
+    if (terminal === "partial" || terminal === "stale") return "blocked";
+    return "";
   }
 
   function traceDecisionDetails(decision) {

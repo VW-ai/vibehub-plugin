@@ -28,12 +28,14 @@ own all project and runtime mutations.
 2. Resolve the CLI once in this bounded order:
    - an exact executable path explicitly supplied by the user;
    - a non-empty `VIBEHUB_BIN` already present in the host environment;
-   - the existing `vibehub` found by `command -v vibehub`;
    - the package root containing this active skill, only when that same root
      contains `.codex-plugin/plugin.json` or `.claude-plugin/plugin.json` and
      `packages/cli/dist/main.js`; invoke that entrypoint with `node`;
-   - the plugin-local CLI entrypoint already present beneath
-     `${CLAUDE_PLUGIN_ROOT}/packages/cli/dist/main.js`, invoked with `node`.
+   - the installed Plugin root containing this active skill, only when that
+     same root contains `.codex-plugin/plugin.json` or
+     `.claude-plugin/plugin.json` and `runtime/vibehub-runtime.mjs`; invoke that
+     launcher with `node`, followed by `cli`;
+   - the existing `vibehub` found by `command -v vibehub`.
 3. Stop if none exists. Never download, install, build, search unrelated
    directories, or improvise a replacement executable.
 4. Quote the exact checkout and executable in shell commands. Do not silently

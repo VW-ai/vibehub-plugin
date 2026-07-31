@@ -29,6 +29,7 @@ export interface WorkbenchMcpServer {
   server: {
     oninitialized?: () => void | Promise<void>;
     getClientCapabilities(): { roots?: unknown } | undefined;
+    getClientVersion(): { name: string; version: string } | undefined;
     listRoots(): Promise<{ roots: Array<{ uri: string }> }>;
   };
   connect(transport: unknown): Promise<void>;
@@ -38,7 +39,10 @@ export interface WorkbenchMcpServer {
 export function createWorkbenchMcpServer(
   context: CapabilityContext | PromiseLike<CapabilityContext>,
 ): WorkbenchMcpServer {
-  const api = async () => createCapabilities(await context);
+  // Resolve capabilities once per MCP connection so its claimed actor remains
+  // stable for every operation in that session, including Run credentials.
+  const capabilities = Promise.resolve(context).then(createCapabilities);
+  const api = async () => capabilities;
   const server = new McpServer(
     { name: "vibehub-local", version: WORKBENCH_MCP_VERSION },
     { instructions: "Vibehub MCP exposes deterministic local capabilities. Semantic workflows live in vibehub skills." },
@@ -97,7 +101,7 @@ export function createWorkbenchMcpServer(
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
     title: "Dispatch one canonical Ticket operation",
-    description: "Read the current Git-native Ticket graph, apply one validated exact-base worktree patch, or append review facts. Ticket Decisions fail closed unless a trusted host injects exact human authority; the generic MCP runtime never does. Ticket semantics come from the trusted workspace path, never SQLite; Skills own planning and judgment.",
+    description: "Read the current Git-native Ticket graph, compile exact execution context, coordinate a bounded Run, append evidence or independent closeout, apply one validated exact-base worktree patch, or append review facts. Ticket Decisions fail closed unless a trusted host injects exact human authority; the generic MCP runtime never does. Ticket semantics come from the trusted workspace path, never SQLite; Skills own planning and judgment.",
     inputSchema: {
       requestId: logicalRequestId,
       operation: z.enum(TICKET_OPERATION_NAMES),

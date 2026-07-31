@@ -2,5 +2,7 @@
 export const OPERATION_INPUT_BYTE_LIMITS = Object.freeze({
   "ticket.worktree.patch": 10485760,
   "ticket.review.append": 524288,
-  "ticket.decision.record": 131072
+  "ticket.decision.record": 131072,
+  "ticket.evidence.append": 524288,
+  "ticket.closeout.append": 524288
 });

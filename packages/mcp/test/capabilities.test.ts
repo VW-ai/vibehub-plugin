@@ -30,6 +30,7 @@ import {
   openRuntimeContextForClient,
   openRuntimeContextFromRoots,
 } from "../src/runtime.js";
+import { createMcpSessionActor } from "../src/session-actor.js";
 
 const NOW = "2026-07-12T10:00:00.000Z";
 const toolText = (value: unknown): string =>
@@ -199,6 +200,13 @@ describe("local MCP deterministic capabilities", () => {
         "ticket.graph.snapshot",
         "ticket.subject.inspect",
         "ticket.trace.list",
+        "ticket.frontier.read",
+        "ticket.context.compile",
+        "ticket.run.claim",
+        "ticket.run.heartbeat",
+        "ticket.run.release",
+        "ticket.evidence.append",
+        "ticket.closeout.append",
         "ticket.worktree.patch",
         "ticket.review.append",
         "ticket.decision.record",
@@ -468,6 +476,189 @@ describe("local MCP deterministic capabilities", () => {
     );
   });
 
+  it("derives stable per-session attribution without treating client metadata as authority", () => {
+    const executor = createMcpSessionActor({
+      clientInfo: { name: "Codex Executor", version: "1.0.0" },
+      sessionId: "session-a",
+    });
+    expect(createMcpSessionActor({
+      clientInfo: { name: "Codex Executor", version: "1.0.0" },
+      sessionId: "session-a",
+    })).toBe(executor);
+    expect(createMcpSessionActor({
+      clientInfo: { name: "Codex Verifier", version: "1.0.0" },
+      sessionId: "session-a",
+    })).not.toBe(executor);
+    expect(createMcpSessionActor({
+      clientInfo: { name: "Codex Executor", version: "1.0.0" },
+      sessionId: "session-b",
+    })).not.toBe(executor);
+    expect(executor).toMatch(
+      /^mcp-session:codex-executor:[0-9a-f]{64}$/u,
+    );
+    expect(executor).not.toContain("session-a");
+  });
+
+  it("uses distinct production-style MCP sessions for execution and independent closeout", async () => {
+    writeTicketLedger(repo);
+    execFileSync("git", ["add", ".vibehub/tickets"], { cwd: repo });
+    execFileSync("git", ["commit", "-qm", "ticket execution ledger"], {
+      cwd: repo,
+    });
+    const dbPath = path.join(dir, "runtime-sessions.db");
+    const root = [{ uri: pathToFileURL(repo).href }];
+    const executorRuntime = await openRuntimeContextForClient({
+      supportsRoots: true,
+      listRoots: async () => root,
+      cwd: repo,
+      dbPath,
+      clientInfo: { name: "executor-agent", version: "1.0.0" },
+      sessionId: "executor-session",
+    });
+    const verifierRuntime = await openRuntimeContextForClient({
+      supportsRoots: true,
+      listRoots: async () => root,
+      cwd: repo,
+      dbPath,
+      clientInfo: { name: "verifier-agent", version: "1.0.0" },
+      sessionId: "verifier-session",
+    });
+    try {
+      expect(executorRuntime.context.actor).toMatch(
+        /^mcp-session:executor-agent:/u,
+      );
+      expect(verifierRuntime.context.actor).toMatch(
+        /^mcp-session:verifier-agent:/u,
+      );
+      expect(verifierRuntime.context.actor)
+        .not.toBe(executorRuntime.context.actor);
+
+      const executor = createCapabilities(executorRuntime.context);
+      const verifier = createCapabilities(verifierRuntime.context);
+      const initial = operationData(executor.dispatchTicket(
+        "ticket.frontier.read",
+        {},
+        "session-frontier-initial",
+      ));
+      const ticket = initial.tickets[0]!;
+      const compiled = operationData(executor.dispatchTicket(
+        "ticket.context.compile",
+        {
+          expectedSource: initial.source,
+          ticketId: ticket.ticketId,
+          expectedTicketRevision: ticket.ticketRevision,
+        },
+        "session-context-compile",
+      ));
+      const afterCompile = operationData(executor.dispatchTicket(
+        "ticket.frontier.read",
+        {},
+        "session-frontier-compiled",
+      ));
+      const run = operationData(executor.dispatchTicket(
+        "ticket.run.claim",
+        {
+          expectedSource: afterCompile.source,
+          ticketId: ticket.ticketId,
+          expectedTicketRevision: ticket.ticketRevision,
+          contextBindingId:
+            compiled.contextBinding.document.context_binding_id,
+          contextBindingDigest: compiled.contextBinding.documentDigest,
+          leaseSeconds: 60,
+        },
+        "session-run-claim",
+      ));
+      expect(run.actor).toBe(executorRuntime.context.actor);
+
+      const evidenceSource = operationData(executor.dispatchTicket(
+        "ticket.frontier.read",
+        {},
+        "session-frontier-evidence",
+      ));
+      const evidence = operationData(executor.dispatchTicket(
+        "ticket.evidence.append",
+        {
+          expectedSource: evidenceSource.source,
+          run: {
+            runId: run.runId,
+            generation: run.generation,
+            leaseToken: run.leaseToken,
+          },
+          acceptanceId: "mcp",
+          evidenceType: "inspection",
+          summary: "The executor inspected the exact MCP fixture.",
+          references: [{
+            kind: "repo_path",
+            label: "Fixture source",
+            target: "README.md",
+          }],
+        },
+        "session-evidence-append",
+      ));
+      operationData(executor.dispatchTicket(
+        "ticket.run.release",
+        {
+          runId: run.runId,
+          generation: run.generation,
+          leaseToken: run.leaseToken,
+          reason: "lease_released",
+        },
+        "session-run-release",
+      ));
+      const closeoutSource = operationData(verifier.dispatchTicket(
+        "ticket.frontier.read",
+        {},
+        "session-frontier-closeout",
+      ));
+      const closeoutInput = {
+        expectedSource: closeoutSource.source,
+        runId: run.runId,
+        generation: run.generation,
+        terminalForm: "successful" as const,
+        executorReport: "The MCP fixture execution completed.",
+        acceptance: [{
+          acceptanceId: "mcp",
+          disposition: "accepted" as const,
+          evidenceRefs: [evidence.evidence.document.evidence_id],
+          rationale: "A separate MCP session inspected the exact evidence.",
+        }],
+        followUpTicketRefs: [],
+        semanticCloseoutRefs: [],
+      };
+
+      expect(executor.dispatchTicket(
+        "ticket.closeout.append",
+        closeoutInput,
+        "session-self-closeout",
+      )).toMatchObject({
+        ok: false,
+        error: {
+          code: "ticket_ledger_invalid_document",
+          message: expect.stringMatching(/cannot verify itself/i),
+        },
+      });
+      const closed = operationData(verifier.dispatchTicket(
+        "ticket.closeout.append",
+        closeoutInput,
+        "session-independent-closeout",
+      ));
+      expect(closed.outcome.document).toMatchObject({
+        terminal_form: "successful",
+        run: {
+          executor: {
+            actor_ref: executorRuntime.context.actor,
+          },
+        },
+        verifier: {
+          actor_ref: verifierRuntime.context.actor,
+        },
+      });
+    } finally {
+      executorRuntime.close();
+      verifierRuntime.close();
+    }
+  });
+
   it("self_report remains task-scoped and the manual is reference-only", () => {
     const api = createCapabilities({
       db,
@@ -483,6 +674,9 @@ describe("local MCP deterministic capabilities", () => {
       done: "Ticket read cut",
     });
     expect(api.getManual().text).toMatch(/skills own semantic workflow/);
+    expect(api.getManual().text).toMatch(
+      /vibehub-ticket-run.*vibehub-ticket-closeout/,
+    );
   });
 
   it("derives repo and task from the server cwd", () => {
@@ -574,4 +768,20 @@ function writeTicketLedger(repo: string): void {
     "  - test:mcp",
     "",
   ].join("\n"));
+}
+
+function operationData(result: unknown): any {
+  const envelope = result as {
+    ok: boolean;
+    data?: unknown;
+    error?: { code: string; message: string };
+  };
+  if (!envelope.ok) {
+    throw new Error(
+      `${envelope.error?.code ?? "unknown"}: ${
+        envelope.error?.message ?? "operation failed"
+      }`,
+    );
+  }
+  return envelope.data;
 }

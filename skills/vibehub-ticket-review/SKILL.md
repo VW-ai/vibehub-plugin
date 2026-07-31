@@ -25,7 +25,9 @@ review into another chat transcript.
    instead of opening it automatically.
 2. Let the human read the graph in execution order: what is ready, what blocks
    it, and what completing a Ticket unlocks. Use the Inspector for the complete
-   executable context and traceable evidence.
+   Ticket definition, graph context, and traceable evidence. The exact bounded
+   execution packet exists only after `ticket.context.compile`; never present
+   the Inspector as that packet.
 3. Treat only interventions the host actually exposes as available. A Decision
    requires one explicit confirmation in the installed Plugin host. The browser
    submits only the Decision content; the host freezes the exact current Ticket

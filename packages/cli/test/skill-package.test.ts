@@ -10,7 +10,7 @@ import { openDb, OperationDispatcher, operationAcceptanceConstructManifest, oper
 const cliRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const workbench=path.resolve(cliRoot,"../..");
 const skills=path.join(workbench,"skills");
-const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-review","vibehub-ticket-validate"];
+const entry=["vibehub-ingest","vibehub-query","vibehub-distill","vibehub-update","vibehub-review","vibehub-setup","vibehub-pr","vibehub-ticket-plan","vibehub-ticket-review","vibehub-ticket-validate","vibehub-ticket-run","vibehub-ticket-closeout"];
 
 function files(root:string):string[]{return fs.readdirSync(root,{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(path.join(root,e.name)):[path.join(root,e.name)]);}
 
@@ -18,7 +18,7 @@ describe("production skill package",()=>{
   it("contains valid progressive entrypoints and resolvable resources",()=>{
     const validation=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--package",skills],{encoding:"utf8"});
     expect(validation.status,validation.stdout+validation.stderr).toBe(0);
-    expect(entry).toHaveLength(10);
+    expect(entry).toHaveLength(12);
     for(const name of entry){
       const text=fs.readFileSync(path.join(skills,name,"SKILL.md"),"utf8");
       expect(text).toContain("## Prerequisites");
@@ -277,6 +277,45 @@ describe("production skill package",()=>{
     expect(validate).not.toContain("vh-ticket.mjs worktree.patch");
   });
 
+  it("ships bounded Ticket execution and independent closeout intelligence",()=>{
+    const read=(relative:string)=>fs.readFileSync(path.join(skills,relative),"utf8");
+    const run=read("vibehub-ticket-run/SKILL.md");
+    const closeout=read("vibehub-ticket-closeout/SKILL.md");
+    for(const operation of [
+      "ticket.frontier.read",
+      "ticket.context.compile",
+      "ticket.run.claim",
+      "ticket.run.heartbeat",
+      "ticket.run.release",
+      "ticket.evidence.append",
+    ])expect(run).toContain(operation);
+    expect(run).toContain("fresh Agent");
+    expect(run).toMatch(/every current\s+acceptance criterion/);
+    expect(run).toContain("$vibehub-ticket-plan");
+    expect(run).toContain("$vibehub-ticket-review");
+    expect(run).toContain("executor cannot certify its own completion");
+    expect(run).toContain("before changing the graph");
+    expect(run).not.toMatch(/manual YAML/i);
+    expect(closeout).toContain("separate Agent context");
+    expect(closeout).toContain("ticket.closeout.append");
+    for(const terminal of [
+      "`successful`",
+      "`partial`",
+      "`failed`",
+      "`deviated`",
+      "`stale`",
+    ])expect(closeout).toContain(terminal);
+    expect(closeout).toContain("unlock nothing");
+    expect(closeout).toContain("semantic knowledge effects as proposals");
+    expect(closeout).toContain("Do not change the graph before appending");
+    expect(closeout).toContain("historical-binding `stale` path");
+    expect(closeout).toContain("historical binding; never mix");
+    expect(closeout).toMatch(
+      /current\s+authorized\s+successful\s+closeout\s+is\s+`DONE`/,
+    );
+    expect(closeout).not.toMatch(/manual YAML/i);
+  });
+
   it("pins the setup workflow, activation proof, and presentation invariants",()=>{
     const read=(relative:string)=>fs.readFileSync(path.join(skills,relative),"utf8");
     const setup=read("vibehub-setup/SKILL.md");
@@ -452,9 +491,16 @@ describe("production skill package",()=>{
     ] as const;
     for(const [operation,caseName] of regressions){const contract=artifact.operations[operation]!,fixture=contract.fixtures.negatives.find(x=>x.case===caseName)!;const run=spawnSync(process.execPath,[path.join(skills,"scripts/validate-artifact.mjs"),"--operation",operation],{input:JSON.stringify(materializeOperationFixture(contract,fixture)),encoding:"utf8"});expect(run.status,`${operation}/${caseName}: ${run.stdout}`).toBe(2);}
     expect(Object.keys(artifact.operations).filter(operation=>operation.startsWith("ticket."))).toEqual([
+      "ticket.closeout.append",
+      "ticket.context.compile",
       "ticket.decision.record",
+      "ticket.evidence.append",
+      "ticket.frontier.read",
       "ticket.graph.snapshot",
       "ticket.review.append",
+      "ticket.run.claim",
+      "ticket.run.heartbeat",
+      "ticket.run.release",
       "ticket.subject.inspect",
       "ticket.trace.list",
       "ticket.worktree.patch",
@@ -576,7 +622,7 @@ describe("production skill package",()=>{
     expect(JSON.parse(run.stdout)).toMatchObject({ok:true,meta:{operation:"kb.status",requestId:"clean"}});
   });
 
-  it("forwards a frozen Ticket read through the packaged Ticket wrapper",()=>{
+  it("forwards Ticket reads and runtime mutations through one thin wrapper",()=>{
     const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-wrapper-"));
     const fake=path.join(temp,"vibehub");
     fs.writeFileSync(fake,"#!/usr/bin/env node\nlet raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n");
@@ -593,6 +639,75 @@ describe("production skill package",()=>{
         "--request","ticket:graph:1","--input","-",
       ],
       raw:input,
+    });
+    const closeoutInput=JSON.stringify({
+      expectedSource:{sourceToken:"tls-fixture"},
+      runId:"run-fixture",
+    });
+    const closeout=spawnSync(process.execPath,[
+      path.join(skills,"scripts/vh-ticket.mjs"),
+      "closeout.append","--repo",temp,"--actor","agent:closer",
+      "--request","ticket:closeout:1",
+    ],{input:closeoutInput,encoding:"utf8",env:{...process.env,VIBEHUB_BIN:fake}});
+    expect(closeout.status,closeout.stdout+closeout.stderr).toBe(0);
+    expect(JSON.parse(closeout.stdout).data).toEqual({
+      argv:[
+        "ticket","closeout.append","--json","--repo",temp,
+        "--actor","agent:closer","--request","ticket:closeout:1",
+        "--input","-",
+      ],
+      raw:closeoutInput,
+    });
+  });
+
+  it("uses the installed thin runtime for Ticket reads and mutations without a global CLI",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-ticket-runtime-"));
+    const plugin=path.join(temp,"plugin");
+    const scripts=path.join(plugin,"skills","scripts");
+    const runtime=path.join(plugin,"runtime","vibehub-runtime.mjs");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(runtime),{recursive:true});
+    fs.writeFileSync(
+      runtime,
+      "let raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n",
+    );
+    const invoke=(operation:string,input:string)=>spawnSync(process.execPath,[
+      path.join(scripts,"vh-ticket.mjs"),
+      operation,"--repo",temp,"--actor","agent:installed",
+      "--request",`installed:${operation}`,
+    ],{
+      input,
+      encoding:"utf8",
+      env:{
+        HOME:path.join(temp,"home"),
+        PATH:"/usr/bin:/bin",
+        VIBEHUB_BIN:undefined,
+      },
+    });
+    const frontier=invoke("frontier.read","{}");
+    expect(frontier.status,frontier.stdout+frontier.stderr).toBe(0);
+    expect(JSON.parse(frontier.stdout).data).toEqual({
+      argv:[
+        "cli","ticket","frontier.read","--json","--repo",temp,
+        "--actor","agent:installed","--request","installed:frontier.read",
+        "--input","-",
+      ],
+      raw:"{}",
+    });
+    const closeoutInput=JSON.stringify({
+      expectedSource:{sourceToken:"tls-fixture"},
+      runId:"run-fixture",
+    });
+    const closeout=invoke("closeout.append",closeoutInput);
+    expect(closeout.status,closeout.stdout+closeout.stderr).toBe(0);
+    expect(JSON.parse(closeout.stdout).data).toEqual({
+      argv:[
+        "cli","ticket","closeout.append","--json","--repo",temp,
+        "--actor","agent:installed","--request","installed:closeout.append",
+        "--input","-",
+      ],
+      raw:closeoutInput,
     });
   });
 
@@ -817,6 +932,41 @@ describe("production skill package",()=>{
       argv:[
         "checkpoint","prepare","--json","--scope","ticket","--repo",temp,
         "--input","-",
+      ],
+      raw:selection,
+    });
+  });
+
+  it("uses the installed thin runtime for Ticket checkpoint without a global CLI",()=>{
+    const temp=fs.mkdtempSync(path.join(os.tmpdir(),"vh-checkpoint-runtime-"));
+    const plugin=path.join(temp,"plugin");
+    const scripts=path.join(plugin,"skills","scripts");
+    const runtime=path.join(plugin,"runtime","vibehub-runtime.mjs");
+    fs.mkdirSync(path.dirname(scripts),{recursive:true});
+    fs.cpSync(path.join(skills,"scripts"),scripts,{recursive:true});
+    fs.mkdirSync(path.dirname(runtime),{recursive:true});
+    fs.writeFileSync(
+      runtime,
+      "let raw='';process.stdin.on('data',chunk=>raw+=chunk);process.stdin.on('end',()=>process.stdout.write(JSON.stringify({ok:true,data:{argv:process.argv.slice(2),raw}})));\n",
+    );
+    const selection=JSON.stringify({source:{},changedPaths:[]});
+    const run=spawnSync(process.execPath,[
+      path.join(scripts,"vh-checkpoint.mjs"),
+      "prepare","--scope","ticket","--repo",temp,
+    ],{
+      input:selection,
+      encoding:"utf8",
+      env:{
+        HOME:path.join(temp,"home"),
+        PATH:"/usr/bin:/bin",
+        VIBEHUB_BIN:undefined,
+      },
+    });
+    expect(run.status,run.stdout+run.stderr).toBe(0);
+    expect(JSON.parse(run.stdout).data).toEqual({
+      argv:[
+        "cli","checkpoint","prepare","--json","--scope","ticket",
+        "--repo",temp,"--input","-",
       ],
       raw:selection,
     });
