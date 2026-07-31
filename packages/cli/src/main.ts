@@ -46,6 +46,11 @@ import {
 } from "@vw-ai/vibehub-core";
 import { releaseAssetManifest, releaseAssetRoot } from "./managed-assets.js";
 import { adaptHookInput, projectHookOutput } from "./hook-adapters.js";
+import {
+  installVibeHubHosts,
+  type HostSelection,
+  type VibeHubHost,
+} from "./host-installer.js";
 
 interface Flags {
   repo: string;
@@ -97,6 +102,7 @@ function parseSetupFlags(argv: string[]): Flags {
 
 const USAGE = `usage:
   vibehub init [--repo <path>] [--db <path>] [--json]
+  vibehub host install [--hosts auto|all|claude|codex|claude,codex] [--version latest|X.Y.Z] [--source <marketplace>] [--replace-existing] [--json]
   vibehub setup inspect|apply|status [--repo <path>] [--db <path>] [--json]
   vibehub doctor [--json] [--repo <path>] [--db <path>]
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
@@ -109,6 +115,125 @@ const USAGE = `usage:
   vibehub inject <task-id> <text> [--mode inject|pause] [--context <locus>] [--request <id>] [--json] [--db <path>]
   vibehub team sync    [--repo <path>] [--db <path>] [--json]
   vibehub team snapshot [--repo <path>] [--db <path>] [--out <file>]`;
+
+const HOST_INSTALL_USAGE = `usage:
+  vibehub host install [options]
+
+options:
+  --hosts auto|all|claude|codex|claude,codex
+  --version latest|MAJOR.MINOR.PATCH
+  --repo OWNER/REPOSITORY
+  --source <release-marketplace-directory>
+  --install-dir <installer-owned-directory>
+  --replace-existing
+  --json`;
+
+interface HostInstallCliFlags {
+  hosts: HostSelection;
+  version?: string;
+  repository?: string;
+  source?: string;
+  installDir?: string;
+  replaceExisting: boolean;
+  json: boolean;
+}
+
+function parseHostSelection(value: string): HostSelection {
+  if (value === "auto" || value === "all") return value;
+  const values = [...new Set(value.split(","))];
+  if (
+    values.length === 0 ||
+    values.some((host) => host !== "claude" && host !== "codex")
+  ) {
+    throw new Error(
+      "--hosts must be auto, all, claude, codex, or claude,codex",
+    );
+  }
+  return values as VibeHubHost[];
+}
+
+function parseHostInstallFlags(argv: string[]): HostInstallCliFlags {
+  let hosts: HostSelection = "auto";
+  let version: string | undefined;
+  let repository: string | undefined;
+  let source: string | undefined;
+  let installDir: string | undefined;
+  let replaceExisting = false;
+  let json = false;
+  const seen = new Set<string>();
+  for (let index = 0; index < argv.length; index += 1) {
+    const flag = argv[index];
+    if (!flag) throw new Error("invalid empty flag");
+    if (seen.has(flag)) throw new Error(`repeated flag: ${flag}`);
+    seen.add(flag);
+    const take = (): string => {
+      const value = argv[++index];
+      if (!value || value.startsWith("--")) {
+        throw new Error(`${flag} requires a value`);
+      }
+      return value;
+    };
+    if (flag === "--hosts") hosts = parseHostSelection(take());
+    else if (flag === "--version") version = take();
+    else if (flag === "--repo") repository = take();
+    else if (flag === "--source") source = take();
+    else if (flag === "--install-dir") installDir = take();
+    else if (flag === "--replace-existing") replaceExisting = true;
+    else if (flag === "--json") json = true;
+    else throw new Error(`unknown flag: ${flag}`);
+  }
+  return {
+    hosts,
+    ...(version ? { version } : {}),
+    ...(repository ? { repository } : {}),
+    ...(source ? { source } : {}),
+    ...(installDir ? { installDir } : {}),
+    replaceExisting,
+    json,
+  };
+}
+
+function runHostInstall(argv: string[]): number {
+  const wantsJson = argv.includes("--json");
+  try {
+    const flags = parseHostInstallFlags(argv);
+    const receipt = installVibeHubHosts({
+      hosts: flags.hosts,
+      ...(flags.version ? { version: flags.version } : {}),
+      ...(flags.repository ? { repository: flags.repository } : {}),
+      ...(flags.source ? { source: flags.source } : {}),
+      ...(flags.installDir ? { installDir: flags.installDir } : {}),
+      replaceExisting: flags.replaceExisting,
+    });
+    if (flags.json) process.stdout.write(`${JSON.stringify(receipt)}\n`);
+    else {
+      const hosts = Object.entries(receipt.hosts)
+        .map(([host, result]) => `${host}: ${result.status}`)
+        .join(", ");
+      console.log(
+        `VibeHub ${receipt.version} ${receipt.outcome} for ${hosts}. Restart the host to load the plugin.`,
+      );
+      for (const [host, result] of Object.entries(receipt.hosts)) {
+        if (result.status === "failed" && result.message) {
+          console.error(`${host}: ${result.message}`);
+        }
+      }
+    }
+    return receipt.ok ? 0 : 1;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (wantsJson) {
+      process.stdout.write(`${JSON.stringify({
+        schemaVersion: 1,
+        ok: false,
+        error: { code: "host_install_failed", message },
+      })}\n`);
+    } else {
+      console.error(`VibeHub host installation failed: ${message}`);
+    }
+    return 1;
+  }
+}
 
 interface KbCliFlags {
   db:string; repo:string; repoId?:number; actor?:string; taskId?:string; requestId:string;
@@ -384,6 +509,21 @@ function printSnapshot(flags: Flags): number {
 
 export function main(argv: string[]): number {
   const [group, cmd, ...rest] = argv;
+  if (group === "host") {
+    if (
+      cmd === "--help" ||
+      cmd === "-h" ||
+      (cmd === "install" && (rest.includes("--help") || rest.includes("-h")))
+    ) {
+      console.log(HOST_INSTALL_USAGE);
+      return 0;
+    }
+    if (cmd !== "install") {
+      console.error(USAGE);
+      return 2;
+    }
+    return runHostInstall(rest);
+  }
   if (group === "checkpoint") return runSemanticCheckpoint(cmd, rest);
   if(group==="kb"&&cmd==="migrate-store"){
     try{return runSemanticMigration(rest);}

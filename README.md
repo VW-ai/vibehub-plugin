@@ -17,30 +17,32 @@ does not embed an LLM.
 
 ## Install
 
-Requires Node.js 20 or newer. No global npm install, platform target, or API key
-is required.
-
-### Claude Code
+Requires Node.js 20 or newer and GitHub CLI access to this private repository.
+No global npm install, platform target, or API key is required.
 
 ```bash
-claude plugin marketplace add https://github.com/VW-ai/vibehub-plugin.git
-claude plugin install vibehub@vibehub
+gh auth login --hostname github.com
+npx -y @vw-ai/vibehub-cli@latest host install
 ```
 
-### OpenAI Codex
-
-```bash
-codex plugin marketplace add VW-ai/vibehub-plugin
-codex plugin add vibehub@vibehub
-```
+The installer detects Claude Code and Codex. Use `--hosts all` to require both.
+It downloads and verifies the matching immutable GitHub Release rather than
+following a moving branch. By default, it selects the latest published
+release; use `--version X.Y.Z` to pin one.
 
 On first use, the plugin downloads its matching signed npm runtime into
 `~/.vibehub/runtime/npm/`. Later starts reuse that versioned local cache.
+See [installation and update details](docs/INSTALL.md).
 
 ## Start
 
-Open a new Claude Code session or Codex task in the repository you want to
-connect, then ask the host:
+Open a new session in the repository you want to connect. In Claude Code, run:
+
+```text
+/vibehub:vibehub-setup
+```
+
+In Codex, ask:
 
 ```text
 Use $vibehub-setup for this repository.
@@ -111,9 +113,11 @@ VibeHub 为 Claude Code 和 OpenAI Codex 提供一个本地优先的项目上下
 CLI、MCP、hooks 和知识工作流共用本机 SQLite，不需要 API key，也不会在运行
 时内置调用 LLM。
 
-安装时使用上面的公开 marketplace 命令。安装完成后，在目标仓库的新会话中
-让宿主使用 `$vibehub-setup`；之后可以通过 `$vibehub-query` 查询上下文、
-用 `$vibehub-ingest` 保存长期决策，或用 `$vibehub-distill` 梳理已有项目。
+安装时先用 GitHub CLI 登录有权访问本私有仓库的账号，再运行上面的一行
+installer。安装完成后，在目标仓库的新会话中，Claude Code 使用
+`/vibehub:vibehub-setup`，Codex 使用 `$vibehub-setup`；之后可以通过
+`$vibehub-query` 查询上下文、用 `$vibehub-ingest` 保存长期决策，或用
+`$vibehub-distill` 梳理已有项目。
 
 安装需要 Node.js 20 或更新版本，不需要 `npm -g`，也不用选择系统或 CPU
 对应的 branch。首次使用会将与插件同版本的 npm runtime 缓存到本机。

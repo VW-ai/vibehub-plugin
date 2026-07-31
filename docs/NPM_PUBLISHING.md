@@ -101,6 +101,11 @@ In parallel, the GitHub Release workflow builds one universal marketplace,
 waits until the exact npm tarballs are public, installs them on macOS and Linux
 across arm64 and x64, and only then publishes the GitHub Release.
 
+This is a two-phase release: an npm version may be visible before the
+four-platform matrix finishes, but it is not selected by the default VibeHub
+installer until the corresponding GitHub Release is published. A failed matrix
+therefore leaves normal installs on the previous verified release.
+
 The publisher is restart-safe. If a job stops after publishing one package, a
 rerun skips versions already present and continues with the remaining
 packages. Published npm versions and Git tags are immutable.

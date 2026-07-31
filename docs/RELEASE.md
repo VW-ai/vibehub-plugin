@@ -46,7 +46,10 @@ and Codex install verification runs on Windows in the release workflow.
 
 ## Release gates
 
-Every tag must pass all of these gates before anything public is updated:
+Publication is deliberately two-phase. The tagged source gate runs before npm
+publication. The npm packages can become visible while the complete
+four-platform host matrix is still running, but the installer does not promote
+that version as stable until the immutable GitHub Release passes every gate:
 
 1. Version and tag equality.
 2. Frozen-lockfile install.
@@ -57,7 +60,14 @@ Every tag must pass all of these gates before anything public is updated:
 6. Real isolated installation through the pinned Claude Code and Codex CLIs on
    every target.
 7. Thin-package checks that reject bundled `node_modules` and source packages.
-8. Artifact archive and SHA-256 publication.
+8. Authenticated private-installer ingestion, followed by artifact archive and
+   SHA-256 publication.
+
+If a post-npm matrix gate fails, the npm version remains immutable but no
+GitHub Release is published. The default installer resolves the latest
+published GitHub Release, so normal installs stay on the previous verified
+version. Fix the defect under a new SemVer version; never overwrite the
+registry package or published release.
 
 The pinned host versions in the release workflow are the minimum versions
 certified for that release. Updating either pin requires passing the full
@@ -72,9 +82,11 @@ It publishes `@vw-ai/vibehub-core`, `@vw-ai/vibehub-cli`, and
 Publishing. See `docs/NPM_PUBLISHING.md` for the first-release bootstrap and
 tokenless OIDC configuration.
 
-The repository's default branch is the single marketplace URL. Each release
-also attaches one `vibehub-VERSION-marketplace.tar.gz` archive and checksum to
-GitHub Releases. There are no platform or per-release marketplace branches.
+Each release attaches one
+`vibehub-VERSION-marketplace.tar.gz` archive and checksum to the private GitHub
+Release. The public npm CLI uses authenticated GitHub CLI access to install
+that immutable marketplace. There are no platform or per-release marketplace
+branches.
 
 ## Upgrade and rollback
 
