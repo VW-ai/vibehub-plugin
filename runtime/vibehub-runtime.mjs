@@ -96,9 +96,27 @@ function installSpecs() {
   return expected.map((entry) => `${entry.name}@${version}`);
 }
 
+function timeoutFromEnvironment(name, fallback) {
+  const raw = process.env[name];
+  if (raw === undefined) return fallback;
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value < 1_000) {
+    throw new Error(`${name} must be an integer of at least 1000 milliseconds`);
+  }
+  return value;
+}
+
+const installTimeout = timeoutFromEnvironment(
+  "VIBEHUB_RUNTIME_INSTALL_TIMEOUT_MS",
+  180_000,
+);
+const sqliteSmokeTimeout = 30_000;
+const staleLockThreshold = installTimeout + sqliteSmokeTimeout + 60_000;
+const lockWaitTimeout = staleLockThreshold + 60_000;
+
 function acquireInstallLock() {
   mkdirSync(runtimeParent, { recursive: true });
-  const deadline = Date.now() + 120_000;
+  const deadline = Date.now() + lockWaitTimeout;
   while (Date.now() < deadline) {
     try {
       mkdirSync(lockRoot);
@@ -107,7 +125,7 @@ function acquireInstallLock() {
       if (error?.code !== "EEXIST") throw error;
       if (runtimeIsCurrent()) return false;
       try {
-        if (Date.now() - statSync(lockRoot).mtimeMs > 300_000) {
+        if (Date.now() - statSync(lockRoot).mtimeMs > staleLockThreshold) {
           rmSync(lockRoot, { recursive: true, force: true });
           continue;
         }
@@ -145,8 +163,13 @@ function ensureRuntime() {
         "--no-fund",
         ...installSpecs(),
       ],
-      { encoding: "utf8" },
+      { encoding: "utf8", timeout: installTimeout },
     );
+    if (result.error?.code === "ETIMEDOUT") {
+      throw new Error(
+        `npm runtime installation timed out after ${installTimeout}ms`,
+      );
+    }
     if (result.error) throw result.error;
     if (result.status !== 0) {
       throw new Error(
@@ -180,8 +203,11 @@ function ensureRuntime() {
         "const m=await import(process.argv[1]);const db=m.openDb(':memory:');db.close();",
         pathToFileURL(stagedCore).href,
       ],
-      { encoding: "utf8" },
+      { encoding: "utf8", timeout: sqliteSmokeTimeout },
     );
+    if (smoke.error?.code === "ETIMEDOUT") {
+      throw new Error("installed VibeHub runtime SQLite smoke test timed out");
+    }
     if (smoke.error) throw smoke.error;
     if (smoke.status !== 0) {
       throw new Error(

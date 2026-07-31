@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
-import { createHash } from "node:crypto";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { gunzipSync } from "node:zlib";
+import { publishedArchiveMatches } from "./lib/npm-artifact-integrity.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const artifactRoot = join(root, "dist", "npm");
@@ -12,14 +11,6 @@ const manifest = JSON.parse(
   readFileSync(join(artifactRoot, "manifest.json"), "utf8"),
 );
 const releaseTag = process.env.VIBEHUB_NPM_RELEASE_TAG;
-
-function sha512(buffer) {
-  return createHash("sha512").update(buffer).digest("base64");
-}
-
-function tarPayloadIntegrity(archive) {
-  return `sha512-${sha512(gunzipSync(archive))}`;
-}
 
 if (releaseTag !== manifest.tag) {
   throw new Error(
@@ -57,7 +48,6 @@ for (const entry of manifest.packages) {
     const publishedVersion = JSON.parse(lookup.stdout);
     const archivePath = join(artifactRoot, entry.archive);
     const localArchive = readFileSync(archivePath);
-    const localIntegrity = `sha512-${sha512(localArchive)}`;
     const integrityLookup = spawnSync(
       "npm",
       ["view", spec, "dist.integrity", "dist.tarball", "--json"],
@@ -65,20 +55,11 @@ for (const entry of manifest.packages) {
     );
     const publishedDist =
       integrityLookup.status === 0 ? JSON.parse(integrityLookup.stdout) : null;
-    let contentMatches = publishedDist?.["dist.integrity"] === localIntegrity;
-
-    if (!contentMatches && publishedDist?.["dist.tarball"]) {
-      const response = await fetch(publishedDist["dist.tarball"]);
-      if (!response.ok) {
-        throw new Error(
-          `could not download ${spec} for content verification: HTTP ${response.status}`,
-        );
-      }
-      const publishedArchive = Buffer.from(await response.arrayBuffer());
-      contentMatches =
-        tarPayloadIntegrity(publishedArchive) ===
-        tarPayloadIntegrity(localArchive);
-    }
+    const contentMatches = await publishedArchiveMatches(
+      localArchive,
+      publishedDist?.["dist.integrity"],
+      publishedDist?.["dist.tarball"],
+    );
 
     if (publishedVersion !== entry.version || !contentMatches) {
       throw new Error(
