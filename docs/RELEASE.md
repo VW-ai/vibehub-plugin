@@ -79,8 +79,8 @@ drift, but must not silently change the certified minimum.
 The npm publication workflow is defined in `.github/workflows/npm-publish.yml`.
 It publishes `@vw-ai/vibehub-core`, `@vw-ai/vibehub-cli`, and
 `@vw-ai/vibehub-workbench-mcp` from an immutable release tag using npm Trusted
-Publishing. See `docs/NPM_PUBLISHING.md` for the first-release bootstrap and
-tokenless OIDC configuration.
+Publishing. See `docs/NPM_PUBLISHING.md` for the tokenless OIDC release
+workflow.
 
 Each release attaches one
 `vibehub-VERSION-marketplace.tar.gz` archive and checksum to the private GitHub
@@ -110,11 +110,9 @@ branches.
 2. Run `pnpm verify:release-metadata`.
 3. Run `pnpm verify` locally on a supported development target.
 4. Create the signed or annotated `vMAJOR.MINOR.PATCH` tag.
-5. For the first npm release only, publish locally and configure Trusted
-   Publishers as documented in `docs/NPM_PUBLISHING.md`.
-6. Push the tag and wait for both release workflows.
-7. Verify the three npm packages and the universal GitHub Release archive.
-8. Install once from the repository marketplace on a clean machine and run
+5. Push the tag and wait for both release workflows.
+6. Verify the three npm packages and the universal GitHub Release archive.
+7. Install once from the repository marketplace on a clean machine and run
    `npx @vw-ai/vibehub-cli@VERSION doctor --json`.
 
 Do not publish manually around a failed gate. Fix the source, bump the version

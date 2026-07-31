@@ -74,11 +74,15 @@ parse stdout as JSON on exit 0 or 1. An exit code never replaces the
 6. After a changeful apply, or when Connected lacks a host handshake, follow
    the active host's reference procedure. For Claude Code, restart the host
    in the exact checkout, re-run status, and let only its deterministic
-   proof establish Connected. For OpenAI Codex, start a fresh task in the
-   exact checkout, review and trust the packaged hooks through `/hooks`, and
-   let only a real host-attributed SessionStart ingestion establish Connected.
-   Installation, hook trust, or a synthetic hook invocation alone is not a
-   handshake.
+   proof establish Connected. For OpenAI Codex, use Codex CLI `/hooks` to
+   review and trust the packaged hooks when trust is pending. A desktop task
+   may launch and drive that interactive CLI flow when its terminal and
+   permission policy allow; otherwise, instruct the user to run it. The desktop
+   app has no `/hooks` surface and reuses the trust stored in shared Codex
+   configuration. Then start a fresh task on the intended Codex surface in the
+   exact checkout, and let only a real host-attributed SessionStart ingestion
+   establish Connected. Installation, persisted hook trust, or a synthetic
+   hook invocation alone is not a handshake.
 7. Once Connected, classify the project semantically by inspecting tracked,
    substantive implementation files and repository history:
    - unborn history, documentation-only content, or scaffold-only tracked

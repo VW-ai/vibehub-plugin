@@ -374,6 +374,14 @@ describe("production skill package",()=>{
     expect(codex).toContain("VIBEHUB_BIN");
     expect(codex).toContain("exact checkout");
     expect(codex).toContain("codex plugin add vibehub@vibehub-local");
+    expect(codex).toContain("Open an interactive Codex CLI");
+    expect(codex).toContain("desktop task may");
+    expect(codex).toContain("launch and drive this CLI flow");
+    expect(codex).toContain("desktop app does");
+    expect(codex).toContain("not expose `/hooks`");
+    expect(codex).toMatch(/shared\s+Codex configuration/);
+    expect(codex).toContain("Desktop users do not");
+    expect(codex).toContain("repeat hook approval");
     expect(codex).toContain("Connected requires a real, trusted Codex `SessionStart`");
     expect(codex).toContain("`setup status` may correctly report `waiting`");
     expect(codex).toContain("checkpoint reminders and queued context delivery");

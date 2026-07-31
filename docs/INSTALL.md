@@ -42,7 +42,12 @@ with each selected host.
 
 Restart the host after installation. Claude Code exposes the setup Skill as
 `/vibehub:vibehub-setup`; Codex exposes it as `$vibehub-setup`. On first use
-in Codex, inspect and trust the packaged hooks through `/hooks` when prompted.
+in Codex, use an interactive `codex` CLI and `/hooks` to inspect and trust the
+packaged VibeHub hooks. A desktop task may launch and drive that CLI flow when
+its terminal and permission policy allow; otherwise, run it manually. The
+desktop app does not expose `/hooks`, but it reuses the trust recorded in
+Codex's shared local configuration. After trusting the hooks, start a fresh
+desktop task in the target repository so a trusted `SessionStart` can run.
 
 ## Update or repair
 

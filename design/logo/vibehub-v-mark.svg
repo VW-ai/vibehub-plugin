@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024">
+  <defs>
+    <style>
+      .bg{fill:#f7f7f5}.ink{fill:#191b1f}.green{fill:#3e7d4c}.line{stroke:#d9dade;stroke-width:1}
+      .title{font:700 23px -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;letter-spacing:.08em;fill:#191b1f}
+      .word{font:650 70px -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;letter-spacing:-2.5px;fill:#191b1f}
+      .label{font:650 17px ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:.08em;fill:#191b1f}
+      .body{font:400 18px -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;fill:#6b6f77}
+      .small{font:500 14px ui-monospace,"SF Mono",Menlo,monospace;fill:#6b6f77}
+    </style>
+
+    <!-- Two code-boundary arms form a V. The green context token occupies
+         the convergence point. The open channel points down: intent. -->
+    <g id="vmark">
+      <path class="ink" d="M12 10H34Q39 10 41 15L57 52L47 73Q44 79 39 73L8 20Q3 10 12 10Z"/>
+      <path class="ink" d="M88 10H66Q61 10 59 15L43 52L53 73Q56 79 61 73L92 20Q97 10 88 10Z"/>
+      <rect class="green" x="41" y="53" width="18" height="18" rx="5"/>
+    </g>
+    <g id="vmark-mono">
+      <path class="ink" d="M12 10H34Q39 10 41 15L57 52L47 73Q44 79 39 73L8 20Q3 10 12 10Z"/>
+      <path class="ink" d="M88 10H66Q61 10 59 15L43 52L53 73Q56 79 61 73L92 20Q97 10 88 10Z"/>
+      <rect class="ink" x="41" y="53" width="18" height="18" rx="5"/>
+    </g>
+  </defs>
+
+  <rect class="bg" width="1536" height="1024"/>
+  <text class="title" x="90" y="82">VIBEHUB / V-CONVERGENCE</text>
+  <text class="body" x="90" y="118">Code forms the boundary. Context sits at the focus. Intent supplies direction.</text>
+  <line class="line" x1="90" y1="154" x2="1446" y2="154"/>
+
+  <g transform="translate(140 220) scale(4.4)"><use href="#vmark"/></g>
+  <text class="label" x="112" y="700">MASTER MARK</text>
+  <text class="body" x="112" y="736">The symbol reads as VibeHub before it explains the system.</text>
+  <text class="body" x="112" y="767">Active context is embedded directly in its convergence point.</text>
+
+  <g transform="translate(650 235) scale(1.35)"><use href="#vmark"/></g>
+  <text class="word" x="790" y="342">VibeHub</text>
+
+  <text class="label" x="650" y="446">ONE SHAPE, THREE READINGS</text>
+  <g transform="translate(650 494)">
+    <path class="ink" d="M0 0H38L50 28L40 46L23 18H0Z"/>
+    <text class="label" x="74" y="17">CODE</text>
+    <text class="body" x="74" y="43">Two dark arms behave like an open code boundary.</text>
+
+    <rect class="green" x="0" y="89" width="42" height="42" rx="9"/>
+    <text class="label" x="74" y="106">CONTEXT</text>
+    <text class="body" x="74" y="132">The context token owns the only live color.</text>
+
+    <path class="ink" d="M12 173H30V193H44L21 216L-2 193H12Z"/>
+    <text class="label" x="74" y="190">INTENT</text>
+    <text class="body" x="74" y="216">The V and its open channel establish a clear vector.</text>
+  </g>
+
+  <line class="line" x1="90" y1="830" x2="1446" y2="830"/>
+  <text class="label" x="90" y="883">16 PX</text>
+  <g transform="translate(175 851) scale(.18)"><use href="#vmark"/></g>
+  <g transform="translate(224 851) scale(.18)"><use href="#vmark-mono"/></g>
+  <text class="small" x="278" y="882">active / monochrome</text>
+
+  <text class="label" x="632" y="883">APP ICON</text>
+  <rect class="ink" x="744" y="850" width="92" height="92" rx="21"/>
+  <g transform="translate(750 856) scale(.8)">
+    <path fill="#f7f7f5" d="M12 10H34Q39 10 41 15L57 52L47 73Q44 79 39 73L8 20Q3 10 12 10Z"/>
+    <path fill="#f7f7f5" d="M88 10H66Q61 10 59 15L43 52L53 73Q56 79 61 73L92 20Q97 10 88 10Z"/>
+    <rect class="green" x="41" y="53" width="18" height="18" rx="5"/>
+  </g>
+  <text class="small" x="858" y="882">V first / semantics second</text>
+
+  <text class="label" x="1162" y="883">FOCUS</text>
+  <rect x="1268" y="858" width="16" height="16" rx="4" fill="#3e7d4c"/>
+  <text class="small" x="1298" y="871">active context</text>
+</svg>

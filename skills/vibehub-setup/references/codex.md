@@ -29,11 +29,17 @@ target project. The two `codex plugin` commands are the explicit
 machine-install step and update Codex's own local plugin state.
 After installation:
 
-1. Start a new Codex task in the target checkout so the plugin skills, MCP
-   server, and project instructions load together.
-2. Open `/hooks`, review the exact VibeHub plugin hook definitions, and trust
-   them. Installing or enabling a plugin does not automatically trust hooks;
-   changed hook definitions require review again.
+1. Open an interactive Codex CLI in the target checkout and use `/hooks` to
+   review the exact VibeHub plugin hook definitions and trust them. A Codex
+   desktop task may launch and drive this CLI flow when its terminal and
+   permission policy allow; otherwise, instruct the user to run it manually.
+   The desktop app does not expose `/hooks`; it reuses trust stored in shared
+   Codex configuration. Installing or enabling a plugin does not automatically
+   trust hooks, and changed hook definitions require review again.
+2. Exit the pre-trust CLI session and start a fresh task on the intended Codex
+   surface in the target checkout so the trusted `SessionStart`, plugin skills,
+   MCP server, and project instructions load together. Desktop users do not
+   repeat hook approval.
 3. Ask Codex to use `$vibehub-setup` for the exact checkout. Let the skill run
    the canonical `setup inspect`, `setup apply`, and `setup status` sequence.
 
@@ -77,8 +83,8 @@ writes.
 
 Connected requires a real, trusted Codex `SessionStart` ingestion after the
 current instruction blocks for the exact checkout. Installed plugin files,
-synthetic hook fixtures, a marketplace receipt, or `/hooks` approval alone do
-not prove Connected. Activated still requires a later meaningful query or
+synthetic hook fixtures, a marketplace receipt, or persisted hook trust alone
+do not prove Connected. Activated still requires a later meaningful query or
 ingest receipt; hook activity alone does not prove context value.
 
 Immediately after install or before the first trusted SessionStart,

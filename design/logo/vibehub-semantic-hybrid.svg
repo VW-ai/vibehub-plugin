@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024">
+  <defs>
+    <style>
+      .bg { fill:#f7f7f5 }
+      .ink { fill:#191b1f }
+      .green { fill:#3e7d4c }
+      .line { stroke:#d9dade; stroke-width:1 }
+      .title { font:700 23px -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif; letter-spacing:.08em; fill:#191b1f }
+      .word { font:650 68px -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif; letter-spacing:-2.4px; fill:#191b1f }
+      .label { font:650 17px ui-monospace,"SF Mono",Menlo,monospace; letter-spacing:.08em; fill:#191b1f }
+      .body { font:400 18px -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif; fill:#6b6f77 }
+      .small { font:500 14px ui-monospace,"SF Mono",Menlo,monospace; fill:#6b6f77 }
+    </style>
+
+    <!--
+      One semantic mark, three pieces:
+      1. top ink territory: code boundary
+      2. bottom ink territory: directional intent
+      3. green territory: active context
+      The white channel between the ink territories forms a rightward arrow.
+    -->
+    <g id="mark">
+      <path class="ink" d="M13 10H48Q52 10 55 13L69 27Q72 30 69 33L57 45L46 34H13Q9 34 9 30V14Q9 10 13 10Z"/>
+      <path class="ink" d="M13 66H46L57 55L69 67Q72 70 69 73L55 87Q52 90 48 90H13Q9 90 9 86V70Q9 66 13 66Z"/>
+      <rect class="green" x="68" y="38" width="23" height="23" rx="5"/>
+    </g>
+    <g id="mark-mono">
+      <path class="ink" d="M13 10H48Q52 10 55 13L69 27Q72 30 69 33L57 45L46 34H13Q9 34 9 30V14Q9 10 13 10Z"/>
+      <path class="ink" d="M13 66H46L57 55L69 67Q72 70 69 73L55 87Q52 90 48 90H13Q9 90 9 86V70Q9 66 13 66Z"/>
+      <rect class="ink" x="68" y="38" width="23" height="23" rx="5"/>
+    </g>
+  </defs>
+
+  <rect class="bg" width="1536" height="1024"/>
+  <text class="title" x="90" y="82">VIBEHUB / SEMANTIC HYBRID</text>
+  <text class="body" x="90" y="118">One mark first. Code, context and intent on the second read.</text>
+  <line class="line" x1="90" y1="154" x2="1446" y2="154"/>
+
+  <!-- master mark -->
+  <g transform="translate(122 230) scale(4.35)"><use href="#mark"/></g>
+  <text class="label" x="105" y="705">MASTER MARK</text>
+  <text class="body" x="105" y="738">The two dark territories make one code boundary.</text>
+  <text class="body" x="105" y="768">Their white channel points toward active context.</text>
+
+  <!-- horizontal lockup -->
+  <g transform="translate(632 238) scale(1.38)"><use href="#mark"/></g>
+  <text class="word" x="780" y="344">VibeHub</text>
+
+  <!-- semantic reading -->
+  <text class="label" x="636" y="442">SHAPE READING</text>
+  <g transform="translate(636 485)">
+    <rect class="ink" x="0" y="0" width="42" height="42" rx="8"/>
+    <text class="label" x="66" y="18">CODE</text>
+    <text class="body" x="66" y="43">Dark outer territories form the boundary.</text>
+
+    <rect class="green" x="0" y="80" width="42" height="42" rx="8"/>
+    <text class="label" x="66" y="98">CONTEXT</text>
+    <text class="body" x="66" y="123">The only live color: context currently in use.</text>
+
+    <path class="ink" d="M0 174H24V160L46 181L24 202V188H0Z"/>
+    <text class="label" x="66" y="178">INTENT</text>
+    <text class="body" x="66" y="203">The negative channel establishes direction.</text>
+  </g>
+
+  <!-- small-size and app icon proofs -->
+  <line class="line" x1="90" y1="830" x2="1446" y2="830"/>
+  <text class="label" x="90" y="883">16 PX</text>
+  <g transform="translate(175 852) scale(.18)"><use href="#mark"/></g>
+  <g transform="translate(224 852) scale(.18)"><use href="#mark-mono"/></g>
+  <text class="small" x="278" y="882">active / monochrome</text>
+
+  <text class="label" x="632" y="883">APP ICON</text>
+  <rect class="ink" x="744" y="850" width="92" height="92" rx="21"/>
+  <g transform="translate(754 860) scale(.8)">
+    <path fill="#f7f7f5" d="M13 10H48Q52 10 55 13L69 27Q72 30 69 33L57 45L46 34H13Q9 34 9 30V14Q9 10 13 10Z"/>
+    <path fill="#f7f7f5" d="M13 66H46L57 55L69 67Q72 70 69 73L55 87Q52 90 48 90H13Q9 90 9 86V70Q9 66 13 66Z"/>
+    <rect class="green" x="68" y="38" width="23" height="23" rx="5"/>
+  </g>
+  <text class="small" x="858" y="882">warm white / active green</text>
+
+  <text class="label" x="1162" y="883">STATUS</text>
+  <rect x="1268" y="858" width="16" height="16" rx="4" fill="#3e7d4c"/>
+  <rect x="1296" y="858" width="16" height="16" rx="4" fill="#9a6b16"/>
+  <rect x="1324" y="858" width="16" height="16" rx="4" fill="#c0392b"/>
+  <rect x="1352" y="858" width="16" height="16" rx="4" fill="#8b8f97"/>
+  <text class="small" x="1268" y="907">live / clash / need / idle</text>
+</svg>

@@ -95,7 +95,13 @@ In Codex, ask:
 Use $vibehub-setup for this repository.
 ```
 
-In Codex, review and trust the packaged hooks through `/hooks` when prompted.
+Codex requires a one-time review of non-managed hooks. The desktop app does not
+expose `/hooks`, but a desktop task may launch an interactive `codex` CLI in the
+repository, review the VibeHub hooks through CLI `/hooks`, and complete trust
+when its terminal and permission policy allow. Otherwise, run that CLI step
+manually. Then start a fresh desktop task in this repository. Codex stores trust
+in shared local configuration, so the desktop app does not need a second
+approval.
 
 Turn one concrete deliverable into an executable graph, then review it:
 

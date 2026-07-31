@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1024" viewBox="0 0 1536 1024">
+  <defs>
+    <style>
+      .bg{fill:#f7f7f5}.ink{fill:#191b1f}.green{fill:#3e7d4c}.line{stroke:#d9dade;stroke-width:1}
+      .title{font:700 23px -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;letter-spacing:.08em;fill:#191b1f}
+      .word{font:650 70px -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;letter-spacing:-2.5px;fill:#191b1f}
+      .label{font:650 17px ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:.08em;fill:#191b1f}
+      .body{font:400 18px -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;fill:#6b6f77}
+      .small{font:500 14px ui-monospace,"SF Mono",Menlo,monospace;fill:#6b6f77}
+    </style>
+
+    <!-- Three independent territories compose the V itself. The broad left
+         territory is one arm; the right arm is split into an ink territory
+         and an active green context territory. -->
+    <g id="mark">
+      <path class="ink" d="M11 11H33Q37 11 39 15L53 48L43 72Q40 79 36 72L8 20Q3 11 11 11Z"/>
+      <path class="ink" d="M89 11H69Q65 11 63 15L53 38L62 58L92 20Q97 11 89 11Z"/>
+      <path class="green" d="M59 61L52 78Q50 83 47 78L42 68L51 48Z"/>
+    </g>
+    <g id="mark-mono">
+      <path class="ink" d="M11 11H33Q37 11 39 15L53 48L43 72Q40 79 36 72L8 20Q3 11 11 11Z"/>
+      <path class="ink" d="M89 11H69Q65 11 63 15L53 38L62 58L92 20Q97 11 89 11Z"/>
+      <path class="ink" d="M59 61L52 78Q50 83 47 78L42 68L51 48Z"/>
+    </g>
+  </defs>
+
+  <rect class="bg" width="1536" height="1024"/>
+  <text class="title" x="90" y="82">VIBEHUB / TERRITORY V</text>
+  <text class="body" x="90" y="118">A recognizable V, rebuilt as three independent working territories.</text>
+  <line class="line" x1="90" y1="154" x2="1446" y2="154"/>
+
+  <g transform="translate(135 222) scale(4.5)"><use href="#mark"/></g>
+  <text class="label" x="110" y="700">MASTER MARK</text>
+  <text class="body" x="110" y="736">All three territories participate in the V silhouette.</text>
+  <text class="body" x="110" y="767">The active context is structural, not an attached badge.</text>
+
+  <g transform="translate(650 238) scale(1.35)"><use href="#mark"/></g>
+  <text class="word" x="790" y="342">VibeHub</text>
+
+  <text class="label" x="650" y="446">WHAT CHANGED</text>
+  <g transform="translate(650 493)">
+    <rect class="ink" x="0" y="0" width="44" height="44" rx="8"/>
+    <text class="label" x="72" y="17">SEPARATION</text>
+    <text class="body" x="72" y="43">No overlaps: each territory owns its boundary.</text>
+
+    <path class="ink" d="M0 92H42L34 136H10Z"/>
+    <text class="label" x="72" y="109">ASYMMETRY</text>
+    <text class="body" x="72" y="135">One broad arm; one arm split across two territories.</text>
+
+    <path class="green" d="M0 184Q0 176 8 176H34Q42 176 42 184V210Q42 218 34 218H8Q0 218 0 210Z"/>
+    <text class="label" x="72" y="193">ACTIVE NODE</text>
+    <text class="body" x="72" y="219">Context completes the V instead of hanging below it.</text>
+  </g>
+
+  <line class="line" x1="90" y1="830" x2="1446" y2="830"/>
+  <text class="label" x="90" y="883">16 PX</text>
+  <g transform="translate(175 852) scale(.18)"><use href="#mark"/></g>
+  <g transform="translate(224 852) scale(.18)"><use href="#mark-mono"/></g>
+  <text class="small" x="278" y="882">active / monochrome</text>
+
+  <text class="label" x="632" y="883">APP ICON</text>
+  <rect class="ink" x="744" y="850" width="92" height="92" rx="21"/>
+  <g transform="translate(750 856) scale(.8)">
+    <path fill="#f7f7f5" d="M11 11H33Q37 11 39 15L53 48L43 72Q40 79 36 72L8 20Q3 11 11 11Z"/>
+    <path fill="#f7f7f5" d="M89 11H69Q65 11 63 15L53 38L62 58L92 20Q97 11 89 11Z"/>
+    <path class="green" d="M59 61L52 78Q50 83 47 78L42 68L51 48Z"/>
+  </g>
+  <text class="small" x="858" y="882">three territories / one V</text>
+
+  <text class="label" x="1162" y="883">GAPS</text>
+  <path class="ink" d="M1268 852H1300L1292 884H1276Z"/>
+  <path class="ink" d="M1312 852H1344L1336 884H1320Z"/>
+  <text class="small" x="1268" y="915">optical, not mechanical</text>
+</svg>
