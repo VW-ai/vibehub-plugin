@@ -1,4 +1,4 @@
 interface:
   display_name: "VibeHub Setup"
-  short_description: "Onboard and activate VibeHub in a project"
-  default_prompt: "Use $vibehub-setup to inspect, apply, and verify VibeHub onboarding for this exact project checkout."
+  short_description: "Set up lightweight Git-native VibeHub"
+  default_prompt: "Use $vibehub-setup to detect existing memory systems and set up lightweight VibeHub in this checkout."

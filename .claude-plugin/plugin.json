@@ -3,8 +3,8 @@
   "name": "vibehub",
   "displayName": "VibeHub",
   "version": "0.3.0",
-  "description": "Git-native executable Ticket graphs, governed project context, and deterministic lifecycle evidence for Claude Code and Codex.",
+  "description": "Lightweight Skill-first development cycles with Git-native Tickets and durable project Context.",
   "author": { "name": "VibeHub Team" },
   "license": "Apache-2.0",
-  "keywords": ["context", "collaboration", "knowledge", "hooks", "mcp"]
+  "keywords": ["context", "collaboration", "knowledge", "tickets", "skills"]
 }

@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "context-minimum-works"
+  ],
+  "evidence_id": "context-minimum-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-07-31T22:24:00.000Z",
+  "refs": [
+    "test/context.test.mjs",
+    "skills/contracts/context.schema.json",
+    "skills/scripts/vh.mjs",
+    "docs/SPEED_FIRST_CLEANUP.md"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh Node processes captured and queried schema-valid stable-ID Context with readable source/evidence; malformed persisted input and dangling Context relations failed visibly.",
+  "ticket_id": "ticket-speed-first-cleanup"
+}

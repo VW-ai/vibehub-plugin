@@ -1,0 +1,32 @@
+{
+  "context_id": "decision-speed-first-skill-plugin",
+  "detail": "VibeHub is a lightweight plugin whose development control plane is the checked-in Ticket graph and whose durable memory is checked-in Context. Normal development starts from an explicit Ticket cycle. Durable decisions, intent, constraints, contracts, conventions, and reusable explanations are captured only on explicit user instruction or when a Ticket workflow exposes a real cross-Ticket fact. Skills own planning and semantic judgment. Agents read and edit the files with normal host tools; dependency-free bundled scripts provide shared schema and graph validation. The product has no required Core package, global CLI, MCP server, SQLite database, native runtime, generic dispatcher, hook cadence, Run lease or heartbeat, compiled ContextBinding, local Decision attestation, writable local host, dual-write compatibility framework, or persistent digest cache. Git and GitHub own concurrency, rollback, history, and review. A UI may later use a disposable in-process render cache only after profiling; it is never truth, authority, currentness, synchronization, or completion state. Cleanup is deletion-first and speed-first: preserve a cheap Git baseline, remove obsolete machinery, and rebuild only gaps demonstrated by real use. Context quality is protected by schema-valid stable-ID files, readable source/evidence, valid relation endpoints, and a fresh-process capture/query roundtrip. The minimum Ticket slice is explicit entry, direct Ticket YAML, graph validation, Agent execution, acceptance-linked Evidence and independent Outcome, and successful direct-dependent unlock.",
+  "evidence": [
+    {
+      "note": "The repository owner explicitly chose speed over compatibility ceremony and authorized mistaken deletion with later gap-driven rebuilding.",
+      "ref": "conversation:2026-07-31-speed-first-cleanup"
+    },
+    {
+      "note": "Git commit preserving the earlier governed decision revision before hard deletion.",
+      "ref": "commit:38b7f5eb1629c90cc76d4c7f9bb410a09f565adf"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-07-31T22:22:00.000Z",
+    "quote": "我们不用求稳，我们求快，我们可以错删，能后面发现gap能力重建就好了，不要over engineering",
+    "ref": "conversation:2026-07-31-speed-first-cleanup"
+  },
+  "state": "active",
+  "summary": "VibeHub is a speed-first Skill plugin built from direct Git-native Tickets and Context",
+  "tags": [
+    "architecture",
+    "context",
+    "skill-first",
+    "speed-first",
+    "tickets"
+  ],
+  "type": "decision"
+}

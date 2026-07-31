@@ -9,21 +9,16 @@ import {
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const STATIC_PLUGIN_PATHS = [
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const PLUGIN_PATHS = [
   ".claude-plugin",
   ".codex-plugin",
-  ".mcp.json",
-  "codex",
-  "docs/assets/ticket-system",
-  "hooks",
-  "runtime",
   "skills",
   "LICENSE",
   "README.md",
 ];
 
-function assertArtifactBudget(artifactRoot) {
+export function artifactStats(artifactRoot) {
   const pending = [artifactRoot];
   let files = 0;
   let bytes = 0;
@@ -39,48 +34,29 @@ function assertArtifactBudget(artifactRoot) {
       }
     }
   }
-  const maxFiles = 8_000;
-  const maxBytes = 100 * 1024 * 1024;
-  if (files > maxFiles || bytes > maxBytes) {
-    throw new Error(
-      `plugin artifact exceeds release budget: ${files} files, ${bytes} bytes`,
-    );
-  }
+  return { files, bytes };
 }
 
-export function buildPluginArtifact({
-  sourceRoot = scriptRoot,
-  artifactRoot,
-} = {}) {
+export function buildPluginArtifact({ sourceRoot = root, artifactRoot } = {}) {
   if (!artifactRoot) throw new Error("artifactRoot is required");
-  if (existsSync(artifactRoot)) {
-    throw new Error(`artifact output already exists: ${artifactRoot}`);
-  }
+  if (existsSync(artifactRoot)) throw new Error(`artifact output already exists: ${artifactRoot}`);
   mkdirSync(artifactRoot, { recursive: true });
-  for (const relativePath of STATIC_PLUGIN_PATHS) {
-    cpSync(join(sourceRoot, relativePath), join(artifactRoot, relativePath), {
-      recursive: true,
-    });
+  for (const relativePath of PLUGIN_PATHS) {
+    cpSync(join(sourceRoot, relativePath), join(artifactRoot, relativePath), { recursive: true });
   }
-  assertArtifactBudget(artifactRoot);
-  return artifactRoot;
+  return { artifactRoot, ...artifactStats(artifactRoot) };
 }
 
-function parseCli(argv) {
-  let out = null;
-  let offline = process.env.VIBEHUB_OFFLINE === "1";
-  for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-    if (arg === "--out") out = argv[++index] ?? null;
-    else if (arg === "--offline") offline = true;
-    else throw new Error(`unknown argument: ${arg}`);
+function parseArgs(argv) {
+  const index = argv.indexOf("--out");
+  if (index < 0 || !argv[index + 1]) {
+    throw new Error("Usage: build-plugin-artifact.mjs --out <empty-directory>");
   }
-  if (!out) throw new Error("usage: build-plugin-artifact.mjs --out <empty-directory> [--offline]");
-  return { out: resolve(out), offline };
+  if (argv.length !== 2) throw new Error(`Unknown arguments: ${argv.join(" ")}`);
+  return resolve(argv[index + 1]);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const options = parseCli(process.argv.slice(2));
-  buildPluginArtifact({ artifactRoot: options.out, offline: options.offline });
-  process.stdout.write(`${JSON.stringify({ ok: true, artifactRoot: options.out })}\n`);
+  const result = buildPluginArtifact({ artifactRoot: parseArgs(process.argv.slice(2)) });
+  process.stdout.write(`${JSON.stringify({ ok: true, ...result })}\n`);
 }

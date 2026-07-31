@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.dev/schemas/ticket-outcome.v1.json",
+  "title": "VibeHub Ticket Outcome",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "ticket_id", "status", "accepted_acceptance_ids", "unresolved_acceptance_ids", "evidence_ids", "summary", "closed_at"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "ticket_outcome" },
+    "ticket_id": { "$ref": "#/$defs/id" },
+    "status": { "enum": ["successful", "partial", "failed", "deviated"] },
+    "accepted_acceptance_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "unresolved_acceptance_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "evidence_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "summary": { "$ref": "#/$defs/text" },
+    "closed_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+  }
+}

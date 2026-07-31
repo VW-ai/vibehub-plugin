@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Pivot VibeHub to a lightweight Skill-first plugin with direct Git-native
+  Context, Tickets, Evidence, and Outcomes.
+- Remove the required Core/CLI/MCP packages, SQLite/native runtime, hooks,
+  dispatcher, coordination/attestation stack, and writable local review host.
+- Add dependency-free schemas, validation, fresh-process Context roundtrips,
+  Ticket graph checks, and direct dependent unlock semantics.
+
 All notable VibeHub changes are recorded here. Versions follow Semantic
 Versioning.
 

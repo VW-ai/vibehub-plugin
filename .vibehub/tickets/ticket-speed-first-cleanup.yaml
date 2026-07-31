@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "baseline-checkpoint",
+      "criterion": "The completed ticket-first runtime pivot worktree is captured in Git before hard deletions, providing a cheap exact rollback point."
+    },
+    {
+      "acceptance_id": "context-minimum-works",
+      "criterion": "In a clean temporary repository, explicit capture writes schema-valid stable-ID Context YAML with readable source/evidence; a fresh process or reclone can query it; malformed YAML and obvious dangling references fail visibly."
+    },
+    {
+      "acceptance_id": "footprint-and-gap-report",
+      "criterion": "Closeout reports before-and-after production files, production dependencies, and packaged bytes plus gaps encountered during implementation; only observed gaps are rebuilt and no parity checklist is required."
+    },
+    {
+      "acceptance_id": "legacy-runtime-absent",
+      "criterion": "The repository, installed artifact, manifests, and dependency metadata contain no required CLI package or bin, MCP server or host config, better-sqlite3/native runtime, runtime launcher, per-turn hook/cadence pipeline, generic operation dispatcher, Run coordination machinery, Context compilation/artifacts, local Decision attestation/trust store, or writable loopback host."
+    },
+    {
+      "acceptance_id": "plugin-clean-install",
+      "criterion": "Claude and Codex plugin installation exposes the Skills and succeeds without a global executable, MCP configuration, database initialization, native build, daemon, hook process, or writable local server."
+    },
+    {
+      "acceptance_id": "ticket-vertical-slice-works",
+      "criterion": "In a clean temporary repository, explicit Ticket entry creates and reads a YAML graph, validation catches missing endpoints and dependency cycles, an Agent records acceptance-linked Evidence and an independent Outcome, and success unlocks a direct dependent while non-success does not."
+    }
+  ],
+  "constraints": [
+    "Optimize for speed and code deletion; temporary broken intermediate commits are acceptable.",
+    "Do not build a retirement lifecycle, generic migration or archival framework, compatibility layer, dual-write path, or new coordination service.",
+    "Do not repair code scheduled for deletion except when necessary to extract indispensable data.",
+    "Preserve the minimum Context quality invariants, not old runtime internals or complete artifact history.",
+    "Preserve unrelated user changes and create the rollback baseline before destructive implementation."
+  ],
+  "context": "The repository owner authorized a deletion-first cleanup and accepts temporary breakage or mistaken deletion. Git commit 9dee0f095374211d8d7cbeeacac653ebb87bed91 is the pre-cleanup rollback baseline. The earlier runtime Ticket machinery has handed execution to this direct Git-YAML Ticket. Keep only Skill-owned workflows, shared schemas, and dependency-free validation/serialization. Human review happens in Agent conversation and GitHub. Rebuild only capabilities whose absence causes an observed user failure.",
+  "context_refs": [
+    {
+      "purpose": "Current product and cleanup authority.",
+      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Public product behavior and data model.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Dependency-free Context and Ticket validation helper.",
+      "ref": "skills/scripts/vh.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "Installed VibeHub is a lightweight Skill-first Git-YAML plugin with no required CLI, MCP, SQLite/native runtime, hook pipeline, generic dispatcher, coordination or attestation stack, or writable local host, while explicit Context capture/query and one Ticket execution/closeout vertical slice work after a clean install.",
+  "provenance_refs": [
+    "conversation:2026-07-31-speed-first-cleanup",
+    "context:decision-speed-first-skill-plugin",
+    "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-speed-first-cleanup"
+}

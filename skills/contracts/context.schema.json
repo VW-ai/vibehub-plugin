@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.dev/schemas/context.v1.json",
+  "title": "VibeHub Context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "context_id", "type", "state", "summary", "detail", "tags", "source", "evidence", "relations"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "context" },
+    "context_id": { "$ref": "#/$defs/id" },
+    "type": { "enum": ["intent", "decision", "constraint", "contract", "convention", "change", "note"] },
+    "state": { "enum": ["active", "superseded", "archived"] },
+    "summary": { "$ref": "#/$defs/text" },
+    "detail": { "$ref": "#/$defs/text" },
+    "tags": { "type": "array", "items": { "$ref": "#/$defs/text" }, "uniqueItems": true },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "captured_at"],
+      "properties": {
+        "ref": { "$ref": "#/$defs/text" },
+        "quote": { "$ref": "#/$defs/text" },
+        "captured_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ref", "note"],
+        "properties": { "ref": { "$ref": "#/$defs/text" }, "note": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "target_context_id"],
+        "properties": {
+          "type": { "enum": ["relates_to", "depends_on", "supersedes"] },
+          "target_context_id": { "$ref": "#/$defs/id" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+  }
+}

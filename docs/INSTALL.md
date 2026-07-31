@@ -1,96 +1,56 @@
 # Install VibeHub
 
-VibeHub ships one platform-neutral plugin for Claude Code and OpenAI Codex.
-The plugin is distributed as an immutable GitHub Release artifact; its matching
-runtime is installed from npm on first use.
+VibeHub is a Skill-first plugin. Installation copies manifests, Skills,
+schemas, and dependency-free helper scripts. It does not install or start a
+CLI, MCP server, hook process, database, native module, daemon, or local web
+server.
 
 ## Requirements
 
-- macOS or Linux
-- Node.js 20 or newer
-- [GitHub CLI](https://cli.github.com/) authenticated to an account that can
-  read `VW-ai/vibehub-plugin`
-- Claude Code, OpenAI Codex, or both
+- Claude Code or Codex with plugin/Skill support
+- Node.js 20+ for bundled validation scripts
+- Git for history, collaboration, and rollback
 
-Authenticate once:
+## Setup a repository
 
-```bash
-gh auth login --hostname github.com
+Ask the Agent to use `$vibehub-setup` in the exact checkout.
+
+Before writing, setup inspects common overlapping surfaces:
+
+- `AGENTS.md` and `CLAUDE.md`
+- `docs/` and repository knowledge folders
+- `.github/copilot-instructions.md`
+- project-local Claude/Codex skills
+- existing memory, context, decision, ADR, or note systems
+- similarly named “record”, “remember”, or archive commands
+
+When overlap exists, setup asks for one choice:
+
+- **dual-write** — keep the current system and update its command to write both
+  stores; or
+- **VibeHub-only** — stop old writes after an explicitly reviewed one-time
+  conversion.
+
+If the user does not grant write permission, VibeHub can still read and advise,
+but cannot claim a complete development cycle.
+
+After consent, setup creates only:
+
+```text
+.vibehub/context/
+.vibehub/tickets/
+.vibehub/evidence/
+.vibehub/outcomes/
 ```
 
-The installer delegates private repository access to `gh`. It does not accept,
-print, or store a GitHub token.
-
-## Install
-
-Install into every detected host:
+and a small managed project-instruction block. Validate with:
 
 ```bash
-npx -y @vw-ai/vibehub-cli@latest host install
+node <plugin>/skills/scripts/vh.mjs project validate --repo <repository>
 ```
 
-Require both Claude Code and Codex:
+## Uninstall
 
-```bash
-npx -y @vw-ai/vibehub-cli@latest host install --hosts all
-```
-
-The command resolves the latest published, immutable GitHub Release, verifies
-its SHA-256 receipt and manifests, atomically places it at
-`~/.vibehub/distribution/marketplace/`, and registers that local marketplace
-with each selected host.
-
-Restart the host after installation. Claude Code exposes the setup Skill as
-`/vibehub:vibehub-setup`; Codex exposes it as `$vibehub-setup`. On first use
-in Codex, use an interactive `codex` CLI and `/hooks` to inspect and trust the
-packaged VibeHub hooks. A desktop task may launch and drive that CLI flow when
-its terminal and permission policy allow; otherwise, run it manually. The
-desktop app does not expose `/hooks`, but it reuses the trust recorded in
-Codex's shared local configuration. After trusting the hooks, start a fresh
-desktop task in the target repository so a trusted `SessionStart` can run.
-
-## Update or repair
-
-Run the same command again:
-
-```bash
-npx -y @vw-ai/vibehub-cli@latest host install
-```
-
-Installation is idempotent. A repeated run revalidates the managed
-distribution and host caches, repairing damaged content or missing
-registration. It also advances to the latest published release when one is
-available.
-
-To install a specific released version:
-
-```bash
-npx -y @vw-ai/vibehub-cli@latest host install --version VERSION
-```
-
-Replace `VERSION` with the published SemVer number to pin.
-
-If a host already has a `vibehub` marketplace registered from the old direct
-Git flow, inspect it first, then explicitly migrate it:
-
-```bash
-npx -y @vw-ai/vibehub-cli@latest host install --replace-existing
-```
-
-The installer never removes project `.vibehub/` files, the VibeHub database, or
-the versioned npm runtime cache.
-
-## Release and local verification
-
-Maintainers can verify a built marketplace without GitHub access:
-
-```bash
-node packages/cli/dist/main.js host install \
-  --source dist/release \
-  --hosts all \
-  --json
-```
-
-`--source` still requires a complete release marketplace with matching Claude,
-Codex, plugin, and npm runtime identities. A source checkout is not accepted as
-a substitute for a release artifact.
+Remove the plugin through the host. Repository Context and Tickets remain
+ordinary Git files. Delete them only when you intentionally want to remove the
+project history; Git can restore earlier versions.

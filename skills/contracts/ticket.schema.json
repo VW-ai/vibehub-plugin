@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.dev/schemas/ticket.v1.json",
+  "title": "VibeHub Ticket",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "ticket_id", "outcome", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "ticket" },
+    "ticket_id": { "$ref": "#/$defs/id" },
+    "outcome": { "$ref": "#/$defs/text" },
+    "context": { "$ref": "#/$defs/text" },
+    "acceptance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["acceptance_id", "criterion"],
+        "properties": { "acceptance_id": { "$ref": "#/$defs/id" }, "criterion": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "constraints": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+    "context_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ref", "purpose"],
+        "properties": { "ref": { "$ref": "#/$defs/text" }, "purpose": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "target_ticket_id"],
+        "properties": {
+          "type": { "const": "depends_on" },
+          "target_ticket_id": { "$ref": "#/$defs/id" },
+          "rationale": { "$ref": "#/$defs/text" }
+        }
+      }
+    },
+    "provenance_refs": { "type": "array", "items": { "$ref": "#/$defs/text" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+  }
+}

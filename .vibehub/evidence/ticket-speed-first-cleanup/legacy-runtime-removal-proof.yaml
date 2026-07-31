@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "legacy-runtime-absent"
+  ],
+  "evidence_id": "legacy-runtime-removal-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-07-31T22:24:02.000Z",
+  "refs": [
+    "package.json",
+    ".codex-plugin/plugin.json",
+    ".claude-plugin/plugin.json",
+    ".github/workflows/verify.yml",
+    "docs/SPEED_FIRST_CLEANUP.md"
+  ],
+  "schema_version": 1,
+  "summary": "The worktree and manifests have no packages, runtime, hooks, Codex MCP config, root MCP config, pnpm workspace/lock, native dependency, CLI bin, or writable local host; CI now runs dependency-free Node verification.",
+  "ticket_id": "ticket-speed-first-cleanup"
+}

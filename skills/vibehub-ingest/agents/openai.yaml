@@ -1,4 +1,4 @@
 interface:
   display_name: "VibeHub Ingest"
-  short_description: "Machine-review evidence into active knowledge"
-  default_prompt: "Use $vibehub-ingest to validate and capture this evidence as active VibeHub knowledge."
+  short_description: "Explicitly capture durable project context"
+  default_prompt: "Use $vibehub-ingest to record this durable context in Git-native VibeHub YAML."

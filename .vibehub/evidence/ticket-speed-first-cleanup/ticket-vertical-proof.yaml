@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "ticket-vertical-slice-works"
+  ],
+  "evidence_id": "ticket-vertical-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-07-31T22:24:01.000Z",
+  "refs": [
+    "test/ticket.test.mjs",
+    "skills/contracts/ticket.schema.json",
+    "skills/contracts/evidence.schema.json",
+    "skills/contracts/outcome.schema.json",
+    "skills/scripts/vh.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh repositories created and read a direct Ticket graph; validation rejected missing endpoints and cycles; acceptance-linked Evidence plus independent-style Outcome unlocked only the successful direct dependency path.",
+  "ticket_id": "ticket-speed-first-cleanup"
+}
