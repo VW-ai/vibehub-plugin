@@ -1,6 +1,6 @@
 {
   "created_at": "2026-07-28T00:00:00.000Z",
-  "current_revision": 1,
+  "current_revision": 2,
   "feature_id": "09-ticket-runtime",
   "kind": "spec",
   "provenance": [
@@ -29,6 +29,32 @@
       },
       "request_id": "canonical-spec-migration-20260731-v1",
       "task_id": "canonical-spec-migration-20260731"
+    },
+    {
+      "actor": "codex-minimal-runtime-architecture",
+      "at": "2026-07-31T21:34:38.171Z",
+      "durable_id": "8e333d3a99eb72971f96a5c02f718d9f11bedeb9f8695af4c64cc40a7c74f6fb",
+      "operation": "amend",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T21:34:38.171Z",
+          "idempotencyKey": "decision-ticket-intelligence-loop-explicit-entry-20260731-v2",
+          "inputHash": "968bc65bf05ae391cfaa6d5b3b56b2b1b2881d8754260904672efaea46723027",
+          "operation": "amend",
+          "result": {
+            "operation": "amend",
+            "revision": 2,
+            "specId": "decision-ticket-intelligence-loop-001",
+            "state": "active"
+          }
+        },
+        "operation": "amend",
+        "revision": 2,
+        "specId": "decision-ticket-intelligence-loop-001",
+        "state": "active"
+      },
+      "request_id": "explicit-ticket-entry-amend-20260731-01",
+      "task_id": "product-architecture-simplification"
     }
   ],
   "relations": [
@@ -106,11 +132,58 @@
         "ticket-generation"
       ],
       "type": "decision"
+    },
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "VibeHub 对用户提供一个明确、可教学的 Ticket development entry。只有用户显式要求进入 Ticket 开发周期时，Agent 才创建、修订或执行该周期的 Ticket Graph。普通对话、一般开发请求、Context 查询或 Archive 行为不会因为 hook、scene detector 或 Agent 猜测而静默切换成 Ticket orchestration；Agent 可以说明或建议入口，但不能代替用户进入。\n\n显式进入后，现有 Ticket intelligence 继续成立：从可理解的 scenario/outcome 编译 coarse graph，用户 review 该计划或授予 bounded delegation；Agent 在授权边界内拥有可客观裁决的技术决策、计划细化、执行、验证和 closeout；改变用户体验、产品逻辑、已接受架构/设计原则、permission 或 risk 的选择仍成为可见的 human Decision/deviation blocker。内部 plan、validate、run、closeout Skills 可以自动组合，但对外仍是同一个开发周期入口。\n\n因此不再重新发明一套“每一步用户做什么”的通用流程：用户动作和 Agent authority 以现有 Ticket contract 为准，本决策只收窄进入条件。",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "decision-ticket-intelligence-loop-001:2:1",
+          "evidence_ref": null,
+          "exact_quote": "什么叫开发周期，我觉得我们就指望显式指令。我们就给一个非常明确的入口，可能我们整个项目就只有这样一个入口，我们需要教用户怎么样进入Ticket的开发周期，那就可以了。需要用户哪些动作、哪些叫agent，我感觉我们之前Ticket上其实都已经定义过了。",
+          "produced_at": "2026-07-31T21:34:38.171Z",
+          "producer": "codex-minimal-runtime-architecture",
+          "source_ref": "conversation:2026-07-31-minimal-runtime-architecture",
+          "source_type": "user_instruction"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-31T21:34:38.171Z",
+      "producer": "codex-minimal-runtime-architecture",
+      "revision": 2,
+      "summary": "Ticket 开发周期只由用户通过一个明确入口启动；进入后沿用已定义的 review、delegation 与 Agent authority 边界",
+      "tags": [
+        "ticket",
+        "explicit-entry",
+        "user-invocation",
+        "delegation",
+        "skills"
+      ],
+      "type": "decision"
     }
   ],
   "schema_version": 2,
   "source_kind": "canonical",
   "spec_id": "decision-ticket-intelligence-loop-001",
   "state": "active",
-  "updated_at": "2026-07-28T00:00:00.000Z"
+  "updated_at": "2026-07-31T21:34:38.171Z"
 }

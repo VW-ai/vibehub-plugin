@@ -34,6 +34,32 @@
       },
       "request_id": "canonical-spec-migration-20260731-v1",
       "task_id": "canonical-spec-migration-20260731"
+    },
+    {
+      "actor": "codex-minimal-runtime-architecture",
+      "at": "2026-07-31T21:34:50.133Z",
+      "durable_id": "11a4d6e16491f31302860166bb437e8788973c84cdef861b6ed8317263d65e4a",
+      "operation": "supersede",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T21:34:50.133Z",
+          "idempotencyKey": "decision-project-025-superseded-by-minimal-kernel-20260731-v1",
+          "inputHash": "0792ed058a32c6f10657474423bcaad1aa142560f51039455c3cf0f05229f3c9",
+          "operation": "supersede",
+          "result": {
+            "operation": "supersede",
+            "replacementSpecId": "decision-project-013",
+            "specId": "decision-project-025",
+            "state": "superseded"
+          }
+        },
+        "operation": "supersede",
+        "replacementSpecId": "decision-project-013",
+        "specId": "decision-project-025",
+        "state": "superseded"
+      },
+      "request_id": "broad-core-supersede-20260731-01",
+      "task_id": "product-architecture-simplification"
     }
   ],
   "relations": [
@@ -42,6 +68,12 @@
       "rationale": "META implements relation from decision-project-025: Library-first and thin-adapter architecture",
       "to_spec_id": "decision-project-013",
       "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T21:34:50.133Z",
+      "rationale": "The prior broad canonical Core service inventory and hook/CLI runtime boundary are replaced by the amended minimal-kernel decision; only concretely justified validators/projections remain.",
+      "to_spec_id": "decision-project-013",
+      "type": "supersedes"
     }
   ],
   "revisions": [
@@ -139,6 +171,6 @@
   "schema_version": 2,
   "source_kind": "canonical",
   "spec_id": "decision-project-025",
-  "state": "active",
-  "updated_at": "2026-07-31T17:23:53.966Z"
+  "state": "superseded",
+  "updated_at": "2026-07-31T21:34:50.133Z"
 }

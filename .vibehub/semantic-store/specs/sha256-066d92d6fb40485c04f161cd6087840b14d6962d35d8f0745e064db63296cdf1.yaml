@@ -1,6 +1,6 @@
 {
   "created_at": "2026-07-31T17:23:53.966Z",
-  "current_revision": 1,
+  "current_revision": 2,
   "feature_id": "00-project-room",
   "kind": "spec",
   "provenance": [
@@ -33,6 +33,32 @@
       },
       "request_id": "canonical-spec-migration-20260731-v1",
       "task_id": "canonical-spec-migration-20260731"
+    },
+    {
+      "actor": "codex-minimal-runtime-architecture",
+      "at": "2026-07-31T21:34:31.113Z",
+      "durable_id": "fccefa779a5e4d704ac4022a6837a2cc226f55bc94644b62ff71c0b883b853a5",
+      "operation": "amend",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T21:34:31.113Z",
+          "idempotencyKey": "decision-project-013-minimal-kernel-20260731-v2",
+          "inputHash": "94059e6254d4968d25e8c73f79fc14fd0c868389afe9f78728f0e2e0784c6c48",
+          "operation": "amend",
+          "result": {
+            "operation": "amend",
+            "revision": 2,
+            "specId": "decision-project-013",
+            "state": "active"
+          }
+        },
+        "operation": "amend",
+        "revision": 2,
+        "specId": "decision-project-013",
+        "state": "active"
+      },
+      "request_id": "minimal-core-amend-20260731-01",
+      "task_id": "product-architecture-simplification"
     }
   ],
   "relations": [
@@ -127,11 +153,85 @@
         "layering"
       ],
       "type": "decision"
+    },
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/cli/src",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/mcp/src",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "VibeHub 是 lightweight Plugin，不以拥有 Core、CLI、MCP 或自定义 operation runtime 为产品目标。Agent 可以通过宿主文件工具和 Git 直接读取、编辑 Git-native Ticket/Context YAML；不能因为已有工具存在就把所有读写强制路由进工具。\n\n最小确定性内核只保留删除后会造成明确产品破坏的能力：\n- 共享 YAML schema validation，保证 Agent、CI、GitHub projection 与前端 visualization 对同一数据合约解释一致；\n- Ticket graph 的 ID、relation endpoint、dependency cycle、acceptance/evidence 引用等结构完整性验证；\n- 必要的 deterministic normalization/serialization，保证稳定 diff；\n- 前端或 GitHub surface 无法自行安全重建时所需的 read-only projection。\n\nGit 本身拥有 branch/worktree 隔离、commit history、non-fast-forward push rejection、merge conflict 与 PR review。产品按 one Agent/writer per worktree 设计，不为本来就不安全的 same-worktree concurrent writers 重建第二套并发系统。因此 layered sourceToken/graphDigest/semanticLedgerDigest CAS、SQLite Run lease/heartbeat/generation、ContextBinding 内容编译与复制、installation-local Ed25519 Decision attestation、通用 operation dispatcher、CLI/MCP adapter 都不再是默认必需组件。它们只有在能给出一个无法由 Git、GitHub、宿主权限或 schema validation 覆盖的具体用户失败场景和回归测试时，才能重新进入产品。\n\nSkills 继续拥有规划、语义判断和工作流编排；小型 validator/render helper 可以作为 Skill bundled scripts 或 CI commands 存在，而不形成长期运行时或用户必须理解的工具层。",
+      "domain": "architecture",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "decision-project-013:2:1",
+          "evidence_ref": null,
+          "exact_quote": "我们尽量尽量没有core了。如果有一个非常需要、真的需要一个core的话，我们把它做到足够的轻量。你需要跟我讲清楚，git native、schema、CAS这些东西是不是真的有必要。一定不能说这个工具反而成为我们的负债。包括所有的lease这些东西，真的是有必要吗，还是形式主义呢？如果真的有必要，那就有必要。如果没有必要，就拉倒。schema validation确实好像是有用，因为我们需要对齐前端，不然数据没法visualize。",
+          "produced_at": "2026-07-31T21:34:31.113Z",
+          "producer": "codex-minimal-runtime-architecture",
+          "source_ref": "conversation:2026-07-31-minimal-runtime-architecture",
+          "source_type": "user_instruction"
+        },
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "decision-project-013:2:2",
+          "evidence_ref": "Current Ticket codec/writer/reader, dispatcher, execution, lease, context compiler and attestation substrate spans 13,531 source lines; observed during the 2026-07-31 architecture review.",
+          "exact_quote": null,
+          "produced_at": "2026-07-31T21:34:31.113Z",
+          "producer": "codex-minimal-runtime-architecture",
+          "source_ref": "packages/core/src/ticket-ledger and Ticket execution modules",
+          "source_type": "implementation_inspection"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-31T21:34:31.113Z",
+      "producer": "codex-minimal-runtime-architecture",
+      "revision": 2,
+      "summary": "不设强制通用 Core/CLI/MCP；只保留直接保护 YAML 合约、Ticket 图与可视化互操作的最小确定性内核",
+      "tags": [
+        "plugin",
+        "minimal-kernel",
+        "schema",
+        "git",
+        "skills",
+        "no-cli",
+        "no-mcp"
+      ],
+      "type": "decision"
     }
   ],
   "schema_version": 2,
   "source_kind": "canonical",
   "spec_id": "decision-project-013",
   "state": "active",
-  "updated_at": "2026-07-31T17:23:53.966Z"
+  "updated_at": "2026-07-31T21:34:31.113Z"
 }

@@ -59,6 +59,32 @@
       },
       "request_id": "ticket-first-ingest-amend-20260731-01",
       "task_id": "ticket-first-runtime-pivot"
+    },
+    {
+      "actor": "codex-minimal-runtime-architecture",
+      "at": "2026-07-31T21:34:56.248Z",
+      "durable_id": "a18ae3236316e3deebd66c47bb59f9c8662e6076e194ce60d8831732aac5c969",
+      "operation": "supersede",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T21:34:56.248Z",
+          "idempotencyKey": "intent-workbench-003-superseded-by-ticket-cycle-context-20260731-v1",
+          "inputHash": "fd3e30ba8736ea2d7059f230d4b2fac0345a99ed95ce2a4af1a0327184413e50",
+          "operation": "supersede",
+          "result": {
+            "operation": "supersede",
+            "replacementSpecId": "decision-project-026",
+            "specId": "intent-workbench-003",
+            "state": "superseded"
+          }
+        },
+        "operation": "supersede",
+        "replacementSpecId": "decision-project-026",
+        "specId": "intent-workbench-003",
+        "state": "superseded"
+      },
+      "request_id": "checkpoint-model-supersede-20260731-01",
+      "task_id": "product-architecture-simplification"
     }
   ],
   "relations": [
@@ -73,6 +99,12 @@
       "rationale": "META constrained_by relation from intent-workbench-003: Intelligence remains in skills",
       "to_spec_id": "decision-workbench-010",
       "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T21:34:56.248Z",
+      "rationale": "The per-task cadence and Ticket shadow-checkpoint model are explicitly replaced by user-invoked capture and Ticket-cycle-owned Context handling without hooks, polling, drift, or scope detectors.",
+      "to_spec_id": "decision-project-026",
+      "type": "supersedes"
     }
   ],
   "revisions": [
@@ -252,6 +284,6 @@
   "schema_version": 2,
   "source_kind": "canonical",
   "spec_id": "intent-workbench-003",
-  "state": "active",
-  "updated_at": "2026-07-31T18:24:00.937Z"
+  "state": "superseded",
+  "updated_at": "2026-07-31T21:34:56.248Z"
 }

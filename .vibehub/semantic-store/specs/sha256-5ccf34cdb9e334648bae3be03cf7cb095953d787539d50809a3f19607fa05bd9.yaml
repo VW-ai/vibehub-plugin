@@ -1,6 +1,6 @@
 {
   "created_at": "2026-07-31T17:23:53.966Z",
-  "current_revision": 1,
+  "current_revision": 2,
   "feature_id": "03-01-context-cru",
   "kind": "spec",
   "provenance": [
@@ -34,6 +34,32 @@
       },
       "request_id": "canonical-spec-migration-20260731-v1",
       "task_id": "canonical-spec-migration-20260731"
+    },
+    {
+      "actor": "codex-minimal-runtime-architecture",
+      "at": "2026-07-31T21:34:43.860Z",
+      "durable_id": "ece2f0d46b859a093fc74c922ba975c945ae1a0866388f13e726ca44d95e9703",
+      "operation": "amend",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T21:34:43.860Z",
+          "idempotencyKey": "decision-project-026-ticket-cycle-context-20260731-v2",
+          "inputHash": "0ffc4e278d46fcd31e8b026e2746cba19eef383798ccfc5a24c150aa5fc33423",
+          "operation": "amend",
+          "result": {
+            "operation": "amend",
+            "revision": 2,
+            "specId": "decision-project-026",
+            "state": "active"
+          }
+        },
+        "operation": "amend",
+        "revision": 2,
+        "specId": "decision-project-026",
+        "state": "active"
+      },
+      "request_id": "ticket-cycle-context-amend-20260731-01",
+      "task_id": "product-architecture-simplification"
     }
   ],
   "relations": [
@@ -163,11 +189,80 @@
         "injection-budget"
       ],
       "type": "decision"
+    },
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "codex/hooks.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "hooks/hooks.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-ingest/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-query/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-update/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "VibeHub 不再通过 UserPromptSubmit cadence、shadow checkpoint、transcript boundary、context drift、scope/off-scope 或类似持续检测去适配任意开发流程。普通对话中的持久化只在用户显式请求时按 Capture Routing Contract 路由。\n\n用户显式进入 Ticket development cycle 后，Ticket Plan/Run/Decision/Closeout 已经提供开发边界。Ticket Skills 在需要时读取相关 governed Context，并在周期内产生真正跨 Ticket 仍然成立的 durable semantics 时调用 Context lifecycle；这属于同一开发流程的规则，不是另一套 detector。无需在 complexity/runtime 层重复推断 intent 是否 drift、feature 是否 drift 或 context boundary。\n\nCold-start distillation 仍是显式行为。Context Layer 的 schema、provenance、placement、conflict、stale/supersession 与 validation 质量门槛保持，但何时进入 lifecycle 由显式用户动作或 Ticket workflow 决定，不由 hooks/polling/cadence 决定。",
+      "domain": "context-cru",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "decision-project-026:2:1",
+          "evidence_ref": null,
+          "exact_quote": "context在plan、deviation和plan自动判断，我感觉这也是我们之前做的context drift检测、scope这些，这个在Ticket环节里面没有意义。之前context支持检测，是因为我不知道你的开发流程什么样子；但现在我们直接自己做开发流程，就没有必要在complex层面去触发这些判断。",
+          "produced_at": "2026-07-31T21:34:43.860Z",
+          "producer": "codex-minimal-runtime-architecture",
+          "source_ref": "conversation:2026-07-31-minimal-runtime-architecture",
+          "source_type": "user_instruction"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-31T21:34:43.860Z",
+      "producer": "codex-minimal-runtime-architecture",
+      "revision": 2,
+      "summary": "Context 只在用户显式沉淀或已进入的 Ticket 周期内按规则处理；删除 per-turn checkpoint、drift、scope 与边界检测",
+      "tags": [
+        "ticket-cycle",
+        "explicit-capture",
+        "no-checkpoint",
+        "no-drift",
+        "no-scope",
+        "context-quality"
+      ],
+      "type": "decision"
     }
   ],
   "schema_version": 2,
   "source_kind": "canonical",
   "spec_id": "decision-project-026",
   "state": "active",
-  "updated_at": "2026-07-31T17:23:53.966Z"
+  "updated_at": "2026-07-31T21:34:43.860Z"
 }
