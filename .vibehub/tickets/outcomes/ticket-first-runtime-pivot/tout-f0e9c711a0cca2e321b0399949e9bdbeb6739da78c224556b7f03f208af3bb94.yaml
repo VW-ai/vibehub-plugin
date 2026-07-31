@@ -1,0 +1,62 @@
+schema_version: 1
+kind: ticket_outcome
+subject:
+  ticket_id: ticket-first-runtime-pivot
+  ticket_revision: 8fa2f5b8b57c721b74d81003e87a47537fb9dfa40bebb8b3298f0beb01abf781
+context_binding:
+  context_binding_id: tcb-6d079c225dd61adc9c5da93008e38a8b390a9c65fc93a01afa350fdcd8a47a35
+  document_digest: b2f688f4d3b07a283add1f33e956a985a3643aab30c44942a445d01a342c6364
+  packet_digest: af2090d5ddb3fdb08d5cf281ecd5ff34fd2f20cc10075bb25dc2d4841428a3a2
+run:
+  run_id: trn-4ac944ed41b1958c92a8a6afaa08e2a0754b3298be3bd5218c83250813b0898c
+  generation: 1
+  executor:
+    actor_kind: agent
+    actor_ref: codex
+  started_source_digest: sha256:bd055b3c560149238bcf1db40815ba471be1651ce61dddbe3e4cacb882926e32
+terminal_form: successful
+executor_report: "Run generation 1 produced the bounded Ticket-first runtime pivot in the current worktree: dual-mode SessionStart and checkpoint behavior, revised installed/setup/MCP guidance with unchanged activation semantics, a governed revision-2 amendment of intent-workbench-003, a durable dogfood log, and six acceptance-linked Evidence records. Independent inspection matched every cited digest and found no protected-boundary deviation. Independent verification passed build, typecheck, 71 focused Core tests, 37 skill-package tests, 12 MCP tests, script syntax checks, and bounded dogfood. The pre-existing governed-read materialization race reproduced and remains documented as a follow-up candidate; no follow-up Ticket currently exists."
+acceptance:
+  - acceptance_id: canonical-context-truth
+    adjudication: accepted
+    evidence_refs:
+      - evidence_id: tev-0251529a32b4b7c11927d95942f40dd9e6fff037cf073fa8d02e5e3eed3d12ae
+        evidence_digest: 31968517b650e0c594e0dd2834f6668fff21b74c735f1777b3b0ed5721052629
+    rationale: The exact Run evidence binds active intent-workbench-003 revision 2 and its successful amend receipt; raw readback contains the Ticket-managed shadow, context-only reminder, provenance, and unchanged canonical quality boundaries, with the cited artifact digest matching.
+  - acceptance_id: checkpoint-dual-mode
+    adjudication: accepted
+    evidence_refs:
+      - evidence_id: tev-da99d228b123a1747bbe7e73fc13f61179d3b4fc97402d3794f03141208c408b
+        evidence_digest: 2c0f0fd2e2375241d5c910010ed135b673a65c7bfbbed51fb74bb5f9c0d64b5a
+    rationale: The current implementation records and re-arms deduplicated shadow checkpoints for Ticket-managed prompts without reminder output while preserving context-only fire, defer, replay, and canonical-write reset paths; cited digests match and independent focused tests passed.
+  - acceptance_id: dogfood-findings
+    adjudication: accepted
+    evidence_refs:
+      - evidence_id: tev-796bcc95a7363624bdf794be1e35c79320f5b8db7a2e8a486e7eb18dcd27ecf9
+        evidence_digest: 52850e9280e5655e74807a9fd5443f58134f651f1aeb4ade35759c2c675f975c
+    rationale: The exact Run evidence references a matching durable dogfood document that records bounded Plan, independent Validate, Run, Evidence, observed defects and friction, evidence, and dispositions without claiming historical M5 proof.
+  - acceptance_id: installed-guidance
+    adjudication: accepted
+    evidence_refs:
+      - evidence_id: tev-0970bcb10c5751891268f1f41c83f1470fe4be8acef59ba9a45019600a9ee415
+        evidence_digest: 41195c270d6564c6af20ff3dd81222e8bc158bc3d55debf527753afa2185dbad
+    rationale: Matching implementation artifacts consistently make Ticket the primary managed-checkout development surface, keep coordination optional, preserve query/ingest quality roles, and leave activation proof semantics unchanged; independent guidance tests passed.
+  - acceptance_id: session-routing
+    adjudication: accepted
+    evidence_refs:
+      - evidence_id: tev-0d2e5de5bbbf79c22e053fd1d8676e18f486e6bfa81a9ff3051968be4ad25ee3
+        evidence_digest: d81c6ff59159c190e10604c8c0c51698c1b39cc33972ac61fd0c1c4629155e30
+    rationale: The exact-checkout protocol marker deterministically selects complete Ticket-first guidance or context-first guidance; the Ticket branch names planning/READY execution, ContextBinding authority, gap query, durable ingest, Evidence, independent closeout, and protected Decisions, and independent tests passed.
+  - acceptance_id: verification
+    adjudication: accepted
+    evidence_refs:
+      - evidence_id: tev-6c80cf8302633f83eddb881634107321ea679680e170dc451f95a4128a807083
+        evidence_digest: 2d523b5ffe45aeb538150de793d6a8057df6d600d67b74cf6663ae2887af1011
+    rationale: All cited Run artifacts are current; independent build and typecheck passed, focused Core/CLI/MCP and skill-package tests passed 120/120, script checks and bounded dual-mode dogfood passed, and inspection found no new semantic store, parser, daemon, scheduler, activation broadening, or quality-gate bypass.
+verifier:
+  actor_kind: agent
+  actor_ref: codex-independent-closeout
+follow_up_ticket_refs: []
+semantic_closeout_refs: []
+closed_at: 2026-07-31T18:35:05.451Z
+outcome_id: tout-f0e9c711a0cca2e321b0399949e9bdbeb6739da78c224556b7f03f208af3bb94

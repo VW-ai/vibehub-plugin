@@ -72,8 +72,8 @@ The Codex adapter intentionally uses three documented mechanical events:
 
 | Event | VibeHub use |
 | --- | --- |
-| `SessionStart` | host-attributed session handshake, session protocol, pending context delivery |
-| `UserPromptSubmit` | user-turn evidence, task-scoped checkpoint cadence, pending context delivery |
+| `SessionStart` | host-attributed session handshake, Ticket-first protocol when the canonical Ticket ledger exists or context-first protocol otherwise, pending context delivery |
+| `UserPromptSubmit` | user-turn evidence, task-scoped checkpoint cadence, shadow checkpoint in Ticket-managed checkouts or reminder delivery in context-only checkouts, pending context delivery |
 | `PostToolUse` matching `apply_patch` | successful edit footprints, off-scope reminder, pending context delivery |
 
 The adapter maps Codex `turn_id` to a host-namespaced prompt identity for
@@ -85,7 +85,8 @@ Connected requires a real, trusted Codex `SessionStart` ingestion after the
 current instruction blocks for the exact checkout. Installed plugin files,
 synthetic hook fixtures, a marketplace receipt, or persisted hook trust alone
 do not prove Connected. Activated still requires a later meaningful query or
-ingest receipt; hook activity alone does not prove context value.
+ingest receipt; Ticket frontier or Run activity and hook activity alone do not
+prove context value.
 
 Immediately after install or before the first trusted SessionStart,
 `setup status` may correctly report `waiting` with Connected and Activated
@@ -100,8 +101,13 @@ Available on Codex now:
 - all packaged workflow skills and the shared MCP tool surface;
 - the full CLI and the same deterministic operation receipts;
 - host-attributed session and user-turn evidence;
-- checkpoint reminders and queued context delivery at SessionStart or
-  UserPromptSubmit;
+- Ticket-first SessionStart guidance plus shadow checkpoint cadence when the
+  canonical Ticket ledger exists;
+- context-first SessionStart guidance plus checkpoint reminders when the
+  Ticket ledger does not exist;
+- governed Context query and durable cross-Ticket ingest in both modes;
+- optional `register_scope` and `self_report` coordination in both modes;
+- queued context delivery at SessionStart or UserPromptSubmit;
 - successful `apply_patch` edit footprints, off-scope reminders, and
   post-edit delivery.
 

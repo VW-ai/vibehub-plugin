@@ -119,12 +119,16 @@ export function createCapabilities(ctx: CapabilityContext) {
     getManual(_input: { topic?: string } = {}) {
       return {
         text:
-          "Vibehub keeps team context local. Hooks trigger at the right time; " +
-          "skills own semantic workflow; MCP capabilities validate and persist mechanical facts. " +
-          "Use vibehub-query for context pulls, vibehub-ingest for discussions, and " +
-          "vibehub-distill for first-run repository mapping. Use vibehub-ticket-plan " +
-          "to shape work, vibehub-ticket-run to execute one ready Ticket, and " +
-          "vibehub-ticket-closeout for independent acceptance adjudication.",
+          "When a checkout contains the canonical Git-native Ticket ledger, its Ticket graph " +
+          "is the primary development control plane: use vibehub-ticket-plan to shape a " +
+          "deliverable, vibehub-ticket-run to execute one READY Ticket from its compiled " +
+          "ContextBinding, and vibehub-ticket-closeout for independent acceptance adjudication. " +
+          "VibeHub's local Context Layer remains the governed knowledge infrastructure: use " +
+          "vibehub-query for project-wide context gaps, vibehub-ingest for durable cross-Ticket " +
+          "semantics, and vibehub-distill for first-run repository mapping. Without a Ticket " +
+          "ledger, work context-first. Hooks own timing, skills own semantic workflow, and MCP " +
+          "capabilities validate and persist mechanical facts. register_scope and self_report " +
+          "are optional coordination tools in both modes.",
       };
     },
   };

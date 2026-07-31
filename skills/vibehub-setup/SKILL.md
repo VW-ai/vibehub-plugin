@@ -95,10 +95,19 @@ parse stdout as JSON on exit 0 or 1. An exit code never replaces the
      history signals and ask the user which path fits.
    This judgment stays in the skill. Never encode it in setup/core, infer it
    from file count alone, or hide distillation inside setup.
-8. Obtain real context value through a meaningful `$vibehub-query` or
-   `$vibehub-ingest`, then re-run setup status. An empty query, failed operation,
-   skipped ingest, or invented knowledge write does not prove Activated.
-9. Render the outcome with these exact portable labels:
+8. Select the development surface from governed runtime capabilities, never by
+   reading persistence files in the Skill. When the exact checkout exposes a
+   canonical Git-native Ticket ledger, present its Ticket graph as the primary
+   control plane: use `$vibehub-ticket-plan` for a concrete deliverable or
+   `$vibehub-ticket-run` for one READY Ticket. Otherwise keep the repository
+   context-first. In both modes, `register_scope` and `self_report` are optional
+   coordination, not setup or quality gates.
+9. Preserve the current activation evidence contract: obtain real Context
+   Layer value through a meaningful `$vibehub-query` or `$vibehub-ingest`, then
+   re-run setup status. Ticket readiness or Run activity does not independently
+   prove Activated. An empty query, failed operation, skipped ingest, or
+   invented knowledge write does not prove Activated.
+10. Render the outcome with these exact portable labels:
 
    ```text
    Activity: Setup

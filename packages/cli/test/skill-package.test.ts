@@ -384,7 +384,9 @@ describe("production skill package",()=>{
     expect(codex).toContain("repeat hook approval");
     expect(codex).toContain("Connected requires a real, trusted Codex `SessionStart`");
     expect(codex).toContain("`setup status` may correctly report `waiting`");
-    expect(codex).toContain("checkpoint reminders and queued context delivery");
+    expect(codex).toContain("Ticket-first SessionStart guidance plus shadow checkpoint cadence");
+    expect(codex).toContain("context-first SessionStart guidance plus checkpoint reminders");
+    expect(codex).toContain("optional `register_scope` and `self_report` coordination");
     expect(codex).toContain("`--host codex`");
     expect(codex).toContain("Do not tail host logs, watch files, poll for activity");
     expect(codex).toContain("Do not add `Stop`, `SessionEnd`, or failure events");

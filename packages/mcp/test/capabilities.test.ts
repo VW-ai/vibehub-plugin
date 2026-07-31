@@ -677,6 +677,9 @@ describe("local MCP deterministic capabilities", () => {
     expect(api.getManual().text).toMatch(
       /vibehub-ticket-run.*vibehub-ticket-closeout/,
     );
+    expect(api.getManual().text).toMatch(/Ticket graph.*primary development control plane/);
+    expect(api.getManual().text).toMatch(/Context Layer remains the governed knowledge infrastructure/);
+    expect(api.getManual().text).toMatch(/register_scope and self_report.*optional coordination/);
   });
 
   it("derives repo and task from the server cwd", () => {

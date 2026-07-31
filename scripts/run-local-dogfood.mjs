@@ -76,7 +76,19 @@ try {
     hook_event_name: "SessionStart",
   };
   const startOutput = JSON.parse(runCli(["hook", "SessionStart"], JSON.stringify(hookPayload)));
-  assert.match(startOutput.hookSpecificOutput.additionalContext, /register_scope/);
+  assert.match(startOutput.hookSpecificOutput.additionalContext, /persistent context layer/);
+  assert.match(startOutput.hookSpecificOutput.additionalContext, /optional coordination tools/);
+
+  const ticketRoot = path.join(repo, ".vibehub", "tickets");
+  fs.mkdirSync(ticketRoot, { recursive: true });
+  fs.writeFileSync(path.join(ticketRoot, "protocol.yaml"), "schema_version: 1\n");
+  const ticketStartOutput = JSON.parse(runCli(
+    ["hook", "SessionStart"],
+    JSON.stringify({ ...hookPayload, session_id: "dogfood-ticket-session" }),
+  ));
+  assert.match(ticketStartOutput.hookSpecificOutput.additionalContext, /primary development surface/);
+  assert.match(ticketStartOutput.hookSpecificOutput.additionalContext, /compiled ContextBinding/);
+  assert.match(ticketStartOutput.hookSpecificOutput.additionalContext, /optional coordination tools/);
 
   const mcp = await import("../packages/mcp/dist/index.js");
   const runtime = mcp.openRuntimeContext(repo, db, () => "2026-07-13T00:00:00.000Z");

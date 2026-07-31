@@ -3,11 +3,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { CURRENT_SCHEMA_VERSION, openDb, type Db } from "../src/db.js";
+import { upsertTask } from "../src/activity-store.js";
 import { setSetting } from "../src/graph-store.js";
 import { upsertRepo } from "../src/team-store.js";
 import {
   CHECKPOINT_CADENCE_SETTING_KEY,
   DEFAULT_CHECKPOINT_CADENCE_TURNS,
+  recordUserPromptTurn,
   resolveCheckpointCadence,
 } from "../src/knowledge-checkpoint.js";
 
@@ -48,6 +50,34 @@ describe("checkpoint cadence configuration (one central resolver)", () => {
       setSetting(db, CHECKPOINT_CADENCE_SETTING_KEY, bad);
       expect(resolveCheckpointCadence(db, 1)).toBe(DEFAULT_CHECKPOINT_CADENCE_TURNS);
     }
+  });
+
+  it("records shadow checkpoints without changing cadence or replay semantics", () => {
+    setSetting(db, CHECKPOINT_CADENCE_SETTING_KEY, "2", 1);
+    upsertTask(db, {
+      id: "task:shadow", repoId: 1, title: "shadow", state: "running",
+      signalTier: "hooks", branch: "feature/shadow", worktreePath: null,
+      prNumber: null, prState: null, stateSince: NOW, lastEventAt: NOW,
+      statusDetail: null, createdAt: NOW, startHeadSha: null,
+    });
+    const turn = (promptId: string) => recordUserPromptTurn(db, {
+      repoId: 1,
+      taskId: "task:shadow",
+      promptId,
+      now: NOW,
+      deliveringInterventions: false,
+      reminderMode: "shadow",
+    });
+
+    expect(turn("prompt-1").status).toBe("counted");
+    expect(turn("prompt-2")).toEqual({
+      status: "shadowed", countedTurns: 2, turnsSinceLastWrite: 2, threshold: 2,
+    });
+    expect(turn("prompt-2")).toEqual({
+      status: "duplicate", countedTurns: 2, turnsSinceLastWrite: 2, threshold: 2,
+    });
+    expect(turn("prompt-3").status).toBe("counted");
+    expect(turn("prompt-4").status).toBe("shadowed");
   });
 
   it("migration 015 ships empty cadence tables and the provenance task index", () => {

@@ -212,8 +212,8 @@ try {
       { cwd: repo, env: hookEnv, input: hookInput },
     ),
   );
-  if (!hook.hookSpecificOutput?.additionalContext?.includes("register_scope")) {
-    throw new Error("thin SessionStart hook did not return VibeHub context");
+  if (!hook.hookSpecificOutput?.additionalContext?.includes("persistent context layer")) {
+    throw new Error("thin SessionStart hook did not return context-first VibeHub guidance");
   }
 
   const cliManifest = join(

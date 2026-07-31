@@ -4,11 +4,13 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   applyProjectActivation,
+  DEFAULT_PROJECT_INSTRUCTION_BODY,
   inspectProjectActivation,
   openDb,
   operationProvesContextValue,
   PROJECT_INSTRUCTION_END,
   PROJECT_INSTRUCTION_START,
+  PROJECT_INSTRUCTION_VERSION,
   readProjectActivationStatus,
   sha256,
   upsertSession,
@@ -98,6 +100,10 @@ describe("project activation primitives", () => {
     expect(applyProjectActivation(x).ok).toBe(true);
     expect(fs.readFileSync(path.join(x.repo, "AGENTS.md"), "utf8"))
       .toMatch(new RegExp(`^agents-no-newline\\n${PROJECT_INSTRUCTION_START}`));
+    expect(PROJECT_INSTRUCTION_VERSION).toBe("2");
+    expect(DEFAULT_PROJECT_INSTRUCTION_BODY).toContain("Ticket graph as the development control plane");
+    expect(DEFAULT_PROJECT_INSTRUCTION_BODY).toContain("Context Layer remains the governed knowledge infrastructure");
+    expect(DEFAULT_PROJECT_INSTRUCTION_BODY).toContain("optional coordination tools");
     const files = ["AGENTS.md", "CLAUDE.md"].map((name) => path.join(x.repo, name));
     const before = files.map((file) => [sha256(fs.readFileSync(file)), fs.statSync(file).mtimeMs]);
     expect(applyProjectActivation(x).outcome).toBe("unchanged");

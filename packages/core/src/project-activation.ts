@@ -13,17 +13,25 @@ import {
   type InitRuntimeResult,
 } from "./runtime-lifecycle.js";
 import { getRepoByRoot } from "./team-store.js";
-export const PROJECT_INSTRUCTION_VERSION = "1";
+export const PROJECT_INSTRUCTION_VERSION = "2";
 export const PROJECT_INSTRUCTION_START = "<!-- VIBEHUB:START -->";
 export const PROJECT_INSTRUCTION_END = "<!-- VIBEHUB:END -->";
 const VERSION_PREFIX = "<!-- VIBEHUB:VERSION";
 export const DEFAULT_PROJECT_INSTRUCTION_BODY = `## VibeHub
 
-This project uses VibeHub as its persistent context layer. Before non-trivial
-work, query the relevant project context. When durable intent, decisions,
-constraints, conventions, contracts, context, or changes emerge, use the
-VibeHub workflow skills to persist them. Treat VibeHub receipts as the source
-of truth for whether an operation was merely attempted or actually persisted.`;
+When this checkout contains the canonical Git-native Ticket ledger, use its
+Ticket graph as the development control plane: plan concrete deliverables as
+Tickets, execute one READY Ticket from its compiled ContextBinding, attach
+acceptance-linked Evidence, and use an independent closeout. Protected product,
+experience, permission, and risk choices still require human Decisions.
+
+VibeHub's Context Layer remains the governed knowledge infrastructure beneath
+that loop. Query it when planning or execution needs project-wide knowledge,
+and ingest durable intent, decisions, constraints, conventions, contracts,
+context, or changes that should govern work across Tickets. In checkouts
+without a Ticket ledger, query before non-trivial work and use the Context
+Layer directly. Treat operation receipts as the source of truth for persistence.
+register_scope and self_report are optional coordination tools in both modes.`;
 export type ActivationProofState = "proven" | "not_proven" | "blocked";
 export interface ActivationProof { state: ActivationProofState; evidence: string[] }
 export type ProjectInstructionStatus = "missing" | "append" | "upgrade" | "current" | "conflict";

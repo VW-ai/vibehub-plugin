@@ -1,13 +1,14 @@
 /**
- * Task-scoped periodic knowledge checkpoint (intent-workbench-003).
+ * Task-scoped knowledge-checkpoint cadence (intent-workbench-003).
  *
- * The hook owns WHEN only: it counts deduplicated user prompts per
- * (repo, task) and, once enough turns pass without a new canonical
- * knowledge write, reminds the agent — once — to review the conversation
- * for durable knowledge. Whether durable knowledge exists, how it is
- * classified, and what gets written stay with the model and the
- * vibehub-ingest skill (decision-workbench-010); nothing here parses
- * transcripts, estimates tokens, or classifies semantics.
+ * The hook owns WHEN only: it counts deduplicated user prompts per (repo,
+ * task). Context-only repositories still receive the periodic reminder as a
+ * safety net. Ticket-managed repositories record the same cadence as a shadow
+ * checkpoint without injecting it into the active Run; Ticket planning and
+ * closeout own the semantic capture boundaries there. Whether durable
+ * knowledge exists, how it is classified, and what gets written stay with the
+ * model and the vibehub-ingest skill (decision-workbench-010); nothing here
+ * parses transcripts, estimates tokens, or classifies semantics.
  *
  * Reset evidence = kb_provenance_events: the append-only ledger written
  * ONLY inside successful canonical KB mutations. Failed mutations roll
@@ -31,13 +32,11 @@ import type { Db } from "./db.js";
 import { getSetting } from "./graph-store.js";
 
 /**
- * Default user-turn cadence between checkpoint reminders. Tunable, awaits
- * dogfood benchmark — no empirical basis yet. Seed reasoning: the session
- * protocol already asks for ingest-at-decision-time, so the checkpoint is
- * a safety net; a handful of turns approximates one work phase without
- * nagging every exchange. Override per repo or globally via the settings
- * key below; invalid or non-positive values fall back here ("0" is not a
- * disable switch — disabling would be an explicit product decision).
+ * Default user-turn cadence between emitted or shadow checkpoints. The
+ * checkpoint remains a context-only safety net; Ticket-managed work uses the
+ * same cadence for migration observability without interrupting execution.
+ * Override per repo or globally via the settings key below; invalid or
+ * non-positive values fall back here.
  */
 export const DEFAULT_CHECKPOINT_CADENCE_TURNS = 8;
 
@@ -60,7 +59,12 @@ export function resolveCheckpointCadence(db: Db, repoId: number): number {
     : DEFAULT_CHECKPOINT_CADENCE_TURNS;
 }
 
-export type CheckpointStatus = "counted" | "duplicate" | "fired" | "deferred";
+export type CheckpointStatus =
+  | "counted"
+  | "duplicate"
+  | "fired"
+  | "deferred"
+  | "shadowed";
 
 export interface CheckpointCadenceFacts {
   status: CheckpointStatus;
@@ -80,6 +84,11 @@ export interface CheckpointTurnInput {
   now: string;
   /** True when this same hook fire is delivering claimed interventions. */
   deliveringInterventions: boolean;
+  /**
+   * Ticket-managed tasks preserve cadence facts without injecting a generic
+   * knowledge reminder into the execution loop.
+   */
+  reminderMode?: "emit" | "shadow";
 }
 
 /**
@@ -90,9 +99,9 @@ export interface CheckpointTurnInput {
  *    last_write_turn to the current count;
  * 2. replay dedup — a prompt_id seen before never counts and never fires,
  *    so duplicated hook registrations are inert;
- * 3. strict priority — an eligible turn that is delivering claimed
- *    interventions defers (reminder turn untouched) and retries on the
- *    next quiet turn; a pause instruction is never contradicted.
+ * 3. Ticket-managed shadow mode records the boundary without delivery;
+ * 4. otherwise an eligible turn delivering claimed interventions defers
+ *    (reminder turn untouched) and retries on the next quiet turn.
  */
 export function recordUserPromptTurn(
   db: Db,
@@ -137,11 +146,15 @@ export function recordUserPromptTurn(
   const status: CheckpointStatus = !isNew
     ? "duplicate"
     : eligible
-      ? input.deliveringInterventions
-        ? "deferred"
-        : "fired"
+      ? input.reminderMode === "shadow"
+        ? "shadowed"
+        : input.deliveringInterventions
+          ? "deferred"
+          : "fired"
       : "counted";
-  if (status === "fired") lastReminderTurn = countedTurns;
+  if (status === "fired" || status === "shadowed") {
+    lastReminderTurn = countedTurns;
+  }
 
   db.prepare(
     `UPDATE task_prompt_cadence

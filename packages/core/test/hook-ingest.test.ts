@@ -82,9 +82,35 @@ describe("ingestHookEvent on a scratch repo", () => {
     expect(task.title).toBe("vibehub/fix-login"); // branch = the only honest title
     expect(task.signalTier).toBe("hooks");
     expect(getRepoByRoot(db, repo.work)).not.toBeNull();
-    expect(r.output?.hookSpecificOutput?.additionalContext).toContain(
-      "use the vibehub-query skill",
+    const context = r.output?.hookSpecificOutput?.additionalContext ?? "";
+    expect(context).toContain("persistent context layer");
+    expect(context).toContain("use the vibehub-query skill");
+    expect(context).toContain("optional coordination tools");
+    expect(context).not.toContain("primary development surface");
+  });
+
+  it("routes SessionStart through the Ticket control plane only for a canonical Ticket ledger", () => {
+    const ticketRoot = path.join(repo.work, ".vibehub", "tickets");
+    fs.mkdirSync(ticketRoot, { recursive: true });
+    fs.writeFileSync(path.join(ticketRoot, "protocol.yaml"), "schema_version: 1\n");
+
+    const ticketStart = ingestHookEvent(
+      db,
+      "SessionStart",
+      payload(),
+      { now: () => T(0) },
     );
+    const context = ticketStart.output?.hookSpecificOutput?.additionalContext ?? "";
+    expect(context).toContain("primary development surface");
+    expect(context).toContain("vibehub-ticket-plan");
+    expect(context).toContain("one READY Ticket");
+    expect(context).toContain("compiled ContextBinding");
+    expect(context).toContain("conversation memory is optional context");
+    expect(context).toContain("acceptance-linked Evidence");
+    expect(context).toContain("separate Agent for vibehub-ticket-closeout");
+    expect(context).toContain("Ticket Review and Decision");
+    expect(context).toContain("optional coordination tools");
+    expect(context).not.toContain("persistent context layer. Protocol");
   });
 
   it("reminds once when an edit leaves the current raw write scope", () => {
@@ -644,6 +670,41 @@ describe("knowledge checkpoint cadence (intent-workbench-003)", () => {
       status: "fired", countedTurns: 6, turnsSinceLastWrite: 6, threshold: 3,
     });
     expect(again.output?.hookSpecificOutput?.additionalContext).toContain("6 user turns");
+  });
+
+  it("shadows and re-arms the same deduplicated cadence in Ticket-managed checkouts", () => {
+    const ticketRoot = path.join(repo.work, ".vibehub", "tickets");
+    fs.mkdirSync(ticketRoot, { recursive: true });
+    fs.writeFileSync(path.join(ticketRoot, "protocol.yaml"), "schema_version: 1\n");
+
+    expect(prompt(1).checkpoint?.status).toBe("counted");
+    expect(prompt(2).checkpoint?.status).toBe("counted");
+    const shadowed = prompt(3);
+    expect(shadowed.checkpoint).toEqual({
+      status: "shadowed", countedTurns: 3, turnsSinceLastWrite: 3, threshold: 3,
+    });
+    expect(shadowed.output).toBeUndefined();
+    expect(cadenceRow(taskBranch)?.lastReminderTurn).toBe(3);
+
+    const replay = ingestHookEvent(
+      db,
+      "UserPromptSubmit",
+      payload({ prompt: "turn 3", prompt_id: "p-3" }),
+      { now: () => T(4) },
+    );
+    expect(replay.checkpoint).toEqual({
+      status: "duplicate", countedTurns: 3, turnsSinceLastWrite: 3, threshold: 3,
+    });
+    expect(replay.output).toBeUndefined();
+
+    prompt(4);
+    prompt(5);
+    const again = prompt(6);
+    expect(again.checkpoint).toEqual({
+      status: "shadowed", countedTurns: 6, turnsSinceLastWrite: 6, threshold: 3,
+    });
+    expect(again.output).toBeUndefined();
+    expect(cadenceRow(taskBranch)?.lastReminderTurn).toBe(6);
   });
 
   it("never counts or fires a replayed prompt event (stable prompt identity)", () => {

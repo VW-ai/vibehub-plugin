@@ -220,8 +220,33 @@ try {
     }),
   });
   const hookReceipt = JSON.parse(hookOutput);
-  if (!hookReceipt.hookSpecificOutput?.additionalContext?.includes("register_scope")) {
-    throw new Error("installed Codex SessionStart hook did not emit the shared protocol");
+  if (!hookReceipt.hookSpecificOutput?.additionalContext?.includes("persistent context layer")) {
+    throw new Error("installed Codex SessionStart hook did not emit the context-first protocol");
+  }
+
+  const ticketRoot = join(repo, ".vibehub", "tickets");
+  mkdirSync(ticketRoot, { recursive: true });
+  writeFileSync(join(ticketRoot, "protocol.yaml"), "schema_version: 1\n");
+  const ticketHookReceipt = JSON.parse(run("/bin/sh", ["-c", sessionCommand], {
+    cwd: repo,
+    env: {
+      ...env,
+      CLAUDE_PLUGIN_ROOT: installedRoot,
+      PLUGIN_ROOT: installedRoot,
+    },
+    input: JSON.stringify({
+      session_id: "codex-ticket-session",
+      transcript_path: null,
+      cwd: repo,
+      hook_event_name: "SessionStart",
+      model: "gpt-5",
+      permission_mode: "default",
+      source: "startup",
+    }),
+  }));
+  const ticketContext = ticketHookReceipt.hookSpecificOutput?.additionalContext ?? "";
+  if (!ticketContext.includes("primary development surface") || !ticketContext.includes("compiled ContextBinding")) {
+    throw new Error("installed Codex SessionStart hook did not emit the Ticket-first protocol");
   }
 
   await verifyCodexHostStartsMcp(codexBin, env, repo);

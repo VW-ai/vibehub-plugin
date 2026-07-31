@@ -186,8 +186,8 @@ try {
       }),
     ),
   );
-  if (!hookOutput.hookSpecificOutput?.additionalContext?.includes("register_scope")) {
-    throw new Error("installed Claude plugin did not start the public npm runtime");
+  if (!hookOutput.hookSpecificOutput?.additionalContext?.includes("persistent context layer")) {
+    throw new Error("installed Claude plugin did not emit context-first guidance from the public npm runtime");
   }
 
   const codexEnv = installerReceipt
@@ -302,11 +302,11 @@ try {
   );
   if (
     !codexHookOutput.hookSpecificOutput?.additionalContext?.includes(
-      "register_scope",
+      "persistent context layer",
     )
   ) {
     throw new Error(
-      "installed Codex plugin did not emit the shared SessionStart protocol",
+      "installed Codex plugin did not emit the context-first SessionStart protocol",
     );
   }
   await verifyCodexHostStartsMcp(codexBin, codexRuntimeEnv, repo, {

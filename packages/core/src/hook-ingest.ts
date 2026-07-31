@@ -227,6 +227,9 @@ export function ingestCanonicalHookEvent(
   // use). Branch/toplevel come from the SESSION's cwd (a worktree has its
   // own HEAD); repoRoot is the shared domain (decision-github-004).
   const ctx = GitFacade.sessionContextAt(payload.cwd);
+  const ticketManaged = (
+    hook === "SessionStart" || hook === "UserPromptSubmit"
+  ) && hasTicketLedgerProtocol(ctx.toplevel);
   const validatedToolTouches = validatedToolPaths(payload.toolTouches ?? [], payload.cwd, ctx.toplevel);
   // Slug/default-branch are stable repo facts — spawn for them only the
   // first time this repo is ever seen.
@@ -481,13 +484,18 @@ export function ingestCanonicalHookEvent(
       promptId: payload.promptIdentity,
       now: nowIso,
       deliveringInterventions: claimed.length > 0,
+      reminderMode: ticketManaged ? "shadow" : "emit",
     });
     if (checkpoint.status === "fired") {
       conditionalContext.push(formatCheckpointReminder(checkpoint, taskId));
     }
   }
 
-  if (hook === "SessionStart") conditionalContext.unshift(SESSION_PROTOCOL);
+  if (hook === "SessionStart") {
+    conditionalContext.unshift(
+      ticketManaged ? TICKET_SESSION_PROTOCOL : CONTEXT_SESSION_PROTOCOL,
+    );
+  }
   if (!delivery && conditionalContext.length > 0) {
     delivery = {
       kind: "additional_context",
@@ -534,17 +542,30 @@ function legacyClaudeToolTouches(
   return [];
 }
 
-const SESSION_PROTOCOL = `[Vibehub] This repo runs Vibehub — your team's shared context layer. Protocol:
-1. Before your first edit, call register_scope with what you'll touch and one line on what you're doing.
-2. Before working in code you haven't touched this session, use the vibehub-query skill; decisions and constraints may bind it.
-3. When a design decision is made, use the vibehub-ingest skill to capture it now; don't batch it for later.
-4. If your direction changes, call self_report with one line.
-Call get_manual only when you need the full picture. Skipping this protocol hides your work from your team.`;
+const TICKET_SESSION_PROTOCOL = `[Vibehub] This checkout uses its Git-native Ticket graph as the primary development surface. Protocol:
+1. For a concrete deliverable, use vibehub-ticket-plan; for existing work, read the frontier and use vibehub-ticket-run on one READY Ticket.
+2. Treat the Ticket's compiled ContextBinding, current Decisions, and direct prerequisite Outcomes as execution authority; conversation memory is optional context.
+3. Use vibehub-query when planning needs project-wide knowledge or a Ticket exposes missing context. Use vibehub-ingest only for durable knowledge that should govern work across Tickets.
+4. Record acceptance-linked Evidence during execution and use a separate Agent for vibehub-ticket-closeout. Protected product, experience, permission, or risk choices go through Ticket Review and Decision.
+register_scope and self_report remain optional coordination tools. Call get_manual only when you need the component boundaries.`;
+
+const CONTEXT_SESSION_PROTOCOL = `[Vibehub] This checkout uses VibeHub as its persistent context layer. Protocol:
+1. Before non-trivial work, use the vibehub-query skill to retrieve relevant governed context, decisions, and constraints.
+2. When durable intent, decisions, constraints, conventions, contracts, context, or changes emerge, use vibehub-ingest to persist them; do not create filler records.
+3. Treat canonical operation receipts as the source of truth for whether knowledge was merely attempted or actually persisted.
+register_scope and self_report are optional coordination tools. Call get_manual only when you need the component boundaries.`;
+
+function hasTicketLedgerProtocol(worktreeRoot: string): boolean {
+  return fs.lstatSync(
+    path.join(worktreeRoot, ".vibehub", "tickets", "protocol.yaml"),
+    { throwIfNoEntry: false },
+  )?.isFile() === true;
+}
 
 function formatOffScopeReminder(file: string): string {
   return (
     `[Vibehub] Your last edit (${file}) is outside your declared write scope. ` +
-    "If your plan changed, call self_report with one line and register_scope the new area. " +
+    "If your plan changed and you are using the optional coordination tools, update self_report and register_scope for the new area. " +
     "If this is a quick touch-up, continue; you won't be reminded again for this scope."
   );
 }

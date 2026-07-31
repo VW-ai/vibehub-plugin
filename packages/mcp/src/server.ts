@@ -45,12 +45,12 @@ export function createWorkbenchMcpServer(
   const api = async () => capabilities;
   const server = new McpServer(
     { name: "vibehub-local", version: WORKBENCH_MCP_VERSION },
-    { instructions: "Vibehub MCP exposes deterministic local capabilities. Semantic workflows live in vibehub skills." },
+    { instructions: "Vibehub MCP exposes deterministic local capabilities. Ticket Skills own the development control loop when a ledger exists; Context Skills preserve governed knowledge quality." },
   );
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[0], {
     title: "Register session scope",
-    description: "Store this task's repo-relative read/write globs and human-readable status. Replaces the previous declaration; attribution is derived later.",
+    description: "Optional coordination: store this task's repo-relative read/write globs and human-readable status. Replaces the previous declaration; attribution is derived later.",
     inputSchema: {
       status: z.string().min(1).max(200),
       write: z.array(scopeItem).min(1),
@@ -60,7 +60,7 @@ export function createWorkbenchMcpServer(
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[1], {
     title: "Update task status",
-    description: "Persist one concise status line and an optional completed step. This is a mechanical task fact, not a report-writing workflow.",
+    description: "Optional coordination: persist one concise status line and an optional completed step. This is a mechanical task fact, not a report-writing workflow.",
     inputSchema: {
       status: z.string().min(1).max(200),
       done: z.string().min(1).max(200).optional(),
@@ -101,7 +101,7 @@ export function createWorkbenchMcpServer(
 
   server.registerTool(WORKBENCH_MCP_TOOL_NAMES[5], {
     title: "Dispatch one canonical Ticket operation",
-    description: "Read the current Git-native Ticket graph, compile exact execution context, coordinate a bounded Run, append evidence or independent closeout, apply one validated exact-base worktree patch, or append review facts. Ticket Decisions fail closed unless a trusted host injects exact human authority; the generic MCP runtime never does. Ticket semantics come from the trusted workspace path, never SQLite; Skills own planning and judgment.",
+    description: "Operate the primary development control plane for a Ticket-managed checkout: read the current Git-native Ticket graph, compile exact execution context, coordinate a bounded Run, append evidence or independent closeout, apply one validated exact-base worktree patch, or append review facts. Ticket Decisions fail closed unless a trusted host injects exact human authority; the generic MCP runtime never does. Ticket semantics come from the trusted workspace path, never SQLite; Skills own planning and judgment.",
     inputSchema: {
       requestId: logicalRequestId,
       operation: z.enum(TICKET_OPERATION_NAMES),
