@@ -1,0 +1,107 @@
+{
+  "created_at": "2026-07-31T08:08:45.769Z",
+  "current_revision": 1,
+  "feature_id": null,
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex",
+      "at": "2026-07-31T08:08:45.769Z",
+      "durable_id": "963cb0c17cc5bdbf91177d801d40a796793e024af82dee0e5a0d26fb6586aee6",
+      "operation": "spec_batch",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T08:08:45.769Z",
+          "idempotencyKey": "codex-desktop-hook-onboarding-20260731-v1",
+          "inputHash": "3b850358890587cf3d5fa12e9f36b223173dfb9203ea0983cc81723d8d2edaf4",
+          "operation": "spec_batch",
+          "result": {
+            "created": [
+              "context-codex-desktop-hook-trust-control-plane",
+              "decision-codex-desktop-self-service-hook-trust"
+            ],
+            "idempotencyKey": "codex-desktop-hook-onboarding-20260731-v1",
+            "inputHash": "3b850358890587cf3d5fa12e9f36b223173dfb9203ea0983cc81723d8d2edaf4",
+            "operation": "spec_batch",
+            "state": "active",
+            "validation": {
+              "checks": [
+                "schema",
+                "evidence",
+                "anchors",
+                "relations"
+              ],
+              "status": "passed"
+            }
+          }
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "desktop-hook-docs-20260731:apply:01",
+      "task_id": "codex-desktop-hook-docs-20260731"
+    }
+  ],
+  "relations": [],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "README.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "docs/INSTALL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-setup/references/codex.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "A Codex Desktop task should launch an interactive codex CLI in the exact checkout, review the VibeHub hooks through /hooks, and complete trust when its terminal and permission policy permit. If the task cannot do so, it instructs the user to run the same CLI step manually. Afterward, onboarding starts a fresh Desktop task and does not request duplicate Desktop approval.",
+      "domain": "codex-host-integration",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "decision-codex-desktop-self-service-hook-trust:1:1",
+          "evidence_ref": null,
+          "exact_quote": "也可以让codex desktop端的用户，直接让自己的codex desktop起一个cli 自己trust交互都行了。",
+          "produced_at": "2026-07-31T08:08:45.769Z",
+          "producer": "codex",
+          "source_ref": "Codex task conversation 2026-07-31",
+          "source_type": "user-decision"
+        }
+      ],
+      "layer": null,
+      "priority": null,
+      "produced_at": "2026-07-31T08:08:45.769Z",
+      "producer": "codex",
+      "revision": 1,
+      "summary": "VibeHub Desktop onboarding lets the desktop task drive the interactive Codex CLI trust flow when policy allows, with manual CLI as fallback.",
+      "tags": [
+        "codex",
+        "desktop",
+        "hooks",
+        "onboarding"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-codex-desktop-self-service-hook-trust",
+  "state": "active",
+  "updated_at": "2026-07-31T08:08:45.769Z"
+}

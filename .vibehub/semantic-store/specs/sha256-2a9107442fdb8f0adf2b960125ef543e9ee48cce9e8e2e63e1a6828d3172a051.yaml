@@ -1,0 +1,234 @@
+{
+  "created_at": "2026-07-30T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "fead0abffb3d2a0e6472a167335ff0b35bc8670638af62991c6d38b36d345061",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 10,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "sourcePath": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "sourceProvenance": {
+            "confidence": 0.98,
+            "produced_at": "2026-07-30",
+            "produced_by_agent": "implementation",
+            "source_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+            "source_type": "implementation_design"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-contract-002",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-git-native-ledger-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-graph-lifecycle-002",
+      "type": "depends_on"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/core/src/git-facade.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-context-compiler.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-ledger",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-ticket-run/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "The v0 compiler binds the current Ticket revision and graph, exact direct\nprerequisite Outcomes, dynamically verified relevant current Decisions\nand their exact authority receipts, repository/worktree/branch identity,\nthe execution-start code source, and every authored context reference.\nRepository file and directory references are expanded deterministically\ninto bounded UTF-8 files with path, byte length, and content digest.\nMissing, ambiguous, overlapping, symlinked, special, binary, changing, or\noversized required context fails closed. Git administration paths and the\nsemantic Ticket ledger cannot be copied back into the generic file packet:\nTicket, Decision, receipt, prerequisite Outcome, and graph identity enter\nthrough their first-class binding fields. Claim recompiles the authored\ncontext manifest before execution begins, so an ignored-file change that\nGit status cannot see still invalidates the binding.\n\nThe Git ContextBinding stores the exact manifest and packet digest. The\noperation response supplies the bounded contents to the fresh Agent.\nContextBinding is a semantic fact; live ownership and heartbeat remain\ndisposable Run coordination. Feature Room v0 is consumed through its\nchecked-in Specs, mapping artifacts, and provenance refs. A generic\nprovider framework is deliberately deferred. Decision verification stays\ndynamic after closeout: revoked or otherwise non-current authority keeps\nthe recorded binding and Outcome traceable but withdraws operational DONE\nand downstream eligibility.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-1",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must] Bind exact Ticket ID and revision, graph digest, direct prerequisite successful Outcomes, dynamically verified relevant Decisions and exact verification refs, repository incarnation, worktree identity, branch, starting HEAD, and non-ledger worktree source digest including dirty worktree bytes, staged blob IDs, and modes",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-10",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must_not] Do not generalize v0 into a provider marketplace or copy the whole repository into every ContextBinding",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-2",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must] Resolve authored context references as canonical repository-relative regular UTF-8 files or bounded directories and preserve purpose, path, digest, and byte length",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-3",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must] Fail closed on stale Ticket/source, unresolved prerequisites, unverified, revoked, tampered, changed, or non-authorizing relevant Decision authority, missing or overlapping paths, symlinks, special or binary files, source movement, and declared capacity overflow",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-4",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must] Reject any case-folded .git path segment and any generic context ref that names, descends from, or contains .vibehub/tickets; bind Ticket, graph, Decision, verification, and prerequisite Outcome semantics only through first-class fields",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-5",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must] Before claim, recompile the current authored context references and require their exact ordered manifest and content digest to match the stored ContextBinding, including ignored files and new files inside referenced directories",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-6",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must] Revalidate bound Decision authority for current operational completion and downstream eligibility without deleting the durable ContextBinding or Outcome when authority is withdrawn",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-7",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must] Apply the current forbidden-context-ref policy when deriving operational DONE and downstream eligibility; preserve raw historical facts but withdraw operational completion for a now-invalid binding",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-8",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must] Persist the bounded manifest and packet digest in Git while returning file contents only in the compiled execution packet",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:constraint-9",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "[must_not] Do not treat conversation memory, SQLite, a mutable latest pointer, or an unverified review claim as required execution context",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:c60fbec83e53c3d2511f53a5ed7bcfd783bf5dd3984d103a3fa9b1cfb41f1218",
+          "evidence_id": "contract-ticket-context-binding-001:1:meta-source",
+          "evidence_ref": "M4 MR-ready context-binding settlement — 2026-07-30",
+          "exact_quote": "A Ticket execution starts from one bounded, exact, fail-closed context binding rather than conversation memory or a mutable latest pointer.",
+          "produced_at": "2026-07-30T00:00:00.000Z",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-context-binding-001.yaml",
+          "source_type": "implementation_design"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-30T00:00:00.000Z",
+      "producer": "meta:implementation",
+      "revision": 1,
+      "summary": "A Ticket execution starts from one bounded, exact, fail-closed context binding rather than conversation memory or a mutable latest pointer.",
+      "tags": [
+        "ticket",
+        "execution",
+        "context",
+        "git",
+        "worktree",
+        "feature-room"
+      ],
+      "type": "contract"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "contract-ticket-context-binding-001",
+  "state": "active",
+  "updated_at": "2026-07-30T00:00:00.000Z"
+}

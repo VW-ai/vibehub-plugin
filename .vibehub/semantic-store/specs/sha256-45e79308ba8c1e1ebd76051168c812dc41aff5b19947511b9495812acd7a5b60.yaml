@@ -1,0 +1,223 @@
+{
+  "created_at": "2026-07-20T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "08-git-semantic-store",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "454a32112e8130651a19d16f67e8ce1ff15c76e318415a2911d43a5de981e172",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 7,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "sourcePath": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "produced_at": "2026-07-20",
+            "source_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META constrained_by relation from decision-project-028: The machine-level SQLite operational topology and canonical repository identity remain active.",
+      "to_spec_id": "contract-runtime-001",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from decision-project-028",
+      "to_spec_id": "intent-project-004",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/08-git-semantic-store/technical-review.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/cli/src/main.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/experimental/git-semantic-store/index.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/git-semantic-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/operation-dispatcher.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/test/git-semantic-merge-spike.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/test/git-semantic-ref-cache.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/test/git-semantic-store.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "The completed architecture spikes support a split authority model. A strict\nGit semantic tree carries durable feature/spec/revision/evidence/anchor/\nrelation/provenance truth. SQLite remains canonical for operational state\nand holds rebuildable semantic query caches keyed by repository identity,\ncommit SHA and derived semantic digest.\n\nStable identity-derived paths preserve useful native Git merge behavior.\nMutable global manifests and committed global digests are rejected as\ncollaboration hotspots. Branch commits are durable proposals; merged main\nis shared semantic truth. Provenance uses collision-safe durable content\nidentity while SQLite integer IDs remain cache-local projections.\n\nWayne approved all six review decisions on 2026-07-20. Repositories cut\nover independently when their canonical protocol appears; this avoids a\nglobal flag day and gives every repository one non-dual-write authority\nboundary.\n",
+      "domain": "git-semantic-store",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "evidence_id": "decision-project-028:1:constraint-1",
+          "evidence_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+          "exact_quote": "[must] Durable semantic entity paths derive from stable identity, while inventory and semantic digests derive from the selected Git tree or commit",
+          "produced_at": "2026-07-20T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "evidence_id": "decision-project-028:1:constraint-2",
+          "evidence_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+          "exact_quote": "[must] Every semantic read identifies its source ref and resolved commit; caches are isolated by repository, commit and semantic digest",
+          "produced_at": "2026-07-20T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "evidence_id": "decision-project-028:1:constraint-3",
+          "evidence_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+          "exact_quote": "[must] SQLite remains source of truth for sessions, hooks, events, queues, claims, leases, cadence, distillation runs and live projections",
+          "produced_at": "2026-07-20T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "evidence_id": "decision-project-028:1:constraint-4",
+          "evidence_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+          "exact_quote": "[must] A deterministic validator and CI enforce protocol and graph integrity independently of any PR skill",
+          "produced_at": "2026-07-20T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "evidence_id": "decision-project-028:1:constraint-5",
+          "evidence_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+          "exact_quote": "[must] Workflow skills depend on stable semantic operations and governed lifecycle concepts, never semantic-store paths, file formats, cache topology or database implementation",
+          "produced_at": "2026-07-20T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "evidence_id": "decision-project-028:1:constraint-6",
+          "evidence_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+          "exact_quote": "[must] Migration uses one reviewed authority cutover with writer freeze, parity proof, backup and rollback receipt",
+          "produced_at": "2026-07-20T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "evidence_id": "decision-project-028:1:constraint-7",
+          "evidence_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+          "exact_quote": "[must_not] Do not introduce semantic dual-write or silently union knowledge from different refs",
+          "produced_at": "2026-07-20T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2dbe4fd0b1a3a882ca4e340663cedd77f6045aaec208bdeba742256281572981",
+          "evidence_id": "decision-project-028:1:meta-source",
+          "evidence_ref": "Wayne approved the six technical-review decisions and autonomous migration — 2026-07-20",
+          "exact_quote": "Adopt Git semantic store as durable semantic truth and retain SQLite for operational truth plus commit-keyed semantic caches",
+          "produced_at": "2026-07-20T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/08-git-semantic-store/specs/decision-project-028.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-20T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Adopt Git semantic store as durable semantic truth and retain SQLite for operational truth plus commit-keyed semantic caches",
+      "tags": [
+        "git",
+        "yaml",
+        "sqlite",
+        "cache",
+        "provenance",
+        "source-of-truth",
+        "architecture-review"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-project-028",
+  "state": "active",
+  "updated_at": "2026-07-20T00:00:00.000Z"
+}

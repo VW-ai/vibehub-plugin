@@ -16,6 +16,7 @@ import {
   stableSemanticPath,
   upsertRepo,
 } from "../src/index.js";
+import { seedActiveMapping } from "./kb-fixtures.js";
 
 const NOW = "2026-07-20T10:00:00.000Z";
 
@@ -51,8 +52,12 @@ describe("Git semantic authority cutover", () => {
 
     const db = openDb(dbPath);
     const row = upsertRepo(db, repo, "vibehub/authority", "main", NOW);
-    db.prepare(`INSERT INTO kb_features(repo_id,feature_id,created_at)
-      VALUES (?, 'feature/auth', ?)`).run(row.id, NOW);
+    seedActiveMapping(db, row.id, [{
+      id: "feature/auth",
+      name: "Authentication",
+      anchors: [{ file: "README.md" }],
+      layout: { pctLeft: 1, pctTop: 2, pctWidth: 3, pctHeight: 4 },
+    }], NOW);
     db.close();
 
     const migrated = migrateSqliteSemanticStoreToGit({

@@ -1,0 +1,116 @@
+{
+  "created_at": "2026-07-12T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "21-workbench",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "d53edfee49c46f29a4fd7a7ef313d69adb3bbba53faccf4b9180fa1a96850fe3",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 0,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:4a2031a8e68b138565f6e3d1f78f27e03c6b5c2479afe030856eaee61bc86c85",
+          "sourcePath": "META/legacy-21-workbench/specs/change-2026-07-12-m2-integration-design.yaml",
+          "sourceProvenance": {
+            "confidence": 0.9,
+            "produced_at": "2026-07-12",
+            "source_ref": "M2 integration session 2026-07-12",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from change-2026-07-12-m2-integration-design: 机械启发式兜底档",
+      "to_spec_id": "decision-workbench-001",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-workbench-006",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "pendingInjections"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/hook-ingest.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "formatDelivery"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/hook-ingest.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "ingestHookEvent"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/milestone.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "classifyUserPrompt"
+        }
+      ],
+      "detail": "设计侧(卡点前不 promote):\n- hooks 官方能力表 2026-07-12 抓自 code.claude.com/docs/en/hooks 钉死成表\n  (design-claude-code-integration.md 块A.0),Stop additionalContext 唤醒\n  语义、SessionStart(source=compact) 重注入口等关键事实非凭记忆;\n- decision-workbench-006(draft):九事件接线矩阵 + 注入预算总账 +\n  robustness 判决(不自建监听器,降级走 021 弱档);\n- decision-workbench-007(draft):四组微协议文本各 2-3 候选,style-tiles\n  式待逐条选;\n- decision-workbench-008(draft):register_scope/self_report/kb_retrieve/\n  kb_record 的 description 逐字文本 + schema,GitHub-why-not 已答。\n\n代码侧(块D,不等卡点):\n- 注入投递端:回查点从 UserPromptSubmit/PostToolUse 扩到 Stop(送达即\n  唤醒,fire-and-forget 不等下条 prompt)与 SessionStart(离场补送);\n  pause/inject 双模包装,批内一 pause 全 pause(最严胜出),包装文本\n  标注 PROVISIONAL 待卡点 2;claimed_at = 送达回执,超时不存态——\n  pendingInjections() 读侧推导(与 stalled 同纪律);\n- 里程碑机械兜底(workbench-001):classifyUserPrompt 纯函数,\n  routine(ack 词表)/milestone(结构或加权长度,CJK×2)/ambiguous\n  (留薄 LLM 异步再裁);launch 恒里程碑不分类;deck 注入不分类\n  (介入必入两档,023);\n- 契约增量:LaunchEvent/UserInjectionEvent +promptId(hook 自带\n  prompt_id,001 回溯),UserInjectionEvent +classification;\n- core vitest 105/105(+13),core/cli tsc clean。\n",
+      "domain": "workbench",
+      "evidence": [
+        {
+          "confidence": 0.9,
+          "content_hash": "sha256:4a2031a8e68b138565f6e3d1f78f27e03c6b5c2479afe030856eaee61bc86c85",
+          "evidence_id": "change-2026-07-12-m2-integration-design:1:meta-source",
+          "evidence_ref": "M2 integration session 2026-07-12",
+          "exact_quote": "M2 Claude Code 集成层第一批:设计块 A/B/C 落 draft(006 hook 矩阵/007 微协议文本/008 MCP 工具面,三卡点待 Wayne)+ 机械块 D 实装(注入投递端扩 Stop/SessionStart+pause 包装+送达读侧语义;里程碑机械启发式 CJK 加权)",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/legacy-21-workbench/specs/change-2026-07-12-m2-integration-design.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P1",
+      "produced_at": "2026-07-12T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "M2 Claude Code 集成层第一批:设计块 A/B/C 落 draft(006 hook 矩阵/007 微协议文本/008 MCP 工具面,三卡点待 Wayne)+ 机械块 D 实装(注入投递端扩 Stop/SessionStart+pause 包装+送达读侧语义;里程碑机械启发式 CJK 加权)",
+      "tags": [
+        "claude-code",
+        "hooks",
+        "injection-delivery",
+        "milestone-heuristic",
+        "m2"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-12-m2-integration-design",
+  "state": "active",
+  "updated_at": "2026-07-12T00:00:00.000Z"
+}

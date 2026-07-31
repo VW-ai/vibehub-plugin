@@ -1,0 +1,210 @@
+{
+  "created_at": "2026-07-29T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "6e4a793fc95b19cb2ae951ba5264359597285d7357c779e3f768511153e29b53",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 7,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "sourcePath": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "sourceProvenance": {
+            "confidence": 0.98,
+            "produced_at": "2026-07-29",
+            "produced_by_agent": "ingest",
+            "source_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-contract-002",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-git-native-ledger-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-intelligence-loop-001",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/core/src/git-facade.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/operation-dispatcher.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-ledger/projection.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-ledger/reader.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-review-resolver.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "**Decision**: The selected Git worktree/tree is the Ticket semantic\nlifecycle boundary.\n\nTicket definitions and typed relations describe the current graph.\nProposal, Validation, Decision, ApplicationReceipt, Outcome, and Evidence\ndocuments preserve the meaningful causal record when that record exists.\nThey are not mandatory stages for every mutation. A Skill decides which\nfacts are needed from the change class and authority boundary:\n\n- delegated clarification or decomposition may be independently validated\n  and applied directly without manufacturing a semantic receipt;\n- an initial plan may enter the current graph after machine validation;\n  human review or explicit delegation gates execution of that active graph,\n  not Ticket activation;\n- a candidate that would select or alter an experience/product choice,\n  accepted architecture or principle, permission/side effect, or\n  policy/risk boundary preserves the unresolved question as a blocker and\n  creates an explicit Proposal or human Decision only when that durable\n  comparison or answer exists;\n- inconclusive validation or honest Planning Fog remains visible rather\n  than fabricating downstream Tickets.\n\nDeterministic scripts bind a mutation to the observed Git HEAD when\ncommitted, the current graph digest, and every targeted Ticket revision.\nThey fail stale changes before writing. A successful patch updates the\naffected Ticket documents as one validated worktree change set. A semantic\nreceipt document is created only when its causal meaning is independently\nuseful; it is not a patch stage. Normal Git commit, merge, and conflict\nsemantics carry collaboration and history; there is no parallel\n`latest.yaml` generation, SQLite application intent, cross-store writer\nfence, or SQLite terminal receipt.\n\nEach worktree reads its checked-out Ticket world. Same-named branches or\nTickets in sibling worktrees may proceed independently. SQLite Run state\nbinds repository identity, worktree identity, exact HEAD/dirty graph\ndigest, Ticket ID, and Ticket revision. Switching branch or changing the\nbound graph makes an active Run stale or suspended instead of transferring\nit silently.\n\nDONE and readiness are reconstructed from durable Ticket, Decision,\nOutcome, and Evidence facts plus any currently live Run observations.\nLosing SQLite may lose heartbeat or a claim, but never durable completion.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "evidence_id": "decision-ticket-graph-lifecycle-002:1:constraint-1",
+          "evidence_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+          "exact_quote": "[must] Every semantic mutation is bound to the observed Git source, graph digest, and targeted Ticket revisions and fails closed when stale",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "evidence_id": "decision-ticket-graph-lifecycle-002:1:constraint-2",
+          "evidence_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+          "exact_quote": "[must] Proposal, Validation, Decision, and semantic Receipt documents are created according to semantic need and authority, not as a mandatory fixed workflow",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "evidence_id": "decision-ticket-graph-lifecycle-002:1:constraint-3",
+          "evidence_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+          "exact_quote": "[must] Machine-validated initial plans may enter the current graph directly; human review or delegation gates execution rather than Ticket activation",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "evidence_id": "decision-ticket-graph-lifecycle-002:1:constraint-4",
+          "evidence_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+          "exact_quote": "[must] A successful graph change leaves a Git-readable causal record sufficient to reconstruct why the current Ticket world exists",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "evidence_id": "decision-ticket-graph-lifecycle-002:1:constraint-5",
+          "evidence_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+          "exact_quote": "[must] Local Run coordination binds exact worktree plus HEAD or dirty graph digest and Ticket revision; branch switches stale or suspend it",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "evidence_id": "decision-ticket-graph-lifecycle-002:1:constraint-6",
+          "evidence_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+          "exact_quote": "[must_not] Do not use internal generations, latest.yaml, SQLite intents, dual-store fences, or SQLite receipts as Ticket lifecycle authority",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "evidence_id": "decision-ticket-graph-lifecycle-002:1:constraint-7",
+          "evidence_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+          "exact_quote": "[must_not] Do not introduce a global cross-branch scheduler or silently reconcile semantic conflicts across Git histories",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:1988c7f1ac99ff10caeb3042a2d4a847a81385086eb9326347f8089c16a3812a",
+          "evidence_id": "decision-ticket-graph-lifecycle-002:1:meta-source",
+          "evidence_ref": "Wayne required Ticket documents to follow Git across branches/worktrees, rejected semantic SQLite authority, and confirmed that initial plan review gates execution rather than activation — 2026-07-29",
+          "exact_quote": "Ticket 的语义生命周期跟 Git 走；Proposal、Validation、Decision、Receipt 是按需要产生的文档，不是固定五阶段 workflow。",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-graph-lifecycle-002.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-29T00:00:00.000Z",
+      "producer": "meta:ingest",
+      "revision": 1,
+      "summary": "Ticket 的语义生命周期跟 Git 走；Proposal、Validation、Decision、Receipt 是按需要产生的文档，不是固定五阶段 workflow。",
+      "tags": [
+        "git",
+        "lifecycle",
+        "proposal",
+        "validation",
+        "decision",
+        "receipt",
+        "worktree",
+        "run"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-ticket-graph-lifecycle-002",
+  "state": "active",
+  "updated_at": "2026-07-29T00:00:00.000Z"
+}

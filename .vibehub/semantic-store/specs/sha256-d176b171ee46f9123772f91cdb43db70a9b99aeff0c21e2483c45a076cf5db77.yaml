@@ -1,0 +1,110 @@
+{
+  "created_at": "2026-07-12T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "21-workbench",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "da529dd8be8d069d95d8546d33e5ae6a3bb6f23fe0be7dfe3a4ed7ddfd8329d1",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 0,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:e40088d4816d0b68ba44d6d5f546a2b5d2a369131d92cf79306e98ac384e76bb",
+          "sourcePath": "META/legacy-21-workbench/specs/change-2026-07-12-hook-cli-heart.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "produced_at": "2026-07-12",
+            "source_ref": "M1 backend session 2026-07-12(handoff:后端 M1 range ③)",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from change-2026-07-12-hook-cli-heart: CLI 心脏 `vibehub hook` + StateMachine 模块落地",
+      "to_spec_id": "decision-project-025",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "workbench/packages/cli/src/main.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "runHook"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/hook-ingest.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "ingestHookEvent"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/hook-ingest.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "lastAssistantText"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/state-machine.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "nextState"
+        }
+      ],
+      "detail": "core 新增 hook-ingest(逻辑)+ state-machine(纯函数),CLI 加\n`vibehub hook <event>`(stdin 读 hook payload,任何错误吞进\n~/.vibehub/hook.log,恒 exit 0——hook 永不打断用户 session)。\n- 事捕捉:branch 为 join key(024),未见过的 branch 自动建\n  未命名的事(017,title=branch 名);worktree session 归域主 repo\n  (github-004),branch/toplevel 从 session cwd 解析(修了 facade\n  锚主 root 读错 HEAD 的 bug,有回归测试)。\n- 事件直译:UserPromptSubmit 首条→launch、后续→user_injection;\n  PostToolUse Edit/Write/MultiEdit/NotebookEdit→edit 足迹、\n  Read→read 足迹(repo-relative);Notification→question(verbatim)\n  +waiting;Stop→self_report(transcript 最后一条 assistant 原文,\n  机械解析零合成)+waiting;SessionEnd→session 收口+done。\n- StateMachine:活动→running、Stop/Notification→waiting、\n  SessionEnd→done;**stalled 不由事件产出**——无 daemon 无定时器\n  (016),沉默是读时观察(lastEventAt age),不存转移。\n- 注入回查(018):UserPromptSubmit/PostToolUse 边界原子 claim,\n  按 hook 协议输出 additionalContext,投递入时间线(介入必入史\n  023),不双发(有测试)。\n- **真 session 校准**:临时 repo 装 hooks 真跑 claude -p,\n  DB 收到 launch/footprints(edit+read)/self_report/两次\n  state_transition,与契约成员形状一致,hook.log 零错误。\nGates:core vitest 72/72(+13)、tsc clean、build 绿。\n",
+      "domain": "workbench",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:e40088d4816d0b68ba44d6d5f546a2b5d2a369131d92cf79306e98ac384e76bb",
+          "evidence_id": "change-2026-07-12-hook-cli-heart:1:meta-source",
+          "evidence_ref": "M1 backend session 2026-07-12(handoff:后端 M1 range ③)",
+          "exact_quote": "M1 ③ 落地:`vibehub hook <event>` CLI 心脏 — 短命(写事件→查注入队列→退出)、零 LLM、永不 fail session;StateMachine 纯函数(五态,stalled=读时观察);真 Claude Code session 校准通过,事件流形状与契约对齐",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/legacy-21-workbench/specs/change-2026-07-12-hook-cli-heart.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-12T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "M1 ③ 落地:`vibehub hook <event>` CLI 心脏 — 短命(写事件→查注入队列→退出)、零 LLM、永不 fail session;StateMachine 纯函数(五态,stalled=读时观察);真 Claude Code session 校准通过,事件流形状与契约对齐",
+      "tags": [
+        "backend-m1",
+        "hook-cli",
+        "state-machine",
+        "injection-queue",
+        "calibration"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-12-hook-cli-heart",
+  "state": "active",
+  "updated_at": "2026-07-12T00:00:00.000Z"
+}

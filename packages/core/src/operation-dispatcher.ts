@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { openDb, type Db } from "./db.js";
+import { computeMappingChecksum, openDb, type Db } from "./db.js";
 import crypto from "node:crypto";
 import { z } from "zod";
 import { KnowledgeError, KnowledgeService, type SpecBatchInput } from "./knowledge-service.js";
@@ -669,7 +669,8 @@ function copyOperationalKnowledgeContext(source:Db,sourceRepoId:number,target:Db
   copyMutationReceipts(source,sourceRepoId,target,targetRepoId);
   const active=source.prepare(`SELECT a.version_id versionId,a.activated_at activatedAt,v.state,v.source_kind sourceKind,v.checksum,v.created_at createdAt,v.finalized_at finalizedAt FROM repo_active_mapping a JOIN mapping_versions v ON v.repo_id=a.repo_id AND v.version_id=a.version_id WHERE a.repo_id=?`).get(sourceRepoId) as {versionId:string;activatedAt:string;state:string;sourceKind:string;checksum:string;createdAt:string;finalizedAt:string|null}|undefined;
   if(!active)return;
-  target.prepare(`INSERT INTO mapping_versions(repo_id,version_id,state,source_kind,checksum,created_at,finalized_at) VALUES(?,?,?,?,?,?,?)`).run(targetRepoId,active.versionId,active.state,active.sourceKind,active.checksum,active.createdAt,active.finalizedAt);
+  if(active.state!=="finalized")throw new KnowledgeError("internal_error","active mapping is not finalized");
+  target.prepare(`INSERT INTO mapping_versions(repo_id,version_id,state,source_kind,checksum,created_at,finalized_at) VALUES(?,?,'building',?,'',?,NULL)`).run(targetRepoId,active.versionId,active.sourceKind,active.createdAt);
   const features=source.prepare(`SELECT feature_id featureId,parent_feature_id parentId,name,description,intent,lifecycle FROM mapping_version_features WHERE repo_id=? AND version_id=?`).all(sourceRepoId,active.versionId) as Array<{featureId:string;parentId:string|null;name:string;description:string|null;intent:string|null;lifecycle:string}>;
   const pending=new Map(features.map(row=>[row.featureId,row]));
   const inserted=new Set<string>();
@@ -686,6 +687,12 @@ function copyOperationalKnowledgeContext(source:Db,sourceRepoId:number,target:Db
   const anchors=source.prepare(`SELECT feature_id featureId,file,symbol,line_start lineStart,line_end lineEnd,content_hash contentHash FROM mapping_version_anchors WHERE repo_id=? AND version_id=?`).all(sourceRepoId,active.versionId) as Array<{featureId:string;file:string;symbol:string;lineStart:number|null;lineEnd:number|null;contentHash:string|null}>;
   const insertAnchor=target.prepare(`INSERT INTO mapping_version_anchors(repo_id,version_id,feature_id,file,symbol,line_start,line_end,content_hash) VALUES(?,?,?,?,?,?,?,?)`);
   for(const row of anchors)insertAnchor.run(targetRepoId,active.versionId,row.featureId,row.file,row.symbol,row.lineStart,row.lineEnd,row.contentHash);
+  const layouts=source.prepare(`SELECT feature_id featureId,pct_left pctLeft,pct_top pctTop,pct_width pctWidth,pct_height pctHeight,computed_at computedAt FROM mapping_version_layouts WHERE repo_id=? AND version_id=?`).all(sourceRepoId,active.versionId) as Array<{featureId:string;pctLeft:number;pctTop:number;pctWidth:number;pctHeight:number;computedAt:string}>;
+  const insertLayout=target.prepare(`INSERT INTO mapping_version_layouts(repo_id,version_id,feature_id,pct_left,pct_top,pct_width,pct_height,computed_at) VALUES(?,?,?,?,?,?,?,?)`);
+  for(const row of layouts)insertLayout.run(targetRepoId,active.versionId,row.featureId,row.pctLeft,row.pctTop,row.pctWidth,row.pctHeight,row.computedAt);
+  const checksum=computeMappingChecksum(target,targetRepoId,active.versionId);
+  if(checksum!==active.checksum)throw new KnowledgeError("checksum_mismatch","copied active mapping checksum does not match its source",{versionId:active.versionId,expected:active.checksum,actual:checksum});
+  target.prepare(`UPDATE mapping_versions SET state='finalized',checksum=?,finalized_at=? WHERE repo_id=? AND version_id=?`).run(checksum,active.finalizedAt,targetRepoId,active.versionId);
   target.prepare(`INSERT INTO repo_active_mapping(repo_id,version_id,activated_at) VALUES(?,?,?)`).run(targetRepoId,active.versionId,active.activatedAt);
 }
 

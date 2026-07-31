@@ -1,0 +1,159 @@
+{
+  "created_at": "2026-07-29T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "9738034f8ac2c00854e7d5241d6d63fa1dd18b98159d5b3932241ad0f1bda206",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 5,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:4681afb6bb7b22e2da931b297197388c1ac87766bcfe31a9987d4a55be288c1c",
+          "sourcePath": "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+          "sourceProvenance": {
+            "confidence": 0.96,
+            "produced_at": "2026-07-29",
+            "produced_by_agent": "ingest",
+            "source_ref": "Wayne defined Ticket as an executable context package and rejected Ticket hierarchy in favor of relations — 2026-07-28; reconciled during the Git-native pivot 2026-07-29",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-work-unit-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-review-surface-001",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-28-ticket-review-surface-prototype-v4.html",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "**Decision**: Preserve the accepted Ticket promise and execution-handoff\ncontract while removing compulsory containment hierarchy.\n\nA Ticket ID still binds one stable, independently meaningful outcome\npromise. A fresh Agent with VibeHub must be able to read an executable\nTicket and its bound context and perform the correct work without reopening\nthe planning conversation. Acceptance proves its outcome rather than\nenumerating implementation steps. Material promise changes create a new\nTicket with explicit lineage.\n\nTicket nodes are flat. No Ticket is required to have `parentId`, one\ncontainment parent, or an ancestry-derived scenario. Planning,\ndependencies, joins, decomposition, supersession, evidence, verification,\nand contribution to a deliverable are represented by explicit typed\nrelations. The default execution projection emphasizes direct\ndependency/unlock relations.\n\nA scenario remains a derived human planning and review lens over relation\npaths. A coarse integration or verification Ticket may prove a scenario,\nbut Scenario is neither a canonical entity nor a Ticket hierarchy.\n\nThe earlier outline/specified/executable intelligence handoff, machine-first\nvalidation, verifiable acceptance, human authority boundaries, and bounded\nAgent-created Ticket rules remain valid. “Belongs inside earlier work” now\nmeans that the new Ticket has truthful typed relation paths to the\npreviously authorized outcomes; it does not require a tree parent.\n\nThe first protocol should keep the relation taxonomy small and evidence-led.\nExact relation names may be finalized with the Git document schema, but the\ndata model must remain a typed graph rather than a hidden tree.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.96,
+          "content_hash": "sha256:4681afb6bb7b22e2da931b297197388c1ac87766bcfe31a9987d4a55be288c1c",
+          "evidence_id": "decision-ticket-contract-002:1:constraint-1",
+          "evidence_ref": "Wayne defined Ticket as an executable context package and rejected Ticket hierarchy in favor of relations — 2026-07-28; reconciled during the Git-native pivot 2026-07-29",
+          "exact_quote": "[must] A Ticket binds one stable outcome promise and enough bounded context, acceptance, authority, and execution policy for a fresh Agent handoff when executable",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.96,
+          "content_hash": "sha256:4681afb6bb7b22e2da931b297197388c1ac87766bcfe31a9987d4a55be288c1c",
+          "evidence_id": "decision-ticket-contract-002:1:constraint-2",
+          "evidence_ref": "Wayne defined Ticket as an executable context package and rejected Ticket hierarchy in favor of relations — 2026-07-28; reconciled during the Git-native pivot 2026-07-29",
+          "exact_quote": "[must] Ticket-to-Ticket semantics use explicit typed relations and the execution view prioritizes direct dependency or unlock relations",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.96,
+          "content_hash": "sha256:4681afb6bb7b22e2da931b297197388c1ac87766bcfe31a9987d4a55be288c1c",
+          "evidence_id": "decision-ticket-contract-002:1:constraint-3",
+          "evidence_ref": "Wayne defined Ticket as an executable context package and rejected Ticket hierarchy in favor of relations — 2026-07-28; reconciled during the Git-native pivot 2026-07-29",
+          "exact_quote": "[must] Agent-created Tickets preserve provenance and truthful relation paths to the authorized deliverable",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.96,
+          "content_hash": "sha256:4681afb6bb7b22e2da931b297197388c1ac87766bcfe31a9987d4a55be288c1c",
+          "evidence_id": "decision-ticket-contract-002:1:constraint-4",
+          "evidence_ref": "Wayne defined Ticket as an executable context package and rejected Ticket hierarchy in favor of relations — 2026-07-28; reconciled during the Git-native pivot 2026-07-29",
+          "exact_quote": "[must_not] Do not require parentId, one containment parent, ancestry-derived scenario membership, or a nested Ticket hierarchy",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.96,
+          "content_hash": "sha256:4681afb6bb7b22e2da931b297197388c1ac87766bcfe31a9987d4a55be288c1c",
+          "evidence_id": "decision-ticket-contract-002:1:constraint-5",
+          "evidence_ref": "Wayne defined Ticket as an executable context package and rejected Ticket hierarchy in favor of relations — 2026-07-28; reconciled during the Git-native pivot 2026-07-29",
+          "exact_quote": "[must_not] Do not make Scenario a second canonical object or silently identify it one-to-one with a Ticket",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.96,
+          "content_hash": "sha256:4681afb6bb7b22e2da931b297197388c1ac87766bcfe31a9987d4a55be288c1c",
+          "evidence_id": "decision-ticket-contract-002:1:meta-source",
+          "evidence_ref": "Wayne defined Ticket as an executable context package and rejected Ticket hierarchy in favor of relations — 2026-07-28; reconciled during the Git-native pivot 2026-07-29",
+          "exact_quote": "Ticket 是 executable context package；Ticket 之间没有固有层级，只用关系表达。",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-contract-002.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-29T00:00:00.000Z",
+      "producer": "meta:ingest",
+      "revision": 1,
+      "summary": "Ticket 是 executable context package；Ticket 之间没有固有层级，只用关系表达。",
+      "tags": [
+        "ticket",
+        "contract",
+        "context-package",
+        "typed-relations",
+        "flat-graph",
+        "scenario"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-ticket-contract-002",
+  "state": "active",
+  "updated_at": "2026-07-29T00:00:00.000Z"
+}

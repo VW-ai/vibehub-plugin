@@ -1,0 +1,158 @@
+{
+  "created_at": "2026-07-31T17:23:53.966Z",
+  "current_revision": 1,
+  "feature_id": "03-02-cold-start-distillation",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "f1ef2346edba61af1fa20240c99dba61ceca07fde524b03a54f0815b0c0404e3",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 4,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:792ea4e9968a4c5a07bf6643038813b4e22299453051219cdc2a9eaa7b902a98",
+          "sourcePath": "META/03-02-cold-start-distillation/specs/decision-workbench-012.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "from_path": "META/21-workbench/specs/decision-workbench-012.yaml",
+              "from_repository": "VW-ai/Vibehub",
+              "migrated_at": "2026-07-19"
+            },
+            "source_ref": "Wayne DB-native intelligence decision — 2026-07-13",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META constrains relation from decision-workbench-012: Storage pivot must preserve staged validation and promotion semantics",
+      "to_spec_id": "intent-project-004",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/core/src/distillation-service.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/operation-dispatcher.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/contracts/distillation-result.schema.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-distill/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Distill skill 负责 inventory interpretation、feature hypotheses、cross-scope\nreconciliation 与 unresolved ambiguity。Core/CLI/MCP 负责公开版本化 contracts、\nvalidation、finalization、immutable revision 与 activation compare-and-swap。\n\nCanonical promotion 必须 guarded/reviewed。Distillation 中间运行态不等于\nsemantic truth；即使未来 Git/YAML 成为 durable semantic layer，也只有\nfinalize/review/activate 后的语义产物可进入 canonical store。\n",
+      "domain": "cold-start-distillation",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:792ea4e9968a4c5a07bf6643038813b4e22299453051219cdc2a9eaa7b902a98",
+          "evidence_id": "decision-workbench-012:1:constraint-1",
+          "evidence_ref": "Wayne DB-native intelligence decision — 2026-07-13",
+          "exact_quote": "[must] Distillation 必须先 validate/finalize immutable candidate，再由 review 决定 activation",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-02-cold-start-distillation/specs/decision-workbench-012.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:792ea4e9968a4c5a07bf6643038813b4e22299453051219cdc2a9eaa7b902a98",
+          "evidence_id": "decision-workbench-012:1:constraint-2",
+          "evidence_ref": "Wayne DB-native intelligence decision — 2026-07-13",
+          "exact_quote": "[must] Activation 必须使用 CAS 或等价并发保护",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-02-cold-start-distillation/specs/decision-workbench-012.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:792ea4e9968a4c5a07bf6643038813b4e22299453051219cdc2a9eaa7b902a98",
+          "evidence_id": "decision-workbench-012:1:constraint-3",
+          "evidence_ref": "Wayne DB-native intelligence decision — 2026-07-13",
+          "exact_quote": "[must] Unresolved ambiguity 必须显式保留，不得为完成率制造虚假确定性",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-02-cold-start-distillation/specs/decision-workbench-012.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:792ea4e9968a4c5a07bf6643038813b4e22299453051219cdc2a9eaa7b902a98",
+          "evidence_id": "decision-workbench-012:1:constraint-4",
+          "evidence_ref": "Wayne DB-native intelligence decision — 2026-07-13",
+          "exact_quote": "[must_not] 不得让 distillation 中间态直接成为 canonical knowledge",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-02-cold-start-distillation/specs/decision-workbench-012.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:792ea4e9968a4c5a07bf6643038813b4e22299453051219cdc2a9eaa7b902a98",
+          "evidence_id": "decision-workbench-012:1:meta-source",
+          "evidence_ref": "Wayne DB-native intelligence decision — 2026-07-13",
+          "exact_quote": "Distillation 使用 DB-native staged workflow：skills 负责语义，deterministic runtime 校验并产出 immutable candidate，human review 后 CAS activation",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-02-cold-start-distillation/specs/decision-workbench-012.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-31T17:23:53.966Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Distillation 使用 DB-native staged workflow：skills 负责语义，deterministic runtime 校验并产出 immutable candidate，human review 后 CAS activation",
+      "tags": [
+        "distillation",
+        "db-native",
+        "immutable-candidate",
+        "review",
+        "cas"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-workbench-012",
+  "state": "active",
+  "updated_at": "2026-07-31T17:23:53.966Z"
+}

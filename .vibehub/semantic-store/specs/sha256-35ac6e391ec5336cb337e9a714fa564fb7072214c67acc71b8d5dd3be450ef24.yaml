@@ -1,0 +1,145 @@
+{
+  "created_at": "2026-07-31T17:23:53.966Z",
+  "current_revision": 1,
+  "feature_id": "00-project-room",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "f7369766d512d7a39e60183d5971d188bc53b587f621391224f74343ae752867",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 3,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:d50b0da152fc6d89a48a373dbbbc54fde5c93ad4d6143a6e7883bd9d8eff65c6",
+          "sourcePath": "META/00-project-room/specs/decision-project-014.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "from_path": "META/00-project-room/specs/decision-project-014.yaml",
+              "from_repository": "VW-ai/Vibehub",
+              "migrated_at": "2026-07-19"
+            },
+            "source_ref": "Wayne architecture decision — 2026-07-08; status reaffirmed 2026-07-19",
+            "source_type": "manual_input"
+          },
+          "sourceState": "superseded"
+        },
+        "revision": 1,
+        "state": "superseded",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META challenged_by relation from decision-project-014: The exploration completed and produced decision-project-028.",
+      "to_spec_id": "intent-project-004",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Explicitly superseded after technical review approval on 2026-07-20.\n\nGit semantic store now holds durable semantic authority for each repository after its explicit protocol cutover.",
+      "to_spec_id": "decision-project-028",
+      "type": "supersedes"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/core/src/db.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/distillation-service.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/knowledge-service.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "当前实现以 SQLite 承载 semantic knowledge 与 operational state，并由 core\n提供唯一读写门、schema migration、query/index 与 projection。\n\n本决策记录 2026-07-20 以前的 SQLite-only authority。lossless round-trip、\nGit merge、branch/ref cache 与 provenance identity 已完成验证；Wayne 随后\n批准 decision-project-028。SQLite 继续承载 operational truth 和可重建\nsemantic cache，但不再是已迁移仓库的 durable semantic authority。\n",
+      "domain": "storage",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:d50b0da152fc6d89a48a373dbbbc54fde5c93ad4d6143a6e7883bd9d8eff65c6",
+          "evidence_id": "decision-project-014:1:constraint-1",
+          "evidence_ref": "Wayne architecture decision — 2026-07-08; status reaffirmed 2026-07-19",
+          "exact_quote": "[must] 当前所有 canonical knowledge mutation 继续通过 SQLite-backed deterministic operations",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/00-project-room/specs/decision-project-014.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:d50b0da152fc6d89a48a373dbbbc54fde5c93ad4d6143a6e7883bd9d8eff65c6",
+          "evidence_id": "decision-project-014:1:constraint-2",
+          "evidence_ref": "Wayne architecture decision — 2026-07-08; status reaffirmed 2026-07-19",
+          "exact_quote": "[must] 任何 source-of-truth 切换必须显式 supersede 本决策",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/00-project-room/specs/decision-project-014.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:d50b0da152fc6d89a48a373dbbbc54fde5c93ad4d6143a6e7883bd9d8eff65c6",
+          "evidence_id": "decision-project-014:1:constraint-3",
+          "evidence_ref": "Wayne architecture decision — 2026-07-08; status reaffirmed 2026-07-19",
+          "exact_quote": "[must_not] 不得让导出文件产生 SQLite 中不存在的 canonical truth",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/00-project-room/specs/decision-project-014.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:d50b0da152fc6d89a48a373dbbbc54fde5c93ad4d6143a6e7883bd9d8eff65c6",
+          "evidence_id": "decision-project-014:1:meta-source",
+          "evidence_ref": "Wayne architecture decision — 2026-07-08; status reaffirmed 2026-07-19",
+          "exact_quote": "当前 source of truth = SQLite；文件只是 projection/export，直至另有正式 supersede",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/00-project-room/specs/decision-project-014.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-31T17:23:53.966Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "当前 source of truth = SQLite；文件只是 projection/export，直至另有正式 supersede",
+      "tags": [
+        "sqlite",
+        "source-of-truth",
+        "projection",
+        "migration-boundary"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-project-014",
+  "state": "superseded",
+  "updated_at": "2026-07-31T17:23:53.966Z"
+}

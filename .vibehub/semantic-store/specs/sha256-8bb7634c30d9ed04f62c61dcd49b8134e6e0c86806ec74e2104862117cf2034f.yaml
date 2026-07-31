@@ -1,0 +1,141 @@
+{
+  "created_at": "2026-07-18T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "03-01-context-cru",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "0febadaf20e94264ead422431cf4550b6f0287eca1a9bbfa57b614b480b09407",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 3,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:5c7d5af20b51263c4473ae74b2b801dfaa09439be81c331836c3d533164d9d88",
+          "sourcePath": "META/03-01-context-cru/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "produced_at": "2026-07-18",
+            "source_ref": "META/legacy-21-workbench/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+            "source_type": "migrated_spec"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META constrained_by relation from change-2026-07-18-knowledge-checkpoint",
+      "to_spec_id": "decision-workbench-010",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from change-2026-07-18-knowledge-checkpoint",
+      "to_spec_id": "intent-workbench-003",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/core/src/hook-ingest.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/knowledge-checkpoint.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/test/knowledge-checkpoint.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "UserPromptSubmit deduplicates stable prompt IDs and increments a persistent\nper-task cadence. At the threshold it injects a short checkpoint reminder.\nOnly a successful canonical knowledge mutation for the same task resets the\ncounter. Claimed interventions and pause delivery take priority.\n",
+      "domain": "context-cru",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:5c7d5af20b51263c4473ae74b2b801dfaa09439be81c331836c3d533164d9d88",
+          "evidence_id": "change-2026-07-18-knowledge-checkpoint:1:constraint-1",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "exact_quote": "[must] Hooks own cadence and deduplication only; durable semantic judgment and capture remain in the ingest skill",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:5c7d5af20b51263c4473ae74b2b801dfaa09439be81c331836c3d533164d9d88",
+          "evidence_id": "change-2026-07-18-knowledge-checkpoint:1:constraint-2",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "exact_quote": "[must] Only deterministic same-task canonical persistence may reset cadence",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:5c7d5af20b51263c4473ae74b2b801dfaa09439be81c331836c3d533164d9d88",
+          "evidence_id": "change-2026-07-18-knowledge-checkpoint:1:constraint-3",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "exact_quote": "[must_not] Do not parse transcripts, estimate tokens or classify knowledge inside the hook",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:5c7d5af20b51263c4473ae74b2b801dfaa09439be81c331836c3d533164d9d88",
+          "evidence_id": "change-2026-07-18-knowledge-checkpoint:1:meta-source",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "exact_quote": "Implemented task-scoped periodic knowledge checkpoints with mechanical cadence and skill-owned semantic judgment",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/change-2026-07-18-knowledge-checkpoint.yaml",
+          "source_type": "migrated_spec"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-18T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Implemented task-scoped periodic knowledge checkpoints with mechanical cadence and skill-owned semantic judgment",
+      "tags": [
+        "checkpoint",
+        "cadence",
+        "prompt-dedup",
+        "prompt-first"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-18-knowledge-checkpoint",
+  "state": "active",
+  "updated_at": "2026-07-18T00:00:00.000Z"
+}

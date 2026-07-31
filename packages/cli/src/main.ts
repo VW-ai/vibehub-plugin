@@ -28,6 +28,7 @@ import {
   exportTeamMapSnapshot,
   GitFacade,
   ingestCanonicalHookEvent,
+  migrateMetaSpecsToCanonical,
   migrateSqliteSemanticStoreToGit,
   openDb,
   prepareSemanticCheckpoint,
@@ -115,6 +116,7 @@ const USAGE = `usage:
   vibehub snapshot|inspect [--repo <path>] [--db <path>] [--out <file>]
   vibehub kb <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
   vibehub kb migrate-store --json [--repo <path>] [--db <path>]
+  vibehub kb migrate-meta --json --actor <id> --task <id> [--input '{"sourceDirectory":"META"}'] [--repo <path>] [--db <path>] [--request <id>]
   vibehub checkpoint prepare --json [--scope semantic|ticket] [--input <selection-json>] [--repo <path>] [--protect <branch>]
   vibehub checkpoint commit --json --input <receipt-json> --actor <id> [--scope semantic|ticket] [--task <id>] [--request <id>] [--repo <path>] [--protect <branch>]
   vibehub distill <operation> --json --actor <id> [--input <json>] [--task <id>] [--request <id>]
@@ -449,6 +451,41 @@ function runSemanticMigration(argv:string[]):number{
   }finally{db.close();}
 }
 
+function runMetaCanonicalMigration(argv:string[]):number{
+  const flags=parseKbFlags(argv,16_384);
+  if(!flags.json)throw new Error("kb migrate-meta requires --json");
+  if(!flags.actor?.trim())throw new Error("kb migrate-meta requires --actor <id>");
+  if(!flags.taskId?.trim())throw new Error("kb migrate-meta requires --task <id>");
+  const unknown=Object.keys(flags.input).filter(key=>key!=="sourceDirectory");
+  if(unknown.length)throw new Error(`kb migrate-meta input has unknown field: ${unknown[0]}`);
+  const sourceDirectory=flags.input.sourceDirectory;
+  if(sourceDirectory!==undefined&&typeof sourceDirectory!=="string"){
+    throw new Error("kb migrate-meta sourceDirectory must be a string");
+  }
+  const session=GitFacade.sessionContextAt(flags.repo);
+  const db=openDb(flags.db);
+  try{
+    const repo=db.prepare(`SELECT id FROM repos WHERE root_path=?`).get(session.repoRoot) as {id:number}|undefined;
+    if(!repo)throw new Error("repository is not initialized in VibeHub; run vibehub init first");
+  }finally{db.close();}
+  try{
+    const now=new Date().toISOString();
+    const data=migrateMetaSpecsToCanonical({
+      repoRoot:session.toplevel,
+      sourceDirectory,
+      actor:flags.actor,
+      taskId:flags.taskId,
+      requestId:flags.requestId,
+      now,
+    });
+    process.stdout.write(`${JSON.stringify({ok:true,data,meta:{operation:"kb.migrate-meta",requestId:flags.requestId,at:now}})}\n`);
+    return 0;
+  }catch(error){
+    process.stdout.write(`${JSON.stringify({ok:false,error:{code:"migration_failed",message:error instanceof Error?error.message:String(error)}})}\n`);
+    return 1;
+  }
+}
+
 interface CheckpointCliFlags {
   repo: string;
   json: boolean;
@@ -736,6 +773,10 @@ export function main(argv: string[]): number {
   }
   if(group==="kb"&&cmd==="migrate-store"){
     try{return runSemanticMigration(rest);}
+    catch(error){process.stdout.write(`${JSON.stringify({ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error)}})}\n`);return 2;}
+  }
+  if(group==="kb"&&cmd==="migrate-meta"){
+    try{return runMetaCanonicalMigration(rest);}
     catch(error){process.stdout.write(`${JSON.stringify({ok:false,error:{code:"validation_error",message:error instanceof Error?error.message:String(error)}})}\n`);return 2;}
   }
   if (group === "kb" || group === "distill" || group === "ticket") {

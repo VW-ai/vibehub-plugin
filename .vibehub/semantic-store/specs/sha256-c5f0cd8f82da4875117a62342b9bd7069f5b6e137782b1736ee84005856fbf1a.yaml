@@ -1,0 +1,133 @@
+{
+  "created_at": "2026-07-14T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "06-workbench-app",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "22d2a8f29ea02ba336f238f0dfb773a8707c1440380c8b8304b5d75fcc732f8b",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 3,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:1cd69aa3abcfe1e4488831ef1e1faa2a47a0b1fa5c3b6073d7affdae9e01ae30",
+          "sourcePath": "META/06-workbench-app/specs/decision-workbench-014.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "migrated_at": "2026-07-19",
+              "migrated_to": "06-workbench-app"
+            },
+            "produced_at": "2026-07-14",
+            "source_ref": "META/legacy-21-workbench/specs/decision-workbench-014.yaml",
+            "source_type": "migrated_spec"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "app/src/WorkbenchMap.tsx",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "app/src/app.css",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "app/src/tokens.css",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "The App is a compact, cool-neutral, macOS-like spatial collaboration surface\nbuilt around a territory canvas, live rail, system typography, state color\nand restrained elevation. Preserving this authority does not freeze defects:\nkeyboard focus, readable contrast, reduced motion, production-path coverage\nand honest affordances remain hard requirements.\n",
+      "domain": "workbench-app",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:1cd69aa3abcfe1e4488831ef1e1faa2a47a0b1fa5c3b6073d7affdae9e01ae30",
+          "evidence_id": "decision-workbench-014:1:constraint-1",
+          "evidence_ref": "META/legacy-21-workbench/specs/decision-workbench-014.yaml",
+          "exact_quote": "[must] App UI must preserve the v8 spatial map, live rail, compact system typography and cool-neutral surface language",
+          "produced_at": "2026-07-14T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/06-workbench-app/specs/decision-workbench-014.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:1cd69aa3abcfe1e4488831ef1e1faa2a47a0b1fa5c3b6073d7affdae9e01ae30",
+          "evidence_id": "decision-workbench-014:1:constraint-2",
+          "evidence_ref": "META/legacy-21-workbench/specs/decision-workbench-014.yaml",
+          "exact_quote": "[must] Keyboard focus, contrast, reduced motion and production-path behavior must remain verified",
+          "produced_at": "2026-07-14T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/06-workbench-app/specs/decision-workbench-014.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:1cd69aa3abcfe1e4488831ef1e1faa2a47a0b1fa5c3b6073d7affdae9e01ae30",
+          "evidence_id": "decision-workbench-014:1:constraint-3",
+          "evidence_ref": "META/legacy-21-workbench/specs/decision-workbench-014.yaml",
+          "exact_quote": "[must_not] UI must not promise repository switching, task launch, resume, terminate or completion unless the bridge can prove the capability",
+          "produced_at": "2026-07-14T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/06-workbench-app/specs/decision-workbench-014.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:1cd69aa3abcfe1e4488831ef1e1faa2a47a0b1fa5c3b6073d7affdae9e01ae30",
+          "evidence_id": "decision-workbench-014:1:meta-source",
+          "evidence_ref": "META/legacy-21-workbench/specs/decision-workbench-014.yaml",
+          "exact_quote": "The Workbench App design authority is the approved v8 spatial-workbench language",
+          "produced_at": "2026-07-14T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/06-workbench-app/specs/decision-workbench-014.yaml",
+          "source_type": "migrated_spec"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-14T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "The Workbench App design authority is the approved v8 spatial-workbench language",
+      "tags": [
+        "v8",
+        "spatial-workbench",
+        "design-authority",
+        "honesty",
+        "accessibility"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-workbench-014",
+  "state": "active",
+  "updated_at": "2026-07-14T00:00:00.000Z"
+}

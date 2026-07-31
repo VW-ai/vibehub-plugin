@@ -1,0 +1,215 @@
+{
+  "created_at": "2026-07-30T20:30:42Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "37f1c7e0b301fcc01495d51e3d9f16e376077a770e9e4f438617d88a2c18f171",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 7,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "sourcePath": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "sourceProvenance": {
+            "confidence": 0.99,
+            "produced_at": "2026-07-30T20:30:42Z",
+            "produced_by_agent": "implementation-review",
+            "source_ref": "M3 adversarial authority review — 2026-07-30",
+            "source_type": "implementation_review"
+          },
+          "sourceState": "superseded"
+        },
+        "revision": 1,
+        "state": "superseded",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Extends session-only Decision attestation into a fresh-process authority handoff.",
+      "to_spec_id": "contract-ticket-git-review-interventions-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Keeps intent and evidence Git-native while separating the external trust root.",
+      "to_spec_id": "decision-ticket-git-native-ledger-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Supplies authority evidence to Skills without moving semantic judgment into Core.",
+      "to_spec_id": "decision-ticket-skill-driven-boundary-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Protected context-binding cannot unblock fresh execution until its human ratification is verifiable.",
+      "to_spec_id": "decision-ticket-context-binding-001",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "M3.6 retains exact durable Decision receipts while replacing this WebAuthn ceremony with an honestly scoped install-local Ed25519 authority and one explicit Plugin-host click.\n\nPreserves exact durable cross-process verification while replacing the WebAuthn ceremony, expiry, and named-human-presence claim.",
+      "to_spec_id": "contract-ticket-install-local-decision-attestation-001",
+      "type": "supersedes"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": ".vibehub/tickets/tickets/ticket-durable-decision-attestation-ready.yaml",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-authority-boundary-candidate.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-git-review-intervention.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "A Decision document is durable intent and evidence, not a\nself-authenticating authority receipt. M3 may attest one exact Decision\ninside the trusted host process that received the human action, but that\ncapability correctly disappears on restart, branch or worktree change,\nexpiry, or document tamper. Independent CLI Skill invocations therefore\nsee raw Decisions as current-unverified evidence and must preserve the\nprotected boundary.\n\nBefore execution and closeout can use protected Decisions across fresh\nprocesses, VibeHub needs one small durable attestation boundary. A trusted\nhuman ceremony in a real installed-plugin entrypoint must attest the exact\ncanonical Decision document, authority principal, repository incarnation,\ngoverned ref or branch, subject, and scope. A fresh host or Agent must be\nable to verify that attestation without SQLite, a previous process, or\ncaller-supplied authority fields. Arbitrary repository write access must\nnot be sufficient to mint it.\n\nThe implementation may use a signed Git-adjacent receipt, host identity,\nOS-backed key, or another narrow mechanism after focused research. It must\ndefine trust-root enrollment, explicit human presence, expiry or\nrevocation, replay behavior, worktree and branch isolation, and recovery.\nIt must also provide the real production adapter that binds the review host\nto that trusted identity; constructor options and tests alone are not a\nuser-facing integration.\n\nKeep the mechanism scoped to Decision authority. Comments and edit\nproposals remain ordinary attributed Git facts, and Ticket planning,\nvalidation, graph layout, execution scheduling, Outcome, and Evidence do\nnot belong in an authentication subsystem.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "evidence_id": "contract-ticket-durable-decision-attestation-001:1:constraint-1",
+          "evidence_ref": "M3 adversarial authority review — 2026-07-30",
+          "exact_quote": "[must] A fresh process verifies the exact canonical Decision, principal, repository, ref or branch, subject, and granted scope without trusting editable Decision fields",
+          "produced_at": "2026-07-30T20:30:42Z",
+          "producer": "meta:implementation-review",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "evidence_id": "contract-ticket-durable-decision-attestation-001:1:constraint-2",
+          "evidence_ref": "M3 adversarial authority review — 2026-07-30",
+          "exact_quote": "[must] The trust root and signing authority are not stored as writable Git or SQLite semantics available to the Agent",
+          "produced_at": "2026-07-30T20:30:42Z",
+          "producer": "meta:implementation-review",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "evidence_id": "contract-ticket-durable-decision-attestation-001:1:constraint-3",
+          "evidence_ref": "M3 adversarial authority review — 2026-07-30",
+          "exact_quote": "[must] The installed plugin has a real explicit human entrypoint for attribution, review, Decision, re-attestation, expiry, and revocation",
+          "produced_at": "2026-07-30T20:30:42Z",
+          "producer": "meta:implementation-review",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "evidence_id": "contract-ticket-durable-decision-attestation-001:1:constraint-4",
+          "evidence_ref": "M3 adversarial authority review — 2026-07-30",
+          "exact_quote": "[must] Restart, sibling worktree, branch mismatch, replay, expiry, revocation, and any Decision-content tamper fail closed and remain inspectable",
+          "produced_at": "2026-07-30T20:30:42Z",
+          "producer": "meta:implementation-review",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "evidence_id": "contract-ticket-durable-decision-attestation-001:1:constraint-5",
+          "evidence_ref": "M3 adversarial authority review — 2026-07-30",
+          "exact_quote": "[must] Verified authority composes with same-snapshot Ticket reads and remains separate from semantic validity, readiness, and completion",
+          "produced_at": "2026-07-30T20:30:42Z",
+          "producer": "meta:implementation-review",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "evidence_id": "contract-ticket-durable-decision-attestation-001:1:constraint-6",
+          "evidence_ref": "M3 adversarial authority review — 2026-07-30",
+          "exact_quote": "[must_not] Do not treat a raw YAML authority claim, browser bearer, OS username, Git author string, previous in-memory registry, or SQLite row as sufficient human authority",
+          "produced_at": "2026-07-30T20:30:42Z",
+          "producer": "meta:implementation-review",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "evidence_id": "contract-ticket-durable-decision-attestation-001:1:constraint-7",
+          "evidence_ref": "M3 adversarial authority review — 2026-07-30",
+          "exact_quote": "[must_not] Do not expand the solution into remote authentication, a generic workflow engine, or mandatory review for Agent-owned technical choices",
+          "produced_at": "2026-07-30T20:30:42Z",
+          "producer": "meta:implementation-review",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0ca516e2013526652815d72ce066aa01531915154c3eac06602cccca70ba0eb6",
+          "evidence_id": "contract-ticket-durable-decision-attestation-001:1:meta-source",
+          "evidence_ref": "M3 adversarial authority review — 2026-07-30",
+          "exact_quote": "Fresh host 与 fresh Agent 如何验证一个 exact human Decision，而不信任可编辑 YAML？",
+          "produced_at": "2026-07-30T20:30:42Z",
+          "producer": "meta:implementation-review",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-durable-decision-attestation-001.yaml",
+          "source_type": "implementation_review"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-30T20:30:42Z",
+      "producer": "meta:implementation-review",
+      "revision": 1,
+      "summary": "Fresh host 与 fresh Agent 如何验证一个 exact human Decision，而不信任可编辑 YAML？",
+      "tags": [
+        "ticket",
+        "decision",
+        "authority",
+        "attestation",
+        "trust",
+        "git",
+        "plugin",
+        "worktree"
+      ],
+      "type": "contract"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "contract-ticket-durable-decision-attestation-001",
+  "state": "superseded",
+  "updated_at": "2026-07-30T20:30:42Z"
+}

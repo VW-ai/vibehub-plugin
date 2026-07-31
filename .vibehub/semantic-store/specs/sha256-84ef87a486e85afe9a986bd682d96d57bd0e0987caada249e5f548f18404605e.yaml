@@ -1,0 +1,171 @@
+{
+  "created_at": "2026-07-31T17:23:53.966Z",
+  "current_revision": 1,
+  "feature_id": "04-project-activation",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "53fb09530a0c1b3b38e4552cec8e09cf8d5896ac44776f2a32a7039f6d846fef",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 4,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:13e1bd8cbbfb7cb31f8efbb71edfd2ea660a4fb05eec78f6a736091b75bcaf10",
+          "sourcePath": "META/04-project-activation/specs/decision-workbench-015.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "from_path": "META/21-workbench/specs/decision-workbench-015.yaml",
+              "from_repository": "VW-ai/Vibehub",
+              "migrated_at": "2026-07-19"
+            },
+            "source_ref": "Wayne onboarding decision — 2026-07-18",
+            "source_type": "chat_extraction"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META realizes relation from decision-workbench-015: Agent-first setup preserves headless product independence",
+      "to_spec_id": "decision-workbench-011",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META constrained_by relation from decision-workbench-015: Setup uses the shared receipt/presentation protocol",
+      "to_spec_id": "decision-workbench-016",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/cli/src/main.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/project-activation.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/runtime-lifecycle.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-setup/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-setup/references/onboarding-contract.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Canonical onboarding 在 Claude Code/Codex 中完成。Setup skill 发现现状、解释\n冲突和 recovery，并调用 core/CLI 的 init、repo binding、managed instruction\nmerge、doctor 与 status primitives。App 只能提供同 contract 的图形入口。\n\nFresh repo 不制造虚假 mapping 或 knowledge write；existing-code repo 在\nConnected 后显式推荐 cold-start distill。Activated 必须有真实 query/ingest\n价值证据，不能由文件存在或 doctor green 冒充。\n",
+      "domain": "project-activation",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:13e1bd8cbbfb7cb31f8efbb71edfd2ea660a4fb05eec78f6a736091b75bcaf10",
+          "evidence_id": "decision-workbench-015:1:constraint-1",
+          "evidence_ref": "Wayne onboarding decision — 2026-07-18",
+          "exact_quote": "[must] Onboarding 必须区分 Installed、Connected、Activated",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/04-project-activation/specs/decision-workbench-015.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:13e1bd8cbbfb7cb31f8efbb71edfd2ea660a4fb05eec78f6a736091b75bcaf10",
+          "evidence_id": "decision-workbench-015:1:constraint-2",
+          "evidence_ref": "Wayne onboarding decision — 2026-07-18",
+          "exact_quote": "[must] Setup workflow intelligence 位于 vibehub-setup skill；core/CLI 只提供幂等 primitives",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/04-project-activation/specs/decision-workbench-015.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:13e1bd8cbbfb7cb31f8efbb71edfd2ea660a4fb05eec78f6a736091b75bcaf10",
+          "evidence_id": "decision-workbench-015:1:constraint-3",
+          "evidence_ref": "Wayne onboarding decision — 2026-07-18",
+          "exact_quote": "[must_not] 不得覆盖用户 AGENTS.md/CLAUDE.md；只能幂等维护 VibeHub-owned managed block",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/04-project-activation/specs/decision-workbench-015.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:13e1bd8cbbfb7cb31f8efbb71edfd2ea660a4fb05eec78f6a736091b75bcaf10",
+          "evidence_id": "decision-workbench-015:1:constraint-4",
+          "evidence_ref": "Wayne onboarding decision — 2026-07-18",
+          "exact_quote": "[must_not] 不得把 cold-start distill 隐藏在 deterministic init 内",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/04-project-activation/specs/decision-workbench-015.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:13e1bd8cbbfb7cb31f8efbb71edfd2ea660a4fb05eec78f6a736091b75bcaf10",
+          "evidence_id": "decision-workbench-015:1:meta-source",
+          "evidence_ref": "Wayne onboarding decision — 2026-07-18",
+          "exact_quote": "Agent-first onboarding：机器级安装一次，exact checkout 由 vibehub-setup 编排 Installed → Connected → Activated",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/04-project-activation/specs/decision-workbench-015.yaml",
+          "source_type": "chat_extraction"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-31T17:23:53.966Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Agent-first onboarding：机器级安装一次，exact checkout 由 vibehub-setup 编排 Installed → Connected → Activated",
+      "tags": [
+        "setup",
+        "onboarding",
+        "activation",
+        "repo-identity",
+        "managed-instructions"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-workbench-015",
+  "state": "active",
+  "updated_at": "2026-07-31T17:23:53.966Z"
+}

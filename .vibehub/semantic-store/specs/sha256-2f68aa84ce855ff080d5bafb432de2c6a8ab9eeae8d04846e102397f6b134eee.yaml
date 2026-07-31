@@ -1,0 +1,208 @@
+{
+  "created_at": "2026-07-12T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "21-workbench",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "b2effea19fe6e20ed04af53294d84ccb255051b728134b182651b9f75bc36bf2",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 0,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:43e4b15bf02e453e0753cd16cee6c2f4b2049c8b7616387f032eefc523cf3190",
+          "sourcePath": "META/legacy-21-workbench/specs/change-2026-07-12-three-domain-schema.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "produced_at": "2026-07-12",
+            "source_ref": "M1 backend session 2026-07-12(handoff:后端 M1 range ②)",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from change-2026-07-12-three-domain-schema: SQLite 为体:schema migration 梯 = 能力升级通道",
+      "to_spec_id": "decision-project-014",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from change-2026-07-12-three-domain-schema: SQLite 三表域拍板的直译落地",
+      "to_spec_id": "decision-project-025",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "appendEvent"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "claimPendingInjections"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "enqueueInjection"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "insertConflict"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "readDiagnosis"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "readScopes"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "readTimeline"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "setScopes"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "upsertTask"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/db.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "openDb"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/graph-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "addAnchor"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/graph-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "featuresForFile"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/graph-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "getSetting"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/graph-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "listTerritories"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/graph-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "setSetting"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/graph-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "upsertFeature"
+        },
+        {
+          "content_hash": null,
+          "file": "workbench/packages/core/src/graph-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "upsertSpec"
+        }
+      ],
+      "detail": "migration 002(user_version 1→2,升级保数据,有测试):\n- 运行域:tasks(五态 CHECK 封顶)/sessions/events(11 型 TimelineEvent\n  判别列 + JSON payload 原样往返)/footprints(原始 file touch,一切\n  足迹派生量之源)/scopes(seq 保申报序)/injections(enqueue/claim\n  原子 FIFO,018)/conflicts+conflict_symbols(序保 1:1 对齐不变式)\n  /conflict_diagnoses(claude -p verbatim + provenance)/notifications\n  (预算账本,020)/mapping_runs(仅 start/exit,无进度分数)。\n- 图域:features(territory/sub-block 同表 parent_id)/specs(无 D,\n  stale/supersede,026)/anchors(足迹→地盘归因 join)/edges。\n- 配置域:settings(repo 0=global,repo 值遮蔽 global)。\n契约铁律落实:milestone 档/twist/filesTouched/session ordinal/\nstaleness 计数/geometry 一律不建列,读时派生(ActivityStore\nreadScopes/sessionIdentity/readDiagnosis 现场计算,有测试钉死:\nread 不计 staleness、蒸馏前文件归因 []=诚实灰区)。\n契约类型四文件(panel/conflict/install + map)canonical 家搬进\ncore/src/contract/(app-demo 副本待切片④消灭)。\nGates:core vitest 59/59(+17)、tsc clean、build 绿。\n",
+      "domain": "workbench",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:43e4b15bf02e453e0753cd16cee6c2f4b2049c8b7616387f032eefc523cf3190",
+          "evidence_id": "change-2026-07-12-three-domain-schema:1:meta-source",
+          "evidence_ref": "M1 backend session 2026-07-12(handoff:后端 M1 range ②)",
+          "exact_quote": "M1 ② 落地:SQLite 三表域 schema(运行域/图域/配置域)从五个契约 types 文件直译进 core(migration 002)+ ActivityStore/GraphStore 两扇 typed 门;DERIVED-NEVER-STORED 全线贯彻",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/legacy-21-workbench/specs/change-2026-07-12-three-domain-schema.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-12T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "M1 ② 落地:SQLite 三表域 schema(运行域/图域/配置域)从五个契约 types 文件直译进 core(migration 002)+ ActivityStore/GraphStore 两扇 typed 门;DERIVED-NEVER-STORED 全线贯彻",
+      "tags": [
+        "backend-m1",
+        "sqlite",
+        "schema",
+        "three-domain",
+        "activity-store",
+        "graph-store"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-12-three-domain-schema",
+  "state": "active",
+  "updated_at": "2026-07-12T00:00:00.000Z"
+}

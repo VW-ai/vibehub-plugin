@@ -1,0 +1,140 @@
+{
+  "created_at": "2026-07-31T17:23:53.966Z",
+  "current_revision": 1,
+  "feature_id": "02-01-claude-code",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "62e52930c752e1dd9b26633030d6f0d8b289e5772ada061de0a91f01dc2d204f",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 3,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:2ec2b0ddd12e8e75d659017519b86460291952a6da41a8fa7f57303444a779e8",
+          "sourcePath": "META/02-01-claude-code/specs/decision-workbench-006.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "from_path": "META/21-workbench/specs/decision-workbench-006.yaml",
+              "from_repository": "VW-ai/Vibehub",
+              "migrated_at": "2026-07-19"
+            },
+            "source_ref": "Wayne Claude hook matrix approval — 2026-07-12",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implemented_by relation from decision-workbench-006: Delivery and micro-protocol wire semantics",
+      "to_spec_id": "decision-workbench-007",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "hooks/hooks.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/hook-ingest.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/hook-protocol.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Claude Code 适配覆盖宿主公开 hook matrix。普通 hook 只记录 mechanical\nevidence；无条件行为协议仅在 SessionStart 注入一次。Queued context 在\n可靠 boundary 投递，Stop 使用官方 block/reason wire format 唤醒。\n\nRobustness 依赖宿主 hooks 与机械 evidence，不自建进程监听器或 transcript\nparser。信号缺失时诚实降级，不伪造 stalled/ready 精度。\n",
+      "domain": "claude-code",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2ec2b0ddd12e8e75d659017519b86460291952a6da41a8fa7f57303444a779e8",
+          "evidence_id": "decision-workbench-006:1:constraint-1",
+          "evidence_ref": "Wayne Claude hook matrix approval — 2026-07-12",
+          "exact_quote": "[must] 稳态高频 hooks 不得重复注入行为协议",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/02-01-claude-code/specs/decision-workbench-006.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2ec2b0ddd12e8e75d659017519b86460291952a6da41a8fa7f57303444a779e8",
+          "evidence_id": "decision-workbench-006:1:constraint-2",
+          "evidence_ref": "Wayne Claude hook matrix approval — 2026-07-12",
+          "exact_quote": "[must] Stop 唤醒必须使用宿主官方 wire contract",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/02-01-claude-code/specs/decision-workbench-006.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2ec2b0ddd12e8e75d659017519b86460291952a6da41a8fa7f57303444a779e8",
+          "evidence_id": "decision-workbench-006:1:constraint-3",
+          "evidence_ref": "Wayne Claude hook matrix approval — 2026-07-12",
+          "exact_quote": "[must_not] 不得为生命周期补洞自建脆弱 session 监听器",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/02-01-claude-code/specs/decision-workbench-006.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:2ec2b0ddd12e8e75d659017519b86460291952a6da41a8fa7f57303444a779e8",
+          "evidence_id": "decision-workbench-006:1:meta-source",
+          "evidence_ref": "Wayne Claude hook matrix approval — 2026-07-12",
+          "exact_quote": "Claude hooks 使用官方生命周期；稳态逐 hook 注入为零，SessionStart 一次注入协议，Stop 可做可靠唤醒",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/02-01-claude-code/specs/decision-workbench-006.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-31T17:23:53.966Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Claude hooks 使用官方生命周期；稳态逐 hook 注入为零，SessionStart 一次注入协议，Stop 可做可靠唤醒",
+      "tags": [
+        "hooks",
+        "session-start",
+        "stop",
+        "delivery",
+        "robustness"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-workbench-006",
+  "state": "active",
+  "updated_at": "2026-07-31T17:23:53.966Z"
+}

@@ -1,0 +1,371 @@
+{
+  "created_at": "2026-07-30T14:56:25-07:00",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "1d438aef8e5d417793934f9b3ae9284660ca1e4f47519dc0eb409df531cbd42d",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 16,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "sourcePath": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "sourceProvenance": {
+            "confidence": 0.99,
+            "produced_at": "2026-07-30T14:56:25-07:00",
+            "produced_by_agent": "implementation",
+            "source_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+            "source_type": "implementation_review"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Supplies durable authority for the exact Git-native Decision facts introduced by M3.",
+      "to_spec_id": "contract-ticket-git-review-interventions-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Keeps the signed receipt in Git while the signing key and revocable public trust remain repo-external.",
+      "to_spec_id": "decision-ticket-git-native-ledger-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Exposes verified authority evidence to Skills without moving semantic judgment into Core.",
+      "to_spec_id": "decision-ticket-skill-driven-boundary-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "The context-binding mechanics are Agent-owned; only a genuine protected product, permission, or material-risk Decision discovered around execution may use this receipt.",
+      "to_spec_id": "contract-ticket-context-binding-001",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-install-local-decision-authority-pivot.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-30-ticket-m3-5-durable-decision-attestation.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/cli/src/main.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/cli/src/ticket-local-decision-authority.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/cli/src/ticket-review-host.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/operation-dispatcher.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-decision-attestation.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-decision-trust-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-ledger/codec.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-ledger/contract.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/ticket-ledger/writer.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/mcp/src/runtime.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-ticket-review/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "M3.6 keeps the useful durable-receipt boundary from M3.5 while removing the\nWebAuthn ceremony and its stronger-than-needed human-presence claim. One\nexplicit click in the installed Plugin review host confirms one exact\nDecision. The host signs that Decision with a repository-scoped,\ninstallation-local Ed25519 key whose private material and public trust\nregistry live outside Git and SQLite.\n\nThe detached Git receipt binds the exact canonical Decision document and\ndigest, authority attribution, repository incarnation and roots, worktree,\nnamed branch, protected subject, disposition and granted scope. Detached\ncheckouts remain readable but cannot create durable Decisions because a\ncommit would immediately change their commit identity. The receipt also\nrecords the signer key ID and fingerprint, the\n`plugin_host_click` confirmation method, a nonce, and issuance time.\nSignature bytes are the fixed domain\n`vibehub.ticket-decision-attestation.v1\\0` followed by the canonical\nenvelope without the signature.\n\nFresh Core, CLI, MCP, and Skill readers resolve the public profile from the\nrepo-external registry for every verification. A missing, mismatched, or\nrevoked profile; any Decision, checkout, repository, worktree, subject, or\nscope mismatch; or an invalid signature fails closed. Receipts do not\nexpire. They remain usable only while their exact bound facts are current\nand their signing profile is not revoked.\n\nThis is intentionally local-installation authority, not proof of a named\nperson. `confirmation.method: plugin_host_click` records what the trusted\nPlugin host says happened; it is not biometric verification, WebAuthn user\nverification, or cryptographic proof of human presence. The profile's\nhuman-shaped authority fields preserve the Decision contract as a\n`designated_human` host assertion but identify\n`local-installation:<profileId>`, not an individual or repository owner.\n\nThe threat model protects against repository-only mutation, Git or SQLite\nfabrication, stale checkout reuse, receipt tamper, and fresh-process trust\nconfusion. It does not protect against an arbitrary process running as the\nsame OS user that can read or invoke the installation key, a compromised\nPlugin/runtime, or compromise of the local OS account. Those stronger\nthreats require an OS-backed or remote authority and are explicitly outside\nthis contract.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-1",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] One explicit Plugin-host click produces at most one exact Decision and its detached attestation; no default draft or second review ceremony is required",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-10",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] A running host remains bound to its startup profile and fails closed after revocation; it cannot rotate from an old browser form or direct request, and only a subsequent named-branch host startup provisions the replacement",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-11",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] The non-semantic SQLite mutex is owner-only before SQLite opens it, and the complete owner record is fsynced before atomic no-replace publication so process exit cannot leave an empty canonical lock",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-12",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must_not] Do not describe plugin_host_click as WebAuthn, biometric verification, named-human identity, or cryptographic proof of human presence",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-13",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must_not] Do not let editable Git documents, SQLite rows, browser-supplied identity or proof fields, OS usernames, Git authors, or previous in-memory state mint or preserve authority",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-14",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must_not] Do not treat the local SQLite writer mutex as Ticket meaning, identity, trust material, or durable authority",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-15",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must_not] Do not claim resistance to arbitrary same-UID key access, Plugin/runtime compromise, or local OS-account compromise",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-16",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must_not] Do not expand the mechanism into remote authentication, generic workflow policy, or mandatory human review for Agent-owned technical choices",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-2",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] The signer is a repository-scoped installation-local Ed25519 profile, keyed by repository incarnation, whose private key and trust registry live outside Git and SQLite",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-3",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] The signed envelope binds the exact Decision ID, path, digest, designated-human host attribution, repository incarnation and roots, worktree identity and root, named branch, subject, disposition, and granted scope",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-4",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] The signed envelope also binds signer key ID and fingerprint, algorithm Ed25519, confirmation method plugin_host_click, a fresh nonce, and issued_at; the signature is canonical base64url over the fixed domain-separated canonical envelope",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-5",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] Fresh and already-running readers dynamically reread the repo-external public trust registry for each verification so missing, mismatched, or revoked profiles fail closed without a restart",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-6",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] A Decision written without its matching receipt after interruption remains inspectable current-unverified evidence and never projects protected execution authority",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-7",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] The receipt has no not_before, expires_at, or TTL semantics; a subject or checkout change requires a newly bound Decision, while profile revocation invalidates prior receipts",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-8",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] Detached checkouts remain readable but durable Decision controls are unavailable and direct writes fail closed until the worktree is on a named branch",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:constraint-9",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "[must] Revoked profiles remain inspectable, the next named-branch host may rotate to one new active profile, and a dead authority-writer lock is recovered only after its recorded process no longer exists while a non-semantic process-releasing mutex excludes concurrent recoverers",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.99,
+          "content_hash": "sha256:0141444b93de77b5be731f3ed180277b362fa0d1652e73881aa386d659321d28",
+          "evidence_id": "contract-ticket-install-local-decision-attestation-001:1:meta-source",
+          "evidence_ref": "Install-local Ed25519 Decision authority pivot — 2026-07-30",
+          "exact_quote": "Fresh host 与 fresh Agent 如何在不声称 WebAuthn、biometric 或 named-human presence 的前提下，验证一次 Plugin-host click 所确认的 exact Decision？",
+          "produced_at": "2026-07-30T14:56:25-07:00",
+          "producer": "meta:implementation",
+          "source_ref": "META/09-ticket-runtime/specs/contract-ticket-install-local-decision-attestation-001.yaml",
+          "source_type": "implementation_review"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-30T14:56:25-07:00",
+      "producer": "meta:implementation",
+      "revision": 1,
+      "summary": "Fresh host 与 fresh Agent 如何在不声称 WebAuthn、biometric 或 named-human presence 的前提下，验证一次 Plugin-host click 所确认的 exact Decision？",
+      "tags": [
+        "ticket",
+        "decision",
+        "authority",
+        "attestation",
+        "ed25519",
+        "plugin",
+        "git",
+        "worktree"
+      ],
+      "type": "contract"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "contract-ticket-install-local-decision-attestation-001",
+  "state": "active",
+  "updated_at": "2026-07-30T14:56:25-07:00"
+}

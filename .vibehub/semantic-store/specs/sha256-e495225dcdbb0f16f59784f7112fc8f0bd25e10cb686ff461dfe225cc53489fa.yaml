@@ -1,0 +1,139 @@
+{
+  "created_at": "2026-07-31T17:26:49.934Z",
+  "current_revision": 1,
+  "feature_id": "08-git-semantic-store",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:26:49.934Z",
+      "durable_id": "0510d6a4aac7ed655e3da20e9cb6ac16c0e959303e9c6875c2e1d29ed9c1cf37",
+      "operation": "spec_batch",
+      "payload": {
+        "_receipt": {
+          "createdAt": "2026-07-31T17:26:49.934Z",
+          "idempotencyKey": "canonical-meta-migration-and-mapping-copy-fix-20260731-v1",
+          "inputHash": "61ad2255ac07089ed262a84810d815063786df9c8d592dd704201e036b52ecf7",
+          "operation": "spec_batch",
+          "result": {
+            "created": [
+              "change-2026-07-31-finalized-mapping-cache-copy",
+              "change-2026-07-31-meta-canonical-spec-migration"
+            ],
+            "idempotencyKey": "canonical-meta-migration-and-mapping-copy-fix-20260731-v1",
+            "inputHash": "61ad2255ac07089ed262a84810d815063786df9c8d592dd704201e036b52ecf7",
+            "operation": "spec_batch",
+            "state": "active",
+            "validation": {
+              "checks": [
+                "schema",
+                "evidence",
+                "anchors",
+                "relations"
+              ],
+              "status": "passed"
+            }
+          }
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-migration-change-apply-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:26:49.934Z",
+      "rationale": "This implements the user-authorized same-source META conversion boundary as canonical knowledge rather than leaving the content as distillation candidates.",
+      "to_spec_id": "decision-meta-native-distillation-source-001",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:26:49.934Z",
+      "rationale": "The migration installs the converted truth in the Git-native canonical semantic store through its validated CAS boundary.",
+      "to_spec_id": "decision-project-028",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/cli/src/main.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "runMetaCanonicalMigration"
+        },
+        {
+          "content_hash": null,
+          "file": "packages/cli/test/kb-cli.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/meta-canonical-migration.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "migrateMetaSpecsToCanonical"
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/test/meta-canonical-migration.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "The one-time kb migrate-meta command selects current Room copies over legacy duplicates before full validation, validates chosen META Specs, preserves their IDs and draft/active/stale/superseded lifecycle, places each Spec in its Room feature, expands symbol anchors, normalizes only trailing-slash directory anchors, maps heterogeneous relations into the four canonical relation types with OLD-to-NEW supersession, and records source content hashes plus original provenance. It builds the full result in a temporary semantic cache and replaces the Git semantic store only through a digest CAS. Missing relation endpoints are reported and skipped rather than fabricated. The 2026-07-31 migration selected 85 of 109 source files, yielding 88 total canonical Specs and 187 canonical relations.",
+      "domain": "git-semantic-store",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "change-2026-07-31-meta-canonical-spec-migration:1:1",
+          "evidence_ref": null,
+          "exact_quote": "okay，做canonical spec migration",
+          "produced_at": "2026-07-31T17:26:49.934Z",
+          "producer": "codex-root",
+          "source_ref": "conversation:2026-07-31/canonical-spec-migration",
+          "source_type": "user_request"
+        },
+        {
+          "confidence": 1,
+          "content_hash": null,
+          "evidence_id": "change-2026-07-31-meta-canonical-spec-migration:1:2",
+          "evidence_ref": null,
+          "exact_quote": "85 selected META Specs; final canonical count 88; lifecycle 69 active, 4 draft, 4 stale, 11 superseded; 187 relations; semantic digest 196c700e5f74c588233e6d36dcf90e7486ea89763f0a8d313fd48a42206d16e7.",
+          "produced_at": "2026-07-31T17:26:49.934Z",
+          "producer": "codex-root",
+          "source_ref": ".vibehub/semantic-store",
+          "source_type": "migration_receipt"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-31T17:26:49.934Z",
+      "producer": "codex-root",
+      "revision": 1,
+      "summary": "A bounded META-to-canonical migration now imports same-source authored Specs with lifecycle, placement, relations, anchors, evidence, and provenance preserved.",
+      "tags": [
+        "meta",
+        "migration",
+        "canonical",
+        "lifecycle",
+        "provenance"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-31-meta-canonical-spec-migration",
+  "state": "active",
+  "updated_at": "2026-07-31T17:26:49.934Z"
+}

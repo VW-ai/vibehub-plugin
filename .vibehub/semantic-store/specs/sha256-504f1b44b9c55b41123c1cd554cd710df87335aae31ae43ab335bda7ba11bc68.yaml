@@ -1,0 +1,122 @@
+{
+  "created_at": "2026-07-12T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "05-02-scope-conflict-intervention",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "cb4645da266978b26824bb02e71b723c1d2de0ec4c859130fee8bee993315977",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 2,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:2756b571958106b522d3c1f7b12c7a3e56021455df6266bdb48c7b0450444b7b",
+          "sourcePath": "META/05-02-scope-conflict-intervention/specs/decision-workbench-002.yaml",
+          "sourceProvenance": {
+            "confidence": 0.85,
+            "migration": {
+              "migrated_at": "2026-07-19",
+              "migrated_to": "05-02-scope-conflict-intervention"
+            },
+            "produced_at": "2026-07-12",
+            "source_ref": "META/legacy-21-workbench/specs/decision-workbench-002.yaml",
+            "source_type": "migrated_spec"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/core/src/conflict-ignore.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/intervention-service.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/workflow-receipt-projectors.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "A resolved conflict must appear in timeline or notification feedback, and\nresolution evidence should support daily, weekly and monthly value reporting.\nSending an intervention is not resolution: the system must distinguish\nqueueing from delivery and later observe whether the work actually converged.\n",
+      "domain": "scope-conflict-intervention",
+      "evidence": [
+        {
+          "confidence": 0.85,
+          "content_hash": "sha256:2756b571958106b522d3c1f7b12c7a3e56021455df6266bdb48c7b0450444b7b",
+          "evidence_id": "decision-workbench-002:1:constraint-1",
+          "evidence_ref": "META/legacy-21-workbench/specs/decision-workbench-002.yaml",
+          "exact_quote": "[must] Intervention receipts must distinguish queued or delivered instructions from verified resolution",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/05-02-scope-conflict-intervention/specs/decision-workbench-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.85,
+          "content_hash": "sha256:2756b571958106b522d3c1f7b12c7a3e56021455df6266bdb48c7b0450444b7b",
+          "evidence_id": "decision-workbench-002:1:constraint-2",
+          "evidence_ref": "META/legacy-21-workbench/specs/decision-workbench-002.yaml",
+          "exact_quote": "[should] Resolution events should support aggregate outcome reporting without inventing semantic success",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/05-02-scope-conflict-intervention/specs/decision-workbench-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.85,
+          "content_hash": "sha256:2756b571958106b522d3c1f7b12c7a3e56021455df6266bdb48c7b0450444b7b",
+          "evidence_id": "decision-workbench-002:1:meta-source",
+          "evidence_ref": "META/legacy-21-workbench/specs/decision-workbench-002.yaml",
+          "exact_quote": "Conflict resolution must produce user-visible feedback and retain evidence for outcome statistics",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/05-02-scope-conflict-intervention/specs/decision-workbench-002.yaml",
+          "source_type": "migrated_spec"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P1",
+      "produced_at": "2026-07-12T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Conflict resolution must produce user-visible feedback and retain evidence for outcome statistics",
+      "tags": [
+        "conflict",
+        "intervention",
+        "feedback",
+        "receipts",
+        "outcomes"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-workbench-002",
+  "state": "active",
+  "updated_at": "2026-07-12T00:00:00.000Z"
+}

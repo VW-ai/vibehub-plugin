@@ -1,0 +1,99 @@
+{
+  "created_at": "2026-07-12T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "21-workbench",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "5ff415205a15cb966440c41d87fae027c099142081386613bc1fff33f6a5e761",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 1,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:e0a8b93e7cb1e8f97067b9fe39157d83ea03daa3e8c747671a9a283b6284f4f5",
+          "sourcePath": "META/legacy-21-workbench/specs/decision-workbench-005.yaml",
+          "sourceProvenance": {
+            "confidence": 0.85,
+            "produced_at": "2026-07-12",
+            "produced_by_agent": "ingest",
+            "source_ref": "Wayne 五点 thinking — 2026-07-12(main-planning session 裁决)",
+            "source_type": "chat_extraction"
+          },
+          "sourceState": "draft"
+        },
+        "revision": 1,
+        "state": "draft",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "自发 CRU 的入口侧推论",
+      "to_spec_id": "decision-project-026",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "队友 branch 蒸馏的触发方式即本条的实例",
+      "to_spec_id": "decision-workbench-004",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [],
+      "detail": "Wayne 2026-07-12 口述(五点 thinking 之五)+ 裁决。\n\n起点疑问:\"后端功能几乎都从 app 触发?用 Claude Code 时没法显式触发?\"\n——前提恰好相反:intent-project-002 + decision-project-026 拍板 app 里\n几乎没有功能触发(只有感知+介入+发射),知识库操作全由 agent 自发。\n\n**定案:两个入口收敛到同一机制。**\n- Claude Code 内:用户直接说(\"拉这个 branch 帮我看看\")= 原生触发,\n  agent 经 MCP 工具/CLI 执行(拉 branch、跑队友蒸馏、回答);\n- GUI 内:对应动作按钮(如队友事卡上的 \"Summarize this branch\")=\n  发射一个带预置 context 的 session 或 claude -p——替用户把那句话说了。\nGUI 按钮是咒语的按钮化,不存在第三种触发系统;新功能设计时先问\n\"这句话在 Claude Code 里怎么说\",按钮只是它的封装。\n",
+      "domain": "workbench",
+      "evidence": [
+        {
+          "confidence": 0.85,
+          "content_hash": "sha256:e0a8b93e7cb1e8f97067b9fe39157d83ea03daa3e8c747671a9a283b6284f4f5",
+          "evidence_id": "decision-workbench-005:1:constraint-1",
+          "evidence_ref": "Wayne 五点 thinking — 2026-07-12(main-planning session 裁决)",
+          "exact_quote": "[must_not] 不为 GUI 发明独立于 agent 执行路径的功能触发机制",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/legacy-21-workbench/specs/decision-workbench-005.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.85,
+          "content_hash": "sha256:e0a8b93e7cb1e8f97067b9fe39157d83ea03daa3e8c747671a9a283b6284f4f5",
+          "evidence_id": "decision-workbench-005:1:meta-source",
+          "evidence_ref": "Wayne 五点 thinking — 2026-07-12(main-planning session 裁决)",
+          "exact_quote": "触发模型 = 双入口同机制:app 里没有『功能触发』只有感知/介入/发射;一切语义动作(如『看看队友这个 branch 在干嘛』)在 Claude Code 里直接说即原生触发(agent 调 MCP/CLI 完成),GUI 按钮 = 咒语的按钮化(发射一个带预置 context 的 session / claude -p),底下同一条 agent 执行路径",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/legacy-21-workbench/specs/decision-workbench-005.yaml",
+          "source_type": "chat_extraction"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P1",
+      "produced_at": "2026-07-12T00:00:00.000Z",
+      "producer": "meta:ingest",
+      "revision": 1,
+      "summary": "触发模型 = 双入口同机制:app 里没有『功能触发』只有感知/介入/发射;一切语义动作(如『看看队友这个 branch 在干嘛』)在 Claude Code 里直接说即原生触发(agent 调 MCP/CLI 完成),GUI 按钮 = 咒语的按钮化(发射一个带预置 context 的 session / claude -p),底下同一条 agent 执行路径",
+      "tags": [
+        "trigger-model",
+        "dual-entry",
+        "mcp",
+        "launch",
+        "ui"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-workbench-005",
+  "state": "draft",
+  "updated_at": "2026-07-12T00:00:00.000Z"
+}

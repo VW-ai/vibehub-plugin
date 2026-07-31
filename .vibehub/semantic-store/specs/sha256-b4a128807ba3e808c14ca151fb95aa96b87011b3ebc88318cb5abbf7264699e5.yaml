@@ -1,0 +1,89 @@
+{
+  "created_at": "2026-07-12T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "21-workbench",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "0c986e2373babbe85d6dd5f81ff67569616a78ed1a7a597122c1f92076454525",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 0,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:e93d778f7467fd2d5aaf2dbd6c9da9cf8097eeb02dd20ea5ed0f2272640562c1",
+          "sourcePath": "META/legacy-21-workbench/specs/intent-workbench-002.yaml",
+          "sourceProvenance": {
+            "confidence": 0.8,
+            "produced_at": "2026-07-12",
+            "produced_by_agent": "ingest",
+            "source_ref": "Wayne 口述 — 2026-07-12 M2 integration session(明确非 immediate)",
+            "source_type": "chat_extraction"
+          },
+          "sourceState": "draft"
+        },
+        "revision": 1,
+        "state": "draft",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "产品化触发遵循双入口同机制(咒语按钮化)",
+      "to_spec_id": "decision-workbench-005",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "同一 context db 的下一种使用方式;009 是 context 管理侧的地基",
+      "to_spec_id": "decision-workbench-009",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [],
+      "detail": "Wayne 2026-07-12 口述 mark。\"我们现在 focus on context 管理,但是\n有 context 就有 action\"——loopfinding 的设计本质是\"高效利用一个\n稳定、robust、方便查询、结构上设计得很好的 context database\"的\n一种使用方式;同一个 db 可以长出别的使用方式。\n\n候选形态(未裁,到期再议):\n- 发射 session 时,基于 feature room 自动组装带 action 的强 prompt\n  (发射即带上下文与动作,不只是空 session);\n- 开发期 prompt-gen skill(拉 Room context 增强 prompt)即此方向的\n  雏形,产品化 = 咒语按钮化(005)+ 自发触发(026);\n- 与 loopfinding 系列的关系到期梳理。\n\n明确:**现在不做**。当前 focus = context 管理本身做好(单 session\n体感 consistent context → 多 agent 舰队仪表盘/介入盘)。人选倾向\nVictor(Wayne 口述\"可能我要 Victor 去做\")。\n",
+      "domain": "workbench",
+      "evidence": [
+        {
+          "confidence": 0.8,
+          "content_hash": "sha256:e93d778f7467fd2d5aaf2dbd6c9da9cf8097eeb02dd20ea5ed0f2272640562c1",
+          "evidence_id": "intent-workbench-002:1:meta-source",
+          "evidence_ref": "Wayne 口述 — 2026-07-12 M2 integration session(明确非 immediate)",
+          "exact_quote": "前瞻(现在不做,倾向 Victor 接):context → action——基于 feature room 生成强 action prompt 直接喂 agent;loopfinding 同系列(高效利用结构良好、可查询的 context db 的使用方式);发射 session 时自带动作是首个候选形态;开发期 prompt-gen skill 是雏形",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/legacy-21-workbench/specs/intent-workbench-002.yaml",
+          "source_type": "chat_extraction"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P2",
+      "produced_at": "2026-07-12T00:00:00.000Z",
+      "producer": "meta:ingest",
+      "revision": 1,
+      "summary": "前瞻(现在不做,倾向 Victor 接):context → action——基于 feature room 生成强 action prompt 直接喂 agent;loopfinding 同系列(高效利用结构良好、可查询的 context db 的使用方式);发射 session 时自带动作是首个候选形态;开发期 prompt-gen skill 是雏形",
+      "tags": [
+        "context-to-action",
+        "prompt-gen",
+        "launch",
+        "loopfinding",
+        "future",
+        "victor"
+      ],
+      "type": "intent"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "intent-workbench-002",
+  "state": "draft",
+  "updated_at": "2026-07-12T00:00:00.000Z"
+}

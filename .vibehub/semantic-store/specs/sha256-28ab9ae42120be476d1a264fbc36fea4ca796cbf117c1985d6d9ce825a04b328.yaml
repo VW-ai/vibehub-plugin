@@ -1,0 +1,142 @@
+{
+  "created_at": "2026-07-12T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "05-03-git-team-visibility",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "2dffbbab38592f55f04a2aa089bf13baf635d41b4265b52e74af6cb6976ce966",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 0,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:29e5bc901581858651d2678c5edc94a5b41d4054d8078c5a435041f38e173659",
+          "sourcePath": "META/05-03-git-team-visibility/specs/change-2026-07-12-team-visibility-slice.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "migrated_at": "2026-07-19",
+              "migrated_to": "05-03-git-team-visibility"
+            },
+            "produced_at": "2026-07-12",
+            "source_ref": "META/legacy-21-workbench/specs/change-2026-07-12-team-visibility-slice.yaml",
+            "source_type": "migrated_spec"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from change-2026-07-12-team-visibility-slice",
+      "to_spec_id": "decision-workbench-004",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/core/src/db.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "defaultDbPath"
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/db.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "openDb"
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/git-facade.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "GhFacade"
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/git-facade.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "GitFacade"
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/git-facade.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "parseRemoteSlug"
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/snapshot-export.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/team-sync.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "selectConflictCandidates"
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/team-sync.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": "syncTeamSnapshot"
+        }
+      ],
+      "detail": "The first backend slice added GitFacade, GitHub PR discovery, team snapshot\ntables, conflict candidate selection and a browser-safe map projection. It\nproved that team visibility can run locally without a VibeHub cloud service.\n",
+      "domain": "git-team-visibility",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:29e5bc901581858651d2678c5edc94a5b41d4054d8078c5a435041f38e173659",
+          "evidence_id": "change-2026-07-12-team-visibility-slice:1:meta-source",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-12-team-visibility-slice.yaml",
+          "exact_quote": "Implemented the Git/GitHub to SQLite to Workbench team-visibility vertical slice",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/05-03-git-team-visibility/specs/change-2026-07-12-team-visibility-slice.yaml",
+          "source_type": "migrated_spec"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-12T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Implemented the Git/GitHub to SQLite to Workbench team-visibility vertical slice",
+      "tags": [
+        "git",
+        "github",
+        "sqlite",
+        "team-sync",
+        "local-first"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-12-team-visibility-slice",
+  "state": "active",
+  "updated_at": "2026-07-12T00:00:00.000Z"
+}

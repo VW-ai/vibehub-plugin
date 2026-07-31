@@ -1,0 +1,148 @@
+{
+  "created_at": "2026-07-19T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "07-release-engineering",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "ac090e5d3c6c8b52b74ee0d7a7b66fe9d53988ea2a8a23be47ae8d035a9c587f",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 3,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:63b9db9fba0390226c748ceb44f3e77d4671b0c433948fd735e6721663db0999",
+          "sourcePath": "META/07-release-engineering/specs/change-2026-07-19-plugin-repository-migration.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "produced_at": "2026-07-19",
+            "source_ref": "Standalone repository migration and independent reviews, 2026-07-19",
+            "source_type": "implementation"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META builds_on relation from change-2026-07-19-plugin-repository-migration",
+      "to_spec_id": "change-2026-07-19-claude-marketplace",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META constrained_by relation from change-2026-07-19-plugin-repository-migration",
+      "to_spec_id": "constraint-public-beta-001",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/00-project-room/_tree.yaml",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "META/project.yaml",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "README.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/mcp/test/protocol-docs.test.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "The filtered repository promotes the former workbench subtree to its root,\npreserves the original Room 21 as an unindexed legacy archive, and adds an\n18-Room plugin-centric canonical META. Standalone manifests, documentation,\ngovernance tests and generated marketplace metadata now identify\nVW-ai/vibehub-plugin. Full release verification passes from the filtered\nrepository before public push.\n",
+      "domain": "release-engineering",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:63b9db9fba0390226c748ceb44f3e77d4671b0c433948fd735e6721663db0999",
+          "evidence_id": "change-2026-07-19-plugin-repository-migration:1:constraint-1",
+          "evidence_ref": "Standalone repository migration and independent reviews, 2026-07-19",
+          "exact_quote": "[must] The canonical META is independent of the former monorepo while legacy Room 21 remains available only as provenance",
+          "produced_at": "2026-07-19T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/07-release-engineering/specs/change-2026-07-19-plugin-repository-migration.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:63b9db9fba0390226c748ceb44f3e77d4671b0c433948fd735e6721663db0999",
+          "evidence_id": "change-2026-07-19-plugin-repository-migration:1:constraint-2",
+          "evidence_ref": "Standalone repository migration and independent reviews, 2026-07-19",
+          "exact_quote": "[must] Rewritten history must be scanned for secrets and validated with git fsck before publication",
+          "produced_at": "2026-07-19T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/07-release-engineering/specs/change-2026-07-19-plugin-repository-migration.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:63b9db9fba0390226c748ceb44f3e77d4671b0c433948fd735e6721663db0999",
+          "evidence_id": "change-2026-07-19-plugin-repository-migration:1:constraint-3",
+          "evidence_ref": "Standalone repository migration and independent reviews, 2026-07-19",
+          "exact_quote": "[must_not] Do not describe the standalone repository as a future subtree split or silently skip governance checks",
+          "produced_at": "2026-07-19T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/07-release-engineering/specs/change-2026-07-19-plugin-repository-migration.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:63b9db9fba0390226c748ceb44f3e77d4671b0c433948fd735e6721663db0999",
+          "evidence_id": "change-2026-07-19-plugin-repository-migration:1:meta-source",
+          "evidence_ref": "Standalone repository migration and independent reviews, 2026-07-19",
+          "exact_quote": "Migrated the plugin/runtime and relevant governance history into the standalone vibehub-plugin repository",
+          "produced_at": "2026-07-19T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/07-release-engineering/specs/change-2026-07-19-plugin-repository-migration.yaml",
+          "source_type": "implementation"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-19T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Migrated the plugin/runtime and relevant governance history into the standalone vibehub-plugin repository",
+      "tags": [
+        "open-source",
+        "history-migration",
+        "feature-room",
+        "standalone"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-19-plugin-repository-migration",
+  "state": "active",
+  "updated_at": "2026-07-19T00:00:00.000Z"
+}

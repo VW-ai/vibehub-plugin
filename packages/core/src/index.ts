@@ -156,6 +156,11 @@ export {
   type WorktreeSemanticStoreInspection,
 } from "./git-semantic-store.js";
 export {
+  migrateMetaSpecsToCanonical,
+  type MetaCanonicalMigrationOptions,
+  type MetaCanonicalMigrationResult,
+} from "./meta-canonical-migration.js";
+export {
   ingestCanonicalHookEvent,
   ingestHookEvent,
   lastAssistantText,

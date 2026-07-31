@@ -1,0 +1,157 @@
+{
+  "created_at": "2026-07-18T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "07-release-engineering",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "1a01677529051662d5925f76ee17de8fbec623c31e798e4d0a328e0a0bbf70a6",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 2,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:a4a8e2fb235812d366216c363328e2dd46649e47fa1cf45cc3e2d6cfe1ea6ff9",
+          "sourcePath": "META/07-release-engineering/specs/change-2026-07-18-codex-activation-parity.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "migrated_at": "2026-07-19",
+              "migrated_to": "07-release-engineering"
+            },
+            "produced_at": "2026-07-18",
+            "source_ref": "META/legacy-21-workbench/specs/change-2026-07-18-codex-activation-parity.yaml",
+            "source_type": "migrated_spec"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META complements relation from change-2026-07-18-codex-activation-parity",
+      "to_spec_id": "change-2026-07-19-claude-marketplace",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": ".codex-plugin/plugin.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "codex/hooks.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "codex/mcp.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/cli/src/hook-adapters.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/hook-protocol.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "scripts/verify-codex-plugin.mjs",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "scripts/verify-plugin-artifact.mjs",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Claude and Codex share SQLite, repo/worktree identity, skills, MCP and\nreceipts. The Codex adapter only maps host events and output. Its default\npackage wires verified SessionStart, UserPromptSubmit and PostToolUse\napply_patch evidence; absent lifecycle events remain honestly absent.\nIsolated verification installs the real marketplace, executes the installed\nhook and proves the installed MCP reaches ready in a real Codex app-server.\n",
+      "domain": "release-engineering",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:a4a8e2fb235812d366216c363328e2dd46649e47fa1cf45cc3e2d6cfe1ea6ff9",
+          "evidence_id": "change-2026-07-18-codex-activation-parity:1:constraint-1",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-codex-activation-parity.yaml",
+          "exact_quote": "[must] Codex and Claude must share one runtime and one semantic contract",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/07-release-engineering/specs/change-2026-07-18-codex-activation-parity.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:a4a8e2fb235812d366216c363328e2dd46649e47fa1cf45cc3e2d6cfe1ea6ff9",
+          "evidence_id": "change-2026-07-18-codex-activation-parity:1:constraint-2",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-codex-activation-parity.yaml",
+          "exact_quote": "[must_not] Missing Codex lifecycle signals must not be fabricated with watchers, log tailing or transcript parsing",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/07-release-engineering/specs/change-2026-07-18-codex-activation-parity.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:a4a8e2fb235812d366216c363328e2dd46649e47fa1cf45cc3e2d6cfe1ea6ff9",
+          "evidence_id": "change-2026-07-18-codex-activation-parity:1:meta-source",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-codex-activation-parity.yaml",
+          "exact_quote": "Added a thin native Codex adapter sharing the same runtime and a real isolated Codex marketplace gate",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/07-release-engineering/specs/change-2026-07-18-codex-activation-parity.yaml",
+          "source_type": "migrated_spec"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-18T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Added a thin native Codex adapter sharing the same runtime and a real isolated Codex marketplace gate",
+      "tags": [
+        "codex",
+        "marketplace",
+        "adapter",
+        "isolated",
+        "capability-parity"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-18-codex-activation-parity",
+  "state": "active",
+  "updated_at": "2026-07-18T00:00:00.000Z"
+}

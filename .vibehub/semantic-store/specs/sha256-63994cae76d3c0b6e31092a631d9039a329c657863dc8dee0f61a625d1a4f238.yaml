@@ -1,0 +1,142 @@
+{
+  "created_at": "2026-07-18T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "00-project-room",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "79203c2f94e72c50ff4f89f46cfd6392038e1afed4ee25cbc1c25cf7bf8e4c82",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 3,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:5ee5de796c3998fbd29684658712000f185e18f59028b1fa9c5a8d3ec0115d8a",
+          "sourcePath": "META/00-project-room/specs/change-2026-07-18-presentation-rollout.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "produced_at": "2026-07-18",
+            "source_ref": "META/legacy-21-workbench/specs/change-2026-07-18-presentation-rollout.yaml",
+            "source_type": "migrated_spec"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "change-2026-07-18-knowledge-checkpoint",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from change-2026-07-18-presentation-rollout",
+      "to_spec_id": "decision-workbench-016",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "app/src/receipt-note-derive.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/contract/workflow-receipt-projection.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/_stdlib/reporting.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "CLI, skills and App project the same WorkflowReceiptV1 facts through\nActivity, Trigger, Effects, Result and Next. Silent, brief and expanded\nvisibility budgets use host-native affordances and portable text. Weak\nevidence never upgrades attempted, queued or claimed work into success.\n",
+      "domain": "workflow-presentation",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:5ee5de796c3998fbd29684658712000f185e18f59028b1fa9c5a8d3ec0115d8a",
+          "evidence_id": "change-2026-07-18-presentation-rollout:1:constraint-1",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-presentation-rollout.yaml",
+          "exact_quote": "[must] All surfaces use shared receipt outcome vocabulary and deterministic evidence",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/00-project-room/specs/change-2026-07-18-presentation-rollout.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:5ee5de796c3998fbd29684658712000f185e18f59028b1fa9c5a8d3ec0115d8a",
+          "evidence_id": "change-2026-07-18-presentation-rollout:1:constraint-2",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-presentation-rollout.yaml",
+          "exact_quote": "[must] Failure and waiting states are never silent",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/00-project-room/specs/change-2026-07-18-presentation-rollout.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:5ee5de796c3998fbd29684658712000f185e18f59028b1fa9c5a8d3ec0115d8a",
+          "evidence_id": "change-2026-07-18-presentation-rollout:1:constraint-3",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-presentation-rollout.yaml",
+          "exact_quote": "[must_not] Do not depend on custom TUI widgets, ANSI color or pixel layout for unique meaning",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/00-project-room/specs/change-2026-07-18-presentation-rollout.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:5ee5de796c3998fbd29684658712000f185e18f59028b1fa9c5a8d3ec0115d8a",
+          "evidence_id": "change-2026-07-18-presentation-rollout:1:meta-source",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-18-presentation-rollout.yaml",
+          "exact_quote": "Rolled one evidence-backed presentation protocol across setup, query, ingest, distill, inject and checkpoint",
+          "produced_at": "2026-07-18T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/00-project-room/specs/change-2026-07-18-presentation-rollout.yaml",
+          "source_type": "migrated_spec"
+        }
+      ],
+      "layer": "project",
+      "priority": "P0",
+      "produced_at": "2026-07-18T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Rolled one evidence-backed presentation protocol across setup, query, ingest, distill, inject and checkpoint",
+      "tags": [
+        "presentation",
+        "receipt",
+        "tui",
+        "cli",
+        "app"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-18-presentation-rollout",
+  "state": "active",
+  "updated_at": "2026-07-18T00:00:00.000Z"
+}

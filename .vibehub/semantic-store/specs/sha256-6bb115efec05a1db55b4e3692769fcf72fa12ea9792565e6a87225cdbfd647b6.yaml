@@ -1,0 +1,144 @@
+{
+  "created_at": "2026-07-31T17:23:53.966Z",
+  "current_revision": 1,
+  "feature_id": "01-runtime-foundation",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "0164eb43e61da1b13857c6a95c965afa1a1f23df58b53b695b975660581ba5f4",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 2,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:a46417d593a1ce72c60cf9a8c8a37f5e7e9c01fe7f82b14b38cd6e3aa60cc76d",
+          "sourcePath": "META/01-runtime-foundation/specs/decision-project-025.yaml",
+          "sourceProvenance": {
+            "confidence": 0.95,
+            "migration": {
+              "from_path": "META/00-project-room/specs/decision-project-025.yaml",
+              "from_repository": "VW-ai/Vibehub",
+              "migrated_at": "2026-07-19",
+              "note": "保留 spec_id；将早期九模块/Tauri表述投影到已落地 package boundaries"
+            },
+            "source_ref": "Workbench service architecture — 2026-07-11",
+            "source_type": "chat_extraction"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META implements relation from decision-project-025: Library-first and thin-adapter architecture",
+      "to_spec_id": "decision-project-013",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "packages/cli/src/hook-adapters.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/live-read-models.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/snapshot-export.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/mcp/src/capabilities.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Runtime 按职责拆为 activity/knowledge/distillation/scope/intervention/state/\ngit/team/projection 等 core services。Hook CLI 是短命进程：记录 evidence、\n检查可投递内容、输出宿主协议后退出。MCP 暴露确定性 capability；App\n读取 core 生成的 live read model/snapshot。\n\n原设计中的具体模块清单可随实现演进，但“业务逻辑只有一个 canonical\nimplementation point”保持不变。\n",
+      "domain": "runtime-foundation",
+      "evidence": [
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:a46417d593a1ce72c60cf9a8c8a37f5e7e9c01fe7f82b14b38cd6e3aa60cc76d",
+          "evidence_id": "decision-project-025:1:constraint-1",
+          "evidence_ref": "Workbench service architecture — 2026-07-11",
+          "exact_quote": "[must] Host adapters、CLI、MCP 与 App 不得复制 core 业务规则",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/01-runtime-foundation/specs/decision-project-025.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:a46417d593a1ce72c60cf9a8c8a37f5e7e9c01fe7f82b14b38cd6e3aa60cc76d",
+          "evidence_id": "decision-project-025:1:constraint-2",
+          "evidence_ref": "Workbench service architecture — 2026-07-11",
+          "exact_quote": "[must] Hook 热路径必须短命、确定性且不得因 VibeHub 内部失败中断宿主工作",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/01-runtime-foundation/specs/decision-project-025.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:a46417d593a1ce72c60cf9a8c8a37f5e7e9c01fe7f82b14b38cd6e3aa60cc76d",
+          "evidence_id": "decision-project-025:1:meta-source",
+          "evidence_ref": "Workbench service architecture — 2026-07-11",
+          "exact_quote": "Core 承载唯一业务实现，CLI/MCP/host adapters 为薄壳，App 为 projection consumer",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/01-runtime-foundation/specs/decision-project-025.yaml",
+          "source_type": "chat_extraction"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-31T17:23:53.966Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Core 承载唯一业务实现，CLI/MCP/host adapters 为薄壳，App 为 projection consumer",
+      "tags": [
+        "core",
+        "adapters",
+        "sqlite",
+        "hook-cli",
+        "projection"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-project-025",
+  "state": "active",
+  "updated_at": "2026-07-31T17:23:53.966Z"
+}

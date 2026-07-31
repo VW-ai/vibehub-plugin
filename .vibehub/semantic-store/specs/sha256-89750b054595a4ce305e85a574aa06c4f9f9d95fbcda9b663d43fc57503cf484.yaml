@@ -1,0 +1,105 @@
+{
+  "created_at": "2026-07-12T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "21-workbench",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "c771c48ee336b0ef53043bd1e428278941d307f412557fbd42bf1c8432df9f4a",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 2,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:93db212919d1eaa6b3e9fedf72d8e4a4971af597c902980fdbe087fe075c5e51",
+          "sourcePath": "META/legacy-21-workbench/specs/intent-workbench-001.yaml",
+          "sourceProvenance": {
+            "confidence": 0.8,
+            "produced_at": "2026-07-12",
+            "produced_by_agent": "ingest",
+            "source_ref": "Wayne thinking share — 2026-07-12 main-planning session(明确非 immediate)",
+            "source_type": "chat_extraction"
+          },
+          "sourceState": "draft"
+        },
+        "revision": 1,
+        "state": "draft",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "meta session = 双入口的对话侧常驻化",
+      "to_spec_id": "decision-workbench-005",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [],
+      "detail": "Wayne 2026-07-12 口述(源于 Victor 在 Helm 做操作舱的讨论;Helm 驾驶舱\n的设计与开发现已归 Wayne)。明确:**现在不做**,记录待 M3+。\n\n**两个座位,一个壳(差别只在注入的 context 与授权的工具面):**\n1. **Meta session**(Wayne 提出):每 repo/窗口常驻一个,job=编排不干活。\n   SessionStart hook 识别 meta 角色 → 注入舰队态摘要(地图 rollup/等你/\n   撞车)+ meta 微协议;工具面 = 建事/发射/注入/裁决(MCP)。它是\n   decision-workbench-005 双入口的对话侧常驻化——GUI 按钮=咒语按钮化,\n   meta session=咒语控制台。守卫:声明空写 scope,碰代码文件即 twist\n   告警(020 机制复用),\"meta 不干活,干活=发射新事\"由系统自守。\n2. **Task session PTY**:点开一件事,真 terminal 挂其 session——介入层\n   完全体(看全输出/直接打字/hooks 照采)。\n\n**技术判断**:Tauri + PTY(portable-pty)+ xterm.js 成熟三件套,嵌 pane\n为周级 spike;当年 form-path 否决的是\"XL 完整 wrapper\"(自管进程/多窗格/\n主工作场所/与 Conductor 拼 UX),非此形态。\n\n**两条守线**:①地图仍是主视图,操作舱是面板的升级段/tab,不是 app 本体\n(否则沦为 Conductor 竞品,丢上下文层护城河);②与 decision-project-018\nconstraint(\"不自己跑/托管 agent 进程\")存在张力——落地时需正式\nsupersede 留痕:托管的是终端窗口不是 agent 生命周期。\n\n**与 Helm 协同**:Helm 驾驶舱(对话+知识库+看文件)核心可复用 meta\nsession pattern,两边一套设计。\n\n**介入双通道,按 session 出生地分流(2026-07-12 补):**\n- 舱内出生(app 发射进 PTY pane):terminal 即 session 真 stdin/stdout,\n  直接对话、实时双向(正在生成也能 Ctrl-C),不经注入队列;hook 采集照常;\n- 舱外出生(用户终端随手开):tty 归属其终端,app 无法事后接管——\n  hook 回查注入仍是唯一诚实通道(tmux attach 类 hack 违背\"骑在既有\n  行为上\",不做核心路径)。\n产品激励白送:舱内发射的事介入体验天然高一档,用户被吸向\"从 app 发射\",\n无需说教。\n\n**下一步(到期时)**:先 spike(Tauri+PTY+xterm 跑 claude 验手感),\n产品结合待 spike 实感后再拍。\n",
+      "domain": "workbench",
+      "evidence": [
+        {
+          "confidence": 0.8,
+          "content_hash": "sha256:93db212919d1eaa6b3e9fedf72d8e4a4971af597c902980fdbe087fe075c5e51",
+          "evidence_id": "intent-workbench-001:1:constraint-1",
+          "evidence_ref": "Wayne thinking share — 2026-07-12 main-planning session(明确非 immediate)",
+          "exact_quote": "[must] 落地前必须正式处理与 decision-project-018『不托管 agent 进程』的冲突(supersede 留痕)",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/legacy-21-workbench/specs/intent-workbench-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.8,
+          "content_hash": "sha256:93db212919d1eaa6b3e9fedf72d8e4a4971af597c902980fdbe087fe075c5e51",
+          "evidence_id": "intent-workbench-001:1:constraint-2",
+          "evidence_ref": "Wayne thinking share — 2026-07-12 main-planning session(明确非 immediate)",
+          "exact_quote": "[must] 地图保持主视图;操作舱不得成为 app 本体形态",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/legacy-21-workbench/specs/intent-workbench-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.8,
+          "content_hash": "sha256:93db212919d1eaa6b3e9fedf72d8e4a4971af597c902980fdbe087fe075c5e51",
+          "evidence_id": "intent-workbench-001:1:meta-source",
+          "evidence_ref": "Wayne thinking share — 2026-07-12 main-planning session(明确非 immediate)",
+          "exact_quote": "操作舱前瞻(非 immediate,M3+):同一套 PTY+xterm wrapper 提供两个座位——Meta session(常驻编排席:context management 注入舰队态+meta 微协议,工具面=建事/发射/裁决,声明空写 scope 使 twist 自动守卫『meta 不干活』)与 Task session PTY(每件事的接管席,018 对话接管的完全体);先 spike 验手感再定产品结合",
+          "produced_at": "2026-07-12T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/legacy-21-workbench/specs/intent-workbench-001.yaml",
+          "source_type": "chat_extraction"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P2",
+      "produced_at": "2026-07-12T00:00:00.000Z",
+      "producer": "meta:ingest",
+      "revision": 1,
+      "summary": "操作舱前瞻(非 immediate,M3+):同一套 PTY+xterm wrapper 提供两个座位——Meta session(常驻编排席:context management 注入舰队态+meta 微协议,工具面=建事/发射/裁决,声明空写 scope 使 twist 自动守卫『meta 不干活』)与 Task session PTY(每件事的接管席,018 对话接管的完全体);先 spike 验手感再定产品结合",
+      "tags": [
+        "cockpit",
+        "meta-session",
+        "pty",
+        "terminal-wrapper",
+        "future",
+        "helm"
+      ],
+      "type": "intent"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "intent-workbench-001",
+  "state": "draft",
+  "updated_at": "2026-07-12T00:00:00.000Z"
+}

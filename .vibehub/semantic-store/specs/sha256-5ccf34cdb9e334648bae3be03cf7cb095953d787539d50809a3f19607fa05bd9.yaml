@@ -1,0 +1,173 @@
+{
+  "created_at": "2026-07-31T17:23:53.966Z",
+  "current_revision": 1,
+  "feature_id": "03-01-context-cru",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "9b090b2d35d6dd60aaf3b6259df5fd59299df490d68c745789f8cc35e2edcabb",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 4,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:f7d10a556751b2f047bf050cc3f92960274dfcf36472626ecb3fe215478a2092",
+          "sourcePath": "META/03-01-context-cru/specs/decision-project-026.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "from_path": "META/00-project-room/specs/decision-project-026.yaml",
+              "from_repository": "VW-ai/Vibehub",
+              "migrated_at": "2026-07-19",
+              "note": "保留 spec_id；修正早期『用户永不主动触发』的绝对表述为 agent-first default"
+            },
+            "source_ref": "Wayne spontaneous CRU decision — 2026-07-11; prompt-first refinement — 2026-07-18",
+            "source_type": "migration_synthesis"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META constrained_by relation from decision-project-026: Short protocol triggers full skill intelligence",
+      "to_spec_id": "decision-workbench-009",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META supported_by relation from decision-project-026: Periodic checkpoint closes missed-settlement gaps",
+      "to_spec_id": "intent-workbench-003",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "codex/hooks.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "hooks/hooks.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-ingest/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-query/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/vibehub-update/SKILL.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "用户不应需要记住知识库 CRUD 咒语。SessionStart 协议、MCP discoverability\n与 agent intelligence 应促使模型在非平凡修改前 retrieve，在形成 durable\nintent/decision/constraint 等时 settle，并在 truth 演进时 update/supersede。\n\n“主动”描述 agent 的默认行为，不禁止用户显式 query 或要求沉淀。删除不是\n默认 lifecycle；错误或过时语义优先以 stale/supersede 和 provenance 保留\n演进链。所有 prompt 注入受 token/noise budget 约束。\n",
+      "domain": "context-cru",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:f7d10a556751b2f047bf050cc3f92960274dfcf36472626ecb3fe215478a2092",
+          "evidence_id": "decision-project-026:1:constraint-1",
+          "evidence_ref": "Wayne spontaneous CRU decision — 2026-07-11; prompt-first refinement — 2026-07-18",
+          "exact_quote": "[must] Agent 应在需要时主动 retrieve，并在形成 durable semantics 时主动 settle",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/decision-project-026.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:f7d10a556751b2f047bf050cc3f92960274dfcf36472626ecb3fe215478a2092",
+          "evidence_id": "decision-project-026:1:constraint-2",
+          "evidence_ref": "Wayne spontaneous CRU decision — 2026-07-11; prompt-first refinement — 2026-07-18",
+          "exact_quote": "[must] Hook protocol 必须短且受注入预算约束",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/decision-project-026.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:f7d10a556751b2f047bf050cc3f92960274dfcf36472626ecb3fe215478a2092",
+          "evidence_id": "decision-project-026:1:constraint-3",
+          "evidence_ref": "Wayne spontaneous CRU decision — 2026-07-11; prompt-first refinement — 2026-07-18",
+          "exact_quote": "[should] 知识更新优先使用 stale/supersede 与 version history，而非无痕删除",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/decision-project-026.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:f7d10a556751b2f047bf050cc3f92960274dfcf36472626ecb3fe215478a2092",
+          "evidence_id": "decision-project-026:1:constraint-4",
+          "evidence_ref": "Wayne spontaneous CRU decision — 2026-07-11; prompt-first refinement — 2026-07-18",
+          "exact_quote": "[must_not] 不得要求用户把主动 CRUD 命令作为日常正确使用 VibeHub 的前提",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/decision-project-026.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:f7d10a556751b2f047bf050cc3f92960274dfcf36472626ecb3fe215478a2092",
+          "evidence_id": "decision-project-026:1:meta-source",
+          "evidence_ref": "Wayne spontaneous CRU decision — 2026-07-11; prompt-first refinement — 2026-07-18",
+          "exact_quote": "Context create/retrieve/update 默认由 agent 在真实工作中主动发生；冷启动 distill 是显式例外",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/03-01-context-cru/specs/decision-project-026.yaml",
+          "source_type": "migration_synthesis"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-31T17:23:53.966Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Context create/retrieve/update 默认由 agent 在真实工作中主动发生；冷启动 distill 是显式例外",
+      "tags": [
+        "retrieve",
+        "ingest",
+        "update",
+        "proactive",
+        "prompt-first",
+        "injection-budget"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-project-026",
+  "state": "active",
+  "updated_at": "2026-07-31T17:23:53.966Z"
+}

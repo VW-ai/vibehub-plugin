@@ -1,0 +1,130 @@
+{
+  "created_at": "2026-07-29T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "5485a86750f399be8beba653d0c9454e380d1ddeef3d7164826b212ba328f4ca",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 3,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:e8a348b3bae2a0c69a5ff9a79013c7199a3133e71067b6cfc55b109de4a12d36",
+          "sourcePath": "META/09-ticket-runtime/specs/convention-ticket-backchain-forward-normalize-002.yaml",
+          "sourceProvenance": {
+            "confidence": 0.95,
+            "produced_at": "2026-07-29",
+            "produced_by_agent": "ingest",
+            "source_ref": "Wayne ratified backward synthesis, forward cleanup, and a relationship-only Ticket graph — 2026-07-28; reconciled during pivot 2026-07-29",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-contract-002",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-skill-driven-boundary-001",
+      "type": "depends_on"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Ticket shaping uses `Backchain → Forward Normalize`.\n\nBackchain begins from each observable deliverable or scenario acceptance\nand asks what result, fact, proof, or authorized decision must exist\nimmediately before it can be established. It repeats until paths reach\ncurrent evidence, executable work, a genuine decision blocker, or honest\nPlanning Fog. Parallel necessary paths, joins, and shared prerequisites are\npreserved.\n\nForward Normalize then reads from current facts toward each deliverable and\nremoves duplicates, orphan work, dead ends, redundant transitive edges, and\nfalse serialization. It checks that every Ticket contributes through one\nor more typed relation paths to an observable outcome and that each Ticket\nhas an independent scheduling, blocking, retry, authority, or verification\nboundary.\n\nThis is a typed DAG, not a containment tree. Shared Tickets connect to every\nrelevant path through explicit relations. Scenario lenses are derived from\nthose paths. Work that lacks an independent boundary remains elaboration\ninside a Ticket's executable context rather than becoming another node.\n\nThe Skill owns this reasoning. Scripts may validate graph references,\ncycles, reachability, relation types, canonical ordering, and stale bases,\nbut they do not decide semantic usefulness.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:e8a348b3bae2a0c69a5ff9a79013c7199a3133e71067b6cfc55b109de4a12d36",
+          "evidence_id": "convention-ticket-backchain-forward-normalize-002:1:constraint-1",
+          "evidence_ref": "Wayne ratified backward synthesis, forward cleanup, and a relationship-only Ticket graph — 2026-07-28; reconciled during pivot 2026-07-29",
+          "exact_quote": "[must] A planned graph is checked both outcome-to-prerequisite and current-fact-to-outcome before execution",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/convention-ticket-backchain-forward-normalize-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:e8a348b3bae2a0c69a5ff9a79013c7199a3133e71067b6cfc55b109de4a12d36",
+          "evidence_id": "convention-ticket-backchain-forward-normalize-002:1:constraint-2",
+          "evidence_ref": "Wayne ratified backward synthesis, forward cleanup, and a relationship-only Ticket graph — 2026-07-28; reconciled during pivot 2026-07-29",
+          "exact_quote": "[must] Every Ticket contributes through explicit typed relation paths to at least one observable deliverable or accepted follow-up outcome",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/convention-ticket-backchain-forward-normalize-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:e8a348b3bae2a0c69a5ff9a79013c7199a3133e71067b6cfc55b109de4a12d36",
+          "evidence_id": "convention-ticket-backchain-forward-normalize-002:1:constraint-3",
+          "evidence_ref": "Wayne ratified backward synthesis, forward cleanup, and a relationship-only Ticket graph — 2026-07-28; reconciled during pivot 2026-07-29",
+          "exact_quote": "[must_not] Do not require a containment parent or fabricate Tickets for uncertain alternatives, implementation detail, or unknown downstream work",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/convention-ticket-backchain-forward-normalize-002.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:e8a348b3bae2a0c69a5ff9a79013c7199a3133e71067b6cfc55b109de4a12d36",
+          "evidence_id": "convention-ticket-backchain-forward-normalize-002:1:meta-source",
+          "evidence_ref": "Wayne ratified backward synthesis, forward cleanup, and a relationship-only Ticket graph — 2026-07-28; reconciled during pivot 2026-07-29",
+          "exact_quote": "生成 Tickets 时先从可验证结果倒推，再从当前事实向前清理；结果是一张有关系路径、没有层级要求的 DAG。",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/convention-ticket-backchain-forward-normalize-002.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-29T00:00:00.000Z",
+      "producer": "meta:ingest",
+      "revision": 1,
+      "summary": "生成 Tickets 时先从可验证结果倒推，再从当前事实向前清理；结果是一张有关系路径、没有层级要求的 DAG。",
+      "tags": [
+        "ticket-generation",
+        "planning",
+        "backchain",
+        "normalization",
+        "typed-dag",
+        "intelligence"
+      ],
+      "type": "convention"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "convention-ticket-backchain-forward-normalize-002",
+  "state": "active",
+  "updated_at": "2026-07-29T00:00:00.000Z"
+}

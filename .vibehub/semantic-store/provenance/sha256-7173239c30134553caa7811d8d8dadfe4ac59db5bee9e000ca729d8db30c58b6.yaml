@@ -1,0 +1,41 @@
+{
+  "actor": "codex-root",
+  "at": "2026-07-31T17:03:46.398Z",
+  "durable_id": "7173239c30134553caa7811d8d8dadfe4ac59db5bee9e000ca729d8db30c58b6",
+  "kind": "repo_provenance",
+  "operation": "distill.finalize.features",
+  "payload": {
+    "features": [
+      "00-project-room",
+      "01-runtime-foundation",
+      "02-01-claude-code",
+      "02-02-codex",
+      "02-host-integrations",
+      "03-01-context-cru",
+      "03-02-cold-start-distillation",
+      "03-knowledge-lifecycle",
+      "04-project-activation",
+      "05-01-task-run-authority",
+      "05-02-scope-conflict-intervention",
+      "05-03-git-team-visibility",
+      "05-context-to-action",
+      "06-01-live-shell",
+      "06-02-territory-task-ux",
+      "06-workbench-app",
+      "07-release-engineering",
+      "08-git-semantic-store",
+      "09-ticket-runtime",
+      "21-workbench"
+    ],
+    "result": {
+      "candidateChecksum": "6e8fe62574e6dbb109935fc91a6b88c2382c6f05628010bff5bab54b4cfe30d9",
+      "checksum": "a259c2012204d6a93f6f60745c9d1389c2751e436367a08fc375e717ae1e4c9f",
+      "runId": "meta-import-db9f7448e2b7",
+      "unresolvedDispositions": [],
+      "versionId": "distill-meta-import-db9f7448e2b7"
+    }
+  },
+  "request_id": "meta-distill-finalize-01",
+  "schema_version": 2,
+  "task_id": "meta-only-distill"
+}

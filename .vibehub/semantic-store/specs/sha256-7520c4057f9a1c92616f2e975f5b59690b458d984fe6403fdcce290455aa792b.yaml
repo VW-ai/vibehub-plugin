@@ -1,0 +1,157 @@
+{
+  "created_at": "2026-07-27T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "8b577507916fb1fd16c8e5e5fec3cb84ea52146189eb4cd6629354920308cc7c",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 5,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:9f8962d1c6aa13d34103f834fe334e022121225658f2f1f13156f474b8c631a2",
+          "sourcePath": "META/09-ticket-runtime/specs/intent-ticket-runtime-001.yaml",
+          "sourceProvenance": {
+            "confidence": 0.95,
+            "produced_at": "2026-07-27",
+            "source_ref": "Wayne Ticket Runtime discussions in Codex sessions 019fa1de-8499-7e23-9576-c29db4d0168b and 019fa272-202e-73a1-8b80-9abfbfee0790",
+            "source_type": "chat_extraction"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META challenges relation from intent-ticket-runtime-001: Explores whether context-to-action should become an explicit Ticket compiler and runtime rather than remain Task-oriented and host-surface-first.",
+      "to_spec_id": "intent-context-to-action-001",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META challenges relation from intent-ticket-runtime-001: The eventual App/Runtime/Plugin boundary may refine the current plugin-first product intent.",
+      "to_spec_id": "intent-project-001",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/spec.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Provisional destination: make the path from durable user intent and current\nsemantic state to a machine-validated, executable Ticket Graph clear enough\nthat the existing Plugin can dogfood the first trustworthy loop.\n\nThe way is clear when the project has canonical definitions and authority\nboundaries for Plan, Ticket, Run, Gate, Outcome/Evidence, context binding,\ngraph mutation, semantic closeout, storage, and the first implementation\nslice. The resulting contracts must be implementable without silently\ndeciding unresolved ontology in code.\n\nThis destination is intentionally narrower than shipping the future App,\nServer, unattended scheduler, external tracker integration, or rebrand.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:9f8962d1c6aa13d34103f834fe334e022121225658f2f1f13156f474b8c631a2",
+          "evidence_id": "intent-ticket-runtime-001:1:constraint-1",
+          "evidence_ref": "Wayne Ticket Runtime discussions in Codex sessions 019fa1de-8499-7e23-9576-c29db4d0168b and 019fa272-202e-73a1-8b80-9abfbfee0790",
+          "exact_quote": "[must] Preserve high-value intermediate reasoning without treating exploration artifacts as canonical truth",
+          "produced_at": "2026-07-27T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/09-ticket-runtime/specs/intent-ticket-runtime-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:9f8962d1c6aa13d34103f834fe334e022121225658f2f1f13156f474b8c631a2",
+          "evidence_id": "intent-ticket-runtime-001:1:constraint-2",
+          "evidence_ref": "Wayne Ticket Runtime discussions in Codex sessions 019fa1de-8499-7e23-9576-c29db4d0168b and 019fa272-202e-73a1-8b80-9abfbfee0790",
+          "exact_quote": "[must] Use one canonical decision map to drive the first Plugin dogfood loop",
+          "produced_at": "2026-07-27T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/09-ticket-runtime/specs/intent-ticket-runtime-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:9f8962d1c6aa13d34103f834fe334e022121225658f2f1f13156f474b8c631a2",
+          "evidence_id": "intent-ticket-runtime-001:1:constraint-3",
+          "evidence_ref": "Wayne Ticket Runtime discussions in Codex sessions 019fa1de-8499-7e23-9576-c29db4d0168b and 019fa272-202e-73a1-8b80-9abfbfee0790",
+          "exact_quote": "[must] Machine-validated Specs enter canonical knowledge as active; human intervention is reserved for explicit authority gates",
+          "produced_at": "2026-07-27T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/09-ticket-runtime/specs/intent-ticket-runtime-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:9f8962d1c6aa13d34103f834fe334e022121225658f2f1f13156f474b8c631a2",
+          "evidence_id": "intent-ticket-runtime-001:1:constraint-4",
+          "evidence_ref": "Wayne Ticket Runtime discussions in Codex sessions 019fa1de-8499-7e23-9576-c29db4d0168b and 019fa272-202e-73a1-8b80-9abfbfee0790",
+          "exact_quote": "[must] Any change to current Task/Run, plugin-first, App, or storage authority must explicitly relate to or supersede the existing active spec",
+          "produced_at": "2026-07-27T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/09-ticket-runtime/specs/intent-ticket-runtime-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:9f8962d1c6aa13d34103f834fe334e022121225658f2f1f13156f474b8c631a2",
+          "evidence_id": "intent-ticket-runtime-001:1:constraint-5",
+          "evidence_ref": "Wayne Ticket Runtime discussions in Codex sessions 019fa1de-8499-7e23-9576-c29db4d0168b and 019fa272-202e-73a1-8b80-9abfbfee0790",
+          "exact_quote": "[must_not] Do not implement a second Ticket state machine in Plugin and App",
+          "produced_at": "2026-07-27T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/09-ticket-runtime/specs/intent-ticket-runtime-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.95,
+          "content_hash": "sha256:9f8962d1c6aa13d34103f834fe334e022121225658f2f1f13156f474b8c631a2",
+          "evidence_id": "intent-ticket-runtime-001:1:meta-source",
+          "evidence_ref": "Wayne Ticket Runtime discussions in Codex sessions 019fa1de-8499-7e23-9576-c29db4d0168b and 019fa272-202e-73a1-8b80-9abfbfee0790",
+          "exact_quote": "把关于 Ticket 的想法一步一步沉淀到 META，再用它制定并驱动 Plugin 的 Ticket System 改造",
+          "produced_at": "2026-07-27T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/09-ticket-runtime/specs/intent-ticket-runtime-001.yaml",
+          "source_type": "chat_extraction"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-27T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "把关于 Ticket 的想法一步一步沉淀到 META，再用它制定并驱动 Plugin 的 Ticket System 改造",
+      "tags": [
+        "ticket",
+        "planning",
+        "work-graph",
+        "loop-engineering",
+        "wayfinder"
+      ],
+      "type": "intent"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "intent-ticket-runtime-001",
+  "state": "active",
+  "updated_at": "2026-07-27T00:00:00.000Z"
+}

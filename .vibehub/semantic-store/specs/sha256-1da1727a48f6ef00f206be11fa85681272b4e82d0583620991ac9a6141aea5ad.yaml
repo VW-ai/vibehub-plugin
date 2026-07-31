@@ -1,0 +1,147 @@
+{
+  "created_at": "2026-07-31T17:23:53.966Z",
+  "current_revision": 1,
+  "feature_id": "02-host-integrations",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "0b33d2de6aae4566723461da84b4f27f930c1fcf7ee32179542bef9fd534e124",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 3,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:459273d08d286a5b0373c962284e055e7adbf0da75cba447343d90c4ffbafca0",
+          "sourcePath": "META/02-host-integrations/specs/decision-workbench-009.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "from_path": "META/21-workbench/specs/decision-workbench-009.yaml",
+              "from_repository": "VW-ai/Vibehub",
+              "migrated_at": "2026-07-19"
+            },
+            "source_ref": "Wayne plugin architecture decision — 2026-07-12",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META refined_by relation from decision-workbench-009: Skills own semantic intelligence",
+      "to_spec_id": "decision-workbench-010",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "codex/hooks.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "hooks/hooks.json",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/mcp/src/capabilities.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "Hooks 只采集生命周期 evidence、提供机械 cadence 与可靠 delivery boundary；\nMCP 暴露版本化确定性能力与质量闸；skills 承载用户可读、可改、可 fork 的\n方法论与 workflow intelligence。\n\nSessionStart 可注入短行为协议，但不得把完整 workflow 拆碎后分散塞入每个\nhook 或 tool description。Description 只说明 capability、输入输出与轻量\nrouting。\n",
+      "domain": "host-integrations",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:459273d08d286a5b0373c962284e055e7adbf0da75cba447343d90c4ffbafca0",
+          "evidence_id": "decision-workbench-009:1:constraint-1",
+          "evidence_ref": "Wayne plugin architecture decision — 2026-07-12",
+          "exact_quote": "[must] Hooks 不得承担语义分类；MCP/core 不得承载自然语言 workflow intelligence",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/02-host-integrations/specs/decision-workbench-009.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:459273d08d286a5b0373c962284e055e7adbf0da75cba447343d90c4ffbafca0",
+          "evidence_id": "decision-workbench-009:1:constraint-2",
+          "evidence_ref": "Wayne plugin architecture decision — 2026-07-12",
+          "exact_quote": "[must] 完整方法论必须以 skill 为 canonical intelligence artifact",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/02-host-integrations/specs/decision-workbench-009.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:459273d08d286a5b0373c962284e055e7adbf0da75cba447343d90c4ffbafca0",
+          "evidence_id": "decision-workbench-009:1:constraint-3",
+          "evidence_ref": "Wayne plugin architecture decision — 2026-07-12",
+          "exact_quote": "[must_not] 不得通过高频 hook 重复注入长协议",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/02-host-integrations/specs/decision-workbench-009.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 1,
+          "content_hash": "sha256:459273d08d286a5b0373c962284e055e7adbf0da75cba447343d90c4ffbafca0",
+          "evidence_id": "decision-workbench-009:1:meta-source",
+          "evidence_ref": "Wayne plugin architecture decision — 2026-07-12",
+          "exact_quote": "Host plugin 三件套：hooks=when，MCP=deterministic capabilities，skills=how well",
+          "produced_at": "2026-07-31T17:23:53.966Z",
+          "producer": "meta-migration",
+          "source_ref": "META/02-host-integrations/specs/decision-workbench-009.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-31T17:23:53.966Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Host plugin 三件套：hooks=when，MCP=deterministic capabilities，skills=how well",
+      "tags": [
+        "hooks",
+        "mcp",
+        "skills",
+        "prompt-first",
+        "intelligence-boundary"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-workbench-009",
+  "state": "active",
+  "updated_at": "2026-07-31T17:23:53.966Z"
+}

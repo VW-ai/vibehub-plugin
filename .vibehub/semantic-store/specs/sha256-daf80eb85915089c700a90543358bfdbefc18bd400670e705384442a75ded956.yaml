@@ -1,0 +1,116 @@
+{
+  "created_at": "2026-07-28T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "091508a15d41883c5c9e677a2a8070ab856f8a55b5813fb029f36b9e7ba89af0",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 0,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:b4cd64a3d54d02d4005bdd9d954203d4b407ac9c91ba547de4abc6b3ed22bfa8",
+          "sourcePath": "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml",
+          "sourceProvenance": {
+            "confidence": 0.85,
+            "produced_at": "2026-07-28",
+            "source_ref": "Wayne asked how Tickets are generated and Ticket Skills are invoked — 2026-07-28",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Generation and invocation must preserve the ratified Ticket identity, maturity, authority, and validation contract.",
+      "to_spec_id": "decision-ticket-contract-002",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "The intelligence loop composes Skill-owned judgment over deterministic Git document capabilities.",
+      "to_spec_id": "decision-ticket-skill-driven-boundary-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Invocation policy proposes mutations whose legal lifecycle remains governed separately.",
+      "to_spec_id": "decision-ticket-graph-lifecycle-002",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Skill composition constrains what reusable Workflow may mean without resolving that ontology here.",
+      "to_spec_id": "decision-ticket-workflow-role-001",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-28-ticket-intelligence-substrate.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "**Question**: Define the intelligent Ticket loop without turning it into a\nmandatory end-to-end workflow.\n\nThe answer must decide:\n- which scenes invite Ticket generation or revision, including explicit\n  planning, blocker resolution, execution discovery, validation findings,\n  and Run closeout;\n- how the Agent distinguishes no durable work, elaboration, decomposition,\n  expansion, and Planning Fog before proposing a graph mutation;\n- how the host Agent discovers and composes query/context, shape, validate,\n  and closeout intelligence;\n- when invocation is explicitly requested, Agent-initiated, or merely\n  suggested by a hook;\n- how authority gates prevent an intelligent loop from silently expanding\n  product, technical, permission, or risk boundaries;\n- what minimum observable proposal or receipt lets the loop be inspected\n  and improved without encoding every reasoning step.\n\nExact operation schemas, graph transitions, context packet contents, and\ncloseout semantics remain owned by their focused active contracts or\ndecisions; objectively adjudicable technical contracts do not require\nmanufactured human ratification.\n\n**Wayne's product framing — 2026-07-28**\n\nThe first implementation should be driven by concrete user cases:\n\n1. A human frames a situation and intended deliverable, then asks the Agent\n   to enter Ticket orchestration. The deliverable is normally expressed as\n   a small set of core user experiences or scenarios—often roughly five to\n   ten—not only as one static description. The Agent compiles them into a\n   coherent initial Ticket graph.\n2. The human may review the orchestration before execution or explicitly\n   delegate that review. Under delegation, the Agent proceeds through the\n   graph autonomously until it reaches a genuine human blocker.\n3. Within the approved experiences, product boundaries, architecture, and\n   design principles, the Agent owns technical decisions that have\n   sufficiently explicit engineering criteria. Difficulty alone does not\n   make a decision human-owned: database locking, schema mechanics, and\n   similar internal choices should normally stay delegated.\n4. A choice that would define or alter the human-authorized user experience,\n   core product behavior, visual/product direction, or another\n   preference-bearing boundary creates a blocking decision Ticket for the\n   human rather than being silently selected by the Agent.\n5. During execution, a material deviation from the approved user\n   experiences, technical architecture, or design principles creates a\n   visible deviation/decision Ticket and routes the affected branch back to\n   the human. Ordinary technical learning inside those boundaries is\n   handled autonomously by tending the graph.\n\nThe governing distinction is impact on an authorized experience or\nprinciple, not whether a decision is “technical.” The approximate scenario\ncount is a planning heuristic, not a schema limit.\n\n**Ratified partial behavior — review surface**\n\nHuman review should apply to the compact scenario/outcome plan, major\nboundaries, and already-known human blockers—not to every generated leaf\nTicket or implementation choice. Review is an execution authority gate over\nan active graph, not a `draft → active` lifecycle. Opting out grants bounded\nauthority to proceed until a later decision or deviation crosses the same\nboundary.\n\nWayne ratified this review surface on 2026-07-28.\n\n**Human control surface input**\n\nEvery project's Tickets should be visible through a lightweight HTML\nprojection. Its default view emphasizes the core scenarios/outcomes,\nmaterial blockers, human decisions, and deviations; implementation Tickets\nremain inspectable through progressive disclosure. Visibility does not make\nevery Ticket a review unit.\n\nHumans may leave comments and make simple edits from this surface. Those\ninteractions become attributed, versioned proposals or Ticket revisions\nthat pass through the same validation and authority boundary; the HTML must\nnot become a second source of truth or a raw storage editor.\n\n“Scenario” is broader than a consumer user story. Its actor may be an end\nuser, operator, developer, service, or system. The invariant is an\nunderstandable situation and observable intended outcome around which a\nhuman can evaluate the plan.\n\n**Ratified clarification — scenario is a review lens, not a Ticket**\n\nScenario is the human planning, constraint, and validation boundary used to\nunderstand whether the graph delivers an observable experience or system\noutcome. It is not a second canonical entity, but it is also not\nautomatically identical to one coarse Ticket.\n\nCanonical graph nodes remain Tickets with independently meaningful\nexecution boundaries. Several related Tickets may jointly realize one\nscenario; a coarse assembly, integration, or verification Ticket may prove\nthat the scenario is achieved. A coarse Ticket may therefore anchor a\nscenario lens without creating a required one-to-one identity.\n\nThe Ticket UI remains a flat typed-relation graph rather than a nested\nhierarchy. Scenario lenses select and explain relevant Tickets without\nowning their lifecycle, changing their direct execution relations, or\ncausing layout reflow.\n\nWayne ratified this refinement while reviewing the causal Ticket Graph on\n2026-07-28.\n\n**Resolved intelligence loop**\n\nTicket orchestration begins from human-understandable scenarios/outcomes\nand compiles a coarse graph before execution. Ticket Skills are invoked by\nthe host Agent at the scene where their intelligence is useful—shape during\nplanning or discovery, validate after definition changes, query/context\nbefore acting, and closeout after a Run—rather than through one mandatory\nworkflow.\n\nHuman review or explicit delegation gates the scenario/outcome plan, not\nevery leaf. Within that authority, the Agent may generate, refine, and\nexecute Tickets and make objectively adjudicable technical decisions.\nChanges to authorized experience, product logic, architecture, design\nprinciples, permissions, or risk become visible blocking decision/deviation\nTickets. Hooks may surface a relevant scene but do not own orchestration.\n\nScenario remains a human review lens over the same typed Ticket graph used\nfor Agent execution. Coarse Tickets may anchor or verify a scenario without\nmaking Scenario a Ticket or introducing a second hierarchy. The project\nHTML review surface is delegated to its resolved prototype decision.\n\nWayne ratified the complete intelligence loop on 2026-07-28.\n\n**Git-native Skill-driven clarification — 2026-07-29**\n\nThe loop is orchestrated by Skills over Git Ticket documents. Bundled\nscripts provide deterministic reads, typed-graph validation, stale checks,\ndiffs, and bounded writes; they do not own the semantic workflow. Agent\ndecomposition attaches new Tickets through truthful typed relation paths,\nnot mandatory parent/ancestor hierarchy.\n\n**Claimed**: Codex 2026-07-28\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.85,
+          "content_hash": "sha256:b4cd64a3d54d02d4005bdd9d954203d4b407ac9c91ba547de4abc6b3ed22bfa8",
+          "evidence_id": "decision-ticket-intelligence-loop-001:1:meta-source",
+          "evidence_ref": "Wayne asked how Tickets are generated and Ticket Skills are invoked — 2026-07-28",
+          "exact_quote": "Agent 何时生成或修订 Ticket，并如何发现、选择和组合 Ticket intelligence Skills？",
+          "produced_at": "2026-07-28T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-intelligence-loop-001.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-28T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Agent 何时生成或修订 Ticket，并如何发现、选择和组合 Ticket intelligence Skills？",
+      "tags": [
+        "wayfinder",
+        "resolved",
+        "grilling",
+        "intelligence",
+        "skills",
+        "planning",
+        "ticket-generation"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-ticket-intelligence-loop-001",
+  "state": "active",
+  "updated_at": "2026-07-28T00:00:00.000Z"
+}

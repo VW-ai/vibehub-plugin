@@ -1,0 +1,100 @@
+{
+  "created_at": "2026-07-13T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "05-01-task-run-authority",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "d8b9043d187607db17d2954f22c3d7c38e1f34d64a01088c612cc5949c3f7a75",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 0,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:0aa8bb0439f475d4124aad952bef6985deb6597043e700750847958d0e6c2fab",
+          "sourcePath": "META/05-01-task-run-authority/specs/change-2026-07-13-context-to-action-workflow.yaml",
+          "sourceProvenance": {
+            "confidence": 1,
+            "migration": {
+              "migrated_at": "2026-07-19",
+              "migrated_to": "05-01-task-run-authority"
+            },
+            "produced_at": "2026-07-13",
+            "source_ref": "META/legacy-21-workbench/specs/change-2026-07-13-context-to-action-workflow.yaml",
+            "source_type": "migrated_spec"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "META creates relation from change-2026-07-13-context-to-action-workflow",
+      "to_spec_id": "decision-workbench-013",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/legacy-21-workbench/design-context-to-action-workflow.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/activity-store.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "The 2026-07-13 design session extended VibeHub from context memory into a\nhost-agent context-to-action layer. It froze the Task/Run distinction,\ncontext-only versus code-write authority, decision-boundary intervention,\nskill-owned transitions and the rule that the App remains optional.\n",
+      "domain": "task-run-authority",
+      "evidence": [
+        {
+          "confidence": 1,
+          "content_hash": "sha256:0aa8bb0439f475d4124aad952bef6985deb6597043e700750847958d0e6c2fab",
+          "evidence_id": "change-2026-07-13-context-to-action-workflow:1:meta-source",
+          "evidence_ref": "META/legacy-21-workbench/specs/change-2026-07-13-context-to-action-workflow.yaml",
+          "exact_quote": "Established the Task/Run/worktree authority model and separated operational evidence from semantic truth",
+          "produced_at": "2026-07-13T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/05-01-task-run-authority/specs/change-2026-07-13-context-to-action-workflow.yaml",
+          "source_type": "migrated_spec"
+        }
+      ],
+      "layer": "feature",
+      "priority": "P0",
+      "produced_at": "2026-07-13T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Established the Task/Run/worktree authority model and separated operational evidence from semantic truth",
+      "tags": [
+        "context-to-action",
+        "task",
+        "run",
+        "worktree",
+        "evidence"
+      ],
+      "type": "change"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "change-2026-07-13-context-to-action-workflow",
+  "state": "active",
+  "updated_at": "2026-07-13T00:00:00.000Z"
+}

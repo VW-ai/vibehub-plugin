@@ -26,6 +26,17 @@ describe("vibehub kb JSON adapter",()=>{let dir:string,repo:string,dbPath:string
     stdout="";expect(main(["kb","migrate-store","--json","--repo",repo,"--db",dbPath])).toBe(1);
     expect(JSON.parse(stdout)).toMatchObject({ok:false,error:{code:"migration_failed"}});
   });
+  it("migrates authored META specs through the bounded canonical migration command",()=>{let stdout="";vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
+    fs.mkdirSync(path.join(repo,"META/feature/specs"),{recursive:true});
+    fs.writeFileSync(path.join(repo,"META/feature/room.yaml"),JSON.stringify({room:{id:"feature",name:"Feature",parent:null}}));
+    fs.writeFileSync(path.join(repo,"META/feature/specs/decision-cli.yaml"),JSON.stringify({spec_id:"decision-cli",type:"decision",state:"draft",intent:{summary:"CLI migration"},indexing:{type:"decision",domain:"cli",tags:["migration"]},provenance:{source_type:"test",source_ref:"fixture",confidence:1},relations:[],anchors:[{file:"README.md"}]}));
+    execFileSync("git",["add","META"],{cwd:repo});execFileSync("git",["commit","-m","META fixture"],{cwd:repo});
+    const db=openDb(dbPath);db.prepare(`INSERT INTO kb_features(repo_id,feature_id,created_at) VALUES(1,'feature','2026-07-13T00:00:00.000Z')`).run();db.close();
+    expect(main(["kb","migrate-store","--json","--repo",repo,"--db",dbPath])).toBe(0);
+    stdout="";
+    expect(main(["kb","migrate-meta","--json","--repo",repo,"--db",dbPath,"--actor","cli-test","--task","task-meta","--request","request-meta"])).toBe(0);
+    expect(JSON.parse(stdout)).toMatchObject({ok:true,data:{operation:"kb.migrate-meta",selectedSpecCount:1,stateCounts:{draft:1},finalSpecCount:1,finalFeatureCount:1},meta:{operation:"kb.migrate-meta",requestId:"request-meta"}});
+  });
   it("dispatches distillation with the identical shared JSON envelope",()=>{let stdout="";vi.spyOn(process.stdout,"write").mockImplementation(((chunk:unknown)=>{stdout+=String(chunk);return true;}) as typeof process.stdout.write);
     expect(main(["distill","run.start","--json","--repo",repo,"--db",dbPath,"--actor","cli-test","--task","task-1","--request","d1","--input",JSON.stringify({runId:"run-cli",mode:"cold",baseCommit:commit,skillHash:"s",configHash:"c"})])).toBe(0);
     expect(JSON.parse(stdout)).toMatchObject({ok:true,data:{runId:"run-cli",state:"collecting",baseCommit:commit},meta:{operation:"distill.run.start",requestId:"d1"}});

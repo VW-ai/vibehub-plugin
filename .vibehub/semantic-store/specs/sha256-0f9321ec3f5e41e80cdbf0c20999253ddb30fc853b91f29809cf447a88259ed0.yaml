@@ -1,0 +1,168 @@
+{
+  "created_at": "2026-07-29T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "85a00feb47b377ce1f12b2dd79bbdd27da7600552df01a6ed5e85dcf61ac9829",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 5,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:a5186f38c6b0b5befdf8663fa2db469c00b86fa08551e21a8b40e52c70104852",
+          "sourcePath": "META/09-ticket-runtime/specs/decision-ticket-skill-driven-boundary-001.yaml",
+          "sourceProvenance": {
+            "confidence": 0.98,
+            "produced_at": "2026-07-29",
+            "produced_by_agent": "ingest",
+            "source_ref": "Wayne clarified that Ticket is fundamentally Skill-driven even when Skills include scripts — 2026-07-29",
+            "source_type": "manual_input"
+          },
+          "sourceState": "active"
+        },
+        "revision": 1,
+        "state": "active",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Skills operate over the Git semantic ledger while SQLite remains operational only.",
+      "to_spec_id": "decision-ticket-git-native-ledger-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Preserves its scene-specific intelligence and human-boundary decisions.",
+      "to_spec_id": "decision-ticket-intelligence-loop-001",
+      "type": "relates_to"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-29-ticket-git-native-skill-driven-pivot-plan.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "packages/core/src/operation-dispatcher.ts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/scripts",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "**Decision**: Ticket is a Skill-operated Git collaboration protocol, not a\ngeneric Runtime workflow engine.\n\nSkills own scene recognition, orchestration, and semantic judgment:\nplanning from scenarios/outcomes, Ticket boundary selection, backchaining,\nforward normalization, context choice, validation, execution guidance,\nprotected-boundary routing, deviation detection, and closeout.\n\nA Skill may package and call scripts. Those scripts are its deterministic\nhands: they read and query documents, validate schemas and typed DAG\nrelations, calculate digests, check stale bases, produce diffs, perform\nbounded atomic writes, and project the graph for Agents or HTML. Scripts\nreport facts and enforce integrity; they do not decide the product meaning\nof the next step or encode one mandatory proposal-to-receipt workflow.\n\nCore libraries may implement those reusable mechanics once. CLI, MCP, the\nlocal host, and HTML remain thin access or projection adapters. None owns a\nsecond Ticket lifecycle, semantic database, or hidden authority model.\n\nThe system may expose stable operations for portability across Agents and\nhosts, but those operations are capabilities composed by Skills rather\nthan the owner of Ticket intelligence.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:a5186f38c6b0b5befdf8663fa2db469c00b86fa08551e21a8b40e52c70104852",
+          "evidence_id": "decision-ticket-skill-driven-boundary-001:1:constraint-1",
+          "evidence_ref": "Wayne clarified that Ticket is fundamentally Skill-driven even when Skills include scripts — 2026-07-29",
+          "exact_quote": "[must] Skills own Ticket scene selection, semantic judgment, and orchestration",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-skill-driven-boundary-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:a5186f38c6b0b5befdf8663fa2db469c00b86fa08551e21a8b40e52c70104852",
+          "evidence_id": "decision-ticket-skill-driven-boundary-001:1:constraint-2",
+          "evidence_ref": "Wayne clarified that Ticket is fundamentally Skill-driven even when Skills include scripts — 2026-07-29",
+          "exact_quote": "[must] Bundled scripts and shared libraries own deterministic document reads, validation, digesting, diffing, atomic writes, and projection",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-skill-driven-boundary-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:a5186f38c6b0b5befdf8663fa2db469c00b86fa08551e21a8b40e52c70104852",
+          "evidence_id": "decision-ticket-skill-driven-boundary-001:1:constraint-3",
+          "evidence_ref": "Wayne clarified that Ticket is fundamentally Skill-driven even when Skills include scripts — 2026-07-29",
+          "exact_quote": "[must] CLI, MCP, HTML, and any local host remain thin peers over the same deterministic capabilities",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-skill-driven-boundary-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:a5186f38c6b0b5befdf8663fa2db469c00b86fa08551e21a8b40e52c70104852",
+          "evidence_id": "decision-ticket-skill-driven-boundary-001:1:constraint-4",
+          "evidence_ref": "Wayne clarified that Ticket is fundamentally Skill-driven even when Skills include scripts — 2026-07-29",
+          "exact_quote": "[must_not] Do not encode Ticket product judgment or one mandatory end-to-end workflow in Core, SQLite, or a daemon",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-skill-driven-boundary-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:a5186f38c6b0b5befdf8663fa2db469c00b86fa08551e21a8b40e52c70104852",
+          "evidence_id": "decision-ticket-skill-driven-boundary-001:1:constraint-5",
+          "evidence_ref": "Wayne clarified that Ticket is fundamentally Skill-driven even when Skills include scripts — 2026-07-29",
+          "exact_quote": "[must_not] Do not create adapter-specific storage semantics or lifecycle rules",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-skill-driven-boundary-001.yaml",
+          "source_type": "meta_constraint"
+        },
+        {
+          "confidence": 0.98,
+          "content_hash": "sha256:a5186f38c6b0b5befdf8663fa2db469c00b86fa08551e21a8b40e52c70104852",
+          "evidence_id": "decision-ticket-skill-driven-boundary-001:1:meta-source",
+          "evidence_ref": "Wayne clarified that Ticket is fundamentally Skill-driven even when Skills include scripts — 2026-07-29",
+          "exact_quote": "Skill 可以包含脚本，但本质上还是 Skill 驱动。",
+          "produced_at": "2026-07-29T00:00:00.000Z",
+          "producer": "meta:ingest",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-skill-driven-boundary-001.yaml",
+          "source_type": "manual_input"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-29T00:00:00.000Z",
+      "producer": "meta:ingest",
+      "revision": 1,
+      "summary": "Skill 可以包含脚本，但本质上还是 Skill 驱动。",
+      "tags": [
+        "skills",
+        "scripts",
+        "intelligence",
+        "core",
+        "cli",
+        "mcp",
+        "html",
+        "architecture"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-ticket-skill-driven-boundary-001",
+  "state": "active",
+  "updated_at": "2026-07-29T00:00:00.000Z"
+}

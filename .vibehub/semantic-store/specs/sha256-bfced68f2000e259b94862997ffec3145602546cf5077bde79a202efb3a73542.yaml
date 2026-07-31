@@ -1,0 +1,115 @@
+{
+  "created_at": "2026-07-27T00:00:00.000Z",
+  "current_revision": 1,
+  "feature_id": "09-ticket-runtime",
+  "kind": "spec",
+  "provenance": [
+    {
+      "actor": "codex-root",
+      "at": "2026-07-31T17:23:53.966Z",
+      "durable_id": "7a0f822a9e9a91b01cdfdfa5bc38a8d219f927f7885fdb3ac2e5cf9019673013",
+      "operation": "meta_canonical_migration",
+      "payload": {
+        "migration": {
+          "constraintCount": 0,
+          "format": "context-os-meta-spec-v1",
+          "sourceContentSha256": "sha256:089dd7d3ddd896032529addd31b8d3653aaa6efb39ee44222be1b3a206a36968",
+          "sourcePath": "META/09-ticket-runtime/specs/decision-ticket-closeout-001.yaml",
+          "sourceProvenance": {
+            "confidence": 0.75,
+            "produced_at": "2026-07-27",
+            "source_ref": "Outcome/Evidence/Semantic Closeout discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b",
+            "source_type": "chat_extraction"
+          },
+          "sourceState": "superseded"
+        },
+        "revision": 1,
+        "state": "superseded",
+        "validation": "passed"
+      },
+      "request_id": "canonical-spec-migration-20260731-v1",
+      "task_id": "canonical-spec-migration-20260731"
+    }
+  ],
+  "relations": [
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-context-binding-001",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": null,
+      "to_spec_id": "decision-ticket-graph-lifecycle-002",
+      "type": "depends_on"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "The existing canonical lifecycle remains the authority for semantic promotion.",
+      "to_spec_id": "decision-workbench-010",
+      "type": "relates_to"
+    },
+    {
+      "created_at": "2026-07-31T17:23:53.966Z",
+      "rationale": "Resolves the open technical question without manufacturing a protected human decision.\n\nThe M4 contract settles independent Evidence adjudication, Outcome forms, and semantic-closeout authority.",
+      "to_spec_id": "contract-ticket-closeout-001",
+      "type": "supersedes"
+    }
+  ],
+  "revisions": [
+    {
+      "anchors": [
+        {
+          "content_hash": null,
+          "file": "META/09-ticket-runtime/artifacts/2026-07-27-ticket-runtime-exploration.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        },
+        {
+          "content_hash": null,
+          "file": "skills/_stdlib/lifecycle.md",
+          "line_end": null,
+          "line_start": null,
+          "symbol": ""
+        }
+      ],
+      "detail": "**Question**: Define the feedback boundary from operational work to durable\nsemantic state.\n\nThe answer must specify:\n- what evidence satisfies each acceptance condition;\n- verifier versus human-judgment authority;\n- how Outcome records partial, failed, or successful results;\n- when follow-up Tickets are derived;\n- how a closeout proposes create/amend/stale/supersede effects;\n- why DONE does not itself authorize canonical semantic mutation;\n- which detailed traces cool into retrievable history rather than normal\n  context.\n\nThis historical question is resolved by\n`contract-ticket-closeout-001`.\n",
+      "domain": "ticket-runtime",
+      "evidence": [
+        {
+          "confidence": 0.75,
+          "content_hash": "sha256:089dd7d3ddd896032529addd31b8d3653aaa6efb39ee44222be1b3a206a36968",
+          "evidence_id": "decision-ticket-closeout-001:1:meta-source",
+          "evidence_ref": "Outcome/Evidence/Semantic Closeout discussion in Codex session 019fa1de-8499-7e23-9576-c29db4d0168b",
+          "exact_quote": "Run 的 Artifact、Evidence 与 Outcome 如何关闭 Ticket，并提出但不越权执行 Semantic Closeout？",
+          "produced_at": "2026-07-27T00:00:00.000Z",
+          "producer": "meta-migration",
+          "source_ref": "META/09-ticket-runtime/specs/decision-ticket-closeout-001.yaml",
+          "source_type": "chat_extraction"
+        }
+      ],
+      "layer": "epic",
+      "priority": "P0",
+      "produced_at": "2026-07-27T00:00:00.000Z",
+      "producer": "meta-migration",
+      "revision": 1,
+      "summary": "Run 的 Artifact、Evidence 与 Outcome 如何关闭 Ticket，并提出但不越权执行 Semantic Closeout？",
+      "tags": [
+        "wayfinder",
+        "resolved",
+        "outcome",
+        "evidence",
+        "verification",
+        "semantic-closeout"
+      ],
+      "type": "decision"
+    }
+  ],
+  "schema_version": 2,
+  "source_kind": "canonical",
+  "spec_id": "decision-ticket-closeout-001",
+  "state": "superseded",
+  "updated_at": "2026-07-27T00:00:00.000Z"
+}
