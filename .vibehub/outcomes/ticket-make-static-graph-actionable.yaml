@@ -1,0 +1,30 @@
+{
+  "accepted_acceptance_ids": [
+    "one-copy-handoff-per-object",
+    "evidence-references-are-typed-and-compact",
+    "bound-context-is-inspectable",
+    "source-actions-are-mechanical-and-honest",
+    "relations-and-provenance-have-visual-language",
+    "dense-causal-position-remains-readable",
+    "visual-polish-strengthens-not-obscures",
+    "read-only-boundary-remains-light"
+  ],
+  "closed_at": "2026-08-02T22:44:20Z",
+  "evidence_ids": [
+    "actionable-static-graph-engineering",
+    "bound-context-agent-only-actions",
+    "context-handoff-refinement",
+    "contract-definition-of-done-hierarchy",
+    "dense-causal-browser-fixture",
+    "evidence-language-alignment",
+    "log-navigation-language",
+    "ticket-header-and-reference-alignment",
+    "owner-authorizes-main-release-direction"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all eight criteria. Current source and recorded browser proofs show one coherent Agent handoff per Ticket, Context, Evidence, Outcome, and Git source; compact typed references; exact expandable canonical Context; honest commit-pinned editor and GitHub links; directional dependencies and typed provenance; and a bounded five-in/five-out causal lens with prioritized state and complete-set disclosure. The quiet responsive visual and interaction direction remains consistent with the checked-in authority, and the exact conversation-backed owner release Evidence explicitly authorizes this UI as the v0.4.0 release candidate; no unrelated approval was inferred. Fresh project and Ticket validation, diff checks, and the full 13 of 13 test suite passed, with a dependency-free 33-file 244335-byte clean artifact and unchanged schema-valid GET/HEAD-only ephemeral-bearer boundary without database, cache, daemon, write route, opener endpoint, or hidden durable state.",
+  "ticket_id": "ticket-make-static-graph-actionable",
+  "unresolved_acceptance_ids": []
+}
