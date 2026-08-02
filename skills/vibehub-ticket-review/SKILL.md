@@ -17,6 +17,10 @@ The launcher binds an ephemeral loopback port, creates a short-lived bearer
 URL, and opens the browser. Use `--no-open` to print the URL without opening it,
 `--port <port>` only when a stable local port is useful, and `--json` for an
 Agent-readable launch envelope. Stop the foreground process to close the host.
+The default browser is the user's normal operating-system browser, not Codex.
+The page keeps its short-lived `#` bearer fragment and exposes **Copy link**;
+the complete copied URL can be pasted into another local browser while the
+launcher is alive. A bare origin without the fragment is intentionally denied.
 
 The graph, Ticket inspector, Evidence, and Outcome trace are projected fresh
 from `.vibehub/` on every refresh. The UI is read-only and has no database,

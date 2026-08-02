@@ -87,6 +87,10 @@ try {
   if (/\/api\/(?:review|decision)/u.test(installedScript)) {
     throw new Error("installed local UI still contains writable review routes");
   }
+  if (/history\.replaceState/u.test(installedScript)
+    || !/copyText\(location\.href, "Authorized link copied"\)/u.test(installedScript)) {
+    throw new Error("installed local UI does not preserve a portable authorized URL");
+  }
   const uiModule = await import(pathToFileURL(
     join(artifact, "skills", "scripts", "vh-ui.mjs"),
   ).href);

@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "normal-browser-entry-is-obvious"
+  ],
+  "evidence_id": "normal-browser-entry-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T09:15:00Z",
+  "refs": [
+    "skills/scripts/vh-ui.mjs",
+    "test/ui-host.test.mjs",
+    "README.md",
+    "docs/INSTALL.md",
+    "skills/vibehub-ticket-review/SKILL.md",
+    "command:node skills/scripts/vh-ui.mjs --repo . --json",
+    "launch-envelope:opened-true-port-61573"
+  ],
+  "schema_version": 1,
+  "summary": "Running the launcher without `--no-open` returned an `opened:true` envelope containing the complete authorized fragment URL and invoked the operating-system browser opener. Flag tests prove open is the default and no-open remains explicit. README, install guidance, and the review Skill now state that the default target is the user's normal system browser, explain Copy link, and reserve no-open for Agent/testing use.",
+  "ticket_id": "ticket-rebuild-local-graph-workbench"
+}

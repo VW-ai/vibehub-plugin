@@ -11,6 +11,9 @@
 - Restore the comprehensive local Ticket graph as a dependency-free read-only
   loopback UI that projects the checked-in YAML directly, without reviving the
   old CLI/runtime stack.
+- Replace the nested popover-style graph shell with a full-window VibeHub
+  workbench and preserve the short-lived authorized URL so it can be copied
+  into the user's normal browser.
 
 All notable VibeHub changes are recorded here. Versions follow Semantic
 Versioning.

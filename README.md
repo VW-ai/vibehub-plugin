@@ -71,6 +71,12 @@ loopback port, short-lived bearer URL, restrictive browser headers, and no
 database, daemon, persistent cache, or write endpoint. Browser writes and
 Decision authority are deliberately outside this first restored UI slice.
 
+By default the launcher opens the complete authorized URL in your normal
+system browser. The page keeps that short-lived `#` fragment in the address bar
+and provides **Copy link**, so the same URL can be pasted into another local
+browser while the foreground launcher is running. Use `--no-open` only when an
+Agent or test should print the URL without opening a browser.
+
 ## Data
 
 ```text

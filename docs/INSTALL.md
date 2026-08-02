@@ -58,10 +58,14 @@ Ask the Agent to use `$vibehub-ticket-review`, or launch the bundled helper:
 node <plugin>/skills/scripts/vh-ui.mjs --repo <repository>
 ```
 
-Use `--no-open` to print the short-lived local URL, `--port <port>` to choose a
-loopback port, and `--json` for an Agent-readable launch envelope. The UI reads
-the repository's checked-in YAML directly, rejects invalid canonical documents
-before projection, and exposes no write routes.
+The default command opens the complete short-lived URL in your normal system
+browser. Use the page's **Copy link** control to open that same authorized URL
+in another local browser. Keep the `#...` fragment: a bare loopback origin is
+intentionally unauthorized. Use `--no-open` only to print the URL for an Agent
+or test, `--port <port>` to choose a loopback port, and `--json` for an
+Agent-readable launch envelope. The UI reads the repository's checked-in YAML
+directly, rejects invalid canonical documents before projection, and exposes
+no write routes.
 
 ## Uninstall
 

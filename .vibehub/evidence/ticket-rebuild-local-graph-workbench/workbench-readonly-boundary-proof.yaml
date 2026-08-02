@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "canonical-readonly-boundary-survives"
+  ],
+  "evidence_id": "workbench-readonly-boundary-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T09:15:00Z",
+  "refs": [
+    "command:npm run verify",
+    "scripts/verify-plugin-artifact.mjs",
+    "test/ui-host.test.mjs",
+    "skills/scripts/vh-ui.mjs",
+    "package.json",
+    "/private/tmp/vibehub-workbench-claude-20260802",
+    "/private/tmp/vibehub-workbench-codex-20260802"
+  ],
+  "schema_version": 1,
+  "summary": "`npm run verify` passed all 8 tests plus clean-artifact UI startup and produced a 32-file, 167,469-byte plugin. Tests cover all four canonical document types, invalid-document rejection before projection, fresh reads, unchanged repository bytes after UI interactions, bearer authorization, restrictive headers, POST denial, and narrow launcher flags. Fresh offline Claude and Codex marketplace builds succeeded; package dependencies remain zero and the redesign adds no server route or durable state.",
+  "ticket_id": "ticket-rebuild-local-graph-workbench"
+}

@@ -128,7 +128,8 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const token = "a".repeat(64);
   const host = startVibeHubUi({ repoRoot: repo, token, tokenLifetimeMs: 60_000 });
   hosts.push(host);
-  const { origin } = await host.ready;
+  const { origin, url } = await host.ready;
+  assert.equal(new URL(url).hash, `#${token}`);
 
   const health = await fetch(`${origin}/health`);
   assert.equal(health.status, 200);
@@ -176,13 +177,18 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const html = await (await fetch(`${origin}/`)).text();
   const script = await (await fetch(`${origin}/app.js`)).text();
   const styles = await (await fetch(`${origin}/app.css`)).text();
-  assert.match(html, /Ticket dependency graph/u);
+  assert.match(html, /class="app-shell"/u);
+  assert.match(html, /id="copyLink"/u);
+  assert.doesNotMatch(html, /class="(?:surface|signal|sheet)/u);
   assert.match(script, /function layoutGraph/u);
   assert.match(script, /function causalCone/u);
   assert.match(script, /minimapWorldPoint/u);
+  assert.match(script, /copyText\(location\.href, "Authorized link copied"\)/u);
+  assert.doesNotMatch(script, /history\.replaceState/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
   assert.match(styles, /\.ticket-node\.state-deviated/u);
-  assert.match(styles, /@media \(max-width: 760px\)/u);
+  assert.match(styles, /@media \(max-width: 720px\)/u);
+  assert.doesNotMatch(styles, /\.(?:surface|signal|sheet)(?:\s|\{|\.)/u);
 
   assert.deepEqual(canonicalBytes(repo), beforeUi);
 
@@ -198,6 +204,12 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
 });
 
 test("launcher flags stay intentionally narrow", () => {
+  assert.deepEqual(parseUiFlags([]), {
+    repo: process.cwd(),
+    port: 0,
+    open: true,
+    json: false,
+  });
   assert.deepEqual(parseUiFlags([
     "--repo", ".", "--port", "4321", "--no-open", "--json",
   ]), {

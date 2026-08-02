@@ -20,18 +20,13 @@
   ]);
 
   const elements = {
-    surface: document.querySelector("#surface"),
-    sheet: document.querySelector("#sheet"),
-    signal: document.querySelector("#signal"),
-    signalDetail: document.querySelector("#signalDetail"),
-    signalAttention: document.querySelector("#signalAttention"),
     projectName: document.querySelector("#projectName"),
     sourceRef: document.querySelector("#sourceRef"),
-    ambientProject: document.querySelector("#ambientProject"),
-    ambientBranch: document.querySelector("#ambientBranch"),
+    graphSummary: document.querySelector("#graphSummary"),
     stateDot: document.querySelector("#stateDot"),
     stateLabel: document.querySelector("#stateLabel"),
     sourceStatus: document.querySelector("#sourceStatus"),
+    copyLink: document.querySelector("#copyLink"),
     workspace: document.querySelector(".workspace"),
     canvas: document.querySelector("#canvas"),
     graph: document.querySelector("#graph"),
@@ -51,7 +46,6 @@
   };
 
   let token = location.hash.slice(1);
-  if (token) history.replaceState(null, "", location.pathname);
   let state = null;
   let positions = new Map();
   let selected = null;
@@ -144,9 +138,6 @@
       : "unborn";
     const worktree = worktreeBasename(source.worktreeRoot);
     elements.projectName.textContent = project.name;
-    elements.ambientProject.textContent = project.name;
-    elements.ambientBranch.textContent =
-      `${worktree} · ${project.branch} · ${commit} · Git-YAML Ticket graph`;
     elements.sourceRef.textContent =
       `${worktree} · ${project.branch}@${commit}`;
     elements.sourceRef.title =
@@ -155,15 +146,10 @@
       "aria-label",
       `Worktree ${worktree}. Copy full path.`,
     );
-    elements.signalDetail.textContent =
-      `${graph.tickets.length} Tickets · ${graph.relations.length} direct unlocks`;
-    elements.signalAttention.textContent = deviatedCount > 0
-      ? `${deviatedCount} deviated`
-      : source.semanticDirty ? "Local" : "Git";
-    elements.signalAttention.className =
-      `signal-attention${
-        deviatedCount > 0 ? " deviated" : source.semanticDirty ? " dirty" : ""
-      }`;
+    elements.graphSummary.textContent =
+      `${graph.tickets.length} Ticket${graph.tickets.length === 1 ? "" : "s"}`
+      + ` · ${graph.relations.length} direct unlock${graph.relations.length === 1 ? "" : "s"}`;
+    document.title = `${project.name} · VibeHub Ticket graph`;
     elements.stateDot.className =
       `state-dot${
         deviatedCount > 0 ? " deviated" : source.semanticDirty ? " dirty" : ""
@@ -360,7 +346,7 @@
     elements.workspace.classList.remove("inspector-closed");
     elements.inspector.classList.add("open");
     elements.inspectorEyebrow.textContent = "Current graph";
-    elements.inspectorTitle.textContent = "The work that unlocks the outcome";
+    elements.inspectorTitle.textContent = "Execution context";
     elements.inspectorOutcome.textContent =
       `This exact worktree source contains ${state.graph.tickets.length} `
       + `Tickets and ${state.graph.relations.length} direct unlock relations. `
@@ -1414,11 +1400,11 @@
     elements.loadingState.hidden = true;
     elements.stateDot.className = "state-dot error";
     elements.stateLabel.textContent = "Unavailable";
-    elements.signalAttention.textContent = "Error";
-    elements.signalAttention.className = "signal-attention error";
-    elements.signalDetail.textContent = error.message;
+    elements.graphSummary.textContent = "Graph unavailable";
     elements.inspectorTitle.textContent = "Ticket graph unavailable";
-    elements.inspectorOutcome.textContent = error.message;
+    elements.inspectorOutcome.textContent = token
+      ? error.message
+      : "This address is missing its short-lived access fragment. Return to the terminal that launched VibeHub and copy the complete URL, including the text after #.";
     elements.inspectorContent.replaceChildren();
   }
 
@@ -1464,10 +1450,20 @@
 
   async function copyText(value, copiedLabel) {
     try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
       await navigator.clipboard.writeText(value);
       showToast(copiedLabel);
     } catch {
-      showToast("Copy unavailable · full path is in the hover detail");
+      const fallback = document.createElement("textarea");
+      fallback.value = value;
+      fallback.setAttribute("readonly", "");
+      fallback.style.position = "fixed";
+      fallback.style.opacity = "0";
+      document.body.append(fallback);
+      fallback.select();
+      const copied = document.execCommand("copy");
+      fallback.remove();
+      showToast(copied ? copiedLabel : "Copy unavailable in this browser");
     }
   }
 
@@ -1551,21 +1547,13 @@
     return Math.max(minimum, Math.min(maximum, value));
   }
 
-  elements.signal.addEventListener("click", () => {
-    const open = elements.surface.classList.toggle("open");
-    elements.signal.setAttribute("aria-expanded", String(open));
-    elements.sheet.setAttribute("aria-hidden", String(!open));
-    elements.sheet.inert = !open;
-    if (!open && elements.sheet.contains(document.activeElement)) {
-      elements.signal.focus();
-    } else if (open) {
-      requestAnimationFrame(frameGraph);
-    }
-  });
   elements.sourceStatus.addEventListener(
     "click",
     () => void refresh("Graph refreshed from Git"),
   );
+  elements.copyLink.addEventListener("click", () => {
+    void copyText(location.href, "Authorized link copied");
+  });
   elements.sourceRef.addEventListener("click", () => {
     if (!state) return;
     void copyText(
