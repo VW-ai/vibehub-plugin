@@ -1,0 +1,50 @@
+{
+  "context_id": "constraint-ui-quiet-intelligence-standard",
+  "detail": "A VibeHub UI does not receive a lower design bar because it ships inside a lightweight Plugin rather than as a standalone application. The local Ticket surface must feel like a deliberate execution instrument worth returning to: the complete causal graph is the primary object, read left-to-right as what becomes executable next; selection keeps that graph visible and progressively reveals contract, rationale, context, Evidence, Outcome, and Git trace. Healthy state stays quiet while human boundaries, blockers, deviations, stale facts, active work, and proof appear in situ at the graph locus that owns them. The visual language is compact, cool-neutral, macOS-like spatial tooling with system typography, restrained elevation, a small shape vocabulary, and semantic color only. Symbols, relations, position, weight, and whitespace carry structure before cards, labels, borders, or schema vocabulary. Every visible affordance must be honest, keyboard reachable, contrast-readable, and reduced-motion safe. The UI must not become a dense dashboard, a raw YAML/schema viewer, another chat, a warm editorial/serif brand page, or a decorative card collection. Historical runtime architecture is not part of this authority: the surface continues to consume schema-valid canonical Git documents mechanically and may rebuild only the presentation and interaction needed to meet this standard.",
+  "evidence": [
+    {
+      "note": "Historic project authority defines quiet intelligence, semantic color, progressive disclosure, traceable interaction, and rigor beneath rather than schema vocabulary on the surface.",
+      "ref": "commit:9dee0f0:META/00-project-room/specs/constraint-project-quiet-intelligence-001.yaml"
+    },
+    {
+      "note": "Wayne's approved v8 authority requires the compact cool-neutral spatial-workbench language and explicitly rejects warm editorial and serif styling for Workbench.",
+      "ref": "commit:9dee0f0:META/legacy-21-workbench/specs/decision-workbench-014.yaml"
+    },
+    {
+      "note": "The ratified review surface makes the complete direct-unlock causal graph primary, keeps inspection in situ, and rejects separate dashboard regions.",
+      "ref": "commit:9dee0f0:META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml"
+    },
+    {
+      "note": "The current warm paper, forest accent, serif display typography, persistent legend, and card-heavy presentation visibly diverge from that approved authority.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-02T08:06:31Z",
+    "quote": "我用我们这个UI没有任何的让我想去用的欲望……我们这边依然要保持我们之前想要做的这样一个标准",
+    "ref": "conversation:2026-08-02-ui-standard-reaffirmed"
+  },
+  "state": "active",
+  "summary": "Every VibeHub UI must preserve the approved quiet-intelligence spatial-workbench standard",
+  "tags": [
+    "design-authority",
+    "graph",
+    "interaction",
+    "local-ui",
+    "quiet-intelligence",
+    "spatial-workbench"
+  ],
+  "type": "constraint"
+}

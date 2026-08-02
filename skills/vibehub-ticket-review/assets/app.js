@@ -2,12 +2,12 @@
   "use strict";
 
   const SVG = "http://www.w3.org/2000/svg";
-  const NODE = { width: 254, height: 112 };
+  const NODE = { width: 232, height: 96 };
   const LAYOUT = {
-    marginX: 92,
-    marginY: 82,
-    columnGap: 136,
-    rowGap: 68,
+    marginX: 80,
+    marginY: 76,
+    columnGap: 118,
+    rowGap: 58,
     sweeps: 5,
   };
   const MIN_SCALE = 0.12;
@@ -23,6 +23,8 @@
     projectName: document.querySelector("#projectName"),
     sourceRef: document.querySelector("#sourceRef"),
     graphSummary: document.querySelector("#graphSummary"),
+    graphSignal: document.querySelector("#graphSignal"),
+    graphSignalCount: document.querySelector("#graphSignalCount"),
     stateDot: document.querySelector("#stateDot"),
     stateLabel: document.querySelector("#stateLabel"),
     sourceStatus: document.querySelector("#sourceStatus"),
@@ -114,7 +116,7 @@
       renderChrome();
       renderGraph();
       renderMinimap();
-      renderGraphInspector();
+      renderGraphInspector({ open: false });
       requestAnimationFrame(frameGraph);
       if (message) showToast(message);
       return true;
@@ -130,9 +132,8 @@
   function renderChrome() {
     const { project, graph } = state;
     const { source } = graph;
-    const deviatedCount = graph.tickets.filter(
-      (ticket) => ticketOperationalState(ticket)?.label === "DEVIATED",
-    ).length;
+    const counts = operationalCounts(graph.tickets);
+    const deviatedCount = counts.DEVIATED;
     const commit = source.resolvedCommit
       ? source.resolvedCommit.slice(0, 8)
       : "unborn";
@@ -146,7 +147,8 @@
       "aria-label",
       `Worktree ${worktree}. Copy full path.`,
     );
-    elements.graphSummary.textContent =
+    elements.graphSummary.textContent = graphSummary(counts);
+    elements.graphSignalCount.textContent =
       `${graph.tickets.length} Ticket${graph.tickets.length === 1 ? "" : "s"}`
       + ` · ${graph.relations.length} direct unlock${graph.relations.length === 1 ? "" : "s"}`;
     document.title = `${project.name} · VibeHub Ticket graph`;
@@ -171,6 +173,7 @@
     elements.nodeLayer.replaceChildren();
     if (!state) return;
     const related = selected ? causalCone(selected) : null;
+    const ports = relationPorts(state.graph.relations);
 
     for (const relation of state.graph.relations) {
       const from = positions.get(relation.prerequisiteTicketId);
@@ -191,11 +194,27 @@
           `${relation.prerequisiteTicketId} unlocks ${relation.dependentTicketId}`,
       });
       group.dataset.relationRef = relation.relationRef;
-      const geometry = edgeGeometry(from, to, relation.relationRef);
+      const geometry = edgeGeometry(
+        from,
+        to,
+        relation.relationRef,
+        ports.get(relation.relationRef),
+      );
       group.append(
         svg("path", { class: "edge-visible", d: geometry.path }),
         svg("path", { class: "edge-arrow", d: geometry.arrow }),
-        svg("path", { class: "edge-hit", d: geometry.path }),
+        svg("circle", {
+          class: "edge-control-halo",
+          cx: geometry.handle.x,
+          cy: geometry.handle.y,
+          r: 11,
+        }),
+        svg("circle", {
+          class: "edge-control",
+          cx: geometry.handle.x,
+          cy: geometry.handle.y,
+          r: 3.5,
+        }),
       );
       group.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -250,23 +269,30 @@
           cy: NODE.height / 2,
           r: 7,
         }),
+        svg("line", {
+          class: "ticket-proof",
+          x1: 8,
+          y1: NODE.height - 1,
+          x2: NODE.width - 8,
+          y2: NODE.height - 1,
+        }),
       );
-      const id = svg("text", { class: "ticket-id", x: 15, y: 23 });
+      const id = svg("text", { class: "ticket-id", x: 14, y: 20 });
       id.textContent = shortTicketId(ticket.ticketId);
       group.append(id);
-      wrap(ticket.outcome, 38, 3).forEach((line, index) => {
+      wrap(ticket.outcome, 34, 3).forEach((line, index) => {
         const text = svg("text", {
           class: "ticket-outcome",
-          x: 15,
-          y: 49 + index * 17,
+          x: 14,
+          y: 43 + index * 15,
         });
         text.textContent = line;
         group.append(text);
       });
       const meta = svg("text", {
         class: "ticket-meta",
-        x: 15,
-        y: NODE.height - 12,
+        x: 14,
+        y: NODE.height - 10,
       });
       meta.textContent =
         `${ticket.relationCounts.prerequisites} in · `
@@ -275,8 +301,8 @@
       if (operational) {
         const status = svg("text", {
           class: "ticket-state",
-          x: NODE.width - 15,
-          y: NODE.height - 12,
+          x: NODE.width - 14,
+          y: NODE.height - 10,
           "text-anchor": "end",
         });
         status.textContent = operational.label;
@@ -338,22 +364,29 @@
     updateMinimapViewport();
   }
 
-  function renderGraphInspector() {
+  function renderGraphInspector({ open = true } = {}) {
     if (!state) return;
     const request = ++subjectRequest;
     const snapshotId = state.graph.snapshotId;
     selected = null;
-    elements.workspace.classList.remove("inspector-closed");
-    elements.inspector.classList.add("open");
+    if (open) openInspector();
+    else {
+      elements.workspace.classList.add("inspector-closed");
+      elements.inspector.classList.remove("open");
+      elements.inspector.setAttribute("aria-hidden", "true");
+      elements.inspector.inert = true;
+    }
     elements.inspectorEyebrow.textContent = "Current graph";
     elements.inspectorTitle.textContent = "Execution context";
-    elements.inspectorOutcome.textContent =
-      `This exact worktree source contains ${state.graph.tickets.length} `
-      + `Tickets and ${state.graph.relations.length} direct unlock relations. `
-      + "Select any Ticket to inspect its current Git-derived state, recorded "
-      + "context, and trace.";
+    const counts = operationalCounts(state.graph.tickets);
+    elements.inspectorOutcome.textContent = graphNarrative(counts);
     const content = document.createDocumentFragment();
-    content.append(
+    content.append(section(
+      "Execution signal",
+      stateSummary(counts),
+    ));
+    content.append(disclosure(
+      "Exact Git source",
       facts([
         ["Source", sourceLabel(state.graph.source)],
         [
@@ -370,7 +403,7 @@
             : "matches committed VibeHub files",
         ],
       ]),
-    );
+    ));
     if (state.graph.source.semanticDirty) {
       const pendingPaths = state.graph.source.dirtyPaths.map(
         (item) => ({ title: item }),
@@ -382,7 +415,7 @@
         });
       }
       content.append(
-        section(
+        disclosure(
           "Pending local VibeHub files",
           list(
             pendingPaths,
@@ -392,12 +425,13 @@
         ),
       );
     }
-    const traceSection = section(
-      "Trace",
+    const traceDisclosure = disclosure(
+      "Git trace",
       quietMessage("Reading Git trace…"),
     );
+    const traceSection = traceDisclosure.lastElementChild;
     traceSection.dataset.trace = "graph";
-    content.append(traceSection);
+    content.append(traceDisclosure);
     elements.inspectorContent.replaceChildren(content);
     void loadGraphTrace(request, snapshotId, traceSection);
   }
@@ -416,16 +450,10 @@
         inspection,
         trace,
       )) return;
-      traceSection.replaceChildren(
-        sectionHeading("Trace"),
-        traceList(trace.records || []),
-      );
+      traceSection.replaceChildren(traceList(trace.records || []));
     } catch (error) {
       if (!isCurrentSubjectRequest(request, snapshotId)) return;
-      traceSection.replaceChildren(
-        sectionHeading("Trace"),
-        quietMessage(error.message, "error"),
-      );
+      traceSection.replaceChildren(quietMessage(error.message, "error"));
       showToast(error.message);
     }
   }
@@ -497,23 +525,32 @@
     elements.inspectorEyebrow.textContent =
       `Ticket · ${shortTicketId(ticket.ticketId)}`;
     elements.inspectorTitle.textContent = ticket.outcome;
-    elements.inspectorOutcome.textContent =
-      contextPackage.context || "No additional context was recorded.";
+    const operational = ticketOperationalState(ticket);
+    elements.inspectorOutcome.textContent = operational?.detail
+      || "Inspect this Ticket's bounded execution contract and exact Git trace.";
     const content = document.createDocumentFragment();
-    content.append(facts([
-      ["Revision", ticket.ticketRevision],
-      [
-        "Topology",
-        `${ticket.relationCounts.prerequisites} prerequisites · `
-        + `${ticket.relationCounts.dependents} unlocks`,
-      ],
-      ["Source", sourceLabel(inspection.source || state.graph.source)],
-    ]));
-    const operational = executionStateView(ticket);
-    if (operational) {
-      content.append(section("Current state", operational));
+    const stateView = executionStateView(ticket);
+    if (stateView) {
+      content.append(section("Current state", stateView));
     }
-    appendSection(
+    appendDisclosure(
+      content,
+      "Execution context",
+      textBlock(contextPackage.context || "No additional context was recorded."),
+    );
+    content.append(disclosure(
+      "Exact source",
+      facts([
+        ["Revision", ticket.ticketRevision],
+        [
+          "Topology",
+          `${ticket.relationCounts.prerequisites} prerequisites · `
+          + `${ticket.relationCounts.dependents} unlocks`,
+        ],
+        ["Source", sourceLabel(inspection.source || state.graph.source)],
+      ]),
+    ));
+    appendDisclosure(
       content,
       "Acceptance",
       list(
@@ -524,7 +561,7 @@
         }),
       ),
     );
-    appendSection(
+    appendDisclosure(
       content,
       "Constraints",
       list(
@@ -532,21 +569,21 @@
         (item) => ({ detail: item }),
       ),
     );
-    appendSection(
+    appendDisclosure(
       content,
-      "Context references",
+      "Bound context",
       list(
         contextPackage.contextRefs || [],
         (item) => ({ title: item.ref, detail: item.purpose }),
         "code-ref",
       ),
     );
-    appendSection(
+    appendDisclosure(
       content,
-      "Typed relations",
+      "Dependencies",
       relationList(contextPackage.relations || []),
     );
-    appendSection(
+    appendDisclosure(
       content,
       "Provenance",
       list(
@@ -555,12 +592,13 @@
         "code-ref",
       ),
     );
-    const traceSection = section(
-      "Trace",
+    const traceDisclosure = disclosure(
+      "Git trace",
       quietMessage("Reading Git trace…"),
     );
+    const traceSection = traceDisclosure.lastElementChild;
     traceSection.dataset.trace = "ticket";
-    content.append(traceSection);
+    content.append(traceDisclosure);
     elements.inspectorContent.replaceChildren(content);
     return traceSection;
   }
@@ -633,13 +671,16 @@
     elements.inspectorOutcome.textContent =
       relation.rationale || "Direct execution dependency.";
     const content = document.createDocumentFragment();
-    content.append(facts([
-      ["Relation", relation.relationRef],
-      ["From", relation.prerequisiteTicketId],
-      ["To", relation.dependentTicketId],
-      ["Source", sourceLabel(inspection.source || state.graph.source)],
-    ]));
-    appendSection(
+    content.append(disclosure(
+      "Exact relation",
+      facts([
+        ["Relation", relation.relationRef],
+        ["From", relation.prerequisiteTicketId],
+        ["To", relation.dependentTicketId],
+        ["Source", sourceLabel(inspection.source || state.graph.source)],
+      ]),
+    ));
+    appendDisclosure(
       content,
       "Provenance",
       list(
@@ -648,12 +689,13 @@
         "code-ref",
       ),
     );
-    const traceSection = section(
-      "Trace",
+    const traceDisclosure = disclosure(
+      "Git trace",
       quietMessage("Reading Git trace…"),
     );
+    const traceSection = traceDisclosure.lastElementChild;
     traceSection.dataset.trace = "relation";
-    content.append(traceSection);
+    content.append(traceDisclosure);
     elements.inspectorContent.replaceChildren(content);
     return traceSection;
   }
@@ -673,16 +715,10 @@
         || trace?.snapshotId !== snapshotId
         || !traceSubjectMatches(subject, trace?.subject)
       ) return;
-      traceSection.replaceChildren(
-        sectionHeading("Trace"),
-        traceList(trace.records || []),
-      );
+      traceSection.replaceChildren(traceList(trace.records || []));
     } catch (error) {
       if (!isCurrentSubjectRequest(request, snapshotId)) return;
-      traceSection.replaceChildren(
-        sectionHeading("Trace"),
-        quietMessage(error.message, "error"),
-      );
+      traceSection.replaceChildren(quietMessage(error.message, "error"));
       showToast(error.message);
     }
   }
@@ -738,6 +774,8 @@
   function openInspector() {
     elements.workspace.classList.remove("inspector-closed");
     elements.inspector.classList.add("open");
+    elements.inspector.setAttribute("aria-hidden", "false");
+    elements.inspector.inert = false;
   }
 
   function closeInspector() {
@@ -746,6 +784,8 @@
     selected = null;
     elements.inspector.classList.remove("open");
     elements.workspace.classList.add("inspector-closed");
+    elements.inspector.setAttribute("aria-hidden", "true");
+    elements.inspector.inert = true;
     renderGraph();
     requestAnimationFrame(() => focusGraphSubject(restore));
   }
@@ -796,9 +836,26 @@
     return wrapper;
   }
 
+  function disclosure(title, child, open = false) {
+    const details = document.createElement("details");
+    details.className = "inspector-disclosure";
+    details.open = open;
+    const summary = document.createElement("summary");
+    summary.textContent = title;
+    const body = document.createElement("div");
+    body.append(child);
+    details.append(summary, body);
+    return details;
+  }
+
   function appendSection(fragment, title, child) {
     if (child === null) return;
     fragment.append(section(title, child));
+  }
+
+  function appendDisclosure(fragment, title, child, open = false) {
+    if (child === null) return;
+    fragment.append(disclosure(title, child, open));
   }
 
   function list(items, project, className = "") {
@@ -854,15 +911,16 @@
     return wrapper;
   }
 
-  function sectionHeading(title) {
-    const heading = document.createElement("h2");
-    heading.textContent = title;
-    return heading;
-  }
-
   function quietMessage(message, tone = "") {
     const paragraph = document.createElement("p");
     paragraph.className = classes("quiet-message", tone);
+    paragraph.textContent = message;
+    return paragraph;
+  }
+
+  function textBlock(message) {
+    const paragraph = document.createElement("p");
+    paragraph.className = "context-copy";
     paragraph.textContent = message;
     return paragraph;
   }
@@ -927,6 +985,50 @@
         ? slot.summary.references
         : [],
     };
+  }
+
+  function operationalCounts(tickets) {
+    const counts = { READY: 0, BLOCKED: 0, DONE: 0, DEVIATED: 0 };
+    for (const ticket of tickets) {
+      const label = ticketOperationalState(ticket)?.label;
+      if (label && Object.hasOwn(counts, label)) counts[label] += 1;
+    }
+    return counts;
+  }
+
+  function graphSummary(counts) {
+    const parts = [];
+    if (counts.READY) parts.push(`${counts.READY} ready`);
+    if (counts.BLOCKED) parts.push(`${counts.BLOCKED} blocked`);
+    if (counts.DEVIATED) parts.push(`${counts.DEVIATED} deviation${counts.DEVIATED === 1 ? "" : "s"}`);
+    if (!parts.length && counts.DONE) parts.push(`${counts.DONE} proven`);
+    return parts.join(" · ") || "No executable Tickets";
+  }
+
+  function graphNarrative(counts) {
+    if (counts.DEVIATED) {
+      return `${counts.DEVIATED} execution deviation${counts.DEVIATED === 1 ? "" : "s"} need attention. `
+        + `${counts.READY} Ticket${counts.READY === 1 ? " is" : "s are"} executable now.`;
+    }
+    if (counts.READY) {
+      return `${counts.READY} Ticket${counts.READY === 1 ? " is" : "s are"} executable now. `
+        + `${counts.BLOCKED} remain blocked and ${counts.DONE} are proven complete.`;
+    }
+    if (counts.BLOCKED) {
+      return `No Ticket is executable yet; ${counts.BLOCKED} remain blocked by direct prerequisites.`;
+    }
+    return `${counts.DONE} Ticket${counts.DONE === 1 ? " is" : "s are"} proven complete. The graph is quiet.`;
+  }
+
+  function stateSummary(counts) {
+    const result = document.createElement("div");
+    result.className = "execution-state-copy";
+    const primary = document.createElement("strong");
+    primary.textContent = graphSummary(counts);
+    const detail = document.createElement("span");
+    detail.textContent = "Select a Ticket or direct unlock to reveal its exact bounded context and Git trace.";
+    result.append(primary, detail);
+    return result;
   }
 
   function executionStateView(ticket) {
@@ -1171,7 +1273,34 @@
     ) / neighbors.length;
   }
 
-  function edgeGeometry(from, to, relationRef) {
+  function relationPorts(relations) {
+    const incoming = new Map();
+    for (const relation of relations) {
+      if (!incoming.has(relation.dependentTicketId)) {
+        incoming.set(relation.dependentTicketId, []);
+      }
+      incoming.get(relation.dependentTicketId).push(relation);
+    }
+    const result = new Map(relations.map((relation) => [
+      relation.relationRef,
+      { target: 0 },
+    ]));
+    const assign = (groups, endpoint, orderBy) => {
+      for (const group of groups.values()) {
+        group.sort((left, right) =>
+          orderBy(left).localeCompare(orderBy(right))
+          || left.relationRef.localeCompare(right.relationRef));
+        group.forEach((relation, index) => {
+          result.get(relation.relationRef)[endpoint] =
+            (index - (group.length - 1) / 2) * 14;
+        });
+      }
+    };
+    assign(incoming, "target", (relation) => relation.prerequisiteTicketId);
+    return result;
+  }
+
+  function edgeGeometry(from, to, relationRef, ports = {}) {
     const x1 = from.x + NODE.width + 7;
     const y1 = from.y + NODE.height / 2;
     const x2 = to.x - 2;
@@ -1179,8 +1308,17 @@
     const arrow =
       `M ${x2 - 7} ${y2 - 3.5} L ${x2} ${y2} `
       + `L ${x2 - 7} ${y2 + 3.5} Z`;
+    const handleX = clamp(
+      x2 - 30 - (ports.target || 0),
+      x1 + 18,
+      x2 - 12,
+    );
     if (Math.abs(y2 - y1) < 1) {
-      return { path: `M ${x1} ${y1} H ${x2}`, arrow };
+      return {
+        path: `M ${x1} ${y1} H ${x2}`,
+        arrow,
+        handle: { x: handleX, y: y1 },
+      };
     }
     const lane = stableLane(relationRef);
     const ratio = 0.5 + lane * 0.035;
@@ -1192,6 +1330,7 @@
     return {
       path: `M ${x1} ${y1} H ${mid} V ${y2} H ${x2}`,
       arrow,
+      handle: { x: Math.max(mid + 10, handleX), y: y2 },
     };
   }
 
@@ -1397,6 +1536,7 @@
   }
 
   function renderError(error) {
+    openInspector();
     elements.loadingState.hidden = true;
     elements.stateDot.className = "state-dot error";
     elements.stateLabel.textContent = "Unavailable";
@@ -1554,6 +1694,10 @@
   elements.copyLink.addEventListener("click", () => {
     void copyText(location.href, "Authorized link copied");
   });
+  elements.graphSignal.addEventListener("click", () => {
+    renderGraphInspector();
+    renderGraph();
+  });
   elements.sourceRef.addEventListener("click", () => {
     if (!state) return;
     void copyText(
@@ -1575,8 +1719,7 @@
       return;
     }
     if (selected) {
-      renderGraphInspector();
-      renderGraph();
+      closeInspector();
     }
   });
   elements.canvas.addEventListener("pointerdown", (event) => {
@@ -1622,7 +1765,9 @@
     );
   }, { passive: false });
   window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && selected) closeInspector();
+    if (event.key === "Escape" && elements.inspector.classList.contains("open")) {
+      closeInspector();
+    }
   });
   window.addEventListener(
     "resize",

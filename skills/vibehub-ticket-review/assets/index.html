@@ -11,34 +11,25 @@
 <body>
   <div class="app-shell">
     <header class="app-bar">
-      <div class="brand-lockup" aria-label="VibeHub Ticket graph">
-        <span class="brand-mark" aria-hidden="true">V</span>
-        <div>
-          <strong>VibeHub</strong>
-          <span>Ticket graph</span>
-        </div>
+      <div class="source-line" aria-label="Current Git source">
+        <span class="wordmark">VibeHub</span>
+        <span class="source-separator">/</span>
+        <strong id="projectName">Project</strong>
+        <button
+          class="source-ref"
+          id="sourceRef"
+          type="button"
+          title="Copy full worktree path"
+        >worktree</button>
       </div>
 
-      <div class="source-lockup">
-        <span class="source-label">Current worktree</span>
-        <div class="source-line">
-          <strong id="projectName">Project</strong>
-          <span class="source-separator">/</span>
-          <button
-            class="source-ref"
-            id="sourceRef"
-            type="button"
-            title="Copy full worktree path"
-          >worktree</button>
-        </div>
+      <div class="graph-tools" aria-label="Graph controls">
+        <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
+        <button type="button" id="fitGraph">Fit</button>
+        <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
       </div>
 
       <div class="app-actions">
-        <div class="graph-tools" aria-label="Graph controls">
-          <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
-          <button type="button" id="fitGraph">Fit</button>
-          <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
-        </div>
         <button
           class="source-status"
           id="sourceStatus"
@@ -57,18 +48,13 @@
       </div>
     </header>
 
-    <main class="workspace">
+    <main class="workspace inspector-closed">
       <section class="canvas" id="canvas" aria-label="Ticket dependency graph">
         <div class="canvas-heading">
           <div>
-            <span class="eyebrow">Execution topology</span>
-            <strong id="graphSummary">Reading current Tickets…</strong>
-          </div>
-          <div class="state-legend" aria-label="Ticket states">
-            <span class="legend-ready">Ready</span>
-            <span class="legend-blocked">Blocked</span>
-            <span class="legend-done">Done</span>
-            <span class="legend-deviated">Deviated</span>
+            <span class="eyebrow">Execution map</span>
+            <strong>What can execute next</strong>
+            <span id="graphSummary">Reading current Tickets…</span>
           </div>
         </div>
         <svg id="graph" role="group" aria-label="Direct unlock graph">
@@ -86,6 +72,15 @@
           aria-label="Recenter graph from minimap"
           preserveAspectRatio="xMidYMid meet"
         ></svg>
+        <button class="graph-signal" id="graphSignal" type="button">
+          <span class="graph-glyph" aria-hidden="true"></span>
+          <span>
+            <strong>Ticket graph</strong>
+            <small id="graphSignalCount">Reading Git source…</small>
+          </span>
+          <span class="graph-source">Git</span>
+          <span class="graph-chevron" aria-hidden="true">⌃</span>
+        </button>
         <div class="empty-state" id="emptyState" hidden>
           <span class="empty-mark"></span>
           <strong>No Tickets in this worktree</strong>
@@ -97,7 +92,7 @@
         </div>
       </section>
 
-      <aside class="inspector open" id="inspector" aria-label="Ticket inspector">
+      <aside class="inspector" id="inspector" aria-label="Ticket inspector" aria-hidden="true" inert>
         <div class="inspector-head">
           <div>
             <span class="eyebrow" id="inspectorEyebrow">Current graph</span>

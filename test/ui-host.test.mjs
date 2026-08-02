@@ -179,16 +179,27 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const styles = await (await fetch(`${origin}/app.css`)).text();
   assert.match(html, /class="app-shell"/u);
   assert.match(html, /id="copyLink"/u);
+  assert.match(html, /class="workspace inspector-closed"/u);
+  assert.match(html, /id="graphSignal"/u);
   assert.doesNotMatch(html, /class="(?:surface|signal|sheet)/u);
+  assert.doesNotMatch(html, /state-legend|brand-mark/u);
   assert.match(script, /function layoutGraph/u);
   assert.match(script, /function causalCone/u);
+  assert.match(script, /function relationPorts/u);
+  assert.match(script, /edge-control-halo/u);
   assert.match(script, /minimapWorldPoint/u);
+  assert.match(script, /renderGraphInspector\(\{ open: false \}\)/u);
+  assert.match(script, /function disclosure/u);
   assert.match(script, /copyText\(location\.href, "Authorized link copied"\)/u);
   assert.doesNotMatch(script, /history\.replaceState/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
   assert.match(styles, /\.ticket-node\.state-deviated/u);
+  assert.match(styles, /\.edge-control-halo/u);
+  assert.match(styles, /--canvas: #f1f2f0/u);
+  assert.match(styles, /\.inspector-disclosure/u);
   assert.match(styles, /@media \(max-width: 720px\)/u);
   assert.doesNotMatch(styles, /\.(?:surface|signal|sheet)(?:\s|\{|\.)/u);
+  assert.doesNotMatch(styles, /ui-serif|Iowan Old Style|Palatino|#245b43/u);
 
   assert.deepEqual(canonicalBytes(repo), beforeUi);
 

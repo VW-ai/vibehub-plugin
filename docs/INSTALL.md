@@ -65,7 +65,8 @@ intentionally unauthorized. Use `--no-open` only to print the URL for an Agent
 or test, `--port <port>` to choose a loopback port, and `--json` for an
 Agent-readable launch envelope. The UI reads the repository's checked-in YAML
 directly, rejects invalid canonical documents before projection, and exposes
-no write routes.
+no write routes. Its visual and interaction contract is documented in
+[LOCAL_GRAPH_DESIGN.md](LOCAL_GRAPH_DESIGN.md).
 
 ## Uninstall
 

@@ -61,10 +61,14 @@ Ask the Agent to open the VibeHub Ticket graph, or run the bundled launcher:
 node <plugin>/skills/scripts/vh-ui.mjs --repo <repository>
 ```
 
-The established directed-graph experience includes Ticket state, direct
-dependency edges, pan/zoom, fit, minimap navigation, causal highlighting, and
-an inspector for Context references, acceptance, Evidence, and Outcome. Each
-refresh projects the exact checkout's `.vibehub/` files directly.
+The graph is a quiet execution map built around one question: what becomes
+executable next? Direct unlocks, forks, joins, proof, and deviations remain in
+place; pan/zoom, fit, minimap navigation, causal highlighting, and precise
+relation handles keep the complete graph usable. Selecting a Ticket or relation
+opens one structural Inspector, and strict Context, acceptance, provenance,
+Evidence, and Outcome remain progressively disclosed. Each refresh projects the
+exact checkout's `.vibehub/` files directly. See the checked-in
+[local graph design authority](docs/LOCAL_GRAPH_DESIGN.md).
 
 The launcher is a narrow, dependency-free foreground process: ephemeral
 loopback port, short-lived bearer URL, restrictive browser headers, and no
