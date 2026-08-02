@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
 import { buildUiSnapshot, parseUiFlags, startVibeHubUi } from "../skills/scripts/vh-ui.mjs";
@@ -19,10 +19,23 @@ function fixture() {
   repos.push(repo);
   assert.equal(run(repo, "project", "init").status, 0);
   assert.equal(run(repo, "context", "put", context()).status, 0);
+  mkdirSync(join(repo, "docs"));
+  writeFileSync(join(repo, "docs", "LOCAL_GRAPH_DESIGN.md"), "# Local graph design\n");
+  const feature = ticket("feature", ["foundation"]);
+  feature.context_refs = [
+    {
+      ref: ".vibehub/context/decision-use-tickets.yaml",
+      purpose: "Canonical product direction.",
+    },
+    {
+      ref: "docs/LOCAL_GRAPH_DESIGN.md",
+      purpose: "Design source when present.",
+    },
+  ];
   assert.equal(run(repo, "ticket", "apply", {
     tickets: [
       ticket("foundation"),
-      ticket("feature", ["foundation"]),
+      feature,
       ticket("unsuccessful"),
       ticket("blocked", ["unsuccessful"]),
     ],
@@ -34,7 +47,7 @@ function fixture() {
     ticket_id: "foundation",
     acceptance_ids: ["works"],
     summary: "Foundation behavior was observed.",
-    refs: ["test:foundation"],
+    refs: ["test:foundation", "browser:foundation-reviewed"],
     recorded_at: NOW,
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
@@ -122,6 +135,38 @@ test("invalid canonical documents fail before UI projection", () => {
   );
 });
 
+test("dense causal position preserves every direct prerequisite and unlock", () => {
+  const repo = tempRepo("ui-dense-causal");
+  repos.push(repo);
+  assert.equal(run(repo, "project", "init").status, 0);
+  const prerequisites = Array.from({ length: 5 }, (_, index) => `prerequisite-${index + 1}`);
+  const dependents = Array.from({ length: 5 }, (_, index) => `dependent-${index + 1}`);
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [
+      ...prerequisites.map((id) => ticket(id)),
+      ticket("causal-center", prerequisites),
+      ...dependents.map((id) => ticket(id, ["causal-center"])),
+    ],
+  }).status, 0);
+  const snapshot = buildUiSnapshot(repo);
+  const center = snapshot.state.graph.tickets.find(
+    (item) => item.ticketId === "causal-center",
+  );
+  assert.deepEqual(center.relationCounts, { prerequisites: 5, dependents: 5 });
+  assert.equal(
+    snapshot.state.graph.relations.filter(
+      (relation) => relation.dependentTicketId === "causal-center",
+    ).length,
+    5,
+  );
+  assert.equal(
+    snapshot.state.graph.relations.filter(
+      (relation) => relation.prerequisiteTicketId === "causal-center",
+    ).length,
+    5,
+  );
+});
+
 test("read-only loopback host serves assets, current graph, inspector, and trace", async () => {
   const repo = fixture();
   const beforeUi = canonicalBytes(repo);
@@ -147,6 +192,8 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(state.graph.tickets.length, 4);
   assert.equal(state.graph.relations.length, 2);
   assert.equal(state.interventions.review.available, false);
+  assert.equal(state.graph.source.actions.worktree.editorHref.startsWith("vscode://file"), true);
+  assert.equal(state.graph.source.agentPayload.kind, "vibehub_git_source");
 
   const ticketQuery = new URLSearchParams({
     snapshotId: state.graph.snapshotId,
@@ -159,6 +206,24 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   )).json()).data;
   assert.equal(subject.subject.ticket.ticketId, "foundation");
   assert.equal(subject.contextPackage.acceptance[0].acceptanceId, "works");
+  assert.equal(subject.contextPackage.agentPayload.kind, "vibehub_ticket_handoff");
+
+  const featureQuery = new URLSearchParams({
+    snapshotId: state.graph.snapshotId,
+    kind: "ticket",
+    ticketId: "feature",
+  });
+  const featureSubject = (await (await fetch(
+    `${origin}/api/subject?${featureQuery}`,
+    authorized(token),
+  )).json()).data;
+  assert.equal(featureSubject.contextPackage.contextRefs[0].kind, "context");
+  assert.equal(
+    featureSubject.contextPackage.contextRefs[0].canonicalContext.summary,
+    "Use Tickets as the development entry point",
+  );
+  assert.equal(featureSubject.contextPackage.contextRefs[1].kind, "source");
+  assert.equal(featureSubject.contextPackage.contextRefs[1].canonicalContext, null);
 
   const trace = (await (await fetch(
     `${origin}/api/trace?${ticketQuery}`,
@@ -166,6 +231,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   )).json()).data;
   assert.deepEqual(trace.records.map((record) => record.kind), ["evidence", "outcome"]);
   assert.deepEqual(trace.records[0].acceptanceIds, ["works"]);
+  assert.deepEqual(
+    trace.records[0].targets.map((target) => target.kind),
+    ["test", "browser"],
+  );
+  assert.equal(trace.records[0].agentPayload.kind, "vibehub_ticket_evidence");
   assert.equal(trace.records[1].subkind, "successful");
   assert.deepEqual(trace.records[1].acceptedAcceptanceIds, ["works"]);
   assert.deepEqual(trace.records[1].unresolvedAcceptanceIds, []);
@@ -184,6 +254,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(html, /id="copyLink"/u);
   assert.match(html, /class="workspace inspector-closed"/u);
   assert.match(html, /id="graphSignal"/u);
+  assert.match(html, /id="sourceDock"/u);
   assert.doesNotMatch(html, /class="(?:surface|signal|sheet)/u);
   assert.doesNotMatch(html, /state-legend|brand-mark/u);
   assert.match(script, /function layoutGraph/u);
@@ -195,6 +266,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function disclosure/u);
   assert.match(script, /function tabbedTicketView/u);
   assert.match(script, /function ticketExecutionPanel/u);
+  assert.match(script, /function canonicalContextObject/u);
+  assert.match(script, /function typedReferenceList/u);
+  assert.match(script, /Copy for Agent/u);
   assert.match(script, /function updateTicketProof/u);
   assert.match(script, /function revealTicket/u);
   assert.match(script, /incoming\.length - completed/u);
@@ -213,6 +287,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(styles, /\.acceptance-rail/u);
   assert.match(styles, /\.guardrail-list/u);
   assert.match(styles, /\.context-grid/u);
+  assert.match(styles, /\.source-dock/u);
+  assert.match(styles, /\.typed-reference/u);
+  assert.match(styles, /\.causal-more/u);
   assert.match(styles, /@media \(max-width: 720px\)/u);
   assert.doesNotMatch(styles, /\.(?:surface|signal|sheet)(?:\s|\{|\.)/u);
   assert.doesNotMatch(styles, /ui-serif|Iowan Old Style|Palatino|#245b43/u);

@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import http from "node:http";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   assertValid,
@@ -59,11 +59,81 @@ function git(repo, args) {
   }
 }
 
+function githubWebBase(remote) {
+  if (!remote) return null;
+  const match = remote.match(
+    /^(?:git@github\.com:|https?:\/\/github\.com\/)([^/]+\/[^/]+?)(?:\.git)?$/u,
+  );
+  return match ? `https://github.com/${match[1]}` : null;
+}
+
+function pathActions(source, path) {
+  const absolutePath = isAbsolute(path)
+    ? path
+    : resolve(source.worktreeRoot, path);
+  const repositoryPath = relative(source.repositoryRoot, absolutePath)
+    .split("\\").join("/");
+  const insideRepository = repositoryPath !== ".."
+    && !repositoryPath.startsWith("../");
+  const revision = source.resolvedCommit || source.branch;
+  return {
+    path,
+    absolutePath,
+    editorHref: `vscode://file${encodeURI(absolutePath)}`,
+    githubHref: insideRepository && source.githubWebBase && revision
+      ? `${source.githubWebBase}/blob/${encodeURIComponent(revision)}/${repositoryPath
+        .split("/").map(encodeURIComponent).join("/")}`
+      : null,
+  };
+}
+
+function referenceKind(reference) {
+  if (/^https?:\/\//u.test(reference)) return "url";
+  if (/^(?:commit|git):/u.test(reference)) return "commit";
+  if (/^test:/u.test(reference)) return "test";
+  if (/^browser:/u.test(reference)) return "browser";
+  if (/^conversation:/u.test(reference)) return "conversation";
+  if (/^(?:file:)?[^:]+\.(?:md|ya?ml|json|m?js|c?js|css|html|tsx?|jsx?)$/u.test(reference)) {
+    return "file";
+  }
+  return "reference";
+}
+
+function referenceLabel(reference, kind = referenceKind(reference)) {
+  if (kind === "file") return basename(reference.replace(/^file:/u, ""));
+  if (kind === "url") {
+    try {
+      return new URL(reference).hostname;
+    } catch {
+      return "Web reference";
+    }
+  }
+  const value = reference.includes(":")
+    ? reference.slice(reference.indexOf(":") + 1)
+    : reference;
+  const compact = value.length > 32 ? `${value.slice(0, 20)}…${value.slice(-8)}` : value;
+  return `${kind.charAt(0).toUpperCase()}${kind.slice(1)} · ${compact}`;
+}
+
+function typedReference(source, reference) {
+  const kind = referenceKind(reference);
+  const filePath = kind === "file" ? reference.replace(/^file:/u, "") : null;
+  return {
+    kind,
+    label: referenceLabel(reference, kind),
+    target: reference,
+    href: kind === "url" ? reference : null,
+    actions: filePath ? pathActions(source, filePath) : null,
+  };
+}
+
 function gitSource(repo, graphDigest) {
   const repositoryRoot = git(repo, ["rev-parse", "--show-toplevel"]) || repo;
   const worktreeRoot = realpathSync(repo);
   const branch = git(repo, ["symbolic-ref", "--quiet", "--short", "HEAD"]);
   const resolvedCommit = git(repo, ["rev-parse", "--verify", "HEAD"]);
+  const remoteOrigin = git(repo, ["config", "--get", "remote.origin.url"]);
+  const githubBase = githubWebBase(remoteOrigin);
   const status = git(repo, [
     "status",
     "--short",
@@ -75,7 +145,7 @@ function gitSource(repo, graphDigest) {
     ? status.split("\n").map((line) => line.slice(3).trim()).filter(Boolean)
     : [];
   const dirtyPaths = allDirtyPaths.slice(0, MAX_DIRTY_PATHS);
-  return {
+  const source = {
     mode: "worktree",
     repositoryRoot,
     worktreeRoot,
@@ -87,7 +157,29 @@ function gitSource(repo, graphDigest) {
     semanticDirty: allDirtyPaths.length > 0,
     dirtyPaths,
     dirtyPathsTruncated: allDirtyPaths.length > dirtyPaths.length,
+    remoteOrigin: remoteOrigin || null,
+    githubWebBase: githubBase,
   };
+  source.actions = {
+    worktree: {
+      ...pathActions(source, source.worktreeRoot),
+      githubHref: null,
+    },
+    repository: githubBase,
+    commit: githubBase && resolvedCommit
+      ? `${githubBase}/commit/${resolvedCommit}`
+      : null,
+  };
+  source.agentPayload = {
+    kind: "vibehub_git_source",
+    repository: source.repositoryRoot,
+    worktree: source.worktreeRoot,
+    branch: source.branch,
+    commit: source.resolvedCommit,
+    semanticDirty: source.semanticDirty,
+    dirtyPaths: source.dirtyPaths,
+  };
+  return source;
 }
 
 function relationRef(prerequisiteTicketId, dependentTicketId) {
@@ -170,7 +262,43 @@ function projectGraph(repository) {
   return { tickets, relations };
 }
 
-function ticketContextPackage(ticket, relations) {
+function canonicalContextFromRef(repository, reference) {
+  const match = reference.match(/^\.vibehub\/context\/([^/]+)\.yaml$/u);
+  if (!match) return null;
+  const context = repository.contexts.documents.get(match[1])?.document;
+  if (!context) return null;
+  return {
+    contextId: context.context_id,
+    type: context.type,
+    state: context.state,
+    summary: context.summary,
+    detail: context.detail,
+    tags: context.tags,
+    source: context.source,
+    evidence: context.evidence,
+    relations: context.relations,
+  };
+}
+
+function ticketContextPackage(ticket, relations, repository, source) {
+  const contextRefs = ticket.context_refs.map((item) => ({
+    ...item,
+    kind: canonicalContextFromRef(repository, item.ref) ? "context" : "source",
+    canonicalContext: canonicalContextFromRef(repository, item.ref),
+    actions: pathActions(source, item.ref),
+  }));
+  const agentPayload = {
+    kind: "vibehub_ticket_handoff",
+    ticketId: ticket.ticket_id,
+    outcome: ticket.outcome,
+    context: ticket.context,
+    acceptance: ticket.acceptance,
+    constraints: ticket.constraints,
+    contextRefs: ticket.context_refs,
+    relations: ticket.relations,
+    provenanceRefs: ticket.provenance_refs,
+    source: source.agentPayload,
+  };
   return {
     outcome: ticket.outcome,
     context: ticket.context,
@@ -179,7 +307,7 @@ function ticketContextPackage(ticket, relations) {
       criterion: item.criterion,
     })),
     constraints: ticket.constraints,
-    contextRefs: ticket.context_refs,
+    contextRefs,
     relations: ticket.relations.map((relation) => ({
       type: relation.type,
       targetTicketId: relation.target_ticket_id,
@@ -188,11 +316,12 @@ function ticketContextPackage(ticket, relations) {
         candidate.prerequisiteTicketId === relation.target_ticket_id
         && candidate.dependentTicketId === ticket.ticket_id)?.relationRef,
     })),
-    provenanceRefs: ticket.provenance_refs,
+    provenanceRefs: ticket.provenance_refs.map((ref) => typedReference(source, ref)),
+    agentPayload,
   };
 }
 
-function evidenceTrace(evidence) {
+function evidenceTrace(evidence, source) {
   return {
     kind: "evidence",
     subkind: "acceptance",
@@ -201,15 +330,21 @@ function evidenceTrace(evidence) {
     occurredAt: evidence.recorded_at,
     summary: evidence.summary,
     body: `Acceptance: ${evidence.acceptance_ids.join(", ")}`,
-    targets: evidence.refs.map((ref) => ({
-      kind: "file",
-      label: "Evidence reference",
-      target: ref,
-    })),
+    targets: evidence.refs.map((ref) => typedReference(source, ref)),
+    agentPayload: {
+      kind: "vibehub_ticket_evidence",
+      evidenceId: evidence.evidence_id,
+      ticketId: evidence.ticket_id,
+      acceptanceIds: evidence.acceptance_ids,
+      summary: evidence.summary,
+      refs: evidence.refs,
+      recordedAt: evidence.recorded_at,
+    },
   };
 }
 
-function outcomeTrace(outcome) {
+function outcomeTrace(outcome, source) {
+  const outcomeRef = `.vibehub/outcomes/${outcome.ticket_id}.yaml`;
   return {
     kind: "outcome",
     subkind: outcome.status,
@@ -223,20 +358,30 @@ function outcomeTrace(outcome) {
       `Unresolved: ${outcome.unresolved_acceptance_ids.join(", ") || "none"}`,
     ].join("\n"),
     targets: [{
-      kind: "file",
-      label: "Outcome",
-      target: `.vibehub/outcomes/${outcome.ticket_id}.yaml`,
+      ...typedReference(source, outcomeRef),
+      label: "Canonical Outcome",
     }],
+    agentPayload: {
+      kind: "vibehub_ticket_outcome",
+      ticketId: outcome.ticket_id,
+      status: outcome.status,
+      acceptedAcceptanceIds: outcome.accepted_acceptance_ids,
+      unresolvedAcceptanceIds: outcome.unresolved_acceptance_ids,
+      evidenceIds: outcome.evidence_ids,
+      summary: outcome.summary,
+      closedAt: outcome.closed_at,
+      ref: outcomeRef,
+    },
   };
 }
 
-function traceRecords(repository, ticketId = null) {
+function traceRecords(repository, source, ticketId = null) {
   const evidence = documents(repository.evidence.documents)
     .filter((item) => ticketId === null || item.ticket_id === ticketId)
-    .map(evidenceTrace);
+    .map((item) => evidenceTrace(item, source));
   const outcomes = documents(repository.outcomes.documents)
     .filter((item) => ticketId === null || item.ticket_id === ticketId)
-    .map(outcomeTrace);
+    .map((item) => outcomeTrace(item, source));
   return [...evidence, ...outcomes].sort((left, right) =>
     String(left.occurredAt).localeCompare(String(right.occurredAt)),
   );
@@ -305,9 +450,19 @@ function subjectFrom(snapshot, url) {
       subject: {
         kind: "ticket",
         ticket: node,
-        contextPackage: ticketContextPackage(ticket, snapshot.graph.relations),
+        contextPackage: ticketContextPackage(
+          ticket,
+          snapshot.graph.relations,
+          snapshot.repository,
+          snapshot.state.graph.source,
+        ),
       },
-      contextPackage: ticketContextPackage(ticket, snapshot.graph.relations),
+      contextPackage: ticketContextPackage(
+        ticket,
+        snapshot.graph.relations,
+        snapshot.repository,
+        snapshot.state.graph.source,
+      ),
     };
   }
   if (kind === "relation") {
@@ -331,9 +486,9 @@ function traceFrom(snapshot, url) {
     snapshotId: inspected.snapshotId,
     subject,
     records: subject.kind === "ticket"
-      ? traceRecords(snapshot.repository, subject.ticketId)
+      ? traceRecords(snapshot.repository, snapshot.state.graph.source, subject.ticketId)
       : subject.kind === "graph"
-        ? traceRecords(snapshot.repository)
+        ? traceRecords(snapshot.repository, snapshot.state.graph.source)
         : [],
     nextCursor: null,
   };

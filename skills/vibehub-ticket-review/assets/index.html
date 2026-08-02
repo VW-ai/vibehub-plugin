@@ -19,9 +19,21 @@
           class="source-ref"
           id="sourceRef"
           type="button"
-          title="Copy full worktree path"
+          title="Inspect exact Git source"
+          aria-expanded="false"
         >worktree</button>
       </div>
+
+      <aside class="source-dock" id="sourceDock" hidden aria-label="Exact Git source">
+        <div class="source-dock-head">
+          <div>
+            <span class="eyebrow">Exact Git source</span>
+            <strong id="sourceDockTitle">Current worktree</strong>
+          </div>
+          <button class="icon-button" id="closeSourceDock" type="button" aria-label="Close source details">×</button>
+        </div>
+        <div id="sourceDockContent"></div>
+      </aside>
 
       <div class="graph-tools" aria-label="Graph controls">
         <button type="button" id="zoomOut" aria-label="Zoom out">−</button>

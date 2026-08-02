@@ -22,6 +22,10 @@
   const elements = {
     projectName: document.querySelector("#projectName"),
     sourceRef: document.querySelector("#sourceRef"),
+    sourceDock: document.querySelector("#sourceDock"),
+    sourceDockTitle: document.querySelector("#sourceDockTitle"),
+    sourceDockContent: document.querySelector("#sourceDockContent"),
+    closeSourceDock: document.querySelector("#closeSourceDock"),
     graphSummary: document.querySelector("#graphSummary"),
     graphSignal: document.querySelector("#graphSignal"),
     graphSignalCount: document.querySelector("#graphSignalCount"),
@@ -142,11 +146,12 @@
     elements.sourceRef.textContent =
       `${worktree} · ${project.branch}@${commit}`;
     elements.sourceRef.title =
-      `${source.worktreeRoot}\nWorktree ${source.worktreeIdentity}\nClick to copy full path`;
+      `${source.worktreeRoot}\nWorktree ${source.worktreeIdentity}\nInspect exact source`;
     elements.sourceRef.setAttribute(
       "aria-label",
-      `Worktree ${worktree}. Copy full path.`,
+      `Worktree ${worktree}. Inspect exact Git source.`,
     );
+    renderSourceDock();
     elements.graphSummary.textContent = graphSummary(counts);
     elements.graphSignalCount.textContent =
       `${graph.tickets.length} Ticket${graph.tickets.length === 1 ? "" : "s"}`
@@ -633,11 +638,7 @@
     appendDisclosure(
       content,
       "Provenance",
-      list(
-        relation.provenanceRefs || [],
-        (item) => ({ title: item }),
-        "code-ref",
-      ),
+      typedReferenceList(relation.provenanceRefs || []),
     );
     const traceDisclosure = disclosure(
       "Git trace",
@@ -842,12 +843,20 @@
       const row = document.createElement("button");
       row.type = "button";
       row.className = "relation-row";
-      const title = document.createElement("strong");
-      title.textContent =
-        `${relation.type} → ${shortTicketId(relation.targetTicketId)}`;
+      const route = document.createElement("span");
+      route.className = "relation-route";
+      const current = document.createElement("span");
+      current.textContent = "THIS TICKET";
+      const arrow = document.createElement("span");
+      arrow.className = "relation-route-arrow";
+      arrow.textContent = "→";
+      const target = document.createElement("strong");
+      target.textContent = shortTicketId(relation.targetTicketId);
+      route.append(current, arrow, target);
       const detail = document.createElement("span");
+      detail.className = "relation-rationale";
       detail.textContent = relation.rationale || relation.targetTicketId;
-      row.append(title, detail);
+      row.append(route, detail);
       const projected = state.graph.relations.find(
         (candidate) => candidate.relationRef === relation.relationRef,
       );
@@ -961,7 +970,15 @@
     marker.setAttribute("aria-hidden", "true");
     const label = document.createElement("strong");
     label.textContent = operational?.label || "TICKET";
-    heading.append(marker, label);
+    const handoff = actionButton({
+      label: "Copy for Agent",
+      className: "agent-handoff",
+      onClick: () => void copyPayload(
+        contextPackage.agentPayload,
+        `Ticket ${ticket.ticketId} copied for Agent`,
+      ),
+    });
+    heading.append(marker, label, handoff);
 
     const metrics = document.createElement("div");
     metrics.className = "ticket-signal-metrics";
@@ -1048,22 +1065,52 @@
       group.append(empty);
       return group;
     }
-    ticketIds.slice(0, 3).forEach((ticketId) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "causal-ticket";
-      button.textContent = shortTicketId(ticketId);
-      button.title = ticketId;
-      button.addEventListener("click", () => void selectTicket(ticketId, true));
-      group.append(button);
+    const ordered = [...ticketIds].sort((left, right) =>
+      causalPriority(left) - causalPriority(right)
+      || left.localeCompare(right));
+    ordered.slice(0, 3).forEach((ticketId) => {
+      group.append(causalTicketButton(ticketId));
     });
     if (ticketIds.length > 3) {
-      const remainder = document.createElement("span");
-      remainder.className = "causal-empty";
-      remainder.textContent = `+${ticketIds.length - 3} more`;
-      group.append(remainder);
+      const all = document.createElement("details");
+      all.className = "causal-more";
+      const summary = document.createElement("summary");
+      summary.textContent = `View all ${ticketIds.length}`;
+      const body = document.createElement("div");
+      ordered.slice(3).forEach((ticketId) => {
+        body.append(causalTicketButton(ticketId));
+      });
+      all.append(summary, body);
+      group.append(all);
     }
     return group;
+  }
+
+  function causalPriority(ticketId) {
+    const ticket = state.graph.tickets.find((item) => item.ticketId === ticketId);
+    return { DEVIATED: 0, BLOCKED: 1, READY: 2, DONE: 3 }[
+      ticketOperationalState(ticket)?.label
+    ] ?? 4;
+  }
+
+  function causalTicketButton(ticketId) {
+    const ticket = state.graph.tickets.find((item) => item.ticketId === ticketId);
+    const operational = ticketOperationalState(ticket);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = classes(
+      "causal-ticket",
+      operational ? `state-${operational.key}` : "",
+    );
+    button.title = ticketId;
+    const marker = document.createElement("span");
+    marker.className = "causal-ticket-state";
+    marker.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("span");
+    copy.textContent = shortTicketId(ticketId);
+    button.append(marker, copy);
+    button.addEventListener("click", () => void selectTicket(ticketId, true));
+    return button;
   }
 
   function causalCurrent(ticketId) {
@@ -1123,10 +1170,8 @@
       ["Revision", ticket.ticketRevision],
       ["Source", sourceLabel(inspection.source || state.graph.source)],
     ]));
-    const provenance = list(
+    const provenance = typedReferenceList(
       contextPackage.provenanceRefs || ticket.provenanceRefs || [],
-      (item) => ({ title: item }),
-      "code-ref",
     );
     if (provenance) audit.append(provenance);
     const source = disclosure("Exact source & provenance", audit);
@@ -1199,24 +1244,110 @@
     const grid = document.createElement("div");
     grid.className = "context-grid";
     for (const item of items) {
-      const object = document.createElement("article");
-      object.className = "context-object";
-      const type = document.createElement("span");
-      type.className = "context-kind";
-      type.textContent = contextKind(item.ref);
-      const title = document.createElement("strong");
-      title.textContent = contextLabel(item.ref);
-      const purpose = document.createElement("p");
-      purpose.textContent = item.purpose;
-      const copy = document.createElement("button");
-      copy.type = "button";
-      copy.textContent = "Copy ref";
-      copy.title = item.ref;
-      copy.addEventListener("click", () => void copyText(item.ref, "Context reference copied"));
-      object.append(type, title, purpose, copy);
+      const object = item.canonicalContext
+        ? canonicalContextObject(item)
+        : sourceContextObject(item);
       grid.append(object);
     }
     return grid;
+  }
+
+  function contextObjectHeading(item, canonical) {
+    const heading = document.createElement("span");
+    heading.className = "context-object-heading";
+    const type = document.createElement("span");
+    type.className = "context-kind";
+    type.textContent = canonical?.type || contextKind(item.ref);
+    const title = document.createElement("strong");
+    title.textContent = canonical?.summary || contextLabel(item.ref);
+    const stateLabel = document.createElement("span");
+    stateLabel.className = "context-state";
+    stateLabel.textContent = canonical?.state || "reference";
+    heading.append(type, title, stateLabel);
+    return heading;
+  }
+
+  function canonicalContextObject(item) {
+    const canonical = item.canonicalContext;
+    const object = document.createElement("details");
+    object.className = "context-object canonical-context";
+    const summary = document.createElement("summary");
+    summary.append(contextObjectHeading(item, canonical));
+    const body = document.createElement("div");
+    body.className = "context-object-body";
+    const purpose = document.createElement("p");
+    purpose.className = "context-purpose";
+    purpose.textContent = item.purpose;
+    const detail = document.createElement("p");
+    detail.textContent = canonical.detail;
+    body.append(purpose, detail);
+    if ((canonical.tags || []).length) {
+      const tags = document.createElement("div");
+      tags.className = "context-tags";
+      canonical.tags.forEach((tag) => {
+        const token = document.createElement("span");
+        token.textContent = tag;
+        tags.append(token);
+      });
+      body.append(tags);
+    }
+    body.append(contextActions(item, {
+      kind: "vibehub_context",
+      ref: item.ref,
+      purpose: item.purpose,
+      ...canonical,
+    }));
+    const factsView = contextFactLedger(canonical);
+    if (factsView) body.append(factsView);
+    object.append(summary, body);
+    return object;
+  }
+
+  function sourceContextObject(item) {
+    const object = document.createElement("article");
+    object.className = "context-object source-context";
+    object.append(contextObjectHeading(item, null));
+    const purpose = document.createElement("p");
+    purpose.textContent = item.purpose;
+    object.append(purpose, contextActions(item, {
+      kind: "vibehub_source_reference",
+      ref: item.ref,
+      purpose: item.purpose,
+    }));
+    return object;
+  }
+
+  function contextFactLedger(canonical) {
+    const factsView = document.createElement("dl");
+    factsView.className = "context-ledger";
+    const append = (label, value) => {
+      if (value === undefined || value === null
+        || (Array.isArray(value) && value.length === 0)) return;
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const definition = document.createElement("dd");
+      definition.textContent = typeof value === "string"
+        ? value
+        : JSON.stringify(value, null, 2);
+      factsView.append(term, definition);
+    };
+    append("Context ID", canonical.contextId);
+    append("Source", canonical.source);
+    append("Evidence", canonical.evidence);
+    append("Relations", canonical.relations);
+    return factsView.childElementCount ? factsView : null;
+  }
+
+  function contextActions(item, payload) {
+    const actions = document.createElement("div");
+    actions.className = "object-actions";
+    actions.append(actionButton({
+      label: "Copy for Agent",
+      className: "agent-handoff compact",
+      onClick: () => void copyPayload(payload, "Context copied for Agent"),
+    }));
+    appendMechanicalActions(actions, item.actions, item.ref);
+    return actions;
   }
 
   function contextKind(reference) {
@@ -1317,6 +1448,7 @@
       const tone = historical ? "" : traceTone(record);
       row.className = classes(
         "trace-row",
+        `kind-${record.kind}`,
         historical ? "historical" : "",
         tone ? `trace-${tone}` : "",
       );
@@ -1327,8 +1459,13 @@
 
       const copy = document.createElement("div");
       copy.className = "trace-copy";
+      const heading = document.createElement("div");
+      heading.className = "trace-heading";
+      const headingCopy = document.createElement("div");
       const title = document.createElement("strong");
+      title.className = "trace-title";
       title.textContent = record.summary;
+      title.title = record.summary;
       const meta = document.createElement("span");
       meta.className = "trace-meta";
       meta.textContent = [
@@ -1336,7 +1473,25 @@
         record.status || "recorded",
         formatInstant(record.occurredAt),
       ].join(" · ");
-      copy.append(title, meta);
+      headingCopy.append(title, meta);
+      heading.append(headingCopy, iconButton({
+        label: `Copy ${record.kind} for Agent`,
+        onClick: () => void copyPayload(
+          record.agentPayload || record,
+          `${humanizeIdentifier(record.kind)} copied for Agent`,
+        ),
+      }));
+      copy.append(heading);
+      if (record.summary.length > 220) {
+        const complete = document.createElement("details");
+        complete.className = "trace-record-details";
+        const completeSummary = document.createElement("summary");
+        completeSummary.textContent = "Read complete record";
+        const completeBody = document.createElement("p");
+        completeBody.textContent = record.summary;
+        complete.append(completeSummary, completeBody);
+        copy.append(complete);
+      }
       const decision = traceDecisionDetails(record.decision);
       if (decision) copy.append(decision);
       if (record.body) {
@@ -1524,25 +1679,55 @@
     const wrapper = document.createElement("div");
     wrapper.className = "trace-targets";
     for (const target of targets) {
-      if (target.kind === "url") {
-        const link = document.createElement("a");
-        link.href = target.target;
-        link.target = "_blank";
-        link.rel = "noreferrer";
-        link.textContent = target.label;
-        link.title = target.target;
-        wrapper.append(link);
-        continue;
+      const reference = document.createElement("span");
+      reference.className = `typed-reference kind-${target.kind || "reference"}`;
+      const kind = document.createElement("span");
+      kind.className = "reference-kind";
+      kind.textContent = target.kind || "reference";
+      const label = target.href || target.actions?.githubHref
+        ? document.createElement("a")
+        : document.createElement("span");
+      label.className = "reference-label";
+      label.textContent = target.label || compactReference(target.target);
+      label.title = target.target;
+      if (label instanceof HTMLAnchorElement) {
+        label.href = target.href || target.actions.githubHref;
+        label.target = "_blank";
+        label.rel = "noreferrer";
       }
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = target.label;
-      button.title = target.target;
-      button.addEventListener(
-        "click",
-        () => void copyText(target.target, `${target.label} copied`),
-      );
-      wrapper.append(button);
+      const copy = iconButton({
+        label: `Copy ${target.label || target.kind || "reference"}`,
+        onClick: () => void copyText(target.target, "Reference copied"),
+      });
+      copy.classList.add("reference-copy");
+      reference.append(kind, label, copy);
+      wrapper.append(reference);
+    }
+    return wrapper;
+  }
+
+  function typedReferenceList(items) {
+    if (!items.length) return null;
+    const wrapper = document.createElement("div");
+    wrapper.className = "typed-reference-list";
+    for (const item of items) {
+      const normalized = typeof item === "string"
+        ? { kind: "reference", label: compactReference(item), target: item }
+        : item;
+      const row = document.createElement("div");
+      row.className = `typed-reference kind-${normalized.kind || "reference"}`;
+      const kind = document.createElement("span");
+      kind.className = "reference-kind";
+      kind.textContent = normalized.kind || "reference";
+      const label = document.createElement("span");
+      label.className = "reference-label";
+      label.textContent = normalized.label;
+      label.title = normalized.target;
+      row.append(kind, label, iconButton({
+        label: `Copy ${normalized.label}`,
+        onClick: () => void copyText(normalized.target, "Provenance copied"),
+      }));
+      wrapper.append(row);
     }
     return wrapper;
   }
@@ -1976,6 +2161,117 @@
       + `${source.semanticDirty ? " · local changes" : ""}`;
   }
 
+  function renderSourceDock() {
+    if (!state || !elements.sourceDockContent) return;
+    const source = state.graph.source;
+    elements.sourceDockTitle.textContent =
+      `${worktreeBasename(source.worktreeRoot)} · ${state.project.branch}`;
+    const content = document.createDocumentFragment();
+    const summary = document.createElement("div");
+    summary.className = "source-dock-summary";
+    const stateMark = document.createElement("span");
+    stateMark.className = classes(
+      "source-dock-mark",
+      source.semanticDirty ? "dirty" : "exact",
+    );
+    const copy = document.createElement("div");
+    const label = document.createElement("strong");
+    label.textContent = source.semanticDirty
+      ? `${dirtyPathCount(source)} local VibeHub change${source.dirtyPaths.length === 1 ? "" : "s"}`
+      : "Exact checked-in VibeHub source";
+    const detail = document.createElement("span");
+    detail.textContent = `${state.project.branch} @ ${source.resolvedCommit?.slice(0, 10) || "unborn"}`;
+    copy.append(label, detail);
+    summary.append(stateMark, copy);
+    content.append(summary);
+
+    const actions = document.createElement("div");
+    actions.className = "source-dock-actions";
+    actions.append(actionButton({
+      label: "Copy for Agent",
+      className: "agent-handoff",
+      onClick: () => void copyPayload(source.agentPayload, "Git source copied for Agent"),
+    }));
+    appendMechanicalActions(actions, source.actions?.worktree, source.worktreeRoot);
+    appendExternalAction(actions, source.actions?.repository, "GitHub repo");
+    appendExternalAction(actions, source.actions?.commit, "Exact commit");
+    content.append(actions);
+    content.append(facts([
+      ["Worktree", copyableWorktree(source)],
+      ["Branch", source.branch || "detached"],
+      ["Commit", source.resolvedCommit || "unborn HEAD"],
+      ["Remote", source.remoteOrigin || "No recognized remote"],
+      ["Graph", shortDigest(source.graphDigest)],
+    ]));
+    if (source.semanticDirty) {
+      content.append(list(
+        source.dirtyPaths.map((path) => ({ title: path })),
+        (item) => item,
+        "code-ref",
+      ));
+    }
+    elements.sourceDockContent.replaceChildren(content);
+  }
+
+  function appendMechanicalActions(container, actions, copyValue) {
+    container.append(iconButton({
+      label: `Copy ${copyValue}`,
+      onClick: () => void copyText(copyValue, "Reference copied"),
+    }));
+    appendExternalAction(container, actions?.editorHref, "Open in VS Code");
+    appendExternalAction(container, actions?.githubHref, "View HEAD on GitHub");
+  }
+
+  function appendExternalAction(container, href, label) {
+    if (!href) return;
+    const link = document.createElement("a");
+    link.className = "mechanical-link";
+    link.href = href;
+    link.textContent = label;
+    link.title = href;
+    if (/^https?:/u.test(href)) {
+      link.target = "_blank";
+      link.rel = "noreferrer";
+    }
+    container.append(link);
+  }
+
+  function copyIcon() {
+    const icon = svg("svg", {
+      viewBox: "0 0 16 16",
+      "aria-hidden": "true",
+    });
+    icon.append(
+      svg("rect", { x: 5.25, y: 5.25, width: 7.5, height: 7.5, rx: 1.25 }),
+      svg("path", { d: "M10.5 5.25V4.5A1.25 1.25 0 0 0 9.25 3.25H4.5A1.25 1.25 0 0 0 3.25 4.5v4.75A1.25 1.25 0 0 0 4.5 10.5h.75" }),
+    );
+    return icon;
+  }
+
+  function iconButton({ label, onClick }) {
+    const button = document.createElement("button");
+    button.className = "copy-icon-button";
+    button.type = "button";
+    button.title = label;
+    button.setAttribute("aria-label", label);
+    button.append(copyIcon());
+    button.addEventListener("click", onClick);
+    return button;
+  }
+
+  function actionButton({ label, onClick, className = "" }) {
+    const button = document.createElement("button");
+    button.className = classes("object-action", className);
+    button.type = "button";
+    button.append(copyIcon(), document.createTextNode(label));
+    button.addEventListener("click", onClick);
+    return button;
+  }
+
+  function copyPayload(payload, copiedLabel) {
+    return copyText(JSON.stringify(payload, null, 2), copiedLabel);
+  }
+
   function dirtyPathCount(source) {
     return `${source.dirtyPaths.length}${source.dirtyPathsTruncated ? "+" : ""}`;
   }
@@ -2109,10 +2405,16 @@
   });
   elements.sourceRef.addEventListener("click", () => {
     if (!state) return;
-    void copyText(
-      state.graph.source.worktreeRoot,
-      "Worktree path copied",
+    elements.sourceDock.hidden = !elements.sourceDock.hidden;
+    elements.sourceRef.setAttribute(
+      "aria-expanded",
+      String(!elements.sourceDock.hidden),
     );
+  });
+  elements.closeSourceDock.addEventListener("click", () => {
+    elements.sourceDock.hidden = true;
+    elements.sourceRef.setAttribute("aria-expanded", "false");
+    elements.sourceRef.focus();
   });
   document.querySelector("#fitGraph").addEventListener("click", fitGraph);
   document
