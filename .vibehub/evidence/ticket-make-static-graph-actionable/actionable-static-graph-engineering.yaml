@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "one-copy-handoff-per-object",
+    "evidence-references-are-typed-and-compact",
+    "bound-context-is-inspectable",
+    "source-actions-are-mechanical-and-honest",
+    "relations-and-provenance-have-visual-language",
+    "read-only-boundary-remains-light"
+  ],
+  "evidence_id": "actionable-static-graph-engineering",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T19:53:12.000Z",
+  "refs": [
+    "git:54e0592",
+    "git:55bf753",
+    "test:npm-test-9-of-9",
+    "test:npm-run-verify-32-files-223662-bytes",
+    "browser:actual-repository-actionable-ui-desktop-and-390x720",
+    "browser:source-dock-context-expansion-proof-and-copy-confirmation",
+    "file:skills/scripts/vh-ui.mjs",
+    "file:skills/vibehub-ticket-review/assets/app.js",
+    "file:skills/vibehub-ticket-review/assets/app.css",
+    "file:test/ui-host.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "At commits 54e0592 and 55bf753, the freshly validated projection exposes one typed Agent payload per Git source, Ticket, canonical Context, source ref, Evidence, and Outcome; compact common copy icons; typed/countable Evidence references; expandable exact canonical Context; commit-pinned GitHub and local VS Code links; directional dependency objects; typed provenance; and a compact source dock. Real-browser review exercised the actual repository at desktop and 390x720, including Source Dock, Context expansion, long-proof progressive disclosure, copy confirmation, and narrow full-screen Inspector. npm test passed 9 of 9, full artifact verification passed 9 of 9 at 32 files and 223662 bytes, runtime logs were empty, and the host remains GET/HEAD-only, schema-validating, dependency-free, database/cache/daemon-free, and without opener or write endpoints.",
+  "ticket_id": "ticket-make-static-graph-actionable"
+}
