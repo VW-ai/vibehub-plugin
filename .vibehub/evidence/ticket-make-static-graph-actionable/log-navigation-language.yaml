@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "evidence-references-are-typed-and-compact",
+    "visual-polish-strengthens-not-obscures"
+  ],
+  "evidence_id": "log-navigation-language",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T22:07:46.000Z",
+  "refs": [
+    "git:f568d5f",
+    "conversation:2026-08-02-log-is-navigation-evidence-is-domain-object",
+    "browser:execution-contract-log-tabs-with-evidence-and-outcome-content",
+    "test:npm-run-verify-9-of-9-32-files-237157-bytes",
+    "file:skills/vibehub-ticket-review/assets/app.js",
+    "file:test/ui-host.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Owner dogfood clarified that the third navigation layer should answer what happened and therefore read Log, while Evidence remains a canonical acceptance-linked record inside that history and Outcome remains its independent decision object. Commit f568d5f changes only the visible navigation label, preserving the internal evidence identity, Evidence coverage metric, Evidence cards, Evidence & Outcome heading, and ticket_evidence schema. Real-browser verification confirmed exactly Execution, Contract, and Log tabs; no visible Evidence or Proof tab; an active Log surface containing Evidence & Outcome; and empty runtime logs. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 237157 bytes. Final owner approval of the overall visual direction remains protected.",
+  "ticket_id": "ticket-make-static-graph-actionable"
+}
