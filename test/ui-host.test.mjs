@@ -165,7 +165,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     authorized(token),
   )).json()).data;
   assert.deepEqual(trace.records.map((record) => record.kind), ["evidence", "outcome"]);
+  assert.deepEqual(trace.records[0].acceptanceIds, ["works"]);
   assert.equal(trace.records[1].subkind, "successful");
+  assert.deepEqual(trace.records[1].acceptedAcceptanceIds, ["works"]);
+  assert.deepEqual(trace.records[1].unresolvedAcceptanceIds, []);
 
   const readOnly = await fetch(`${origin}/api/review`, {
     method: "POST",
@@ -190,7 +193,13 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /minimapWorldPoint/u);
   assert.match(script, /renderGraphInspector\(\{ open: false \}\)/u);
   assert.match(script, /function disclosure/u);
+  assert.match(script, /function tabbedTicketView/u);
+  assert.match(script, /function ticketExecutionPanel/u);
+  assert.match(script, /function updateTicketProof/u);
+  assert.match(script, /function revealTicket/u);
+  assert.match(script, /incoming\.length - completed/u);
   assert.match(script, /copyText\(location\.href, "Authorized link copied"\)/u);
+  assert.doesNotMatch(script, /inspectorOutcome\.textContent = operational\?\.detail/u);
   assert.doesNotMatch(script, /history\.replaceState/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
   assert.match(styles, /\.ticket-node\.state-deviated/u);
@@ -199,6 +208,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(styles, /\.edge-control-halo/u);
   assert.match(styles, /--canvas: #f1f2f0/u);
   assert.match(styles, /\.inspector-disclosure/u);
+  assert.match(styles, /\.inspector h1:focus-visible/u);
+  assert.match(styles, /\.ticket-tabs/u);
+  assert.match(styles, /\.acceptance-rail/u);
+  assert.match(styles, /\.guardrail-list/u);
+  assert.match(styles, /\.context-grid/u);
   assert.match(styles, /@media \(max-width: 720px\)/u);
   assert.doesNotMatch(styles, /\.(?:surface|signal|sheet)(?:\s|\{|\.)/u);
   assert.doesNotMatch(styles, /ui-serif|Iowan Old Style|Palatino|#245b43/u);

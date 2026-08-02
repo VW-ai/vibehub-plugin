@@ -197,6 +197,7 @@ function evidenceTrace(evidence) {
     kind: "evidence",
     subkind: "acceptance",
     status: "recorded",
+    acceptanceIds: evidence.acceptance_ids,
     occurredAt: evidence.recorded_at,
     summary: evidence.summary,
     body: `Acceptance: ${evidence.acceptance_ids.join(", ")}`,
@@ -213,6 +214,8 @@ function outcomeTrace(outcome) {
     kind: "outcome",
     subkind: outcome.status,
     status: outcome.status,
+    acceptedAcceptanceIds: outcome.accepted_acceptance_ids,
+    unresolvedAcceptanceIds: outcome.unresolved_acceptance_ids,
     occurredAt: outcome.closed_at,
     summary: outcome.summary,
     body: [

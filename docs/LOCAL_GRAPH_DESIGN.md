@@ -44,6 +44,28 @@ fresh schema-valid Context, Ticket, Evidence, and Outcome files mechanically.
 Git remains the only durable truth; selection, layout, pan, and zoom are
 disposable view state.
 
+## Interaction depth
+
+The surface borrows the calm, content-first interaction logic of a modern AI
+workspace without copying another product's brand skin. Black, white, and gray
+carry reading; VibeHub's cool wash and semantic state color appear only where
+they communicate environment, execution, proof, or attention.
+
+- In three seconds, the graph establishes the exact worktree, executable
+  frontier, causal direction, blocker, and deviation state.
+- In ten seconds, selecting a Ticket becomes one execution lens: outcome,
+  operational state, direct prerequisites and unlocks, and proof availability
+  remain visible without repeating state prose.
+- In thirty seconds, Contract and Proof layers expose acceptance as an
+  Evidence rail, constraints as guardrails, bound Context as governing objects,
+  and Evidence plus Outcome as a chronological proof trace.
+
+Different canonical objects do not collapse into one generic text list.
+Tickets, dependencies, acceptance, constraints, Context, Evidence, and Outcome
+each receive a visual primitive matching their role. The UI may request new
+structured mechanical projection when that primitive needs existing canonical
+facts, but it may not infer missing semantics or create a parallel state model.
+
 ## Current review surfaces
 
 These real-browser captures use one disposable canonical fork-and-join Ticket

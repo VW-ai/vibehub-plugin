@@ -378,6 +378,7 @@
     }
     elements.inspectorEyebrow.textContent = "Current graph";
     elements.inspectorTitle.textContent = "Execution context";
+    elements.inspectorOutcome.hidden = false;
     const counts = operationalCounts(state.graph.tickets);
     elements.inspectorOutcome.textContent = graphNarrative(counts);
     const content = document.createDocumentFragment();
@@ -474,6 +475,7 @@
     elements.inspectorEyebrow.textContent =
       `Ticket · ${shortTicketId(ticket.ticketId)}`;
     elements.inspectorTitle.textContent = ticket.outcome;
+    elements.inspectorOutcome.hidden = false;
     elements.inspectorOutcome.textContent = "Reading current Ticket facts…";
     elements.inspectorContent.replaceChildren(
       facts([
@@ -486,6 +488,7 @@
       ]),
     );
     renderGraph();
+    requestAnimationFrame(() => revealTicket(ticketId));
     try {
       const query = subjectQuery(snapshotId, {
         kind: "ticket",
@@ -499,12 +502,12 @@
         inspection,
         null,
       )) return;
-      const traceSection = renderTicketInspection(inspection);
+      const traceTarget = renderTicketInspection(inspection);
       void loadSubjectTrace(
         request,
         snapshotId,
         { kind: "ticket", ticketId },
-        traceSection,
+        traceTarget,
       );
       if (focusInspector) elements.inspectorTitle.focus();
     } catch (error) {
@@ -526,81 +529,26 @@
       `Ticket · ${shortTicketId(ticket.ticketId)}`;
     elements.inspectorTitle.textContent = ticket.outcome;
     const operational = ticketOperationalState(ticket);
-    elements.inspectorOutcome.textContent = operational?.detail
-      || "Inspect this Ticket's bounded execution contract and exact Git trace.";
-    const content = document.createDocumentFragment();
-    const stateView = executionStateView(ticket);
-    if (stateView) {
-      content.append(section("Current state", stateView));
-    }
-    appendDisclosure(
-      content,
-      "Execution context",
-      textBlock(contextPackage.context || "No additional context was recorded."),
-    );
-    content.append(disclosure(
-      "Exact source",
-      facts([
-        ["Revision", ticket.ticketRevision],
-        [
-          "Topology",
-          `${ticket.relationCounts.prerequisites} prerequisites · `
-          + `${ticket.relationCounts.dependents} unlocks`,
-        ],
-        ["Source", sourceLabel(inspection.source || state.graph.source)],
-      ]),
-    ));
-    appendDisclosure(
-      content,
-      "Acceptance",
-      list(
-        contextPackage.acceptance || [],
-        (item) => ({
-          title: item.acceptanceId,
-          detail: item.criterion,
-        }),
-      ),
-    );
-    appendDisclosure(
-      content,
-      "Constraints",
-      list(
-        contextPackage.constraints || [],
-        (item) => ({ detail: item }),
-      ),
-    );
-    appendDisclosure(
-      content,
-      "Bound context",
-      list(
-        contextPackage.contextRefs || [],
-        (item) => ({ title: item.ref, detail: item.purpose }),
-        "code-ref",
-      ),
-    );
-    appendDisclosure(
-      content,
-      "Dependencies",
-      relationList(contextPackage.relations || []),
-    );
-    appendDisclosure(
-      content,
-      "Provenance",
-      list(
-        contextPackage.provenanceRefs || ticket.provenanceRefs || [],
-        (item) => ({ title: item }),
-        "code-ref",
-      ),
-    );
-    const traceDisclosure = disclosure(
-      "Git trace",
-      quietMessage("Reading Git trace…"),
-    );
-    const traceSection = traceDisclosure.lastElementChild;
+    elements.inspectorOutcome.hidden = true;
+    elements.inspectorOutcome.textContent = "";
+
+    const execution = ticketExecutionPanel(ticket, contextPackage, operational);
+    const contract = ticketContractPanel(ticket, contextPackage, inspection);
+    const proof = ticketProofPanel();
+    const view = tabbedTicketView(ticket.ticketId, [
+      { id: "execution", label: "Execution", panel: execution },
+      { id: "contract", label: "Contract", panel: contract.panel },
+      { id: "proof", label: "Proof", panel: proof.panel },
+    ]);
+    const traceSection = proof.traceSection;
     traceSection.dataset.trace = "ticket";
-    content.append(traceDisclosure);
-    elements.inspectorContent.replaceChildren(content);
-    return traceSection;
+    elements.inspectorContent.replaceChildren(view);
+    return {
+      traceSection,
+      acceptanceRail: contract.acceptanceRail,
+      proofSummary: proof.summary,
+      acceptanceCount: (contextPackage.acceptance || []).length,
+    };
   }
 
   async function selectRelation(
@@ -622,6 +570,7 @@
       + shortTicketId(relation.dependentTicketId);
     elements.inspectorOutcome.textContent =
       relation.rationale || "Direct execution dependency.";
+    elements.inspectorOutcome.hidden = false;
     elements.inspectorContent.replaceChildren(
       facts([
         ["Relation", relation.relationRef],
@@ -670,6 +619,7 @@
       + shortTicketId(relation.dependentTicketId);
     elements.inspectorOutcome.textContent =
       relation.rationale || "Direct execution dependency.";
+    elements.inspectorOutcome.hidden = false;
     const content = document.createDocumentFragment();
     content.append(disclosure(
       "Exact relation",
@@ -704,8 +654,9 @@
     request,
     snapshotId,
     subject,
-    traceSection,
+    traceTarget,
   ) {
+    const traceSection = traceTarget?.traceSection ?? traceTarget;
     try {
       const trace = await api(
         `/api/trace?${subjectQuery(snapshotId, subject)}`,
@@ -715,7 +666,9 @@
         || trace?.snapshotId !== snapshotId
         || !traceSubjectMatches(subject, trace?.subject)
       ) return;
-      traceSection.replaceChildren(traceList(trace.records || []));
+      const records = trace.records || [];
+      traceSection.replaceChildren(traceList(records));
+      if (traceTarget?.proofSummary) updateTicketProof(traceTarget, records);
     } catch (error) {
       if (!isCurrentSubjectRequest(request, snapshotId)) return;
       traceSection.replaceChildren(quietMessage(error.message, "error"));
@@ -923,6 +876,433 @@
     paragraph.className = "context-copy";
     paragraph.textContent = message;
     return paragraph;
+  }
+
+  function tabbedTicketView(ticketId, tabs) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "ticket-view";
+    const tabList = document.createElement("div");
+    tabList.className = "ticket-tabs";
+    tabList.setAttribute("role", "tablist");
+    tabList.setAttribute("aria-label", "Ticket inspection layers");
+    const controls = [];
+    const panels = [];
+
+    const activate = (index, focus = false) => {
+      controls.forEach((control, candidate) => {
+        const active = candidate === index;
+        control.setAttribute("aria-selected", String(active));
+        control.tabIndex = active ? 0 : -1;
+        panels[candidate].hidden = !active;
+      });
+      if (focus) controls[index].focus();
+    };
+
+    tabs.forEach((tab, index) => {
+      const control = document.createElement("button");
+      const controlId = `ticket-tab-${ticketId}-${tab.id}`;
+      const panelId = `ticket-panel-${ticketId}-${tab.id}`;
+      control.type = "button";
+      control.className = "ticket-tab";
+      control.id = controlId;
+      control.textContent = tab.label;
+      control.setAttribute("role", "tab");
+      control.setAttribute("aria-controls", panelId);
+      control.addEventListener("click", () => activate(index));
+      control.addEventListener("keydown", (event) => {
+        let next = null;
+        if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+        else if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = tabs.length - 1;
+        if (next === null) return;
+        event.preventDefault();
+        activate(next, true);
+      });
+
+      tab.panel.classList.add("ticket-panel");
+      tab.panel.id = panelId;
+      tab.panel.setAttribute("role", "tabpanel");
+      tab.panel.setAttribute("aria-labelledby", controlId);
+      controls.push(control);
+      panels.push(tab.panel);
+      tabList.append(control);
+      wrapper.append(tab.panel);
+    });
+    wrapper.prepend(tabList);
+    activate(0);
+    return wrapper;
+  }
+
+  function ticketExecutionPanel(ticket, contextPackage, operational) {
+    const panel = document.createElement("section");
+    const incoming = state.graph.relations.filter(
+      (relation) => relation.dependentTicketId === ticket.ticketId,
+    );
+    const outgoing = state.graph.relations.filter(
+      (relation) => relation.prerequisiteTicketId === ticket.ticketId,
+    );
+    const completed = incoming.filter((relation) => {
+      const prerequisite = state.graph.tickets.find(
+        (item) => item.ticketId === relation.prerequisiteTicketId,
+      );
+      return ticketOperationalState(prerequisite)?.label === "DONE";
+    }).length;
+
+    const signal = document.createElement("div");
+    signal.className = classes(
+      "ticket-signal",
+      operational ? `state-${operational.key}` : "",
+    );
+    const heading = document.createElement("div");
+    heading.className = "ticket-signal-heading";
+    const marker = document.createElement("span");
+    marker.className = "ticket-signal-mark";
+    marker.setAttribute("aria-hidden", "true");
+    const label = document.createElement("strong");
+    label.textContent = operational?.label || "TICKET";
+    heading.append(marker, label);
+
+    const metrics = document.createElement("div");
+    metrics.className = "ticket-signal-metrics";
+    metrics.append(
+      signalMetric(`${completed} / ${incoming.length}`, "prerequisites"),
+      signalMetric(
+        String(Math.max(0, incoming.length - completed)),
+        "blockers",
+      ),
+      signalMetric(String(outgoing.length), "unlocks"),
+      signalMetric("Reading", "proof", "proof-metric"),
+    );
+    signal.append(heading, metrics);
+    panel.append(signal);
+
+    if (
+      operational?.detail
+      && (operational.label === "BLOCKED" || operational.label === "DEVIATED")
+    ) {
+      const exception = document.createElement("p");
+      exception.className = "ticket-exception";
+      exception.textContent = operational.detail;
+      panel.append(exception);
+    }
+
+    panel.append(ticketSectionHeading(
+      "Causal position",
+      "Direct prerequisites and immediate unlocks stay in view.",
+    ));
+    panel.append(causalStrip(ticket.ticketId, incoming, outgoing));
+
+    const context = contextPackage.context;
+    if (context) {
+      const why = disclosure("Why this Ticket exists", textBlock(context));
+      why.classList.add("ticket-why");
+      panel.append(why);
+    }
+    return panel;
+  }
+
+  function signalMetric(value, label, extraClass = "") {
+    const metric = document.createElement("span");
+    metric.className = classes("ticket-metric", extraClass);
+    const strong = document.createElement("strong");
+    strong.textContent = value;
+    const detail = document.createElement("span");
+    detail.textContent = label;
+    metric.append(strong, detail);
+    return metric;
+  }
+
+  function causalStrip(ticketId, incoming, outgoing) {
+    const strip = document.createElement("div");
+    strip.className = "causal-strip";
+    strip.append(
+      causalGroup(
+        "Requires",
+        incoming.map((relation) => relation.prerequisiteTicketId),
+        "No prerequisites",
+      ),
+      causalArrow(),
+      causalCurrent(ticketId),
+      causalArrow(),
+      causalGroup(
+        "Unlocks",
+        outgoing.map((relation) => relation.dependentTicketId),
+        "No direct unlock",
+      ),
+    );
+    return strip;
+  }
+
+  function causalGroup(label, ticketIds, emptyLabel) {
+    const group = document.createElement("div");
+    group.className = "causal-group";
+    const eyebrow = document.createElement("span");
+    eyebrow.className = "causal-label";
+    eyebrow.textContent = label;
+    group.append(eyebrow);
+    if (!ticketIds.length) {
+      const empty = document.createElement("span");
+      empty.className = "causal-empty";
+      empty.textContent = emptyLabel;
+      group.append(empty);
+      return group;
+    }
+    ticketIds.slice(0, 3).forEach((ticketId) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "causal-ticket";
+      button.textContent = shortTicketId(ticketId);
+      button.title = ticketId;
+      button.addEventListener("click", () => void selectTicket(ticketId, true));
+      group.append(button);
+    });
+    if (ticketIds.length > 3) {
+      const remainder = document.createElement("span");
+      remainder.className = "causal-empty";
+      remainder.textContent = `+${ticketIds.length - 3} more`;
+      group.append(remainder);
+    }
+    return group;
+  }
+
+  function causalCurrent(ticketId) {
+    const current = document.createElement("div");
+    current.className = "causal-current";
+    const label = document.createElement("span");
+    label.textContent = "Selected";
+    const title = document.createElement("strong");
+    title.textContent = shortTicketId(ticketId);
+    title.title = ticketId;
+    current.append(label, title);
+    return current;
+  }
+
+  function causalArrow() {
+    const arrow = document.createElement("span");
+    arrow.className = "causal-arrow";
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = "→";
+    return arrow;
+  }
+
+  function ticketContractPanel(ticket, contextPackage, inspection) {
+    const panel = document.createElement("section");
+    panel.append(ticketSectionHeading(
+      "Acceptance",
+      "Evidence attaches to criteria; independent Outcome decides completion.",
+    ));
+    const acceptanceRail = acceptanceView(contextPackage.acceptance || []);
+    panel.append(acceptanceRail);
+
+    if ((contextPackage.constraints || []).length) {
+      panel.append(ticketSectionHeading(
+        "Guardrails",
+        "Binding limits on how this outcome may be reached.",
+      ));
+      panel.append(guardrailView(contextPackage.constraints));
+    }
+
+    if ((contextPackage.contextRefs || []).length) {
+      panel.append(ticketSectionHeading(
+        "Bound context",
+        "The exact knowledge objects governing this Ticket.",
+      ));
+      panel.append(contextObjectView(contextPackage.contextRefs));
+    }
+
+    const relations = relationList(contextPackage.relations || []);
+    if (relations) {
+      const dependency = disclosure("Dependency rationale", relations);
+      dependency.classList.add("ticket-audit-disclosure");
+      panel.append(dependency);
+    }
+
+    const audit = document.createDocumentFragment();
+    audit.append(facts([
+      ["Revision", ticket.ticketRevision],
+      ["Source", sourceLabel(inspection.source || state.graph.source)],
+    ]));
+    const provenance = list(
+      contextPackage.provenanceRefs || ticket.provenanceRefs || [],
+      (item) => ({ title: item }),
+      "code-ref",
+    );
+    if (provenance) audit.append(provenance);
+    const source = disclosure("Exact source & provenance", audit);
+    source.classList.add("ticket-audit-disclosure");
+    panel.append(source);
+    return { panel, acceptanceRail };
+  }
+
+  function ticketSectionHeading(title, detail) {
+    const heading = document.createElement("div");
+    heading.className = "ticket-section-heading";
+    const label = document.createElement("h2");
+    label.textContent = title;
+    heading.append(label);
+    if (detail) {
+      const copy = document.createElement("p");
+      copy.textContent = detail;
+      heading.append(copy);
+    }
+    return heading;
+  }
+
+  function acceptanceView(items) {
+    const rail = document.createElement("div");
+    rail.className = "acceptance-rail";
+    if (!items.length) {
+      rail.append(quietMessage("No acceptance criteria were recorded."));
+      return rail;
+    }
+    for (const item of items) {
+      const row = document.createElement("details");
+      row.className = "acceptance-item";
+      row.dataset.acceptanceId = item.acceptanceId;
+      const summary = document.createElement("summary");
+      const marker = document.createElement("span");
+      marker.className = "acceptance-marker";
+      marker.setAttribute("aria-hidden", "true");
+      const title = document.createElement("strong");
+      title.textContent = humanizeIdentifier(item.acceptanceId);
+      const status = document.createElement("span");
+      status.className = "acceptance-status";
+      status.textContent = "Awaiting evidence";
+      summary.append(marker, title, status);
+      const criterion = document.createElement("p");
+      criterion.textContent = item.criterion;
+      row.append(summary, criterion);
+      rail.append(row);
+    }
+    return rail;
+  }
+
+  function guardrailView(items) {
+    const list = document.createElement("div");
+    list.className = "guardrail-list";
+    items.forEach((item) => {
+      const row = document.createElement("div");
+      row.className = "guardrail-row";
+      const marker = document.createElement("span");
+      marker.className = "guardrail-marker";
+      marker.setAttribute("aria-hidden", "true");
+      const copy = document.createElement("span");
+      copy.textContent = item;
+      row.append(marker, copy);
+      list.append(row);
+    });
+    return list;
+  }
+
+  function contextObjectView(items) {
+    const grid = document.createElement("div");
+    grid.className = "context-grid";
+    for (const item of items) {
+      const object = document.createElement("article");
+      object.className = "context-object";
+      const type = document.createElement("span");
+      type.className = "context-kind";
+      type.textContent = contextKind(item.ref);
+      const title = document.createElement("strong");
+      title.textContent = contextLabel(item.ref);
+      const purpose = document.createElement("p");
+      purpose.textContent = item.purpose;
+      const copy = document.createElement("button");
+      copy.type = "button";
+      copy.textContent = "Copy ref";
+      copy.title = item.ref;
+      copy.addEventListener("click", () => void copyText(item.ref, "Context reference copied"));
+      object.append(type, title, purpose, copy);
+      grid.append(object);
+    }
+    return grid;
+  }
+
+  function contextKind(reference) {
+    const name = reference.split("/").at(-1) || reference;
+    const prefix = name.split("-")[0];
+    if (["decision", "constraint", "contract", "convention"].includes(prefix)) {
+      return prefix;
+    }
+    if (/\.(?:md|yaml)$/u.test(name)) return "document";
+    return "source";
+  }
+
+  function contextLabel(reference) {
+    const name = (reference.split("/").at(-1) || reference)
+      .replace(/\.(?:yaml|md|js|css|html)$/u, "")
+      .replace(/^(?:decision|constraint|contract|convention)-/u, "");
+    return humanizeIdentifier(name);
+  }
+
+  function humanizeIdentifier(value) {
+    const normalized = String(value).replace(/-/gu, " ");
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+  }
+
+  function ticketProofPanel() {
+    const panel = document.createElement("section");
+    const summary = document.createElement("div");
+    summary.className = "proof-summary";
+    const label = document.createElement("strong");
+    label.textContent = "Reading proof…";
+    const detail = document.createElement("span");
+    detail.textContent = "Acceptance-linked Evidence and independent Outcome appear here.";
+    summary.append(label, detail);
+    panel.append(summary);
+    panel.append(ticketSectionHeading(
+      "Evidence & Outcome",
+      "Chronological proof from the exact Git source.",
+    ));
+    const traceSection = document.createElement("div");
+    traceSection.append(quietMessage("Reading Git trace…"));
+    panel.append(traceSection);
+    return { panel, traceSection, summary };
+  }
+
+  function updateTicketProof(target, records) {
+    const evidence = records.filter((record) => record.kind === "evidence");
+    const outcomes = records.filter((record) => record.kind === "outcome");
+    const evidenced = new Set(evidence.flatMap(
+      (record) => record.acceptanceIds || [],
+    ));
+    const accepted = new Set(outcomes.flatMap(
+      (record) => record.acceptedAcceptanceIds || [],
+    ));
+    const unresolved = new Set(outcomes.flatMap(
+      (record) => record.unresolvedAcceptanceIds || [],
+    ));
+
+    const metric = elements.inspectorContent.querySelector(".proof-metric strong");
+    if (metric) metric.textContent = `${evidenced.size} / ${target.acceptanceCount}`;
+    const label = target.proofSummary.querySelector("strong");
+    const detail = target.proofSummary.querySelector("span");
+    if (!records.length) {
+      label.textContent = "No proof recorded yet";
+      detail.textContent = `${target.acceptanceCount} criteria await acceptance-linked Evidence.`;
+    } else {
+      label.textContent = `${evidence.length} Evidence · ${outcomes.length ? "Outcome recorded" : "Outcome pending"}`;
+      detail.textContent = `${evidenced.size} of ${target.acceptanceCount} criteria have Evidence attached.`;
+    }
+
+    target.acceptanceRail.querySelectorAll("[data-acceptance-id]").forEach((row) => {
+      const id = row.dataset.acceptanceId;
+      const status = row.querySelector(".acceptance-status");
+      row.classList.remove("has-evidence", "is-accepted", "is-unresolved");
+      if (accepted.has(id)) {
+        row.classList.add("is-accepted");
+        status.textContent = "Accepted";
+      } else if (unresolved.has(id)) {
+        row.classList.add("is-unresolved");
+        status.textContent = "Unresolved";
+      } else if (evidenced.has(id)) {
+        row.classList.add("has-evidence");
+        status.textContent = "Evidence attached";
+      } else {
+        status.textContent = "Awaiting evidence";
+      }
+    });
   }
 
   function traceList(records) {
@@ -1417,6 +1797,35 @@
     );
     elements.graph.classList.toggle("lod-low", scale < 0.48);
     updateMinimapViewport();
+  }
+
+  function revealTicket(ticketId) {
+    if (window.innerWidth <= 720
+      || !elements.inspector.classList.contains("open")) return;
+    const position = positions.get(ticketId);
+    if (!position) return;
+    const { width, height } = visibleCanvasViewport();
+    const sideMargin = Math.min(34, width * 0.08);
+    const topMargin = Math.min(86, height * 0.16);
+    const bottomMargin = Math.min(38, height * 0.08);
+    const left = panX + position.x * scale;
+    const right = panX + (position.x + NODE.width) * scale;
+    const top = panY + position.y * scale;
+    const bottom = panY + (position.y + NODE.height) * scale;
+    let deltaX = 0;
+    let deltaY = 0;
+    if (left < sideMargin) deltaX = sideMargin - left;
+    else if (right > width - sideMargin) {
+      deltaX = width - sideMargin - right;
+    }
+    if (top < topMargin) deltaY = topMargin - top;
+    else if (bottom > height - bottomMargin) {
+      deltaY = height - bottomMargin - bottom;
+    }
+    if (deltaX === 0 && deltaY === 0) return;
+    panX += deltaX;
+    panY += deltaY;
+    applyTransform();
   }
 
   function visibleCanvasViewport() {
