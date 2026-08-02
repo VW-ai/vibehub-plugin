@@ -23,7 +23,9 @@ The same production-code scope was measured before and after:
 | Plugin artifact bytes | 2,495,913 | 65,042 |
 
 The production-code line count fell by about 97.3%, and artifact bytes fell by
-about 97.4%.
+about 97.4%. These are the exact cleanup-closeout measurements; later
+gap-driven rebuilds are reported by their own Tickets rather than rewriting
+this historical baseline.
 
 ## Removed product paths
 
@@ -81,6 +83,8 @@ artifact.
   accepts the JSON-compatible YAML subset. This keeps the install dependency
   free; richer YAML should be rebuilt only if real editing behavior proves the
   subset insufficient.
-- There is no local graph web UI. Review uses the Agent conversation and GitHub
-  branch/PR/comments. A read-only projection can be added later only after an
-  observed review failure.
+- At cleanup closeout there was no local graph web UI. Subsequent dogfood made
+  that absence an owner-confirmed product gap, so
+  `ticket-restore-local-graph-ui` selectively restores the visual experience as
+  a direct-YAML, read-only loopback projection without restoring the old
+  runtime stack.

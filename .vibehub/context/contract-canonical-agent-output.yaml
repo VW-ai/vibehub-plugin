@@ -1,0 +1,42 @@
+{
+  "context_id": "contract-canonical-agent-output",
+  "detail": "Agents and VibeHub Skills own semantic judgment and produce canonical Context, Ticket, Evidence, and Outcome documents in the shared JSON-compatible YAML format. The four schemas plus repository validation are the handoff boundary: after validation, the local UI, a lightweight CLI, and Cloud may consume and project those documents mechanically without semantic inference, hidden lifecycle state, or a second source of truth. Recover as much of the prior UI's visual and interaction surface as can be derived from canonical documents. Disposable UI state such as selection, pan, zoom, and layout may live in memory but is never durable product state. Invalid documents must fail visibly before projection rather than being guessed into shape. Any later authorized write surface must write the same canonical documents through the same validation boundary and must not introduce a parallel data model. This contract does not require SQLite, the former large CLI, MCP, a package runtime, hooks, leases, or a persistent cache.",
+  "evidence": [
+    {
+      "note": "The repository owner explicitly defined validated Agent output as sufficient input for mechanical UI and CLI consumption while asking to preserve as much of the earlier UI as possible.",
+      "ref": "conversation:2026-08-02-canonical-agent-output"
+    },
+    {
+      "note": "The plugin already defines the four canonical document schemas and a dependency-free validator used by Agent workflows.",
+      "ref": "skills/contracts/"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-02T08:00:00Z",
+    "quote": "之前UI还是尽可能都恢复……在一个agent跑出来的result和它可以直接被一个CLI或者被UI直接消费……只要我的数据产出来的这些东西能够满足需求……下游的消费就可以是机械式的",
+    "ref": "conversation:2026-08-02-canonical-agent-output"
+  },
+  "state": "active",
+  "summary": "Schema-valid Agent output is the sole handoff contract for mechanical consumers",
+  "tags": [
+    "agent-output",
+    "architecture",
+    "canonical-data",
+    "consumer-contract",
+    "schema",
+    "ui"
+  ],
+  "type": "contract"
+}

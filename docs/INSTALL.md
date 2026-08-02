@@ -1,9 +1,10 @@
 # Install VibeHub
 
 VibeHub is a Skill-first plugin. Installation copies manifests, Skills,
-schemas, and dependency-free helper scripts. It does not install or start a
-CLI, MCP server, hook process, database, native module, daemon, or local web
-server.
+schemas, dependency-free helper scripts, and the local graph UI assets. It does
+not install a global CLI, MCP server, hook process, database, native module, or
+daemon. The read-only UI host starts in the foreground only when explicitly
+requested and exits with its launcher process.
 
 ## Requirements
 
@@ -48,6 +49,19 @@ and a small managed project-instruction block. Validate with:
 ```bash
 node <plugin>/skills/scripts/vh.mjs project validate --repo <repository>
 ```
+
+## Open the Ticket graph
+
+Ask the Agent to use `$vibehub-ticket-review`, or launch the bundled helper:
+
+```bash
+node <plugin>/skills/scripts/vh-ui.mjs --repo <repository>
+```
+
+Use `--no-open` to print the short-lived local URL, `--port <port>` to choose a
+loopback port, and `--json` for an Agent-readable launch envelope. The UI reads
+the repository's checked-in YAML directly, rejects invalid canonical documents
+before projection, and exposes no write routes.
 
 ## Uninstall
 

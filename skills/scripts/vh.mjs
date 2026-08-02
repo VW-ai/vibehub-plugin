@@ -4,11 +4,13 @@ import {
   lstatSync,
   mkdirSync,
   readFileSync,
+  realpathSync,
   readdirSync,
   renameSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, isAbsolute, join, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const CONTEXT_TYPES = new Set([
@@ -435,7 +437,7 @@ function findCycle(tickets) {
   return null;
 }
 
-function loadRepository(repo, overrides = {}) {
+export function loadRepository(repo, overrides = {}) {
   const paths = dirs(repo);
   const contexts = loadMap(yamlFiles(paths.context), "context_id", validateContext, "Context");
   const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket");
@@ -531,11 +533,11 @@ function loadRepository(repo, overrides = {}) {
   return { paths, contexts, tickets, evidence, outcomes, errors };
 }
 
-function assertValid(errors, message = "VibeHub validation failed") {
+export function assertValid(errors, message = "VibeHub validation failed") {
   if (errors.length > 0) throw new VibeHubError("validation_error", message, { errors });
 }
 
-function documents(map) {
+export function documents(map) {
   return [...map.values()].map((entry) => entry.document);
 }
 
@@ -584,7 +586,7 @@ function contextOperation(operation, repo, input) {
   throw new VibeHubError("unsupported_operation", `Unsupported context operation: ${operation}`);
 }
 
-function ticketStatus(repository, ticket) {
+export function ticketStatus(repository, ticket) {
   const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
   if (outcome?.status === "successful") return "DONE";
   const blocking = ticket.relations
@@ -703,17 +705,20 @@ function run() {
   process.stdout.write(`${JSON.stringify({ ok: true, data })}\n`);
 }
 
-try {
-  run();
-} catch (error) {
-  const normalized = error instanceof VibeHubError
-    ? error
-    : new VibeHubError("internal_error", error instanceof Error ? error.message : String(error));
-  process.stdout.write(
-    `${JSON.stringify({
-      ok: false,
-      error: { code: normalized.code, message: normalized.message, details: normalized.details },
-    })}\n`,
-  );
-  process.exitCode = 1;
+if (process.argv[1]
+  && realpathSync(resolve(process.argv[1])) === realpathSync(fileURLToPath(import.meta.url))) {
+  try {
+    run();
+  } catch (error) {
+    const normalized = error instanceof VibeHubError
+      ? error
+      : new VibeHubError("internal_error", error instanceof Error ? error.message : String(error));
+    process.stdout.write(
+      `${JSON.stringify({
+        ok: false,
+        error: { code: normalized.code, message: normalized.message, details: normalized.details },
+      })}\n`,
+    );
+    process.exitCode = 1;
+  }
 }

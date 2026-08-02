@@ -9,12 +9,14 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
 import { buildPluginArtifact } from "./build-plugin-artifact.mjs";
 
 const temp = mkdtempSync(join(tmpdir(), "vibehub-plugin-verify-"));
 const artifact = join(temp, "plugin");
 const repo = join(temp, "repo");
+let uiHost;
 
 function invoke(helper, domain, operation, input) {
   let inputPath;
@@ -37,6 +39,10 @@ try {
     "skills/vibehub-ingest/SKILL.md",
     "skills/vibehub-ticket-run/SKILL.md",
     "skills/scripts/vh.mjs",
+    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-review/assets/index.html",
+    "skills/vibehub-ticket-review/assets/app.css",
+    "skills/vibehub-ticket-review/assets/app.js",
     "skills/contracts/context.schema.json",
     "skills/contracts/ticket.schema.json",
   ]) {
@@ -74,7 +80,43 @@ try {
   const query = invoke(helper, "context", "query", { query: "runtime service" });
   if (query.data.count !== 1) throw new Error("installed Context roundtrip failed");
 
-  process.stdout.write(`${JSON.stringify({ ok: true, artifact: "skill-first", ...stats })}\n`);
+  const installedScript = readFileSync(
+    join(artifact, "skills", "vibehub-ticket-review", "assets", "app.js"),
+    "utf8",
+  );
+  if (/\/api\/(?:review|decision)/u.test(installedScript)) {
+    throw new Error("installed local UI still contains writable review routes");
+  }
+  const uiModule = await import(pathToFileURL(
+    join(artifact, "skills", "scripts", "vh-ui.mjs"),
+  ).href);
+  uiHost = uiModule.startVibeHubUi({
+    repoRoot: repo,
+    token: "artifact-verification-token",
+    tokenLifetimeMs: 60_000,
+  });
+  const { origin } = await uiHost.ready;
+  const health = await (await fetch(`${origin}/health`)).json();
+  if (!health.ok || health.readOnly !== true) {
+    throw new Error("installed UI health check failed");
+  }
+  const stateResponse = await fetch(`${origin}/api/state`, {
+    headers: { Authorization: `Bearer ${uiHost.token}` },
+  });
+  const state = await stateResponse.json();
+  if (!state.ok || state.data.graph.tickets.length !== 0) {
+    throw new Error("installed UI graph projection failed");
+  }
+  await uiHost.close();
+  uiHost = undefined;
+
+  process.stdout.write(`${JSON.stringify({
+    ok: true,
+    artifact: "skill-first-with-local-ui",
+    ui: "read-only-loopback",
+    ...stats,
+  })}\n`);
 } finally {
+  if (uiHost) await uiHost.close();
   rmSync(temp, { recursive: true, force: true });
 }

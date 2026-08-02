@@ -32,6 +32,7 @@
     "defaultPrompt": [
       "Set up VibeHub for this project.",
       "Start this deliverable as a VibeHub Ticket.",
+      "Open the local VibeHub Ticket graph.",
       "Query the VibeHub Context needed for this Ticket.",
       "Record this decision in VibeHub Context."
     ],

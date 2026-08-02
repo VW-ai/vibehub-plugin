@@ -53,6 +53,24 @@ Git owns branch isolation, history, rollback, merge conflicts, and PR review.
 VibeHub assumes one Agent/writer per worktree and does not rebuild Git's
 concurrency model.
 
+## Local graph UI
+
+Ask the Agent to open the VibeHub Ticket graph, or run the bundled launcher:
+
+```bash
+node <plugin>/skills/scripts/vh-ui.mjs --repo <repository>
+```
+
+The established directed-graph experience includes Ticket state, direct
+dependency edges, pan/zoom, fit, minimap navigation, causal highlighting, and
+an inspector for Context references, acceptance, Evidence, and Outcome. Each
+refresh projects the exact checkout's `.vibehub/` files directly.
+
+The launcher is a narrow, dependency-free foreground process: ephemeral
+loopback port, short-lived bearer URL, restrictive browser headers, and no
+database, daemon, persistent cache, or write endpoint. Browser writes and
+Decision authority are deliberately outside this first restored UI slice.
+
 ## Data
 
 ```text
@@ -66,6 +84,16 @@ concurrency model.
 The files use a JSON-compatible YAML 1.2 subset. That keeps them readable,
 deterministic, dependency-free, and validatable in a clean plugin install.
 Schemas live in `skills/contracts/`.
+
+```text
+Agent / Skills -> canonical documents -> shared validation -> UI / helper / Cloud
+```
+
+This is the product boundary. Agents make semantic decisions and write the four
+canonical document types; downstream surfaces only validate, read, and project
+them. Invalid files fail before projection instead of being guessed into shape.
+Selection, graph layout, pan, and zoom may remain disposable UI memory, but no
+consumer owns a parallel durable model or a second source of truth.
 
 There is no persistent digest cache. A future UI may keep a disposable
 in-process render cache if profiling proves it useful; that cache would never
