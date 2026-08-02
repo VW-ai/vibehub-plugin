@@ -320,6 +320,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function contextRelationsView/u);
   assert.match(script, /function typedReferenceList/u);
   assert.match(script, /Copy for Agent/u);
+  assert.equal(
+    (script.match(/`Ticket · \$\{ticket\.ticketId\}`/gu) || []).length,
+    2,
+  );
+  assert.doesNotMatch(
+    script,
+    /`Ticket · \$\{shortTicketId\(ticket\.ticketId\)\}`/u,
+  );
   assert.match(
     script,
     /function contextActions\(payload\)[\s\S]*?return actions;/u,
@@ -331,6 +339,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /function iconButton/u);
   assert.doesNotMatch(script, /Reference copied|Provenance copied|Worktree path copied/u);
   assert.match(script, /function updateTicketProof/u);
+  assert.match(
+    styles,
+    /\.source-context > p \{[\s\S]*?margin: 0 11px 10px;[\s\S]*?\}/u,
+  );
+  assert.match(
+    styles,
+    /\.inspector-head \.eyebrow \{[\s\S]*?overflow-wrap: anywhere;[\s\S]*?text-transform: none;[\s\S]*?\}/u,
+  );
   assert.match(script, /function revealTicket/u);
   assert.match(script, /incoming\.length - completed/u);
   assert.match(script, /copyText\(location\.href, "Authorized link copied"\)/u);

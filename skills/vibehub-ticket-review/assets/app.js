@@ -478,7 +478,7 @@
     lastFocusedSubject = selected;
     openInspector();
     elements.inspectorEyebrow.textContent =
-      `Ticket · ${shortTicketId(ticket.ticketId)}`;
+      `Ticket · ${ticket.ticketId}`;
     elements.inspectorTitle.textContent = ticket.outcome;
     elements.inspectorOutcome.hidden = false;
     elements.inspectorOutcome.textContent = "Reading current Ticket facts…";
@@ -531,7 +531,7 @@
     const contextPackage =
       subject.contextPackage ?? inspection.contextPackage ?? {};
     elements.inspectorEyebrow.textContent =
-      `Ticket · ${shortTicketId(ticket.ticketId)}`;
+      `Ticket · ${ticket.ticketId}`;
     elements.inspectorTitle.textContent = ticket.outcome;
     const operational = ticketOperationalState(ticket);
     elements.inspectorOutcome.hidden = true;

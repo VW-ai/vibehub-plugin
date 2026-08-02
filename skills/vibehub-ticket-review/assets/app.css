@@ -788,6 +788,10 @@ summary:focus-visible {
 
 .inspector-head .eyebrow {
   margin-bottom: 8px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+  text-transform: none;
 }
 
 .inspector h1 {
@@ -1404,7 +1408,6 @@ summary:focus-visible {
   gap: 0;
 }
 
-.source-context > p,
 .source-context > .object-actions {
   margin-right: 11px;
   margin-left: 11px;
@@ -1446,6 +1449,11 @@ summary:focus-visible {
   color: var(--muted);
   font-size: 9px;
   line-height: 1.48;
+}
+
+.source-context > p {
+  margin: 0 11px 10px;
+  letter-spacing: -0.003em;
 }
 
 .context-object-body {
