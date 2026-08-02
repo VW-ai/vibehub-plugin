@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "one-copy-handoff-per-object",
+    "bound-context-is-inspectable",
+    "read-only-boundary-remains-light"
+  ],
+  "evidence_id": "bound-context-agent-only-actions",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T20:07:17.000Z",
+  "refs": [
+    "git:e14476f",
+    "conversation:2026-08-02-bound-context-agent-only-no-json",
+    "browser:current-ticket-bound-context-eight-objects-one-copy-no-links-no-json",
+    "test:npm-run-verify-9-of-9-32-files-227583-bytes",
+    "file:skills/vibehub-ticket-review/assets/app.js",
+    "file:skills/scripts/vh-ui.mjs",
+    "file:test/ui-host.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Owner dogfood clarified that each Bound Context object should expose only one Copy for Agent action and should never show raw Source or Evidence JSON. Commit e14476f removes per-reference editor and GitHub actions from Bound Context while retaining those mechanical links in the dedicated Source Dock. Canonical Context remains human-readable through parsed Source quote/ref/time, Evidence note/ref records, directional Relations, and compact identity. A real-browser audit of the current Ticket found exactly one Copy for Agent button, no links, and no Source/Evidence JSON dump in every visible Bound Context object. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 227583 bytes.",
+  "ticket_id": "ticket-make-static-graph-actionable"
+}
