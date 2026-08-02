@@ -285,7 +285,6 @@ function ticketContextPackage(ticket, relations, repository, source) {
     ...item,
     kind: canonicalContextFromRef(repository, item.ref) ? "context" : "source",
     canonicalContext: canonicalContextFromRef(repository, item.ref),
-    actions: pathActions(source, item.ref),
   }));
   const agentPayload = {
     kind: "vibehub_ticket_handoff",

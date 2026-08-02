@@ -1277,7 +1277,7 @@
       });
       body.append(tags);
     }
-    body.append(contextActions(item, {
+    body.append(contextActions({
       kind: "vibehub_context",
       ref: item.ref,
       purpose: item.purpose,
@@ -1295,7 +1295,7 @@
     object.append(contextObjectHeading(item, null));
     const purpose = document.createElement("p");
     purpose.textContent = item.purpose;
-    object.append(purpose, contextActions(item, {
+    object.append(purpose, contextActions({
       kind: "vibehub_source_reference",
       ref: item.ref,
       purpose: item.purpose,
@@ -1429,7 +1429,7 @@
     return "reference";
   }
 
-  function contextActions(item, payload) {
+  function contextActions(payload) {
     const actions = document.createElement("div");
     actions.className = "object-actions";
     actions.append(actionButton({
@@ -1437,7 +1437,6 @@
       className: "agent-handoff compact",
       onClick: () => void copyPayload(payload, "Context copied for Agent"),
     }));
-    appendOpenActions(actions, item.actions);
     return actions;
   }
 

@@ -271,6 +271,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   );
   assert.equal(featureSubject.contextPackage.contextRefs[1].kind, "source");
   assert.equal(featureSubject.contextPackage.contextRefs[1].canonicalContext, null);
+  assert.equal("actions" in featureSubject.contextPackage.contextRefs[1], false);
 
   const trace = (await (await fetch(
     `${origin}/api/trace?${ticketQuery}`,
@@ -319,6 +320,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function contextRelationsView/u);
   assert.match(script, /function typedReferenceList/u);
   assert.match(script, /Copy for Agent/u);
+  assert.match(
+    script,
+    /function contextActions\(payload\)[\s\S]*?return actions;/u,
+  );
+  assert.doesNotMatch(
+    script,
+    /function contextActions\(payload\)[\s\S]*?appendOpenActions\([\s\S]*?return actions;/u,
+  );
   assert.doesNotMatch(script, /function iconButton/u);
   assert.doesNotMatch(script, /Reference copied|Provenance copied|Worktree path copied/u);
   assert.match(script, /function updateTicketProof/u);
