@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "lifecycle-contract-is-single-and-testable",
+    "ticket-skills-have-narrow-ownership",
+    "focused-review-links-are-mechanical",
+    "presentation-reuses-current-task-resources",
+    "prompt-behavior-has-scenario-coverage",
+    "plugin-remains-lightweight"
+  ],
+  "evidence_id": "lifecycle-driven-focused-review",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T22:33:34.000Z",
+  "refs": [
+    "git:953156e",
+    "conversation:2026-08-02-ui-should-present-at-workflow-boundaries",
+    "conversation:2026-08-02-prompts-need-lifecycle-ownership-and-unit-checks",
+    "test:npm-run-verify-13-of-13-33-files-244335-bytes",
+    "test:skill-creator-quick-validate-six-of-six",
+    "browser:focused-workflow-ticket-execution-contract-log-same-host-and-tab",
+    "file:skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "file:skills/vibehub-ticket-review/SKILL.md",
+    "file:skills/scripts/vh-ui.mjs",
+    "file:skills/vibehub-ticket-review/assets/app.js",
+    "file:test/ticket-lifecycle.test.mjs",
+    "file:test/ui-host.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Commit 953156e treats the Ticket Skills as one distributed workflow without adding a prompt runtime. A compact bundled lifecycle contract defines seven observable events, sole semantic owners, presentation modes, target surfaces, continuation semantics, conversation fallback, and a current-Agent-task-only host/tab reuse policy. Plan, Validate, Run, Closeout, PR, and Review now read that contract and own only their named events: plan presents the new Ticket Execution surface without adding an approval gate; ordinary READY execution stays quiet; protected execution presents Contract and waits; unapplied validation choices remain honest in conversation; closeout presents Log; PR presents the branch graph; explicit review remains a fallback. Ticket Review alone owns presentation mechanics. The launcher adds only validated --ticket and --view execution|contract|log inputs, preserves the bearer in the fragment, rejects unknown Tickets before binding, and the UI mechanically selects the requested Ticket and tab. Real-browser dogfood reused one host and one tab while navigating the current Ticket automatically through Execution, Contract, and Log with no manual Ticket click and empty runtime logs. Lifecycle tests reject duplicate ownership, unknown owners/surfaces, and contradictory human-boundary continuation, then cover all required scenarios. All six modified Skills passed Skill Creator validation; full verification passed 13 of 13 tests and the dependency-free 33-file artifact at 244335 bytes; project validation remained valid with no hook, dispatcher, prompt engine, registry, daemon, cache, database, or durable UI state.",
+  "ticket_id": "ticket-make-workflow-present-itself"
+}
