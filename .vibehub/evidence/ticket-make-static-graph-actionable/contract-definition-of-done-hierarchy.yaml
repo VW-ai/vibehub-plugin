@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "evidence-references-are-typed-and-compact",
+    "bound-context-is-inspectable",
+    "relations-and-provenance-have-visual-language",
+    "visual-polish-strengthens-not-obscures",
+    "read-only-boundary-remains-light"
+  ],
+  "evidence_id": "contract-definition-of-done-hierarchy",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T21:04:30.000Z",
+  "refs": [
+    "git:eb6e8ba",
+    "conversation:2026-08-02-contract-page-needs-clear-primary-question",
+    "browser:current-ticket-contract-definition-of-done-and-three-support-disclosures",
+    "browser:proof-sixteen-commit-pinned-file-links-with-source-affordance",
+    "test:npm-run-verify-9-of-9-32-files-237396-bytes",
+    "file:skills/vibehub-ticket-review/assets/app.js",
+    "file:skills/vibehub-ticket-review/assets/app.css",
+    "file:test/ui-host.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Owner dogfood found Contract substantially less direct than Execution and Proof because Acceptance, Guardrails, Context, dependency rationale, and provenance were all presented at equal weight. Commit eb6e8ba turns Contract into a definition-of-done view: one brief leads with acceptance count, Evidence coverage, and independent Outcome state; acceptance conditions remain the sole default-expanded body; and Working boundaries, Required context, plus Dependency & source become three counted supporting disclosures. Execution, Contract, and Proof remain separate because they answer execution state, completion conditions, and recorded evidence respectively. Real-browser review on the current READY Ticket confirmed 8 acceptance conditions, live 8/8 Evidence coverage with Outcome pending, three closed support disclosures, intact expandable canonical Context, and 16 commit-pinned Proof file links carrying a visible external-link glyph and explicit GitHub hover title. Runtime logs were empty. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 237396 bytes. Final owner approval of the overall visual direction remains protected.",
+  "ticket_id": "ticket-make-static-graph-actionable"
+}
