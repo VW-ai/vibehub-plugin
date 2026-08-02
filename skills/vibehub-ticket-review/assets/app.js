@@ -543,7 +543,7 @@
     const view = tabbedTicketView(ticket.ticketId, [
       { id: "execution", label: "Execution", panel: execution },
       { id: "contract", label: "Contract", panel: contract.panel },
-      { id: "proof", label: "Proof", panel: proof.panel },
+      { id: "evidence", label: "Evidence", panel: proof.panel },
     ]);
     const traceSection = proof.traceSection;
     traceSection.dataset.trace = "ticket";
@@ -976,7 +976,7 @@
         "blockers",
       ),
       signalMetric(String(outgoing.length), "unlocks"),
-      signalMetric("Reading", "proof", "proof-metric"),
+      signalMetric("Reading", "evidence", "proof-metric"),
     );
     signal.append(heading, metrics);
     panel.append(signal);
@@ -1208,13 +1208,11 @@
     eyebrow.textContent = "Definition of done";
     const title = document.createElement("strong");
     title.textContent = `${acceptanceCount} acceptance condition${acceptanceCount === 1 ? "" : "s"} define success`;
-    const detail = document.createElement("span");
-    detail.textContent = "Evidence supports each condition; independent Outcome decides completion.";
-    copy.append(eyebrow, title, detail);
+    copy.append(eyebrow, title);
     const status = document.createElement("div");
     status.className = "contract-brief-status";
     const statusValue = document.createElement("strong");
-    statusValue.textContent = "Reading proof…";
+    statusValue.textContent = "Reading Evidence…";
     const statusDetail = document.createElement("span");
     statusDetail.textContent = "Outcome is authoritative";
     status.append(statusValue, statusDetail);
@@ -1557,14 +1555,14 @@
     const summary = document.createElement("div");
     summary.className = "proof-summary";
     const label = document.createElement("strong");
-    label.textContent = "Reading proof…";
+    label.textContent = "Reading Evidence…";
     const detail = document.createElement("span");
     detail.textContent = "Acceptance-linked Evidence and independent Outcome appear here.";
     summary.append(label, detail);
     panel.append(summary);
     panel.append(ticketSectionHeading(
       "Evidence & Outcome",
-      "Chronological proof from the exact Git source.",
+      "Chronological Evidence and Outcome from the exact Git source.",
     ));
     const traceSection = document.createElement("div");
     traceSection.append(quietMessage("Reading Git trace…"));
@@ -1609,7 +1607,7 @@
     const label = target.proofSummary.querySelector("strong");
     const detail = target.proofSummary.querySelector("span");
     if (!records.length) {
-      label.textContent = "No proof recorded yet";
+      label.textContent = "No Evidence recorded yet";
       detail.textContent = `${target.acceptanceCount} criteria await acceptance-linked Evidence.`;
     } else {
       label.textContent = `${evidence.length} Evidence · ${outcomes.length ? "Outcome recorded" : "Outcome pending"}`;

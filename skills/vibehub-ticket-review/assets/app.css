@@ -1147,12 +1147,6 @@ summary:focus-visible {
   line-height: 1.35;
 }
 
-.contract-brief-copy > span:last-child {
-  color: var(--muted);
-  font-size: 9px;
-  line-height: 1.45;
-}
-
 .contract-brief-status {
   min-width: 112px;
   padding-left: 13px;

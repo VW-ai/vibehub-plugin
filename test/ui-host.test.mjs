@@ -316,6 +316,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function ticketExecutionPanel/u);
   assert.match(script, /function contractBrief/u);
   assert.match(script, /function contractSupportDisclosure/u);
+  assert.match(script, /\{ id: "evidence", label: "Evidence", panel: proof\.panel \}/u);
+  assert.doesNotMatch(script, /label: "Proof"/u);
+  assert.doesNotMatch(
+    script,
+    /Evidence supports each condition; independent Outcome decides completion\./u,
+  );
+  assert.match(script, /signalMetric\("Reading", "evidence", "proof-metric"\)/u);
+  assert.match(script, /No Evidence recorded yet/u);
   assert.match(script, /Acceptance conditions/u);
   assert.match(script, /Supporting contract/u);
   assert.match(script, /Working boundaries/u);
