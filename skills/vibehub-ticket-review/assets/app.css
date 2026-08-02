@@ -1106,6 +1106,196 @@ summary:focus-visible {
   line-height: 1.45;
 }
 
+.contract-brief {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: start;
+  padding: 14px 15px;
+  border: 1px solid var(--vibe-line);
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--surface-solid), var(--vibe-wash));
+}
+
+.contract-brief-mark {
+  width: 9px;
+  height: 12px;
+  margin-top: 3px;
+  border: 1px solid var(--vibe-ink);
+  border-radius: 3px;
+  box-shadow: inset 0 -4px 0 rgba(83, 102, 115, 0.12);
+}
+
+.contract-brief-copy,
+.contract-brief-status {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.contract-brief-copy > span:first-child {
+  color: var(--vibe-ink);
+  font: 8px/1.3 var(--mono);
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.contract-brief-copy > strong {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.contract-brief-copy > span:last-child {
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.contract-brief-status {
+  min-width: 112px;
+  padding-left: 13px;
+  border-left: 1px solid rgba(83, 102, 115, 0.13);
+  text-align: right;
+}
+
+.contract-brief-status strong {
+  color: var(--ink);
+  font: 600 9px/1.35 var(--mono);
+}
+
+.contract-brief-status span {
+  color: var(--quiet);
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.contract-brief-status.is-complete strong {
+  color: var(--done);
+}
+
+.contract-brief-status.has-attention strong {
+  color: var(--attention);
+}
+
+.contract-support {
+  display: grid;
+  border-top: 1px solid var(--line);
+}
+
+.contract-support-disclosure {
+  border-bottom: 1px solid var(--line);
+}
+
+.contract-support-disclosure > summary {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto 12px;
+  gap: 10px;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 1px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.contract-support-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.contract-support-disclosure > summary::after {
+  color: var(--faint);
+  content: "+";
+  font: 12px/1 var(--ui);
+  text-align: center;
+}
+
+.contract-support-disclosure[open] > summary::after {
+  content: "−";
+}
+
+.contract-support-disclosure > summary:hover .contract-support-copy strong {
+  color: var(--vibe-ink);
+}
+
+.contract-support-mark {
+  place-self: center;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--edge);
+}
+
+.contract-support-mark.kind-boundary {
+  width: 2px;
+  height: 14px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--vibe-line);
+}
+
+.contract-support-mark.kind-context {
+  border-color: var(--vibe-ink);
+  border-radius: 2px;
+  box-shadow: 2px 2px 0 rgba(83, 102, 115, 0.14);
+}
+
+.contract-support-mark.kind-audit {
+  border-radius: 50%;
+}
+
+.contract-support-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.contract-support-copy strong {
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.contract-support-copy > span {
+  overflow: hidden;
+  color: var(--quiet);
+  font-size: 8px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contract-support-count {
+  min-width: 22px;
+  padding: 2px 6px;
+  border-radius: 99px;
+  color: var(--quiet);
+  background: var(--vibe-wash);
+  font: 8px/1.4 var(--mono);
+  text-align: center;
+}
+
+.contract-support-body {
+  padding: 2px 0 16px 18px;
+}
+
+.contract-audit {
+  display: grid;
+  gap: 16px;
+}
+
+.contract-audit-section {
+  display: grid;
+  gap: 7px;
+}
+
+.contract-audit-section > strong {
+  color: var(--quiet);
+  font: 500 8px/1.35 var(--mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .causal-strip {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 12px minmax(0, 1.08fr) 12px minmax(0, 1fr);
@@ -2052,6 +2242,23 @@ summary:focus-visible {
   white-space: nowrap;
 }
 
+a.reference-label.linked-reference {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reference-link-icon {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.15;
+}
+
 a.reference-label:hover {
   color: var(--ink);
   text-decoration: underline;
@@ -2279,6 +2486,23 @@ a.reference-label:hover {
 
   .ticket-signal-heading .agent-handoff {
     max-width: 150px;
+  }
+
+  .contract-brief {
+    grid-template-columns: 9px minmax(0, 1fr);
+  }
+
+  .contract-brief-status {
+    grid-column: 2;
+    min-width: 0;
+    padding: 8px 0 0;
+    border-top: 1px solid rgba(83, 102, 115, 0.13);
+    border-left: 0;
+    text-align: left;
+  }
+
+  .contract-support-body {
+    padding-left: 0;
   }
 }
 

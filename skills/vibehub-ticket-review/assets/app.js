@@ -551,6 +551,7 @@
     return {
       traceSection,
       acceptanceRail: contract.acceptanceRail,
+      contractSummary: contract.summary,
       proofSummary: proof.summary,
       acceptanceCount: (contextPackage.acceptance || []).length,
     };
@@ -1121,49 +1122,138 @@
 
   function ticketContractPanel(ticket, contextPackage, inspection) {
     const panel = document.createElement("section");
+    const acceptance = contextPackage.acceptance || [];
+    const constraints = contextPackage.constraints || [];
+    const contextRefs = contextPackage.contextRefs || [];
+    const relations = contextPackage.relations || [];
+    const provenanceRefs =
+      contextPackage.provenanceRefs || ticket.provenanceRefs || [];
+    const summary = contractBrief(acceptance.length);
+    panel.append(summary);
     panel.append(ticketSectionHeading(
-      "Acceptance",
-      "Evidence attaches to criteria; independent Outcome decides completion.",
+      "Acceptance conditions",
+      "The exact conditions an independent Outcome can accept.",
     ));
-    const acceptanceRail = acceptanceView(contextPackage.acceptance || []);
+    const acceptanceRail = acceptanceView(acceptance);
     panel.append(acceptanceRail);
 
-    if ((contextPackage.constraints || []).length) {
-      panel.append(ticketSectionHeading(
-        "Guardrails",
-        "Binding limits on how this outcome may be reached.",
-      ));
-      panel.append(guardrailView(contextPackage.constraints));
+    const support = document.createElement("div");
+    support.className = "contract-support";
+    if (constraints.length) {
+      support.append(contractSupportDisclosure({
+        title: "Working boundaries",
+        detail: `${constraints.length} binding limit${constraints.length === 1 ? "" : "s"} on implementation`,
+        count: constraints.length,
+        kind: "boundary",
+        body: guardrailView(constraints),
+      }));
     }
 
-    if ((contextPackage.contextRefs || []).length) {
-      panel.append(ticketSectionHeading(
-        "Bound context",
-        "The exact knowledge objects governing this Ticket.",
-      ));
-      panel.append(contextObjectView(contextPackage.contextRefs));
+    if (contextRefs.length) {
+      const governed = contextRefs.filter((item) => item.canonicalContext).length;
+      const sourceRefs = contextRefs.length - governed;
+      support.append(contractSupportDisclosure({
+        title: "Required context",
+        detail: [
+          `${governed} governed object${governed === 1 ? "" : "s"}`,
+          `${sourceRefs} source reference${sourceRefs === 1 ? "" : "s"}`,
+        ].join(" · "),
+        count: contextRefs.length,
+        kind: "context",
+        body: contextObjectView(contextRefs),
+      }));
     }
 
-    const relations = relationList(contextPackage.relations || []);
-    if (relations) {
-      const dependency = disclosure("Dependency rationale", relations);
-      dependency.classList.add("ticket-audit-disclosure");
-      panel.append(dependency);
+    const audit = document.createElement("div");
+    audit.className = "contract-audit";
+    const dependencyList = relationList(relations);
+    if (dependencyList) {
+      audit.append(contractAuditSection("Dependency rationale", dependencyList));
     }
-
-    const audit = document.createDocumentFragment();
-    audit.append(facts([
+    audit.append(contractAuditSection("Exact source", facts([
       ["Revision", ticket.ticketRevision],
       ["Source", sourceLabel(inspection.source || state.graph.source)],
-    ]));
-    const provenance = typedReferenceList(
-      contextPackage.provenanceRefs || ticket.provenanceRefs || [],
-    );
-    if (provenance) audit.append(provenance);
-    const source = disclosure("Exact source & provenance", audit);
-    source.classList.add("ticket-audit-disclosure");
-    panel.append(source);
-    return { panel, acceptanceRail };
+    ])));
+    const provenance = typedReferenceList(provenanceRefs);
+    if (provenance) {
+      audit.append(contractAuditSection("Provenance", provenance));
+    }
+    support.append(contractSupportDisclosure({
+      title: "Dependency & source",
+      detail: `${relations.length} direct dependenc${relations.length === 1 ? "y" : "ies"} · ${provenanceRefs.length} provenance reference${provenanceRefs.length === 1 ? "" : "s"}`,
+      count: relations.length + provenanceRefs.length,
+      kind: "audit",
+      body: audit,
+    }));
+
+    if (support.childElementCount) {
+      panel.append(ticketSectionHeading(
+        "Supporting contract",
+        "Open boundaries, context, or audit detail only when needed.",
+      ));
+      panel.append(support);
+    }
+    return { panel, acceptanceRail, summary };
+  }
+
+  function contractBrief(acceptanceCount) {
+    const brief = document.createElement("div");
+    brief.className = "contract-brief";
+    const marker = document.createElement("span");
+    marker.className = "contract-brief-mark";
+    marker.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("div");
+    copy.className = "contract-brief-copy";
+    const eyebrow = document.createElement("span");
+    eyebrow.textContent = "Definition of done";
+    const title = document.createElement("strong");
+    title.textContent = `${acceptanceCount} acceptance condition${acceptanceCount === 1 ? "" : "s"} define success`;
+    const detail = document.createElement("span");
+    detail.textContent = "Evidence supports each condition; independent Outcome decides completion.";
+    copy.append(eyebrow, title, detail);
+    const status = document.createElement("div");
+    status.className = "contract-brief-status";
+    const statusValue = document.createElement("strong");
+    statusValue.textContent = "Reading proof…";
+    const statusDetail = document.createElement("span");
+    statusDetail.textContent = "Outcome is authoritative";
+    status.append(statusValue, statusDetail);
+    brief.append(marker, copy, status);
+    return brief;
+  }
+
+  function contractSupportDisclosure({ title, detail, count, kind, body }) {
+    const disclosure = document.createElement("details");
+    disclosure.className = "contract-support-disclosure";
+    const summary = document.createElement("summary");
+    const marker = document.createElement("span");
+    marker.className = `contract-support-mark kind-${kind}`;
+    marker.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("span");
+    copy.className = "contract-support-copy";
+    const label = document.createElement("strong");
+    label.textContent = title;
+    const description = document.createElement("span");
+    description.textContent = detail;
+    copy.append(label, description);
+    const countLabel = document.createElement("span");
+    countLabel.className = "contract-support-count";
+    countLabel.textContent = String(count);
+    const content = document.createElement("div");
+    content.className = "contract-support-body";
+    content.append(body);
+    summary.append(marker, copy, countLabel);
+    disclosure.append(summary, content);
+    return disclosure;
+  }
+
+  function contractAuditSection(title, body) {
+    const section = document.createElement("section");
+    section.className = "contract-audit-section";
+    const heading = document.createElement("strong");
+    heading.textContent = title;
+    section.append(heading, body);
+    return section;
   }
 
   function ticketSectionHeading(title, detail) {
@@ -1495,6 +1585,25 @@
       (record) => record.unresolvedAcceptanceIds || [],
     ));
 
+    const contractStatus = target.contractSummary.querySelector(
+      ".contract-brief-status",
+    );
+    const contractValue = contractStatus.querySelector("strong");
+    const contractDetail = contractStatus.querySelector("span");
+    contractStatus.classList.remove("is-complete", "has-attention");
+    if (outcomes.length) {
+      contractValue.textContent = unresolved.size
+        ? `${accepted.size} accepted · ${unresolved.size} unresolved`
+        : `${accepted.size} / ${target.acceptanceCount} accepted`;
+      contractDetail.textContent = "Independent Outcome recorded";
+      contractStatus.classList.add(
+        unresolved.size ? "has-attention" : "is-complete",
+      );
+    } else {
+      contractValue.textContent = `${evidenced.size} / ${target.acceptanceCount} evidenced`;
+      contractDetail.textContent = "Independent Outcome pending";
+    }
+
     const metric = elements.inspectorContent.querySelector(".proof-metric strong");
     if (metric) metric.textContent = `${evidenced.size} / ${target.acceptanceCount}`;
     const label = target.proofSummary.querySelector("strong");
@@ -1780,12 +1889,19 @@
         ? document.createElement("a")
         : document.createElement("span");
       label.className = "reference-label";
-      label.textContent = target.label || compactReference(target.target);
+      const labelText = target.label || compactReference(target.target);
       label.title = target.target;
       if (label instanceof HTMLAnchorElement) {
         label.href = target.href || target.actions.githubHref;
         label.target = "_blank";
         label.rel = "noreferrer";
+        label.classList.add("linked-reference");
+        label.title = target.actions?.githubHref
+          ? `Open ${target.target} on GitHub`
+          : `Open ${target.target}`;
+        label.append(document.createTextNode(labelText), externalLinkIcon());
+      } else {
+        label.textContent = labelText;
       }
       reference.append(kind, label);
       wrapper.append(reference);
@@ -2324,6 +2440,20 @@
     icon.append(
       svg("rect", { x: 5.25, y: 5.25, width: 7.5, height: 7.5, rx: 1.25 }),
       svg("path", { d: "M10.5 5.25V4.5A1.25 1.25 0 0 0 9.25 3.25H4.5A1.25 1.25 0 0 0 3.25 4.5v4.75A1.25 1.25 0 0 0 4.5 10.5h.75" }),
+    );
+    return icon;
+  }
+
+  function externalLinkIcon() {
+    const icon = svg("svg", {
+      viewBox: "0 0 16 16",
+      "aria-hidden": "true",
+    });
+    icon.classList.add("reference-link-icon");
+    icon.append(
+      svg("path", { d: "M6.25 3.75h6v6" }),
+      svg("path", { d: "M12.25 3.75 5.5 10.5" }),
+      svg("path", { d: "M10.5 8.75v2.5a1 1 0 0 1-1 1h-5.75v-8h3" }),
     );
     return icon;
   }

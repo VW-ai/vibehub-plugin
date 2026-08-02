@@ -314,6 +314,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function disclosure/u);
   assert.match(script, /function tabbedTicketView/u);
   assert.match(script, /function ticketExecutionPanel/u);
+  assert.match(script, /function contractBrief/u);
+  assert.match(script, /function contractSupportDisclosure/u);
+  assert.match(script, /Acceptance conditions/u);
+  assert.match(script, /Supporting contract/u);
+  assert.match(script, /Working boundaries/u);
+  assert.match(script, /Required context/u);
+  assert.match(script, /Dependency & source/u);
+  assert.doesNotMatch(script, /panel\.append\(guardrailView/u);
   assert.match(script, /function canonicalContextObject/u);
   assert.match(script, /function contextSourceView/u);
   assert.match(script, /function contextEvidenceView/u);
@@ -339,6 +347,8 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /function iconButton/u);
   assert.doesNotMatch(script, /Reference copied|Provenance copied|Worktree path copied/u);
   assert.match(script, /function updateTicketProof/u);
+  assert.match(script, /function externalLinkIcon/u);
+  assert.match(script, /Open \$\{target\.target\} on GitHub/u);
   assert.match(
     styles,
     /\.source-context > p \{[\s\S]*?margin: 0 11px 10px;[\s\S]*?\}/u,
@@ -362,6 +372,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(styles, /\.inspector h1:focus-visible/u);
   assert.match(styles, /\.ticket-tabs/u);
   assert.match(styles, /\.acceptance-rail/u);
+  assert.match(styles, /\.contract-brief/u);
+  assert.match(styles, /\.contract-support-disclosure/u);
+  assert.match(styles, /\.contract-support-body/u);
+  assert.match(styles, /\.reference-link-icon/u);
   assert.match(styles, /\.guardrail-list/u);
   assert.match(styles, /\.context-grid/u);
   assert.match(styles, /\.source-dock/u);
