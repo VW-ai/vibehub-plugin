@@ -316,8 +316,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function ticketExecutionPanel/u);
   assert.match(script, /function contractBrief/u);
   assert.match(script, /function contractSupportDisclosure/u);
-  assert.match(script, /\{ id: "evidence", label: "Evidence", panel: proof\.panel \}/u);
+  assert.match(script, /\{ id: "evidence", label: "Log", panel: proof\.panel \}/u);
   assert.doesNotMatch(script, /label: "Proof"/u);
+  assert.doesNotMatch(script, /label: "Evidence"/u);
   assert.doesNotMatch(
     script,
     /Evidence supports each condition; independent Outcome decides completion\./u,

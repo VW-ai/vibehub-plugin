@@ -543,7 +543,7 @@
     const view = tabbedTicketView(ticket.ticketId, [
       { id: "execution", label: "Execution", panel: execution },
       { id: "contract", label: "Contract", panel: contract.panel },
-      { id: "evidence", label: "Evidence", panel: proof.panel },
+      { id: "evidence", label: "Log", panel: proof.panel },
     ]);
     const traceSection = proof.traceSection;
     traceSection.dataset.trace = "ticket";
