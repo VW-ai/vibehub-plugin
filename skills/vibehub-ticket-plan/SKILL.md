@@ -9,6 +9,9 @@ Plan outcomes, not ceremony. One coherent deliverable is usually one Ticket.
 Split only at a real scheduling, dependency, retry, authority, or verification
 boundary.
 
+Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+This Skill owns `plan-applied`; it does not own UI launch mechanics.
+
 ## Workflow
 
 1. Read the current graph and any named Ticket:
@@ -35,8 +38,11 @@ boundary.
    ```
 
 6. Read the graph back and report Ticket IDs, paths, READY/BLOCKED state, and
-   the next executable outcome. Git commit/PR is the review and rollback
-   boundary.
+   the next executable outcome. Follow `plan-applied`: ask
+   `$vibehub-ticket-review` to present the refreshed graph, focused on the new
+   Ticket when there is one clear subject. Presentation is not an approval
+   gate; continue when the user already authorized execution. Git commit/PR is
+   the review and rollback boundary.
 
 ## Guardrails
 

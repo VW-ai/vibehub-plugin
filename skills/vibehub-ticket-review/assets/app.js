@@ -18,6 +18,15 @@
     "BLOCKED",
     "DEVIATED",
   ]);
+  const TICKET_VIEW_IDS = new Map([
+    ["execution", "execution"],
+    ["contract", "contract"],
+    ["log", "evidence"],
+  ]);
+  const focusQuery = new URLSearchParams(location.search);
+  const requestedTicketId = focusQuery.get("ticket");
+  const requestedViewId = TICKET_VIEW_IDS.get(focusQuery.get("view"))
+    ?? "execution";
 
   const elements = {
     projectName: document.querySelector("#projectName"),
@@ -64,6 +73,7 @@
   let dragging = null;
   let suppressCanvasClick = false;
   let toastTimer = null;
+  let initialFocusPending = Boolean(requestedTicketId);
 
   function svg(tag, attributes = {}) {
     const element = document.createElementNS(SVG, tag);
@@ -120,8 +130,21 @@
       renderChrome();
       renderGraph();
       renderMinimap();
-      renderGraphInspector({ open: false });
       requestAnimationFrame(frameGraph);
+      const focusedTicketExists = initialFocusPending
+        && state.graph.tickets.some(
+          (ticket) => ticket.ticketId === requestedTicketId,
+        );
+      initialFocusPending = false;
+      if (focusedTicketExists) {
+        await selectTicket(
+          requestedTicketId,
+          false,
+          requestedViewId,
+        );
+      } else {
+        renderGraphInspector({ open: false });
+      }
       if (message) showToast(message);
       return true;
     } catch (error) {
@@ -467,6 +490,7 @@
   async function selectTicket(
     ticketId,
     focusInspector = false,
+    initialViewId = "execution",
   ) {
     const ticket = state.graph.tickets.find(
       (item) => item.ticketId === ticketId,
@@ -507,7 +531,7 @@
         inspection,
         null,
       )) return;
-      const traceTarget = renderTicketInspection(inspection);
+      const traceTarget = renderTicketInspection(inspection, initialViewId);
       void loadSubjectTrace(
         request,
         snapshotId,
@@ -522,7 +546,7 @@
     }
   }
 
-  function renderTicketInspection(inspection) {
+  function renderTicketInspection(inspection, initialViewId = "execution") {
     const subject = inspection.subject;
     if (subject?.kind !== "ticket") {
       throw new Error("Ticket inspector received the wrong subject.");
@@ -540,11 +564,15 @@
     const execution = ticketExecutionPanel(ticket, contextPackage, operational);
     const contract = ticketContractPanel(ticket, contextPackage, inspection);
     const proof = ticketProofPanel();
-    const view = tabbedTicketView(ticket.ticketId, [
-      { id: "execution", label: "Execution", panel: execution },
-      { id: "contract", label: "Contract", panel: contract.panel },
-      { id: "evidence", label: "Log", panel: proof.panel },
-    ]);
+    const view = tabbedTicketView(
+      ticket.ticketId,
+      [
+        { id: "execution", label: "Execution", panel: execution },
+        { id: "contract", label: "Contract", panel: contract.panel },
+        { id: "evidence", label: "Log", panel: proof.panel },
+      ],
+      initialViewId,
+    );
     const traceSection = proof.traceSection;
     traceSection.dataset.trace = "ticket";
     elements.inspectorContent.replaceChildren(view);
@@ -874,7 +902,7 @@
     return paragraph;
   }
 
-  function tabbedTicketView(ticketId, tabs) {
+  function tabbedTicketView(ticketId, tabs, initialTabId = "execution") {
     const wrapper = document.createElement("div");
     wrapper.className = "ticket-view";
     const tabList = document.createElement("div");
@@ -926,7 +954,8 @@
       wrapper.append(tab.panel);
     });
     wrapper.prepend(tabList);
-    activate(0);
+    const initialIndex = tabs.findIndex((tab) => tab.id === initialTabId);
+    activate(initialIndex < 0 ? 0 : initialIndex);
     return wrapper;
   }
 

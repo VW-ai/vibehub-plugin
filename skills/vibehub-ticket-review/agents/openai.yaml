@@ -1,4 +1,4 @@
 interface:
   display_name: "VibeHub Ticket Review"
-  short_description: "Review Tickets in the Agent conversation"
-  default_prompt: "Use $vibehub-ticket-review to inspect this worktree's Ticket graph in the conversation."
+  short_description: "Present a focused local Ticket review"
+  default_prompt: "Use $vibehub-ticket-review to present the relevant Ticket graph surface or review it in the conversation."

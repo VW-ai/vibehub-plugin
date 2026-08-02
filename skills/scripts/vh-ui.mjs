@@ -16,6 +16,8 @@ const LOOPBACK_HOST = "127.0.0.1";
 const HOST_SCHEMA_VERSION = 1;
 const DEFAULT_TOKEN_LIFETIME_MS = 30 * 60 * 1_000;
 const MAX_DIRTY_PATHS = 100;
+const TICKET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+const FOCUS_VIEWS = new Set(["execution", "contract", "log"]);
 const ASSET_FILES = new Map([
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/index.html", ["index.html", "text/html; charset=utf-8"]],
@@ -506,6 +508,26 @@ function assertAssets(assetRoot) {
   }
 }
 
+function validateFocus(ticket, view) {
+  if (ticket !== null && !TICKET_ID_PATTERN.test(ticket)) {
+    throw new Error("--ticket must be a canonical Ticket ID");
+  }
+  if (view !== null && !FOCUS_VIEWS.has(view)) {
+    throw new Error("--view must be execution, contract, or log");
+  }
+  if (view !== null && ticket === null) {
+    throw new Error("--view requires --ticket");
+  }
+}
+
+function focusedUrl(origin, token, ticket, view) {
+  const url = new URL(`${origin}/`);
+  if (ticket !== null) url.searchParams.set("ticket", ticket);
+  if (view !== null) url.searchParams.set("view", view);
+  url.hash = token;
+  return url.toString();
+}
+
 function securityHeaders(response) {
   response.setHeader("Cache-Control", "no-store");
   response.setHeader("Content-Security-Policy", [
@@ -575,6 +597,8 @@ export function startVibeHubUi({
   token = crypto.randomBytes(32).toString("hex"),
   tokenLifetimeMs = DEFAULT_TOKEN_LIFETIME_MS,
   assetRoot = defaultAssetRoot(),
+  ticket = null,
+  view = null,
 } = {}) {
   if (!repoRoot) throw new Error("repoRoot is required");
   if (!Number.isInteger(port) || port < 0 || port > 65_535) {
@@ -583,9 +607,14 @@ export function startVibeHubUi({
   if (!Number.isInteger(tokenLifetimeMs) || tokenLifetimeMs <= 0) {
     throw new Error("tokenLifetimeMs must be a positive integer");
   }
+  validateFocus(ticket, view);
   if (!existsSync(resolve(repoRoot))) throw new Error(`Repository does not exist: ${repoRoot}`);
   assertAssets(assetRoot);
-  buildUiSnapshot(repoRoot);
+  const initialSnapshot = buildUiSnapshot(repoRoot);
+  if (ticket !== null
+    && !initialSnapshot.state.graph.tickets.some((item) => item.ticketId === ticket)) {
+    throw new Error(`Unknown Ticket for --ticket: ${ticket}`);
+  }
   let origin = null;
   let closed = false;
   let expiry = null;
@@ -648,9 +677,10 @@ export function startVibeHubUi({
       expiry.unref();
       resolveReady({
         origin,
-        url: `${origin}/#${token}`,
+        url: focusedUrl(origin, token, ticket, view),
         port: address.port,
         expiresInMs: tokenLifetimeMs,
+        focus: { ticket, view },
       });
     });
   });
@@ -673,27 +703,32 @@ export function parseUiFlags(argv) {
   let port = 0;
   let open = true;
   let json = false;
+  let ticket = null;
+  let view = null;
   const seen = new Set();
   for (let index = 0; index < argv.length; index += 1) {
     const flag = argv[index];
     if (seen.has(flag)) throw new Error(`repeated flag: ${flag}`);
     seen.add(flag);
-    if (flag === "--repo" || flag === "--port") {
+    if (flag === "--repo" || flag === "--port"
+      || flag === "--ticket" || flag === "--view") {
       const value = argv[++index];
       if (!value || value.startsWith("--")) throw new Error(`${flag} requires a value`);
       if (flag === "--repo") repo = value;
-      else {
+      else if (flag === "--port") {
         port = Number(value);
         if (!Number.isInteger(port) || port < 0 || port > 65_535) {
           throw new Error("--port must be an integer between 0 and 65535");
         }
-      }
+      } else if (flag === "--ticket") ticket = value;
+      else view = value;
     } else if (flag === "--open") open = true;
     else if (flag === "--no-open") open = false;
     else if (flag === "--json") json = true;
     else throw new Error(`unknown flag: ${flag}`);
   }
-  return { repo: resolve(repo), port, open, json };
+  validateFocus(ticket, view);
+  return { repo: resolve(repo), port, open, json, ticket, view };
 }
 
 function openBrowser(url) {
@@ -711,7 +746,12 @@ function openBrowser(url) {
 
 async function launch(argv) {
   const flags = parseUiFlags(argv);
-  const handle = startVibeHubUi({ repoRoot: flags.repo, port: flags.port });
+  const handle = startVibeHubUi({
+    repoRoot: flags.repo,
+    port: flags.port,
+    ticket: flags.ticket,
+    view: flags.view,
+  });
   const ready = await handle.ready;
   if (flags.json) {
     process.stdout.write(`${JSON.stringify({

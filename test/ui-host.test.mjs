@@ -135,6 +135,14 @@ test("invalid canonical documents fail before UI projection", () => {
   );
 });
 
+test("focused launcher rejects an unknown Ticket before binding", () => {
+  const repo = fixture();
+  assert.throws(
+    () => startVibeHubUi({ repoRoot: repo, ticket: "missing-ticket" }),
+    /Unknown Ticket for --ticket/u,
+  );
+});
+
 test("dense causal position preserves every direct prerequisite and unlock", () => {
   const repo = tempRepo("ui-dense-causal");
   repos.push(repo);
@@ -218,10 +226,20 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const repo = fixture();
   const beforeUi = canonicalBytes(repo);
   const token = "a".repeat(64);
-  const host = startVibeHubUi({ repoRoot: repo, token, tokenLifetimeMs: 60_000 });
+  const host = startVibeHubUi({
+    repoRoot: repo,
+    token,
+    tokenLifetimeMs: 60_000,
+    ticket: "foundation",
+    view: "log",
+  });
   hosts.push(host);
-  const { origin, url } = await host.ready;
-  assert.equal(new URL(url).hash, `#${token}`);
+  const { origin, url, focus } = await host.ready;
+  const authorizedUrl = new URL(url);
+  assert.equal(authorizedUrl.hash, `#${token}`);
+  assert.equal(authorizedUrl.searchParams.get("ticket"), "foundation");
+  assert.equal(authorizedUrl.searchParams.get("view"), "log");
+  assert.deepEqual(focus, { ticket: "foundation", view: "log" });
 
   const health = await fetch(`${origin}/health`);
   assert.equal(health.status, 200);
@@ -313,6 +331,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /renderGraphInspector\(\{ open: false \}\)/u);
   assert.match(script, /function disclosure/u);
   assert.match(script, /function tabbedTicketView/u);
+  assert.match(script, /const requestedTicketId = focusQuery\.get\("ticket"\)/u);
+  assert.match(script, /\["log", "evidence"\]/u);
+  assert.match(script, /initialFocusPending/u);
+  assert.match(script, /initialTabId = "execution"/u);
   assert.match(script, /function ticketExecutionPanel/u);
   assert.match(script, /function contractBrief/u);
   assert.match(script, /function contractSupportDisclosure/u);
@@ -416,15 +438,29 @@ test("launcher flags stay intentionally narrow", () => {
     port: 0,
     open: true,
     json: false,
+    ticket: null,
+    view: null,
   });
   assert.deepEqual(parseUiFlags([
     "--repo", ".", "--port", "4321", "--no-open", "--json",
+    "--ticket", "feature", "--view", "contract",
   ]), {
     repo: process.cwd(),
     port: 4321,
     open: false,
     json: true,
+    ticket: "feature",
+    view: "contract",
   });
   assert.throws(() => parseUiFlags(["--db", "state.sqlite"]), /unknown flag/u);
   assert.throws(() => parseUiFlags(["--port", "70000"]), /between 0 and 65535/u);
+  assert.throws(() => parseUiFlags(["--view", "log"]), /requires --ticket/u);
+  assert.throws(
+    () => parseUiFlags(["--ticket", "Feature", "--view", "execution"]),
+    /canonical Ticket ID/u,
+  );
+  assert.throws(
+    () => parseUiFlags(["--ticket", "feature", "--view", "proof"]),
+    /execution, contract, or log/u,
+  );
 });

@@ -7,6 +7,9 @@ description: Independently adjudicate one lightweight VibeHub Ticket against eve
 
 The closeout Agent must be independent from the executor.
 
+Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+This Skill owns `closeout-recorded`; it does not own UI launch mechanics.
+
 1. Read the exact Ticket, diff, tests, and all Evidence:
 
    ```text
@@ -26,5 +29,7 @@ The closeout Agent must be independent from the executor.
    ```
 
 5. Read `ticket frontier` back. Only a successful Outcome unlocks direct
-   dependents. Report the result and any concrete follow-up gap; do not create
+   dependents. Follow `closeout-recorded`: ask `$vibehub-ticket-review` to
+   present the exact Ticket's Log, then report the result and any concrete
+   follow-up gap. Presentation is not another approval step. Do not create
    speculative parity work.

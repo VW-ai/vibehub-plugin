@@ -43,6 +43,7 @@ try {
     "skills/vibehub-ticket-review/assets/index.html",
     "skills/vibehub-ticket-review/assets/app.css",
     "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
     "skills/contracts/context.schema.json",
     "skills/contracts/ticket.schema.json",
   ]) {
@@ -60,6 +61,17 @@ try {
   }
   const codex = JSON.parse(readFileSync(join(artifact, ".codex-plugin", "plugin.json"), "utf8"));
   if (codex.mcpServers || codex.hooks) throw new Error("Codex manifest still requires MCP or hooks");
+  const lifecycle = JSON.parse(readFileSync(join(
+    artifact,
+    "skills",
+    "vibehub-ticket-review",
+    "references",
+    "ticket-lifecycle.json",
+  ), "utf8"));
+  if (lifecycle.presenter !== "vibehub-ticket-review"
+    || lifecycle.resource_policy?.cross_task_discovery !== "forbidden") {
+    throw new Error("installed Ticket lifecycle contract is invalid");
+  }
 
   const helper = join(artifact, "skills", "scripts", "vh.mjs");
   mkdirSync(repo, { recursive: true });
