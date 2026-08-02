@@ -1891,6 +1891,12 @@ summary:focus-visible {
   margin-top: 8px;
 }
 
+.reference-overview {
+  flex: 0 0 100%;
+  color: var(--faint);
+  font: 8px/1.35 var(--mono);
+}
+
 .typed-reference-list {
   display: grid;
   gap: 5px;

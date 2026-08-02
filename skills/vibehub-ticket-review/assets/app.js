@@ -1678,6 +1678,10 @@
     if (!targets.length) return null;
     const wrapper = document.createElement("div");
     wrapper.className = "trace-targets";
+    const overview = document.createElement("span");
+    overview.className = "reference-overview";
+    overview.textContent = `${targets.length} reference${targets.length === 1 ? "" : "s"}`;
+    wrapper.append(overview);
     for (const target of targets) {
       const reference = document.createElement("span");
       reference.className = `typed-reference kind-${target.kind || "reference"}`;

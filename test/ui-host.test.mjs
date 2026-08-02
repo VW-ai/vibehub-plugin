@@ -148,11 +148,58 @@ test("dense causal position preserves every direct prerequisite and unlock", () 
       ...dependents.map((id) => ticket(id, ["causal-center"])),
     ],
   }).status, 0);
+  assert.equal(run(repo, "ticket", "evidence", {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "dense-completed-proof",
+    ticket_id: prerequisites[0],
+    acceptance_ids: ["works"],
+    summary: "The completed prerequisite passed.",
+    refs: ["test:dense-completed"],
+    recorded_at: NOW,
+  }).status, 0);
+  assert.equal(run(repo, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: prerequisites[0],
+    status: "successful",
+    accepted_acceptance_ids: ["works"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: ["dense-completed-proof"],
+    summary: "The completed prerequisite succeeded.",
+    closed_at: NOW,
+  }).status, 0);
+  assert.equal(run(repo, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: prerequisites[1],
+    status: "failed",
+    accepted_acceptance_ids: [],
+    unresolved_acceptance_ids: ["works"],
+    evidence_ids: [],
+    summary: "The deviated prerequisite failed.",
+    closed_at: NOW,
+  }).status, 0);
   const snapshot = buildUiSnapshot(repo);
   const center = snapshot.state.graph.tickets.find(
     (item) => item.ticketId === "causal-center",
   );
   assert.deepEqual(center.relationCounts, { prerequisites: 5, dependents: 5 });
+  assert.deepEqual(
+    Object.fromEntries(snapshot.state.graph.tickets
+      .filter((item) => prerequisites.includes(item.ticketId))
+      .map((item) => [
+        item.ticketId,
+        item.capabilities.operational.summary.label,
+      ])),
+    {
+      "prerequisite-1": "DONE",
+      "prerequisite-2": "DEVIATED",
+      "prerequisite-3": "READY",
+      "prerequisite-4": "READY",
+      "prerequisite-5": "READY",
+    },
+  );
   assert.equal(
     snapshot.state.graph.relations.filter(
       (relation) => relation.dependentTicketId === "causal-center",
