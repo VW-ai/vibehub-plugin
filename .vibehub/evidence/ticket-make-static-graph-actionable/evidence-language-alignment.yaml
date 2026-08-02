@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "evidence-references-are-typed-and-compact",
+    "visual-polish-strengthens-not-obscures"
+  ],
+  "evidence_id": "evidence-language-alignment",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T21:20:57.000Z",
+  "refs": [
+    "git:285da82",
+    "conversation:2026-08-02-remove-contract-explanation-and-rename-proof-evidence",
+    "browser:execution-contract-evidence-tabs-and-concise-contract-brief",
+    "test:npm-run-verify-9-of-9-32-files-237162-bytes",
+    "file:skills/vibehub-ticket-review/assets/app.js",
+    "file:skills/vibehub-ticket-review/assets/app.css",
+    "file:test/ui-host.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Owner dogfood identified the Contract rule sentence as unnecessary explanatory UI and chose Evidence as the clearer name for the former Proof interface. Commit 285da82 removes the repeated explanation, renames the visible tab to Evidence, aligns the Execution metric and empty/loading states to Evidence, and retains Evidence & Outcome as the page heading so independent Outcome authority stays explicit without extra prose. A real-browser audit confirmed the exact Execution, Contract, Evidence tab set, the concise Definition of Done brief, absence of the removed sentence, and empty runtime logs. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 237162 bytes. Final owner approval of the overall visual direction remains protected.",
+  "ticket_id": "ticket-make-static-graph-actionable"
+}
