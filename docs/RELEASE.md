@@ -21,6 +21,7 @@ npm is not a release or installation surface for this product generation.
    dependency-free plugin, archives it, writes a SHA-256 checksum, and creates
    the GitHub Release.
 6. Verify that the GitHub Release points to the tagged `main` commit and that
-   both the archive and checksum are present.
+   both the archive and checksum are present. Download both into one directory
+   and run `sha256sum --check vibehub-plugin-X.Y.Z.tar.gz.sha256`.
 
 Never create the final tag or GitHub Release from a feature branch.

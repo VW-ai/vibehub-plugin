@@ -25,13 +25,14 @@ jobs:
         run: npm run build
       - name: Package release
         run: |
-          archive="dist/vibehub-plugin-${GITHUB_REF_NAME#v}.tar.gz"
-          tar -C dist -czf "$archive" plugin
+          archive="vibehub-plugin-${GITHUB_REF_NAME#v}.tar.gz"
+          tar -C dist -czf "dist/$archive" plugin
+          cd dist
           sha256sum "$archive" > "$archive.sha256"
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          archive="dist/vibehub-plugin-${GITHUB_REF_NAME#v}.tar.gz"
-          gh release create "$GITHUB_REF_NAME" "$archive" "$archive.sha256" \
+          archive="vibehub-plugin-${GITHUB_REF_NAME#v}.tar.gz"
+          gh release create "$GITHUB_REF_NAME" "dist/$archive" "dist/$archive.sha256" \
             --verify-tag --generate-notes --title "VibeHub $GITHUB_REF_NAME"

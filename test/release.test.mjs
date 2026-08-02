@@ -44,6 +44,7 @@ test("release is GitHub-only, reproducible, and documented", () => {
     "npm run verify",
     "npm run build",
     "sha256sum",
+    "cd dist",
     "gh release create",
   ]) assert.ok(workflow.includes(required), `release workflow missing ${required}`);
   assert.doesNotMatch(workflow, /npm publish|NODE_AUTH_TOKEN|strategy:|matrix:|native|marketplace/iu);

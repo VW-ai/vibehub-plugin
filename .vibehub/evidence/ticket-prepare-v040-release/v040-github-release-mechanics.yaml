@@ -14,7 +14,7 @@
     "file:docs/RELEASE.md",
     "file:CHANGELOG.md",
     "test:verify-release-tag-v0.4.0",
-    "test:npm-run-verify-16-of-16-40-files-324397-bytes"
+    "test:npm-run-verify-16-of-16-40-files-324497-bytes"
   ],
   "schema_version": 1,
   "summary": "Commit ecb811a aligns package, Codex, Claude, and marketplace identity at 0.4.0; cuts the dated v0.4.0 Changelog with the runtime break; adds a tag/version guard; and documents the merge-main→tag-exact-commit→GitHub-Release procedure. The 37-line tag workflow runs the complete verification gate, builds the dependency-free plugin, creates a tar archive and SHA-256 checksum, and publishes only through GitHub Releases. Tests mechanically reject npm publication/auth, matrices, native builds, and marketplace release machinery.",
