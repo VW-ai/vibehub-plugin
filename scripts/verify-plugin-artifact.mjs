@@ -36,6 +36,11 @@ try {
   for (const required of [
     ".claude-plugin/plugin.json",
     ".codex-plugin/plugin.json",
+    "assets/brand/vibehub-logo.svg",
+    "CHANGELOG.md",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/INSTALL.md",
+    "docs/RELEASE.md",
     "skills/vibehub-ingest/SKILL.md",
     "skills/vibehub-ticket-run/SKILL.md",
     "skills/scripts/vh.mjs",

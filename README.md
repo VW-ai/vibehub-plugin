@@ -1,87 +1,91 @@
-# VibeHub
+<p align="center">
+  <img src="assets/brand/vibehub-logo.svg" alt="VibeHub" width="360">
+</p>
 
-VibeHub is a lightweight plugin for Ticket-driven development with durable,
-Git-native project Context.
+<h3 align="center">Ticket-driven development for coding agents.</h3>
 
-## Current phase: dogfood
+<p align="center">
+  Keep the work executable. Keep the meaning durable. See the graph when human attention matters.
+</p>
 
-The architecture pivot is complete. This version is now in a dogfood-only
-validation phase: use it for real development, observe where it helps or
-fails, and do not pre-emptively rebuild deleted layers or pursue a runtime
-parity checklist.
+<p align="center">
+  <strong>Skill-first</strong> · <strong>Git-native</strong> · <strong>Local by default</strong> · <strong>No runtime service</strong>
+</p>
 
-For each real deliverable, start with a Ticket, develop against its acceptance
-criteria, record acceptance-linked Evidence, and let an independent Agent write
-the Outcome. Capture durable decisions as Context only when explicitly asked
-or when the Ticket exposes a fact that must survive across work. When real use
-reveals friction or a missing capability, open a focused Ticket with the
-observed failure and desired outcome; that evidence, not speculation, is the
-reason to extend the product.
+![VibeHub local Ticket graph](docs/assets/local-graph/quiet-workbench-desktop.jpg)
 
-The product has two layers:
+## One development cycle, two kinds of truth
 
-- **Tickets drive development.** A deliverable becomes a checked-in Ticket with
-  outcome, acceptance, constraints, Context references, and direct dependencies.
-- **Context preserves durable meaning.** Decisions, intent, constraints,
-  contracts, conventions, and reusable explanations are captured only when the
-  user explicitly asks or a Ticket workflow identifies a real cross-Ticket fact.
+| | Ticket | Context |
+| --- | --- | --- |
+| **Answers** | What must change, what unlocks next, and how success is proven? | What decision, constraint, or intent must survive this task? |
+| **Created when** | There is an executable deliverable. | The user explicitly asks to record something, or work reveals a real cross-Ticket fact. |
+| **Lives in** | `.vibehub/tickets/`, with Evidence and an independent Outcome. | `.vibehub/context/`, with source and provenance. |
 
-VibeHub is Skills plus files. It does not require a global CLI, MCP server,
-SQLite database, native module, daemon, hook cadence, Run lease, Context copy,
-or writable local host. Agents use their normal file and Git tools; small
-bundled scripts only validate and serialize the shared schemas.
+Tickets drive development. Context protects meaning. VibeHub does not turn every
+conversation into memory or every note into work.
 
-## What happens when the user says “record this”?
+## The workflow presents itself
 
-“帮我记录一下”, “沉淀一下”, and “remember this” normally create Context, not a
-Ticket. A Ticket is created when there is an executable deliverable.
+You should not need to remember a UI command. The Ticket Skills own one compact
+lifecycle and present the focused graph at the moments where seeing it helps:
 
-If one conversation contains both a durable decision and work to implement it,
-VibeHub writes one Context item plus one Ticket that references it. It does not
-turn every note into work or every work item into permanent knowledge.
+| Moment | What you see | What happens next |
+| --- | --- | --- |
+| **Plan** | **Execution** — the new Ticket, its contract, and direct dependency path | Work continues |
+| **Run** | Nothing extra | The Agent executes quietly from checked-in truth |
+| **Human boundary** | **Contract** — the exact choice or acceptance that needs you | Work waits for your decision |
+| **Closeout** | **Log** — Evidence, Outcome, and what became executable | The result is reported |
+| **PR / explicit review** | The current graph | You audit the branch when you want to |
 
-## Development cycle
+A Ticket is not complete because its executor says so. The executor records
+acceptance-linked Evidence; an independent Agent writes the Outcome. Only a
+successful Outcome unlocks direct dependents.
 
-1. `$vibehub-ticket-plan` creates the smallest honest Ticket graph.
-2. An independent Agent uses `$vibehub-ticket-validate` when available.
-3. `$vibehub-ticket-run` executes one READY Ticket from checked-in context.
-4. The executor records acceptance-linked Evidence.
-5. An independent `$vibehub-ticket-closeout` writes a successful, partial,
-   failed, or deviated Outcome. Only success unlocks direct dependents.
+## Start a cycle
 
-Git owns branch isolation, history, rollback, merge conflicts, and PR review.
-VibeHub assumes one Agent/writer per worktree and does not rebuild Git's
-concurrency model.
+Install the plugin through your Codex or Claude Code plugin flow, then ask:
 
-## Local graph UI
+> Set up VibeHub for this repository.
 
-Ask the Agent to open the VibeHub Ticket graph, or run the bundled launcher:
+Setup detects existing docs, memory folders, project Skills, and similarly
+named capture commands before writing. When another memory system overlaps,
+you choose **dual-write** or **VibeHub-only**. See [installation and coexistence](docs/INSTALL.md).
+
+Then describe a deliverable naturally:
+
+> Start this as a VibeHub Ticket and build it.
+
+The Agent plans the smallest honest Ticket graph, validates it, executes one
+READY Ticket, records Evidence, and hands closeout to an independent Agent.
+Git remains responsible for branches, rollback, merge conflicts, and review.
+
+When you say “record this”, “remember this”, or “沉淀一下”, VibeHub normally
+captures Context—not a Ticket. If the same conversation also creates work, it
+writes one Context item and a Ticket that references it.
+
+## A graph made for decisions
+
+The local graph answers one question first: **what can execute next?** It keeps
+direct unlocks, forks, joins, deviations, Evidence, and Outcomes available
+without flattening them into a wall of text. Selecting a Ticket moves from a
+three-second orientation to its Contract, Execution, and Log without changing
+the underlying truth.
+
+The graph is read-only. Every refresh projects the exact checkout's checked-in
+files; copy-for-Agent and source links hand work back to the tools that already
+own editing. To open it explicitly as a fallback:
 
 ```bash
 node <plugin>/skills/scripts/vh-ui.mjs --repo <repository>
 ```
 
-The graph is a quiet execution map built around one question: what becomes
-executable next? Direct unlocks, forks, joins, proof, and deviations remain in
-place; pan/zoom, fit, minimap navigation, causal highlighting, and precise
-relation handles keep the complete graph usable. Selecting a Ticket or relation
-opens one structural Inspector, and strict Context, acceptance, provenance,
-Evidence, and Outcome remain progressively disclosed. Each refresh projects the
-exact checkout's `.vibehub/` files directly. See the checked-in
+The narrow launcher starts an ephemeral loopback server, opens a short-lived
+authorized URL in the normal browser, and exits with the foreground process.
+There is no database, daemon, persistent cache, or write endpoint. See the
 [local graph design authority](docs/LOCAL_GRAPH_DESIGN.md).
 
-The launcher is a narrow, dependency-free foreground process: ephemeral
-loopback port, short-lived bearer URL, restrictive browser headers, and no
-database, daemon, persistent cache, or write endpoint. Browser writes and
-Decision authority are deliberately outside this first restored UI slice.
-
-By default the launcher opens the complete authorized URL in your normal
-system browser. The page keeps that short-lived `#` fragment in the address bar
-and provides **Copy link**, so the same URL can be pasted into another local
-browser while the foreground launcher is running. Use `--no-open` only when an
-Agent or test should print the URL without opening a browser.
-
-## Data
+## The entire durable model
 
 ```text
 .vibehub/
@@ -91,45 +95,26 @@ Agent or test should print the URL without opening a browser.
   outcomes/<ticket-id>.yaml
 ```
 
-The files use a JSON-compatible YAML 1.2 subset. That keeps them readable,
-deterministic, dependency-free, and validatable in a clean plugin install.
-Schemas live in `skills/contracts/`.
+These are deterministic, JSON-compatible YAML 1.2 documents. Agents make the
+semantic decisions; small dependency-free scripts validate the shared schemas
+and project the graph. Consumers never own a second durable model.
 
-```text
-Agent / Skills -> canonical documents -> shared validation -> UI / helper / Cloud
-```
+VibeHub intentionally ships without a required Core package, global CLI, MCP
+server, SQLite database, native module, hook cadence, lease, or background
+capture. If real use exposes a missing capability, it can be rebuilt from the
+observed gap instead of being carried as speculative infrastructure.
 
-This is the product boundary. Agents make semantic decisions and write the four
-canonical document types; downstream surfaces only validate, read, and project
-them. Invalid files fail before projection instead of being guessed into shape.
-Selection, graph layout, pan, and zoom may remain disposable UI memory, but no
-consumer owns a parallel durable model or a second source of truth.
+## Verify locally
 
-There is no persistent digest cache. A future UI may keep a disposable
-in-process render cache if profiling proves it useful; that cache would never
-be truth, authority, currentness, or completion state.
-
-## Install and setup
-
-Install the plugin through your Claude Code or Codex plugin flow, then ask:
-
-> Set up VibeHub for this repository.
-
-`$vibehub-setup` first detects existing documentation, memory folders, project
-skills, and similarly named capture commands. If another memory system may
-overlap, it asks you to choose dual-write or VibeHub-only before changing the
-repository. See [docs/INSTALL.md](docs/INSTALL.md).
-
-## Local verification
-
-Requirements: Node.js 20+ and Git.
+Requirements: Node.js 20+ and Git. No dependency install or native build is
+required.
 
 ```bash
-npm test
-npm run verify:artifact
+npm run verify
 ```
 
-No dependency install or native build is required.
+VibeHub releases are plugin archives published through GitHub Releases. npm is
+not a distribution surface for the Skill-first product.
 
 ## License
 

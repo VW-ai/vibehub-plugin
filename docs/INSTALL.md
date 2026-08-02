@@ -3,8 +3,9 @@
 VibeHub is a Skill-first plugin. Installation copies manifests, Skills,
 schemas, dependency-free helper scripts, and the local graph UI assets. It does
 not install a global CLI, MCP server, hook process, database, native module, or
-daemon. The read-only UI host starts in the foreground only when explicitly
-requested and exits with its launcher process.
+daemon. The read-only UI host starts in the foreground when a Ticket lifecycle
+moment needs a visual review, or when explicitly requested as a fallback, and
+exits with its launcher process.
 
 ## Requirements
 
@@ -50,9 +51,12 @@ and a small managed project-instruction block. Validate with:
 node <plugin>/skills/scripts/vh.mjs project validate --repo <repository>
 ```
 
-## Open the Ticket graph
+## Ticket graph presentation
 
-Ask the Agent to use `$vibehub-ticket-review`, or launch the bundled helper:
+Ticket Skills proactively present the focused graph after planning, at a
+protected human boundary, after closeout, and for PR review. Routine execution
+stays quiet. To open the graph explicitly as a fallback, ask the Agent to use
+`$vibehub-ticket-review` or launch the bundled helper:
 
 ```bash
 node <plugin>/skills/scripts/vh-ui.mjs --repo <repository>

@@ -1,6 +1,6 @@
 {
   "name": "vibehub",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Lightweight Skill-first development cycles with Git-native Tickets and durable project Context.",
   "author": {
     "name": "VibeHub Team",
@@ -32,7 +32,7 @@
     "defaultPrompt": [
       "Set up VibeHub for this project.",
       "Start this deliverable as a VibeHub Ticket.",
-      "Open the local VibeHub Ticket graph.",
+      "Review the current VibeHub Ticket graph.",
       "Query the VibeHub Context needed for this Ticket.",
       "Record this decision in VibeHub Context."
     ],

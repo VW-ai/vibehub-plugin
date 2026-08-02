@@ -13,6 +13,12 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const PLUGIN_PATHS = [
   ".claude-plugin",
   ".codex-plugin",
+  "assets/brand",
+  "CHANGELOG.md",
+  "docs/INSTALL.md",
+  "docs/LOCAL_GRAPH_DESIGN.md",
+  "docs/RELEASE.md",
+  "docs/assets/local-graph/quiet-workbench-desktop.jpg",
   "skills",
   "LICENSE",
   "README.md",
@@ -42,7 +48,9 @@ export function buildPluginArtifact({ sourceRoot = root, artifactRoot } = {}) {
   if (existsSync(artifactRoot)) throw new Error(`artifact output already exists: ${artifactRoot}`);
   mkdirSync(artifactRoot, { recursive: true });
   for (const relativePath of PLUGIN_PATHS) {
-    cpSync(join(sourceRoot, relativePath), join(artifactRoot, relativePath), { recursive: true });
+    const target = join(artifactRoot, relativePath);
+    mkdirSync(dirname(target), { recursive: true });
+    cpSync(join(sourceRoot, relativePath), target, { recursive: true });
   }
   return { artifactRoot, ...artifactStats(artifactRoot) };
 }
