@@ -1,0 +1,95 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "human-authority-is-canonical-and-backward-compatible",
+      "criterion": "The Ticket contract has a minimal optional structured way to mark an acceptance criterion as requiring human authority, existing Ticket documents remain valid with Agent authority as the documented default, and schema plus validator tests reject unknown authority values."
+    },
+    {
+      "acceptance_id": "ticket-skills-protect-human-boundaries",
+      "criterion": "Ticket planning, validation, execution, and independent closeout instructions consistently preserve human-authority criteria, forbid an Agent from substituting its own judgment, and require explicit human-origin Evidence before successful closeout without introducing a lease, approval service, or attestation stack."
+    },
+    {
+      "acceptance_id": "ui-projects-human-attention-mechanically",
+      "criterion": "The mechanical UI projection exposes the count and Evidence state of human-authority criteria, and Ticket nodes plus the Execution/Contract lens use a restrained but unmistakable badge, aperture, shape, or semantic accent to distinguish human attention from READY/BLOCKED/DONE/DEVIATED without parsing criterion text."
+    },
+    {
+      "acceptance_id": "human-attention-state-is-honest",
+      "criterion": "Representative Tickets show distinct states for a future human boundary, human Evidence pending, human Evidence recorded, and successful Outcome; the UI never labels an Agent-authored assertion as human approval and never treats a human badge as a dependency blocker."
+    },
+    {
+      "acceptance_id": "agent-handoff-names-the-boundary",
+      "criterion": "Copy-for-Agent payloads and Ticket review output identify the exact human-authority acceptance IDs and criteria so an Agent can ask for the decision precisely rather than sending a generic review request."
+    },
+    {
+      "acceptance_id": "authority-feature-remains-lightweight",
+      "criterion": "Fresh validation, Ticket execution, Evidence, Outcome, UI projection, and clean Plugin verification pass with no service, account system, permission engine, database, hidden decision state, or breaking rewrite of existing canonical documents."
+    }
+  ],
+  "constraints": [
+    "Model authority per acceptance criterion rather than labeling an entire Ticket human when only one boundary may require human judgment.",
+    "Do not infer authority from Ticket prose, constraints, tags, filenames, Evidence wording, or conversation sentiment.",
+    "Do not change READY/BLOCKED dependency semantics; human attention is an orthogonal canonical signal until independent Outcome closes the Ticket.",
+    "Do not rebuild the removed Decision attestation, lease, account, permission, or coordination systems.",
+    "Existing schema-valid Tickets without the optional authority field must remain valid and behave as Agent-authority Tickets.",
+    "The exact field naming and compact visual treatment are implementation choices, but their semantics must be explicit in the checked-in contracts and Skills."
+  ],
+  "context": "The owner wants large graphs to make Tickets requiring human judgment visibly distinct. This cannot be a UI-only color inferred from words such as approve, review, or human. Model authority at the acceptance-criterion boundary because a Ticket may be largely Agent-executable while reserving one product or permission choice for a human. Preserve the lightweight trust model: schema-valid Git documents and explicit conversation-backed Evidence, not a new attestation service. The graph should show that a human boundary exists and whether acceptance-linked Evidence has been recorded, while READY/BLOCKED/DONE/DEVIATED continue to mean execution/dependency truth.",
+  "context_refs": [
+    {
+      "purpose": "Binding lightweight architecture and explicit rejection of local Decision attestation and coordination machinery.",
+      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Binding rule for restrained semantic state and accessibility.",
+      "ref": ".vibehub/context/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Canonical Ticket and acceptance contract to extend compatibly.",
+      "ref": "skills/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Current acceptance-linked Evidence contract whose limits must remain explicit.",
+      "ref": "skills/contracts/evidence.schema.json"
+    },
+    {
+      "purpose": "Shared schema and graph validation implementation.",
+      "ref": "skills/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Planning behavior that first introduces protected human boundaries.",
+      "ref": "skills/vibehub-ticket-plan/SKILL.md"
+    },
+    {
+      "purpose": "Independent validation behavior for protected choices.",
+      "ref": "skills/vibehub-ticket-validate/SKILL.md"
+    },
+    {
+      "purpose": "Independent closeout behavior that must not certify human judgment without explicit Evidence.",
+      "ref": "skills/vibehub-ticket-closeout/SKILL.md"
+    },
+    {
+      "purpose": "Mechanical projection for human-authority counts and Evidence state.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    },
+    {
+      "purpose": "Graph and Ticket lens where human attention becomes visible.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "Tickets can canonically mark acceptance that requires human authority, every Ticket Skill preserves that protected boundary, and the graph visibly signals human attention without guessing from prose, faking approval, or changing READY/BLOCKED dependency semantics.",
+  "provenance_refs": [
+    "conversation:2026-08-02-human-required-tickets-should-look-distinct",
+    "conversation:2026-08-02-ui-needs-backend-skill-schema-when-information-matters",
+    "context:decision-speed-first-skill-plugin"
+  ],
+  "relations": [
+    {
+      "rationale": "Add protected human-attention semantics after the source, copy-for-Agent, and typed object interaction primitives are stable enough to carry the exact boundary.",
+      "target_ticket_id": "ticket-make-static-graph-actionable",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-encode-human-acceptance-authority"
+}

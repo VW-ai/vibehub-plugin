@@ -1,0 +1,97 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "one-copy-handoff-per-object",
+      "criterion": "The selected Ticket and each Evidence or Outcome object expose one clearly prioritized common-copy-icon action that copies a coherent Agent-ready payload containing typed identity, useful summary, and exact references; users are not forced to copy fields or indistinguishable references one by one."
+    },
+    {
+      "acceptance_id": "evidence-references-are-typed-and-compact",
+      "criterion": "Each Evidence card presents a compact reference overview with meaningful types and labels such as commit, test, file, browser, conversation, or URL, a visible count, one copy-all action, and optional individual compact controls; the current wall of repeated large 'Evidence reference' buttons is gone and Outcome remains visually distinct."
+    },
+    {
+      "acceptance_id": "bound-context-is-inspectable",
+      "criterion": "A bound canonical VibeHub Context object can expand inline to show its exact validated type, state, summary, detail, source, Evidence, and relations; ordinary document and source-code refs remain honest path objects with copy/open affordances and never pretend unprojected content exists."
+    },
+    {
+      "acceptance_id": "source-actions-are-mechanical-and-honest",
+      "criterion": "The VibeHub/project/worktree area opens a compact source surface showing exact worktree, branch, commit, and dirty state plus copy-path and copy-for-Agent actions; well-formed local paths and recognized Git remotes may produce editor or GitHub links mechanically, while unavailable actions are omitted or explained without a writable host endpoint."
+    },
+    {
+      "acceptance_id": "relations-and-provenance-have-visual-language",
+      "criterion": "Dependency rationale is rendered as a directional relation object and provenance as typed source tokens or a compact source ledger rather than undifferentiated disclosure text, while every exact raw ref remains reachable and copyable."
+    },
+    {
+      "acceptance_id": "dense-causal-position-remains-readable",
+      "criterion": "In a real-browser fixture with at least five direct prerequisites and five direct unlocks including completed, blocked, and deviated paths, the selected Ticket's causal lens prioritizes blockers and executable consequences, communicates totals, offers one route to the complete set or focused graph cone, and never overflows into an unreadable row of tiny cards."
+    },
+    {
+      "acceptance_id": "visual-polish-strengthens-not-obscures",
+      "criterion": "Desktop, normal Codex width, and 390px narrow review show a more authored VibeHub atmosphere, clearer object shapes, restrained background or proof accents, compact standard icons, and deliberate hover/focus feedback without weakening three-second orientation, state contrast, reduced motion, or the quiet-intelligence standard; the owner approves the resulting direction."
+    },
+    {
+      "acceptance_id": "read-only-boundary-remains-light",
+      "criterion": "The clean Plugin remains dependency-free and mechanically derived from freshly validated Git-YAML with the existing ephemeral loopback bearer boundary, no database, cache, daemon, semantic inference, server-side file opener, write route, or hidden durable state."
+    }
+  ],
+  "constraints": [
+    "Move quickly and replace weak presentation directly; do not preserve current DOM, CSS, or generic button compatibility.",
+    "Use one coherent copy-for-Agent payload per visible object and common compact icons; do not create a copy button beside every line of text.",
+    "Editor and GitHub affordances must be ordinary mechanically derived links with copy fallback, never a new local command-execution or writable host endpoint.",
+    "Project canonical Context content only from already validated Context documents; source files and docs may expose paths and links but must not be silently parsed into invented summaries.",
+    "Keep the complete graph primary and the first Ticket lens fast; decorative polish must support source, state, causality, proof, or attention.",
+    "Do not add a frontend framework, package dependency, database, daemon, persistent cache, branch aggregator, or second source of truth.",
+    "Final visual-direction judgment after real desktop and narrow review remains a protected owner choice."
+  ],
+  "context": "The current graph, Execution/Contract/Proof interaction, and Evidence & Outcome model are approved. The next product gap is that the static projection is still too sealed: users can read facts but often cannot carry them directly into an Agent, editor, or Git review. Replace repeated generic copy buttons and raw text disclosures with compact typed objects, one useful copy-for-Agent action per object, honest deep links, expandable canonical Context, and stronger relation/provenance visuals. Keep the graph primary and the visual language quiet; add delight through hierarchy, shape, subtle VibeHub atmosphere, and precise micro-interactions rather than decoration for its own sake. Stress the causal lens with many prerequisites and unlocks so the simple current topology does not hide overflow problems.",
+  "context_refs": [
+    {
+      "purpose": "Binding limit on visual noise, semantics, interaction, accessibility, and lightweight implementation.",
+      "ref": ".vibehub/context/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Product authority for a first-class local graph and narrow per-worktree launcher.",
+      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Mechanical-consumer boundary for Agent output and canonical Git documents.",
+      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Successful baseline and owner-approved interaction direction that this Ticket deepens.",
+      "ref": ".vibehub/outcomes/ticket-refine-local-ticket-interaction.yaml"
+    },
+    {
+      "purpose": "Current product and interaction design authority.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Mechanical projection boundary to extend with typed Context and source/link metadata only where canonical facts exist.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    },
+    {
+      "purpose": "Current copy, trace, Context, causal lens, and interaction implementation.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Current quiet-intelligence visual system and responsive behavior.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The read-only local Ticket graph turns every important canonical object into an immediately useful handoff: a human can understand it, copy a coherent payload for an Agent, copy or open its exact reference, and follow mechanically resolvable editor or GitHub links without repeated generic controls or server-side mutation.",
+  "provenance_refs": [
+    "conversation:2026-08-02-static-ui-needs-agent-editor-git-handoffs",
+    "conversation:2026-08-02-evidence-outcome-approved-reference-controls-rejected",
+    "conversation:2026-08-02-more-visual-assistance-and-dense-causal-lens",
+    "git:3397936"
+  ],
+  "relations": [
+    {
+      "rationale": "Build the actionable handoff and richer visual layer on the independently accepted Execution/Contract/Proof interaction baseline.",
+      "target_ticket_id": "ticket-refine-local-ticket-interaction",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-make-static-graph-actionable"
+}
