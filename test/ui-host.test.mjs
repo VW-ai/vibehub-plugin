@@ -194,6 +194,8 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /history\.replaceState/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
   assert.match(styles, /\.ticket-node\.state-deviated/u);
+  assert.match(styles, /\.ticket-node:focus-visible,[\s\S]*?outline: none;/u);
+  assert.match(styles, /\.ticket-node:focus-visible \.ticket-boundary/u);
   assert.match(styles, /\.edge-control-halo/u);
   assert.match(styles, /--canvas: #f1f2f0/u);
   assert.match(styles, /\.inspector-disclosure/u);

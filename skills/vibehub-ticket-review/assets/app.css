@@ -448,6 +448,11 @@ summary:focus-visible {
   transition: opacity 110ms ease;
 }
 
+.ticket-node:focus-visible,
+.edge:focus-visible {
+  outline: none;
+}
+
 .ticket-boundary {
   fill: rgba(251, 251, 250, 0.98);
   stroke: var(--line-strong);
@@ -456,7 +461,7 @@ summary:focus-visible {
 }
 
 .ticket-node:hover .ticket-boundary,
-.ticket-node:focus .ticket-boundary,
+.ticket-node:focus-visible .ticket-boundary,
 .ticket-node.related .ticket-boundary {
   fill: var(--node-hover);
   stroke: #777c81;
@@ -573,21 +578,21 @@ summary:focus-visible {
 }
 
 .edge:hover .edge-visible,
-.edge:focus .edge-visible,
+.edge:focus-visible .edge-visible,
 .edge.related .edge-visible {
   stroke: var(--edge-active);
   stroke-width: 1.65;
 }
 
 .edge:hover .edge-arrow,
-.edge:focus .edge-arrow,
+.edge:focus-visible .edge-arrow,
 .edge.related .edge-arrow,
 .edge.selected .edge-arrow {
   fill: var(--edge-active);
 }
 
 .edge:hover .edge-control,
-.edge:focus .edge-control,
+.edge:focus-visible .edge-control,
 .edge.related .edge-control,
 .edge.selected .edge-control {
   fill: var(--surface-solid);
