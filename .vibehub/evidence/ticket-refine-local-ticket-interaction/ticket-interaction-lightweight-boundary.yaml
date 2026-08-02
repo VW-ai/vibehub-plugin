@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "lightweight-boundary-survives"
+  ],
+  "evidence_id": "ticket-interaction-lightweight-boundary",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T09:37:57Z",
+  "refs": [
+    "git:fbdf901",
+    "test:npm-test-8-of-8",
+    "test:npm-run-verify-32-files-196876-bytes",
+    "file:test/ui-host.test.mjs",
+    "file:skills/scripts/vh-ui.mjs",
+    "file:skills/vibehub-ticket-review/assets/app.js"
+  ],
+  "schema_version": 1,
+  "summary": "At commit fbdf901, node syntax checks passed, npm test passed all 8 tests, npm run verify passed all 8 tests again, and the clean Plugin artifact check reported the skill-first-with-local-ui/read-only-loopback artifact at 32 files and 196876 bytes. The host tests continue to prove fresh schema validation, unchanged canonical bytes after UI reads, bearer authorization, restrictive headers, GET-only state/subject/trace routes, POST rejection, narrow launcher flags, and zero dependency or database/cache/write machinery. The only projection extension is structured acceptance ID arrays already present in canonical Evidence and Outcome documents; the browser remains a mechanical consumer.",
+  "ticket_id": "ticket-refine-local-ticket-interaction"
+}
