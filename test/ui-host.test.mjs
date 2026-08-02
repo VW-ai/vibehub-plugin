@@ -314,8 +314,13 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function tabbedTicketView/u);
   assert.match(script, /function ticketExecutionPanel/u);
   assert.match(script, /function canonicalContextObject/u);
+  assert.match(script, /function contextSourceView/u);
+  assert.match(script, /function contextEvidenceView/u);
+  assert.match(script, /function contextRelationsView/u);
   assert.match(script, /function typedReferenceList/u);
   assert.match(script, /Copy for Agent/u);
+  assert.doesNotMatch(script, /function iconButton/u);
+  assert.doesNotMatch(script, /Reference copied|Provenance copied|Worktree path copied/u);
   assert.match(script, /function updateTicketProof/u);
   assert.match(script, /function revealTicket/u);
   assert.match(script, /incoming\.length - completed/u);
@@ -336,6 +341,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(styles, /\.context-grid/u);
   assert.match(styles, /\.source-dock/u);
   assert.match(styles, /\.typed-reference/u);
+  assert.match(styles, /\.context-source-card/u);
+  assert.match(styles, /\.context-evidence-row/u);
+  assert.match(styles, /\.context-relation-row/u);
   assert.match(styles, /\.causal-more/u);
   assert.match(styles, /@media \(max-width: 720px\)/u);
   assert.doesNotMatch(styles, /\.(?:surface|signal|sheet)(?:\s|\{|\.)/u);

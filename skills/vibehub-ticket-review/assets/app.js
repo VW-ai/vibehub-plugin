@@ -397,7 +397,7 @@
         ["Source", sourceLabel(state.graph.source)],
         [
           "Worktree",
-          copyableWorktree(state.graph.source),
+          state.graph.source.worktreeRoot,
         ],
         ["Commit", state.graph.source.resolvedCommit || "unborn HEAD"],
         ["Graph", state.graph.source.graphDigest],
@@ -760,21 +760,7 @@
       const term = document.createElement("dt");
       const definition = document.createElement("dd");
       term.textContent = label;
-      if (value && typeof value === "object" && value.copyValue) {
-        const button = document.createElement("button");
-        button.className = "copy-fact";
-        button.type = "button";
-        button.textContent = value.text;
-        button.title = value.title;
-        button.setAttribute("aria-label", value.ariaLabel);
-        button.addEventListener(
-          "click",
-          () => void copyText(value.copyValue, value.copiedLabel),
-        );
-        definition.append(button);
-      } else {
-        definition.textContent = value;
-      }
+      definition.textContent = value;
       row.append(term, definition);
       list.append(row);
     }
@@ -1318,24 +1304,129 @@
   }
 
   function contextFactLedger(canonical) {
-    const factsView = document.createElement("dl");
-    factsView.className = "context-ledger";
-    const append = (label, value) => {
-      if (value === undefined || value === null
-        || (Array.isArray(value) && value.length === 0)) return;
-      const term = document.createElement("dt");
-      term.textContent = label;
-      const definition = document.createElement("dd");
-      definition.textContent = typeof value === "string"
-        ? value
-        : JSON.stringify(value, null, 2);
-      factsView.append(term, definition);
-    };
-    append("Context ID", canonical.contextId);
-    append("Source", canonical.source);
-    append("Evidence", canonical.evidence);
-    append("Relations", canonical.relations);
-    return factsView.childElementCount ? factsView : null;
+    const ledger = document.createElement("div");
+    ledger.className = "context-ledger";
+    const source = contextSourceView(canonical.source);
+    if (source) ledger.append(source);
+    const evidence = contextEvidenceView(canonical.evidence || []);
+    if (evidence) ledger.append(evidence);
+    const relations = contextRelationsView(canonical.relations || []);
+    if (relations) ledger.append(relations);
+    const identity = document.createElement("div");
+    identity.className = "context-identity";
+    const label = document.createElement("span");
+    label.textContent = "Context ID";
+    const value = document.createElement("code");
+    value.textContent = canonical.contextId;
+    identity.append(label, value);
+    ledger.append(identity);
+    return ledger;
+  }
+
+  function contextSourceView(source) {
+    if (!source) return null;
+    const section = contextLedgerSection("Source", "The exact moment this Context entered the project.");
+    const card = document.createElement("article");
+    card.className = "context-source-card";
+    if (source.quote) {
+      const quote = document.createElement("blockquote");
+      quote.textContent = source.quote;
+      card.append(quote);
+    }
+    card.append(contextReferenceMeta(source.ref, source.captured_at));
+    section.append(card);
+    return section;
+  }
+
+  function contextEvidenceView(items) {
+    if (!items.length) return null;
+    const section = contextLedgerSection(
+      "Evidence",
+      `${items.length} durable record${items.length === 1 ? "" : "s"} supporting this Context.`,
+    );
+    const list = document.createElement("div");
+    list.className = "context-evidence-list";
+    items.forEach((item) => {
+      const row = document.createElement("article");
+      row.className = "context-evidence-row";
+      const marker = document.createElement("span");
+      marker.className = "context-evidence-marker";
+      marker.setAttribute("aria-hidden", "true");
+      const copy = document.createElement("div");
+      const note = document.createElement("p");
+      note.textContent = item.note;
+      copy.append(note, contextReferenceMeta(item.ref));
+      row.append(marker, copy);
+      list.append(row);
+    });
+    section.append(list);
+    return section;
+  }
+
+  function contextRelationsView(items) {
+    if (!items.length) return null;
+    const section = contextLedgerSection(
+      "Relations",
+      `${items.length} canonical Context connection${items.length === 1 ? "" : "s"}.`,
+    );
+    const list = document.createElement("div");
+    list.className = "context-relation-list";
+    items.forEach((item) => {
+      const row = document.createElement("div");
+      row.className = "context-relation-row";
+      const type = document.createElement("span");
+      type.textContent = humanizeIdentifier(item.type || "relates to");
+      const arrow = document.createElement("span");
+      arrow.textContent = "→";
+      const target = document.createElement("code");
+      target.textContent = item.target_context_id || item.targetContextId || "Context";
+      row.append(type, arrow, target);
+      list.append(row);
+    });
+    section.append(list);
+    return section;
+  }
+
+  function contextLedgerSection(title, detail) {
+    const section = document.createElement("section");
+    section.className = "context-ledger-section";
+    const heading = document.createElement("div");
+    const label = document.createElement("strong");
+    label.textContent = title;
+    const description = document.createElement("span");
+    description.textContent = detail;
+    heading.append(label, description);
+    section.append(heading);
+    return section;
+  }
+
+  function contextReferenceMeta(reference, instant = null) {
+    const meta = document.createElement("div");
+    meta.className = "context-reference-meta";
+    const kind = document.createElement("span");
+    kind.className = "reference-kind";
+    kind.textContent = referenceKindFromValue(reference);
+    const ref = document.createElement("code");
+    ref.textContent = reference;
+    ref.title = reference;
+    meta.append(kind, ref);
+    if (instant) {
+      const time = document.createElement("time");
+      time.dateTime = instant;
+      time.textContent = formatInstant(instant);
+      meta.append(time);
+    }
+    return meta;
+  }
+
+  function referenceKindFromValue(reference) {
+    if (/^https?:/u.test(reference)) return "url";
+    if (/^(?:commit|git):/u.test(reference)) return "commit";
+    if (/^conversation:/u.test(reference)) return "conversation";
+    if (/^test:/u.test(reference)) return "test";
+    if (/^browser:/u.test(reference)) return "browser";
+    if (/\.(?:md|ya?ml|json|m?js|css|html)$/u.test(reference)) return "file";
+    return "reference";
   }
 
   function contextActions(item, payload) {
@@ -1346,7 +1437,7 @@
       className: "agent-handoff compact",
       onClick: () => void copyPayload(payload, "Context copied for Agent"),
     }));
-    appendMechanicalActions(actions, item.actions, item.ref);
+    appendOpenActions(actions, item.actions);
     return actions;
   }
 
@@ -1474,8 +1565,9 @@
         formatInstant(record.occurredAt),
       ].join(" · ");
       headingCopy.append(title, meta);
-      heading.append(headingCopy, iconButton({
-        label: `Copy ${record.kind} for Agent`,
+      heading.append(headingCopy, actionButton({
+        label: "Copy for Agent",
+        className: "agent-handoff compact",
         onClick: () => void copyPayload(
           record.agentPayload || record,
           `${humanizeIdentifier(record.kind)} copied for Agent`,
@@ -1619,10 +1711,7 @@
           () => void selectTicket(linkedTicket.ticketId, true),
         );
       } else {
-        button.addEventListener(
-          "click",
-          () => void copyText(reference.ref, "Reference copied"),
-        );
+        button.disabled = true;
       }
       wrapper.append(button);
     }
@@ -1699,12 +1788,7 @@
         label.target = "_blank";
         label.rel = "noreferrer";
       }
-      const copy = iconButton({
-        label: `Copy ${target.label || target.kind || "reference"}`,
-        onClick: () => void copyText(target.target, "Reference copied"),
-      });
-      copy.classList.add("reference-copy");
-      reference.append(kind, label, copy);
+      reference.append(kind, label);
       wrapper.append(reference);
     }
     return wrapper;
@@ -1727,10 +1811,7 @@
       label.className = "reference-label";
       label.textContent = normalized.label;
       label.title = normalized.target;
-      row.append(kind, label, iconButton({
-        label: `Copy ${normalized.label}`,
-        onClick: () => void copyText(normalized.target, "Provenance copied"),
-      }));
+      row.append(kind, label);
       wrapper.append(row);
     }
     return wrapper;
@@ -2196,12 +2277,12 @@
       className: "agent-handoff",
       onClick: () => void copyPayload(source.agentPayload, "Git source copied for Agent"),
     }));
-    appendMechanicalActions(actions, source.actions?.worktree, source.worktreeRoot);
+    appendOpenActions(actions, source.actions?.worktree);
     appendExternalAction(actions, source.actions?.repository, "GitHub repo");
     appendExternalAction(actions, source.actions?.commit, "Exact commit");
     content.append(actions);
     content.append(facts([
-      ["Worktree", copyableWorktree(source)],
+      ["Worktree", source.worktreeRoot],
       ["Branch", source.branch || "detached"],
       ["Commit", source.resolvedCommit || "unborn HEAD"],
       ["Remote", source.remoteOrigin || "No recognized remote"],
@@ -2217,11 +2298,7 @@
     elements.sourceDockContent.replaceChildren(content);
   }
 
-  function appendMechanicalActions(container, actions, copyValue) {
-    container.append(iconButton({
-      label: `Copy ${copyValue}`,
-      onClick: () => void copyText(copyValue, "Reference copied"),
-    }));
+  function appendOpenActions(container, actions) {
     appendExternalAction(container, actions?.editorHref, "Open in VS Code");
     appendExternalAction(container, actions?.githubHref, "View HEAD on GitHub");
   }
@@ -2252,17 +2329,6 @@
     return icon;
   }
 
-  function iconButton({ label, onClick }) {
-    const button = document.createElement("button");
-    button.className = "copy-icon-button";
-    button.type = "button";
-    button.title = label;
-    button.setAttribute("aria-label", label);
-    button.append(copyIcon());
-    button.addEventListener("click", onClick);
-    return button;
-  }
-
   function actionButton({ label, onClick, className = "" }) {
     const button = document.createElement("button");
     button.className = classes("object-action", className);
@@ -2284,17 +2350,6 @@
     const normalized = String(worktreeRoot || "worktree")
       .replace(/[\\/]+$/u, "");
     return normalized.split(/[\\/]/u).at(-1) || "worktree";
-  }
-
-  function copyableWorktree(source) {
-    const worktree = worktreeBasename(source.worktreeRoot);
-    return {
-      text: worktree,
-      title: `${source.worktreeRoot}\nWorktree ${source.worktreeIdentity}\nClick to copy full path`,
-      ariaLabel: `Worktree ${worktree}. Copy full path.`,
-      copyValue: source.worktreeRoot,
-      copiedLabel: "Worktree path copied",
-    };
   }
 
   async function copyText(value, copiedLabel) {
