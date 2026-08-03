@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "feedback-loop-is-actionable"
+  ],
+  "evidence_id": "readme-dogfood-loop-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-07-31T22:42:21Z",
+  "refs": [
+    "README.md:13",
+    ".vibehub/context/decision-dogfood-only-phase.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "README gives the real-use loop from Ticket through acceptance-linked Evidence and independent Outcome, keeps durable Context explicit, and routes only observed failures or missing capabilities into focused Tickets.",
+  "ticket_id": "ticket-document-dogfood-phase"
+}

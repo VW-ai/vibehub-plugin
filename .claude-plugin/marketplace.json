@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "vibehub",
   "description": "VibeHub plugins for Claude Code.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "owner": {
     "name": "VibeHub Team"
   },
@@ -10,15 +10,15 @@
     {
       "name": "vibehub",
       "source": "./",
-      "description": "Git-native executable Ticket graphs, governed project context, and deterministic lifecycle evidence for Claude Code and Codex.",
-      "version": "0.3.0",
+      "description": "Lightweight Skill-first development cycles with Git-native Tickets and durable project Context.",
+      "version": "0.4.0",
       "author": {
         "name": "VibeHub Team"
       },
       "homepage": "https://github.com/VW-ai/vibehub-plugin",
       "repository": "https://github.com/VW-ai/vibehub-plugin",
       "license": "Apache-2.0",
-      "keywords": ["context", "collaboration", "knowledge", "hooks", "mcp"],
+      "keywords": ["context", "collaboration", "knowledge", "tickets", "skills"],
       "category": "development"
     }
   ]

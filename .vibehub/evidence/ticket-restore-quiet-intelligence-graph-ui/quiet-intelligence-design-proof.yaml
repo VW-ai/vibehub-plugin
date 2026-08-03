@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "design-authority-is-explicit",
+    "spatial-language-matches-authority"
+  ],
+  "evidence_id": "quiet-intelligence-design-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T08:26:06Z",
+  "refs": [
+    "commit:c2126ebaf77344d3042e044f0315124f0d549137",
+    "docs/LOCAL_GRAPH_DESIGN.md",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "sha256:f3d0d32efd9b71410cebc5a789cc49a356d82f3e2144822f8972719316d746f9",
+    "docs/assets/local-graph/quiet-workbench-narrow.jpg",
+    "sha256:3841d734e111b2024420032e77527712a9140f0d205bd517bf74d8d60201d1a1"
+  ],
+  "schema_version": 1,
+  "summary": "Commit c2126eb compiles the approved quiet-intelligence, v8 spatial-workbench, and causal-graph authority into a checked-in local design brief and removes the rejected warm editorial, serif, decorative-green, persistent-legend, card-dashboard direction. Real-browser review used a disposable eight-Ticket fork-and-join fixture with DONE, READY, BLOCKED, and DEVIATED states. The retained 1280-class desktop and 390px narrow captures show cool-neutral matte surfaces, compact system typography, restrained state color, bounded execution objects, direct relation handles, a quiet default graph, and a full-screen narrow Inspector.",
+  "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
+}

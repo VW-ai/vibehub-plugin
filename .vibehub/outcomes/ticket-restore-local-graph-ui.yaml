@@ -1,0 +1,25 @@
+{
+  "accepted_acceptance_ids": [
+    "graph-experience-restored",
+    "inspector-reads-current-yaml",
+    "launcher-is-narrow-and-safe",
+    "skill-and-artifact-work-cleanly",
+    "legacy-bulk-remains-absent",
+    "canonical-output-is-mechanical"
+  ],
+  "closed_at": "2026-08-02T07:30:26Z",
+  "evidence_ids": [
+    "local-graph-browser-proof",
+    "direct-yaml-inspector-proof",
+    "narrow-launcher-security-proof",
+    "clean-artifact-ui-proof",
+    "ui-footprint-boundary-proof",
+    "canonical-output-consumer-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six criteria. Fresh project and Ticket validation passed; npm verification passed all 8 tests plus the clean-installed read-only loopback artifact check (32 files, 168644 bytes); both offline marketplace builders included the launcher and UI assets. Direct inspection confirmed current schema-validated YAML projection, refresh-from-disk behavior, valid/invalid/no-write assertions, narrow bearer-protected GET-only host behavior, selective graph interactions and inspector surfaces, zero package dependencies, a 1716-line six-script production footprint, 3075-line/81011-byte UI assets, and continued absence of the former package, SQLite, MCP, hook, coordination, attestation, writable-review, and hidden-lifecycle stack.",
+  "ticket_id": "ticket-restore-local-graph-ui",
+  "unresolved_acceptance_ids": []
+}

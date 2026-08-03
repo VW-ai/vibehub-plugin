@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "presenter": "vibehub-ticket-review",
+  "resource_policy": {
+    "scope": "current-agent-task",
+    "reuse_live_host": true,
+    "reuse_browser_tab": true,
+    "cross_task_discovery": "forbidden"
+  },
+  "events": [
+    {
+      "event": "plan-applied",
+      "owner": "vibehub-ticket-plan",
+      "presentation": "review",
+      "surface": "execution",
+      "continuation": "continue",
+      "human_boundary": false,
+      "fallback": "conversation"
+    },
+    {
+      "event": "validation-needs-human",
+      "owner": "vibehub-ticket-validate",
+      "presentation": "conversation",
+      "surface": "conversation",
+      "continuation": "wait",
+      "human_boundary": true,
+      "fallback": "conversation"
+    },
+    {
+      "event": "ready-execution",
+      "owner": "vibehub-ticket-run",
+      "presentation": "none",
+      "surface": "none",
+      "continuation": "continue",
+      "human_boundary": false,
+      "fallback": "conversation"
+    },
+    {
+      "event": "execution-needs-human",
+      "owner": "vibehub-ticket-run",
+      "presentation": "review",
+      "surface": "contract",
+      "continuation": "wait",
+      "human_boundary": true,
+      "fallback": "conversation"
+    },
+    {
+      "event": "closeout-recorded",
+      "owner": "vibehub-ticket-closeout",
+      "presentation": "review",
+      "surface": "log",
+      "continuation": "report",
+      "human_boundary": false,
+      "fallback": "conversation"
+    },
+    {
+      "event": "pr-review-ready",
+      "owner": "vibehub-pr",
+      "presentation": "review",
+      "surface": "graph",
+      "continuation": "report",
+      "human_boundary": false,
+      "fallback": "conversation"
+    },
+    {
+      "event": "explicit-review",
+      "owner": "vibehub-ticket-review",
+      "presentation": "review",
+      "surface": "requested",
+      "continuation": "report",
+      "human_boundary": false,
+      "fallback": "conversation"
+    }
+  ]
+}

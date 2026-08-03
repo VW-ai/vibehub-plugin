@@ -1,131 +1,38 @@
 ---
 name: vibehub-setup
-description: Set up, onboard, connect, or activate VibeHub for an exact project checkout. Use when a user asks to configure VibeHub in a repository, inspect onboarding health, repair a partial setup, or prove Installed, Connected, and Activated state.
+description: Set up the lightweight Skill-first VibeHub folders and project instructions in an exact repository, while detecting existing documentation or memory systems before writing. Use for installation, onboarding, or setup repair.
 ---
 
 # VibeHub Setup
 
-Onboard one exact checkout through deterministic setup receipts. Keep discovery,
-host interpretation, recovery choices, and next-step judgment here; let the CLI
-own all project and runtime mutations.
-
-## Prerequisites
-
-1. Always read `references/onboarding-contract.md` before any setup operation.
-2. Read `references/claude-code.md` only when the active host is Claude Code.
-3. Read `references/codex.md` only when the active host is OpenAI Codex.
-4. Read `references/recovery.md` only on blocked, partial, conflict, missing
-   executable, wrong-worktree, or failed activation evidence.
-5. Read `../_stdlib/reporting.md` before rendering the outcome report.
-
-## Resolve the target and executable
-
-1. Resolve the exact target checkout. Prefer an explicit path from the user.
-   Otherwise use the current working directory only when
-   `git rev-parse --show-toplevel` identifies one unambiguous worktree. Use that
-   checkout top level, not the Git common directory. Stop on a non-Git folder.
-   Never run `git init`.
-2. Resolve the CLI once in this bounded order:
-   - an exact executable path explicitly supplied by the user;
-   - a non-empty `VIBEHUB_BIN` already present in the host environment;
-   - the package root containing this active skill, only when that same root
-     contains `.codex-plugin/plugin.json` or `.claude-plugin/plugin.json` and
-     `packages/cli/dist/main.js`; invoke that entrypoint with `node`;
-   - the installed Plugin root containing this active skill, only when that
-     same root contains `.codex-plugin/plugin.json` or
-     `.claude-plugin/plugin.json` and `runtime/vibehub-runtime.mjs`; invoke that
-     launcher with `node`, followed by `cli`;
-   - the existing `vibehub` found by `command -v vibehub`.
-3. Stop if none exists. Never download, install, build, search unrelated
-   directories, or improvise a replacement executable.
-4. Quote the exact checkout and executable in shell commands. Do not silently
-   switch targets after inspection.
+VibeHub installs as Skills plus checked-in Git YAML. It has no required CLI,
+MCP server, hook process, database, daemon, native build, or local web host.
+When Ticket Plan invokes Setup for the canonical “Start this with VibeHub.”
+entry, return to Ticket Plan after successful validation so the current
+deliverable continues without another user command.
 
 ## Workflow
 
-The fixed sequence is `setup inspect --json`, `setup apply --json`, then
-`setup status --json`, always with `--repo <exact-checkout>`. For every command,
-parse stdout as JSON on exit 0 or 1. An exit code never replaces the
-`ProjectActivationResultV1` evidence.
+1. Inspect the exact checkout for existing `AGENTS.md`, `CLAUDE.md`, `docs/`,
+   `.github/copilot-instructions.md`, project-local skills, memory/context
+   folders, and similarly named capture commands.
+2. If an existing durable-memory system may overlap, show the detected paths
+   and ask the user to choose:
+   - dual-write: preserve the existing system and teach its command to write
+     both stores; or
+   - VibeHub-only: stop writing the old store after an explicitly reviewed
+     one-time conversion.
 
-1. Run `<resolved-cli> setup inspect --repo <exact-checkout> --json` before any
-   apply. Parse its JSON even when it exits 1. The raw
-   `ProjectActivationResultV1` is the evidence: inspect `outcome`,
-   `instructions`, `runtime`, `activation`, and `errors`; do not infer success
-   from prose or exit status alone.
-2. If inspection is blocked or partial, stop and load recovery guidance. Never
-   edit managed markers, rewrite persistent state, alter hooks, or repair files by
-   hand.
-3. Before applying, explain the two owned targets, `AGENTS.md` and `CLAUDE.md`,
-   and that only the VibeHub managed block may change. State any planned
-   append/upgrade and obtain approval when the host requires it.
-4. Run `<resolved-cli> setup apply --repo <exact-checkout> --json`. Parse stdout
-   as JSON on exit 0 or 1 and preserve the complete result. Continue to status
-   only when `ok:true`, `outcome` is `applied` or `unchanged`, and `errors` is
-   empty. On `blocked`, `partial`, `unhealthy`, any non-empty errors, or any
-   unexpected outcome, stop immediately, load recovery guidance, and present
-   the full apply result plus every retained backup path. After a
-   user-approved repair, begin again with a fresh inspect; never run status to
-   conceal a failed or partial apply. Do not call a successful apply Activated.
-5. Run `<resolved-cli> setup status --repo <exact-checkout> --json`. Parse stdout
-   as JSON on exit 0 or 1. A repeated
-   current setup should be idempotent and quiet: if apply reports `unchanged`,
-   do not manufacture an effect or celebratory event.
-6. After a changeful apply, or when Connected lacks a host handshake, follow
-   the active host's reference procedure. For Claude Code, restart the host
-   in the exact checkout, re-run status, and let only its deterministic
-   proof establish Connected. For OpenAI Codex, use Codex CLI `/hooks` to
-   review and trust the packaged hooks when trust is pending. A desktop task
-   may launch and drive that interactive CLI flow when its terminal and
-   permission policy allow; otherwise, instruct the user to run it. The desktop
-   app has no `/hooks` surface and reuses the trust stored in shared Codex
-   configuration. Then start a fresh task on the intended Codex surface in the
-   exact checkout, and let only a real host-attributed SessionStart ingestion
-   establish Connected. Installation, persisted hook trust, or a synthetic
-   hook invocation alone is not a handshake.
-7. Once Connected, classify the project semantically by inspecting tracked,
-   substantive implementation files and repository history:
-   - unborn history, documentation-only content, or scaffold-only tracked
-     files means fresh; invite normal brainstorming, documentation, or
-     context-building work;
-   - meaningful tracked implementation plus established history means
-     existing-code; explicitly recommend `$vibehub-distill`, while allowing
-     the user to skip it;
-   - mixed or uncertain signals remain ambiguous; list the observed file and
-     history signals and ask the user which path fits.
-   This judgment stays in the skill. Never encode it in setup/core, infer it
-   from file count alone, or hide distillation inside setup.
-8. Obtain real context value through a meaningful `$vibehub-query` or
-   `$vibehub-ingest`, then re-run setup status. An empty query, failed operation,
-   skipped ingest, or invented knowledge write does not prove Activated.
-9. Render the outcome with these exact portable labels:
+   Do not assume permission to replace or duplicate user knowledge.
+3. After the choice, initialize only the direct data folders:
 
    ```text
-   Activity: Setup
-   Trigger: <why setup ran now>
-   Effects: <files/runtime/context actually changed, or none>
-   Result: <applied|unchanged|waiting|blocked|partial plus proof states>
-   Next: <one required or optional user action>
+   node ../scripts/vh.mjs project init --repo <root>
    ```
 
-   Keep raw `ProjectActivationResultV1` available as evidence. Do not invent a
-   separate workflow wire receipt or claim richer TUI components. Result uses
-   the setup evidence states from the activation result verbatim; the shared
-   reporting contract's visibility budget applies, and setup renders expanded.
-
-## External-send boundary
-
-Package tests, local fixtures, and synthetic hook events are not real Claude
-host proof. A real dogfood run requires explicit user approval and the exact
-target path before setup writes or host-triggered context leaves this
-development checkout. The same approval boundary applies to a real Codex
-host run.
-
-## Guardrails
-
-- Never overwrite user-authored instruction content.
-- Never delete retained backups or bypass a typed conflict.
-- Never claim Installed, Connected, or Activated without the corresponding
-  deterministic proof state.
-- Never manufacture a query result, ingest write, host handshake, or successful
-  receipt to complete onboarding.
+4. Add a small managed instruction block: development starts from Tickets;
+   query Context when planning/execution needs it; explicit phrases such as
+   “记录一下” or “remember this” invoke `$vibehub-ingest`.
+5. Run `project validate`. Prove setup by reading the files from a fresh
+   process. Installation is complete when Skills and folders are available;
+   no host handshake or background activation state exists.

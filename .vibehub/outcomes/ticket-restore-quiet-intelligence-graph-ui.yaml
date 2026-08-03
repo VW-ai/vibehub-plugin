@@ -1,0 +1,25 @@
+{
+  "accepted_acceptance_ids": [
+    "design-authority-is-explicit",
+    "causal-graph-is-primary",
+    "quiet-progressive-disclosure",
+    "spatial-language-matches-authority",
+    "interaction-is-deliberate-and-accessible",
+    "mechanical-boundary-remains-light",
+    "owner-approves-design-direction"
+  ],
+  "closed_at": "2026-08-02T08:44:04Z",
+  "evidence_ids": [
+    "quiet-intelligence-design-proof",
+    "causal-progressive-interaction-proof",
+    "single-ticket-focus-boundary-proof",
+    "lightweight-ui-boundary-proof",
+    "owner-quiet-ui-direction-approval"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all seven criteria. The checked-in design brief and real desktop and narrow captures restore the approved quiet-intelligence causal graph direction; browser and source checks confirm deterministic fork and join topology, progressive in-place inspection, deliberate accessible interactions, and the read-only zero-dependency Git document boundary. The full test suite passed 8 of 8 and clean artifact verification passed at 32 files and 173352 bytes. The owner explicitly accepted this surface as a clear baseline; desired future Ticket interaction iteration is follow-up product work, not a gap in this Ticket.",
+  "ticket_id": "ticket-restore-quiet-intelligence-graph-ui",
+  "unresolved_acceptance_ids": []
+}

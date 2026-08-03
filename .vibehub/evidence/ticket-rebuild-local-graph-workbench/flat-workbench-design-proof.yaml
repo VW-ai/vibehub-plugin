@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "flat-workbench-replaces-nested-shells",
+    "design-language-is-coherent"
+  ],
+  "evidence_id": "flat-workbench-design-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T09:15:00Z",
+  "refs": [
+    "skills/vibehub-ticket-review/assets/index.html",
+    "skills/vibehub-ticket-review/assets/app.css",
+    "/private/tmp/vibehub-graph-workbench-desktop.png",
+    "/private/tmp/vibehub-graph-workbench-narrow.png",
+    "/private/tmp/vibehub-graph-workbench-narrow-inspector.png",
+    "browser:2026-08-02-desktop-workbench",
+    "browser:2026-08-02-narrow-workbench"
+  ],
+  "schema_version": 1,
+  "summary": "The former surface/signal/sheet DOM and CSS are absent. The real desktop render is one 1440x960 workbench with a single 72px product/source toolbar, graph canvas, state legend, minimap, and bounded right inspector. The 390x844 render shows the graph as the primary screen and the selected Ticket as a separate full-screen inspector state. A consistent warm Git-workbench palette, serif display hierarchy, mono provenance labels, green VibeHub brand, state colors, card/edge/minimap styling, spacing, empty/loading/error treatment, and responsive rules are defined in one asset stylesheet.",
+  "ticket_id": "ticket-rebuild-local-graph-workbench"
+}

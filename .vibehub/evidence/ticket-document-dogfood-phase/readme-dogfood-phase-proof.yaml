@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "phase-is-explicit"
+  ],
+  "evidence_id": "readme-dogfood-phase-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-07-31T22:42:21Z",
+  "refs": [
+    "README.md:6",
+    "git-diff:README.md"
+  ],
+  "schema_version": 1,
+  "summary": "README now states immediately after the introduction that the architecture pivot is complete, this version is in dogfood-only validation, and pre-emptive runtime parity work is out of scope.",
+  "ticket_id": "ticket-document-dogfood-phase"
+}

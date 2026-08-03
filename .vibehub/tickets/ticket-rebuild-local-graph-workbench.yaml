@@ -1,0 +1,68 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "authorized-link-is-portable",
+      "criterion": "The short-lived bearer remains in a fragment that is not sent in HTTP request paths, the UI no longer erases it from browser history, a clearly labeled Copy link control copies the complete authorized URL, and pasting that URL into a separate browser session loads the same graph until expiry; opening the bare origin still fails visibly with recovery guidance."
+    },
+    {
+      "acceptance_id": "flat-workbench-replaces-nested-shells",
+      "criterion": "Desktop renders one full-viewport application with a single product/source toolbar, one graph canvas, and one bounded right-side inspector; the former collapsible signal/surface/sheet and bottom overlay treatments are absent, graph controls and source refresh remain reachable, and narrow screens use one deliberate responsive inspector state rather than stacked nested panels."
+    },
+    {
+      "acceptance_id": "design-language-is-coherent",
+      "criterion": "The UI defines and consistently applies a recognizable VibeHub visual language across typography, spacing, color, Ticket cards, dependency edges, operational states, minimap, empty/loading/error states, toolbar, and inspector hierarchy; real-browser screenshots at desktop and narrow widths make the hierarchy independently reviewable."
+    },
+    {
+      "acceptance_id": "normal-browser-entry-is-obvious",
+      "criterion": "The default launcher continues to open the complete authorized URL in the operating system's normal browser, `--no-open` remains an Agent/testing option, the launch envelope and docs explain the distinction, and the page itself exposes Copy link so Codex is not a required viewing surface."
+    },
+    {
+      "acceptance_id": "canonical-readonly-boundary-survives",
+      "criterion": "Context, Ticket, Evidence, and Outcome remain fresh schema-validated Git-YAML inputs; loopback binding, token expiry, restrictive headers, GET/HEAD-only APIs, zero package dependencies, and no database, persistent cache, hidden state, or write authority all remain verified in the clean plugin artifact."
+    }
+  ],
+  "constraints": [
+    "Move quickly and delete obsolete presentation structure instead of preserving CSS compatibility.",
+    "Do not weaken loopback binding, bearer validation, expiry, or security headers to make the link portable.",
+    "Keep the UI read-only and dependency-free; this Ticket does not authorize browser writes.",
+    "Reuse the mechanical graph layout and inspector data projection where useful, but do not let old DOM structure dictate the redesign.",
+    "Treat user-owned Chrome, Safari, or another normal browser as a first-class viewer, not a fallback from Codex."
+  ],
+  "context": "Immediate dogfood exposed three failures in the just-restored UI: the client removes the bearer fragment from browser history so an address-bar copy cannot authenticate in another browser; the page nests a collapsible surface, signal, sheet, workspace, canvas, inspector, and bottom status treatment into a visually confused stack; and the launch/copy experience makes the local UI appear Codex-only even though the launcher can open the operating system browser. Replace the presentation, not the canonical data architecture. Keep the direct validated Git-YAML projection and read-only loopback host, but make the authorized link portable for its short lifetime and rebuild the page as one intentional graph application rather than a web panel embedded inside another web panel.",
+  "context_refs": [
+    {
+      "purpose": "Product authority for a comprehensive local graph UI and a narrow launcher.",
+      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Binding canonical-document and mechanical-consumer boundary.",
+      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Current token erasure, interaction behavior, and presentation logic to repair.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Current deeply nested document structure to replace.",
+      "ref": "skills/vibehub-ticket-review/assets/index.html"
+    },
+    {
+      "purpose": "Current visual system and responsive overlays to replace.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    },
+    {
+      "purpose": "Loopback host, authorized URL, browser launcher, and security boundary to preserve.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The local VibeHub Ticket graph is a coherent full-window workbench whose authorized URL can be copied into the user's normal browser without losing access.",
+  "provenance_refs": [
+    "conversation:2026-08-02-ui-dogfood-failure",
+    "browser:bare-origin-ticket-graph-unavailable",
+    "code:app-js-removes-bearer-fragment"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-rebuild-local-graph-workbench"
+}

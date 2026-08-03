@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "one-entry-is-product-truth",
+    "release-pr-remains-verified"
+  ],
+  "evidence_id": "canonical-entry-clean-install-and-pr",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-03T00:10:40.000Z",
+  "refs": [
+    "git:e3ce26d",
+    "file:.codex-plugin/plugin.json",
+    "file:skills/vibehub-ticket-plan/SKILL.md",
+    "file:skills/vibehub-setup/SKILL.md",
+    "test:canonical-entry-routes-through-existing-setup-and-ticket-plan",
+    "test:clean-installed-entry-reaches-ready-ticket",
+    "test:npm-run-verify-17-of-17-42-files-325439-bytes",
+    "github:pr-11-mergeable-two-verify-checks-successful",
+    "ticket:ticket-encode-human-acceptance-authority-ready-unexecuted"
+  ],
+  "schema_version": 1,
+  "summary": "Commit e3ce26d reduces the Codex interface to the single exact default prompt 'Start this with VibeHub.' and makes the existing Ticket Plan Skill own it. Ticket Plan explicitly reuses VibeHub Setup when `.vibehub/` is absent and resumes the same deliverable through the existing lifecycle; no router, orchestration Skill, service, or runtime was added. Clean-artifact verification initializes a fresh repository, applies a concrete entry Ticket through the installed helper, and proves it reaches READY. Full verification passes 17/17 and produces a dependency-free 42-file, 325439-byte artifact. PR #11 was updated with the one-line refinement, remains draft/mergeable, and both GitHub Verify VibeHub checks pass. The unrelated human-authority Ticket remains READY and unexecuted.",
+  "ticket_id": "ticket-focus-product-on-one-line-entry"
+}

@@ -1,287 +1,179 @@
 #!/usr/bin/env node
-import { spawn, spawnSync } from "node:child_process";
 import {
   existsSync,
-  mkdtempSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
-  realpathSync,
   rmSync,
-  statSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { createInterface } from "node:readline";
-import { fileURLToPath, pathToFileURL } from "node:url";
-import { buildClaudeMarketplace } from "./build-claude-marketplace.mjs";
-import { readReleaseIdentity } from "./release-metadata.mjs";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+import { spawnSync } from "node:child_process";
+import { buildPluginArtifact } from "./build-plugin-artifact.mjs";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const identity = readReleaseIdentity(root);
-const temp = mkdtempSync(join(tmpdir(), "vibehub-thin-plugin-"));
-const marketplaceRoot = join(temp, "marketplace");
-const runtimeRoot = join(temp, "runtime", `v${identity.version}`);
-const home = join(temp, "home");
+const temp = mkdtempSync(join(tmpdir(), "vibehub-plugin-verify-"));
+const artifact = join(temp, "plugin");
 const repo = join(temp, "repo");
-const keep = process.env.VIBEHUB_KEEP_TMP === "1";
-const specs = JSON.stringify([
-  join(root, "dist", "npm", `vw-ai-vibehub-core-${identity.version}.tgz`),
-  join(root, "dist", "npm", `vw-ai-vibehub-cli-${identity.version}.tgz`),
-  join(
-    root,
-    "dist",
-    "npm",
-    `vw-ai-vibehub-workbench-mcp-${identity.version}.tgz`,
-  ),
-]);
+let uiHost;
 
-function readJson(path) {
-  return JSON.parse(readFileSync(path, "utf8"));
-}
-
-function run(command, args, options = {}) {
-  const result = spawnSync(command, args, {
-    cwd: options.cwd ?? root,
-    env: options.env ?? process.env,
-    input: options.input,
-    encoding: "utf8",
-  });
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    throw new Error(
-      `${command} ${args.join(" ")} failed (${result.status})\n${result.stdout}\n${result.stderr}`,
-    );
+function invoke(helper, domain, operation, input) {
+  let inputPath;
+  if (input !== undefined) {
+    inputPath = join(temp, `${domain}-${operation}-${Math.random().toString(16).slice(2)}.json`);
+    writeFileSync(inputPath, `${JSON.stringify(input)}\n`);
   }
-  return result.stdout;
-}
-
-async function runMcp(command, args, env) {
-  const child = spawn(command, args, {
-    cwd: repo,
-    env,
-    stdio: ["pipe", "pipe", "pipe"],
-  });
-  const lines = createInterface({ input: child.stdout });
-  let stderr = "";
-  child.stderr.setEncoding("utf8");
-  child.stderr.on("data", (chunk) => {
-    stderr += chunk;
-  });
-
-  const tools = await new Promise((resolveTools, reject) => {
-    const timeout = setTimeout(
-      () => reject(new Error(`thin MCP startup timed out\n${stderr}`)),
-      20_000,
-    );
-    const finish = (callback) => {
-      clearTimeout(timeout);
-      lines.close();
-      callback();
-    };
-    lines.on("line", (line) => {
-      let message;
-      try {
-        message = JSON.parse(line);
-      } catch {
-        return;
-      }
-      if (message.method === "roots/list" && message.id !== undefined) {
-        child.stdin.write(
-          `${JSON.stringify({
-            jsonrpc: "2.0",
-            id: message.id,
-            result: {
-              roots: [{ uri: pathToFileURL(repo).href, name: "thin-plugin" }],
-            },
-          })}\n`,
-        );
-      }
-      if (message.id === 2) {
-        if (message.error) {
-          finish(() => reject(new Error(line)));
-        } else {
-          finish(() => resolveTools(message.result?.tools));
-        }
-      }
-    });
-    child.once("error", (error) => finish(() => reject(error)));
-    child.once("exit", (code, signal) => {
-      if (code !== null || signal !== "SIGTERM") {
-        finish(() =>
-          reject(
-            new Error(
-              `thin MCP exited before tools/list (${code ?? signal})\n${stderr}`,
-            ),
-          ),
-        );
-      }
-    });
-    const send = (message) =>
-      child.stdin.write(`${JSON.stringify(message)}\n`);
-    send({
-      jsonrpc: "2.0",
-      id: 1,
-      method: "initialize",
-      params: {
-        protocolVersion: "2025-03-26",
-        capabilities: { roots: { listChanged: false } },
-        clientInfo: { name: "thin-plugin", version: identity.version },
-      },
-    });
-    send({ jsonrpc: "2.0", method: "notifications/initialized" });
-    send({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
-  });
-  const exited = new Promise((resolveExit) => child.once("exit", resolveExit));
-  child.kill("SIGTERM");
-  await exited;
-  return tools;
+  const args = [helper, domain, operation, "--repo", repo];
+  if (inputPath) args.push("--input", inputPath);
+  const result = spawnSync(process.execPath, args, { encoding: "utf8" });
+  if (result.status !== 0) throw new Error(result.stdout || result.stderr);
+  return JSON.parse(result.stdout);
 }
 
 try {
-  const marketplace = buildClaudeMarketplace({ outputRoot: marketplaceRoot });
-  const artifact = marketplace.pluginRoot;
-  const launcher = join(artifact, "runtime", "vibehub-runtime.mjs");
-  if (!existsSync(launcher)) throw new Error("thin runtime launcher is absent");
-  for (const forbidden of ["node_modules", "packages"]) {
-    if (existsSync(join(artifact, forbidden))) {
-      throw new Error(`thin plugin must not contain ${forbidden}`);
-    }
+  const stats = buildPluginArtifact({ artifactRoot: artifact });
+  for (const required of [
+    ".claude-plugin/plugin.json",
+    ".codex-plugin/plugin.json",
+    "assets/brand/vibehub-logo-dark.svg",
+    "assets/brand/vibehub-logo.svg",
+    "CHANGELOG.md",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/CONCEPT.md",
+    "docs/INSTALL.md",
+    "docs/RELEASE.md",
+    "skills/vibehub-ingest/SKILL.md",
+    "skills/vibehub-ticket-run/SKILL.md",
+    "skills/scripts/vh.mjs",
+    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-review/assets/index.html",
+    "skills/vibehub-ticket-review/assets/app.css",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "skills/contracts/context.schema.json",
+    "skills/contracts/ticket.schema.json",
+  ]) {
+    if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
   }
-
-  const claudeConfig = join(home, ".claude");
-  mkdirSync(claudeConfig, { recursive: true });
-  mkdirSync(repo, { recursive: true });
-  const hostEnv = {
-    ...process.env,
-    HOME: home,
-    CLAUDE_CONFIG_DIR: claudeConfig,
-    NPM_CONFIG_CACHE: join(temp, "npm-cache"),
-    VIBEHUB_RUNTIME_DIR: runtimeRoot,
-    VIBEHUB_RUNTIME_PACKAGE_SPECS: specs,
-  };
-  run("claude", ["plugin", "validate", "--strict", marketplaceRoot], {
-    env: hostEnv,
-  });
-  run(
-    "claude",
-    ["plugin", "marketplace", "add", marketplaceRoot, "--scope", "user"],
-    { env: hostEnv },
-  );
-  run(
-    "claude",
-    ["plugin", "install", "vibehub@vibehub-local", "--scope", "user"],
-    { env: hostEnv },
-  );
-  const installed = JSON.parse(
-    run("claude", ["plugin", "list", "--json"], { env: hostEnv }),
-  ).find((entry) => entry.id === "vibehub@vibehub-local");
-  if (!installed?.enabled || !existsSync(installed.installPath)) {
-    throw new Error("Claude did not install the thin VibeHub plugin");
-  }
-  const installedRoot = realpathSync(installed.installPath);
-  if (
-    existsSync(join(installedRoot, "node_modules")) ||
-    existsSync(join(installedRoot, "packages"))
-  ) {
-    throw new Error("Claude installation materialized a legacy runtime");
-  }
-
-  run("git", ["init", "-q", "-b", "main"], { cwd: repo });
-  run("git", ["config", "user.email", "thin-plugin@vibehub.local"], {
-    cwd: repo,
-  });
-  run("git", ["config", "user.name", "VibeHub Thin Plugin"], { cwd: repo });
-  run("git", ["commit", "-q", "--allow-empty", "-m", "seed"], { cwd: repo });
-  const installedHooks = readJson(join(installedRoot, "hooks", "hooks.json"));
-  const session = installedHooks.hooks.SessionStart[0].hooks[0];
-  const hookEnv = {
-    ...hostEnv,
-    CLAUDE_PLUGIN_ROOT: installedRoot,
-  };
-  const hookInput = JSON.stringify({
-    session_id: "thin-plugin-session",
-    cwd: repo,
-    hook_event_name: "SessionStart",
-  });
-  const hook = JSON.parse(
-    run(
-      session.command,
-      session.args.map((arg) =>
-        arg.replaceAll("${CLAUDE_PLUGIN_ROOT}", installedRoot),
-      ),
-      { cwd: repo, env: hookEnv, input: hookInput },
-    ),
-  );
-  if (!hook.hookSpecificOutput?.additionalContext?.includes("register_scope")) {
-    throw new Error("thin SessionStart hook did not return VibeHub context");
-  }
-
-  const cliManifest = join(
-    runtimeRoot,
+  for (const forbidden of [
+    ".mcp.json",
+    "codex",
+    "hooks",
+    "runtime",
+    "packages",
     "node_modules",
-    "@vw-ai",
-    "vibehub-cli",
-    "package.json",
+  ]) {
+    if (existsSync(join(artifact, forbidden))) throw new Error(`artifact contains forbidden ${forbidden}`);
+  }
+  const codex = JSON.parse(readFileSync(join(artifact, ".codex-plugin", "plugin.json"), "utf8"));
+  if (codex.mcpServers || codex.hooks) throw new Error("Codex manifest still requires MCP or hooks");
+  if (JSON.stringify(codex.interface?.defaultPrompt) !== JSON.stringify(["Start this with VibeHub."])) {
+    throw new Error("Codex manifest does not expose the one canonical VibeHub entry");
+  }
+  const installedPlanSkill = readFileSync(
+    join(artifact, "skills", "vibehub-ticket-plan", "SKILL.md"),
+    "utf8",
   );
-  const firstRuntimeMtime = statSync(cliManifest).mtimeMs;
-  const secondHook = JSON.parse(
-    run(
-      session.command,
-      session.args.map((arg) =>
-        arg.replaceAll("${CLAUDE_PLUGIN_ROOT}", installedRoot),
-      ),
-      { cwd: repo, env: hookEnv, input: hookInput },
-    ),
-  );
-  if (
-    !secondHook.hookSpecificOutput ||
-    statSync(cliManifest).mtimeMs !== firstRuntimeMtime
-  ) {
-    throw new Error("thin runtime cache was not reused");
+  if (!installedPlanSkill.includes("Start this with VibeHub.")
+    || !installedPlanSkill.includes("$vibehub-setup")
+    || !installedPlanSkill.includes("then\n   resume this workflow")) {
+    throw new Error("installed Ticket Plan does not route the canonical entry through Setup");
+  }
+  const lifecycle = JSON.parse(readFileSync(join(
+    artifact,
+    "skills",
+    "vibehub-ticket-review",
+    "references",
+    "ticket-lifecycle.json",
+  ), "utf8"));
+  if (lifecycle.presenter !== "vibehub-ticket-review"
+    || lifecycle.resource_policy?.cross_task_discovery !== "forbidden") {
+    throw new Error("installed Ticket lifecycle contract is invalid");
   }
 
-  const mcp = readJson(join(installedRoot, ".mcp.json")).mcpServers.vibehub;
-  const tools = await runMcp(
-    mcp.command,
-    mcp.args.map((arg) =>
-      arg.replaceAll("${CLAUDE_PLUGIN_ROOT}", installedRoot),
-    ),
-    hookEnv,
-  );
-  if (!Array.isArray(tools) || !tools.some((tool) => tool.name === "kb_retrieve")) {
-    throw new Error("thin MCP did not expose VibeHub tools");
+  const helper = join(artifact, "skills", "scripts", "vh.mjs");
+  mkdirSync(repo, { recursive: true });
+  invoke(helper, "project", "init");
+  invoke(helper, "context", "put", {
+    schema_version: 1,
+    kind: "context",
+    context_id: "decision-clean-install",
+    type: "decision",
+    state: "active",
+    summary: "The installed plugin works without a runtime service",
+    detail: "Skills read and write checked-in JSON-compatible YAML directly.",
+    tags: ["install"],
+    source: { ref: "verification", captured_at: "2026-07-31T22:00:00.000Z" },
+    evidence: [{ ref: "scripts/verify-plugin-artifact.mjs", note: "Fresh-process artifact verification." }],
+    relations: [],
+  });
+  const query = invoke(helper, "context", "query", { query: "runtime service" });
+  if (query.data.count !== 1) throw new Error("installed Context roundtrip failed");
+  invoke(helper, "ticket", "apply", {
+    tickets: [{
+      schema_version: 1,
+      kind: "ticket",
+      ticket_id: "ticket-build-entry-fixture",
+      outcome: "The concrete entry fixture produces one executable checked-in Ticket.",
+      context: "A clean installed plugin received a concrete deliverable followed by the exact canonical entry Start this with VibeHub.",
+      acceptance: [{
+        acceptance_id: "entry-reaches-ready-ticket",
+        criterion: "The initialized repository exposes this applied Ticket as READY.",
+      }],
+      constraints: ["Reuse Setup and Ticket Plan without a router or runtime service."],
+      context_refs: [],
+      relations: [],
+      provenance_refs: ["prompt:Start-this-with-VibeHub"],
+    }],
+  });
+  const frontier = invoke(helper, "ticket", "frontier");
+  if (frontier.data.count !== 1
+    || frontier.data.ready[0]?.ticket?.ticket_id !== "ticket-build-entry-fixture") {
+    throw new Error("canonical entry scenario did not reach a READY Ticket");
   }
 
-  const runtimePackages = [
-    "@vw-ai/vibehub-core",
-    "@vw-ai/vibehub-cli",
-    "@vw-ai/vibehub-workbench-mcp",
-  ];
-  for (const name of runtimePackages) {
-    const [scope, packageName] = name.split("/");
-    const manifest = readJson(
-      join(runtimeRoot, "node_modules", scope, packageName, "package.json"),
-    );
-    if (manifest.version !== identity.version) {
-      throw new Error(`${name} runtime version drifted`);
-    }
-  }
-
-  process.stdout.write(
-    `${JSON.stringify({
-      ok: true,
-      version: identity.version,
-      artifact: "thin",
-      runtime: "npm",
-      cache: "reused",
-      claude: "installed",
-      mcp: "ready",
-    })}\n`,
+  const installedScript = readFileSync(
+    join(artifact, "skills", "vibehub-ticket-review", "assets", "app.js"),
+    "utf8",
   );
+  if (/\/api\/(?:review|decision)/u.test(installedScript)) {
+    throw new Error("installed local UI still contains writable review routes");
+  }
+  if (/history\.replaceState/u.test(installedScript)
+    || !/copyText\(location\.href, "Authorized link copied"\)/u.test(installedScript)) {
+    throw new Error("installed local UI does not preserve a portable authorized URL");
+  }
+  const uiModule = await import(pathToFileURL(
+    join(artifact, "skills", "scripts", "vh-ui.mjs"),
+  ).href);
+  uiHost = uiModule.startVibeHubUi({
+    repoRoot: repo,
+    token: "artifact-verification-token",
+    tokenLifetimeMs: 60_000,
+  });
+  const { origin } = await uiHost.ready;
+  const health = await (await fetch(`${origin}/health`)).json();
+  if (!health.ok || health.readOnly !== true) {
+    throw new Error("installed UI health check failed");
+  }
+  const stateResponse = await fetch(`${origin}/api/state`, {
+    headers: { Authorization: `Bearer ${uiHost.token}` },
+  });
+  const state = await stateResponse.json();
+  if (!state.ok || state.data.graph.tickets.length !== 1) {
+    throw new Error("installed UI graph projection failed");
+  }
+  await uiHost.close();
+  uiHost = undefined;
+
+  process.stdout.write(`${JSON.stringify({
+    ok: true,
+    artifact: "skill-first-with-local-ui",
+    ui: "read-only-loopback",
+    ...stats,
+  })}\n`);
 } finally {
-  if (keep) {
-    process.stderr.write(`kept thin plugin verification at ${temp}\n`);
-  } else {
-    rmSync(temp, { recursive: true, force: true });
-  }
+  if (uiHost) await uiHost.close();
+  rmSync(temp, { recursive: true, force: true });
 }

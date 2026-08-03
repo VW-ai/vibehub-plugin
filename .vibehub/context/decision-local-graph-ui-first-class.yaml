@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-local-graph-ui-first-class",
+  "detail": "VibeHub must bring back the local Ticket graph UI rather than relying only on Agent conversation and GitHub review. The earlier visual and interaction design is valuable and should be recovered from Git history where it still fits the direct Git-YAML model. A lightweight local launcher or narrow CLI is an acceptable cost when it exists only to select a repository, start the loopback UI, and optionally open the browser. This amends the earlier cleanup decision only where it excluded a local graph host or any CLI entrypoint: it does not authorize restoring the old large CLI, SQLite/native runtime, MCP, hook cadence, dispatcher, leases, ContextBinding, attestation stack, or a second source of truth. The UI reads current Context, Ticket, Evidence, and Outcome YAML directly; Git remains truth. Any writable UI action requires separate explicit product authority and must write the same governed files without hidden state.",
+  "evidence": [
+    {
+      "note": "The rollback baseline contains the earlier static graph UI, inspector, graph layout, minimap, loopback host, and their tests for selective recovery.",
+      "ref": "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91"
+    },
+    {
+      "note": "The repository owner rejected the no-local-UI result and explicitly authorized the cost of a narrow launcher.",
+      "ref": "conversation:2026-08-02-local-graph-ui"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dogfood-only-phase",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-02T07:03:29Z",
+    "quote": "我们要bring back我们那个local的graph UI……哪怕我们最后还是可能为了使用UI之后还是需要去做一个light的这样一个CLI,这个成本是可以接受的,只不过我们之前那个cli大的有点太过分了",
+    "ref": "conversation:2026-08-02-local-graph-ui"
+  },
+  "state": "active",
+  "summary": "The comprehensive local Ticket graph UI is a first-class VibeHub surface",
+  "tags": [
+    "architecture",
+    "cli",
+    "graph",
+    "local-ui",
+    "tickets"
+  ],
+  "type": "decision"
+}

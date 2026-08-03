@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.4.0 — 2026-08-02
+
+- Pivot VibeHub to a lightweight Skill-first plugin with direct Git-native
+  Context, Tickets, Evidence, and Outcomes.
+- Remove the required Core/CLI/MCP packages, SQLite/native runtime, hooks,
+  dispatcher, coordination/attestation stack, and old writable review host.
+- Add dependency-free schemas, validation, fresh-process Context roundtrips,
+  Ticket graph checks, and direct dependent unlock semantics.
+- Restore the comprehensive local Ticket graph as a dependency-free read-only
+  loopback UI that projects the checked-in YAML directly, without reviving the
+  old CLI/runtime stack.
+- Replace the nested popover-style graph shell with a full-window VibeHub
+  workbench and preserve the short-lived authorized URL so it can be copied
+  into the user's normal browser.
+- Present the focused Execution, Contract, Log, or graph surface automatically
+  at lifecycle moments where human attention matters while routine execution
+  stays quiet.
+- Publish the Skill-first plugin as a versioned GitHub Release artifact with a
+  checksum. npm is no longer a VibeHub distribution surface.
+- Collapse the public product surface to one canonical entry—`Start this with
+  VibeHub.`—and add a dark-mode-safe wordmark for GitHub.
+
+**Breaking:** v0.4.0 deliberately removes the v0.3 Core/CLI/MCP runtime and its
+npm-backed installation path. Existing `.vibehub/` Context and Ticket documents
+remain ordinary Git files.
+
 All notable VibeHub changes are recorded here. Versions follow Semantic
 Versioning.
 

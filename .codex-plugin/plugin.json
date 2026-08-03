@@ -1,7 +1,7 @@
 {
   "name": "vibehub",
-  "version": "0.3.0",
-  "description": "Git-native executable Ticket graphs, governed project context, and deterministic lifecycle evidence for Claude Code and Codex.",
+  "version": "0.4.0",
+  "description": "Lightweight Skill-first development cycles with Git-native Tickets and durable project Context.",
   "author": {
     "name": "VibeHub Team",
     "url": "https://github.com/VW-ai/vibehub-plugin"
@@ -13,16 +13,14 @@
     "context",
     "collaboration",
     "knowledge",
-    "hooks",
-    "mcp"
+    "tickets",
+    "skills"
   ],
   "skills": "./skills/",
-  "mcpServers": "./codex/mcp.json",
-  "hooks": "./codex/hooks.json",
   "interface": {
     "displayName": "VibeHub",
     "shortDescription": "Executable Ticket graphs for coding agents",
-    "longDescription": "Use Git-native durable semantics with skill-owned intelligence, deterministic CLI/MCP operations, disposable local coordination, and lifecycle evidence across Codex and Claude Code.",
+    "longDescription": "Use Skill-owned workflows and directly checked-in YAML for Ticket-driven development and durable project Context across Codex and Claude Code.",
     "developerName": "VibeHub Team",
     "category": "Developer Tools",
     "capabilities": [
@@ -32,9 +30,7 @@
     ],
     "websiteURL": "https://github.com/VW-ai/vibehub-plugin",
     "defaultPrompt": [
-      "Set up VibeHub for this project.",
-      "Query VibeHub before changing this unfamiliar area.",
-      "Plan this deliverable as an honest VibeHub Ticket graph."
+      "Start this with VibeHub."
     ],
     "brandColor": "#3E7D4C"
   }

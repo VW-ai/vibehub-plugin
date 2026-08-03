@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "one-copy-handoff-per-object",
+    "evidence-references-are-typed-and-compact",
+    "bound-context-is-inspectable",
+    "source-actions-are-mechanical-and-honest",
+    "relations-and-provenance-have-visual-language",
+    "read-only-boundary-remains-light"
+  ],
+  "evidence_id": "context-handoff-refinement",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T20:01:00.000Z",
+  "refs": [
+    "git:720a961",
+    "conversation:2026-08-02-only-copy-for-agent-no-context-json",
+    "browser:current-ticket-bound-context-source-evidence-relations-desktop-and-390x720",
+    "test:npm-run-verify-9-of-9-32-files-227691-bytes",
+    "file:skills/vibehub-ticket-review/assets/app.js",
+    "file:skills/vibehub-ticket-review/assets/app.css",
+    "file:test/ui-host.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "After owner dogfood rejected redundant per-reference copy controls and raw JSON-shaped Bound Context facts, commit 720a961 narrowed every visible object to one labeled Copy for Agent action while retaining honest editor and commit-pinned GitHub links. Canonical Context now projects Source as the exact captured quote, typed ref, and timestamp; Evidence as individual note-and-ref records; Relations as directional Context connections; and identity as a compact footer. Evidence and provenance refs remain typed and readable but no longer expose per-ref copy buttons. Real-browser review on the current Ticket covered desktop and 390x720 expanded Context views with no overflow or runtime warnings. Full verification passed 9 of 9 tests and the dependency-free 32-file artifact at 227691 bytes.",
+  "ticket_id": "ticket-make-static-graph-actionable"
+}

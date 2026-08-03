@@ -1,7 +1,4 @@
 node_modules/
-.pnpm-store/
-**/node_modules/
-**/dist/
-**/coverage/
-**/test-results/
-**/playwright-report/
+dist/
+coverage/
+test-results/

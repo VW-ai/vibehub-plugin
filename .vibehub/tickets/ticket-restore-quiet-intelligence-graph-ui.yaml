@@ -1,0 +1,92 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "design-authority-is-explicit",
+      "criterion": "A concise checked-in local-graph design brief translates the approved quiet-intelligence and v8 causal-graph authority into this Plugin surface, explicitly identifies which historical product-language and interaction principles are retained, which old runtime capabilities are excluded, and why the rejected warm editorial/card-viewer direction is removed."
+    },
+    {
+      "acceptance_id": "causal-graph-is-primary",
+      "criterion": "The complete direct-unlock graph is the dominant first view, reads left-to-right as what becomes executable next, uses deterministic stable layout with clear fork/join paths and no selection-driven reflow, keeps every non-orphan Ticket reachable, and preserves pan, zoom, fit, minimap, Ticket selection, relation selection, and causal-path focus."
+    },
+    {
+      "acceptance_id": "quiet-progressive-disclosure",
+      "criterion": "The default surface is visually quiet and answers current source, executable frontier, blockers, deviations, and proof without exposing raw schema vocabulary or a dense dashboard; selecting a Ticket or relation keeps the graph visible and progressively reveals outcome, exact dependency rationale, bounded Context, constraints, acceptance, Evidence, Outcome, provenance, and trace no more than two direct interactions from the graph."
+    },
+    {
+      "acceptance_id": "spatial-language-matches-authority",
+      "criterion": "Desktop and narrow real-browser screenshots over a representative fork-and-join fixture demonstrate compact system typography, cool-neutral matte surfaces, restrained elevation, a coherent small shape vocabulary, relations and symbols before chrome, neutral interaction states, and semantic color limited to truthful runtime meaning; warm editorial/serif branding, decorative green emphasis, persistent state legend, and floating dashboard-card styling are absent."
+    },
+    {
+      "acceptance_id": "interaction-is-deliberate-and-accessible",
+      "criterion": "Hover, selection, focus, close/back, source refresh, Copy link, graph controls, minimap recentering, and responsive Inspector behavior form one coherent interaction model; core controls are keyboard reachable with readable focus and contrast, reduced motion is honored, touch targets remain usable, and no affordance promises a capability or fact unavailable from canonical documents."
+    },
+    {
+      "acceptance_id": "mechanical-boundary-remains-light",
+      "criterion": "The clean Plugin artifact still has zero package dependencies and no database, cache, hidden durable state, writes, restored legacy runtime, or semantic inference in the browser; it reads fresh schema-validated Context, Ticket, Evidence, and Outcome files through the loopback GET/HEAD-only host with the existing expiring fragment bearer and restrictive security headers."
+    },
+    {
+      "acceptance_id": "owner-approves-design-direction",
+      "criterion": "After seeing the real desktop and narrow surfaces, the repository owner explicitly confirms that the UI once again feels aligned with the intended VibeHub product direction; automated checks and an independent Agent cannot substitute for this aesthetic and interaction judgment."
+    }
+  ],
+  "constraints": [
+    "Move fast and delete the rejected presentation rather than preserving CSS or DOM compatibility.",
+    "Use the approved historical design authority as a product contract, not as permission to restore historical runtime architecture.",
+    "Do not invent active Run, human decision, stale-context, review, comment, or write facts that the canonical v1 documents cannot prove.",
+    "Keep Git and the four schema-valid document families as the sole durable truth; browser selection, pan, zoom, and layout remain disposable view state.",
+    "The owner approval criterion is a protected human boundary and must remain unresolved until the owner reviews the rendered result.",
+    "Clean one-shot inputs, screenshots, extracted references, and test artifacts after use; durable Evidence may cite stable Git refs and digests but not depend only on temporary paths."
+  ],
+  "context": "Dogfood invalidated the visual success claimed by ticket-rebuild-local-graph-workbench. That Ticket repaired link portability and removed nested shells, but the resulting warm editorial palette, serif display type, persistent toolbar and legend, card-heavy graph, and schema-forward inspector do not express VibeHub's approved product language and give the owner no desire to use the surface. Treat this as a design-direction rebuild, not polish. Recover the ratified v8 spatial-workbench and causal Ticket-graph interaction contract from the newly captured authority: one complete deterministic left-to-right graph answers what becomes executable next; the default view is quiet; deviations and proof appear at their owning locus; selection preserves the graph and progressively reveals exact trace. Preserve the current narrow loopback host, portable authorized URL, direct schema-valid Git-YAML read path, and zero-dependency boundary. Do not restore the old runtime, database, MCP, leases, hooks, writable intervention system, or unsupported facts merely because the historical UI once projected them.",
+  "context_refs": [
+    {
+      "purpose": "Binding visual and interaction authority for every VibeHub UI.",
+      "ref": ".vibehub/context/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Product authority for a comprehensive local Ticket graph and narrow launcher.",
+      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Binding Agent-output and mechanical-consumer architecture boundary.",
+      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Lifecycle rules for temporary design and verification artifacts.",
+      "ref": ".vibehub/context/convention-disposable-artifacts-are-cleaned.yaml"
+    },
+    {
+      "purpose": "Current graph, toolbar, and Inspector structure to replace or refine.",
+      "ref": "skills/vibehub-ticket-review/assets/index.html"
+    },
+    {
+      "purpose": "Current conflicting visual tokens and presentation language to remove.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    },
+    {
+      "purpose": "Working graph layout, projection, interaction, and trace behavior to preserve where it matches the authority.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Read-only loopback, validation, portable authorization, and launcher boundary that must survive.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The local Ticket graph feels like VibeHub's approved quiet-intelligence execution instrument while remaining a lightweight mechanical projection of canonical Git documents.",
+  "provenance_refs": [
+    "conversation:2026-08-02-ui-standard-reaffirmed",
+    "dogfood:current-local-graph-has-no-desire-to-use",
+    "commit:9dee0f0:META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml",
+    "commit:9dee0f0:META/legacy-21-workbench/specs/decision-workbench-014.yaml"
+  ],
+  "relations": [
+    {
+      "rationale": "Reuse only the completed Ticket's portable authorized link and lightweight mechanical host while superseding its rejected presentation direction.",
+      "target_ticket_id": "ticket-rebuild-local-graph-workbench",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
+}

@@ -1,0 +1,84 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "default-view-orients-immediately",
+      "criterion": "The first real-browser view makes the exact project/worktree source, causal direction, executable frontier, and any blocker or deviation immediately distinguishable without opening the Inspector, reading raw schema terms, or scanning a dashboard legend."
+    },
+    {
+      "acceptance_id": "selection-is-one-execution-lens",
+      "criterion": "Selecting a Ticket produces one stable visual focus rather than competing frames or layout movement: the graph keeps the Ticket's causal position visible while the first Inspector view answers intended outcome, current state and why, direct prerequisites/unlocks, and proof availability before secondary details."
+    },
+    {
+      "acceptance_id": "detail-is-progressive-and-task-ordered",
+      "criterion": "From the selected Ticket, exact dependency rationale, bounded Context, constraints, acceptance, Evidence, Outcome, provenance, and Git trace are reachable in a task-oriented order with no important fact more than one further disclosure away and no unsupported action implied."
+    },
+    {
+      "acceptance_id": "navigation-feels-fluid-and-predictable",
+      "criterion": "Mouse, keyboard, pan, zoom, fit, minimap, Ticket/relation selection, close/back, refresh, and narrow-screen Inspector behavior work as one predictable model over representative multiple-root, fork, join, blocked, completed, and deviated topology, with stable layout, visible focus, no transient duplicate selection affordance, and reduced-motion support."
+    },
+    {
+      "acceptance_id": "lightweight-boundary-survives",
+      "criterion": "The verified clean Plugin remains dependency-free and read-only with one ephemeral loopback host per exact worktree, fresh schema-validated Git-YAML projection, expiring fragment bearer, restrictive headers, and no database, cache, daemon, branch aggregation, hidden state, semantic inference, or write route."
+    },
+    {
+      "acceptance_id": "owner-approves-daily-interaction-direction",
+      "criterion": "After at least one rapid real-browser feedback loop on the actual repository, the owner explicitly confirms that the interaction direction is worth using during normal Ticket-driven development; automated checks and an Agent cannot substitute for this judgment."
+    }
+  ],
+  "constraints": [
+    "Treat the current surface as a product baseline, not a DOM or CSS compatibility contract; replace weak interaction and presentation directly.",
+    "Optimize for rapid real-browser iteration with the owner and delete rejected experiments instead of building compatibility or abstraction layers.",
+    "Keep one complete deterministic causal graph primary; do not turn the page into a dashboard, kanban board, raw schema viewer, or branch switcher.",
+    "Keep the first-class UI read-only and mechanically derived from current schema-valid Context, Ticket, Evidence, and Outcome files; do not add fake actions or unsupported facts.",
+    "Do not add a frontend framework, package dependency, database, daemon, persistent cache, host registry, or writable endpoint for this interaction sprint.",
+    "Final daily-use interaction judgment remains a protected owner choice after reviewing the real desktop and narrow browser surfaces."
+  ],
+  "context": "The restored quiet-intelligence graph is now approved as a clear enough product baseline. The next step is not more runtime architecture or visual polish in isolation; it is a focused frontend interaction sprint over the real Ticket workflow. Optimize the path from opening the graph, locating executable or troubled work, selecting a Ticket, understanding why it is READY/BLOCKED/DONE/DEVIATED, inspecting only the Context and proof needed, and returning to development. Iterate in the real browser with the owner, keep experiments cheap, and delete rejected interaction or presentation work. Preserve the graph as the primary causal object and the current read-only canonical Git-YAML boundary. Do not invent Run state, branch aggregation, write actions, or backend machinery merely to make the prototype feel active.",
+  "context_refs": [
+    {
+      "purpose": "Binding visual and interaction standard for a quiet execution instrument.",
+      "ref": ".vibehub/context/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Authority for the local graph and narrow per-worktree launcher.",
+      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Mechanical read-only consumer and canonical-data boundary.",
+      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Approved baseline product language that interaction changes must strengthen rather than replace.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Current information architecture and reachable controls.",
+      "ref": "skills/vibehub-ticket-review/assets/index.html"
+    },
+    {
+      "purpose": "Current spatial, responsive, focus, selection, and state presentation.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    },
+    {
+      "purpose": "Current graph projection, selection, navigation, and Inspector behavior.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A human can open the local Ticket graph and move from orientation to a confident understanding of one Ticket's state, causal position, and proof through a fast, coherent interaction that feels useful during daily development.",
+  "provenance_refs": [
+    "conversation:2026-08-02-current-ui-is-clear-enough-baseline",
+    "conversation:2026-08-02-serious-ticket-interaction-design-sprint",
+    "context:constraint-ui-quiet-intelligence-standard",
+    "context:decision-local-graph-ui-first-class"
+  ],
+  "relations": [
+    {
+      "rationale": "Use the owner-approved quiet-intelligence graph as the baseline before optimizing its daily Ticket interaction.",
+      "target_ticket_id": "ticket-restore-quiet-intelligence-graph-ui",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-refine-local-ticket-interaction"
+}

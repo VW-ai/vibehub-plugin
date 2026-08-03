@@ -1,0 +1,76 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "graph-experience-restored",
+      "criterion": "The local browser UI renders the current directed Ticket dependency graph with READY/BLOCKED/DONE and non-success Outcome states, selectable nodes and edges, pan/zoom, fit, minimap navigation, causal-cone highlighting, responsive layout, empty/loading/error states, and the established visual design selectively recovered from commit 9dee0f0."
+    },
+    {
+      "acceptance_id": "inspector-reads-current-yaml",
+      "criterion": "Selecting the graph or a Ticket/edge shows current outcome, context, acceptance, constraints, Context references, provenance, dependencies, acceptance-linked Evidence, and Outcome directly projected from the exact checkout's `.vibehub` YAML; refresh rereads disk and no database, persistent cache, compiled Context copy, or second truth exists."
+    },
+    {
+      "acceptance_id": "launcher-is-narrow-and-safe",
+      "criterion": "A dependency-free Node launcher included in the plugin accepts only repository/port/open/json-style UI flags, binds to loopback on an ephemeral port by default, uses a random short-lived bearer URL and restrictive security headers, opens or prints the URL, shuts down cleanly, and neither installs a global executable nor starts a daemon or writable server."
+    },
+    {
+      "acceptance_id": "skill-and-artifact-work-cleanly",
+      "criterion": "`$vibehub-ticket-review` teaches the Agent to launch or converse over the same graph, and clean Claude/Codex marketplace artifacts contain the UI assets and launcher, can open a temporary Git-YAML project, and pass automated host/API plus browser-surface verification without package installation or native build."
+    },
+    {
+      "acceptance_id": "legacy-bulk-remains-absent",
+      "criterion": "The implementation does not restore packages/core, packages/cli, packages/mcp, pnpm workspace metadata, SQLite/better-sqlite3, MCP, hooks, generic dispatcher, lease/heartbeat coordination, ContextBinding, Decision attestation/trust store, writable review endpoints, or any hidden lifecycle state; closeout reports final source and artifact footprint."
+    },
+    {
+      "acceptance_id": "canonical-output-is-mechanical",
+      "criterion": "Schema-valid canonical Context, Ticket, Evidence, and Outcome documents produced by an Agent are sufficient input for UI and lightweight CLI consumers: valid fixtures project without semantic services, invalid documents fail visibly before projection, and disposable selection/pan/zoom/layout state never becomes durable truth."
+    }
+  ],
+  "constraints": [
+    "Favor selective recovery of the proven HTML/CSS/graph interactions over a visual redesign.",
+    "Write a new small direct-YAML projection and host rather than adapting the old runtime stack.",
+    "Use Node.js standard-library modules only and keep the existing zero-production-dependency package contract.",
+    "Keep the first UI read-only; do not expose POST mutation, review, approval, or Decision authority routes.",
+    "Git files remain the sole durable truth and a page refresh must be sufficient to observe current state.",
+    "Recover every old display or interaction whose required facts can be derived from canonical documents; exclude only behavior that needs unavailable facts or new write authority.",
+    "Treat shared schema validation as the consumer boundary and fail visibly rather than introducing semantic inference or compatibility guesses downstream."
+  ],
+  "context": "The owner explicitly rejected removing the local graph UI and authorized a lightweight launcher while retaining the speed-first architecture. Recover the valuable visual and interaction design from rollback baseline commit 9dee0f095374211d8d7cbeeacac653ebb87bed91, especially the directed graph, pan/zoom, minimap, causal highlighting, source status, and Ticket inspector. The Agent and Skills own semantic judgment; their schema-valid canonical files are the complete handoff to downstream UI, lightweight CLI, and Cloud consumers. Do not restore the old TypeScript packages, SQLite-backed host, projector stack, review/Decision attestation, dispatcher, or distribution CLI. The first restored vertical slice is read-only; future browser writes require separate product authority and a focused Ticket.",
+  "context_refs": [
+    {
+      "purpose": "Owner authority to restore the local UI and accept a narrow launcher.",
+      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Binding handoff contract from Agent-produced canonical documents to mechanical UI, CLI, and Cloud consumers.",
+      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Binding constraints against rebuilding the old runtime and second state system.",
+      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Current direct Git-YAML reader, validator, graph state, and potential shared projection boundary.",
+      "ref": "skills/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Current conversation-only review entrypoint that must gain local UI launch guidance.",
+      "ref": "skills/vibehub-ticket-review/SKILL.md"
+    },
+    {
+      "purpose": "Current dependency-free artifact boundary that must include the restored UI.",
+      "ref": "scripts/build-plugin-artifact.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A clean-installed VibeHub plugin can open the comprehensive local Ticket graph UI for an exact repository through a dependency-free narrow launcher that mechanically consumes schema-valid canonical Context, Tickets, Evidence, and Outcomes.",
+  "provenance_refs": [
+    "conversation:2026-08-02-local-graph-ui",
+    "conversation:2026-08-02-canonical-agent-output",
+    "context:decision-local-graph-ui-first-class",
+    "context:contract-canonical-agent-output",
+    "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-restore-local-graph-ui"
+}

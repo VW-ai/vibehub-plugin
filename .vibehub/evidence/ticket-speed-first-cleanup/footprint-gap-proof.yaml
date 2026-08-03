@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "footprint-and-gap-report"
+  ],
+  "evidence_id": "footprint-gap-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-07-31T22:24:04.000Z",
+  "refs": [
+    "docs/SPEED_FIRST_CLEANUP.md",
+    "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in report records before/after files, lines, dependencies, artifact bytes, deleted surfaces, preserved invariants, verification, and every observed gap without a parity checklist.",
+  "ticket_id": "ticket-speed-first-cleanup"
+}

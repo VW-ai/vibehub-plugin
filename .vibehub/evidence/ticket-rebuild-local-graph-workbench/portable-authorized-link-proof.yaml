@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "authorized-link-is-portable"
+  ],
+  "evidence_id": "portable-authorized-link-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T09:15:00Z",
+  "refs": [
+    "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/assets/index.html",
+    "test/ui-host.test.mjs",
+    "browser:2026-08-02-copy-authorized-link",
+    "browser:2026-08-02-second-tab-portability",
+    "browser:2026-08-02-bare-origin-recovery"
+  ],
+  "schema_version": 1,
+  "summary": "The client no longer calls history.replaceState, retains the complete short-lived bearer fragment in location.href, and exposes a Copy link control. Real-browser interaction reported `Authorized link copied`; opening the same complete URL in a second tab rendered the 4-Ticket graph and retained the exact fragment, while the bare origin rendered explicit recovery guidance to copy the complete URL including the text after #. The server still receives the token only through the Authorization header.",
+  "ticket_id": "ticket-rebuild-local-graph-workbench"
+}

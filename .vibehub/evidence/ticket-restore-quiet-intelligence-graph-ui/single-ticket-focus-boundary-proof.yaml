@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "interaction-is-deliberate-and-accessible"
+  ],
+  "evidence_id": "single-ticket-focus-boundary-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-02T08:34:17Z",
+  "refs": [
+    "commit:d9c6a65be4d5759b148552ad555882c32e6a6093",
+    "skills/vibehub-ticket-review/assets/app.css",
+    "test/ui-host.test.mjs",
+    "browser-test:focus-visible-ticket-uses-inner-boundary-with-no-group-outline",
+    "command:npm-test-8-of-8",
+    "command:npm-run-verify-8-of-8"
+  ],
+  "schema_version": 1,
+  "summary": "Dogfood isolated the transient second selection frame to the browser focus outline on the focusable SVG Ticket group immediately before selection re-render replaced that group. Commit d9c6a65 removes the outer SVG-group outline while retaining keyboard focus on the Ticket's own boundary and relation geometry. In the real loopback browser, closing the Inspector restored focus to the Ticket with :focus-visible true, outer outline none, and the Ticket boundary visibly stroked; pointer selection retained a single selected boundary. All 8 tests and the clean plugin verification passed.",
+  "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
+}

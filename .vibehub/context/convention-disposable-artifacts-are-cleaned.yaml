@@ -1,0 +1,41 @@
+{
+  "context_id": "convention-disposable-artifacts-are-cleaned",
+  "detail": "Canonical project state under .vibehub is limited to Context, Ticket, Evidence, and Outcome documents in their named directories. One-shot query inputs, candidate payloads, browser screenshots, extracted historical assets, test repositories, staged install artifacts, sockets, logs, and other reproducible intermediates belong in standard input or the operating system temporary directory and must be removed when their run or review is finished. Test and launcher code must clean temporary paths on success and failure where it owns their lifecycle. Durable Evidence must not depend only on a temporary path: preserve a stable Git ref and digest, or check in the smallest necessary evidence asset when the visual artifact itself must survive. Do not create an extra cache, tmp, runtime, or session subtree inside .vibehub merely to make temporary work visible.",
+  "evidence": [
+    {
+      "note": "The current helper persists only canonical Context, Ticket, Evidence, and Outcome files and already uses atomic transient files for document writes.",
+      "ref": "skills/scripts/vh.mjs"
+    },
+    {
+      "note": "The current project root contains only the four formal durable document families; temporary investigation inputs remain outside it.",
+      "ref": ".vibehub/"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-02T08:06:31Z",
+    "quote": "反正我们只要记得就把这些东西删掉就可以",
+    "ref": "conversation:2026-08-02-temporary-artifact-cleanup"
+  },
+  "state": "active",
+  "summary": "Disposable VibeHub inputs and verification artifacts never become durable project state",
+  "tags": [
+    "cleanup",
+    "evidence",
+    "filesystem",
+    "maintenance",
+    "temporary-files"
+  ],
+  "type": "convention"
+}

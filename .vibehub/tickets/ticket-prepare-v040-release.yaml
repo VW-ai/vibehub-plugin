@@ -1,0 +1,114 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "readme-leads-with-product-and-visual",
+      "criterion": "README opens with the VibeHub brand, a concise Ticket-driven development proposition, and an approved local graph visual, then makes the Ticket/Context split and three-second product value understandable before architecture detail; every referenced local asset resolves and the page remains readable on GitHub."
+    },
+    {
+      "acceptance_id": "readme-teaches-the-real-workflow",
+      "criterion": "README describes the current lifecycle truth: Plan presents a new Ticket, routine Run stays quiet, protected human attention presents Contract, Closeout presents Log, and explicit review/launcher use is a fallback; it no longer tells users they must remember to ask for the UI and remains honest about independent Outcome and explicit durable Context capture."
+    },
+    {
+      "acceptance_id": "v040-identity-is-consistent",
+      "criterion": "package metadata, Codex manifest, Claude plugin manifest, and Claude marketplace metadata all report 0.4.0; Changelog has a dated 0.4.0 entry summarizing the Skill-first pivot, local graph, proactive workflow, breaking runtime removal, and GitHub-only distribution with no stale Unreleased claims for shipped work."
+    },
+    {
+      "acceptance_id": "github-release-is-small-and-reproducible",
+      "criterion": "A tag-triggered GitHub Actions workflow validates that v0.4.0 matches every manifest, runs the complete verification suite, builds the dependency-free plugin artifact, archives it, produces a SHA-256 checksum, and creates the GitHub Release; it contains no npm authentication, package publication, host matrix, native build, marketplace branch, or restored installer machinery."
+    },
+    {
+      "acceptance_id": "release-procedure-is-explicit",
+      "criterion": "A concise checked-in release procedure states the real order—merge verified PR to main, tag the exact main commit, let the tag workflow publish the artifact, and verify the GitHub Release—and explicitly says npm is not a release surface for this product generation."
+    },
+    {
+      "acceptance_id": "release-candidate-is-merge-ready",
+      "criterion": "The branch still contains current origin/main without divergence, project/Ticket validation and the full test/artifact suite pass, the built artifact contains only the intended plugin surface, and the prepared PR summary accurately calls out the v0.4.0 architecture break, user-visible workflow, validation, and any still-open follow-up Tickets."
+    }
+  ],
+  "constraints": [
+    "Move quickly and replace the current text-heavy README directly; do not build a documentation site or introduce a frontend/docs framework.",
+    "Use approved checked-in VibeHub brand and graph assets; do not invent a second visual identity or depend on external image hosting.",
+    "Publish v0.4.0 through Git tag and GitHub Release only; do not restore npm publishing, packages, lockfiles, CLI, MCP, SQLite, native builds, hooks, installers, marketplace branches, or runtime host matrices.",
+    "Keep package.json private and dependency-free; its version remains useful release identity even though it is not published to npm.",
+    "Do not tag or create the final GitHub Release from the feature branch; release only the exact verified commit after the PR reaches main.",
+    "Do not silently close or execute unrelated follow-up Tickets as release ceremony; report them honestly.",
+    "Keep the release workflow and documentation small enough to audit in one screen where practical."
+  ],
+  "context": "The owner has moved the current product into final main-merge and formal release preparation. This branch is 41 commits ahead of current origin/main and contains it without divergence. The last public release is v0.3.0, whose npm-backed CLI/Core/MCP distribution no longer exists; the current package.json is private and only supplies local verification/build scripts, and the old npm/release workflows and publishing docs were deliberately deleted. Treat v0.4.0 as the next product generation: a dependency-free Claude/Codex plugin made of Skills, canonical Git-native Context/Tickets/Evidence/Outcomes, a narrow validator, and a read-only local Ticket graph. The README must lead with the product thesis and approved graph visual, explain that Ticket Skills proactively present Execution/Contract/Log at human-attention boundaries, keep explicit UI launch as a fallback, and make the deliberate absence of CLI/MCP/database/hooks understandable rather than defensive. Release means a merged main commit, matching 0.4.0 manifests, tag v0.4.0, and a GitHub Release containing the clean plugin artifact plus checksum; it does not mean npm publish.",
+  "context_refs": [
+    {
+      "purpose": "Binding Skill-first architecture and explicit removal of npm-backed runtime machinery.",
+      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Authority for the first-class read-only graph and narrow launcher.",
+      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Current proactive workflow presentation truth to teach publicly.",
+      "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+    },
+    {
+      "purpose": "Primary public product and onboarding surface to redesign.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Public version history to cut for v0.4.0.",
+      "ref": "CHANGELOG.md"
+    },
+    {
+      "purpose": "Private package metadata and local build identity.",
+      "ref": "package.json"
+    },
+    {
+      "purpose": "Codex plugin release identity and product metadata.",
+      "ref": ".codex-plugin/plugin.json"
+    },
+    {
+      "purpose": "Claude plugin release identity.",
+      "ref": ".claude-plugin/plugin.json"
+    },
+    {
+      "purpose": "Claude marketplace release identity.",
+      "ref": ".claude-plugin/marketplace.json"
+    },
+    {
+      "purpose": "Current dependency-free CI baseline that release must preserve.",
+      "ref": ".github/workflows/verify.yml"
+    },
+    {
+      "purpose": "Canonical clean plugin artifact builder for the GitHub Release.",
+      "ref": "scripts/build-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Clean-install artifact boundary to retain in the release gate.",
+      "ref": "scripts/verify-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Approved local graph visual for the public product story.",
+      "ref": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "VibeHub v0.4.0 is a polished, verifiable GitHub plugin release candidate whose README, visuals, manifests, changelog, focused Ticket workflow, and tag-triggered artifact release all express the same lightweight Skill-first product without restoring npm publication or the removed runtime stack.",
+  "provenance_refs": [
+    "conversation:2026-08-02-owner-requests-main-merge-and-formal-release",
+    "git:v0.3.0",
+    "git:938e2a8",
+    "github:release-v0.3.0-is-current-latest"
+  ],
+  "relations": [
+    {
+      "rationale": "Package and document the independently accepted actionable graph rather than releasing an unresolved visual direction.",
+      "target_ticket_id": "ticket-make-static-graph-actionable",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Teach and ship the completed lifecycle-driven presentation behavior as part of the release.",
+      "target_ticket_id": "ticket-make-workflow-present-itself",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-prepare-v040-release"
+}

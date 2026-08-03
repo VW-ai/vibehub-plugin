@@ -1,0 +1,104 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "lifecycle-contract-is-single-and-testable",
+      "criterion": "One concise bundled lifecycle reference names every supported presentation event, its sole owning Skill, continuation behavior, human-boundary behavior, target graph surface, and fallback; deterministic tests reject duplicate event ownership, unknown Skills or surfaces, and contradictory continue-versus-wait semantics."
+    },
+    {
+      "acceptance_id": "ticket-skills-have-narrow-ownership",
+      "criterion": "Ticket Plan, Validate, Run, Closeout, PR, and Review read the shared lifecycle contract and contain only their transition-specific instructions: applying a graph presents it without adding an approval gate, ordinary READY execution stays quiet, protected human attention presents Contract and waits, closeout presents Log, PR review presents the branch graph, and Ticket Review alone owns launch/focus mechanics."
+    },
+    {
+      "acceptance_id": "focused-review-links-are-mechanical",
+      "criterion": "The dependency-free launcher accepts optional validated Ticket and Execution/Contract/Log focus inputs, emits them in the authorized URL without weakening the fragment bearer, and the read-only UI mechanically selects the requested existing Ticket and view while ignoring no canonical data and exposing no write action."
+    },
+    {
+      "acceptance_id": "presentation-reuses-current-task-resources",
+      "criterion": "Ticket Review instructs the Agent to reuse a still-live host URL and browser tab within the current task, refreshing and refocusing it instead of opening repeated ports or tabs; when no live resource is known it starts the normal ephemeral host, and no cross-task registry, daemon, PID file, persistent cache, or hidden state is introduced."
+    },
+    {
+      "acceptance_id": "prompt-behavior-has-scenario-coverage",
+      "criterion": "Automated tests cover the central lifecycle and prompt integration plus focused launcher behavior for planned graph presentation, quiet execution, protected human attention, closeout Log, PR review, explicit fallback, invalid focus values, and an already-running current-task resource policy without coupling tests to incidental wording."
+    },
+    {
+      "acceptance_id": "plugin-remains-lightweight",
+      "criterion": "Project validation, the full test suite, and clean artifact verification pass with the existing Git-YAML truth, read-only loopback bearer boundary, zero package dependencies, and no hook cadence, generic dispatcher, prompt engine, service registry, database, or durable UI state."
+    }
+  ],
+  "constraints": [
+    "Move quickly and replace duplicated prompt logic directly; do not build a general Prompt framework or compatibility layer.",
+    "Keep the shared lifecycle reference short enough to read whenever a Ticket Skill triggers; detailed prose and duplicated policy are defects.",
+    "Test observable ownership and behavior contracts, not exact paragraphs or model phrasing.",
+    "Do not add a new lifecycle state, background hook, dispatcher, daemon, service registry, PID file, persistent cache, database, or cross-task host discovery protocol.",
+    "Do not turn UI presentation into an implicit approval gate: only an explicit protected human boundary pauses execution.",
+    "Keep the local UI read-only and retain the short-lived bearer in the URL fragment.",
+    "Explicit Ticket Review remains supported as a fallback but is not the primary user path."
+  ],
+  "context": "Dogfood showed that the local graph is useful but still behaves like a tool the user must remember to request. The owner wants the Ticket workflow itself to present the UI at the right moments and also identified that prompt behavior becomes unmanageable when lifecycle rules are duplicated across Skills without unit-like checks. Treat the Skills as one distributed program: define one concise shared lifecycle/ownership contract, let each Skill own only its transition, route all UI presentation through Ticket Review, and test observable trigger behavior rather than exact prose. Plan/apply may present a newly created graph without inventing an approval gate; routine READY execution remains quiet; protected human attention presents the exact Contract; successful or non-successful closeout presents Log; PR review can present the branch graph. Explicit Ticket Review remains a fallback. The launcher may add narrow mechanical focus parameters, but no background hook, prompt runtime, daemon, registry, cache, or second lifecycle is authorized.",
+  "context_refs": [
+    {
+      "purpose": "Binding Skill-first architecture and rejection of hooks, dispatchers, runtime coordination, caches, and second lifecycle machinery.",
+      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Authority for the narrow local launcher and first-class read-only Ticket graph.",
+      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Mechanical-consumer boundary for Agent-authored canonical Git documents.",
+      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Current graph planning and apply transition.",
+      "ref": "skills/vibehub-ticket-plan/SKILL.md"
+    },
+    {
+      "purpose": "Current read-only validation and protected-choice behavior.",
+      "ref": "skills/vibehub-ticket-validate/SKILL.md"
+    },
+    {
+      "purpose": "Current READY execution and stopping behavior.",
+      "ref": "skills/vibehub-ticket-run/SKILL.md"
+    },
+    {
+      "purpose": "Current independent Outcome transition.",
+      "ref": "skills/vibehub-ticket-closeout/SKILL.md"
+    },
+    {
+      "purpose": "Current local graph launch and conversation fallback behavior.",
+      "ref": "skills/vibehub-ticket-review/SKILL.md"
+    },
+    {
+      "purpose": "Current GitHub review handoff.",
+      "ref": "skills/vibehub-pr/SKILL.md"
+    },
+    {
+      "purpose": "Narrow loopback launcher to extend with mechanical focus only.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    },
+    {
+      "purpose": "Read-only graph interaction that can consume focus parameters.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Existing launcher and UI contract test surface.",
+      "ref": "test/ui-host.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The Ticket Skill suite follows one compact, mechanically checked lifecycle contract and proactively presents the focused local graph at human-attention transitions, while normal execution stays quiet and users never need to know a special UI command.",
+  "provenance_refs": [
+    "conversation:2026-08-02-ui-should-present-at-workflow-boundaries",
+    "conversation:2026-08-02-prompts-need-lifecycle-ownership-and-unit-checks",
+    "context:decision-speed-first-skill-plugin"
+  ],
+  "relations": [
+    {
+      "rationale": "Add lifecycle-driven presentation to the already accepted dependency-free read-only graph launcher rather than creating another UI path.",
+      "target_ticket_id": "ticket-restore-local-graph-ui",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-make-workflow-present-itself"
+}

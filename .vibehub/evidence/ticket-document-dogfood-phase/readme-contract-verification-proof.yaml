@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "existing-contract-remains-consistent"
+  ],
+  "evidence_id": "readme-contract-verification-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-07-31T22:42:21Z",
+  "refs": [
+    "README.md",
+    "command:node skills/scripts/vh.mjs project validate --repo .",
+    "command:node skills/scripts/vh.mjs ticket validate --repo .",
+    "command:npm run verify"
+  ],
+  "schema_version": 1,
+  "summary": "The existing Skill-first, Git-YAML, no-required-CLI/MCP/runtime, and no-persistent-cache contract remains intact; project and Ticket validation passed and npm run verify passed all four tests plus the 28-file artifact check.",
+  "ticket_id": "ticket-document-dogfood-phase"
+}
