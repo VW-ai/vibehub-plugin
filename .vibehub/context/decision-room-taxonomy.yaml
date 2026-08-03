@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-room-taxonomy",
+  "detail": "VibeHub restores hierarchical knowledge organization as Rooms. A Room is a bounded workspace, deliberately named room instead of feature because feature is software-specific and VibeHub should eventually help anyone do any kind of work; only the anchor implementation is Git-bound today. Layout: .vibehub/rooms/<slug>/ holds a room.yaml self-description (description, boundary, anchors, alignment state, stale flag) plus the Context entries that belong to that room; sub-rooms are subdirectories, so containment is carried by the path and composition by nesting. Cross-room references keep using relates_to and depends_on; containment is never expressed as a relation. Identifiers are semantic kebab-case slugs. Sequence numbers (001, 002) are rejected because they collide under parallel work and imply a false global order; hashes are rejected as a regression to the unreadable CAS store; timestamps are rejected because rooms are spaces, not events. Slug collisions are treated as a signal to split the boundary finer. Timestamps such as created_at live inside file content, never in filenames. This rebuilds, in Git-native human-readable form, the taxonomy that commit 74ab68f deleted together with the CAS semantic store; the flat context model that replaced it could not express feature membership or assembly, which a real dogfood project demonstrated.",
+  "evidence": [
+    {
+      "note": "Owner confirmed the flat context folder lost the Feature Room taxonomy after a real project produced only flat specs, and chose room over feature and semantic slugs over numbering, hashes, and timestamps.",
+      "ref": "conversation:2026-08-03-room-taxonomy-design"
+    },
+    {
+      "note": "Speed-first cleanup that deleted .vibehub/semantic-store/ including its feature nodes, removing the taxonomy this decision rebuilds.",
+      "ref": "commit:74ab68f473eb27281ac82494d03a88a6d8a1d8d8"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:dfe40a28aa7d5fd023f0a6c01f0e6b43"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-03T22:36:40.000Z",
+    "quote": "我觉得语意上我甚至更prefer room而不是feature，因为feature 太software specific了，而我希望这个套件可以帮助任何人，做任何工作",
+    "ref": "conversation:2026-08-03-room-taxonomy-design"
+  },
+  "state": "active",
+  "summary": "Room is the first-class domain-agnostic knowledge unit; directories express containment and semantic slugs are the only IDs",
+  "tags": [
+    "rooms",
+    "taxonomy",
+    "context",
+    "slugs",
+    "domain-agnostic",
+    "architecture"
+  ],
+  "type": "decision"
+}
