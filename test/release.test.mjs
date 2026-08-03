@@ -14,22 +14,37 @@ test("v0.4.0 release identity is consistent and dependency-free", () => {
   assert.deepEqual(new Set(Object.values(identity.versions)), new Set(["0.4.0"]));
 });
 
-test("README leads with the visual product and teaches proactive presentation", () => {
+test("README is a dark-safe one-line product surface", () => {
   const readme = read("README.md");
   for (const asset of [
+    "assets/brand/vibehub-logo-dark.svg",
     "assets/brand/vibehub-logo.svg",
     "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/CONCEPT.md",
     "docs/INSTALL.md",
     "docs/LOCAL_GRAPH_DESIGN.md",
   ]) {
     assert.ok(readme.includes(asset), `README missing ${asset}`);
     assert.ok(existsSync(join(root, asset)), `README target missing ${asset}`);
   }
-  assert.match(readme, /\| \*\*Plan\*\* \| \*\*Execution\*\*/u);
-  assert.match(readme, /\| \*\*Run\*\* \| Nothing extra/u);
-  assert.match(readme, /\*\*Human boundary\*\* \| \*\*Contract\*\*/u);
-  assert.match(readme, /\| \*\*Closeout\*\* \| \*\*Log\*\*/u);
-  assert.doesNotMatch(readme, /Ask the Agent to open the VibeHub Ticket graph/u);
+  assert.ok(readme.split("\n").length <= 45, "README is no longer one-line focused");
+  assert.match(readme, /VibeHub turns a development request into a Git-native Ticket cycle/u);
+  assert.equal([...readme.matchAll(/Start this with VibeHub\./gu)].length, 1);
+  assert.match(readme, /Memory tools preserve the conversation; VibeHub preserves the development cycle\./u);
+  assert.doesNotMatch(readme, /The workflow presents itself|\| Moment \| What you see|The entire durable model/u);
+});
+
+test("the canonical entry routes through existing Setup and Ticket Plan", () => {
+  const codex = JSON.parse(read(".codex-plugin/plugin.json"));
+  assert.deepEqual(codex.interface.defaultPrompt, ["Start this with VibeHub."]);
+  const plan = read("skills/vibehub-ticket-plan/SKILL.md");
+  assert.match(plan, /canonical user entry “Start this with VibeHub\.”/u);
+  assert.match(plan, /use `\$vibehub-setup` first and then/u);
+  assert.doesNotMatch(plan, /orchestration Skill|routing service|hidden router/u);
+  const concept = read("docs/CONCEPT.md");
+  for (const truth of ["Ticket drives; Context survives", "Routine execution stays quiet", ".vibehub/", "no required Core package"]) {
+    assert.ok(concept.includes(truth), `concept doc missing ${truth}`);
+  }
 });
 
 test("release is GitHub-only, reproducible, and documented", () => {

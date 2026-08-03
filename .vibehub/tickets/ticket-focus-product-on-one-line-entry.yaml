@@ -1,0 +1,95 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "hero-is-dark-mode-safe-and-immediate",
+      "criterion": "The README hero uses checked-in light/dark wordmark variants through a GitHub-compatible picture element, remains legible on black and white backgrounds, and makes the product's single core idea understandable before the graph image or secondary detail."
+    },
+    {
+      "acceptance_id": "three-lines-carry-the-product",
+      "criterion": "The README has one concise sentence for what VibeHub does, one visibly dominant natural-language instruction exactly 'Start this with VibeHub.' for how to use it, and one concise comparison explaining that memory tools preserve conversation while VibeHub makes the development cycle itself durable; redundant taglines, lifecycle tables, and repeated explanations are removed."
+    },
+    {
+      "acceptance_id": "one-entry-is-product-truth",
+      "criterion": "The Codex plugin exposes exactly one default prompt, 'Start this with VibeHub.'; the existing Ticket Plan Skill canonically owns that entry, requires the existing Setup Skill first when `.vibehub/` is absent, and then continues the normal Ticket lifecycle for the concrete deliverable. A clean-installed-plugin scenario using that exact entry proves setup and Ticket application reach a READY executable Ticket without requiring Skill/UI commands or adding an orchestration Skill, router, service, or runtime."
+    },
+    {
+      "acceptance_id": "details-move-without-truth-loss",
+      "criterion": "Secondary Ticket/Context semantics, lifecycle, canonical files, lightweight architecture, explicit capture behavior, and fallback commands live in one linked concept document or existing focused docs; README stays product-facing and compact while every local link and dark/light asset resolves in both the repository and clean plugin artifact."
+    },
+    {
+      "acceptance_id": "release-pr-remains-verified",
+      "criterion": "README-specific tests enforce the one-line entry and absence of the removed lifecycle table, full project and plugin verification pass, and PR #11 is updated with the refinement without changing the 0.4.0 GitHub-only release boundary or executing unrelated READY Tickets."
+    }
+  ],
+  "constraints": [
+    "Prefer deletion and direct language; do not replace the old README with another taxonomy, feature grid, framework, or long workflow explanation.",
+    "Keep the approved local graph image as the primary product visual, but let the product sentence and single entry precede it.",
+    "Do not add a public CLI, orchestration Skill, service, database, hidden router, or second lifecycle merely to implement a single conceptual entry.",
+    "Keep detailed truth accessible in docs instead of deleting architecture and workflow knowledge.",
+    "Do not change v0.4.0 release mechanics except where artifact verification must include the new brand/doc assets.",
+    "Do not execute ticket-encode-human-acceptance-authority as part of this refinement."
+  ],
+  "context": "Owner review found the v0.4.0 README visually too dark on GitHub dark mode and conceptually too diffuse. The public surface currently explains lifecycle phases, data layout, launcher behavior, release mechanics, and architecture before establishing one memorable product idea. Collapse the README around the canonical domain unit: VibeHub turns development work into a Git-native Ticket cycle while preserving only the Context that must outlive it. The only primary user action is the natural-language entry 'Start this with VibeHub.' Detailed lifecycle, installation, graph, validation, and release material belongs in linked docs. The dark GitHub theme must receive a light wordmark rather than the current near-black SVG.",
+  "context_refs": [
+    {
+      "purpose": "Binding Ticket-first, explicit Context, lightweight architecture truth.",
+      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Successful release-candidate baseline being refined before merge.",
+      "ref": ".vibehub/outcomes/ticket-prepare-v040-release.yaml"
+    },
+    {
+      "purpose": "Public surface to collapse around the one-line principle.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Current light-background wordmark needing a dark-background counterpart.",
+      "ref": "assets/brand/vibehub-logo.svg"
+    },
+    {
+      "purpose": "Current five-prompt surface to reduce to the single user entry.",
+      "ref": ".codex-plugin/plugin.json"
+    },
+    {
+      "purpose": "Existing focused home for setup and fallback launcher details.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Existing focused home for graph interaction detail.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Existing repository initialization behavior that the canonical entry must reuse when setup is absent.",
+      "ref": "skills/vibehub-setup/SKILL.md"
+    },
+    {
+      "purpose": "Existing planning Skill that must own the canonical user entry without a new router.",
+      "ref": "skills/vibehub-ticket-plan/SKILL.md"
+    },
+    {
+      "purpose": "Existing presentation and continuation lifecycle the canonical entry must preserve.",
+      "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+    },
+    {
+      "purpose": "Release contract tests to realign with the focused README.",
+      "ref": "test/release.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "VibeHub presents one memorable product idea and one user entry: the README says in one line what VibeHub does, in one line how to start it, and in one line how it differs from conversation-memory tools, with a dark-mode-safe identity and all secondary mechanics moved out of the way.",
+  "provenance_refs": [
+    "conversation:2026-08-02-readme-dark-mode-and-one-line-principle",
+    "git:5fb2bed",
+    "github:pr-11"
+  ],
+  "relations": [
+    {
+      "rationale": "Refine the independently accepted v0.4.0 candidate in direct response to owner review before main merge.",
+      "target_ticket_id": "ticket-prepare-v040-release",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-focus-product-on-one-line-entry"
+}

@@ -30,11 +30,7 @@
     ],
     "websiteURL": "https://github.com/VW-ai/vibehub-plugin",
     "defaultPrompt": [
-      "Set up VibeHub for this project.",
-      "Start this deliverable as a VibeHub Ticket.",
-      "Review the current VibeHub Ticket graph.",
-      "Query the VibeHub Context needed for this Ticket.",
-      "Record this decision in VibeHub Context."
+      "Start this with VibeHub."
     ],
     "brandColor": "#3E7D4C"
   }

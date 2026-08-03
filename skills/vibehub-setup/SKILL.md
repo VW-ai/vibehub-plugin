@@ -7,6 +7,9 @@ description: Set up the lightweight Skill-first VibeHub folders and project inst
 
 VibeHub installs as Skills plus checked-in Git YAML. It has no required CLI,
 MCP server, hook process, database, daemon, native build, or local web host.
+When Ticket Plan invokes Setup for the canonical “Start this with VibeHub.”
+entry, return to Ticket Plan after successful validation so the current
+deliverable continues without another user command.
 
 ## Workflow
 

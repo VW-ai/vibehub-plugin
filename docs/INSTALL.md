@@ -13,9 +13,15 @@ exits with its launcher process.
 - Node.js 20+ for bundled validation scripts
 - Git for history, collaboration, and rollback
 
-## Setup a repository
+## Start in a repository
 
-Ask the Agent to use `$vibehub-setup` in the exact checkout.
+Describe the concrete deliverable, then tell the Agent:
+
+> Start this with VibeHub.
+
+Ticket Plan owns this entry. When the exact checkout has not been initialized,
+it uses VibeHub Setup first and then resumes the same development cycle. The
+user does not need to choose a Skill or issue another command.
 
 Before writing, setup inspects common overlapping surfaces:
 

@@ -15,6 +15,7 @@ const PLUGIN_PATHS = [
   ".codex-plugin",
   "assets/brand",
   "CHANGELOG.md",
+  "docs/CONCEPT.md",
   "docs/INSTALL.md",
   "docs/LOCAL_GRAPH_DESIGN.md",
   "docs/RELEASE.md",
