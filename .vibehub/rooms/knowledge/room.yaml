@@ -10,6 +10,14 @@
         "path": "skills/contracts/room.schema.json"
       },
       {
+        "blob": "21b7bba3f1677a2c8ffeadf513173e25e4bc972c",
+        "path": "skills/vibehub-distill/SKILL.md"
+      },
+      {
+        "blob": "d7a671ac57909d14ae52fbe8cbdce70a6b17ebe0",
+        "path": "skills/vibehub-distill/agents/openai.yaml"
+      },
+      {
         "blob": "eee8817ea31f86a9d95131869566cbf7192e2800",
         "path": "skills/vibehub-ingest/SKILL.md"
       },
@@ -26,12 +34,13 @@
         "path": "skills/vibehub-query/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-03T23:08:38.077Z",
-    "last_aligned_commit": "60af6c10239b6e82b5fd919d10e0f1cf4a41b043"
+    "checked_at": "2026-08-03T23:23:42.144Z",
+    "last_aligned_commit": "5bdae93c8418a7bea955867c32fb239a51616baa"
   },
   "anchors": [
     "skills/contracts/context.schema.json",
     "skills/contracts/room.schema.json",
+    "skills/vibehub-distill/",
     "skills/vibehub-ingest/",
     "skills/vibehub-query/"
   ],

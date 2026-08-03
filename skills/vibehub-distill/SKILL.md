@@ -40,7 +40,5 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
 ## Guardrails
 
 - Never write a room for territory you have not read.
-- Never align a room whose drift state is WARNING — the checkout is older
-  than its baseline.
 - Do not introduce progress files, manifests, or a second store; the tree and
   its stamps are the whole state.
