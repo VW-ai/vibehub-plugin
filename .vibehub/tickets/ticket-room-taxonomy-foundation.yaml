@@ -1,0 +1,45 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "room-schema",
+      "criterion": "skills/contracts/room.schema.json defines room.yaml (description, boundary, anchor globs, alignment block with last_aligned_commit, checked_at and per-file blob hashes, stale flag with optional reason) and validates every checked-in room.yaml."
+    },
+    {
+      "acceptance_id": "vh-room-validation",
+      "criterion": "vh.mjs validates a nested rooms/ tree — room.yaml presence per room directory, slug rules, schema validity, and context entries inside room directories resolving in context query — with node --test coverage."
+    },
+    {
+      "acceptance_id": "context-placement",
+      "criterion": "vh.mjs context put accepts an optional room path and writes the entry inside that room directory; flat root-level entries keep working unchanged."
+    },
+    {
+      "acceptance_id": "dogfood-rooms",
+      "criterion": "This repository's own .vibehub gains an initial rooms/ tree and the existing context entries are placed into their owning rooms (root only for genuinely cross-room items)."
+    }
+  ],
+  "constraints": [
+    "Semantic kebab-case slugs only; numbering, hashes, and timestamps in filenames are forbidden.",
+    "Dependency-free Node built-ins only; JSON-compatible YAML documents; no database, daemon, or CAS store.",
+    "Containment is carried by directory paths, never by a new relation type."
+  ],
+  "context": "Commit 74ab68f deleted the CAS semantic store together with the feature taxonomy, leaving .vibehub/context/ flat; a real dogfood project demonstrated the gap (no way to express membership or assembly of knowledge). The approved rebuild is Git-native: .vibehub/rooms/<slug>/ directories, one room.yaml self-description per room (description, boundary, anchors as segment-boundary globs, alignment block, stale flag with reason), sub-rooms as subdirectories, context entries placed inside their owning room directory, cross-room links via existing relates_to/depends_on relations. Identifiers are semantic kebab-case slugs only — no sequence numbers, no hashes, no timestamps in filenames. Rooms are domain-agnostic (deliberately not called features); only anchors are Git-specific.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative taxonomy, layout, and slug decision this ticket implements.",
+      "ref": ".vibehub/context/decision-room-taxonomy.yaml"
+    },
+    {
+      "purpose": "Speed-first boundaries: what must not be reintroduced.",
+      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "VibeHub gains a Room taxonomy: a room.yaml contract, nested rooms/ tree validation in vh.mjs, room-scoped context placement, and this repository's own context reorganized into rooms.",
+  "provenance_refs": [
+    "conversation:2026-08-03-room-taxonomy-design",
+    "task:dfe40a28aa7d5fd023f0a6c01f0e6b43"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-room-taxonomy-foundation"
+}

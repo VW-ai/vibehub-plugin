@@ -1,0 +1,51 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "drift-four-states",
+      "criterion": "vh drift reports COLD_START for a missing rooms/ tree and otherwise classifies every room FRESH, DRIFTED (with exact changed/added/deleted file lists), STALE (with reason), or UNKNOWN, plus the old-checkout WARNING."
+    },
+    {
+      "acceptance_id": "audited-edge-tests",
+      "criterion": "node --test covers: rename out of an anchor dir still flags the source room; untracked files in new nested directories are detected; change-then-revert reports FRESH; old checkout yields WARNING not DRIFTED; anchor glob src/auth does not match src/authx."
+    },
+    {
+      "acceptance_id": "atomic-align",
+      "criterion": "vh align resolves anchors, records per-file blob hashes, last_aligned_commit, and checked_at in one atomic write, and clears the stale flag; a partial alignment state is impossible."
+    },
+    {
+      "acceptance_id": "stale-writeback",
+      "criterion": "A single vh command marks a drifted room stale with a reason (the deferred, align-on-use path), and vh drift surfaces manually marked stale rooms even when hashes match."
+    }
+  ],
+  "constraints": [
+    "Pure deterministic script: no agent calls, no network, no token spend; runs in milliseconds on this repository.",
+    "Only filter-clean git blob hashes are compared; raw working-tree file contents are never hashed directly.",
+    "The alignment block in room.yaml is written only by vh align; submodule interiors are out of scope for v1."
+  ],
+  "context": "The approved drift design treats per-file filter-clean blob hashes as the only ground truth. vh drift takes one snapshot (git ls-tree -r HEAD overlaid with git status --porcelain -uall --no-renames), resolves each room's anchor globs against it, and set-compares with the hashes recorded at alignment: changed, added, and deleted files any of which make the room DRIFTED; no rooms/ tree is COLD_START; a manual stale flag makes the room STALE regardless of hashes; an unresolvable state is UNKNOWN. last_aligned_commit is provenance plus a direction check — when merge-base --is-ancestor shows HEAD is behind the baseline, report a WARNING and never allow backward realignment. An adversarial audit with sandbox git experiments fixed the requirements: --no-renames (rename detection silently drops old paths, letting an emptied room look FRESH), -uall (porcelain collapses untracked directories), and hash-not-commit ground truth (aligning a dirty tree while stamping HEAD makes commit diffs report already-aligned content as drift forever).",
+  "context_refs": [
+    {
+      "purpose": "Authoritative audited algorithm this ticket implements.",
+      "ref": ".vibehub/context/decision-drift-check-snapshot-hashes.yaml"
+    },
+    {
+      "purpose": "room.yaml shape and anchor semantics the commands operate on.",
+      "ref": ".vibehub/context/decision-room-taxonomy.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "vh.mjs gains deterministic drift and align commands implementing the audited snapshot-hash comparison over room anchors.",
+  "provenance_refs": [
+    "conversation:2026-08-03-drift-check-adversarial-audit",
+    "task:dfe40a28aa7d5fd023f0a6c01f0e6b43"
+  ],
+  "relations": [
+    {
+      "rationale": "Needs the room.yaml contract and rooms/ tree validation to exist.",
+      "target_ticket_id": "ticket-room-taxonomy-foundation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-drift-check-mechanical"
+}
