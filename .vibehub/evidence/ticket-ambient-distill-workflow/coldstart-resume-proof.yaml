@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "coldstart-skill"
+  ],
+  "evidence_id": "coldstart-resume-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-03T23:17:30.000Z",
+  "refs": [
+    "skills/vibehub-distill/SKILL.md",
+    "skills/scripts/vh.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-distill/SKILL.md owns cold start and resumes without any separate progress state: the room align stamp is the per-room progress marker. Reproducible demo: a scratch repo with parser and renderer rooms where only parser was stamped before interruption; on re-invocation vh room drift reports parser FRESH and renderer UNKNOWN (never aligned), which is exactly the remaining work set.",
+  "ticket_id": "ticket-ambient-distill-workflow"
+}

@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "trust-layering"
+  ],
+  "evidence_id": "trust-layering-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-03T23:17:30.000Z",
+  "refs": [
+    "skills/vibehub-distill/SKILL.md",
+    ".vibehub/rooms/knowledge/decision-ambient-two-mode-distill.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "The distill skill documents the trust rule as agent-facing judgment, not mechanics: distilled Context entries carry a distill: source ref marking the lower-trust layer, human-ingested Context wins every conflict and conflicts are recorded rather than overwritten, and PR review on Git remains the only activation gate. This matches the governance recorded in decision-ambient-two-mode-distill.",
+  "ticket_id": "ticket-ambient-distill-workflow"
+}
