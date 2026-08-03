@@ -27,10 +27,13 @@ test("README is a dark-safe one-line product surface", () => {
     assert.ok(readme.includes(asset), `README missing ${asset}`);
     assert.ok(existsSync(join(root, asset)), `README target missing ${asset}`);
   }
-  assert.ok(readme.split("\n").length <= 45, "README is no longer one-line focused");
+  assert.ok(readme.split("\n").length <= 60, "README is no longer one-line focused");
   assert.match(readme, /VibeHub turns a development request into a Git-native Ticket cycle/u);
   assert.equal([...readme.matchAll(/Start this with VibeHub\./gu)].length, 1);
   assert.match(readme, /Memory tools preserve the conversation; VibeHub preserves the development cycle\./u);
+  assert.match(readme, /codex plugin marketplace add VW-ai\/vibehub-plugin/u);
+  assert.match(readme, /\/plugin install vibehub@vibehub/u);
+  assert.doesNotMatch(readme, /but no global CLI|MCP server, database|background capture/u);
   assert.doesNotMatch(readme, /The workflow presents itself|\| Moment \| What you see|The entire durable model/u);
 });
 

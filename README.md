@@ -23,9 +23,27 @@ Tickets, durable Context, Evidence, and Outcomes remain ordinary Git files.
 The graph appears when it helps you orient, decide, or audit; routine execution
 stays out of the way.
 
-Install VibeHub through your Codex or Claude Code plugin flow. It needs Node.js
-20+ and Git, but no global CLI, MCP server, database, daemon, hook cadence, npm
-package, or background capture.
+## Installation
+
+**Codex**
+
+```bash
+codex plugin marketplace add VW-ai/vibehub-plugin
+codex
+```
+
+Then open `/plugins`, install **VibeHub** from the `vibehub` marketplace, and
+start a new session.
+
+**Claude Code**
+
+```text
+/plugin marketplace add VW-ai/vibehub-plugin
+/plugin install vibehub@vibehub
+/reload-plugins
+```
+
+Describe the work in a new session, then use the single entry above.
 
 Read the [product concept](docs/CONCEPT.md), [installation and coexistence](docs/INSTALL.md),
 [local graph design](docs/LOCAL_GRAPH_DESIGN.md), or [release procedure](docs/RELEASE.md).
