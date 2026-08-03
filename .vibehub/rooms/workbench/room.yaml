@@ -1,0 +1,11 @@
+{
+  "anchors": [
+    "skills/vibehub-ticket-review/"
+  ],
+  "boundary": "The read-only local graph workbench: projection, loopback host, assets, and interaction language. Not the canonical YAML documents it renders.",
+  "description": "The local read-only graph UI that presents the Ticket graph and Context as a quiet, actionable workbench.",
+  "kind": "room",
+  "room_id": "workbench",
+  "schema_version": 1,
+  "stale": false
+}

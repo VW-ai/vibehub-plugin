@@ -42,7 +42,7 @@
     },
     {
       "purpose": "Authority for the first-class read-only graph and narrow launcher.",
-      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
     },
     {
       "purpose": "Current proactive workflow presentation truth to teach publicly.",

@@ -41,15 +41,15 @@
   "context_refs": [
     {
       "purpose": "Binding visual and interaction authority for every VibeHub UI.",
-      "ref": ".vibehub/context/constraint-ui-quiet-intelligence-standard.yaml"
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     },
     {
       "purpose": "Product authority for a comprehensive local Ticket graph and narrow launcher.",
-      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
     },
     {
       "purpose": "Binding Agent-output and mechanical-consumer architecture boundary.",
-      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     },
     {
       "purpose": "Lifecycle rules for temporary design and verification artifacts.",

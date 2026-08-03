@@ -38,11 +38,11 @@
   "context_refs": [
     {
       "purpose": "Owner authority to restore the local UI and accept a narrow launcher.",
-      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
     },
     {
       "purpose": "Binding handoff contract from Agent-produced canonical documents to mechanical UI, CLI, and Cloud consumers.",
-      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     },
     {
       "purpose": "Binding constraints against rebuilding the old runtime and second state system.",

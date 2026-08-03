@@ -1,0 +1,18 @@
+{
+  "anchors": [
+    "skills/contracts/evidence.schema.json",
+    "skills/contracts/outcome.schema.json",
+    "skills/contracts/ticket.schema.json",
+    "skills/scripts/vh.mjs",
+    "skills/vibehub-ticket-closeout/",
+    "skills/vibehub-ticket-plan/",
+    "skills/vibehub-ticket-run/",
+    "skills/vibehub-ticket-validate/"
+  ],
+  "boundary": "The Ticket execution lifecycle from plan through independent closeout, including the deterministic vh.mjs validation surface. Not knowledge capture and not the workbench UI.",
+  "description": "Ticket-driven development: planning, validation, execution, evidence, and independent closeout.",
+  "kind": "room",
+  "room_id": "ticket-lifecycle",
+  "schema_version": 1,
+  "stale": false
+}

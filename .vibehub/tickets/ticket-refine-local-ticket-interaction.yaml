@@ -37,15 +37,15 @@
   "context_refs": [
     {
       "purpose": "Binding visual and interaction standard for a quiet execution instrument.",
-      "ref": ".vibehub/context/constraint-ui-quiet-intelligence-standard.yaml"
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     },
     {
       "purpose": "Authority for the local graph and narrow per-worktree launcher.",
-      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
     },
     {
       "purpose": "Mechanical read-only consumer and canonical-data boundary.",
-      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     },
     {
       "purpose": "Approved baseline product language that interaction changes must strengthen rather than replace.",

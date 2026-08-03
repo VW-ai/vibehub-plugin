@@ -32,11 +32,11 @@
   "context_refs": [
     {
       "purpose": "Product authority for a comprehensive local graph UI and a narrow launcher.",
-      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
     },
     {
       "purpose": "Binding canonical-document and mechanical-consumer boundary.",
-      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     },
     {
       "purpose": "Current token erasure, interaction behavior, and presentation logic to repair.",

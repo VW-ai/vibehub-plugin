@@ -1,4 +1,4 @@
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -10,13 +10,13 @@ export function tempRepo(label) {
   return mkdtempSync(join(tmpdir(), `vibehub-${label}-`));
 }
 
-export function run(repo, domain, operation, input) {
+export function run(repo, domain, operation, input, flags = []) {
   let inputPath;
   if (input !== undefined) {
     inputPath = join(repo, `.input-${domain}-${operation}-${Math.random().toString(16).slice(2)}.json`);
     writeFileSync(inputPath, `${JSON.stringify(input)}\n`);
   }
-  const args = [helper, domain, operation, "--repo", repo];
+  const args = [helper, domain, operation, "--repo", repo, ...flags];
   if (inputPath) args.push("--input", inputPath);
   const result = spawnSync(process.execPath, args, { encoding: "utf8" });
   const envelope = JSON.parse(result.stdout);
@@ -47,6 +47,25 @@ export function context(overrides = {}) {
     relations: [],
     ...overrides,
   };
+}
+
+export function room(id, overrides = {}) {
+  return {
+    schema_version: 1,
+    kind: "room",
+    room_id: id,
+    description: `The ${id} room.`,
+    boundary: `Everything about ${id}, nothing else.`,
+    anchors: [`src/${id}/`],
+    stale: false,
+    ...overrides,
+  };
+}
+
+export function writeRoom(repo, roomPath, document) {
+  const directory = join(repo, ".vibehub", "rooms", ...roomPath.split("/"));
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(join(directory, "room.yaml"), `${JSON.stringify(document, null, 2)}\n`);
 }
 
 export function ticket(id, dependencies = []) {

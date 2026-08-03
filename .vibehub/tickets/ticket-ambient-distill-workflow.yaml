@@ -26,11 +26,11 @@
   "context_refs": [
     {
       "purpose": "Authoritative two-mode distill and governance decision this ticket implements.",
-      "ref": ".vibehub/context/decision-ambient-two-mode-distill.yaml"
+      "ref": ".vibehub/rooms/knowledge/decision-ambient-two-mode-distill.yaml"
     },
     {
       "purpose": "Mechanical check contract the workflow consumes.",
-      "ref": ".vibehub/context/decision-drift-check-snapshot-hashes.yaml"
+      "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
     }
   ],
   "kind": "ticket",

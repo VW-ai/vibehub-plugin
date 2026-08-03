@@ -26,7 +26,7 @@
   "context_refs": [
     {
       "purpose": "Authoritative taxonomy, layout, and slug decision this ticket implements.",
-      "ref": ".vibehub/context/decision-room-taxonomy.yaml"
+      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
     },
     {
       "purpose": "Speed-first boundaries: what must not be reintroduced.",

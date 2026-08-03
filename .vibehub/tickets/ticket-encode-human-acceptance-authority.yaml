@@ -41,7 +41,7 @@
     },
     {
       "purpose": "Binding rule for restrained semantic state and accessibility.",
-      "ref": ".vibehub/context/constraint-ui-quiet-intelligence-standard.yaml"
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     },
     {
       "purpose": "Canonical Ticket and acceptance contract to extend compatibly.",

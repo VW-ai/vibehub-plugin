@@ -42,11 +42,11 @@
     },
     {
       "purpose": "Authority for the narrow local launcher and first-class read-only Ticket graph.",
-      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
     },
     {
       "purpose": "Mechanical-consumer boundary for Agent-authored canonical Git documents.",
-      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     },
     {
       "purpose": "Current graph planning and apply transition.",

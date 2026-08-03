@@ -26,11 +26,11 @@
   "context_refs": [
     {
       "purpose": "Authoritative audited algorithm this ticket implements.",
-      "ref": ".vibehub/context/decision-drift-check-snapshot-hashes.yaml"
+      "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
     },
     {
       "purpose": "room.yaml shape and anchor semantics the commands operate on.",
-      "ref": ".vibehub/context/decision-room-taxonomy.yaml"
+      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
     }
   ],
   "kind": "ticket",
