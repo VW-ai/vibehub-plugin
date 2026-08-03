@@ -9,6 +9,7 @@ import {
   renameSync,
   writeFileSync,
 } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -61,7 +62,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|ticket|project> <operation> --repo <path> [--input <json>]",
+      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--room <path>]",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -792,6 +793,116 @@ function ticketOperation(operation, repo, input) {
   throw new VibeHubError("unsupported_operation", `Unsupported ticket operation: ${operation}`);
 }
 
+function git(repo, args, { allowFailure = false } = {}) {
+  const result = spawnSync("git", ["-C", repo, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (result.error) throw new VibeHubError("git_error", `git is unavailable: ${result.error.message}`);
+  if (result.status !== 0 && !allowFailure) {
+    throw new VibeHubError("git_error", `git ${args[0]} failed: ${(result.stderr || "").trim()}`);
+  }
+  return result;
+}
+
+// Anchors are path prefixes matched on whole segments: "src/auth" covers
+// src/auth and src/auth/**, never src/authx.
+function anchorMatches(anchor, path) {
+  const prefix = anchor.endsWith("/") ? anchor.slice(0, -1) : anchor;
+  return path === prefix || path.startsWith(`${prefix}/`);
+}
+
+// One snapshot of path -> filter-clean blob hash: committed tree overlaid
+// with the dirty working tree. Hashes are the drift ground truth; commits
+// are provenance only, so this survives rebases, fresh clones, and gc.
+function repoSnapshot(repo) {
+  const snapshot = new Map();
+  for (const entry of git(repo, ["ls-tree", "-r", "-z", "HEAD"]).stdout.split("\0")) {
+    if (!entry) continue;
+    const tab = entry.indexOf("\t");
+    const [, type, hash] = entry.slice(0, tab).split(" ");
+    if (type === "blob") snapshot.set(entry.slice(tab + 1), hash);
+  }
+  for (const entry of git(repo, ["status", "--porcelain", "-uall", "--no-renames", "-z"]).stdout.split("\0")) {
+    if (entry.length < 4) continue;
+    const path = entry.slice(3);
+    if (!existsSync(join(repo, path)) || !lstatSync(join(repo, path)).isFile()) snapshot.delete(path);
+    else snapshot.set(path, git(repo, ["hash-object", `--path=${path}`, path]).stdout.trim());
+  }
+  return snapshot;
+}
+
+function anchoredFiles(document, snapshot) {
+  const files = new Map();
+  for (const [path, hash] of snapshot) {
+    if ((document.anchors ?? []).some((anchor) => anchorMatches(anchor, path))) files.set(path, hash);
+  }
+  return files;
+}
+
+function headIsBehind(repo, baseline) {
+  const head = git(repo, ["rev-parse", "HEAD"]).stdout.trim();
+  if (baseline === head) return false;
+  return git(repo, ["merge-base", "--is-ancestor", "HEAD", baseline], { allowFailure: true }).status === 0;
+}
+
+function roomOperation(operation, repo, input, options = {}) {
+  const repository = loadRepository(repo);
+  assertValid(repository.errors);
+  if (operation === "drift") {
+    if (repository.rooms.documents.size === 0) return { cold_start: true, rooms: [] };
+    const snapshot = repoSnapshot(repo);
+    const rooms = [...repository.rooms.documents.entries()].map(([roomPath, { document }]) => {
+      if (document.stale === true) {
+        return { room: roomPath, state: "STALE", reason: document.stale_reason ?? null };
+      }
+      if (!document.alignment) return { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
+      if (headIsBehind(repo, document.alignment.last_aligned_commit)) {
+        return {
+          room: roomPath,
+          state: "WARNING",
+          reason: "checkout is older than the alignment baseline; never realign specs backwards",
+        };
+      }
+      const current = anchoredFiles(document, snapshot);
+      const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
+      const changed = [...current].filter(([path, hash]) => recorded.has(path) && recorded.get(path) !== hash).map(([path]) => path);
+      const added = [...current.keys()].filter((path) => !recorded.has(path));
+      const deleted = [...recorded.keys()].filter((path) => !current.has(path));
+      if (changed.length || added.length || deleted.length) {
+        return { room: roomPath, state: "DRIFTED", changed, added, deleted };
+      }
+      return { room: roomPath, state: "FRESH" };
+    });
+    return { cold_start: false, rooms };
+  }
+  const entry = repository.rooms.documents.get(options.room ?? "");
+  if (!entry) throw new VibeHubError("not_found", `Room not found: ${options.room ?? "(missing --room)"}`);
+  if (operation === "align") {
+    if (entry.document.alignment && headIsBehind(repo, entry.document.alignment.last_aligned_commit)) {
+      throw new VibeHubError("invalid_state", "checkout is older than the alignment baseline; refusing to realign backwards");
+    }
+    const files = anchoredFiles(entry.document, repoSnapshot(repo));
+    const document = {
+      ...entry.document,
+      alignment: {
+        last_aligned_commit: git(repo, ["rev-parse", "HEAD"]).stdout.trim(),
+        checked_at: new Date().toISOString(),
+        anchor_hashes: [...files].sort(([a], [b]) => (a < b ? -1 : 1)).map(([path, blob]) => ({ path, blob })),
+      },
+      stale: false,
+    };
+    delete document.stale_reason;
+    writeDocument(entry.path, document);
+    return { room: options.room, aligned_files: files.size, last_aligned_commit: document.alignment.last_aligned_commit };
+  }
+  if (operation === "stale") {
+    if (typeof input.reason !== "string" || !input.reason.trim()) {
+      throw new VibeHubError("invalid_input", "room stale needs a non-empty reason");
+    }
+    writeDocument(entry.path, { ...entry.document, stale: true, stale_reason: input.reason });
+    return { room: options.room, state: "STALE", reason: input.reason };
+  }
+  throw new VibeHubError("unsupported_operation", `Unsupported room operation: ${operation}`);
+}
+
 function projectOperation(operation, repo) {
   if (operation === "init") return initProject(repo);
   if (operation === "validate") {
@@ -815,6 +926,7 @@ function run() {
   const input = readInput(args.inputPath);
   let data;
   if (args.domain === "context") data = contextOperation(args.operation, args.repo, input, { room: args.room });
+  else if (args.domain === "room") data = roomOperation(args.operation, args.repo, input, { room: args.room });
   else if (args.domain === "ticket") data = ticketOperation(args.operation, args.repo, input);
   else if (args.domain === "project") data = projectOperation(args.operation, args.repo, input);
   else throw new VibeHubError("unsupported_domain", `Unsupported domain: ${args.domain}`);

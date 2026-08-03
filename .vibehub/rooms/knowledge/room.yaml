@@ -1,4 +1,34 @@
 {
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "956fb8cf65743894e27e167c6da586dfc716107e",
+        "path": "skills/contracts/context.schema.json"
+      },
+      {
+        "blob": "bf8884197dba4632d84d96d42c315baf5b767d63",
+        "path": "skills/contracts/room.schema.json"
+      },
+      {
+        "blob": "eee8817ea31f86a9d95131869566cbf7192e2800",
+        "path": "skills/vibehub-ingest/SKILL.md"
+      },
+      {
+        "blob": "2d90711188cd41e482615bc7714869bf60355545",
+        "path": "skills/vibehub-ingest/agents/openai.yaml"
+      },
+      {
+        "blob": "3dd3d92500fae5bfc0141f69dffe654f66003a3e",
+        "path": "skills/vibehub-query/SKILL.md"
+      },
+      {
+        "blob": "979251aa2a5a6ca887c5a02de7c7cb95e6394a31",
+        "path": "skills/vibehub-query/agents/openai.yaml"
+      }
+    ],
+    "checked_at": "2026-08-03T23:08:38.077Z",
+    "last_aligned_commit": "60af6c10239b6e82b5fd919d10e0f1cf4a41b043"
+  },
   "anchors": [
     "skills/contracts/context.schema.json",
     "skills/contracts/room.schema.json",

@@ -1,4 +1,58 @@
 {
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "ce1e5e6fdd94c8cf519ca0a862849553680fad85",
+        "path": "skills/contracts/evidence.schema.json"
+      },
+      {
+        "blob": "ebbc595d15ff936f9ee351d8d56abeae78ca2491",
+        "path": "skills/contracts/outcome.schema.json"
+      },
+      {
+        "blob": "0484fb8a84ab1af8c1b7d369d07a9007fd98efde",
+        "path": "skills/contracts/ticket.schema.json"
+      },
+      {
+        "blob": "e80302c629b74acbd8965e57dfa621103e13ff68",
+        "path": "skills/scripts/vh.mjs"
+      },
+      {
+        "blob": "c1b5cf48652f979d66eeaed343f0b8bb821a4739",
+        "path": "skills/vibehub-ticket-closeout/SKILL.md"
+      },
+      {
+        "blob": "849c09d87bde8bb13d372650cf48db71898dd676",
+        "path": "skills/vibehub-ticket-closeout/agents/openai.yaml"
+      },
+      {
+        "blob": "6368e695b2ff966629b1db616962b52e3cca6655",
+        "path": "skills/vibehub-ticket-plan/SKILL.md"
+      },
+      {
+        "blob": "4b4435a0aea6a7842c4fd9595e9b885f608b7429",
+        "path": "skills/vibehub-ticket-plan/agents/openai.yaml"
+      },
+      {
+        "blob": "8bfe8da32ecb7d05eeb4b92de76410e88d18aeb1",
+        "path": "skills/vibehub-ticket-run/SKILL.md"
+      },
+      {
+        "blob": "d10e7b0f27eca775babc62bd6951f5346b05f86a",
+        "path": "skills/vibehub-ticket-run/agents/openai.yaml"
+      },
+      {
+        "blob": "4ba09cb3e42da24791a1ad78bed06617bde81a7d",
+        "path": "skills/vibehub-ticket-validate/SKILL.md"
+      },
+      {
+        "blob": "6aa6b1344f587bb968c605698afee6b6e3e80514",
+        "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
+      }
+    ],
+    "checked_at": "2026-08-03T23:08:38.393Z",
+    "last_aligned_commit": "60af6c10239b6e82b5fd919d10e0f1cf4a41b043"
+  },
   "anchors": [
     "skills/contracts/evidence.schema.json",
     "skills/contracts/outcome.schema.json",
