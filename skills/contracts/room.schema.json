@@ -21,6 +21,7 @@
         "checked_at": { "type": "string", "format": "date-time" },
         "anchor_hashes": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
             "type": "object",
             "additionalProperties": false,
