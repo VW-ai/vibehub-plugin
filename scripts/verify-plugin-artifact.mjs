@@ -51,6 +51,8 @@ try {
     "skills/vibehub-ticket-review/assets/app.css",
     "skills/vibehub-ticket-review/assets/app.js",
     "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "skills/vibehub-setup/references/architecture-boundary.md",
+    "skills/vibehub-ingest/references/knowledge-governance.json",
     "skills/contracts/context.schema.json",
     "skills/contracts/ticket.schema.json",
   ]) {

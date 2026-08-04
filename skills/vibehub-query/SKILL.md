@@ -7,10 +7,10 @@ description: Retrieve lightweight Git-native VibeHub Context for a Ticket, file,
 
 Use the smallest query that can answer the task. The Room tree under
 `.vibehub/rooms/` is the source of truth — every Context entry lives inside
-the room that owns it, and nothing exists outside
-`../vibehub-setup/references/architecture-boundary.md` to refresh. When
-reporting answers, distinguish trust layers per
-`../vibehub-ingest/references/knowledge-governance.json`.
+the room that owns it, and the architecture boundary
+(`../vibehub-setup/references/architecture-boundary.md`) means there is no
+database or cache elsewhere to refresh. When reporting answers, distinguish
+trust layers per `../vibehub-ingest/references/knowledge-governance.json`.
 
 ```text
 node ../scripts/vh.mjs context query --repo <root> --input <query.json>
