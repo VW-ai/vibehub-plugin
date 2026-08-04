@@ -1,0 +1,40 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-from-first-real-workflow",
+      "criterion": "Placeholder: after one real cross-repository or non-software workflow exposes concrete user value and friction, refine this Ticket in place into independently checkable UX, authority, repository lifecycle, portability, failure-recovery, and verification criteria; until then it remains REFINE and creates no repository or delegated permission."
+    }
+  ],
+  "constraints": [
+    "Git invisibility initially means hiding mechanics, not removing the current Git-native source of truth; replacing Git is a separate future product and architecture decision.",
+    "No background repository may make durable resources or authority invisible: creation, access, inspection, export, deletion, and revocation boundaries must remain understandable to the user.",
+    "Cross-repository dispatch must preserve bounded Ticket authority and may not turn one task into open-ended access to the user's repositories or external systems.",
+    "The first refined workflow must preserve portable canonical Context, Ticket, Evidence, and Outcome semantics and continued Codex and Claude Code compatibility.",
+    "App and hosted-service implementation are out of scope; they become separate Tickets only after observed product evidence."
+  ],
+  "context": "Direction only. VibeHub currently exposes Git-native Ticket cycles for coding agents. The owner wants a future action terminal whose Tickets cover software and non-software work, whose accumulated Context compounds across weeks and months, and whose implementation can dispatch work across repositories without making users manage Git. Candidate examples include spreadsheet work and travel planning stored in background repositories created under explicit user authority. This Ticket deliberately stops before implementation because the first target workflow, permission model, repository ownership, recovery semantics, and product surface are not yet known. Refine only after real dogfood exposes one concrete cross-repository or non-software workflow; do not build a generic platform from the vision alone.",
+  "context_refs": [
+    {
+      "purpose": "The long-term product intent and the authority/portability boundary governing this future work.",
+      "ref": ".vibehub/rooms/product/intent-context-compounding-action-system.yaml"
+    },
+    {
+      "purpose": "Current lightweight Git-native architecture that this draft may not silently supersede.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Canonical document handoff contract that future App or service surfaces must preserve until separately revised.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "VibeHub proves its first user-authorized workflow in which a bounded Ticket crosses repository boundaries while Git mechanics stay out of the user's way, non-software artifacts can participate, and durable Context plus Evidence-backed completion remain portable and inspectable.",
+  "provenance_refs": [
+    "conversation:2026-08-03-context-compounding-action-vision",
+    "context:intent-context-compounding-action-system"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-invisible-git-cross-repo-actions"
+}

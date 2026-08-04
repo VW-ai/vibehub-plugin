@@ -1,0 +1,46 @@
+{
+  "context_id": "intent-context-compounding-action-system",
+  "detail": "VibeHub begins with coding-agent development cycles, but its long-term product unit is any user action that can be expressed as a bounded Ticket. The intended product is a personal action and todo terminal used continuously across weeks and months: completed work accumulates durable Context, and that Context improves the planning and execution of later work across software and non-software domains. This is a different form of long horizon from keeping one task running for 100 hours; continuity comes from repeated Ticket cycles over a growing Context layer. The directional path is to make Git mechanics progressively invisible while initially preserving Git review, rollback, and portability; later dogfood may justify user-authorized repository creation and cross-repository Ticket dispatch, including background repositories that hold non-software work such as spreadsheet changes or travel planning. A first-class app may then expose task creation and richer visualization. A hosted, everywhere service is a later option, not a committed storage architecture: replacing Git as canonical storage must be justified independently rather than treated as the goal. Codex and Claude Code remain compatible execution hosts, and ecosystem connectors may extend the action surface. Invisible mechanics must never mean invisible authority or invisible durable resources: users must retain understandable permission, inspection, export, and deletion boundaries.",
+  "evidence": [
+    {
+      "note": "The owner described the product as a personal action terminal whose differentiator is Context accumulated through continuous use over weeks and months, then outlined invisible Git, cross-repository dispatch, non-software work, an app, and a possible hosted service.",
+      "ref": "conversation:2026-08-03-context-compounding-action-vision"
+    },
+    {
+      "note": "Existing product authority already makes Rooms domain-agnostic and says only today's anchor implementation is Git-bound.",
+      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T04:35:36.000Z",
+    "quote": "一个周，一个月，你都不停的在用我们，在积累你的 context，然后去做任何任务。",
+    "ref": "conversation:2026-08-03-context-compounding-action-vision"
+  },
+  "state": "active",
+  "summary": "VibeHub aims to become a context-compounding personal action system used across weeks and months, not merely a runtime for one long task",
+  "tags": [
+    "action-system",
+    "context",
+    "cross-repository",
+    "long-horizon",
+    "personal-todo",
+    "product-vision"
+  ],
+  "type": "intent"
+}

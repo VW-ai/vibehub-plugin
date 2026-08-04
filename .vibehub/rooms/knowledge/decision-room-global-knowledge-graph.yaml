@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-room-global-knowledge-graph",
+  "detail": "Rooms and a future global knowledge graph solve different Context problems and should compose rather than replace one another. Rooms provide human-readable ownership, containment, boundaries, and local assembly of canonical Context. A larger graph may later represent identities and semantic relationships that cross Rooms, repositories, domains, and time. Directory containment remains separate from semantic relations: a Context belongs to one lowest owning Room while graph edges can connect it globally. The exact graph implementation, storage engine, identity model, and synchronization mechanism remain deliberately deferred until real cross-Room retrieval and governance gaps demonstrate the need.",
+  "evidence": [
+    {
+      "note": "The owner confirmed that durable Context will likely need Rooms combined with a larger global knowledge graph.",
+      "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+    },
+    {
+      "note": "The current Room authority already assigns containment to directory paths and cross-Room meaning to explicit relations.",
+      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T06:18:52Z",
+    "quote": "可能后面需要是一个 room 结合这个更大的 global knowledge graph 的方法来保留 context 了",
+    "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+  },
+  "state": "active",
+  "summary": "Rooms own and contain Context locally while a future global knowledge graph may connect it across boundaries",
+  "tags": [
+    "context",
+    "global-knowledge-graph",
+    "rooms",
+    "governance",
+    "retrieval"
+  ],
+  "type": "decision"
+}

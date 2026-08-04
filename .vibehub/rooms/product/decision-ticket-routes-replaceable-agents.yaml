@@ -1,0 +1,45 @@
+{
+  "context_id": "decision-ticket-routes-replaceable-agents",
+  "detail": "The Ticket is the stable user-facing action object; Agents, chats, repositories, models, and runtimes are replaceable execution resources selected for that action. As VibeHub expands beyond a single coding repository, the interaction model should move from an Agent or chat that happens to create Tickets toward a Ticket that routes work to one or more suitable Agents. This is a product-perception and UI transition as much as an orchestration change. It is not a requirement for the current open-source release: the near-term product may keep coding-Agent and chat entry points while proving the canonical Ticket cycle first.",
+  "evidence": [
+    {
+      "note": "The owner explicitly described the transition from coding-Agent-led Ticket creation to Ticket-led Agent execution, especially in user interaction and perception.",
+      "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+    },
+    {
+      "note": "The owner confirmed that Agents should be replaceable executors while Tickets remain stable product objects.",
+      "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-ticket-project-independent",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T06:18:52Z",
+    "quote": "从交互和用户感知层面 especially，很多场景由 coding agent 主导 ticket 变成 ticket 主导 agent",
+    "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+  },
+  "state": "active",
+  "summary": "Ticket is the stable action object that increasingly routes replaceable Agents, while current open source may retain Agent-first entry",
+  "tags": [
+    "agents",
+    "interaction-model",
+    "product-model",
+    "ticket",
+    "ux"
+  ],
+  "type": "decision"
+}

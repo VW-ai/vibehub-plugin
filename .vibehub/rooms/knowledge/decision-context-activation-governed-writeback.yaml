@@ -1,0 +1,50 @@
+{
+  "context_id": "decision-context-activation-governed-writeback",
+  "detail": "Long-lived memory must be activated and updated through an explicit Context management layer. Raw sources are distilled into canonical Context; each Ticket receives the smallest relevant Context packet rather than the entire corpus; completed Outcomes may propose new or changed Context with provenance; governance decides whether those proposals become durable truth. Repeated execution should improve the user's world model without letting every Agent transcript or Outcome pollute it automatically. A separately developed personal daily knowledge product may eventually own broader personal memory while VibeHub owns the action graph, but convergence should use explicit read, write, identity, provenance, and authority boundaries rather than two competing canonical stores.",
+  "evidence": [
+    {
+      "note": "The owner confirmed both a continuously evolving management layer above Context and the need for per-Ticket activation with governed Outcome writeback.",
+      "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+    },
+    {
+      "note": "The owner disclosed a parallel personal daily knowledge-base product and expects future convergence, establishing the need for an explicit ownership boundary.",
+      "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+    },
+    {
+      "note": "Canonical Agent output is already the sole validated handoff contract for downstream consumers.",
+      "ref": ".vibehub/rooms/knowledge/contract-canonical-agent-output.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-room-global-knowledge-graph",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T06:18:52Z",
+    "quote": "context 之上的一层 context 管理层也在持续演化",
+    "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+  },
+  "state": "active",
+  "summary": "Each Ticket activates a minimal Context packet and Outcomes update durable memory only through governed, provenance-preserving writeback",
+  "tags": [
+    "activation",
+    "context",
+    "governance",
+    "knowledge-base",
+    "provenance",
+    "writeback"
+  ],
+  "type": "decision"
+}

@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-ticket-project-independent",
+  "detail": "A Ticket does not require a Project parent. For an Agent, two independent Tickets have the same execution shape whether they concern one repository, different repositories, or eventually non-software resources: each is governed by its own Outcome, activated Context, authority, capabilities, acceptance criteria, and direct dependencies. Project remains useful as a user-facing view and as a boundary for authority, resources, collaboration, billing, and reporting, but it must not become the mandatory top-level container of the action graph. Cross-project and same-project work therefore use one Ticket model instead of separate orchestration semantics.",
+  "evidence": [
+    {
+      "note": "The owner explicitly observed that independent Tickets are equivalent to an Agent regardless of whether they belong to the same project and confirmed Project as a view or boundary rather than a mandatory parent.",
+      "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+    },
+    {
+      "note": "The established long-term intent already expands Ticket cycles across repositories and non-software work.",
+      "ref": ".vibehub/rooms/product/intent-context-compounding-action-system.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T06:18:52Z",
+    "quote": "人的思考不会拘泥于某一个项目，而真的就是，我想做什么。",
+    "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
+  },
+  "state": "active",
+  "summary": "Ticket is project-independent; Project is an optional view and governance boundary, not the action graph's mandatory parent",
+  "tags": [
+    "action-graph",
+    "project",
+    "ticket",
+    "product-model",
+    "cross-repository"
+  ],
+  "type": "decision"
+}
