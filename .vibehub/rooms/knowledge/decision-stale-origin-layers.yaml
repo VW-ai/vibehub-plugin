@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-stale-origin-layers",
+  "detail": "The stale channel splits into two origins, mirroring the distill: source-ref layering. A mechanical mark — written when drift is deferred at ticket start — uses a drift: prefixed reason; it is derived state and may be cleared by realignment whenever recomputation against the current tree shows the anchors fresh. An unprefixed reason is a semantic claim by a human or an agent exercising judgment (the spec is wrong in a way hashes cannot see); it is knowledge, preserved across merges and cleared only by addressing the reason. This makes merge resolution mechanical where it can be and honest where it cannot: drift reports for a stale room whether its hashes currently match, so a drift:-prefixed mark with fresh hashes is clearably stale-stale, while an unprefixed mark always reaches a human or judging agent. The convention lives once in the knowledge-governance reference.",
+  "evidence": [
+    {
+      "note": "Owner approved the two-origin stale design resolving cross-branch stale divergence without deciding ahead-or-behind from metadata.",
+      "ref": "conversation:2026-08-04-pr-room-merge-semantics"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-derived-alignment-recompute",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-ambient-two-mode-distill",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T02:17:22.000Z",
+    "quote": "我们这里把某个spec 标了stale，别人那里不是stale，那他到底是领先我们还是落后我们呢",
+    "ref": "conversation:2026-08-04-pr-room-merge-semantics"
+  },
+  "state": "active",
+  "summary": "Stale reasons carry their origin: drift-prefixed marks are mechanical and recomputable, unprefixed marks are semantic claims that survive merges",
+  "tags": [
+    "stale",
+    "drift",
+    "trust-layers",
+    "merge",
+    "contracts"
+  ],
+  "type": "decision"
+}
