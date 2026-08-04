@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "discovery-single-sourced"
+  ],
+  "evidence_id": "discovery-single-source-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T00:45:43.000Z",
+  "refs": [
+    "commit:f413d67",
+    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "skills/vibehub-ticket-plan/SKILL.md",
+    "test/ticket-lifecycle.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "execution-discovers-work entered ticket-lifecycle.json owned by vibehub-ticket-plan (quiet: presentation none, continuation continue); the plan skill states the transition exactly once, ticket-run hands discovered independently schedulable work to planning via a pointer that never names the event, and the ownership test — which fails if the backticked event name appears in any non-owner skill — passes across the suite.",
+  "ticket_id": "ticket-room-retrieval-and-discovery"
+}
