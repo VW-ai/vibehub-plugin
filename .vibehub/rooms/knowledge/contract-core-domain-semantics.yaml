@@ -1,0 +1,59 @@
+{
+  "context_id": "contract-core-domain-semantics",
+  "detail": "Future VibeHub product and storage work must preserve a minimal domain language before introducing federation, server, indexing, or synchronization concepts. The Action layer consists of Ticket, Evidence, and Outcome: a Ticket expresses one bounded change the user wants; Evidence is a reference-backed observation mapped to Acceptance; Outcome is the independent judgment over that Evidence. The Knowledge layer consists of Room and Context: Context is one durable reusable claim; a Room is strictly the bounded namespace in which related durable Context is curated and owned. This tightens the earlier broad phrase 'bounded workspace': Rooms do not own Tickets, Agents, Projects, repositories, or execution state. Reference is a typed value that points to external reality such as code at a revision, a GitHub or Linear issue, a pull request, a document, a test run, or an artifact; referenced code is not promoted into a separate business Resource entity. Agent is an executor, not durable product state. Project is an optional view or governance grouping, not an action-graph parent. A repository may both be referenced as code and physically carry current VibeHub documents, but that implementation co-location does not make repository, Room, Project, and storage the same business concept. The complete semantic relation is: a Room owns Context; Context informs a Ticket; an Agent executes the Ticket; the Ticket produces Evidence; Evidence supports an Outcome; any of those durable documents may carry typed References to external facts. Ticket creation must not require the user to choose a Room: References and the current Outcome drive retrieval of the smallest relevant Context packet, while ambiguity, authority crossings, or conflicting Context return to the user. Future Store, catalog, index, namespace, sync, and server designs remain infrastructure and must not enter this business vocabulary or create a parallel source of truth. This is a long-range semantic contract only; it does not authorize a schema migration, storage rewrite, federated index, or implementation Ticket.",
+  "evidence": [
+    {
+      "note": "The owner explicitly corrected the proposed Resource abstraction: code should be treated as a Reference, then requested that the business semantics be clarified and preserved as a long-range spec before the model becomes confused.",
+      "ref": "conversation:2026-08-04-core-domain-semantics-future-spec"
+    },
+    {
+      "note": "The existing Room decision provides the current physical taxonomy and broad wording that this contract narrows only at the business-semantic layer.",
+      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
+    },
+    {
+      "note": "The current schemas already encode Ticket, Context, Evidence, and Outcome as canonical documents, providing the concrete baseline for the semantic separation.",
+      "ref": "skills/contracts/"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-project-independent",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-context-activation-governed-writeback",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-room-global-knowledge-graph",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T22:26:17Z",
+    "quote": "代码，就是一种，把代码当作 reference 了……业务语意是需要理清楚的，不然会很乱。",
+    "ref": "conversation:2026-08-04-core-domain-semantics-future-spec"
+  },
+  "state": "active",
+  "summary": "VibeHub's future domain model separates Action, Knowledge, external References, and execution actors before any federated storage design",
+  "tags": [
+    "business-semantics",
+    "context",
+    "domain-model",
+    "future-spec",
+    "references",
+    "rooms",
+    "tickets"
+  ],
+  "type": "contract"
+}
