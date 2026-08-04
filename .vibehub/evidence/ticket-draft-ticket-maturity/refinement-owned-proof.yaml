@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "refinement-owned-by-plan"
+  ],
+  "evidence_id": "refinement-owned-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T01:07:37.000Z",
+  "refs": [
+    "commit:46d88ff",
+    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "skills/vibehub-ticket-plan/SKILL.md"
+  ],
+  "schema_version": 1,
+  "summary": "draft-needs-refinement entered ticket-lifecycle.json owned by vibehub-ticket-plan with the quiet shape, and the plan skill states the refinement transition once (rewrite acceptance, remove marker in place); the ownership test covers the new event automatically and the suite proves the backticked name appears only in the owner skill.",
+  "ticket_id": "ticket-draft-ticket-maturity"
+}

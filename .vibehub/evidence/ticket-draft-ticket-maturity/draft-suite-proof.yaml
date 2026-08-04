@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "draft-suite-green"
+  ],
+  "evidence_id": "draft-suite-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T01:07:37.000Z",
+  "refs": [
+    "commit:46d88ff",
+    "test/draft-maturity.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Full node --test suite passes 36/36 including the three new draft-maturity tests, and the plugin artifact builds and verifies cleanly (47 files) with both shared references asserted present; all four rooms FRESH after align-on-use.",
+  "ticket_id": "ticket-draft-ticket-maturity"
+}
