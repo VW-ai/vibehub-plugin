@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "owner": "vibehub-ingest",
+  "placement": {
+    "rule": "lowest-owning-room",
+    "cross_room": "lowest-common-ancestor",
+    "missing_room": "create-it",
+    "statement": "Place each claim in the lowest room that owns it. A claim spanning several rooms belongs to their lowest common ancestor room. When that room does not exist, create it rather than dropping knowledge somewhere it does not belong."
+  },
+  "trust_layers": [
+    {
+      "layer": "human",
+      "source_ref_prefix": null,
+      "wins_conflicts": true,
+      "statement": "Human-ingested Context is the authoritative layer. Conflicts are preserved as new Context or escalated to the user, never overwritten."
+    },
+    {
+      "layer": "distilled",
+      "source_ref_prefix": "distill:",
+      "wins_conflicts": false,
+      "statement": "Distill-produced Context carries a distill: source ref and yields to the human layer whenever they disagree."
+    }
+  ],
+  "activation_gate": "git-pr-review"
+}

@@ -30,10 +30,8 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
    node ../scripts/vh.mjs room align --repo <root> --room <path>
    ```
 
-4. Distilled knowledge is the lower-trust layer. Any Context entry written
-   here uses a `distill:` source ref; when it disagrees with human-ingested
-   Context, the human entry wins — record the conflict, never overwrite it.
-   PR review on Git is the only activation gate.
+4. Distilled output follows the trust and placement rules in
+   `../vibehub-ingest/references/knowledge-governance.json`.
 5. Report one line per room at most; close with totals (rooms, anchored
    files).
 
@@ -41,4 +39,5 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
 
 - Never write a room for territory you have not read.
 - Do not introduce progress files, manifests, or a second store; the tree and
-  its stamps are the whole state.
+  its stamps are the whole state, inside
+  `../vibehub-setup/references/architecture-boundary.md`.
