@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "version-identity"
+  ],
+  "evidence_id": "version-identity-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T03:55:21.000Z",
+  "refs": [
+    "commit:05e5801",
+    "CHANGELOG.md",
+    "test/release.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "package.json, both plugin manifests, and both marketplace.json version fields all state 0.5.0; CHANGELOG.md gains the dated 0.5.0 entry covering the Room taxonomy, drift layer, two-mode distill, lifecycle completion, contractized skills, room-aware PR flow, and the agent-driven migration path; release.test.mjs asserts the v0.5.0 identity and npm run verify passes end to end (39 tests, artifact 50 files with the migrate skill in the required list).",
+  "ticket_id": "ticket-release-v050"
+}
