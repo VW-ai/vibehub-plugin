@@ -1,0 +1,49 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "migrations-reference-owned",
+      "criterion": "A versioned migrations reference exists under the new skill, states the 0.4-to-0.5 step once (room tree via distill, entries moved per placement rule, context_refs rewritten, validation and drift green afterwards), and the skill-contracts tests assert its presence and structure."
+    },
+    {
+      "acceptance_id": "migrate-skill-judgment-first",
+      "criterion": "skills/vibehub-migrate/SKILL.md is short and judgment-first: it detects the project's shape, applies only the applicable steps from the reference as reviewable Git changes, triggers only on the legacy validation error or an explicit upgrade request, and points at (never restates) the placement and boundary references."
+    },
+    {
+      "acceptance_id": "migration-rehearsed",
+      "criterion": "A scripted rehearsal proves the 0.4-to-0.5 path: a scratch repo with a 0.4-style flat context layer fails validate, and after following the migration step mechanically (rooms created, entries moved, refs rewritten) the same repo passes project validate; covered by node --test."
+    },
+    {
+      "acceptance_id": "migration-suite-green",
+      "criterion": "The full node --test suite and the plugin artifact verification pass with the new skill bundled."
+    }
+  ],
+  "constraints": [
+    "No forward-compatibility shims, dual read paths, or background conversion anywhere.",
+    "The migrations reference is the single source; the skill and other documents point at it.",
+    "Migration output is ordinary Git changes reviewed like any other work."
+  ],
+  "context": "Per decision-agent-driven-upgrade-migration, the data layer carries no forward-compatibility shims; upgrades are explicit agent-driven restructures shipped with each release. This ticket creates the capability the v0.5.0 release requires, following the established contract pattern: a versioned migrations reference (single source, owned by the new skill) whose entries are agent-facing judgment guidance per version step, and a short vibehub-migrate skill that reads the project's current shape, finds the applicable steps, and applies them as ordinary reviewable Git changes. Triggers are honest: the legacy-structure validation error (a populated flat .vibehub/context/ fails validate with migration guidance since 0.5) or an explicit user upgrade request — never background conversion. The 0.4-to-0.5 entry: build the Room tree via the distill skill when none exists, move flat context entries into their owning rooms per the placement rule, rewrite ticket context_refs to roomed paths, then prove project validate and room drift pass. Skills stay judgment-first; anything deterministic already exists in vh.mjs.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative upgrade policy this ticket implements.",
+      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+    },
+    {
+      "purpose": "Placement rule the migration applies when moving entries into rooms.",
+      "ref": "skills/vibehub-ingest/references/knowledge-governance.json"
+    },
+    {
+      "purpose": "The 0.5 target structure and the legacy-directory validation error that triggers migration.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-always-roomed.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "Projects on an older VibeHub data format upgrade by agent-driven restructure: a migrate skill owns a versioned migrations reference whose first entry converts a 0.4-style flat context layer into the 0.5 Room world.",
+  "provenance_refs": [
+    "conversation:2026-08-04-v050-release-migration",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-upgrade-migration-skill"
+}

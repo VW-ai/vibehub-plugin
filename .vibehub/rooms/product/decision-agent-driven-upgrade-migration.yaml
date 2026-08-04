@@ -1,0 +1,41 @@
+{
+  "context_id": "decision-agent-driven-upgrade-migration",
+  "detail": "The checked-in data layer (Context, Rooms, Tickets, Evidence, Outcomes) is never burdened with forward-compatibility shims. Instead, upgrading is an explicit, agent-driven restructure: when a user pulls a new plugin version into a project whose .vibehub still has the previous format, the agent converts the old structure into the new one in place, under Git review like any other change. Every release that changes the data layer or skill contracts must therefore ship its migration step as agent-facing guidance in a versioned, single-source migrations reference owned by a migrate skill — the same contract pattern as the lifecycle and knowledge-governance references. Migration triggers are honest and explicit: a validation error naming a legacy structure (such as a populated flat .vibehub/context/) or the user asking to upgrade; never background conversion. The first entry is 0.4-to-0.5: flat context entries move into owning rooms (building the room tree via distill when none exists), ticket context_refs are rewritten to roomed paths, and validation must pass afterwards. This keeps the codebase clean of compatibility branches while making upgrades cheap for users: the agent pays the conversion cost once per project, visibly, in a reviewable diff.",
+  "evidence": [
+    {
+      "note": "Owner set the upgrade policy while preparing the v0.5.0 release: no forward compatibility, agent-driven restructure shipped with every release, generalized beyond the context layer to every version-adaptation need.",
+      "ref": "conversation:2026-08-04-v050-release-migration"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-context-always-roomed",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T03:39:59.000Z",
+    "quote": "我们不对context layer向前兼容，但是我们直接把前版本的context layer给重构成新版本",
+    "ref": "conversation:2026-08-04-v050-release-migration"
+  },
+  "state": "active",
+  "summary": "VibeHub does not keep the data layer forward-compatible: every release ships agent-facing migration guidance that restructures a project's old-format .vibehub into the new format",
+  "tags": [
+    "release",
+    "migration",
+    "upgrade",
+    "compatibility",
+    "contracts"
+  ],
+  "type": "decision"
+}
