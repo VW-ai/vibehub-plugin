@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.5.0 — 2026-08-04
+
+- Introduce the Room taxonomy: every Context entry lives in the room that
+  owns it under `.vibehub/rooms/`, directories carry containment, and the
+  flat `.vibehub/context/` is removed (a populated legacy directory fails
+  validation with migration guidance).
+- Add the deterministic freshness layer: `vh room drift`, `align`, and
+  `stale` compare snapshot blob hashes as ground truth, with anchor-overlap
+  detection and stale-origin layering (`drift:` marks are recomputable,
+  unprefixed marks are preserved claims).
+- Restore distillation as two ambient modes: a resumable cold start that
+  builds the Room tree and align-on-use updates at every Ticket start.
+- Complete the Ticket lifecycle: mid-execution work discovery and rolling-wave
+  draft Tickets (`maturity: draft` surfaces as REFINE and never executes),
+  both as plan-owned lifecycle events.
+- Contractize the skill system: knowledge-governance and architecture-boundary
+  shared references, plus a model-free contract test layer welding every
+  skill-cited command and pointer to reality.
+- Make vibehub-pr room-aware: merge semantics for Rooms, a drift gate before
+  PR handoff, and a Room-lens summary.
+- Ship agent-driven upgrades: `vibehub-migrate` restructures a 0.4-style
+  project into the Room world from a versioned migrations reference; the
+  data layer carries no forward-compatibility shims.
+
 ## 0.4.0 — 2026-08-02
 
 - Pivot VibeHub to a lightweight Skill-first plugin with direct Git-native
