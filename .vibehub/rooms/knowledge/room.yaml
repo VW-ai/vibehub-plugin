@@ -30,7 +30,7 @@
         "path": "skills/vibehub-ingest/references/knowledge-governance.json"
       },
       {
-        "blob": "6897bffe5ec35a195aa12b5821c9aec3c5477cdc",
+        "blob": "c20a6246e4b73a88e3cf1ab055da0573dd6760d3",
         "path": "skills/vibehub-query/SKILL.md"
       },
       {
@@ -38,8 +38,8 @@
         "path": "skills/vibehub-query/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-04T00:54:47.701Z",
-    "last_aligned_commit": "6d16979ec26603501c16f859e3595839fdd37748"
+    "checked_at": "2026-08-04T01:07:55.264Z",
+    "last_aligned_commit": "1d7d379009105bd85dbdd9c1d753c92fe52b6969"
   },
   "anchors": [
     "skills/contracts/context.schema.json",
