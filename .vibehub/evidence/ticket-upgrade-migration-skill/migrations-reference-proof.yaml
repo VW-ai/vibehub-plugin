@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "migrations-reference-owned"
+  ],
+  "evidence_id": "migrations-reference-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T03:49:15.000Z",
+  "refs": [
+    "commit:b7abb52",
+    "skills/vibehub-migrate/references/migrations.json",
+    "test/skill-contracts.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-migrate/references/migrations.json states the 0.4-to-0.5 step once — distill-built room tree, placement-rule moves via git mv, context_ref rewrites, validation and drift proof — with detect text matching the real legacy error; the skill-contracts test asserts owner, version pair, step count, and the skill's pointer to the reference.",
+  "ticket_id": "ticket-upgrade-migration-skill"
+}
