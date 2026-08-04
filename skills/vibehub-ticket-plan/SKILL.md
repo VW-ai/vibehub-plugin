@@ -10,7 +10,11 @@ Split only at a real scheduling, dependency, retry, authority, or verification
 boundary.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
-This Skill owns `plan-applied`; it does not own UI launch mechanics.
+This Skill owns `plan-applied` and `execution-discovers-work`; it does not own
+UI launch mechanics. `execution-discovers-work` is the single home of the
+mid-cycle transition: when execution surfaces new independently schedulable
+work, it re-enters this Skill, which turns the discovery into Tickets with
+their direct dependencies — executors never absorb it silently.
 
 ## Workflow
 

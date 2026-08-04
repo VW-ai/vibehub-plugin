@@ -686,15 +686,25 @@ function contextOperation(operation, repo, input, options = {}) {
     const query = typeof input.query === "string" ? input.query.trim().toLowerCase() : "";
     const requested = Array.isArray(input.context_ids) ? new Set(input.context_ids) : null;
     const includeInactive = input.include_inactive === true;
-    const matches = documents(repository.contexts.documents).filter((item) => {
-      if (!includeInactive && item.state !== "active") return false;
-      if (requested && !requested.has(item.context_id)) return false;
-      if (!query) return true;
-      return [item.context_id, item.type, item.summary, item.detail, ...item.tags]
-        .join("\n")
-        .toLowerCase()
-        .includes(query);
-    });
+    let scope = null;
+    if (options.room) {
+      if (!repository.rooms.documents.has(options.room)) {
+        throw new VibeHubError("not_found", `Room not found: ${options.room}`);
+      }
+      scope = join(repository.paths.rooms, ...options.room.split("/")) + sep;
+    }
+    const matches = [...repository.contexts.documents.values()]
+      .filter(({ document: item, path }) => {
+        if (scope && !path.startsWith(scope)) return false;
+        if (!includeInactive && item.state !== "active") return false;
+        if (requested && !requested.has(item.context_id)) return false;
+        if (!query) return true;
+        return [item.context_id, item.type, item.summary, item.detail, ...item.tags]
+          .join("\n")
+          .toLowerCase()
+          .includes(query);
+      })
+      .map((entry) => entry.document);
     return { contexts: matches, count: matches.length };
   }
   throw new VibeHubError("unsupported_operation", `Unsupported context operation: ${operation}`);

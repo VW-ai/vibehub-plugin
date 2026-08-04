@@ -90,6 +90,32 @@ test("context put demands a room, refuses a missing room, and never duplicates a
   assert.equal(updated.status, 0, updated.stdout);
 });
 
+test("context query --room scopes to the room subtree including sub-rooms", () => {
+  const repo = tempRepo("room-query-scope");
+  assert.equal(run(repo, "project", "init").status, 0);
+  writeRoom(repo, "auth", room("auth"));
+  writeRoom(repo, "auth/oauth", room("oauth"));
+  writeRoom(repo, "billing", room("billing"));
+  assert.equal(run(repo, "context", "put", context({ context_id: "decision-auth-flow", summary: "Auth flow decision" }), ["--room", "auth"]).status, 0);
+  assert.equal(run(repo, "context", "put", context({ context_id: "decision-oauth-provider", summary: "OAuth provider decision" }), ["--room", "auth/oauth"]).status, 0);
+  assert.equal(run(repo, "context", "put", context({ context_id: "decision-billing-cycle", summary: "Billing cycle decision" }), ["--room", "billing"]).status, 0);
+
+  const authScope = run(repo, "context", "query", {}, ["--room", "auth"]);
+  assert.equal(authScope.status, 0, authScope.stdout);
+  assert.deepEqual(
+    authScope.envelope.data.contexts.map((item) => item.context_id).sort(),
+    ["decision-auth-flow", "decision-oauth-provider"],
+  );
+
+  const billingScope = run(repo, "context", "query", {}, ["--room", "billing"]);
+  assert.equal(billingScope.envelope.data.count, 1);
+  assert.equal(billingScope.envelope.data.contexts[0].context_id, "decision-billing-cycle");
+
+  const missing = run(repo, "context", "query", {}, ["--room", "payments"]);
+  assert.notEqual(missing.status, 0);
+  assert.equal(missing.envelope.error.code, "not_found");
+});
+
 test("alignment block and stale flag validate strictly", () => {
   const repo = tempRepo("room-alignment");
   assert.equal(run(repo, "project", "init").status, 0);

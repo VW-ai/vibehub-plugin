@@ -1,0 +1,42 @@
+{
+  "context_id": "note-four-invariants-of-modular-systems",
+  "detail": "The owner distilled the skill-system methodology into four invariants that hold for any modular system — teams, pipelines, microservices — independent of AI or natural language. Decomposition: what is the independent unit of work; the test is whether pieces can execute without depending on each other (VibeHub: skills as units, tickets as work units, rooms as knowledge units). Explicit boundary agreement: at every handoff, the shape of the handoff artifact must be explicit and acknowledged by both sides, because implicit assumptions at boundaries make systems break silently (VibeHub: the five document schemas, the lifecycle contract, the canonical-agent-output contract). Shared knowledge, deduplicated: any methodology or rule used by two or more units is extracted to a single referenced source to prevent drift — DRY for governing text (VibeHub: ticket-lifecycle.json, the planned knowledge-governance reference, this room's conventions). Dispatch: every multi-unit system needs a mechanism that decides who handles a request, even if it is one if/else (VibeHub: the host's skill-trigger matching is the dispatch table and each SKILL.md description is its routing entry, with the one-line canonical entry owned by ticket-plan; a deliberate decision rejects any second router). When evaluating or extending the skill system, changes should be judged against these four dimensions.",
+  "evidence": [
+    {
+      "note": "Owner articulated the four invariants (切分, 边界上的显式约定, 共享知识的单一来源, 入口与路由) as the system-agnostic theory behind the contract-first skill audit.",
+      "ref": "conversation:2026-08-04-skill-contract-audit"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "convention-skill-contract-test-layers",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T01:00:00.000Z",
+    "quote": "边界处如果没有显式约定，就会隐性假设不一致，然后系统悄悄坏掉",
+    "ref": "conversation:2026-08-04-skill-contract-audit"
+  },
+  "state": "active",
+  "summary": "Four system-agnostic invariants govern the skill architecture: decomposition, explicit boundary agreement, deduplicated shared knowledge, and dispatch",
+  "tags": [
+    "architecture",
+    "modularity",
+    "skills",
+    "contracts",
+    "dispatch",
+    "methodology"
+  ],
+  "type": "note"
+}

@@ -27,7 +27,10 @@ UI launch mechanics.
 3. Implement autonomously within the Ticket's outcome, constraints, and user
    authority. Git commits are cheap rollback points; no database coordination
    is required for one Agent/writer per worktree. `ready-execution` stays
-   quiet: do not open review UI for routine progress.
+   quiet: do not open review UI for routine progress. New independently
+   schedulable work discovered mid-execution belongs to planning — hand it to
+   `$vibehub-ticket-plan`. A durable cross-ticket fact surfaced by execution
+   is delegated to `$vibehub-ingest`, placed in the room this Ticket entered.
 4. Test in proportion to risk. For each criterion with real proof, append one
    or more Evidence documents using `../contracts/evidence.schema.json`:
 
