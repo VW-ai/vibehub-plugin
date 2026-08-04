@@ -34,8 +34,8 @@
         "path": "skills/vibehub-query/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-04T00:19:42.859Z",
-    "last_aligned_commit": "3b45ab2341b092fe4526fc266798ffaf2c9069fe"
+    "checked_at": "2026-08-04T00:45:20.670Z",
+    "last_aligned_commit": "f413d67e8686cb8337cf0f52c2d508ba67699d22"
   },
   "anchors": [
     "skills/contracts/context.schema.json",
