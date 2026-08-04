@@ -31,5 +31,6 @@ This Skill owns `closeout-recorded`; it does not own UI launch mechanics.
 5. Read `ticket frontier` back. Only a successful Outcome unlocks direct
    dependents. Follow `closeout-recorded`: ask `$vibehub-ticket-review` to
    present the exact Ticket's Log, then report the result and any concrete
-   follow-up gap. Presentation is not another approval step. Do not create
+   follow-up gap. A durable cross-ticket fact revealed by adjudication is
+   delegated to `$vibehub-ingest`, placed in the Ticket's room. Do not create
    speculative parity work.

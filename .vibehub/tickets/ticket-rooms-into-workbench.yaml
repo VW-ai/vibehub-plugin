@@ -1,0 +1,68 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "uiux-design-approved",
+      "criterion": "A UI/UX proposal for the rooms surface — tree placement, per-room state rendering, room detail with entries and consuming Tickets — is presented against the quiet-intelligence standard and explicitly approved by the owner before implementation begins."
+    },
+    {
+      "acceptance_id": "projection-exposes-rooms",
+      "criterion": "The vh-ui projection exposes the room tree with each room's description, boundary, and drift state computed deterministically, consumable by the UI without semantic inference."
+    },
+    {
+      "acceptance_id": "in-situ-staleness",
+      "criterion": "The rooms surface keeps FRESH rooms quiet and renders DRIFTED, STALE, UNKNOWN, and WARNING in situ with restrained semantic accents consistent with the checked-in UI constraint."
+    },
+    {
+      "acceptance_id": "room-consumption-detail",
+      "criterion": "Selecting a room reveals its Context entries and the Tickets consuming them, derived mechanically from context_refs paths."
+    },
+    {
+      "acceptance_id": "workbench-verified",
+      "criterion": "node --test covers the extended projection and surface, and the plugin artifact builds and verifies cleanly."
+    }
+  ],
+  "constraints": [
+    "The causal Ticket graph is never re-clustered or re-laid-out by room.",
+    "All room information is mechanically projected from canonical documents; the UI performs no semantic inference.",
+    "The quiet-intelligence spatial-workbench standard binds every visual choice."
+  ],
+  "context": "Rooms are currently invisible in the local graph UI beyond the room chip on context cards. The quiet-intelligence constraint already demands that stale facts appear in situ at the locus that owns them, and room drift states (FRESH, DRIFTED, STALE, UNKNOWN, WARNING) are the first real mechanical source of that signal. Everything needed is mechanically derivable from canonical documents: the room tree and room.yaml self-descriptions, drift states via the same snapshot-hash comparison vh room drift uses, and ticket-to-room consumption edges from context_refs paths. This is a large ticket that starts with UI/UX design before any implementation: the visual form of the rooms surface is an owner decision governed by the quiet-intelligence standard. Deliberately out of scope: re-clustering or re-laying-out the causal ticket graph by room — the graph's primary object remains the execution order.",
+  "context_refs": [
+    {
+      "purpose": "Binding visual and interaction standard for the new surface.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Mechanical projection boundary the rooms data must respect.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Drift states the surface renders and their exact semantics.",
+      "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
+    },
+    {
+      "purpose": "Room tree structure and containment semantics being visualized.",
+      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The workbench UI makes the Room layer visible: the room tree with per-room drift state rendered in situ, and each room's knowledge and consuming Tickets reachable from a quiet rooms surface.",
+  "provenance_refs": [
+    "conversation:2026-08-03-room-taxonomy-design",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [
+    {
+      "rationale": "Per-room drift states come from the deterministic drift comparison.",
+      "target_ticket_id": "ticket-drift-check-mechanical",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Consumption edges assume every context ref resolves inside the Room tree.",
+      "target_ticket_id": "ticket-context-always-roomed",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-rooms-into-workbench"
+}

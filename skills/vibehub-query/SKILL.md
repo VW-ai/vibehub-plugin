@@ -5,9 +5,12 @@ description: Retrieve lightweight Git-native VibeHub Context for a Ticket, file,
 
 # VibeHub Query
 
-Use the smallest query that can answer the task. The files in
-`.vibehub/context/` are the source of truth; there is no database or cache to
-refresh.
+Use the smallest query that can answer the task. The Room tree under
+`.vibehub/rooms/` is the source of truth — every Context entry lives inside
+the room that owns it, and the architecture boundary
+(`../vibehub-setup/references/architecture-boundary.md`) means there is no
+database or cache elsewhere to refresh. When reporting answers, distinguish
+trust layers per `../vibehub-ingest/references/knowledge-governance.json`.
 
 ```text
 node ../scripts/vh.mjs context query --repo <root> --input <query.json>

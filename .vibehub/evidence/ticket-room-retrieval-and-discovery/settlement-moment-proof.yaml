@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "settlement-owned-moment"
+  ],
+  "evidence_id": "settlement-moment-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T00:45:43.000Z",
+  "refs": [
+    "commit:f413d67",
+    "skills/vibehub-ticket-run/SKILL.md",
+    "skills/vibehub-ticket-closeout/SKILL.md"
+  ],
+  "schema_version": 1,
+  "summary": "ticket-run and ticket-closeout each gained one judgment-first sentence delegating durable cross-ticket facts to the ingest skill, placed in the room the ticket entered — using the ingest skill's existing explicit-delegation path, adding no background capture, polling, or new mechanics.",
+  "ticket_id": "ticket-room-retrieval-and-discovery"
+}

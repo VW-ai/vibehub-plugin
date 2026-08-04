@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-derived-alignment-recompute",
+  "detail": "Room alignment blocks and mechanically written stale marks are derived state — a cache of hash comparisons against one tree snapshot. The merge rule for derived state is recompute, not choose-a-side: after merging real content (code and spec text), run vh room drift on the merged tree and realign; whether the other branch was ahead or behind becomes a non-question because hashes answer it against merged reality. Semantic stale marks are different: they are claims, governed by knowledge governance — preserved across merges and never silently cleared until the recorded reason is actually addressed. Parallel branches creating rooms is expected to be rare because parallel work means different territory; the one silent failure is two branches naming the same territory differently (two room directories with overlapping anchors merge without any git conflict), so anchor overlap between non-nested rooms is a mechanically detected defect that surfaces the need for human fusion — no automated split or merge machinery is built for an anomaly that only needs detection. Directory-carried containment makes the benign cases compose naturally: entries added to a room that another branch restructured land one level too high at worst, honest and repairable by git mv, never lost.",
+  "evidence": [
+    {
+      "note": "Owner raised the stale-divergence and room-fusion questions for the PR skill; agreed detection-only for overlap and recompute-not-pick for derived state.",
+      "ref": "conversation:2026-08-04-pr-room-merge-semantics"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-drift-check-snapshot-hashes",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T02:17:22.000Z",
+    "quote": "我感觉the point of two people work in parallel就是我们彼此在干不同的事情",
+    "ref": "conversation:2026-08-04-pr-room-merge-semantics"
+  },
+  "state": "active",
+  "summary": "Alignment state is derived: merges never hand-pick it, they recompute drift against the merged tree; room fusion is detected, not automated",
+  "tags": [
+    "merge",
+    "pr",
+    "rooms",
+    "drift",
+    "derived-state",
+    "stale"
+  ],
+  "type": "decision"
+}

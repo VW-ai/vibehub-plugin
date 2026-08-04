@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "pr-drift-gate",
+    "room-aware-summary",
+    "gate-suite-green"
+  ],
+  "closed_at": "2026-08-04T03:20:00.000Z",
+  "evidence_ids": [
+    "drift-gate-proof",
+    "room-lens-summary-proof",
+    "gate-suite-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout verified commit 5055155 against all three criteria. pr-drift-gate: vibehub-pr step 1 now runs room drift alongside project validate and states the gate with the validator-refined semantics — entered rooms must be aligned (deliberately not the criterion's literal FRESH, so a preserved semantic claim from another branch cannot over-block), an unexplained DRIFTED room blocks the handoff until aligned or honestly marked, drift:-prefixed marks ship as recorded debt, and rooms the branch never entered do not block; no drift states or origin rules are restated beyond the pre-existing step-3 pointer to knowledge-governance.json. room-aware-summary: step 4 leads with contract and shared-reference diffs, then rooms entered with their knowledge changes, then the existing outcome, evidence, tests, and known-gaps items. gate-suite-green: independently reran node --test (38/38 pass; the skill-contracts command-surface test resolves the newly cited room drift invocation) and verify-plugin-artifact (ok, 47 files); ticket validate reports a valid graph. Constraints held: judgment-first prose only, +10/-3 lines, no new commands, and the no-second-merge-protocol guardrail is intact.",
+  "ticket_id": "ticket-pr-room-aware-gate",
+  "unresolved_acceptance_ids": []
+}

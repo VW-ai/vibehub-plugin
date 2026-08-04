@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-ambient-two-mode-distill",
+  "detail": "Distillation is restored in two modes. Cold start: when a checkout has no rooms/ tree, a full-repository distill builds the initial room taxonomy. It runs once per project (at setup or the first ticket), is allowed to be perceptible, and must be resumable with per-room progress so large repositories can continue after interruption. A recursive lazy variant (distill only the neighborhood of each ticket, backfill later) was explicitly rejected: distill-before-ticket recursion makes every ticket's startup path unpredictable, which is worse than paying the full cost once. Update: at every ticket-plan start, a deterministic mechanical drift check (see decision-drift-check-snapshot-hashes) classifies rooms; the agent semantically reconciles only rooms the current ticket enters, and unrelated drifted rooms are merely marked stale with a reason — align-on-use, so each ticket's alignment cost is proportional to the rooms it enters, never to the whole project's debt. Governance: there is no runtime activation gate. Distilled output carries distilled provenance and is the lower-trust layer; human-ingested decisions and constraints win conflicts; PR review on Git is the human gate. User perception target for a normal ticket start is a single line such as: Aligned 2 rooms (3 files drifted).",
+  "evidence": [
+    {
+      "note": "Owner approved Git-as-the-gate trust layering, rejected recursive lazy cold start in favor of a one-time full pass, and approved the align-on-use policy for unrelated drifted rooms.",
+      "ref": "conversation:2026-08-03-room-taxonomy-design"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:dfe40a28aa7d5fd023f0a6c01f0e6b43"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-03T22:36:40.000Z",
+    "quote": "这样会不会反而有一点复杂了，都不如一个新的项目，上来先跑一次cold start",
+    "ref": "conversation:2026-08-03-room-taxonomy-design"
+  },
+  "state": "active",
+  "summary": "Distill returns as a one-time resumable cold start plus ambient align-on-use updates, with Git as the only review gate",
+  "tags": [
+    "distill",
+    "cold-start",
+    "align-on-use",
+    "stale",
+    "ambient",
+    "governance"
+  ],
+  "type": "decision"
+}

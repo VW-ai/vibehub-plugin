@@ -1,0 +1,41 @@
+{
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "dca0bab950650385d9fd42197ce2d8b0fee4f74d",
+        "path": "skills/vibehub-ticket-review/SKILL.md"
+      },
+      {
+        "blob": "9d666f916f3b9050cc8f98420d571a6b54cb4812",
+        "path": "skills/vibehub-ticket-review/agents/openai.yaml"
+      },
+      {
+        "blob": "77c3c01d28b916692b1712adcd2231e69127dae2",
+        "path": "skills/vibehub-ticket-review/assets/app.css"
+      },
+      {
+        "blob": "3379c1b7813353bd59a71abd06034fe28518ab9a",
+        "path": "skills/vibehub-ticket-review/assets/app.js"
+      },
+      {
+        "blob": "9fdf7ddf3b3bdd7a2c5931b482a424b17cbfa075",
+        "path": "skills/vibehub-ticket-review/assets/index.html"
+      },
+      {
+        "blob": "8e9df3757ed56691221bf83002dfffba0f9c0bda",
+        "path": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+      }
+    ],
+    "checked_at": "2026-08-04T01:07:37.324Z",
+    "last_aligned_commit": "46d88ff2ca549af77545003d367d811889fbf6af"
+  },
+  "anchors": [
+    "skills/vibehub-ticket-review/"
+  ],
+  "boundary": "The read-only local graph workbench: projection, loopback host, assets, and interaction language. Not the canonical YAML documents it renders.",
+  "description": "The local read-only graph UI that presents the Ticket graph and Context as a quiet, actionable workbench.",
+  "kind": "room",
+  "room_id": "workbench",
+  "schema_version": 1,
+  "stale": false
+}

@@ -1,0 +1,51 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "pr-drift-gate",
+      "criterion": "vibehub-pr's preparation step runs room drift and states the gate: rooms this branch entered must be FRESH, drift:-prefixed stale marks may ship as recorded debt, and an unexplained DRIFTED room blocks the PR handoff until aligned or honestly marked."
+    },
+    {
+      "acceptance_id": "room-aware-summary",
+      "criterion": "The PR summary instruction leads with contract and shared-reference diffs and lists the rooms the branch entered with their knowledge changes, alongside the existing outcome, evidence, tests, and known-gaps items."
+    },
+    {
+      "acceptance_id": "gate-suite-green",
+      "criterion": "The skill-contracts tests stay green over the new text and the full node --test suite plus artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Judgment-first prose only: no new vh commands, flags, or mechanics.",
+    "The gate reuses drift semantics as recorded; no restatement of drift states or origin rules beyond the existing pointers.",
+    "The skill stays short; the no-second-merge-protocol guardrail stands."
+  ],
+  "context": "vibehub-pr's preparation step runs only document-level validation, which never looks at drift — so a branch could ship drifted or unstamped rooms and export staleness to the whole team, exactly what align-on-use exists to prevent. The gate is the last stop of 谁用谁修: at PR preparation, room drift must show every room this branch entered as FRESH; drift:-prefixed stale marks on unentered rooms are honest recorded debt and may ship; an unexplained DRIFTED room blocks the handoff until aligned or honestly marked. The summary also predates Rooms: reviewers should see contract and shared-reference diffs first because their blast radius exceeds skill prose (ownership tests and pointer networks hang off them), followed by the rooms entered with their knowledge changes — all mechanically derivable from alignment stamps and context placement paths. Both changes are a few judgment-first lines in the existing skill; no new commands, no new mechanics.",
+  "context_refs": [
+    {
+      "purpose": "Derived-state and recompute semantics the gate applies at the PR boundary.",
+      "ref": ".vibehub/rooms/knowledge/decision-derived-alignment-recompute.yaml"
+    },
+    {
+      "purpose": "Origin rules deciding which stale marks may ship.",
+      "ref": ".vibehub/rooms/knowledge/decision-stale-origin-layers.yaml"
+    },
+    {
+      "purpose": "Align-on-use policy the gate completes.",
+      "ref": ".vibehub/rooms/knowledge/decision-ambient-two-mode-distill.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A branch cannot hand off a PR with unexplained room drift, and the PR summary reads through the Room lens: contract diffs first, then the rooms the branch entered and what knowledge changed in each.",
+  "provenance_refs": [
+    "conversation:2026-08-04-pr-room-merge-semantics",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [
+    {
+      "rationale": "The gate builds on the merge judgment and origin contract that ticket landed in the pr skill.",
+      "target_ticket_id": "ticket-pr-room-merge-semantics",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-pr-room-aware-gate"
+}

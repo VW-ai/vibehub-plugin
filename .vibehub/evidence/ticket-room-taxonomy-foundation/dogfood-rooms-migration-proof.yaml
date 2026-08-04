@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "dogfood-rooms"
+  ],
+  "evidence_id": "dogfood-rooms-migration-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-03T23:00:44.000Z",
+  "refs": [
+    "commit:069d4d8",
+    ".vibehub/rooms/knowledge/room.yaml",
+    ".vibehub/rooms/workbench/room.yaml",
+    ".vibehub/rooms/ticket-lifecycle/room.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "This repository's .vibehub gained knowledge, workbench, and ticket-lifecycle rooms; six context entries moved into their owning rooms via git mv with every ticket context_ref updated, and three genuinely cross-room entries (speed-first, dogfood-only phase, disposable artifacts) remain at the root. project validate reports rooms:3 contexts:9 with zero errors and the plugin artifact build verifies.",
+  "ticket_id": "ticket-room-taxonomy-foundation"
+}

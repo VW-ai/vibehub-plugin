@@ -9,6 +9,7 @@
     "schema_version": { "const": 1 },
     "kind": { "const": "ticket" },
     "ticket_id": { "$ref": "#/$defs/id" },
+    "maturity": { "const": "draft" },
     "outcome": { "$ref": "#/$defs/text" },
     "context": { "$ref": "#/$defs/text" },
     "acceptance": {

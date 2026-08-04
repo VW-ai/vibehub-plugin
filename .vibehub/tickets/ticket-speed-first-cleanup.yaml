@@ -36,7 +36,7 @@
   "context_refs": [
     {
       "purpose": "Current product and cleanup authority.",
-      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     },
     {
       "purpose": "Public product behavior and data model.",

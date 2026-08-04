@@ -1,0 +1,41 @@
+{
+  "context_id": "convention-skill-contract-test-layers",
+  "detail": "Systematic, state-machine, or cross-skill content is never written as prose in more than one skill: it lives in exactly one checked-in contract or shared reference (the pattern set by ticket-lifecycle.json) owned by one skill, and every other skill keeps a single pointer line. Testing follows a three-layer pyramid. Unit: deterministic script and schema behavior in vh.mjs and contracts, model-free and millisecond-fast. Contract: model-free assertions that weld prompt text to system reality — an event name appears only in its owner's SKILL.md, every vh.mjs invocation a skill cites resolves to a real domain and operation, required contract pointers are present. This layer tests whether what a prompt says about the system is true, and its absence caused real drift (a stale context put example after --room became required; a verification script failing at runtime). E2E: a real agent executes the skill and an independent agent adjudicates the result — testing a skill itself is e2e by definition, today practiced socially as independent validate and closeout agents per ticket. The thicker the contract layer, the less the expensive e2e layer must cover: e2e should be left with pure judgment, never mechanics.",
+  "evidence": [
+    {
+      "note": "Owner set the modularity rule (systematic content lives in one place) and the three-layer test framing during the whole-skill contract audit.",
+      "ref": "conversation:2026-08-04-skill-contract-audit"
+    },
+    {
+      "note": "Existing ownership test proving the contract-layer pattern: a lifecycle event name outside its owner's skill fails the suite.",
+      "ref": "test/ticket-lifecycle.test.mjs"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T00:41:13.000Z",
+    "quote": "这样我们的对prompt的测试也会好写很多好吧。甚至可以区分，什么是unit 测试， 什么是e2e测试（测试skill 本身，就是e2e）",
+    "ref": "conversation:2026-08-04-skill-contract-audit"
+  },
+  "state": "active",
+  "summary": "Skills are developed contract-first and tested in three layers: deterministic unit, mechanical prompt-contract, and agent-through-skill e2e",
+  "tags": [
+    "skills",
+    "testing",
+    "contracts",
+    "modularity",
+    "prompt-engineering"
+  ],
+  "type": "convention"
+}

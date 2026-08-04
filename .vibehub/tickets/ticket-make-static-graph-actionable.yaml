@@ -46,15 +46,15 @@
   "context_refs": [
     {
       "purpose": "Binding limit on visual noise, semantics, interaction, accessibility, and lightweight implementation.",
-      "ref": ".vibehub/context/constraint-ui-quiet-intelligence-standard.yaml"
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     },
     {
       "purpose": "Product authority for a first-class local graph and narrow per-worktree launcher.",
-      "ref": ".vibehub/context/decision-local-graph-ui-first-class.yaml"
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
     },
     {
       "purpose": "Mechanical-consumer boundary for Agent output and canonical Git documents.",
-      "ref": ".vibehub/context/contract-canonical-agent-output.yaml"
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     },
     {
       "purpose": "Successful baseline and owner-approved interaction direction that this Ticket deepens.",

@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "boundary-stated-once"
+  ],
+  "evidence_id": "boundary-once-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T00:54:48.000Z",
+  "refs": [
+    "commit:6d16979",
+    "skills/vibehub-setup/references/architecture-boundary.md",
+    "skills/vibehub-ticket-plan/SKILL.md"
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-setup/references/architecture-boundary.md states the product-wide boundary once; the four restating skills (setup, ingest, query, run) lost their variant wordings for pointer lines, plan and distill gained the pointer they lacked while keeping only skill-specific temptations, and both presentation-semantics restatements (plan and closeout) were removed in favor of the lifecycle contract's continuation fields.",
+  "ticket_id": "ticket-contractize-skill-system"
+}

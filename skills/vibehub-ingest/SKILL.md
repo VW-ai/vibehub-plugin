@@ -24,10 +24,11 @@ checkpoint cadence.
 3. Create one atomic document per claim using
    `../contracts/context.schema.json`. Preserve the user's exact source ref and,
    when useful, a short exact quote. Every document needs readable evidence.
-4. Write the complete document:
+4. Choose the owning room per the placement rule in
+   `references/knowledge-governance.json`, then write the complete document:
 
    ```text
-   node ../scripts/vh.mjs context put --repo <root> --input <context.json>
+   node ../scripts/vh.mjs context put --repo <root> --room <path> --input <context.json>
    ```
 
    The `.yaml` file uses JSON-compatible YAML so the installed plugin needs no
@@ -42,5 +43,5 @@ checkpoint cadence.
   in a new Context item or ask the user when product authority is required.
 - Do not dual-write into another documentation system unless the user selected
   dual-write during setup.
-- Do not introduce receipts, databases, digests, daemons, hooks, or background
-  capture to make the write look more authoritative than Git.
+- A write gains no authority beyond Git; stay inside
+  `../vibehub-setup/references/architecture-boundary.md`.

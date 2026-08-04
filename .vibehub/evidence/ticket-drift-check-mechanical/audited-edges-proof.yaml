@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "audited-edge-tests"
+  ],
+  "evidence_id": "audited-edges-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-03T23:09:19.000Z",
+  "refs": [
+    "commit:41db1eb",
+    "test/room-drift.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "node --test covers every adversarially audited edge: a git mv out of the anchor still flags the source room via its deleted list (--no-renames), untracked files in new nested directories are detected (-uall), change-then-revert reports FRESH (hash equality, not history scan), an old checkout yields WARNING and align refuses to realign backwards, and anchor src/auth never matches src/authx (segment-boundary matching). Suite passes 28/28.",
+  "ticket_id": "ticket-drift-check-mechanical"
+}

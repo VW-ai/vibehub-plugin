@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "coldstart-skill",
+      "criterion": "A distill skill builds the initial rooms/ tree from the repository; interrupting it mid-run and re-invoking continues from recorded per-room progress instead of restarting."
+    },
+    {
+      "acceptance_id": "ticket-plan-integration",
+      "criterion": "vibehub-ticket-plan runs vh drift before planning; rooms the ticket enters are reconciled and aligned in the same start, unrelated drifted rooms only receive the stale write-back."
+    },
+    {
+      "acceptance_id": "trust-layering",
+      "criterion": "Distill-produced documents carry distilled provenance, and the documented conflict rule makes human-ingested context win over distilled content."
+    },
+    {
+      "acceptance_id": "perception-one-line",
+      "criterion": "A normal ticket start on an already-distilled repository surfaces alignment as a single report line (e.g. Aligned 2 rooms, 3 files drifted); only COLD_START is allowed to be a perceptible multi-step experience."
+    }
+  ],
+  "constraints": [
+    "No background capture, daemons, hooks cadence, or hidden state; distill runs only inside explicit skill workflows.",
+    "Update distill cost must be proportional to the rooms the ticket enters, never to whole-project drift debt.",
+    "Semantic judgment stays in skills/agents; every deterministic step goes through vh.mjs."
+  ],
+  "context": "Distill returns in two modes. Cold start: when vh drift reports COLD_START, a distill skill proposes the room tree and writes room.yaml per room; it runs once per project, may be perceptible, and must be resumable with per-room progress (a recursive lazy variant was explicitly rejected). Update: ticket-plan runs vh drift at every start; the agent semantically reconciles only rooms the current ticket enters (re-reading only the exact changed/added/deleted files vh drift lists), then vh align stamps them; unrelated drifted rooms get the stale write-back and are left alone — align-on-use. Governance: distilled documents carry distilled provenance and are the lower-trust layer; human-ingested decisions win conflicts; there is no runtime activation gate — PR review on Git is the gate.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative two-mode distill and governance decision this ticket implements.",
+      "ref": ".vibehub/rooms/knowledge/decision-ambient-two-mode-distill.yaml"
+    },
+    {
+      "purpose": "Mechanical check contract the workflow consumes.",
+      "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "Cold-start and align-on-use update distill run through the ticket lifecycle: a resumable cold-start distill skill and a ticket-plan integration that keeps user perception to one line.",
+  "provenance_refs": [
+    "conversation:2026-08-03-room-taxonomy-design",
+    "task:dfe40a28aa7d5fd023f0a6c01f0e6b43"
+  ],
+  "relations": [
+    {
+      "rationale": "Distill writes room.yaml documents defined by the foundation ticket.",
+      "target_ticket_id": "ticket-room-taxonomy-foundation",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Both modes are triggered and scoped by vh drift and stamped by vh align.",
+      "target_ticket_id": "ticket-drift-check-mechanical",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-ambient-distill-workflow"
+}

@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "retrieval-suite-green"
+  ],
+  "evidence_id": "retrieval-suite-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T00:45:43.000Z",
+  "refs": [
+    "commit:f413d67",
+    "commit:61ada04"
+  ],
+  "schema_version": 1,
+  "summary": "Full node --test suite passes 30/30 including the lifecycle ownership and scenario tests over the extended contract, and the plugin artifact builds and verifies cleanly from a wiped dist (45 files); all four dogfood rooms report FRESH after align-on-use.",
+  "ticket_id": "ticket-room-retrieval-and-discovery"
+}

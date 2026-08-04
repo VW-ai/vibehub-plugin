@@ -1,0 +1,38 @@
+{
+  "context_id": "decision-draft-ticket-maturity",
+  "detail": "Rolling-wave planning becomes canonical. A ticket may carry an optional maturity: draft marker (absence means firm; every existing ticket stays valid). A draft states the real direction in outcome and context but its acceptance may be coarse placeholders — at least one criterion always, because intent is never empty. The mechanical rule: a draft whose dependencies are all satisfied surfaces as REFINE, never READY, so an under-defined ticket is structurally impossible to execute; the frontier excludes drafts unconditionally. Refinement is owned by planning: when prerequisites close or the awaited human input arrives, ticket-plan re-enters with the accumulated results, rewrites the acceptance for real, and removes the maturity marker in place — the same ticket_id, so Git history preserves the evolution from sketch to firm. This models the owner's scenario: a big project planned day one keeps the whole road visible (a human-input blocker ticket in the middle, a chain of drafts behind it), and each draft firms up only when what it depends on is actually known. Draft is orthogonal to human-authority marking: the authority badge says a human must decide here; draft says everything behind this is still a sketch. Visual treatment in the workbench belongs to the rooms-surface design proposal and its owner-approval gate.",
+  "evidence": [
+    {
+      "note": "Owner described the rolling-wave gap (blockers followed by direction-known but under-defined tickets) and approved the maturity/REFINE design with 起吧.",
+      "ref": "conversation:2026-08-04-fuzzy-draft-tickets"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T00:59:02.000Z",
+    "quote": "那这种blocker 后面，我们会有类似于，fuzzy/draft tickets，就是大方向，大概有啥步骤我们是有的，但是具体的验收标准，或者具体的ticket 定义可能是多少欠缺的",
+    "ref": "conversation:2026-08-04-fuzzy-draft-tickets"
+  },
+  "state": "active",
+  "summary": "Draft tickets carry direction without executable definition: they can never run, only refine into firm tickets when their blockers resolve",
+  "tags": [
+    "tickets",
+    "draft",
+    "maturity",
+    "rolling-wave",
+    "lifecycle",
+    "planning"
+  ],
+  "type": "decision"
+}

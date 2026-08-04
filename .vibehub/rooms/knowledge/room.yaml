@@ -1,0 +1,57 @@
+{
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "956fb8cf65743894e27e167c6da586dfc716107e",
+        "path": "skills/contracts/context.schema.json"
+      },
+      {
+        "blob": "bf8884197dba4632d84d96d42c315baf5b767d63",
+        "path": "skills/contracts/room.schema.json"
+      },
+      {
+        "blob": "85ecc6e11f94a754d59f4f303a73eefca03708d6",
+        "path": "skills/vibehub-distill/SKILL.md"
+      },
+      {
+        "blob": "d7a671ac57909d14ae52fbe8cbdce70a6b17ebe0",
+        "path": "skills/vibehub-distill/agents/openai.yaml"
+      },
+      {
+        "blob": "9a8f293ebdab3f02cad4f7501ebde9fd87990061",
+        "path": "skills/vibehub-ingest/SKILL.md"
+      },
+      {
+        "blob": "2d90711188cd41e482615bc7714869bf60355545",
+        "path": "skills/vibehub-ingest/agents/openai.yaml"
+      },
+      {
+        "blob": "4fdd8f3bcd48be15dce4076b28d039e316279436",
+        "path": "skills/vibehub-ingest/references/knowledge-governance.json"
+      },
+      {
+        "blob": "c20a6246e4b73a88e3cf1ab055da0573dd6760d3",
+        "path": "skills/vibehub-query/SKILL.md"
+      },
+      {
+        "blob": "979251aa2a5a6ca887c5a02de7c7cb95e6394a31",
+        "path": "skills/vibehub-query/agents/openai.yaml"
+      }
+    ],
+    "checked_at": "2026-08-04T02:27:07.912Z",
+    "last_aligned_commit": "43fae5d96f8cd6337ca8f828d1d1dc2a19a2f807"
+  },
+  "anchors": [
+    "skills/contracts/context.schema.json",
+    "skills/contracts/room.schema.json",
+    "skills/vibehub-distill/",
+    "skills/vibehub-ingest/",
+    "skills/vibehub-query/"
+  ],
+  "boundary": "How durable knowledge enters, lives in, and leaves .vibehub: Context entries, the Room taxonomy, ingest and query, and the coming distill workflows. Not the Ticket execution lifecycle and not the workbench UI.",
+  "description": "The knowledge lifecycle of VibeHub: Context capture, Room taxonomy, retrieval, and distillation.",
+  "kind": "room",
+  "room_id": "knowledge",
+  "schema_version": 1,
+  "stale": false
+}

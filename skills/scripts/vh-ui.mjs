@@ -212,17 +212,25 @@ function operationalState(repository, ticket, outcome) {
   const blockers = ticket.relations
     .map((relation) => relation.target_ticket_id)
     .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful");
-  return label === "BLOCKED"
-    ? {
-        label,
-        detail: "Waiting for direct prerequisites to close successfully.",
-        references: blockers.map((ref) => ({ ref, label: "Prerequisite" })),
-      }
-    : {
-        label,
-        detail: "No unresolved direct prerequisite prevents execution.",
-        references: [],
-      };
+  if (label === "BLOCKED") {
+    return {
+      label,
+      detail: "Waiting for direct prerequisites to close successfully.",
+      references: blockers.map((ref) => ({ ref, label: "Prerequisite" })),
+    };
+  }
+  if (label === "REFINE") {
+    return {
+      label,
+      detail: "Draft Ticket: unblocked but under-defined; planning must rewrite its acceptance before it can execute.",
+      references: [{ ref: `.vibehub/tickets/${ticket.ticket_id}.yaml`, label: "Draft" }],
+    };
+  }
+  return {
+    label,
+    detail: "No unresolved direct prerequisite prevents execution.",
+    references: [],
+  };
 }
 
 function projectGraph(repository) {
@@ -265,11 +273,12 @@ function projectGraph(repository) {
 }
 
 function canonicalContextFromRef(repository, reference) {
-  const match = reference.match(/^\.vibehub\/context\/([^/]+)\.yaml$/u);
-  if (!match) return null;
-  const context = repository.contexts.documents.get(match[1])?.document;
+  const match = reference.match(/^\.vibehub\/rooms\/((?:[a-z0-9-]+\/)+)([a-z0-9-]+)\.yaml$/u);
+  if (!match || match[2] === "room") return null;
+  const context = repository.contexts.documents.get(match[2])?.document;
   if (!context) return null;
   return {
+    room: match[1].slice(0, -1),
     contextId: context.context_id,
     type: context.type,
     state: context.state,

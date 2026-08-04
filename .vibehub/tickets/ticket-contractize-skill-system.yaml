@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "knowledge-governance-reference",
+      "criterion": "A checked-in shared knowledge-governance reference states placement (lowest owning room, lowest common ancestor, create the missing room), trust layers (distill: source refs are the lower-trust layer, human-ingested Context wins, Git PR is the only gate), and the distill: source-ref convention exactly once; ingest, distill, and query each carry a single pointer line and no restated rule, and a node --test asserts the pointers exist."
+    },
+    {
+      "acceptance_id": "command-surface-welded",
+      "criterion": "A node --test extracts every vh.mjs domain-and-operation invocation cited in any SKILL.md and fails if one does not resolve to a real operation in vh.mjs, including the --room flag form."
+    },
+    {
+      "acceptance_id": "boundary-stated-once",
+      "criterion": "The product-wide architecture boundary is stated in exactly one shared reference; every skill keeps a one-line pointer plus only its skill-specific temptations (the four restating skills lose their variant wordings, plan and distill gain the pointer), and the two prose restatements of lifecycle continuation semantics (presentation is not an approval gate) are removed in favor of the contract."
+    },
+    {
+      "acceptance_id": "taxonomy-reflected",
+      "criterion": "Contract-layer tests are grouped recognizably (single test file or named section) so the unit, contract, and e2e layers of convention-skill-contract-test-layers are visible in the test tree, and the full suite plus artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Skills stay short and judgment-first; no skill gains mechanical step inflation from this work.",
+    "No agent-in-the-loop e2e harness in this ticket; e2e remains the social independent validate and closeout practice.",
+    "The lifecycle ownership test remains the pattern; nothing weakens it."
+  ],
+  "context": "A whole-skill audit against the modularity rule found the lifecycle contract pattern (shared JSON + ownership test) working but applied to only one dimension. Three gaps: knowledge-governance rules are scattered and incomplete — placement judgment lives only in the ingest skill, trust layering only in the distill skill, and the query skill, which most needs trust layering to answer honestly, does not know the rule at all; vh.mjs invocations cited across skills have no test welding them to the real command surface, which already caused two real drifts (a stale context put example after --room became required, and the artifact verification script failing at runtime); the product-wide architecture boundary (no database, daemon, CLI, MCP server, background capture) is restated in four skills in four wordings (setup, ingest, query, run), while plan and distill carry only skill-specific temptations (no second lifecycle or lease; no progress files) and simply lack the product-wide pointer. The three-layer test convention (unit / contract / e2e) recorded in convention-skill-contract-test-layers governs where each fix lands. Prompts stay judgment-first: contracts carry the system, skills carry the judgment.",
+  "context_refs": [
+    {
+      "purpose": "The modularity rule and three-layer test taxonomy this ticket implements.",
+      "ref": ".vibehub/rooms/product/convention-skill-contract-test-layers.yaml"
+    },
+    {
+      "purpose": "Trust-layer semantics the knowledge-governance reference must state verbatim.",
+      "ref": ".vibehub/rooms/knowledge/decision-ambient-two-mode-distill.yaml"
+    },
+    {
+      "purpose": "Placement rule the knowledge-governance reference must state verbatim.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-always-roomed.yaml"
+    },
+    {
+      "purpose": "The working contract pattern being extended to new dimensions.",
+      "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The skill system's systematic content lives in owned contracts with a mechanical prompt-contract test layer: knowledge governance gets its shared reference, every vh.mjs command a skill cites is test-welded to the script, and the product-wide architecture boundary is stated once.",
+  "provenance_refs": [
+    "conversation:2026-08-04-skill-contract-audit",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [
+    {
+      "rationale": "Query gains its trust-layer pointer after room-scoped retrieval lands, and the discovery event must exist before the command-surface test locks the skill texts.",
+      "target_ticket_id": "ticket-room-retrieval-and-discovery",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-contractize-skill-system"
+}

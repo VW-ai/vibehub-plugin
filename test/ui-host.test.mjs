@@ -3,7 +3,7 @@ import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "nod
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
 import { buildUiSnapshot, parseUiFlags, startVibeHubUi } from "../skills/scripts/vh-ui.mjs";
-import { context, run, tempRepo, ticket } from "./helpers.mjs";
+import { context, room, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 
 const repos = [];
 const hosts = [];
@@ -18,13 +18,14 @@ function fixture() {
   const repo = tempRepo("ui-host");
   repos.push(repo);
   assert.equal(run(repo, "project", "init").status, 0);
-  assert.equal(run(repo, "context", "put", context()).status, 0);
+  writeRoom(repo, "product", room("product"));
+  assert.equal(run(repo, "context", "put", context(), ["--room", "product"]).status, 0);
   mkdirSync(join(repo, "docs"));
   writeFileSync(join(repo, "docs", "LOCAL_GRAPH_DESIGN.md"), "# Local graph design\n");
   const feature = ticket("feature", ["foundation"]);
   feature.context_refs = [
     {
-      ref: ".vibehub/context/decision-use-tickets.yaml",
+      ref: ".vibehub/rooms/product/decision-use-tickets.yaml",
       purpose: "Canonical product direction.",
     },
     {
@@ -287,6 +288,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     featureSubject.contextPackage.contextRefs[0].canonicalContext.summary,
     "Use Tickets as the development entry point",
   );
+  assert.equal(featureSubject.contextPackage.contextRefs[0].canonicalContext.room, "product");
   assert.equal(featureSubject.contextPackage.contextRefs[1].kind, "source");
   assert.equal(featureSubject.contextPackage.contextRefs[1].canonicalContext, null);
   assert.equal("actions" in featureSubject.contextPackage.contextRefs[1], false);

@@ -22,11 +22,11 @@
   "context_refs": [
     {
       "purpose": "Current product-phase authority and observed-gap policy.",
-      "ref": ".vibehub/context/decision-dogfood-only-phase.yaml"
+      "ref": ".vibehub/rooms/product/decision-dogfood-only-phase.yaml"
     },
     {
       "purpose": "Binding Skill-first and speed-first architecture decision.",
-      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     },
     {
       "purpose": "Exact public documentation surface to update.",

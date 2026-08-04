@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "ticket-plan-integration"
+  ],
+  "evidence_id": "ticket-plan-drift-step-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-03T23:17:30.000Z",
+  "refs": [
+    "skills/vibehub-ticket-plan/SKILL.md",
+    "test/release.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "vibehub-ticket-plan gained a single alignment step before planning: run vh room drift; cold_start routes through vibehub-distill; otherwise reconcile only rooms the deliverable enters by re-reading exactly the changed/added/deleted files drift lists and aligning them, while unrelated drifted rooms get room stale with a short reason. The release test guarding the canonical entry and setup routing still passes.",
+  "ticket_id": "ticket-ambient-distill-workflow"
+}

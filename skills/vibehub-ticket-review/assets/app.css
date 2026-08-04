@@ -1628,6 +1628,14 @@ summary:focus-visible {
   text-transform: uppercase;
 }
 
+.context-room {
+  padding: 2px 5px;
+  border: 1px dashed rgba(83, 102, 115, 0.22);
+  border-radius: 99px;
+  color: var(--quiet);
+  font: 7px/1.25 var(--mono);
+}
+
 .context-object p {
   margin: 0;
   color: var(--muted);

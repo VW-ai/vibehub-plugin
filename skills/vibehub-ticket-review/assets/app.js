@@ -1367,6 +1367,12 @@
     stateLabel.className = "context-state";
     stateLabel.textContent = canonical?.state || "reference";
     heading.append(type, title, stateLabel);
+    if (canonical?.room) {
+      const roomLabel = document.createElement("span");
+      roomLabel.className = "context-room";
+      roomLabel.textContent = canonical.room;
+      heading.append(roomLabel);
+    }
     return heading;
   }
 

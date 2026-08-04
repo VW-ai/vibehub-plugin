@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "anchor-overlap-detected",
+      "criterion": "Repository validation reports an explicit error when two rooms where neither is an ancestor of the other have overlapping anchors, while parent and child rooms may nest territory legitimately; node --test covers both the overlap and the legitimate nesting."
+    },
+    {
+      "acceptance_id": "stale-origin-in-contract",
+      "criterion": "knowledge-governance.json states the two stale origins once (drift: prefix mechanical and recomputable, unprefixed semantic and preserved), the ticket-plan deferred write-back instruction adopts the drift: prefix, and vh room drift reports for a STALE room whether its anchors currently match the recorded hashes; node --test covers the report."
+    },
+    {
+      "acceptance_id": "pr-merge-judgment",
+      "criterion": "vibehub-pr states in a few judgment-first lines that post-merge alignment is recomputed via drift against the merged tree and never hand-picked, that same-slug room conflicts are boundary decisions, and that unprefixed stale marks survive merges; the skill-contracts tests stay green over the new text."
+    },
+    {
+      "acceptance_id": "merge-suite-green",
+      "criterion": "The full node --test suite and the plugin artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Detection only: no automated room fusion, split, or merge machinery.",
+    "Derived state is never merged by hand; recomputation is the only resolution for alignment blocks and drift:-prefixed marks.",
+    "The origin convention is stated once in the knowledge-governance reference; skills carry pointers and single-line adoption, not restatements.",
+    "Skills stay short and judgment-first; deterministic checks live in vh.mjs."
+  ],
+  "context": "vibehub-pr predates Rooms and knows nothing about merging them. Three gaps close together, per decision-derived-alignment-recompute and decision-stale-origin-layers. Detection: two branches naming the same territory differently (two room directories with overlapping anchors) merge without any git conflict and silently double-claim code, so validation must detect anchor overlap between rooms where neither contains the other — detection only, no automated fusion, because parallel work overlapping is an anomaly that needs surfacing, not machinery. Origin: stale reasons split into drift:-prefixed mechanical marks (derived state, clearable when recomputation shows anchors fresh) and unprefixed semantic claims (knowledge, preserved across merges until addressed); the convention lands once in the knowledge-governance reference, drift reports whether a stale room's hashes currently match so resolution is mechanical where possible, and the deferred write-back instruction adopts the prefix. Judgment: the PR skill gains a few judgment-first lines — after a merge, alignment state is recomputed against the merged tree, never hand-picked from a side; same-slug room.yaml conflicts are boundary decisions; semantic stale survives.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative merge-semantics decision this ticket implements.",
+      "ref": ".vibehub/rooms/knowledge/decision-derived-alignment-recompute.yaml"
+    },
+    {
+      "purpose": "Authoritative stale-origin decision this ticket implements.",
+      "ref": ".vibehub/rooms/knowledge/decision-stale-origin-layers.yaml"
+    },
+    {
+      "purpose": "Contract receiving the stale-origin convention.",
+      "ref": "skills/vibehub-ingest/references/knowledge-governance.json"
+    },
+    {
+      "purpose": "Drift semantics the overlap detection and stale hash report extend.",
+      "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "Merging branches in the Room world is safe and decidable: anchor overlap between rooms is mechanically detected, stale marks carry their origin so recomputation can clear what is mechanical and preserve what is a claim, and the PR skill states the merge judgment once.",
+  "provenance_refs": [
+    "conversation:2026-08-04-pr-room-merge-semantics",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [
+    {
+      "rationale": "The stale-origin convention lands in the knowledge-governance reference and the pr text is locked by the contract-layer tests that ticket created.",
+      "target_ticket_id": "ticket-contractize-skill-system",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-pr-room-merge-semantics"
+}

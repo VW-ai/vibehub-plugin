@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-drift-check-snapshot-hashes",
+  "detail": "The mechanical room drift check treats per-file blob hashes as the only ground truth. At alignment time, vh align resolves each room's anchor globs and records filter-clean blob hashes per file plus last_aligned_commit and checked_at, written atomically by the script — agents never hand-edit the alignment block. The check takes one snapshot: git ls-tree -r HEAD for committed blobs overlaid with git status --porcelain -uall --no-renames for the working tree, resolves anchors against it, and set-compares against the recorded hashes: differing hash means changed, recorded-but-missing means deleted, present-but-unrecorded means added; any hit is DRIFTED with exact file lists, no hit is FRESH; a missing rooms/ tree is COLD_START. last_aligned_commit is demoted to provenance plus a direction check: if merge-base --is-ancestor shows HEAD is behind the baseline, the checkout is old and the room is a WARNING — specs must never be realigned backwards to older code. An adversarial audit with sandbox git experiments forced this design: baseline-commit diffs silently drop the old path of renames unless --no-renames is used (a moved-out room would look FRESH), porcelain collapses untracked directories unless -uall is used, and stamping HEAD while aligning a dirty working tree makes commit-based diffs report already-aligned content as drift forever; snapshot-hash comparison closes all of these structurally, survives fresh and shallow clones and gc, and is revert-immune. Stale is the union of two channels: computed drift, and a manual stale flag with reason in room.yaml that captures semantic staleness hashes cannot see; deferred drift is written back as a manual stale mark so the channels back each other up. Glob matching must respect path-segment boundaries (src/auth must not match src/authx). Submodule interiors are out of scope for v1.",
+  "evidence": [
+    {
+      "note": "Adversarial audit with reproducible git experiments: rename detection swallowing old paths, untracked directory collapse, orphaned-baseline diff behavior, revert immunity of tree diffs, and old-checkout direction detection. Owner approved the resulting v2.",
+      "ref": "conversation:2026-08-03-drift-check-adversarial-audit"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:dfe40a28aa7d5fd023f0a6c01f0e6b43"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-ambient-two-mode-distill",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-03T22:36:40.000Z",
+    "quote": "我们的git based的outdated room的检查，他应该也能检查到，我们自己标的stale room",
+    "ref": "conversation:2026-08-03-drift-check-adversarial-audit"
+  },
+  "state": "active",
+  "summary": "Drift detection compares recorded anchor blob hashes against the current snapshot; commits are provenance only and stale has two channels",
+  "tags": [
+    "drift-check",
+    "vh-mjs",
+    "git",
+    "hashes",
+    "stale",
+    "deterministic"
+  ],
+  "type": "decision"
+}

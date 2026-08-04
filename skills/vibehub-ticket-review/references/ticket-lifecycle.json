@@ -27,6 +27,24 @@
       "fallback": "conversation"
     },
     {
+      "event": "draft-needs-refinement",
+      "owner": "vibehub-ticket-plan",
+      "presentation": "none",
+      "surface": "none",
+      "continuation": "continue",
+      "human_boundary": false,
+      "fallback": "conversation"
+    },
+    {
+      "event": "execution-discovers-work",
+      "owner": "vibehub-ticket-plan",
+      "presentation": "none",
+      "surface": "none",
+      "continuation": "continue",
+      "human_boundary": false,
+      "fallback": "conversation"
+    },
+    {
       "event": "ready-execution",
       "owner": "vibehub-ticket-run",
       "presentation": "none",

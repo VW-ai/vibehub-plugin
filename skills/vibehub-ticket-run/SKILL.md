@@ -6,7 +6,8 @@ description: Execute one READY lightweight VibeHub Ticket from its checked-in Gi
 # VibeHub Ticket Run
 
 There is no Run lease or compiled Context copy. The named branch, Ticket YAML,
-referenced Context, and Git status are the execution boundary.
+referenced Context, and Git status are the execution boundary, inside
+`../vibehub-setup/references/architecture-boundary.md`.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
 This Skill owns `ready-execution` and `execution-needs-human`; it does not own
@@ -25,9 +26,12 @@ UI launch mechanics.
    when a real context gap appears. Confirm the branch and preserve unrelated
    changes.
 3. Implement autonomously within the Ticket's outcome, constraints, and user
-   authority. Git commits are cheap rollback points; no database coordination
-   is required for one Agent/writer per worktree. `ready-execution` stays
-   quiet: do not open review UI for routine progress.
+   authority. Git commits are cheap rollback points; one Agent/writer per
+   worktree needs no coordination beyond Git. `ready-execution` stays
+   quiet: do not open review UI for routine progress. New independently
+   schedulable work discovered mid-execution belongs to planning — hand it to
+   `$vibehub-ticket-plan`. A durable cross-ticket fact surfaced by execution
+   is delegated to `$vibehub-ingest`, placed in the room this Ticket entered.
 4. Test in proportion to risk. For each criterion with real proof, append one
    or more Evidence documents using `../contracts/evidence.schema.json`:
 

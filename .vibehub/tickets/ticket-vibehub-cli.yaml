@@ -1,0 +1,32 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-cli-shape",
+      "criterion": "Placeholder: refinement with the owner decides the boundary reconciliation (optional sugar versus revised boundary), the CLI shape, and the command surface, then rewrites this acceptance for real."
+    }
+  ],
+  "constraints": [
+    "The dependency-free scripts remain the substrate; nothing may start requiring the CLI unless the owner revises the architecture boundary."
+  ],
+  "context": "Direction only — recorded as a draft while the pain is still abstract. The deterministic surface has grown to a multi-domain vh.mjs, a vh-ui.mjs launcher, and build/verify scripts, all invoked as verbose node paths with --repo flags. A CLI could make this ergonomic for humans and agents alike. The open product choice that refinement must resolve with the owner: the architecture boundary (skills/vibehub-setup/references/architecture-boundary.md) forbids a REQUIRED CLI — so either the CLI ships as strictly optional sugar over the same dependency-free scripts (skills keep working without it), or the boundary decision is consciously revised. Shape (npm bin, single file, name), command mapping, and distribution are all undecided. Refine when script sprawl hurts concretely or before opening the plugin to external users.",
+  "context_refs": [
+    {
+      "purpose": "The boundary any CLI must reconcile with at refinement.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    },
+    {
+      "purpose": "Original no-required-CLI stance this draft must not silently override.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The growing script surface (vh.mjs, vh-ui.mjs, build and verify scripts) is consolidated behind one coherent, ergonomic command-line entry point.",
+  "provenance_refs": [
+    "conversation:2026-08-04-future-cli-idea",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-vibehub-cli"
+}

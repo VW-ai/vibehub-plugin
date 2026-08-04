@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "maturity-field-compatible",
+      "criterion": "ticket.schema.json and the vh.mjs validator accept an optional maturity field whose only value is draft, reject unknown values, and every existing checked-in ticket validates unchanged."
+    },
+    {
+      "acceptance_id": "refine-never-ready",
+      "criterion": "A draft whose dependencies are all satisfied reports REFINE, never READY; the frontier excludes drafts unconditionally; graph output carries the state; node --test covers a draft chain behind a blocker, including that a successful upstream Outcome flips a draft to REFINE and not to READY."
+    },
+    {
+      "acceptance_id": "refinement-owned-by-plan",
+      "criterion": "The lifecycle contract gains a draft-needs-refinement event owned by vibehub-ticket-plan stating the refinement transition once — plan rewrites acceptance and removes the marker in place — and the ownership test proves the event name appears only in the owner skill."
+    },
+    {
+      "acceptance_id": "projection-exposes-refine",
+      "criterion": "The UI projection reports the REFINE operational state and the maturity marker mechanically so representative tickets show it, with node --test coverage; no visual design is shipped."
+    },
+    {
+      "acceptance_id": "draft-suite-green",
+      "criterion": "The full node --test suite and the plugin artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "A draft can never enter the READY frontier under any condition; there is no override flag.",
+    "Refinement rewrites the same ticket_id in place; no parallel draft store, no copy, no new document kind.",
+    "Acceptance still requires at least one criterion on drafts — intent is never empty.",
+    "Workbench visual treatment stays behind the rooms-surface design approval gate; this ticket touches projection data only."
+  ],
+  "context": "Rolling-wave planning per decision-draft-ticket-maturity: a big project planned on day one keeps its whole road in the graph — firm tickets up front, a human-input blocker in the middle, a chain of drafts behind it whose direction is known but whose acceptance cannot honestly be written yet. The mechanism is small and rides existing patterns: an optional maturity field with the single value draft (absence means firm, every existing ticket stays valid); ticketStatus yields REFINE for a draft whose dependencies are all satisfied and the frontier excludes drafts unconditionally, so an under-defined ticket cannot be picked up by execution; refinement re-enters ticket-plan, which rewrites acceptance for real and removes the marker in place on the same ticket_id so Git history keeps the sketch-to-firm evolution — encoded as a lifecycle event owned by ticket-plan following the execution-discovers-work single-sourcing pattern the ownership test enforces. Draft is orthogonal to human authority (badge: a human decides here; draft: everything behind is a sketch). Workbench visual treatment is out of scope here — it joins the rooms-surface design proposal behind its owner-approval gate; this ticket only makes the projection expose the state honestly.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative draft-maturity decision this ticket implements.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
+    },
+    {
+      "purpose": "Lifecycle contract receiving the refinement event.",
+      "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+    },
+    {
+      "purpose": "Test-layer convention governing where each assertion lands.",
+      "ref": ".vibehub/rooms/product/convention-skill-contract-test-layers.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "Tickets can be planned as drafts that structurally cannot execute: an unlocked draft surfaces as REFINE instead of READY, refinement is a planning-owned lifecycle transition, and the projection exposes the state mechanically.",
+  "provenance_refs": [
+    "conversation:2026-08-04-fuzzy-draft-tickets",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [
+    {
+      "rationale": "Reuses the single-sourced lifecycle-event pattern that ticket established and the ownership test now locks.",
+      "target_ticket_id": "ticket-room-retrieval-and-discovery",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-draft-ticket-maturity"
+}

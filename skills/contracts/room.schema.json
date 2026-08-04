@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibehub.dev/schemas/room.v1.json",
+  "title": "VibeHub Room",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "room_id", "description", "boundary", "anchors", "stale"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "kind": { "const": "room" },
+    "room_id": { "$ref": "#/$defs/id" },
+    "description": { "$ref": "#/$defs/text" },
+    "boundary": { "$ref": "#/$defs/text" },
+    "anchors": { "type": "array", "items": { "$ref": "#/$defs/text" }, "uniqueItems": true },
+    "alignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["last_aligned_commit", "checked_at", "anchor_hashes"],
+      "properties": {
+        "last_aligned_commit": { "$ref": "#/$defs/text" },
+        "checked_at": { "type": "string", "format": "date-time" },
+        "anchor_hashes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "blob"],
+            "properties": { "path": { "$ref": "#/$defs/text" }, "blob": { "$ref": "#/$defs/text" } }
+          }
+        }
+      }
+    },
+    "stale": { "type": "boolean" },
+    "stale_reason": { "$ref": "#/$defs/text" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+  }
+}

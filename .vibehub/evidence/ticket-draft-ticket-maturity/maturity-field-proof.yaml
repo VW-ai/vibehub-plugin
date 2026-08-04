@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "maturity-field-compatible"
+  ],
+  "evidence_id": "maturity-field-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T01:07:37.000Z",
+  "refs": [
+    "commit:46d88ff",
+    "skills/contracts/ticket.schema.json",
+    "test/draft-maturity.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "ticket.schema.json gained the optional maturity const draft and vh.mjs validateTicket mirrors it, rejecting any other value with an explicit message; the whole checked-in graph (19 tickets, none carrying the field) validates unchanged, and draft-maturity tests cover both the accepted and rejected forms.",
+  "ticket_id": "ticket-draft-ticket-maturity"
+}

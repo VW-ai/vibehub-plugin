@@ -1,0 +1,36 @@
+{
+  "context_id": "decision-context-always-roomed",
+  "detail": "The flat .vibehub/context/ directory no longer exists as a home for Context. Every Context entry is placed in the lowest room that owns its claim; knowledge spanning several rooms belongs to their lowest common ancestor room, and when no such room exists one is created (for this repository, a top-level product room holds product-wide decisions). vh context put requires --room, so placement is always an explicit judgment. A leftover populated .vibehub/context/ is a visible validation error that instructs migration into rooms; it is never silently ignored, because silent ignoring would be knowledge loss. This closes the coexistence the initial Room rebuild left open: the earlier layout kept genuinely cross-room entries at the root, which created two places to look and an ambiguous placement rule.",
+  "evidence": [
+    {
+      "note": "After seeing the coexisting context/ and rooms/ layout, the owner decided every Context entry must have an owning room.",
+      "ref": "conversation:2026-08-03-room-taxonomy-design"
+    },
+    {
+      "note": "Design conversation task this capture is attributed to.",
+      "ref": "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-room-taxonomy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-04T00:05:24.000Z",
+    "quote": "我感觉不应该并存，我们任何context 都是有归属的room的",
+    "ref": "conversation:2026-08-03-room-taxonomy-design"
+  },
+  "state": "active",
+  "summary": "Every Context entry lives inside a room; the root context directory is removed",
+  "tags": [
+    "rooms",
+    "context",
+    "placement",
+    "taxonomy"
+  ],
+  "type": "decision"
+}

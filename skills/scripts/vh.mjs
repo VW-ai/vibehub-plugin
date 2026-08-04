@@ -9,6 +9,7 @@ import {
   renameSync,
   writeFileSync,
 } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -47,10 +48,12 @@ function parseArgs(argv) {
   const positionals = [];
   let repo = process.cwd();
   let inputPath = null;
+  let room = null;
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--repo") repo = argv[++index] ?? "";
     else if (value === "--input") inputPath = argv[++index] ?? "";
+    else if (value === "--room") room = argv[++index] ?? "";
     else if (value.startsWith("--")) {
       throw new VibeHubError("invalid_argument", `Unknown argument: ${value}`);
     } else positionals.push(value);
@@ -59,14 +62,18 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|ticket|project> <operation> --repo <path> [--input <json>]",
+      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--room <path>]",
     );
+  }
+  if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
+    throw new VibeHubError("invalid_argument", "--room needs a slash-separated path of kebab-case room slugs");
   }
   return {
     domain: positionals[0],
     operation: positionals[1],
     repo: resolve(repo),
     inputPath,
+    room,
   };
 }
 
@@ -150,7 +157,7 @@ function nestedYamlFiles(path) {
 function dirs(repo) {
   return {
     root: join(repo, ".vibehub"),
-    context: join(repo, ".vibehub", "context"),
+    rooms: join(repo, ".vibehub", "rooms"),
     tickets: join(repo, ".vibehub", "tickets"),
     evidence: join(repo, ".vibehub", "evidence"),
     outcomes: join(repo, ".vibehub", "outcomes"),
@@ -260,6 +267,51 @@ function validateContext(document, path = "context") {
   return errors;
 }
 
+function validateRoom(document, path = "room") {
+  const errors = [];
+  if (
+    !strictKeys(
+      errors,
+      document,
+      new Set(["schema_version", "kind", "room_id", "description", "boundary", "anchors", "alignment", "stale", "stale_reason"]),
+      path,
+    )
+  ) return errors;
+  if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
+  if (document.kind !== "room") add(errors, `${path}.kind`, "must equal room");
+  requiredString(errors, document, "room_id", path, { id: true });
+  requiredString(errors, document, "description", path);
+  requiredString(errors, document, "boundary", path);
+  stringArray(errors, document.anchors ?? null, `${path}.anchors`);
+  if (typeof document.stale !== "boolean") add(errors, `${path}.stale`, "must be a boolean");
+  if (document.stale_reason !== undefined && (typeof document.stale_reason !== "string" || !document.stale_reason.trim())) {
+    add(errors, `${path}.stale_reason`, "must be a non-empty string when present");
+  }
+  if (document.alignment !== undefined
+    && strictKeys(errors, document.alignment, new Set(["last_aligned_commit", "checked_at", "anchor_hashes"]), `${path}.alignment`)) {
+    requiredString(errors, document.alignment, "last_aligned_commit", `${path}.alignment`);
+    requiredString(errors, document.alignment, "checked_at", `${path}.alignment`);
+    if (Number.isNaN(Date.parse(document.alignment.checked_at))) {
+      add(errors, `${path}.alignment.checked_at`, "must be an ISO-compatible date-time");
+    }
+    const hashes = document.alignment.anchor_hashes;
+    if (!Array.isArray(hashes)) add(errors, `${path}.alignment.anchor_hashes`, "must be an array");
+    else {
+      const seen = new Set();
+      hashes.forEach((item, index) => {
+        const itemPath = `${path}.alignment.anchor_hashes[${index}]`;
+        if (strictKeys(errors, item, new Set(["path", "blob"]), itemPath)) {
+          requiredString(errors, item, "path", itemPath);
+          requiredString(errors, item, "blob", itemPath);
+          if (seen.has(item.path)) add(errors, `${itemPath}.path`, "must be unique");
+          seen.add(item.path);
+        }
+      });
+    }
+  }
+  return errors;
+}
+
 function validateTicket(document, path = "ticket") {
   const errors = [];
   if (
@@ -270,6 +322,7 @@ function validateTicket(document, path = "ticket") {
         "schema_version",
         "kind",
         "ticket_id",
+        "maturity",
         "outcome",
         "context",
         "acceptance",
@@ -283,6 +336,9 @@ function validateTicket(document, path = "ticket") {
   ) return errors;
   if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
   if (document.kind !== "ticket") add(errors, `${path}.kind`, "must equal ticket");
+  if (document.maturity !== undefined && document.maturity !== "draft") {
+    add(errors, `${path}.maturity`, "must equal draft when present");
+  }
   requiredString(errors, document, "ticket_id", path, { id: true });
   requiredString(errors, document, "outcome", path);
   requiredString(errors, document, "context", path);
@@ -411,6 +467,69 @@ function loadMap(files, idField, validator, label) {
   return { documents, errors };
 }
 
+const ROOM_FILE = "room.yaml";
+
+// Rooms are directories: the path carries containment, room.yaml carries the
+// room's own description. Every other .yaml inside a room is a Context entry.
+function loadRooms(roomsPath) {
+  const documents = new Map();
+  const errors = [];
+  const contextFiles = [];
+  if (!existsSync(roomsPath)) return { documents, errors, contextFiles };
+  const walk = (path, roomPath) => {
+    for (const entry of readdirSync(path, { withFileTypes: true })) {
+      const child = join(path, entry.name);
+      if (entry.isDirectory()) {
+        if (!ID.test(entry.name)) add(errors, child, "room directory must be a lowercase kebab-case slug");
+        if (!existsSync(join(child, ROOM_FILE))) add(errors, child, `room directory must contain ${ROOM_FILE}`);
+        walk(child, roomPath ? `${roomPath}/${entry.name}` : entry.name);
+      } else if (!entry.isFile() || !entry.name.endsWith(".yaml")) {
+        continue;
+      } else if (!roomPath) {
+        add(errors, child, "documents must live inside a room directory, not directly under rooms/");
+      } else if (entry.name === ROOM_FILE) {
+        try {
+          const document = readDocument(child);
+          errors.push(...validateRoom(document, child));
+          const slug = roomPath.split("/").at(-1);
+          if (isObject(document) && document.room_id !== slug) {
+            add(errors, child, `room_id must equal its directory name: ${slug}`);
+          }
+          documents.set(roomPath, { document, path: child });
+        } catch (error) {
+          add(errors, child, error instanceof Error ? error.message : String(error));
+        }
+      } else {
+        contextFiles.push(child);
+      }
+    }
+  };
+  walk(roomsPath, "");
+  contextFiles.sort();
+  // Two rooms where neither contains the other must not claim the same
+  // territory: overlapping anchors merge across branches without any git
+  // conflict, so the defect has to be surfaced here.
+  const entries = [...documents.entries()];
+  for (let left = 0; left < entries.length; left += 1) {
+    for (let right = left + 1; right < entries.length; right += 1) {
+      const [pathA, roomA] = entries[left];
+      const [pathB, roomB] = entries[right];
+      if (pathA.startsWith(`${pathB}/`) || pathB.startsWith(`${pathA}/`)) continue;
+      const overlapping = (Array.isArray(roomA.document?.anchors) ? roomA.document.anchors : [])
+        .filter((anchorA) => (Array.isArray(roomB.document?.anchors) ? roomB.document.anchors : [])
+          .some((anchorB) => {
+            const a = anchorA.replace(/\/+$/u, "");
+            const b = anchorB.replace(/\/+$/u, "");
+            return a === b || a.startsWith(`${b}/`) || b.startsWith(`${a}/`);
+          }));
+      if (overlapping.length > 0) {
+        add(errors, roomA.path, `rooms ${pathA} and ${pathB} claim overlapping territory (${overlapping.join(", ")}); fuse or split them — two rooms must not own the same anchors`);
+      }
+    }
+  }
+  return { documents, errors, contextFiles };
+}
+
 function findCycle(tickets) {
   const visiting = new Set();
   const visited = new Set();
@@ -439,7 +558,12 @@ function findCycle(tickets) {
 
 export function loadRepository(repo, overrides = {}) {
   const paths = dirs(repo);
-  const contexts = loadMap(yamlFiles(paths.context), "context_id", validateContext, "Context");
+  const rooms = loadRooms(paths.rooms);
+  const contexts = loadMap(rooms.contextFiles, "context_id", validateContext, "Context");
+  const legacyContext = join(paths.root, "context");
+  if (yamlFiles(legacyContext).length > 0) {
+    add(rooms.errors, legacyContext, "every Context lives in a room now; migrate these entries into their owning rooms under .vibehub/rooms/");
+  }
   const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket");
   const evidence = loadMap(nestedYamlFiles(paths.evidence), "evidence_id", validateEvidence, "Evidence");
   const outcomes = loadMap(yamlFiles(paths.outcomes), "ticket_id", validateOutcome, "Outcome");
@@ -455,7 +579,7 @@ export function loadRepository(repo, overrides = {}) {
   for (const document of overrides.outcomes ?? []) {
     outcomes.documents.set(document.ticket_id, { document, path: `<candidate:${document.ticket_id}>` });
   }
-  const errors = [...contexts.errors, ...tickets.errors, ...evidence.errors, ...outcomes.errors];
+  const errors = [...rooms.errors, ...contexts.errors, ...tickets.errors, ...evidence.errors, ...outcomes.errors];
   for (const { document, path } of contexts.documents.values()) {
     for (const relation of document.relations ?? []) {
       if (!contexts.documents.has(relation.target_context_id)) {
@@ -530,7 +654,7 @@ export function loadRepository(repo, overrides = {}) {
       }
     }
   }
-  return { paths, contexts, tickets, evidence, outcomes, errors };
+  return { paths, rooms, contexts, tickets, evidence, outcomes, errors };
 }
 
 export function assertValid(errors, message = "VibeHub validation failed") {
@@ -544,18 +668,33 @@ export function documents(map) {
 function initProject(repo) {
   const paths = dirs(repo);
   for (const path of Object.values(paths)) mkdirSync(path, { recursive: true });
-  return { root: paths.root, directories: [paths.context, paths.tickets, paths.evidence, paths.outcomes] };
+  return { root: paths.root, directories: [paths.rooms, paths.tickets, paths.evidence, paths.outcomes] };
 }
 
-function contextOperation(operation, repo, input) {
+function contextOperation(operation, repo, input, options = {}) {
   if (operation === "put") {
     const errors = validateContext(input);
     assertValid(errors, "Context document is invalid");
+    if (!options.room) {
+      throw new VibeHubError("invalid_input", "every Context lives in a room; pass --room with the lowest room that owns this claim");
+    }
     const repository = loadRepository(repo, { contexts: [input] });
     assertValid(repository.errors);
-    const path = join(repository.paths.context, `${input.context_id}.yaml`);
+    if (!repository.rooms.documents.has(options.room)) {
+      throw new VibeHubError("not_found", `Room not found: ${options.room}`);
+    }
+    const directory = join(repository.paths.rooms, ...options.room.split("/"));
+    const path = join(directory, `${input.context_id}.yaml`);
+    const existing = repository.rooms.contextFiles
+      .find((file) => file.endsWith(`${sep}${input.context_id}.yaml`));
+    if (existing && existing !== path) {
+      throw new VibeHubError(
+        "invalid_input",
+        `Context ${input.context_id} already lives at ${existing}; move it with git, not context put`,
+      );
+    }
     writeDocument(path, input);
-    return { status: "written", context_id: input.context_id, path };
+    return { status: "written", context_id: input.context_id, room: options.room ?? null, path };
   }
   const repository = loadRepository(repo);
   assertValid(repository.errors);
@@ -572,15 +711,25 @@ function contextOperation(operation, repo, input) {
     const query = typeof input.query === "string" ? input.query.trim().toLowerCase() : "";
     const requested = Array.isArray(input.context_ids) ? new Set(input.context_ids) : null;
     const includeInactive = input.include_inactive === true;
-    const matches = documents(repository.contexts.documents).filter((item) => {
-      if (!includeInactive && item.state !== "active") return false;
-      if (requested && !requested.has(item.context_id)) return false;
-      if (!query) return true;
-      return [item.context_id, item.type, item.summary, item.detail, ...item.tags]
-        .join("\n")
-        .toLowerCase()
-        .includes(query);
-    });
+    let scope = null;
+    if (options.room) {
+      if (!repository.rooms.documents.has(options.room)) {
+        throw new VibeHubError("not_found", `Room not found: ${options.room}`);
+      }
+      scope = join(repository.paths.rooms, ...options.room.split("/")) + sep;
+    }
+    const matches = [...repository.contexts.documents.values()]
+      .filter(({ document: item, path }) => {
+        if (scope && !path.startsWith(scope)) return false;
+        if (!includeInactive && item.state !== "active") return false;
+        if (requested && !requested.has(item.context_id)) return false;
+        if (!query) return true;
+        return [item.context_id, item.type, item.summary, item.detail, ...item.tags]
+          .join("\n")
+          .toLowerCase()
+          .includes(query);
+      })
+      .map((entry) => entry.document);
     return { contexts: matches, count: matches.length };
   }
   throw new VibeHubError("unsupported_operation", `Unsupported context operation: ${operation}`);
@@ -592,7 +741,10 @@ export function ticketStatus(repository, ticket) {
   const blocking = ticket.relations
     .map((relation) => relation.target_ticket_id)
     .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful");
-  return blocking.length === 0 ? "READY" : "BLOCKED";
+  if (blocking.length > 0) return "BLOCKED";
+  // A draft can never become READY: it surfaces as REFINE until planning
+  // rewrites its acceptance for real and removes the maturity marker.
+  return ticket.maturity === "draft" ? "REFINE" : "READY";
 }
 
 function ticketOperation(operation, repo, input) {
@@ -677,6 +829,123 @@ function ticketOperation(operation, repo, input) {
   throw new VibeHubError("unsupported_operation", `Unsupported ticket operation: ${operation}`);
 }
 
+function git(repo, args, { allowFailure = false } = {}) {
+  const result = spawnSync("git", ["-C", repo, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (result.error) throw new VibeHubError("git_error", `git is unavailable: ${result.error.message}`);
+  if (result.status !== 0 && !allowFailure) {
+    throw new VibeHubError("git_error", `git ${args[0]} failed: ${(result.stderr || "").trim()}`);
+  }
+  return result;
+}
+
+// Anchors are path prefixes matched on whole segments: "src/auth" covers
+// src/auth and src/auth/**, never src/authx.
+function anchorMatches(anchor, path) {
+  const prefix = anchor.endsWith("/") ? anchor.slice(0, -1) : anchor;
+  return path === prefix || path.startsWith(`${prefix}/`);
+}
+
+// One snapshot of path -> filter-clean blob hash: committed tree overlaid
+// with the dirty working tree. Hashes are the drift ground truth; commits
+// are provenance only, so this survives rebases, fresh clones, and gc.
+function repoSnapshot(repo) {
+  const snapshot = new Map();
+  for (const entry of git(repo, ["ls-tree", "-r", "-z", "HEAD"]).stdout.split("\0")) {
+    if (!entry) continue;
+    const tab = entry.indexOf("\t");
+    const [, type, hash] = entry.slice(0, tab).split(" ");
+    if (type === "blob") snapshot.set(entry.slice(tab + 1), hash);
+  }
+  for (const entry of git(repo, ["status", "--porcelain", "-uall", "--no-renames", "-z"]).stdout.split("\0")) {
+    if (entry.length < 4) continue;
+    const path = entry.slice(3);
+    if (!existsSync(join(repo, path)) || !lstatSync(join(repo, path)).isFile()) snapshot.delete(path);
+    else snapshot.set(path, git(repo, ["hash-object", `--path=${path}`, path]).stdout.trim());
+  }
+  return snapshot;
+}
+
+function anchoredFiles(document, snapshot) {
+  const files = new Map();
+  for (const [path, hash] of snapshot) {
+    if ((document.anchors ?? []).some((anchor) => anchorMatches(anchor, path))) files.set(path, hash);
+  }
+  return files;
+}
+
+function headIsBehind(repo, baseline) {
+  const head = git(repo, ["rev-parse", "HEAD"]).stdout.trim();
+  if (baseline === head) return false;
+  return git(repo, ["merge-base", "--is-ancestor", "HEAD", baseline], { allowFailure: true }).status === 0;
+}
+
+function roomOperation(operation, repo, input, options = {}) {
+  const repository = loadRepository(repo);
+  assertValid(repository.errors);
+  if (operation === "drift") {
+    if (repository.rooms.documents.size === 0) return { cold_start: true, rooms: [] };
+    const snapshot = repoSnapshot(repo);
+    const rooms = [...repository.rooms.documents.entries()].map(([roomPath, { document }]) => {
+      if (document.stale === true) {
+        let hashesMatch = null;
+        if (document.alignment) {
+          const current = anchoredFiles(document, snapshot);
+          const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
+          hashesMatch = current.size === recorded.size
+            && [...current].every(([path, blob]) => recorded.get(path) === blob);
+        }
+        return { room: roomPath, state: "STALE", reason: document.stale_reason ?? null, hashes_match: hashesMatch };
+      }
+      if (!document.alignment) return { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
+      if (headIsBehind(repo, document.alignment.last_aligned_commit)) {
+        return {
+          room: roomPath,
+          state: "WARNING",
+          reason: "checkout is older than the alignment baseline; never realign specs backwards",
+        };
+      }
+      const current = anchoredFiles(document, snapshot);
+      const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
+      const changed = [...current].filter(([path, hash]) => recorded.has(path) && recorded.get(path) !== hash).map(([path]) => path);
+      const added = [...current.keys()].filter((path) => !recorded.has(path));
+      const deleted = [...recorded.keys()].filter((path) => !current.has(path));
+      if (changed.length || added.length || deleted.length) {
+        return { room: roomPath, state: "DRIFTED", changed, added, deleted };
+      }
+      return { room: roomPath, state: "FRESH" };
+    });
+    return { cold_start: false, rooms };
+  }
+  const entry = repository.rooms.documents.get(options.room ?? "");
+  if (!entry) throw new VibeHubError("not_found", `Room not found: ${options.room ?? "(missing --room)"}`);
+  if (operation === "align") {
+    if (entry.document.alignment && headIsBehind(repo, entry.document.alignment.last_aligned_commit)) {
+      throw new VibeHubError("invalid_state", "checkout is older than the alignment baseline; refusing to realign backwards");
+    }
+    const files = anchoredFiles(entry.document, repoSnapshot(repo));
+    const document = {
+      ...entry.document,
+      alignment: {
+        last_aligned_commit: git(repo, ["rev-parse", "HEAD"]).stdout.trim(),
+        checked_at: new Date().toISOString(),
+        anchor_hashes: [...files].sort(([a], [b]) => (a < b ? -1 : 1)).map(([path, blob]) => ({ path, blob })),
+      },
+      stale: false,
+    };
+    delete document.stale_reason;
+    writeDocument(entry.path, document);
+    return { room: options.room, aligned_files: files.size, last_aligned_commit: document.alignment.last_aligned_commit };
+  }
+  if (operation === "stale") {
+    if (typeof input.reason !== "string" || !input.reason.trim()) {
+      throw new VibeHubError("invalid_input", "room stale needs a non-empty reason");
+    }
+    writeDocument(entry.path, { ...entry.document, stale: true, stale_reason: input.reason });
+    return { room: options.room, state: "STALE", reason: input.reason };
+  }
+  throw new VibeHubError("unsupported_operation", `Unsupported room operation: ${operation}`);
+}
+
 function projectOperation(operation, repo) {
   if (operation === "init") return initProject(repo);
   if (operation === "validate") {
@@ -684,6 +953,7 @@ function projectOperation(operation, repo) {
     assertValid(repository.errors);
     return {
       valid: true,
+      rooms: repository.rooms.documents.size,
       contexts: repository.contexts.documents.size,
       tickets: repository.tickets.documents.size,
       evidence: repository.evidence.documents.size,
@@ -698,7 +968,8 @@ function run() {
   if (!existsSync(args.repo)) throw new VibeHubError("not_found", `Repository path does not exist: ${args.repo}`);
   const input = readInput(args.inputPath);
   let data;
-  if (args.domain === "context") data = contextOperation(args.operation, args.repo, input);
+  if (args.domain === "context") data = contextOperation(args.operation, args.repo, input, { room: args.room });
+  else if (args.domain === "room") data = roomOperation(args.operation, args.repo, input, { room: args.room });
   else if (args.domain === "ticket") data = ticketOperation(args.operation, args.repo, input);
   else if (args.domain === "project") data = projectOperation(args.operation, args.repo, input);
   else throw new VibeHubError("unsupported_domain", `Unsupported domain: ${args.domain}`);

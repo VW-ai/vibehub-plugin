@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "merge-suite-green"
+  ],
+  "evidence_id": "merge-suite-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T02:27:08.000Z",
+  "refs": [
+    "commit:43fae5d",
+    "test/room-drift.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Full node --test suite passes 38/38 and the plugin artifact builds and verifies cleanly (47 files) with the extended governance reference bundled; all four rooms FRESH after align-on-use.",
+  "ticket_id": "ticket-pr-room-merge-semantics"
+}
