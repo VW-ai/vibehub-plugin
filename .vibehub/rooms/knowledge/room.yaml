@@ -46,6 +46,7 @@
     "skills/contracts/room.schema.json",
     "skills/vibehub-distill/",
     "skills/vibehub-ingest/",
+    "skills/vibehub-migrate/",
     "skills/vibehub-query/"
   ],
   "boundary": "How durable knowledge enters, lives in, and leaves .vibehub: Context entries, the Room taxonomy, ingest and query, and the coming distill workflows. Not the Ticket execution lifecycle and not the workbench UI.",

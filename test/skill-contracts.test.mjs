@@ -74,4 +74,13 @@ test("skills point at their governing shared references", () => {
     const pointer = name === "vibehub-ingest" ? "references/knowledge-governance.json" : `../${governance}`;
     assert.ok(bodies.get(name).includes(pointer), `${name} misses the knowledge governance pointer`);
   }
+
+  const migrations = JSON.parse(readFileSync(join(root, "skills", "vibehub-migrate", "references", "migrations.json"), "utf8"));
+  assert.equal(migrations.owner, "vibehub-migrate");
+  assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length >= 1);
+  const first = migrations.migrations[0];
+  assert.equal(first.from, "0.4");
+  assert.equal(first.to, "0.5");
+  assert.ok(typeof first.detect === "string" && first.steps.length >= 3);
+  assert.ok(bodies.get("vibehub-migrate").includes("references/migrations.json"), "vibehub-migrate misses its migrations pointer");
 });
