@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "tag-and-release-verified"
+  ],
+  "evidence_id": "tag-release-verified-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T04:15:26.000Z",
+  "refs": [
+    "https://github.com/VW-ai/vibehub-plugin/releases/tag/v0.5.0",
+    "commit:33effbb",
+    "conversation:2026-08-04-v050-release-migration"
+  ],
+  "schema_version": 1,
+  "summary": "Tag v0.5.0 was created on the exact merged main commit 33effbb and pushed; the Release workflow completed successfully and the GitHub Release targets main with both assets present (vibehub-plugin-0.5.0.tar.gz and its .sha256). The archive was downloaded and its SHA-256 checksum verified OK locally, and the archive contains the vibehub-migrate skill files.",
+  "ticket_id": "ticket-release-v050"
+}

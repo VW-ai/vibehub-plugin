@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "release-pr-merged"
+  ],
+  "evidence_id": "release-pr-merged-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T04:15:26.000Z",
+  "refs": [
+    "https://github.com/VW-ai/vibehub-plugin/pull/13",
+    "commit:33effbb",
+    "conversation:2026-08-04-v050-release-migration"
+  ],
+  "schema_version": 1,
+  "summary": "PR 13 (feat/v050-release-and-migration) carried the migration skill's closed Outcome, its Evidence chain, and the version identity commit, and was merged into main by the owner as commit 33effbb after explicit authorization in conversation (发, then merge了).",
+  "ticket_id": "ticket-release-v050"
+}
