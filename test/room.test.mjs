@@ -67,21 +67,26 @@ test("documents directly under rooms/ and schema-invalid room.yaml fail visibly"
   assert.match(details, /extra/);
 });
 
-test("context put refuses a missing room and never duplicates an existing Context elsewhere", () => {
+test("context put demands a room, refuses a missing room, and never duplicates a Context elsewhere", () => {
   const repo = tempRepo("room-put-guards");
   assert.equal(run(repo, "project", "init").status, 0);
   writeRoom(repo, "auth", room("auth"));
+  writeRoom(repo, "billing", room("billing"));
 
-  const missing = run(repo, "context", "put", context(), ["--room", "billing"]);
+  const roomless = run(repo, "context", "put", context());
+  assert.notEqual(roomless.status, 0);
+  assert.match(roomless.envelope.error.message, /every Context lives in a room/);
+
+  const missing = run(repo, "context", "put", context(), ["--room", "payments"]);
   assert.notEqual(missing.status, 0);
   assert.equal(missing.envelope.error.code, "not_found");
 
-  assert.equal(run(repo, "context", "put", context()).status, 0);
-  const moved = run(repo, "context", "put", context(), ["--room", "auth"]);
+  assert.equal(run(repo, "context", "put", context(), ["--room", "auth"]).status, 0);
+  const moved = run(repo, "context", "put", context(), ["--room", "billing"]);
   assert.notEqual(moved.status, 0);
   assert.match(moved.envelope.error.message, /already lives at/);
 
-  const updated = run(repo, "context", "put", context({ summary: "Updated summary" }));
+  const updated = run(repo, "context", "put", context({ summary: "Updated summary" }), ["--room", "auth"]);
   assert.equal(updated.status, 0, updated.stdout);
 });
 

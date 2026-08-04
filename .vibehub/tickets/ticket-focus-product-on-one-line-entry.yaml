@@ -33,7 +33,7 @@
   "context_refs": [
     {
       "purpose": "Binding Ticket-first, explicit Context, lightweight architecture truth.",
-      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     },
     {
       "purpose": "Successful release-candidate baseline being refined before merge.",

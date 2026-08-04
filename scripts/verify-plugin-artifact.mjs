@@ -18,13 +18,13 @@ const artifact = join(temp, "plugin");
 const repo = join(temp, "repo");
 let uiHost;
 
-function invoke(helper, domain, operation, input) {
+function invoke(helper, domain, operation, input, flags = []) {
   let inputPath;
   if (input !== undefined) {
     inputPath = join(temp, `${domain}-${operation}-${Math.random().toString(16).slice(2)}.json`);
     writeFileSync(inputPath, `${JSON.stringify(input)}\n`);
   }
-  const args = [helper, domain, operation, "--repo", repo];
+  const args = [helper, domain, operation, "--repo", repo, ...flags];
   if (inputPath) args.push("--input", inputPath);
   const result = spawnSync(process.execPath, args, { encoding: "utf8" });
   if (result.status !== 0) throw new Error(result.stdout || result.stderr);
@@ -95,6 +95,16 @@ try {
   const helper = join(artifact, "skills", "scripts", "vh.mjs");
   mkdirSync(repo, { recursive: true });
   invoke(helper, "project", "init");
+  mkdirSync(join(repo, ".vibehub", "rooms", "product"), { recursive: true });
+  writeFileSync(join(repo, ".vibehub", "rooms", "product", "room.yaml"), `${JSON.stringify({
+    schema_version: 1,
+    kind: "room",
+    room_id: "product",
+    description: "Product-wide decisions of the verification repo.",
+    boundary: "Everything product-wide, nothing subsystem-specific.",
+    anchors: [],
+    stale: false,
+  }, null, 2)}\n`);
   invoke(helper, "context", "put", {
     schema_version: 1,
     kind: "context",
@@ -107,7 +117,7 @@ try {
     source: { ref: "verification", captured_at: "2026-07-31T22:00:00.000Z" },
     evidence: [{ ref: "scripts/verify-plugin-artifact.mjs", note: "Fresh-process artifact verification." }],
     relations: [],
-  });
+  }, ["--room", "product"]);
   const query = invoke(helper, "context", "query", { query: "runtime service" });
   if (query.data.count !== 1) throw new Error("installed Context roundtrip failed");
   invoke(helper, "ticket", "apply", {

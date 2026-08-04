@@ -6,7 +6,7 @@
     },
     {
       "acceptance_id": "no-root-context-loading",
-      "criterion": "loadRepository reads Context only from rooms, project init creates no context/ directory, and a populated legacy .vibehub/context/ fails project validate with an error instructing migration into rooms, covered by node --test."
+      "criterion": "loadRepository reads Context only from rooms, project init creates no context/ directory, and a populated legacy .vibehub/rooms/product/ fails project validate with an error instructing migration into rooms, covered by node --test."
     },
     {
       "acceptance_id": "dogfood-product-room",
@@ -14,7 +14,7 @@
     },
     {
       "acceptance_id": "skills-teach-placement",
-      "criterion": "The ingest and query skills state the placement judgment in a few lines — lowest owning room, lowest common ancestor for cross-room claims, create the missing room rather than dropping knowledge at a root — and every checked-in instruction that still names .vibehub/context/ as a live location (CLAUDE.md, AGENTS.md, docs/INSTALL.md) is swept to rooms, without mechanical step inflation."
+      "criterion": "The ingest and query skills state the placement judgment in a few lines — lowest owning room, lowest common ancestor for cross-room claims, create the missing room rather than dropping knowledge at a root — and every checked-in instruction that still names .vibehub/rooms/product/ as a live location (CLAUDE.md, AGENTS.md, docs/INSTALL.md) is swept to rooms, without mechanical step inflation."
     },
     {
       "acceptance_id": "ui-context-refs-roomed",
@@ -26,7 +26,7 @@
     "The legacy-directory failure must be a visible validation error, never a silent skip.",
     "Skill text stays short and judgment-first; deterministic enforcement lives in vh.mjs."
   ],
-  "context": "The initial Room rebuild kept a flat .vibehub/context/ for cross-room entries, so knowledge had two homes and an ambiguous placement rule. The owner decided every Context entry must have an owning room: place each claim in the lowest room that owns it, and knowledge spanning several rooms belongs to their lowest common ancestor room, creating a parent or top-level room when none exists. vh context put must therefore require --room. A leftover populated .vibehub/context/ must fail validation with migration guidance rather than being silently ignored, because silent ignoring is knowledge loss. Speed-first applies: no dual read paths and no compatibility shim for the removed root directory.",
+  "context": "The initial Room rebuild kept a flat .vibehub/rooms/product/ for cross-room entries, so knowledge had two homes and an ambiguous placement rule. The owner decided every Context entry must have an owning room: place each claim in the lowest room that owns it, and knowledge spanning several rooms belongs to their lowest common ancestor room, creating a parent or top-level room when none exists. vh context put must therefore require --room. A leftover populated .vibehub/rooms/product/ must fail validation with migration guidance rather than being silently ignored, because silent ignoring is knowledge loss. Speed-first applies: no dual read paths and no compatibility shim for the removed root directory.",
   "context_refs": [
     {
       "purpose": "Authoritative placement decision this ticket implements.",
@@ -38,11 +38,11 @@
     },
     {
       "purpose": "Speed-first boundary: delete cleanly, no compatibility machinery. This ref moves with the migration this ticket performs.",
-      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     }
   ],
   "kind": "ticket",
-  "outcome": "Every Context entry lives inside a room: the root .vibehub/context/ directory is gone, placement is always an explicit --room judgment, and this repository's product-wide entries live in a top-level product room.",
+  "outcome": "Every Context entry lives inside a room: the root .vibehub/rooms/product/ directory is gone, placement is always an explicit --room judgment, and this repository's product-wide entries live in a top-level product room.",
   "provenance_refs": [
     "conversation:2026-08-03-room-taxonomy-design",
     "task:5c6d85a3a430d2dc5308f35e5d0e5115"

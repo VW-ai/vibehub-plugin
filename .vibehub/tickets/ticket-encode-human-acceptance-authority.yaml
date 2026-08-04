@@ -37,7 +37,7 @@
   "context_refs": [
     {
       "purpose": "Binding lightweight architecture and explicit rejection of local Decision attestation and coordination machinery.",
-      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     },
     {
       "purpose": "Binding rule for restrained semantic state and accessibility.",

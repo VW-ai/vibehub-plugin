@@ -53,7 +53,7 @@
     },
     {
       "purpose": "Lifecycle rules for temporary design and verification artifacts.",
-      "ref": ".vibehub/context/convention-disposable-artifacts-are-cleaned.yaml"
+      "ref": ".vibehub/rooms/product/convention-disposable-artifacts-are-cleaned.yaml"
     },
     {
       "purpose": "Current graph, toolbar, and Inspector structure to replace or refine.",

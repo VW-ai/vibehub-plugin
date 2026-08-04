@@ -38,7 +38,7 @@
   "context_refs": [
     {
       "purpose": "Binding Skill-first architecture and rejection of hooks, dispatchers, runtime coordination, caches, and second lifecycle machinery.",
-      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     },
     {
       "purpose": "Authority for the narrow local launcher and first-class read-only Ticket graph.",

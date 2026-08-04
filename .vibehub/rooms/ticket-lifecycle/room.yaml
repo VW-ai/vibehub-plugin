@@ -14,7 +14,7 @@
         "path": "skills/contracts/ticket.schema.json"
       },
       {
-        "blob": "e80302c629b74acbd8965e57dfa621103e13ff68",
+        "blob": "13413fbfd95060d83e440b2633a6adb7deafa3ac",
         "path": "skills/scripts/vh.mjs"
       },
       {
@@ -50,8 +50,8 @@
         "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-03T23:23:41.916Z",
-    "last_aligned_commit": "5bdae93c8418a7bea955867c32fb239a51616baa"
+    "checked_at": "2026-08-04T00:19:43.562Z",
+    "last_aligned_commit": "3b45ab2341b092fe4526fc266798ffaf2c9069fe"
   },
   "anchors": [
     "skills/contracts/evidence.schema.json",

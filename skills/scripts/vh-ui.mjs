@@ -265,11 +265,12 @@ function projectGraph(repository) {
 }
 
 function canonicalContextFromRef(repository, reference) {
-  const match = reference.match(/^\.vibehub\/context\/([^/]+)\.yaml$/u);
-  if (!match) return null;
-  const context = repository.contexts.documents.get(match[1])?.document;
+  const match = reference.match(/^\.vibehub\/rooms\/((?:[a-z0-9-]+\/)+)([a-z0-9-]+)\.yaml$/u);
+  if (!match || match[2] === "room") return null;
+  const context = repository.contexts.documents.get(match[2])?.document;
   if (!context) return null;
   return {
+    room: match[1].slice(0, -1),
     contextId: context.context_id,
     type: context.type,
     state: context.state,

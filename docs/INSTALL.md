@@ -45,7 +45,7 @@ but cannot claim a complete development cycle.
 After consent, setup creates only:
 
 ```text
-.vibehub/context/
+.vibehub/rooms/
 .vibehub/tickets/
 .vibehub/evidence/
 .vibehub/outcomes/

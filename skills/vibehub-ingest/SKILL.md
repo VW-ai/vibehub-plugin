@@ -24,10 +24,13 @@ checkpoint cadence.
 3. Create one atomic document per claim using
    `../contracts/context.schema.json`. Preserve the user's exact source ref and,
    when useful, a short exact quote. Every document needs readable evidence.
-4. Write the complete document:
+4. Place each claim in the lowest room that owns it. A claim spanning several
+   rooms belongs to their lowest common ancestor; when that room does not
+   exist, create it rather than dropping knowledge somewhere it does not
+   belong. Then write the complete document:
 
    ```text
-   node ../scripts/vh.mjs context put --repo <root> --input <context.json>
+   node ../scripts/vh.mjs context put --repo <root> --room <path> --input <context.json>
    ```
 
    The `.yaml` file uses JSON-compatible YAML so the installed plugin needs no

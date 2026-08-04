@@ -1,0 +1,55 @@
+{
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "2a323435382eec202f1e40d67531015770cec72e",
+        "path": "CHANGELOG.md"
+      },
+      {
+        "blob": "b7c7145ff7054ab876819ac845844acfc6630f90",
+        "path": "README.md"
+      },
+      {
+        "blob": "c724e1583a7ebc6909dad6f9ae2b9208637b761f",
+        "path": "docs/CONCEPT.md"
+      },
+      {
+        "blob": "e1191442cb7461840285a08f769c29b94d0a193b",
+        "path": "docs/INSTALL.md"
+      },
+      {
+        "blob": "c0f214cb7f278533fe7beb38c3a1c57afa8dfabe",
+        "path": "docs/LOCAL_GRAPH_DESIGN.md"
+      },
+      {
+        "blob": "bba25862b59850c49e883185e4aaee76b3ec692d",
+        "path": "docs/RELEASE.md"
+      },
+      {
+        "blob": "b5d11fecb58d9e15c672264523a6e4cdda0bb0e0",
+        "path": "docs/SPEED_FIRST_CLEANUP.md"
+      },
+      {
+        "blob": "4b73a20aa5cfbe9a8640a51bd1787b1f7eb90847",
+        "path": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
+      },
+      {
+        "blob": "129f5686ca258cae198bc110c2aa4cb301c50265",
+        "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
+      }
+    ],
+    "checked_at": "2026-08-04T00:19:42.155Z",
+    "last_aligned_commit": "3b45ab2341b092fe4526fc266798ffaf2c9069fe"
+  },
+  "anchors": [
+    "CHANGELOG.md",
+    "README.md",
+    "docs/"
+  ],
+  "boundary": "Product-wide direction: architecture philosophy, development phase, and conventions that govern every other room. Not the implementation of any single subsystem.",
+  "description": "The top room of VibeHub itself: decisions and conventions whose claims span the whole product.",
+  "kind": "room",
+  "room_id": "product",
+  "schema_version": 1,
+  "stale": false
+}

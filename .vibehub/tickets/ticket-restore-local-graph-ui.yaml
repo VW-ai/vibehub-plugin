@@ -46,7 +46,7 @@
     },
     {
       "purpose": "Binding constraints against rebuilding the old runtime and second state system.",
-      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     },
     {
       "purpose": "Current direct Git-YAML reader, validator, graph state, and potential shared projection boundary.",

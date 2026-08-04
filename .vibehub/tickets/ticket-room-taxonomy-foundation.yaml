@@ -22,7 +22,7 @@
     "Dependency-free Node built-ins only; JSON-compatible YAML documents; no database, daemon, or CAS store.",
     "Containment is carried by directory paths, never by a new relation type."
   ],
-  "context": "Commit 74ab68f deleted the CAS semantic store together with the feature taxonomy, leaving .vibehub/context/ flat; a real dogfood project demonstrated the gap (no way to express membership or assembly of knowledge). The approved rebuild is Git-native: .vibehub/rooms/<slug>/ directories, one room.yaml self-description per room (description, boundary, anchors as segment-boundary globs, alignment block, stale flag with reason), sub-rooms as subdirectories, context entries placed inside their owning room directory, cross-room links via existing relates_to/depends_on relations. Identifiers are semantic kebab-case slugs only — no sequence numbers, no hashes, no timestamps in filenames. Rooms are domain-agnostic (deliberately not called features); only anchors are Git-specific.",
+  "context": "Commit 74ab68f deleted the CAS semantic store together with the feature taxonomy, leaving .vibehub/rooms/product/ flat; a real dogfood project demonstrated the gap (no way to express membership or assembly of knowledge). The approved rebuild is Git-native: .vibehub/rooms/<slug>/ directories, one room.yaml self-description per room (description, boundary, anchors as segment-boundary globs, alignment block, stale flag with reason), sub-rooms as subdirectories, context entries placed inside their owning room directory, cross-room links via existing relates_to/depends_on relations. Identifiers are semantic kebab-case slugs only — no sequence numbers, no hashes, no timestamps in filenames. Rooms are domain-agnostic (deliberately not called features); only anchors are Git-specific.",
   "context_refs": [
     {
       "purpose": "Authoritative taxonomy, layout, and slug decision this ticket implements.",
@@ -30,7 +30,7 @@
     },
     {
       "purpose": "Speed-first boundaries: what must not be reintroduced.",
-      "ref": ".vibehub/context/decision-speed-first-skill-plugin.yaml"
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     }
   ],
   "kind": "ticket",

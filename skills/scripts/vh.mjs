@@ -157,7 +157,6 @@ function nestedYamlFiles(path) {
 function dirs(repo) {
   return {
     root: join(repo, ".vibehub"),
-    context: join(repo, ".vibehub", "context"),
     rooms: join(repo, ".vibehub", "rooms"),
     tickets: join(repo, ".vibehub", "tickets"),
     evidence: join(repo, ".vibehub", "evidence"),
@@ -535,12 +534,11 @@ function findCycle(tickets) {
 export function loadRepository(repo, overrides = {}) {
   const paths = dirs(repo);
   const rooms = loadRooms(paths.rooms);
-  const contexts = loadMap(
-    [...yamlFiles(paths.context), ...rooms.contextFiles],
-    "context_id",
-    validateContext,
-    "Context",
-  );
+  const contexts = loadMap(rooms.contextFiles, "context_id", validateContext, "Context");
+  const legacyContext = join(paths.root, "context");
+  if (yamlFiles(legacyContext).length > 0) {
+    add(rooms.errors, legacyContext, "every Context lives in a room now; migrate these entries into their owning rooms under .vibehub/rooms/");
+  }
   const tickets = loadMap(yamlFiles(paths.tickets), "ticket_id", validateTicket, "Ticket");
   const evidence = loadMap(nestedYamlFiles(paths.evidence), "evidence_id", validateEvidence, "Evidence");
   const outcomes = loadMap(yamlFiles(paths.outcomes), "ticket_id", validateOutcome, "Outcome");
@@ -645,24 +643,24 @@ export function documents(map) {
 function initProject(repo) {
   const paths = dirs(repo);
   for (const path of Object.values(paths)) mkdirSync(path, { recursive: true });
-  return { root: paths.root, directories: [paths.context, paths.rooms, paths.tickets, paths.evidence, paths.outcomes] };
+  return { root: paths.root, directories: [paths.rooms, paths.tickets, paths.evidence, paths.outcomes] };
 }
 
 function contextOperation(operation, repo, input, options = {}) {
   if (operation === "put") {
     const errors = validateContext(input);
     assertValid(errors, "Context document is invalid");
+    if (!options.room) {
+      throw new VibeHubError("invalid_input", "every Context lives in a room; pass --room with the lowest room that owns this claim");
+    }
     const repository = loadRepository(repo, { contexts: [input] });
     assertValid(repository.errors);
-    let directory = repository.paths.context;
-    if (options.room) {
-      if (!repository.rooms.documents.has(options.room)) {
-        throw new VibeHubError("not_found", `Room not found: ${options.room}`);
-      }
-      directory = join(repository.paths.rooms, ...options.room.split("/"));
+    if (!repository.rooms.documents.has(options.room)) {
+      throw new VibeHubError("not_found", `Room not found: ${options.room}`);
     }
+    const directory = join(repository.paths.rooms, ...options.room.split("/"));
     const path = join(directory, `${input.context_id}.yaml`);
-    const existing = [...yamlFiles(repository.paths.context), ...repository.rooms.contextFiles]
+    const existing = repository.rooms.contextFiles
       .find((file) => file.endsWith(`${sep}${input.context_id}.yaml`));
     if (existing && existing !== path) {
       throw new VibeHubError(
