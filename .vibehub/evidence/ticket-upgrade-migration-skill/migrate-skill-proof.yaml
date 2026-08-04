@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "migrate-skill-judgment-first"
+  ],
+  "evidence_id": "migrate-skill-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-04T03:49:15.000Z",
+  "refs": [
+    "commit:b7abb52",
+    "skills/vibehub-migrate/SKILL.md"
+  ],
+  "schema_version": 1,
+  "summary": "skills/vibehub-migrate/SKILL.md is 29 lines of judgment: detect shape, apply applicable steps as ordinary Git changes, prove with validate and drift; placement and boundary rules are pointers to the knowledge-governance and architecture-boundary references; triggers are restricted to the legacy validation error or an explicit upgrade request with background conversion forbidden in guardrails.",
+  "ticket_id": "ticket-upgrade-migration-skill"
+}

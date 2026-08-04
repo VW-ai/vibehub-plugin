@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Migrate"
+  short_description: "Upgrade old .vibehub data to the current format"
+  default_prompt: "Use $vibehub-migrate to restructure this project's .vibehub data to the current VibeHub format."
