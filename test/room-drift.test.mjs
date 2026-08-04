@@ -111,6 +111,21 @@ test("an old checkout yields WARNING, never DRIFTED, and align refuses to go bac
   assert.match(refused.envelope.error.message, /refusing to realign backwards/);
 });
 
+test("drift reports whether a stale room's hashes still match", () => {
+  const repo = gitRepo("drift-stale-hashes");
+  const aligned = run(repo, "room", "align", undefined, ["--room", "auth"]);
+  assert.equal(aligned.status, 0, aligned.stdout);
+  run(repo, "room", "stale", { reason: "spec is semantically wrong" }, ["--room", "auth"]);
+  assert.equal(driftFor(repo, "auth").hashes_match, true);
+
+  writeFileSync(join(repo, "src", "auth", "login.txt"), "v2\n");
+  assert.equal(driftFor(repo, "auth").hashes_match, false);
+
+  rmSync(join(repo, ".vibehub", "rooms", "auth", "room.yaml"));
+  writeRoom(repo, "auth", room("auth", { anchors: ["src/auth"], stale: true, stale_reason: "drift: deferred, never aligned" }));
+  assert.equal(driftFor(repo, "auth").hashes_match, null);
+});
+
 test("align is atomic, clears stale, and stale needs a reason", () => {
   const repo = gitRepo("drift-align-atomic");
   run(repo, "room", "stale", { reason: "deferred at ticket start" }, ["--room", "auth"]);

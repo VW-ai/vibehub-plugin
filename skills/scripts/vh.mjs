@@ -506,6 +506,27 @@ function loadRooms(roomsPath) {
   };
   walk(roomsPath, "");
   contextFiles.sort();
+  // Two rooms where neither contains the other must not claim the same
+  // territory: overlapping anchors merge across branches without any git
+  // conflict, so the defect has to be surfaced here.
+  const entries = [...documents.entries()];
+  for (let left = 0; left < entries.length; left += 1) {
+    for (let right = left + 1; right < entries.length; right += 1) {
+      const [pathA, roomA] = entries[left];
+      const [pathB, roomB] = entries[right];
+      if (pathA.startsWith(`${pathB}/`) || pathB.startsWith(`${pathA}/`)) continue;
+      const overlapping = (Array.isArray(roomA.document?.anchors) ? roomA.document.anchors : [])
+        .filter((anchorA) => (Array.isArray(roomB.document?.anchors) ? roomB.document.anchors : [])
+          .some((anchorB) => {
+            const a = anchorA.replace(/\/+$/u, "");
+            const b = anchorB.replace(/\/+$/u, "");
+            return a === b || a.startsWith(`${b}/`) || b.startsWith(`${a}/`);
+          }));
+      if (overlapping.length > 0) {
+        add(errors, roomA.path, `rooms ${pathA} and ${pathB} claim overlapping territory (${overlapping.join(", ")}); fuse or split them — two rooms must not own the same anchors`);
+      }
+    }
+  }
   return { documents, errors, contextFiles };
 }
 
@@ -866,7 +887,14 @@ function roomOperation(operation, repo, input, options = {}) {
     const snapshot = repoSnapshot(repo);
     const rooms = [...repository.rooms.documents.entries()].map(([roomPath, { document }]) => {
       if (document.stale === true) {
-        return { room: roomPath, state: "STALE", reason: document.stale_reason ?? null };
+        let hashesMatch = null;
+        if (document.alignment) {
+          const current = anchoredFiles(document, snapshot);
+          const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
+          hashesMatch = current.size === recorded.size
+            && [...current].every(([path, blob]) => recorded.get(path) === blob);
+        }
+        return { room: roomPath, state: "STALE", reason: document.stale_reason ?? null, hashes_match: hashesMatch };
       }
       if (!document.alignment) return { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
       if (headIsBehind(repo, document.alignment.last_aligned_commit)) {

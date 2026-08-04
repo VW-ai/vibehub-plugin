@@ -67,6 +67,9 @@ test("skills point at their governing shared references", () => {
   assert.equal(document.owner, "vibehub-ingest");
   assert.equal(document.placement.rule, "lowest-owning-room");
   assert.equal(document.trust_layers.filter((layer) => layer.wins_conflicts).length, 1);
+  const recomputable = document.stale_origins.filter((origin) => origin.resolution === "recompute");
+  assert.equal(recomputable.length, 1);
+  assert.equal(recomputable[0].reason_prefix, "drift:");
   for (const name of ["vibehub-ingest", "vibehub-distill", "vibehub-query"]) {
     const pointer = name === "vibehub-ingest" ? "references/knowledge-governance.json" : `../${governance}`;
     assert.ok(bodies.get(name).includes(pointer), `${name} misses the knowledge governance pointer`);

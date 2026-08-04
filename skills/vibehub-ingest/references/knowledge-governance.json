@@ -21,5 +21,19 @@
       "statement": "Distill-produced Context carries a distill: source ref and yields to the human layer whenever they disagree."
     }
   ],
-  "activation_gate": "git-pr-review"
+  "activation_gate": "git-pr-review",
+  "stale_origins": [
+    {
+      "origin": "mechanical",
+      "reason_prefix": "drift:",
+      "resolution": "recompute",
+      "statement": "A drift:-prefixed stale reason is derived state written when drift was deferred at ticket start. Realignment may clear it whenever recomputation against the current tree shows the anchors fresh."
+    },
+    {
+      "origin": "semantic",
+      "reason_prefix": null,
+      "resolution": "address-the-reason",
+      "statement": "An unprefixed stale reason is a claim hashes cannot see. It survives merges and is cleared only by addressing the recorded reason."
+    }
+  ]
 }

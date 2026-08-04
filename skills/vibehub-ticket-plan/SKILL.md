@@ -39,7 +39,7 @@ its acceptance for real and removes the marker in place on the same Ticket.
    the rooms this deliverable enters: re-read exactly the changed, added, and
    deleted files drift lists, update that room's knowledge, then
    `room align` it. Mark unrelated drifted rooms `room stale` with a short
-   reason and move on — alignment cost stays proportional to the rooms
+   `drift:`-prefixed reason and move on — alignment cost stays proportional to the rooms
    entered, never to whole-project debt. Surface the result as one line,
    e.g. `Aligned 2 rooms (3 files drifted)`.
 3. Read the current graph and any named Ticket:

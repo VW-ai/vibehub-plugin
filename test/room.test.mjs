@@ -90,6 +90,22 @@ test("context put demands a room, refuses a missing room, and never duplicates a
   assert.equal(updated.status, 0, updated.stdout);
 });
 
+test("overlapping anchors between non-nested rooms fail validation; parent and child may nest territory", () => {
+  const repo = tempRepo("room-overlap");
+  assert.equal(run(repo, "project", "init").status, 0);
+  writeRoom(repo, "auth", room("auth", { anchors: ["src/auth"] }));
+  writeRoom(repo, "identity", room("identity", { anchors: ["src/auth/oauth"] }));
+  const overlapping = run(repo, "project", "validate");
+  assert.notEqual(overlapping.status, 0);
+  assert.match(JSON.stringify(overlapping.envelope.error.details), /claim overlapping territory/);
+
+  const nested = tempRepo("room-nested-territory");
+  assert.equal(run(nested, "project", "init").status, 0);
+  writeRoom(nested, "auth", room("auth", { anchors: ["src/auth"] }));
+  writeRoom(nested, "auth/oauth", room("oauth", { anchors: ["src/auth/oauth"] }));
+  assert.equal(run(nested, "project", "validate").status, 0);
+});
+
 test("context query --room scopes to the room subtree including sub-rooms", () => {
   const repo = tempRepo("room-query-scope");
   assert.equal(run(repo, "project", "init").status, 0);
