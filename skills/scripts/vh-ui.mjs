@@ -212,17 +212,25 @@ function operationalState(repository, ticket, outcome) {
   const blockers = ticket.relations
     .map((relation) => relation.target_ticket_id)
     .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful");
-  return label === "BLOCKED"
-    ? {
-        label,
-        detail: "Waiting for direct prerequisites to close successfully.",
-        references: blockers.map((ref) => ({ ref, label: "Prerequisite" })),
-      }
-    : {
-        label,
-        detail: "No unresolved direct prerequisite prevents execution.",
-        references: [],
-      };
+  if (label === "BLOCKED") {
+    return {
+      label,
+      detail: "Waiting for direct prerequisites to close successfully.",
+      references: blockers.map((ref) => ({ ref, label: "Prerequisite" })),
+    };
+  }
+  if (label === "REFINE") {
+    return {
+      label,
+      detail: "Draft Ticket: unblocked but under-defined; planning must rewrite its acceptance before it can execute.",
+      references: [{ ref: `.vibehub/tickets/${ticket.ticket_id}.yaml`, label: "Draft" }],
+    };
+  }
+  return {
+    label,
+    detail: "No unresolved direct prerequisite prevents execution.",
+    references: [],
+  };
 }
 
 function projectGraph(repository) {

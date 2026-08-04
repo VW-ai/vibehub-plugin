@@ -10,11 +10,16 @@ Split only at a real scheduling, dependency, retry, authority, or verification
 boundary.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
-This Skill owns `plan-applied` and `execution-discovers-work`; it does not own
-UI launch mechanics. `execution-discovers-work` is the single home of the
-mid-cycle transition: when execution surfaces new independently schedulable
-work, it re-enters this Skill, which turns the discovery into Tickets with
-their direct dependencies — executors never absorb it silently.
+This Skill owns `plan-applied`, `execution-discovers-work`, and
+`draft-needs-refinement`; it does not own UI launch mechanics.
+`execution-discovers-work` is the single home of the mid-cycle transition:
+when execution surfaces new independently schedulable work, it re-enters this
+Skill, which turns the discovery into Tickets with their direct dependencies —
+executors never absorb it silently. `draft-needs-refinement` is the single
+home of rolling-wave refinement: a Ticket planned with `maturity: draft`
+carries honest direction whose acceptance cannot be written yet, surfaces as
+REFINE (never READY) once unblocked, and re-enters this Skill, which rewrites
+its acceptance for real and removes the marker in place on the same Ticket.
 
 ## Workflow
 
