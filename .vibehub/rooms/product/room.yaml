@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "b7c7145ff7054ab876819ac845844acfc6630f90",
+        "blob": "a537254ae3aa21c309deaea6ed7d94a6189f2fc3",
         "path": "README.md"
       },
       {
@@ -14,7 +14,7 @@
         "path": "docs/CONCEPT.md"
       },
       {
-        "blob": "e1191442cb7461840285a08f769c29b94d0a193b",
+        "blob": "9778b289bdbd130fbb830c55e4013260d68f313e",
         "path": "docs/INSTALL.md"
       },
       {
@@ -38,8 +38,8 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       }
     ],
-    "checked_at": "2026-08-04T03:55:33.017Z",
-    "last_aligned_commit": "18ff928d0856d9dacb00da724d918a0a20eec341"
+    "checked_at": "2026-08-05T00:29:55.319Z",
+    "last_aligned_commit": "8ce3cd092d090992a5706b547a85b84441379821"
   },
   "anchors": [
     "CHANGELOG.md",

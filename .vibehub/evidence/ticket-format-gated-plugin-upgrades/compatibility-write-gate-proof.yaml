@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "compatibility-preflight-and-write-gate"
+  ],
+  "evidence_id": "compatibility-write-gate-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-05T00:07:02Z",
+  "refs": [
+    "skills/scripts/vh.mjs",
+    "test/project-format.test.mjs",
+    "node skills/scripts/vh.mjs project compatibility --repo .: CURRENT current_format=1 target_format=1",
+    "npm run verify: project-format compatibility and all write-gate tests passed"
+  ],
+  "schema_version": 1,
+  "summary": "The dependency-free helper reports CURRENT, MIGRATION_REQUIRED, or UNSUPPORTED_NEWER with current/target data and refuses every Context, Room, Ticket, Evidence, Outcome, alignment, and stale-mark write while non-current.",
+  "ticket_id": "ticket-format-gated-plugin-upgrades"
+}

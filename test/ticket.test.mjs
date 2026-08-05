@@ -6,6 +6,7 @@ const at = "2026-07-31T22:00:00.000Z";
 
 test("Ticket graph validates dependencies and successful closeout unlocks only direct dependents", () => {
   const repo = tempRepo("ticket-vertical");
+  assert.equal(run(repo, "project", "init").status, 0);
   const applied = run(repo, "ticket", "apply", {
     tickets: [ticket("base"), ticket("dependent", ["base"]), ticket("downstream", ["dependent"])],
   });
@@ -81,11 +82,13 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
 
 test("Ticket validation rejects missing endpoints and dependency cycles", () => {
   const missingRepo = tempRepo("ticket-missing");
+  assert.equal(run(missingRepo, "project", "init").status, 0);
   const missing = run(missingRepo, "ticket", "apply", { tickets: [ticket("a", ["missing"])] });
   assert.notEqual(missing.status, 0);
   assert.match(JSON.stringify(missing.envelope.error.details), /dangling Ticket dependency/);
 
   const cycleRepo = tempRepo("ticket-cycle");
+  assert.equal(run(cycleRepo, "project", "init").status, 0);
   const cycle = run(cycleRepo, "ticket", "apply", {
     tickets: [ticket("a", ["b"]), ticket("b", ["a"])],
   });

@@ -10,17 +10,20 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
 
 ## Workflow
 
-1. `node ../scripts/vh.mjs room drift --repo <root>` decides the mode.
+1. Run `project compatibility` before any Room write. Proceed only for
+   `CURRENT`, except when `$vibehub-migrate` invoked this Skill after the
+   explicit migration boundary for a registered legacy step.
+2. `node ../scripts/vh.mjs room drift --repo <root>` decides the mode.
    `cold_start:true` means propose a tree. Otherwise distill only rooms
    reporting UNKNOWN: the alignment stamp is the resume marker, so an
    interrupted cold start continues exactly where stamps are missing — there
    is no separate progress state to maintain.
-2. Propose the tree by judgment, not enumeration. A room is a bounded
+3. Propose the tree by judgment, not enumeration. A room is a bounded
    workspace someone does coherent work in, named by a semantic kebab-case
    slug; nest a sub-room only when the parent genuinely composes it. A small
    honest tree beats an exhaustive one — rooms are cheap to split later with
    `git mv`.
-3. Read enough of each room's territory to describe it truthfully, then write
+4. Read enough of each room's territory to describe it truthfully, then write
    its `room.yaml` (`../contracts/room.schema.json`): a description, a
    boundary that also says what the room is not, and anchors as
    segment-boundary path prefixes covering what its knowledge is about. Stamp
@@ -30,9 +33,9 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
    node ../scripts/vh.mjs room align --repo <root> --room <path>
    ```
 
-4. Distilled output follows the trust and placement rules in
+5. Distilled output follows the trust and placement rules in
    `../vibehub-ingest/references/knowledge-governance.json`.
-5. Report one line per room at most; close with totals (rooms, anchored
+6. Report one line per room at most; close with totals (rooms, anchored
    files).
 
 ## Guardrails

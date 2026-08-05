@@ -82,5 +82,13 @@ test("skills point at their governing shared references", () => {
   assert.equal(first.from, "0.4");
   assert.equal(first.to, "0.5");
   assert.ok(typeof first.detect === "string" && first.steps.length >= 3);
+  const formatMarker = migrations.migrations.find((migration) => migration.from === "0.5-unversioned");
+  assert.equal(formatMarker.to, "format-1");
+  assert.match(formatMarker.detect, /project compatibility/u);
+  assert.ok(formatMarker.steps.some((step) => step.includes(".vibehub/version.yaml")));
   assert.ok(bodies.get("vibehub-migrate").includes("references/migrations.json"), "vibehub-migrate misses its migrations pointer");
+
+  const projectFormat = JSON.parse(readFileSync(join(root, "skills", "contracts", "project-format.schema.json"), "utf8"));
+  assert.equal(projectFormat.properties.format_version.type, "integer");
+  assert.equal(projectFormat.properties.kind.const, "vibehub_project");
 });

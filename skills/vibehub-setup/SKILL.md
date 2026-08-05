@@ -24,7 +24,8 @@ deliverable continues without another user command.
      one-time conversion.
 
    Do not assume permission to replace or duplicate user knowledge.
-3. After the choice, initialize only the direct data folders:
+3. After the choice, initialize the project-format marker and direct data
+   folders:
 
    ```text
    node ../scripts/vh.mjs project init --repo <root>
@@ -33,6 +34,7 @@ deliverable continues without another user command.
 4. Add a small managed instruction block: development starts from Tickets;
    query Context when planning/execution needs it; explicit phrases such as
    “记录一下” or “remember this” invoke `$vibehub-ingest`.
-5. Run `project validate`. Prove setup by reading the files from a fresh
+5. Run `project compatibility` and require `CURRENT`, then run `project
+   validate`. Prove setup by reading the files from a fresh
    process. Installation is complete when Skills and folders are available;
    no host handshake or background activation state exists.

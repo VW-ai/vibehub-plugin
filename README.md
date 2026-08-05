@@ -45,7 +45,15 @@ start a new session.
 
 Describe the work in a new session, then use the single entry above.
 
+## Upgrades
+
+The host updates the plugin bundle; VibeHub never updates itself in the
+background and never rewrites checked-in project data during installation.
+Claude Code can refresh auto-update-enabled marketplaces and apply the new
+bundle with `/reload-plugins`. In Codex, refresh the Git marketplace with
+`codex plugin marketplace upgrade vibehub`, refresh or reinstall the plugin,
+then start a new session. If `.vibehub/version.yaml` needs migration, the new
+session previews and applies that change separately through the migrate Skill.
 Read the [product concept](docs/CONCEPT.md), [installation and coexistence](docs/INSTALL.md),
 [local graph design](docs/LOCAL_GRAPH_DESIGN.md), or [release procedure](docs/RELEASE.md).
-
 Apache-2.0
