@@ -1,0 +1,64 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "project-format-contract",
+      "criterion": "A single owned project-format contract defines a monotonic integer data format independently from plugin SemVer; project init writes the canonical .vibehub version document, this repository dogfoods it, and project validate rejects malformed or unsupported-newer markers without changing repository files."
+    },
+    {
+      "acceptance_id": "compatibility-preflight-and-write-gate",
+      "criterion": "A read-only deterministic project compatibility operation distinguishes CURRENT, MIGRATION_REQUIRED (including recognizable unversioned 0.4/0.5 layouts), and UNSUPPORTED_NEWER with machine-readable current/target information; every Context, Room, Ticket, Evidence, Outcome, and alignment write refuses to run unless the project format is CURRENT, covered by node --test."
+    },
+    {
+      "acceptance_id": "explicit-reviewable-migration",
+      "criterion": "The migrate skill and its single-source registry consume compatibility preflight, select the applicable path, preview affected checked-in files before mutation, require the explicit migration boundary, and prove the resulting format with project validate and room drift; no migration runs during plugin installation, marketplace refresh, validation, query, UI launch, or other background/read-only activity."
+    },
+    {
+      "acceptance_id": "codex-claude-update-contracts",
+      "criterion": "Codex and Claude Code installation/upgrade guidance clearly separates bundle refresh from repository migration: Claude Code documents its host auto-update/reload path, Codex documents its currently available marketplace refresh plus new-session activation without claiming unsupported automation, and both built marketplace artifacts expose the same plugin version, skills, format contract, and migration registry."
+    },
+    {
+      "acceptance_id": "cross-host-clean-install-proof",
+      "criterion": "Automated tests build fresh Codex and Claude Code marketplace artifacts, invoke the installed helper from each artifact against versioned-current, migration-required, and unsupported-newer fixtures, and prove identical compatibility/write-gate behavior; the full test suite, artifact verification, and both marketplace builders pass."
+    }
+  ],
+  "constraints": [
+    "No plugin-owned daemon, scheduled updater, hook cadence, MCP service, hidden state, remote-code loader, or self-modifying bootstrap is introduced.",
+    "Plugin SemVer and repository data-format version remain separate; refreshing plugin code never writes a user's repository.",
+    "No forward-compatibility shim, dual live format, or silent best-effort parse is added; unsupported formats fail visibly before writes.",
+    "Migration output remains ordinary Git changes with review and rollback through normal history.",
+    "Codex and Claude Code receive behaviorally equivalent installed artifacts even when their host refresh/reload capabilities differ."
+  ],
+  "context": "The owner wants plugin updates to stop requiring users to manually pull every release, without allowing a new plugin bundle to silently rewrite checked-in Context, Rooms, Tickets, Evidence, or Outcomes. Mature plugin systems separate host-owned bundle refresh from plugin-owned durable-state migration. VibeHub already decided that data upgrades are agent-driven restructures rather than forward-compatibility shims, but projects have no project-level format marker and the current migration skill detects only legacy shape errors. Implement the missing compatibility layer inside the existing dependency-free helper and Skill system: an explicit project format document, a read-only compatibility preflight, write gates, versioned migration guidance, and clean-install proofs from both Codex and Claude Code marketplace artifacts. Claude Code can consume marketplace auto-update and reload behavior; current Codex only exposes explicit marketplace refresh and new-session activation, so documentation and tests must state that limitation honestly rather than introducing a plugin-owned daemon, hook cadence, or self-modifying updater.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative decision that project data upgrades are explicit agent-driven restructures with no background conversion or compatibility shims.",
+      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+    },
+    {
+      "purpose": "Existing single-source migration registry this Ticket extends.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    },
+    {
+      "purpose": "Product boundary forbidding a required daemon, service, hook cadence, or hidden update state.",
+      "ref": "skills/vibehub-setup/references/architecture-boundary.md"
+    },
+    {
+      "purpose": "Current Codex and Claude Code installation surface whose upgrade guidance must become explicit.",
+      "ref": "docs/INSTALL.md"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "VibeHub plugin releases can refresh safely across Codex and Claude Code while every repository exposes an explicit data-format version and blocks writes until any required Context/Ticket migration is previewed, approved, applied, and validated.",
+  "provenance_refs": [
+    "conversation:2026-08-04-auto-update-and-format-migration"
+  ],
+  "relations": [
+    {
+      "rationale": "Extends the shipped migrate skill and registry from shape-only migration guidance to project-level format compatibility.",
+      "target_ticket_id": "ticket-upgrade-migration-skill",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-format-gated-plugin-upgrades"
+}

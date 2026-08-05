@@ -55,6 +55,7 @@ try {
     "skills/vibehub-ingest/references/knowledge-governance.json",
     "skills/vibehub-migrate/SKILL.md",
     "skills/vibehub-migrate/references/migrations.json",
+    "skills/contracts/project-format.schema.json",
     "skills/contracts/context.schema.json",
     "skills/contracts/ticket.schema.json",
   ]) {

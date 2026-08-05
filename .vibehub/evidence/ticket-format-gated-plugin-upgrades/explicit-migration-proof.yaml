@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "explicit-reviewable-migration"
+  ],
+  "evidence_id": "explicit-migration-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-05T00:07:02Z",
+  "refs": [
+    "skills/vibehub-migrate/SKILL.md",
+    "skills/vibehub-migrate/references/migrations.json",
+    "skills/vibehub-distill/SKILL.md",
+    "test/migration.test.mjs",
+    "docs/INSTALL.md"
+  ],
+  "schema_version": 1,
+  "summary": "The migrate Skill consumes compatibility preflight, uses the single registry for 0.4 and unversioned 0.5 paths, previews checked-in paths, requires the explicit write boundary, and verifies CURRENT, validate, and drift afterward.",
+  "ticket_id": "ticket-format-gated-plugin-upgrades"
+}

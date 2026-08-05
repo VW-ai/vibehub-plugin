@@ -35,6 +35,8 @@ const CONTEXT_RELATIONS = new Set([
   "depends_on",
   "supersedes",
 ]);
+const CURRENT_PROJECT_FORMAT = 1;
+const PROJECT_FORMAT_FILE = "version.yaml";
 
 class VibeHubError extends Error {
   constructor(code, message, details = null) {
@@ -164,6 +166,10 @@ function dirs(repo) {
   };
 }
 
+function projectFormatPath(repo) {
+  return join(repo, ".vibehub", PROJECT_FORMAT_FILE);
+}
+
 function add(errors, path, message) {
   errors.push({ path, message });
 }
@@ -203,6 +209,107 @@ function strictKeys(errors, document, allowed, path) {
     if (!allowed.has(key)) add(errors, `${path}.${key}`, "is not allowed");
   }
   return true;
+}
+
+function validateProjectFormat(document, path = "project-format") {
+  const errors = [];
+  if (!strictKeys(
+    errors,
+    document,
+    new Set(["schema_version", "kind", "format_version"]),
+    path,
+  )) return errors;
+  if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
+  if (document.kind !== "vibehub_project") add(errors, `${path}.kind`, "must equal vibehub_project");
+  if (!Number.isInteger(document.format_version) || document.format_version < 1) {
+    add(errors, `${path}.format_version`, "must be a positive integer");
+  }
+  return errors;
+}
+
+function canonicalProjectFormat() {
+  return {
+    schema_version: 1,
+    kind: "vibehub_project",
+    format_version: CURRENT_PROJECT_FORMAT,
+  };
+}
+
+function projectCompatibility(repo) {
+  const path = projectFormatPath(repo);
+  if (existsSync(path)) {
+    let document;
+    try {
+      document = readDocument(path);
+    } catch (error) {
+      throw new VibeHubError(
+        "validation_error",
+        "Project format document is invalid",
+        { errors: [{ path, message: error instanceof Error ? error.message : String(error) }] },
+      );
+    }
+    const errors = validateProjectFormat(document, path);
+    assertValid(errors, "Project format document is invalid");
+    if (document.format_version > CURRENT_PROJECT_FORMAT) {
+      return {
+        state: "UNSUPPORTED_NEWER",
+        current_format: document.format_version,
+        target_format: CURRENT_PROJECT_FORMAT,
+        detected_format: document.format_version,
+        version_path: path,
+        reason: "This repository was written by a newer VibeHub data format; use a compatible plugin version.",
+      };
+    }
+    if (document.format_version < CURRENT_PROJECT_FORMAT) {
+      return {
+        state: "MIGRATION_REQUIRED",
+        current_format: document.format_version,
+        target_format: CURRENT_PROJECT_FORMAT,
+        detected_format: document.format_version,
+        version_path: path,
+        reason: "This repository needs an explicit VibeHub data migration before writes are allowed.",
+      };
+    }
+    return {
+      state: "CURRENT",
+      current_format: document.format_version,
+      target_format: CURRENT_PROJECT_FORMAT,
+      detected_format: document.format_version,
+      version_path: path,
+      reason: null,
+    };
+  }
+
+  const paths = dirs(repo);
+  const legacyContext = join(paths.root, "context");
+  const initialized = existsSync(paths.root);
+  const detectedFormat = yamlFiles(legacyContext).length > 0
+    ? "0.4-unversioned"
+    : initialized
+      ? "0.5-unversioned"
+      : "uninitialized";
+  return {
+    state: "MIGRATION_REQUIRED",
+    current_format: null,
+    target_format: CURRENT_PROJECT_FORMAT,
+    detected_format: detectedFormat,
+    version_path: path,
+    reason: initialized
+      ? "This repository predates the project format marker and needs an explicit migration before writes are allowed."
+      : "This repository has not been initialized for VibeHub.",
+  };
+}
+
+function assertCurrentProjectFormat(repo) {
+  const compatibility = projectCompatibility(repo);
+  if (compatibility.state !== "CURRENT") {
+    throw new VibeHubError(
+      "format_mismatch",
+      compatibility.reason,
+      { compatibility },
+    );
+  }
+  return compatibility;
 }
 
 function validateContext(document, path = "context") {
@@ -667,12 +774,32 @@ export function documents(map) {
 
 function initProject(repo) {
   const paths = dirs(repo);
+  const compatibility = projectCompatibility(repo);
+  if (
+    compatibility.state !== "CURRENT"
+    && compatibility.detected_format !== "uninitialized"
+  ) {
+    throw new VibeHubError(
+      "format_mismatch",
+      "Existing VibeHub data must be migrated explicitly; project init never upgrades it in place.",
+      { compatibility },
+    );
+  }
   for (const path of Object.values(paths)) mkdirSync(path, { recursive: true });
-  return { root: paths.root, directories: [paths.rooms, paths.tickets, paths.evidence, paths.outcomes] };
+  if (!existsSync(projectFormatPath(repo))) {
+    writeDocument(projectFormatPath(repo), canonicalProjectFormat());
+  }
+  return {
+    root: paths.root,
+    format_version: CURRENT_PROJECT_FORMAT,
+    version_path: projectFormatPath(repo),
+    directories: [paths.rooms, paths.tickets, paths.evidence, paths.outcomes],
+  };
 }
 
 function contextOperation(operation, repo, input, options = {}) {
   if (operation === "put") {
+    assertCurrentProjectFormat(repo);
     const errors = validateContext(input);
     assertValid(errors, "Context document is invalid");
     if (!options.room) {
@@ -749,6 +876,7 @@ export function ticketStatus(repository, ticket) {
 
 function ticketOperation(operation, repo, input) {
   if (operation === "apply") {
+    assertCurrentProjectFormat(repo);
     if (!Array.isArray(input.tickets) || input.tickets.length === 0) {
       throw new VibeHubError("invalid_input", "ticket apply needs a non-empty tickets array");
     }
@@ -770,6 +898,7 @@ function ticketOperation(operation, repo, input) {
     return { status: "written", ticket_ids: input.tickets.map((ticket) => ticket.ticket_id), paths: written };
   }
   if (operation === "evidence") {
+    assertCurrentProjectFormat(repo);
     const errors = validateEvidence(input);
     assertValid(errors, "Evidence document is invalid");
     const repository = loadRepository(repo, { evidence: [input] });
@@ -779,6 +908,7 @@ function ticketOperation(operation, repo, input) {
     return { status: "written", evidence_id: input.evidence_id, path };
   }
   if (operation === "closeout") {
+    assertCurrentProjectFormat(repo);
     const errors = validateOutcome(input);
     assertValid(errors, "Outcome document is invalid");
     const repository = loadRepository(repo, { outcomes: [input] });
@@ -880,6 +1010,9 @@ function headIsBehind(repo, baseline) {
 }
 
 function roomOperation(operation, repo, input, options = {}) {
+  if (operation === "align" || operation === "stale") {
+    assertCurrentProjectFormat(repo);
+  }
   const repository = loadRepository(repo);
   assertValid(repository.errors);
   if (operation === "drift") {
@@ -948,11 +1081,14 @@ function roomOperation(operation, repo, input, options = {}) {
 
 function projectOperation(operation, repo) {
   if (operation === "init") return initProject(repo);
+  if (operation === "compatibility") return projectCompatibility(repo);
   if (operation === "validate") {
+    const compatibility = assertCurrentProjectFormat(repo);
     const repository = loadRepository(repo);
     assertValid(repository.errors);
     return {
       valid: true,
+      format_version: compatibility.current_format,
       rooms: repository.rooms.documents.size,
       contexts: repository.contexts.documents.size,
       tickets: repository.tickets.documents.size,

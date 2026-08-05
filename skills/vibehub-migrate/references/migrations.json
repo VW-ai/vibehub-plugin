@@ -5,12 +5,23 @@
     {
       "from": "0.4",
       "to": "0.5",
-      "detect": "project validate fails naming a populated legacy .vibehub/context/ directory (every Context lives in a room now).",
+      "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 0.4-unversioned for a populated legacy .vibehub/context/ directory.",
       "steps": [
+        "Before writing, preview every legacy Context path and every Ticket context_ref that will change; cross the explicit migration boundary once for this reviewed set.",
         "When .vibehub/rooms/ is missing or empty, build the Room tree first with the distill skill (cold start); do not invent rooms for territory you have not read.",
         "Move every entry out of .vibehub/context/ into the lowest room that owns its claim, per the placement rule in the knowledge-governance reference, using git mv; remove the emptied directory.",
         "Rewrite every ticket context_ref that names a .vibehub/context/ path to the entry's new roomed path.",
-        "Prove the result: project validate passes; align the rooms that received entries so drift is honest about what the migration touched."
+        "Continue with the 0.5-unversioned-to-format-1 step; the room move alone is not the current project format."
+      ]
+    },
+    {
+      "from": "0.5-unversioned",
+      "to": "format-1",
+      "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 0.5-unversioned after the Room layout is present but .vibehub/version.yaml is absent.",
+      "steps": [
+        "Preview the one new checked-in path .vibehub/version.yaml and confirm that the repository no longer contains populated legacy .vibehub/context/ entries.",
+        "After the explicit migration boundary, write .vibehub/version.yaml with schema_version 1, kind vibehub_project, and integer format_version 1.",
+        "Prove project compatibility returns CURRENT, project validate passes, and align every room changed by an earlier step so room drift is honest."
       ]
     }
   ]

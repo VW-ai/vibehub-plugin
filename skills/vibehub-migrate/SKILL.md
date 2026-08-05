@@ -10,13 +10,23 @@ once in `references/migrations.json`; this Skill supplies the judgment.
 
 ## Workflow
 
-1. Read the project's current shape — `project validate` output and the
-   `.vibehub/` tree — and find the applicable entries in
-   `references/migrations.json`. Nothing applicable: say so and stop.
-2. Apply the steps as ordinary Git changes. Placement judgment follows
+1. Run the read-only compatibility preflight and inspect the `.vibehub/` tree:
+
+   ```text
+   node ../scripts/vh.mjs project compatibility --repo <root>
+   ```
+
+   `CURRENT` stops with no work. For `MIGRATION_REQUIRED`, find the complete
+   path in `references/migrations.json`. `UNSUPPORTED_NEWER` needs a newer
+   plugin, never a guessed downgrade.
+2. Preview the affected checked-in paths and the planned transformations.
+   Cross the explicit migration boundary before writing; plugin installation,
+   marketplace refresh, validation, query, and UI launch never grant it.
+3. Apply the selected steps as ordinary Git changes. Placement judgment follows
    `../vibehub-ingest/references/knowledge-governance.json`; a missing Room
    tree is built with `$vibehub-distill` first.
-3. Prove the result: `project validate` passes and `room drift` is honest
+4. Prove `project compatibility` is `CURRENT`, `project validate` passes, and
+   `room drift` is honest
    about anything the migration could not settle. Leave the diff to normal
    Git review — migration output has no special authority.
 

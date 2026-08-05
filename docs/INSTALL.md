@@ -45,6 +45,7 @@ but cannot claim a complete development cycle.
 After consent, setup creates only:
 
 ```text
+.vibehub/version.yaml
 .vibehub/rooms/
 .vibehub/tickets/
 .vibehub/evidence/
@@ -56,6 +57,38 @@ and a small managed project-instruction block. Validate with:
 ```bash
 node <plugin>/skills/scripts/vh.mjs project validate --repo <repository>
 ```
+
+## Upgrade the plugin and project data
+
+Plugin code and checked-in project data have separate lifecycles. Updating a
+plugin bundle never writes `.vibehub/`. The installed helper first reports the
+repository compatibility state:
+
+```bash
+node <plugin>/skills/scripts/vh.mjs project compatibility --repo <repository>
+```
+
+`CURRENT` permits normal work. `MIGRATION_REQUIRED` routes through
+`$vibehub-migrate`, which previews the affected Git paths and waits at the
+explicit migration boundary before restructuring them. `UNSUPPORTED_NEWER`
+means the repository needs a newer plugin; VibeHub does not guess or downgrade
+the data.
+
+**Claude Code.** Claude Code can refresh auto-update-enabled marketplaces and
+installed plugins. Run `/reload-plugins` after an update when you want the new
+bundle in the current process, then start or resume work; repository migration
+remains a separate reviewed action.
+
+**Codex.** Current Codex releases expose explicit Git marketplace refresh:
+
+```bash
+codex plugin marketplace upgrade vibehub
+```
+
+Refresh or reinstall `vibehub@vibehub` from the plugin browser, then start a
+new session. Codex does not currently expose a documented plugin hot-reload or
+background installed-plugin updater, so VibeHub does not claim or emulate one
+with a daemon or hook.
 
 ## Ticket graph presentation
 

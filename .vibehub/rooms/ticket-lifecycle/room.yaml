@@ -10,11 +10,15 @@
         "path": "skills/contracts/outcome.schema.json"
       },
       {
+        "blob": "5a5f279f13c65f0b9decf0732e5af1d43a11dce5",
+        "path": "skills/contracts/project-format.schema.json"
+      },
+      {
         "blob": "3065bda35c632a6d1004dfa2e5b3a495b4facaac",
         "path": "skills/contracts/ticket.schema.json"
       },
       {
-        "blob": "2347cfb5bed0de6a81b4d94d862d44b446bec0fb",
+        "blob": "d9652b69ba05e7d04883f3727330ece2950bdb5a",
         "path": "skills/scripts/vh.mjs"
       },
       {
@@ -50,12 +54,13 @@
         "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-04T02:27:08.082Z",
-    "last_aligned_commit": "43fae5d96f8cd6337ca8f828d1d1dc2a19a2f807"
+    "checked_at": "2026-08-05T00:29:55.928Z",
+    "last_aligned_commit": "8ce3cd092d090992a5706b547a85b84441379821"
   },
   "anchors": [
     "skills/contracts/evidence.schema.json",
     "skills/contracts/outcome.schema.json",
+    "skills/contracts/project-format.schema.json",
     "skills/contracts/ticket.schema.json",
     "skills/scripts/vh.mjs",
     "skills/vibehub-ticket-closeout/",

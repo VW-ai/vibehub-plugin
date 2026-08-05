@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "cross-host-clean-install-proof"
+  ],
+  "evidence_id": "cross-host-clean-install-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-05T00:07:02Z",
+  "refs": [
+    "test/host-marketplaces.test.mjs: afterEach removes every tracked fixture and artifact root",
+    ".vibehub/rooms/product/convention-disposable-artifacts-are-cleaned.yaml",
+    "npm run verify: 43/43 tests passed; artifact files=51 bytes=361397",
+    "node scripts/build-codex-marketplace.mjs --out /private/tmp/vibehub-codex-marketplace-format-gate --offline: passed",
+    "node scripts/build-claude-marketplace.mjs --out /private/tmp/vibehub-claude-marketplace-format-gate --offline: passed",
+    "git diff --check: passed",
+    "node skills/scripts/vh.mjs project validate --repo .: valid format_version=1"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh Codex and Claude marketplace artifacts execute their installed helpers identically for current, migration-required, and newer-format fixtures and clean all test-owned temporary paths after success or failure; the complete suite, artifact verifier, diff check, project validation, and both standalone builders pass.",
+  "ticket_id": "ticket-format-gated-plugin-upgrades"
+}

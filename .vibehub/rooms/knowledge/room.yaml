@@ -10,7 +10,7 @@
         "path": "skills/contracts/room.schema.json"
       },
       {
-        "blob": "85ecc6e11f94a754d59f4f303a73eefca03708d6",
+        "blob": "55bb0678f89717b7947ba4509e03d4e896fe1b5f",
         "path": "skills/vibehub-distill/SKILL.md"
       },
       {
@@ -30,7 +30,7 @@
         "path": "skills/vibehub-ingest/references/knowledge-governance.json"
       },
       {
-        "blob": "ef8b81fac1c8b8e3378efd4ab50d7644cc68ed1e",
+        "blob": "926de1eb22b3c162c0fbf48ac083ce859567c409",
         "path": "skills/vibehub-migrate/SKILL.md"
       },
       {
@@ -38,7 +38,7 @@
         "path": "skills/vibehub-migrate/agents/openai.yaml"
       },
       {
-        "blob": "cc893287f3756d33d34bfd3a8b7be655ec2cd624",
+        "blob": "68e00f23cd044d76a3ce0b48263cf6aeab2dcd33",
         "path": "skills/vibehub-migrate/references/migrations.json"
       },
       {
@@ -50,8 +50,8 @@
         "path": "skills/vibehub-query/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-04T03:49:15.329Z",
-    "last_aligned_commit": "b7abb52713195af53661727f94f82fc2def7fb35"
+    "checked_at": "2026-08-05T00:29:54.778Z",
+    "last_aligned_commit": "8ce3cd092d090992a5706b547a85b84441379821"
   },
   "anchors": [
     "skills/contracts/context.schema.json",

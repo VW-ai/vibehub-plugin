@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "project-format-contract"
+  ],
+  "evidence_id": "project-format-contract-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-05T00:07:02Z",
+  "refs": [
+    ".vibehub/version.yaml",
+    "skills/contracts/project-format.schema.json",
+    "skills/scripts/vh.mjs",
+    "test/project-format.test.mjs",
+    "npm run verify: 43/43 tests passed and artifact verification passed on 2026-08-05"
+  ],
+  "schema_version": 1,
+  "summary": "The repository now owns and dogfoods integer project format 1; init writes the canonical marker and validation rejects malformed or newer markers without mutation.",
+  "ticket_id": "ticket-format-gated-plugin-upgrades"
+}
