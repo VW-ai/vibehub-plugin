@@ -1,29 +1,50 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-cli-shape",
-      "criterion": "Placeholder: refinement with the owner decides the boundary reconciliation (optional sugar versus revised boundary), the CLI shape, and the command surface, then rewrites this acceptance for real."
+      "acceptance_id": "refine-cli-evaluation",
+      "criterion": "Placeholder: refinement turns this future direction into a bounded evaluation plan with measurable current pain, proposed module seams, a stable command and JSON compatibility contract, Codex/Claude distribution options, migration cost, test strategy, and an explicit recommendation before any implementation Ticket is created."
     }
   ],
   "constraints": [
-    "The dependency-free scripts remain the substrate; nothing may start requiring the CLI unless the owner revises the architecture boundary."
+    "This draft authorizes evaluation only; implementation, package publication, and changing Skill command references require a separately refined executable Ticket.",
+    "Preserve the dependency-free installed artifact, direct checked-in YAML source of truth, and machine-readable success/error envelopes unless a later owner decision explicitly changes the architecture boundary.",
+    "Do not introduce a required global install, daemon, MCP service, database, hidden state, or host-specific command behavior.",
+    "Treat maintainability and Agent invocation as separate problems: module extraction must earn its seams, while any CLI wrapper must demonstrate value beyond renaming node skills/scripts/vh.mjs.",
+    "Any future shape must remain behaviorally equivalent in fresh Codex and Claude Code marketplace artifacts and retain project-format compatibility and write gates."
   ],
-  "context": "Direction only — recorded as a draft while the pain is still abstract. The deterministic surface has grown to a multi-domain vh.mjs, a vh-ui.mjs launcher, and build/verify scripts, all invoked as verbose node paths with --repo flags. A CLI could make this ergonomic for humans and agents alike. The open product choice that refinement must resolve with the owner: the architecture boundary (skills/vibehub-setup/references/architecture-boundary.md) forbids a REQUIRED CLI — so either the CLI ships as strictly optional sugar over the same dependency-free scripts (skills keep working without it), or the boundary decision is consciously revised. Shape (npm bin, single file, name), command mapping, and distribution are all undecided. Refine when script sprawl hurts concretely or before opening the plugin to external users.",
+  "context": "Future evaluation, not an implementation authorization. The current skills/scripts/vh.mjs is already a command-line program, but it has grown to 1,131 lines, about 46 KB, and 41 top-level classes/functions spanning argument parsing, serialization, six validator domains, repository loading, Context/Ticket/Room/Project operations, Git drift, and dispatch. Its path is cited 23 times across Skills. A prettier executable name alone would improve invocation ergonomics but would not solve the maintenance problem; internal module boundaries and a stable command contract are the likely core. When this Ticket is scheduled, evaluate the smallest architecture that keeps one predictable Agent-facing command and machine-readable JSON envelope while separating cohesive internals. Decide explicitly whether an optional package bin/shim adds enough value for Codex and Claude Code, or whether a bundled script entry remains the better distribution surface. Refine this draft only when the evaluation is ready to run; do not start a rewrite from file size alone.",
   "context_refs": [
     {
-      "purpose": "The boundary any CLI must reconcile with at refinement.",
+      "purpose": "The 1,131-line multi-domain implementation whose responsibilities and seams need evaluation.",
+      "ref": "skills/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Current contract proving every command cited by Skills resolves against the helper.",
+      "ref": "test/skill-contracts.test.mjs"
+    },
+    {
+      "purpose": "Compatibility and write-gate behavior that a refactor or wrapper must preserve.",
+      "ref": "test/project-format.test.mjs"
+    },
+    {
+      "purpose": "Cross-host clean-install parity expected from any future CLI distribution shape.",
+      "ref": "test/host-marketplaces.test.mjs"
+    },
+    {
+      "purpose": "Binding lightweight boundary that currently forbids a required CLI or runtime service.",
       "ref": "skills/vibehub-setup/references/architecture-boundary.md"
     },
     {
-      "purpose": "Original no-required-CLI stance this draft must not silently override.",
+      "purpose": "Original decision to rebuild only gaps demonstrated by real use and keep deterministic behavior in dependency-free scripts.",
       "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
     }
   ],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "The growing script surface (vh.mjs, vh-ui.mjs, build and verify scripts) is consolidated behind one coherent, ergonomic command-line entry point.",
+  "outcome": "An evidence-backed, implementation-ready decision defines whether and how VibeHub should split the monolithic vh.mjs behind a stable Agent-friendly CLI without weakening its dependency-free cross-host contract.",
   "provenance_refs": [
     "conversation:2026-08-04-future-cli-idea",
+    "conversation:2026-08-04-vh-mjs-maintainability-evaluation",
     "task:5c6d85a3a430d2dc5308f35e5d0e5115"
   ],
   "relations": [],
