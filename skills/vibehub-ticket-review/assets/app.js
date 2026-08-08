@@ -74,6 +74,7 @@
   let suppressCanvasClick = false;
   let toastTimer = null;
   let initialFocusPending = Boolean(requestedTicketId);
+  let watchPollTimer = null;
 
   function svg(tag, attributes = {}) {
     const element = document.createElementNS(SVG, tag);
@@ -154,6 +155,34 @@
     } finally {
       if (request === graphRequest) setBusy(false);
     }
+  }
+
+  function renderWatchState(watchInfo) {
+    if (!watchInfo?.error) return;
+    elements.stateDot.className = "state-dot deviated";
+    elements.stateLabel.textContent =
+      "Invalid Ticket YAML · showing last valid snapshot";
+    elements.stateLabel.title = watchInfo.error;
+  }
+
+  function startWatchPolling() {
+    if (watchPollTimer || !state?.watch?.enabled) return;
+    watchPollTimer = window.setInterval(async () => {
+      try {
+        const nextState = await api("/api/state");
+        const previousError = state?.watch?.error ?? null;
+        if (nextState.graph.snapshotId !== state.graph.snapshotId) {
+          await refresh();
+          renderWatchState(state?.watch);
+          return;
+        }
+        state.watch = nextState.watch;
+        if (nextState.watch?.error) renderWatchState(nextState.watch);
+        else if (previousError) renderChrome();
+      } catch {
+        // Keep the last valid view; the next poll retries.
+      }
+    }, 1000);
   }
 
   function renderChrome() {
@@ -2721,5 +2750,5 @@
     }
   });
 
-  void refresh();
+  void refresh().then(() => startWatchPolling());
 })();

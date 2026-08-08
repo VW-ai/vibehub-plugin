@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import crypto from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
-import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync, statSync, watch as watchDirectory } from "node:fs";
 import http from "node:http";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,7 @@ import {
 const LOOPBACK_HOST = "127.0.0.1";
 const HOST_SCHEMA_VERSION = 1;
 const DEFAULT_TOKEN_LIFETIME_MS = 30 * 60 * 1_000;
+const WATCH_DEBOUNCE_MS = 150;
 const MAX_DIRTY_PATHS = 100;
 const TICKET_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const FOCUS_VIEWS = new Set(["execution", "contract", "log"]);
@@ -608,6 +609,7 @@ export function startVibeHubUi({
   assetRoot = defaultAssetRoot(),
   ticket = null,
   view = null,
+  watch = false,
 } = {}) {
   if (!repoRoot) throw new Error("repoRoot is required");
   if (!Number.isInteger(port) || port < 0 || port > 65_535) {
@@ -632,6 +634,51 @@ export function startVibeHubUi({
   const closedPromise = new Promise((resolveClosedPromise) => {
     resolveClosed = resolveClosedPromise;
   });
+  // Watch mode: a debounced watcher revalidates and reprojects into this
+  // in-memory cache; requests then serve the last valid snapshot instead of
+  // reprojecting per request. The cache is never truth and never persisted.
+  let cachedSnapshot = initialSnapshot;
+  let watchDebounce = null;
+  let watchStatus = {
+    enabled: watch === true,
+    lastSyncAt: new Date().toISOString(),
+    projectionCount: 1,
+    error: null,
+  };
+  const directoryWatchers = [];
+  function reproject() {
+    let error = null;
+    try {
+      cachedSnapshot = buildUiSnapshot(repoRoot);
+    } catch (caught) {
+      error = caught instanceof Error ? caught.message : String(caught);
+    }
+    watchStatus = {
+      ...watchStatus,
+      lastSyncAt: new Date().toISOString(),
+      projectionCount: watchStatus.projectionCount + 1,
+      error,
+    };
+  }
+  function scheduleReprojection() {
+    if (closed) return;
+    if (watchDebounce) clearTimeout(watchDebounce);
+    watchDebounce = setTimeout(reproject, WATCH_DEBOUNCE_MS);
+    watchDebounce.unref();
+  }
+  if (watch === true) {
+    directoryWatchers.push(watchDirectory(
+      join(initialSnapshot.repo, ".vibehub"),
+      { recursive: true },
+      scheduleReprojection,
+    ));
+    const gitDirectory = join(initialSnapshot.repo, ".git");
+    if (existsSync(gitDirectory)) {
+      directoryWatchers.push(watchDirectory(gitDirectory, (eventType, filename) => {
+        if (filename === "HEAD" || filename === "index") scheduleReprojection();
+      }));
+    }
+  }
   const server = http.createServer((request, response) => {
     securityHeaders(response);
     try {
@@ -656,9 +703,13 @@ export function startVibeHubUi({
         throw new UiError(404, "not_found", "Route not found");
       }
       requireBearer(request, token);
-      const snapshot = buildUiSnapshot(repoRoot);
+      const snapshot = watch === true ? cachedSnapshot : buildUiSnapshot(repoRoot);
       let data;
-      if (url.pathname === "/api/state") data = snapshot.state;
+      if (url.pathname === "/api/state") {
+        data = watch === true
+          ? { ...snapshot.state, watch: watchStatus }
+          : snapshot.state;
+      }
       else if (url.pathname === "/api/subject") data = subjectFrom(snapshot, url);
       else if (url.pathname === "/api/trace") data = traceFrom(snapshot, url);
       else throw new UiError(404, "not_found", "Route not found");
@@ -671,6 +722,8 @@ export function startVibeHubUi({
     if (closed) return;
     closed = true;
     if (expiry) clearTimeout(expiry);
+    if (watchDebounce) clearTimeout(watchDebounce);
+    for (const watcher of directoryWatchers.splice(0)) watcher.close();
     resolveClosed();
   });
   const ready = new Promise((resolveReady, rejectReady) => {
@@ -692,6 +745,7 @@ export function startVibeHubUi({
         url: focusedUrl(origin, token, ticket, view),
         port: address.port,
         expiresInMs: tokenLifetimeMs,
+        watch: watch === true,
         focus: { ticket, view },
       });
     });

@@ -16,6 +16,7 @@ async function launch(argv) {
     ticket: flags.ticket,
     view: flags.view,
     tokenLifetimeMs: null,
+    watch: true,
   });
   const ready = await handle.ready;
   if (flags.json) {

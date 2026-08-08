@@ -89,7 +89,11 @@ node skills/scripts/vh-workbench.mjs --repo /path/to/your/worktree
 
 The command prints an authorized local URL, opens your browser, and keeps the
 loopback host alive until you press Ctrl+C; stopping the foreground process
-ends the host and invalidates the URL. The lifetime belongs to that command:
+ends the host and invalidates the URL. The session also watches
+`.vibehub/**` and the Git HEAD and index of the selected worktree: bursts of
+Agent writes coalesce into one revalidated reprojection and the open graph
+refreshes itself, while invalid or half-written YAML keeps the last valid
+view with a visible validation notice until the files become valid again. The lifetime belongs to that command:
 no expiry timer, and also no daemon, PID file, registry, or background start.
 The session preserves every Agent-host guarantee — it binds only 127.0.0.1,
 serves only GET and HEAD, keeps the bearer token in memory and the URL
