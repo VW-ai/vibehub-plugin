@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "authority-states-quiet-workbench",
+    "supersession-is-traceable"
+  ],
+  "evidence_id": "amended-authority-content",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T14:20:03Z",
+  "refs": [
+    ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml",
+    "commit:79b92b1",
+    "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md",
+    "docs/demos/vibehub-workbench-webview.html"
+  ],
+  "schema_version": 1,
+  "summary": "constraint-ui-quiet-intelligence-standard was amended in place at commit 79b92b1: one active governed document now binds every VibeHub UI to top-to-bottom causal flow, the fixed A · Quiet Workbench direction with no style selector, IMPLEMENTING as a non-persistent presence overlay that never alters Git-native states, Inbox badges counting only unread items needing human action, and the persistence boundary allowing app-local non-authoritative UI preferences while forbidding tokens, Ticket states, and snapshots. The left-to-right wording was replaced in the same document with source and evidence citing the checked-in baseline (docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md §11, §11.1–11.3, §8.2) and the owner's recorded direction choice; relations to decision-local-graph-ui-first-class and contract-canonical-agent-output are preserved as valid endpoints.",
+  "ticket_id": "ticket-amend-workbench-ui-authority"
+}
