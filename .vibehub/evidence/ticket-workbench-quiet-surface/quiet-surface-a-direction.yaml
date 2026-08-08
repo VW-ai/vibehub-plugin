@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "quiet-a-direction"
+  ],
+  "evidence_id": "quiet-surface-a-direction",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T17:02:38Z",
+  "refs": [
+    "commit:a8ca1343cc79001342089db03ea67a9362068ceb",
+    "test:ui-host read-only loopback host serves assets, current graph, inspector, and trace",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/assets/local-graph/quiet-workbench-narrow.jpg",
+    "docs/demos/vibehub-workbench-webview.html",
+    "skills/vibehub-ticket-review/assets/app.css"
+  ],
+  "schema_version": 1,
+  "summary": "Real-browser screenshots against the live loopback host were captured at 1440px (docs/assets/local-graph/quiet-workbench-desktop.jpg) and 375px (docs/assets/local-graph/quiet-workbench-narrow.jpg) and show the fixed A · Quiet Workbench language taken from the checked-in demo's quiet tokens: system font stack, cool neutral surfaces (--canvas #eef0ef family), restrained shadows, semantic color only with every state also carried by a textual label on nodes, frontier rows, and summary cells, and the neutral --selection #283a32 outline for the current selection. No style selector exists (ui-host asserts style-lab/style-option/style-swatch absence in html and css), no visual preference is persisted (localStorage/sessionStorage absence asserted), no network fonts or third-party resources are referenced, and the 720px media block enforces 44px minimum touch targets verified in the 375px capture (commit a8ca1343cc79001342089db03ea67a9362068ceb).",
+  "ticket_id": "ticket-workbench-quiet-surface"
+}

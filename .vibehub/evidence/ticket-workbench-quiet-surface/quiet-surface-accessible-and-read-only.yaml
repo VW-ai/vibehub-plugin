@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "accessible-and-read-only"
+  ],
+  "evidence_id": "quiet-surface-accessible-and-read-only",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T17:02:38Z",
+  "refs": [
+    "commit:a8ca1343cc79001342089db03ea67a9362068ceb",
+    "test:ui-host read-only loopback host serves assets, current graph, inspector, and trace",
+    "test:session-watch the watcher never writes back into the repository",
+    "test:workbench-launcher session-owned host has no expiry and stays read-only",
+    "test:npm-run-verify-53-pass-artifact-ok"
+  ],
+  "schema_version": 1,
+  "summary": "Nodes and relations carry role=button tabindex=0 with Enter/Space selection, ArrowUp/ArrowDown causal navigation, Escape close, roving-tabindex inspector tabs with arrow-key movement, a keyboard-reachable minimap, and a visible 2px focus outline plus a dedicated focus-visible boundary stroke; prefers-reduced-motion collapses all transitions and animations. npm run verify on commit a8ca1343cc79001342089db03ea67a9362068ceb ends with 53 tests, fail 0, and artifact ok: the full ui-host suite (401 unauthorized, 405 read_only on POST, CSP default-src 'self', snapshot-stale, projection topology) passes with the rebuilt assets, new surface assertions cover the top-to-bottom layout function, honest presence empty state, style-selector absence, persistence absence, and the source dock, and the canonicalBytes before/after comparisons in ui-host, session-watch, and workbench-launcher prove Git YAML is byte-for-byte unchanged by UI use.",
+  "ticket_id": "ticket-workbench-quiet-surface"
+}
