@@ -613,8 +613,9 @@ export function startVibeHubUi({
   if (!Number.isInteger(port) || port < 0 || port > 65_535) {
     throw new Error("port must be an integer between 0 and 65535");
   }
-  if (!Number.isInteger(tokenLifetimeMs) || tokenLifetimeMs <= 0) {
-    throw new Error("tokenLifetimeMs must be a positive integer");
+  if (tokenLifetimeMs !== null
+    && (!Number.isInteger(tokenLifetimeMs) || tokenLifetimeMs <= 0)) {
+    throw new Error("tokenLifetimeMs must be a positive integer, or null for a session-owned lifetime");
   }
   validateFocus(ticket, view);
   if (!existsSync(resolve(repoRoot))) throw new Error(`Repository does not exist: ${repoRoot}`);
@@ -682,8 +683,10 @@ export function startVibeHubUi({
         return;
       }
       origin = `http://${LOOPBACK_HOST}:${address.port}`;
-      expiry = setTimeout(() => server.close(), tokenLifetimeMs);
-      expiry.unref();
+      if (tokenLifetimeMs !== null) {
+        expiry = setTimeout(() => server.close(), tokenLifetimeMs);
+        expiry.unref();
+      }
       resolveReady({
         origin,
         url: focusedUrl(origin, token, ticket, view),
@@ -740,7 +743,7 @@ export function parseUiFlags(argv) {
   return { repo: resolve(repo), port, open, json, ticket, view };
 }
 
-function openBrowser(url) {
+export function openBrowser(url) {
   const command = process.platform === "darwin"
     ? { file: "open", args: [url] }
     : process.platform === "win32"

@@ -75,3 +75,25 @@ so owner review and future design drift checks bind to exact visual evidence.
 ![Desktop causal Ticket graph](assets/local-graph/quiet-workbench-desktop.jpg)
 
 ![Narrow progressive Ticket Inspector](assets/local-graph/quiet-workbench-narrow.jpg)
+
+## User-owned Workbench session
+
+Agent-launched review hosts intentionally expire with the Agent task and its
+30-minute bearer token. To keep the same read-only Ticket graph open while you
+develop — without creating or continuing any Agent conversation — start the
+user-owned Workbench session yourself from the plugin bundle or a checkout:
+
+```bash
+node skills/scripts/vh-workbench.mjs --repo /path/to/your/worktree
+```
+
+The command prints an authorized local URL, opens your browser, and keeps the
+loopback host alive until you press Ctrl+C; stopping the foreground process
+ends the host and invalidates the URL. The lifetime belongs to that command:
+no expiry timer, and also no daemon, PID file, registry, or background start.
+The session preserves every Agent-host guarantee — it binds only 127.0.0.1,
+serves only GET and HEAD, keeps the bearer token in memory and the URL
+fragment, projects fresh from `.vibehub/` on each request, and leaves Git YAML
+byte-for-byte unchanged. `--no-open`, `--json`, `--port`, `--ticket <id>`, and
+`--view <execution|contract|log>` work exactly as they do for the Agent
+launcher documented in the Ticket review Skill.

@@ -20,8 +20,8 @@ executes it, records Evidence, asks for human attention only at a real boundary,
 and hands completion to an independent Outcome.
 
 Tickets, durable Context, Evidence, and Outcomes remain ordinary Git files.
-The graph appears when it helps you orient, decide, or audit; routine execution
-stays out of the way.
+The graph appears when it helps you orient, decide, or audit; routine execution stays out of the way.
+Keep it open yourself with the read-only, user-owned `node skills/scripts/vh-workbench.mjs --repo <worktree>` session described in the [local graph design](docs/LOCAL_GRAPH_DESIGN.md).
 
 ## Installation
 
