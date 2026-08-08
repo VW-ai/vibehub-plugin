@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "user-owned-lifetime",
+    "no-agent-no-residue"
+  ],
+  "evidence_id": "user-session-lifetime-and-residue",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T14:29:56Z",
+  "refs": [
+    "commit:cac2aaf",
+    "skills/scripts/vh-workbench.mjs",
+    "test/workbench-launcher.test.mjs",
+    "docs/LOCAL_GRAPH_DESIGN.md",
+    "README.md"
+  ],
+  "schema_version": 1,
+  "summary": "The documented foreground invocation node skills/scripts/vh-workbench.mjs --repo <worktree> (README pointer plus the User-owned Workbench session section in docs/LOCAL_GRAPH_DESIGN.md) starts the loopback host with tokenLifetimeMs null: the launch envelope reports expiresInMs null and no expiry timer is armed, so the session lasts until the user stops the process. The spawned-process test in test/workbench-launcher.test.mjs proves the full lifecycle without any Agent conversation: the real launcher process serves /health and authorized /api/state, then on SIGTERM exits with code 0, the port stops accepting connections (fetch rejects), .vibehub bytes and the repository root file listing are unchanged, and no daemon, PID file, registry entry, or on-disk token exists at any point — the token appears only in memory and the URL fragment.",
+  "ticket_id": "ticket-workbench-user-session-launcher"
+}
