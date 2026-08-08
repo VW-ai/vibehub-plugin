@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "debounced-single-refresh",
+      "criterion": "A burst of consecutive file events inside the debounce window produces exactly one stable revalidation and refresh, demonstrated by a test that writes multiple YAML files in quick succession."
+    },
+    {
+      "acceptance_id": "valid-swap-and-recovery",
+      "criterion": "After a valid governed update the UI shows the new snapshot without manual reopen; an invalid or half-written YAML state keeps the last valid snapshot with a visible validation error, and recovery is automatic once files become valid again."
+    },
+    {
+      "acceptance_id": "git-metadata-follows",
+      "criterion": "Branch switches, new commits, and dirty-state changes in the watched worktree update the displayed branch, commit, and working-tree state."
+    },
+    {
+      "acceptance_id": "no-writeback-proof",
+      "criterion": "Automated tests prove the watcher writes nothing into the repository and Git YAML remains byte-for-byte unchanged across watch, refresh, and error cycles."
+    }
+  ],
+  "constraints": [
+    "Observe only the user-selected exact worktree; no cross-repository scanning.",
+    "Watcher and snapshot state stay in memory; no snapshot or event log is persisted.",
+    "A validation failure must never clear the graph or fabricate partial state.",
+    "The Agent-task presentation path remains unaffected."
+  ],
+  "context": "Baseline §8.3: watch .vibehub/**/*.yaml plus .git/HEAD and .git/index in the selected exact worktree; debounce 100–250ms so one Agent operation produces one refresh; validate completely before swapping the UI snapshot; on validation failure keep the last valid view and show an explicit error; never write watcher state into the repository. Today the user-session UI only reflects changes when the page re-requests projection; the watcher closes the daily loop (§7: Agent updates YAML, interface refreshes without reopening). The capability lives in the user-owned session — first in the Phase 0 launcher, reused unchanged by the desktop shell later. Half-written YAML during an Agent write burst must never blank the graph.",
+  "context_refs": [
+    {
+      "purpose": "Requirement baseline: §8.3 watch rules, §7 daily flow, §16 half-write risk handling.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Projection and host the watcher triggers; buildUiSnapshot is the validation and projection unit.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    },
+    {
+      "purpose": "Existing invariants the watching session must keep passing.",
+      "ref": "test/ui-host.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A user-owned Workbench session revalidates and reprojects automatically after governed Git YAML changes, keeping the last valid view during invalid writes.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [
+    {
+      "rationale": "The watcher lives inside the user-owned session lifetime that the launcher establishes.",
+      "target_ticket_id": "ticket-workbench-user-session-launcher",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-session-watch"
+}

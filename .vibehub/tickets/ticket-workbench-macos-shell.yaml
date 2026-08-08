@@ -1,0 +1,69 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "user-owned-window",
+      "criterion": "A user opens the app, selects an exact Git worktree through native directory selection, and sees the Ticket graph with no Agent involvement; closing any Agent task or conversation leaves the Workbench running."
+    },
+    {
+      "acceptance_id": "session-lifecycle-clean",
+      "criterion": "The loopback host starts inside the app session with an in-memory token, and quitting the app verifiably terminates the host and watcher and leaves no process, open port, token, or cache behind."
+    },
+    {
+      "acceptance_id": "preferences-only-persistence",
+      "criterion": "Recent repositories, window frame, last selected Ticket, inspector tab, and viewport are restored across launches, while every Ticket state is recomputed from Git YAML and the token and snapshots are never written to disk."
+    },
+    {
+      "acceptance_id": "narrow-bridge-boundary",
+      "criterion": "The WebView cannot read files outside the selected worktree; directory selection and Git metadata flow only through the narrow bridge, demonstrated by a test or documented probe."
+    },
+    {
+      "acceptance_id": "shared-frontend-no-fork",
+      "criterion": "The shell renders the same shared frontend assets and read-only API contract as the browser mode without forking them, and the Phase 0 browser entry keeps working from the same code."
+    }
+  ],
+  "constraints": [
+    "No daemon, auto-start, login item, or background repository scanning.",
+    "The desktop framework stays out of the Ticket semantic layer; the host-to-WebView interface remains the narrow read-only contract.",
+    "The bearer token is bound to the app session and memory only.",
+    "The Agent-task review flow and Phase 0 launcher remain working fallbacks."
+  ],
+  "context": "Baseline §6.1: the Workbench is a thin desktop shell — the native window owns directory selection, recent repositories, and window lifecycle; the app starts the existing read-only host inside its session; the WebView loads the shared frontend; quitting the app ends host, watcher, and token. §8.1 defines the non-semantic RepositorySession (repoRoot, branch, commit, dirty read fresh from Git; selectedTicket, tab, viewport as UI preference only). §8.2 is the persistence allowlist: recent repository paths, window frame, last selected Ticket and tab, and pan/zoom may persist; the bearer token, Ticket states, frontier, and projected snapshots must not. §10: the WebView must not receive arbitrary local file permission — directory choice, Git metadata, and .vibehub reads pass through a narrow native or Node bridge restricted to the selected worktree. §12: calling the exported startVibeHubUi is acceptable initially, but avoid making skills/ relative paths a long-term structural dependency. WKWebView targets macOS dogfood first; cross-platform shells are a later evaluation (§6.2).",
+  "context_refs": [
+    {
+      "purpose": "Requirement baseline: §6 product shape, §8 session and persistence boundaries, §10 security, §12 module split, §14 lifecycle acceptance.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Interaction baseline for the shell chrome: titlebar identity, recent repositories, source dock.",
+      "ref": "docs/demos/vibehub-workbench-webview.html"
+    },
+    {
+      "purpose": "Exported startVibeHubUi and host boundary the shell embeds.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    },
+    {
+      "purpose": "Architecture boundary: no required daemon, database, or second truth in the plugin runtime.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A thin macOS WKWebView shell owns repository selection, recent repositories, the in-app read-only host, and session lifecycle, so the Workbench survives any Agent task.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [
+    {
+      "rationale": "The shell embeds the user-owned session and host lifetime mode the launcher introduces.",
+      "target_ticket_id": "ticket-workbench-user-session-launcher",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The shell's daily value depends on automatic revalidation and refresh inside the session.",
+      "target_ticket_id": "ticket-workbench-session-watch",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-macos-shell"
+}

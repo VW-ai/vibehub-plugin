@@ -30,16 +30,24 @@
         "path": "docs/SPEED_FIRST_CLEANUP.md"
       },
       {
+        "blob": "22d445ffe745a88dc7567fa8b244da5bfb2ce2e7",
+        "path": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+      },
+      {
         "blob": "4b73a20aa5cfbe9a8640a51bd1787b1f7eb90847",
         "path": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
       },
       {
         "blob": "129f5686ca258cae198bc110c2aa4cb301c50265",
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
+      },
+      {
+        "blob": "dbc48131deefdecdfe48d85ee3bafa9d6006f8cb",
+        "path": "docs/demos/vibehub-workbench-webview.html"
       }
     ],
-    "checked_at": "2026-08-05T00:29:55.319Z",
-    "last_aligned_commit": "8ce3cd092d090992a5706b547a85b84441379821"
+    "checked_at": "2026-08-08T03:40:37.234Z",
+    "last_aligned_commit": "58d060cb93ad8e383df12421277b7b9335202b5b"
   },
   "anchors": [
     "CHANGELOG.md",
