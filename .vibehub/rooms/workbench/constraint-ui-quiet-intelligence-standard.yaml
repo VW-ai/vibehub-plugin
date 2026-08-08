@@ -1,22 +1,26 @@
 {
   "context_id": "constraint-ui-quiet-intelligence-standard",
-  "detail": "A VibeHub UI does not receive a lower design bar because it ships inside a lightweight Plugin rather than as a standalone application. The local Ticket surface must feel like a deliberate execution instrument worth returning to: the complete causal graph is the primary object, read left-to-right as what becomes executable next; selection keeps that graph visible and progressively reveals contract, rationale, context, Evidence, Outcome, and Git trace. Healthy state stays quiet while human boundaries, blockers, deviations, stale facts, active work, and proof appear in situ at the graph locus that owns them. The visual language is compact, cool-neutral, macOS-like spatial tooling with system typography, restrained elevation, a small shape vocabulary, and semantic color only. Symbols, relations, position, weight, and whitespace carry structure before cards, labels, borders, or schema vocabulary. Every visible affordance must be honest, keyboard reachable, contrast-readable, and reduced-motion safe. The UI must not become a dense dashboard, a raw YAML/schema viewer, another chat, a warm editorial/serif brand page, or a decorative card collection. Historical runtime architecture is not part of this authority: the surface continues to consume schema-valid canonical Git documents mechanically and may rebuild only the presentation and interaction needed to meet this standard.",
+  "detail": "A VibeHub UI does not receive a lower design bar because it ships inside a lightweight Plugin rather than as a standalone application, and the same standard binds every surface including the user-owned Workbench. The complete causal graph is the primary object and reads top-to-bottom as what becomes executable next: completed foundations at the top, work currently being implemented central, and READY or BLOCKED downstream beneath it. Selection keeps the graph visible and progressively reveals contract, rationale, context, Evidence, Outcome, and Git trace. Healthy state stays quiet while human boundaries, blockers, deviations, stale facts, active work, and proof appear in situ at the graph locus that owns them. The visual direction is fixed to A · Quiet Workbench: compact, cool-neutral, macOS-like spatial tooling with system typography, restrained elevation, a small shape vocabulary, and semantic color only; no style selector ships on the product surface and no visual preference is written into the project. IMPLEMENTING is never a Ticket YAML status: it may appear only as a non-persistent Active-Run presence overlay that never alters Git-native READY, BLOCKED, DONE, DEVIATED, or REFINE, degrades to stale when heartbeats expire, and shows honest absence when no trusted presence source exists; states are never expressed by color alone and the current selection uses a neutral outline rather than a new state color. The Inbox is a cross-repository attention queue, not a notification stream: only Review requested, Decision required, and blocked interventions needing a human count toward the badge, the badge counts unread items that need action, seen remains local UI state that never implies approval or closeout, aggregated items keep their source labels, and the Inbox never derives or overrides Ticket state. Persistence boundary: app-local, non-authoritative UI preferences — recent repositories, window frame, last selection, viewport — may persist as interface preference and sit outside durable product state in the sense of contract-canonical-agent-output, while bearer tokens, Ticket states, frontiers, and projected snapshots must never persist. Every visible affordance must be honest, keyboard reachable, contrast-readable, and reduced-motion safe, with at least 44px touch targets on narrow layouts, and no network fonts or third-party resources. The UI must not become a dense dashboard, a raw YAML or schema viewer, another chat, a warm editorial or serif brand page, or a decorative card collection. Historical runtime architecture is not part of this authority: the surface continues to consume schema-valid canonical Git documents mechanically and may rebuild only the presentation and interaction needed to meet this standard.",
   "evidence": [
     {
-      "note": "Historic project authority defines quiet intelligence, semantic color, progressive disclosure, traceable interaction, and rigor beneath rather than schema vocabulary on the surface.",
+      "note": "Checked-in requirement baseline: §11 fixes direction A, changes causal flow to top-to-bottom per owner feedback, and requires this amendment before implementation; §11.2–11.3 define Inbox and IMPLEMENTING semantics; §8.2 defines the persistence allowlist.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "note": "Checked-in interaction baseline demonstrating the approved A · Quiet Workbench surface, top-to-bottom graph, Implementing-now overlay, and Inbox attention queue.",
+      "ref": "docs/demos/vibehub-workbench-webview.html"
+    },
+    {
+      "note": "Historic project authority defining quiet intelligence, semantic color, progressive disclosure, and rigor beneath rather than schema vocabulary on the surface; direction of causal reading amended from left-to-right to top-to-bottom by the checked-in baseline.",
       "ref": "commit:9dee0f0:META/00-project-room/specs/constraint-project-quiet-intelligence-001.yaml"
     },
     {
-      "note": "Wayne's approved v8 authority requires the compact cool-neutral spatial-workbench language and explicitly rejects warm editorial and serif styling for Workbench.",
+      "note": "Wayne's approved v8 authority for the compact cool-neutral spatial-workbench language, which the A · Quiet Workbench direction continues.",
       "ref": "commit:9dee0f0:META/legacy-21-workbench/specs/decision-workbench-014.yaml"
     },
     {
-      "note": "The ratified review surface makes the complete direct-unlock causal graph primary, keeps inspection in situ, and rejects separate dashboard regions.",
-      "ref": "commit:9dee0f0:META/09-ticket-runtime/specs/decision-ticket-review-surface-001.yaml"
-    },
-    {
-      "note": "The current warm paper, forest accent, serif display typography, persistent legend, and card-heavy presentation visibly diverge from that approved authority.",
-      "ref": "skills/vibehub-ticket-review/assets/app.css"
+      "note": "Ticket that executed this in-place amendment from the checked-in baseline.",
+      "ref": ".vibehub/tickets/ticket-amend-workbench-ui-authority.yaml"
     }
   ],
   "kind": "context",
@@ -32,19 +36,20 @@
   ],
   "schema_version": 1,
   "source": {
-    "captured_at": "2026-08-02T08:06:31Z",
-    "quote": "我用我们这个UI没有任何的让我想去用的欲望……我们这边依然要保持我们之前想要做的这样一个标准",
-    "ref": "conversation:2026-08-02-ui-standard-reaffirmed"
+    "captured_at": "2026-08-08T00:00:00Z",
+    "quote": "用户已选择 A 作为产品方向。正式 Workbench 不再显示 A / B / C 风格选择器……本提案和 Demo 根据本轮用户反馈改为自上到下。正式实现前应 amend / supersede 对应 governed constraint",
+    "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
   },
   "state": "active",
-  "summary": "Every VibeHub UI must preserve the approved quiet-intelligence spatial-workbench standard",
+  "summary": "Every VibeHub UI preserves the A · Quiet Workbench top-to-bottom spatial standard",
   "tags": [
     "design-authority",
     "graph",
     "interaction",
     "local-ui",
     "quiet-intelligence",
-    "spatial-workbench"
+    "spatial-workbench",
+    "workbench"
   ],
   "type": "constraint"
 }
