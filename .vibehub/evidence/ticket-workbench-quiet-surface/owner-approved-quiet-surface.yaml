@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "owner-approves-surface"
+  ],
+  "evidence_id": "owner-approved-quiet-surface",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T15:50:38Z",
+  "refs": [
+    "conversation:2026-08-09-owner-approves-quiet-workbench-surface",
+    "commit:ed4db45",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/assets/local-graph/quiet-workbench-narrow.jpg"
+  ],
+  "schema_version": 1,
+  "summary": "Human approval from the repository owner. The owner reviewed the rebuilt surface as a live rendering — the user-owned watching session at commit ed4db45 showing this repository's real Ticket graph — together with the checked-in desktop (1440x900) and narrow (375x812) review screenshots at docs/assets/local-graph/quiet-workbench-desktop.jpg and quiet-workbench-narrow.jpg. Presented for judgment were the top-to-bottom causal flow with completed foundations above and READY/BLOCKED downstream, the honest Implementing-now empty state in both the switcher strip and the rail, the READY frontier and graph summary, the progressive Execution/Contract/Log inspector, and the persistent source dock. Asked to approve or state what was wrong, the owner replied 批准 (approve) on 2026-08-09. This Evidence records the owner's own judgment; no Agent assertion substitutes for it.",
+  "ticket_id": "ticket-workbench-quiet-surface"
+}
