@@ -101,3 +101,53 @@ fragment, projects fresh from `.vibehub/` on each request, and leaves Git YAML
 byte-for-byte unchanged. `--no-open`, `--json`, `--port`, `--ticket <id>`, and
 `--view <execution|contract|log>` work exactly as they do for the Agent
 launcher documented in the Ticket review Skill.
+
+### The macOS Workbench shell
+
+`apps/workbench/` is a thin macOS WKWebView shell around that same session. It
+is not part of the Skill plugin and is never bundled into the plugin artifact.
+
+```bash
+cd apps/workbench && swift build          # runnable binary in .build/debug
+sh apps/workbench/Scripts/make-app-bundle.sh   # optional VibeHub Workbench.app
+open "apps/workbench/.build/VibeHub Workbench.app"
+```
+
+The package splits exactly the lifecycle adapter the shell owns and nothing
+else: `WorkbenchRepositorySession` (exact worktree, Git metadata, preference
+allowlist), `WorkbenchWebViewBridge` (starting and stopping the read-only host,
+the in-memory token, the navigation policy), and `WorkbenchDesktop` (window,
+directory selection, session lifetime).
+
+On launch the window lists recent repositories and opens `NSOpenPanel`
+restricted to directories. Choosing an exact Git worktree spawns
+`node skills/scripts/vh-workbench.mjs --repo <path> --no-open --json` inside the
+app session, reads the authorized URL from its first stdout line, and loads that
+URL in a `WKWebView`. Projection, layout, and the frontend are not
+reimplemented: the WebView renders the same `app.css` and `app.js` the browser
+mode serves, over the same read-only API. Quitting the app — including a plain
+`kill`, which AppKit would otherwise not intercept — terminates the host process
+and with it the watcher and the token; nothing is left listening. One honest
+exception remains: `SIGKILL` cannot be handled, so force-killing the shell
+leaves its host running until you stop that process yourself.
+
+The shell persists only the §8.2 allowlist, in the
+`dev.vibehub.workbench.preferences` domain: `recentRepositories`, `windowFrame`,
+`lastTicketId`, and `lastInspectorTab` (the last two keyed by exact worktree).
+The bearer token, Ticket states, the frontier, and projected snapshots are never
+written; every Ticket state is recomputed from Git YAML on each launch. The last
+Ticket and inspector tab are restored through the frontend's existing
+`?ticket=<id>&view=<execution|contract|log>` contract. **Graph pan and zoom are
+not restored.** §8.2 permits persisting them, but the shared frontend keeps
+pan/zoom in a closure and exposes no viewport contract, so restoring one would
+require forking the frontend; the shell records nothing it cannot honestly
+reproduce.
+
+The WebView never receives local file permission. It is allowed exactly one
+origin — the loopback session this app started — and there is no
+`WKScriptMessageHandler`, no injected user script, no `loadFileURL`, and no
+persistent data store. Remote links a user clicks open in the default browser
+instead. `VibeHubWorkbench --probe-navigation`, `--probe-preferences`,
+`--probe-session`, and `--probe-render` expose these boundaries headlessly, and
+`test/workbench-shell.test.mjs` asserts them (skipping when no Swift toolchain
+is present).

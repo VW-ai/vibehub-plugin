@@ -63,6 +63,7 @@ try {
   }
   for (const forbidden of [
     ".mcp.json",
+    "apps",
     "codex",
     "hooks",
     "runtime",
