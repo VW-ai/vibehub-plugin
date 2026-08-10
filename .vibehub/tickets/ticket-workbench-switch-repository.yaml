@@ -1,0 +1,85 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "in-app-switching-entry",
+      "criterion": "With a repository open, the app offers an in-app way to change repository — an Open Repository… menu item bound to Cmd-O plus a recent-repositories menu listing previously opened worktrees — and choosing either opens the selected exact worktree in the same running app session, reusing the persisted window frame, without quitting; proven by a headless probe over the real binary that prints the built menu with titles, key equivalents and recent-worktree entries, and drives the same open path a selection invokes."
+    },
+    {
+      "acceptance_id": "previous-session-fully-released",
+      "criterion": "Switching terminates the previous repository's host process and watcher before or as the new session becomes visible, leaving no orphan process and no listening port; a test over the real binary asserts the old host pid is dead, its port unreachable, its previously authorized URL no longer resolving, and no preference key holding a token."
+    },
+    {
+      "acceptance_id": "switch-confirmation-is-consistent",
+      "criterion": "An in-app switch to a different repository uses the same explicit confirmation semantics the deep link already applies, refusal leaves the current session untouched, and no switch path changes projects silently."
+    },
+    {
+      "acceptance_id": "recents-reflect-real-use",
+      "criterion": "The recent-repositories list updates on each successful open and stays within the persistence allowlist; a remembered repository that fails validation is reported honestly, dropped from recents when the cause is permanent — notADirectory, notAVibeHubRepository or notAnExactWorktree — and kept when the cause is transient, such as gitFailed, so a temporary failure never erases a valid entry."
+    },
+    {
+      "acceptance_id": "switching-changes-no-ticket-state",
+      "criterion": "Automated tests prove that switching repositories — including a refused switch and a switch to an invalid path — leaves canonical Git YAML byte-for-byte unchanged in both worktrees, and that every Ticket state in the newly opened repository is recomputed from its own Git YAML rather than carried over from the previous session."
+    }
+  ],
+  "constraints": [
+    "Reuse the existing deep-link resolution and host session lifecycle; do not add a second switching semantics or a parallel window path.",
+    "Persist nothing beyond the existing allowlist; no Ticket state, frontier, snapshot, or token may survive a switch.",
+    "Do not change the shared frontend's read-only API contract, and do not move repository selection into the page — the shell owns repository identity.",
+    "Browser mode keeps one repository per foreground command; this Ticket does not add multi-repository behavior to vh-workbench.mjs.",
+    "No daemon, background scanning, or automatic opening of repositories the user did not choose."
+  ],
+  "context": "Dogfood gap found by the repository owner while using the shipped Workbench: with several local repositories using VibeHub, there is no quick way to change which one the window shows. The gap sits exactly between two closed Tickets, each of which met its own acceptance. ticket-workbench-quiet-surface scoped the recent-repositories list out of the shared frontend as shell-owned, so the page shows only the current repository identity. ticket-workbench-macos-shell built recent repositories into the launch picker, but AppDelegate closes that picker once a repository opens and the menu carries only About, Quit, Copy, Select All, Close Window and Minimize. Nothing owns switching while a session is running, so today the only paths are quitting and relaunching, or sending a deep link for the other repository from a terminal — vibehub://open already implements the confirm-switch resolution, which proves the switch semantics exist and are only missing an in-app entry. Browser mode is deliberately out of scope: vh-workbench.mjs binds one --repo per foreground command, and a page-level repository picker would need the frontend to address more than one host, which is a different and larger question. Reuse rather than reinvent: DeepLinkPlanner already distinguishes focus-current-session, open-known-repository, confirm-first-use and confirm-switch, HostSession already starts and terminates a session host, and AppDelegate.open already performs a complete switch by terminating the old host, starting the new one and replacing the window; what is missing is only the entry point that reaches them. Note the window is replaced rather than reused — WorkbenchWindowController documents that swapping the WebView URL in place crashes on a repository switch — so a switch must construct the new window as the existing path does. Sequencing: the baseline puts multi-repository recents and repository validation recovery in Phase 2 while dogfood release closes Phase 1; this Ticket deliberately pulls that forward on the owner's dogfood request rather than expanding Phase 1 scope by accident.",
+  "context_refs": [
+    {
+      "purpose": "Requirement baseline for the boundaries this work must respect: §8.2 persistence allowlist, §9 deep link switch confirmation, §13 Phase 2 multi-repository recents. The in-app switching entry itself is new interaction justified by owner dogfood feedback, not pre-existing governance — §7 documents relaunch, not mid-session switching.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Where a repository is opened and the picker is closed today; the single entry any switch path must reuse.",
+      "ref": "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift"
+    },
+    {
+      "purpose": "Current menu without any repository entry.",
+      "ref": "apps/workbench/Sources/WorkbenchDesktop/WorkbenchMenu.swift"
+    },
+    {
+      "purpose": "Existing switch resolutions and confirmation wording to reuse rather than duplicate.",
+      "ref": "apps/workbench/Sources/WorkbenchRepositorySession/DeepLink.swift"
+    },
+    {
+      "purpose": "Host start and termination the switch must drive cleanly.",
+      "ref": "apps/workbench/Sources/WorkbenchWebViewBridge/HostSession.swift"
+    },
+    {
+      "purpose": "Binding UI authority, including the persistence boundary any recents change must respect.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Established probe pattern over the real binary for switch decisions and no-mutation proof.",
+      "ref": "test/workbench-deep-link.test.mjs"
+    },
+    {
+      "purpose": "Existing real-binary host pid and port assertions the release criterion extends to a switch.",
+      "ref": "test/workbench-shell.test.mjs"
+    },
+    {
+      "purpose": "Where the menu and switch probes are added, following the existing probe pattern.",
+      "ref": "apps/workbench/Sources/WorkbenchDesktop/ProbeCommands.swift"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A user developing in several VibeHub repositories can switch the open macOS Workbench app between them without quitting it, and the session they leave is torn down completely.",
+  "provenance_refs": [
+    "conversation:2026-08-10-dogfood-no-quick-repository-switch",
+    "commit:f4f2994"
+  ],
+  "relations": [
+    {
+      "rationale": "The in-app switch reuses the deep link's switch resolution and confirmation semantics.",
+      "target_ticket_id": "ticket-workbench-deep-link",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-switch-repository"
+}
