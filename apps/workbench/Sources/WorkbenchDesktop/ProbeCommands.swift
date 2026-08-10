@@ -13,7 +13,8 @@ enum ProbeCommand {
   case toolchain
   case navigation(origin: String, url: String, isLinkActivation: Bool)
   case session(repoRoot: String)
-  case render(repoRoot: String)
+  case render(repoRoot: String, deepLink: String?)
+  case deepLink(uri: String, currentRepository: String?, knownRepositories: [String])
 
   static let usage = """
     VibeHubWorkbench — the thin macOS Workbench shell.
@@ -29,9 +30,14 @@ enum ProbeCommand {
       --probe-session --repo <worktree>        start the read-only host, print its
                                                origin and pid, and hold it until
                                                SIGTERM/SIGINT
-      --probe-render --repo <worktree>         load the authorized URL in the real
+      --probe-render --repo <worktree> [--deep-link <uri>]
+                                               load the authorized URL in the real
                                                WKWebView off-screen and print what
-                                               the shared frontend rendered
+                                               the shared frontend rendered, then
+                                               apply the deep link to it
+      --probe-deep-link --url <uri> [--current <worktree>] [--known <worktree>]...
+                                               print the §9 decision for that URI
+                                               without opening a window or a host
     """
 
   init?(arguments: [String]) {
@@ -41,6 +47,11 @@ enum ProbeCommand {
         return nil
       }
       return arguments[index + 1]
+    }
+    func values(_ flag: String) -> [String] {
+      arguments.indices.compactMap { index in
+        arguments[index] == flag && index + 1 < arguments.count ? arguments[index + 1] : nil
+      }
     }
     switch first {
     case "--probe-preferences":
@@ -55,7 +66,14 @@ enum ProbeCommand {
       self = .session(repoRoot: repo)
     case "--probe-render":
       guard let repo = value("--repo") else { return nil }
-      self = .render(repoRoot: repo)
+      self = .render(repoRoot: repo, deepLink: value("--deep-link"))
+    case "--probe-deep-link":
+      guard let uri = value("--url") else { return nil }
+      self = .deepLink(
+        uri: uri,
+        currentRepository: value("--current"),
+        knownRepositories: values("--known")
+      )
     default:
       return nil
     }
@@ -97,14 +115,99 @@ enum ProbeCommand {
       return emit(["ok": true, "url": url, "decision": decision.rawValue])
     case .session(let repoRoot):
       return runSession(repoRoot: repoRoot)
-    case .render(let repoRoot):
-      return runRender(repoRoot: repoRoot)
+    case .render(let repoRoot, let deepLink):
+      return runRender(repoRoot: repoRoot, deepLink: deepLink)
+    case .deepLink(let uri, let currentRepository, let knownRepositories):
+      return runDeepLink(uri: uri, current: currentRepository, known: knownRepositories)
     }
   }
 
-  private func runRender(repoRoot: String) -> Int32 {
+  /// The whole §9 decision for one URI, over the same code the app runs, with
+  /// no window, no host, and no write of any kind.
+  private func runDeepLink(uri: String, current: String?, known: [String]) -> Int32 {
+    // Captured before and after so a refusal can be shown to change nothing.
+    let preferenceKeys = WorkbenchPreferences().writtenKeys()
+    let link: DeepLink
+    do {
+      link = try DeepLink.parse(uri)
+    } catch {
+      return emit([
+        "ok": true,
+        "accepted": false,
+        "stage": "uri",
+        "error": (error as? LocalizedError)?.errorDescription ?? error.localizedDescription,
+        "hostStarted": false,
+        "preferenceKeys": preferenceKeys,
+        "preferenceKeysAfter": WorkbenchPreferences().writtenKeys(),
+      ])
+    }
+
+    // Exactly the picker's validation: an exact Git worktree root holding
+    // `.vibehub`. A deep link reaches no path this would refuse.
+    do {
+      _ = try GitMetadata.readSession(repoRoot: link.repoRoot)
+    } catch {
+      return emit([
+        "ok": true,
+        "accepted": false,
+        "stage": "repository",
+        "error": (error as? LocalizedError)?.errorDescription ?? error.localizedDescription,
+        "repo": link.repoRoot,
+        "hostStarted": false,
+        "preferenceKeys": preferenceKeys,
+        "preferenceKeysAfter": WorkbenchPreferences().writtenKeys(),
+      ])
+    }
+
+    let resolution = DeepLinkPlanner.resolve(
+      link: link,
+      currentRepository: current,
+      knownRepositories: known
+    )
+    let ticketPresent = link.ticketId
+      .map { DeepLinkPlanner.ticketIsPresent($0, inWorktree: link.repoRoot) }
+    // A synthetic base stands in for the live session URL so the focus contract
+    // and the carried fragment can be shown without a running host or a token.
+    let base = URL(string: "http://127.0.0.1:65535/#SESSIONFRAGMENT")!
+    let focused = FocusedSessionURL.make(
+      base: base,
+      ticket: ticketPresent == true ? link.ticketId : nil,
+      view: link.view
+    )
+    // The exact question the user would be asked, printed instead of shown.
+    var prompt: [String: Any] = [:]
+    switch resolution {
+    case .confirmFirstUse:
+      prompt = describe(ConfirmationPrompts.firstUse(repoRoot: link.repoRoot))
+    case .confirmSwitch(let from):
+      prompt = describe(ConfirmationPrompts.switchRepository(from: from, to: link.repoRoot))
+    case .focusCurrentSession, .openKnownRepository:
+      break
+    }
+    return emit([
+      "ok": true,
+      "accepted": true,
+      "stage": "resolved",
+      "repo": link.repoRoot,
+      "ticket": link.ticketId ?? NSNull(),
+      "view": link.view?.rawValue ?? NSNull(),
+      "uri": link.uri,
+      "resolution": resolution.name,
+      "requiresConfirmation": resolution.requiresConfirmation,
+      "prompt": prompt.isEmpty ? NSNull() : prompt,
+      "ticketPresent": ticketPresent ?? NSNull(),
+      "focusPath": (focused.path) + (focused.query.map { "?\($0)" } ?? ""),
+      "focusFragmentPreserved": focused.fragment == "SESSIONFRAGMENT",
+      "hostStarted": false,
+      "preferenceKeys": preferenceKeys,
+      "preferenceKeysAfter": WorkbenchPreferences().writtenKeys(),
+    ])
+  }
+
+  private func runRender(repoRoot: String, deepLink: String?) -> Int32 {
     do {
       let session = try GitMetadata.readSession(repoRoot: repoRoot)
+      let link = try deepLink.map { try DeepLink.parse($0) }
       let host = try HostSession.start(
         repoRoot: session.repoRoot,
         node: try ToolchainLocator.nodeExecutable(),
@@ -113,7 +216,7 @@ enum ProbeCommand {
       defer { host.terminate() }
       // `.accessory` keeps the probe out of the Dock and away from focus.
       NSApplication.shared.setActivationPolicy(.accessory)
-      return RenderProbe(session: session, host: host).run()
+      return RenderProbe(session: session, host: host, deepLink: link).run()
     } catch {
       return fail(error)
     }
@@ -160,6 +263,15 @@ enum ProbeCommand {
     } catch {
       return fail(error)
     }
+  }
+
+  private func describe(_ prompt: ConfirmationPrompt) -> [String: Any] {
+    [
+      "title": prompt.title,
+      "detail": prompt.detail,
+      "affirmative": prompt.affirmative,
+      "cancel": prompt.cancel,
+    ]
   }
 
   private func ownLocation() -> URL {

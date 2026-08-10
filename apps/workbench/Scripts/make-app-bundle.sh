@@ -27,6 +27,17 @@ cat > "$bundle/Contents/Info.plist" <<'PLIST'
   <key>CFBundleVersion</key><string>0.5.0</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
+  <!-- The §9 deep link. One scheme, viewer role: the app is only ever asked to
+       navigate to a repository, Ticket, and inspector layer it then validates. -->
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key><string>dev.vibehub.workbench.deep-link</string>
+      <key>CFBundleTypeRole</key><string>Viewer</string>
+      <key>CFBundleURLSchemes</key>
+      <array><string>vibehub</string></array>
+    </dict>
+  </array>
 </dict>
 </plist>
 PLIST

@@ -11,13 +11,22 @@ import WorkbenchWebViewBridge
 /// with no forked frontend, and it proves `file:` stays denied inside the live
 /// WebView rather than only in the pure policy.
 final class RenderProbe: NSObject, WKNavigationDelegate {
+  private enum Phase {
+    case initial
+    case deepLinkFocus
+  }
+
   private let session: RepositorySession
   private let host: HostSession
   private let webView: WKWebView
   private let policy: NavigationPolicy
   private let window: NSWindow
+  private let deepLink: DeepLink?
+  private var phase: Phase = .initial
   private var finished = false
   private var deniedFileNavigation = false
+  private var pendingPayload: [String: Any] = [:]
+  private var pendingDeepLinkPayload: [String: Any] = [:]
 
   private static let readout = """
     JSON.stringify({
@@ -32,9 +41,27 @@ final class RenderProbe: NSObject, WKNavigationDelegate {
     })
     """
 
-  init(session: RepositorySession, host: HostSession) {
+  /// What the shell reads back after a deep link: the Ticket and inspector
+  /// layer the shared frontend actually selected.
+  private static let selectionReadout = """
+    JSON.stringify({
+      selection: (() => {
+        const tab = document.querySelector('.ticket-tab[aria-selected="true"]');
+        if (!tab || typeof tab.id !== 'string' || !tab.id.startsWith('ticket-tab-')) return '';
+        const rest = tab.id.slice('ticket-tab-'.length);
+        const cut = rest.lastIndexOf('-');
+        if (cut <= 0) return '';
+        return rest.slice(0, cut) + ' ' + rest.slice(cut + 1);
+      })(),
+      nodes: document.querySelectorAll('#nodeLayer [data-ticket-id]').length,
+      path: (document.querySelector('#sourcePath') || {}).textContent || ''
+    })
+    """
+
+  init(session: RepositorySession, host: HostSession, deepLink: DeepLink? = nil) {
     self.session = session
     self.host = host
+    self.deepLink = deepLink
     self.policy = NavigationPolicy(sessionOrigin: host.ready.origin)
     self.webView = WKWebView(
       frame: NSRect(x: 0, y: 0, width: 1280, height: 820),
@@ -54,7 +81,7 @@ final class RenderProbe: NSObject, WKNavigationDelegate {
     webView.navigationDelegate = self
   }
 
-  func run(timeout: TimeInterval = 60) -> Int32 {
+  func run(timeout: TimeInterval = 90) -> Int32 {
     webView.load(URLRequest(url: host.ready.authorizedURL))
     let deadline = Date().addingTimeInterval(timeout)
     while !finished && Date() < deadline {
@@ -85,7 +112,11 @@ final class RenderProbe: NSObject, WKNavigationDelegate {
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     // Give the frontend one projection round-trip before reading the DOM.
     DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-      self?.probeFileBoundary()
+      guard let self else { return }
+      switch self.phase {
+      case .initial: self.probeFileBoundary()
+      case .deepLinkFocus: self.readSelection()
+      }
     }
   }
 
@@ -140,7 +171,7 @@ final class RenderProbe: NSObject, WKNavigationDelegate {
         ])
         return
       }
-      self.report([
+      var payload: [String: Any] = [
         "ok": true,
         "repo": self.session.repoRoot,
         "rendered": rendered,
@@ -148,7 +179,80 @@ final class RenderProbe: NSObject, WKNavigationDelegate {
         "escapeAttempts": escapeResult,
         "loadedOrigin": self.webView.url?.host ?? "",
         "loadedPort": self.webView.url?.port ?? -1,
-      ])
+      ]
+      guard let link = self.deepLink else {
+        self.report(payload)
+        return
+      }
+      self.applyDeepLink(link, into: &payload)
+    }
+  }
+
+  /// Applies a `vibehub://` link to the page this session is already showing,
+  /// exactly as the window does: resolve, then either re-address the one
+  /// authorized URL at the Ticket, or state that this worktree has no such
+  /// Ticket and leave the open repository alone.
+  private func applyDeepLink(_ link: DeepLink, into payload: inout [String: Any]) {
+    let resolution = DeepLinkPlanner.resolve(
+      link: link,
+      currentRepository: session.repoRoot,
+      knownRepositories: [session.repoRoot]
+    )
+    let present = link.ticketId
+      .map { DeepLinkPlanner.ticketIsPresent($0, inWorktree: session.repoRoot) }
+    var deepLinkPayload: [String: Any] = [
+      "uri": link.uri,
+      "resolution": resolution.name,
+      "requiresConfirmation": resolution.requiresConfirmation,
+      "ticket": link.ticketId ?? NSNull(),
+      "view": link.view?.rawValue ?? NSNull(),
+      "ticketPresent": present ?? NSNull(),
+    ]
+    guard let ticketId = link.ticketId, present == true else {
+      if let ticketId = link.ticketId {
+        deepLinkPayload["navigated"] = false
+        deepLinkPayload["missingTicketStatement"] = [
+          MissingTicketStatement.title(ticketId),
+          MissingTicketStatement.detail(ticketId: ticketId, worktree: session.repoRoot),
+        ].joined(separator: " ")
+      } else {
+        deepLinkPayload["navigated"] = false
+      }
+      payload["deepLink"] = deepLinkPayload
+      report(payload)
+      return
+    }
+    deepLinkPayload["navigated"] = true
+    pendingPayload = payload
+    pendingDeepLinkPayload = deepLinkPayload
+    phase = .deepLinkFocus
+    webView.load(URLRequest(
+      url: host.ready.focusedURL(ticket: ticketId, view: link.view ?? .execution)
+    ))
+  }
+
+  private func readSelection() {
+    webView.evaluateJavaScript(RenderProbe.selectionReadout) { [weak self] value, error in
+      guard let self else { return }
+      var payload = self.pendingPayload
+      var deepLinkPayload = self.pendingDeepLinkPayload
+      if let raw = value as? String,
+        let data = raw.data(using: .utf8),
+        let selection = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+      {
+        let parts = (selection["selection"] as? String ?? "").split(separator: " ")
+        deepLinkPayload["selectedTicket"] = parts.count == 2 ? String(parts[0]) : NSNull()
+        deepLinkPayload["selectedTab"] = parts.count == 2 ? String(parts[1]) : NSNull()
+        deepLinkPayload["nodesAfterFocus"] = selection["nodes"] ?? NSNull()
+        deepLinkPayload["pathAfterFocus"] = selection["path"] ?? NSNull()
+      } else {
+        deepLinkPayload["error"] = error?.localizedDescription
+          ?? "the focused Ticket could not be read"
+      }
+      deepLinkPayload["focusedQuery"] = self.webView.url?.query ?? NSNull()
+      deepLinkPayload["focusedOrigin"] = self.webView.url?.host ?? NSNull()
+      payload["deepLink"] = deepLinkPayload
+      self.report(payload)
     }
   }
 

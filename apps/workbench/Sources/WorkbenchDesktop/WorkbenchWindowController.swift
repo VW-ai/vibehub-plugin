@@ -13,6 +13,7 @@ final class WorkbenchWindowController: NSObject, WKNavigationDelegate {
   private let webView: WKWebView
   private let policy: NavigationPolicy
   private let session: RepositorySession
+  private let ready: HostSessionReady
   private let preferences: WorkbenchPreferences
   private var selectionTimer: Timer?
 
@@ -33,6 +34,7 @@ final class WorkbenchWindowController: NSObject, WKNavigationDelegate {
 
   init(session: RepositorySession, ready: HostSessionReady, preferences: WorkbenchPreferences) {
     self.session = session
+    self.ready = ready
     self.preferences = preferences
     self.policy = NavigationPolicy(sessionOrigin: ready.origin)
 
@@ -49,6 +51,11 @@ final class WorkbenchWindowController: NSObject, WKNavigationDelegate {
     super.init()
 
     webView.navigationDelegate = self
+    // AppKit still defaults to releasing a window when it closes, which under
+    // ARC frees a window this controller also owns. Closing the window on a
+    // repository switch would then crash the app the next time anything touched
+    // it, so ownership stays with the controller alone.
+    window.isReleasedWhenClosed = false
     window.contentView = webView
     window.titlebarAppearsTransparent = false
     window.title = "VibeHub Workbench — \(session.displayName)"
@@ -74,6 +81,38 @@ final class WorkbenchWindowController: NSObject, WKNavigationDelegate {
     persistFrame()
     window.delegate = nil
     window.close()
+  }
+
+  // MARK: deep link focus (§9)
+
+  func focusWindow() {
+    window.makeKeyAndOrderFront(nil)
+  }
+
+  /// Re-addresses the one authorized session URL at a Ticket and layer.
+  ///
+  /// This is navigation inside the single allowed origin, through the frontend's
+  /// own `?ticket=&view=` contract — no new origin, no new capability, and no
+  /// change to the read-only host that is already running.
+  func focus(ticket: String?, view: InspectorTab?) {
+    webView.load(URLRequest(url: ready.focusedURL(ticket: ticket, view: view)))
+  }
+
+  /// §9.4 — say plainly that the Ticket is not in this worktree instead of
+  /// showing an empty inspector the user has to interpret.
+  func reportMissingTicket(_ ticketId: String, worktree: String) {
+    report(
+      MissingTicketStatement.title(ticketId),
+      detail: MissingTicketStatement.detail(ticketId: ticketId, worktree: worktree)
+    )
+  }
+
+  func report(_ message: String, detail: String) {
+    let alert = NSAlert()
+    alert.messageText = message
+    alert.informativeText = detail
+    alert.alertStyle = .informational
+    alert.beginSheetModal(for: window)
   }
 
   // MARK: preference-only persistence

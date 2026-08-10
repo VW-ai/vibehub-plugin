@@ -25,6 +25,9 @@ final class RepositoryPickerWindowController: NSObject {
     super.init()
 
     window.title = "VibeHub Workbench"
+    // Opening a repository closes this window and a later refused deep link
+    // brings it back. AppKit's default would have freed it on that first close.
+    window.isReleasedWhenClosed = false
     window.center()
     window.contentView = buildContent()
     reloadRecents()

@@ -149,6 +149,50 @@ origin — the loopback session this app started — and there is no
 `WKScriptMessageHandler`, no injected user script, no `loadFileURL`, and no
 persistent data store. Remote links a user clicks open in the default browser
 instead. `VibeHubWorkbench --probe-navigation`, `--probe-preferences`,
-`--probe-session`, and `--probe-render` expose these boundaries headlessly, and
-`test/workbench-shell.test.mjs` asserts them (skipping when no Swift toolchain
-is present).
+`--probe-session`, `--probe-render`, and `--probe-deep-link` expose these
+boundaries headlessly, and `test/workbench-shell.test.mjs` plus
+`test/workbench-deep-link.test.mjs` assert them (skipping when no Swift
+toolchain is present).
+
+#### Deep links
+
+The app bundle claims one URL scheme, `vibehub`, and handles it through
+`kAEGetURL`:
+
+```text
+vibehub://open?repo=<absolute-path>&ticket=<ticket-id>&view=<execution|contract|log>
+```
+
+`repo` is required and must be an absolute path with no `..` segment; `ticket`
+must be a canonical Ticket ID; `view` is one of exactly those three layers and
+requires `ticket`, mirroring the launcher rule. Nothing else is accepted — an
+unknown scheme or action, an unknown or repeated parameter, a URI fragment,
+credentials, or a port is refused whole, and a refusal opens nothing, reads no
+repository, and writes no preference. **A deep link carries navigation only.**
+It names a repository, a Ticket, and an inspector layer, and there is no
+parameter through which it could create, change, or delete anything; the host it
+addresses is the same read-only session, and the WebView boundary is unchanged
+(`vibehub:` is not navigable inside the page). It deliberately says nothing
+about pan and zoom, for the same reason the shell does not restore them.
+
+Before anything is focused, opened, or asked, the named path is validated
+exactly as a directory chosen in `NSOpenPanel` is: an exact Git worktree root
+holding `.vibehub`. Then:
+
+| Situation | Behaviour |
+| --- | --- |
+| Workbench already open on that worktree | Focus the window and re-address the authorized URL at the Ticket and layer. |
+| Not running, worktree already in `recentRepositories` | Open it directly. |
+| Not running, worktree seen for the first time | Ask first — a sheet naming the path, opening only on **Open Repository**. |
+| Open on a different worktree | Ask first — a sheet naming both paths, switching only on **Switch Repository**. Declining leaves the session untouched. |
+| Ticket not checked in by that worktree | Open the repository anyway and say so: *"<id> is not in this worktree."* |
+
+That last row is why the shell checks `.vibehub/tickets/<id>.yaml` before it
+passes `--ticket` to the host: the host refuses to start on an unknown Ticket,
+which would keep the repository itself from opening. The launcher's validation
+is unchanged and still authoritative; the shell simply never asks it to bind a
+Ticket that is not there, which also means a stale `lastTicketId` preference can
+no longer block a launch.
+
+Deep links are an enhancement. The Workbench opens, watches, and renders with no
+Agent, no deep link, and no URL scheme registered at all.
