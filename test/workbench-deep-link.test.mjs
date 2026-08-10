@@ -471,6 +471,7 @@ test("deep link handling writes nothing, valid or not", (t) => {
   const repo = fixture("workbench-deep-link-bytes");
   const other = fixture("workbench-deep-link-bytes-other");
   const before = canonicalBytes(repo);
+  const otherBefore = canonicalBytes(other);
   const rootEntriesBefore = readdirSync(repo).sort();
   const preferencesBefore = link(uri(repo)).preferenceKeys;
 
@@ -495,7 +496,7 @@ test("deep link handling writes nothing, valid or not", (t) => {
     }
   }
   assert.deepEqual(canonicalBytes(repo), before);
-  assert.deepEqual(canonicalBytes(other), canonicalBytes(other));
+  assert.deepEqual(canonicalBytes(other), otherBefore);
   assert.deepEqual(readdirSync(repo).sort(), rootEntriesBefore);
 });
 
