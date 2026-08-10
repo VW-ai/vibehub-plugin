@@ -6,9 +6,10 @@ finishes, what becomes executable next?**
 
 ## Retained product language
 
-- One complete, deterministic, left-to-right direct-unlock graph is the primary
-  object. Forks, joins, blockers, deviations, and proof stay at their owning
-  graph locus.
+- One complete, deterministic, top-to-bottom direct-unlock graph is the primary
+  object: proven foundations above, current work central, READY and BLOCKED
+  downstream beneath. Forks, joins, blockers, deviations, and proof stay at
+  their owning graph locus.
 - The healthy surface is quiet. Matte cool neutrals carry the base; semantic
   color is reserved for truthful execution state. Hover and selection remain
   neutral interaction states.

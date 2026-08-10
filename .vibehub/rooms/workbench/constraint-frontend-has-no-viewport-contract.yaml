@@ -1,0 +1,41 @@
+{
+  "context_id": "constraint-frontend-has-no-viewport-contract",
+  "detail": "The shared frontend assets keep graph pan and zoom as closure-local state in app.js with no storage of any kind, and the only URL contract they read is ?ticket=<id> and ?view=<execution|contract|log>. Anything outside the shell that wants to address, restore, or hand off a viewport therefore cannot do so today: the macOS Workbench shell restores recent repositories, window frame, last Ticket, and last inspector tab, but honestly declines to restore pan and zoom rather than faking it, because adding a viewport contract would mean changing the shared frontend rather than the lifecycle adapter. This binds future work in both directions. Deep link, presence overlay, Inbox, and any later shell feature may address a Ticket and an inspector view but must not claim viewport addressing until app.js gains an explicit viewport contract; and adding such a contract is a shared-frontend change that belongs to the surface, must keep every consumer of the read-only API working, and must keep pan and zoom disposable view state rather than durable product state.",
+  "evidence": [
+    {
+      "note": "Independent closeout of the macOS shell verified in app.js that panX, panY and scale are closure-local bindings, that no localStorage, sessionStorage or indexedDB use exists, and that only ticket and view are read from the URL.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "note": "The shell records the resulting limitation honestly instead of faking a viewport restore.",
+      "ref": ".vibehub/evidence/ticket-workbench-macos-shell/evidence-macos-shell-preferences-only-persistence.yaml"
+    },
+    {
+      "note": "Ticket whose execution and independent adjudication surfaced this cross-Ticket fact.",
+      "ref": ".vibehub/tickets/ticket-workbench-macos-shell.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-ui-quiet-intelligence-standard",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-09T16:40:00Z",
+    "quote": "the shared frontend exposes no viewport contract — pan/zoom is closure-local with no storage and the only URL contract is ?ticket=/?view=",
+    "ref": "conversation:2026-08-09-macos-shell-closeout"
+  },
+  "state": "active",
+  "summary": "The shared Ticket graph frontend exposes no viewport contract; only ticket and view are addressable",
+  "tags": [
+    "deep-link",
+    "frontend",
+    "local-ui",
+    "viewport",
+    "workbench"
+  ],
+  "type": "constraint"
+}
