@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "shared-frontend-no-fork"
+  ],
+  "evidence_id": "evidence-macos-shell-shared-frontend-no-fork",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T03:41:08Z",
+  "refs": [
+    "commit:aec63834cb07ca740b5eab26fab77d84206d9285",
+    "test:the shell ships no frontend of its own",
+    "test:the WebView renders the shared frontend and cannot escape the origin",
+    "test:the shell starts the existing read-only host instead of reimplementing it",
+    "command:npm run verify",
+    "observation:probe-render assets=[/app.css,/app.js] nodes=35 branch=claude/vibehub-workbench-webview-53ffda",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "At commit aec63834cb07ca740b5eab26fab77d84206d9285 the shell contains no frontend of its own: Node test `the shell ships no frontend of its own` walks apps/workbench (excluding .build) and fails if any .html/.css/.js/.mjs/.ts file exists - the result is empty. `VibeHubWorkbench --probe-render` loaded the authorized URL in the real WKWebView against this worktree and read back from the live DOM: 35 Ticket nodes in #nodeLayer, frontier count 3, source dock path equal to the selected worktree, branch claude/vibehub-workbench-webview-53ffda, commit 795403f959, document title 'vibehub-workbench-webview-53ffda · VibeHub Ticket graph', and exactly two referenced assets, /app.css and /app.js, served by skills/vibehub-ticket-review/assets through the same read-only host the browser mode uses; against the disposable single-Ticket fixture the same probe reported 1 node, proving the numbers come from projection rather than a constant. The shell adds no /api route, no snapshot builder and no layout code - test `the shell starts the existing read-only host instead of reimplementing it` fails if /api/state, buildUiSnapshot or a frontier assignment appears in Swift, and asserts the exact spawn argv [launcher, --repo, repoRoot, --no-open, --json]. The Phase 0 browser entry is untouched: skills/scripts/vh-workbench.mjs and skills/scripts/vh-ui.mjs were not modified by this Ticket, and their existing suites (workbench-launcher.test.mjs, ui-host.test.mjs, session-watch.test.mjs) still pass unchanged inside `npm run verify` - 64 tests, fail 0, plugin artifact ok with 52 files. scripts/verify-plugin-artifact.mjs now also forbids an apps/ directory in the artifact, so the desktop shell can never ship inside the Skill plugin.",
+  "ticket_id": "ticket-workbench-macos-shell"
+}

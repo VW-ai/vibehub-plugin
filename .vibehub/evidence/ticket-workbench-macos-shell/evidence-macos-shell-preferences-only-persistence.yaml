@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "preferences-only-persistence"
+  ],
+  "evidence_id": "evidence-macos-shell-preferences-only-persistence",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T03:41:08Z",
+  "refs": [
+    "commit:aec63834cb07ca740b5eab26fab77d84206d9285",
+    "apps/workbench/Sources/WorkbenchRepositorySession/WorkbenchPreferences.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/WorkbenchWindowController.swift",
+    "test:the running binary reports the persistence allowlist honestly",
+    "test:only the §8.2 preference allowlist is written, and never authority",
+    "command:defaults read dev.vibehub.workbench.preferences",
+    "docs/LOCAL_GRAPH_DESIGN.md"
+  ],
+  "schema_version": 1,
+  "summary": "At commit aec63834cb07ca740b5eab26fab77d84206d9285 the shell persists exactly four keys in its own UserDefaults suite dev.vibehub.workbench.preferences: recentRepositories, windowFrame, lastTicketId, lastInspectorTab (the last two dictionaries keyed by exact worktree). Manually observed: after opening this worktree, `defaults read dev.vibehub.workbench.preferences` contained only recentRepositories with the one selected path - no token, no Ticket state, no frontier, no snapshot. Mechanically: `VibeHubWorkbench --probe-preferences` reports allowlist exactly [recentRepositories, windowFrame, lastTicketId, lastInspectorTab], viewportRestored false, and every key actually written inside that allowlist; Node test `the running binary reports the persistence allowlist honestly` asserts it against the real binary, and `only the §8.2 preference allowlist is written, and never authority` parses every defaults.set call in the compiled Swift (comments stripped) and fails if any write uses a key outside PreferenceKey. Ticket state is never restored from the app: every launch spawns the read-only host, which reprojects from Git YAML. Last Ticket and inspector tab are restored through the frontend's existing ?ticket=<id>&view=<execution|contract|log> contract, read back from the rendered page's aria-selected tab id. HONEST LIMITATION: graph pan/zoom is NOT restored. §8.2 permits persisting a viewport, but skills/vibehub-ticket-review/assets/app.js keeps panX/panY/scale in a closure and exposes no viewport parameter or storage, so restoring one would require forking the shared frontend, which this Ticket forbids. The shell therefore persists no viewport at all rather than writing a value it could not honestly reproduce; --probe-preferences reports viewportRestored:false and docs/LOCAL_GRAPH_DESIGN.md states it. This acceptance criterion is met for recent repositories, window frame, last Ticket and inspector tab, and is deliberately unmet for viewport.",
+  "ticket_id": "ticket-workbench-macos-shell"
+}
