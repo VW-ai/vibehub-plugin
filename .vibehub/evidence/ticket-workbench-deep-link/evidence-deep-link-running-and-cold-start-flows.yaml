@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "running-and-cold-start-flows"
+  ],
+  "evidence_id": "evidence-deep-link-running-and-cold-start-flows",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T05:48:31Z",
+  "refs": [
+    "commit:a0b0f442c64daa9c95df1ee2893b08e63c1b3557",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/WorkbenchWindowController.swift",
+    "test:a deep link selects the Ticket and layer in the real WebView",
+    "test:the §9 behaviours are decided before anything opens",
+    "test:both confirmations are real prompts the user has to answer",
+    "command:open \"vibehub://open?repo=<worktree>&ticket=ticket-workbench-macos-shell&view=contract\"",
+    "command:defaults read dev.vibehub.workbench.preferences",
+    "observation:first-seen repository link left the app waiting with no host started and recentRepositories unchanged",
+    "limitation:GUI automation denied (osascript not allowed assistive access) so the confirmation button was not clicked"
+  ],
+  "schema_version": 1,
+  "summary": "Both flows were exercised manually against the real registered app bundle at commit a0b0f442c64daa9c95df1ee2893b08e63c1b3557, and headlessly against the built binary. RUNNING: with the Workbench open on this worktree, `open \"vibehub://open?repo=<worktree>&ticket=ticket-workbench-session-watch&view=execution\"` moved the live window to that Ticket and layer; observed because the shell reads the rendered page's aria-selected tab id and `defaults read dev.vibehub.workbench.preferences` then showed lastTicketId=ticket-workbench-session-watch and lastInspectorTab=execution, and a further link moved it to ticket-workbench-quiet-surface/contract. The same behaviour is proven mechanically inside a real WKWebView by `--probe-render --repo <fixture> --deep-link <uri>`: resolution focus-current-session, navigated true, focusedQuery ticket=ticket-second&view=contract, and the page reported selectedTicket ticket-second with selectedTab contract while still on 127.0.0.1 and still serving only /app.css and /app.js (test `a deep link selects the Ticket and layer in the real WebView`). COLD START, KNOWN REPOSITORY: with no VibeHubWorkbench process running, `open \"vibehub://open?repo=<worktree>&ticket=ticket-workbench-macos-shell&view=contract\"` launched the app through Launch Services with no arguments and opened that worktree focused on that Ticket and layer (defaults showed macos-shell/contract afterwards). COLD START, FIRST-SEEN REPOSITORY: with recentRepositories holding only this worktree, a link naming /Users/victor/work/VibeHub/vibehub-release-7:31 launched the app, which then STAYED RUNNING for the full observation window with its confirmation sheet up while starting NO read-only host for that repository and leaving recentRepositories unchanged - nothing opened without an answer. Headlessly, `--probe-deep-link` reports resolution confirm-first-use with requiresConfirmation true and the exact prompt (title \"Open this repository in the Workbench?\", buttons Open Repository / Cancel, detail naming the path), and open-known-repository with no prompt when the path is already in recents. HONEST LIMITATION: GUI automation is denied in this environment (osascript reported \"not allowed assistive access\"), so I could not click Open Repository; the affirmative branch is proven by source assertion in test `both confirmations are real prompts the user has to answer` (the repository is opened only inside the accepted closure of the sheet completion) and by the open-known-repository path, which is the same open() call. DEFECT FOUND AND FIXED WHILE VERIFYING: the first implementation used an application-modal NSAlert; run at launch before the event loop and with no window behind it, it answered itself with its default button and the app then quit when the alert closed (observed: the app opened the repository unasked, then disappeared after ~2s). Both questions are now sheets on a real window and a launch-time link is handled one run loop turn after the launch surface is on screen; the retest above shows the app waiting instead.",
+  "ticket_id": "ticket-workbench-deep-link"
+}
