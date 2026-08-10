@@ -19,7 +19,16 @@
         "type": "object",
         "additionalProperties": false,
         "required": ["acceptance_id", "criterion"],
-        "properties": { "acceptance_id": { "$ref": "#/$defs/id" }, "criterion": { "$ref": "#/$defs/text" } }
+        "properties": {
+          "acceptance_id": { "$ref": "#/$defs/id" },
+          "criterion": { "$ref": "#/$defs/text" },
+          "authority": {
+            "type": "string",
+            "enum": ["agent", "human"],
+            "default": "agent",
+            "description": "Who may judge this criterion. Omission means agent authority."
+          }
+        }
       }
     },
     "constraints": { "type": "array", "items": { "$ref": "#/$defs/text" } },

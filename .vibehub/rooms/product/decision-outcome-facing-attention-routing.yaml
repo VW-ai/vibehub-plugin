@@ -1,0 +1,51 @@
+{
+  "context_id": "decision-outcome-facing-attention-routing",
+  "detail": "VibeHub's long-term interaction model is a consumer-grade conceptual simplification of Linear for ordinary people, non-technical teams, and everyday work. The user should express what they want completed in normal language and primarily see outcomes, useful progress, and the few moments that require their judgment, permission, input, or intervention; they should not need to understand Ticket graphs or manage execution objects. Internally, a Ticket remains the stable bounded contract that carries Context, authority, acceptance, dependencies, Evidence, and Outcome, while Agents, models, chats, repositories, tools, and human collaborators are replaceable execution resources. VibeHub routes work outward to the right executor, watches its bounded lifecycle, and pulls it back into the user's attention only at a real boundary or when completion is ready. Over time this attention-routing role may coordinate a person's projects, small teams, collaborators, and personal actions across software and non-software domains. The intended 2C product is therefore closer to an outcome-oriented todo and personal action system than a visible issue tracker, while retaining the rigorous action contract underneath. This decision refines the earlier Ticket-led Agent direction: Ticket remains canonical but is no longer required to be the user's product-level mental model.",
+  "evidence": [
+    {
+      "note": "The owner defined the long-term product as a consumer and non-technical simplification of Linear: dispatch work to Agents or people, then return only completed outcomes and moments requiring human attention.",
+      "ref": "conversation:2026-08-09-linear-simplification-attention-router"
+    },
+    {
+      "note": "The existing long-term intent already establishes a cross-domain personal action system whose Context compounds over repeated work.",
+      "ref": ".vibehub/rooms/product/intent-context-compounding-action-system.yaml"
+    },
+    {
+      "note": "The prior interaction decision made Ticket user-facing; this decision preserves its stable-contract and replaceable-executor semantics while replacing the required Ticket-facing mental model with outcomes and attention.",
+      "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-project-independent",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-09T07:06:34Z",
+    "quote": "对于普通人来说，他可能重要的并不是说你现在有什么 ticket，而是你最后完成了这些东西。",
+    "ref": "conversation:2026-08-09-linear-simplification-attention-router"
+  },
+  "state": "superseded",
+  "summary": "VibeHub presents outcomes and human attention, not Tickets: a consumer-grade router dispatches work to replaceable Agents or people and returns it only when the user is needed",
+  "tags": [
+    "attention-routing",
+    "consumer-product",
+    "interaction-model",
+    "outcomes",
+    "personal-action-system",
+    "replaceable-agents",
+    "todo"
+  ],
+  "type": "decision"
+}

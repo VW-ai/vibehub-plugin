@@ -2,6 +2,7 @@
   "acceptance": [
     {
       "acceptance_id": "uiux-design-approved",
+      "authority": "human",
       "criterion": "A UI/UX proposal for the rooms surface — tree placement, per-room state rendering, room detail with entries and consuming Tickets — is presented against the quiet-intelligence standard and explicitly approved by the owner before implementation begins."
     },
     {

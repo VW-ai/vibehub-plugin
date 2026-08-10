@@ -1,0 +1,64 @@
+{
+  "context_id": "decision-person-centered-ticket-attention-system",
+  "detail": "Ticket remains VibeHub's primary durable and user-perceived product object. It is an advanced todo: one manageable desired action that may carry rich Context, relate to other Tickets, depend on other work, route to an Agent or person, and produce Evidence-backed completion. VibeHub organizes Tickets from the individual's point of view across the person's whole information world — company work, personal projects, several simultaneous ventures, life tasks, and ad hoc intentions that begin in no existing system. Organization-centered systems such as Linear, Jira, Feishu, or another company workflow remain valid systems of record for the organization; connectors may reference or synchronize their relevant work into the person's VibeHub world, but a company Ticket and the individual's Ticket are not assumed to be the same object because personal priority, Context, execution resources, and attention boundaries differ. The person may bring existing Agent subscriptions or purpose-built Agents; VibeHub does not need to design one monolithic long-running workflow, but coordinates bounded Ticket cycles, makes Agent activity understandable, and knows when a Ticket needs to reclaim the person's attention for judgment, authority, missing information, failure, or completion. Prioritization is person-centered and may reason about expected ROI to the individual rather than only a company's product lifecycle. Repeated use compounds: completed Tickets leave durable Context that makes later work — such as preparing a resume or starting another project — faster and more personally grounded. The long-term 2C thesis is that AI turns individuals into super-individuals managing many Agents and information sources, and they need a personal Ticket and attention system alongside, not inside, organization-centered coordination products.",
+  "evidence": [
+    {
+      "note": "The owner corrected the prior interpretation: Ticket remains the primary user-perceived object, while attention routing, Agent coordination, company-system connectors, personal ROI, and Context compounding operate around it.",
+      "ref": "conversation:2026-08-09-person-centered-ticket-system-correction"
+    },
+    {
+      "note": "The earlier Ticket-led Agent model correctly established Ticket as stable and Agents as replaceable executors; this decision restores and broadens that principle to the individual's entire information world.",
+      "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    },
+    {
+      "note": "The existing long-term intent establishes repeated cross-domain Ticket cycles and durable Context as the source of compounding value.",
+      "ref": ".vibehub/rooms/product/intent-context-compounding-action-system.yaml"
+    },
+    {
+      "note": "The canonical domain model already defines a Ticket as one bounded desired action informed by Context and executed by a replaceable Agent, with external systems represented through References.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-project-independent",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-outcome-facing-attention-routing",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-09T07:10:31Z",
+    "quote": "我们本质上是希望去管理你信息世界中一切可管理的 ticket。",
+    "ref": "conversation:2026-08-09-person-centered-ticket-system-correction"
+  },
+  "state": "active",
+  "summary": "VibeHub is a person-centered system for all manageable Tickets in a user's information world, using Agents and accumulated Context to execute them and reclaim attention only when it matters",
+  "tags": [
+    "agents",
+    "attention-routing",
+    "connectors",
+    "consumer-product",
+    "personal-action-system",
+    "person-centered",
+    "roi",
+    "tickets"
+  ],
+  "type": "decision"
+}

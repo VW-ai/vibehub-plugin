@@ -13,6 +13,12 @@
     "acceptance_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
     "summary": { "$ref": "#/$defs/text" },
     "refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+    "origin": {
+      "type": "string",
+      "enum": ["agent", "human"],
+      "default": "agent",
+      "description": "Who supplied the recorded fact or judgment. Omission means agent origin."
+    },
     "recorded_at": { "type": "string", "format": "date-time" }
   },
   "$defs": {

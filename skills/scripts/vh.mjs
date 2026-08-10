@@ -30,6 +30,8 @@ const OUTCOME_STATUSES = new Set([
   "failed",
   "deviated",
 ]);
+const ACCEPTANCE_AUTHORITIES = new Set(["agent", "human"]);
+const EVIDENCE_ORIGINS = new Set(["agent", "human"]);
 const CONTEXT_RELATIONS = new Set([
   "relates_to",
   "depends_on",
@@ -455,9 +457,12 @@ function validateTicket(document, path = "ticket") {
     const ids = new Set();
     document.acceptance.forEach((item, index) => {
       const itemPath = `${path}.acceptance[${index}]`;
-      if (strictKeys(errors, item, new Set(["acceptance_id", "criterion"]), itemPath)) {
+      if (strictKeys(errors, item, new Set(["acceptance_id", "criterion", "authority"]), itemPath)) {
         requiredString(errors, item, "acceptance_id", itemPath, { id: true });
         requiredString(errors, item, "criterion", itemPath);
+        if (item.authority !== undefined && !ACCEPTANCE_AUTHORITIES.has(item.authority)) {
+          add(errors, `${itemPath}.authority`, "must equal agent or human when present");
+        }
         if (ids.has(item.acceptance_id)) add(errors, `${itemPath}.acceptance_id`, "must be unique");
         ids.add(item.acceptance_id);
       }
@@ -501,6 +506,7 @@ function validateEvidence(document, path = "evidence") {
         "acceptance_ids",
         "summary",
         "refs",
+        "origin",
         "recorded_at",
       ]),
       path,
@@ -513,6 +519,9 @@ function validateEvidence(document, path = "evidence") {
   stringArray(errors, document.acceptance_ids, `${path}.acceptance_ids`, { nonEmpty: true, ids: true });
   requiredString(errors, document, "summary", path);
   stringArray(errors, document.refs, `${path}.refs`, { nonEmpty: true });
+  if (document.origin !== undefined && !EVIDENCE_ORIGINS.has(document.origin)) {
+    add(errors, `${path}.origin`, "must equal agent or human when present");
+  }
   requiredString(errors, document, "recorded_at", path);
   if (Number.isNaN(Date.parse(document.recorded_at))) add(errors, `${path}.recorded_at`, "must be an ISO-compatible date-time");
   return errors;
@@ -756,8 +765,15 @@ export function loadRepository(repo, overrides = {}) {
       else if (item.ticket_id !== document.ticket_id) add(errors, path, `Outcome references Evidence for another Ticket: ${item.evidence_id}`);
     }
     for (const id of accepted) {
-      if (!referencedEvidence.some((item) => item?.acceptance_ids.includes(id))) {
+      const supportingEvidence = referencedEvidence.filter((item) =>
+        item?.acceptance_ids.includes(id));
+      if (supportingEvidence.length === 0) {
         add(errors, path, `Accepted criterion has no referenced Evidence: ${id}`);
+      }
+      const criterion = ticket.acceptance.find((item) => item.acceptance_id === id);
+      if ((criterion?.authority ?? "agent") === "human"
+        && !supportingEvidence.some((item) => (item.origin ?? "agent") === "human")) {
+        add(errors, path, `Human-authority criterion has no referenced human-origin Evidence: ${id}`);
       }
     }
   }

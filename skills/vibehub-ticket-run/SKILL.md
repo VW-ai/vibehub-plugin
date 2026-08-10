@@ -10,6 +10,11 @@ referenced Context, and Git status are the execution boundary, inside
 `../vibehub-setup/references/architecture-boundary.md`.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../contracts/acceptance-authority.md`. An executor may satisfy
+Agent-authority criteria autonomously. It must not satisfy a human-authority
+criterion, set `origin: human`, or treat its own recommendation as the user's
+decision; only explicit human input with a readable reference can become
+human-origin Evidence.
 This Skill owns `ready-execution` and `execution-needs-human`; it does not own
 UI launch mechanics.
 
@@ -42,8 +47,10 @@ UI launch mechanics.
 5. Hand the Ticket, diff, and Evidence to a separate Agent using
    `$vibehub-ticket-closeout`. The executor never certifies its own success.
 
-Stop only for a genuine protected choice, missing permission, or material
-deviation. For `execution-needs-human`, ask `$vibehub-ticket-review` to present
-the exact Ticket's Contract and wait after stating the precise choice. Fall
-back to the same facts in conversation when a browser is unavailable. Hard
-engineering work and implementation fog are not user gates.
+Stop only when execution reaches a human-authority criterion, missing
+permission, or material deviation. For `execution-needs-human`, ask
+`$vibehub-ticket-review` to present the exact Ticket's Contract, name the
+acceptance ID and criterion, and wait for explicit human input. Fall back to
+the same facts in conversation when a browser is unavailable. Hard engineering
+work, implementation fog, and a future human boundary not reached yet are not
+user gates.

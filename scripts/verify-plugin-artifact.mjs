@@ -58,6 +58,8 @@ try {
     "skills/contracts/project-format.schema.json",
     "skills/contracts/context.schema.json",
     "skills/contracts/ticket.schema.json",
+    "skills/contracts/evidence.schema.json",
+    "skills/contracts/acceptance-authority.md",
   ]) {
     if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
   }
@@ -135,6 +137,7 @@ try {
       acceptance: [{
         acceptance_id: "entry-reaches-ready-ticket",
         criterion: "The initialized repository exposes this applied Ticket as READY.",
+        authority: "human",
       }],
       constraints: ["Reuse Setup and Ticket Plan without a router or runtime service."],
       context_refs: [],
@@ -147,6 +150,28 @@ try {
     || frontier.data.ready[0]?.ticket?.ticket_id !== "ticket-build-entry-fixture") {
     throw new Error("canonical entry scenario did not reach a READY Ticket");
   }
+  invoke(helper, "ticket", "evidence", {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "entry-human-proof",
+    ticket_id: "ticket-build-entry-fixture",
+    acceptance_ids: ["entry-reaches-ready-ticket"],
+    summary: "The human explicitly confirmed the clean entry fixture.",
+    refs: ["conversation:artifact-verification-human-input"],
+    origin: "human",
+    recorded_at: "2026-08-09T08:00:00.000Z",
+  });
+  invoke(helper, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "ticket-build-entry-fixture",
+    status: "successful",
+    accepted_acceptance_ids: ["entry-reaches-ready-ticket"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: ["entry-human-proof"],
+    summary: "The installed artifact completed the human-authority Ticket.",
+    closed_at: "2026-08-09T08:01:00.000Z",
+  });
 
   const installedScript = readFileSync(
     join(artifact, "skills", "vibehub-ticket-review", "assets", "app.js"),
@@ -178,6 +203,11 @@ try {
   const state = await stateResponse.json();
   if (!state.ok || state.data.graph.tickets.length !== 1) {
     throw new Error("installed UI graph projection failed");
+  }
+  const installedTicket = state.data.graph.tickets[0];
+  if (installedTicket.capabilities.attention.summary.label !== "COMPLETE"
+    || state.data.interventions.authority.status !== "available") {
+    throw new Error("installed UI human-attention projection failed");
   }
   await uiHost.close();
   uiHost = undefined;

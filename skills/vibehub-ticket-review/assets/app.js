@@ -18,6 +18,12 @@
     "BLOCKED",
     "DEVIATED",
   ]);
+  const ATTENTION_STATES = new Set([
+    "UPCOMING",
+    "PENDING",
+    "RECORDED",
+    "COMPLETE",
+  ]);
   const TICKET_VIEW_IDS = new Map([
     ["execution", "execution"],
     ["contract", "contract"],
@@ -261,6 +267,7 @@
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
       const operational = ticketOperationalState(ticket);
+      const attention = ticketAttentionState(ticket);
       const isSelected =
         selected?.kind === "ticket" && selected.id === ticket.ticketId;
       const group = svg("g", {
@@ -269,6 +276,7 @@
           isSelected ? "selected" : "",
           related && !related.nodes.has(ticket.ticketId) ? "dimmed" : "",
           operational ? `state-${operational.key}` : "",
+          attention ? `attention-${attention.key}` : "",
         ),
         transform: `translate(${position.x} ${position.y})`,
         role: "button",
@@ -279,6 +287,9 @@
           + `${ticket.relationCounts.dependents} unlocks.`
           + (operational
             ? ` ${operational.label}. ${operational.detail || ""}`
+            : "")
+          + (attention
+            ? ` Human attention ${attention.label}. ${attention.detail || ""}`
             : ""),
       });
       group.dataset.ticketId = ticket.ticketId;
@@ -305,6 +316,20 @@
           y2: NODE.height - 1,
         }),
       );
+      if (attention) {
+        group.append(svg("path", {
+          class: "ticket-attention",
+          d: `M ${NODE.width - 14} 9 l 5 5 -5 5 -5 -5 Z`,
+        }));
+        const attentionLabel = svg("text", {
+          class: "ticket-attention-label",
+          x: NODE.width - 25,
+          y: 18,
+          "text-anchor": "end",
+        });
+        attentionLabel.textContent = `${attention.humanEvidenceCount}/${attention.humanAcceptanceCount} human`;
+        group.append(attentionLabel);
+      }
       const id = svg("text", { class: "ticket-id", x: 14, y: 20 });
       id.textContent = shortTicketId(ticket.ticketId);
       group.append(id);
@@ -375,10 +400,12 @@
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
       const operational = ticketOperationalState(ticket);
+      const attention = ticketAttentionState(ticket);
       elements.minimap.append(svg("rect", {
         class: classes(
           "minimap-node",
           operational ? `state-${operational.key}` : "",
+          attention ? `attention-${attention.key}` : "",
         ),
         x: position.x,
         y: position.y,
@@ -558,10 +585,16 @@
       `Ticket · ${ticket.ticketId}`;
     elements.inspectorTitle.textContent = ticket.outcome;
     const operational = ticketOperationalState(ticket);
+    const attention = ticketAttentionState(ticket);
     elements.inspectorOutcome.hidden = true;
     elements.inspectorOutcome.textContent = "";
 
-    const execution = ticketExecutionPanel(ticket, contextPackage, operational);
+    const execution = ticketExecutionPanel(
+      ticket,
+      contextPackage,
+      operational,
+      attention,
+    );
     const contract = ticketContractPanel(ticket, contextPackage, inspection);
     const proof = ticketProofPanel();
     const view = tabbedTicketView(
@@ -959,7 +992,12 @@
     return wrapper;
   }
 
-  function ticketExecutionPanel(ticket, contextPackage, operational) {
+  function ticketExecutionPanel(
+    ticket,
+    contextPackage,
+    operational,
+    attention,
+  ) {
     const panel = document.createElement("section");
     const incoming = state.graph.relations.filter(
       (relation) => relation.dependentTicketId === ticket.ticketId,
@@ -1010,6 +1048,8 @@
     signal.append(heading, metrics);
     panel.append(signal);
 
+    if (attention) panel.append(humanAttentionBrief(attention));
+
     if (
       operational?.detail
       && (operational.label === "BLOCKED" || operational.label === "DEVIATED")
@@ -1033,6 +1073,34 @@
       panel.append(why);
     }
     return panel;
+  }
+
+  function humanAttentionBrief(attention) {
+    const labels = {
+      UPCOMING: "Human boundary ahead",
+      PENDING: "Human evidence pending",
+      RECORDED: "Human evidence recorded",
+      COMPLETE: "Human boundary accepted",
+    };
+    const brief = document.createElement("div");
+    brief.className = classes(
+      "human-attention-brief",
+      `attention-${attention.key}`,
+    );
+    const marker = document.createElement("span");
+    marker.className = "human-attention-mark";
+    marker.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("span");
+    const title = document.createElement("strong");
+    title.textContent = labels[attention.label];
+    const detail = document.createElement("span");
+    detail.textContent = attention.detail;
+    copy.append(title, detail);
+    const count = document.createElement("span");
+    count.className = "human-attention-count";
+    count.textContent = `${attention.humanEvidenceCount} / ${attention.humanAcceptanceCount}`;
+    brief.append(marker, copy, count);
+    return brief;
   }
 
   function signalMetric(value, label, extraClass = "") {
@@ -1157,7 +1225,7 @@
     const relations = contextPackage.relations || [];
     const provenanceRefs =
       contextPackage.provenanceRefs || ticket.provenanceRefs || [];
-    const summary = contractBrief(acceptance.length);
+    const summary = contractBrief(acceptance);
     panel.append(summary);
     panel.append(ticketSectionHeading(
       "Acceptance conditions",
@@ -1225,7 +1293,11 @@
     return { panel, acceptanceRail, summary };
   }
 
-  function contractBrief(acceptanceCount) {
+  function contractBrief(acceptance) {
+    const acceptanceCount = acceptance.length;
+    const humanCount = acceptance.filter(
+      (item) => item.authority === "human",
+    ).length;
     const brief = document.createElement("div");
     brief.className = "contract-brief";
     const marker = document.createElement("span");
@@ -1236,7 +1308,8 @@
     const eyebrow = document.createElement("span");
     eyebrow.textContent = "Definition of done";
     const title = document.createElement("strong");
-    title.textContent = `${acceptanceCount} acceptance condition${acceptanceCount === 1 ? "" : "s"} define success`;
+    title.textContent = `${acceptanceCount} acceptance condition${acceptanceCount === 1 ? "" : "s"} define success`
+      + (humanCount ? ` · ${humanCount} require human authority` : "");
     copy.append(eyebrow, title);
     const status = document.createElement("div");
     status.className = "contract-brief-status";
@@ -1306,8 +1379,13 @@
     }
     for (const item of items) {
       const row = document.createElement("details");
-      row.className = "acceptance-item";
+      const authority = item.authority || "agent";
+      row.className = classes(
+        "acceptance-item",
+        authority === "human" ? "authority-human" : "",
+      );
       row.dataset.acceptanceId = item.acceptanceId;
+      row.dataset.authority = authority;
       const summary = document.createElement("summary");
       const marker = document.createElement("span");
       marker.className = "acceptance-marker";
@@ -1316,8 +1394,19 @@
       title.textContent = humanizeIdentifier(item.acceptanceId);
       const status = document.createElement("span");
       status.className = "acceptance-status";
-      status.textContent = "Awaiting evidence";
-      summary.append(marker, title, status);
+      status.textContent = authority === "human"
+        ? "Human evidence pending"
+        : "Awaiting evidence";
+      const meta = document.createElement("span");
+      meta.className = "acceptance-meta";
+      if (authority === "human") {
+        const badge = document.createElement("span");
+        badge.className = "acceptance-authority";
+        badge.textContent = "Human";
+        meta.append(badge);
+      }
+      meta.append(status);
+      summary.append(marker, title, meta);
       const criterion = document.createElement("p");
       criterion.textContent = item.criterion;
       row.append(summary, criterion);
@@ -1611,6 +1700,9 @@
     const evidenced = new Set(evidence.flatMap(
       (record) => record.acceptanceIds || [],
     ));
+    const humanEvidenced = new Set(evidence
+      .filter((record) => record.origin === "human")
+      .flatMap((record) => record.acceptanceIds || []));
     const accepted = new Set(outcomes.flatMap(
       (record) => record.acceptedAcceptanceIds || [],
     ));
@@ -1651,14 +1743,29 @@
 
     target.acceptanceRail.querySelectorAll("[data-acceptance-id]").forEach((row) => {
       const id = row.dataset.acceptanceId;
+      const human = row.dataset.authority === "human";
       const status = row.querySelector(".acceptance-status");
-      row.classList.remove("has-evidence", "is-accepted", "is-unresolved");
+      row.classList.remove(
+        "has-evidence",
+        "has-human-evidence",
+        "is-accepted",
+        "is-unresolved",
+      );
       if (accepted.has(id)) {
         row.classList.add("is-accepted");
-        status.textContent = "Accepted";
+        status.textContent = human
+          ? "Human acceptance verified"
+          : "Accepted";
       } else if (unresolved.has(id)) {
         row.classList.add("is-unresolved");
-        status.textContent = "Unresolved";
+        status.textContent = human
+          ? "Human acceptance unresolved"
+          : "Unresolved";
+      } else if (human && humanEvidenced.has(id)) {
+        row.classList.add("has-human-evidence");
+        status.textContent = "Human evidence recorded";
+      } else if (human) {
+        status.textContent = "Human evidence pending";
       } else if (evidenced.has(id)) {
         row.classList.add("has-evidence");
         status.textContent = "Evidence attached";
@@ -1703,8 +1810,9 @@
       meta.textContent = [
         record.subkind || record.kind,
         record.status || "recorded",
+        record.kind === "evidence" ? `${record.origin || "agent"} origin` : null,
         formatInstant(record.occurredAt),
-      ].join(" · ");
+      ].filter(Boolean).join(" · ");
       headingCopy.append(title, meta);
       heading.append(headingCopy, actionButton({
         label: "Copy for Agent",
@@ -1752,6 +1860,20 @@
       references: Array.isArray(slot.summary?.references)
         ? slot.summary.references
         : [],
+    };
+  }
+
+  function ticketAttentionState(ticket) {
+    const slot = ticket?.capabilities?.attention;
+    if (slot?.availability !== "available") return null;
+    const label = String(slot.summary?.label || "").toUpperCase();
+    if (!ATTENTION_STATES.has(label)) return null;
+    return {
+      label,
+      key: label.toLowerCase(),
+      detail: slot.summary?.detail || "",
+      humanAcceptanceCount: Number(slot.summary?.humanAcceptanceCount) || 0,
+      humanEvidenceCount: Number(slot.summary?.humanEvidenceCount) || 0,
     };
   }
 

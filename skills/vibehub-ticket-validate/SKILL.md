@@ -8,6 +8,9 @@ description: Independently validate a proposed or current lightweight VibeHub Ti
 Be independent and read-only. Do not rewrite or apply the candidate.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../contracts/acceptance-authority.md` and verify that `human` appears only
+on the exact acceptance criteria that genuinely reserve human judgment. Never
+infer or remove authority from criterion wording.
 This Skill owns `validation-needs-human`; an unapplied candidate cannot be
 projected as canonical UI state.
 
@@ -21,8 +24,8 @@ projected as canonical UI state.
 
 3. Verify each Ticket promises an observable outcome, has acceptance that can
    be independently checked, lists only direct dependencies, carries enough
-   checked-in Context for a fresh Agent, and does not silently decide a product,
-   permission, or material-risk choice reserved for the user.
+   checked-in Context for a fresh Agent, and encodes any product, permission,
+   or material-risk choice reserved for the user as human-authority acceptance.
 4. Return `passed`, `failed`, or `inconclusive`, followed by material findings,
    implementation fog, protected-boundary state, and the next action. For
    `validation-needs-human`, present the exact protected choice in the

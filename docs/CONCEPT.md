@@ -40,6 +40,13 @@ turn every conversation into memory.
 Presentation never becomes approval authority. The checked-in documents remain
 truth, and the same facts can fall back to the Agent conversation.
 
+Acceptance authority defaults to the Agent. One criterion may explicitly use
+`authority: human` when a product, permission, or material-risk judgment must
+come from a person. That criterion needs referenced Evidence with
+`origin: human` before successful closeout; Agent advice cannot substitute for
+the decision. These fields are lightweight Git provenance, not an identity or
+approval service, and they never change dependency status.
+
 ## Four durable document types
 
 ```text

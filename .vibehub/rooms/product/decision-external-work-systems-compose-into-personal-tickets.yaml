@@ -1,0 +1,52 @@
+{
+  "context_id": "decision-external-work-systems-compose-into-personal-tickets",
+  "detail": "VibeHub does not require users to replace a project-management system they like. A person or company may continue using Linear, Jira, Feishu, or another organization-centered product for its project lifecycle, Git integration, collaboration, and reporting. At the person's VibeHub layer, that external system is one participating source and action surface rather than the global organizer of the user's work. An external project, issue, comment, document, status, or history may inform a personal Ticket as Context or a typed Reference. Reading from the external system, creating or updating one of its objects, linking a pull request, or reporting completion back may be an executable step or an Acceptance criterion of the personal Ticket; the resulting external state or URL may serve as Evidence. VibeHub should not assume a permanent one-to-one mirror: one external issue may inform several personal Tickets, and one personal Ticket may coordinate facts and actions across several systems. The external product remains authoritative for the organization's shared object, while VibeHub remains authoritative for the person's Ticket, personal Context, Agent coordination, attention boundaries, and Outcome. Connectors should therefore learn the user's intended use and operate through bounded, reviewable reads and writes with explicit authority instead of rebuilding Linear-style project management or silently synchronizing everything.",
+  "evidence": [
+    {
+      "note": "The owner clarified that users may keep using Linear for project management; its projects and Tickets become part of personal Context and Ticket execution, including Linear writeback as Acceptance or completion, rather than a competing system to replace.",
+      "ref": "conversation:2026-08-09-external-systems-in-personal-ticket-cycle"
+    },
+    {
+      "note": "The person-centered product decision already separates organization systems of record from the individual's Ticket graph and attention boundaries.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "note": "The core domain contract defines external Linear issues, pull requests, documents, and artifacts as typed References that may appear on durable VibeHub documents.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-project-independent",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-09T07:12:58Z",
+    "quote": "写回 Linear，或者 update Linear 的某 ticket，是你这边某 ticket 的一个验收标准、一个完成标准而已。",
+    "ref": "conversation:2026-08-09-external-systems-in-personal-ticket-cycle"
+  },
+  "state": "active",
+  "summary": "Linear, Jira, Feishu, and other organization systems remain useful systems of record whose objects compose into personal VibeHub Tickets as Context, References, actions, Acceptance, and Evidence",
+  "tags": [
+    "acceptance",
+    "connectors",
+    "external-systems",
+    "linear",
+    "person-centered",
+    "references",
+    "systems-of-record",
+    "tickets"
+  ],
+  "type": "decision"
+}

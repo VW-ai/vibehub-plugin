@@ -489,6 +489,12 @@ summary:focus-visible {
   stroke: var(--deviated);
 }
 
+.minimap-node.attention-upcoming,
+.minimap-node.attention-pending,
+.minimap-node.attention-recorded {
+  stroke: var(--attention);
+}
+
 .graph-signal {
   position: absolute;
   right: 18px;
@@ -644,6 +650,43 @@ summary:focus-visible {
   stroke: var(--edge-active);
 }
 
+.ticket-attention {
+  fill: var(--node);
+  stroke: var(--attention);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.ticket-attention-label {
+  fill: var(--attention);
+  font: 600 7px/1 var(--mono);
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.ticket-node.attention-upcoming .ticket-attention {
+  fill: transparent;
+  stroke-dasharray: 2 2;
+}
+
+.ticket-node.attention-pending .ticket-attention {
+  fill: var(--attention);
+}
+
+.ticket-node.attention-recorded .ticket-attention {
+  fill: var(--attention-soft);
+  stroke-width: 2;
+}
+
+.ticket-node.attention-complete .ticket-attention {
+  fill: var(--done);
+  stroke: var(--done);
+}
+
+.ticket-node.attention-complete .ticket-attention-label {
+  fill: var(--done);
+}
+
 .ticket-id {
   fill: var(--quiet);
   font: 500 9px/1 var(--mono);
@@ -752,6 +795,7 @@ summary:focus-visible {
 #graph.lod-low .ticket-outcome,
 #graph.lod-low .ticket-meta,
 #graph.lod-low .ticket-state,
+#graph.lod-low .ticket-attention-label,
 #graph.lod-low .ticket-proof {
   display: none;
 }
@@ -1083,6 +1127,76 @@ summary:focus-visible {
   color: var(--muted);
   font-size: 10px;
   line-height: 1.55;
+}
+
+.human-attention-brief {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-top: 9px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--quiet);
+  background: rgba(250, 250, 248, 0.72);
+}
+
+.human-attention-mark {
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.human-attention-brief > span:nth-child(2) {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.human-attention-brief strong {
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.human-attention-brief > span:nth-child(2) > span {
+  color: var(--quiet);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.human-attention-count {
+  color: currentColor;
+  font: 600 9px/1 var(--mono);
+}
+
+.human-attention-brief.attention-pending {
+  border-color: rgba(152, 103, 31, 0.28);
+  color: var(--attention);
+  background: var(--attention-soft);
+}
+
+.human-attention-brief.attention-pending .human-attention-mark {
+  background: currentColor;
+}
+
+.human-attention-brief.attention-recorded {
+  color: var(--attention);
+}
+
+.human-attention-brief.attention-recorded .human-attention-mark {
+  box-shadow: inset 0 0 0 2px var(--surface-solid);
+  background: currentColor;
+}
+
+.human-attention-brief.attention-complete {
+  color: var(--done);
+}
+
+.human-attention-brief.attention-complete .human-attention-mark {
+  background: currentColor;
 }
 
 .ticket-section-heading {
@@ -1483,6 +1597,30 @@ summary:focus-visible {
   white-space: nowrap;
 }
 
+.acceptance-meta {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.acceptance-authority {
+  padding: 2px 5px;
+  border: 1px solid rgba(152, 103, 31, 0.28);
+  border-radius: 4px;
+  color: var(--attention);
+  background: var(--attention-soft);
+  font: 600 7px/1 var(--mono);
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.acceptance-item.authority-human .acceptance-marker {
+  border-color: var(--attention);
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
 .acceptance-item > p {
   margin: 0 0 12px 19px;
   color: var(--muted);
@@ -1493,6 +1631,12 @@ summary:focus-visible {
 .acceptance-item.has-evidence .acceptance-marker {
   border-color: var(--focus);
   box-shadow: 0 0 0 2px rgba(101, 122, 165, 0.12);
+}
+
+.acceptance-item.has-human-evidence .acceptance-marker {
+  border-color: var(--attention);
+  background: var(--attention);
+  box-shadow: inset 0 0 0 2px var(--surface-solid);
 }
 
 .acceptance-item.is-accepted .acceptance-marker {
@@ -1506,6 +1650,7 @@ summary:focus-visible {
 }
 
 .acceptance-item.has-evidence .acceptance-status,
+.acceptance-item.has-human-evidence .acceptance-status,
 .acceptance-item.is-accepted .acceptance-status {
   color: var(--vibe-ink);
 }

@@ -91,4 +91,18 @@ test("skills point at their governing shared references", () => {
   const projectFormat = JSON.parse(readFileSync(join(root, "skills", "contracts", "project-format.schema.json"), "utf8"));
   assert.equal(projectFormat.properties.format_version.type, "integer");
   assert.equal(projectFormat.properties.kind.const, "vibehub_project");
+
+  const authority = "contracts/acceptance-authority.md";
+  assert.ok(existsSync(join(root, "skills", authority)));
+  for (const name of [
+    "vibehub-ticket-plan",
+    "vibehub-ticket-validate",
+    "vibehub-ticket-run",
+    "vibehub-ticket-closeout",
+  ]) {
+    assert.ok(
+      bodies.get(name).includes(`../${authority}`),
+      `${name} misses the acceptance authority pointer`,
+    );
+  }
 });
