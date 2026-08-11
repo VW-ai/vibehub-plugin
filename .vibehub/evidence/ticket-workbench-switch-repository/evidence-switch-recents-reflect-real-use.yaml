@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "recents-reflect-real-use"
+  ],
+  "evidence_id": "evidence-switch-recents-reflect-real-use",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-11T00:23:09Z",
+  "refs": [
+    "commit:84576fd231937ad1704dd13b4f83d5b51d25dc9f",
+    "apps/workbench/Sources/WorkbenchRepositorySession/RepositoryOpen.swift",
+    "apps/workbench/Sources/WorkbenchRepositorySession/GitMetadata.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "test:a remembered repository is dropped only when the cause is permanent",
+    "test:an invalid recent entry is reported on the open window and dropped",
+    "test:a transient failure reports honestly and keeps the remembered repository",
+    "test:choosing a recent repository switches the running app and releases the old session",
+    "observation:--probe-recents reports permanent true and dropped [path] for notADirectory, notAnExactWorktree and notAVibeHubRepository, and permanent false with the entry retained for gitFailed",
+    "observation:the real dev.vibehub.workbench.preferences domain was backed up before the manual bundle run and restored to its prior recentRepositories value afterwards",
+    "docs/LOCAL_GRAPH_DESIGN.md"
+  ],
+  "schema_version": 1,
+  "summary": "Pruning now turns on the class of the failure, and the shell reports honestly either way. WorktreeError gained isPermanent - notADirectory, notAnExactWorktree and notAVibeHubRepository are permanent, gitFailed is not - and RepositoryOpen.attempt is the one place that validates a path and updates the remembered list, used by the launch picker, both menu entries, the deep link's open path and the probes. This replaces the previous AppDelegate branch, which dropped only notAVibeHubRepository and notADirectory and so silently missed notAnExactWorktree. `--probe-recents --open <path> --recent <path> --recent <other>` over the real binary reports, for each class: a deleted directory -> notADirectory, permanent true, dropped [that path]; <alpha>/.vibehub -> notAnExactWorktree, permanent true, dropped [that path]; a git repository with no .vibehub -> notAVibeHubRepository, permanent true, dropped [that path]; a plain directory git cannot read -> gitFailed, permanent false, dropped [], and the entry still present in recentsAfter. Every case carries a non-empty human error string, and in every case the unrelated remembered repository survives. A successful open reports opened true with recentsAfter [<opened>, <previous>], so the list updates on each successful open and puts that worktree first; the accepted live switch reports recentsAfter [beta, alpha] for the same reason. Live in the real app: `--probe-switch --to <deleted path>` puts the failure on the open Workbench window as a sheet reading \"That repository could not be opened.\" and \"<path> is not a directory.\", drops that entry and keeps alpha, with the alpha session still alive (previousOriginStatus 200); `--probe-switch --to <directory with .vibehub but no git>` likewise states the failure on the window and KEEPS the entry. Persistence stays inside the allowlist: preferenceKeys after a switch is a subset of PreferenceKey.allowlist, bearerInPreferences false, and probe preference state is in-memory so no new domain is created. For the one manual run of the assembled bundle that did touch the real dev.vibehub.workbench.preferences domain, I copied the plist first and restored recentRepositories to its exact prior single entry afterwards; windowFrame, lastTicketId and lastInspectorTab were unchanged by that run.",
+  "ticket_id": "ticket-workbench-switch-repository"
+}
