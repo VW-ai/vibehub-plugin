@@ -1,0 +1,80 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "release-scope-authorized",
+      "authority": "human",
+      "criterion": "Human-origin Evidence records the owner's explicit choice of version 0.6.0, required release scope, authorization to open the release MR, and instruction to publish only after that MR merges."
+    },
+    {
+      "acceptance_id": "release-identity-and-changelog",
+      "authority": "agent",
+      "criterion": "package.json, .codex-plugin/plugin.json, .claude-plugin/plugin.json, and both version fields in .claude-plugin/marketplace.json state 0.6.0; CHANGELOG.md has a dated 0.6.0 section covering per-acceptance Agent/human decision authority, human-origin Evidence enforcement, Workbench human-attention states, firm/draft maturity and REFINE behavior, stateless repository-level Agent handoff, and the proposal to human decision to downstream refinement graph boundary."
+    },
+    {
+      "acceptance_id": "release-candidate-verified",
+      "authority": "agent",
+      "criterion": "node scripts/verify-release-version.mjs --tag v0.6.0, npm run verify, npm run build, project validation, Ticket validation, Room drift with every Room FRESH, and git diff --check all pass; clean host-marketplace coverage proves the built plugin supports both Codex and Claude Code."
+    },
+    {
+      "acceptance_id": "release-pr-ready",
+      "authority": "agent",
+      "criterion": "The release branch is based on main commit cbd41a10cbd2caa4d008ac1ad495154ee9f4140a, contains only the bounded v0.6.0 release preparation plus its VibeHub Ticket records, introduces no updater or runtime machinery, and is ready for a PR to main carrying the successful Outcome and acceptance-linked Evidence."
+    }
+  ],
+  "constraints": [
+    "Follow docs/RELEASE.md exactly; npm is not a release or installation surface.",
+    "Support both Codex and Claude Code and keep all five release identity fields consistent.",
+    "Do not create or push v0.6.0, or create a GitHub Release, from the release branch.",
+    "Do not rewrite existing project data or add updater, runtime, daemon, MCP, database, hook, or self-modifying machinery.",
+    "Keep the release branch and PR narrowly scoped to release identity, changelog, required verification maintenance, and VibeHub Ticket records."
+  ],
+  "context": "PR #15, Model human decisions as Ticket boundaries, merged to main as cbd41a10cbd2caa4d008ac1ad495154ee9f4140a. The current release identity remains 0.5.0. The owner selected 0.6.0 as a backward-compatible feature release and authorized a release branch, MR, and post-merge publication. Preparation follows docs/RELEASE.md: synchronize every release identity, document the human-decision boundary features, prove both Codex and Claude Code plugin surfaces, and carry successful Outcome and Evidence into a small PR. Publication is a separate dependent Ticket because tagging and GitHub Release verification may begin only after this PR is merged into main.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative release sequence and publication boundary.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "Public release history receiving the v0.6.0 feature summary.",
+      "ref": "CHANGELOG.md"
+    },
+    {
+      "purpose": "Mechanical cross-manifest and GitHub-only release guard.",
+      "ref": "test/release.test.mjs"
+    },
+    {
+      "purpose": "Clean Codex and Claude Code marketplace support proof.",
+      "ref": "test/host-marketplaces.test.mjs"
+    },
+    {
+      "purpose": "Completed feature set and Evidence behind the v0.6.0 human-decision boundary release.",
+      "ref": ".vibehub/outcomes/ticket-encode-human-acceptance-authority.yaml"
+    },
+    {
+      "purpose": "Completed explicit maturity and REFINE behavior included in the release.",
+      "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub v0.6.0 is a small, verified release candidate from the latest main, with synchronized Codex and Claude Code identities, an accurate feature changelog, and complete pre-merge release evidence.",
+  "provenance_refs": [
+    "conversation:2026-08-10-v060-release-request",
+    "github:pull-request-15",
+    "commit:cbd41a10cbd2caa4d008ac1ad495154ee9f4140a"
+  ],
+  "relations": [
+    {
+      "rationale": "The human decision authority and handoff feature must be completed before it can ship.",
+      "target_ticket_id": "ticket-encode-human-acceptance-authority",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Explicit firm/draft maturity and REFINE behavior must be completed before it can ship.",
+      "target_ticket_id": "ticket-explicit-firm-maturity",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-prepare-v060-release"
+}
