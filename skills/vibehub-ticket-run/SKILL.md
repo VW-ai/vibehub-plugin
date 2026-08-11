@@ -28,15 +28,19 @@ UI launch mechanics.
    ```
 
 2. Read every `context_ref` from the exact checkout. Use `$vibehub-query` only
-   when a real context gap appears. Confirm the branch and preserve unrelated
-   changes.
+   when a real context gap appears. When a direct prerequisite produced an
+   input this Ticket consumes, read that Ticket's successful Outcome and
+   referenced Evidence too. Confirm the branch and preserve unrelated changes.
 3. Implement autonomously within the Ticket's outcome, constraints, and user
    authority. Git commits are cheap rollback points; one Agent/writer per
    worktree needs no coordination beyond Git. `ready-execution` stays
    quiet: do not open review UI for routine progress. New independently
    schedulable work discovered mid-execution belongs to planning — hand it to
-   `$vibehub-ticket-plan`. A durable cross-ticket fact surfaced by execution
-   is delegated to `$vibehub-ingest`, placed in the room this Ticket entered.
+   `$vibehub-ticket-plan`. This includes a newly discovered human decision:
+   planning decides whether to revise the current Ticket or split out a new
+   human-decision Ticket and wire the direct dependency before execution waits.
+   A durable cross-ticket fact surfaced by execution is delegated to
+   `$vibehub-ingest`, placed in the room this Ticket entered.
 4. Test in proportion to risk. For each criterion with real proof, append one
    or more Evidence documents using `../contracts/evidence.schema.json`:
 

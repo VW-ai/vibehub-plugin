@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "plan-and-run-handle-human-decisions"
+  ],
+  "evidence_id": "decision-boundary-prompt-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-11T00:02:19.000Z",
+  "refs": [
+    "skills/contracts/acceptance-authority.md",
+    "skills/vibehub-ticket-plan/SKILL.md",
+    "skills/vibehub-ticket-run/SKILL.md",
+    "skills/vibehub-ticket-validate/SKILL.md",
+    "test/skill-contracts.test.mjs",
+    "test:npm-test-46-of-46"
+  ],
+  "summary": "The shared authority contract defines decision ownership, graph splitting for independently schedulable downstream work, terminal sign-off, and execution-triggered replanning without an Event package. Plan encodes known boundaries, Run returns newly discovered decisions to Plan for revise-or-split, Validate rejects hidden gating boundaries, and the contract-layer assertions plus the complete 46-test suite pass.",
+  "schema_version": 1,
+  "ticket_id": "ticket-encode-human-acceptance-authority"
+}

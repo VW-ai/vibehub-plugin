@@ -12,14 +12,20 @@ boundary.
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
 Read `../contracts/acceptance-authority.md` before assigning acceptance
 authority. Omit `authority` (or use `agent`) for independently checkable work;
-use `human` only for the exact criterion that reserves a product, permission,
-or material-risk judgment for a person.
+use `human` only for the exact criterion whose decision owner must be a person.
+When that decision gates independently schedulable downstream work, make the
+boundary visible in the graph: proposal, human decision, then dependent
+implementation. Keep terminal human sign-off in the delivery Ticket when no
+downstream work needs a separate scheduling boundary.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
 `draft-needs-refinement`; it does not own UI launch mechanics.
 `execution-discovers-work` is the single home of the mid-cycle transition:
 when execution surfaces new independently schedulable work, it re-enters this
 Skill, which turns the discovery into Tickets with their direct dependencies —
-executors never absorb it silently. `draft-needs-refinement` is the single
+including a newly discovered human decision that gates continuation. Planning
+may revise the current Ticket when the boundary is not independently
+schedulable, or create the smallest new decision Ticket when it is; executors
+never absorb it silently. `draft-needs-refinement` is the single
 home of rolling-wave refinement: a Ticket planned with `maturity: draft`
 carries honest direction whose acceptance cannot be written yet, surfaces as
 REFINE (never READY) once unblocked, and re-enters this Skill, which rewrites

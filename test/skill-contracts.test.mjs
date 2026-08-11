@@ -106,3 +106,14 @@ test("skills point at their governing shared references", () => {
     );
   }
 });
+
+test("human decision boundaries stay in the Ticket graph", () => {
+  const authority = "contracts/acceptance-authority.md";
+  const authorityBody = readFileSync(join(root, "skills", authority), "utf8");
+  assert.match(authorityBody, /decision owner/u);
+  assert.match(authorityBody, /independently\s+schedulable downstream work/u);
+  assert.match(authorityBody, /returns to Ticket Plan/u);
+  assert.match(bodies.get("vibehub-ticket-plan"), /proposal, human decision, then dependent\s+implementation/u);
+  assert.match(bodies.get("vibehub-ticket-run"), /split out a new\s+human-decision Ticket/u);
+  assert.match(bodies.get("vibehub-ticket-validate"), /represented by direct\s+Ticket dependencies/u);
+});

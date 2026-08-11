@@ -24,8 +24,11 @@ projected as canonical UI state.
 
 3. Verify each Ticket promises an observable outcome, has acceptance that can
    be independently checked, lists only direct dependencies, carries enough
-   checked-in Context for a fresh Agent, and encodes any product, permission,
-   or material-risk choice reserved for the user as human-authority acceptance.
+   checked-in Context for a fresh Agent, and encodes every judgment whose
+   decision owner must be the user as human-authority acceptance. When such a
+   decision gates independently schedulable downstream work, verify that the
+   proposal, decision, and implementation boundary is represented by direct
+   Ticket dependencies rather than hidden inside one Ticket's prose.
 4. Return `passed`, `failed`, or `inconclusive`, followed by material findings,
    implementation fog, protected-boundary state, and the next action. For
    `validation-needs-human`, present the exact protected choice in the

@@ -1,11 +1,6 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "uiux-design-approved",
-      "authority": "human",
-      "criterion": "A UI/UX proposal for the rooms surface — tree placement, per-room state rendering, room detail with entries and consuming Tickets — is presented against the quiet-intelligence standard and explicitly approved by the owner before implementation begins."
-    },
-    {
       "acceptance_id": "projection-exposes-rooms",
       "criterion": "The vh-ui projection exposes the room tree with each room's description, boundary, and drift state computed deterministically, consumable by the UI without semantic inference."
     },
@@ -27,7 +22,7 @@
     "All room information is mechanically projected from canonical documents; the UI performs no semantic inference.",
     "The quiet-intelligence spatial-workbench standard binds every visual choice."
   ],
-  "context": "Rooms are currently invisible in the local graph UI beyond the room chip on context cards. The quiet-intelligence constraint already demands that stale facts appear in situ at the locus that owns them, and room drift states (FRESH, DRIFTED, STALE, UNKNOWN, WARNING) are the first real mechanical source of that signal. Everything needed is mechanically derivable from canonical documents: the room tree and room.yaml self-descriptions, drift states via the same snapshot-hash comparison vh room drift uses, and ticket-to-room consumption edges from context_refs paths. This is a large ticket that starts with UI/UX design before any implementation: the visual form of the rooms surface is an owner decision governed by the quiet-intelligence standard. Deliberately out of scope: re-clustering or re-laying-out the causal ticket graph by room — the graph's primary object remains the execution order.",
+  "context": "Rooms are currently invisible in the local graph UI beyond the room chip on context cards. The preceding proposal and owner-decision Tickets make the visual direction an explicit graph boundary, so this Ticket is now an implementation-only package. Read the successful decision Ticket's Outcome and referenced human-origin Evidence before beginning. The quiet-intelligence constraint requires stale facts to appear in situ at the locus that owns them, and Room drift states (FRESH, DRIFTED, STALE, UNKNOWN, WARNING) are the first real mechanical source of that signal. Everything needed is mechanically derivable from canonical documents: the Room tree and room.yaml self-descriptions, drift states via the same snapshot-hash comparison vh room drift uses, and ticket-to-room consumption edges from context_refs paths. Re-clustering or re-laying-out the causal Ticket graph by Room remains out of scope.",
   "context_refs": [
     {
       "purpose": "Binding visual and interaction standard for the new surface.",
@@ -54,13 +49,8 @@
   ],
   "relations": [
     {
-      "rationale": "Per-room drift states come from the deterministic drift comparison.",
-      "target_ticket_id": "ticket-drift-check-mechanical",
-      "type": "depends_on"
-    },
-    {
-      "rationale": "Consumption edges assume every context ref resolves inside the Room tree.",
-      "target_ticket_id": "ticket-context-always-roomed",
+      "rationale": "Implementation starts only after the owner-selected proposal direction is recorded and independently accepted.",
+      "target_ticket_id": "ticket-decide-rooms-workbench-direction",
       "type": "depends_on"
     }
   ],

@@ -10,7 +10,7 @@
         "path": "README.md"
       },
       {
-        "blob": "c724e1583a7ebc6909dad6f9ae2b9208637b761f",
+        "blob": "fe78dfafc5232b70b48f3e47a215f8a308cb5d1f",
         "path": "docs/CONCEPT.md"
       },
       {
@@ -38,8 +38,8 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       }
     ],
-    "checked_at": "2026-08-05T00:29:55.319Z",
-    "last_aligned_commit": "8ce3cd092d090992a5706b547a85b84441379821"
+    "checked_at": "2026-08-10T22:39:45.290Z",
+    "last_aligned_commit": "7267b43b96da68d123f7ca84df5b35cbdd4bd021"
   },
   "anchors": [
     "CHANGELOG.md",

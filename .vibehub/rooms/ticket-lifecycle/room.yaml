@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "ce1e5e6fdd94c8cf519ca0a862849553680fad85",
+        "blob": "c980a2037f068b2d987ebaec69594b2ca6d58774",
         "path": "skills/contracts/evidence.schema.json"
       },
       {
@@ -14,15 +14,15 @@
         "path": "skills/contracts/project-format.schema.json"
       },
       {
-        "blob": "3065bda35c632a6d1004dfa2e5b3a495b4facaac",
+        "blob": "62ce3c347081a1917aaa550acc061cb73da62245",
         "path": "skills/contracts/ticket.schema.json"
       },
       {
-        "blob": "d9652b69ba05e7d04883f3727330ece2950bdb5a",
+        "blob": "d59e1ca390ef87cb1375a35f646e977913af75cb",
         "path": "skills/scripts/vh.mjs"
       },
       {
-        "blob": "4c77215c16ba3d997ee2aeac43cefcdbb6108243",
+        "blob": "926f288d142b49700c8ce71d601cbfdbd76dd5a5",
         "path": "skills/vibehub-ticket-closeout/SKILL.md"
       },
       {
@@ -30,7 +30,7 @@
         "path": "skills/vibehub-ticket-closeout/agents/openai.yaml"
       },
       {
-        "blob": "b2d2a091f24cf7a7eaa104931c986bcc22a27f55",
+        "blob": "a9cf06e97c452c16e633f78fc202896f0514d7ae",
         "path": "skills/vibehub-ticket-plan/SKILL.md"
       },
       {
@@ -38,7 +38,7 @@
         "path": "skills/vibehub-ticket-plan/agents/openai.yaml"
       },
       {
-        "blob": "3ec485cf323b5f369cbf9dca06a97dab6e774854",
+        "blob": "a29209f672366835a0127b67883bb9bd208394db",
         "path": "skills/vibehub-ticket-run/SKILL.md"
       },
       {
@@ -46,7 +46,7 @@
         "path": "skills/vibehub-ticket-run/agents/openai.yaml"
       },
       {
-        "blob": "4ba09cb3e42da24791a1ad78bed06617bde81a7d",
+        "blob": "e874635a5586627a31be74677b9fc6b84a808010",
         "path": "skills/vibehub-ticket-validate/SKILL.md"
       },
       {
@@ -54,8 +54,8 @@
         "path": "skills/vibehub-ticket-validate/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-05T00:29:55.928Z",
-    "last_aligned_commit": "8ce3cd092d090992a5706b547a85b84441379821"
+    "checked_at": "2026-08-11T00:00:13.547Z",
+    "last_aligned_commit": "7267b43b96da68d123f7ca84df5b35cbdd4bd021"
   },
   "anchors": [
     "skills/contracts/evidence.schema.json",
