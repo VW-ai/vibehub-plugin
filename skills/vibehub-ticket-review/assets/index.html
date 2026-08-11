@@ -10,38 +10,19 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="app-bar">
-      <div class="source-line" aria-label="Current Git source">
-        <span class="wordmark">VibeHub</span>
-        <span class="source-separator">/</span>
-        <strong id="projectName">Project</strong>
-        <button
-          class="source-ref"
-          id="sourceRef"
-          type="button"
-          title="Inspect exact Git source"
-          aria-expanded="false"
-        >worktree</button>
-      </div>
-
-      <aside class="source-dock" id="sourceDock" hidden aria-label="Exact Git source">
-        <div class="source-dock-head">
-          <div>
-            <span class="eyebrow">Exact Git source</span>
-            <strong id="sourceDockTitle">Current worktree</strong>
-          </div>
-          <button class="icon-button" id="closeSourceDock" type="button" aria-label="Close source details">×</button>
+    <header class="titlebar">
+      <div class="repo-identity">
+        <span class="wordmark" aria-hidden="true">VH</span>
+        <div class="repo-copy">
+          <span class="eyebrow">VibeHub Workbench</span>
+          <span class="repo-title">
+            <strong id="projectName">Project</strong>
+            <span class="repo-branch" id="repoBranch"></span>
+          </span>
         </div>
-        <div id="sourceDockContent"></div>
-      </aside>
-
-      <div class="graph-tools" aria-label="Graph controls">
-        <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
-        <button type="button" id="fitGraph">Fit</button>
-        <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
       </div>
 
-      <div class="app-actions">
+      <div class="title-actions">
         <button
           class="source-status"
           id="sourceStatus"
@@ -61,47 +42,100 @@
     </header>
 
     <main class="workspace inspector-closed">
-      <section class="canvas" id="canvas" aria-label="Ticket dependency graph">
-        <div class="canvas-heading">
-          <div>
-            <span class="eyebrow">Execution map</span>
-            <strong>What can execute next</strong>
-            <span id="graphSummary">Reading current Tickets…</span>
+      <aside class="rail" aria-label="Workbench navigation">
+        <div class="section-heading"><span>Implementing now</span></div>
+        <div class="implementing-list" id="implementingList"></div>
+
+        <div class="rail-divider"></div>
+
+        <div class="section-heading">
+          <span>Ready frontier</span>
+          <span class="section-count" id="frontierCount">0</span>
+        </div>
+        <div class="frontier-list" id="frontierList"></div>
+
+        <div class="rail-divider"></div>
+
+        <div class="section-heading"><span>Graph summary</span></div>
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-cell">
+            <span class="summary-value" id="summaryReady">0</span>
+            <span class="summary-name">Ready</span>
+          </div>
+          <div class="summary-cell">
+            <span class="summary-value" id="summaryBlocked">0</span>
+            <span class="summary-name">Blocked</span>
+          </div>
+          <div class="summary-cell">
+            <span class="summary-value" id="summaryDone">0</span>
+            <span class="summary-name">Done</span>
+          </div>
+          <div class="summary-cell">
+            <span class="summary-value" id="summaryDeviated">0</span>
+            <span class="summary-name">Deviated</span>
           </div>
         </div>
-        <svg id="graph" role="group" aria-label="Direct unlock graph">
-          <g id="world">
-            <g id="edgeLayer"></g>
-            <g id="nodeLayer"></g>
-          </g>
-        </svg>
-        <div class="canvas-hint">Drag to pan · scroll to zoom · select a Ticket</div>
-        <svg
-          class="minimap"
-          id="minimap"
-          role="button"
-          tabindex="0"
-          aria-label="Recenter graph from minimap"
-          preserveAspectRatio="xMidYMid meet"
-        ></svg>
-        <button class="graph-signal" id="graphSignal" type="button">
-          <span class="graph-glyph" aria-hidden="true"></span>
-          <span>
-            <strong>Ticket graph</strong>
-            <small id="graphSignalCount">Reading Git source…</small>
-          </span>
-          <span class="graph-source">Git</span>
-          <span class="graph-chevron" aria-hidden="true">⌃</span>
-        </button>
-        <div class="empty-state" id="emptyState" hidden>
-          <span class="empty-mark"></span>
-          <strong>No Tickets in this worktree</strong>
-          <span>Start a VibeHub Ticket to create the first node.</span>
+      </aside>
+
+      <section class="canvas-pane" aria-label="Ticket causal graph">
+        <div
+          class="implementing-strip"
+          id="implementingStrip"
+          aria-label="Tickets currently being implemented"
+        >
+          <div class="implementing-heading">
+            <span class="implementing-title">Implementing now</span>
+            <span class="implementing-caption">Active-Run presence only · never inferred from Git</span>
+          </div>
+          <div class="implementing-strip-body" id="implementingStripBody"></div>
         </div>
-        <div class="loading-state" id="loadingState">
-          <span class="loading-mark"></span>
-          <span>Validating the current Git source…</span>
-        </div>
+
+        <section class="canvas" id="canvas" aria-label="Ticket dependency graph">
+          <div class="canvas-heading">
+            <div>
+              <span class="eyebrow">Execution flow</span>
+              <strong>Proven upstream, executable downstream</strong>
+              <span id="graphSummary">Reading current Tickets…</span>
+            </div>
+          </div>
+          <div class="graph-tools" aria-label="Graph controls">
+            <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
+            <button type="button" id="fitGraph">Fit</button>
+            <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
+          </div>
+          <svg id="graph" role="group" aria-label="Top-to-bottom causal graph">
+            <g id="world">
+              <g id="edgeLayer"></g>
+              <g id="nodeLayer"></g>
+            </g>
+          </svg>
+          <div class="canvas-hint">Drag to pan · scroll to zoom · select a Ticket</div>
+          <svg
+            class="minimap"
+            id="minimap"
+            role="button"
+            tabindex="0"
+            aria-label="Recenter graph from minimap"
+            preserveAspectRatio="xMidYMid meet"
+          ></svg>
+          <button class="graph-overview" id="graphSignal" type="button">
+            <span class="graph-glyph" aria-hidden="true"></span>
+            <span>
+              <strong>Ticket graph</strong>
+              <small id="graphSignalCount">Reading Git source…</small>
+            </span>
+            <span class="graph-source">Git</span>
+          </button>
+          <div class="empty-state" id="emptyState" hidden>
+            <span class="empty-mark"></span>
+            <strong>No Tickets in this worktree</strong>
+            <span>Start a VibeHub Ticket to create the first node.</span>
+          </div>
+          <div class="loading-state" id="loadingState">
+            <span class="loading-mark"></span>
+            <span>Validating the current Git source…</span>
+          </div>
+        </section>
       </section>
 
       <aside class="inspector" id="inspector" aria-label="Ticket inspector" aria-hidden="true" inert>
@@ -120,6 +154,46 @@
         </div>
       </aside>
     </main>
+
+    <footer class="source-dock" id="sourceDock" aria-label="Exact Git source">
+      <div class="source-cell source-path-cell">
+        <span class="eyebrow">Exact worktree</span>
+        <span class="source-path" id="sourcePath">Reading…</span>
+      </div>
+      <div class="source-cell">
+        <span class="eyebrow">Branch</span>
+        <span class="source-value" id="sourceBranch">—</span>
+      </div>
+      <div class="source-cell">
+        <span class="eyebrow">Commit</span>
+        <span class="source-value" id="sourceCommit">—</span>
+      </div>
+      <div class="source-cell">
+        <span class="eyebrow">Working tree</span>
+        <span class="source-value">
+          <span class="source-state-dot" id="sourceDirtyDot" aria-hidden="true"></span>
+          <span id="sourceDirty">—</span>
+        </span>
+      </div>
+      <button
+        class="source-ref"
+        id="sourceRef"
+        type="button"
+        title="Inspect exact Git source"
+        aria-expanded="false"
+      >Details</button>
+
+      <aside class="source-dock-panel" id="sourceDockPanel" hidden aria-label="Exact Git source details">
+        <div class="source-dock-head">
+          <div>
+            <span class="eyebrow">Exact Git source</span>
+            <strong id="sourceDockTitle">Current worktree</strong>
+          </div>
+          <button class="icon-button" id="closeSourceDock" type="button" aria-label="Close source details">×</button>
+        </div>
+        <div id="sourceDockContent"></div>
+      </aside>
+    </footer>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

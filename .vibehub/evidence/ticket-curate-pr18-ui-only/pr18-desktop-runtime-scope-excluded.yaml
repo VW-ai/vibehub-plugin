@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "desktop-and-runtime-scope-excluded"
+  ],
+  "evidence_id": "pr18-desktop-runtime-scope-excluded",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-11T22:35:05Z",
+  "refs": [
+    ".vibehub/outcomes/ticket-decide-pr18-ui-only-scope.yaml",
+    "README.md",
+    "docs/LOCAL_GRAPH_DESIGN.md",
+    "test:desktop-runtime-path-absence-audit"
+  ],
+  "schema_version": 1,
+  "summary": "The curated tree contains no apps/workbench Desktop product, desktop tests, vh-workbench launcher, session-watch behavior, deep-link or repository-switch runtime, packaging, or documentation claim that those rejected capabilities ship.",
+  "ticket_id": "ticket-curate-pr18-ui-only"
+}

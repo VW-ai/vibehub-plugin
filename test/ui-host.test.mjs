@@ -1,5 +1,14 @@
 import assert from "node:assert/strict";
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
 import { buildUiSnapshot, parseUiFlags, startVibeHubUi } from "../skills/scripts/vh-ui.mjs";
@@ -201,6 +210,27 @@ test("invalid canonical documents fail before UI projection", () => {
       return true;
     },
   );
+});
+
+test("read-only projection disables repository-configured fsmonitor hooks", () => {
+  const repo = fixture();
+  execFileSync("git", ["init"], { cwd: repo, stdio: "ignore" });
+  const hook = join(repo, "malicious-fsmonitor.sh");
+  const marker = join(repo, "fsmonitor-executed");
+  writeFileSync(
+    hook,
+    `#!/bin/sh\n: > ${JSON.stringify(marker)}\nprintf 'token\\n'\n`,
+  );
+  chmodSync(hook, 0o755);
+  execFileSync("git", ["config", "core.fsmonitor", hook], { cwd: repo });
+
+  // Prove the fixture is capable of executing the repository-configured hook.
+  execFileSync("git", ["status", "--short"], { cwd: repo });
+  assert.equal(existsSync(marker), true);
+  rmSync(marker);
+
+  buildUiSnapshot(repo);
+  assert.equal(existsSync(marker), false);
 });
 
 test("focused launcher rejects an unknown Ticket before binding", () => {
@@ -434,7 +464,33 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(html, /id="sourceDock"/u);
   assert.doesNotMatch(html, /class="(?:surface|signal|sheet)/u);
   assert.doesNotMatch(html, /state-legend|brand-mark/u);
-  assert.match(script, /function layoutGraph/u);
+  // A · Quiet Workbench surface: rail, implementing strip, and source dock.
+  assert.match(html, /id="implementingStrip"/u);
+  assert.match(html, /id="implementingList"/u);
+  assert.match(html, /id="frontierList"/u);
+  assert.match(html, /id="summaryGrid"/u);
+  assert.match(html, /id="sourcePath"/u);
+  assert.match(html, /id="sourceBranch"/u);
+  assert.match(html, /id="sourceCommit"/u);
+  assert.match(html, /id="sourceDirty"/u);
+  // The style-lab A/B/C selector is a design-exploration artifact and must
+  // never ship on the product surface.
+  assert.doesNotMatch(html, /style-lab|style-option|style-swatch|data-theme/u);
+  // Top-to-bottom causal layout replaces the superseded left-to-right flow.
+  assert.match(script, /function layoutGraphTopToBottom/u);
+  // Honest Implementing-now layer: presence is the only permitted input, the
+  // MVP has none, and Git-native states are never promoted to IMPLEMENTING.
+  assert.match(script, /ACTIVE_RUN_PRESENCE = Object\.freeze\(\[\]\)/u);
+  assert.match(script, /No Active Run can be proven right now\./u);
+  assert.match(script, /READY frontier remains available\./u);
+  assert.doesNotMatch(script, /"IMPLEMENTING"/u);
+  // No visual preference is ever persisted by the product surface.
+  assert.doesNotMatch(script, /localStorage|sessionStorage/u);
+  assert.doesNotMatch(script, /renderProjectionTime|startWatchPolling|state\.watch/u);
+  // Copy for Agent only hands out a ticket-run instruction for READY Tickets.
+  assert.match(script, /stateLabel === "READY"/u);
+  assert.match(script, /vibehub-ticket-run/u);
+  assert.match(script, /vibehub-ticket-review/u);
   assert.match(script, /function causalCone/u);
   assert.match(script, /function relationPorts/u);
   assert.match(script, /edge-control-halo/u);
@@ -516,7 +572,18 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(styles, /\.ticket-node:focus-visible,[\s\S]*?outline: none;/u);
   assert.match(styles, /\.ticket-node:focus-visible \.ticket-boundary/u);
   assert.match(styles, /\.edge-control-halo/u);
-  assert.match(styles, /--canvas: #f1f2f0/u);
+  // Quiet cool-neutral tokens and the neutral selection outline.
+  assert.match(styles, /--canvas: #eef0ef/u);
+  assert.match(styles, /--selection: #283a32/u);
+  assert.match(
+    styles,
+    /\.ticket-node\.selected \.ticket-boundary \{[\s\S]*?stroke: var\(--selection\)/u,
+  );
+  assert.match(styles, /\.implementing-strip/u);
+  assert.match(styles, /\.presence-empty/u);
+  assert.match(styles, /\.summary-grid/u);
+  assert.match(styles, /min-height: 44px/u);
+  assert.doesNotMatch(styles, /style-lab|style-option|style-swatch/u);
   assert.match(styles, /\.inspector-disclosure/u);
   assert.match(styles, /\.inspector h1:focus-visible/u);
   assert.match(styles, /\.ticket-tabs/u);

@@ -6,7 +6,7 @@ finishes, what becomes executable next?**
 
 ## Retained product language
 
-- One complete, deterministic, left-to-right direct-unlock graph is the primary
+- One complete, deterministic, top-to-bottom direct-unlock graph is the primary
   object. Forks, joins, blockers, deviations, and proof stay at their owning
   graph locus.
 - The healthy surface is quiet. Matte cool neutrals carry the base; semantic
@@ -72,6 +72,6 @@ These real-browser captures use one disposable canonical fork-and-join Ticket
 fixture. The fixture itself is not product state; the two images are retained
 so owner review and future design drift checks bind to exact visual evidence.
 
-![Desktop causal Ticket graph](assets/local-graph/quiet-workbench-desktop.jpg)
+![Wide causal Ticket graph](assets/local-graph/quiet-workbench-desktop.jpg)
 
 ![Narrow progressive Ticket Inspector](assets/local-graph/quiet-workbench-narrow.jpg)

@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "previous-session-fully-released"
+  ],
+  "evidence_id": "evidence-switch-previous-session-fully-released",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-11T00:23:09Z",
+  "refs": [
+    "commit:84576fd231937ad1704dd13b4f83d5b51d25dc9f",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/SwitchProbe.swift",
+    "apps/workbench/Sources/WorkbenchWebViewBridge/HostSession.swift",
+    "test:choosing a recent repository switches the running app and releases the old session",
+    "test:a switch builds a new window instead of re-pointing the live WebView",
+    "observation:previousHostAlive false, previousOriginStatus -1, previousAuthorizedUrlStatus -1, previousAuthorizedApiStatus -1 after an accepted switch",
+    "observation:probe preference state is an in-memory UserDefaults subclass, so no probe plist is created on disk",
+    "docs/LOCAL_GRAPH_DESIGN.md"
+  ],
+  "schema_version": 1,
+  "summary": "A switch over the real binary leaves nothing of the previous session. In `--probe-switch --repo <alpha> --to <beta> --answer accept`, the probe records alpha's host pid, origin, port and in-memory authorized URL before the switch and re-checks them after: previousHostAlive false (kill(pid, 0) fails), previousOriginStatus -1 on GET <old origin>/health, previousAuthorizedUrlStatus -1 on GET of the exact authorized URL the WKWebView had been loading, and previousAuthorizedApiStatus -1 on GET <old origin>/api/state carrying the bearer that was valid moments earlier - all four are measurements made after the new window is up, and all four say the old session answers nothing. The new host is on a different port from the old one. firstHostAliveAtExit and secondHostAliveAtExit are both false, so the probe itself leaks nothing either. No preference key holds a bearer: preferenceKeys is a subset of the §8.2 allowlist (recentRepositories, windowFrame observed), bearerInPreferences is false from a regular-expression scan of every value in the probe's preference state for a 64-hex string, and the test additionally asserts the whole printed envelope contains no 64-hex sequence, so the bearer reached neither disk nor stdout. Probe preference state is an in-memory UserDefaults subclass, so running the probe writes no plist anywhere, including its own. Ordering is asserted against the source by test `a switch builds a new window instead of re-pointing the live WebView`: HostSession.start for the new repository comes first (a switch that cannot start leaves the running session alone), then host?.terminate() for the old one, then workbench?.close(), then the new WorkbenchWindowController is constructed - so the previous host, its .vibehub/** + Git watcher and its bearer are gone before the new window exists.",
+  "ticket_id": "ticket-workbench-switch-repository"
+}

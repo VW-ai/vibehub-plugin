@@ -1,0 +1,49 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "authority-states-quiet-workbench",
+      "criterion": "One active governed document in the workbench room binds every VibeHub UI to: top-to-bottom causal flow (completed foundations at top, current work central, READY/BLOCKED downstream), the fixed A · Quiet Workbench visual direction with no style selector, IMPLEMENTING expressed only as a non-persistent presence overlay that never alters Git-native states, Inbox attention semantics where badges count only unread items that need human action, and the persistence boundary that app-local non-authoritative UI preferences may persist while tokens, Ticket states, and projected snapshots may not."
+    },
+    {
+      "acceptance_id": "supersession-is-traceable",
+      "criterion": "The previous left-to-right wording is amended or superseded in place with source and evidence citing the checked-in baseline document and the owner's direction choice, and existing relations to decision-local-graph-ui-first-class and contract-canonical-agent-output remain valid endpoints."
+    },
+    {
+      "acceptance_id": "workbench-room-stays-valid",
+      "criterion": "Repository validation passes after the amendment and vh room drift reports the workbench room FRESH once aligned."
+    }
+  ],
+  "constraints": [
+    "Record the owner's already-made direction from the checked-in baseline; do not reopen or re-decide the visual direction.",
+    "Amend governed Context only; no runtime, host, schema, or asset changes ride along on this Ticket.",
+    "The read-only, mechanical-consumer, and no-second-truth boundaries of the existing UI authority remain intact."
+  ],
+  "context": "constraint-ui-quiet-intelligence-standard currently requires the causal graph to read left-to-right. The checked-in Workbench baseline (docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md §11) fixes the visual direction to A · Quiet Workbench, changes the causal flow to top-to-bottom per the owner's explicit feedback, removes any style selector from the product surface, separates Git-native Ticket states from an IMPLEMENTING presence overlay, and defines Inbox attention-queue semantics. The baseline itself states that the governed constraint must be amended or superseded before implementation and that the document does not claim the canonical Context was already updated. This Ticket records the owner's already-made direction canonically; it does not reopen the design. The amendment must also state the baseline §8.2 persistence boundary explicitly, so app-local, non-authoritative UI preferences (recent repositories, window frame, last selection, viewport) are recognized as outside 'durable product state' in the sense of contract-canonical-agent-output, while tokens, Ticket states, and snapshots remain forbidden to persist. Reader note: baseline §18 cites .vibehub/context/*.yaml paths from an older layout — canonical Context now lives under .vibehub/rooms/<room>/; there is no .vibehub/tickets/protocol.yaml — repository validation through vh.mjs is the mechanical gate.",
+  "context_refs": [
+    {
+      "purpose": "The governed constraint this Ticket amends or supersedes.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Requirement baseline recording the owner-chosen direction, §11 interface standard and §11.1–11.3 semantics.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Interaction baseline demonstrating the approved A · Quiet Workbench surface.",
+      "ref": "docs/demos/vibehub-workbench-webview.html"
+    },
+    {
+      "purpose": "Product authority for the local graph surface that the amended standard continues to govern.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The governed UI authority states the A · Quiet Workbench standard — top-to-bottom causal flow, the user-owned Workbench surface, IMPLEMENTING-as-presence-overlay rules, and Inbox attention semantics — superseding the left-to-right requirement in place.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-amend-workbench-ui-authority"
+}

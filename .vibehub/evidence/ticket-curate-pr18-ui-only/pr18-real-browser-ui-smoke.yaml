@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "quiet-ui-integrated",
+    "ui-verification-passes"
+  ],
+  "evidence_id": "pr18-real-browser-ui-smoke",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-11T22:40:00Z",
+  "refs": [
+    "browser:headless-chrome-current-branch-wide-and-narrow",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/assets/local-graph/quiet-workbench-narrow.jpg",
+    "test:ui-host-static-watcher-residue-regression"
+  ],
+  "schema_version": 1,
+  "summary": "Headless Chrome executed the actual shared UI on the current UI-only branch at wide and narrow viewports after the stale watcher-call fix; the causal graph rendered successfully in both captures with current canonical Tickets and no Desktop PR work active.",
+  "ticket_id": "ticket-curate-pr18-ui-only"
+}

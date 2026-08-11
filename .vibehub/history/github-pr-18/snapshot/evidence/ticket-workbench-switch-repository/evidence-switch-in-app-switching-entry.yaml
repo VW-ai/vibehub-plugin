@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "in-app-switching-entry"
+  ],
+  "evidence_id": "evidence-switch-in-app-switching-entry",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-11T00:23:09Z",
+  "refs": [
+    "commit:84576fd231937ad1704dd13b4f83d5b51d25dc9f",
+    "apps/workbench/Sources/WorkbenchDesktop/WorkbenchMenu.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/SwitchProbe.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/main.swift",
+    "test:the menu offers Open Repository... on Cmd-O and a recent-repositories submenu",
+    "test:with nothing remembered the submenu says so instead of offering nothing",
+    "test:both in-app entries resolve through the deep link's own planner",
+    "test:choosing a recent repository switches the running app and releases the old session",
+    "observation:the binary inside the assembled VibeHub Workbench.app prints the same File menu under --probe-menu",
+    "limitation:GUI automation denied, so no menu item was clicked and no NSOpenPanel selection was made",
+    "docs/LOCAL_GRAPH_DESIGN.md"
+  ],
+  "schema_version": 1,
+  "summary": "The menu now carries both entries and a headless probe over the real binary prints them and drives the open path a selection invokes. `VibeHubWorkbench --probe-menu --recent /tmp/vibehub-menu-alpha --recent /tmp/vibehub-menu-beta` prints a File menu holding `Open Repository...` with key \"o\" and modifiers [\"command\"] bound to action `openRepository:`, and a `Recent Repositories` submenu whose items are titled with the worktree basenames in most-recent-first order (vibehub-menu-alpha, vibehub-menu-beta), each carrying the full absolute path as its represented value and tooltip and bound to `openRecentRepository:`; with nothing remembered the submenu holds one disabled `No Repositories Opened Yet` item with no action. The same output comes from the binary inside the assembled `VibeHub Workbench.app`, which I built with `sh apps/workbench/Scripts/make-app-bundle.sh` and queried directly, so the shipped bundle carries the menu and not just the swift-build binary. `--probe-switch --repo <alpha> --to <beta> --recent <beta> --recent <alpha> --frame \"{{140, 140}, {1000, 700}}\" --answer accept` then drives the real path: it constructs the real AppDelegate, installs the same WorkbenchMenu main.swift hands to AppKit, opens alpha, and sends the chosen item's action with `NSApplication.sendAction(action, to: item.target, from: item)` where the target is nil, so it travels the responder chain exactly as a menu-bar click does. It reports actionSent true, chosenItem.action `openRecentRepository:` carrying the exact beta path, then switched true, currentRepository beta, windowRecreated true and windowFrameReused true against the seeded frame {{140, 140}, {1000, 700}} - one process, one delegate, no relaunch. For Cmd-O the probe reports openRepositoryItem.responder \"AppDelegate\", resolved through `NSApplication.target(forAction:to:from:)`, proving the item is wired to a responder that handles it. HONEST LIMITATION: GUI automation is denied in this environment, so I never clicked a menu item and never answered the NSOpenPanel that Cmd-O raises; what is proven for Cmd-O is the binding and its responder, not a directory chosen through the panel. Asserted by tests `the menu offers Open Repository... on Cmd-O and a recent-repositories submenu`, `with nothing remembered the submenu says so instead of offering nothing`, `both in-app entries resolve through the deep link's own planner`, and `choosing a recent repository switches the running app and releases the old session`.",
+  "ticket_id": "ticket-workbench-switch-repository"
+}

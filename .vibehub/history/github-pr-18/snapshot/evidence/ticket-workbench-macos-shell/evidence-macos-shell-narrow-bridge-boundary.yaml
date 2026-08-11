@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "narrow-bridge-boundary"
+  ],
+  "evidence_id": "evidence-macos-shell-narrow-bridge-boundary",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T03:41:08Z",
+  "refs": [
+    "commit:aec63834cb07ca740b5eab26fab77d84206d9285",
+    "apps/workbench/Sources/WorkbenchWebViewBridge/NavigationPolicy.swift",
+    "apps/workbench/Sources/WorkbenchWebViewBridge/WorkbenchWebView.swift",
+    "apps/workbench/Sources/WorkbenchWebViewBridge/ToolchainLocator.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/RenderProbe.swift",
+    "test:the navigation policy allows exactly one loopback session origin",
+    "test:the WebView gets no file access and no callable native bridge",
+    "observation:probe-render escapeAttempts=fetch-file:blocked,bridge:absent fileNavigationDenied=true"
+  ],
+  "schema_version": 1,
+  "summary": "Demonstrated by both a live probe and source assertions at commit aec63834cb07ca740b5eab26fab77d84206d9285. `VibeHubWorkbench --probe-render --repo <fixture>` loads the authorized URL in the shell's real hardened WKWebView and then asks the live page to escape; it reported escapeAttempts \"fetch-file:blocked,bridge:absent\", meaning fetch('file:///etc/passwd') was blocked and window.webkit.messageHandlers does not exist, and fileNavigationDenied true for an attempted top-level load of file:///etc/passwd, with the page still on 127.0.0.1. `--probe-navigation` exercises the same NavigationPolicy the window's decidePolicyFor uses: http://127.0.0.1:<session port>/ and /api/state allow-in-webview; a different loopback port, localhost, file:///etc/passwd (with and without a link activation), data: URLs, and a non-activated https URL all deny; only a user-activated remote link returns open-externally, which the window hands to NSWorkspace instead of the WebView. Node test `the WebView gets no file access and no callable native bridge` greps the compiled Swift with comments stripped and fails on loadFileURL, allowingReadAccessTo, allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs, WKScriptMessageHandler, WKUserScript, or userContentController.add, and asserts websiteDataStore = .nonPersistent(). Directory choice reaches the session only through NSOpenPanel (canChooseDirectories true, canChooseFiles false) and Git metadata only through /usr/bin/git -C <selected worktree> with a fixed minimal environment; the host launcher is resolved by walking up from the app binary or an explicit env override, and test `the shell starts the existing read-only host instead of reimplementing it` asserts ToolchainLocator never references the selected repository, so choosing a worktree can never mean executing code from it.",
+  "ticket_id": "ticket-workbench-macos-shell"
+}

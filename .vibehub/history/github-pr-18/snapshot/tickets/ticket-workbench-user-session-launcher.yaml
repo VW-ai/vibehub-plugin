@@ -1,0 +1,58 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "user-owned-lifetime",
+      "criterion": "A documented foreground invocation starts the loopback host on an exact worktree and remains valid until the user stops the process; the 30-minute expiry does not apply in this mode."
+    },
+    {
+      "acceptance_id": "no-agent-no-residue",
+      "criterion": "The documented user entry works without any Agent conversation, and stopping the foreground process ends the host, invalidates the URL, and leaves no daemon, PID file, registry entry, or on-disk token behind."
+    },
+    {
+      "acceptance_id": "agent-semantics-unchanged",
+      "criterion": "Default Agent-task launches keep the current short-lived token and task-scoped lifecycle policy; existing ui-host and skill-contract tests pass unchanged and new coverage exercises the user-session mode."
+    },
+    {
+      "acceptance_id": "read-only-preserved",
+      "criterion": "In user-session mode the host still binds only loopback, serves only GET and HEAD, and automated tests prove Git YAML stays byte-for-byte unchanged by use."
+    }
+  ],
+  "constraints": [
+    "Reuse the existing host and projector; no second UI stack or forked frontend.",
+    "No daemon, background start, PID or port registry, or cross-task discovery; the lifetime belongs to the foreground command.",
+    "The bearer token stays in memory and the URL fragment; it is never written to disk or configuration.",
+    "Do not implement the vh.mjs CLI split here; ticket-vibehub-cli owns that evaluation."
+  ],
+  "context": "The review UI is currently Agent-task-owned: vh-ui.mjs issues a 30-minute bearer token, the lifecycle reference scopes reuse to the current Agent task, and cross-task discovery is forbidden. That policy is right for Agent presentation but wrong as the only daily entry — the baseline (§2–§4) shows users re-asking an Agent every time they want to see Tickets. decision-local-graph-ui-first-class already authorizes a narrow launcher that only selects a repository, starts the loopback UI, and optionally opens the browser. Baseline §13 Phase 0 asks for exactly that as the browser transitional dogfood before any desktop shell. Deliver a documented user entry — a flag or thin wrapper over the exported startVibeHubUi — where host and token lifetime belong to the foreground process instead of a timer, while the Agent-task default behavior stays unchanged. This is explicitly not the vh.mjs CLI split: ticket-vibehub-cli (draft) owns that evaluation, and this launcher must stay inside the already-authorized narrow scope.",
+  "context_refs": [
+    {
+      "purpose": "Requirement baseline: §2–§4 lifecycle problem, §13 Phase 0 browser transitional launcher.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Existing loopback host, token lifetime, and exported startVibeHubUi this launcher extends.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    },
+    {
+      "purpose": "Agent-task resource policy that must remain unchanged for Agent presentation.",
+      "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+    },
+    {
+      "purpose": "Authority that already accepts a narrow launcher cost for repository selection and loopback UI start.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Security, read-only, and Git-invariance contract the new mode must keep passing.",
+      "ref": "test/ui-host.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A user can start and keep the read-only Ticket graph open from a foreground command whose lifetime the user owns, without creating or continuing any Agent task.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-user-session-launcher"
+}

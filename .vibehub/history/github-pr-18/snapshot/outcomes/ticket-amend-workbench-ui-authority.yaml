@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "authority-states-quiet-workbench",
+    "supersession-is-traceable",
+    "workbench-room-stays-valid"
+  ],
+  "closed_at": "2026-08-08T14:22:16Z",
+  "evidence_ids": [
+    "amended-authority-content",
+    "amended-authority-validation"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout confirmed against the repository, not the executor's summary. authority-states-quiet-workbench: constraint-ui-quiet-intelligence-standard in the workbench room is a single active governed document whose detail binds every VibeHub UI to top-to-bottom causal flow (completed foundations top, current work central, READY/BLOCKED downstream), the fixed A · Quiet Workbench direction with no style selector, IMPLEMENTING only as a non-persistent Active-Run presence overlay that never alters Git-native states, Inbox badges counting only unread items needing human action, and the persistence boundary permitting app-local non-authoritative UI preferences while forbidding bearer tokens, Ticket states, frontiers, and projected snapshots; each clause matches baseline docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md §11, §11.1-11.3, and §8.2. supersession-is-traceable: commit 79b92b1 replaced the left-to-right wording in place in the same document; the diff touches only this file, source now quotes the baseline's owner-direction text verbatim (A chosen, no selector, top-to-bottom, amend before implementation), evidence cites the baseline document and demo, and the unchanged relations to decision-local-graph-ui-first-class and contract-canonical-agent-output resolve to existing active contexts in the workbench room. workbench-room-stays-valid: re-run vh project validate returned valid (format 1, 4 rooms, 22 contexts, 35 tickets) and vh room drift reports workbench FRESH with cold_start false. Ticket constraints held: only the governed constraint changed on 79b92b1, the direction was recorded rather than reopened, and the read-only, mechanical-consumer, no-second-truth boundaries remain in the amended text.",
+  "ticket_id": "ticket-amend-workbench-ui-authority",
+  "unresolved_acceptance_ids": []
+}

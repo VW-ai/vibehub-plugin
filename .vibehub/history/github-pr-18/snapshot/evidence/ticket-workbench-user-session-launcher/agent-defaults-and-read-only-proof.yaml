@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "agent-semantics-unchanged",
+    "read-only-preserved"
+  ],
+  "evidence_id": "agent-defaults-and-read-only-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T14:29:56Z",
+  "refs": [
+    "commit:cac2aaf",
+    "test/workbench-launcher.test.mjs",
+    "test/ui-host.test.mjs",
+    "test:npm-run-verify-2026-08-08-fail-0",
+    "skills/scripts/vh-ui.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Agent-task semantics are untouched: startVibeHubUi still defaults to the 30-minute token (the new test asserts expiresInMs 1800000 on a default launch and that invalid lifetimes are still rejected), vh-ui.mjs flag parsing is reused unchanged, and test/ui-host.test.mjs plus test/skill-contracts.test.mjs were not modified — npm run verify passes with fail 0 and the plugin artifact builds and verifies cleanly (52 files). Read-only guarantees hold in user-session mode: the host binds only 127.0.0.1, an unauthorized /api request returns 401, POST returns 405 read_only, and canonical .vibehub bytes compare deepEqual before and after serving state, subject, and health requests in both the in-process and spawned-process tests.",
+  "ticket_id": "ticket-workbench-user-session-launcher"
+}

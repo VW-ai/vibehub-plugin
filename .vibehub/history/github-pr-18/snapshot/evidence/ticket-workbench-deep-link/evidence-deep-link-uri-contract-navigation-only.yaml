@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "uri-contract-navigation-only"
+  ],
+  "evidence_id": "evidence-deep-link-uri-contract-navigation-only",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T05:48:31Z",
+  "refs": [
+    "commit:a0b0f442c64daa9c95df1ee2893b08e63c1b3557",
+    "apps/workbench/Sources/WorkbenchRepositorySession/DeepLink.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "apps/workbench/Scripts/make-app-bundle.sh",
+    "test:the app bundle registers exactly one scheme and the app handles it",
+    "test:a deep link can express navigation and nothing else",
+    "test:the running binary accepts exactly the §9 URI forms",
+    "test:every malformed or over-reaching URI fails safe",
+    "command:plutil -p '.build/VibeHub Workbench.app/Contents/Info.plist'",
+    "observation:lsregister -dump shows bindings: vibehub:",
+    "docs/LOCAL_GRAPH_DESIGN.md"
+  ],
+  "schema_version": 1,
+  "summary": "At commit a0b0f442c64daa9c95df1ee2893b08e63c1b3557 the app bundle claims exactly one URL scheme and the app handles it. Scripts/make-app-bundle.sh writes CFBundleURLTypes with CFBundleURLSchemes [vibehub] and CFBundleTypeRole Viewer; `plutil -p '.build/VibeHub Workbench.app/Contents/Info.plist'` on the assembled bundle printed that entry, and Launch Services accepted it (lsregister -f followed by `lsregister -dump` showing bindings: vibehub:). AppDelegate.applicationWillFinishLaunching installs an NSAppleEventManager handler for kInternetEventClass/kAEGetURL and reads keyDirectObject; that handler is the only entry, and a URI arriving before launch completes is held in pendingDeepLink. DeepLink.parse is pure and total: scheme must be vibehub, host must be open, path empty or /, repo required, absolute, and free of any .. segment, ticket canonical, view one of execution|contract|log and only with a ticket - mirroring validateFocus in skills/scripts/vh-ui.mjs. Verified against the real built binary with `VibeHubWorkbench --probe-deep-link`: repo alone accepts with focusPath /; repo+ticket gives /?ticket=<id>&view=execution; each of the three views gives /?ticket=<id>&view=<view> with the session fragment preserved. Node test `every malformed or over-reaching URI fails safe` runs 23 refusals through that binary - a non-URI string, vibehubx://, https://, file://, vibehub://write, vibehub://open/apply, missing and empty repo, relative repo, /tmp/../etc and <repo>/../.., view without ticket, view=viewport, view=EXECUTION, ticket=Ticket_Foundation, ticket=../../etc/passwd, mutate=1, token=abc, a repeated ticket parameter, a URI fragment, credentials, and a port - and asserts every one is refused at stage uri with hostStarted false, the preference key list unchanged before and after, no repo reported, and the fixture's .vibehub bytes identical. NAVIGATION ONLY IS STRUCTURAL: DeepLink has exactly three stored properties (repoRoot, ticketId, view), asserted by test `a deep link can express navigation and nothing else`, which also fails the compiled Swift (comments stripped) on any write path - vh.mjs invocation, ticket apply, file writing, or an HTTP method on a URLRequest. The shell has no write API for a parameter to reach. Manually observed against the registered bundle: with the Workbench open, `open \"vibehub://open?repo=<worktree>&ticket=ticket-workbench-macos-shell&mutate=1\"` left the app running and its selection unchanged.",
+  "ticket_id": "ticket-workbench-deep-link"
+}

@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "kind": "pull_request_ledger_snapshot",
+  "pull_request": "github-pr:VW-ai/vibehub-plugin#18",
+  "merge_base": "c17e973b3784005f5c0d8baa37b2bd6262d97280",
+  "pr_head": "0c21858ca1a4dd1537e75a335f124548a44d3587",
+  "counts": {
+    "tickets": 10,
+    "evidence": 28,
+    "outcomes": 7
+  },
+  "records": [
+    {
+      "original_path": ".vibehub/evidence/ticket-amend-workbench-ui-authority/amended-authority-content.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-amend-workbench-ui-authority/amended-authority-content.yaml",
+      "sha256": "sha256:07fa698d34436497c716cea56c212d7c6a163b8678a74c93726a4061f250147a"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-amend-workbench-ui-authority/amended-authority-validation.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-amend-workbench-ui-authority/amended-authority-validation.yaml",
+      "sha256": "sha256:df4467904776ac8cccc8160f220e128c7969ead4dc9b4553d9863a6431b8bfc9"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-deep-link/evidence-deep-link-explicit-repo-switch-confirmation.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-deep-link/evidence-deep-link-explicit-repo-switch-confirmation.yaml",
+      "sha256": "sha256:ccc56960edb876e7c04f3a840cd2b25dbbb10165590a07501bdf97f1cfe95b2e"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-deep-link/evidence-deep-link-missing-ticket-honest-state.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-deep-link/evidence-deep-link-missing-ticket-honest-state.yaml",
+      "sha256": "sha256:4b1c115a9581e497dd3f641efddd50f926d86762dde1f232a890cd984ecc2641"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-deep-link/evidence-deep-link-no-mutation-proof.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-deep-link/evidence-deep-link-no-mutation-proof.yaml",
+      "sha256": "sha256:617be1a9841a852e4732913a9921dbb59663e7313057a92aedd98d67c4698596"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-deep-link/evidence-deep-link-running-and-cold-start-flows.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-deep-link/evidence-deep-link-running-and-cold-start-flows.yaml",
+      "sha256": "sha256:fb2295c1fde6a5d94e2f774fbf136fad2c795464295a76ff116f9b543eb50cf9"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-deep-link/evidence-deep-link-uri-contract-navigation-only.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-deep-link/evidence-deep-link-uri-contract-navigation-only.yaml",
+      "sha256": "sha256:9114a08dabed65e363090b0a400a4ca4fc72d76dc7a99414faa9db81101eeee7"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-macos-shell/evidence-macos-shell-narrow-bridge-boundary.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-macos-shell/evidence-macos-shell-narrow-bridge-boundary.yaml",
+      "sha256": "sha256:db5afd1c4f761d2e779680aa2410f3fc3486625eb9356fb58d5a4b3190416503"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-macos-shell/evidence-macos-shell-preferences-only-persistence.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-macos-shell/evidence-macos-shell-preferences-only-persistence.yaml",
+      "sha256": "sha256:bb8eda81f19189fb1d21296985dbd60667eb1398dcbbc11fc99330e79b312632"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-macos-shell/evidence-macos-shell-session-lifecycle-clean.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-macos-shell/evidence-macos-shell-session-lifecycle-clean.yaml",
+      "sha256": "sha256:dac9d89aaa2b85f527b95c053c26d4c48821e862da245f84bb6fb19fdef83693"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-macos-shell/evidence-macos-shell-shared-frontend-no-fork.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-macos-shell/evidence-macos-shell-shared-frontend-no-fork.yaml",
+      "sha256": "sha256:f4927d3744b7660249a7b7ca5925e4207c730ac21a47c60c799e4c785277f03f"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-macos-shell/evidence-macos-shell-user-owned-window.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-macos-shell/evidence-macos-shell-user-owned-window.yaml",
+      "sha256": "sha256:1e49876a747b600ba1b9655b376b048219b03cffe69d21688383529e7bfb6ceb"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-quiet-surface/owner-approved-quiet-surface.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-quiet-surface/owner-approved-quiet-surface.yaml",
+      "sha256": "sha256:3ec75359ca0ac4d09ab8efbbe0127471f9ccbe8406aa363c757db21a23c37f59"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-quiet-surface/quiet-surface-a-direction.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-quiet-surface/quiet-surface-a-direction.yaml",
+      "sha256": "sha256:4488dafbcf274ce07478e9331b784cc9e4096d22df5573a76c8b41d1b594c0a2"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-quiet-surface/quiet-surface-accessible-and-read-only.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-quiet-surface/quiet-surface-accessible-and-read-only.yaml",
+      "sha256": "sha256:3a73c02361970b07c731f11dd3386847a1f98cf29c5d1ee4bf9ab274d7100827"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-quiet-surface/quiet-surface-honest-implementing-layer.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-quiet-surface/quiet-surface-honest-implementing-layer.yaml",
+      "sha256": "sha256:60d575b90fd0dfd4cf6aa0721b39d6a015a365e71e71a6d7039c99d8a24febd0"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-quiet-surface/quiet-surface-inspector-progressive.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-quiet-surface/quiet-surface-inspector-progressive.yaml",
+      "sha256": "sha256:5a40e5455306d8680aa083fe94a77aa37f72be90fe71e903c4871163c02a9e7b"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-quiet-surface/quiet-surface-source-dock-truth.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-quiet-surface/quiet-surface-source-dock-truth.yaml",
+      "sha256": "sha256:f8e1f4d4f74572ae02627d9337d9dfcd4e0740893a900ad980b36a17ec9e47d3"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-quiet-surface/quiet-surface-top-to-bottom-graph.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-quiet-surface/quiet-surface-top-to-bottom-graph.yaml",
+      "sha256": "sha256:d7b8dcef35994d8635f6c7e33d3dd7a1840db4ae4d17e6b5157a1043a168aad0"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-session-watch/watch-debounce-and-recovery.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-session-watch/watch-debounce-and-recovery.yaml",
+      "sha256": "sha256:48dd37a07ad1fd2469f7387cef12a36d3a44f73b77c6c13ad858f03dd2adb727"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-session-watch/watch-no-writeback-and-agent-unchanged.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-session-watch/watch-no-writeback-and-agent-unchanged.yaml",
+      "sha256": "sha256:cfc2b27dfedaad9f12aab30db03de6de6de42ce7c702548b7c9e2d6b35a0e530"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-switch-repository/evidence-switch-changes-no-ticket-state.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-switch-repository/evidence-switch-changes-no-ticket-state.yaml",
+      "sha256": "sha256:4767e06e08b1e1f3cef5673da1a9182aaa36dfd6afd7238a57cc3e470a0e0ad1"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-switch-repository/evidence-switch-confirmation-is-consistent.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-switch-repository/evidence-switch-confirmation-is-consistent.yaml",
+      "sha256": "sha256:ed4595c2aa23eff7b10f7401656256d710e7e5dcf97cc4c5a7c3f22f9f36bbc9"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-switch-repository/evidence-switch-in-app-switching-entry.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-switch-repository/evidence-switch-in-app-switching-entry.yaml",
+      "sha256": "sha256:16cd4d684f04412a20c6d3836c8ddaa4a9f79956994b16568deacbb4e81d52d6"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-switch-repository/evidence-switch-previous-session-fully-released.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-switch-repository/evidence-switch-previous-session-fully-released.yaml",
+      "sha256": "sha256:f644388dd69eefb8f320ade81baeafa63d1b8ff70ccbd6d3806ee20c098b50a2"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-switch-repository/evidence-switch-recents-reflect-real-use.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-switch-repository/evidence-switch-recents-reflect-real-use.yaml",
+      "sha256": "sha256:7bf07847d03102f46d298a44251617d4281b5b83abe99bc1b5158377c98fff10"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-user-session-launcher/agent-defaults-and-read-only-proof.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-user-session-launcher/agent-defaults-and-read-only-proof.yaml",
+      "sha256": "sha256:cef861cfaadbb86db560fbbc937ed7bb9833b4f7e5fb1850b374e158c00eba77"
+    },
+    {
+      "original_path": ".vibehub/evidence/ticket-workbench-user-session-launcher/user-session-lifetime-and-residue.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/evidence/ticket-workbench-user-session-launcher/user-session-lifetime-and-residue.yaml",
+      "sha256": "sha256:ee101b46e866e802a83c5d0a43050ba14b4a9736f01a1cb90d4476c7f54a699b"
+    },
+    {
+      "original_path": ".vibehub/outcomes/ticket-amend-workbench-ui-authority.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/outcomes/ticket-amend-workbench-ui-authority.yaml",
+      "sha256": "sha256:112a4fdef3024c495b19e73f9b2455f3b69aae64165b6c9223eb49afbe941568"
+    },
+    {
+      "original_path": ".vibehub/outcomes/ticket-workbench-deep-link.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/outcomes/ticket-workbench-deep-link.yaml",
+      "sha256": "sha256:17a4efc4fda4942abc5db7cc63f0d6c8f9b3eabcaeeecdbb3c737741b83e918d"
+    },
+    {
+      "original_path": ".vibehub/outcomes/ticket-workbench-macos-shell.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/outcomes/ticket-workbench-macos-shell.yaml",
+      "sha256": "sha256:21bf9257dbc2f407014e2dffabff59703e1eb419dd3f724e3a777b7ffa00ec5f"
+    },
+    {
+      "original_path": ".vibehub/outcomes/ticket-workbench-quiet-surface.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/outcomes/ticket-workbench-quiet-surface.yaml",
+      "sha256": "sha256:1c61aa1b9de79a90a1d4e8d6ea62bd6b191934f259d6db48297c58f871bdfc27"
+    },
+    {
+      "original_path": ".vibehub/outcomes/ticket-workbench-session-watch.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/outcomes/ticket-workbench-session-watch.yaml",
+      "sha256": "sha256:ee2a3d9dadfda1b2a3b80dedf1ad4396e6f33a20d61139377d330a2917a776aa"
+    },
+    {
+      "original_path": ".vibehub/outcomes/ticket-workbench-switch-repository.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/outcomes/ticket-workbench-switch-repository.yaml",
+      "sha256": "sha256:3b6f048eb1c21b34490dee034afe053cde0d817580c86f5565d4af6ccf0b7c9c"
+    },
+    {
+      "original_path": ".vibehub/outcomes/ticket-workbench-user-session-launcher.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/outcomes/ticket-workbench-user-session-launcher.yaml",
+      "sha256": "sha256:43a16d380ec12a8b6f2a311204c3a0237628883779f16f665461ac45c7eeba0d"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-amend-workbench-ui-authority.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-amend-workbench-ui-authority.yaml",
+      "sha256": "sha256:98fdb8e91571b103e509e86c261abcd8fa173f1638a9ee4c992b262e6d2130ac"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-attention-inbox.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-attention-inbox.yaml",
+      "sha256": "sha256:ba500364023bdbf499896bc727bd707bfe4376a48cf7d1ac149fee488012f5b2"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-deep-link.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-deep-link.yaml",
+      "sha256": "sha256:4b5b4ee51e6688237d2de58ea2a3917b969f2b93d291fcdbcec826171837dc54"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-dogfood-release.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-dogfood-release.yaml",
+      "sha256": "sha256:70e8fb5f24eec7bea3f06b59bb98a65f8f1983042617207e3f1f61fbe09b303f"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-implementing-presence.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-implementing-presence.yaml",
+      "sha256": "sha256:176c29ef4cc992d3848205d23863cc41cd43f63531163db86da6378bcf775b5a"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-macos-shell.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-macos-shell.yaml",
+      "sha256": "sha256:f44a9018d76072abf0dadf126d424d60ca5abf36bc2a4c71efe10150bd7cfb29"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-quiet-surface.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-quiet-surface.yaml",
+      "sha256": "sha256:72aad74e2669440867d61e9ab4b27f188fafb318af16c1fe7a2b6e7228306fa3"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-session-watch.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-session-watch.yaml",
+      "sha256": "sha256:3a87753ef0c6630aee8edd2b8f5e70411cd0611461fc665e4270ba972c06dfa0"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-switch-repository.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-switch-repository.yaml",
+      "sha256": "sha256:493364e6a7faf929bc54cf5856020526e07e8903d57f1419c87f9365296db1c7"
+    },
+    {
+      "original_path": ".vibehub/tickets/ticket-workbench-user-session-launcher.yaml",
+      "archive_path": ".vibehub/history/github-pr-18/snapshot/tickets/ticket-workbench-user-session-launcher.yaml",
+      "sha256": "sha256:11ccc3241c7ac8c4c51da25d5a5399c4addbd6def2e2d1017c862b0ee16bef87"
+    }
+  ]
+}

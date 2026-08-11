@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "user-owned-lifetime",
+    "no-agent-no-residue",
+    "agent-semantics-unchanged",
+    "read-only-preserved"
+  ],
+  "closed_at": "2026-08-08T14:33:05Z",
+  "evidence_ids": [
+    "user-session-lifetime-and-residue",
+    "agent-defaults-and-read-only-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout adjudicated against the repository on commit cac2aaf, with the suite and a live smoke run re-executed by the adjudicator rather than trusting the executor's summaries. user-owned-lifetime: the documented invocation node skills/scripts/vh-workbench.mjs --repo <worktree> (README one-line pointer inside the 60-line budget at 59 lines, plus the User-owned Workbench session section of docs/LOCAL_GRAPH_DESIGN.md) starts the existing loopback host with tokenLifetimeMs null; vh-ui.mjs arms the expiry timer only when the lifetime is non-null, and a live launch against this exact worktree reported expiresInMs null in the JSON envelope. no-agent-no-residue: the adjudicator ran the launcher directly from a shell with no Agent conversation, served /health (200 readOnly) and authorized /api/state (200, 35 tickets), then SIGTERM produced exit code 0 and the port refused connections (ECONNREFUSED); git status stayed clean with zero untracked files afterward, the wrapper performs no filesystem writes, and the spawned-process test additionally proves the repository root listing and canonical .vibehub bytes are unchanged while test coverage rejects a --daemon flag. agent-semantics-unchanged: DEFAULT_TOKEN_LIFETIME_MS remains 30*60*1000 as the default parameter, the new test asserts expiresInMs 1800000 on a default launch and that invalid lifetimes are still rejected, and commit cac2aaf touches only README.md, docs/LOCAL_GRAPH_DESIGN.md, skills/scripts/vh-ui.mjs, skills/scripts/vh-workbench.mjs, and test/workbench-launcher.test.mjs — test/ui-host.test.mjs, the skill SKILL.md files, ticket-lifecycle.json, and vh.mjs are untouched; npm run verify re-run by the adjudicator passed 48 tests with fail 0 and the plugin artifact verified cleanly (52 files). read-only-preserved: the live session bound only http://127.0.0.1, returned 401 without the bearer token, 405 read_only for POST, and the tests compare canonical .vibehub bytes deepEqual before and after use in both in-process and spawned-process modes. Constraints held: the wrapper reuses startVibeHubUi, parseUiFlags, and the newly exported openBrowser from vh-ui.mjs with no second UI stack; there is no daemon, PID file, port registry, or cross-task discovery; the token lives only in memory and the URL fragment; and the vh.mjs CLI split was not implemented here.",
+  "ticket_id": "ticket-workbench-user-session-launcher",
+  "unresolved_acceptance_ids": []
+}

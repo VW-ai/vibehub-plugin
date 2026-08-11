@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "debounced-single-refresh",
+    "valid-swap-and-recovery",
+    "git-metadata-follows"
+  ],
+  "evidence_id": "watch-debounce-and-recovery",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T14:59:44Z",
+  "refs": [
+    "commit:994bd6e",
+    "test/session-watch.test.mjs",
+    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-review/assets/app.js"
+  ],
+  "schema_version": 1,
+  "summary": "test/session-watch.test.mjs proves the watch behavior against a real host: writing three ticket YAML files in quick succession produces exactly one revalidated reprojection (watch.projectionCount rises by exactly 1 while the graph gains all three tickets); writing a broken ticket YAML keeps the previous snapshotId and ticket count while watch.error carries the validation message, and deleting the broken file clears the error and restores the valid projection automatically; and a git checkout -b in the watched worktree updates graph.source.branch through the .git HEAD watcher. The frontend polls /api/state only when watch.enabled is true, triggers the existing refresh routine when snapshotId changes, and renders the validation-error state without blanking the last valid graph.",
+  "ticket_id": "ticket-workbench-session-watch"
+}

@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "top-to-bottom-graph"
+  ],
+  "evidence_id": "quiet-surface-top-to-bottom-graph",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T17:02:38Z",
+  "refs": [
+    "commit:a8ca1343cc79001342089db03ea67a9362068ceb",
+    "test:ui-host read-only loopback host serves assets, current graph, inspector, and trace",
+    "test:ui-host dense causal position preserves every direct prerequisite and unlock",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "skills/vibehub-ticket-review/assets/app.js"
+  ],
+  "schema_version": 1,
+  "summary": "layoutGraphTopToBottom in skills/vibehub-ticket-review/assets/app.js stacks topological ranks vertically (rank 0 foundations at the top, dependents beneath) with deterministic barycenter ordering and centered rows; edges leave the prerequisite's bottom aperture and enter the dependent's top edge; frameGraph anchors tall graphs at their proven top. Pan, zoom, fit, minimap recenter, node and relation selection, and ArrowUp/ArrowDown causal keyboard navigation all work against the live host, and every non-orphan Ticket remains connected through projected relations (test 'dense causal position preserves every direct prerequisite and unlock' plus the ui-host asset assertions on function layoutGraphTopToBottom, relationPorts, and minimapWorldPoint pass in commit a8ca1343cc79001342089db03ea67a9362068ceb). The live 1440px capture docs/assets/local-graph/quiet-workbench-desktop.jpg shows 25 DONE foundations in the upper rows and the READY/BLOCKED frontier downstream.",
+  "ticket_id": "ticket-workbench-quiet-surface"
+}

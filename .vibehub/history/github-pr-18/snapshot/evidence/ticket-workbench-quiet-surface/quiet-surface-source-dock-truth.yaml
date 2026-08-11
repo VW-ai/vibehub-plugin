@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "source-dock-truth"
+  ],
+  "evidence_id": "quiet-surface-source-dock-truth",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T17:02:38Z",
+  "refs": [
+    "commit:a8ca1343cc79001342089db03ea67a9362068ceb",
+    "test:session-watch invalid YAML keeps the last valid snapshot and recovers automatically",
+    "test:ui-host read-only loopback host serves assets, current graph, inspector, and trace",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "skills/vibehub-ticket-review/assets/index.html"
+  ],
+  "schema_version": 1,
+  "summary": "A persistent source dock footer is present in every Tickets view (index.html #sourceDock) showing the exact worktree path, branch, commit, working-tree dirty state, and last projection time, all fed from the projected graph source and watch.lastSyncAt; both retained screenshots show the dock populated with the real worktree /Users/victor/work/VibeHub/vibehub-release-7:31/.claude/worktrees/vibehub-workbench-webview-53ffda, branch claude/vibehub-workbench-webview-53ffda, commit d7e51b3857, and projection time. renderWatchState now surfaces validation failure explicitly in the dock's Validation cell ('Invalid Ticket YAML · showing last valid snapshot') while the last valid graph is retained — the preserved watch integration is proven by the unchanged session-watch suite ('invalid YAML keeps the last valid snapshot and recovers automatically') passing in commit a8ca1343cc79001342089db03ea67a9362068ceb, and ui-host asserts sourcePath/sourceBranch/sourceCommit/sourceDirty/sourceSynced/sourceValidation exist in the shipped markup.",
+  "ticket_id": "ticket-workbench-quiet-surface"
+}

@@ -3,13 +3,24 @@
 
   const SVG = "http://www.w3.org/2000/svg";
   const NODE = { width: 232, height: 96 };
+  // Top-to-bottom causal flow: layers stack vertically (proven foundations at
+  // the top, READY/BLOCKED downstream below), siblings spread horizontally.
   const LAYOUT = {
-    marginX: 80,
-    marginY: 76,
-    columnGap: 118,
-    rowGap: 58,
+    marginX: 84,
+    marginY: 72,
+    columnGap: 52,
+    rowGap: 108,
     sweeps: 5,
   };
+  // §11.3 honesty rule: IMPLEMENTING may only come from a trusted Active-Run
+  // presence input. The MVP has no such source, so presence is always empty
+  // here and is never derived from Ticket YAML, Git-native states, dirty
+  // files, or timestamps.
+  const ACTIVE_RUN_PRESENCE = Object.freeze([]);
+  const PRESENCE_EMPTY_MESSAGE =
+    "No Active Run can be proven right now.";
+  const PRESENCE_EMPTY_DETAIL =
+    "The READY frontier remains available.";
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
   const TICKET_STATES = new Set([
@@ -36,11 +47,26 @@
 
   const elements = {
     projectName: document.querySelector("#projectName"),
+    repoBranch: document.querySelector("#repoBranch"),
     sourceRef: document.querySelector("#sourceRef"),
     sourceDock: document.querySelector("#sourceDock"),
+    sourceDockPanel: document.querySelector("#sourceDockPanel"),
     sourceDockTitle: document.querySelector("#sourceDockTitle"),
     sourceDockContent: document.querySelector("#sourceDockContent"),
     closeSourceDock: document.querySelector("#closeSourceDock"),
+    implementingList: document.querySelector("#implementingList"),
+    implementingStripBody: document.querySelector("#implementingStripBody"),
+    frontierList: document.querySelector("#frontierList"),
+    frontierCount: document.querySelector("#frontierCount"),
+    summaryReady: document.querySelector("#summaryReady"),
+    summaryBlocked: document.querySelector("#summaryBlocked"),
+    summaryDone: document.querySelector("#summaryDone"),
+    summaryDeviated: document.querySelector("#summaryDeviated"),
+    sourcePath: document.querySelector("#sourcePath"),
+    sourceBranch: document.querySelector("#sourceBranch"),
+    sourceCommit: document.querySelector("#sourceCommit"),
+    sourceDirty: document.querySelector("#sourceDirty"),
+    sourceDirtyDot: document.querySelector("#sourceDirtyDot"),
     graphSummary: document.querySelector("#graphSummary"),
     graphSignal: document.querySelector("#graphSignal"),
     graphSignalCount: document.querySelector("#graphSignalCount"),
@@ -132,7 +158,10 @@
       subjectRequest += 1;
       state = nextState;
       selected = null;
-      positions = layoutGraph(state.graph.tickets, state.graph.relations);
+      positions = layoutGraphTopToBottom(
+        state.graph.tickets,
+        state.graph.relations,
+      );
       renderChrome();
       renderGraph();
       renderMinimap();
@@ -167,20 +196,12 @@
     const { source } = graph;
     const counts = operationalCounts(graph.tickets);
     const deviatedCount = counts.DEVIATED;
-    const commit = source.resolvedCommit
-      ? source.resolvedCommit.slice(0, 8)
-      : "unborn";
-    const worktree = worktreeBasename(source.worktreeRoot);
     elements.projectName.textContent = project.name;
-    elements.sourceRef.textContent =
-      `${worktree} · ${project.branch}@${commit}`;
-    elements.sourceRef.title =
-      `${source.worktreeRoot}\nWorktree ${source.worktreeIdentity}\nInspect exact source`;
-    elements.sourceRef.setAttribute(
-      "aria-label",
-      `Worktree ${worktree}. Inspect exact Git source.`,
-    );
+    elements.repoBranch.textContent = project.branch;
     renderSourceDock();
+    renderImplementingNow();
+    renderFrontier();
+    renderSummaryCounts(counts);
     elements.graphSummary.textContent = graphSummary(counts);
     elements.graphSignalCount.textContent =
       `${graph.tickets.length} Ticket${graph.tickets.length === 1 ? "" : "s"}`
@@ -200,6 +221,78 @@
         : "Exact Git source";
     elements.emptyState.hidden = graph.tickets.length !== 0;
     elements.minimap.hidden = graph.tickets.length === 0;
+  }
+
+  function renderImplementingNow() {
+    // Renders exclusively from ACTIVE_RUN_PRESENCE — the only permitted input
+    // for this surface. The MVP has no trusted presence source, so both the
+    // strip and the rail list always show the explicit honest empty state.
+    // Git-native READY/BLOCKED/DONE/DEVIATED/REFINE, Ticket YAML, dirty
+    // files, and timestamps are never consulted and never promoted to
+    // IMPLEMENTING here.
+    if (ACTIVE_RUN_PRESENCE.length > 0) {
+      throw new Error(
+        "Active-Run presence rendering requires a trusted presence contract "
+        + "that does not exist yet.",
+      );
+    }
+    const strip = document.createElement("p");
+    strip.className = "presence-empty";
+    const primary = document.createElement("strong");
+    primary.textContent = PRESENCE_EMPTY_MESSAGE;
+    const detail = document.createElement("span");
+    detail.textContent = PRESENCE_EMPTY_DETAIL;
+    strip.append(primary, detail);
+    elements.implementingStripBody.replaceChildren(strip);
+    const railEmpty = document.createElement("p");
+    railEmpty.className = "presence-empty compact";
+    railEmpty.textContent =
+      `${PRESENCE_EMPTY_MESSAGE} ${PRESENCE_EMPTY_DETAIL}`;
+    elements.implementingList.replaceChildren(railEmpty);
+  }
+
+  function renderFrontier() {
+    const ready = state.graph.tickets.filter(
+      (ticket) => ticketOperationalState(ticket)?.label === "READY",
+    );
+    elements.frontierCount.textContent = String(ready.length);
+    if (!ready.length) {
+      const empty = document.createElement("p");
+      empty.className = "rail-empty";
+      empty.textContent = "No Ticket is executable right now.";
+      elements.frontierList.replaceChildren(empty);
+      return;
+    }
+    const items = ready.map((ticket) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "frontier-item";
+      button.title = ticket.ticketId;
+      const marker = document.createElement("span");
+      marker.className = "frontier-marker";
+      marker.setAttribute("aria-hidden", "true");
+      const copy = document.createElement("span");
+      copy.className = "frontier-copy";
+      const name = document.createElement("strong");
+      name.textContent = shortTicketId(ticket.ticketId);
+      const stateName = document.createElement("span");
+      stateName.textContent = "READY";
+      copy.append(name, stateName);
+      button.append(marker, copy);
+      button.addEventListener(
+        "click",
+        () => void selectTicket(ticket.ticketId, true),
+      );
+      return button;
+    });
+    elements.frontierList.replaceChildren(...items);
+  }
+
+  function renderSummaryCounts(counts) {
+    elements.summaryReady.textContent = String(counts.READY);
+    elements.summaryBlocked.textContent = String(counts.BLOCKED);
+    elements.summaryDone.textContent = String(counts.DONE);
+    elements.summaryDeviated.textContent = String(counts.DEVIATED);
   }
 
   function renderGraph() {
@@ -300,20 +393,27 @@
           y: 0,
           width: NODE.width,
           height: NODE.height,
-          rx: 8,
+          rx: 9,
+        }),
+        svg("line", {
+          class: "ticket-accent",
+          x1: 9,
+          y1: 1.5,
+          x2: NODE.width - 9,
+          y2: 1.5,
         }),
         svg("circle", {
           class: "ticket-aperture",
-          cx: NODE.width,
-          cy: NODE.height / 2,
-          r: 7,
+          cx: NODE.width / 2,
+          cy: NODE.height,
+          r: 6,
         }),
         svg("line", {
           class: "ticket-proof",
-          x1: 8,
-          y1: NODE.height - 1,
-          x2: NODE.width - 8,
-          y2: NODE.height - 1,
+          x1: 9,
+          y1: NODE.height - 1.5,
+          x2: NODE.width - 9,
+          y2: NODE.height - 1.5,
         }),
       );
       if (attention) {
@@ -330,9 +430,20 @@
         attentionLabel.textContent = `${attention.humanEvidenceCount}/${attention.humanAcceptanceCount} human`;
         group.append(attentionLabel);
       }
-      const id = svg("text", { class: "ticket-id", x: 14, y: 20 });
+      const id = svg("text", { class: "ticket-id", x: 14, y: 22 });
       id.textContent = shortTicketId(ticket.ticketId);
       group.append(id);
+      // The state is always a textual label; color is a secondary accent.
+      if (operational) {
+        const status = svg("text", {
+          class: "ticket-state",
+          x: NODE.width - 14,
+          y: 22,
+          "text-anchor": "end",
+        });
+        status.textContent = operational.label;
+        group.append(status);
+      }
       wrap(ticket.outcome, 34, 3).forEach((line, index) => {
         const text = svg("text", {
           class: "ticket-outcome",
@@ -351,16 +462,6 @@
         `${ticket.relationCounts.prerequisites} in · `
         + `${ticket.relationCounts.dependents} out`;
       group.append(meta);
-      if (operational) {
-        const status = svg("text", {
-          class: "ticket-state",
-          x: NODE.width - 14,
-          y: NODE.height - 10,
-          "text-anchor": "end",
-        });
-        status.textContent = operational.label;
-        group.append(status);
-      }
       group.addEventListener("click", (event) => {
         event.stopPropagation();
         void selectTicket(ticket.ticketId);
@@ -388,11 +489,11 @@
       const to = positions.get(relation.dependentTicketId);
       if (!from || !to) continue;
       elements.minimap.append(svg("line", {
-        x1: from.x + NODE.width,
-        y1: from.y + NODE.height / 2,
-        x2: to.x,
-        y2: to.y + NODE.height / 2,
-        stroke: "#a2a8ac",
+        x1: from.x + NODE.width / 2,
+        y1: from.y + NODE.height,
+        x2: to.x + NODE.width / 2,
+        y2: to.y,
+        stroke: "#9aa59f",
         "stroke-width": 4,
       }));
     }
@@ -1028,7 +1129,7 @@
       label: "Copy for Agent",
       className: "agent-handoff",
       onClick: () => void copyPayload(
-        contextPackage.agentPayload,
+        agentHandoffPayload(ticket, contextPackage, operational),
         `Ticket ${ticket.ticketId} copied for Agent`,
       ),
     });
@@ -1101,6 +1202,26 @@
     count.textContent = `${attention.humanEvidenceCount} / ${attention.humanAcceptanceCount}`;
     brief.append(marker, copy, count);
     return brief;
+  }
+
+  function agentHandoffPayload(ticket, contextPackage, operational) {
+    // READY is the only Git-native state that may hand an Agent a new
+    // ticket-run instruction. Every other state copies an inspect
+    // instruction so an Agent never starts work the graph does not allow.
+    const stateLabel = operational?.label || "UNPROJECTED";
+    const instruction = stateLabel === "READY"
+      ? `Execute the READY VibeHub Ticket ${ticket.ticketId} in this exact `
+        + "worktree with the Skill vibehub-ticket-run."
+      : `Inspect VibeHub Ticket ${ticket.ticketId} (currently ${stateLabel}) `
+        + "with the Skill vibehub-ticket-review. It is not READY, so do not "
+        + "start vibehub-ticket-run for it.";
+    return {
+      instruction,
+      ...(contextPackage.agentPayload ?? {
+        kind: "vibehub_ticket_handoff",
+        ticketId: ticket.ticketId,
+      }),
+    };
   }
 
   function signalMetric(value, label, extraClass = "") {
@@ -2098,7 +2219,7 @@
     }).format(date);
   }
 
-  function layoutGraph(tickets, relations) {
+  function layoutGraphTopToBottom(tickets, relations) {
     const ids = tickets.map((ticket) => ticket.ticketId).sort();
     const outgoing = new Map(ids.map((id) => [id, []]));
     const incoming = new Map(ids.map((id) => [id, []]));
@@ -2172,16 +2293,26 @@
         });
       }
     }
+    // Layers stack downward: rank 0 (proven foundations) is the top row and
+    // each dependent rank renders beneath its prerequisites. Rows are centered
+    // against the widest rank so the flow reads as one vertical spine.
+    const rowWidth = (count) =>
+      count * NODE.width + (count - 1) * LAYOUT.columnGap;
+    const widest = Math.max(
+      1,
+      ...orderedLayers.map(([, layer]) => layer.length),
+    );
     const result = new Map();
-    for (const [layerIndex, layer] of orderedLayers) {
-      layer.forEach((id, row) => {
+    orderedLayers.forEach(([, layer], rowIndex) => {
+      const inset = (rowWidth(widest) - rowWidth(layer.length)) / 2;
+      layer.forEach((id, column) => {
         result.set(id, {
-          x: LAYOUT.marginX
-            + layerIndex * (NODE.width + LAYOUT.columnGap),
-          y: LAYOUT.marginY + row * (NODE.height + LAYOUT.rowGap),
+          x: LAYOUT.marginX + inset
+            + column * (NODE.width + LAYOUT.columnGap),
+          y: LAYOUT.marginY + rowIndex * (NODE.height + LAYOUT.rowGap),
         });
       });
-    }
+    });
     return result;
   }
 
@@ -2221,36 +2352,38 @@
   }
 
   function edgeGeometry(from, to, relationRef, ports = {}) {
-    const x1 = from.x + NODE.width + 7;
-    const y1 = from.y + NODE.height / 2;
-    const x2 = to.x - 2;
-    const y2 = to.y + NODE.height / 2;
+    // Top-to-bottom flow: an unlock leaves the bottom aperture of its
+    // prerequisite and enters the top edge of the dependent Ticket.
+    const x1 = from.x + NODE.width / 2;
+    const y1 = from.y + NODE.height + 7;
+    const x2 = to.x + NODE.width / 2 + (ports.target || 0);
+    const y2 = to.y - 2;
     const arrow =
-      `M ${x2 - 7} ${y2 - 3.5} L ${x2} ${y2} `
-      + `L ${x2 - 7} ${y2 + 3.5} Z`;
-    const handleX = clamp(
-      x2 - 30 - (ports.target || 0),
-      x1 + 18,
-      x2 - 12,
+      `M ${x2 - 3.5} ${y2 - 7} L ${x2} ${y2} `
+      + `L ${x2 + 3.5} ${y2 - 7} Z`;
+    const handleY = clamp(
+      y2 - 26,
+      y1 + 14,
+      y2 - 12,
     );
-    if (Math.abs(y2 - y1) < 1) {
+    if (Math.abs(x2 - x1) < 1) {
       return {
-        path: `M ${x1} ${y1} H ${x2}`,
+        path: `M ${x1} ${y1} V ${y2}`,
         arrow,
-        handle: { x: handleX, y: y1 },
+        handle: { x: x1, y: handleY },
       };
     }
     const lane = stableLane(relationRef);
     const ratio = 0.5 + lane * 0.035;
     const mid = clamp(
-      x1 + (x2 - x1) * ratio,
-      x1 + 34,
-      x2 - 28,
+      y1 + (y2 - y1) * ratio,
+      y1 + 22,
+      y2 - 20,
     );
     return {
-      path: `M ${x1} ${y1} H ${mid} V ${y2} H ${x2}`,
+      path: `M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`,
       arrow,
-      handle: { x: Math.max(mid + 10, handleX), y: y2 },
+      handle: { x: x2, y: Math.max(mid + 10, handleY) },
     };
   }
 
@@ -2310,11 +2443,13 @@
       (height - padding * 2) / bounds.height,
     );
     scale = clamp(Math.max(fitScale, 0.64), MIN_SCALE, 1);
-    panX = bounds.width * scale <= width - padding * 2
-      ? (width - bounds.width * scale) / 2 - bounds.x * scale
-      : padding - bounds.x * scale;
-    panY =
-      (height - bounds.height * scale) / 2 - bounds.y * scale;
+    panX =
+      (width - bounds.width * scale) / 2 - bounds.x * scale;
+    // A tall causal flow anchors its proven foundations at the top instead of
+    // centering the middle of the graph.
+    panY = bounds.height * scale <= height - padding * 2
+      ? (height - bounds.height * scale) / 2 - bounds.y * scale
+      : padding - bounds.y * scale;
     applyTransform();
   }
 
@@ -2463,14 +2598,18 @@
       closeInspector();
       return;
     }
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    // Vertical causality: Up walks to a prerequisite above, Down walks to a
+    // dependent below. Left/Right stay as aliases for the same directions.
+    const upstream = event.key === "ArrowUp" || event.key === "ArrowLeft";
+    const downstream = event.key === "ArrowDown" || event.key === "ArrowRight";
+    if (!upstream && !downstream) return;
     event.preventDefault();
     const relation = state.graph.relations.find((item) =>
-      event.key === "ArrowLeft"
+      upstream
         ? item.dependentTicketId === ticketId
         : item.prerequisiteTicketId === ticketId,
     );
-    const target = event.key === "ArrowLeft"
+    const target = upstream
       ? relation?.prerequisiteTicketId
       : relation?.dependentTicketId;
     if (!target) return;
@@ -2519,6 +2658,19 @@
   function renderSourceDock() {
     if (!state || !elements.sourceDockContent) return;
     const source = state.graph.source;
+    elements.sourcePath.textContent = source.worktreeRoot;
+    elements.sourcePath.title = source.worktreeRoot;
+    elements.sourceBranch.textContent = source.branch || "detached";
+    elements.sourceCommit.textContent = source.resolvedCommit
+      ? source.resolvedCommit.slice(0, 10)
+      : "unborn HEAD";
+    elements.sourceCommit.title = source.resolvedCommit || "unborn HEAD";
+    elements.sourceDirty.textContent = source.semanticDirty
+      ? `${dirtyPathCount(source)} local change`
+        + `${source.dirtyPaths.length === 1 && !source.dirtyPathsTruncated ? "" : "s"}`
+      : "Clean";
+    elements.sourceDirtyDot.className =
+      `source-state-dot${source.semanticDirty ? " dirty" : ""}`;
     elements.sourceDockTitle.textContent =
       `${worktreeBasename(source.worktreeRoot)} · ${state.project.branch}`;
     const content = document.createDocumentFragment();
@@ -2748,14 +2900,14 @@
   });
   elements.sourceRef.addEventListener("click", () => {
     if (!state) return;
-    elements.sourceDock.hidden = !elements.sourceDock.hidden;
+    elements.sourceDockPanel.hidden = !elements.sourceDockPanel.hidden;
     elements.sourceRef.setAttribute(
       "aria-expanded",
-      String(!elements.sourceDock.hidden),
+      String(!elements.sourceDockPanel.hidden),
     );
   });
   elements.closeSourceDock.addEventListener("click", () => {
-    elements.sourceDock.hidden = true;
+    elements.sourceDockPanel.hidden = true;
     elements.sourceRef.setAttribute("aria-expanded", "false");
     elements.sourceRef.focus();
   });

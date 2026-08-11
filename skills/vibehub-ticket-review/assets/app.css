@@ -1,31 +1,41 @@
 :root {
-  --page: #e6e7e5;
-  --canvas: #f1f2f0;
-  --surface: #f8f8f6;
-  --surface-solid: #fafaf8;
-  --node: #fbfbfa;
+  /* A · Quiet Workbench — cool neutral surfaces, system typography,
+     restrained elevation, semantic color only. */
+  --canvas: #eef0ef;
+  --page: #eef0ef;
+  --surface: #f8f9f8;
+  --surface-solid: #ffffff;
+  --surface-muted: #f1f3f2;
+  --rail-bg: #f5f7f5;
+  --node: #ffffff;
   --node-hover: #ffffff;
-  --ink: #202124;
-  --muted: #5f6368;
-  --quiet: #777b81;
-  --faint: #a4a8ad;
-  --line: rgba(24, 27, 31, 0.095);
-  --line-strong: rgba(24, 27, 31, 0.19);
-  --edge: #a2a8ac;
-  --edge-active: #60656a;
-  --ready: #56725c;
-  --blocked: #7d8287;
-  --done: #56725c;
-  --deviated: #a64d57;
-  --deviated-soft: #faf1f2;
-  --attention: #98671f;
-  --attention-soft: #faf6ed;
-  --focus: #657aa5;
-  --vibe-wash: #edf1f3;
-  --vibe-line: #d7dde1;
-  --vibe-ink: #536673;
-  --shadow: 0 18px 50px rgba(25, 27, 30, 0.13), 0 2px 6px rgba(25, 27, 30, 0.05);
-  --shadow-float: 0 10px 28px rgba(25, 27, 30, 0.09);
+  --ink: #17201c;
+  --muted: #53605a;
+  --quiet: #66716b;
+  --faint: #7b8680;
+  --line: #d9ddda;
+  --line-strong: #bcc4bf;
+  --edge: #9aa59f;
+  --edge-active: #5c6a62;
+  --selection: #283a32;
+  --ready: #087f8c;
+  --ready-soft: #e2f4f5;
+  --done: #3f7d5d;
+  --done-soft: #e6f1ea;
+  --blocked: #a56b13;
+  --blocked-soft: #f7eddc;
+  --deviated: #b24a4a;
+  --deviated-soft: #f8e7e7;
+  --active: #315f9c;
+  --active-soft: #e7eef8;
+  --attention: #a56b13;
+  --attention-soft: #f7eddc;
+  --focus: #087f8c;
+  --vibe-wash: #e9eef5;
+  --vibe-line: #ccd8e6;
+  --vibe-ink: #44607f;
+  --shadow: 0 18px 44px rgba(29, 42, 35, 0.12), 0 2px 8px rgba(29, 42, 35, 0.07);
+  --shadow-float: 0 8px 20px rgba(29, 42, 35, 0.08);
   --ui: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", sans-serif;
   --mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, "Cascadia Mono", monospace;
 }
@@ -48,7 +58,7 @@ body {
 body {
   overflow: hidden;
   color: var(--ink);
-  background: var(--page);
+  background: var(--canvas);
   font: 13px/1.5 var(--ui);
   letter-spacing: -0.006em;
   -webkit-font-smoothing: antialiased;
@@ -71,273 +81,119 @@ textarea:focus-visible,
 select:focus-visible,
 input:focus-visible,
 summary:focus-visible {
-  outline: 2px solid rgba(101, 122, 165, 0.62);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 
 .app-shell {
   display: grid;
-  grid-template-rows: 48px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100%;
   height: 100%;
-  padding: 8px;
-  background: var(--page);
+  background: var(--canvas);
 }
 
-.app-bar {
+/* Titlebar: repository identity plus refresh and link actions. */
+
+.titlebar {
   position: relative;
   z-index: 10;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: center;
-  min-width: 0;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-bottom: 0;
-  border-radius: 10px 10px 0 0;
-  background: rgba(248, 248, 246, 0.96);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.72) inset;
+  min-height: 52px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(248, 249, 248, 0.96);
 }
 
-.source-line {
+.repo-identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+}
+
+.wordmark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: #ffffff;
+  background: #20332b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.repo-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.eyebrow {
+  display: block;
+  color: var(--faint);
+  font: 600 9px/1.3 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.repo-title {
   display: flex;
   min-width: 0;
   align-items: baseline;
-  gap: 8px;
+  gap: 7px;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.wordmark,
-.source-line strong {
-  flex: 0 0 auto;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: -0.012em;
-}
-
-.source-line strong {
+.repo-title strong {
   overflow: hidden;
-  max-width: 34vw;
-  text-overflow: ellipsis;
-}
-
-.source-separator {
-  color: var(--faint);
-}
-
-.source-ref {
-  min-width: 0;
-  overflow: hidden;
-  padding: 2px 4px;
-  border: 0;
-  border-radius: 4px;
-  color: var(--quiet);
-  background: transparent;
-  cursor: pointer;
-  font: 9px/1.35 var(--mono);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.source-ref[aria-expanded="true"] {
-  color: var(--vibe-ink);
-  background: var(--vibe-wash);
-}
-
-.source-dock {
-  position: absolute;
-  top: 43px;
-  left: 10px;
-  z-index: 20;
-  width: min(390px, calc(100vw - 36px));
-  overflow: hidden;
-  padding: 15px;
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
-  background: rgba(250, 250, 248, 0.98);
-  box-shadow: var(--shadow-float);
-  backdrop-filter: blur(18px);
-}
-
-.source-dock-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  gap: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--line);
-}
-
-.source-dock-head > div,
-.source-dock-summary > div {
-  display: grid;
-  gap: 2px;
-}
-
-.source-dock-head strong {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  text-overflow: ellipsis;
 }
 
-.source-dock-summary {
-  display: grid;
-  grid-template-columns: 9px minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
-  padding: 14px 0 12px;
+.repo-branch {
+  overflow: hidden;
+  color: var(--faint);
+  font: 10px/1.4 var(--mono);
+  text-overflow: ellipsis;
 }
 
-.source-dock-summary strong {
-  font-size: 10px;
-  font-weight: 600;
-}
-
-.source-dock-summary span {
-  color: var(--quiet);
-  font: 9px/1.5 var(--mono);
-}
-
-.source-dock-mark {
-  width: 8px;
-  height: 8px;
-  margin-top: 3px;
-  border: 1px solid var(--ready);
-  border-radius: 3px;
-  background: var(--ready);
-}
-
-.source-dock-mark.dirty {
-  border-color: var(--attention);
-  background: var(--attention-soft);
-}
-
-.source-dock-actions,
-.object-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-
-.source-dock-actions {
-  padding-bottom: 12px;
-}
-
-.mechanical-link,
-.object-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--line);
-  color: var(--quiet);
-  background: rgba(255, 255, 255, 0.58);
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.mechanical-link,
-.object-action {
-  min-height: 27px;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 9px;
-  line-height: 1.25;
-}
-
-.object-action svg {
-  width: 13px;
-  height: 13px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.25;
-}
-
-.mechanical-link:hover,
-.object-action:hover {
-  color: var(--ink);
-  border-color: var(--line-strong);
-  background: var(--surface-solid);
-}
-
-.agent-handoff {
-  color: var(--vibe-ink);
-  border-color: var(--vibe-line);
-  background: var(--vibe-wash);
-  font-weight: 500;
-}
-
-.agent-handoff.compact {
-  min-height: 25px;
-  padding-block: 3px;
-}
-
-.source-ref:hover {
-  color: var(--ink);
-  background: #eeeeec;
-}
-
-.graph-tools {
+.title-actions {
   display: flex;
   align-items: center;
-  padding: 2px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: #f4f4f2;
-}
-
-.graph-tools button {
-  min-width: 27px;
-  height: 25px;
-  padding: 0 8px;
-  border: 0;
-  border-radius: 5px;
-  color: var(--muted);
-  background: transparent;
-  cursor: pointer;
-  font-size: 11px;
-}
-
-.graph-tools button:hover {
-  color: var(--ink);
-  background: #e8e8e5;
-}
-
-.app-actions {
-  display: flex;
-  justify-self: end;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
+  gap: 7px;
 }
 
 .source-status,
 .copy-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
-  height: 29px;
-  padding: 0 8px;
-  border: 0;
-  border-radius: 6px;
-  color: var(--quiet);
-  background: transparent;
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--surface-solid);
   cursor: pointer;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .source-status:hover,
 .copy-link:hover {
   color: var(--ink);
-  background: #eeeeec;
-}
-
-.copy-link {
-  border: 1px solid var(--line);
-  color: var(--muted);
-  background: #f4f4f2;
+  border-color: var(--line-strong);
 }
 
 .copy-link svg {
@@ -350,50 +206,260 @@ summary:focus-visible {
 }
 
 .state-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--done);
+  box-shadow: 0 0 0 3px var(--done-soft);
 }
 
 .state-dot.dirty {
   background: var(--attention);
+  box-shadow: 0 0 0 3px var(--attention-soft);
 }
 
 .state-dot.deviated,
 .state-dot.error {
   background: var(--deviated);
+  box-shadow: 0 0 0 3px var(--deviated-soft);
 }
+
+/* Workspace: rail, causal canvas, and inspector share one quiet window. */
 
 .workspace {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(420px, 36vw, 480px);
+  grid-template-columns: 232px minmax(0, 1fr) clamp(360px, 31vw, 420px);
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 0 0 10px 10px;
   background: var(--surface);
-  box-shadow: var(--shadow);
 }
 
 .workspace.inspector-closed {
-  grid-template-columns: minmax(0, 1fr) 0;
+  grid-template-columns: 232px minmax(0, 1fr) 0;
+}
+
+/* Rail: honest Implementing-now list, READY frontier, graph summary. */
+
+.rail {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 15px 12px 18px;
+  border-right: 1px solid var(--line);
+  background: var(--rail-bg);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 3px 8px;
+  color: var(--faint);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.section-count {
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--surface-muted);
+  font: 600 9px/1.5 var(--mono);
+  text-align: center;
+}
+
+.rail-divider {
+  height: 1px;
+  margin: 14px 3px;
+  background: var(--line);
+}
+
+.presence-empty {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.62);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.presence-empty strong {
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 640;
+}
+
+.presence-empty span {
+  color: var(--faint);
+}
+
+.presence-empty.compact {
+  color: var(--muted);
+}
+
+.rail-empty {
+  margin: 0 3px;
+  color: var(--faint);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.frontier-list,
+.implementing-list {
+  display: grid;
+  gap: 4px;
+}
+
+.frontier-item {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.frontier-item:hover {
+  border-color: var(--line);
+  background: var(--surface-solid);
+}
+
+.frontier-marker {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ready);
+}
+
+.frontier-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.frontier-copy strong {
+  overflow: hidden;
+  color: var(--ink);
+  font: 500 10px/1.4 var(--mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.frontier-copy span {
+  color: var(--ready);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.summary-cell {
+  display: grid;
+  gap: 1px;
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.summary-value {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.summary-name {
+  color: var(--faint);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Canvas pane: the Implementing-now strip sits above the causal graph. */
+
+.canvas-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.implementing-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  min-height: 54px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  background: #f5f7f6;
+}
+
+.implementing-heading {
+  display: grid;
+  gap: 1px;
+  min-width: 118px;
+}
+
+.implementing-title {
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.implementing-caption {
+  color: var(--faint);
+  font-size: 9px;
+}
+
+.implementing-strip-body {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.implementing-strip-body .presence-empty {
+  grid-auto-flow: column;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 0;
+  padding: 7px 11px;
 }
 
 .canvas {
   position: relative;
+  flex: 1;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
   background-color: var(--canvas);
   background-image:
-    radial-gradient(circle at 18% 14%, rgba(158, 177, 190, 0.2), transparent 33%),
-    radial-gradient(circle at 82% 78%, rgba(196, 183, 164, 0.12), transparent 32%),
-    radial-gradient(circle, rgba(53, 58, 62, 0.12) 0.7px, transparent 0.8px);
-  background-position: center, center, 0 0;
-  background-size: 100% 100%, 100% 100%, 20px 20px;
+    radial-gradient(circle, rgba(74, 92, 82, 0.16) 0.75px, transparent 0.8px);
+  background-size: 18px 18px;
   cursor: grab;
   touch-action: none;
 }
@@ -404,8 +470,8 @@ summary:focus-visible {
 
 .canvas-heading {
   position: absolute;
-  top: 19px;
-  left: 20px;
+  top: 16px;
+  left: 18px;
   z-index: 3;
   pointer-events: none;
 }
@@ -416,22 +482,14 @@ summary:focus-visible {
 }
 
 .canvas-heading strong {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.016em;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.018em;
 }
 
 .canvas-heading #graphSummary {
   color: var(--quiet);
   font-size: 10px;
-}
-
-.eyebrow {
-  display: block;
-  color: var(--quiet);
-  font: 500 9px/1.2 var(--mono);
-  text-transform: uppercase;
-  letter-spacing: 0.075em;
 }
 
 #graph {
@@ -441,47 +499,87 @@ summary:focus-visible {
   overflow: visible;
 }
 
+.graph-tools {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(248, 249, 248, 0.94);
+  box-shadow: 0 1px 2px rgba(29, 42, 35, 0.05);
+}
+
+.graph-tools button {
+  min-width: 30px;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.graph-tools button:hover {
+  color: var(--ink);
+  background: var(--surface-muted);
+}
+
 .canvas-hint {
   position: absolute;
-  bottom: 17px;
-  left: 20px;
+  bottom: 15px;
+  left: 18px;
   z-index: 3;
   color: var(--faint);
-  font: 9px/1.2 var(--mono);
+  font: 9px/1.3 var(--mono);
   pointer-events: none;
 }
 
 .minimap {
   position: absolute;
-  right: 18px;
+  right: 14px;
   bottom: 76px;
   z-index: 4;
-  width: 116px;
-  height: 68px;
+  width: 104px;
+  height: 132px;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: rgba(248, 248, 246, 0.92);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: rgba(249, 250, 249, 0.92);
   box-shadow: var(--shadow-float);
   cursor: crosshair;
 }
 
 .minimap-viewport {
-  fill: rgba(96, 101, 106, 0.06);
-  stroke: rgba(96, 101, 106, 0.72);
+  fill: rgba(40, 58, 50, 0.05);
+  stroke: rgba(40, 58, 50, 0.6);
   stroke-width: 4;
   vector-effect: non-scaling-stroke;
 }
 
 .minimap-node {
   fill: var(--node);
-  stroke: var(--blocked);
+  stroke: var(--line-strong);
 }
 
-.minimap-node.state-ready,
-.minimap-node.state-done {
-  fill: #f2f6f2;
+.minimap-node.state-ready {
   stroke: var(--ready);
+}
+
+.minimap-node.state-done {
+  fill: var(--done-soft);
+  stroke: var(--done);
+}
+
+.minimap-node.state-blocked {
+  stroke: var(--blocked);
 }
 
 .minimap-node.state-deviated {
@@ -495,36 +593,37 @@ summary:focus-visible {
   stroke: var(--attention);
 }
 
-.graph-signal {
+.graph-overview {
   position: absolute;
-  right: 18px;
-  bottom: 16px;
+  right: 14px;
+  bottom: 15px;
   z-index: 5;
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) auto auto;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
   gap: 9px;
   align-items: center;
-  width: 244px;
+  width: 240px;
   min-height: 46px;
   padding: 7px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--muted);
-  background: rgba(248, 248, 246, 0.96);
+  background: rgba(248, 249, 248, 0.96);
   box-shadow: var(--shadow-float);
   cursor: pointer;
   text-align: left;
 }
 
-.graph-signal:hover {
+.graph-overview:hover {
   border-color: var(--line-strong);
   background: var(--surface-solid);
 }
 
 .graph-glyph {
   position: relative;
-  width: 16px;
-  height: 12px;
+  width: 14px;
+  height: 16px;
+  justify-self: center;
 }
 
 .graph-glyph::before,
@@ -536,36 +635,36 @@ summary:focus-visible {
 }
 
 .graph-glyph::before {
-  top: 3px;
-  left: 0;
+  top: 0;
+  left: 4px;
   width: 5px;
   height: 5px;
   border-radius: 2px;
-  box-shadow: 10px 0 0 -1px var(--surface-solid), 10px 0 0 0 var(--quiet);
+  box-shadow: 0 10px 0 -1px var(--surface-solid), 0 10px 0 0 var(--quiet);
 }
 
 .graph-glyph::after {
-  top: 6px;
-  left: 5px;
-  width: 6px;
-  height: 0;
-  border-width: 1px 0 0;
+  top: 5px;
+  left: 7px;
+  width: 0;
+  height: 6px;
+  border-width: 0 0 0 1px;
   background: transparent;
 }
 
-.graph-signal > span:nth-child(2) {
+.graph-overview > span:nth-child(2) {
   display: grid;
   min-width: 0;
   gap: 1px;
 }
 
-.graph-signal strong {
+.graph-overview strong {
   color: var(--ink);
   font-size: 11px;
   font-weight: 600;
 }
 
-.graph-signal small {
+.graph-overview small {
   overflow: hidden;
   color: var(--quiet);
   font-size: 9px;
@@ -582,10 +681,7 @@ summary:focus-visible {
   text-transform: uppercase;
 }
 
-.graph-chevron {
-  color: var(--faint);
-  font-size: 11px;
-}
+/* Ticket nodes: quiet boundaries, one accent line, textual state labels. */
 
 .ticket-node,
 .edge {
@@ -599,28 +695,56 @@ summary:focus-visible {
 }
 
 .ticket-boundary {
-  fill: rgba(251, 251, 250, 0.98);
+  fill: rgba(255, 255, 255, 0.98);
   stroke: var(--line-strong);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
-.ticket-node:hover .ticket-boundary,
-.ticket-node:focus-visible .ticket-boundary,
-.ticket-node.related .ticket-boundary {
-  fill: var(--node-hover);
-  stroke: #777c81;
+.ticket-accent {
+  stroke: var(--line-strong);
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
+.ticket-node.state-ready .ticket-accent {
+  stroke: var(--ready);
+}
+
+.ticket-node.state-done .ticket-accent {
+  stroke: var(--done);
+}
+
+.ticket-node.state-blocked .ticket-accent {
+  stroke: var(--blocked);
+}
+
+.ticket-node.state-deviated .ticket-accent {
+  stroke: var(--deviated);
+}
+
+.ticket-node:hover .ticket-boundary,
+.ticket-node.related .ticket-boundary {
+  fill: var(--node-hover);
+  stroke: #89958e;
+}
+
+.ticket-node:focus-visible .ticket-boundary {
+  stroke: var(--focus);
+  stroke-width: 2;
+}
+
+/* Selection is a neutral outline, never a new state color. */
 .ticket-node.selected .ticket-boundary {
   fill: var(--node-hover);
-  stroke: var(--edge-active);
+  stroke: var(--selection);
   stroke-width: 2;
 }
 
 .ticket-aperture {
   fill: var(--node);
-  stroke: var(--blocked);
+  stroke: var(--line-strong);
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
@@ -633,11 +757,14 @@ summary:focus-visible {
 .ticket-node.state-done .ticket-aperture {
   fill: var(--done);
   stroke: var(--done);
-  box-shadow: inset 0 0 0 2px var(--node);
+}
+
+.ticket-node.state-blocked .ticket-aperture {
+  stroke: var(--blocked);
 }
 
 .ticket-node.state-deviated .ticket-boundary {
-  stroke: rgba(166, 77, 87, 0.72);
+  stroke: rgba(178, 74, 74, 0.6);
 }
 
 .ticket-node.state-deviated .ticket-aperture {
@@ -646,8 +773,7 @@ summary:focus-visible {
 }
 
 .ticket-node.selected .ticket-aperture {
-  fill: var(--edge-active);
-  stroke: var(--edge-active);
+  stroke: var(--selection);
 }
 
 .ticket-attention {
@@ -704,13 +830,20 @@ summary:focus-visible {
 }
 
 .ticket-state {
-  font: 600 8px/1 var(--ui);
-  letter-spacing: 0.04em;
+  font: 700 8px/1 var(--ui);
+  letter-spacing: 0.07em;
 }
 
-.ticket-node.state-ready .ticket-state,
-.ticket-node.state-done .ticket-state {
+.ticket-node .ticket-state {
+  fill: var(--muted);
+}
+
+.ticket-node.state-ready .ticket-state {
   fill: var(--ready);
+}
+
+.ticket-node.state-done .ticket-state {
+  fill: var(--done);
 }
 
 .ticket-node.state-blocked .ticket-state {
@@ -724,6 +857,7 @@ summary:focus-visible {
 .ticket-proof {
   stroke: transparent;
   stroke-width: 2;
+  stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
 
@@ -800,6 +934,8 @@ summary:focus-visible {
   display: none;
 }
 
+/* Inspector: selection keeps the graph visible and discloses progressively. */
+
 .inspector {
   position: relative;
   z-index: 6;
@@ -825,7 +961,7 @@ summary:focus-visible {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 14px;
   align-items: start;
-  padding: 25px 23px 20px;
+  padding: 22px 20px 17px;
   border-bottom: 1px solid var(--line);
   background: var(--surface);
 }
@@ -842,7 +978,7 @@ summary:focus-visible {
   margin: 0;
   color: var(--ink);
   font-size: 17px;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.24;
   letter-spacing: -0.024em;
   overflow-wrap: anywhere;
@@ -866,19 +1002,19 @@ summary:focus-visible {
 
 .icon-button:hover {
   color: var(--ink);
-  background: #eeeeec;
+  background: var(--surface-muted);
 }
 
 .inspector-body {
   min-height: 0;
   overflow: auto;
-  padding: 19px 23px 32px;
-  scrollbar-color: rgba(95, 99, 104, 0.24) transparent;
+  padding: 17px 20px 30px;
+  scrollbar-color: rgba(83, 96, 90, 0.24) transparent;
 }
 
 .outcome {
   margin: 0 0 18px;
-  color: #3f4347;
+  color: #33413a;
   font-size: 12px;
   line-height: 1.62;
 }
@@ -993,7 +1129,7 @@ summary:focus-visible {
   margin-bottom: 23px;
   padding: 3px;
   border-radius: 8px;
-  background: #efefed;
+  background: var(--surface-muted);
 }
 
 .ticket-tab {
@@ -1006,7 +1142,7 @@ summary:focus-visible {
   background: transparent;
   cursor: pointer;
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .ticket-tab:hover {
@@ -1016,7 +1152,7 @@ summary:focus-visible {
 .ticket-tab[aria-selected="true"] {
   color: var(--ink);
   background: var(--surface-solid);
-  box-shadow: 0 1px 2px rgba(25, 27, 30, 0.08);
+  box-shadow: 0 1px 2px rgba(29, 42, 35, 0.08);
 }
 
 .ticket-panel[hidden] {
@@ -1025,9 +1161,9 @@ summary:focus-visible {
 
 .ticket-signal {
   overflow: hidden;
-  border: 1px solid var(--vibe-line);
+  border: 1px solid var(--line-strong);
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--surface-solid), var(--vibe-wash));
+  background: var(--surface-solid);
 }
 
 .ticket-signal-heading {
@@ -1040,8 +1176,8 @@ summary:focus-visible {
 
 .ticket-signal-heading strong {
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 .ticket-signal-heading .agent-handoff {
@@ -1062,35 +1198,29 @@ summary:focus-visible {
 }
 
 .ticket-signal.state-ready,
-.ticket-signal.state-done {
+.ticket-signal.state-ready .ticket-signal-heading {
   color: var(--ready);
 }
 
-.ticket-signal.state-ready .ticket-signal-heading,
+.ticket-signal.state-done,
 .ticket-signal.state-done .ticket-signal-heading {
-  color: var(--ready);
+  color: var(--done);
 }
 
+.ticket-signal.state-blocked,
 .ticket-signal.state-blocked .ticket-signal-heading {
   color: var(--blocked);
 }
 
+.ticket-signal.state-deviated,
 .ticket-signal.state-deviated .ticket-signal-heading {
-  color: var(--deviated);
-}
-
-.ticket-signal.state-blocked {
-  color: var(--blocked);
-}
-
-.ticket-signal.state-deviated {
   color: var(--deviated);
 }
 
 .ticket-signal-metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid rgba(83, 102, 115, 0.12);
+  border-top: 1px solid var(--line);
 }
 
 .ticket-metric {
@@ -1098,7 +1228,7 @@ summary:focus-visible {
   min-width: 0;
   gap: 2px;
   padding: 11px 10px 12px;
-  border-left: 1px solid rgba(83, 102, 115, 0.12);
+  border-left: 1px solid var(--line);
   color: var(--quiet);
 }
 
@@ -1209,7 +1339,7 @@ summary:focus-visible {
   margin: 0;
   color: var(--ink);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 650;
   letter-spacing: -0.012em;
 }
 
@@ -1237,7 +1367,7 @@ summary:focus-visible {
   margin-top: 3px;
   border: 1px solid var(--vibe-ink);
   border-radius: 3px;
-  box-shadow: inset 0 -4px 0 rgba(83, 102, 115, 0.12);
+  box-shadow: inset 0 -4px 0 rgba(68, 96, 127, 0.12);
 }
 
 .contract-brief-copy,
@@ -1257,14 +1387,14 @@ summary:focus-visible {
 .contract-brief-copy > strong {
   color: var(--ink);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.35;
 }
 
 .contract-brief-status {
   min-width: 112px;
   padding-left: 13px;
-  border-left: 1px solid rgba(83, 102, 115, 0.13);
+  border-left: 1px solid rgba(68, 96, 127, 0.13);
   text-align: right;
 }
 
@@ -1344,7 +1474,7 @@ summary:focus-visible {
 .contract-support-mark.kind-context {
   border-color: var(--vibe-ink);
   border-radius: 2px;
-  box-shadow: 2px 2px 0 rgba(83, 102, 115, 0.14);
+  box-shadow: 2px 2px 0 rgba(68, 96, 127, 0.14);
 }
 
 .contract-support-mark.kind-audit {
@@ -1360,7 +1490,7 @@ summary:focus-visible {
 .contract-support-copy strong {
   color: var(--ink);
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.4;
 }
 
@@ -1476,9 +1606,12 @@ summary:focus-visible {
   border-radius: 2px;
 }
 
-.causal-ticket.state-ready,
-.causal-ticket.state-done {
+.causal-ticket.state-ready {
   color: var(--ready);
+}
+
+.causal-ticket.state-done {
+  color: var(--done);
 }
 
 .causal-ticket.state-blocked {
@@ -1530,7 +1663,7 @@ summary:focus-visible {
 
 .causal-ticket:hover {
   color: var(--ink);
-  background: #eeeeec;
+  background: var(--surface-muted);
 }
 
 .causal-empty {
@@ -1580,7 +1713,7 @@ summary:focus-visible {
 .acceptance-item > summary strong {
   color: var(--ink);
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.4;
 }
 
@@ -1629,8 +1762,8 @@ summary:focus-visible {
 }
 
 .acceptance-item.has-evidence .acceptance-marker {
-  border-color: var(--focus);
-  box-shadow: 0 0 0 2px rgba(101, 122, 165, 0.12);
+  border-color: var(--vibe-ink);
+  box-shadow: 0 0 0 2px rgba(68, 96, 127, 0.12);
 }
 
 .acceptance-item.has-human-evidence .acceptance-marker {
@@ -1694,7 +1827,7 @@ summary:focus-visible {
   overflow: hidden;
   border: 1px solid var(--vibe-line);
   border-radius: 8px;
-  background: rgba(237, 241, 243, 0.72);
+  background: rgba(233, 238, 245, 0.62);
 }
 
 .context-object > summary {
@@ -1739,11 +1872,8 @@ summary:focus-visible {
 
 .source-context > .object-actions {
   margin-right: 11px;
-  margin-left: 11px;
-}
-
-.source-context > .object-actions {
   margin-bottom: 11px;
+  margin-left: 11px;
 }
 
 .context-kind {
@@ -1758,7 +1888,7 @@ summary:focus-visible {
   overflow: hidden;
   color: var(--ink);
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.4;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1766,7 +1896,7 @@ summary:focus-visible {
 
 .context-state {
   padding: 2px 5px;
-  border: 1px solid rgba(83, 102, 115, 0.16);
+  border: 1px solid rgba(68, 96, 127, 0.16);
   border-radius: 99px;
   color: var(--quiet);
   font: 7px/1.25 var(--mono);
@@ -1775,7 +1905,7 @@ summary:focus-visible {
 
 .context-room {
   padding: 2px 5px;
-  border: 1px dashed rgba(83, 102, 115, 0.22);
+  border: 1px dashed rgba(68, 96, 127, 0.22);
   border-radius: 99px;
   color: var(--quiet);
   font: 7px/1.25 var(--mono);
@@ -1797,7 +1927,7 @@ summary:focus-visible {
   display: grid;
   gap: 10px;
   padding: 0 11px 12px;
-  border-top: 1px solid rgba(83, 102, 115, 0.1);
+  border-top: 1px solid rgba(68, 96, 127, 0.1);
 }
 
 .context-object-body > p:first-child {
@@ -1827,7 +1957,7 @@ summary:focus-visible {
   display: grid;
   gap: 15px;
   padding-top: 10px;
-  border-top: 1px solid rgba(83, 102, 115, 0.12);
+  border-top: 1px solid rgba(68, 96, 127, 0.12);
 }
 
 .context-ledger-section {
@@ -1843,7 +1973,7 @@ summary:focus-visible {
 .context-ledger-section > div:first-child strong {
   color: var(--ink);
   font-size: 9px;
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .context-ledger-section > div:first-child > span {
@@ -1879,7 +2009,7 @@ summary:focus-visible {
   gap: 9px;
   align-items: start;
   padding: 9px;
-  border: 1px solid rgba(83, 102, 115, 0.11);
+  border: 1px solid rgba(68, 96, 127, 0.11);
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.35);
 }
@@ -1953,7 +2083,7 @@ summary:focus-visible {
   gap: 8px;
   align-items: center;
   padding-top: 9px;
-  border-top: 1px solid rgba(83, 102, 115, 0.1);
+  border-top: 1px solid rgba(68, 96, 127, 0.1);
 }
 
 .context-identity span {
@@ -1983,7 +2113,7 @@ summary:focus-visible {
 .proof-summary strong {
   color: var(--ink);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .proof-summary span {
@@ -2032,9 +2162,12 @@ summary:focus-visible {
   line-height: 1.5;
 }
 
-.execution-state.state-ready,
-.execution-state.state-done {
+.execution-state.state-ready {
   color: var(--ready);
+}
+
+.execution-state.state-done {
+  color: var(--done);
 }
 
 .execution-state.state-blocked {
@@ -2197,10 +2330,10 @@ summary:focus-visible {
 .trace-row.kind-outcome {
   margin-top: 5px;
   padding: 11px 9px 12px 0;
-  border: 1px solid rgba(86, 114, 92, 0.14);
+  border: 1px solid rgba(63, 125, 93, 0.16);
   border-left: 0;
   border-radius: 0 8px 8px 0;
-  background: rgba(86, 114, 92, 0.045);
+  background: rgba(63, 125, 93, 0.05);
 }
 
 .trace-marker {
@@ -2234,7 +2367,7 @@ summary:focus-visible {
   display: block;
   color: var(--ink);
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.45;
 }
 
@@ -2369,8 +2502,8 @@ summary:focus-visible {
 }
 
 .kind-test .reference-kind {
-  color: var(--ready);
-  background: rgba(86, 114, 92, 0.09);
+  color: var(--done);
+  background: var(--done-soft);
 }
 
 .kind-browser .reference-kind,
@@ -2411,6 +2544,59 @@ a.reference-label:hover {
   text-decoration: underline;
 }
 
+.object-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.mechanical-link,
+.object-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 27px;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--quiet);
+  background: rgba(255, 255, 255, 0.58);
+  cursor: pointer;
+  font-size: 9px;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.object-action svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+}
+
+.mechanical-link:hover,
+.object-action:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+  background: var(--surface-solid);
+}
+
+.agent-handoff {
+  color: var(--vibe-ink);
+  border-color: var(--vibe-line);
+  background: var(--vibe-wash);
+  font-weight: 600;
+}
+
+.agent-handoff.compact {
+  min-height: 25px;
+  padding-block: 3px;
+}
+
+/* Empty and loading states stay quiet, never decorative. */
 
 .loading-state,
 .empty-state {
@@ -2422,7 +2608,7 @@ a.reference-label:hover {
   justify-items: center;
   gap: 10px;
   color: var(--quiet);
-  background: rgba(241, 242, 240, 0.88);
+  background: rgba(238, 240, 239, 0.88);
   font: 10px/1.4 var(--mono);
   backdrop-filter: blur(4px);
 }
@@ -2434,7 +2620,7 @@ a.reference-label:hover {
 .empty-state strong {
   color: var(--ink);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .loading-mark,
@@ -2452,19 +2638,177 @@ a.reference-label:hover {
   animation: none;
 }
 
+/* Source dock: the exact Git truth is always visible under the graph. */
+
+.source-dock {
+  position: relative;
+  z-index: 12;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  min-height: 54px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--line);
+  background: var(--rail-bg);
+}
+
+.source-cell {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.source-path-cell {
+  flex: 1 1 220px;
+}
+
+.source-path {
+  overflow: hidden;
+  color: var(--ink);
+  font: 10px/1.4 var(--mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.source-cell .source-value {
+  font: 10px/1.4 var(--mono);
+  font-weight: 500;
+}
+
+.source-state-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--done);
+}
+
+.source-state-dot.dirty {
+  background: var(--attention);
+}
+
+.source-ref {
+  margin-left: auto;
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--quiet);
+  background: var(--surface-solid);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.source-ref:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.source-ref[aria-expanded="true"] {
+  color: var(--vibe-ink);
+  border-color: var(--vibe-line);
+  background: var(--vibe-wash);
+}
+
+.source-dock-panel {
+  position: absolute;
+  right: 12px;
+  bottom: calc(100% + 8px);
+  z-index: 20;
+  width: min(420px, calc(100vw - 32px));
+  overflow: hidden;
+  padding: 15px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(18px);
+}
+
+.source-dock-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.source-dock-head > div,
+.source-dock-summary > div {
+  display: grid;
+  gap: 2px;
+}
+
+.source-dock-head strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.source-dock-summary {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 14px 0 12px;
+}
+
+.source-dock-summary strong {
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.source-dock-summary span {
+  color: var(--quiet);
+  font: 9px/1.5 var(--mono);
+}
+
+.source-dock-mark {
+  width: 8px;
+  height: 8px;
+  margin-top: 3px;
+  border: 1px solid var(--done);
+  border-radius: 3px;
+  background: var(--done);
+}
+
+.source-dock-mark.dirty {
+  border-color: var(--attention);
+  background: var(--attention-soft);
+}
+
+.source-dock-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 12px;
+}
+
 .toast {
   position: fixed;
   bottom: 20px;
   left: 50%;
   z-index: 50;
   max-width: min(440px, calc(100vw - 32px));
-  padding: 8px 11px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: #f6f6f4;
-  background: rgba(32, 33, 36, 0.94);
+  padding: 9px 12px;
+  border: 1px solid #385046;
+  border-radius: 8px;
+  color: #f4f7f5;
+  background: #20332b;
   box-shadow: var(--shadow-float);
-  font-size: 10px;
+  font-size: 11px;
   opacity: 0;
   transform: translate(-50%, 7px);
   pointer-events: none;
@@ -2480,117 +2824,137 @@ a.reference-label:hover {
   to { transform: rotate(360deg); }
 }
 
-@media (max-width: 980px) {
+/* Responsive: 1280 and 1024 keep every control reachable; the rail folds
+   before the graph or the source dock ever do. */
+
+@media (max-width: 1280px) {
   .workspace {
-    grid-template-columns: minmax(0, 1fr) 400px;
+    grid-template-columns: 208px minmax(0, 1fr) clamp(330px, 32vw, 380px);
   }
 
+  .workspace.inspector-closed {
+    grid-template-columns: 208px minmax(0, 1fr) 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .workspace {
+    grid-template-columns: 188px minmax(0, 1fr) 320px;
+  }
+
+  .workspace.inspector-closed {
+    grid-template-columns: 188px minmax(0, 1fr) 0;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 980px) {
   #stateLabel {
     display: none;
   }
 
-  .source-ref {
-    max-width: 170px;
+  .source-status {
+    min-width: 32px;
+    padding: 0;
+  }
+
+  .workspace,
+  .workspace.inspector-closed {
+    grid-template-columns: 176px minmax(0, 1fr) 0;
+  }
+
+  .workspace .inspector {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(400px, 86vw);
+    box-shadow: var(--shadow);
   }
 }
 
 @media (max-width: 720px) {
-  .app-shell {
-    grid-template-rows: 46px minmax(0, 1fr);
+  .titlebar {
+    min-height: 48px;
+    gap: 8px;
+    padding: 7px 10px;
+  }
+
+  .repo-title strong {
+    max-width: 38vw;
+  }
+
+  .source-status,
+  .copy-link {
+    min-width: 44px;
+    min-height: 44px;
     padding: 0;
-  }
-
-  .app-bar {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    gap: 7px;
-    padding: 0 9px;
-    border-width: 0 0 1px;
-    border-radius: 0;
-  }
-
-  .source-line {
-    gap: 5px;
-  }
-
-  .wordmark {
-    font-size: 11px;
-  }
-
-  .source-line strong {
-    display: none;
-    font-size: 10px;
-  }
-
-  .source-separator {
-    display: none;
-  }
-
-  .source-ref {
-    max-width: 30vw;
-  }
-
-  .source-dock {
-    top: 42px;
-    left: 7px;
-  }
-
-  .graph-tools button {
-    min-width: 25px;
-    height: 25px;
-    padding: 0 6px;
-  }
-
-  .source-status {
-    width: 28px;
-    padding: 0;
-    justify-content: center;
   }
 
   .copy-link {
-    width: 28px;
-    padding: 0;
-    justify-content: center;
     font-size: 0;
+    gap: 0;
   }
 
   .workspace,
   .workspace.inspector-closed {
     display: block;
-    border: 0;
-    border-radius: 0;
   }
 
-  .canvas {
-    width: 100%;
+  .rail {
+    display: none;
+  }
+
+  .canvas-pane {
     height: 100%;
   }
 
+  .implementing-strip {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    min-height: 0;
+    padding: 8px 10px;
+  }
+
   .canvas-heading {
-    top: 15px;
-    left: 15px;
+    top: 13px;
+    right: 122px;
+    left: 13px;
   }
 
   .canvas-heading strong {
-    font-size: 14px;
+    font-size: 13px;
+  }
+
+  .graph-tools {
+    top: 10px;
+    right: 10px;
+  }
+
+  .graph-tools button {
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .canvas-hint {
-    bottom: 14px;
-    left: 15px;
-    max-width: calc(100% - 195px);
+    display: none;
   }
 
   .minimap {
-    right: 13px;
-    bottom: 70px;
-    width: 96px;
-    height: 58px;
+    right: 11px;
+    bottom: 72px;
+    width: 84px;
+    height: 106px;
   }
 
-  .graph-signal {
-    right: 13px;
-    bottom: 12px;
+  .graph-overview {
+    right: 11px;
+    bottom: 13px;
     width: 178px;
+    min-height: 46px;
   }
 
   .graph-source {
@@ -2611,16 +2975,29 @@ a.reference-label:hover {
     pointer-events: none;
   }
 
+  .workspace .inspector {
+    width: auto;
+  }
+
   .inspector-head {
-    padding: 21px 18px 17px;
+    padding: 19px 16px 15px;
   }
 
   .inspector h1 {
     font-size: 18px;
   }
 
+  .icon-button {
+    width: 44px;
+    height: 44px;
+  }
+
   .inspector-body {
-    padding: 17px 18px 28px;
+    padding: 15px 16px 28px;
+  }
+
+  .ticket-tab {
+    height: 44px;
   }
 
   .context-grid {
@@ -2635,6 +3012,16 @@ a.reference-label:hover {
     max-width: 150px;
   }
 
+  .agent-handoff,
+  .object-action,
+  .mechanical-link {
+    min-height: 44px;
+  }
+
+  .agent-handoff.compact {
+    min-height: 44px;
+  }
+
   .contract-brief {
     grid-template-columns: 9px minmax(0, 1fr);
   }
@@ -2643,13 +3030,27 @@ a.reference-label:hover {
     grid-column: 2;
     min-width: 0;
     padding: 8px 0 0;
-    border-top: 1px solid rgba(83, 102, 115, 0.13);
+    border-top: 1px solid rgba(68, 96, 127, 0.13);
     border-left: 0;
     text-align: left;
   }
 
   .contract-support-body {
     padding-left: 0;
+  }
+
+  .source-dock {
+    gap: 8px 16px;
+    padding: 8px 10px 10px;
+  }
+
+  .source-path-cell {
+    flex: 1 1 100%;
+  }
+
+  .source-ref {
+    min-height: 44px;
+    padding: 4px 14px;
   }
 }
 
