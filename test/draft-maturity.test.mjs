@@ -13,22 +13,28 @@ function statusOf(repo, id) {
   return result.envelope.data.status;
 }
 
-test("maturity accepts only draft and existing tickets stay valid", () => {
+test("maturity accepts explicit firm and draft while omission stays compatible", () => {
   const repo = tempRepo("draft-schema");
   assert.equal(run(repo, "project", "init").status, 0);
-  assert.equal(run(repo, "ticket", "apply", { tickets: [draft("sketch")] }).status, 0);
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [draft("sketch"), { ...ticket("explicit-firm"), maturity: "firm" }, ticket("legacy-firm")],
+  }).status, 0);
+  assert.equal(statusOf(repo, "explicit-firm"), "READY");
+  assert.equal(statusOf(repo, "legacy-firm"), "READY");
 
-  const invalid = run(repo, "ticket", "apply", { tickets: [{ ...ticket("bad"), maturity: "firm" }] });
+  const invalid = run(repo, "ticket", "apply", { tickets: [{ ...ticket("bad"), maturity: "fuzzy" }] });
   assert.notEqual(invalid.status, 0);
-  assert.match(JSON.stringify(invalid.envelope.error.details), /must equal draft when present/);
+  assert.match(JSON.stringify(invalid.envelope.error.details), /must equal firm or draft when present/);
 });
 
-test("an unblocked draft surfaces as REFINE, never READY, and firms up in place", () => {
+test("a draft behind a human blocker surfaces as REFINE, never READY, and firms up in place", () => {
   const repo = tempRepo("draft-chain");
   assert.equal(run(repo, "project", "init").status, 0);
+  const blocker = ticket("blocker");
+  blocker.acceptance[0].authority = "human";
   assert.equal(run(repo, "ticket", "apply", {
     tickets: [
-      ticket("blocker"),
+      blocker,
       draft("frontend", ["blocker"]),
       draft("e2e", ["frontend"]),
     ],
@@ -45,6 +51,7 @@ test("an unblocked draft surfaces as REFINE, never READY, and firms up in place"
     acceptance_ids: ["works"],
     summary: "The blocker behavior was observed.",
     refs: ["test:draft-chain"],
+    origin: "human",
     recorded_at: "2026-08-04T00:00:00.000Z",
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
@@ -69,7 +76,7 @@ test("an unblocked draft surfaces as REFINE, never READY, and firms up in place"
     "a draft must never enter the READY frontier",
   );
 
-  const firmed = ticket("frontend", ["blocker"]);
+  const firmed = { ...ticket("frontend", ["blocker"]), maturity: "firm" };
   firmed.acceptance = [{ acceptance_id: "interaction-approved", criterion: "The approved interaction design is implemented." }];
   assert.equal(run(repo, "ticket", "apply", { tickets: [firmed] }).status, 0);
   assert.equal(statusOf(repo, "frontend"), "READY");
@@ -87,6 +94,6 @@ test("the projection reports REFINE honestly instead of the READY wording", () =
   const node = snapshot.state.graph.tickets.find((item) => item.ticketId === "sketch");
   assert.ok(node, JSON.stringify(snapshot.state.graph.tickets.map((item) => item.ticketId)));
   assert.equal(node.capabilities.operational.summary.label, "REFINE");
-  assert.match(node.capabilities.operational.summary.detail, /planning must rewrite its acceptance/);
+  assert.match(node.capabilities.operational.summary.detail, /maturity set to firm before execution/);
   assert.doesNotMatch(node.capabilities.operational.summary.detail, /prevents execution/);
 });

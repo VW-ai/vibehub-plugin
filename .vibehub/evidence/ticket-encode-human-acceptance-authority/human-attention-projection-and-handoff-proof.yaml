@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "ui-projects-human-attention-mechanically",
+    "human-attention-state-is-honest",
+    "agent-handoff-names-the-boundary"
+  ],
+  "evidence_id": "human-attention-projection-and-handoff-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T08:48:21Z",
+  "refs": [
+    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/assets/app.css",
+    "test/ui-host.test.mjs",
+    ".vibehub/tickets/ticket-rooms-into-workbench.yaml",
+    "browser:2026-08-09-human-attention-desktop-contract-and-390px-qa"
+  ],
+  "schema_version": 1,
+  "summary": "The read-only projection now derives Human attention only from canonical authority and Evidence origin, exposing criterion counts plus UPCOMING, PENDING, RECORDED, and COMPLETE without parsing prose. Operational READY/BLOCKED/DONE/DEVIATED remains separate. Ticket nodes use a restrained diamond and recorded/total count; Execution shows the exact attention state; Contract marks each Human criterion and distinguishes pending, human Evidence recorded, independently verified, and unresolved states. Copy-for-Agent payloads include exact humanBoundaries with acceptance ID, criterion, and Evidence state. Automated host tests cover all four states and human-origin trace projection. Real in-app browser QA confirmed the live Rooms Ticket at PENDING on desktop and 390px narrow layout with no horizontal overflow or console errors.",
+  "ticket_id": "ticket-encode-human-acceptance-authority"
+}

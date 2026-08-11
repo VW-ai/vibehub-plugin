@@ -1,0 +1,88 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "current-plugin-loop-inventoried",
+      "criterion": "The current installed Plugin journey is mapped from entry and setup through Ticket planning, execution, Evidence, independent Outcome, and review, with concrete repository references and the most consequential user-facing friction or missing transitions identified."
+    },
+    {
+      "acceptance_id": "open-graph-reconciled",
+      "criterion": "Every existing non-DONE Ticket is judged against the near-term solo/small-team Plugin wedge and classified as do next, do later, refine from evidence, or defer, with a concise rationale and no silent duplication."
+    },
+    {
+      "acceptance_id": "observed-and-speculative-gaps-separated",
+      "criterion": "Candidate improvements clearly distinguish gaps supported by current code, README promises, prior Evidence/Outcomes, or demonstrated dogfood friction from attractive but speculative future capabilities."
+    },
+    {
+      "acceptance_id": "candidates-ranked",
+      "criterion": "Three to five bounded Plugin improvement candidates are ranked using explicit dimensions covering immediate user value, repeated-use leverage, strategic fit, implementation size or risk, and strength of evidence."
+    },
+    {
+      "acceptance_id": "next-slice-recommended",
+      "criterion": "One smallest next implementation slice is recommended with a concrete outcome, proposed acceptance boundaries, major constraints, expected user-visible change, and an explicit explanation of why the other candidates should not precede it."
+    },
+    {
+      "acceptance_id": "hosted-service-deferred-cleanly",
+      "criterion": "The report records only Plugin seams whose validation may later inform a private hosted Context and Ticket service; storage, accounts, synchronization, Cloud architecture, and deployment remain outside this Ticket and are not smuggled into the recommendation."
+    }
+  ],
+  "constraints": [
+    "This is a read-only product and implementation audit except for VibeHub Ticket, Evidence, and Outcome artifacts; it does not implement a Plugin feature.",
+    "Do not recommend Linear parity, organization-scale roadmap tooling, or broad collaboration infrastructure merely because those capabilities exist elsewhere.",
+    "Prefer the smallest repeated-use loop improvement demonstrated by repository evidence over a large architectural platform or speculative connector surface.",
+    "Preserve the lightweight Skill-first, Git-native, dependency-free Plugin boundary unless the audit proves a concrete current failure that requires changing it.",
+    "Treat existing READY Tickets as real candidates and existing REFINE Tickets as directions requiring evidence, not as an automatic roadmap.",
+    "Do not create or refine the private hosted service Ticket in this deliverable."
+  ],
+  "context": "The owner has separated the product horizon into two stages. First, improve the current lightweight Plugin for personal and small-team coordination; later, evaluate a private centralized Context and Ticket service whose storage and service may be hosted while local tokens and language models perform computation. This Ticket researches only the first stage. The repository has 22 successful Outcomes, two READY Tickets (human acceptance authority and Rooms in Workbench), and two REFINE directions (cross-repository actions and a CLI evaluation). The recent person-centered product decisions make Ticket interaction, project-aware Context, replaceable-Agent coordination, human attention boundaries, and Evidence-backed completion the strategic kernel. The audit must test current reality rather than infer a roadmap from vision or imitate Linear feature breadth.",
+  "context_refs": [
+    {
+      "purpose": "Current public one-line entry, Plugin promise, and user-facing development cycle.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Current lightweight Ticket lifecycle, document model, and intentional product boundary.",
+      "ref": "docs/CONCEPT.md"
+    },
+    {
+      "purpose": "Near-term market and product wedge governing candidate selection.",
+      "ref": ".vibehub/rooms/product/decision-plugin-wedge-solo-small-team-coordination.yaml"
+    },
+    {
+      "purpose": "Long-term Ticket and attention model that near-term improvements should exercise without implementing the consumer service.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "purpose": "Project-aware reusable Context direction whose smallest Plugin precursor may be evaluated.",
+      "ref": ".vibehub/rooms/product/decision-project-playbook-context-guides-tickets.yaml"
+    },
+    {
+      "purpose": "Ticket interaction and Agent control intent that distinguishes the core loop from a chat wrapper.",
+      "ref": ".vibehub/rooms/product/intent-conversational-ticket-control-surface.yaml"
+    },
+    {
+      "purpose": "Existing READY Ticket for explicit human attention boundaries.",
+      "ref": ".vibehub/tickets/ticket-encode-human-acceptance-authority.yaml"
+    },
+    {
+      "purpose": "Existing READY Ticket for Room visibility in the Workbench.",
+      "ref": ".vibehub/tickets/ticket-rooms-into-workbench.yaml"
+    },
+    {
+      "purpose": "Existing REFINE direction for cross-repository and non-software action.",
+      "ref": ".vibehub/tickets/ticket-invisible-git-cross-repo-actions.yaml"
+    },
+    {
+      "purpose": "Existing REFINE direction for helper modularity and command ergonomics.",
+      "ref": ".vibehub/tickets/ticket-vibehub-cli.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "An evidence-backed near-term Plugin direction ranks the smallest high-leverage improvements, reconciles them with the current open Ticket graph, and recommends one bounded next implementation slice without prematurely designing the private hosted service.",
+  "provenance_refs": [
+    "conversation:2026-08-09-near-term-plugin-before-private-service",
+    "context:decision-plugin-wedge-solo-small-team-coordination"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
+}

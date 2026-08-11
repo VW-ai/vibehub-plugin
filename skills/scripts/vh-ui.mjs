@@ -222,7 +222,7 @@ function operationalState(repository, ticket, outcome) {
   if (label === "REFINE") {
     return {
       label,
-      detail: "Draft Ticket: unblocked but under-defined; planning must rewrite its acceptance before it can execute.",
+      detail: "Draft Ticket: unblocked but under-defined; its acceptance must be refined and maturity set to firm before execution.",
       references: [{ ref: `.vibehub/tickets/${ticket.ticket_id}.yaml`, label: "Draft" }],
     };
   }
@@ -230,6 +230,71 @@ function operationalState(repository, ticket, outcome) {
     label,
     detail: "No unresolved direct prerequisite prevents execution.",
     references: [],
+  };
+}
+
+function acceptanceAuthority(criterion) {
+  return criterion.authority ?? "agent";
+}
+
+function evidenceOrigin(evidence) {
+  return evidence.origin ?? "agent";
+}
+
+function humanAttentionState(repository, ticket, outcome) {
+  const humanCriteria = ticket.acceptance.filter(
+    (criterion) => acceptanceAuthority(criterion) === "human",
+  );
+  const humanEvidence = documents(repository.evidence.documents).filter(
+    (evidence) => evidence.ticket_id === ticket.ticket_id
+      && evidenceOrigin(evidence) === "human",
+  );
+  const recordedIds = new Set(humanEvidence.flatMap(
+    (evidence) => evidence.acceptance_ids,
+  ));
+  const criteria = humanCriteria.map((criterion) => ({
+    acceptanceId: criterion.acceptance_id,
+    criterion: criterion.criterion,
+    authority: "human",
+    evidenceState: recordedIds.has(criterion.acceptance_id)
+      ? "recorded"
+      : "pending",
+  }));
+  const recordedAcceptanceIds = criteria
+    .filter((criterion) => criterion.evidenceState === "recorded")
+    .map((criterion) => criterion.acceptanceId);
+  const pendingAcceptanceIds = criteria
+    .filter((criterion) => criterion.evidenceState === "pending")
+    .map((criterion) => criterion.acceptanceId);
+  const humanAcceptanceCount = criteria.length;
+  const humanEvidenceCount = recordedAcceptanceIds.length;
+  const operational = ticketStatus(repository, ticket);
+  let label = "NONE";
+  let detail = "No acceptance criterion reserves human authority.";
+  if (humanAcceptanceCount > 0 && outcome?.status === "successful") {
+    label = "COMPLETE";
+    detail = "Human-authority acceptance was independently accepted.";
+  } else if (humanAcceptanceCount > 0
+    && humanEvidenceCount === humanAcceptanceCount) {
+    label = "RECORDED";
+    detail = "Human-origin Evidence is recorded; independent Outcome is pending.";
+  } else if (humanAcceptanceCount > 0
+    && (operational === "BLOCKED" || operational === "REFINE")) {
+    label = "UPCOMING";
+    detail = "A human boundary is ahead; dependency or refinement work comes first.";
+  } else if (humanAcceptanceCount > 0) {
+    label = "PENDING";
+    detail = `${pendingAcceptanceIds.length} human-authority criterion${pendingAcceptanceIds.length === 1 ? "" : "s"} await human-origin Evidence.`;
+  }
+  return {
+    label,
+    detail,
+    humanAcceptanceCount,
+    humanEvidenceCount,
+    acceptanceIds: criteria.map((criterion) => criterion.acceptanceId),
+    recordedAcceptanceIds,
+    pendingAcceptanceIds,
+    criteria,
   };
 }
 
@@ -255,6 +320,7 @@ function projectGraph(repository) {
   }
   const tickets = ticketDocuments.map((ticket) => {
     const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+    const attention = humanAttentionState(repository, ticket, outcome);
     return {
       ticketId: ticket.ticket_id,
       ticketRevision: digest(ticket),
@@ -265,6 +331,10 @@ function projectGraph(repository) {
         operational: {
           availability: "available",
           summary: operationalState(repository, ticket, outcome),
+        },
+        attention: {
+          availability: "available",
+          summary: attention,
         },
       },
     };
@@ -292,6 +362,15 @@ function canonicalContextFromRef(repository, reference) {
 }
 
 function ticketContextPackage(ticket, relations, repository, source) {
+  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+  const attention = humanAttentionState(repository, ticket, outcome);
+  const maturity = ticket.maturity ?? "firm";
+  const operational = outcomeState(outcome) ?? ticketStatus(repository, ticket);
+  const acceptance = ticket.acceptance.map((item) => ({
+    acceptanceId: item.acceptance_id,
+    criterion: item.criterion,
+    authority: acceptanceAuthority(item),
+  }));
   const contextRefs = ticket.context_refs.map((item) => ({
     ...item,
     kind: canonicalContextFromRef(repository, item.ref) ? "context" : "source",
@@ -300,9 +379,15 @@ function ticketContextPackage(ticket, relations, repository, source) {
   const agentPayload = {
     kind: "vibehub_ticket_handoff",
     ticketId: ticket.ticket_id,
+    maturity,
+    operationalState: operational,
     outcome: ticket.outcome,
     context: ticket.context,
-    acceptance: ticket.acceptance,
+    acceptance: ticket.acceptance.map((item) => ({
+      ...item,
+      authority: acceptanceAuthority(item),
+    })),
+    humanBoundaries: attention.criteria,
     constraints: ticket.constraints,
     contextRefs: ticket.context_refs,
     relations: ticket.relations,
@@ -310,12 +395,12 @@ function ticketContextPackage(ticket, relations, repository, source) {
     source: source.agentPayload,
   };
   return {
+    maturity,
+    operationalState: operational,
     outcome: ticket.outcome,
     context: ticket.context,
-    acceptance: ticket.acceptance.map((item) => ({
-      acceptanceId: item.acceptance_id,
-      criterion: item.criterion,
-    })),
+    acceptance,
+    attention,
     constraints: ticket.constraints,
     contextRefs,
     relations: ticket.relations.map((relation) => ({
@@ -337,6 +422,7 @@ function evidenceTrace(evidence, source) {
     subkind: "acceptance",
     status: "recorded",
     acceptanceIds: evidence.acceptance_ids,
+    origin: evidenceOrigin(evidence),
     occurredAt: evidence.recorded_at,
     summary: evidence.summary,
     body: `Acceptance: ${evidence.acceptance_ids.join(", ")}`,
@@ -346,6 +432,7 @@ function evidenceTrace(evidence, source) {
       evidenceId: evidence.evidence_id,
       ticketId: evidence.ticket_id,
       acceptanceIds: evidence.acceptance_ids,
+      origin: evidenceOrigin(evidence),
       summary: evidence.summary,
       refs: evidence.refs,
       recordedAt: evidence.recorded_at,
@@ -408,6 +495,14 @@ export function buildUiSnapshot(repoRoot) {
   const graphDigest = digest({ contexts, tickets: rawTickets, evidence: rawEvidence, outcomes: rawOutcomes });
   const source = gitSource(repo, graphDigest);
   const graph = projectGraph(repository);
+  const protectedBoundaries = graph.tickets
+    .filter((ticket) =>
+      ticket.capabilities.attention.summary.humanAcceptanceCount > 0)
+    .map((ticket) => ({
+      ticketId: ticket.ticketId,
+      state: ticket.capabilities.attention.summary.label,
+      criteria: ticket.capabilities.attention.summary.criteria,
+    }));
   const snapshotId = digest({ graphDigest, source: {
     resolvedCommit: source.resolvedCommit,
     branch: source.branch,
@@ -431,8 +526,12 @@ export function buildUiSnapshot(repoRoot) {
       review: { available: false },
       planReview: { available: false },
       protectedDecision: { available: false },
-      protectedBoundaries: [],
-      authority: { status: "unavailable" },
+      protectedBoundaries,
+      authority: {
+        status: "available",
+        scope: "acceptance",
+        default: "agent",
+      },
     },
   };
   return { repo, repository, graph, state };

@@ -91,4 +91,37 @@ test("skills point at their governing shared references", () => {
   const projectFormat = JSON.parse(readFileSync(join(root, "skills", "contracts", "project-format.schema.json"), "utf8"));
   assert.equal(projectFormat.properties.format_version.type, "integer");
   assert.equal(projectFormat.properties.kind.const, "vibehub_project");
+
+  const authority = "contracts/acceptance-authority.md";
+  assert.ok(existsSync(join(root, "skills", authority)));
+  for (const name of [
+    "vibehub-ticket-plan",
+    "vibehub-ticket-validate",
+    "vibehub-ticket-run",
+    "vibehub-ticket-closeout",
+  ]) {
+    assert.ok(
+      bodies.get(name).includes(`../${authority}`),
+      `${name} misses the acceptance authority pointer`,
+    );
+  }
+});
+
+test("human decision boundaries stay in the Ticket graph", () => {
+  const authority = "contracts/acceptance-authority.md";
+  const authorityBody = readFileSync(join(root, "skills", authority), "utf8");
+  const ticketSchema = JSON.parse(readFileSync(join(root, "skills", "contracts", "ticket.schema.json"), "utf8"));
+  assert.deepEqual(ticketSchema.properties.maturity.enum, ["firm", "draft"]);
+  assert.equal(ticketSchema.properties.maturity.default, "firm");
+  assert.match(authorityBody, /decision owner/u);
+  assert.match(authorityBody, /independently\s+schedulable downstream work/u);
+  assert.match(authorityBody, /repository-level handoff/u);
+  assert.match(authorityBody, /does not assign, wake, or bind an Agent session/u);
+  assert.match(authorityBody, /maturity: draft/u);
+  assert.match(bodies.get("vibehub-ticket-plan"), /proposal, human decision, then dependent\s+implementation/u);
+  assert.match(bodies.get("vibehub-ticket-plan"), /do not manufacture a firm downstream\s+plan/u);
+  assert.match(bodies.get("vibehub-ticket-plan"), /new or rewritten Tickets state it explicitly/u);
+  assert.match(bodies.get("vibehub-ticket-run"), /split out a new\s+human-decision Ticket/u);
+  assert.match(bodies.get("vibehub-ticket-validate"), /represented by direct\s+Ticket dependencies/u);
+  assert.match(bodies.get("vibehub-ticket-validate"), /remain `maturity: draft`/u);
 });

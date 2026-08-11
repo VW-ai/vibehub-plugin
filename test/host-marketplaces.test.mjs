@@ -76,6 +76,7 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
 
   for (const pluginRoot of [codex.pluginRoot, claude.pluginRoot]) {
     assert.ok(existsSync(join(pluginRoot, "skills", "contracts", "project-format.schema.json")));
+    assert.ok(existsSync(join(pluginRoot, "skills", "contracts", "acceptance-authority.md")));
     assert.ok(existsSync(join(pluginRoot, "skills", "vibehub-migrate", "references", "migrations.json")));
   }
   const codexVersion = JSON.parse(
@@ -92,6 +93,7 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
   assert.deepEqual(skillNames(codex.pluginRoot), skillNames(claude.pluginRoot));
   for (const relativePath of [
     join("skills", "contracts", "project-format.schema.json"),
+    join("skills", "contracts", "acceptance-authority.md"),
     join("skills", "vibehub-migrate", "references", "migrations.json"),
   ]) {
     assert.equal(

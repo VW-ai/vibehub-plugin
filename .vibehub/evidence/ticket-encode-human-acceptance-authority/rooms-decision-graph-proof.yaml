@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "rooms-flow-proves-graph-boundary"
+  ],
+  "evidence_id": "rooms-decision-graph-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-11T00:02:19.000Z",
+  "refs": [
+    ".vibehub/tickets/ticket-prepare-rooms-workbench-proposal.yaml",
+    ".vibehub/tickets/ticket-decide-rooms-workbench-direction.yaml",
+    ".vibehub/tickets/ticket-rooms-into-workbench.yaml",
+    "command:vh-ticket-graph-proposal-ready-decision-blocked-implementation-blocked",
+    "command:vh-ui-projection-decision-upcoming",
+    "test:draft-behind-human-blocker-becomes-refine-never-ready",
+    "test:npm-test-46-of-46",
+    "verification:plugin-artifact-52-files-378280-bytes"
+  ],
+  "summary": "The former combined Rooms Ticket is now a three-node direct dependency chain whose implementation node is maturity: draft. Mechanical graph output reports the proposal READY, the human-decision Ticket BLOCKED by the proposal, and draft implementation BLOCKED by the decision. UI projection reports the decision UPCOMING rather than PENDING while its proposal prerequisite is unresolved. The draft-maturity test now uses an authority: human blocker and proves that its successful human-origin Outcome moves the dependent only to REFINE, never READY; Ticket Plan must rewrite that same Ticket before execution.",
+  "schema_version": 1,
+  "ticket_id": "ticket-encode-human-acceptance-authority"
+}

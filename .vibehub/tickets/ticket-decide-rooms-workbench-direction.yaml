@@ -1,0 +1,46 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "rooms-workbench-direction-chosen",
+      "authority": "human",
+      "criterion": "After reviewing the completed Rooms Workbench proposal, the owner explicitly approves one direction or records the changes required before implementation."
+    }
+  ],
+  "constraints": [
+    "The Agent running this Ticket presents the proposal and the exact decision needed; it does not substitute its recommendation for the owner's judgment.",
+    "Do not begin implementation in this Ticket.",
+    "Only explicit owner input with a readable reference may become human-origin Evidence."
+  ],
+  "context": "This Ticket is the explicit authority boundary between proposal and implementation. Its prerequisite produces the reviewable proposal. Once that Outcome succeeds, an Agent can run this Ticket by reading the prerequisite's Outcome and referenced Evidence, presenting the proposal, and waiting for the owner's decision. A successful Outcome means the direction is recorded precisely enough to constrain implementation.",
+  "context_refs": [
+    {
+      "purpose": "Decision-owner and human-origin Evidence semantics for this boundary.",
+      "ref": "skills/contracts/acceptance-authority.md"
+    },
+    {
+      "purpose": "The proposal package whose successful Outcome and Evidence supply the decision material.",
+      "ref": ".vibehub/tickets/ticket-prepare-rooms-workbench-proposal.yaml"
+    },
+    {
+      "purpose": "Binding visual standard against which the owner judges the proposal.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner-selected Rooms Workbench direction is recorded as human-origin Evidence and independently accepted, moving downstream implementation into refinement.",
+  "provenance_refs": [
+    "conversation:2026-08-03-room-taxonomy-design",
+    "conversation:2026-08-10-human-decision-boundary-policy",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [
+    {
+      "rationale": "A real owner choice requires the reviewable proposal first.",
+      "target_ticket_id": "ticket-prepare-rooms-workbench-proposal",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-decide-rooms-workbench-direction"
+}

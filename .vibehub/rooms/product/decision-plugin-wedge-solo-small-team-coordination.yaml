@@ -1,0 +1,54 @@
+{
+  "context_id": "decision-plugin-wedge-solo-small-team-coordination",
+  "detail": "The near-term product remains a lightweight coding-Agent Plugin for an individual or small team doing real project work. Its job is to provide most of the coordination they actually need without requiring an organization-scale issue-management system: turn a request into a user-visible bounded Ticket, preserve relevant Context, expose dependencies and human boundaries when useful, coordinate Agent execution, and return Evidence-backed completion. This entry wedge does not attempt Linear parity in roadmap planning, customer feedback, organization hierarchy, analytics, or enterprise workflow administration, and it does not prematurely build the later consumer app. Real solo and small-team dogfood should determine the minimum coordination primitives that earn repeated use and can later generalize into the person-centered Ticket and attention system. The Plugin is therefore the practical first form of the broader product, not a separate final identity.",
+  "evidence": [
+    {
+      "note": "The owner separated the near-term lightweight Plugin for solo and small-team project coordination from the later 2C product.",
+      "ref": "conversation:2026-08-09-linear-simplification-attention-router"
+    },
+    {
+      "note": "The owner clarified that the later 2C product remains Ticket-first: Ticket is an advanced todo and the primary user-perceived object, with attention routing around it.",
+      "ref": "conversation:2026-08-09-person-centered-ticket-system-correction"
+    },
+    {
+      "note": "The current architecture is already a lightweight Skill-first Plugin with Git-native Ticket and Context as its control plane.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "note": "The current product phase requires rebuilding capabilities only from real-use dogfood gaps rather than speculative parity work.",
+      "ref": ".vibehub/rooms/product/decision-dogfood-only-phase.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-dogfood-only-phase",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-09T07:06:34Z",
+    "quote": "更短期的话呢，我觉得就是我们这会变成一个 plugin，更多是给你一个人进行你的工作上的 coordination。",
+    "ref": "conversation:2026-08-09-linear-simplification-attention-router"
+  },
+  "state": "active",
+  "summary": "VibeHub enters through a lightweight Plugin for one person and small teams coordinating project work, not through organization-scale Linear parity",
+  "tags": [
+    "dogfood",
+    "market-entry",
+    "plugin",
+    "product-wedge",
+    "small-team",
+    "solo-developer"
+  ],
+  "type": "decision"
+}

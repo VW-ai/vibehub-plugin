@@ -1,0 +1,54 @@
+{
+  "context_id": "decision-project-playbook-context-guides-tickets",
+  "detail": "When a user opens or names a known project, VibeHub should understand more than a repository or a list of Tickets. The project has a reusable playbook-like Context layer — conceptually similar to CLAUDE.md or AGENTS.md but not committed to one file format — describing how work is normally done: which Linear, Jira, Feishu, GitHub, repository, document, or other systems participate; how Tickets are usually created and scoped; which development, review, release, and communication practices apply; what Agent guidance matters; and what typically counts as completion. The system combines this project playbook with the person's durable Context and fresh external References, then uses an existing language model for semantic interpretation and Ticket planning. The playbook is reusable Context, not a rigid long-workflow engine, a duplicate project-management database, or a mandatory parent for every Ticket. It may reuse existing project instructions and external conventions, should record only durable judgments, and must remain reviewable and revisable as the project changes. Project remains an optional user-facing view and governance boundary; the playbook makes entering that scope cheap without changing the project-independent Ticket model. This decision defines a long-term product interaction principle only and does not authorize a new schema, mobile application, connector, or synchronization service.",
+  "evidence": [
+    {
+      "note": "The owner described a future interaction in which naming a project automatically activates its usual development flow, external system setup, and Ticket-creation conventions, analogous to reusable CLAUDE.md-style guidance.",
+      "ref": "conversation:2026-08-09-project-aware-mobile-ticket-interaction"
+    },
+    {
+      "note": "The external-system decision establishes Linear and other project systems as Context, References, action surfaces, Acceptance, and Evidence in personal Ticket cycles.",
+      "ref": ".vibehub/rooms/product/decision-external-work-systems-compose-into-personal-tickets.yaml"
+    },
+    {
+      "note": "The core domain contract keeps Project optional, Context reusable, References external, and Ticket as the bounded action unit.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-external-work-systems-compose-into-personal-tickets",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-project-independent",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-09T07:18:22Z",
+    "quote": "这个项目在我们这里是有一个感知的，就是它知道这边一般的开发流程，以及一般的项目 ticket 的创建应该是什么样的。",
+    "ref": "conversation:2026-08-09-project-aware-mobile-ticket-interaction"
+  },
+  "state": "active",
+  "summary": "A known project carries reusable playbook Context that teaches VibeHub its normal workflow, external systems, Ticket conventions, Agent guidance, and completion expectations",
+  "tags": [
+    "agent-guidance",
+    "context",
+    "project-playbook",
+    "projects",
+    "ticket-planning",
+    "workflow-conventions"
+  ],
+  "type": "decision"
+}

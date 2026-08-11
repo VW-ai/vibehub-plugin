@@ -1,0 +1,52 @@
+{
+  "context_id": "intent-user-configurable-autonomy-policy",
+  "detail": "Future hosted or authenticated VibeHub should let the user define an autonomy policy that governs planning and execution rather than relying on one fixed meaning of reasonable cost. The policy expresses how strongly the user prefers uninterrupted autonomous progress versus close intent alignment, together with acceptable budgets for experiments, tokens, elapsed time, external actions, reversibility, and deviation risk. Higher autonomy authorizes more bounded investigation, experimentation, and recovery before reclaiming attention; lower autonomy creates earlier human gates and tighter confirmation. Planning uses the policy to budget evidence gathering and shape known human boundaries. Execution compares the marginal value, cost, and risk of further investigation against that authorized budget, and escalates when the boundary is exceeded instead of silently expanding work or confidently choosing a costly wrong path. The current Skill-first Plugin can dogfood the semantics through prompt instructions and explicit Ticket Context, but a mature online service may need durable user preferences, per-project or per-Ticket overrides, usage accounting, and an inspectable policy-to-decision trace. Exact controls, storage, identity, billing, and enforcement remain deferred until real hosted-product work.",
+  "evidence": [
+    {
+      "note": "The owner proposed user-controlled autonomy as a future product setting that trades higher experiment, token, and deviation budgets for fewer human interruptions.",
+      "ref": "conversation:2026-08-09-user-configurable-autonomy-policy"
+    },
+    {
+      "note": "The long-term product already centers the person's Tickets, ROI, Agents, and attention boundaries.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "note": "The near-term Plugin remains the prompt- and Skill-first dogfood wedge rather than prematurely implementing the hosted preference service.",
+      "ref": ".vibehub/rooms/product/decision-plugin-wedge-solo-small-team-coordination.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-plugin-wedge-solo-small-team-coordination",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-draft-ticket-maturity",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-09T09:07:41Z",
+    "quote": "他期望更高的 autonomous，那就会有更高的额外的实验成本、token 成本以及 deviation 的风险，但是人的介入就会大大地降低。",
+    "ref": "conversation:2026-08-09-user-configurable-autonomy-policy"
+  },
+  "state": "active",
+  "summary": "A future hosted VibeHub lets each user tune the tradeoff between Agent autonomy, evidence budget, deviation risk, and human attention",
+  "tags": [
+    "attention-routing",
+    "autonomy-policy",
+    "evidence-budget",
+    "hosted-service",
+    "human-gates",
+    "planning",
+    "preferences",
+    "risk"
+  ],
+  "type": "intent"
+}

@@ -1,0 +1,58 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "rooms-proposal-is-reviewable",
+      "criterion": "A checked-in Rooms Workbench UI/UX proposal shows tree placement, per-room drift-state rendering, room detail with Context entries and consuming Tickets, and representative focused and empty states clearly enough for the owner to choose a direction."
+    },
+    {
+      "acceptance_id": "rooms-proposal-respects-contracts",
+      "criterion": "The proposal preserves the causal Ticket graph, derives Room information mechanically from canonical documents, and applies the quiet-intelligence standard with FRESH state kept quiet and exceptional drift rendered in situ."
+    }
+  ],
+  "constraints": [
+    "Produce a reviewable proposal only; do not implement the Rooms surface in this Ticket.",
+    "Do not re-cluster or re-layout the causal Ticket graph by room.",
+    "Show enough concrete interaction and state detail that the following human decision is a real choice rather than approval of an abstraction."
+  ],
+  "context": "Rooms are currently invisible in the local graph UI beyond the room chip on context cards. Before implementation, the product needs a concrete UI/UX proposal for how the Room tree, drift state, and room detail coexist with the causal Ticket graph. This Ticket is Agent-owned and ends when that proposal is independently judged reviewable; it does not ask the owner to choose the direction and it does not authorize implementation.",
+  "context_refs": [
+    {
+      "purpose": "Binding visual and interaction standard for the proposal.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Mechanical projection boundary the proposed surface must respect.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Drift states the proposal must represent and their exact semantics.",
+      "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
+    },
+    {
+      "purpose": "Room tree structure and containment semantics being visualized.",
+      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A concrete, contract-grounded Rooms Workbench proposal is ready for an explicit owner decision.",
+  "provenance_refs": [
+    "conversation:2026-08-03-room-taxonomy-design",
+    "conversation:2026-08-10-human-decision-boundary-policy",
+    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+  ],
+  "relations": [
+    {
+      "rationale": "The proposal's drift states come from the deterministic drift comparison.",
+      "target_ticket_id": "ticket-drift-check-mechanical",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The proposal assumes every Context ref resolves inside the Room tree.",
+      "target_ticket_id": "ticket-context-always-roomed",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-prepare-rooms-workbench-proposal"
+}

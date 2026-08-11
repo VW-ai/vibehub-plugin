@@ -8,6 +8,10 @@ description: Independently adjudicate one lightweight VibeHub Ticket against eve
 The closeout Agent must be independent from the executor.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../contracts/acceptance-authority.md`. A human-authority criterion can be
+accepted only when the Outcome references Evidence with `origin: human` that
+faithfully records explicit human input. Agent-origin Evidence may support the
+record but cannot substitute for that judgment.
 This Skill owns `closeout-recorded`; it does not own UI launch mechanics.
 
 1. Read the exact Ticket, diff, tests, and all Evidence:

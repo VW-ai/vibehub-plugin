@@ -23,6 +23,7 @@ function fixture() {
   mkdirSync(join(repo, "docs"));
   writeFileSync(join(repo, "docs", "LOCAL_GRAPH_DESIGN.md"), "# Local graph design\n");
   const feature = ticket("feature", ["foundation"]);
+  feature.acceptance[0].authority = "human";
   feature.context_refs = [
     {
       ref: ".vibehub/rooms/product/decision-use-tickets.yaml",
@@ -33,9 +34,11 @@ function fixture() {
       purpose: "Design source when present.",
     },
   ];
+  const foundation = ticket("foundation");
+  foundation.acceptance[0].authority = "human";
   assert.equal(run(repo, "ticket", "apply", {
     tickets: [
-      ticket("foundation"),
+      foundation,
       feature,
       ticket("unsuccessful"),
       ticket("blocked", ["unsuccessful"]),
@@ -48,7 +51,12 @@ function fixture() {
     ticket_id: "foundation",
     acceptance_ids: ["works"],
     summary: "Foundation behavior was observed.",
-    refs: ["test:foundation", "browser:foundation-reviewed"],
+    refs: [
+      "test:foundation",
+      "browser:foundation-reviewed",
+      "conversation:test-foundation-approved",
+    ],
+    origin: "human",
     recorded_at: NOW,
   }).status, 0);
   assert.equal(run(repo, "ticket", "closeout", {
@@ -111,6 +119,18 @@ test("direct YAML projection exposes graph topology and operational states", () 
     },
   );
   assert.equal(snapshot.state.graph.relations.length, 2);
+  assert.deepEqual(
+    Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
+      item.ticketId,
+      item.capabilities.attention.summary.label,
+    ])),
+    {
+      blocked: "NONE",
+      feature: "PENDING",
+      foundation: "COMPLETE",
+      unsuccessful: "NONE",
+    },
+  );
   const featureRelation = snapshot.state.graph.relations.find(
     (relation) => relation.dependentTicketId === "feature",
   );
@@ -121,6 +141,53 @@ test("direct YAML projection exposes graph topology and operational states", () 
     rationale: "feature needs foundation.",
     provenanceRefs: ["test:ticket-vertical-slice"],
   });
+});
+
+test("human attention projection distinguishes upcoming, pending, recorded, and complete", () => {
+  const repo = fixture();
+  const upcoming = ticket("human-upcoming", ["unsuccessful"]);
+  upcoming.acceptance[0].authority = "human";
+  const recorded = ticket("human-recorded");
+  recorded.acceptance[0].authority = "human";
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [upcoming, recorded],
+  }).status, 0);
+  assert.equal(run(repo, "ticket", "evidence", {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "human-recorded-proof",
+    ticket_id: "human-recorded",
+    acceptance_ids: ["works"],
+    summary: "The human supplied the required decision.",
+    refs: ["conversation:test-human-recorded"],
+    origin: "human",
+    recorded_at: NOW,
+  }).status, 0);
+
+  const snapshot = buildUiSnapshot(repo);
+  const attention = Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
+    item.ticketId,
+    item.capabilities.attention.summary,
+  ]));
+  assert.equal(attention["human-upcoming"].label, "UPCOMING");
+  assert.equal(attention.feature.label, "PENDING");
+  assert.equal(attention["human-recorded"].label, "RECORDED");
+  assert.equal(attention.foundation.label, "COMPLETE");
+  assert.equal(attention["human-recorded"].humanAcceptanceCount, 1);
+  assert.equal(attention["human-recorded"].humanEvidenceCount, 1);
+  assert.deepEqual(attention["human-recorded"].recordedAcceptanceIds, ["works"]);
+  assert.equal(
+    snapshot.state.graph.tickets.find(
+      (item) => item.ticketId === "human-upcoming",
+    ).capabilities.operational.summary.label,
+    "BLOCKED",
+  );
+  assert.equal(
+    snapshot.state.graph.tickets.find(
+      (item) => item.ticketId === "human-recorded",
+    ).capabilities.operational.summary.label,
+    "READY",
+  );
 });
 
 test("invalid canonical documents fail before UI projection", () => {
@@ -258,6 +325,12 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(state.graph.tickets.length, 4);
   assert.equal(state.graph.relations.length, 2);
   assert.equal(state.interventions.review.available, false);
+  assert.deepEqual(state.interventions.authority, {
+    status: "available",
+    scope: "acceptance",
+    default: "agent",
+  });
+  assert.equal(state.interventions.protectedBoundaries.length, 2);
   assert.equal(state.graph.source.actions.worktree.editorHref.startsWith("vscode://file"), true);
   assert.equal(state.graph.source.agentPayload.kind, "vibehub_git_source");
 
@@ -272,7 +345,19 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   )).json()).data;
   assert.equal(subject.subject.ticket.ticketId, "foundation");
   assert.equal(subject.contextPackage.acceptance[0].acceptanceId, "works");
+  assert.equal(subject.contextPackage.acceptance[0].authority, "human");
+  assert.equal(subject.contextPackage.attention.label, "COMPLETE");
+  assert.equal(subject.contextPackage.maturity, "firm");
+  assert.equal(subject.contextPackage.operationalState, "DONE");
   assert.equal(subject.contextPackage.agentPayload.kind, "vibehub_ticket_handoff");
+  assert.equal(subject.contextPackage.agentPayload.maturity, "firm");
+  assert.equal(subject.contextPackage.agentPayload.operationalState, "DONE");
+  assert.deepEqual(subject.contextPackage.agentPayload.humanBoundaries, [{
+    acceptanceId: "works",
+    criterion: "foundation behavior is observed.",
+    authority: "human",
+    evidenceState: "recorded",
+  }]);
 
   const featureQuery = new URLSearchParams({
     snapshotId: state.graph.snapshotId,
@@ -292,6 +377,28 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(featureSubject.contextPackage.contextRefs[1].kind, "source");
   assert.equal(featureSubject.contextPackage.contextRefs[1].canonicalContext, null);
   assert.equal("actions" in featureSubject.contextPackage.contextRefs[1], false);
+  assert.equal(featureSubject.contextPackage.attention.label, "PENDING");
+  assert.deepEqual(
+    featureSubject.contextPackage.agentPayload.humanBoundaries.map(
+      (item) => [item.acceptanceId, item.criterion, item.evidenceState],
+    ),
+    [["works", "feature behavior is observed.", "pending"]],
+  );
+
+  const unsuccessfulQuery = new URLSearchParams({
+    snapshotId: state.graph.snapshotId,
+    kind: "ticket",
+    ticketId: "unsuccessful",
+  });
+  const unsuccessfulSubject = (await (await fetch(
+    `${origin}/api/subject?${unsuccessfulQuery}`,
+    authorized(token),
+  )).json()).data;
+  assert.equal(unsuccessfulSubject.contextPackage.operationalState, "DEVIATED");
+  assert.equal(
+    unsuccessfulSubject.contextPackage.agentPayload.operationalState,
+    "DEVIATED",
+  );
 
   const trace = (await (await fetch(
     `${origin}/api/trace?${ticketQuery}`,
@@ -299,11 +406,13 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   )).json()).data;
   assert.deepEqual(trace.records.map((record) => record.kind), ["evidence", "outcome"]);
   assert.deepEqual(trace.records[0].acceptanceIds, ["works"]);
+  assert.equal(trace.records[0].origin, "human");
   assert.deepEqual(
     trace.records[0].targets.map((target) => target.kind),
-    ["test", "browser"],
+    ["test", "browser", "conversation"],
   );
   assert.equal(trace.records[0].agentPayload.kind, "vibehub_ticket_evidence");
+  assert.equal(trace.records[0].agentPayload.origin, "human");
   assert.equal(trace.records[1].subkind, "successful");
   assert.deepEqual(trace.records[1].acceptedAcceptanceIds, ["works"]);
   assert.deepEqual(trace.records[1].unresolvedAcceptanceIds, []);
@@ -338,6 +447,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /initialFocusPending/u);
   assert.match(script, /initialTabId = "execution"/u);
   assert.match(script, /function ticketExecutionPanel/u);
+  assert.match(script, /function ticketAttentionState/u);
+  assert.match(script, /function humanAttentionBrief/u);
+  assert.match(script, /Human evidence pending/u);
+  assert.match(script, /Human acceptance verified/u);
   assert.match(script, /function contractBrief/u);
   assert.match(script, /function contractSupportDisclosure/u);
   assert.match(script, /\{ id: "evidence", label: "Log", panel: proof\.panel \}/u);
@@ -397,6 +510,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /history\.replaceState/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
   assert.match(styles, /\.ticket-node\.state-deviated/u);
+  assert.match(styles, /\.ticket-node\.attention-pending \.ticket-attention/u);
+  assert.match(styles, /\.human-attention-brief\.attention-pending/u);
+  assert.match(styles, /\.acceptance-item\.authority-human/u);
   assert.match(styles, /\.ticket-node:focus-visible,[\s\S]*?outline: none;/u);
   assert.match(styles, /\.ticket-node:focus-visible \.ticket-boundary/u);
   assert.match(styles, /\.edge-control-halo/u);
@@ -423,8 +539,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
 
   assert.deepEqual(canonicalBytes(repo), beforeUi);
 
+  const newlyVisible = ticket("newly-visible");
+  newlyVisible.maturity = "draft";
   assert.equal(run(repo, "ticket", "apply", {
-    tickets: [ticket("newly-visible")],
+    tickets: [newlyVisible],
   }).status, 0);
   const refreshed = (await (await fetch(
     `${origin}/api/state`,
@@ -432,6 +550,19 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   )).json()).data;
   assert.equal(refreshed.graph.tickets.length, 5);
   assert.notEqual(refreshed.graph.snapshotId, state.graph.snapshotId);
+  const draftQuery = new URLSearchParams({
+    snapshotId: refreshed.graph.snapshotId,
+    kind: "ticket",
+    ticketId: "newly-visible",
+  });
+  const draftSubject = (await (await fetch(
+    `${origin}/api/subject?${draftQuery}`,
+    authorized(token),
+  )).json()).data;
+  assert.equal(draftSubject.contextPackage.maturity, "draft");
+  assert.equal(draftSubject.contextPackage.operationalState, "REFINE");
+  assert.equal(draftSubject.contextPackage.agentPayload.maturity, "draft");
+  assert.equal(draftSubject.contextPackage.agentPayload.operationalState, "REFINE");
 });
 
 test("launcher flags stay intentionally narrow", () => {

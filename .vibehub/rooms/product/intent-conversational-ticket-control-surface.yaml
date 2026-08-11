@@ -1,0 +1,63 @@
+{
+  "context_id": "intent-conversational-ticket-control-surface",
+  "detail": "The long-term interaction should let a user speak or type from a phone or another lightweight surface — for example, open a known project or ask to run a comparison — and have VibeHub resolve the intended scope, activate the person's Context plus the project's reusable playbook, form one or more user-visible Tickets, and dispatch bounded work to available Agents such as Claude Code, Codex, subscribed Agents, or purpose-built Agents. Conversation is the natural entry and control surface, not the durable source of truth: Ticket remains the primary product object, and the user can create, inspect, steer, delegate, pause, approve, close, or reopen it while seeing what its Agent is doing. VibeHub should use existing language-model services for semantic reasoning rather than treating ownership of a foundation model as the product. Its distinct value is the persistent personal and project Context, project-aware Ticket interaction, cross-system action lifecycle, replaceable-Agent routing, and knowing when execution needs to return to the user's attention. The product should optimize the bounded Ticket interaction loop rather than design one monolithic long-running workflow. A future mobile app is a plausible surface for this loop, but this intent does not authorize app, Cloud, account, hosting, or connector implementation before dogfood demonstrates the required seams.",
+  "evidence": [
+    {
+      "note": "The owner described phone-based project entry, playbook-aware Ticket creation, work dispatch, Claude/Codex integration, and personal Context as the future interaction loop, while treating existing language models as the intelligence service.",
+      "ref": "conversation:2026-08-09-project-aware-mobile-ticket-interaction"
+    },
+    {
+      "note": "The person-centered decision establishes Ticket as the primary user object and attention return as a core system responsibility.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "note": "The Ticket-led Agent decision establishes Ticket as stable while Agents, chats, repositories, models, and runtimes remain replaceable execution resources.",
+      "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    },
+    {
+      "note": "The lightweight Plugin wedge is the current practical form in which the core Ticket interaction loop can be dogfooded before a consumer surface is built.",
+      "ref": ".vibehub/rooms/product/decision-plugin-wedge-solo-small-team-coordination.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-project-playbook-context-guides-tickets",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-plugin-wedge-solo-small-team-coordination",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-09T07:18:22Z",
+    "quote": "我们去把这个关于 ticket 的交互给做到极致，就是你的个人 action 的交互给做到极致。",
+    "ref": "conversation:2026-08-09-project-aware-mobile-ticket-interaction"
+  },
+  "state": "active",
+  "summary": "VibeHub should make project-aware Ticket creation, inspection, steering, Agent dispatch, and attention handoff excellent from conversational surfaces such as a phone",
+  "tags": [
+    "agent-routing",
+    "conversation",
+    "interaction-model",
+    "mobile",
+    "project-aware",
+    "ticket-control",
+    "user-experience"
+  ],
+  "type": "intent"
+}

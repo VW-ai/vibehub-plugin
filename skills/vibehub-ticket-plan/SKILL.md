@@ -10,16 +10,31 @@ Split only at a real scheduling, dependency, retry, authority, or verification
 boundary.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
+Read `../contracts/acceptance-authority.md` before assigning acceptance
+authority. Omit `authority` (or use `agent`) for independently checkable work;
+use `human` only for the exact criterion whose decision owner must be a person.
+When that decision gates independently schedulable downstream work, make the
+boundary visible in the graph: proposal, human decision, then dependent
+implementation. Mark the dependent implementation `maturity: draft` when the
+decision determines its real acceptance; do not manufacture a firm downstream
+plan before the choice exists. Keep terminal human sign-off in the delivery
+Ticket when no downstream work needs a separate scheduling boundary.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
-`draft-needs-refinement`; it does not own UI launch mechanics.
+`draft-needs-refinement`; it owns their planning semantics, not Agent/session
+routing or UI launch mechanics.
 `execution-discovers-work` is the single home of the mid-cycle transition:
-when execution surfaces new independently schedulable work, it re-enters this
-Skill, which turns the discovery into Tickets with their direct dependencies —
-executors never absorb it silently. `draft-needs-refinement` is the single
+when execution surfaces new independently schedulable work, the same or a
+later Agent applies this Skill to turn the discovery into Tickets with their
+direct dependencies — including a newly discovered human decision that gates
+continuation. Planning may revise the current Ticket when the boundary is not
+independently schedulable, or create the smallest new decision Ticket when it
+is; executors never absorb it silently. `draft-needs-refinement` is the single
 home of rolling-wave refinement: a Ticket planned with `maturity: draft`
-carries honest direction whose acceptance cannot be written yet, surfaces as
-REFINE (never READY) once unblocked, and re-enters this Skill, which rewrites
-its acceptance for real and removes the marker in place on the same Ticket.
+carries honest direction whose acceptance cannot be written yet and surfaces
+as REFINE (never READY) once unblocked. That checked-in state is sufficient for
+any Agent selecting work to apply this Skill, rewrite acceptance for real, and
+set `maturity: firm` in place on the same Ticket. No session handoff or wake-up
+is implied.
 
 ## Workflow
 
@@ -53,6 +68,9 @@ its acceptance for real and removes the marker in place on the same Ticket.
    planning gap. The Ticket itself carries enough `context`, `context_refs`,
    constraints, and acceptance for a fresh Agent.
 5. Draft complete Ticket documents using `../contracts/ticket.schema.json`.
+   Write `maturity: firm` when acceptance is executable and `maturity: draft`
+   when direction is known but acceptance is not; omitted maturity remains
+   legacy-compatible firm, but new or rewritten Tickets state it explicitly.
    Dependents list only direct prerequisites. Do not manufacture migration,
    review, or dogfood stages.
 6. Ask a separate Agent to use `$vibehub-ticket-validate` on the raw candidate
@@ -75,6 +93,8 @@ its acceptance for real and removes the marker in place on the same Ticket.
 
 - Never edit around failed schema or graph validation.
 - Never add a second lifecycle, source-token protocol, lease, or hidden state.
-- Comments and Agent suggestions are input, not human authority.
+- Preserve the authority semantics in `../contracts/acceptance-authority.md`;
+  never turn comments, Agent suggestions, or suggestive prose into human
+  authority or human-origin Evidence.
 - Planning output stays inside
   `../vibehub-setup/references/architecture-boundary.md`.

@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "hosted-service-deferred-cleanly"
+  ],
+  "evidence_id": "hosted-service-boundary",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T08:27:48Z",
+  "refs": [
+    "docs/CONCEPT.md",
+    ".vibehub/rooms/product/decision-plugin-wedge-solo-small-team-coordination.yaml",
+    ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml",
+    ".vibehub/rooms/product/intent-conversational-ticket-control-surface.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "The Plugin recommendation preserves the current Skill-first, Git-native, dependency-free, read-only local UI boundary. It deliberately does not propose hosted storage, accounts, permissions, synchronization, deployment, cloud execution, organization administration, or connector architecture. The only future-service seams exposed for later validation are canonical per-acceptance attention/authority, project-scoped Context selection, replaceable Agent handoff payloads, and Evidence-backed completion; these are being exercised locally first rather than turned into infrastructure now.",
+  "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
+}
