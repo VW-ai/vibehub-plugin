@@ -27,5 +27,12 @@ let application = NSApplication.shared
 let delegate = AppDelegate(initialRepository: initialRepository)
 application.delegate = delegate
 application.setActivationPolicy(.regular)
-application.mainMenu = WorkbenchMenu.build()
+// The menu reads the remembered list from the same preferences the session
+// writes, and the session keeps a reference so the recent-repositories submenu
+// is rebuilt whenever that list changes.
+let mainMenu = WorkbenchMenu(recents: { [preferences = delegate.preferences] in
+  preferences.recentRepositories
+})
+delegate.menu = mainMenu
+application.mainMenu = mainMenu.menu
 application.run()

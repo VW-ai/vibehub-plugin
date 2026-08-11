@@ -15,6 +15,9 @@ enum ProbeCommand {
   case session(repoRoot: String)
   case render(repoRoot: String, deepLink: String?)
   case deepLink(uri: String, currentRepository: String?, knownRepositories: [String])
+  case menu(recents: [String])
+  case recents(open: String, remembered: [String])
+  case switchRepository(from: String, to: String, accept: Bool, recents: [String], frame: String?)
 
   static let usage = """
     VibeHubWorkbench — the thin macOS Workbench shell.
@@ -38,6 +41,19 @@ enum ProbeCommand {
       --probe-deep-link --url <uri> [--current <worktree>] [--known <worktree>]...
                                                print the §9 decision for that URI
                                                without opening a window or a host
+      --probe-menu [--recent <worktree>]...    print the menu this app installs,
+                                               with its key equivalents and its
+                                               recent-repository entries
+      --probe-recents --open <worktree> [--recent <worktree>]...
+                                               validate that worktree against a
+                                               throwaway preference domain and
+                                               print what the remembered list
+                                               kept or dropped
+      --probe-switch --repo <worktree> --to <worktree> [--answer accept|decline]
+                     [--recent <worktree>]... [--frame <rect>]
+                                               open the first worktree, then pick
+                                               the second from the real menu and
+                                               answer the sheet the app presents
     """
 
   init?(arguments: [String]) {
@@ -73,6 +89,20 @@ enum ProbeCommand {
         uri: uri,
         currentRepository: value("--current"),
         knownRepositories: values("--known")
+      )
+    case "--probe-menu":
+      self = .menu(recents: values("--recent"))
+    case "--probe-recents":
+      guard let open = value("--open") else { return nil }
+      self = .recents(open: open, remembered: values("--recent"))
+    case "--probe-switch":
+      guard let repo = value("--repo"), let target = value("--to") else { return nil }
+      self = .switchRepository(
+        from: repo,
+        to: target,
+        accept: (value("--answer") ?? "accept") == "accept",
+        recents: values("--recent"),
+        frame: value("--frame")
       )
     default:
       return nil
@@ -119,7 +149,58 @@ enum ProbeCommand {
       return runRender(repoRoot: repoRoot, deepLink: deepLink)
     case .deepLink(let uri, let currentRepository, let knownRepositories):
       return runDeepLink(uri: uri, current: currentRepository, known: knownRepositories)
+    case .menu(let recents):
+      return runMenu(recents: recents)
+    case .recents(let open, let remembered):
+      return runRecents(open: open, remembered: remembered)
+    case .switchRepository(let from, let target, let accept, let recents, let frame):
+      return SwitchProbe(from: from, to: target, accept: accept, recents: recents, frame: frame)
+        .run()
     }
+  }
+
+  /// The menu this application installs, built from the same type `main.swift`
+  /// hands to AppKit, with the remembered list supplied instead of read.
+  private func runMenu(recents: [String]) -> Int32 {
+    let menu = WorkbenchMenu(recents: { recents })
+    return emit([
+      "ok": true,
+      "recents": recents,
+      "menu": menu.descriptor,
+      "openRepositoryTitle": WorkbenchMenu.openRepositoryTitle,
+      "recentRepositoriesTitle": WorkbenchMenu.recentRepositoriesTitle,
+    ])
+  }
+
+  /// What choosing that worktree does to the remembered list, over the same
+  /// `RepositoryOpen.attempt` the window and the menu both go through, against a
+  /// throwaway preference domain that is deleted before this process exits.
+  private func runRecents(open: String, remembered: [String]) -> Int32 {
+    let store = EphemeralPreferences(recents: remembered)
+    defer { store.discard() }
+    let before = store.preferences.recentRepositories
+    var payload: [String: Any] = [
+      "ok": true,
+      "preferenceDomain": store.domain,
+      "open": open,
+      "recentsBefore": before,
+    ]
+    switch RepositoryOpen.attempt(repoRoot: open, preferences: store.preferences) {
+    case .success(let session):
+      // The remembered list is written when a session actually starts, exactly
+      // as the window does it, not merely because a path validated.
+      store.preferences.rememberRepository(session.repoRoot)
+      payload["opened"] = true
+      payload["repo"] = session.repoRoot
+    case .failure(let error):
+      payload["opened"] = false
+      payload["errorClass"] = error.name
+      payload["permanent"] = error.isPermanent
+      payload["error"] = error.errorDescription ?? "\(error)"
+    }
+    payload["recentsAfter"] = store.preferences.recentRepositories
+    payload["dropped"] = before.filter { !store.preferences.recentRepositories.contains($0) }
+    return emit(payload)
   }
 
   /// The whole §9 decision for one URI, over the same code the app runs, with

@@ -140,6 +140,17 @@ final class RepositoryPickerWindowController: NSObject {
   }
 
   @objc private func chooseRepository(_ sender: Any?) {
+    chooseRepository(presentedOn: window)
+  }
+
+  /// The one directory chooser, presented on whichever window the user is
+  /// looking at.
+  ///
+  /// `Open Repository…` mid-session sheets it on the open Workbench window, so
+  /// changing repository never has to bring the launch surface back on screen;
+  /// it is still this controller's panel, with this controller's validation
+  /// behind it, rather than a second copy that could drift.
+  func chooseRepository(presentedOn host: NSWindow?) {
     let panel = NSOpenPanel()
     panel.title = "Choose an exact Git worktree"
     panel.prompt = "Open"
@@ -148,7 +159,7 @@ final class RepositoryPickerWindowController: NSObject {
     panel.allowsMultipleSelection = false
     panel.canCreateDirectories = false
     panel.resolvesAliases = true
-    panel.beginSheetModal(for: window) { [weak self] response in
+    panel.beginSheetModal(for: host ?? window) { [weak self] response in
       guard response == .OK, let url = panel.url else { return }
       self?.onOpen(url.resolvingSymlinksInPath().path)
     }

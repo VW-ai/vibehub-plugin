@@ -18,6 +18,33 @@ public enum WorktreeError: Error, LocalizedError {
       return message.isEmpty ? "git could not read this directory." : message
     }
   }
+
+  /// The name the headless probes print, so a test can assert the *class* of a
+  /// failure rather than pattern-matching a human sentence.
+  public var name: String {
+    switch self {
+    case .notADirectory: return "notADirectory"
+    case .notAnExactWorktree: return "notAnExactWorktree"
+    case .notAVibeHubRepository: return "notAVibeHubRepository"
+    case .gitFailed: return "gitFailed"
+    }
+  }
+
+  /// Whether this failure is a property of the path itself rather than of this
+  /// moment.
+  ///
+  /// A path that is not a directory, not an exact worktree root, or holds no
+  /// `.vibehub` will fail the same way every time it is chosen, so remembering
+  /// it only offers the user a button that cannot work. `gitFailed` is the
+  /// opposite: git being unavailable, a volume not mounted yet, or a repository
+  /// mid-operation are all temporary, and a temporary problem must never erase a
+  /// repository the user still works in.
+  public var isPermanent: Bool {
+    switch self {
+    case .notADirectory, .notAnExactWorktree, .notAVibeHubRepository: return true
+    case .gitFailed: return false
+    }
+  }
 }
 
 /// Git metadata for the exact worktree the user selected.

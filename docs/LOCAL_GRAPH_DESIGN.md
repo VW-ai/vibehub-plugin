@@ -149,10 +149,65 @@ origin — the loopback session this app started — and there is no
 `WKScriptMessageHandler`, no injected user script, no `loadFileURL`, and no
 persistent data store. Remote links a user clicks open in the default browser
 instead. `VibeHubWorkbench --probe-navigation`, `--probe-preferences`,
-`--probe-session`, `--probe-render`, and `--probe-deep-link` expose these
-boundaries headlessly, and `test/workbench-shell.test.mjs` plus
-`test/workbench-deep-link.test.mjs` assert them (skipping when no Swift
-toolchain is present).
+`--probe-session`, `--probe-render`, `--probe-deep-link`, `--probe-menu`,
+`--probe-recents`, and `--probe-switch` expose these boundaries headlessly, and
+`test/workbench-shell.test.mjs`, `test/workbench-deep-link.test.mjs`, plus
+`test/workbench-switch-repository.test.mjs` assert them (skipping when no Swift
+toolchain — or, for the window-server probes, no GUI session — is present).
+
+#### Changing repository without quitting
+
+The menu carries two entries, both reachable while a repository is open:
+
+| Entry | Key | What it does |
+| --- | --- | --- |
+| **File ▸ Open Repository…** | Cmd-O | The same `NSOpenPanel` the launch surface offers, sheeted on the window you are looking at. |
+| **File ▸ Recent Repositories** | — | One item per remembered worktree, most recent first, titled with the worktree's directory name and carrying the exact absolute path (also its tooltip). |
+
+Both hand one exact worktree to a single entry, `AppDelegate.requestRepository`,
+which validates it and then asks `DeepLinkPlanner` — the same planner
+`vibehub://open` uses. There is one switching semantics, not two:
+
+| Situation | Behaviour |
+| --- | --- |
+| Already open on that worktree | Focus the window. The host is not restarted for a repository that is already on screen. |
+| No repository open yet | Open it. Choosing a worktree in the app *is* the explicit yes a link arriving from elsewhere has to ask for. |
+| Open on a different worktree | The §9.3 question, as a sheet on that window. **Switch Repository** switches; **Stay Here** leaves the session — host, port, window, and remembered list — exactly as it was. |
+
+The question is the same one a deep link raises: same title, same two buttons,
+same two paths, same consequence. Only the line naming who asked differs
+(*"A vibehub:// link asked for:"* versus *"You asked to open:"*), because
+telling someone who just picked a worktree from a menu that a link asked for it
+would be false. It is always a sheet on a real window, never an
+application-modal alert — one raised at launch answers itself and ends the app.
+
+A confirmed switch starts the new host *before* ending the old one, so a switch
+that cannot start leaves the running session untouched. Once the new host
+answers, the previous repository's host process, its `.vibehub/**` + Git
+watcher, and its bearer end together, before the new window appears: no orphan
+process, no port left listening, and the URL that was authorized a moment ago
+resolves to nothing. The window is **replaced, not re-pointed** — swapping a
+live `WKWebView`'s URL across a repository switch crashes the shell — and
+closing the old one writes the frame you arranged so the new one restores it.
+Every Ticket state in the newly opened repository is recomputed by its own host
+from its own Git YAML; nothing projected is carried across.
+
+The remembered list is updated on each successful open and pruned only when the
+failure is a property of the path itself:
+
+| Failure | Remembered list |
+| --- | --- |
+| `notADirectory`, `notAnExactWorktree`, `notAVibeHubRepository` | Entry dropped — choosing it again could only fail again. |
+| `gitFailed` | Entry kept. Git being unavailable or a volume not mounted yet is temporary, and a temporary problem must never erase a repository you still work in. |
+
+Either way the failure is stated in words, on the open window when there is one
+and on the launch surface otherwise. Nothing new is persisted: the allowlist is
+still exactly `recentRepositories`, `windowFrame`, `lastTicketId`, and
+`lastInspectorTab`.
+
+Browser mode is deliberately unchanged: `vh-workbench.mjs` binds one `--repo`
+per foreground command, and moving repository selection into the page would
+require the shared frontend to address more than one host.
 
 #### Deep links
 

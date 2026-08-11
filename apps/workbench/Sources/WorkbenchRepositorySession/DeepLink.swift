@@ -195,6 +195,26 @@ public struct ConfirmationPrompt: Equatable, Sendable {
   public let cancel: String
 }
 
+/// Who asked for a repository.
+///
+/// Both entry points — a `vibehub://` link and the in-app `Open Repository…` or
+/// recent-repositories menu — ask the same question, with the same title, the
+/// same two buttons, the same two paths, and the same consequence. Only the one
+/// line naming the requester differs, because telling someone who just picked a
+/// worktree from a menu that "a vibehub:// link asked for" it would be false.
+public enum RepositoryRequester: Equatable, Sendable {
+  case deepLink
+  case userSelection
+
+  /// The line that introduces the requested worktree.
+  public var requestPhrase: String {
+    switch self {
+    case .deepLink: return "A vibehub:// link asked for:"
+    case .userSelection: return "You asked to open:"
+    }
+  }
+}
+
 /// The exact questions §9.2 and §9.3 require, kept beside the rule so the sheet
 /// the user reads and the headless probe are the same words.
 public enum ConfirmationPrompts {
@@ -213,9 +233,13 @@ public enum ConfirmationPrompts {
     )
   }
 
-  public static func switchRepository(from current: String, to requested: String)
-    -> ConfirmationPrompt
-  {
+  /// The one switch question, asked identically however the switch was
+  /// requested. `requestedBy` changes nothing but the line that names who asked.
+  public static func switchRepository(
+    from current: String,
+    to requested: String,
+    requestedBy requester: RepositoryRequester = .deepLink
+  ) -> ConfirmationPrompt {
     ConfirmationPrompt(
       title: "Switch the Workbench to a different repository?",
       detail: """
@@ -223,7 +247,7 @@ public enum ConfirmationPrompts {
 
         \(current)
 
-        A vibehub:// link asked for:
+        \(requester.requestPhrase)
 
         \(requested)
 
