@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "release-pr-merged",
+    "tagged-merged-main",
+    "github-release-verified"
+  ],
+  "closed_at": "2026-08-11T07:42:13Z",
+  "evidence_ids": [
+    "v060-release-pr-merged-proof",
+    "v060-tagged-merged-main-proof",
+    "v060-github-release-verified-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independently adjudicated all three publication criteria as satisfied: PR #16 merged the verified preparation records into main at 20988ffa; the exact lightweight tag v0.6.0 points locally and remotely to that merged main commit rather than the feature-branch head; Release VibeHub run 31469669331 succeeded and published a non-draft, non-prerelease GitHub Release with both archive and checksum assets whose downloaded SHA-256 verification passes.",
+  "ticket_id": "ticket-publish-v060-release",
+  "unresolved_acceptance_ids": []
+}

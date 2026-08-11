@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "github-release-verified"
+  ],
+  "evidence_id": "v060-github-release-verified-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-11T07:38:38Z",
+  "refs": [
+    "https://github.com/VW-ai/vibehub-plugin/actions/runs/31469669331",
+    "https://github.com/VW-ai/vibehub-plugin/releases/tag/v0.6.0",
+    "https://github.com/VW-ai/vibehub-plugin/releases/download/v0.6.0/vibehub-plugin-0.6.0.tar.gz",
+    "https://github.com/VW-ai/vibehub-plugin/releases/download/v0.6.0/vibehub-plugin-0.6.0.tar.gz.sha256",
+    "command:sha256sum --check vibehub-plugin-0.6.0.tar.gz.sha256"
+  ],
+  "schema_version": 1,
+  "summary": "Tag push triggered Release VibeHub workflow run 31469669331 at head SHA 20988ffa3fde04e952a0d6905268e43fb93e195e and the run completed successfully. GitHub Release v0.6.0 is published, non-draft, non-prerelease, targets main, and its tag ref points to that exact commit. Both vibehub-plugin-0.6.0.tar.gz (135922 bytes; GitHub digest sha256:c66cf19f754483c35057eb87be19c9367b19648458c06e0cc03a517fe2c795a0) and vibehub-plugin-0.6.0.tar.gz.sha256 exist. Downloading both into /private/tmp/vibehub-v060-release.HBrIO4 and running sha256sum --check vibehub-plugin-0.6.0.tar.gz.sha256 returned vibehub-plugin-0.6.0.tar.gz: OK.",
+  "ticket_id": "ticket-publish-v060-release"
+}
