@@ -222,7 +222,7 @@ function operationalState(repository, ticket, outcome) {
   if (label === "REFINE") {
     return {
       label,
-      detail: "Draft Ticket: unblocked but under-defined; planning must rewrite its acceptance before it can execute.",
+      detail: "Draft Ticket: unblocked but under-defined; its acceptance must be refined and maturity set to firm before execution.",
       references: [{ ref: `.vibehub/tickets/${ticket.ticket_id}.yaml`, label: "Draft" }],
     };
   }
@@ -364,6 +364,8 @@ function canonicalContextFromRef(repository, reference) {
 function ticketContextPackage(ticket, relations, repository, source) {
   const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
   const attention = humanAttentionState(repository, ticket, outcome);
+  const maturity = ticket.maturity ?? "firm";
+  const operational = outcomeState(outcome) ?? ticketStatus(repository, ticket);
   const acceptance = ticket.acceptance.map((item) => ({
     acceptanceId: item.acceptance_id,
     criterion: item.criterion,
@@ -377,6 +379,8 @@ function ticketContextPackage(ticket, relations, repository, source) {
   const agentPayload = {
     kind: "vibehub_ticket_handoff",
     ticketId: ticket.ticket_id,
+    maturity,
+    operationalState: operational,
     outcome: ticket.outcome,
     context: ticket.context,
     acceptance: ticket.acceptance.map((item) => ({
@@ -391,6 +395,8 @@ function ticketContextPackage(ticket, relations, repository, source) {
     source: source.agentPayload,
   };
   return {
+    maturity,
+    operationalState: operational,
     outcome: ticket.outcome,
     context: ticket.context,
     acceptance,

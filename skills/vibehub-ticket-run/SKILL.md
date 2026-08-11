@@ -35,10 +35,12 @@ UI launch mechanics.
    authority. Git commits are cheap rollback points; one Agent/writer per
    worktree needs no coordination beyond Git. `ready-execution` stays
    quiet: do not open review UI for routine progress. New independently
-   schedulable work discovered mid-execution belongs to planning — hand it to
-   `$vibehub-ticket-plan`. This includes a newly discovered human decision:
-   planning decides whether to revise the current Ticket or split out a new
-   human-decision Ticket and wire the direct dependency before execution waits.
+   schedulable work discovered mid-execution belongs in the checked-in graph;
+   use `$vibehub-ticket-plan` semantics before crossing that boundary. This
+   includes a newly discovered human decision: revise the current Ticket or
+   split out a new human-decision Ticket and wire the direct dependency before
+   execution waits. The repository state is the handoff; no Agent session is
+   assigned or resumed automatically.
    A durable cross-ticket fact surfaced by execution is delegated to
    `$vibehub-ingest`, placed in the room this Ticket entered.
 4. Test in proportion to risk. For each criterion with real proof, append one

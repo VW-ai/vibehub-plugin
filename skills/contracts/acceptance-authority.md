@@ -27,14 +27,18 @@ as one acceptance criterion in the delivery Ticket.
 
 When the decision determines what downstream acceptance should be, keep that
 dependent Ticket at `maturity: draft` instead of inventing a firm plan. The
-decision's successful Outcome moves it from BLOCKED to REFINE, where Ticket
-Plan reads the decision Evidence, rewrites the same Ticket in place, and only
-then marks it `maturity: firm` and makes it eligible for READY execution.
+decision's successful Outcome moves it from BLOCKED to REFINE. REFINE is the
+repository-level handoff: it does not assign, wake, or bind an Agent session.
+Any current or later Agent selecting work can read the Ticket plus the
+decision's Outcome and Evidence, apply Ticket Plan semantics to rewrite the
+same Ticket in place, and mark it `maturity: firm` before execution.
 
-If execution discovers an unplanned human decision, it returns to Ticket Plan.
-Planning either revises the current Ticket or creates the smallest new Ticket
-and direct dependency needed to make the boundary canonical. No Event record or
-second execution package is required.
+If execution discovers an unplanned human decision, the graph must be replanned
+before execution crosses that boundary. The same or a later Agent either
+revises the current Ticket or creates the smallest new Ticket and direct
+dependency needed to make the boundary canonical. This is a repository state
+change, not an automatic Agent handoff. No Event record or second execution
+package is required.
 
 This is a lightweight provenance claim in checked-in Git documents, not an
 identity, permission, approval, or attestation system.

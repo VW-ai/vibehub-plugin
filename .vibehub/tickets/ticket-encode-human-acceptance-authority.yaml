@@ -31,7 +31,7 @@
     },
     {
       "acceptance_id": "plan-and-run-handle-human-decisions",
-      "criterion": "Ticket Plan identifies known human decision boundaries and Ticket Run sends a newly discovered human decision back to planning, where the planner either revises the current Ticket or creates the smallest new decision Ticket with direct dependencies; no Event or second execution package is introduced."
+      "criterion": "Ticket Plan identifies known human decision boundaries, while a newly discovered human decision causes the checked-in graph to be replanned before execution crosses it: the same or a later Agent either revises the current Ticket or creates the smallest new decision Ticket with direct dependencies; no automatic session handoff, Event, or second execution package is introduced."
     },
     {
       "acceptance_id": "rooms-flow-proves-graph-boundary",
@@ -46,7 +46,7 @@
     "The Ticket remains the complete Agent-runnable package; do not add Event, Brief, dispatcher, policy-engine, account, lease, signature, or hidden-state machinery.",
     "Existing schema-valid Tickets and Evidence without optional authority or origin remain valid and behave as Agent-origin documents."
   ],
-  "context": "The branch already implements the minimal durable carrier: per-acceptance authority, human-origin Evidence, mechanical closeout enforcement, exact Agent handoff, and visible Workbench attention state. The remaining gap is narrower than a general attention-routing framework. A Ticket is already the complete package an Agent reads and runs. Planning must decide whether a human-owned judgment is merely terminal sign-off inside that package or a real scheduling boundary that should be visible as a separate Ticket dependency. Known boundaries are encoded during planning. If execution discovers one later, it re-enters the existing Ticket Plan transition, which may revise the current Ticket or split out a new decision Ticket. Downstream work whose real acceptance depends on that choice stays at maturity: draft and becomes REFINE after the decision, reusing the existing rolling-wave mechanism. The Rooms UI Ticket is the dogfood case: its proposal, owner choice, and implementation were incorrectly packed into one firm Ticket, so READY could not say whether the proposal had reached the owner and the implementation criteria falsely pretended the design was already known.",
+  "context": "The branch already implements the minimal durable carrier: per-acceptance authority, human-origin Evidence, mechanical closeout enforcement, exact Agent handoff, and visible Workbench attention state. The remaining gap is narrower than a general attention-routing framework. A Ticket is already the complete package an Agent reads and runs. Planning must decide whether a human-owned judgment is merely terminal sign-off inside that package or a real scheduling boundary that should be visible as a separate Ticket dependency. Known boundaries are encoded during planning. If execution discovers one later, the checked-in graph is replanned before execution crosses it: the same or a later Agent may revise the current Ticket or split out a new decision Ticket. No session is assigned or resumed automatically. Downstream work whose real acceptance depends on that choice stays at maturity: draft and becomes REFINE after the decision, reusing the existing rolling-wave mechanism. The Rooms UI Ticket is the dogfood case: its proposal, owner choice, and implementation were incorrectly packed into one firm Ticket, so READY could not say whether the proposal had reached the owner and the implementation criteria falsely pretended the design was already known.",
   "context_refs": [
     {
       "purpose": "Binding lightweight architecture and rejection of new execution packages or coordination machinery.",
@@ -73,7 +73,7 @@
       "ref": "skills/vibehub-ticket-plan/SKILL.md"
     },
     {
-      "purpose": "Execution Prompt that returns a discovered boundary to planning.",
+      "purpose": "Execution Prompt that records a discovered boundary in the graph before continuing.",
       "ref": "skills/vibehub-ticket-run/SKILL.md"
     },
     {

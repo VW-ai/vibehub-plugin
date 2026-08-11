@@ -28,7 +28,7 @@
   ],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The owner-selected Rooms Workbench direction is recorded as human-origin Evidence and independently accepted, unlocking implementation.",
+  "outcome": "The owner-selected Rooms Workbench direction is recorded as human-origin Evidence and independently accepted, moving downstream implementation into refinement.",
   "provenance_refs": [
     "conversation:2026-08-03-room-taxonomy-design",
     "conversation:2026-08-10-human-decision-boundary-policy",

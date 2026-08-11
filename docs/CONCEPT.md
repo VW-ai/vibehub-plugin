@@ -41,11 +41,13 @@ Presentation never becomes approval authority. The checked-in documents remain
 truth, and the same facts can fall back to the Agent conversation.
 
 Acceptance authority defaults to the Agent. One criterion may explicitly use
-`authority: human` when a product, permission, or material-risk judgment must
-come from a person. That criterion needs referenced Evidence with
-`origin: human` before successful closeout; Agent advice cannot substitute for
-the decision. These fields are lightweight Git provenance, not an identity or
-approval service, and they never change dependency status.
+`authority: human` when product direction or another acceptance judgment is
+reserved to a person. Host permission to perform an already-authorized action
+does not by itself change the decision owner. A human-authority criterion needs
+referenced Evidence with `origin: human` before successful closeout; Agent
+advice cannot substitute for the decision. These fields are lightweight Git
+provenance, not an identity or approval service, and they never change
+dependency status.
 
 ## Four durable document types
 

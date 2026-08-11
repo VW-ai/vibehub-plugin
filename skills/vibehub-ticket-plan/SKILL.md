@@ -20,18 +20,21 @@ decision determines its real acceptance; do not manufacture a firm downstream
 plan before the choice exists. Keep terminal human sign-off in the delivery
 Ticket when no downstream work needs a separate scheduling boundary.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
-`draft-needs-refinement`; it does not own UI launch mechanics.
+`draft-needs-refinement`; it owns their planning semantics, not Agent/session
+routing or UI launch mechanics.
 `execution-discovers-work` is the single home of the mid-cycle transition:
-when execution surfaces new independently schedulable work, it re-enters this
-Skill, which turns the discovery into Tickets with their direct dependencies —
-including a newly discovered human decision that gates continuation. Planning
-may revise the current Ticket when the boundary is not independently
-schedulable, or create the smallest new decision Ticket when it is; executors
-never absorb it silently. `draft-needs-refinement` is the single
+when execution surfaces new independently schedulable work, the same or a
+later Agent applies this Skill to turn the discovery into Tickets with their
+direct dependencies — including a newly discovered human decision that gates
+continuation. Planning may revise the current Ticket when the boundary is not
+independently schedulable, or create the smallest new decision Ticket when it
+is; executors never absorb it silently. `draft-needs-refinement` is the single
 home of rolling-wave refinement: a Ticket planned with `maturity: draft`
-carries honest direction whose acceptance cannot be written yet, surfaces as
-REFINE (never READY) once unblocked, and re-enters this Skill, which rewrites
-its acceptance for real and sets `maturity: firm` in place on the same Ticket.
+carries honest direction whose acceptance cannot be written yet and surfaces
+as REFINE (never READY) once unblocked. That checked-in state is sufficient for
+any Agent selecting work to apply this Skill, rewrite acceptance for real, and
+set `maturity: firm` in place on the same Ticket. No session handoff or wake-up
+is implied.
 
 ## Workflow
 

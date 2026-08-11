@@ -94,6 +94,6 @@ test("the projection reports REFINE honestly instead of the READY wording", () =
   const node = snapshot.state.graph.tickets.find((item) => item.ticketId === "sketch");
   assert.ok(node, JSON.stringify(snapshot.state.graph.tickets.map((item) => item.ticketId)));
   assert.equal(node.capabilities.operational.summary.label, "REFINE");
-  assert.match(node.capabilities.operational.summary.detail, /planning must rewrite its acceptance/);
+  assert.match(node.capabilities.operational.summary.detail, /maturity set to firm before execution/);
   assert.doesNotMatch(node.capabilities.operational.summary.detail, /prevents execution/);
 });

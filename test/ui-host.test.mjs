@@ -347,7 +347,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(subject.contextPackage.acceptance[0].acceptanceId, "works");
   assert.equal(subject.contextPackage.acceptance[0].authority, "human");
   assert.equal(subject.contextPackage.attention.label, "COMPLETE");
+  assert.equal(subject.contextPackage.maturity, "firm");
+  assert.equal(subject.contextPackage.operationalState, "DONE");
   assert.equal(subject.contextPackage.agentPayload.kind, "vibehub_ticket_handoff");
+  assert.equal(subject.contextPackage.agentPayload.maturity, "firm");
+  assert.equal(subject.contextPackage.agentPayload.operationalState, "DONE");
   assert.deepEqual(subject.contextPackage.agentPayload.humanBoundaries, [{
     acceptanceId: "works",
     criterion: "foundation behavior is observed.",
@@ -379,6 +383,21 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
       (item) => [item.acceptanceId, item.criterion, item.evidenceState],
     ),
     [["works", "feature behavior is observed.", "pending"]],
+  );
+
+  const unsuccessfulQuery = new URLSearchParams({
+    snapshotId: state.graph.snapshotId,
+    kind: "ticket",
+    ticketId: "unsuccessful",
+  });
+  const unsuccessfulSubject = (await (await fetch(
+    `${origin}/api/subject?${unsuccessfulQuery}`,
+    authorized(token),
+  )).json()).data;
+  assert.equal(unsuccessfulSubject.contextPackage.operationalState, "DEVIATED");
+  assert.equal(
+    unsuccessfulSubject.contextPackage.agentPayload.operationalState,
+    "DEVIATED",
   );
 
   const trace = (await (await fetch(
@@ -520,8 +539,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
 
   assert.deepEqual(canonicalBytes(repo), beforeUi);
 
+  const newlyVisible = ticket("newly-visible");
+  newlyVisible.maturity = "draft";
   assert.equal(run(repo, "ticket", "apply", {
-    tickets: [ticket("newly-visible")],
+    tickets: [newlyVisible],
   }).status, 0);
   const refreshed = (await (await fetch(
     `${origin}/api/state`,
@@ -529,6 +550,19 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   )).json()).data;
   assert.equal(refreshed.graph.tickets.length, 5);
   assert.notEqual(refreshed.graph.snapshotId, state.graph.snapshotId);
+  const draftQuery = new URLSearchParams({
+    snapshotId: refreshed.graph.snapshotId,
+    kind: "ticket",
+    ticketId: "newly-visible",
+  });
+  const draftSubject = (await (await fetch(
+    `${origin}/api/subject?${draftQuery}`,
+    authorized(token),
+  )).json()).data;
+  assert.equal(draftSubject.contextPackage.maturity, "draft");
+  assert.equal(draftSubject.contextPackage.operationalState, "REFINE");
+  assert.equal(draftSubject.contextPackage.agentPayload.maturity, "draft");
+  assert.equal(draftSubject.contextPackage.agentPayload.operationalState, "REFINE");
 });
 
 test("launcher flags stay intentionally narrow", () => {

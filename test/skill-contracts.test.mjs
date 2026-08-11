@@ -115,7 +115,8 @@ test("human decision boundaries stay in the Ticket graph", () => {
   assert.equal(ticketSchema.properties.maturity.default, "firm");
   assert.match(authorityBody, /decision owner/u);
   assert.match(authorityBody, /independently\s+schedulable downstream work/u);
-  assert.match(authorityBody, /returns to Ticket Plan/u);
+  assert.match(authorityBody, /repository-level handoff/u);
+  assert.match(authorityBody, /does not assign, wake, or bind an Agent session/u);
   assert.match(authorityBody, /maturity: draft/u);
   assert.match(bodies.get("vibehub-ticket-plan"), /proposal, human decision, then dependent\s+implementation/u);
   assert.match(bodies.get("vibehub-ticket-plan"), /do not manufacture a firm downstream\s+plan/u);
