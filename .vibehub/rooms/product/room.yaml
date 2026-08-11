@@ -18,7 +18,7 @@
         "path": "docs/INSTALL.md"
       },
       {
-        "blob": "4180ad4ea7985710439882e26dd295df2279a668",
+        "blob": "5d584e80c66ddc50186f776d89aeea204bbe6d59",
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
@@ -46,8 +46,8 @@
         "path": "docs/demos/vibehub-workbench-webview.html"
       }
     ],
-    "checked_at": "2026-08-10T10:05:09.507Z",
-    "last_aligned_commit": "f4f2994e3988b554aebaa61d508e592b2245ab6f"
+    "checked_at": "2026-08-11T18:03:59.086Z",
+    "last_aligned_commit": "a333ff006437fa3f574b3d016ec1342f4d302c7c"
   },
   "anchors": [
     "CHANGELOG.md",
