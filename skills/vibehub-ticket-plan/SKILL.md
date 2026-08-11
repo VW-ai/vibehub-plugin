@@ -15,8 +15,10 @@ authority. Omit `authority` (or use `agent`) for independently checkable work;
 use `human` only for the exact criterion whose decision owner must be a person.
 When that decision gates independently schedulable downstream work, make the
 boundary visible in the graph: proposal, human decision, then dependent
-implementation. Keep terminal human sign-off in the delivery Ticket when no
-downstream work needs a separate scheduling boundary.
+implementation. Mark the dependent implementation `maturity: draft` when the
+decision determines its real acceptance; do not manufacture a firm downstream
+plan before the choice exists. Keep terminal human sign-off in the delivery
+Ticket when no downstream work needs a separate scheduling boundary.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
 `draft-needs-refinement`; it does not own UI launch mechanics.
 `execution-discovers-work` is the single home of the mid-cycle transition:
@@ -29,7 +31,7 @@ never absorb it silently. `draft-needs-refinement` is the single
 home of rolling-wave refinement: a Ticket planned with `maturity: draft`
 carries honest direction whose acceptance cannot be written yet, surfaces as
 REFINE (never READY) once unblocked, and re-enters this Skill, which rewrites
-its acceptance for real and removes the marker in place on the same Ticket.
+its acceptance for real and sets `maturity: firm` in place on the same Ticket.
 
 ## Workflow
 
@@ -63,6 +65,9 @@ its acceptance for real and removes the marker in place on the same Ticket.
    planning gap. The Ticket itself carries enough `context`, `context_refs`,
    constraints, and acceptance for a fresh Agent.
 5. Draft complete Ticket documents using `../contracts/ticket.schema.json`.
+   Write `maturity: firm` when acceptance is executable and `maturity: draft`
+   when direction is known but acceptance is not; omitted maturity remains
+   legacy-compatible firm, but new or rewritten Tickets state it explicitly.
    Dependents list only direct prerequisites. Do not manufacture migration,
    review, or dogfood stages.
 6. Ask a separate Agent to use `$vibehub-ticket-validate` on the raw candidate

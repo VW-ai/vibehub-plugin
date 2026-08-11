@@ -28,7 +28,10 @@ projected as canonical UI state.
    decision owner must be the user as human-authority acceptance. When such a
    decision gates independently schedulable downstream work, verify that the
    proposal, decision, and implementation boundary is represented by direct
-   Ticket dependencies rather than hidden inside one Ticket's prose.
+   Ticket dependencies rather than hidden inside one Ticket's prose. If the
+   decision determines the downstream acceptance, require that dependent to
+   remain `maturity: draft` until planning can refine it from the decision's
+   successful Outcome and Evidence.
 4. Return `passed`, `failed`, or `inconclusive`, followed by material findings,
    implementation fog, protected-boundary state, and the next action. For
    `validation-needs-human`, present the exact protected choice in the

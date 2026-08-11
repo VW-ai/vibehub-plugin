@@ -12,10 +12,11 @@
     ".vibehub/tickets/ticket-rooms-into-workbench.yaml",
     "command:vh-ticket-graph-proposal-ready-decision-blocked-implementation-blocked",
     "command:vh-ui-projection-decision-upcoming",
+    "test:draft-behind-human-blocker-becomes-refine-never-ready",
     "test:npm-test-46-of-46",
     "verification:plugin-artifact-52-files-378280-bytes"
   ],
-  "summary": "The former combined Rooms Ticket is now a three-node direct dependency chain. Mechanical graph output reports the proposal READY, the human-decision Ticket BLOCKED by the proposal, and implementation BLOCKED by the decision. UI projection reports the decision UPCOMING rather than PENDING while its proposal prerequisite is unresolved. The decision Ticket alone carries human authority, so a successful human-origin Outcome is the only unlock for implementation.",
+  "summary": "The former combined Rooms Ticket is now a three-node direct dependency chain whose implementation node is maturity: draft. Mechanical graph output reports the proposal READY, the human-decision Ticket BLOCKED by the proposal, and draft implementation BLOCKED by the decision. UI projection reports the decision UPCOMING rather than PENDING while its proposal prerequisite is unresolved. The draft-maturity test now uses an authority: human blocker and proves that its successful human-origin Outcome moves the dependent only to REFINE, never READY; Ticket Plan must rewrite that same Ticket before execution.",
   "schema_version": 1,
   "ticket_id": "ticket-encode-human-acceptance-authority"
 }

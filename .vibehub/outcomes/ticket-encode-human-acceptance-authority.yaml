@@ -10,19 +10,20 @@
     "plan-and-run-handle-human-decisions",
     "rooms-flow-proves-graph-boundary"
   ],
-  "closed_at": "2026-08-11T00:06:15Z",
+  "closed_at": "2026-08-11T01:19:26Z",
   "evidence_ids": [
     "authority-contract-and-skill-proof",
     "clean-authority-plugin-verification",
     "human-attention-projection-and-handoff-proof",
     "decision-boundary-policy-approval",
+    "draft-after-decision-policy-approval",
     "decision-boundary-prompt-proof",
     "rooms-decision-graph-proof"
   ],
   "kind": "ticket_outcome",
   "schema_version": 1,
   "status": "successful",
-  "summary": "Fresh independent closeout accepted all nine current criteria. It re-read the current Ticket, contracts, lifecycle, Plan/Run/Validate prompts, schemas, six Evidence documents, and full worktree diff; verified the owner policy through referenced human-origin Evidence; reproduced the Rooms proposal → human decision → implementation graph as READY/BLOCKED/BLOCKED with UPCOMING attention, then dynamically proved proposal success yields READY+PENDING for the decision while implementation stays BLOCKED, and human-origin decision closeout yields DONE+COMPLETE and unlocks implementation to READY. The current project validates, all Rooms are FRESH, git diff checks pass, and npm run verify passes 46/46 tests plus the dependency-free 52-file artifact verification.",
+  "summary": "Fresh independent closeout accepted all nine current criteria against the updated authority-and-maturity policy and all seven Evidence documents. Per-acceptance authority and human-origin closeout enforcement remain compatible and lightweight; Plan, Run, and Validate make independently schedulable human decisions explicit graph boundaries without another execution package. The Rooms dogfood chain now states firm proposal, firm human decision, and draft implementation. Its current states are proposal READY, decision BLOCKED with UPCOMING human attention, and implementation BLOCKED. A disposable exact-chain replay proved proposal success makes the decision READY/PENDING while implementation remains BLOCKED; human-origin decision Evidence plus independent Outcome then makes the decision DONE/COMPLETE and moves implementation only to REFINE, never directly to READY. Ticket Plan must rewrite the same downstream Ticket from draft to explicit firm before execution. Relevant tests pass 17/17, the complete suite passes 46/46 with the 52-file Codex/Claude-compatible artifact, project and Ticket validation pass, all Rooms are FRESH, and git diff check is clean.",
   "ticket_id": "ticket-encode-human-acceptance-authority",
   "unresolved_acceptance_ids": []
 }

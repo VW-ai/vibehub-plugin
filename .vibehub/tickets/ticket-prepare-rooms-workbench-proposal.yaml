@@ -34,6 +34,7 @@
     }
   ],
   "kind": "ticket",
+  "maturity": "firm",
   "outcome": "A concrete, contract-grounded Rooms Workbench proposal is ready for an explicit owner decision.",
   "provenance_refs": [
     "conversation:2026-08-03-room-taxonomy-design",

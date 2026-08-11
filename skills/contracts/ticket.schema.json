@@ -9,7 +9,12 @@
     "schema_version": { "const": 1 },
     "kind": { "const": "ticket" },
     "ticket_id": { "$ref": "#/$defs/id" },
-    "maturity": { "const": "draft" },
+    "maturity": {
+      "type": "string",
+      "enum": ["firm", "draft"],
+      "default": "firm",
+      "description": "Planning maturity. New or rewritten Tickets state firm or draft explicitly; omission remains legacy-compatible firm."
+    },
     "outcome": { "$ref": "#/$defs/text" },
     "context": { "$ref": "#/$defs/text" },
     "acceptance": {

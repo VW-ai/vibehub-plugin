@@ -25,6 +25,12 @@ human-decision Ticket records the choice, and implementation depends on its
 successful Outcome. A terminal human sign-off with no downstream work may stay
 as one acceptance criterion in the delivery Ticket.
 
+When the decision determines what downstream acceptance should be, keep that
+dependent Ticket at `maturity: draft` instead of inventing a firm plan. The
+decision's successful Outcome moves it from BLOCKED to REFINE, where Ticket
+Plan reads the decision Evidence, rewrites the same Ticket in place, and only
+then marks it `maturity: firm` and makes it eligible for READY execution.
+
 If execution discovers an unplanned human decision, it returns to Ticket Plan.
 Planning either revises the current Ticket or creates the smallest new Ticket
 and direct dependency needed to make the boundary canonical. No Event record or

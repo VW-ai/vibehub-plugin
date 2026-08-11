@@ -445,8 +445,8 @@ function validateTicket(document, path = "ticket") {
   ) return errors;
   if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
   if (document.kind !== "ticket") add(errors, `${path}.kind`, "must equal ticket");
-  if (document.maturity !== undefined && document.maturity !== "draft") {
-    add(errors, `${path}.maturity`, "must equal draft when present");
+  if (document.maturity !== undefined && !["firm", "draft"].includes(document.maturity)) {
+    add(errors, `${path}.maturity`, "must equal firm or draft when present");
   }
   requiredString(errors, document, "ticket_id", path, { id: true });
   requiredString(errors, document, "outcome", path);
@@ -886,7 +886,7 @@ export function ticketStatus(repository, ticket) {
     .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful");
   if (blocking.length > 0) return "BLOCKED";
   // A draft can never become READY: it surfaces as REFINE until planning
-  // rewrites its acceptance for real and removes the maturity marker.
+  // rewrites its acceptance for real and marks the Ticket firm.
   return ticket.maturity === "draft" ? "REFINE" : "READY";
 }
 

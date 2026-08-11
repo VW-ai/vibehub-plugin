@@ -1,10 +1,14 @@
 {
   "context_id": "decision-draft-ticket-maturity",
-  "detail": "Rolling-wave planning becomes canonical. A ticket may carry an optional maturity: draft marker (absence means firm; every existing ticket stays valid). A draft states the real direction in outcome and context but its acceptance may be coarse placeholders — at least one criterion always, because intent is never empty. The mechanical rule: a draft whose dependencies are all satisfied surfaces as REFINE, never READY, so an under-defined ticket is structurally impossible to execute; the frontier excludes drafts unconditionally. Refinement is owned by planning: when prerequisites close or the awaited human input arrives, ticket-plan re-enters with the accumulated results, rewrites the acceptance for real, and removes the maturity marker in place — the same ticket_id, so Git history preserves the evolution from sketch to firm. This models the owner's scenario: a big project planned day one keeps the whole road visible (a human-input blocker ticket in the middle, a chain of drafts behind it), and each draft firms up only when what it depends on is actually known. Draft is orthogonal to human-authority marking: the authority badge says a human must decide here; draft says everything behind this is still a sketch. Visual treatment in the workbench belongs to the rooms-surface design proposal and its owner-approval gate.",
+  "detail": "Rolling-wave planning becomes canonical. Ticket maturity has two explicit values: firm means its acceptance is executable, while draft means the direction is known but its acceptance cannot yet be written honestly. New and rewritten Tickets state maturity explicitly; omission remains legacy-compatible firm so existing repositories need no migration. A draft carries real outcome, context, constraints, and at least one coarse placeholder criterion because intent is never empty. Mechanically, a draft whose dependencies are all satisfied surfaces as REFINE, never READY, so an under-defined Ticket is structurally impossible to execute and the frontier excludes it. Refinement is owned by planning: when prerequisites close or awaited human input arrives, Ticket Plan reads the accumulated results, rewrites acceptance for real, and changes the same Ticket to maturity: firm — preserving its ticket_id and Git history from sketch to executable package. This models a big project planned day one with firm work up front, a human-input blocker in the middle, and draft work behind it. Maturity is orthogonal to human authority: authority says who decides here; draft says downstream is still a sketch.",
   "evidence": [
     {
       "note": "Owner described the rolling-wave gap (blockers followed by direction-known but under-defined tickets) and approved the maturity/REFINE design with 起吧.",
       "ref": "conversation:2026-08-04-fuzzy-draft-tickets"
+    },
+    {
+      "note": "Owner requested explicit maturity: firm alongside draft for a uniform new Ticket contract while retaining compatibility for existing Tickets.",
+      "ref": "conversation:2026-08-10-explicit-firm-ticket-maturity"
     },
     {
       "note": "Design conversation task this capture is attributed to.",
@@ -25,7 +29,7 @@
     "ref": "conversation:2026-08-04-fuzzy-draft-tickets"
   },
   "state": "active",
-  "summary": "Draft tickets carry direction without executable definition: they can never run, only refine into firm tickets when their blockers resolve",
+  "summary": "Tickets explicitly state firm or draft maturity; drafts carry direction, become REFINE after blockers resolve, and firm up in place before execution",
   "tags": [
     "tickets",
     "draft",

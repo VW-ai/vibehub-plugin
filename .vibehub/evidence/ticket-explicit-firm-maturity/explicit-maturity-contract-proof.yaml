@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "firm-and-draft-are-canonical",
+    "planning-writes-maturity-explicitly"
+  ],
+  "evidence_id": "explicit-maturity-contract-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-11T01:14:42.000Z",
+  "refs": [
+    "skills/contracts/ticket.schema.json",
+    "skills/scripts/vh.mjs",
+    "skills/vibehub-ticket-plan/SKILL.md",
+    ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml",
+    "test/draft-maturity.test.mjs",
+    "test/skill-contracts.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The schema now canonically enumerates firm and draft with a documented firm default, while the validator accepts both and rejects fuzzy. Ticket Plan requires new and rewritten Tickets to state maturity explicitly and changes refinement from removing draft to setting firm. Behavioral and contract tests verify explicit firm, explicit draft, legacy omission, invalid input, schema parity, and prompt wording.",
+  "ticket_id": "ticket-explicit-firm-maturity"
+}

@@ -1,20 +1,8 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "projection-exposes-rooms",
-      "criterion": "The vh-ui projection exposes the room tree with each room's description, boundary, and drift state computed deterministically, consumable by the UI without semantic inference."
-    },
-    {
-      "acceptance_id": "in-situ-staleness",
-      "criterion": "The rooms surface keeps FRESH rooms quiet and renders DRIFTED, STALE, UNKNOWN, and WARNING in situ with restrained semantic accents consistent with the checked-in UI constraint."
-    },
-    {
-      "acceptance_id": "room-consumption-detail",
-      "criterion": "Selecting a room reveals its Context entries and the Tickets consuming them, derived mechanically from context_refs paths."
-    },
-    {
-      "acceptance_id": "workbench-verified",
-      "criterion": "node --test covers the extended projection and surface, and the plugin artifact builds and verifies cleanly."
+      "acceptance_id": "refine-rooms-workbench-implementation",
+      "criterion": "Placeholder: after the owner-selected Rooms direction is recorded, Ticket Plan rewrites this Ticket in place with independently checkable projection, interaction, visual-state, and verification criteria grounded in that decision before implementation begins."
     }
   ],
   "constraints": [
@@ -22,7 +10,7 @@
     "All room information is mechanically projected from canonical documents; the UI performs no semantic inference.",
     "The quiet-intelligence spatial-workbench standard binds every visual choice."
   ],
-  "context": "Rooms are currently invisible in the local graph UI beyond the room chip on context cards. The preceding proposal and owner-decision Tickets make the visual direction an explicit graph boundary, so this Ticket is now an implementation-only package. Read the successful decision Ticket's Outcome and referenced human-origin Evidence before beginning. The quiet-intelligence constraint requires stale facts to appear in situ at the locus that owns them, and Room drift states (FRESH, DRIFTED, STALE, UNKNOWN, WARNING) are the first real mechanical source of that signal. Everything needed is mechanically derivable from canonical documents: the Room tree and room.yaml self-descriptions, drift states via the same snapshot-hash comparison vh room drift uses, and ticket-to-room consumption edges from context_refs paths. Re-clustering or re-laying-out the causal Ticket graph by Room remains out of scope.",
+  "context": "Rooms are currently invisible in the local graph UI beyond the room chip on context cards. The direction is known — expose the Room tree, drift state, Context entries, and consuming Tickets without disturbing the causal graph — but the implementation contract cannot be written honestly until the proposal is reviewed and the owner chooses a direction. This Ticket therefore preserves the downstream position as a draft. While the decision is unresolved it remains BLOCKED; after a successful decision Outcome it becomes REFINE, never READY. Ticket Plan then reads the decision's Outcome and human-origin Evidence, rewrites this same Ticket's acceptance for real, and changes maturity to firm before implementation. The quiet-intelligence and mechanical-projection constraints remain binding throughout refinement.",
   "context_refs": [
     {
       "purpose": "Binding visual and interaction standard for the new surface.",
@@ -42,6 +30,7 @@
     }
   ],
   "kind": "ticket",
+  "maturity": "draft",
   "outcome": "The workbench UI makes the Room layer visible: the room tree with per-room drift state rendered in situ, and each room's knowledge and consuming Tickets reachable from a quiet rooms surface.",
   "provenance_refs": [
     "conversation:2026-08-03-room-taxonomy-design",

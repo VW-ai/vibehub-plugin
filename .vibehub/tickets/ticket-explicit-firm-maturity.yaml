@@ -1,0 +1,64 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "firm-and-draft-are-canonical",
+      "criterion": "The Ticket schema and deterministic validator accept maturity: firm and maturity: draft, reject unknown values, and continue interpreting omitted maturity as firm so existing repositories require no migration."
+    },
+    {
+      "acceptance_id": "planning-writes-maturity-explicitly",
+      "criterion": "Ticket Plan instructs new and rewritten Tickets to state firm or draft explicitly, and refinement changes the same Ticket from draft to firm instead of deleting the field."
+    },
+    {
+      "acceptance_id": "rolling-wave-behavior-is-preserved",
+      "criterion": "Tests prove explicit firm and legacy omission both reach READY, draft remains REFINE after a human blocker succeeds, and firming the same Ticket makes it READY; the Rooms proposal, decision, and downstream implementation graph uses firm, firm, and draft respectively."
+    },
+    {
+      "acceptance_id": "explicit-maturity-verifies-cleanly",
+      "criterion": "Project and Ticket validation, the complete node test suite, and the Codex/Claude-compatible Plugin artifact verification pass with all entered Rooms FRESH."
+    }
+  ],
+  "constraints": [
+    "Do not make maturity required in schema version 1; omitted maturity remains a compatibility input interpreted as firm.",
+    "Do not rewrite every historical Ticket merely to materialize the default.",
+    "Do not add a new lifecycle state: firm uses existing READY behavior and draft uses existing REFINE behavior."
+  ],
+  "context": "The owner wants Ticket maturity to be symmetric and explicit rather than representing firm only by absence. The smallest compatible change adds firm beside draft as a canonical value, teaches planning to write one value on every new or rewritten Ticket, and changes refinement to set firm explicitly. Historical Tickets remain valid without migration because omission still has firm semantics. This is representation cleanup, not a new state machine.",
+  "context_refs": [
+    {
+      "purpose": "Active rolling-wave maturity decision being refined compatibly.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
+    },
+    {
+      "purpose": "Canonical Ticket schema whose maturity enum changes.",
+      "ref": "skills/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Deterministic validator and unchanged status calculation.",
+      "ref": "skills/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Planning instructions for new Tickets and draft refinement.",
+      "ref": "skills/vibehub-ticket-plan/SKILL.md"
+    },
+    {
+      "purpose": "Behavioral tests for explicit, omitted, and draft maturity.",
+      "ref": "test/draft-maturity.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Ticket maturity is explicitly symmetric for new work: firm and draft are canonical values, legacy omission still behaves as firm, and rolling-wave refinement changes draft to firm in place.",
+  "provenance_refs": [
+    "conversation:2026-08-10-explicit-firm-ticket-maturity",
+    "context:decision-draft-ticket-maturity"
+  ],
+  "relations": [
+    {
+      "rationale": "This compatible representation cleanup builds on the completed draft/REFINE lifecycle.",
+      "target_ticket_id": "ticket-draft-ticket-maturity",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-explicit-firm-maturity"
+}

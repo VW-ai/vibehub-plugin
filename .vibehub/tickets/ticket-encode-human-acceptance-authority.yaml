@@ -27,7 +27,7 @@
     {
       "acceptance_id": "decision-boundary-policy-approved",
       "authority": "human",
-      "criterion": "The owner explicitly approves the policy that authority names the decision owner, a human decision that gates independently schedulable downstream work becomes a Ticket-graph boundary, and a terminal human sign-off may remain inside the delivery Ticket."
+      "criterion": "The owner explicitly approves the policy that authority names the decision owner, a human decision that gates independently schedulable downstream work becomes a Ticket-graph boundary, acceptance-unknown downstream work remains draft until that decision, and a terminal human sign-off may remain inside the delivery Ticket."
     },
     {
       "acceptance_id": "plan-and-run-handle-human-decisions",
@@ -35,7 +35,7 @@
     },
     {
       "acceptance_id": "rooms-flow-proves-graph-boundary",
-      "criterion": "The existing Rooms Workbench work is replanned as proposal, human decision, and implementation Tickets so the graph mechanically keeps the decision UPCOMING until its proposal prerequisite succeeds, makes it PENDING only when the decision Ticket is READY, and blocks implementation until human-origin Evidence is independently accepted."
+      "criterion": "The existing Rooms Workbench work is replanned as proposal, human decision, and draft implementation Tickets so the graph keeps the decision UPCOMING until its proposal prerequisite succeeds, makes it PENDING only when the decision Ticket is READY, and moves implementation from BLOCKED to REFINE — never directly to READY — after the human decision is independently accepted."
     }
   ],
   "constraints": [
@@ -46,7 +46,7 @@
     "The Ticket remains the complete Agent-runnable package; do not add Event, Brief, dispatcher, policy-engine, account, lease, signature, or hidden-state machinery.",
     "Existing schema-valid Tickets and Evidence without optional authority or origin remain valid and behave as Agent-origin documents."
   ],
-  "context": "The branch already implements the minimal durable carrier: per-acceptance authority, human-origin Evidence, mechanical closeout enforcement, exact Agent handoff, and visible Workbench attention state. The remaining gap is narrower than a general attention-routing framework. A Ticket is already the complete package an Agent reads and runs. Planning must decide whether a human-owned judgment is merely terminal sign-off inside that package or a real scheduling boundary that should be visible as a separate Ticket dependency. Known boundaries are encoded during planning. If execution discovers one later, it re-enters the existing Ticket Plan transition, which may revise the current Ticket or split out a new decision Ticket. The Rooms UI Ticket is the dogfood case: its proposal, owner choice, and implementation were incorrectly packed into one Ticket, so READY could not say whether the proposal had actually reached the owner.",
+  "context": "The branch already implements the minimal durable carrier: per-acceptance authority, human-origin Evidence, mechanical closeout enforcement, exact Agent handoff, and visible Workbench attention state. The remaining gap is narrower than a general attention-routing framework. A Ticket is already the complete package an Agent reads and runs. Planning must decide whether a human-owned judgment is merely terminal sign-off inside that package or a real scheduling boundary that should be visible as a separate Ticket dependency. Known boundaries are encoded during planning. If execution discovers one later, it re-enters the existing Ticket Plan transition, which may revise the current Ticket or split out a new decision Ticket. Downstream work whose real acceptance depends on that choice stays at maturity: draft and becomes REFINE after the decision, reusing the existing rolling-wave mechanism. The Rooms UI Ticket is the dogfood case: its proposal, owner choice, and implementation were incorrectly packed into one firm Ticket, so READY could not say whether the proposal had reached the owner and the implementation criteria falsely pretended the design was already known.",
   "context_refs": [
     {
       "purpose": "Binding lightweight architecture and rejection of new execution packages or coordination machinery.",
@@ -79,9 +79,14 @@
     {
       "purpose": "Current combined Rooms Ticket to replan as the concrete proof case.",
       "ref": ".vibehub/tickets/ticket-rooms-into-workbench.yaml"
+    },
+    {
+      "purpose": "Existing rolling-wave rule for under-defined work behind a blocker.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
     }
   ],
   "kind": "ticket",
+  "maturity": "firm",
   "outcome": "Tickets name the decision owner only where judgment belongs to a person, and real human-gated scheduling boundaries are represented by the existing Ticket graph at plan time or through execution-triggered replanning.",
   "provenance_refs": [
     "conversation:2026-08-02-human-required-tickets-should-look-distinct",
