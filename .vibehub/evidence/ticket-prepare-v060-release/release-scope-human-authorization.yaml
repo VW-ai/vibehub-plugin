@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "release-scope-authorized"
+  ],
+  "evidence_id": "release-scope-human-authorization",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-11T06:10:11Z",
+  "refs": [
+    "conversation:2026-08-10-v060-release-request"
+  ],
+  "schema_version": 1,
+  "summary": "The repository owner explicitly requested preparation and publication of VibeHub v0.6.0 as a backward-compatible feature release from latest main, specified the five identity fields and changelog scope, authorized opening the release MR, and instructed that the exact v0.6.0 tag and GitHub Release may be created only after that MR is merged.",
+  "ticket_id": "ticket-prepare-v060-release"
+}

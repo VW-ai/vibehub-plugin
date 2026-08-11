@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.6.0 — 2026-08-10
+
+- Add per-acceptance decision authority: each criterion may name `agent` or
+  `human` as its decision owner while existing Tickets remain compatible with
+  Agent authority as the default.
+- Enforce human-origin Evidence for human-owned criteria before an independent
+  closeout may accept them, without introducing an approval or identity
+  service.
+- Project human-attention states mechanically in the Workbench, distinguishing
+  upcoming decisions, pending human Evidence, recorded Evidence, and completed
+  Outcomes without changing READY, BLOCKED, REFINE, DONE, or DEVIATED.
+- Make `maturity: firm` and `maturity: draft` explicit, symmetric planning
+  values; legacy omission remains firm, while unblocked draft work surfaces as
+  REFINE until Ticket Plan firms the same Ticket in place.
+- Define a stateless repository-level Agent handoff: any current or later Agent
+  can continue from the checked-in Ticket, decision Outcome, and Evidence,
+  without assigning, waking, or binding an Agent session.
+- Model real scheduling boundaries as a causal graph of firm proposal → firm
+  human decision → draft downstream refinement, so a successful decision moves
+  dependent work to REFINE rather than pretending its acceptance was known.
+
 ## 0.5.0 — 2026-08-04
 
 - Introduce the Room taxonomy: every Context entry lives in the room that

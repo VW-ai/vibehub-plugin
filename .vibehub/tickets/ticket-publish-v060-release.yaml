@@ -1,0 +1,52 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "release-pr-merged",
+      "authority": "agent",
+      "criterion": "The verified v0.6.0 release-preparation PR is merged into main, and updated origin/main contains its successful preparation Outcome and Evidence."
+    },
+    {
+      "acceptance_id": "tagged-merged-main",
+      "authority": "agent",
+      "criterion": "After fast-forwarding local main, tag v0.6.0 points exactly to the merged main commit and is pushed to origin; no feature-branch commit is tagged."
+    },
+    {
+      "acceptance_id": "github-release-verified",
+      "authority": "agent",
+      "criterion": "The Release VibeHub workflow succeeds; GitHub Release v0.6.0 points to the tagged main commit; vibehub-plugin-0.6.0.tar.gz and vibehub-plugin-0.6.0.tar.gz.sha256 both exist; and local SHA-256 verification of the downloaded archive passes."
+    }
+  ],
+  "constraints": [
+    "Never tag or create the GitHub Release from the release branch.",
+    "Do not create the GitHub Release manually; wait for the tag-triggered Release VibeHub workflow.",
+    "Tag exactly v0.6.0 with no alternate spelling or suffix.",
+    "Do not publish to npm or add any updater/runtime machinery."
+  ],
+  "context": "Publication begins only after the v0.6.0 release-preparation PR is merged. Follow docs/RELEASE.md exactly: return to main, fast-forward from origin/main, tag the exact merged main commit as v0.6.0, push only that tag, wait for the Release VibeHub workflow, then verify the GitHub Release target and both downloadable assets by checking the checksum locally. The GitHub workflow owns Release creation; no feature branch or manual release path is authorized.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative tag, workflow, asset, and checksum verification sequence.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "Tag-triggered workflow that builds and creates the GitHub Release.",
+      "ref": ".github/workflows/release.yml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub v0.6.0 is published from the exact merged main commit as a verified GitHub Release with its archive and SHA-256 checksum.",
+  "provenance_refs": [
+    "conversation:2026-08-10-v060-release-request",
+    "commit:cbd41a10cbd2caa4d008ac1ad495154ee9f4140a"
+  ],
+  "relations": [
+    {
+      "rationale": "Publication may start only after the verified release candidate and its review records exist.",
+      "target_ticket_id": "ticket-prepare-v060-release",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-publish-v060-release"
+}
