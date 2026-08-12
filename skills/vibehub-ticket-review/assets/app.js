@@ -23,18 +23,20 @@
     "The READY frontier remains available.";
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
-  const TICKET_STATES = new Set([
-    "READY",
-    "DONE",
-    "BLOCKED",
-    "DEVIATED",
-  ]);
-  const ATTENTION_STATES = new Set([
-    "UPCOMING",
-    "PENDING",
-    "RECORDED",
-    "COMPLETE",
-  ]);
+  const workbenchModel = globalThis.VibeHubWorkbenchModel;
+  if (!workbenchModel) {
+    throw new Error("VibeHub Workbench presentation model is unavailable.");
+  }
+  const {
+    agentHandoffInstruction,
+    causalPriority: operationalPriority,
+    graphNarrative,
+    graphSummary,
+    operationalCounts,
+    ticketAttentionState,
+    ticketNodePresentation,
+    ticketOperationalState,
+  } = workbenchModel;
   const TICKET_VIEW_IDS = new Map([
     ["execution", "execution"],
     ["contract", "contract"],
@@ -59,6 +61,7 @@
     frontierList: document.querySelector("#frontierList"),
     frontierCount: document.querySelector("#frontierCount"),
     summaryReady: document.querySelector("#summaryReady"),
+    summaryRefine: document.querySelector("#summaryRefine"),
     summaryBlocked: document.querySelector("#summaryBlocked"),
     summaryDone: document.querySelector("#summaryDone"),
     summaryDeviated: document.querySelector("#summaryDeviated"),
@@ -290,6 +293,7 @@
 
   function renderSummaryCounts(counts) {
     elements.summaryReady.textContent = String(counts.READY);
+    elements.summaryRefine.textContent = String(counts.REFINE);
     elements.summaryBlocked.textContent = String(counts.BLOCKED);
     elements.summaryDone.textContent = String(counts.DONE);
     elements.summaryDeviated.textContent = String(counts.DEVIATED);
@@ -359,31 +363,19 @@
     for (const ticket of state.graph.tickets) {
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
-      const operational = ticketOperationalState(ticket);
-      const attention = ticketAttentionState(ticket);
       const isSelected =
         selected?.kind === "ticket" && selected.id === ticket.ticketId;
+      const presentation = ticketNodePresentation(ticket, {
+        selected: isSelected,
+        dimmed: Boolean(related && !related.nodes.has(ticket.ticketId)),
+      });
+      const { operational, attention } = presentation;
       const group = svg("g", {
-        class: classes(
-          "ticket-node",
-          isSelected ? "selected" : "",
-          related && !related.nodes.has(ticket.ticketId) ? "dimmed" : "",
-          operational ? `state-${operational.key}` : "",
-          attention ? `attention-${attention.key}` : "",
-        ),
+        class: presentation.className,
         transform: `translate(${position.x} ${position.y})`,
         role: "button",
         tabindex: "0",
-        "aria-label":
-          `${ticket.ticketId}. ${ticket.outcome}. `
-          + `${ticket.relationCounts.prerequisites} prerequisites, `
-          + `${ticket.relationCounts.dependents} unlocks.`
-          + (operational
-            ? ` ${operational.label}. ${operational.detail || ""}`
-            : "")
-          + (attention
-            ? ` Human attention ${attention.label}. ${attention.detail || ""}`
-            : ""),
+        "aria-label": presentation.ariaLabel,
       });
       group.dataset.ticketId = ticket.ticketId;
       group.append(
@@ -1206,17 +1198,12 @@
 
   function agentHandoffPayload(ticket, contextPackage, operational) {
     // READY is the only Git-native state that may hand an Agent a new
-    // ticket-run instruction. Every other state copies an inspect
-    // instruction so an Agent never starts work the graph does not allow.
+    // ticket-run instruction. REFINE routes back to Ticket Plan; every other
+    // state copies an inspect instruction so an Agent never starts work the
+    // graph does not allow.
     const stateLabel = operational?.label || "UNPROJECTED";
-    const instruction = stateLabel === "READY"
-      ? `Execute the READY VibeHub Ticket ${ticket.ticketId} in this exact `
-        + "worktree with the Skill vibehub-ticket-run."
-      : `Inspect VibeHub Ticket ${ticket.ticketId} (currently ${stateLabel}) `
-        + "with the Skill vibehub-ticket-review. It is not READY, so do not "
-        + "start vibehub-ticket-run for it.";
     return {
-      instruction,
+      instruction: agentHandoffInstruction(ticket.ticketId, stateLabel),
       ...(contextPackage.agentPayload ?? {
         kind: "vibehub_ticket_handoff",
         ticketId: ticket.ticketId,
@@ -1293,9 +1280,7 @@
 
   function causalPriority(ticketId) {
     const ticket = state.graph.tickets.find((item) => item.ticketId === ticketId);
-    return { DEVIATED: 0, BLOCKED: 1, READY: 2, DONE: 3 }[
-      ticketOperationalState(ticket)?.label
-    ] ?? 4;
+    return operationalPriority(ticketOperationalState(ticket)?.label);
   }
 
   function causalTicketButton(ticketId) {
@@ -1967,68 +1952,6 @@
       result.append(row);
     }
     return result;
-  }
-
-  function ticketOperationalState(ticket) {
-    const slot = ticket?.capabilities?.operational;
-    if (slot?.availability !== "available") return null;
-    const label = String(slot.summary?.label || "").toUpperCase();
-    if (!TICKET_STATES.has(label)) return null;
-    return {
-      label,
-      key: label.toLowerCase(),
-      detail: slot.summary?.detail || "",
-      references: Array.isArray(slot.summary?.references)
-        ? slot.summary.references
-        : [],
-    };
-  }
-
-  function ticketAttentionState(ticket) {
-    const slot = ticket?.capabilities?.attention;
-    if (slot?.availability !== "available") return null;
-    const label = String(slot.summary?.label || "").toUpperCase();
-    if (!ATTENTION_STATES.has(label)) return null;
-    return {
-      label,
-      key: label.toLowerCase(),
-      detail: slot.summary?.detail || "",
-      humanAcceptanceCount: Number(slot.summary?.humanAcceptanceCount) || 0,
-      humanEvidenceCount: Number(slot.summary?.humanEvidenceCount) || 0,
-    };
-  }
-
-  function operationalCounts(tickets) {
-    const counts = { READY: 0, BLOCKED: 0, DONE: 0, DEVIATED: 0 };
-    for (const ticket of tickets) {
-      const label = ticketOperationalState(ticket)?.label;
-      if (label && Object.hasOwn(counts, label)) counts[label] += 1;
-    }
-    return counts;
-  }
-
-  function graphSummary(counts) {
-    const parts = [];
-    if (counts.READY) parts.push(`${counts.READY} ready`);
-    if (counts.BLOCKED) parts.push(`${counts.BLOCKED} blocked`);
-    if (counts.DEVIATED) parts.push(`${counts.DEVIATED} deviation${counts.DEVIATED === 1 ? "" : "s"}`);
-    if (!parts.length && counts.DONE) parts.push(`${counts.DONE} proven`);
-    return parts.join(" · ") || "No executable Tickets";
-  }
-
-  function graphNarrative(counts) {
-    if (counts.DEVIATED) {
-      return `${counts.DEVIATED} execution deviation${counts.DEVIATED === 1 ? "" : "s"} need attention. `
-        + `${counts.READY} Ticket${counts.READY === 1 ? " is" : "s are"} executable now.`;
-    }
-    if (counts.READY) {
-      return `${counts.READY} Ticket${counts.READY === 1 ? " is" : "s are"} executable now. `
-        + `${counts.BLOCKED} remain blocked and ${counts.DONE} are proven complete.`;
-    }
-    if (counts.BLOCKED) {
-      return `No Ticket is executable yet; ${counts.BLOCKED} remain blocked by direct prerequisites.`;
-    }
-    return `${counts.DONE} Ticket${counts.DONE === 1 ? " is" : "s are"} proven complete. The graph is quiet.`;
   }
 
   function stateSummary(counts) {

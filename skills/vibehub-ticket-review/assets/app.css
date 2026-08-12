@@ -20,6 +20,8 @@
   --selection: #283a32;
   --ready: #087f8c;
   --ready-soft: #e2f4f5;
+  --refine: #665f8f;
+  --refine-soft: #efedf6;
   --done: #3f7d5d;
   --done-soft: #e6f1ea;
   --blocked: #a56b13;
@@ -573,6 +575,12 @@ summary:focus-visible {
   stroke: var(--ready);
 }
 
+.minimap-node.state-refine {
+  fill: var(--refine-soft);
+  stroke: var(--refine);
+  stroke-dasharray: 7 5;
+}
+
 .minimap-node.state-done {
   fill: var(--done-soft);
   stroke: var(--done);
@@ -712,6 +720,15 @@ summary:focus-visible {
   stroke: var(--ready);
 }
 
+.ticket-node.state-refine .ticket-accent {
+  stroke: var(--refine);
+  stroke-dasharray: 7 4;
+}
+
+.ticket-node.state-refine .ticket-boundary {
+  stroke-dasharray: 5 3;
+}
+
 .ticket-node.state-done .ticket-accent {
   stroke: var(--done);
 }
@@ -752,6 +769,11 @@ summary:focus-visible {
 .ticket-node.state-ready .ticket-aperture {
   stroke: var(--ready);
   stroke-width: 2;
+}
+
+.ticket-node.state-refine .ticket-aperture {
+  stroke: var(--refine);
+  stroke-dasharray: 2 2;
 }
 
 .ticket-node.state-done .ticket-aperture {
@@ -840,6 +862,10 @@ summary:focus-visible {
 
 .ticket-node.state-ready .ticket-state {
   fill: var(--ready);
+}
+
+.ticket-node.state-refine .ticket-state {
+  fill: var(--refine);
 }
 
 .ticket-node.state-done .ticket-state {
@@ -1200,6 +1226,15 @@ summary:focus-visible {
 .ticket-signal.state-ready,
 .ticket-signal.state-ready .ticket-signal-heading {
   color: var(--ready);
+}
+
+.ticket-signal.state-refine,
+.ticket-signal.state-refine .ticket-signal-heading {
+  color: var(--refine);
+}
+
+.ticket-signal.state-refine .ticket-signal-mark {
+  border-style: dashed;
 }
 
 .ticket-signal.state-done,
@@ -1608,6 +1643,14 @@ summary:focus-visible {
 
 .causal-ticket.state-ready {
   color: var(--ready);
+}
+
+.causal-ticket.state-refine {
+  color: var(--refine);
+}
+
+.causal-ticket.state-refine .causal-ticket-state {
+  border-style: dashed;
 }
 
 .causal-ticket.state-done {
@@ -2164,6 +2207,14 @@ summary:focus-visible {
 
 .execution-state.state-ready {
   color: var(--ready);
+}
+
+.execution-state.state-refine {
+  color: var(--refine);
+}
+
+.execution-state.state-refine .execution-state-mark {
+  border-style: dashed;
 }
 
 .execution-state.state-done {

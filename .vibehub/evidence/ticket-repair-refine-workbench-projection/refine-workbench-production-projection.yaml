@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "refine-is-first-class-in-workbench",
+    "refine-remains-non-executable",
+    "browser-regression-catches-refine-omission",
+    "pr15-authority-contract-stays-intact",
+    "refine-repair-verifies-cleanly"
+  ],
+  "evidence_id": "refine-workbench-production-projection",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-12T03:34:49Z",
+  "refs": [
+    "file:skills/vibehub-ticket-review/assets/app-model.js",
+    "file:skills/vibehub-ticket-review/assets/app.js",
+    "file:skills/vibehub-ticket-review/assets/app.css",
+    "test:test/ui-model.test.mjs",
+    "test:npm-test-49-of-49",
+    "test:npm-run-verify-artifact-53-files-652089-bytes",
+    "test:vibehub-project-and-ticket-validate-success",
+    "test:git-diff-check-success",
+    "browser:in-app-browser-refine-wide-1440x900",
+    "browser:in-app-browser-refine-narrow-700x900",
+    "browser:copy-for-agent-refine-interaction-confirmed"
+  ],
+  "schema_version": 1,
+  "summary": "The shared browser/Node presentation model now recognizes REFINE across graph-card text and dashed semantics, minimap, summary, Inspector, accessibility, causal sorting, and the non-executable Ticket Plan handoff. The production-model behavior regression exercises an unlocked draft with separate PENDING human attention and would fail if REFINE were removed. The full 49-test suite, 53-file artifact verification, project/Ticket validation, git diff check, and real in-app-browser smoke at 1440x900 and 700x900 passed; wide and narrow captures show REFINE without overflow. Existing PR #15 authority, human-origin Evidence, four attention states, exact human-boundary payload, and operational/attention separation remain covered by the unchanged passing suite.",
+  "ticket_id": "ticket-repair-refine-workbench-projection"
+}

@@ -455,10 +455,12 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal((await readOnly.json()).error.code, "read_only");
 
   const html = await (await fetch(`${origin}/`)).text();
+  const model = await (await fetch(`${origin}/app-model.js`)).text();
   const script = await (await fetch(`${origin}/app.js`)).text();
   const styles = await (await fetch(`${origin}/app.css`)).text();
   assert.match(html, /class="app-shell"/u);
   assert.match(html, /id="copyLink"/u);
+  assert.match(html, /src="\/app-model\.js"/u);
   assert.match(html, /class="workspace inspector-closed"/u);
   assert.match(html, /id="graphSignal"/u);
   assert.match(html, /id="sourceDock"/u);
@@ -469,6 +471,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(html, /id="implementingList"/u);
   assert.match(html, /id="frontierList"/u);
   assert.match(html, /id="summaryGrid"/u);
+  assert.match(html, /id="summaryRefine"/u);
   assert.match(html, /id="sourcePath"/u);
   assert.match(html, /id="sourceBranch"/u);
   assert.match(html, /id="sourceCommit"/u);
@@ -488,9 +491,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /localStorage|sessionStorage/u);
   assert.doesNotMatch(script, /renderProjectionTime|startWatchPolling|state\.watch/u);
   // Copy for Agent only hands out a ticket-run instruction for READY Tickets.
-  assert.match(script, /stateLabel === "READY"/u);
-  assert.match(script, /vibehub-ticket-run/u);
-  assert.match(script, /vibehub-ticket-review/u);
+  assert.match(model, /stateLabel === "READY"/u);
+  assert.match(model, /stateLabel === "REFINE"/u);
+  assert.match(model, /vibehub-ticket-run/u);
+  assert.match(model, /vibehub-ticket-plan/u);
+  assert.match(model, /vibehub-ticket-review/u);
   assert.match(script, /function causalCone/u);
   assert.match(script, /function relationPorts/u);
   assert.match(script, /edge-control-halo/u);
@@ -503,7 +508,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /initialFocusPending/u);
   assert.match(script, /initialTabId = "execution"/u);
   assert.match(script, /function ticketExecutionPanel/u);
-  assert.match(script, /function ticketAttentionState/u);
+  assert.match(model, /function ticketAttentionState/u);
   assert.match(script, /function humanAttentionBrief/u);
   assert.match(script, /Human evidence pending/u);
   assert.match(script, /Human acceptance verified/u);
@@ -566,6 +571,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /history\.replaceState/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
   assert.match(styles, /\.ticket-node\.state-deviated/u);
+  assert.match(styles, /\.ticket-node\.state-refine/u);
+  assert.match(styles, /\.minimap-node\.state-refine/u);
+  assert.match(styles, /\.execution-state\.state-refine/u);
   assert.match(styles, /\.ticket-node\.attention-pending \.ticket-attention/u);
   assert.match(styles, /\.human-attention-brief\.attention-pending/u);
   assert.match(styles, /\.acceptance-item\.authority-human/u);
