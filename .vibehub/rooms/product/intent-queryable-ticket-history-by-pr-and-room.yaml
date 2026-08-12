@@ -1,0 +1,52 @@
+{
+  "context_id": "intent-queryable-ticket-history-by-pr-and-room",
+  "detail": "Every Ticket, its Evidence, and its Outcome remain part of the project's durable history; completing and shipping work must never require deleting old canonical records. The default operational Workbench should not render the project's entire lifetime graph. Once completed Tickets are delivered through a pull request, the system should carry a canonical, queryable association that says which Tickets closed in and belong to that PR, and should project those Tickets as archived outside the default current-work view. Users must still be able to inspect all Tickets and compose useful historical projections, including the Tickets for one PR and Tickets related through one or several selected Rooms. This is a full-stack capability: archive and PR-association semantics, deterministic query projection, and Workbench filtering must share one canonical contract derived from Git-native documents, not a browser-only filter or hidden index. Room-based retrieval is a relation/view over Ticket Context and must not make Rooms own Tickets. Exact schema placement, the authoritative PR-delivery moment, legacy backfill, reopened work, multi-PR delivery, and how hidden completed prerequisites remain intelligible in a filtered causal graph are intentionally left for future Ticket refinement rather than decided implicitly now.",
+  "evidence": [
+    {
+      "note": "The owner explicitly requested durable historical Tickets, post-PR archival and PR membership, an all-Tickets view, and composable per-PR and one-or-many-Room Ticket queries as a future full-stack capability.",
+      "ref": "conversation:2026-08-11-queryable-ticket-history-by-pr-and-room"
+    },
+    {
+      "note": "The current Ticket contract has no canonical archive or delivery-PR association field.",
+      "ref": "skills/contracts/ticket.schema.json"
+    },
+    {
+      "note": "The current UI projection reads and renders every canonical Ticket without a shared historical-query contract.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-12T03:07:15Z",
+    "quote": "一个项目的所有历史工单都会存，但是当前面板肯定不看全部……这个 ticket 在这个 PR 里 close 了，这个 ticket 就属于这个 PR。",
+    "ref": "conversation:2026-08-11-queryable-ticket-history-by-pr-and-room"
+  },
+  "state": "active",
+  "summary": "VibeHub keeps every historical Ticket durably while the active Workbench defaults to current work and offers full-stack queries over archived history by delivery PR and related Rooms",
+  "tags": [
+    "archive",
+    "full-stack",
+    "history",
+    "pull-requests",
+    "queries",
+    "rooms",
+    "tickets",
+    "workbench"
+  ],
+  "type": "intent"
+}

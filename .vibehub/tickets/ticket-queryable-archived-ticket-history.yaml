@@ -1,0 +1,61 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-archive-pr-and-query-contract",
+      "criterion": "Placeholder: before implementation, Ticket Plan rewrites this same Ticket in place to maturity: firm with independently checkable criteria for the canonical archive transition and delivery-PR association; immutable retention of Ticket, Evidence, and Outcome; backward-compatible treatment or migration of existing history; deterministic current/all/per-PR/one-or-many-Room query composition shared by CLI/JSON and Workbench; filtered-graph treatment of hidden completed prerequisites; reopened, abandoned, reverted, cherry-picked, and multi-PR cases; URL/accessibility behavior; and unit, contract, real-browser, and artifact verification."
+    }
+  ],
+  "constraints": [
+    "Archiving is a query and lifecycle projection over durable history; never delete or move canonical Ticket, Evidence, or Outcome records merely to keep the current panel quiet.",
+    "Do not infer PR membership from a branch name, current checkout, prose, or whichever PR happens to be open; the refined contract must name one reviewable canonical source and authoritative transition.",
+    "Rooms own Context, not Tickets; Room-based Ticket queries derive relations from canonical references and may select one or several Rooms without changing the core domain model.",
+    "Filtered views must not falsify dependency state or erase the fact that a visible Ticket was unlocked by archived completed prerequisites.",
+    "The CLI/JSON projection and Workbench must consume the same semantics; do not create a browser-only archive list, database, persistent cache, hosted index, or parallel source of truth.",
+    "This future draft does not alter the v0.7.0 release chain or authorize schema, lifecycle, query, or UI implementation until it is refined to firm."
+  ],
+  "context": "Future direction captured by intent-queryable-ticket-history-by-pr-and-room. The repository currently keeps completed Tickets indefinitely, but both vh ticket graph and the Workbench project the whole set. Ticket, Evidence, and Outcome schemas have no first-class archive or delivery-PR membership, so a browser-only hide-DONE toggle would lose the owner's core requirement and make other consumers disagree. When this work is scheduled, define the smallest Git-native carrier and deterministic projection that can distinguish current from archived history, associate the Tickets delivered by a PR, and compose all/per-PR/per-Room queries across CLI/JSON and Web UI. This remains draft because the desired capability is clear but schema placement and lifecycle edge cases are not yet honest enough for implementation acceptance.",
+  "context_refs": [
+    {
+      "purpose": "Human-ingested product intent governing durable history, PR membership, current-view scope, and full-stack query projections.",
+      "ref": ".vibehub/rooms/product/intent-queryable-ticket-history-by-pr-and-room.yaml"
+    },
+    {
+      "purpose": "Binding separation: Rooms own Context while Tickets remain action objects and pull requests remain typed external References.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    },
+    {
+      "purpose": "Mechanical-consumer contract requiring CLI and UI projections to share canonical Git-native documents without hidden state.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Canonical rule for preserving a clear future direction as REFINE until acceptance can be written honestly.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
+    },
+    {
+      "purpose": "Current Ticket contract lacking archive and delivery-PR membership.",
+      "ref": "skills/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Current completion contract whose relationship to post-PR archive timing must be designed.",
+      "ref": "skills/contracts/outcome.schema.json"
+    },
+    {
+      "purpose": "Current graph/frontier commands and future deterministic query surface.",
+      "ref": "skills/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Current all-Ticket projection that future filtered Web views must share rather than fork.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "VibeHub preserves every historical Ticket while providing one canonical full-stack archive and query model for current work, all history, delivery PRs, and one-or-many related Rooms.",
+  "provenance_refs": [
+    "conversation:2026-08-11-queryable-ticket-history-by-pr-and-room",
+    "context:intent-queryable-ticket-history-by-pr-and-room"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-queryable-archived-ticket-history"
+}
