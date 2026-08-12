@@ -40,8 +40,8 @@
       "type": "depends_on"
     },
     {
-      "rationale": "The final visual treatment must be verified on the completed dense two-orientation graph geometry.",
-      "target_ticket_id": "ticket-workbench-dense-graph-layout",
+      "rationale": "The production visual system must include the canonical current/history filters, subdued archived boundary cards, expandable relation stubs, and the dense two-orientation geometry that archive/query already depends on.",
+      "target_ticket_id": "ticket-queryable-archived-ticket-history",
       "type": "depends_on"
     }
   ],

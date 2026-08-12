@@ -1,0 +1,70 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "one-pr-contains-the-complete-web-upgrade",
+      "criterion": "One reviewable branch and pull request contains the successful canvas shell, layout direction, dense graph, canonical archive/query, selected Codex-like visual system, and selected Rooms surface Outcomes, with each constituent Ticket retaining separate acceptance-linked Evidence, Outcome, and bounded commits. The constituent set is exactly the transitive dependency closure rooted at this Ticket minus `ticket-publish-v070-ui-release` itself and minus every dependency whose successful Outcome already exists in the tagged v0.7.0 tree; after the PR URL exists, every remaining Ticket in that closed set records the exact canonical pull_request delivery entry as proposed on this branch."
+    },
+    {
+      "acceptance_id": "main-and-pr15-contracts-are-reconciled",
+      "criterion": "The branch is updated against the latest remote main before handoff; semantic and code conflicts with the PR #15 authority/human-attention contracts and the v0.7.0 Web baseline are resolved explicitly, and no accepted human-origin Evidence rule, REFINE behavior, causal-cone interaction, exact Git source, or READY-gated handoff regresses."
+    },
+    {
+      "acceptance_id": "combined-workbench-journeys-pass",
+      "criterion": "A single clean-host browser pass verifies current and all-history graphs, per-PR and one-or-many-Room queries, archived-hop expansion, both layout directions, Overview, Room detail, causal focus, Inspector lenses, exact source, focused-link restoration, human-attention states, keyboard access, reduced motion, 1440x960, 1180x820, and 390x844 without horizontal overflow or stale cross-feature state."
+    },
+    {
+      "acceptance_id": "plugin-boundary-and-artifact-stay-clean",
+      "criterion": "Project and every Ticket validate, the full test suite and installed Plugin artifact pass from a clean checkout, all entered Rooms are FRESH, and the final diff adds no Desktop application, repository switcher, launcher runtime, session watcher, database, daemon, persistent browser store, hidden cache, or writable Workbench route."
+    },
+    {
+      "acceptance_id": "pr-handoff-is-reviewable",
+      "criterion": "The final PR description names the Web-only scope, constituent Ticket Outcomes, user-visible changes, archive/query schema compatibility implications, browser evidence, test results, known limitations, and release recommendation; the branch is clean and contains no unrelated work before PR creation or update. Its own proposed delivery entries remain current during review and may change to delivered—and therefore become archived—only in a later Git change after the external merge is authoritative and its exact merge commit and time are known."
+    }
+  ],
+  "constraints": [
+    "This is one Web interaction, query, and aesthetic upgrade PR; do not split its planned constituent Tickets across separate feature PRs unless the owner changes the delivery decision.",
+    "One PR does not collapse Ticket lifecycle boundaries: every constituent Ticket still requires its own Evidence, independent closeout, Outcome, and reviewable commit history.",
+    "Exclude the rejected macOS Desktop application and its repository switching, launcher, session-watch, deep-link-to-app, and packaging surfaces; focused links remain honest live local Web URLs.",
+    "Do not publish a release or merge the PR inside this Ticket unless a later explicit owner instruction authorizes those external actions."
+  ],
+  "context": "The owner has chosen a single concentrated delivery boundary for the next Web Workbench generation. The branch may contain a sequence of independently executed and closed Tickets, including archive/query, but they should be reviewed together because their interaction, graph geometry, visual language, Rooms navigation, URL state, and accessibility must cohere as one product surface. This terminal Ticket owns integration conflict repair, combined regression, remote-main alignment, and PR readiness; it does not replace the constituent Tickets and does not authorize Desktop work, merge, or release publication.",
+  "context_refs": [
+    {
+      "purpose": "Binding Web-only Workbench interaction and source-truth design boundary.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Canonical quiet-intelligence and accessibility constraints shared by every constituent UI Ticket.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "PR #15 authority and person-centered attention semantics that the integrated surface must preserve.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "purpose": "Canonical shared mechanical projection boundary for CLI/JSON and Web consumers.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The complete Web Workbench interaction, archive/query, Rooms, graph-layout, and Codex-like visual upgrade is reconciled on one clean branch and ready for one focused pull request.",
+  "provenance_refs": [
+    "conversation:2026-08-12-single-web-workbench-upgrade-pr",
+    "conversation:2026-08-12-single-web-workbench-upgrade-pr-includes-archive-query"
+  ],
+  "relations": [
+    {
+      "rationale": "The integrated PR must include the owner-selected production visual system after its independent implementation closeout.",
+      "target_ticket_id": "ticket-apply-codex-like-workbench-visual-language",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The integrated PR must include the owner-selected Rooms surface after its independent implementation closeout.",
+      "target_ticket_id": "ticket-rooms-into-workbench",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
+}

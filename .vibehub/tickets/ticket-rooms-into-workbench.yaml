@@ -41,6 +41,11 @@
       "rationale": "Implementation starts only after the owner-selected proposal direction is recorded and independently accepted.",
       "target_ticket_id": "ticket-decide-rooms-workbench-direction",
       "type": "depends_on"
+    },
+    {
+      "rationale": "Room-consuming Ticket views must reuse the canonical one-or-many-Room query projection rather than creating a Workbench-only Room filter.",
+      "target_ticket_id": "ticket-queryable-archived-ticket-history",
+      "type": "depends_on"
     }
   ],
   "schema_version": 1,
