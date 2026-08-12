@@ -1,0 +1,69 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "proposal-defines-one-coherent-token-system",
+      "criterion": "A checked-in proposal defines concrete typography, spacing, radii, border, elevation, surface, semantic color, icon, hover, focus, selection, and reduced-motion tokens for the canvas, Ticket cards, graph edges, compact overview, controls, and Inspector."
+    },
+    {
+      "acceptance_id": "proposal-separates-state-from-human-attention",
+      "criterion": "A complete state matrix shows whole-card but restrained treatments for DONE, READY, BLOCKED, REFINE, and DEVIATED, plus an independent non-color-only layer for UPCOMING, PENDING, RECORDED, and COMPLETE human attention so a human boundary is never falsely presented as an operational blocker."
+    },
+    {
+      "acceptance_id": "proposal-preserves-victor-product-value",
+      "criterion": "Representative focused, unfocused, dense, relation-selected, Inspector, source, empty, and narrow states preserve the complete graph, upstream/downstream causal cone, progressive Execution/Contract/Log detail, exact Git truth, focused local link, and READY-gated Agent handoff."
+    },
+    {
+      "acceptance_id": "proposal-is-reviewable-at-real-sizes",
+      "criterion": "Review artifacts show the actual repository at desktop, normal Codex width, and 390px narrow sizes with enough fidelity to judge color, shape, shadow, icons, typography, hierarchy, and card-state coexistence; contrast and color-independent labels are annotated mechanically."
+    },
+    {
+      "acceptance_id": "proposal-does-not-ship-production-style",
+      "criterion": "This Ticket changes only checked-in proposal or prototype artifacts and their validation; production Workbench assets, release identity, runtime behavior, and canonical Ticket semantics remain unchanged."
+    }
+  ],
+  "constraints": [
+    "Use Codex as interaction and visual-language inspiration, not as a claim of exact proprietary design reproduction.",
+    "Do not trade away Victor's causal-cone, Inspector, source, handoff, accessibility, or read-only capabilities for visual similarity.",
+    "Do not encode state by color alone or merge operational state with human authority/evidence state.",
+    "Do not implement the chosen design in production until the separate human decision Ticket succeeds."
+  ],
+  "context": "The owner values Victor's Web functionality and detailed causal interactions but finds its overall visual quality weaker than the previous Workbench. The desired next direction is closer to the Codex desktop experience in interaction density and visual language: quiet neutral color, deliberate shapes, restrained shadows, familiar compact icons, disciplined typography, and less dashboard chrome. Operational state should be legible from the whole card, but human attention is an orthogonal authority/evidence channel and must not be collapsed into BLOCKED or encoded by color alone. Exact palette, elevation, icon, and card treatments remain a genuine product judgment, so planning exposes a proposal and human decision before production implementation.",
+  "context_refs": [
+    {
+      "purpose": "Binding quiet-intelligence and accessibility boundary the proposal must evolve rather than discard.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Product authority for Ticket-centered human attention.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "purpose": "Current retained Victor interaction model and visual baseline.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Current wide visual baseline to compare.",
+      "ref": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
+    },
+    {
+      "purpose": "Current narrow visual baseline to compare.",
+      "ref": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A reviewable visual-system proposal translates the owner's Codex-like interaction direction into concrete Workbench tokens, state layers, and wide/narrow examples without changing production UI.",
+  "provenance_refs": [
+    "conversation:2026-08-11-owner-wants-codex-like-workbench-language",
+    "conversation:2026-08-11-owner-wants-whole-card-state-color-with-human-attention-distinct"
+  ],
+  "relations": [
+    {
+      "rationale": "The visual proposal is intentionally scheduled after the bounded Victor UI release.",
+      "target_ticket_id": "ticket-publish-v070-ui-release",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-propose-codex-like-workbench-visual-language"
+}

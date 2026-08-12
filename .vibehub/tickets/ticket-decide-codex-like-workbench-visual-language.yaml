@@ -1,0 +1,40 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "codex-like-visual-direction-chosen",
+      "authority": "human",
+      "criterion": "After reviewing the completed proposal at desktop, normal Codex width, and narrow sizes, the owner explicitly approves a concrete production direction, either the proposal as-is or the proposal with exact owner-specified modifications that themselves define the selected treatment, including whole-card operational state and the separate human-attention layer; a request for another proposal or review round without selecting a treatment remains unresolved or closes non-successfully."
+    }
+  ],
+  "constraints": [
+    "Only human-origin Evidence may satisfy the visual-direction choice.",
+    "Do not treat automated contrast checks, an Agent opinion, or proposal completion as owner approval.",
+    "Do not modify production Workbench assets in this decision Ticket."
+  ],
+  "context": "The proposal Ticket creates concrete real-size artifacts and a state matrix. This Ticket is the protected decision boundary: the owner, not an Agent or automated screenshot check, decides whether that direction is worth shipping and records the selected treatment or required revision precisely enough for implementation planning. It authorizes no production styling by itself.",
+  "context_refs": [
+    {
+      "purpose": "Current production baseline against which the prerequisite proposal is reviewed.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Canonical human-origin Evidence and decision-owner semantics.",
+      "ref": "skills/contracts/acceptance-authority.md"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner selects or revises the proposed Codex-like Workbench visual language, recording exact product constraints for downstream implementation.",
+  "provenance_refs": [
+    "conversation:2026-08-11-owner-wants-codex-like-workbench-language"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner can choose only after the concrete proposal is independently complete and reviewable.",
+      "target_ticket_id": "ticket-propose-codex-like-workbench-visual-language",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-decide-codex-like-workbench-visual-language"
+}

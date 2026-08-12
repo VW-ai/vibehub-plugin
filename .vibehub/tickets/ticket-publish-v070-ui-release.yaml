@@ -2,7 +2,7 @@
   "acceptance": [
     {
       "acceptance_id": "release-pr-merged",
-      "criterion": "The verified v0.7.0 replacement PR is merged into main, and updated origin/main contains both successful UI curation and release-preparation Outcomes with their acceptance-linked Evidence."
+      "criterion": "The verified v0.7.0 replacement PR, including the successful REFINE Workbench projection repair, is merged into main, and updated origin/main contains the UI curation, release-preparation, and compatibility-repair Outcomes with their acceptance-linked Evidence."
     },
     {
       "acceptance_id": "tagged-merged-main",
@@ -24,7 +24,7 @@
     "Do not publish to npm or add updater/runtime machinery.",
     "Do not close original PR #18 until the curated replacement has actually merged."
   ],
-  "context": "Publication begins only after ticket-prepare-v070-ui-release closes successfully and its replacement PR merges to main. Follow docs/RELEASE.md: update local main by fast-forward from origin/main, tag that exact merged commit as v0.7.0, push only the tag, wait for the Release VibeHub workflow, verify the GitHub Release target plus archive and checksum, and close the original conflicting PR #18 as superseded by the curated replacement. Publication evidence and independent Outcome are appended after the external state is real.",
+  "context": "Publication begins only after the later PR #15 compatibility audit closes its REFINE projection repair successfully and the replacement PR containing that repair merges to main. Follow docs/RELEASE.md: update local main by fast-forward from origin/main, tag that exact merged commit as v0.7.0, push only the tag, wait for the Release VibeHub workflow, verify the GitHub Release target plus archive and checksum, and close the original conflicting PR #18 as superseded by the curated replacement. Publication evidence and independent Outcome are appended after the external state is real. The earlier successful preparation Outcome remains historical; the new direct dependency records the subsequently discovered browser-level gap without rewriting that history.",
   "context_refs": [
     {
       "purpose": "Authoritative merged-main tagging and release verification procedure.",
@@ -40,13 +40,14 @@
   "outcome": "VibeHub v0.7.0 is published from the exact merged main commit as a verified GitHub Release with its archive and SHA-256 checksum, and the superseded original PR #18 is retired honestly.",
   "provenance_refs": [
     "conversation:2026-08-11-owner-requests-merge-before-ui-redesign-and-release",
+    "conversation:2026-08-11-pr15-victor-ui-alignment-audit",
     "github-pr:VW-ai/vibehub-plugin#18",
     "commit:0b5585c77ef6b2473ca22504d93287db8cbc3a84"
   ],
   "relations": [
     {
-      "rationale": "Publication is authorized only after a verified preparation Outcome and merged replacement PR.",
-      "target_ticket_id": "ticket-prepare-v070-ui-release",
+      "rationale": "The merged release candidate must include the independently accepted PR #15 REFINE projection repair before tagging.",
+      "target_ticket_id": "ticket-repair-refine-workbench-projection",
       "type": "depends_on"
     }
   ],

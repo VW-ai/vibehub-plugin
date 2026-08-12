@@ -1,0 +1,50 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-selected-visual-system-for-production",
+      "criterion": "Placeholder: after the owner-selected visual direction and the canvas/dense-layout foundations are successful, Ticket Plan rewrites this same Ticket with independently checkable production token, component, state-matrix, accessibility, regression, and wide/narrow verification criteria before any production styling begins."
+    }
+  ],
+  "constraints": [
+    "This draft authorizes no production UI change until it is refined in place to maturity: firm.",
+    "The chosen whole-card operational state treatment must remain distinct from human authority/evidence attention and must not rely on color alone.",
+    "Preserve Victor's causal cone, Inspector detail, exact source, focused link, minimap/pan/zoom, and READY-gated Agent handoff.",
+    "Preserve the dependency-free read-only Web boundary and exclude the rejected Desktop runtime."
+  ],
+  "context": "The production implementation direction is known, but its exact acceptance cannot be written honestly until the owner chooses the visual proposal and the canvas, orientation, and dense-layout foundations are successful. This draft preserves the downstream position. After all prerequisites succeed it becomes REFINE, never READY; Ticket Plan must rewrite this same Ticket in place to maturity: firm using the chosen human-origin Evidence and prerequisite Outcomes before implementation starts.",
+  "context_refs": [
+    {
+      "purpose": "Canonical rule requiring this blocked downstream direction to become REFINE and be firmed in place after its prerequisites succeed.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
+    },
+    {
+      "purpose": "Current production visual and interaction boundary that remains binding until superseded by accepted work.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Current production baseline whose successor will be constrained by prerequisite Outcomes and Evidence.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The selected Codex-like visual system is applied consistently to the canvas-first Workbench without losing Victor's causal interaction, PR #15 authority semantics, or dense-graph usability.",
+  "provenance_refs": [
+    "conversation:2026-08-11-owner-wants-codex-like-workbench-language",
+    "context:decision-draft-ticket-maturity"
+  ],
+  "relations": [
+    {
+      "rationale": "Production acceptance cannot be firmed until the owner-selected visual direction is recorded and independently accepted.",
+      "target_ticket_id": "ticket-decide-codex-like-workbench-visual-language",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The final visual treatment must be verified on the completed dense two-orientation graph geometry.",
+      "target_ticket_id": "ticket-workbench-dense-graph-layout",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-apply-codex-like-workbench-visual-language"
+}

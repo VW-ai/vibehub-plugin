@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "layout-authority-is-amended",
+      "criterion": "The active Workbench Context and local graph design document replace the mandatory top-to-bottom rule with one shared causal-layout contract: left-to-right is the desktop default and top-to-bottom remains an explicit supported choice, while causal direction and Ticket semantics are unchanged."
+    },
+    {
+      "acceptance_id": "both-directions-are-real-layouts",
+      "criterion": "An accessible graph control switches the same complete graph between left-to-right and top-to-bottom layouts; node ranks, relation ports, arrow direction, minimap geometry, pan/zoom framing, and keyboard causal navigation all agree with the selected orientation."
+    },
+    {
+      "acceptance_id": "direction-state-is-explicit-and-copyable",
+      "criterion": "The current direction is represented in explicit URL focus state or an equally inspectable non-hidden mechanism, Copy link restores it in the same live local session, invalid values fall back safely, and no localStorage, sessionStorage, account preference, or parallel durable state is added."
+    },
+    {
+      "acceptance_id": "focus-and-attention-survive-direction-change",
+      "criterion": "Switching direction preserves the selected Ticket, complete upstream/downstream causal cone, Inspector lens, human-attention accents, operational labels including REFINE, and source truth without a page reload."
+    },
+    {
+      "acceptance_id": "direction-choice-is-behavior-tested",
+      "criterion": "Behavior-level tests and real-browser wide plus narrow fixtures exercise both orientations, causal keyboard movement, copied focus restoration, and reduced motion; the full suite and Plugin artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Do not create a general theme/style laboratory or persist preferences in hidden browser storage.",
+    "Do not fork the graph data model, Ticket semantics, Inspector, or frontend assets by orientation.",
+    "Desktop defaults left-to-right; top-to-bottom remains a first-class user choice rather than a removed legacy mode.",
+    "Preserve the complete graph and Victor's causal-cone selection in both orientations."
+  ],
+  "context": "The current active Workbench constraint and Victor asset mandate a top-to-bottom graph. The owner has now made a superseding product decision: left-to-right makes more sense on desktop, while users should be able to choose either left-to-right or top-to-bottom. This is not a style-lab theme selector; it is one causal-reading preference over the same canonical graph. The active Context and design documentation must be amended as part of the work so the implementation is not knowingly inconsistent with durable authority. Direction should be explicit and copyable, not hidden local persistence.",
+  "context_refs": [
+    {
+      "purpose": "Active top-to-bottom authority that this owner decision must amend explicitly.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Current layout and interaction design documentation.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Current top-to-bottom layout, edge geometry, keyboard navigation, focus state, and causal cone.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The causal Ticket graph supports explicit left-to-right and top-to-bottom layouts, defaults to left-to-right on desktop, and keeps direction in honest copyable Web focus state.",
+  "provenance_refs": [
+    "conversation:2026-08-11-owner-chooses-horizontal-default-with-vertical-option"
+  ],
+  "relations": [
+    {
+      "rationale": "Direction state extends the focused URL and compact graph shell established by the canvas-first interaction Ticket, so both must not edit the same shell independently.",
+      "target_ticket_id": "ticket-workbench-canvas-first-overview",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-layout-direction-choice"
+}
