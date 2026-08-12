@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "switching-changes-no-ticket-state"
+  ],
+  "evidence_id": "evidence-switch-changes-no-ticket-state",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-11T00:23:09Z",
+  "refs": [
+    "commit:84576fd231937ad1704dd13b4f83d5b51d25dc9f",
+    "test/workbench-switch-repository.test.mjs",
+    "test:choosing a recent repository switches the running app and releases the old session",
+    "test:refusing the question leaves the current session exactly as it was",
+    "test:an invalid recent entry is reported on the open window and dropped",
+    "test:a transient failure reports honestly and keeps the remembered repository",
+    "observation:alpha served 1 Ticket and beta served 3 from their own hosts across one switch, so no projection was carried over",
+    "observation:npm run verify ended 87 pass / 0 fail with artifact ok and 0 apps/ entries in the built artifact",
+    "docs/LOCAL_GRAPH_DESIGN.md"
+  ],
+  "schema_version": 1,
+  "summary": "Two fixtures with deliberately different Ticket counts make a carried-over projection visible, and no switch path writes a byte. The fixtures are alpha, holding one Ticket (ticket-foundation) on branch workbench-switch-alpha-branch, and beta, holding three (ticket-foundation, ticket-second, ticket-third) on branch workbench-switch-beta-branch. Across an accepted switch the probe fetches /api/state from each host with that host's own bearer: before, first.projection reports worktreeRoot alpha, 1 Ticket, ticketIds [ticket-foundation]; after, second.projection reports worktreeRoot beta, 3 Tickets, ticketIds [ticket-foundation, ticket-second, ticket-third] and branch workbench-switch-beta-branch. The counts, the IDs, the branch and the worktree root all come from the new repository's own Git YAML through its own newly started host - a projection carried over from the previous session would have shown one Ticket and alpha's root. Byte-for-byte comparison of every file under .vibehub, collected recursively and sorted, is unchanged in BOTH worktrees across the accepted switch; unchanged in BOTH worktrees across the refused switch; and unchanged in alpha across a switch to an invalid path and across a switch to a directory git cannot read. Nothing else was persisted either: preferenceKeys after the switch is a subset of the §8.2 allowlist, bearerInPreferences is false, and the probe's whole printed envelope contains no 64-hex sequence. The change touches no Ticket YAML in this repository (git diff over .vibehub/ is empty for the implementation commit), and `npm run verify` ends 87 pass / 0 fail with the artifact verifier reporting ok and zero apps/ entries in the built plugin artifact.",
+  "ticket_id": "ticket-workbench-switch-repository"
+}

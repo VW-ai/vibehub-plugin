@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "signed-dogfood-artifact",
+      "criterion": "A signed macOS build with a documented install and upgrade path launches on a machine without the development checkout."
+    },
+    {
+      "acceptance_id": "recent-repositories-restore",
+      "criterion": "A fresh launch lists recent repositories and restores window and view preferences, while all Ticket states are recomputed from Git YAML and never from app cache."
+    },
+    {
+      "acceptance_id": "clean-exit-verified",
+      "criterion": "A scripted or documented verification shows that after quit no host process, open port, watcher, or token remains."
+    },
+    {
+      "acceptance_id": "lifecycle-acceptance-holds",
+      "criterion": "The §14 lifecycle block is demonstrated end-to-end: open without Agent, survive Agent task closure, exit clean, relaunch from recent repositories."
+    },
+    {
+      "acceptance_id": "review-fallback-preserved",
+      "criterion": "The Agent-task vibehub-ticket-review browser flow still works unchanged alongside the installed app."
+    }
+  ],
+  "constraints": [
+    "No automatic background startup, login item, or cross-repository scanning.",
+    "The app release changes no plugin runtime semantics and adds no write route.",
+    "Preserve the browser review fallback and Phase 0 launcher."
+  ],
+  "context": "Baseline §13 Phase 1 closes with signing, packaging, and an upgrade path so the Workbench can be dogfooded as a real app rather than a dev checkout. §14 lifecycle acceptance is the bar: opening the Workbench requires no Agent task; closing Agent tasks does not close it; exit leaves no host, watcher, or token; the next launch lists recent repositories while recomputing every Ticket state from Git YAML. The release wraps the approved surface, shell, watcher, and deep link into one distributable artifact; it must not change plugin runtime semantics or introduce background startup.",
+  "context_refs": [
+    {
+      "purpose": "Requirement baseline: §13 Phase 1 packaging scope and §14 acceptance criteria.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Existing release procedure the app distribution must coexist with.",
+      "ref": "docs/RELEASE.md"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A signed macOS dogfood build of the Workbench opens recent repositories without Agent involvement and leaves nothing behind on exit.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [
+    {
+      "rationale": "The dogfood build ships the owner-approved A · Quiet Workbench surface.",
+      "target_ticket_id": "ticket-workbench-quiet-surface",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The artifact packages the shell that owns session lifecycle.",
+      "target_ticket_id": "ticket-workbench-macos-shell",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Phase 1 scope includes Agent deep-link focus, integrated before packaging.",
+      "target_ticket_id": "ticket-workbench-deep-link",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-dogfood-release"
+}

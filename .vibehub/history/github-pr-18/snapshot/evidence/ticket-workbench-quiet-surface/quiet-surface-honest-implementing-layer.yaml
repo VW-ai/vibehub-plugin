@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "honest-implementing-layer"
+  ],
+  "evidence_id": "quiet-surface-honest-implementing-layer",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T17:02:38Z",
+  "refs": [
+    "commit:a8ca1343cc79001342089db03ea67a9362068ceb",
+    "test:ui-host read-only loopback host serves assets, current graph, inspector, and trace",
+    "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/assets/local-graph/quiet-workbench-narrow.jpg",
+    "skills/vibehub-ticket-review/assets/app.js"
+  ],
+  "schema_version": 1,
+  "summary": "renderImplementingNow renders exclusively from the frozen-empty ACTIVE_RUN_PRESENCE input and throws if presence rendering is attempted without a presence contract; both the switcher strip above the canvas and the compact rail list show the explicit empty state 'No Active Run can be proven right now. The READY frontier remains available.' in the live captures. Git-native states stay exactly READY/BLOCKED/DONE/DEVIATED as projected (TICKET_STATES set), and ui-host assertions in commit a8ca1343cc79001342089db03ea67a9362068ceb prove ACTIVE_RUN_PRESENCE = Object.freeze([]), the empty-state copy, and the absence of any \"IMPLEMENTING\" string literal in the shipped script; no owner, progress, agent, or heartbeat field is read or fabricated anywhere in the assets.",
+  "ticket_id": "ticket-workbench-quiet-surface"
+}

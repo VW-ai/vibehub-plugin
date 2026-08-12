@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.7.0 — 2026-08-11
+
+- Rebuild the shared dependency-free Ticket graph as the responsive A · Quiet
+  Workbench surface, with top-to-bottom causal flow, progressive
+  Execution/Contract/Log inspection, an honest empty Active-Run presence layer,
+  and persistent exact Git source visibility.
+- Preserve v0.6.0's per-acceptance human authority, human-attention projection,
+  human-origin Evidence, explicit maturity/REFINE behavior, and READY-only
+  stateless Agent handoff throughout the Web UI conflict resolution.
+- Keep the release UI-only: the proposed macOS Desktop shell, custom deep
+  links, repository switching, foreground launcher, session watcher, and
+  Desktop packaging do not enter the shipped plugin.
+- Preserve PR #18's original Ticket, Evidence, and Outcome ledger byte-for-byte
+  in a non-canonical history snapshot while appending the later UI-only product
+  decision and delivery records to the active graph.
+- Disable repository-configured `core.fsmonitor` on every retained UI-host Git
+  subprocess, with a malicious-hook regression proving that opening an
+  untrusted repository cannot execute its configured fsmonitor command.
+
 ## 0.6.0 — 2026-08-10
 
 - Add per-acceptance decision authority: each criterion may name `agent` or

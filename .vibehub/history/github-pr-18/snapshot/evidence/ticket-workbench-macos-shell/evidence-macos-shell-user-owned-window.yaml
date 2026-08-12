@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "user-owned-window"
+  ],
+  "evidence_id": "evidence-macos-shell-user-owned-window",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T03:41:08Z",
+  "refs": [
+    "commit:aec63834cb07ca740b5eab26fab77d84206d9285",
+    "apps/workbench/Sources/WorkbenchDesktop/RepositoryPickerWindowController.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "test/workbench-shell.test.mjs",
+    "command:swift build --package-path apps/workbench",
+    "command:open apps/workbench/.build/VibeHub Workbench.app --args --repo <worktree>",
+    "observation:CGWindowListCopyWindowInfo owner=VibeHub Workbench layer=0 bounds 1280x848"
+  ],
+  "schema_version": 1,
+  "summary": "Built at commit aec63834cb07ca740b5eab26fab77d84206d9285 with `swift build --package-path apps/workbench` (Swift 6.2, macOS 15.7.1) and ran the real bundle from Scripts/make-app-bundle.sh. Observed with a CGWindowListCopyWindowInfo enumeration: launching with no recent repositories showed two on-screen layer-0 windows owned by VibeHub Workbench, the 560x408 picker plus the 800x448 NSOpenPanel directory sheet; launching again after a repository was remembered showed only the 560x408 picker with the recent entry and started no host until a repository was chosen; opening this worktree showed one 1280x848 window. No Agent task, conversation, or token was involved at any point - the app was started from the Finder/`open` and the host it started belonged to the app process (pid 53721 -> host pid 53735). LIMITATION, recorded honestly: GUI automation permission was denied in this non-interactive session (mcp computer-use request_access returned user_denied, and System Events UI scripting timed out), so the final click on the NSOpenPanel Open button could not be performed and no screenshot of the rendered graph was captured. The equivalent path was exercised instead through `VibeHubWorkbench --repo <worktree>`, which runs the same AppDelegate.open(repoRoot:) code the panel callback runs. Node test `the shell owns repository selection and recent repositories natively` asserts NSOpenPanel with canChooseDirectories true and canChooseFiles false plus recent-repository wiring.",
+  "ticket_id": "ticket-workbench-macos-shell"
+}

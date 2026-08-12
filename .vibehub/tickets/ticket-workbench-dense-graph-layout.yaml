@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "dense-fixtures-cover-real-failure-shapes",
+      "criterion": "Deterministic fixtures cover at least 35 Tickets, a layer with at least 10 siblings, one Ticket with at least five prerequisites and five unlocks, long edges spanning multiple ranks, and mixed DONE/READY/BLOCKED/REFINE/DEVIATED plus human-attention states in both orientations."
+    },
+    {
+      "acceptance_id": "cards-and-routes-remain-legible",
+      "criterion": "In every dense fixture, cards do not overlap, ordinary relation paths do not cross card interiors, source and target ports remain distinguishable, labels remain readable at the initial fit, and stable inputs produce stable positions and routes across refreshes."
+    },
+    {
+      "acceptance_id": "crossings-and-congestion-are-materially-reduced",
+      "criterion": "At fixed 1440x960 and 1180x820 viewports, a checked-in mechanical comparison uses tagged v0.7.0 as the top-to-bottom baseline and the verified commit recorded by the prerequisite layout-direction Outcome as the left-to-right baseline; across the fixed dense fixtures, aggregate edge crossings fall by at least 30% and aggregate coincident orthogonal-segment length falls by at least 25%, with neither metric regressing by more than 5% in any individual fixture and without hiding Tickets or relations."
+    },
+    {
+      "acceptance_id": "causal-focus-scales-with-layout",
+      "criterion": "Selecting a Ticket still preserves and emphasizes its complete transitive upstream and downstream cone while unrelated nodes and edges recede; relation hit targets, minimap recentering, pan/zoom, Inspector selection, and keyboard traversal remain usable in both orientations."
+    },
+    {
+      "acceptance_id": "dense-layout-verifies-in-browser",
+      "criterion": "Behavior-level geometry tests plus desktop, normal Codex-width, and 390px real-browser review pass for both directions with no new frontend dependency, worker, cache, server endpoint, or semantic graph state."
+    }
+  ],
+  "constraints": [
+    "Optimize deterministic geometry only; do not hide canonical Tickets or relations to make screenshots look cleaner.",
+    "Do not add a frontend framework, graph library dependency, worker service, persistent cache, or alternate graph source.",
+    "Preserve the causal rank semantics, explicit textual states, read-only boundary, and complete selected causal cone.",
+    "Treat left-to-right and top-to-bottom as two orientations of one algorithm rather than separate implementations."
+  ],
+  "context": "The current deterministic rank plus barycenter layout works for small graphs but the real repository already makes the cards and orthogonal lines difficult to parse. The owner explicitly identified graph layout and line/card routing as the major scaling weakness. This is a graph-geometry deliverable, separate from shell composition and visual styling: it should make many Tickets legible in both supported directions while preserving Victor's strongest interaction, the full upstream/downstream cone on card selection.",
+  "context_refs": [
+    {
+      "purpose": "Current deterministic rank, barycenter ordering, edge ports, routing, minimap, and causal-cone implementation.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Current UI tests to extend with behavior-level dense graph fixtures.",
+      "ref": "test/ui-host.test.mjs"
+    },
+    {
+      "purpose": "Earlier accepted requirement for a selected Ticket with at least five prerequisites and five unlocks to remain readable.",
+      "ref": ".vibehub/tickets/ticket-make-static-graph-actionable.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Large Ticket graphs remain readable and stable in either direction through improved rank ordering, spacing, ports, and edge routing without weakening causal focus.",
+  "provenance_refs": [
+    "conversation:2026-08-11-owner-identifies-dense-graph-layout-as-scaling-gap"
+  ],
+  "relations": [
+    {
+      "rationale": "Dense geometry must optimize the single layout contract after both supported orientations are established.",
+      "target_ticket_id": "ticket-workbench-layout-direction-choice",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-dense-graph-layout"
+}

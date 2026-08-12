@@ -1,0 +1,45 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-presence-source",
+      "criterion": "Placeholder: refinement turns this direction into an executable Ticket once a trusted presence source design exists — covering the source contract, heartbeat and staleness thresholds, switcher and inspector behavior for multiple Active Runs, and tests proving presence never touches Git state, never persists, and never unlocks dependents."
+    }
+  ],
+  "constraints": [
+    "Presence is never persisted, never written to Git, and never semantic authority over Ticket states.",
+    "No inference from dirty files, cursor position, timestamps, or chat content.",
+    "Without a trusted source the UI must show honest absence, not guesses.",
+    "This draft authorizes design and refinement only; implementation requires the refined executable Ticket."
+  ],
+  "context": "Future direction, not yet executable. Baseline §8.1 defines ImplementationPresence: repositoryRoot, worktreeRoot, ticketId, runId, agentLabel, state, startedAt, lastHeartbeatAt — received in memory by the user-owned Workbench. Hard rules: presence disappears when the Workbench closes; it is never written to Ticket YAML, never enters Git, never restores across app sessions; it is never guessed from dirty files, cursor position, or chat content; a heartbeat timeout degrades the display to stale/disconnected instead of continuing to claim implementation; presence affects only the Implementing-now display and switching, never READY/BLOCKED/DONE or downstream unlock; without a trusted source the interface honestly shows that no implementing Ticket can be proven. §11.3 defines the target interactions: multiple Active Runs ordered by heartbeat freshness, switcher and sidebar selecting the same Ticket with graph scroll and inspector sync, no automatic claim or release of Runs, and Copy for Agent focusing the existing Run for active Tickets while only READY Tickets generate a new ticket-run instruction. The trusted source itself — trusted host task/run events or a separately designed local IPC adapter — does not exist yet, which is why this Ticket stays draft until that source design is ready.",
+  "context_refs": [
+    {
+      "purpose": "Requirement baseline: §8.1 ImplementationPresence contract and §11.3 interaction rules.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Interaction baseline: Implementing-now switcher, heartbeat display, and Active Run inspector fields.",
+      "ref": "docs/demos/vibehub-workbench-webview.html"
+    },
+    {
+      "purpose": "Boundary keeping non-canonical presence data out of the mechanical document contract.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The Workbench truthfully shows which Tickets are being implemented right now through an in-memory ImplementationPresence overlay fed by a trusted source.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [
+    {
+      "rationale": "A long-lived user-owned session must exist to receive and expire in-memory presence.",
+      "target_ticket_id": "ticket-workbench-macos-shell",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-implementing-presence"
+}

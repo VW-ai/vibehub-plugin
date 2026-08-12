@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "debounced-single-refresh",
+    "valid-swap-and-recovery",
+    "git-metadata-follows",
+    "no-writeback-proof"
+  ],
+  "closed_at": "2026-08-08T15:05:06Z",
+  "evidence_ids": [
+    "watch-debounce-and-recovery",
+    "watch-no-writeback-and-agent-unchanged"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout re-ran every proof against commit 994bd6e. npm run verify passes 53 tests with fail 0 and a clean plugin artifact; test/session-watch.test.mjs passes 5/5 in isolation. Debounce: three YAML writes in one burst raise watch.projectionCount by exactly 1 through the 150ms debounce and the graph gains all three tickets in one snapshot swap. Swap and recovery: a valid governed write is served from the swapped in-memory cache without reopening; a broken YAML keeps the prior snapshotId and ticket count while watch.error carries the validation message, and deleting the broken file restores the valid projection with error null automatically. Git metadata: the checked-in test proves a branch switch through the .git HEAD watcher, and an adjudicator-run probe additionally confirmed a new commit advances resolvedCommit and an unstaged .vibehub edit flips semanticDirty with the path listed, both without restart. No write-back: canonical .vibehub bytes compare deepEqual across watch cycles and repeated state requests, and a live vh-workbench smoke (envelope watch:true, expiresInMs null, /api/state watch field present) left the worktree clean and the port refusing connections after SIGTERM. Constraints hold: watchers cover only the selected worktree root, all watch state is in-memory closure state closed with the host, validation failure never clears the cached graph, and the agent-task path is untouched — vh-ui launches default watch:false, /api/state exposes no watch field there, per-request projection is proven by test, and test/ui-host.test.mjs is untouched by 994bd6e and passes 6/6.",
+  "ticket_id": "ticket-workbench-session-watch",
+  "unresolved_acceptance_ids": []
+}

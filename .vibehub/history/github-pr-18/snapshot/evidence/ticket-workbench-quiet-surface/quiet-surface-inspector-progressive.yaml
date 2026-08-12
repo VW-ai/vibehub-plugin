@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "inspector-progressive"
+  ],
+  "evidence_id": "quiet-surface-inspector-progressive",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T17:02:38Z",
+  "refs": [
+    "commit:a8ca1343cc79001342089db03ea67a9362068ceb",
+    "test:ui-host read-only loopback host serves assets, current graph, inspector, and trace",
+    "browser:quiet-workbench-inspector-selection-reviewed",
+    "skills/vibehub-ticket-review/assets/app.js"
+  ],
+  "schema_version": 1,
+  "summary": "Selecting a node in the live host opens the side inspector while the graph stays visible with the causal cone highlighted (verified in a real browser during the screenshot session; the node's neutral selection outline and dimmed unrelated tickets are visible alongside the open inspector). The inspector progressively reveals Execution (state signal, prerequisite/blocker/unlock/evidence metrics, causal position, why-this-ticket disclosure), Contract (acceptance conditions, working boundaries, required context with room-labelled canonical objects, dependency rationale, provenance, exact source), and Log (evidence timeline plus Outcome trace from /api/trace). agentHandoffPayload gates Copy for Agent: only stateLabel === \"READY\" produces a vibehub-ticket-run instruction, every other state produces a vibehub-ticket-review inspect instruction that forbids starting ticket-run — asserted by ui-host in commit a8ca1343cc79001342089db03ea67a9362068ceb. No Copy-deep-link affordance ships because no handler exists yet.",
+  "ticket_id": "ticket-workbench-quiet-surface"
+}

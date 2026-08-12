@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "session-lifecycle-clean"
+  ],
+  "evidence_id": "evidence-macos-shell-session-lifecycle-clean",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T03:41:08Z",
+  "refs": [
+    "commit:aec63834cb07ca740b5eab26fab77d84206d9285",
+    "apps/workbench/Sources/WorkbenchWebViewBridge/HostSession.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "test/workbench-shell.test.mjs",
+    "test:the shell session owns the host and leaves no process or port behind",
+    "test:quitting the shell terminates the host, and nothing daemonizes",
+    "observation:app pid 53721 -> host pid 53735 on 127.0.0.1:55674, gone after quit"
+  ],
+  "schema_version": 1,
+  "summary": "Verified twice at commit aec63834cb07ca740b5eab26fab77d84206d9285. Manually: the launched VibeHub Workbench.app (pid 53721) spawned exactly one child `node skills/scripts/vh-workbench.mjs --repo <worktree> --no-open --json` (pid 53735) listening on 127.0.0.1:55674, and lsof showed the app's com.apple.WebKit.Networking process (pid 53773) holding an ESTABLISHED connection to that port, so the WebView really loaded from the app-owned host. After `osascript -e 'quit app id \"dev.vibehub.workbench\"'` the app was gone, host pid 53735 was gone, port 55674 was closed, and `pgrep -f vh-workbench.mjs` showed only the pre-existing user-owned session (pids 96025/96028) that this agent did not start and did not touch. Mechanically: Node test `the shell session owns the host and leaves no process or port behind` spawns `VibeHubWorkbench --probe-session --repo <fixture>` (the same GitMetadata + HostSession code the window uses), asserts the handshake carries origin/hostPid but no 64-hex token, fetches /health for {ok,schemaVersion:1,readOnly:true}, sends SIGTERM to the shell, and asserts exit {code:0,signal:null}, the host pid dead, /health now unreachable, and every .vibehub file byte-for-byte unchanged. Node test `quitting the shell terminates the host, and nothing daemonizes` asserts applicationWillTerminate, applicationShouldTerminateAfterLastWindowClosed, the explicit SIGTERM/SIGINT/SIGHUP DispatchSource handlers (AppKit does not run applicationWillTerminate for a plain kill), and the absence of SMLoginItemSetEnabled, NSBackgroundActivityScheduler, LSSharedFileList, launchctl, and LSUIElement. LIMITATION, recorded honestly: SIGKILL cannot be handled, so force-killing the shell leaves its host running; this is stated in docs/LOCAL_GRAPH_DESIGN.md rather than hidden, and the test harness now sends SIGTERM before SIGKILL so the suite itself cannot leak a host.",
+  "ticket_id": "ticket-workbench-macos-shell"
+}

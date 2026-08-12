@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "59fa853a0f8c7f3e371faedf722c4efa33b7fe69",
+        "blob": "6aade3dd770f5a33a861e074cba1406d0ca847a0",
         "path": "CHANGELOG.md"
       },
       {
@@ -18,7 +18,7 @@
         "path": "docs/INSTALL.md"
       },
       {
-        "blob": "c0f214cb7f278533fe7beb38c3a1c57afa8dfabe",
+        "blob": "95bce99a3b16bf1cedbacffe12264a97969b0192",
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
@@ -30,16 +30,16 @@
         "path": "docs/SPEED_FIRST_CLEANUP.md"
       },
       {
-        "blob": "4b73a20aa5cfbe9a8640a51bd1787b1f7eb90847",
+        "blob": "d20d10925ac4ed918ccd1339f8618b84d26f20d5",
         "path": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
       },
       {
-        "blob": "129f5686ca258cae198bc110c2aa4cb301c50265",
+        "blob": "b8d2d86c80575bb3e8e90c473b50b2a8aecbd92a",
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       }
     ],
-    "checked_at": "2026-08-11T06:09:16.547Z",
-    "last_aligned_commit": "cbd41a10cbd2caa4d008ac1ad495154ee9f4140a"
+    "checked_at": "2026-08-12T02:32:59.372Z",
+    "last_aligned_commit": "ad21554e334cc88b434feb6f7e7145aad002af2a"
   },
   "anchors": [
     "CHANGELOG.md",

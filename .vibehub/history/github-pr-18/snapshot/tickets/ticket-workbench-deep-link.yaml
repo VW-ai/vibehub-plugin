@@ -1,0 +1,55 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "uri-contract-navigation-only",
+      "criterion": "The app registers vibehub://open with repo, ticket, and view parameters where view is limited to execution, contract, or log; unknown or extra parameters fail safe without side effects."
+    },
+    {
+      "acceptance_id": "running-and-cold-start-flows",
+      "criterion": "With the Workbench running, a deep link focuses the window, validates the repository, and selects the Ticket and view; with it not running, the app starts and asks the user to confirm a repository seen for the first time."
+    },
+    {
+      "acceptance_id": "explicit-repo-switch-confirmation",
+      "criterion": "A deep link naming a repository different from the current session produces an explicit switch prompt and never changes projects silently."
+    },
+    {
+      "acceptance_id": "missing-ticket-honest-state",
+      "criterion": "A deep link naming a Ticket absent from the current worktree still opens the repository and shows an explicit state that the Ticket does not exist there."
+    },
+    {
+      "acceptance_id": "no-mutation-proof",
+      "criterion": "Automated tests prove deep-link handling performs no write and leaves Git YAML byte-for-byte unchanged, including for malformed URIs."
+    }
+  ],
+  "constraints": [
+    "Deep links carry navigation only; no parameter may express or trigger a write.",
+    "The Workbench must never require an Agent or a deep link to function.",
+    "First use of a repository through a deep link requires explicit user confirmation."
+  ],
+  "context": "Baseline §9 defines the contract: vibehub://open?repo=<absolute-path>&ticket=<ticket-id>&view=<execution|contract|log>. Behavior: when the Workbench is running, focus the window, validate the repository, then select the Ticket; when not running, start the app and require user confirmation for a first-seen repository; when the repo differs from the current session, prompt explicitly instead of switching silently; when the Ticket does not exist, open the repository and show an honest 'not in this worktree' state; the URI carries navigation only and can never mutate a Ticket. Deep links are an enhancement — the Workbench must keep working without any Agent. The inspector's Copy-deep-link affordance becomes honest once this handler exists.",
+  "context_refs": [
+    {
+      "purpose": "Requirement baseline: §9 deep link contract and §10 security boundaries.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Interaction baseline: Copy deep link affordance and focus behavior.",
+      "ref": "docs/demos/vibehub-workbench-webview.html"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "Agents can focus the user-owned Workbench on an exact repository, Ticket, and inspector view through a navigation-only vibehub:// deep link.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [
+    {
+      "rationale": "URI scheme registration, window focus, and repository confirmation require the desktop shell.",
+      "target_ticket_id": "ticket-workbench-macos-shell",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-deep-link"
+}

@@ -22,6 +22,7 @@ const ASSET_FILES = new Map([
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/index.html", ["index.html", "text/html; charset=utf-8"]],
   ["/app.css", ["app.css", "text/css; charset=utf-8"]],
+  ["/app-model.js", ["app-model.js", "text/javascript; charset=utf-8"]],
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
 ]);
 
@@ -51,7 +52,9 @@ function digest(value) {
 
 function git(repo, args) {
   try {
-    return execFileSync("git", args, {
+    // The UI accepts arbitrary repository paths. Never let repository-local
+    // fsmonitor configuration turn a read-only projection into hook execution.
+    return execFileSync("git", ["-c", "core.fsmonitor=false", ...args], {
       cwd: repo,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],

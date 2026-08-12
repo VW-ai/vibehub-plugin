@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "workbench-room-stays-valid"
+  ],
+  "evidence_id": "amended-authority-validation",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T14:20:03Z",
+  "refs": [
+    "commit:79b92b1",
+    ".vibehub/rooms/workbench/room.yaml",
+    "test:vh-project-validate-and-room-drift-2026-08-08"
+  ],
+  "schema_version": 1,
+  "summary": "After the in-place amendment, vh project validate reports the repository valid (format 1, 4 rooms, 22 contexts, 35 tickets, 91 evidence, 22 outcomes) and vh room drift reports every room FRESH including workbench, with no realignment debt introduced by the amendment.",
+  "ticket_id": "ticket-amend-workbench-ui-authority"
+}

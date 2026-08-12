@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "no-writeback-proof"
+  ],
+  "evidence_id": "watch-no-writeback-and-agent-unchanged",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-08T14:59:44Z",
+  "refs": [
+    "commit:994bd6e",
+    "test/session-watch.test.mjs",
+    "test:npm-run-verify-2026-08-08-watch-fail-0",
+    "skills/scripts/vh-workbench.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The watcher only reads: after a governed write settles, canonical .vibehub bytes compare deepEqual across repeated watch cycles and state requests, proving no watcher state is written into the repository. Watch mode exists only behind the opt-in watch option that vh-workbench passes; agent-task launches expose no watch field and keep per-request projection (a file written after launch is visible on the immediately following request with no debounce), and npm run verify passes with fail 0 plus a clean plugin artifact, keeping every existing ui-host and skill-contract invariant intact.",
+  "ticket_id": "ticket-workbench-session-watch"
+}

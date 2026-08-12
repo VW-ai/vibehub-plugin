@@ -1,0 +1,46 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-inbox-sources",
+      "criterion": "Placeholder: refinement turns this direction into an executable Ticket once multi-repository sessions and trusted review/decision/presence sources are designed — covering the item payload contract, needs-you versus all-activity classification, badge semantics, per-source labeling, and the honesty rules that seen-state and Inbox aggregation never alter Tickets or become authority."
+    }
+  ],
+  "constraints": [
+    "The badge counts only unread items that require human action.",
+    "Seen is local UI state and never implies approval, decision, or closeout.",
+    "Every aggregated item keeps its source label; the Inbox derives no Ticket state.",
+    "This draft authorizes design and refinement only; implementation requires the refined executable Ticket."
+  ],
+  "context": "Future direction, not yet executable. Baseline §11.2 defines the Inbox as an attention queue across recent repositories answering one question: with multiple Agents developing at once, what truly needs me now. Only three kinds enter Needs-you — Review requested (Agent explicitly asks for human inspection), Decision required (multiple valid options need a human product or architecture choice; neither UI nor Agent may pick silently), and Blocked intervention (credentials, permissions, or external coordination) — while heartbeats, percentage changes, watcher refreshes, frontier changes, and completions stay in All activity without consuming the badge. The badge counts unread items that need action, never total messages. Every item must carry the exact repository and worktree identity, Ticket ID and optional Run ID, type, requester and time, why a human is needed, the Agent-prepared bounded context and evidence summary, and a deep link to the exact Ticket; seen is local App UI state only and never implies review, decision, or closeout. Sources keep their labels; the Inbox never derives READY/DONE itself and never becomes a second truth. Blocked on capabilities that do not exist yet: multi-repository recent sessions (Phase 2 direction) and canonical or trusted sources for review requests, decision requests, and presence events — hence draft.",
+  "context_refs": [
+    {
+      "purpose": "Requirement baseline: §11.2 Inbox information architecture and honesty rules.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Interaction baseline: Inbox filters, queue, detail panel, and actions.",
+      "ref": "docs/demos/vibehub-workbench-webview.html"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A cross-repository Inbox aggregates only Review requested, Decision required, and blocked interventions that genuinely need the user, with source-labeled items and honest badges.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [
+    {
+      "rationale": "Cross-repository sessions and a persistent user-owned surface must exist before an attention queue can aggregate them.",
+      "target_ticket_id": "ticket-workbench-macos-shell",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Active Run presence is one of the labeled sources the Inbox aggregates.",
+      "target_ticket_id": "ticket-workbench-implementing-presence",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-attention-inbox"
+}

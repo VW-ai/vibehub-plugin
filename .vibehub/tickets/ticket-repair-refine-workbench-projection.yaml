@@ -1,0 +1,69 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-is-first-class-in-workbench",
+      "criterion": "An unlocked maturity: draft Ticket is projected as REFINE on its graph card, minimap, Inspector execution signal, graph summary or overview, and accessibility label with a textual state plus a non-color-only semantic treatment; it is never rendered as an unknown or unprojected Ticket."
+    },
+    {
+      "acceptance_id": "refine-remains-non-executable",
+      "criterion": "REFINE remains excluded from the READY frontier, causal sorting treats it as a known lifecycle state, and Copy for Agent names the exact REFINE state and instructs Ticket review/refinement rather than ticket-run."
+    },
+    {
+      "acceptance_id": "browser-regression-catches-refine-omission",
+      "criterion": "A browser-executed or equivalently behavior-level UI regression fixture contains an unlocked draft Ticket and proves its rendered card, summary, Inspector, and copied handoff observe REFINE; the check would fail if REFINE were removed from the browser state whitelist, rather than merely asserting that the server JSON contains REFINE or that a source string exists."
+    },
+    {
+      "acceptance_id": "pr15-authority-contract-stays-intact",
+      "criterion": "Existing tests and a representative UI fixture continue to prove per-criterion human authority, human-origin Evidence, UPCOMING/PENDING/RECORDED/COMPLETE attention, exact human-boundary Agent payloads, and the distinction between human attention and operational state."
+    },
+    {
+      "acceptance_id": "refine-repair-verifies-cleanly",
+      "criterion": "Project and Ticket validation, the full node test suite, Plugin artifact verification, and wide plus narrow real-browser smoke pass without adding a service, dependency, writable route, Desktop runtime, or new lifecycle state."
+    }
+  ],
+  "constraints": [
+    "Do not change ticketStatus, firm/draft meaning, dependency unlocking, or READY/BLOCKED/REFINE/DONE/DEVIATED semantics.",
+    "Do not redesign the Workbench shell, graph direction, palette, or dense-layout algorithm in this compatibility repair.",
+    "Do not rewrite or delete the successful PR #15 or release-preparation Outcomes; this later Ticket is the append-only record of the deeper audit finding."
+  ],
+  "context": "A fresh PR #15-to-current-UI audit found that the canonical data layer still emits maturity: draft and operationalState: REFINE correctly, but the browser asset's TICKET_STATES whitelist and operational summaries recognize only READY, DONE, BLOCKED, and DEVIATED. As a result, an unlocked draft loses its state label and semantic styling, disappears from counts and narratives, and Copy for Agent describes it as UNPROJECTED rather than REFINE. The omission already existed in the PR #15 browser asset and Victor's UI retained it, so this is a current integration gap rather than a newly introduced Victor regression. Repair only the presentation and its executable browser coverage; do not change lifecycle semantics or absorb the later visual redesign.",
+  "context_refs": [
+    {
+      "purpose": "PR #15 authority and attention contract that the repaired UI must preserve.",
+      "ref": ".vibehub/tickets/ticket-encode-human-acceptance-authority.yaml"
+    },
+    {
+      "purpose": "Canonical draft and REFINE lifecycle semantics.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
+    },
+    {
+      "purpose": "Mechanical projection that already emits REFINE and the complete human-attention package correctly.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    },
+    {
+      "purpose": "Browser consumer whose state whitelist, summaries, handoff, and rendering require repair.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Current test surface that proves server REFINE output but does not execute enough browser behavior to catch the omission.",
+      "ref": "test/ui-host.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The shared Web Workbench projects REFINE as a first-class non-executable Ticket state everywhere, closing the remaining practical gap between PR #15's draft-maturity contract and the browser UI before v0.7.0 publishes.",
+  "provenance_refs": [
+    "conversation:2026-08-11-pr15-victor-ui-alignment-audit",
+    "github-pr:VW-ai/vibehub-plugin#15",
+    "commit:cbd41a10cbd2caa4d008ac1ad495154ee9f4140a"
+  ],
+  "relations": [
+    {
+      "rationale": "The deeper compatibility audit follows the completed v0.7.0 preparation and must be repaired before its publication proceeds.",
+      "target_ticket_id": "ticket-prepare-v070-ui-release",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-repair-refine-workbench-projection"
+}

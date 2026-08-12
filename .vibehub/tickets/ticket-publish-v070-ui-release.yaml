@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "release-pr-merged",
+      "criterion": "The verified v0.7.0 replacement PR, including the successful REFINE Workbench projection repair, is merged into main, and updated origin/main contains the UI curation, release-preparation, and compatibility-repair Outcomes with their acceptance-linked Evidence."
+    },
+    {
+      "acceptance_id": "tagged-merged-main",
+      "criterion": "After fast-forwarding local main, lightweight tag v0.7.0 points exactly to the merged main commit and is pushed to origin; no feature-branch commit is tagged."
+    },
+    {
+      "acceptance_id": "github-release-verified",
+      "criterion": "The Release VibeHub workflow succeeds; GitHub Release v0.7.0 points to the tagged main commit; vibehub-plugin-0.7.0.tar.gz and vibehub-plugin-0.7.0.tar.gz.sha256 both exist; and local SHA-256 verification of the downloaded archive passes."
+    },
+    {
+      "acceptance_id": "superseded-pr-retired",
+      "criterion": "Original PR #18 is closed without merge with a concise explanation and link to the merged curated replacement, preserving its review history while making the shipping path unambiguous."
+    }
+  ],
+  "constraints": [
+    "Never tag or publish from the feature/release branch; tag only the exact merged main commit.",
+    "Do not create the GitHub Release manually; wait for the tag-triggered workflow.",
+    "Tag exactly v0.7.0 with no alternate spelling or suffix.",
+    "Do not publish to npm or add updater/runtime machinery.",
+    "Do not close original PR #18 until the curated replacement has actually merged."
+  ],
+  "context": "Publication begins only after the later PR #15 compatibility audit closes its REFINE projection repair successfully and the replacement PR containing that repair merges to main. Follow docs/RELEASE.md: update local main by fast-forward from origin/main, tag that exact merged commit as v0.7.0, push only the tag, wait for the Release VibeHub workflow, verify the GitHub Release target plus archive and checksum, and close the original conflicting PR #18 as superseded by the curated replacement. Publication evidence and independent Outcome are appended after the external state is real. The earlier successful preparation Outcome remains historical; the new direct dependency records the subsequently discovered browser-level gap without rewriting that history.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative merged-main tagging and release verification procedure.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "Tag-triggered workflow that verifies, builds, checksums, and creates the GitHub Release.",
+      "ref": ".github/workflows/release.yml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub v0.7.0 is published from the exact merged main commit as a verified GitHub Release with its archive and SHA-256 checksum, and the superseded original PR #18 is retired honestly.",
+  "provenance_refs": [
+    "conversation:2026-08-11-owner-requests-merge-before-ui-redesign-and-release",
+    "conversation:2026-08-11-pr15-victor-ui-alignment-audit",
+    "github-pr:VW-ai/vibehub-plugin#18",
+    "commit:0b5585c77ef6b2473ca22504d93287db8cbc3a84"
+  ],
+  "relations": [
+    {
+      "rationale": "The merged release candidate must include the independently accepted PR #15 REFINE projection repair before tagging.",
+      "target_ticket_id": "ticket-repair-refine-workbench-projection",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-publish-v070-ui-release"
+}

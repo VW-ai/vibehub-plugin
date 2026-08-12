@@ -1,0 +1,36 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "ui-only-scope-chosen",
+      "authority": "human",
+      "criterion": "The repository owner explicitly decides that the replacement delivery keeps the approved shared Ticket-graph UI upgrade, excludes the macOS Desktop product version and its product entry points from the final tree, and preserves earlier PR Ticket, Evidence, and Outcome records with later Tickets appended rather than deleting history."
+    }
+  ],
+  "constraints": [
+    "This Ticket records the product decision only; it does not implement or certify the replacement delivery.",
+    "Only explicit owner input with a readable conversation reference may be recorded as human-origin Evidence.",
+    "Do not rewrite or delete the earlier PR's Ticket, Evidence, or Outcome history to make the decision appear retroactive."
+  ],
+  "context": "PR #18 combines a substantial shared Workbench UI redesign with a user-owned session mode, macOS Desktop shell, deep links, repository switching, packaging direction, and their completed Ticket records. During review the owner clarified that the expected business outcome was limited to UI upgrade and update. The Desktop product version is not accepted for this delivery. Existing Ticket, Evidence, and Outcome records from the PR are historical records and must not be deleted; the later scope decision and resulting removal are represented by new checked-in Tickets instead.",
+  "context_refs": [
+    {
+      "purpose": "Existing product authority for a first-class shared local Ticket-graph UI without authorizing a native Desktop product.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Binding visual and interaction quality standard for the retained UI scope.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The repository owner's business disposition of PR #18 is recorded: retain the shared Ticket-graph UI upgrade, do not ship the macOS Desktop product version, and preserve earlier PR records while appending the later decision.",
+  "provenance_refs": [
+    "github-pr:VW-ai/vibehub-plugin#18",
+    "commit:0c21858ca1a4dd1537e75a335f124548a44d3587",
+    "conversation:2026-08-11-pr18-ui-business-review"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-decide-pr18-ui-only-scope"
+}

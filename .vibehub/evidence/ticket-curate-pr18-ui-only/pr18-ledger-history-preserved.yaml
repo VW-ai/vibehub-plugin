@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "history-preserved-by-append"
+  ],
+  "evidence_id": "pr18-ledger-history-preserved",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-11T22:35:05Z",
+  "refs": [
+    ".vibehub/history/github-pr-18/manifest.json",
+    "test/pr18-history.test.mjs",
+    "test:pr18-ledger-snapshot-complete-byte-stable-and-non-canonical",
+    "commit:0c21858ca1a4dd1537e75a335f124548a44d3587"
+  ],
+  "schema_version": 1,
+  "summary": "The non-canonical PR #18 snapshot preserves all 45 ledger blobs added by the PR—10 Tickets, 28 Evidence, and 7 Outcomes—with original paths, archived paths, SHA-256 digests, merge-base and PR-head provenance, while the canonical graph appends the later UI-only decision and delivery records.",
+  "ticket_id": "ticket-curate-pr18-ui-only"
+}

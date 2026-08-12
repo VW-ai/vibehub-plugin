@@ -1,0 +1,73 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "canvas-is-default-primary-surface",
+      "criterion": "Desktop and normal Codex-width views open with the complete causal graph as the dominant surface and no permanently expanded left overview panel; a narrow compact status affordance or top-right signal expands and collapses detailed overview content on explicit request."
+    },
+    {
+      "acceptance_id": "overview-has-one-operational-purpose",
+      "criterion": "The compact and expanded overview prioritize executable READY count/frontier, genuine human-attention boundaries, deviations, and exact-source dirtiness; they do not duplicate the full Inspector, long Evidence/Context content, or a second graph navigation hierarchy, and REFINE is counted honestly as non-executable work needing refinement."
+    },
+    {
+      "acceptance_id": "empty-presence-does-not-occupy-shell",
+      "criterion": "With no trusted Active-Run presence source, no Implementing panel, rail section, or full-width empty strip occupies the default layout and nothing is inferred as IMPLEMENTING; if a future canonical presence item exists, its presentation remains conditional on that trusted input."
+    },
+    {
+      "acceptance_id": "focused-local-link-is-complete-and-honest",
+      "criterion": "Selecting a Ticket and changing its Execution, Contract, or Log lens updates explicit URL focus state without reloading or losing the bearer fragment, Copy link restores that focus in the same live local host session, and the UI does not imply the link is a remote share, durable permalink, or repository switch mechanism."
+    },
+    {
+      "acceptance_id": "victor-interactions-are-preserved",
+      "criterion": "Card selection still highlights the complete upstream and downstream causal cone, relation selection and minimap/pan/zoom remain usable, the progressive Inspector retains Execution/Contract/Log and exact Git source, and Agent handoff stays READY-gated and read-only."
+    },
+    {
+      "acceptance_id": "canvas-shell-is-responsive-and-verified",
+      "criterion": "Against the tagged v0.7.0 shell at fixed 1440x960 and 1180x820 viewports, behavior-level DOM measurements prove the default drawable canvas rectangle is at least 20% larger at each viewport; real-browser review at those sizes and 390x844 also proves keyboard reachability, 44px narrow targets, reduced-motion safety, no content loss, and no narrow horizontal overflow."
+    }
+  ],
+  "constraints": [
+    "Preserve the shared dependency-free Web surface; do not restore the macOS Desktop shell, repository switching, session watch, or launcher runtime.",
+    "Overview is a compact operational index, not a default dashboard, second state model, or replacement for the Ticket Inspector.",
+    "Do not infer Active-Run presence from Ticket state, Git dirtiness, timestamps, or Agent prose.",
+    "Do not remove Victor's causal-cone focus, detailed Inspector, typed source objects, or focused-entry capability."
+  ],
+  "context": "The owner accepts Victor's causal-cone selection, detailed Inspector, exact source, and Web interaction work, but does not want a permanently open left overview rail or duplicated empty Implementing surfaces. The graph should reclaim the main desktop area. Overview exists to answer only three operational questions at a glance: what can execute now, what genuinely needs the person, and whether execution/source truth has deviated. A compact top-right or narrow-edge affordance may expand into details; it is not another navigation hierarchy or a duplicate Inspector. Honest presence still matters, but when no trusted Active-Run source exists the UI should make no implementing claim and should not consume layout space explaining an empty subsystem. The existing local focused-link capability is useful for reopening the same Ticket and Inspector lens in the same live local session, but selection and tab changes currently do not update the copied URL, so this shell refinement completes that interaction honestly.",
+  "context_refs": [
+    {
+      "purpose": "Current quiet-intelligence, read-only, accessibility, source-truth, and presence boundaries.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Product authority for reclaiming a person's attention only at genuine Ticket boundaries.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "purpose": "Current Victor-derived Workbench design and retained interaction contract.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Current permanent rail and duplicated Implementing shell.",
+      "ref": "skills/vibehub-ticket-review/assets/index.html"
+    },
+    {
+      "purpose": "Current causal-cone, Inspector, focus-query, copy-link, and presence behavior.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The shared Web Workbench opens as a canvas-first causal graph with a compact, purposeful overview that expands only on demand and preserves Victor's detailed graph and Inspector interactions.",
+  "provenance_refs": [
+    "conversation:2026-08-11-canvas-first-overview-direction",
+    "conversation:2026-08-11-preserve-victor-web-interactions"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner chose to merge and release the bounded Victor UI update before beginning this larger interaction-shell refinement.",
+      "target_ticket_id": "ticket-publish-v070-ui-release",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-canvas-first-overview"
+}

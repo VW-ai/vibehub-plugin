@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "missing-ticket-honest-state"
+  ],
+  "evidence_id": "evidence-deep-link-missing-ticket-honest-state",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T05:48:31Z",
+  "refs": [
+    "commit:a0b0f442c64daa9c95df1ee2893b08e63c1b3557",
+    "apps/workbench/Sources/WorkbenchRepositorySession/DeepLink.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/WorkbenchWindowController.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "test:an unknown Ticket would stop the host, so the shell never passes one",
+    "test:a Ticket absent from the worktree still opens the repository",
+    "test:focused launcher rejects an unknown Ticket before binding",
+    "observation:probe-render reported ticketPresent=false navigated=false with the graph still rendered",
+    "limitation:the sheet was not visually confirmed; screen automation is denied here"
+  ],
+  "schema_version": 1,
+  "summary": "The obstacle was real and is resolved in the shell: startVibeHubUi throws \"Unknown Ticket for --ticket\" before binding, which is asserted afresh in test `an unknown Ticket would stop the host, so the shell never passes one`, so passing an absent Ticket through would have kept the repository itself from opening. The shell therefore asks one narrow question before it passes --ticket - does <worktree>/.vibehub/tickets/<id>.yaml exist - and passes nothing when it does not; vh-ui.mjs and vh-workbench.mjs are unchanged and their validation is still authoritative, with test/workbench-launcher.test.mjs and test/session-watch.test.mjs passing unchanged. Proven inside the real WKWebView at commit a0b0f442c64daa9c95df1ee2893b08e63c1b3557 by `--probe-render --repo <fixture> --deep-link 'vibehub://open?repo=<fixture>&ticket=ticket-not-in-this-worktree&view=log'` (test `a Ticket absent from the worktree still opens the repository`): the repository opened and rendered its graph (rendered.path equal to the worktree, nodes >= 1), ticketPresent false, navigated false - the open view was not silently reset - and the statement reported was \"ticket-not-in-this-worktree is not in this worktree. The repository is open and its checked-in Ticket graph is shown, but <worktree> checks in no Ticket with the ID ticket-not-in-this-worktree. Nothing was created: the Workbench only reads.\" Those exact words come from MissingTicketStatement in WorkbenchRepositorySession, which is also what WorkbenchWindowController.reportMissingTicket puts in the sheet, so the probe and the user read the same sentence. The same gate is applied to the restored lastTicketId preference, so a Ticket deleted since the last session can no longer block a launch either; the state is only announced when a deep link actually named it. Manually observed against the registered bundle: `open \"vibehub://open?repo=<worktree>&ticket=ticket-absent-from-worktree&view=log\"` left the app running with its repository open and its selection unchanged. HONEST LIMITATION: the sheet itself was not seen or dismissed - screen automation is denied in this environment - so the visual presentation is evidenced by the shared statement text and the source path that displays it, not by a screenshot.",
+  "ticket_id": "ticket-workbench-deep-link"
+}

@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "no-mutation-proof"
+  ],
+  "evidence_id": "evidence-deep-link-no-mutation-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T05:48:31Z",
+  "refs": [
+    "commit:a0b0f442c64daa9c95df1ee2893b08e63c1b3557",
+    "test:deep link handling writes nothing, valid or not",
+    "test:every malformed or over-reaching URI fails safe",
+    "test:a deep link selects the Ticket and layer in the real WebView",
+    "test:a Ticket absent from the worktree still opens the repository",
+    "test:a deep link can express navigation and nothing else",
+    "apps/workbench/Sources/WorkbenchRepositorySession/DeepLink.swift",
+    "command:git status --short -- .vibehub after the manual deep link runs",
+    "test/workbench-deep-link.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Test `deep link handling writes nothing, valid or not` at commit a0b0f442c64daa9c95df1ee2893b08e63c1b3557 drives the real built binary through ten URI forms - repository only, repository with a Ticket, with a Ticket and layer, with a Ticket that is absent, a second repository, mutate=1, delete=true, vibehub://apply, /tmp/../etc, and a non-URI string - in each of three session contexts (no session, a session on that repository, a session on another one), thirty runs in all. Every run reports hostStarted false and the same preference key list before and after, and after all of them the fixture's .vibehub tree is byte-for-byte identical (every file read and compared, sorted by path) and the repository root has exactly the same entries. Malformed URIs are covered twice: the same byte comparison also closes test `every malformed or over-reaching URI fails safe`, which runs 23 refusals. The two WKWebView tests that actually start a read-only host and navigate it with a deep link - `a deep link selects the Ticket and layer in the real WebView` and `a Ticket absent from the worktree still opens the repository` - assert the identical .vibehub bytes across the whole session as well, so the no-write property holds for the live path and not only for the pure decision. Structurally, DeepLink carries three navigation fields and no other, and test `a deep link can express navigation and nothing else` fails the compiled Swift on any write path (vh.mjs invocation, ticket apply, file writing, an HTTP method on a URLRequest); the host a link addresses is the same read-only session that answers 405 to any non-GET/HEAD. Manually observed: after every manual deep link run against this worktree - valid, malformed, absent Ticket, invalid repository, and a different repository - `git status --short -- .vibehub` reported nothing, so no checked-in document was touched. Preference state was restored to its pre-test condition afterwards.",
+  "ticket_id": "ticket-workbench-deep-link"
+}

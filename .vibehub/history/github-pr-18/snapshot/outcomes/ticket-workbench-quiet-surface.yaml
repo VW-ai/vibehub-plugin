@@ -1,0 +1,27 @@
+{
+  "accepted_acceptance_ids": [
+    "top-to-bottom-graph",
+    "honest-implementing-layer",
+    "quiet-a-direction",
+    "inspector-progressive",
+    "source-dock-truth",
+    "accessible-and-read-only",
+    "owner-approves-surface"
+  ],
+  "closed_at": "2026-08-09T16:05:19Z",
+  "evidence_ids": [
+    "quiet-surface-top-to-bottom-graph",
+    "quiet-surface-honest-implementing-layer",
+    "quiet-surface-a-direction",
+    "quiet-surface-inspector-progressive",
+    "quiet-surface-source-dock-truth",
+    "quiet-surface-accessible-and-read-only",
+    "owner-approved-quiet-surface"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independently adjudicated against commit a8ca1343cc79001342089db03ea67a9362068ceb by re-reading the diff, re-running the suites, and driving a self-started host in a real browser. top-to-bottom-graph: layoutGraphTopToBottom ranks topologically and stacks ranks downward with deterministic ordering (sorted ids, fixed barycenter sweeps, localeCompare tiebreak); the live DOM shows all 35 nodes on exactly 6 row bands at y 72/276/480/684/888/1092 with foundations on top and BLOCKED downstream, and pan, zoom, Fit, minimap, and selection all work. honest-implementing-layer: renderImplementingNow reads only ACTIVE_RUN_PRESENCE = Object.freeze([]) and throws if presence rendering is ever attempted; both the strip and the rail render the explicit empty state live, TICKET_STATES holds only READY/DONE/BLOCKED/DEVIATED, and no owner, progress, agent, or heartbeat field is read anywhere. quiet-a-direction: verified in-browser at 375x812 that every control measures at least 44x44, the body font stack is system-only, no external resource loads, no style-lab markup exists, and states carry textual labels beside color; --canvas #eef0ef and the neutral --selection #283a32 outline are the shipped tokens. inspector-progressive: selecting a node kept the graph visible with the causal cone highlighted and unrelated Tickets dimmed, and Execution, Contract, and Log each rendered live with progressive disclosure; agentHandoffPayload gates the vibehub-ticket-run instruction on stateLabel === \"READY\" and hands every other state a vibehub-ticket-review inspect instruction. source-dock-truth: the dock stayed visible in every view at both widths showing the exact worktree, branch, commit, clean working tree, and last projection, with a dedicated validation cell retaining the last valid snapshot. accessible-and-read-only: all 35 nodes carry role=button tabindex=0, the inspector tabs use a correct roving tabindex, the minimap is focusable, prefers-reduced-motion is honored, npm run verify passed with 53 tests, fail 0, artifact ok, and the .vibehub YAML tree hashed identically after a full interactive browser session. owner-approves-surface accepted solely on human-origin Evidence: owner-approved-quiet-surface records that the repository owner reviewed the live rebuilt surface plus the checked-in 1440x900 and 375x812 screenshots and replied 批准 on 2026-08-09, ref conversation:2026-08-09-owner-approves-quiet-workbench-surface, committed separately as 63503ed; no Agent judgment was substituted in either direction. Constraints hold: the graph remains primary with no card wall, chat, or YAML editing; a8ca134 touched only assets, ui-host tests, and screenshots, leaving vh-ui.mjs and the state/subject/trace API contract untouched; nothing is persisted (localStorage and sessionStorage both empty after use); and the context-object and context-room surfaces the rooms work depends on are carried forward unchanged, so ticket-rooms-into-workbench is not stranded and remains READY. Only two ui-host assertions changed, both design-coupled and both tightened rather than weakened: /function layoutGraph/ became /function layoutGraphTopToBottom/, and --canvas: #f1f2f0 became --canvas: #eef0ef; every security and invariance assertion (CSP default-src 'self', null access-control-allow-origin, 401 unauthorized, 405 read_only, snapshot-stale, canonicalBytes Git-invariance, projection topology) is byte-identical, and session-watch and workbench-launcher were not modified.",
+  "ticket_id": "ticket-workbench-quiet-surface",
+  "unresolved_acceptance_ids": []
+}

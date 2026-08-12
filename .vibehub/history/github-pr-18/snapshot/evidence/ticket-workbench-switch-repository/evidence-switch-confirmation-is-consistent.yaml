@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "switch-confirmation-is-consistent"
+  ],
+  "evidence_id": "evidence-switch-confirmation-is-consistent",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-11T00:23:09Z",
+  "refs": [
+    "commit:84576fd231937ad1704dd13b4f83d5b51d25dc9f",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "apps/workbench/Sources/WorkbenchRepositorySession/DeepLink.swift",
+    "apps/workbench/Sources/WorkbenchDesktop/SwitchProbe.swift",
+    "test:both in-app entries resolve through the deep link's own planner",
+    "test:choosing a recent repository switches the running app and releases the old session",
+    "test:refusing the question leaves the current session exactly as it was",
+    "test:the in-app question and the deep link question differ only in who asked",
+    "test:both confirmations are real prompts the user has to answer",
+    "observation:assembled bundle on alpha (app pid 49900, host pid 49907); open vibehub://open?repo=<beta> started no host for beta and left one app process and one host",
+    "limitation:GUI automation denied, so the live sheet's buttons were not clicked; headlessly the real sheet was ended with .alertFirstButtonReturn and .alertSecondButtonReturn",
+    "docs/LOCAL_GRAPH_DESIGN.md"
+  ],
+  "schema_version": 1,
+  "summary": "The in-app switch asks the deep link's own question, on the window the user is reading, and no path changes project without an answer. AppDelegate.requestRepository is the single in-app entry for the Cmd-O panel, the recent-repositories submenu and the launch picker; it validates the path and then calls the same DeepLinkPlanner.resolve with the same currentRepository and the same remembered list a vibehub:// link uses, mapping confirmSwitch to confirmSwitch(from:to:requestedBy:.userSelection) - the same method the deep link calls. In `--probe-switch`, the probe waits for whatever AppKit puts on the window and reads the sheet's own NSTextField and NSButton text back out of the view hierarchy: sheetPresented true, sheetIsConfirmation true, and promptMatchesSheet true, meaning the drawn title, detail, affirmative and cancel all equal ConfirmationPrompts.switchRepository - title \"Switch the Workbench to a different repository?\", buttons \"Switch Repository\" and \"Stay Here\", and a detail naming both the open worktree and the requested one. With --answer decline the probe ends that same real sheet with .alertSecondButtonReturn and the session is untouched: switched false, currentRepository still alpha, second null (beta's host was never started), previousHostAlive true, previousOriginStatus 200, previousAuthorizedApiStatus 200, windowRecreated false and recentsAfter identical to recentsBefore. The deep link's own wording is unchanged: `--probe-deep-link` for a different repository still reports resolution confirm-switch and a detail containing \"A vibehub:// link asked for:\", and DeepLink.swift holds exactly one occurrence of the title and one of the consequence sentence, with the requester enum the only thing that varies - .deepLink says \"A vibehub:// link asked for:\" and .userSelection says \"You asked to open:\", because telling someone who picked a worktree from a menu that a link asked for it would be false. Manually, on the assembled bundle: I launched `VibeHub Workbench.app` through LaunchServices with --args --repo <alpha> (app pid 49900, its host pid 49907 on alpha), then ran `open \"vibehub://open?repo=<beta>\"`. Six seconds later there was still exactly one app process and exactly one read-only host, alpha's - no host for beta was started, which is what a silent switch would have produced. HONEST LIMITATION: GUI automation is denied here, so I could not click Switch Repository or Stay Here in that live window; what I observed manually is the refusal to switch while the question is unanswered. The click itself is covered headlessly by ending the real AppKit sheet with the exact return code each button produces.",
+  "ticket_id": "ticket-workbench-switch-repository"
+}

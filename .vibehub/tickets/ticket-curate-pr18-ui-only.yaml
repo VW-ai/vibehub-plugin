@@ -1,0 +1,79 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "quiet-ui-integrated",
+      "criterion": "The shared Ticket review assets deliver the A · Quiet Workbench update with top-to-bottom causal flow, quiet cool-neutral styling, responsive keyboard-accessible graph and progressive inspector behavior, honest empty ImplementationPresence, persistent source truth, and no style selector."
+    },
+    {
+      "acceptance_id": "current-main-ui-contracts-preserved",
+      "criterion": "The refreshed assets preserve current main's human-attention states, human acceptance-authority rendering, READY-gated Agent handoff, Rooms-facing context-card affordances, and direct Git-YAML read-only behavior without semantic inference."
+    },
+    {
+      "acceptance_id": "retained-host-git-is-safe",
+      "criterion": "Every Git command issued by the retained shared Node UI host disables repository-configured core.fsmonitor; a regression test opens and projects a repository with a malicious fsmonitor command and proves that command is never executed."
+    },
+    {
+      "acceptance_id": "desktop-and-runtime-scope-excluded",
+      "criterion": "The final tracked tree contains no macOS Desktop app or app bundle, desktop deep-link or repository-switch product path, desktop-only tests, new user-owned foreground vh-workbench launcher, or session-watch behavior; README and current design documentation do not claim those rejected capabilities ship."
+    },
+    {
+      "acceptance_id": "history-preserved-by-append",
+      "criterion": "A non-canonical .vibehub/history/github-pr-18 snapshot preserves byte-identical copies of the 10 Ticket, 28 Evidence, and 7 Outcome blobs added by PR #18 between merge-base c17e973b3784005f5c0d8baa37b2bd6262d97280 and PR head 0c21858ca1a4dd1537e75a335f124548a44d3587, with a manifest mapping every original path to its archived path, SHA-256 digest, merge-base, and PR head; the rejected records are not loaded as active canonical work, and the later UI-only decision and delivery are represented by newly appended canonical Ticket, Evidence, and Outcome documents."
+    },
+    {
+      "acceptance_id": "ui-verification-passes",
+      "criterion": "Focused UI tests cover top-to-bottom layout, source truth, honest presence, human attention, acceptance authority, accessibility, read-only behavior, and responsive assets; project validation, full npm verification, and plugin artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Current main is the semantic and contract baseline; never resolve conflicts by choosing the PR side wholesale.",
+    "Do not discard or retroactively edit earlier Ticket, Evidence, or Outcome records: preserve exact originals in the PR snapshot and append the later business decision and delivery to the canonical graph.",
+    "All retained shared-host Git invocations must override repository-configured core.fsmonitor so opening an untrusted repository cannot execute its hook.",
+    "Do not retain apps/workbench, desktop-only tests, vh-workbench session launcher, session-watch behavior, or claims that the Desktop version ships.",
+    "The retained UI remains dependency-free, read-only, and mechanically projected from canonical Git documents.",
+    "Room alignment is recomputed after the merged tree is final; room.yaml stamps are never hand-picked from either branch."
+  ],
+  "context": "The prerequisite decision closed successfully with human-origin Evidence: retain PR #18's shared Ticket-graph UI upgrade, exclude the macOS Desktop product version and its entry points, and preserve earlier PR Ticket, Evidence, and Outcome history by appending later records. The retained implementation is the dependency-free shared review surface at PR commit a8ca1343cc79001342089db03ea67a9362068ceb: top-to-bottom causal flow, A · Quiet Workbench visual system, responsive and accessible graph/inspector interaction, honest empty ImplementationPresence, and persistent source truth. PR Ticket ticket-amend-workbench-ui-authority and its successful Outcome record the top-to-bottom amendment. Integration must combine that authority with current main's newer human-attention projection, acceptance-authority rendering, and Rooms-facing context-card affordances. The excluded implementation is apps/workbench, its app bundle, native deep links, repository switching, dogfood packaging, the user-owned foreground vh-workbench session, and session-watch behavior. Loading all earlier PR ledger documents unchanged into the current canonical graph would leave rejected work active and create dangling Context refs after Desktop deletion, so those original blobs are preserved byte-identically as a non-canonical PR snapshot with an exact manifest; this Ticket and its prerequisite are the appended canonical disposition records.",
+  "context_refs": [
+    {
+      "purpose": "Product authority for retaining the shared local Ticket graph UI.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Current-main visual and interaction standard plus the amendment integrated from PR #18.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Read-only mechanical projection boundary that the UI integration must preserve.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Current main's human authority and human-origin Evidence contract.",
+      "ref": "skills/contracts/acceptance-authority.md"
+    },
+    {
+      "purpose": "Successful owner scope decision that makes this delivery acceptance executable.",
+      "ref": ".vibehub/outcomes/ticket-decide-pr18-ui-only-scope.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "PR #18 is integrated onto current main as a shared Quiet Workbench UI upgrade, while the macOS Desktop product version and other non-UI runtime additions are absent from the final tree and the historical PR ledger remains traceable through a byte-identical non-canonical snapshot plus appended canonical records.",
+  "provenance_refs": [
+    "github-pr:VW-ai/vibehub-plugin#18",
+    "commit:0c21858ca1a4dd1537e75a335f124548a44d3587",
+    "commit:a8ca1343cc79001342089db03ea67a9362068ceb",
+    "ticket:ticket-amend-workbench-ui-authority",
+    "ticket:ticket-decide-pr18-ui-only-scope",
+    "conversation:2026-08-11-pr18-ui-business-review"
+  ],
+  "relations": [
+    {
+      "rationale": "Implementation begins only after the owner's UI-only business disposition is recorded and independently accepted.",
+      "target_ticket_id": "ticket-decide-pr18-ui-only-scope",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-curate-pr18-ui-only"
+}

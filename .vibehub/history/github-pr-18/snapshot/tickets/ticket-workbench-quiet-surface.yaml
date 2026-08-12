@@ -1,0 +1,90 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "top-to-bottom-graph",
+      "criterion": "The complete causal graph reads top-to-bottom — completed foundations at top, current work central, READY/BLOCKED downstream — with deterministic stable layout, pan, zoom, fit, and minimap preserved and every non-orphan Ticket reachable."
+    },
+    {
+      "acceptance_id": "honest-implementing-layer",
+      "criterion": "The Implementing-now strip and sidebar list render only from a presence input the MVP does not yet have, defaulting to an explicit empty state; Git-native state rendering never claims IMPLEMENTING and no presence fact is derived from Ticket YAML, dirty files, or timestamps."
+    },
+    {
+      "acceptance_id": "quiet-a-direction",
+      "criterion": "Desktop and 375px real-browser screenshots against the demo baseline show the fixed A · Quiet Workbench language — system typography, cool neutrals, restrained elevation, semantic color only, states never expressed by color alone, neutral selection outline, no style selector — with 44px minimum touch targets on narrow layouts."
+    },
+    {
+      "acceptance_id": "inspector-progressive",
+      "criterion": "Selecting a node keeps the graph visible and progressively reveals Execution, Contract, and Log surfaces — outcome, acceptance, constraints, dependencies with rationale, evidence timeline, and Outcome trace — and Copy for Agent emits a ticket-run instruction only for READY Tickets while other states copy an inspect instruction."
+    },
+    {
+      "acceptance_id": "source-dock-truth",
+      "criterion": "The exact worktree path, branch, commit, dirty state, and last projection time stay visible in every Tickets view, and a validation failure is shown explicitly while the last valid view is retained."
+    },
+    {
+      "acceptance_id": "accessible-and-read-only",
+      "criterion": "Node selection, inspector tabs, and graph controls are keyboard reachable with visible focus; reduced motion is honored; existing ui-host tests plus new surface coverage pass and prove Git YAML is byte-for-byte unchanged by UI use."
+    },
+    {
+      "acceptance_id": "owner-approves-surface",
+      "criterion": "After seeing the rendered desktop and narrow surfaces, the repository owner explicitly confirms the surface matches the A · Quiet Workbench baseline; automated checks cannot substitute for this judgment."
+    }
+  ],
+  "constraints": [
+    "The graph is the primary surface; no dashboard card walls, chat, or raw YAML editing.",
+    "Assets remain dependency-free and are served by the existing host; the state/subject/trace API contract changes only by mechanical extension, never semantic inference.",
+    "Presence facts are never invented; IMPLEMENTING can only come from a presence input.",
+    "No style selector ships and no visual preference is written into the project or localStorage.",
+    "The owner approval criterion is a protected human boundary and remains unresolved until the owner reviews the rendered result.",
+    "Do not regress or strand the planned rooms surface on these shared assets."
+  ],
+  "context": "The current assets follow the superseded left-to-right authority. The checked-in demo is the interaction baseline: top-to-bottom causal graph with edge labels and minimap, an Implementing-now switcher strip above the canvas plus a compact sidebar in-progress list, ready frontier and graph summary in the rail, a three-tab inspector (Execution / Contract / Log) with Copy for Agent, and a source dock always answering which exact worktree, branch, commit, and dirty state is shown. Honesty rules: the MVP has no trusted presence source, so every Implementing-now surface must render the explicit empty state (cannot prove any Ticket is being implemented) and never infer IMPLEMENTING from Git-native states — READY/BLOCKED/DONE/DEVIATED/REFINE stay exactly as projected. The demo's style-lab A/B/C selector is a design-exploration artifact and must not ship (§11.1). The demo's owner, progress, agent, and heartbeat fields are presence-overlay data, not canonical Ticket fields — do not fabricate them from YAML. A Copy-deep-link affordance ships only when a handler exists (ticket-workbench-deep-link); until then the inspector offers Copy for Agent only. Coordinate with ticket-rooms-into-workbench, which adds a rooms surface to these same shared assets; its UI/UX proposal is judged against the amended authority and this restructure must not strand it.",
+  "context_refs": [
+    {
+      "purpose": "Interaction and visual baseline for the target surface.",
+      "ref": "docs/demos/vibehub-workbench-webview.html"
+    },
+    {
+      "purpose": "Requirement baseline: §11 interface standard, §11.1 final visual direction, §11.3 IMPLEMENTING interaction rules, §14 acceptance.",
+      "ref": "docs/VIBEHUB_WORKBENCH_WEBVIEW.zh-CN.md"
+    },
+    {
+      "purpose": "Binding UI authority as amended by ticket-amend-workbench-ui-authority.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Current surface structure to restructure.",
+      "ref": "skills/vibehub-ticket-review/assets/index.html"
+    },
+    {
+      "purpose": "Current graph layout, projection consumption, and interaction to restructure.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Current visual tokens to replace with the A · Quiet Workbench language.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    },
+    {
+      "purpose": "Read-only and Git-invariance contract that must keep passing.",
+      "ref": "test/ui-host.test.mjs"
+    },
+    {
+      "purpose": "Concurrent rooms-surface work on the same shared assets that must be coordinated, not stranded.",
+      "ref": ".vibehub/tickets/ticket-rooms-into-workbench.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The shared Ticket-graph frontend presents the A · Quiet Workbench baseline: a top-to-bottom causal graph with an honest Implementing-now layer, compact navigation rail, progressive inspector, and an always-visible exact-source dock.",
+  "provenance_refs": [
+    "commit:58d060cb93ad8e383df12421277b7b9335202b5b",
+    "conversation:2026-08-08-workbench-webview-ticket-plan"
+  ],
+  "relations": [
+    {
+      "rationale": "The binding UI authority must state the top-to-bottom A · Quiet Workbench standard before the surface is rebuilt against it.",
+      "target_ticket_id": "ticket-amend-workbench-ui-authority",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-workbench-quiet-surface"
+}

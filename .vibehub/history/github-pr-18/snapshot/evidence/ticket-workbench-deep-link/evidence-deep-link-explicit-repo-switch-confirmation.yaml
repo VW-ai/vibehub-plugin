@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "explicit-repo-switch-confirmation"
+  ],
+  "evidence_id": "evidence-deep-link-explicit-repo-switch-confirmation",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-10T05:48:31Z",
+  "refs": [
+    "commit:a0b0f442c64daa9c95df1ee2893b08e63c1b3557",
+    "apps/workbench/Sources/WorkbenchDesktop/AppDelegate.swift",
+    "apps/workbench/Sources/WorkbenchRepositorySession/DeepLink.swift",
+    "test:the §9 behaviours are decided before anything opens",
+    "test:both confirmations are real prompts the user has to answer",
+    "observation:different-repository link left recentRepositories unchanged and started no host for it",
+    "limitation:GUI automation denied (osascript not allowed assistive access) so the switch button was not clicked",
+    "docs/LOCAL_GRAPH_DESIGN.md"
+  ],
+  "schema_version": 1,
+  "summary": "Manually observed at commit a0b0f442c64daa9c95df1ee2893b08e63c1b3557 with the Workbench running on this worktree: `open \"vibehub://open?repo=/Users/victor/work/VibeHub/vibehub-release-7:31&ticket=ticket-workbench-deep-link&view=contract\"` did not change projects. Eight seconds later the app was still alive, recentRepositories still held only the original worktree, and the only read-only hosts on the machine were the app's own host for the original worktree and the user's pre-existing foreground session - no host was started for the named repository, which is what a silent switch would have produced. A subsequent same-repository link still focused a Ticket, so the pending question does not wedge the app. Headlessly, `VibeHubWorkbench --probe-deep-link --url <other repo> --current <open repo> --known <both>` reports resolution confirm-switch with requiresConfirmation true and prints the exact question the user is shown: title \"Switch the Workbench to a different repository?\", buttons Switch Repository / Stay Here, and a detail naming BOTH the open worktree and the requested one, asserted by test `the §9 behaviours are decided before anything opens`. The same test shows a repository already in recentRepositories still asks when a session is open on another one, because the question is about the window being read, not about trust. Test `both confirmations are real prompts the user has to answer` asserts against the source that open(repoRoot:deepLink:) is reachable only from the accepted closure of the sheet, that declining calls workbench.focusWindow() and changes nothing, that a question with no window to appear on is treated as a refusal, and that no runModal remains in the delegate. HONEST LIMITATION: GUI automation is denied here (osascript reported \"not allowed assistive access\"), so I could not click Switch Repository or Stay Here; what was observed manually is the refusal to switch while the question is unanswered, not the post-click switch. The accepted branch calls the same open() that the picker and the cold-start flows use, which is exercised end to end elsewhere.",
+  "ticket_id": "ticket-workbench-deep-link"
+}
