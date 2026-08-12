@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "remote-main-and-pr15-aligned"
+  ],
+  "evidence_id": "v070-origin-main-and-pr15-alignment",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-12T02:31:27Z",
+  "refs": [
+    "command:git fetch origin --prune --tags",
+    "command:git merge-base --is-ancestor origin/main HEAD",
+    "commit:0b5585c77ef6b2473ca22504d93287db8cbc3a84",
+    "github-pr:VW-ai/vibehub-plugin#15",
+    "skills/contracts/acceptance-authority.md",
+    "test:human-acceptance-stays-orthogonal-to-readiness-and-requires-human-origin-evidence",
+    "test:draft-behind-human-blocker-surfaces-refine-never-ready",
+    "test:human-attention-projection-distinguishes-upcoming-pending-recorded-complete",
+    "test:copy-for-agent-is-ready-only"
+  ],
+  "schema_version": 1,
+  "summary": "A fresh origin fetch left origin/main at 0b5585c and git merge-base --is-ancestor origin/main HEAD returned success. The branch is a direct extension of main's PR #15 and v0.6.0 closeout: acceptance-authority contracts and schemas are unchanged, the retained host changes only add fsmonitor hardening, and the full suite passes human-origin Evidence enforcement, firm/draft REFINE behavior, human-attention projection, and READY-only stateless handoff assertions after the Victor UI merge.",
+  "ticket_id": "ticket-prepare-v070-ui-release"
+}

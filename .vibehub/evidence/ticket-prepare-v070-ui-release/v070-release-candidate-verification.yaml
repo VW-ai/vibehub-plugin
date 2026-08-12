@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "release-candidate-verified"
+  ],
+  "evidence_id": "v070-release-candidate-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-12T02:31:27Z",
+  "refs": [
+    "command:node scripts/verify-release-version.mjs --tag v0.7.0",
+    "test:npm-run-verify-48-of-48",
+    "test:npm-run-build-52-files-648451-bytes",
+    "test:vibehub-project-validate-success",
+    "test:vibehub-release-ticket-candidate-independent-validation",
+    "test:git-diff-check-success",
+    "test:vibehub-room-drift-all-fresh",
+    "browser:headless-chrome-v070-current-branch-wide-and-narrow"
+  ],
+  "schema_version": 1,
+  "summary": "The v0.7.0 identity guard passed; npm run verify passed 48 of 48 tests and a clean 52-file, 648451-byte artifact check; npm run build produced the same 52-file, 648451-byte plugin; project and raw Ticket graph validation passed; git diff --check passed; all four Rooms are FRESH after product alignment; and headless Chrome rendered the current 36-Ticket release candidate successfully at 1440x900 and 390x844.",
+  "ticket_id": "ticket-prepare-v070-ui-release"
+}

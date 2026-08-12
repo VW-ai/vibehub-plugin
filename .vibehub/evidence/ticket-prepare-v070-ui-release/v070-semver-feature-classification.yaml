@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "v070-semver-classification"
+  ],
+  "evidence_id": "v070-semver-feature-classification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-12T02:31:27Z",
+  "refs": [
+    "tag:v0.6.0",
+    "CHANGELOG.md",
+    ".vibehub/version.yaml",
+    ".codex-plugin/plugin.json",
+    ".claude-plugin/plugin.json",
+    ".claude-plugin/marketplace.json",
+    "docs/INSTALL.md",
+    "docs/RELEASE.md",
+    ".github/workflows/release.yml",
+    "command:git diff --name-status origin/main..HEAD"
+  ],
+  "schema_version": 1,
+  "summary": "The published baseline and latest fetched tag are v0.6.0. The curated branch adds a user-visible shared Web graph and Inspector upgrade while retaining the same Start-this-with-VibeHub entry, format_version 1 canonical schemas, Git-native document model, Codex/Claude installation metadata shape, dependency-free artifact boundary, and GitHub-only release workflow. With no incompatible product boundary, data-format, installation, or release-surface change, Semantic Versioning classifies the next feature release as v0.7.0.",
+  "ticket_id": "ticket-prepare-v070-ui-release"
+}

@@ -1,0 +1,87 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "release-scope-authorized",
+      "authority": "human",
+      "criterion": "Human-origin Evidence records the owner's explicit decision to merge the current curated Victor Web UI before attempting the larger redesign, preserve its functionality, and publish a new release afterward."
+    },
+    {
+      "acceptance_id": "remote-main-and-pr15-aligned",
+      "criterion": "A fresh origin fetch proves current origin/main is an ancestor of the release branch; an implementation and Context audit proves PR #15's acceptance-authority schema/contract, human-attention projection, human-origin Evidence, explicit maturity/REFINE behavior, and READY-only stateless handoff remain intact after the Victor UI conflict resolution."
+    },
+    {
+      "acceptance_id": "v070-semver-classification",
+      "criterion": "A release-scope audit proves the current published identity and latest tag are v0.6.0, the curated change adds user-visible shared Web UI functionality, and it changes no plugin entrypoint, canonical-data/project format, installation path, or GitHub-only release surface incompatibly; therefore the observable next Semantic Version is the backward-compatible minor release v0.7.0."
+    },
+    {
+      "acceptance_id": "v070-identity-and-changelog",
+      "criterion": "package.json, .codex-plugin/plugin.json, .claude-plugin/plugin.json, and both .claude-plugin/marketplace.json version fields state 0.7.0; CHANGELOG.md has a dated 0.7.0 entry accurately covering the shared Quiet Workbench graph/Inspector upgrade, preserved human-authority behavior, Desktop/runtime exclusion, historical PR snapshot, and retained-host fsmonitor safety fix."
+    },
+    {
+      "acceptance_id": "release-candidate-verified",
+      "criterion": "node scripts/verify-release-version.mjs --tag v0.7.0, npm run verify, npm run build, project validation, Ticket validation, git diff --check, and Room drift with every Room FRESH all pass; a real-browser wide/narrow smoke still renders the curated graph."
+    },
+    {
+      "acceptance_id": "replacement-pr-ready",
+      "criterion": "The clean branch contains latest origin/main plus the independently accepted UI-only curation and bounded v0.7.0 preparation records, introduces no rejected Desktop/runtime path, and is ready for a replacement PR to main whose summary states it supersedes PR #18 and includes the successful preparation Outcome and Evidence."
+    }
+  ],
+  "constraints": [
+    "Do not implement the proposed Codex-like visual redesign, layout toggle, overview redesign, or graph algorithm work in this release candidate; plan those as later work.",
+    "Do not restore apps/workbench, vibehub:// Desktop deep links, repository switching, vh-workbench launcher, session-watch, or Desktop packaging.",
+    "Preserve PR #15's per-acceptance human authority and stateless handoff semantics exactly; do not resolve UI conflicts by selecting Victor's older branch wholesale.",
+    "Follow docs/RELEASE.md exactly; npm is not a release or installation surface.",
+    "Do not create or push tag v0.7.0, or create a GitHub Release, from this feature/release branch.",
+    "Keep all five release identity fields synchronized and retain dependency-free Codex and Claude Code plugin artifacts."
+  ],
+  "context": "The owner chose to merge the curated UI-only replacement before attempting the larger Codex-like interaction redesign, and explicitly requires a new release after merge. Current fetched origin/main is 0b5585c77ef6b2473ca22504d93287db8cbc3a84, the merge of the v0.6.0 closeout, and is an ancestor of codex/pr18-ui-curation. It already contains PR #15's human acceptance authority, human-origin Evidence enforcement, explicit Ticket maturity, REFINE behavior, and stateless Agent handoff. The curated Ticket ticket-curate-pr18-ui-only is independently successful and preserves those contracts while retaining Victor's shared Web graph/Inspector work, excluding the Desktop runtime, and fixing retained-host core.fsmonitor execution. Because this is a backward-compatible user-visible feature release after 0.6.0, the next SemVer identity is 0.7.0. Preparation follows docs/RELEASE.md and ends before merge or tag publication; publication is the direct dependent Ticket.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative PR, merged-main tag, workflow, asset, and checksum sequence.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "Public release history receiving the 0.7.0 feature summary.",
+      "ref": "CHANGELOG.md"
+    },
+    {
+      "purpose": "Mechanical cross-manifest and GitHub-only release guard updated for 0.7.0.",
+      "ref": "test/release.test.mjs"
+    },
+    {
+      "purpose": "PR #15 authority and human-origin Evidence contract that the UI integration must preserve.",
+      "ref": "skills/contracts/acceptance-authority.md"
+    },
+    {
+      "purpose": "Successful independent closeout for the exact UI-only feature being released.",
+      "ref": ".vibehub/outcomes/ticket-curate-pr18-ui-only.yaml"
+    },
+    {
+      "purpose": "Completed PR #15 behavior whose semantic and UI projection must remain intact.",
+      "ref": ".vibehub/outcomes/ticket-encode-human-acceptance-authority.yaml"
+    },
+    {
+      "purpose": "Completed explicit maturity and REFINE behavior retained from PR #15.",
+      "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub v0.7.0 is a verified release candidate that integrates the curated PR #18 Web UI on the latest main without regressing PR #15's human-authority and stateless-handoff contracts.",
+  "provenance_refs": [
+    "conversation:2026-08-11-owner-requests-merge-before-ui-redesign-and-release",
+    "github-pr:VW-ai/vibehub-plugin#18",
+    "github-pr:VW-ai/vibehub-plugin#15",
+    "commit:0b5585c77ef6b2473ca22504d93287db8cbc3a84",
+    "commit:ad21554"
+  ],
+  "relations": [
+    {
+      "rationale": "Only the independently accepted UI-only curation may become the release candidate.",
+      "target_ticket_id": "ticket-curate-pr18-ui-only",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-prepare-v070-ui-release"
+}

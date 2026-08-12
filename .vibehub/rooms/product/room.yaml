@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "59fa853a0f8c7f3e371faedf722c4efa33b7fe69",
+        "blob": "6aade3dd770f5a33a861e074cba1406d0ca847a0",
         "path": "CHANGELOG.md"
       },
       {
@@ -38,8 +38,8 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       }
     ],
-    "checked_at": "2026-08-11T22:39:30.615Z",
-    "last_aligned_commit": "0b5585c77ef6b2473ca22504d93287db8cbc3a84"
+    "checked_at": "2026-08-12T02:32:59.372Z",
+    "last_aligned_commit": "ad21554e334cc88b434feb6f7e7145aad002af2a"
   },
   "anchors": [
     "CHANGELOG.md",

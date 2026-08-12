@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "v070-identity-and-changelog"
+  ],
+  "evidence_id": "v070-release-identity-and-changelog",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-12T02:31:27Z",
+  "refs": [
+    "command:node scripts/verify-release-version.mjs --tag v0.7.0",
+    "package.json",
+    ".codex-plugin/plugin.json",
+    ".claude-plugin/plugin.json",
+    ".claude-plugin/marketplace.json",
+    "CHANGELOG.md",
+    "test/release.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "All five release identity fields now state 0.7.0, and the dated 0.7.0 changelog accurately records the shared Quiet Workbench graph/Inspector upgrade, preserved v0.6.0 human-authority and handoff behavior, excluded Desktop/runtime scope, byte-stable non-canonical PR ledger snapshot, and retained-host core.fsmonitor safety fix.",
+  "ticket_id": "ticket-prepare-v070-ui-release"
+}
