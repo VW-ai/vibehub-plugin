@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "canvas-is-default-primary-surface",
+    "overview-has-one-operational-purpose",
+    "empty-presence-does-not-occupy-shell",
+    "focused-local-link-is-complete-and-honest",
+    "victor-interactions-are-preserved",
+    "canvas-shell-is-responsive-and-verified"
+  ],
+  "closed_at": "2026-08-12T22:50:36Z",
+  "evidence_ids": [
+    "canvas-first-overview-implementation-and-browser-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all six criteria after reading the Ticket, prerequisite release Outcome, implementation and Evidence commits 9d70122 and 26364e4, current source, tests, and the canonical Evidence. canvas-is-default-primary-surface: the production shell has no permanent overview rail; the default #canvas independently measured 1440x854 at 1440x960 and 1180x714 at 1180x820, while Overview remained hidden until its compact graph signal was activated. overview-has-one-operational-purpose: the live panel exposed only READY frontier, pending/upcoming human attention, deviations, REFINE count, and exact Git-source dirtiness, with no Inspector duplicate or second navigation hierarchy. empty-presence-does-not-occupy-shell: the old rail, implementing list, and implementing strip are absent from production HTML/JS/CSS and no presence or IMPLEMENTING state is inferred. focused-local-link-is-complete-and-honest: independent keyboard selection and Execution/Contract/Log changes produced explicit ticket/view query values while preserving the 64-character bearer fragment; a second in-app Browser tab restored the exact Ticket and Log lens; copy feedback explicitly limited the URL to the live local host. victor-interactions-are-preserved: Ticket selection retained one selected causal node with complete related-versus-dimmed cone projection; relation selection, zoom, fit, pointer pan, minimap recenter, progressive Inspector tabs, exact Git source, and state-aware read-only Agent instructions remained usable. canvas-shell-is-responsive-and-verified: the tagged v0.7.0 grid and strip geometry reproduces baselines 1208x800 and 972x660, so the independently measured current areas 1229760 and 842520 are 27.3% and 31.3% larger; at 390x844 the default canvas, 370px Overview, and full-width Inspector had zero horizontal overflow, and graph, copy, source, Overview, Inspector, tab, and handoff targets were at least 44px where narrow. Escape restored focus to the Overview signal, Enter opened a Ticket, and the live stylesheet exposed the reduced-motion safeguard. An independent escalated npm run verify passed 51/51 tests and the installed dependency-free artifact check at 53 files and 659222 bytes; canonical Ticket validation passed with no unresolved acceptance gap.",
+  "ticket_id": "ticket-workbench-canvas-first-overview",
+  "unresolved_acceptance_ids": []
+}
