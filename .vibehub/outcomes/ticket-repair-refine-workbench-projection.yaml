@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "refine-is-first-class-in-workbench",
+    "refine-remains-non-executable",
+    "browser-regression-catches-refine-omission",
+    "pr15-authority-contract-stays-intact",
+    "refine-repair-verifies-cleanly"
+  ],
+  "closed_at": "2026-08-12T03:39:07Z",
+  "evidence_ids": [
+    "refine-workbench-production-projection"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Accepted the REFINE Workbench compatibility repair after independent behavior and browser verification of executor commit 161bca7. The production presentation model projects REFINE on graph cards, minimap, graph summary, Inspector, accessibility labels, and causal ordering with textual and dashed non-color semantics; the READY frontier remains an exact READY-only filter, and REFINE Copy for Agent routes to vibehub-ticket-plan with maturity: firm guidance and an explicit prohibition on ticket-run. In a disposable clone, the production-model test passed at baseline and failed with null versus REFINE after removing REFINE from the real whitelist, proving the regression catches the original omission. PR #15 authority, human-origin Evidence enforcement, UPCOMING/PENDING/RECORDED/COMPLETE attention, exact human-boundary payloads, and operational-versus-attention separation all remain covered by passing focused tests. The full suite passed 49 of 49 with a 53-file artifact; project and Ticket validation and diff check passed; independent Chrome wide and narrow renders on the clean current commit showed REFINE correctly in the graph and Inspector without overflow. The repair adds no service, dependency, writable route, Desktop runtime, or lifecycle state.",
+  "ticket_id": "ticket-repair-refine-workbench-projection",
+  "unresolved_acceptance_ids": []
+}
