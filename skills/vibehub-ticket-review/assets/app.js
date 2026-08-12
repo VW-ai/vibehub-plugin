@@ -2,22 +2,17 @@
   "use strict";
 
   const SVG = "http://www.w3.org/2000/svg";
-  const NODE = { width: 232, height: 96 };
-  // One causal layout supports two orientations. Desktop defaults to a
-  // left-to-right reading flow; top-to-bottom remains an explicit choice.
-  const LAYOUT = {
-    marginX: 84,
-    marginY: 72,
-    columnGap: 52,
-    rowGap: 108,
-    sweeps: 5,
-  };
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
   const workbenchModel = globalThis.VibeHubWorkbenchModel;
+  const graphLayoutModel = globalThis.VibeHubGraphLayout;
   if (!workbenchModel) {
     throw new Error("VibeHub Workbench presentation model is unavailable.");
   }
+  if (!graphLayoutModel) {
+    throw new Error("VibeHub Workbench graph layout is unavailable.");
+  }
+  const { NODE } = graphLayoutModel;
   const {
     agentHandoffInstruction,
     causalPriority: operationalPriority,
@@ -107,6 +102,7 @@
   let token = location.hash.slice(1);
   let state = null;
   let positions = new Map();
+  let graphGeometry = { positions, routes: new Map() };
   let selected = null;
   let lastFocusedSubject = null;
   let graphRequest = 0;
@@ -171,11 +167,12 @@
       subjectRequest += 1;
       state = nextState;
       selected = null;
-      positions = layoutGraph(
+      graphGeometry = layoutGraph(
         state.graph.tickets,
         state.graph.relations,
         layoutDirection,
       );
+      positions = graphGeometry.positions;
       renderChrome();
       renderGraph();
       renderMinimap();
@@ -363,8 +360,6 @@
     elements.nodeLayer.replaceChildren();
     if (!state) return;
     const related = selected ? causalCone(selected) : null;
-    const ports = relationPorts(state.graph.relations, layoutDirection);
-
     for (const relation of state.graph.relations) {
       const from = positions.get(relation.prerequisiteTicketId);
       const to = positions.get(relation.dependentTicketId);
@@ -384,13 +379,8 @@
           `${relation.prerequisiteTicketId} unlocks ${relation.dependentTicketId}`,
       });
       group.dataset.relationRef = relation.relationRef;
-      const geometry = edgeGeometry(
-        from,
-        to,
-        relation.relationRef,
-        ports.get(relation.relationRef),
-        layoutDirection,
-      );
+      const geometry = graphGeometry.routes.get(relation.relationRef);
+      if (!geometry) continue;
       group.append(
         svg("path", { class: "edge-visible", d: geometry.path }),
         svg("path", { class: "edge-arrow", d: geometry.arrow }),
@@ -540,11 +530,11 @@
       const from = positions.get(relation.prerequisiteTicketId);
       const to = positions.get(relation.dependentTicketId);
       if (!from || !to) continue;
-      elements.minimap.append(svg("line", {
-        x1: from.x + (layoutDirection === "ltr" ? NODE.width : NODE.width / 2),
-        y1: from.y + (layoutDirection === "ltr" ? NODE.height / 2 : NODE.height),
-        x2: to.x + (layoutDirection === "ltr" ? 0 : NODE.width / 2),
-        y2: to.y + (layoutDirection === "ltr" ? NODE.height / 2 : 0),
+      const route = graphGeometry.routes.get(relation.relationRef);
+      if (!route) continue;
+      elements.minimap.append(svg("polyline", {
+        points: route.points.map((point) => `${point.x},${point.y}`).join(" "),
+        fill: "none",
         stroke: "#9aa59f",
         "stroke-width": 4,
       }));
@@ -2233,214 +2223,7 @@
   }
 
   function layoutGraph(tickets, relations, direction = "ltr") {
-    const ids = tickets.map((ticket) => ticket.ticketId).sort();
-    const outgoing = new Map(ids.map((id) => [id, []]));
-    const incoming = new Map(ids.map((id) => [id, []]));
-    const indegree = new Map(ids.map((id) => [id, 0]));
-    for (const relation of relations) {
-      if (!outgoing.has(relation.prerequisiteTicketId)
-        || !incoming.has(relation.dependentTicketId)) {
-        continue;
-      }
-      outgoing
-        .get(relation.prerequisiteTicketId)
-        .push(relation.dependentTicketId);
-      incoming
-        .get(relation.dependentTicketId)
-        .push(relation.prerequisiteTicketId);
-      indegree.set(
-        relation.dependentTicketId,
-        indegree.get(relation.dependentTicketId) + 1,
-      );
-    }
-    for (const values of [...outgoing.values(), ...incoming.values()]) {
-      values.sort();
-    }
-    const rank = new Map(ids.map((id) => [id, 0]));
-    const queue = ids.filter((id) => indegree.get(id) === 0);
-    const visited = [];
-    while (queue.length) {
-      queue.sort();
-      const id = queue.shift();
-      visited.push(id);
-      for (const dependent of outgoing.get(id)) {
-        rank.set(
-          dependent,
-          Math.max(rank.get(dependent), rank.get(id) + 1),
-        );
-        indegree.set(dependent, indegree.get(dependent) - 1);
-        if (indegree.get(dependent) === 0) queue.push(dependent);
-      }
-    }
-    if (visited.length !== ids.length) {
-      throw new Error("The Ticket graph contains a cycle and cannot be laid out.");
-    }
-    const layers = new Map();
-    for (const id of ids) {
-      const layer = rank.get(id);
-      if (!layers.has(layer)) layers.set(layer, []);
-      layers.get(layer).push(id);
-    }
-    const orderedLayers = [...layers.entries()]
-      .sort((left, right) => left[0] - right[0]);
-    const indexMap = () => new Map(
-      orderedLayers.flatMap(
-        ([, layer]) => layer.map((id, index) => [id, index]),
-      ),
-    );
-    for (let sweep = 0; sweep < LAYOUT.sweeps; sweep += 1) {
-      const forward = sweep % 2 === 0;
-      const sequence = forward
-        ? orderedLayers
-        : [...orderedLayers].reverse();
-      const indices = indexMap();
-      for (const [, layer] of sequence) {
-        layer.sort((left, right) => {
-          const leftNeighbors =
-            forward ? incoming.get(left) : outgoing.get(left);
-          const rightNeighbors =
-            forward ? incoming.get(right) : outgoing.get(right);
-          return barycenter(leftNeighbors, indices)
-            - barycenter(rightNeighbors, indices)
-            || left.localeCompare(right);
-        });
-      }
-    }
-    const leftToRight = direction === "ltr";
-    const siblingSize = leftToRight ? NODE.height : NODE.width;
-    const siblingGap = leftToRight ? LAYOUT.columnGap : LAYOUT.columnGap;
-    const rankSize = leftToRight ? NODE.width : NODE.height;
-    const rankGap = LAYOUT.rowGap;
-    const layerSpan = (count) =>
-      count * siblingSize + (count - 1) * siblingGap;
-    const widest = Math.max(
-      1,
-      ...orderedLayers.map(([, layer]) => layer.length),
-    );
-    const result = new Map();
-    orderedLayers.forEach(([, layer], rankIndex) => {
-      const inset = (layerSpan(widest) - layerSpan(layer.length)) / 2;
-      layer.forEach((id, siblingIndex) => {
-        const rankPosition = (leftToRight ? LAYOUT.marginX : LAYOUT.marginY)
-          + rankIndex * (rankSize + rankGap);
-        const siblingPosition = (leftToRight ? LAYOUT.marginY : LAYOUT.marginX)
-          + inset + siblingIndex * (siblingSize + siblingGap);
-        result.set(id, leftToRight
-          ? { x: rankPosition, y: siblingPosition }
-          : { x: siblingPosition, y: rankPosition });
-      });
-    });
-    return result;
-  }
-
-  function barycenter(neighbors, indices) {
-    if (!neighbors.length) return Number.MAX_SAFE_INTEGER;
-    return neighbors.reduce(
-      (sum, id) => sum + (indices.get(id) ?? 0),
-      0,
-    ) / neighbors.length;
-  }
-
-  function relationPorts(relations, direction = "ltr") {
-    const incoming = new Map();
-    for (const relation of relations) {
-      if (!incoming.has(relation.dependentTicketId)) {
-        incoming.set(relation.dependentTicketId, []);
-      }
-      incoming.get(relation.dependentTicketId).push(relation);
-    }
-    const result = new Map(relations.map((relation) => [
-      relation.relationRef,
-      { target: 0 },
-    ]));
-    const assign = (groups, endpoint, orderBy) => {
-      for (const group of groups.values()) {
-        group.sort((left, right) =>
-          orderBy(left).localeCompare(orderBy(right))
-          || left.relationRef.localeCompare(right.relationRef));
-        group.forEach((relation, index) => {
-          result.get(relation.relationRef)[endpoint] =
-            (index - (group.length - 1) / 2)
-              * (direction === "ltr" ? 11 : 14);
-        });
-      }
-    };
-    assign(incoming, "target", (relation) => relation.prerequisiteTicketId);
-    return result;
-  }
-
-  function edgeGeometry(from, to, relationRef, ports = {}, direction = "ltr") {
-    if (direction === "ltr") {
-      const x1 = from.x + NODE.width + 7;
-      const y1 = from.y + NODE.height / 2;
-      const x2 = to.x - 2;
-      const y2 = to.y + NODE.height / 2 + (ports.target || 0);
-      const arrow =
-        `M ${x2 - 7} ${y2 - 3.5} L ${x2} ${y2} `
-        + `L ${x2 - 7} ${y2 + 3.5} Z`;
-      const handleX = clamp(x2 - 26, x1 + 14, x2 - 12);
-      if (Math.abs(y2 - y1) < 1) {
-        return {
-          path: `M ${x1} ${y1} H ${x2}`,
-          arrow,
-          handle: { x: handleX, y: y1 },
-        };
-      }
-      const lane = stableLane(relationRef);
-      const ratio = 0.5 + lane * 0.035;
-      const mid = clamp(
-        x1 + (x2 - x1) * ratio,
-        x1 + 22,
-        x2 - 20,
-      );
-      return {
-        path: `M ${x1} ${y1} H ${mid} V ${y2} H ${x2}`,
-        arrow,
-        handle: { x: Math.max(mid + 10, handleX), y: y2 },
-      };
-    }
-    // Top-to-bottom flow leaves the prerequisite bottom aperture and enters
-    // the dependent top edge.
-    const x1 = from.x + NODE.width / 2;
-    const y1 = from.y + NODE.height + 7;
-    const x2 = to.x + NODE.width / 2 + (ports.target || 0);
-    const y2 = to.y - 2;
-    const arrow =
-      `M ${x2 - 3.5} ${y2 - 7} L ${x2} ${y2} `
-      + `L ${x2 + 3.5} ${y2 - 7} Z`;
-    const handleY = clamp(
-      y2 - 26,
-      y1 + 14,
-      y2 - 12,
-    );
-    if (Math.abs(x2 - x1) < 1) {
-      return {
-        path: `M ${x1} ${y1} V ${y2}`,
-        arrow,
-        handle: { x: x1, y: handleY },
-      };
-    }
-    const lane = stableLane(relationRef);
-    const ratio = 0.5 + lane * 0.035;
-    const mid = clamp(
-      y1 + (y2 - y1) * ratio,
-      y1 + 22,
-      y2 - 20,
-    );
-    return {
-      path: `M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`,
-      arrow,
-      handle: { x: x2, y: Math.max(mid + 10, handleY) },
-    };
-  }
-
-  function stableLane(value) {
-    let hash = 2166136261;
-    for (const character of value) {
-      hash ^= character.codePointAt(0);
-      hash = Math.imul(hash, 16777619);
-    }
-    return (Math.abs(hash) % 7) - 3;
+    return graphLayoutModel.layoutGraph(tickets, relations, direction);
   }
 
   function graphBounds() {
@@ -2505,11 +2288,12 @@
     const next = normalizeLayoutDirection(direction);
     if (next === layoutDirection) return;
     layoutDirection = next;
-    positions = layoutGraph(
+    graphGeometry = layoutGraph(
       state.graph.tickets,
       state.graph.relations,
       layoutDirection,
     );
+    positions = graphGeometry.positions;
     const nextHref = layoutDirectionHref(location.href, layoutDirection);
     history.replaceState(null, "", nextHref);
     renderDirectionControl();

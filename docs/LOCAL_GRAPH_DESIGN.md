@@ -10,6 +10,9 @@ finishes, what becomes executable next?**
   Left-to-right is the desktop default; top-to-bottom remains an explicit
   first-class choice over the same nodes, relations, and causal ranks. Forks,
   joins, blockers, deviations, and proof stay at their owning graph locus.
+  Dense ranks are ordered with long-edge waypoints, bounded source and target
+  ports, and deterministic orthogonal lanes so routing does not cross through
+  cards or achieve clarity by hiding canonical Tickets and relations.
 - The default shell is canvas-first. Overview is a compact operational index
   that opens on request to answer what is READY, what genuinely needs a person,
   and whether execution or exact source has deviated; it is not a permanent

@@ -456,11 +456,13 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
 
   const html = await (await fetch(`${origin}/`)).text();
   const model = await (await fetch(`${origin}/app-model.js`)).text();
+  const layout = await (await fetch(`${origin}/app-layout.js`)).text();
   const script = await (await fetch(`${origin}/app.js`)).text();
   const styles = await (await fetch(`${origin}/app.css`)).text();
   assert.match(html, /class="app-shell"/u);
   assert.match(html, /id="copyLink"/u);
   assert.match(html, /src="\/app-model\.js"/u);
+  assert.match(html, /src="\/app-layout\.js"/u);
   assert.match(html, /class="workspace inspector-closed"/u);
   assert.match(html, /id="graphSignal"/u);
   assert.match(html, /id="sourceDock"/u);
@@ -491,6 +493,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(html, /id="directionLtr"[^>]+aria-pressed="true"/u);
   assert.match(html, /id="directionTtb"[^>]+aria-pressed="false"/u);
   assert.match(script, /function layoutGraph\(tickets, relations, direction/u);
+  assert.match(layout, /function minimizeCrossings/u);
+  assert.match(layout, /function routeRelations/u);
+  assert.match(layout, /relationRef.*source: 0, target: 0/su);
+  assert.match(layout, /The Ticket graph contains a cycle/u);
   assert.match(script, /function setLayoutDirection/u);
   assert.match(script, /layoutDirection === "ltr"/u);
   // No trusted Active-Run source exists, so the shell makes no presence claim
@@ -507,7 +513,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(model, /vibehub-ticket-plan/u);
   assert.match(model, /vibehub-ticket-review/u);
   assert.match(script, /function causalCone/u);
-  assert.match(script, /function relationPorts/u);
+  assert.match(layout, /function relationPorts/u);
   assert.match(script, /edge-control-halo/u);
   assert.match(script, /minimapWorldPoint/u);
   assert.match(script, /renderGraphInspector\(\{ open: false \}\)/u);

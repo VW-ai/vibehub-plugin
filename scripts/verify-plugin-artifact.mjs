@@ -49,6 +49,7 @@ try {
     "skills/scripts/vh-ui.mjs",
     "skills/vibehub-ticket-review/assets/index.html",
     "skills/vibehub-ticket-review/assets/app.css",
+    "skills/vibehub-ticket-review/assets/app-layout.js",
     "skills/vibehub-ticket-review/assets/app.js",
     "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
     "skills/vibehub-setup/references/architecture-boundary.md",
@@ -181,6 +182,10 @@ try {
     join(artifact, "skills", "vibehub-ticket-review", "assets", "app-model.js"),
     "utf8",
   );
+  const installedLayout = readFileSync(
+    join(artifact, "skills", "vibehub-ticket-review", "assets", "app-layout.js"),
+    "utf8",
+  );
   if (/\/api\/(?:review|decision)/u.test(installedScript)) {
     throw new Error("installed local UI still contains writable review routes");
   }
@@ -188,6 +193,8 @@ try {
     || !/Focused local link copied · valid while this host is running/u.test(installedScript)
     || !/function localFocusHref/u.test(installedModel)
     || !/function layoutDirectionHref/u.test(installedModel)
+    || !/function minimizeCrossings/u.test(installedLayout)
+    || !/function routeRelations/u.test(installedLayout)
     || !/function setLayoutDirection/u.test(installedScript)) {
     throw new Error("installed local UI does not preserve a focused authorized URL");
   }

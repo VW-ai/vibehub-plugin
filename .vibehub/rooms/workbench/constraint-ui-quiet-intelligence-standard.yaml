@@ -1,10 +1,18 @@
 {
   "context_id": "constraint-ui-quiet-intelligence-standard",
-  "detail": "The shared dependency-free Ticket review surface uses A · Quiet Workbench: a compact cool-neutral spatial tool with system typography, restrained elevation, a small shape vocabulary, and semantic color only. The complete causal graph is the primary object and uses one deterministic causal-layout contract: left-to-right is the desktop default and top-to-bottom remains an explicit first-class choice, with completed foundations before READY or BLOCKED downstream work in either orientation. Selection keeps the graph visible and progressively reveals contract, rationale, Context, Evidence, Outcome, and Git trace. Human attention, blockers, deviations, and proof appear at the graph locus that owns them; states are never expressed by color alone and current selection uses a neutral outline. IMPLEMENTING is never inferred from Ticket YAML: without a trusted Active-Run presence source, the surface renders an explicit honest empty state. The UI remains read-only, keyboard reachable, contrast-readable, reduced-motion safe, and uses at least 44px targets on narrow layouts. It has no style selector, network font, third-party resource, hidden persistence, Desktop-only runtime, or parallel state model.",
+  "detail": "The shared dependency-free Ticket review surface uses A · Quiet Workbench: a compact cool-neutral spatial tool with system typography, restrained elevation, a small shape vocabulary, and semantic color only. The complete causal graph is the primary object and uses one deterministic causal-layout contract: left-to-right is the desktop default and top-to-bottom remains an explicit first-class choice, with completed foundations before READY or BLOCKED downstream work in either orientation. Dense graphs use the same layered algorithm in both directions: long relations reserve virtual waypoints during ordering, cards never overlap, ordinary routes avoid card interiors, source and target ports remain distinct, and deterministic crossing reduction may change geometry but never hide a canonical Ticket or relation. Selection keeps the graph visible and progressively reveals contract, rationale, Context, Evidence, Outcome, and Git trace. Human attention, blockers, deviations, and proof appear at the graph locus that owns them; states are never expressed by color alone and current selection uses a neutral outline. IMPLEMENTING is never inferred from Ticket YAML: without a trusted Active-Run presence source, the surface renders an explicit honest empty state. The UI remains read-only, keyboard reachable, contrast-readable, reduced-motion safe, and uses at least 44px targets on narrow layouts. It has no style selector, network font, third-party resource, hidden persistence, Desktop-only runtime, or parallel state model.",
   "evidence": [
     {
       "note": "Current UI-only design authority for the shared local graph surface.",
       "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "note": "Dependency-free deterministic geometry, virtual waypoint ordering, bounded ports, and orthogonal routing implementation.",
+      "ref": "skills/vibehub-ticket-review/assets/app-layout.js"
+    },
+    {
+      "note": "Checked-in comparison against the exact v0.7.0 top-to-bottom and layout-direction left-to-right baselines.",
+      "ref": "scripts/measure-graph-layout.mjs"
     },
     {
       "note": "PR implementation commit containing the approved A · Quiet Workbench assets and top-to-bottom layout.",
