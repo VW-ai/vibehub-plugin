@@ -12,15 +12,6 @@
     rowGap: 108,
     sweeps: 5,
   };
-  // §11.3 honesty rule: IMPLEMENTING may only come from a trusted Active-Run
-  // presence input. The MVP has no such source, so presence is always empty
-  // here and is never derived from Ticket YAML, Git-native states, dirty
-  // files, or timestamps.
-  const ACTIVE_RUN_PRESENCE = Object.freeze([]);
-  const PRESENCE_EMPTY_MESSAGE =
-    "No Active Run can be proven right now.";
-  const PRESENCE_EMPTY_DETAIL =
-    "The READY frontier remains available.";
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
   const workbenchModel = globalThis.VibeHubWorkbenchModel;
@@ -32,10 +23,12 @@
     causalPriority: operationalPriority,
     graphNarrative,
     graphSummary,
+    localFocusHref,
     operationalCounts,
     ticketAttentionState,
     ticketNodePresentation,
     ticketOperationalState,
+    workbenchOverview,
   } = workbenchModel;
   const TICKET_VIEW_IDS = new Map([
     ["execution", "execution"],
@@ -56,14 +49,17 @@
     sourceDockTitle: document.querySelector("#sourceDockTitle"),
     sourceDockContent: document.querySelector("#sourceDockContent"),
     closeSourceDock: document.querySelector("#closeSourceDock"),
-    implementingList: document.querySelector("#implementingList"),
-    implementingStripBody: document.querySelector("#implementingStripBody"),
     frontierList: document.querySelector("#frontierList"),
     frontierCount: document.querySelector("#frontierCount"),
+    attentionList: document.querySelector("#attentionList"),
+    attentionCount: document.querySelector("#attentionCount"),
+    attentionSection: document.querySelector("#attentionSection"),
+    deviationList: document.querySelector("#deviationList"),
+    deviationCount: document.querySelector("#deviationCount"),
+    deviationSection: document.querySelector("#deviationSection"),
     summaryReady: document.querySelector("#summaryReady"),
     summaryRefine: document.querySelector("#summaryRefine"),
-    summaryBlocked: document.querySelector("#summaryBlocked"),
-    summaryDone: document.querySelector("#summaryDone"),
+    summaryHuman: document.querySelector("#summaryHuman"),
     summaryDeviated: document.querySelector("#summaryDeviated"),
     sourcePath: document.querySelector("#sourcePath"),
     sourceBranch: document.querySelector("#sourceBranch"),
@@ -73,6 +69,11 @@
     graphSummary: document.querySelector("#graphSummary"),
     graphSignal: document.querySelector("#graphSignal"),
     graphSignalCount: document.querySelector("#graphSignalCount"),
+    overviewPanel: document.querySelector("#overviewPanel"),
+    closeOverview: document.querySelector("#closeOverview"),
+    overviewSource: document.querySelector("#overviewSource"),
+    overviewSourceDot: document.querySelector("#overviewSourceDot"),
+    overviewSourceLabel: document.querySelector("#overviewSourceLabel"),
     stateDot: document.querySelector("#stateDot"),
     stateLabel: document.querySelector("#stateLabel"),
     sourceStatus: document.querySelector("#sourceStatus"),
@@ -198,17 +199,16 @@
     const { project, graph } = state;
     const { source } = graph;
     const counts = operationalCounts(graph.tickets);
+    const overview = workbenchOverview(graph.tickets, source);
     const deviatedCount = counts.DEVIATED;
     elements.projectName.textContent = project.name;
     elements.repoBranch.textContent = project.branch;
     renderSourceDock();
-    renderImplementingNow();
-    renderFrontier();
-    renderSummaryCounts(counts);
+    renderOverview(overview);
     elements.graphSummary.textContent = graphSummary(counts);
     elements.graphSignalCount.textContent =
-      `${graph.tickets.length} Ticket${graph.tickets.length === 1 ? "" : "s"}`
-      + ` · ${graph.relations.length} direct unlock${graph.relations.length === 1 ? "" : "s"}`;
+      `${overview.ready.length} ready · ${overview.humanPending.length} need you · `
+      + (overview.sourceDirty ? "local changes" : "exact source");
     document.title = `${project.name} · VibeHub Ticket graph`;
     elements.stateDot.className =
       `state-dot${
@@ -226,77 +226,104 @@
     elements.minimap.hidden = graph.tickets.length === 0;
   }
 
-  function renderImplementingNow() {
-    // Renders exclusively from ACTIVE_RUN_PRESENCE — the only permitted input
-    // for this surface. The MVP has no trusted presence source, so both the
-    // strip and the rail list always show the explicit honest empty state.
-    // Git-native READY/BLOCKED/DONE/DEVIATED/REFINE, Ticket YAML, dirty
-    // files, and timestamps are never consulted and never promoted to
-    // IMPLEMENTING here.
-    if (ACTIVE_RUN_PRESENCE.length > 0) {
-      throw new Error(
-        "Active-Run presence rendering requires a trusted presence contract "
-        + "that does not exist yet.",
-      );
-    }
-    const strip = document.createElement("p");
-    strip.className = "presence-empty";
-    const primary = document.createElement("strong");
-    primary.textContent = PRESENCE_EMPTY_MESSAGE;
-    const detail = document.createElement("span");
-    detail.textContent = PRESENCE_EMPTY_DETAIL;
-    strip.append(primary, detail);
-    elements.implementingStripBody.replaceChildren(strip);
-    const railEmpty = document.createElement("p");
-    railEmpty.className = "presence-empty compact";
-    railEmpty.textContent =
-      `${PRESENCE_EMPTY_MESSAGE} ${PRESENCE_EMPTY_DETAIL}`;
-    elements.implementingList.replaceChildren(railEmpty);
+  function renderOverview(overview) {
+    elements.summaryReady.textContent = String(overview.ready.length);
+    elements.summaryHuman.textContent = String(overview.humanPending.length);
+    elements.summaryDeviated.textContent = String(overview.deviated.length);
+    elements.summaryRefine.textContent = String(overview.refineCount);
+    elements.frontierCount.textContent = String(overview.ready.length);
+    elements.attentionCount.textContent = String(
+      overview.humanPending.length + overview.humanUpcoming.length,
+    );
+    elements.deviationCount.textContent = String(overview.deviated.length);
+    renderOverviewTickets(
+      elements.frontierList,
+      overview.ready,
+      "READY",
+      "No Ticket is executable right now.",
+    );
+    renderAttentionTickets(overview);
+    renderOverviewTickets(
+      elements.deviationList,
+      overview.deviated,
+      "DEVIATED",
+      "No execution deviations.",
+    );
+    elements.overviewSourceDot.className =
+      `source-state-dot${overview.sourceDirty ? " dirty" : ""}`;
+    elements.overviewSourceLabel.textContent = overview.sourceDirty
+      ? `${overview.sourceDirtyCount}${overview.sourceDirtyTruncated ? "+" : ""} local VibeHub change${overview.sourceDirtyCount === 1 && !overview.sourceDirtyTruncated ? "" : "s"}`
+      : "Matches the checked-in VibeHub files";
   }
 
-  function renderFrontier() {
-    const ready = state.graph.tickets.filter(
-      (ticket) => ticketOperationalState(ticket)?.label === "READY",
-    );
-    elements.frontierCount.textContent = String(ready.length);
-    if (!ready.length) {
+  function renderOverviewTickets(container, tickets, label, emptyMessage) {
+    if (!tickets.length) {
       const empty = document.createElement("p");
-      empty.className = "rail-empty";
-      empty.textContent = "No Ticket is executable right now.";
-      elements.frontierList.replaceChildren(empty);
+      empty.className = "overview-empty";
+      empty.textContent = emptyMessage;
+      container.replaceChildren(empty);
       return;
     }
-    const items = ready.map((ticket) => {
+    const items = tickets.map((ticket) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "frontier-item";
+      button.className = classes("overview-item", `state-${label.toLowerCase()}`);
       button.title = ticket.ticketId;
       const marker = document.createElement("span");
-      marker.className = "frontier-marker";
+      marker.className = "overview-item-marker";
       marker.setAttribute("aria-hidden", "true");
       const copy = document.createElement("span");
-      copy.className = "frontier-copy";
+      copy.className = "overview-item-copy";
       const name = document.createElement("strong");
       name.textContent = shortTicketId(ticket.ticketId);
       const stateName = document.createElement("span");
-      stateName.textContent = "READY";
+      stateName.textContent = label;
       copy.append(name, stateName);
       button.append(marker, copy);
-      button.addEventListener(
-        "click",
-        () => void selectTicket(ticket.ticketId, true),
-      );
+      button.addEventListener("click", () => {
+        closeOverview(false);
+        void selectTicket(ticket.ticketId, true);
+      });
       return button;
     });
-    elements.frontierList.replaceChildren(...items);
+    container.replaceChildren(...items);
   }
 
-  function renderSummaryCounts(counts) {
-    elements.summaryReady.textContent = String(counts.READY);
-    elements.summaryRefine.textContent = String(counts.REFINE);
-    elements.summaryBlocked.textContent = String(counts.BLOCKED);
-    elements.summaryDone.textContent = String(counts.DONE);
-    elements.summaryDeviated.textContent = String(counts.DEVIATED);
+  function renderAttentionTickets(overview) {
+    const tickets = [
+      ...overview.humanPending.map((ticket) => ({ ticket, label: "PENDING" })),
+      ...overview.humanUpcoming.map((ticket) => ({ ticket, label: "UPCOMING" })),
+    ];
+    if (!tickets.length) {
+      const empty = document.createElement("p");
+      empty.className = "overview-empty";
+      empty.textContent = "No human boundary needs attention.";
+      elements.attentionList.replaceChildren(empty);
+      return;
+    }
+    const items = tickets.map(({ ticket, label }) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = classes("overview-item", `attention-${label.toLowerCase()}`);
+      button.title = ticket.ticketId;
+      const marker = document.createElement("span");
+      marker.className = "overview-item-marker";
+      marker.setAttribute("aria-hidden", "true");
+      const copy = document.createElement("span");
+      copy.className = "overview-item-copy";
+      const name = document.createElement("strong");
+      name.textContent = shortTicketId(ticket.ticketId);
+      const stateName = document.createElement("span");
+      stateName.textContent = label === "PENDING" ? "NEEDS YOU" : "BOUNDARY AHEAD";
+      copy.append(name, stateName);
+      button.append(marker, copy);
+      button.addEventListener("click", () => {
+        closeOverview(false);
+        void selectTicket(ticket.ticketId, true);
+      });
+      return button;
+    });
+    elements.attentionList.replaceChildren(...items);
   }
 
   function renderGraph() {
@@ -517,6 +544,7 @@
     const request = ++subjectRequest;
     const snapshotId = state.graph.snapshotId;
     selected = null;
+    syncFocusUrl();
     if (open) openInspector();
     else {
       elements.workspace.classList.add("inspector-closed");
@@ -620,6 +648,7 @@
     const snapshotId = state.graph.snapshotId;
     selected = { kind: "ticket", id: ticketId };
     lastFocusedSubject = selected;
+    syncFocusUrl(ticketId, initialViewId);
     openInspector();
     elements.inspectorEyebrow.textContent =
       `Ticket · ${ticket.ticketId}`;
@@ -723,6 +752,7 @@
     const snapshotId = state.graph.snapshotId;
     selected = { kind: "relation", id: relationRef };
     lastFocusedSubject = selected;
+    syncFocusUrl();
     openInspector();
     elements.inspectorEyebrow.textContent = "Direct unlock";
     elements.inspectorTitle.textContent =
@@ -891,12 +921,38 @@
     const restore = selected ?? lastFocusedSubject;
     subjectRequest += 1;
     selected = null;
+    syncFocusUrl();
     elements.inspector.classList.remove("open");
     elements.workspace.classList.add("inspector-closed");
     elements.inspector.setAttribute("aria-hidden", "true");
     elements.inspector.inert = true;
     renderGraph();
     requestAnimationFrame(() => focusGraphSubject(restore));
+  }
+
+  function syncFocusUrl(ticketId = null, viewId = null) {
+    const nextHref = localFocusHref(location.href, ticketId, viewId);
+    if (nextHref === location.href) return;
+    history.replaceState(null, "", nextHref);
+  }
+
+  function openOverview() {
+    elements.overviewPanel.hidden = false;
+    elements.overviewPanel.inert = false;
+    elements.graphSignal.setAttribute("aria-expanded", "true");
+    elements.closeOverview.focus();
+  }
+
+  function closeOverview(restoreFocus = true) {
+    elements.overviewPanel.hidden = true;
+    elements.overviewPanel.inert = true;
+    elements.graphSignal.setAttribute("aria-expanded", "false");
+    if (restoreFocus) elements.graphSignal.focus();
+  }
+
+  function toggleOverview() {
+    if (elements.overviewPanel.hidden) openOverview();
+    else closeOverview();
   }
 
   function focusGraphSubject(subject) {
@@ -1045,6 +1101,7 @@
         control.tabIndex = active ? 0 : -1;
         panels[candidate].hidden = !active;
       });
+      syncFocusUrl(ticketId, tabs[index].id);
       if (focus) controls[index].focus();
     };
 
@@ -2815,11 +2872,23 @@
     () => void refresh("Graph refreshed from Git"),
   );
   elements.copyLink.addEventListener("click", () => {
-    void copyText(location.href, "Authorized link copied");
+    void copyText(
+      location.href,
+      "Focused local link copied · valid while this host is running",
+    );
   });
-  elements.graphSignal.addEventListener("click", () => {
-    renderGraphInspector();
-    renderGraph();
+  elements.graphSignal.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleOverview();
+  });
+  elements.overviewPanel.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+  elements.closeOverview.addEventListener("click", () => closeOverview());
+  elements.overviewSource.addEventListener("click", () => {
+    closeOverview(false);
+    elements.sourceDockPanel.hidden = false;
+    elements.sourceRef.setAttribute("aria-expanded", "true");
   });
   elements.sourceRef.addEventListener("click", () => {
     if (!state) return;
@@ -2847,6 +2916,7 @@
       suppressCanvasClick = false;
       return;
     }
+    if (!elements.overviewPanel.hidden) closeOverview(false);
     if (selected) {
       closeInspector();
     }
@@ -2894,6 +2964,10 @@
     );
   }, { passive: false });
   window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !elements.overviewPanel.hidden) {
+      closeOverview();
+      return;
+    }
     if (event.key === "Escape" && elements.inspector.classList.contains("open")) {
       closeInspector();
     }

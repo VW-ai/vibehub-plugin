@@ -59,6 +59,50 @@
     return counts;
   }
 
+  function workbenchOverview(tickets, source = {}) {
+    const ready = [];
+    const deviated = [];
+    const humanPending = [];
+    const humanUpcoming = [];
+    let refineCount = 0;
+    for (const ticket of tickets) {
+      const operational = ticketOperationalState(ticket);
+      const attention = ticketAttentionState(ticket);
+      if (operational?.label === "READY") ready.push(ticket);
+      if (operational?.label === "REFINE") refineCount += 1;
+      if (operational?.label === "DEVIATED") deviated.push(ticket);
+      if (attention?.label === "PENDING") humanPending.push(ticket);
+      if (attention?.label === "UPCOMING") humanUpcoming.push(ticket);
+    }
+    return {
+      ready,
+      deviated,
+      humanPending,
+      humanUpcoming,
+      refineCount,
+      sourceDirty: Boolean(source.semanticDirty),
+      sourceDirtyCount: Array.isArray(source.dirtyPaths)
+        ? source.dirtyPaths.length
+        : 0,
+      sourceDirtyTruncated: Boolean(source.dirtyPathsTruncated),
+    };
+  }
+
+  function localFocusHref(currentHref, ticketId = null, viewId = null) {
+    const url = new URL(currentHref);
+    if (!ticketId) {
+      url.searchParams.delete("ticket");
+      url.searchParams.delete("view");
+      return url.href;
+    }
+    url.searchParams.set("ticket", ticketId);
+    url.searchParams.set(
+      "view",
+      viewId === "evidence" ? "log" : viewId || "execution",
+    );
+    return url.href;
+  }
+
   function graphSummary(counts) {
     const parts = [];
     if (counts.READY) parts.push(`${counts.READY} ready`);
@@ -158,8 +202,10 @@
     graphNarrative,
     graphSummary,
     operationalCounts,
+    localFocusHref,
     ticketAttentionState,
     ticketNodePresentation,
     ticketOperationalState,
+    workbenchOverview,
   });
 })();

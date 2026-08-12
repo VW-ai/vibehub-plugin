@@ -9,6 +9,10 @@ finishes, what becomes executable next?**
 - One complete, deterministic, top-to-bottom direct-unlock graph is the primary
   object. Forks, joins, blockers, deviations, and proof stay at their owning
   graph locus.
+- The default shell is canvas-first. Overview is a compact operational index
+  that opens on request to answer what is READY, what genuinely needs a person,
+  and whether execution or exact source has deviated; it is not a permanent
+  navigation rail or a second Inspector.
 - The healthy surface is quiet. Matte cool neutrals carry the base; semantic
   color is reserved for truthful execution state. Hover and selection remain
   neutral interaction states.
@@ -23,6 +27,13 @@ finishes, what becomes executable next?**
   part of the production contract.
 - Every affordance is honest. The UI only presents facts and actions available
   from the current canonical documents and read-only loopback host.
+- Active-Run presence is never inferred. Until a trusted presence source
+  exists, the default shell spends no space on an Implementing section or an
+  empty presence explanation.
+- A focused link is deliberately local and short-lived. Ticket selection and
+  the Execution, Contract, or Log lens travel in the URL while the bearer
+  fragment remains intact, so the same live host can reopen that exact focus;
+  it is not a remote share, durable permalink, or repository switch.
 
 This translates the approved `quiet intelligence`, v8 spatial-workbench, and
 causal Ticket review decisions preserved in Git history at `9dee0f0`.

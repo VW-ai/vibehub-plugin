@@ -33,68 +33,22 @@
           <span class="state-dot" id="stateDot"></span>
           <span id="stateLabel">Reading</span>
         </button>
-        <button class="copy-link" id="copyLink" type="button">
+        <button
+          class="copy-link"
+          id="copyLink"
+          type="button"
+          title="Copy focus for this live local host"
+        >
           <svg viewBox="0 0 16 16" aria-hidden="true">
             <path d="M6.5 9.5 9.5 6.5M5.2 11.9l-1.1 1.1a2.2 2.2 0 0 1-3.1-3.1l2.4-2.4a2.2 2.2 0 0 1 3.1 0M10.8 4.1l1.1-1.1A2.2 2.2 0 1 1 15 6.1l-2.4 2.4a2.2 2.2 0 0 1-3.1 0"/>
           </svg>
-          Copy link
+          Copy focused link
         </button>
       </div>
     </header>
 
     <main class="workspace inspector-closed">
-      <aside class="rail" aria-label="Workbench navigation">
-        <div class="section-heading"><span>Implementing now</span></div>
-        <div class="implementing-list" id="implementingList"></div>
-
-        <div class="rail-divider"></div>
-
-        <div class="section-heading">
-          <span>Ready frontier</span>
-          <span class="section-count" id="frontierCount">0</span>
-        </div>
-        <div class="frontier-list" id="frontierList"></div>
-
-        <div class="rail-divider"></div>
-
-        <div class="section-heading"><span>Graph summary</span></div>
-        <div class="summary-grid" id="summaryGrid">
-          <div class="summary-cell">
-            <span class="summary-value" id="summaryReady">0</span>
-            <span class="summary-name">Ready</span>
-          </div>
-          <div class="summary-cell">
-            <span class="summary-value" id="summaryRefine">0</span>
-            <span class="summary-name">Refine</span>
-          </div>
-          <div class="summary-cell">
-            <span class="summary-value" id="summaryBlocked">0</span>
-            <span class="summary-name">Blocked</span>
-          </div>
-          <div class="summary-cell">
-            <span class="summary-value" id="summaryDone">0</span>
-            <span class="summary-name">Done</span>
-          </div>
-          <div class="summary-cell">
-            <span class="summary-value" id="summaryDeviated">0</span>
-            <span class="summary-name">Deviated</span>
-          </div>
-        </div>
-      </aside>
-
       <section class="canvas-pane" aria-label="Ticket causal graph">
-        <div
-          class="implementing-strip"
-          id="implementingStrip"
-          aria-label="Tickets currently being implemented"
-        >
-          <div class="implementing-heading">
-            <span class="implementing-title">Implementing now</span>
-            <span class="implementing-caption">Active-Run presence only · never inferred from Git</span>
-          </div>
-          <div class="implementing-strip-body" id="implementingStripBody"></div>
-        </div>
-
         <section class="canvas" id="canvas" aria-label="Ticket dependency graph">
           <div class="canvas-heading">
             <div>
@@ -123,14 +77,87 @@
             aria-label="Recenter graph from minimap"
             preserveAspectRatio="xMidYMid meet"
           ></svg>
-          <button class="graph-overview" id="graphSignal" type="button">
+          <button
+            class="graph-overview"
+            id="graphSignal"
+            type="button"
+            aria-controls="overviewPanel"
+            aria-expanded="false"
+          >
             <span class="graph-glyph" aria-hidden="true"></span>
             <span>
-              <strong>Ticket graph</strong>
+              <strong>Overview</strong>
               <small id="graphSignalCount">Reading Git source…</small>
             </span>
             <span class="graph-source">Git</span>
           </button>
+          <aside
+            class="overview-panel"
+            id="overviewPanel"
+            aria-labelledby="overviewTitle"
+            hidden
+            inert
+          >
+            <div class="overview-head">
+              <div>
+                <span class="eyebrow">Operational index</span>
+                <strong id="overviewTitle">Overview</strong>
+              </div>
+              <button class="icon-button" id="closeOverview" type="button" aria-label="Close overview">×</button>
+            </div>
+
+            <div class="summary-grid" id="summaryGrid">
+              <div class="summary-cell state-ready">
+                <span class="summary-value" id="summaryReady">0</span>
+                <span class="summary-name">Ready now</span>
+              </div>
+              <div class="summary-cell attention-pending">
+                <span class="summary-value" id="summaryHuman">0</span>
+                <span class="summary-name">Need you</span>
+              </div>
+              <div class="summary-cell state-deviated">
+                <span class="summary-value" id="summaryDeviated">0</span>
+                <span class="summary-name">Deviated</span>
+              </div>
+              <div class="summary-cell state-refine">
+                <span class="summary-value" id="summaryRefine">0</span>
+                <span class="summary-name">Refine</span>
+              </div>
+            </div>
+
+            <section class="overview-section">
+              <div class="section-heading">
+                <span>Ready frontier</span>
+                <span class="section-count" id="frontierCount">0</span>
+              </div>
+              <div class="frontier-list" id="frontierList"></div>
+            </section>
+
+            <section class="overview-section" id="attentionSection">
+              <div class="section-heading">
+                <span>Human attention</span>
+                <span class="section-count" id="attentionCount">0</span>
+              </div>
+              <div class="attention-list" id="attentionList"></div>
+            </section>
+
+            <section class="overview-section" id="deviationSection">
+              <div class="section-heading">
+                <span>Execution deviations</span>
+                <span class="section-count" id="deviationCount">0</span>
+              </div>
+              <div class="deviation-list" id="deviationList"></div>
+            </section>
+
+            <button class="overview-source" id="overviewSource" type="button">
+              <span class="source-state-dot" id="overviewSourceDot" aria-hidden="true"></span>
+              <span>
+                <strong>Exact Git source</strong>
+                <small id="overviewSourceLabel">Reading current worktree…</small>
+              </span>
+              <span aria-hidden="true">›</span>
+            </button>
+          </aside>
           <div class="empty-state" id="emptyState" hidden>
             <span class="empty-mark"></span>
             <strong>No Tickets in this worktree</strong>

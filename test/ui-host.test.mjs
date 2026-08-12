@@ -466,12 +466,19 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(html, /id="sourceDock"/u);
   assert.doesNotMatch(html, /class="(?:surface|signal|sheet)/u);
   assert.doesNotMatch(html, /state-legend|brand-mark/u);
-  // A · Quiet Workbench surface: rail, implementing strip, and source dock.
-  assert.match(html, /id="implementingStrip"/u);
-  assert.match(html, /id="implementingList"/u);
+  // Canvas-first shell: operational overview is available on demand while
+  // empty presence and a permanent navigation rail consume no layout space.
+  assert.doesNotMatch(html, /class="rail"|id="implementingStrip"|id="implementingList"/u);
+  assert.match(html, /id="overviewPanel"/u);
+  assert.match(html, /aria-controls="overviewPanel"/u);
+  assert.match(html, /id="closeOverview"/u);
   assert.match(html, /id="frontierList"/u);
+  assert.match(html, /id="attentionList"/u);
+  assert.match(html, /id="deviationList"/u);
   assert.match(html, /id="summaryGrid"/u);
   assert.match(html, /id="summaryRefine"/u);
+  assert.match(html, /id="summaryHuman"/u);
+  assert.match(html, /id="overviewSource"/u);
   assert.match(html, /id="sourcePath"/u);
   assert.match(html, /id="sourceBranch"/u);
   assert.match(html, /id="sourceCommit"/u);
@@ -481,11 +488,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(html, /style-lab|style-option|style-swatch|data-theme/u);
   // Top-to-bottom causal layout replaces the superseded left-to-right flow.
   assert.match(script, /function layoutGraphTopToBottom/u);
-  // Honest Implementing-now layer: presence is the only permitted input, the
-  // MVP has none, and Git-native states are never promoted to IMPLEMENTING.
-  assert.match(script, /ACTIVE_RUN_PRESENCE = Object\.freeze\(\[\]\)/u);
-  assert.match(script, /No Active Run can be proven right now\./u);
-  assert.match(script, /READY frontier remains available\./u);
+  // No trusted Active-Run source exists, so the shell makes no presence claim
+  // and never promotes Git-native state into an implementing subsystem.
+  assert.doesNotMatch(script, /ACTIVE_RUN_PRESENCE|renderImplementingNow/u);
   assert.doesNotMatch(script, /"IMPLEMENTING"/u);
   // No visual preference is ever persisted by the product surface.
   assert.doesNotMatch(script, /localStorage|sessionStorage/u);
@@ -504,6 +509,8 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function disclosure/u);
   assert.match(script, /function tabbedTicketView/u);
   assert.match(script, /const requestedTicketId = focusQuery\.get\("ticket"\)/u);
+  assert.match(model, /function localFocusHref/u);
+  assert.match(model, /function workbenchOverview/u);
   assert.match(script, /\["log", "evidence"\]/u);
   assert.match(script, /initialFocusPending/u);
   assert.match(script, /initialTabId = "execution"/u);
@@ -566,9 +573,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   );
   assert.match(script, /function revealTicket/u);
   assert.match(script, /incoming\.length - completed/u);
-  assert.match(script, /copyText\(location\.href, "Authorized link copied"\)/u);
+  assert.match(script, /Focused local link copied · valid while this host is running/u);
   assert.doesNotMatch(script, /inspectorOutcome\.textContent = operational\?\.detail/u);
-  assert.doesNotMatch(script, /history\.replaceState/u);
+  assert.match(script, /history\.replaceState\(null, "", nextHref\)/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
   assert.match(styles, /\.ticket-node\.state-deviated/u);
   assert.match(styles, /\.ticket-node\.state-refine/u);
@@ -587,8 +594,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     styles,
     /\.ticket-node\.selected \.ticket-boundary \{[\s\S]*?stroke: var\(--selection\)/u,
   );
-  assert.match(styles, /\.implementing-strip/u);
-  assert.match(styles, /\.presence-empty/u);
+  assert.doesNotMatch(styles, /\.implementing-strip|\.presence-empty|\.rail\s*\{/u);
+  assert.match(styles, /\.overview-panel/u);
+  assert.match(styles, /\.overview-source/u);
+  assert.match(styles, /\.overview-item/u);
   assert.match(styles, /\.summary-grid/u);
   assert.match(styles, /min-height: 44px/u);
   assert.doesNotMatch(styles, /style-lab|style-option|style-swatch/u);

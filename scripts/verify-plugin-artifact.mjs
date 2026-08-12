@@ -177,12 +177,17 @@ try {
     join(artifact, "skills", "vibehub-ticket-review", "assets", "app.js"),
     "utf8",
   );
+  const installedModel = readFileSync(
+    join(artifact, "skills", "vibehub-ticket-review", "assets", "app-model.js"),
+    "utf8",
+  );
   if (/\/api\/(?:review|decision)/u.test(installedScript)) {
     throw new Error("installed local UI still contains writable review routes");
   }
-  if (/history\.replaceState/u.test(installedScript)
-    || !/copyText\(location\.href, "Authorized link copied"\)/u.test(installedScript)) {
-    throw new Error("installed local UI does not preserve a portable authorized URL");
+  if (!/history\.replaceState\(null, "", nextHref\)/u.test(installedScript)
+    || !/Focused local link copied · valid while this host is running/u.test(installedScript)
+    || !/function localFocusHref/u.test(installedModel)) {
+    throw new Error("installed local UI does not preserve a focused authorized URL");
   }
   const uiModule = await import(pathToFileURL(
     join(artifact, "skills", "scripts", "vh-ui.mjs"),
