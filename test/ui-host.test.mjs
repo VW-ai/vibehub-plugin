@@ -486,8 +486,13 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   // The style-lab A/B/C selector is a design-exploration artifact and must
   // never ship on the product surface.
   assert.doesNotMatch(html, /style-lab|style-option|style-swatch|data-theme/u);
-  // Top-to-bottom causal layout replaces the superseded left-to-right flow.
-  assert.match(script, /function layoutGraphTopToBottom/u);
+  // One causal layout supports an explicit left-to-right default and
+  // top-to-bottom choice without forking the graph model.
+  assert.match(html, /id="directionLtr"[^>]+aria-pressed="true"/u);
+  assert.match(html, /id="directionTtb"[^>]+aria-pressed="false"/u);
+  assert.match(script, /function layoutGraph\(tickets, relations, direction/u);
+  assert.match(script, /function setLayoutDirection/u);
+  assert.match(script, /layoutDirection === "ltr"/u);
   // No trusted Active-Run source exists, so the shell makes no presence claim
   // and never promotes Git-native state into an implementing subsystem.
   assert.doesNotMatch(script, /ACTIVE_RUN_PRESENCE|renderImplementingNow/u);
@@ -510,6 +515,8 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function tabbedTicketView/u);
   assert.match(script, /const requestedTicketId = focusQuery\.get\("ticket"\)/u);
   assert.match(model, /function localFocusHref/u);
+  assert.match(model, /function normalizeLayoutDirection/u);
+  assert.match(model, /function layoutDirectionHref/u);
   assert.match(model, /function workbenchOverview/u);
   assert.match(script, /\["log", "evidence"\]/u);
   assert.match(script, /initialFocusPending/u);

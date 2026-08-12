@@ -3,8 +3,8 @@
 
   const SVG = "http://www.w3.org/2000/svg";
   const NODE = { width: 232, height: 96 };
-  // Top-to-bottom causal flow: layers stack vertically (proven foundations at
-  // the top, READY/BLOCKED downstream below), siblings spread horizontally.
+  // One causal layout supports two orientations. Desktop defaults to a
+  // left-to-right reading flow; top-to-bottom remains an explicit choice.
   const LAYOUT = {
     marginX: 84,
     marginY: 72,
@@ -23,7 +23,10 @@
     causalPriority: operationalPriority,
     graphNarrative,
     graphSummary,
+    layoutDirectionHref,
+    layoutDirectionSpec,
     localFocusHref,
+    normalizeLayoutDirection,
     operationalCounts,
     ticketAttentionState,
     ticketNodePresentation,
@@ -39,6 +42,9 @@
   const requestedTicketId = focusQuery.get("ticket");
   const requestedViewId = TICKET_VIEW_IDS.get(focusQuery.get("view"))
     ?? "execution";
+  const requestedDirection = normalizeLayoutDirection(
+    focusQuery.get("direction"),
+  );
 
   const elements = {
     projectName: document.querySelector("#projectName"),
@@ -81,6 +87,8 @@
     workspace: document.querySelector(".workspace"),
     canvas: document.querySelector("#canvas"),
     graph: document.querySelector("#graph"),
+    directionLtr: document.querySelector("#directionLtr"),
+    directionTtb: document.querySelector("#directionTtb"),
     world: document.querySelector("#world"),
     edgeLayer: document.querySelector("#edgeLayer"),
     nodeLayer: document.querySelector("#nodeLayer"),
@@ -106,6 +114,7 @@
   let panX = 0;
   let panY = 0;
   let scale = 1;
+  let layoutDirection = requestedDirection;
   let dragging = null;
   let suppressCanvasClick = false;
   let toastTimer = null;
@@ -162,9 +171,10 @@
       subjectRequest += 1;
       state = nextState;
       selected = null;
-      positions = layoutGraphTopToBottom(
+      positions = layoutGraph(
         state.graph.tickets,
         state.graph.relations,
+        layoutDirection,
       );
       renderChrome();
       renderGraph();
@@ -206,6 +216,7 @@
     renderSourceDock();
     renderOverview(overview);
     elements.graphSummary.textContent = graphSummary(counts);
+    renderDirectionControl();
     elements.graphSignalCount.textContent =
       `${overview.ready.length} ready · ${overview.humanPending.length} need you · `
       + (overview.sourceDirty ? "local changes" : "exact source");
@@ -224,6 +235,27 @@
         : "Exact Git source";
     elements.emptyState.hidden = graph.tickets.length !== 0;
     elements.minimap.hidden = graph.tickets.length === 0;
+  }
+
+  function renderDirectionControl() {
+    const leftToRight = layoutDirection === "ltr";
+    elements.directionLtr.setAttribute("aria-pressed", String(leftToRight));
+    elements.directionTtb.setAttribute("aria-pressed", String(!leftToRight));
+    elements.graph.setAttribute(
+      "aria-label",
+      leftToRight
+        ? "Left-to-right causal graph"
+        : "Top-to-bottom causal graph",
+    );
+    elements.canvas.dataset.direction = layoutDirection;
+    const heading = elements.canvas.querySelector(".canvas-heading strong");
+    if (heading) {
+      heading.textContent = leftToRight
+        ? "Proven left, executable right"
+        : "Proven upstream, executable downstream";
+    }
+    const nextHref = layoutDirectionHref(location.href, layoutDirection);
+    if (nextHref !== location.href) history.replaceState(null, "", nextHref);
   }
 
   function renderOverview(overview) {
@@ -331,7 +363,7 @@
     elements.nodeLayer.replaceChildren();
     if (!state) return;
     const related = selected ? causalCone(selected) : null;
-    const ports = relationPorts(state.graph.relations);
+    const ports = relationPorts(state.graph.relations, layoutDirection);
 
     for (const relation of state.graph.relations) {
       const from = positions.get(relation.prerequisiteTicketId);
@@ -357,6 +389,7 @@
         to,
         relation.relationRef,
         ports.get(relation.relationRef),
+        layoutDirection,
       );
       group.append(
         svg("path", { class: "edge-visible", d: geometry.path }),
@@ -423,8 +456,8 @@
         }),
         svg("circle", {
           class: "ticket-aperture",
-          cx: NODE.width / 2,
-          cy: NODE.height,
+          cx: layoutDirection === "ltr" ? NODE.width : NODE.width / 2,
+          cy: layoutDirection === "ltr" ? NODE.height / 2 : NODE.height,
           r: 6,
         }),
         svg("line", {
@@ -508,10 +541,10 @@
       const to = positions.get(relation.dependentTicketId);
       if (!from || !to) continue;
       elements.minimap.append(svg("line", {
-        x1: from.x + NODE.width / 2,
-        y1: from.y + NODE.height,
-        x2: to.x + NODE.width / 2,
-        y2: to.y,
+        x1: from.x + (layoutDirection === "ltr" ? NODE.width : NODE.width / 2),
+        y1: from.y + (layoutDirection === "ltr" ? NODE.height / 2 : NODE.height),
+        x2: to.x + (layoutDirection === "ltr" ? 0 : NODE.width / 2),
+        y2: to.y + (layoutDirection === "ltr" ? NODE.height / 2 : 0),
         stroke: "#9aa59f",
         "stroke-width": 4,
       }));
@@ -2199,7 +2232,7 @@
     }).format(date);
   }
 
-  function layoutGraphTopToBottom(tickets, relations) {
+  function layoutGraph(tickets, relations, direction = "ltr") {
     const ids = tickets.map((ticket) => ticket.ticketId).sort();
     const outgoing = new Map(ids.map((id) => [id, []]));
     const incoming = new Map(ids.map((id) => [id, []]));
@@ -2273,24 +2306,28 @@
         });
       }
     }
-    // Layers stack downward: rank 0 (proven foundations) is the top row and
-    // each dependent rank renders beneath its prerequisites. Rows are centered
-    // against the widest rank so the flow reads as one vertical spine.
-    const rowWidth = (count) =>
-      count * NODE.width + (count - 1) * LAYOUT.columnGap;
+    const leftToRight = direction === "ltr";
+    const siblingSize = leftToRight ? NODE.height : NODE.width;
+    const siblingGap = leftToRight ? LAYOUT.columnGap : LAYOUT.columnGap;
+    const rankSize = leftToRight ? NODE.width : NODE.height;
+    const rankGap = LAYOUT.rowGap;
+    const layerSpan = (count) =>
+      count * siblingSize + (count - 1) * siblingGap;
     const widest = Math.max(
       1,
       ...orderedLayers.map(([, layer]) => layer.length),
     );
     const result = new Map();
-    orderedLayers.forEach(([, layer], rowIndex) => {
-      const inset = (rowWidth(widest) - rowWidth(layer.length)) / 2;
-      layer.forEach((id, column) => {
-        result.set(id, {
-          x: LAYOUT.marginX + inset
-            + column * (NODE.width + LAYOUT.columnGap),
-          y: LAYOUT.marginY + rowIndex * (NODE.height + LAYOUT.rowGap),
-        });
+    orderedLayers.forEach(([, layer], rankIndex) => {
+      const inset = (layerSpan(widest) - layerSpan(layer.length)) / 2;
+      layer.forEach((id, siblingIndex) => {
+        const rankPosition = (leftToRight ? LAYOUT.marginX : LAYOUT.marginY)
+          + rankIndex * (rankSize + rankGap);
+        const siblingPosition = (leftToRight ? LAYOUT.marginY : LAYOUT.marginX)
+          + inset + siblingIndex * (siblingSize + siblingGap);
+        result.set(id, leftToRight
+          ? { x: rankPosition, y: siblingPosition }
+          : { x: siblingPosition, y: rankPosition });
       });
     });
     return result;
@@ -2304,7 +2341,7 @@
     ) / neighbors.length;
   }
 
-  function relationPorts(relations) {
+  function relationPorts(relations, direction = "ltr") {
     const incoming = new Map();
     for (const relation of relations) {
       if (!incoming.has(relation.dependentTicketId)) {
@@ -2323,7 +2360,8 @@
           || left.relationRef.localeCompare(right.relationRef));
         group.forEach((relation, index) => {
           result.get(relation.relationRef)[endpoint] =
-            (index - (group.length - 1) / 2) * 14;
+            (index - (group.length - 1) / 2)
+              * (direction === "ltr" ? 11 : 14);
         });
       }
     };
@@ -2331,9 +2369,38 @@
     return result;
   }
 
-  function edgeGeometry(from, to, relationRef, ports = {}) {
-    // Top-to-bottom flow: an unlock leaves the bottom aperture of its
-    // prerequisite and enters the top edge of the dependent Ticket.
+  function edgeGeometry(from, to, relationRef, ports = {}, direction = "ltr") {
+    if (direction === "ltr") {
+      const x1 = from.x + NODE.width + 7;
+      const y1 = from.y + NODE.height / 2;
+      const x2 = to.x - 2;
+      const y2 = to.y + NODE.height / 2 + (ports.target || 0);
+      const arrow =
+        `M ${x2 - 7} ${y2 - 3.5} L ${x2} ${y2} `
+        + `L ${x2 - 7} ${y2 + 3.5} Z`;
+      const handleX = clamp(x2 - 26, x1 + 14, x2 - 12);
+      if (Math.abs(y2 - y1) < 1) {
+        return {
+          path: `M ${x1} ${y1} H ${x2}`,
+          arrow,
+          handle: { x: handleX, y: y1 },
+        };
+      }
+      const lane = stableLane(relationRef);
+      const ratio = 0.5 + lane * 0.035;
+      const mid = clamp(
+        x1 + (x2 - x1) * ratio,
+        x1 + 22,
+        x2 - 20,
+      );
+      return {
+        path: `M ${x1} ${y1} H ${mid} V ${y2} H ${x2}`,
+        arrow,
+        handle: { x: Math.max(mid + 10, handleX), y: y2 },
+      };
+    }
+    // Top-to-bottom flow leaves the prerequisite bottom aperture and enters
+    // the dependent top edge.
     const x1 = from.x + NODE.width / 2;
     const y1 = from.y + NODE.height + 7;
     const x2 = to.x + NODE.width / 2 + (ports.target || 0);
@@ -2424,13 +2491,31 @@
     );
     scale = clamp(Math.max(fitScale, 0.64), MIN_SCALE, 1);
     panX =
-      (width - bounds.width * scale) / 2 - bounds.x * scale;
-    // A tall causal flow anchors its proven foundations at the top instead of
-    // centering the middle of the graph.
-    panY = bounds.height * scale <= height - padding * 2
-      ? (height - bounds.height * scale) / 2 - bounds.y * scale
-      : padding - bounds.y * scale;
+      layoutDirection === "ltr" && bounds.width * scale > width - padding * 2
+        ? padding - bounds.x * scale
+        : (width - bounds.width * scale) / 2 - bounds.x * scale;
+    panY = layoutDirection === "ttb"
+      && bounds.height * scale > height - padding * 2
+      ? padding - bounds.y * scale
+      : (height - bounds.height * scale) / 2 - bounds.y * scale;
     applyTransform();
+  }
+
+  function setLayoutDirection(direction) {
+    const next = normalizeLayoutDirection(direction);
+    if (next === layoutDirection) return;
+    layoutDirection = next;
+    positions = layoutGraph(
+      state.graph.tickets,
+      state.graph.relations,
+      layoutDirection,
+    );
+    const nextHref = layoutDirectionHref(location.href, layoutDirection);
+    history.replaceState(null, "", nextHref);
+    renderDirectionControl();
+    renderGraph();
+    renderMinimap();
+    requestAnimationFrame(frameGraph);
   }
 
   function zoomAt(nextScale, x, y) {
@@ -2578,10 +2663,9 @@
       closeInspector();
       return;
     }
-    // Vertical causality: Up walks to a prerequisite above, Down walks to a
-    // dependent below. Left/Right stay as aliases for the same directions.
-    const upstream = event.key === "ArrowUp" || event.key === "ArrowLeft";
-    const downstream = event.key === "ArrowDown" || event.key === "ArrowRight";
+    const directionSpec = layoutDirectionSpec(layoutDirection);
+    const upstream = event.key === directionSpec.upstreamKey;
+    const downstream = event.key === directionSpec.downstreamKey;
     if (!upstream && !downstream) return;
     event.preventDefault();
     const relation = state.graph.relations.find((item) =>
@@ -2903,6 +2987,17 @@
     elements.sourceRef.setAttribute("aria-expanded", "false");
     elements.sourceRef.focus();
   });
+  document.querySelector(".graph-tools").addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+  elements.directionLtr.addEventListener(
+    "click",
+    () => setLayoutDirection("ltr"),
+  );
+  elements.directionTtb.addEventListener(
+    "click",
+    () => setLayoutDirection("ttb"),
+  );
   document.querySelector("#fitGraph").addEventListener("click", fitGraph);
   document
     .querySelector("#zoomIn")

@@ -6,9 +6,10 @@ finishes, what becomes executable next?**
 
 ## Retained product language
 
-- One complete, deterministic, top-to-bottom direct-unlock graph is the primary
-  object. Forks, joins, blockers, deviations, and proof stay at their owning
-  graph locus.
+- One complete deterministic direct-unlock graph is the primary object.
+  Left-to-right is the desktop default; top-to-bottom remains an explicit
+  first-class choice over the same nodes, relations, and causal ranks. Forks,
+  joins, blockers, deviations, and proof stay at their owning graph locus.
 - The default shell is canvas-first. Overview is a compact operational index
   that opens on request to answer what is READY, what genuinely needs a person,
   and whether execution or exact source has deviated; it is not a permanent
@@ -31,9 +32,10 @@ finishes, what becomes executable next?**
   exists, the default shell spends no space on an Implementing section or an
   empty presence explanation.
 - A focused link is deliberately local and short-lived. Ticket selection and
-  the Execution, Contract, or Log lens travel in the URL while the bearer
-  fragment remains intact, so the same live host can reopen that exact focus;
-  it is not a remote share, durable permalink, or repository switch.
+  the Execution, Contract, or Log lens plus the selected graph direction travel
+  in the URL while the bearer fragment remains intact, so the same live host
+  can reopen that exact focus; it is not a remote share, durable permalink, or
+  repository switch.
 
 This translates the approved `quiet intelligence`, v8 spatial-workbench, and
 causal Ticket review decisions preserved in Git history at `9dee0f0`.

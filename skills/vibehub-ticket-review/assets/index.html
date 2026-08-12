@@ -58,11 +58,15 @@
             </div>
           </div>
           <div class="graph-tools" aria-label="Graph controls">
+            <div class="direction-control" role="group" aria-label="Causal graph direction">
+              <button type="button" id="directionLtr" aria-label="Left to right" aria-pressed="true" title="Left to right">→</button>
+              <button type="button" id="directionTtb" aria-label="Top to bottom" aria-pressed="false" title="Top to bottom">↓</button>
+            </div>
             <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
             <button type="button" id="fitGraph">Fit</button>
             <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
           </div>
-          <svg id="graph" role="group" aria-label="Top-to-bottom causal graph">
+          <svg id="graph" role="group" aria-label="Left-to-right causal graph">
             <g id="world">
               <g id="edgeLayer"></g>
               <g id="nodeLayer"></g>

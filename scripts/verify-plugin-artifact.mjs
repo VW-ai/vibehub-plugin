@@ -186,7 +186,9 @@ try {
   }
   if (!/history\.replaceState\(null, "", nextHref\)/u.test(installedScript)
     || !/Focused local link copied · valid while this host is running/u.test(installedScript)
-    || !/function localFocusHref/u.test(installedModel)) {
+    || !/function localFocusHref/u.test(installedModel)
+    || !/function layoutDirectionHref/u.test(installedModel)
+    || !/function setLayoutDirection/u.test(installedScript)) {
     throw new Error("installed local UI does not preserve a focused authorized URL");
   }
   const uiModule = await import(pathToFileURL(

@@ -14,6 +14,34 @@
     "RECORDED",
     "COMPLETE",
   ]);
+  const LAYOUT_DIRECTIONS = new Set(["ltr", "ttb"]);
+
+  function normalizeLayoutDirection(value) {
+    return LAYOUT_DIRECTIONS.has(value) ? value : "ltr";
+  }
+
+  function layoutDirectionSpec(value) {
+    const direction = normalizeLayoutDirection(value);
+    return direction === "ltr"
+      ? {
+          direction,
+          rankAxis: "x",
+          siblingAxis: "y",
+          sourcePort: "right",
+          targetPort: "left",
+          upstreamKey: "ArrowLeft",
+          downstreamKey: "ArrowRight",
+        }
+      : {
+          direction,
+          rankAxis: "y",
+          siblingAxis: "x",
+          sourcePort: "bottom",
+          targetPort: "top",
+          upstreamKey: "ArrowUp",
+          downstreamKey: "ArrowDown",
+        };
+  }
 
   function ticketOperationalState(ticket) {
     const slot = ticket?.capabilities?.operational;
@@ -100,6 +128,12 @@
       "view",
       viewId === "evidence" ? "log" : viewId || "execution",
     );
+    return url.href;
+  }
+
+  function layoutDirectionHref(currentHref, direction) {
+    const url = new URL(currentHref);
+    url.searchParams.set("direction", normalizeLayoutDirection(direction));
     return url.href;
   }
 
@@ -201,8 +235,11 @@
     causalPriority,
     graphNarrative,
     graphSummary,
+    layoutDirectionHref,
+    layoutDirectionSpec,
     operationalCounts,
     localFocusHref,
+    normalizeLayoutDirection,
     ticketAttentionState,
     ticketNodePresentation,
     ticketOperationalState,

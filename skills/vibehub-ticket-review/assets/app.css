@@ -489,6 +489,20 @@ summary:focus-visible {
   background: var(--surface-muted);
 }
 
+.direction-control {
+  display: flex;
+  gap: 2px;
+  padding-right: 3px;
+  margin-right: 1px;
+  border-right: 1px solid var(--line);
+}
+
+.graph-tools button[aria-pressed="true"] {
+  color: var(--ink);
+  background: var(--surface-muted);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
 .canvas-hint {
   position: absolute;
   bottom: 15px;
@@ -2998,8 +3012,8 @@ a.reference-label:hover {
   }
 
   .canvas-heading {
-    top: 13px;
-    right: 122px;
+    top: 66px;
+    right: 13px;
     left: 13px;
   }
 

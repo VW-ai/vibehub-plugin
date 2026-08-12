@@ -134,3 +134,43 @@ test("focused local href preserves the bearer fragment and follows the Inspector
   assert.equal(cleared.search, "");
   assert.equal(cleared.hash, `#${token}`);
 });
+
+test("layout direction is explicit, copyable, and safely defaults left-to-right", () => {
+  const model = loadWorkbenchModel();
+  const token = "b".repeat(64);
+  const focused = `http://127.0.0.1:43111/?ticket=ready-work&view=log#${token}`;
+
+  assert.equal(model.normalizeLayoutDirection("ltr"), "ltr");
+  assert.equal(model.normalizeLayoutDirection("ttb"), "ttb");
+  assert.equal(model.normalizeLayoutDirection("sideways"), "ltr");
+  assert.equal(model.normalizeLayoutDirection(null), "ltr");
+
+  const vertical = new URL(model.layoutDirectionHref(focused, "ttb"));
+  assert.equal(vertical.searchParams.get("direction"), "ttb");
+  assert.equal(vertical.searchParams.get("ticket"), "ready-work");
+  assert.equal(vertical.searchParams.get("view"), "log");
+  assert.equal(vertical.hash, `#${token}`);
+
+  const fallback = new URL(model.layoutDirectionHref(vertical.href, "diagonal"));
+  assert.equal(fallback.searchParams.get("direction"), "ltr");
+  assert.equal(fallback.hash, `#${token}`);
+
+  assert.deepEqual({ ...model.layoutDirectionSpec("ltr") }, {
+    direction: "ltr",
+    rankAxis: "x",
+    siblingAxis: "y",
+    sourcePort: "right",
+    targetPort: "left",
+    upstreamKey: "ArrowLeft",
+    downstreamKey: "ArrowRight",
+  });
+  assert.deepEqual({ ...model.layoutDirectionSpec("ttb") }, {
+    direction: "ttb",
+    rankAxis: "y",
+    siblingAxis: "x",
+    sourcePort: "bottom",
+    targetPort: "top",
+    upstreamKey: "ArrowUp",
+    downstreamKey: "ArrowDown",
+  });
+});
