@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "current-plugin-loop-inventoried",
+    "observed-and-speculative-gaps-separated",
+    "hosted-service-deferred-cleanly"
+  ],
+  "evidence_id": "v070-plugin-loop-refresh",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-12T18:46:18Z",
+  "refs": [
+    "README.md",
+    "docs/CONCEPT.md",
+    "skills/vibehub-ticket-plan/SKILL.md",
+    "skills/vibehub-ticket-run/SKILL.md",
+    "skills/vibehub-ticket-closeout/SKILL.md",
+    "skills/vibehub-ticket-review/SKILL.md",
+    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "skills/vibehub-ticket-review/assets/index.html",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "test:npm-test-49-of-49-post-v070",
+    ".vibehub/rooms/product/decision-plugin-wedge-solo-small-team-coordination.yaml",
+    ".vibehub/rooms/product/intent-conversational-ticket-control-surface.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "Post-v0.7.0 audit confirms the installed loop is healthy and complete: README's single entry routes through Ticket Plan and setup/compatibility; Plan checks Room drift and writes the smallest canonical Ticket graph; Ticket Run selects only READY work and appends acceptance-linked Evidence; a separate Agent owns Outcome closeout; Ticket Review presents Execution, protected Contract boundaries, Log, and PR/explicit graph review. The current 49-test suite passes. The strongest observed gaps are now Workbench interaction and information density rather than lifecycle correctness: index.html permanently reserves a left rail and a second full-width empty Implementing strip despite no trusted presence input; app.js has only top-to-bottom layout and projects all 44 canonical Tickets, of which 31 are DONE; the owner has directly identified canvas space, direction choice, dense routing, visual quality, and historical-ticket filtering as friction. Rooms visibility is a real but larger proposal/decision surface. Codex-like styling, project playbooks, cross-repository actions, CLI packaging, and hosted coordination are separated from observed gaps: visual language has explicit owner demand but still needs proposal/decision; playbooks, cross-repository action, CLI, accounts, synchronization, storage, deployment, and connectors remain speculative or deferred until dogfood supplies narrower evidence. The recommendation preserves the Skill-first, Git-native, dependency-free plugin and read-only loopback UI; no hosted-service architecture is proposed.",
+  "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
+}
