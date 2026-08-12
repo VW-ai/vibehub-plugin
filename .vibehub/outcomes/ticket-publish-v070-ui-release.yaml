@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "release-pr-merged",
+    "tagged-merged-main",
+    "github-release-verified",
+    "superseded-pr-retired"
+  ],
+  "closed_at": "2026-08-12T04:22:15Z",
+  "evidence_ids": [
+    "v070-merged-main-release-and-pr-retirement"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Accepted the v0.7.0 publication after independent local and GitHub verification. PR #19 is MERGED at merge commit 3860f3a57ca7215dd9e76eaa6fad41872eece924, and fetched origin/main contains the successful UI curation, release preparation, and REFINE compatibility-repair Outcomes with their acceptance-linked Evidence. Remote refs/heads/main and refs/tags/v0.7.0 both resolve exactly to 3860f3a; the tag is lightweight because its object type is commit, and it targets the merge commit rather than feature tip 5a17a03. Release VibeHub run 31562864171 completed successfully for head SHA 3860f3a. GitHub Release v0.7.0 is published, non-draft, non-prerelease, targets main through that exact tag, and exposes the archive plus checksum assets. Independently downloaded assets passed shasum -a 256 -c; the 343503-byte archive digest is e8ab544db738936aa0cc0e98f7a40aa69c2d84d5a7ede4e25254d3e09f10a05b and its contents are readable. PR #18 is CLOSED with mergedAt null and retains a visible comment identifying merged replacement #19 and shipped v0.7.0.",
+  "ticket_id": "ticket-publish-v070-ui-release",
+  "unresolved_acceptance_ids": []
+}

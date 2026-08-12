@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "release-pr-merged",
+    "tagged-merged-main",
+    "github-release-verified",
+    "superseded-pr-retired"
+  ],
+  "evidence_id": "v070-merged-main-release-and-pr-retirement",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-12T04:20:15Z",
+  "refs": [
+    "github-pr:VW-ai/vibehub-plugin#19",
+    "commit:3860f3a57ca7215dd9e76eaa6fad41872eece924",
+    "test:merged-main-npm-run-verify-49-of-49-and-53-file-artifact",
+    "test:merged-main-vibehub-project-and-ticket-validation",
+    "test:merged-main-four-rooms-fresh",
+    "git-tag:v0.7.0@3860f3a57ca7215dd9e76eaa6fad41872eece924",
+    "github-actions:VW-ai/vibehub-plugin/actions/runs/31562864171",
+    "github-release:https://github.com/VW-ai/vibehub-plugin/releases/tag/v0.7.0",
+    "artifact:vibehub-plugin-0.7.0.tar.gz",
+    "artifact:vibehub-plugin-0.7.0.tar.gz.sha256",
+    "test:sha256sum-check-vibehub-plugin-0.7.0-ok",
+    "github-pr:VW-ai/vibehub-plugin#18-closed-unmerged"
+  ],
+  "schema_version": 1,
+  "summary": "Replacement PR #19 merged the curated shared Web UI, release preparation, and REFINE compatibility repair into main at merge commit 3860f3a. Local main fast-forwarded exactly to that commit and passed npm run verify (49/49 plus the 53-file artifact), project/Ticket validation, and four-room FRESH drift checks before lightweight tag v0.7.0 was created and pushed on that exact merged-main commit. The tag-triggered Release VibeHub run 31562864171 succeeded, publishing both the 343503-byte archive and checksum; downloading both and running sha256sum --check returned OK, and the archive digest is e8ab544db738936aa0cc0e98f7a40aa69c2d84d5a7ede4e25254d3e09f10a05b. Original PR #18 was then closed without merge with a comment pointing to merged replacement #19 and v0.7.0.",
+  "ticket_id": "ticket-publish-v070-ui-release"
+}
