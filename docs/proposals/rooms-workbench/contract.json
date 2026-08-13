@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "surface": "on-demand-floating-room-browser",
+  "default_open": false,
+  "tree_source": ".vibehub/rooms/**/room.yaml directory containment",
+  "detail_source": ["room.yaml", "Context files in selected subtree", "Ticket context_refs"],
+  "drift_states": {
+    "FRESH": { "label": "FRESH", "icon": "check", "prominence": "quiet" },
+    "DRIFTED": { "label": "DRIFTED", "icon": "git-diff", "prominence": "exception" },
+    "WARNING": { "label": "OLD CHECKOUT", "icon": "history", "prominence": "exception" },
+    "STALE": { "label": "STALE", "icon": "alert-circle", "prominence": "exception" },
+    "COLD_START": { "label": "ROOMS NOT INITIALIZED", "icon": "snowflake", "prominence": "exception" }
+  },
+  "ticket_filter": {
+    "source": "shared projectTicketQuery repeated Room union",
+    "composition": "Room union intersects scope and delivery filters",
+    "layout": "preserve every surviving Ticket x/y; never cluster or rerank by Room",
+    "clear": "restore prior query and graph positions"
+  },
+  "responsive": {
+    "desktop": "360px floating surface anchored below header",
+    "narrow": "bottom sheet, graph remains visible above",
+    "minimum_target": 44
+  }
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeHub · Rooms Workbench proposal</title>
+  <link rel="stylesheet" href="rooms.css">
+</head>
+<body>
+  <header class="header">
+    <div class="brand"><span class="mark">VH</span><strong>vibehub-plugin</strong><span class="branch">codex/workbench-ui-next</span></div>
+    <div class="actions">
+      <button class="source" type="button"><span class="fresh-dot"></span>Exact source <code>bec53a5</code></button>
+      <button id="roomsButton" class="rooms-button active" type="button" aria-expanded="true" aria-controls="roomsPanel">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h5v5H4zM11 4h5v5h-5zM4 11h5v5H4zM11 11h5v5h-5z"/></svg>
+        <span>Rooms</span><b>4</b>
+      </button>
+      <button class="icon-button" type="button" aria-label="Copy focused link">↗</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="canvas" aria-label="Unchanged Ticket causal graph">
+      <div class="canvas-title"><span>Execution flow</span><h1>Proven left, executable right</h1><p>2 ready · 1 refine · 1 needs you</p></div>
+      <div class="graph-controls"><button type="button" aria-label="Left to right" aria-pressed="true">→</button><button type="button" aria-label="Top to bottom">↓</button><button type="button" aria-label="Fit graph">⌗</button></div>
+      <div class="graph" id="graph">
+        <svg viewBox="0 0 1040 610" aria-hidden="true"><path d="M216 153H302M518 153H604M820 153H870V340H910M518 153H560V405H604"/><path d="M820 405H870V340H910"/></svg>
+        <article class="ticket archived" data-rooms="product" style="--x:20px;--y:105px"><span>ticket-publish-v070…</span><b>Publish retained UI release.</b><small>✓ ARCHIVED</small></article>
+        <article class="ticket done" data-rooms="workbench product" style="--x:302px;--y:105px"><span>ticket-dense-graph-layout</span><b>Keep dense graphs legible.</b><small>✓ DONE</small></article>
+        <article class="ticket ready selected" data-rooms="workbench product" style="--x:604px;--y:105px"><span>ticket-visual-language</span><b>Define quiet visual tokens.</b><small>▶ READY</small></article>
+        <article class="ticket blocked" data-rooms="workbench" style="--x:910px;--y:292px"><span>ticket-owner-decision</span><b>Owner chooses direction.</b><small>▣ BLOCKED</small></article>
+        <article class="ticket ready" data-rooms="workbench knowledge" style="--x:302px;--y:357px"><span>ticket-rooms-proposal</span><b>Make Rooms visible.</b><small>▶ READY</small></article>
+        <article class="ticket refine" data-rooms="workbench ticket-lifecycle" style="--x:604px;--y:357px"><span>ticket-apply-visual</span><b>Apply selected tokens.</b><small>≡ REFINE</small></article>
+      </div>
+      <div class="filter-status" id="filterStatus" hidden><span>Room filter</span><strong id="filterName">workbench</strong><button id="clearFilter" type="button">Clear</button></div>
+      <div class="canvas-help">Room selection never moves Ticket cards · current x/y preserved</div>
+    </section>
+
+    <aside class="rooms-panel" id="roomsPanel" aria-label="Rooms browser">
+      <div class="sheet-handle"></div>
+      <div class="panel-header"><div><span class="eyebrow">Knowledge spaces</span><h2>Rooms</h2></div><button class="icon-button" id="closeRooms" type="button" aria-label="Close Rooms">×</button></div>
+      <div class="tree" role="tree" aria-label="Canonical Room tree">
+        <button type="button" role="treeitem" data-room="product" aria-selected="false"><span class="chevron">⌄</span><span class="room-icon">□</span><span class="room-label"><strong>product</strong><small>15 Context · 26 Tickets</small></span><span class="drift drifted">⎇ DRIFTED</span></button>
+        <button type="button" role="treeitem" data-room="knowledge" aria-selected="false"><span class="chevron"></span><span class="room-icon">□</span><span class="room-label"><strong>knowledge</strong><small>8 Context · 7 Tickets</small></span><span class="drift fresh">✓</span></button>
+        <button type="button" role="treeitem" data-room="ticket-lifecycle" aria-selected="false"><span class="chevron"></span><span class="room-icon">□</span><span class="room-label"><strong>ticket-lifecycle</strong><small>1 Context · 13 Tickets</small></span><span class="drift fresh">✓</span></button>
+        <button type="button" role="treeitem" data-room="workbench" aria-selected="true"><span class="chevron"></span><span class="room-icon">□</span><span class="room-label"><strong>workbench</strong><small>2 Context · 19 Tickets</small></span><span class="drift fresh">✓</span></button>
+      </div>
+
+      <div class="detail" id="roomDetail">
+        <div class="detail-title"><div><span class="eyebrow">Selected Room</span><h3 id="roomTitle">workbench</h3></div><span class="state-label fresh-label" id="roomState">✓ FRESH</span></div>
+        <p class="boundary" id="roomBoundary">Read-only graph projection, local loopback host, visual language, and interaction. Canonical YAML remains outside this Room.</p>
+        <div class="detail-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-view="context">Context <b id="contextCount">2</b></button><button type="button" role="tab" aria-selected="false" data-view="tickets">Tickets <b id="ticketCount">19</b></button><button type="button" role="tab" aria-selected="false" data-view="drift">Drift</button></div>
+        <div class="detail-content" id="detailContent"></div>
+        <button class="show-tickets" id="showTickets" type="button"><span>Show related Tickets</span><small>Uses canonical Room query · preserves x/y</small></button>
+      </div>
+      <div class="empty-detail" id="emptyDetail" hidden><span class="empty-icon">□</span><strong>Select a Room</strong><p>Its boundary, Context, consuming Tickets, and drift evidence appear here. The Ticket graph stays causal.</p></div>
+      <button class="empty-toggle" id="emptyToggle" type="button">Preview no-selection state</button>
+    </aside>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="rooms.js"></script>
+</body>
+</html>
