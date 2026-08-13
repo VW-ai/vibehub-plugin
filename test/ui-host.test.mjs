@@ -320,6 +320,72 @@ test("dense causal position preserves every direct prerequisite and unlock", () 
   );
 });
 
+test("Web projection shares current/all archive queries and progressive history stubs", () => {
+  const repo = tempRepo("ui-archive-query");
+  repos.push(repo);
+  assert.equal(run(repo, "project", "init").status, 0);
+  const delivery = {
+    kind: "pull_request",
+    ref: "https://github.com/VW-ai/vibehub-plugin/pull/77",
+    state: "delivered",
+    delivered_at: NOW,
+    delivered_commit: "a".repeat(40),
+  };
+  const old = { ...ticket("old-history"), deliveries: [delivery] };
+  const boundary = { ...ticket("archived-boundary", ["old-history"]), deliveries: [delivery] };
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [old, boundary, ticket("current-work", ["archived-boundary"]), ticket("other-current")],
+  }).status, 0);
+  for (const id of ["old-history", "archived-boundary"]) {
+    assert.equal(run(repo, "ticket", "evidence", {
+      schema_version: 1,
+      kind: "ticket_evidence",
+      evidence_id: `${id}-proof`,
+      ticket_id: id,
+      acceptance_ids: ["works"],
+      summary: `${id} passed.`,
+      refs: [`test:${id}`],
+      recorded_at: NOW,
+    }).status, 0);
+    assert.equal(run(repo, "ticket", "closeout", {
+      schema_version: 1,
+      kind: "ticket_outcome",
+      ticket_id: id,
+      status: "successful",
+      accepted_acceptance_ids: ["works"],
+      unresolved_acceptance_ids: [],
+      evidence_ids: [`${id}-proof`],
+      summary: `${id} passed independently.`,
+      closed_at: NOW,
+    }).status, 0);
+  }
+  const current = buildUiSnapshot(repo);
+  assert.deepEqual(current.state.graph.tickets.map((item) => [item.ticketId, item.archived]), [
+    ["archived-boundary", true], ["current-work", false], ["other-current", false],
+  ]);
+  assert.deepEqual(current.state.graph.stubs.map((stub) => ({
+    anchor: stub.anchorTicketId,
+    direction: stub.direction,
+    count: stub.hiddenTicketCount,
+    next: stub.nextTicketIds,
+  })), [{
+    anchor: "archived-boundary",
+    direction: "upstream",
+    count: 1,
+    next: ["old-history"],
+  }]);
+  const expanded = buildUiSnapshot(repo, { historyIds: ["old-history"] });
+  assert.deepEqual(expanded.state.graph.tickets.map((item) => item.ticketId), [
+    "archived-boundary", "current-work", "old-history", "other-current",
+  ]);
+  assert.deepEqual(expanded.state.graph.stubs, []);
+  const all = buildUiSnapshot(repo, { scope: "all" });
+  assert.deepEqual(all.state.graph.tickets.map((item) => item.ticketId), [
+    "archived-boundary", "current-work", "old-history", "other-current",
+  ]);
+  assert.deepEqual(all.state.graph.stubs, []);
+});
+
 test("read-only loopback host serves assets, current graph, inspector, and trace", async () => {
   const repo = fixture();
   const beforeUi = canonicalBytes(repo);
@@ -363,6 +429,15 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(state.interventions.protectedBoundaries.length, 2);
   assert.equal(state.graph.source.actions.worktree.editorHref.startsWith("vscode://file"), true);
   assert.equal(state.graph.source.agentPayload.kind, "vibehub_git_source");
+  assert.equal(state.graph.filters.scope, "current");
+  assert.deepEqual(state.graph.stubs, []);
+
+  const invalidFilter = await fetch(
+    `${origin}/api/state?scope=past`,
+    authorized(token),
+  );
+  assert.equal(invalidFilter.status, 400);
+  assert.equal((await invalidFilter.json()).error.code, "invalid_filter");
 
   const ticketQuery = new URLSearchParams({
     snapshotId: state.graph.snapshotId,
@@ -492,12 +567,18 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   // top-to-bottom choice without forking the graph model.
   assert.match(html, /id="directionLtr"[^>]+aria-pressed="true"/u);
   assert.match(html, /id="directionTtb"[^>]+aria-pressed="false"/u);
+  assert.match(html, /id="scopeCurrent"[^>]+aria-pressed="true"/u);
+  assert.match(html, /id="scopeAll"[^>]+aria-pressed="false"/u);
   assert.match(script, /function layoutGraph\(tickets, relations, direction/u);
   assert.match(layout, /function minimizeCrossings/u);
   assert.match(layout, /function routeRelations/u);
   assert.match(layout, /relationRef.*source: 0, target: 0/su);
   assert.match(layout, /The Ticket graph contains a cycle/u);
   assert.match(script, /function setLayoutDirection/u);
+  assert.match(script, /function setGraphScope/u);
+  assert.match(script, /function revealHistory/u);
+  assert.match(script, /ARCHIVED delivery history/u);
+  assert.match(script, /preserveLayout/u);
   assert.match(script, /layoutDirection === "ltr"/u);
   // No trusted Active-Run source exists, so the shell makes no presence claim
   // and never promotes Git-native state into an implementing subsystem.

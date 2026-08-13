@@ -489,12 +489,45 @@ summary:focus-visible {
   background: var(--surface-muted);
 }
 
-.direction-control {
+.direction-control,
+.scope-control {
   display: flex;
   gap: 2px;
   padding-right: 3px;
   margin-right: 1px;
   border-right: 1px solid var(--line);
+}
+
+.ticket-node.archived {
+  opacity: 0.62;
+}
+
+.ticket-node.archived .ticket-boundary {
+  stroke-dasharray: 5 4;
+}
+
+.history-stub {
+  cursor: pointer;
+}
+
+.history-stub rect {
+  fill: rgba(248, 249, 248, 0.94);
+  stroke: var(--line-strong);
+  stroke-dasharray: 4 3;
+}
+
+.history-stub text {
+  fill: var(--muted);
+  font: 9px/1 var(--mono);
+}
+
+.history-stub:focus {
+  outline: none;
+}
+
+.history-stub:focus rect,
+.history-stub:hover rect {
+  stroke: var(--ink);
 }
 
 .graph-tools button[aria-pressed="true"] {

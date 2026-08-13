@@ -119,4 +119,46 @@ for (const direction of ["ltr", "ttb"]) {
       }
     }
   });
+
+  test(`dense ${direction} history expansion preserves existing card coordinates`, () => {
+    const model = loadLayoutModel();
+    const fixture = denseGraphFixtures[0];
+    const hiddenIds = new Set(["root-0", "root-1"]);
+    const initialTickets = fixture.tickets.filter((ticket) => !hiddenIds.has(ticket.ticketId));
+    const initialRelations = fixture.relations.filter((relation) =>
+      !hiddenIds.has(relation.prerequisiteTicketId)
+      && !hiddenIds.has(relation.dependentTicketId));
+    const initial = model.layoutGraph(initialTickets, initialRelations, direction);
+    const expanded = model.layoutGraph(
+      fixture.tickets,
+      fixture.relations,
+      direction,
+      { fixedPositions: initial.positions },
+    );
+    for (const [ticketId, position] of initial.positions) {
+      assert.deepEqual(expanded.positions.get(ticketId), position, `${ticketId} moved`);
+    }
+    const entries = [...expanded.positions.entries()];
+    for (let left = 0; left < entries.length; left += 1) {
+      for (let right = left + 1; right < entries.length; right += 1) {
+        assert.equal(
+          overlaps(entries[left][1], entries[right][1], model.NODE),
+          false,
+          `${entries[left][0]} overlaps ${entries[right][0]} after expansion`,
+        );
+      }
+    }
+    for (const [relationRef, route] of expanded.routes) {
+      const relation = fixture.relations.find((item) => item.relationRef === relationRef);
+      for (const [ticketId, position] of entries) {
+        if (ticketId === relation.prerequisiteTicketId
+          || ticketId === relation.dependentTicketId) continue;
+        assert.equal(
+          route.segments.some((segment) => segmentCrossesCard(segment, position, model.NODE)),
+          false,
+          `${relationRef} crosses ${ticketId} after expansion`,
+        );
+      }
+    }
+  });
 }

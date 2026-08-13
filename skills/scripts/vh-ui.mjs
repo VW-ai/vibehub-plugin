@@ -9,6 +9,8 @@ import {
   assertValid,
   documents,
   loadRepository,
+  projectTicketQuery,
+  ticketArchived,
   ticketStatus,
 } from "./vh.mjs";
 
@@ -302,18 +304,20 @@ function humanAttentionState(repository, ticket, outcome) {
   };
 }
 
-function projectGraph(repository) {
-  const ticketDocuments = documents(repository.tickets.documents)
-    .sort((left, right) => left.ticket_id.localeCompare(right.ticket_id));
-  const relations = ticketDocuments.flatMap((ticket) =>
-    ticket.relations.map((relation) => ({
-      relationRef: relationRef(relation.target_ticket_id, ticket.ticket_id),
-      prerequisiteTicketId: relation.target_ticket_id,
-      dependentTicketId: ticket.ticket_id,
-      rationale: relation.rationale ?? "Direct execution dependency.",
-      provenanceRefs: ticket.provenance_refs,
-    })),
-  );
+function projectGraph(repository, queryOptions = {}) {
+  const query = projectTicketQuery(repository, queryOptions);
+  const ticketDocuments = query.tickets;
+  const relations = query.relations.map((relation) => {
+    const dependent = repository.tickets.documents
+      .get(relation.dependent_ticket_id)?.document;
+    return {
+      relationRef: relationRef(relation.prerequisite_ticket_id, relation.dependent_ticket_id),
+      prerequisiteTicketId: relation.prerequisite_ticket_id,
+      dependentTicketId: relation.dependent_ticket_id,
+      rationale: relation.rationale,
+      provenanceRefs: dependent?.provenance_refs ?? [],
+    };
+  });
   const counts = new Map(ticketDocuments.map((ticket) => [
     ticket.ticket_id,
     { prerequisites: 0, dependents: 0 },
@@ -329,6 +333,8 @@ function projectGraph(repository) {
       ticketId: ticket.ticket_id,
       ticketRevision: digest(ticket),
       outcome: ticket.outcome,
+      archived: ticketArchived(repository, ticket),
+      deliveries: ticket.deliveries ?? [],
       provenanceRefs: ticket.provenance_refs,
       relationCounts: counts.get(ticket.ticket_id),
       capabilities: {
@@ -343,7 +349,18 @@ function projectGraph(repository) {
       },
     };
   });
-  return { tickets, relations };
+  return {
+    tickets,
+    relations,
+    stubs: query.stubs.map((stub) => ({
+      stubRef: stub.stub_ref,
+      anchorTicketId: stub.anchor_ticket_id,
+      direction: stub.direction,
+      hiddenTicketCount: stub.hidden_ticket_count,
+      nextTicketIds: stub.next_ticket_ids,
+    })),
+    filters: query.filters,
+  };
 }
 
 function canonicalContextFromRef(repository, reference) {
@@ -488,7 +505,7 @@ function traceRecords(repository, source, ticketId = null) {
   );
 }
 
-export function buildUiSnapshot(repoRoot) {
+export function buildUiSnapshot(repoRoot, queryOptions = {}) {
   const repo = realpathSync(resolve(repoRoot));
   const repository = loadRepository(repo);
   assertValid(repository.errors);
@@ -498,7 +515,7 @@ export function buildUiSnapshot(repoRoot) {
   const rawOutcomes = documents(repository.outcomes.documents);
   const graphDigest = digest({ contexts, tickets: rawTickets, evidence: rawEvidence, outcomes: rawOutcomes });
   const source = gitSource(repo, graphDigest);
-  const graph = projectGraph(repository);
+  const graph = projectGraph(repository, queryOptions);
   const protectedBoundaries = graph.tickets
     .filter((ticket) =>
       ticket.capabilities.attention.summary.humanAcceptanceCount > 0)
@@ -525,6 +542,8 @@ export function buildUiSnapshot(repoRoot) {
       source,
       tickets: graph.tickets,
       relations: graph.relations,
+      stubs: graph.stubs,
+      filters: graph.filters,
     },
     interventions: {
       review: { available: false },
@@ -539,6 +558,15 @@ export function buildUiSnapshot(repoRoot) {
     },
   };
   return { repo, repository, graph, state };
+}
+
+function queryOptionsFromUrl(url) {
+  return {
+    scope: url.searchParams.get("scope") ?? "current",
+    delivery: url.searchParams.get("delivery"),
+    rooms: url.searchParams.getAll("room"),
+    historyIds: url.searchParams.getAll("history"),
+  };
 }
 
 function subjectFrom(snapshot, url) {
@@ -758,7 +786,15 @@ export function startVibeHubUi({
         throw new UiError(404, "not_found", "Route not found");
       }
       requireBearer(request, token);
-      const snapshot = buildUiSnapshot(repoRoot);
+      let snapshot;
+      try {
+        snapshot = buildUiSnapshot(repoRoot, queryOptionsFromUrl(url));
+      } catch (error) {
+        if (error?.code === "invalid_argument") {
+          throw new UiError(400, "invalid_filter", error.message, error.details ?? null);
+        }
+        throw error;
+      }
       let data;
       if (url.pathname === "/api/state") data = snapshot.state;
       else if (url.pathname === "/api/subject") data = subjectFrom(snapshot, url);

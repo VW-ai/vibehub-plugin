@@ -84,6 +84,8 @@
     graph: document.querySelector("#graph"),
     directionLtr: document.querySelector("#directionLtr"),
     directionTtb: document.querySelector("#directionTtb"),
+    scopeCurrent: document.querySelector("#scopeCurrent"),
+    scopeAll: document.querySelector("#scopeAll"),
     world: document.querySelector("#world"),
     edgeLayer: document.querySelector("#edgeLayer"),
     nodeLayer: document.querySelector("#nodeLayer"),
@@ -116,6 +118,29 @@
   let toastTimer = null;
   let initialFocusPending = Boolean(requestedTicketId);
 
+  normalizeGraphQueryUrl();
+
+  function graphQuery() {
+    const query = new URLSearchParams(location.search);
+    return {
+      scope: query.get("scope") ?? "current",
+      delivery: query.get("delivery"),
+      rooms: query.getAll("room").sort(),
+      historyIds: query.getAll("history").sort(),
+    };
+  }
+
+  function normalizeGraphQueryUrl() {
+    const url = new URL(location.href);
+    if (!url.searchParams.has("scope")) url.searchParams.set("scope", "current");
+    for (const key of ["room", "history"]) {
+      const values = [...new Set(url.searchParams.getAll(key))].sort();
+      url.searchParams.delete(key);
+      for (const value of values) url.searchParams.append(key, value);
+    }
+    history.replaceState(null, "", url.href);
+  }
+
   function svg(tag, attributes = {}) {
     const element = document.createElementNS(SVG, tag);
     for (const [name, value] of Object.entries(attributes)) {
@@ -133,7 +158,13 @@
     const body = options.body === undefined
       ? undefined
       : JSON.stringify(options.body);
-    const response = await fetch(path, {
+    const requestUrl = new URL(path, location.origin);
+    const query = graphQuery();
+    requestUrl.searchParams.set("scope", query.scope);
+    if (query.delivery) requestUrl.searchParams.set("delivery", query.delivery);
+    for (const room of query.rooms) requestUrl.searchParams.append("room", room);
+    for (const id of query.historyIds) requestUrl.searchParams.append("history", id);
+    const response = await fetch(`${requestUrl.pathname}${requestUrl.search}`, {
       method: options.method ?? "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -157,7 +188,7 @@
     return envelope.data;
   }
 
-  async function refresh(message) {
+  async function refresh(message, { preserveLayout = false } = {}) {
     const request = ++graphRequest;
     subjectRequest += 1;
     setBusy(true);
@@ -165,12 +196,15 @@
       const nextState = await api("/api/state");
       if (request !== graphRequest) return;
       subjectRequest += 1;
+      const fixedPositions = preserveLayout ? new Map(positions) : null;
+      const previousSelection = preserveLayout ? selected : null;
       state = nextState;
-      selected = null;
+      selected = previousSelection;
       graphGeometry = layoutGraph(
         state.graph.tickets,
         state.graph.relations,
         layoutDirection,
+        fixedPositions ? { fixedPositions } : undefined,
       );
       positions = graphGeometry.positions;
       renderChrome();
@@ -188,6 +222,16 @@
           false,
           requestedViewId,
         );
+      } else if (preserveLayout && previousSelection?.kind === "ticket"
+        && state.graph.tickets.some((ticket) => ticket.ticketId === previousSelection.id)) {
+        await selectTicket(
+          previousSelection.id,
+          false,
+          TICKET_VIEW_IDS.get(new URLSearchParams(location.search).get("view")) ?? "execution",
+        );
+      } else if (preserveLayout && previousSelection?.kind === "relation"
+        && state.graph.relations.some((relation) => relation.relationRef === previousSelection.id)) {
+        await selectRelation(previousSelection.id, false);
       } else {
         renderGraphInspector({ open: false });
       }
@@ -214,6 +258,7 @@
     renderOverview(overview);
     elements.graphSummary.textContent = graphSummary(counts);
     renderDirectionControl();
+    renderScopeControl();
     elements.graphSignalCount.textContent =
       `${overview.ready.length} ready · ${overview.humanPending.length} need you · `
       + (overview.sourceDirty ? "local changes" : "exact source");
@@ -253,6 +298,12 @@
     }
     const nextHref = layoutDirectionHref(location.href, layoutDirection);
     if (nextHref !== location.href) history.replaceState(null, "", nextHref);
+  }
+
+  function renderScopeControl() {
+    const current = graphQuery().scope === "current";
+    elements.scopeCurrent.setAttribute("aria-pressed", String(current));
+    elements.scopeAll.setAttribute("aria-pressed", String(!current));
   }
 
   function renderOverview(overview) {
@@ -410,6 +461,35 @@
       elements.edgeLayer.append(group);
     }
 
+    for (const stub of state.graph.stubs ?? []) {
+      const anchor = positions.get(stub.anchorTicketId);
+      if (!anchor) continue;
+      const point = historyStubPosition(anchor, stub.direction);
+      const group = svg("g", {
+        class: "history-stub",
+        transform: `translate(${point.x} ${point.y})`,
+        role: "button",
+        tabindex: "0",
+        "aria-label": `${stub.hiddenTicketCount} hidden archived Ticket${stub.hiddenTicketCount === 1 ? "" : "s"} ${stub.direction}; reveal next hop`,
+      });
+      group.dataset.stubRef = stub.stubRef;
+      group.append(svg("rect", { width: 116, height: 34, rx: 8 }));
+      const label = svg("text", { x: 58, y: 21, "text-anchor": "middle" });
+      label.textContent = `${stub.hiddenTicketCount} archived ${stub.direction === "upstream" ? "←" : "→"}`;
+      group.append(label);
+      group.addEventListener("click", (event) => {
+        event.stopPropagation();
+        void revealHistory(stub.nextTicketIds);
+      });
+      group.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          void revealHistory(stub.nextTicketIds);
+        }
+      });
+      elements.nodeLayer.append(group);
+    }
+
     for (const ticket of state.graph.tickets) {
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
@@ -421,11 +501,11 @@
       });
       const { operational, attention } = presentation;
       const group = svg("g", {
-        class: presentation.className,
+        class: classes(presentation.className, ticket.archived ? "archived" : ""),
         transform: `translate(${position.x} ${position.y})`,
         role: "button",
         tabindex: "0",
-        "aria-label": presentation.ariaLabel,
+        "aria-label": `${presentation.ariaLabel}${ticket.archived ? " ARCHIVED delivery history." : ""}`,
       });
       group.dataset.ticketId = ticket.ticketId;
       group.append(
@@ -483,7 +563,7 @@
           y: 22,
           "text-anchor": "end",
         });
-        status.textContent = operational.label;
+        status.textContent = ticket.archived ? "ARCHIVED" : operational.label;
         group.append(status);
       }
       wrap(ticket.outcome, 34, 3).forEach((line, index) => {
@@ -515,6 +595,29 @@
       elements.nodeLayer.append(group);
     }
     applyTransform();
+  }
+
+  function historyStubPosition(anchor, direction) {
+    if (layoutDirection === "ltr") {
+      return {
+        x: direction === "upstream" ? anchor.x - 142 : anchor.x + NODE.width + 26,
+        y: anchor.y + NODE.height / 2 - 17,
+      };
+    }
+    return {
+      x: anchor.x + NODE.width / 2 - 58,
+      y: direction === "upstream" ? anchor.y - 54 : anchor.y + NODE.height + 20,
+    };
+  }
+
+  async function revealHistory(ticketIds) {
+    const url = new URL(location.href);
+    const existing = new Set(url.searchParams.getAll("history"));
+    for (const id of ticketIds) existing.add(id);
+    url.searchParams.delete("history");
+    for (const id of [...existing].sort()) url.searchParams.append("history", id);
+    history.replaceState(null, "", url.href);
+    await refresh("Archived history expanded one hop", { preserveLayout: true });
   }
 
   function renderMinimap() {
@@ -2222,20 +2325,29 @@
     }).format(date);
   }
 
-  function layoutGraph(tickets, relations, direction = "ltr") {
-    return graphLayoutModel.layoutGraph(tickets, relations, direction);
+  function layoutGraph(tickets, relations, direction = "ltr", options) {
+    return graphLayoutModel.layoutGraph(tickets, relations, direction, options);
   }
 
   function graphBounds() {
     if (!positions.size) return null;
-    const values = [...positions.values()];
+    const values = [...positions.values()].map((value) => ({
+      ...value,
+      width: NODE.width,
+      height: NODE.height,
+    }));
+    for (const stub of state?.graph?.stubs ?? []) {
+      const anchor = positions.get(stub.anchorTicketId);
+      if (!anchor) continue;
+      values.push({ ...historyStubPosition(anchor, stub.direction), width: 116, height: 34 });
+    }
     const minX = Math.min(...values.map((value) => value.x));
     const minY = Math.min(...values.map((value) => value.y));
     const maxX = Math.max(
-      ...values.map((value) => value.x + NODE.width),
+      ...values.map((value) => value.x + value.width),
     );
     const maxY = Math.max(
-      ...values.map((value) => value.y + NODE.height),
+      ...values.map((value) => value.y + value.height),
     );
     return {
       x: minX,
@@ -2300,6 +2412,16 @@
     renderGraph();
     renderMinimap();
     requestAnimationFrame(frameGraph);
+  }
+
+  async function setGraphScope(scope) {
+    if (scope === graphQuery().scope) return;
+    const url = new URL(location.href);
+    url.searchParams.set("scope", scope);
+    if (scope === "all") url.searchParams.delete("history");
+    history.replaceState(null, "", url.href);
+    selected = null;
+    await refresh(scope === "all" ? "Showing all Ticket history" : "Showing current work");
   }
 
   function zoomAt(nextScale, x, y) {
@@ -2782,6 +2904,14 @@
     "click",
     () => setLayoutDirection("ttb"),
   );
+  elements.scopeCurrent.addEventListener(
+    "click",
+    () => void setGraphScope("current"),
+  );
+  elements.scopeAll.addEventListener(
+    "click",
+    () => void setGraphScope("all"),
+  );
   document.querySelector("#fitGraph").addEventListener("click", fitGraph);
   document
     .querySelector("#zoomIn")
@@ -2801,7 +2931,7 @@
     }
   });
   elements.canvas.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || event.target.closest(".ticket-node, .edge")) {
+    if (event.button !== 0 || event.target.closest(".ticket-node, .edge, .history-stub")) {
       return;
     }
     dragging = {

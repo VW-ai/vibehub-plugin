@@ -10,7 +10,7 @@
     sweeps: 12,
   });
 
-  function layoutGraph(tickets, relations, direction = "ltr") {
+  function layoutGraph(tickets, relations, direction = "ltr", options = {}) {
     const leftToRight = direction !== "ttb";
     const ids = tickets.map((ticket) => ticket.ticketId).sort();
     const validIds = new Set(ids);
@@ -102,6 +102,31 @@
       });
     });
 
+    if (options.fixedPositions instanceof Map) {
+      for (const [ticketId, fixed] of options.fixedPositions) {
+        if (!positions.has(ticketId)) continue;
+        const position = { x: fixed.x, y: fixed.y };
+        positions.set(ticketId, position);
+        itemPositions.set(ticketId, position);
+      }
+      const fixedIds = new Set(options.fixedPositions.keys());
+      const occupied = [...positions.entries()]
+        .filter(([id]) => fixedIds.has(id))
+        .map(([, position]) => position);
+      const step = (leftToRight ? NODE.height : NODE.width) + LAYOUT.siblingGap;
+      for (const [ticketId, position] of positions) {
+        if (fixedIds.has(ticketId)) continue;
+        const candidate = { ...position };
+        while (occupied.some((item) => rectanglesOverlap(candidate, item))) {
+          if (leftToRight) candidate.y += step;
+          else candidate.x += step;
+        }
+        positions.set(ticketId, candidate);
+        itemPositions.set(ticketId, candidate);
+        occupied.push(candidate);
+      }
+    }
+
     const ports = relationPorts(validRelations, direction, positions);
     const routes = routeRelations(
       validRelations,
@@ -118,6 +143,13 @@
       rankById,
       layers: layers.map((layer) => layer.map((item) => item.key)),
     });
+  }
+
+  function rectanglesOverlap(left, right) {
+    return left.x < right.x + NODE.width
+      && left.x + NODE.width > right.x
+      && left.y < right.y + NODE.height
+      && left.y + NODE.height > right.y;
   }
 
   function longestPathRanks(ids, outgoing, initialIndegree) {
@@ -346,7 +378,12 @@
           points.push({ x: destinationX, y: isTarget ? target.y - 2 : to.y + NODE.height / 2 });
         }
       }
-      const compact = compactPoints(points);
+      const obstacles = [...itemByKey.values()]
+        .filter((item) => item.real
+          && item.ticketId !== relation.prerequisiteTicketId
+          && item.ticketId !== relation.dependentTicketId)
+        .map((item) => itemPositions.get(item.key));
+      const compact = routeAroundCards(compactPoints(points), obstacles);
       const end = compact.at(-1);
       const arrow = leftToRight
         ? `M ${end.x - 7} ${end.y - 3.5} L ${end.x} ${end.y} L ${end.x - 7} ${end.y + 3.5} Z`
@@ -360,6 +397,96 @@
       }));
     }
     return routes;
+  }
+
+  function routeAroundCards(points, obstacles) {
+    if (!points.some((point, index) => index > 0
+      && obstacles.some((obstacle) => segmentCrossesRectangle(points[index - 1], point, obstacle)))) {
+      return points;
+    }
+    const start = points[0];
+    const end = points.at(-1);
+    const clearance = 12;
+    const xs = [...new Set([
+      start.x,
+      end.x,
+      ...obstacles.flatMap((item) => [item.x - clearance, item.x + NODE.width + clearance]),
+    ])].sort((left, right) => left - right);
+    const ys = [...new Set([
+      start.y,
+      end.y,
+      ...obstacles.flatMap((item) => [item.y - clearance, item.y + NODE.height + clearance]),
+    ])].sort((left, right) => left - right);
+    const pointAt = (xIndex, yIndex) => ({ x: xs[xIndex], y: ys[yIndex] });
+    const valid = (point) => !obstacles.some((item) => pointInsideRectangle(point, item));
+    const startIndex = `${xs.indexOf(start.x)}:${ys.indexOf(start.y)}`;
+    const endIndex = `${xs.indexOf(end.x)}:${ys.indexOf(end.y)}`;
+    const best = new Map([[`${startIndex}:n`, 0]]);
+    const previous = new Map();
+    const queue = [{ key: `${startIndex}:n`, pointKey: startIndex, direction: "n", cost: 0 }];
+    let finalKey = null;
+    while (queue.length) {
+      queue.sort((left, right) => left.cost - right.cost || left.key.localeCompare(right.key));
+      const current = queue.shift();
+      if (current.cost !== best.get(current.key)) continue;
+      if (current.pointKey === endIndex) {
+        finalKey = current.key;
+        break;
+      }
+      const [xIndex, yIndex] = current.pointKey.split(":").map(Number);
+      const from = pointAt(xIndex, yIndex);
+      const neighbors = [
+        [xIndex - 1, yIndex, "h"],
+        [xIndex + 1, yIndex, "h"],
+        [xIndex, yIndex - 1, "v"],
+        [xIndex, yIndex + 1, "v"],
+      ];
+      for (const [nextX, nextY, direction] of neighbors) {
+        if (nextX < 0 || nextX >= xs.length || nextY < 0 || nextY >= ys.length) continue;
+        const to = pointAt(nextX, nextY);
+        if (!valid(to) || obstacles.some((item) => segmentCrossesRectangle(from, to, item))) continue;
+        const pointKey = `${nextX}:${nextY}`;
+        const key = `${pointKey}:${direction}`;
+        const distance = Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
+        const bend = current.direction !== "n" && current.direction !== direction ? 24 : 0;
+        const cost = current.cost + distance + bend;
+        if (cost >= (best.get(key) ?? Number.POSITIVE_INFINITY)) continue;
+        best.set(key, cost);
+        previous.set(key, current.key);
+        queue.push({ key, pointKey, direction, cost });
+      }
+    }
+    if (!finalKey) return points;
+    const result = [];
+    for (let key = finalKey; key; key = previous.get(key)) {
+      const [xIndex, yIndex] = key.split(":").map(Number);
+      result.push(pointAt(xIndex, yIndex));
+    }
+    return compactPoints(result.reverse());
+  }
+
+  function pointInsideRectangle(point, rectangle) {
+    return point.x > rectangle.x
+      && point.x < rectangle.x + NODE.width
+      && point.y > rectangle.y
+      && point.y < rectangle.y + NODE.height;
+  }
+
+  function segmentCrossesRectangle(from, to, rectangle) {
+    const epsilon = 0.001;
+    if (Math.abs(from.y - to.y) < epsilon) {
+      return from.y > rectangle.y + epsilon
+        && from.y < rectangle.y + NODE.height - epsilon
+        && Math.max(from.x, to.x) > rectangle.x + epsilon
+        && Math.min(from.x, to.x) < rectangle.x + NODE.width - epsilon;
+    }
+    if (Math.abs(from.x - to.x) < epsilon) {
+      return from.x > rectangle.x + epsilon
+        && from.x < rectangle.x + NODE.width - epsilon
+        && Math.max(from.y, to.y) > rectangle.y + epsilon
+        && Math.min(from.y, to.y) < rectangle.y + NODE.height - epsilon;
+    }
+    return true;
   }
 
   function compactPoints(points) {

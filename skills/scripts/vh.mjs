@@ -39,6 +39,9 @@ const CONTEXT_RELATIONS = new Set([
 ]);
 const CURRENT_PROJECT_FORMAT = 1;
 const PROJECT_FORMAT_FILE = "version.yaml";
+const PULL_REQUEST_REF = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/u;
+const COMMIT_REF = /^commit:[0-9a-f]{40}$/u;
+const COMMIT_HASH = /^[0-9a-f]{40}$/u;
 
 class VibeHubError extends Error {
   constructor(code, message, details = null) {
@@ -53,11 +56,19 @@ function parseArgs(argv) {
   let repo = process.cwd();
   let inputPath = null;
   let room = null;
+  const rooms = [];
+  let scope = null;
+  let delivery = null;
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--repo") repo = argv[++index] ?? "";
     else if (value === "--input") inputPath = argv[++index] ?? "";
-    else if (value === "--room") room = argv[++index] ?? "";
+    else if (value === "--room") {
+      room = argv[++index] ?? "";
+      rooms.push(room);
+    }
+    else if (value === "--scope") scope = argv[++index] ?? "";
+    else if (value === "--delivery") delivery = argv[++index] ?? "";
     else if (value.startsWith("--")) {
       throw new VibeHubError("invalid_argument", `Unknown argument: ${value}`);
     } else positionals.push(value);
@@ -66,7 +77,7 @@ function parseArgs(argv) {
   if (positionals.length !== 2) {
     throw new VibeHubError(
       "invalid_argument",
-      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--room <path>]",
+      "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...",
     );
   }
   if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
@@ -78,6 +89,9 @@ function parseArgs(argv) {
     repo: resolve(repo),
     inputPath,
     room,
+    rooms,
+    scope,
+    delivery,
   };
 }
 
@@ -433,6 +447,7 @@ function validateTicket(document, path = "ticket") {
         "ticket_id",
         "maturity",
         "outcome",
+        "deliveries",
         "context",
         "acceptance",
         "constraints",
@@ -450,6 +465,40 @@ function validateTicket(document, path = "ticket") {
   }
   requiredString(errors, document, "ticket_id", path, { id: true });
   requiredString(errors, document, "outcome", path);
+  if (document.deliveries !== undefined) {
+    if (!Array.isArray(document.deliveries)) add(errors, `${path}.deliveries`, "must be an array when present");
+    else {
+      const refs = new Set();
+      document.deliveries.forEach((delivery, index) => {
+        const deliveryPath = `${path}.deliveries[${index}]`;
+        const allowed = new Set(["kind", "ref", "state", "delivered_at", "delivered_commit", "reverted_by"]);
+        if (!strictKeys(errors, delivery, allowed, deliveryPath)) return;
+        requiredString(errors, delivery, "kind", deliveryPath);
+        requiredString(errors, delivery, "ref", deliveryPath);
+        requiredString(errors, delivery, "state", deliveryPath);
+        const delivered = delivery.state === "delivered";
+        if (delivery.kind === "pull_request") {
+          if (!PULL_REQUEST_REF.test(delivery.ref ?? "")) add(errors, `${deliveryPath}.ref`, "must be a canonical GitHub pull request URL");
+          if (!["proposed", "delivered", "abandoned"].includes(delivery.state)) add(errors, `${deliveryPath}.state`, "must equal proposed, delivered, or abandoned");
+        } else if (delivery.kind === "cherry_pick") {
+          if (!COMMIT_REF.test(delivery.ref ?? "")) add(errors, `${deliveryPath}.ref`, "must equal commit:<40-hex>");
+          if (!delivered) add(errors, `${deliveryPath}.state`, "cherry_pick must be delivered");
+        } else add(errors, `${deliveryPath}.kind`, "must equal pull_request or cherry_pick");
+        if (delivered) {
+          requiredString(errors, delivery, "delivered_at", deliveryPath);
+          if (delivery.delivered_at && Number.isNaN(Date.parse(delivery.delivered_at))) add(errors, `${deliveryPath}.delivered_at`, "must be an ISO-compatible date-time");
+          if (!COMMIT_HASH.test(delivery.delivered_commit ?? "")) add(errors, `${deliveryPath}.delivered_commit`, "must be 40 lowercase hex characters");
+          if (delivery.reverted_by !== undefined && !COMMIT_REF.test(delivery.reverted_by)) add(errors, `${deliveryPath}.reverted_by`, "must equal commit:<40-hex>");
+        } else {
+          for (const field of ["delivered_at", "delivered_commit", "reverted_by"]) {
+            if (delivery[field] !== undefined) add(errors, `${deliveryPath}.${field}`, "is allowed only for delivered entries");
+          }
+        }
+        if (refs.has(delivery.ref)) add(errors, `${deliveryPath}.ref`, "must be unique per Ticket");
+        refs.add(delivery.ref);
+      });
+    }
+  }
   requiredString(errors, document, "context", path);
   if (!Array.isArray(document.acceptance) || document.acceptance.length === 0) {
     add(errors, `${path}.acceptance`, "must contain at least one criterion");
@@ -890,7 +939,131 @@ export function ticketStatus(repository, ticket) {
   return ticket.maturity === "draft" ? "REFINE" : "READY";
 }
 
-function ticketOperation(operation, repo, input) {
+export function ticketArchived(repository, ticket) {
+  if (!ticket) return false;
+  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
+  return outcome?.status === "successful"
+    && (ticket.deliveries ?? []).some((delivery) => delivery.state === "delivered");
+}
+
+function ticketRoomPaths(ticket) {
+  return ticket.context_refs.flatMap(({ ref }) => {
+    const match = ref.match(/^\.vibehub\/rooms\/(.+)\/[^/]+\.yaml$/u);
+    return match ? [match[1]] : [];
+  });
+}
+
+function normalizeTicketQuery(repository, options = {}) {
+  const scope = options.scope ?? "current";
+  if (!new Set(["current", "all"]).has(scope)) {
+    throw new VibeHubError("invalid_argument", "--scope must equal current or all");
+  }
+  const delivery = options.delivery ?? null;
+  if (delivery !== null && !PULL_REQUEST_REF.test(delivery) && !COMMIT_REF.test(delivery)) {
+    throw new VibeHubError("invalid_argument", "--delivery must be a canonical GitHub pull request URL or commit:<40-hex>");
+  }
+  const rooms = [...new Set(options.rooms ?? [])].sort();
+  for (const room of rooms) {
+    if (!repository.rooms.documents.has(room)) {
+      throw new VibeHubError("invalid_argument", `Unknown Room filter: ${room}`);
+    }
+  }
+  const historyIds = [...new Set(options.historyIds ?? [])].sort();
+  for (const id of historyIds) {
+    const ticket = repository.tickets.documents.get(id)?.document;
+    if (!ticket || !ticketArchived(repository, ticket)) {
+      throw new VibeHubError("invalid_argument", `Unknown or non-archived history Ticket: ${id}`);
+    }
+  }
+  return { scope, delivery, rooms, historyIds };
+}
+
+export function projectTicketQuery(repository, options = {}) {
+  const filters = normalizeTicketQuery(repository, options);
+  const all = documents(repository.tickets.documents)
+    .sort((left, right) => left.ticket_id.localeCompare(right.ticket_id));
+  const matchesFilters = (ticket) => {
+    if (filters.delivery !== null
+      && !(ticket.deliveries ?? []).some((item) => item.ref === filters.delivery)) return false;
+    if (filters.rooms.length > 0) {
+      const ticketRooms = ticketRoomPaths(ticket);
+      if (!ticketRooms.some((path) => filters.rooms.some((room) =>
+        path === room || path.startsWith(`${room}/`)))) return false;
+    }
+    return true;
+  };
+  const base = all.filter((ticket) => matchesFilters(ticket)
+    && (filters.scope === "all" || !ticketArchived(repository, ticket)));
+  const visibleIds = new Set(base.map((ticket) => ticket.ticket_id));
+  const baseIds = new Set(visibleIds);
+  const relationDocuments = all.flatMap((ticket) => ticket.relations.map((relation) => ({
+    prerequisite_ticket_id: relation.target_ticket_id,
+    dependent_ticket_id: ticket.ticket_id,
+    rationale: relation.rationale ?? "Direct execution dependency.",
+  }))).sort((left, right) =>
+    left.prerequisite_ticket_id.localeCompare(right.prerequisite_ticket_id)
+    || left.dependent_ticket_id.localeCompare(right.dependent_ticket_id));
+  if (filters.scope === "current") {
+    for (const relation of relationDocuments) {
+      const leftVisible = baseIds.has(relation.prerequisite_ticket_id);
+      const rightVisible = baseIds.has(relation.dependent_ticket_id);
+      const otherId = leftVisible && !rightVisible
+        ? relation.dependent_ticket_id
+        : rightVisible && !leftVisible
+          ? relation.prerequisite_ticket_id
+          : null;
+      const other = otherId ? repository.tickets.documents.get(otherId)?.document : null;
+      if (other && ticketArchived(repository, other)) visibleIds.add(otherId);
+    }
+    for (const id of filters.historyIds) visibleIds.add(id);
+  }
+  const tickets = all.filter((ticket) => visibleIds.has(ticket.ticket_id));
+  const relations = relationDocuments.filter((relation) =>
+    visibleIds.has(relation.prerequisite_ticket_id)
+    && visibleIds.has(relation.dependent_ticket_id));
+  const stubs = [];
+  if (filters.scope === "current") {
+    for (const ticket of tickets) {
+      for (const direction of ["upstream", "downstream"]) {
+        const nextIds = relationDocuments.flatMap((relation) => {
+          if (direction === "upstream" && relation.dependent_ticket_id === ticket.ticket_id) return [relation.prerequisite_ticket_id];
+          if (direction === "downstream" && relation.prerequisite_ticket_id === ticket.ticket_id) return [relation.dependent_ticket_id];
+          return [];
+        }).filter((id) => !visibleIds.has(id)
+          && ticketArchived(repository, repository.tickets.documents.get(id)?.document));
+        if (!nextIds.length) continue;
+        const hidden = new Set(nextIds);
+        const queue = [...nextIds];
+        while (queue.length) {
+          const id = queue.shift();
+          for (const relation of relationDocuments) {
+            const next = direction === "upstream" && relation.dependent_ticket_id === id
+              ? relation.prerequisite_ticket_id
+              : direction === "downstream" && relation.prerequisite_ticket_id === id
+                ? relation.dependent_ticket_id
+                : null;
+            if (!next || visibleIds.has(next) || hidden.has(next)) continue;
+            const candidate = repository.tickets.documents.get(next)?.document;
+            if (candidate && ticketArchived(repository, candidate)) {
+              hidden.add(next);
+              queue.push(next);
+            }
+          }
+        }
+        stubs.push({
+          stub_ref: `${ticket.ticket_id}:${direction}`,
+          anchor_ticket_id: ticket.ticket_id,
+          direction,
+          hidden_ticket_count: hidden.size,
+          next_ticket_ids: [...new Set(nextIds)].sort(),
+        });
+      }
+    }
+  }
+  return { filters, tickets, relations, stubs };
+}
+
+function ticketOperation(operation, repo, input, options = {}) {
   if (operation === "apply") {
     assertCurrentProjectFormat(repo);
     if (!Array.isArray(input.tickets) || input.tickets.length === 0) {
@@ -958,9 +1131,13 @@ function ticketOperation(operation, repo, input) {
     };
   }
   if (operation === "graph" || operation === "frontier") {
-    const items = documents(repository.tickets.documents).map((ticket) => ({
+    const query = operation === "graph"
+      ? projectTicketQuery(repository, options)
+      : { tickets: documents(repository.tickets.documents), relations: [], stubs: [], filters: null };
+    const items = query.tickets.map((ticket) => ({
       ticket,
       status: ticketStatus(repository, ticket),
+      archived: ticketArchived(repository, ticket),
       blocking_ticket_ids: ticket.relations
         .map((relation) => relation.target_ticket_id)
         .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful"),
@@ -970,7 +1147,13 @@ function ticketOperation(operation, repo, input) {
       const ready = items.filter((item) => item.status === "READY");
       return { ready, count: ready.length };
     }
-    return { tickets: items, count: items.length };
+    return {
+      tickets: items.sort((left, right) => left.ticket.ticket_id.localeCompare(right.ticket.ticket_id)),
+      relations: query.relations,
+      stubs: query.stubs,
+      filters: query.filters,
+      count: items.length,
+    };
   }
   throw new VibeHubError("unsupported_operation", `Unsupported ticket operation: ${operation}`);
 }
@@ -1122,7 +1305,11 @@ function run() {
   let data;
   if (args.domain === "context") data = contextOperation(args.operation, args.repo, input, { room: args.room });
   else if (args.domain === "room") data = roomOperation(args.operation, args.repo, input, { room: args.room });
-  else if (args.domain === "ticket") data = ticketOperation(args.operation, args.repo, input);
+  else if (args.domain === "ticket") data = ticketOperation(args.operation, args.repo, input, {
+    scope: args.scope,
+    delivery: args.delivery,
+    rooms: args.rooms,
+  });
   else if (args.domain === "project") data = projectOperation(args.operation, args.repo, input);
   else throw new VibeHubError("unsupported_domain", `Unsupported domain: ${args.domain}`);
   process.stdout.write(`${JSON.stringify({ ok: true, data })}\n`);

@@ -39,6 +39,13 @@ finishes, what becomes executable next?**
   in the URL while the bearer fragment remains intact, so the same live host
   can reopen that exact focus; it is not a remote share, durable permalink, or
   repository switch.
+- The default graph is current work, not the repository's entire lifetime.
+  Successfully delivered Tickets remain canonical history: the nearest
+  archived causal boundary stays visible with an explicit `ARCHIVED` label,
+  deeper history appears as count-labelled one-hop expansion stubs, and `All`
+  restores the complete graph. Scope, exact delivery, selected Room subtrees,
+  and explicit history expansion live in the focused URL and use the same
+  query semantics as CLI JSON.
 
 This translates the approved `quiet intelligence`, v8 spatial-workbench, and
 causal Ticket review decisions preserved in Git history at `9dee0f0`.
