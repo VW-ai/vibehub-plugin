@@ -36,10 +36,34 @@
       {
         "blob": "b8d2d86c80575bb3e8e90c473b50b2a8aecbd92a",
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
+      },
+      {
+        "blob": "c1c39065208e89614405315f77145ef67be85d21",
+        "path": "docs/proposals/codex-like-workbench/README.md"
+      },
+      {
+        "blob": "22f3a71f5a5395bd399a87c86abde33ef7945ac5",
+        "path": "docs/proposals/codex-like-workbench/index.html"
+      },
+      {
+        "blob": "cf238f292bcb75df65274f8e3abedb7c67225464",
+        "path": "docs/proposals/codex-like-workbench/proposal.css"
+      },
+      {
+        "blob": "96dcd90ae17bb094282c41d6ecbedc1394984439",
+        "path": "docs/proposals/codex-like-workbench/proposal.js"
+      },
+      {
+        "blob": "424e1e40d56cfd015af22feb9b4cb58f4ade4f55",
+        "path": "docs/proposals/codex-like-workbench/state-matrix.json"
+      },
+      {
+        "blob": "f57b97b8386ac85829582f44db5243d0d5601e48",
+        "path": "docs/proposals/codex-like-workbench/tokens.json"
       }
     ],
-    "checked_at": "2026-08-13T00:09:46.184Z",
-    "last_aligned_commit": "f59a1b25882f90a8195a82cb4aafc89d36113785"
+    "checked_at": "2026-08-13T00:52:03.536Z",
+    "last_aligned_commit": "f5daedb8c7223ce341ffa638878902e975cd0632"
   },
   "anchors": [
     "CHANGELOG.md",
