@@ -490,7 +490,15 @@
       selected = snapshot.selected;
     }
     await refresh("Room filter cleared", { preserveLayout: true });
-    if (snapshot) applyTransform();
+    if (snapshot) {
+      await new Promise((resolve) => requestAnimationFrame(
+        () => requestAnimationFrame(resolve),
+      ));
+      panX = snapshot.panX;
+      panY = snapshot.panY;
+      scale = snapshot.scale;
+      applyTransform();
+    }
     roomFilterSnapshot = null;
   }
 

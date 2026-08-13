@@ -47,6 +47,8 @@ test("Room filter reuses URL query and preserves the causal layout snapshot", ()
   assert.match(script, /if \(!snapshot\) url\.searchParams\.delete\("room"\)/u);
   assert.match(script, /roomFilterStatus\.addEventListener\("click", \(event\) => event\.stopPropagation\(\)\)/u);
   assert.match(script, /requestAnimationFrame\(preserveLayout \? applyTransform : frameGraph\)/u);
+  assert.match(script, /requestAnimationFrame\(\s*\(\) => requestAnimationFrame\(resolve\)/u);
+  assert.match(script, /panX = snapshot\.panX;\s*panY = snapshot\.panY;\s*scale = snapshot\.scale;\s*applyTransform\(\);/u);
   assert.match(script, /await refresh\("Room filter cleared", \{ preserveLayout: true \}\)/u);
   assert.doesNotMatch(script, /localStorage|sessionStorage|\/api\/(?:room|write)/u);
 });
