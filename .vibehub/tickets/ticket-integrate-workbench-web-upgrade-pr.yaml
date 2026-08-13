@@ -17,17 +17,21 @@
       "criterion": "Project and every Ticket validate, the full test suite and installed Plugin artifact pass from a clean checkout, all entered Rooms are FRESH, and the final diff adds no Desktop application, repository switcher, launcher runtime, session watcher, database, daemon, persistent browser store, hidden cache, or writable Workbench route."
     },
     {
+      "acceptance_id": "v080-release-candidate-identity-is-in-pr",
+      "criterion": "package.json, the Codex and Claude plugin manifests, the Claude marketplace manifest, release verification tests, and the top Changelog entry all agree on feature release 0.8.0 dated 2026-08-13. The Changelog names the concentrated Web Workbench improvements, the optional deliveries compatibility model, preserved PR #15 authority/REFINE semantics, and the intentionally absent Desktop runtime; clean verification and artifact build pass without changing the GitHub-only release mechanism or data format version."
+    },
+    {
       "acceptance_id": "pr-handoff-is-reviewable",
-      "criterion": "The final PR description names the Web-only scope, constituent Ticket Outcomes, user-visible changes, archive/query schema compatibility implications, browser evidence, test results, known limitations, and release recommendation; the branch is clean and contains no unrelated work before PR creation or update. Its own proposed delivery entries remain current during review and may change to delivered—and therefore become archived—only in a later Git change after the external merge is authoritative and its exact merge commit and time are known."
+      "criterion": "The final PR description names the Web-only scope, constituent Ticket Outcomes, user-visible changes, archive/query schema compatibility implications, browser evidence, test results, known limitations, and v0.8.0 release recommendation; the branch is clean and contains no unrelated work before PR creation or update. Its own proposed delivery entries remain current during review and may change to delivered—and therefore become archived—only in a later Git change after the external merge is authoritative and its exact merge commit and time are known."
     }
   ],
   "constraints": [
     "This is one Web interaction, query, and aesthetic upgrade PR; do not split its planned constituent Tickets across separate feature PRs unless the owner changes the delivery decision.",
     "One PR does not collapse Ticket lifecycle boundaries: every constituent Ticket still requires its own Evidence, independent closeout, Outcome, and reviewable commit history.",
     "Exclude the rejected macOS Desktop application and its repository switching, launcher, session-watch, deep-link-to-app, and packaging surfaces; focused links remain honest live local Web URLs.",
-    "Do not publish a release or merge the PR inside this Ticket unless a later explicit owner instruction authorizes those external actions."
+    "This Ticket prepares the release candidate and PR; only the dependent publication Ticket may merge, tag, publish, and convert proposed delivery membership after those external facts are authoritative."
   ],
-  "context": "The owner has chosen a single concentrated delivery boundary for the next Web Workbench generation. The branch may contain a sequence of independently executed and closed Tickets, including archive/query, but they should be reviewed together because their interaction, graph geometry, visual language, Rooms navigation, URL state, and accessibility must cohere as one product surface. This terminal Ticket owns integration conflict repair, combined regression, remote-main alignment, and PR readiness; it does not replace the constituent Tickets and does not authorize Desktop work, merge, or release publication. The Rooms implementation directly depends on and consumes the visual implementation, so this integration Ticket depends only on Rooms as the last constituent implementation boundary rather than repeating a transitive visual dependency.",
+  "context": "The owner has chosen a single concentrated delivery boundary for the next Web Workbench generation and has now explicitly authorized shipping it as a new feature release. The branch may contain a sequence of independently executed and closed Tickets, including archive/query, but they should be reviewed together because their interaction, graph geometry, visual language, Rooms navigation, URL state, and accessibility must cohere as one product surface. This terminal Ticket owns integration conflict repair, combined regression, remote-main alignment, v0.8.0 release identity, and PR readiness; it does not replace the constituent Tickets and does not itself claim external merge or publication. The Rooms implementation directly depends on and consumes the visual implementation, so this integration Ticket depends only on Rooms as the last constituent implementation boundary rather than repeating a transitive visual dependency.",
   "context_refs": [
     {
       "purpose": "Binding Web-only Workbench interaction and source-truth design boundary.",
@@ -44,14 +48,19 @@
     {
       "purpose": "Canonical shared mechanical projection boundary for CLI/JSON and Web consumers.",
       "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Authoritative merged-main tagging and GitHub Release procedure for v0.8.0.",
+      "ref": "docs/RELEASE.md"
     }
   ],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The complete Web Workbench interaction, archive/query, Rooms, graph-layout, and Codex-like visual upgrade is reconciled on one clean branch and ready for one focused pull request.",
+  "outcome": "The complete Web Workbench interaction, archive/query, Rooms, graph-layout, and Codex-like visual upgrade is reconciled on one clean v0.8.0 release-candidate branch and ready for one focused pull request.",
   "provenance_refs": [
     "conversation:2026-08-12-single-web-workbench-upgrade-pr",
-    "conversation:2026-08-12-single-web-workbench-upgrade-pr-includes-archive-query"
+    "conversation:2026-08-12-single-web-workbench-upgrade-pr-includes-archive-query",
+    "conversation:2026-08-13-owner-authorizes-new-release"
   ],
   "relations": [
     {
