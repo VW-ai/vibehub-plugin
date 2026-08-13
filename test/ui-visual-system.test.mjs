@@ -39,6 +39,10 @@ test("production canvas counts and Overview are compact two-axis legends", () =>
   assert.match(html, /aria-label="Ticket state legend"/u);
   assert.match(html, /aria-label="Human attention legend"/u);
   assert.match(script, /renderGraphSummary/u);
+  assert.match(
+    script,
+    /add\(counts\.DONE, "DONE", "check", "state-done"\);[\s\S]*add\(counts\.READY/u,
+  );
   assert.match(script, /"NEEDS YOU"/u);
   for (const banned of [
     "Execution flow",

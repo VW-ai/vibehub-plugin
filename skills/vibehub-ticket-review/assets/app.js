@@ -364,12 +364,12 @@
       item.append(htmlIcon(icon), value, ` ${label}`);
       items.push(item);
     };
+    add(counts.DONE, "DONE", "check", "state-done");
     add(counts.READY, "READY", "play", "state-ready");
     add(counts.REFINE, "REFINE", "sliders", "state-refine");
     add(counts.BLOCKED, "BLOCKED", "lock", "state-blocked");
     add(counts.DEVIATED, "DEVIATED", "alert", "state-deviated");
     add(overview.humanPending.length, "NEEDS YOU", "pending", "attention-pending");
-    if (!items.length) add(counts.DONE, "DONE", "check", "state-done");
     elements.graphSummary.replaceChildren(...items);
   }
 
