@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeHub · Codex-like Workbench proposal</title>
+  <link rel="stylesheet" href="proposal.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="identity">
+        <div class="mark" aria-hidden="true">VH</div>
+        <div class="project-lockup">
+          <span class="product">VibeHub</span>
+          <strong>vibehub-plugin</strong>
+          <span class="branch">codex/workbench-ui-next</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="source-button" type="button" aria-label="Exact Git source">
+          <span class="source-dot"></span><span class="source-label">Exact source</span>
+          <span class="mono">5e54b3a</span>
+        </button>
+        <button class="icon-button" id="overviewButton" type="button" aria-label="Open overview" aria-expanded="false">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4.5h14M3 10h9M3 15.5h6"/></svg>
+        </button>
+        <button class="copy-button" type="button" id="copyButton">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 6.5 5.7 8.3a3 3 0 0 0 4.2 4.2l1.8-1.8M12.5 13.5l1.8-1.8a3 3 0 0 0-4.2-4.2L8.3 9.3"/></svg>
+          <span>Copy focus</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="canvas" aria-label="Ticket causal graph proposal">
+        <div class="canvas-heading">
+          <div>
+            <span class="eyebrow">Execution flow</span>
+            <h1>Proven left, executable right</h1>
+            <p><strong>2 ready</strong> · 1 refine · 1 needs you</p>
+          </div>
+          <div class="graph-tools" aria-label="Graph controls">
+            <div class="segmented" aria-label="History scope">
+              <button type="button" class="active" aria-pressed="true">Now</button>
+              <button type="button" aria-pressed="false">All</button>
+            </div>
+            <div class="segmented direction" aria-label="Graph direction">
+              <button type="button" class="active" aria-pressed="true" data-direction="ltr" aria-label="Left to right">→</button>
+              <button type="button" aria-pressed="false" data-direction="ttb" aria-label="Top to bottom">↓</button>
+            </div>
+            <button class="icon-button" type="button" aria-label="Fit graph">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 3.5h-3v3M13.5 3.5h3v3M6.5 16.5h-3v-3M13.5 16.5h3v-3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="graph-viewport">
+          <div class="graph-world" id="graphWorld">
+            <svg class="relations" viewBox="0 0 1060 650" aria-label="Direct Ticket relations">
+              <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8z"/></marker></defs>
+              <path class="edge archived-edge" d="M195 168H258" data-ltr="M195 168H258" data-ttb="M478 180V230"/>
+              <path class="edge selected-edge" d="M470 168H545" data-ltr="M470 168H545" data-ttb="M478 330V360H258V390"/>
+              <path class="edge selected-edge" d="M760 168H820V308H850" data-ltr="M760 168H820V308H850" data-ttb="M258 490V520H168V550"/>
+              <path class="edge" d="M470 168H510V430H545" data-ltr="M470 168H510V430H545" data-ttb="M478 330V550"/>
+              <path class="edge" d="M760 430H820V308H850" data-ltr="M760 430H820V308H850" data-ttb="M698 490V520H478V550"/>
+              <path class="edge" d="M760 430H820V528H850" data-ltr="M760 430H820V528H850" data-ttb="M576 600H690"/>
+              <circle class="relation-handle selected" cx="507" cy="168" r="7" aria-label="Selected relation" data-ltr-x="507" data-ltr-y="168" data-ttb-x="478" data-ttb-y="345"/>
+            </svg>
+
+            <button class="history-stub" type="button" aria-label="3 hidden archived Tickets upstream">
+              <span>3 archived</span><span aria-hidden="true">←</span>
+            </button>
+
+            <button class="ticket archived-ticket" type="button" data-ticket="archive" style="--x:0px;--y:118px">
+              <span class="ticket-top"><span class="ticket-id">ticket-publish-v070-ui-release</span><span class="state"><i>✓</i> ARCHIVED</span></span>
+              <strong>Publish the retained Web Workbench release.</strong>
+              <span class="ticket-meta">DONE · 0 in · 1 out</span>
+            </button>
+
+            <button class="ticket state-done" type="button" data-ticket="dense" style="--x:275px;--y:118px">
+              <span class="ticket-top"><span class="ticket-id">ticket-workbench-dense-graph-layout</span><span class="state"><i>✓</i> DONE</span></span>
+              <strong>Make dense causal graphs remain legible.</strong>
+              <span class="ticket-meta">1 in · 2 out</span>
+            </button>
+
+            <button class="ticket state-ready selected" type="button" data-ticket="visual" style="--x:565px;--y:118px" aria-current="true">
+              <span class="ticket-top"><span class="ticket-id">ticket-propose-codex-like…</span><span class="state"><i>▶</i> READY</span></span>
+              <strong>Define a quieter Codex-like visual system.</strong>
+              <span class="ticket-meta">1 in · 2 out</span>
+            </button>
+
+            <button class="ticket state-blocked attention-upcoming" type="button" data-ticket="decision" style="--x:870px;--y:258px">
+              <span class="attention"><i>◌</i> UPCOMING</span>
+              <span class="ticket-top"><span class="ticket-id">ticket-decide-codex-like…</span><span class="state"><i>▣</i> BLOCKED</span></span>
+              <strong>Owner selects the production direction.</strong>
+              <span class="ticket-meta">1 in · 1 out</span>
+            </button>
+
+            <button class="ticket state-ready" type="button" data-ticket="rooms" style="--x:275px;--y:380px">
+              <span class="ticket-top"><span class="ticket-id">ticket-prepare-rooms…</span><span class="state"><i>▶</i> READY</span></span>
+              <strong>Make Rooms visible without reclustering Tickets.</strong>
+              <span class="ticket-meta">2 in · 1 out</span>
+            </button>
+
+            <button class="ticket state-refine attention-recorded" type="button" data-ticket="apply" style="--x:565px;--y:380px">
+              <span class="attention"><i>◆</i> DECISION NOTED</span>
+              <span class="ticket-top"><span class="ticket-id">ticket-apply-codex-like…</span><span class="state"><i>≡</i> REFINE</span></span>
+              <strong>Translate the chosen tokens into production.</strong>
+              <span class="ticket-meta">2 in · 1 out</span>
+            </button>
+
+            <button class="ticket state-deviated" type="button" data-ticket="integration" style="--x:870px;--y:478px">
+              <span class="ticket-top"><span class="ticket-id">ticket-integrate-workbench…</span><span class="state"><i>!</i> DEVIATED</span></span>
+              <strong>Prove the concentrated Web upgrade PR.</strong>
+              <span class="ticket-meta">2 in · 0 out</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="canvas-footer"><span>Drag to pan · scroll to zoom</span><span class="zoom-readout">64%</span></div>
+      </section>
+
+      <aside class="overview" id="overviewPanel" aria-label="Compact overview" hidden>
+        <div class="overview-title"><strong>Overview</strong><span>Exact source</span></div>
+        <div class="metrics">
+          <div><strong>2</strong><span>Ready</span></div><div><strong>1</strong><span>Refine</span></div><div><strong>1</strong><span>Needs you</span></div>
+        </div>
+        <div class="attention-row"><span class="attention-icon">☝</span><div><strong>Owner decision follows this proposal</strong><span>Not actionable until independent closeout.</span></div></div>
+        <div class="presence-empty"><span class="empty-icon">○</span><div><strong>No Active Run proven</strong><span>READY is not reported as implementing.</span></div></div>
+      </aside>
+
+      <aside class="inspector" aria-label="Ticket Inspector">
+        <div class="inspector-grabber" aria-hidden="true"></div>
+        <div class="inspector-header">
+          <div><span class="eyebrow">Ticket · READY</span><h2>Define a quieter Codex-like visual system.</h2></div>
+          <button class="icon-button close-inspector" type="button" aria-label="Close Inspector">×</button>
+        </div>
+        <div class="inspector-tabs" role="tablist">
+          <button type="button" role="tab" aria-selected="true" data-tab="execution">Execution</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="contract">Contract</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="log">Log</button>
+        </div>
+        <div class="inspector-body" id="inspectorBody">
+          <section class="panel-section">
+            <span class="section-label">Next action</span>
+            <div class="action-callout"><span class="play">▶</span><div><strong>Execute proposal Ticket</strong><p>Agent-owned · production assets remain unchanged.</p></div></div>
+          </section>
+          <section class="panel-section">
+            <div class="section-heading"><span class="section-label">Causal context</span><span>1 upstream · 2 downstream</span></div>
+            <div class="relation-list"><span class="relation-chip done">✓ Dense layout</span><span class="relation-arrow">→</span><span class="relation-chip ready">Visual proposal</span><span class="relation-arrow">→</span><span class="relation-chip blocked">Owner choice</span></div>
+          </section>
+          <section class="panel-section">
+            <span class="section-label">Bound context</span>
+            <button class="context-row" type="button"><span class="context-icon">◇</span><span><strong>Quiet intelligence standard</strong><small>workbench · constraint</small></span><span>›</span></button>
+            <button class="context-row" type="button"><span class="context-icon">◇</span><span><strong>Person-centered attention</strong><small>product · decision</small></span><span>›</span></button>
+          </section>
+          <section class="panel-section compact-proof">
+            <span class="section-label">Proof</span><span class="proof-value">0 / 5 acceptance criteria evidenced</span>
+          </section>
+        </div>
+        <div class="inspector-footer"><span class="mono">5e54b3a · clean</span><button type="button">Open exact source</button></div>
+      </aside>
+    </main>
+    <div class="toast" id="toast" role="status">Focused local link copied</div>
+  </div>
+  <script src="proposal.js"></script>
+</body>
+</html>
