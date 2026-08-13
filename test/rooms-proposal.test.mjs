@@ -46,6 +46,9 @@ test("Rooms proposal keeps quiet desktop and accessible narrow surfaces", () => 
   assert.match(css, /\.rooms-panel\[hidden\]\{display:none\}/u);
   assert.match(css, /min-width:44px;height:44px/u);
   assert.match(css, /\.filter-status button\{min-width:44px;min-height:44px\}/u);
+  assert.match(css, /--ui:ui-monospace/u);
+  assert.match(css, /\.show-tickets\{height:44px/u);
+  assert.match(html, /#icon-filter/u);
   assert.match(script, /roomsButton\.setAttribute\("aria-expanded", String\(open\)\)/u);
   assert.equal(html.includes("Knowledge spaces"), false);
   assert.equal(html.includes("Selected Room"), false);

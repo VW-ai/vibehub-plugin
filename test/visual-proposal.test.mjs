@@ -32,6 +32,9 @@ test("Codex-like proposal defines one complete dependency-free token system", ()
   );
   assert.deepEqual(Object.keys(tokens.semantic), ["done", "ready", "blocked", "refine", "deviated", "archived"]);
   assert.deepEqual(Object.keys(tokens.attention), ["upcoming", "pending", "recorded", "complete"]);
+  assert.match(tokens.typography.family_ui, /^ui-monospace/u);
+  assert.equal(tokens.typography.family_ui, tokens.typography.family_mono);
+  assert.match(css, /--ui:\s*ui-monospace/u);
   assert.equal(tokens.interaction.target_narrow, 44);
   assert.equal(tokens.interaction.reduced_motion.includes("disabled"), true);
   assert.equal(html.includes("http://") || html.includes("https://"), false);

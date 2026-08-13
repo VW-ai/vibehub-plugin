@@ -21,7 +21,7 @@
   --deviated-bg: #fff0ee;
   --deviated: #a7433b;
   --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-  --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ui: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
 }
 
 * { box-sizing: border-box; }
