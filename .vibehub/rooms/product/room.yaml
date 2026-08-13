@@ -38,19 +38,19 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       },
       {
-        "blob": "c1c39065208e89614405315f77145ef67be85d21",
+        "blob": "53cd4880e023a69922296a5d4a0c2573d0adf25b",
         "path": "docs/proposals/codex-like-workbench/README.md"
       },
       {
-        "blob": "22f3a71f5a5395bd399a87c86abde33ef7945ac5",
+        "blob": "e5e7aa243c0e9ef091b3d94dc4eb1ff31507fd95",
         "path": "docs/proposals/codex-like-workbench/index.html"
       },
       {
-        "blob": "cf238f292bcb75df65274f8e3abedb7c67225464",
+        "blob": "9f2180712f261f56fabc262dfe44e118e3262689",
         "path": "docs/proposals/codex-like-workbench/proposal.css"
       },
       {
-        "blob": "96dcd90ae17bb094282c41d6ecbedc1394984439",
+        "blob": "a58e04ef0059118685c75cb8e2c76bd3134dbe85",
         "path": "docs/proposals/codex-like-workbench/proposal.js"
       },
       {
@@ -62,7 +62,7 @@
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
-        "blob": "fd046ad81a868f3328eeb6278de777427e43c6df",
+        "blob": "fc042fd824fe4dc0681f574131aacb4683f34b90",
         "path": "docs/proposals/rooms-workbench/README.md"
       },
       {
@@ -70,7 +70,7 @@
         "path": "docs/proposals/rooms-workbench/contract.json"
       },
       {
-        "blob": "c363b6161907fd85dad9880458d5b5c3ef2edc49",
+        "blob": "49b7d143c736bcae74cebd1d756e21908f0ca45a",
         "path": "docs/proposals/rooms-workbench/index.html"
       },
       {
@@ -82,8 +82,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-13T01:16:07.577Z",
-    "last_aligned_commit": "d4e8773a6ce9cf9d31abcc51d8f2dcc45b4b0c2d"
+    "checked_at": "2026-08-13T03:30:22.805Z",
+    "last_aligned_commit": "c5492028d15bfaf2ed04417b2a030733aa0625ea"
   },
   "anchors": [
     "CHANGELOG.md",
