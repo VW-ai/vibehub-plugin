@@ -48,6 +48,13 @@
     RECORDED: "recorded",
     COMPLETE: "complete",
   });
+  const ROOM_STATE_PRESENTATION = Object.freeze({
+    FRESH: { label: "FRESH", icon: "check" },
+    DRIFTED: { label: "DRIFTED", icon: "drift" },
+    WARNING: { label: "OLD CHECKOUT", icon: "history" },
+    STALE: { label: "STALE", icon: "alert-circle" },
+    COLD_START: { label: "ROOMS NOT INITIALIZED", icon: "snowflake" },
+  });
   const focusQuery = new URLSearchParams(location.search);
   const requestedTicketId = focusQuery.get("ticket");
   const requestedViewId = TICKET_VIEW_IDS.get(focusQuery.get("view"))
@@ -372,6 +379,7 @@
       button.type = "button";
       button.setAttribute("role", "treeitem");
       button.setAttribute("aria-selected", String(selectedRoom === room.room));
+      button.setAttribute("aria-level", String(room.room.split("/").length));
       button.dataset.room = room.room;
       button.style.setProperty("--room-depth", String(room.room.split("/").length - 1));
       button.append(htmlIcon("room"));
@@ -382,10 +390,11 @@
       const small = document.createElement("small");
       small.textContent = `${room.contexts.length} Context · ${room.consumingTickets.length} Tickets`;
       label.append(strong, small);
+      const presentation = roomStatePresentation(room.drift.state);
       const drift = document.createElement("span");
       drift.className = `room-drift state-${room.drift.state.toLowerCase()}`;
-      drift.append(htmlIcon(room.drift.state === "FRESH" ? "check" : "drift"));
-      if (room.drift.state !== "FRESH") drift.append(room.drift.state);
+      drift.append(htmlIcon(presentation.icon));
+      if (room.drift.state !== "FRESH") drift.append(presentation.label);
       else drift.setAttribute("aria-label", "Fresh");
       button.append(label, drift);
       button.addEventListener("click", () => selectRoom(
@@ -396,6 +405,14 @@
     const active = rooms.find((room) => room.room === selectedRoom);
     elements.roomDetail.hidden = !active;
     elements.roomEmpty.hidden = Boolean(active);
+    if (!active) {
+      const emptyLabel = elements.roomEmpty.querySelector("strong");
+      const coldStart = state.rooms?.coldStart === true;
+      const presentation = roomStatePresentation("COLD_START");
+      emptyLabel.textContent = coldStart ? presentation.label : "Select a Room";
+      const use = elements.roomEmpty.querySelector("use");
+      use.setAttribute("href", `#icon-${coldStart ? presentation.icon : "room"}`);
+    }
     if (active) renderRoomDetail(active);
     const filteredRooms = graphQuery().rooms;
     elements.roomFilterStatus.hidden = filteredRooms.length === 0;
@@ -409,14 +426,15 @@
   }
 
   function renderRoomDetail(room) {
+    const presentation = roomStatePresentation(room.drift.state);
     elements.roomTitle.textContent = room.roomId;
     elements.roomBoundary.textContent = room.boundary;
     elements.roomContextCount.textContent = String(room.contexts.length);
     elements.roomTicketCount.textContent = String(room.consumingTickets.length);
     elements.roomState.className = `room-state state-${room.drift.state.toLowerCase()}`;
     elements.roomState.replaceChildren(
-      htmlIcon(room.drift.state === "FRESH" ? "check" : "drift"),
-      document.createTextNode(room.drift.state),
+      htmlIcon(presentation.icon),
+      document.createTextNode(presentation.label),
     );
     for (const tab of document.querySelectorAll("[data-room-view]")) {
       tab.setAttribute("aria-selected", String(tab.dataset.roomView === roomView));
@@ -442,15 +460,21 @@
       : "Show related Tickets";
   }
 
+  function roomStatePresentation(stateLabel) {
+    return ROOM_STATE_PRESENTATION[stateLabel]
+      ?? { label: String(stateLabel || "COLD_START"), icon: "alert-circle" };
+  }
+
   function roomDriftRows(room) {
     const drift = room.drift;
+    const presentation = roomStatePresentation(drift.state);
     if (drift.state === "FRESH") return [["FRESH", "Aligned with the current Git snapshot"]];
     const rows = [];
-    if (drift.reason) rows.push([drift.state, drift.reason]);
+    if (drift.reason) rows.push([presentation.label, drift.reason]);
     for (const key of ["changed", "added", "deleted"]) {
       if (drift[key]?.length) rows.push([`${drift[key].length} ${key}`, drift[key].join(", ")]);
     }
-    return rows.length ? rows : [[drift.state, "Room alignment needs attention"]];
+    return rows.length ? rows : [[presentation.label, "Room alignment needs attention"]];
   }
 
   function toggleRooms(force = null) {

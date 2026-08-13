@@ -23,10 +23,27 @@ test("production host projects canonical Rooms and consuming Tickets", () => {
   assert.match(workbench.drift.state, /^(?:FRESH|DRIFTED|WARNING|STALE|COLD_START)$/u);
 });
 
+test("every canonical drift state has its exact production presentation", () => {
+  for (const [state, label, icon] of [
+    ["FRESH", "FRESH", "check"],
+    ["DRIFTED", "DRIFTED", "drift"],
+    ["WARNING", "OLD CHECKOUT", "history"],
+    ["STALE", "STALE", "alert-circle"],
+    ["COLD_START", "ROOMS NOT INITIALIZED", "snowflake"],
+  ]) {
+    assert.match(script, new RegExp(`${state}: \\{ label: "${label}", icon: "${icon}" \\}`, "u"));
+    assert.match(html, new RegExp(`id="icon-${icon}"`, "u"));
+  }
+  assert.match(script, /coldStart \? presentation\.label : "Select a Room"/u);
+  assert.match(script, /rows\.push\(\[presentation\.label, drift\.reason\]\)/u);
+  assert.match(script, /\[\[presentation\.label, "Room alignment needs attention"\]\]/u);
+});
+
 test("production Rooms surface is on demand, minimal, and responsive", () => {
   assert.match(html, /id="roomsButton"[^>]*aria-label="Rooms"[^>]*aria-expanded="false"/u);
   assert.match(html, /id="roomsPanel"[^>]*hidden inert/u);
   assert.match(html, /role="tree" aria-label="Canonical Room tree"/u);
+  assert.match(script, /setAttribute\("aria-level", String\(room\.room\.split\("\/"\)\.length\)\)/u);
   assert.match(html, /data-room-view="context"/u);
   assert.match(html, /data-room-view="tickets"/u);
   assert.match(html, /data-room-view="drift"/u);
