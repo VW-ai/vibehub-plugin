@@ -549,13 +549,13 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(html, /id="overviewPanel"/u);
   assert.match(html, /aria-controls="overviewPanel"/u);
   assert.match(html, /id="closeOverview"/u);
-  assert.match(html, /id="frontierList"/u);
-  assert.match(html, /id="attentionList"/u);
-  assert.match(html, /id="deviationList"/u);
+  assert.match(html, /aria-label="Ticket state legend"/u);
+  assert.match(html, /aria-label="Human attention legend"/u);
+  assert.doesNotMatch(html, /id="frontierList"|id="attentionList"|id="deviationList"/u);
   assert.match(html, /id="summaryGrid"/u);
   assert.match(html, /id="summaryRefine"/u);
   assert.match(html, /id="summaryHuman"/u);
-  assert.match(html, /id="overviewSource"/u);
+  assert.doesNotMatch(html, /id="overviewSource"/u);
   assert.match(html, /id="sourcePath"/u);
   assert.match(html, /id="sourceBranch"/u);
   assert.match(html, /id="sourceCommit"/u);
@@ -681,17 +681,17 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(styles, /\.ticket-node:focus-visible,[\s\S]*?outline: none;/u);
   assert.match(styles, /\.ticket-node:focus-visible \.ticket-boundary/u);
   assert.match(styles, /\.edge-control-halo/u);
-  // Quiet cool-neutral tokens and the neutral selection outline.
-  assert.match(styles, /--canvas: #eef0ef/u);
-  assert.match(styles, /--selection: #283a32/u);
+  // Selected warm-neutral tokens and the neutral selection outline.
+  assert.match(styles, /--canvas: #fafaf8/u);
+  assert.match(styles, /--selection: #252523/u);
   assert.match(
     styles,
     /\.ticket-node\.selected \.ticket-boundary \{[\s\S]*?stroke: var\(--selection\)/u,
   );
   assert.doesNotMatch(styles, /\.implementing-strip|\.presence-empty|\.rail\s*\{/u);
   assert.match(styles, /\.overview-panel/u);
-  assert.match(styles, /\.overview-source/u);
-  assert.match(styles, /\.overview-item/u);
+  assert.doesNotMatch(styles, /\.overview-source/u);
+  assert.doesNotMatch(styles, /\.overview-item/u);
   assert.match(styles, /\.summary-grid/u);
   assert.match(styles, /min-height: 44px/u);
   assert.doesNotMatch(styles, /style-lab|style-option|style-swatch/u);

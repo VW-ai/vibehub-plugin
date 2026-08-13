@@ -34,6 +34,20 @@
     ["contract", "contract"],
     ["log", "evidence"],
   ]);
+  const STATE_ICON_IDS = Object.freeze({
+    DONE: "check",
+    READY: "play",
+    BLOCKED: "lock",
+    REFINE: "sliders",
+    DEVIATED: "alert",
+    ARCHIVED: "archive",
+  });
+  const ATTENTION_ICON_IDS = Object.freeze({
+    UPCOMING: "upcoming",
+    PENDING: "pending",
+    RECORDED: "recorded",
+    COMPLETE: "complete",
+  });
   const focusQuery = new URLSearchParams(location.search);
   const requestedTicketId = focusQuery.get("ticket");
   const requestedViewId = TICKET_VIEW_IDS.get(focusQuery.get("view"))
@@ -51,14 +65,6 @@
     sourceDockTitle: document.querySelector("#sourceDockTitle"),
     sourceDockContent: document.querySelector("#sourceDockContent"),
     closeSourceDock: document.querySelector("#closeSourceDock"),
-    frontierList: document.querySelector("#frontierList"),
-    frontierCount: document.querySelector("#frontierCount"),
-    attentionList: document.querySelector("#attentionList"),
-    attentionCount: document.querySelector("#attentionCount"),
-    attentionSection: document.querySelector("#attentionSection"),
-    deviationList: document.querySelector("#deviationList"),
-    deviationCount: document.querySelector("#deviationCount"),
-    deviationSection: document.querySelector("#deviationSection"),
     summaryReady: document.querySelector("#summaryReady"),
     summaryRefine: document.querySelector("#summaryRefine"),
     summaryHuman: document.querySelector("#summaryHuman"),
@@ -73,9 +79,6 @@
     graphSignalCount: document.querySelector("#graphSignalCount"),
     overviewPanel: document.querySelector("#overviewPanel"),
     closeOverview: document.querySelector("#closeOverview"),
-    overviewSource: document.querySelector("#overviewSource"),
-    overviewSourceDot: document.querySelector("#overviewSourceDot"),
-    overviewSourceLabel: document.querySelector("#overviewSourceLabel"),
     stateDot: document.querySelector("#stateDot"),
     stateLabel: document.querySelector("#stateLabel"),
     sourceStatus: document.querySelector("#sourceStatus"),
@@ -147,6 +150,17 @@
     for (const [name, value] of Object.entries(attributes)) {
       element.setAttribute(name, String(value));
     }
+    return element;
+  }
+
+  function svgIcon(iconId, attributes = {}) {
+    return svg("use", { href: `#icon-${iconId}`, ...attributes });
+  }
+
+  function htmlIcon(iconId) {
+    const element = document.createElementNS(SVG, "svg");
+    element.setAttribute("aria-hidden", "true");
+    element.append(svgIcon(iconId));
     return element;
   }
 
@@ -257,7 +271,7 @@
     elements.repoBranch.textContent = project.branch;
     renderSourceDock();
     renderOverview(overview);
-    elements.graphSummary.textContent = graphSummary(counts);
+    renderGraphSummary(counts, overview);
     renderDirectionControl();
     renderScopeControl();
     elements.graphSignalCount.textContent =
@@ -291,12 +305,6 @@
         : "Top-to-bottom causal graph",
     );
     elements.canvas.dataset.direction = layoutDirection;
-    const heading = elements.canvas.querySelector(".canvas-heading strong");
-    if (heading) {
-      heading.textContent = leftToRight
-        ? "Proven left, executable right"
-        : "Proven upstream, executable downstream";
-    }
     const nextHref = layoutDirectionHref(location.href, layoutDirection);
     if (nextHref !== location.href) history.replaceState(null, "", nextHref);
   }
@@ -312,99 +320,27 @@
     elements.summaryHuman.textContent = String(overview.humanPending.length);
     elements.summaryDeviated.textContent = String(overview.deviated.length);
     elements.summaryRefine.textContent = String(overview.refineCount);
-    elements.frontierCount.textContent = String(overview.ready.length);
-    elements.attentionCount.textContent = String(
-      overview.humanPending.length + overview.humanUpcoming.length,
-    );
-    elements.deviationCount.textContent = String(overview.deviated.length);
-    renderOverviewTickets(
-      elements.frontierList,
-      overview.ready,
-      "READY",
-      "No Ticket is executable right now.",
-    );
-    renderAttentionTickets(overview);
-    renderOverviewTickets(
-      elements.deviationList,
-      overview.deviated,
-      "DEVIATED",
-      "No execution deviations.",
-    );
-    elements.overviewSourceDot.className =
-      `source-state-dot${overview.sourceDirty ? " dirty" : ""}`;
-    elements.overviewSourceLabel.textContent = overview.sourceDirty
-      ? `${overview.sourceDirtyCount}${overview.sourceDirtyTruncated ? "+" : ""} local VibeHub change${overview.sourceDirtyCount === 1 && !overview.sourceDirtyTruncated ? "" : "s"}`
-      : "Matches the checked-in VibeHub files";
   }
 
-  function renderOverviewTickets(container, tickets, label, emptyMessage) {
-    if (!tickets.length) {
-      const empty = document.createElement("p");
-      empty.className = "overview-empty";
-      empty.textContent = emptyMessage;
-      container.replaceChildren(empty);
-      return;
-    }
-    const items = tickets.map((ticket) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = classes("overview-item", `state-${label.toLowerCase()}`);
-      button.title = ticket.ticketId;
-      const marker = document.createElement("span");
-      marker.className = "overview-item-marker";
-      marker.setAttribute("aria-hidden", "true");
-      const copy = document.createElement("span");
-      copy.className = "overview-item-copy";
-      const name = document.createElement("strong");
-      name.textContent = shortTicketId(ticket.ticketId);
-      const stateName = document.createElement("span");
-      stateName.textContent = label;
-      copy.append(name, stateName);
-      button.append(marker, copy);
-      button.addEventListener("click", () => {
-        closeOverview(false);
-        void selectTicket(ticket.ticketId, true);
-      });
-      return button;
-    });
-    container.replaceChildren(...items);
-  }
-
-  function renderAttentionTickets(overview) {
-    const tickets = [
-      ...overview.humanPending.map((ticket) => ({ ticket, label: "PENDING" })),
-      ...overview.humanUpcoming.map((ticket) => ({ ticket, label: "UPCOMING" })),
-    ];
-    if (!tickets.length) {
-      const empty = document.createElement("p");
-      empty.className = "overview-empty";
-      empty.textContent = "No human boundary needs attention.";
-      elements.attentionList.replaceChildren(empty);
-      return;
-    }
-    const items = tickets.map(({ ticket, label }) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = classes("overview-item", `attention-${label.toLowerCase()}`);
-      button.title = ticket.ticketId;
-      const marker = document.createElement("span");
-      marker.className = "overview-item-marker";
-      marker.setAttribute("aria-hidden", "true");
-      const copy = document.createElement("span");
-      copy.className = "overview-item-copy";
-      const name = document.createElement("strong");
-      name.textContent = shortTicketId(ticket.ticketId);
-      const stateName = document.createElement("span");
-      stateName.textContent = label === "PENDING" ? "NEEDS YOU" : "BOUNDARY AHEAD";
-      copy.append(name, stateName);
-      button.append(marker, copy);
-      button.addEventListener("click", () => {
-        closeOverview(false);
-        void selectTicket(ticket.ticketId, true);
-      });
-      return button;
-    });
-    elements.attentionList.replaceChildren(...items);
+  function renderGraphSummary(counts, overview) {
+    const items = [];
+    const add = (count, label, icon, className) => {
+      if (!count) return;
+      const item = document.createElement("span");
+      item.className = classes("canvas-summary-item", className);
+      item.setAttribute("role", "listitem");
+      const value = document.createElement("b");
+      value.textContent = String(count);
+      item.append(htmlIcon(icon), value, ` ${label}`);
+      items.push(item);
+    };
+    add(counts.READY, "READY", "play", "state-ready");
+    add(counts.REFINE, "REFINE", "sliders", "state-refine");
+    add(counts.BLOCKED, "BLOCKED", "lock", "state-blocked");
+    add(counts.DEVIATED, "DEVIATED", "alert", "state-deviated");
+    add(overview.humanPending.length, "NEEDS YOU", "pending", "attention-pending");
+    if (!items.length) add(counts.DONE, "DONE", "check", "state-done");
+    elements.graphSummary.replaceChildren(...items);
   }
 
   function renderGraph() {
@@ -548,31 +484,55 @@
         }),
       );
       if (attention) {
-        group.append(svg("path", {
-          class: "ticket-attention",
-          d: `M ${NODE.width - 14} 9 l 5 5 -5 5 -5 -5 Z`,
-        }));
+        const attentionText = {
+          UPCOMING: "UPCOMING",
+          PENDING: "NEEDS YOU",
+          RECORDED: "RECORDED",
+          COMPLETE: "COMPLETE",
+        }[attention.label];
+        const attentionBadge = svg("g", {
+          class: "ticket-attention-badge",
+          transform: `translate(${NODE.width - 8} -12)`,
+        });
+        attentionBadge.append(
+          svg("rect", { x: -88, y: 0, width: 88, height: 24, rx: 12 }),
+          svgIcon(ATTENTION_ICON_IDS[attention.label], {
+            class: "ticket-attention-icon",
+            x: -81,
+            y: 4,
+            width: 16,
+            height: 16,
+          }),
+        );
         const attentionLabel = svg("text", {
           class: "ticket-attention-label",
-          x: NODE.width - 25,
-          y: 18,
-          "text-anchor": "end",
+          x: -61,
+          y: 15,
         });
-        attentionLabel.textContent = `${attention.humanEvidenceCount}/${attention.humanAcceptanceCount} human`;
-        group.append(attentionLabel);
+        attentionLabel.textContent = attentionText;
+        attentionBadge.append(attentionLabel);
+        group.append(attentionBadge);
       }
       const id = svg("text", { class: "ticket-id", x: 14, y: 22 });
       id.textContent = shortTicketId(ticket.ticketId);
       group.append(id);
       // The state is always a textual label; color is a secondary accent.
       if (operational) {
+        const visibleState = ticket.archived ? "ARCHIVED" : operational.label;
+        group.append(svgIcon(STATE_ICON_IDS[visibleState], {
+          class: "ticket-state-icon",
+          x: NODE.width - 80,
+          y: NODE.height - 24,
+          width: 14,
+          height: 14,
+        }));
         const status = svg("text", {
           class: "ticket-state",
           x: NODE.width - 14,
-          y: 22,
+          y: NODE.height - 12,
           "text-anchor": "end",
         });
-        status.textContent = ticket.archived ? "ARCHIVED" : operational.label;
+        status.textContent = visibleState;
         group.append(status);
       }
       wrap(ticket.outcome, 34, 3).forEach((line, index) => {
@@ -2886,11 +2846,6 @@
     event.stopPropagation();
   });
   elements.closeOverview.addEventListener("click", () => closeOverview());
-  elements.overviewSource.addEventListener("click", () => {
-    closeOverview(false);
-    elements.sourceDockPanel.hidden = false;
-    elements.sourceRef.setAttribute("aria-expanded", "true");
-  });
   elements.sourceRef.addEventListener("click", () => {
     if (!state) return;
     elements.sourceDockPanel.hidden = !elements.sourceDockPanel.hidden;
