@@ -769,6 +769,22 @@ summary:focus-visible {
   transition: opacity 110ms ease;
 }
 
+.text-tooltip {
+  position: fixed;
+  z-index: 30;
+  max-width: min(420px, calc(100vw - 24px));
+  padding: 7px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  color: var(--surface-solid);
+  background: var(--ink);
+  box-shadow: var(--shadow-float);
+  font: 9px/1.45 var(--mono);
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  white-space: pre-wrap;
+}
+
 .ticket-node:focus-visible,
 .edge:focus-visible {
   outline: none;

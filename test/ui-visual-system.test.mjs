@@ -72,3 +72,14 @@ test("Ticket copy wraps to the real monospace card width", () => {
   assert.match(script, /wrap\(ticket\.outcome, 28, 3\)/u);
   assert.doesNotMatch(script, /wrap\(ticket\.outcome, 34, 3\)/u);
 });
+
+test("every shortened Workbench label exposes its full text on hover and focus", () => {
+  assert.match(html, /id="textTooltip" role="tooltip" hidden/u);
+  assert.match(css, /\.text-tooltip \{[\s\S]*position: fixed;[\s\S]*pointer-events: none;/u);
+  assert.match(script, /function textTooltipCandidate\(target\)/u);
+  assert.match(script, /candidate\.scrollWidth > candidate\.clientWidth \+ 1/u);
+  assert.match(script, /"data-full-text": `\$\{ticket\.ticketId\}\\n\$\{ticket\.outcome\}`/u);
+  assert.match(script, /button\.dataset\.fullText = ticketId/u);
+  assert.match(script, /document\.addEventListener\("pointerover"/u);
+  assert.match(script, /document\.addEventListener\("focusin"/u);
+});

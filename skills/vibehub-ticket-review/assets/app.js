@@ -127,6 +127,7 @@
     inspectorOutcome: document.querySelector("#inspectorOutcome"),
     inspectorContent: document.querySelector("#inspectorContent"),
     toast: document.querySelector("#toast"),
+    textTooltip: document.querySelector("#textTooltip"),
   };
 
   let token = location.hash.slice(1);
@@ -144,6 +145,7 @@
   let dragging = null;
   let suppressCanvasClick = false;
   let toastTimer = null;
+  let tooltipAnchor = null;
   let initialFocusPending = Boolean(requestedTicketId);
   let selectedRoom = null;
   let roomView = "context";
@@ -634,6 +636,7 @@
         role: "button",
         tabindex: "0",
         "aria-label": `${presentation.ariaLabel}${ticket.archived ? " ARCHIVED delivery history." : ""}`,
+        "data-full-text": `${ticket.ticketId}\n${ticket.outcome}`,
       });
       group.dataset.ticketId = ticket.ticketId;
       group.append(
@@ -1333,6 +1336,7 @@
       arrow.textContent = "→";
       const target = document.createElement("strong");
       target.textContent = shortTicketId(relation.targetTicketId);
+      target.dataset.fullText = relation.targetTicketId;
       route.append(current, arrow, target);
       const detail = document.createElement("span");
       detail.className = "relation-rationale";
@@ -1633,7 +1637,8 @@
       "causal-ticket",
       operational ? `state-${operational.key}` : "",
     );
-    button.title = ticketId;
+    button.dataset.fullText = ticketId;
+    button.setAttribute("aria-label", ticketId);
     const marker = document.createElement("span");
     marker.className = "causal-ticket-state";
     marker.setAttribute("aria-hidden", "true");
@@ -1651,7 +1656,7 @@
     label.textContent = "Selected";
     const title = document.createElement("strong");
     title.textContent = shortTicketId(ticketId);
-    title.title = ticketId;
+    title.dataset.fullText = ticketId;
     current.append(label, title);
     return current;
   }
@@ -2352,7 +2357,7 @@
       button.textContent = reference.label
         ? `${reference.label} · ${compactReference(reference.ref)}`
         : compactReference(reference.ref);
-      button.title = reference.ref;
+      button.dataset.fullText = reference.ref;
       if (linkedTicket) {
         button.addEventListener(
           "click",
@@ -2430,15 +2435,18 @@
         : document.createElement("span");
       label.className = "reference-label";
       const labelText = target.label || compactReference(target.target);
-      label.title = target.target;
+      label.dataset.fullText = target.target;
       if (label instanceof HTMLAnchorElement) {
         label.href = target.href || target.actions.githubHref;
         label.target = "_blank";
         label.rel = "noreferrer";
         label.classList.add("linked-reference");
-        label.title = target.actions?.githubHref
-          ? `Open ${target.target} on GitHub`
-          : `Open ${target.target}`;
+        label.setAttribute(
+          "aria-label",
+          target.actions?.githubHref
+            ? `Open ${target.target} on GitHub`
+            : `Open ${target.target}`,
+        );
         label.append(document.createTextNode(labelText), externalLinkIcon());
       } else {
         label.textContent = labelText;
@@ -2465,7 +2473,7 @@
       const label = document.createElement("span");
       label.className = "reference-label";
       label.textContent = normalized.label;
-      label.title = normalized.target;
+      label.dataset.fullText = normalized.target;
       row.append(kind, label);
       wrapper.append(row);
     }
@@ -2774,6 +2782,60 @@
     );
   }
 
+  function textTooltipCandidate(target) {
+    if (!(target instanceof Element)) return null;
+    const explicit = target.closest("[data-full-text]");
+    if (explicit?.dataset.fullText?.trim()) {
+      return { anchor: explicit, text: explicit.dataset.fullText.trim() };
+    }
+    let candidate = target instanceof HTMLElement ? target : target.parentElement;
+    while (candidate && candidate !== document.body) {
+      const text = candidate.textContent?.trim();
+      if (
+        candidate !== elements.textTooltip
+        && text
+        && candidate.childElementCount === 0
+        && (candidate.scrollWidth > candidate.clientWidth + 1
+          || candidate.scrollHeight > candidate.clientHeight + 1)
+      ) {
+        return { anchor: candidate, text };
+      }
+      candidate = candidate.parentElement;
+    }
+    return null;
+  }
+
+  function showTextTooltip(candidate) {
+    if (!candidate || !candidate.text) {
+      hideTextTooltip();
+      return;
+    }
+    tooltipAnchor = candidate.anchor;
+    elements.textTooltip.textContent = candidate.text;
+    elements.textTooltip.hidden = false;
+    const anchorRect = candidate.anchor.getBoundingClientRect();
+    const tooltipRect = elements.textTooltip.getBoundingClientRect();
+    const left = clamp(
+      anchorRect.left,
+      12,
+      Math.max(12, window.innerWidth - tooltipRect.width - 12),
+    );
+    const below = anchorRect.bottom + 8;
+    const top = below + tooltipRect.height <= window.innerHeight - 12
+      ? below
+      : Math.max(12, anchorRect.top - tooltipRect.height - 8);
+    elements.textTooltip.style.left = `${left}px`;
+    elements.textTooltip.style.top = `${top}px`;
+  }
+
+  function hideTextTooltip() {
+    tooltipAnchor = null;
+    elements.textTooltip.hidden = true;
+    elements.textTooltip.textContent = "";
+    elements.textTooltip.style.removeProperty("left");
+    elements.textTooltip.style.removeProperty("top");
+  }
+
   function sourceLabel(source) {
     if (!source) return "unknown";
     const commit = source.resolvedCommit
@@ -2787,7 +2849,7 @@
     if (!state || !elements.sourceDockContent) return;
     const source = state.graph.source;
     elements.sourcePath.textContent = source.worktreeRoot;
-    elements.sourcePath.title = source.worktreeRoot;
+    elements.sourcePath.dataset.fullText = source.worktreeRoot;
     elements.sourceBranch.textContent = source.branch || "detached";
     elements.sourceCommit.textContent = source.resolvedCommit
       ? source.resolvedCommit.slice(0, 10)
@@ -3014,6 +3076,21 @@
   function clamp(value, minimum, maximum) {
     return Math.max(minimum, Math.min(maximum, value));
   }
+
+  document.addEventListener("pointerover", (event) => {
+    showTextTooltip(textTooltipCandidate(event.target));
+  });
+  document.addEventListener("pointerout", (event) => {
+    if (tooltipAnchor?.contains(event.relatedTarget)) return;
+    hideTextTooltip();
+  });
+  document.addEventListener("focusin", (event) => {
+    showTextTooltip(textTooltipCandidate(event.target));
+  });
+  document.addEventListener("focusout", (event) => {
+    if (tooltipAnchor?.contains(event.relatedTarget)) return;
+    hideTextTooltip();
+  });
 
   elements.sourceStatus.addEventListener(
     "click",
