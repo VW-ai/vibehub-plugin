@@ -7,6 +7,18 @@
   <link rel="stylesheet" href="proposal.css">
 </head>
 <body>
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="icon-check" viewBox="0 0 20 20"><path d="m4 10.5 3.5 3.5L16 5.5"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 20 20"><path d="m7 5 8 5-8 5z"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 20 20"><rect x="4.5" y="8.5" width="11" height="8" rx="2"/><path d="M7 8.5V6a3 3 0 0 1 6 0v2.5"/></symbol>
+    <symbol id="icon-sliders" viewBox="0 0 20 20"><path d="M4 5h12M4 10h12M4 15h12M8 3v4M13 8v4M7 13v4"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 20 20"><path d="M10 3 17 16H3zM10 7v4M10 14h.01"/></symbol>
+    <symbol id="icon-archive" viewBox="0 0 20 20"><path d="M4 7h12v9H4zM3 4h14v3H3zM8 10h4"/></symbol>
+    <symbol id="icon-upcoming" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6" stroke-dasharray="2 2"/><path d="M10 7v3l2 1"/></symbol>
+    <symbol id="icon-recorded" viewBox="0 0 20 20"><path d="M6 3.5h8v13L10 14l-4 2.5z"/><path d="m8 8 1.5 1.5L12.5 7"/></symbol>
+    <symbol id="icon-pending" viewBox="0 0 20 20"><path d="M7 10V5.5a1.25 1.25 0 0 1 2.5 0V9M9.5 9V4.5a1.25 1.25 0 0 1 2.5 0V9M12 9V5.5a1.25 1.25 0 0 1 2.5 0v6c0 3-2 5-5 5H8c-1.6 0-2.8-.8-3.7-2.2L2.8 12a1.3 1.3 0 0 1 2.1-1.5L7 12"/></symbol>
+    <symbol id="icon-complete" viewBox="0 0 20 20"><path d="m3 10 3 3 5-5M9 13l2 2 6-7"/></symbol>
+  </svg>
   <div class="app-shell">
     <header class="app-header">
       <div class="identity">
@@ -36,8 +48,6 @@
       <section class="canvas" aria-label="Ticket causal graph proposal">
         <div class="canvas-heading">
           <div>
-            <span class="eyebrow">Execution flow</span>
-            <h1>Proven left, executable right</h1>
             <p><strong>2 ready</strong> · 1 refine · 1 needs you</p>
           </div>
           <div class="graph-tools" aria-label="Graph controls">
@@ -73,45 +83,45 @@
             </button>
 
             <button class="ticket archived-ticket" type="button" data-ticket="archive" style="--x:0px;--y:118px">
-              <span class="ticket-top"><span class="ticket-id">ticket-publish-v070-ui-release</span><span class="state"><i>✓</i> ARCHIVED</span></span>
+              <span class="ticket-top"><span class="ticket-id">ticket-publish-v070-ui-release</span><span class="state"><svg aria-hidden="true"><use href="#icon-archive"/></svg> ARCHIVED</span></span>
               <strong>Publish the retained Web Workbench release.</strong>
               <span class="ticket-meta">DONE · 0 in · 1 out</span>
             </button>
 
             <button class="ticket state-done" type="button" data-ticket="dense" style="--x:275px;--y:118px">
-              <span class="ticket-top"><span class="ticket-id">ticket-workbench-dense-graph-layout</span><span class="state"><i>✓</i> DONE</span></span>
+              <span class="ticket-top"><span class="ticket-id">ticket-workbench-dense-graph-layout</span><span class="state"><svg aria-hidden="true"><use href="#icon-check"/></svg> DONE</span></span>
               <strong>Make dense causal graphs remain legible.</strong>
               <span class="ticket-meta">1 in · 2 out</span>
             </button>
 
             <button class="ticket state-ready selected" type="button" data-ticket="visual" style="--x:565px;--y:118px" aria-current="true">
-              <span class="ticket-top"><span class="ticket-id">ticket-propose-codex-like…</span><span class="state"><i>▶</i> READY</span></span>
+              <span class="ticket-top"><span class="ticket-id">ticket-propose-codex-like…</span><span class="state"><svg aria-hidden="true"><use href="#icon-play"/></svg> READY</span></span>
               <strong>Define a quieter Codex-like visual system.</strong>
               <span class="ticket-meta">1 in · 2 out</span>
             </button>
 
             <button class="ticket state-blocked attention-upcoming" type="button" data-ticket="decision" style="--x:870px;--y:258px">
-              <span class="attention"><i>◌</i> UPCOMING</span>
-              <span class="ticket-top"><span class="ticket-id">ticket-decide-codex-like…</span><span class="state"><i>▣</i> BLOCKED</span></span>
+              <span class="attention"><svg aria-hidden="true"><use href="#icon-upcoming"/></svg> UPCOMING</span>
+              <span class="ticket-top"><span class="ticket-id">ticket-decide-codex-like…</span><span class="state"><svg aria-hidden="true"><use href="#icon-lock"/></svg> BLOCKED</span></span>
               <strong>Owner selects the production direction.</strong>
               <span class="ticket-meta">1 in · 1 out</span>
             </button>
 
             <button class="ticket state-ready" type="button" data-ticket="rooms" style="--x:275px;--y:380px">
-              <span class="ticket-top"><span class="ticket-id">ticket-prepare-rooms…</span><span class="state"><i>▶</i> READY</span></span>
+              <span class="ticket-top"><span class="ticket-id">ticket-prepare-rooms…</span><span class="state"><svg aria-hidden="true"><use href="#icon-play"/></svg> READY</span></span>
               <strong>Make Rooms visible without reclustering Tickets.</strong>
               <span class="ticket-meta">2 in · 1 out</span>
             </button>
 
             <button class="ticket state-refine attention-recorded" type="button" data-ticket="apply" style="--x:565px;--y:380px">
-              <span class="attention"><i>◆</i> DECISION NOTED</span>
-              <span class="ticket-top"><span class="ticket-id">ticket-apply-codex-like…</span><span class="state"><i>≡</i> REFINE</span></span>
+              <span class="attention"><svg aria-hidden="true"><use href="#icon-recorded"/></svg> DECISION NOTED</span>
+              <span class="ticket-top"><span class="ticket-id">ticket-apply-codex-like…</span><span class="state"><svg aria-hidden="true"><use href="#icon-sliders"/></svg> REFINE</span></span>
               <strong>Translate the chosen tokens into production.</strong>
               <span class="ticket-meta">2 in · 1 out</span>
             </button>
 
             <button class="ticket state-deviated" type="button" data-ticket="integration" style="--x:870px;--y:478px">
-              <span class="ticket-top"><span class="ticket-id">ticket-integrate-workbench…</span><span class="state"><i>!</i> DEVIATED</span></span>
+              <span class="ticket-top"><span class="ticket-id">ticket-integrate-workbench…</span><span class="state"><svg aria-hidden="true"><use href="#icon-alert"/></svg> DEVIATED</span></span>
               <strong>Prove the concentrated Web upgrade PR.</strong>
               <span class="ticket-meta">2 in · 0 out</span>
             </button>
@@ -126,8 +136,26 @@
         <div class="metrics">
           <div><strong>2</strong><span>Ready</span></div><div><strong>1</strong><span>Refine</span></div><div><strong>1</strong><span>Needs you</span></div>
         </div>
-        <div class="attention-row"><span class="attention-icon">☝</span><div><strong>Owner decision follows this proposal</strong><span>Not actionable until independent closeout.</span></div></div>
-        <div class="presence-empty"><span class="empty-icon">○</span><div><strong>No Active Run proven</strong><span>READY is not reported as implementing.</span></div></div>
+        <section class="legend" aria-label="Ticket state legend">
+          <span class="legend-title">Ticket state</span>
+          <div class="legend-grid">
+            <span class="legend-item done"><svg aria-hidden="true"><use href="#icon-check"/></svg>Done</span>
+            <span class="legend-item ready"><svg aria-hidden="true"><use href="#icon-play"/></svg>Ready</span>
+            <span class="legend-item blocked"><svg aria-hidden="true"><use href="#icon-lock"/></svg>Blocked</span>
+            <span class="legend-item refine"><svg aria-hidden="true"><use href="#icon-sliders"/></svg>Refine</span>
+            <span class="legend-item deviated"><svg aria-hidden="true"><use href="#icon-alert"/></svg>Deviated</span>
+            <span class="legend-item archived"><svg aria-hidden="true"><use href="#icon-archive"/></svg>Archived</span>
+          </div>
+        </section>
+        <section class="legend attention-legend" aria-label="Human attention legend">
+          <span class="legend-title">Human attention</span>
+          <div class="legend-grid">
+            <span class="legend-item upcoming"><svg aria-hidden="true"><use href="#icon-upcoming"/></svg>Upcoming</span>
+            <span class="legend-item pending"><svg aria-hidden="true"><use href="#icon-pending"/></svg>Needs you</span>
+            <span class="legend-item recorded"><svg aria-hidden="true"><use href="#icon-recorded"/></svg>Recorded</span>
+            <span class="legend-item complete"><svg aria-hidden="true"><use href="#icon-complete"/></svg>Complete</span>
+          </div>
+        </section>
       </aside>
 
       <aside class="inspector" aria-label="Ticket Inspector">
@@ -144,11 +172,11 @@
         <div class="inspector-body" id="inspectorBody">
           <section class="panel-section">
             <span class="section-label">Next action</span>
-            <div class="action-callout"><span class="play">▶</span><div><strong>Execute proposal Ticket</strong><p>Agent-owned · production assets remain unchanged.</p></div></div>
+            <div class="action-callout"><span class="play"><svg aria-hidden="true"><use href="#icon-play"/></svg></span><div><strong>Execute proposal Ticket</strong><p>Agent-owned · production assets remain unchanged.</p></div></div>
           </section>
           <section class="panel-section">
             <div class="section-heading"><span class="section-label">Causal context</span><span>1 upstream · 2 downstream</span></div>
-            <div class="relation-list"><span class="relation-chip done">✓ Dense layout</span><span class="relation-arrow">→</span><span class="relation-chip ready">Visual proposal</span><span class="relation-arrow">→</span><span class="relation-chip blocked">Owner choice</span></div>
+            <div class="relation-list"><span class="relation-chip done"><svg aria-hidden="true"><use href="#icon-check"/></svg>Dense layout</span><span class="relation-arrow">→</span><span class="relation-chip ready">Visual proposal</span><span class="relation-arrow">→</span><span class="relation-chip blocked">Owner choice</span></div>
           </section>
           <section class="panel-section">
             <span class="section-label">Bound context</span>

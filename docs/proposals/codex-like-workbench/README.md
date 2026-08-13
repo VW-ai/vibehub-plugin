@@ -22,7 +22,13 @@ discipline; it does not reproduce another product's brand skin.
 - Preserve Execution, Contract, and Log as progressive Inspector lenses; exact
   Git source and Copy focused link remain compact utilities, not navigation.
 - Use one small icon system: 16px, 1.6px stroke, rounded joins, no filled
-  illustrations. Use system UI and system monospace fonts only.
+  illustrations and no emoji. Use system UI and system monospace fonts only.
+- Keep the canvas heading to operational counts only; omit both the redundant
+  `Execution flow` label and the explanatory `Proven left, executable right`
+  slogan because the graph and controls already communicate that structure.
+- Use the on-demand Overview for compact counts and a two-axis legend only.
+  Proposal/decision scaffolding and an empty Active-Run explanation do not
+  belong in the production Overview.
 
 ## Review states
 

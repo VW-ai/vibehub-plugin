@@ -57,7 +57,8 @@ test("proposal retains real Workbench capabilities and review states", () => {
     "Log",
     "Exact Git source",
     "Copy focus",
-    "No Active Run proven",
+    "Ticket state legend",
+    "Human attention legend",
     "ticket-propose-codex-like",
     "ticket-prepare-rooms",
     "ticket-decide-codex-like",
@@ -65,6 +66,11 @@ test("proposal retains real Workbench capabilities and review states", () => {
     "DEVIATED",
     "REFINE",
   ]) assert.match(html, new RegExp(value, "u"));
+  assert.equal(html.includes("Proven left, executable right"), false);
+  assert.equal(html.includes("Execution flow"), false);
+  assert.equal(html.includes("Owner decision follows this proposal"), false);
+  assert.equal(html.includes("No Active Run proven"), false);
+  assert.equal(/[☝○◌◆▶▣✓]/u.test(html), false);
   assert.match(css, /@media \(max-width: 1220px\)/u);
   assert.match(css, /@media \(max-width: 700px\)/u);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/u);

@@ -21,6 +21,11 @@ navigation system and not a new graph layout.
   by Room.
 - On narrow screens, the same surface is a bottom sheet over a still-visible
   graph. Every interactive target is at least 44px.
+- Do not repeat what hierarchy and interaction already make clear. The panel
+  says `Rooms`, the selected Room says its name, and redundant labels such as
+  `Knowledge spaces` or `Selected Room` are omitted. Copy is reserved for
+  canonical boundaries, drift facts, errors, and actions whose meaning cannot
+  be inferred safely from layout alone.
 
 ## Review states
 

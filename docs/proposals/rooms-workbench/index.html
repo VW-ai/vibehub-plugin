@@ -38,7 +38,7 @@
 
     <aside class="rooms-panel" id="roomsPanel" aria-label="Rooms browser">
       <div class="sheet-handle"></div>
-      <div class="panel-header"><div><span class="eyebrow">Knowledge spaces</span><h2>Rooms</h2></div><button class="icon-button" id="closeRooms" type="button" aria-label="Close Rooms">×</button></div>
+      <div class="panel-header"><h2>Rooms</h2><button class="icon-button" id="closeRooms" type="button" aria-label="Close Rooms">×</button></div>
       <div class="tree" role="tree" aria-label="Canonical Room tree">
         <button type="button" role="treeitem" data-room="product" aria-selected="false"><span class="chevron">⌄</span><span class="room-icon">□</span><span class="room-label"><strong>product</strong><small>15 Context · 26 Tickets</small></span><span class="drift drifted">⎇ DRIFTED</span></button>
         <button type="button" role="treeitem" data-room="knowledge" aria-selected="false"><span class="chevron"></span><span class="room-icon">□</span><span class="room-label"><strong>knowledge</strong><small>8 Context · 7 Tickets</small></span><span class="drift fresh">✓</span></button>
@@ -47,7 +47,7 @@
       </div>
 
       <div class="detail" id="roomDetail">
-        <div class="detail-title"><div><span class="eyebrow">Selected Room</span><h3 id="roomTitle">workbench</h3></div><span class="state-label fresh-label" id="roomState">✓ FRESH</span></div>
+        <div class="detail-title"><h3 id="roomTitle">workbench</h3><span class="state-label fresh-label" id="roomState">✓ FRESH</span></div>
         <p class="boundary" id="roomBoundary">Read-only graph projection, local loopback host, visual language, and interaction. Canonical YAML remains outside this Room.</p>
         <div class="detail-tabs" role="tablist"><button type="button" role="tab" aria-selected="true" data-view="context">Context <b id="contextCount">2</b></button><button type="button" role="tab" aria-selected="false" data-view="tickets">Tickets <b id="ticketCount">19</b></button><button type="button" role="tab" aria-selected="false" data-view="drift">Drift</button></div>
         <div class="detail-content" id="detailContent"></div>

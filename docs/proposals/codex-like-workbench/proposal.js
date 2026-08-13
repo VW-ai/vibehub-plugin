@@ -21,7 +21,7 @@
       <section class="panel-section"><span class="section-label">Guardrail</span><p>Proposal only. Production Workbench assets and lifecycle semantics remain unchanged.</p></section>`,
     log: `
       <section class="panel-section"><span class="section-label">Evidence timeline</span>
-        <div class="action-callout"><span class="play">◇</span><div><strong>Proposal awaiting independent proof</strong><p>Real-size browser review and mechanical contrast checks will attach here.</p></div></div>
+        <div class="action-callout"><span class="play"><svg aria-hidden="true"><use href="#icon-recorded"/></svg></span><div><strong>Proposal awaiting independent proof</strong><p>Real-size browser review and mechanical contrast checks will attach here.</p></div></div>
       </section>
       <section class="panel-section compact-proof"><span class="section-label">Outcome</span><span class="proof-value">Not recorded</span></section>`,
   };

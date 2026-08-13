@@ -29,6 +29,7 @@ html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 body { font: 13px/1.45 var(--ui); color: var(--ink); background: var(--app); }
 button { color: inherit; font: inherit; }
 button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.icon-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .app-shell { height: 100%; display: grid; grid-template-rows: 52px minmax(0, 1fr); }
 
 .app-header {
@@ -57,8 +58,7 @@ button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .canvas-heading { position: absolute; z-index: 5; top: 18px; left: 18px; right: 390px; display: flex; align-items: flex-start; justify-content: space-between; pointer-events: none; }
 .canvas-heading > div { pointer-events: auto; }
 .eyebrow, .section-label { display: block; color: var(--secondary); font: 620 10px/1.2 var(--ui); letter-spacing: .08em; text-transform: uppercase; }
-.canvas-heading h1 { margin: 4px 0 1px; font-size: 17px; line-height: 1.25; letter-spacing: -.015em; }
-.canvas-heading p { margin: 0; color: var(--secondary); font-size: 12px; }
+.canvas-heading p { margin: 5px 0 0; color: var(--secondary); font-size: 12px; }
 .canvas-heading p strong { color: var(--ready); font-weight: 620; }
 .graph-tools { display: flex; align-items: center; gap: 6px; padding: 4px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.9); box-shadow: 0 2px 8px rgba(27,27,25,.05); backdrop-filter: blur(12px); }
 .segmented { display: flex; gap: 2px; padding: 2px; background: var(--muted-surface); border-radius: 8px; }
@@ -81,7 +81,9 @@ button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .ticket-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 9px; }
 .ticket-id { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--secondary); font: 9px/1.2 var(--mono); }
 .state { flex: none; color: var(--state); font: 620 9px/1.2 var(--ui); letter-spacing: .05em; }
-.state i, .attention i { font-style: normal; margin-right: 2px; }
+.state, .attention { display: inline-flex; align-items: center; gap: 3px; }
+.state svg, .attention svg, .legend-item svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.state svg use[href="#icon-play"], .legend-item svg use[href="#icon-play"] { fill: currentColor; stroke: none; }
 .ticket strong { display: block; max-width: 168px; font-size: 12px; line-height: 1.3; font-weight: 620; letter-spacing: -.006em; }
 .ticket-meta { display: block; margin-top: 9px; color: var(--secondary); font: 9px/1.2 var(--mono); }
 .state-done { --state-bg: var(--done-bg); --state: var(--done); }
@@ -106,12 +108,16 @@ button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .metrics > div { padding: 9px; border-radius: 9px; background: var(--muted-surface); }
 .metrics strong { display: block; font-size: 17px; line-height: 1; }
 .metrics span { display: block; margin-top: 5px; color: var(--secondary); font-size: 9px; text-transform: uppercase; letter-spacing: .04em; }
-.attention-row, .presence-empty { display: flex; gap: 9px; padding: 10px 0; border-top: 1px solid var(--line); }
-.attention-row > span, .presence-empty > span { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; }
-.attention-icon { color: var(--blocked); background: var(--blocked-bg); }
-.empty-icon { color: var(--secondary); background: var(--muted-surface); }
-.attention-row strong, .presence-empty strong { display: block; font-size: 11px; }
-.attention-row div span, .presence-empty div span { color: var(--secondary); font-size: 10px; }
+.legend { display: block; padding: 11px 0 2px; border-top: 1px solid var(--line); }
+.legend-title { display: block; margin-bottom: 7px; color: var(--secondary); font-size: 9px; font-weight: 620; letter-spacing: .06em; text-transform: uppercase; }
+.legend-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.legend-item { display: inline-flex; align-items: center; gap: 5px; min-width: 0; height: 28px; padding: 0 7px; border-radius: 7px; color: var(--legend); background: var(--legend-bg); font-size: 9px; font-weight: 620; }
+.legend-item.done,.legend-item.complete { --legend: var(--done); --legend-bg: var(--done-bg); }
+.legend-item.ready,.legend-item.recorded { --legend: var(--ready); --legend-bg: var(--ready-bg); }
+.legend-item.blocked,.legend-item.pending { --legend: var(--blocked); --legend-bg: var(--blocked-bg); }
+.legend-item.refine { --legend: var(--refine); --legend-bg: var(--refine-bg); }
+.legend-item.deviated { --legend: var(--deviated); --legend-bg: var(--deviated-bg); }
+.legend-item.archived,.legend-item.upcoming { --legend: #5f5f5a; --legend-bg: #f3f3f0; }
 
 .inspector { position: absolute; z-index: 10; inset: 0 0 0 auto; width: 372px; display: grid; grid-template-rows: auto auto minmax(0,1fr) auto; border-left: 1px solid var(--line); background: rgba(255,255,255,.98); box-shadow: -12px 0 32px rgba(27,27,25,.08); backdrop-filter: blur(20px); }
 .inspector-grabber { display: none; }
@@ -125,11 +131,13 @@ button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .inspector-body { min-height: 0; overflow: auto; padding: 4px 20px 20px; }
 .panel-section { padding: 16px 0; border-bottom: 1px solid var(--line); }
 .action-callout { display: flex; gap: 10px; margin-top: 9px; padding: 11px; border: 1px solid #c8d9ee; border-radius: 10px; background: var(--ready-bg); }
-.action-callout .play { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 8px; color: white; background: var(--ready); font-size: 9px; }
+.action-callout .play { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 8px; color: white; background: var(--ready); }
+.action-callout .play svg { width: 13px; height: 13px; fill: currentColor; stroke: none; }
 .action-callout strong { font-size: 12px; }
 .action-callout p { margin: 2px 0 0; color: var(--secondary); font-size: 10px; }
 .relation-list { display: flex; align-items: center; gap: 4px; margin-top: 10px; overflow: hidden; }
-.relation-chip { padding: 6px 7px; border-radius: 7px; white-space: nowrap; font-size: 9px; }
+.relation-chip { display: inline-flex; align-items: center; gap: 3px; padding: 6px 7px; border-radius: 7px; white-space: nowrap; font-size: 9px; }
+.relation-chip svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .relation-chip.done { color: var(--done); background: var(--done-bg); }
 .relation-chip.ready { color: var(--ready); background: var(--ready-bg); }
 .relation-chip.blocked { color: var(--blocked); background: var(--blocked-bg); }
@@ -175,7 +183,6 @@ button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
   .copy-button { width: 44px; padding: 0; justify-content: center; }
   .header-actions .icon-button, .header-actions .copy-button { width: 44px; height: 44px; }
   .canvas-heading { top: 10px; left: 10px; right: 10px; }
-  .canvas-heading h1 { font-size: 14px; max-width: 185px; }
   .canvas-heading p { font-size: 10px; }
   .graph-tools { position: absolute; top: 0; right: 0; gap: 2px; padding: 2px; }
   .graph-tools button, .segmented button, .graph-tools > .icon-button { min-width: 44px; width: 44px; height: 44px; }
@@ -185,7 +192,7 @@ button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
   .graph-world { left: -8px; top: 12px; transform: scale(.64); }
   .canvas-footer { display: none; }
   .overview { top: 66px; right: 10px; width: calc(100% - 20px); }
-  .overview .presence-empty { display: none; }
+  .legend-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .inspector { inset: auto 0 0; width: 100%; height: 55%; border: 1px solid var(--line); border-width: 1px 0 0; border-radius: 16px 16px 0 0; box-shadow: 0 -12px 32px rgba(27,27,25,.12); }
   .inspector-grabber { display: block; position: absolute; left: 50%; top: 7px; width: 34px; height: 4px; border-radius: 4px; background: var(--line-strong); transform: translateX(-50%); }
   .inspector-header { padding: 20px 14px 8px; }
