@@ -12,16 +12,17 @@
 
 <p align="center"><em>Memory tools preserve the conversation; VibeHub preserves the development cycle.</em></p>
 
-![VibeHub local Ticket graph](docs/assets/local-graph/quiet-workbench-desktop.jpg)
+![VibeHub v0.8 canvas-first Ticket Workbench](docs/assets/local-graph/quiet-workbench-desktop.jpg)
 
-That one line is the entire user entry. Describe the work, say it, and the
-Agent handles repository setup when needed, plans the smallest honest Ticket,
-executes it, records Evidence, asks for human attention only at a real boundary,
-and hands completion to an independent Outcome.
+Describe the work and say that one line. VibeHub plans the smallest honest
+Git-native Tickets and keeps current causal work on the canvas. Select a Ticket
+for Execution, Contract, and Log detail; open Rooms or history only when useful;
+and follow clear signals when a decision genuinely needs you.
 
-Tickets, durable Context, Evidence, and Outcomes remain ordinary Git files.
-The graph appears when it helps you orient, decide, or audit; routine execution
-stays out of the way.
+As work proceeds, the Agent records acceptance-linked Evidence and hands
+completion to an independent Outcome. Tickets, durable Context, Evidence, and
+Outcomes remain ordinary Git files, so the next Agent can resume from exact
+repository truth while routine execution stays out of the way.
 
 ## Installation
 
@@ -29,11 +30,10 @@ stays out of the way.
 
 ```bash
 codex plugin marketplace add VW-ai/vibehub-plugin
-codex
+codex plugin add vibehub@vibehub
 ```
 
-Then open `/plugins`, install **VibeHub** from the `vibehub` marketplace, and
-start a new session.
+Then start a new task and use the single entry above.
 
 **Claude Code**
 
@@ -43,17 +43,16 @@ start a new session.
 /reload-plugins
 ```
 
-Describe the work in a new session, then use the single entry above.
-
 ## Upgrades
 
 The host updates the plugin bundle; VibeHub never updates itself in the
 background and never rewrites checked-in project data during installation.
-Claude Code can refresh auto-update-enabled marketplaces and apply the new
-bundle with `/reload-plugins`. In Codex, refresh the Git marketplace with
-`codex plugin marketplace upgrade vibehub`, refresh or reinstall the plugin,
-then start a new session. If `.vibehub/version.yaml` needs migration, the new
-session previews and applies that change separately through the migrate Skill.
+In Codex, run `codex plugin marketplace upgrade vibehub` followed by
+`codex plugin add vibehub@vibehub`, then start a new task. In Claude Code, run
+`claude plugin update vibehub@vibehub --scope user`, then restart Claude Code
+(or use `/reload-plugins` after a marketplace refresh). If project data needs
+migration, the new session previews that separate Git change through the
+migrate Skill; installing a plugin never rewrites `.vibehub/`.
 Read the [product concept](docs/CONCEPT.md), [installation and coexistence](docs/INSTALL.md),
 [local graph design](docs/LOCAL_GRAPH_DESIGN.md), or [release procedure](docs/RELEASE.md).
 Apache-2.0

@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "a537254ae3aa21c309deaea6ed7d94a6189f2fc3",
+        "blob": "c89af5c8e478a420a606063efb6fd8be6448fdc8",
         "path": "README.md"
       },
       {
@@ -30,7 +30,7 @@
         "path": "docs/SPEED_FIRST_CLEANUP.md"
       },
       {
-        "blob": "d20d10925ac4ed918ccd1339f8618b84d26f20d5",
+        "blob": "68f9a0219b05a05b158c8f27a29b0da9c57936d0",
         "path": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
       },
       {
@@ -82,8 +82,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-13T08:31:49.978Z",
-    "last_aligned_commit": "eb3f5a0491f08c1d6182f261418e2e2825a44ffc"
+    "checked_at": "2026-08-13T22:03:06.429Z",
+    "last_aligned_commit": "215ab65b43df7d06deb55746a929e4eee0375d66"
   },
   "anchors": [
     "CHANGELOG.md",
