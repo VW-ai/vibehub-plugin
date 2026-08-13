@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "archive-and-delivery-membership-are-canonical",
+    "history-edge-cases-stay-truthful",
+    "one-query-model-serves-cli-json-and-web",
+    "filtered-graphs-preserve-causal-truth",
+    "query-focus-is-explicit-accessible-and-copyable",
+    "archive-query-is-regression-verified"
+  ],
+  "evidence_id": "archive-query-contract-cli-and-browser-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-13T00:28:12Z",
+  "refs": [
+    "commit:f59a1b25882f90a8195a82cb4aafc89d36113785",
+    "commit:73a638554fda1f8373f7fee4ef26147a11c25021",
+    "commit:c2bf1a4433a12a9c955422523ea1fa92f8a7b1aa",
+    "commit:a8331ac2aa394064b1470ff60775901abbc09c55",
+    "test:npm-run-verify-62-of-62-and-54-file-artifact-698815-bytes",
+    "test:delivery-schema-state-table-shared-query-invalid-filter-and-fixed-layout-regressions",
+    "browser:current-all-delivery-single-room-multi-room-and-invalid-filter-proof",
+    "browser:1440x960-1180x820-390x844-both-directions-no-overflow-and-accessible-history-target",
+    "browser:one-hop-expansion-preserves-card-coordinates-ticket-log-lens-direction-and-copyable-url",
+    "room:all-four-rooms-fresh-at-a8331ac"
+  ],
+  "schema_version": 1,
+  "summary": "Commits f59a1b2 and 73a6385 add the optional discriminated Ticket deliveries array, the derived successful-plus-delivered archive predicate, one exported current/all/delivery/repeated-Room query projection shared by CLI JSON and Web, deterministic endpoint-visible relations, progressive archived boundary cards and one-hop stubs, explicit URL filters, and aligned Product, Ticket Lifecycle, and Workbench Room contracts. State-table and schema tests cover omitted legacy deliveries, proposed/abandoned/unmerged pull requests, delivered pull requests and cherry-picks, failed/partial/deviated Outcomes, multiple memberships, revert preservation, and reopen provenance. Full verification passes 62/62 plus the dependency-free 54-file, 698815-byte artifact. A real Codex in-app-browser fixture proves the default current view contains three current Tickets plus one textual/dashed ARCHIVED boundary and one keyboard-focusable upstream stub; Enter reveals old-foundation, removes the exhausted stub, records history=old-foundation, and preserves every prior card coordinate, selected current-web-work Ticket, Log lens, and direction. All history contains five Tickets and no stubs; exact pull request delivery returns the two archived members; product/web returns four, knowledge returns two, and repeated normalized Rooms return their five-Ticket union. Invalid scope, delivery, Room, and history values render Ticket graph unavailable with zero Ticket cards rather than broadening. Copy focused link reports success and the live URL preserves scope, sorted repeated filters, history, selected Ticket, Log lens, direction, and the 64-character bearer fragment without persistent browser state. At 1440x960, 1180x820, and 390x844, both left-to-right and top-to-bottom views retain four current nodes, one archived boundary, and one stub without document overflow or console warnings/errors; the narrow history target is 44.8px high after the browser-found c2bf1a4 fix and all graph controls are 44x44. The complete plugin remains Git-native and read-only, with all four Rooms FRESH at a8331ac.",
+  "ticket_id": "ticket-queryable-archived-ticket-history"
+}
