@@ -38,7 +38,7 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       },
       {
-        "blob": "53cd4880e023a69922296a5d4a0c2573d0adf25b",
+        "blob": "58d55bf49c411a39951ac316f81dc310f68cd4d4",
         "path": "docs/proposals/codex-like-workbench/README.md"
       },
       {
@@ -46,7 +46,7 @@
         "path": "docs/proposals/codex-like-workbench/index.html"
       },
       {
-        "blob": "9f2180712f261f56fabc262dfe44e118e3262689",
+        "blob": "a3c2c4c371e300b4d509081d49f65030b65dd1a0",
         "path": "docs/proposals/codex-like-workbench/proposal.css"
       },
       {
@@ -58,11 +58,11 @@
         "path": "docs/proposals/codex-like-workbench/state-matrix.json"
       },
       {
-        "blob": "f57b97b8386ac85829582f44db5243d0d5601e48",
+        "blob": "e2d21fa748c5dd096ae3e2f328c04bc969a920e2",
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
-        "blob": "f92c7c0120ad68cb74a289c5e037238dab829c5c",
+        "blob": "a50ccf87b3986fa4d8d14c6cf85cabac97497a84",
         "path": "docs/proposals/rooms-workbench/README.md"
       },
       {
@@ -70,11 +70,11 @@
         "path": "docs/proposals/rooms-workbench/contract.json"
       },
       {
-        "blob": "f855bd6fccd311033dae6bdf865a877fefe5ff68",
+        "blob": "9d40e4967207b5285724dea8f3116b4e0c6d0f9d",
         "path": "docs/proposals/rooms-workbench/index.html"
       },
       {
-        "blob": "01dd15cc432cbfbae5893ed68d3340521222a558",
+        "blob": "c1095ff3fee182fbdde29d3ddb26bd4d6f6022c7",
         "path": "docs/proposals/rooms-workbench/rooms.css"
       },
       {
@@ -82,8 +82,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-13T03:40:49.109Z",
-    "last_aligned_commit": "674dfd29f53f59b5db2cd079b53cd283a0a0f927"
+    "checked_at": "2026-08-13T03:55:30.025Z",
+    "last_aligned_commit": "bbbac957da11e712b8d688237054359eabc65ec7"
   },
   "anchors": [
     "CHANGELOG.md",
