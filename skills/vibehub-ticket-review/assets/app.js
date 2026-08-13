@@ -4,6 +4,7 @@
   const SVG = "http://www.w3.org/2000/svg";
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
+  const HISTORY_STUB = Object.freeze({ width: 116, height: 70 });
   const workbenchModel = globalThis.VibeHubWorkbenchModel;
   const graphLayoutModel = globalThis.VibeHubGraphLayout;
   if (!workbenchModel) {
@@ -473,8 +474,16 @@
         "aria-label": `${stub.hiddenTicketCount} hidden archived Ticket${stub.hiddenTicketCount === 1 ? "" : "s"} ${stub.direction}; reveal next hop`,
       });
       group.dataset.stubRef = stub.stubRef;
-      group.append(svg("rect", { width: 116, height: 34, rx: 8 }));
-      const label = svg("text", { x: 58, y: 21, "text-anchor": "middle" });
+      group.append(svg("rect", {
+        width: HISTORY_STUB.width,
+        height: HISTORY_STUB.height,
+        rx: 8,
+      }));
+      const label = svg("text", {
+        x: HISTORY_STUB.width / 2,
+        y: HISTORY_STUB.height / 2 + 4,
+        "text-anchor": "middle",
+      });
       label.textContent = `${stub.hiddenTicketCount} archived ${stub.direction === "upstream" ? "←" : "→"}`;
       group.append(label);
       group.addEventListener("click", (event) => {
@@ -601,12 +610,14 @@
     if (layoutDirection === "ltr") {
       return {
         x: direction === "upstream" ? anchor.x - 142 : anchor.x + NODE.width + 26,
-        y: anchor.y + NODE.height / 2 - 17,
+        y: anchor.y + NODE.height / 2 - HISTORY_STUB.height / 2,
       };
     }
     return {
-      x: anchor.x + NODE.width / 2 - 58,
-      y: direction === "upstream" ? anchor.y - 54 : anchor.y + NODE.height + 20,
+      x: anchor.x + NODE.width / 2 - HISTORY_STUB.width / 2,
+      y: direction === "upstream"
+        ? anchor.y - HISTORY_STUB.height - 20
+        : anchor.y + NODE.height + 20,
     };
   }
 
@@ -2339,7 +2350,7 @@
     for (const stub of state?.graph?.stubs ?? []) {
       const anchor = positions.get(stub.anchorTicketId);
       if (!anchor) continue;
-      values.push({ ...historyStubPosition(anchor, stub.direction), width: 116, height: 34 });
+      values.push({ ...historyStubPosition(anchor, stub.direction), ...HISTORY_STUB });
     }
     const minX = Math.min(...values.map((value) => value.x));
     const minY = Math.min(...values.map((value) => value.y));
