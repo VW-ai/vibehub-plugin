@@ -11,7 +11,8 @@ navigation system and not a new graph layout.
   or `depends_on` into containment and never invents a hierarchy.
 - Drift appears in situ beside the owning Room. `FRESH` is a quiet check and is
   omitted from the closed control; `DRIFTED`, `WARNING`, `STALE`, and
-  `COLD_START` use explicit text and icons, not color alone.
+  `COLD_START` use explicit text and the shared compact stroke-SVG icon system,
+  not color alone or emoji.
 - Selecting a Room opens its detail in the same surface: boundary, anchors,
   canonical Context entries, and Tickets whose `context_refs` consume that Room
   subtree.

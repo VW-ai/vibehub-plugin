@@ -22,14 +22,16 @@ test("Rooms proposal defines every canonical drift presentation explicitly", () 
   assert.deepEqual(Object.keys(contract.drift_states), ["FRESH", "DRIFTED", "WARNING", "STALE", "COLD_START"]);
   assert.equal(Object.values(contract.drift_states).every((item) => item.label && item.icon && item.prominence), true);
   assert.match(html, /Canonical Room tree/u);
-  assert.match(html, /⎇ DRIFTED/u);
-  assert.match(html, /✓ FRESH/u);
+  assert.match(html, /icon-drift/u);
+  assert.match(html, /DRIFTED/u);
+  assert.match(html, /icon-check/u);
+  assert.match(html, /FRESH/u);
   assert.match(script, /docs\/LOCAL_GRAPH_DESIGN\.md/u);
 });
 
 test("Rooms proposal exposes Context, consuming Tickets, drift, filtering, focus, and empty states", () => {
   for (const value of [
-    "Context", "Tickets", "Drift", "Show related Tickets", "Preview no-selection state",
+    "Context", "Tickets", "Drift", "Show related Tickets",
     "Select a Room", "Room filter", "workbench", "product", "knowledge", "ticket-lifecycle",
   ]) assert.match(html, new RegExp(value, "u"));
   assert.match(script, /ticket\.classList\.toggle\("receded"/u);
@@ -47,4 +49,14 @@ test("Rooms proposal keeps quiet desktop and accessible narrow surfaces", () => 
   assert.match(script, /roomsButton\.setAttribute\("aria-expanded", String\(open\)\)/u);
   assert.equal(html.includes("Knowledge spaces"), false);
   assert.equal(html.includes("Selected Room"), false);
+  assert.equal(html.includes("Execution flow"), false);
+  assert.equal(html.includes("Proven left, executable right"), false);
+  assert.equal(html.includes("Room selection never moves Ticket cards"), false);
+  assert.equal(html.includes("Uses canonical Room query · preserves x/y"), false);
+  assert.equal(html.includes("Preview no-selection state"), false);
+  assert.match(script, /selected === item\.dataset\.room/u);
+  for (const symbol of ["✓", "▶", "▣", "≡", "⎇", "□", "⌗", "↗"]) {
+    assert.equal(html.includes(symbol) || script.includes(symbol), false);
+  }
+  assert.match(html, /class="icon-sprite"/u);
 });
