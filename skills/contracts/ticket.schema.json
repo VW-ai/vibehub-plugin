@@ -16,6 +16,11 @@
       "description": "Planning maturity. New or rewritten Tickets state firm or draft explicitly; omission remains legacy-compatible firm."
     },
     "outcome": { "$ref": "#/$defs/text" },
+    "deliveries": {
+      "type": "array",
+      "default": [],
+      "items": { "$ref": "#/$defs/delivery" }
+    },
     "context": { "$ref": "#/$defs/text" },
     "acceptance": {
       "type": "array",
@@ -63,6 +68,54 @@
   },
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
-    "text": { "type": "string", "minLength": 1, "pattern": "\\S" }
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "commit_ref": { "type": "string", "pattern": "^commit:[0-9a-f]{40}$" },
+    "pull_request_ref": { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[1-9][0-9]*$" },
+    "delivery": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "ref", "state"],
+          "properties": {
+            "kind": { "const": "pull_request" },
+            "ref": { "$ref": "#/$defs/pull_request_ref" },
+            "state": { "enum": ["proposed", "delivered", "abandoned"] },
+            "delivered_at": { "type": "string", "format": "date-time" },
+            "delivered_commit": { "$ref": "#/$defs/commit" },
+            "reverted_by": { "$ref": "#/$defs/commit_ref" }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "state": { "const": "delivered" } } },
+              "then": { "required": ["delivered_at", "delivered_commit"] },
+              "else": {
+                "not": {
+                  "anyOf": [
+                    { "required": ["delivered_at"] },
+                    { "required": ["delivered_commit"] },
+                    { "required": ["reverted_by"] }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "ref", "state", "delivered_at", "delivered_commit"],
+          "properties": {
+            "kind": { "const": "cherry_pick" },
+            "ref": { "$ref": "#/$defs/commit_ref" },
+            "state": { "const": "delivered" },
+            "delivered_at": { "type": "string", "format": "date-time" },
+            "delivered_commit": { "$ref": "#/$defs/commit" },
+            "reverted_by": { "$ref": "#/$defs/commit_ref" }
+          }
+        }
+      ]
+    }
   }
 }

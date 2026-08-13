@@ -1,0 +1,64 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "current-and-candidate-semantics-are-audited",
+      "criterion": "The proposal documents the current UPCOMING, NEEDS YOU, RECORDED, and COMPLETE human-attention meanings, explicitly distinguishes COMPLETE from operational DONE and derived ARCHIVED, and compares a bounded set of candidate information classes for the upper-right slot using user value, urgency, truth source, stability, and ambiguity as criteria."
+    },
+    {
+      "acceptance_id": "corner-slot-ownership-and-priority-are-exact",
+      "criterion": "The proposal recommends one exact ownership rule for the corner slot—either one coherent semantic axis or a deterministic priority contract—and defines eligibility, absence, coexistence, replacement, and conflict behavior so two signals never compete visually or silently overwrite a more important fact."
+    },
+    {
+      "acceptance_id": "labels-icons-and-explanation-are-reviewable",
+      "criterion": "Every proposed state has concrete label, 16px stroke-SVG icon, non-color treatment, compact legend wording, full hover/focus explanation, accessible name, and narrow-card behavior; the design preserves the approved pill shape and position while removing ambiguous standalone vocabulary such as COMPLETE unless surrounding UI makes its human-boundary meaning immediate."
+    },
+    {
+      "acceptance_id": "state-combinations-are-prototyped",
+      "criterion": "Reviewable wide and narrow examples cover the corner signal alongside operational DONE, READY, BLOCKED, REFINE, and DEVIATED, derived ARCHIVED treatment, selected and dimmed cards, long graph copy, causal focus, and cards with no corner signal, with no overlap, clipping, color-only meaning, or mistaken implication of Active Run or implementation completion."
+    },
+    {
+      "acceptance_id": "downstream-boundaries-are-ready-for-owner-review",
+      "criterion": "The proposal identifies the smallest subsequent protected owner decision and production implementation boundaries, including any projection/schema impact, fallback behavior, token/component changes, legend/tooltip updates, regression fixtures, and coordination with the separate large-graph clarity and graph-card-copy proposal."
+    }
+  ],
+  "constraints": [
+    "Preserve the approved upper-right badge position, compact pill shape, restrained visual language, and icon-plus-text accessibility; this Ticket chooses semantics rather than discarding the design.",
+    "Do not conflate operational Ticket status, human authority/evidence attention, derived archive/delivery history, or trusted Active-Run presence into one lifecycle state.",
+    "Do not turn the corner into a rotating carousel, arbitrary metadata bucket, priority guess, hover-only fact, or color-only signal.",
+    "This Ticket produces a proposal for explicit owner review; it does not silently change production vocabulary or data projection before the protected choice is recorded."
+  ],
+  "context": "The production card currently uses the upper-right pill for the orthogonal human-attention axis. In particular, COMPLETE means that every human-authority acceptance boundary on that Ticket has human-origin Evidence and has been independently accepted; it does not mean that implementation is complete, which is expressed separately by the operational DONE label at the lower right. The owner likes the upper-right badge's visual design and explicitly wants to preserve this location as valuable card information territory, but found the standalone COMPLETE label semantically unclear. Before changing copy or assigning additional information to the slot, VibeHub needs one deliberate contract for what belongs there, how multiple candidate signals are prioritized or excluded, and how the meaning is explained without burdening the graph.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative person-centered human-attention axis that currently owns the card corner badge.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "purpose": "Binding quiet Workbench, non-color semantics, truthful presence, and card interaction constraints.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Successful production Outcome for the approved card, state, attention, icon, and compact legend system.",
+      "ref": ".vibehub/outcomes/ticket-apply-codex-like-workbench-visual-language.yaml"
+    },
+    {
+      "purpose": "Parallel future proposal whose graph-copy and information-density decisions must remain compatible with the corner signal.",
+      "ref": ".vibehub/tickets/ticket-propose-large-graph-clarity-and-card-copy.yaml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A reviewable semantic and visual contract turns the Ticket card's approved upper-right badge position into a clear, trustworthy information signal without confusing human attention, execution state, or delivery history.",
+  "provenance_refs": [
+    "conversation:2026-08-13-owner-preserves-card-corner-design-and-requests-clear-signal-semantics"
+  ],
+  "relations": [
+    {
+      "rationale": "The semantic proposal should evaluate the stable integrated production card rather than expand the delivery scope of the current Web upgrade PR.",
+      "target_ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-propose-card-corner-signal-contract"
+}

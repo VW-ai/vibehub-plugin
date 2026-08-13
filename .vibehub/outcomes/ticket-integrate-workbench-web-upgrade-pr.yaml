@@ -1,0 +1,24 @@
+{
+  "accepted_acceptance_ids": [
+    "one-pr-contains-the-complete-web-upgrade",
+    "main-and-pr15-contracts-are-reconciled",
+    "combined-workbench-journeys-pass",
+    "plugin-boundary-and-artifact-stay-clean",
+    "v080-release-candidate-identity-is-in-pr",
+    "pr-handoff-is-reviewable"
+  ],
+  "closed_at": "2026-08-13T18:24:25Z",
+  "evidence_ids": [
+    "v080-exact-head-cross-feature-browser-proof",
+    "v080-focused-pr-and-delivery-membership",
+    "v080-main-contract-release-and-boundary-proof",
+    "workbench-canvas-done-count-browser-proof",
+    "workbench-shortened-text-tooltip-browser-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout at exact clean PR #21 head 2d440813 accepted all six criteria after auditing the firm Ticket, governing Context, every integration Evidence record, all ten constituent successful Outcomes, the origin/main diff, PR #15, current source and tests, GitHub PR state, and a fresh read-only Workbench host. one-pr-contains-the-complete-web-upgrade: the exact transitive dependency closure minus v0.7.0 successful Outcomes resolves to ten Tickets; all and only those ten have successful Outcomes and the canonical PR #21 delivery entry in proposed state, and the PR's bounded commit history contains canvas, direction, dense layout, archive/query, visual proposal/decision/implementation, and Rooms proposal/decision/implementation. main-and-pr15-contracts-are-reconciled: fetched origin/main 92802fa is an ancestor of HEAD; source and fresh tests preserve human acceptance authority, human-origin Evidence, orthogonal human attention, non-executable REFINE, READY-only handoff, exact Git source, and complete causal focus. combined-workbench-journeys-pass: fresh browser spot checks at current head independently reproduced Current/All URL and aria state, LTR/TTB geometry, Fit/zoom, focused Ticket and Inspector, exact clean source, Room detail and related-Ticket filtering, exact PR #21 query with ten Tickets, and zero horizontal overflow or console errors; the independently adjudicated constituent Outcomes supply the required archived-hop, Overview, focus restoration, attention coexistence, keyboard/reduced-motion, and 1440x960, 1180x820, and 390x844 matrices in both directions. plugin-boundary-and-artifact-stay-clean: project and Ticket validation pass at 48 Tickets, 148 Evidence, and 42 prior Outcomes; all four Rooms are FRESH; independent npm run verify passes 81/81 and the installed dependency-free artifact is 54 files / 724304 bytes; host source accepts only GET/HEAD and the diff adds no Desktop app, repository switcher, launcher runtime, session watcher, database, daemon, persistent browser store, hidden cache, or writable Workbench route. v080-release-candidate-identity-is-in-pr: package, Codex, Claude, marketplace, release test, and top Changelog agree on 0.8.0 dated 2026-08-13; verify-release-version accepts v0.8.0, format remains 1, and the GitHub-only workflow changes only to fetch full history required by its committed layout baseline. pr-handoff-is-reviewable: GitHub reports PR #21 OPEN, ready, MERGEABLE/CLEAN at the exact local head with both Verify runs successful; its description truthfully covers Web-only scope, ten Outcomes, compatibility, browser/test proof, follow-ups, and the release recommendation, while delivery entries remain proposed until an authoritative later merge.",
+  "ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
+  "unresolved_acceptance_ids": []
+}

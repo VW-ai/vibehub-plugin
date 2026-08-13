@@ -9,6 +9,9 @@ import {
   assertValid,
   documents,
   loadRepository,
+  projectRoomDrift,
+  projectTicketQuery,
+  ticketArchived,
   ticketStatus,
 } from "./vh.mjs";
 
@@ -23,6 +26,7 @@ const ASSET_FILES = new Map([
   ["/index.html", ["index.html", "text/html; charset=utf-8"]],
   ["/app.css", ["app.css", "text/css; charset=utf-8"]],
   ["/app-model.js", ["app-model.js", "text/javascript; charset=utf-8"]],
+  ["/app-layout.js", ["app-layout.js", "text/javascript; charset=utf-8"]],
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
 ]);
 
@@ -301,18 +305,20 @@ function humanAttentionState(repository, ticket, outcome) {
   };
 }
 
-function projectGraph(repository) {
-  const ticketDocuments = documents(repository.tickets.documents)
-    .sort((left, right) => left.ticket_id.localeCompare(right.ticket_id));
-  const relations = ticketDocuments.flatMap((ticket) =>
-    ticket.relations.map((relation) => ({
-      relationRef: relationRef(relation.target_ticket_id, ticket.ticket_id),
-      prerequisiteTicketId: relation.target_ticket_id,
-      dependentTicketId: ticket.ticket_id,
-      rationale: relation.rationale ?? "Direct execution dependency.",
-      provenanceRefs: ticket.provenance_refs,
-    })),
-  );
+function projectGraph(repository, queryOptions = {}) {
+  const query = projectTicketQuery(repository, queryOptions);
+  const ticketDocuments = query.tickets;
+  const relations = query.relations.map((relation) => {
+    const dependent = repository.tickets.documents
+      .get(relation.dependent_ticket_id)?.document;
+    return {
+      relationRef: relationRef(relation.prerequisite_ticket_id, relation.dependent_ticket_id),
+      prerequisiteTicketId: relation.prerequisite_ticket_id,
+      dependentTicketId: relation.dependent_ticket_id,
+      rationale: relation.rationale,
+      provenanceRefs: dependent?.provenance_refs ?? [],
+    };
+  });
   const counts = new Map(ticketDocuments.map((ticket) => [
     ticket.ticket_id,
     { prerequisites: 0, dependents: 0 },
@@ -328,6 +334,8 @@ function projectGraph(repository) {
       ticketId: ticket.ticket_id,
       ticketRevision: digest(ticket),
       outcome: ticket.outcome,
+      archived: ticketArchived(repository, ticket),
+      deliveries: ticket.deliveries ?? [],
       provenanceRefs: ticket.provenance_refs,
       relationCounts: counts.get(ticket.ticket_id),
       capabilities: {
@@ -342,7 +350,72 @@ function projectGraph(repository) {
       },
     };
   });
-  return { tickets, relations };
+  return {
+    tickets,
+    relations,
+    stubs: query.stubs.map((stub) => ({
+      stubRef: stub.stub_ref,
+      anchorTicketId: stub.anchor_ticket_id,
+      direction: stub.direction,
+      hiddenTicketCount: stub.hidden_ticket_count,
+      nextTicketIds: stub.next_ticket_ids,
+    })),
+    filters: query.filters,
+  };
+}
+
+function projectRooms(repo, repository) {
+  let drift;
+  try {
+    drift = projectRoomDrift(repo, repository);
+  } catch (error) {
+    if (error?.code !== "git_error") throw error;
+    drift = {
+      cold_start: true,
+      rooms: [...repository.rooms.documents.keys()].map((room) => ({
+        room,
+        state: "UNKNOWN",
+        reason: "Git snapshot unavailable",
+      })),
+    };
+  }
+  const driftByRoom = new Map(drift.rooms.map((item) => [item.room, item]));
+  const contextEntries = [...repository.contexts.documents.values()];
+  const tickets = documents(repository.tickets.documents);
+  const rooms = [...repository.rooms.documents.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([roomPath, entry]) => {
+      const prefix = `${join(repository.paths.rooms, ...roomPath.split("/"))}/`;
+      const contexts = contextEntries
+        .filter((item) => item.path.startsWith(prefix))
+        .map(({ document, path }) => ({
+          contextId: document.context_id,
+          type: document.type,
+          state: document.state,
+          summary: document.summary,
+          path: relative(repo, path).split("\\").join("/"),
+        }))
+        .sort((left, right) => left.contextId.localeCompare(right.contextId));
+      const consumingTickets = tickets.filter((ticket) => ticket.context_refs.some(({ ref }) => {
+        const match = ref.match(/^\.vibehub\/rooms\/(.+)\/[^/]+\.yaml$/u);
+        return match && (match[1] === roomPath || match[1].startsWith(`${roomPath}/`));
+      })).map((ticket) => ticket.ticket_id).sort();
+      return {
+        room: roomPath,
+        roomId: entry.document.room_id,
+        parent: roomPath.includes("/") ? roomPath.slice(0, roomPath.lastIndexOf("/")) : null,
+        description: entry.document.description,
+        boundary: entry.document.boundary,
+        anchors: entry.document.anchors,
+        contexts,
+        consumingTickets,
+        drift: (() => {
+          const item = driftByRoom.get(roomPath) ?? { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
+          return item.state === "UNKNOWN" ? { ...item, state: "COLD_START" } : item;
+        })(),
+      };
+    });
+  return { coldStart: drift.cold_start, rooms };
 }
 
 function canonicalContextFromRef(repository, reference) {
@@ -487,7 +560,7 @@ function traceRecords(repository, source, ticketId = null) {
   );
 }
 
-export function buildUiSnapshot(repoRoot) {
+export function buildUiSnapshot(repoRoot, queryOptions = {}) {
   const repo = realpathSync(resolve(repoRoot));
   const repository = loadRepository(repo);
   assertValid(repository.errors);
@@ -497,7 +570,8 @@ export function buildUiSnapshot(repoRoot) {
   const rawOutcomes = documents(repository.outcomes.documents);
   const graphDigest = digest({ contexts, tickets: rawTickets, evidence: rawEvidence, outcomes: rawOutcomes });
   const source = gitSource(repo, graphDigest);
-  const graph = projectGraph(repository);
+  const graph = projectGraph(repository, queryOptions);
+  const rooms = projectRooms(repo, repository);
   const protectedBoundaries = graph.tickets
     .filter((ticket) =>
       ticket.capabilities.attention.summary.humanAcceptanceCount > 0)
@@ -524,7 +598,10 @@ export function buildUiSnapshot(repoRoot) {
       source,
       tickets: graph.tickets,
       relations: graph.relations,
+      stubs: graph.stubs,
+      filters: graph.filters,
     },
+    rooms,
     interventions: {
       review: { available: false },
       planReview: { available: false },
@@ -538,6 +615,15 @@ export function buildUiSnapshot(repoRoot) {
     },
   };
   return { repo, repository, graph, state };
+}
+
+function queryOptionsFromUrl(url) {
+  return {
+    scope: url.searchParams.get("scope") ?? "current",
+    delivery: url.searchParams.get("delivery"),
+    rooms: url.searchParams.getAll("room"),
+    historyIds: url.searchParams.getAll("history"),
+  };
 }
 
 function subjectFrom(snapshot, url) {
@@ -757,7 +843,15 @@ export function startVibeHubUi({
         throw new UiError(404, "not_found", "Route not found");
       }
       requireBearer(request, token);
-      const snapshot = buildUiSnapshot(repoRoot);
+      let snapshot;
+      try {
+        snapshot = buildUiSnapshot(repoRoot, queryOptionsFromUrl(url));
+      } catch (error) {
+        if (error?.code === "invalid_argument") {
+          throw new UiError(400, "invalid_filter", error.message, error.details ?? null);
+        }
+        throw error;
+      }
       let data;
       if (url.pathname === "/api/state") data = snapshot.state;
       else if (url.pathname === "/api/subject") data = subjectFrom(snapshot, url);

@@ -8,10 +8,10 @@ import { verifyReleaseTag } from "../scripts/verify-release-version.mjs";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(root, path), "utf8");
 
-test("v0.7.0 release identity is consistent and dependency-free", () => {
-  const identity = verifyReleaseTag("v0.7.0");
-  assert.equal(identity.version, "0.7.0");
-  assert.deepEqual(new Set(Object.values(identity.versions)), new Set(["0.7.0"]));
+test("v0.8.0 release identity is consistent and dependency-free", () => {
+  const identity = verifyReleaseTag("v0.8.0");
+  assert.equal(identity.version, "0.8.0");
+  assert.deepEqual(new Set(Object.values(identity.versions)), new Set(["0.8.0"]));
 });
 
 test("README is a dark-safe one-line product surface", () => {
@@ -52,7 +52,7 @@ test("the canonical entry routes through existing Setup and Ticket Plan", () => 
 
 test("release is GitHub-only, reproducible, and documented", () => {
   const changelog = read("CHANGELOG.md");
-  assert.match(changelog, /## 0\.7\.0 — 2026-08-11/u);
+  assert.match(changelog, /## 0\.8\.0 — 2026-08-13/u);
   assert.doesNotMatch(changelog, /## Unreleased/u);
 
   const workflow = read(".github/workflows/release.yml");

@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "one-pr-contains-the-complete-web-upgrade",
+    "pr-handoff-is-reviewable"
+  ],
+  "evidence_id": "v080-focused-pr-and-delivery-membership",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-13T17:48:00Z",
+  "refs": [
+    "github-pr:https://github.com/VW-ai/vibehub-plugin/pull/21",
+    "commit:ebac37c6900533a54c055d1e029650fa9824b0d0",
+    "github-actions:https://github.com/VW-ai/vibehub-plugin/actions/runs/31726770781",
+    "github-actions:https://github.com/VW-ai/vibehub-plugin/actions/runs/31726776774"
+  ],
+  "schema_version": 1,
+  "summary": "GitHub PR #21 is the single ready-for-review Web Workbench delivery from codex/workbench-ui-next into main. The exact dependency closure rule resolves to 10 post-v0.7 constituent Tickets; all 10 and only those 10 carry the canonical https://github.com/VW-ai/vibehub-plugin/pull/21 delivery entry in proposed state, so none is prematurely archived. The PR description names the Web-only scope, all constituent Outcomes, optional deliveries compatibility, PR #15 semantics, browser and automated verification, release recommendation, excluded Desktop/runtime surfaces, and the two intentionally deferred UI clarity proposals. GitHub reports head ebac37c6900533a54c055d1e029650fa9824b0d0 MERGEABLE/CLEAN with two successful Verify VibeHub runs.",
+  "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
+}

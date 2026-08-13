@@ -320,6 +320,72 @@ test("dense causal position preserves every direct prerequisite and unlock", () 
   );
 });
 
+test("Web projection shares current/all archive queries and progressive history stubs", () => {
+  const repo = tempRepo("ui-archive-query");
+  repos.push(repo);
+  assert.equal(run(repo, "project", "init").status, 0);
+  const delivery = {
+    kind: "pull_request",
+    ref: "https://github.com/VW-ai/vibehub-plugin/pull/77",
+    state: "delivered",
+    delivered_at: NOW,
+    delivered_commit: "a".repeat(40),
+  };
+  const old = { ...ticket("old-history"), deliveries: [delivery] };
+  const boundary = { ...ticket("archived-boundary", ["old-history"]), deliveries: [delivery] };
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [old, boundary, ticket("current-work", ["archived-boundary"]), ticket("other-current")],
+  }).status, 0);
+  for (const id of ["old-history", "archived-boundary"]) {
+    assert.equal(run(repo, "ticket", "evidence", {
+      schema_version: 1,
+      kind: "ticket_evidence",
+      evidence_id: `${id}-proof`,
+      ticket_id: id,
+      acceptance_ids: ["works"],
+      summary: `${id} passed.`,
+      refs: [`test:${id}`],
+      recorded_at: NOW,
+    }).status, 0);
+    assert.equal(run(repo, "ticket", "closeout", {
+      schema_version: 1,
+      kind: "ticket_outcome",
+      ticket_id: id,
+      status: "successful",
+      accepted_acceptance_ids: ["works"],
+      unresolved_acceptance_ids: [],
+      evidence_ids: [`${id}-proof`],
+      summary: `${id} passed independently.`,
+      closed_at: NOW,
+    }).status, 0);
+  }
+  const current = buildUiSnapshot(repo);
+  assert.deepEqual(current.state.graph.tickets.map((item) => [item.ticketId, item.archived]), [
+    ["archived-boundary", true], ["current-work", false], ["other-current", false],
+  ]);
+  assert.deepEqual(current.state.graph.stubs.map((stub) => ({
+    anchor: stub.anchorTicketId,
+    direction: stub.direction,
+    count: stub.hiddenTicketCount,
+    next: stub.nextTicketIds,
+  })), [{
+    anchor: "archived-boundary",
+    direction: "upstream",
+    count: 1,
+    next: ["old-history"],
+  }]);
+  const expanded = buildUiSnapshot(repo, { historyIds: ["old-history"] });
+  assert.deepEqual(expanded.state.graph.tickets.map((item) => item.ticketId), [
+    "archived-boundary", "current-work", "old-history", "other-current",
+  ]);
+  assert.deepEqual(expanded.state.graph.stubs, []);
+  const all = buildUiSnapshot(repo, { scope: "all" });
+  assert.deepEqual(all.state.graph.tickets.map((item) => item.ticketId), [
+    "archived-boundary", "current-work", "old-history", "other-current",
+  ]);
+  assert.deepEqual(all.state.graph.stubs, []);
+});
+
 test("read-only loopback host serves assets, current graph, inspector, and trace", async () => {
   const repo = fixture();
   const beforeUi = canonicalBytes(repo);
@@ -363,6 +429,15 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(state.interventions.protectedBoundaries.length, 2);
   assert.equal(state.graph.source.actions.worktree.editorHref.startsWith("vscode://file"), true);
   assert.equal(state.graph.source.agentPayload.kind, "vibehub_git_source");
+  assert.equal(state.graph.filters.scope, "current");
+  assert.deepEqual(state.graph.stubs, []);
+
+  const invalidFilter = await fetch(
+    `${origin}/api/state?scope=past`,
+    authorized(token),
+  );
+  assert.equal(invalidFilter.status, 400);
+  assert.equal((await invalidFilter.json()).error.code, "invalid_filter");
 
   const ticketQuery = new URLSearchParams({
     snapshotId: state.graph.snapshotId,
@@ -456,22 +531,31 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
 
   const html = await (await fetch(`${origin}/`)).text();
   const model = await (await fetch(`${origin}/app-model.js`)).text();
+  const layout = await (await fetch(`${origin}/app-layout.js`)).text();
   const script = await (await fetch(`${origin}/app.js`)).text();
   const styles = await (await fetch(`${origin}/app.css`)).text();
   assert.match(html, /class="app-shell"/u);
   assert.match(html, /id="copyLink"/u);
   assert.match(html, /src="\/app-model\.js"/u);
+  assert.match(html, /src="\/app-layout\.js"/u);
   assert.match(html, /class="workspace inspector-closed"/u);
   assert.match(html, /id="graphSignal"/u);
   assert.match(html, /id="sourceDock"/u);
   assert.doesNotMatch(html, /class="(?:surface|signal|sheet)/u);
   assert.doesNotMatch(html, /state-legend|brand-mark/u);
-  // A · Quiet Workbench surface: rail, implementing strip, and source dock.
-  assert.match(html, /id="implementingStrip"/u);
-  assert.match(html, /id="implementingList"/u);
-  assert.match(html, /id="frontierList"/u);
+  // Canvas-first shell: operational overview is available on demand while
+  // empty presence and a permanent navigation rail consume no layout space.
+  assert.doesNotMatch(html, /class="rail"|id="implementingStrip"|id="implementingList"/u);
+  assert.match(html, /id="overviewPanel"/u);
+  assert.match(html, /aria-controls="overviewPanel"/u);
+  assert.match(html, /id="closeOverview"/u);
+  assert.match(html, /aria-label="Ticket state legend"/u);
+  assert.match(html, /aria-label="Human attention legend"/u);
+  assert.doesNotMatch(html, /id="frontierList"|id="attentionList"|id="deviationList"/u);
   assert.match(html, /id="summaryGrid"/u);
   assert.match(html, /id="summaryRefine"/u);
+  assert.match(html, /id="summaryHuman"/u);
+  assert.doesNotMatch(html, /id="overviewSource"/u);
   assert.match(html, /id="sourcePath"/u);
   assert.match(html, /id="sourceBranch"/u);
   assert.match(html, /id="sourceCommit"/u);
@@ -479,13 +563,26 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   // The style-lab A/B/C selector is a design-exploration artifact and must
   // never ship on the product surface.
   assert.doesNotMatch(html, /style-lab|style-option|style-swatch|data-theme/u);
-  // Top-to-bottom causal layout replaces the superseded left-to-right flow.
-  assert.match(script, /function layoutGraphTopToBottom/u);
-  // Honest Implementing-now layer: presence is the only permitted input, the
-  // MVP has none, and Git-native states are never promoted to IMPLEMENTING.
-  assert.match(script, /ACTIVE_RUN_PRESENCE = Object\.freeze\(\[\]\)/u);
-  assert.match(script, /No Active Run can be proven right now\./u);
-  assert.match(script, /READY frontier remains available\./u);
+  // One causal layout supports an explicit left-to-right default and
+  // top-to-bottom choice without forking the graph model.
+  assert.match(html, /id="directionLtr"[^>]+aria-pressed="true"/u);
+  assert.match(html, /id="directionTtb"[^>]+aria-pressed="false"/u);
+  assert.match(html, /id="scopeCurrent"[^>]+aria-pressed="true"/u);
+  assert.match(html, /id="scopeAll"[^>]+aria-pressed="false"/u);
+  assert.match(script, /function layoutGraph\(tickets, relations, direction/u);
+  assert.match(layout, /function minimizeCrossings/u);
+  assert.match(layout, /function routeRelations/u);
+  assert.match(layout, /relationRef.*source: 0, target: 0/su);
+  assert.match(layout, /The Ticket graph contains a cycle/u);
+  assert.match(script, /function setLayoutDirection/u);
+  assert.match(script, /function setGraphScope/u);
+  assert.match(script, /function revealHistory/u);
+  assert.match(script, /ARCHIVED delivery history/u);
+  assert.match(script, /preserveLayout/u);
+  assert.match(script, /layoutDirection === "ltr"/u);
+  // No trusted Active-Run source exists, so the shell makes no presence claim
+  // and never promotes Git-native state into an implementing subsystem.
+  assert.doesNotMatch(script, /ACTIVE_RUN_PRESENCE|renderImplementingNow/u);
   assert.doesNotMatch(script, /"IMPLEMENTING"/u);
   // No visual preference is ever persisted by the product surface.
   assert.doesNotMatch(script, /localStorage|sessionStorage/u);
@@ -497,13 +594,17 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(model, /vibehub-ticket-plan/u);
   assert.match(model, /vibehub-ticket-review/u);
   assert.match(script, /function causalCone/u);
-  assert.match(script, /function relationPorts/u);
+  assert.match(layout, /function relationPorts/u);
   assert.match(script, /edge-control-halo/u);
   assert.match(script, /minimapWorldPoint/u);
   assert.match(script, /renderGraphInspector\(\{ open: false \}\)/u);
   assert.match(script, /function disclosure/u);
   assert.match(script, /function tabbedTicketView/u);
   assert.match(script, /const requestedTicketId = focusQuery\.get\("ticket"\)/u);
+  assert.match(model, /function localFocusHref/u);
+  assert.match(model, /function normalizeLayoutDirection/u);
+  assert.match(model, /function layoutDirectionHref/u);
+  assert.match(model, /function workbenchOverview/u);
   assert.match(script, /\["log", "evidence"\]/u);
   assert.match(script, /initialFocusPending/u);
   assert.match(script, /initialTabId = "execution"/u);
@@ -566,9 +667,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   );
   assert.match(script, /function revealTicket/u);
   assert.match(script, /incoming\.length - completed/u);
-  assert.match(script, /copyText\(location\.href, "Authorized link copied"\)/u);
+  assert.match(script, /Focused local link copied · valid while this host is running/u);
   assert.doesNotMatch(script, /inspectorOutcome\.textContent = operational\?\.detail/u);
-  assert.doesNotMatch(script, /history\.replaceState/u);
+  assert.match(script, /history\.replaceState\(null, "", nextHref\)/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
   assert.match(styles, /\.ticket-node\.state-deviated/u);
   assert.match(styles, /\.ticket-node\.state-refine/u);
@@ -580,15 +681,17 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(styles, /\.ticket-node:focus-visible,[\s\S]*?outline: none;/u);
   assert.match(styles, /\.ticket-node:focus-visible \.ticket-boundary/u);
   assert.match(styles, /\.edge-control-halo/u);
-  // Quiet cool-neutral tokens and the neutral selection outline.
-  assert.match(styles, /--canvas: #eef0ef/u);
-  assert.match(styles, /--selection: #283a32/u);
+  // Selected warm-neutral tokens and the neutral selection outline.
+  assert.match(styles, /--canvas: #fafaf8/u);
+  assert.match(styles, /--selection: #252523/u);
   assert.match(
     styles,
     /\.ticket-node\.selected \.ticket-boundary \{[\s\S]*?stroke: var\(--selection\)/u,
   );
-  assert.match(styles, /\.implementing-strip/u);
-  assert.match(styles, /\.presence-empty/u);
+  assert.doesNotMatch(styles, /\.implementing-strip|\.presence-empty|\.rail\s*\{/u);
+  assert.match(styles, /\.overview-panel/u);
+  assert.doesNotMatch(styles, /\.overview-source/u);
+  assert.doesNotMatch(styles, /\.overview-item/u);
   assert.match(styles, /\.summary-grid/u);
   assert.match(styles, /min-height: 44px/u);
   assert.doesNotMatch(styles, /style-lab|style-option|style-swatch/u);

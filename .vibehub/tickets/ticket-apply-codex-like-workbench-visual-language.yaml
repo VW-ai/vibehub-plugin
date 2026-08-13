@@ -1,47 +1,78 @@
 {
+  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"proposed"}],
   "acceptance": [
     {
-      "acceptance_id": "refine-selected-visual-system-for-production",
-      "criterion": "Placeholder: after the owner-selected visual direction and the canvas/dense-layout foundations are successful, Ticket Plan rewrites this same Ticket with independently checkable production token, component, state-matrix, accessibility, regression, and wide/narrow verification criteria before any production styling begins."
+      "acceptance_id": "production-visual-system-matches-owner-direction",
+      "criterion": "The production Workbench translates the current approved Codex-like proposal into one dependency-free token and component system: one global system-monospace stack; quiet neutral canvas, panel, border, radius, and elevation tokens; compact 16px stroke-SVG icons with no emoji; restrained whole-card surfaces plus icon-and-text labels for the operational DONE, READY, BLOCKED, REFINE, and DEVIATED axis; a separate derived ARCHIVED delivery/history boundary treatment; an independent icon-and-text human-attention treatment for UPCOMING, PENDING/NEEDS YOU, RECORDED, and COMPLETE; neutral hover and selection; and colored icon-bearing operational and attention counts that serve as the compact canvas/Overview legend without redundant explanatory copy."
+    },
+    {
+      "acceptance_id": "production-capabilities-and-truth-remain-intact",
+      "criterion": "The restyled production surface retains the complete causal graph, selected upstream/downstream cone, both layout directions, dense non-overlapping routes, minimap/pan/zoom, current/all/delivery/Room query state, progressive archived-hop expansion, Execution/Contract/Log Inspector lenses, exact Git source, focused-link restoration, and READY-only Agent handoff; REFINE remains non-executable, human attention remains independent of operational state, and the UI never reports an Active Run without a trusted presence source."
+    },
+    {
+      "acceptance_id": "overview-and-progressive-detail-stay-quiet",
+      "criterion": "Overview is closed by default and opens on demand as compact counts plus clearly separated Ticket-state and human-attention legends; the full-bleed graph remains the primary object; Inspector remains progressive detail on the right and becomes a bottom sheet on narrow screens; proposal/decision scaffolding, the empty no-Active-Run explanation, Execution flow, Proven left/executable right, and copy already communicated by hierarchy or interaction are absent from production."
+    },
+    {
+      "acceptance_id": "visual-accessibility-and-regression-proof-pass",
+      "criterion": "Automated token/state/contrast/reduced-motion tests and a real-browser pass at 1440x960, 1180x820, and 390x844 verify both layout directions, every operational and human-attention coexistence treatment, keyboard-visible focus, readable non-color state labels, at least 44px narrow targets, Inspector/Overview open and closed states, complete selected cones, no horizontal document overflow, and no console warnings or errors; full project/Ticket validation, Rooms freshness, the complete test suite, and the installed Plugin artifact also pass."
     }
   ],
   "constraints": [
-    "This draft authorizes no production UI change until it is refined in place to maturity: firm.",
-    "The chosen whole-card operational state treatment must remain distinct from human authority/evidence attention and must not rely on color alone.",
-    "Preserve Victor's causal cone, Inspector detail, exact source, focused link, minimap/pan/zoom, and READY-gated Agent handoff.",
-    "Preserve the dependency-free read-only Web boundary and exclude the rejected Desktop runtime."
+    "Preserve the dependency-free read-only loopback Workbench and canonical validated-document boundary; add no network font, third-party UI runtime, persistence, writable route, Desktop application, or parallel state model.",
+    "The approved whole-card operational state must remain visually and semantically distinct from human authority/evidence attention, and neither axis may rely on color alone.",
+    "Do not trade away Victor's causal-cone interaction, Inspector detail, exact source, focused link, archive/query behavior, minimap/pan/zoom, or READY-gated Agent handoff for visual simplification.",
+    "Hierarchy, position, selection state, and interaction carry meaning wherever safe; visible copy is reserved for distinctions, exceptions, exact facts, errors, and actions that would otherwise be ambiguous."
   ],
-  "context": "The production implementation direction is known, but its exact acceptance cannot be written honestly until the owner chooses the visual proposal and the canvas, orientation, and dense-layout foundations are successful. This draft preserves the downstream position. After all prerequisites succeed it becomes REFINE, never READY; Ticket Plan must rewrite this same Ticket in place to maturity: firm using the chosen human-origin Evidence and prerequisite Outcomes before implementation starts.",
+  "context": "The owner selected the Codex-like Workbench proposal and then refined the shared surface during live Rooms review. Production now has an executable visual contract: quiet full-bleed causal canvas, progressive Overview and Inspector, restrained whole-card operational states, orthogonal human attention, one global system-monospace voice, compact stroke-SVG icons without emoji, semantic counts that double as the local legend, and no explanatory copy that repeats what the interface already communicates. This Ticket applies that direction to the real Workbench without changing its canonical data, query, lifecycle, or read-only boundaries.",
   "context_refs": [
     {
-      "purpose": "Canonical rule requiring this blocked downstream direction to become REFINE and be firmed in place after its prerequisites succeed.",
-      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
+      "purpose": "Current owner-approved visual direction, token contract, state matrix, responsive examples, and exact interface refinements.",
+      "ref": "docs/proposals/codex-like-workbench/README.md"
     },
     {
-      "purpose": "Current production visual and interaction boundary that remains binding until superseded by accepted work.",
+      "purpose": "Machine-checkable typography, spacing, shape, surface, semantic-state, attention, and interaction tokens selected for production.",
+      "ref": "docs/proposals/codex-like-workbench/tokens.json"
+    },
+    {
+      "purpose": "Independent successful Outcome for the protected visual-direction decision.",
+      "ref": ".vibehub/outcomes/ticket-decide-codex-like-workbench-visual-language.yaml"
+    },
+    {
+      "purpose": "Latest explicit owner refinements shared by the approved Rooms and visual surfaces, including monospace, SVG, minimal copy, neutral row action, and counts-as-legend.",
+      "ref": ".vibehub/evidence/ticket-decide-rooms-workbench-direction/rooms-workbench-direction-owner-decision.yaml"
+    },
+    {
+      "purpose": "Binding causal-layout, truthful-presence, accessibility, and read-only Workbench constraint.",
       "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     },
     {
-      "purpose": "Current production baseline whose successor will be constrained by prerequisite Outcomes and Evidence.",
+      "purpose": "Current production behavior and source-truth baseline that styling must preserve.",
       "ref": "docs/LOCAL_GRAPH_DESIGN.md"
     }
   ],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "The selected Codex-like visual system is applied consistently to the canvas-first Workbench without losing Victor's causal interaction, PR #15 authority semantics, or dense-graph usability.",
+  "maturity": "firm",
+  "outcome": "The owner-selected Codex-like visual system is applied consistently to the production canvas-first Workbench without losing causal interaction, PR #15 authority semantics, archive/query truth, or dense-graph usability.",
   "provenance_refs": [
     "conversation:2026-08-11-owner-wants-codex-like-workbench-language",
-    "context:decision-draft-ticket-maturity"
+    "conversation:2026-08-13-owner-approves-codex-like-direction-with-interface-refinements",
+    "conversation:2026-08-13-owner-selects-global-monospace-and-counts-legend"
   ],
   "relations": [
     {
-      "rationale": "Production acceptance cannot be firmed until the owner-selected visual direction is recorded and independently accepted.",
+      "rationale": "Production acceptance is grounded in the independently accepted owner-selected visual direction.",
       "target_ticket_id": "ticket-decide-codex-like-workbench-visual-language",
       "type": "depends_on"
     },
     {
-      "rationale": "The final visual treatment must be verified on the completed dense two-orientation graph geometry.",
-      "target_ticket_id": "ticket-workbench-dense-graph-layout",
+      "rationale": "The visual system must retain canonical archive/query filters, subdued archive boundaries, progressive history stubs, and dense two-orientation geometry.",
+      "target_ticket_id": "ticket-queryable-archived-ticket-history",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The latest global typography, SVG, minimal-copy, row-action, and counts-as-legend refinements were protected by and explicitly approved through the Rooms owner decision.",
+      "target_ticket_id": "ticket-decide-rooms-workbench-direction",
       "type": "depends_on"
     }
   ],

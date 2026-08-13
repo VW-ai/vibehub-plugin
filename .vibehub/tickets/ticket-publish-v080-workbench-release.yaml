@@ -1,0 +1,54 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "verified-feature-pr-is-merged",
+      "criterion": "The focused v0.8.0 Web Workbench PR merges with successful required checks, and fetched origin/main contains the exact integration Outcome, its acceptance-linked Evidence, and all constituent successful Outcomes without unrelated Desktop or runtime surfaces."
+    },
+    {
+      "acceptance_id": "delivery-membership-is-made-authoritative",
+      "criterion": "After GitHub reports the merge, every constituent Ticket named by the integration Ticket's exact closed-set rule changes its matching canonical pull_request delivery entry from proposed to delivered with the exact GitHub mergedAt timestamp and 40-hex merge commit; a bounded follow-up Git change containing those facts is merged before release tagging, while historical and future non-constituent Tickets are untouched."
+    },
+    {
+      "acceptance_id": "v080-tags-the-final-main-commit",
+      "criterion": "After fetching and fast-forwarding local main, lightweight tag v0.8.0 points exactly to the final origin/main commit that contains the authoritative delivered membership change and is pushed to origin; no feature-branch-only commit is tagged."
+    },
+    {
+      "acceptance_id": "v080-github-release-is-verified",
+      "criterion": "The Release VibeHub workflow for the exact v0.8.0 tag completes successfully; GitHub Release v0.8.0 is published as neither draft nor prerelease; vibehub-plugin-0.8.0.tar.gz and vibehub-plugin-0.8.0.tar.gz.sha256 both exist; and a fresh local download passes SHA-256 verification and archive readability checks."
+    }
+  ],
+  "constraints": [
+    "Never tag or publish from the feature branch; tag only the final exact origin/main commit after authoritative delivery metadata is merged.",
+    "Do not create the GitHub Release manually; wait for the tag-triggered Release VibeHub workflow.",
+    "Tag exactly v0.8.0 with no alternate spelling or suffix.",
+    "Do not publish to npm or add updater, Desktop, launcher, session watcher, repository switcher, database, daemon, or writable Web runtime machinery.",
+    "Do not mark a proposed delivery as delivered until GitHub exposes its exact merge commit and mergedAt timestamp."
+  ],
+  "context": "The owner explicitly authorized a new release for the concentrated Web Workbench upgrade. Publication begins only after the integration Ticket independently proves the v0.8.0 release candidate and focused feature PR. Follow docs/RELEASE.md: merge the verified PR, fetch and fast-forward to the exact remote main state, then record the now-authoritative pull-request delivery commit and time in a bounded follow-up Git change before tagging the final merged main commit. Tag exactly v0.8.0, let the existing tag-triggered workflow create the GitHub Release, and verify its archive and checksum locally. This Ticket owns external merge and publication facts; it must never infer delivery before GitHub reports the merge.",
+  "context_refs": [
+    {
+      "purpose": "Authoritative merged-main tagging and release verification procedure.",
+      "ref": "docs/RELEASE.md"
+    },
+    {
+      "purpose": "Tag-triggered workflow that verifies, builds, checksums, and creates the GitHub Release.",
+      "ref": ".github/workflows/release.yml"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "VibeHub v0.8.0 is merged, tagged, and published from the exact verified main commit as a GitHub Release with a locally verified archive and SHA-256 checksum, while the constituent Tickets record truthful delivered PR membership.",
+  "provenance_refs": [
+    "conversation:2026-08-13-owner-authorizes-new-release",
+    "release:v0.8.0"
+  ],
+  "relations": [
+    {
+      "rationale": "External merge and release begin only after the complete v0.8.0 candidate and focused PR are independently accepted.",
+      "target_ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-publish-v080-workbench-release"
+}

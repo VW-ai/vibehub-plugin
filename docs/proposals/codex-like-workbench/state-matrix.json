@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "operational_axis": [
+    { "state": "DONE", "whole_card": "quiet green-gray surface", "label": "check icon + DONE", "meaning": "successful Outcome accepted" },
+    { "state": "READY", "whole_card": "quiet blue surface", "label": "play icon + READY", "meaning": "executable with no unresolved direct prerequisite" },
+    { "state": "BLOCKED", "whole_card": "quiet amber surface", "label": "lock icon + BLOCKED", "meaning": "one or more direct prerequisites unresolved" },
+    { "state": "REFINE", "whole_card": "quiet violet surface", "label": "sliders icon + REFINE", "meaning": "direction exists but acceptance is not yet executable" },
+    { "state": "DEVIATED", "whole_card": "quiet red surface", "label": "warning icon + DEVIATED", "meaning": "recorded Outcome or source deviates from contract" }
+  ],
+  "attention_axis": [
+    { "state": "UPCOMING", "treatment": "outlined top-right badge", "label": "dashed-circle icon + UPCOMING", "meaning": "future human authority boundary; no action now" },
+    { "state": "PENDING", "treatment": "solid top-right badge and small side notch", "label": "hand icon + NEEDS YOU", "meaning": "human input is required now" },
+    { "state": "RECORDED", "treatment": "blue top-right badge", "label": "bookmark-check icon + DECISION NOTED", "meaning": "human-origin Evidence exists but closeout is incomplete" },
+    { "state": "COMPLETE", "treatment": "green-gray top-right badge", "label": "double-check icon + COMPLETE", "meaning": "human criterion independently accepted" }
+  ],
+  "coexistence_examples": [
+    { "operational": "BLOCKED", "attention": "UPCOMING", "rendered_as": "BLOCKED card + UPCOMING badge", "truth": "dependency blocks execution; the person is not being asked yet" },
+    { "operational": "READY", "attention": "PENDING", "rendered_as": "READY card + NEEDS YOU badge", "truth": "the Ticket is ready specifically for the owner decision" },
+    { "operational": "BLOCKED", "attention": "RECORDED", "rendered_as": "BLOCKED card + DECISION NOTED badge", "truth": "the choice is recorded; another prerequisite or closeout still blocks" },
+    { "operational": "DONE", "attention": "COMPLETE", "rendered_as": "DONE card + COMPLETE badge", "truth": "both operational and protected human acceptance are complete" }
+  ],
+  "non_color_contract": "Every state and attention treatment includes a stable uppercase label and distinct icon; color is redundant reinforcement only."
+}

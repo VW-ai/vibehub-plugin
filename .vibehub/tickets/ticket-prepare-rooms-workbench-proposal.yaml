@@ -1,4 +1,5 @@
 {
+  "deliveries": [{"kind":"pull_request","ref":"https://github.com/VW-ai/vibehub-plugin/pull/21","state":"proposed"}],
   "acceptance": [
     {
       "acceptance_id": "rooms-proposal-is-reviewable",

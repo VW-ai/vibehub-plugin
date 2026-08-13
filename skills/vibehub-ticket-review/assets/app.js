@@ -2,50 +2,66 @@
   "use strict";
 
   const SVG = "http://www.w3.org/2000/svg";
-  const NODE = { width: 232, height: 96 };
-  // Top-to-bottom causal flow: layers stack vertically (proven foundations at
-  // the top, READY/BLOCKED downstream below), siblings spread horizontally.
-  const LAYOUT = {
-    marginX: 84,
-    marginY: 72,
-    columnGap: 52,
-    rowGap: 108,
-    sweeps: 5,
-  };
-  // §11.3 honesty rule: IMPLEMENTING may only come from a trusted Active-Run
-  // presence input. The MVP has no such source, so presence is always empty
-  // here and is never derived from Ticket YAML, Git-native states, dirty
-  // files, or timestamps.
-  const ACTIVE_RUN_PRESENCE = Object.freeze([]);
-  const PRESENCE_EMPTY_MESSAGE =
-    "No Active Run can be proven right now.";
-  const PRESENCE_EMPTY_DETAIL =
-    "The READY frontier remains available.";
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
+  const HISTORY_STUB = Object.freeze({ width: 116, height: 70 });
   const workbenchModel = globalThis.VibeHubWorkbenchModel;
+  const graphLayoutModel = globalThis.VibeHubGraphLayout;
   if (!workbenchModel) {
     throw new Error("VibeHub Workbench presentation model is unavailable.");
   }
+  if (!graphLayoutModel) {
+    throw new Error("VibeHub Workbench graph layout is unavailable.");
+  }
+  const { NODE } = graphLayoutModel;
   const {
     agentHandoffInstruction,
     causalPriority: operationalPriority,
     graphNarrative,
     graphSummary,
+    layoutDirectionHref,
+    layoutDirectionSpec,
+    localFocusHref,
+    normalizeLayoutDirection,
     operationalCounts,
     ticketAttentionState,
     ticketNodePresentation,
     ticketOperationalState,
+    workbenchOverview,
   } = workbenchModel;
   const TICKET_VIEW_IDS = new Map([
     ["execution", "execution"],
     ["contract", "contract"],
     ["log", "evidence"],
   ]);
+  const STATE_ICON_IDS = Object.freeze({
+    DONE: "check",
+    READY: "play",
+    BLOCKED: "lock",
+    REFINE: "sliders",
+    DEVIATED: "alert",
+    ARCHIVED: "archive",
+  });
+  const ATTENTION_ICON_IDS = Object.freeze({
+    UPCOMING: "upcoming",
+    PENDING: "pending",
+    RECORDED: "recorded",
+    COMPLETE: "complete",
+  });
+  const ROOM_STATE_PRESENTATION = Object.freeze({
+    FRESH: { label: "FRESH", icon: "check" },
+    DRIFTED: { label: "DRIFTED", icon: "drift" },
+    WARNING: { label: "OLD CHECKOUT", icon: "history" },
+    STALE: { label: "STALE", icon: "alert-circle" },
+    COLD_START: { label: "ROOMS NOT INITIALIZED", icon: "snowflake" },
+  });
   const focusQuery = new URLSearchParams(location.search);
   const requestedTicketId = focusQuery.get("ticket");
   const requestedViewId = TICKET_VIEW_IDS.get(focusQuery.get("view"))
     ?? "execution";
+  const requestedDirection = normalizeLayoutDirection(
+    focusQuery.get("direction"),
+  );
 
   const elements = {
     projectName: document.querySelector("#projectName"),
@@ -56,14 +72,9 @@
     sourceDockTitle: document.querySelector("#sourceDockTitle"),
     sourceDockContent: document.querySelector("#sourceDockContent"),
     closeSourceDock: document.querySelector("#closeSourceDock"),
-    implementingList: document.querySelector("#implementingList"),
-    implementingStripBody: document.querySelector("#implementingStripBody"),
-    frontierList: document.querySelector("#frontierList"),
-    frontierCount: document.querySelector("#frontierCount"),
     summaryReady: document.querySelector("#summaryReady"),
     summaryRefine: document.querySelector("#summaryRefine"),
-    summaryBlocked: document.querySelector("#summaryBlocked"),
-    summaryDone: document.querySelector("#summaryDone"),
+    summaryHuman: document.querySelector("#summaryHuman"),
     summaryDeviated: document.querySelector("#summaryDeviated"),
     sourcePath: document.querySelector("#sourcePath"),
     sourceBranch: document.querySelector("#sourceBranch"),
@@ -73,13 +84,36 @@
     graphSummary: document.querySelector("#graphSummary"),
     graphSignal: document.querySelector("#graphSignal"),
     graphSignalCount: document.querySelector("#graphSignalCount"),
+    overviewPanel: document.querySelector("#overviewPanel"),
+    closeOverview: document.querySelector("#closeOverview"),
     stateDot: document.querySelector("#stateDot"),
     stateLabel: document.querySelector("#stateLabel"),
     sourceStatus: document.querySelector("#sourceStatus"),
     copyLink: document.querySelector("#copyLink"),
+    roomsButton: document.querySelector("#roomsButton"),
+    roomsCount: document.querySelector("#roomsCount"),
+    roomsPanel: document.querySelector("#roomsPanel"),
+    closeRooms: document.querySelector("#closeRooms"),
+    roomsTree: document.querySelector("#roomsTree"),
+    roomDetail: document.querySelector("#roomDetail"),
+    roomEmpty: document.querySelector("#roomEmpty"),
+    roomTitle: document.querySelector("#roomTitle"),
+    roomState: document.querySelector("#roomState"),
+    roomBoundary: document.querySelector("#roomBoundary"),
+    roomContextCount: document.querySelector("#roomContextCount"),
+    roomTicketCount: document.querySelector("#roomTicketCount"),
+    roomDetailContent: document.querySelector("#roomDetailContent"),
+    roomFilterAction: document.querySelector("#roomFilterAction"),
+    roomFilterStatus: document.querySelector("#roomFilterStatus"),
+    roomFilterName: document.querySelector("#roomFilterName"),
+    clearRoomFilter: document.querySelector("#clearRoomFilter"),
     workspace: document.querySelector(".workspace"),
     canvas: document.querySelector("#canvas"),
     graph: document.querySelector("#graph"),
+    directionLtr: document.querySelector("#directionLtr"),
+    directionTtb: document.querySelector("#directionTtb"),
+    scopeCurrent: document.querySelector("#scopeCurrent"),
+    scopeAll: document.querySelector("#scopeAll"),
     world: document.querySelector("#world"),
     edgeLayer: document.querySelector("#edgeLayer"),
     nodeLayer: document.querySelector("#nodeLayer"),
@@ -93,11 +127,13 @@
     inspectorOutcome: document.querySelector("#inspectorOutcome"),
     inspectorContent: document.querySelector("#inspectorContent"),
     toast: document.querySelector("#toast"),
+    textTooltip: document.querySelector("#textTooltip"),
   };
 
   let token = location.hash.slice(1);
   let state = null;
   let positions = new Map();
+  let graphGeometry = { positions, routes: new Map() };
   let selected = null;
   let lastFocusedSubject = null;
   let graphRequest = 0;
@@ -105,16 +141,55 @@
   let panX = 0;
   let panY = 0;
   let scale = 1;
+  let layoutDirection = requestedDirection;
   let dragging = null;
   let suppressCanvasClick = false;
   let toastTimer = null;
+  let tooltipAnchor = null;
   let initialFocusPending = Boolean(requestedTicketId);
+  let selectedRoom = null;
+  let roomView = "context";
+  let roomFilterSnapshot = null;
+
+  normalizeGraphQueryUrl();
+
+  function graphQuery() {
+    const query = new URLSearchParams(location.search);
+    return {
+      scope: query.get("scope") ?? "current",
+      delivery: query.get("delivery"),
+      rooms: query.getAll("room").sort(),
+      historyIds: query.getAll("history").sort(),
+    };
+  }
+
+  function normalizeGraphQueryUrl() {
+    const url = new URL(location.href);
+    if (!url.searchParams.has("scope")) url.searchParams.set("scope", "current");
+    for (const key of ["room", "history"]) {
+      const values = [...new Set(url.searchParams.getAll(key))].sort();
+      url.searchParams.delete(key);
+      for (const value of values) url.searchParams.append(key, value);
+    }
+    history.replaceState(null, "", url.href);
+  }
 
   function svg(tag, attributes = {}) {
     const element = document.createElementNS(SVG, tag);
     for (const [name, value] of Object.entries(attributes)) {
       element.setAttribute(name, String(value));
     }
+    return element;
+  }
+
+  function svgIcon(iconId, attributes = {}) {
+    return svg("use", { href: `#icon-${iconId}`, ...attributes });
+  }
+
+  function htmlIcon(iconId) {
+    const element = document.createElementNS(SVG, "svg");
+    element.setAttribute("aria-hidden", "true");
+    element.append(svgIcon(iconId));
     return element;
   }
 
@@ -127,7 +202,13 @@
     const body = options.body === undefined
       ? undefined
       : JSON.stringify(options.body);
-    const response = await fetch(path, {
+    const requestUrl = new URL(path, location.origin);
+    const query = graphQuery();
+    requestUrl.searchParams.set("scope", query.scope);
+    if (query.delivery) requestUrl.searchParams.set("delivery", query.delivery);
+    for (const room of query.rooms) requestUrl.searchParams.append("room", room);
+    for (const id of query.historyIds) requestUrl.searchParams.append("history", id);
+    const response = await fetch(`${requestUrl.pathname}${requestUrl.search}`, {
       method: options.method ?? "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -151,7 +232,7 @@
     return envelope.data;
   }
 
-  async function refresh(message) {
+  async function refresh(message, { preserveLayout = false } = {}) {
     const request = ++graphRequest;
     subjectRequest += 1;
     setBusy(true);
@@ -159,16 +240,21 @@
       const nextState = await api("/api/state");
       if (request !== graphRequest) return;
       subjectRequest += 1;
+      const fixedPositions = preserveLayout ? new Map(positions) : null;
+      const previousSelection = preserveLayout ? selected : null;
       state = nextState;
-      selected = null;
-      positions = layoutGraphTopToBottom(
+      selected = previousSelection;
+      graphGeometry = layoutGraph(
         state.graph.tickets,
         state.graph.relations,
+        layoutDirection,
+        fixedPositions ? { fixedPositions } : undefined,
       );
+      positions = graphGeometry.positions;
       renderChrome();
       renderGraph();
       renderMinimap();
-      requestAnimationFrame(frameGraph);
+      requestAnimationFrame(preserveLayout ? applyTransform : frameGraph);
       const focusedTicketExists = initialFocusPending
         && state.graph.tickets.some(
           (ticket) => ticket.ticketId === requestedTicketId,
@@ -180,6 +266,16 @@
           false,
           requestedViewId,
         );
+      } else if (preserveLayout && previousSelection?.kind === "ticket"
+        && state.graph.tickets.some((ticket) => ticket.ticketId === previousSelection.id)) {
+        await selectTicket(
+          previousSelection.id,
+          false,
+          TICKET_VIEW_IDS.get(new URLSearchParams(location.search).get("view")) ?? "execution",
+        );
+      } else if (preserveLayout && previousSelection?.kind === "relation"
+        && state.graph.relations.some((relation) => relation.relationRef === previousSelection.id)) {
+        await selectRelation(previousSelection.id, false);
       } else {
         renderGraphInspector({ open: false });
       }
@@ -198,17 +294,19 @@
     const { project, graph } = state;
     const { source } = graph;
     const counts = operationalCounts(graph.tickets);
+    const overview = workbenchOverview(graph.tickets, source);
     const deviatedCount = counts.DEVIATED;
     elements.projectName.textContent = project.name;
     elements.repoBranch.textContent = project.branch;
     renderSourceDock();
-    renderImplementingNow();
-    renderFrontier();
-    renderSummaryCounts(counts);
-    elements.graphSummary.textContent = graphSummary(counts);
+    renderOverview(overview);
+    renderGraphSummary(counts, overview);
+    renderRooms();
+    renderDirectionControl();
+    renderScopeControl();
     elements.graphSignalCount.textContent =
-      `${graph.tickets.length} Ticket${graph.tickets.length === 1 ? "" : "s"}`
-      + ` · ${graph.relations.length} direct unlock${graph.relations.length === 1 ? "" : "s"}`;
+      `${overview.ready.length} ready · ${overview.humanPending.length} need you · `
+      + (overview.sourceDirty ? "local changes" : "exact source");
     document.title = `${project.name} · VibeHub Ticket graph`;
     elements.stateDot.className =
       `state-dot${
@@ -226,77 +324,208 @@
     elements.minimap.hidden = graph.tickets.length === 0;
   }
 
-  function renderImplementingNow() {
-    // Renders exclusively from ACTIVE_RUN_PRESENCE — the only permitted input
-    // for this surface. The MVP has no trusted presence source, so both the
-    // strip and the rail list always show the explicit honest empty state.
-    // Git-native READY/BLOCKED/DONE/DEVIATED/REFINE, Ticket YAML, dirty
-    // files, and timestamps are never consulted and never promoted to
-    // IMPLEMENTING here.
-    if (ACTIVE_RUN_PRESENCE.length > 0) {
-      throw new Error(
-        "Active-Run presence rendering requires a trusted presence contract "
-        + "that does not exist yet.",
-      );
-    }
-    const strip = document.createElement("p");
-    strip.className = "presence-empty";
-    const primary = document.createElement("strong");
-    primary.textContent = PRESENCE_EMPTY_MESSAGE;
-    const detail = document.createElement("span");
-    detail.textContent = PRESENCE_EMPTY_DETAIL;
-    strip.append(primary, detail);
-    elements.implementingStripBody.replaceChildren(strip);
-    const railEmpty = document.createElement("p");
-    railEmpty.className = "presence-empty compact";
-    railEmpty.textContent =
-      `${PRESENCE_EMPTY_MESSAGE} ${PRESENCE_EMPTY_DETAIL}`;
-    elements.implementingList.replaceChildren(railEmpty);
+  function renderDirectionControl() {
+    const leftToRight = layoutDirection === "ltr";
+    elements.directionLtr.setAttribute("aria-pressed", String(leftToRight));
+    elements.directionTtb.setAttribute("aria-pressed", String(!leftToRight));
+    elements.graph.setAttribute(
+      "aria-label",
+      leftToRight
+        ? "Left-to-right causal graph"
+        : "Top-to-bottom causal graph",
+    );
+    elements.canvas.dataset.direction = layoutDirection;
+    const nextHref = layoutDirectionHref(location.href, layoutDirection);
+    if (nextHref !== location.href) history.replaceState(null, "", nextHref);
   }
 
-  function renderFrontier() {
-    const ready = state.graph.tickets.filter(
-      (ticket) => ticketOperationalState(ticket)?.label === "READY",
-    );
-    elements.frontierCount.textContent = String(ready.length);
-    if (!ready.length) {
-      const empty = document.createElement("p");
-      empty.className = "rail-empty";
-      empty.textContent = "No Ticket is executable right now.";
-      elements.frontierList.replaceChildren(empty);
-      return;
-    }
-    const items = ready.map((ticket) => {
+  function renderScopeControl() {
+    const current = graphQuery().scope === "current";
+    elements.scopeCurrent.setAttribute("aria-pressed", String(current));
+    elements.scopeAll.setAttribute("aria-pressed", String(!current));
+  }
+
+  function renderOverview(overview) {
+    elements.summaryReady.textContent = String(overview.ready.length);
+    elements.summaryHuman.textContent = String(overview.humanPending.length);
+    elements.summaryDeviated.textContent = String(overview.deviated.length);
+    elements.summaryRefine.textContent = String(overview.refineCount);
+  }
+
+  function renderGraphSummary(counts, overview) {
+    const items = [];
+    const add = (count, label, icon, className) => {
+      if (!count) return;
+      const item = document.createElement("span");
+      item.className = classes("canvas-summary-item", className);
+      item.setAttribute("role", "listitem");
+      const value = document.createElement("b");
+      value.textContent = String(count);
+      item.append(htmlIcon(icon), value, ` ${label}`);
+      items.push(item);
+    };
+    add(counts.DONE, "DONE", "check", "state-done");
+    add(counts.READY, "READY", "play", "state-ready");
+    add(counts.REFINE, "REFINE", "sliders", "state-refine");
+    add(counts.BLOCKED, "BLOCKED", "lock", "state-blocked");
+    add(counts.DEVIATED, "DEVIATED", "alert", "state-deviated");
+    add(overview.humanPending.length, "NEEDS YOU", "pending", "attention-pending");
+    elements.graphSummary.replaceChildren(...items);
+  }
+
+  function renderRooms() {
+    const rooms = state.rooms?.rooms ?? [];
+    elements.roomsCount.textContent = String(rooms.length);
+    elements.roomsTree.replaceChildren(...rooms.map((room) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "frontier-item";
-      button.title = ticket.ticketId;
-      const marker = document.createElement("span");
-      marker.className = "frontier-marker";
-      marker.setAttribute("aria-hidden", "true");
-      const copy = document.createElement("span");
-      copy.className = "frontier-copy";
-      const name = document.createElement("strong");
-      name.textContent = shortTicketId(ticket.ticketId);
-      const stateName = document.createElement("span");
-      stateName.textContent = "READY";
-      copy.append(name, stateName);
-      button.append(marker, copy);
-      button.addEventListener(
-        "click",
-        () => void selectTicket(ticket.ticketId, true),
-      );
+      button.setAttribute("role", "treeitem");
+      button.setAttribute("aria-selected", String(selectedRoom === room.room));
+      button.setAttribute("aria-level", String(room.room.split("/").length));
+      button.dataset.room = room.room;
+      button.style.setProperty("--room-depth", String(room.room.split("/").length - 1));
+      button.append(htmlIcon("room"));
+      const label = document.createElement("span");
+      label.className = "room-tree-label";
+      const strong = document.createElement("strong");
+      strong.textContent = room.roomId;
+      const small = document.createElement("small");
+      small.textContent = `${room.contexts.length} Context · ${room.consumingTickets.length} Tickets`;
+      label.append(strong, small);
+      const presentation = roomStatePresentation(room.drift.state);
+      const drift = document.createElement("span");
+      drift.className = `room-drift state-${room.drift.state.toLowerCase()}`;
+      drift.append(htmlIcon(presentation.icon));
+      if (room.drift.state !== "FRESH") drift.append(presentation.label);
+      else drift.setAttribute("aria-label", "Fresh");
+      button.append(label, drift);
+      button.addEventListener("click", () => selectRoom(
+        selectedRoom === room.room ? null : room.room,
+      ));
       return button;
-    });
-    elements.frontierList.replaceChildren(...items);
+    }));
+    const active = rooms.find((room) => room.room === selectedRoom);
+    elements.roomDetail.hidden = !active;
+    elements.roomEmpty.hidden = Boolean(active);
+    if (!active) {
+      const emptyLabel = elements.roomEmpty.querySelector("strong");
+      const coldStart = state.rooms?.coldStart === true;
+      const presentation = roomStatePresentation("COLD_START");
+      emptyLabel.textContent = coldStart ? presentation.label : "Select a Room";
+      const use = elements.roomEmpty.querySelector("use");
+      use.setAttribute("href", `#icon-${coldStart ? presentation.icon : "room"}`);
+    }
+    if (active) renderRoomDetail(active);
+    const filteredRooms = graphQuery().rooms;
+    elements.roomFilterStatus.hidden = filteredRooms.length === 0;
+    elements.roomFilterName.textContent = filteredRooms.join(" + ");
   }
 
-  function renderSummaryCounts(counts) {
-    elements.summaryReady.textContent = String(counts.READY);
-    elements.summaryRefine.textContent = String(counts.REFINE);
-    elements.summaryBlocked.textContent = String(counts.BLOCKED);
-    elements.summaryDone.textContent = String(counts.DONE);
-    elements.summaryDeviated.textContent = String(counts.DEVIATED);
+  function selectRoom(room) {
+    selectedRoom = room;
+    roomView = "context";
+    renderRooms();
+  }
+
+  function renderRoomDetail(room) {
+    const presentation = roomStatePresentation(room.drift.state);
+    elements.roomTitle.textContent = room.roomId;
+    elements.roomBoundary.textContent = room.boundary;
+    elements.roomContextCount.textContent = String(room.contexts.length);
+    elements.roomTicketCount.textContent = String(room.consumingTickets.length);
+    elements.roomState.className = `room-state state-${room.drift.state.toLowerCase()}`;
+    elements.roomState.replaceChildren(
+      htmlIcon(presentation.icon),
+      document.createTextNode(presentation.label),
+    );
+    for (const tab of document.querySelectorAll("[data-room-view]")) {
+      tab.setAttribute("aria-selected", String(tab.dataset.roomView === roomView));
+    }
+    const rows = roomView === "context"
+      ? room.contexts.map((item) => [item.contextId, item.summary])
+      : roomView === "tickets"
+        ? room.consumingTickets.map((ticketId) => [ticketId, "Consumes this Room subtree"])
+        : roomDriftRows(room);
+    elements.roomDetailContent.replaceChildren(...rows.map(([title, detail]) => {
+      const row = document.createElement("div");
+      row.className = "room-detail-row";
+      const strong = document.createElement("strong");
+      strong.textContent = title;
+      const small = document.createElement("small");
+      small.textContent = detail;
+      row.append(strong, small);
+      return row;
+    }));
+    elements.roomFilterAction.disabled = graphQuery().rooms.includes(room.room);
+    elements.roomFilterAction.querySelector("span").textContent = elements.roomFilterAction.disabled
+      ? "Showing related Tickets"
+      : "Show related Tickets";
+  }
+
+  function roomStatePresentation(stateLabel) {
+    return ROOM_STATE_PRESENTATION[stateLabel]
+      ?? { label: String(stateLabel || "COLD_START"), icon: "alert-circle" };
+  }
+
+  function roomDriftRows(room) {
+    const drift = room.drift;
+    const presentation = roomStatePresentation(drift.state);
+    if (drift.state === "FRESH") return [["FRESH", "Aligned with the current Git snapshot"]];
+    const rows = [];
+    if (drift.reason) rows.push([presentation.label, drift.reason]);
+    for (const key of ["changed", "added", "deleted"]) {
+      if (drift[key]?.length) rows.push([`${drift[key].length} ${key}`, drift[key].join(", ")]);
+    }
+    return rows.length ? rows : [[presentation.label, "Room alignment needs attention"]];
+  }
+
+  function toggleRooms(force = null) {
+    const open = force ?? elements.roomsPanel.hidden;
+    elements.roomsPanel.hidden = !open;
+    elements.roomsPanel.inert = !open;
+    elements.roomsButton.setAttribute("aria-expanded", String(open));
+    elements.roomsButton.classList.toggle("active", open);
+  }
+
+  async function applyRoomFilter() {
+    if (!selectedRoom || graphQuery().rooms.includes(selectedRoom)) return;
+    roomFilterSnapshot = {
+      url: location.href,
+      positions: new Map(positions),
+      panX,
+      panY,
+      scale,
+      selected,
+    };
+    const url = new URL(location.href);
+    url.searchParams.append("room", selectedRoom);
+    history.replaceState(null, "", url.href);
+    await refresh(`Showing ${selectedRoom} Tickets`, { preserveLayout: true });
+  }
+
+  async function clearRoomFilter() {
+    const snapshot = roomFilterSnapshot;
+    const url = snapshot ? new URL(snapshot.url) : new URL(location.href);
+    if (!snapshot) url.searchParams.delete("room");
+    history.replaceState(null, "", url.href);
+    if (snapshot) {
+      positions = new Map(snapshot.positions);
+      panX = snapshot.panX;
+      panY = snapshot.panY;
+      scale = snapshot.scale;
+      selected = snapshot.selected;
+    }
+    await refresh("Room filter cleared", { preserveLayout: true });
+    if (snapshot) {
+      await new Promise((resolve) => requestAnimationFrame(
+        () => requestAnimationFrame(resolve),
+      ));
+      panX = snapshot.panX;
+      panY = snapshot.panY;
+      scale = snapshot.scale;
+      applyTransform();
+    }
+    roomFilterSnapshot = null;
   }
 
   function renderGraph() {
@@ -304,8 +533,6 @@
     elements.nodeLayer.replaceChildren();
     if (!state) return;
     const related = selected ? causalCone(selected) : null;
-    const ports = relationPorts(state.graph.relations);
-
     for (const relation of state.graph.relations) {
       const from = positions.get(relation.prerequisiteTicketId);
       const to = positions.get(relation.dependentTicketId);
@@ -325,12 +552,8 @@
           `${relation.prerequisiteTicketId} unlocks ${relation.dependentTicketId}`,
       });
       group.dataset.relationRef = relation.relationRef;
-      const geometry = edgeGeometry(
-        from,
-        to,
-        relation.relationRef,
-        ports.get(relation.relationRef),
-      );
+      const geometry = graphGeometry.routes.get(relation.relationRef);
+      if (!geometry) continue;
       group.append(
         svg("path", { class: "edge-visible", d: geometry.path }),
         svg("path", { class: "edge-arrow", d: geometry.arrow }),
@@ -360,6 +583,43 @@
       elements.edgeLayer.append(group);
     }
 
+    for (const stub of state.graph.stubs ?? []) {
+      const anchor = positions.get(stub.anchorTicketId);
+      if (!anchor) continue;
+      const point = historyStubPosition(anchor, stub.direction);
+      const group = svg("g", {
+        class: "history-stub",
+        transform: `translate(${point.x} ${point.y})`,
+        role: "button",
+        tabindex: "0",
+        "aria-label": `${stub.hiddenTicketCount} hidden archived Ticket${stub.hiddenTicketCount === 1 ? "" : "s"} ${stub.direction}; reveal next hop`,
+      });
+      group.dataset.stubRef = stub.stubRef;
+      group.append(svg("rect", {
+        width: HISTORY_STUB.width,
+        height: HISTORY_STUB.height,
+        rx: 8,
+      }));
+      const label = svg("text", {
+        x: HISTORY_STUB.width / 2,
+        y: HISTORY_STUB.height / 2 + 4,
+        "text-anchor": "middle",
+      });
+      label.textContent = `${stub.hiddenTicketCount} archived ${stub.direction === "upstream" ? "←" : "→"}`;
+      group.append(label);
+      group.addEventListener("click", (event) => {
+        event.stopPropagation();
+        void revealHistory(stub.nextTicketIds);
+      });
+      group.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          void revealHistory(stub.nextTicketIds);
+        }
+      });
+      elements.nodeLayer.append(group);
+    }
+
     for (const ticket of state.graph.tickets) {
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
@@ -371,11 +631,12 @@
       });
       const { operational, attention } = presentation;
       const group = svg("g", {
-        class: presentation.className,
+        class: classes(presentation.className, ticket.archived ? "archived" : ""),
         transform: `translate(${position.x} ${position.y})`,
         role: "button",
         tabindex: "0",
-        "aria-label": presentation.ariaLabel,
+        "aria-label": `${presentation.ariaLabel}${ticket.archived ? " ARCHIVED delivery history." : ""}`,
+        "data-full-text": `${ticket.ticketId}\n${ticket.outcome}`,
       });
       group.dataset.ticketId = ticket.ticketId;
       group.append(
@@ -396,8 +657,8 @@
         }),
         svg("circle", {
           class: "ticket-aperture",
-          cx: NODE.width / 2,
-          cy: NODE.height,
+          cx: layoutDirection === "ltr" ? NODE.width : NODE.width / 2,
+          cy: layoutDirection === "ltr" ? NODE.height / 2 : NODE.height,
           r: 6,
         }),
         svg("line", {
@@ -409,34 +670,62 @@
         }),
       );
       if (attention) {
-        group.append(svg("path", {
-          class: "ticket-attention",
-          d: `M ${NODE.width - 14} 9 l 5 5 -5 5 -5 -5 Z`,
-        }));
+        const attentionText = {
+          UPCOMING: "UPCOMING",
+          PENDING: "NEEDS YOU",
+          RECORDED: "RECORDED",
+          COMPLETE: "COMPLETE",
+        }[attention.label];
+        const attentionBadge = svg("g", {
+          class: "ticket-attention-badge",
+          transform: `translate(${NODE.width - 8} -12)`,
+        });
+        attentionBadge.append(
+          svg("rect", { x: -88, y: 0, width: 88, height: 24, rx: 12 }),
+          svgIcon(ATTENTION_ICON_IDS[attention.label], {
+            class: "ticket-attention-icon",
+            x: -81,
+            y: 4,
+            width: 16,
+            height: 16,
+          }),
+        );
         const attentionLabel = svg("text", {
           class: "ticket-attention-label",
-          x: NODE.width - 25,
-          y: 18,
-          "text-anchor": "end",
+          x: -61,
+          y: 15,
         });
-        attentionLabel.textContent = `${attention.humanEvidenceCount}/${attention.humanAcceptanceCount} human`;
-        group.append(attentionLabel);
+        attentionLabel.textContent = attentionText;
+        attentionBadge.append(attentionLabel);
+        group.append(attentionBadge);
       }
       const id = svg("text", { class: "ticket-id", x: 14, y: 22 });
       id.textContent = shortTicketId(ticket.ticketId);
       group.append(id);
       // The state is always a textual label; color is a secondary accent.
       if (operational) {
+        const visibleState = ticket.archived ? "ARCHIVED" : operational.label;
+        group.append(svgIcon(STATE_ICON_IDS[visibleState], {
+          class: "ticket-state-icon",
+          x: NODE.width - 80,
+          y: NODE.height - 24,
+          width: 14,
+          height: 14,
+        }));
         const status = svg("text", {
           class: "ticket-state",
           x: NODE.width - 14,
-          y: 22,
+          y: NODE.height - 12,
           "text-anchor": "end",
         });
-        status.textContent = operational.label;
+        status.textContent = visibleState;
         group.append(status);
       }
-      wrap(ticket.outcome, 34, 3).forEach((line, index) => {
+      // A 232px card has 204px of copy width after its 14px insets. The
+      // selected 12px system monospace face fits 28 display units there;
+      // using a wider logical measure lets SVG text escape the card even
+      // though the line count is clamped.
+      wrap(ticket.outcome, 28, 3).forEach((line, index) => {
         const text = svg("text", {
           class: "ticket-outcome",
           x: 14,
@@ -467,6 +756,31 @@
     applyTransform();
   }
 
+  function historyStubPosition(anchor, direction) {
+    if (layoutDirection === "ltr") {
+      return {
+        x: direction === "upstream" ? anchor.x - 142 : anchor.x + NODE.width + 26,
+        y: anchor.y + NODE.height / 2 - HISTORY_STUB.height / 2,
+      };
+    }
+    return {
+      x: anchor.x + NODE.width / 2 - HISTORY_STUB.width / 2,
+      y: direction === "upstream"
+        ? anchor.y - HISTORY_STUB.height - 20
+        : anchor.y + NODE.height + 20,
+    };
+  }
+
+  async function revealHistory(ticketIds) {
+    const url = new URL(location.href);
+    const existing = new Set(url.searchParams.getAll("history"));
+    for (const id of ticketIds) existing.add(id);
+    url.searchParams.delete("history");
+    for (const id of [...existing].sort()) url.searchParams.append("history", id);
+    history.replaceState(null, "", url.href);
+    await refresh("Archived history expanded one hop", { preserveLayout: true });
+  }
+
   function renderMinimap() {
     elements.minimap.replaceChildren();
     const bounds = graphBounds();
@@ -480,11 +794,11 @@
       const from = positions.get(relation.prerequisiteTicketId);
       const to = positions.get(relation.dependentTicketId);
       if (!from || !to) continue;
-      elements.minimap.append(svg("line", {
-        x1: from.x + NODE.width / 2,
-        y1: from.y + NODE.height,
-        x2: to.x + NODE.width / 2,
-        y2: to.y,
+      const route = graphGeometry.routes.get(relation.relationRef);
+      if (!route) continue;
+      elements.minimap.append(svg("polyline", {
+        points: route.points.map((point) => `${point.x},${point.y}`).join(" "),
+        fill: "none",
         stroke: "#9aa59f",
         "stroke-width": 4,
       }));
@@ -517,6 +831,7 @@
     const request = ++subjectRequest;
     const snapshotId = state.graph.snapshotId;
     selected = null;
+    syncFocusUrl();
     if (open) openInspector();
     else {
       elements.workspace.classList.add("inspector-closed");
@@ -620,6 +935,7 @@
     const snapshotId = state.graph.snapshotId;
     selected = { kind: "ticket", id: ticketId };
     lastFocusedSubject = selected;
+    syncFocusUrl(ticketId, initialViewId);
     openInspector();
     elements.inspectorEyebrow.textContent =
       `Ticket · ${ticket.ticketId}`;
@@ -723,6 +1039,7 @@
     const snapshotId = state.graph.snapshotId;
     selected = { kind: "relation", id: relationRef };
     lastFocusedSubject = selected;
+    syncFocusUrl();
     openInspector();
     elements.inspectorEyebrow.textContent = "Direct unlock";
     elements.inspectorTitle.textContent =
@@ -891,12 +1208,38 @@
     const restore = selected ?? lastFocusedSubject;
     subjectRequest += 1;
     selected = null;
+    syncFocusUrl();
     elements.inspector.classList.remove("open");
     elements.workspace.classList.add("inspector-closed");
     elements.inspector.setAttribute("aria-hidden", "true");
     elements.inspector.inert = true;
     renderGraph();
     requestAnimationFrame(() => focusGraphSubject(restore));
+  }
+
+  function syncFocusUrl(ticketId = null, viewId = null) {
+    const nextHref = localFocusHref(location.href, ticketId, viewId);
+    if (nextHref === location.href) return;
+    history.replaceState(null, "", nextHref);
+  }
+
+  function openOverview() {
+    elements.overviewPanel.hidden = false;
+    elements.overviewPanel.inert = false;
+    elements.graphSignal.setAttribute("aria-expanded", "true");
+    elements.closeOverview.focus();
+  }
+
+  function closeOverview(restoreFocus = true) {
+    elements.overviewPanel.hidden = true;
+    elements.overviewPanel.inert = true;
+    elements.graphSignal.setAttribute("aria-expanded", "false");
+    if (restoreFocus) elements.graphSignal.focus();
+  }
+
+  function toggleOverview() {
+    if (elements.overviewPanel.hidden) openOverview();
+    else closeOverview();
   }
 
   function focusGraphSubject(subject) {
@@ -993,6 +1336,7 @@
       arrow.textContent = "→";
       const target = document.createElement("strong");
       target.textContent = shortTicketId(relation.targetTicketId);
+      target.dataset.fullText = relation.targetTicketId;
       route.append(current, arrow, target);
       const detail = document.createElement("span");
       detail.className = "relation-rationale";
@@ -1045,6 +1389,7 @@
         control.tabIndex = active ? 0 : -1;
         panels[candidate].hidden = !active;
       });
+      syncFocusUrl(ticketId, tabs[index].id);
       if (focus) controls[index].focus();
     };
 
@@ -1292,7 +1637,8 @@
       "causal-ticket",
       operational ? `state-${operational.key}` : "",
     );
-    button.title = ticketId;
+    button.dataset.fullText = ticketId;
+    button.setAttribute("aria-label", ticketId);
     const marker = document.createElement("span");
     marker.className = "causal-ticket-state";
     marker.setAttribute("aria-hidden", "true");
@@ -1310,7 +1656,7 @@
     label.textContent = "Selected";
     const title = document.createElement("strong");
     title.textContent = shortTicketId(ticketId);
-    title.title = ticketId;
+    title.dataset.fullText = ticketId;
     current.append(label, title);
     return current;
   }
@@ -2011,7 +2357,7 @@
       button.textContent = reference.label
         ? `${reference.label} · ${compactReference(reference.ref)}`
         : compactReference(reference.ref);
-      button.title = reference.ref;
+      button.dataset.fullText = reference.ref;
       if (linkedTicket) {
         button.addEventListener(
           "click",
@@ -2089,15 +2435,18 @@
         : document.createElement("span");
       label.className = "reference-label";
       const labelText = target.label || compactReference(target.target);
-      label.title = target.target;
+      label.dataset.fullText = target.target;
       if (label instanceof HTMLAnchorElement) {
         label.href = target.href || target.actions.githubHref;
         label.target = "_blank";
         label.rel = "noreferrer";
         label.classList.add("linked-reference");
-        label.title = target.actions?.githubHref
-          ? `Open ${target.target} on GitHub`
-          : `Open ${target.target}`;
+        label.setAttribute(
+          "aria-label",
+          target.actions?.githubHref
+            ? `Open ${target.target} on GitHub`
+            : `Open ${target.target}`,
+        );
         label.append(document.createTextNode(labelText), externalLinkIcon());
       } else {
         label.textContent = labelText;
@@ -2124,7 +2473,7 @@
       const label = document.createElement("span");
       label.className = "reference-label";
       label.textContent = normalized.label;
-      label.title = normalized.target;
+      label.dataset.fullText = normalized.target;
       row.append(kind, label);
       wrapper.append(row);
     }
@@ -2142,193 +2491,29 @@
     }).format(date);
   }
 
-  function layoutGraphTopToBottom(tickets, relations) {
-    const ids = tickets.map((ticket) => ticket.ticketId).sort();
-    const outgoing = new Map(ids.map((id) => [id, []]));
-    const incoming = new Map(ids.map((id) => [id, []]));
-    const indegree = new Map(ids.map((id) => [id, 0]));
-    for (const relation of relations) {
-      if (!outgoing.has(relation.prerequisiteTicketId)
-        || !incoming.has(relation.dependentTicketId)) {
-        continue;
-      }
-      outgoing
-        .get(relation.prerequisiteTicketId)
-        .push(relation.dependentTicketId);
-      incoming
-        .get(relation.dependentTicketId)
-        .push(relation.prerequisiteTicketId);
-      indegree.set(
-        relation.dependentTicketId,
-        indegree.get(relation.dependentTicketId) + 1,
-      );
-    }
-    for (const values of [...outgoing.values(), ...incoming.values()]) {
-      values.sort();
-    }
-    const rank = new Map(ids.map((id) => [id, 0]));
-    const queue = ids.filter((id) => indegree.get(id) === 0);
-    const visited = [];
-    while (queue.length) {
-      queue.sort();
-      const id = queue.shift();
-      visited.push(id);
-      for (const dependent of outgoing.get(id)) {
-        rank.set(
-          dependent,
-          Math.max(rank.get(dependent), rank.get(id) + 1),
-        );
-        indegree.set(dependent, indegree.get(dependent) - 1);
-        if (indegree.get(dependent) === 0) queue.push(dependent);
-      }
-    }
-    if (visited.length !== ids.length) {
-      throw new Error("The Ticket graph contains a cycle and cannot be laid out.");
-    }
-    const layers = new Map();
-    for (const id of ids) {
-      const layer = rank.get(id);
-      if (!layers.has(layer)) layers.set(layer, []);
-      layers.get(layer).push(id);
-    }
-    const orderedLayers = [...layers.entries()]
-      .sort((left, right) => left[0] - right[0]);
-    const indexMap = () => new Map(
-      orderedLayers.flatMap(
-        ([, layer]) => layer.map((id, index) => [id, index]),
-      ),
-    );
-    for (let sweep = 0; sweep < LAYOUT.sweeps; sweep += 1) {
-      const forward = sweep % 2 === 0;
-      const sequence = forward
-        ? orderedLayers
-        : [...orderedLayers].reverse();
-      const indices = indexMap();
-      for (const [, layer] of sequence) {
-        layer.sort((left, right) => {
-          const leftNeighbors =
-            forward ? incoming.get(left) : outgoing.get(left);
-          const rightNeighbors =
-            forward ? incoming.get(right) : outgoing.get(right);
-          return barycenter(leftNeighbors, indices)
-            - barycenter(rightNeighbors, indices)
-            || left.localeCompare(right);
-        });
-      }
-    }
-    // Layers stack downward: rank 0 (proven foundations) is the top row and
-    // each dependent rank renders beneath its prerequisites. Rows are centered
-    // against the widest rank so the flow reads as one vertical spine.
-    const rowWidth = (count) =>
-      count * NODE.width + (count - 1) * LAYOUT.columnGap;
-    const widest = Math.max(
-      1,
-      ...orderedLayers.map(([, layer]) => layer.length),
-    );
-    const result = new Map();
-    orderedLayers.forEach(([, layer], rowIndex) => {
-      const inset = (rowWidth(widest) - rowWidth(layer.length)) / 2;
-      layer.forEach((id, column) => {
-        result.set(id, {
-          x: LAYOUT.marginX + inset
-            + column * (NODE.width + LAYOUT.columnGap),
-          y: LAYOUT.marginY + rowIndex * (NODE.height + LAYOUT.rowGap),
-        });
-      });
-    });
-    return result;
-  }
-
-  function barycenter(neighbors, indices) {
-    if (!neighbors.length) return Number.MAX_SAFE_INTEGER;
-    return neighbors.reduce(
-      (sum, id) => sum + (indices.get(id) ?? 0),
-      0,
-    ) / neighbors.length;
-  }
-
-  function relationPorts(relations) {
-    const incoming = new Map();
-    for (const relation of relations) {
-      if (!incoming.has(relation.dependentTicketId)) {
-        incoming.set(relation.dependentTicketId, []);
-      }
-      incoming.get(relation.dependentTicketId).push(relation);
-    }
-    const result = new Map(relations.map((relation) => [
-      relation.relationRef,
-      { target: 0 },
-    ]));
-    const assign = (groups, endpoint, orderBy) => {
-      for (const group of groups.values()) {
-        group.sort((left, right) =>
-          orderBy(left).localeCompare(orderBy(right))
-          || left.relationRef.localeCompare(right.relationRef));
-        group.forEach((relation, index) => {
-          result.get(relation.relationRef)[endpoint] =
-            (index - (group.length - 1) / 2) * 14;
-        });
-      }
-    };
-    assign(incoming, "target", (relation) => relation.prerequisiteTicketId);
-    return result;
-  }
-
-  function edgeGeometry(from, to, relationRef, ports = {}) {
-    // Top-to-bottom flow: an unlock leaves the bottom aperture of its
-    // prerequisite and enters the top edge of the dependent Ticket.
-    const x1 = from.x + NODE.width / 2;
-    const y1 = from.y + NODE.height + 7;
-    const x2 = to.x + NODE.width / 2 + (ports.target || 0);
-    const y2 = to.y - 2;
-    const arrow =
-      `M ${x2 - 3.5} ${y2 - 7} L ${x2} ${y2} `
-      + `L ${x2 + 3.5} ${y2 - 7} Z`;
-    const handleY = clamp(
-      y2 - 26,
-      y1 + 14,
-      y2 - 12,
-    );
-    if (Math.abs(x2 - x1) < 1) {
-      return {
-        path: `M ${x1} ${y1} V ${y2}`,
-        arrow,
-        handle: { x: x1, y: handleY },
-      };
-    }
-    const lane = stableLane(relationRef);
-    const ratio = 0.5 + lane * 0.035;
-    const mid = clamp(
-      y1 + (y2 - y1) * ratio,
-      y1 + 22,
-      y2 - 20,
-    );
-    return {
-      path: `M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`,
-      arrow,
-      handle: { x: x2, y: Math.max(mid + 10, handleY) },
-    };
-  }
-
-  function stableLane(value) {
-    let hash = 2166136261;
-    for (const character of value) {
-      hash ^= character.codePointAt(0);
-      hash = Math.imul(hash, 16777619);
-    }
-    return (Math.abs(hash) % 7) - 3;
+  function layoutGraph(tickets, relations, direction = "ltr", options) {
+    return graphLayoutModel.layoutGraph(tickets, relations, direction, options);
   }
 
   function graphBounds() {
     if (!positions.size) return null;
-    const values = [...positions.values()];
+    const values = [...positions.values()].map((value) => ({
+      ...value,
+      width: NODE.width,
+      height: NODE.height,
+    }));
+    for (const stub of state?.graph?.stubs ?? []) {
+      const anchor = positions.get(stub.anchorTicketId);
+      if (!anchor) continue;
+      values.push({ ...historyStubPosition(anchor, stub.direction), ...HISTORY_STUB });
+    }
     const minX = Math.min(...values.map((value) => value.x));
     const minY = Math.min(...values.map((value) => value.y));
     const maxX = Math.max(
-      ...values.map((value) => value.x + NODE.width),
+      ...values.map((value) => value.x + value.width),
     );
     const maxY = Math.max(
-      ...values.map((value) => value.y + NODE.height),
+      ...values.map((value) => value.y + value.height),
     );
     return {
       x: minX,
@@ -2367,13 +2552,42 @@
     );
     scale = clamp(Math.max(fitScale, 0.64), MIN_SCALE, 1);
     panX =
-      (width - bounds.width * scale) / 2 - bounds.x * scale;
-    // A tall causal flow anchors its proven foundations at the top instead of
-    // centering the middle of the graph.
-    panY = bounds.height * scale <= height - padding * 2
-      ? (height - bounds.height * scale) / 2 - bounds.y * scale
-      : padding - bounds.y * scale;
+      layoutDirection === "ltr" && bounds.width * scale > width - padding * 2
+        ? padding - bounds.x * scale
+        : (width - bounds.width * scale) / 2 - bounds.x * scale;
+    panY = layoutDirection === "ttb"
+      && bounds.height * scale > height - padding * 2
+      ? padding - bounds.y * scale
+      : (height - bounds.height * scale) / 2 - bounds.y * scale;
     applyTransform();
+  }
+
+  function setLayoutDirection(direction) {
+    const next = normalizeLayoutDirection(direction);
+    if (next === layoutDirection) return;
+    layoutDirection = next;
+    graphGeometry = layoutGraph(
+      state.graph.tickets,
+      state.graph.relations,
+      layoutDirection,
+    );
+    positions = graphGeometry.positions;
+    const nextHref = layoutDirectionHref(location.href, layoutDirection);
+    history.replaceState(null, "", nextHref);
+    renderDirectionControl();
+    renderGraph();
+    renderMinimap();
+    requestAnimationFrame(frameGraph);
+  }
+
+  async function setGraphScope(scope) {
+    if (scope === graphQuery().scope) return;
+    const url = new URL(location.href);
+    url.searchParams.set("scope", scope);
+    if (scope === "all") url.searchParams.delete("history");
+    history.replaceState(null, "", url.href);
+    selected = null;
+    await refresh(scope === "all" ? "Showing all Ticket history" : "Showing current work");
   }
 
   function zoomAt(nextScale, x, y) {
@@ -2521,10 +2735,9 @@
       closeInspector();
       return;
     }
-    // Vertical causality: Up walks to a prerequisite above, Down walks to a
-    // dependent below. Left/Right stay as aliases for the same directions.
-    const upstream = event.key === "ArrowUp" || event.key === "ArrowLeft";
-    const downstream = event.key === "ArrowDown" || event.key === "ArrowRight";
+    const directionSpec = layoutDirectionSpec(layoutDirection);
+    const upstream = event.key === directionSpec.upstreamKey;
+    const downstream = event.key === directionSpec.downstreamKey;
     if (!upstream && !downstream) return;
     event.preventDefault();
     const relation = state.graph.relations.find((item) =>
@@ -2569,6 +2782,60 @@
     );
   }
 
+  function textTooltipCandidate(target) {
+    if (!(target instanceof Element)) return null;
+    const explicit = target.closest("[data-full-text]");
+    if (explicit?.dataset.fullText?.trim()) {
+      return { anchor: explicit, text: explicit.dataset.fullText.trim() };
+    }
+    let candidate = target instanceof HTMLElement ? target : target.parentElement;
+    while (candidate && candidate !== document.body) {
+      const text = candidate.textContent?.trim();
+      if (
+        candidate !== elements.textTooltip
+        && text
+        && candidate.childElementCount === 0
+        && (candidate.scrollWidth > candidate.clientWidth + 1
+          || candidate.scrollHeight > candidate.clientHeight + 1)
+      ) {
+        return { anchor: candidate, text };
+      }
+      candidate = candidate.parentElement;
+    }
+    return null;
+  }
+
+  function showTextTooltip(candidate) {
+    if (!candidate || !candidate.text) {
+      hideTextTooltip();
+      return;
+    }
+    tooltipAnchor = candidate.anchor;
+    elements.textTooltip.textContent = candidate.text;
+    elements.textTooltip.hidden = false;
+    const anchorRect = candidate.anchor.getBoundingClientRect();
+    const tooltipRect = elements.textTooltip.getBoundingClientRect();
+    const left = clamp(
+      anchorRect.left,
+      12,
+      Math.max(12, window.innerWidth - tooltipRect.width - 12),
+    );
+    const below = anchorRect.bottom + 8;
+    const top = below + tooltipRect.height <= window.innerHeight - 12
+      ? below
+      : Math.max(12, anchorRect.top - tooltipRect.height - 8);
+    elements.textTooltip.style.left = `${left}px`;
+    elements.textTooltip.style.top = `${top}px`;
+  }
+
+  function hideTextTooltip() {
+    tooltipAnchor = null;
+    elements.textTooltip.hidden = true;
+    elements.textTooltip.textContent = "";
+    elements.textTooltip.style.removeProperty("left");
+    elements.textTooltip.style.removeProperty("top");
+  }
+
   function sourceLabel(source) {
     if (!source) return "unknown";
     const commit = source.resolvedCommit
@@ -2582,7 +2849,7 @@
     if (!state || !elements.sourceDockContent) return;
     const source = state.graph.source;
     elements.sourcePath.textContent = source.worktreeRoot;
-    elements.sourcePath.title = source.worktreeRoot;
+    elements.sourcePath.dataset.fullText = source.worktreeRoot;
     elements.sourceBranch.textContent = source.branch || "detached";
     elements.sourceCommit.textContent = source.resolvedCommit
       ? source.resolvedCommit.slice(0, 10)
@@ -2810,17 +3077,55 @@
     return Math.max(minimum, Math.min(maximum, value));
   }
 
+  document.addEventListener("pointerover", (event) => {
+    showTextTooltip(textTooltipCandidate(event.target));
+  });
+  document.addEventListener("pointerout", (event) => {
+    if (tooltipAnchor?.contains(event.relatedTarget)) return;
+    hideTextTooltip();
+  });
+  document.addEventListener("focusin", (event) => {
+    showTextTooltip(textTooltipCandidate(event.target));
+  });
+  document.addEventListener("focusout", (event) => {
+    if (tooltipAnchor?.contains(event.relatedTarget)) return;
+    hideTextTooltip();
+  });
+
   elements.sourceStatus.addEventListener(
     "click",
     () => void refresh("Graph refreshed from Git"),
   );
   elements.copyLink.addEventListener("click", () => {
-    void copyText(location.href, "Authorized link copied");
+    void copyText(
+      location.href,
+      "Focused local link copied · valid while this host is running",
+    );
   });
-  elements.graphSignal.addEventListener("click", () => {
-    renderGraphInspector();
-    renderGraph();
+  elements.roomsButton.addEventListener("click", () => toggleRooms());
+  elements.closeRooms.addEventListener("click", () => {
+    toggleRooms(false);
+    elements.roomsButton.focus();
   });
+  elements.roomsPanel.addEventListener("click", (event) => event.stopPropagation());
+  for (const tab of document.querySelectorAll("[data-room-view]")) {
+    tab.addEventListener("click", () => {
+      roomView = tab.dataset.roomView;
+      const room = state?.rooms?.rooms.find((item) => item.room === selectedRoom);
+      if (room) renderRoomDetail(room);
+    });
+  }
+  elements.roomFilterAction.addEventListener("click", () => void applyRoomFilter());
+  elements.clearRoomFilter.addEventListener("click", () => void clearRoomFilter());
+  elements.roomFilterStatus.addEventListener("click", (event) => event.stopPropagation());
+  elements.graphSignal.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleOverview();
+  });
+  elements.overviewPanel.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+  elements.closeOverview.addEventListener("click", () => closeOverview());
   elements.sourceRef.addEventListener("click", () => {
     if (!state) return;
     elements.sourceDockPanel.hidden = !elements.sourceDockPanel.hidden;
@@ -2834,6 +3139,25 @@
     elements.sourceRef.setAttribute("aria-expanded", "false");
     elements.sourceRef.focus();
   });
+  document.querySelector(".graph-tools").addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+  elements.directionLtr.addEventListener(
+    "click",
+    () => setLayoutDirection("ltr"),
+  );
+  elements.directionTtb.addEventListener(
+    "click",
+    () => setLayoutDirection("ttb"),
+  );
+  elements.scopeCurrent.addEventListener(
+    "click",
+    () => void setGraphScope("current"),
+  );
+  elements.scopeAll.addEventListener(
+    "click",
+    () => void setGraphScope("all"),
+  );
   document.querySelector("#fitGraph").addEventListener("click", fitGraph);
   document
     .querySelector("#zoomIn")
@@ -2847,12 +3171,20 @@
       suppressCanvasClick = false;
       return;
     }
+    if (!elements.overviewPanel.hidden) closeOverview(false);
     if (selected) {
       closeInspector();
     }
   });
   elements.canvas.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || event.target.closest(".ticket-node, .edge")) {
+    // The controls, Rooms sheet, Inspector, and graph nodes all live inside
+    // the canvas shell. Never capture their pointer sequence for panning: a
+    // small real-mouse movement would otherwise retarget pointerup/click to
+    // the canvas and make every nested button appear inert.
+    if (event.button !== 0 || event.target.closest(
+      "button, a, input, textarea, select, summary, [role='button'], "
+      + "[role='treeitem'], .ticket-node, .edge, .history-stub",
+    )) {
       return;
     }
     dragging = {
@@ -2894,6 +3226,15 @@
     );
   }, { passive: false });
   window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !elements.roomsPanel.hidden) {
+      toggleRooms(false);
+      elements.roomsButton.focus();
+      return;
+    }
+    if (event.key === "Escape" && !elements.overviewPanel.hidden) {
+      closeOverview();
+      return;
+    }
     if (event.key === "Escape" && elements.inspector.classList.contains("open")) {
       closeInspector();
     }

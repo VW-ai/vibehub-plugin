@@ -49,6 +49,8 @@ When a browser is unavailable, read the same graph directly:
 
 ```text
 node ../scripts/vh.mjs ticket graph --repo <root>
+node ../scripts/vh.mjs ticket graph --repo <root> --scope all
+node ../scripts/vh.mjs ticket graph --repo <root> --delivery <canonical-ref> --room <room-slug>
 node ../scripts/vh.mjs ticket get --repo <root> --input <id.json>
 ```
 

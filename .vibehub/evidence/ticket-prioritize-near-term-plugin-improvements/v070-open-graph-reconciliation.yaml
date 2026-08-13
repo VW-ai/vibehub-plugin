@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "open-graph-reconciled",
+    "observed-and-speculative-gaps-separated"
+  ],
+  "evidence_id": "v070-open-graph-reconciliation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-12T18:46:18Z",
+  "refs": [
+    "command:vh-ticket-graph-44-total-31-done-4-ready-3-refine-6-blocked",
+    ".vibehub/tickets/ticket-workbench-canvas-first-overview.yaml",
+    ".vibehub/tickets/ticket-workbench-layout-direction-choice.yaml",
+    ".vibehub/tickets/ticket-workbench-dense-graph-layout.yaml",
+    ".vibehub/tickets/ticket-propose-codex-like-workbench-visual-language.yaml",
+    ".vibehub/tickets/ticket-decide-codex-like-workbench-visual-language.yaml",
+    ".vibehub/tickets/ticket-apply-codex-like-workbench-visual-language.yaml",
+    ".vibehub/tickets/ticket-prepare-rooms-workbench-proposal.yaml",
+    ".vibehub/tickets/ticket-decide-rooms-workbench-direction.yaml",
+    ".vibehub/tickets/ticket-rooms-into-workbench.yaml",
+    ".vibehub/tickets/ticket-queryable-archived-ticket-history.yaml",
+    ".vibehub/tickets/ticket-invisible-git-cross-repo-actions.yaml",
+    ".vibehub/tickets/ticket-vibehub-cli.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "All 13 non-DONE Tickets were reconciled against the solo/small-team Plugin wedge. DO NOW: ticket-prioritize-near-term-plugin-improvements is this refresh and should close without product implementation. DO NEXT: ticket-workbench-canvas-first-overview is the smallest user-visible slice and unlocks the established UI chain. DO LATER in dependency order: ticket-workbench-layout-direction-choice after canvas focus state; ticket-workbench-dense-graph-layout after both orientations; ticket-propose-codex-like-workbench-visual-language once the shell baseline is stable; ticket-decide-codex-like-workbench-visual-language as the protected owner choice; ticket-apply-codex-like-workbench-visual-language only after owner choice and dense geometry; ticket-prepare-rooms-workbench-proposal after the core shell direction is clearer; ticket-decide-rooms-workbench-direction as its owner boundary; ticket-rooms-into-workbench after that draft is refined. REFINE FROM EVIDENCE: ticket-queryable-archived-ticket-history now has strong current evidence (31 of 44 Tickets are DONE and the Workbench renders all 44), but its archive/PR/query schema and filtered causal interaction still require an explicit refinement pass before implementation. DEFER: ticket-invisible-git-cross-repo-actions lacks one real target workflow and authority/recovery evidence; ticket-vibehub-cli has maintainability signals but no measured user outcome or command failure justifying a new public surface. No duplicate Ticket is needed: every current direction maps to one existing canonical Ticket or dependency chain.",
+  "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
+}

@@ -14,6 +14,34 @@
     "RECORDED",
     "COMPLETE",
   ]);
+  const LAYOUT_DIRECTIONS = new Set(["ltr", "ttb"]);
+
+  function normalizeLayoutDirection(value) {
+    return LAYOUT_DIRECTIONS.has(value) ? value : "ltr";
+  }
+
+  function layoutDirectionSpec(value) {
+    const direction = normalizeLayoutDirection(value);
+    return direction === "ltr"
+      ? {
+          direction,
+          rankAxis: "x",
+          siblingAxis: "y",
+          sourcePort: "right",
+          targetPort: "left",
+          upstreamKey: "ArrowLeft",
+          downstreamKey: "ArrowRight",
+        }
+      : {
+          direction,
+          rankAxis: "y",
+          siblingAxis: "x",
+          sourcePort: "bottom",
+          targetPort: "top",
+          upstreamKey: "ArrowUp",
+          downstreamKey: "ArrowDown",
+        };
+  }
 
   function ticketOperationalState(ticket) {
     const slot = ticket?.capabilities?.operational;
@@ -57,6 +85,56 @@
       if (label && Object.hasOwn(counts, label)) counts[label] += 1;
     }
     return counts;
+  }
+
+  function workbenchOverview(tickets, source = {}) {
+    const ready = [];
+    const deviated = [];
+    const humanPending = [];
+    const humanUpcoming = [];
+    let refineCount = 0;
+    for (const ticket of tickets) {
+      const operational = ticketOperationalState(ticket);
+      const attention = ticketAttentionState(ticket);
+      if (operational?.label === "READY") ready.push(ticket);
+      if (operational?.label === "REFINE") refineCount += 1;
+      if (operational?.label === "DEVIATED") deviated.push(ticket);
+      if (attention?.label === "PENDING") humanPending.push(ticket);
+      if (attention?.label === "UPCOMING") humanUpcoming.push(ticket);
+    }
+    return {
+      ready,
+      deviated,
+      humanPending,
+      humanUpcoming,
+      refineCount,
+      sourceDirty: Boolean(source.semanticDirty),
+      sourceDirtyCount: Array.isArray(source.dirtyPaths)
+        ? source.dirtyPaths.length
+        : 0,
+      sourceDirtyTruncated: Boolean(source.dirtyPathsTruncated),
+    };
+  }
+
+  function localFocusHref(currentHref, ticketId = null, viewId = null) {
+    const url = new URL(currentHref);
+    if (!ticketId) {
+      url.searchParams.delete("ticket");
+      url.searchParams.delete("view");
+      return url.href;
+    }
+    url.searchParams.set("ticket", ticketId);
+    url.searchParams.set(
+      "view",
+      viewId === "evidence" ? "log" : viewId || "execution",
+    );
+    return url.href;
+  }
+
+  function layoutDirectionHref(currentHref, direction) {
+    const url = new URL(currentHref);
+    url.searchParams.set("direction", normalizeLayoutDirection(direction));
+    return url.href;
   }
 
   function graphSummary(counts) {
@@ -157,9 +235,14 @@
     causalPriority,
     graphNarrative,
     graphSummary,
+    layoutDirectionHref,
+    layoutDirectionSpec,
     operationalCounts,
+    localFocusHref,
+    normalizeLayoutDirection,
     ticketAttentionState,
     ticketNodePresentation,
     ticketOperationalState,
+    workbenchOverview,
   });
 })();

@@ -9,7 +9,7 @@ function loadWorkbenchModel() {
     process.cwd(),
     "skills/vibehub-ticket-review/assets/app-model.js",
   ), "utf8");
-  const sandbox = {};
+  const sandbox = { URL };
   sandbox.globalThis = sandbox;
   runInNewContext(source, sandbox, { filename: "app-model.js" });
   return sandbox.VibeHubWorkbenchModel;
@@ -76,4 +76,101 @@ test("production workbench model renders REFINE as visible but non-executable", 
   const readyHandoff = model.agentHandoffInstruction("ready-work", "READY");
   assert.match(readyHandoff, /vibehub-ticket-run/u);
   assert.doesNotMatch(readyHandoff, /vibehub-ticket-plan/u);
+});
+
+test("production workbench model projects the compact overview without inventing presence", () => {
+  const model = loadWorkbenchModel();
+  const ready = projectedTicket("READY", "PENDING");
+  ready.ticketId = "ready-work";
+  const refine = projectedTicket("REFINE", "UPCOMING");
+  refine.ticketId = "refine-work";
+  const deviated = projectedTicket("DEVIATED", "COMPLETE");
+  deviated.ticketId = "deviated-work";
+
+  const overview = model.workbenchOverview(
+    [ready, refine, deviated],
+    {
+      semanticDirty: true,
+      dirtyPaths: [".vibehub/tickets/ready-work.yaml"],
+      dirtyPathsTruncated: false,
+    },
+  );
+  assert.equal(
+    overview.ready.map((ticket) => ticket.ticketId).join(","),
+    "ready-work",
+  );
+  assert.equal(
+    overview.humanPending.map((ticket) => ticket.ticketId).join(","),
+    "ready-work",
+  );
+  assert.equal(
+    overview.humanUpcoming.map((ticket) => ticket.ticketId).join(","),
+    "refine-work",
+  );
+  assert.equal(
+    overview.deviated.map((ticket) => ticket.ticketId).join(","),
+    "deviated-work",
+  );
+  assert.equal(overview.refineCount, 1);
+  assert.equal(overview.sourceDirty, true);
+  assert.equal(overview.sourceDirtyCount, 1);
+  assert.equal("implementing" in overview, false);
+});
+
+test("focused local href preserves the bearer fragment and follows the Inspector lens", () => {
+  const model = loadWorkbenchModel();
+  const token = "a".repeat(64);
+  const base = `http://127.0.0.1:43111/#${token}`;
+  const contract = new URL(model.localFocusHref(base, "ready-work", "contract"));
+  assert.equal(contract.searchParams.get("ticket"), "ready-work");
+  assert.equal(contract.searchParams.get("view"), "contract");
+  assert.equal(contract.hash, `#${token}`);
+
+  const log = new URL(model.localFocusHref(contract.href, "ready-work", "evidence"));
+  assert.equal(log.searchParams.get("view"), "log");
+  assert.equal(log.hash, `#${token}`);
+
+  const cleared = new URL(model.localFocusHref(log.href));
+  assert.equal(cleared.search, "");
+  assert.equal(cleared.hash, `#${token}`);
+});
+
+test("layout direction is explicit, copyable, and safely defaults left-to-right", () => {
+  const model = loadWorkbenchModel();
+  const token = "b".repeat(64);
+  const focused = `http://127.0.0.1:43111/?ticket=ready-work&view=log#${token}`;
+
+  assert.equal(model.normalizeLayoutDirection("ltr"), "ltr");
+  assert.equal(model.normalizeLayoutDirection("ttb"), "ttb");
+  assert.equal(model.normalizeLayoutDirection("sideways"), "ltr");
+  assert.equal(model.normalizeLayoutDirection(null), "ltr");
+
+  const vertical = new URL(model.layoutDirectionHref(focused, "ttb"));
+  assert.equal(vertical.searchParams.get("direction"), "ttb");
+  assert.equal(vertical.searchParams.get("ticket"), "ready-work");
+  assert.equal(vertical.searchParams.get("view"), "log");
+  assert.equal(vertical.hash, `#${token}`);
+
+  const fallback = new URL(model.layoutDirectionHref(vertical.href, "diagonal"));
+  assert.equal(fallback.searchParams.get("direction"), "ltr");
+  assert.equal(fallback.hash, `#${token}`);
+
+  assert.deepEqual({ ...model.layoutDirectionSpec("ltr") }, {
+    direction: "ltr",
+    rankAxis: "x",
+    siblingAxis: "y",
+    sourcePort: "right",
+    targetPort: "left",
+    upstreamKey: "ArrowLeft",
+    downstreamKey: "ArrowRight",
+  });
+  assert.deepEqual({ ...model.layoutDirectionSpec("ttb") }, {
+    direction: "ttb",
+    rankAxis: "y",
+    siblingAxis: "x",
+    sourcePort: "bottom",
+    targetPort: "top",
+    upstreamKey: "ArrowUp",
+    downstreamKey: "ArrowDown",
+  });
 });

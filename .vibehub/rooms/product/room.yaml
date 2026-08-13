@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "6aade3dd770f5a33a861e074cba1406d0ca847a0",
+        "blob": "809e2df357eac65b5c265cda620e1b386999a359",
         "path": "CHANGELOG.md"
       },
       {
@@ -18,7 +18,7 @@
         "path": "docs/INSTALL.md"
       },
       {
-        "blob": "95bce99a3b16bf1cedbacffe12264a97969b0192",
+        "blob": "66b04561bbc4e3fd20d3b08f35985e0f23ca8879",
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
@@ -36,10 +36,54 @@
       {
         "blob": "b8d2d86c80575bb3e8e90c473b50b2a8aecbd92a",
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
+      },
+      {
+        "blob": "58d55bf49c411a39951ac316f81dc310f68cd4d4",
+        "path": "docs/proposals/codex-like-workbench/README.md"
+      },
+      {
+        "blob": "e5e7aa243c0e9ef091b3d94dc4eb1ff31507fd95",
+        "path": "docs/proposals/codex-like-workbench/index.html"
+      },
+      {
+        "blob": "a3c2c4c371e300b4d509081d49f65030b65dd1a0",
+        "path": "docs/proposals/codex-like-workbench/proposal.css"
+      },
+      {
+        "blob": "a58e04ef0059118685c75cb8e2c76bd3134dbe85",
+        "path": "docs/proposals/codex-like-workbench/proposal.js"
+      },
+      {
+        "blob": "424e1e40d56cfd015af22feb9b4cb58f4ade4f55",
+        "path": "docs/proposals/codex-like-workbench/state-matrix.json"
+      },
+      {
+        "blob": "e2d21fa748c5dd096ae3e2f328c04bc969a920e2",
+        "path": "docs/proposals/codex-like-workbench/tokens.json"
+      },
+      {
+        "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
+        "path": "docs/proposals/rooms-workbench/README.md"
+      },
+      {
+        "blob": "ab4e013da5020ff102091f77356df1381483f237",
+        "path": "docs/proposals/rooms-workbench/contract.json"
+      },
+      {
+        "blob": "e30c3a7ccb9b2d33796bac812ae7bae7c3584f25",
+        "path": "docs/proposals/rooms-workbench/index.html"
+      },
+      {
+        "blob": "bd7fb3592ef489e1ada3f8f7a8e9ff182c73aaeb",
+        "path": "docs/proposals/rooms-workbench/rooms.css"
+      },
+      {
+        "blob": "4c6096f6e6c0a9addad816f9973cd23e2152965f",
+        "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-12T02:32:59.372Z",
-    "last_aligned_commit": "ad21554e334cc88b434feb6f7e7145aad002af2a"
+    "checked_at": "2026-08-13T08:31:49.978Z",
+    "last_aligned_commit": "eb3f5a0491f08c1d6182f261418e2e2825a44ffc"
   },
   "anchors": [
     "CHANGELOG.md",

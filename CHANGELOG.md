@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.8.0 — 2026-08-13
+
+- Turn the shared Ticket graph into a canvas-first Web Workbench with explicit
+  left-to-right or top-to-bottom causal layout, dense-graph routing, minimap,
+  causal focus, responsive Inspector surfaces, and clearer zoom/fit controls.
+- Add one canonical full-stack query contract for current or all history,
+  exact pull-request or cherry-pick delivery membership, and one-or-many Room
+  subtrees; archived one-hop boundaries remain visible without moving the
+  current graph and can be expanded progressively.
+- Add an optional typed `deliveries` array to Ticket schema v1. Omission remains
+  the only compatibility default (`[]`), archive stays a derived delivery view
+  orthogonal to operational status, and no data-format migration is required.
+- Bring the canonical Room tree into the Workbench as an on-demand surface with
+  host-projected freshness and drift detail, exact Room filtering, URL-safe
+  restoration, accessible responsive controls, and no writable browser route.
+- Apply the selected Codex-like visual language across cards, legends, panels,
+  typography, attention signals, full-text hover affordances, and compact
+  counts while preserving exact Git source and honest Active Run presence.
+- Preserve PR #15's human-owned acceptance, human-origin Evidence, independent
+  human-attention axis, READY-only handoff, and non-executable REFINE semantics.
+- Keep the release Web-only: no macOS Desktop app, repository switcher,
+  launcher, session watcher, deep-link-to-app packaging, database, or daemon is
+  introduced.
+
 ## 0.7.0 — 2026-08-11
 
 - Rebuild the shared dependency-free Ticket graph as the responsive A · Quiet
