@@ -3194,6 +3194,10 @@ a.reference-label:hover {
     min-height: 44px;
   }
 
+  .causal-ticket {
+    min-height: 44px;
+  }
+
   .contract-brief {
     grid-template-columns: 9px minmax(0, 1fr);
   }

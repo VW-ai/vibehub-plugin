@@ -37,6 +37,7 @@ test("production Rooms surface is on demand, minimal, and responsive", () => {
   assert.match(css, /\.rooms-panel \{[\s\S]*position:absolute/u);
   assert.match(css, /@media \(max-width: 720px\)[\s\S]*\.rooms-panel \{[\s\S]*top:auto;[\s\S]*bottom:0;[\s\S]*height:66%/u);
   assert.match(css, /\.room-filter-status button \{ min-width:44px; min-height:44px;/u);
+  assert.match(css, /\.causal-ticket \{\s*min-height: 44px;/u);
 });
 
 test("Room filter reuses URL query and preserves the causal layout snapshot", () => {
