@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "rooms-projection-is-canonical-and-shared",
+    "rooms-surface-is-on-demand-and-responsive",
+    "room-detail-and-filter-preserve-causal-layout",
+    "rooms-use-the-owner-selected-interface-language",
+    "rooms-production-journeys-and-boundary-pass"
+  ],
+  "evidence_id": "production-rooms-projection-and-interface-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-13T05:05:00.000Z",
+  "refs": [
+    "commit:b4fee6c20719c967febf8cffc4a62372c0991327",
+    "commit:4cc74b3",
+    "test/ui-rooms.test.mjs",
+    "test/ui-host.test.mjs",
+    "test/room-drift.test.mjs",
+    "skills/scripts/vh.mjs",
+    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-review/assets/app.js"
+  ],
+  "schema_version": 1,
+  "summary": "The read-only production host now projects the canonical directory-containment Room tree, Room boundaries/anchors, subtree Context, context_ref-consuming Tickets, and shared Git snapshot drift semantics; the browser owns no parallel index or inference. The closed-by-default Rooms control opens a floating panel or narrow bottom sheet with ARIA-synchronized tree selection, no-selection toggle, progressive Context/Tickets/Drift detail, minimal owner-selected copy, and a neutral Show related Tickets action. The action composes the canonical repeated room URL query and preserves the pre-filter positions, selected subject, direction, pan, and zoom for clear restoration. Fresh npm run verify passes 77/77 and the installed artifact verifies at 54 files / 716853 bytes; focused Room drift/UI host tests pass, project/Ticket validation remains required at closeout, and all four Rooms are FRESH after aligning the implementation commit. Independent closeout must reproduce the complete specified browser viewport/direction/filter-intersection matrix before accepting the journey criterion.",
+  "ticket_id": "ticket-rooms-into-workbench"
+}
