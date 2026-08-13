@@ -1,0 +1,61 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "readme-shows-current-workbench",
+      "criterion": "The README hero uses a newly captured current-main Workbench image that visibly represents the v0.8 canvas-first experience rather than the v0.7 top-to-bottom screenshot; the image is readable on GitHub, has accurate alt text, and the referenced asset exists in the repository."
+    },
+    {
+      "acceptance_id": "user-scenario-is-clear-and-compact",
+      "criterion": "Immediately after the hero, a compact user-oriented explanation says that the user describes work and invokes the one canonical entry, while VibeHub plans Git-native Tickets, shows current causal work and human boundaries, lets the user inspect Rooms and history on demand, records Evidence, and closes through an independent Outcome. It does not become an exhaustive feature list or duplicate linked design docs."
+    },
+    {
+      "acceptance_id": "installation-and-upgrade-copy-is-current",
+      "criterion": "Codex and Claude Code installation and upgrade instructions remain executable and match the current host commands, including marketplace refresh plus plugin refresh/reinstall behavior and the need to start a new Codex task or restart/reload Claude after updates; the README does not imply background self-update or project-data mutation."
+    },
+    {
+      "acceptance_id": "readme-surface-stays-focused-and-verified",
+      "criterion": "README remains dark-mode safe, keeps exactly one `Start this with VibeHub.` entry, stays at or below the existing 60-line product-surface guard, names no rejected Desktop/runtime capability, all README links and image targets exist, the release/readme tests and full verification pass, and the product Room is FRESH after alignment."
+    }
+  ],
+  "constraints": [
+    "Keep README as the smallest useful product entry; detailed lifecycle, schema, query, coexistence, and release documentation stays behind links.",
+    "Do not add badges, animation, network-hosted images, emoji, a long feature matrix, release-note duplication, or Desktop product claims.",
+    "Use the real read-only Workbench at current main for visuals; do not use a concept mockup or hand-edited screenshot that claims unavailable behavior.",
+    "Preserve the dark-safe wordmark and the single canonical user entry."
+  ],
+  "context": "The v0.8.0 release materially changed the visible product, but README still leads with the v0.7 quiet-workbench screenshot and only generic lifecycle prose. The owner asked to update README after publishing and installing v0.8. The README should remain an intentionally small product surface rather than become exhaustive documentation: retain the one-line entry, show the current canvas-first Workbench, explain in a few sentences how a user moves from request to current work, causal context, Rooms, history, and Evidence, and keep deeper details linked. This is a documentation and visual refresh only; it does not change product behavior or release identity.",
+  "context_refs": [
+    {
+      "purpose": "Successful integrated v0.8 Workbench behavior and boundary being documented.",
+      "ref": ".vibehub/outcomes/ticket-integrate-workbench-web-upgrade-pr.yaml"
+    },
+    {
+      "purpose": "Current production interaction and read-only visual contract.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Canonical current installation, upgrade, and project-data compatibility instructions.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Existing mechanical guard for the focused README product surface.",
+      "ref": "test/release.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The repository README presents the released v0.8 Web Workbench accurately and concisely with current visuals, a clear user scenario, and installation and upgrade instructions that match both supported hosts.",
+  "provenance_refs": [
+    "conversation:2026-08-13-owner-requests-readme-update-after-v080-release",
+    "release:v0.8.0"
+  ],
+  "relations": [
+    {
+      "rationale": "README should describe the independently accepted integrated v0.8 Workbench rather than an earlier proposal.",
+      "target_ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-refresh-readme-for-v080-workbench"
+}
