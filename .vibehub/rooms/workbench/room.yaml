@@ -22,7 +22,7 @@
         "path": "skills/vibehub-ticket-review/assets/app.css"
       },
       {
-        "blob": "602bb086ad2fc5c1014b7e45a835b5d3c0b46d9c",
+        "blob": "cfa542bdf46ff8c1626ae4a4b78ed2ab6ae6d4c1",
         "path": "skills/vibehub-ticket-review/assets/app.js"
       },
       {
@@ -34,8 +34,8 @@
         "path": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
       }
     ],
-    "checked_at": "2026-08-13T05:37:04.084Z",
-    "last_aligned_commit": "3240e810b6fd9ed9f14187b139b4118e143932e3"
+    "checked_at": "2026-08-13T05:46:23.025Z",
+    "last_aligned_commit": "e6d4f0dcfd993a6b96997b5e13e3f40e6aebe709"
   },
   "anchors": [
     "skills/vibehub-ticket-review/"
