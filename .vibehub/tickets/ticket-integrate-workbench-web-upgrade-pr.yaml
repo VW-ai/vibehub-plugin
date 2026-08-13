@@ -27,7 +27,7 @@
     "Exclude the rejected macOS Desktop application and its repository switching, launcher, session-watch, deep-link-to-app, and packaging surfaces; focused links remain honest live local Web URLs.",
     "Do not publish a release or merge the PR inside this Ticket unless a later explicit owner instruction authorizes those external actions."
   ],
-  "context": "The owner has chosen a single concentrated delivery boundary for the next Web Workbench generation. The branch may contain a sequence of independently executed and closed Tickets, including archive/query, but they should be reviewed together because their interaction, graph geometry, visual language, Rooms navigation, URL state, and accessibility must cohere as one product surface. This terminal Ticket owns integration conflict repair, combined regression, remote-main alignment, and PR readiness; it does not replace the constituent Tickets and does not authorize Desktop work, merge, or release publication.",
+  "context": "The owner has chosen a single concentrated delivery boundary for the next Web Workbench generation. The branch may contain a sequence of independently executed and closed Tickets, including archive/query, but they should be reviewed together because their interaction, graph geometry, visual language, Rooms navigation, URL state, and accessibility must cohere as one product surface. This terminal Ticket owns integration conflict repair, combined regression, remote-main alignment, and PR readiness; it does not replace the constituent Tickets and does not authorize Desktop work, merge, or release publication. The Rooms implementation directly depends on and consumes the visual implementation, so this integration Ticket depends only on Rooms as the last constituent implementation boundary rather than repeating a transitive visual dependency.",
   "context_refs": [
     {
       "purpose": "Binding Web-only Workbench interaction and source-truth design boundary.",
@@ -55,12 +55,7 @@
   ],
   "relations": [
     {
-      "rationale": "The integrated PR must include the owner-selected production visual system after its independent implementation closeout.",
-      "target_ticket_id": "ticket-apply-codex-like-workbench-visual-language",
-      "type": "depends_on"
-    },
-    {
-      "rationale": "The integrated PR must include the owner-selected Rooms surface after its independent implementation closeout.",
+      "rationale": "The integrated PR must include the selected Rooms surface, which directly consumes and therefore closes only after the shared production visual system.",
       "target_ticket_id": "ticket-rooms-into-workbench",
       "type": "depends_on"
     }

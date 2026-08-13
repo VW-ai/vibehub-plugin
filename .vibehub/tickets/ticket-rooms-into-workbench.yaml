@@ -1,50 +1,85 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-rooms-workbench-implementation",
-      "criterion": "Placeholder: after the owner-selected Rooms direction is recorded, Ticket Plan rewrites this Ticket in place with independently checkable projection, interaction, visual-state, and verification criteria grounded in that decision before implementation begins."
+      "acceptance_id": "rooms-projection-is-canonical-and-shared",
+      "criterion": "The production host/model mechanically projects the canonical Room directory-containment tree, each Room's boundary and anchors, Context in the selected Room subtree, and consuming Tickets derived from context_refs from validated repository documents; one shared read-only host-side drift projection combines canonical room.yaml alignment data with the current Git snapshot/status and old-checkout direction to produce exact FRESH, DRIFTED, WARNING/OLD CHECKOUT, STALE, and COLD_START semantics; Room filtering reuses the shared one-or-many-Room projectTicketQuery composition with current/all and delivery filters, invalid Room values fail visibly, and the browser only renders that projection without owning a Room/drift index or performing semantic inference."
+    },
+    {
+      "acceptance_id": "rooms-surface-is-on-demand-and-responsive",
+      "criterion": "A compact Rooms control opens no panel by default, reports only a quiet count while closed, and toggles an ARIA-synchronized canonical tree in a floating desktop/normal-width surface or a narrow bottom sheet that leaves the causal graph visible; there is no permanent navigation rail, selecting the current Room again enters the no-selection state, and all visible narrow controls measure at least 44x44px."
+    },
+    {
+      "acceptance_id": "room-detail-and-filter-preserve-causal-layout",
+      "criterion": "Selecting a Room exposes its exact name, boundary, Context, consuming Tickets, and drift evidence through progressive Context/Tickets/Drift views; Show related Tickets is a neutral row-level action that applies the canonical filter, only recedes or removes nonmatches, preserves every retained Ticket x/y and every causal relation whose endpoints remain visible, retains canonical archived-boundary and expandable-stub semantics without re-clustering or re-ranking, and Clear restores the prior query, graph positions, selected Ticket, Inspector lens, layout direction, pan, and zoom."
+    },
+    {
+      "acceptance_id": "rooms-use-the-owner-selected-interface-language",
+      "criterion": "The Rooms production surface consumes the shared production token/component system established by ticket-apply-codex-like-workbench-visual-language: the same global system-monospace stack, quiet neutral surfaces, compact 16px stroke-SVG icons without emoji, non-color drift labels, restrained exception emphasis, minimal nonredundant copy, and colored icon-and-text READY, REFINE, and NEEDS YOU counts as the compact local legend; redundant labels and slogans including Knowledge spaces, Selected Room, Execution flow, and Proven left/executable right are absent."
+    },
+    {
+      "acceptance_id": "rooms-production-journeys-and-boundary-pass",
+      "criterion": "Automated fixture/model/host tests and a clean real-browser pass at 1440x960, 1180x820, and 390x844 verify panel close/reopen and ARIA state, tree containment, every drift presentation, focused and no-selection detail, Context/Tickets/Drift tabs, Room filter/clear with bit-identical retained Ticket rectangles in both layout directions, current/all/delivery filter intersections, keyboard-visible focus, no horizontal overflow, no console warnings or errors, and unchanged read-only/no-persistence behavior; full project/Ticket validation, Rooms freshness, the complete test suite, and installed Plugin artifact pass."
     }
   ],
   "constraints": [
-    "The causal Ticket graph is never re-clustered or re-laid-out by room.",
-    "All room information is mechanically projected from canonical documents; the UI performs no semantic inference.",
-    "The quiet-intelligence spatial-workbench standard binds every visual choice."
+    "The causal Ticket graph is never re-clustered, re-ranked, or re-laid-out by Room; Room is an optional knowledge/query lens over the causal graph, not a second topology.",
+    "Room knowledge and containment are mechanically projected from canonical validated documents and shared query functions; drift is computed once on the read-only host from room.yaml alignment plus the current Git snapshot/status and old-checkout direction; the browser renders this projection, performs no semantic inference, and owns no durable Room state.",
+    "Preserve current/all/delivery/archive history, focused Ticket and Inspector URL state, both layout directions, dense routing, causal-cone selection, and READY-only Agent handoff.",
+    "Add no database, cache, daemon, hidden persistence, network resource, writable Web route, Desktop application, or parallel lifecycle/query model."
   ],
-  "context": "Rooms are currently invisible in the local graph UI beyond the room chip on context cards. The direction is known — expose the Room tree, drift state, Context entries, and consuming Tickets without disturbing the causal graph — but the implementation contract cannot be written honestly until the proposal is reviewed and the owner chooses a direction. This Ticket therefore preserves the downstream position as a draft. While the decision is unresolved it remains BLOCKED; after a successful decision Outcome it becomes REFINE, never READY. REFINE is the repository-level handoff: any current or later Agent selecting work reads the decision's Outcome and human-origin Evidence, rewrites this same Ticket's acceptance for real with Ticket Plan semantics, and changes maturity to firm before implementation. No session is assigned or resumed automatically. The quiet-intelligence and mechanical-projection constraints remain binding throughout refinement.",
+  "context": "The owner approved the refined on-demand Rooms proposal after live desktop and narrow review. The production Workbench must expose canonical Room knowledge and drift without turning Rooms into permanent navigation or disturbing the causal Ticket graph. The selected interface uses a closed-by-default header control, floating panel or narrow bottom sheet, canonical Room tree, progressive detail, shared-query filtering with coordinate preservation, one system-monospace voice, compact SVG icons, counts-as-legend, and minimal copy. This firm Ticket implements that exact direction against the existing read-only projection.",
   "context_refs": [
     {
-      "purpose": "Binding visual and interaction standard for the new surface.",
-      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+      "purpose": "Owner-approved Rooms direction, interaction rules, visual refinements, and review states.",
+      "ref": "docs/proposals/rooms-workbench/README.md"
     },
     {
-      "purpose": "Mechanical projection boundary the rooms data must respect.",
+      "purpose": "Machine-readable surface, drift-state, shared-query, layout-preservation, and responsive contract.",
+      "ref": "docs/proposals/rooms-workbench/contract.json"
+    },
+    {
+      "purpose": "Independent successful Outcome for the protected Rooms-direction decision.",
+      "ref": ".vibehub/outcomes/ticket-decide-rooms-workbench-direction.yaml"
+    },
+    {
+      "purpose": "Faithful human-origin record of the approved direction and exact later interface refinements.",
+      "ref": ".vibehub/evidence/ticket-decide-rooms-workbench-direction/rooms-workbench-direction-owner-decision.yaml"
+    },
+    {
+      "purpose": "Canonical shared query and validated-document projection boundary for CLI/JSON and Web consumers.",
       "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     },
     {
-      "purpose": "Drift states the surface renders and their exact semantics.",
-      "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
+      "purpose": "Canonical Room containment semantics.",
+      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
     },
     {
-      "purpose": "Room tree structure and containment semantics being visualized.",
-      "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
+      "purpose": "Exact Room drift state and snapshot-hash semantics.",
+      "ref": ".vibehub/rooms/knowledge/decision-drift-check-snapshot-hashes.yaml"
     }
   ],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "The workbench UI makes the Room layer visible: the room tree with per-room drift state rendered in situ, and each room's knowledge and consuming Tickets reachable from a quiet rooms surface.",
+  "maturity": "firm",
+  "outcome": "The production Workbench exposes the canonical Room tree, drift state, knowledge, and consuming Tickets through the owner-selected on-demand surface without disturbing causal graph truth or layout.",
   "provenance_refs": [
     "conversation:2026-08-03-room-taxonomy-design",
-    "task:5c6d85a3a430d2dc5308f35e5d0e5115"
+    "conversation:2026-08-13-owner-approves-refined-rooms-workbench-direction",
+    "conversation:2026-08-13-owner-selects-global-monospace-and-counts-legend"
   ],
   "relations": [
     {
-      "rationale": "Implementation starts only after the owner-selected proposal direction is recorded and independently accepted.",
+      "rationale": "Production implementation starts only from the independently accepted owner-selected Rooms direction.",
       "target_ticket_id": "ticket-decide-rooms-workbench-direction",
       "type": "depends_on"
     },
     {
-      "rationale": "Room-consuming Ticket views must reuse the canonical one-or-many-Room query projection rather than creating a Workbench-only Room filter.",
+      "rationale": "Room-consuming Ticket views must reuse the canonical one-or-many-Room query projection and archive/delivery composition rather than creating a Workbench-only filter.",
       "target_ticket_id": "ticket-queryable-archived-ticket-history",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Rooms consumes the shared production typography, tokens, SVG icons, state axes, compact legend, and component treatments rather than defining a competing global system.",
+      "target_ticket_id": "ticket-apply-codex-like-workbench-visual-language",
       "type": "depends_on"
     }
   ],
