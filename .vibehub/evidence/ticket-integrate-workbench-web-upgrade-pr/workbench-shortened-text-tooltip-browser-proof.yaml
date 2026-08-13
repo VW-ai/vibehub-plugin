@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "combined-workbench-journeys-pass",
+    "plugin-boundary-and-artifact-stay-clean"
+  ],
+  "evidence_id": "workbench-shortened-text-tooltip-browser-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-13T07:53:11Z",
+  "refs": [
+    "commit:db89f68",
+    "test:ui-visual-system-shortened-text-hover-focus",
+    "browser:iab-causal-position-and-graph-card-tooltip-2026-08-13"
+  ],
+  "schema_version": 1,
+  "summary": "The integrated production Workbench now uses one dependency-free tooltip path for semantically shortened Ticket IDs/outcomes and every actually overflowing leaf label. Real in-app-browser pointer movement over the Causal position prerequisite displayed the exact full Ticket ID; pointer movement over a graph card displayed its full Ticket ID and canonical outcome in a 420px tooltip wholly inside the viewport. Keyboard focus uses the same resolver, graph nodes retain full ARIA labels, browser logs were clean, all 81 tests passed, the installed 54-file artifact verified at 722759 bytes, and all four Rooms were FRESH.",
+  "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
+}
