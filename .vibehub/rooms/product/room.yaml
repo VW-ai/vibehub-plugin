@@ -60,10 +60,30 @@
       {
         "blob": "f57b97b8386ac85829582f44db5243d0d5601e48",
         "path": "docs/proposals/codex-like-workbench/tokens.json"
+      },
+      {
+        "blob": "fd046ad81a868f3328eeb6278de777427e43c6df",
+        "path": "docs/proposals/rooms-workbench/README.md"
+      },
+      {
+        "blob": "ab4e013da5020ff102091f77356df1381483f237",
+        "path": "docs/proposals/rooms-workbench/contract.json"
+      },
+      {
+        "blob": "c363b6161907fd85dad9880458d5b5c3ef2edc49",
+        "path": "docs/proposals/rooms-workbench/index.html"
+      },
+      {
+        "blob": "faf033c31dd6461da80e9ddc0b6ce916e8ccb879",
+        "path": "docs/proposals/rooms-workbench/rooms.css"
+      },
+      {
+        "blob": "9435f22d676cdd9f29d59517fb1df727ec894f14",
+        "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-13T00:52:03.536Z",
-    "last_aligned_commit": "f5daedb8c7223ce341ffa638878902e975cd0632"
+    "checked_at": "2026-08-13T01:16:07.577Z",
+    "last_aligned_commit": "d4e8773a6ce9cf9d31abcc51d8f2dcc45b4b0c2d"
   },
   "anchors": [
     "CHANGELOG.md",
