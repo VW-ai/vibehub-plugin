@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "card-copy-options-are-measured-and-decidable",
+      "criterion": "Using the real repository corpus plus deterministic long-copy fixtures, the proposal compares at least modest card-height changes, a typed graph-only summary with full-outcome fallback, and any justified semantic-zoom alternative; it reports fit percentages, graph-density effects, schema and compatibility costs, and recommends one exact graph-copy contract that keeps the canonical full outcome in Inspector detail and does not solve overflow by shrinking text below the approved readable typography."
+    },
+    {
+      "acceptance_id": "large-graph-clarity-model-is-concrete",
+      "criterion": "The proposal defines a coherent initial orientation and progressive-disclosure model for current work, all history, delivery, one-or-many Rooms, active frontier, causal focus, search/filter, and hidden archived or out-of-scope context, including how the UI explains why a visible Ticket is blocked or unlocked without silently dropping canonical relations."
+    },
+    {
+      "acceptance_id": "scale-prototypes-cover-real-usage",
+      "criterion": "Reviewable wide and narrow prototypes exercise the current real graph and deterministic approximately 200- and 1000-Ticket fixtures in both causal directions; at normal card-reading zoom at least 90% of the proposed graph summaries fit without ellipsis, while overview, query, focus, minimap, navigation, and recovery remain usable without requiring the entire graph to be simultaneously readable at fit-to-screen scale."
+    },
+    {
+      "acceptance_id": "implementation-boundaries-are-ready-for-owner-review",
+      "criterion": "The proposal identifies the smallest subsequent schema/projection, interaction, layout, migration-or-fallback, accessibility, and verification boundaries; it preserves non-color state and attention semantics, keyboard and narrow-screen access, exact Git truth, read-only Web scope, and existing causal-cone and archive boundary behavior, and presents the remaining protected product choices explicitly for owner review rather than embedding them in implementation."
+    }
+  ],
+  "constraints": [
+    "Do not replace the canonical Ticket outcome with lossy graph copy; graph-specific copy is a projection or explicitly typed optional field whose truth, fallback, and validation are defined.",
+    "Do not claim that showing every Ticket at once is clarity. Query, focus, grouping, folding, semantic zoom, and progressive disclosure may reduce what is visually foregrounded, but hidden canonical context remains inspectable and causally explainable.",
+    "Do not use smaller typography, color alone, hover-only disclosure, a Desktop-only runtime, hidden persistence, or a second Ticket lifecycle as the solution.",
+    "This Ticket produces a reviewable proposal and downstream implementation boundaries; it does not silently change the Ticket schema or production Workbench before the owner reviews the protected product choices."
+  ],
+  "context": "The current 45-Ticket dogfood graph exposed two different problems that must not be conflated. First, canonical Ticket outcomes are deliberately complete and average far beyond a compact card: at the real 232px card copy width, 90% of the current outcomes require about 12 lines, so simply making every card tall enough would push cards toward roughly 230px and make the dense graph harder to scan. Second, as repositories accumulate hundreds or thousands of historical and current Tickets, layout quality alone cannot provide orientation; the Workbench needs progressive information architecture, query/focus modes, and honest explanations for hidden context. The owner wants roughly 90% of card copy readable directly, is open to a shorter graph-only description while preserving the full outcome in expanded detail, and expects the large-graph UI/UX to become a genuinely powerful future surface. This Ticket produces the concrete proposal and contract needed before production implementation is planned.",
+  "context_refs": [
+    {
+      "purpose": "Binding Workbench visual, causal-layout, accessibility, and truthful-presence constraints.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Completed deterministic dense-layout baseline that this information-architecture work must build on rather than replace.",
+      "ref": ".vibehub/outcomes/ticket-workbench-dense-graph-layout.yaml"
+    },
+    {
+      "purpose": "Canonical current/all/delivery/Room query and progressive archived-boundary semantics.",
+      "ref": ".vibehub/outcomes/ticket-queryable-archived-ticket-history.yaml"
+    },
+    {
+      "purpose": "Current production graph interaction, focus, URL, Inspector, and read-only design boundary.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A reviewable product, interaction, and data-contract proposal makes large Ticket graphs progressively understandable and makes at least 90% of graph-card summaries readable without opening the Inspector.",
+  "provenance_refs": [
+    "conversation:2026-08-13-owner-reports-card-overflow-and-large-graph-clarity-gap"
+  ],
+  "relations": [
+    {
+      "rationale": "The next clarity proposal should measure and extend the stable integrated Web upgrade rather than changing the delivery scope of the current PR.",
+      "target_ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-propose-large-graph-clarity-and-card-copy"
+}
