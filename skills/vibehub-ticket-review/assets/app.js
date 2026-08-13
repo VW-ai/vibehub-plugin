@@ -245,7 +245,7 @@
       renderChrome();
       renderGraph();
       renderMinimap();
-      requestAnimationFrame(frameGraph);
+      requestAnimationFrame(preserveLayout ? applyTransform : frameGraph);
       const focusedTicketExists = initialFocusPending
         && state.graph.tickets.some(
           (ticket) => ticket.ticketId === requestedTicketId,
@@ -480,7 +480,7 @@
   async function clearRoomFilter() {
     const snapshot = roomFilterSnapshot;
     const url = snapshot ? new URL(snapshot.url) : new URL(location.href);
-    url.searchParams.delete("room");
+    if (!snapshot) url.searchParams.delete("room");
     history.replaceState(null, "", url.href);
     if (snapshot) {
       positions = new Map(snapshot.positions);
@@ -3004,6 +3004,7 @@
   }
   elements.roomFilterAction.addEventListener("click", () => void applyRoomFilter());
   elements.clearRoomFilter.addEventListener("click", () => void clearRoomFilter());
+  elements.roomFilterStatus.addEventListener("click", (event) => event.stopPropagation());
   elements.graphSignal.addEventListener("click", (event) => {
     event.stopPropagation();
     toggleOverview();

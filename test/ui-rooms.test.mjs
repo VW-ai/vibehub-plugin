@@ -24,7 +24,7 @@ test("production host projects canonical Rooms and consuming Tickets", () => {
 });
 
 test("production Rooms surface is on demand, minimal, and responsive", () => {
-  assert.match(html, /id="roomsButton"[^>]*aria-expanded="false"/u);
+  assert.match(html, /id="roomsButton"[^>]*aria-label="Rooms"[^>]*aria-expanded="false"/u);
   assert.match(html, /id="roomsPanel"[^>]*hidden inert/u);
   assert.match(html, /role="tree" aria-label="Canonical Room tree"/u);
   assert.match(html, /data-room-view="context"/u);
@@ -44,6 +44,9 @@ test("Room filter reuses URL query and preserves the causal layout snapshot", ()
   assert.match(script, /roomFilterSnapshot = \{[\s\S]*positions: new Map\(positions\),[\s\S]*panX,[\s\S]*panY,[\s\S]*scale,[\s\S]*selected/u);
   assert.match(script, /refresh\(`Showing \$\{selectedRoom\} Tickets`, \{ preserveLayout: true \}\)/u);
   assert.match(script, /positions = new Map\(snapshot\.positions\)/u);
+  assert.match(script, /if \(!snapshot\) url\.searchParams\.delete\("room"\)/u);
+  assert.match(script, /roomFilterStatus\.addEventListener\("click", \(event\) => event\.stopPropagation\(\)\)/u);
+  assert.match(script, /requestAnimationFrame\(preserveLayout \? applyTransform : frameGraph\)/u);
   assert.match(script, /await refresh\("Room filter cleared", \{ preserveLayout: true \}\)/u);
   assert.doesNotMatch(script, /localStorage|sessionStorage|\/api\/(?:room|write)/u);
 });
