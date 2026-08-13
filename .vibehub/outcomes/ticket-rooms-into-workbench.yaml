@@ -1,0 +1,23 @@
+{
+  "accepted_acceptance_ids": [
+    "rooms-projection-is-canonical-and-shared",
+    "rooms-surface-is-on-demand-and-responsive",
+    "room-detail-and-filter-preserve-causal-layout",
+    "rooms-use-the-owner-selected-interface-language",
+    "rooms-production-journeys-and-boundary-pass"
+  ],
+  "closed_at": "2026-08-13T06:01:02Z",
+  "evidence_ids": [
+    "production-rooms-projection-and-interface-proof",
+    "room-filter-closeout-repair-proof",
+    "exact-room-viewport-restoration-proof",
+    "narrow-causal-control-repair-proof",
+    "canonical-room-state-presentation-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout at clean HEAD 359a415 accepted all five criteria after auditing the firm Ticket, approved proposal/contract, current source and diff, five acceptance-linked Evidence records, and the repaired paths that two earlier browser retries had correctly rejected. The shared host projects directory-containment Rooms, exact boundaries/anchors, subtree Context, context_ref-consuming Tickets, shared projectTicketQuery intersections, and one Git-snapshot drift model; invalid Room and malformed delivery filters failed visibly with zero broadened graph nodes. Safe read-only browser fixtures reproduced the exact FRESH/check, DRIFTED/diff, OLD CHECKOUT/history, STALE/alert-circle, and ROOMS NOT INITIALIZED/snowflake presentations in the tree, detail header, Drift rows, and true zero-Room state; a nested platform/api fixture exposed aria-level 1/2 and canonical depth. The production Workbench remained closed by default, ARIA synchronized, floating at wide sizes and a 390px bottom sheet with the graph still visible; same-Room activation cleared selection, Context/Tickets/Drift views and exact canonical detail worked, keyboard focus had a visible 2px outline, every visible narrow HTML button measured at least 44px, and no document overflow or console warning/error occurred. A fresh six-case matrix at 1440x960, 1180x820, and 390x844 in both LTR and TTB verified product+workbench query-union plus knowledge composition, stable retained graph coordinates and relations, and Clear restoring the exact URL, selected Rooms Ticket, Contract lens, direction, world transform, pan/zoom, edges, and every retained client rectangle bit-identically. Current/all Room scope intersections and invalid filters passed; delivery/Room/archive composition, progressive stubs, every drift semantic, and read-only/no-persistence behavior passed the automated fixture/model/host suite. Fresh Ticket/project validation passed, all four repository Rooms were FRESH, npm run verify passed 78/78, and the installed dependency-free artifact verified at 54 files / 718834 bytes.",
+  "ticket_id": "ticket-rooms-into-workbench",
+  "unresolved_acceptance_ids": []
+}
