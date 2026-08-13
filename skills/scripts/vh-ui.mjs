@@ -9,6 +9,7 @@ import {
   assertValid,
   documents,
   loadRepository,
+  projectRoomDrift,
   projectTicketQuery,
   ticketArchived,
   ticketStatus,
@@ -363,6 +364,60 @@ function projectGraph(repository, queryOptions = {}) {
   };
 }
 
+function projectRooms(repo, repository) {
+  let drift;
+  try {
+    drift = projectRoomDrift(repo, repository);
+  } catch (error) {
+    if (error?.code !== "git_error") throw error;
+    drift = {
+      cold_start: true,
+      rooms: [...repository.rooms.documents.keys()].map((room) => ({
+        room,
+        state: "UNKNOWN",
+        reason: "Git snapshot unavailable",
+      })),
+    };
+  }
+  const driftByRoom = new Map(drift.rooms.map((item) => [item.room, item]));
+  const contextEntries = [...repository.contexts.documents.values()];
+  const tickets = documents(repository.tickets.documents);
+  const rooms = [...repository.rooms.documents.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([roomPath, entry]) => {
+      const prefix = `${join(repository.paths.rooms, ...roomPath.split("/"))}/`;
+      const contexts = contextEntries
+        .filter((item) => item.path.startsWith(prefix))
+        .map(({ document, path }) => ({
+          contextId: document.context_id,
+          type: document.type,
+          state: document.state,
+          summary: document.summary,
+          path: relative(repo, path).split("\\").join("/"),
+        }))
+        .sort((left, right) => left.contextId.localeCompare(right.contextId));
+      const consumingTickets = tickets.filter((ticket) => ticket.context_refs.some(({ ref }) => {
+        const match = ref.match(/^\.vibehub\/rooms\/(.+)\/[^/]+\.yaml$/u);
+        return match && (match[1] === roomPath || match[1].startsWith(`${roomPath}/`));
+      })).map((ticket) => ticket.ticket_id).sort();
+      return {
+        room: roomPath,
+        roomId: entry.document.room_id,
+        parent: roomPath.includes("/") ? roomPath.slice(0, roomPath.lastIndexOf("/")) : null,
+        description: entry.document.description,
+        boundary: entry.document.boundary,
+        anchors: entry.document.anchors,
+        contexts,
+        consumingTickets,
+        drift: (() => {
+          const item = driftByRoom.get(roomPath) ?? { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
+          return item.state === "UNKNOWN" ? { ...item, state: "COLD_START" } : item;
+        })(),
+      };
+    });
+  return { coldStart: drift.cold_start, rooms };
+}
+
 function canonicalContextFromRef(repository, reference) {
   const match = reference.match(/^\.vibehub\/rooms\/((?:[a-z0-9-]+\/)+)([a-z0-9-]+)\.yaml$/u);
   if (!match || match[2] === "room") return null;
@@ -516,6 +571,7 @@ export function buildUiSnapshot(repoRoot, queryOptions = {}) {
   const graphDigest = digest({ contexts, tickets: rawTickets, evidence: rawEvidence, outcomes: rawOutcomes });
   const source = gitSource(repo, graphDigest);
   const graph = projectGraph(repository, queryOptions);
+  const rooms = projectRooms(repo, repository);
   const protectedBoundaries = graph.tickets
     .filter((ticket) =>
       ticket.capabilities.attention.summary.humanAcceptanceCount > 0)
@@ -545,6 +601,7 @@ export function buildUiSnapshot(repoRoot, queryOptions = {}) {
       stubs: graph.stubs,
       filters: graph.filters,
     },
+    rooms,
     interventions: {
       review: { available: false },
       planReview: { available: false },

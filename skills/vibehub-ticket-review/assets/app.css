@@ -214,6 +214,25 @@ summary:focus-visible {
   stroke-width: 1.25;
 }
 
+.rooms-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-solid);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rooms-button.active { border-color: #b6c9e2; background: var(--ready-soft); }
+.rooms-button svg, .rooms-panel svg, .room-filter-action svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.rooms-button b { display:grid; place-items:center; min-width:18px; height:18px; border-radius:9px; color:var(--muted); background:var(--surface-muted); font-size:9px; }
+
 .state-dot {
   width: 7px;
   height: 7px;
@@ -689,6 +708,59 @@ summary:focus-visible {
 }
 
 /* Ticket nodes: quiet boundaries, one accent line, textual state labels. */
+
+.rooms-panel {
+  position:absolute;
+  z-index:9;
+  top:12px;
+  bottom:12px;
+  left:12px;
+  display:grid;
+  grid-template-rows:auto auto minmax(0,1fr);
+  width:380px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(255,255,255,.98);
+  box-shadow:var(--shadow-float);
+  backdrop-filter:blur(18px);
+}
+
+.rooms-handle { display:none; }
+.rooms-head { display:flex; align-items:center; justify-content:space-between; padding:14px 14px 8px; }
+.rooms-head strong { font-size:16px; }
+.rooms-tree { padding:0 8px 9px; border-bottom:1px solid var(--line); }
+.rooms-tree button { display:grid; grid-template-columns:24px minmax(0,1fr) auto; align-items:center; gap:7px; width:100%; min-height:48px; padding:0 8px 0 calc(8px + var(--room-depth) * 18px); border:0; border-radius:9px; background:transparent; cursor:pointer; text-align:left; }
+.rooms-tree button:hover { background:var(--page); }
+.rooms-tree button[aria-selected="true"] { background:var(--ready-soft); }
+.room-tree-label strong, .room-tree-label small { display:block; }
+.room-tree-label strong { font-size:11px; }
+.room-tree-label small { margin-top:2px; color:var(--muted); font-size:9px; }
+.room-drift, .room-state { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:700; letter-spacing:.04em; }
+.room-drift.state-fresh, .room-state.state-fresh { color:var(--done); }
+.room-drift:not(.state-fresh), .room-state:not(.state-fresh) { padding:4px 6px; border-radius:6px; color:var(--blocked); background:var(--blocked-soft); }
+.room-detail { display:flex; min-height:0; flex-direction:column; overflow:hidden; }
+.room-detail-title { display:flex; align-items:start; justify-content:space-between; padding:14px 16px 8px; }
+.room-detail-title h2 { margin:2px 0 0; font-size:16px; }
+.room-detail > p { margin:0; padding:0 16px 12px; color:var(--muted); font-size:10px; }
+.room-tabs { display:flex; gap:16px; padding:0 16px; border-bottom:1px solid var(--line); }
+.room-tabs button { position:relative; min-width:64px; height:40px; padding:0; border:0; color:var(--muted); background:transparent; cursor:pointer; font-size:11px; }
+.room-tabs button[aria-selected="true"] { color:var(--ink); font-weight:700; }
+.room-tabs button[aria-selected="true"]::after { content:""; position:absolute; right:0; bottom:-1px; left:0; height:2px; background:var(--ink); }
+.room-tabs b { display:inline-grid; place-items:center; min-width:17px; height:17px; margin-left:3px; border-radius:9px; background:var(--surface-muted); font-size:9px; }
+.room-detail-content { min-height:0; overflow:auto; padding:6px 16px; }
+.room-detail-row { display:grid; gap:2px; min-height:50px; align-content:center; border-bottom:1px solid var(--line); }
+.room-detail-row:last-child { border-bottom:0; }
+.room-detail-row strong { overflow:hidden; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+.room-detail-row small { color:var(--muted); font-size:9px; }
+.room-filter-action { display:grid; grid-template-columns:16px minmax(0,1fr); align-items:center; gap:8px; min-height:44px; margin:8px 16px 14px; padding:0 12px; border:1px solid var(--line); border-radius:9px; background:var(--surface); cursor:pointer; text-align:left; font-weight:600; }
+.room-filter-action:hover { background:var(--page); border-color:var(--line-strong); }
+.room-filter-action:disabled { color:var(--muted); cursor:default; }
+.room-empty { display:grid; min-height:0; place-content:center; justify-items:center; gap:10px; color:var(--muted); }
+.room-empty svg { width:32px; height:32px; }
+.room-filter-status { position:absolute; z-index:8; bottom:20px; left:50%; display:flex; align-items:center; gap:8px; padding:7px 8px 7px 11px; border:1px solid var(--line); border-radius:10px; background:var(--surface); box-shadow:var(--shadow-float); transform:translateX(-50%); }
+.room-filter-status strong { font-size:10px; }
+.room-filter-status button { min-height:32px; border:0; border-radius:7px; background:var(--surface-muted); cursor:pointer; }
 
 .ticket-node,
 .edge {
@@ -2947,6 +3019,47 @@ a.reference-label:hover {
     min-height: 44px;
     padding: 0;
   }
+
+  .rooms-button {
+    min-width:44px;
+    min-height:44px;
+    padding:0 8px;
+  }
+
+  .rooms-button > span { display:none; }
+
+  .rooms-panel {
+    top:auto;
+    right:0;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:66%;
+    border-width:1px 0 0;
+    border-radius:16px 16px 0 0;
+  }
+
+  .rooms-handle {
+    position:absolute;
+    top:7px;
+    left:50%;
+    display:block;
+    width:34px;
+    height:4px;
+    border-radius:4px;
+    background:var(--line-strong);
+    transform:translateX(-50%);
+  }
+
+  .rooms-head { padding-top:20px; }
+  .rooms-tree { display:flex; gap:4px; overflow-x:auto; }
+  .rooms-tree button { flex:0 0 142px; grid-template-columns:24px minmax(0,1fr); min-height:54px; padding:0 7px; }
+  .rooms-tree .room-drift { display:none; }
+  .room-tree-label small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .room-tabs button { min-width:72px; min-height:44px; }
+  .room-filter-action { min-height:44px; }
+  .room-filter-status { bottom:calc(66% + 10px); }
+  .room-filter-status button { min-width:44px; min-height:44px; }
 
   .copy-link {
     font-size: 0;

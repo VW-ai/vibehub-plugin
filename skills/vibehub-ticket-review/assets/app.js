@@ -83,6 +83,23 @@
     stateLabel: document.querySelector("#stateLabel"),
     sourceStatus: document.querySelector("#sourceStatus"),
     copyLink: document.querySelector("#copyLink"),
+    roomsButton: document.querySelector("#roomsButton"),
+    roomsCount: document.querySelector("#roomsCount"),
+    roomsPanel: document.querySelector("#roomsPanel"),
+    closeRooms: document.querySelector("#closeRooms"),
+    roomsTree: document.querySelector("#roomsTree"),
+    roomDetail: document.querySelector("#roomDetail"),
+    roomEmpty: document.querySelector("#roomEmpty"),
+    roomTitle: document.querySelector("#roomTitle"),
+    roomState: document.querySelector("#roomState"),
+    roomBoundary: document.querySelector("#roomBoundary"),
+    roomContextCount: document.querySelector("#roomContextCount"),
+    roomTicketCount: document.querySelector("#roomTicketCount"),
+    roomDetailContent: document.querySelector("#roomDetailContent"),
+    roomFilterAction: document.querySelector("#roomFilterAction"),
+    roomFilterStatus: document.querySelector("#roomFilterStatus"),
+    roomFilterName: document.querySelector("#roomFilterName"),
+    clearRoomFilter: document.querySelector("#clearRoomFilter"),
     workspace: document.querySelector(".workspace"),
     canvas: document.querySelector("#canvas"),
     graph: document.querySelector("#graph"),
@@ -121,6 +138,9 @@
   let suppressCanvasClick = false;
   let toastTimer = null;
   let initialFocusPending = Boolean(requestedTicketId);
+  let selectedRoom = null;
+  let roomView = "context";
+  let roomFilterSnapshot = null;
 
   normalizeGraphQueryUrl();
 
@@ -272,6 +292,7 @@
     renderSourceDock();
     renderOverview(overview);
     renderGraphSummary(counts, overview);
+    renderRooms();
     renderDirectionControl();
     renderScopeControl();
     elements.graphSignalCount.textContent =
@@ -341,6 +362,136 @@
     add(overview.humanPending.length, "NEEDS YOU", "pending", "attention-pending");
     if (!items.length) add(counts.DONE, "DONE", "check", "state-done");
     elements.graphSummary.replaceChildren(...items);
+  }
+
+  function renderRooms() {
+    const rooms = state.rooms?.rooms ?? [];
+    elements.roomsCount.textContent = String(rooms.length);
+    elements.roomsTree.replaceChildren(...rooms.map((room) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.setAttribute("role", "treeitem");
+      button.setAttribute("aria-selected", String(selectedRoom === room.room));
+      button.dataset.room = room.room;
+      button.style.setProperty("--room-depth", String(room.room.split("/").length - 1));
+      button.append(htmlIcon("room"));
+      const label = document.createElement("span");
+      label.className = "room-tree-label";
+      const strong = document.createElement("strong");
+      strong.textContent = room.roomId;
+      const small = document.createElement("small");
+      small.textContent = `${room.contexts.length} Context · ${room.consumingTickets.length} Tickets`;
+      label.append(strong, small);
+      const drift = document.createElement("span");
+      drift.className = `room-drift state-${room.drift.state.toLowerCase()}`;
+      drift.append(htmlIcon(room.drift.state === "FRESH" ? "check" : "drift"));
+      if (room.drift.state !== "FRESH") drift.append(room.drift.state);
+      else drift.setAttribute("aria-label", "Fresh");
+      button.append(label, drift);
+      button.addEventListener("click", () => selectRoom(
+        selectedRoom === room.room ? null : room.room,
+      ));
+      return button;
+    }));
+    const active = rooms.find((room) => room.room === selectedRoom);
+    elements.roomDetail.hidden = !active;
+    elements.roomEmpty.hidden = Boolean(active);
+    if (active) renderRoomDetail(active);
+    const filteredRooms = graphQuery().rooms;
+    elements.roomFilterStatus.hidden = filteredRooms.length === 0;
+    elements.roomFilterName.textContent = filteredRooms.join(" + ");
+  }
+
+  function selectRoom(room) {
+    selectedRoom = room;
+    roomView = "context";
+    renderRooms();
+  }
+
+  function renderRoomDetail(room) {
+    elements.roomTitle.textContent = room.roomId;
+    elements.roomBoundary.textContent = room.boundary;
+    elements.roomContextCount.textContent = String(room.contexts.length);
+    elements.roomTicketCount.textContent = String(room.consumingTickets.length);
+    elements.roomState.className = `room-state state-${room.drift.state.toLowerCase()}`;
+    elements.roomState.replaceChildren(
+      htmlIcon(room.drift.state === "FRESH" ? "check" : "drift"),
+      document.createTextNode(room.drift.state),
+    );
+    for (const tab of document.querySelectorAll("[data-room-view]")) {
+      tab.setAttribute("aria-selected", String(tab.dataset.roomView === roomView));
+    }
+    const rows = roomView === "context"
+      ? room.contexts.map((item) => [item.contextId, item.summary])
+      : roomView === "tickets"
+        ? room.consumingTickets.map((ticketId) => [ticketId, "Consumes this Room subtree"])
+        : roomDriftRows(room);
+    elements.roomDetailContent.replaceChildren(...rows.map(([title, detail]) => {
+      const row = document.createElement("div");
+      row.className = "room-detail-row";
+      const strong = document.createElement("strong");
+      strong.textContent = title;
+      const small = document.createElement("small");
+      small.textContent = detail;
+      row.append(strong, small);
+      return row;
+    }));
+    elements.roomFilterAction.disabled = graphQuery().rooms.includes(room.room);
+    elements.roomFilterAction.querySelector("span").textContent = elements.roomFilterAction.disabled
+      ? "Showing related Tickets"
+      : "Show related Tickets";
+  }
+
+  function roomDriftRows(room) {
+    const drift = room.drift;
+    if (drift.state === "FRESH") return [["FRESH", "Aligned with the current Git snapshot"]];
+    const rows = [];
+    if (drift.reason) rows.push([drift.state, drift.reason]);
+    for (const key of ["changed", "added", "deleted"]) {
+      if (drift[key]?.length) rows.push([`${drift[key].length} ${key}`, drift[key].join(", ")]);
+    }
+    return rows.length ? rows : [[drift.state, "Room alignment needs attention"]];
+  }
+
+  function toggleRooms(force = null) {
+    const open = force ?? elements.roomsPanel.hidden;
+    elements.roomsPanel.hidden = !open;
+    elements.roomsPanel.inert = !open;
+    elements.roomsButton.setAttribute("aria-expanded", String(open));
+    elements.roomsButton.classList.toggle("active", open);
+  }
+
+  async function applyRoomFilter() {
+    if (!selectedRoom || graphQuery().rooms.includes(selectedRoom)) return;
+    roomFilterSnapshot = {
+      url: location.href,
+      positions: new Map(positions),
+      panX,
+      panY,
+      scale,
+      selected,
+    };
+    const url = new URL(location.href);
+    url.searchParams.append("room", selectedRoom);
+    history.replaceState(null, "", url.href);
+    await refresh(`Showing ${selectedRoom} Tickets`, { preserveLayout: true });
+  }
+
+  async function clearRoomFilter() {
+    const snapshot = roomFilterSnapshot;
+    const url = snapshot ? new URL(snapshot.url) : new URL(location.href);
+    url.searchParams.delete("room");
+    history.replaceState(null, "", url.href);
+    if (snapshot) {
+      positions = new Map(snapshot.positions);
+      panX = snapshot.panX;
+      panY = snapshot.panY;
+      scale = snapshot.scale;
+      selected = snapshot.selected;
+    }
+    await refresh("Room filter cleared", { preserveLayout: true });
+    if (snapshot) applyTransform();
+    roomFilterSnapshot = null;
   }
 
   function renderGraph() {
@@ -2838,6 +2989,21 @@
       "Focused local link copied · valid while this host is running",
     );
   });
+  elements.roomsButton.addEventListener("click", () => toggleRooms());
+  elements.closeRooms.addEventListener("click", () => {
+    toggleRooms(false);
+    elements.roomsButton.focus();
+  });
+  elements.roomsPanel.addEventListener("click", (event) => event.stopPropagation());
+  for (const tab of document.querySelectorAll("[data-room-view]")) {
+    tab.addEventListener("click", () => {
+      roomView = tab.dataset.roomView;
+      const room = state?.rooms?.rooms.find((item) => item.room === selectedRoom);
+      if (room) renderRoomDetail(room);
+    });
+  }
+  elements.roomFilterAction.addEventListener("click", () => void applyRoomFilter());
+  elements.clearRoomFilter.addEventListener("click", () => void clearRoomFilter());
   elements.graphSignal.addEventListener("click", (event) => {
     event.stopPropagation();
     toggleOverview();
@@ -2939,6 +3105,11 @@
     );
   }, { passive: false });
   window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !elements.roomsPanel.hidden) {
+      toggleRooms(false);
+      elements.roomsButton.focus();
+      return;
+    }
     if (event.key === "Escape" && !elements.overviewPanel.hidden) {
       closeOverview();
       return;

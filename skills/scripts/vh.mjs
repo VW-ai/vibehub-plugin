@@ -1208,6 +1208,43 @@ function headIsBehind(repo, baseline) {
   return git(repo, ["merge-base", "--is-ancestor", "HEAD", baseline], { allowFailure: true }).status === 0;
 }
 
+export function projectRoomDrift(repo, loadedRepository = null) {
+  const repository = loadedRepository ?? loadRepository(repo);
+  assertValid(repository.errors);
+  if (repository.rooms.documents.size === 0) return { cold_start: true, rooms: [] };
+  const snapshot = repoSnapshot(repo);
+  const rooms = [...repository.rooms.documents.entries()].map(([roomPath, { document }]) => {
+    if (document.stale === true) {
+      let hashesMatch = null;
+      if (document.alignment) {
+        const current = anchoredFiles(document, snapshot);
+        const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
+        hashesMatch = current.size === recorded.size
+          && [...current].every(([path, blob]) => recorded.get(path) === blob);
+      }
+      return { room: roomPath, state: "STALE", reason: document.stale_reason ?? null, hashes_match: hashesMatch };
+    }
+    if (!document.alignment) return { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
+    if (headIsBehind(repo, document.alignment.last_aligned_commit)) {
+      return {
+        room: roomPath,
+        state: "WARNING",
+        reason: "checkout is older than the alignment baseline; never realign specs backwards",
+      };
+    }
+    const current = anchoredFiles(document, snapshot);
+    const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
+    const changed = [...current].filter(([path, hash]) => recorded.has(path) && recorded.get(path) !== hash).map(([path]) => path);
+    const added = [...current.keys()].filter((path) => !recorded.has(path));
+    const deleted = [...recorded.keys()].filter((path) => !current.has(path));
+    if (changed.length || added.length || deleted.length) {
+      return { room: roomPath, state: "DRIFTED", changed, added, deleted };
+    }
+    return { room: roomPath, state: "FRESH" };
+  });
+  return { cold_start: false, rooms };
+}
+
 function roomOperation(operation, repo, input, options = {}) {
   if (operation === "align" || operation === "stale") {
     assertCurrentProjectFormat(repo);
@@ -1215,38 +1252,7 @@ function roomOperation(operation, repo, input, options = {}) {
   const repository = loadRepository(repo);
   assertValid(repository.errors);
   if (operation === "drift") {
-    if (repository.rooms.documents.size === 0) return { cold_start: true, rooms: [] };
-    const snapshot = repoSnapshot(repo);
-    const rooms = [...repository.rooms.documents.entries()].map(([roomPath, { document }]) => {
-      if (document.stale === true) {
-        let hashesMatch = null;
-        if (document.alignment) {
-          const current = anchoredFiles(document, snapshot);
-          const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
-          hashesMatch = current.size === recorded.size
-            && [...current].every(([path, blob]) => recorded.get(path) === blob);
-        }
-        return { room: roomPath, state: "STALE", reason: document.stale_reason ?? null, hashes_match: hashesMatch };
-      }
-      if (!document.alignment) return { room: roomPath, state: "UNKNOWN", reason: "never aligned" };
-      if (headIsBehind(repo, document.alignment.last_aligned_commit)) {
-        return {
-          room: roomPath,
-          state: "WARNING",
-          reason: "checkout is older than the alignment baseline; never realign specs backwards",
-        };
-      }
-      const current = anchoredFiles(document, snapshot);
-      const recorded = new Map(document.alignment.anchor_hashes.map((item) => [item.path, item.blob]));
-      const changed = [...current].filter(([path, hash]) => recorded.has(path) && recorded.get(path) !== hash).map(([path]) => path);
-      const added = [...current.keys()].filter((path) => !recorded.has(path));
-      const deleted = [...recorded.keys()].filter((path) => !current.has(path));
-      if (changed.length || added.length || deleted.length) {
-        return { room: roomPath, state: "DRIFTED", changed, added, deleted };
-      }
-      return { room: roomPath, state: "FRESH" };
-    });
-    return { cold_start: false, rooms };
+    return projectRoomDrift(repo, repository);
   }
   const entry = repository.rooms.documents.get(options.room ?? "");
   if (!entry) throw new VibeHubError("not_found", `Room not found: ${options.room ?? "(missing --room)"}`);
