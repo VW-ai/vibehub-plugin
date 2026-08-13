@@ -18,7 +18,7 @@
         "path": "docs/INSTALL.md"
       },
       {
-        "blob": "ebceb247e3199519b0ac04a95234ca32add7ada0",
+        "blob": "66b04561bbc4e3fd20d3b08f35985e0f23ca8879",
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
@@ -38,8 +38,8 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       }
     ],
-    "checked_at": "2026-08-12T23:45:12.345Z",
-    "last_aligned_commit": "74a5d6580c775777336a47d2aae97ed6ae4f5905"
+    "checked_at": "2026-08-13T00:09:46.184Z",
+    "last_aligned_commit": "f59a1b25882f90a8195a82cb4aafc89d36113785"
   },
   "anchors": [
     "CHANGELOG.md",
