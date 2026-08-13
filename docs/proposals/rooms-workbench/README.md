@@ -24,6 +24,9 @@ navigation system and not a new graph layout.
   graph. Every interactive target is at least 44px.
 - The full Workbench uses the same system monospace stack as Room and Ticket
   identifiers; buttons and prose do not fall back to a separate sans-serif voice.
+- The compact canvas counts are also the local legend: each operational-state
+  or human-attention count carries its canonical color, SVG icon, and text label
+  without adding a separate explanatory panel.
 - Do not repeat what hierarchy and interaction already make clear. The panel
   says `Rooms`, the selected Room says its name, and redundant labels such as
   `Knowledge spaces` or `Selected Room` are omitted. Copy is reserved for

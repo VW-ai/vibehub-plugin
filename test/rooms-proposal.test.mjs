@@ -49,6 +49,13 @@ test("Rooms proposal keeps quiet desktop and accessible narrow surfaces", () => 
   assert.match(css, /--ui:ui-monospace/u);
   assert.match(css, /\.show-tickets\{height:44px/u);
   assert.match(html, /#icon-filter/u);
+  assert.match(html, /Ticket state and human attention summary/u);
+  assert.match(html, /summary-item ready/u);
+  assert.match(html, /summary-item refine/u);
+  assert.match(html, /summary-item attention/u);
+  assert.match(css, /\.summary-item\.ready\{color:var\(--blue\)\}/u);
+  assert.match(css, /\.summary-item\.refine\{color:var\(--violet\)\}/u);
+  assert.match(css, /\.summary-item\.attention\{color:var\(--amber\)\}/u);
   assert.match(script, /roomsButton\.setAttribute\("aria-expanded", String\(open\)\)/u);
   assert.equal(html.includes("Knowledge spaces"), false);
   assert.equal(html.includes("Selected Room"), false);

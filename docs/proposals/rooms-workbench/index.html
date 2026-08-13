@@ -12,6 +12,7 @@
     <symbol id="icon-play" viewBox="0 0 16 16"><path d="m5.5 3.5 6 4.5-6 4.5z"/></symbol>
     <symbol id="icon-lock" viewBox="0 0 16 16"><rect x="3.5" y="7" width="9" height="6" rx="1.5"/><path d="M5.5 7V5.5a2.5 2.5 0 0 1 5 0V7"/></symbol>
     <symbol id="icon-refine" viewBox="0 0 16 16"><path d="M3 4h10M3 8h10M3 12h10M6 2.5v3M10 6.5v3M7 10.5v3"/></symbol>
+    <symbol id="icon-pending" viewBox="0 0 20 20"><path d="M7 10V5.5a1.25 1.25 0 0 1 2.5 0V9M9.5 9V4.5a1.25 1.25 0 0 1 2.5 0V9M12 9V5.5a1.25 1.25 0 0 1 2.5 0v6c0 3-2 5-5 5H8c-1.6 0-2.8-.8-3.7-2.2L2.8 12a1.3 1.3 0 0 1 2.1-1.5L7 12"/></symbol>
     <symbol id="icon-archive" viewBox="0 0 16 16"><path d="M3 5.5h10v7.5H3zM2.5 3h11v2.5h-11zM6 8h4"/></symbol>
     <symbol id="icon-room" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="2"/><path d="M5.5 2.5v11M5.5 6h8"/></symbol>
     <symbol id="icon-drift" viewBox="0 0 16 16"><path d="M4 3v8.5M4 3l-2 2M4 3l2 2M12 13V4.5M12 13l-2-2M12 13l2-2M4 8h8"/></symbol>
@@ -40,7 +41,11 @@
 
   <main class="workspace">
     <section class="canvas" aria-label="Unchanged Ticket causal graph">
-      <div class="canvas-title"><p>2 ready · 1 refine · 1 needs you</p></div>
+      <div class="canvas-title" role="list" aria-label="Ticket state and human attention summary">
+        <span class="summary-item ready" role="listitem"><svg aria-hidden="true"><use href="#icon-play"/></svg><b>2</b> READY</span>
+        <span class="summary-item refine" role="listitem"><svg aria-hidden="true"><use href="#icon-refine"/></svg><b>1</b> REFINE</span>
+        <span class="summary-item attention" role="listitem"><svg aria-hidden="true"><use href="#icon-pending"/></svg><b>1</b> NEEDS YOU</span>
+      </div>
       <div class="graph-controls"><button type="button" aria-label="Left to right" aria-pressed="true"><svg aria-hidden="true"><use href="#icon-ltr"/></svg></button><button type="button" aria-label="Top to bottom"><svg aria-hidden="true"><use href="#icon-ttb"/></svg></button><button type="button" aria-label="Fit graph"><svg aria-hidden="true"><use href="#icon-fit"/></svg></button></div>
       <div class="graph" id="graph">
         <svg viewBox="0 0 1040 610" aria-hidden="true"><path d="M216 153H302M518 153H604M820 153H870V340H910M518 153H560V405H604"/><path d="M820 405H870V340H910"/></svg>
