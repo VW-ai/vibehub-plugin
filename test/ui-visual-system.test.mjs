@@ -56,3 +56,19 @@ test("production narrow Inspector remains a bottom sheet over the graph", () => 
   assert.match(css, /\.graph-tools button \{[\s\S]*min-width: 44px;[\s\S]*min-height: 44px/u);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/u);
 });
+
+test("canvas panning cannot capture nested Workbench controls", () => {
+  assert.match(
+    script,
+    /event\.target\.closest\([\s\S]*"button, a, input, textarea, select, summary, \[role='button'\], "[\s\S]*"\[role='treeitem'\], \.ticket-node, \.edge, \.history-stub"/u,
+  );
+  assert.match(
+    css,
+    /\.graph-tools button\[aria-pressed="true"\] \{[\s\S]*color: var\(--surface-solid\);[\s\S]*background: var\(--ink\);/u,
+  );
+});
+
+test("Ticket copy wraps to the real monospace card width", () => {
+  assert.match(script, /wrap\(ticket\.outcome, 28, 3\)/u);
+  assert.doesNotMatch(script, /wrap\(ticket\.outcome, 34, 3\)/u);
+});

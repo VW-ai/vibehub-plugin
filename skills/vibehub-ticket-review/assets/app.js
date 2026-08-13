@@ -718,7 +718,11 @@
         status.textContent = visibleState;
         group.append(status);
       }
-      wrap(ticket.outcome, 34, 3).forEach((line, index) => {
+      // A 232px card has 204px of copy width after its 14px insets. The
+      // selected 12px system monospace face fits 28 display units there;
+      // using a wider logical measure lets SVG text escape the card even
+      // though the line count is clamped.
+      wrap(ticket.outcome, 28, 3).forEach((line, index) => {
         const text = svg("text", {
           class: "ticket-outcome",
           x: 14,
@@ -3096,7 +3100,14 @@
     }
   });
   elements.canvas.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || event.target.closest(".ticket-node, .edge, .history-stub")) {
+    // The controls, Rooms sheet, Inspector, and graph nodes all live inside
+    // the canvas shell. Never capture their pointer sequence for panning: a
+    // small real-mouse movement would otherwise retarget pointerup/click to
+    // the canvas and make every nested button appear inert.
+    if (event.button !== 0 || event.target.closest(
+      "button, a, input, textarea, select, summary, [role='button'], "
+      + "[role='treeitem'], .ticket-node, .edge, .history-stub",
+    )) {
       return;
     }
     dragging = {
