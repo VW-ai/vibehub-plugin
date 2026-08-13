@@ -62,7 +62,7 @@
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
-        "blob": "fc042fd824fe4dc0681f574131aacb4683f34b90",
+        "blob": "f92c7c0120ad68cb74a289c5e037238dab829c5c",
         "path": "docs/proposals/rooms-workbench/README.md"
       },
       {
@@ -70,20 +70,20 @@
         "path": "docs/proposals/rooms-workbench/contract.json"
       },
       {
-        "blob": "49b7d143c736bcae74cebd1d756e21908f0ca45a",
+        "blob": "f855bd6fccd311033dae6bdf865a877fefe5ff68",
         "path": "docs/proposals/rooms-workbench/index.html"
       },
       {
-        "blob": "faf033c31dd6461da80e9ddc0b6ce916e8ccb879",
+        "blob": "01dd15cc432cbfbae5893ed68d3340521222a558",
         "path": "docs/proposals/rooms-workbench/rooms.css"
       },
       {
-        "blob": "9435f22d676cdd9f29d59517fb1df727ec894f14",
+        "blob": "4c6096f6e6c0a9addad816f9973cd23e2152965f",
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-13T03:30:22.805Z",
-    "last_aligned_commit": "c5492028d15bfaf2ed04417b2a030733aa0625ea"
+    "checked_at": "2026-08-13T03:40:49.109Z",
+    "last_aligned_commit": "674dfd29f53f59b5db2cd079b53cd283a0a0f927"
   },
   "anchors": [
     "CHANGELOG.md",
