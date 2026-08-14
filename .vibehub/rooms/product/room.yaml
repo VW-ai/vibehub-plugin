@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "c89af5c8e478a420a606063efb6fd8be6448fdc8",
+        "blob": "617158f0d1777dfbfd0256b788f32ebc04fad7c3",
         "path": "README.md"
       },
       {
@@ -36,6 +36,14 @@
       {
         "blob": "b8d2d86c80575bb3e8e90c473b50b2a8aecbd92a",
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
+      },
+      {
+        "blob": "b139f93c74c772316d49b29f29b52c1e61217b92",
+        "path": "docs/assets/local-graph/workbench-rooms-narrow.jpg"
+      },
+      {
+        "blob": "1e42da3d572229ed1207652c5b4727a5e8ac072e",
+        "path": "docs/assets/local-graph/workbench-ticket-proof.jpg"
       },
       {
         "blob": "58d55bf49c411a39951ac316f81dc310f68cd4d4",
@@ -82,8 +90,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-13T22:03:06.429Z",
-    "last_aligned_commit": "215ab65b43df7d06deb55746a929e4eee0375d66"
+    "checked_at": "2026-08-14T22:47:18.769Z",
+    "last_aligned_commit": "df09aa7158150765569924509817be3d65d84b41"
   },
   "anchors": [
     "CHANGELOG.md",

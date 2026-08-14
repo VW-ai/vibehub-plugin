@@ -5,7 +5,6 @@
     <img src="assets/brand/vibehub-logo.svg" alt="VibeHub" width="360">
   </picture>
 </p>
-
 <p align="center"><strong>VibeHub turns a development request into a Git-native Ticket cycle your coding agent can plan, execute, prove, and close.</strong></p>
 
 <h3 align="center"><code>Start this with VibeHub.</code></h3>
@@ -14,15 +13,17 @@
 
 ![VibeHub v0.8 canvas-first Ticket Workbench](docs/assets/local-graph/quiet-workbench-desktop.jpg)
 
-Describe the work and say that one line. VibeHub plans the smallest honest
-Git-native Tickets and keeps current causal work on the canvas. Select a Ticket
-for Execution, Contract, and Log detail; open Rooms or history only when useful;
-and follow clear signals when a decision genuinely needs you.
+**See what matters now.** The canvas separates DONE, READY, and REFINE work, then keeps a selected Ticket's direct prerequisites and unlocks in view instead of flattening the repository into a task list.
 
-As work proceeds, the Agent records acceptance-linked Evidence and hands
-completion to an independent Outcome. Tickets, durable Context, Evidence, and
-Outcomes remain ordinary Git files, so the next Agent can resume from exact
-repository truth while routine execution stays out of the way.
+![VibeHub Ticket Log tracing Evidence and an independently recorded Outcome](docs/assets/local-graph/workbench-ticket-proof.jpg)
+
+**Inspect proof, not a status claim.** Execution explains what can run, Contract shows acceptance boundaries, and Log traces Evidence plus the independently recorded Outcome from exact Git source.
+
+![VibeHub Rooms exposing repository Context at a real narrow viewport](docs/assets/local-graph/workbench-rooms-narrow.jpg)
+
+**Bring repository context in only when useful.** Rooms expose durable Context, consuming Tickets, and drift state on demand; the same read-only graph remains usable at a real narrow viewport.
+
+Describe the work and say the line above. VibeHub plans the smallest honest Git-native Tickets, keeps human decisions explicit, and records acceptance-linked Evidence before independent closeout. Tickets, Context, Evidence, and Outcomes remain ordinary Git files, so another Agent can resume from repository truth without reconstructing the conversation.
 
 ## Installation
 

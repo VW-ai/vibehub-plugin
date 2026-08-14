@@ -20,6 +20,8 @@ test("README is a dark-safe one-line product surface", () => {
     "assets/brand/vibehub-logo-dark.svg",
     "assets/brand/vibehub-logo.svg",
     "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/assets/local-graph/workbench-ticket-proof.jpg",
+    "docs/assets/local-graph/workbench-rooms-narrow.jpg",
     "docs/CONCEPT.md",
     "docs/INSTALL.md",
     "docs/LOCAL_GRAPH_DESIGN.md",
