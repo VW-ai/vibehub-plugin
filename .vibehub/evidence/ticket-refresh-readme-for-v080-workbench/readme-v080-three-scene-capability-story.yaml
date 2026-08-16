@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "readme-shows-current-workbench",
+    "user-scenario-is-clear-and-compact",
+    "readme-surface-stays-focused-and-verified"
+  ],
+  "evidence_id": "readme-v080-three-scene-capability-story",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-14T22:47:46Z",
+  "refs": [
+    "image:docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "image:docs/assets/local-graph/workbench-ticket-proof.jpg",
+    "image:docs/assets/local-graph/workbench-rooms-narrow.jpg",
+    "browser:iab-clean-main-capability-story-2026-08-14",
+    "test:node-test-release-4-of-4",
+    "test:npm-run-verify-81-of-81",
+    "artifact:54-files-568449-bytes",
+    "room:product-fresh"
+  ],
+  "schema_version": 1,
+  "summary": "README now uses exactly three repository-local, optimized, authentic v0.8 Workbench captures as a capability sequence rather than a UI gallery. The 1280x720 current-work canvas shows DONE/READY/REFINE, a selected READY Ticket, its direct causal position, archived boundary, minimap, and clean exact-main Git source. The new 1180x820 proof view focuses the completed integration Ticket's Log and visibly reports 5 Evidence, Outcome recorded, and 6 of 6 criteria with the causal graph still present. The new 390x844 narrow view shows the on-demand canonical Room tree with product selected, FRESH state, 17 Context, 23 consuming Tickets, Drift, and the related-Tickets action over the still-visible graph. Browser measurements confirmed the narrow page was 390/390 with no horizontal overflow; proof and Room passes had no console warnings or errors. Adjacent README copy explains the corresponding user jobs: orient current work, inspect Contract/Evidence/Outcome, and bring repository context in on demand. README remains 59 wc lines / 60 split lines, contains the canonical entry exactly once, and all five referenced local assets plus documentation links exist. Focused release tests passed 4/4, full npm run verify passed 81/81 with the 54-file artifact, project/Ticket validation and diff checks passed, and all four Rooms are FRESH after product alignment.",
+  "ticket_id": "ticket-refresh-readme-for-v080-workbench"
+}

@@ -1,0 +1,63 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "readme-shows-current-workbench",
+      "criterion": "README uses a bounded set of three authentic v0.8 Workbench captures at meaningfully different viewports: a wide current-work causal canvas, a medium focused Ticket proof/history view, and a real narrow Rooms/context view. Each capture has accurate alt text, an adjacent user-job caption, a repository-local optimized asset, and readable content at its intended GitHub display size; together they explain capabilities rather than merely showing visual polish."
+    },
+    {
+      "acceptance_id": "user-scenario-is-clear-and-compact",
+      "criterion": "The visual sequence and compact prose explain that the user describes work and invokes the one canonical entry, while VibeHub plans Git-native Tickets, shows current causal work and human boundaries, exposes one Ticket's Contract, Evidence, and Outcome, scopes context with Rooms or history on demand, and preserves the cycle as ordinary Git files. It does not become an exhaustive feature list or duplicate linked design docs."
+    },
+    {
+      "acceptance_id": "installation-and-upgrade-copy-is-current",
+      "criterion": "Codex and Claude Code installation and upgrade instructions remain executable and match the current host commands, including marketplace refresh plus plugin refresh/reinstall behavior and the need to start a new Codex task or restart/reload Claude after updates; the README does not imply background self-update or project-data mutation."
+    },
+    {
+      "acceptance_id": "readme-surface-stays-focused-and-verified",
+      "criterion": "README remains dark-mode safe, keeps exactly one `Start this with VibeHub.` entry, stays at or below the existing 60-line product-surface guard, names no rejected Desktop/runtime capability, all README links and image targets exist, image files are reasonably optimized, the release/readme tests and full verification pass, and the product Room is FRESH after alignment."
+    }
+  ],
+  "constraints": [
+    "Keep README as the smallest useful product entry; detailed lifecycle, schema, query, coexistence, and release documentation stays behind links.",
+    "Every screenshot must explain a distinct user job and be paired with compact capability copy; do not create an unlabeled UI gallery or repeat the same state at several widths.",
+    "Do not add badges, animation, network-hosted images, emoji, a long feature matrix, release-note duplication, or Desktop product claims.",
+    "Use the real read-only Workbench from a clean released-main checkout for visuals; do not use a concept mockup or hand-edit screenshots to claim unavailable behavior.",
+    "Preserve the dark-safe wordmark and the single canonical user entry."
+  ],
+  "context": "The first v0.8 README refresh replaced the obsolete hero and corrected installation and upgrade copy. During review, the owner clarified that one attractive UI image is not enough: the README should use a small set of differently sized real captures to explain what the plugin can do. The visual sequence should answer user questions rather than inventory controls: what is happening now and why, what proves one Ticket's contract and completion, and how Rooms narrow a large repository's context on demand. This remains one focused README deliverable, not a UI gallery, feature matrix, or product behavior change.",
+  "context_refs": [
+    {
+      "purpose": "Successful integrated v0.8 Workbench behavior and boundary being documented.",
+      "ref": ".vibehub/outcomes/ticket-integrate-workbench-web-upgrade-pr.yaml"
+    },
+    {
+      "purpose": "Current production interaction and read-only visual contract.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Canonical current installation, upgrade, and project-data compatibility instructions.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Existing mechanical guard for the focused README product surface.",
+      "ref": "test/release.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The repository README presents the released v0.8 plugin as a compact capability story: authentic Workbench captures show how a user sees current causal work, inspects proof and history, and scopes context through Rooms, followed by current installation and upgrade instructions for both supported hosts.",
+  "provenance_refs": [
+    "conversation:2026-08-13-owner-requests-readme-update-after-v080-release",
+    "conversation:2026-08-14-owner-requests-multi-size-capability-story",
+    "release:v0.8.0"
+  ],
+  "relations": [
+    {
+      "rationale": "README should describe the independently accepted integrated v0.8 Workbench rather than an earlier proposal.",
+      "target_ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-refresh-readme-for-v080-workbench"
+}

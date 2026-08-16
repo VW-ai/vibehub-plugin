@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "readme-shows-current-workbench",
+    "user-scenario-is-clear-and-compact",
+    "installation-and-upgrade-copy-is-current",
+    "readme-surface-stays-focused-and-verified"
+  ],
+  "evidence_id": "readme-v080-current-surface-and-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-13T22:05:16Z",
+  "refs": [
+    "file:README.md",
+    "image:docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "browser:iab-clean-main-readme-v080-2026-08-13",
+    "test:node-test-release-4-of-4",
+    "test:npm-run-verify-81-of-81",
+    "artifact:54-files-567833-bytes",
+    "room:product-fresh"
+  ],
+  "schema_version": 1,
+  "summary": "README now presents v0.8 through an authentic 1280x720 capture from clean main in the read-only Workbench at scope=current and direction=ltr, with current controls, causal canvas, archived boundary, selected cone, minimap, and Execution Inspector visible; the browser had no console errors or document overflow. The adjacent two-paragraph scenario covers the canonical user entry, Git-native Ticket planning, current causal work, human boundaries, on-demand Rooms and history, acceptance-linked Evidence, and independent Outcome without becoming a feature inventory. Codex and Claude install/upgrade commands match the current docs and the locally verified v0.8.0 update flows, while explicitly preserving checked-in project data. README is 58 lines, retains exactly one canonical entry and the dark-safe wordmark, names no Desktop product, and all local links/assets exist. The focused release suite passed 4/4, full npm run verify passed 81/81 with a 54-file artifact, Ticket/project validation passed, git diff checks passed, and all four Rooms are FRESH after product alignment.",
+  "ticket_id": "ticket-refresh-readme-for-v080-workbench"
+}
