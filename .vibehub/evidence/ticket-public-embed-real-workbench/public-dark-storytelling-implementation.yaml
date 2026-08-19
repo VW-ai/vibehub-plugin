@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "dark-canvas-clarifies-the-product",
+    "first-message-is-one-authentic-composer",
+    "persistent-header-keeps-real-entry-points",
+    "ticket-view-is-a-faithful-workbench-scene",
+    "rooms-explain-context-without-a-second-topology",
+    "evidence-and-outcome-explain-trust",
+    "motion-is-explanatory-and-disposable",
+    "public-fixture-is-honest-and-lightweight",
+    "workbench-embedding-preserves-product-quality"
+  ],
+  "evidence_id": "public-dark-storytelling-implementation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-19T07:44:23Z",
+  "refs": [
+    "file:site/app/page.tsx",
+    "file:site/app/globals.css",
+    "file:site/tests/rendered-html.test.mjs",
+    "preview:http://localhost:3000"
+  ],
+  "schema_version": 1,
+  "summary": "The public site now uses a near-black deep-graphite canvas while preserving the faithful light Workbench as the dominant product object. The hero request is one authentic coding-agent composer message with a restrained caret, and the sticky header keeps only VibeHub home, truthful Codex and Claude install actions, GitHub, and Copy for Agent. Three vertical product sections reuse the same typed Workbench to explain request-to-Ticket causality, Room-owned Context, and acceptance-linked Evidence plus independent Outcome. Exact request phrases are statically tagged to the Tickets they caused; only those tags receive a one-time transform-and-opacity entrance, with a complete reduced-motion presentation. Optional desktop graph panning remains disposable browser view state. No backend, model call, persistence, video, iframe, analytics, motion dependency, or second lifecycle was added.",
+  "ticket_id": "ticket-public-embed-real-workbench"
+}

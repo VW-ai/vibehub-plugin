@@ -1,0 +1,111 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "causal-canvas-is-the-site-grammar",
+      "criterion": "The public site is composed as one responsive, content-first causal narrative: normal vertical scrolling leads from the product promise through the Ticket cycle, use cases, and documentation while the graph advances toward the lower right; no horizontal canvas travel, browser frame, iframe, or webpage-inside-webpage presentation contains the graph."
+    },
+    {
+      "acceptance_id": "first-viewport-communicates-and-invites",
+      "criterion": "At a 1440px desktop viewport the first view presents the VibeHub identity, one concise product promise, the exact entry 'Start this with VibeHub.', an immediately legible causal Ticket path, and honest install/GitHub actions without requiring a visitor to scroll or decode schema terminology."
+    },
+    {
+      "acceptance_id": "canonical-cycle-is-visually-proven",
+      "criterion": "One coherent scenario visually demonstrates a human Request and existing long-term Context shaping one central Ticket, the Ticket producing acceptance-linked Evidence, an independent Outcome, and durable learning returning to Context; Request, Context, Evidence, and Outcome are visibly distinct object types rather than additional Tickets, every label matches current canonical semantics, and no generated placeholder such as signing, immutable attestation, priority, analytics, pricing, or account behavior is presented as product capability."
+    },
+    {
+      "acceptance_id": "interaction-remains-spatial-and-accessible",
+      "criterion": "Pointer, keyboard, touch, narrow viewport, reduced-motion, and high-contrast behavior preserve causal orientation: visitors can move among graph regions, focus or select meaningful objects, and reveal progressive detail without trapping scrolling, hiding primary content, or relying on motion or color alone."
+    },
+    {
+      "acceptance_id": "visual-language-is-public-grade",
+      "criterion": "The site reaches the selected Causal Canvas direction with cool-neutral matte space, precise system and mono typography, restrained semantic color, deliberate Ticket shapes, icons, connector hierarchy, and generous whitespace; it avoids generic SaaS navigation, decorative card grids, gradient spectacle, warm editorial styling, and dense dashboard chrome."
+    },
+    {
+      "acceptance_id": "static-build-is-isolated-and-verifiable",
+      "criterion": "The complete website produces a documented Cloudflare-compatible static production build that the owner can deploy through an existing service; it remains isolated from the installed Plugin runtime and release artifact, uses no database, account system, hidden product state, or new VibeHub lifecycle, and repository plus Plugin artifact verification continue to pass."
+    }
+  ],
+  "constraints": [
+    "Ship one coherent public-site deliverable; do not split design, implementation, animation, documentation, or deployment into ceremonial Tickets.",
+    "Do not change the installed local Graph UI in this Ticket; record transferable design improvements only after the website proves them.",
+    "Use the selected Causal Canvas concept as direction, not as factual source; checked-in contracts and current product behavior remain authoritative.",
+    "Keep the public surface lightweight and static-first; do not add product persistence, authentication, analytics machinery, or a second source of truth.",
+    "Preserve the single user entry and concise product language already established in README.md.",
+    "Do not create a hosting account, deploy externally, bind a domain, or change DNS; the owner will publish the verified static build through an existing Cloudflare service."
+  ],
+  "context": "The owner selected the Causal Canvas direction for VibeHub's public website, then clarified that product comprehension outranks visual novelty and that the primary story must center one Ticket rather than several equal Ticket-like cards. Human Request creates the need for a Ticket; long-term Context helps that Ticket emerge; the Ticket produces Evidence; independent Outcome returns durable learning to Context. Product, use cases, and documentation should feel like one causal narrative without imposing Workbench navigation behavior on a website: normal vertical scrolling is primary, core meaning is visible without selection, and the graph advances diagonally as a supporting visual language. Build the website first; do not redesign the installed local Workbench in this Ticket. The selected concept's stronger Ticket shape, icons, hierarchy, and connectors are visual inspiration, but generated placeholder claims are not product truth. The owner has an existing Cloudflare service and asked for the complete static website without domain binding, account creation, or external deployment from this Ticket.",
+  "context_refs": [
+    {
+      "purpose": "Owner-approved Causal Canvas website direction and the boundary between visual inspiration and canonical product truth.",
+      "ref": ".vibehub/rooms/workbench/decision-public-causal-canvas-site.yaml"
+    },
+    {
+      "purpose": "Content-first vertical reading order and the boundary between public-site composition and future Workbench visual refinement.",
+      "ref": ".vibehub/rooms/workbench/decision-public-canvas-scrolls-diagonally.yaml"
+    },
+    {
+      "purpose": "Binding visual and interaction standard for every VibeHub UI surface.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Canonical graph and progressive-inspection product direction whose public expression must stay honest.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "purpose": "Lightweight architecture boundary and rebuild-only-observed-gaps rule.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Canonical product loop in which one Ticket mediates human intent, action, and compounding long-term Context.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Current one-line product promise, canonical entry, installation, and comparison language.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Canonical product story, document roles, and direct-dependent unlock semantics.",
+      "ref": "docs/CONCEPT.md"
+    },
+    {
+      "purpose": "Exact supported installation and coexistence guidance exposed by the website.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Detailed causal graph interaction and progressive-disclosure language.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Canonical presentation events and surfaces represented by the public scenario.",
+      "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
+    },
+    {
+      "purpose": "Checked-in visual baseline for the existing causal Ticket workbench.",
+      "ref": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
+    },
+    {
+      "purpose": "Canonical Ticket and acceptance semantics represented by the public scenario.",
+      "ref": "skills/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Canonical acceptance-linked Evidence semantics represented by the public scenario.",
+      "ref": "skills/contracts/evidence.schema.json"
+    },
+    {
+      "purpose": "Canonical independent Outcome and unlock semantics represented by the public scenario.",
+      "ref": "skills/contracts/outcome.schema.json"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "A public VibeHub website makes one Ticket the visible interaction unit between human intent and compounding long-term Context, so a first-time visitor can understand and begin the Git-native development cycle from one extraordinary causal narrative.",
+  "provenance_refs": [
+    "conversation:2026-08-05-public-site-causal-canvas-selected",
+    "conversation:2026-08-05-content-before-ui",
+    "conversation:2026-08-05-one-ticket-intent-context-loop",
+    "conversation:2026-08-03-public-visual-directions",
+    "context:constraint-ui-quiet-intelligence-standard"
+  ],
+  "relations": [],
+  "schema_version": 1,
+  "ticket_id": "ticket-launch-public-causal-canvas-site"
+}

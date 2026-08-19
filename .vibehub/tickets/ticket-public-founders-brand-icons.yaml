@@ -1,0 +1,67 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "founders-are-two-real-people",
+      "criterion": "The initial public conversation replaces the expandable premise/disclaimer with one non-expandable two-person founder strip; each founder has a real image, public display name, personal-site link, and LinkedIn link, and no biography, quote, role, metric, placeholder, or invented identity is shown."
+    },
+    {
+      "acceptance_id": "actions-have-distinct-brand-symbols",
+      "criterion": "Install for Codex, Install for Claude Code, and GitHub each show a distinct recognizable brand symbol from an existing asset source, with useful accessible labeling, while the two copy actions and external GitHub link retain their exact existing behavior and feedback."
+    },
+    {
+      "acceptance_id": "identity-and-symbols-fit-the-formal-shell",
+      "criterion": "The founder strip and action symbols remain legible, restrained, and keyboard/pointer accessible within the existing formal quiet-intelligence visual system at desktop and 390px mobile widths, without overflow, new navigation, runtime network image requests, or hiding the suggested development request."
+    },
+    {
+      "acceptance_id": "public-identity-change-is-verified",
+      "criterion": "Rendered assertions, lint, static production build, desktop/mobile browser inspection, canonical VibeHub validation, and Plugin artifact verification pass after the identity and icon change."
+    }
+  ],
+  "constraints": [
+    "Display exactly two founders and only their image, name, personal website, and LinkedIn; do not add biographies, titles, quotes, GitHub profiles, contact details, founder narrative, or an expandable disclosure.",
+    "Do not guess public identity data. Use the owner's verified LinkedIn, personal site, and published headshot; use Victor's personal site's published identity and LinkedIn plus his current public GitHub profile photo.",
+    "Keep all founder photos and brand symbols as local static assets; do not introduce an icon package, runtime CDN dependency, backend, CMS, analytics, or another route.",
+    "Preserve the current installation commands, clipboard behavior, GitHub repository target, deterministic demo, persistent masthead, Copy for Agent, and static hosting configuration.",
+    "Do not deploy, commit, push, alter the installed graph UI, or modify prior successful Outcomes."
+  ],
+  "context": "The owner rejected the abstract expandable founder premise. The founder area should contain exactly two people—the owner and Victor—with each person's real name, image, personal website, and LinkedIn. Publicly verifiable identity surfaces resolve to Wayne Wang | 王宇轩 at wayne-wang-yuxuan.com and Chenyang Zhang (Victor) at victorz.studio; Victor's personal site publishes his LinkedIn and GitHub links. Use a local copy of the headshot published by Wayne's personal site and Victor's current public GitHub profile photo rather than remote runtime image dependencies. The three arrival actions already behave correctly, but their generic copy/arrow glyphs do not identify Codex, Claude Code, and GitHub; add distinct recognizable brand symbols while preserving their existing copy/link behavior.",
+  "context_refs": [
+    {
+      "purpose": "Successful formal Coding-Agent-first shell this focused refinement preserves.",
+      "ref": ".vibehub/outcomes/ticket-formal-public-agent-entry.yaml"
+    },
+    {
+      "purpose": "Binding visual quality, accessibility, honesty, and restrained interaction standard.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Founder identity and install/source action implementation surface.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Responsive formal-shell styling surface.",
+      "ref": "site/app/globals.css"
+    },
+    {
+      "purpose": "Static rendered contract that must reject the former founder placeholder and assert the new identities and symbols.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The public Coding Agent entrance presents VibeHub's two founders as a restrained identity strip and makes the Codex, Claude Code, and GitHub actions immediately recognizable through distinct brand symbols.",
+  "provenance_refs": [
+    "conversation:2026-08-09-founder-identities-and-brand-symbols",
+    "public-profile:https://www.linkedin.com/in/wayne-wang-yuxuan",
+    "public-site:https://wayne-wang-yuxuan.com",
+    "public-site:https://www.victorz.studio/work"
+  ],
+  "relations": [
+    {
+      "rationale": "This identity and icon pass is a focused refinement of the completed formal public entrance.",
+      "target_ticket_id": "ticket-formal-public-agent-entry",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-public-founders-brand-icons"
+}

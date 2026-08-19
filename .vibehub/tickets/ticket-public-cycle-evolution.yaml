@@ -1,0 +1,76 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "post-decision-cycle-evolves-in-order",
+      "criterion": "Selecting any palette immediately applies it in the App, keeps successful Outcome unavailable, then deterministically brings the visitor to the Ticket View while Evidence is the current stage, and only afterward reveals successful Outcome plus returned Context; the sequence is explicit in the state schedule and rendered contract rather than jumping directly from choice to completion."
+    },
+    {
+      "acceptance_id": "graph-projects-progressive-causality",
+      "criterion": "The Ticket graph mechanically projects future, current, and completed states for Human, Evidence, Outcome, and every connecting edge from the existing Phase; future stages stay readable but quiet, the current stage is unmistakable, completed stages remain stable, and no duplicate progress model or fake execution state is introduced."
+    },
+    {
+      "acceptance_id": "motion-explains-without-obstructing",
+      "criterion": "Explanatory graph/workspace/context-return movement uses only existing CSS tokens with transform and opacity, strong ease-out/ease-in-out curves, and sub-300ms UI transitions; manual App/Ticket tabs, keyboard submission, reset, copy, founder, and navigation actions remain immediate, and no motion or UI library is added."
+    },
+    {
+      "acceptance_id": "reduced-motion-preserves-the-sequence",
+      "criterion": "prefers-reduced-motion removes spatial travel while preserving readable state/color changes and the same causal phase sequence; fine-pointer hover remains gated and neither desktop nor 390px layouts gain page overflow or lose access to Chat, App, Ticket, the human choice, Evidence, Outcome, or returned Context."
+    },
+    {
+      "acceptance_id": "cycle-evolution-is-verified",
+      "criterion": "Rendered assertions, lint, static production build, full repository tests, responsive source contracts, canonical VibeHub validation, and Plugin artifact verification pass after the evolution refinement."
+    }
+  ],
+  "constraints": [
+    "Name the motion purpose as explanation, spatial consistency, or state indication; do not add decorative parallax, mouse tracking, autoplay loops, floating cards, celebration, bounce, blur spectacle, or motion to frequently used controls.",
+    "Use CSS transitions and @starting-style only; do not add Motion, Framer Motion, GSAP, Three.js, a timeline library, or a second animation token system.",
+    "Animate transform and opacity for spatial movement. Color, border, and background may transition for semantic state; do not animate layout dimensions, margin, padding, top, left, or use scale(0), transition: all, or ease-in.",
+    "Preserve the truthful deterministic dark-mode example, exact install/source/founder content, immediate human authority boundary, manual App/Ticket access, static architecture, and existing clipboard behavior.",
+    "Do not add routes, backend calls, model calls, persistence, analytics, iframe content, deployment, or changes to the installed local graph UI."
+  ],
+  "context": "The visual identity and founder entrance now feel correct, but the current post-decision sequence hides the product's most important evolution. After a visitor selects a dark palette, the App changes and then the demo jumps directly to the final Ticket state; the visitor barely sees Evidence form or Outcome arrive. Preserve the immediate live-App response, then let the right-hand View follow the lifecycle back to Ticket while the Evidence edge/node becomes current, followed by independent Outcome and returned Context. Future graph stages should remain spatially present as quiet structure, while active/completed nodes and connectors become progressively legible. Motion exists only to explain this rare onboarding cycle and must not slow keyboard input, manual App/Ticket switching, copy controls, or normal navigation.",
+  "context_refs": [
+    {
+      "purpose": "Latest successful public entrance and identity implementation this motion refinement preserves.",
+      "ref": ".vibehub/outcomes/ticket-public-founders-brand-icons.yaml"
+    },
+    {
+      "purpose": "Accepted deterministic lifecycle and human-boundary interaction contract.",
+      "ref": ".vibehub/outcomes/ticket-coding-agent-first-public-site.yaml"
+    },
+    {
+      "purpose": "Binding restrained motion, semantic state, accessibility, and spatial-workbench quality standard.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Canonical Request/Context-to-Ticket-to-Evidence-to-Outcome-to-returned-Context causal model being explained.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Current deterministic phase scheduling and graph-state projection surface.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Existing motion tokens, responsive graph layout, reduced-motion rules, and visual state surface.",
+      "ref": "site/app/globals.css"
+    },
+    {
+      "purpose": "Static lifecycle, animation-contract, and production-artifact verification surface.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The public Coding Agent demo makes the one-Ticket development cycle visibly evolve from Request and Context through the human boundary, Evidence, independent Outcome, and returned Context without adding ornamental motion or interaction delay.",
+  "provenance_refs": [
+    "conversation:2026-08-09-public-cycle-evolution-refinement"
+  ],
+  "relations": [
+    {
+      "rationale": "The lifecycle evolution refines the current accepted public entrance without reopening its founder or brand-asset scope.",
+      "target_ticket_id": "ticket-public-founders-brand-icons",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-public-cycle-evolution"
+}

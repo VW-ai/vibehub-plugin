@@ -1,0 +1,81 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "first-view-explains-and-installs",
+      "criterion": "At a 1440px desktop viewport Product is open by default and the first view plainly includes The development cycle survives the chat., the one-Ticket supporting line, the exact Start this with VibeHub. entry, truthful Codex and Claude Code installation access, Copy for Agent, and GitHub without requiring scrolling or prior product knowledge."
+    },
+    {
+      "acceptance_id": "ticket-shelf-is-the-site-navigation",
+      "criterion": "One persistent shelf exposes Start, Product, Workflow, Documentation, and Founder as distinct Ticket-shaped controls with ports, direct connector language, and state signals; the active shelf position is visibly empty or reserved and connected to the opened Ticket, while URL state, back-forward navigation, pointer activation, and keyboard activation all select the corresponding surface."
+    },
+    {
+      "acceptance_id": "opened-ticket-is-physical-and-readable",
+      "criterion": "The selected Ticket visibly originates at its shelf slot and opens into one coherent tactile dossier or flip-book with page thickness and hinge cues rather than a modal, browser frame, dashboard, or slide deck; Product, Workflow, Documentation, and Founder each expose module-specific, semantically structured, linearly readable content, and the Product graph unmistakably depicts Request and Context shaping one Ticket, acceptance-linked Evidence, independent Outcome, and durable learning returning to Context."
+    },
+    {
+      "acceptance_id": "motion-is-fluid-restrained-and-interruptible",
+      "criterion": "Pointer press feedback is immediate, open and switch motion is origin-aware and can retarget without a blocking sequence, frequent hover feedback is near-imperceptible and only enabled on fine hover pointers, layout avoids transition-all and layout-property animation, keyboard selection is immediate, and prefers-reduced-motion receives a static or crossfade-equivalent experience without parallax or 3D travel."
+    },
+    {
+      "acceptance_id": "responsive-accessible-static-site-is-verifiable",
+      "criterion": "The experience remains causally legible and linearly readable at desktop and narrow mobile viewports without page-level horizontal overflow; touch targets, focus visibility, landmarks, headings, labels, contrast, copy status, and external links remain usable; rendered assertions, lint, production build, desktop and mobile browser inspection, canonical project validation, and Plugin artifact verification pass without adding backend state."
+    }
+  ],
+  "constraints": [
+    "Use one coherent central stage and persistent Ticket Shelf, not a conventional stack of SaaS marketing sections or horizontal page travel.",
+    "Content clarity is the first priority; physical depth and motion explain spatial continuity but never make prose non-linear or obscure the installation path.",
+    "Prefer CSS transitions or the Web Animations API using transform and opacity; do not add WebGL, Three.js, an animation dependency, or runtime state unless browser evidence reveals a real capability gap.",
+    "Keep the visual language quiet and precise: cool off-white dotted canvas, system typography, mono metadata, restrained semantic green and blue, rectangular Ticket objects, ports, connectors, and subtle shadows.",
+    "Keep one global Copy for Agent payload and exact current Codex and Claude Code installation truth; do not invent one-click installation, accounts, metrics, pricing, analytics, immutable attestations, or remote product services.",
+    "Do not mutate the installed local Workbench or deploy, bind a domain, or change hosting, persistence, or analytics in this Ticket."
+  ],
+  "context": "The owner selected the Ticket Shelf direction over a conventional landing page. The whole public site should live on one quiet graph canvas with five persistent Ticket modules: Start, Product, Workflow, Documentation, and Founder. Product opens by default so the first viewport states what VibeHub is, shows the exact Start this with VibeHub. entry, and exposes truthful install and Agent-copy actions. Selecting another module should preserve spatial continuity: its shelf slot becomes an empty dashed origin, a connector remains visible, and the selected Ticket lifts and opens as a tactile two-page dossier or flip-book. The opened object may feel dimensional, but text remains linear and content-first. This revision keeps the binding distinction between a multi-Ticket public graph and the one-Ticket product model: the shelf shows several site modules as Tickets, while the Product surface explains how one development Ticket mediates human Request, durable Context, Evidence, and independent Outcome.",
+  "context_refs": [
+    {
+      "purpose": "Binding distinction between a multi-Ticket public graph and the one-Ticket Product lifecycle explanation.",
+      "ref": ".vibehub/rooms/workbench/decision-public-hero-shows-ticket-graph.yaml"
+    },
+    {
+      "purpose": "Binding direction that the graph is the site-wide navigation and storytelling system rather than a screenshot inside a normal page.",
+      "ref": ".vibehub/rooms/workbench/decision-public-causal-canvas-site.yaml"
+    },
+    {
+      "purpose": "Binding visual, accessibility, and interaction quality standard.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Canonical one-Ticket product model the Product surface must explain.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Current truthful installation and coexistence instructions.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Owner-selected graph composition and craft reference, used only for visual quality.",
+      "ref": "design/public-site/causal-canvas-direction-a.png"
+    },
+    {
+      "purpose": "Public interaction and content implementation surface.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Public visual, motion, accessibility, and responsive implementation surface.",
+      "ref": "site/app/globals.css"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The public VibeHub site becomes one persistent Ticket Shelf where a visitor immediately understands and installs the product, then explores Product, Workflow, Documentation, and Founder through an origin-aware physical Ticket without losing the surrounding graph.",
+  "provenance_refs": [
+    "conversation:2026-08-09-ticket-shelf-public-site"
+  ],
+  "relations": [
+    {
+      "rationale": "The Ticket Shelf preserves and reframes the completed public site and its global Agent handoff.",
+      "target_ticket_id": "ticket-add-site-copy-for-agent",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-restore-public-hero-ticket-graph"
+}

@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-public-causal-canvas-site",
+  "detail": "The selected public-site direction is Causal Canvas (visual direction A). The Ticket graph is not a framed product screenshot or one section among conventional pages: it is the website's navigation and storytelling space. Product, use cases, documentation, installation, and GitHub appear as reachable graph regions or spatial transitions. The site is built and judged first. Its stronger Ticket shapes, icons, hierarchy, and connector language may later inform a separate local Workbench refinement, but this decision does not authorize changing the installed UI now. The checked-in direction image is non-authoritative visual inspiration: its layout, scale, whitespace, and causal composition are approved, while any generated labels, claims, navigation items, metrics, product states, or capabilities must be discarded unless current canonical VibeHub documents support them.",
+  "evidence": [
+    {
+      "note": "Owner-selected visual direction A, checked in only as non-authoritative composition and art-direction evidence.",
+      "ref": "design/public-site/causal-canvas-direction-a.png"
+    },
+    {
+      "note": "The owner explicitly prioritized finishing the website before transferring proven visual improvements back to the local UI.",
+      "ref": "conversation:2026-08-05-public-site-first-then-local-ui"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-ui-quiet-intelligence-standard",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-05T07:51:57Z",
+    "quote": "我觉得A最好能从A这个方向往下推……product,use case,甚至到documentation，都可以围绕这个graph",
+    "ref": "conversation:2026-08-05-public-site-causal-canvas-selected"
+  },
+  "state": "active",
+  "summary": "The public VibeHub website uses the Ticket graph as its site-wide spatial language",
+  "tags": [
+    "brand",
+    "causal-canvas",
+    "public-site",
+    "ticket-graph",
+    "visual-direction",
+    "workbench"
+  ],
+  "type": "decision"
+}

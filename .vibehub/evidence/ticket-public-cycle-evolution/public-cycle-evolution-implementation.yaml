@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "post-decision-cycle-evolves-in-order",
+    "graph-projects-progressive-causality",
+    "motion-explains-without-obstructing",
+    "reduced-motion-preserves-the-sequence"
+  ],
+  "evidence_id": "public-cycle-evolution-implementation",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T22:48:46Z",
+  "refs": [
+    "file:site/app/page.tsx",
+    "file:site/app/globals.css"
+  ],
+  "schema_version": 1,
+  "summary": "The public walkthrough now exposes one causal evolution rather than jumping from human choice to completion. Choosing a palette still changes the App immediately; after 520ms the View returns to the Ticket while Evidence is the mechanically projected current stage, and only at 1680ms does successful Outcome and returned Context appear. Request, Context, Ticket, Human, Evidence, Outcome, and all four edges derive future/current/done presentation directly from the existing Phase. A compact 01 Ticket / 02 Human / 03 Evidence / 04 Outcome marker names the current lifecycle without creating another progress state. Graph nodes, edges, workspace entry, and returned Context use the existing motion tokens with transform/opacity transitions under 300ms; controls remain immediate. Reduced-motion removes spatial travel while retaining semantic state opacity and color, and the existing narrow-layout graph remains vertically reachable.",
+  "ticket_id": "ticket-public-cycle-evolution"
+}

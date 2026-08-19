@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "post-decision-cycle-evolves-in-order",
+    "graph-projects-progressive-causality",
+    "motion-explains-without-obstructing",
+    "reduced-motion-preserves-the-sequence",
+    "cycle-evolution-is-verified"
+  ],
+  "evidence_id": "public-cycle-evolution-verification",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T22:48:46Z",
+  "refs": [
+    "file:site/tests/rendered-html.test.mjs",
+    "command:cd site && npm run lint",
+    "command:cd site && npm run build",
+    "command:cd site && node --test tests/rendered-html.test.mjs",
+    "command:node skills/scripts/vh.mjs project validate --repo .",
+    "command:node skills/scripts/vh.mjs ticket validate --repo .",
+    "command:npm test",
+    "command:npm run verify:artifact"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh non-browser verification passes after the lifecycle refinement: ESLint, Vinext static production export, seven rendered product-contract tests, canonical project validation at 4 rooms / 26 Context / 33 Tickets / 104 prior Evidence / 28 Outcomes, canonical Ticket validation, the full repository suite at 43/43, and Plugin artifact verification at 51 files and 361397 bytes. The rendered contracts assert the two-step Evidence-before-Outcome schedule, mechanical connector and node states, the four lifecycle labels, horizontal and mobile-vertical connector projection, reduced-motion state preservation, both approved easing tokens, and the absence of transition-all, scale(0), ease-in, or 300ms-plus opacity/transform transitions. No motion dependency was added and the production site remains a static export.",
+  "ticket_id": "ticket-public-cycle-evolution"
+}

@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "interaction-remains-spatial-and-accessible",
+    "visual-language-is-public-grade"
+  ],
+  "evidence_id": "public-site-interaction-and-visual",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-05T08:23:49Z",
+  "refs": [
+    "site/app/page.tsx",
+    "site/app/globals.css",
+    "site/public/og.png",
+    "browser:http://localhost:3000/#product desktop-1440x900 and mobile-390x844",
+    "command:site/npm-run-lint"
+  ],
+  "schema_version": 1,
+  "summary": "Desktop and narrow browser checks confirm content remains readable without selection or horizontal travel; keyboard focus, optional detail, reduced-motion, forced-color, one deliberate Ticket shape, distinct surrounding object shapes, connector hierarchy, and restrained semantic color are implemented in the public surface.",
+  "ticket_id": "ticket-launch-public-causal-canvas-site"
+}
