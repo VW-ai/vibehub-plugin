@@ -40,6 +40,10 @@ try {
     "assets/brand/vibehub-logo.svg",
     "CHANGELOG.md",
     "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/assets/local-graph/quiet-workbench-desktop-2x.png",
+    "docs/assets/local-graph/workbench-ticket-action-2x.png",
+    "docs/assets/local-graph/workbench-rooms-narrow-2x.png",
+    "docs/assets/local-graph/readme-capture-manifest.json",
     "docs/CONCEPT.md",
     "docs/INSTALL.md",
     "docs/RELEASE.md",
@@ -66,6 +70,19 @@ try {
     "skills/contracts/ticket-next-action.md",
   ]) {
     if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
+  }
+  const installedReadme = readFileSync(join(artifact, "README.md"), "utf8");
+  const readmeImageRefs = new Set([
+    ...[...installedReadme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/gu)]
+      .map((match) => match[1]),
+    ...[...installedReadme.matchAll(/\b(?:src|srcset)="([^"]+)"/gu)]
+      .flatMap((match) => match[1].split(",").map((entry) => entry.trim().split(/\s+/u)[0])),
+  ]);
+  for (const ref of readmeImageRefs) {
+    if (/^(?:https?:|data:|#)/u.test(ref)) continue;
+    if (!existsSync(join(artifact, ref))) {
+      throw new Error(`installed README image target is missing: ${ref}`);
+    }
   }
   for (const forbidden of [
     ".mcp.json",

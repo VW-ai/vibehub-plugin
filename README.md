@@ -11,15 +11,15 @@
 
 <p align="center"><em>Memory tools preserve the conversation; VibeHub preserves the development cycle.</em></p>
 
-![VibeHub v0.8 canvas-first Ticket Workbench](docs/assets/local-graph/quiet-workbench-desktop.jpg)
+<img src="docs/assets/local-graph/quiet-workbench-desktop-2x.png" alt="VibeHub four-phase Ticket Workbench showing the current causal graph" width="1280">
 
-**See what matters now.** The canvas separates DONE, READY, and REFINE work, then keeps a selected Ticket's direct prerequisites and unlocks in view instead of flattening the repository into a task list.
+**See what matters now.** The canvas distinguishes DRAFT, READY, RUNNING, and DONE work, then keeps direct prerequisites and unlocks visible instead of flattening the repository into a task list.
 
-![VibeHub Ticket Log tracing Evidence and an independently recorded Outcome](docs/assets/local-graph/workbench-ticket-proof.jpg)
+<img src="docs/assets/local-graph/workbench-ticket-action-2x.png" alt="Focused VibeHub Ticket with Verify and close as its Recommended action" width="1180">
 
-**Inspect proof, not a status claim.** Execution explains what can run, Contract shows acceptance boundaries, and Log traces Evidence plus the independently recorded Outcome from exact Git source.
+**Take the next action from the Ticket.** Recommended action stays primary, its explanation appears on demand, and Contract plus Log keep acceptance, Evidence, and Outcome traceable to exact Git source.
 
-![VibeHub Rooms exposing repository Context at a real narrow viewport](docs/assets/local-graph/workbench-rooms-narrow.jpg)
+<img src="docs/assets/local-graph/workbench-rooms-narrow-2x.png" alt="VibeHub Workbench Room open at a real 390 by 844 narrow viewport" width="390">
 
 **Bring repository context in only when useful.** Rooms expose durable Context, consuming Tickets, and drift state on demand; the same read-only graph remains usable at a real narrow viewport.
 

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "source_commit": "55c52b49b9d7caffe0ce5c048529269dbfdb9261",
+  "captured_at": "2026-08-20T23:03:00Z",
+  "dpr": 2,
+  "capture_contract": "Exact clean Workbench source rendered in the selected in-app Browser through same-origin CSS viewports at 2x. Returned pixels were dimension-checked before PNG encoding; no image was resized. The narrow fixed-layout capture was assembled from native 2x slices without resampling.",
+  "captures": [
+    {
+      "path": "docs/assets/local-graph/quiet-workbench-desktop-2x.png",
+      "subject": "current causal graph",
+      "css_viewport": { "width": 1280, "height": 720 },
+      "dpr": 2,
+      "output_pixels": { "width": 2560, "height": 1440 },
+      "sha256": "44ee942e17dd0a64e8b876c0fc0162ec32654cb6a07d52d13d3030549c19841f"
+    },
+    {
+      "path": "docs/assets/local-graph/workbench-ticket-action-2x.png",
+      "subject": "focused Ticket Recommended action",
+      "css_viewport": { "width": 1180, "height": 820 },
+      "dpr": 2,
+      "output_pixels": { "width": 2360, "height": 1640 },
+      "sha256": "b3d861181a8965bce9ef8fb641119dd4936be0fdf30d8b919239950b427fa4e8"
+    },
+    {
+      "path": "docs/assets/local-graph/workbench-rooms-narrow-2x.png",
+      "subject": "selected Workbench Room at narrow width",
+      "css_viewport": { "width": 390, "height": 844 },
+      "dpr": 2,
+      "output_pixels": { "width": 780, "height": 1688 },
+      "sha256": "d73dc2f48a79dabd88123e551e71056218af301d738e71a86b3726d0c87b3222"
+    }
+  ]
+}

@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "617158f0d1777dfbfd0256b788f32ebc04fad7c3",
+        "blob": "61630827cc71989dcc8b6d0442a05b718419ec06",
         "path": "README.md"
       },
       {
@@ -66,6 +66,10 @@
         "path": "docs/SPEED_FIRST_CLEANUP.md"
       },
       {
+        "blob": "2961f14f4d201094a6fda525117a7b19980b529b",
+        "path": "docs/assets/local-graph/quiet-workbench-desktop-2x.png"
+      },
+      {
         "blob": "68f9a0219b05a05b158c8f27a29b0da9c57936d0",
         "path": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
       },
@@ -74,8 +78,20 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       },
       {
+        "blob": "ea2f3c13ce59e51e5ab564a004edffd82758af38",
+        "path": "docs/assets/local-graph/readme-capture-manifest.json"
+      },
+      {
+        "blob": "9848601c890923d0b17cc9436f8d7ad2d50caff7",
+        "path": "docs/assets/local-graph/workbench-rooms-narrow-2x.png"
+      },
+      {
         "blob": "b139f93c74c772316d49b29f29b52c1e61217b92",
         "path": "docs/assets/local-graph/workbench-rooms-narrow.jpg"
+      },
+      {
+        "blob": "6353976f590a96ae4b456921bea407fa279a650a",
+        "path": "docs/assets/local-graph/workbench-ticket-action-2x.png"
       },
       {
         "blob": "1e42da3d572229ed1207652c5b4727a5e8ac072e",
@@ -154,8 +170,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-20T21:56:06.186Z",
-    "last_aligned_commit": "0dd18fbea09daf10875dea3dfb9de7509380ff97"
+    "checked_at": "2026-08-20T23:04:44.849Z",
+    "last_aligned_commit": "051456d29b43a96169170f36308bb16514f439dc"
   },
   "anchors": [
     "CHANGELOG.md",
