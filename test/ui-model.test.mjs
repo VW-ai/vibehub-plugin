@@ -113,6 +113,9 @@ test("production workbench routes execution and adjudication from host next acti
   };
   const next = model.ticketNextAction(closeout);
   assert.equal(next.action, "CLOSE_OUT");
+  const presentation = model.ticketNodePresentation(closeout);
+  assert.match(presentation.className, /(?:^| )next-close-out(?: |$)/u);
+  assert.match(presentation.ariaLabel, /Next action CLOSE_OUT/u);
   assert.match(
     model.agentHandoffInstruction(closeout.ticketId, next, "READY"),
     /vibehub-ticket-closeout/u,
@@ -141,9 +144,11 @@ test("production workbench model projects the compact overview without inventing
   refine.ticketId = "refine-work";
   const deviated = projectedTicket("DEVIATED", "COMPLETE");
   deviated.ticketId = "deviated-work";
+  const closeout = projectedTicket("READY", "RECORDED", "CLOSE_OUT");
+  closeout.ticketId = "closeout-work";
 
   const overview = model.workbenchOverview(
-    [ready, refine, deviated],
+    [ready, refine, deviated, closeout],
     {
       semanticDirty: true,
       dirtyPaths: [".vibehub/tickets/ready-work.yaml"],
@@ -153,6 +158,10 @@ test("production workbench model projects the compact overview without inventing
   assert.equal(
     overview.ready.map((ticket) => ticket.ticketId).join(","),
     "ready-work",
+  );
+  assert.equal(
+    overview.closeout.map((ticket) => ticket.ticketId).join(","),
+    "closeout-work",
   );
   assert.equal(
     overview.humanPending.map((ticket) => ticket.ticketId).join(","),
@@ -167,6 +176,13 @@ test("production workbench model projects the compact overview without inventing
     "deviated-work",
   );
   assert.equal(overview.refineCount, 1);
+  const counts = model.operationalCounts([closeout]);
+  assert.match(model.graphSummary(counts, overview), /1 close out/u);
+  assert.match(model.graphNarrative(counts, {
+    ...overview,
+    ready: [],
+    closeout: [closeout],
+  }), /No Ticket is executable; 1 await independent closeout/u);
   assert.equal(overview.sourceDirty, true);
   assert.equal(overview.sourceDirtyCount, 1);
   assert.equal("implementing" in overview, false);

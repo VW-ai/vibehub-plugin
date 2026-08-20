@@ -41,6 +41,7 @@
     REFINE: "sliders",
     DEVIATED: "alert",
     ARCHIVED: "archive",
+    REVIEW: "recorded",
   });
   const ATTENTION_ICON_IDS = Object.freeze({
     UPCOMING: "upcoming",
@@ -73,6 +74,7 @@
     sourceDockContent: document.querySelector("#sourceDockContent"),
     closeSourceDock: document.querySelector("#closeSourceDock"),
     summaryReady: document.querySelector("#summaryReady"),
+    summaryCloseout: document.querySelector("#summaryCloseout"),
     summaryRefine: document.querySelector("#summaryRefine"),
     summaryHuman: document.querySelector("#summaryHuman"),
     summaryDeviated: document.querySelector("#summaryDeviated"),
@@ -86,6 +88,8 @@
     graphSignalCount: document.querySelector("#graphSignalCount"),
     overviewPanel: document.querySelector("#overviewPanel"),
     closeOverview: document.querySelector("#closeOverview"),
+    closeoutQueue: document.querySelector("#closeoutQueue"),
+    closeoutQueueCount: document.querySelector("#closeoutQueueCount"),
     stateDot: document.querySelector("#stateDot"),
     stateLabel: document.querySelector("#stateLabel"),
     sourceStatus: document.querySelector("#sourceStatus"),
@@ -305,7 +309,8 @@
     renderDirectionControl();
     renderScopeControl();
     elements.graphSignalCount.textContent =
-      `${overview.ready.length} ready · ${overview.humanPending.length} need you · `
+      `${overview.ready.length} ready · ${overview.closeout.length} close out · `
+      + `${overview.humanPending.length} need you · `
       + (overview.sourceDirty ? "local changes" : "exact source");
     document.title = `${project.name} · VibeHub Ticket graph`;
     elements.stateDot.className =
@@ -347,9 +352,45 @@
 
   function renderOverview(overview) {
     elements.summaryReady.textContent = String(overview.ready.length);
+    elements.summaryCloseout.textContent = String(overview.closeout.length);
     elements.summaryHuman.textContent = String(overview.humanPending.length);
     elements.summaryDeviated.textContent = String(overview.deviated.length);
     elements.summaryRefine.textContent = String(overview.refineCount);
+    elements.closeoutQueueCount.textContent = String(overview.closeout.length);
+    renderCloseoutQueue(overview.closeout);
+  }
+
+  function renderCloseoutQueue(tickets) {
+    if (!tickets.length) {
+      elements.closeoutQueue.replaceChildren(
+        quietMessage("No Ticket is awaiting independent adjudication."),
+      );
+      return;
+    }
+    elements.closeoutQueue.replaceChildren(...tickets.map((ticket) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "closeout-ticket";
+      button.setAttribute(
+        "aria-label",
+        `Review ${ticket.ticketId} for independent closeout`,
+      );
+      const copy = document.createElement("span");
+      const id = document.createElement("strong");
+      id.textContent = shortTicketId(ticket.ticketId);
+      id.dataset.fullText = ticket.ticketId;
+      const outcome = document.createElement("small");
+      outcome.textContent = ticket.outcome;
+      copy.append(id, outcome);
+      const action = document.createElement("b");
+      action.textContent = "REVIEW";
+      button.append(copy, action);
+      button.addEventListener("click", () => {
+        closeOverview(false);
+        void selectTicket(ticket.ticketId, true, "evidence");
+      });
+      return button;
+    }));
   }
 
   function renderGraphSummary(counts, overview) {
@@ -365,7 +406,8 @@
       items.push(item);
     };
     add(counts.DONE, "DONE", "check", "state-done");
-    add(counts.READY, "READY", "play", "state-ready");
+    add(overview.ready.length, "READY", "play", "state-ready");
+    add(overview.closeout.length, "CLOSE OUT", "recorded", "next-close-out");
     add(counts.REFINE, "REFINE", "sliders", "state-refine");
     add(counts.BLOCKED, "BLOCKED", "lock", "state-blocked");
     add(counts.DEVIATED, "DEVIATED", "alert", "state-deviated");
@@ -655,7 +697,7 @@
         selected: isSelected,
         dimmed: Boolean(related && !related.nodes.has(ticket.ticketId)),
       });
-      const { operational, attention } = presentation;
+      const { operational, attention, nextAction } = presentation;
       const group = svg("g", {
         class: classes(presentation.className, ticket.archived ? "archived" : ""),
         transform: `translate(${position.x} ${position.y})`,
@@ -730,7 +772,11 @@
       group.append(id);
       // The state is always a textual label; color is a secondary accent.
       if (operational) {
-        const visibleState = ticket.archived ? "ARCHIVED" : operational.label;
+        const visibleState = ticket.archived
+          ? "ARCHIVED"
+          : nextAction?.action === "CLOSE_OUT"
+            ? "REVIEW"
+            : operational.label;
         group.append(svgIcon(STATE_ICON_IDS[visibleState], {
           class: "ticket-state-icon",
           x: NODE.width - 80,
@@ -851,11 +897,13 @@
       if (!position) continue;
       const operational = ticketOperationalState(ticket);
       const attention = ticketAttentionState(ticket);
+      const nextAction = ticketNextAction(ticket);
       elements.minimap.append(svg("rect", {
         class: classes(
           "minimap-node",
           operational ? `state-${operational.key}` : "",
           attention ? `attention-${attention.key}` : "",
+          nextAction ? `next-${nextAction.key}` : "",
         ),
         x: position.x,
         y: position.y,
@@ -886,11 +934,12 @@
     elements.inspectorTitle.textContent = "Execution context";
     elements.inspectorOutcome.hidden = false;
     const counts = operationalCounts(state.graph.tickets);
-    elements.inspectorOutcome.textContent = graphNarrative(counts);
+    const overview = workbenchOverview(state.graph.tickets, state.graph.source);
+    elements.inspectorOutcome.textContent = graphNarrative(counts, overview);
     const content = document.createDocumentFragment();
     content.append(section(
       "Execution signal",
-      stateSummary(counts),
+      stateSummary(counts, overview),
     ));
     content.append(disclosure(
       "Exact Git source",
@@ -1049,8 +1098,13 @@
       attention,
       nextAction,
     );
-    const contract = ticketContractPanel(ticket, contextPackage, inspection);
-    const proof = ticketProofPanel();
+    const contract = ticketContractPanel(
+      ticket,
+      contextPackage,
+      inspection,
+      nextAction,
+    );
+    const proof = ticketProofPanel(contextPackage, nextAction);
     const view = tabbedTicketView(
       ticket.ticketId,
       [
@@ -1069,6 +1123,7 @@
       contractSummary: contract.summary,
       proofSummary: proof.summary,
       acceptanceCount: (contextPackage.acceptance || []).length,
+      nextAction,
     };
   }
 
@@ -1500,6 +1555,7 @@
     signal.className = classes(
       "ticket-signal",
       operational ? `state-${operational.key}` : "",
+      nextAction ? `next-${nextAction.key}` : "",
     );
     const heading = document.createElement("div");
     heading.className = "ticket-signal-heading";
@@ -1507,13 +1563,18 @@
     marker.className = "ticket-signal-mark";
     marker.setAttribute("aria-hidden", "true");
     const label = document.createElement("strong");
-    label.textContent = operational?.label || "TICKET";
+    label.textContent = nextAction?.action === "CLOSE_OUT"
+      ? "REVIEW"
+      : operational?.label || "TICKET";
+    const closeout = nextAction?.action === "CLOSE_OUT";
     const handoff = actionButton({
-      label: "Copy for Agent",
-      className: "agent-handoff",
+      label: closeout ? "Close out with Agent" : "Copy for Agent",
+      className: classes("agent-handoff", closeout ? "closeout-handoff" : ""),
       onClick: () => void copyPayload(
         agentHandoffPayload(ticket, contextPackage, operational),
-        `Ticket ${ticket.ticketId} copied for Agent`,
+        closeout
+          ? `Closeout handoff for ${ticket.ticketId} copied`
+          : `Ticket ${ticket.ticketId} copied for Agent`,
       ),
     });
     heading.append(marker, label, handoff);
@@ -1532,6 +1593,9 @@
     );
     signal.append(heading, metrics);
     panel.append(signal);
+
+    const review = closeoutReviewBrief(contextPackage, nextAction);
+    if (review) panel.append(review);
 
     if (attention) panel.append(humanAttentionBrief(attention));
 
@@ -1594,17 +1658,39 @@
     // this Ticket should execute, wait, ask a human, close out, or replan.
     const stateLabel = operational?.label || "UNPROJECTED";
     const nextAction = ticketNextAction(ticket);
+    const canonical = contextPackage.agentPayload ?? {
+      kind: "vibehub_ticket_handoff",
+      ticketId: ticket.ticketId,
+    };
     return {
-      instruction: agentHandoffInstruction(
+      ...canonical,
+      instruction: canonical.handoff?.instruction ?? agentHandoffInstruction(
         ticket.ticketId,
         nextAction,
         stateLabel,
       ),
-      ...(contextPackage.agentPayload ?? {
-        kind: "vibehub_ticket_handoff",
-        ticketId: ticket.ticketId,
-      }),
     };
+  }
+
+  function closeoutReviewBrief(contextPackage, nextAction) {
+    if (nextAction?.action !== "CLOSE_OUT") return null;
+    const acceptance = contextPackage.acceptance || [];
+    const evidence = contextPackage.evidence || [];
+    const brief = document.createElement("div");
+    brief.className = "closeout-review-brief";
+    const marker = document.createElement("span");
+    marker.className = "closeout-review-mark";
+    marker.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("span");
+    const title = document.createElement("strong");
+    title.textContent = "Ready for independent closeout";
+    const detail = document.createElement("span");
+    detail.textContent = `${acceptance.length} / ${acceptance.length} criteria have authority-satisfying Evidence across ${evidence.length} record${evidence.length === 1 ? "" : "s"}. Outcome is pending; Evidence is proof, not judgment.`;
+    copy.append(title, detail);
+    const action = document.createElement("b");
+    action.textContent = "CLOSE OUT";
+    brief.append(marker, copy, action);
+    return brief;
   }
 
   function signalMetric(value, label, extraClass = "") {
@@ -1720,7 +1806,7 @@
     return arrow;
   }
 
-  function ticketContractPanel(ticket, contextPackage, inspection) {
+  function ticketContractPanel(ticket, contextPackage, inspection, nextAction) {
     const panel = document.createElement("section");
     const acceptance = contextPackage.acceptance || [];
     const constraints = contextPackage.constraints || [];
@@ -1730,6 +1816,8 @@
       contextPackage.provenanceRefs || ticket.provenanceRefs || [];
     const summary = contractBrief(acceptance);
     panel.append(summary);
+    const review = closeoutReviewBrief(contextPackage, nextAction);
+    if (review) panel.append(review);
     panel.append(ticketSectionHeading(
       "Acceptance conditions",
       "The exact conditions an independent Outcome can accept.",
@@ -2177,7 +2265,7 @@
     return normalized.charAt(0).toUpperCase() + normalized.slice(1);
   }
 
-  function ticketProofPanel() {
+  function ticketProofPanel(contextPackage, nextAction) {
     const panel = document.createElement("section");
     const summary = document.createElement("div");
     summary.className = "proof-summary";
@@ -2187,6 +2275,8 @@
     detail.textContent = "Acceptance-linked Evidence and independent Outcome appear here.";
     summary.append(label, detail);
     panel.append(summary);
+    const review = closeoutReviewBrief(contextPackage, nextAction);
+    if (review) panel.append(review);
     panel.append(ticketSectionHeading(
       "Evidence & Outcome",
       "Chronological Evidence and Outcome from the exact Git source.",
@@ -2229,7 +2319,9 @@
       );
     } else {
       contractValue.textContent = `${evidenced.size} / ${target.acceptanceCount} evidenced`;
-      contractDetail.textContent = "Independent Outcome pending";
+      contractDetail.textContent = target.nextAction?.action === "CLOSE_OUT"
+        ? "Authority satisfied · independent Outcome pending"
+        : "Independent Outcome pending";
     }
 
     const metric = elements.inspectorContent.querySelector(".proof-metric strong");
@@ -2241,7 +2333,9 @@
       detail.textContent = `${target.acceptanceCount} criteria await acceptance-linked Evidence.`;
     } else {
       label.textContent = `${evidence.length} Evidence · ${outcomes.length ? "Outcome recorded" : "Outcome pending"}`;
-      detail.textContent = `${evidenced.size} of ${target.acceptanceCount} criteria have Evidence attached.`;
+      detail.textContent = target.nextAction?.action === "CLOSE_OUT"
+        ? `${evidenced.size} of ${target.acceptanceCount} criteria are authority-satisfied; independent adjudication is next.`
+        : `${evidenced.size} of ${target.acceptanceCount} criteria have Evidence attached.`;
     }
 
     target.acceptanceRail.querySelectorAll("[data-acceptance-id]").forEach((row) => {
@@ -2351,11 +2445,11 @@
     return result;
   }
 
-  function stateSummary(counts) {
+  function stateSummary(counts, overview = null) {
     const result = document.createElement("div");
     result.className = "execution-state-copy";
     const primary = document.createElement("strong");
-    primary.textContent = graphSummary(counts);
+    primary.textContent = graphSummary(counts, overview);
     const detail = document.createElement("span");
     detail.textContent = "Select a Ticket or direct unlock to reveal its exact bounded context and Git trace.";
     result.append(primary, detail);

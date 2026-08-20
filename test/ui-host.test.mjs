@@ -49,9 +49,20 @@ function fixture() {
     tickets: [
       foundation,
       feature,
+      ticket("closeout-ready"),
       ticket("unsuccessful"),
       ticket("blocked", ["unsuccessful"]),
     ],
+  }).status, 0);
+  assert.equal(run(repo, "ticket", "evidence", {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "closeout-ready-proof",
+    ticket_id: "closeout-ready",
+    acceptance_ids: ["works"],
+    summary: "The current acceptance has reproducible proof.",
+    refs: ["test:closeout-ready"],
+    recorded_at: NOW,
   }).status, 0);
   assert.equal(run(repo, "ticket", "evidence", {
     schema_version: 1,
@@ -122,6 +133,7 @@ test("direct YAML projection exposes graph topology and operational states", () 
     ])),
     {
       blocked: "BLOCKED",
+      "closeout-ready": "READY",
       feature: "READY",
       foundation: "DONE",
       unsuccessful: "DEVIATED",
@@ -135,6 +147,7 @@ test("direct YAML projection exposes graph topology and operational states", () 
     ])),
     {
       blocked: "WAIT",
+      "closeout-ready": "CLOSE_OUT",
       feature: "NEEDS_HUMAN",
       foundation: "DONE",
       unsuccessful: "REPLAN",
@@ -147,6 +160,7 @@ test("direct YAML projection exposes graph topology and operational states", () 
     ])),
     {
       blocked: "NONE",
+      "closeout-ready": "NONE",
       feature: "PENDING",
       foundation: "COMPLETE",
       unsuccessful: "NONE",
@@ -209,6 +223,86 @@ test("human attention projection distinguishes upcoming, pending, recorded, and 
     ).capabilities.operational.summary.label,
     "READY",
   );
+});
+
+test("Workbench projection preserves the observed execution and adjudication corpus", () => {
+  const repo = tempRepo("ui-closeout-corpus");
+  repos.push(repo);
+  assert.equal(run(repo, "project", "init").status, 0);
+  const partial = ticket("partial");
+  partial.acceptance.push({
+    acceptance_id: "second",
+    criterion: "the second condition is observed.",
+  });
+  const humanMissing = ticket("human-missing");
+  humanMissing.acceptance[0].authority = "human";
+  const humanComplete = ticket("human-complete");
+  humanComplete.acceptance[0].authority = "human";
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [
+      ticket("zero"),
+      partial,
+      ticket("agent-complete"),
+      humanMissing,
+      humanComplete,
+      ticket("successful"),
+      ticket("failed"),
+    ],
+  }).status, 0);
+  for (const [ticketId, acceptanceIds, origin = "agent"] of [
+    ["partial", ["works"]],
+    ["agent-complete", ["works"]],
+    ["human-complete", ["works"], "human"],
+    ["successful", ["works"]],
+  ]) {
+    assert.equal(run(repo, "ticket", "evidence", {
+      schema_version: 1,
+      kind: "ticket_evidence",
+      evidence_id: `${ticketId}-proof`,
+      ticket_id: ticketId,
+      acceptance_ids: acceptanceIds,
+      summary: `${ticketId} has bounded proof.`,
+      refs: [origin === "human" ? `conversation:${ticketId}` : `test:${ticketId}`],
+      origin,
+      recorded_at: NOW,
+    }).status, 0);
+  }
+  assert.equal(run(repo, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "successful",
+    status: "successful",
+    accepted_acceptance_ids: ["works"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: ["successful-proof"],
+    summary: "Independent adjudication accepted the Ticket.",
+    closed_at: NOW,
+  }).status, 0);
+  assert.equal(run(repo, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "failed",
+    status: "failed",
+    accepted_acceptance_ids: [],
+    unresolved_acceptance_ids: ["works"],
+    evidence_ids: [],
+    summary: "Independent adjudication rejected the Ticket.",
+    closed_at: NOW,
+  }).status, 0);
+
+  const snapshot = buildUiSnapshot(repo, { scope: "all" });
+  assert.deepEqual(Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
+    item.ticketId,
+    item.capabilities.nextAction.summary.action,
+  ])), {
+    "agent-complete": "CLOSE_OUT",
+    failed: "REPLAN",
+    "human-complete": "CLOSE_OUT",
+    "human-missing": "NEEDS_HUMAN",
+    partial: "EXECUTE",
+    successful: "DONE",
+    zero: "EXECUTE",
+  });
 });
 
 test("invalid canonical documents fail before UI projection", () => {
@@ -430,7 +524,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const stateResponse = await fetch(`${origin}/api/state`, authorized(token));
   assert.equal(stateResponse.status, 200);
   const state = (await stateResponse.json()).data;
-  assert.equal(state.graph.tickets.length, 4);
+  assert.equal(state.graph.tickets.length, 5);
   assert.equal(state.graph.relations.length, 2);
   assert.equal(state.interventions.review.available, false);
   assert.deepEqual(state.interventions.authority, {
@@ -521,6 +615,34 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     "DEVIATED",
   );
 
+  const closeoutQuery = new URLSearchParams({
+    snapshotId: state.graph.snapshotId,
+    kind: "ticket",
+    ticketId: "closeout-ready",
+  });
+  const closeoutSubject = (await (await fetch(
+    `${origin}/api/subject?${closeoutQuery}`,
+    authorized(token),
+  )).json()).data;
+  const closeoutPayload = closeoutSubject.contextPackage.agentPayload;
+  assert.equal(closeoutSubject.contextPackage.nextAction.action, "CLOSE_OUT");
+  assert.equal(closeoutSubject.contextPackage.evidence.length, 1);
+  assert.equal(closeoutPayload.ticketRef, ".vibehub/tickets/closeout-ready.yaml");
+  assert.equal(closeoutPayload.acceptance[0].authority, "agent");
+  assert.equal(closeoutPayload.evidence[0].evidenceId, "closeout-ready-proof");
+  assert.deepEqual(closeoutPayload.evidence[0].acceptanceIds, ["works"]);
+  assert.equal(closeoutPayload.outcomeRecord, null);
+  assert.equal(closeoutPayload.handoff.action, "CLOSE_OUT");
+  assert.equal(closeoutPayload.handoff.skill, "vibehub-ticket-closeout");
+  assert.equal(closeoutPayload.handoff.requiresIndependentAgent, true);
+  assert.equal(closeoutPayload.handoff.readOnly, true);
+  assert.match(closeoutPayload.handoff.instruction, /independently adjudicate/iu);
+  assert.match(closeoutPayload.handoff.instruction, /do not execute it again/iu);
+  assert.deepEqual(closeoutPayload.reviewInputs.evidenceRefs, [
+    ".vibehub/evidence/closeout-ready/closeout-ready-proof.yaml",
+  ]);
+  assert.equal(closeoutPayload.reviewInputs.outcomeRef, null);
+
   const trace = (await (await fetch(
     `${origin}/api/trace?${ticketQuery}`,
     authorized(token),
@@ -570,7 +692,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(html, /id="frontierList"|id="attentionList"|id="deviationList"/u);
   assert.match(html, /id="summaryGrid"/u);
   assert.match(html, /id="summaryRefine"/u);
+  assert.match(html, /id="summaryCloseout"/u);
   assert.match(html, /id="summaryHuman"/u);
+  assert.match(html, /id="closeoutQueue"/u);
+  assert.match(html, /Independent closeout/u);
   assert.doesNotMatch(html, /id="overviewSource"/u);
   assert.match(html, /id="sourcePath"/u);
   assert.match(html, /id="sourceBranch"/u);
@@ -624,10 +749,15 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(model, /function normalizeLayoutDirection/u);
   assert.match(model, /function layoutDirectionHref/u);
   assert.match(model, /function workbenchOverview/u);
+  assert.match(model, /nextAction\?\.action === "CLOSE_OUT"/u);
   assert.match(script, /\["log", "evidence"\]/u);
   assert.match(script, /initialFocusPending/u);
   assert.match(script, /initialTabId = "execution"/u);
   assert.match(script, /function ticketExecutionPanel/u);
+  assert.match(script, /function renderCloseoutQueue/u);
+  assert.match(script, /Close out with Agent/u);
+  assert.match(script, /function closeoutReviewBrief/u);
+  assert.match(script, /Evidence is proof, not judgment/u);
   assert.match(model, /function ticketAttentionState/u);
   assert.match(script, /function humanAttentionBrief/u);
   assert.match(script, /Human evidence pending/u);
@@ -712,6 +842,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(styles, /\.overview-source/u);
   assert.doesNotMatch(styles, /\.overview-item/u);
   assert.match(styles, /\.summary-grid/u);
+  assert.match(styles, /\.closeout-overview/u);
+  assert.match(styles, /\.closeout-ticket/u);
+  assert.match(styles, /\.ticket-node\.next-close-out/u);
+  assert.match(styles, /\.closeout-review-brief/u);
   assert.match(styles, /min-height: 44px/u);
   assert.doesNotMatch(styles, /style-lab|style-option|style-swatch/u);
   assert.match(styles, /\.inspector-disclosure/u);
@@ -745,7 +879,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     `${origin}/api/state`,
     authorized(token),
   )).json()).data;
-  assert.equal(refreshed.graph.tickets.length, 5);
+  assert.equal(refreshed.graph.tickets.length, 6);
   assert.notEqual(refreshed.graph.snapshotId, state.graph.snapshotId);
   const draftQuery = new URLSearchParams({
     snapshotId: refreshed.graph.snapshotId,

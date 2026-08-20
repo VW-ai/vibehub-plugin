@@ -260,6 +260,46 @@ function evidenceOrigin(evidence) {
   return evidence.origin ?? "agent";
 }
 
+function handoffInstruction(ticketId, nextAction) {
+  const routes = {
+    EXECUTE: {
+      skill: "vibehub-ticket-run",
+      instruction: `Execute the READY VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-run.`,
+    },
+    CLOSE_OUT: {
+      skill: "vibehub-ticket-closeout",
+      instruction: `Independently adjudicate VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-closeout. Read the exact current Ticket, Acceptance authority, Evidence, Git diff or refs, and tests; do not execute it again, accept an executor summary as proof, or write a successful Outcome unless every current criterion is independently satisfied.`,
+      requiresIndependentAgent: true,
+    },
+    NEEDS_HUMAN: {
+      skill: "vibehub-ticket-review",
+      instruction: `Present the Contract for VibeHub Ticket ${ticketId} with the Skill vibehub-ticket-review and wait for explicit human input. Do not substitute Agent-origin Evidence for human authority.`,
+    },
+    REFINE: {
+      skill: "vibehub-ticket-plan",
+      instruction: `Refine VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-plan; do not start vibehub-ticket-run until its contract is firm.`,
+    },
+    REPLAN: {
+      skill: "vibehub-ticket-plan",
+      instruction: `Replan VibeHub Ticket ${ticketId} in this exact worktree with the Skill vibehub-ticket-plan, preserving the non-successful Outcome.`,
+    },
+    WAIT: {
+      skill: "vibehub-ticket-review",
+      instruction: `Inspect VibeHub Ticket ${ticketId} with the Skill vibehub-ticket-review and wait for its direct prerequisites to close successfully.`,
+    },
+    DONE: {
+      skill: "vibehub-ticket-review",
+      instruction: `Inspect the recorded Outcome for VibeHub Ticket ${ticketId} with the Skill vibehub-ticket-review.`,
+    },
+  };
+  return {
+    action: nextAction.action,
+    readOnly: true,
+    requiresIndependentAgent: false,
+    ...(routes[nextAction.action] ?? routes.DONE),
+  };
+}
+
 function humanAttentionState(repository, ticket, outcome) {
   const humanCriteria = ticket.acceptance.filter(
     (criterion) => acceptanceAuthority(criterion) === "human",
@@ -456,6 +496,16 @@ function canonicalContextFromRef(repository, reference) {
 
 function ticketContextPackage(ticket, relations, repository, source) {
   const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+  const evidence = documents(repository.evidence.documents)
+    .filter((item) => item.ticket_id === ticket.ticket_id)
+    .map((item) => ({
+      evidenceId: item.evidence_id,
+      acceptanceIds: item.acceptance_ids,
+      origin: evidenceOrigin(item),
+      summary: item.summary,
+      refs: item.refs,
+      recordedAt: item.recorded_at,
+    }));
   const attention = humanAttentionState(repository, ticket, outcome);
   const maturity = ticket.maturity ?? "firm";
   const operational = outcomeState(outcome) ?? ticketStatus(repository, ticket);
@@ -473,21 +523,36 @@ function ticketContextPackage(ticket, relations, repository, source) {
   const agentPayload = {
     kind: "vibehub_ticket_handoff",
     ticketId: ticket.ticket_id,
+    ticketRef: `.vibehub/tickets/${ticket.ticket_id}.yaml`,
     maturity,
     operationalState: operational,
     nextAction,
+    handoff: handoffInstruction(ticket.ticket_id, nextAction),
     outcome: ticket.outcome,
+    outcomeRecord: outcome,
     context: ticket.context,
     acceptance: ticket.acceptance.map((item) => ({
       ...item,
       authority: acceptanceAuthority(item),
     })),
     humanBoundaries: attention.criteria,
+    evidence,
     constraints: ticket.constraints,
     contextRefs: ticket.context_refs,
     relations: ticket.relations,
     provenanceRefs: ticket.provenance_refs,
     source: source.agentPayload,
+    reviewInputs: {
+      ticketRef: `.vibehub/tickets/${ticket.ticket_id}.yaml`,
+      evidenceRefs: evidence.map(({ evidenceId }) =>
+        `.vibehub/evidence/${ticket.ticket_id}/${evidenceId}.yaml`),
+      outcomeRef: outcome
+        ? `.vibehub/outcomes/${ticket.ticket_id}.yaml`
+        : null,
+      commit: source.resolvedCommit,
+      semanticDirty: source.semanticDirty,
+      dirtyPaths: source.dirtyPaths,
+    },
   };
   return {
     maturity,
@@ -496,6 +561,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
     outcome: ticket.outcome,
     context: ticket.context,
     acceptance,
+    evidence,
     attention,
     constraints: ticket.constraints,
     contextRefs,

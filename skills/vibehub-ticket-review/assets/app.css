@@ -286,12 +286,17 @@ summary:focus-visible {
 }
 
 .summary-cell.state-ready { color: var(--ready); }
+.summary-cell.next-close-out { color: var(--quiet); }
 .summary-cell.state-refine { color: var(--refine); }
 .summary-cell.state-deviated { color: var(--deviated); }
 .summary-cell.attention-pending { color: var(--attention); }
 
 .summary-cell.state-ready .summary-value {
   color: var(--ready);
+}
+
+.summary-cell.next-close-out .summary-value {
+  color: var(--ink);
 }
 
 .summary-cell.state-refine .summary-value {
@@ -361,6 +366,111 @@ summary:focus-visible {
 .legend-item.archived,
 .legend-item.upcoming { color: #5f5f5a; }
 .legend-item.recorded { color: var(--active); }
+
+.closeout-overview {
+  display: grid;
+  gap: 8px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+}
+
+.closeout-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.closeout-overview-heading > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.closeout-overview-heading strong {
+  color: var(--ink);
+  font-size: 10px;
+}
+
+.closeout-overview-heading small {
+  color: var(--quiet);
+  font-size: 8px;
+  line-height: 1.35;
+}
+
+.closeout-overview-heading b {
+  display: grid;
+  min-width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 11px;
+  color: var(--ink);
+  font: 600 9px/1 var(--mono);
+}
+
+.closeout-queue {
+  display: grid;
+  gap: 5px;
+}
+
+.closeout-queue .quiet-message {
+  margin: 0;
+}
+
+.closeout-ticket {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+  text-align: left;
+}
+
+.closeout-ticket:hover,
+.closeout-ticket:focus-visible {
+  border-color: var(--line-strong);
+  background: var(--surface-solid);
+}
+
+.closeout-ticket:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.closeout-ticket > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.closeout-ticket strong,
+.closeout-ticket small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.closeout-ticket strong {
+  font: 600 9px/1.3 var(--mono);
+}
+
+.closeout-ticket small {
+  color: var(--quiet);
+  font-size: 8px;
+}
+
+.closeout-ticket > b {
+  color: var(--quiet);
+  font: 700 8px/1 var(--ui);
+  letter-spacing: 0.06em;
+}
 
 /* Canvas pane: no shell chrome takes space from an empty presence source. */
 
@@ -628,6 +738,12 @@ summary:focus-visible {
 .minimap-node.attention-pending,
 .minimap-node.attention-recorded {
   stroke: var(--attention);
+}
+
+.minimap-node.next-close-out {
+  fill: #f7f7f4;
+  stroke: var(--quiet);
+  stroke-dasharray: 6 4;
 }
 
 .graph-overview {
@@ -990,6 +1106,31 @@ summary:focus-visible {
 
 .ticket-node.state-ready .ticket-state {
   fill: var(--ready);
+}
+
+/* CLOSE_OUT is a review routing state, not another operational state. */
+.ticket-node.next-close-out .ticket-boundary {
+  fill: #f7f7f4;
+  stroke: #8e928e;
+}
+
+.ticket-node.next-close-out .ticket-accent {
+  stroke: var(--quiet);
+  stroke-dasharray: 3 3;
+}
+
+.ticket-node.next-close-out .ticket-aperture {
+  fill: var(--surface-solid);
+  stroke: var(--quiet);
+  stroke-width: 2;
+}
+
+.ticket-node.next-close-out .ticket-state-icon {
+  color: var(--quiet);
+}
+
+.ticket-node.next-close-out .ticket-state {
+  fill: var(--quiet);
 }
 
 .ticket-node.state-refine .ticket-state {
@@ -1356,6 +1497,24 @@ summary:focus-visible {
   color: var(--ready);
 }
 
+.ticket-signal.next-close-out,
+.ticket-signal.next-close-out .ticket-signal-heading {
+  color: var(--quiet);
+  background: #f7f7f4;
+}
+
+.ticket-signal.next-close-out .ticket-signal-mark {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--surface-solid);
+  background: currentColor;
+}
+
+.closeout-handoff {
+  border-color: var(--line-strong);
+  color: var(--ink);
+  background: var(--surface-solid);
+}
+
 .ticket-signal.state-refine,
 .ticket-signal.state-refine .ticket-signal-heading {
   color: var(--refine);
@@ -1490,6 +1649,52 @@ summary:focus-visible {
 
 .human-attention-brief.attention-complete .human-attention-mark {
   background: currentColor;
+}
+
+.closeout-review-brief {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-top: 9px;
+  padding: 11px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--quiet);
+  background: #f7f7f4;
+}
+
+.closeout-review-mark {
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--surface-solid);
+  background: currentColor;
+}
+
+.closeout-review-brief > span:nth-child(2) {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.closeout-review-brief strong {
+  color: var(--ink);
+  font-size: 10px;
+}
+
+.closeout-review-brief > span:nth-child(2) > span {
+  color: var(--quiet);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.closeout-review-brief > b {
+  color: var(--quiet);
+  font: 700 8px/1 var(--ui);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 .ticket-section-heading {

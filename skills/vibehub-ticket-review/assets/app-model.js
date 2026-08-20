@@ -117,6 +117,7 @@
 
   function workbenchOverview(tickets, source = {}) {
     const ready = [];
+    const closeout = [];
     const deviated = [];
     const humanPending = [];
     const humanUpcoming = [];
@@ -124,7 +125,9 @@
     for (const ticket of tickets) {
       const operational = ticketOperationalState(ticket);
       const attention = ticketAttentionState(ticket);
-      if (operational?.label === "READY") ready.push(ticket);
+      const nextAction = ticketNextAction(ticket);
+      if (nextAction?.action === "EXECUTE") ready.push(ticket);
+      if (nextAction?.action === "CLOSE_OUT") closeout.push(ticket);
       if (operational?.label === "REFINE") refineCount += 1;
       if (operational?.label === "DEVIATED") deviated.push(ticket);
       if (attention?.label === "PENDING") humanPending.push(ticket);
@@ -132,6 +135,7 @@
     }
     return {
       ready,
+      closeout,
       deviated,
       humanPending,
       humanUpcoming,
@@ -165,9 +169,12 @@
     return url.href;
   }
 
-  function graphSummary(counts) {
+  function graphSummary(counts, overview = null) {
+    const readyCount = overview?.ready?.length ?? counts.READY;
+    const closeoutCount = overview?.closeout?.length ?? 0;
     const parts = [];
-    if (counts.READY) parts.push(`${counts.READY} ready`);
+    if (readyCount) parts.push(`${readyCount} ready`);
+    if (closeoutCount) parts.push(`${closeoutCount} close out`);
     if (counts.REFINE) parts.push(`${counts.REFINE} refine`);
     if (counts.BLOCKED) parts.push(`${counts.BLOCKED} blocked`);
     if (counts.DEVIATED) {
@@ -179,16 +186,25 @@
     return parts.join(" · ") || "No executable Tickets";
   }
 
-  function graphNarrative(counts) {
+  function graphNarrative(counts, overview = null) {
+    const readyCount = overview?.ready?.length ?? counts.READY;
+    const closeoutCount = overview?.closeout?.length ?? 0;
+    const closeoutSentence = closeoutCount
+      ? ` ${closeoutCount} await independent closeout.`
+      : "";
     if (counts.DEVIATED) {
       return `${counts.DEVIATED} execution deviation${counts.DEVIATED === 1 ? "" : "s"} need attention. `
-        + `${counts.READY} Ticket${counts.READY === 1 ? " is" : "s are"} executable now; `
-        + `${counts.REFINE} need refinement.`;
+        + `${readyCount} Ticket${readyCount === 1 ? " is" : "s are"} executable now; `
+        + `${counts.REFINE} need refinement.${closeoutSentence}`;
     }
-    if (counts.READY) {
-      return `${counts.READY} Ticket${counts.READY === 1 ? " is" : "s are"} executable now. `
+    if (readyCount) {
+      return `${readyCount} Ticket${readyCount === 1 ? " is" : "s are"} executable now. `
         + `${counts.REFINE} need refinement, ${counts.BLOCKED} remain blocked, and `
-        + `${counts.DONE} are proven complete.`;
+        + `${counts.DONE} are proven complete.${closeoutSentence}`;
+    }
+    if (closeoutCount) {
+      return `No Ticket is executable; ${closeoutCount} await independent closeout. `
+        + `${counts.REFINE} need refinement and ${counts.BLOCKED} remain blocked.`;
     }
     if (counts.REFINE) {
       return `No Ticket is executable; ${counts.REFINE} need refinement before execution. `
@@ -261,6 +277,7 @@
       dimmed ? "dimmed" : "",
       operational ? `state-${operational.key}` : "",
       attention ? `attention-${attention.key}` : "",
+      nextAction ? `next-${nextAction.key}` : "",
     ].filter(Boolean);
     const relationCounts = ticket.relationCounts || {
       prerequisites: 0,

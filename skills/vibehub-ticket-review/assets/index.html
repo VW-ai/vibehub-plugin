@@ -144,6 +144,11 @@
                 <span class="summary-value" id="summaryReady">0</span>
                 <span class="summary-name">Ready</span>
               </div>
+              <div class="summary-cell next-close-out">
+                <svg aria-hidden="true"><use href="#icon-recorded"/></svg>
+                <span class="summary-value" id="summaryCloseout">0</span>
+                <span class="summary-name">Close out</span>
+              </div>
               <div class="summary-cell attention-pending">
                 <svg aria-hidden="true"><use href="#icon-pending"/></svg>
                 <span class="summary-value" id="summaryHuman">0</span>
@@ -160,6 +165,16 @@
                 <span class="summary-name">Refine</span>
               </div>
             </div>
+            <section class="closeout-overview" aria-labelledby="closeoutOverviewTitle">
+              <div class="closeout-overview-heading">
+                <span>
+                  <strong id="closeoutOverviewTitle">Independent closeout</strong>
+                  <small>Authority-satisfying Evidence; Outcome pending</small>
+                </span>
+                <b id="closeoutQueueCount">0</b>
+              </div>
+              <div class="closeout-queue" id="closeoutQueue" aria-live="polite"></div>
+            </section>
             <section class="legend" aria-label="Ticket state legend">
               <span class="legend-title">Ticket state</span>
               <div class="legend-grid">

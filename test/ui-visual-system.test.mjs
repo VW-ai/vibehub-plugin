@@ -32,6 +32,7 @@ test("production graph keeps operational, archive, and attention treatments inde
   assert.match(script, /ATTENTION_ICON_IDS/u);
   assert.match(script, /ticket-state-icon/u);
   assert.match(script, /ticket-attention-badge/u);
+  assert.match(css, /\.ticket-node\.next-close-out \.ticket-boundary/u);
 });
 
 test("archived history stubs remain legible, anchored, and keyboard explicit", () => {
@@ -54,8 +55,10 @@ test("production canvas counts and Overview are compact two-axis legends", () =>
   assert.match(script, /renderGraphSummary/u);
   assert.match(
     script,
-    /add\(counts\.DONE, "DONE", "check", "state-done"\);[\s\S]*add\(counts\.READY/u,
+    /add\(counts\.DONE, "DONE", "check", "state-done"\);[\s\S]*add\(overview\.ready\.length, "READY"[\s\S]*add\(overview\.closeout\.length, "CLOSE OUT"/u,
   );
+  assert.match(html, /id="closeoutQueue"/u);
+  assert.match(html, /Independent closeout/u);
   assert.match(script, /"NEEDS YOU"/u);
   for (const banned of [
     "Execution flow",

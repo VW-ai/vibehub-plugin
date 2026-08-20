@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "read-only-closeout-handoff-is-complete",
+    "skills-route-complete-evidence-to-closeout",
+    "batch-and-single-ticket-review-remain-bounded",
+    "interaction-regressions-pass"
+  ],
+  "evidence_id": "closeout-handoff-and-routing-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T20:52:58Z",
+  "refs": [
+    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-run/SKILL.md",
+    "skills/vibehub-ticket-review/SKILL.md",
+    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "test/ticket-lifecycle.test.mjs",
+    "test/ui-host.test.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:verify-plugin-artifact-57-files-607662-bytes",
+    "command:npm-run-verify-118-of-118"
+  ],
+  "schema_version": 1,
+  "summary": "The read-only host now emits one complete vibehub_ticket_handoff containing exact Ticket ID and canonical Ticket ref, current Acceptance with explicit authority, complete Evidence records and refs, Outcome record or pending null, Context and constraints, direct relations, provenance, exact worktree/branch/commit/dirty paths, review input refs, and a machine-readable CLOSE_OUT route with the independent-closeout instruction. The browser copies that host payload and has no write route; the same typed handoff can be invoked later by an official DSH no-model-turn command without binding this Plugin to another task system. Ticket Run rereads next_action after Evidence, Review exposes only ready_to_closeout for bounded review, and the shared lifecycle maps EXECUTE to Run and CLOSE_OUT to a separate independent closeout owner. Artifact verification passed for the installed Plugin with 57 files and 607662 bytes, including the routing contract, queue, complete payload, and read-only loopback host.",
+  "ticket_id": "ticket-make-closeout-first-class-handoff"
+}

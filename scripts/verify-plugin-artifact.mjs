@@ -99,7 +99,10 @@ try {
   ), "utf8"));
   if (lifecycle.presenter !== "vibehub-ticket-review"
     || lifecycle.resource_policy?.cross_task_discovery !== "forbidden"
-    || lifecycle.planning_contracts?.dependency_hygiene !== "../../contracts/dependency-hygiene.json") {
+    || lifecycle.planning_contracts?.dependency_hygiene !== "../../contracts/dependency-hygiene.json"
+    || lifecycle.next_action_routing?.EXECUTE?.owner !== "vibehub-ticket-run"
+    || lifecycle.next_action_routing?.CLOSE_OUT?.owner !== "vibehub-ticket-closeout"
+    || lifecycle.next_action_routing?.CLOSE_OUT?.independent_agent !== true) {
     throw new Error("installed Ticket lifecycle contract is invalid");
   }
 
@@ -236,6 +239,14 @@ try {
     join(artifact, "skills", "vibehub-ticket-review", "assets", "app-layout.js"),
     "utf8",
   );
+  const installedHost = readFileSync(
+    join(artifact, "skills", "scripts", "vh-ui.mjs"),
+    "utf8",
+  );
+  const installedHtml = readFileSync(
+    join(artifact, "skills", "vibehub-ticket-review", "assets", "index.html"),
+    "utf8",
+  );
   if (/\/api\/(?:review|decision)/u.test(installedScript)) {
     throw new Error("installed local UI still contains writable review routes");
   }
@@ -247,6 +258,15 @@ try {
     || !/function routeRelations/u.test(installedLayout)
     || !/function setLayoutDirection/u.test(installedScript)) {
     throw new Error("installed local UI does not preserve a focused authorized URL");
+  }
+  if (!/id="closeoutQueue"/u.test(installedHtml)
+    || !/function renderCloseoutQueue/u.test(installedScript)
+    || !/Close out with Agent/u.test(installedScript)
+    || !/nextAction\?\.action === "CLOSE_OUT"/u.test(installedModel)
+    || !/requiresIndependentAgent: true/u.test(installedHost)
+    || !/reviewInputs/u.test(installedHost)
+    || !/evidenceRefs/u.test(installedHost)) {
+    throw new Error("installed local UI is missing the bounded independent-closeout handoff");
   }
   const uiModule = await import(pathToFileURL(
     join(artifact, "skills", "scripts", "vh-ui.mjs"),

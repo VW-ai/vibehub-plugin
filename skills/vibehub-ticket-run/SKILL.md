@@ -53,8 +53,14 @@ UI launch mechanics.
    node ../scripts/vh.mjs ticket evidence --repo <root> --input <evidence.json>
    ```
 
-5. Hand the Ticket, diff, and Evidence to a separate Agent using
-   `$vibehub-ticket-closeout`. The executor never certifies its own success.
+5. Read the exact Ticket back after Evidence is appended. If its host-derived
+   `next_action.action` is `CLOSE_OUT`, hand the exact Ticket, current
+   Acceptance and authority, Evidence, diff or Git refs, and tests to a
+   separate Agent using `$vibehub-ticket-closeout`. Do not start another Run
+   merely because operational status still says READY. If it is
+   `NEEDS_HUMAN`, follow the human boundary below; other actions retain their
+   owner from the shared lifecycle routing. The executor never certifies its
+   own success.
 
 Stop only when execution reaches a human-authority criterion, missing
 permission, or material deviation. For `execution-needs-human`, ask
