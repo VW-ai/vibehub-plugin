@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "favicon-is-current-mark-at-new-url",
+    "metadata-and-artifact-use-only-new-favicon",
+    "favicon-change-is-production-ready"
+  ],
+  "evidence_id": "public-favicon-production-deployment-v2",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:43:04Z",
+  "refs": [
+    "commit:5f5a87e1e0ed332885efb2bb0aba5c9e53ebf99f",
+    "sites-version:appgprj_6a86aafc71d48191b3c03a532dc367f3~appgver_0339107cfee4819194015b62b5acaf5b",
+    "sites-deployment:appgdep_6a86bddbe90881918e432649ab45c912",
+    "https://vibehub.icu/vibehub-favicon.svg",
+    "command:sha256-live-favicon-matches-current-mark",
+    "command:node-site-release-verify-vibehub-icu"
+  ],
+  "schema_version": 1,
+  "summary": "The public release serves /vibehub-favicon.svg from vibehub.icu. Its SHA-256 digest is byte-identical to both checked-in site/public/vibehub-favicon.svg and the canonical site/public/vibehub-mark.svg, while the live HTML references only the new favicon path. The custom domain, provider, and SSL remained active after Sites version 2 deployed successfully.",
+  "ticket_id": "ticket-refresh-public-site-favicon"
+}

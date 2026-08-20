@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "public-cards-match-workbench-grammar",
+    "public-links-match-workbench-grammar",
+    "public-shell-is-truthful-and-clear",
+    "graph-refinement-is-regression-checked"
+  ],
+  "evidence_id": "public-graph-production-deployment-v2",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:43:04Z",
+  "refs": [
+    "commit:5f5a87e1e0ed332885efb2bb0aba5c9e53ebf99f",
+    "sites-version:appgprj_6a86aafc71d48191b3c03a532dc367f3~appgver_0339107cfee4819194015b62b5acaf5b",
+    "sites-deployment:appgdep_6a86bddbe90881918e432649ab45c912",
+    "https://vibehub.w-wayne-vip.chatgpt.site",
+    "https://vibehub.icu",
+    "command:node-site-release-verify-immutable-url",
+    "command:node-site-release-verify-vibehub-icu",
+    "command:live-html-workbench-label-contract"
+  ],
+  "schema_version": 1,
+  "summary": "Sites version 2 deployed the exact validated commit to the existing public VibeHub project. The immutable deployment succeeded, the vibehub.icu custom domain remained active with active provider and SSL status, and HTTPS verification returned 200 for both URLs. The live canonical HTML contains Ticket Workbench and Dark mode feature, contains no Vibe task app or GUIDED FIXTURE label, and references the new favicon path.",
+  "ticket_id": "ticket-align-public-graph-with-real-workbench"
+}
