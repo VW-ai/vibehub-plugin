@@ -787,6 +787,8 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /function renderCloseoutQueue/u);
   assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
   assert.match(script, /label: "Copy prompt"/u);
+  assert.match(script, /label\.dataset\.fullText = nextAction\?\.detail/u);
+  assert.match(script, /label\.setAttribute\("aria-describedby", "textTooltip"\)/u);
   assert.match(script, /function closeoutReviewBrief/u);
   assert.match(script, /Evidence is proof, not judgment/u);
   assert.match(model, /function ticketAttentionState/u);

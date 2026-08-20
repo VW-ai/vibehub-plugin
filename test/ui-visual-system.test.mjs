@@ -78,8 +78,20 @@ test("focused Ticket makes the exact copy handoff the dominant recommended actio
   assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
   assert.match(script, /label: "Copy prompt"/u);
   assert.match(script, /if \(contextPackage\.agentPayload\) return canonical;/u);
-  assert.match(css, /\.recommended-action-heading strong \{[\s\S]*font-size: 15px/u);
+  assert.match(css, /\.recommended-action-title \{[\s\S]*font-size: 15px/u);
   assert.match(css, /\.recommended-action \.agent-handoff \{[\s\S]*background: var\(--ink\)/u);
+});
+
+test("card phase pair is label-relative and action detail stays on demand", () => {
+  assert.match(script, /const labelWidth = stateLabel\.getComputedTextLength\(\)/u);
+  assert.match(script, /NODE\.width - 14 - labelWidth - 18/u);
+  assert.match(script, /y: NODE\.height - 22/u);
+  assert.match(script, /label\.className = "recommended-action-title"/u);
+  assert.match(script, /label\.tabIndex = 0/u);
+  assert.match(script, /label\.dataset\.fullText = nextAction\?\.detail/u);
+  assert.match(script, /label\.setAttribute\("aria-describedby", "textTooltip"\)/u);
+  assert.doesNotMatch(script, /detail\.textContent = nextAction\?\.detail/u);
+  assert.match(css, /\.recommended-action-title:focus-visible/u);
 });
 
 test("production narrow Inspector remains a bottom sheet over the graph", () => {

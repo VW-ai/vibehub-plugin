@@ -720,13 +720,13 @@
       // The state is always a textual label; color is a secondary accent.
       {
         const visibleState = ticket.archived ? "ARCHIVED" : phase.label;
-        group.append(svgIcon(STATE_ICON_IDS[visibleState], {
+        const stateIcon = svgIcon(STATE_ICON_IDS[visibleState], {
           class: "ticket-state-icon",
           x: NODE.width - 80,
-          y: NODE.height - 24,
+          y: NODE.height - 22,
           width: 14,
           height: 14,
-        }));
+        });
         const status = svg("text", {
           class: "ticket-state",
           x: NODE.width - 14,
@@ -734,7 +734,7 @@
           "text-anchor": "end",
         });
         status.textContent = visibleState;
-        group.append(status);
+        group.append(stateIcon, status);
       }
       if (phase.live) {
         group.append(svg("circle", {
@@ -775,6 +775,18 @@
         (event) => onNodeKey(event, ticket.ticketId),
       );
       elements.nodeLayer.append(group);
+      const stateIcon = group.querySelector(".ticket-state-icon");
+      const stateLabel = group.querySelector(".ticket-state");
+      if (stateIcon && stateLabel) {
+        // Keep labels right-aligned, then position the icon from the actual
+        // rendered label width. The 18px subtraction is 14px of icon plus a
+        // deliberate four-pixel gap, independent of label length.
+        const labelWidth = stateLabel.getComputedTextLength();
+        stateIcon.setAttribute(
+          "x",
+          String(NODE.width - 14 - labelWidth - 18),
+        );
+      }
     }
     applyTransform();
   }
@@ -1510,10 +1522,13 @@
     eyebrow.className = "eyebrow";
     eyebrow.textContent = "Recommended action";
     const label = document.createElement("strong");
+    label.className = "recommended-action-title";
     label.textContent = recommendedActionTitle(nextAction?.action);
-    const detail = document.createElement("span");
-    detail.textContent = nextAction?.detail || "Inspect the current Ticket context.";
-    copy.append(eyebrow, label, detail);
+    label.tabIndex = 0;
+    label.dataset.fullText = nextAction?.detail
+      || "Inspect the current Ticket context.";
+    label.setAttribute("aria-describedby", "textTooltip");
+    copy.append(eyebrow, label);
     const closeout = nextAction?.action === "CLOSE_OUT";
     const handoff = actionButton({
       label: "Copy prompt",

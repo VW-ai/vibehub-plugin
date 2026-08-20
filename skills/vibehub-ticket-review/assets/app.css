@@ -1319,16 +1319,17 @@ summary:focus-visible {
   gap: 3px;
 }
 
-.recommended-action-heading strong {
+.recommended-action-title {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  cursor: help;
+  outline: none;
 }
 
-.recommended-action-heading > span:first-child > span:last-child {
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.45;
+.recommended-action-title:focus-visible {
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px var(--focus-soft);
 }
 
 .recommended-action .agent-handoff {
