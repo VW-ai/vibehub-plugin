@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "draft-and-plan-language-is-centralized",
+      "criterion": "One explicit presentation contract maps the exact canonical operational REFINE plus next_action REFINE case to visible state DRAFT, visible next action PLAN, CTA Plan with Agent, and plain-language explanation Define outcome and acceptance before execution; Graph, Overview, Inspector chrome, accessibility text, and handoff presentation consume that contract rather than inventing local synonyms."
+    },
+    {
+      "acceptance_id": "workbench-no-longer-exposes-refine-jargon",
+      "criterion": "In the production Workbench, unlocked draft cards and minimap nodes show DRAFT, the compact summary and Overview count DRAFT or NEEDS PLAN, the Inspector explains why planning is required, and keyboard or pointer handoff says Plan with Agent; no system-authored visible or accessible production chrome exposes REFINE or need refinement, while exact canonical and historical source content remains untouched."
+    },
+    {
+      "acceptance_id": "agent-routing-remains-exact",
+      "criterion": "The host-owned payload keeps canonical action REFINE and target Skill vibehub-ticket-plan with the exact Ticket ID, current source, acceptance and constraints; Workbench presents Plan with Agent and requires maturity:firm before execution, Ticket Review routes the payload, and Ticket Run defensively refuses or reroutes this state rather than presenting Start, Execute, CLOSE OUT, or ticket-run."
+    },
+    {
+      "acceptance_id": "machine-compatibility-remains-stable",
+      "criterion": "Canonical v0.8 ticketStatus, ticketNextAction.action, frontier needs_refinement, lifecycle draft-needs-refinement, and raw handoff action retain REFINE without a format bump, while additive presentation fields or a shared UI mapping provide DRAFT and PLAN; Codex and Claude installed artifacts remain behaviorally identical."
+    },
+    {
+      "acceptance_id": "real-and-fixture-regressions-pass",
+      "criterion": "A fixture matrix proves zero unlocked drafts has no DRAFT or PLAN count; blocked draft remains BLOCKED and WAIT; newly unblocked draft becomes DRAFT and PLAN; focused unlocked draft shows Plan with Agent across wide, narrow, keyboard, reduced-motion, focused-link, Inspector, payload, and frontier paths; firmed-in-place becomes READY and EXECUTE; non-success Outcome remains DEVIATED and REPLAN; successful Outcome remains DONE; CLOSE OUT, NEEDS YOU, archive, and exact Git source remain unchanged, and complete repository plus artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Do not change maturity:draft semantics, dependency unlocking, acceptance authority, Evidence, Outcome, archive, delivery, or READY execution behavior.",
+    "Do not rewrite historical Tickets, Outcomes, Evidence, Changelog entries, or proposal artifacts merely to erase an old term from history.",
+    "Do not require a project-format migration or break current machine consumers of operational REFINE, next_action REFINE, or needs_refinement in v0.8.",
+    "Do not display both REFINE and DRAFT or PLAN in system-authored presentation chrome; exact canonical source, historical Ticket, Evidence, Outcome, Changelog, proposal, or raw inspection content may retain REFINE truthfully.",
+    "Keep DRAFT non-executable and route planning through VibeHub Ticket Plan, never Ticket Run."
+  ],
+  "context": "The owner found REFINE non-straightforward in the production Workbench. The underlying state is precise: only an unblocked maturity:draft Ticket with no Outcome reaches canonical operational REFINE and next_action REFINE; unresolved dependencies remain BLOCKED and WAIT, non-success Outcomes remain DEVIATED and REPLAN, and successful Outcomes remain DONE. Preserve that source-of-truth behavior, but give this one presentation case a familiar noun for the current state and a direct verb for the next action. Canonical REFINE, needs_refinement, and draft-needs-refinement compatibility fields must remain for v0.8 consumers; the system-authored Human-facing Graph, Overview, Inspector chrome, accessibility, and Agent handoff presentation should map that exact case to DRAFT plus PLAN.",
+  "context_refs": [
+    {
+      "purpose": "Authority for maturity:draft as the non-executable source truth behind the current compatibility state.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
+    },
+    {
+      "purpose": "Current canonical routing and compatibility fields that the presentation change must preserve.",
+      "ref": "skills/contracts/ticket-next-action.md"
+    },
+    {
+      "purpose": "Accepted baseline proving draft work is projected everywhere and never enters execution.",
+      "ref": ".vibehub/outcomes/ticket-repair-refine-workbench-projection.yaml"
+    },
+    {
+      "purpose": "Latest accepted action-oriented Graph, Overview, Inspector, and host-owned handoff baseline.",
+      "ref": ".vibehub/outcomes/ticket-make-closeout-first-class-handoff.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Whenever the canonical projection says an unblocked draft is REFINE, every system-authored human-facing surface presents the Task state as DRAFT and its action as PLAN, while all higher-precedence actions and v0.8 machine fields remain unchanged.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-finds-refine-not-straightforward"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-replace-refine-with-draft-plan-language"
+}
