@@ -1,0 +1,47 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-after-authoritative-outcomes",
+      "criterion": "After both prerequisite Outcomes exist, this same Ticket is replanned to maturity firm with executable acceptance derived from the owner-approved interaction direction and the proven DeepSeek Harness seams before implementation begins."
+    }
+  ],
+  "constraints": [
+    "Do not execute while maturity remains draft.",
+    "Keep current Skills and canonical Git-native Ticket, Context, Evidence, and Outcome documents working throughout the first vertical slice.",
+    "Use this repository as the initial monorepo and keep DeepSeek Harness pinned as an external dependency unless the prerequisite decision explicitly establishes a different necessity.",
+    "Do not add cross-repository federation, a native desktop wrapper, cloud sync, or a second durable state model to the first vertical slice."
+  ],
+  "context": "This is intentionally a draft implementation boundary. Its exact acceptance, package structure, DSH integration shape, and compatibility plan must be refined from the successful product-direction and DSH-feasibility Outcomes rather than guessed now. The expected shape remains one current-repository vertical slice: browser-first task Chat, explicit branch operations, scoped Context, Ticket materialization, Start, replaceable execution events, attention return, and Evidence, all using the canonical Git-native VibeHub documents. Development remains in this repository as a monorepo until real distribution pressure demonstrates a reason to split repositories.",
+  "context_refs": [
+    {
+      "purpose": "Domain semantics the implementation must preserve.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    },
+    {
+      "purpose": "Existing authority for the replaceable executor boundary that the prerequisite Outcomes will narrow.",
+      "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The owner-approved VibeHub Harness direction becomes the smallest real single-Workspace vertical slice from task-oriented Chat through Ticket Start to visible execution and Evidence.",
+  "provenance_refs": [
+    "conversation:2026-08-17-vibehub-deepseek-harness-product-direction",
+    "conversation:2026-08-17-same-repository-initial-development"
+  ],
+  "relations": [
+    {
+      "rationale": "Permanent implementation follows explicit owner judgment of the product and interaction proposal.",
+      "target_ticket_id": "ticket-decide-task-harness-product-direction",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Implementation acceptance depends on the proven upstream extension and lifecycle seams.",
+      "target_ticket_id": "ticket-spike-deepseek-harness-foundations",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-build-task-harness-vertical-slice"
+}

@@ -45,6 +45,15 @@
       "ref": "test/draft-maturity.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-11T05:48:43.000Z",
+      "delivered_commit": "cbd41a10cbd2caa4d008ac1ad495154ee9f4140a",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/15",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "Ticket maturity is explicitly symmetric for new work: firm and draft are canonical values, legacy omission still behaves as firm, and rolling-wave refinement changes draft to firm in place.",
@@ -59,6 +68,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-explicit-firm-maturity"
 }

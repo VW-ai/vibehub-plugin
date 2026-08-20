@@ -37,7 +37,12 @@ const CONTEXT_RELATIONS = new Set([
   "depends_on",
   "supersedes",
 ]);
-const CURRENT_PROJECT_FORMAT = 1;
+const VERSION_CONTRACT = JSON.parse(readFileSync(
+  fileURLToPath(new URL("../contracts/versions.json", import.meta.url)),
+  "utf8",
+));
+const CURRENT_PROJECT_FORMAT = VERSION_CONTRACT.project_format;
+const CURRENT_TICKET_SCHEMA = VERSION_CONTRACT.document_schemas.ticket;
 const PROJECT_FORMAT_FILE = "version.yaml";
 const PULL_REQUEST_REF = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/u;
 const COMMIT_REF = /^commit:[0-9a-f]{40}$/u;
@@ -458,16 +463,18 @@ function validateTicket(document, path = "ticket") {
       path,
     )
   ) return errors;
-  if (document.schema_version !== 1) add(errors, `${path}.schema_version`, "must equal 1");
+  if (document.schema_version !== CURRENT_TICKET_SCHEMA) {
+    add(errors, `${path}.schema_version`, `must equal ${CURRENT_TICKET_SCHEMA}`);
+  }
   if (document.kind !== "ticket") add(errors, `${path}.kind`, "must equal ticket");
   if (document.maturity !== undefined && !["firm", "draft"].includes(document.maturity)) {
     add(errors, `${path}.maturity`, "must equal firm or draft when present");
   }
   requiredString(errors, document, "ticket_id", path, { id: true });
   requiredString(errors, document, "outcome", path);
-  if (document.deliveries !== undefined) {
-    if (!Array.isArray(document.deliveries)) add(errors, `${path}.deliveries`, "must be an array when present");
-    else {
+  if (!Array.isArray(document.deliveries)) {
+    add(errors, `${path}.deliveries`, "must be an array");
+  } else {
       const refs = new Set();
       document.deliveries.forEach((delivery, index) => {
         const deliveryPath = `${path}.deliveries[${index}]`;
@@ -497,7 +504,6 @@ function validateTicket(document, path = "ticket") {
         if (refs.has(delivery.ref)) add(errors, `${deliveryPath}.ref`, "must be unique per Ticket");
         refs.add(delivery.ref);
       });
-    }
   }
   requiredString(errors, document, "context", path);
   if (!Array.isArray(document.acceptance) || document.acceptance.length === 0) {
@@ -971,8 +977,8 @@ function normalizeTicketQuery(repository, options = {}) {
   const historyIds = [...new Set(options.historyIds ?? [])].sort();
   for (const id of historyIds) {
     const ticket = repository.tickets.documents.get(id)?.document;
-    if (!ticket || !ticketArchived(repository, ticket)) {
-      throw new VibeHubError("invalid_argument", `Unknown or non-archived history Ticket: ${id}`);
+    if (!ticket || ticketStatus(repository, ticket) !== "DONE") {
+      throw new VibeHubError("invalid_argument", `Unknown or non-DONE history Ticket: ${id}`);
     }
   }
   return { scope, delivery, rooms, historyIds };
@@ -993,7 +999,7 @@ export function projectTicketQuery(repository, options = {}) {
     return true;
   };
   const base = all.filter((ticket) => matchesFilters(ticket)
-    && (filters.scope === "all" || !ticketArchived(repository, ticket)));
+    && (filters.scope === "all" || ticketStatus(repository, ticket) !== "DONE"));
   const visibleIds = new Set(base.map((ticket) => ticket.ticket_id));
   const baseIds = new Set(visibleIds);
   const relationDocuments = all.flatMap((ticket) => ticket.relations.map((relation) => ({
@@ -1013,7 +1019,7 @@ export function projectTicketQuery(repository, options = {}) {
           ? relation.prerequisite_ticket_id
           : null;
       const other = otherId ? repository.tickets.documents.get(otherId)?.document : null;
-      if (other && ticketArchived(repository, other)) visibleIds.add(otherId);
+      if (other && ticketStatus(repository, other) === "DONE") visibleIds.add(otherId);
     }
     for (const id of filters.historyIds) visibleIds.add(id);
   }
@@ -1029,8 +1035,11 @@ export function projectTicketQuery(repository, options = {}) {
           if (direction === "upstream" && relation.dependent_ticket_id === ticket.ticket_id) return [relation.prerequisite_ticket_id];
           if (direction === "downstream" && relation.prerequisite_ticket_id === ticket.ticket_id) return [relation.dependent_ticket_id];
           return [];
-        }).filter((id) => !visibleIds.has(id)
-          && ticketArchived(repository, repository.tickets.documents.get(id)?.document));
+        }).filter((id) => {
+          if (visibleIds.has(id)) return false;
+          const candidate = repository.tickets.documents.get(id)?.document;
+          return candidate && ticketStatus(repository, candidate) === "DONE";
+        });
         if (!nextIds.length) continue;
         const hidden = new Set(nextIds);
         const queue = [...nextIds];
@@ -1044,7 +1053,7 @@ export function projectTicketQuery(repository, options = {}) {
                 : null;
             if (!next || visibleIds.has(next) || hidden.has(next)) continue;
             const candidate = repository.tickets.documents.get(next)?.document;
-            if (candidate && ticketArchived(repository, candidate)) {
+            if (candidate && ticketStatus(repository, candidate) === "DONE") {
               hidden.add(next);
               queue.push(next);
             }

@@ -76,7 +76,9 @@ test("skills point at their governing shared references", () => {
   }
 
   const migrations = JSON.parse(readFileSync(join(root, "skills", "vibehub-migrate", "references", "migrations.json"), "utf8"));
+  const versions = JSON.parse(readFileSync(join(root, "skills", "contracts", "versions.json"), "utf8"));
   assert.equal(migrations.owner, "vibehub-migrate");
+  assert.equal(migrations.current_format, versions.project_format);
   assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length >= 1);
   const first = migrations.migrations[0];
   assert.equal(first.from, "0.4");
@@ -86,11 +88,30 @@ test("skills point at their governing shared references", () => {
   assert.equal(formatMarker.to, "format-1");
   assert.match(formatMarker.detect, /project compatibility/u);
   assert.ok(formatMarker.steps.some((step) => step.includes(".vibehub/version.yaml")));
+  const deliveryAudit = migrations.migrations.find((migration) => migration.from === "format-1");
+  assert.equal(deliveryAudit.to, "format-2");
+  assert.deepEqual(deliveryAudit.document_schema_versions, {
+    ticket: { from: 1, to: 2 },
+  });
+  assert.match(deliveryAudit.detect, /detected_format 1/u);
+  assert.ok(deliveryAudit.steps.some((step) => step.includes("deliveries array")));
+  assert.ok(deliveryAudit.steps.some((step) => step.includes("schema_version 1 to schema_version 2")));
+  assert.ok(deliveryAudit.steps.some((step) => step.includes("format_version 2")));
   assert.ok(bodies.get("vibehub-migrate").includes("references/migrations.json"), "vibehub-migrate misses its migrations pointer");
 
   const projectFormat = JSON.parse(readFileSync(join(root, "skills", "contracts", "project-format.schema.json"), "utf8"));
   assert.equal(projectFormat.properties.format_version.type, "integer");
   assert.equal(projectFormat.properties.kind.const, "vibehub_project");
+  const currentProject = JSON.parse(readFileSync(join(root, ".vibehub", "version.yaml"), "utf8"));
+  assert.equal(currentProject.format_version, versions.project_format);
+
+  const currentTicket = JSON.parse(readFileSync(join(root, "skills", "contracts", "ticket.schema.json"), "utf8"));
+  assert.equal(currentTicket.$id, "https://vibehub.dev/schemas/ticket.v2.json");
+  assert.equal(currentTicket.properties.schema_version.const, versions.document_schemas.ticket);
+  assert.equal(
+    deliveryAudit.document_schema_versions.ticket.to,
+    versions.document_schemas.ticket,
+  );
 
   const authority = "contracts/acceptance-authority.md";
   assert.ok(existsSync(join(root, "skills", authority)));

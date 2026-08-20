@@ -41,6 +41,15 @@
       "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-04T03:35:11.000Z",
+      "delivered_commit": "1c94470a3d06a8e7bcf2b49000fc48be807da946",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/12",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The skill system's systematic content lives in owned contracts with a mechanical prompt-contract test layer: knowledge governance gets its shared reference, every vh.mjs command a skill cites is test-welded to the script, and the product-wide architecture boundary is stated once.",
   "provenance_refs": [
@@ -54,6 +63,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-contractize-skill-system"
 }

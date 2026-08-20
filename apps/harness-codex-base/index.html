@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f7f7f6">
+  <title>VibeHub Harness · Low-fidelity product loop</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="codex-app">
+    <aside class="sidebar" aria-label="Work by attention">
+      <header class="sidebar-header">
+        <div class="product"><span class="product-mark">C</span><strong>Codex</strong><span class="product-addon">+ VibeHub</span></div>
+        <button class="icon-button" type="button" aria-label="Collapse sidebar">Hide</button>
+      </header>
+
+      <button class="new-task" id="newTask" type="button"><span>New task</span><kbd>⌘ N</kbd></button>
+
+      <nav class="main-nav workspace-nav" aria-label="Primary navigation">
+        <button class="active" id="ticketsHome" type="button"><span>Tickets</span><small>7</small></button>
+        <button type="button"><span>Chats</span><small>3</small></button>
+        <button type="button"><span>Rooms</span><small>4</small></button>
+      </nav>
+
+      <section class="sidebar-section">
+        <header><span>Recent chats</span></header>
+        <button type="button" data-phase="explore"><strong>Personal task Harness</strong><small>3 branches · now</small></button>
+        <button type="button"><strong>Open-source launch direction</strong><small>Yesterday</small></button>
+        <button type="button"><strong>Cross-project Context</strong><small>Mon</small></button>
+      </section>
+
+      <nav class="main-nav utility-nav" aria-label="Engine navigation">
+        <button type="button"><span>Automations</span><small>2</small></button>
+        <button type="button"><span>Skills</span></button>
+      </nav>
+
+      <footer class="sidebar-footer">
+        <button type="button"><span class="avatar">W</span><span><strong>Wayne</strong><small>Engine & settings</small></span></button>
+      </footer>
+    </aside>
+
+    <main class="thread">
+      <header class="thread-header">
+        <div class="thread-title">
+          <button class="back-to-graph" id="backToGraph" type="button" hidden>← Tickets</button>
+          <strong id="workTitle">vibehub-plugin</strong>
+          <span id="workMeta">CURRENT TICKET GRAPH · main · local</span>
+        </div>
+        <div class="thread-actions">
+          <button id="historyButton" type="button" hidden>Chat</button>
+          <button id="branchesButton" type="button" hidden>Branches <small>3</small></button>
+          <button id="ticketButton" class="ticket-action linked" type="button" hidden>View ticket</button>
+          <button type="button" aria-label="Task actions">More</button>
+        </div>
+      </header>
+
+      <nav class="prototype-map" id="prototypeMap" aria-label="Low-fidelity lifecycle states" hidden>
+        <span>LOW-FI PRODUCT LOOP</span>
+        <div>
+          <button type="button" data-phase="explore">Explore</button>
+          <i>→</i>
+          <button type="button" data-phase="ready">Ready</button>
+          <i>→</i>
+          <button class="active" type="button" data-phase="running">Running</button>
+          <i>↔</i>
+          <button type="button" data-phase="needs">Needs you</button>
+          <i>→</i>
+          <button type="button" data-phase="review">Review</button>
+          <i>→</i>
+          <button type="button" data-phase="done">Done</button>
+        </div>
+      </nav>
+
+      <div class="lineage" id="lineage" hidden>
+        <span>Forked from Main · assistant turn 4</span><button id="backToMain" type="button">Back to Main</button>
+      </div>
+
+      <section class="stage" id="stage" aria-label="Current work surface" aria-live="polite"></section>
+
+      <div class="composer-area">
+        <div class="context-row" id="contextRow" hidden>
+          <button id="contextSummary" type="button"><strong>Context</strong><span id="contextSummaryText">3 Workspace references</span></button>
+          <button id="removeContext" type="button" aria-label="Remove Context">Remove</button>
+        </div>
+        <form class="composer" id="composer">
+          <textarea id="prompt" rows="2" aria-label="Message Codex" placeholder="Steer this Run, ask for status, or interrupt"></textarea>
+          <div class="composer-toolbar">
+            <div>
+              <button class="round-action" type="button" aria-label="Attach files">Add</button>
+              <button id="contextButton" type="button"><span class="context-symbol"></span>Context <small>Off</small></button>
+              <span class="composer-mode" id="composerMode">Steering · Ticket remains active</span>
+            </div>
+            <div class="composer-runtime">
+              <button type="button">GPT-5.6 Sol</button><button type="button">Medium</button><button type="button">Local</button><button class="send" type="submit">Send</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <div class="overlay" id="overlay" hidden></div>
+
+  <aside class="side-panel" id="branchesPanel" hidden inert aria-labelledby="branchesTitle">
+    <header><div><small>Conversation lineage</small><h2 id="branchesTitle">Branches</h2></div><button type="button" data-close>Close</button></header>
+    <div class="branch-list">
+      <button class="branch-item selected" type="button" data-branch="main"><span class="branch-rail"></span><span><strong>Main</strong><small>9 turns · current</small></span></button>
+      <div class="branch-origin">Forked after assistant turn 4</div>
+      <button class="branch-item" type="button" data-branch="ticket"><span class="branch-rail"></span><span><strong>Ticket as durable contract</strong><small>4 turns</small></span></button>
+      <button class="branch-item" type="button" data-branch="context"><span class="branch-rail"></span><span><strong>Context activation</strong><small>3 turns</small></span></button>
+    </div>
+    <footer><button id="compareBranches" type="button">Compare two branches</button></footer>
+  </aside>
+
+  <aside class="side-panel" id="ticketPanel" hidden inert aria-labelledby="ticketTitle">
+    <header><div><small>Durable work contract</small><h2 id="ticketTitle">Ticket</h2></div><button type="button" data-close>Close</button></header>
+    <div class="readiness"><span>Ready</span><p>The outcome is bounded. No dependency or owner decision is missing.</p></div>
+    <label class="field"><span>Desired outcome</span><textarea id="ticketOutcome" rows="5">Define and demonstrate the complete VibeHub Harness product loop from exploration through evidence-backed closeout.</textarea></label>
+    <section class="ticket-section"><h3>Source</h3><button type="button"><strong id="ticketSource">Main · latest turn</strong><small>Conversation Reference</small></button><button type="button"><strong id="ticketContextSource">3 Context references</strong><small>Explicit Workspace Context</small></button></section>
+    <section class="ticket-section"><h3>Acceptance</h3><p>Ticket stays primary after commitment</p><p>Run carries the majority of Agent work</p><p>Attention returns only for exact human needs</p><p>Evidence remains separate from completion claims</p></section>
+    <footer><button type="button" data-close>Keep refining</button><button id="createTicket" class="primary" type="button">Save ticket</button></footer>
+  </aside>
+
+  <div class="context-menu" id="contextMenu" hidden>
+    <header><strong>Context for next turn</strong><span>vibehub-plugin</span></header>
+    <p>Choose a small, inspectable packet. Nothing is written back automatically.</p>
+    <label><input type="checkbox" checked><span><strong>Harness product contract</strong><small>Product · active</small></span></label>
+    <label><input type="checkbox" checked><span><strong>Person-centered Ticket attention</strong><small>Product · decision</small></span></label>
+    <label><input type="checkbox" checked><span><strong>Governed Context activation</strong><small>Knowledge · decision</small></span></label>
+    <label><input type="checkbox"><span><strong>DeepSeek Harness feasibility</strong><small>Architecture · report</small></span></label>
+    <footer><span id="contextCount">3 selected</span><button id="useContext" type="button">Use Context</button></footer>
+  </div>
+
+  <section class="compare-modal" id="compareModal" hidden aria-labelledby="compareTitle">
+    <header><div><small>New comparison turn</small><h2 id="compareTitle">Compare branches</h2></div><button type="button" data-close>Close</button></header>
+    <div class="compare-body"><article><span>BRANCH A</span><h3>Ticket as durable contract</h3><p>Ticket persists across conversation, Agent choice, retries, Run activity, and review.</p></article><article><span>BRANCH B</span><h3>Context activation</h3><p>Context is a visible input to a turn or Ticket. It does not imply transcript capture or automatic writeback.</p></article></div>
+    <footer><span>The source branches remain unchanged.</span><button id="bringBack" type="button">Bring back to Main</button></footer>
+  </section>
+
+  <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+</body>
+</html>

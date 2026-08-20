@@ -55,6 +55,15 @@
       "ref": "skills/scripts/vh-ui.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-03T00:19:00.000Z",
+      "delivered_commit": "05b9aa28bd8493da6c47d1af153dd5dfe1c76ec6",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/11",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The local VibeHub Ticket graph is a coherent full-window workbench whose authorized URL can be copied into the user's normal browser without losing access.",
   "provenance_refs": [
@@ -63,6 +72,6 @@
     "code:app-js-removes-bearer-fragment"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-rebuild-local-graph-workbench"
 }

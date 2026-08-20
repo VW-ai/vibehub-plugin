@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://vibehub.dev/schemas/ticket.v1.json",
+  "$id": "https://vibehub.dev/schemas/ticket.v2.json",
   "title": "VibeHub Ticket",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "kind", "ticket_id", "outcome", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs"],
+  "required": ["schema_version", "kind", "ticket_id", "outcome", "deliveries", "context", "acceptance", "constraints", "context_refs", "relations", "provenance_refs"],
   "properties": {
-    "schema_version": { "const": 1 },
+    "schema_version": { "const": 2 },
     "kind": { "const": "ticket" },
     "ticket_id": { "$ref": "#/$defs/id" },
     "maturity": {

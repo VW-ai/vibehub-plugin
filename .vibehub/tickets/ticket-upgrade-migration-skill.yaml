@@ -37,6 +37,15 @@
       "ref": ".vibehub/rooms/knowledge/decision-context-always-roomed.yaml"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-04T04:12:16.000Z",
+      "delivered_commit": "33effbb792a6a5284ea524caa35399cdabc61146",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/13",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "Projects on an older VibeHub data format upgrade by agent-driven restructure: a migrate skill owns a versioned migrations reference whose first entry converts a 0.4-style flat context layer into the 0.5 Room world.",
   "provenance_refs": [
@@ -44,6 +53,6 @@
     "task:5c6d85a3a430d2dc5308f35e5d0e5115"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-upgrade-migration-skill"
 }

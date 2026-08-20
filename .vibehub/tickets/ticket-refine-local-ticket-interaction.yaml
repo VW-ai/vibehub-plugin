@@ -64,6 +64,15 @@
       "ref": "skills/vibehub-ticket-review/assets/app.js"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-03T00:19:00.000Z",
+      "delivered_commit": "05b9aa28bd8493da6c47d1af153dd5dfe1c76ec6",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/11",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "A human can open the local Ticket graph and move from orientation to a confident understanding of one Ticket's state, causal position, and proof through a fast, coherent interaction that feels useful during daily development.",
   "provenance_refs": [
@@ -79,6 +88,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-refine-local-ticket-interaction"
 }

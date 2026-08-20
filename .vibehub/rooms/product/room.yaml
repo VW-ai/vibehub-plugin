@@ -14,11 +14,39 @@
         "path": "docs/CONCEPT.md"
       },
       {
+        "blob": "31f81498982a9b3f14bcf7b16fd235022d473561",
+        "path": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+      },
+      {
+        "blob": "e968b861000d86fe1e0a615ab4473af24640742f",
+        "path": "docs/HARNESS_CHAT_V1_REVIEW.md"
+      },
+      {
+        "blob": "41f322914129ff1dc9adc59ac6ae4f66a1d5e9ce",
+        "path": "docs/HARNESS_CODEX_BASE_REVIEW.md"
+      },
+      {
+        "blob": "1e0117bb212c0b0ec5752a41b87c7a9437b30cd0",
+        "path": "docs/HARNESS_PRODUCT_CONTRACT.md"
+      },
+      {
+        "blob": "ac36ba80f7c611e0dec9acbb1d6681badbd9ad9f",
+        "path": "docs/HARNESS_PRODUCT_LOGIC.md"
+      },
+      {
+        "blob": "26afb5462f3a6ef243d258095d51f3ee7fd19994",
+        "path": "docs/HARNESS_PROTOTYPE_REVIEW.md"
+      },
+      {
+        "blob": "cd40a1fd709635ceb950bb93ac7e04b4dbc13564",
+        "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+      },
+      {
         "blob": "9778b289bdbd130fbb830c55e4013260d68f313e",
         "path": "docs/INSTALL.md"
       },
       {
-        "blob": "66b04561bbc4e3fd20d3b08f35985e0f23ca8879",
+        "blob": "8f19d098f116896f4294c5482db8fa016e8444d5",
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
@@ -90,8 +118,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-14T22:47:18.769Z",
-    "last_aligned_commit": "df09aa7158150765569924509817be3d65d84b41"
+    "checked_at": "2026-08-20T00:30:47.965Z",
+    "last_aligned_commit": "b47a9b3f9b0cc8d995c5a8793396c704aa303ca5"
   },
   "anchors": [
     "CHANGELOG.md",

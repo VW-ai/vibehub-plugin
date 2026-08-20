@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "near-and-far-scenarios-are-explicit",
+    "clickable-core-loop-prototype",
+    "ticket-context-annotation-language",
+    "execution-is-strongly-perceptible",
+    "browser-first-app-like-shell",
+    "review-pack-is-decision-ready"
+  ],
+  "evidence_id": "harness-prototype-product-loop",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-17T18:08:01Z",
+  "refs": [
+    "docs/HARNESS_PRODUCT_CONTRACT.md",
+    "docs/HARNESS_PROTOTYPE_REVIEW.md",
+    "apps/harness-prototype/index.html",
+    "apps/harness-prototype/app.css",
+    "apps/harness-prototype/app.js",
+    "scripts/vh-harness-prototype.mjs",
+    "test/harness-prototype.test.mjs",
+    "test:npm-test-84-of-84",
+    "test:loopback-prototype-server-static-disposable",
+    "test:verify-artifact-54-files-568449-bytes",
+    "browser:safari-local-loopback-prototype-launched",
+    "room:product-aligned-2026-08-17"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in product contract defines the think-first and act-first paths, the complete single-Workspace loop, the longer-term Workspace catalog and federation direction, and explicit V1 exclusions including cross-repository coordination and a native wrapper. The dependency-free mocked browser prototype implements normal Chat, explicit forks, a conversation graph, sibling Compare, Bring Back to Main, visible scoped Context activation, reversible Ticket craft, Ready and Start, a persistent execution dock, and a detailed Run surface with distinct queued, running, waiting-for-human, failed, evidence-producing, and completed projections. Ticket, Context, Reference, Branch, Run, and Evidence use separate compact annotations, while Run state is sourced independently from Ticket state. The review guide supplies an exact walkthrough and eight owner decision questions. The prototype serves only static checked-in assets from 127.0.0.1, writes no durable state, loads no network resources, has narrow-layout and reduced-motion rules, and was launched successfully in Safari at a local ephemeral port. The focused prototype tests passed, the complete repository suite passed 84/84 including both local loopback hosts, the plugin artifact verifier remained green at 54 files and 568449 bytes, project validation passed at 53 Tickets, and the entered Product Room was explicitly realigned.",
+  "ticket_id": "ticket-prototype-task-harness-experience"
+}

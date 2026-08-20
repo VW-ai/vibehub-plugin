@@ -33,6 +33,15 @@
       "ref": ".vibehub/rooms/knowledge/decision-room-taxonomy.yaml"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-04T03:35:11.000Z",
+      "delivered_commit": "1c94470a3d06a8e7bcf2b49000fc48be807da946",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/12",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "vh.mjs gains deterministic drift and align commands implementing the audited snapshot-hash comparison over room anchors.",
   "provenance_refs": [
@@ -46,6 +55,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-drift-check-mechanical"
 }

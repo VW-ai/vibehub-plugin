@@ -35,6 +35,7 @@
       "ref": ".github/workflows/release.yml"
     }
   ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "VibeHub v0.8.0 is merged, tagged, and published from the exact verified main commit as a GitHub Release with a locally verified archive and SHA-256 checksum, while the constituent Tickets record truthful delivered PR membership.",
@@ -49,6 +50,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-publish-v080-workbench-release"
 }

@@ -77,6 +77,15 @@
       "ref": "skills/vibehub-ticket-review/assets/app.css"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-03T00:19:00.000Z",
+      "delivered_commit": "05b9aa28bd8493da6c47d1af153dd5dfe1c76ec6",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/11",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The read-only local Ticket graph turns every important canonical object into an immediately useful handoff: a human can understand it, copy a coherent payload for an Agent, copy or open its exact reference, and follow mechanically resolvable editor or GitHub links without repeated generic controls or server-side mutation.",
   "provenance_refs": [
@@ -92,6 +101,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-make-static-graph-actionable"
 }

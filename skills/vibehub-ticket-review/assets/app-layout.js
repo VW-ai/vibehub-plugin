@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const NODE = Object.freeze({ width: 232, height: 96 });
+  const NODE = Object.freeze({ width: 232, height: 104 });
   const LAYOUT = Object.freeze({
     marginX: 84,
     marginY: 72,

@@ -33,6 +33,15 @@
       "ref": ".vibehub/rooms/knowledge/decision-ambient-two-mode-distill.yaml"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-04T03:35:11.000Z",
+      "delivered_commit": "1c94470a3d06a8e7bcf2b49000fc48be807da946",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/12",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "A branch cannot hand off a PR with unexplained room drift, and the PR summary reads through the Room lens: contract diffs first, then the rooms the branch entered and what knowledge changed in each.",
   "provenance_refs": [
@@ -46,6 +55,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-pr-room-aware-gate"
 }

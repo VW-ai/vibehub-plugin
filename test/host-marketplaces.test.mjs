@@ -54,7 +54,7 @@ function exerciseInstalledHelper(helper, label) {
   assert.equal(invoke(helper, newer, "project", "init").status, 0);
   writeFileSync(
     join(newer, ".vibehub", "version.yaml"),
-    `${JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 2 })}\n`,
+    `${JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 3 })}\n`,
   );
   const newerCompatibility = invoke(helper, newer, "project", "compatibility");
   const refusedNewerWrite = invoke(helper, newer, "ticket", "apply", { tickets: [] });

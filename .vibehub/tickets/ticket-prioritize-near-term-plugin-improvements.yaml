@@ -76,6 +76,15 @@
       "ref": ".vibehub/tickets/ticket-vibehub-cli.yaml"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34.000Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "An evidence-backed near-term Plugin direction ranks the smallest high-leverage improvements, reconciles them with the current open Ticket graph, and recommends one bounded next implementation slice without prematurely designing the private hosted service.",
   "provenance_refs": [
@@ -83,6 +92,6 @@
     "context:decision-plugin-wedge-solo-small-team-coordination"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-prioritize-near-term-plugin-improvements"
 }

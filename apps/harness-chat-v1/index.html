@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#111213">
+  <title>VibeHub · Chat workspace</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="app-bar">
+      <div class="brand" aria-label="VibeHub">
+        <span class="brand-mark">V</span>
+        <strong>VibeHub</strong>
+      </div>
+      <button class="command-trigger" id="commandTrigger" type="button">
+        <span>Search or start anything</span><kbd>⌘ K</kbd>
+      </button>
+      <div class="app-meta">
+        <button class="workspace-button" type="button"><span class="live-dot"></span>vibehub-plugin <small>main</small></button>
+        <button class="engine-button" id="engineButton" type="button">Codex <small>gpt-5.6</small></button>
+      </div>
+    </header>
+
+    <div class="work-area">
+      <aside class="sidebar" aria-label="Workspace navigation">
+        <div class="sidebar-top">
+          <button class="new-chat" id="newChat" type="button"><span>New chat</span><kbd>⌘ N</kbd></button>
+          <nav class="sidebar-nav">
+            <button class="nav-row active" type="button"><span>Chats</span><small>12</small></button>
+            <button class="nav-row" type="button"><span>Tickets</span><small>4</small></button>
+            <button class="nav-row" type="button"><span>Runs</span><small id="runCount">—</small></button>
+          </nav>
+        </div>
+
+        <div class="thread-list">
+          <div class="thread-group">
+            <div class="group-label">Today</div>
+            <button class="thread-row selected" type="button">
+              <span class="thread-title">Harness 的日常工作体验</span>
+              <small id="threadBranchLabel">Main · now</small>
+            </button>
+            <button class="thread-row" type="button"><span class="thread-title">开源发布顺序</span><small>14 min</small></button>
+            <button class="thread-row" type="button"><span class="thread-title">DSH extension boundary</span><small>1 hr</small></button>
+          </div>
+          <div class="thread-group">
+            <div class="group-label">This week</div>
+            <button class="thread-row" type="button"><span class="thread-title">Context activation model</span><small>Mon</small></button>
+            <button class="thread-row" type="button"><span class="thread-title">Ticket craft notes</span><small>Sun</small></button>
+          </div>
+        </div>
+
+        <div class="sidebar-foot">
+          <button type="button" id="settingsButton"><span>Engine & settings</span><small>Local</small></button>
+        </div>
+      </aside>
+
+      <main class="chat-stage">
+        <header class="chat-header">
+          <div class="chat-identity">
+            <span class="chat-path" id="chatPath">vibehub-plugin / Main</span>
+            <h1>Harness 的日常工作体验</h1>
+          </div>
+          <div class="chat-tools">
+            <button class="tool-button" id="contextToggle" type="button" aria-pressed="false"><span class="tool-status"></span>Context <small>Off</small></button>
+            <button class="tool-button" id="branchesButton" type="button">Branches <small>3</small></button>
+            <button class="task-button" id="taskButton" type="button">Make task</button>
+          </div>
+        </header>
+
+        <div class="branch-return" id="branchReturn" hidden>
+          <span>Forked from <strong>Main</strong> · “Execution should be visible only when…”</span>
+          <button id="returnMain" type="button">Return to Main</button>
+        </div>
+
+        <section class="transcript" id="transcript" aria-label="Conversation" aria-live="polite">
+          <div class="conversation-day"><span>Today</span></div>
+
+          <article class="message user-message main-tail">
+            <div class="message-copy">
+              <p>我不想再做一个有很多面板的 AI 工作台。用户打开它的时候，应该就是想清楚一个任务，然后真的把它做掉。Chat 要保持原生，但我们需要让分支、Context 和执行自然地连起来。</p>
+            </div>
+          </article>
+
+          <article class="message assistant-message">
+            <header><span class="agent-mark">V</span><strong>VibeHub Agent</strong><small>Codex · 42s</small></header>
+            <div class="message-copy assistant-copy">
+              <p>那第一原则不是“展示系统能力”，而是<strong>保护当前这条思路</strong>。默认界面只需要让人感知三件事：我们正在聊什么、这条对话从哪里来、下一步是否已经足够明确。</p>
+
+              <section class="answer-section" data-section="attention">
+                <h2>工作面应该保持安静</h2>
+                <p>Workspace、模型和历史对话属于应用壳。它们持续存在，但视觉上退后。Context、Ticket、Run 不应该成为常驻栏目，而是在对话需要它们的时候出现。</p>
+                <button class="fork-action" type="button" data-fork="attention">Fork from here</button>
+              </section>
+
+              <section class="answer-section" data-section="branching">
+                <h2>分支是对话能力，不是知识图谱</h2>
+                <p>用户从具体一段回答旁边 Fork。新分支保留来源，讨论结束后可以 Compare，再把结论作为一个新 turn 带回 Main；两边的历史都不被改写。</p>
+                <button class="fork-action" type="button" data-fork="branching">Fork from here</button>
+              </section>
+
+              <section class="answer-section" data-section="execution">
+                <h2>执行只有发生时才占据界面</h2>
+                <p>Ready 不是 Running。只有真实 executor 发出事件后，Run 才进入全局状态带；只有遇到失败、审批或用户判断时，它才主动跨越当前页面索取注意力。</p>
+                <button class="fork-action" type="button" data-fork="execution">Fork from here</button>
+              </section>
+            </div>
+            <footer class="message-footer"><button type="button">Copy</button><button type="button">Retry</button><span>3 fork points</span></footer>
+          </article>
+
+          <article class="message user-message">
+            <div class="message-copy"><p>对。那先不要做完整系统，先给我一个我真的愿意每天打开的 Chat 工作态。</p></div>
+          </article>
+
+          <article class="message assistant-message latest-message main-tail">
+            <header><span class="agent-mark">V</span><strong>VibeHub Agent</strong><small>Codex · now</small></header>
+            <div class="message-copy assistant-copy">
+              <p>可以。这个状态里，Chat 是唯一主角。左侧只负责回到工作，顶部只保留当前边界，所有 VibeHub 能力都从这条对话就地发生。</p>
+              <p>如果我们现在继续，最自然的动作是把这段讨论变成一个有边界的实现任务；如果边界还不够清楚，就继续聊，不会被工作流催促。</p>
+            </div>
+            <footer class="message-footer"><button type="button">Copy</button><button type="button" data-fork="latest">Fork</button><button class="inline-task" id="inlineTask" type="button">Make task from this</button></footer>
+          </article>
+        </section>
+
+        <div class="composer-zone" id="composerZone">
+          <div class="context-attachment" id="contextAttachment" hidden>
+            <span>Context for next turn</span>
+            <button type="button" data-open-context><span id="contextCountLabel">3</span> selected references</button>
+            <button class="remove-context" id="removeContext" type="button" aria-label="Remove Context">Remove</button>
+          </div>
+          <form class="composer" id="composer">
+            <textarea id="messageInput" rows="2" aria-label="Message" placeholder="Ask, explore, or describe the work…"></textarea>
+            <div class="composer-footer">
+              <div class="composer-options">
+                <button type="button" aria-label="Attach reference">Add</button>
+                <button type="button" id="composerModel">Codex <span>gpt-5.6</span></button>
+                <button type="button" id="composerContext"><span class="mini-status"></span>Context off</button>
+              </div>
+              <div class="send-area"><span>⌘ ↵</span><button type="submit" aria-label="Send message">Send</button></div>
+            </div>
+          </form>
+          <p class="local-note">Local prototype · no conversation data is saved</p>
+        </div>
+
+        <aside class="run-strip" id="runStrip" hidden aria-label="Active execution">
+          <button class="run-summary" id="runSummary" type="button">
+            <span class="run-pulse"></span>
+            <span><strong id="runLabel">Running task</strong><small id="runDetail">Inspecting the current product surface</small></span>
+          </button>
+          <div class="run-progress"><i id="runProgress"></i></div>
+          <span class="run-step" id="runStep">2 / 5</span>
+          <button class="run-open" id="runOpen" type="button">Open run</button>
+        </aside>
+      </main>
+    </div>
+  </div>
+
+  <div class="scrim" id="scrim" hidden></div>
+
+  <section class="command-palette" id="commandPalette" hidden aria-labelledby="commandTitle">
+    <header>
+      <label for="commandInput" id="commandTitle">Go to or start</label>
+      <kbd>ESC</kbd>
+    </header>
+    <input id="commandInput" type="search" autocomplete="off" placeholder="Chat, Ticket, branch, file, or command…">
+    <div class="command-results" id="commandResults">
+      <button type="button" data-command="chat"><span><strong>Continue with a thought</strong><small>Focus the current conversation</small></span><kbd>↵</kbd></button>
+      <button type="button" data-command="task"><span><strong>Make task from current turn</strong><small>Preview outcome and readiness</small></span><kbd>T</kbd></button>
+      <button type="button" data-command="branches"><span><strong>Open conversation branches</strong><small>3 lines in this Session</small></span><kbd>B</kbd></button>
+      <button type="button" data-command="context"><span><strong>Choose Context for next turn</strong><small>Workspace scope · explicit attachment</small></span><kbd>C</kbd></button>
+      <button type="button" data-command="ticket"><span><strong>Find a Ticket</strong><small>Search this Workspace</small></span><kbd>F</kbd></button>
+    </div>
+    <footer><span>VibeHub actions do not become model turns</span><span>↑↓ navigate · ↵ open</span></footer>
+  </section>
+
+  <aside class="drawer branch-drawer" id="branchDrawer" hidden inert aria-labelledby="branchTitle">
+    <header class="drawer-header"><div><span class="drawer-kicker">Conversation</span><h2 id="branchTitle">Branches</h2></div><button class="close-button" type="button" data-close aria-label="Close">Close</button></header>
+    <div class="lineage-summary"><strong>3 lines</strong><span>All branches share the first 6 turns</span></div>
+    <div class="branch-map">
+      <button class="branch-node current" type="button" data-branch="main"><span class="node-line"></span><span><small>MAIN · 10 TURNS</small><strong>Harness 的日常工作体验</strong><em>Current</em></span></button>
+      <div class="fork-origin"><span>Forked from assistant turn 6</span></div>
+      <button class="branch-node" type="button" data-branch="ticket"><span class="node-line"></span><span><small>FORK · 5 TURNS</small><strong>Ticket craft 的边界</strong><em>Context on</em></span></button>
+      <button class="branch-node" type="button" data-branch="execution"><span class="node-line"></span><span><small>FORK · 4 TURNS</small><strong>执行如何返回注意力</strong><em>Compared 8 min ago</em></span></button>
+    </div>
+    <div class="drawer-actions"><button class="secondary-action" id="compareButton" type="button">Compare two forks</button></div>
+  </aside>
+
+  <aside class="drawer context-drawer" id="contextDrawer" hidden inert aria-labelledby="contextTitle">
+    <header class="drawer-header"><div><span class="drawer-kicker">Next model turn</span><h2 id="contextTitle">Context</h2></div><button class="close-button" type="button" data-close aria-label="Close">Close</button></header>
+    <p class="drawer-intro">Choose the smallest packet that should inform the next answer. This does not capture the conversation or write anything back.</p>
+    <div class="context-scope">
+      <span>Scope</span><strong>vibehub-plugin</strong><small id="contextScopeCount">3 of 18 references selected</small>
+    </div>
+    <div class="reference-list">
+      <label><input type="checkbox" checked><span><strong>Harness product contract</strong><small>Product · active contract</small></span></label>
+      <label><input type="checkbox" checked><span><strong>Conversational Ticket control</strong><small>Product · intent</small></span></label>
+      <label><input type="checkbox" checked><span><strong>Governed Context activation</strong><small>Knowledge · decision</small></span></label>
+      <label><input type="checkbox"><span><strong>DeepSeek Harness feasibility</strong><small>Architecture · report</small></span></label>
+    </div>
+    <div class="drawer-actions"><button class="primary-action" id="applyContext" type="button">Use 3 references</button></div>
+  </aside>
+
+  <aside class="drawer task-drawer" id="taskDrawer" hidden inert aria-labelledby="taskTitle">
+    <header class="drawer-header"><div><span class="drawer-kicker">From this conversation</span><h2 id="taskTitle">Make task</h2></div><button class="close-button" type="button" data-close aria-label="Close">Close</button></header>
+    <div class="task-readiness"><span class="ready-mark"></span><div><strong>Ready to craft</strong><small>The outcome is bounded and no dependency is missing.</small></div></div>
+    <label class="field"><span>Outcome</span><textarea rows="5">Build one normal-scale Chat working state where the application shell recedes, conversation stays primary, and Branch, Context, Ticket, and Run appear only when relevant.</textarea></label>
+    <div class="task-source">
+      <span class="source-label">Source</span>
+      <button type="button"><strong id="taskSourceBranch">Main conversation</strong><small>Latest assistant turn</small></button>
+      <button type="button"><strong id="taskSourceContext">No Context attached</strong><small>Explicit next-turn scope only</small></button>
+    </div>
+    <div class="task-contract"><span>Acceptance</span><p>Normal Chat remains unconstrained</p><p>Run is absent until trusted execution begins</p><p>Owner can judge the complete first viewport</p></div>
+    <div class="drawer-actions task-actions"><button class="secondary-action" type="button" data-close>Keep chatting</button><button class="primary-action" id="createAndStart" type="button">Create & start</button></div>
+  </aside>
+
+  <section class="compare-dialog" id="compareDialog" hidden aria-labelledby="compareTitle">
+    <header><div><span class="drawer-kicker">Compare without merging history</span><h2 id="compareTitle">Ticket craft × Execution attention</h2></div><button class="close-button" type="button" data-close>Close</button></header>
+    <div class="compare-columns">
+      <article><small>FORK A</small><h3>Ticket craft 的边界</h3><p>Keep Chat fluid. The task appears only after the desired outcome is bounded.</p><ul><li>Preview before creating</li><li>Preserve source turn</li><li>Show exact Context</li></ul></article>
+      <article><small>FORK B</small><h3>执行如何返回注意力</h3><p>Keep live work quiet until a failure, approval, or judgment needs the person.</p><ul><li>Trusted Run events only</li><li>Attention belongs to a step</li><li>Evidence remains inspectable</li></ul></article>
+    </div>
+    <footer><span>A new turn will be added to Main. Neither branch changes.</span><button class="primary-action" id="bringBack" type="button">Bring back to Main</button></footer>
+  </section>
+
+  <aside class="run-panel" id="runPanel" hidden inert aria-labelledby="runPanelTitle">
+    <header class="drawer-header"><div><span class="drawer-kicker">Trusted executor activity</span><h2 id="runPanelTitle">Build Chat working state</h2></div><button class="close-button" type="button" data-close>Close</button></header>
+    <div class="run-panel-state"><span class="run-pulse"></span><div><strong>Running</strong><small>Codex · local workspace</small></div></div>
+    <ol class="run-timeline">
+      <li class="done"><span>1</span><div><strong>Read product contract</strong><small>Completed · 18s</small></div></li>
+      <li class="done"><span>2</span><div><strong>Inspect current UI surface</strong><small>Completed · 31s</small></div></li>
+      <li class="active"><span>3</span><div><strong>Implement application shell</strong><small>Editing 4 files</small></div></li>
+      <li><span>4</span><div><strong>Verify interactions</strong><small>Queued</small></div></li>
+      <li><span>5</span><div><strong>Attach Evidence</strong><small>Queued</small></div></li>
+    </ol>
+    <div class="attention-preview"><span>WHEN ATTENTION IS NEEDED</span><strong>The run strip expands at the owning step.</strong><p>It never infers activity from Ticket status and never interrupts unrelated Chat for routine progress.</p><button id="previewAttention" type="button">Preview attention request</button></div>
+  </aside>
+
+  <div class="attention-bar" id="attentionBar" hidden role="status">
+    <div><span>Needs you</span><strong>Allow the local preview to open?</strong><small>Run step 4 · Verify interactions</small></div>
+    <div><button id="notNow" type="button">Not now</button><button id="allowOnce" type="button">Allow once</button></div>
+  </div>
+
+  <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+</body>
+</html>

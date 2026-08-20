@@ -46,6 +46,7 @@
       "ref": ".vibehub/tickets/ticket-propose-large-graph-clarity-and-card-copy.yaml"
     }
   ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "A reviewable semantic and visual contract turns the Ticket card's approved upper-right badge position into a clear, trustworthy information signal without confusing human attention, execution state, or delivery history.",
@@ -59,6 +60,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-propose-card-corner-signal-contract"
 }

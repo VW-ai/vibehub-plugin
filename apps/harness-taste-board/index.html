@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#151515" />
+    <title>VibeHub Taste Calibration</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand"><span>V</span><div><strong>Taste calibration</strong><small>Reference only · no VibeHub UI</small></div></div>
+      <div class="progress"><span id="rated-count">0</span> / <span id="visible-count">0</span> reviewed</div>
+      <button class="summary-button" data-action="open-summary">Review selections</button>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <span class="label">RESET / 02</span>
+          <h1>只判断真实产品，<br />暂时不设计 VibeHub。</h1>
+        </div>
+        <div class="intro-copy">
+          <p>每张图只问一个问题：这里有没有我们希望长期使用的感觉？可以喜欢整体，也可以只喜欢一个局部。没有选中不会被视为默认同意。</p>
+          <div class="legend"><span><i class="keep"></i>喜欢</span><span><i class="part"></i>只要局部</span><span><i class="reject"></i>不要</span></div>
+        </div>
+      </section>
+
+      <div class="toolbar">
+        <div class="filter-group" id="dimension-filters" aria-label="按界面维度筛选">
+          <button class="is-active" data-dimension="all">全部</button>
+          <button data-dimension="shell">应用壳</button>
+          <button data-dimension="chat">Chat</button>
+          <button data-dimension="action">动作层</button>
+          <button data-dimension="execution">执行与状态</button>
+          <button data-dimension="density">密度与层级</button>
+        </div>
+        <div class="filter-group product-filters" id="product-filters" aria-label="按产品筛选">
+          <button class="is-active" data-product="all">所有产品</button>
+          <button data-product="codex">Codex</button>
+          <button data-product="claude">Claude</button>
+          <button data-product="linear">Linear</button>
+          <button data-product="raycast">Raycast</button>
+          <button data-product="warp">Warp</button>
+          <button data-product="dia">Dia</button>
+        </div>
+      </div>
+
+      <section class="reference-grid" id="reference-grid" aria-live="polite"></section>
+
+      <section class="empty-state" id="empty-state" hidden>
+        <strong>这个组合没有参考图。</strong><p>切回“全部”或换一个维度。</p>
+      </section>
+    </main>
+
+    <dialog id="image-dialog" class="image-dialog">
+      <form method="dialog"><button class="dialog-close" aria-label="关闭">×</button></form>
+      <div class="dialog-body"><div class="dialog-image"><img alt="" /></div><aside><span class="dialog-product"></span><h2></h2><p></p><div class="dialog-principle"></div><a target="_blank" rel="noreferrer">查看官方来源 ↗</a><div class="dialog-rating"></div></aside></div>
+    </dialog>
+
+    <dialog id="summary-dialog" class="summary-dialog">
+      <form method="dialog"><header><div><span class="label">YOUR SIGNALS</span><h2>目前的 taste brief</h2></div><button aria-label="关闭">×</button></header></form>
+      <div class="summary-content" id="summary-content"></div>
+      <footer><button data-action="clear-ratings">Clear</button><button class="copy-button" data-action="copy-summary">Copy brief</button></footer>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

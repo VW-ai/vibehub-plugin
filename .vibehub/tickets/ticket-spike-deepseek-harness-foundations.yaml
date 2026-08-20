@@ -1,0 +1,69 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "upstream-baseline-is-pinned",
+      "criterion": "The exploration records an exact DeepSeek Harness release or commit, the supported runtime requirements, and primary-source links for every relied-on Bundle, Profile, Cordis, Session, command, and Web UI contract; all runnable spike code uses that pinned baseline."
+    },
+    {
+      "acceptance_id": "bundle-profile-boot-spike",
+      "criterion": "A reproducible local spike installs or links a VibeHub-owned Bundle into a named Profile and boots a local browser surface without vendoring or modifying the DeepSeek Harness repository."
+    },
+    {
+      "acceptance_id": "ui-extension-seams-proven",
+      "criterion": "Runnable code and source references establish whether VibeHub can add or replace the required root layout, navigation, Chat actions, branch graph surface, Ticket surface, and execution surface; every unsupported or unstable seam is called out explicitly with a fallback."
+    },
+    {
+      "acceptance_id": "session-and-branch-model-proven",
+      "criterion": "A spike inspects or exercises durable session events, fork or resume identity, transcript projection, and branch comparison inputs, then documents the minimum VibeHub-owned projection needed for Fork, Compare, and Bring Back without inventing an automatic semantic graph."
+    },
+    {
+      "acceptance_id": "commands-and-executor-boundary-proven",
+      "criterion": "A minimal command and execution spike demonstrates how an explicit UI action can invoke VibeHub behavior without posing as a user model turn, and how queued, running, tool, approval, waiting, failed, completed, and Evidence events would map from a replaceable executor such as Codex."
+    },
+    {
+      "acceptance_id": "local-browser-lifecycle-proven",
+      "criterion": "The spike documents and exercises the local host lifecycle needed for an app-like Safari experience, including start, authorized access, refresh or resume, shutdown, and the boundary between browser mode and a possible later desktop wrapper."
+    },
+    {
+      "acceptance_id": "architecture-recommendation-is-decision-ready",
+      "criterion": "A checked-in feasibility report scores each product-critical seam as proven, conditional, unsupported, or unstable and recommends an exact initial composition, compatibility adapter boundary, repository package shape, smoke-test set, and stop conditions before implementation."
+    }
+  ],
+  "constraints": [
+    "Do not fork, vendor, or patch DeepSeek Harness upstream as the default solution.",
+    "Keep spike artifacts isolated and disposable; do not migrate the current VibeHub architecture during exploration.",
+    "Do not treat documentation claims as proof when a runnable or source-level check is possible.",
+    "Do not build a general-purpose Agent runtime; preserve Ticket, Context, Evidence, and Outcome as VibeHub concepts and executors as replaceable resources.",
+    "Pin the upstream baseline and put all unstable assumptions behind one compatibility boundary."
+  ],
+  "context": "DeepSeek Harness is a rapidly evolving developer preview, so product architecture must not rest only on documentation or community examples. This Ticket explores the smallest real integration seams in a disposable area of the current repository. It must examine Bundle and Profile composition, Cordis services/events/effects, Web UI layout and navigation extension points, durable session events and fork/resume identity, human commands that do not consume a model turn, execution event projection, local browser lifecycle, and version/upgrade isolation. The result may prove, qualify, or falsify each hypothesis. Codex remains a replaceable future executor; this Ticket defines and exercises the executor event boundary but does not need to ship production Codex integration.",
+  "context_refs": [
+    {
+      "purpose": "Existing authority for Ticket-led routing to replaceable execution resources.",
+      "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    },
+    {
+      "purpose": "Current lightweight boundary that exploration may recommend amending but must not silently overwrite.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Long-range semantic boundary separating Ticket, Context, execution actors, and infrastructure.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    },
+    {
+      "purpose": "Existing authority for a local browser surface backed by a narrow lifecycle.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Source-level and runnable technical spikes establish which DeepSeek Harness and Cordis extension points can safely host VibeHub's product shell, conversation graph, human commands, execution projection, and local browser distribution without forking upstream.",
+  "provenance_refs": [
+    "conversation:2026-08-17-vibehub-deepseek-harness-product-direction",
+    "conversation:2026-08-17-start-deepseek-harness-exploration"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-spike-deepseek-harness-foundations"
+}

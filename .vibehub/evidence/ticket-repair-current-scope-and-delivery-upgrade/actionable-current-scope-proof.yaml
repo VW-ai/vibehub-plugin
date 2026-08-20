@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "current-scope-is-actionable",
+    "all-and-delivery-history-remain-truthful"
+  ],
+  "evidence_id": "actionable-current-scope-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-20T00:22:02Z",
+  "refs": [
+    "skills/scripts/vh.mjs",
+    "test/ticket.test.mjs",
+    "test/ui-host.test.mjs",
+    "docs/LOCAL_GRAPH_DESIGN.md",
+    "command:vh-ticket-graph-current:11-visible-1-done-boundary",
+    "command:vh-ticket-graph-all:54-visible"
+  ],
+  "schema_version": 1,
+  "summary": "The shared projection now seeds current scope from non-DONE Tickets, retains only directly adjacent DONE boundaries, and traverses DONE history independently of delivery metadata. On the real repository, current fell from 47 visible Tickets with 38 DONE to 11 visible Tickets: 10 open and one direct archived causal boundary; all scope remains complete at 54 Tickets and exact delivery/archive semantics remain separate.",
+  "ticket_id": "ticket-repair-current-scope-and-delivery-upgrade"
+}

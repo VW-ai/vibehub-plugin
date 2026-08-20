@@ -55,6 +55,15 @@
       "ref": ".vibehub/outcomes/ticket-explicit-firm-maturity.yaml"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-11T07:34:51.000Z",
+      "delivered_commit": "20988ffa3fde04e952a0d6905268e43fb93e195e",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/16",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "VibeHub v0.6.0 is a small, verified release candidate from the latest main, with synchronized Codex and Claude Code identities, an accurate feature changelog, and complete pre-merge release evidence.",
@@ -75,6 +84,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-prepare-v060-release"
 }

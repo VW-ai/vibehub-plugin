@@ -95,10 +95,18 @@ test("delivery archive and shared current/all/delivery/Room queries stay truthfu
   assert.equal(run(repo, "ticket", "graph", undefined, ["--room", "missing"]).envelope.error.code, "invalid_argument");
 });
 
-test("delivery schema enforces discriminated states, unique refs, and legacy omission", () => {
+test("delivery schema requires an explicit array and enforces discriminated states and unique refs", () => {
   const repo = tempRepo("ticket-delivery-schema");
   assert.equal(run(repo, "project", "init").status, 0);
-  assert.equal(run(repo, "ticket", "apply", { tickets: [ticket("legacy-current")] }).status, 0);
+  const legacy = ticket("legacy-schema");
+  legacy.schema_version = 1;
+  const rejectedLegacy = run(repo, "ticket", "apply", { tickets: [legacy] });
+  assert.notEqual(rejectedLegacy.status, 0);
+  assert.match(JSON.stringify(rejectedLegacy.envelope.error.details), /schema_version.*must equal 2/u);
+  const missing = ticket("missing-deliveries");
+  delete missing.deliveries;
+  assert.notEqual(run(repo, "ticket", "apply", { tickets: [missing] }).status, 0);
+  assert.equal(run(repo, "ticket", "apply", { tickets: [ticket("explicit-current")] }).status, 0);
   const proposed = ticket("proposed-work");
   proposed.deliveries = [{ kind: "pull_request", ref: deliveryRef, state: "proposed" }];
   assert.equal(run(repo, "ticket", "apply", { tickets: [proposed] }).status, 0);
@@ -121,6 +129,35 @@ test("delivery schema enforces discriminated states, unique refs, and legacy omi
     JSON.stringify(run(repo, "ticket", "apply", { tickets: [duplicate] }).envelope.error.details),
     /unique per Ticket/u,
   );
+});
+
+test("current scope is seeded by actionable Tickets rather than delivery metadata", () => {
+  const repo = tempRepo("ticket-actionable-current");
+  assert.equal(run(repo, "project", "init").status, 0);
+  const old = ticket("old-done");
+  const boundary = ticket("done-boundary", ["old-done"]);
+  const unrelated = ticket("unrelated-done");
+  const current = ticket("current-work", ["done-boundary"]);
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [old, boundary, unrelated, current],
+  }).status, 0);
+  for (const id of ["old-done", "done-boundary", "unrelated-done"]) closeSuccessfully(repo, id);
+
+  const graph = run(repo, "ticket", "graph").envelope.data;
+  assert.deepEqual(graph.tickets.map((item) => [item.ticket.ticket_id, item.archived]), [
+    ["current-work", false], ["done-boundary", false],
+  ]);
+  assert.deepEqual(graph.stubs, [{
+    stub_ref: "done-boundary:upstream",
+    anchor_ticket_id: "done-boundary",
+    direction: "upstream",
+    hidden_ticket_count: 1,
+    next_ticket_ids: ["old-done"],
+  }]);
+  const all = run(repo, "ticket", "graph", undefined, ["--scope", "all"]).envelope.data;
+  assert.deepEqual(all.tickets.map((item) => item.ticket.ticket_id), [
+    "current-work", "done-boundary", "old-done", "unrelated-done",
+  ]);
 });
 
 test("archive state table stays orthogonal to Outcome status, revert, and reopen provenance", () => {

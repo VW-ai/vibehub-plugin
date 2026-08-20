@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "owner": "vibehub-migrate",
+  "current_format": 2,
   "migrations": [
     {
       "from": "0.4",
@@ -11,7 +12,7 @@
         "When .vibehub/rooms/ is missing or empty, build the Room tree first with the distill skill (cold start); do not invent rooms for territory you have not read.",
         "Move every entry out of .vibehub/context/ into the lowest room that owns its claim, per the placement rule in the knowledge-governance reference, using git mv; remove the emptied directory.",
         "Rewrite every ticket context_ref that names a .vibehub/context/ path to the entry's new roomed path.",
-        "Continue with the 0.5-unversioned-to-format-1 step; the room move alone is not the current project format."
+        "Continue with the 0.5-unversioned-to-format-1 step and every following format step; the room move alone is not the current project format."
       ]
     },
     {
@@ -21,7 +22,24 @@
       "steps": [
         "Preview the one new checked-in path .vibehub/version.yaml and confirm that the repository no longer contains populated legacy .vibehub/context/ entries.",
         "After the explicit migration boundary, write .vibehub/version.yaml with schema_version 1, kind vibehub_project, and integer format_version 1.",
-        "Prove project compatibility returns CURRENT, project validate passes, and align every room changed by an earlier step so room drift is honest."
+        "Continue with the format-1-to-format-2 step; format 1 is no longer current."
+      ]
+    },
+    {
+      "from": "format-1",
+      "to": "format-2",
+      "document_schema_versions": {
+        "ticket": {
+          "from": 1,
+          "to": 2
+        }
+      },
+      "detect": "project compatibility returns MIGRATION_REQUIRED with detected_format 1 and target_format 2 after Ticket delivery membership became canonical project data.",
+      "steps": [
+        "Preview every canonical Ticket and classify its delivery membership from exact reviewable history; do not infer delivery from Ticket status, branch name, filename, prose, or whichever pull request is currently open.",
+        "Upgrade every Ticket document from schema_version 1 to schema_version 2 and add an explicit deliveries array. For a delivered pull request, record its canonical GitHub pull request URL, state delivered, exact mergedAt timestamp, and 40-hex merge commit. For an exact delivered cherry-pick, record the commit ref, timestamp, and delivered commit. Leave an empty array when no authoritative delivery can be established.",
+        "After the reviewed Ticket audit, write .vibehub/version.yaml with schema_version 1, kind vibehub_project, and integer format_version 2.",
+        "Prove project compatibility returns CURRENT, project validate passes, the current Ticket graph is action-focused, and room drift remains honest."
       ]
     }
   ]

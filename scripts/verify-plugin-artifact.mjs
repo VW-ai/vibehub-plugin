@@ -130,10 +130,11 @@ try {
   if (query.data.count !== 1) throw new Error("installed Context roundtrip failed");
   invoke(helper, "ticket", "apply", {
     tickets: [{
-      schema_version: 1,
+      schema_version: 2,
       kind: "ticket",
       ticket_id: "ticket-build-entry-fixture",
       outcome: "The concrete entry fixture produces one executable checked-in Ticket.",
+      deliveries: [],
       context: "A clean installed plugin received a concrete deliverable followed by the exact canonical entry Start this with VibeHub.",
       acceptance: [{
         acceptance_id: "entry-reaches-ready-ticket",
@@ -215,12 +216,19 @@ try {
     headers: { Authorization: `Bearer ${uiHost.token}` },
   });
   const state = await stateResponse.json();
-  if (!state.ok || state.data.graph.tickets.length !== 1) {
-    throw new Error("installed UI graph projection failed");
+  if (!state.ok || state.data.graph.tickets.length !== 0) {
+    throw new Error("installed UI current graph did not hide unrelated DONE history");
   }
-  const installedTicket = state.data.graph.tickets[0];
+  const allStateResponse = await fetch(`${origin}/api/state?scope=all`, {
+    headers: { Authorization: `Bearer ${uiHost.token}` },
+  });
+  const allState = await allStateResponse.json();
+  if (!allState.ok || allState.data.graph.tickets.length !== 1) {
+    throw new Error("installed UI all-history graph projection failed");
+  }
+  const installedTicket = allState.data.graph.tickets[0];
   if (installedTicket.capabilities.attention.summary.label !== "COMPLETE"
-    || state.data.interventions.authority.status !== "available") {
+    || allState.data.interventions.authority.status !== "available") {
     throw new Error("installed UI human-attention projection failed");
   }
   await uiHost.close();

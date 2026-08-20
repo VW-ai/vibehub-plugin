@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "delivery-audit-is-a-versioned-migration",
+    "repository-history-is-audited"
+  ],
+  "evidence_id": "format-two-delivery-audit-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-20T00:22:02Z",
+  "refs": [
+    ".vibehub/version.yaml",
+    ".vibehub/tickets/",
+    "skills/contracts/ticket.schema.json",
+    "skills/vibehub-migrate/references/migrations.json",
+    "skills/scripts/vh.mjs",
+    "test/migration.test.mjs",
+    "test/project-format.test.mjs",
+    "command:vh-project-compatibility:current-format-2",
+    "command:vh-project-validate:54-tickets"
+  ],
+  "schema_version": 1,
+  "summary": "Project format 2 requires every Ticket to carry an explicit deliveries array and compatibility blocks format 1 writes until the agent-driven audit completes. The repository audit added explicit arrays to 43 legacy-shaped Tickets: 33 successful Tickets received exact PR URL, merge timestamp, and 40-hex merge commit from the first main merge introducing their Outcome; ten unproven or unfinished Tickets remained explicit empty arrays. All 54 canonical Tickets now carry the field, 43 have verified archived delivery, and project compatibility plus validation report CURRENT format 2.",
+  "ticket_id": "ticket-repair-current-scope-and-delivery-upgrade"
+}

@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f3f4f1">
+  <title>VibeHub Harness · Product prototype</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="titlebar">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">V</span>
+        <strong>VibeHub</strong>
+        <span class="prototype-badge">Product prototype</span>
+      </div>
+      <button class="workspace-switcher" type="button" aria-label="Current workspace">
+        <span class="status-dot"></span>
+        <span><strong>vibehub-plugin</strong><small>main · local workspace</small></span>
+        <span aria-hidden="true">⌄</span>
+      </button>
+      <div class="title-actions">
+        <button class="quiet-button" id="contextButton" type="button" aria-pressed="false">
+          <span class="diamond" aria-hidden="true"></span>
+          Context off
+        </button>
+        <button class="quiet-button" id="resetDemo" type="button">Reset demo</button>
+      </div>
+    </header>
+
+    <div class="workspace-grid">
+      <aside class="sidebar" aria-label="Product navigation">
+        <nav class="primary-nav">
+          <button class="nav-item active" type="button" data-view="chat"><span aria-hidden="true">◌</span>Chat</button>
+          <button class="nav-item" type="button" data-view="graph"><span aria-hidden="true">⌘</span>Branches <b>3</b></button>
+          <button class="nav-item" type="button" data-view="ticket"><span aria-hidden="true">▱</span>Tickets <b id="ticketCount">0</b></button>
+          <button class="nav-item" type="button" data-view="run"><span aria-hidden="true">▷</span>Activity <i id="activityPulse" hidden></i></button>
+        </nav>
+
+        <div class="sidebar-section">
+          <span class="section-label">Open work</span>
+          <button class="work-item selected" type="button" data-view="chat">
+            <span class="work-glyph">VH</span>
+            <span><strong>Harness product</strong><small id="sidebarBranch">Main exploration</small></span>
+          </button>
+          <button class="work-item" type="button">
+            <span class="work-glyph muted">+</span>
+            <span><strong>New task</strong><small>Think or start directly</small></span>
+          </button>
+        </div>
+
+        <div class="sidebar-foot">
+          <span>Local browser surface</span>
+          <small>No backend · mocked state</small>
+        </div>
+      </aside>
+
+      <main class="main-stage">
+        <section class="view active" id="chatView" data-view-panel="chat" aria-labelledby="chatTitle">
+          <header class="view-head chat-head">
+            <div>
+              <div class="eyebrow" id="branchPath">Exploration / Main</div>
+              <h1 id="chatTitle">Design the task-oriented Harness</h1>
+            </div>
+            <div class="head-actions">
+              <button class="quiet-button" type="button" data-view="graph">View graph</button>
+              <button class="primary-button" id="makeTicketTop" type="button">Make Ticket</button>
+            </div>
+          </header>
+
+          <div class="branch-notice" id="branchNotice" hidden>
+            <span><strong>Forked conversation</strong><small id="branchNoticeCopy"></small></span>
+            <button type="button" data-view="graph">See where this came from</button>
+          </div>
+
+          <div class="chat-stream" id="chatStream" aria-live="polite"></div>
+
+          <div class="composer-wrap">
+            <div class="attached-context" id="attachedContext" hidden>
+              <span class="context-chip"><span class="diamond" aria-hidden="true"></span>3 scoped Context</span>
+              <span class="reference-chip">↗ Current workspace</span>
+              <button id="inspectContext" type="button">Inspect</button>
+            </div>
+            <form class="composer" id="chatComposer">
+              <textarea id="composerInput" rows="2" aria-label="Message" placeholder="Ask, explore, or describe work to start…"></textarea>
+              <div class="composer-actions">
+                <span>Normal agent chat · ⌘↵ send</span>
+                <button class="send-button" type="submit" aria-label="Send message">↑</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="view" id="graphView" data-view-panel="graph" aria-labelledby="graphTitle" hidden>
+          <header class="view-head">
+            <div><div class="eyebrow">Conversation topology</div><h1 id="graphTitle">Three parallel lines, one visible origin</h1></div>
+            <div class="head-actions"><button class="quiet-button" type="button" data-view="chat">Return to chat</button><button class="primary-button" type="button" data-view="compare">Compare branches</button></div>
+          </header>
+          <div class="graph-canvas">
+            <div class="graph-note">A conversation is a node. Forks are explicit user actions—not inferred semantic relationships.</div>
+            <div class="conversation-graph" role="tree" aria-label="Conversation branch graph">
+              <button class="graph-node root selected" type="button" data-thread="main">
+                <span class="node-kicker">Main · 8 turns</span><strong>Task-oriented Harness</strong><small>Define the first product loop</small>
+              </button>
+              <div class="branch-lines" aria-hidden="true"><i></i><i></i></div>
+              <div class="branch-nodes">
+                <button class="graph-node" type="button" data-thread="ticket-craft">
+                  <span class="node-kicker">Fork · 4 turns</span><strong>Ticket craft</strong><small>How chat becomes executable work</small><em>Context attached · 3</em>
+                </button>
+                <button class="graph-node" type="button" data-thread="execution">
+                  <span class="node-kicker">Fork · 5 turns</span><strong>Execution presence</strong><small>Make Agent work feel alive and trustworthy</small><em>Compared recently</em>
+                </button>
+              </div>
+            </div>
+            <div class="graph-legend"><span><i class="legend-main"></i>Current line</span><span><i class="legend-context"></i>Context attached</span><span>Click any node to enter its chat</span></div>
+          </div>
+        </section>
+
+        <section class="view" id="compareView" data-view-panel="compare" aria-labelledby="compareTitle" hidden>
+          <header class="view-head">
+            <div><div class="eyebrow">Compare branches</div><h1 id="compareTitle">Ticket craft × Execution presence</h1></div>
+            <button class="quiet-button" type="button" data-view="graph">Back to graph</button>
+          </header>
+          <div class="compare-grid">
+            <article class="compare-column">
+              <header><span>Branch A</span><strong>Ticket craft</strong><small>4 turns · forked from Main</small></header>
+              <div class="compare-summary"><span class="annotation ticket">Ticket</span><p>Keep the conversation fluid. A Ticket appears only when intent is ready to become a bounded action.</p></div>
+              <ul><li>Preview the generated outcome before writing.</li><li>Show attached Context and exact References.</li><li>Make Draft, Ready, and Blocked legible.</li></ul>
+            </article>
+            <article class="compare-column">
+              <header><span>Branch B</span><strong>Execution presence</strong><small>5 turns · forked from Main</small></header>
+              <div class="compare-summary"><span class="annotation run">Run</span><p>Execution is a live activity projection, not a second Ticket state. It should remain visible while the user continues chatting.</p></div>
+              <ul><li>Expose the current step and tool activity.</li><li>Return attention at the exact waiting step.</li><li>Attach Evidence as it is produced.</li></ul>
+            </article>
+          </div>
+          <section class="convergence-card">
+            <div><span class="eyebrow">Bring back</span><h2>Converge both conclusions into Main</h2><p>Create a new assistant turn that can be edited and discussed before anything becomes durable.</p></div>
+            <button class="primary-button" id="bringBack" type="button">Bring back to Main</button>
+          </section>
+        </section>
+
+        <section class="view" id="ticketView" data-view-panel="ticket" aria-labelledby="ticketTitle" hidden>
+          <header class="view-head">
+            <div><div class="eyebrow">Durable action</div><h1 id="ticketTitle">Ticket craft</h1></div>
+            <button class="quiet-button" type="button" data-view="chat">Open source chat</button>
+          </header>
+          <div class="ticket-empty" id="ticketEmpty">
+            <span class="empty-glyph">▱</span><h2>No Ticket yet</h2><p>Keep exploring, or materialize the current line when the desired outcome is bounded.</p><button class="primary-button" id="makeTicketEmpty" type="button">Craft from current chat</button>
+          </div>
+          <div class="ticket-contract" id="ticketContract" hidden>
+            <div class="ticket-main">
+              <div class="ticket-state-line"><span class="state-pill ready">Ready</span><span class="ticket-id">ticket-prototype-task-harness-experience</span></div>
+              <h2>Make the task-oriented Harness concrete enough to judge</h2>
+              <p class="ticket-outcome">A browser-first product prototype shows how normal Agent Chat branches, gathers scoped Context, becomes a Ticket, and makes execution strongly perceptible.</p>
+              <section class="contract-block"><span class="block-label">Acceptance</span><label><input type="checkbox" checked disabled> Think-first and act-first paths are explicit</label><label><input type="checkbox" checked disabled> Fork, Compare, and Bring Back are clickable</label><label><input type="checkbox" disabled> Owner judges the product direction</label></section>
+              <section class="contract-block"><span class="block-label">Constraints</span><p>Single Workspace · browser first · mocked state · no native wrapper · no cross-repo federation</p></section>
+            </div>
+            <aside class="ticket-context">
+              <span class="block-label">Attached context</span>
+              <button class="context-reference" type="button"><span class="diamond"></span><span><strong>Conversational Ticket control</strong><small>Product · Intent</small></span></button>
+              <button class="context-reference" type="button"><span class="diamond"></span><span><strong>Governed Context activation</strong><small>Knowledge · Decision</small></span></button>
+              <button class="context-reference" type="button"><span class="reference-arrow">↗</span><span><strong>Source conversation</strong><small>Main → converged turn</small></span></button>
+              <p class="context-footnote">These references inform execution. They are not copied into the Ticket or silently rewritten.</p>
+              <button class="start-button" id="startTicket" type="button"><span>Start Ticket</span><small>Run with current Agent</small></button>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="runView" data-view-panel="run" aria-labelledby="runTitle" hidden>
+          <header class="view-head">
+            <div><div class="eyebrow">Live execution</div><h1 id="runTitle">Harness product prototype</h1></div>
+            <button class="quiet-button" type="button" data-view="ticket">View Ticket contract</button>
+          </header>
+          <div class="run-layout">
+            <section class="run-focus">
+              <div class="run-status-card" id="runStatusCard">
+                <div><span class="live-indicator" id="runIndicator"></span><span class="eyebrow" id="runEyebrow">Queued</span><h2 id="runStatusTitle">Waiting to begin</h2><p id="runStatusCopy">The Ticket is ready and the executor has been selected.</p></div>
+                <button class="primary-button" id="advanceRun" type="button">Begin demo run</button>
+              </div>
+              <ol class="execution-timeline" id="executionTimeline" aria-label="Execution timeline"></ol>
+            </section>
+            <aside class="state-lab">
+              <span class="block-label">Preview execution states</span>
+              <p>The Ticket state stays Ready or Done. This panel previews trusted Run events separately.</p>
+              <div class="state-buttons" role="group" aria-label="Preview run state">
+                <button type="button" data-run-state="queued">Queued</button>
+                <button type="button" data-run-state="running">Running</button>
+                <button type="button" data-run-state="waiting">Needs you</button>
+                <button type="button" data-run-state="failed">Failed</button>
+                <button type="button" data-run-state="evidence">Evidence</button>
+                <button type="button" data-run-state="completed">Complete</button>
+              </div>
+              <div class="attention-card" id="attentionCard" hidden>
+                <span>Needs you</span><strong>Allow local browser preview?</strong><p>The Agent reached the exact step that requires opening Safari.</p><div><button type="button" id="denyAttention">Not now</button><button type="button" id="approveAttention">Allow once</button></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </main>
+
+      <aside class="activity-dock" aria-label="Current execution activity">
+        <header><div><span class="dock-pulse" id="dockPulse"></span><strong>Execution</strong></div><button type="button" data-view="run">Open</button></header>
+        <div class="dock-empty" id="dockEmpty"><span>Nothing running</span><small>Start a Ready Ticket to see live work here.</small></div>
+        <div class="dock-live" id="dockLive" hidden>
+          <span class="dock-state" id="dockState">Running</span>
+          <strong>Harness product prototype</strong>
+          <p id="dockCopy">Preparing the product surface…</p>
+          <div class="progress-track"><i id="dockProgress"></i></div>
+          <div class="dock-meta"><span id="dockStep">Step 1 of 4</span><span id="dockTime">now</span></div>
+        </div>
+        <section class="dock-context">
+          <span class="section-label">Current focus</span>
+          <button type="button" data-view="chat"><span class="annotation branch">Fork</span><span><strong id="dockBranch">Main exploration</strong><small>Conversation node</small></span></button>
+          <button type="button" id="dockContext"><span class="annotation context">Context</span><span><strong id="dockContextTitle">Not active</strong><small id="dockContextCopy">Chat uses only this thread</small></span></button>
+          <button type="button" data-view="ticket"><span class="annotation ticket">Ticket</span><span><strong id="dockTicketTitle">Not crafted</strong><small id="dockTicketCopy">Explore until work is bounded</small></span></button>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <aside class="side-sheet" id="contextSheet" aria-labelledby="contextSheetTitle" hidden inert>
+    <header><div><span class="eyebrow">Scoped for the next turn</span><h2 id="contextSheetTitle">Context</h2></div><button class="sheet-close" type="button" data-close-sheet="contextSheet" aria-label="Close Context">×</button></header>
+    <p>Context is explicit and inspectable. Turning it on attaches a minimal packet to the next model turn; it does not expose every Room or automatically write back.</p>
+    <div class="context-list"><article><span class="diamond"></span><div><strong>Conversational Ticket control</strong><small>Product / active intent</small><p>Conversation is the natural entry; Ticket remains durable truth.</p></div></article><article><span class="diamond"></span><div><strong>Context activation</strong><small>Knowledge / decision</small><p>Use the smallest relevant packet and govern every writeback.</p></div></article><article><span class="diamond"></span><div><strong>Quiet intelligence</strong><small>Workbench / constraint</small><p>Return attention only where the user owns a decision.</p></div></article></div>
+  </aside>
+
+  <aside class="side-sheet ticket-sheet" id="ticketSheet" aria-labelledby="ticketSheetTitle" hidden inert>
+    <header><div><span class="eyebrow">Craft from conversation</span><h2 id="ticketSheetTitle">New Ticket</h2></div><button class="sheet-close" type="button" data-close-sheet="ticketSheet" aria-label="Close Ticket craft">×</button></header>
+    <label class="field"><span>Desired outcome</span><textarea rows="4">Make the task-oriented Harness concrete enough to judge through a browser-first interactive prototype.</textarea></label>
+    <div class="field-row"><label class="field"><span>Maturity</span><select><option>Firm · Ready when unblocked</option><option>Draft · Refine later</option></select></label><label class="field"><span>Executor</span><select><option>Current Agent</option><option>Choose when starting</option></select></label></div>
+    <section class="craft-source"><span class="block-label">Source and Context</span><div><span class="annotation branch">Fork</span>Main / converged result</div><div><span class="annotation context">Context</span>3 scoped references</div></section>
+    <section class="craft-preview"><span class="block-label">Readiness preview</span><strong>Ready</strong><p>No unresolved dependency or human decision blocks the proposed outcome.</p></section>
+    <button class="primary-button full-button" id="confirmTicket" type="button">Create Ticket</button>
+    <p class="sheet-footnote">Prototype only. This action changes mocked UI state and writes no repository files.</p>
+  </aside>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
