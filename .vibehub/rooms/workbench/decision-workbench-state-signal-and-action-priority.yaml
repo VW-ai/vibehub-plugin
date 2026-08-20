@@ -1,0 +1,48 @@
+{
+  "context_id": "decision-workbench-state-signal-and-action-priority",
+  "detail": "The production Workbench must not import the proposal's full visual treatment. Card-top dashed versus solid accents are unnecessary and should not become a primary phase language. Preserve the existing production card anatomy and use new motion only for a trusted live execution effect; when no trusted runtime fact exists, never imply activity. Reuse the existing upper-right card space for one deterministic substate such as NEEDS YOU, BLOCKED, DEVIATED, VERIFYING, or WAITING rather than adding another band, badge system, or color axis. READY and RUNNING must remain visually distinguishable and must not simply share one color treatment; final production colors and motion should fit the existing quiet Workbench rather than the proposal board. In the focused Ticket panel, Recommended action is the most important hierarchy and should be materially more prominent than supporting lifecycle, proof, and metadata. For the current lightweight Plugin, actions primarily assemble and copy the exact context-aware prompt or handoff into Chat; do not pretend the read-only Workbench can directly execute or mutate work. A future DeepSeek Harness Plugin may replace that copy boundary with a native action while preserving the same Task semantics. Outside these bounded changes, keep existing graph, panel, Inspector lenses, Context, Evidence, history, and navigation interactions stable.",
+  "evidence": [
+    {
+      "note": "The owner explicitly rejected proposal-only card accents and same-color READY/RUNNING, selected live presence plus the existing corner for substate, and prioritized Recommended action in the focused panel.",
+      "ref": "conversation:2026-08-20-owner-corrects-production-task-state-ui"
+    },
+    {
+      "note": "The reviewed proposal supplies the semantic source matrix and runtime honesty boundary; this decision accepts only the bounded production subset and corrects its visual recommendations.",
+      "ref": "docs/proposals/card-corner-signal/README.md"
+    },
+    {
+      "note": "The current production Workbench card and panel remain the visual and interaction baseline to preserve.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T22:02:25Z",
+    "quote": "卡片顶的虚线和实线真的没必要；主要就是加一个 live 的效果，用已经有的右上角空间来表达 sub 状态。Ticket 点开后的 panel view 最 important 的是 recommended action。",
+    "ref": "conversation:2026-08-20-owner-corrects-production-task-state-ui"
+  },
+  "state": "active",
+  "summary": "Keep the production Ticket card visually stable: express truthful live activity and one upper-right substate, while making Recommended action the focused panel's dominant interaction",
+  "tags": [
+    "workbench",
+    "ticket-card",
+    "state",
+    "live-presence",
+    "substate",
+    "recommended-action",
+    "plugin",
+    "deepseek-harness"
+  ],
+  "type": "decision"
+}

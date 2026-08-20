@@ -1,0 +1,18 @@
+{
+  "acceptance_ids": [
+    "owner-selects-primary-and-substate-contract"
+  ],
+  "evidence_id": "owner-corrects-and-accepts-production-state-contract",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-20T22:02:25Z",
+  "refs": [
+    "conversation:2026-08-20-owner-corrects-production-task-state-ui",
+    ".vibehub/rooms/workbench/decision-workbench-state-signal-and-action-priority.yaml",
+    "docs/proposals/card-corner-signal/README.md",
+    "http://127.0.0.1:56222/"
+  ],
+  "schema_version": 1,
+  "summary": "After reviewing the clickable proposal, the owner accepted the bounded semantic direction but explicitly corrected its production visual and interaction contract. Production keeps the four-phase mental model without importing proposal-only card-top dashed/solid phase accents. New card behavior is limited to truthful trusted live presence and one existing upper-right slot for the deterministic substate. READY and RUNNING must remain visually distinct rather than sharing one color. In a focused Ticket panel, Recommended action is the dominant interaction; existing supporting panel and graph behavior remains minor and stable. In the current read-only Plugin, the recommended action primarily assembles and copies the exact context-aware prompt/handoff into Chat; a future DeepSeek Harness Plugin may make the same action native. This human decision is captured in the Workbench Context and explicitly authorizes production implementation under those corrections.",
+  "ticket_id": "ticket-decide-workbench-task-state-contract"
+}
