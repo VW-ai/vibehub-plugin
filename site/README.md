@@ -22,7 +22,7 @@ Agents must use the repository-local release Skill:
 site/release/SKILL.md
 ```
 
-It owns the exact-source Sites deployment, custom-domain guardrails, production
+It owns the exact-source Cloudflare Pages deployment, custom-domain guardrails, production
 verification, rollback, and VibeHub Evidence handoff. Run the complete local
 preflight before publishing:
 
@@ -34,13 +34,21 @@ After deployment, verify the canonical site mechanically:
 
 ```bash
 npm run release:verify
+npm run release:verify-www
 ```
 
-The site uses Next-compatible static export through vinext. The deployable Sites
-artifact is written to `dist/`. `.openai/hosting.json` stores only the existing
-Sites project ID and its intentionally empty D1/R2 bindings. Credentials, DNS
-validation values, live certificate state, and temporary deployment archives
-never belong in Git.
+The site uses Next-compatible static export through vinext. The deployable
+artifact is `dist/client`, uploaded directly to the existing Cloudflare Pages
+project `vibehub-website-v1`:
 
-`https://vibehub.icu` is the canonical production URL. Routine releases reuse
-its active custom-domain binding and do not edit DNS.
+```bash
+npm run release:deploy
+```
+
+The deploy command accepts only a clean committed source state and attaches its
+full Git commit to the Pages deployment. Credentials, OAuth state, DNS
+validation values, certificate state, and Wrangler logs never belong in Git.
+
+`https://vibehub.icu` is the canonical production URL. The `www` hostname is
+redirect-only and its release check preserves path and query. Routine releases
+reuse these active bindings and do not edit DNS.

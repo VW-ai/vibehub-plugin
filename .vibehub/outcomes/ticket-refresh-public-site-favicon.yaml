@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "favicon-is-current-mark-at-new-url",
+    "metadata-and-artifact-use-only-new-favicon",
+    "favicon-change-is-production-ready"
+  ],
+  "closed_at": "2026-08-20T20:23:37Z",
+  "evidence_ids": [
+    "public-site-favicon-cache-bust-implementation",
+    "public-site-favicon-production-build-verification",
+    "public-favicon-production-deployment-v2"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all three criteria. Fresh SHA-256 comparison proves site/public/vibehub-favicon.svg is byte-identical to the canonical VibeHub mark; the obsolete public/favicon.svg is absent. Metadata points standard and shortcut icons only to the new path, rendered contracts reject the legacy reference, and the static artifact contains the new SVG. Fresh release preflight, 8/8 rendered contracts, 104/104 repository tests, Plugin artifact, and canonical validation passed without changing visible site content. Sites version 2 deployment succeeded, live vibehub.icu references the cache-busting path, and an independent HTTPS fetch reproduced the exact checked-in SHA-256 digest.",
+  "ticket_id": "ticket-refresh-public-site-favicon",
+  "unresolved_acceptance_ids": []
+}

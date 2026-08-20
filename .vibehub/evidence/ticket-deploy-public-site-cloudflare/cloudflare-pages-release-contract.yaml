@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "repository-release-path-is-cloudflare-only",
+    "cloudflare-migration-is-regression-proven"
+  ],
+  "evidence_id": "cloudflare-pages-release-contract",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T21:05:23Z",
+  "refs": [
+    "commit:4d628ba713e5cb869e19dd7c2e28d5fe68626f77",
+    "command:node-site-release-scripts-release-mjs-preflight",
+    "command:npm-test-104-of-104",
+    "command:node-skills-scripts-vh-mjs-ticket-validate",
+    "file:site/release/SKILL.md",
+    "file:site/release/scripts/release.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Commit 4d628ba713e5cb869e19dd7c2e28d5fe68626f77 replaces the repository's Sites-specific publisher with one exact-build Cloudflare Pages Direct Upload contract for the existing vibehub-website-v1 project. The obsolete Sites project metadata and build plugin are absent; the release Skill, script, npm entry point, README, rendered contracts, and repository test bind one clean full-SHA deployment path without a second publisher. Fresh release preflight passed lint, the deterministic Vinext static build, and 9/9 rendered contracts. The complete repository suite passed 104/104, diff checks passed, and VibeHub validation passed for 71 Tickets, 201 pre-existing Evidence documents, and 59 Outcomes before these records.",
+  "ticket_id": "ticket-deploy-public-site-cloudflare"
+}

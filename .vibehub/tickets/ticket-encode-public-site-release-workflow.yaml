@@ -31,8 +31,8 @@
       "ref": ".vibehub/rooms/product/intent-reproducible-public-site-release.yaml"
     },
     {
-      "purpose": "Canonical existing Sites project identity and binding boundary.",
-      "ref": "site/.openai/hosting.json"
+      "purpose": "Accepted Outcome preserving the historical Sites release identity and proof after its checked-in metadata was superseded.",
+      "ref": ".vibehub/outcomes/ticket-encode-public-site-release-workflow.yaml"
     },
     {
       "purpose": "Current human-facing build and deployment instructions to narrow and correct.",
