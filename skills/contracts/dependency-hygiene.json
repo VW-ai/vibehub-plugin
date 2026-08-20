@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "owner": "vibehub-ticket-plan",
+  "scope": "newly-proposed-dependency-edges",
+  "classification": {
+    "depends_on": "A direct independently schedulable prerequisite whose successful Outcome supplies a required input or unlock for the dependent Ticket.",
+    "context_refs": "Completed product authority, implementation baseline, design constraint, or historical precedent that informs work without remaining an execution prerequisite, unless preserving the exact causal edge is itself required."
+  },
+  "candidate_done_dependency": {
+    "advice_code": "completed-dependency-review",
+    "level": "advisory",
+    "trigger": "A candidate adds a depends_on edge that is absent from the checked-in Ticket and whose target has a successful Outcome.",
+    "rationale_required": true,
+    "instruction": "Require an explicit causal rationale and review whether the completed target is still an exact input. Keep a justified historical dependency; otherwise replace the edge with an exact Ticket, Outcome, Evidence, Context, or source context_ref.",
+    "blocking": false
+  },
+  "preservation": {
+    "existing_edges": "Never delete or rewrite checked-in historical dependencies solely to reduce Current graph boundaries or archived stubs.",
+    "schema_validity": "A dependency on a DONE Ticket remains schema-valid and may be a legitimate causal input.",
+    "mutation": "Advice never silently changes a candidate Ticket."
+  }
+}

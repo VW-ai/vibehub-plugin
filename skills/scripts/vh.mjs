@@ -41,6 +41,10 @@ const VERSION_CONTRACT = JSON.parse(readFileSync(
   fileURLToPath(new URL("../contracts/versions.json", import.meta.url)),
   "utf8",
 ));
+const DEPENDENCY_HYGIENE = JSON.parse(readFileSync(
+  fileURLToPath(new URL("../contracts/dependency-hygiene.json", import.meta.url)),
+  "utf8",
+));
 const CURRENT_PROJECT_FORMAT = VERSION_CONTRACT.project_format;
 const CURRENT_TICKET_SCHEMA = VERSION_CONTRACT.document_schemas.ticket;
 const PROJECT_FORMAT_FILE = "version.yaml";
@@ -952,6 +956,42 @@ export function ticketArchived(repository, ticket) {
     && (ticket.deliveries ?? []).some((delivery) => delivery.state === "delivered");
 }
 
+function ticketDependencyKey(relation) {
+  return `${relation.type}:${relation.target_ticket_id}`;
+}
+
+export function candidateDependencyAdvice(currentRepository, candidateRepository, candidates) {
+  const advice = [];
+  candidates.forEach((candidate, candidateIndex) => {
+    const existing = currentRepository.tickets.documents.get(candidate.ticket_id)?.document;
+    const existingEdges = new Set((existing?.relations ?? []).map(ticketDependencyKey));
+    candidate.relations.forEach((relation, relationIndex) => {
+      if (existingEdges.has(ticketDependencyKey(relation))) return;
+      const target = candidateRepository.tickets.documents.get(relation.target_ticket_id)?.document;
+      if (!target || ticketStatus(candidateRepository, target) !== "DONE") return;
+      advice.push({
+        code: DEPENDENCY_HYGIENE.candidate_done_dependency.advice_code,
+        level: DEPENDENCY_HYGIENE.candidate_done_dependency.level,
+        blocking: DEPENDENCY_HYGIENE.candidate_done_dependency.blocking,
+        relation_path: `tickets[${candidateIndex}].relations[${relationIndex}]`,
+        ticket_id: candidate.ticket_id,
+        target_ticket_id: relation.target_ticket_id,
+        rationale: relation.rationale ?? null,
+        rationale_present: typeof relation.rationale === "string" && relation.rationale.trim() !== "",
+        message: DEPENDENCY_HYGIENE.candidate_done_dependency.instruction,
+        suggested_context_refs: [
+          `.vibehub/tickets/${relation.target_ticket_id}.yaml`,
+          `.vibehub/outcomes/${relation.target_ticket_id}.yaml`,
+        ],
+      });
+    });
+  });
+  return advice.sort((left, right) =>
+    left.ticket_id.localeCompare(right.ticket_id)
+    || left.target_ticket_id.localeCompare(right.target_ticket_id)
+    || left.relation_path.localeCompare(right.relation_path));
+}
+
 function ticketRoomPaths(ticket) {
   return ticket.context_refs.flatMap(({ ref }) => {
     const match = ref.match(/^\.vibehub\/rooms\/(.+)\/[^/]+\.yaml$/u);
@@ -1085,15 +1125,23 @@ function ticketOperation(operation, repo, input, options = {}) {
       ids.add(ticket.ticket_id);
     }
     assertValid(errors, "Ticket candidate is invalid");
+    const currentRepository = loadRepository(repo);
+    assertValid(currentRepository.errors);
     const repository = loadRepository(repo, { tickets: input.tickets });
     assertValid(repository.errors);
+    const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
     const written = [];
     for (const ticket of input.tickets) {
       const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
       writeDocument(path, ticket);
       written.push(path);
     }
-    return { status: "written", ticket_ids: input.tickets.map((ticket) => ticket.ticket_id), paths: written };
+    return {
+      status: "written",
+      ticket_ids: input.tickets.map((ticket) => ticket.ticket_id),
+      paths: written,
+      advice,
+    };
   }
   if (operation === "evidence") {
     assertCurrentProjectFormat(repo);

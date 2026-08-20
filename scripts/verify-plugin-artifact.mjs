@@ -61,6 +61,7 @@ try {
     "skills/contracts/ticket.schema.json",
     "skills/contracts/evidence.schema.json",
     "skills/contracts/acceptance-authority.md",
+    "skills/contracts/dependency-hygiene.json",
   ]) {
     if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
   }
@@ -96,7 +97,8 @@ try {
     "ticket-lifecycle.json",
   ), "utf8"));
   if (lifecycle.presenter !== "vibehub-ticket-review"
-    || lifecycle.resource_policy?.cross_task_discovery !== "forbidden") {
+    || lifecycle.resource_policy?.cross_task_discovery !== "forbidden"
+    || lifecycle.planning_contracts?.dependency_hygiene !== "../../contracts/dependency-hygiene.json") {
     throw new Error("installed Ticket lifecycle contract is invalid");
   }
 

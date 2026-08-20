@@ -126,6 +126,24 @@ test("skills point at their governing shared references", () => {
       `${name} misses the acceptance authority pointer`,
     );
   }
+
+  const dependencyHygiene = "contracts/dependency-hygiene.json";
+  const dependencyContract = JSON.parse(readFileSync(join(root, "skills", dependencyHygiene), "utf8"));
+  assert.equal(dependencyContract.owner, "vibehub-ticket-plan");
+  assert.equal(dependencyContract.scope, "newly-proposed-dependency-edges");
+  assert.match(dependencyContract.classification.depends_on, /direct independently schedulable prerequisite/u);
+  assert.match(dependencyContract.classification.context_refs, /Completed product authority/u);
+  assert.equal(dependencyContract.candidate_done_dependency.advice_code, "completed-dependency-review");
+  assert.equal(dependencyContract.candidate_done_dependency.blocking, false);
+  assert.equal(dependencyContract.candidate_done_dependency.rationale_required, true);
+  assert.match(dependencyContract.preservation.existing_edges, /Never delete or rewrite/u);
+  assert.match(dependencyContract.preservation.schema_validity, /remains schema-valid/u);
+  for (const name of ["vibehub-ticket-plan", "vibehub-ticket-validate"]) {
+    assert.ok(
+      bodies.get(name).includes(`../${dependencyHygiene}`),
+      `${name} misses the dependency hygiene pointer`,
+    );
+  }
 });
 
 test("human decision boundaries stay in the Ticket graph", () => {

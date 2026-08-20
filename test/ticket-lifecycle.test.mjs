@@ -38,6 +38,10 @@ function readLifecycle() {
 function validateLifecycle(contract) {
   assert.equal(contract.schema_version, 1);
   assert.equal(contract.presenter, "vibehub-ticket-review");
+  assert.equal(
+    contract.planning_contracts.dependency_hygiene,
+    "../../contracts/dependency-hygiene.json",
+  );
   assert.equal(contract.resource_policy.scope, "current-agent-task");
   assert.equal(contract.resource_policy.reuse_live_host, true);
   assert.equal(contract.resource_policy.reuse_browser_tab, true);

@@ -45,6 +45,66 @@ function exerciseInstalledHelper(helper, label) {
   assert.equal(invoke(helper, current, "project", "init").status, 0);
   const currentCompatibility = invoke(helper, current, "project", "compatibility");
 
+  const baseTicket = {
+    schema_version: 2,
+    kind: "ticket",
+    ticket_id: "completed-baseline",
+    outcome: "The baseline is complete.",
+    deliveries: [],
+    context: "Cross-host dependency advice fixture.",
+    acceptance: [{ acceptance_id: "works", criterion: "The baseline works." }],
+    constraints: [],
+    context_refs: [],
+    relations: [],
+    provenance_refs: ["test:host-marketplaces"],
+  };
+  assert.equal(invoke(helper, current, "ticket", "apply", { tickets: [baseTicket] }).status, 0);
+  assert.equal(invoke(helper, current, "ticket", "evidence", {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "baseline-proof",
+    ticket_id: "completed-baseline",
+    acceptance_ids: ["works"],
+    summary: "The installed baseline passed.",
+    refs: ["test:host-marketplaces"],
+    recorded_at: "2026-08-20T00:00:00.000Z",
+  }).status, 0);
+  assert.equal(invoke(helper, current, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "completed-baseline",
+    status: "successful",
+    accepted_acceptance_ids: ["works"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: ["baseline-proof"],
+    summary: "The installed baseline was independently accepted.",
+    closed_at: "2026-08-20T00:01:00.000Z",
+  }).status, 0);
+  const consumer = {
+    ...baseTicket,
+    ticket_id: "candidate-consumer",
+    outcome: "The candidate consumes the baseline.",
+    relations: [{
+      type: "depends_on",
+      target_ticket_id: "completed-baseline",
+      rationale: "Consumes the exact completed artifact.",
+    }],
+  };
+  const advised = invoke(helper, current, "ticket", "apply", { tickets: [consumer] });
+  assert.equal(advised.status, 0);
+  assert.deepEqual(
+    advised.envelope.data.advice.map(({ code, level, blocking, ticket_id, target_ticket_id }) => ({
+      code, level, blocking, ticket_id, target_ticket_id,
+    })),
+    [{
+      code: "completed-dependency-review",
+      level: "advisory",
+      blocking: false,
+      ticket_id: "candidate-consumer",
+      target_ticket_id: "completed-baseline",
+    }],
+  );
+
   const migration = temporaryRoot(`vibehub-${label}-migration-`);
   mkdirSync(join(migration, ".vibehub", "rooms"), { recursive: true });
   const migrationCompatibility = invoke(helper, migration, "project", "compatibility");
@@ -66,6 +126,7 @@ function exerciseInstalledHelper(helper, label) {
     migration: migrationCompatibility.envelope.data.state,
     migrationDetected: migrationCompatibility.envelope.data.detected_format,
     newer: newerCompatibility.envelope.data.state,
+    dependencyAdvice: advised.envelope.data.advice[0].code,
   };
 }
 
@@ -77,6 +138,7 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
   for (const pluginRoot of [codex.pluginRoot, claude.pluginRoot]) {
     assert.ok(existsSync(join(pluginRoot, "skills", "contracts", "project-format.schema.json")));
     assert.ok(existsSync(join(pluginRoot, "skills", "contracts", "acceptance-authority.md")));
+    assert.ok(existsSync(join(pluginRoot, "skills", "contracts", "dependency-hygiene.json")));
     assert.ok(existsSync(join(pluginRoot, "skills", "vibehub-migrate", "references", "migrations.json")));
   }
   const codexVersion = JSON.parse(
@@ -94,6 +156,7 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
   for (const relativePath of [
     join("skills", "contracts", "project-format.schema.json"),
     join("skills", "contracts", "acceptance-authority.md"),
+    join("skills", "contracts", "dependency-hygiene.json"),
     join("skills", "vibehub-migrate", "references", "migrations.json"),
   ]) {
     assert.equal(
@@ -115,6 +178,7 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
     migration: "MIGRATION_REQUIRED",
     migrationDetected: "0.5-unversioned",
     newer: "UNSUPPORTED_NEWER",
+    dependencyAdvice: "completed-dependency-review",
   });
   assert.deepEqual(claudeBehavior, codexBehavior);
 });
