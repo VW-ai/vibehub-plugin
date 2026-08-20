@@ -58,6 +58,14 @@ instruction.
    node site/release/scripts/release.mjs verify https://vibehub.icu
    ```
 
+   Verify the redirect-only `www` hostname separately. Both HTTP and HTTPS
+   must return a permanent redirect to the canonical apex while preserving the
+   exact path and query:
+
+   ```text
+   node site/release/scripts/release.mjs verify-www
+   ```
+
 7. Open the canonical site for the user. Record acceptance-linked VibeHub
    Evidence with the exact source commit, saved Sites version or deployment
    reference, public URL, and successful verification result. Do not record

@@ -34,6 +34,7 @@ After deployment, verify the canonical site mechanically:
 
 ```bash
 npm run release:verify
+npm run release:verify-www
 ```
 
 The site uses Next-compatible static export through vinext. The deployable Sites
@@ -42,5 +43,6 @@ Sites project ID and its intentionally empty D1/R2 bindings. Credentials, DNS
 validation values, live certificate state, and temporary deployment archives
 never belong in Git.
 
-`https://vibehub.icu` is the canonical production URL. Routine releases reuse
-its active custom-domain binding and do not edit DNS.
+`https://vibehub.icu` is the canonical production URL. The `www` hostname is
+redirect-only and its release check preserves path and query. Routine releases
+reuse these active bindings and do not edit DNS.
