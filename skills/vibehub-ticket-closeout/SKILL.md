@@ -12,6 +12,9 @@ Read `../contracts/acceptance-authority.md`. A human-authority criterion can be
 accepted only when the Outcome references Evidence with `origin: human` that
 faithfully records explicit human input. Agent-origin Evidence may support the
 record but cannot substitute for that judgment.
+Read `../contracts/ticket-next-action.md`. The normal closeout entry is
+`next_action.action: CLOSE_OUT`; full Evidence coverage still requires this
+independent adjudication and never creates success automatically.
 This Skill owns `closeout-recorded`; it does not own UI launch mechanics.
 
 1. Read the exact Ticket, diff, tests, and all Evidence:

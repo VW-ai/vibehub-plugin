@@ -49,9 +49,20 @@ function fixture() {
     tickets: [
       foundation,
       feature,
+      ticket("closeout-ready"),
       ticket("unsuccessful"),
       ticket("blocked", ["unsuccessful"]),
     ],
+  }).status, 0);
+  assert.equal(run(repo, "ticket", "evidence", {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "closeout-ready-proof",
+    ticket_id: "closeout-ready",
+    acceptance_ids: ["works"],
+    summary: "The current acceptance has reproducible proof.",
+    refs: ["test:closeout-ready"],
+    recorded_at: NOW,
   }).status, 0);
   assert.equal(run(repo, "ticket", "evidence", {
     schema_version: 1,
@@ -122,6 +133,7 @@ test("direct YAML projection exposes graph topology and operational states", () 
     ])),
     {
       blocked: "BLOCKED",
+      "closeout-ready": "READY",
       feature: "READY",
       foundation: "DONE",
       unsuccessful: "DEVIATED",
@@ -131,10 +143,24 @@ test("direct YAML projection exposes graph topology and operational states", () 
   assert.deepEqual(
     Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
       item.ticketId,
+      item.capabilities.nextAction.summary.action,
+    ])),
+    {
+      blocked: "WAIT",
+      "closeout-ready": "CLOSE_OUT",
+      feature: "NEEDS_HUMAN",
+      foundation: "DONE",
+      unsuccessful: "REPLAN",
+    },
+  );
+  assert.deepEqual(
+    Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
+      item.ticketId,
       item.capabilities.attention.summary.label,
     ])),
     {
       blocked: "NONE",
+      "closeout-ready": "NONE",
       feature: "PENDING",
       foundation: "COMPLETE",
       unsuccessful: "NONE",
@@ -197,6 +223,86 @@ test("human attention projection distinguishes upcoming, pending, recorded, and 
     ).capabilities.operational.summary.label,
     "READY",
   );
+});
+
+test("Workbench projection preserves the observed execution and adjudication corpus", () => {
+  const repo = tempRepo("ui-closeout-corpus");
+  repos.push(repo);
+  assert.equal(run(repo, "project", "init").status, 0);
+  const partial = ticket("partial");
+  partial.acceptance.push({
+    acceptance_id: "second",
+    criterion: "the second condition is observed.",
+  });
+  const humanMissing = ticket("human-missing");
+  humanMissing.acceptance[0].authority = "human";
+  const humanComplete = ticket("human-complete");
+  humanComplete.acceptance[0].authority = "human";
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [
+      ticket("zero"),
+      partial,
+      ticket("agent-complete"),
+      humanMissing,
+      humanComplete,
+      ticket("successful"),
+      ticket("failed"),
+    ],
+  }).status, 0);
+  for (const [ticketId, acceptanceIds, origin = "agent"] of [
+    ["partial", ["works"]],
+    ["agent-complete", ["works"]],
+    ["human-complete", ["works"], "human"],
+    ["successful", ["works"]],
+  ]) {
+    assert.equal(run(repo, "ticket", "evidence", {
+      schema_version: 1,
+      kind: "ticket_evidence",
+      evidence_id: `${ticketId}-proof`,
+      ticket_id: ticketId,
+      acceptance_ids: acceptanceIds,
+      summary: `${ticketId} has bounded proof.`,
+      refs: [origin === "human" ? `conversation:${ticketId}` : `test:${ticketId}`],
+      origin,
+      recorded_at: NOW,
+    }).status, 0);
+  }
+  assert.equal(run(repo, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "successful",
+    status: "successful",
+    accepted_acceptance_ids: ["works"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: ["successful-proof"],
+    summary: "Independent adjudication accepted the Ticket.",
+    closed_at: NOW,
+  }).status, 0);
+  assert.equal(run(repo, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "failed",
+    status: "failed",
+    accepted_acceptance_ids: [],
+    unresolved_acceptance_ids: ["works"],
+    evidence_ids: [],
+    summary: "Independent adjudication rejected the Ticket.",
+    closed_at: NOW,
+  }).status, 0);
+
+  const snapshot = buildUiSnapshot(repo, { scope: "all" });
+  assert.deepEqual(Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
+    item.ticketId,
+    item.capabilities.nextAction.summary.action,
+  ])), {
+    "agent-complete": "CLOSE_OUT",
+    failed: "REPLAN",
+    "human-complete": "CLOSE_OUT",
+    "human-missing": "NEEDS_HUMAN",
+    partial: "EXECUTE",
+    successful: "DONE",
+    zero: "EXECUTE",
+  });
 });
 
 test("invalid canonical documents fail before UI projection", () => {
@@ -411,6 +517,18 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(health.headers.get("content-security-policy"), /default-src 'self'/u);
   assert.equal(health.headers.get("access-control-allow-origin"), null);
 
+  const favicon = await fetch(`${origin}/vibehub-mark.svg`);
+  assert.equal(favicon.status, 200);
+  assert.equal(favicon.redirected, false);
+  assert.equal(favicon.headers.get("content-type"), "image/svg+xml");
+  assert.deepEqual(
+    Buffer.from(await favicon.arrayBuffer()),
+    readFileSync(new URL("../assets/brand/vibehub-mark.svg", import.meta.url)),
+  );
+  const faviconHead = await fetch(`${origin}/vibehub-mark.svg`, { method: "HEAD" });
+  assert.equal(faviconHead.status, 200);
+  assert.equal(faviconHead.headers.get("content-type"), "image/svg+xml");
+
   const unauthorized = await fetch(`${origin}/api/state`);
   assert.equal(unauthorized.status, 401);
   assert.equal((await unauthorized.json()).error.code, "unauthorized");
@@ -418,7 +536,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const stateResponse = await fetch(`${origin}/api/state`, authorized(token));
   assert.equal(stateResponse.status, 200);
   const state = (await stateResponse.json()).data;
-  assert.equal(state.graph.tickets.length, 4);
+  assert.equal(state.graph.tickets.length, 5);
   assert.equal(state.graph.relations.length, 2);
   assert.equal(state.interventions.review.available, false);
   assert.deepEqual(state.interventions.authority, {
@@ -431,6 +549,12 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(state.graph.source.agentPayload.kind, "vibehub_git_source");
   assert.equal(state.graph.filters.scope, "current");
   assert.deepEqual(state.graph.stubs, []);
+  for (const ticket of state.graph.tickets) {
+    assert.deepEqual(ticket.capabilities.runtime, {
+      availability: "unavailable",
+      reason: "No trusted runtime source is connected to this read-only host.",
+    });
+  }
 
   const invalidFilter = await fetch(
     `${origin}/api/state?scope=past`,
@@ -454,9 +578,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(subject.contextPackage.attention.label, "COMPLETE");
   assert.equal(subject.contextPackage.maturity, "firm");
   assert.equal(subject.contextPackage.operationalState, "DONE");
+  assert.equal(subject.contextPackage.nextAction.action, "DONE");
   assert.equal(subject.contextPackage.agentPayload.kind, "vibehub_ticket_handoff");
   assert.equal(subject.contextPackage.agentPayload.maturity, "firm");
   assert.equal(subject.contextPackage.agentPayload.operationalState, "DONE");
+  assert.equal(subject.contextPackage.agentPayload.nextAction.action, "DONE");
   assert.deepEqual(subject.contextPackage.agentPayload.humanBoundaries, [{
     acceptanceId: "works",
     criterion: "foundation behavior is observed.",
@@ -483,6 +609,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(featureSubject.contextPackage.contextRefs[1].canonicalContext, null);
   assert.equal("actions" in featureSubject.contextPackage.contextRefs[1], false);
   assert.equal(featureSubject.contextPackage.attention.label, "PENDING");
+  assert.equal(featureSubject.contextPackage.nextAction.action, "NEEDS_HUMAN");
   assert.deepEqual(
     featureSubject.contextPackage.agentPayload.humanBoundaries.map(
       (item) => [item.acceptanceId, item.criterion, item.evidenceState],
@@ -500,10 +627,42 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     authorized(token),
   )).json()).data;
   assert.equal(unsuccessfulSubject.contextPackage.operationalState, "DEVIATED");
+  assert.equal(unsuccessfulSubject.contextPackage.nextAction.action, "REPLAN");
   assert.equal(
     unsuccessfulSubject.contextPackage.agentPayload.operationalState,
     "DEVIATED",
   );
+
+  const closeoutQuery = new URLSearchParams({
+    snapshotId: state.graph.snapshotId,
+    kind: "ticket",
+    ticketId: "closeout-ready",
+  });
+  const closeoutSubject = (await (await fetch(
+    `${origin}/api/subject?${closeoutQuery}`,
+    authorized(token),
+  )).json()).data;
+  const closeoutPayload = closeoutSubject.contextPackage.agentPayload;
+  assert.equal(closeoutSubject.contextPackage.nextAction.action, "CLOSE_OUT");
+  assert.equal(closeoutSubject.contextPackage.evidence.length, 1);
+  assert.equal(closeoutPayload.ticketRef, ".vibehub/tickets/closeout-ready.yaml");
+  assert.equal(closeoutPayload.acceptance[0].authority, "agent");
+  assert.equal(closeoutPayload.evidence[0].evidenceId, "closeout-ready-proof");
+  assert.deepEqual(closeoutPayload.evidence[0].acceptanceIds, ["works"]);
+  assert.equal(closeoutPayload.outcomeRecord, null);
+  assert.equal(closeoutPayload.handoff.action, "CLOSE_OUT");
+  assert.equal(closeoutPayload.handoff.skill, "vibehub-ticket-closeout");
+  assert.equal(closeoutPayload.handoff.requiresIndependentAgent, true);
+  assert.equal(closeoutPayload.handoff.readOnly, true);
+  assert.equal("presentation" in closeoutPayload, false);
+  assert.equal("phase" in closeoutPayload, false);
+  assert.equal("substate" in closeoutPayload, false);
+  assert.match(closeoutPayload.handoff.instruction, /independently adjudicate/iu);
+  assert.match(closeoutPayload.handoff.instruction, /do not execute it again/iu);
+  assert.deepEqual(closeoutPayload.reviewInputs.evidenceRefs, [
+    ".vibehub/evidence/closeout-ready/closeout-ready-proof.yaml",
+  ]);
+  assert.equal(closeoutPayload.reviewInputs.outcomeRef, null);
 
   const trace = (await (await fetch(
     `${origin}/api/trace?${ticketQuery}`,
@@ -528,6 +687,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   });
   assert.equal(readOnly.status, 405);
   assert.equal((await readOnly.json()).error.code, "read_only");
+  const faviconWrite = await fetch(`${origin}/vibehub-mark.svg`, { method: "POST" });
+  assert.equal(faviconWrite.status, 405);
+  assert.equal((await faviconWrite.json()).error.code, "read_only");
 
   const html = await (await fetch(`${origin}/`)).text();
   const model = await (await fetch(`${origin}/app-model.js`)).text();
@@ -535,6 +697,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const script = await (await fetch(`${origin}/app.js`)).text();
   const styles = await (await fetch(`${origin}/app.css`)).text();
   assert.match(html, /class="app-shell"/u);
+  assert.match(
+    html,
+    /<link rel="icon" type="image\/svg\+xml" href="\/vibehub-mark\.svg">/u,
+  );
   assert.match(html, /id="copyLink"/u);
   assert.match(html, /src="\/app-model\.js"/u);
   assert.match(html, /src="\/app-layout\.js"/u);
@@ -549,12 +715,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(html, /id="overviewPanel"/u);
   assert.match(html, /aria-controls="overviewPanel"/u);
   assert.match(html, /id="closeOverview"/u);
-  assert.match(html, /aria-label="Ticket state legend"/u);
-  assert.match(html, /aria-label="Human attention legend"/u);
+  assert.match(html, /aria-label="Ticket phase legend"/u);
+  assert.doesNotMatch(html, /Human attention legend/u);
   assert.doesNotMatch(html, /id="frontierList"|id="attentionList"|id="deviationList"/u);
   assert.match(html, /id="summaryGrid"/u);
-  assert.match(html, /id="summaryRefine"/u);
-  assert.match(html, /id="summaryHuman"/u);
+  for (const id of ["summaryDraft", "summaryReady", "summaryRunning", "summaryDone"]) {
+    assert.match(html, new RegExp(`id="${id}"`, "u"));
+  }
+  assert.doesNotMatch(html, /id="closeoutQueue"|Independent closeout/u);
   assert.doesNotMatch(html, /id="overviewSource"/u);
   assert.match(html, /id="sourcePath"/u);
   assert.match(html, /id="sourceBranch"/u);
@@ -580,16 +748,22 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /ARCHIVED delivery history/u);
   assert.match(script, /preserveLayout/u);
   assert.match(script, /layoutDirection === "ltr"/u);
-  // No trusted Active-Run source exists, so the shell makes no presence claim
-  // and never promotes Git-native state into an implementing subsystem.
+  // The production host makes runtime unavailability explicit. Only an
+  // injected trusted, scoped, unexpired capability can promote presentation.
   assert.doesNotMatch(script, /ACTIVE_RUN_PRESENCE|renderImplementingNow/u);
   assert.doesNotMatch(script, /"IMPLEMENTING"/u);
+  assert.match(model, /function ticketRuntimeState/u);
+  assert.match(model, /summary\.trustedSource/u);
+  assert.match(model, /expiresAt <= now/u);
   // No visual preference is ever persisted by the product surface.
   assert.doesNotMatch(script, /localStorage|sessionStorage/u);
   assert.doesNotMatch(script, /renderProjectionTime|startWatchPolling|state\.watch/u);
-  // Copy for Agent only hands out a ticket-run instruction for READY Tickets.
-  assert.match(model, /stateLabel === "READY"/u);
-  assert.match(model, /stateLabel === "REFINE"/u);
+  // Copy for Agent consumes the host-derived next action instead of inferring
+  // routing from operational status or Evidence count in the browser.
+  assert.match(model, /function ticketNextAction/u);
+  assert.match(model, /action === "EXECUTE"/u);
+  assert.match(model, /action === "CLOSE_OUT"/u);
+  assert.match(model, /action === "NEEDS_HUMAN"/u);
   assert.match(model, /vibehub-ticket-run/u);
   assert.match(model, /vibehub-ticket-plan/u);
   assert.match(model, /vibehub-ticket-review/u);
@@ -605,10 +779,18 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(model, /function normalizeLayoutDirection/u);
   assert.match(model, /function layoutDirectionHref/u);
   assert.match(model, /function workbenchOverview/u);
+  assert.match(model, /action === "CLOSE_OUT" \|\| runtimeEligible/u);
   assert.match(script, /\["log", "evidence"\]/u);
   assert.match(script, /initialFocusPending/u);
   assert.match(script, /initialTabId = "execution"/u);
   assert.match(script, /function ticketExecutionPanel/u);
+  assert.doesNotMatch(script, /function renderCloseoutQueue/u);
+  assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
+  assert.match(script, /label: "Copy prompt"/u);
+  assert.match(script, /label\.dataset\.fullText = nextAction\?\.detail/u);
+  assert.match(script, /label\.setAttribute\("aria-describedby", "textTooltip"\)/u);
+  assert.match(script, /function closeoutReviewBrief/u);
+  assert.match(script, /Evidence is proof, not judgment/u);
   assert.match(model, /function ticketAttentionState/u);
   assert.match(script, /function humanAttentionBrief/u);
   assert.match(script, /Human evidence pending/u);
@@ -671,11 +853,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /inspectorOutcome\.textContent = operational\?\.detail/u);
   assert.match(script, /history\.replaceState\(null, "", nextHref\)/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
-  assert.match(styles, /\.ticket-node\.state-deviated/u);
-  assert.match(styles, /\.ticket-node\.state-refine/u);
-  assert.match(styles, /\.minimap-node\.state-refine/u);
-  assert.match(styles, /\.execution-state\.state-refine/u);
-  assert.match(styles, /\.ticket-node\.attention-pending \.ticket-attention/u);
+  assert.match(styles, /\.ticket-node\.phase-draft/u);
+  assert.match(styles, /\.ticket-node\.phase-running/u);
+  assert.match(styles, /\.minimap-node\.phase-draft/u);
+  assert.match(styles, /\.execution-state\.phase-draft/u);
+  assert.match(styles, /\.ticket-node\.substate-needs-you \.ticket-substate-badge/u);
   assert.match(styles, /\.human-attention-brief\.attention-pending/u);
   assert.match(styles, /\.acceptance-item\.authority-human/u);
   assert.match(styles, /\.ticket-node:focus-visible,[\s\S]*?outline: none;/u);
@@ -693,6 +875,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(styles, /\.overview-source/u);
   assert.doesNotMatch(styles, /\.overview-item/u);
   assert.match(styles, /\.summary-grid/u);
+  assert.doesNotMatch(styles, /\.closeout-overview|\.closeout-ticket/u);
+  assert.match(styles, /\.ticket-node\.phase-running/u);
+  assert.match(styles, /\.ticket-node\.substate-verifying/u);
+  assert.match(styles, /\.recommended-action/u);
+  assert.match(styles, /\.closeout-review-brief/u);
   assert.match(styles, /min-height: 44px/u);
   assert.doesNotMatch(styles, /style-lab|style-option|style-swatch/u);
   assert.match(styles, /\.inspector-disclosure/u);
@@ -726,7 +913,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     `${origin}/api/state`,
     authorized(token),
   )).json()).data;
-  assert.equal(refreshed.graph.tickets.length, 5);
+  assert.equal(refreshed.graph.tickets.length, 6);
   assert.notEqual(refreshed.graph.snapshotId, state.graph.snapshotId);
   const draftQuery = new URLSearchParams({
     snapshotId: refreshed.graph.snapshotId,
@@ -739,6 +926,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   )).json()).data;
   assert.equal(draftSubject.contextPackage.maturity, "draft");
   assert.equal(draftSubject.contextPackage.operationalState, "REFINE");
+  assert.equal(draftSubject.contextPackage.nextAction.action, "REFINE");
   assert.equal(draftSubject.contextPackage.agentPayload.maturity, "draft");
   assert.equal(draftSubject.contextPackage.agentPayload.operationalState, "REFINE");
 });

@@ -15,12 +15,15 @@ Agent-authority criteria autonomously. It must not satisfy a human-authority
 criterion, set `origin: human`, or treat its own recommendation as the user's
 decision; only explicit human input with a readable reference can become
 human-origin Evidence.
+Read `../contracts/ticket-next-action.md`. Routine execution starts only from
+`next_action.action: EXECUTE`; status `READY` alone may instead route to human
+input or independent closeout.
 This Skill owns `ready-execution` and `execution-needs-human`; it does not own
 UI launch mechanics.
 
 ## Workflow
 
-1. Read the READY frontier and select the Ticket requested by the user:
+1. Read `ready_to_execute` from the frontier and select the requested Ticket:
 
    ```text
    node ../scripts/vh.mjs ticket frontier --repo <root>
@@ -50,8 +53,14 @@ UI launch mechanics.
    node ../scripts/vh.mjs ticket evidence --repo <root> --input <evidence.json>
    ```
 
-5. Hand the Ticket, diff, and Evidence to a separate Agent using
-   `$vibehub-ticket-closeout`. The executor never certifies its own success.
+5. Read the exact Ticket back after Evidence is appended. If its host-derived
+   `next_action.action` is `CLOSE_OUT`, hand the exact Ticket, current
+   Acceptance and authority, Evidence, diff or Git refs, and tests to a
+   separate Agent using `$vibehub-ticket-closeout`. Do not start another Run
+   merely because operational status still says READY. If it is
+   `NEEDS_HUMAN`, follow the human boundary below; other actions retain their
+   owner from the shared lifecycle routing. The executor never certifies its
+   own success.
 
 Stop only when execution reaches a human-authority criterion, missing
 permission, or material deviation. For `execution-needs-human`, ask

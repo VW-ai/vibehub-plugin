@@ -13,36 +13,56 @@ test("production Workbench uses the selected global visual language", () => {
   assert.match(css, /--mono:\s*ui-monospace/u);
   assert.match(html, /class="icon-sprite"/u);
   for (const id of [
-    "check", "play", "lock", "sliders", "alert", "archive",
+    "check", "play", "running", "lock", "sliders", "alert", "archive",
     "upcoming", "pending", "recorded", "complete",
   ]) assert.match(html, new RegExp(`id="icon-${id}"`, "u"));
   assert.equal(/[☝○●✓✦⚠🔒▶◉◌▣≡⎇□⌗↗]/u.test(html), false);
 });
 
-test("production graph keeps operational, archive, and attention treatments independent", () => {
-  for (const state of ["done", "ready", "blocked", "refine", "deviated"]) {
-    assert.match(css, new RegExp(`\\.ticket-node\\.state-${state} \\.ticket-boundary \\{ fill:`, "u"));
+test("production graph keeps four phases, one substate slot, archive, and live independent", () => {
+  for (const phase of ["draft", "ready", "running", "done"]) {
+    assert.match(css, new RegExp(`\\.ticket-node\\.phase-${phase} \\.ticket-boundary \\{ fill:`, "u"));
   }
   assert.match(css, /\.ticket-node\.archived \.ticket-boundary \{ fill:/u);
   assert.match(css, /\.ticket-node\.archived \.ticket-boundary[\s\S]*stroke-dasharray/u);
-  for (const attention of ["upcoming", "pending", "recorded", "complete"]) {
-    assert.match(css, new RegExp(`\\.ticket-node\\.attention-${attention} \\.ticket-attention-badge`, "u"));
+  for (const substate of ["blocked", "needs-you", "deviated", "verifying", "waiting"]) {
+    assert.match(css, new RegExp(`\\.ticket-node\\.substate-${substate} \\.ticket-substate-badge`, "u"));
   }
   assert.match(script, /STATE_ICON_IDS/u);
-  assert.match(script, /ATTENTION_ICON_IDS/u);
+  assert.match(script, /SUBSTATE_ICON_IDS/u);
   assert.match(script, /ticket-state-icon/u);
-  assert.match(script, /ticket-attention-badge/u);
+  assert.match(script, /ticket-substate-badge/u);
+  assert.doesNotMatch(script, /class: "ticket-accent"/u);
+  assert.match(script, /ticket-live-indicator/u);
+  assert.match(css, /@keyframes ticket-live-pulse/u);
 });
 
-test("production canvas counts and Overview are compact two-axis legends", () => {
-  assert.match(html, /Ticket state and human attention summary/u);
-  assert.match(html, /aria-label="Ticket state legend"/u);
-  assert.match(html, /aria-label="Human attention legend"/u);
+test("archived history stubs remain legible, anchored, and keyboard explicit", () => {
+  assert.match(script, /graphLayoutModel\.historyStubGeometry/u);
+  assert.match(script, /class: "history-stub-link"/u);
+  assert.match(script, /class: "history-stub-label"/u);
+  assert.match(script, /class: "history-stub-action"/u);
+  assert.match(script, /reveal next hop: \$\{nextTicketLabel\}/u);
+  assert.match(script, /querySelector\(`\[data-ticket-id="\$\{CSS\.escape\(revealedTicket\)\}"\]`\)[\s\S]*\.focus\(\)/u);
+  assert.match(css, /\.history-stub-boundary \{[\s\S]*fill: var\(--surface-solid\);/u);
+  assert.match(css, /\.history-stub-label \{[\s\S]*fill: var\(--ink\);[\s\S]*font: 650 10px/u);
+  assert.match(css, /\.history-stub:focus-visible \.history-stub-boundary \{[\s\S]*stroke: var\(--focus\);/u);
+  assert.match(css, /\.history-stub-link \{[\s\S]*stroke-dasharray/u);
+});
+
+test("production canvas exposes exactly four primary phases and one compact substate channel", () => {
+  assert.match(html, /Ticket phase and attention summary/u);
+  assert.match(html, /aria-label="Ticket phase legend"/u);
+  assert.doesNotMatch(html, /Human attention legend/u);
   assert.match(script, /renderGraphSummary/u);
   assert.match(
     script,
-    /add\(counts\.DONE, "DONE", "check", "state-done"\);[\s\S]*add\(counts\.READY/u,
+    /add\(counts\.RUNNING, "RUNNING", "running", "phase-running"\);[\s\S]*add\(counts\.READY, "READY"[\s\S]*add\(counts\.DRAFT, "DRAFT"[\s\S]*add\(counts\.DONE, "DONE"/u,
   );
+  assert.doesNotMatch(html, /id="closeoutQueue"/u);
+  for (const id of ["summaryDraft", "summaryReady", "summaryRunning", "summaryDone"]) {
+    assert.match(html, new RegExp(`id="${id}"`, "u"));
+  }
   assert.match(script, /"NEEDS YOU"/u);
   for (const banned of [
     "Execution flow",
@@ -51,6 +71,27 @@ test("production canvas counts and Overview are compact two-axis legends", () =>
     "Owner decision follows this proposal",
     "No Active Run proven",
   ]) assert.equal(html.includes(banned), false);
+});
+
+test("focused Ticket makes the exact copy handoff the dominant recommended action", () => {
+  assert.match(script, /className = classes\("recommended-action"/u);
+  assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
+  assert.match(script, /label: "Copy prompt"/u);
+  assert.match(script, /if \(contextPackage\.agentPayload\) return canonical;/u);
+  assert.match(css, /\.recommended-action-title \{[\s\S]*font-size: 15px/u);
+  assert.match(css, /\.recommended-action \.agent-handoff \{[\s\S]*background: var\(--ink\)/u);
+});
+
+test("card phase pair is label-relative and action detail stays on demand", () => {
+  assert.match(script, /const labelWidth = stateLabel\.getComputedTextLength\(\)/u);
+  assert.match(script, /NODE\.width - 14 - labelWidth - 18/u);
+  assert.match(script, /y: NODE\.height - 22/u);
+  assert.match(script, /label\.className = "recommended-action-title"/u);
+  assert.match(script, /label\.tabIndex = 0/u);
+  assert.match(script, /label\.dataset\.fullText = nextAction\?\.detail/u);
+  assert.match(script, /label\.setAttribute\("aria-describedby", "textTooltip"\)/u);
+  assert.doesNotMatch(script, /detail\.textContent = nextAction\?\.detail/u);
+  assert.match(css, /\.recommended-action-title:focus-visible/u);
 });
 
 test("production narrow Inspector remains a bottom sheet over the graph", () => {

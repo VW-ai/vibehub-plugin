@@ -1,0 +1,66 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "production-phase-icon-and-label-align-tightly",
+      "criterion": "DRAFT, READY, RUNNING, DONE, and archived production cards render the lower-right phase icon on the label's visual centerline with a deliberately small, consistent icon-to-label gap, while card bounds, right-edge placement, upper-right substate, aperture, live presence, proof line, copy, and causal geometry remain unchanged."
+    },
+    {
+      "acceptance_id": "action-detail-is-progressively-disclosed",
+      "criterion": "The focused Execution panel's Recommended action block visibly contains only the eyebrow, short action title, primary Copy prompt control, phase/substate, and existing metrics; the exact canonical next_action detail is attached to the short title as hover and keyboard-focus help, is programmatically associated for assistive technology, and never alters the exact host-owned copied payload, while the remaining Execution Inspector content stays available and unchanged below the block."
+    },
+    {
+      "acceptance_id": "workbench-polish-regressions-pass",
+      "criterion": "Focused source and installed-artifact tests plus real-browser review cover all four phases, archived state, long and short labels, CLOSE_OUT detail disclosure, wide and 390x844 narrow layouts, keyboard focus, reduced motion, no console errors, exact payload identity, and unchanged graph/panel semantics in fresh Codex and Claude artifacts."
+    }
+  ],
+  "constraints": [
+    "Do not change four-phase or upper-right substate semantics, trusted live projection, Ticket card dimensions, canonical next_action, host-owned Agent payload, graph topology, or Inspector information architecture.",
+    "Keep state icon and text as separate non-color carriers; adjust only the lower-right phase pair, not substate, legend, aperture, relation, or live icons.",
+    "The complete canonical next-action detail remains available from the short action title on hover and keyboard focus and to assistive technology, but is absent from the normal visible panel flow.",
+    "Preserve exact read-only host behavior and Codex/Claude installed-artifact parity."
+  ],
+  "context": "The owner reviewed the production Ticket Graph after the four-phase state implementation. The lower-right phase icon remains slightly above the label's visual baseline and too far from the text. In the focused Ticket panel, the canonical next-action explanation is useful but visually over-explicit; the short action title should remain dominant, with the explanation disclosed only from that title on hover or keyboard focus. The earlier alignment Ticket is proposal-only and currently awaits independent closeout; its Evidence remains historical input and is not rebound here. This is a narrow production-only polish pass, not another state-model or panel redesign.",
+  "context_refs": [
+    {
+      "purpose": "Accepted four-phase, one-substate, honest-live, and Recommended-action production baseline to preserve.",
+      "ref": ".vibehub/outcomes/ticket-simplify-workbench-primary-state-language.yaml"
+    },
+    {
+      "purpose": "Production SVG card geometry and Recommended action markup to adjust.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Production card typography and focused-panel styling boundary.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    },
+    {
+      "purpose": "Owner-approved state and action hierarchy governing this polish.",
+      "ref": ".vibehub/rooms/workbench/decision-workbench-state-signal-and-action-priority.yaml"
+    },
+    {
+      "purpose": "Earlier proposal-only alignment Ticket whose scope must remain distinct from production Workbench polish.",
+      "ref": ".vibehub/tickets/ticket-align-card-state-icon-baseline.yaml"
+    },
+    {
+      "purpose": "Proposal experiment Evidence that may inform but must not be rebound to the new production criterion.",
+      "ref": ".vibehub/evidence/ticket-align-card-state-icon-baseline/card-phase-native-centering-proof.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Production Workbench cards align each phase icon tightly with its label, while Recommended action keeps explanatory copy available on demand without occupying the default panel layout.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-corrects-production-card-icon-alignment",
+    "conversation:2026-08-20-owner-requests-on-demand-action-explanation"
+  ],
+  "relations": [
+    {
+      "rationale": "This polish consumes the accepted production four-phase and Recommended-action implementation.",
+      "target_ticket_id": "ticket-simplify-workbench-primary-state-language",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-polish-workbench-state-action-affordances"
+}

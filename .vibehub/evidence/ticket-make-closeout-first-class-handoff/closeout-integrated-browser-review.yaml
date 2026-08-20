@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "graph-and-overview-surface-closeout-work",
+    "inspector-explains-proof-versus-judgment",
+    "batch-and-single-ticket-review-remain-bounded",
+    "interaction-regressions-pass"
+  ],
+  "evidence_id": "closeout-integrated-browser-review",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T21:05:00Z",
+  "refs": [
+    "conversation:2026-08-20-integrated-closeout-workbench-browser-review",
+    "commit:52eaa8a",
+    "http://127.0.0.1:56220/",
+    "command:npm-run-verify-118-of-118"
+  ],
+  "schema_version": 1,
+  "summary": "Direct integrated-main inspection in the authorized read-only loopback Workbench confirmed the current graph separates 2 executable READY Tickets from 7 CLOSE OUT Tickets and one NEEDS YOU Ticket. Closeout-ready cards render a neutral REVIEW state, while the focused Inspector presents Close out with Agent, 6/6 Evidence, Outcome pending, and the explicit statement that Evidence is proof rather than judgment. The Overview exposes a distinct Independent closeout count and a repository-scoped seven-Ticket review queue without mixing READY, REFINE, BLOCKED, or NEEDS YOU work. The real page remained the existing graph-first Workbench rather than a second review application; no repository state was written by the browser inspection.",
+  "ticket_id": "ticket-make-closeout-first-class-handoff"
+}

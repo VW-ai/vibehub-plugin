@@ -19,6 +19,12 @@ implementation. Mark the dependent implementation `maturity: draft` when the
 decision determines its real acceptance; do not manufacture a firm downstream
 plan before the choice exists. Keep terminal human sign-off in the delivery
 Ticket when no downstream work needs a separate scheduling boundary.
+Read `../contracts/dependency-hygiene.json` before choosing `depends_on` versus
+`context_refs`; it is the single classification and preservation contract for
+new dependency edges.
+Read `../contracts/ticket-next-action.md`. This Skill owns plans reached through
+`REFINE` and `REPLAN`; it preserves any non-success Outcome while revising the
+current contract for a later execution cycle.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
 `draft-needs-refinement`; it owns their planning semantics, not Agent/session
 routing or UI launch mechanics.
@@ -71,8 +77,13 @@ is implied.
    Write `maturity: firm` when acceptance is executable and `maturity: draft`
    when direction is known but acceptance is not; omitted maturity remains
    legacy-compatible firm, but new or rewritten Tickets state it explicitly.
-   Dependents list only direct prerequisites. Do not manufacture migration,
-   review, or dogfood stages.
+   Dependents list only direct prerequisites. For every proposed dependency,
+   read the target Ticket and current Outcome. When the target is DONE, keep
+   the edge only when its successful Outcome is still the exact causal input
+   or unlock described by the shared dependency-hygiene contract, and require
+   an explicit non-empty causal rationale; otherwise move the exact Ticket,
+   Outcome, Evidence, Context, or source file into `context_refs`. Do not
+   manufacture migration, review, or dogfood stages.
 6. Ask a separate Agent to use `$vibehub-ticket-validate` on the raw candidate
    when an independent Agent is available. The validator is read-only. A
    protected product, permission, or material-risk choice remains blocked for
@@ -82,6 +93,10 @@ is implied.
    ```text
    node ../scripts/vh.mjs ticket apply --repo <root> --input <tickets.json>
    ```
+
+   Read any structured `advice` in the success envelope. A completed-dependency
+   review is nonblocking: resolve it semantically before reporting the plan,
+   but never treat it as a schema failure or let the helper rewrite the batch.
 
 8. Read the graph back and report Ticket IDs, paths, READY/BLOCKED state, and
    the next executable outcome. Follow `plan-applied`: ask

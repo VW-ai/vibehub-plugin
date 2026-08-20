@@ -11,6 +11,9 @@ Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
 Read `../contracts/acceptance-authority.md` and verify that `human` appears only
 on the exact acceptance criteria that genuinely reserve human judgment. Never
 infer or remove authority from criterion wording.
+Read `../contracts/dependency-hygiene.json` and use its exact classification
+when reviewing proposed dependency edges. It is advice about planning truth,
+not another schema gate.
 This Skill owns `validation-needs-human`; an unapplied candidate cannot be
 projected as canonical UI state.
 
@@ -21,6 +24,11 @@ projected as canonical UI state.
    ```text
    node ../scripts/vh.mjs ticket validate --repo <root>
    ```
+
+   When disposable `ticket apply` returns structured dependency advice, report
+   it as nonblocking implementation fog unless the candidate prose itself
+   reveals that a completed baseline was mistaken for an execution unlock.
+   Never rewrite the candidate or fail it merely because the target is DONE.
 
 3. Verify each Ticket promises an observable outcome, has acceptance that can
    be independently checked, lists only direct dependencies, carries enough

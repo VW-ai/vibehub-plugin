@@ -273,6 +273,120 @@ test("Ticket graph validates dependencies and successful closeout unlocks only d
   assert.equal(frontier.envelope.data.ready.some((item) => item.ticket.ticket_id === "downstream"), false);
 });
 
+test("new dependencies on DONE Tickets return deterministic nonblocking planning advice", () => {
+  const repo = tempRepo("ticket-completed-dependency-advice");
+  assert.equal(run(repo, "project", "init").status, 0);
+  assert.equal(run(repo, "ticket", "apply", {
+    tickets: [ticket("completed-baseline"), ticket("active-prerequisite")],
+  }).status, 0);
+  closeSuccessfully(repo, "completed-baseline");
+
+  const contextOnly = ticket("context-only-consumer");
+  contextOnly.context_refs = [{
+    ref: ".vibehub/outcomes/completed-baseline.yaml",
+    purpose: "Completed implementation baseline, not an execution unlock.",
+  }];
+  const contextApply = run(repo, "ticket", "apply", { tickets: [contextOnly] });
+  assert.equal(contextApply.status, 0, contextApply.stdout);
+  assert.deepEqual(contextApply.envelope.data.advice, []);
+  assert.deepEqual(run(repo, "ticket", "graph").envelope.data.stubs, []);
+
+  const candidate = ticket("historical-causal-consumer", ["completed-baseline"]);
+  candidate.relations[0].rationale = "Consumes the exact completed migration artifact.";
+  const advised = run(repo, "ticket", "apply", { tickets: [candidate] });
+  assert.equal(advised.status, 0, advised.stdout);
+  assert.deepEqual(advised.envelope.data.advice, [{
+    code: "completed-dependency-review",
+    level: "advisory",
+    blocking: false,
+    relation_path: "tickets[0].relations[0]",
+    ticket_id: "historical-causal-consumer",
+    target_ticket_id: "completed-baseline",
+    rationale: "Consumes the exact completed migration artifact.",
+    rationale_present: true,
+    message: "Require an explicit causal rationale and review whether the completed target is still an exact input. Keep a justified historical dependency; otherwise replace the edge with an exact Ticket, Outcome, Evidence, Context, or source context_ref.",
+    suggested_context_refs: [
+      ".vibehub/tickets/completed-baseline.yaml",
+      ".vibehub/outcomes/completed-baseline.yaml",
+    ],
+  }]);
+  assert.equal(
+    run(repo, "ticket", "graph", undefined, ["--scope", "all"]).envelope.data.relations
+      .some((relation) => relation.prerequisite_ticket_id === "completed-baseline"
+        && relation.dependent_ticket_id === "historical-causal-consumer"),
+    true,
+  );
+
+  const repeated = run(repo, "ticket", "apply", { tickets: [candidate] });
+  assert.equal(repeated.status, 0, repeated.stdout);
+  assert.deepEqual(repeated.envelope.data.advice, []);
+
+  const missingRationale = ticket("missing-rationale-consumer", ["completed-baseline"]);
+  delete missingRationale.relations[0].rationale;
+  const missingRationaleApply = run(repo, "ticket", "apply", { tickets: [missingRationale] });
+  assert.equal(missingRationaleApply.status, 0, missingRationaleApply.stdout);
+  assert.equal(missingRationaleApply.envelope.data.advice[0].blocking, false);
+  assert.equal(missingRationaleApply.envelope.data.advice[0].rationale, null);
+  assert.equal(missingRationaleApply.envelope.data.advice[0].rationale_present, false);
+
+  const activeConsumer = ticket("active-consumer", ["active-prerequisite"]);
+  const activeApply = run(repo, "ticket", "apply", { tickets: [activeConsumer] });
+  assert.equal(activeApply.status, 0, activeApply.stdout);
+  assert.deepEqual(activeApply.envelope.data.advice, []);
+  assert.equal(
+    run(repo, "ticket", "get", activeConsumer).envelope.data.status,
+    "BLOCKED",
+  );
+
+  const forkLeft = ticket("fork-left", ["completed-baseline"]);
+  forkLeft.relations[0].rationale = "Forks from the accepted baseline.";
+  const forkRight = ticket("fork-right", ["completed-baseline"]);
+  forkRight.relations[0].rationale = "Forks from the accepted baseline.";
+  const releaseConsumer = ticket("release-consumer", ["completed-baseline"]);
+  releaseConsumer.relations[0].rationale = "Packages the exact accepted release input.";
+  const migrationConsumer = ticket("migration-consumer", ["completed-baseline"]);
+  migrationConsumer.relations[0].rationale = "Migrates the exact accepted prior format.";
+  const joinConsumer = ticket("join-consumer", ["completed-baseline", "active-prerequisite"]);
+  joinConsumer.relations[0].rationale = "Joins the accepted baseline with pending active work.";
+  joinConsumer.relations[1].rationale = "Joins pending active work with the accepted baseline.";
+  const topologyApply = run(repo, "ticket", "apply", {
+    tickets: [releaseConsumer, forkRight, joinConsumer, migrationConsumer, forkLeft],
+  });
+  assert.equal(topologyApply.status, 0, topologyApply.stdout);
+  assert.deepEqual(
+    topologyApply.envelope.data.advice.map((item) => [item.ticket_id, item.target_ticket_id]),
+    [
+      ["fork-left", "completed-baseline"],
+      ["fork-right", "completed-baseline"],
+      ["join-consumer", "completed-baseline"],
+      ["migration-consumer", "completed-baseline"],
+      ["release-consumer", "completed-baseline"],
+    ],
+  );
+  const allRelations = run(repo, "ticket", "graph", undefined, ["--scope", "all"])
+    .envelope.data.relations;
+  for (const dependent of [
+    "fork-left",
+    "fork-right",
+    "historical-causal-consumer",
+    "join-consumer",
+    "migration-consumer",
+    "release-consumer",
+  ]) {
+    assert.equal(
+      allRelations.some((relation) => relation.prerequisite_ticket_id === "completed-baseline"
+        && relation.dependent_ticket_id === dependent),
+      true,
+      `completed causal edge was lost for ${dependent}`,
+    );
+  }
+  assert.equal(
+    allRelations.some((relation) => relation.prerequisite_ticket_id === "active-prerequisite"
+      && relation.dependent_ticket_id === "join-consumer"),
+    true,
+  );
+});
+
 test("Ticket validation rejects missing endpoints and dependency cycles", () => {
   const missingRepo = tempRepo("ticket-missing");
   assert.equal(run(missingRepo, "project", "init").status, 0);
@@ -311,7 +425,11 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
   let frontier = run(repo, "ticket", "frontier");
   assert.deepEqual(
     frontier.envelope.data.ready.map((item) => item.ticket.ticket_id),
-    ["agent-default", "human-boundary"],
+    ["agent-default"],
+  );
+  assert.deepEqual(
+    frontier.envelope.data.needs_human.map((item) => item.ticket.ticket_id),
+    ["human-boundary"],
   );
 
   const invalidOrigin = run(repo, "ticket", "evidence", {
@@ -366,6 +484,11 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
     origin: "human",
     recorded_at: at,
   }).status, 0);
+  frontier = run(repo, "ticket", "frontier");
+  assert.deepEqual(
+    frontier.envelope.data.ready_to_closeout.map((item) => item.ticket.ticket_id),
+    ["human-boundary"],
+  );
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",

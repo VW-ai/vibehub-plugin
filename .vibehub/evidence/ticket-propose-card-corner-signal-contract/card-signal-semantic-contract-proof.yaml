@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "canonical-facts-and-human-model-are-separated",
+    "primary-phase-derivation-and-precedence-are-exact",
+    "one-cross-cutting-substate-slot-is-defined",
+    "running-substages-and-live-presence-are-distinct",
+    "recommendation-and-downstream-boundaries-are-decision-ready"
+  ],
+  "evidence_id": "card-signal-semantic-contract-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T21:33:59Z",
+  "refs": [
+    "file:docs/proposals/card-corner-signal/README.md",
+    "file:docs/proposals/card-corner-signal/contract.json",
+    "file:docs/proposals/card-corner-signal/phase-model.mjs",
+    "file:docs/proposals/card-corner-signal/fixtures.json",
+    "test:test/card-corner-signal-proposal.test.mjs",
+    "command:node-test-card-corner-signal-proposal-8-of-8",
+    "command:npm-run-verify-126-of-126",
+    "command:installed-artifact-57-files-607662-bytes"
+  ],
+  "schema_version": 1,
+  "summary": "The decision-ready contract audits eight distinct truth sources and proposes exactly four Human phases derived by strict precedence. Its executable model and 22-case adversarial fixture matrix prove successful/non-success Outcomes, unresolved/resolved dependencies, draft/firm maturity, NEEDS_HUMAN before and during trusted work, CLOSE_OUT with and without presence, Run start/end, stale/untrusted presence, failed closeout, archive, and reopened history. The one-slot eligibility matrix rejects contradictory Cartesian pairs and implements DEVIATED > BLOCKED > actionable NEEDS YOU > VERIFYING > WAITING > empty. It defines all current no-schema v0.8 mappings, treats every non-success Outcome as material, records the DRAFT+NEEDS YOU hard gap and recommended explicit trusted runtime/current-human-boundary source, preserves independent closeout inside RUNNING, and separates seven downstream decision/implementation boundaries without changing production truth.",
+  "ticket_id": "ticket-propose-card-corner-signal-contract"
+}

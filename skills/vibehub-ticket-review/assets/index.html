@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>VibeHub · Ticket graph</title>
+  <link rel="icon" type="image/svg+xml" href="/vibehub-mark.svg">
   <link rel="stylesheet" href="/app.css">
   <script src="/app-model.js" defer></script>
   <script src="/app-layout.js" defer></script>
@@ -14,6 +15,7 @@
   <svg class="icon-sprite" aria-hidden="true">
     <symbol id="icon-check" viewBox="0 0 20 20"><path d="m4 10.5 3.5 3.5L16 5.5"/></symbol>
     <symbol id="icon-play" viewBox="0 0 20 20"><path d="m7 5 8 5-8 5z"/></symbol>
+    <symbol id="icon-running" viewBox="0 0 20 20"><path d="M5 10a5 5 0 1 1 2 4M5 10 3 8M5 10l3 1"/></symbol>
     <symbol id="icon-lock" viewBox="0 0 20 20"><rect x="4.5" y="8.5" width="11" height="8" rx="2"/><path d="M7 8.5V6a3 3 0 0 1 6 0v2.5"/></symbol>
     <symbol id="icon-sliders" viewBox="0 0 20 20"><path d="M4 5h12M4 10h12M4 15h12M8 3v4M13 8v4M7 13v4"/></symbol>
     <symbol id="icon-alert" viewBox="0 0 20 20"><path d="M10 3 17 16H3zM10 7v4M10 14h.01"/></symbol>
@@ -80,7 +82,7 @@
       <section class="canvas-pane" aria-label="Ticket causal graph">
         <section class="canvas" id="canvas" aria-label="Ticket dependency graph">
           <div class="canvas-heading">
-            <div id="graphSummary" role="list" aria-label="Ticket state and human attention summary">Reading current Tickets…</div>
+            <div id="graphSummary" role="list" aria-label="Ticket phase and attention summary">Reading current Tickets…</div>
           </div>
           <div class="graph-tools" aria-label="Graph controls">
             <div class="scope-control" role="group" aria-label="Ticket history scope">
@@ -139,45 +141,34 @@
             </div>
 
             <div class="summary-grid" id="summaryGrid">
-              <div class="summary-cell state-ready">
+              <div class="summary-cell phase-draft">
+                <svg aria-hidden="true"><use href="#icon-sliders"/></svg>
+                <span class="summary-value" id="summaryDraft">0</span>
+                <span class="summary-name">Draft</span>
+              </div>
+              <div class="summary-cell phase-ready">
                 <svg aria-hidden="true"><use href="#icon-play"/></svg>
                 <span class="summary-value" id="summaryReady">0</span>
                 <span class="summary-name">Ready</span>
               </div>
-              <div class="summary-cell attention-pending">
-                <svg aria-hidden="true"><use href="#icon-pending"/></svg>
-                <span class="summary-value" id="summaryHuman">0</span>
-                <span class="summary-name">Needs you</span>
+              <div class="summary-cell phase-running">
+                <svg aria-hidden="true"><use href="#icon-running"/></svg>
+                <span class="summary-value" id="summaryRunning">0</span>
+                <span class="summary-name">Running</span>
               </div>
-              <div class="summary-cell state-deviated">
-                <svg aria-hidden="true"><use href="#icon-alert"/></svg>
-                <span class="summary-value" id="summaryDeviated">0</span>
-                <span class="summary-name">Deviated</span>
-              </div>
-              <div class="summary-cell state-refine">
-                <svg aria-hidden="true"><use href="#icon-sliders"/></svg>
-                <span class="summary-value" id="summaryRefine">0</span>
-                <span class="summary-name">Refine</span>
+              <div class="summary-cell phase-done">
+                <svg aria-hidden="true"><use href="#icon-check"/></svg>
+                <span class="summary-value" id="summaryDone">0</span>
+                <span class="summary-name">Done</span>
               </div>
             </div>
-            <section class="legend" aria-label="Ticket state legend">
-              <span class="legend-title">Ticket state</span>
+            <section class="legend" aria-label="Ticket phase legend">
+              <span class="legend-title">Task phase</span>
               <div class="legend-grid">
-                <span class="legend-item done"><svg aria-hidden="true"><use href="#icon-check"/></svg>Done</span>
+                <span class="legend-item draft"><svg aria-hidden="true"><use href="#icon-sliders"/></svg>Draft</span>
                 <span class="legend-item ready"><svg aria-hidden="true"><use href="#icon-play"/></svg>Ready</span>
-                <span class="legend-item blocked"><svg aria-hidden="true"><use href="#icon-lock"/></svg>Blocked</span>
-                <span class="legend-item refine"><svg aria-hidden="true"><use href="#icon-sliders"/></svg>Refine</span>
-                <span class="legend-item deviated"><svg aria-hidden="true"><use href="#icon-alert"/></svg>Deviated</span>
-                <span class="legend-item archived"><svg aria-hidden="true"><use href="#icon-archive"/></svg>Archived</span>
-              </div>
-            </section>
-            <section class="legend attention-legend" aria-label="Human attention legend">
-              <span class="legend-title">Human attention</span>
-              <div class="legend-grid">
-                <span class="legend-item upcoming"><svg aria-hidden="true"><use href="#icon-upcoming"/></svg>Upcoming</span>
-                <span class="legend-item pending"><svg aria-hidden="true"><use href="#icon-pending"/></svg>Needs you</span>
-                <span class="legend-item recorded"><svg aria-hidden="true"><use href="#icon-recorded"/></svg>Recorded</span>
-                <span class="legend-item complete"><svg aria-hidden="true"><use href="#icon-complete"/></svg>Complete</span>
+                <span class="legend-item running"><svg aria-hidden="true"><use href="#icon-running"/></svg>Running</span>
+                <span class="legend-item done"><svg aria-hidden="true"><use href="#icon-check"/></svg>Done</span>
               </div>
             </section>
           </aside>

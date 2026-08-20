@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "id": "successful-overrides-live",
+      "facts": { "outcomeStatus": "successful", "dependenciesResolved": true, "maturity": "firm", "nextAction": "DONE", "runtime": { "trust": "trusted", "freshness": "active", "operation": "execute", "state": "running" }, "archived": false },
+      "expected": { "primary": "DONE", "substate": null, "runStage": null, "live": false, "action": "View outcome" }
+    },
+    {
+      "id": "successful-delivery-keeps-archive-separate",
+      "facts": { "outcomeStatus": "successful", "dependenciesResolved": true, "maturity": "firm", "nextAction": "DONE", "runtime": null, "archived": true },
+      "expected": { "primary": "DONE", "substate": null, "runStage": null, "live": false, "action": "View outcome", "archiveBoundary": true }
+    },
+    {
+      "id": "partial-outcome-is-material-deviation",
+      "facts": { "outcomeStatus": "partial", "dependenciesResolved": true, "maturity": "firm", "nextAction": "REPLAN", "runtime": { "trust": "trusted", "freshness": "active", "operation": "execute", "state": "running" }, "archived": false },
+      "expected": { "primary": "DRAFT", "substate": "DEVIATED", "runStage": null, "live": false, "action": "Revise" }
+    },
+    {
+      "id": "failed-closeout-returns-to-draft",
+      "facts": { "outcomeStatus": "failed", "dependenciesResolved": true, "maturity": "firm", "nextAction": "REPLAN", "runtime": { "trust": "trusted", "freshness": "ended", "operation": "closeout", "state": "failed" }, "archived": false },
+      "expected": { "primary": "DRAFT", "substate": "DEVIATED", "runStage": null, "live": false, "action": "Revise" }
+    },
+    {
+      "id": "deviation-precedes-blocker",
+      "facts": { "outcomeStatus": "deviated", "dependenciesResolved": false, "maturity": "firm", "nextAction": "REPLAN", "runtime": null, "archived": false },
+      "expected": { "primary": "DRAFT", "substate": "DEVIATED", "runStage": null, "live": false, "action": "Revise" }
+    },
+    {
+      "id": "draft-behind-dependencies-is-blocked",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": false, "maturity": "draft", "nextAction": "WAIT", "runtime": null, "archived": false },
+      "expected": { "primary": "DRAFT", "substate": "BLOCKED", "runStage": null, "live": false, "action": "View blocker" }
+    },
+    {
+      "id": "firm-behind-dependencies-is-blocked-draft",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": false, "maturity": "firm", "nextAction": "WAIT", "runtime": { "trust": "trusted", "freshness": "active", "operation": "execute", "state": "running" }, "archived": false },
+      "expected": { "primary": "DRAFT", "substate": "BLOCKED", "runStage": null, "live": false, "action": "View blocker" }
+    },
+    {
+      "id": "unblocked-draft-has-no-substate",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "draft", "nextAction": "REFINE", "runtime": null, "archived": false },
+      "expected": { "primary": "DRAFT", "substate": null, "runStage": null, "live": false, "action": "Define" }
+    },
+    {
+      "id": "draft-needs-explicit-planning-input",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "draft", "nextAction": "REFINE", "runtime": { "trust": "trusted", "freshness": "active", "operation": "plan", "state": "waiting_human" }, "archived": false },
+      "expected": { "primary": "DRAFT", "substate": "NEEDS_YOU", "runStage": null, "live": true, "action": "Respond" }
+    },
+    {
+      "id": "untrusted-planning-claim-is-ignored",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "draft", "nextAction": "REFINE", "runtime": { "trust": "session-claim", "freshness": "active", "operation": "plan", "state": "waiting_human" }, "archived": false },
+      "expected": { "primary": "DRAFT", "substate": null, "runStage": null, "live": false, "action": "Define" }
+    },
+    {
+      "id": "ready-agent-next",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "EXECUTE", "runtime": null, "archived": false },
+      "expected": { "primary": "READY", "substate": null, "runStage": null, "live": false, "action": "Start" }
+    },
+    {
+      "id": "ready-human-next",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "NEEDS_HUMAN", "runtime": null, "archived": false },
+      "expected": { "primary": "READY", "substate": "NEEDS_YOU", "runStage": null, "live": false, "action": "Decide" }
+    },
+    {
+      "id": "trusted-run-executing",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "EXECUTE", "runtime": { "trust": "trusted", "freshness": "active", "operation": "execute", "state": "running" }, "archived": false },
+      "expected": { "primary": "RUNNING", "substate": null, "runStage": "execute", "live": true, "action": "Open run" }
+    },
+    {
+      "id": "trusted-run-waiting-on-tool",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "EXECUTE", "runtime": { "trust": "trusted", "freshness": "active", "operation": "execute", "state": "waiting_tool" }, "archived": false },
+      "expected": { "primary": "RUNNING", "substate": "WAITING", "runStage": "execute", "live": true, "action": "Open run" }
+    },
+    {
+      "id": "trusted-run-execution-continues",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "EXECUTE", "runtime": { "trust": "trusted", "freshness": "active", "operation": "execute", "state": "running" }, "archived": false },
+      "expected": { "primary": "RUNNING", "substate": null, "runStage": "execute", "live": true, "action": "Open run" }
+    },
+    {
+      "id": "human-boundary-mid-run",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "NEEDS_HUMAN", "runtime": { "trust": "trusted", "freshness": "active", "operation": "execute", "state": "waiting_human" }, "archived": false },
+      "expected": { "primary": "RUNNING", "substate": "NEEDS_YOU", "runStage": "execute", "live": true, "action": "Respond" }
+    },
+    {
+      "id": "closeout-without-live-presence",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "CLOSE_OUT", "runtime": null, "archived": false },
+      "expected": { "primary": "RUNNING", "substate": "VERIFYING", "runStage": "closeout", "live": false, "action": "Close out" }
+    },
+    {
+      "id": "closeout-with-live-presence",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "CLOSE_OUT", "runtime": { "trust": "trusted", "freshness": "active", "operation": "closeout", "state": "running" }, "archived": false },
+      "expected": { "primary": "RUNNING", "substate": "VERIFYING", "runStage": "closeout", "live": true, "action": "Close out" }
+    },
+    {
+      "id": "ended-run-with-incomplete-evidence-is-ready",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "EXECUTE", "runtime": { "trust": "trusted", "freshness": "ended", "operation": "execute", "state": "completed" }, "archived": false },
+      "expected": { "primary": "READY", "substate": null, "runStage": null, "live": false, "action": "Start" }
+    },
+    {
+      "id": "stale-run-with-incomplete-evidence-is-ready",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "EXECUTE", "runtime": { "trust": "trusted", "freshness": "stale", "operation": "execute", "state": "running" }, "archived": false },
+      "expected": { "primary": "READY", "substate": null, "runStage": null, "live": false, "action": "Start" }
+    },
+    {
+      "id": "untrusted-session-is-not-running",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "EXECUTE", "runtime": { "trust": "session-claim", "freshness": "active", "operation": "execute", "state": "running" }, "archived": false },
+      "expected": { "primary": "READY", "substate": null, "runStage": null, "live": false, "action": "Start" }
+    },
+    {
+      "id": "reopened-firm-work-is-ready",
+      "facts": { "outcomeStatus": null, "dependenciesResolved": true, "maturity": "firm", "nextAction": "EXECUTE", "runtime": null, "historicalSuccessfulOutcome": true, "archived": false },
+      "expected": { "primary": "READY", "substate": null, "runStage": null, "live": false, "action": "Start" }
+    }
+  ]
+}

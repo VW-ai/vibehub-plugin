@@ -9,6 +9,9 @@ Read `references/ticket-lifecycle.json` before acting. This Skill owns
 `explicit-review` and is the sole presenter for every event whose
 `presentation` is `review`; semantic transition ownership remains with the
 calling Ticket Skill.
+Read `../contracts/ticket-next-action.md`. Present the host-derived next action
+beside operational state and human attention; never infer it again from UI
+copy, Evidence counts, or browser state.
 
 ## Local graph UI
 
@@ -43,6 +46,15 @@ persistent cache, daemon, review write route, or Decision authority.
 The four canonical schemas and repository validation are the complete handoff:
 do not repair, infer, or translate invalid Agent output inside the UI.
 
+For one Ticket awaiting adjudication, focus its Log directly with `--ticket`
+and `--view log`. For a bounded batch review, use the current repository's
+Overview **Independent closeout** queue or `ticket frontier`'s
+`ready_to_closeout` array. That queue contains only Tickets whose host-derived
+action is `CLOSE_OUT`; it never mixes executable READY, REFINE, WAIT, human
+authority, or non-success Outcome work, and it never accepts a batch. A
+closeout action copies the exact read-only Agent handoff for an independent
+closeout Agent; it is not a browser write or a model turn.
+
 ## Conversation review
 
 When a browser is unavailable, read the same graph directly:
@@ -54,8 +66,12 @@ node ../scripts/vh.mjs ticket graph --repo <root> --delivery <canonical-ref> --r
 node ../scripts/vh.mjs ticket get --repo <root> --input <id.json>
 ```
 
-Present outcomes, READY/BLOCKED/DONE/DEVIATED state, direct dependencies,
-acceptance, Evidence, and Outcome in the conversation.
+Present outcomes, READY/BLOCKED/DONE/DEVIATED state, derived next action,
+direct dependencies, acceptance, Evidence, and Outcome in the conversation.
+When `next_action.action` is `CLOSE_OUT`, present it as independent review work
+and route it to `$vibehub-ticket-closeout`; never call Ticket Run again. When a
+bounded list is requested, report only `ready_to_closeout` from this exact
+repository and scope.
 
 If the user requests an edit, delegate the revised documents to
 `$vibehub-ticket-plan`. Browser state and comments are not Decision authority;

@@ -1,0 +1,84 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "four-phase-presentation-is-derived-once",
+      "criterion": "One shared Workbench model deterministically projects exactly four human-facing phases without changing raw host facts: DONE next_action becomes DONE; REPLAN, WAIT, and REFINE become DRAFT; EXECUTE and NEEDS_HUMAN become READY; CLOSE_OUT becomes RUNNING with an explicit verifying stage; trusted active execute runtime may promote EXECUTE to RUNNING, while stale, absent, planning-only, completed, or failed runtime cannot. Graph cards, minimap, overview, focused panel, narratives, and accessible names consume that projection rather than independently remapping canonical labels; copied Agent payloads deliberately do not carry browser-owned presentation metadata."
+    },
+    {
+      "acceptance_id": "one-upper-right-substate-is-truthful",
+      "criterion": "Every Ticket card renders at most one textual/icon upper-right substate in the existing badge position with deterministic priority DEVIATED over BLOCKED over NEEDS YOU over VERIFYING over WAITING over empty. REPLAN maps to DRAFT+DEVIATED, WAIT to DRAFT+BLOCKED, NEEDS_HUMAN to READY+NEEDS YOU, CLOSE_OUT to RUNNING+VERIFYING, and trusted runtime waiting_human or waiting_tool may supply NEEDS YOU or WAITING only when a higher-priority canonical condition is absent. READY and RUNNING never coexist with BLOCKED or DEVIATED, and live presence remains a separate fact rather than consuming the slot."
+    },
+    {
+      "acceptance_id": "card-visual-change-is-minimal-and-live-is-honest",
+      "criterion": "Production cards keep their existing size, copy, aperture, relation metadata, selection, and topology, remove the top solid/dashed phase accent from the rendered anatomy and phase grammar, distinguish READY from RUNNING through readable text/icon and restrained non-identical treatment, and show a reduced-motion-safe live effect only for unexpired trusted execute or closeout runtime presence. The current host explicitly exposes runtime as unavailable rather than fabricating a live card; deterministic fixtures prove the optional available path and expiry fallback."
+    },
+    {
+      "acceptance_id": "recommended-action-dominates-the-focused-panel",
+      "criterion": "The Execution panel begins with a clearly labelled Recommended action surface whose short action title, explanation, and primary CTA are the strongest hierarchy. In this Plugin the CTA copies the exact context-aware host-owned Agent handoff for EXECUTE, REFINE, REPLAN, WAIT, NEEDS_HUMAN, CLOSE_OUT, or DONE without injecting browser-owned phase or substate metadata; CLOSE_OUT still requires an independent Agent and no CTA writes repository state. Existing causal, Context, Contract, Log, Evidence, source, and Inspector-lens content remains available but visually subordinate and materially unchanged."
+    },
+    {
+      "acceptance_id": "production-and-installed-regressions-pass",
+      "criterion": "Focused model, host, visual-system, layout, accessibility, and lifecycle tests cover the full canonical action matrix, optional trusted/stale runtime, substate priority, zero-or-one slot, action payload integrity, no top accent, distinct READY/RUNNING, wide and narrow keyboard interaction, reduced motion, archive/history/source truth, and no write routes. Fresh browser review of the real Workbench plus full repository verification and fresh Codex/Claude installed-artifact parity pass."
+    }
+  ],
+  "constraints": [
+    "Do not change canonical Ticket status, next_action, authority, Evidence, Outcome, archive, delivery, dependency, or unlock semantics; DRAFT, RUNNING, substate, and live are presentation projections only.",
+    "Do not retain or add card-top solid/dashed phase accents as a primary visual language, and do not import the proposal board's shell or decorative presentation into production.",
+    "Do not claim live execution from Ticket status, CLOSE_OUT, Evidence completeness, a running browser host, or stale runtime data; live requires a trusted, active, scoped runtime capability.",
+    "Do not make the read-only Plugin execute, close, approve, or mutate a Ticket. The dominant action copies the exact host-owned prompt or handoff; future DSH native invocation remains outside this Ticket.",
+    "Keep existing Graph topology, Rooms, history stubs, direction controls, minimap, Inspector lenses, Context, Contract, Log, source truth, and narrow-sheet behavior unless a local adjustment is strictly required by the new state/action presentation.",
+    "Preserve independent closeout judgment even when CLOSE_OUT appears inside the continuous RUNNING phase."
+  ],
+  "context": "Implement only the subset the owner accepted after reviewing the state proposal. Preserve the current production Graph and focused Ticket panel as the baseline. Human-facing phase is a small projection over canonical next_action: DRAFT for refinement, blockers, or non-successful Outcomes; READY when a stable Ticket's next actor can act; RUNNING for a trusted active execute/closeout flow and for the open execution-to-independent-closeout phase; DONE only for a successful Outcome. Do not import proposal-only card-top dashed/solid phase accents. Reuse the existing upper-right badge position for exactly one substate. The current Plugin remains read-only and its primary action copies a host-owned, context-aware Agent handoff into Chat. Runtime presence is optional, ephemeral, and truthful; the current host must not invent it merely to animate cards.",
+  "context_refs": [
+    {
+      "purpose": "Binding owner correction for production scope, card signals, Recommended action, and the Plugin-to-DSH boundary.",
+      "ref": ".vibehub/rooms/workbench/decision-workbench-state-signal-and-action-priority.yaml"
+    },
+    {
+      "purpose": "Human-origin decision Evidence that authorizes this implementation.",
+      "ref": ".vibehub/evidence/ticket-decide-workbench-task-state-contract/owner-corrects-and-accepts-production-state-contract.yaml"
+    },
+    {
+      "purpose": "Reviewed semantic source matrix and adversarial cases; its visual recommendations are subordinate to the owner correction.",
+      "ref": "docs/proposals/card-corner-signal/contract.json"
+    },
+    {
+      "purpose": "Canonical machine routing values that presentation must not rename or mutate.",
+      "ref": "skills/contracts/ticket-next-action.md"
+    },
+    {
+      "purpose": "Shared browser-side projection and Agent handoff routing to extend once.",
+      "ref": "skills/vibehub-ticket-review/assets/app-model.js"
+    },
+    {
+      "purpose": "Production card, corner signal, focused panel, and Copy-for-Agent interaction.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Production visual baseline and responsive/reduced-motion contracts.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    },
+    {
+      "purpose": "Read-only host projection and exact Agent handoff payload boundary.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The production Ticket Workbench adds a minimal four-phase presentation, one truthful upper-right substate, and an action-first focused panel without redesigning the existing graph or pretending the read-only Plugin executes work.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-corrects-production-task-state-ui",
+    "conversation:2026-08-20-owner-authorizes-production-state-implementation"
+  ],
+  "relations": [
+    {
+      "rationale": "Production implementation follows the successful owner decision that corrects the reviewed proposal.",
+      "target_ticket_id": "ticket-decide-workbench-task-state-contract",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-simplify-workbench-primary-state-language"
+}

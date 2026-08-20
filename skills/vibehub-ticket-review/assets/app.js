@@ -4,7 +4,6 @@
   const SVG = "http://www.w3.org/2000/svg";
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
-  const HISTORY_STUB = Object.freeze({ width: 116, height: 70 });
   const workbenchModel = globalThis.VibeHubWorkbenchModel;
   const graphLayoutModel = globalThis.VibeHubGraphLayout;
   if (!workbenchModel) {
@@ -13,7 +12,7 @@
   if (!graphLayoutModel) {
     throw new Error("VibeHub Workbench graph layout is unavailable.");
   }
-  const { NODE } = graphLayoutModel;
+  const { HISTORY_STUB, NODE } = graphLayoutModel;
   const {
     agentHandoffInstruction,
     causalPriority: operationalPriority,
@@ -25,8 +24,10 @@
     normalizeLayoutDirection,
     operationalCounts,
     ticketAttentionState,
+    ticketNextAction,
     ticketNodePresentation,
     ticketOperationalState,
+    ticketPhasePresentation,
     workbenchOverview,
   } = workbenchModel;
   const TICKET_VIEW_IDS = new Map([
@@ -35,18 +36,18 @@
     ["log", "evidence"],
   ]);
   const STATE_ICON_IDS = Object.freeze({
+    DRAFT: "sliders",
     DONE: "check",
     READY: "play",
-    BLOCKED: "lock",
-    REFINE: "sliders",
-    DEVIATED: "alert",
+    RUNNING: "running",
     ARCHIVED: "archive",
   });
-  const ATTENTION_ICON_IDS = Object.freeze({
-    UPCOMING: "upcoming",
-    PENDING: "pending",
-    RECORDED: "recorded",
-    COMPLETE: "complete",
+  const SUBSTATE_ICON_IDS = Object.freeze({
+    DEVIATED: "alert",
+    BLOCKED: "lock",
+    NEEDS_YOU: "pending",
+    VERIFYING: "recorded",
+    WAITING: "upcoming",
   });
   const ROOM_STATE_PRESENTATION = Object.freeze({
     FRESH: { label: "FRESH", icon: "check" },
@@ -72,10 +73,10 @@
     sourceDockTitle: document.querySelector("#sourceDockTitle"),
     sourceDockContent: document.querySelector("#sourceDockContent"),
     closeSourceDock: document.querySelector("#closeSourceDock"),
+    summaryDraft: document.querySelector("#summaryDraft"),
     summaryReady: document.querySelector("#summaryReady"),
-    summaryRefine: document.querySelector("#summaryRefine"),
-    summaryHuman: document.querySelector("#summaryHuman"),
-    summaryDeviated: document.querySelector("#summaryDeviated"),
+    summaryRunning: document.querySelector("#summaryRunning"),
+    summaryDone: document.querySelector("#summaryDone"),
     sourcePath: document.querySelector("#sourcePath"),
     sourceBranch: document.querySelector("#sourceBranch"),
     sourceCommit: document.querySelector("#sourceCommit"),
@@ -295,7 +296,7 @@
     const { source } = graph;
     const counts = operationalCounts(graph.tickets);
     const overview = workbenchOverview(graph.tickets, source);
-    const deviatedCount = counts.DEVIATED;
+    const deviatedCount = overview.deviated.length;
     elements.projectName.textContent = project.name;
     elements.repoBranch.textContent = project.branch;
     renderSourceDock();
@@ -305,7 +306,8 @@
     renderDirectionControl();
     renderScopeControl();
     elements.graphSignalCount.textContent =
-      `${overview.ready.length} ready · ${overview.humanPending.length} need you · `
+      `${counts.RUNNING} running · ${counts.READY} ready · `
+      + `${overview.needsYou.length} need you · `
       + (overview.sourceDirty ? "local changes" : "exact source");
     document.title = `${project.name} · VibeHub Ticket graph`;
     elements.stateDot.className =
@@ -346,10 +348,10 @@
   }
 
   function renderOverview(overview) {
-    elements.summaryReady.textContent = String(overview.ready.length);
-    elements.summaryHuman.textContent = String(overview.humanPending.length);
-    elements.summaryDeviated.textContent = String(overview.deviated.length);
-    elements.summaryRefine.textContent = String(overview.refineCount);
+    elements.summaryDraft.textContent = String(overview.phases.DRAFT.length);
+    elements.summaryReady.textContent = String(overview.phases.READY.length);
+    elements.summaryRunning.textContent = String(overview.phases.RUNNING.length);
+    elements.summaryDone.textContent = String(overview.phases.DONE.length);
   }
 
   function renderGraphSummary(counts, overview) {
@@ -364,12 +366,11 @@
       item.append(htmlIcon(icon), value, ` ${label}`);
       items.push(item);
     };
-    add(counts.DONE, "DONE", "check", "state-done");
-    add(counts.READY, "READY", "play", "state-ready");
-    add(counts.REFINE, "REFINE", "sliders", "state-refine");
-    add(counts.BLOCKED, "BLOCKED", "lock", "state-blocked");
-    add(counts.DEVIATED, "DEVIATED", "alert", "state-deviated");
-    add(overview.humanPending.length, "NEEDS YOU", "pending", "attention-pending");
+    add(counts.RUNNING, "RUNNING", "running", "phase-running");
+    add(counts.READY, "READY", "play", "phase-ready");
+    add(counts.DRAFT, "DRAFT", "sliders", "phase-draft");
+    add(counts.DONE, "DONE", "check", "phase-done");
+    add(overview.needsYou.length, "NEEDS YOU", "pending", "substate-needs-you");
     elements.graphSummary.replaceChildren(...items);
   }
 
@@ -532,6 +533,7 @@
     elements.edgeLayer.replaceChildren();
     elements.nodeLayer.replaceChildren();
     if (!state) return;
+    const stubGeometries = historyStubGeometries();
     const related = selected ? causalCone(selected) : null;
     for (const relation of state.graph.relations) {
       const from = positions.get(relation.prerequisiteTicketId);
@@ -584,29 +586,54 @@
     }
 
     for (const stub of state.graph.stubs ?? []) {
-      const anchor = positions.get(stub.anchorTicketId);
-      if (!anchor) continue;
-      const point = historyStubPosition(anchor, stub.direction);
+      const geometry = stubGeometries.get(stub.stubRef);
+      if (!geometry) continue;
+      elements.edgeLayer.append(svg("path", {
+        class: "history-stub-link",
+        d: geometry.connector.path,
+        "aria-hidden": "true",
+      }));
+      elements.edgeLayer.append(svg("circle", {
+        class: "history-stub-knot",
+        cx: geometry.connector.start.x,
+        cy: geometry.connector.start.y,
+        r: 2.75,
+        "aria-hidden": "true",
+      }));
+    }
+
+    for (const stub of state.graph.stubs ?? []) {
+      const geometry = stubGeometries.get(stub.stubRef);
+      if (!geometry) continue;
+      const point = geometry.position;
+      const nextTicketLabel = stub.nextTicketIds.join(", ");
       const group = svg("g", {
         class: "history-stub",
         transform: `translate(${point.x} ${point.y})`,
         role: "button",
         tabindex: "0",
-        "aria-label": `${stub.hiddenTicketCount} hidden archived Ticket${stub.hiddenTicketCount === 1 ? "" : "s"} ${stub.direction}; reveal next hop`,
+        "aria-label": `${stub.hiddenTicketCount} hidden archived Ticket${stub.hiddenTicketCount === 1 ? "" : "s"} ${stub.direction}; reveal next hop: ${nextTicketLabel}`,
       });
       group.dataset.stubRef = stub.stubRef;
       group.append(svg("rect", {
+        class: "history-stub-boundary",
         width: HISTORY_STUB.width,
         height: HISTORY_STUB.height,
-        rx: 8,
+        rx: 10,
       }));
       const label = svg("text", {
-        x: HISTORY_STUB.width / 2,
-        y: HISTORY_STUB.height / 2 + 4,
-        "text-anchor": "middle",
+        class: "history-stub-label",
+        x: 12,
+        y: 30,
       });
-      label.textContent = `${stub.hiddenTicketCount} archived ${stub.direction === "upstream" ? "←" : "→"}`;
-      group.append(label);
+      label.textContent = `${stub.hiddenTicketCount} archived`;
+      const action = svg("text", {
+        class: "history-stub-action",
+        x: 12,
+        y: 48,
+      });
+      action.textContent = `reveal ${stub.direction} ${stub.direction === "upstream" ? "←" : "→"}`;
+      group.append(label, action);
       group.addEventListener("click", (event) => {
         event.stopPropagation();
         void revealHistory(stub.nextTicketIds);
@@ -629,7 +656,7 @@
         selected: isSelected,
         dimmed: Boolean(related && !related.nodes.has(ticket.ticketId)),
       });
-      const { operational, attention } = presentation;
+      const { phase } = presentation;
       const group = svg("g", {
         class: classes(presentation.className, ticket.archived ? "archived" : ""),
         transform: `translate(${position.x} ${position.y})`,
@@ -648,13 +675,6 @@
           height: NODE.height,
           rx: 9,
         }),
-        svg("line", {
-          class: "ticket-accent",
-          x1: 9,
-          y1: 1.5,
-          x2: NODE.width - 9,
-          y2: 1.5,
-        }),
         svg("circle", {
           class: "ticket-aperture",
           cx: layoutDirection === "ltr" ? NODE.width : NODE.width / 2,
@@ -669,49 +689,44 @@
           y2: NODE.height - 1.5,
         }),
       );
-      if (attention) {
-        const attentionText = {
-          UPCOMING: "UPCOMING",
-          PENDING: "NEEDS YOU",
-          RECORDED: "RECORDED",
-          COMPLETE: "COMPLETE",
-        }[attention.label];
-        const attentionBadge = svg("g", {
-          class: "ticket-attention-badge",
+      if (phase.substate) {
+        const substateText = phase.substate.replaceAll("_", " ");
+        const substateBadge = svg("g", {
+          class: "ticket-substate-badge",
           transform: `translate(${NODE.width - 8} -12)`,
         });
-        attentionBadge.append(
+        substateBadge.append(
           svg("rect", { x: -88, y: 0, width: 88, height: 24, rx: 12 }),
-          svgIcon(ATTENTION_ICON_IDS[attention.label], {
-            class: "ticket-attention-icon",
+          svgIcon(SUBSTATE_ICON_IDS[phase.substate], {
+            class: "ticket-substate-icon",
             x: -81,
             y: 4,
             width: 16,
             height: 16,
           }),
         );
-        const attentionLabel = svg("text", {
-          class: "ticket-attention-label",
+        const substateLabel = svg("text", {
+          class: "ticket-substate-label",
           x: -61,
           y: 15,
         });
-        attentionLabel.textContent = attentionText;
-        attentionBadge.append(attentionLabel);
-        group.append(attentionBadge);
+        substateLabel.textContent = substateText;
+        substateBadge.append(substateLabel);
+        group.append(substateBadge);
       }
       const id = svg("text", { class: "ticket-id", x: 14, y: 22 });
       id.textContent = shortTicketId(ticket.ticketId);
       group.append(id);
       // The state is always a textual label; color is a secondary accent.
-      if (operational) {
-        const visibleState = ticket.archived ? "ARCHIVED" : operational.label;
-        group.append(svgIcon(STATE_ICON_IDS[visibleState], {
+      {
+        const visibleState = ticket.archived ? "ARCHIVED" : phase.label;
+        const stateIcon = svgIcon(STATE_ICON_IDS[visibleState], {
           class: "ticket-state-icon",
           x: NODE.width - 80,
-          y: NODE.height - 24,
+          y: NODE.height - 22,
           width: 14,
           height: 14,
-        }));
+        });
         const status = svg("text", {
           class: "ticket-state",
           x: NODE.width - 14,
@@ -719,7 +734,15 @@
           "text-anchor": "end",
         });
         status.textContent = visibleState;
-        group.append(status);
+        group.append(stateIcon, status);
+      }
+      if (phase.live) {
+        group.append(svg("circle", {
+          class: "ticket-live-indicator",
+          cx: NODE.width - 92,
+          cy: NODE.height - 17,
+          r: 3,
+        }));
       }
       // A 232px card has 204px of copy width after its 14px insets. The
       // selected 12px system monospace face fits 28 display units there;
@@ -752,23 +775,45 @@
         (event) => onNodeKey(event, ticket.ticketId),
       );
       elements.nodeLayer.append(group);
+      const stateIcon = group.querySelector(".ticket-state-icon");
+      const stateLabel = group.querySelector(".ticket-state");
+      if (stateIcon && stateLabel) {
+        // Keep labels right-aligned, then position the icon from the actual
+        // rendered label width. The 18px subtraction is 14px of icon plus a
+        // deliberate four-pixel gap, independent of label length.
+        const labelWidth = stateLabel.getComputedTextLength();
+        stateIcon.setAttribute(
+          "x",
+          String(NODE.width - 14 - labelWidth - 18),
+        );
+      }
     }
     applyTransform();
   }
 
-  function historyStubPosition(anchor, direction) {
-    if (layoutDirection === "ltr") {
-      return {
-        x: direction === "upstream" ? anchor.x - 142 : anchor.x + NODE.width + 26,
-        y: anchor.y + NODE.height / 2 - HISTORY_STUB.height / 2,
-      };
+  function historyStubGeometries() {
+    const result = new Map();
+    const occupied = [...positions.values()].map((position) => ({
+      ...position,
+      width: NODE.width,
+      height: NODE.height,
+    }));
+    const routes = [...graphGeometry.routes.values()];
+    for (const stub of [...(state?.graph?.stubs ?? [])]
+      .sort((left, right) => left.stubRef.localeCompare(right.stubRef))) {
+      const anchor = positions.get(stub.anchorTicketId);
+      if (!anchor) continue;
+      const geometry = graphLayoutModel.historyStubGeometry(
+        anchor,
+        stub.direction,
+        layoutDirection,
+        occupied,
+        routes,
+      );
+      result.set(stub.stubRef, geometry);
+      occupied.push({ ...geometry.position, ...HISTORY_STUB });
     }
-    return {
-      x: anchor.x + NODE.width / 2 - HISTORY_STUB.width / 2,
-      y: direction === "upstream"
-        ? anchor.y - HISTORY_STUB.height - 20
-        : anchor.y + NODE.height + 20,
-    };
+    return result;
   }
 
   async function revealHistory(ticketIds) {
@@ -779,6 +824,13 @@
     for (const id of [...existing].sort()) url.searchParams.append("history", id);
     history.replaceState(null, "", url.href);
     await refresh("Archived history expanded one hop", { preserveLayout: true });
+    const revealedTicket = ticketIds.find((ticketId) =>
+      state.graph.tickets.some((ticket) => ticket.ticketId === ticketId));
+    if (revealedTicket) {
+      elements.nodeLayer
+        .querySelector(`[data-ticket-id="${CSS.escape(revealedTicket)}"]`)
+        ?.focus();
+    }
   }
 
   function renderMinimap() {
@@ -806,13 +858,11 @@
     for (const ticket of state.graph.tickets) {
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
-      const operational = ticketOperationalState(ticket);
-      const attention = ticketAttentionState(ticket);
+      const presentation = ticketNodePresentation(ticket);
       elements.minimap.append(svg("rect", {
         class: classes(
           "minimap-node",
-          operational ? `state-${operational.key}` : "",
-          attention ? `attention-${attention.key}` : "",
+          ...presentation.className.split(" ").filter((name) => name !== "ticket-node"),
         ),
         x: position.x,
         y: position.y,
@@ -843,11 +893,12 @@
     elements.inspectorTitle.textContent = "Execution context";
     elements.inspectorOutcome.hidden = false;
     const counts = operationalCounts(state.graph.tickets);
-    elements.inspectorOutcome.textContent = graphNarrative(counts);
+    const overview = workbenchOverview(state.graph.tickets, state.graph.source);
+    elements.inspectorOutcome.textContent = graphNarrative(counts, overview);
     const content = document.createDocumentFragment();
     content.append(section(
       "Execution signal",
-      stateSummary(counts),
+      stateSummary(counts, overview),
     ));
     content.append(disclosure(
       "Exact Git source",
@@ -940,6 +991,7 @@
     elements.inspectorEyebrow.textContent =
       `Ticket · ${ticket.ticketId}`;
     elements.inspectorTitle.textContent = ticket.outcome;
+    elements.inspectorTitle.dataset.fullText = ticket.outcome;
     elements.inspectorOutcome.hidden = false;
     elements.inspectorOutcome.textContent = "Reading current Ticket facts…";
     elements.inspectorContent.replaceChildren(
@@ -993,8 +1045,10 @@
     elements.inspectorEyebrow.textContent =
       `Ticket · ${ticket.ticketId}`;
     elements.inspectorTitle.textContent = ticket.outcome;
+    elements.inspectorTitle.dataset.fullText = ticket.outcome;
     const operational = ticketOperationalState(ticket);
     const attention = ticketAttentionState(ticket);
+    const nextAction = ticketNextAction(ticket);
     elements.inspectorOutcome.hidden = true;
     elements.inspectorOutcome.textContent = "";
 
@@ -1003,9 +1057,15 @@
       contextPackage,
       operational,
       attention,
+      nextAction,
     );
-    const contract = ticketContractPanel(ticket, contextPackage, inspection);
-    const proof = ticketProofPanel();
+    const contract = ticketContractPanel(
+      ticket,
+      contextPackage,
+      inspection,
+      nextAction,
+    );
+    const proof = ticketProofPanel(contextPackage, nextAction);
     const view = tabbedTicketView(
       ticket.ticketId,
       [
@@ -1024,6 +1084,7 @@
       contractSummary: contract.summary,
       proofSummary: proof.summary,
       acceptanceCount: (contextPackage.acceptance || []).length,
+      nextAction,
     };
   }
 
@@ -1435,6 +1496,7 @@
     contextPackage,
     operational,
     attention,
+    nextAction,
   ) {
     const panel = document.createElement("section");
     const incoming = state.graph.relations.filter(
@@ -1450,27 +1512,41 @@
       return ticketOperationalState(prerequisite)?.label === "DONE";
     }).length;
 
-    const signal = document.createElement("div");
-    signal.className = classes(
-      "ticket-signal",
-      operational ? `state-${operational.key}` : "",
-    );
+    const phase = ticketPhasePresentation(ticket);
+    const signal = document.createElement("section");
+    signal.className = classes("recommended-action", `phase-${phase.key}`);
     const heading = document.createElement("div");
-    heading.className = "ticket-signal-heading";
-    const marker = document.createElement("span");
-    marker.className = "ticket-signal-mark";
-    marker.setAttribute("aria-hidden", "true");
+    heading.className = "recommended-action-heading";
+    const copy = document.createElement("span");
+    const eyebrow = document.createElement("span");
+    eyebrow.className = "eyebrow";
+    eyebrow.textContent = "Recommended action";
     const label = document.createElement("strong");
-    label.textContent = operational?.label || "TICKET";
+    label.className = "recommended-action-title";
+    label.textContent = recommendedActionTitle(nextAction?.action);
+    label.tabIndex = 0;
+    label.dataset.fullText = nextAction?.detail
+      || "Inspect the current Ticket context.";
+    label.setAttribute("aria-describedby", "textTooltip");
+    copy.append(eyebrow, label);
+    const closeout = nextAction?.action === "CLOSE_OUT";
     const handoff = actionButton({
-      label: "Copy for Agent",
-      className: "agent-handoff",
+      label: "Copy prompt",
+      className: classes("agent-handoff", closeout ? "closeout-handoff" : ""),
       onClick: () => void copyPayload(
         agentHandoffPayload(ticket, contextPackage, operational),
-        `Ticket ${ticket.ticketId} copied for Agent`,
+        closeout
+          ? `Closeout handoff for ${ticket.ticketId} copied`
+          : `Ticket ${ticket.ticketId} copied for Agent`,
       ),
     });
-    heading.append(marker, label, handoff);
+    heading.append(copy, handoff);
+
+    const phaseMeta = document.createElement("div");
+    phaseMeta.className = "recommended-action-phase";
+    phaseMeta.textContent = phase.substate
+      ? `${phase.label} · ${phase.substate.replaceAll("_", " ")}`
+      : phase.label;
 
     const metrics = document.createElement("div");
     metrics.className = "ticket-signal-metrics";
@@ -1481,10 +1557,14 @@
         "blockers",
       ),
       signalMetric(String(outgoing.length), "unlocks"),
+      signalMetric(nextAction?.action || "—", "next action"),
       signalMetric("Reading", "evidence", "proof-metric"),
     );
-    signal.append(heading, metrics);
+    signal.append(heading, phaseMeta, metrics);
     panel.append(signal);
+
+    const review = closeoutReviewBrief(contextPackage, nextAction);
+    if (review) panel.append(review);
 
     if (attention) panel.append(humanAttentionBrief(attention));
 
@@ -1542,18 +1622,53 @@
   }
 
   function agentHandoffPayload(ticket, contextPackage, operational) {
-    // READY is the only Git-native state that may hand an Agent a new
-    // ticket-run instruction. REFINE routes back to Ticket Plan; every other
-    // state copies an inspect instruction so an Agent never starts work the
-    // graph does not allow.
+    // The canonical host projection owns routing. Operational state and human
+    // attention remain separate context; the browser never re-derives whether
+    // this Ticket should execute, wait, ask a human, close out, or replan.
     const stateLabel = operational?.label || "UNPROJECTED";
-    return {
-      instruction: agentHandoffInstruction(ticket.ticketId, stateLabel),
-      ...(contextPackage.agentPayload ?? {
-        kind: "vibehub_ticket_handoff",
-        ticketId: ticket.ticketId,
-      }),
+    const nextAction = ticketNextAction(ticket);
+    const canonical = contextPackage.agentPayload ?? {
+      kind: "vibehub_ticket_handoff",
+      ticketId: ticket.ticketId,
     };
+    if (contextPackage.agentPayload) return canonical;
+    return {
+      ...canonical,
+      instruction: agentHandoffInstruction(ticket.ticketId, nextAction, stateLabel),
+    };
+  }
+
+  function recommendedActionTitle(action) {
+    return {
+      EXECUTE: "Start work",
+      REFINE: "Define task",
+      REPLAN: "Revise task",
+      WAIT: "Review blockers",
+      NEEDS_HUMAN: "Respond",
+      CLOSE_OUT: "Verify & close",
+      DONE: "Review outcome",
+    }[action] || "Inspect task";
+  }
+
+  function closeoutReviewBrief(contextPackage, nextAction) {
+    if (nextAction?.action !== "CLOSE_OUT") return null;
+    const acceptance = contextPackage.acceptance || [];
+    const evidence = contextPackage.evidence || [];
+    const brief = document.createElement("div");
+    brief.className = "closeout-review-brief";
+    const marker = document.createElement("span");
+    marker.className = "closeout-review-mark";
+    marker.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("span");
+    const title = document.createElement("strong");
+    title.textContent = "Ready for independent closeout";
+    const detail = document.createElement("span");
+    detail.textContent = `${acceptance.length} / ${acceptance.length} criteria have authority-satisfying Evidence across ${evidence.length} record${evidence.length === 1 ? "" : "s"}. Outcome is pending; Evidence is proof, not judgment.`;
+    copy.append(title, detail);
+    const action = document.createElement("b");
+    action.textContent = "CLOSE OUT";
+    brief.append(marker, copy, action);
+    return brief;
   }
 
   function signalMetric(value, label, extraClass = "") {
@@ -1625,17 +1740,17 @@
 
   function causalPriority(ticketId) {
     const ticket = state.graph.tickets.find((item) => item.ticketId === ticketId);
-    return operationalPriority(ticketOperationalState(ticket)?.label);
+    return operationalPriority(ticketPhasePresentation(ticket).label);
   }
 
   function causalTicketButton(ticketId) {
     const ticket = state.graph.tickets.find((item) => item.ticketId === ticketId);
-    const operational = ticketOperationalState(ticket);
+    const phase = ticketPhasePresentation(ticket);
     const button = document.createElement("button");
     button.type = "button";
     button.className = classes(
       "causal-ticket",
-      operational ? `state-${operational.key}` : "",
+      `phase-${phase.key}`,
     );
     button.dataset.fullText = ticketId;
     button.setAttribute("aria-label", ticketId);
@@ -1669,7 +1784,7 @@
     return arrow;
   }
 
-  function ticketContractPanel(ticket, contextPackage, inspection) {
+  function ticketContractPanel(ticket, contextPackage, inspection, nextAction) {
     const panel = document.createElement("section");
     const acceptance = contextPackage.acceptance || [];
     const constraints = contextPackage.constraints || [];
@@ -1679,6 +1794,8 @@
       contextPackage.provenanceRefs || ticket.provenanceRefs || [];
     const summary = contractBrief(acceptance);
     panel.append(summary);
+    const review = closeoutReviewBrief(contextPackage, nextAction);
+    if (review) panel.append(review);
     panel.append(ticketSectionHeading(
       "Acceptance conditions",
       "The exact conditions an independent Outcome can accept.",
@@ -2126,7 +2243,7 @@
     return normalized.charAt(0).toUpperCase() + normalized.slice(1);
   }
 
-  function ticketProofPanel() {
+  function ticketProofPanel(contextPackage, nextAction) {
     const panel = document.createElement("section");
     const summary = document.createElement("div");
     summary.className = "proof-summary";
@@ -2136,6 +2253,8 @@
     detail.textContent = "Acceptance-linked Evidence and independent Outcome appear here.";
     summary.append(label, detail);
     panel.append(summary);
+    const review = closeoutReviewBrief(contextPackage, nextAction);
+    if (review) panel.append(review);
     panel.append(ticketSectionHeading(
       "Evidence & Outcome",
       "Chronological Evidence and Outcome from the exact Git source.",
@@ -2178,7 +2297,9 @@
       );
     } else {
       contractValue.textContent = `${evidenced.size} / ${target.acceptanceCount} evidenced`;
-      contractDetail.textContent = "Independent Outcome pending";
+      contractDetail.textContent = target.nextAction?.action === "CLOSE_OUT"
+        ? "Authority satisfied · independent Outcome pending"
+        : "Independent Outcome pending";
     }
 
     const metric = elements.inspectorContent.querySelector(".proof-metric strong");
@@ -2190,7 +2311,9 @@
       detail.textContent = `${target.acceptanceCount} criteria await acceptance-linked Evidence.`;
     } else {
       label.textContent = `${evidence.length} Evidence · ${outcomes.length ? "Outcome recorded" : "Outcome pending"}`;
-      detail.textContent = `${evidenced.size} of ${target.acceptanceCount} criteria have Evidence attached.`;
+      detail.textContent = target.nextAction?.action === "CLOSE_OUT"
+        ? `${evidenced.size} of ${target.acceptanceCount} criteria are authority-satisfied; independent adjudication is next.`
+        : `${evidenced.size} of ${target.acceptanceCount} criteria have Evidence attached.`;
     }
 
     target.acceptanceRail.querySelectorAll("[data-acceptance-id]").forEach((row) => {
@@ -2300,11 +2423,11 @@
     return result;
   }
 
-  function stateSummary(counts) {
+  function stateSummary(counts, overview = null) {
     const result = document.createElement("div");
     result.className = "execution-state-copy";
     const primary = document.createElement("strong");
-    primary.textContent = graphSummary(counts);
+    primary.textContent = graphSummary(counts, overview);
     const detail = document.createElement("span");
     detail.textContent = "Select a Ticket or direct unlock to reveal its exact bounded context and Git trace.";
     result.append(primary, detail);
@@ -2313,15 +2436,16 @@
 
   function executionStateView(ticket) {
     const operational = ticketOperationalState(ticket);
-    if (!operational) return null;
+    const phase = ticketPhasePresentation(ticket);
+    if (!operational && !phase) return null;
     const wrapper = document.createElement("div");
     wrapper.className = classes(
       "execution-state",
-      `state-${operational.key}`,
+      `phase-${phase.key}`,
     );
     wrapper.setAttribute(
       "aria-label",
-      `${operational.label}. ${operational.detail}`,
+      `${phase.label}${phase.substate ? `. ${phase.substate.replaceAll("_", " ")}` : ""}. ${operational?.detail || ""}`,
     );
 
     const marker = document.createElement("span");
@@ -2330,16 +2454,18 @@
     const copy = document.createElement("div");
     copy.className = "execution-state-copy";
     const label = document.createElement("strong");
-    label.textContent = operational.label;
+    label.textContent = phase.substate
+      ? `${phase.label} · ${phase.substate.replaceAll("_", " ")}`
+      : phase.label;
     copy.append(label);
-    if (operational.detail) {
+    if (operational?.detail) {
       const detail = document.createElement("span");
       detail.textContent = operational.detail;
       copy.append(detail);
     }
     wrapper.append(marker, copy);
 
-    const references = executionStateReferences(operational.references);
+    const references = executionStateReferences(operational?.references || []);
     if (references) wrapper.append(references);
     return wrapper;
   }
@@ -2502,10 +2628,8 @@
       width: NODE.width,
       height: NODE.height,
     }));
-    for (const stub of state?.graph?.stubs ?? []) {
-      const anchor = positions.get(stub.anchorTicketId);
-      if (!anchor) continue;
-      values.push({ ...historyStubPosition(anchor, stub.direction), ...HISTORY_STUB });
+    for (const geometry of historyStubGeometries().values()) {
+      values.push({ ...geometry.position, ...HISTORY_STUB });
     }
     const minX = Math.min(...values.map((value) => value.x));
     const minY = Math.min(...values.map((value) => value.y));

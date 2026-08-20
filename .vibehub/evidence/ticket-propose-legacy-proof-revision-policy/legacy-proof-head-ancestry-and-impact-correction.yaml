@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "legacy-proof-corpus-is-audited",
+    "repository-truth-impact-is-quantified",
+    "git-reconstruction-limits-are-proven"
+  ],
+  "evidence_id": "legacy-proof-head-ancestry-and-impact-correction",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-20T20:40:04Z",
+  "refs": [
+    "docs/LEGACY_PROOF_REVISION_POLICY.md",
+    "scripts/audit-legacy-proof.mjs",
+    "test/legacy-proof-audit.test.mjs",
+    "command:node --test test/legacy-proof-audit.test.mjs",
+    "command:node scripts/audit-legacy-proof.mjs --repo .",
+    "commit:175e83aef0886b3714c92053231a9a0ed0c4f428",
+    "commit:cdeac6b57dcab02e97f243d392f818afaad973c5",
+    "rejected-non-ancestor:24b3d6d9df041a94ef3cb74468be9528b0214747"
+  ],
+  "schema_version": 1,
+  "summary": "The corrected audit follows only current HEAD ancestry and has a regression fixture proving an unrelated newer branch addition cannot be selected. At HEAD 175e83a it reconstructs 210/210 Evidence and 61/61 Outcomes, identifies 19 Evidence and one successful Outcome with later contract drift, and mechanically quantifies for all-stale, grandfather, and reconstruction policies: DONE, archive, human authority, CLOSE_OUT, Current/All graph size, successful prerequisite edges, open dependent unlock, project-format/schema changes, two installed host artifacts, migration, and rollback. The earlier non-ancestor 24b3d6d example is preserved as the exact diagnosed failure; cdeac6b is the truthful current-ancestry addition.",
+  "ticket_id": "ticket-propose-legacy-proof-revision-policy"
+}

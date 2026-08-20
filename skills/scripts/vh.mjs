@@ -41,6 +41,10 @@ const VERSION_CONTRACT = JSON.parse(readFileSync(
   fileURLToPath(new URL("../contracts/versions.json", import.meta.url)),
   "utf8",
 ));
+const DEPENDENCY_HYGIENE = JSON.parse(readFileSync(
+  fileURLToPath(new URL("../contracts/dependency-hygiene.json", import.meta.url)),
+  "utf8",
+));
 const CURRENT_PROJECT_FORMAT = VERSION_CONTRACT.project_format;
 const CURRENT_TICKET_SCHEMA = VERSION_CONTRACT.document_schemas.ticket;
 const PROJECT_FORMAT_FILE = "version.yaml";
@@ -945,11 +949,142 @@ export function ticketStatus(repository, ticket) {
   return ticket.maturity === "draft" ? "REFINE" : "READY";
 }
 
+function acceptanceAuthority(criterion) {
+  return criterion.authority ?? "agent";
+}
+
+function evidenceOrigin(evidence) {
+  return evidence.origin ?? "agent";
+}
+
+export function ticketNextAction(repository, ticket) {
+  const acceptanceIds = ticket.acceptance.map((criterion) => criterion.acceptance_id);
+  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+  if (outcome?.status === "successful") {
+    return {
+      action: "DONE",
+      reason: "successful_outcome",
+      detail: "An independent successful Outcome accepts every current criterion.",
+      acceptance_ids: acceptanceIds,
+      blocking_ticket_ids: [],
+    };
+  }
+  if (outcome) {
+    return {
+      action: "REPLAN",
+      reason: "non_successful_outcome",
+      detail: `The independent Outcome is ${outcome.status}; revise the Ticket before another execution cycle.`,
+      acceptance_ids: outcome.unresolved_acceptance_ids,
+      blocking_ticket_ids: [],
+    };
+  }
+
+  const blockingTicketIds = ticket.relations
+    .map((relation) => relation.target_ticket_id)
+    .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful")
+    .sort();
+  if (blockingTicketIds.length > 0) {
+    return {
+      action: "WAIT",
+      reason: "unresolved_direct_dependencies",
+      detail: "Direct prerequisites must close successfully before this Ticket can advance.",
+      acceptance_ids: [],
+      blocking_ticket_ids: blockingTicketIds,
+    };
+  }
+
+  if (ticket.maturity === "draft") {
+    return {
+      action: "REFINE",
+      reason: "draft_contract",
+      detail: "The unblocked draft needs a firm, executable acceptance contract.",
+      acceptance_ids: acceptanceIds,
+      blocking_ticket_ids: [],
+    };
+  }
+
+  const ticketEvidence = documents(repository.evidence.documents)
+    .filter((evidence) => evidence.ticket_id === ticket.ticket_id);
+  const evidencedIds = new Set(ticketEvidence.flatMap((evidence) => evidence.acceptance_ids));
+  const humanEvidencedIds = new Set(ticketEvidence
+    .filter((evidence) => evidenceOrigin(evidence) === "human")
+    .flatMap((evidence) => evidence.acceptance_ids));
+  const missingHumanIds = ticket.acceptance
+    .filter((criterion) => acceptanceAuthority(criterion) === "human"
+      && !humanEvidencedIds.has(criterion.acceptance_id))
+    .map((criterion) => criterion.acceptance_id);
+  if (missingHumanIds.length > 0) {
+    return {
+      action: "NEEDS_HUMAN",
+      reason: "missing_human_evidence",
+      detail: "Reachable human-authority criteria still need explicit human-origin Evidence.",
+      acceptance_ids: missingHumanIds,
+      blocking_ticket_ids: [],
+    };
+  }
+
+  const missingEvidenceIds = ticket.acceptance
+    .filter((criterion) => !evidencedIds.has(criterion.acceptance_id))
+    .map((criterion) => criterion.acceptance_id);
+  if (missingEvidenceIds.length === 0) {
+    return {
+      action: "CLOSE_OUT",
+      reason: "authority_satisfying_evidence_complete",
+      detail: "Every current criterion has authority-satisfying Evidence; independent adjudication is next.",
+      acceptance_ids: acceptanceIds,
+      blocking_ticket_ids: [],
+    };
+  }
+  return {
+    action: "EXECUTE",
+    reason: "acceptance_evidence_incomplete",
+    detail: "Executable criteria still need reproducible acceptance-linked Evidence.",
+    acceptance_ids: missingEvidenceIds,
+    blocking_ticket_ids: [],
+  };
+}
+
 export function ticketArchived(repository, ticket) {
   if (!ticket) return false;
   const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
   return outcome?.status === "successful"
     && (ticket.deliveries ?? []).some((delivery) => delivery.state === "delivered");
+}
+
+function ticketDependencyKey(relation) {
+  return `${relation.type}:${relation.target_ticket_id}`;
+}
+
+export function candidateDependencyAdvice(currentRepository, candidateRepository, candidates) {
+  const advice = [];
+  candidates.forEach((candidate, candidateIndex) => {
+    const existing = currentRepository.tickets.documents.get(candidate.ticket_id)?.document;
+    const existingEdges = new Set((existing?.relations ?? []).map(ticketDependencyKey));
+    candidate.relations.forEach((relation, relationIndex) => {
+      if (existingEdges.has(ticketDependencyKey(relation))) return;
+      const target = candidateRepository.tickets.documents.get(relation.target_ticket_id)?.document;
+      if (!target || ticketStatus(candidateRepository, target) !== "DONE") return;
+      advice.push({
+        code: DEPENDENCY_HYGIENE.candidate_done_dependency.advice_code,
+        level: DEPENDENCY_HYGIENE.candidate_done_dependency.level,
+        blocking: DEPENDENCY_HYGIENE.candidate_done_dependency.blocking,
+        relation_path: `tickets[${candidateIndex}].relations[${relationIndex}]`,
+        ticket_id: candidate.ticket_id,
+        target_ticket_id: relation.target_ticket_id,
+        rationale: relation.rationale ?? null,
+        rationale_present: typeof relation.rationale === "string" && relation.rationale.trim() !== "",
+        message: DEPENDENCY_HYGIENE.candidate_done_dependency.instruction,
+        suggested_context_refs: [
+          `.vibehub/tickets/${relation.target_ticket_id}.yaml`,
+          `.vibehub/outcomes/${relation.target_ticket_id}.yaml`,
+        ],
+      });
+    });
+  });
+  return advice.sort((left, right) =>
+    left.ticket_id.localeCompare(right.ticket_id)
+    || left.target_ticket_id.localeCompare(right.target_ticket_id)
+    || left.relation_path.localeCompare(right.relation_path));
 }
 
 function ticketRoomPaths(ticket) {
@@ -1085,15 +1220,23 @@ function ticketOperation(operation, repo, input, options = {}) {
       ids.add(ticket.ticket_id);
     }
     assertValid(errors, "Ticket candidate is invalid");
+    const currentRepository = loadRepository(repo);
+    assertValid(currentRepository.errors);
     const repository = loadRepository(repo, { tickets: input.tickets });
     assertValid(repository.errors);
+    const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
     const written = [];
     for (const ticket of input.tickets) {
       const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
       writeDocument(path, ticket);
       written.push(path);
     }
-    return { status: "written", ticket_ids: input.tickets.map((ticket) => ticket.ticket_id), paths: written };
+    return {
+      status: "written",
+      ticket_ids: input.tickets.map((ticket) => ticket.ticket_id),
+      paths: written,
+      advice,
+    };
   }
   if (operation === "evidence") {
     assertCurrentProjectFormat(repo);
@@ -1135,6 +1278,7 @@ function ticketOperation(operation, repo, input, options = {}) {
     return {
       ticket: item,
       status: ticketStatus(repository, item),
+      next_action: ticketNextAction(repository, item),
       evidence: ticketEvidence,
       outcome: repository.outcomes.documents.get(input.ticket_id)?.document ?? null,
     };
@@ -1146,6 +1290,7 @@ function ticketOperation(operation, repo, input, options = {}) {
     const items = query.tickets.map((ticket) => ({
       ticket,
       status: ticketStatus(repository, ticket),
+      next_action: ticketNextAction(repository, ticket),
       archived: ticketArchived(repository, ticket),
       blocking_ticket_ids: ticket.relations
         .map((relation) => relation.target_ticket_id)
@@ -1153,8 +1298,22 @@ function ticketOperation(operation, repo, input, options = {}) {
       outcome: repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null,
     }));
     if (operation === "frontier") {
-      const ready = items.filter((item) => item.status === "READY");
-      return { ready, count: ready.length };
+      const byAction = (action) => items
+        .filter((item) => item.next_action.action === action)
+        .sort((left, right) => left.ticket.ticket_id.localeCompare(right.ticket.ticket_id));
+      const readyToExecute = byAction("EXECUTE");
+      return {
+        // Compatibility path for existing callers: `ready` still exists, but
+        // now means genuinely ready to execute rather than merely status READY.
+        ready: readyToExecute,
+        ready_to_execute: readyToExecute,
+        ready_to_closeout: byAction("CLOSE_OUT"),
+        needs_human: byAction("NEEDS_HUMAN"),
+        needs_replan: byAction("REPLAN"),
+        needs_refinement: byAction("REFINE"),
+        waiting: byAction("WAIT"),
+        count: readyToExecute.length,
+      };
     }
     return {
       tickets: items.sort((left, right) => left.ticket.ticket_id.localeCompare(right.ticket.ticket_id)),

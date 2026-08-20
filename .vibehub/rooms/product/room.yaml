@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "617158f0d1777dfbfd0256b788f32ebc04fad7c3",
+        "blob": "13da7eda9d85e44dac78aa99ec862e9e7181309f",
         "path": "README.md"
       },
       {
@@ -50,6 +50,10 @@
         "path": "docs/INSTALL.md"
       },
       {
+        "blob": "a2e46e8fe8e88bcf6ee50ed2e5f6859776cf9a39",
+        "path": "docs/LEGACY_PROOF_REVISION_POLICY.md"
+      },
+      {
         "blob": "8f19d098f116896f4294c5482db8fa016e8444d5",
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
@@ -62,6 +66,10 @@
         "path": "docs/SPEED_FIRST_CLEANUP.md"
       },
       {
+        "blob": "2961f14f4d201094a6fda525117a7b19980b529b",
+        "path": "docs/assets/local-graph/quiet-workbench-desktop-2x.png"
+      },
+      {
         "blob": "68f9a0219b05a05b158c8f27a29b0da9c57936d0",
         "path": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
       },
@@ -70,12 +78,52 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       },
       {
+        "blob": "ea2f3c13ce59e51e5ab564a004edffd82758af38",
+        "path": "docs/assets/local-graph/readme-capture-manifest.json"
+      },
+      {
+        "blob": "9848601c890923d0b17cc9436f8d7ad2d50caff7",
+        "path": "docs/assets/local-graph/workbench-rooms-narrow-2x.png"
+      },
+      {
         "blob": "b139f93c74c772316d49b29f29b52c1e61217b92",
         "path": "docs/assets/local-graph/workbench-rooms-narrow.jpg"
       },
       {
+        "blob": "6353976f590a96ae4b456921bea407fa279a650a",
+        "path": "docs/assets/local-graph/workbench-ticket-action-2x.png"
+      },
+      {
         "blob": "1e42da3d572229ed1207652c5b4727a5e8ac072e",
         "path": "docs/assets/local-graph/workbench-ticket-proof.jpg"
+      },
+      {
+        "blob": "85fafdaebc2668fb4e4f456d23b715c3bf858633",
+        "path": "docs/proposals/card-corner-signal/README.md"
+      },
+      {
+        "blob": "bacec00f101b479b827207901345cea48f42c0f0",
+        "path": "docs/proposals/card-corner-signal/contract.json"
+      },
+      {
+        "blob": "591749d2a61a287aebacae74cdd5617fc6f5992a",
+        "path": "docs/proposals/card-corner-signal/fixtures.json"
+      },
+      {
+        "blob": "2a738eb744695cad46b8c59cee146892830f7494",
+        "path": "docs/proposals/card-corner-signal/index.html"
+      },
+      {
+        "blob": "578540d9054125c2d4f95d63afceb2db668d4f6e",
+        "path": "docs/proposals/card-corner-signal/phase-model.mjs"
+      },
+      {
+        "blob": "658ad3be5c26fd6a8000761c9518d6900b953f55",
+        "path": "docs/proposals/card-corner-signal/prototype.css"
+      },
+      {
+        "blob": "89edf0ccce4ffd2e6f8b47c7c4bae85d8954ca34",
+        "path": "docs/proposals/card-corner-signal/prototype.js"
       },
       {
         "blob": "58d55bf49c411a39951ac316f81dc310f68cd4d4",
@@ -122,8 +170,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-20T00:30:47.965Z",
-    "last_aligned_commit": "b47a9b3f9b0cc8d995c5a8793396c704aa303ca5"
+    "checked_at": "2026-08-20T23:17:24.714Z",
+    "last_aligned_commit": "cf680825f0f0cb3b7798443aba2696144d113eb8"
   },
   "anchors": [
     "CHANGELOG.md",

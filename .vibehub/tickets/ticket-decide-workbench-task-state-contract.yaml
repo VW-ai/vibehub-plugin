@@ -1,0 +1,37 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "owner-selects-primary-and-substate-contract",
+      "authority": "human",
+      "criterion": "The owner explicitly accepts or corrects the proposal's four primary phase derivation and precedence, RUNNING and closeout relationship, upper-right substate taxonomy and priority, short user-facing language, and restrained visual encoding, with human-origin Evidence pointing to the reviewed artifact and decision."
+    }
+  ],
+  "constraints": [
+    "Do not infer acceptance from the owner's earlier examples; they explicitly requested semantic validation before implementation.",
+    "Do not accept Agent-origin Evidence for this protected product-language and interaction decision.",
+    "A successful Outcome records the chosen contract; it does not itself modify production UI or canonical machine projections."
+  ],
+  "context": "The broad constraints are owner-decided—few primary states, DRAFT language, important RUNNING, review normally inside RUNNING, and a composable upper-right substate—but the exact derivation, combinations, priority, labels, and visual treatment still require review of the proposal. This Ticket is the protected boundary between research and production implementation.",
+  "context_refs": [
+    {
+      "purpose": "The decision-ready proposal this Human criterion reviews.",
+      "ref": ".vibehub/tickets/ticket-propose-card-corner-signal-contract.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner records the exact Workbench primary-phase and cross-cutting substate contract that production implementation must follow.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-requests-semantic-validation-before-major-state-ui-development"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner must review a concrete, tested semantic and visual proposal rather than decide from examples alone.",
+      "target_ticket_id": "ticket-propose-card-corner-signal-contract",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-workbench-task-state-contract"
+}

@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "dependency-versus-context-rule-is-explicit",
+    "planner-checks-current-prerequisite-state",
+    "validation-emits-nonblocking-structured-advice",
+    "graph-hygiene-improves-without-history-loss",
+    "skills-and-tests-share-one-rule"
+  ],
+  "evidence_id": "dependency-hygiene-contract-advice-and-parity",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T20:19:09Z",
+  "refs": [
+    "skills/contracts/dependency-hygiene.json",
+    "skills/vibehub-ticket-plan/SKILL.md",
+    "skills/vibehub-ticket-validate/SKILL.md",
+    "skills/scripts/vh.mjs",
+    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "test/ticket.test.mjs",
+    "test/skill-contracts.test.mjs",
+    "test/ticket-lifecycle.test.mjs",
+    "test/host-marketplaces.test.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:npm-run-verify-108-of-108-2026-08-20"
+  ],
+  "schema_version": 1,
+  "summary": "A single checked-in dependency-hygiene contract now defines depends_on versus context_refs and historical preservation. Ticket Plan reads each proposed target and resolves DONE edges semantically; Ticket Validate reports the same advisory boundary without treating DONE dependencies as invalid. The dependency-free helper emits sorted completed-dependency-review advice only for newly proposed edges to successful targets, leaves writes and existing edges untouched, and suggests exact Ticket and Outcome context refs. Fixtures prove context-only baselines create no boundary, repeated historical edges are not re-warned, active dependencies retain normal blocking, and legitimate fork, join, release, migration, and consumed-artifact edges remain exact. Fresh full verification passed 108/108 tests, the 56-file installed artifact, read-only loopback UI, and identical Codex and Claude Code marketplace behavior; project and Ticket validation passed and all Rooms are FRESH.",
+  "ticket_id": "ticket-tighten-completed-dependency-hygiene"
+}

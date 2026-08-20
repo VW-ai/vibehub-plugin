@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "legacy-proof-corpus-is-audited",
+    "three-transition-policies-are-compared",
+    "repository-truth-impact-is-quantified",
+    "git-reconstruction-limits-are-proven",
+    "recommendation-is-decision-ready",
+    "downstream-boundary-is-explicit"
+  ],
+  "evidence_id": "legacy-proof-audit-and-policy-proposal",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-20T20:17:44Z",
+  "refs": [
+    "docs/LEGACY_PROOF_REVISION_POLICY.md",
+    "scripts/audit-legacy-proof.mjs",
+    "command:node scripts/audit-legacy-proof.mjs --repo .",
+    "commit:b558f35e4813268e02d3438b6e7d863fbc7951e7",
+    "commit:24b3d6d9df041a94ef3cb74468be9528b0214747",
+    "commit:ffaad6d19139942e4d1e21679a3cf7b8a6d94f21"
+  ],
+  "schema_version": 1,
+  "summary": "A reproducible Git-history audit at b558f35 inventories 79 Tickets, 202 Evidence, 59 successful Outcomes, 43 archived Tickets, and human-authority proof; it reconstructs every proof document at first Git appearance, identifies 19 Evidence and one successful Outcome with later contract drift, quantifies all-stale, grandfather, and reconstruction impacts, and supports a decision-ready bounded-reconstruction hybrid with explicit migration, rollback, schema, projection, host-parity, and regression boundaries without mutating repository truth.",
+  "ticket_id": "ticket-propose-legacy-proof-revision-policy"
+}

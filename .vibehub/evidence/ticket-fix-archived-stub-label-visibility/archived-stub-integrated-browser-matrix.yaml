@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "archived-stub-is-legible-in-real-graph",
+    "archive-expansion-remains-exact-and-operable",
+    "directions-and-narrow-layout-regressions-pass",
+    "quiet-accessible-visual-contract-is-preserved"
+  ],
+  "evidence_id": "archived-stub-integrated-browser-matrix",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-20T20:35:10Z",
+  "refs": [
+    "conversation:2026-08-20-integrated-archived-stub-browser-matrix",
+    "commit:efc725acc557f955b50fe5b53a837aaa0b1756a8",
+    "commit:f285778cee8ad4816821b629a80a1ac8bd6ece47",
+    "test/ui-layout.test.mjs",
+    "test/ui-visual-system.test.mjs",
+    "command:npm run verify"
+  ],
+  "schema_version": 1,
+  "summary": "Direct integrated-main browser inspection on the authorized read-only loopback Workbench confirmed all three real archived boundaries render as opaque two-line controls with complete counts and upstream/downstream labels outside the primary causal lane in both LTR and TTB. At an explicit 760x900 viewport the document measured clientWidth=scrollWidth=760 and clientHeight=scrollHeight=900. Keyboard Enter on the 18-Ticket upstream stub added exactly history=ticket-rooms-into-workbench, revealed that canonical Ticket, replaced the boundary with the next 17-Ticket stub, and moved focus to the revealed archived Ticket. Normal viewport was restored after the check; no browser or repository state became authoritative.",
+  "ticket_id": "ticket-fix-archived-stub-label-visibility"
+}

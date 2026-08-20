@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "398f49668706041a82effbcb194f9b2c7a15d102",
+        "blob": "aa6e309450a63a11e94d8f1f531215883e91f090",
         "path": "skills/vibehub-ticket-review/SKILL.md"
       },
       {
@@ -10,32 +10,36 @@
         "path": "skills/vibehub-ticket-review/agents/openai.yaml"
       },
       {
-        "blob": "c67f2b63f5e0a80d97fe9ab1d067d53591233cee",
+        "blob": "692597d531c7d20d9ad9f31c26ed31cf18a9f97a",
         "path": "skills/vibehub-ticket-review/assets/app-layout.js"
       },
       {
-        "blob": "9d19d10ec69573c7a5863cef4b7c26d6de56e753",
+        "blob": "5694a40fb3b75112ea99bbd521ea61fdca7495aa",
         "path": "skills/vibehub-ticket-review/assets/app-model.js"
       },
       {
-        "blob": "c261d877c0cfc47c1564a82acec76395646edb7c",
+        "blob": "754cd55cba2500773fe2346a02b2f849053c108f",
         "path": "skills/vibehub-ticket-review/assets/app.css"
       },
       {
-        "blob": "1fed38f8ce9dd380247336307e79b34d285f2999",
+        "blob": "ac845d24798da510b8dfe0edb6803dbf4fdd502c",
         "path": "skills/vibehub-ticket-review/assets/app.js"
       },
       {
-        "blob": "caf13fbe91679cf2ab86f69991de6719b046f486",
+        "blob": "5effca213341ab14477c55ffd49755ae0fe10cb7",
         "path": "skills/vibehub-ticket-review/assets/index.html"
       },
       {
-        "blob": "8e9df3757ed56691221bf83002dfffba0f9c0bda",
+        "blob": "76c7d1a1e6c75d145043f00b009d7f11d2e556e6",
+        "path": "skills/vibehub-ticket-review/assets/vibehub-mark.svg"
+      },
+      {
+        "blob": "9e678ba25d9b2e383eb807581d5bf1cfd366b05d",
         "path": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
       }
     ],
-    "checked_at": "2026-08-20T00:36:38.739Z",
-    "last_aligned_commit": "b47a9b3f9b0cc8d995c5a8793396c704aa303ca5"
+    "checked_at": "2026-08-20T22:49:01.777Z",
+    "last_aligned_commit": "299fc7722c6a0620bd324fece9cea4e7547ab235"
   },
   "anchors": [
     "skills/vibehub-ticket-review/"

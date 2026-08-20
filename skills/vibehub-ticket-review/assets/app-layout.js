@@ -2,6 +2,7 @@
   "use strict";
 
   const NODE = Object.freeze({ width: 232, height: 104 });
+  const HISTORY_STUB = Object.freeze({ width: 132, height: 70 });
   const LAYOUT = Object.freeze({
     marginX: 84,
     marginY: 72,
@@ -146,10 +147,14 @@
   }
 
   function rectanglesOverlap(left, right) {
-    return left.x < right.x + NODE.width
-      && left.x + NODE.width > right.x
-      && left.y < right.y + NODE.height
-      && left.y + NODE.height > right.y;
+    const leftWidth = left.width ?? NODE.width;
+    const leftHeight = left.height ?? NODE.height;
+    const rightWidth = right.width ?? NODE.width;
+    const rightHeight = right.height ?? NODE.height;
+    return left.x < right.x + rightWidth
+      && left.x + leftWidth > right.x
+      && left.y < right.y + rightHeight
+      && left.y + leftHeight > right.y;
   }
 
   function longestPathRanks(ids, outgoing, initialIndegree) {
@@ -466,25 +471,29 @@
   }
 
   function pointInsideRectangle(point, rectangle) {
+    const width = rectangle.width ?? NODE.width;
+    const height = rectangle.height ?? NODE.height;
     return point.x > rectangle.x
-      && point.x < rectangle.x + NODE.width
+      && point.x < rectangle.x + width
       && point.y > rectangle.y
-      && point.y < rectangle.y + NODE.height;
+      && point.y < rectangle.y + height;
   }
 
   function segmentCrossesRectangle(from, to, rectangle) {
+    const width = rectangle.width ?? NODE.width;
+    const height = rectangle.height ?? NODE.height;
     const epsilon = 0.001;
     if (Math.abs(from.y - to.y) < epsilon) {
       return from.y > rectangle.y + epsilon
-        && from.y < rectangle.y + NODE.height - epsilon
+        && from.y < rectangle.y + height - epsilon
         && Math.max(from.x, to.x) > rectangle.x + epsilon
-        && Math.min(from.x, to.x) < rectangle.x + NODE.width - epsilon;
+        && Math.min(from.x, to.x) < rectangle.x + width - epsilon;
     }
     if (Math.abs(from.x - to.x) < epsilon) {
       return from.x > rectangle.x + epsilon
-        && from.x < rectangle.x + NODE.width - epsilon
+        && from.x < rectangle.x + width - epsilon
         && Math.max(from.y, to.y) > rectangle.y + epsilon
-        && Math.min(from.y, to.y) < rectangle.y + NODE.height - epsilon;
+        && Math.min(from.y, to.y) < rectangle.y + height - epsilon;
     }
     return true;
   }
@@ -527,6 +536,131 @@
     }));
   }
 
+  function historyStubGeometry(
+    anchor,
+    direction,
+    layoutDirection = "ltr",
+    occupied = [],
+    routes = [],
+  ) {
+    const leftToRight = layoutDirection !== "ttb";
+    const occupiedBounds = occupied.map((item) => ({
+      x: item.x,
+      y: item.y,
+      width: item.width ?? NODE.width,
+      height: item.height ?? NODE.height,
+    }));
+    const routeSegments = routes.flatMap((route) => route.segments ?? []);
+    const crossMin = Math.min(
+      leftToRight ? anchor.y : anchor.x,
+      ...occupiedBounds.map((item) => leftToRight ? item.y : item.x),
+    );
+    const crossMax = Math.max(
+      leftToRight ? anchor.y + NODE.height : anchor.x + NODE.width,
+      ...occupiedBounds.map((item) =>
+        leftToRight ? item.y + item.height : item.x + item.width),
+    );
+    const candidates = historyStubCandidates(
+      anchor,
+      direction,
+      layoutDirection,
+      crossMin,
+      crossMax,
+    );
+    const clear = (position) => {
+      const bounds = { ...position, ...HISTORY_STUB };
+      const padded = {
+        x: bounds.x - 8,
+        y: bounds.y - 8,
+        width: bounds.width + 16,
+        height: bounds.height + 16,
+      };
+      return !occupiedBounds.some((item) => rectanglesOverlap(bounds, {
+        x: item.x - 10,
+        y: item.y - 10,
+        width: item.width + 20,
+        height: item.height + 20,
+      })) && !routeSegments.some((segment) => segmentCrossesRectangle(
+        { x: segment.x1, y: segment.y1 },
+        { x: segment.x2, y: segment.y2 },
+        padded,
+      ));
+    };
+    const position = candidates.find(clear) ?? candidates.at(-1);
+    return Object.freeze({
+      position,
+      connector: historyStubConnector(
+        anchor,
+        position,
+        direction,
+        layoutDirection,
+      ),
+    });
+  }
+
+  function historyStubCandidates(anchor, direction, layoutDirection, crossMin, crossMax) {
+    const upstream = direction === "upstream";
+    if (layoutDirection !== "ttb") {
+      const x = upstream
+        ? anchor.x - HISTORY_STUB.width - 26
+        : anchor.x + NODE.width + 26;
+      const above = { x, y: anchor.y - HISTORY_STUB.height - 18 };
+      const below = { x, y: anchor.y + NODE.height + 18 };
+      const outer = upstream
+        ? { x, y: crossMin - HISTORY_STUB.height - 18 }
+        : { x, y: crossMax + 18 };
+      return upstream ? [above, below, outer] : [below, above, outer];
+    }
+    const y = upstream
+      ? anchor.y - HISTORY_STUB.height - 26
+      : anchor.y + NODE.height + 26;
+    const left = { x: anchor.x - HISTORY_STUB.width - 18, y };
+    const right = { x: anchor.x + NODE.width + 18, y };
+    const outer = upstream
+      ? { x: crossMin - HISTORY_STUB.width - 18, y }
+      : { x: crossMax + 18, y };
+    return upstream ? [left, right, outer] : [right, left, outer];
+  }
+
+  function historyStubConnector(anchor, position, direction, layoutDirection) {
+    const leftToRight = layoutDirection !== "ttb";
+    let start;
+    let end;
+    let points;
+    if (leftToRight) {
+      start = {
+        x: direction === "upstream" ? anchor.x - 7 : anchor.x + NODE.width + 7,
+        y: anchor.y + NODE.height / 2,
+      };
+      end = {
+        x: direction === "upstream"
+          ? position.x + HISTORY_STUB.width
+          : position.x,
+        y: position.y + HISTORY_STUB.height / 2,
+      };
+      const channel = (start.x + end.x) / 2;
+      points = [start, { x: channel, y: start.y }, { x: channel, y: end.y }, end];
+    } else {
+      start = {
+        x: anchor.x + NODE.width / 2,
+        y: direction === "upstream" ? anchor.y - 7 : anchor.y + NODE.height + 7,
+      };
+      end = {
+        x: position.x + HISTORY_STUB.width / 2,
+        y: direction === "upstream"
+          ? position.y + HISTORY_STUB.height
+          : position.y,
+      };
+      const channel = (start.y + end.y) / 2;
+      points = [start, { x: start.x, y: channel }, { x: end.x, y: channel }, end];
+    }
+    const compact = compactPoints(points);
+    return Object.freeze({
+      start,
+      path: pathFromPoints(compact),
+    });
+  }
+
   function handlePoint(points) {
     if (points.length < 2) return points[0] || { x: 0, y: 0 };
     const end = points.at(-1);
@@ -538,8 +672,10 @@
   }
 
   globalThis.VibeHubGraphLayout = Object.freeze({
+    HISTORY_STUB,
     LAYOUT,
     NODE,
+    historyStubGeometry,
     layoutGraph,
     pointSegments,
   });

@@ -40,6 +40,10 @@ try {
     "assets/brand/vibehub-logo.svg",
     "CHANGELOG.md",
     "docs/assets/local-graph/quiet-workbench-desktop.jpg",
+    "docs/assets/local-graph/quiet-workbench-desktop-2x.png",
+    "docs/assets/local-graph/workbench-ticket-action-2x.png",
+    "docs/assets/local-graph/workbench-rooms-narrow-2x.png",
+    "docs/assets/local-graph/readme-capture-manifest.json",
     "docs/CONCEPT.md",
     "docs/INSTALL.md",
     "docs/RELEASE.md",
@@ -51,6 +55,7 @@ try {
     "skills/vibehub-ticket-review/assets/app.css",
     "skills/vibehub-ticket-review/assets/app-layout.js",
     "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/assets/vibehub-mark.svg",
     "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
     "skills/vibehub-setup/references/architecture-boundary.md",
     "skills/vibehub-ingest/references/knowledge-governance.json",
@@ -61,8 +66,37 @@ try {
     "skills/contracts/ticket.schema.json",
     "skills/contracts/evidence.schema.json",
     "skills/contracts/acceptance-authority.md",
+    "skills/contracts/dependency-hygiene.json",
+    "skills/contracts/ticket-next-action.md",
   ]) {
     if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
+  }
+  const installedReadme = readFileSync(join(artifact, "README.md"), "utf8");
+  for (const narrative of [
+    "Stop managing chats. Manage the work.",
+    "Turn one coding request into a Git-native Ticket with the exact Context needed",
+    "work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context",
+    "Git keeps the history reviewable and reversible",
+  ]) {
+    if (!installedReadme.includes(narrative)) {
+      throw new Error(`installed README is missing public-site narrative: ${narrative}`);
+    }
+  }
+  if ([...installedReadme.matchAll(/href="https:\/\/vibehub\.icu"/gu)].length !== 1
+    || /https:\/\/www\.vibehub\.icu|https:\/\/[^"<\s]*\.pages\.dev/iu.test(installedReadme)) {
+    throw new Error("installed README does not retain the one canonical vibehub.icu link");
+  }
+  const readmeImageRefs = new Set([
+    ...[...installedReadme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/gu)]
+      .map((match) => match[1]),
+    ...[...installedReadme.matchAll(/\b(?:src|srcset)="([^"]+)"/gu)]
+      .flatMap((match) => match[1].split(",").map((entry) => entry.trim().split(/\s+/u)[0])),
+  ]);
+  for (const ref of readmeImageRefs) {
+    if (/^(?:https?:|data:|#)/u.test(ref)) continue;
+    if (!existsSync(join(artifact, ref))) {
+      throw new Error(`installed README image target is missing: ${ref}`);
+    }
   }
   for (const forbidden of [
     ".mcp.json",
@@ -96,7 +130,11 @@ try {
     "ticket-lifecycle.json",
   ), "utf8"));
   if (lifecycle.presenter !== "vibehub-ticket-review"
-    || lifecycle.resource_policy?.cross_task_discovery !== "forbidden") {
+    || lifecycle.resource_policy?.cross_task_discovery !== "forbidden"
+    || lifecycle.planning_contracts?.dependency_hygiene !== "../../contracts/dependency-hygiene.json"
+    || lifecycle.next_action_routing?.EXECUTE?.owner !== "vibehub-ticket-run"
+    || lifecycle.next_action_routing?.CLOSE_OUT?.owner !== "vibehub-ticket-closeout"
+    || lifecycle.next_action_routing?.CLOSE_OUT?.independent_agent !== true) {
     throw new Error("installed Ticket lifecycle contract is invalid");
   }
 
@@ -139,7 +177,6 @@ try {
       acceptance: [{
         acceptance_id: "entry-reaches-ready-ticket",
         criterion: "The initialized repository exposes this applied Ticket as READY.",
-        authority: "human",
       }],
       constraints: ["Reuse Setup and Ticket Plan without a router or runtime service."],
       context_refs: [],
@@ -163,6 +200,12 @@ try {
     origin: "human",
     recorded_at: "2026-08-09T08:00:00.000Z",
   });
+  const closeoutFrontier = invoke(helper, "ticket", "frontier");
+  if (closeoutFrontier.data.count !== 0
+    || closeoutFrontier.data.ready_to_closeout[0]?.ticket?.ticket_id
+      !== "ticket-build-entry-fixture") {
+    throw new Error("installed next-action projection did not route complete Evidence to closeout");
+  }
   invoke(helper, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",
@@ -171,8 +214,49 @@ try {
     accepted_acceptance_ids: ["entry-reaches-ready-ticket"],
     unresolved_acceptance_ids: [],
     evidence_ids: ["entry-human-proof"],
-    summary: "The installed artifact completed the human-authority Ticket.",
+    summary: "The installed artifact completed the executable entry Ticket.",
     closed_at: "2026-08-09T08:01:00.000Z",
+  });
+  invoke(helper, "ticket", "apply", {
+    tickets: [{
+      schema_version: 2,
+      kind: "ticket",
+      ticket_id: "ticket-human-authority-fixture",
+      outcome: "The installed projection preserves criterion-level human authority.",
+      deliveries: [],
+      context: "Exercise human Evidence and attention independently of executable entry routing.",
+      acceptance: [{
+        acceptance_id: "owner-confirms-authority",
+        criterion: "The owner explicitly confirms the protected fixture.",
+        authority: "human",
+      }],
+      constraints: ["Agent Evidence cannot substitute for the owner."],
+      context_refs: [],
+      relations: [],
+      provenance_refs: ["test:installed-human-authority"],
+    }],
+  });
+  invoke(helper, "ticket", "evidence", {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "installed-human-authority-proof",
+    ticket_id: "ticket-human-authority-fixture",
+    acceptance_ids: ["owner-confirms-authority"],
+    summary: "The human explicitly confirmed the protected fixture.",
+    refs: ["conversation:artifact-verification-human-authority"],
+    origin: "human",
+    recorded_at: "2026-08-09T08:02:00.000Z",
+  });
+  invoke(helper, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "ticket-human-authority-fixture",
+    status: "successful",
+    accepted_acceptance_ids: ["owner-confirms-authority"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: ["installed-human-authority-proof"],
+    summary: "The installed artifact preserved the protected human boundary.",
+    closed_at: "2026-08-09T08:03:00.000Z",
   });
 
   const installedScript = readFileSync(
@@ -187,6 +271,31 @@ try {
     join(artifact, "skills", "vibehub-ticket-review", "assets", "app-layout.js"),
     "utf8",
   );
+  const installedHost = readFileSync(
+    join(artifact, "skills", "scripts", "vh-ui.mjs"),
+    "utf8",
+  );
+  const installedHtml = readFileSync(
+    join(artifact, "skills", "vibehub-ticket-review", "assets", "index.html"),
+    "utf8",
+  );
+  const installedFavicon = readFileSync(join(
+    artifact,
+    "skills",
+    "vibehub-ticket-review",
+    "assets",
+    "vibehub-mark.svg",
+  ));
+  const installedCanonicalMark = readFileSync(join(
+    artifact,
+    "assets",
+    "brand",
+    "vibehub-mark.svg",
+  ));
+  if (!installedFavicon.equals(installedCanonicalMark)
+    || !/<link rel="icon" type="image\/svg\+xml" href="\/vibehub-mark\.svg">/u.test(installedHtml)) {
+    throw new Error("installed local UI favicon is not the canonical VibeHub mark");
+  }
   if (/\/api\/(?:review|decision)/u.test(installedScript)) {
     throw new Error("installed local UI still contains writable review routes");
   }
@@ -198,6 +307,18 @@ try {
     || !/function routeRelations/u.test(installedLayout)
     || !/function setLayoutDirection/u.test(installedScript)) {
     throw new Error("installed local UI does not preserve a focused authorized URL");
+  }
+  if (/id="closeoutQueue"/u.test(installedHtml)
+    || /function renderCloseoutQueue/u.test(installedScript)
+    || !/eyebrow\.textContent = "Recommended action"/u.test(installedScript)
+    || !/label: "Copy prompt"/u.test(installedScript)
+    || !/if \(contextPackage\.agentPayload\) return canonical;/u.test(installedScript)
+    || !/action === "CLOSE_OUT" \|\| runtimeEligible/u.test(installedModel)
+    || !/No trusted runtime source is connected/u.test(installedHost)
+    || !/requiresIndependentAgent: true/u.test(installedHost)
+    || !/reviewInputs/u.test(installedHost)
+    || !/evidenceRefs/u.test(installedHost)) {
+    throw new Error("installed local UI is missing the bounded independent-closeout handoff");
   }
   const uiModule = await import(pathToFileURL(
     join(artifact, "skills", "scripts", "vh-ui.mjs"),
@@ -212,6 +333,14 @@ try {
   if (!health.ok || health.readOnly !== true) {
     throw new Error("installed UI health check failed");
   }
+  const faviconResponse = await fetch(`${origin}/vibehub-mark.svg`);
+  const faviconBytes = Buffer.from(await faviconResponse.arrayBuffer());
+  if (faviconResponse.status !== 200
+    || faviconResponse.redirected
+    || faviconResponse.headers.get("content-type") !== "image/svg+xml"
+    || !faviconBytes.equals(installedCanonicalMark)) {
+    throw new Error("installed UI did not serve the canonical SVG favicon exactly");
+  }
   const stateResponse = await fetch(`${origin}/api/state`, {
     headers: { Authorization: `Bearer ${uiHost.token}` },
   });
@@ -223,10 +352,12 @@ try {
     headers: { Authorization: `Bearer ${uiHost.token}` },
   });
   const allState = await allStateResponse.json();
-  if (!allState.ok || allState.data.graph.tickets.length !== 1) {
+  if (!allState.ok || allState.data.graph.tickets.length !== 2) {
     throw new Error("installed UI all-history graph projection failed");
   }
-  const installedTicket = allState.data.graph.tickets[0];
+  const installedTicket = allState.data.graph.tickets.find(
+    (ticket) => ticket.ticketId === "ticket-human-authority-fixture",
+  );
   if (installedTicket.capabilities.attention.summary.label !== "COMPLETE"
     || allState.data.interventions.authority.status !== "available") {
     throw new Error("installed UI human-attention projection failed");

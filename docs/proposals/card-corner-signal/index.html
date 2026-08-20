@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeHub · Card signal contract proposal</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="prototype.css">
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="icon-draft" viewBox="0 0 20 20"><path d="M5 4h10M5 10h7M5 16h5"/><circle cx="15" cy="14" r="2.5"/></symbol>
+    <symbol id="icon-ready" viewBox="0 0 20 20"><path d="m7 5 8 5-8 5z"/></symbol>
+    <symbol id="icon-running" viewBox="0 0 20 20"><path d="M5 10a5 5 0 1 1 2 4M5 10l-2-2M5 10 3 12"/></symbol>
+    <symbol id="icon-done" viewBox="0 0 20 20"><path d="m4 10.5 3.5 3.5L16 5.5"/></symbol>
+    <symbol id="icon-blocked" viewBox="0 0 20 20"><rect x="4.5" y="8.5" width="11" height="8" rx="2"/><path d="M7 8.5V6a3 3 0 0 1 6 0v2.5"/></symbol>
+    <symbol id="icon-deviated" viewBox="0 0 20 20"><path d="M10 3 17 16H3zM10 7v4M10 14h.01"/></symbol>
+    <symbol id="icon-needs" viewBox="0 0 20 20"><path d="M7 10V5.5a1.2 1.2 0 0 1 2.4 0V9m0 0V4.5a1.2 1.2 0 0 1 2.4 0V9m0 0V6a1.2 1.2 0 0 1 2.4 0v5.5c0 3-2 5-5 5H8c-1.5 0-2.7-.8-3.6-2.2L3 12a1.3 1.3 0 0 1 2.1-1.5L7 12"/></symbol>
+    <symbol id="icon-verifying" viewBox="0 0 20 20"><circle cx="9" cy="9" r="5"/><path d="m13 13 4 4m-10-8 1.5 1.5L11 7.5"/></symbol>
+    <symbol id="icon-waiting" viewBox="0 0 20 20"><circle cx="5" cy="10" r="1"/><circle cx="10" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></symbol>
+    <symbol id="icon-focus" viewBox="0 0 20 20"><path d="M6 3H3v3m11-3h3v3M6 17H3v-3m11 3h3v-3"/></symbol>
+  </svg>
+
+  <main class="page-shell">
+    <header class="proposal-header">
+      <div>
+        <p class="kicker">VibeHub · proposal only</p>
+        <h1>Four phases. One truthful corner.</h1>
+        <p class="subtitle">Context stability and forward motion, without replacing canonical v0.8 truth.</p>
+      </div>
+      <div class="review-controls" aria-label="Prototype viewport">
+        <button type="button" class="active" data-viewport="wide" aria-pressed="true">Wide</button>
+        <button type="button" data-viewport="narrow" aria-pressed="false">Narrow</button>
+        <button type="button" id="focusToggle" aria-pressed="false"><svg aria-hidden="true"><use href="#icon-focus"/></svg> Causal focus</button>
+      </div>
+    </header>
+
+    <section class="contract-strip" aria-label="Recommended primary phase legend">
+      <span><svg aria-hidden="true"><use href="#icon-draft"/></svg><strong>DRAFT</strong><small>Context can change</small></span>
+      <span><svg aria-hidden="true"><use href="#icon-ready"/></svg><strong>READY</strong><small>Stable, next actor can act</small></span>
+      <span><svg aria-hidden="true"><use href="#icon-running"/></svg><strong>RUNNING</strong><small>Work loop advancing</small></span>
+      <span><svg aria-hidden="true"><use href="#icon-done"/></svg><strong>DONE</strong><small>Independently accepted</small></span>
+    </section>
+
+    <section class="viewport-frame" id="viewportFrame" data-viewport="wide" aria-label="Production-shaped card signal review board">
+      <header class="workbench-header">
+        <div class="workbench-lockup"><span class="mark">VH</span><span><strong>vibehub-plugin</strong><small>card signal contract · exact proposal source</small></span></div>
+        <div class="summary"><strong>2 ready</strong><span>3 running</span><span>3 draft</span><span>1 needs you</span></div>
+      </header>
+      <div class="workbench-body">
+        <section class="graph-pane" aria-label="Task dependency graph prototype">
+          <div class="canvas-heading">
+            <div><strong>Task graph</strong><small>Click or focus a card to inspect its derivation</small></div>
+            <span class="source-pill">PROPOSAL · READ ONLY</span>
+          </div>
+          <div class="graph-scroll">
+            <div class="graph-world" id="graphWorld" role="group" aria-label="Representative Task cards"></div>
+          </div>
+          <div class="canvas-footer"><span>Primary phase at lower right · one substate at upper right</span><span>Live is separate</span></div>
+        </section>
+        <aside class="inspector" aria-label="Selected Task derivation" aria-live="polite">
+          <div class="inspector-grabber" aria-hidden="true"></div>
+          <div class="inspector-head"><span class="eyebrow" id="inspectorPhase">DRAFT</span><h2 id="inspectorTitle">Select a representative Task</h2></div>
+          <div class="inspector-body">
+            <section><span class="section-label">Why this card</span><p id="inspectorExplanation">The Inspector exposes the exact truth sources behind the compact card.</p></section>
+            <section><span class="section-label">Recommended action</span><strong class="action" id="inspectorAction">Define</strong></section>
+            <section><span class="section-label">Canonical v0.8 facts</span><pre id="inspectorFacts">No selection</pre></section>
+            <section><span class="section-label">Signal contract</span><dl><div><dt>Primary</dt><dd id="inspectorPrimary">—</dd></div><div><dt>Corner</dt><dd id="inspectorSubstate">empty</dd></div><div><dt>Live</dt><dd id="inspectorLive">No claim</dd></div></dl></section>
+            <section class="guardrail"><span class="section-label">Guardrail</span><p>Raw Ticket status, next_action, Evidence, Outcome, archive, and routing remain unchanged.</p></section>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="decision-grid">
+      <article><span class="number">01</span><h2>DRAFT + NEEDS YOU</h2><p>Never infer it from <code>authority:human</code>. Recommend an explicit trusted planning boundary with source and expiry; use a separate Human-decision Ticket as today's fallback.</p></article>
+      <article><span class="number">02</span><h2>RUNNING + VERIFYING</h2><p><code>CLOSE_OUT</code> remains independent judgment, but appears inside the continuous RUNNING phase. Without trusted presence it says VERIFYING, never LIVE.</p></article>
+      <article><span class="number">03</span><h2>Material deviation</h2><p>Every v0.8 non-success Outcome is material. A transient tool or resumable Run failure stays runtime detail and does not paint the Task DEVIATED.</p></article>
+      <article><span class="number">04</span><h2>Quiet budget</h2><p>Four legend entries; neutral DRAFT/BLOCKED, shared action blue, proof green, attention amber, exception red. Text and icon always carry truth without color.</p></article>
+    </section>
+  </main>
+  <script type="module" src="prototype.js"></script>
+</body>
+</html>

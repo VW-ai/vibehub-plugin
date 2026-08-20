@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "graph-and-overview-surface-closeout-work",
+    "inspector-explains-proof-versus-judgment",
+    "batch-and-single-ticket-review-remain-bounded",
+    "interaction-regressions-pass"
+  ],
+  "evidence_id": "closeout-workbench-review-surface-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T20:52:58Z",
+  "refs": [
+    "skills/vibehub-ticket-review/assets/app-model.js",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/assets/app.css",
+    "skills/vibehub-ticket-review/assets/index.html",
+    "test/ui-model.test.mjs",
+    "test/ui-host.test.mjs",
+    "test/ui-visual-system.test.mjs",
+    "command:focused-closeout-workbench-21-of-21",
+    "command:visual-system-contract-8-of-8",
+    "command:npm-run-verify-118-of-118"
+  ],
+  "schema_version": 1,
+  "summary": "The production graph consumes host-derived CLOSE_OUT as a non-color next-action layer: cards and minimap use a neutral dashed REVIEW treatment instead of executable READY copy, the canvas summary separates READY from CLOSE OUT, and Overview exposes a repository- and scope-bounded Independent closeout count and keyboard-reachable queue that opens one Ticket's Log without any batch acceptance. Execution, Contract, and Log each show authority-satisfying coverage, Outcome pending, and the Evidence-versus-independent-judgment boundary while keeping every acceptance inspectable and NEEDS_HUMAN separate. The UI regression corpus projects zero Evidence, partial Evidence, complete Agent Evidence, missing human Evidence, complete human Evidence, successful Outcome, and failed Outcome; focused Workbench/lifecycle/host/model tests passed 21 of 21, the visual-system contract passed 8 of 8 including narrow, keyboard-target, and reduced-motion rules, and complete verification passed 118 of 118.",
+  "ticket_id": "ticket-make-closeout-first-class-handoff"
+}

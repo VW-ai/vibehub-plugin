@@ -38,10 +38,26 @@ function readLifecycle() {
 function validateLifecycle(contract) {
   assert.equal(contract.schema_version, 1);
   assert.equal(contract.presenter, "vibehub-ticket-review");
+  assert.equal(
+    contract.planning_contracts.dependency_hygiene,
+    "../../contracts/dependency-hygiene.json",
+  );
   assert.equal(contract.resource_policy.scope, "current-agent-task");
   assert.equal(contract.resource_policy.reuse_live_host, true);
   assert.equal(contract.resource_policy.reuse_browser_tab, true);
   assert.equal(contract.resource_policy.cross_task_discovery, "forbidden");
+  assert.deepEqual(Object.keys(contract.next_action_routing).sort(), [
+    "CLOSE_OUT", "DONE", "EXECUTE", "NEEDS_HUMAN", "REFINE", "REPLAN", "WAIT",
+  ]);
+  for (const route of Object.values(contract.next_action_routing)) {
+    assert.equal(skillPaths.has(route.owner), true, `unknown route owner: ${route.owner}`);
+    assert.equal(typeof route.independent_agent, "boolean");
+  }
+  assert.deepEqual(contract.next_action_routing.CLOSE_OUT, {
+    owner: "vibehub-ticket-closeout",
+    independent_agent: true,
+  });
+  assert.equal(contract.next_action_routing.EXECUTE.owner, "vibehub-ticket-run");
   assert.ok(Array.isArray(contract.events) && contract.events.length > 0);
   const eventIds = new Set();
   for (const event of contract.events) {
@@ -154,4 +170,21 @@ test("Lifecycle scenarios preserve proactive review and quiet execution", () => 
   );
   assert.equal(events.get("closeout-recorded").surface, "log");
   assert.equal(events.get("explicit-review").surface, "requested");
+});
+
+test("complete Evidence routes to bounded independent closeout", () => {
+  const contract = validateLifecycle(readLifecycle());
+  const runSkill = readFileSync(join(root, skillPaths.get("vibehub-ticket-run")), "utf8");
+  const reviewSkill = readFileSync(join(root, skillPaths.get("vibehub-ticket-review")), "utf8");
+  assert.equal(contract.next_action_routing.EXECUTE.owner, "vibehub-ticket-run");
+  assert.deepEqual(contract.next_action_routing.CLOSE_OUT, {
+    owner: "vibehub-ticket-closeout",
+    independent_agent: true,
+  });
+  assert.match(runSkill, /read the exact Ticket back after Evidence is appended/iu);
+  assert.match(runSkill, /do not start another Run/iu);
+  assert.match(runSkill, /exact Ticket, current\s+Acceptance and authority, Evidence, diff or Git refs, and tests/iu);
+  assert.match(reviewSkill, /ready_to_closeout/u);
+  assert.match(reviewSkill, /never accepts a batch/iu);
+  assert.match(reviewSkill, /never call Ticket Run again/iu);
 });
