@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "repository-release-path-is-cloudflare-only"
+  ],
+  "closed_at": "2026-08-20T21:10:11Z",
+  "evidence_ids": [
+    "cloudflare-pages-production-cutover",
+    "cloudflare-pages-release-contract"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "partial",
+  "summary": "Independent read-only review confirms the authorized Cloudflare account, the pre-existing vibehub-website-v1 project and deployment history, production deployment c07ad72e on main with source prefix 4d628ba, healthy immutable and apex HTTPS content, retained Google verification TXT presence, working path/query-preserving www redirects, and commit 4d628ba713e5cb869e19dd7c2e28d5fe68626f77 replacing the executable repository release path with Cloudflare Pages Direct Upload. Closeout remains partial because the canonical Evidence records—but does not provide independently reproducible provider output, timestamps, audit-log references, or resolvable snapshots proving that the immutable deployment was verified before DNS mutation, that only the two preflighted apex A records were removed, and that Cloudflare reported the custom domain Active with SSL enabled. The regression criterion transitively requires those unproven facts.",
+  "ticket_id": "ticket-deploy-public-site-cloudflare",
+  "unresolved_acceptance_ids": [
+    "existing-pages-project-is-reused",
+    "canonical-apex-is-served-by-pages",
+    "cloudflare-migration-is-regression-proven"
+  ]
+}
