@@ -538,14 +538,35 @@ function workbenchAttention(ticket: WorkbenchTicket, moment: TicketMoment): Atte
   return moment === "done" ? "COMPLETE" : "UPCOMING";
 }
 
+function directionalCone(seed: string, direction: "upstream" | "downstream") {
+  const tickets = new Set<string>([seed]);
+  const relations = new Set<string>();
+  const queue = [seed];
+
+  while (queue.length) {
+    const ticketId = queue.shift();
+    for (const relation of WORKBENCH_EDGES) {
+      const matches = direction === "upstream" ? relation.to === ticketId : relation.from === ticketId;
+      if (!matches) continue;
+      relations.add(relation.id);
+      const next = direction === "upstream" ? relation.from : relation.to;
+      if (!tickets.has(next)) {
+        tickets.add(next);
+        queue.push(next);
+      }
+    }
+  }
+
+  return { tickets, relations };
+}
+
 function causalCone(ticketId: string) {
-  const selected = WORKBENCH_FIXTURE.tickets.find((ticket) => ticket.id === ticketId);
-  const related = new Set<string>([ticketId]);
-  selected?.requires.forEach((id) => related.add(id));
-  WORKBENCH_FIXTURE.tickets.forEach((ticket) => {
-    if (ticket.requires.includes(ticketId)) related.add(ticket.id);
-  });
-  return related;
+  const upstream = directionalCone(ticketId, "upstream");
+  const downstream = directionalCone(ticketId, "downstream");
+  return {
+    tickets: new Set([...upstream.tickets, ...downstream.tickets]),
+    relations: new Set([...upstream.relations, ...downstream.relations]),
+  };
 }
 
 function WorkbenchTicketNode({
@@ -836,7 +857,7 @@ function TicketView({
           <div ref={mapRef} className="public-canvas-map" style={{ "--canvas-pan-x": `${pan.x}px`, "--canvas-pan-y": `${pan.y}px` } as CSSProperties}>
             <svg className="public-causal-links" aria-hidden="true">
               {edgeRoutes.map((edge) => {
-                const edgeRelated = related.has(edge.from) && related.has(edge.to);
+                const edgeRelated = related.relations.has(edge.id);
                 return (
                   <g key={edge.id} data-edge-id={edge.id} data-edge-from={edge.from} data-edge-to={edge.to} className={`public-causal-link ${edgeRelated ? "is-related" : "is-dimmed"}`}>
                     <path className="public-edge-visible" d={edge.path} />
@@ -847,9 +868,9 @@ function TicketView({
                 );
               })}
             </svg>
-            {WORKBENCH_FIXTURE.tickets.map((ticket) => <WorkbenchTicketNode key={ticket.id} ticket={ticket} moment={moment} selected={ticket.id === selectedTicket.id} related={related.has(ticket.id)} onSelect={() => selectTicket(ticket.id)} />)}
+            {WORKBENCH_FIXTURE.tickets.map((ticket) => <WorkbenchTicketNode key={ticket.id} ticket={ticket} moment={moment} selected={ticket.id === selectedTicket.id} related={related.tickets.has(ticket.id)} onSelect={() => selectTicket(ticket.id)} />)}
           </div>
-          <p className="public-canvas-hint">{pannable ? "Drag empty canvas to move the graph. Select a Ticket to inspect it." : "Select a Ticket to trace its direct causal cone and inspect its contract."}</p>
+          <p className="public-canvas-hint">{pannable ? "Drag empty canvas to move the graph. Select a Ticket to inspect it." : "Select a Ticket to trace its complete causal cone and inspect its contract."}</p>
           {roomsOpen ? <WorkbenchRooms selectedRoom={selectedRoom} onSelectRoom={setSelectedRoom} onSelectTicket={selectTicket} onClose={() => setRoomsOpen(false)} /> : null}
         </section>
         {inspectorOpen ? <WorkbenchInspector ticket={selectedTicket} moment={moment} lens={lens} onLens={setLens} onClose={() => setInspectorOpen(false)} onSelectTicket={selectTicket} /> : null}

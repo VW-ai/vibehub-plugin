@@ -88,7 +88,15 @@ test("the product view remains the faithful typed Ticket Workbench", async () =>
   assert.match(page, /const WORKBENCH_FIXTURE/);
   assert.equal((page.match(/id: "VH-20[1-5]"/g) ?? []).length, 5);
   assert.equal((page.match(/const WORKBENCH_FIXTURE/g) ?? []).length, 1);
+  assert.match(page, /function directionalCone/);
   assert.match(page, /function causalCone/);
+  assert.match(page, /while \(queue\.length\)/);
+  assert.match(page, /direction === "upstream" \? relation\.to === ticketId : relation\.from === ticketId/);
+  assert.match(page, /tickets: new Set\(\[\.\.\.upstream\.tickets, \.\.\.downstream\.tickets\]\)/);
+  assert.match(page, /relations: new Set\(\[\.\.\.upstream\.relations, \.\.\.downstream\.relations\]\)/);
+  assert.match(page, /related\.relations\.has\(edge\.id\)/);
+  assert.match(page, /related\.tickets\.has\(ticket\.id\)/);
+  assert.doesNotMatch(page, /related\.has\(edge\.from\) && related\.has\(edge\.to\)/);
   assert.match(page, /function WorkbenchTicketNode/);
   assert.match(page, /function WorkbenchInspector/);
   assert.match(page, /function WorkbenchRooms/);
