@@ -1,0 +1,42 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "card-phase-icon-baseline-is-corrected",
+      "criterion": "Every lower-right card phase icon receives one explicit, narrowly scoped optical baseline correction relative to its adjacent state label, while corner-signal and legend icons retain their existing geometry."
+    },
+    {
+      "acceptance_id": "alignment-regression-is-verified",
+      "criterion": "Focused contract tests and browser review at wide and narrow proposal viewports confirm the phase icon/label pair remains legible and aligned without changing card dimensions, signal placement, accessibility, or responsive behavior."
+    }
+  ],
+  "constraints": [
+    "Change only the lower-right card phase icon alignment; do not shift corner-signal icons, the top phase legend, live presence, card geometry, or phase semantics.",
+    "Keep icon and text as separate non-color carriers of the same state.",
+    "Preserve wide and narrow proposal layouts, keyboard behavior, reduced motion, and production Workbench code."
+  ],
+  "context": "The owner reviewed the accepted card-state proposal in the browser and observed that the lower-right state icon sits slightly above the adjacent label. The defect is limited to the card phase row: the upper-right substate signal and the four-item phase legend already have the intended alignment.",
+  "context_refs": [
+    {
+      "purpose": "Exact card phase-row sizing and alignment rules to correct.",
+      "ref": "docs/proposals/card-corner-signal/prototype.css"
+    },
+    {
+      "purpose": "Exact lower-right phase icon and label markup to preserve.",
+      "ref": "docs/proposals/card-corner-signal/prototype.js"
+    },
+    {
+      "purpose": "Accepted proposal baseline this follow-up visual correction must preserve.",
+      "ref": ".vibehub/outcomes/ticket-propose-card-corner-signal-contract.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The phase icon in each proposal Task card sits on the same visual baseline as its state label without disturbing any other icon family.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-reports-card-state-icon-baseline"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-align-card-state-icon-baseline"
+}

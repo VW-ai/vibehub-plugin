@@ -164,6 +164,9 @@ test("production-shaped review board is clickable, responsive, quiet, and access
   assert.match(css, /\.viewport-frame\[data-viewport="narrow"\]/u);
   assert.match(css, /\.task-card\.selected/u);
   assert.match(css, /\.task-card\.dimmed/u);
+  assert.match(css, /\.phase svg \{ width: 14px; height: 14px; transform: translateY\(1px\); \}/u);
+  assert.doesNotMatch(css, /\.corner-signal svg[^}]*translateY/u);
+  assert.doesNotMatch(css, /\.contract-strip svg[^}]*translateY/u);
 });
 
 test("visual budget has four primary entries, bounded color families, and non-color truth", () => {
