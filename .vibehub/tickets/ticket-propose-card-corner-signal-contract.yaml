@@ -1,65 +1,84 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "current-and-candidate-semantics-are-audited",
-      "criterion": "The proposal documents the current UPCOMING, NEEDS YOU, RECORDED, and COMPLETE human-attention meanings, explicitly distinguishes COMPLETE from operational DONE and derived ARCHIVED, and compares a bounded set of candidate information classes for the upper-right slot using user value, urgency, truth source, stability, and ambiguity as criteria."
+      "acceptance_id": "canonical-facts-and-human-model-are-separated",
+      "criterion": "The proposal audits maturity, dependency readiness, next_action, Evidence and Outcome, human authority, non-success deviation, archive or delivery, and trusted Active Run presence as distinct truth sources, then evaluates one four-primary-phase Human model based on Context stability and forward motion: DRAFT while the Context or path still needs change, READY when it is stable and the next actor can act, RUNNING while the work loop is advancing including closeout, and DONE after independent acceptance."
     },
     {
-      "acceptance_id": "corner-slot-ownership-and-priority-are-exact",
-      "criterion": "The proposal recommends one exact ownership rule for the corner slot—either one coherent semantic axis or a deterministic priority contract—and defines eligibility, absence, coexistence, replacement, and conflict behavior so two signals never compete visually or silently overwrite a more important fact."
+      "acceptance_id": "primary-phase-derivation-and-precedence-are-exact",
+      "criterion": "A deterministic derivation and adversarial matrix define every overlap, including successful Outcome versus stale or live presence, CLOSE_OUT with or without live presence, trusted Run start and end with incomplete Evidence, maturity:draft behind dependencies, firm work behind dependencies, NEEDS_HUMAN before start or mid-run, WAIT, REPLAN, failed closeout, and reopened work. BLOCKED and material DEVIATED both project the current primary phase to DRAFT because the Context or path must change; READY and RUNNING can never coexist with BLOCKED or material DEVIATED; prior execution history remains inspectable rather than controlling the current phase; and no live claim survives stale or absent trusted presence."
     },
     {
-      "acceptance_id": "labels-icons-and-explanation-are-reviewable",
-      "criterion": "Every proposed state has concrete label, 16px stroke-SVG icon, non-color treatment, compact legend wording, full hover/focus explanation, accessible name, and narrow-card behavior; the design preserves the approved pill shape and position while removing ambiguous standalone vocabulary such as COMPLETE unless surrounding UI makes its human-boundary meaning immediate."
+      "acceptance_id": "one-cross-cutting-substate-slot-is-defined",
+      "criterion": "The upper-right slot is specified as one secondary signal with explicit eligibility by primary phase. The proposal defines a bounded taxonomy, absence, coexistence, replacement, and deterministic priority. It tests BLOCKED and DEVIATED only on DRAFT; tests NEEDS YOU on DRAFT when Human input is required to stabilize Context, on READY when the stable Task's next actor is Human, and on RUNNING when a Human boundary appears mid-flow; distinguishes those three explanations; and rejects contradictory combinations rather than rendering every Cartesian pair."
     },
     {
-      "acceptance_id": "state-combinations-are-prototyped",
-      "criterion": "Reviewable wide and narrow examples cover the corner signal alongside operational DONE, READY, BLOCKED, REFINE, and DEVIATED, derived ARCHIVED treatment, selected and dimmed cards, long graph copy, causal focus, and cards with no corner signal, with no overlap, clipping, color-only meaning, or mistaken implication of Active Run or implementation completion."
+      "acceptance_id": "running-substages-and-live-presence-are-distinct",
+      "criterion": "The proposal decides how executing, waiting on Agent or tool, and verifying or independent closeout fit inside RUNNING; treats CLOSE_OUT as a normally continuous internal phase rather than a major REVIEW lifecycle state; and separately specifies when pulse, avatar, motion, or live copy is allowed from trusted Active Run presence, including reduced-motion and stale-presence behavior."
     },
     {
-      "acceptance_id": "downstream-boundaries-are-ready-for-owner-review",
-      "criterion": "The proposal identifies the smallest subsequent protected owner decision and production implementation boundaries, including any projection/schema impact, fallback behavior, token/component changes, legend/tooltip updates, regression fixtures, and coordination with the separate large-graph clarity and graph-card-copy proposal."
+      "acceptance_id": "quiet-visual-and-language-system-is-reviewable",
+      "criterion": "Wide and narrow production-shaped prototypes show the four primary phases and representative substate combinations using the approved card anatomy, short DRAFT language, no Plan with Agent jargon, no more than four primary legend entries, no one-color-per-fact rainbow, icon-plus-text and non-color distinction, exact hover and focus explanation, accessibility names, long copy, selected or dimmed cards, causal focus, and cards with no substate."
+    },
+    {
+      "acceptance_id": "recommendation-and-downstream-boundaries-are-decision-ready",
+      "criterion": "The proposal recommends one exact phase derivation, substate taxonomy and priority, short action language, color or token budget, and review-to-running interaction; identifies the smallest protected Human decision and subsequent projection, Workbench, Skill routing, migration-or-compatibility, accessibility, and regression boundaries; and explicitly preserves raw v0.8 machine values until that decision is accepted."
     }
   ],
   "constraints": [
-    "Preserve the approved upper-right badge position, compact pill shape, restrained visual language, and icon-plus-text accessibility; this Ticket chooses semantics rather than discarding the design.",
-    "Do not conflate operational Ticket status, human authority/evidence attention, derived archive/delivery history, or trusted Active-Run presence into one lifecycle state.",
-    "Do not turn the corner into a rotating carousel, arbitrary metadata bucket, priority guess, hover-only fact, or color-only signal.",
-    "This Ticket produces a proposal for explicit owner review; it does not silently change production vocabulary or data projection before the protected choice is recorded."
+    "This Ticket produces a semantic and interaction proposal for explicit owner review; it does not change production projection, vocabulary, colors, or routing.",
+    "Do not infer a primary phase from an untrusted Session, heartbeat, cache, browser state, Agent claim, or stale Run record.",
+    "Do not flatten primary phase, dependency condition, human authority, deviation, closeout routing, archive history, and live presence into one enum merely to simplify rendering.",
+    "Do not turn the upper-right slot into a carousel, arbitrary metadata bucket, multiple competing badges, hover-only fact, or color-only signal.",
+    "Preserve the approved compact upper-right position and current graph-first interaction while allowing the proposal to change its exact semantics.",
+    "Do not require a project-format migration or rewrite historical source before the protected decision and a firm implementation Ticket exist."
   ],
-  "context": "The production card currently uses the upper-right pill for the orthogonal human-attention axis. In particular, COMPLETE means that every human-authority acceptance boundary on that Ticket has human-origin Evidence and has been independently accepted; it does not mean that implementation is complete, which is expressed separately by the operational DONE label at the lower right. The owner likes the upper-right badge's visual design and explicitly wants to preserve this location as valuable card information territory, but found the standalone COMPLETE label semantically unclear. Before changing copy or assigning additional information to the slot, VibeHub needs one deliberate contract for what belongs there, how multiple candidate signals are prioritized or excluded, and how the meaning is explained without burdening the graph.",
+  "context": "The owner first identified REFINE as internal jargon, rejected PLAN and Plan with Agent as longer but no clearer replacements, and set a cognitive and visual ceiling: the normal UI should expose no more than four primary Task states and must not assign another card color to every internal fact. The emerging semantic axis is Context stability and forward motion. DRAFT means the Context or path can and must still change; READY means it is stable and the next actor can act; RUNNING means the work loop is advancing, including independent closeout; DONE means independently accepted. Consequently BLOCKED and material DEVIATED belong to DRAFT and cannot coexist with READY or RUNNING. NEEDS YOU is different: it is cross-phase attention. On DRAFT it asks a person to stabilize Context, on READY it says the next actor is Human, and on RUNNING it marks a Human boundary encountered mid-flow. Independent closeout normally stays inside RUNNING rather than becoming a major REVIEW state. These are strong owner directions, while exact derivation, eligibility edge cases, priority, labels, and visual treatment still require proposal-level validation before implementation.",
   "context_refs": [
     {
-      "purpose": "Authoritative person-centered human-attention axis that currently owns the card corner badge.",
+      "purpose": "Authority for maturity:draft and firming the same Ticket before execution.",
+      "ref": ".vibehub/rooms/ticket-lifecycle/decision-draft-ticket-maturity.yaml"
+    },
+    {
+      "purpose": "Current canonical next-action precedence and raw compatibility contract.",
+      "ref": "skills/contracts/ticket-next-action.md"
+    },
+    {
+      "purpose": "Authority for cross-cutting human attention independent of operational state.",
       "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
     },
     {
-      "purpose": "Binding quiet Workbench, non-color semantics, truthful presence, and card interaction constraints.",
+      "purpose": "Binding quiet visual language, exact source, accessibility, and trusted-presence constraints.",
       "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     },
     {
-      "purpose": "Successful production Outcome for the approved card, state, attention, icon, and compact legend system.",
+      "purpose": "Accepted current production card and state visual baseline.",
       "ref": ".vibehub/outcomes/ticket-apply-codex-like-workbench-visual-language.yaml"
     },
     {
-      "purpose": "Parallel future proposal whose graph-copy and information-density decisions must remain compatible with the corner signal.",
+      "purpose": "Accepted closeout routing capability whose presentation may become a RUNNING substage without weakening independent adjudication.",
+      "ref": ".vibehub/outcomes/ticket-make-closeout-first-class-handoff.yaml"
+    },
+    {
+      "purpose": "Parallel graph-density proposal that must remain compatible with the final card information hierarchy.",
       "ref": ".vibehub/tickets/ticket-propose-large-graph-clarity-and-card-copy.yaml"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "A reviewable semantic and visual contract turns the Ticket card's approved upper-right badge position into a clear, trustworthy information signal without confusing human attention, execution state, or delivery history.",
+  "outcome": "A decision-ready semantic and visual proposal defines four understandable primary Task phases plus one truthful, deterministic cross-cutting substate slot without losing canonical lifecycle, attention, dependency, deviation, closeout, or live-presence facts.",
   "provenance_refs": [
-    "conversation:2026-08-13-owner-preserves-card-corner-design-and-requests-clear-signal-semantics"
+    "conversation:2026-08-13-owner-preserves-card-corner-design-and-requests-clear-signal-semantics",
+    "conversation:2026-08-20-owner-finds-refine-not-straightforward",
+    "conversation:2026-08-20-owner-limits-primary-ui-states-and-rejects-plan-label",
+    "conversation:2026-08-20-owner-preserves-running-as-primary-state",
+    "conversation:2026-08-20-owner-makes-review-a-running-substage",
+    "conversation:2026-08-20-owner-proposes-cross-cutting-card-substates",
+    "conversation:2026-08-20-owner-forbids-blocked-ready-or-running-combinations",
+    "conversation:2026-08-20-owner-groups-blocked-and-deviated-under-draft-and-needs-you-across-phases"
   ],
-  "relations": [
-    {
-      "rationale": "The semantic proposal should evaluate the stable integrated production card rather than expand the delivery scope of the current Web upgrade PR.",
-      "target_ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
-      "type": "depends_on"
-    }
-  ],
+  "relations": [],
   "schema_version": 2,
   "ticket_id": "ticket-propose-card-corner-signal-contract"
 }

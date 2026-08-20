@@ -1,0 +1,45 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-after-owner-state-contract",
+      "criterion": "After the direct Human-decision prerequisite succeeds, replan this same Ticket to maturity:firm with exact acceptance for the chosen primary-phase derivation, substate priority and combinations, Workbench Graph and Inspector presentation, closeout-in-RUNNING routing, raw v0.8 compatibility, accessibility, migration or fallback, installed-host parity, browser matrices, and complete regression coverage."
+    }
+  ],
+  "constraints": [
+    "Do not execute this Ticket while draft or infer the exact semantic contract before human-origin decision Evidence exists.",
+    "Do not change canonical Ticket status, next_action, authority, Evidence, Outcome, archive, delivery, or trusted-presence semantics merely to simplify presentation.",
+    "Do not rewrite historical Tickets, Outcomes, Evidence, Changelog entries, proposal artifacts, raw payloads, or exact source inspection.",
+    "Do not weaken executor-versus-independent-closeout judgment if both become one continuous user-visible RUNNING flow."
+  ],
+  "context": "Production implementation is intentionally deferred. The owner has set the product direction but requested semantic validation because primary phases and cross-cutting substates combine across maturity, dependency, attention, deviation, closeout, and presence. Once the proposal is accepted through the Human-decision Ticket, rewrite this same Ticket in place to firm and implement the exact contract without inventing another state system.",
+  "context_refs": [
+    {
+      "purpose": "Current canonical routing that implementation must preserve or explicitly adapt after the owner decision.",
+      "ref": "skills/contracts/ticket-next-action.md"
+    },
+    {
+      "purpose": "Binding production visual, source-truth, accessibility, and presence constraints.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Accepted current closeout handoff baseline to subordinate inside RUNNING without losing independent judgment.",
+      "ref": ".vibehub/outcomes/ticket-make-closeout-first-class-handoff.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The production Workbench implements the owner-approved four-phase Task model and one deterministic cross-cutting substate slot with calm visuals, truthful source semantics, and continuous execution-to-closeout interaction.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-requests-semantic-validation-before-major-state-ui-development"
+  ],
+  "relations": [
+    {
+      "rationale": "The implementation contract is not knowable until the owner accepts or corrects the validated semantic and visual proposal.",
+      "target_ticket_id": "ticket-decide-workbench-task-state-contract",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-simplify-workbench-primary-state-language"
+}
