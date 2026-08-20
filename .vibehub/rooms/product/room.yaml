@@ -50,7 +50,7 @@
         "path": "docs/INSTALL.md"
       },
       {
-        "blob": "6930dbe366a98ed2087b869c3e6237ca0eb8a9f1",
+        "blob": "a2e46e8fe8e88bcf6ee50ed2e5f6859776cf9a39",
         "path": "docs/LEGACY_PROOF_REVISION_POLICY.md"
       },
       {
@@ -126,8 +126,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-20T20:22:46.146Z",
-    "last_aligned_commit": "5784ed722b9331a5588afa2346b98e561c00245b"
+    "checked_at": "2026-08-20T20:40:56.360Z",
+    "last_aligned_commit": "5d4125cc5f245d7c9d360e292ce102a630cb996c"
   },
   "anchors": [
     "CHANGELOG.md",
