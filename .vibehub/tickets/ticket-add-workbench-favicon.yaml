@@ -1,0 +1,47 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "workbench-declares-canonical-favicon",
+      "criterion": "The production Workbench HTML declares an SVG favicon using the canonical VibeHub mark, with an explicit type and a local absolute asset path that works for every focused or query URL."
+    },
+    {
+      "acceptance_id": "loopback-host-serves-favicon-exactly",
+      "criterion": "The read-only host serves the declared favicon with HTTP 200, image/svg+xml content type, canonical mark content, and no writable route, redirect, external dependency, or missing-resource console failure."
+    },
+    {
+      "acceptance_id": "installed-artifacts-and-regressions-pass",
+      "criterion": "Artifact verification requires the favicon file and HTML link, fresh Codex and Claude marketplace installs behave identically, focused host tests fetch the icon, and complete repository plus artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Reuse the canonical VibeHub mark; do not create another logo or visual identity.",
+    "Keep the Workbench dependency-free, read-only, loopback-only, and compatible with the URL bearer fragment.",
+    "Do not change the public site, public-site release Ticket, Graph behavior, API projection, or repository source truth.",
+    "The favicon file must be included in both Codex and Claude installed artifacts rather than resolving only from this development checkout."
+  ],
+  "context": "The owner noticed that opening the read-only local Ticket Graph has no VibeHub favicon. Reuse the existing canonical SVG mark, ship it with the Workbench assets, declare it in the HTML head, and serve it from the loopback host with an exact image content type. This is a small Workbench identity fix, separate from the public-site favicon Ticket and from the state-semantics proposal.",
+  "context_refs": [
+    {
+      "purpose": "Canonical existing mark to reuse without inventing another identity.",
+      "ref": "assets/brand/vibehub-mark.svg"
+    },
+    {
+      "purpose": "Production Workbench document that must declare the local favicon.",
+      "ref": "skills/vibehub-ticket-review/assets/index.html"
+    },
+    {
+      "purpose": "Read-only loopback asset allowlist that must serve the icon exactly.",
+      "ref": "skills/scripts/vh-ui.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The local VibeHub Ticket Graph presents the canonical VibeHub mark as its browser favicon in source and freshly installed Codex and Claude plugin artifacts.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-requests-ticket-graph-favicon"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-add-workbench-favicon"
+}
