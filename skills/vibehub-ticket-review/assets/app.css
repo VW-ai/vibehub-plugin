@@ -505,24 +505,55 @@ summary:focus-visible {
   cursor: pointer;
 }
 
-.history-stub rect {
-  fill: rgba(248, 249, 248, 0.94);
+.history-stub-boundary {
+  fill: var(--surface-solid);
   stroke: var(--line-strong);
+  stroke-width: 1;
   stroke-dasharray: 4 3;
+  vector-effect: non-scaling-stroke;
 }
 
-.history-stub text {
+.history-stub-label {
+  fill: var(--ink);
+  font: 650 10px/1 var(--mono);
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
+
+.history-stub-action {
   fill: var(--muted);
-  font: 9px/1 var(--mono);
+  font: 8px/1 var(--mono);
+  pointer-events: none;
+}
+
+.history-stub-link {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.history-stub-knot {
+  fill: var(--surface-solid);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
 }
 
 .history-stub:focus {
   outline: none;
 }
 
-.history-stub:focus rect,
-.history-stub:hover rect {
+.history-stub:hover .history-stub-boundary {
   stroke: var(--ink);
+}
+
+.history-stub:focus-visible .history-stub-boundary {
+  stroke: var(--focus);
+  stroke-width: 2;
 }
 
 .graph-tools button[aria-pressed="true"] {

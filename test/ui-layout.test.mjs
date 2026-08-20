@@ -23,6 +23,13 @@ function overlaps(left, right, node) {
     && left.y + node.height > right.y;
 }
 
+function boundsOverlap(left, right) {
+  return left.x < right.x + right.width
+    && left.x + left.width > right.x
+    && left.y < right.y + right.height
+    && left.y + left.height > right.y;
+}
+
 function segmentCrossesCard(segment, position, node) {
   const epsilon = 0.001;
   const minX = Math.min(segment.x1, segment.x2);
@@ -54,6 +61,83 @@ test("ticket cards reserve breathing room above the bottom status row", () => {
   assert.equal(model.NODE.height, 104);
   assert.match(renderer, /y: NODE\.height - 12/u);
   assert.match(renderer, /y: NODE\.height - 10/u);
+});
+
+test("left-to-right history stubs leave the causal lane and keep an anchored leader", () => {
+  const model = loadLayoutModel();
+  const anchor = { x: 84, y: 160 };
+  const dependent = { x: 424, y: 160 };
+  const route = {
+    segments: [{
+      x1: anchor.x + model.NODE.width + 7,
+      y1: anchor.y + model.NODE.height / 2,
+      x2: dependent.x - 2,
+      y2: dependent.y + model.NODE.height / 2,
+    }],
+  };
+  const geometry = model.historyStubGeometry(
+    anchor,
+    "downstream",
+    "ltr",
+    [
+      { ...anchor, ...model.NODE },
+      { ...dependent, ...model.NODE },
+    ],
+    [route],
+  );
+  const bounds = { ...geometry.position, ...model.HISTORY_STUB };
+  assert.equal(boundsOverlap(bounds, { ...anchor, ...model.NODE }), false);
+  assert.equal(boundsOverlap(bounds, { ...dependent, ...model.NODE }), false);
+  assert.equal(route.segments.some((segment) => segmentCrossesCard(
+    segment,
+    { x: bounds.x - 8, y: bounds.y - 8 },
+    { width: bounds.width + 16, height: bounds.height + 16 },
+  )), false);
+  assert.equal(geometry.position.y > anchor.y + model.NODE.height, true);
+  assert.equal(geometry.connector.path.startsWith("M "), true);
+  assert.equal(geometry.connector.start.x, anchor.x + model.NODE.width + 7);
+  assert.equal(geometry.connector.start.y, anchor.y + model.NODE.height / 2);
+});
+
+test("top-to-bottom history stubs choose a collision-free side deterministically", () => {
+  const model = loadLayoutModel();
+  const anchor = { x: 240, y: 72 };
+  const blockers = [
+    { ...anchor, ...model.NODE },
+    { x: anchor.x + model.NODE.width + 18, y: 202, ...model.NODE },
+  ];
+  const route = {
+    segments: [{
+      x1: anchor.x + model.NODE.width / 2,
+      y1: anchor.y + model.NODE.height + 7,
+      x2: anchor.x + model.NODE.width / 2,
+      y2: 360,
+    }],
+  };
+  const first = model.historyStubGeometry(
+    anchor,
+    "downstream",
+    "ttb",
+    blockers,
+    [route],
+  );
+  const second = model.historyStubGeometry(
+    anchor,
+    "downstream",
+    "ttb",
+    blockers,
+    [route],
+  );
+  assert.deepEqual(first, second);
+  const bounds = { ...first.position, ...model.HISTORY_STUB };
+  assert.equal(blockers.some((item) => boundsOverlap(bounds, item)), false);
+  assert.equal(route.segments.some((segment) => segmentCrossesCard(
+    segment,
+    { x: bounds.x - 8, y: bounds.y - 8 },
+    { width: bounds.width + 16, height: bounds.height + 16 },
+  )), false);
+  assert.equal(first.position.x < anchor.x, true);
+  assert.equal(first.connector.path.startsWith("M "), true);
 });
 
 test("dense fixtures cover wide layers, high-degree causality, long edges, and mixed states", () => {

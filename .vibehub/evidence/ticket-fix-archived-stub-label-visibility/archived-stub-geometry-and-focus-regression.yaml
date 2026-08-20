@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "archived-stub-is-legible-in-real-graph",
+    "archive-expansion-remains-exact-and-operable",
+    "quiet-accessible-visual-contract-is-preserved"
+  ],
+  "evidence_id": "archived-stub-geometry-and-focus-regression",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T20:23:24Z",
+  "refs": [
+    "skills/vibehub-ticket-review/assets/app-layout.js",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/assets/app.css",
+    "test/ui-layout.test.mjs",
+    "test/ui-visual-system.test.mjs",
+    "test:node-test-ui-layout-ui-visual-system-16-of-16",
+    "test:npm-run-verify-110-of-110",
+    "artifact:dependency-free-read-only-55-files-577351-bytes"
+  ],
+  "schema_version": 1,
+  "summary": "The production Workbench now derives every archived-history stub from deterministic collision-aware geometry: a 132 by 70 opaque quiet-surface affordance is moved off the primary causal lane, avoids visible card bounds and routed relation segments in both causal directions, and retains an explicit dashed leader and anchor knot. Its visible two-line label separates the hidden archived count from the reveal action; its accessible name includes direction and the exact canonical next Ticket IDs; visible focus uses the shared focus token. Enter or Space still calls revealHistory with the projection supplied nextTicketIds, preserves the sorted history query and existing graph layout, then moves focus to the first actually revealed canonical Ticket. No query, archive, delivery, Ticket, Evidence, Outcome, or writable-host code changed. Focused layout and visual-contract tests passed 16 of 16, and the final complete verification passed 110 of 110 with the dependency-free read-only artifact at 55 files and 577351 bytes.",
+  "ticket_id": "ticket-fix-archived-stub-label-visibility"
+}

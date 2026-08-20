@@ -34,6 +34,19 @@ test("production graph keeps operational, archive, and attention treatments inde
   assert.match(script, /ticket-attention-badge/u);
 });
 
+test("archived history stubs remain legible, anchored, and keyboard explicit", () => {
+  assert.match(script, /graphLayoutModel\.historyStubGeometry/u);
+  assert.match(script, /class: "history-stub-link"/u);
+  assert.match(script, /class: "history-stub-label"/u);
+  assert.match(script, /class: "history-stub-action"/u);
+  assert.match(script, /reveal next hop: \$\{nextTicketLabel\}/u);
+  assert.match(script, /querySelector\(`\[data-ticket-id="\$\{CSS\.escape\(revealedTicket\)\}"\]`\)[\s\S]*\.focus\(\)/u);
+  assert.match(css, /\.history-stub-boundary \{[\s\S]*fill: var\(--surface-solid\);/u);
+  assert.match(css, /\.history-stub-label \{[\s\S]*fill: var\(--ink\);[\s\S]*font: 650 10px/u);
+  assert.match(css, /\.history-stub:focus-visible \.history-stub-boundary \{[\s\S]*stroke: var\(--focus\);/u);
+  assert.match(css, /\.history-stub-link \{[\s\S]*stroke-dasharray/u);
+});
+
 test("production canvas counts and Overview are compact two-axis legends", () => {
   assert.match(html, /Ticket state and human attention summary/u);
   assert.match(html, /aria-label="Ticket state legend"/u);

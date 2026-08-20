@@ -4,7 +4,6 @@
   const SVG = "http://www.w3.org/2000/svg";
   const MIN_SCALE = 0.12;
   const MAX_SCALE = 2.4;
-  const HISTORY_STUB = Object.freeze({ width: 116, height: 70 });
   const workbenchModel = globalThis.VibeHubWorkbenchModel;
   const graphLayoutModel = globalThis.VibeHubGraphLayout;
   if (!workbenchModel) {
@@ -13,7 +12,7 @@
   if (!graphLayoutModel) {
     throw new Error("VibeHub Workbench graph layout is unavailable.");
   }
-  const { NODE } = graphLayoutModel;
+  const { HISTORY_STUB, NODE } = graphLayoutModel;
   const {
     agentHandoffInstruction,
     causalPriority: operationalPriority,
@@ -533,6 +532,7 @@
     elements.edgeLayer.replaceChildren();
     elements.nodeLayer.replaceChildren();
     if (!state) return;
+    const stubGeometries = historyStubGeometries();
     const related = selected ? causalCone(selected) : null;
     for (const relation of state.graph.relations) {
       const from = positions.get(relation.prerequisiteTicketId);
@@ -585,29 +585,54 @@
     }
 
     for (const stub of state.graph.stubs ?? []) {
-      const anchor = positions.get(stub.anchorTicketId);
-      if (!anchor) continue;
-      const point = historyStubPosition(anchor, stub.direction);
+      const geometry = stubGeometries.get(stub.stubRef);
+      if (!geometry) continue;
+      elements.edgeLayer.append(svg("path", {
+        class: "history-stub-link",
+        d: geometry.connector.path,
+        "aria-hidden": "true",
+      }));
+      elements.edgeLayer.append(svg("circle", {
+        class: "history-stub-knot",
+        cx: geometry.connector.start.x,
+        cy: geometry.connector.start.y,
+        r: 2.75,
+        "aria-hidden": "true",
+      }));
+    }
+
+    for (const stub of state.graph.stubs ?? []) {
+      const geometry = stubGeometries.get(stub.stubRef);
+      if (!geometry) continue;
+      const point = geometry.position;
+      const nextTicketLabel = stub.nextTicketIds.join(", ");
       const group = svg("g", {
         class: "history-stub",
         transform: `translate(${point.x} ${point.y})`,
         role: "button",
         tabindex: "0",
-        "aria-label": `${stub.hiddenTicketCount} hidden archived Ticket${stub.hiddenTicketCount === 1 ? "" : "s"} ${stub.direction}; reveal next hop`,
+        "aria-label": `${stub.hiddenTicketCount} hidden archived Ticket${stub.hiddenTicketCount === 1 ? "" : "s"} ${stub.direction}; reveal next hop: ${nextTicketLabel}`,
       });
       group.dataset.stubRef = stub.stubRef;
       group.append(svg("rect", {
+        class: "history-stub-boundary",
         width: HISTORY_STUB.width,
         height: HISTORY_STUB.height,
-        rx: 8,
+        rx: 10,
       }));
       const label = svg("text", {
-        x: HISTORY_STUB.width / 2,
-        y: HISTORY_STUB.height / 2 + 4,
-        "text-anchor": "middle",
+        class: "history-stub-label",
+        x: 12,
+        y: 30,
       });
-      label.textContent = `${stub.hiddenTicketCount} archived ${stub.direction === "upstream" ? "←" : "→"}`;
-      group.append(label);
+      label.textContent = `${stub.hiddenTicketCount} archived`;
+      const action = svg("text", {
+        class: "history-stub-action",
+        x: 12,
+        y: 48,
+      });
+      action.textContent = `reveal ${stub.direction} ${stub.direction === "upstream" ? "←" : "→"}`;
+      group.append(label, action);
       group.addEventListener("click", (event) => {
         event.stopPropagation();
         void revealHistory(stub.nextTicketIds);
@@ -757,19 +782,29 @@
     applyTransform();
   }
 
-  function historyStubPosition(anchor, direction) {
-    if (layoutDirection === "ltr") {
-      return {
-        x: direction === "upstream" ? anchor.x - 142 : anchor.x + NODE.width + 26,
-        y: anchor.y + NODE.height / 2 - HISTORY_STUB.height / 2,
-      };
+  function historyStubGeometries() {
+    const result = new Map();
+    const occupied = [...positions.values()].map((position) => ({
+      ...position,
+      width: NODE.width,
+      height: NODE.height,
+    }));
+    const routes = [...graphGeometry.routes.values()];
+    for (const stub of [...(state?.graph?.stubs ?? [])]
+      .sort((left, right) => left.stubRef.localeCompare(right.stubRef))) {
+      const anchor = positions.get(stub.anchorTicketId);
+      if (!anchor) continue;
+      const geometry = graphLayoutModel.historyStubGeometry(
+        anchor,
+        stub.direction,
+        layoutDirection,
+        occupied,
+        routes,
+      );
+      result.set(stub.stubRef, geometry);
+      occupied.push({ ...geometry.position, ...HISTORY_STUB });
     }
-    return {
-      x: anchor.x + NODE.width / 2 - HISTORY_STUB.width / 2,
-      y: direction === "upstream"
-        ? anchor.y - HISTORY_STUB.height - 20
-        : anchor.y + NODE.height + 20,
-    };
+    return result;
   }
 
   async function revealHistory(ticketIds) {
@@ -780,6 +815,13 @@
     for (const id of [...existing].sort()) url.searchParams.append("history", id);
     history.replaceState(null, "", url.href);
     await refresh("Archived history expanded one hop", { preserveLayout: true });
+    const revealedTicket = ticketIds.find((ticketId) =>
+      state.graph.tickets.some((ticket) => ticket.ticketId === ticketId));
+    if (revealedTicket) {
+      elements.nodeLayer
+        .querySelector(`[data-ticket-id="${CSS.escape(revealedTicket)}"]`)
+        ?.focus();
+    }
   }
 
   function renderMinimap() {
@@ -2511,10 +2553,8 @@
       width: NODE.width,
       height: NODE.height,
     }));
-    for (const stub of state?.graph?.stubs ?? []) {
-      const anchor = positions.get(stub.anchorTicketId);
-      if (!anchor) continue;
-      values.push({ ...historyStubPosition(anchor, stub.direction), ...HISTORY_STUB });
+    for (const geometry of historyStubGeometries().values()) {
+      values.push({ ...geometry.position, ...HISTORY_STUB });
     }
     const minX = Math.min(...values.map((value) => value.x));
     const minY = Math.min(...values.map((value) => value.y));
