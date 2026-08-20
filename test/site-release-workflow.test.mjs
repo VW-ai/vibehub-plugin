@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 
@@ -21,13 +21,17 @@ test("the public-site release workflow is repository-local and discoverable", as
 
   assert.match(skill, /name: vibehub-site-release/);
   assert.match(skill, /vibehub\.icu/);
-  assert.match(skill, /never create a\s+second project/i);
+  assert.match(skill, /vibehub-website-v1/);
+  assert.match(skill, /Cloudflare Pages/);
+  assert.doesNotMatch(skill, /Sites hosting Skill|saved Sites version/);
   assert.match(agents, /site\/release\/SKILL\.md/);
   assert.match(packageJson, /"release:preflight"/);
+  assert.match(packageJson, /"release:deploy"/);
   assert.match(packageJson, /"release:verify"/);
   assert.match(readme, /Production: \[vibehub\.icu\]\(https:\/\/vibehub\.icu\)/);
   assert.match(manifest, /"skills": "\.\/skills\/"/);
   assert.doesNotMatch(artifactBuilder, /["']site\/release["']/);
+  await assert.rejects(access(new URL("site/.openai/hosting.json", root)), { code: "ENOENT" });
 });
 
 test("the release checker accepts the checked-in production identity", () => {
@@ -41,5 +45,7 @@ test("the release checker accepts the checked-in production identity", () => {
   const output = JSON.parse(result.stdout);
   assert.equal(output.ok, true);
   assert.equal(output.canonical_url, "https://vibehub.icu");
-  assert.equal(output.project_id, "appgprj_6a86aafc71d48191b3c03a532dc367f3");
+  assert.equal(output.cloudflare_account_id, "72091e7e079e357ced7f9603c03a926e");
+  assert.equal(output.pages_project_name, "vibehub-website-v1");
+  assert.equal(output.production_branch, "main");
 });

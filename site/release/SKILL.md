@@ -1,29 +1,29 @@
 ---
 name: vibehub-site-release
-description: Release, verify, or roll back the VibeHub public website through its existing Sites project and vibehub.icu custom domain. Use when the user asks to publish, deploy, update, verify, or roll back the VibeHub website in site/.
+description: Release, verify, or roll back the VibeHub public website through the existing vibehub-website-v1 Cloudflare Pages project and vibehub.icu custom domain. Use when the user asks to publish, deploy, update, verify, or roll back the VibeHub website in site/.
 ---
 
 # VibeHub Site Release
 
-Keep one exact source commit, one existing Sites project, and one canonical
-hostname. Use the available Sites hosting Skill for connector operations; this
-Skill adds the VibeHub-specific contract.
+Keep one exact source commit, one existing Cloudflare Pages project, and one
+canonical hostname. The production project is `vibehub-website-v1` in account
+`72091e7e079e357ced7f9603c03a926e`; do not create a replacement project.
 
 ## Prepare
 
 1. Work from the exact VibeHub repository and read the active Ticket.
-2. Read `site/.openai/hosting.json`. Reuse its `project_id`; never create a
-   second project while this ID exists.
-3. Run the mechanical preflight from the repository root:
+2. Run the complete mechanical preflight from the repository root:
 
    ```text
    node site/release/scripts/release.mjs preflight
    ```
 
-   It validates the production identity, lints, builds with
-   `NEXT_PUBLIC_SITE_URL=https://vibehub.icu`, and runs the rendered contracts.
-4. Review the diff and Git status. Deploy only an exact committed source state.
-   Push the intended commit before saving the Sites version.
+   It validates the Pages identity, lints, builds with
+   `NEXT_PUBLIC_SITE_URL=https://vibehub.icu`, and tests the rendered static
+   artifact in `site/dist/client`.
+3. Review the diff and Git status. Commit and push the intended source before
+   deployment. The deployment command refuses a dirty worktree and attaches
+   the full current commit hash to Cloudflare.
 
 If the user asked only to change or prepare the site, stop after preflight.
 Publishing is a production action and needs an explicit publish or deploy
@@ -31,64 +31,70 @@ instruction.
 
 ## Publish
 
-1. Follow the Sites hosting Skill's existing-project flow. Obtain a short-lived
-   source write credential only when necessary, keep it out of URLs and Git
-   configuration, and push the exact validated commit with a per-command
-   authorization header.
-2. Package the site with the Sites hosting helper. Save one version using the
-   pushed commit SHA, then deploy that saved version to the existing project's
-   resolved access mode. Treat every returned deployment URL as production.
-3. Poll the deployment directly until it succeeds or fails. Do not infer
-   success from a URL alone.
-4. Verify the immutable deployment URL:
+1. Inspect the existing Pages project and current production deployments:
+
+   ```text
+   cd site
+   npx wrangler pages project list
+   npx wrangler pages deployment list --project-name vibehub-website-v1
+   ```
+
+   Select the authorized Cloudflare account and confirm that the project
+   already exists. Never create another Pages or Workers project.
+2. From a clean, pushed source commit, deploy the exact preflighted static
+   export to the project's `main` production branch:
+
+   ```text
+   npm run release:deploy
+   ```
+
+   This is a Cloudflare Pages Direct Upload of `dist/client`. Keep OAuth state,
+   API tokens, Wrangler logs, and other transient provider state outside Git.
+3. Verify the immutable deployment URL returned by Wrangler before any domain
+   change:
 
    ```text
    node site/release/scripts/release.mjs verify <deployment-url>
    ```
 
-5. Inspect the existing `vibehub.icu` custom-domain status. When it is already
-   active, do not touch DNS. If it is missing, pending, failed, or conflicts
-   with another resource, perform read-only preflight and require explicit
-   human authorization before adding, replacing, or deleting any binding.
-   Never commit validation TXT values.
-6. Wait for both provider and SSL status to become active, then verify the
-   canonical domain:
+4. Bind `vibehub.icu` through the existing Pages project's Custom domains
+   flow. Perform read-only conflict inspection first. If the apex still points
+   to the temporary origin, replace only the exact preflighted obsolete apex
+   records needed by Pages. Retain the Search Console TXT proof, the
+   redirect-only `www` record, and every unrelated DNS record. Do not add a
+   manual CNAME without the Pages custom-domain association.
+5. Wait until the Pages custom domain and certificate are active, then verify:
 
    ```text
    node site/release/scripts/release.mjs verify https://vibehub.icu
-   ```
-
-   Verify the redirect-only `www` hostname separately. Both HTTP and HTTPS
-   must return a permanent redirect to the canonical apex while preserving the
-   exact path and query:
-
-   ```text
    node site/release/scripts/release.mjs verify-www
    ```
 
-7. Open the canonical site for the user. Record acceptance-linked VibeHub
-   Evidence with the exact source commit, saved Sites version or deployment
-   reference, public URL, and successful verification result. Do not record
-   credentials, cookies, authorization headers, or DNS validation values.
+   Both HTTP and HTTPS `www` requests must permanently redirect to the apex
+   while preserving the exact path and query.
+6. Record acceptance-linked VibeHub Evidence with the source commit, Pages
+   project, immutable deployment URL, domain state, and successful checks.
+   Never record credentials, cookies, authorization headers, OAuth state, or
+   DNS verification values.
 
 ## Roll back
 
-Rollback is another production mutation. After explicit authorization, deploy
-the previous known-successful saved Sites version; do not change DNS. Poll it
-to success, verify both its deployment URL and `https://vibehub.icu`, and record
-new Evidence describing the rollback.
+Rollback is another production mutation. After explicit authorization, use
+Cloudflare Pages deployment rollback for the previous known-successful
+production deployment, or redeploy the exact prior committed build if rollback
+is unavailable. Do not change DNS. Verify both the immutable deployment and
+`https://vibehub.icu`, then record new Evidence describing the rollback.
 
 ## Stop conditions
 
 Stop and report when any of these is true:
 
-- the checked-in Sites project ID is missing or different;
+- the selected account or existing `vibehub-website-v1` project differs;
 - preflight fails, the deploy source is uncommitted, or the pushed SHA differs;
 - the current request does not explicitly authorize public deployment;
-- an existing DNS or custom-domain binding would be replaced without explicit
-  human authorization;
+- an unrelated DNS or custom-domain binding would be replaced;
 - deployment, provider activation, SSL activation, or production verification
   fails.
 
-Keep credentials and transient provider state outside Git. Do not add a release
-database, daemon, global CLI, or second deployment state model.
+Do not add Pages Functions, Workers deployment, a release database, daemon,
+global CLI, second hosting project, or second deployment state model.

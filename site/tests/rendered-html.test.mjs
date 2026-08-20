@@ -203,10 +203,10 @@ test("the concise showcase remains responsive, accessible, and quiet", async () 
 });
 
 test("production artifact stays static and Cloudflare-ready", async () => {
-  const [packageJson, nextConfig, hosting, layout, robotsSource, sitemapSource, favicon, mark] = await Promise.all([
+  const [packageJson, nextConfig, viteConfig, layout, robotsSource, sitemapSource, favicon, mark] = await Promise.all([
     source("package.json"),
     source("next.config.ts"),
-    source(".openai/hosting.json"),
+    source("vite.config.ts"),
     source("app/layout.tsx"),
     source("public/robots.txt"),
     source("public/sitemap.xml"),
@@ -215,8 +215,10 @@ test("production artifact stays static and Cloudflare-ready", async () => {
   ]);
 
   assert.match(packageJson, /"name": "@vibehub\/site"/);
+  assert.match(packageJson, /"release:deploy": "node release\/scripts\/release\.mjs deploy"/);
   assert.doesNotMatch(packageJson, /three|framer-motion|drizzle|tailwind/i);
   assert.match(nextConfig, /output:\s*"export"/);
+  assert.doesNotMatch(viteConfig, /hosting\.json|sites-vite-plugin|\bsites\(\)/);
   assert.match(layout, /NEXT_PUBLIC_SITE_URL/);
   assert.match(layout, /alternates:\s*{\s*canonical: "\/"/);
   assert.match(layout, /\/og\.png/);
@@ -226,11 +228,6 @@ test("production artifact stays static and Cloudflare-ready", async () => {
   assert.equal(favicon, mark);
   assert.equal((layout.match(/\/vibehub-favicon\.svg/g) ?? []).length, 2);
   assert.doesNotMatch(layout, /["']\/favicon\.svg["']/);
-  assert.deepEqual(JSON.parse(hosting), {
-    project_id: "appgprj_6a86aafc71d48191b3c03a532dc367f3",
-    d1: null,
-    r2: null,
-  });
 
   await Promise.all([
     access(new URL("dist/client/index.html", root)),
@@ -244,7 +241,6 @@ test("production artifact stays static and Cloudflare-ready", async () => {
     access(new URL("dist/client/brands/github.svg", root)),
     access(new URL("dist/client/founders/wayne-wang.jpg", root)),
     access(new URL("dist/client/founders/victor-zhang.jpg", root)),
-    access(new URL("dist/.openai/hosting.json", root)),
   ]);
 });
 

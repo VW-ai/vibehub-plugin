@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -8,7 +8,9 @@ import { fileURLToPath } from "node:url";
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const siteRoot = join(repoRoot, "site");
 const canonicalUrl = "https://vibehub.icu";
-const projectId = "appgprj_6a86aafc71d48191b3c03a532dc367f3";
+const cloudflareAccountId = "72091e7e079e357ced7f9603c03a926e";
+const pagesProjectName = "vibehub-website-v1";
+const productionBranch = "main";
 const title = "VibeHub — The Git-native development cycle";
 const productMarker = "Stop managing chats. Manage the work.";
 
@@ -20,20 +22,45 @@ async function readText(relativePath) {
   return readFile(join(repoRoot, relativePath), "utf8");
 }
 
+async function exists(relativePath) {
+  try {
+    await access(join(repoRoot, relativePath));
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+function run(command, args, options = {}) {
+  const result = spawnSync(command, args, {
+    cwd: options.cwd ?? repoRoot,
+    env: { ...process.env, ...options.env },
+    encoding: "utf8",
+    stdio: options.capture ? "pipe" : "inherit",
+  });
+  assertion(result.status === 0, `${command} ${args.join(" ")} failed with exit code ${result.status ?? "unknown"}${result.stderr ? `: ${result.stderr.trim()}` : ""}`);
+  return result;
+}
+
 async function checkConfiguration() {
-  const [hostingSource, packageSource, layoutSource, robotsSource, sitemapSource] = await Promise.all([
-    readText("site/.openai/hosting.json"),
+  const [packageSource, layoutSource, robotsSource, sitemapSource, viteSource, skillSource] = await Promise.all([
     readText("site/package.json"),
     readText("site/app/layout.tsx"),
     readText("site/public/robots.txt"),
     readText("site/public/sitemap.xml"),
+    readText("site/vite.config.ts"),
+    readText("site/release/SKILL.md"),
   ]);
-  const hosting = JSON.parse(hostingSource);
   const packageJson = JSON.parse(packageSource);
 
-  assertion(hosting.project_id === projectId, `Expected existing Sites project ${projectId}`);
-  assertion(hosting.d1 === null && hosting.r2 === null, "Public site must not add D1 or R2 bindings");
+  assertion(!(await exists("site/.openai/hosting.json")), "Obsolete Sites hosting metadata must not exist");
+  assertion(!(await exists("site/build/sites-vite-plugin.ts")), "Obsolete Sites build plugin must not exist");
   assertion(packageJson.name === "@vibehub/site", "Expected the VibeHub public-site package");
+  assertion(packageJson.scripts?.["release:deploy"]?.includes("release.mjs deploy"), "Expected the Cloudflare Pages deploy entry point");
+  assertion(!viteSource.includes("sites-vite-plugin"), "Vite must not package Sites metadata");
+  assertion(skillSource.includes(pagesProjectName), `Release Skill must name existing Pages project ${pagesProjectName}`);
+  assertion(!skillSource.includes("Sites hosting Skill"), "Release Skill must not retain the obsolete Sites publisher");
   assertion(layoutSource.includes("NEXT_PUBLIC_SITE_URL"), "Site metadata must use NEXT_PUBLIC_SITE_URL");
   assertion(layoutSource.includes('canonical: "/"'), "Site metadata must publish the canonical apex URL");
   assertion(layoutSource.includes(title), "Site metadata title changed; update the release contract deliberately");
@@ -42,18 +69,17 @@ async function checkConfiguration() {
   assertion(robotsSource.includes(`Sitemap: ${canonicalUrl}/sitemap.xml`), "robots.txt must name the canonical sitemap");
   assertion(sitemapSource.includes(`<loc>${canonicalUrl}/</loc>`), "sitemap.xml must name the canonical homepage");
 
-  return { project_id: hosting.project_id, canonical_url: canonicalUrl };
+  return {
+    cloudflare_account_id: cloudflareAccountId,
+    pages_project_name: pagesProjectName,
+    production_branch: productionBranch,
+    canonical_url: canonicalUrl,
+  };
 }
 
 function runNpm(script, env = {}) {
   const npm = process.platform === "win32" ? "npm.cmd" : "npm";
-  const result = spawnSync(npm, ["run", script], {
-    cwd: siteRoot,
-    env: { ...process.env, ...env },
-    encoding: "utf8",
-    stdio: "inherit",
-  });
-  assertion(result.status === 0, `npm run ${script} failed with exit code ${result.status ?? "unknown"}`);
+  run(npm, ["run", script], { cwd: siteRoot, env });
 }
 
 async function preflight() {
@@ -61,6 +87,56 @@ async function preflight() {
   runNpm("lint");
   runNpm("test", { NEXT_PUBLIC_SITE_URL: canonicalUrl });
   return configuration;
+}
+
+function git(...args) {
+  return run("git", args, { capture: true }).stdout.trim();
+}
+
+async function deploy() {
+  const configuration = await checkConfiguration();
+  for (const artifact of [
+    "site/dist/client/index.html",
+    "site/dist/client/robots.txt",
+    "site/dist/client/sitemap.xml",
+    "site/dist/client/og.png",
+  ]) {
+    assertion(await exists(artifact), `Missing deployable artifact ${artifact}; run release:preflight first`);
+  }
+
+  assertion(git("status", "--porcelain") === "", "Deploy only a clean, exact committed source state");
+  const commitHash = git("rev-parse", "HEAD");
+  assertion(/^[0-9a-f]{40}$/.test(commitHash), "Expected a full 40-character Git commit hash");
+  const commitMessage = git("log", "-1", "--pretty=%s");
+  const wrangler = join(siteRoot, "node_modules", ".bin", process.platform === "win32" ? "wrangler.cmd" : "wrangler");
+  assertion(await exists("site/node_modules/.bin/wrangler"), "Wrangler is not installed; run npm ci in site/");
+
+  const result = run(wrangler, [
+    "pages",
+    "deploy",
+    "dist/client",
+    "--project-name",
+    pagesProjectName,
+    "--branch",
+    productionBranch,
+    "--commit-hash",
+    commitHash,
+    "--commit-message",
+    commitMessage,
+  ], {
+    cwd: siteRoot,
+    capture: true,
+    env: {
+      CLOUDFLARE_ACCOUNT_ID: cloudflareAccountId,
+      WRANGLER_LOG_PATH: join(siteRoot, ".wrangler", "wrangler.log"),
+    },
+  });
+  process.stderr.write(result.stderr ?? "");
+  process.stderr.write(result.stdout ?? "");
+  const deploymentUrl = result.stdout.match(/https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.pages\.dev/i)?.[0] ?? null;
+  assertion(deploymentUrl, "Wrangler completed without returning an immutable Pages deployment URL");
+
+  return { ...configuration, commit_hash: commitHash, deployment_url: deploymentUrl };
 }
 
 async function verify(target = canonicalUrl) {
@@ -81,12 +157,16 @@ async function verify(target = canonicalUrl) {
   assertion(html.includes(`content="${canonicalUrl}/og.png"`), "Production metadata does not point to the canonical Open Graph image");
   assertion(html.includes(`rel="canonical" href="${canonicalUrl}/"`), "Production page is missing the canonical apex link");
 
-  const [robotsResponse, sitemapResponse] = await Promise.all([
+  const [robotsResponse, sitemapResponse, ogResponse, faviconResponse] = await Promise.all([
     fetch(new URL("/robots.txt", url), { signal: AbortSignal.timeout(20_000) }),
     fetch(new URL("/sitemap.xml", url), { signal: AbortSignal.timeout(20_000) }),
+    fetch(new URL("/og.png", url), { signal: AbortSignal.timeout(20_000) }),
+    fetch(new URL("/vibehub-favicon.svg", url), { signal: AbortSignal.timeout(20_000) }),
   ]);
   assertion(robotsResponse.ok, `Expected robots.txt, received HTTP ${robotsResponse.status}`);
   assertion(sitemapResponse.ok, `Expected sitemap.xml, received HTTP ${sitemapResponse.status}`);
+  assertion(ogResponse.ok, `Expected og.png, received HTTP ${ogResponse.status}`);
+  assertion(faviconResponse.ok, `Expected vibehub-favicon.svg, received HTTP ${faviconResponse.status}`);
   const [robots, sitemap] = await Promise.all([robotsResponse.text(), sitemapResponse.text()]);
   assertion(robots.includes(`Sitemap: ${canonicalUrl}/sitemap.xml`), "robots.txt does not name the canonical sitemap");
   assertion(sitemap.includes(`<loc>${canonicalUrl}/</loc>`), "sitemap.xml does not name the canonical homepage");
@@ -98,6 +178,8 @@ async function verify(target = canonicalUrl) {
     status: response.status,
     robots_status: robotsResponse.status,
     sitemap_status: sitemapResponse.status,
+    og_status: ogResponse.status,
+    favicon_status: faviconResponse.status,
   };
 }
 
@@ -137,6 +219,12 @@ async function main() {
     process.stdout.write(`${JSON.stringify({ ok: true, command, ...result })}\n`);
     return;
   }
+  if (command === "deploy") {
+    assertion(args.length === 0, "deploy does not accept arguments");
+    const result = await deploy();
+    process.stdout.write(`${JSON.stringify({ ok: true, command, ...result })}\n`);
+    return;
+  }
   if (command === "verify") {
     const result = await verify(args[0]);
     process.stdout.write(`${JSON.stringify({ ok: true, command, ...result })}\n`);
@@ -148,7 +236,7 @@ async function main() {
     process.stdout.write(`${JSON.stringify({ ok: true, command, ...result })}\n`);
     return;
   }
-  throw new Error("Usage: release.mjs <check|preflight|verify|verify-www> [https-url]");
+  throw new Error("Usage: release.mjs <check|preflight|deploy|verify|verify-www> [https-url]");
 }
 
 main().catch((error) => {

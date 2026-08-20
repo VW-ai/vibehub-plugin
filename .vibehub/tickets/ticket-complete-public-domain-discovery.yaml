@@ -14,28 +14,41 @@
     },
     {
       "acceptance_id": "domain-discovery-is-production-verified",
-      "criterion": "Focused metadata contracts, lint, static production build, release preflight, exact source deployment, DNS resolution, redirect path and query preservation, canonical HTTPS content, robots.txt, sitemap.xml, and canonical-domain checks pass in production."
+      "criterion": "Focused metadata contracts, lint, static production build, release preflight, exact Cloudflare Pages source deployment, DNS resolution, redirect path and query preservation, canonical HTTPS content, robots.txt, sitemap.xml, and canonical-domain checks pass in production."
     }
   ],
   "constraints": [
     "Keep https://vibehub.icu as the single canonical public hostname; www is redirect-only.",
-    "Perform read-only conflict inspection before creating or changing www DNS or redirect state, and do not overwrite an unrelated existing resource.",
-    "Before Google Domain Property verification, inspect existing apex TXT and CNAME records; add only the exact Search Console record issued for vibehub.icu, never overwrite or delete another record, and retain the verification record after success.",
+    "Use the existing vibehub-website-v1 Cloudflare Pages project as the only production host after its deployment Ticket succeeds; do not preserve the Sites release dependency or maintain two publication paths.",
+    "Perform read-only conflict inspection before changing DNS or redirect state, and do not overwrite an unrelated existing resource.",
+    "Retain the exact Search Console verification record after success; never overwrite or delete another DNS record.",
     "Keep provider credentials, Google authorization, DNS verification values, and transient API state out of Git; Evidence may record only the method, record presence, timestamp, property, and non-secret account label.",
     "Do not add analytics, email DNS, HSTS preload, WAF policy, database, backend, daemon, or a second release system in this Ticket."
   ],
-  "context": "The canonical apex site is live with active SSL and HTTP-to-HTTPS forwarding, but www.vibehub.icu returns NXDOMAIN, robots.txt and sitemap.xml return 404, and the homepage has no explicit canonical link. The owner authorized the smallest complete discovery configuration: redirect www to the apex, publish canonical crawler metadata, and connect Google Search Console. The existing repository-local release workflow remains the only publication path.",
+  "context": "The source now contains the canonical link, public robots.txt, one-URL sitemap.xml, release verification, and a production-proven www-to-apex 301 rule. The vibehub.icu Search Console Domain Property is ownership-verified through a retained apex TXT proof. Production still serves the preceding Sites build, so canonical metadata publication, sitemap submission, and homepage recrawl wait on the owner's newly selected Cloudflare Pages deployment. The existing repository release workflow must be replaced rather than maintained in parallel.",
   "context_refs": [
     {
-      "purpose": "Canonical hostname metadata and favicon/social metadata surface to extend.",
+      "purpose": "Canonical hostname metadata and favicon/social metadata surface.",
       "ref": "site/app/layout.tsx"
     },
     {
-      "purpose": "Existing deterministic public-site deployment and production verification boundary.",
+      "purpose": "Checked-in public crawler policy and canonical sitemap reference.",
+      "ref": "site/public/robots.txt"
+    },
+    {
+      "purpose": "Checked-in canonical URL inventory to publish and submit.",
+      "ref": "site/public/sitemap.xml"
+    },
+    {
+      "purpose": "Repository-local release workflow that the direct Cloudflare deployment will replace and this Ticket will consume.",
       "ref": "site/release/SKILL.md"
     },
     {
-      "purpose": "Human-origin decision that established vibehub.icu as the canonical apex hostname.",
+      "purpose": "Non-secret ownership verification facts and remaining sitemap/recrawl boundary.",
+      "ref": ".vibehub/evidence/ticket-complete-public-domain-discovery/search-console-domain-property-verification.yaml"
+    },
+    {
+      "purpose": "Human-origin decision establishing the selected account and canonical apex hostname.",
       "ref": ".vibehub/evidence/ticket-decide-public-site-cloudflare-hostname/vibehub-icu-hostname-and-replacement-decision.yaml"
     }
   ],
@@ -44,17 +57,18 @@
   "maturity": "firm",
   "outcome": "The VibeHub public site has one canonical, crawlable production identity: www redirects cleanly to the apex, crawler metadata agrees on that apex, and Google Search Console knows the canonical sitemap.",
   "provenance_refs": [
-    "conversation:2026-08-20-owner-authorizes-public-domain-discovery-configuration"
+    "conversation:2026-08-20-owner-authorizes-public-domain-discovery-configuration",
+    "conversation:2026-08-20-owner-selects-cloudflare-pages-as-only-public-host"
   ],
   "relations": [
     {
-      "rationale": "The canonical apex hostname and replacement boundary must be human-owned and independently accepted before adding www or Google verification DNS state.",
+      "rationale": "The canonical account and apex hostname remain human-owned and independently accepted.",
       "target_ticket_id": "ticket-decide-public-site-cloudflare-hostname",
       "type": "depends_on"
     },
     {
-      "rationale": "Production metadata and verification must use the independently accepted repository-local release workflow and existing Sites project.",
-      "target_ticket_id": "ticket-encode-public-site-release-workflow",
+      "rationale": "Crawler metadata can be truthfully submitted and production-verified only after the exact build is live on the owner's selected Cloudflare Pages origin.",
+      "target_ticket_id": "ticket-deploy-public-site-cloudflare",
       "type": "depends_on"
     }
   ],

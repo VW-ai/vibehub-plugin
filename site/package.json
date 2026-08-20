@@ -13,6 +13,7 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "release:check": "node release/scripts/release.mjs check",
     "release:preflight": "node release/scripts/release.mjs preflight",
+    "release:deploy": "node release/scripts/release.mjs deploy",
     "release:verify": "node release/scripts/release.mjs verify https://vibehub.icu",
     "release:verify-www": "node release/scripts/release.mjs verify-www"
   },

@@ -1,35 +1,59 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "deployment-contract-is-refined-from-decisions",
-      "criterion": "After both direct prerequisites succeed, this same Ticket is rewritten to maturity firm with the literal Cloudflare account and hostname, read-only conflict preflight, exact merged-main source boundary, non-secret deployment configuration, Workers deployment proof, HTTPS/custom-domain proof, metadata origin, and reproducibility checks."
+      "acceptance_id": "existing-pages-project-is-reused",
+      "criterion": "Read-only Cloudflare inventory proves that vibehub-website-v1 is the existing project in the selected account; the exact committed static build is deployed to its main production branch with its full commit hash attached, and the immutable Pages deployment URL passes the canonical homepage, robots.txt, sitemap.xml, and static-asset verification before apex DNS changes."
+    },
+    {
+      "acceptance_id": "canonical-apex-is-served-by-pages",
+      "criterion": "The supported Cloudflare Pages custom-domain flow binds vibehub.icu to vibehub-website-v1, replaces only the exact preflighted obsolete apex origin records required for that binding, reaches active domain and certificate state, and serves the verified Pages deployment at https://vibehub.icu without changing the retained Google verification TXT record or the working www redirect contract."
+    },
+    {
+      "acceptance_id": "repository-release-path-is-cloudflare-only",
+      "criterion": "The repository-local release Skill, script, npm entry points, README, tests, and hosting metadata name the existing Cloudflare Pages project and exact-build Direct Upload workflow; the obsolete OpenAI Sites project ID, connector, source credential, archive, save-version, deployment polling, .openai/hosting.json, and Sites-specific production path are removed without adding a second release system."
+    },
+    {
+      "acceptance_id": "cloudflare-migration-is-regression-proven",
+      "criterion": "Focused release-workflow contracts, lint, deterministic static build, rendered metadata tests, complete release preflight, exact Pages deployment verification, apex DNS and custom-domain verification, www path/query redirect verification, and canonical production verification all pass, and acceptance-linked Evidence records non-secret project, deployment, commit, DNS transition, domain, and certificate facts."
     }
   ],
   "constraints": [
-    "Use Cloudflare Workers Static Assets through the existing Cloudflare Vite plugin and Wrangler; do not migrate this site to Pages or build a direct asset-upload API client.",
-    "Never commit Cloudflare credentials, account tokens, zone IDs that are not required, or local Wrangler state.",
-    "Do not bind or modify any hostname until the hostname-decision Ticket has a successful Outcome and this draft Ticket has been refined to firm.",
-    "Do not alter unrelated DNS records, Cloudflare applications, Workers, routes, or zones.",
-    "Stop on any existing state at the selected hostname unless the hostname-decision Outcome explicitly authorizes replacement of that named resource.",
-    "Deploy only a fetched, verified origin/main commit after PR #24 merges."
+    "Reuse Cloudflare account 72091e7e079e357ced7f9603c03a926e and existing Pages project vibehub-website-v1; do not create another Pages, Workers, Sites, or hosting project.",
+    "Deploy and verify the immutable Pages URL before changing apex DNS or custom-domain ownership.",
+    "Perform read-only DNS and Pages custom-domain conflict inspection first; replace only the two exact obsolete apex A records previously serving the temporary Sites origin, and retain unrelated DNS including the Google Search Console TXT proof and the redirect-only www record.",
+    "Keep Cloudflare OAuth state, API tokens, provider credentials, DNS verification values, cookies, and transient deployment state out of Git and Evidence.",
+    "Do not add Pages Functions, Workers code, database, backend, daemon, analytics, email DNS, WAF policy, or another release state model.",
+    "Do not delete the historical remote Sites deployment merely to complete repository migration; removing its canonical DNS ownership and repository release dependency is sufficient."
   ],
-  "context": "The owner authorized publishing the accepted public site through an existing Cloudflare account and domain after the founder correction is merged to main. The site already builds with Vinext and the Cloudflare Vite plugin and requires no D1 or R2. Cloudflare's current official guidance recommends Workers Static Assets and Wrangler for this application shape; a Custom Domain is appropriate because the Worker is the site's origin. This Ticket remains draft until the direct hostname-decision Outcome supplies the literal account, hostname, and conflict rule; it must then be rewritten in place to firm before execution.",
+  "context": "The public site is a deterministic static Vinext export under site/dist/client. Cloudflare already owns the vibehub.icu zone, SSL edge, Search Console TXT proof, and the working www-to-apex 301 rule. A read-only Wrangler inventory found an existing Git-connected Pages project named vibehub-website-v1 in the selected Wayne Cloudflare account, with a historical production deployment at vibehub-website-v1.pages.dev. The current apex still uses two DNS-only A records for the temporary Sites origin, while the repository release Skill pins an OpenAI Sites project. The owner explicitly chose to collapse hosting into Cloudflare rather than publish through Sites. This existing draft is refined in place from its superseded Workers direction to the authorized Pages direction so its history remains intact. Reuse the existing Pages project, deploy and verify the exact build before switching the apex, then make Cloudflare Pages the single repository release contract.",
   "context_refs": [
     {
-      "purpose": "Existing Cloudflare Vite plugin and Worker build configuration.",
+      "purpose": "Current repository release contract whose Sites-specific implementation must be replaced in place.",
+      "ref": "site/release/SKILL.md"
+    },
+    {
+      "purpose": "Current deterministic preflight and production verifier to preserve while changing the publisher.",
+      "ref": "site/release/scripts/release.mjs"
+    },
+    {
+      "purpose": "Current static build configuration whose Sites-only metadata dependency must be removed without changing the output contract.",
       "ref": "site/vite.config.ts"
     },
     {
-      "purpose": "Existing Worker entry point generated for Vinext hosting.",
-      "ref": "site/worker/index.ts"
+      "purpose": "Static production artifact and canonical metadata regression surface.",
+      "ref": "site/tests/rendered-html.test.mjs"
     },
     {
-      "purpose": "Production-origin metadata configuration.",
-      "ref": "site/app/layout.tsx"
+      "purpose": "Repository-local release identity contract to rewrite around Cloudflare Pages.",
+      "ref": "test/site-release-workflow.test.mjs"
     },
     {
-      "purpose": "Current build and hosting documentation to make reproducible.",
-      "ref": "site/README.md"
+      "purpose": "Successful prior release contract that is now explicitly superseded by the owner's hosting consolidation decision.",
+      "ref": ".vibehub/outcomes/ticket-encode-public-site-release-workflow.yaml"
+    },
+    {
+      "purpose": "Human authority for the selected account, canonical apex hostname, and replacement boundary.",
+      "ref": ".vibehub/evidence/ticket-decide-public-site-cloudflare-hostname/vibehub-icu-hostname-and-replacement-decision.yaml"
     }
   ],
   "deliveries": [
@@ -40,22 +64,28 @@
     }
   ],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "The exact merged main version of the validated VibeHub public site is deployed as a Cloudflare Worker and served over HTTPS from the owner's explicitly selected custom hostname.",
+  "maturity": "firm",
+  "outcome": "The existing vibehub-website-v1 Cloudflare Pages project becomes VibeHub's only canonical public-site hosting and release path, with vibehub.icu serving the exact verified static build and the obsolete Sites dependency removed from the repository.",
   "provenance_refs": [
     "conversation:2026-08-19-owner-authorizes-cloudflare-site-launch",
-    "official-doc:https://developers.cloudflare.com/workers/static-assets/get-started/",
-    "official-doc:https://developers.cloudflare.com/workers/configuration/routing/custom-domains/"
+    "conversation:2026-08-20-owner-selects-cloudflare-pages-as-only-public-host",
+    "official-doc:https://developers.cloudflare.com/pages/get-started/direct-upload/",
+    "official-doc:https://developers.cloudflare.com/pages/configuration/custom-domains/"
   ],
   "relations": [
     {
-      "rationale": "The corrected founder identity must be accepted and merged before production deployment.",
+      "rationale": "The accepted founder identity remains part of the exact public build that this deployment publishes.",
       "target_ticket_id": "ticket-correct-public-founder-identity",
       "type": "depends_on"
     },
     {
-      "rationale": "Deployment cannot become firm until the owner selects the exact account, hostname, and conflict rule.",
+      "rationale": "The production account, apex hostname, and conflict-replacement boundary must remain grounded in the accepted owner decision.",
       "target_ticket_id": "ticket-decide-public-site-cloudflare-hostname",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The previously accepted repository-local release contract is the exact baseline this Ticket supersedes rather than a second path to retain.",
+      "target_ticket_id": "ticket-encode-public-site-release-workflow",
       "type": "depends_on"
     }
   ],
