@@ -47,6 +47,13 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The public Coding Agent entrance presents VibeHub's two founders as a restrained identity strip and makes the Codex, Claude Code, and GitHub actions immediately recognizable through distinct brand symbols.",
   "provenance_refs": [
@@ -62,6 +69,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-public-founders-brand-icons"
 }

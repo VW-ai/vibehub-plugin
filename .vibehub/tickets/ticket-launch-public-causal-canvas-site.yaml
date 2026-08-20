@@ -96,6 +96,13 @@
       "ref": "skills/contracts/outcome.schema.json"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "A public VibeHub website makes one Ticket the visible interaction unit between human intent and compounding long-term Context, so a first-time visitor can understand and begin the Git-native development cycle from one extraordinary causal narrative.",
   "provenance_refs": [
@@ -106,6 +113,6 @@
     "context:constraint-ui-quiet-intelligence-standard"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-launch-public-causal-canvas-site"
 }

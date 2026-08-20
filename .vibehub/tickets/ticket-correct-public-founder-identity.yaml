@@ -33,6 +33,13 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The public site presents both founders in one consistent bilingual identity format: Wayne Wang · 王宇轩 and Victor Zhang · 张辰扬.",
@@ -46,6 +53,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-correct-public-founder-identity"
 }

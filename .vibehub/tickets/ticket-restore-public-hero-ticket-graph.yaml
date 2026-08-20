@@ -64,6 +64,13 @@
       "ref": "site/app/globals.css"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The public VibeHub site becomes one persistent Ticket Shelf where a visitor immediately understands and installs the product, then explores Product, Workflow, Documentation, and Founder through an origin-aware physical Ticket without losing the surrounding graph.",
   "provenance_refs": [
@@ -76,6 +83,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-restore-public-hero-ticket-graph"
 }

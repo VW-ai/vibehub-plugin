@@ -61,6 +61,13 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The public VibeHub homepage behaves like a coding Agent first: it opens as one focused onboarding conversation, then a concrete development request reveals a contextual right-hand View where a visitor can make a real product decision, inspect the changed localhost app, and audit the resulting Ticket graph.",
   "provenance_refs": [
@@ -73,6 +80,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-coding-agent-first-public-site"
 }

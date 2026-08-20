@@ -18,6 +18,13 @@
       "ref": "site/README.md"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The owner selects the exact Cloudflare account and canonical hostname for the VibeHub public site, together with an explicit stop-or-replace rule if that hostname already has DNS or Worker state.",
@@ -26,6 +33,6 @@
     "official-doc:https://developers.cloudflare.com/workers/configuration/routing/custom-domains/"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-decide-public-site-cloudflare-hostname"
 }

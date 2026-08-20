@@ -52,6 +52,13 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The Coding-Agent-first public site has a persistent, unmistakable VibeHub product entrance and a quieter, more formal visual shell, so visitors can leave or restart the interactive example at any point without losing the clarity of the one-Ticket product story.",
   "provenance_refs": [
@@ -64,6 +71,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-formal-public-agent-entry"
 }

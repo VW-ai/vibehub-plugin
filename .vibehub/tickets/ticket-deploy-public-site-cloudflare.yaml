@@ -32,6 +32,13 @@
       "ref": "site/README.md"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "maturity": "draft",
   "outcome": "The exact merged main version of the validated VibeHub public site is deployed as a Cloudflare Worker and served over HTTPS from the owner's explicitly selected custom hostname.",
@@ -52,6 +59,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-deploy-public-site-cloudflare"
 }

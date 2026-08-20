@@ -100,6 +100,13 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The public site tells one coherent vertical product story on a deep graphite canvas: one authentic coding-agent message becomes a faithful Ticket Graph, the second screen displays the schema-valid Ticket file that drives the selected Workbench Ticket, the next screen shows real Room and Context file shapes plus their capture-to-bind-to-return lifecycle, and later real surfaces explain Evidence, independent Outcome, and durable learning without a fake demo or parallel lifecycle.",
@@ -123,6 +130,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-public-embed-real-workbench"
 }

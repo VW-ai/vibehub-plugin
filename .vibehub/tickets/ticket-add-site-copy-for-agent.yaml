@@ -41,6 +41,13 @@
       "ref": "site/app/page.tsx"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The public website exposes one global Copy for Agent action that copies a truthful, immediately usable VibeHub adoption brief covering product identity, installation, entry, workflow, and core philosophy.",
   "provenance_refs": [
@@ -53,6 +60,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-add-site-copy-for-agent"
 }

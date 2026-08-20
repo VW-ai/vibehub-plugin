@@ -59,6 +59,13 @@
       "ref": "site/tests/rendered-html.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The public Coding Agent demo makes the one-Ticket development cycle visibly evolve from Request and Context through the human boundary, Evidence, independent Outcome, and returned Context without adding ornamental motion or interaction delay.",
   "provenance_refs": [
@@ -71,6 +78,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-public-cycle-evolution"
 }
