@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "ticket-is-an-agent-executable-object",
+    "rooms-explain-context-without-a-second-topology",
+    "public-fixture-is-honest-and-lightweight",
+    "workbench-embedding-preserves-product-quality"
+  ],
+  "evidence_id": "public-real-ticket-room-files",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-19T08:33:58Z",
+  "refs": [
+    "site/app/page.tsx",
+    "site/app/globals.css",
+    "site/tests/rendered-html.test.mjs",
+    "command:pnpm --filter @vibehub/site test (8 passed)",
+    "command:pnpm --filter @vibehub/site lint (passed)",
+    "command:node skills/scripts/vh.mjs project validate --repo . (valid)",
+    "command:git diff --check (passed)"
+  ],
+  "schema_version": 1,
+  "summary": "The public story now pairs a complete schema-valid persistent-dark-mode Ticket file with the corresponding selected Workbench Ticket, then pairs schema-valid Product Room, Decision, Constraint, and Contract files with a concise capture-to-Room-to-Ticket-to-return lifecycle and the real Rooms Workbench. The source viewers use the same deterministic typed fixture, remain browser-only, and add no backend, persistence, or parallel execution model. Static production build and all eight rendered-content contracts pass; site lint, canonical VibeHub project validation, and diff whitespace checks also pass.",
+  "ticket_id": "ticket-public-embed-real-workbench"
+}

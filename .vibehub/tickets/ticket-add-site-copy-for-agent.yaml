@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "global-copy-action-is-immediate",
+      "criterion": "A keyboard-reachable Copy for Agent control appears in the global top-right action area on desktop and narrow layouts, copies with one activation, and reports success in the control without opening another panel or hiding Install and GitHub access."
+    },
+    {
+      "acceptance_id": "copied-brief-is-complete-and-truthful",
+      "criterion": "The copied plain-text brief is directly usable in an Agent conversation and concisely includes what VibeHub is, exact supported Codex and Claude Code installation commands, the exact canonical entry, the Request-to-one-Ticket-to-Evidence-to-Outcome-to-Context model, explicit durable-Context guidance, Git-native truth, and a concrete first action without inventing services or capabilities."
+    },
+    {
+      "acceptance_id": "copy-feature-is-statically-verified",
+      "criterion": "Rendered-source assertions, lint, desktop/narrow browser interaction, static production build, and canonical project validation pass with the new action and payload while the installed Plugin artifact remains unchanged."
+    }
+  ],
+  "constraints": [
+    "Keep one global Copy for Agent payload as a code constant; do not add a CMS, endpoint, analytics, download service, or writable product state.",
+    "The copy action is onboarding for an Agent, not another installation stage or a replacement for the visible website explanation.",
+    "Do not reopen or mutate the successful public-site Outcome; this follow-up depends on it."
+  ],
+  "context": "The owner wants the public site itself to be transferable into an Agent conversation. A top-right Copy for Agent button should copy a complete brief rather than a URL or marketing fragment. The payload must help an Agent understand what VibeHub is, how Codex and Claude Code install it, the exact Start this with VibeHub. entry, and the product model: one Ticket mediates human intent and long-term Context; work produces acceptance-linked Evidence; independent Outcome returns durable learning to Context; checked-in Git documents remain truth. Keep the website static and the action clipboard-only.",
+  "context_refs": [
+    {
+      "purpose": "Successful public-site implementation this follow-up extends.",
+      "ref": ".vibehub/outcomes/ticket-launch-public-causal-canvas-site.yaml"
+    },
+    {
+      "purpose": "Canonical one-Ticket product loop the copied brief must explain.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Current installation and coexistence truth.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Canonical product and lifecycle language.",
+      "ref": "docs/CONCEPT.md"
+    },
+    {
+      "purpose": "Public site implementation surface.",
+      "ref": "site/app/page.tsx"
+    }
+  ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The public website exposes one global Copy for Agent action that copies a truthful, immediately usable VibeHub adoption brief covering product identity, installation, entry, workflow, and core philosophy.",
+  "provenance_refs": [
+    "conversation:2026-08-05-global-copy-for-agent"
+  ],
+  "relations": [
+    {
+      "rationale": "The global copy action extends the completed public website and its settled product language.",
+      "target_ticket_id": "ticket-launch-public-causal-canvas-site",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-add-site-copy-for-agent"
+}

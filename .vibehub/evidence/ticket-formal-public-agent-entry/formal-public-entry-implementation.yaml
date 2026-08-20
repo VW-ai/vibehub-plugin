@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "product-entry-remains-reachable",
+    "shell-feels-formal-not-prototypical",
+    "agent-first-cycle-remains-intact"
+  ],
+  "evidence_id": "formal-public-entry-implementation",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T21:58:13Z",
+  "refs": [
+    "file:site/app/page.tsx",
+    "file:site/app/globals.css",
+    "file:site/tests/rendered-html.test.mjs",
+    "context:.vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml",
+    "conversation:2026-08-09-formal-product-entry"
+  ],
+  "schema_version": 1,
+  "summary": "The public page now has a brand-level VibeHub masthead outside the Coding Agent product surface. The VibeHub mark and explicit Overview control both call the same reset path, and the active Agent header exposes Exit demo; reset clears every pending lifecycle timer and restores idle phase, Ticket view, suggested request, palette, founder disclosure, copy state, and task preview without a reload. Faux operating-system dots and LOCAL DEMO chrome were removed. The refined cool-neutral shell uses one precise outer frame, restrained depth and radii, larger status and support text, a flatter founder disclosure, and one consistent product-navigation hierarchy across arrival, Chat, App, and Ticket. The original truthful install/source/Copy for Agent actions, protected founder premise, deterministic dark-mode request, explicit human palette choice, App/Ticket switch, acceptance-linked Evidence, independent Outcome, and returned Context remain intact.",
+  "ticket_id": "ticket-formal-public-agent-entry"
+}

@@ -1,0 +1,38 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "owner-selects-account-hostname-and-conflict-rule",
+      "authority": "human",
+      "criterion": "The owner explicitly names one of the visible Cloudflare accounts, one complete canonical hostname, and either STOP on any existing DNS/Worker binding (recommended) or explicitly authorizes replacement of the named existing resource."
+    }
+  ],
+  "constraints": [
+    "Do not grant all-account access when one account is sufficient.",
+    "Do not infer root versus www versus another subdomain from the repository or product name.",
+    "If the owner does not explicitly authorize replacement, any existing DNS record, Custom Domain, route, Pages project, or Worker binding at the hostname means stop and report."
+  ],
+  "context": "Cloudflare OAuth exposes two available accounts and the owner has said an existing domain should be used, but has not yet named the exact account or hostname. A Workers Custom Domain automatically creates DNS and certificate state and cannot be placed over an existing CNAME. The smallest safe human decision is therefore the exact account, the exact root/www/subdomain hostname, and whether any existing record or Worker binding must stop deployment or may be explicitly replaced. The recommended default is stop and report.",
+  "context_refs": [
+    {
+      "purpose": "Current public-site hosting boundary that the selected Cloudflare account and hostname must satisfy.",
+      "ref": "site/README.md"
+    }
+  ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner selects the exact Cloudflare account and canonical hostname for the VibeHub public site, together with an explicit stop-or-replace rule if that hostname already has DNS or Worker state.",
+  "provenance_refs": [
+    "conversation:2026-08-19-cloudflare-account-and-hostname-boundary",
+    "official-doc:https://developers.cloudflare.com/workers/configuration/routing/custom-domains/"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-public-site-cloudflare-hostname"
+}

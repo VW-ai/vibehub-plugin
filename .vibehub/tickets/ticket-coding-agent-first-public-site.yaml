@@ -1,0 +1,85 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "arrival-is-one-coding-agent-conversation",
+      "criterion": "At 1440px desktop and 390px mobile widths the initial viewport contains one centered, generic Coding Agent conversation with no visible right-hand workspace; its first VibeHub message plainly states what the product does, exposes truthful Codex and Claude Code installation actions, GitHub source access, a founder-premise entry, and a strongly suggested dark-mode request without requiring scrolling or prior product knowledge."
+    },
+    {
+      "acceptance_id": "development-request-opens-contextual-view",
+      "criterion": "Submitting the supported dark-mode request by pointer or keyboard keeps Chat visible, reveals the right-hand View, creates one persistent Ticket, and progresses deterministically to a human-decision boundary without fake token streaming, a network request, an iframe, or a claim that arbitrary prompts are being executed."
+    },
+    {
+      "acceptance_id": "human-choice-drives-live-app",
+      "criterion": "At the human boundary the Agent offers multiple readable dark-palette choices, clearly waits for the visitor, and applies the selected palette immediately to the embedded localhost task app; the chosen value remains visibly selected and execution does not reach a successful Outcome before that explicit choice."
+    },
+    {
+      "acceptance_id": "app-and-ticket-views-share-one-cycle",
+      "criterion": "After development begins the right-hand surface provides keyboard- and pointer-reachable App and Ticket views, automatically presents the useful view for the current stage, and the Ticket view visibly connects Request, Context, the one Ticket, Human decision, acceptance-linked Evidence, independent Outcome, and returned durable learning without exposing raw schema JSON."
+    },
+    {
+      "acceptance_id": "agent-first-site-is-accessible-and-verifiable",
+      "criterion": "The static site remains readable and operable on desktop and narrow mobile without page-level horizontal overflow; focus, labels, status announcements, copy feedback, reduced motion, fine-pointer hover gating, external links, and touch targets remain usable; rendered assertions, lint, production build, desktop/mobile browser inspection, canonical project and Ticket validation, and Plugin artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Use Coding Agent as the primary product surface and identity; do not brand the shell as Codex or Claude Code, and mention those hosts only where installation truth requires them.",
+    "The initial state is conversation-only. Do not keep the previous Ticket Shelf, open book, graph, localhost preview, or a conventional marketing dashboard visible before the visitor starts development.",
+    "Keep one supported deterministic dark-mode example. If the visitor submits unrelated text, explain the example boundary honestly instead of fabricating Agent execution.",
+    "Do not add a backend, model call, persistence service, analytics, account, database, iframe, WebGL, motion dependency, or writable product state.",
+    "Use existing design tokens and CSS transitions or the Web Animations API; routine keyboard actions are immediate, press feedback stays 100-160ms, explanatory state changes stay restrained and interruptible, and reduced-motion removes spatial travel.",
+    "Do not invent founder identities, biographies, quotes, metrics, users, customers, or one-click installation. Founder copy may state the verified product premise and expose a future identity surface until approved names and links exist.",
+    "Do not deploy, bind a domain, mutate the installed local graph UI, or change hosting configuration in this Ticket."
+  ],
+  "context": "The owner has replaced the Ticket-Shelf-first public-site model with a Coding-Agent-first model. Arrival should feel like opening a generic coding Agent, not like entering a VibeHub dashboard or a Codex imitation. The first Agent message introduces VibeHub, its GitHub source, truthful Codex and Claude Code installation actions, the founder premise, and one strongly suggested development request. There is no right-hand product pane before development begins. Submitting the supported dark-mode task begins the simulated development cycle: Chat remains on the left and a right-hand View opens only when useful. The right View can show the localhost task app or the Ticket audit surface; the Agent should automatically select the useful surface while preserving a manual App/Ticket switch. A dark-palette decision is an explicit human boundary: the Agent must wait, the visitor chooses, the app updates immediately, and only then do Evidence and an independent successful Outcome complete the graph. The simulation is deterministic and browser-local, with no fake model streaming or backend claim. Ticket cards, ports, connectors, cool-neutral paper, and restrained physical depth remain the VibeHub visual vocabulary, but the graph is a contextual product View rather than the site's permanent shell.",
+  "context_refs": [
+    {
+      "purpose": "Successful prior public-site implementation being deliberately reframed rather than reopened.",
+      "ref": ".vibehub/outcomes/ticket-restore-public-hero-ticket-graph.yaml"
+    },
+    {
+      "purpose": "Binding visual, accessibility, and interaction-quality standard.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Canonical one-Ticket product model the contextual Ticket View must preserve.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Current installation, lifecycle-presentation, and product-boundary truth.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Existing public-site interaction and content surface to replace.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Existing public-site visual, responsive, and motion implementation surface to simplify.",
+      "ref": "site/app/globals.css"
+    },
+    {
+      "purpose": "Static product-contract assertions that must be rewritten for the new interaction.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The public VibeHub homepage behaves like a coding Agent first: it opens as one focused onboarding conversation, then a concrete development request reveals a contextual right-hand View where a visitor can make a real product decision, inspect the changed localhost app, and audit the resulting Ticket graph.",
+  "provenance_refs": [
+    "conversation:2026-08-09-coding-agent-first-public-site"
+  ],
+  "relations": [
+    {
+      "rationale": "The new Agent-first site reuses and reframes the already accepted public visual foundation.",
+      "target_ticket_id": "ticket-restore-public-hero-ticket-graph",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-coding-agent-first-public-site"
+}

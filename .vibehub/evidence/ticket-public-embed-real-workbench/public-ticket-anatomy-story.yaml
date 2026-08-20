@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "git-and-github-stay-below-product-value",
+    "public-fixture-is-honest-and-lightweight",
+    "workbench-embedding-preserves-product-quality"
+  ],
+  "evidence_id": "public-ticket-anatomy-story",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-19T08:04:23Z",
+  "refs": [
+    "file:site/app/page.tsx",
+    "file:site/app/globals.css",
+    "file:site/tests/rendered-html.test.mjs",
+    "test:site-rendered-contracts-8-of-8",
+    "build:site-static-production-export",
+    "preview:http://localhost:3000"
+  ],
+  "schema_version": 1,
+  "summary": "The second public screen now answers What is a Ticket? instead of mapping fragments of a long request. A concrete VH-204 anatomy surface makes Work, Dependencies, Bound Context, and Acceptance visible as four distinct parts, then names the resulting object Agent-executable. The adjacent faithful Workbench opens the same selected Ticket on Contract so the anatomy maps to real Acceptance and Bound Context UI rather than a marketing-only abstraction. The hero leads with Stop managing chats. Manage the work. and Turn every coding request into a Ticket with your context; Git and GitHub appear only in the later ownership and implementation section. The change removes the old request-mapping component and its motion without adding a dependency or second lifecycle.",
+  "ticket_id": "ticket-public-embed-real-workbench"
+}

@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "first-view-explains-and-installs",
+    "ticket-shelf-is-the-site-navigation",
+    "opened-ticket-is-physical-and-readable",
+    "motion-is-fluid-restrained-and-interruptible"
+  ],
+  "evidence_id": "ticket-shelf-implementation-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T08:39:10Z",
+  "refs": [
+    "file:site/app/page.tsx",
+    "file:site/app/globals.css",
+    "file:site/app/layout.tsx",
+    "context:.vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml",
+    "context:.vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "The public page now renders one physical two-page Ticket over a persistent five-module Ticket Shelf. Product opens by default with the exact promise, one-Ticket explanation, canonical entry, truthful Codex and Claude Code actions, Copy for Agent, and GitHub. The shelf preserves the selected Ticket as a dashed OPEN origin with a connector to the expanded dossier. Product, Workflow, Documentation, and Founder render distinct linearly readable page structures. The Product page keeps Request and Context semantically separate from the single Ticket, then shows Evidence and independent Outcome. Pointer switching uses an origin-measured, cancellable WAAPI transform/opacity animation; keyboard and narrow layouts switch immediately; hover is fine-pointer-gated and reduced motion is honored.",
+  "ticket_id": "ticket-restore-public-hero-ticket-graph"
+}
