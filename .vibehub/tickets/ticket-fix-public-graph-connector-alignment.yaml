@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "connectors-use-rendered-card-geometry",
+      "criterion": "Every dependency path is computed from the current rendered source and target card bounds inside the graph map; the fixed path, arrow, and handle coordinates are removed."
+    },
+    {
+      "acceptance_id": "connectors-stay-attached-through-layout-change",
+      "criterion": "Initial render, wide desktop, Inspector width, browser resize, and canvas pan keep each path attached from the source card's right aperture to the target card boundary without visible floating segments or card overlap."
+    },
+    {
+      "acceptance_id": "graph-language-and-interaction-remain-intact",
+      "criterion": "The Workbench card language, routed curves, arrowheads, control knots, causal-cone focus, Ticket selection, Rooms, Inspector lenses, mobile stacked fallback, and accessible labels remain intact."
+    },
+    {
+      "acceptance_id": "connector-fix-is-production-verified",
+      "criterion": "Focused geometry contracts, lint, production build, rendered contracts, release preflight, browser checks at the owner's wide screenshot class and standard desktop width, production deployment, and canonical-domain verification pass."
+    }
+  ],
+  "constraints": [
+    "Fix the shared public TicketView graph renderer rather than tuning one page or one screenshot.",
+    "Do not alter the canonical plugin Workbench or change the website narrative and card visual design.",
+    "Do not add a graph library, timer loop, backend, or second graph data model.",
+    "Use ResizeObserver or an equivalent event-driven measurement boundary; do not poll layout."
+  ],
+  "context": "The owner found a production regression immediately after the public graph visual alignment release: on a wide viewport, cards use responsive CSS positions and sizes while the SVG dependency paths use a fixed 1000 by 650 coordinate fixture. The endpoints and bends therefore float far away from their cards. The graph must use one geometry system derived from the rendered card bounds, matching the real Workbench's layout behavior rather than tuning another fixed screenshot.",
+  "context_refs": [
+    {
+      "purpose": "Public graph layout, Ticket nodes, and current fixed SVG connector implementation.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Responsive Ticket sizing and graph layers that caused the coordinate mismatch.",
+      "ref": "site/app/globals.css"
+    },
+    {
+      "purpose": "Canonical Workbench precedent for deriving routes from current node positions.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Public-site regression contracts.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    },
+    {
+      "purpose": "Production release and verification boundary for the live regression fix.",
+      "ref": "site/release/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The public Ticket graph keeps every dependency path physically attached to its source and target cards at every supported viewport and panel width.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-reports-floating-public-graph-connectors",
+    "image:screenshot-2026-08-20-10-37-08-am"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-fix-public-graph-connector-alignment"
+}

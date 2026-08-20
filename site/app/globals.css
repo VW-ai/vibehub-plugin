@@ -1184,7 +1184,7 @@ button:disabled { cursor: default; }
   .causal-neighbors button:hover,
   .room-consuming-tickets button:hover,
   .public-rooms > nav button:hover { color: #252523; background-color: #f1f1ee; }
-  .workbench-ticket:hover { opacity: 1; transform: translateY(-2px); }
+  .workbench-ticket:hover { opacity: 1; }
 }
 
 @media (max-width: 1040px) {

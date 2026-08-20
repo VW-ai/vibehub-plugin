@@ -331,31 +331,48 @@ const ROOM_SOURCE_FILES: SourceFile[] = [
 ];
 
 const WORKBENCH_EDGES = [
-  {
-    id: "VH-201:VH-204",
-    from: "VH-201",
-    to: "VH-204",
-    path: "M 340 135 H 354 Q 376 135 376 157 V 258 Q 376 280 398 280",
-    arrow: "M 388 275 L 398 280 L 388 285 Z",
-    handle: [376, 157],
-  },
-  {
-    id: "VH-202:VH-204",
-    from: "VH-202",
-    to: "VH-204",
-    path: "M 340 438 H 354 Q 376 438 376 416 V 302 Q 376 280 398 280",
-    arrow: "M 388 275 L 398 280 L 388 285 Z",
-    handle: [376, 416],
-  },
-  {
-    id: "VH-204:VH-205",
-    from: "VH-204",
-    to: "VH-205",
-    path: "M 680 280 H 694 Q 716 280 716 258 V 179 Q 716 157 738 157",
-    arrow: "M 728 152 L 738 157 L 728 162 Z",
-    handle: [716, 258],
-  },
+  { id: "VH-201:VH-204", from: "VH-201", to: "VH-204" },
+  { id: "VH-202:VH-204", from: "VH-202", to: "VH-204" },
+  { id: "VH-204:VH-205", from: "VH-204", to: "VH-205" },
 ];
+
+type WorkbenchEdgeRoute = {
+  id: string;
+  from: string;
+  to: string;
+  path: string;
+  arrow: string;
+  handle: [number, number];
+};
+
+function graphCoordinate(value: number) {
+  return Math.round(value * 10) / 10;
+}
+
+function buildWorkbenchEdgeRoute(
+  edge: (typeof WORKBENCH_EDGES)[number],
+  source: DOMRect,
+  target: DOMRect,
+  map: DOMRect,
+): WorkbenchEdgeRoute {
+  const startX = graphCoordinate(source.right - map.left);
+  const startY = graphCoordinate(source.top + source.height / 2 - map.top);
+  const endX = graphCoordinate(target.left - map.left);
+  const endY = graphCoordinate(target.top + target.height / 2 - map.top);
+  const directionX = endX >= startX ? 1 : -1;
+  const directionY = endY >= startY ? 1 : -1;
+  const midX = graphCoordinate((startX + endX) / 2);
+  const verticalDistance = Math.abs(endY - startY);
+  const horizontalDistance = Math.abs(endX - startX);
+  const radius = graphCoordinate(Math.min(18, verticalDistance / 2, horizontalDistance / 4));
+  const handle: [number, number] = [midX, graphCoordinate((startY + endY) / 2)];
+  const path = verticalDistance < 1
+    ? `M ${startX} ${startY} H ${endX}`
+    : `M ${startX} ${startY} H ${graphCoordinate(midX - directionX * radius)} Q ${midX} ${startY} ${midX} ${graphCoordinate(startY + directionY * radius)} V ${graphCoordinate(endY - directionY * radius)} Q ${midX} ${endY} ${graphCoordinate(midX + directionX * radius)} ${endY} H ${endX}`;
+  const arrow = `M ${graphCoordinate(endX - directionX * 9)} ${graphCoordinate(endY - 5)} L ${endX} ${endY} L ${graphCoordinate(endX - directionX * 9)} ${graphCoordinate(endY + 5)} Z`;
+
+  return { ...edge, path, arrow, handle };
+}
 
 const SITE_AGENT_BRIEF = `Help me install and use VibeHub in this repository.
 
@@ -554,6 +571,7 @@ function WorkbenchTicketNode({
       type="button"
       className={`workbench-ticket state-${state.toLowerCase()} ${attention ? `attention-${attention.toLowerCase()}` : ""} ${selected ? "is-selected" : related ? "is-related" : "is-dimmed"}`}
       style={style}
+      data-ticket-id={ticket.id}
       aria-pressed={selected}
       aria-label={`${ticket.id}. ${ticket.title}. ${state}. ${ticket.requires.length} prerequisites, ${unlocks} unlocks.`}
       onClick={onSelect}
@@ -725,12 +743,48 @@ function TicketView({
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [panning, setPanning] = useState(false);
   const panRef = useRef<{ pointerId: number; startX: number; startY: number; originX: number; originY: number } | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [edgeRoutes, setEdgeRoutes] = useState<WorkbenchEdgeRoute[]>([]);
   const selectedTicket = WORKBENCH_FIXTURE.tickets.find((ticket) => ticket.id === selectedTicketId) ?? WORKBENCH_FIXTURE.tickets[2];
   const related = causalCone(selectedTicket.id);
   const counts = WORKBENCH_FIXTURE.tickets.reduce((result, ticket) => {
     result[workbenchState(ticket, moment)] += 1;
     return result;
   }, { READY: 0, BLOCKED: 0, DONE: 0 });
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    let frame = 0;
+    const tickets = Array.from(map.querySelectorAll<HTMLElement>("[data-ticket-id]"));
+
+    function measureRoutes() {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const mapBounds = map.getBoundingClientRect();
+        const ticketBounds = new Map(
+          tickets.map((ticket) => [ticket.dataset.ticketId, ticket.getBoundingClientRect()]),
+        );
+        setEdgeRoutes(WORKBENCH_EDGES.flatMap((edge) => {
+          const source = ticketBounds.get(edge.from);
+          const target = ticketBounds.get(edge.to);
+          return source && target ? [buildWorkbenchEdgeRoute(edge, source, target, mapBounds)] : [];
+        }));
+      });
+    }
+
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measureRoutes);
+    observer?.observe(map);
+    tickets.forEach((ticket) => observer?.observe(ticket));
+    window.addEventListener("resize", measureRoutes);
+    measureRoutes();
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener("resize", measureRoutes);
+    };
+  }, []);
 
   function selectTicket(ticketId: string) {
     setSelectedTicketId(ticketId);
@@ -779,12 +833,12 @@ function TicketView({
           onPointerCancel={endPan}
         >
           <div className="public-canvas-summary" aria-label="Ticket state summary"><span className="state-done">{counts.DONE} done</span><span className="state-ready">{counts.READY} ready</span>{counts.BLOCKED ? <span className="state-blocked">{counts.BLOCKED} blocked</span> : null}</div>
-          <div className="public-canvas-map" style={{ "--canvas-pan-x": `${pan.x}px`, "--canvas-pan-y": `${pan.y}px` } as CSSProperties}>
-            <svg className="public-causal-links" viewBox="0 0 1000 650" preserveAspectRatio="none" aria-hidden="true">
-              {WORKBENCH_EDGES.map((edge) => {
+          <div ref={mapRef} className="public-canvas-map" style={{ "--canvas-pan-x": `${pan.x}px`, "--canvas-pan-y": `${pan.y}px` } as CSSProperties}>
+            <svg className="public-causal-links" aria-hidden="true">
+              {edgeRoutes.map((edge) => {
                 const edgeRelated = related.has(edge.from) && related.has(edge.to);
                 return (
-                  <g key={edge.id} className={`public-causal-link ${edgeRelated ? "is-related" : "is-dimmed"}`}>
+                  <g key={edge.id} data-edge-id={edge.id} data-edge-from={edge.from} data-edge-to={edge.to} className={`public-causal-link ${edgeRelated ? "is-related" : "is-dimmed"}`}>
                     <path className="public-edge-visible" d={edge.path} />
                     <path className="public-edge-arrow" d={edge.arrow} />
                     <circle className="public-edge-control-halo" cx={edge.handle[0]} cy={edge.handle[1]} r="12" />
