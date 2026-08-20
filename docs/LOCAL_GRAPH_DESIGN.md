@@ -40,12 +40,14 @@ finishes, what becomes executable next?**
   can reopen that exact focus; it is not a remote share, durable permalink, or
   repository switch.
 - The default graph is current work, not the repository's entire lifetime.
-  Successfully delivered Tickets remain canonical history: the nearest
-  archived causal boundary stays visible with an explicit `ARCHIVED` label,
-  deeper history appears as count-labelled one-hop expansion stubs, and `All`
-  restores the complete graph. Scope, exact delivery, selected Room subtrees,
-  and explicit history expansion live in the focused URL and use the same
-  query semantics as CLI JSON.
+  READY, REFINE, and BLOCKED Tickets seed that view. Only their nearest DONE
+  causal boundary remains visible; deeper completed history appears as
+  count-labelled one-hop expansion stubs, and `All` restores the complete
+  graph. A delivered boundary also carries the explicit `ARCHIVED` label, but
+  delivery metadata never decides whether unrelated DONE work occupies the
+  current action surface. Scope, exact delivery, selected Room subtrees, and
+  explicit history expansion live in the focused URL and use the same query
+  semantics as CLI JSON.
 
 This translates the approved `quiet intelligence`, v8 spatial-workbench, and
 causal Ticket review decisions preserved in Git history at `9dee0f0`.
@@ -66,6 +68,12 @@ attestation, writable review operations, or hidden lifecycle state. It consumes
 fresh schema-valid Context, Ticket, Evidence, and Outcome files mechanically.
 Git remains the only durable truth; selection, layout, pan, and zoom are
 disposable view state.
+
+Compatibility is also checked-in truth, not a permissive parser fallback.
+`skills/contracts/versions.json` is the runtime version contract. Project
+format 2 requires Ticket schema v2, including an explicit `deliveries` array;
+the format-1-to-format-2 migration declares that document transition and must
+upgrade canonical Tickets before advancing the project marker.
 
 ## Interaction depth
 

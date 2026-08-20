@@ -5,8 +5,10 @@ description: Upgrade a project's checked-in .vibehub data from an older VibeHub 
 
 # VibeHub Migrate
 
-Upgrading is a restructure, not a compatibility layer. The version steps live
-once in `references/migrations.json`; this Skill supplies the judgment.
+Upgrading is a restructure, not a compatibility layer. Current project and
+document versions live in `../contracts/versions.json`; the matching upgrade
+steps live once in `references/migrations.json`. Their targets must agree
+mechanically before a migration is complete; this Skill supplies the judgment.
 
 ## Workflow
 

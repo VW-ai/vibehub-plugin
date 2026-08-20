@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#07080a" />
+    <title>VibeHub — application direction study</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="review-bar">
+      <div class="review-brand">
+        <button class="mark" data-action="compare" aria-label="Compare all directions">V</button>
+        <div><strong>Application direction study</strong><span>Visual gate · not a feature prototype</span></div>
+      </div>
+
+      <nav class="direction-tabs" aria-label="Visual direction">
+        <button class="is-active" data-direction="compare"><span>00</span>Compare</button>
+        <button data-direction="ambient"><span>01</span>Ambient OS</button>
+        <button data-direction="spatial"><span>02</span>Spatial Cockpit</button>
+        <button data-direction="kinetic"><span>03</span>Kinetic Command</button>
+      </nav>
+
+      <div class="review-actions">
+        <button class="annotation-toggle" data-action="toggle-notes" aria-pressed="false"><i></i>Notes</button>
+        <button class="fullscreen-toggle" data-action="toggle-chrome">Hide review UI</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="compare-screen is-active" id="compare-screen" aria-labelledby="compare-title">
+        <header class="compare-header">
+          <div><span class="eyebrow">SAME PRODUCT · THREE ATTITUDES</span><h1 id="compare-title">Choose the environment,<br />not the decoration.</h1></div>
+          <div class="scenario-control" role="group" aria-label="Scenario to compare">
+            <button class="is-active" data-scene="home">First frame <kbd>H</kbd></button>
+            <button data-scene="chat">Chat at work <kbd>C</kbd></button>
+            <button data-scene="runs">Active runs <kbd>R</kbd></button>
+          </div>
+        </header>
+
+        <div class="direction-grid" id="direction-grid"></div>
+
+        <footer class="compare-footer">
+          <p><strong>Look for:</strong> where your eyes land first, whether execution feels alive, and whether you would keep this open all day.</p>
+          <p>Keys <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> open directions · <kbd>Esc</kbd> returns here</p>
+        </footer>
+      </section>
+
+      <section class="focus-screen" id="focus-screen" hidden>
+        <div class="focus-stage" id="focus-stage"></div>
+        <aside class="concept-notes" id="concept-notes" aria-hidden="true">
+          <header><span>DESIGN INTENT</span><button data-action="toggle-notes" aria-label="Close notes">×</button></header>
+          <div id="notes-content"></div>
+        </aside>
+        <nav class="focus-scenes" aria-label="Prototype state">
+          <button class="is-active" data-scene="home"><span>01</span>First frame</button>
+          <button data-scene="chat"><span>02</span>Chat at work</button>
+          <button data-scene="runs"><span>03</span>Active runs</button>
+        </nav>
+      </section>
+    </main>
+
+    <div class="key-hint" id="key-hint" role="status" aria-live="polite"></div>
+  </body>
+</html>

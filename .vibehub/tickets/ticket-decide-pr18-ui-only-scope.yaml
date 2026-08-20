@@ -22,6 +22,15 @@
       "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-12T04:17:49.000Z",
+      "delivered_commit": "3860f3a57ca7215dd9e76eaa6fad41872eece924",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/19",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The repository owner's business disposition of PR #18 is recorded: retain the shared Ticket-graph UI upgrade, do not ship the macOS Desktop product version, and preserve earlier PR records while appending the later decision.",
@@ -31,6 +40,6 @@
     "conversation:2026-08-11-pr18-ui-business-review"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-decide-pr18-ui-only-scope"
 }

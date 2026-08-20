@@ -85,6 +85,15 @@
       "ref": "test/ui-host.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-03T00:19:00.000Z",
+      "delivered_commit": "05b9aa28bd8493da6c47d1af153dd5dfe1c76ec6",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/11",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The Ticket Skill suite follows one compact, mechanically checked lifecycle contract and proactively presents the focused local graph at human-attention transitions, while normal execution stays quiet and users never need to know a special UI command.",
   "provenance_refs": [
@@ -99,6 +108,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-make-workflow-present-itself"
 }

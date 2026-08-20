@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "near-and-far-scenarios-are-explicit",
+    "clickable-core-loop-prototype",
+    "whole-application-product-identity",
+    "ticket-context-annotation-language",
+    "execution-is-strongly-perceptible",
+    "review-pack-is-decision-ready"
+  ],
+  "evidence_id": "graph-first-ticket-workspace-correction",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-18T00:21:38Z",
+  "refs": [
+    "conversation:2026-08-17-owner-corrects-harness-to-graph-first-ticket-system",
+    "docs/HARNESS_PRODUCT_LOGIC.md",
+    "docs/HARNESS_CODEX_BASE_REVIEW.md",
+    "apps/harness-codex-base/index.html",
+    "apps/harness-codex-base/app.css",
+    "apps/harness-codex-base/app.js",
+    "test/harness-codex-base.test.mjs",
+    "test:npm-test-99-of-99",
+    "http:127.0.0.1:55724-health-ok"
+  ],
+  "schema_version": 1,
+  "summary": "The owner corrected the application hierarchy: the previous build was acceptable only as the internal execution state of one Ticket, while the primary application surface must present Tickets through the existing VibeHub causal graph grammar. The low-fidelity prototype now opens on a Ticket Graph that shows direct dependencies, fork and join geometry, blockers, unlocks, operational state, orthogonal Needs-you signals, and trusted Active-Run presence. Clicking a graph Ticket enters its phase-specific Ticket Workspace, preserving the earlier Explore, Ready, Running, Needs you, Review, and Done surfaces; a persistent back action returns to the graph. The sidebar now contains stable Tickets, Chats, and Rooms destinations plus recent uncommitted Chats rather than replacing committed Ticket causality with flat attention queues. Product logic and review guidance explicitly define the two-level Graph-to-Ticket-Workspace application. The full repository suite passed 99/99 and the local-only preview served the corrected graph-first prototype.",
+  "ticket_id": "ticket-prototype-task-harness-experience"
+}

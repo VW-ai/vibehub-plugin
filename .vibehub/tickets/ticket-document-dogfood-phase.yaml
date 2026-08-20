@@ -33,6 +33,15 @@
       "ref": "README.md"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-03T00:19:00.000Z",
+      "delivered_commit": "05b9aa28bd8493da6c47d1af153dd5dfe1c76ec6",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/11",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The public README makes the current dogfood-only product phase and its real-use feedback loop immediately clear without implying more platform construction.",
   "provenance_refs": [
@@ -41,6 +50,6 @@
     "context:decision-dogfood-only-phase"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-document-dogfood-phase"
 }

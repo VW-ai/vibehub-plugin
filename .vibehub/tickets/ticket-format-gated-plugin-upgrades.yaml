@@ -47,6 +47,15 @@
       "ref": "docs/INSTALL.md"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-05T00:39:25.000Z",
+      "delivered_commit": "945d2d94460e100098ccdf1276757e9abae3ed0c",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/14",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "VibeHub plugin releases can refresh safely across Codex and Claude Code while every repository exposes an explicit data-format version and blocks writes until any required Context/Ticket migration is previewed, approved, applied, and validated.",
   "provenance_refs": [
@@ -59,6 +68,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-format-gated-plugin-upgrades"
 }

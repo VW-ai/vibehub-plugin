@@ -37,6 +37,15 @@
       "ref": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-04T03:35:11.000Z",
+      "delivered_commit": "1c94470a3d06a8e7bcf2b49000fc48be807da946",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/12",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "Agents can retrieve a room's whole knowledge in one query, mid-execution work discovery is a single-sourced lifecycle transition owned by planning, and execution's durable learnings have an owned capture moment into the entered room.",
   "provenance_refs": [
@@ -50,6 +59,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-room-retrieval-and-discovery"
 }

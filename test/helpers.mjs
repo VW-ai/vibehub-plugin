@@ -70,10 +70,11 @@ export function writeRoom(repo, roomPath, document) {
 
 export function ticket(id, dependencies = []) {
   return {
-    schema_version: 1,
+    schema_version: 2,
     kind: "ticket",
     ticket_id: id,
     outcome: `${id} observable outcome`,
+    deliveries: [],
     context: `Execute ${id} from its checked-in context.`,
     acceptance: [
       { acceptance_id: "works", criterion: `${id} behavior is observed.` },

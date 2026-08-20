@@ -1,0 +1,70 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "current-scope-is-actionable",
+      "criterion": "The shared current-scope projection used by CLI JSON and Workbench seeds visibility from READY, REFINE, and BLOCKED Tickets, includes only the minimum directly adjacent DONE causal boundary needed to explain those open Tickets, preserves explicit one-hop history expansion, and no longer treats an unrelated DONE Ticket as current merely because deliveries is omitted or empty."
+    },
+    {
+      "acceptance_id": "all-and-delivery-history-remain-truthful",
+      "criterion": "All scope still returns every canonical Ticket, exact delivery and Room filters retain their existing deterministic semantics, archive remains derived from successful Outcome plus exact delivered membership, and current filtering never deletes, moves, unarchives, or falsifies historical Tickets and relations."
+    },
+    {
+      "acceptance_id": "delivery-audit-is-a-versioned-migration",
+      "criterion": "The current project format advances by one version and the single migrations reference defines the complete prior-format upgrade: preview legacy Tickets, add an explicit deliveries array, backfill pull-request or cherry-pick delivery only from exact authoritative refs, timestamps, and commits, preserve an empty array when delivery is absent or unprovable, then update the format marker and validate; compatibility gates old-format writes until this explicit reviewable migration is applied."
+    },
+    {
+      "acceptance_id": "repository-history-is-audited",
+      "criterion": "Every canonical Ticket in this repository has an explicit deliveries array after a reviewable audit; previously delivered Tickets receive exact evidence-backed membership where it can be proven from repository or GitHub history, unproven cases remain empty without inference, and the repository format marker records the completed migration."
+    },
+    {
+      "acceptance_id": "projection-and-migration-are-regression-proven",
+      "criterion": "Focused fixtures prove the current graph stays small with many legacy DONE Tickets, direct causal DONE boundaries and progressive history remain correct, the prior-format-to-current migration succeeds, compatibility/write gates behave honestly, the real repository validates, and the complete test plus plugin-artifact verification suite passes."
+    },
+    {
+      "acceptance_id": "schema-evolution-gate-is-mechanical",
+      "criterion": "Ticket documents advance from schema v1 to v2 as part of project format 1 to 2; the migration registry declares that document transition in machine-readable form, rewrites both schema_version and deliveries before advancing the project marker, and regression tests mechanically bind the current project format, current Ticket schema, migration target, and every canonical repository Ticket so this contract change cannot remain silently compatible."
+    }
+  ],
+  "constraints": [
+    "Do not infer delivery from Ticket status, branch names, filenames, prose, or an arbitrary current PR; a delivered entry requires an exact canonical PR or commit reference, delivered timestamp, and 40-hex commit.",
+    "Do not hide READY, REFINE, or BLOCKED work, and do not make delivery/archive state another operational Ticket lifecycle.",
+    "Do not delete, relocate, squash, or rewrite Evidence and Outcomes merely to reduce the current graph.",
+    "CLI JSON and Workbench must consume the same exported query projection; no browser-only filtering, cache, database, or second source of truth.",
+    "Preserve the user's existing uncommitted Harness prototype files and limit edits to this Ticket's projection, migration, canonical Ticket data, tests, documentation, Evidence, and Outcome."
+  ],
+  "context": "Real dogfood of the v0.8 Workbench showed that scope=current renders 47 of 53 Tickets, including 38 DONE cards. Thirty-four successful Tickets have no delivered membership because the deliveries field was added after those Tickets and the project format was not advanced, so the legacy omission fallback incorrectly keeps completed history in the current action surface. The deeper compatibility flaw is that the Ticket data contract changed while Ticket schema_version, project format, the migration registry, and their tests remained independent, allowing the project to report CURRENT without upgrading canonical data. Fix the projection and the upgrade gap together: current work is seeded by non-DONE Tickets and expands only the minimum direct DONE causal boundary needed to understand those open Tickets; delivery/archive remains the canonical PR/history model and All remains complete. Advance the project format, advance Ticket documents to schema v2, and add an explicit agent-driven migration that adds an explicit deliveries array to legacy Tickets, populates delivered entries only from exact reviewable PR or cherry-pick evidence, and leaves an empty array when no authoritative delivery can be established. Apply that audit to this repository's existing Tickets as the first migration proof and mechanically bind future compatibility checks to the declared schema transition.",
+  "context_refs": [
+    {
+      "purpose": "Authority for durable history, delivery membership, current/all scope, and progressive causal history.",
+      "ref": ".vibehub/rooms/product/intent-queryable-ticket-history-by-pr-and-room.yaml"
+    },
+    {
+      "purpose": "Authority requiring explicit versioned agent-driven restructuring instead of compatibility shims.",
+      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+    },
+    {
+      "purpose": "Mechanical shared projection and canonical-data boundary for CLI and Workbench.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Current project format, archive derivation, compatibility gates, and shared graph projection.",
+      "ref": "skills/scripts/vh.mjs"
+    },
+    {
+      "purpose": "Single source for explicit project-format upgrade steps.",
+      "ref": "skills/vibehub-migrate/references/migrations.json"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The default Ticket Graph becomes a genuinely actionable current-work view, while one mechanically gated project-format and Ticket-schema migration audits and backfills historical delivery structure without inventing PR or commit facts.",
+  "provenance_refs": [
+    "conversation:2026-08-19-current-graph-done-ticket-dogfood-gap",
+    "context:intent-queryable-ticket-history-by-pr-and-room",
+    "context:decision-agent-driven-upgrade-migration"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-repair-current-scope-and-delivery-upgrade"
+}

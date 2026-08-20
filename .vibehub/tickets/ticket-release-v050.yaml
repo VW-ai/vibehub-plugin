@@ -29,6 +29,7 @@
       "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
     }
   ],
+  "deliveries": [],
   "kind": "ticket",
   "outcome": "VibeHub v0.5.0 ships: version identity synchronized across package.json, both plugin manifests, marketplace metadata, and CHANGELOG; the release PR merges verified; the tag builds the GitHub Release with archive and checksum.",
   "provenance_refs": [
@@ -42,6 +43,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-release-v050"
 }

@@ -72,6 +72,15 @@
       "ref": "skills/scripts/vh-ui.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-03T00:19:00.000Z",
+      "delivered_commit": "05b9aa28bd8493da6c47d1af153dd5dfe1c76ec6",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/11",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "The local Ticket graph feels like VibeHub's approved quiet-intelligence execution instrument while remaining a lightweight mechanical projection of canonical Git documents.",
   "provenance_refs": [
@@ -87,6 +96,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-restore-quiet-intelligence-graph-ui"
 }

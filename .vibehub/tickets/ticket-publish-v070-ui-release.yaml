@@ -35,6 +35,15 @@
       "ref": ".github/workflows/release.yml"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-12T04:24:52.000Z",
+      "delivered_commit": "92802fa54739ed8051a8c0704fb0eae873ab60e8",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/20",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "VibeHub v0.7.0 is published from the exact merged main commit as a verified GitHub Release with its archive and SHA-256 checksum, and the superseded original PR #18 is retired honestly.",
@@ -51,6 +60,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-publish-v070-ui-release"
 }

@@ -44,6 +44,18 @@ function segmentCrossesCard(segment, position, node) {
   return false;
 }
 
+test("ticket cards reserve breathing room above the bottom status row", () => {
+  const model = loadLayoutModel();
+  const renderer = readFileSync(join(
+    process.cwd(),
+    "skills/vibehub-ticket-review/assets/app.js",
+  ), "utf8");
+  assert.equal(model.NODE.width, 232);
+  assert.equal(model.NODE.height, 104);
+  assert.match(renderer, /y: NODE\.height - 12/u);
+  assert.match(renderer, /y: NODE\.height - 10/u);
+});
+
 test("dense fixtures cover wide layers, high-degree causality, long edges, and mixed states", () => {
   const allTickets = denseGraphFixtures.flatMap((fixture) => fixture.tickets);
   assert.equal(denseGraphFixtures.every((fixture) => fixture.tickets.length >= 35), true);

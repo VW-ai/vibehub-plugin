@@ -1,0 +1,4 @@
+# Disposable VibeHub host-plane Spike layered after dsh-base + dsh-web-app.
+- insert:
+    - id: vibehub-foundation-spike
+      name: dsh-vibehub-foundation-spike

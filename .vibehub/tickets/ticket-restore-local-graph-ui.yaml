@@ -61,6 +61,15 @@
       "ref": "scripts/build-plugin-artifact.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-03T00:19:00.000Z",
+      "delivered_commit": "05b9aa28bd8493da6c47d1af153dd5dfe1c76ec6",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/11",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "A clean-installed VibeHub plugin can open the comprehensive local Ticket graph UI for an exact repository through a dependency-free narrow launcher that mechanically consumes schema-valid canonical Context, Tickets, Evidence, and Outcomes.",
   "provenance_refs": [
@@ -71,6 +80,6 @@
     "commit:9dee0f095374211d8d7cbeeacac653ebb87bed91"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-restore-local-graph-ui"
 }

@@ -42,6 +42,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-decide-rooms-workbench-direction"
 }

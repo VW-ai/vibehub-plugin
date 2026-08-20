@@ -43,6 +43,15 @@
       "ref": "test/release.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-16T21:45:31.000Z",
+      "delivered_commit": "b47a9b3f9b0cc8d995c5a8793396c704aa303ca5",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/23",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The repository README presents the released v0.8 plugin as a compact capability story: authentic Workbench captures show how a user sees current causal work, inspects proof and history, and scopes context through Rooms, followed by current installation and upgrade instructions for both supported hosts.",
@@ -58,6 +67,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-refresh-readme-for-v080-workbench"
 }

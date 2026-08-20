@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "initial-shell-and-dsh-direction-decided"
+  ],
+  "evidence_id": "owner-requires-whole-application-shell",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-17T18:41:14Z",
+  "refs": [
+    "conversation:2026-08-17-owner-rejects-additive-ui-and-requires-whole-application-revolution"
+  ],
+  "schema_version": 1,
+  "summary": "The owner explicitly rejected the additive DSH Client Spike as product UI and clarified that VibeHub must not merely add frontends for VibeHub-specific parts. DeepSeek Harness should remain the underlying runtime and extension substrate, while VibeHub revolutionizes the complete visible UI/UX so the result feels like a completely different application. This Evidence records the shell-composition direction only; it does not accept the replacement visual design, information architecture, or remaining core-loop criteria before the owner reviews the new whole-application prototype.",
+  "ticket_id": "ticket-decide-task-harness-product-direction"
+}

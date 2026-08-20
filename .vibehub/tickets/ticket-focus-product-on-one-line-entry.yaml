@@ -76,6 +76,15 @@
       "ref": "test/release.test.mjs"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-03T00:19:00.000Z",
+      "delivered_commit": "05b9aa28bd8493da6c47d1af153dd5dfe1c76ec6",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/11",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "outcome": "VibeHub presents one memorable product idea and one user entry: the README says in one line what VibeHub does, in one line how to start it, and in one line how it differs from conversation-memory tools, with a dark-mode-safe identity and all secondary mechanics moved out of the way.",
   "provenance_refs": [
@@ -90,6 +99,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-focus-product-on-one-line-entry"
 }

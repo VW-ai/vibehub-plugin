@@ -7,6 +7,13 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-plugin-artifact.mjs --out dist/plugin",
+    "prototype:directions": "node scripts/vh-harness-directions.mjs",
+    "prototype:directions:safari": "node scripts/vh-harness-directions.mjs --safari",
+    "prototype:taste": "node scripts/vh-harness-taste-board.mjs",
+    "prototype:chat": "node scripts/vh-harness-chat-v1.mjs",
+    "prototype:codex-base": "node scripts/vh-harness-codex-base.mjs",
+    "prototype:harness": "node scripts/vh-harness-prototype.mjs",
+    "prototype:harness:safari": "node scripts/vh-harness-prototype.mjs --safari",
     "test": "node --test test/*.test.mjs",
     "verify:artifact": "node scripts/verify-plugin-artifact.mjs",
     "verify": "node --test test/*.test.mjs && node scripts/verify-plugin-artifact.mjs"

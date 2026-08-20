@@ -27,6 +27,7 @@
       "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
     }
   ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
   "outcome": "VibeHub proves its first user-authorized workflow in which a bounded Ticket crosses repository boundaries while Git mechanics stay out of the user's way, non-software artifacts can participate, and durable Context plus Evidence-backed completion remain portable and inspectable.",
@@ -35,6 +36,6 @@
     "context:intent-context-compounding-action-system"
   ],
   "relations": [],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-invisible-git-cross-repo-actions"
 }

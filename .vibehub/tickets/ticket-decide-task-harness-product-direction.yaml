@@ -1,0 +1,62 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "core-loop-direction-decided",
+      "authority": "human",
+      "criterion": "After using the replacement whole-application prototype, the owner explicitly accepts or revises the V1 think-first and act-first loop, including Fork, Compare, Bring Back, Context activation, Ticket crafting, and Start."
+    },
+    {
+      "acceptance_id": "information-language-decided",
+      "authority": "human",
+      "criterion": "The owner explicitly accepts or revises how Branch, Context, Reference, Ticket, Run, attention, and Evidence surface across Chat, Graph, navigation, inspectors, and narrow layouts."
+    },
+    {
+      "acceptance_id": "initial-shell-and-dsh-direction-decided",
+      "authority": "human",
+      "criterion": "The owner explicitly decides whether V1 should present a completely VibeHub-owned browser application while retaining DSH as the underlying runtime and extension substrate, including whether the proposed global information architecture and replacement-shell boundary feel right."
+    }
+  ],
+  "constraints": [
+    "Do not substitute Agent preference, browser comments, or suggestive prose for explicit owner judgment.",
+    "Do not start permanent vertical-slice implementation before the complete decision is recorded as human-origin Evidence and independently closed out.",
+    "Do not treat acceptance of whole-application ownership as acceptance of the current visual design; the replacement prototype remains subject to explicit review.",
+    "Keep the decision scoped to V1; it need not settle cross-repository federation, cloud collaboration, or a native desktop wrapper."
+  ],
+  "context": "The first DSH Client Spike proved that VibeHub can load into the official application, occupy conversation slots, create real Session forks, and add whole views. The owner explicitly rejected that Spike as product UI and clarified that VibeHub should not feel like several custom panels inside stock DSH. DSH is to remain the runtime, plugin, Session, model, tool, permission, and host substrate, while VibeHub owns the complete visible application and product experience. That shell-direction decision is now explicit, but the owner has not yet accepted the replacement visual system, information architecture, or complete task loop. Permanent implementation waits for a high-fidelity whole-application prototype and explicit judgment of the remaining criteria.",
+  "context_refs": [
+    {
+      "purpose": "Existing product authority the V1 decision should narrow rather than replace.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "purpose": "Existing interaction intent that the replacement proposal and feasibility work make decision-ready.",
+      "ref": ".vibehub/rooms/product/intent-conversational-ticket-control-surface.yaml"
+    },
+    {
+      "purpose": "Revised whole-application contract under human review.",
+      "ref": "docs/HARNESS_PRODUCT_CONTRACT.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The repository owner explicitly records the V1 VibeHub whole-application product, interaction, visual, and DSH composition direction after using the replacement prototype and reading the technical feasibility evidence.",
+  "provenance_refs": [
+    "conversation:2026-08-17-human-uiux-product-gate",
+    "conversation:2026-08-17-owner-rejects-additive-ui-and-requires-whole-application-revolution"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner needs the replacement whole-application proposal before accepting the remaining product and interaction direction.",
+      "target_ticket_id": "ticket-prototype-task-harness-experience",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The replacement shell and recreated extension contract depend on proven DSH root, client-module, Session, and lifecycle seams.",
+      "target_ticket_id": "ticket-spike-deepseek-harness-foundations",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-task-harness-product-direction"
+}

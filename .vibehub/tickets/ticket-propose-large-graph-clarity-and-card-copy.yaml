@@ -42,6 +42,7 @@
       "ref": "docs/LOCAL_GRAPH_DESIGN.md"
     }
   ],
+  "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "A reviewable product, interaction, and data-contract proposal makes large Ticket graphs progressively understandable and makes at least 90% of graph-card summaries readable without opening the Inspector.",
@@ -55,6 +56,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-propose-large-graph-clarity-and-card-copy"
 }

@@ -54,6 +54,15 @@
       "ref": "docs/RELEASE.md"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-13T18:27:34.000Z",
+      "delivered_commit": "ee2cd9bbe7489754e513de6b2c376e63473187fe",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/21",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "The complete Web Workbench interaction, archive/query, Rooms, graph-layout, and Codex-like visual upgrade is reconciled on one clean v0.8.0 release-candidate branch and ready for one focused pull request.",
@@ -69,6 +78,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-integrate-workbench-web-upgrade-pr"
 }

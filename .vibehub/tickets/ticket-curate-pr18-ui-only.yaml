@@ -56,6 +56,15 @@
       "ref": ".vibehub/outcomes/ticket-decide-pr18-ui-only-scope.yaml"
     }
   ],
+  "deliveries": [
+    {
+      "delivered_at": "2026-08-12T04:17:49.000Z",
+      "delivered_commit": "3860f3a57ca7215dd9e76eaa6fad41872eece924",
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/19",
+      "state": "delivered"
+    }
+  ],
   "kind": "ticket",
   "maturity": "firm",
   "outcome": "PR #18 is integrated onto current main as a shared Quiet Workbench UI upgrade, while the macOS Desktop product version and other non-UI runtime additions are absent from the final tree and the historical PR ledger remains traceable through a byte-identical non-canonical snapshot plus appended canonical records.",
@@ -74,6 +83,6 @@
       "type": "depends_on"
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket_id": "ticket-curate-pr18-ui-only"
 }
