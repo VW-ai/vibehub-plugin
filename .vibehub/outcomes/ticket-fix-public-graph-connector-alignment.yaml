@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "connectors-use-rendered-card-geometry",
+    "connectors-stay-attached-through-layout-change",
+    "graph-language-and-interaction-remain-intact",
+    "connector-fix-is-production-verified"
+  ],
+  "closed_at": "2026-08-20T20:23:37Z",
+  "evidence_ids": [
+    "public-graph-rendered-geometry-fix",
+    "public-graph-rendered-geometry-verification",
+    "public-graph-rendered-geometry-production"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all four criteria. Direct implementation inspection confirms that every route derives from current source, target, and map DOMRect values; fixed path coordinates are absent; ResizeObserver plus browser resize recomputes routes without polling. Because cards and SVG share the transformed map, panning preserves attachment, while map/card observation covers Inspector and responsive width changes. Existing card language, curve, arrow, knot, selection, Rooms, lenses, pan, labels, and mobile fallback remain intact. Fresh release preflight, 8/8 rendered contracts, 104/104 repository tests, Plugin artifact, and canonical validation passed. Sites version 3 is bound to exact commit 17a8967 and its deployment succeeded; canonical Evidence independently measured subpixel endpoint accuracy across panel widths and production.",
+  "ticket_id": "ticket-fix-public-graph-connector-alignment",
+  "unresolved_acceptance_ids": []
+}

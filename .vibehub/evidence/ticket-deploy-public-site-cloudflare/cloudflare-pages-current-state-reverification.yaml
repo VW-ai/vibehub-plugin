@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "existing-pages-project-is-reused",
+    "canonical-apex-is-served-by-pages",
+    "repository-release-path-is-cloudflare-only",
+    "cloudflare-migration-is-regression-proven"
+  ],
+  "evidence_id": "cloudflare-pages-current-state-reverification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T21:52:31Z",
+  "refs": [
+    "cloudflare-account:72091e7e079e357ced7f9603c03a926e",
+    "cloudflare-pages-project:vibehub-website-v1",
+    "cloudflare-pages-deployment:c07ad72e-df89-429e-9903-29c9c94c411d",
+    "https://c07ad72e.vibehub-website-v1.pages.dev",
+    "https://vibehub.icu",
+    "commit:4d628ba713e5cb869e19dd7c2e28d5fe68626f77",
+    "command:wrangler-pages-project-list-current-domain-inventory",
+    "command:wrangler-pages-deployment-list-current-production",
+    "command:node-site-release-scripts-release-mjs-preflight-9-of-9",
+    "command:node-site-release-scripts-release-mjs-verify-immutable",
+    "command:node-site-release-scripts-release-mjs-verify-apex",
+    "command:node-site-release-scripts-release-mjs-verify-www",
+    "command:dig-redacted-google-site-verification-txt-count-1"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh closeout verification on 2026-08-20 confirmed that the selected Cloudflare account still contains the pre-existing vibehub-website-v1 Pages project and lists both vibehub-website-v1.pages.dev and vibehub.icu as its domains. Its current Production deployment c07ad72e-df89-429e-9903-29c9c94c411d is on branch main, identifies source 4d628ba, and resolves to the immutable URL c07ad72e.vibehub-website-v1.pages.dev; the repository release record pins the complete source commit 4d628ba713e5cb869e19dd7c2e28d5fe68626f77. A fresh release preflight passed lint, deterministic static build, and 9/9 rendered contracts. Fresh immutable and apex verifiers returned 200 for the homepage, robots.txt, sitemap.xml, Open Graph image, and favicon. Fresh HTTP and HTTPS www probes returned direct 301 responses preserving the exact path and query. A value-redacted DNS check counted one retained google-site-verification TXT proof. No credential, token, cookie, verification value, or transient authorization state is recorded.",
+  "ticket_id": "ticket-deploy-public-site-cloudflare"
+}

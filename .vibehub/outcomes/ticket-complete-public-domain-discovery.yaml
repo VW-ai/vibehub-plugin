@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "www-permanently-redirects-to-canonical-apex",
+    "canonical-discovery-metadata-is-consistent",
+    "search-console-discovery-is-configured",
+    "domain-discovery-is-production-verified"
+  ],
+  "closed_at": "2026-08-20T21:56:09Z",
+  "evidence_ids": [
+    "canonical-discovery-artifact-preflight",
+    "canonical-www-redirect-production-verification",
+    "cloudflare-pages-canonical-production-verification",
+    "search-console-domain-property-verification",
+    "search-console-sitemap-and-recrawl"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent read-only closeout accepted all four criteria against the refreshed Ticket, current diff, successful Cloudflare Pages deployment dependency Outcome, all five acceptance-linked Evidence records, checked-in source and built artifacts, and fresh production verification facts. HTTP and HTTPS www requests permanently redirect to the equivalent canonical apex path and query; homepage canonical metadata, robots.txt, and the one-URL sitemap consistently name only https://vibehub.icu; the verified Search Console Domain Property records the non-secret account label, retained apex TXT method, accepted sitemap submission, indexed homepage, and acknowledged recrawl request; and the exact Cloudflare Pages deployment, TLS content, crawler assets, redirect contract, focused tests, lint, static build, release preflight, and canonical validation are proven. Search Console's immediate sitemap processing row truthfully remains 'Couldn't fetch' despite valid public and Googlebot HTTP 200 XML probes; the criterion requires verified configuration, submission, and recrawl acknowledgement, not successful asynchronous ingestion.",
+  "ticket_id": "ticket-complete-public-domain-discovery",
+  "unresolved_acceptance_ids": []
+}

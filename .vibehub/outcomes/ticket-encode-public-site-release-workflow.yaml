@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "repo-local-release-skill-is-complete",
+    "release-checks-are-mechanical",
+    "human-entry-is-short-and-truthful",
+    "current-production-path-is-proven"
+  ],
+  "closed_at": "2026-08-20T20:23:37Z",
+  "evidence_ids": [
+    "public-site-release-workflow-implementation",
+    "public-site-release-workflow-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all four criteria. Source inspection confirms one repository-local release Skill with prepare, publish, custom-domain guardrails, verification, rollback, evidence, and explicit stop conditions; its dependency-free checker pins the existing Sites project and vibehub.icu, composes lint/build/rendered contracts with canonical metadata, and performs actionable HTTPS verification. README and AGENTS provide the short truthful entry while credentials and live DNS state remain outside Git; the Skill is outside the distributable Plugin path. The standard Skill validator passed. Fresh release preflight passed lint, static build, and 8/8 contracts; live canonical verification returned HTTPS 200 with expected metadata and product marker; repository verification passed 104/104 and produced a 55-file artifact without the site release Skill; canonical validation passed.",
+  "ticket_id": "ticket-encode-public-site-release-workflow",
+  "unresolved_acceptance_ids": []
+}
