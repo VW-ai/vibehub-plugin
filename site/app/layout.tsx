@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   ...(publicUrl
     ? {
         metadataBase: new URL(publicUrl),
+        alternates: {
+          canonical: "/",
+        },
         openGraph: {
           title: "VibeHub — The Git-native development cycle",
           description:

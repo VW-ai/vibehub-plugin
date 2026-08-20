@@ -203,11 +203,13 @@ test("the concise showcase remains responsive, accessible, and quiet", async () 
 });
 
 test("production artifact stays static and Cloudflare-ready", async () => {
-  const [packageJson, nextConfig, hosting, layout, favicon, mark] = await Promise.all([
+  const [packageJson, nextConfig, hosting, layout, robotsSource, sitemapSource, favicon, mark] = await Promise.all([
     source("package.json"),
     source("next.config.ts"),
     source(".openai/hosting.json"),
     source("app/layout.tsx"),
+    source("public/robots.txt"),
+    source("public/sitemap.xml"),
     source("public/vibehub-favicon.svg"),
     source("public/vibehub-mark.svg"),
   ]);
@@ -216,7 +218,11 @@ test("production artifact stays static and Cloudflare-ready", async () => {
   assert.doesNotMatch(packageJson, /three|framer-motion|drizzle|tailwind/i);
   assert.match(nextConfig, /output:\s*"export"/);
   assert.match(layout, /NEXT_PUBLIC_SITE_URL/);
+  assert.match(layout, /alternates:\s*{\s*canonical: "\/"/);
   assert.match(layout, /\/og\.png/);
+  assert.match(robotsSource, /User-agent: \*\s+Allow: \/\s+Sitemap: https:\/\/vibehub\.icu\/sitemap\.xml/i);
+  assert.match(sitemapSource, /<loc>https:\/\/vibehub\.icu\/<\/loc>/i);
+  assert.doesNotMatch(`${layout}\n${robotsSource}\n${sitemapSource}`, /www\.vibehub\.icu/);
   assert.equal(favicon, mark);
   assert.equal((layout.match(/\/vibehub-favicon\.svg/g) ?? []).length, 2);
   assert.doesNotMatch(layout, /["']\/favicon\.svg["']/);
@@ -228,6 +234,8 @@ test("production artifact stays static and Cloudflare-ready", async () => {
 
   await Promise.all([
     access(new URL("dist/client/index.html", root)),
+    access(new URL("dist/client/robots.txt", root)),
+    access(new URL("dist/client/sitemap.xml", root)),
     access(new URL("dist/client/index.rsc", root)),
     access(new URL("dist/client/vibehub-favicon.svg", root)),
     access(new URL("dist/client/og.png", root)),
@@ -238,4 +246,18 @@ test("production artifact stays static and Cloudflare-ready", async () => {
     access(new URL("dist/client/founders/victor-zhang.jpg", root)),
     access(new URL("dist/.openai/hosting.json", root)),
   ]);
+});
+
+test("rendered discovery metadata names one canonical production identity", async () => {
+  const [html, robots, sitemap] = await Promise.all([
+    source("dist/client/index.html"),
+    source("dist/client/robots.txt"),
+    source("dist/client/sitemap.xml"),
+  ]);
+
+  assert.match(html, /<link rel="canonical" href="https:\/\/vibehub\.icu\/"\s*\/>/i);
+  assert.match(robots, /User-agent: \*\s+Allow: \/\s+Sitemap: https:\/\/vibehub\.icu\/sitemap\.xml/i);
+  assert.match(sitemap, /<loc>https:\/\/vibehub\.icu\/<\/loc>/i);
+  assert.equal((sitemap.match(/<url>/g) ?? []).length, 1);
+  assert.doesNotMatch(`${html}\n${robots}\n${sitemap}`, /www\.vibehub\.icu/);
 });

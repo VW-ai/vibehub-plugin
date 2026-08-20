@@ -21,10 +21,12 @@ async function readText(relativePath) {
 }
 
 async function checkConfiguration() {
-  const [hostingSource, packageSource, layoutSource] = await Promise.all([
+  const [hostingSource, packageSource, layoutSource, robotsSource, sitemapSource] = await Promise.all([
     readText("site/.openai/hosting.json"),
     readText("site/package.json"),
     readText("site/app/layout.tsx"),
+    readText("site/public/robots.txt"),
+    readText("site/public/sitemap.xml"),
   ]);
   const hosting = JSON.parse(hostingSource);
   const packageJson = JSON.parse(packageSource);
@@ -33,8 +35,12 @@ async function checkConfiguration() {
   assertion(hosting.d1 === null && hosting.r2 === null, "Public site must not add D1 or R2 bindings");
   assertion(packageJson.name === "@vibehub/site", "Expected the VibeHub public-site package");
   assertion(layoutSource.includes("NEXT_PUBLIC_SITE_URL"), "Site metadata must use NEXT_PUBLIC_SITE_URL");
+  assertion(layoutSource.includes('canonical: "/"'), "Site metadata must publish the canonical apex URL");
   assertion(layoutSource.includes(title), "Site metadata title changed; update the release contract deliberately");
   assertion(layoutSource.includes('url: "/og.png"'), "Site metadata must publish the checked-in Open Graph image");
+  assertion(robotsSource.includes("User-agent: *"), "robots.txt must allow public crawler rules");
+  assertion(robotsSource.includes(`Sitemap: ${canonicalUrl}/sitemap.xml`), "robots.txt must name the canonical sitemap");
+  assertion(sitemapSource.includes(`<loc>${canonicalUrl}/</loc>`), "sitemap.xml must name the canonical homepage");
 
   return { project_id: hosting.project_id, canonical_url: canonicalUrl };
 }
@@ -73,8 +79,48 @@ async function verify(target = canonicalUrl) {
   assertion(html.includes(`<title>${title}</title>`), "Production title does not match the release contract");
   assertion(html.includes(productMarker), "Production page is missing the stable VibeHub product marker");
   assertion(html.includes(`content="${canonicalUrl}/og.png"`), "Production metadata does not point to the canonical Open Graph image");
+  assertion(html.includes(`rel="canonical" href="${canonicalUrl}/"`), "Production page is missing the canonical apex link");
 
-  return { requested_url: url.href, final_url: response.url, status: response.status };
+  const [robotsResponse, sitemapResponse] = await Promise.all([
+    fetch(new URL("/robots.txt", url), { signal: AbortSignal.timeout(20_000) }),
+    fetch(new URL("/sitemap.xml", url), { signal: AbortSignal.timeout(20_000) }),
+  ]);
+  assertion(robotsResponse.ok, `Expected robots.txt, received HTTP ${robotsResponse.status}`);
+  assertion(sitemapResponse.ok, `Expected sitemap.xml, received HTTP ${sitemapResponse.status}`);
+  const [robots, sitemap] = await Promise.all([robotsResponse.text(), sitemapResponse.text()]);
+  assertion(robots.includes(`Sitemap: ${canonicalUrl}/sitemap.xml`), "robots.txt does not name the canonical sitemap");
+  assertion(sitemap.includes(`<loc>${canonicalUrl}/</loc>`), "sitemap.xml does not name the canonical homepage");
+  assertion(!sitemap.includes("www.vibehub.icu"), "sitemap.xml must not publish the redirect-only www hostname");
+
+  return {
+    requested_url: url.href,
+    final_url: response.url,
+    status: response.status,
+    robots_status: robotsResponse.status,
+    sitemap_status: sitemapResponse.status,
+  };
+}
+
+async function verifyWww() {
+  const pathAndQuery = "/domain-discovery-check?source=vibehub";
+  const expected = `${canonicalUrl}${pathAndQuery}`;
+  const checks = [];
+
+  for (const protocol of ["http:", "https:"]) {
+    const requested = `${protocol}//www.vibehub.icu${pathAndQuery}`;
+    const response = await fetch(requested, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(20_000),
+      headers: { "user-agent": "VibeHub release verifier" },
+    });
+    const location = response.headers.get("location");
+    assertion([301, 308].includes(response.status), `Expected a permanent redirect from ${requested}, received HTTP ${response.status}`);
+    assertion(location !== null, `Expected a Location header from ${requested}`);
+    assertion(new URL(location, requested).href === expected, `Expected ${requested} to preserve its path and query at ${expected}`);
+    checks.push({ requested_url: requested, status: response.status, location });
+  }
+
+  return { canonical_url: canonicalUrl, checks };
 }
 
 async function main() {
@@ -96,7 +142,13 @@ async function main() {
     process.stdout.write(`${JSON.stringify({ ok: true, command, ...result })}\n`);
     return;
   }
-  throw new Error("Usage: release.mjs <check|preflight|verify> [https-url]");
+  if (command === "verify-www") {
+    assertion(args.length === 0, "verify-www does not accept a URL argument");
+    const result = await verifyWww();
+    process.stdout.write(`${JSON.stringify({ ok: true, command, ...result })}\n`);
+    return;
+  }
+  throw new Error("Usage: release.mjs <check|preflight|verify|verify-www> [https-url]");
 }
 
 main().catch((error) => {
