@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "proposal": "card-corner-signal-contract-v1",
+  "status": "proposal-only-owner-decision-required",
+  "recommendation": {
+    "human_axis": "Context stability and forward motion",
+    "primary_phases": ["DRAFT", "READY", "RUNNING", "DONE"],
+    "primary_derivation_precedence": [
+      "successful Outcome -> DONE",
+      "non-success Outcome / REPLAN -> DRAFT + DEVIATED",
+      "unresolved direct dependency / WAIT -> DRAFT + BLOCKED",
+      "maturity:draft / REFINE -> DRAFT",
+      "CLOSE_OUT -> RUNNING + VERIFYING",
+      "trusted fresh execute or closeout runtime -> RUNNING",
+      "otherwise firm reachable work -> READY"
+    ],
+    "upper_right_slot_priority": ["DEVIATED", "BLOCKED", "NEEDS_YOU", "VERIFYING", "WAITING", "empty"],
+    "live_presence_is_separate": true,
+    "raw_v080_values_remain_unchanged": true
+  },
+  "canonical_truth_sources": [
+    {
+      "fact": "maturity",
+      "source": "Ticket.maturity",
+      "meaning": "draft cannot execute; firm can become reachable",
+      "does_not_mean": "current Agent activity"
+    },
+    {
+      "fact": "dependency readiness",
+      "source": "direct depends_on relations plus successful prerequisite Outcomes",
+      "meaning": "WAIT/BLOCKED until every direct prerequisite succeeds",
+      "does_not_mean": "a generic paused runtime"
+    },
+    {
+      "fact": "next action",
+      "source": "ticketNextAction deterministic projection",
+      "meaning": "DONE > REPLAN > WAIT > REFINE > NEEDS_HUMAN > CLOSE_OUT > EXECUTE",
+      "does_not_mean": "the primary Human phase by itself"
+    },
+    {
+      "fact": "proof",
+      "source": "acceptance-linked Evidence",
+      "meaning": "proof available for independent judgment",
+      "does_not_mean": "accepted completion"
+    },
+    {
+      "fact": "accepted completion or material deviation",
+      "source": "independent Outcome",
+      "meaning": "successful is DONE; partial, failed, or deviated requires replanning",
+      "does_not_mean": "a transient Run or tool failure"
+    },
+    {
+      "fact": "human authority",
+      "source": "Acceptance.authority plus human-origin Evidence",
+      "meaning": "who owns a criterion and whether input is recorded",
+      "does_not_mean": "DRAFT needs the person right now"
+    },
+    {
+      "fact": "archive and delivery",
+      "source": "successful Outcome plus delivered delivery",
+      "meaning": "historical boundary",
+      "does_not_mean": "a fifth primary phase or upper-right substate"
+    },
+    {
+      "fact": "live presence",
+      "source": "future trusted ephemeral runtime capability with source and expiry",
+      "meaning": "an Agent/tool work loop is active now",
+      "does_not_mean": "durable Ticket state"
+    }
+  ],
+  "current_v080_corpus": {
+    "observed_combinations": {
+      "BLOCKED|WAIT": 4,
+      "DONE|DONE": 64,
+      "READY|CLOSE_OUT": 6,
+      "READY|EXECUTE": 2,
+      "READY|NEEDS_HUMAN": 1,
+      "REFINE|REFINE": 3
+    },
+    "non_success_outcome_count": 0,
+    "production_runtime_projection": false,
+    "minimal_presentation_mapping": [
+      { "next_action": "DONE", "primary": "DONE", "slot": null },
+      { "next_action": "REPLAN", "primary": "DRAFT", "slot": "DEVIATED" },
+      { "next_action": "WAIT", "primary": "DRAFT", "slot": "BLOCKED" },
+      { "next_action": "REFINE", "primary": "DRAFT", "slot": null },
+      { "next_action": "EXECUTE", "primary": "READY", "slot": null },
+      { "next_action": "NEEDS_HUMAN", "primary": "READY", "slot": "NEEDS_YOU" },
+      { "next_action": "CLOSE_OUT", "primary": "RUNNING", "slot": "VERIFYING", "live": false }
+    ]
+  },
+  "upper_right_slot": {
+    "rule": "Render at most one short icon-plus-text signal. The first eligible priority wins.",
+    "signals": [
+      { "signal": "DEVIATED", "eligible": ["DRAFT"], "source": "non-success Outcome / REPLAN", "meaning": "the contract or path must materially change" },
+      { "signal": "BLOCKED", "eligible": ["DRAFT"], "source": "unresolved direct dependency / WAIT", "meaning": "a prerequisite prevents progress" },
+      { "signal": "NEEDS_YOU", "eligible": ["DRAFT", "READY", "RUNNING"], "source": "explicit current human boundary", "meaning_by_phase": { "DRAFT": "stabilize Context", "READY": "Human is the next actor", "RUNNING": "active work reached a Human boundary" } },
+      { "signal": "VERIFYING", "eligible": ["RUNNING"], "source": "CLOSE_OUT", "meaning": "independent adjudication is the current internal stage" },
+      { "signal": "WAITING", "eligible": ["DRAFT", "RUNNING"], "source": "trusted fresh runtime state waiting_tool", "meaning": "the live loop waits on an Agent or tool, not the person" }
+    ],
+    "allowed_combinations": {
+      "DRAFT": ["empty", "DEVIATED", "BLOCKED", "NEEDS_YOU", "WAITING"],
+      "READY": ["empty", "NEEDS_YOU"],
+      "RUNNING": ["empty", "NEEDS_YOU", "VERIFYING", "WAITING"],
+      "DONE": ["empty"]
+    },
+    "outside_the_slot": ["UPCOMING", "RECORDED", "COMPLETE", "ARCHIVED", "live pulse/avatar", "Evidence count"]
+  },
+  "runtime_capability_boundary": {
+    "persistence": "ephemeral projection, never a Ticket schema field",
+    "required_fields": ["availability", "trustedSource", "ticketId", "runId", "operation", "state", "observedAt", "expiresAt or terminalAt"],
+    "operation_values": ["plan", "execute", "closeout"],
+    "state_values": ["queued", "running", "waiting_tool", "waiting_human", "completed", "failed"],
+    "rules": [
+      "operation:plan never changes DRAFT to RUNNING",
+      "operation:execute or closeout with a trusted unexpired active state may project RUNNING",
+      "waiting_human supplies actionable NEEDS YOU only while the trusted runtime is live",
+      "waiting_tool supplies WAITING and never NEEDS YOU",
+      "completed, failed, expired, stale, missing, or untrusted presence cannot claim live",
+      "DONE, REPLAN, and WAIT canonical facts suppress a conflicting live claim"
+    ]
+  },
+  "draft_needs_you": {
+    "problem": "Current v0.8 cannot derive DRAFT + NEEDS YOU honestly. authority:human can be a future or terminal sign-off, and current REFINE/BLOCKED attention is UPCOMING.",
+    "options": [
+      { "option": "Infer from authority:human", "decision": "reject", "reason": "conflates decision ownership with current planning attention" },
+      { "option": "Treat UPCOMING as actionable", "decision": "reject", "reason": "changes a deliberately non-actionable signal into a prompt" },
+      { "option": "Require a separate Human-decision Ticket", "decision": "valid current fallback", "reason": "the decision Ticket itself becomes READY + NEEDS YOU while dependents remain DRAFT + BLOCKED" },
+      { "option": "Add trusted plan runtime waiting_human/current-human-boundary projection", "decision": "recommend", "reason": "names the owning operation, request, trust, and expiry without changing durable Ticket truth" }
+    ]
+  },
+  "material_deviation": {
+    "safe_v080_threshold": "Every non-success Outcome (partial, failed, deviated) is material and projects DRAFT + DEVIATED.",
+    "material_when": [
+      "the current Outcome, Acceptance, constraints, or dependency contract can no longer be targeted honestly",
+      "accepted proof is invalid for the changed meaning and a new execution cycle requires replanning"
+    ],
+    "not_material_by_itself": ["tool retry", "temporary Agent wait", "resumable Run failure", "implementation-path adjustment within current constraints"],
+    "future_finer_policy": "requires additive explicit metadata; never infer materiality from prose or color"
+  },
+  "transitions": [
+    { "event": "blocker clears", "from": "DRAFT + BLOCKED", "to": "DRAFT if maturity:draft; READY if firm; RUNNING only with trusted active execute/closeout runtime", "note": "newly-unblocked animation requires a disposable prior snapshot, not Git truth" },
+    { "event": "trusted execute starts", "from": "READY", "to": "RUNNING", "note": "queued/running are live; no durable state rewrite" },
+    { "event": "trusted execute ends with incomplete Evidence", "from": "RUNNING", "to": "READY", "note": "Run history remains inspectable but cannot keep RUNNING alive" },
+    { "event": "all authority-satisfying Evidence exists", "from": "READY or RUNNING", "to": "RUNNING + VERIFYING", "note": "canonical CLOSE_OUT begins the independent acceptance stage even without live presence" },
+    { "event": "closeout succeeds", "from": "RUNNING + VERIFYING", "to": "DONE", "note": "successful Outcome wins over any stale live claim" },
+    { "event": "closeout fails or deviates", "from": "RUNNING + VERIFYING", "to": "DRAFT + DEVIATED", "note": "non-success Outcome is material in v0.8" },
+    { "event": "work is reopened", "from": "DONE history", "to": "derive from current canonical Ticket after the old Outcome is no longer current", "note": "reopen is not first-class in v0.8; provenance alone does not control phase" }
+  ],
+  "language": {
+    "DRAFT": { "empty": "Define", "BLOCKED": "View blocker", "DEVIATED": "Revise", "NEEDS_YOU": "Respond", "WAITING": "Open planning" },
+    "READY": { "empty": "Start", "NEEDS_YOU": "Decide" },
+    "RUNNING": { "empty": "Open run", "NEEDS_YOU": "Respond", "VERIFYING": "Close out", "WAITING": "Open run" },
+    "DONE": { "empty": "View outcome" },
+    "banned": ["Plan with Agent", "REFINE in Human chrome", "REVIEW as a fifth primary phase"]
+  },
+  "visual_budget": {
+    "primary_legend_entries": 4,
+    "families": {
+      "neutral": "canvas, DRAFT, BLOCKED, selection, archive boundary",
+      "action_blue": "READY and RUNNING; distinguish with icon, copy, and trusted motion rather than another hue",
+      "proof_green": "DONE",
+      "attention_amber": "NEEDS YOU",
+      "exception_red": "DEVIATED only"
+    },
+    "non_color": "Every primary phase and slot signal has text plus a distinct stroke icon or boundary pattern.",
+    "live": "A small separate dot/avatar may pulse only for trusted unexpired presence; reduced motion uses a static ring.",
+    "selection": "Neutral 2px outline; unrelated cards dim but remain readable.",
+    "narrow_target_px": 44
+  },
+  "downstream_boundaries": [
+    "Protected Human decision accepts or corrects this exact phase, slot, language, priority, and token contract.",
+    "Projection implementation maps raw v0.8 values additively and preserves exact source inspection.",
+    "Trusted runtime capability is a separate ephemeral integration with source, operation, state, and expiry.",
+    "Workbench implementation applies Graph, Overview, Inspector, focus, narrow, keyboard, and reduced-motion behavior.",
+    "Skill routing keeps Ticket Run versus independent Closeout authority even when both appear inside RUNNING.",
+    "Compatibility/migration decision is required before changing any raw machine vocabulary; this proposal requires none.",
+    "Regression suite covers the exact fixture matrix, source/raw payload invariants, installed Codex/Claude parity, and real browser viewports."
+  ]
+}

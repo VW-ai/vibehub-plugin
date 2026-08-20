@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "one-cross-cutting-substate-slot-is-defined",
+    "running-substages-and-live-presence-are-distinct",
+    "quiet-visual-and-language-system-is-reviewable",
+    "recommendation-and-downstream-boundaries-are-decision-ready"
+  ],
+  "evidence_id": "card-signal-wide-narrow-review-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T21:33:59Z",
+  "refs": [
+    "file:docs/proposals/card-corner-signal/index.html",
+    "file:docs/proposals/card-corner-signal/prototype.css",
+    "file:docs/proposals/card-corner-signal/prototype.js",
+    "browser:headless-chrome-wide-1440x1000",
+    "browser:headless-chrome-narrow-frame-390x844",
+    "test:test/card-corner-signal-proposal.test.mjs",
+    "command:git-diff-no-production-workbench-or-contract-files",
+    "command:npm-run-verify-126-of-126"
+  ],
+  "schema_version": 1,
+  "summary": "A dependency-free production-shaped review board renders eleven representative cards using the accepted compact graph anatomy, four primary legend entries, one upper-right icon-plus-text signal, and a separate trusted-live affordance. Real headless Chrome review confirmed the 1440x1000 wide graph plus right Inspector and the explicit 390x844 narrow frame with a scrollable graph plus lower Inspector; long copy remains bounded, cards without a substate stay quiet, selected and causal-dimmed states remain readable, and RUNNING+VERIFYING correctly claims no live presence when only CLOSE_OUT exists. Pointer and keyboard focus update the exact derivation Inspector, hover/focus reveal the same explanation, narrow targets are at least 44px, and reduced motion replaces pulse with a static ring. The palette uses neutrals plus shared action blue, proof green, attention amber, and exception red rather than one color per fact, and production Workbench assets remain untouched.",
+  "ticket_id": "ticket-propose-card-corner-signal-contract"
+}
