@@ -517,6 +517,18 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(health.headers.get("content-security-policy"), /default-src 'self'/u);
   assert.equal(health.headers.get("access-control-allow-origin"), null);
 
+  const favicon = await fetch(`${origin}/vibehub-mark.svg`);
+  assert.equal(favicon.status, 200);
+  assert.equal(favicon.redirected, false);
+  assert.equal(favicon.headers.get("content-type"), "image/svg+xml");
+  assert.deepEqual(
+    Buffer.from(await favicon.arrayBuffer()),
+    readFileSync(new URL("../assets/brand/vibehub-mark.svg", import.meta.url)),
+  );
+  const faviconHead = await fetch(`${origin}/vibehub-mark.svg`, { method: "HEAD" });
+  assert.equal(faviconHead.status, 200);
+  assert.equal(faviconHead.headers.get("content-type"), "image/svg+xml");
+
   const unauthorized = await fetch(`${origin}/api/state`);
   assert.equal(unauthorized.status, 401);
   assert.equal((await unauthorized.json()).error.code, "unauthorized");
@@ -666,6 +678,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   });
   assert.equal(readOnly.status, 405);
   assert.equal((await readOnly.json()).error.code, "read_only");
+  const faviconWrite = await fetch(`${origin}/vibehub-mark.svg`, { method: "POST" });
+  assert.equal(faviconWrite.status, 405);
+  assert.equal((await faviconWrite.json()).error.code, "read_only");
 
   const html = await (await fetch(`${origin}/`)).text();
   const model = await (await fetch(`${origin}/app-model.js`)).text();
@@ -673,6 +688,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   const script = await (await fetch(`${origin}/app.js`)).text();
   const styles = await (await fetch(`${origin}/app.css`)).text();
   assert.match(html, /class="app-shell"/u);
+  assert.match(
+    html,
+    /<link rel="icon" type="image\/svg\+xml" href="\/vibehub-mark\.svg">/u,
+  );
   assert.match(html, /id="copyLink"/u);
   assert.match(html, /src="\/app-model\.js"/u);
   assert.match(html, /src="\/app-layout\.js"/u);

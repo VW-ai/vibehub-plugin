@@ -12,6 +12,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 import { afterEach } from "node:test";
 import { buildCodexMarketplace } from "../scripts/build-codex-marketplace.mjs";
 import { buildClaudeMarketplace } from "../scripts/build-claude-marketplace.mjs";
@@ -130,7 +131,63 @@ function exerciseInstalledHelper(helper, label) {
   };
 }
 
-test("Codex and Claude Code marketplace artifacts expose identical format behavior", () => {
+async function exerciseInstalledFavicon(pluginRoot, label) {
+  const repo = temporaryRoot(`vibehub-${label}-favicon-`);
+  const helper = join(pluginRoot, "skills", "scripts", "vh.mjs");
+  assert.equal(invoke(helper, repo, "project", "init").status, 0);
+  const faviconPath = join(
+    pluginRoot,
+    "skills",
+    "vibehub-ticket-review",
+    "assets",
+    "vibehub-mark.svg",
+  );
+  const canonicalPath = join(pluginRoot, "assets", "brand", "vibehub-mark.svg");
+  const html = readFileSync(join(
+    pluginRoot,
+    "skills",
+    "vibehub-ticket-review",
+    "assets",
+    "index.html",
+  ), "utf8");
+  const faviconBytes = readFileSync(faviconPath);
+  assert.deepEqual(faviconBytes, readFileSync(canonicalPath));
+  assert.match(
+    html,
+    /<link rel="icon" type="image\/svg\+xml" href="\/vibehub-mark\.svg">/u,
+  );
+  const uiModule = await import(pathToFileURL(
+    join(pluginRoot, "skills", "scripts", "vh-ui.mjs"),
+  ).href);
+  const host = uiModule.startVibeHubUi({
+    repoRoot: repo,
+    token: `${label}-favicon-token`,
+    tokenLifetimeMs: 60_000,
+  });
+  try {
+    const { origin } = await host.ready;
+    const response = await fetch(`${origin}/vibehub-mark.svg`);
+    assert.equal(response.status, 200);
+    assert.equal(response.redirected, false);
+    assert.equal(response.headers.get("content-type"), "image/svg+xml");
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), faviconBytes);
+    const head = await fetch(`${origin}/vibehub-mark.svg`, { method: "HEAD" });
+    assert.equal(head.status, 200);
+    assert.equal(head.headers.get("content-type"), "image/svg+xml");
+    const write = await fetch(`${origin}/vibehub-mark.svg`, { method: "POST" });
+    assert.equal(write.status, 405);
+    assert.equal((await write.json()).error.code, "read_only");
+    return {
+      bytes: faviconBytes.length,
+      contentType: response.headers.get("content-type"),
+      href: "/vibehub-mark.svg",
+    };
+  } finally {
+    await host.close();
+  }
+}
+
+test("Codex and Claude Code marketplace artifacts expose identical format behavior", async () => {
   const output = temporaryRoot("vibehub-host-marketplaces-");
   const codex = buildCodexMarketplace({ outputRoot: join(output, "codex"), offline: true });
   const claude = buildClaudeMarketplace({ outputRoot: join(output, "claude"), offline: true });
@@ -181,4 +238,7 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
     dependencyAdvice: "completed-dependency-review",
   });
   assert.deepEqual(claudeBehavior, codexBehavior);
+  const codexFavicon = await exerciseInstalledFavicon(codex.pluginRoot, "codex");
+  const claudeFavicon = await exerciseInstalledFavicon(claude.pluginRoot, "claude");
+  assert.deepEqual(claudeFavicon, codexFavicon);
 });

@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "workbench-declares-canonical-favicon",
+    "loopback-host-serves-favicon-exactly",
+    "installed-artifacts-and-regressions-pass"
+  ],
+  "evidence_id": "workbench-favicon-source-installed-host-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T21:36:39Z",
+  "refs": [
+    "assets/brand/vibehub-mark.svg",
+    "skills/vibehub-ticket-review/assets/vibehub-mark.svg",
+    "skills/vibehub-ticket-review/assets/index.html",
+    "skills/scripts/vh-ui.mjs",
+    "test/ui-host.test.mjs",
+    "test/host-marketplaces.test.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:cmp-canonical-workbench-mark-byte-for-byte",
+    "command:focused-source-codex-claude-hosts-11-of-11",
+    "command:npm-run-verify-118-of-118",
+    "command:verify-plugin-artifact-58-files-608379-bytes"
+  ],
+  "schema_version": 1,
+  "summary": "The production Workbench now declares `<link rel=\"icon\" type=\"image/svg+xml\" href=\"/vibehub-mark.svg\">` and ships a byte-for-byte copy of assets/brand/vibehub-mark.svg in its local asset directory. The loopback allowlist serves that absolute path with HTTP 200 and exact image/svg+xml bytes for GET and HEAD while POST remains read-only 405, preserving the bearer-fragment model and adding no redirect or external dependency. Focused source-host plus fresh Codex and Claude marketplace-host verification passed 11/11 and proved identical canonical bytes and content type across both installed hosts. Complete repository verification passed 118/118; installed artifact verification fetched the icon from the built host and reported 58 files and 608379 bytes. Ticket and project validation pass, all four Rooms are FRESH after aligning Workbench, and no public-site file changed.",
+  "ticket_id": "ticket-add-workbench-favicon"
+}

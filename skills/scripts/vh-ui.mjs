@@ -29,6 +29,7 @@ const ASSET_FILES = new Map([
   ["/app-model.js", ["app-model.js", "text/javascript; charset=utf-8"]],
   ["/app-layout.js", ["app-layout.js", "text/javascript; charset=utf-8"]],
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
+  ["/vibehub-mark.svg", ["vibehub-mark.svg", "image/svg+xml"]],
 ]);
 
 class UiError extends Error {

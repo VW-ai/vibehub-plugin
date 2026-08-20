@@ -51,6 +51,7 @@ try {
     "skills/vibehub-ticket-review/assets/app.css",
     "skills/vibehub-ticket-review/assets/app-layout.js",
     "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/assets/vibehub-mark.svg",
     "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
     "skills/vibehub-setup/references/architecture-boundary.md",
     "skills/vibehub-ingest/references/knowledge-governance.json",
@@ -247,6 +248,23 @@ try {
     join(artifact, "skills", "vibehub-ticket-review", "assets", "index.html"),
     "utf8",
   );
+  const installedFavicon = readFileSync(join(
+    artifact,
+    "skills",
+    "vibehub-ticket-review",
+    "assets",
+    "vibehub-mark.svg",
+  ));
+  const installedCanonicalMark = readFileSync(join(
+    artifact,
+    "assets",
+    "brand",
+    "vibehub-mark.svg",
+  ));
+  if (!installedFavicon.equals(installedCanonicalMark)
+    || !/<link rel="icon" type="image\/svg\+xml" href="\/vibehub-mark\.svg">/u.test(installedHtml)) {
+    throw new Error("installed local UI favicon is not the canonical VibeHub mark");
+  }
   if (/\/api\/(?:review|decision)/u.test(installedScript)) {
     throw new Error("installed local UI still contains writable review routes");
   }
@@ -280,6 +298,14 @@ try {
   const health = await (await fetch(`${origin}/health`)).json();
   if (!health.ok || health.readOnly !== true) {
     throw new Error("installed UI health check failed");
+  }
+  const faviconResponse = await fetch(`${origin}/vibehub-mark.svg`);
+  const faviconBytes = Buffer.from(await faviconResponse.arrayBuffer());
+  if (faviconResponse.status !== 200
+    || faviconResponse.redirected
+    || faviconResponse.headers.get("content-type") !== "image/svg+xml"
+    || !faviconBytes.equals(installedCanonicalMark)) {
+    throw new Error("installed UI did not serve the canonical SVG favicon exactly");
   }
   const stateResponse = await fetch(`${origin}/api/state`, {
     headers: { Authorization: `Bearer ${uiHost.token}` },
