@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "repo-local-release-skill-is-complete",
+    "release-checks-are-mechanical",
+    "human-entry-is-short-and-truthful"
+  ],
+  "evidence_id": "public-site-release-workflow-implementation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T07:52:14Z",
+  "refs": [
+    "site/release/SKILL.md",
+    "site/release/scripts/release.mjs",
+    "site/release/agents/openai.yaml",
+    "site/README.md",
+    "site/package.json",
+    "AGENTS.md",
+    "test/site-release-workflow.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The repository now contains a VibeHub-specific public-site release Skill at site/release/SKILL.md, a dependency-free release checker, short npm entry points, an AGENTS route, and a narrowed human README. The Skill reuses the checked-in Sites project, protects DNS and custom-domain replacement behind explicit human authority, covers prepare/publish/verify/rollback/evidence/stop behavior, and remains outside the public Plugin skills directory and artifact path.",
+  "ticket_id": "ticket-encode-public-site-release-workflow"
+}

@@ -1,0 +1,31 @@
+{
+  "context_id": "intent-reproducible-public-site-release",
+  "detail": "Keep the VibeHub public-site release workflow in this repository as a project-local Agent Skill backed by small deterministic checks. The durable workflow covers production build metadata, the existing Sites project, deployment, the canonical vibehub.icu hostname, protected DNS replacement, HTTPS and rendered-content verification, and checked-in release evidence. Keep credentials and transient platform state out of Git. The Skill is repository-local so VibeHub Plugin users do not receive an irrelevant publisher for VibeHub's own website.",
+  "evidence": [
+    {
+      "note": "The repository owner explicitly requested that the working public-site release process be preserved as reusable documentation or a Skill with scripts for future site changes.",
+      "ref": "conversation:2026-08-20-preserve-public-site-release-workflow"
+    },
+    {
+      "note": "The repository already records the production Sites project ID and the absence of D1 and R2 bindings.",
+      "ref": "site/.openai/hosting.json"
+    }
+  ],
+  "kind": "context",
+  "relations": [],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T07:45:58Z",
+    "quote": "把我们这个网站的发布流程什么的也给固定一下，写成个文档，或者一个什么 skill，对吧，skill配合脚本或者什么的，这种给它放进去。这样我们后面如果需要更改这个网站什么的就好做了，对吧，沉淀一下。",
+    "ref": "conversation:2026-08-20-preserve-public-site-release-workflow"
+  },
+  "state": "active",
+  "summary": "VibeHub public-site releases must be reproducible from checked-in instructions and mechanical verification",
+  "tags": [
+    "public-site",
+    "release",
+    "skill-first",
+    "sites"
+  ],
+  "type": "intent"
+}

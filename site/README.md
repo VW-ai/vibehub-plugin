@@ -1,5 +1,7 @@
 # VibeHub public site
 
+Production: [vibehub.icu](https://vibehub.icu)
+
 The public surface is one content-first causal narrative. It reads through
 normal vertical scrolling, while the Ticket cycle advances from the upper left
 toward the lower right. Installation remains a first-layer action rather than
@@ -12,23 +14,33 @@ npm ci
 npm run dev
 ```
 
-## Verify the production build
+## Release
 
-```bash
-npm test
+Agents must use the repository-local release Skill:
+
+```text
+site/release/SKILL.md
 ```
 
-For the final public build, provide the canonical URL so Open Graph and Twitter
-metadata point to the checked-in `public/og.png` preview:
+It owns the exact-source Sites deployment, custom-domain guardrails, production
+verification, rollback, and VibeHub Evidence handoff. Run the complete local
+preflight before publishing:
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://your-domain.example npm run build
+npm run release:preflight
 ```
 
-The site uses Next-compatible static export through vinext. The deployable
-Cloudflare-compatible artifact is written to `dist/`. It requires no D1, R2,
-authentication, account state, or runtime product service; `.openai/hosting.json`
-keeps both optional bindings disabled.
+After deployment, verify the canonical site mechanically:
 
-Deploy the generated artifact through the existing Cloudflare service. Domain,
-DNS, and account configuration intentionally remain outside this repository.
+```bash
+npm run release:verify
+```
+
+The site uses Next-compatible static export through vinext. The deployable Sites
+artifact is written to `dist/`. `.openai/hosting.json` stores only the existing
+Sites project ID and its intentionally empty D1/R2 bindings. Credentials, DNS
+validation values, live certificate state, and temporary deployment archives
+never belong in Git.
+
+`https://vibehub.icu` is the canonical production URL. Routine releases reuse
+its active custom-domain binding and do not edit DNS.
