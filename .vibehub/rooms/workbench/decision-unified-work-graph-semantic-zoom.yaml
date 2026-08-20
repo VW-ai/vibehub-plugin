@@ -1,0 +1,54 @@
+{
+  "context_id": "decision-unified-work-graph-semantic-zoom",
+  "detail": "The existing VibeHub Graph Workbench remains the starting spatial language rather than being replaced. The Global Work Graph shows Project clusters, Task nodes, and visually lighter Chat meta nodes together. A Chat meta node summarizes one Human-led Context Space, branch count, current attention owner, activity, and explicit Task associations; its individual conversation branches remain hidden globally. Selecting a Task or Chat first supports a lightweight Peek. Focusing a Task enters its Context Space and reveals relevant dependencies, Agent Runs, Evidence, and associated Chats. Focusing a Chat reveals its Conversation Stream graph, where forks represent thought provenance rather than Subtasks; a branch becomes a Task only when it gains an independent Outcome and execution contract. Multi-stream layouts may pin several independent Streams at once, with polished presets for common densities but no canonical limit in the data model. Compare creates a synthesis Stream and Bring Back merges selected conclusions or artifacts rather than concatenating histories. Chat-to-Task and branch-to-Task relations appear on focus to avoid edge noise. Selecting one Project should smoothly reframe and enlarge its clusters while other Projects fade, shrink, or exit toward a secondary rail with spatial continuity, rather than disappearing abruptly. Returning restores the prior Graph position and focus.",
+  "evidence": [
+    {
+      "note": "The owner accepted the Graph-first global direction, required Chat meta nodes with expandable branches, multi-stream viewing, direct Task interaction, and graceful Project focus transitions.",
+      "ref": "conversation:2026-08-20-unified-work-graph"
+    },
+    {
+      "note": "The existing local graph interaction is already a first-class product surface and remains the reuse baseline.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "note": "Quiet intelligence, progressive disclosure, causal focus, and exact viewport restoration constrain the new Global Work Graph.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "constraint-ui-quiet-intelligence-standard",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-human-and-agent-led-context-spaces",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-topology-derived-task-clusters",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T18:37:14Z",
+    "quote": "the task is a graph, and the chat, they're a graph; how can those two graphs connect to each other instead of having two separate graphs",
+    "ref": "conversation:2026-08-20-unified-work-graph"
+  },
+  "state": "active",
+  "summary": "One Global Work Graph presents Task and Chat Context nodes, then uses semantic zoom to reveal Task topology or Conversation streams without competing graph products",
+  "tags": [
+    "chat-graph",
+    "global-graph",
+    "multi-project",
+    "multi-stream",
+    "semantic-zoom",
+    "task-graph"
+  ],
+  "type": "decision"
+}

@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-task-working-context-and-durable-writeback",
+  "detail": "A Task is the Context Space on which Humans and Agents operate. Its working Context preserves the Objective, constraints, selected Context references, conversation Streams, Agent Sessions, execution events, attachments, Evidence, and state history needed to leave and resume the work. Completing a Task must produce a durable result: accepted Outcome, reusable Evidence, decisions, and relevant Context proposals are written back through the owning Project's governed Context protocol. Raw tool calls, transient reasoning, repeated messages, and full execution logs remain inspectable within the Task but are not automatically promoted into long-lived Project Context. This preserves provenance and resume ability without polluting the Context OS. Reading Context from another Project does not grant writeback authority there.",
+  "evidence": [
+    {
+      "note": "The owner explicitly equated entering a Task with entering its Context and required completed work to settle into Context.",
+      "ref": "conversation:2026-08-20-task-context-writeback"
+    },
+    {
+      "note": "Existing governance already separates Context reading from mutation authority and requires explicit governed writeback.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-context-activation-governed-writeback",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-human-and-agent-led-context-spaces",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T18:37:14Z",
+    "quote": "进入task，其实等于进入context了。进入task跑完都会落context。",
+    "ref": "conversation:2026-08-20-task-context-writeback"
+  },
+  "state": "active",
+  "summary": "Entering a Task enters its complete working Context Space, while completion writes curated Outcome and Evidence rather than raw execution noise into durable Project Context",
+  "tags": [
+    "context-space",
+    "durable-context",
+    "evidence",
+    "outcome",
+    "provenance",
+    "writeback"
+  ],
+  "type": "decision"
+}

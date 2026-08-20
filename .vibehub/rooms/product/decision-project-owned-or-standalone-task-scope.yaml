@@ -44,7 +44,7 @@
     "quote": "ticket 还是要归属一个 project 可能，然后也可以有 temp ticket 就是不归属 project",
     "ref": "conversation:2026-08-19-project-owned-and-standalone-tasks"
   },
-  "state": "active",
+  "state": "superseded",
   "summary": "A Task has zero or one owning Project; Projects own their Task scope and Room tree, while standalone Tasks remain valid",
   "tags": [
     "context-scope",

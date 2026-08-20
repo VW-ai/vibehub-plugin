@@ -3,60 +3,63 @@
     {
       "acceptance_id": "core-loop-direction-decided",
       "authority": "human",
-      "criterion": "After using the replacement whole-application prototype, the owner explicitly accepts or revises the V1 think-first and act-first loop, including Fork, Compare, Bring Back, Context activation, Ticket crafting, and Start."
+      "criterion": "The owner explicitly accepts Task as the durable work unit and the Ticket Graph as the first frame, with entering a Task entering its Context Space, normal Chat and explicit Fork, Compare, Bring Back for exploration, scoped Context activation, Task creation or conversion, Start, autonomous execution, precise human attention, Evidence review, closeout, and return."
     },
     {
       "acceptance_id": "information-language-decided",
       "authority": "human",
-      "criterion": "The owner explicitly accepts or revises how Branch, Context, Reference, Ticket, Run, attention, and Evidence surface across Chat, Graph, navigation, inspectors, and narrow layouts."
+      "criterion": "The owner explicitly accepts one Work Graph with Task nodes and lighter Chat meta nodes, Human-led versus Agent-led Context Spaces, Project-owned or standalone Tasks, topology-derived visual clusters instead of canonical High-Level or Subtask entities, and Context-anchored intervention with approval kept distinct from ordinary input."
     },
     {
       "acceptance_id": "initial-shell-and-dsh-direction-decided",
       "authority": "human",
-      "criterion": "The owner explicitly decides whether V1 should present a completely VibeHub-owned browser application while retaining DSH as the underlying runtime and extension substrate, including whether the proposed global information architecture and replacement-shell boundary feel right."
+      "criterion": "The owner explicitly chooses a non-invasive DeepSeek Harness Plugin: preserve DSH runtime and ecosystem, add one or two VibeHub Graph or Task pages plus additive Chat actions and Theme integration, perform a substantial coherent reskin where needed, and avoid an upstream fork, executor-specific coupling, or wholesale replacement-shell architecture for V1."
     }
   ],
   "constraints": [
-    "Do not substitute Agent preference, browser comments, or suggestive prose for explicit owner judgment.",
-    "Do not start permanent vertical-slice implementation before the complete decision is recorded as human-origin Evidence and independently closed out.",
-    "Do not treat acceptance of whole-application ownership as acceptance of the current visual design; the replacement prototype remains subject to explicit review.",
-    "Keep the decision scoped to V1; it need not settle cross-repository federation, cloud collaboration, or a native desktop wrapper."
+    "This decision accepts the product and composition direction, not the current prototype's visual design or a complete high-fidelity interaction specification.",
+    "Do not bind VibeHub Tasks to DSH Agent Team tasks, another Plugin's task model, Codex internals, or any one executor implementation.",
+    "Do not start permanent implementation until the draft vertical-slice Ticket is replanned from this Outcome, the DSH feasibility Outcome, and the remaining interaction decisions.",
+    "Keep V1 scoped to a non-invasive Plugin and the current repository; cross-Project federation, personal Context hierarchy, team collaboration, and a native desktop wrapper remain deferred."
   ],
-  "context": "The first DSH Client Spike proved that VibeHub can load into the official application, occupy conversation slots, create real Session forks, and add whole views. The owner explicitly rejected that Spike as product UI and clarified that VibeHub should not feel like several custom panels inside stock DSH. DSH is to remain the runtime, plugin, Session, model, tool, permission, and host substrate, while VibeHub owns the complete visible application and product experience. That shell-direction decision is now explicit, but the owner has not yet accepted the replacement visual system, information architecture, or complete task loop. Permanent implementation waits for a high-fidelity whole-application prototype and explicit judgment of the remaining criteria.",
+  "context": "This decision boundary is updated to reflect the owner's later corrections. VibeHub does not need to replace DeepSeek Harness wholesale or bind to executor-internal task mechanisms. DSH remains the fast-moving runtime, Session, model, tool, permission, command, and Plugin substrate. VibeHub adds one or two first-class Graph and Task surfaces, uses official additive slots and Theme composition for normal Chat actions such as Remember or Plan, and invests in a coherent Codex/Linear-quality reskin across the host. The product's durable unit is Task, normally Project-owned but optionally standalone. Chat and Task share a Context-Space substrate but differ in who owns forward motion. The global first frame is the existing VibeHub-style Task graph, extended through progressive Chat meta nodes, Project focus, and topology-derived clusters rather than a fabricated parent-task hierarchy. Detailed interaction and high-fidelity styling remain future design work; this Ticket settles the product and composition direction needed to refine the first implementation slice.",
   "context_refs": [
     {
-      "purpose": "Existing product authority the V1 decision should narrow rather than replace.",
-      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+      "purpose": "Authority for the unified Chat and Task Context-Space model.",
+      "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"
     },
     {
-      "purpose": "Existing interaction intent that the replacement proposal and feasibility work make decision-ready.",
-      "ref": ".vibehub/rooms/product/intent-conversational-ticket-control-surface.yaml"
+      "purpose": "Authority for Project scope, standalone Tasks, and derived rather than canonical hierarchy.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
     },
     {
-      "purpose": "Revised whole-application contract under human review.",
-      "ref": "docs/HARNESS_PRODUCT_CONTRACT.md"
+      "purpose": "Authority for the graph-first application hierarchy and Chat/Task semantic zoom.",
+      "ref": ".vibehub/rooms/workbench/decision-unified-work-graph-semantic-zoom.yaml"
+    },
+    {
+      "purpose": "Authority for deterministic topology-owned grouping and AI-limited semantics.",
+      "ref": ".vibehub/rooms/workbench/decision-topology-derived-task-clusters.yaml"
+    },
+    {
+      "purpose": "Existing non-invasive DSH runtime and executor-opacity boundary.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    },
+    {
+      "purpose": "Pinned technical feasibility and extension-seam evidence.",
+      "ref": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The repository owner explicitly records the V1 VibeHub whole-application product, interaction, visual, and DSH composition direction after using the replacement prototype and reading the technical feasibility evidence.",
+  "outcome": "The owner records the V1 Task Workbench direction: one Task-first Global Work Graph, Human-led Chat and Agent-led Task Context Spaces, and a non-invasive DeepSeek Harness Plugin with additive surfaces plus a coherent visual reskin.",
   "provenance_refs": [
-    "conversation:2026-08-17-human-uiux-product-gate",
-    "conversation:2026-08-17-owner-rejects-additive-ui-and-requires-whole-application-revolution"
+    "conversation:2026-08-19-owner-prefers-additive-pages-theme-and-slots-over-shell-replacement",
+    "conversation:2026-08-20-owner-sets-task-not-chat-product-unit",
+    "conversation:2026-08-20-unified-work-graph",
+    "conversation:2026-08-20-topology-derived-task-clusters"
   ],
-  "relations": [
-    {
-      "rationale": "The owner needs the replacement whole-application proposal before accepting the remaining product and interaction direction.",
-      "target_ticket_id": "ticket-prototype-task-harness-experience",
-      "type": "depends_on"
-    },
-    {
-      "rationale": "The replacement shell and recreated extension contract depend on proven DSH root, client-module, Session, and lifecycle seams.",
-      "target_ticket_id": "ticket-spike-deepseek-harness-foundations",
-      "type": "depends_on"
-    }
-  ],
+  "relations": [],
   "schema_version": 2,
   "ticket_id": "ticket-decide-task-harness-product-direction"
 }

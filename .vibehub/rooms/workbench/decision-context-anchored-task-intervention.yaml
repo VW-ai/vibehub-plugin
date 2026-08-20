@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-context-anchored-task-intervention",
+  "detail": "Understanding, discussing, updating, and intervening in a Task are one continuous Context-Space interaction rather than separate product zones. Selecting a Goal, Constraint, Evidence item, Agent step, file region, or conversation message supplies an explicit anchor, so Discuss, Edit, Attach, Fork, or Remember can operate without a general intent-classification module. Approval and rejection remain distinct explicit interrupt actions because they resolve a waiting execution boundary rather than merely add information. A Human message to a running Task is addressed to the Task Context Space, not exposed as a requirement to talk to a particular Agent Session. The runtime adapter should prefer continuing a waiting Session, resumable interrupt, safe queued steering, or a structured Context-changed event. Forking is reserved for explicit parallel exploration or used only as a compatibility fallback when DSH cannot safely steer the active execution. The exact DSH mechanism is deferred to the targeted feasibility Spike. Dragging files and links may later become a polished interaction, but implicit placement or meaning must not depend on hidden intent classification when an explicit anchor or scope action can be offered.",
+  "evidence": [
+    {
+      "note": "The owner rejected unnecessary intent classification for selected Context, separated approval from ordinary input, and expected Task-level conversation to reach execution without exposing Agent-to-Agent plumbing.",
+      "ref": "conversation:2026-08-20-context-anchored-intervention"
+    },
+    {
+      "note": "The existing runtime boundary already treats execution internals as opaque beneath human-facing Task state.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-human-and-agent-led-context-spaces",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-native-chat-with-additive-task-actions",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T18:37:14Z",
+    "quote": "if I comment on the constraint, then it's for the constraint",
+    "ref": "conversation:2026-08-20-context-anchored-intervention"
+  },
+  "state": "active",
+  "summary": "Human interaction occurs inside the Task Context Space through explicit anchors and actions, while runtime steering remains an adapter concern",
+  "tags": [
+    "anchored-context",
+    "approval",
+    "human-intervention",
+    "runtime-adapter",
+    "steering",
+    "task-workspace"
+  ],
+  "type": "decision"
+}

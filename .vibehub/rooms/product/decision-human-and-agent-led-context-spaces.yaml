@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-human-and-agent-led-context-spaces",
+  "detail": "Chat and Task are both Context Spaces in which a Human and one or more Agents build work. A Chat is normally Human-led: the Human chooses the next direction while the Agent reacts, elaborates, and waits; it may stay temporary and open-ended. A Task is normally Agent-led: it has an explicit Outcome, Context scope, constraints, Acceptance or stopping conditions, and delegated authority for the Agent to advance without continuous conversation. The unifying interaction state is attention ownership — Human, Agent, or nobody owns the next move — so a completed Chat response and a Needs-You Task both return attention to the Human, while an AI-generating Chat and a Running Task give the next move to the Agent. A Chat may become a Task in place by adding an execution contract and delegation without copying its history into a new object. A Task may open Human-led conversation streams for exploration or intervention without ceasing to be the same Task. Agent Session remains a replaceable execution carrier rather than the durable user-facing Task.",
+  "evidence": [
+    {
+      "note": "The owner defined Chat as a Human-driven Context Space and Task as an Agent-driven bounded Context Space, while keeping both inside one product interaction model.",
+      "ref": "conversation:2026-08-20-human-and-agent-led-context-spaces"
+    },
+    {
+      "note": "The existing Task-first decision already makes Task the durable work unit and Chat the unconstrained exploration and steering surface.",
+      "ref": ".vibehub/rooms/product/decision-task-first-human-workbench.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-native-chat-with-additive-task-actions",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T18:37:14Z",
+    "quote": "a task is a context space where we let AI agent push through; chat is like a task where my human agent is trying to push through",
+    "ref": "conversation:2026-08-20-human-and-agent-led-context-spaces"
+  },
+  "state": "active",
+  "summary": "Chat and Task share one Work Context substrate but differ by who owns forward motion and whether an execution contract exists",
+  "tags": [
+    "attention-owner",
+    "chat",
+    "context-space",
+    "execution-contract",
+    "product-model",
+    "task"
+  ],
+  "type": "decision"
+}

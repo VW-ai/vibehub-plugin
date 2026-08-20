@@ -1,0 +1,52 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "archived-stub-is-legible-in-real-graph",
+      "criterion": "A deterministic fixture reproduces the current left-to-right archived boundary and the production graph renders the complete hidden-count label and affordance without connector, card, viewport, mask, or clipping overlap at the real graph scale; the label remains distinguishable from an archived Ticket card and from ordinary relation copy."
+    },
+    {
+      "acceptance_id": "archive-expansion-remains-exact-and-operable",
+      "criterion": "Pointer and keyboard activation of the repaired stub reveal the exact next archived Ticket IDs from the canonical projection, preserve or intentionally restore graph focus and URL state, and never infer, duplicate, or silently omit archived relations."
+    },
+    {
+      "acceptance_id": "directions-and-narrow-layout-regressions-pass",
+      "criterion": "Focused browser and automated regression cover left-to-right, top-to-bottom, normal desktop, and narrow layouts, including a stub adjacent to selected, dimmed, and long-copy cards; labels, hit targets, connectors, and the Inspector remain usable with no horizontal document overflow."
+    },
+    {
+      "acceptance_id": "quiet-accessible-visual-contract-is-preserved",
+      "criterion": "The repair uses the approved quiet Workbench tokens and non-color semantics, exposes an accurate accessible name and visible keyboard focus, respects reduced motion, and changes no Ticket, Evidence, Outcome, delivery, archive, or query source-of-truth semantics."
+    }
+  ],
+  "constraints": [
+    "Fix the production archived-stub component or its graph geometry; do not hide the defect by removing archived boundaries, changing the default query, or forcing all history open.",
+    "Do not use a hover-only label, color-only meaning, tiny target, or free-floating overlay that loses its causal anchor.",
+    "Do not add browser persistence, writable Web state, a second archive index, or a special-case repository data mutation.",
+    "Keep the patch narrowly scoped and preserve existing Ticket selection, causal focus, fit, pan, zoom, minimap, and viewport restoration behavior."
+  ],
+  "context": "Real dogfood of the current left-to-right graph exposed a small but material presentation defect: the dashed archived-history stub and its connector can visually consume or obscure the compact `1 archived` label, so the user cannot reliably perceive the hidden-history boundary even though the underlying archive/query projection is correct. This is a focused Web Workbench repair, not a new archive model. Preserve the canonical derived stub, exact next-ticket traversal, current/all query semantics, quiet visual language, and read-only browser boundary while making the collapsed boundary readable at the moment it matters.",
+  "context_refs": [
+    {
+      "purpose": "Canonical archive/query and progressive hidden-history behavior that the visual repair must preserve.",
+      "ref": ".vibehub/outcomes/ticket-queryable-archived-ticket-history.yaml"
+    },
+    {
+      "purpose": "Binding graph readability, accessibility, causal focus, and restrained visual constraints.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Current production graph interaction and read-only Workbench boundary.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Collapsed archived-history boundaries remain immediately legible and operable in the Ticket Graph without corrupting connector geometry, focus, or exact archive traversal.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-reports-archived-stub-visibility-bug",
+    "screenshot:2026-08-20-ticket-graph-archived-stub"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-fix-archived-stub-label-visibility"
+}

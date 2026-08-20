@@ -1,0 +1,50 @@
+{
+  "context_id": "decision-project-scope-with-derived-task-hierarchy",
+  "detail": "A Task normally belongs to exactly one Project, and a Project remains the human work scope containing its Task graph and project-level Room tree. A temporary or standalone Task may have no Project. Cross-Project work remains explicit through coordination Tasks, project-owned related Tasks, and governed Context references; reading another Project does not grant writeback authority. This decision corrects the earlier unimplemented assumption that child Tasks were already part of the accepted domain model. Current canonical Tasks remain independently executable units connected by dependency edges, and no Parent Task, Child Task, Subtask, High-Level Task, Low-Level Task, or Task Group lifecycle is committed. The Workbench should first obtain hierarchy and concentration from topology-derived visual clusters. A canonical containment relation may be reconsidered only if dogfood demonstrates durable operations that a view cannot provide, such as inherited Context, shared Outcome or Acceptance ownership, lifecycle rollup, whole-group moves, or whole-group archival. The first DSH Plugin slice may remain single-Project and omit personal Rooms, cross-Project coordination, and team semantics.",
+  "evidence": [
+    {
+      "note": "The owner clarified that the current backend deliberately keeps Tasks linear and dependency-linked, and requested that product design not assume an unproven parent-child ontology.",
+      "ref": "conversation:2026-08-20-derived-task-hierarchy-correction"
+    },
+    {
+      "note": "The checked-in Ticket v2 schema mechanically confirms only depends_on relations.",
+      "ref": "skills/contracts/ticket.schema.json"
+    },
+    {
+      "note": "The superseded decision remains evidence for Project ownership, standalone Tasks, cross-Project authority, and the earlier child-Task assumption that this decision now corrects.",
+      "ref": ".vibehub/rooms/product/decision-project-owned-or-standalone-task-scope.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-project-owned-or-standalone-task-scope",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-topology-derived-task-clusters",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T18:37:14Z",
+    "quote": "我不想说硬生造一个high level task的概念",
+    "ref": "conversation:2026-08-20-derived-task-hierarchy-correction"
+  },
+  "state": "active",
+  "summary": "Projects still own normal Tasks and Rooms, but Task hierarchy remains a derived Graph projection rather than an accepted canonical parent-child model",
+  "tags": [
+    "cross-project",
+    "hierarchy",
+    "project",
+    "standalone-task",
+    "task",
+    "task-scope"
+  ],
+  "type": "decision"
+}

@@ -1,57 +1,72 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "card-copy-options-are-measured-and-decidable",
-      "criterion": "Using the real repository corpus plus deterministic long-copy fixtures, the proposal compares at least modest card-height changes, a typed graph-only summary with full-outcome fallback, and any justified semantic-zoom alternative; it reports fit percentages, graph-density effects, schema and compatibility costs, and recommends one exact graph-copy contract that keeps the canonical full outcome in Inspector detail and does not solve overflow by shrinking text below the approved readable typography."
+      "acceptance_id": "topology-cluster-contract-is-deterministic",
+      "criterion": "The proposal defines deterministic Project-scoped cluster membership and stable identity from the existing dependency DAG, evaluates convergence frontiers, upstream cones, shared prerequisites, overlap, boundary cost, and compression benefit on real plus adversarial fixtures, and leaves Tickets ungrouped when confidence or usefulness is insufficient; no AI output or canonical parent, child, subtask, or group field controls membership."
     },
     {
-      "acceptance_id": "large-graph-clarity-model-is-concrete",
-      "criterion": "The proposal defines a coherent initial orientation and progressive-disclosure model for current work, all history, delivery, one-or-many Rooms, active frontier, causal focus, search/filter, and hidden archived or out-of-scope context, including how the UI explains why a visible Ticket is blocked or unlocked without silently dropping canonical relations."
+      "acceptance_id": "collapsed-causality-remains-exact",
+      "criterion": "Collapsed clusters preserve every cross-boundary Ticket dependency as inspectable source truth, distinguish shared non-owning prerequisites, expose why a cluster or Task is blocked or unlocked, and never invent a causal super-edge, conceal a two-way boundary pattern, or imply shared lifecycle ownership."
     },
     {
-      "acceptance_id": "scale-prototypes-cover-real-usage",
-      "criterion": "Reviewable wide and narrow prototypes exercise the current real graph and deterministic approximately 200- and 1000-Ticket fixtures in both causal directions; at normal card-reading zoom at least 90% of the proposed graph summaries fit without ellipsis, while overview, query, focus, minimap, navigation, and recovery remain usable without requiring the entire graph to be simultaneously readable at fit-to-screen scale."
+      "acceptance_id": "semantic-zoom-and-project-focus-are-reviewable",
+      "criterion": "Reviewable wide and narrow prototypes cover the real graph plus deterministic approximately 200- and 1000-Ticket fixtures across multi-Project overview, Project focus, cluster focus, exact Task focus, return, current/all scope, both graph directions, selected and dimmed states, and smooth fade, shrink, exit, and restoration behavior, while Chat meta nodes and individual conversation branches remain progressively disclosed rather than competing as a second global graph."
     },
     {
-      "acceptance_id": "implementation-boundaries-are-ready-for-owner-review",
-      "criterion": "The proposal identifies the smallest subsequent schema/projection, interaction, layout, migration-or-fallback, accessibility, and verification boundaries; it preserves non-color state and attention semantics, keyboard and narrow-screen access, exact Git truth, read-only Web scope, and existing causal-cone and archive boundary behavior, and presents the remaining protected product choices explicitly for owner review rather than embedding them in implementation."
+      "acceptance_id": "representative-and-ai-semantics-are-bounded",
+      "criterion": "The proposal defines a deterministic structural representative or small frontier for each cluster, then a separate human-facing label and purpose contract generated from member Outcomes, Acceptance, Rooms, and Context; AI cannot change membership, edges, state, or acceptance, deterministic fallback covers absent or stale generated semantics, an optional Human-pinned label overrides presentation only, and regeneration timing is left as a product-led backend boundary rather than an implicit background process."
+    },
+    {
+      "acceptance_id": "task-card-copy-remains-readable",
+      "criterion": "Using the real corpus plus deterministic long-copy fixtures, the proposal selects one graph-only Task summary contract with canonical Outcome fallback and full detail in the Inspector, reports fit and density effects, and keeps at least 90% of representative Task summaries readable at normal card-reading zoom without shrinking below the approved typography."
+    },
+    {
+      "acceptance_id": "implementation-boundaries-are-decision-ready",
+      "criterion": "The proposal identifies the smallest subsequent projection, clustering, semantic-label, interaction, layout, migration-or-fallback, accessibility, cache-invalidation, and verification Tickets; it preserves exact Git truth, read-only Web scope, current causal focus, archive boundaries, keyboard access, narrow layouts, and protected owner choices for explicit review."
     }
   ],
   "constraints": [
-    "Do not replace the canonical Ticket outcome with lossy graph copy; graph-specific copy is a projection or explicitly typed optional field whose truth, fallback, and validation are defined.",
-    "Do not claim that showing every Ticket at once is clarity. Query, focus, grouping, folding, semantic zoom, and progressive disclosure may reduce what is visually foregrounded, but hidden canonical context remains inspectable and causally explainable.",
-    "Do not use smaller typography, color alone, hover-only disclosure, a Desktop-only runtime, hidden persistence, or a second Ticket lifecycle as the solution.",
-    "This Ticket produces a reviewable proposal and downstream implementation boundaries; it does not silently change the Ticket schema or production Workbench before the owner reviews the protected product choices."
+    "Do not add canonical High-Level Task, Low-Level Task, Parent Task, Subtask, or Task Group structure merely to support the view.",
+    "Do not let AI infer cluster membership, dependencies, readiness, state, acceptance, or authority.",
+    "Do not claim that showing every Ticket simultaneously is clarity; progressive disclosure may foreground a subset only when hidden canonical context remains inspectable and causally explainable.",
+    "Do not replace canonical Ticket outcomes with lossy graph copy, use color alone, require hover, or solve density through unreadably small type.",
+    "This Ticket produces a reviewable contract and downstream implementation plan; it does not silently change the production schema or Workbench."
   ],
-  "context": "The current 45-Ticket dogfood graph exposed two different problems that must not be conflated. First, canonical Ticket outcomes are deliberately complete and average far beyond a compact card: at the real 232px card copy width, 90% of the current outcomes require about 12 lines, so simply making every card tall enough would push cards toward roughly 230px and make the dense graph harder to scan. Second, as repositories accumulate hundreds or thousands of historical and current Tickets, layout quality alone cannot provide orientation; the Workbench needs progressive information architecture, query/focus modes, and honest explanations for hidden context. The owner wants roughly 90% of card copy readable directly, is open to a shorter graph-only description while preserving the full outcome in expanded detail, and expects the large-graph UI/UX to become a genuinely powerful future surface. This Ticket produces the concrete proposal and contract needed before production implementation is planned.",
+  "context": "The earlier large-graph proposal correctly identified that card overflow and hundreds of Tickets cannot be solved by layout alone, but the product direction is now sharper. Canonical Tasks remain independently executable nodes connected only by dependency edges. The Workbench may derive stable visual clusters from topology, progressively zoom from Project and cluster posture into exact Tasks, and ask AI only for human-facing cluster semantics. This Ticket turns that decision into a reviewable interaction and data contract before production implementation. It retains the existing graph-copy requirement because cluster labels do not remove the need for readable individual Task summaries.",
   "context_refs": [
     {
-      "purpose": "Binding Workbench visual, causal-layout, accessibility, and truthful-presence constraints.",
+      "purpose": "Authority for topology-owned membership and AI-limited cluster semantics.",
+      "ref": ".vibehub/rooms/workbench/decision-topology-derived-task-clusters.yaml"
+    },
+    {
+      "purpose": "Authority for one Global Work Graph and progressive Task, Chat, Project, and Stream focus.",
+      "ref": ".vibehub/rooms/workbench/decision-unified-work-graph-semantic-zoom.yaml"
+    },
+    {
+      "purpose": "Authority rejecting an unproven canonical parent-child Task model.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    },
+    {
+      "purpose": "Binding visual, accessibility, exact-causality, and progressive-disclosure constraints.",
       "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     },
     {
-      "purpose": "Completed deterministic dense-layout baseline that this information-architecture work must build on rather than replace.",
+      "purpose": "Accepted deterministic layout baseline that clustering and semantic zoom extend.",
       "ref": ".vibehub/outcomes/ticket-workbench-dense-graph-layout.yaml"
-    },
-    {
-      "purpose": "Canonical current/all/delivery/Room query and progressive archived-boundary semantics.",
-      "ref": ".vibehub/outcomes/ticket-queryable-archived-ticket-history.yaml"
-    },
-    {
-      "purpose": "Current production graph interaction, focus, URL, Inspector, and read-only design boundary.",
-      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "A reviewable product, interaction, and data-contract proposal makes large Ticket graphs progressively understandable and makes at least 90% of graph-card summaries readable without opening the Inspector.",
+  "outcome": "A reviewable topology-derived clustering, semantic-zoom, and graph-copy contract makes large multi-Project Task graphs understandable without inventing a parent-task ontology or hiding canonical causality.",
   "provenance_refs": [
-    "conversation:2026-08-13-owner-reports-card-overflow-and-large-graph-clarity-gap"
+    "conversation:2026-08-13-owner-reports-card-overflow-and-large-graph-clarity-gap",
+    "conversation:2026-08-20-derived-task-hierarchy-correction",
+    "conversation:2026-08-20-topology-derived-task-clusters"
   ],
   "relations": [
     {
-      "rationale": "The next clarity proposal should measure and extend the stable integrated Web upgrade rather than changing the delivery scope of the current PR.",
+      "rationale": "The proposal extends the accepted v0.8 production graph rather than changing its historical delivery scope.",
       "target_ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
       "type": "depends_on"
     }

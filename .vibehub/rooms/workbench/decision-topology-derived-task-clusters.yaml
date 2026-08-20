@@ -1,0 +1,50 @@
+{
+  "context_id": "decision-topology-derived-task-clusters",
+  "detail": "The multi-Project Work Graph may visually compress related Tickets into expandable Task clusters without introducing a canonical High-Level Task, Low-Level Task, Parent Task, Subtask, or Group entity. Cluster membership and stable identity are derived from the existing directed acyclic dependency graph within Project scope. Candidate clusters may use transitive reduction, convergence or acceptance frontiers, post-dominator-style upstream cones, boundary cost, overlap detection, and compression benefit; the exact algorithm remains implementation work. A convergence Ticket or a small terminal frontier may act as a structural anchor, while shared prerequisites remain outside or appear as non-owning stubs. Cross-cluster dependency edges remain exact Ticket-to-Ticket facts; a collapsed cluster must not invent a causal super-edge or hide a possible two-way boundary pattern. If topology does not yield a confident, useful boundary, the Tickets remain ungrouped. The terminal Ticket often describes validation rather than the human meaning of the work, so Room and Context names are consulted first and AI may generate a short cluster label and purpose from member Outcomes, Acceptance, and Context references. AI never changes membership, dependencies, state, or Acceptance. Label generation and regeneration timing are deferred backend mechanics that must follow product interaction needs; a future Human-pinned label may override generated presentation without changing canonical Task ontology.",
+  "evidence": [
+    {
+      "note": "The owner preferred mathematically derived clusters over inventing a High-Level Task type and identified AI-generated semantics as a product-led backend concern.",
+      "ref": "conversation:2026-08-20-topology-derived-task-clusters"
+    },
+    {
+      "note": "The current canonical Ticket schema exposes only depends_on relations and has no parent, child, subtask, or group field.",
+      "ref": "skills/contracts/ticket.schema.json"
+    },
+    {
+      "note": "The Workbench already treats the complete causal graph as primary and permits deterministic geometry changes without hiding canonical Tickets or relations.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "constraint-ui-quiet-intelligence-standard",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T18:37:14Z",
+    "quote": "cluster这个概念很好，这样我们其实可以很容易的算出来哪一个ticket是能够比较好的represent这个cluster",
+    "ref": "conversation:2026-08-20-topology-derived-task-clusters"
+  },
+  "state": "active",
+  "summary": "Task clusters are stable view projections derived from the dependency DAG; topology owns membership and AI may supply only human-facing semantics",
+  "tags": [
+    "ai-labeling",
+    "cluster",
+    "dag",
+    "graph-projection",
+    "semantic-zoom",
+    "task-topology"
+  ],
+  "type": "decision"
+}

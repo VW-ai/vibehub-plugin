@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "core-loop-direction-decided",
+    "information-language-decided",
+    "initial-shell-and-dsh-direction-decided"
+  ],
+  "evidence_id": "owner-records-current-task-workbench-direction",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-20T19:01:05Z",
+  "refs": [
+    "conversation:2026-08-19-owner-prefers-additive-pages-theme-and-slots-over-shell-replacement",
+    "conversation:2026-08-20-owner-sets-task-not-chat-product-unit",
+    "conversation:2026-08-20-human-and-agent-led-context-spaces",
+    "conversation:2026-08-20-unified-work-graph",
+    "conversation:2026-08-20-context-anchored-intervention",
+    "conversation:2026-08-20-derived-task-hierarchy-correction",
+    "conversation:2026-08-20-topology-derived-task-clusters"
+  ],
+  "schema_version": 1,
+  "summary": "Across the current product review, the owner explicitly chose Task rather than Chat as the durable product unit and the VibeHub Ticket Graph as the first frame. Entering a Task enters its working Context Space; normal Chat remains the open Human-led exploration and steering surface with explicit Fork, Compare, Bring Back, scoped Context, conversion to Task, Start, human attention, Evidence review, and closeout. The owner accepted one Global Work Graph with Task nodes and lighter Chat meta nodes, Project-owned or standalone Tasks, and topology-derived visual clusters rather than inventing High-Level, Parent, Child, or Subtask ontology. The owner also corrected the earlier wholesale-shell direction: V1 should remain a non-invasive DeepSeek Harness Plugin using one or two VibeHub Graph or Task pages, additive Chat actions and official Theme composition, with a substantial coherent Codex/Linear-quality reskin but no upstream fork or executor-internal task coupling. This is explicit product and composition approval, not approval of the current low-fidelity visual design or all remaining interaction details.",
+  "ticket_id": "ticket-decide-task-harness-product-direction"
+}
