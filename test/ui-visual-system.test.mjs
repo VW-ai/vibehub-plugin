@@ -13,26 +13,28 @@ test("production Workbench uses the selected global visual language", () => {
   assert.match(css, /--mono:\s*ui-monospace/u);
   assert.match(html, /class="icon-sprite"/u);
   for (const id of [
-    "check", "play", "lock", "sliders", "alert", "archive",
+    "check", "play", "running", "lock", "sliders", "alert", "archive",
     "upcoming", "pending", "recorded", "complete",
   ]) assert.match(html, new RegExp(`id="icon-${id}"`, "u"));
   assert.equal(/[☝○●✓✦⚠🔒▶◉◌▣≡⎇□⌗↗]/u.test(html), false);
 });
 
-test("production graph keeps operational, archive, and attention treatments independent", () => {
-  for (const state of ["done", "ready", "blocked", "refine", "deviated"]) {
-    assert.match(css, new RegExp(`\\.ticket-node\\.state-${state} \\.ticket-boundary \\{ fill:`, "u"));
+test("production graph keeps four phases, one substate slot, archive, and live independent", () => {
+  for (const phase of ["draft", "ready", "running", "done"]) {
+    assert.match(css, new RegExp(`\\.ticket-node\\.phase-${phase} \\.ticket-boundary \\{ fill:`, "u"));
   }
   assert.match(css, /\.ticket-node\.archived \.ticket-boundary \{ fill:/u);
   assert.match(css, /\.ticket-node\.archived \.ticket-boundary[\s\S]*stroke-dasharray/u);
-  for (const attention of ["upcoming", "pending", "recorded", "complete"]) {
-    assert.match(css, new RegExp(`\\.ticket-node\\.attention-${attention} \\.ticket-attention-badge`, "u"));
+  for (const substate of ["blocked", "needs-you", "deviated", "verifying", "waiting"]) {
+    assert.match(css, new RegExp(`\\.ticket-node\\.substate-${substate} \\.ticket-substate-badge`, "u"));
   }
   assert.match(script, /STATE_ICON_IDS/u);
-  assert.match(script, /ATTENTION_ICON_IDS/u);
+  assert.match(script, /SUBSTATE_ICON_IDS/u);
   assert.match(script, /ticket-state-icon/u);
-  assert.match(script, /ticket-attention-badge/u);
-  assert.match(css, /\.ticket-node\.next-close-out \.ticket-boundary/u);
+  assert.match(script, /ticket-substate-badge/u);
+  assert.doesNotMatch(script, /class: "ticket-accent"/u);
+  assert.match(script, /ticket-live-indicator/u);
+  assert.match(css, /@keyframes ticket-live-pulse/u);
 });
 
 test("archived history stubs remain legible, anchored, and keyboard explicit", () => {
@@ -48,17 +50,19 @@ test("archived history stubs remain legible, anchored, and keyboard explicit", (
   assert.match(css, /\.history-stub-link \{[\s\S]*stroke-dasharray/u);
 });
 
-test("production canvas counts and Overview are compact two-axis legends", () => {
-  assert.match(html, /Ticket state and human attention summary/u);
-  assert.match(html, /aria-label="Ticket state legend"/u);
-  assert.match(html, /aria-label="Human attention legend"/u);
+test("production canvas exposes exactly four primary phases and one compact substate channel", () => {
+  assert.match(html, /Ticket phase and attention summary/u);
+  assert.match(html, /aria-label="Ticket phase legend"/u);
+  assert.doesNotMatch(html, /Human attention legend/u);
   assert.match(script, /renderGraphSummary/u);
   assert.match(
     script,
-    /add\(counts\.DONE, "DONE", "check", "state-done"\);[\s\S]*add\(overview\.ready\.length, "READY"[\s\S]*add\(overview\.closeout\.length, "CLOSE OUT"/u,
+    /add\(counts\.RUNNING, "RUNNING", "running", "phase-running"\);[\s\S]*add\(counts\.READY, "READY"[\s\S]*add\(counts\.DRAFT, "DRAFT"[\s\S]*add\(counts\.DONE, "DONE"/u,
   );
-  assert.match(html, /id="closeoutQueue"/u);
-  assert.match(html, /Independent closeout/u);
+  assert.doesNotMatch(html, /id="closeoutQueue"/u);
+  for (const id of ["summaryDraft", "summaryReady", "summaryRunning", "summaryDone"]) {
+    assert.match(html, new RegExp(`id="${id}"`, "u"));
+  }
   assert.match(script, /"NEEDS YOU"/u);
   for (const banned of [
     "Execution flow",
@@ -67,6 +71,15 @@ test("production canvas counts and Overview are compact two-axis legends", () =>
     "Owner decision follows this proposal",
     "No Active Run proven",
   ]) assert.equal(html.includes(banned), false);
+});
+
+test("focused Ticket makes the exact copy handoff the dominant recommended action", () => {
+  assert.match(script, /className = classes\("recommended-action"/u);
+  assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
+  assert.match(script, /label: "Copy prompt"/u);
+  assert.match(script, /if \(contextPackage\.agentPayload\) return canonical;/u);
+  assert.match(css, /\.recommended-action-heading strong \{[\s\S]*font-size: 15px/u);
+  assert.match(css, /\.recommended-action \.agent-handoff \{[\s\S]*background: var\(--ink\)/u);
 });
 
 test("production narrow Inspector remains a bottom sheet over the graph", () => {

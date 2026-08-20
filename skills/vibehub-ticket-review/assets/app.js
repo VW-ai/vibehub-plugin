@@ -27,6 +27,7 @@
     ticketNextAction,
     ticketNodePresentation,
     ticketOperationalState,
+    ticketPhasePresentation,
     workbenchOverview,
   } = workbenchModel;
   const TICKET_VIEW_IDS = new Map([
@@ -35,19 +36,18 @@
     ["log", "evidence"],
   ]);
   const STATE_ICON_IDS = Object.freeze({
+    DRAFT: "sliders",
     DONE: "check",
     READY: "play",
-    BLOCKED: "lock",
-    REFINE: "sliders",
-    DEVIATED: "alert",
+    RUNNING: "running",
     ARCHIVED: "archive",
-    REVIEW: "recorded",
   });
-  const ATTENTION_ICON_IDS = Object.freeze({
-    UPCOMING: "upcoming",
-    PENDING: "pending",
-    RECORDED: "recorded",
-    COMPLETE: "complete",
+  const SUBSTATE_ICON_IDS = Object.freeze({
+    DEVIATED: "alert",
+    BLOCKED: "lock",
+    NEEDS_YOU: "pending",
+    VERIFYING: "recorded",
+    WAITING: "upcoming",
   });
   const ROOM_STATE_PRESENTATION = Object.freeze({
     FRESH: { label: "FRESH", icon: "check" },
@@ -73,11 +73,10 @@
     sourceDockTitle: document.querySelector("#sourceDockTitle"),
     sourceDockContent: document.querySelector("#sourceDockContent"),
     closeSourceDock: document.querySelector("#closeSourceDock"),
+    summaryDraft: document.querySelector("#summaryDraft"),
     summaryReady: document.querySelector("#summaryReady"),
-    summaryCloseout: document.querySelector("#summaryCloseout"),
-    summaryRefine: document.querySelector("#summaryRefine"),
-    summaryHuman: document.querySelector("#summaryHuman"),
-    summaryDeviated: document.querySelector("#summaryDeviated"),
+    summaryRunning: document.querySelector("#summaryRunning"),
+    summaryDone: document.querySelector("#summaryDone"),
     sourcePath: document.querySelector("#sourcePath"),
     sourceBranch: document.querySelector("#sourceBranch"),
     sourceCommit: document.querySelector("#sourceCommit"),
@@ -88,8 +87,6 @@
     graphSignalCount: document.querySelector("#graphSignalCount"),
     overviewPanel: document.querySelector("#overviewPanel"),
     closeOverview: document.querySelector("#closeOverview"),
-    closeoutQueue: document.querySelector("#closeoutQueue"),
-    closeoutQueueCount: document.querySelector("#closeoutQueueCount"),
     stateDot: document.querySelector("#stateDot"),
     stateLabel: document.querySelector("#stateLabel"),
     sourceStatus: document.querySelector("#sourceStatus"),
@@ -299,7 +296,7 @@
     const { source } = graph;
     const counts = operationalCounts(graph.tickets);
     const overview = workbenchOverview(graph.tickets, source);
-    const deviatedCount = counts.DEVIATED;
+    const deviatedCount = overview.deviated.length;
     elements.projectName.textContent = project.name;
     elements.repoBranch.textContent = project.branch;
     renderSourceDock();
@@ -309,8 +306,8 @@
     renderDirectionControl();
     renderScopeControl();
     elements.graphSignalCount.textContent =
-      `${overview.ready.length} ready · ${overview.closeout.length} close out · `
-      + `${overview.humanPending.length} need you · `
+      `${counts.RUNNING} running · ${counts.READY} ready · `
+      + `${overview.needsYou.length} need you · `
       + (overview.sourceDirty ? "local changes" : "exact source");
     document.title = `${project.name} · VibeHub Ticket graph`;
     elements.stateDot.className =
@@ -351,46 +348,10 @@
   }
 
   function renderOverview(overview) {
-    elements.summaryReady.textContent = String(overview.ready.length);
-    elements.summaryCloseout.textContent = String(overview.closeout.length);
-    elements.summaryHuman.textContent = String(overview.humanPending.length);
-    elements.summaryDeviated.textContent = String(overview.deviated.length);
-    elements.summaryRefine.textContent = String(overview.refineCount);
-    elements.closeoutQueueCount.textContent = String(overview.closeout.length);
-    renderCloseoutQueue(overview.closeout);
-  }
-
-  function renderCloseoutQueue(tickets) {
-    if (!tickets.length) {
-      elements.closeoutQueue.replaceChildren(
-        quietMessage("No Ticket is awaiting independent adjudication."),
-      );
-      return;
-    }
-    elements.closeoutQueue.replaceChildren(...tickets.map((ticket) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "closeout-ticket";
-      button.setAttribute(
-        "aria-label",
-        `Review ${ticket.ticketId} for independent closeout`,
-      );
-      const copy = document.createElement("span");
-      const id = document.createElement("strong");
-      id.textContent = shortTicketId(ticket.ticketId);
-      id.dataset.fullText = ticket.ticketId;
-      const outcome = document.createElement("small");
-      outcome.textContent = ticket.outcome;
-      copy.append(id, outcome);
-      const action = document.createElement("b");
-      action.textContent = "REVIEW";
-      button.append(copy, action);
-      button.addEventListener("click", () => {
-        closeOverview(false);
-        void selectTicket(ticket.ticketId, true, "evidence");
-      });
-      return button;
-    }));
+    elements.summaryDraft.textContent = String(overview.phases.DRAFT.length);
+    elements.summaryReady.textContent = String(overview.phases.READY.length);
+    elements.summaryRunning.textContent = String(overview.phases.RUNNING.length);
+    elements.summaryDone.textContent = String(overview.phases.DONE.length);
   }
 
   function renderGraphSummary(counts, overview) {
@@ -405,13 +366,11 @@
       item.append(htmlIcon(icon), value, ` ${label}`);
       items.push(item);
     };
-    add(counts.DONE, "DONE", "check", "state-done");
-    add(overview.ready.length, "READY", "play", "state-ready");
-    add(overview.closeout.length, "CLOSE OUT", "recorded", "next-close-out");
-    add(counts.REFINE, "REFINE", "sliders", "state-refine");
-    add(counts.BLOCKED, "BLOCKED", "lock", "state-blocked");
-    add(counts.DEVIATED, "DEVIATED", "alert", "state-deviated");
-    add(overview.humanPending.length, "NEEDS YOU", "pending", "attention-pending");
+    add(counts.RUNNING, "RUNNING", "running", "phase-running");
+    add(counts.READY, "READY", "play", "phase-ready");
+    add(counts.DRAFT, "DRAFT", "sliders", "phase-draft");
+    add(counts.DONE, "DONE", "check", "phase-done");
+    add(overview.needsYou.length, "NEEDS YOU", "pending", "substate-needs-you");
     elements.graphSummary.replaceChildren(...items);
   }
 
@@ -697,7 +656,7 @@
         selected: isSelected,
         dimmed: Boolean(related && !related.nodes.has(ticket.ticketId)),
       });
-      const { operational, attention, nextAction } = presentation;
+      const { phase } = presentation;
       const group = svg("g", {
         class: classes(presentation.className, ticket.archived ? "archived" : ""),
         transform: `translate(${position.x} ${position.y})`,
@@ -716,13 +675,6 @@
           height: NODE.height,
           rx: 9,
         }),
-        svg("line", {
-          class: "ticket-accent",
-          x1: 9,
-          y1: 1.5,
-          x2: NODE.width - 9,
-          y2: 1.5,
-        }),
         svg("circle", {
           class: "ticket-aperture",
           cx: layoutDirection === "ltr" ? NODE.width : NODE.width / 2,
@@ -737,46 +689,37 @@
           y2: NODE.height - 1.5,
         }),
       );
-      if (attention) {
-        const attentionText = {
-          UPCOMING: "UPCOMING",
-          PENDING: "NEEDS YOU",
-          RECORDED: "RECORDED",
-          COMPLETE: "COMPLETE",
-        }[attention.label];
-        const attentionBadge = svg("g", {
-          class: "ticket-attention-badge",
+      if (phase.substate) {
+        const substateText = phase.substate.replaceAll("_", " ");
+        const substateBadge = svg("g", {
+          class: "ticket-substate-badge",
           transform: `translate(${NODE.width - 8} -12)`,
         });
-        attentionBadge.append(
+        substateBadge.append(
           svg("rect", { x: -88, y: 0, width: 88, height: 24, rx: 12 }),
-          svgIcon(ATTENTION_ICON_IDS[attention.label], {
-            class: "ticket-attention-icon",
+          svgIcon(SUBSTATE_ICON_IDS[phase.substate], {
+            class: "ticket-substate-icon",
             x: -81,
             y: 4,
             width: 16,
             height: 16,
           }),
         );
-        const attentionLabel = svg("text", {
-          class: "ticket-attention-label",
+        const substateLabel = svg("text", {
+          class: "ticket-substate-label",
           x: -61,
           y: 15,
         });
-        attentionLabel.textContent = attentionText;
-        attentionBadge.append(attentionLabel);
-        group.append(attentionBadge);
+        substateLabel.textContent = substateText;
+        substateBadge.append(substateLabel);
+        group.append(substateBadge);
       }
       const id = svg("text", { class: "ticket-id", x: 14, y: 22 });
       id.textContent = shortTicketId(ticket.ticketId);
       group.append(id);
       // The state is always a textual label; color is a secondary accent.
-      if (operational) {
-        const visibleState = ticket.archived
-          ? "ARCHIVED"
-          : nextAction?.action === "CLOSE_OUT"
-            ? "REVIEW"
-            : operational.label;
+      {
+        const visibleState = ticket.archived ? "ARCHIVED" : phase.label;
         group.append(svgIcon(STATE_ICON_IDS[visibleState], {
           class: "ticket-state-icon",
           x: NODE.width - 80,
@@ -792,6 +735,14 @@
         });
         status.textContent = visibleState;
         group.append(status);
+      }
+      if (phase.live) {
+        group.append(svg("circle", {
+          class: "ticket-live-indicator",
+          cx: NODE.width - 92,
+          cy: NODE.height - 17,
+          r: 3,
+        }));
       }
       // A 232px card has 204px of copy width after its 14px insets. The
       // selected 12px system monospace face fits 28 display units there;
@@ -895,15 +846,11 @@
     for (const ticket of state.graph.tickets) {
       const position = positions.get(ticket.ticketId);
       if (!position) continue;
-      const operational = ticketOperationalState(ticket);
-      const attention = ticketAttentionState(ticket);
-      const nextAction = ticketNextAction(ticket);
+      const presentation = ticketNodePresentation(ticket);
       elements.minimap.append(svg("rect", {
         class: classes(
           "minimap-node",
-          operational ? `state-${operational.key}` : "",
-          attention ? `attention-${attention.key}` : "",
-          nextAction ? `next-${nextAction.key}` : "",
+          ...presentation.className.split(" ").filter((name) => name !== "ticket-node"),
         ),
         x: position.x,
         y: position.y,
@@ -1032,6 +979,7 @@
     elements.inspectorEyebrow.textContent =
       `Ticket · ${ticket.ticketId}`;
     elements.inspectorTitle.textContent = ticket.outcome;
+    elements.inspectorTitle.dataset.fullText = ticket.outcome;
     elements.inspectorOutcome.hidden = false;
     elements.inspectorOutcome.textContent = "Reading current Ticket facts…";
     elements.inspectorContent.replaceChildren(
@@ -1085,6 +1033,7 @@
     elements.inspectorEyebrow.textContent =
       `Ticket · ${ticket.ticketId}`;
     elements.inspectorTitle.textContent = ticket.outcome;
+    elements.inspectorTitle.dataset.fullText = ticket.outcome;
     const operational = ticketOperationalState(ticket);
     const attention = ticketAttentionState(ticket);
     const nextAction = ticketNextAction(ticket);
@@ -1551,24 +1500,23 @@
       return ticketOperationalState(prerequisite)?.label === "DONE";
     }).length;
 
-    const signal = document.createElement("div");
-    signal.className = classes(
-      "ticket-signal",
-      operational ? `state-${operational.key}` : "",
-      nextAction ? `next-${nextAction.key}` : "",
-    );
+    const phase = ticketPhasePresentation(ticket);
+    const signal = document.createElement("section");
+    signal.className = classes("recommended-action", `phase-${phase.key}`);
     const heading = document.createElement("div");
-    heading.className = "ticket-signal-heading";
-    const marker = document.createElement("span");
-    marker.className = "ticket-signal-mark";
-    marker.setAttribute("aria-hidden", "true");
+    heading.className = "recommended-action-heading";
+    const copy = document.createElement("span");
+    const eyebrow = document.createElement("span");
+    eyebrow.className = "eyebrow";
+    eyebrow.textContent = "Recommended action";
     const label = document.createElement("strong");
-    label.textContent = nextAction?.action === "CLOSE_OUT"
-      ? "REVIEW"
-      : operational?.label || "TICKET";
+    label.textContent = recommendedActionTitle(nextAction?.action);
+    const detail = document.createElement("span");
+    detail.textContent = nextAction?.detail || "Inspect the current Ticket context.";
+    copy.append(eyebrow, label, detail);
     const closeout = nextAction?.action === "CLOSE_OUT";
     const handoff = actionButton({
-      label: closeout ? "Close out with Agent" : "Copy for Agent",
+      label: "Copy prompt",
       className: classes("agent-handoff", closeout ? "closeout-handoff" : ""),
       onClick: () => void copyPayload(
         agentHandoffPayload(ticket, contextPackage, operational),
@@ -1577,7 +1525,13 @@
           : `Ticket ${ticket.ticketId} copied for Agent`,
       ),
     });
-    heading.append(marker, label, handoff);
+    heading.append(copy, handoff);
+
+    const phaseMeta = document.createElement("div");
+    phaseMeta.className = "recommended-action-phase";
+    phaseMeta.textContent = phase.substate
+      ? `${phase.label} · ${phase.substate.replaceAll("_", " ")}`
+      : phase.label;
 
     const metrics = document.createElement("div");
     metrics.className = "ticket-signal-metrics";
@@ -1591,7 +1545,7 @@
       signalMetric(nextAction?.action || "—", "next action"),
       signalMetric("Reading", "evidence", "proof-metric"),
     );
-    signal.append(heading, metrics);
+    signal.append(heading, phaseMeta, metrics);
     panel.append(signal);
 
     const review = closeoutReviewBrief(contextPackage, nextAction);
@@ -1662,14 +1616,23 @@
       kind: "vibehub_ticket_handoff",
       ticketId: ticket.ticketId,
     };
+    if (contextPackage.agentPayload) return canonical;
     return {
       ...canonical,
-      instruction: canonical.handoff?.instruction ?? agentHandoffInstruction(
-        ticket.ticketId,
-        nextAction,
-        stateLabel,
-      ),
+      instruction: agentHandoffInstruction(ticket.ticketId, nextAction, stateLabel),
     };
+  }
+
+  function recommendedActionTitle(action) {
+    return {
+      EXECUTE: "Start work",
+      REFINE: "Define task",
+      REPLAN: "Revise task",
+      WAIT: "Review blockers",
+      NEEDS_HUMAN: "Respond",
+      CLOSE_OUT: "Verify & close",
+      DONE: "Review outcome",
+    }[action] || "Inspect task";
   }
 
   function closeoutReviewBrief(contextPackage, nextAction) {
@@ -1762,17 +1725,17 @@
 
   function causalPriority(ticketId) {
     const ticket = state.graph.tickets.find((item) => item.ticketId === ticketId);
-    return operationalPriority(ticketOperationalState(ticket)?.label);
+    return operationalPriority(ticketPhasePresentation(ticket).label);
   }
 
   function causalTicketButton(ticketId) {
     const ticket = state.graph.tickets.find((item) => item.ticketId === ticketId);
-    const operational = ticketOperationalState(ticket);
+    const phase = ticketPhasePresentation(ticket);
     const button = document.createElement("button");
     button.type = "button";
     button.className = classes(
       "causal-ticket",
-      operational ? `state-${operational.key}` : "",
+      `phase-${phase.key}`,
     );
     button.dataset.fullText = ticketId;
     button.setAttribute("aria-label", ticketId);
@@ -2458,15 +2421,16 @@
 
   function executionStateView(ticket) {
     const operational = ticketOperationalState(ticket);
-    if (!operational) return null;
+    const phase = ticketPhasePresentation(ticket);
+    if (!operational && !phase) return null;
     const wrapper = document.createElement("div");
     wrapper.className = classes(
       "execution-state",
-      `state-${operational.key}`,
+      `phase-${phase.key}`,
     );
     wrapper.setAttribute(
       "aria-label",
-      `${operational.label}. ${operational.detail}`,
+      `${phase.label}${phase.substate ? `. ${phase.substate.replaceAll("_", " ")}` : ""}. ${operational?.detail || ""}`,
     );
 
     const marker = document.createElement("span");
@@ -2475,16 +2439,18 @@
     const copy = document.createElement("div");
     copy.className = "execution-state-copy";
     const label = document.createElement("strong");
-    label.textContent = operational.label;
+    label.textContent = phase.substate
+      ? `${phase.label} · ${phase.substate.replaceAll("_", " ")}`
+      : phase.label;
     copy.append(label);
-    if (operational.detail) {
+    if (operational?.detail) {
       const detail = document.createElement("span");
       detail.textContent = operational.detail;
       copy.append(detail);
     }
     wrapper.append(marker, copy);
 
-    const references = executionStateReferences(operational.references);
+    const references = executionStateReferences(operational?.references || []);
     if (references) wrapper.append(references);
     return wrapper;
   }

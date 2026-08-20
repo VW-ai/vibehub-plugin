@@ -24,6 +24,9 @@
     "DONE",
     "REPLAN",
   ]);
+  const PRIMARY_PHASES = new Set(["DRAFT", "READY", "RUNNING", "DONE"]);
+  const LIVE_OPERATIONS = new Set(["execute", "closeout"]);
+  const LIVE_STATES = new Set(["running", "waiting_tool", "waiting_human"]);
 
   function normalizeLayoutDirection(value) {
     return LAYOUT_DIRECTIONS.has(value) ? value : "ltr";
@@ -100,46 +103,101 @@
     };
   }
 
-  function operationalCounts(tickets) {
-    const counts = {
-      READY: 0,
-      REFINE: 0,
-      BLOCKED: 0,
-      DONE: 0,
-      DEVIATED: 0,
+  function ticketRuntimeState(ticket, { now = Date.now() } = {}) {
+    const slot = ticket?.capabilities?.runtime;
+    if (slot?.availability !== "available") return null;
+    const summary = slot.summary || {};
+    const operation = String(summary.operation || "").toLowerCase();
+    const state = String(summary.state || "").toLowerCase();
+    const observedAt = Date.parse(summary.observedAt || "");
+    const expiresAt = Date.parse(summary.expiresAt || "");
+    if (!summary.trustedSource || summary.ticketId !== ticket.ticketId) return null;
+    if (!summary.runId || !LIVE_OPERATIONS.has(operation) || !LIVE_STATES.has(state)) return null;
+    if (!Number.isFinite(observedAt) || !Number.isFinite(expiresAt)) return null;
+    if (observedAt > now || expiresAt <= now) return null;
+    return {
+      trustedSource: summary.trustedSource,
+      ticketId: summary.ticketId,
+      runId: summary.runId,
+      operation,
+      state,
+      observedAt: summary.observedAt,
+      expiresAt: summary.expiresAt,
+      live: true,
     };
+  }
+
+  function ticketPhasePresentation(ticket, options = {}) {
+    const operational = ticketOperationalState(ticket);
+    const attention = ticketAttentionState(ticket);
+    const nextAction = ticketNextAction(ticket);
+    const action = nextAction?.action ?? null;
+    const runtime = ticketRuntimeState(ticket, options);
+    const runtimeEligible = runtime
+      && !new Set(["DONE", "REPLAN", "WAIT", "REFINE"]).has(action)
+      ? runtime
+      : null;
+    let label = "DRAFT";
+    if (action === "DONE") label = "DONE";
+    else if (["REPLAN", "WAIT", "REFINE"].includes(action)) label = "DRAFT";
+    else if (action === "CLOSE_OUT" || runtimeEligible) label = "RUNNING";
+    else if (["EXECUTE", "NEEDS_HUMAN"].includes(action)) label = "READY";
+    else if (operational?.label === "DONE") label = "DONE";
+    else if (operational?.label === "READY") label = "READY";
+
+    let substate = null;
+    if (action === "REPLAN") substate = "DEVIATED";
+    else if (action === "WAIT") substate = "BLOCKED";
+    else if (runtimeEligible?.state === "waiting_human") substate = "NEEDS_YOU";
+    else if (action === "NEEDS_HUMAN") substate = "NEEDS_YOU";
+    else if (action === "CLOSE_OUT") substate = "VERIFYING";
+    else if (runtimeEligible?.state === "waiting_tool") substate = "WAITING";
+
+    const stage = action === "CLOSE_OUT"
+      ? "verifying"
+      : runtimeEligible?.state?.replaceAll("_", "-") ?? null;
+    const live = label === "RUNNING" && Boolean(runtimeEligible?.live);
+    return {
+      label: PRIMARY_PHASES.has(label) ? label : "DRAFT",
+      key: label.toLowerCase(),
+      substate,
+      substateKey: substate?.toLowerCase().replaceAll("_", "-") ?? null,
+      stage,
+      live,
+      runtime: runtimeEligible || null,
+      operational,
+      attention,
+      nextAction,
+    };
+  }
+
+  function operationalCounts(tickets, options = {}) {
+    const counts = { DRAFT: 0, READY: 0, RUNNING: 0, DONE: 0 };
     for (const ticket of tickets) {
-      const label = ticketOperationalState(ticket)?.label;
-      if (label && Object.hasOwn(counts, label)) counts[label] += 1;
+      const label = ticketPhasePresentation(ticket, options).label;
+      counts[label] += 1;
     }
     return counts;
   }
 
-  function workbenchOverview(tickets, source = {}) {
-    const ready = [];
-    const closeout = [];
-    const deviated = [];
-    const humanPending = [];
-    const humanUpcoming = [];
-    let refineCount = 0;
+  function workbenchOverview(tickets, source = {}, options = {}) {
+    const phases = { DRAFT: [], READY: [], RUNNING: [], DONE: [] };
+    const substates = {
+      DEVIATED: [], BLOCKED: [], NEEDS_YOU: [], VERIFYING: [], WAITING: [],
+    };
     for (const ticket of tickets) {
-      const operational = ticketOperationalState(ticket);
-      const attention = ticketAttentionState(ticket);
-      const nextAction = ticketNextAction(ticket);
-      if (nextAction?.action === "EXECUTE") ready.push(ticket);
-      if (nextAction?.action === "CLOSE_OUT") closeout.push(ticket);
-      if (operational?.label === "REFINE") refineCount += 1;
-      if (operational?.label === "DEVIATED") deviated.push(ticket);
-      if (attention?.label === "PENDING") humanPending.push(ticket);
-      if (attention?.label === "UPCOMING") humanUpcoming.push(ticket);
+      const presentation = ticketPhasePresentation(ticket, options);
+      phases[presentation.label].push(ticket);
+      if (presentation.substate) substates[presentation.substate].push(ticket);
     }
     return {
-      ready,
-      closeout,
-      deviated,
-      humanPending,
-      humanUpcoming,
-      refineCount,
+      phases,
+      substates,
+      ready: phases.READY,
+      running: phases.RUNNING,
+      needsYou: substates.NEEDS_YOU,
+      deviated: substates.DEVIATED,
+      blocked: substates.BLOCKED,
       sourceDirty: Boolean(source.semanticDirty),
       sourceDirtyCount: Array.isArray(source.dirtyPaths)
         ? source.dirtyPaths.length
@@ -170,60 +228,28 @@
   }
 
   function graphSummary(counts, overview = null) {
-    const readyCount = overview?.ready?.length ?? counts.READY;
-    const closeoutCount = overview?.closeout?.length ?? 0;
     const parts = [];
-    if (readyCount) parts.push(`${readyCount} ready`);
-    if (closeoutCount) parts.push(`${closeoutCount} close out`);
-    if (counts.REFINE) parts.push(`${counts.REFINE} refine`);
-    if (counts.BLOCKED) parts.push(`${counts.BLOCKED} blocked`);
-    if (counts.DEVIATED) {
-      parts.push(
-        `${counts.DEVIATED} deviation${counts.DEVIATED === 1 ? "" : "s"}`,
-      );
+    for (const label of ["RUNNING", "READY", "DRAFT", "DONE"]) {
+      if (counts[label]) parts.push(`${counts[label]} ${label.toLowerCase()}`);
     }
-    if (!parts.length && counts.DONE) parts.push(`${counts.DONE} proven`);
-    return parts.join(" · ") || "No executable Tickets";
+    const needsYou = overview?.needsYou?.length ?? 0;
+    if (needsYou) parts.push(`${needsYou} need you`);
+    return parts.join(" · ") || "No Tickets";
   }
 
   function graphNarrative(counts, overview = null) {
-    const readyCount = overview?.ready?.length ?? counts.READY;
-    const closeoutCount = overview?.closeout?.length ?? 0;
-    const closeoutSentence = closeoutCount
-      ? ` ${closeoutCount} await independent closeout.`
-      : "";
-    if (counts.DEVIATED) {
-      return `${counts.DEVIATED} execution deviation${counts.DEVIATED === 1 ? "" : "s"} need attention. `
-        + `${readyCount} Ticket${readyCount === 1 ? " is" : "s are"} executable now; `
-        + `${counts.REFINE} need refinement.${closeoutSentence}`;
-    }
-    if (readyCount) {
-      return `${readyCount} Ticket${readyCount === 1 ? " is" : "s are"} executable now. `
-        + `${counts.REFINE} need refinement, ${counts.BLOCKED} remain blocked, and `
-        + `${counts.DONE} are proven complete.${closeoutSentence}`;
-    }
-    if (closeoutCount) {
-      return `No Ticket is executable; ${closeoutCount} await independent closeout. `
-        + `${counts.REFINE} need refinement and ${counts.BLOCKED} remain blocked.`;
-    }
-    if (counts.REFINE) {
-      return `No Ticket is executable; ${counts.REFINE} need refinement before execution. `
-        + `${counts.BLOCKED} remain blocked and ${counts.DONE} are proven complete.`;
-    }
-    if (counts.BLOCKED) {
-      return `No Ticket is executable yet; ${counts.BLOCKED} remain blocked by direct prerequisites.`;
-    }
-    return `${counts.DONE} Ticket${counts.DONE === 1 ? " is" : "s are"} proven complete. The graph is quiet.`;
+    const needsYou = overview?.needsYou?.length ?? 0;
+    const sentences = [
+      `${counts.RUNNING} running`,
+      `${counts.READY} ready`,
+      `${counts.DRAFT} draft`,
+      `${counts.DONE} done`,
+    ];
+    return `${sentences.join(", ")}.${needsYou ? ` ${needsYou} need human attention.` : ""}`;
   }
 
   function causalPriority(label) {
-    return {
-      DEVIATED: 0,
-      BLOCKED: 1,
-      READY: 2,
-      REFINE: 3,
-      DONE: 4,
-    }[label] ?? 5;
+    return { RUNNING: 0, READY: 1, DRAFT: 2, DONE: 3 }[label] ?? 4;
   }
 
   function agentHandoffInstruction(ticketId, nextAction, stateLabel = null) {
@@ -268,15 +294,15 @@
   }
 
   function ticketNodePresentation(ticket, { selected = false, dimmed = false } = {}) {
-    const operational = ticketOperationalState(ticket);
-    const attention = ticketAttentionState(ticket);
-    const nextAction = ticketNextAction(ticket);
+    const phase = ticketPhasePresentation(ticket);
+    const { operational, attention, nextAction } = phase;
     const classNames = [
       "ticket-node",
       selected ? "selected" : "",
       dimmed ? "dimmed" : "",
-      operational ? `state-${operational.key}` : "",
-      attention ? `attention-${attention.key}` : "",
+      `phase-${phase.key}`,
+      phase.substateKey ? `substate-${phase.substateKey}` : "",
+      phase.live ? "is-live" : "",
       nextAction ? `next-${nextAction.key}` : "",
     ].filter(Boolean);
     const relationCounts = ticket.relationCounts || {
@@ -286,19 +312,17 @@
     const ariaLabel = `${ticket.ticketId}. ${ticket.outcome}. `
       + `${relationCounts.prerequisites} prerequisites, `
       + `${relationCounts.dependents} unlocks.`
-      + (operational
-        ? ` ${operational.label}. ${operational.detail || ""}`
-        : "")
-      + (attention
-        ? ` Human attention ${attention.label}. ${attention.detail || ""}`
-        : "")
+      + ` Phase ${phase.label}.`
+      + (phase.substate ? ` Substate ${phase.substate.replaceAll("_", " ")}.` : "")
+      + (phase.live ? " Trusted live execution." : " No live execution claim.")
       + (nextAction
         ? ` Next action ${nextAction.action}. ${nextAction.detail || ""}`
         : "");
     return {
       className: classNames.join(" "),
       ariaLabel,
-      stateLabel: operational?.label || null,
+      stateLabel: phase.label,
+      phase,
       operational,
       attention,
       nextAction,
@@ -316,9 +340,11 @@
     localFocusHref,
     normalizeLayoutDirection,
     ticketAttentionState,
+    ticketPhasePresentation,
     ticketNodePresentation,
     ticketNextAction,
     ticketOperationalState,
+    ticketRuntimeState,
     workbenchOverview,
   });
 })();

@@ -549,6 +549,12 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(state.graph.source.agentPayload.kind, "vibehub_git_source");
   assert.equal(state.graph.filters.scope, "current");
   assert.deepEqual(state.graph.stubs, []);
+  for (const ticket of state.graph.tickets) {
+    assert.deepEqual(ticket.capabilities.runtime, {
+      availability: "unavailable",
+      reason: "No trusted runtime source is connected to this read-only host.",
+    });
+  }
 
   const invalidFilter = await fetch(
     `${origin}/api/state?scope=past`,
@@ -648,6 +654,9 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(closeoutPayload.handoff.skill, "vibehub-ticket-closeout");
   assert.equal(closeoutPayload.handoff.requiresIndependentAgent, true);
   assert.equal(closeoutPayload.handoff.readOnly, true);
+  assert.equal("presentation" in closeoutPayload, false);
+  assert.equal("phase" in closeoutPayload, false);
+  assert.equal("substate" in closeoutPayload, false);
   assert.match(closeoutPayload.handoff.instruction, /independently adjudicate/iu);
   assert.match(closeoutPayload.handoff.instruction, /do not execute it again/iu);
   assert.deepEqual(closeoutPayload.reviewInputs.evidenceRefs, [
@@ -706,15 +715,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(html, /id="overviewPanel"/u);
   assert.match(html, /aria-controls="overviewPanel"/u);
   assert.match(html, /id="closeOverview"/u);
-  assert.match(html, /aria-label="Ticket state legend"/u);
-  assert.match(html, /aria-label="Human attention legend"/u);
+  assert.match(html, /aria-label="Ticket phase legend"/u);
+  assert.doesNotMatch(html, /Human attention legend/u);
   assert.doesNotMatch(html, /id="frontierList"|id="attentionList"|id="deviationList"/u);
   assert.match(html, /id="summaryGrid"/u);
-  assert.match(html, /id="summaryRefine"/u);
-  assert.match(html, /id="summaryCloseout"/u);
-  assert.match(html, /id="summaryHuman"/u);
-  assert.match(html, /id="closeoutQueue"/u);
-  assert.match(html, /Independent closeout/u);
+  for (const id of ["summaryDraft", "summaryReady", "summaryRunning", "summaryDone"]) {
+    assert.match(html, new RegExp(`id="${id}"`, "u"));
+  }
+  assert.doesNotMatch(html, /id="closeoutQueue"|Independent closeout/u);
   assert.doesNotMatch(html, /id="overviewSource"/u);
   assert.match(html, /id="sourcePath"/u);
   assert.match(html, /id="sourceBranch"/u);
@@ -740,10 +748,13 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /ARCHIVED delivery history/u);
   assert.match(script, /preserveLayout/u);
   assert.match(script, /layoutDirection === "ltr"/u);
-  // No trusted Active-Run source exists, so the shell makes no presence claim
-  // and never promotes Git-native state into an implementing subsystem.
+  // The production host makes runtime unavailability explicit. Only an
+  // injected trusted, scoped, unexpired capability can promote presentation.
   assert.doesNotMatch(script, /ACTIVE_RUN_PRESENCE|renderImplementingNow/u);
   assert.doesNotMatch(script, /"IMPLEMENTING"/u);
+  assert.match(model, /function ticketRuntimeState/u);
+  assert.match(model, /summary\.trustedSource/u);
+  assert.match(model, /expiresAt <= now/u);
   // No visual preference is ever persisted by the product surface.
   assert.doesNotMatch(script, /localStorage|sessionStorage/u);
   assert.doesNotMatch(script, /renderProjectionTime|startWatchPolling|state\.watch/u);
@@ -768,13 +779,14 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(model, /function normalizeLayoutDirection/u);
   assert.match(model, /function layoutDirectionHref/u);
   assert.match(model, /function workbenchOverview/u);
-  assert.match(model, /nextAction\?\.action === "CLOSE_OUT"/u);
+  assert.match(model, /action === "CLOSE_OUT" \|\| runtimeEligible/u);
   assert.match(script, /\["log", "evidence"\]/u);
   assert.match(script, /initialFocusPending/u);
   assert.match(script, /initialTabId = "execution"/u);
   assert.match(script, /function ticketExecutionPanel/u);
-  assert.match(script, /function renderCloseoutQueue/u);
-  assert.match(script, /Close out with Agent/u);
+  assert.doesNotMatch(script, /function renderCloseoutQueue/u);
+  assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
+  assert.match(script, /label: "Copy prompt"/u);
   assert.match(script, /function closeoutReviewBrief/u);
   assert.match(script, /Evidence is proof, not judgment/u);
   assert.match(model, /function ticketAttentionState/u);
@@ -839,11 +851,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(script, /inspectorOutcome\.textContent = operational\?\.detail/u);
   assert.match(script, /history\.replaceState\(null, "", nextHref\)/u);
   assert.doesNotMatch(script, /\/api\/(?:review|decision)/u);
-  assert.match(styles, /\.ticket-node\.state-deviated/u);
-  assert.match(styles, /\.ticket-node\.state-refine/u);
-  assert.match(styles, /\.minimap-node\.state-refine/u);
-  assert.match(styles, /\.execution-state\.state-refine/u);
-  assert.match(styles, /\.ticket-node\.attention-pending \.ticket-attention/u);
+  assert.match(styles, /\.ticket-node\.phase-draft/u);
+  assert.match(styles, /\.ticket-node\.phase-running/u);
+  assert.match(styles, /\.minimap-node\.phase-draft/u);
+  assert.match(styles, /\.execution-state\.phase-draft/u);
+  assert.match(styles, /\.ticket-node\.substate-needs-you \.ticket-substate-badge/u);
   assert.match(styles, /\.human-attention-brief\.attention-pending/u);
   assert.match(styles, /\.acceptance-item\.authority-human/u);
   assert.match(styles, /\.ticket-node:focus-visible,[\s\S]*?outline: none;/u);
@@ -861,9 +873,10 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.doesNotMatch(styles, /\.overview-source/u);
   assert.doesNotMatch(styles, /\.overview-item/u);
   assert.match(styles, /\.summary-grid/u);
-  assert.match(styles, /\.closeout-overview/u);
-  assert.match(styles, /\.closeout-ticket/u);
-  assert.match(styles, /\.ticket-node\.next-close-out/u);
+  assert.doesNotMatch(styles, /\.closeout-overview|\.closeout-ticket/u);
+  assert.match(styles, /\.ticket-node\.phase-running/u);
+  assert.match(styles, /\.ticket-node\.substate-verifying/u);
+  assert.match(styles, /\.recommended-action/u);
   assert.match(styles, /\.closeout-review-brief/u);
   assert.match(styles, /min-height: 44px/u);
   assert.doesNotMatch(styles, /style-lab|style-option|style-swatch/u);

@@ -277,10 +277,13 @@ try {
     || !/function setLayoutDirection/u.test(installedScript)) {
     throw new Error("installed local UI does not preserve a focused authorized URL");
   }
-  if (!/id="closeoutQueue"/u.test(installedHtml)
-    || !/function renderCloseoutQueue/u.test(installedScript)
-    || !/Close out with Agent/u.test(installedScript)
-    || !/nextAction\?\.action === "CLOSE_OUT"/u.test(installedModel)
+  if (/id="closeoutQueue"/u.test(installedHtml)
+    || /function renderCloseoutQueue/u.test(installedScript)
+    || !/eyebrow\.textContent = "Recommended action"/u.test(installedScript)
+    || !/label: "Copy prompt"/u.test(installedScript)
+    || !/if \(contextPackage\.agentPayload\) return canonical;/u.test(installedScript)
+    || !/action === "CLOSE_OUT" \|\| runtimeEligible/u.test(installedModel)
+    || !/No trusted runtime source is connected/u.test(installedHost)
     || !/requiresIndependentAgent: true/u.test(installedHost)
     || !/reviewInputs/u.test(installedHost)
     || !/evidenceRefs/u.test(installedHost)) {

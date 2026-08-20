@@ -405,6 +405,10 @@ function projectGraph(repository, queryOptions = {}) {
           availability: "available",
           summary: nextAction,
         },
+        runtime: {
+          availability: "unavailable",
+          reason: "No trusted runtime source is connected to this read-only host.",
+        },
       },
     };
   });

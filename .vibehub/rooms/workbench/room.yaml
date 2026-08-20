@@ -14,19 +14,19 @@
         "path": "skills/vibehub-ticket-review/assets/app-layout.js"
       },
       {
-        "blob": "ef647d753b3fe2ec2f40a91924ccbb4bbd3ce520",
+        "blob": "5694a40fb3b75112ea99bbd521ea61fdca7495aa",
         "path": "skills/vibehub-ticket-review/assets/app-model.js"
       },
       {
-        "blob": "3be229d80448a96acd662d8a33b76416ba3deef8",
+        "blob": "11dcff5ee8a337be55dcbbf6550f0ffa052de10b",
         "path": "skills/vibehub-ticket-review/assets/app.css"
       },
       {
-        "blob": "88ad220f72422602bbe9485e50a259eb2ffb5efb",
+        "blob": "269bd3adb329af1c3398e0d891beb886ffd1d3e2",
         "path": "skills/vibehub-ticket-review/assets/app.js"
       },
       {
-        "blob": "b8ef4a072604f4e0d730000a3b756b07002bc364",
+        "blob": "5effca213341ab14477c55ffd49755ae0fe10cb7",
         "path": "skills/vibehub-ticket-review/assets/index.html"
       },
       {
@@ -38,8 +38,8 @@
         "path": "skills/vibehub-ticket-review/references/ticket-lifecycle.json"
       }
     ],
-    "checked_at": "2026-08-20T21:36:04.299Z",
-    "last_aligned_commit": "a14dc91350d10d56d15a9fbd41d5d1d9f963f6f1"
+    "checked_at": "2026-08-20T22:22:37.074Z",
+    "last_aligned_commit": "036a47afb278f815db2320706fe51394874bc94f"
   },
   "anchors": [
     "skills/vibehub-ticket-review/"
