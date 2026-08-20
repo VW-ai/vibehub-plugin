@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "public-cards-match-workbench-grammar",
+    "public-links-match-workbench-grammar",
+    "public-shell-is-truthful-and-clear"
+  ],
+  "evidence_id": "public-graph-real-workbench-visual-implementation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:29:58Z",
+  "refs": [
+    "site/app/page.tsx",
+    "site/app/globals.css",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "skills/vibehub-ticket-review/assets/app.css",
+    "preview:http://localhost:3001"
+  ],
+  "schema_version": 1,
+  "summary": "The public Ticket graph now directly follows the checked-in Workbench visual contract: compact 232:104 cards, state-colored top accents, right circular apertures, lower-left in/out metadata, lower-right state, neutral selection, and completed-proof marks. Dependency lines are routed SVG paths with arrowheads and circular control handles, while causal-cone dimming remains intact. The fake VH initials tile, Vibe task app, demo/dark-mode, and GUIDED FIXTURE labels were removed; the header now uses the canonical VibeHub mark and names the Ticket Workbench plus the dark-mode feature, while the Inspector uses the truthful Ticket label.",
+  "ticket_id": "ticket-align-public-graph-with-real-workbench"
+}

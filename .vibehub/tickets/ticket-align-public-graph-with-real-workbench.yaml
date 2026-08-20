@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "public-cards-match-workbench-grammar",
+      "criterion": "Public graph cards use the real Workbench card proportions and hierarchy: compact horizontal shape, top state accent, right circular aperture, Ticket ID and outcome, lower-left in/out relation metadata, lower-right state, and neutral selected styling."
+    },
+    {
+      "acceptance_id": "public-links-match-workbench-grammar",
+      "criterion": "Public graph dependencies render as thin routed SVG paths with visible circular control or endpoint knots and causal-cone focus behavior; the former rotated line-and-arrow implementation is absent."
+    },
+    {
+      "acceptance_id": "public-shell-is-truthful-and-clear",
+      "criterion": "The Workbench header and inspector contain no VH initials tile, Vibe task app, demo/dark-mode, or GUIDED FIXTURE labels; the header uses the real VibeHub mark and plainly identifies the Ticket Workbench and example feature."
+    },
+    {
+      "acceptance_id": "graph-refinement-is-regression-checked",
+      "criterion": "Ticket selection, Rooms, inspector lenses, responsive layout, lint, production build, rendered contracts, release preflight, and browser visual comparison against the real local Workbench pass."
+    }
+  ],
+  "constraints": [
+    "Treat skills/vibehub-ticket-review/assets as the visual source of truth; do not invent another Ticket design language.",
+    "Preserve the existing website narrative, guided Ticket interaction, and actual plugin Workbench implementation.",
+    "Use the checked-in VibeHub mark instead of a textual initials substitute.",
+    "Do not publish a new production Sites version without an explicit publish or deploy instruction."
+  ],
+  "context": "The owner rejected the public-site Ticket graph because its cards are too tall, its connector knots and lines do not match the actual local Workbench, and its fake VH / Vibe task app / demo-dark-mode / GUIDED FIXTURE chrome makes the product less clear. The real read-only Ticket Workbench is the visual source of truth: compact 232:104 cards, a quiet top state accent, right-edge circular aperture, relationship metadata at lower left, state at lower right, neutral selected outline, and thin routed SVG edges with control knots.",
+  "context_refs": [
+    {
+      "purpose": "Canonical Workbench Ticket and edge rendering behavior.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Canonical Workbench Ticket, state, aperture, and edge visual grammar.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    },
+    {
+      "purpose": "Public interactive graph and inspector implementation to align.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Public graph visual implementation to refine.",
+      "ref": "site/app/globals.css"
+    },
+    {
+      "purpose": "Required preflight and explicit production publication boundary.",
+      "ref": "site/release/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The public-site graph presents the actual VibeHub Workbench visual language instead of a separate oversized demo treatment.",
+  "provenance_refs": [
+    "conversation:2026-08-20-align-public-ticket-graph-with-real-workbench"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-align-public-graph-with-real-workbench"
+}

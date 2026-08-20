@@ -331,9 +331,30 @@ const ROOM_SOURCE_FILES: SourceFile[] = [
 ];
 
 const WORKBENCH_EDGES = [
-  { id: "VH-201:VH-204", from: "VH-201", to: "VH-204", x: 27, y: 26, width: 18, angle: 55 },
-  { id: "VH-202:VH-204", from: "VH-202", to: "VH-204", x: 27, y: 69, width: 18, angle: -54 },
-  { id: "VH-204:VH-205", from: "VH-204", to: "VH-205", x: 61, y: 49, width: 18, angle: -48 },
+  {
+    id: "VH-201:VH-204",
+    from: "VH-201",
+    to: "VH-204",
+    path: "M 340 135 H 354 Q 376 135 376 157 V 258 Q 376 280 398 280",
+    arrow: "M 388 275 L 398 280 L 388 285 Z",
+    handle: [376, 157],
+  },
+  {
+    id: "VH-202:VH-204",
+    from: "VH-202",
+    to: "VH-204",
+    path: "M 340 438 H 354 Q 376 438 376 416 V 302 Q 376 280 398 280",
+    arrow: "M 388 275 L 398 280 L 388 285 Z",
+    handle: [376, 416],
+  },
+  {
+    id: "VH-204:VH-205",
+    from: "VH-204",
+    to: "VH-205",
+    path: "M 680 280 H 694 Q 716 280 716 258 V 179 Q 716 157 738 157",
+    arrow: "M 728 152 L 738 157 L 728 162 Z",
+    handle: [716, 258],
+  },
 ];
 
 const SITE_AGENT_BRIEF = `Help me install and use VibeHub in this repository.
@@ -526,7 +547,6 @@ function WorkbenchTicketNode({
   const state = workbenchState(ticket, moment);
   const attention = workbenchAttention(ticket, moment);
   const unlocks = WORKBENCH_FIXTURE.tickets.filter((candidate) => candidate.requires.includes(ticket.id)).length;
-  const evidenceCount = ticket.id === "VH-204" && moment !== "done" ? 0 : ticket.evidence.length;
   const style = { "--ticket-x": `${ticket.x}%`, "--ticket-y": `${ticket.y}%` } as CSSProperties;
 
   return (
@@ -538,13 +558,15 @@ function WorkbenchTicketNode({
       aria-label={`${ticket.id}. ${ticket.title}. ${state}. ${ticket.requires.length} prerequisites, ${unlocks} unlocks.`}
       onClick={onSelect}
     >
+      <i className="workbench-ticket-accent" aria-hidden="true" />
       <i className="workbench-ticket-aperture" aria-hidden="true" />
       <span className="workbench-ticket-head">
         <span>{ticket.id}</span>
         {attention ? <b>{attention === "PENDING" ? "NEEDS YOU" : attention}</b> : null}
       </span>
       <strong>{ticket.title}</strong>
-      <span className="workbench-ticket-foot"><b>{state}</b><small>{evidenceCount} Evidence</small></span>
+      <span className="workbench-ticket-foot"><small>{ticket.requires.length} in · {unlocks} out</small><b><i aria-hidden="true" />{state}</b></span>
+      <i className="workbench-ticket-proof" aria-hidden="true" />
     </button>
   );
 }
@@ -576,7 +598,7 @@ function WorkbenchInspector({
   return (
     <aside className="public-inspector" aria-label={`Ticket inspector for ${ticket.id}`}>
       <header>
-        <div><span>{ticket.id} · GUIDED FIXTURE</span><h2>{ticket.title}</h2></div>
+        <div><span>TICKET · {ticket.id}</span><h2>{ticket.title}</h2></div>
         <button type="button" aria-label="Close Ticket inspector" onClick={onClose}>×</button>
       </header>
       <nav role="tablist" aria-label="Ticket inspector lenses">
@@ -744,8 +766,8 @@ function TicketView({
   return (
     <div className={`public-workbench phase-${moment}`} data-moment={moment}>
       <header className="public-workbench-bar">
-        <div><i aria-hidden="true">VH</i><span><b>Vibe task app</b><small>demo/dark-mode</small></span></div>
-        <div><button type="button" className={roomsOpen ? "is-active" : ""} aria-expanded={roomsOpen} onClick={() => setRoomsOpen((open) => !open)}>Rooms <b>{WORKBENCH_FIXTURE.rooms.length}</b></button><span><i aria-hidden="true" />GUIDED FIXTURE</span></div>
+        <div className="public-workbench-identity"><Image src="/vibehub-mark.svg" alt="" width={25} height={25} /><span><b>Ticket Workbench</b><small>Dark mode feature</small></span></div>
+        <div><button type="button" className={roomsOpen ? "is-active" : ""} aria-expanded={roomsOpen} onClick={() => setRoomsOpen((open) => !open)}>Rooms <b>{WORKBENCH_FIXTURE.rooms.length}</b></button></div>
       </header>
       <div className={`public-workbench-shell ${inspectorOpen ? "has-inspector" : ""}`}>
         <section
@@ -758,11 +780,19 @@ function TicketView({
         >
           <div className="public-canvas-summary" aria-label="Ticket state summary"><span className="state-done">{counts.DONE} done</span><span className="state-ready">{counts.READY} ready</span>{counts.BLOCKED ? <span className="state-blocked">{counts.BLOCKED} blocked</span> : null}</div>
           <div className="public-canvas-map" style={{ "--canvas-pan-x": `${pan.x}px`, "--canvas-pan-y": `${pan.y}px` } as CSSProperties}>
-            {WORKBENCH_EDGES.map((edge) => {
-              const edgeRelated = related.has(edge.from) && related.has(edge.to);
-              const edgeStyle = { "--edge-x": `${edge.x}%`, "--edge-y": `${edge.y}%`, "--edge-width": `${edge.width}%`, "--edge-angle": `${edge.angle}deg` } as CSSProperties;
-              return <span key={edge.id} className={`public-causal-edge ${edgeRelated ? "is-related" : "is-dimmed"}`} style={edgeStyle} aria-hidden="true" />;
-            })}
+            <svg className="public-causal-links" viewBox="0 0 1000 650" preserveAspectRatio="none" aria-hidden="true">
+              {WORKBENCH_EDGES.map((edge) => {
+                const edgeRelated = related.has(edge.from) && related.has(edge.to);
+                return (
+                  <g key={edge.id} className={`public-causal-link ${edgeRelated ? "is-related" : "is-dimmed"}`}>
+                    <path className="public-edge-visible" d={edge.path} />
+                    <path className="public-edge-arrow" d={edge.arrow} />
+                    <circle className="public-edge-control-halo" cx={edge.handle[0]} cy={edge.handle[1]} r="12" />
+                    <circle className="public-edge-control" cx={edge.handle[0]} cy={edge.handle[1]} r="4" />
+                  </g>
+                );
+              })}
+            </svg>
             {WORKBENCH_FIXTURE.tickets.map((ticket) => <WorkbenchTicketNode key={ticket.id} ticket={ticket} moment={moment} selected={ticket.id === selectedTicket.id} related={related.has(ticket.id)} onSelect={() => selectTicket(ticket.id)} />)}
           </div>
           <p className="public-canvas-hint">{pannable ? "Drag empty canvas to move the graph. Select a Ticket to inspect it." : "Select a Ticket to trace its direct causal cone and inspect its contract."}</p>

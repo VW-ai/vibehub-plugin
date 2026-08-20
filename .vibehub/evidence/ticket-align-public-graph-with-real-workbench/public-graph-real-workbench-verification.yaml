@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "graph-refinement-is-regression-checked"
+  ],
+  "evidence_id": "public-graph-real-workbench-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:29:58Z",
+  "refs": [
+    "site/tests/rendered-html.test.mjs",
+    "command:npm-run-lint",
+    "command:npm-run-test-8-of-8",
+    "command:node-site-release-preflight",
+    "command:browser-compare-public-graph-with-local-workbench",
+    "command:vh-project-validate",
+    "command:vh-ticket-validate"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh site lint passed. The production Vinext export and all 8 rendered contracts passed, including mechanical checks for the real mark, compact card ratio, right circular aperture, SVG paths and control knots, and removal of the fake demo labels and rotated edge implementation. The repository release preflight passed for the existing Sites project and vibehub.icu. Browser inspection compared the localhost public graph directly with the canonical local Ticket Workbench and confirmed the same compact card, port, state, selection, and routed-edge language. Canonical VibeHub project and Ticket validation passed with format 2 and 68 Tickets.",
+  "ticket_id": "ticket-align-public-graph-with-real-workbench"
+}

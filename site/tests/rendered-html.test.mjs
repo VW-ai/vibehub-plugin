@@ -82,6 +82,7 @@ test("one authentic Agent message sits beside the generated real Ticket View", a
 
 test("the product view remains the faithful typed Ticket Workbench", async () => {
   const page = await source("app/page.tsx");
+  const css = await source("app/globals.css");
 
   assert.match(page, /type WorkbenchLens = "execution" \| "contract" \| "log"/);
   assert.match(page, /const WORKBENCH_FIXTURE/);
@@ -100,6 +101,17 @@ test("the product view remains the faithful typed Ticket Workbench", async () =>
   assert.match(page, /BOUND CONTEXT/);
   assert.match(page, /Independent Outcome pending/);
   assert.match(page, /RETURNED CONTEXT/);
+  assert.match(page, /src="\/vibehub-mark\.svg"/);
+  assert.match(page, /<svg className="public-causal-links"/);
+  assert.match(page, /className="public-edge-control"/);
+  assert.match(page, /workbench-ticket-accent/);
+  assert.match(page, /\{ticket\.requires\.length\} in · \{unlocks\} out/);
+  assert.match(page, /TICKET · \{ticket\.id\}/);
+  assert.doesNotMatch(page, /Vibe task app|demo\/dark-mode|GUIDED FIXTURE|public-causal-edge/);
+  assert.match(css, /aspect-ratio: 232 \/ 104/);
+  assert.match(css, /\.workbench-ticket-aperture \{[^}]*right: -6px;[^}]*border-radius: 50%/);
+  assert.match(css, /\.public-edge-visible \{[^}]*stroke-width: 1\.15;[^}]*vector-effect: non-scaling-stroke/);
+  assert.doesNotMatch(css, /\.public-causal-edge/);
   assert.equal((page.match(/JSON\.stringify/g) ?? []).length, 2);
   assert.doesNotMatch(page, /fetch\(|XMLHttpRequest|WebSocket|<iframe/i);
 });
