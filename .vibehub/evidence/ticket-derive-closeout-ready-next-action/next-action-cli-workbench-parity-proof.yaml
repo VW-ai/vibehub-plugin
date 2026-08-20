@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "projection-is-shared-by-cli-and-workbench",
+    "runtime-presence-and-human-attention-remain-orthogonal"
+  ],
+  "evidence_id": "next-action-cli-workbench-parity-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T20:22:01Z",
+  "refs": [
+    "skills/scripts/vh.mjs",
+    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-review/assets/app-model.js",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "test/ui-host.test.mjs",
+    "test/ui-model.test.mjs",
+    "command:npm-run-verify-110-of-110"
+  ],
+  "schema_version": 1,
+  "summary": "ticket get, graph, and frontier now call the same exported ticketNextAction implementation. The read-only host maps that exact result into the Workbench nextAction capability and Ticket Context package; the browser presentation model consumes it for accessible copy, Inspector routing, and Copy for Agent instead of re-inferring from READY, Evidence counts, runtime presence, or local state. Operational state and human attention remain independent capabilities.",
+  "ticket_id": "ticket-derive-closeout-ready-next-action"
+}

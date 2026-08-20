@@ -15,12 +15,15 @@ Agent-authority criteria autonomously. It must not satisfy a human-authority
 criterion, set `origin: human`, or treat its own recommendation as the user's
 decision; only explicit human input with a readable reference can become
 human-origin Evidence.
+Read `../contracts/ticket-next-action.md`. Routine execution starts only from
+`next_action.action: EXECUTE`; status `READY` alone may instead route to human
+input or independent closeout.
 This Skill owns `ready-execution` and `execution-needs-human`; it does not own
 UI launch mechanics.
 
 ## Workflow
 
-1. Read the READY frontier and select the Ticket requested by the user:
+1. Read `ready_to_execute` from the frontier and select the requested Ticket:
 
    ```text
    node ../scripts/vh.mjs ticket frontier --repo <root>

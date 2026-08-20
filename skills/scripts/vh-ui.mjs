@@ -12,6 +12,7 @@ import {
   projectRoomDrift,
   projectTicketQuery,
   ticketArchived,
+  ticketNextAction,
   ticketStatus,
 } from "./vh.mjs";
 
@@ -240,6 +241,17 @@ function operationalState(repository, ticket, outcome) {
   };
 }
 
+function projectedNextAction(repository, ticket) {
+  const derived = ticketNextAction(repository, ticket);
+  return {
+    action: derived.action,
+    reason: derived.reason,
+    detail: derived.detail,
+    acceptanceIds: derived.acceptance_ids,
+    blockingTicketIds: derived.blocking_ticket_ids,
+  };
+}
+
 function acceptanceAuthority(criterion) {
   return criterion.authority ?? "agent";
 }
@@ -330,6 +342,7 @@ function projectGraph(repository, queryOptions = {}) {
   const tickets = ticketDocuments.map((ticket) => {
     const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
     const attention = humanAttentionState(repository, ticket, outcome);
+    const nextAction = projectedNextAction(repository, ticket);
     return {
       ticketId: ticket.ticket_id,
       ticketRevision: digest(ticket),
@@ -346,6 +359,10 @@ function projectGraph(repository, queryOptions = {}) {
         attention: {
           availability: "available",
           summary: attention,
+        },
+        nextAction: {
+          availability: "available",
+          summary: nextAction,
         },
       },
     };
@@ -442,6 +459,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
   const attention = humanAttentionState(repository, ticket, outcome);
   const maturity = ticket.maturity ?? "firm";
   const operational = outcomeState(outcome) ?? ticketStatus(repository, ticket);
+  const nextAction = projectedNextAction(repository, ticket);
   const acceptance = ticket.acceptance.map((item) => ({
     acceptanceId: item.acceptance_id,
     criterion: item.criterion,
@@ -457,6 +475,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
     ticketId: ticket.ticket_id,
     maturity,
     operationalState: operational,
+    nextAction,
     outcome: ticket.outcome,
     context: ticket.context,
     acceptance: ticket.acceptance.map((item) => ({
@@ -473,6 +492,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
   return {
     maturity,
     operationalState: operational,
+    nextAction,
     outcome: ticket.outcome,
     context: ticket.context,
     acceptance,

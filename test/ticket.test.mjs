@@ -425,7 +425,11 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
   let frontier = run(repo, "ticket", "frontier");
   assert.deepEqual(
     frontier.envelope.data.ready.map((item) => item.ticket.ticket_id),
-    ["agent-default", "human-boundary"],
+    ["agent-default"],
+  );
+  assert.deepEqual(
+    frontier.envelope.data.needs_human.map((item) => item.ticket.ticket_id),
+    ["human-boundary"],
   );
 
   const invalidOrigin = run(repo, "ticket", "evidence", {
@@ -480,6 +484,11 @@ test("human acceptance stays orthogonal to readiness and requires human-origin E
     origin: "human",
     recorded_at: at,
   }).status, 0);
+  frontier = run(repo, "ticket", "frontier");
+  assert.deepEqual(
+    frontier.envelope.data.ready_to_closeout.map((item) => item.ticket.ticket_id),
+    ["human-boundary"],
+  );
   assert.equal(run(repo, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",

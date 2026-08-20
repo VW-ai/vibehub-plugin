@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "next-action-table-is-complete-and-authority-aware",
+    "frontier-distinguishes-execution-from-adjudication",
+    "runtime-presence-and-human-attention-remain-orthogonal",
+    "no-automatic-success-or-unlock-is-introduced"
+  ],
+  "evidence_id": "next-action-derivation-and-frontier-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T20:22:01Z",
+  "refs": [
+    "skills/contracts/ticket-next-action.md",
+    "skills/scripts/vh.mjs",
+    "test/ticket-next-action.test.mjs",
+    "test/ticket.test.mjs",
+    "test/ui-model.test.mjs",
+    "command:node-test-ticket-next-action-ticket-draft-ui-model-17-of-17"
+  ],
+  "schema_version": 1,
+  "summary": "One documented host-side derivation now maps successful and non-success Outcomes, unresolved direct dependencies, draft maturity, missing human-origin Evidence, complete authority-satisfying Evidence, and incomplete Agent work to DONE, REPLAN, WAIT, REFINE, NEEDS_HUMAN, CLOSE_OUT, and EXECUTE with stable reasons and relevant IDs. Frontier preserves ready as an alias of ready_to_execute while separately grouping closeout, human, replan, refinement, wait, and done. Regression proves Agent Evidence cannot satisfy human authority, a mixed Ticket routes deterministically, runtime presence does not rewrite routing, and complete Evidence neither creates an Outcome nor unlocks a dependent.",
+  "ticket_id": "ticket-derive-closeout-ready-next-action"
+}

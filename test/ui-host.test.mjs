@@ -131,6 +131,18 @@ test("direct YAML projection exposes graph topology and operational states", () 
   assert.deepEqual(
     Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
       item.ticketId,
+      item.capabilities.nextAction.summary.action,
+    ])),
+    {
+      blocked: "WAIT",
+      feature: "NEEDS_HUMAN",
+      foundation: "DONE",
+      unsuccessful: "REPLAN",
+    },
+  );
+  assert.deepEqual(
+    Object.fromEntries(snapshot.state.graph.tickets.map((item) => [
+      item.ticketId,
       item.capabilities.attention.summary.label,
     ])),
     {
@@ -454,9 +466,11 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(subject.contextPackage.attention.label, "COMPLETE");
   assert.equal(subject.contextPackage.maturity, "firm");
   assert.equal(subject.contextPackage.operationalState, "DONE");
+  assert.equal(subject.contextPackage.nextAction.action, "DONE");
   assert.equal(subject.contextPackage.agentPayload.kind, "vibehub_ticket_handoff");
   assert.equal(subject.contextPackage.agentPayload.maturity, "firm");
   assert.equal(subject.contextPackage.agentPayload.operationalState, "DONE");
+  assert.equal(subject.contextPackage.agentPayload.nextAction.action, "DONE");
   assert.deepEqual(subject.contextPackage.agentPayload.humanBoundaries, [{
     acceptanceId: "works",
     criterion: "foundation behavior is observed.",
@@ -483,6 +497,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.equal(featureSubject.contextPackage.contextRefs[1].canonicalContext, null);
   assert.equal("actions" in featureSubject.contextPackage.contextRefs[1], false);
   assert.equal(featureSubject.contextPackage.attention.label, "PENDING");
+  assert.equal(featureSubject.contextPackage.nextAction.action, "NEEDS_HUMAN");
   assert.deepEqual(
     featureSubject.contextPackage.agentPayload.humanBoundaries.map(
       (item) => [item.acceptanceId, item.criterion, item.evidenceState],
@@ -500,6 +515,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
     authorized(token),
   )).json()).data;
   assert.equal(unsuccessfulSubject.contextPackage.operationalState, "DEVIATED");
+  assert.equal(unsuccessfulSubject.contextPackage.nextAction.action, "REPLAN");
   assert.equal(
     unsuccessfulSubject.contextPackage.agentPayload.operationalState,
     "DEVIATED",
@@ -587,9 +603,12 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   // No visual preference is ever persisted by the product surface.
   assert.doesNotMatch(script, /localStorage|sessionStorage/u);
   assert.doesNotMatch(script, /renderProjectionTime|startWatchPolling|state\.watch/u);
-  // Copy for Agent only hands out a ticket-run instruction for READY Tickets.
-  assert.match(model, /stateLabel === "READY"/u);
-  assert.match(model, /stateLabel === "REFINE"/u);
+  // Copy for Agent consumes the host-derived next action instead of inferring
+  // routing from operational status or Evidence count in the browser.
+  assert.match(model, /function ticketNextAction/u);
+  assert.match(model, /action === "EXECUTE"/u);
+  assert.match(model, /action === "CLOSE_OUT"/u);
+  assert.match(model, /action === "NEEDS_HUMAN"/u);
   assert.match(model, /vibehub-ticket-run/u);
   assert.match(model, /vibehub-ticket-plan/u);
   assert.match(model, /vibehub-ticket-review/u);
@@ -739,6 +758,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   )).json()).data;
   assert.equal(draftSubject.contextPackage.maturity, "draft");
   assert.equal(draftSubject.contextPackage.operationalState, "REFINE");
+  assert.equal(draftSubject.contextPackage.nextAction.action, "REFINE");
   assert.equal(draftSubject.contextPackage.agentPayload.maturity, "draft");
   assert.equal(draftSubject.contextPackage.agentPayload.operationalState, "REFINE");
 });

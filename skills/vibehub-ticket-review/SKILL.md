@@ -9,6 +9,9 @@ Read `references/ticket-lifecycle.json` before acting. This Skill owns
 `explicit-review` and is the sole presenter for every event whose
 `presentation` is `review`; semantic transition ownership remains with the
 calling Ticket Skill.
+Read `../contracts/ticket-next-action.md`. Present the host-derived next action
+beside operational state and human attention; never infer it again from UI
+copy, Evidence counts, or browser state.
 
 ## Local graph UI
 
@@ -54,8 +57,8 @@ node ../scripts/vh.mjs ticket graph --repo <root> --delivery <canonical-ref> --r
 node ../scripts/vh.mjs ticket get --repo <root> --input <id.json>
 ```
 
-Present outcomes, READY/BLOCKED/DONE/DEVIATED state, direct dependencies,
-acceptance, Evidence, and Outcome in the conversation.
+Present outcomes, READY/BLOCKED/DONE/DEVIATED state, derived next action,
+direct dependencies, acceptance, Evidence, and Outcome in the conversation.
 
 If the user requests an edit, delegate the revised documents to
 `$vibehub-ticket-plan`. Browser state and comments are not Decision authority;

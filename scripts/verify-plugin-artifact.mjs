@@ -62,6 +62,7 @@ try {
     "skills/contracts/evidence.schema.json",
     "skills/contracts/acceptance-authority.md",
     "skills/contracts/dependency-hygiene.json",
+    "skills/contracts/ticket-next-action.md",
   ]) {
     if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
   }
@@ -141,7 +142,6 @@ try {
       acceptance: [{
         acceptance_id: "entry-reaches-ready-ticket",
         criterion: "The initialized repository exposes this applied Ticket as READY.",
-        authority: "human",
       }],
       constraints: ["Reuse Setup and Ticket Plan without a router or runtime service."],
       context_refs: [],
@@ -165,6 +165,12 @@ try {
     origin: "human",
     recorded_at: "2026-08-09T08:00:00.000Z",
   });
+  const closeoutFrontier = invoke(helper, "ticket", "frontier");
+  if (closeoutFrontier.data.count !== 0
+    || closeoutFrontier.data.ready_to_closeout[0]?.ticket?.ticket_id
+      !== "ticket-build-entry-fixture") {
+    throw new Error("installed next-action projection did not route complete Evidence to closeout");
+  }
   invoke(helper, "ticket", "closeout", {
     schema_version: 1,
     kind: "ticket_outcome",
@@ -173,8 +179,49 @@ try {
     accepted_acceptance_ids: ["entry-reaches-ready-ticket"],
     unresolved_acceptance_ids: [],
     evidence_ids: ["entry-human-proof"],
-    summary: "The installed artifact completed the human-authority Ticket.",
+    summary: "The installed artifact completed the executable entry Ticket.",
     closed_at: "2026-08-09T08:01:00.000Z",
+  });
+  invoke(helper, "ticket", "apply", {
+    tickets: [{
+      schema_version: 2,
+      kind: "ticket",
+      ticket_id: "ticket-human-authority-fixture",
+      outcome: "The installed projection preserves criterion-level human authority.",
+      deliveries: [],
+      context: "Exercise human Evidence and attention independently of executable entry routing.",
+      acceptance: [{
+        acceptance_id: "owner-confirms-authority",
+        criterion: "The owner explicitly confirms the protected fixture.",
+        authority: "human",
+      }],
+      constraints: ["Agent Evidence cannot substitute for the owner."],
+      context_refs: [],
+      relations: [],
+      provenance_refs: ["test:installed-human-authority"],
+    }],
+  });
+  invoke(helper, "ticket", "evidence", {
+    schema_version: 1,
+    kind: "ticket_evidence",
+    evidence_id: "installed-human-authority-proof",
+    ticket_id: "ticket-human-authority-fixture",
+    acceptance_ids: ["owner-confirms-authority"],
+    summary: "The human explicitly confirmed the protected fixture.",
+    refs: ["conversation:artifact-verification-human-authority"],
+    origin: "human",
+    recorded_at: "2026-08-09T08:02:00.000Z",
+  });
+  invoke(helper, "ticket", "closeout", {
+    schema_version: 1,
+    kind: "ticket_outcome",
+    ticket_id: "ticket-human-authority-fixture",
+    status: "successful",
+    accepted_acceptance_ids: ["owner-confirms-authority"],
+    unresolved_acceptance_ids: [],
+    evidence_ids: ["installed-human-authority-proof"],
+    summary: "The installed artifact preserved the protected human boundary.",
+    closed_at: "2026-08-09T08:03:00.000Z",
   });
 
   const installedScript = readFileSync(
@@ -225,10 +272,12 @@ try {
     headers: { Authorization: `Bearer ${uiHost.token}` },
   });
   const allState = await allStateResponse.json();
-  if (!allState.ok || allState.data.graph.tickets.length !== 1) {
+  if (!allState.ok || allState.data.graph.tickets.length !== 2) {
     throw new Error("installed UI all-history graph projection failed");
   }
-  const installedTicket = allState.data.graph.tickets[0];
+  const installedTicket = allState.data.graph.tickets.find(
+    (ticket) => ticket.ticketId === "ticket-human-authority-fixture",
+  );
   if (installedTicket.capabilities.attention.summary.label !== "COMPLETE"
     || allState.data.interventions.authority.status !== "available") {
     throw new Error("installed UI human-attention projection failed");

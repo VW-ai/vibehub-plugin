@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "real-regression-corpus-covers-observed-gaps",
+    "next-action-table-is-complete-and-authority-aware",
+    "projection-is-shared-by-cli-and-workbench",
+    "frontier-distinguishes-execution-from-adjudication",
+    "no-automatic-success-or-unlock-is-introduced"
+  ],
+  "evidence_id": "next-action-real-corpus-and-artifact-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T20:22:01Z",
+  "refs": [
+    "test/ticket-next-action.test.mjs",
+    "test/ui-host.test.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:npm-run-verify-110-of-110",
+    "command:verify-plugin-artifact-56-files-581556-bytes",
+    "command:vh-project-validate-format-2-79-tickets-202-evidence-59-outcomes",
+    "command:vh-ticket-validate-79-tickets-202-evidence-59-outcomes"
+  ],
+  "schema_version": 1,
+  "summary": "The regression corpus names and reproduces v0.8 publication and six-criterion dogfood repair as CLOSE_OUT-only, plus ordinary execution, incomplete human and mixed authority, unresolved dependency, draft refinement, successful Outcome, and partial, failed, and deviated Outcomes. Complete verification passed 110 of 110 tests, including current/all graph and real loopback Workbench host behavior; project and Ticket validation pass at format 2 with 79 Tickets, 202 Evidence, and 59 Outcomes before this Ticket's Evidence was appended; the dependency-free installed Plugin artifact passed with 56 files and exercised EXECUTE to CLOSE_OUT to DONE without writable Web state or automatic success.",
+  "ticket_id": "ticket-derive-closeout-ready-next-action"
+}

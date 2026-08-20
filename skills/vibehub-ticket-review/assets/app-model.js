@@ -15,6 +15,15 @@
     "COMPLETE",
   ]);
   const LAYOUT_DIRECTIONS = new Set(["ltr", "ttb"]);
+  const NEXT_ACTIONS = new Set([
+    "REFINE",
+    "WAIT",
+    "NEEDS_HUMAN",
+    "EXECUTE",
+    "CLOSE_OUT",
+    "DONE",
+    "REPLAN",
+  ]);
 
   function normalizeLayoutDirection(value) {
     return LAYOUT_DIRECTIONS.has(value) ? value : "ltr";
@@ -69,6 +78,25 @@
       detail: slot.summary?.detail || "",
       humanAcceptanceCount: Number(slot.summary?.humanAcceptanceCount) || 0,
       humanEvidenceCount: Number(slot.summary?.humanEvidenceCount) || 0,
+    };
+  }
+
+  function ticketNextAction(ticket) {
+    const slot = ticket?.capabilities?.nextAction;
+    if (slot?.availability !== "available") return null;
+    const action = String(slot.summary?.action || "").toUpperCase();
+    if (!NEXT_ACTIONS.has(action)) return null;
+    return {
+      action,
+      key: action.toLowerCase().replaceAll("_", "-"),
+      reason: slot.summary?.reason || "",
+      detail: slot.summary?.detail || "",
+      acceptanceIds: Array.isArray(slot.summary?.acceptanceIds)
+        ? slot.summary.acceptanceIds
+        : [],
+      blockingTicketIds: Array.isArray(slot.summary?.blockingTicketIds)
+        ? slot.summary.blockingTicketIds
+        : [],
     };
   }
 
@@ -182,25 +210,51 @@
     }[label] ?? 5;
   }
 
-  function agentHandoffInstruction(ticketId, stateLabel) {
-    if (stateLabel === "READY") {
+  function agentHandoffInstruction(ticketId, nextAction, stateLabel = null) {
+    const action = typeof nextAction === "string"
+      ? nextAction
+      : nextAction?.action;
+    if (action === "EXECUTE") {
       return `Execute the READY VibeHub Ticket ${ticketId} in this exact `
         + "worktree with the Skill vibehub-ticket-run.";
     }
-    if (stateLabel === "REFINE") {
+    if (action === "CLOSE_OUT") {
+      return `Independently adjudicate VibeHub Ticket ${ticketId} in this exact `
+        + "worktree with the Skill vibehub-ticket-closeout. Its current "
+        + "acceptance has authority-satisfying Evidence, but no Outcome; do "
+        + "not execute the Ticket again merely to increase Evidence count.";
+    }
+    if (action === "NEEDS_HUMAN") {
+      return `Present the Contract for VibeHub Ticket ${ticketId} with the `
+        + "Skill vibehub-ticket-review and wait for explicit human input. "
+        + "Do not substitute Agent-origin Evidence for human authority.";
+    }
+    if (action === "REFINE") {
       return `Refine the VibeHub Ticket ${ticketId} in this exact worktree `
         + "with the Skill vibehub-ticket-plan. It is currently REFINE, so "
         + "rewrite the same Ticket's acceptance for real and set maturity: "
         + "firm before execution; do not start vibehub-ticket-run.";
     }
-    return `Inspect VibeHub Ticket ${ticketId} (currently ${stateLabel}) `
-      + "with the Skill vibehub-ticket-review. It is not READY, so do not "
-      + "start vibehub-ticket-run for it.";
+    if (action === "REPLAN") {
+      return `Replan VibeHub Ticket ${ticketId} in this exact worktree with `
+        + "the Skill vibehub-ticket-plan. Its independent Outcome was not "
+        + "successful; preserve that Outcome and revise the current contract "
+        + "before any new execution.";
+    }
+    if (action === "WAIT") {
+      return `Inspect VibeHub Ticket ${ticketId} with the Skill `
+        + "vibehub-ticket-review. It is waiting for direct prerequisites; do "
+        + "not start vibehub-ticket-run until they close successfully.";
+    }
+    return `Inspect VibeHub Ticket ${ticketId} (currently ${stateLabel || "unprojected"}) `
+      + "with the Skill vibehub-ticket-review. Its derived next action is "
+      + `${action || "unavailable"}; do not start vibehub-ticket-run.`;
   }
 
   function ticketNodePresentation(ticket, { selected = false, dimmed = false } = {}) {
     const operational = ticketOperationalState(ticket);
     const attention = ticketAttentionState(ticket);
+    const nextAction = ticketNextAction(ticket);
     const classNames = [
       "ticket-node",
       selected ? "selected" : "",
@@ -220,6 +274,9 @@
         : "")
       + (attention
         ? ` Human attention ${attention.label}. ${attention.detail || ""}`
+        : "")
+      + (nextAction
+        ? ` Next action ${nextAction.action}. ${nextAction.detail || ""}`
         : "");
     return {
       className: classNames.join(" "),
@@ -227,6 +284,7 @@
       stateLabel: operational?.label || null,
       operational,
       attention,
+      nextAction,
     };
   }
 
@@ -242,6 +300,7 @@
     normalizeLayoutDirection,
     ticketAttentionState,
     ticketNodePresentation,
+    ticketNextAction,
     ticketOperationalState,
     workbenchOverview,
   });

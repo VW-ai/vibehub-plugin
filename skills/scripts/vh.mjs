@@ -949,6 +949,101 @@ export function ticketStatus(repository, ticket) {
   return ticket.maturity === "draft" ? "REFINE" : "READY";
 }
 
+function acceptanceAuthority(criterion) {
+  return criterion.authority ?? "agent";
+}
+
+function evidenceOrigin(evidence) {
+  return evidence.origin ?? "agent";
+}
+
+export function ticketNextAction(repository, ticket) {
+  const acceptanceIds = ticket.acceptance.map((criterion) => criterion.acceptance_id);
+  const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null;
+  if (outcome?.status === "successful") {
+    return {
+      action: "DONE",
+      reason: "successful_outcome",
+      detail: "An independent successful Outcome accepts every current criterion.",
+      acceptance_ids: acceptanceIds,
+      blocking_ticket_ids: [],
+    };
+  }
+  if (outcome) {
+    return {
+      action: "REPLAN",
+      reason: "non_successful_outcome",
+      detail: `The independent Outcome is ${outcome.status}; revise the Ticket before another execution cycle.`,
+      acceptance_ids: outcome.unresolved_acceptance_ids,
+      blocking_ticket_ids: [],
+    };
+  }
+
+  const blockingTicketIds = ticket.relations
+    .map((relation) => relation.target_ticket_id)
+    .filter((id) => repository.outcomes.documents.get(id)?.document.status !== "successful")
+    .sort();
+  if (blockingTicketIds.length > 0) {
+    return {
+      action: "WAIT",
+      reason: "unresolved_direct_dependencies",
+      detail: "Direct prerequisites must close successfully before this Ticket can advance.",
+      acceptance_ids: [],
+      blocking_ticket_ids: blockingTicketIds,
+    };
+  }
+
+  if (ticket.maturity === "draft") {
+    return {
+      action: "REFINE",
+      reason: "draft_contract",
+      detail: "The unblocked draft needs a firm, executable acceptance contract.",
+      acceptance_ids: acceptanceIds,
+      blocking_ticket_ids: [],
+    };
+  }
+
+  const ticketEvidence = documents(repository.evidence.documents)
+    .filter((evidence) => evidence.ticket_id === ticket.ticket_id);
+  const evidencedIds = new Set(ticketEvidence.flatMap((evidence) => evidence.acceptance_ids));
+  const humanEvidencedIds = new Set(ticketEvidence
+    .filter((evidence) => evidenceOrigin(evidence) === "human")
+    .flatMap((evidence) => evidence.acceptance_ids));
+  const missingHumanIds = ticket.acceptance
+    .filter((criterion) => acceptanceAuthority(criterion) === "human"
+      && !humanEvidencedIds.has(criterion.acceptance_id))
+    .map((criterion) => criterion.acceptance_id);
+  if (missingHumanIds.length > 0) {
+    return {
+      action: "NEEDS_HUMAN",
+      reason: "missing_human_evidence",
+      detail: "Reachable human-authority criteria still need explicit human-origin Evidence.",
+      acceptance_ids: missingHumanIds,
+      blocking_ticket_ids: [],
+    };
+  }
+
+  const missingEvidenceIds = ticket.acceptance
+    .filter((criterion) => !evidencedIds.has(criterion.acceptance_id))
+    .map((criterion) => criterion.acceptance_id);
+  if (missingEvidenceIds.length === 0) {
+    return {
+      action: "CLOSE_OUT",
+      reason: "authority_satisfying_evidence_complete",
+      detail: "Every current criterion has authority-satisfying Evidence; independent adjudication is next.",
+      acceptance_ids: acceptanceIds,
+      blocking_ticket_ids: [],
+    };
+  }
+  return {
+    action: "EXECUTE",
+    reason: "acceptance_evidence_incomplete",
+    detail: "Executable criteria still need reproducible acceptance-linked Evidence.",
+    acceptance_ids: missingEvidenceIds,
+    blocking_ticket_ids: [],
+  };
+}
+
 export function ticketArchived(repository, ticket) {
   if (!ticket) return false;
   const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
@@ -1183,6 +1278,7 @@ function ticketOperation(operation, repo, input, options = {}) {
     return {
       ticket: item,
       status: ticketStatus(repository, item),
+      next_action: ticketNextAction(repository, item),
       evidence: ticketEvidence,
       outcome: repository.outcomes.documents.get(input.ticket_id)?.document ?? null,
     };
@@ -1194,6 +1290,7 @@ function ticketOperation(operation, repo, input, options = {}) {
     const items = query.tickets.map((ticket) => ({
       ticket,
       status: ticketStatus(repository, ticket),
+      next_action: ticketNextAction(repository, ticket),
       archived: ticketArchived(repository, ticket),
       blocking_ticket_ids: ticket.relations
         .map((relation) => relation.target_ticket_id)
@@ -1201,8 +1298,22 @@ function ticketOperation(operation, repo, input, options = {}) {
       outcome: repository.outcomes.documents.get(ticket.ticket_id)?.document ?? null,
     }));
     if (operation === "frontier") {
-      const ready = items.filter((item) => item.status === "READY");
-      return { ready, count: ready.length };
+      const byAction = (action) => items
+        .filter((item) => item.next_action.action === action)
+        .sort((left, right) => left.ticket.ticket_id.localeCompare(right.ticket.ticket_id));
+      const readyToExecute = byAction("EXECUTE");
+      return {
+        // Compatibility path for existing callers: `ready` still exists, but
+        // now means genuinely ready to execute rather than merely status READY.
+        ready: readyToExecute,
+        ready_to_execute: readyToExecute,
+        ready_to_closeout: byAction("CLOSE_OUT"),
+        needs_human: byAction("NEEDS_HUMAN"),
+        needs_replan: byAction("REPLAN"),
+        needs_refinement: byAction("REFINE"),
+        waiting: byAction("WAIT"),
+        count: readyToExecute.length,
+      };
     }
     return {
       tickets: items.sort((left, right) => left.ticket.ticket_id.localeCompare(right.ticket.ticket_id)),

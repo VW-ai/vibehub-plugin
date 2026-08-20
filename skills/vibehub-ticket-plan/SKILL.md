@@ -22,6 +22,9 @@ Ticket when no downstream work needs a separate scheduling boundary.
 Read `../contracts/dependency-hygiene.json` before choosing `depends_on` versus
 `context_refs`; it is the single classification and preservation contract for
 new dependency edges.
+Read `../contracts/ticket-next-action.md`. This Skill owns plans reached through
+`REFINE` and `REPLAN`; it preserves any non-success Outcome while revising the
+current contract for a later execution cycle.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
 `draft-needs-refinement`; it owns their planning semantics, not Agent/session
 routing or UI launch mechanics.

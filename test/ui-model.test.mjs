@@ -15,7 +15,11 @@ function loadWorkbenchModel() {
   return sandbox.VibeHubWorkbenchModel;
 }
 
-function projectedTicket(label, attentionLabel = "PENDING") {
+function projectedTicket(
+  label,
+  attentionLabel = "PENDING",
+  nextAction = label === "READY" ? "EXECUTE" : "REFINE",
+) {
   return {
     ticketId: "draft-work",
     outcome: "Rewrite this draft into an executable Ticket.",
@@ -40,6 +44,16 @@ function projectedTicket(label, attentionLabel = "PENDING") {
           humanEvidenceCount: 0,
         },
       },
+      nextAction: {
+        availability: "available",
+        summary: {
+          action: nextAction,
+          reason: "fixture_reason",
+          detail: `The canonical next action is ${nextAction}.`,
+          acceptanceIds: ["works"],
+          blockingTicketIds: [],
+        },
+      },
     },
   };
 }
@@ -56,6 +70,7 @@ test("production workbench model renders REFINE as visible but non-executable", 
   assert.match(presentation.className, /(?:^| )attention-pending(?: |$)/u);
   assert.match(presentation.ariaLabel, /REFINE/u);
   assert.match(presentation.ariaLabel, /Human attention PENDING/u);
+  assert.match(presentation.ariaLabel, /Next action REFINE/u);
 
   const counts = model.operationalCounts([refine, ready]);
   assert.equal(counts.READY, 1);
@@ -69,13 +84,53 @@ test("production workbench model renders REFINE as visible but non-executable", 
   );
   assert.deepEqual(readyFrontier.map((ticket) => ticket.ticketId), ["ready-work"]);
 
-  const refineHandoff = model.agentHandoffInstruction("draft-work", "REFINE");
+  const refineHandoff = model.agentHandoffInstruction(
+    "draft-work",
+    model.ticketNextAction(refine),
+    "REFINE",
+  );
   assert.match(refineHandoff, /vibehub-ticket-plan/u);
   assert.match(refineHandoff, /maturity: firm/u);
   assert.match(refineHandoff, /do not start vibehub-ticket-run/u);
-  const readyHandoff = model.agentHandoffInstruction("ready-work", "READY");
+  const readyHandoff = model.agentHandoffInstruction(
+    "ready-work",
+    model.ticketNextAction(ready),
+    "READY",
+  );
   assert.match(readyHandoff, /vibehub-ticket-run/u);
   assert.doesNotMatch(readyHandoff, /vibehub-ticket-plan/u);
+});
+
+test("production workbench routes execution and adjudication from host next action", () => {
+  const model = loadWorkbenchModel();
+  const closeout = projectedTicket("READY", "RECORDED", "CLOSE_OUT");
+  closeout.ticketId = "fully-evidenced";
+  // Runtime presence is intentionally extra presentation state and cannot
+  // rewrite the canonical next-action capability.
+  closeout.capabilities.runtime = {
+    availability: "available",
+    summary: { label: "RUNNING" },
+  };
+  const next = model.ticketNextAction(closeout);
+  assert.equal(next.action, "CLOSE_OUT");
+  assert.match(
+    model.agentHandoffInstruction(closeout.ticketId, next, "READY"),
+    /vibehub-ticket-closeout/u,
+  );
+  assert.doesNotMatch(
+    model.agentHandoffInstruction(closeout.ticketId, next, "READY"),
+    /vibehub-ticket-run/u,
+  );
+
+  const needsHuman = projectedTicket("READY", "PENDING", "NEEDS_HUMAN");
+  assert.match(
+    model.agentHandoffInstruction(
+      "owner-decision",
+      model.ticketNextAction(needsHuman),
+      "READY",
+    ),
+    /wait for explicit human input/u,
+  );
 });
 
 test("production workbench model projects the compact overview without inventing presence", () => {

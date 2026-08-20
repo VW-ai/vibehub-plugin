@@ -25,6 +25,7 @@
     normalizeLayoutDirection,
     operationalCounts,
     ticketAttentionState,
+    ticketNextAction,
     ticketNodePresentation,
     ticketOperationalState,
     workbenchOverview,
@@ -995,6 +996,7 @@
     elements.inspectorTitle.textContent = ticket.outcome;
     const operational = ticketOperationalState(ticket);
     const attention = ticketAttentionState(ticket);
+    const nextAction = ticketNextAction(ticket);
     elements.inspectorOutcome.hidden = true;
     elements.inspectorOutcome.textContent = "";
 
@@ -1003,6 +1005,7 @@
       contextPackage,
       operational,
       attention,
+      nextAction,
     );
     const contract = ticketContractPanel(ticket, contextPackage, inspection);
     const proof = ticketProofPanel();
@@ -1435,6 +1438,7 @@
     contextPackage,
     operational,
     attention,
+    nextAction,
   ) {
     const panel = document.createElement("section");
     const incoming = state.graph.relations.filter(
@@ -1481,6 +1485,7 @@
         "blockers",
       ),
       signalMetric(String(outgoing.length), "unlocks"),
+      signalMetric(nextAction?.action || "—", "next action"),
       signalMetric("Reading", "evidence", "proof-metric"),
     );
     signal.append(heading, metrics);
@@ -1542,13 +1547,17 @@
   }
 
   function agentHandoffPayload(ticket, contextPackage, operational) {
-    // READY is the only Git-native state that may hand an Agent a new
-    // ticket-run instruction. REFINE routes back to Ticket Plan; every other
-    // state copies an inspect instruction so an Agent never starts work the
-    // graph does not allow.
+    // The canonical host projection owns routing. Operational state and human
+    // attention remain separate context; the browser never re-derives whether
+    // this Ticket should execute, wait, ask a human, close out, or replan.
     const stateLabel = operational?.label || "UNPROJECTED";
+    const nextAction = ticketNextAction(ticket);
     return {
-      instruction: agentHandoffInstruction(ticket.ticketId, stateLabel),
+      instruction: agentHandoffInstruction(
+        ticket.ticketId,
+        nextAction,
+        stateLabel,
+      ),
       ...(contextPackage.agentPayload ?? {
         kind: "vibehub_ticket_handoff",
         ticketId: ticket.ticketId,
