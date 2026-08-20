@@ -185,7 +185,11 @@ test("production artifact stays static and Cloudflare-ready", async () => {
   assert.match(nextConfig, /output:\s*"export"/);
   assert.match(layout, /NEXT_PUBLIC_SITE_URL/);
   assert.match(layout, /\/og\.png/);
-  assert.deepEqual(JSON.parse(hosting), { d1: null, r2: null });
+  assert.deepEqual(JSON.parse(hosting), {
+    project_id: "appgprj_6a86aafc71d48191b3c03a532dc367f3",
+    d1: null,
+    r2: null,
+  });
 
   await Promise.all([
     access(new URL("dist/client/index.html", root)),
