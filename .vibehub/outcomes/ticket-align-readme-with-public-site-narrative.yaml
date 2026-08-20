@@ -1,0 +1,18 @@
+{
+  "accepted_acceptance_ids": [
+    "canonical-website-entry-is-visible-and-exact",
+    "readme-and-site-share-one-major-narrative",
+    "existing-readme-contract-and-artifact-parity-remain-intact"
+  ],
+  "closed_at": "2026-08-20T23:21:04Z",
+  "evidence_ids": [
+    "readme-site-narrative-and-link-proof",
+    "readme-site-installed-parity-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepts all three criteria at exact implementation commit a648e4a. The current GitHub main remains 1cbca5d and is incorporated through merge cf68082 immediately before the implementation. The root README exposes exactly one hero-adjacent href to https://vibehub.icu with no www or pages.dev destination, and its compact work-over-chat narrative matches the checked-in public site: one coding request plus exact Context forms a Git-native Ticket, work creates acceptance-linked Evidence, a separate Agent decides Outcome, accepted learning returns to Context, and Git preserves reviewable, reversible ownership. The implementation changed no site path. The README remains 59 lines with exactly one canonical entry, all three manifest-backed Retina Workbench PNGs, DRAFT/READY/RUNNING/DONE language, dark-mode brand, and current Codex and Claude installation and upgrade guidance. Independent focused verification passed 6/6, full repository verification passed 131/131, and a fresh Codex/Claude artifact passed at 62 files and 2828446 bytes with byte-identical installed README content, resolvable images, and the same sole apex link and narrative. Ticket and project validation pass and all four Rooms are FRESH.",
+  "ticket_id": "ticket-align-readme-with-public-site-narrative",
+  "unresolved_acceptance_ids": []
+}
