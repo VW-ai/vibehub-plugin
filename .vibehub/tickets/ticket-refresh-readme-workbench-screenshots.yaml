@@ -1,0 +1,75 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "readme-images-are-lossless-retina-captures",
+      "criterion": "Every screenshot embedded by the root README is a checked-in lossless PNG captured from the real Workbench through a controlled DPR=2 path: the 1280x720 CSS desktop graph produces 2560x1440 pixels, the 1180x820 CSS focused Ticket execution/proof view produces 2360x1640 pixels, and the 390x844 CSS narrow Rooms view produces 780x1688 pixels. A checked-in capture manifest records source commit, CSS viewport, DPR, resulting pixel dimensions, file path, and SHA-256 for each PNG; automated verification checks PNG signature, exact dimensions, manifest fields and hashes, while capture Evidence records a controlled DPR=2 source whose returned pixel dimensions were verified before the asset was written and rejects rather than resizes any 1x result; the root README contains no .jpg or .jpeg Workbench screenshot reference."
+    },
+    {
+      "acceptance_id": "readme-copy-matches-current-product",
+      "criterion": "The root README describes the current DRAFT, READY, RUNNING, and DONE work surface plus progressively disclosed Recommended action and Evidence/Outcome inspection without retaining REFINE-era presentation language or overstating native DSH invocation."
+    },
+    {
+      "acceptance_id": "readme-render-and-artifact-parity-pass",
+      "criterion": "The rendered README is reviewed at normal GitHub-like desktop width and narrow width with crisp text and lines, useful crops, correct alt text, no broken links, and no accidental sensitive/local-only data; repository verification preserves the at-most-60-line surface, single canonical invocation, installation/upgrades, and dark-mode brand contract, while fresh Codex/Claude installed artifacts contain README plus all three referenced PNGs and verify that every relative README image link resolves inside each artifact."
+    }
+  ],
+  "constraints": [
+    "Capture the real read-only Workbench from the exact implemented repository state; do not use the disposable proposal board, mock data, AI-generated imagery, or a compressed chat preview.",
+    "Use lossless PNG from a controlled DPR=2 capture path for every README screenshot, with a clean viewport, readable text and fine lines, no browser chrome, no transient tooltip obscuring the subject, and no console error; a 1x capture that is merely upscaled fails acceptance.",
+    "Do not redesign the README, change installation or release instructions, publish externally, or make claims not visible in the captured product.",
+    "Keep source and installed Codex/Claude plugin documentation assets behaviorally identical.",
+    "Preserve the root README's at-most-60-line product-surface guard, exactly one `Start this with VibeHub.`, existing installation and upgrade instructions, and dark-mode-safe brand assets."
+  ],
+  "context": "The owner explicitly requires README screenshots to be publication-quality rather than browser-tool previews. The current README embeds three low-resolution JPEGs at 1280x720, 1180x820, and 390x844 and still describes the previous DONE, READY, REFINE surface. After the production icon/action polish lands, replace the complete README screenshot set from one exact clean Workbench version using controlled lossless 2x PNG captures and update only the surrounding stale product copy.",
+  "context_refs": [
+    {
+      "purpose": "Public repository narrative and all screenshot placements to refresh.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Current low-resolution global graph image to supersede.",
+      "ref": "docs/assets/local-graph/quiet-workbench-desktop.jpg"
+    },
+    {
+      "purpose": "Current low-resolution focused Ticket image to supersede.",
+      "ref": "docs/assets/local-graph/workbench-ticket-proof.jpg"
+    },
+    {
+      "purpose": "Current low-resolution narrow Rooms image to supersede.",
+      "ref": "docs/assets/local-graph/workbench-rooms-narrow.jpg"
+    },
+    {
+      "purpose": "Binding readability and truthful-product-presentation standard for the screenshots.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Plugin documentation packaging boundary that must include every README-linked PNG.",
+      "ref": "scripts/build-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Fresh installed-artifact resolver and parity checks to extend for the new images.",
+      "ref": "scripts/verify-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Existing README product-surface, installation, brand, and release contract to preserve.",
+      "ref": "test/release.test.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The repository README presents the current production Workbench with crisp Retina PNGs and four-phase product language that remains legible at GitHub display sizes.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-requires-high-resolution-readme-screenshots",
+    "conversation:2026-08-20-owner-requests-readme-refresh"
+  ],
+  "relations": [
+    {
+      "rationale": "Publication screenshots must capture the corrected production UI rather than the superseded version.",
+      "target_ticket_id": "ticket-polish-workbench-state-action-affordances",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-refresh-readme-workbench-screenshots"
+}
