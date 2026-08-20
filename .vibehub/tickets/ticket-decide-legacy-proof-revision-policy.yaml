@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "legacy-proof-transition-policy-decided",
+      "authority": "human",
+      "criterion": "After reviewing the completed proposal, the owner explicitly selects mark-all-stale, grandfather-successful-Outcomes, Git reconstruction with unresolved fallback, or an exact hybrid defined by the proposal, and accepts its stated effects on current DONE, archive membership, dependent unlock, human-authority satisfaction, migration, rollback, and unresolved cases."
+    }
+  ],
+  "constraints": [
+    "This Ticket records the protected human policy decision only; it does not implement or migrate the repository.",
+    "Agent Evidence, inferred preference, or silence cannot satisfy the human-authority criterion.",
+    "The decision must cite the completed proposal and name the selected policy exactly."
+  ],
+  "context": "Acceptance contract binding protects future proof, but the legacy corpus has no intrinsic contract identity. The choice between invalidating, grandfathering, or reconstructing old proof changes current DONE truth and therefore cannot be inferred by an Agent or hidden inside a migration. Review the completed policy proposal and record one explicit owner decision before implementation is made firm.",
+  "context_refs": [
+    {
+      "purpose": "Authority requiring explicit review of migration truth and consequences.",
+      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+    },
+    {
+      "purpose": "Canonical requirement for human-origin Evidence on protected policy choice.",
+      "ref": "skills/contracts/acceptance-authority.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner explicitly chooses the repository-truth policy for transitioning legacy Evidence and Outcomes to acceptance contract revisions.",
+  "provenance_refs": [
+    "conversation:2026-08-20-legacy-proof-policy-must-not-be-inferred"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner needs a verified corpus audit and explicit policy comparison before making the protected migration decision.",
+      "target_ticket_id": "ticket-propose-legacy-proof-revision-policy",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-legacy-proof-revision-policy"
+}

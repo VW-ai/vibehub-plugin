@@ -1,0 +1,69 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "next-action-table-is-complete-and-authority-aware",
+      "criterion": "One documented and mechanically tested derivation covers draft contract refinement, unresolved direct dependencies, missing reachable human-origin Evidence, ordinary execution, every current criterion having authority-satisfying Evidence with no Outcome, successful Outcome, and partial, failed, or deviated Outcome; it produces distinct next actions such as REFINE, WAIT, NEEDS_HUMAN, EXECUTE, CLOSE_OUT, DONE, and REPLAN without treating raw Evidence count as acceptance."
+    },
+    {
+      "acceptance_id": "projection-is-shared-by-cli-and-workbench",
+      "criterion": "The canonical host-side projection exposes next_action plus a stable reason and relevant acceptance IDs from one implementation consumed by ticket get, graph, frontier, and the Web Workbench model; the browser does not re-infer lifecycle semantics from copy, counts, or local state."
+    },
+    {
+      "acceptance_id": "frontier-distinguishes-execution-from-adjudication",
+      "criterion": "The Agent-facing frontier deterministically separates ready-to-execute Tickets from ready-to-closeout, needs-human, and needs-replan work while retaining a machine-readable compatibility path for existing callers; a 6/6-Evidence Ticket with no Outcome appears only in ready-to-closeout and never in ready-to-execute."
+    },
+    {
+      "acceptance_id": "runtime-presence-and-human-attention-remain-orthogonal",
+      "criterion": "Trusted Run presence and the existing human-attention projection remain separate axes: a running Session does not rewrite Git-native next_action, missing human authority cannot be hidden by Agent Evidence, and next_action supplies routing without inventing a Run lease, heartbeat, or persistent dispatcher."
+    },
+    {
+      "acceptance_id": "no-automatic-success-or-unlock-is-introduced",
+      "criterion": "Full Evidence coverage may derive CLOSE_OUT but never writes or implies a successful Outcome, DONE, archive membership, or dependent unlock; regression proves only an independently recorded successful Outcome changes those canonical facts."
+    },
+    {
+      "acceptance_id": "real-regression-corpus-covers-observed-gaps",
+      "criterion": "Fixtures reproduce the observed v0.8 publication, 6/6 dogfood repair, human-authority, non-success Outcome, ordinary READY, and a mixed Ticket whose Agent criteria and human-authority criteria are simultaneously incomplete; precedence is deterministic, and project, Ticket, CLI JSON, current/all graph, Workbench host, and installed-artifact verification pass without changing read-only Web or Git-native source-of-truth boundaries."
+    }
+  ],
+  "constraints": [
+    "Do not add a persisted status or second lifecycle; next_action is derived from canonical Ticket, Evidence, Outcome, authority, maturity, and dependencies.",
+    "Do not auto-create an Outcome, auto-accept Evidence, or let the executor certify its own success.",
+    "Do not make runtime Session state, browser state, a cache, or a background service authoritative for Git-native completion.",
+    "Preserve current/all, delivery, Room, archive, causal-boundary, and exact-source semantics while extending their projection."
+  ],
+  "context": "Dogfood exposed that the canonical repository has more lifecycle truth than the current status projection presents. Today every firm unblocked Ticket without a successful Outcome becomes READY, so zero-Evidence work, fully evidenced work awaiting independent adjudication, and a Ticket with a non-success Outcome can all be offered as ordinary execution. The Inspector separately knows that Evidence is complete and an Outcome is pending, but the graph and frontier do not. Add one deterministic derived next-action projection shared by CLI and Web. It is presentation and routing truth, not a second persisted lifecycle: canonical Ticket maturity, dependencies, Evidence, Outcome, human authority, and trusted runtime presence remain independent sources.",
+  "context_refs": [
+    {
+      "purpose": "Authority separating work Evidence from independent Outcome inside one Ticket cycle.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Authority for returning the exact next move to the Human or Agent.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "purpose": "Lightweight Git-native architecture boundary forbidding a second runtime lifecycle.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Shared host-side projection contract for CLI and Workbench consumers.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Canonical criterion-level human and Agent authority semantics.",
+      "ref": "skills/contracts/acceptance-authority.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "One shared authority-aware projection tells Humans, Agents, CLI, and Workbench whether a Ticket should be refined, executed, awaited, adjudicated, or treated as complete without weakening canonical Outcome semantics.",
+  "provenance_refs": [
+    "conversation:2026-08-20-evidence-complete-ready-gap",
+    "dogfood:ticket-repair-current-scope-and-delivery-upgrade-evidence-6-of-6-without-outcome",
+    "dogfood:ticket-publish-v080-workbench-release-completed-externally-without-outcome"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-derive-closeout-ready-next-action"
+}

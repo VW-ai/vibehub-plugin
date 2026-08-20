@@ -1,0 +1,68 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "legacy-proof-corpus-is-audited",
+      "criterion": "A reproducible audit inventories current and historical Evidence and Outcomes, the Acceptance revisions they can and cannot be associated with, successful DONE and archive impact, authority-sensitive proof, and cases where Git history is incomplete or ambiguous; counts and representative exact-source examples are recorded."
+    },
+    {
+      "acceptance_id": "three-transition-policies-are-compared",
+      "criterion": "The proposal compares at minimum: marking all legacy proof unbound or stale, grandfathering existing successful Outcomes, and reconstructing contract identity from Git where possible with an explicit unresolved fallback; each policy states its source-of-truth assumptions rather than presenting migration convenience as truth."
+    },
+    {
+      "acceptance_id": "repository-truth-impact-is-quantified",
+      "criterion": "For every policy, the proposal quantifies or mechanically estimates effects on current DONE, archive membership, dependent unlock, CLOSE_OUT projection, human-authority satisfaction, current/all graph, and installed-artifact compatibility, including the consequence of rolling the policy back."
+    },
+    {
+      "acceptance_id": "git-reconstruction-limits-are-proven",
+      "criterion": "A bounded prototype tests whether exact historical criterion text, authority, membership, Evidence creation point, and adjudicated Outcome contract can be reconstructed from repository history, and reports ambiguous or impossible cases without fabricating identity or rewriting proof."
+    },
+    {
+      "acceptance_id": "recommendation-is-decision-ready",
+      "criterion": "The proposal recommends one exact policy or explicitly defined hybrid, explains why alternatives were rejected, defines unresolved-case handling, migration and rollback invariants, and presents the owner with a concrete protected choice rather than an implementation-shaped default."
+    },
+    {
+      "acceptance_id": "downstream-boundary-is-explicit",
+      "criterion": "The proposal maps the chosen policy dimensions to future Ticket, Evidence, Outcome, project-format, migration, validation, projection, Workbench, host parity, and test responsibilities while making no production schema or repository-truth mutation itself."
+    }
+  ],
+  "constraints": [
+    "This Ticket produces a policy proposal and bounded audit only; do not change canonical schemas, migrations, Evidence, Outcomes, DONE, or archive truth.",
+    "Do not silently rebind historical proof to current criterion text or infer owner intent from implementation convenience.",
+    "Preserve every historical document and exact Git reference used by the audit.",
+    "Do not assume Git reconstruction is complete until the real corpus demonstrates it."
+  ],
+  "context": "The desired future safety property is clear: proof should bind to the exact Acceptance semantics it evaluated. The migration policy is not. This repository already contains 202 Evidence and 59 Outcomes created before any acceptance contract identity existed. Treating all of them as stale could revoke current DONE truth; grandfathering all successful Outcomes could preserve proof whose contract later drifted; reconstructing historical semantics from Git may be exact for some records and ambiguous for others. Research the real corpus and produce a bounded policy proposal before asking the owner to choose or allowing implementation to encode that choice implicitly.",
+  "context_refs": [
+    {
+      "purpose": "Authority for explicit, reviewable migration instead of hidden compatibility behavior.",
+      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+    },
+    {
+      "purpose": "Git-native truth and versioned schema boundary the proposal must preserve.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Authority separating Acceptance-linked Evidence from independent Outcome.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Current legacy ID-only Evidence contract under audit.",
+      "ref": "skills/contracts/evidence.schema.json"
+    },
+    {
+      "purpose": "Current legacy Outcome contract under audit.",
+      "ref": "skills/contracts/outcome.schema.json"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A decision-ready proposal compares how legacy ID-only Evidence and Outcomes can transition to acceptance contract revisions without silently rewriting repository truth.",
+  "provenance_refs": [
+    "conversation:2026-08-20-acceptance-rewrite-can-reuse-stale-evidence",
+    "validation:legacy-proof-migration-requires-human-policy"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-propose-legacy-proof-revision-policy"
+}

@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "dependency-versus-context-rule-is-explicit",
+      "criterion": "The planning contract defines depends_on as a direct independently schedulable prerequisite whose successful Outcome supplies a required input or unlock, while completed product authority, implementation baseline, design constraint, and historical precedent belong in context_refs unless exact causal history is itself required."
+    },
+    {
+      "acceptance_id": "planner-checks-current-prerequisite-state",
+      "criterion": "Ticket Plan reads each proposed dependency's current Ticket and Outcome and requires an explicit causal rationale before adding a dependency on DONE work; obvious builds-on, preserves, follows, or reference-only cases are rewritten to exact Context, Outcome, Evidence, or source refs."
+    },
+    {
+      "acceptance_id": "validation-emits-nonblocking-structured-advice",
+      "criterion": "A shared planning-validation path emits deterministic nonblocking advice for newly proposed DONE dependencies, naming the edge and suggesting context_refs, while allowing an independently justified historical causal dependency without changing canonical schema validity or rejecting existing repositories."
+    },
+    {
+      "acceptance_id": "graph-hygiene-improves-without-history-loss",
+      "criterion": "Fixtures prove reference-only DONE edges no longer enter new plans or create unnecessary Current boundaries and archived stubs, while legitimate fork, join, release, migration, and consumed-artifact dependencies remain exact and inspectable in All/history."
+    },
+    {
+      "acceptance_id": "skills-and-tests-share-one-rule",
+      "criterion": "Ticket Plan, Ticket Validate, lifecycle references, tests, and Agent guidance state the rule once without semantic duplication, and complete project, Ticket, graph, installed-artifact, and cross-host Skill contract verification pass."
+    }
+  ],
+  "constraints": [
+    "Do not delete or rewrite existing historical dependencies solely to make the Current graph smaller.",
+    "Do not make every dependency on a DONE Ticket invalid; completed prerequisites may remain genuine causal inputs.",
+    "Do not use LLM-only inference as a schema gate or silently mutate candidate Tickets during validation.",
+    "Keep advice nonblocking until a deterministic false-positive-free rule justifies stronger validation."
+  ],
+  "context": "During planning of the archived-stub repair, it was tempting to add depends_on to the already successful archive/query Ticket merely because the repair preserves that behavior. Independent validation correctly moved the completed work to context_refs: it is authority and baseline, not a remaining unlock boundary. This distinction matters as the graph grows because gratuitous dependencies pull DONE boundaries into Current and create archived stubs that look operational. Preserve legitimate causal history while making the planner and validator detect when a completed Ticket is being used only as documentation shorthand.",
+  "context_refs": [
+    {
+      "purpose": "Authority for the smallest honest Ticket graph and direct Git-native references.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Authority requiring exact dependency topology rather than presentation-driven invented edges.",
+      "ref": ".vibehub/rooms/workbench/decision-topology-derived-task-clusters.yaml"
+    },
+    {
+      "purpose": "Concrete planning example where completed archive/query work is Context rather than an execution dependency.",
+      "ref": ".vibehub/tickets/ticket-fix-archived-stub-label-visibility.yaml"
+    },
+    {
+      "purpose": "Completed baseline correctly consumed through Context reference by the new UI repair.",
+      "ref": ".vibehub/outcomes/ticket-queryable-archived-ticket-history.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Ticket planning and validation distinguish a real execution prerequisite from a completed baseline or authority reference, reducing misleading causal edges and archived-history stubs without erasing legitimate dependency history.",
+  "provenance_refs": [
+    "conversation:2026-08-20-completed-dependency-versus-context-reference-gap",
+    "validation:ticket-fix-archived-stub-label-visibility"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-tighten-completed-dependency-hygiene"
+}

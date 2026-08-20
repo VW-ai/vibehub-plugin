@@ -1,0 +1,70 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "graph-and-overview-surface-closeout-work",
+      "criterion": "Tickets whose next_action is CLOSE_OUT receive a restrained non-color REVIEW or CLOSE OUT presentation distinct from READY, Overview reports a dedicated closeout count and queue, and cards never show Start or ordinary Agent execution as the primary action for that state."
+    },
+    {
+      "acceptance_id": "inspector-explains-proof-versus-judgment",
+      "criterion": "Execution, Contract, and Log surfaces clearly state Evidence coverage, authority satisfaction, Outcome pending, and why independent adjudication is next; each acceptance remains inspectable and human-origin gaps route to NEEDS YOU rather than closeout."
+    },
+    {
+      "acceptance_id": "read-only-closeout-handoff-is-complete",
+      "criterion": "The current read-only Workbench provides one explicit Close out with Agent handoff containing the exact Ticket ID, source, current Acceptance, Evidence, authority, diff or Git refs, and independent-closeout instruction; it performs no hidden write, and an official DSH command may later invoke the same payload without posing as a model turn."
+    },
+    {
+      "acceptance_id": "skills-route-complete-evidence-to-closeout",
+      "criterion": "Ticket Run, Review, and lifecycle routing consume next_action so a fully evidenced Ticket is handed to an independent closeout Agent instead of executed again; missing permission, human judgment, or failed Evidence remains explicit and cannot be bypassed by the handoff."
+    },
+    {
+      "acceptance_id": "batch-and-single-ticket-review-remain-bounded",
+      "criterion": "A reviewer can focus one closeout-ready Ticket and can obtain a bounded list of all closeout-ready Tickets without mixing READY execution, REFINE, BLOCKED, or unrelated repositories; no automatic batch acceptance or cross-task browser discovery is introduced."
+    },
+    {
+      "acceptance_id": "interaction-regressions-pass",
+      "criterion": "Real and fixture graphs cover zero Evidence, partial Evidence, complete Agent Evidence, missing human Evidence, complete authority-satisfying Evidence, successful Outcome, and non-success Outcome across desktop, narrow, keyboard, reduced-motion, focused-link, and exact-source flows; complete repository and artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Independent closeout remains a separate Agent judgment; do not let the executor or browser certify its own work.",
+    "Do not make the read-only local Workbench writable or add hidden durable UI state.",
+    "Do not collapse human attention, runtime presence, Evidence coverage, and canonical Ticket status into one badge or lifecycle.",
+    "Reuse the existing Graph, Inspector, Overview, Agent handoff, and DSH additive-command boundaries rather than adding a second review application."
+  ],
+  "context": "The lifecycle Skill contract already says that Ticket Run must hand Evidence, diff, and contract to an independent closeout Agent, but that transition is currently prompt-only. The graph still labels fully evidenced work READY, Overview has no closeout queue, and the read-only Workbench offers no dedicated handoff. Consume the shared next_action projection to make adjudication visible and actionable while preserving the executor/closeout independence rule. The current Plugin may expose a precise Copy or Open-with-Agent handoff rather than writing from the browser; a later DSH integration may bind the same action to an official command surface without changing its semantics.",
+  "context_refs": [
+    {
+      "purpose": "Binding Workbench interaction, accessibility, and truthful-presence constraints.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Authority for returning work only when the person's judgment is needed.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    },
+    {
+      "purpose": "Existing executor-to-independent-closeout contract to make mechanically visible.",
+      "ref": "skills/vibehub-ticket-run/SKILL.md"
+    },
+    {
+      "purpose": "Canonical independent adjudication workflow and authority boundary.",
+      "ref": "skills/vibehub-ticket-closeout/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Workbench and Ticket Skills make independent closeout an obvious, correctly routed next action instead of leaving fully evidenced work looking executable or relying on an Agent to remember the final step.",
+  "provenance_refs": [
+    "conversation:2026-08-20-closeout-must-be-first-class",
+    "dogfood:multiple-evidence-complete-tickets-required-manual-closeout"
+  ],
+  "relations": [
+    {
+      "rationale": "Workbench and Skill routing need one canonical derived next action before presenting or dispatching closeout work.",
+      "target_ticket_id": "ticket-derive-closeout-ready-next-action",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-make-closeout-first-class-handoff"
+}

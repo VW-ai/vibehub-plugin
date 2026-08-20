@@ -1,0 +1,60 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-after-proof-policy-and-next-action",
+      "criterion": "After both direct prerequisites have successful Outcomes, replan this same Ticket to firm with exact acceptance for contract identity, Evidence and Outcome binding, selected legacy migration and unresolved fallback, closed-contract mutation, stale-proof projection, CLOSE_OUT and DONE behavior, Workbench explanation, host parity, rollback, and complete regression coverage derived from the chosen policy and shared next_action contract."
+    }
+  ],
+  "constraints": [
+    "Do not execute this Ticket while draft or infer the protected legacy policy before human Evidence exists.",
+    "Do not delete or rewrite historical Evidence or Outcome to make it match a newer contract.",
+    "Do not use timestamps, Git commit identity, filenames, or mutable repository position as acceptance semantic identity.",
+    "Do not invalidate unchanged criteria because unrelated Ticket context, constraints, relations, deliveries, or copy changed.",
+    "Do not add a database, ledger service, hidden cache, signature authority, or compatibility shim outside an explicit project migration."
+  ],
+  "context": "The direction is known but the implementation contract is intentionally not firm. Acceptance identity must be deterministic and future proof must not silently rebind, yet the legacy transition policy changes schema, migration, DONE, archive, unlock, projection, and rollback behavior. Wait for both the owner policy decision and the shared next-action contract, then replan this same Ticket into an executable implementation without smuggling a migration default into today's draft.",
+  "context_refs": [
+    {
+      "purpose": "Git-native schema and explicit migration boundary the implementation must preserve.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Authority for versioned, reviewable in-place restructuring rather than compatibility shims.",
+      "ref": ".vibehub/rooms/product/decision-agent-driven-upgrade-migration.yaml"
+    },
+    {
+      "purpose": "Authority separating Acceptance-linked Evidence and independent Outcome.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Current Evidence contract whose future revision depends on the policy decision.",
+      "ref": "skills/contracts/evidence.schema.json"
+    },
+    {
+      "purpose": "Current Outcome contract whose future revision depends on the policy decision.",
+      "ref": "skills/contracts/outcome.schema.json"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Evidence and Outcomes are mechanically bound to the exact Acceptance semantics they evaluated, so Ticket replanning cannot silently reuse stale proof or preserve DONE after the contract meaning changes.",
+  "provenance_refs": [
+    "conversation:2026-08-20-acceptance-rewrite-can-reuse-stale-evidence",
+    "dogfood:prototype-and-product-direction-ticket-replanning"
+  ],
+  "relations": [
+    {
+      "rationale": "Implementation acceptance and migration truth cannot be firm until the owner chooses the legacy proof transition policy.",
+      "target_ticket_id": "ticket-decide-legacy-proof-revision-policy",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Stale proof and revised Outcomes must integrate with the canonical CLOSE_OUT and DONE projection rather than invent a parallel lifecycle.",
+      "target_ticket_id": "ticket-derive-closeout-ready-next-action",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-bind-proof-to-acceptance-revision"
+}
