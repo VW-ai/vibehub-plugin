@@ -41,6 +41,11 @@ test("installation, Agent handoff, founders, and local assets stay truthful", as
   assert.match(page, /https:\/\/www\.linkedin\.com\/in\/wayne-wang-yuxuan/);
   assert.match(page, /https:\/\/www\.victorz\.studio/);
   assert.match(page, /https:\/\/www\.linkedin\.com\/in\/zhang-victor-2032151aa\//);
+  assert.match(page, /Wayne Wang <small>· 王宇轩<\/small>/);
+  assert.match(page, /Victor Zhang <small>· 张辰扬<\/small>/);
+  assert.match(page, /alt="Victor Zhang"/);
+  assert.match(page, /aria-label="Victor Zhang profile links"/);
+  assert.doesNotMatch(page, /Chenyang Zhang|张陈阳|张辰阳/);
 
   await Promise.all([
     access(new URL("public/brands/codex.png", root)),

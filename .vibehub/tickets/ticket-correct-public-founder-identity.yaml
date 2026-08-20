@@ -1,0 +1,51 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "founder-names-are-exact",
+      "criterion": "The rendered founder surface displays exactly Wayne Wang · 王宇轩 and Victor Zhang · 张辰扬; Chenyang Zhang and incorrect Chinese-name variants are absent from visible copy, image alt text, and accessible link labels."
+    },
+    {
+      "acceptance_id": "founder-links-and-layout-are-preserved",
+      "criterion": "Both existing portraits, personal websites, LinkedIn destinations, compact non-expandable presentation, responsive layout, and keyboard accessibility remain unchanged apart from the corrected identity text."
+    },
+    {
+      "acceptance_id": "founder-correction-is-verified",
+      "criterion": "Site lint, static production build, rendered content contracts, full repository verification, canonical VibeHub validation, and unchanged Plugin artifact verification pass with the corrected names."
+    }
+  ],
+  "constraints": [
+    "Do not invent biographies, titles, quotes, or additional identity details.",
+    "Do not change founder URLs or portraits unless an existing link is mechanically broken.",
+    "Keep this correction inside the existing PR before it is merged to main."
+  ],
+  "context": "The owner reviewed the public site before launch and corrected Victor's public identity. The English display name is Victor Zhang and the Chinese name is 张辰扬, using 辰 as in 星辰 and 扬 as in 扬帆. Wayne remains Wayne Wang · 王宇轩. This is a focused identity correction on the existing accepted public site, not a founder-profile redesign.",
+  "context_refs": [
+    {
+      "purpose": "Accepted public-site baseline this correction preserves.",
+      "ref": ".vibehub/outcomes/ticket-public-embed-real-workbench.yaml"
+    },
+    {
+      "purpose": "Founder identity rendering surface.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Static identity and asset contracts to update.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The public site presents both founders in one consistent bilingual identity format: Wayne Wang · 王宇轩 and Victor Zhang · 张辰扬.",
+  "provenance_refs": [
+    "conversation:2026-08-19-founder-name-correction"
+  ],
+  "relations": [
+    {
+      "rationale": "Correct the identity on the independently accepted public-site baseline.",
+      "target_ticket_id": "ticket-public-embed-real-workbench",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-correct-public-founder-identity"
+}

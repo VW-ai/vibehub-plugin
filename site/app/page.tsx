@@ -483,8 +483,8 @@ function Founders() {
   return (
     <section className="showcase-founders" aria-label="VibeHub founders">
       <span>Built by</span>
-      <article><Image src="/founders/wayne-wang.jpg" width={32} height={32} alt="Wayne Wang" unoptimized /><div><b>Wayne Wang <small>王宇轩</small></b><nav aria-label="Wayne Wang profile links"><a href="https://wayne-wang-yuxuan.com" target="_blank" rel="noreferrer">Website</a><a href="https://www.linkedin.com/in/wayne-wang-yuxuan" target="_blank" rel="noreferrer">LinkedIn</a></nav></div></article>
-      <article><Image src="/founders/victor-zhang.jpg" width={32} height={32} alt="Chenyang Zhang (Victor)" unoptimized /><div><b>Chenyang Zhang <small>Victor</small></b><nav aria-label="Chenyang Zhang profile links"><a href="https://www.victorz.studio" target="_blank" rel="noreferrer">Website</a><a href="https://www.linkedin.com/in/zhang-victor-2032151aa/" target="_blank" rel="noreferrer">LinkedIn</a></nav></div></article>
+      <article><Image src="/founders/wayne-wang.jpg" width={32} height={32} alt="Wayne Wang" unoptimized /><div><b>Wayne Wang <small>· 王宇轩</small></b><nav aria-label="Wayne Wang profile links"><a href="https://wayne-wang-yuxuan.com" target="_blank" rel="noreferrer">Website</a><a href="https://www.linkedin.com/in/wayne-wang-yuxuan" target="_blank" rel="noreferrer">LinkedIn</a></nav></div></article>
+      <article><Image src="/founders/victor-zhang.jpg" width={32} height={32} alt="Victor Zhang" unoptimized /><div><b>Victor Zhang <small>· 张辰扬</small></b><nav aria-label="Victor Zhang profile links"><a href="https://www.victorz.studio" target="_blank" rel="noreferrer">Website</a><a href="https://www.linkedin.com/in/zhang-victor-2032151aa/" target="_blank" rel="noreferrer">LinkedIn</a></nav></div></article>
     </section>
   );
 }

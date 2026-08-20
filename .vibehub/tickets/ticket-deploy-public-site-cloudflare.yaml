@@ -1,0 +1,57 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "deployment-contract-is-refined-from-decisions",
+      "criterion": "After both direct prerequisites succeed, this same Ticket is rewritten to maturity firm with the literal Cloudflare account and hostname, read-only conflict preflight, exact merged-main source boundary, non-secret deployment configuration, Workers deployment proof, HTTPS/custom-domain proof, metadata origin, and reproducibility checks."
+    }
+  ],
+  "constraints": [
+    "Use Cloudflare Workers Static Assets through the existing Cloudflare Vite plugin and Wrangler; do not migrate this site to Pages or build a direct asset-upload API client.",
+    "Never commit Cloudflare credentials, account tokens, zone IDs that are not required, or local Wrangler state.",
+    "Do not bind or modify any hostname until the hostname-decision Ticket has a successful Outcome and this draft Ticket has been refined to firm.",
+    "Do not alter unrelated DNS records, Cloudflare applications, Workers, routes, or zones.",
+    "Stop on any existing state at the selected hostname unless the hostname-decision Outcome explicitly authorizes replacement of that named resource.",
+    "Deploy only a fetched, verified origin/main commit after PR #24 merges."
+  ],
+  "context": "The owner authorized publishing the accepted public site through an existing Cloudflare account and domain after the founder correction is merged to main. The site already builds with Vinext and the Cloudflare Vite plugin and requires no D1 or R2. Cloudflare's current official guidance recommends Workers Static Assets and Wrangler for this application shape; a Custom Domain is appropriate because the Worker is the site's origin. This Ticket remains draft until the direct hostname-decision Outcome supplies the literal account, hostname, and conflict rule; it must then be rewritten in place to firm before execution.",
+  "context_refs": [
+    {
+      "purpose": "Existing Cloudflare Vite plugin and Worker build configuration.",
+      "ref": "site/vite.config.ts"
+    },
+    {
+      "purpose": "Existing Worker entry point generated for Vinext hosting.",
+      "ref": "site/worker/index.ts"
+    },
+    {
+      "purpose": "Production-origin metadata configuration.",
+      "ref": "site/app/layout.tsx"
+    },
+    {
+      "purpose": "Current build and hosting documentation to make reproducible.",
+      "ref": "site/README.md"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The exact merged main version of the validated VibeHub public site is deployed as a Cloudflare Worker and served over HTTPS from the owner's explicitly selected custom hostname.",
+  "provenance_refs": [
+    "conversation:2026-08-19-owner-authorizes-cloudflare-site-launch",
+    "official-doc:https://developers.cloudflare.com/workers/static-assets/get-started/",
+    "official-doc:https://developers.cloudflare.com/workers/configuration/routing/custom-domains/"
+  ],
+  "relations": [
+    {
+      "rationale": "The corrected founder identity must be accepted and merged before production deployment.",
+      "target_ticket_id": "ticket-correct-public-founder-identity",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Deployment cannot become firm until the owner selects the exact account, hostname, and conflict rule.",
+      "target_ticket_id": "ticket-decide-public-site-cloudflare-hostname",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "ticket_id": "ticket-deploy-public-site-cloudflare"
+}
