@@ -102,7 +102,7 @@
         "path": "docs/proposals/card-corner-signal/phase-model.mjs"
       },
       {
-        "blob": "5c5ef88cd1e8d76af71be647f640315e605d57fd",
+        "blob": "658ad3be5c26fd6a8000761c9518d6900b953f55",
         "path": "docs/proposals/card-corner-signal/prototype.css"
       },
       {
@@ -154,8 +154,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-20T21:50:28.346Z",
-    "last_aligned_commit": "fd6bae7430f0ef891a9e0ad24806ad0a6b099bee"
+    "checked_at": "2026-08-20T21:56:06.186Z",
+    "last_aligned_commit": "0dd18fbea09daf10875dea3dfb9de7509380ff97"
   },
   "anchors": [
     "CHANGELOG.md",

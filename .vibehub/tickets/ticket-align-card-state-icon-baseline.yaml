@@ -2,7 +2,7 @@
   "acceptance": [
     {
       "acceptance_id": "card-phase-icon-baseline-is-corrected",
-      "criterion": "Every lower-right card phase icon receives one explicit, narrowly scoped optical baseline correction relative to its adjacent state label, while corner-signal and legend icons retain their existing geometry."
+      "criterion": "Every lower-right card phase icon uses the phase row's native inline-flex center alignment with no independent vertical transform, while corner-signal and legend icons retain their existing geometry."
     },
     {
       "acceptance_id": "alignment-regression-is-verified",
@@ -10,11 +10,11 @@
     }
   ],
   "constraints": [
-    "Change only the lower-right card phase icon alignment; do not shift corner-signal icons, the top phase legend, live presence, card geometry, or phase semantics.",
+    "Keep the lower-right card phase icon on native flex centering; do not add an independent optical offset or shift corner-signal icons, the top phase legend, live presence, card geometry, or phase semantics.",
     "Keep icon and text as separate non-color carriers of the same state.",
     "Preserve wide and narrow proposal layouts, keyboard behavior, reduced motion, and production Workbench code."
   ],
-  "context": "The owner reviewed the accepted card-state proposal in the browser and observed that the lower-right state icon sits slightly above the adjacent label. The defect is limited to the card phase row: the upper-right substate signal and the four-item phase legend already have the intended alignment.",
+  "context": "The owner reviewed the accepted card-state proposal in the browser, initially perceived the lower-right state icon as slightly high, and then rejected the 1px optical correction because it made the icon visibly too low. The corrected contract is to retain the phase row's native inline-flex centering. The upper-right substate signal and four-item phase legend remain untouched.",
   "context_refs": [
     {
       "purpose": "Exact card phase-row sizing and alignment rules to correct.",
@@ -32,9 +32,10 @@
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The phase icon in each proposal Task card sits on the same visual baseline as its state label without disturbing any other icon family.",
+  "outcome": "The phase icon in each proposal Task card retains balanced native centering beside its state label without disturbing any other icon family.",
   "provenance_refs": [
-    "conversation:2026-08-20-owner-reports-card-state-icon-baseline"
+    "conversation:2026-08-20-owner-reports-card-state-icon-baseline",
+    "conversation:2026-08-20-owner-rejects-one-pixel-optical-offset"
   ],
   "relations": [],
   "schema_version": 2,

@@ -164,7 +164,9 @@ test("production-shaped review board is clickable, responsive, quiet, and access
   assert.match(css, /\.viewport-frame\[data-viewport="narrow"\]/u);
   assert.match(css, /\.task-card\.selected/u);
   assert.match(css, /\.task-card\.dimmed/u);
-  assert.match(css, /\.phase svg \{ width: 14px; height: 14px; transform: translateY\(1px\); \}/u);
+  assert.match(css, /\.phase \{[^}]*display: inline-flex;[^}]*align-items: center;/u);
+  assert.match(css, /\.phase svg \{ width: 14px; height: 14px; \}/u);
+  assert.doesNotMatch(css, /\.phase svg[^}]*transform/u);
   assert.doesNotMatch(css, /\.corner-signal svg[^}]*translateY/u);
   assert.doesNotMatch(css, /\.contract-strip svg[^}]*translateY/u);
 });
