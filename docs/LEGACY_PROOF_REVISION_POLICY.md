@@ -21,22 +21,24 @@ Ticket at that exact commit. It never edits `.vibehub/`.
 
 ## Audited corpus
 
-Snapshot: `b558f35e4813268e02d3438b6e7d863fbc7951e7`.
+Snapshot: `175e83aef0886b3714c92053231a9a0ed0c4f428`.
 
 | Fact | Count |
 | --- | ---: |
 | Tickets | 79 |
-| Evidence | 202 |
-| Outcomes | 59 |
-| Successful Outcomes / current DONE | 59 |
+| Evidence | 210 |
+| Outcomes | 61 |
+| Successful Outcomes / current DONE | 61 |
 | Archived delivered Tickets | 43 |
 | Human-authority criteria | 12 |
 | Currently satisfied human-authority criteria | 10 |
 | Human-origin Evidence | 11 |
 
-All 202 Evidence and all 59 Outcomes can be paired with an owning Ticket
-contract at their first Git appearance. That is useful reconstruction evidence,
-but not a native creation-time identity. Nineteen Evidence records belong to a
+All 210 Evidence and all 61 Outcomes can be paired with an owning Ticket
+contract at their first appearance on the current `HEAD` ancestry. The audit
+deliberately excludes `--all`: an unrelated branch or worktree ref is not
+current repository truth. This is useful reconstruction evidence, but not a
+native creation-time identity. Nineteen Evidence records belong to a
 Ticket whose contract later changed; one successful Outcome belongs to such a
 Ticket: `ticket-encode-human-acceptance-authority`. Its current Ticket changed
 three criteria after the Outcome first appeared.
@@ -44,9 +46,13 @@ three criteria after the Outcome first appeared.
 Representative exact-source cases:
 
 - `.vibehub/evidence/ticket-decide-task-harness-product-direction/owner-requires-whole-application-shell.yaml`
-  first appears at `24b3d6d9df041a94ef3cb74468be9528b0214747`; its referenced
+  first appears on the current ancestry at
+  `cdeac6b57dcab02e97f243d392f818afaad973c5`; its referenced
   `initial-shell-and-dsh-direction-decided` criterion later changed, and newer
-  human Evidence records the corrected product direction.
+  human Evidence records the corrected product direction. The previously
+  reported `24b3d6d9df041a94ef3cb74468be9528b0214747` is not an ancestor of
+  `HEAD` and is retained here as the exact failure that caused the audit to
+  remove `git log --all`.
 - `.vibehub/outcomes/ticket-encode-human-acceptance-authority.yaml` first
   appears at `ffaad6d19139942e4d1e21679a3cf7b8a6d94f21`; the owning Ticket's
   `decision-boundary-policy-approved`, `plan-and-run-handle-human-decisions`,
@@ -58,6 +64,17 @@ import or same-commit migration can preserve a readable snapshot without
 proving that it was the original adjudicated contract. Reconstruction must
 therefore remain visibly classified as reconstructed, never native.
 
+The following impact matrix is produced mechanically by the audit. `Current`
+uses the same canonical current-scope graph projection, including required DONE
+boundaries; `All` is the complete graph. `CLOSE_OUT` uses the shared derived
+next-action implementation rather than raw Evidence count.
+
+| Policy | DONE | Archived | Human satisfied | CLOSE_OUT | Current | All | Successful prerequisite edges | Open dependents unblocked |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Mark all stale | 0 | 0 | 0 | 0 | 79 | 79 | 0 | 0 |
+| Grandfather successful Outcomes | 61 | 43 | 10 | 0 | 23 | 79 | 61 | 4 |
+| Reconstruct unchanged contracts | 60 | 42 | 9 | 8 | 26 | 79 | 60 | 5 |
+
 ## Policy comparison
 
 ### A. Mark every legacy proof stale
@@ -66,10 +83,11 @@ Treat every Evidence and Outcome without a native contract identity as
 unbound. This is maximally strict and maximally disruptive.
 
 On the audited snapshot it retains 0 DONE Tickets, 0 archived Tickets, 0 human
-authority satisfactions, and 0 successful prerequisite edges. It effectively
-reopens the repository and destroys the operational value of already-reviewed
-history. Rollback would require restoring the previous project format or an
-explicit re-adjudication of all 59 Outcomes.
+authority satisfactions, 0 CLOSE_OUT Tickets, and 0 successful prerequisite
+edges. Current expands to all 79 Tickets. It effectively reopens the repository
+and destroys the operational value of already-reviewed history. Rollback would
+require restoring the previous project format or an explicit re-adjudication
+of all 61 Outcomes.
 
 Source-of-truth assumption: absence of native identity means no trustworthy
 historical binding, even when Git contains a contemporaneous contract.
@@ -79,12 +97,14 @@ historical binding, even when Git contains a contemporaneous contract.
 Preserve all currently valid successful Outcomes as permanently accepted
 legacy closures, while binding only new proof to revisions.
 
-It retains all 59 DONE Tickets, 43 archived Tickets, 10 human-authority
-satisfactions, 59 successful prerequisite edges, and the current three open
-dependents whose prerequisites are satisfied. Migration and rollback are
-simple. The cost is semantic: the one known drifted successful Outcome would
-remain DONE against current criterion wording it did not originally
-adjudicate, and future discovery of more drift would not change that.
+It retains all 61 DONE Tickets, 43 archived Tickets, 10 human-authority
+satisfactions, 61 successful prerequisite edges, and four open dependents whose
+prerequisites are satisfied. Current contains 23 projected Tickets. Open legacy
+Evidence is stale, so it contributes zero CLOSE_OUT Tickets until re-recorded.
+Migration and rollback are simple. The cost is semantic: the one known drifted
+successful Outcome would remain DONE against current criterion wording it did
+not originally adjudicate, and future discovery of more drift would not change
+that.
 
 Source-of-truth assumption: current repository validity and prior independent
 closeout are sufficient authority to freeze legacy success despite missing
@@ -97,10 +117,13 @@ successful Outcome current only when reconstruction succeeds and that complete
 contract is unchanged today. Anything missing, ambiguous, or drifted becomes
 legacy-unresolved and requires review.
 
-On this snapshot it retains 58 DONE Tickets, 42 archived Tickets, 9 satisfied
-human-authority criteria, and 58 successful prerequisite edges. The one known
-drifted successful Outcome becomes unresolved. All 202 Evidence and 59 Outcomes
-are reconstructable here, but another repository may have missing history.
+On this snapshot it retains 60 DONE Tickets, 42 archived Tickets, 9 satisfied
+human-authority criteria, 60 successful prerequisite edges, and five open
+dependents whose retained prerequisites are satisfied. Eight open Tickets have
+unchanged reconstructed Evidence and therefore derive CLOSE_OUT. Current
+contains 26 projected Tickets; All remains 79. The one known drifted successful
+Outcome becomes unresolved. All 210 Evidence and 61 Outcomes are
+reconstructable here, but another repository may have missing history.
 
 Source-of-truth assumption: a contemporaneous Git snapshot is acceptable
 migration evidence, but cannot silently certify later contract changes.
@@ -128,10 +151,27 @@ Choose a hybrid of B and C:
    Replanning after success needs a future explicit reopen protocol that keeps
    the prior Outcome immutable.
 
-This recommendation preserves 58 of 59 current closures while surfacing the
+This recommendation preserves 60 of 61 current closures while surfacing the
 one real semantic drift already present. It avoids the repository-wide reset of
 A and the silent reinterpretation of B. The owner must explicitly approve this
 tradeoff before implementation becomes firm.
+
+## Installed-artifact compatibility
+
+Every policy requires one explicit project-format migration, atomic changes to
+the Ticket, Evidence, and Outcome schema contracts, and rebuilding both Codex
+and Claude installed Plugin artifacts. No policy is compatible with upgrading
+only source `vh.mjs` while leaving an older host artifact behind.
+
+- Mark-all-stale makes every installed projection lose prior proof until it is
+  re-recorded.
+- Grandfathering keeps current successful closures compatible after the atomic
+  upgrade, while open legacy Evidence remains stale.
+- Reconstruction preserves only unchanged contracts reachable from the current
+  `HEAD` ancestry and makes every drift or missing-history case reviewable.
+
+All three require explicit migration and preserve historical documents on
+rollback; none introduces a runtime compatibility branch, cache, or daemon.
 
 ## Migration and rollback invariants
 

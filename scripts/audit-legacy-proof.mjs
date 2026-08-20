@@ -6,7 +6,10 @@ import {
   assertValid,
   documents,
   loadRepository,
+  projectTicketQuery,
   ticketArchived,
+  ticketNextAction,
+  ticketStatus,
 } from "../skills/scripts/vh.mjs";
 
 function git(repo, args, { allowFailure = false } = {}) {
@@ -49,8 +52,8 @@ function same(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
-function firstCurrentAddition(repo, path) {
-  const output = git(repo, ["log", "--all", "--diff-filter=A", "--format=%H", "--", path], {
+export function firstCurrentAddition(repo, path) {
+  const output = git(repo, ["log", "--follow", "--diff-filter=A", "--format=%H", "HEAD", "--", path], {
     allowFailure: true,
   }).stdout.trim();
   return output ? output.split("\n")[0] : null;
@@ -122,6 +125,57 @@ function dependencyImpact(tickets, acceptedOutcomeIds) {
   return { successful_prerequisite_edges: successfulPrerequisiteEdges, open_dependents_unblocked: openDependentsUnblocked };
 }
 
+function policyRepository(repository, retainedOutcomeIds, retainedEvidenceIds) {
+  return {
+    ...repository,
+    evidence: {
+      ...repository.evidence,
+      documents: new Map([...repository.evidence.documents]
+        .filter(([id]) => retainedEvidenceIds.has(id))),
+    },
+    outcomes: {
+      ...repository.outcomes,
+      documents: new Map([...repository.outcomes.documents]
+        .filter(([id, entry]) => retainedOutcomeIds.has(id) && entry.document.status === "successful")),
+    },
+  };
+}
+
+function satisfiedHumanCriteria(repository, humanCriteria) {
+  return humanCriteria.filter(({ ticket_id: ticketId, acceptance_id: acceptanceId }) => {
+    const outcome = repository.outcomes.documents.get(ticketId)?.document;
+    if (outcome?.status !== "successful" || !outcome.accepted_acceptance_ids.includes(acceptanceId)) return false;
+    return outcome.evidence_ids.some((evidenceId) => {
+      const item = repository.evidence.documents.get(evidenceId)?.document;
+      return item?.acceptance_ids.includes(acceptanceId) && (item.origin ?? "agent") === "human";
+    });
+  });
+}
+
+function policyImpact(repository, tickets, retainedOutcomeIds, retainedEvidenceIds, humanCriteria, compatibility) {
+  const simulated = policyRepository(repository, retainedOutcomeIds, retainedEvidenceIds);
+  const doneIds = new Set(tickets
+    .filter((ticket) => ticketStatus(simulated, ticket) === "DONE")
+    .map((ticket) => ticket.ticket_id));
+  return {
+    done_tickets_retained: doneIds.size,
+    archived_tickets_retained: tickets.filter((ticket) => ticketArchived(simulated, ticket)).length,
+    human_authority_satisfactions_retained: satisfiedHumanCriteria(simulated, humanCriteria).length,
+    close_out_tickets: tickets.filter((ticket) => ticketNextAction(simulated, ticket).action === "CLOSE_OUT").length,
+    current_graph_tickets: projectTicketQuery(simulated, { scope: "current" }).tickets.length,
+    all_graph_tickets: projectTicketQuery(simulated, { scope: "all" }).tickets.length,
+    ...dependencyImpact(tickets, doneIds),
+    installed_artifact_compatibility: {
+      project_format_bump_required: true,
+      schema_contracts_requiring_atomic_upgrade: 3,
+      installed_host_artifacts_requiring_atomic_upgrade: 2,
+      explicit_legacy_migration_required: true,
+      rollback_preserves_historical_documents: true,
+      policy_effect: compatibility,
+    },
+  };
+}
+
 export function auditLegacyProof(repo) {
   const repository = loadRepository(repo);
   assertValid(repository.errors);
@@ -139,17 +193,16 @@ export function auditLegacyProof(repo) {
         && !audit.ticket_contract_drifted_since_addition;
     })
     .map((entry) => entry.document.ticket_id));
+  const grandfatherEvidenceIds = new Set(successfulOutcomes
+    .flatMap((entry) => entry.document.evidence_ids));
+  const reconstructableEvidenceIds = new Set(evidenceAudit
+    .filter((item) => item.reconstructable_from_first_git_appearance
+      && item.changed_current_acceptance_ids.length === 0)
+    .map((item) => item.id));
   const humanCriteria = tickets.flatMap((ticket) => ticket.acceptance
     .filter((item) => (item.authority ?? "agent") === "human")
     .map((item) => ({ ticket_id: ticket.ticket_id, acceptance_id: item.acceptance_id })));
-  const currentHumanSatisfied = humanCriteria.filter(({ ticket_id, acceptance_id }) => {
-    const outcome = repository.outcomes.documents.get(ticket_id)?.document;
-    if (outcome?.status !== "successful" || !outcome.accepted_acceptance_ids.includes(acceptance_id)) return false;
-    return outcome.evidence_ids.some((evidenceId) => {
-      const item = repository.evidence.documents.get(evidenceId)?.document;
-      return item?.acceptance_ids.includes(acceptance_id) && (item.origin ?? "agent") === "human";
-    });
-  });
+  const currentHumanSatisfied = satisfiedHumanCriteria(repository, humanCriteria);
   const head = git(repo, ["rev-parse", "HEAD"]).stdout.trim();
   return {
     schema_version: 1,
@@ -187,27 +240,30 @@ export function auditLegacyProof(repo) {
       limitation: "Git proves the contract at a document's first appearance in this repository, not the unrecorded creation-time intent before that commit.",
     },
     policy_impact: {
-      mark_all_legacy_stale: {
-        done_tickets_retained: 0,
-        archived_tickets_retained: 0,
-        human_authority_satisfactions_retained: 0,
-        ...dependencyImpact(tickets, new Set()),
-      },
-      grandfather_current_successful_outcomes: {
-        done_tickets_retained: currentSuccessfulIds.size,
-        archived_tickets_retained: tickets.filter((ticket) =>
-          currentSuccessfulIds.has(ticket.ticket_id) && ticketArchived(repository, ticket)).length,
-        human_authority_satisfactions_retained: currentHumanSatisfied.length,
-        ...dependencyImpact(tickets, currentSuccessfulIds),
-      },
-      reconstruct_from_git_without_drift: {
-        done_tickets_retained: reconstructableSuccessfulIds.size,
-        archived_tickets_retained: tickets.filter((ticket) =>
-          reconstructableSuccessfulIds.has(ticket.ticket_id) && ticketArchived(repository, ticket)).length,
-        human_authority_satisfactions_retained: currentHumanSatisfied
-          .filter((item) => reconstructableSuccessfulIds.has(item.ticket_id)).length,
-        ...dependencyImpact(tickets, reconstructableSuccessfulIds),
-      },
+      mark_all_legacy_stale: policyImpact(
+        repository,
+        tickets,
+        new Set(),
+        new Set(),
+        humanCriteria,
+        "All existing proof disappears from installed projections until re-recorded; source and both host artifacts must upgrade together.",
+      ),
+      grandfather_current_successful_outcomes: policyImpact(
+        repository,
+        tickets,
+        currentSuccessfulIds,
+        grandfatherEvidenceIds,
+        humanCriteria,
+        "Current successful closures remain compatible after the atomic upgrade; open legacy Evidence is stale and does not enter CLOSE_OUT.",
+      ),
+      reconstruct_from_git_without_drift: policyImpact(
+        repository,
+        tickets,
+        reconstructableSuccessfulIds,
+        reconstructableEvidenceIds,
+        humanCriteria,
+        "Installed projections preserve only HEAD-ancestry-reconstructed unchanged contracts and surface every drift or missing-history case for review.",
+      ),
     },
   };
 }
