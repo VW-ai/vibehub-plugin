@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "canonical-website-entry-is-visible-and-exact",
+    "readme-and-site-share-one-major-narrative"
+  ],
+  "evidence_id": "readme-site-narrative-and-link-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T23:17:44Z",
+  "refs": [
+    "README.md",
+    "site/app/page.tsx",
+    "site/app/layout.tsx",
+    "site/README.md",
+    ".vibehub/outcomes/ticket-complete-public-domain-discovery.yaml",
+    "test/release.test.mjs",
+    "web:https://vibehub.icu",
+    "git:merge-origin-main-cf680825f0f0cb3b7798443aba2696144d113eb8"
+  ],
+  "schema_version": 1,
+  "summary": "After merging origin/main at 1cbca5d into the feature branch, the root README hero now uses the current checked-in public site's `Stop managing chats. Manage the work.` thesis, immediately explains one coding request becoming a Git-native Ticket with the exact Context needed, and exposes one clear `vibehub.icu` anchor whose href is exactly https://vibehub.icu. The compact lifecycle paragraph now matches the site's current source: Request plus Context shapes one Ticket, work produces acceptance-linked Evidence, a separate Agent decides Outcome, accepted learning returns to Context, and repository/Git keeps the record reviewable and reversible. The README retains the existing memory comparison and does not copy the stale externally cached AI-native command-center/PRD-suite narrative. Source inspection and regression checks reject www, Pages, tracking, and alternative website identities; the successful domain-discovery Outcome independently establishes the apex as canonical. No site source, deployment, release instruction, screenshot, runtime, or Ticket semantic changed in this implementation.",
+  "ticket_id": "ticket-align-readme-with-public-site-narrative"
+}

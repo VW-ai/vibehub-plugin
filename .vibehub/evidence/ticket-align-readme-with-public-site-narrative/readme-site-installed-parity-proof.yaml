@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "canonical-website-entry-is-visible-and-exact",
+    "readme-and-site-share-one-major-narrative",
+    "existing-readme-contract-and-artifact-parity-remain-intact"
+  ],
+  "evidence_id": "readme-site-installed-parity-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T23:17:44Z",
+  "refs": [
+    "README.md",
+    "test/release.test.mjs",
+    "test/host-marketplaces.test.mjs",
+    "scripts/verify-plugin-artifact.mjs",
+    "command:focused-readme-marketplace-tests-6-of-6",
+    "command:npm-run-verify-131-of-131",
+    "artifact:fresh-codex-claude-62-files-2828446-bytes",
+    ".vibehub/rooms/product/room.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "README-focused plus fresh Codex/Claude marketplace tests pass 6/6. Both independently built installed plugin roots contain byte-identical README content with the exact apex link, work-over-chat thesis, Ticket/Evidence/Outcome/Context narrative, and no www or Pages URL. The fresh installed-artifact verifier passes at 62 files and 2,828,446 bytes after asserting the same narrative, exact single apex link, and all relative README image targets. Full repository verification passes 131/131. The root README remains 59 physical lines and within its 60-element guard, preserves exactly one `Start this with VibeHub.`, all three accepted Retina Workbench PNGs, DRAFT/READY/RUNNING/DONE, current Codex and Claude installation/upgrades, and dark-mode brand assets. Product Room alignment is refreshed; all four Rooms are FRESH, Ticket/project validation passes, and the implementation diff contains no site path.",
+  "ticket_id": "ticket-align-readme-with-public-site-narrative"
+}

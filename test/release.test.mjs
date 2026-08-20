@@ -32,7 +32,13 @@ test("README is a dark-safe one-line product surface", () => {
   }
   assert.ok(existsSync(join(root, "docs/assets/local-graph/readme-capture-manifest.json")));
   assert.ok(readme.split("\n").length <= 60, "README is no longer one-line focused");
-  assert.match(readme, /VibeHub turns a development request into a Git-native Ticket cycle/u);
+  assert.match(readme, /Stop managing chats\. Manage the work\./u);
+  assert.match(readme, /Turn one coding request into a Git-native Ticket with the exact Context needed/u);
+  assert.equal([...readme.matchAll(/href="https:\/\/vibehub\.icu"/gu)].length, 1);
+  assert.match(readme, /request and exact Context shape one Ticket/u);
+  assert.match(readme, /work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context/u);
+  assert.match(readme, /Git keeps the history reviewable and reversible/u);
+  assert.doesNotMatch(readme, /https:\/\/(?:www\.)?vibehub\.icu[^"<\s]|https:\/\/[^"<\s]*\.pages\.dev|AI-Native Command Center|From PRD to delivery/iu);
   assert.equal([...readme.matchAll(/Start this with VibeHub\./gu)].length, 1);
   assert.match(readme, /Memory tools preserve the conversation; VibeHub preserves the development cycle\./u);
   for (const phase of ["DRAFT", "READY", "RUNNING", "DONE"]) assert.match(readme, new RegExp(`\\b${phase}\\b`, "u"));

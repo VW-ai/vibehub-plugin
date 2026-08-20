@@ -72,6 +72,20 @@ try {
     if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
   }
   const installedReadme = readFileSync(join(artifact, "README.md"), "utf8");
+  for (const narrative of [
+    "Stop managing chats. Manage the work.",
+    "Turn one coding request into a Git-native Ticket with the exact Context needed",
+    "work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context",
+    "Git keeps the history reviewable and reversible",
+  ]) {
+    if (!installedReadme.includes(narrative)) {
+      throw new Error(`installed README is missing public-site narrative: ${narrative}`);
+    }
+  }
+  if ([...installedReadme.matchAll(/href="https:\/\/vibehub\.icu"/gu)].length !== 1
+    || /https:\/\/www\.vibehub\.icu|https:\/\/[^"<\s]*\.pages\.dev/iu.test(installedReadme)) {
+    throw new Error("installed README does not retain the one canonical vibehub.icu link");
+  }
   const readmeImageRefs = new Set([
     ...[...installedReadme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/gu)]
       .map((match) => match[1]),

@@ -1,0 +1,62 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "canonical-website-entry-is-visible-and-exact",
+      "criterion": "The root README exposes a clear human-readable link to exactly https://vibehub.icu near the product hero; automated checks reject www, Pages, or alternate public-site destinations and fresh installed Codex/Claude artifacts retain the same link."
+    },
+    {
+      "acceptance_id": "readme-and-site-share-one-major-narrative",
+      "criterion": "The README hero and immediately adjacent product copy use the current site's concise work-over-chat thesis and accurately connect one coding request, exact Context, a Git-native Ticket, acceptance-linked Evidence, independent Outcome, returned durable Context, and repository/Git ownership without copying the full website, implying chat management, or introducing unsupported product-suite claims."
+    },
+    {
+      "acceptance_id": "existing-readme-contract-and-artifact-parity-remain-intact",
+      "criterion": "README-focused tests and full repository verification preserve the at-most-60-line surface, exactly one canonical entry, all three Retina Workbench images and four phases, current installation/upgrades and dark-mode brand; fresh Codex/Claude artifacts resolve every README image and retain the website/narrative, all Rooms are FRESH, and Ticket/project validation passes."
+    }
+  ],
+  "constraints": [
+    "Use https://vibehub.icu as the only public-site destination; do not introduce www, a stale Pages URL, tracking parameters, or another website identity.",
+    "Treat merged website source and successful domain-discovery Outcome as current product truth; do not adopt the obsolete broad AI-native product-suite copy returned by a stale external crawl.",
+    "Keep README compact and product-facing: preserve the accepted three Retina Workbench images, DRAFT/READY/RUNNING/DONE language, exactly one `Start this with VibeHub.`, current installation/upgrades, dark-mode brand, and the at-most-60-line guard.",
+    "Do not change site source, public deployment, release instructions, plugin runtime behavior, Ticket semantics, or screenshot assets in this Ticket.",
+    "The checked-in source README and fresh Codex/Claude installed artifacts must expose the same working external link and narrative."
+  ],
+  "context": "The owner asked to first catch the current feature branch up to remote main, then use the website information and major narrative in the root README. origin/main is now merged and contains the canonical Cloudflare Pages production identity plus the current public-site source. The site source leads with `Stop managing chats. Manage the work.`, turns one coding request into a Ticket with exact Context, explains Acceptance to Evidence to independent Outcome to returned Context, and keeps repository/Git ownership explicit. The root README already carries most lifecycle truth and its three accepted Retina Workbench captures, but it has no canonical vibehub.icu link and its hero does not yet use the site's clearest work-over-chat thesis. Align the compact hero and nearby product copy only; do not turn README into a second website or copy obsolete/cached marketing language from a prior deployment.",
+  "context_refs": [
+    {
+      "purpose": "Compact root product surface and installation contract to update minimally.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Current checked-in public-site hero, Ticket, Context, Evidence, Outcome, and Git narrative.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Current public metadata product proposition and canonical description.",
+      "ref": "site/app/layout.tsx"
+    },
+    {
+      "purpose": "Canonical production URL and Cloudflare Pages public-site boundary from merged main.",
+      "ref": "site/README.md"
+    },
+    {
+      "purpose": "Successful canonical-domain discovery and production verification truth.",
+      "ref": ".vibehub/outcomes/ticket-complete-public-domain-discovery.yaml"
+    },
+    {
+      "purpose": "Existing at-most-60-line, canonical-entry, image, installation, and artifact-facing README contract.",
+      "ref": "test/release.test.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The root README gives visitors one canonical vibehub.icu entrance and expresses the same concise coding-agent-first product thesis as the current public site without duplicating the site or weakening installation and Workbench truth.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-requests-remote-main-sync-and-readme-site-alignment",
+    "web:https://vibehub.icu",
+    "git:origin-main-1cbca5d"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-align-readme-with-public-site-narrative"
+}

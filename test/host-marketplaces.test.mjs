@@ -210,6 +210,13 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
     .map((entry) => entry.name)
     .sort();
   assert.deepEqual(skillNames(codex.pluginRoot), skillNames(claude.pluginRoot));
+  const codexReadme = readFileSync(join(codex.pluginRoot, "README.md"), "utf8");
+  const claudeReadme = readFileSync(join(claude.pluginRoot, "README.md"), "utf8");
+  assert.equal(claudeReadme, codexReadme);
+  assert.match(codexReadme, /href="https:\/\/vibehub\.icu"/u);
+  assert.match(codexReadme, /Stop managing chats\. Manage the work\./u);
+  assert.match(codexReadme, /work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context/u);
+  assert.doesNotMatch(codexReadme, /https:\/\/www\.vibehub\.icu|https:\/\/[^"<\s]*\.pages\.dev/iu);
   for (const relativePath of [
     join("skills", "contracts", "project-format.schema.json"),
     join("skills", "contracts", "acceptance-authority.md"),

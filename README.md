@@ -5,11 +5,11 @@
     <img src="assets/brand/vibehub-logo.svg" alt="VibeHub" width="360">
   </picture>
 </p>
-<p align="center"><strong>VibeHub turns a development request into a Git-native Ticket cycle your coding agent can plan, execute, prove, and close.</strong></p>
+<p align="center"><strong>Stop managing chats. Manage the work.</strong><br>Turn one coding request into a Git-native Ticket with the exact Context needed to plan, execute, prove, and close it.</p>
 
 <h3 align="center"><code>Start this with VibeHub.</code></h3>
 
-<p align="center"><em>Memory tools preserve the conversation; VibeHub preserves the development cycle.</em></p>
+<p align="center"><a href="https://vibehub.icu"><strong>vibehub.icu</strong></a> · <em>Memory tools preserve the conversation; VibeHub preserves the development cycle.</em></p>
 
 <img src="docs/assets/local-graph/quiet-workbench-desktop-2x.png" alt="VibeHub four-phase Ticket Workbench showing the current causal graph" width="1280">
 
@@ -23,7 +23,7 @@
 
 **Bring repository context in only when useful.** Rooms expose durable Context, consuming Tickets, and drift state on demand; the same read-only graph remains usable at a real narrow viewport.
 
-Describe the work and say the line above. VibeHub plans the smallest honest Git-native Tickets, keeps human decisions explicit, and records acceptance-linked Evidence before independent closeout. Tickets, Context, Evidence, and Outcomes remain ordinary Git files, so another Agent can resume from repository truth without reconstructing the conversation.
+Describe one coding request and say the line above. The request and exact Context shape one Ticket; work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context. Tickets, Context, Evidence, and Outcomes remain ordinary Git files, so another Agent can resume from repository truth while Git keeps the history reviewable and reversible.
 
 ## Installation
 

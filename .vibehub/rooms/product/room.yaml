@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "61630827cc71989dcc8b6d0442a05b718419ec06",
+        "blob": "13da7eda9d85e44dac78aa99ec862e9e7181309f",
         "path": "README.md"
       },
       {
@@ -170,8 +170,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-20T23:04:44.849Z",
-    "last_aligned_commit": "051456d29b43a96169170f36308bb16514f439dc"
+    "checked_at": "2026-08-20T23:17:24.714Z",
+    "last_aligned_commit": "cf680825f0f0cb3b7798443aba2696144d113eb8"
   },
   "anchors": [
     "CHANGELOG.md",
