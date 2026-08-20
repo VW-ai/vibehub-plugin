@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-public-hero-shows-ticket-graph",
+  "detail": "The public website has two different explanatory scales and must not collapse them. The first viewport shows a realistic multi-Ticket dependency graph with visible Ticket nodes, causal connectors, attached Evidence and Outcome, and restrained state signals, so a visitor immediately recognizes VibeHub as a Ticket graph product. The Product section separately explains the lifecycle of one Ticket: human Request and long-term Context shape the Ticket, the Ticket produces Evidence, independent Outcome returns learning to Context. Multiple Tickets are correct in the hero because they are separate work units; Request, Context, Evidence, and Outcome must still remain visually distinct from Ticket nodes. The owner-approved reference composition—with large promise and entry on the left and an expansive causal graph flowing through the rest of the first viewport—is the quality bar. Visual novelty serves this immediate product recognition. Typography inside the Product section's Outcome ellipse must retain the same readable weight, scale, and rhythm as rectangular objects rather than becoming a decorative exception.",
+  "evidence": [
+    {
+      "note": "The owner rejected the current first viewport because it no longer communicated Ticket graph and selected the earlier expansive graph composition as the strongest direction.",
+      "ref": "conversation:2026-08-05-hero-must-read-as-ticket-graph"
+    },
+    {
+      "note": "The checked-in A direction preserves the selected graph-first composition and visual-quality reference.",
+      "ref": "design/public-site/causal-canvas-direction-a.png"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-public-causal-canvas-site",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-public-canvas-scrolls-diagonally",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-mediates-intent-context-loop",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-05T08:51:00Z",
+    "quote": "完全都看不出来我们是要做一个TK graph……特别是这个第一页……你给我效果最惊艳的,还又是你给我的这个第一页",
+    "ref": "conversation:2026-08-05-hero-must-read-as-ticket-graph"
+  },
+  "state": "active",
+  "summary": "The public hero must unmistakably present VibeHub as a Ticket graph product",
+  "tags": [
+    "causal-canvas",
+    "hero",
+    "public-site",
+    "ticket-graph",
+    "typography",
+    "visual-language"
+  ],
+  "type": "decision"
+}

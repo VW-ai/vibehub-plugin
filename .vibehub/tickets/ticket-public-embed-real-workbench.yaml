@@ -1,0 +1,135 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "dark-canvas-clarifies-the-product",
+      "criterion": "Desktop and 390px layouts use a near-black deep-graphite public canvas instead of the current warm off-white field; text, controls, focus, links, semantic state colors, and the faithful lighter Workbench remain legible and accessible, with green reserved for meaningful state, relation, or interaction rather than large decorative fills."
+    },
+    {
+      "acceptance_id": "first-message-is-one-authentic-composer",
+      "criterion": "The hero contains one familiar coding-agent composer whose single message reads Add dark mode to this task app. Start this with VibeHub. with a restrained caret; no REQUEST label, In your coding agent label, attached status, separate command chip, duplicate frame, send arrow, fake streaming, or claim of arbitrary execution remains."
+    },
+    {
+      "acceptance_id": "persistent-header-keeps-real-entry-points",
+      "criterion": "A restrained sticky header keeps a keyboard-reachable VibeHub home mark, Codex install, Claude Code install, GitHub, and Copy for Agent available with their established icons and truthful links or copy actions; the brand returns to the page top, the full wordmark may appear only after leaving the hero, and How it works is not a persistent navigation burden."
+    },
+    {
+      "acceptance_id": "ticket-view-is-a-faithful-workbench-scene",
+      "criterion": "The first viewport pairs the product promise and authentic message with the faithful real Ticket Graph and Inspector as the dominant product evidence; Ticket selection and optional disposable canvas panning remain browser-only view state and never imply saved canonical data."
+    },
+    {
+      "acceptance_id": "ticket-is-an-agent-executable-object",
+      "criterion": "The second vertical screen is titled What is a Ticket? and displays one complete, readable, schema-valid Ticket file for the persistent-dark-mode example, including outcome, context, context_refs, direct depends_on relations, acceptance, constraints, and provenance; the adjacent faithful Workbench opens the corresponding selected Ticket so the source file and parsed product surface are visibly the same object, with no custom anatomy table or long request-fragment mapping."
+    },
+    {
+      "acceptance_id": "rooms-explain-context-without-a-second-topology",
+      "criterion": "A focused section titled How is context built up? combines a readable schema-valid room.yaml with multiple complete Context-file examples covering Decision, Constraint, and Contract, a concise lifecycle from capture into a Room through Ticket context_refs and accepted Outcome learning back into Context, and the faithful Rooms Workbench showing the same Room and consuming Tickets; Rooms remain Context boundaries rather than a second work graph."
+    },
+    {
+      "acceptance_id": "evidence-and-outcome-explain-trust",
+      "criterion": "A focused section uses the real Acceptance, Evidence, Log, and Outcome surfaces to show what changed, what supports each acceptance condition, how independent Outcome decides completion, and how durable learning returns to Context without exposing raw schema JSON or relying on confidence language."
+    },
+    {
+      "acceptance_id": "motion-is-explanatory-and-disposable",
+      "criterion": "Any remaining first-view motion is rare explanatory motion implemented without a new dependency, animates only transform and opacity or an existing sanctioned property, does not move text while it is being read, uses the existing strong easing tokens, and preserves a complete static presentation under prefers-reduced-motion."
+    },
+    {
+      "acceptance_id": "git-and-github-stay-below-product-value",
+      "criterion": "The hero does not use Git or GitHub to explain VibeHub's primary value; a later compact section separately explains that repository files hold the record, Git carries reviewable and reversible history, and GitHub provides review and collaboration."
+    },
+    {
+      "acceptance_id": "public-fixture-is-honest-and-lightweight",
+      "criterion": "Every displayed Ticket, Room Context, Acceptance, Evidence, and Outcome belongs to one deterministic typed fixture; the site adds no model call, backend, persistence, analytics, iframe, video dependency, motion library, second lifecycle state machine, or claim that the public example is executing a live repository."
+    },
+    {
+      "acceptance_id": "owner-accepts-the-product-feel",
+      "authority": "human",
+      "criterion": "After the revised page is visible in the retained localhost preview, the owner explicitly confirms that the dark palette, authentic message, real Ticket Graph, Ticket anatomy, and Ticket-to-Room-to-Evidence story feel clear enough to continue refining."
+    },
+    {
+      "acceptance_id": "embedded-workbench-is-verified",
+      "criterion": "Rendered content contracts, site lint, static production build, desktop and narrow no-overflow behavior, keyboard focus, contrast, reduced motion, fine-pointer hover gating, canonical VibeHub project validation, full repository verification, and unchanged Plugin artifact verification pass."
+    },
+    {
+      "acceptance_id": "workbench-embedding-preserves-product-quality",
+      "criterion": "The site reuses the current public Ticket Graph and Inspector components with their cool-neutral product tokens, semantic states, causal selection, progressive lenses, keyboard focus, 44px narrow targets, fine-pointer hover gating, reduced-motion behavior, and responsive no-overflow boundary; the new dark marketing canvas remains visually subordinate to the embedded product."
+    }
+  ],
+  "constraints": [
+    "Use near-black deep graphite as the public background direction; do not turn the site into a generic neon-on-black technology template or recolor semantic Workbench states for decoration.",
+    "The product UI is evidence, not illustration: reuse the current typed Workbench fixture, components, geometry, Inspector lenses, Rooms, and state language before creating any new visual object; raw schema may appear only inside explicitly labelled educational source-file viewers.",
+    "The coding-agent composer is one familiar entry metaphor, not a fake Agent application, terminal, arbitrary prompt runner, or multi-step demo.",
+    "Normal vertical reading is primary. Each lower section answers one product question and uses static legibility first; no autoplay sequence, Back or Next controls, stage rail, video player, feature grid, or horizontal page travel.",
+    "Do not deploy, commit, push, publish, or change the installed local Workbench in this Ticket."
+  ],
+  "context": "The owner accepts the current overall direction and has further clarified that the website should teach through the product's real files rather than custom explanatory tables. The hero leads with Stop managing chats. Manage the work. and Turn every coding request into a Ticket with your context. The first viewport makes the real Ticket Graph unmistakable. The second screen answers What is a Ticket? by showing a complete schema-valid Ticket file whose outcome, relations, context_refs, acceptance, constraints, and provenance correspond to the selected persistent-dark-mode Workbench Ticket; the prior custom anatomy table is removed. The next screen answers How is context built up? with a small real file browser for room.yaml plus Decision, Constraint, and Contract Context documents, a concise Capture to Room to Ticket reference to Outcome return lifecycle, and the faithful Rooms Workbench showing the same Product Room and consuming Tickets. Raw files appear only in these educational source viewers; normal product inspection remains parsed and human-readable. Later sections explain Evidence and independent Outcome, then separately explain repository files, Git, and GitHub. The surrounding website stays simpler than the product and reuses the real Workbench rather than drawing a parallel state model.",
+  "context_refs": [
+    {
+      "purpose": "Accepted public lifecycle and Evidence-before-Outcome behavior to explain through real product surfaces.",
+      "ref": ".vibehub/outcomes/ticket-public-cycle-evolution.yaml"
+    },
+    {
+      "purpose": "Accepted production Workbench capability and interaction baseline to reuse faithfully.",
+      "ref": ".vibehub/outcomes/ticket-integrate-workbench-web-upgrade-pr.yaml"
+    },
+    {
+      "purpose": "Binding decision that the public hero must unmistakably show a realistic multi-Ticket graph.",
+      "ref": ".vibehub/rooms/workbench/decision-public-hero-shows-ticket-graph.yaml"
+    },
+    {
+      "purpose": "Binding content-first vertical reading direction for the public site.",
+      "ref": ".vibehub/rooms/workbench/decision-public-canvas-scrolls-diagonally.yaml"
+    },
+    {
+      "purpose": "Canonical separation of Ticket, Evidence, Outcome, Room, Context, Reference, and Agent semantics.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    },
+    {
+      "purpose": "Current production graph, Inspector, Rooms, selection, and progressive disclosure contract.",
+      "ref": "docs/LOCAL_GRAPH_DESIGN.md"
+    },
+    {
+      "purpose": "Public composition and deterministic Workbench fixture to revise.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Public color, shape, accessibility, and responsive surface to revise.",
+      "ref": "site/app/globals.css"
+    },
+    {
+      "purpose": "Static product contracts to rewrite around the real Ticket and Room file story.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The public site tells one coherent vertical product story on a deep graphite canvas: one authentic coding-agent message becomes a faithful Ticket Graph, the second screen displays the schema-valid Ticket file that drives the selected Workbench Ticket, the next screen shows real Room and Context file shapes plus their capture-to-bind-to-return lifecycle, and later real surfaces explain Evidence, independent Outcome, and durable learning without a fake demo or parallel lifecycle.",
+  "provenance_refs": [
+    "conversation:2026-08-16-public-site-embed-mature-workbench-interactions",
+    "conversation:2026-08-18-owner-pivots-to-low-fidelity-product-playback",
+    "conversation:2026-08-18-owner-rejects-walkthrough-for-static-ticket-showcase",
+    "conversation:2026-08-19-dark-public-storytelling",
+    "conversation:2026-08-19-second-screen-defines-ticket",
+    "conversation:2026-08-19-real-ticket-room-file-story"
+  ],
+  "relations": [
+    {
+      "rationale": "Explain the accepted lifecycle without inventing another execution model.",
+      "target_ticket_id": "ticket-public-cycle-evolution",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Use the accepted v0.8 Workbench as the website's truthful product evidence.",
+      "target_ticket_id": "ticket-integrate-workbench-web-upgrade-pr",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-public-embed-real-workbench"
+}

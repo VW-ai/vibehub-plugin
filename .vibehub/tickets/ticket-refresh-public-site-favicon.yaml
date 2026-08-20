@@ -1,0 +1,50 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "favicon-is-current-mark-at-new-url",
+      "criterion": "The favicon asset served by the build is byte-identical to site/public/vibehub-mark.svg, uses a new stable URL that does not reuse /favicon.svg, and the obsolete public favicon asset is removed."
+    },
+    {
+      "acceptance_id": "metadata-and-artifact-use-only-new-favicon",
+      "criterion": "Site metadata points both icon and shortcut icon at the new SVG favicon URL; the rendered HTML and dist artifact contain that asset and contain no /favicon.svg reference."
+    },
+    {
+      "acceptance_id": "favicon-change-is-production-ready",
+      "criterion": "Site lint, production build, rendered contracts, release preflight, focused favicon regression tests, and canonical VibeHub validation pass without changing the visible header mark or other site content."
+    }
+  ],
+  "constraints": [
+    "Reuse the exact checked-in VibeHub mark; do not invent or redraw a new favicon.",
+    "Do not change the visible VibeHub header logo, wordmark, palette, or page content.",
+    "Do not publish a new production Sites version without an explicit publish or deploy instruction."
+  ],
+  "context": "The owner sees an old favicon on vibehub.icu and asked to replace it with the current VibeHub version. Source inspection shows site/public/favicon.svg and site/public/vibehub-mark.svg are already byte-identical, so overwriting the same favicon URL would preserve the browser's stale-cache failure. The smallest truthful fix is a new favicon asset path containing the exact current mark, updated metadata references, deletion of the obsolete path, and a rendered-build regression contract.",
+  "context_refs": [
+    {
+      "purpose": "Canonical current mark to use byte-for-byte.",
+      "ref": "site/public/vibehub-mark.svg"
+    },
+    {
+      "purpose": "Metadata surface that emits favicon links.",
+      "ref": "site/app/layout.tsx"
+    },
+    {
+      "purpose": "Production artifact contract to extend.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    },
+    {
+      "purpose": "Required preflight and explicit publication boundary.",
+      "ref": "site/release/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The VibeHub public-site build references the current VibeHub mark through a cache-busting favicon URL instead of the stale legacy favicon path.",
+  "provenance_refs": [
+    "conversation:2026-08-20-refresh-vibehub-public-favicon"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-refresh-public-site-favicon"
+}

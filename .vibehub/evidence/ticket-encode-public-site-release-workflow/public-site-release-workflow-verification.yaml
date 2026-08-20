@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "current-production-path-is-proven"
+  ],
+  "evidence_id": "public-site-release-workflow-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T07:52:14Z",
+  "refs": [
+    "command:python3-skill-creator-quick-validate-site-release",
+    "command:node-site-release-preflight",
+    "command:node-site-release-verify-https-vibehub-icu",
+    "command:npm-run-verify",
+    "command:vh-project-validate",
+    "command:vh-ticket-validate",
+    "https://vibehub.icu"
+  ],
+  "schema_version": 1,
+  "summary": "The standard Skill validator accepted site/release. The release checker accepted the exact checked-in Sites project and canonical URL, its production preflight passed lint plus the Vinext build and all 8 rendered contracts with NEXT_PUBLIC_SITE_URL=https://vibehub.icu, and its live verification confirmed HTTPS 200 with the expected title, product marker, and canonical Open Graph image. Full repository verification passed 104/104 tests and rebuilt the 55-file public Plugin artifact without the repository-local site release Skill. Canonical VibeHub project and Ticket validation also passed with format 2, 35 Context items, 66 Tickets, 185 Evidence documents before these two records, and 53 Outcomes.",
+  "ticket_id": "ticket-encode-public-site-release-workflow"
+}

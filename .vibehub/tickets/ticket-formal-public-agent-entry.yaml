@@ -1,0 +1,76 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "product-entry-remains-reachable",
+      "criterion": "A keyboard- and pointer-reachable VibeHub brand/Overview entrance remains visible before and during the demo; activating it from any demo phase clears pending timers and returns to the initial product conversation without a reload, and the active experience also names an explicit Exit demo action."
+    },
+    {
+      "acceptance_id": "shell-feels-formal-not-prototypical",
+      "criterion": "The public shell removes faux operating-system window controls and other cheap prototype cues, establishes one coherent brand masthead and product frame, increases key text legibility, reduces repeated micro-label noise, and uses restrained borders, radii, depth, color, and background treatment consistently across arrival, Chat, App, and Ticket surfaces."
+    },
+    {
+      "acceptance_id": "agent-first-cycle-remains-intact",
+      "criterion": "The initial state remains one Coding Agent conversation with truthful installation, source, founder-premise, Copy for Agent, and suggested-request access; the supported request still opens Chat plus View, pauses for a real palette choice, updates the App, and completes the one-Ticket Evidence/Outcome/Context cycle without adding fake execution or hiding App/Ticket switching."
+    },
+    {
+      "acceptance_id": "formal-entry-is-responsive-and-verifiable",
+      "criterion": "At desktop and narrow mobile sizes the persistent entrance, Exit demo action, conversation, composer, workspace, and Ticket graph remain readable and operable without page-level horizontal overflow; focus, touch targets, reduced motion, fine-pointer hover gating, rendered assertions, lint, production build, canonical VibeHub validation, and Plugin artifact verification pass."
+    }
+  ],
+  "constraints": [
+    "Keep Coding Agent as the primary product experience; the persistent product entrance is a minimal orientation layer, not a conventional multi-page marketing navigation or dashboard.",
+    "Do not add routes, a backend, persistence, analytics, model calls, accounts, iframe content, a motion dependency, or writable product state.",
+    "Do not invent founder identities, testimonials, metrics, customers, or capabilities; preserve the truthful installation and deterministic-example boundaries.",
+    "Use the existing cool-neutral quiet-intelligence direction. Formality must come from hierarchy and precision, not serif editorial styling, gratuitous gradients, glassmorphism, 3D spectacle, or excessive animation.",
+    "Reset and Exit demo must be immediate when keyboard initiated; use animation only for explanatory first-time spatial changes, respect reduced motion, and keep press feedback within 100-160ms.",
+    "Do not deploy, bind a domain, change hosting configuration, mutate the installed graph UI, or modify the already-successful prior Outcome."
+  ],
+  "context": "The owner accepts the Coding-Agent-first interaction direction but finds the current result too prototype-like and visually inexpensive. The demo also lacks a stable way back to the product entrance after development begins. Preserve the initial conversation-first model and deterministic dark-mode cycle, but give the page a brand-level frame that remains visible in both the arrival and active-demo states. The VibeHub wordmark or Overview action should always return to the initial product conversation, and the active workspace should expose an explicit Exit demo action. Formality should come from disciplined hierarchy, fewer faux-window conventions, larger readable type, quieter surfaces, more exact spacing, restrained depth, and a reduced number of tiny all-caps labels—not from ornamental effects, a conventional marketing dashboard, or additional content. The resulting page should feel like a finished public product surface rather than a concept mockup while staying static, honest, and lightweight.",
+  "context_refs": [
+    {
+      "purpose": "Successful Agent-first interaction foundation this refinement preserves.",
+      "ref": ".vibehub/outcomes/ticket-coding-agent-first-public-site.yaml"
+    },
+    {
+      "purpose": "Binding interface-quality, visual-language, accessibility, and honesty standard.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Canonical one-Ticket product loop that must remain legible through the formal shell.",
+      "ref": ".vibehub/rooms/product/decision-ticket-mediates-intent-context-loop.yaml"
+    },
+    {
+      "purpose": "Current Agent-first interaction and reset implementation surface.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Current public-site visual, responsive, and motion surface to formalize.",
+      "ref": "site/app/globals.css"
+    },
+    {
+      "purpose": "Static interaction and product-contract verification surface.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "deliveries": [
+    {
+      "kind": "pull_request",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/pull/24",
+      "state": "proposed"
+    }
+  ],
+  "kind": "ticket",
+  "outcome": "The Coding-Agent-first public site has a persistent, unmistakable VibeHub product entrance and a quieter, more formal visual shell, so visitors can leave or restart the interactive example at any point without losing the clarity of the one-Ticket product story.",
+  "provenance_refs": [
+    "conversation:2026-08-09-formal-product-entry"
+  ],
+  "relations": [
+    {
+      "rationale": "This Ticket preserves and refines the completed Coding-Agent-first interaction rather than replacing its product model.",
+      "target_ticket_id": "ticket-coding-agent-first-public-site",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-formal-public-agent-entry"
+}

@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "selection-traces-complete-causal-cone",
+    "only-traversed-relations-light-up",
+    "public-interaction-matches-workbench",
+    "transitive-focus-is-production-verified"
+  ],
+  "evidence_id": "transitive-causal-cone-production-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T17:52:08Z",
+  "refs": [
+    "commit:d5b378ec32f3b9dcbfe9892f90e749e672052f6f",
+    "sites-version:appgprj_6a86aafc71d48191b3c03a532dc367f3~appgver_4920aab9aed08191ac7bedca0b607cdd",
+    "sites-deployment:appgdep_6a873e919b308191886d6ef2b9a7b299",
+    "https://vibehub.w-wayne-vip.chatgpt.site",
+    "https://vibehub.icu",
+    "command:node-site-release-verify-immutable-url",
+    "command:node-site-release-verify-vibehub-icu",
+    "command:browser-live-select-vh-201-and-vh-205"
+  ],
+  "schema_version": 1,
+  "summary": "Sites version 4 deployed the exact transitive-causal-cone commit to the existing public VibeHub project. The immutable deployment and vibehub.icu both returned HTTPS 200, and the custom domain, provider, and SSL remained active. On the live canonical site, selecting VH-201 highlighted its two-hop downstream chain through VH-204 to VH-205 while leaving the sibling VH-202 branch and independent VH-203 dim; selecting VH-205 highlighted both transitive prerequisite branches and all three traversed relations while VH-203 remained dim.",
+  "ticket_id": "ticket-restore-transitive-public-causal-cone"
+}

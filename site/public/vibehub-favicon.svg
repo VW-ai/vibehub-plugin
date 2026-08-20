@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 104" role="img" aria-labelledby="title desc">
+  <title id="title">VibeHub mark</title>
+  <desc id="desc">Three balanced territory shapes, with one active green territory.</desc>
+  <path
+    fill="#191B1F"
+    d="M10 8h36c4 0 6 2 8 5l16 28c2 4 1 7-2 10l-9 8c-2 2-4 3-7 3H32c-3 0-5-1-7-3L8 42c-2-2-3-4-3-7V13c0-3 2-5 5-5Z"
+  />
+  <rect width="24" height="32" x="72" y="18" fill="#3E7D4C" rx="5" />
+  <path
+    fill="#191B1F"
+    d="M60 64h25c3 0 5 2 5 5v17c0 3-1 5-3 7l-9 8c-2 2-4 3-7 3H60c-3 0-5-2-5-5V69c0-3 2-5 5-5Z"
+  />
+</svg>

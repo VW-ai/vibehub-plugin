@@ -1,0 +1,53 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "repo-local-release-skill-is-complete",
+      "criterion": "A concise repository-local VibeHub public-site release Skill defines triggers, exact preflight, Sites version and deployment flow, custom-domain conflict guardrails, production verification, evidence recording, rollback behavior, and stop conditions; it is not included in the distributable VibeHub Plugin skills directory."
+    },
+    {
+      "acceptance_id": "release-checks-are-mechanical",
+      "criterion": "A dependency-free bundled script validates the checked-in Sites project identity and canonical production metadata, runs or composes the existing site lint/build/rendered-contract checks with NEXT_PUBLIC_SITE_URL=https://vibehub.icu, and verifies a deployed URL by HTTPS status, title, canonical metadata, and one stable product marker with actionable failures."
+    },
+    {
+      "acceptance_id": "human-entry-is-short-and-truthful",
+      "criterion": "site/README.md names vibehub.icu, points maintainers to the repository-local release Skill, distinguishes checked-in configuration from credentials and live DNS state, and gives a short manual verification command without duplicating the full workflow."
+    },
+    {
+      "acceptance_id": "current-production-path-is-proven",
+      "criterion": "The Skill passes the standard Skill validator, the release script passes its local configuration and production-build path, the existing rendered site contracts pass, the script verifies the live vibehub.icu deployment, and canonical VibeHub project and Ticket validation remain green."
+    }
+  ],
+  "constraints": [
+    "Keep Cloudflare credentials, temporary deployment credentials, DNS verification values, and transient provider state out of Git.",
+    "Reuse the exact project_id already stored in site/.openai/hosting.json; never create a second Sites project for this site.",
+    "Treat every Sites deployment URL as production and require explicit human authority before replacing an existing DNS or custom-domain binding.",
+    "Do not package this VibeHub-maintainer release Skill into the public VibeHub Plugin artifact.",
+    "Do not add a general deployment CLI, daemon, database, package publication, or second release state model."
+  ],
+  "context": "The public site is now live at vibehub.icu through the existing Sites project recorded in site/.openai/hosting.json. The owner explicitly asked to preserve the successful release process as reusable repository knowledge. A project-local Skill is the right entry point because deployment requires Agent judgment and protected platform operations, while small dependency-free scripts can make configuration, build metadata, and post-deploy content checks mechanical. This project-specific publisher must not become a Plugin Skill shipped to VibeHub users.",
+  "context_refs": [
+    {
+      "purpose": "Owner intent requiring a checked-in reusable website release workflow.",
+      "ref": ".vibehub/rooms/product/intent-reproducible-public-site-release.yaml"
+    },
+    {
+      "purpose": "Canonical existing Sites project identity and binding boundary.",
+      "ref": "site/.openai/hosting.json"
+    },
+    {
+      "purpose": "Current human-facing build and deployment instructions to narrow and correct.",
+      "ref": "site/README.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Future VibeHub public-site changes can be released through one repository-local Agent Skill with deterministic preflight and production verification, without reconstructing the process from chat history.",
+  "provenance_refs": [
+    "conversation:2026-08-20-preserve-public-site-release-workflow",
+    "context:intent-reproducible-public-site-release"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-encode-public-site-release-workflow"
+}

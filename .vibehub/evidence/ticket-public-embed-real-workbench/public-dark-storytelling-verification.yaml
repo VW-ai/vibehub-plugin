@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "embedded-workbench-is-verified"
+  ],
+  "evidence_id": "public-dark-storytelling-verification",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-19T07:44:23Z",
+  "refs": [
+    "test:site-rendered-contracts-8-of-8",
+    "test:site-eslint-pass",
+    "build:site-static-production-export",
+    "test:npm-run-verify-81-of-81",
+    "artifact:54-files-568449-bytes",
+    "validation:canonical-project-pass"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh verification passes after the dark vertical storytelling revision: site ESLint, Vinext static production export, all eight rendered product contracts, the complete repository suite at 81 of 81, the unchanged dependency-free Plugin artifact at 54 files and 568449 bytes, and canonical VibeHub project validation. The rendered contracts require the deep-graphite palette, single authentic composer message, sticky real entry points, four faithful Workbench instances, phrase-to-Ticket mapping, vertical Rooms and Evidence/Outcome sections, disposable panning, static reduced-motion equivalence, and no parallel walkthrough or lifecycle.",
+  "ticket_id": "ticket-public-embed-real-workbench"
+}

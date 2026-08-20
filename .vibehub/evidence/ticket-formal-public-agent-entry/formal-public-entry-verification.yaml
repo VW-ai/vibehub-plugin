@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "product-entry-remains-reachable",
+    "shell-feels-formal-not-prototypical",
+    "agent-first-cycle-remains-intact",
+    "formal-entry-is-responsive-and-verifiable"
+  ],
+  "evidence_id": "formal-public-entry-verification",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T21:58:13Z",
+  "refs": [
+    "file:site/tests/rendered-html.test.mjs",
+    "command:cd site && npm run lint",
+    "command:cd site && npm run build",
+    "command:cd site && node --test tests/rendered-html.test.mjs",
+    "command:node skills/scripts/vh.mjs project validate --repo .",
+    "command:node skills/scripts/vh.mjs ticket validate --repo .",
+    "command:npm run verify:artifact",
+    "browser:http://localhost:3000/@desktop",
+    "browser:http://localhost:3000/@390x844",
+    "conversation:2026-08-09-formal-entry-browser-verification"
+  ],
+  "schema_version": 1,
+  "summary": "Fresh verification passes: ESLint, Vinext static production export, six rendered product-contract tests, canonical project and Ticket validation, and Plugin artifact verification at 51 files and 361397 bytes. Desktop browser inspection confirmed the formal masthead and brand entry remain visible in initial and active states, Send reaches the explicit palette boundary, Exit demo restores the initial conversation immediately, Overview is marked current after reset, the input is re-enabled, and the page has no horizontal overflow (1159px body and viewport). At a 390x844 mobile override the masthead occupies 58px, the initial product surface fills the remaining viewport, the active state stacks 375px-wide Chat and View with three palette choices and no body overflow, and the scoped Overview action returns from the active demo to the initial state. Browser console errors were empty. Reduced-motion and fine-pointer hover contracts remain explicit, and the viewport override was reset after inspection.",
+  "ticket_id": "ticket-formal-public-agent-entry"
+}

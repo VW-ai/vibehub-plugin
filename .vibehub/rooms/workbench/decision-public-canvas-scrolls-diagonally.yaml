@@ -1,0 +1,48 @@
+{
+  "context_id": "decision-public-canvas-scrolls-diagonally",
+  "detail": "Content clarity is the governing priority. A visitor must understand what VibeHub is, how to start, and why the Ticket-driven cycle is useful without learning a novel interaction or selecting objects. The public website borrows the Ticket graph's visual language only to organize that explanation. Normal vertical page scrolling is primary; horizontal canvas travel is removed. The hero and first-layer install action occupy the upper-left, while a clearly legible Ticket path advances diagonally toward the lower-right through Product, use cases, and documentation. Core meaning is visible without selecting a Ticket; selection may expose optional depth only. Ticket typography, object shapes, icon hierarchy, connector treatment, and semantic color established here become design input for a later local Workbench refinement, but the installed UI will not copy the public composition literally because its operational interaction needs differ.",
+  "evidence": [
+    {
+      "note": "The owner explicitly rejected horizontal website travel as a burden and selected natural vertical reading with a diagonal Ticket trajectory.",
+      "ref": "conversation:2026-08-05-public-canvas-diagonal-scroll"
+    },
+    {
+      "note": "The owner made explaining the product clearly the primary goal and visual novelty a secondary concern.",
+      "ref": "conversation:2026-08-05-content-before-ui"
+    },
+    {
+      "note": "The selected A composition remains the visual-quality reference for Ticket legibility, hierarchy, and connector language.",
+      "ref": "design/public-site/causal-canvas-direction-a.png"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-public-causal-canvas-site",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-05T08:18:00Z",
+    "quote": "你把它变成上下的不就很自然了吗……从左上到右下的这样一个动态",
+    "ref": "conversation:2026-08-05-public-canvas-diagonal-scroll"
+  },
+  "state": "active",
+  "summary": "The public site explains VibeHub before its causal canvas adds visual character",
+  "tags": [
+    "causal-canvas",
+    "interaction",
+    "public-site",
+    "scroll",
+    "ticket-graph",
+    "visual-language",
+    "workbench",
+    "content-first"
+  ],
+  "type": "decision"
+}

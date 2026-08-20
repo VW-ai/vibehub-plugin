@@ -1,0 +1,4 @@
+interface:
+  display_name: "VibeHub Site Release"
+  short_description: "Release and verify the VibeHub public site"
+  default_prompt: "Use $vibehub-site-release to publish the current VibeHub site safely."

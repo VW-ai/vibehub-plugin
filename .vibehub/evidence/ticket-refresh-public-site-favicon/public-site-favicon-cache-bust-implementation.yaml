@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "favicon-is-current-mark-at-new-url",
+    "metadata-and-artifact-use-only-new-favicon"
+  ],
+  "evidence_id": "public-site-favicon-cache-bust-implementation",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T08:20:46Z",
+  "refs": [
+    "site/public/vibehub-favicon.svg",
+    "site/public/vibehub-mark.svg",
+    "site/app/layout.tsx",
+    "site/tests/rendered-html.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The public site now carries the exact current VibeHub mark at the new cache-busting path /vibehub-favicon.svg. Site metadata emits that URL for both icon and shortcut icon, the obsolete site/public/favicon.svg asset is removed, and rendered contracts require the new asset while rejecting the legacy href.",
+  "ticket_id": "ticket-refresh-public-site-favicon"
+}

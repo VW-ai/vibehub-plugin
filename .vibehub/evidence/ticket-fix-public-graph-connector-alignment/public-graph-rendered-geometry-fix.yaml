@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "connectors-use-rendered-card-geometry",
+    "connectors-stay-attached-through-layout-change",
+    "graph-language-and-interaction-remain-intact"
+  ],
+  "evidence_id": "public-graph-rendered-geometry-fix",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T17:41:57Z",
+  "refs": [
+    "site/app/page.tsx",
+    "site/app/globals.css",
+    "site/tests/rendered-html.test.mjs",
+    "preview:http://localhost:3001",
+    "command:browser-measure-all-public-graph-instances",
+    "command:browser-measure-expanded-public-graph",
+    "command:browser-measure-panned-public-graph"
+  ],
+  "schema_version": 1,
+  "summary": "The public graph no longer stores fixed SVG paths. Each Ticket node exposes its canonical ID, the graph measures current node and map bounds, and buildWorkbenchEdgeRoute derives the path start, target, rounded bends, handle, and arrow from those rendered bounds. ResizeObserver and the browser resize event recompute routes only when layout changes. Closing the Inspector expanded the first graph map from about 448px to 733px while all three endpoint errors remained below 0.1px; a real -60px, 50px canvas pan preserved the same attachment accuracy. Card language, causal focus, Inspector, Rooms, and the mobile no-edge stacked fallback remain unchanged.",
+  "ticket_id": "ticket-fix-public-graph-connector-alignment"
+}

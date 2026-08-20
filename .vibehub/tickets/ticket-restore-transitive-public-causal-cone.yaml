@@ -1,0 +1,55 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "selection-traces-complete-causal-cone",
+      "criterion": "Selecting any public graph Ticket highlights that Ticket, every transitive prerequisite upstream, and every transitive dependent downstream; unrelated Tickets remain dimmed."
+    },
+    {
+      "acceptance_id": "only-traversed-relations-light-up",
+      "criterion": "The graph highlights the exact dependency relations traversed in the selected Ticket's upstream and downstream cones rather than inferring highlighted edges only from their endpoints."
+    },
+    {
+      "acceptance_id": "public-interaction-matches-workbench",
+      "criterion": "The public implementation follows the canonical Workbench directional-cone semantics, terminates safely for repeated or cyclic references, and preserves Ticket selection, Inspector, Rooms, pan, and responsive connector geometry."
+    },
+    {
+      "acceptance_id": "transitive-focus-is-production-verified",
+      "criterion": "Regression contracts, lint, production build, release preflight, browser interaction checks from both ends of the multi-level fixture, production deployment, and canonical-domain verification pass."
+    }
+  ],
+  "constraints": [
+    "Treat skills/vibehub-ticket-review/assets/app.js as the interaction source of truth; do not invent a second graph-selection model.",
+    "Keep upstream and downstream traversal directional so a sibling prerequisite is not pulled into the cone merely because it shares a downstream Ticket.",
+    "Do not add a graph library, backend, polling loop, or new public data model.",
+    "Preserve the current public Workbench visual design and connector geometry."
+  ],
+  "context": "The owner remembered that selecting a Ticket in the real Workbench lights the complete dependency chain, not only a directly related Ticket. The canonical Workbench recursively computes separate upstream and downstream directional cones and records the exact relations it traverses. The public site regressed this to selected plus direct prerequisites plus direct dependents, so selecting the first or last Ticket in the existing three-level fixture hides part of the chain.",
+  "context_refs": [
+    {
+      "purpose": "Canonical recursive causal-cone and directional-cone behavior.",
+      "ref": "skills/vibehub-ticket-review/assets/app.js"
+    },
+    {
+      "purpose": "Public Workbench fixture, one-hop causalCone, and node/edge focus rendering to repair.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Public-site regression contracts.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    },
+    {
+      "purpose": "Production release and canonical-domain verification boundary.",
+      "ref": "site/release/SKILL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Selecting a Ticket on the public VibeHub graph reveals its complete transitive causal chain with exactly the participating dependency relations highlighted.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-restores-full-dependency-chain-focus"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-restore-transitive-public-causal-cone"
+}

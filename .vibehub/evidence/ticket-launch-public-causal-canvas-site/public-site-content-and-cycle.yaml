@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "causal-canvas-is-the-site-grammar",
+    "first-viewport-communicates-and-invites",
+    "canonical-cycle-is-visually-proven"
+  ],
+  "evidence_id": "public-site-content-and-cycle",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-05T08:23:49Z",
+  "refs": [
+    "site/app/page.tsx",
+    "site/app/globals.css",
+    "browser:http://localhost:3000/#product desktop-1440x900 and mobile-390x844",
+    "context:decision-ticket-mediates-intent-context-loop",
+    "command:site/npm-test static export assertions"
+  ],
+  "schema_version": 1,
+  "summary": "The static public page explains VibeHub before showing one central Ticket mediating a normal-scroll loop: human Request and long-term Context shape the Ticket, the Ticket produces Evidence, independent Outcome returns durable learning to Context, and every non-Ticket object uses a distinct visual form.",
+  "ticket_id": "ticket-launch-public-causal-canvas-site"
+}

@@ -1,0 +1,43 @@
+{
+  "context_id": "decision-ticket-mediates-intent-context-loop",
+  "detail": "VibeHub's primary interaction object is one Ticket, not a row of equally styled lifecycle objects or a pile of Tickets. A human Request creates the need for a Ticket; existing long-term Context helps the Ticket emerge with the right contract and constraints. Work inside that one Ticket produces Evidence, independent adjudication produces an Outcome, and the durable learning from the Outcome returns to Context so later intent begins from a stronger base. Request, Context, Evidence, and Outcome are not Tickets and must use distinct visual forms. A later dependent Ticket may exist when causally required, but the public product story should first teach the single-Ticket loop: human intent becomes bounded action, and completed action compounds long-term Context.",
+  "evidence": [
+    {
+      "note": "The owner corrected the public model from several equal Ticket-like objects to one Ticket mediating the feedback loop between human intent and durable Context.",
+      "ref": "conversation:2026-08-05-one-ticket-intent-context-loop"
+    },
+    {
+      "note": "The canonical concept already defines the Ticket as the development-cycle unit and Context as what survives beyond executable work.",
+      "ref": "docs/CONCEPT.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-05T08:23:49Z",
+    "quote": "我们应该说是我们ticket是什么?是从context中浮现出来……request让我们创造ticket……evidence最后是outcome,它又回到context……中间的这个交互的个体是ticket",
+    "ref": "conversation:2026-08-05-one-ticket-intent-context-loop"
+  },
+  "state": "active",
+  "summary": "One Ticket mediates a loop between human intent and long-term Context",
+  "tags": [
+    "context",
+    "evidence",
+    "human-intent",
+    "outcome",
+    "product-model",
+    "request",
+    "ticket"
+  ],
+  "type": "decision"
+}

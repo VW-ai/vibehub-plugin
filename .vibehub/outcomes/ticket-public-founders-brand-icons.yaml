@@ -1,0 +1,19 @@
+{
+  "accepted_acceptance_ids": [
+    "founders-are-two-real-people",
+    "actions-have-distinct-brand-symbols",
+    "identity-and-symbols-fit-the-formal-shell",
+    "public-identity-change-is-verified"
+  ],
+  "closed_at": "2026-08-09T22:36:34Z",
+  "evidence_ids": [
+    "public-founders-brand-icons-implementation",
+    "public-founders-brand-icons-verification"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepted all four criteria. Source and rendered-output inspection confirm exactly two non-expandable founder profiles containing only local portraits, verified public names, personal-site links, and LinkedIn links; the former premise, placeholder, and founder disclosure state are absent. Distinct local Codex, Claude Code, and GitHub symbols are present while the installation commands, GitHub target, clipboard fallback, action feedback, deterministic demo, masthead, and static hosting contract remain intact. Fresh ESLint, Vinext static production export, seven rendered-contract tests, canonical project and Ticket validation, the complete 43-test repository suite, and 51-file/361397-byte Plugin artifact verification passed. Acceptance-linked browser Evidence covers desktop and 390px mobile layout, overflow, interaction, reset, and console observations; no browser backend was available in this independent closeout task, so those visual interactions could not be rerun here.",
+  "ticket_id": "ticket-public-founders-brand-icons",
+  "unresolved_acceptance_ids": []
+}

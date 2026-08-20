@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "owner-accepts-the-product-feel"
+  ],
+  "evidence_id": "owner-accepts-public-site-product-feel",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-19T18:15:29Z",
+  "refs": [
+    "conversation:2026-08-19-owner-accepts-public-site-and-authorizes-publish"
+  ],
+  "schema_version": 1,
+  "summary": "After inspecting the retained localhost preview with the real Ticket file and Room/Context source story, the owner said ‘我感觉不错’ and explicitly approved proceeding with the closeout, commit, and push workflow.",
+  "ticket_id": "ticket-public-embed-real-workbench"
+}

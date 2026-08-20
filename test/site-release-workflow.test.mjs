@@ -1,0 +1,45 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import test from "node:test";
+
+const root = new URL("../", import.meta.url);
+
+async function source(path) {
+  return readFile(new URL(path, root), "utf8");
+}
+
+test("the public-site release workflow is repository-local and discoverable", async () => {
+  const [skill, agents, packageJson, readme, manifest, artifactBuilder] = await Promise.all([
+    source("site/release/SKILL.md"),
+    source("AGENTS.md"),
+    source("site/package.json"),
+    source("site/README.md"),
+    source(".codex-plugin/plugin.json"),
+    source("scripts/build-plugin-artifact.mjs"),
+  ]);
+
+  assert.match(skill, /name: vibehub-site-release/);
+  assert.match(skill, /vibehub\.icu/);
+  assert.match(skill, /never create a\s+second project/i);
+  assert.match(agents, /site\/release\/SKILL\.md/);
+  assert.match(packageJson, /"release:preflight"/);
+  assert.match(packageJson, /"release:verify"/);
+  assert.match(readme, /Production: \[vibehub\.icu\]\(https:\/\/vibehub\.icu\)/);
+  assert.match(manifest, /"skills": "\.\/skills\/"/);
+  assert.doesNotMatch(artifactBuilder, /["']site\/release["']/);
+});
+
+test("the release checker accepts the checked-in production identity", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["site/release/scripts/release.mjs", "check"],
+    { cwd: new URL("../", import.meta.url), encoding: "utf8" },
+  );
+
+  assert.equal(result.status, 0, result.stderr);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.ok, true);
+  assert.equal(output.canonical_url, "https://vibehub.icu");
+  assert.equal(output.project_id, "appgprj_6a86aafc71d48191b3c03a532dc367f3");
+});

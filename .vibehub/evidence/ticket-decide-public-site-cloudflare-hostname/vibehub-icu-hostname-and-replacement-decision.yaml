@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "owner-selects-account-hostname-and-conflict-rule"
+  ],
+  "evidence_id": "vibehub-icu-hostname-and-replacement-decision",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-20T07:43:59Z",
+  "refs": [
+    "conversation:2026-08-20-vibehub-icu-domain-selection",
+    "conversation:2026-08-20-replace-old-site"
+  ],
+  "schema_version": 1,
+  "summary": "The repository owner selected the existing Cloudflare zone hostname vibehub.icu and explicitly instructed that its old vibehub-website-v1.pages.dev site be replaced by the newly deployed VibeHub public site. This records the human-owned account, canonical apex hostname, and named conflict replacement decision used for the production switch.",
+  "ticket_id": "ticket-decide-public-site-cloudflare-hostname"
+}

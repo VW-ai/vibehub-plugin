@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "first-view-explains-and-installs",
+    "ticket-shelf-is-the-site-navigation",
+    "opened-ticket-is-physical-and-readable",
+    "motion-is-fluid-restrained-and-interruptible",
+    "responsive-accessible-static-site-is-verifiable"
+  ],
+  "evidence_id": "ticket-shelf-browser-and-build-proof",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-09T08:39:10Z",
+  "refs": [
+    "file:site/tests/rendered-html.test.mjs",
+    "command:cd site && npm run lint",
+    "command:cd site && node --test tests/rendered-html.test.mjs",
+    "command:cd site && npm run build",
+    "command:node skills/scripts/vh.mjs project validate --repo .",
+    "command:node skills/scripts/vh.mjs ticket validate --repo .",
+    "command:npm run verify:artifact",
+    "browser:http://localhost:3000/#product@1440x1000",
+    "browser:http://localhost:3000/#product@390x844",
+    "conversation:2026-08-09-ticket-shelf-browser-verification"
+  ],
+  "schema_version": 1,
+  "summary": "Independent browser checks at 1440x1000 and 390x844 confirmed Product is the default first view, all required actions are visible, the Ticket graph and open-slot connector are legible, and document scrollWidth equals clientWidth at both widths. Pointer activation changed Workflow and the URL to #workflow; browser Back restored #product; explicit keyboard Enter opened Documentation at #documentation; the fixed mobile shelf exposes a horizontal snap rail; Copy for Agent produced the complete 2317-character brief containing the exact Codex install and canonical entry; and the browser console had no errors or warnings. Site lint, four rendered-contract tests, static production build, canonical project/Ticket validation, and the 51-file Plugin artifact verification all passed. The fresh Web Interface Guidelines audit led to a skip link, visible focus, balanced headings, touch-action, safe-area handling, and motion/accessibility guardrails with no remaining material finding.",
+  "ticket_id": "ticket-restore-public-hero-ticket-graph"
+}
