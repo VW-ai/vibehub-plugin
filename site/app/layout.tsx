@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   description:
     "VibeHub turns a development request into a Git-native Ticket cycle your coding agent can plan, execute, prove, and close.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/vibehub-favicon.svg",
+    shortcut: "/vibehub-favicon.svg",
   },
   ...(publicUrl
     ? {

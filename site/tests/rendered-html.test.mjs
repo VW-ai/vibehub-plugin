@@ -12,6 +12,8 @@ test("static arrival is one statement plus the real Ticket Graph", async () => {
   const html = await source("dist/client/index.html");
 
   assert.match(html, /<title>VibeHub — The Git-native development cycle<\/title>/i);
+  assert.match(html, /vibehub-favicon\.svg/);
+  assert.doesNotMatch(html, /href="(?:https:\/\/vibehub\.icu)?\/favicon\.svg"/);
   assert.match(html, /<h1 id="showcase-title">Stop managing chats\. Manage the work\.<\/h1>/);
   assert.match(html, /<p>Turn every coding request into a Ticket with your context\.<\/p>/);
   assert.match(html, /VIBEHUB FOR CODING AGENTS/);
@@ -173,11 +175,13 @@ test("the concise showcase remains responsive, accessible, and quiet", async () 
 });
 
 test("production artifact stays static and Cloudflare-ready", async () => {
-  const [packageJson, nextConfig, hosting, layout] = await Promise.all([
+  const [packageJson, nextConfig, hosting, layout, favicon, mark] = await Promise.all([
     source("package.json"),
     source("next.config.ts"),
     source(".openai/hosting.json"),
     source("app/layout.tsx"),
+    source("public/vibehub-favicon.svg"),
+    source("public/vibehub-mark.svg"),
   ]);
 
   assert.match(packageJson, /"name": "@vibehub\/site"/);
@@ -185,6 +189,9 @@ test("production artifact stays static and Cloudflare-ready", async () => {
   assert.match(nextConfig, /output:\s*"export"/);
   assert.match(layout, /NEXT_PUBLIC_SITE_URL/);
   assert.match(layout, /\/og\.png/);
+  assert.equal(favicon, mark);
+  assert.equal((layout.match(/\/vibehub-favicon\.svg/g) ?? []).length, 2);
+  assert.doesNotMatch(layout, /["']\/favicon\.svg["']/);
   assert.deepEqual(JSON.parse(hosting), {
     project_id: "appgprj_6a86aafc71d48191b3c03a532dc367f3",
     d1: null,
@@ -194,7 +201,7 @@ test("production artifact stays static and Cloudflare-ready", async () => {
   await Promise.all([
     access(new URL("dist/client/index.html", root)),
     access(new URL("dist/client/index.rsc", root)),
-    access(new URL("dist/client/favicon.svg", root)),
+    access(new URL("dist/client/vibehub-favicon.svg", root)),
     access(new URL("dist/client/og.png", root)),
     access(new URL("dist/client/brands/codex.png", root)),
     access(new URL("dist/client/brands/claude-code.png", root)),
