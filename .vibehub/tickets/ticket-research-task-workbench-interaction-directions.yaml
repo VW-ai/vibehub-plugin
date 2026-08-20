@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "research-corpus-is-source-backed",
+      "criterion": "A checked-in study uses current primary or official sources for at least eight relevant products spanning agent execution, personal task management, dense work management, command interaction, project workspaces, and branchable Chat; every reference records the exact interaction pattern worth borrowing and the failure mode VibeHub must avoid instead of copying a visual style wholesale."
+    },
+    {
+      "acceptance_id": "scenario-pattern-map-is-complete",
+      "criterion": "The study maps research findings to the complete VibeHub loop: first frame, fast Task creation, graph scanning and causal focus, entering one Task, autonomous Run observation, exact human attention, Chat steering, branch/compare/bring-back, Context activation, Evidence review, closeout, and return to the graph."
+    },
+    {
+      "acceptance_id": "directions-are-interaction-architectures",
+      "criterion": "A locally reviewable board compares three or fewer coherent interaction architectures using the same representative Tasks and lifecycle states; each direction specifies spatial model, navigation, Task-to-Session relationship, dominant surface by phase, graph continuity, narrow-layout behavior, and DSH Slot/theme composition, without presenting a style picker or paper/editorial aesthetic."
+    },
+    {
+      "acceptance_id": "recommendation-is-decision-ready",
+      "criterion": "The research recommends one base direction with explicit reasons, tradeoffs, rejected alternatives, and the smallest remaining owner choices; it distinguishes what can be built through additive DSH Slots and Theme APIs from what would require replacing a single-owner shell surface."
+    },
+    {
+      "acceptance_id": "research-board-is-usable",
+      "criterion": "A local browser review surface presents real source references, concise pattern cards, and clickable low-fidelity walkthroughs for the candidate directions at desktop and narrow widths, with no claim of final visual design or production backend behavior."
+    }
+  ],
+  "constraints": [
+    "Task, not Chat, remains the primary durable and user-facing unit; Chat is an unconstrained exploration and steering surface around Tasks.",
+    "The Ticket Graph remains the home model for committed work; research may vary how it transitions into one Task but may not replace it with a flat chat history, Kanban clone, or generic dashboard.",
+    "Use Codex desktop as the interaction-quality baseline, not as a pixel-copy target, and avoid paper, editorial, marketing-dashboard, sci-fi cockpit, and decorative graph aesthetics already rejected by the owner.",
+    "Do not implement production DSH integration, personal Rooms, cross-Project orchestration, collaboration, or a high-fidelity visual system in this Ticket.",
+    "Treat DSH Agent Team and every other executor-internal task mechanism as opaque; research the human-facing Task and Session layer only."
+  ],
+  "context": "The owner has rejected several visual-first mockups and does not want another arbitrary skin. Research must begin from the actual VibeHub scenario: the home object is a Task graph; the user creates work, observes mostly autonomous execution, understands what happened, answers exact attention requests, reviews Evidence, and intervenes through a capable Chat when useful. DSH should feel like a different application, but the first integration remains a non-invasive Plugin that preserves its runtime and extension ecosystem. The study therefore separates interaction architecture from visual styling, extracts reusable patterns from excellent task, agent, command, project, and branching-chat products, then expresses a small set of end-to-end alternatives against the same scenario. The owner chooses the base interaction direction; only then should high-fidelity visual work continue.",
+  "context_refs": [
+    {
+      "purpose": "Current product identity: Task-first human workbench above Agent sessions.",
+      "ref": ".vibehub/rooms/product/decision-task-first-human-workbench.yaml"
+    },
+    {
+      "purpose": "Project, standalone Task, subtask, and Context-scope semantics the interaction must represent.",
+      "ref": ".vibehub/rooms/product/decision-project-owned-or-standalone-task-scope.yaml"
+    },
+    {
+      "purpose": "Non-invasive DSH Plugin and opaque execution boundary.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    },
+    {
+      "purpose": "Current low-fidelity loop retained as scenario evidence rather than visual authority.",
+      "ref": "docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "purpose": "Rejected visual directions and taste failures that the research must not repeat.",
+      "ref": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "An evidence-backed interaction research board compares coherent Task-first application architectures and makes one base direction ready for explicit owner selection before another prototype is built.",
+  "provenance_refs": [
+    "conversation:2026-08-19-owner-requests-interaction-research-before-direction",
+    "conversation:2026-08-19-owner-requires-whole-dsh-reskin"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-research-task-workbench-interaction-directions"
+}

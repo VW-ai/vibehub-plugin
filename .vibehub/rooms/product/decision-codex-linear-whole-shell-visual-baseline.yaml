@@ -1,0 +1,47 @@
+{
+  "context_id": "decision-codex-linear-whole-shell-visual-baseline",
+  "detail": "The product's high-fidelity visual system should use the Codex desktop app and Linear as its primary quality and taste baselines across the entire DeepSeek Harness shell. Codex contributes a calm, native-feeling, spacious execution workspace in which conversation, progress, artifacts, and intervention feel coherent; Linear contributes precise information hierarchy, disciplined density, quiet navigation, typography, spacing, state treatment, and earned emphasis. This is a directional synthesis rather than a pixel clone or a mixed brand collage. The theme must cover shared shell chrome, navigation, Graph home, Task workspace, Chat, Run progress, attention requests, review, overlays, and responsive states so the user experiences a different, internally consistent application rather than stock DSH with a styled VibeHub panel attached. Paper, editorial, document-editor, decorative dashboard, sci-fi cockpit, excessive cards, and arbitrary dark-product aesthetics remain rejected. Interaction architecture and Task-first product semantics remain independent of the visual layer, and DSH compatibility should be preserved through its Theme Runtime and Plugin surfaces wherever possible.",
+  "evidence": [
+    {
+      "note": "The owner explicitly selected Codex and Linear as the direction for an attractive whole-application DSH reskin.",
+      "ref": "conversation:2026-08-19-codex-linear-whole-shell-style-direction"
+    },
+    {
+      "note": "The interaction study identifies Codex's focused Agent work surface and Linear's receding navigation and earned attention as compatible inputs to a Task-first workbench.",
+      "ref": "docs/HARNESS_INTERACTION_RESEARCH.md"
+    },
+    {
+      "note": "The retained negative study records the rejected paper, editorial, generic dashboard, and visually dated directions this decision must prevent from returning.",
+      "ref": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T00:20:59Z",
+    "quote": "我非常希望做一个，好看的，整体style的话，往codex/linear这里靠的换皮",
+    "ref": "conversation:2026-08-19-codex-linear-whole-shell-style-direction"
+  },
+  "state": "active",
+  "summary": "The VibeHub DSH product should reskin the whole application toward Codex and Linear quality, not style only the VibeHub-specific surfaces",
+  "tags": [
+    "codex",
+    "deepseek-harness",
+    "linear",
+    "product-design",
+    "theme",
+    "ui",
+    "visual-system"
+  ],
+  "type": "decision"
+}

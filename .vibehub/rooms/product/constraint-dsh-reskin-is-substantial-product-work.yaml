@@ -1,0 +1,51 @@
+{
+  "context_id": "constraint-dsh-reskin-is-substantial-product-work",
+  "detail": "The phrase whole-application reskin must not be estimated or planned as a thin palette swap. Reaching the selected Codex and Linear quality bar requires an explicit visual system for typography, density, spacing, color, elevation, borders, state, motion, icons, focus, hover, overlays, responsive behavior, and the hierarchy between navigation, Chat, tools, Run progress, Graph, Task Workspace, attention, and Evidence. It also requires inventorying stock DSH components and Theme tokens, resolving components that do not honor tokens, testing additive VibeHub surfaces against the same primitives, preserving accessibility, and maintaining visual compatibility as DSH changes rapidly. This work may be staged after interaction architecture is fixed, but it remains a first-class scoped deliverable with its own acceptance and regression review; estimates for the initial Plugin must not assume that most frontend work is merely copying existing VibeHub logic.",
+  "evidence": [
+    {
+      "note": "The owner explicitly corrected the planning assumption and established that the selected whole-DSH reskin carries significant work.",
+      "ref": "conversation:2026-08-19-dsh-reskin-effort"
+    },
+    {
+      "note": "The approved baseline spans the whole shell and names a high visual-quality target rather than a local VibeHub panel style.",
+      "ref": ".vibehub/rooms/product/decision-codex-linear-whole-shell-visual-baseline.yaml"
+    },
+    {
+      "note": "The current research separates interaction architecture from visual authority, making a dedicated visual-system workstream necessary after the spatial model settles.",
+      "ref": "docs/HARNESS_INTERACTION_RESEARCH.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-linear-whole-shell-visual-baseline",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-dsh-shell-with-vibehub-task-pages",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T03:37:03Z",
+    "quote": "我们这里说的换皮，是会是不小的工作量呢。",
+    "ref": "conversation:2026-08-19-dsh-reskin-effort"
+  },
+  "state": "active",
+  "summary": "The Codex and Linear quality reskin of DSH is a substantial product and engineering workstream, not a small CSS compatibility task",
+  "tags": [
+    "deepseek-harness",
+    "design-system",
+    "maintenance",
+    "product-quality",
+    "reskin",
+    "scope",
+    "theme"
+  ],
+  "type": "constraint"
+}

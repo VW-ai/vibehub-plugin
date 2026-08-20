@@ -1,0 +1,60 @@
+{
+  "context_id": "decision-native-chat-with-additive-task-actions",
+  "detail": "Ordinary Chat remains a first-class native DSH experience rather than being forced into the VibeHub Task protocol. VibeHub should enrich that experience at moments where discussion becomes durable knowledge or executable work: finalized Assistant answers may expose lightweight actions such as Remember, Plan, Create Task, Attach to Task, Compare, or Bring Back, and richer follow-up state may render inline beneath the owning turn. The exact labels, confirmation flow, scope picker, and distinction between DSH plan mode and VibeHub work planning are deliberately deferred for later interaction exploration. The implementation must use official additive Chat surfaces rather than DOM injection or replacement of the Conversation renderer. At DeepSeek Harness rc.8 commit 141eb6fef83422698aef7a981029e843e8161534, conversation.chat.assistant-actions is a session-scoped list Slot receiving the finalized assistant messageId and rendered between Copy and Branch; conversation.chat.turnTail is a chain Slot for richer whole-row content before the action strip. The shipped ui-message-feedback plugin proves the complete browser action plus Host Remote pattern, while the standard Session kit supplies session identity. A Host action can therefore resolve authoritative Session history from sessionId and messageId, prepare a VibeHub Context or Task proposal, and return reviewable state without scraping rendered text. This is assessed as high feasibility. The current assistant-actions Slot appears only on the closing finalized Assistant message of a completed Turn; extending identical actions to user messages would require another supported Slot or a separate upstream change and is not assumed here.",
+  "evidence": [
+    {
+      "note": "The owner accepted native Chat plus additive message and turn-tail interactions as a direction with high feasibility while explicitly deferring detailed naming and behavior.",
+      "ref": "conversation:2026-08-19-native-chat-additive-task-actions"
+    },
+    {
+      "note": "The rc.8 Conversation contract declares conversation.chat.assistant-actions as an additive per-finalized-message list Slot and conversation.chat.turnTail as a richer completed-turn chain Slot.",
+      "ref": "deepseek-harness:141eb6fef83422698aef7a981029e843e8161534:packages/client/ui-conversation/src/client/contract/slots.ts"
+    },
+    {
+      "note": "The shipped feedback Plugin demonstrates a real per-message action component backed by a per-Session controller and Host Remote mutations.",
+      "ref": "deepseek-harness:141eb6fef83422698aef7a981029e843e8161534:packages/client/ui-message-feedback/src/client/index.ts"
+    },
+    {
+      "note": "Existing Context governance requires Remember to form a provenance-preserving proposal rather than silently polluting durable memory.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-dsh-shell-with-vibehub-task-pages",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-context-activation-governed-writeback",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T03:47:07Z",
+    "quote": "我们后面应该会要去探索很多这样的交互；for now 我们先知道这个方向要做，并且有高可行性。",
+    "ref": "conversation:2026-08-19-native-chat-additive-task-actions"
+  },
+  "state": "active",
+  "summary": "Keep ordinary DSH Chat native and unconstrained while adding high-value VibeHub Remember, Plan, and Task interactions through official message-level and turn-tail extension surfaces",
+  "tags": [
+    "additive-slots",
+    "chat",
+    "context-capture",
+    "deepseek-harness",
+    "interaction",
+    "remember",
+    "task-creation",
+    "turn-tail"
+  ],
+  "type": "decision"
+}

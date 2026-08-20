@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>VibeHub Interaction Research</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="title-group">
+        <span class="mark" aria-hidden="true">V</span>
+        <div><strong>Task Workbench research</strong><span>Interaction architecture · not visual design</span></div>
+      </div>
+      <nav aria-label="Research sections">
+        <button class="nav-button is-active" data-section="directions">Directions</button>
+        <button class="nav-button" data-section="patterns">Research</button>
+        <a href="https://github.com/deepseek-ai/deepseek-harness/tree/141eb6fef83422698aef7a981029e843e8161534" target="_blank" rel="noreferrer">DSH rc.8 ↗</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="directions" class="section is-active">
+        <header class="section-head">
+          <div><span class="eyebrow">ONE SCENARIO, THREE SPATIAL MODELS</span><h1>Graph is home.<br />What happens after you open a Task?</h1></div>
+          <p>这里不比较颜色、卡片或视觉风格。只比较 Graph 和单个 Task Workspace 应该怎样共享空间，以及 Chat、Run、Attention、Evidence 应该在什么时候成为主角。</p>
+        </header>
+
+        <div class="direction-tabs" role="tablist" aria-label="Interaction directions"></div>
+        <div class="step-tabs" role="tablist" aria-label="Scenario step"></div>
+
+        <section class="workbench" aria-live="polite">
+          <header class="workbench-bar">
+            <div class="crumbs"><span>Product launch</span><i>/</i><strong id="frame-location">Tasks</strong></div>
+            <div class="workbench-actions"><button>Search</button><button>⌘ K</button><button class="primary">New task</button></div>
+          </header>
+          <div id="frame" class="frame"></div>
+          <footer class="action-bar"><span id="frame-hint"></span><div><kbd>↵</kbd> Open <kbd>⌘K</kbd> Actions</div></footer>
+        </section>
+
+        <div class="direction-notes">
+          <section><span class="label">WHY THIS MODEL</span><p id="direction-thesis"></p></section>
+          <section><span class="label">MAIN RISK</span><p id="direction-risk"></p></section>
+          <section><span class="label">DSH COMPOSITION</span><p id="direction-dsh"></p></section>
+        </div>
+
+        <section class="recommendation">
+          <div><span class="eyebrow">RECOMMENDATION</span><h2>Start from Focus Route.</h2></div>
+          <p>它保留 Graph 作为真正的 home，但在 Task 内给 autonomous Run、Chat 和 Evidence 足够完整的空间。Spatial Lens 的空间连续性可以带进转场；Live Split 只保留为未来可选的宽屏模式。</p>
+        </section>
+      </section>
+
+      <section id="patterns" class="section">
+        <header class="section-head compact">
+          <div><span class="eyebrow">BEHAVIOR, NOT A MOODBOARD</span><h1>八个产品，八个可以借的交互判断。</h1></div>
+          <p>每一项只回答：它解决了我们 loop 里的哪个问题，以及如果直接照抄会把 VibeHub 带向哪里。</p>
+        </header>
+        <div id="source-grid" class="source-grid"></div>
+        <section class="pattern-summary">
+          <span class="eyebrow">SYNTHESIS</span>
+          <div class="summary-grid">
+            <p><strong>Codex</strong> 给 Task execution 足够空间。</p>
+            <p><strong>Linear</strong> 让导航和次要状态退后。</p>
+            <p><strong>Raycast</strong> 把长尾动作放进 context action layer。</p>
+            <p><strong>Msty</strong> 证明 branch 不需要强迫 Chat 变成 canvas。</p>
+            <p><strong>Things</strong> 让 Task、Subtask、Checklist 保持人类可懂。</p>
+            <p><strong>OpenHands</strong> 让 runtime 替换不改变产品心智。</p>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

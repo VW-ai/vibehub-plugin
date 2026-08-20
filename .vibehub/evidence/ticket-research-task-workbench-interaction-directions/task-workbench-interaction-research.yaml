@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "research-corpus-is-source-backed",
+    "scenario-pattern-map-is-complete",
+    "directions-are-interaction-architectures",
+    "recommendation-is-decision-ready",
+    "research-board-is-usable"
+  ],
+  "evidence_id": "task-workbench-interaction-research",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T00:18:42Z",
+  "refs": [
+    "docs/HARNESS_INTERACTION_RESEARCH.md",
+    "apps/harness-interaction-research/index.html",
+    "apps/harness-interaction-research/app.css",
+    "apps/harness-interaction-research/app.js",
+    "scripts/vh-harness-interaction-research.mjs",
+    "test/harness-interaction-research.test.mjs",
+    "test:node-test-harness-interaction-research-2-pass-1-sandbox-skip",
+    "browser:http-127-0-0-1-50812-three-directions-four-phases-no-console-errors",
+    "upstream:deepseek-harness-141eb6fef83422698aef7a981029e843e8161534",
+    "source-probe:9-of-9-at-deepseek-harness-rc8",
+    "source:packages-client-ui-theme-theme-runtime-register-and-override-tokens"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in study extracts interaction decisions and failure modes from eight official product sources, maps them to the complete Task-first VibeHub loop, and compares Focus Route, Spatial Lens, and Live Split against the same graph, Task, Run, attention, Chat, and review states. The local research board was exercised in the Codex in-app browser across all three spatial models and all four lifecycle phases with no browser warnings or errors. It recommends Focus Route while retaining exact graph restoration and a spatial transition. A fresh source probe against DeepSeek Harness rc.8 commit 141eb6fef83422698aef7a981029e843e8161534 passed the existing nine extension seams and additionally confirmed official composable Theme Runtime token overrides; the report explicitly keeps rc.8 runtime boot unverified and relies on the prior rc.7 live-profile proof for runtime feasibility.",
+  "ticket_id": "ticket-research-task-workbench-interaction-directions"
+}

@@ -1,0 +1,55 @@
+{
+  "context_id": "decision-dsh-shell-with-vibehub-task-pages",
+  "detail": "The first VibeHub product inside DeepSeek Harness should not replace or take ownership of the DSH Root shell. DSH retains its application shell, navigation, Session runtime, Chat, tools, permissions, and Plugin ecosystem. VibeHub adds the smallest coherent set of human-facing Task surfaces: a Tasks or Graph page based on the existing Graph Workbench interaction system, and, if a separate surface is necessary, a focused Task Workspace for Run observation, exact human attention, Chat steering, Context, Evidence, and review. Existing Graph behavior such as causal layout, scope, selection, Rooms, progressive Inspector, direction controls, minimap, and focused return should be adapted rather than redesigned; independent-app chrome should be reconciled with the DSH shell so users do not see nested navigation or duplicate Inspectors. The rest of the integration should use official additive Client Slots for Task association, Context controls, Run state, attention, and Evidence actions, plus a global theme that makes stock DSH and VibeHub surfaces visually continuous. If DSH cannot register a top-level page, the same product surfaces may be expressed as official view extensions; that implementation detail does not authorize Root replacement.",
+  "evidence": [
+    {
+      "note": "The owner rejected making VibeHub Graph Workbench the DSH shell and selected a smaller composition of one or two Workbench-derived pages, whole-app theming, and additive Slots.",
+      "ref": "conversation:2026-08-19-dsh-shell-additive-pages"
+    },
+    {
+      "note": "The existing Graph Workbench is already a first-class interaction surface whose causal layout and progressive inspection should be adapted rather than recreated.",
+      "ref": ".vibehub/rooms/workbench/decision-local-graph-ui-first-class.yaml"
+    },
+    {
+      "note": "The existing DSH boundary already requires a non-invasive Plugin through official extension surfaces without replacing the Root application.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-codex-linear-whole-shell-visual-baseline",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-20T03:37:03Z",
+    "quote": "有多一个/或者两个基于我们目前的 graph workbench 整体的交互改造的页面不就行了，然后让整体的 theme 和 additive slots 匹配上。",
+    "ref": "conversation:2026-08-19-dsh-shell-additive-pages"
+  },
+  "state": "active",
+  "summary": "Keep the DSH application shell and add one or two VibeHub pages derived from the existing Graph Workbench, with Theme Runtime and additive Slots making the whole product coherent",
+  "tags": [
+    "additive-slots",
+    "deepseek-harness",
+    "graph-workbench",
+    "plugin",
+    "product-shell",
+    "task-workspace",
+    "theme"
+  ],
+  "type": "decision"
+}

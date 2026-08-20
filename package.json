@@ -9,6 +9,7 @@
     "build": "node scripts/build-plugin-artifact.mjs --out dist/plugin",
     "prototype:directions": "node scripts/vh-harness-directions.mjs",
     "prototype:directions:safari": "node scripts/vh-harness-directions.mjs --safari",
+    "prototype:interaction-research": "node scripts/vh-harness-interaction-research.mjs",
     "prototype:taste": "node scripts/vh-harness-taste-board.mjs",
     "prototype:chat": "node scripts/vh-harness-chat-v1.mjs",
     "prototype:codex-base": "node scripts/vh-harness-codex-base.mjs",

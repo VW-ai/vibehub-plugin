@@ -1,0 +1,62 @@
+{
+  "context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+  "detail": "DeepSeek Harness is the immediate host, distribution wedge, and runtime integration target, not VibeHub's product boundary. VibeHub should install as a non-invasive Plugin or Bundle through official DSH extension surfaces, including supported frontend surfaces, and should not replace DSH's root application, duplicate its model and tool runtime, or require private coupling to another Plugin. DSH owns Sessions, models, tools, permissions, plugins, and Agent execution. VibeHub owns Projects, the human-facing Task graph, Context activation, attention state, Evidence proposals, and Outcomes. A VibeHub Task may be executed through one Agent session, several sessions, DSH Agent Team, scripts, another Plugin, a different Agent host, or human work; VibeHub must not adapt to or mirror the executor's internal task DAG, roster, mailbox, or planning representation merely because it exists. The thin compatibility adapter only needs stable Task-to-Session-or-Run association, generic lifecycle observation, Context handoff, result-to-Evidence proposal, and restart recovery of that association. Evidence remains a proposal until evaluated against Acceptance, and recovery restores association rather than pretending to reconstruct the executor's private state. Because DSH changes quickly, all host-specific calls should be isolated behind one adapter, pinned to tested versions, and protected by small compatibility smoke tests. The first slice reuses current VibeHub Ticket and Context logic, targets one Project, and prioritizes compatibility plus the complete Task UI over personal-level Rooms, cross-project orchestration, or team infrastructure.",
+  "evidence": [
+    {
+      "note": "The owner rejected direct integration with DSH Agent Team task internals and defined VibeHub as the human-facing management layer above sessions.",
+      "ref": "conversation:2026-08-19-dsh-plugin-and-execution-opacity"
+    },
+    {
+      "note": "The owner accepted attaching execution results as Evidence proposals and recovering Task-to-Session association, provided those remain generic adapter behavior rather than coupling to a specific execution plugin.",
+      "ref": "conversation:2026-08-19-task-session-evidence-recovery"
+    },
+    {
+      "note": "The current product already uses a lightweight Plugin and direct canonical documents, which supplies most reusable logic for the first DSH slice.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "note": "The existing replaceable-Agent decision makes executor opacity a product invariant rather than a DSH-specific workaround.",
+      "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-plugin-wedge-solo-small-team-coordination",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-canonical-agent-output",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-19T23:59:15Z",
+    "quote": "我们不在乎你用什么方法完成一个任务的。也不要跟另一个 plugin 产生适配，产生一套强绑定。",
+    "ref": "conversation:2026-08-19-dsh-plugin-and-execution-opacity"
+  },
+  "state": "active",
+  "summary": "Ship VibeHub first as a non-invasive DSH Plugin while treating every execution mechanism as opaque behind a generic Task-to-Session boundary",
+  "tags": [
+    "adapter",
+    "deepseek-harness",
+    "evidence",
+    "plugin",
+    "runtime-boundary",
+    "session"
+  ],
+  "type": "decision"
+}

@@ -1,0 +1,54 @@
+{
+  "context_id": "decision-task-first-human-workbench",
+  "detail": "The primary user-facing unit is Task. The checked-in canonical object may continue to be named Ticket internally for compatibility, but ordinary product language should say Task because it is understandable outside software teams. Chat remains important as a native, unconstrained way to explore, clarify, branch, compare, bring back, and steer work, yet it is not the product's durable center: a conversation may become a Task, attach to a Task, or remain temporary. The home surface is the Task graph, and selecting a Task opens its execution workspace, where the user can start work, understand what the Agent is doing, inspect progress and evidence, intervene, approve, retry, or close it. Agent execution is expected to occupy most of the lifecycle without continuous conversation. Project is domain-general rather than synonymous with a repository or software feature, so research, job search, operations, writing, and mixed human-plus-script work can use the same model. The near-term product should ship as a personal workbench, while keeping these same human-facing objects suitable for a later collaborative service.",
+  "evidence": [
+    {
+      "note": "The owner identified Task as VibeHub's basic unit, contrasted it with GPT's Chat unit, and made Task creation, execution inspection, intervention, and completion the recurring product loop.",
+      "ref": "conversation:2026-08-19-task-first-human-workbench"
+    },
+    {
+      "note": "The owner kept native model chat and explicit fork, compare, and bring-back interactions, but positioned them as a path into durable Context and executable Tasks rather than as the top-level product object.",
+      "ref": "conversation:2026-08-19-branching-chat-and-task-convergence"
+    },
+    {
+      "note": "The earlier person-centered decision already established the durable action object and attention-return loop; this decision gives that thesis its current Task-first workbench form.",
+      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "intent-conversational-ticket-control-surface",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-19T23:59:15Z",
+    "quote": "dont manage chat, manage task",
+    "ref": "conversation:2026-08-19-task-first-human-workbench"
+  },
+  "state": "active",
+  "summary": "VibeHub is a human-facing Task workbench above Agent sessions: do not manage chat, manage work to completion",
+  "tags": [
+    "chat",
+    "human-facing",
+    "product-model",
+    "task",
+    "task-graph",
+    "workbench"
+  ],
+  "type": "decision"
+}

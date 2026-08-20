@@ -6,19 +6,19 @@
     },
     {
       "acceptance_id": "clickable-core-loop-prototype",
-      "criterion": "A locally runnable high-fidelity browser prototype lets a reviewer traverse capture or normal Chat, explicit fork, branch graph, Compare, Bring Back, scoped Context, Ticket craft, Start, execution attention, and Evidence inside one continuous whole-application shell without backend services."
+      "criterion": "A locally runnable high-fidelity browser prototype lets a reviewer traverse capture or normal Chat, explicit fork, branch graph, Compare, Bring Back, scoped Context, Task craft, Start, execution attention, and Evidence inside one continuous whole-application shell without backend services."
     },
     {
       "acceptance_id": "whole-application-product-identity",
-      "criterion": "The replacement prototype owns the first frame, global navigation, Workspace and Session presentation, Chat header and composer, contextual inspector, empty and onboarding states, settings or engine entry, typography, motion, density, and responsive behavior; direct comparison with stock DSH and the additive Spike makes it credible that a user experiences a completely different application rather than a themed plugin distribution."
+      "criterion": "The replacement prototype owns the first frame, global navigation, Project and Session presentation, Chat header and composer, contextual inspector, empty and onboarding states, settings or engine entry, typography, motion, density, and responsive behavior; direct comparison with stock DSH and the additive Spike makes it credible that a user experiences a completely different application rather than several feature panels."
     },
     {
       "acceptance_id": "ticket-context-annotation-language",
-      "criterion": "The prototype defines one restrained, application-wide visual grammar for Branch, Context, Reference, Ticket, Run, attention, and Evidence that stays legible in Chat, Graph, inspector, command surfaces, and narrow layouts without turning conversation into a form or implying automatic capture."
+      "criterion": "The prototype defines one restrained, application-wide visual grammar for Branch, Context, Reference, Task, Run, attention, and Evidence that stays legible in Chat, Graph, inspector, command surfaces, and narrow layouts without turning conversation into a form or implying automatic capture."
     },
     {
       "acceptance_id": "execution-is-strongly-perceptible",
-      "criterion": "Trusted execution presence follows the user across the application and distinguishes queued, running, waiting-for-human, failed, evidence-producing, and completed states; it disappears when no trusted Run exists, never infers activity from Ticket state, and anchors each attention request to its owning step."
+      "criterion": "Trusted execution presence follows the user across the application and distinguishes queued, running, waiting-for-human, failed, evidence-producing, and completed states; it disappears when no trusted Run exists, never infers activity from Task state, and anchors each attention request to its owning step."
     },
     {
       "acceptance_id": "browser-first-app-like-shell",
@@ -26,58 +26,55 @@
     },
     {
       "acceptance_id": "dsh-extension-contract-is-preserved",
-      "criterion": "A checked-in shell map names every stock DSH root owner intentionally replaced, every DSH runtime or service retained, and the child extension seats the VibeHub shell recreates so whole-application ownership does not silently eliminate model, tool, approval, settings, or third-party plugin extensibility."
+      "criterion": "A checked-in shell map names every stock DSH single-owner surface intentionally replaced, every DSH runtime or service retained, and any child extension seats the VibeHub surface recreates; the design prefers official Theme and additive Slot composition where they can express the selected direction."
     },
     {
       "acceptance_id": "review-pack-is-decision-ready",
-      "criterion": "A concise review guide makes the owner judge application identity, global information architecture, Chat quality, branch return and comparison, Context control, Ticket craft, execution presence, engine settings, responsive behavior, and the difference from both stock DSH and the rejected additive Spike."
+      "criterion": "A concise review guide makes the owner judge application identity, global information architecture, Chat quality, branch return and comparison, Context control, Task craft, execution presence, engine settings, responsive behavior, and the difference from both stock DSH and the rejected prototypes."
     }
   ],
   "constraints": [
     "Do not constrain normal Agent Chat with a bespoke semantic workflow or require users to learn Skill names.",
-    "Do not use the standalone mock or additive DSH Client Spike as the visual or structural baseline; both remain disposable technical fixtures.",
+    "Do not use the standalone mock, additive DSH Client Spike, or rejected visual directions as the visual or structural baseline; they remain disposable evidence.",
     "Do not implement cross-repository coordination, automatic knowledge graphs, cloud sync, or a native desktop shell in this Ticket.",
     "Use mocked or disposable prototype state; no parallel source of truth, hidden durable state, or production backend is authorized.",
-    "Preserve DSH runtime, Session, model, tool, approval, command, and plugin capabilities behind the replacement product shell.",
-    "Preserve quiet intelligence, accessibility, honest execution presence, and human UI/UX authority while allowing a new visual language rather than inheriting the current Workbench or DSH appearance."
+    "Preserve DSH runtime, Session, model, tool, approval, command, and Plugin capabilities behind the product shell.",
+    "Preserve accessibility, honest execution presence, and human UI/UX authority while deriving the prototype from the explicitly selected interaction-research direction."
   ],
-  "context": "The owner rejected the first additive-slot and standalone prototypes as product UI. Those builds proved interaction inventory and DSH feasibility only. The product direction is now whole-application ownership: DeepSeek Harness remains the underlying runtime and plugin substrate, while VibeHub replaces the visible root layout, navigation, Workspace and Session framing, conversation chrome, composer, inspectors, onboarding, settings presentation, typography, motion, and responsive system. The result must feel like a completely different application before a VibeHub-specific control is opened. Chat remains a native high-capability Agent experience; Fork, Graph, Compare, Bring Back, Context, Ticket, Start, Run, attention, and Evidence form one continuous task loop around it. The prototype must also make the extension contract explicit because taking the DSH root removes child slots unless VibeHub deliberately recreates them.",
+  "context": "The owner rejected the first additive-slot and standalone prototypes as product UI and has now rejected continuing directly into another visual treatment. DeepSeek Harness remains the underlying runtime and Plugin substrate, while VibeHub must feel like a complete Task-first application. Before this high-fidelity prototype begins, the interaction-research Ticket must compare real product patterns and produce an explicit base architecture. The prototype then applies that selected spatial and navigational model, using official DSH Theme and additive Slot surfaces wherever possible and replacing a single-owner shell surface only when the chosen interaction cannot otherwise be expressed. Chat remains a capable native Agent experience; Fork, Graph, Compare, Bring Back, Context, Task, Start, Run, attention, and Evidence form one continuous task loop around it.",
   "context_refs": [
     {
-      "purpose": "Existing authority for conversational entry with Ticket as the durable product object.",
-      "ref": ".vibehub/rooms/product/intent-conversational-ticket-control-surface.yaml"
+      "purpose": "Current Task-first product identity and Chat relationship.",
+      "ref": ".vibehub/rooms/product/decision-task-first-human-workbench.yaml"
     },
     {
-      "purpose": "Existing authority for person-centered Ticket control and explicit attention return.",
-      "ref": ".vibehub/rooms/product/decision-person-centered-ticket-attention-system.yaml"
+      "purpose": "Current DSH Plugin and runtime-opacity boundary.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
     },
     {
-      "purpose": "Existing boundary for explicit Context activation and governed sedimentation.",
-      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+      "purpose": "The research decision package this prototype must implement rather than pre-empt.",
+      "ref": ".vibehub/tickets/ticket-research-task-workbench-interaction-directions.yaml"
     },
     {
-      "purpose": "Current accessibility, graph, and honest-presence authority; its existing appearance is not the new visual baseline.",
-      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
-    },
-    {
-      "purpose": "Whole-application product contract revised from explicit owner feedback.",
-      "ref": "docs/HARNESS_PRODUCT_CONTRACT.md"
-    },
-    {
-      "purpose": "Pinned DSH root, child-slot, Session, command, and client-module feasibility evidence.",
+      "purpose": "Pinned DSH source and runnable feasibility evidence.",
       "ref": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "A high-fidelity, reviewable VibeHub whole-application prototype makes DSH feel like a completely different task-oriented product while preserving normal Agent Chat and the underlying runtime and extension capabilities.",
+  "outcome": "The owner-selected interaction architecture becomes a high-fidelity, reviewable VibeHub Task Workbench prototype that feels like a different DSH application while preserving its runtime and Plugin ecosystem.",
   "provenance_refs": [
-    "conversation:2026-08-17-vibehub-deepseek-harness-product-direction",
-    "conversation:2026-08-17-ticket-context-execution-surfacing",
-    "conversation:2026-08-17-owner-rejects-additive-ui-and-requires-whole-application-revolution"
+    "conversation:2026-08-17-owner-rejects-additive-ui-and-requires-whole-application-revolution",
+    "conversation:2026-08-19-owner-requests-interaction-research-before-direction"
   ],
-  "relations": [],
+  "relations": [
+    {
+      "rationale": "High-fidelity interaction implementation begins only after evidence-backed alternatives produce one selected base direction.",
+      "target_ticket_id": "ticket-research-task-workbench-interaction-directions",
+      "type": "depends_on"
+    }
+  ],
   "schema_version": 2,
   "ticket_id": "ticket-prototype-task-harness-experience"
 }

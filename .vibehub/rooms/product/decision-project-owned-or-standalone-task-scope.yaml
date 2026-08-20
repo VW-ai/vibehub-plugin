@@ -1,0 +1,58 @@
+{
+  "context_id": "decision-project-owned-or-standalone-task-scope",
+  "detail": "A Task normally belongs to one Project, and a Project is a first-class human work scope containing its Task graph and project-level Room tree. A Project need not be a code repository or a development effort. A temporary or standalone Task may have no Project, just as a chat may exist outside a GPT Project. A Task may have child Tasks: a child is a real executable Task with its own lifecycle, Context, Evidence, and Outcome, whereas a checklist item is only local prose; parent-child containment is distinct from dependency. One ordinary Task must not silently become multi-owned across Projects. Cross-project work should be represented explicitly by a coordination Task plus project-owned child or related Tasks and explicit Context references. Outcome writeback defaults to the owning Project and does not mutate Context merely because that Context was read from elsewhere. Context therefore has project-level scope by default, with optional personal-level Context as a later layer analogous to user-level configuration; team-level Context can be added with collaboration. The first DSH Plugin slice may remain single-Project and omit personal Rooms, cross-project coordination, and team semantics.",
+  "evidence": [
+    {
+      "note": "The owner corrected Project from a detached view into the normal scope for Tasks and Rooms, while explicitly preserving temporary standalone Tasks.",
+      "ref": "conversation:2026-08-19-project-owned-and-standalone-tasks"
+    },
+    {
+      "note": "The owner accepted explicit cross-project Tickets when work truly spans Projects and rejected accidental writeback into Projects whose Context was only read.",
+      "ref": "conversation:2026-08-19-cross-project-coordination"
+    },
+    {
+      "note": "Existing governed writeback semantics support reading a minimal Context packet without granting implicit mutation authority.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-ticket-project-independent",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-project-playbook-context-guides-tickets",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-context-activation-governed-writeback",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "contract-core-domain-semantics",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-19T23:59:15Z",
+    "quote": "ticket 还是要归属一个 project 可能，然后也可以有 temp ticket 就是不归属 project",
+    "ref": "conversation:2026-08-19-project-owned-and-standalone-tasks"
+  },
+  "state": "active",
+  "summary": "A Task has zero or one owning Project; Projects own their Task scope and Room tree, while standalone Tasks remain valid",
+  "tags": [
+    "context-scope",
+    "cross-project",
+    "project",
+    "rooms",
+    "subtasks",
+    "task"
+  ],
+  "type": "decision"
+}

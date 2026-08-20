@@ -9,6 +9,10 @@
     {
       "note": "The established long-term intent already expands Ticket cycles across repositories and non-software work.",
       "ref": ".vibehub/rooms/product/intent-context-compounding-action-system.yaml"
+    },
+    {
+      "note": "The owner later revised the human-facing model: a Task normally belongs to one Project with its own Room tree, while standalone Tasks remain valid.",
+      "ref": "conversation:2026-08-19-project-owned-and-standalone-tasks"
     }
   ],
   "kind": "context",
@@ -20,6 +24,10 @@
     {
       "target_context_id": "decision-speed-first-skill-plugin",
       "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-project-owned-or-standalone-task-scope",
+      "type": "relates_to"
     }
   ],
   "schema_version": 1,
@@ -28,8 +36,8 @@
     "quote": "人的思考不会拘泥于某一个项目，而真的就是，我想做什么。",
     "ref": "conversation:2026-08-03-person-centered-action-graph-invariants"
   },
-  "state": "active",
-  "summary": "Ticket is project-independent; Project is an optional view and governance boundary, not the action graph's mandatory parent",
+  "state": "superseded",
+  "summary": "Superseded: Ticket was previously modeled as project-independent, with Project only an optional view and governance boundary",
   "tags": [
     "action-graph",
     "project",

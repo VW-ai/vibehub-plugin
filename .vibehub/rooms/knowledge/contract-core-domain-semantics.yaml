@@ -1,6 +1,6 @@
 {
   "context_id": "contract-core-domain-semantics",
-  "detail": "Future VibeHub product and storage work must preserve a minimal domain language before introducing federation, server, indexing, or synchronization concepts. The Action layer consists of Ticket, Evidence, and Outcome: a Ticket expresses one bounded change the user wants; Evidence is a reference-backed observation mapped to Acceptance; Outcome is the independent judgment over that Evidence. The Knowledge layer consists of Room and Context: Context is one durable reusable claim; a Room is strictly the bounded namespace in which related durable Context is curated and owned. This tightens the earlier broad phrase 'bounded workspace': Rooms do not own Tickets, Agents, Projects, repositories, or execution state. Reference is a typed value that points to external reality such as code at a revision, a GitHub or Linear issue, a pull request, a document, a test run, or an artifact; referenced code is not promoted into a separate business Resource entity. Agent is an executor, not durable product state. Project is an optional view or governance grouping, not an action-graph parent. A repository may both be referenced as code and physically carry current VibeHub documents, but that implementation co-location does not make repository, Room, Project, and storage the same business concept. The complete semantic relation is: a Room owns Context; Context informs a Ticket; an Agent executes the Ticket; the Ticket produces Evidence; Evidence supports an Outcome; any of those durable documents may carry typed References to external facts. Ticket creation must not require the user to choose a Room: References and the current Outcome drive retrieval of the smallest relevant Context packet, while ambiguity, authority crossings, or conflicting Context return to the user. Future Store, catalog, index, namespace, sync, and server designs remain infrastructure and must not enter this business vocabulary or create a parallel source of truth. This is a long-range semantic contract only; it does not authorize a schema migration, storage rewrite, federated index, or implementation Ticket.",
+  "detail": "Future VibeHub product and storage work must preserve a minimal domain language before introducing federation, server, indexing, or synchronization concepts. The Action layer consists of Task, Evidence, and Outcome: Task is the user-facing name for one bounded change the user wants, while the checked-in schema may retain Ticket as its compatibility name; Evidence is a reference-backed observation mapped to Acceptance; Outcome is the independent judgment over that Evidence. The Knowledge layer consists of Room and Context: Context is one durable reusable claim; a Room is strictly the bounded namespace in which related durable Context is curated and owned. Rooms do not own Tasks, Agents, repositories, or execution state. Reference is a typed value that points to external reality such as code at a revision, a GitHub or Linear issue, a pull request, a document, a test run, or an artifact; referenced code is not promoted into a separate business Resource entity. Agent is an executor, not durable product state. Project is an optional owning work scope rather than merely a view: a Task has zero or one owning Project, a Project groups its Task graph and project-level Room tree, and standalone Tasks remain valid. A repository may both be referenced as code and physically carry current VibeHub documents, but that implementation co-location does not make repository, Room, Project, and storage the same business concept. The complete semantic relation is: a Project may group Tasks and a Room tree; a Room owns Context; Context informs a Task; an Agent or other executor works on the Task through one or more Sessions or Runs; the Task produces Evidence; Evidence supports an Outcome; any durable document may carry typed References to external facts. Task creation must not require the user to choose a Room: owning Project or standalone scope, References, and the current Outcome drive retrieval of the smallest relevant Context packet, while ambiguity, authority crossings, or conflicting Context return to the user. Future Store, catalog, index, namespace, sync, and server designs remain infrastructure and must not enter this business vocabulary or create a parallel source of truth. This is a long-range semantic contract only; it does not authorize a schema migration, storage rewrite, federated index, or implementation Ticket.",
   "evidence": [
     {
       "note": "The owner explicitly corrected the proposed Resource abstraction: code should be treated as a Reference, then requested that the business semantics be clarified and preserved as a long-range spec before the model becomes confused.",
@@ -13,6 +13,14 @@
     {
       "note": "The current schemas already encode Ticket, Context, Evidence, and Outcome as canonical documents, providing the concrete baseline for the semantic separation.",
       "ref": "skills/contracts/"
+    },
+    {
+      "note": "The owner later revised Project semantics: a Task normally belongs to one Project with its own Room tree, while a temporary or standalone Task may remain unowned.",
+      "ref": "conversation:2026-08-19-project-owned-and-standalone-tasks"
+    },
+    {
+      "note": "The owner identified Task as the ordinary product term while allowing the internal Ticket schema to remain for compatibility.",
+      "ref": "conversation:2026-08-19-task-first-human-workbench"
     }
   ],
   "kind": "context",
@@ -22,7 +30,7 @@
       "type": "relates_to"
     },
     {
-      "target_context_id": "decision-ticket-project-independent",
+      "target_context_id": "decision-project-owned-or-standalone-task-scope",
       "type": "relates_to"
     },
     {
@@ -36,24 +44,29 @@
     {
       "target_context_id": "contract-canonical-agent-output",
       "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
     }
   ],
   "schema_version": 1,
   "source": {
-    "captured_at": "2026-08-04T22:26:17Z",
-    "quote": "代码，就是一种，把代码当作 reference 了……业务语意是需要理清楚的，不然会很乱。",
-    "ref": "conversation:2026-08-04-core-domain-semantics-future-spec"
+    "captured_at": "2026-08-19T23:59:15Z",
+    "quote": "我们的 basic unit 是什么，是 ticket，GPT 的 basic unit chat。",
+    "ref": "conversation:2026-08-19-task-first-human-workbench"
   },
   "state": "active",
-  "summary": "VibeHub's future domain model separates Action, Knowledge, external References, and execution actors before any federated storage design",
+  "summary": "VibeHub separates human-facing Tasks and their Evidence and Outcomes, Room-owned Context, optional Project ownership, external References, and replaceable executors",
   "tags": [
     "business-semantics",
     "context",
     "domain-model",
     "future-spec",
+    "projects",
     "references",
     "rooms",
-    "tickets"
+    "tasks"
   ],
   "type": "contract"
 }
