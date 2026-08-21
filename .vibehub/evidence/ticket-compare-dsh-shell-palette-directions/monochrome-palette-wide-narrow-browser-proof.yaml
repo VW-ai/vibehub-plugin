@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "wide-narrow-and-keyboard-review-is-usable"
+  ],
+  "evidence_id": "monochrome-palette-wide-narrow-browser-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T04:10:37Z",
+  "refs": [
+    "apps/dsh-palette-explorer/index.html",
+    "apps/dsh-palette-explorer/app.css",
+    "apps/dsh-palette-explorer/app.js",
+    "scripts/vh-dsh-palette-explorer.mjs",
+    "test/dsh-palette-explorer.test.mjs",
+    "package.json"
+  ],
+  "schema_version": 1,
+  "summary": "A real browser exercised all five palette radios and observed five distinct computed background tokens, opened the compact Compare all grid, returned to full-size inspection, and switched Graph, Chat and Task surfaces successfully. The built-in exact 390x844 frame reports body clientWidth=scrollWidth=390 and clientHeight=scrollHeight=844, while the Task Graph alone keeps intentional internal horizontal panning. Both wide and narrow frames retain visible controls and the fresh browser logs contain zero errors. Focused tests pass 4/4; full verification passes 150 tests with one optional exact-source skip; and the existing installed plugin artifact remains 62 files / 2,831,812 bytes. The loopback server accepts GET/HEAD only and exposes repositoryWrites=false.",
+  "ticket_id": "ticket-compare-dsh-shell-palette-directions"
+}

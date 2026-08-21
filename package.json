@@ -16,6 +16,7 @@
     "prototype:taste": "node scripts/vh-harness-taste-board.mjs",
     "prototype:chat": "node scripts/vh-harness-chat-v1.mjs",
     "prototype:codex-base": "node scripts/vh-harness-codex-base.mjs",
+    "prototype:dsh-palette": "node scripts/vh-dsh-palette-explorer.mjs",
     "prototype:dsh-shell": "node scripts/vh-dsh-persistent-shell-prototype.mjs",
     "prototype:harness": "node scripts/vh-harness-prototype.mjs",
     "prototype:harness:safari": "node scripts/vh-harness-prototype.mjs --safari",

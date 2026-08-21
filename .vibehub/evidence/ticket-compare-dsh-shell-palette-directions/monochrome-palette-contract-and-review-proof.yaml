@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "same-shell-comparison-is-controlled",
+    "palette-directions-are-distinct-and-coherent",
+    "palette-review-boundary-is-decision-ready"
+  ],
+  "evidence_id": "monochrome-palette-contract-and-review-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T04:10:37Z",
+  "refs": [
+    "apps/dsh-palette-explorer/index.html",
+    "apps/dsh-palette-explorer/app.css",
+    "apps/dsh-palette-explorer/app.js",
+    "docs/DSH_MONOCHROME_PALETTE_REVIEW.md",
+    "test/dsh-palette-explorer.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in rough-HTML explorer renders one fixed persistent Shell, native-shaped Chat, Task Graph and Task Workspace while switching only a shared token contract. True Black, Graphite, Soft Black, Cool Mono and Warm Mono each declare the same complete background, surface, border, text, muted, monochrome accent, selection and four-phase token set, with materially different black level, white level, temperature and contrast but no colored state rainbow, paper treatment or decorative gradient. The review note records intent, strengths, risks and best use for all five; recommends Graphite only as Agent input; and keeps explicit owner preference and later installed whole-application approval separate.",
+  "ticket_id": "ticket-compare-dsh-shell-palette-directions"
+}

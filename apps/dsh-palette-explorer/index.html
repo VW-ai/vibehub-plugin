@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" data-palette="graphite">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0d0f12">
+  <title>VibeHub × DSH · Palette directions</title>
+  <link rel="icon" type="image/svg+xml" href="/vibehub-mark.svg">
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="lab-bar" aria-label="Palette review controls">
+    <div class="lab-title"><strong>DSH palette lab</strong><span>same shell · token-only comparison</span></div>
+    <div class="palette-tabs" role="radiogroup" aria-label="Color direction">
+      <button type="button" role="radio" aria-checked="false" data-palette-choice="true-black"><i></i>True Black</button>
+      <button class="active" type="button" role="radio" aria-checked="true" data-palette-choice="graphite"><i></i>Graphite</button>
+      <button type="button" role="radio" aria-checked="false" data-palette-choice="soft-black"><i></i>Soft Black</button>
+      <button type="button" role="radio" aria-checked="false" data-palette-choice="cool-mono"><i></i>Cool Mono</button>
+      <button type="button" role="radio" aria-checked="false" data-palette-choice="warm-mono"><i></i>Warm Mono</button>
+    </div>
+    <button class="compare-button" id="compareAll" type="button">Compare all</button>
+  </header>
+
+  <section class="palette-context" aria-live="polite">
+    <div><small id="paletteNumber">01 / 05</small><strong id="paletteName">Graphite</strong><span id="paletteIntent">Neutral, near-monochrome, closest to Codex restraint.</span></div>
+    <div class="token-strip" id="tokenStrip" aria-label="Current palette tokens"></div>
+    <div class="view-tabs" role="group" aria-label="Surface to inspect">
+      <button class="active" type="button" data-view="graph">Graph</button>
+      <button type="button" data-view="chat">Chat</button>
+      <button type="button" data-view="task">Task</button>
+    </div>
+  </section>
+
+  <main class="lab-main">
+    <section class="shell" id="fullShell" aria-label="Full size palette inspection">
+      <aside class="sidebar" aria-label="Application navigation">
+        <div class="brand"><img src="/vibehub-mark.svg" alt=""><span><strong>VibeHub</strong><small>on DeepSeek Harness</small></span><button type="button" aria-label="Collapse sidebar">⌫</button></div>
+        <button class="new-chat" type="button"><b>＋</b><span>New chat</span><kbd>⌘ N</kbd></button>
+        <nav>
+          <button class="nav-active" type="button"><span>⌘</span>Tasks <small>8</small></button>
+          <button type="button"><span>◇</span>Rooms <small>4</small></button>
+        </nav>
+        <div class="section-label"><span>Workspace</span><button type="button">•••</button></div>
+        <button class="workspace" type="button"><i></i><span><strong>vibehub-plugin</strong><small>codex/deepseek-harness-v1</small></span><b>⌄</b></button>
+        <div class="section-label"><span>Task focus</span><button type="button">View graph</button></div>
+        <button class="history active" type="button"><i class="phase running"></i><span><strong>Palette directions</strong><small>Running · Needs you</small></span></button>
+        <button class="history" type="button"><i class="phase draft"></i><span><strong>Build visual system</strong><small>Draft · Blocked</small></span></button>
+        <div class="section-label"><span>Chats</span><button type="button">⌕</button></div>
+        <button class="history" type="button"><span><strong>Harness product direction</strong><small>Now · 3 branches</small></span></button>
+        <button class="history" type="button"><span><strong>Open-source launch</strong><small>Yesterday</small></span></button>
+        <div class="sidebar-spacer"></div>
+        <button class="settings" type="button">⚙ <span>Settings</span></button>
+        <button class="profile" type="button"><b>W</b><span><strong>Wayne</strong><small>Local profile</small></span></button>
+      </aside>
+
+      <section class="workspace-main">
+        <header class="app-header"><div><strong id="surfaceTitle">Tasks</strong><small id="surfaceMeta">Current graph · vibehub-plugin</small></div><div><button type="button" aria-label="Search">⌕</button><button type="button" aria-label="More">•••</button></div></header>
+
+        <section class="surface graph-surface active" data-surface="graph">
+          <div class="surface-heading"><div><small>CURRENT WORK</small><h1>Task graph</h1><p>Committed work stays causal. Color stays quiet.</p></div><div class="summary"><span><b>1</b> Running</span><span><b>1</b> Needs you</span><span><b>2</b> Draft</span></div></div>
+          <div class="graph-toolbar"><div><button class="active" type="button">Current</button><button type="button">All</button><button type="button">Product</button></div><div><button type="button">Search</button><button type="button">Fit</button></div></div>
+          <div class="graph-canvas">
+            <svg aria-hidden="true" viewBox="0 0 1000 560" preserveAspectRatio="none"><path d="M210 276 C280 276 282 155 360 155 M210 276 C280 276 282 385 360 385 M570 155 C650 155 648 276 724 276 M570 385 C650 385 648 276 724 276"/></svg>
+            <article class="task-card done card-a"><small>DONE</small><h2>Prove DSH extension seams</h2><p>Official Bundle, Slots and Session routing.</p><footer><span>foundation</span><b>→</b></footer></article>
+            <article class="task-card running-card card-b"><small>RUNNING <em>NEEDS YOU</em></small><h2>Compare shell palette directions</h2><p>Same product. Five restrained color systems.</p><footer><span>visual study</span><b>→</b></footer></article>
+            <article class="task-card draft card-c"><small>DRAFT <em>BLOCKED</em></small><h2>Build whole-app visual system</h2><p>Theme every native and VibeHub surface.</p><footer><span>product shell</span><b>→</b></footer></article>
+            <article class="task-card ready card-d"><small>READY</small><h2>Bridge Chat and Tasks</h2><p>Create, attach and remember in native Chat.</p><footer><span>native chat</span><b>→</b></footer></article>
+          </div>
+        </section>
+
+        <section class="surface chat-surface" data-surface="chat">
+          <div class="chat-header"><small>NATIVE DSH CHAT</small><h1>Harness product direction</h1><p>Chat remains a Human-led Context Space.</p></div>
+          <div class="chat-thread"><div class="human-message">The shell direction works. Show me better color options.</div><article class="assistant-message"><header><i></i><span>DeepSeek</span><small>Reasoned 4s</small></header><p>Keep the structure fixed and compare coherent token systems. That separates visual temperature from product interaction.</p><div><button type="button">Copy</button><button type="button">Fork</button><button type="button">Create Task</button><button type="button">Remember</button></div></article></div>
+          <div class="composer"><textarea aria-label="Message DeepSeek Harness" placeholder="Ask DeepSeek to explore, explain, or do something"></textarea><footer><div><button type="button">＋</button><button type="button">Workspace Write</button></div><div><button type="button">DeepSeek-V4</button><button class="send" type="button">↑</button></div></footer></div>
+        </section>
+
+        <section class="surface task-surface" data-surface="task">
+          <div class="task-head"><small>TASK · ticket-compare-dsh-shell-palette-directions</small><h1>Compare shell palette directions</h1><p>One controlled visual study across the complete product shell.</p><div><span class="pill">Running</span><span class="substate">Needs you</span></div></div>
+          <div class="task-body"><div class="run-column"><article><header><strong>Palette token contract</strong><span>Done</span></header><p>Five named directions share one geometry and interaction model.</p></article><article class="active-run"><header><strong>Wide and narrow browser review</strong><span>Running</span></header><p>Compare Graph, native Chat and Task Workspace without production writes.</p></article><article><header><strong>Record owner preference</strong><span>Next</span></header><p>An explicit preference informs the later visual-system Ticket.</p></article></div><aside class="action-panel"><small>RECOMMENDED ACTION</small><button type="button">Compare palettes <b>→</b></button><small>CONTEXT</small><p>Same Shell · same Task graph · token-only variation</p><small>SESSION</small><p>Native DSH Session<br><b>session:9f82…</b></p></aside></div>
+        </section>
+      </section>
+    </section>
+
+    <section class="overview" id="overview" hidden aria-label="All palette directions"></section>
+  </main>
+  <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+</body>
+</html>

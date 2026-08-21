@@ -22,6 +22,10 @@
         "path": "docs/DEEPSEEK_HARNESS_V1.md"
       },
       {
+        "blob": "42c2a6996621a6b17370686e07c6c7f2d049dba9",
+        "path": "docs/DSH_MONOCHROME_PALETTE_REVIEW.md"
+      },
+      {
         "blob": "50df858473255da7ce5584eba2936fb8df4e9e7e",
         "path": "docs/DSH_PERSISTENT_SHELL_REVIEW.md"
       },
@@ -182,8 +186,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T03:48:52.233Z",
-    "last_aligned_commit": "a3a23dca81a178971ba737f2eff82c92c87bf55d"
+    "checked_at": "2026-08-21T04:10:33.400Z",
+    "last_aligned_commit": "a6a3726f4415d4c946dc28fc0d1e463bb7ccf171"
   },
   "anchors": [
     "CHANGELOG.md",

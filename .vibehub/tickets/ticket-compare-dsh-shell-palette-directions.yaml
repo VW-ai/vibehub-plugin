@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "same-shell-comparison-is-controlled",
+      "criterion": "One local rough-HTML explorer presents the same persistent sidebar, Chat, Task Graph, Task Workspace, Recommended action, card states and content across every option; switching palettes changes only declared visual tokens and never changes layout, copy, topology, hierarchy or interaction behavior."
+    },
+    {
+      "acceptance_id": "palette-directions-are-distinct-and-coherent",
+      "criterion": "At least five named black-and-white or near-monochrome dark directions are materially distinct in black level, white level, surface temperature, neutral ramp and contrast posture while remaining restrained, non-paper-like and suitable for a Codex/Linear-quality application; each exposes its background, surface, border, text, muted, monochrome accent, selection and semantic-state tokens with readable contrast and without turning Task states into a rainbow."
+    },
+    {
+      "acceptance_id": "wide-narrow-and-keyboard-review-is-usable",
+      "criterion": "The palette control and same-shell carrier are keyboard reachable, retain visible focus, work at representative desktop and exact 390x844 narrow frames without page overflow, respect reduced motion, show a compact all-options overview plus full-size inspection, and produce no browser console errors or repository writes."
+    },
+    {
+      "acceptance_id": "palette-review-boundary-is-decision-ready",
+      "criterion": "A checked-in review note names the intent, strengths, risks and recommended use of every palette, identifies one Agent recommendation without treating it as owner approval, and states exactly how an explicit owner preference or correction will inform—but not prematurely approve—the later whole-application visual-system Ticket."
+    }
+  ],
+  "constraints": [
+    "Do not modify the production DSH Bundle, Theme Runtime, current Workbench, or the accepted persistent-shell navigation prototype.",
+    "Do not change typography, spacing, card geometry, information hierarchy or interaction in order to make one palette look better.",
+    "Do not use paper texture, editorial-layout styling, gradients as decoration, neon cyberpunk color, glassmorphism, or color as the only state signal.",
+    "Do not record Agent preference as human-origin Evidence or final visual approval."
+  ],
+  "context": "The persistent-shell prototype is broadly correct, but its current blue-gray color treatment is not owner-approved. The owner specifically wants to feel a black-and-white application rather than compare multiple colored accent families. Produce a fast, production-shaped monochrome study using the exact same Shell, Chat, Graph, Task cards, Task Workspace, Recommended action and state examples for every option so the owner judges black level, surface temperature and contrast rather than layout. This is a visual exploration input for the later whole-application visual system, not final visual authority or production Theme implementation.",
+  "context_refs": [
+    {
+      "purpose": "Successful persistent-shell prototype whose layout, hierarchy and interaction content remain fixed during palette comparison.",
+      "ref": ".vibehub/outcomes/ticket-prototype-dsh-persistent-shell-navigation.yaml"
+    },
+    {
+      "purpose": "Binding Codex/Linear-quality whole-shell visual baseline without requiring exact proprietary reproduction.",
+      "ref": ".vibehub/rooms/product/decision-codex-linear-whole-shell-visual-baseline.yaml"
+    },
+    {
+      "purpose": "Quiet intelligence, restrained state color, accessibility and no-paper-texture constraints.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    },
+    {
+      "purpose": "Current rough shell carrier to extend without treating its colors as approved.",
+      "ref": "apps/dsh-persistent-shell-prototype/index.html"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A disposable same-shell palette explorer lets the owner feel and compare several coherent black-and-white DSH/VibeHub directions without changing the approved navigation, interaction model, or production Plugin.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-accepts-shell-direction-but-rejects-current-colors",
+    "conversation:2026-08-21-owner-narrows-palette-study-to-black-and-white"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-compare-dsh-shell-palette-directions"
+}
