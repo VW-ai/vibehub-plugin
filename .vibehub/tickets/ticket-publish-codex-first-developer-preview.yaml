@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-public-preview-after-codex-first-approval",
+      "criterion": "Placeholder: after approval succeeds, replan this Ticket to firm with package identity, fresh-user setup, Codex auth, Project selection, supported Codex/runtime matrix, schema probes, reproducible artifacts, install/start/restart/upgrade/remove, documentation, demo assets, CI, release notes, limits and rollback acceptance."
+    }
+  ],
+  "constraints": [
+    "Do not publish a static Codex imitation or mock execution.",
+    "Do not require DSH, scrape Codex Desktop or add a second Task database.",
+    "Keep initial scope to one local Project and developer preview.",
+    "Describe ordinary audio and experimental realtime separately."
+  ],
+  "context": "Publish the smallest usable Codex-first one-Project preview after owner approval. DSH compatibility is a separate later package and must not gate this release.",
+  "context_refs": [
+    {
+      "purpose": "Release priority and DSH deferral.",
+      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+    },
+    {
+      "purpose": "Existing GitHub-first reproducibility boundary.",
+      "ref": "docs/RELEASE.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A developer can install and run a versioned Codex-first VibeHub preview, authenticate through supported Codex, select one Project, use Chat and Task work, and upgrade or remove it safely without DSH.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+  ],
+  "relations": [
+    {
+      "rationale": "Public packaging begins only after owner approval of the complete Codex-first product.",
+      "target_ticket_id": "ticket-approve-codex-first-product-experience",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-publish-codex-first-developer-preview"
+}

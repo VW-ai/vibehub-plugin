@@ -10,6 +10,10 @@
         "path": "README.md"
       },
       {
+        "blob": "3df189bc77e4e9829ab257d8bd074cf21afc1e5c",
+        "path": "docs/CODEX_APP_SERVER_DSH_ADAPTER_SPIKE.md"
+      },
+      {
         "blob": "faffbcc7a21b3abb96bc640b55b8915d386b7d76",
         "path": "docs/CONCEPT.md"
       },
@@ -186,8 +190,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T04:10:33.400Z",
-    "last_aligned_commit": "a6a3726f4415d4c946dc28fc0d1e463bb7ccf171"
+    "checked_at": "2026-08-21T05:21:39.208Z",
+    "last_aligned_commit": "5c8afd9a624ebdea926b3117d5591e9cffd4d587"
   },
   "anchors": [
     "CHANGELOG.md",

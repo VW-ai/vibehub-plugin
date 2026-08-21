@@ -1,0 +1,46 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "codex-first-product-experience-approved",
+      "authority": "human",
+      "criterion": "After reviewing the completed visual-system Outcome and real local application in Light, Dark, desktop and narrow states, the owner explicitly accepts Codex familiarity, hierarchy, typography, density, palette, motion, Chat, Composer, voice states, execution, approvals, Task Graph, Task Workspace and overall coherence for developer-preview publication."
+    }
+  ],
+  "constraints": [
+    "This Ticket records protected judgment only.",
+    "Automated screenshots, Agent preference or silence cannot satisfy it.",
+    "Approval covers the working whole application.",
+    "Any exact gap keeps the criterion unresolved and requires replanning."
+  ],
+  "context": "Visual and interaction quality is protected human judgment. Review the complete local application rather than an isolated Graph or DSH packaging layer.",
+  "context_refs": [
+    {
+      "purpose": "Approved product scope.",
+      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+    },
+    {
+      "purpose": "Visual baseline.",
+      "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+    },
+    {
+      "purpose": "Human Evidence boundary.",
+      "ref": "skills/contracts/acceptance-authority.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner explicitly accepts the complete installed Codex-first VibeHub application for developer-preview publication.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner needs the complete mechanically verified application before judging it.",
+      "target_ticket_id": "ticket-build-codex-first-visual-system",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-approve-codex-first-product-experience"
+}

@@ -1,0 +1,50 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-production-shell-from-approved-codex-first-direction",
+      "criterion": "Placeholder: after both prerequisites succeed, replan this Ticket to firm with independently checkable acceptance for the chosen sidebar and route hierarchy, Codex Thread and Turn lifecycle, Graph and Task Workspace transitions, Composer, execution rendering, local lifecycle, restart recovery, accessibility and regression boundaries."
+    }
+  ],
+  "constraints": [
+    "Do not execute while draft or infer the protected composition before human-origin Evidence and a successful Outcome exist.",
+    "Do not scrape Codex Desktop, create a second Task store, run duplicate Agent loops or make DSH a runtime prerequisite.",
+    "Keep upstream-specific calls inside bounded adapters with exact schema probes.",
+    "Preserve exact VibeHub handoff, Evidence and independent closeout semantics."
+  ],
+  "context": "Production acceptance is intentionally deferred until owner review of the real adapter prototype. Refine this Ticket in place after the decision succeeds. The first production carrier must be usable without DSH; shell and runtime seams remain adapter-based so DSH compatibility can follow later.",
+  "context_refs": [
+    {
+      "purpose": "Binding immediate carrier and compatibility priority.",
+      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+    },
+    {
+      "purpose": "Binding product parity and Task contract.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Existing Task handoff, Evidence and closeout baseline to preserve.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The production local application presents persistent Codex Chat and Threads plus VibeHub Task Graph and focused Task Workspace in one coherent Codex-first shell.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+  ],
+  "relations": [
+    {
+      "rationale": "Production consumes the version-pinned Codex adapter and lifecycle proof.",
+      "target_ticket_id": "ticket-spike-codex-app-server-dsh-adapter",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Exact production acceptance cannot be firm before the owner chooses the reviewed composition.",
+      "target_ticket_id": "ticket-decide-codex-first-shell-direction",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-implement-codex-first-vibehub-shell"
+}

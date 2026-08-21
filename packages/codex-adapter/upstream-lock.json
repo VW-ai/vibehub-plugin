@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "codex": {
+    "package": "@openai/codex",
+    "version": "0.147.0",
+    "releaseTag": "rust-v0.147.0",
+    "tagObject": "3ed6f04f6bf8b7c46299d1cb1ff99c74ce21a51d",
+    "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
+    "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2"
+  },
+  "dsh": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.8",
+    "commit": "141eb6fef83422698aef7a981029e843e8161534",
+    "requiredHostServices": [
+      "commands.register",
+      "sessionProjections.register",
+      "webServer.register",
+      "effect"
+    ],
+    "requiredProfileOperations": [
+      "plugin-add",
+      "profile-start",
+      "profile-stop",
+      "profile-restart",
+      "plugin-remove"
+    ],
+    "seams": [
+      {
+        "name": "registered-command-lifecycle",
+        "file": "packages/interaction/commands/src/index.ts",
+        "patterns": ["'command/run'", "'command/done'", "recordInput"]
+      },
+      {
+        "name": "session-projection-replay",
+        "file": "packages/session/session-projection/src/index.ts",
+        "patterns": ["sessionProjections.register()", "stateVersion"]
+      },
+      {
+        "name": "loopback-web-route",
+        "file": "packages/host/webserver/src/index.ts",
+        "patterns": ["register(route: WebRoute)", "get port(): number"]
+      },
+      {
+        "name": "effect-cleanup",
+        "file": "docs/cordis-api/fiber.md",
+        "patterns": ["ctx.effect(execute, label?)", "disposer"]
+      },
+      {
+        "name": "profile-plugin-lifecycle",
+        "file": "docs/user/develop/basic/publish.md",
+        "patterns": ["dsh plugin --profile demo add", "dsh plugin --profile demo remove"]
+      }
+    ]
+  },
+  "transport": {
+    "codexAppServer": "stdio-jsonl",
+    "dshSurface": "loopback-read-only-http",
+    "credentialsPersistedByVibeHub": false
+  },
+  "runtime": {
+    "node": ">=24.0.0",
+    "platform": "darwin-arm64"
+  },
+  "clientCapabilities": {
+    "experimentalApi": true,
+    "requestAttestation": false
+  },
+  "requiredRequests": [
+    "initialize",
+    "account/read",
+    "thread/start",
+    "thread/resume",
+    "thread/list",
+    "thread/read",
+    "thread/delete",
+    "turn/start",
+    "turn/steer",
+    "turn/interrupt",
+    "skills/list"
+  ],
+  "requiredServerRequests": [
+    "item/commandExecution/requestApproval",
+    "item/fileChange/requestApproval",
+    "item/tool/requestUserInput",
+    "item/tool/call"
+  ],
+  "requiredNotifications": [
+    "thread/started",
+    "thread/status/changed",
+    "turn/started",
+    "turn/completed",
+    "turn/plan/updated",
+    "turn/diff/updated",
+    "item/started",
+    "item/completed",
+    "item/agentMessage/delta",
+    "item/commandExecution/outputDelta",
+    "item/fileChange/outputDelta",
+    "item/mcpToolCall/progress",
+    "thread/realtime/started",
+    "thread/realtime/transcript/delta",
+    "thread/realtime/transcript/done",
+    "thread/realtime/outputAudio/delta",
+    "thread/realtime/error",
+    "thread/realtime/closed"
+  ],
+  "audio": {
+    "stableTurnInputs": ["audio", "localAudio"],
+    "experimentalRequests": [
+      "thread/realtime/start",
+      "thread/realtime/appendAudio",
+      "thread/realtime/appendText",
+      "thread/realtime/appendSpeech"
+    ],
+    "requiresExperimentalApi": true,
+    "currentProbeResult": "protocol-present-current-ephemeral-thread-unsupported"
+  },
+  "stopConditions": [
+    "generated-protocol-hash-changed",
+    "required-request-or-event-missing",
+    "managed-auth-status-unavailable",
+    "thread-restart-recovery-unavailable",
+    "approval-cannot-round-trip-without-hidden-state",
+    "audio-input-removed",
+    "dsh-profile-cannot-own-one-idempotent-app-server-process",
+    "same-user-action-routes-through-two-agent-loops"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "codex-parity-floor-is-traversable",
+      "criterion": "The prototype provides a persistent Codex-like sidebar, new and resumed Codex Threads, Chat history, Composer, attachment and voice affordances, streaming Turn items, tools, approvals, plans, diffs, interruption and completion through the real adapter, without DSH vocabulary or setup in the ordinary path."
+    },
+    {
+      "acceptance_id": "vibehub-task-layer-is-additive",
+      "criterion": "The same application exposes Task Graph and focused Task Workspace navigation, links Tasks and Codex Threads without equating them, preserves Recommended action, Context, Evidence and Outcome semantics, and returns to prior Chat or Graph focus without nested application chrome or a second Task store."
+    },
+    {
+      "acceptance_id": "light-and-dark-baseline-is-reviewable",
+      "criterion": "The identical application is reviewable in Light and Dark modes using the exact canonical Codex base colors, typography intent, restrained accent use and translucent-sidebar fallback, while VibeHub Task surfaces share the same semantic tokens."
+    },
+    {
+      "acceptance_id": "wide-narrow-and-accessible-loop-is-real",
+      "criterion": "A real browser or WebView review proves the Chat, Task Graph, Task Workspace and return loop at representative wide and narrow sizes with keyboard navigation, focus restoration, reduced motion, no horizontal overflow, readable contrast and no false live or microphone state."
+    },
+    {
+      "acceptance_id": "owner-review-pack-is-exact",
+      "criterion": "A checked-in decision pack identifies the sidebar hierarchy, default landing, Chat-to-Task entry, Task-to-Thread relationship, Composer and voice placement, local application boundary, known gaps, later DSH compatibility seam and smallest production path."
+    }
+  ],
+  "constraints": [
+    "This is a disposable product and architecture prototype, not production visual approval or public release.",
+    "Do not use mock Codex execution for the primary review path, scrape Codex Desktop, or run a second Agent loop.",
+    "Do not require DSH installation or experimental realtime voice for the ordinary product loop.",
+    "Keep shell and runtime adapters replaceable so later DSH compatibility does not fork the product."
+  ],
+  "context": "Use the verified Codex app-server adapter to answer the protected interaction question in the environment the owner will actually use. The prototype may begin browser-first or WebView-first, but ordinary navigation, Threads, Chat and execution must be driven by real Codex runtime data. DSH packaging is a later compatibility target, not the carrier or prerequisite of this prototype.",
+  "context_refs": [
+    {
+      "purpose": "Binding immediate Codex-first priority and later DSH compatibility boundary.",
+      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+    },
+    {
+      "purpose": "Product promise the prototype must make reviewable.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Exact Light and Dark primitives.",
+      "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+    },
+    {
+      "purpose": "Completed interaction research whose useful shell findings remain reference material, not a carrier dependency.",
+      "ref": ".vibehub/outcomes/ticket-prototype-dsh-persistent-shell-navigation.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A locally runnable Codex-first prototype feels immediately familiar to a Codex user and adds VibeHub Tasks as one coherent work layer without requiring DSH.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+  ],
+  "relations": [
+    {
+      "rationale": "The prototype directly consumes the version-pinned real Codex app-server client, Thread recovery and event projection proved by the spike.",
+      "target_ticket_id": "ticket-spike-codex-app-server-dsh-adapter",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-prototype-codex-first-vibehub-shell"
+}

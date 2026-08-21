@@ -1,0 +1,45 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "codex-first-shell-direction-decided",
+      "authority": "human",
+      "criterion": "After reviewing the real-runtime prototype in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact sidebar hierarchy, default landing, Chat and Composer posture, voice entry, Task Graph entry, Task-to-Thread relationship and Graph-to-Task transition, or records one bounded correction executable against the proven adapter."
+    }
+  ],
+  "constraints": [
+    "This Ticket records protected product composition only; it does not implement or publish artifacts.",
+    "Agent preference, screenshots without owner review, or silence cannot satisfy the human-authority criterion.",
+    "The choice must preserve real Codex runtime ownership, VibeHub Task truth and later replaceable DSH compatibility."
+  ],
+  "context": "The high-level promise and runtime are decided. After the real Codex-first prototype exists, the protected remaining choice is the exact sidebar hierarchy, default landing, Chat and Task transition, Composer and voice placement, narrow behavior and local application packaging posture. DSH composition is not part of this immediate product decision.",
+  "context_refs": [
+    {
+      "purpose": "Binding product priority.",
+      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+    },
+    {
+      "purpose": "Owner-approved parity and additive Task direction.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Exact visual base for review.",
+      "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner explicitly accepts the exact Codex-first application composition and additive VibeHub Task relationship that govern production implementation.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner needs the real-runtime Codex-first prototype and exact tradeoffs before choosing production composition.",
+      "target_ticket_id": "ticket-prototype-codex-first-vibehub-shell",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-codex-first-shell-direction"
+}

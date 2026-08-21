@@ -1,0 +1,5 @@
+- insert:
+    - id: vibehub-codex-adapter-spike
+      name: '@vibehub/dsh-codex-adapter-spike'
+      config:
+        repoRoot: !!js process.cwd()

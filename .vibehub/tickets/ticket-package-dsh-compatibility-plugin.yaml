@@ -1,0 +1,45 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-dsh-compatibility-after-codex-first-preview",
+      "criterion": "Placeholder: after the Codex-first preview succeeds, replan this Ticket to firm with exact supported DSH/Codex versions, Profile install/start/restart/upgrade/remove, Slot and Theme composition, native-user coexistence, shared core parity, no duplicate Agent loop, truthful capability fallback and public Plugin packaging acceptance."
+    }
+  ],
+  "constraints": [
+    "Do not gate the Codex-first product or preview on this Ticket.",
+    "Do not fork DSH upstream, duplicate the Task store or route one action through DSH and Codex Agents.",
+    "Reuse shared core packages and keep DSH version translations bounded.",
+    "DSH-native Agent compatibility may be added later but is not the primary runtime contract."
+  ],
+  "context": "DSH remains strategically useful for distribution and its plugin ecosystem, but it follows the first usable Codex product. Reuse the completed Profile spike and translate the stable core into official DSH Slots, Theme, settings and lifecycle only after the Codex-first preview establishes the product contract.",
+  "context_refs": [
+    {
+      "purpose": "Binding deferral and compatibility decision.",
+      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+    },
+    {
+      "purpose": "Existing Profile lifecycle and ecosystem findings.",
+      "ref": "docs/CODEX_APP_SERVER_DSH_ADAPTER_SPIKE.md"
+    },
+    {
+      "purpose": "Completed DSH Bundle and Task execution baseline.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Existing DSH users can install a compatible VibeHub Plugin that reuses the Codex-first core and VibeHub Task system without forking DSH or creating another Agent loop.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-defers-dsh-compatibility"
+  ],
+  "relations": [
+    {
+      "rationale": "The DSH compatibility package consumes the stable product and packaging contract established by the first Codex preview.",
+      "target_ticket_id": "ticket-publish-codex-first-developer-preview",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-package-dsh-compatibility-plugin"
+}

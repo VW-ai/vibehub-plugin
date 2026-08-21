@@ -11,7 +11,12 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
-import { buildUiSnapshot, parseUiFlags, startVibeHubUi } from "../skills/scripts/vh-ui.mjs";
+import {
+  buildTicketHandoff,
+  buildUiSnapshot,
+  parseUiFlags,
+  startVibeHubUi,
+} from "../skills/scripts/vh-ui.mjs";
 import { context, room, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 
 const repos = [];
@@ -118,6 +123,20 @@ function canonicalBytes(repo) {
   }
   return collect(root).sort(([left], [right]) => left.localeCompare(right));
 }
+
+test("host-owned Ticket handoff is reusable without browser reconstruction", () => {
+  const repo = fixture();
+  const payload = buildTicketHandoff(repo, "feature");
+  assert.equal(payload.kind, "vibehub_ticket_handoff");
+  assert.equal(payload.ticketId, "feature");
+  assert.equal(payload.nextAction.action, "NEEDS_HUMAN");
+  assert.deepEqual(payload.acceptance, [{
+    acceptance_id: "works",
+    authority: "human",
+    criterion: "feature behavior is observed.",
+  }]);
+  assert.throws(() => buildTicketHandoff(repo, "missing"), /Ticket not found/u);
+});
 
 function authorized(token) {
   return { headers: { Authorization: `Bearer ${token}` } };

@@ -1,0 +1,55 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-visual-system-from-complete-codex-first-surfaces",
+      "criterion": "Placeholder: after all direct prerequisites succeed, replan this Ticket to firm with exact semantic tokens, typography, density, spacing, surfaces, borders, elevation, icons, focus, selection, code and diff states, microphone and live states, motion, responsive behavior, accessibility and screenshot acceptance before owner review."
+    }
+  ],
+  "constraints": [
+    "Do not treat a palette swap or styling only Task surfaces as completion.",
+    "Preserve native behavior, accessibility, mode choice, reduced motion and truthful runtime states.",
+    "Use accent only for earned selection, focus, links and primary action.",
+    "Keep tokens shell-agnostic enough for later DSH translation."
+  ],
+  "context": "Final visual acceptance follows the real shell, Chat-to-Task and audio surfaces. Derive the application system from exact Codex Light and Dark primitives; DSH Theme translation is deferred to the later compatibility Ticket.",
+  "context_refs": [
+    {
+      "purpose": "Exact visual primitives.",
+      "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+    },
+    {
+      "purpose": "Immediate carrier and later compatibility boundary.",
+      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+    },
+    {
+      "purpose": "Accessibility and hierarchy boundary.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The complete Codex-first VibeHub application has a coherent Codex-quality Light and Dark visual system across Chat, Composer, Task Graph, Task Workspace, execution, approvals and responsive states.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-provides-codex-light-dark-theme"
+  ],
+  "relations": [
+    {
+      "rationale": "Real shell components must exist before complete visual coverage is firm.",
+      "target_ticket_id": "ticket-implement-codex-first-vibehub-shell",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Final bridge controls are part of the product surface.",
+      "target_ticket_id": "ticket-build-codex-chat-task-bridges",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Microphone and capability states must exist before complete visual coverage.",
+      "target_ticket_id": "ticket-build-codex-audio-input",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-build-codex-first-visual-system"
+}

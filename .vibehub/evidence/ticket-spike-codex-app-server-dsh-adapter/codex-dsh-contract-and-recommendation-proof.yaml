@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "codex-and-dsh-baselines-are-pinned",
+    "adapter-recommendation-is-decision-ready"
+  ],
+  "evidence_id": "codex-dsh-contract-and-recommendation-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T05:08:14Z",
+  "refs": [
+    "packages/codex-adapter/upstream-lock.json",
+    "packages/codex-adapter/probe-schema.mjs",
+    "packages/codex-adapter/probe-dsh-source.mjs",
+    "docs/CODEX_APP_SERVER_DSH_ADAPTER_SPIKE.md",
+    "command:npm-run-probe-codex-pass",
+    "command:probe-dsh-source-5-of-5",
+    "https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md",
+    "https://github.com/deepseek-ai/deepseek-harness/tree/141eb6fef83422698aef7a981029e843e8161534"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in compatibility lock pins Codex 0.147.0 to tag rust-v0.147.0, peeled commit be6e8eac029b183056b7e4402879f15d2c85f61b and generated v2 protocol SHA-256 f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2; it pins DSH rc.8 to 141eb6fef83422698aef7a981029e843e8161534 and names every consumed command, projection, loopback route, cleanup and Profile lifecycle seam. Both machine probes pass. The recommendation assigns Codex app-server, DSH and VibeHub ownership, defines the smallest adapter/shell/Task/voice packages, compares three focused community components without adopting a mega-shell, and records stop, fallback and upgrade rules.",
+  "ticket_id": "ticket-spike-codex-app-server-dsh-adapter"
+}

@@ -583,6 +583,22 @@ function ticketContextPackage(ticket, relations, repository, source) {
   };
 }
 
+export function buildTicketHandoff(repoRoot, ticketId) {
+  if (typeof ticketId !== "string" || !TICKET_ID_PATTERN.test(ticketId)) {
+    throw new Error(`Invalid Ticket ID: ${ticketId}`);
+  }
+  const snapshot = buildUiSnapshot(repoRoot);
+  const ticket = snapshot.repository.tickets.documents.get(ticketId)?.document;
+  const node = snapshot.graph.tickets.find((item) => item.ticketId === ticketId);
+  if (!ticket || !node) throw new Error(`Ticket not found: ${ticketId}`);
+  return ticketContextPackage(
+    ticket,
+    snapshot.graph.relations,
+    snapshot.repository,
+    snapshot.state.graph.source,
+  ).agentPayload;
+}
+
 function evidenceTrace(evidence, source) {
   return {
     kind: "evidence",

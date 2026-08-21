@@ -1,0 +1,51 @@
+{
+  "context_id": "decision-codex-first-product-dsh-later-compatibility",
+  "detail": "The immediate product path is Codex-first because the owner actually uses Codex and needs the product to improve that daily workflow. The application should use the official local Codex app-server and the owner's own Codex/OpenAI account as its primary Chat and Agent runtime, then add the VibeHub Task Graph, Task Workspace, Context, Evidence and Outcome layer. DeepSeek Harness remains a supported future compatibility, packaging and ecosystem target for people who use DSH, but DSH-specific shell composition, native Session behavior, Theme integration and public DSH Plugin packaging must not gate the first usable Codex product. Shared core packages must keep runtime and shell adapters replaceable so later DSH support does not require a fork, a duplicate Agent loop or a second Task store. In security language, Codex app-server runs locally while model Turn content may leave the machine through the owner's authenticated OpenAI service exactly as it does in Codex; this is not a separate third-party Codex service. Private Project Context must not be transmitted by probes unless explicitly authorized; synthetic fixtures should prove transport when real content is unnecessary.",
+  "evidence": [
+    {
+      "note": "The owner explicitly moved DSH compatibility later because Codex is the product they will actually use.",
+      "ref": "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+    },
+    {
+      "note": "The owner rejected wording that implied an unrelated external Codex service; the correct boundary is local app-server plus the owner's authenticated Codex/OpenAI model service.",
+      "ref": "conversation:2026-08-20-owner-clarifies-codex-service-boundary"
+    },
+    {
+      "note": "The existing runtime decision already makes official Codex app-server the single Agent runtime and keeps DSH behind an adapter.",
+      "ref": ".vibehub/rooms/product/decision-codex-app-server-primary-runtime.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-app-server-primary-runtime",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-codex-parity-vibehub-task-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T05:16:38Z",
+    "quote": "dsh 也可以兼容，但这个往后放放，因为我并不会去用 dsh，for real。",
+    "ref": "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+  },
+  "state": "active",
+  "summary": "Build the product for real Codex use first; preserve DSH as a later compatible distribution and composition target",
+  "tags": [
+    "codex",
+    "deepseek-harness",
+    "priority",
+    "product",
+    "runtime",
+    "security",
+    "shell"
+  ],
+  "type": "decision"
+}

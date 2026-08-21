@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "app-server-lifecycle-and-auth-boundary-are-proven",
+    "codex-thread-turn-and-event-loop-is-real",
+    "task-thread-handoff-remains-exact"
+  ],
+  "evidence_id": "codex-dsh-profile-thread-linkage-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T05:08:14Z",
+  "refs": [
+    "packages/codex-adapter/client.mjs",
+    "packages/codex-adapter/linkage.mjs",
+    "packages/codex-adapter/probe-live.mjs",
+    "spikes/codex-app-server/dsh-bundle/index.js",
+    "spikes/codex-app-server/dsh-bundle/cordis.patch.yml",
+    "spikes/codex-app-server/build-dsh-spike.mjs",
+    "test/codex-adapter.test.mjs",
+    "command:codex-live-turn-sentinel-and-restart-recovery-pass",
+    "command:dsh-profile-install-start-stop-restart-remove-pass",
+    "command:loopback-get-200-post-405-redacted-auth",
+    "command:focused-codex-adapter-5-of-5"
+  ],
+  "schema_version": 1,
+  "summary": "A clean temporary DSH rc.8 Web Profile installed the local Bundle, started exactly one Profile-owned Codex app-server, returned a redacted authenticated ChatGPT Pro capability from a no-store loopback health route, rejected POST with 405 read_only, stopped the child, installed the rebuilt Bundle, restarted with the same healthy capability and clean repository state, then removed the Bundle back to base+web with an empty patch. The live official app-server probe initialized, listed stable Workspace Threads, completed a real ephemeral read-only Turn with streamed start/item/delta/completion events and exact sentinel, restarted app-server, and recovered the same stable Thread ID. The versioned DSH command projection deterministically replays Workspace+Ticket+Codex Thread identity without localStorage, SQLite, Agent Team Tasks, live or observedAt fields; canonical Ticket, Evidence and Outcome semantics remain outside Codex runtime events.",
+  "ticket_id": "ticket-spike-codex-app-server-dsh-adapter"
+}

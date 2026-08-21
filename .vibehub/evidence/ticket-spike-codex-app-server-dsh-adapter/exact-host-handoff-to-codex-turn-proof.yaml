@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "task-thread-handoff-remains-exact",
+    "codex-thread-turn-and-event-loop-is-real"
+  ],
+  "evidence_id": "exact-host-handoff-to-codex-turn-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T05:13:45Z",
+  "refs": [
+    "skills/scripts/vh-ui.mjs",
+    "packages/codex-adapter/handoff.mjs",
+    "packages/codex-adapter/linkage.mjs",
+    "packages/codex-adapter/probe-live.mjs",
+    "spikes/codex-app-server/dsh-bundle/index.js",
+    "test/codex-adapter.test.mjs",
+    "test/ui-host.test.mjs",
+    "command:synthetic-exact-handoff-live-turn-start-and-interrupt-pass",
+    "command:exact-handoff-payload-sha256-ffb988c1af118243cc595e780c2e68228e6e227794b54c02dfda9e5a8abaacb8"
+  ],
+  "schema_version": 1,
+  "summary": "The production host now exports one canonical buildTicketHandoff path, and the Codex adapter serializes that object exactly once as the sole Turn input without browser reconstruction. Local tests prove exact structural and byte-equivalent serialization for the current host builder. The elevated live probe built the same host-owned payload from a disposable synthetic non-sensitive VibeHub repository, routed it through the official app-server into ephemeral Codex Thread 01a022bd-2cbd-77e3-a046-750086a9f8eb and Turn 01a022bd-2d02-7801-a399-9d3929efe3a6, observed turn/started, then immediately interrupted it read-only; payload SHA-256 was ffb988c1af118243cc595e780c2e68228e6e227794b54c02dfda9e5a8abaacb8. No private Project Context was transmitted. The separate replayable DSH command projection retains stable Workspace+Ticket+Thread identity and carries no liveness fields.",
+  "ticket_id": "ticket-spike-codex-app-server-dsh-adapter"
+}
