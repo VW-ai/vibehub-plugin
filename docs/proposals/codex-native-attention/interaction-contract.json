@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "defaultSurface": "chat",
+  "objects": {
+    "chat": {
+      "owner": "codex_app_server",
+      "identity": "thread_id",
+      "label": "Chat",
+      "purpose": "Human-led conversation and ordinary Codex work"
+    },
+    "task": {
+      "owner": "vibehub_git",
+      "identity": "ticket_id",
+      "label": "Task",
+      "purpose": "Durable Agent-led execution Context with Outcome and stopping contract"
+    },
+    "context": {
+      "owner": "vibehub_room",
+      "identity": "context_id",
+      "label": "Context",
+      "purpose": "Durable reusable Project claim"
+    },
+    "notification": {
+      "owner": "attention_projection",
+      "identity": "source_kind + source_identity",
+      "label": "Notification",
+      "purpose": "A route back to the exact owning Task, never a work object"
+    },
+    "livePresence": {
+      "owner": "trusted_runtime",
+      "identity": "ticket_id + run_id + observed_at",
+      "label": "Live",
+      "purpose": "Ephemeral execution presence, never durable Task state"
+    }
+  },
+  "search": {
+    "shortcut": "Meta+K",
+    "groups": ["Chats", "Tasks", "Context"],
+    "requirements": [
+      "Every result shows its object type.",
+      "Opening a result preserves its source identity.",
+      "Search never converts Chat into Task or Context."
+    ]
+  },
+  "attention": {
+    "needsYou": {
+      "eligibleWhen": "canonical next_action is NEEDS_HUMAN",
+      "presentation": "persistent current attention",
+      "dismissal": "not dismissible while the canonical Human boundary remains"
+    },
+    "completion": {
+      "eligibleWhen": "a successful Outcome with closed_at exists",
+      "presentation": "repository history; unread only when first observed after the running client baseline",
+      "dismissal": "read state is session-local and never changes the Outcome"
+    },
+    "deviation": {
+      "eligibleWhen": "a partial, failed, or deviated Outcome exists",
+      "presentation": "exception route to the exact Task",
+      "dismissal": "cannot hide the canonical REPLAN fact"
+    },
+    "running": {
+      "eligibleWhen": "unexpired trusted runtime presence exists",
+      "presentation": "quiet live affordance outside the notification count",
+      "dismissal": "expires with trusted presence"
+    }
+  },
+  "truthBoundaries": [
+    "Initial bootstrap completion history is never marked unread.",
+    "A replayed event, stale runtime observation, reload, or browser cache cannot mint a notification.",
+    "Running never generates notification noise by itself.",
+    "Color is supplementary to text, icon, group, and exact destination."
+  ]
+}

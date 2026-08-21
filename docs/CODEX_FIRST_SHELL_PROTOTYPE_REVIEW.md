@@ -19,7 +19,9 @@ reviewing the prototype is read-only.
 
 The ordinary path should feel familiar to a Codex user:
 
-- persistent sidebar and New task entry;
+- persistent sidebar, Chat-default landing, `New chat`, and semantically exact Recent chats;
+- typed `⌘K` Search across Codex Threads, VibeHub Tasks, and durable Context;
+- a quiet Task Inbox for current Needs You boundaries and successful Outcome history;
 - real Codex Thread history and restart recovery;
 - real Thread reading and resumption;
 - Composer input, image/audio attachments, voice recording and interruption;
@@ -27,7 +29,7 @@ The ordinary path should feel familiar to a Codex user:
 - command/file approval and request-user-input boundaries;
 - exact Light and Dark Codex primitives.
 
-VibeHub begins where ordinary Codex task history stops. It adds Tasks as a
+VibeHub begins where ordinary Codex conversation history stops. It adds Tasks as a
 durable work unit, a causal Task Graph, a focused Task Workspace, canonical
 Context and Acceptance, Evidence, independent Outcome and return-to-work
 posture. Codex owns Threads, Turns, tools, approvals and execution. VibeHub does
@@ -36,36 +38,42 @@ Agent loop or Task database.
 
 ## Review path
 
-1. Open the prototype and confirm existing Project Threads appear from the real
-   Codex app-server.
+1. Open the prototype and confirm it lands on ordinary Chat while existing
+   Project Threads appear under **Recent chats** from the real Codex app-server.
 2. Open an existing Thread and inspect its persisted Turns, tools and output.
-3. Start a new Codex task, send a text Turn, observe real streaming, and
+3. Start a new Codex Chat, send a text Turn, observe real streaming, and
    interrupt it if desired.
 4. Attach an image or record voice. The microphone becomes live only after the
    browser grants access; the resulting recording is sent as ordinary Codex
    `audio` input. Realtime conversation is not claimed by this build.
-5. Open Tasks. Select a graph card and inspect the canonical Task Context,
+5. Use `⌘K` Search and confirm Chats, Tasks, and Context remain visibly grouped
+   and open their exact owning objects. Open the bell and confirm Running is not
+   treated as notification activity.
+6. Open Tasks. Select a graph card and inspect the canonical Task Context,
    Acceptance, proof posture and Recommended action.
-6. On an executable Task, select **Start in Codex**. The exact host-owned Task
+7. On an executable Task, select **Start in Codex**. The exact host-owned Task
    handoff becomes the first input of one real Codex Thread. Return to the Task
    and confirm the linked Thread is discoverable without browser storage.
-7. Switch System → Light → Dark and repeat the Chat, Graph and Task loop.
-8. Review at a wide desktop size and 390×844. Confirm keyboard focus, sidebar
+8. Switch System → Light → Dark and repeat the Chat, Search, Inbox, Graph and Task loop.
+9. Review at a wide desktop size and 390×844. Confirm keyboard focus, sidebar
    drawer behavior, no horizontal overflow and reduced-motion behavior.
 
 ## Current composition
 
-The prototype lands on Codex because that is the environment the owner uses
-today. Tasks is a peer top-level destination, not a full-screen overlay or a
-separate nested application. Selecting a Task replaces the center column with
-its focused Workspace. Opening its linked Thread returns to normal Codex Chat
-inside the same persistent shell.
+The prototype lands on lightweight Chat because that is the native environment
+the owner uses today. Tasks is a distinct peer destination, not another name
+for Codex Threads, a full-screen overlay, or a separate nested application.
+Typed Search bridges Chat, Task and Context without converting them. A quiet
+bell and bounded Needs You Sidebar group return important Tasks to the Human;
+ordinary Running progress stays inspectable without becoming notification
+noise. Selecting a Task replaces the center column with its focused Workspace.
+Opening its linked Thread returns to normal Codex Chat inside the same shell.
 
 This is intentionally reviewable rather than final. The protected downstream
 decision chooses:
 
-1. Codex-first or Tasks-first default landing.
-2. Tasks beside Codex in top-level navigation or grouped under the Project.
+1. Exact typed-Search placement and result density.
+2. Bell/Inbox tone, Sidebar Needs You density, and completion treatment.
 3. Center-column Task focus or a bounded Chat-adjacent Task presentation.
 4. Exact Composer and voice placement.
 5. Browser-first, WebView-first or desktop-wrapper production carrier.

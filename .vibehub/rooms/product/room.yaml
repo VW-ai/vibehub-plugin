@@ -14,8 +14,12 @@
         "path": "docs/CODEX_APP_SERVER_DSH_ADAPTER_SPIKE.md"
       },
       {
-        "blob": "adbd2f8d95049ce423eb2bc9edc0f71e964ac52e",
+        "blob": "9de9b1d5a263f30f2719e39cf2a86377b74d4cc9",
         "path": "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"
+      },
+      {
+        "blob": "1b0489b896345091351e05f44b1819ab3777442d",
+        "path": "docs/CODEX_NATIVE_SEARCH_ATTENTION_RESEARCH.md"
       },
       {
         "blob": "faffbcc7a21b3abb96bc640b55b8915d386b7d76",
@@ -170,6 +174,10 @@
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
+        "blob": "c50c25a1a20b1e5ed4c2e87b0800914b0bb1da98",
+        "path": "docs/proposals/codex-native-attention/interaction-contract.json"
+      },
+      {
         "blob": "d1c8e663603c345a32fff971963642eb735f8190",
         "path": "docs/proposals/dsh-persistent-shell/composition-contract.json"
       },
@@ -194,8 +202,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T06:15:19.623Z",
-    "last_aligned_commit": "13dcdb3f6b281c0130d73be635be78bef42db1ad"
+    "checked_at": "2026-08-21T07:19:17.135Z",
+    "last_aligned_commit": "27cde5ac7b0fb7a6516d6e1821aed43a98c11ed4"
   },
   "anchors": [
     "CHANGELOG.md",

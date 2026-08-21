@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "real-shell-prototype-makes-direction-reviewable",
+    "wide-narrow-keyboard-review-is-decision-ready"
+  ],
+  "evidence_id": "codex-native-search-attention-real-shell-browser-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T07:22:36Z",
+  "refs": [
+    "apps/codex-first-shell-prototype/index.html",
+    "apps/codex-first-shell-prototype/app.css",
+    "apps/codex-first-shell-prototype/app.js",
+    "scripts/vh-codex-first-shell-prototype.mjs",
+    "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md",
+    "docs/CODEX_NATIVE_SEARCH_ATTENTION_RESEARCH.md",
+    "test/codex-first-shell-prototype.test.mjs",
+    "browser:codex-in-app:chat-default-search-task-context-inbox-wide:2026-08-21",
+    "browser:codex-in-app:390x844-search-inbox-focus-overflow:2026-08-21",
+    "browser:codex-in-app:wide-narrow-zero-console-errors:2026-08-21",
+    "command:node-test-codex-first-shell-prototype-5-of-5",
+    "command:npm-run-verify-162-pass-1-expected-skip",
+    "command:verify-plugin-artifact-62-files-2832437-bytes"
+  ],
+  "schema_version": 1,
+  "summary": "The real-runtime Codex-first shell now lands on ordinary Chat with real Codex Threads, keeps canonical VibeHub Tasks separate, and adds grouped global Search, a bounded Needs You sidebar group, and a quiet Task Inbox for current human boundaries plus repository completion history. In the live authenticated loopback shell, grouped Search opened exact Chat, Task Workspace, and Context destinations; the Inbox exposed one current Needs You item and durable completion history without treating Running as notification. Keyboard navigation, Enter, Escape, and trigger focus return passed. Wide review had zero horizontal overflow and no console errors; the explicit 390x844 production frame measured clientWidth equal to scrollWidth at 390, kept the 362px Search dialog and 390px Inbox inside the frame, and also logged zero console errors. Reduced-motion and source-truth assertions are enforced in the focused suite and decision-ready review pack.",
+  "ticket_id": "ticket-research-codex-native-search-and-task-attention"
+}

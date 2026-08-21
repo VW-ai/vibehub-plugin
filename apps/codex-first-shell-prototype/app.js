@@ -6,6 +6,7 @@ const state = {
   activeThread: null,
   activeTicketId: null,
   activeTask: null,
+  activeContextId: null,
   eventCursor: 0,
   pendingRequests: [],
   running: false,
@@ -14,9 +15,18 @@ const state = {
   recorder: null,
   recordingStream: null,
   themeIndex: 0,
+  searchResults: [],
+  searchIndex: 0,
+  overlayReturnFocus: null,
+  attentionInitialized: false,
+  initialCompletionKeys: new Set(),
+  unreadCompletionKeys: new Set(),
+  attentionPollCounter: 0,
 };
 
 const token = location.hash.slice(1);
+const reviewFrame = new URLSearchParams(location.search).get("reviewFrame");
+if (reviewFrame === "narrow") document.body.dataset.reviewFrame = "narrow";
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const surface = $("#surface");
@@ -63,7 +73,7 @@ const action = (payload) => api("/api/action", { method: "POST", body: JSON.stri
 
 function titleForThread(thread) {
   if (thread.taskLink) return humanize(thread.taskLink.ticketId);
-  return thread.title || "Untitled task";
+  return thread.title || "Untitled chat";
 }
 
 function humanize(ticketId) {
@@ -72,8 +82,12 @@ function humanize(ticketId) {
 
 function updateSidebar() {
   const list = $("#threadList");
+  const needsYou = state.bootstrap?.attention?.needsYou ?? [];
+  const attention = $("#sidebarAttention");
+  attention.hidden = needsYou.length === 0;
+  $("#sidebarAttentionList").innerHTML = needsYou.slice(0, 3).map((item) => `<button class="attention-item" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Task · Needs you</small></span></button>`).join("");
   if (!state.threads.length) {
-    list.innerHTML = '<p class="muted">No Codex tasks in this Project yet.</p>';
+    list.innerHTML = '<p class="muted">No Codex chats in this Project yet.</p>';
     return;
   }
   list.innerHTML = state.threads.map((thread) => {
@@ -85,6 +99,32 @@ function updateSidebar() {
       ${thread.taskLink ? "<em>TASK</em>" : ""}
     </button>`;
   }).join("");
+
+}
+
+function completionKey(item) {
+  return `${item.ticketId}:${item.closedAt}`;
+}
+
+function updateAttentionState(nextAttention) {
+  const keys = new Set((nextAttention?.recentCompletions ?? []).map(completionKey));
+  if (!state.attentionInitialized) {
+    state.initialCompletionKeys = keys;
+    state.attentionInitialized = true;
+  } else {
+    for (const key of keys) {
+      if (!state.initialCompletionKeys.has(key)) state.unreadCompletionKeys.add(key);
+    }
+  }
+  updateInboxBadge();
+}
+
+function updateInboxBadge() {
+  const currentNeedsYou = state.bootstrap?.attention?.needsYou?.length ?? 0;
+  const count = currentNeedsYou + state.unreadCompletionKeys.size;
+  const badge = $("#inboxBadge");
+  badge.hidden = count === 0;
+  $("#inboxButton").setAttribute("aria-label", count ? `Open Task inbox, ${count} items need attention` : "Open Task inbox");
 }
 
 function setRouteHeader(title, meta, { back = false } = {}) {
@@ -96,12 +136,124 @@ function setRouteHeader(title, meta, { back = false } = {}) {
 function setRoute(route) {
   state.route = route;
   appShell.classList.remove("sidebar-open");
-  $$('[data-route]', $("#sidebar")).forEach((button) => button.classList.toggle("active", button.dataset.route === route));
+  const activeRoute = route === "task" ? "tasks" : route;
+  $$('[data-route]', $("#sidebar")).forEach((button) => button.classList.toggle("active", button.dataset.route === activeRoute));
   composerWrap.hidden = route !== "chat";
   if (route === "chat") renderChat();
   else if (route === "tasks") renderTasks();
   else if (route === "task") renderTaskWorkspace();
   else renderRooms();
+}
+
+function syncScrim() {
+  $("#scrim").hidden = $("#searchDialog").hidden && $("#inboxPanel").hidden && $("#reviewPanel").hidden;
+}
+
+function searchCorpus(query) {
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const includes = (...values) => {
+    const haystack = values.map((value) => String(value ?? "")).join("\n").toLowerCase();
+    return terms.every((term) => haystack.includes(term));
+  };
+  const chats = state.threads
+    .filter((thread) => includes(titleForThread(thread), thread.preview, thread.id))
+    .slice(0, 6)
+    .map((thread) => ({ kind: "chat", id: thread.id, title: titleForThread(thread), detail: thread.preview || "Codex Thread", glyph: "C" }));
+  const tasks = (state.bootstrap?.graph.tickets ?? [])
+    .filter((ticket) => includes(ticket.ticketId, ticket.outcome, ticket.capabilities.nextAction.summary.action))
+    .slice(0, 8)
+    .map((ticket) => ({ kind: "task", id: ticket.ticketId, title: humanize(ticket.ticketId), detail: ticket.outcome, glyph: "T" }));
+  const contexts = (state.bootstrap?.contexts ?? [])
+    .filter((context) => includes(context.contextId, context.summary, context.detail, ...(context.tags ?? [])))
+    .slice(0, 6)
+    .map((context) => ({ kind: "context", id: context.contextId, title: context.summary, detail: `${context.room} · ${context.type}`, glyph: "◇" }));
+  return [...chats, ...tasks, ...contexts];
+}
+
+function renderSearchResults() {
+  state.searchResults = searchCorpus($("#searchInput").value);
+  state.searchIndex = Math.min(state.searchIndex, Math.max(0, state.searchResults.length - 1));
+  const groups = [
+    ["chat", "Chats"],
+    ["task", "Tasks"],
+    ["context", "Context"],
+  ];
+  const markup = groups.map(([kind, label]) => {
+    const matches = state.searchResults.filter((item) => item.kind === kind);
+    if (!matches.length) return "";
+    return `<div class="search-group-label">${label}</div>${matches.map((item) => {
+      const index = state.searchResults.indexOf(item);
+      return `<button class="search-result" type="button" role="option" aria-selected="${index === state.searchIndex}" data-search-kind="${item.kind}" data-search-id="${escapeHtml(item.id)}"><i>${item.glyph}</i><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span><em>${kind === "chat" ? "Chat" : kind === "task" ? "Task" : "Context"}</em></button>`;
+    }).join("")}`;
+  }).join("");
+  $("#searchResults").innerHTML = markup || '<div class="search-empty">No matching Chat, Task, or Context.</div>';
+  $(".search-result[aria-selected=\"true\"]")?.scrollIntoView({ block: "nearest" });
+}
+
+function openSearch() {
+  closeInbox(false);
+  state.overlayReturnFocus = document.activeElement;
+  const dialog = $("#searchDialog");
+  dialog.hidden = false;
+  dialog.inert = false;
+  $("#searchInput").value = "";
+  state.searchIndex = 0;
+  renderSearchResults();
+  syncScrim();
+  requestAnimationFrame(() => $("#searchInput").focus());
+}
+
+function closeSearch(restore = true) {
+  const dialog = $("#searchDialog");
+  if (dialog.hidden) return;
+  dialog.hidden = true;
+  dialog.inert = true;
+  syncScrim();
+  if (restore) state.overlayReturnFocus?.focus?.();
+}
+
+function formatWhen(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? "Recorded" : date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function renderInbox() {
+  const attention = state.bootstrap?.attention ?? { needsYou: [], recentCompletions: [] };
+  const needs = attention.needsYou.map((item) => `<button class="inbox-row needs-you" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Needs your explicit decision</small></span><em>Task</em></button>`).join("");
+  const completed = attention.recentCompletions.map((item) => `<button class="inbox-row" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Successful Outcome · ${escapeHtml(formatWhen(item.closedAt))}</small></span><em>${state.unreadCompletionKeys.has(completionKey(item)) ? "New" : "History"}</em></button>`).join("");
+  $("#inboxContent").innerHTML = `<section class="inbox-section"><header><span>Needs you</span><span>${attention.needsYou.length}</span></header>${needs || '<p class="inbox-empty">Nothing currently needs your decision.</p>'}</section><section class="inbox-section"><header><span>Recently completed</span><span>Repository history</span></header>${completed || '<p class="inbox-empty">No successful Outcomes yet.</p>'}</section>`;
+}
+
+function openInbox() {
+  closeSearch(false);
+  state.overlayReturnFocus = document.activeElement;
+  renderInbox();
+  const panel = $("#inboxPanel");
+  panel.hidden = false;
+  panel.inert = false;
+  state.unreadCompletionKeys.clear();
+  updateInboxBadge();
+  syncScrim();
+  $("#closeInbox").focus();
+}
+
+function closeInbox(restore = true) {
+  const panel = $("#inboxPanel");
+  if (panel.hidden) return;
+  panel.hidden = true;
+  panel.inert = true;
+  syncScrim();
+  if (restore) state.overlayReturnFocus?.focus?.();
+}
+
+async function openSearchResult(kind, id) {
+  closeSearch(false);
+  if (kind === "chat") await openThread(id);
+  else if (kind === "task") await openTask(id);
+  else {
+    state.activeContextId = id;
+    setRoute("rooms");
+  }
 }
 
 function handoffFromText(text) {
@@ -155,7 +307,7 @@ function turnsMarkup(thread) {
 function renderChat() {
   setRouteHeader(state.activeThread ? titleForThread(state.activeThread) : "Codex", state.activeThread ? `Thread ${state.activeThread.id.slice(0, 8)}… · ${state.bootstrap?.graph.project.name}` : "Your real Threads and Turns");
   if (!state.activeThread) {
-    surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>What do you want to work on?</h1><p>This is your Codex runtime. VibeHub adds durable Tasks when the work needs structure—not before.</p><div class="welcome-actions"><button class="primary-button" type="button" data-new-thread>Start a Codex task</button><button class="secondary-button" type="button" data-route="tasks">Open Task Graph</button></div></div>`;
+    surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>What do you want to work on?</h1><p>Start with ordinary Codex Chat. VibeHub adds a durable Task only when the work needs an explicit outcome and stopping contract.</p><div class="welcome-actions"><button class="primary-button" type="button" data-new-thread>Start a chat</button><button class="secondary-button" type="button" data-route="tasks">Open Task Graph</button></div></div>`;
     return;
   }
   surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><h1>${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}</p></header><div id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
@@ -255,7 +407,10 @@ function renderTaskWorkspace() {
     return;
   }
   const handoff = state.activeTask;
-  const ticket = state.bootstrap.graph.tickets.find((item) => item.ticketId === handoff.ticketId);
+  const ticket = state.bootstrap.graph.tickets.find((item) => item.ticketId === handoff.ticketId) ?? {
+    ticketId: handoff.ticketId,
+    capabilities: { nextAction: { summary: handoff.nextAction } },
+  };
   const linked = state.threads.find((thread) => thread.taskLink?.ticketId === handoff.ticketId);
   const phase = primaryPhase(ticket);
   const actionLabel = recommendedAction(handoff);
@@ -265,7 +420,12 @@ function renderTaskWorkspace() {
 
 function renderRooms() {
   setRouteHeader("Rooms", "Durable Project Context");
-  surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>Rooms stay Project-native</h1><p>The Codex-first prototype keeps this destination intentionally quiet. Room search and writeback remain governed VibeHub actions, not automatic transcript harvesting.</p><button class="secondary-button" type="button" data-route="tasks">Return to Tasks</button></div>`;
+  const context = state.bootstrap?.contexts?.find((item) => item.contextId === state.activeContextId);
+  if (context) {
+    surface.innerHTML = `<div class="task-workspace context-focus"><header class="task-hero"><div><span class="eyebrow">CONTEXT · ${escapeHtml(context.room)}</span><h1>${escapeHtml(context.summary)}</h1><p>${escapeHtml(context.type)} · ${escapeHtml(context.contextId)}</p></div><span class="task-phase"><i></i>CONTEXT</span></header><div class="workspace-grid"><div class="workspace-main"><section><span class="eyebrow">DURABLE CLAIM</span><p>${escapeHtml(context.detail)}</p></section><section><span class="eyebrow">TAGS</span><p>${escapeHtml((context.tags ?? []).join(" · "))}</p></section></div><aside class="workspace-aside"><section><span class="eyebrow">SOURCE</span><p>${escapeHtml(context.sourceRef)}</p></section><section><button class="secondary-button" type="button" data-clear-context>Back to Rooms</button></section></aside></div></div>`;
+    return;
+  }
+  surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>Rooms stay Project-native</h1><p>Search can open exact durable Context here. Writeback remains a governed VibeHub action, not automatic Chat harvesting.</p><button class="secondary-button" type="button" id="roomsSearch">Search Context</button></div>`;
 }
 
 async function refreshThreads() {
@@ -274,6 +434,7 @@ async function refreshThreads() {
   state.threads = data.threads;
   state.eventCursor = data.eventCursor;
   state.pendingRequests = data.pendingRequests;
+  updateAttentionState(data.attention);
   $("#projectName").textContent = data.graph.project.name;
   $("#projectBranch").textContent = data.graph.project.branch;
   $("#taskCount").textContent = data.graph.tickets.length;
@@ -410,6 +571,11 @@ async function pollEvents() {
       refresh = true;
     }
     if (refresh && state.activeThreadId) await openThread(state.activeThreadId);
+    state.attentionPollCounter += 1;
+    if (state.attentionPollCounter >= 12) {
+      state.attentionPollCounter = 0;
+      await refreshThreads();
+    }
   } catch (error) {
     $("#runtimeLabel").textContent = "Runtime reconnecting";
   } finally {
@@ -418,12 +584,21 @@ async function pollEvents() {
 }
 
 document.addEventListener("click", async (event) => {
+  const searchResult = event.target.closest("[data-search-kind]");
+  if (searchResult) { await openSearchResult(searchResult.dataset.searchKind, searchResult.dataset.searchId); return; }
+  if (event.target.closest("[data-open-inbox]")) { openInbox(); return; }
   const route = event.target.closest("[data-route]");
-  if (route) { setRoute(route.dataset.route); return; }
+  if (route) {
+    if (route.dataset.route === "rooms") state.activeContextId = null;
+    setRoute(route.dataset.route);
+    return;
+  }
   const thread = event.target.closest("[data-thread-id]");
   if (thread) { await openThread(thread.dataset.threadId); return; }
   const ticket = event.target.closest("[data-ticket-id]");
-  if (ticket) { await openTask(ticket.dataset.ticketId); return; }
+  if (ticket) { closeInbox(false); await openTask(ticket.dataset.ticketId); return; }
+  if (event.target.closest("[data-clear-context]")) { state.activeContextId = null; renderRooms(); return; }
+  if (event.target.closest("#roomsSearch")) { openSearch(); return; }
   if (event.target.closest("[data-new-thread]")) { await newThread(); return; }
   const remove = event.target.closest("[data-remove-attachment]");
   if (remove) { state.attachments.splice(Number(remove.dataset.removeAttachment), 1); renderAttachments(); return; }
@@ -460,7 +635,11 @@ document.addEventListener("click", async (event) => {
 });
 
 $("#newThread").addEventListener("click", newThread);
-$("#refreshThreads").addEventListener("click", async () => { await refreshThreads(); updateSidebar(); notify("Codex task history refreshed."); });
+$("#refreshThreads").addEventListener("click", async () => { await refreshThreads(); updateSidebar(); notify("Codex Chat history refreshed."); });
+$("#searchButton").addEventListener("click", openSearch);
+$("#searchInput").addEventListener("input", () => { state.searchIndex = 0; renderSearchResults(); });
+$("#inboxButton").addEventListener("click", openInbox);
+$("#closeInbox").addEventListener("click", () => closeInbox());
 $("#collapseSidebar").addEventListener("click", () => appShell.classList.toggle("sidebar-collapsed"));
 $("#openSidebar").addEventListener("click", () => appShell.classList.toggle("sidebar-open"));
 backButton.addEventListener("click", () => {
@@ -481,9 +660,13 @@ $("#stopTurn").addEventListener("click", async () => {
   try { await action({ action: "interruptTurn", threadId: state.activeThreadId, turnId: state.currentTurnId }); }
   catch (error) { notify(error.message); }
 });
-$("#reviewButton").addEventListener("click", () => { $("#reviewPanel").hidden = false; $("#reviewPanel").inert = false; $("#scrim").hidden = false; $("#closeReview").focus(); });
-$("#closeReview").addEventListener("click", () => { $("#reviewPanel").hidden = true; $("#reviewPanel").inert = true; $("#scrim").hidden = true; $("#reviewButton").focus(); });
-$("#scrim").addEventListener("click", () => $("#closeReview").click());
+$("#reviewButton").addEventListener("click", () => { closeSearch(false); closeInbox(false); $("#reviewPanel").hidden = false; $("#reviewPanel").inert = false; syncScrim(); $("#closeReview").focus(); });
+$("#closeReview").addEventListener("click", () => { $("#reviewPanel").hidden = true; $("#reviewPanel").inert = true; syncScrim(); $("#reviewButton").focus(); });
+$("#scrim").addEventListener("click", () => {
+  if (!$("#searchDialog").hidden) closeSearch();
+  else if (!$("#inboxPanel").hidden) closeInbox();
+  else if (!$("#reviewPanel").hidden) $("#closeReview").click();
+});
 $("#themeToggle").addEventListener("click", () => {
   const themes = ["system", "light", "dark"];
   state.themeIndex = (state.themeIndex + 1) % themes.length;
@@ -492,7 +675,25 @@ $("#themeToggle").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !$("#reviewPanel").hidden) $("#closeReview").click();
+  if (!$("#searchDialog").hidden && ["ArrowDown", "ArrowUp"].includes(event.key)) {
+    event.preventDefault();
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    state.searchIndex = (state.searchIndex + direction + state.searchResults.length) % Math.max(1, state.searchResults.length);
+    renderSearchResults();
+    return;
+  }
+  if (!$("#searchDialog").hidden && event.key === "Enter" && state.searchResults[state.searchIndex]) {
+    event.preventDefault();
+    const item = state.searchResults[state.searchIndex];
+    openSearchResult(item.kind, item.id);
+    return;
+  }
+  if (event.key === "Escape") {
+    if (!$("#searchDialog").hidden) closeSearch();
+    else if (!$("#inboxPanel").hidden) closeInbox();
+    else if (!$("#reviewPanel").hidden) $("#closeReview").click();
+  }
+  if (event.metaKey && event.key.toLowerCase() === "k") { event.preventDefault(); openSearch(); }
   if (event.metaKey && event.key.toLowerCase() === "n") { event.preventDefault(); newThread(); }
 });
 

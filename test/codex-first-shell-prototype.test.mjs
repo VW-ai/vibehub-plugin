@@ -14,7 +14,7 @@ test("Codex-first shell uses real app-server ownership and additive VibeHub Task
     source("scripts/vh-codex-first-shell-prototype.mjs"),
     source("docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"),
   ]);
-  for (const label of ["New task", "Codex", "Tasks", "Rooms", "Project", "Appearance"]) assert.match(html, new RegExp(label, "i"));
+  for (const label of ["New chat", "Chat", "Tasks", "Rooms", "Project", "Appearance", "Search", "Task inbox", "Recent chats"]) assert.match(html, new RegExp(label, "i"));
   for (const request of ["thread/list", "thread/read", "thread/start", "turn/start", "turn/interrupt"]) assert.match(server, new RegExp(request.replace("/", "\\/")));
   for (const event of ["turn/started", "turn/completed", "serverRequest"]) assert.match(server + script, new RegExp(event.replace("/", "\\/")));
   assert.match(server, /buildTicketHandoff/);
@@ -22,9 +22,42 @@ test("Codex-first shell uses real app-server ownership and additive VibeHub Task
   assert.match(script, /vibehub_ticket_handoff/);
   assert.match(script, /relation\.prerequisiteTicketId/);
   assert.match(script, /relation\.dependentTicketId/);
+  assert.match(script, /searchCorpus/);
+  assert.match(script, /openInbox/);
+  assert.match(server, /knowledgeProjection/);
+  assert.match(server, /attentionProjection/);
   assert.match(review, /Codex owns Threads, Turns, tools, approvals and execution/);
   assert.doesNotMatch(html + script, /DeepSeek|native DSH|DSH Session/);
   assert.doesNotMatch(html + script + server, /localStorage|sessionStorage|sqlite/i);
+});
+
+test("Search, Task attention, and object semantics are explicit and source-backed", async () => {
+  const [html, script, server, research, contractText] = await Promise.all([
+    source("apps/codex-first-shell-prototype/index.html"),
+    source("apps/codex-first-shell-prototype/app.js"),
+    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("docs/CODEX_NATIVE_SEARCH_ATTENTION_RESEARCH.md"),
+    source("docs/proposals/codex-native-attention/interaction-contract.json"),
+  ]);
+  const contract = JSON.parse(contractText);
+  assert.equal(contract.defaultSurface, "chat");
+  assert.deepEqual(contract.search.groups, ["Chats", "Tasks", "Context"]);
+  assert.equal(contract.attention.needsYou.eligibleWhen, "canonical next_action is NEEDS_HUMAN");
+  assert.match(contract.attention.completion.eligibleWhen, /successful Outcome/);
+  assert.match(contract.attention.running.presentation, /outside the notification count/);
+  for (const object of ["chat", "task", "context", "notification", "livePresence"]) assert.ok(contract.objects[object]);
+  for (const sourceUrl of ["developers.openai.com", "linear.app/docs/inbox", "docs.github.com/en/subscriptions-and-notifications", "docs.cursor.com/background-agent", "manual.raycast.com"]) assert.match(research, new RegExp(sourceUrl.replaceAll(".", "\\.")));
+  assert.match(html, /id="searchDialog"/);
+  assert.match(html, /id="inboxPanel"/);
+  assert.match(html, /id="sidebarAttention"/);
+  assert.match(script, /Meta\+K|metaKey/);
+  assert.match(script, /Chat|Task|Context/);
+  assert.match(script, /initialCompletionKeys/);
+  assert.match(script, /unreadCompletionKeys/);
+  assert.match(server, /current_attention_not_unread_event/);
+  assert.match(server, /repository_history_not_unread_event/);
+  assert.match(server, /presence_only_never_notification/);
+  assert.doesNotMatch(html + script + server, /localStorage|sessionStorage|indexedDB/i);
 });
 
 test("Codex-first shell exposes ordinary audio honestly and routes real approvals", async () => {
@@ -61,6 +94,13 @@ test("Codex light and dark primitives share one responsive accessible shell", as
   assert.match(css, /\.app-shell[^}]+color: var\(--text\)/);
   assert.match(css, /\.graph-edges[^}]+pointer-events: none/);
   assert.match(css, /\.graph-edges \{ display: none; \}/);
+  assert.match(css, /\.search-dialog/);
+  assert.match(css, /\.inbox-panel/);
+  assert.match(css, /\.attention-item/);
+  assert.match(script, /reviewFrame === "narrow"/);
+  assert.match(css, /body\[data-review-frame="narrow"\] \{[^}]*width: 390px; height: 844px/);
+  assert.match(css, /body\[data-review-frame="narrow"\] \.search-dialog/);
+  assert.match(css, /body\[data-review-frame="narrow"\] \.inbox-panel/);
   assert.doesNotMatch(css, /\.task-card::before/);
   assert.match(script, /requestAnimationFrame\(renderGraphEdges\)/);
   assert.match(html, /aria-label="Application navigation"/);
@@ -103,6 +143,10 @@ test("Codex-first prototype host is loopback-only, bounded, and connected to the
   assert.equal(payload.data.account.authenticated, true);
   assert.equal(payload.data.runtime.provider, "Codex app-server");
   assert.equal(payload.data.runtime.realtimeConversation, false);
+  assert.ok(payload.data.contexts.some((context) => context.contextId === "decision-chat-default-search-and-task-attention"));
+  assert.equal(payload.data.attention.semantics.running, "presence_only_never_notification");
+  assert.ok(Array.isArray(payload.data.attention.needsYou));
+  assert.ok(Array.isArray(payload.data.attention.recentCompletions));
   assert.ok(payload.data.graph.tickets.some((ticket) => ticket.ticketId === "ticket-prototype-codex-first-vibehub-shell"));
   const rejected = await fetch(url, { method: "POST" });
   assert.equal(rejected.status, 405);

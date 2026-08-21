@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { CodexAppServerClient } from "../packages/codex-adapter/client.mjs";
 import { startCodexTask } from "../packages/codex-adapter/handoff.mjs";
 import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
+import { documents, loadRepository } from "../skills/scripts/vh.mjs";
 
 const sourceRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const assetRoot = join(sourceRoot, "apps", "codex-first-shell-prototype");
@@ -152,12 +153,65 @@ function graphProjection() {
   };
 }
 
+function knowledgeProjection() {
+  const repository = loadRepository(repoRoot);
+  return [...repository.contexts.documents.values()]
+    .filter(({ document }) => document.state === "active")
+    .map(({ document, path }) => ({
+      contextId: document.context_id,
+      type: document.type,
+      summary: document.summary,
+      detail: document.detail,
+      tags: document.tags,
+      room: path.split(".vibehub/rooms/")[1]?.split("/").slice(0, -1).join("/") ?? "project",
+      sourceRef: document.source.ref,
+    }))
+    .sort((left, right) => left.summary.localeCompare(right.summary));
+}
+
+function attentionProjection(graph) {
+  const repository = loadRepository(repoRoot);
+  const tickets = new Map(documents(repository.tickets.documents).map((ticket) => [ticket.ticket_id, ticket]));
+  const needsYou = graph.tickets
+    .filter((ticket) => ticket.capabilities.nextAction.summary.action === "NEEDS_HUMAN")
+    .map((ticket) => ({
+      kind: "needs_you",
+      ticketId: ticket.ticketId,
+      title: tickets.get(ticket.ticketId)?.outcome ?? ticket.outcome,
+      reason: "A current Human-authority criterion needs your explicit decision.",
+      source: "canonical_next_action",
+    }));
+  const recentCompletions = documents(repository.outcomes.documents)
+    .filter((outcome) => outcome.status === "successful")
+    .sort((left, right) => String(right.closed_at).localeCompare(String(left.closed_at)))
+    .slice(0, 6)
+    .map((outcome) => ({
+      kind: "completed",
+      ticketId: outcome.ticket_id,
+      title: tickets.get(outcome.ticket_id)?.outcome ?? outcome.summary,
+      closedAt: outcome.closed_at,
+      source: "canonical_successful_outcome",
+    }));
+  return {
+    needsYou,
+    recentCompletions,
+    semantics: {
+      needsYou: "current_attention_not_unread_event",
+      recentCompletions: "repository_history_not_unread_event",
+      running: "presence_only_never_notification",
+    },
+  };
+}
+
 async function bootstrap() {
   const [account, threads] = await Promise.all([client.accountStatus(), listThreads()]);
+  const graph = graphProjection();
   return {
     account,
     threads,
-    graph: graphProjection(),
+    graph,
+    contexts: knowledgeProjection(),
+    attention: attentionProjection(graph),
     runtime: {
       provider: "Codex app-server",
       version: "0.147.0",
