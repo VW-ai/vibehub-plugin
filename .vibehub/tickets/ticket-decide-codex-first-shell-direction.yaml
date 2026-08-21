@@ -3,51 +3,67 @@
     {
       "acceptance_id": "codex-first-shell-direction-decided",
       "authority": "human",
-      "criterion": "After reviewing the real-runtime prototype and the search/attention study in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact Chat-default sidebar hierarchy, typed search placement, notification/inbox treatment, Composer and voice posture, Task Graph entry, Task-to-Thread relationship and Graph-to-Task transition."
+      "criterion": "After reviewing the real-runtime Search and attention shell, the complete native Chat parity study and prototype, and the Task Workspace conversation/context study and prototype in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact Chat-default sidebar and navigation hierarchy, Thread and Turn rendering floor, typed Search and Task Inbox placement, Composer and voice posture, Task Graph entry, Graph-to-Task transition, Task-to-Thread and Run relationship, Task conversation behavior, Context and Rooms disclosure and initial local packaging posture."
     }
   ],
   "constraints": [
     "This Ticket records protected product composition only; it does not implement or publish artifacts.",
-    "Agent preference, screenshots without owner review, or silence cannot satisfy the human-authority criterion.",
+    "Agent preference, screenshots without owner review, partial enthusiasm or silence cannot satisfy the human-authority criterion.",
     "Any bounded owner correction is recorded as unresolved direction and replanned; it cannot satisfy the successful acceptance criterion.",
-    "The choice must preserve real Codex runtime ownership, VibeHub Task truth, strict Chat/Task semantic separation and later replaceable DSH compatibility."
+    "The choice must preserve real Codex runtime ownership, ordinary Chat without Task protocol, VibeHub Task and Context truth, zero-or-one Project ownership and later replaceable DSH compatibility."
   ],
-  "context": "The owner has selected lightweight Chat as the default landing and required first-class search, strict Chat/Task semantics and native Task attention. The protected remaining choice follows the dedicated interaction study: exact search placement, notification/inbox treatment, Sidebar hierarchy, Task focus transition, Composer and voice placement, narrow behavior and local application packaging posture. DSH composition is not part of this immediate product decision.",
+  "context": "The owner accepts Chat as the default landing, typed Search, quiet Task attention and the overall Codex-first plus VibeHub Task direction, but explicitly rejects treating the current low-fidelity Chat and Task rendering as a production choice. The protected remaining decision follows the native Chat parity research and the Task Workspace conversation/context contract: exact Thread and Turn presentation, sidebar, Search and Inbox placement, Composer and voice posture, Task Graph entry, Graph-to-Task transition, Task-to-Thread and Run relationship, Task conversation, Context and Rooms disclosure, narrow behavior and the first local application package. DSH composition remains later compatibility and does not gate this decision.",
   "context_refs": [
     {
-      "purpose": "Binding product priority.",
+      "purpose": "Binding immediate carrier and compatibility priority.",
       "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
     },
     {
-      "purpose": "Owner-approved parity and additive Task direction.",
+      "purpose": "Binding Codex parity floor and additive Task value.",
       "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
     },
     {
-      "purpose": "Owner-approved Chat default, typed search and native attention correction.",
+      "purpose": "Owner-approved Chat default, typed Search and native attention direction.",
       "ref": ".vibehub/rooms/product/decision-chat-default-search-and-task-attention.yaml"
     },
     {
-      "purpose": "Exact visual base for review.",
+      "purpose": "Owner-approved Project, standalone Task and cross-Project boundary.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    },
+    {
+      "purpose": "Exact visual primitives for review.",
       "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The owner explicitly accepts the exact Codex-first application composition and additive VibeHub Task relationship that govern production implementation.",
+  "outcome": "The owner explicitly accepts the exact Codex-first application composition, native Chat parity floor and additive VibeHub Task and Context relationship that govern production implementation.",
   "provenance_refs": [
     "conversation:2026-08-20-owner-prioritizes-real-codex-use",
-    "conversation:2026-08-21-chat-default-search-task-attention"
+    "conversation:2026-08-21-chat-default-search-task-attention",
+    "conversation:2026-08-21-owner-requires-daily-use-codex-chat-parity",
+    "conversation:2026-08-21-owner-defines-task-workspace-conversation-and-context"
   ],
   "relations": [
     {
-      "rationale": "The owner needs the successful real-runtime Codex-first prototype and exact tradeoffs before choosing production composition.",
+      "rationale": "The owner needs the successful real-runtime Codex-first adapter and shell baseline before choosing production composition.",
       "target_ticket_id": "ticket-prototype-codex-first-vibehub-shell",
       "type": "depends_on"
     },
     {
-      "rationale": "The owner explicitly requested broader interaction research and a native-feeling search/attention prototype before finalizing the production shell direction.",
+      "rationale": "The accepted Search, Inbox and Chat-default study is a direct product input to the final composition.",
       "target_ticket_id": "ticket-research-codex-native-search-and-task-attention",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The owner explicitly requires a complete Codex-quality Chat interaction inventory and real-runtime prototype before approving production Chat composition.",
+      "target_ticket_id": "ticket-research-codex-native-chat-parity",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The owner explicitly requires a reviewable Task conversation, context injection and Rooms contract before approving the production Task Workspace relationship.",
+      "target_ticket_id": "ticket-research-task-workspace-conversation-context",
       "type": "depends_on"
     }
   ],

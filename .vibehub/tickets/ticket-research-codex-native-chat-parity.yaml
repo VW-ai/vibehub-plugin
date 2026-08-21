@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "codex-chat-state-inventory-is-complete",
+      "criterion": "A checked-in first-party inventory covers new, resumed, forked and interrupted Threads; user and Agent Turns; streaming text and reasoning; plans and progress; command, tool, file, diff, image and citation items; approvals and human input; sub-agent or delegated work; errors, retries, reconnect, cancellation and completion; Composer attachments, model or mode controls, microphone posture, shortcuts, focus and accessibility. Each state names the directly observed Codex behavior, the official app-server capability or honest unsupported boundary, and the exact VibeHub relevance."
+    },
+    {
+      "acceptance_id": "open-source-reuse-options-are-audited",
+      "criterion": "A source-backed audit compares maintained open-source ChatGPT-like and coding-agent clients that could supply stream rendering, Markdown and code, virtualization, tool or approval cards, diff views, Composer, attachment previews or accessibility primitives; it records repository, license, maintenance signal, dependency and security surface, exact reusable unit and rejection reason, and does not propose copying proprietary Codex Desktop assets or behavior through scraping."
+    },
+    {
+      "acceptance_id": "app-server-events-map-to-one-ui-contract",
+      "criterion": "One executable contract maps the pinned Codex app-server Thread, Turn, item, approval, diff, plan, tool, sub-agent, audio, interrupt, completion and failure protocol into deterministic visible components, ordering, incremental update, replay and live-presence semantics; it specifies stable identity, reconnect, backpressure, batching or virtualization, sanitization and unknown-item fallback without creating a parallel transcript or Agent loop."
+    },
+    {
+      "acceptance_id": "real-runtime-chat-prototype-is-production-shaped",
+      "criterion": "The existing authenticated Codex-first shell gains a production-shaped but explicitly non-final Chat surface whose hierarchy, density, streaming cadence, Markdown and code, tool or approval disclosure, Composer, interruption, completion and return behavior are close enough to familiar Codex and ChatGPT interaction for meaningful daily-use review, while Search and VibeHub Tasks remain additive and Chat remains fully usable without Task protocol."
+    },
+    {
+      "acceptance_id": "chat-parity-review-is-decision-ready",
+      "criterion": "Deterministic fixtures plus real app-server exercise and browser review cover Light and Dark, representative wide and 390x844 narrow frames, long streaming content, mixed tool and approval items, plan or sub-agent progress, code and diff, attachment or image, error and retry, cancellation and completion, keyboard and focus return, reduced motion, no horizontal overflow, bounded memory or DOM growth and zero false capability or live claim; the review pack distinguishes required v1 parity, reusable upstream choices and deferred behavior."
+    }
+  ],
+  "constraints": [
+    "Do not scrape, embed, or redistribute proprietary Codex Desktop code, icons, assets, private APIs or trademarks; reproduce familiar interaction principles through official app-server contracts and independently implemented or license-compatible components.",
+    "Do not rename Codex Threads, Turns, plans or sub-agent activity as VibeHub Tasks, and do not require VibeHub Task protocol for ordinary Chat.",
+    "Do not accept a static transcript mock as proof of streaming, approval, interruption, replay, recovery or performance behavior.",
+    "This Ticket produces research, an executable UI/event contract and a production-shaped prototype for owner review; it does not publish the final application or claim final visual approval."
+  ],
+  "context": "The owner accepts the Codex-first direction but rejects the current prototype's crude Chat rendering. Before production implementation, inventory the actual Codex interaction surface and directly observed desktop behavior, compare maintained open-source Chat and coding-agent clients for legally and technically reusable components, map every rendered state to the official app-server protocol, and exercise the recommendation in the existing real-runtime shell. The target is familiar daily-use interaction parity, not visual novelty or a deceptive static clone.",
+  "context_refs": [
+    {
+      "purpose": "Binding requirement that ordinary use preserve the Codex interaction floor before additive VibeHub value.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Binding Chat-default navigation and strict Chat/Task separation.",
+      "ref": ".vibehub/rooms/product/decision-chat-default-search-and-task-attention.yaml"
+    },
+    {
+      "purpose": "Exact Light and Dark visual primitives for the prototype review.",
+      "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+    },
+    {
+      "purpose": "Successful pinned app-server protocol and lifecycle baseline.",
+      "ref": ".vibehub/outcomes/ticket-spike-codex-app-server-dsh-adapter.yaml"
+    },
+    {
+      "purpose": "Accepted real-shell Search, Inbox and semantic-separation baseline that Chat parity must preserve.",
+      "ref": ".vibehub/outcomes/ticket-research-codex-native-search-and-task-attention.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A source-backed Codex Chat parity contract and production-shaped real-runtime prototype make every high-value Thread, Turn, streaming, tool, approval, plan, diff, sub-agent, Composer and recovery interaction explicit enough to build without inventing a new Chat product.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-requires-daily-use-codex-chat-parity",
+    "https://developers.openai.com/codex/app-server/",
+    "https://github.com/openai/codex"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-research-codex-native-chat-parity"
+}

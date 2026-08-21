@@ -1,0 +1,70 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "task-workspace-information-and-conversation-model-is-explicit",
+      "criterion": "One interaction contract defines the focused Task Workspace hierarchy across Outcome or intent, DRAFT/READY/RUNNING/DONE posture, substate and Needs You, Acceptance, constraints, dependencies, References, Context and Room provenance, current Thread or Run, Evidence and Outcome, Recommended action and a persistent native-quality conversation or Composer surface; exact disclosure changes across draft, ready, running, waiting-human, verifying, deviated and done states without turning the page into a form or duplicating the Graph."
+    },
+    {
+      "acceptance_id": "initial-task-context-packet-is-deterministic",
+      "criterion": "A checked-in host-owned packet contract deterministically assembles the exact Task identity and current contract, owning Project when present, explicitly referenced Context and References, the smallest relevant project Room context, prior accepted Outcome or Evidence when relevant, and selected Thread or Run provenance; it records ordering, size and truncation, conflicts, authority, unavailable references and source citations, while standalone Tasks work and reading another Project never grants writeback."
+    },
+    {
+      "acceptance_id": "task-thread-run-and-prompt-boundaries-are-proven",
+      "criterion": "A reproducible Codex app-server spike proves how one Task starts, binds, resumes and if needed opens additional Threads or Runs; how the host-owned packet enters the first Turn or another supported context boundary; how Human messages explore, steer, approve, interrupt or redefine work; and how refresh, restart, cancellation, failure, closeout and return remain honest. Browser code does not reconstruct prompts, Codex Session data does not become a second Task store, and a completed Run does not imply a successful Outcome."
+    },
+    {
+      "acceptance_id": "rooms-and-context-are-readable-without-a-second-graph",
+      "criterion": "The Workspace prototype shows why each Context item is present, its owning Room and source, lets the user inspect or explicitly add and remove eligible context for the next Turn, and exposes project-level Rooms without making the user choose a Room to create a Task or adding a permanent second knowledge graph. Personal Rooms, automatic cross-Project writeback and team scope remain explicit later boundaries."
+    },
+    {
+      "acceptance_id": "task-workspace-prototype-is-decision-ready",
+      "criterion": "A production-shaped prototype built on the accepted native Chat substrate exercises Graph-to-Task focus, read and understand, Recommended action, initial execution, live stream, tool or approval, Needs You intervention through the conversation surface, Evidence and verifying posture, independent Outcome, done return, standalone Task and one-Project Context at representative Light, Dark, wide and 390x844 narrow sizes with keyboard, focus restoration, reduced motion, no horizontal overflow and no false prompt, Context, live, authority or completion claim."
+    }
+  ],
+  "constraints": [
+    "Task and Chat remain distinct product objects even when the Task Workspace embeds one or more Codex conversations.",
+    "Do not infer or silently persist durable Context from conversation, let browser code rebuild the execution prompt, or let Codex Threads become the canonical Task database.",
+    "A normal Task has zero or one owning Project; v1 may stay single-Project and must keep standalone Tasks valid. Cross-Project reads are explicit references and never imply cross-Project writeback.",
+    "This Ticket researches and prototypes the interaction plus backend contract; final production Task Workspace implementation and final visual approval remain downstream."
+  ],
+  "context": "The owner expects a focused Task to remain a Context Space with an excellent conversation surface, not a static inspector or a second dashboard. The top of the Workspace should explain the Task, contract, posture and current work; the bottom should use the same native-quality Chat substrate for exploration, intervention and execution. Research and prototype the exact initial context packet, prompt or Turn boundary, stable Task-to-Thread and Run linkage, governed Context inclusion, Rooms disclosure, recovery and Evidence path before production Task UI is firmed. V1 may remain one Project and must keep standalone Tasks valid.",
+  "context_refs": [
+    {
+      "purpose": "Binding Chat and Task Context Space semantics and attention ownership.",
+      "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"
+    },
+    {
+      "purpose": "Binding zero-or-one Project ownership, standalone Tasks, cross-Project boundaries and no invented subtask ontology.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    },
+    {
+      "purpose": "Canonical Task, Project, Room, Context, Reference, Agent, Evidence and Outcome separation.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    },
+    {
+      "purpose": "Governed Context activation and writeback boundary.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    },
+    {
+      "purpose": "Successful exact Task handoff, Skill execution, Evidence and independent closeout baseline.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A reviewable Task Workspace and backend context contract makes a VibeHub Task readable, conversational and executable through native Codex without hiding how Project, Rooms, Context, Thread, Run, Evidence and human intervention are assembled.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-defines-task-workspace-conversation-and-context",
+    "conversation:2026-08-20-human-and-agent-led-context-spaces"
+  ],
+  "relations": [
+    {
+      "rationale": "The Task Workspace conversation surface and its browser review must consume the accepted native Chat UI and app-server event contract rather than defining another Chat renderer.",
+      "target_ticket_id": "ticket-research-codex-native-chat-parity",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-research-task-workspace-conversation-context"
+}
