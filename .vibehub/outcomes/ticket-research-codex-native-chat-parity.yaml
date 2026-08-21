@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "open-source-reuse-options-are-audited",
+    "real-runtime-chat-prototype-is-production-shaped"
+  ],
+  "closed_at": "2026-08-21T08:13:49Z",
+  "evidence_ids": [
+    "codex-native-chat-inventory-reuse-and-event-contract",
+    "codex-native-chat-real-runtime-and-browser-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "partial",
+  "summary": "Independent closeout in a fresh isolated worktree at exact implementation commit b77e878c26a1dccf361e7f8d2d3dc6bce5f1ecaf accepts two of five criteria and records a partial Outcome. The open-source audit compares seven first-party repository surfaces, explicitly records license or missing-license posture, current maintenance signal, dependency and security surface, reusable unit, and rejection boundary, and the checked-in decision avoids proprietary Codex Desktop code, assets, private APIs, scraping, and whole-product runtime adoption. The authenticated Codex-first shell is materially production-shaped for review: ordinary Chat remains independent of VibeHub Tasks, replay and live items share stable identity, animation-frame batching and a 240-item rendered tail bound growth, Markdown and code are escaped before selective rendering, execution activity is grouped, inline approvals retain exact request identity, the Composer supports ordinary image/audio input, and Send, Stop, completion reconciliation, focus, wide/narrow, Light/Dark, and reduced-motion behavior are implemented without a second transcript or Agent loop. Three criteria remain unresolved. First, the claimed complete first-party state inventory never identifies or specifies presentation for the pinned 0.147.0 `agentMessage.memoryCitation` field, and its inventory table does not explicitly record the directly observed or official model/mode, microphone, shortcut, focus, and accessibility behavior required by the criterion. Second, the executable contract and renderer map `agentMessage.text` but omit `memoryCitation`; the field is silently discarded rather than rendered or preserved through an explicit inspectable fallback, so the pinned item contract is incomplete. Third, the deterministic mixed fixture and canonical browser/runtime Evidence cover retry and successful completion but contain no interrupted or cancelled Turn state and no browser or current Ticket exercise of that end state; a Stop handler and prior adapter-level `turn/interrupt` capability do not satisfy this Ticket's decision-ready coverage requirement. The exact local schema probe passed and independently confirmed `memoryCitation`, `TurnStatus: interrupted`, and the pinned protocol hash. Focused verification passed 6 of 6, full verification passed 163 with zero failures and one expected opt-in DSH-source skip, artifact verification passed with 62 files and 2832437 bytes, canonical Ticket and Project validation passed, and all four Rooms were fresh. No fresh browser drive is claimed because this closeout had no browser-control binding; the canonical browser Evidence was inspected without stretching it beyond its recorded claims.",
+  "ticket_id": "ticket-research-codex-native-chat-parity",
+  "unresolved_acceptance_ids": [
+    "codex-chat-state-inventory-is-complete",
+    "app-server-events-map-to-one-ui-contract",
+    "chat-parity-review-is-decision-ready"
+  ]
+}
