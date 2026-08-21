@@ -3,15 +3,16 @@
     {
       "acceptance_id": "codex-first-shell-direction-decided",
       "authority": "human",
-      "criterion": "After reviewing the real-runtime prototype in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact sidebar hierarchy, default landing, Chat and Composer posture, voice entry, Task Graph entry, Task-to-Thread relationship and Graph-to-Task transition, or records one bounded correction executable against the proven adapter."
+      "criterion": "After reviewing the real-runtime prototype and the search/attention study in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact Chat-default sidebar hierarchy, typed search placement, notification/inbox treatment, Composer and voice posture, Task Graph entry, Task-to-Thread relationship and Graph-to-Task transition."
     }
   ],
   "constraints": [
     "This Ticket records protected product composition only; it does not implement or publish artifacts.",
     "Agent preference, screenshots without owner review, or silence cannot satisfy the human-authority criterion.",
-    "The choice must preserve real Codex runtime ownership, VibeHub Task truth and later replaceable DSH compatibility."
+    "Any bounded owner correction is recorded as unresolved direction and replanned; it cannot satisfy the successful acceptance criterion.",
+    "The choice must preserve real Codex runtime ownership, VibeHub Task truth, strict Chat/Task semantic separation and later replaceable DSH compatibility."
   ],
-  "context": "The high-level promise and runtime are decided. After the real Codex-first prototype exists, the protected remaining choice is the exact sidebar hierarchy, default landing, Chat and Task transition, Composer and voice placement, narrow behavior and local application packaging posture. DSH composition is not part of this immediate product decision.",
+  "context": "The owner has selected lightweight Chat as the default landing and required first-class search, strict Chat/Task semantics and native Task attention. The protected remaining choice follows the dedicated interaction study: exact search placement, notification/inbox treatment, Sidebar hierarchy, Task focus transition, Composer and voice placement, narrow behavior and local application packaging posture. DSH composition is not part of this immediate product decision.",
   "context_refs": [
     {
       "purpose": "Binding product priority.",
@@ -20,6 +21,10 @@
     {
       "purpose": "Owner-approved parity and additive Task direction.",
       "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Owner-approved Chat default, typed search and native attention correction.",
+      "ref": ".vibehub/rooms/product/decision-chat-default-search-and-task-attention.yaml"
     },
     {
       "purpose": "Exact visual base for review.",
@@ -31,12 +36,18 @@
   "maturity": "firm",
   "outcome": "The owner explicitly accepts the exact Codex-first application composition and additive VibeHub Task relationship that govern production implementation.",
   "provenance_refs": [
-    "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+    "conversation:2026-08-20-owner-prioritizes-real-codex-use",
+    "conversation:2026-08-21-chat-default-search-task-attention"
   ],
   "relations": [
     {
-      "rationale": "The owner needs the real-runtime Codex-first prototype and exact tradeoffs before choosing production composition.",
+      "rationale": "The owner needs the successful real-runtime Codex-first prototype and exact tradeoffs before choosing production composition.",
       "target_ticket_id": "ticket-prototype-codex-first-vibehub-shell",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The owner explicitly requested broader interaction research and a native-feeling search/attention prototype before finalizing the production shell direction.",
+      "target_ticket_id": "ticket-research-codex-native-search-and-task-attention",
       "type": "depends_on"
     }
   ],

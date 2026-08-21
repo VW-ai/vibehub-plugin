@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "research-corpus-is-official-and-comparative",
+      "criterion": "A checked-in study compares at least five relevant first-party patterns across Codex, Linear Inbox, GitHub Notifications, background Agent navigation and command/global search, naming the reusable interaction, the failure mode and its exact applicability to VibeHub."
+    },
+    {
+      "acceptance_id": "chat-task-search-semantics-are-explicit",
+      "criterion": "One deterministic interaction contract keeps Chat Thread, VibeHub Task, durable Context and notification distinct; global search visibly types or groups every result, supports keyboard navigation and opens the exact owning Thread, Task Workspace or Context without converting one object into another."
+    },
+    {
+      "acceptance_id": "attention-inbox-is-quiet-and-truthful",
+      "criterion": "The proposal defines which canonical facts may create completion, Needs You, deviation and live-running signals; Running does not generate notification noise, color is never the sole carrier, unread/read/done or dismissal semantics are explicit, and stale replay or browser state cannot claim a new event."
+    },
+    {
+      "acceptance_id": "real-shell-prototype-makes-direction-reviewable",
+      "criterion": "The existing real-runtime Codex-first prototype gains a clearly low-fidelity Search and Bell/Inbox interaction plus a restrained Sidebar attention treatment, while Chat remains the default landing and current Codex Threads and canonical VibeHub Tasks remain separate and traversable."
+    },
+    {
+      "acceptance_id": "wide-narrow-keyboard-review-is-decision-ready",
+      "criterion": "A real browser review at representative wide and 390x844 narrow sizes proves search, notification triage, exact go-to navigation, keyboard/focus return, reduced motion, no horizontal overflow and no false runtime or attention claim, and the checked-in review pack states one recommendation and bounded alternatives for owner review."
+    }
+  ],
+  "constraints": [
+    "This is an interaction research and low-fidelity prototype Ticket, not final visual approval or production notification infrastructure.",
+    "Do not rename Codex Threads to VibeHub Tasks, infer notifications from transcript text, or create a second Task/event store.",
+    "Do not use a rainbow of full-card state colors; priority and object type require text, iconography and grouping in addition to restrained color.",
+    "Use official product documentation or directly observed first-party UI for research claims, and label any representative fixture that canonical data cannot yet supply."
+  ],
+  "context": "The owner accepted lightweight Chat as the default landing, required a first-class search capability, rejected ambiguous Chat/Task semantics, and asked for a native notification treatment that brings completed or Needs-You Tasks back into view. Research must compare mature inbox, search and background-agent patterns, then exercise the recommendation in the real Codex-first prototype rather than adding speculative production chrome.",
+  "context_refs": [
+    {
+      "purpose": "Binding owner correction for Chat default, search, semantic separation and native Task attention.",
+      "ref": ".vibehub/rooms/product/decision-chat-default-search-and-task-attention.yaml"
+    },
+    {
+      "purpose": "Existing semantic boundary between Human-led Chat and Agent-led Task Context Spaces.",
+      "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"
+    },
+    {
+      "purpose": "Successful real-runtime shell baseline to extend without reopening its completed prototype contract.",
+      "ref": ".vibehub/outcomes/ticket-prototype-codex-first-vibehub-shell.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A source-backed interactive study makes Chat-default navigation, typed global search and quiet Task attention feel native to Codex without conflating Chat, Task, Context or notification objects.",
+  "provenance_refs": [
+    "conversation:2026-08-21-chat-default-search-task-attention",
+    "https://linear.app/docs/inbox",
+    "https://docs.github.com/en/subscriptions-and-notifications/concepts/about-notifications",
+    "https://docs.cursor.com/background-agent",
+    "https://manual.raycast.com/"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-research-codex-native-search-and-task-attention"
+}
