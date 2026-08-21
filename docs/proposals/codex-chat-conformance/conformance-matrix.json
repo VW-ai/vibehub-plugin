@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "acceptedOutcome": ".vibehub/outcomes/ticket-research-codex-native-chat-parity.yaml",
+    "contract": "docs/proposals/codex-native-chat/chat-ui-contract.json",
+    "codexVersion": "0.147.0",
+    "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2",
+    "rule": "This matrix measures the current shell against the accepted inventory; it does not recreate the inventory."
+  },
+  "severity": {
+    "highest": "Can corrupt, duplicate, hide, misrepresent or prevent a normal Chat action.",
+    "medium": "Usable but materially below the accepted interaction quality.",
+    "low": "Polish or deliberately deferred breadth with a truthful fallback."
+  },
+  "checks": [
+    {
+      "id": "thread-replay-identity",
+      "area": "Thread and Turn",
+      "requirement": "Replay and live notifications share stable Thread, Turn and item identity; replay never claims live presence.",
+      "before": "partial",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Identity was implicit in browser Maps and not executable outside the page; replay/live dedupe had only source-pattern assertions.",
+      "after": "pass",
+      "implementation": "chat-model.mjs canonicalTimeline and applyChatEvent",
+      "proof": ["test/codex-chat-conformance.test.mjs", "apps/codex-first-shell-prototype/chat-conformance-fixtures.json"]
+    },
+    {
+      "id": "completed-item-authority",
+      "area": "Streaming",
+      "requirement": "item/completed authoritatively replaces accumulated deltas without duplication or stale streaming state.",
+      "before": "partial",
+      "beforeSeverity": "highest",
+      "beforeFinding": "The browser implemented replacement but had no reducer-level regression fixture.",
+      "after": "pass",
+      "implementation": "Pure reducer replaces by item id and marks the item non-live.",
+      "proof": ["test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "interruption-recovery",
+      "area": "Thread and Turn",
+      "requirement": "Interrupted and failed Turns retain partial history and exactly one terminal boundary.",
+      "before": "pass",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Accepted correction already proved real interrupt and replay.",
+      "after": "pass",
+      "implementation": "canonicalTimeline preserves replay items and derives one boundary from authoritative Turn status.",
+      "proof": [".vibehub/evidence/ticket-research-codex-native-chat-parity/codex-native-chat-citation-interruption-correction.yaml", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "selection-during-stream",
+      "area": "Streaming",
+      "requirement": "Incremental paint must not destroy a user's active response selection or disclosure posture.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Every streamed frame replaced transcript innerHTML, clearing selection and resetting opened activity details.",
+      "after": "pass",
+      "implementation": "Rendering defers while transcript selection is active and restores stable data-disclosure-id state after reconciliation.",
+      "proof": ["apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "quote-add-to-chat",
+      "area": "Message interaction",
+      "requirement": "Selected Agent text and whole responses can be quoted into the ordinary Composer without turning Chat into a Task.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Only whole-message Copy existed; selection had no action and streaming could erase it.",
+      "after": "pass",
+      "implementation": "Selection-scoped Add to chat control plus whole-response Quote, source item identity in browser state, bounded quote chip and Markdown quote transfer into the next normal Turn.",
+      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
+    },
+    {
+      "id": "markdown-rich-content",
+      "area": "Message and rich content",
+      "requirement": "Escape-first Markdown renders readable headings, lists, quotes, links and bounded code without raw HTML.",
+      "before": "partial",
+      "beforeSeverity": "medium",
+      "beforeFinding": "Headings, paragraphs, unordered lists, links and code existed; ordered lists, block quotes and code copy did not.",
+      "after": "pass",
+      "implementation": "Ordered lists, block quotes, horizontal rules and focusable code copy were added while escape-first sanitization remains.",
+      "proof": ["apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
+    },
+    {
+      "id": "citations-attachments",
+      "area": "Message and rich content",
+      "requirement": "Memory citations and supported image, audio, skill and mention inputs remain visible with source identity.",
+      "before": "pass",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Accepted correction covers citation path, lines, note and source Thread; media inputs are explicit.",
+      "after": "pass",
+      "implementation": "No semantic change; regression remains in accepted fixture and current renderer.",
+      "proof": ["apps/codex-first-shell-prototype/chat-fixtures.json", ".vibehub/evidence/ticket-research-codex-native-chat-parity/codex-native-chat-citation-interruption-correction.yaml"]
+    },
+    {
+      "id": "execution-tool-progress",
+      "area": "Execution and tools",
+      "requirement": "Commands, file changes, tools, plans and delegated work remain subordinate, inspectable, ordered and truthfully live.",
+      "before": "partial",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Activity grouping existed, but MCP progress deltas were silently ignored and disclosure posture reset on streamed repaint.",
+      "after": "pass",
+      "implementation": "Reducer handles item/mcpToolCall/progress; stable disclosures survive repaint; live and failure states control expansion.",
+      "proof": ["apps/codex-first-shell-prototype/chat-model.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "bounded-rich-output",
+      "area": "Execution and tools",
+      "requirement": "Long command, diff, tool and unknown output has a real DOM bound and discloses truncation without mutating durable history.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "CSS bounded visible height but inserted arbitrarily large strings into the DOM.",
+      "after": "pass",
+      "implementation": "boundedText caps rendered payloads and adds an explicit omitted-character notice; app-server replay remains authoritative.",
+      "proof": ["apps/codex-first-shell-prototype/chat-model.mjs", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "approvals",
+      "area": "Execution and approvals",
+      "requirement": "Command and file approvals route exact pending request identity and exact supported decisions inline.",
+      "before": "pass",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Exact request and decisions were already host-routed.",
+      "after": "pass",
+      "implementation": "Preserved; no Task attention is inferred from a Turn-scoped approval.",
+      "proof": ["scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js"]
+    },
+    {
+      "id": "request-user-input",
+      "area": "Execution and approvals",
+      "requirement": "All requestUserInput questions and options render inline, support keyboard operation and return exact answer ids.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "A blocking browser prompt displayed only the first question and discarded rich options.",
+      "after": "pass",
+      "implementation": "Semantic inline form renders every question, radio option or textarea and submits exact question ids through resolveRequest.",
+      "proof": ["apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
+    },
+    {
+      "id": "composer-inputs",
+      "area": "Composer",
+      "requirement": "Text, image and ordinary audio remain available; Composer grows predictably and quote context is removable.",
+      "before": "partial",
+      "beforeSeverity": "medium",
+      "beforeFinding": "Attachments and audio worked, but textarea did not resize and quote context was absent.",
+      "after": "pass",
+      "implementation": "Auto-growing textarea, removable quote tray, attachment tray and existing MediaRecorder flow share the ordinary Turn input.",
+      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js"]
+    },
+    {
+      "id": "composer-keyboard-stop",
+      "area": "Composer and keyboard",
+      "requirement": "Enter sends, Shift+Enter adds a line, and Escape interrupts only when Composer owns the active running Turn.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Enter behavior existed, but Escape only closed overlays and never invoked the documented Stop control.",
+      "after": "pass",
+      "implementation": "Escape delegates to the exact Stop button when no overlay is open, the Turn is trusted running and focus is inside Composer.",
+      "proof": ["apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "retry",
+      "area": "Error and recovery",
+      "requirement": "Retrying remains live; a terminal error stays inspectable and retry creates a new Turn rather than rewriting history.",
+      "before": "partial",
+      "beforeSeverity": "medium",
+      "beforeFinding": "Retry status rendered, but terminal failure offered no bounded recovery action.",
+      "after": "pass",
+      "implementation": "Terminal failure restores the prior human text into Composer and explicitly labels the next send as a new Turn.",
+      "proof": ["apps/codex-first-shell-prototype/app.js"]
+    },
+    {
+      "id": "unknown-items",
+      "area": "Forward compatibility",
+      "requirement": "Unknown completed items stay inspectable while unknown deltas do not invent visible lifecycle.",
+      "before": "pass",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Fallback existed but raw payload size was unbounded.",
+      "after": "pass",
+      "implementation": "Unknown completed item stays visible; unknown delta is non-mutating; raw disclosure is bounded.",
+      "proof": ["apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "focus-and-overlays",
+      "area": "Navigation and accessibility",
+      "requirement": "Search and panels restore focus; all pointer actions have keyboard paths and visible focus.",
+      "before": "partial",
+      "beforeSeverity": "medium",
+      "beforeFinding": "Search and Inbox restored focus; requestUserInput used an inaccessible blocking prompt.",
+      "after": "pass",
+      "implementation": "Inline semantic request forms remove the blocking prompt; existing dialog focus return and focus-visible styles remain.",
+      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
+    },
+    {
+      "id": "wide-narrow-theme-motion",
+      "area": "Responsive and accessibility",
+      "requirement": "The same hierarchy works in Light, Dark, desktop and 390x844 without horizontal overflow and honors reduced motion.",
+      "before": "pass",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Accepted browser proof covered the prior mixed fixture.",
+      "after": "pending-browser",
+      "implementation": "New quote and inline-input controls use the existing responsive shell; final current-commit browser matrix is recorded separately.",
+      "proof": ["apps/codex-first-shell-prototype/app.css"]
+    },
+    {
+      "id": "virtualized-production-list",
+      "area": "Performance",
+      "requirement": "Production list virtualization replaces the research carrier's bounded tail above 240 items.",
+      "before": "partial",
+      "beforeSeverity": "medium",
+      "beforeFinding": "The current carrier intentionally slices to the accepted 240-item tail.",
+      "after": "deferred",
+      "implementation": "Executable 240-item and 20k-character bounds are retained; library choice remains a production-shell concern.",
+      "proof": ["docs/proposals/codex-native-chat/chat-ui-contract.json", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "model-mode-pickers",
+      "area": "Composer",
+      "requirement": "Model and collaboration-mode controls never claim choices the current carrier has not loaded.",
+      "before": "pass",
+      "beforeSeverity": "low",
+      "beforeFinding": "The prototype truthfully labels fixed Agent and Codex posture.",
+      "after": "deferred",
+      "implementation": "Production picker remains separate; no false control was added.",
+      "proof": ["docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md", "apps/codex-first-shell-prototype/index.html"]
+    },
+    {
+      "id": "realtime-voice",
+      "area": "Composer",
+      "requirement": "Realtime voice remains hidden when the runtime probe reports unsupported.",
+      "before": "pass",
+      "beforeSeverity": "low",
+      "beforeFinding": "Ordinary audio is supported and realtime is false.",
+      "after": "deferred",
+      "implementation": "No false realtime control; ordinary MediaRecorder input remains.",
+      "proof": ["scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js"]
+    }
+  ]
+}
