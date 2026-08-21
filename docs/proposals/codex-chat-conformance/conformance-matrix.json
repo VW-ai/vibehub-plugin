@@ -21,7 +21,7 @@
       "beforeSeverity": "highest",
       "beforeFinding": "Identity was implicit in browser Maps and not executable outside the page; replay/live dedupe had only source-pattern assertions.",
       "after": "pass",
-      "implementation": "chat-model.mjs canonicalTimeline and applyChatEvent",
+      "implementation": "chat-model.mjs canonicalTimeline and applyChatEvent key every transient by compound Thread/Turn/item identity and isolate message, command, tool and delegated collisions.",
       "proof": ["test/codex-chat-conformance.test.mjs", "apps/codex-first-shell-prototype/chat-conformance-fixtures.json"]
     },
     {
@@ -98,8 +98,8 @@
       "beforeSeverity": "highest",
       "beforeFinding": "Activity grouping existed, but MCP progress deltas were silently ignored and disclosure posture reset on streamed repaint.",
       "after": "pass",
-      "implementation": "Reducer handles item/mcpToolCall/progress; stable disclosures survive repaint; live and failure states control expansion.",
-      "proof": ["apps/codex-first-shell-prototype/chat-model.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+      "implementation": "Reducer handles pinned structured plan, aggregate Turn diff, file output and MCP progress events; stable keyed disclosures survive repaint; typed tool/delegated output stays visible or falls back truthfully.",
+      "proof": ["apps/codex-first-shell-prototype/chat-model.mjs", "apps/codex-first-shell-prototype/app.js", "docs/proposals/codex-chat-conformance/protocol-event-census.json", "test/codex-chat-conformance.test.mjs"]
     },
     {
       "id": "bounded-rich-output",
@@ -120,8 +120,8 @@
       "beforeSeverity": "highest",
       "beforeFinding": "Exact request and decisions were already host-routed.",
       "after": "pass",
-      "implementation": "Preserved; no Task attention is inferred from a Turn-scoped approval.",
-      "proof": ["scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js"]
+      "implementation": "A pinned-version discriminated registry validates exact decisions; cards expose execution identity and material context and distinguish Decline from Cancel-and-interrupt. Unsupported requests never masquerade as approvals.",
+      "proof": ["apps/codex-first-shell-prototype/server-request-registry.mjs", "scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
     },
     {
       "id": "request-user-input",
@@ -131,7 +131,7 @@
       "beforeSeverity": "highest",
       "beforeFinding": "A blocking browser prompt displayed only the first question and discarded rich options.",
       "after": "pass",
-      "implementation": "Semantic inline form renders every question, radio option or textarea and submits exact question ids through resolveRequest.",
+      "implementation": "Semantic keyed inline form renders every question and exact header, blocking, secret, radio and Other posture; validates every answer id and preserves typed DOM/focus during unrelated streaming patches.",
       "proof": ["apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
     },
     {
@@ -164,8 +164,30 @@
       "beforeSeverity": "medium",
       "beforeFinding": "Retry status rendered, but terminal failure offered no bounded recovery action.",
       "after": "pass",
-      "implementation": "Terminal failure restores the prior human text into Composer and explicitly labels the next send as a new Turn.",
-      "proof": ["apps/codex-first-shell-prototype/app.js"]
+      "implementation": "Authoritative Turn completion retires transient retry/plan/diff/live state; terminal replay produces exactly one boundary. Retry restores the prior human text into Composer and labels the next send as a new Turn.",
+      "proof": ["apps/codex-first-shell-prototype/chat-model.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "transport-gap-runtime-recovery",
+      "area": "Error and recovery",
+      "requirement": "A truncated event window, runtime generation change, external request resolution or runtime exit cannot leave false live state.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "The 500-event host window had no oldest cursor/gap signal; runtimeExit and serverRequest/resolved were ignored.",
+      "after": "pass",
+      "implementation": "The host returns oldestCursor, gap, runtimeGeneration and runtimeAlive; the browser disables actions and reconciles before restoring live posture, and removes externally resolved requests.",
+      "proof": ["apps/codex-first-shell-prototype/event-window.mjs", "scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "unsupported-server-requests",
+      "area": "Forward compatibility",
+      "requirement": "Unsupported server requests never appear as approvals or block the Agent indefinitely.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Every unknown request was labelled as a command approval and item/tool/call could not be resolved.",
+      "after": "pass",
+      "implementation": "The exact registry returns a truthful unsuccessful dynamic-tool response or JSON-RPC method-not-found immediately and records an inspectable bounded event.",
+      "proof": ["apps/codex-first-shell-prototype/server-request-registry.mjs", "scripts/vh-codex-first-shell-prototype.mjs", "test/codex-chat-conformance.test.mjs"]
     },
     {
       "id": "unknown-items",

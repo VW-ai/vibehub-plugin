@@ -8,6 +8,8 @@ import { fileURLToPath } from "node:url";
 import { CodexAppServerClient } from "../packages/codex-adapter/client.mjs";
 import { CodexProjectsAdapter, publicCodexThread } from "../packages/codex-adapter/projects.mjs";
 import { buildTaskContextPacket, startTaskContextThread, taskLinkFromPreview } from "../packages/codex-adapter/task-context.mjs";
+import { eventWindow } from "../apps/codex-first-shell-prototype/event-window.mjs";
+import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell-prototype/server-request-registry.mjs";
 import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
 import { documents, loadRepository } from "../skills/scripts/vh.mjs";
 
@@ -35,6 +37,7 @@ const pendingRequests = new Map();
 let sequence = 0;
 let origin = null;
 let stopping = false;
+const runtime = { generation: 1, alive: false };
 
 function appendEvent(kind, value) {
   events.push({ sequence: ++sequence, kind, value, observedAt: new Date().toISOString() });
@@ -43,11 +46,28 @@ function appendEvent(kind, value) {
 
 client.on("notification", (value) => appendEvent("notification", value));
 client.on("serverRequest", (value) => {
+  const descriptor = requestDescriptor(value);
+  if (!descriptor.supported) {
+    const result = unsupportedServerRequestResult(value);
+    if (result) client.respond(value.id, result);
+    else client.respondError(value.id, -32601, `Unsupported server request: ${value.method}`);
+    appendEvent("unsupportedServerRequest", { id: value.id, method: value.method, params: value.params });
+    appendEvent("requestResolved", { id: value.id, method: value.method, resolution: "unsupported" });
+    return;
+  }
   pendingRequests.set(String(value.id), value);
   appendEvent("serverRequest", value);
 });
+client.on("notification:serverRequest/resolved", (params) => {
+  pendingRequests.delete(String(params.requestId));
+  appendEvent("requestResolved", { id: params.requestId, threadId: params.threadId, resolution: "external" });
+});
 client.on("stderr", (line) => appendEvent("runtimeStderr", { line }));
-client.on("exit", (value) => appendEvent("runtimeExit", value));
+client.on("exit", (value) => {
+  runtime.alive = false;
+  runtime.generation += 1;
+  appendEvent("runtimeExit", { ...value, runtimeGeneration: runtime.generation });
+});
 
 const assets = new Map([
   ["/", [join(assetRoot, "index.html"), "text/html; charset=utf-8"]],
@@ -56,6 +76,8 @@ const assets = new Map([
   ["/app.js", [join(assetRoot, "app.js"), "text/javascript; charset=utf-8"]],
   ["/chat-model.mjs", [join(assetRoot, "chat-model.mjs"), "text/javascript; charset=utf-8"]],
   ["/chat-renderer.mjs", [join(assetRoot, "chat-renderer.mjs"), "text/javascript; charset=utf-8"]],
+  ["/event-window.mjs", [join(assetRoot, "event-window.mjs"), "text/javascript; charset=utf-8"]],
+  ["/server-request-registry.mjs", [join(assetRoot, "server-request-registry.mjs"), "text/javascript; charset=utf-8"]],
   ["/chat-fixtures.json", [join(assetRoot, "chat-fixtures.json"), "application/json; charset=utf-8"]],
   ["/chat-conformance-fixtures.json", [join(assetRoot, "chat-conformance-fixtures.json"), "application/json; charset=utf-8"]],
   ["/task-fixtures.json", [join(assetRoot, "task-fixtures.json"), "application/json; charset=utf-8"]],
@@ -290,6 +312,8 @@ async function bootstrap() {
       local: true,
       audioInput: true,
       realtimeConversation: false,
+      generation: runtime.generation,
+      alive: runtime.alive,
     },
     pendingRequests: [...pendingRequests.values()],
     eventCursor: sequence,
@@ -412,8 +436,8 @@ async function action(payload) {
   if (payload.action === "resolveRequest") {
     const request = pendingRequests.get(String(payload.requestId));
     if (!request) throw Object.assign(new Error("Approval or input request is no longer pending"), { status: 409 });
-    if (request.method === "item/commandExecution/requestApproval" || request.method === "item/fileChange/requestApproval") {
-      if (!["accept", "acceptForSession", "decline", "cancel"].includes(payload.decision)) {
+    if (["item/commandExecution/requestApproval", "item/fileChange/requestApproval"].includes(request.method)) {
+      if (!validateRequestDecision(request, payload.decision)) {
         throw Object.assign(new Error("Invalid approval decision"), { status: 400 });
       }
       client.respond(request.id, { decision: payload.decision });
@@ -433,6 +457,7 @@ async function action(payload) {
 }
 
 await client.start();
+runtime.alive = true;
 
 const server = createServer(async (request, response) => {
   try {
@@ -461,8 +486,7 @@ const server = createServer(async (request, response) => {
       json(response, 200, {
         ok: true,
         data: {
-          events: events.filter((entry) => entry.sequence > after),
-          cursor: sequence,
+          ...eventWindow(events, after, sequence, runtime),
           pendingRequests: [...pendingRequests.values()],
         },
       });

@@ -12,9 +12,24 @@ import {
   renderToolContent,
   renderUserMedia,
 } from "../apps/codex-first-shell-prototype/chat-renderer.mjs";
+import { eventWindow } from "../apps/codex-first-shell-prototype/event-window.mjs";
+import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell-prototype/server-request-registry.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
+
+test("checked-in protocol census classifies every pinned required event", async () => {
+  const [lock, census, fixture] = await Promise.all([
+    source("packages/codex-adapter/upstream-lock.json").then(JSON.parse),
+    source("docs/proposals/codex-chat-conformance/protocol-event-census.json").then(JSON.parse),
+    source("apps/codex-first-shell-prototype/chat-fixtures.json").then(JSON.parse),
+  ]);
+  assert.equal(census.baseline.protocolSchemaSha256, lock.codex.protocolSchemaSha256);
+  for (const method of lock.requiredNotifications) assert.ok(census.notifications[method], `missing notification classification: ${method}`);
+  for (const method of lock.requiredServerRequests) assert.ok(census.serverRequests[method], `missing server-request classification: ${method}`);
+  const delegated = fixture.thread.turns.flatMap((turn) => turn.items).find((item) => item.type === "subAgentActivity");
+  assert.ok(["started", "interacted", "interrupted"].includes(delegated.kind));
+});
 
 test("Codex Chat reducer shares stable identity across replay, deltas, completion, and interruption", async () => {
   const fixture = JSON.parse(await source("apps/codex-first-shell-prototype/chat-conformance-fixtures.json"));
@@ -25,6 +40,9 @@ test("Codex Chat reducer shares stable identity across replay, deltas, completio
   assert.equal(timeline.find((item) => item.id === "agent-shared").text, "Durable completed answer.");
   assert.equal(timeline.find((item) => item.id === "agent-live").text, "Authoritative completed answer.");
   assert.equal(timeline.find((item) => item.id === "tool-live").progress, "Loading page");
+  assert.equal(timeline.find((item) => item.type === "turnPlan").plan[1].status, "inProgress");
+  assert.match(timeline.find((item) => item.type === "turnDiff").diff, /\+new/);
+  assert.equal(timeline.find((item) => item.id === "files-live").output, "Patch applied");
   assert.equal(timeline.filter((item) => item.id === "boundary-turn-interrupted").length, 1);
   assert.equal(timeline.filter((item) => item.id === "error-turn-live").length, 1);
 });
@@ -51,6 +69,30 @@ test("composite identity isolates colliding item ids across Threads and Turns", 
   assert.notEqual(itemKey("thread-a", "turn-a", "same"), itemKey("thread-b", "turn-b", "same"));
 });
 
+test("execution, tool and delegated identities cannot cross Threads or Turns", () => {
+  for (const type of ["commandExecution", "mcpToolCall", "collabAgentToolCall"]) {
+    const model = { liveItems: new Map(), turnErrors: new Map() };
+    applyChatEvent(model, "item/started", { threadId: "thread-a", turnId: "turn-a", item: { id: "same", type, status: "inProgress" } });
+    applyChatEvent(model, "item/started", { threadId: "thread-b", turnId: "turn-b", item: { id: "same", type, status: "inProgress" } });
+    assert.equal(canonicalTimeline({ id: "thread-a", turns: [] }, model).length, 1);
+    assert.equal(canonicalTimeline({ id: "thread-b", turns: [] }, model).length, 1);
+    assert.notEqual(canonicalTimeline({ id: "thread-a", turns: [] }, model)[0]._key, canonicalTimeline({ id: "thread-b", turns: [] }, model)[0]._key);
+  }
+});
+
+test("authoritative Turn completion retires retry, plan, diff and live execution state", () => {
+  const model = { liveItems: new Map(), turnErrors: new Map() };
+  applyChatEvent(model, "error", { threadId: "thread", turnId: "turn", error: { message: "retry" }, willRetry: true });
+  applyChatEvent(model, "turn/plan/updated", { threadId: "thread", turnId: "turn", plan: [{ step: "Retry", status: "inProgress" }] });
+  applyChatEvent(model, "turn/diff/updated", { threadId: "thread", turnId: "turn", diff: "stale" });
+  applyChatEvent(model, "item/started", { threadId: "thread", turnId: "turn", item: { id: "command", type: "commandExecution", status: "inProgress" } });
+  applyChatEvent(model, "turn/completed", { threadId: "thread", turn: { id: "turn", status: "completed" } });
+  assert.equal(canonicalTimeline({ id: "thread", turns: [{ id: "turn", status: "completed", items: [] }] }, model).length, 0);
+  applyChatEvent(model, "error", { threadId: "thread", turnId: "failed", error: { message: "terminal" }, willRetry: false });
+  const failed = canonicalTimeline({ id: "thread", turns: [{ id: "failed", status: "failed", error: { message: "terminal" }, items: [] }] }, model);
+  assert.deepEqual(failed.map((item) => item.type), ["turnBoundary"]);
+});
+
 test("pure rich renderer escapes Markdown and visibly bounds malformed code", () => {
   const budget = createRenderBudget({ textCharacters: 160, mediaCharacters: 100 });
   const html = renderMarkdown("<script>alert(1)</script>\n\n[good](https://example.com) [bad](javascript:alert(1))\n```js\n" + "x".repeat(400), budget, 120);
@@ -74,10 +116,36 @@ test("media, generated images, tool images and unknown rich results have truthfu
     { type: "text", text: "tool result" },
     { type: "image", data: "AA==", mimeType: "image/png" },
     { type: "resource", uri: "file:///not-mounted" },
+    { type: "inputAudio", audioUrl: "data:audio/wav;base64,AA==" },
   ]);
   assert.match(tool, /tool result/);
   assert.match(tool, /Tool image result/);
   assert.match(tool, /resource tool result remains inspectable/);
+  assert.match(tool, /Tool audio result remains available/);
+});
+
+test("event-window recovery reports loss and runtime generation truthfully", () => {
+  const retained = Array.from({ length: 500 }, (_, index) => ({ sequence: index + 2, kind: "notification", value: {} }));
+  const lost = eventWindow(retained, 0, 501, { generation: 4, alive: false });
+  assert.equal(lost.oldestCursor, 2);
+  assert.equal(lost.gap, true);
+  assert.equal(lost.runtimeGeneration, 4);
+  assert.equal(lost.runtimeAlive, false);
+  assert.equal(eventWindow(retained, 1, 501, { generation: 4, alive: true }).gap, false);
+});
+
+test("server-request registry never mislabels unsupported requests as approvals", () => {
+  const command = { method: "item/commandExecution/requestApproval", params: {} };
+  assert.equal(requestDescriptor(command).kind, "commandApproval");
+  assert.equal(validateRequestDecision(command, "cancel"), true);
+  assert.equal(validateRequestDecision(command, "unknown"), false);
+  const dynamic = { method: "item/tool/call", params: {} };
+  assert.equal(requestDescriptor(dynamic).supported, false);
+  assert.deepEqual(unsupportedServerRequestResult(dynamic), {
+    success: false,
+    contentItems: [{ type: "inputText", text: "This local VibeHub carrier does not execute client-side dynamic tools." }],
+  });
+  assert.equal(requestDescriptor({ method: "future/request" }).kind, "unsupported");
 });
 
 test("citations preserve full accessible Thread identity and enforce aggregate counts", () => {
@@ -134,6 +202,11 @@ test("current shell exposes the conformance interactions without a second transc
   assert.match(script, /preserveScroll && existingTimeline[^]*patchTimeline\(existingTimeline/);
   assert.match(script, /Quote added to your next message/);
   assert.match(script, /data-request-form/);
+  assert.match(script, /data-request-other/);
+  assert.match(script, /type=\"\$\{question\.isSecret \? \"password\" : \"text\"\}/);
+  assert.match(script, /Cancel & interrupt/);
+  assert.match(script, /data\.gap/);
+  assert.match(script, /runtimeGeneration/);
   assert.match(script, /Retry as a new Turn/);
   assert.match(script, /state\.running.*composer.*stopTurn/s);
   assert.doesNotMatch(script, /\bprompt\(/);

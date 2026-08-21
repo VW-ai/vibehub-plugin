@@ -74,3 +74,15 @@ commit. Those findings remain unchanged in the reviewer-owned report; the curren
 implementation corrects compound identity, aggregate bounds, generated/tool image
 fallbacks, full citation identity, executable rich-renderer tests and keyed streaming
 updates before final Evidence is considered.
+
+The independent execution/tool/approval audit then found six additional P0
+families. The corrected carrier now classifies every pinned notification/request in
+a checked-in census, renders structured Turn plans and aggregate diffs, retires
+transient state on authoritative completion, detects event-window gaps/runtime
+generation changes, reconciles externally resolved requests, and uses a versioned
+discriminated request registry. Command/file approvals expose material context and
+separate Decline from Cancel-and-interrupt. Human input preserves keyed DOM state,
+distinguishes blocking/secret/Other semantics, and validates every question.
+Unsupported dynamic tools and future requests receive an immediate truthful
+response rather than a false command-approval card. Tool/delegated non-text or
+identity-bearing output remains visible or has an explicit fallback.

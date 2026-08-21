@@ -122,6 +122,11 @@ export class CodexAppServerClient extends EventEmitter {
     this.child.stdin.write(`${JSON.stringify({ id, result })}\n`);
   }
 
+  respondError(id, code, message) {
+    if (!this.child?.stdin?.writable) throw new Error("codex app-server is not running");
+    this.child.stdin.write(`${JSON.stringify({ id, error: { code, message } })}\n`);
+  }
+
   waitForNotification(method, predicate = () => true, { timeoutMs = this.timeoutMs } = {}) {
     const prior = this.notifications.find((entry) => entry.method === method && predicate(entry.params));
     if (prior) return Promise.resolve(prior.params);

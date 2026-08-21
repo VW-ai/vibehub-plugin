@@ -10,6 +10,7 @@ import {
   renderUserMedia,
   takeText,
 } from "./chat-renderer.mjs";
+import { requestDescriptor } from "./server-request-registry.mjs";
 
 const state = {
   route: "chat",
@@ -42,6 +43,8 @@ const state = {
   attentionPollCounter: 0,
   liveItems: new Map(),
   turnErrors: new Map(),
+  turnPlans: new Map(),
+  turnDiffs: new Map(),
   chatRenderFrame: 0,
   fixtureMode: false,
   creatingThread: null,
@@ -49,6 +52,9 @@ const state = {
   selectedQuote: null,
   deferredChatRender: 0,
   selectionDeferralStartedAt: 0,
+  runtimeGeneration: 0,
+  runtimeAlive: false,
+  knownRequestIds: new Set(),
 };
 
 const token = location.hash.slice(1);
@@ -208,11 +214,21 @@ function syncComposerMode() {
   const input = $("#composerInput");
   const taskMode = state.route === "task";
   const linked = taskMode && state.activeThreadId;
-  input.disabled = Boolean(taskMode && !linked);
+  input.disabled = !state.runtimeAlive || Boolean(taskMode && !linked);
+  $("#sendButton").disabled = input.disabled;
   input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : "Ask Codex to do something";
   $("#composerNote").textContent = taskMode
     ? (linked ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.` : "The host will open a linked Codex Thread with the canonical Task packet.")
     : "Codex can make mistakes. Review commands and changes.";
+}
+
+function setRuntimePosture({ alive, generation = state.runtimeGeneration, label } = {}) {
+  state.runtimeAlive = Boolean(alive);
+  state.runtimeGeneration = generation;
+  $("#runtimeLabel").textContent = label ?? (state.runtimeAlive ? "Local app-server" : "Runtime unavailable");
+  $("#accountDot").classList.toggle("connected", state.runtimeAlive && Boolean(state.bootstrap?.account?.authenticated));
+  $("#stopTurn").disabled = !state.runtimeAlive;
+  syncComposerMode();
 }
 
 function syncScrim() {
@@ -379,6 +395,12 @@ function renderItem(item, budget) {
     return `<div class="activity-row">${disclosureCard({ identity, kind: "reasoning", icon: "✦", title: "Reasoning", status: statusLabel(item), summary: item._live ? "Thinking…" : "Reasoning summary", detail: renderMarkdown(text || "Reasoned about the request", budget) })}</div>`;
   }
   if (item.type === "plan") return `<div class="activity-row">${disclosureCard({ identity, kind: "plan", icon: "☷", title: "Plan", status: statusLabel(item), summary: item._live ? "Updating plan…" : "Plan updated", detail: renderMarkdown(item.text, budget), open: true })}</div>`;
+  if (item.type === "turnPlan") {
+    const steps = (item.plan ?? []).slice(0, 64).map((entry) => `<li data-status="${escapeHtml(entry.status)}"><i></i><span>${escapeHtml(takeText(budget, entry.step, 2_000).text)}</span><em>${escapeHtml(entry.status)}</em></li>`).join("");
+    const explanation = item.explanation ? `<p>${escapeHtml(takeText(budget, item.explanation, 4_000).text)}</p>` : "";
+    return `<div class="activity-row">${disclosureCard({ identity, kind: "plan", icon: "☷", title: "Plan", status: "running", summary: `${item.plan?.filter((entry) => entry.status === "completed").length ?? 0}/${item.plan?.length ?? 0} steps`, detail: `${explanation}<ol class="plan-steps">${steps}</ol>`, open: true })}</div>`;
+  }
+  if (item.type === "turnDiff") return `<div class="activity-row">${disclosureCard({ identity, kind: "files", icon: "±", title: "Turn diff", status: "running", summary: "Latest aggregate diff", detail: boundedPre(item.diff, "", DOM_LIMITS.outputCharacters, budget), open: true })}</div>`;
   if (item.type === "commandExecution") {
     const detail = `<div class="command-meta">${escapeHtml(takeText(budget, item.cwd, 1_024).text)}</div><code class="command-line">${escapeHtml(takeText(budget, item.command, 4_000).text)}</code>${item.aggregatedOutput ? boundedPre(item.aggregatedOutput, "terminal-output", DOM_LIMITS.outputCharacters, budget) : ""}`;
     const duration = item.durationMs ? ` · ${(item.durationMs / 1000).toFixed(1)}s` : "";
@@ -388,7 +410,7 @@ function renderItem(item, budget) {
     const changes = item.changes ?? [];
     const count = Math.max(0, Math.min(changes.length, budget.changesRemaining));
     budget.changesRemaining -= count;
-    const detail = `${changes.slice(0, count).map((change) => `<section class="diff-file"><header><strong>${escapeHtml(takeText(budget, change.path, 1_024).text)}</strong><span>${escapeHtml(change.kind?.type ?? change.kind ?? "update")}</span></header>${change.diff ? boundedPre(change.diff, "", DOM_LIMITS.outputCharacters, budget) : ""}</section>`).join("")}${changes.length > count ? `<p class="truncation-note">${changes.length - count} file changes omitted from this mounted view. Durable Thread history remains authoritative.</p>` : ""}`;
+    const detail = `${changes.slice(0, count).map((change) => `<section class="diff-file"><header><strong>${escapeHtml(takeText(budget, change.path, 1_024).text)}</strong><span>${escapeHtml(change.kind?.type ?? change.kind ?? "update")}</span></header>${change.diff ? boundedPre(change.diff, "", DOM_LIMITS.outputCharacters, budget) : ""}</section>`).join("")}${item.output ? boundedPre(item.output, "file-change-output", DOM_LIMITS.outputCharacters, budget) : ""}${changes.length > count ? `<p class="truncation-note">${changes.length - count} file changes omitted from this mounted view. Durable Thread history remains authoritative.</p>` : ""}`;
     return `<div class="activity-row">${disclosureCard({ identity, kind: "files", icon: "±", title: "File changes", status: statusLabel(item), summary: `${changes.length} file${changes.length === 1 ? "" : "s"}`, detail, open: item._live || item.status === "failed" })}</div>`;
   }
   if (item.type === "mcpToolCall" || item.type === "dynamicToolCall") {
@@ -399,8 +421,9 @@ function renderItem(item, budget) {
     return `<div class="activity-row">${disclosureCard({ identity, kind: "tool", icon: "◇", title: name, status: statusLabel(item), summary: `${server}${item.readOnlyHint ? " · read only" : ""}`, detail, open: item._live || item.status === "failed" })}</div>`;
   }
   if (item.type === "collabAgentToolCall") {
-    const agents = Object.entries(item.agentsStates ?? {}).map(([id, value]) => `${id.slice(0, 8)} · ${value.status ?? value}`).join("\n");
-    return `<div class="activity-row">${disclosureCard({ identity, kind: "agents", icon: "⑂", title: "Delegated work", status: statusLabel(item), summary: `${item.receiverThreadIds?.length ?? 0} agent thread${item.receiverThreadIds?.length === 1 ? "" : "s"}`, detail: `${item.prompt ? `<p>${escapeHtml(takeText(budget, item.prompt, 4_000).text)}</p>` : ""}${agents ? boundedPre(agents, "", 8_000, budget) : ""}`, open: item._live })}</div>`;
+    const agents = Object.entries(item.agentsStates ?? {}).map(([id, value]) => `<li><code tabindex="0">${escapeHtml(id)}</code><span>${escapeHtml(value.status ?? value)}</span><button type="button" data-copy-citation-thread="${escapeHtml(id)}" aria-label="Copy delegated Thread id">Copy</button></li>`).join("");
+    const sender = item.senderThreadId ? `<p>Sender <code tabindex="0">${escapeHtml(item.senderThreadId)}</code></p>` : "";
+    return `<div class="activity-row">${disclosureCard({ identity, kind: "agents", icon: "⑂", title: "Delegated work", status: statusLabel(item), summary: `${item.receiverThreadIds?.length ?? 0} agent thread${item.receiverThreadIds?.length === 1 ? "" : "s"}`, detail: `${sender}${item.prompt ? `<p>${escapeHtml(takeText(budget, item.prompt, 4_000).text)}</p>` : ""}${agents ? `<ul class="agent-identities">${agents}</ul>` : ""}`, open: item._live })}</div>`;
   }
   if (item.type === "subAgentActivity") return `<div class="timeline-divider"><span>⑂ ${escapeHtml(takeText(budget, item.agentPath || "Agent", 240).text)}</span><strong>${escapeHtml(item.kind?.type ?? item.kind ?? "activity")}</strong></div>`;
   if (item.type === "webSearch") return `<div class="activity-row">${disclosureCard({ identity, kind: "search", icon: "⌕", title: "Web search", status: statusLabel(item), summary: takeText(budget, item.query ?? item.action?.query ?? "Search activity", 240).text, detail: item.result ? boundedPre(item.result, "", 8_000, budget) : "" })}</div>`;
@@ -417,23 +440,48 @@ function renderItem(item, budget) {
 
 function approvalMarkup(request) {
   const params = request.params ?? {};
-  const title = request.method.includes("fileChange") ? "Approve file changes?" : request.method.includes("requestUserInput") ? "Codex needs your input" : "Approve command?";
-  const detail = params.command ?? params.reason ?? params.questions?.[0]?.question ?? "This Turn is waiting for you.";
+  const descriptor = requestDescriptor(request);
   const disabled = request.fixture ? " disabled title=\"Review fixture only\"" : "";
-  const questions = request.method.includes("requestUserInput") ? (params.questions ?? []).map((question, index) => {
+  if (!descriptor.supported) {
+    return `<section class="approval-card unsupported-request" data-request-id="${escapeHtml(request.id)}" role="status"><header><span>Unsupported runtime request</span><em>Resolved by carrier</em></header><strong>${escapeHtml(request.method)}</strong><p>This request is never presented as a command approval. Its exact payload remains inspectable in the bounded event log.</p></section>`;
+  }
+  if (descriptor.kind === "userInput") {
+    const titleId = `request-title-${String(request.id).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+    const questions = (params.questions ?? []).map((question, index) => {
     const id = question.id ?? `question-${index}`;
-    const options = (question.options ?? []).map((option) => `<label class="request-option"><input type="${question.isOther ? "checkbox" : "radio"}" name="request-${escapeHtml(request.id)}-${escapeHtml(id)}" value="${escapeHtml(option.label ?? option)}"${disabled}> <span>${escapeHtml(option.label ?? option)}${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}</span></label>`).join("");
-    return `<fieldset data-question-id="${escapeHtml(id)}"><legend>${escapeHtml(question.question ?? "Your answer")}</legend>${options || `<textarea rows="2" data-request-answer="${escapeHtml(id)}" aria-label="${escapeHtml(question.question ?? "Answer Codex")}"${disabled}></textarea>`}</fieldset>`;
-  }).join("") : "";
-  return `<section class="approval-card" data-request-id="${escapeHtml(request.id)}"><header><span>Needs your approval</span><em>${request.fixture ? "Review fixture" : "Turn paused"}</em></header><strong>${escapeHtml(title)}</strong>${request.method.includes("requestUserInput") ? `<form data-request-form="${escapeHtml(request.id)}">${questions}<footer><button class="accept" type="submit"${disabled}>Send answer</button></footer></form>` : `<p>${escapeHtml(detail)}</p><footer><button class="accept" type="button" data-request-decision="accept" data-request-id="${escapeHtml(request.id)}"${disabled}>Allow once</button><button type="button" data-request-decision="acceptForSession" data-request-id="${escapeHtml(request.id)}"${disabled}>Allow for session</button><button type="button" data-request-decision="decline" data-request-id="${escapeHtml(request.id)}"${disabled}>Decline</button></footer>`}</section>`;
+      const name = `request-${request.id}-${id}`;
+      const options = (question.options ?? []).map((option) => `<label class="request-option"><input type="radio" name="${escapeHtml(name)}" value="${escapeHtml(option.label ?? option)}"${disabled}> <span>${escapeHtml(option.label ?? option)}${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}</span></label>`).join("");
+      const other = question.isOther ? `<label class="request-option request-other"><input type="radio" name="${escapeHtml(name)}" value="__other__"${disabled}> <span>Other</span><input type="${question.isSecret ? "password" : "text"}" data-request-other="${escapeHtml(id)}" aria-label="Other answer for ${escapeHtml(question.header)}" autocomplete="off"${disabled}></label>` : "";
+      const freeform = options
+        ? `${options}${other}`
+        : `<input class="request-answer" type="${question.isSecret ? "password" : "text"}" data-request-answer="${escapeHtml(id)}" aria-label="${escapeHtml(question.question ?? "Answer Codex")}" autocomplete="off"${disabled}>`;
+      return `<fieldset data-question-id="${escapeHtml(id)}" data-secret="${question.isSecret ? "true" : "false"}"><legend><span>${escapeHtml(question.header ?? "Question")}</span>${escapeHtml(question.question ?? "Your answer")}</legend>${freeform}</fieldset>`;
+    }).join("");
+    return `<section class="approval-card request-input" data-request-id="${escapeHtml(request.id)}" data-blocking="${descriptor.blocking ? "true" : "false"}" role="${descriptor.blocking ? "alertdialog" : "group"}" aria-labelledby="${escapeHtml(titleId)}"><header><span>${descriptor.blocking ? "Needs your input" : "Input requested"}</span><em>${request.fixture ? "Review fixture" : descriptor.blocking ? "Turn paused" : "You can keep working"}</em></header><strong id="${escapeHtml(titleId)}">Codex needs your input</strong><form data-request-form="${escapeHtml(request.id)}">${questions}<footer><button class="accept" type="submit"${disabled}>Send answer</button></footer></form></section>`;
+  }
+  const isFile = descriptor.kind === "fileApproval";
+  const title = isFile ? "Approve file changes?" : "Approve command?";
+  const command = params.command ? `<code class="command-line">${escapeHtml(params.command)}</code>` : "";
+  const context = [
+    params.reason && ["Reason", params.reason],
+    params.cwd && ["Working directory", params.cwd],
+    params.itemId && ["Execution item", params.itemId],
+    params.grantRoot && ["Requested write root", params.grantRoot],
+    params.commandActions?.length && ["Parsed actions", JSON.stringify(params.commandActions)],
+    params.proposedExecpolicyAmendment?.length && ["Exec policy amendment", params.proposedExecpolicyAmendment.join(" ")],
+    params.proposedNetworkPolicyAmendments?.length && ["Network policy amendment", JSON.stringify(params.proposedNetworkPolicyAmendments)],
+    params.networkApprovalContext && ["Network context", JSON.stringify(params.networkApprovalContext)],
+  ].filter(Boolean).map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(takeText(createRenderBudget({ textCharacters: 8_000 }), value, 2_000).text)}</dd>`).join("");
+  return `<section class="approval-card" data-request-id="${escapeHtml(request.id)}" role="alertdialog" aria-label="${escapeHtml(title)}"><header><span>Needs your approval</span><em>${request.fixture ? "Review fixture" : "Turn paused"}</em></header><strong>${escapeHtml(title)}</strong>${command}<dl class="approval-context">${context}</dl><footer><button class="accept" type="button" data-request-decision="accept" data-request-id="${escapeHtml(request.id)}"${disabled}>Allow once</button><button type="button" data-request-decision="acceptForSession" data-request-id="${escapeHtml(request.id)}"${disabled}>Allow for session</button><button type="button" data-request-decision="decline" data-request-id="${escapeHtml(request.id)}"${disabled}>Decline</button><button class="danger" type="button" data-request-decision="cancel" data-request-id="${escapeHtml(request.id)}"${disabled}>Cancel & interrupt</button></footer></section>`;
 }
 
-const groupableActivityTypes = new Set(["commandExecution", "fileChange", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "sleep", "imageGeneration"]);
+const groupableActivityTypes = new Set(["commandExecution", "fileChange", "turnDiff", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "sleep", "imageGeneration"]);
 
 function renderTimelineItems(items) {
   const budget = createRenderBudget();
   const output = [];
   let group = [];
+  let groupOrdinal = 0;
   const flush = () => {
     if (!group.length) return;
     const running = group.some((item) => item._live || ["inProgress", "running"].includes(item.status));
@@ -441,7 +489,7 @@ function renderTimelineItems(items) {
     const files = group.filter((item) => item.type === "fileChange").flatMap((item) => item.changes ?? []).length;
     const label = running ? "Working…" : failed ? "Work needs attention" : "Worked on this Turn";
     const detail = `${group.length} activit${group.length === 1 ? "y" : "ies"}${files ? ` · ${files} file${files === 1 ? "" : "s"}` : ""}`;
-    const identity = group.map((item) => item._key ?? item.id).filter(Boolean).join("--");
+    const identity = `${group[0]._threadId ?? "thread"}--${group[0]._turnId ?? "turn"}--${groupOrdinal++}`;
     output.push(`<details class="activity-group" data-render-key="group-${escapeHtml(identity)}" data-disclosure-id="group-${escapeHtml(identity)}" ${running || failed ? "open" : ""}><summary><span><i>${running ? "↻" : failed ? "!" : "✓"}</i><strong>${label}</strong></span><em>${detail}</em></summary><div>${group.map((item) => renderItem(item, budget)).join("")}</div></details>`);
     group = [];
   };
@@ -463,15 +511,17 @@ function turnsMarkup(thread) {
   return renderTimelineItems(items) + approvals.map((request) => `<div class="timeline-entry" data-render-key="request-${escapeHtml(request.id)}">${approvalMarkup(request)}</div>`).join("");
 }
 
-function openDisclosureIds(root = surface) {
-  const ids = new Set($$("details[open][data-disclosure-id]", root).map((detail) => detail.dataset.disclosureId));
-  if (root.matches?.("details[open][data-disclosure-id]")) ids.add(root.dataset.disclosureId);
-  return ids;
+function disclosureStates(root = surface) {
+  const states = new Map($$("details[data-disclosure-id]", root).map((detail) => [detail.dataset.disclosureId, detail.open]));
+  if (root.matches?.("details[data-disclosure-id]")) states.set(root.dataset.disclosureId, root.open);
+  return states;
 }
 
-function restoreDisclosureIds(ids, root = surface) {
-  if (root.matches?.("details[data-disclosure-id]")) root.open = ids.has(root.dataset.disclosureId) || root.open;
-  for (const detail of $$('details[data-disclosure-id]', root)) detail.open = ids.has(detail.dataset.disclosureId) || detail.open;
+function restoreDisclosureStates(states, root = surface) {
+  if (root.matches?.("details[data-disclosure-id]") && states.has(root.dataset.disclosureId)) root.open = states.get(root.dataset.disclosureId);
+  for (const detail of $$("details[data-disclosure-id]", root)) {
+    if (states.has(detail.dataset.disclosureId)) detail.open = states.get(detail.dataset.disclosureId);
+  }
 }
 
 function transcriptSelectionActive() {
@@ -506,9 +556,9 @@ function patchTimeline(container, markup) {
     } else if (existing.outerHTML !== next.outerHTML) {
       const focused = existing.contains(document.activeElement) ? document.activeElement : null;
       const signature = focusSignature(focused, existing);
-      const expanded = openDisclosureIds(existing);
+      const disclosures = disclosureStates(existing);
       existing.replaceWith(next);
-      restoreDisclosureIds(expanded, next);
+      restoreDisclosureStates(disclosures, next);
       if (signature) next.querySelector(signature)?.focus({ preventScroll: true });
       mounted = next;
     }
@@ -713,12 +763,14 @@ async function refreshThreads() {
   }
   state.eventCursor = data.eventCursor;
   state.pendingRequests = data.pendingRequests;
+  state.knownRequestIds = new Set(data.pendingRequests.map((request) => String(request.id)));
+  state.runtimeGeneration = data.runtime.generation;
+  state.runtimeAlive = data.runtime.alive;
   updateAttentionState(data.attention);
   $("#taskCount").textContent = data.graph.tickets.length;
   $("#accountName").textContent = data.account.authenticated ? "Codex" : "Sign in required";
   $("#accountPlan").textContent = data.account.planType ?? data.account.accountType ?? "Unavailable";
-  $("#accountDot").classList.toggle("connected", data.account.authenticated);
-  $("#runtimeLabel").textContent = data.account.authenticated ? "Local app-server" : "Authentication required";
+  setRuntimePosture({ alive: data.runtime.alive && data.account.authenticated, generation: data.runtime.generation, label: data.account.authenticated ? (data.runtime.alive ? "Local app-server" : "Runtime unavailable") : "Authentication required" });
   updateSidebar();
 }
 
@@ -730,6 +782,9 @@ async function openThread(threadId, { route = "chat" } = {}) {
   state.running = String(data.thread.status?.type ?? data.thread.status).toLowerCase().includes("active");
   if (!state.running) {
     for (const [key, item] of state.liveItems) if (item._threadId === threadId) state.liveItems.delete(key);
+    for (const map of [state.turnErrors, state.turnPlans, state.turnDiffs]) {
+      for (const [key, item] of map) if (item._threadId === threadId) map.delete(key);
+    }
   }
   $("#stopTurn").hidden = !state.running;
   updateSidebar();
@@ -755,6 +810,16 @@ function scheduleChatRender() {
   });
 }
 
+function focusNewBlockingRequest(previousIds) {
+  const request = state.pendingRequests.find((entry) => !previousIds.has(String(entry.id)) && requestDescriptor(entry).blocking);
+  if (!request) return;
+  requestAnimationFrame(() => {
+    const card = surface.querySelector(`[data-request-id="${CSS.escape(String(request.id))}"]`);
+    card?.querySelector("input:not([disabled]), textarea:not([disabled]), button:not([disabled])")?.focus({ preventScroll: true });
+    $("#streamStatus").textContent = "Codex needs your input.";
+  });
+}
+
 async function newThread() {
   if (state.creatingThread) return state.creatingThread;
   state.creatingThread = (async () => {
@@ -767,6 +832,8 @@ async function newThread() {
     state.running = false;
     state.liveItems.clear();
     state.turnErrors.clear();
+    state.turnPlans.clear();
+    state.turnDiffs.clear();
     updateSidebar();
     setRoute("chat");
     $("#composerInput").focus();
@@ -960,17 +1027,27 @@ async function submitTurn(event) {
 
 async function pollEvents() {
   try {
+    const previousRequestIds = new Set(state.pendingRequests.map((request) => String(request.id)));
+    const focusedRequestId = document.activeElement?.closest?.("[data-request-id]")?.dataset.requestId;
+    const previousGeneration = state.runtimeGeneration;
     const data = await api(`/api/events?after=${state.eventCursor}`);
     state.eventCursor = data.cursor;
     state.pendingRequests = data.pendingRequests;
+    state.knownRequestIds = new Set(data.pendingRequests.map((request) => String(request.id)));
+    setRuntimePosture({ alive: data.runtimeAlive, generation: data.runtimeGeneration });
     let refreshRequests = false;
-    let reconcile = false;
+    let reconcile = data.gap || data.runtimeGeneration !== previousGeneration;
     let rendered = false;
     for (const entry of data.events) {
       if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refreshRequests = true;
+      if (entry.kind === "runtimeExit") {
+        setRuntimePosture({ alive: false, generation: entry.value.runtimeGeneration, label: "Runtime exited" });
+        reconcile = false;
+      }
       if (entry.kind !== "notification") continue;
       const method = entry.value.method;
       const params = entry.value.params ?? {};
+      if (method === "serverRequest/resolved") refreshRequests = true;
       if (params.threadId !== state.activeThreadId) continue;
       if (method === "turn/started") {
         state.running = true;
@@ -985,15 +1062,17 @@ async function pollEvents() {
       }
       rendered = applyChatNotification(method, params) || rendered;
     }
-    if (reconcile && state.activeThreadId) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
+    if (reconcile && state.activeThreadId && state.runtimeAlive) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
     else if ((rendered || refreshRequests) && state.activeThreadId) scheduleChatRender();
+    focusNewBlockingRequest(previousRequestIds);
+    if (focusedRequestId && !state.knownRequestIds.has(focusedRequestId)) requestAnimationFrame(() => $("#composerInput")?.focus({ preventScroll: true }));
     state.attentionPollCounter += 1;
     if (state.attentionPollCounter >= 12) {
       state.attentionPollCounter = 0;
       await refreshThreads();
     }
   } catch (error) {
-    $("#runtimeLabel").textContent = "Runtime reconnecting";
+    setRuntimePosture({ alive: false, label: "Runtime reconnecting" });
   } finally {
     pollTimer = setTimeout(pollEvents, 850);
   }
@@ -1093,7 +1172,7 @@ document.addEventListener("click", async (event) => {
   if (copyCitationThread) { await navigator.clipboard.writeText(copyCitationThread.dataset.copyCitationThread); notify("Source Thread id copied."); return; }
   const decision = event.target.closest("[data-request-decision]");
   if (decision) {
-    try { await action({ action: "resolveRequest", requestId: decision.dataset.requestId, decision: decision.dataset.requestDecision }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); }
+    try { await action({ action: "resolveRequest", requestId: decision.dataset.requestId, decision: decision.dataset.requestDecision }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); $("#composerInput").focus(); }
     catch (error) { notify(error.message); }
     return;
   }
@@ -1133,12 +1212,18 @@ document.addEventListener("submit", async (event) => {
   if (!form) return;
   event.preventDefault();
   const answers = {};
+  let invalid = false;
   for (const fieldset of $$("fieldset[data-question-id]", form)) {
-    const selected = $$('input:checked', fieldset).map((input) => input.value);
-    const written = $("textarea", fieldset)?.value.trim();
-    answers[fieldset.dataset.questionId] = { answers: selected.length ? selected : written ? [written] : [] };
+    const selected = $$("input[type=radio]:checked", fieldset).map((input) => input.value);
+    const direct = $("[data-request-answer]", fieldset)?.value.trim();
+    const other = selected.includes("__other__") ? $("[data-request-other]", fieldset)?.value.trim() : "";
+    const values = selected.filter((value) => value !== "__other__");
+    if (other) values.push(other);
+    if (direct) values.push(direct);
+    if (!values.length) invalid = true;
+    answers[fieldset.dataset.questionId] = { answers: values };
   }
-  if (!Object.values(answers).some((entry) => entry.answers.length)) { notify("Answer at least one question before sending."); return; }
+  if (invalid || !Object.keys(answers).length) { notify("Answer every question before sending."); form.querySelector("input:not([disabled]), textarea:not([disabled])")?.focus(); return; }
   try { await action({ action: "resolveRequest", requestId: form.dataset.requestForm, answers }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); $("#composerInput").focus(); }
   catch (error) { notify(error.message); }
 });

@@ -152,8 +152,12 @@ export function renderGeneratedImage(item, budget = createRenderBudget()) {
 export function renderToolContent(content, budget = createRenderBudget()) {
   const entries = Array.isArray(content) ? content.slice(0, 32) : [];
   const output = entries.map((entry) => {
-    if (entry.type === "text") return `<div class="tool-result">${renderMarkdown(entry.text, budget, DOM_LIMITS.outputCharacters)}</div>`;
-    if (entry.type === "image") return safeImageMarkup(entry.data ? `data:${entry.mimeType ?? "image/png"};base64,${entry.data}` : imageSource(entry), "Tool image result", budget);
+    if (["text", "inputText"].includes(entry.type)) return `<div class="tool-result">${renderMarkdown(entry.text, budget, DOM_LIMITS.outputCharacters)}</div>`;
+    if (["image", "inputImage"].includes(entry.type)) return safeImageMarkup(entry.data ? `data:${entry.mimeType ?? "image/png"};base64,${entry.data}` : imageSource(entry), "Tool image result", budget);
+    if (entry.type === "inputAudio") {
+      budget.mediaCountRemaining = Math.max(0, budget.mediaCountRemaining - 1);
+      return `<span class="message-attachment unsupported-media" role="note">◉ Tool audio result remains available in Thread history${entry.audioUrl ? "; this carrier does not mount the source" : ""}</span>`;
+    }
     return `<span class="message-attachment unsupported-media" role="note">◇ ${escapeHtml(entry.type ?? "Unknown")} tool result remains inspectable in Thread history</span>`;
   }).join("");
   return `${output}${Array.isArray(content) && content.length > entries.length ? omissionMarkup(content.length - entries.length, "tool result entries") : ""}`;

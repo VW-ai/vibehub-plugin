@@ -15,6 +15,20 @@ function liveItem(model, threadId, itemId, fallback, turnId) {
   return item;
 }
 
+function transientMap(model, name) {
+  model[name] ??= new Map();
+  return model[name];
+}
+
+function clearTurnTransient(model, threadId, turnId) {
+  for (const name of ["liveItems", "turnErrors", "turnPlans", "turnDiffs"]) {
+    const map = transientMap(model, name);
+    for (const [key, value] of map) {
+      if (value?._threadId === threadId && value?._turnId === turnId) map.delete(key);
+    }
+  }
+}
+
 export function applyChatEvent(model, method, params = {}) {
   if (!model?.liveItems || !model?.turnErrors) throw new TypeError("Chat model requires liveItems and turnErrors Maps");
   if (method === "item/started") {
@@ -25,6 +39,35 @@ export function applyChatEvent(model, method, params = {}) {
   if (method === "item/completed") {
     const key = itemKey(params.threadId, params.turnId, params.item.id);
     model.liveItems.set(key, { ...params.item, _threadId: params.threadId, _turnId: params.turnId, _key: key, _live: false });
+    return true;
+  }
+  if (method === "turn/plan/updated") {
+    const id = `plan-${params.turnId}`;
+    const key = itemKey(params.threadId, params.turnId, id);
+    transientMap(model, "turnPlans").set(key, {
+      id,
+      type: "turnPlan",
+      plan: params.plan ?? [],
+      explanation: params.explanation ?? null,
+      _threadId: params.threadId,
+      _turnId: params.turnId,
+      _key: key,
+      _live: true,
+    });
+    return true;
+  }
+  if (method === "turn/diff/updated") {
+    const id = `diff-${params.turnId}`;
+    const key = itemKey(params.threadId, params.turnId, id);
+    transientMap(model, "turnDiffs").set(key, {
+      id,
+      type: "turnDiff",
+      diff: params.diff ?? "",
+      _threadId: params.threadId,
+      _turnId: params.turnId,
+      _key: key,
+      _live: true,
+    });
     return true;
   }
   if (method === "item/agentMessage/delta") {
@@ -59,6 +102,11 @@ export function applyChatEvent(model, method, params = {}) {
     item.changes = params.changes ?? item.changes;
     return true;
   }
+  if (method === "item/fileChange/outputDelta") {
+    const item = liveItem(model, params.threadId, params.itemId, { type: "fileChange", status: "inProgress", changes: [], output: "" }, params.turnId);
+    item.output = `${item.output ?? ""}${params.delta ?? ""}`;
+    return true;
+  }
   if (method === "item/mcpToolCall/progress") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "mcpToolCall", status: "inProgress", arguments: {} }, params.turnId);
     item.progress = `${item.progress ?? ""}${params.message ?? params.delta ?? ""}`;
@@ -76,6 +124,11 @@ export function applyChatEvent(model, method, params = {}) {
       message: params.error?.message ?? params.error ?? "Codex encountered an error.",
       willRetry: Boolean(params.willRetry),
     });
+    return true;
+  }
+  if (method === "turn/completed") {
+    const turnId = params.turn?.id ?? params.turnId;
+    if (turnId) clearTurnTransient(model, params.threadId, turnId);
     return true;
   }
   return false;
@@ -103,10 +156,16 @@ export function canonicalTimeline(thread, model, { limit = 240 } = {}) {
     }
     return items;
   });
+  const authoritativeTurnIds = new Set((thread?.turns ?? []).filter((turn) => !LIVE_STATUSES.has(turn?.status?.type ?? turn?.status)).map((turn) => turn.id));
   const replayIds = new Set(replay.map((item) => item._key));
-  const live = [...model.liveItems.values()].filter((item) => item._threadId === threadId && !replayIds.has(item._key));
+  const transient = [
+    ...transientMap(model, "turnPlans").values(),
+    ...transientMap(model, "turnDiffs").values(),
+    ...model.liveItems.values(),
+  ];
+  const live = transient.filter((item) => item._threadId === threadId && !authoritativeTurnIds.has(item._turnId) && !replayIds.has(item._key));
   const errorIds = new Set(replay.map((item) => item._key));
-  const errors = [...model.turnErrors.values()].filter((item) => item._threadId === threadId && !errorIds.has(item._key));
+  const errors = [...model.turnErrors.values()].filter((item) => item._threadId === threadId && !authoritativeTurnIds.has(item._turnId) && !errorIds.has(item._key));
   return [...replay, ...live, ...errors].slice(-limit);
 }
 

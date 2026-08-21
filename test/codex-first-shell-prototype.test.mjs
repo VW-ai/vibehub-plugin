@@ -149,7 +149,8 @@ test("Codex-native Chat contract covers replay, live deltas, rich items, and lic
   assert.match(css, /\.source-citations/);
   assert.match(css, /\.turn-boundary/);
   const fixtureTypes = fixture.thread.turns.flatMap((turn) => turn.items.map((item) => item.type));
-  for (const type of ["userMessage", "agentMessage", "reasoning", "plan", "commandExecution", "fileChange", "mcpToolCall", "collabAgentToolCall", "subAgentActivity", "turnError", "contextCompaction"]) assert.ok(fixtureTypes.includes(type));
+  for (const type of ["userMessage", "agentMessage", "reasoning", "plan", "commandExecution", "fileChange", "mcpToolCall", "collabAgentToolCall", "subAgentActivity", "contextCompaction"]) assert.ok(fixtureTypes.includes(type));
+  assert.ok(["started", "interacted", "interrupted"].includes(fixture.thread.turns.flatMap((turn) => turn.items).find((item) => item.type === "subAgentActivity")?.kind));
   const citedMessage = fixture.thread.turns.flatMap((turn) => turn.items).find((item) => item.type === "agentMessage" && item.memoryCitation);
   assert.ok(citedMessage?.memoryCitation.entries.length);
   assert.ok(citedMessage?.memoryCitation.threadIds.length);
@@ -159,10 +160,12 @@ test("Codex-native Chat contract covers replay, live deltas, rich items, and lic
 });
 
 test("Codex-first shell exposes ordinary audio honestly and routes real approvals", async () => {
-  const [html, script, server, lock] = await Promise.all([
+  const [html, script, server, eventWindow, registry, lock] = await Promise.all([
     source("apps/codex-first-shell-prototype/index.html"),
     source("apps/codex-first-shell-prototype/app.js"),
     source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("apps/codex-first-shell-prototype/event-window.mjs"),
+    source("apps/codex-first-shell-prototype/server-request-registry.mjs"),
     source("packages/codex-adapter/upstream-lock.json"),
   ]);
   assert.match(html, /Record voice input/);
@@ -172,8 +175,11 @@ test("Codex-first shell exposes ordinary audio honestly and routes real approval
   assert.match(server, /audioInput: true/);
   assert.match(server, /realtimeConversation: false/);
   assert.match(lock, /"stableTurnInputs": \["audio", "localAudio"\]/);
-  for (const decision of ["accept", "acceptForSession", "decline", "cancel"]) assert.match(server, new RegExp(`"${decision}"`));
+  for (const decision of ["accept", "acceptForSession", "decline", "cancel"]) assert.match(registry, new RegExp(`"${decision}"`));
   assert.match(server, /item\/tool\/requestUserInput/);
+  assert.match(server, /unsupportedServerRequestResult/);
+  assert.match(eventWindow, /oldestCursor/);
+  assert.match(server, /runtimeGeneration/);
   assert.match(script, /data-request-decision/);
 });
 
@@ -277,6 +283,8 @@ test("Codex-first prototype host is loopback-only, bounded, and connected to the
   assert.equal(payload.ok, true);
   assert.equal(payload.data.account.authenticated, true);
   assert.equal(payload.data.runtime.provider, "Codex app-server");
+  assert.equal(payload.data.runtime.alive, true);
+  assert.ok(payload.data.runtime.generation >= 1);
   assert.equal(payload.data.runtime.realtimeConversation, false);
   assert.ok(payload.data.contexts.some((context) => context.contextId === "decision-chat-default-search-and-task-attention"));
   assert.equal(payload.data.attention.semantics.running, "presence_only_never_notification");
@@ -295,6 +303,16 @@ test("Codex-first prototype host is loopback-only, bounded, and connected to the
   const projectFixtures = await fetch(new URL("project-fixtures.json", url));
   assert.equal(projectFixtures.status, 200);
   assert.equal((await projectFixtures.json()).projects[0].name, "Launch VibeHub");
+  const eventRecovery = await fetch(new URL("api/events?after=-1", url), { headers: { authorization: `Bearer ${token}` } });
+  const eventPayload = await eventRecovery.json();
+  assert.equal(eventPayload.data.gap, true);
+  assert.ok(Number.isInteger(eventPayload.data.oldestCursor));
+  assert.equal(eventPayload.data.runtimeAlive, true);
+  for (const moduleName of ["chat-renderer.mjs", "event-window.mjs", "server-request-registry.mjs"]) {
+    const module = await fetch(new URL(moduleName, url));
+    assert.equal(module.status, 200);
+    assert.match(module.headers.get("content-type"), /text\/javascript/);
+  }
   const exit = once(child, "exit");
   child.kill("SIGTERM");
   await exit;

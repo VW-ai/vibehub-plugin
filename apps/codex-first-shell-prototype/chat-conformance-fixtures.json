@@ -26,6 +26,9 @@
     { "method": "item/agentMessage/delta", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-live", "itemId": "agent-live", "delta": "answer." } },
     { "method": "item/started", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-live", "item": { "id": "tool-live", "type": "mcpToolCall", "server": "browser", "tool": "inspect", "status": "inProgress" } } },
     { "method": "item/mcpToolCall/progress", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-live", "itemId": "tool-live", "message": "Loading page" } },
+    { "method": "turn/plan/updated", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-live", "explanation": "Execute the verified path", "plan": [{ "step": "Inspect", "status": "completed" }, { "step": "Verify", "status": "inProgress" }] } },
+    { "method": "turn/diff/updated", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-live", "diff": "@@ -1 +1 @@\n-old\n+new" } },
+    { "method": "item/fileChange/outputDelta", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-live", "itemId": "files-live", "delta": "Patch applied" } },
     { "method": "item/completed", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-live", "item": { "id": "agent-live", "type": "agentMessage", "text": "Authoritative completed answer." } } },
     { "method": "item/completed", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-replay", "item": { "id": "agent-shared", "type": "agentMessage", "text": "A stale live duplicate that replay must hide." } } },
     { "method": "error", "params": { "threadId": "fixture-reducer-thread", "turnId": "turn-live", "error": { "message": "Retrying transport" }, "willRetry": true } }

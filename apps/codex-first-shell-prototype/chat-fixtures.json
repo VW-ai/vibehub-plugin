@@ -88,15 +88,9 @@
           {
             "type": "subAgentActivity",
             "id": "fixture-subagent-activity",
-            "kind": { "type": "completed" },
+            "kind": "interacted",
             "agentThreadId": "fixture-subagent",
             "agentPath": "protocol-audit"
-          },
-          {
-            "type": "turnError",
-            "id": "fixture-retry",
-            "message": "The first stream disconnected; Codex retained the Turn and resumed it.",
-            "willRetry": true
           },
           {
             "type": "contextCompaction",

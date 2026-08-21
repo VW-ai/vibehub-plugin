@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "codexVersion": "0.147.0",
+    "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2"
+  },
+  "notifications": {
+    "thread/started": "reconcile",
+    "thread/status/changed": "reconcile",
+    "turn/started": "render",
+    "turn/completed": "reconcile",
+    "turn/plan/updated": "render",
+    "turn/diff/updated": "render",
+    "item/started": "render",
+    "item/completed": "render",
+    "item/agentMessage/delta": "render",
+    "item/commandExecution/outputDelta": "render",
+    "item/fileChange/outputDelta": "render-deprecated-truthful",
+    "item/fileChange/patchUpdated": "render",
+    "item/mcpToolCall/progress": "render",
+    "serverRequest/resolved": "reconcile",
+    "thread/realtime/started": "deliberate-deferral-hidden",
+    "thread/realtime/transcript/delta": "deliberate-deferral-hidden",
+    "thread/realtime/transcript/done": "deliberate-deferral-hidden",
+    "thread/realtime/outputAudio/delta": "deliberate-deferral-hidden",
+    "thread/realtime/error": "diagnostic-only",
+    "thread/realtime/closed": "diagnostic-only"
+  },
+  "serverRequests": {
+    "item/commandExecution/requestApproval": "render-and-resolve",
+    "item/fileChange/requestApproval": "render-and-resolve",
+    "item/tool/requestUserInput": "render-and-resolve",
+    "item/tool/call": "truthful-unsupported-result-immediate",
+    "unknown": "json-rpc-method-not-found-immediate"
+  },
+  "rule": "No pinned protocol event may disappear silently. Replay from thread/read remains authoritative after every reconcile path."
+}
