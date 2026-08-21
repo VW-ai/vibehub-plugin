@@ -17,7 +17,8 @@
   "components": {
     "userMessage": "user bubble with text, image, audio, skill, and mention attachments",
     "hookPrompt": "quiet system context disclosure",
-    "agentMessage": "sanitized Markdown response with streaming cursor only while live",
+    "agentMessage": "sanitized Markdown response with streaming cursor only while live; memoryCitation entries render as bounded source path, line range, and note disclosures",
+    "memoryCitation": "agentMessage field retained and rendered from entries plus source Thread identity; never silently discarded",
     "reasoning": "collapsed reasoning disclosure with streamed summary",
     "plan": "structured plan card with streaming or final progress",
     "commandExecution": "collapsible terminal group with cwd, command, output, duration, and exit status",
@@ -62,7 +63,7 @@
     "waitingHuman": "scoped server request renders inline and remains separate from VibeHub Task attention",
     "retrying": "error notification with willRetry true; keep the Turn open and expose retry state",
     "failed": "terminal error or failed item; keep output inspectable and offer a new Turn, never rewrite history",
-    "interrupted": "turn/interrupt followed by authoritative completion status; no false completed claim",
+    "interrupted": "turn/interrupt followed by authoritative TurnStatus interrupted; partial output remains and an explicit Turn interrupted boundary renders",
     "completed": "turn/completed reconciled with thread/read; completion is not a VibeHub Outcome"
   },
   "composer": {

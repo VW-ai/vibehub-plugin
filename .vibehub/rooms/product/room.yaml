@@ -18,7 +18,7 @@
         "path": "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"
       },
       {
-        "blob": "46373458c37fb38874d1d57e29ff0be40c1df295",
+        "blob": "06ed0f34a0e8ed4d2826f4afdc2cc225bf9ee115",
         "path": "docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md"
       },
       {
@@ -182,11 +182,11 @@
         "path": "docs/proposals/codex-native-attention/interaction-contract.json"
       },
       {
-        "blob": "0c2f772fa6eba64b6d16ca29909ca7e65241dd6d",
+        "blob": "8cf4d83b01eade96bede255e484b3cca2b5ec5da",
         "path": "docs/proposals/codex-native-chat/README.md"
       },
       {
-        "blob": "eb8e9a16c212389101d888955df3bcce8d9fa7ae",
+        "blob": "8f4fc23a5e75ef3306cff7fbb4611a3f387c683e",
         "path": "docs/proposals/codex-native-chat/chat-ui-contract.json"
       },
       {
@@ -214,8 +214,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T08:09:47.493Z",
-    "last_aligned_commit": "9728e953bdebf92cecf57aba846dbb77f7ab5d60"
+    "checked_at": "2026-08-21T08:20:13.140Z",
+    "last_aligned_commit": "0b3bdc316ac1275ede2ffdd3321598a28455d1e1"
   },
   "anchors": [
     "CHANGELOG.md",

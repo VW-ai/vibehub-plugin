@@ -158,6 +158,12 @@ button:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline
 .message-actions button { height: 27px; padding: 0 7px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; font-size: 10px; }
 .message-actions button:hover:not([disabled]) { color: var(--text); background: var(--hover); }
 .message-actions button[disabled] { opacity: .4; cursor: default; }
+.source-citations { display: grid; gap: 5px; margin: 14px 0 7px; padding: 9px 10px; border-left: 2px solid var(--line-strong); color: var(--muted); font-size: 10px; }
+.source-citations > strong { color: var(--text); font-weight: 550; }
+.source-citations > span { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.source-citations code { overflow: hidden; color: var(--accent); text-overflow: ellipsis; white-space: nowrap; font: 9px/1.4 var(--mono); }
+.source-citations em { color: var(--muted); font-style: normal; }
+.source-citations small { color: var(--faint); font: 9px/1.4 var(--mono); }
 .message-image { display: block; max-width: min(360px, 100%); max-height: 260px; margin-top: 8px; border: 1px solid var(--line); border-radius: 10px; object-fit: contain; }
 .message-attachment { display: inline-flex; align-items: center; min-height: 28px; margin: 7px 5px 0 0; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--panel); font-size: 10px; }
 .code-block { position: relative; margin: 12px 0; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--code); }
@@ -211,6 +217,9 @@ button:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline
 .turn-error { margin: 12px 0 12px 38px; padding: 11px 12px; border: 1px solid color-mix(in srgb, #d74747 42%, var(--line)); border-radius: 10px; background: color-mix(in srgb, #d74747 7%, var(--panel)); }
 .turn-error p { margin: 4px 0; color: var(--muted); }
 .retrying { color: #b06a00; font-size: 10px; }
+.turn-boundary { display: flex; align-items: center; gap: 9px; margin: 12px 0 12px 38px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); background: var(--raised); font-size: 10px; }
+.turn-boundary span { color: var(--text); font-weight: 560; }
+.turn-boundary strong { font-weight: 400; }
 .approval-card { margin: 14px 0 14px 38px; padding: 12px; border: 1px solid color-mix(in srgb, #d89b00 45%, var(--line)); border-radius: 11px; background: color-mix(in srgb, #d89b00 7%, var(--panel)); }
 .approval-card > header { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: #b06a00; font: 9px/1 var(--mono); text-transform: uppercase; }
 .approval-card > header em { color: var(--muted); font-style: normal; }

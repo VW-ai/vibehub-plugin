@@ -76,7 +76,7 @@ test("Codex-native Chat contract covers replay, live deltas, rich items, and lic
   assert.equal(contract.baseline.version, lock.codex.version);
   assert.equal(contract.baseline.commit, lock.codex.commit);
   assert.equal(contract.baseline.protocolSchemaSha256, lock.codex.protocolSchemaSha256);
-  for (const type of ["userMessage", "agentMessage", "reasoning", "plan", "commandExecution", "fileChange", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "imageGeneration", "contextCompaction", "unknown"]) assert.ok(contract.components[type]);
+  for (const type of ["userMessage", "agentMessage", "memoryCitation", "reasoning", "plan", "commandExecution", "fileChange", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "imageGeneration", "contextCompaction", "unknown"]) assert.ok(contract.components[type]);
   for (const method of ["item/started", "item/agentMessage/delta", "item/reasoning/summaryTextDelta", "item/plan/delta", "item/commandExecution/outputDelta", "item/fileChange/patchUpdated", "item/completed", "error", "turn/completed"]) assert.ok(contract.streaming.events.includes(method));
   assert.equal(contract.vibehubBoundary.ordinaryChatRequiresTask, false);
   assert.equal(contract.vibehubBoundary.threadIsTask, false);
@@ -92,14 +92,25 @@ test("Codex-native Chat contract covers replay, live deltas, rich items, and lic
   assert.match(script, /requestAnimationFrame/);
   assert.match(script, /slice\(-240\)/);
   assert.match(script, /renderMarkdown/);
+  assert.match(script, /memoryCitationMarkup/);
+  assert.match(script, /citation\?\.threadIds/);
+  assert.match(script, /turnBoundary/);
+  assert.match(script, /turn\.status === "interrupted"/);
   assert.match(script, /noreferrer noopener/);
   assert.match(script, /Unsupported item/);
   assert.match(css, /\.activity-card/);
   assert.match(css, /\.activity-group/);
   assert.match(css, /\.code-block/);
   assert.match(css, /\.turn-error/);
+  assert.match(css, /\.source-citations/);
+  assert.match(css, /\.turn-boundary/);
   const fixtureTypes = fixture.thread.turns.flatMap((turn) => turn.items.map((item) => item.type));
   for (const type of ["userMessage", "agentMessage", "reasoning", "plan", "commandExecution", "fileChange", "mcpToolCall", "collabAgentToolCall", "subAgentActivity", "turnError", "contextCompaction"]) assert.ok(fixtureTypes.includes(type));
+  const citedMessage = fixture.thread.turns.flatMap((turn) => turn.items).find((item) => item.type === "agentMessage" && item.memoryCitation);
+  assert.ok(citedMessage?.memoryCitation.entries.length);
+  assert.ok(citedMessage?.memoryCitation.threadIds.length);
+  assert.ok(fixture.thread.turns.some((turn) => turn.status === "interrupted"));
+  for (const term of ["Model and mode posture", "Microphone posture", "Shortcuts", "Focus and accessibility", "Memory citations"]) assert.match(research, new RegExp(term));
   assert.equal(fixture.pendingRequests[0].fixture, true);
 });
 

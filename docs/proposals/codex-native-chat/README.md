@@ -15,6 +15,8 @@ Tasks. The same renderer must handle durable replay and live notifications.
   behavior, automatic follow, manual-scroll preservation and focus return.
 - Recover after refresh by reconciling `thread/read`; replay never claims a live
   Agent and Turn completion never claims a VibeHub Outcome.
+- Render `agentMessage.memoryCitation` as inspectable source path/line/note and
+  render authoritative interrupted/failed Turn boundaries without deleting partial output.
 - Preserve Chat/Search/Task separation. VibeHub remains an additive action layer.
 
 ## Reuse decision

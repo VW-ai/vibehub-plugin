@@ -22,6 +22,7 @@ The checked-in executable mapping is
 | New, resume, fork, archive and delete Thread | `thread/start`, `thread/resume`, `thread/fork`, `thread/read`, `thread/list`, `thread/archive`, `thread/delete` | Threads remain Codex objects; Task linkage references identity only. |
 | User and Agent Turns | `turn/start`, `turn/steer`, `turn/interrupt`, `turn/started`, `turn/completed` | Task execution may own one linked Thread/Run without redefining the Turn. |
 | Streaming answer | `item/started`, `item/agentMessage/delta`, `item/completed` | The UI may stream, but durable replay is app-server truth. |
+| Memory citations | `agentMessage.memoryCitation.entries { path, lineStart, lineEnd, note }` plus source Thread ids | Render bounded source disclosure beneath the answer; never drop the field or invent an external URL. |
 | Reasoning and plan | reasoning summary/content deltas, `plan`, `item/plan/delta`, `turn/plan/updated` | Render as disclosures/progress, never as VibeHub Subtasks. |
 | Commands and terminal | `commandExecution`, output delta, terminal interaction, process output/exit | Compact activity with expandable output and exact status. |
 | Files and diff | `fileChange`, patch/output updates, `turn/diff/updated` | Reviewable changes are execution facts, not Evidence until explicitly recorded. |
@@ -31,6 +32,10 @@ The checked-in executable mapping is
 | Search/image/generation/wait | `webSearch`, `imageView`, `imageGeneration`, `sleep` | Quiet activity cards with honest result boundaries. |
 | Review and compaction | entered/exited review mode, `contextCompaction` | Timeline boundaries; compaction is not loss or completion. |
 | Attachments | text, image, localImage, audio, localAudio, skill and mention inputs | Familiar Composer; ordinary audio is supported. |
+| Model and mode posture | `model/list`, `collaborationMode/list`, and Turn overrides for model, effort and collaboration mode | Inventory exact choices; the current prototype labels its fixed Agent/Codex posture and defers a picker rather than showing a false control. |
+| Microphone posture | browser `MediaRecorder` produces an ordinary `audio` input; app-server audio/localAudio are stable inputs | Record/stop, preview/remove and submit through the normal Composer; permission failure stays local and visible. |
+| Shortcuts | app shell binds Meta+N, Meta+K, Enter, Shift+Enter, Escape and the exact Stop control | Preserve ordinary editing, avoid global capture while overlays own focus, and keep actions discoverable. |
+| Focus and accessibility | semantic buttons/forms/details, labelled Composer/overlays, visible `:focus-visible`, focus return, reduced-motion and textual state | Every mouse action has a keyboard path; color and animation are never the sole state channel. |
 | Realtime audio | realtime requests/events exist, but the current authenticated probe reports unsupported | Hide realtime controls; do not imply a capability from schema presence. |
 | Retry and error | `error { willRetry }`, warning/config/model reroute events | Retrying remains live; terminal failure remains inspectable and starts no fake Turn. |
 | Reconnect and replay | event cursor plus `thread/read` reconciliation | Replayed history never produces live presence. |

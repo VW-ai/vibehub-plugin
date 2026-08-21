@@ -330,6 +330,19 @@ function userMediaMarkup(content) {
   }).join("");
 }
 
+function memoryCitationMarkup(citation) {
+  const entries = citation?.entries ?? [];
+  if (!entries.length) return "";
+  const sourceThreads = (citation?.threadIds ?? []).filter(Boolean);
+  const sourceIdentity = sourceThreads.length
+    ? `<small>Source thread${sourceThreads.length === 1 ? "" : "s"}: ${sourceThreads.map((id) => escapeHtml(String(id).slice(0, 12))).join(", ")}</small>`
+    : "";
+  return `<aside class="source-citations" aria-label="Memory citations"><strong>Sources</strong>${entries.map((entry) => {
+    const lines = entry.lineStart ? `:${entry.lineStart}${entry.lineEnd && entry.lineEnd !== entry.lineStart ? `-${entry.lineEnd}` : ""}` : "";
+    return `<span><code>${escapeHtml(entry.path)}${escapeHtml(lines)}</code>${entry.note ? `<em>${escapeHtml(entry.note)}</em>` : ""}</span>`;
+  }).join("")}${sourceIdentity}</aside>`;
+}
+
 function renderItem(item) {
   if (!item) return "";
   if (item.type === "userMessage") {
@@ -339,7 +352,7 @@ function renderItem(item) {
     const media = userMediaMarkup(item.content);
     return `<div class="turn user" data-item-id="${escapeHtml(item.id)}"><article>${text ? `<div>${renderMarkdown(text)}</div>` : ""}${media}</article></div>`;
   }
-  if (item.type === "agentMessage") return `<div class="turn assistant" data-item-id="${escapeHtml(item.id)}"><span class="agent-mark">C</span><article class="agent-response${item._live ? " streaming" : ""}">${renderMarkdown(item.text)}<footer class="message-actions"><button type="button" data-copy-message="${escapeHtml(item.id)}">Copy</button><button type="button" disabled title="Planned VibeHub bridge">Remember</button><button type="button" disabled title="Planned VibeHub bridge">Make Task</button></footer></article></div>`;
+  if (item.type === "agentMessage") return `<div class="turn assistant" data-item-id="${escapeHtml(item.id)}"><span class="agent-mark">C</span><article class="agent-response${item._live ? " streaming" : ""}">${renderMarkdown(item.text)}${memoryCitationMarkup(item.memoryCitation)}<footer class="message-actions"><button type="button" data-copy-message="${escapeHtml(item.id)}">Copy</button><button type="button" disabled title="Planned VibeHub bridge">Remember</button><button type="button" disabled title="Planned VibeHub bridge">Make Task</button></footer></article></div>`;
   if (item.type === "reasoning") {
     const text = [...(item.summary ?? []), ...(item.content ?? [])].join("\n");
     return `<div class="activity-row">${disclosureCard({ kind: "reasoning", icon: "✦", title: "Reasoning", status: statusLabel(item), summary: item._live ? "Thinking…" : "Reasoning summary", detail: renderMarkdown(text || "Reasoned about the request") })}</div>`;
@@ -375,6 +388,7 @@ function renderItem(item) {
   if (item.type === "contextCompaction") return '<div class="timeline-divider"><span>Context compacted</span><strong>Earlier detail remains in Thread history</strong></div>';
   if (item.type === "hookPrompt") return `<div class="timeline-divider"><span>Project instructions</span><strong>${escapeHtml((item.fragments ?? []).map((fragment) => fragment.text ?? fragment.content ?? "").join(" ").slice(0, 120))}</strong></div>`;
   if (item.type === "turnError") return `<section class="turn-error"><strong>${item.willRetry ? "Codex is retrying" : "This Turn stopped"}</strong><p>${escapeHtml(item.message)}</p>${item.willRetry ? '<span class="retrying">Retrying…</span>' : ""}</section>`;
+  if (item.type === "turnBoundary") return `<div class="turn-boundary ${escapeHtml(item.status)}"><span>${item.status === "interrupted" ? "Turn interrupted" : "Turn failed"}</span><strong>${escapeHtml(item.message ?? (item.status === "interrupted" ? "Partial output remains in Thread history." : "The error remains inspectable in this Thread."))}</strong></div>`;
   return `<div class="activity-row">${disclosureCard({ kind: "unknown", icon: "?", title: item.type ?? "Unsupported item", status: statusLabel(item), summary: "Inspect raw app-server item; no result inferred", detail: `<pre>${escapeHtml(JSON.stringify(item, null, 2))}</pre>` })}</div>`;
 }
 
@@ -415,7 +429,13 @@ function renderTimelineItems(items) {
 
 function turnsMarkup(thread) {
   const turns = thread?.turns ?? [];
-  const replay = turns.flatMap((turn) => (turn.items ?? []).map((item) => ({ ...item, _turnId: turn.id })));
+  const replay = turns.flatMap((turn) => {
+    const items = (turn.items ?? []).map((item) => ({ ...item, _turnId: turn.id }));
+    if (turn.status === "interrupted" || turn.status === "failed") {
+      items.push({ type: "turnBoundary", id: `boundary-${turn.id}`, _turnId: turn.id, status: turn.status, message: turn.error?.message });
+    }
+    return items;
+  });
   const replayIds = new Set(replay.map((item) => item.id));
   const live = [...state.liveItems.values()].filter((item) => !replayIds.has(item.id));
   const errors = [...state.turnErrors.values()];

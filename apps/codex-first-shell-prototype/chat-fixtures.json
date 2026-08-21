@@ -32,7 +32,13 @@
           {
             "type": "agentMessage",
             "id": "fixture-agent",
-            "text": "The renderer now keeps the **answer** visually primary while execution stays inspectable.\n\n```js\nconst truth = threadRead.itemsById[item.id];\nrender(truth);\n```\n\n- Replay is durable history.\n- Live deltas update the same item identity.\n- VibeHub remains additive."
+            "text": "The renderer now keeps the **answer** visually primary while execution stays inspectable.\n\n```js\nconst truth = threadRead.itemsById[item.id];\nrender(truth);\n```\n\n- Replay is durable history.\n- Live deltas update the same item identity.\n- VibeHub remains additive.",
+            "memoryCitation": {
+              "entries": [
+                { "path": "docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md", "lineStart": 1, "lineEnd": 12, "note": "Pinned Chat interaction contract" }
+              ],
+              "threadIds": ["fixture-source-thread"]
+            }
           },
           {
             "type": "commandExecution",
@@ -95,6 +101,19 @@
           {
             "type": "contextCompaction",
             "id": "fixture-compaction"
+          }
+        ],
+        "status": "completed"
+      },
+      {
+        "id": "fixture-turn-2",
+        "status": "interrupted",
+        "items": [
+          {
+            "type": "userMessage",
+            "id": "fixture-interrupt-user",
+            "clientId": "fixture-interrupt-client",
+            "content": [{ "type": "text", "text": "Stop this Turn before it finishes." }]
           }
         ]
       }
