@@ -39,6 +39,7 @@
 [data-theme="dark"] { color-scheme: dark; --accent:#339cff; --bg:#181818; --sidebar:#202020; --panel:#1c1c1c; --raised:#262626; --hover:#2d2d2d; --text:#fff; --muted:#aaa; --faint:#777; --line:#303030; --line-strong:#474747; --code:#242424; --shadow:0 14px 42px rgb(0 0 0 / .34); }
 
 * { box-sizing: border-box; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 body { color: var(--text); background: var(--bg); font: 13px/1.45 var(--ui); }
 button, textarea, input { color: inherit; font: inherit; }
@@ -68,15 +69,36 @@ button:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline
 .primary-nav button.active { font-weight: 600; }
 .primary-nav button small, .sidebar-footer button small { margin-left: auto; color: var(--muted); }
 .nav-icon { width: 17px; text-align: center; color: var(--muted); }
-.project-block, .attention-section, .thread-section { margin-top: 12px; min-height: 0; }
-.project-block > header, .attention-section > header, .thread-section > header { display: flex; align-items: center; justify-content: space-between; padding: 0 8px 5px; color: var(--muted); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-.project-block > header button, .attention-section > header button, .thread-section > header button { border: 0; color: var(--muted); background: transparent; border-radius: 5px; }
-.project-row { gap: 9px; min-width: 0; padding: 7px 9px; border-radius: 8px; }
+.project-block, .pinned-section, .attention-section, .thread-section { margin-top: 12px; min-height: 0; }
+.project-block > header, .pinned-section > header, .attention-section > header, .thread-section > header { display: flex; align-items: center; justify-content: space-between; padding: 0 8px 5px; color: var(--muted); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.project-block > header button, .pinned-section > header button, .attention-section > header button, .thread-section > header button { border: 0; color: var(--muted); background: transparent; border-radius: 5px; }
+.pinned-section { flex: none; border-radius: 9px; }
+.pinned-section.drag-over { background: color-mix(in srgb, var(--accent) 10%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 48%, transparent); }
+.project-list { max-height: 34vh; overflow: auto; scrollbar-width: thin; }
+.project-group { border-radius: 9px; transition: background 120ms ease, box-shadow 120ms ease; }
+.project-group.drag-over, .recent-drop-target.drag-over { background: color-mix(in srgb, var(--accent) 10%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 48%, transparent); }
+.project-group > header { display: grid; grid-template-columns: minmax(0, 1fr) 24px; align-items: center; gap: 2px; }
+.project-toggle { min-width: 0; gap: 8px; padding: 6px 9px !important; border: 0; border-radius: 7px; text-align: left; background: transparent; }
+.project-toggle:hover { background: var(--hover); }
+.project-toggle strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 560; }
+.project-toggle small { margin-left: auto; color: var(--faint); font: 9px/1 var(--mono); }
+.project-menu { position: relative; }
+.project-menu > summary { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; color: var(--muted); cursor: pointer; list-style: none; }
+.project-menu > summary::-webkit-details-marker { display: none; }
+.project-menu > summary:hover { background: var(--hover); }
+.project-menu > div { position: absolute; z-index: 10; top: 26px; right: 0; width: 110px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); box-shadow: var(--shadow); }
+.project-menu button { width: 100%; min-height: 29px; padding: 0 7px; border: 0; border-radius: 6px; text-align: left; background: transparent; }
+.project-menu button:hover { background: var(--hover); }
+.project-threads { padding-left: 10px; }
+.project-group.collapsed .project-threads { display: none; }
+.project-group.collapsed .project-toggle .project-dot { background: var(--muted); }
+.project-threads .thread-button { padding-block: 5px; }
 .project-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 .thread-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .thread-list { min-height: 0; overflow: auto; scrollbar-width: thin; }
 .thread-button { position: relative; width: 100%; min-width: 0; gap: 8px; padding: 7px 9px; border: 0; border-radius: 7px; text-align: left; background: transparent; }
 .thread-button:hover, .thread-button.active { background: var(--hover); }
+.thread-button.dragging { opacity: .38; }
 .thread-button .thread-state { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
 .thread-button .thread-state.active { background: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
 .thread-button strong { font-weight: 500; }
@@ -132,8 +154,9 @@ button:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline
 .thread-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 4px 4px 22px; }
 .thread-heading h1 { margin: 0; font-size: 20px; letter-spacing: -.025em; }
 .thread-heading p { margin: 4px 0 0; color: var(--muted); font: 10px/1.4 var(--mono); }
-.thread-menu { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; color: var(--muted); background: transparent; }
-.thread-menu:hover { color: var(--text); background: var(--hover); }
+.thread-actions { display: flex; align-items: center; gap: 6px; }
+.thread-actions select, .thread-actions button { height: 30px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--panel); font-size: 10px; }
+.thread-actions select:hover, .thread-actions button:hover { color: var(--text); border-color: var(--line-strong); }
 .transcript { min-height: 180px; }
 .turn { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; margin: 22px 0; }
 .turn.user { grid-template-columns: 1fr; justify-items: end; }
@@ -359,7 +382,7 @@ button:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline
 
 .app-shell.sidebar-collapsed { grid-template-columns: 64px minmax(0, 1fr); }
 .app-shell.sidebar-collapsed .sidebar { padding-inline: 8px; }
-.app-shell.sidebar-collapsed .brand span, .app-shell.sidebar-collapsed .new-thread strong, .app-shell.sidebar-collapsed .new-thread kbd, .app-shell.sidebar-collapsed .primary-nav button span:not(.nav-icon), .app-shell.sidebar-collapsed .primary-nav button small, .app-shell.sidebar-collapsed .project-block, .app-shell.sidebar-collapsed .attention-section, .app-shell.sidebar-collapsed .thread-section, .app-shell.sidebar-collapsed .sidebar-footer span:not(.avatar), .app-shell.sidebar-collapsed .sidebar-footer small, .app-shell.sidebar-collapsed .account-row i { display: none; }
+.app-shell.sidebar-collapsed .brand span, .app-shell.sidebar-collapsed .new-thread strong, .app-shell.sidebar-collapsed .new-thread kbd, .app-shell.sidebar-collapsed .primary-nav button span:not(.nav-icon), .app-shell.sidebar-collapsed .primary-nav button small, .app-shell.sidebar-collapsed .project-block, .app-shell.sidebar-collapsed .pinned-section, .app-shell.sidebar-collapsed .attention-section, .app-shell.sidebar-collapsed .thread-section, .app-shell.sidebar-collapsed .sidebar-footer span:not(.avatar), .app-shell.sidebar-collapsed .sidebar-footer small, .app-shell.sidebar-collapsed .account-row i { display: none; }
 .app-shell.sidebar-collapsed .new-thread, .app-shell.sidebar-collapsed .primary-nav button, .app-shell.sidebar-collapsed .sidebar-footer button, .app-shell.sidebar-collapsed .account-row { justify-content: center; padding-inline: 0; }
 
 @media (max-width: 760px) {
@@ -375,6 +398,10 @@ button:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline
   .surface { overflow-x: hidden; }
   .chat-view, .task-workspace { width: calc(100% - 24px); }
   .chat-view { padding-top: 15px; }
+  .thread-heading { display: block; }
+  .thread-actions { margin-top: 12px; }
+  .thread-actions label { min-width: 0; flex: 1; }
+  .thread-actions select { width: 100%; }
   .tasks-view { padding: 14px; }
   .tasks-heading { align-items: flex-start; }
   .tasks-heading p, .task-summary { display: none; }
@@ -408,6 +435,10 @@ body[data-review-frame="narrow"] .surface { overflow-x: hidden; }
 body[data-review-frame="narrow"] .chat-view,
 body[data-review-frame="narrow"] .task-workspace { width: calc(100% - 24px); }
 body[data-review-frame="narrow"] .chat-view { padding-top: 15px; }
+body[data-review-frame="narrow"] .thread-heading { display: block; }
+body[data-review-frame="narrow"] .thread-actions { margin-top: 12px; }
+body[data-review-frame="narrow"] .thread-actions label { min-width: 0; flex: 1; }
+body[data-review-frame="narrow"] .thread-actions select { width: 100%; }
 body[data-review-frame="narrow"] .tasks-view { padding: 14px; }
 body[data-review-frame="narrow"] .tasks-heading { align-items: flex-start; }
 body[data-review-frame="narrow"] .tasks-heading p,

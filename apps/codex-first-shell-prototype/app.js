@@ -2,6 +2,9 @@ const state = {
   route: "chat",
   bootstrap: null,
   threads: [],
+  projects: [],
+  pinned: [],
+  recents: [],
   activeThreadId: null,
   activeThread: null,
   activeTicketId: null,
@@ -87,26 +90,31 @@ function humanize(ticketId) {
   return String(ticketId).replace(/^ticket-/, "").split("-").map((part) => part[0]?.toUpperCase() + part.slice(1)).join(" ");
 }
 
+function threadButton(thread) {
+  const active = thread.id === state.activeThreadId;
+  const runtimeActive = String(thread.status?.type ?? thread.status ?? "").toLowerCase().includes("active");
+  return `<button class="thread-button${active ? " active" : ""}" type="button" draggable="true" data-thread-id="${escapeHtml(thread.id)}">
+    <i class="thread-state${runtimeActive ? " active" : ""}"></i>
+    <span><strong>${escapeHtml(titleForThread(thread))}</strong><small>${escapeHtml(thread.taskLink ? "VibeHub Task · Codex Thread" : (thread.preview || "Codex Thread").slice(0, 54))}</small></span>
+    ${thread.taskLink ? "<em>TASK</em>" : ""}
+  </button>`;
+}
+
 function updateSidebar() {
   const list = $("#threadList");
   const needsYou = state.bootstrap?.attention?.needsYou ?? [];
   const attention = $("#sidebarAttention");
   attention.hidden = needsYou.length === 0;
   $("#sidebarAttentionList").innerHTML = needsYou.slice(0, 3).map((item) => `<button class="attention-item" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Task · Needs you</small></span></button>`).join("");
-  if (!state.threads.length) {
-    list.innerHTML = '<p class="muted">No Codex chats in this Project yet.</p>';
-    return;
-  }
-  list.innerHTML = state.threads.map((thread) => {
-    const active = thread.id === state.activeThreadId;
-    const runtimeActive = String(thread.status?.type ?? thread.status ?? "").toLowerCase().includes("active");
-    return `<button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
-      <i class="thread-state${runtimeActive ? " active" : ""}"></i>
-      <span><strong>${escapeHtml(titleForThread(thread))}</strong><small>${escapeHtml(thread.taskLink ? "VibeHub Task · Codex Thread" : (thread.preview || "Codex Thread").slice(0, 54))}</small></span>
-      ${thread.taskLink ? "<em>TASK</em>" : ""}
-    </button>`;
-  }).join("");
-
+  $("#pinnedSection").hidden = state.pinned.length === 0;
+  $("#pinnedList").innerHTML = state.pinned.map(threadButton).join("");
+  $("#projectList").innerHTML = state.projects.length
+    ? state.projects.map((project) => `<section class="project-group" data-project-drop="${escapeHtml(project.id)}">
+        <header><button class="project-toggle" type="button" data-toggle-project="${escapeHtml(project.id)}" aria-expanded="true" aria-label="Collapse ${escapeHtml(project.name)} Project"><span class="project-dot"></span><strong>${escapeHtml(project.name)}</strong><small>${project.threads.length}</small></button><details class="project-menu"><summary aria-label="${escapeHtml(project.name)} Project actions">•••</summary><div><button type="button" data-rename-project="${escapeHtml(project.id)}">Rename</button><button type="button" data-delete-project="${escapeHtml(project.id)}">Delete</button></div></details></header>
+        <div class="project-threads">${project.threads.map(threadButton).join("") || '<p class="muted">Drop a Chat here</p>'}</div>
+      </section>`).join("")
+    : '<p class="muted">No Projects yet. Chats stay in Recents.</p>';
+  list.innerHTML = state.recents.map(threadButton).join("") || '<p class="muted">No unprojected chats.</p>';
 }
 
 function completionKey(item) {
@@ -474,7 +482,11 @@ function renderChat({ preserveScroll = false } = {}) {
     return;
   }
   const distanceFromBottom = surface.scrollHeight - surface.scrollTop - surface.clientHeight;
-  surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1>${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}</p></div><button class="thread-menu" type="button" aria-label="Thread actions" title="Thread actions">•••</button></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+  const activeProjectId = state.activeThread.project?.id ?? null;
+  const pinnedId = state.bootstrap?.capabilities?.pinnedSectionId;
+  const projectOptions = [`<option value=""${activeProjectId === null ? " selected" : ""}>Recents</option>`, ...(pinnedId ? [`<option value="${escapeHtml(pinnedId)}"${activeProjectId === pinnedId ? " selected" : ""}>Pinned</option>`] : []), ...state.projects.map((project) => `<option value="${escapeHtml(project.id)}"${activeProjectId === project.id ? " selected" : ""}>${escapeHtml(project.name)}</option>`)].join("");
+  const lineage = state.activeThread.forkedFromId ? ` · Forked from ${escapeHtml(state.activeThread.forkedFromId.slice(0, 8))}…` : "";
+  surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1>${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${lineage}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}">Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
   requestAnimationFrame(() => {
     if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
     else surface.scrollTop = Math.max(0, surface.scrollHeight - surface.clientHeight - distanceFromBottom);
@@ -628,11 +640,16 @@ async function refreshThreads() {
   const data = await api("/api/bootstrap");
   state.bootstrap = data;
   state.threads = data.threads;
+  state.projects = data.projects;
+  state.pinned = data.pinned;
+  state.recents = data.recents;
+  if (state.activeThreadId) {
+    const metadata = state.threads.find((thread) => thread.id === state.activeThreadId);
+    if (metadata && state.activeThread) state.activeThread = { ...state.activeThread, ...metadata };
+  }
   state.eventCursor = data.eventCursor;
   state.pendingRequests = data.pendingRequests;
   updateAttentionState(data.attention);
-  $("#projectName").textContent = data.graph.project.name;
-  $("#projectBranch").textContent = data.graph.project.branch;
   $("#taskCount").textContent = data.graph.tickets.length;
   $("#accountName").textContent = data.account.authenticated ? "Codex" : "Sign in required";
   $("#accountPlan").textContent = data.account.planType ?? data.account.accountType ?? "Unavailable";
@@ -721,6 +738,7 @@ async function newThread() {
     $("#newThread").disabled = true;
     const data = await action({ action: "newThread" });
     state.threads.unshift(data.thread);
+    state.recents.unshift(data.thread);
     state.activeThreadId = data.thread.id;
     state.activeThread = { ...data.thread, turns: [] };
     state.running = false;
@@ -914,6 +932,57 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-clear-context]")) { state.activeContextId = null; renderRooms(); return; }
   if (event.target.closest("#roomsSearch")) { openSearch(); return; }
   if (event.target.closest("[data-new-thread]")) { await newThread(); return; }
+  const toggleProject = event.target.closest("[data-toggle-project]");
+  if (toggleProject) {
+    const group = toggleProject.closest(".project-group");
+    const collapsed = group.classList.toggle("collapsed");
+    toggleProject.setAttribute("aria-expanded", String(!collapsed));
+    toggleProject.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${toggleProject.querySelector("strong").textContent} Project`);
+    return;
+  }
+  const renameProject = event.target.closest("[data-rename-project]");
+  if (renameProject) {
+    const project = state.projects.find((item) => item.id === renameProject.dataset.renameProject);
+    const name = prompt("Rename Project", project?.name ?? "");
+    if (name?.trim()) {
+      try { await action({ action: "renameProject", projectId: renameProject.dataset.renameProject, name }); await refreshThreads(); notify("Project renamed."); }
+      catch (error) { notify(error.message); }
+    }
+    return;
+  }
+  const deleteProject = event.target.closest("[data-delete-project]");
+  if (deleteProject) {
+    const project = state.projects.find((item) => item.id === deleteProject.dataset.deleteProject);
+    if (confirm(`Delete “${project?.name ?? "Project"}”? Its Chats will return to Recents.`)) {
+      try { await action({ action: "deleteProject", projectId: deleteProject.dataset.deleteProject }); await refreshThreads(); if (state.route === "chat") renderChat(); notify("Project deleted. Chats returned to Recents."); }
+      catch (error) { notify(error.message); }
+    }
+    return;
+  }
+  const forkThread = event.target.closest("[data-fork-thread]");
+  if (forkThread) {
+    try {
+      const result = await action({ action: "forkThread", threadId: forkThread.dataset.forkThread });
+      await refreshThreads();
+      await openThread(result.thread.id);
+      notify(result.placement?.applied
+        ? "Chat forked with its source Project and lineage."
+        : "Chat forked; its source Project changed, so the fork stayed in Recents.");
+    } catch (error) { notify(error.message); }
+    return;
+  }
+  const archiveThread = event.target.closest("[data-archive-thread]");
+  if (archiveThread) {
+    try {
+      await action({ action: "archiveThread", threadId: archiveThread.dataset.archiveThread });
+      state.activeThreadId = null;
+      state.activeThread = null;
+      await refreshThreads();
+      setRoute("chat");
+      notify("Chat archived.");
+    } catch (error) { notify(error.message); }
+    return;
+  }
   const remove = event.target.closest("[data-remove-attachment]");
   if (remove) { state.attachments.splice(Number(remove.dataset.removeAttachment), 1); renderAttachments(); return; }
   const copyMessage = event.target.closest("[data-copy-message]");
@@ -961,7 +1030,16 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-focus-task-composer]")) { $("#composerInput").focus(); return; }
 });
 
-document.addEventListener("change", (event) => {
+document.addEventListener("change", async (event) => {
+  if (event.target.id === "activeThreadProject") {
+    try {
+      await action({ action: "moveThread", threadId: state.activeThreadId, projectId: event.target.value || null });
+      await refreshThreads();
+      renderChat();
+      notify(event.target.value ? "Chat moved to Project." : "Chat moved to Recents.");
+    } catch (error) { notify(error.message); }
+    return;
+  }
   const contextInput = event.target.closest("[data-task-context-id]");
   if (!contextInput || contextInput.disabled) return;
   if (contextInput.checked) state.taskSelectedContextIds.add(contextInput.dataset.taskContextId);
@@ -971,6 +1049,12 @@ document.addEventListener("change", (event) => {
 });
 
 $("#newThread").addEventListener("click", newThread);
+$("#createProject").addEventListener("click", async () => {
+  const name = prompt("New Project name");
+  if (!name?.trim()) return;
+  try { await action({ action: "createProject", name }); await refreshThreads(); notify("Project created."); }
+  catch (error) { notify(error.message); }
+});
 $("#refreshThreads").addEventListener("click", async () => { await refreshThreads(); updateSidebar(); notify("Codex Chat history refreshed."); });
 $("#searchButton").addEventListener("click", openSearch);
 $("#searchInput").addEventListener("input", () => { state.searchIndex = 0; renderSearchResults(); });
@@ -1039,10 +1123,57 @@ document.addEventListener("keydown", (event) => {
   if (event.metaKey && event.key.toLowerCase() === "n") { event.preventDefault(); newThread(); }
 });
 
+document.addEventListener("dragstart", (event) => {
+  const thread = event.target.closest(".thread-button[data-thread-id]");
+  if (!thread || !event.dataTransfer) return;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/x-vibehub-thread", thread.dataset.threadId);
+  thread.classList.add("dragging");
+});
+
+document.addEventListener("dragend", (event) => {
+  event.target.closest(".thread-button")?.classList.remove("dragging");
+  $$("[data-project-drop]").forEach((target) => target.classList.remove("drag-over"));
+});
+
+document.addEventListener("dragover", (event) => {
+  const target = event.target.closest("[data-project-drop]");
+  if (!target) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  target.classList.add("drag-over");
+});
+
+document.addEventListener("dragleave", (event) => event.target.closest("[data-project-drop]")?.classList.remove("drag-over"));
+
+document.addEventListener("drop", async (event) => {
+  const target = event.target.closest("[data-project-drop]");
+  const threadId = event.dataTransfer?.getData("text/x-vibehub-thread");
+  if (!target || !threadId) return;
+  event.preventDefault();
+  target.classList.remove("drag-over");
+  const projectId = target.dataset.projectDrop === "recent" ? null : target.dataset.projectDrop;
+  try {
+    await action({ action: "moveThread", threadId, projectId });
+    await refreshThreads();
+    if (state.route === "chat" && state.activeThreadId === threadId) renderChat();
+    notify(projectId ? "Chat moved to Project." : "Chat moved to Recents.");
+  } catch (error) { notify(error.message); }
+});
+
 async function start() {
   try {
     await refreshThreads();
     const params = new URLSearchParams(location.search);
+    if (params.get("projectFixture") === "matrix") {
+      const fixture = await fetch("/project-fixtures.json").then((response) => response.json());
+      state.fixtureMode = true;
+      state.projects = fixture.projects;
+      state.pinned = fixture.pinned ?? [];
+      state.recents = fixture.recents;
+      state.threads = [...state.pinned, ...fixture.recents, ...fixture.projects.flatMap((project) => project.threads)];
+      updateSidebar();
+    }
     const taskFixtureName = params.get("taskFixture");
     if (taskFixtureName) {
       const fixture = await fetch("/task-fixtures.json").then((response) => response.json());

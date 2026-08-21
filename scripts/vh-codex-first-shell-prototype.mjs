@@ -6,6 +6,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { CodexAppServerClient } from "../packages/codex-adapter/client.mjs";
+import { CodexProjectsAdapter, publicCodexThread } from "../packages/codex-adapter/projects.mjs";
 import { buildTaskContextPacket, startTaskContextThread, taskLinkFromPreview } from "../packages/codex-adapter/task-context.mjs";
 import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
 import { documents, loadRepository } from "../skills/scripts/vh.mjs";
@@ -55,6 +56,7 @@ const assets = new Map([
   ["/app.js", [join(assetRoot, "app.js"), "text/javascript; charset=utf-8"]],
   ["/chat-fixtures.json", [join(assetRoot, "chat-fixtures.json"), "application/json; charset=utf-8"]],
   ["/task-fixtures.json", [join(assetRoot, "task-fixtures.json"), "application/json; charset=utf-8"]],
+  ["/project-fixtures.json", [join(assetRoot, "project-fixtures.json"), "application/json; charset=utf-8"]],
   ["/vibehub-mark.svg", [join(sourceRoot, "assets", "brand", "vibehub-mark.svg"), "image/svg+xml"]],
 ]);
 
@@ -114,18 +116,13 @@ function taskLinkFromThread(thread) {
 
 function publicThread(thread) {
   return {
-    id: thread.id,
+    ...publicCodexThread(thread),
     title: threadTitle(thread),
-    preview: thread.preview,
-    cwd: thread.cwd,
-    createdAt: thread.createdAt,
-    updatedAt: thread.updatedAt,
-    status: thread.status,
-    source: thread.source,
-    forkedFromId: thread.forkedFromId,
     taskLink: taskLinkFromThread(thread),
   };
 }
+
+const projects = new CodexProjectsAdapter({ client, exposeThread: publicThread });
 
 async function listThreads() {
   const result = await client.request("thread/list", {
@@ -133,6 +130,7 @@ async function listThreads() {
     cursor: null,
     cwd: repoRoot,
     limit: 40,
+    sourceKinds: ["cli", "vscode", "appServer"],
     searchTerm: null,
     sortDirection: "desc",
     sortKey: "updated_at",
@@ -275,11 +273,11 @@ function attentionProjection(graph) {
 }
 
 async function bootstrap() {
-  const [account, threads] = await Promise.all([client.accountStatus(), listThreads()]);
+  const [account, projectSnapshot] = await Promise.all([client.accountStatus(), projects.snapshot()]);
   const graph = graphProjection();
   return {
     account,
-    threads,
+    ...projectSnapshot,
     graph,
     contexts: knowledgeProjection(),
     attention: attentionProjection(graph),
@@ -321,6 +319,34 @@ async function action(payload) {
   if (payload.action === "readThread") {
     if (typeof payload.threadId !== "string") throw Object.assign(new Error("threadId required"), { status: 400 });
     return client.request("thread/read", { threadId: payload.threadId, includeTurns: true });
+  }
+  if (payload.action === "createProject") {
+    return projects.createProject(payload.name);
+  }
+  if (payload.action === "renameProject") {
+    return projects.renameProject(payload.projectId, payload.name);
+  }
+  if (payload.action === "deleteProject") {
+    return projects.deleteProject(payload.projectId);
+  }
+  if (payload.action === "moveThread") {
+    if (payload.projectId !== null && typeof payload.projectId !== "string") {
+      throw Object.assign(new Error("projectId must be a Project id or null"), { status: 400 });
+    }
+    return projects.moveThread(payload.threadId, payload.projectId, { beforeThreadId: payload.beforeThreadId ?? null });
+  }
+  if (payload.action === "forkThread") {
+    return projects.forkThread(payload.threadId, { lastTurnId: payload.lastTurnId ?? null });
+  }
+  if (payload.action === "archiveThread") {
+    return projects.archiveThread(payload.threadId);
+  }
+  if (payload.action === "unarchiveThread") {
+    return projects.unarchiveThread(payload.threadId);
+  }
+  if (payload.action === "searchThreads") {
+    if (typeof payload.searchTerm !== "string" || !payload.searchTerm.trim()) return { threads: [] };
+    return { threads: await projects.listThreads({ searchTerm: payload.searchTerm.trim() }) };
   }
   if (payload.action === "startTurn") {
     if (typeof payload.threadId !== "string" || !validInputs(payload.input)) {

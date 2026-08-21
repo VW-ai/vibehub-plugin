@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "codexVersion": "0.147.0",
+    "codexCommit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
+    "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2"
+  },
+  "objects": {
+    "codexProject": {
+      "protocolObject": "ThreadSection",
+      "owner": "Codex app-server",
+      "identity": "opaque server-generated UUIDv7",
+      "fields": ["id", "name"],
+      "membership": "zero or one Thread.section",
+      "operations": ["list", "create", "rename", "delete", "move thread in", "move thread out", "manual thread order"],
+      "not": ["repository cwd", "Codex config project layer", "VibeHub Project"]
+    },
+    "codexPinned": {
+      "protocolObject": "built-in ThreadSection",
+      "owner": "Codex app-server",
+      "identity": "01984de2-8f74-7c91-a3b2-5c5e937cf318",
+      "rule": "Rendered as Pinned, not as a user-created Project; it accepts Thread moves but cannot be renamed or deleted."
+    },
+    "codexChat": {
+      "protocolObject": "Thread",
+      "owner": "Codex app-server",
+      "identity": "Codex Thread.id",
+      "transcript": "Codex Turn and ThreadItem history",
+      "projectMembership": "Thread.section or null",
+      "forkProvenance": "Thread.forkedFromId",
+      "search": "thread/list searchTerm over extracted title in the stable baseline",
+      "standalone": "section is null and the Chat appears in Recents"
+    },
+    "vibehubProject": {
+      "owner": "VibeHub Git-native Context",
+      "identity": "repository Project identity",
+      "contains": ["Task graph", "Project Room tree", "Project Context"],
+      "mappingToCodexProject": "optional explicit association; never name equality"
+    },
+    "vibehubTask": {
+      "owner": "VibeHub Git-native Ticket graph",
+      "identity": "ticket_id",
+      "projectMembership": "zero or one VibeHub Project",
+      "contains": ["Outcome", "Acceptance", "constraints", "Context refs", "Evidence", "Outcome record"],
+      "chatAssociation": "zero or many Codex Threads; one immutable origin locator when born from Chat"
+    },
+    "taskOrigin": {
+      "owner": "VibeHub",
+      "identity": "one immutable locator per born Task",
+      "locator": ["Thread.id", "branch or fork lineage", "exact Turn id or selected Turn range"],
+      "cardinality": "one continuous Chat may birth zero or many independent Tasks",
+      "mutationRule": "moving, renaming, forking or continuing the Chat never moves or rewrites the Task"
+    },
+    "taskRun": {
+      "owner": "selected harness runtime",
+      "codexIdentity": ["Thread.id", "Turn.id"],
+      "rule": "Run completion is not VibeHub Outcome acceptance"
+    }
+  },
+  "uiSemantics": {
+    "Projects": "Codex ThreadSection list",
+    "Pinned": "the built-in immutable Codex ThreadSection is rendered separately from Projects",
+    "Recents": "non-archived Threads returned by thread/list with sectionId explicitly null",
+    "move": "thread/section/move changes only Thread.section and ordering",
+    "fork": "thread/fork creates a new Thread with forkedFromId; the VibeHub adapter then places it in the source section by default and reports a visible unsectioned-Recents fallback if placement fails",
+    "deleteProject": "threadSection/delete atomically returns member Threads to unsectioned Recents",
+    "search": "all-section native Thread query; Task and Context search remain separately typed"
+  },
+  "invariants": [
+    "Codex app-server is the sole transcript and Project-membership authority.",
+    "No browser localStorage, IndexedDB or second chat registry stores membership.",
+    "Codex Project movement never changes Thread.cwd.",
+    "Codex Project movement never changes VibeHub Project, Task, Context, Evidence or Outcome.",
+    "A Chat fork is a Thread lineage edge, not a Subtask or Task dependency.",
+    "Task origin is provenance, not Codex Project membership."
+  ],
+  "migrationAndFailure": {
+    "nativeAvailability": "Pinned Codex 0.147.0 satisfies every required Project-membership method, so no shadow membership store is created.",
+    "schemaDrift": "The adapter stops when a required method or pinned schema hash is missing.",
+    "forkPlacementRace": "If the source Project disappears after fork creation, the new native Thread remains visible in unsectioned Recents with forkedFromId and the adapter reports placement.applied=false.",
+    "upgrade": "Re-probe generated schema and live lifecycle before accepting a new Codex baseline; server-owned identities require no VibeHub migration.",
+    "removal": "Removing VibeHub removes no Codex Project or Thread data because VibeHub stores no membership copy."
+  }
+}

@@ -11,6 +11,7 @@
     "probe:dsh": "node packages/dsh-adapter/probe-source.mjs",
     "probe:dsh-shell": "node packages/dsh-adapter/probe-persistent-shell.mjs",
     "probe:codex": "node packages/codex-adapter/probe-schema.mjs",
+    "probe:codex:projects": "node packages/codex-adapter/probe-projects-live.mjs",
     "probe:codex:dsh": "node packages/codex-adapter/probe-dsh-source.mjs",
     "probe:codex:live": "node packages/codex-adapter/probe-live.mjs",
     "probe:harness:isolation": "node packages/harness-core/probe-package-isolation.mjs",

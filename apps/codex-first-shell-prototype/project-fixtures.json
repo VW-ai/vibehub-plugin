@@ -1,0 +1,83 @@
+{
+  "pinned": [
+    {
+      "id": "fixture-pinned-chat",
+      "title": "Product principles",
+      "preview": "Keep Task truth separate from Chat organization",
+      "cwd": "/workspace/vibehub-plugin",
+      "createdAt": 1787340000,
+      "updatedAt": 1787359900,
+      "recencyAt": 1787359900,
+      "status": { "type": "notLoaded" },
+      "source": "appServer",
+      "forkedFromId": null,
+      "project": { "id": "01984de2-8f74-7c91-a3b2-5c5e937cf318", "name": "Pinned" },
+      "taskLink": null
+    }
+  ],
+  "projects": [
+    {
+      "id": "fixture-project-launch",
+      "name": "Launch VibeHub",
+      "threads": [
+        {
+          "id": "fixture-project-chat",
+          "title": "Prepare developer preview",
+          "preview": "Package the first daily-use build",
+          "cwd": "/workspace/vibehub-plugin",
+          "createdAt": 1787355600,
+          "updatedAt": 1787359200,
+          "recencyAt": 1787359200,
+          "status": { "type": "notLoaded" },
+          "source": "appServer",
+          "forkedFromId": null,
+          "project": { "id": "fixture-project-launch", "name": "Launch VibeHub" },
+          "taskLink": null
+        },
+        {
+          "id": "fixture-project-fork",
+          "title": "Explore onboarding alternative",
+          "preview": "A parallel branch from the preview plan",
+          "cwd": "/workspace/vibehub-plugin",
+          "createdAt": 1787356500,
+          "updatedAt": 1787359800,
+          "recencyAt": 1787359800,
+          "status": { "type": "notLoaded" },
+          "source": "appServer",
+          "forkedFromId": "fixture-project-chat",
+          "project": { "id": "fixture-project-launch", "name": "Launch VibeHub" },
+          "taskLink": null
+        }
+      ]
+    },
+    {
+      "id": "fixture-project-research",
+      "name": "Interaction research",
+      "threads": []
+    }
+  ],
+  "recents": [
+    {
+      "id": "fixture-recent-chat",
+      "title": "Think through a small idea",
+      "preview": "An ordinary Chat with no Project membership",
+      "cwd": "/workspace/scratch",
+      "createdAt": 1787350000,
+      "updatedAt": 1787358600,
+      "recencyAt": 1787358600,
+      "status": { "type": "notLoaded" },
+      "source": "appServer",
+      "forkedFromId": null,
+      "project": null,
+      "taskLink": null
+    }
+  ],
+  "archived": [
+    {
+      "id": "fixture-archived-chat",
+      "title": "Archived exploration",
+      "project": null,
+      "visibleInRecents": false
+    }
+  ]
+}

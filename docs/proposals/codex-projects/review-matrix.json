@@ -1,0 +1,73 @@
+{
+  "reviewedAt": "2026-08-21T23:24:38Z",
+  "baseline": {
+    "codexVersion": "0.147.0",
+    "codexCommit": "be6e8eac029b183056b7e4402879f15d2c85f61b"
+  },
+  "surfaces": [
+    {
+      "source": "deterministic project-fixtures.json visual matrix",
+      "viewport": "1280x720",
+      "theme": "light",
+      "checks": {
+        "pinnedIsSeparateFromProjects": true,
+        "customProjectCount": 2,
+        "projectedChatCount": 2,
+        "unsectionedRecentCount": 1,
+        "emptyProjectIsVisible": true,
+        "forkLineageFixtureIsVisible": true,
+        "archivedFixtureIsAbsent": true,
+        "bodyWidthEqualsScrollWidth": true
+      }
+    },
+    {
+      "source": "deterministic project-fixtures.json visual matrix",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "checks": {
+        "backgroundRgb": "24,24,24",
+        "foregroundRgb": "255,255,255",
+        "projectHierarchyReadable": true,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "source": "deterministic project-fixtures.json visual matrix",
+      "viewport": "390x844",
+      "theme": "light",
+      "checks": {
+        "sidebarOpenWidth": 300,
+        "projectHierarchyReadable": true,
+        "bodyWidthEqualsScrollWidth": true,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "source": "authenticated local Codex app-server",
+      "viewport": "default desktop",
+      "checks": {
+        "nativeRecentsRendered": true,
+        "unsectionedThreadsRemainInRecents": true,
+        "emptyCustomProjectStateRendered": true,
+        "pinnedSectionNotMislabeledAsProject": true,
+        "openingNativeThreadReplaysTranscript": true,
+        "keyboardProjectSelectorPresent": true,
+        "forkControlPresent": true,
+        "archiveControlPresent": true
+      }
+    }
+  ],
+  "interactionCoverage": {
+    "pointerDrag": "implemented against data-project-drop and covered structurally; no user-owned real Thread was mutated during browser review",
+    "keyboardEquivalent": "native select in the Chat header calls the same moveThread action",
+    "liveLifecycle": "probe-projects-live.mjs independently exercises create, move, fork, search, archive, restart, restore, delete and cleanup against authenticated app-server",
+    "fixtureAuthority": "visual only; projectFixture=matrix is visibly isolated and never used by runtime membership"
+  },
+  "downstreamGaps": [
+    "polished pointer insertion and manual reordering",
+    "archived-history browsing",
+    "pagination virtualization for very large Recents lists",
+    "final focus restoration and screen-reader live wording",
+    "final visual token pass"
+  ]
+}

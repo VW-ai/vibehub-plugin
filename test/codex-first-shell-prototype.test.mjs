@@ -14,7 +14,7 @@ test("Codex-first shell uses real app-server ownership and additive VibeHub Task
     source("scripts/vh-codex-first-shell-prototype.mjs"),
     source("docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"),
   ]);
-  for (const label of ["New chat", "Chat", "Tasks", "Rooms", "Project", "Appearance", "Search", "Task inbox", "Recent chats"]) assert.match(html, new RegExp(label, "i"));
+  for (const label of ["New chat", "Chat", "Tasks", "Rooms", "Projects", "Appearance", "Search", "Task inbox", "Recents"]) assert.match(html, new RegExp(label, "i"));
   for (const request of ["thread/list", "thread/read", "thread/start", "thread/resume", "turn/start", "turn/steer", "turn/interrupt"]) assert.match(server, new RegExp(request.replace("/", "\\/")));
   for (const event of ["turn/started", "turn/completed", "serverRequest"]) assert.match(server + script, new RegExp(event.replace("/", "\\/")));
   assert.match(server, /buildTicketHandoff/);
@@ -30,6 +30,42 @@ test("Codex-first shell uses real app-server ownership and additive VibeHub Task
   assert.match(review, /Codex owns Threads, Turns, tools, approvals and execution/);
   assert.doesNotMatch(html + script, /DeepSeek|native DSH|DSH Session/);
   assert.doesNotMatch(html + script + server, /localStorage|sessionStorage|sqlite/i);
+});
+
+test("Projects, unprojected Recents, drag, keyboard move, and Fork use the native Codex adapter", async () => {
+  const [html, script, css, server, adapter, research, contractText, fixtureText] = await Promise.all([
+    source("apps/codex-first-shell-prototype/index.html"),
+    source("apps/codex-first-shell-prototype/app.js"),
+    source("apps/codex-first-shell-prototype/app.css"),
+    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("packages/codex-adapter/projects.mjs"),
+    source("docs/CODEX_PROJECTS_RECENTS_PARITY_RESEARCH.md"),
+    source("docs/proposals/codex-projects/project-object-contract.json"),
+    source("apps/codex-first-shell-prototype/project-fixtures.json"),
+  ]);
+  const contract = JSON.parse(contractText);
+  const fixture = JSON.parse(fixtureText);
+  assert.equal(contract.objects.codexProject.protocolObject, "ThreadSection");
+  assert.equal(contract.uiSemantics.Recents, "non-archived Threads returned by thread/list with sectionId explicitly null");
+  assert.equal(contract.objects.vibehubTask.owner, "VibeHub Git-native Ticket graph");
+  assert.match(adapter, /sectionId: null/);
+  for (const method of ["threadSection/list", "threadSection/create", "threadSection/update", "threadSection/delete", "thread/section/move", "thread/fork", "thread/archive", "thread/unarchive"]) assert.match(adapter, new RegExp(method.replace("/", "\\/")));
+  for (const action of ["createProject", "renameProject", "deleteProject", "moveThread", "forkThread", "archiveThread", "searchThreads"]) assert.match(server, new RegExp(action));
+  assert.match(html, /id="projectList"/);
+  assert.match(html, /data-project-drop="recent"/);
+  assert.match(script, /text\/x-vibehub-thread/);
+  assert.match(script, /data-toggle-project/);
+  assert.match(script, /id="activeThreadProject"/);
+  assert.match(script, /data-fork-thread/);
+  assert.match(script, /data-archive-thread/);
+  assert.match(css, /\.project-group\.drag-over/);
+  assert.match(css, /\.thread-actions/);
+  assert.equal(fixture.projects[0].threads[1].forkedFromId, "fixture-project-chat");
+  assert.equal(fixture.pinned[0].project.id, "01984de2-8f74-7c91-a3b2-5c5e937cf318");
+  assert.equal(fixture.recents[0].project, null);
+  assert.equal(fixture.archived[0].visibleInRecents, false);
+  for (const sourceUrl of ["codex-rs/app-server/README.md", "thread_data.rs", "thread_sections.rs", "thread_metadata_update.rs"]) assert.match(research, new RegExp(sourceUrl.replaceAll(".", "\\.")));
+  assert.doesNotMatch(html + script + server + adapter, /localStorage|sessionStorage|indexedDB/i);
 });
 
 test("Search, Task attention, and object semantics are explicit and source-backed", async () => {
@@ -249,6 +285,9 @@ test("Codex-first prototype host is loopback-only, bounded, and connected to the
   const taskFixtures = await fetch(new URL("task-fixtures.json", url));
   assert.equal(taskFixtures.status, 200);
   assert.equal((await taskFixtures.json()).ticketId, "ticket-review-task-workspace");
+  const projectFixtures = await fetch(new URL("project-fixtures.json", url));
+  assert.equal(projectFixtures.status, 200);
+  assert.equal((await projectFixtures.json()).projects[0].name, "Launch VibeHub");
   const exit = once(child, "exit");
   child.kill("SIGTERM");
   await exit;

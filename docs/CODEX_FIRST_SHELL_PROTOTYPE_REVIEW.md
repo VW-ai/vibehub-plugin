@@ -19,7 +19,9 @@ reviewing the prototype is read-only.
 
 The ordinary path should feel familiar to a Codex user:
 
-- persistent sidebar, Chat-default landing, `New chat`, and semantically exact Recent chats;
+- persistent sidebar, Chat-default landing, native Projects, and semantically exact unprojected Recents;
+- drag or keyboard-equivalent Chat movement, native Project create/rename/delete,
+  native Fork lineage, and archive/restart recovery;
 - typed `⌘K` Search across Codex Threads, VibeHub Tasks, and durable Context;
 - a quiet Task Inbox for current Needs You boundaries and successful Outcome history;
 - real Codex Thread history and restart recovery;
@@ -38,24 +40,29 @@ Agent loop or Task database.
 
 ## Review path
 
-1. Open the prototype and confirm it lands on ordinary Chat while existing
-   Project Threads appear under **Recent chats** from the real Codex app-server.
-2. Open an existing Thread and inspect its persisted Turns, tools and output.
-3. Start a new Codex Chat, send a text Turn, observe real streaming, and
+1. Open the prototype and confirm it lands on ordinary Chat. Native Codex
+   Thread Sections appear as **Projects**, while only Threads with no section
+   membership appear under **Recents**.
+2. Drag a Recent Chat into a Project, then use the Chat-header Project selector
+   to move it back. Fork it and confirm the new Chat retains native lineage and
+   appears in the source Project. Project creation, rename and deletion use the
+   same server-owned identities; deleting a Project returns its Chats to Recents.
+3. Open an existing Thread and inspect its persisted Turns, tools and output.
+4. Start a new Codex Chat, send a text Turn, observe real streaming, and
    interrupt it if desired.
-4. Attach an image or record voice. The microphone becomes live only after the
+5. Attach an image or record voice. The microphone becomes live only after the
    browser grants access; the resulting recording is sent as ordinary Codex
    `audio` input. Realtime conversation is not claimed by this build.
-5. Use `⌘K` Search and confirm Chats, Tasks, and Context remain visibly grouped
+6. Use `⌘K` Search and confirm Chats, Tasks, and Context remain visibly grouped
    and open their exact owning objects. Open the bell and confirm Running is not
    treated as notification activity.
-6. Open Tasks. Select a graph card and inspect the canonical Task Context,
+7. Open Tasks. Select a graph card and inspect the canonical Task Context,
    Acceptance, proof posture and Recommended action.
-7. On an executable Task, select **Start in Codex**. The exact host-owned Task
+8. On an executable Task, select **Start in Codex**. The exact host-owned Task
    handoff becomes the first input of one real Codex Thread. Return to the Task
    and confirm the linked Thread is discoverable without browser storage.
-8. Switch System → Light → Dark and repeat the Chat, Search, Inbox, Graph and Task loop.
-9. Review at a wide desktop size and 390×844. Confirm keyboard focus, sidebar
+9. Switch System → Light → Dark and repeat the Chat, Search, Inbox, Graph and Task loop.
+10. Review at a wide desktop size and 390×844. Confirm keyboard focus, sidebar
    drawer behavior, no horizontal overflow and reduced-motion behavior.
 
 ## Current composition
@@ -68,6 +75,9 @@ bell and bounded Needs You Sidebar group return important Tasks to the Human;
 ordinary Running progress stays inspectable without becoming notification
 noise. Selecting a Task replaces the center column with its focused Workspace.
 Opening its linked Thread returns to normal Codex Chat inside the same shell.
+The user-facing Codex Project is the app-server's native `ThreadSection`; it is
+not a VibeHub Project, repository cwd, Room tree, Task, or implicit Context
+authority. Moving a Chat changes none of those VibeHub objects.
 
 This is intentionally reviewable rather than final. The protected downstream
 decision chooses:
