@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "codex-project-and-thread-capabilities-are-source-audited",
+    "project-chat-task-object-mapping-is-explicit",
+    "projects-recents-and-fork-prototype-is-real",
+    "unsupported-native-membership-has-truthful-adapter-boundary"
+  ],
+  "closed_at": "2026-08-21T23:40:54Z",
+  "evidence_ids": [
+    "codex-project-contract-and-live-lifecycle-proof",
+    "codex-projects-recents-shell-and-review-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "partial",
+  "summary": "Strict independent re-adjudication at exact Evidence commit be0745126dafc32f1f5549102aade9267185fca7 accepts the source audit, object mapping, real lifecycle prototype and truthful native-membership adapter boundary, but cannot accept project-parity-review-is-decision-ready. The criterion explicitly requires browser review to cover pointer drag plus keyboard-equivalent move and focus return. The checked-in review matrix says pointer drag was only covered structurally and that no real Thread was dragged during browser review; its own downstreamGaps list says final focus restoration remains undone. Source inspection confirms that openThread calls updateSidebar before setRoute, replacing the clicked Thread button without subsequently focusing the active Chat or Composer; the Project-selector change path likewise refreshes and rerenders the Chat without preserving or restoring the selector focus. Independent browser reproduction against the exact snapshot opened a real Thread and observed document.activeElement as BODY afterward. The focused project/prototype suite passes 13 of 13 when allowed to start the local authenticated app-server, but its drag assertion only searches source strings and CSS hooks and therefore does not prove an end-to-end pointer gesture or focus return. To close the remaining criterion truthfully, add deterministic browser tests and recorded review that actually move a temporary Thread by pointer and keyboard paths, preserve or deliberately restore focus after opening and after membership rerender, and verify those behaviors at the required wide, narrow, Light and Dark surfaces.",
+  "ticket_id": "ticket-research-codex-project-and-recent-chat-parity",
+  "unresolved_acceptance_ids": [
+    "project-parity-review-is-decision-ready"
+  ]
+}
