@@ -1,0 +1,21 @@
+{
+  "accepted_acceptance_ids": [
+    "codex-parity-floor-is-traversable",
+    "vibehub-task-layer-is-additive",
+    "light-and-dark-baseline-is-reviewable",
+    "wide-narrow-and-accessible-loop-is-real",
+    "owner-review-pack-is-exact"
+  ],
+  "closed_at": "2026-08-21T06:20:44Z",
+  "evidence_ids": [
+    "codex-first-real-runtime-and-task-loop-proof",
+    "codex-first-light-dark-wide-narrow-browser-proof",
+    "codex-first-owner-review-pack-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout in a fresh isolated worktree at exact implementation commit 8ef9463d41eb78e11c606c9df319f482f2183dde accepts all five criteria. Source and runtime inspection confirmed one real local Codex app-server, persisted Thread and Turn APIs, bounded event and approval routing, ordinary image and audio inputs with no realtime claim, exact host-owned Task handoff, the canonical 18-Ticket and 17-edge graph, focused Task Context, Acceptance, Evidence, Outcome and Recommended action surfaces, no DSH ordinary path, and no browser-local or second Task store. The checked-in review pack identifies the protected shell, landing, Chat-to-Task, Task-to-Thread, Composer, voice, carrier, known-gap, DSH compatibility and production boundaries. The canonical browser Evidence records the real wide, 390x844, theme, traversal, overflow, focus-restoration and console checks; this closeout did not claim a new browser run because no independent browser-control binding was available, but corroborated those records against the exact DOM, responsive CSS, focus handlers and runtime implementation. Focused verification passed 21 of 21, full verification passed 161 with zero failures and one expected opt-in DSH-source skip, artifact verification passed, the isolated read-only host returned authenticated Codex capability and the exact Task handoff, all Rooms were fresh, and canonical Ticket and Project validation passed.",
+  "ticket_id": "ticket-prototype-codex-first-vibehub-shell",
+  "unresolved_acceptance_ids": []
+}
