@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f7f7f5">
+  <title>VibeHub × DSH · Persistent shell prototype</title>
+  <link rel="icon" type="image/svg+xml" href="/vibehub-mark.svg">
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="review-strip" role="region" aria-label="Prototype review controls">
+    <div>
+      <strong>Persistent shell prototype</strong>
+      <span>DSH rc.8 · disposable state · not production UI</span>
+    </div>
+    <div class="variant-switch" role="group" aria-label="Sidebar hierarchy variant">
+      <button class="active" type="button" data-variant="tasks-first">A · Tasks first</button>
+      <button type="button" data-variant="chat-first">B · Chat first</button>
+    </div>
+    <button class="review-button" id="reviewNotes" type="button">Review notes</button>
+  </div>
+
+  <div class="app-frame" id="appFrame" data-variant="tasks-first">
+    <aside class="sidebar" aria-label="Application navigation">
+      <header class="brand-row">
+        <button class="brand" type="button" data-route="chat" aria-label="Start a new chat">
+          <img src="/vibehub-mark.svg" alt="">
+          <span><strong>VibeHub</strong><small>on DeepSeek Harness</small></span>
+        </button>
+        <button class="icon-button" id="collapseSidebar" type="button" aria-label="Collapse sidebar">⌫</button>
+      </header>
+
+      <button class="new-chat" type="button" data-route="chat"><span class="nav-icon">＋</span><span>New chat</span><kbd>⌘ N</kbd></button>
+
+      <nav class="primary-nav" aria-label="Primary destinations">
+        <button class="active" type="button" data-route="tasks"><span class="nav-icon graph-icon">⌘</span><span>Tasks</span><small>8</small></button>
+        <button type="button" data-route="rooms"><span class="nav-icon">◇</span><span>Rooms</span><small>4</small></button>
+      </nav>
+
+      <section class="project-block">
+        <header><span>Workspace</span><button type="button" aria-label="Workspace options">•••</button></header>
+        <button class="workspace-row" type="button"><span class="workspace-dot"></span><span><strong>vibehub-plugin</strong><small>codex/dsh-product-shell</small></span><span>⌄</span></button>
+      </section>
+
+      <section class="sidebar-section task-shortcuts" aria-labelledby="taskSectionTitle">
+        <header><span id="taskSectionTitle">Task focus</span><button type="button" data-route="tasks">View graph</button></header>
+        <button type="button" data-task="prototype"><span class="phase-dot running"></span><span><strong>Prototype persistent shell</strong><small>Verifying</small></span></button>
+        <button type="button" data-task="decision"><span class="phase-dot draft"></span><span><strong>Choose navigation direction</strong><small>Blocked</small></span></button>
+      </section>
+
+      <section class="sidebar-section chat-history" aria-labelledby="chatSectionTitle">
+        <header><span id="chatSectionTitle">Chats</span><button type="button" aria-label="Search chats">⌕</button></header>
+        <button type="button" data-route="chat" data-chat="harness"><span><strong>Harness product direction</strong><small>Now · 3 branches</small></span></button>
+        <button type="button" data-route="chat" data-chat="release"><span><strong>Open-source launch</strong><small>Yesterday</small></span></button>
+        <button type="button" data-route="chat" data-chat="context"><span><strong>Cross-project Context</strong><small>Mon</small></span></button>
+      </section>
+
+      <footer class="sidebar-footer">
+        <button type="button" data-route="settings"><span class="nav-icon">⚙</span><span>Settings</span></button>
+        <button class="profile" type="button"><span class="avatar">W</span><span><strong>Wayne</strong><small>Local profile</small></span></button>
+      </footer>
+    </aside>
+
+    <main class="main-column">
+      <header class="main-header">
+        <div class="mobile-leading">
+          <button class="icon-button" id="openSidebar" type="button" aria-label="Open navigation">☰</button>
+        </div>
+        <div class="route-title">
+          <button class="back-button" id="backToGraph" type="button" hidden>← Tasks</button>
+          <div><strong id="routeTitle">Tasks</strong><small id="routeMeta">Current graph · vibehub-plugin</small></div>
+        </div>
+        <div class="header-actions">
+          <button type="button" id="chatAction" hidden>Open Chat</button>
+          <button type="button" aria-label="Search">⌕</button>
+          <button type="button" aria-label="More actions">•••</button>
+        </div>
+      </header>
+
+      <section class="main-surface" id="surface" aria-live="polite"></section>
+
+      <div class="composer-wrap" id="composerWrap" hidden>
+        <form class="composer" id="composer">
+          <textarea id="composerInput" rows="2" aria-label="Message DeepSeek Harness" placeholder="Describe what you want to build"></textarea>
+          <div class="composer-toolbar">
+            <div><button type="button" aria-label="Add reference">＋</button><button type="button">Workspace Write</button></div>
+            <div><button type="button">DeepSeek-V4</button><button class="send" type="submit" aria-label="Send message">↑</button></div>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="review-panel" id="reviewPanel" hidden inert aria-labelledby="reviewTitle">
+    <header><div><small>Owner decision pack</small><h2 id="reviewTitle">Persistent shell composition</h2></div><button type="button" data-close-panel>Close</button></header>
+    <section>
+      <span class="section-label">Recommendation</span>
+      <h3>A · Tasks first</h3>
+      <p>Keep the rc.8 Root and Conversation owners. Replace only the Sidebar owner through the official single slot, recreate every stock child seat, and add Tasks as a stable destination above native Session history. Graph and Task Workspace live in the center column; native Chat remains a first-class route.</p>
+    </section>
+    <section>
+      <span class="section-label">Bounded alternative</span>
+      <h3>B · Chat first</h3>
+      <p>Use the same composition seam but land on native Chat and place Tasks below the Workspace section. Lower product disruption, weaker Task-first posture. The Graph-to-Task Focus Route remains unchanged.</p>
+    </section>
+    <section>
+      <span class="section-label">Supported DSH boundary</span>
+      <ul>
+        <li><strong>Keep:</strong> <code>root</code>, <code>conversation</code>, <code>details</code>, native composer and Session services.</li>
+        <li><strong>Shadow deliberately:</strong> the single <code>sidebar</code> owner only.</li>
+        <li><strong>Recreate:</strong> brand mark/name, workspace browser, settings and footer action child seats.</li>
+        <li><strong>Use additively:</strong> conversation actions, message actions, input controls and Theme tokens.</li>
+        <li><strong>Reject:</strong> ordinary content in <code>shell.overlay</code>, DOM injection, synthetic Sessions and Root replacement.</li>
+      </ul>
+    </section>
+    <section>
+      <span class="section-label">Owner choices after review</span>
+      <ol>
+        <li>Tasks-first or Chat-first default landing?</li>
+        <li>Tasks above Workspace, or inside the Workspace group?</li>
+        <li>Focus Route as shown, including exact Graph viewport restoration?</li>
+        <li>Native Chat as a route plus a Task-scoped conversation drawer?</li>
+      </ol>
+    </section>
+  </aside>
+
+  <div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+</body>
+</html>

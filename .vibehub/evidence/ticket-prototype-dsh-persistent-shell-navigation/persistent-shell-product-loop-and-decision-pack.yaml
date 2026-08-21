@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "persistent-shell-information-architecture-is-reviewable",
+    "chat-graph-task-loop-is-complete",
+    "owner-decision-pack-is-exact"
+  ],
+  "evidence_id": "persistent-shell-product-loop-and-decision-pack",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T03:49:06Z",
+  "refs": [
+    "apps/dsh-persistent-shell-prototype/index.html",
+    "apps/dsh-persistent-shell-prototype/app.js",
+    "apps/dsh-persistent-shell-prototype/app.css",
+    "docs/DSH_PERSISTENT_SHELL_REVIEW.md",
+    "docs/proposals/dsh-persistent-shell/composition-contract.json",
+    "test/dsh-persistent-shell-prototype.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The production-shaped review carrier keeps one persistent DSH/Codex-like sidebar across native Chat, Tasks Graph and focused Task Workspace, with New Chat, Chat history, Workspace, Task focus, Rooms, Settings and profile continuously available. A clean browser run traversed native Chat to Tasks, the canonical Graph, the selected Task Workspace, Recommended action, Needs You and owner choice, then returned to the exact prior Graph focus. Variant A is the explicit Tasks-first recommendation and Variant B is the bounded Chat-first alternative; the checked-in review guide states default landing, hierarchy, Focus Route, exact DSH composition, tradeoffs, fallback and the precise owner decisions required before production implementation.",
+  "ticket_id": "ticket-prototype-dsh-persistent-shell-navigation"
+}

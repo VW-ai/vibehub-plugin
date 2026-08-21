@@ -1,0 +1,41 @@
+{
+  "context_id": "constraint-dsh-persistent-task-navigation-requires-sidebar-owner-composition",
+  "detail": "The pinned DSH rc.8 Root declares sidebar as a single-owner slot. Stock SidebarRoot owns New Session and declares brand mark, brand name, workspace browser, settings, and footer-action child seats. The only additive sidebar seat is footer action, which cannot truthfully carry the primary Tasks destination at the bottom. Therefore a production persistent VibeHub navigation must either accept that inferior footer placement or shadow the Sidebar owner through official composition, preserve native New Session and collapse behavior, and recreate all five child seats. Root, Conversation, Details, native composer, Session and Workspace services remain stock. If those seats or native behavior cannot be preserved, implementation must stop rather than inject DOM or fork upstream.",
+  "evidence": [
+    {
+      "note": "The production-shaped composition contract records the exact keep, shadow, recreate, additive, forbidden, and stop-condition boundaries.",
+      "ref": "docs/proposals/dsh-persistent-shell/composition-contract.json"
+    },
+    {
+      "note": "The exact-source probe binds the contract to official commit 141eb6fef83422698aef7a981029e843e8161534.",
+      "ref": "packages/dsh-adapter/probe-persistent-shell.mjs"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-dsh-shell-with-vibehub-task-pages",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T03:45:00Z",
+    "ref": "execution:ticket-prototype-dsh-persistent-shell-navigation"
+  },
+  "state": "active",
+  "summary": "On DSH rc.8, a stable top-level Tasks destination requires deliberate Sidebar-owner composition because no additive top-level sidebar navigation seat exists",
+  "tags": [
+    "deepseek-harness",
+    "navigation",
+    "plugin",
+    "sidebar",
+    "slots",
+    "stop-condition"
+  ],
+  "type": "constraint"
+}

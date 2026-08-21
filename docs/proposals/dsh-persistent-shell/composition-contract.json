@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "status": "proposal",
+  "upstream": {
+    "package": "@deepseek-ai/dsh@0.1.0-rc.8",
+    "commit": "141eb6fef83422698aef7a981029e843e8161534",
+    "runtime": "^22.19.0 || >=24.0.0"
+  },
+  "product_invariant": "One persistent DSH shell contains native Chat, Sessions, Tasks, the Task Graph and focused Task Workspaces; VibeHub never appears as a nested application.",
+  "recommended_variant": "tasks-first",
+  "variants": [
+    {
+      "id": "tasks-first",
+      "default_route": "tasks",
+      "sidebar_order": ["new-chat", "tasks", "rooms", "workspace", "task-focus", "chat-history", "settings"],
+      "reason": "VibeHub manages work to completion, so committed Tasks deserve the primary stable destination while normal Chat remains one click away."
+    },
+    {
+      "id": "chat-first",
+      "default_route": "chat",
+      "sidebar_order": ["new-chat", "tasks", "rooms", "workspace", "chat-history", "task-focus", "settings"],
+      "reason": "Lower-disruption fallback for DSH users who expect native Chat on first boot; the same Tasks destination and Focus Route remain available."
+    }
+  ],
+  "composition": {
+    "keep_owners": ["root", "conversation", "details"],
+    "shadow_owners": ["sidebar"],
+    "recreate_child_slots": [
+      "sidebar.brand.mark",
+      "sidebar.brand.name",
+      "sidebar.workspaces",
+      "sidebar.settings",
+      "sidebar.footer.action"
+    ],
+    "additive_slots": [
+      "conversation.session.header.actions",
+      "conversation.chat.assistant-actions",
+      "conversation.chat.turnTail",
+      "conversation.input.left",
+      "conversation.input.right",
+      "conversation.input.dock"
+    ],
+    "services": ["layout", "sessions", "workspaces", "conversation", "theme"],
+    "forbidden": [
+      "ordinary full-page content in shell.overlay",
+      "DOM injection",
+      "upstream fork",
+      "synthetic Session for the global Task Graph",
+      "second Task database",
+      "Root replacement for styling"
+    ]
+  },
+  "surface_map": [
+    {
+      "surface": "persistent navigation",
+      "dsh_seam": "sidebar single owner",
+      "strategy": "shadow",
+      "reason": "Stock rc.8 exposes no additive top-level destination seat; a stable Tasks destination cannot be inserted through sidebar.footer.action without placing primary navigation at the foot."
+    },
+    {
+      "surface": "native Chat and composer",
+      "dsh_seam": "conversation single owner and its child slots",
+      "strategy": "preserve",
+      "reason": "Native Session, models, tools, approvals, input state and composer remain the trusted Chat implementation."
+    },
+    {
+      "surface": "Task Graph",
+      "dsh_seam": "center-column product route selected by the shadow sidebar",
+      "strategy": "compose",
+      "reason": "A global Task Graph must not pretend to be a Session conversation.view and must not use shell.overlay as a scrolling page."
+    },
+    {
+      "surface": "focused Task Workspace",
+      "dsh_seam": "center-column Focus Route with optional native Session association",
+      "strategy": "compose",
+      "reason": "Execution, attention and Evidence need a full center surface while the sidebar remains visible and Back restores exact Graph focus."
+    },
+    {
+      "surface": "Task actions in Chat",
+      "dsh_seam": "conversation header, assistant action, turn-tail and composer slots",
+      "strategy": "additive",
+      "reason": "Create, attach and remember controls belong beside native Chat rather than in a parallel transcript UI."
+    },
+    {
+      "surface": "whole-application visual continuity",
+      "dsh_seam": "Theme Runtime tokens",
+      "strategy": "additive",
+      "reason": "Theme is the supported reskin mechanism; Root replacement is not a styling shortcut."
+    }
+  ],
+  "source_bindings": [
+    {
+      "file": "packages/client/ui-layout/src/client/index.ts",
+      "facts": ["root declares sidebar, conversation, details and shell.overlay", "sidebar and conversation are single-owner", "shell.overlay is an additive list"]
+    },
+    {
+      "file": "packages/client/ui-layout/src/client/AppFrame.tsx",
+      "facts": ["sidebar and conversation occupy fixed columns", "shell.overlay renders outside scroll containers", "narrow layout owns sidebar collapse"]
+    },
+    {
+      "file": "packages/client/ui-sidebar/src/client/index.ts",
+      "facts": ["stock SidebarRoot occupies sidebar", "SidebarRoot declares five child seats", "shadowing SidebarRoot removes those declarations unless recreated"]
+    },
+    {
+      "file": "packages/client/ui-sidebar/src/client/SidebarRoot.tsx",
+      "facts": ["native New Session remains shell-owned", "workspace browser fills the middle region", "settings and footer actions remain bottom-pinned"]
+    },
+    {
+      "file": "packages/client/ui-conversation/src/client/contract/slots.ts",
+      "facts": ["native Chat exposes additive message and composer seats", "conversation.view is Session-scoped", "composer survives the no-session to session transition"]
+    }
+  ],
+  "scenario_path": [
+    "first boot",
+    "normal native Chat",
+    "return to an existing Chat",
+    "open Tasks",
+    "scan causal Graph",
+    "select a Task",
+    "Focus Route into Task Workspace",
+    "use Recommended action",
+    "steer through native Chat",
+    "resolve Needs You",
+    "inspect execution and Evidence",
+    "return to exact Graph focus"
+  ],
+  "runtime_truth": {
+    "task_phase_source": "canonical VibeHub next_action and Outcome projection",
+    "live_presence_source": "unexpired trusted DSH Session observation scoped to the same Ticket and Run",
+    "closeout": "CLOSE_OUT may display as Running / Verifying but never claims a live Agent without trusted presence",
+    "writes": "The prototype is static, local-only and performs no repository write."
+  },
+  "stop_conditions": [
+    "The sidebar owner cannot recreate every stock child seat without losing native Session, Workspace or Settings behavior.",
+    "A global Task route requires a synthetic Session or DOM injection.",
+    "The selected composition requires Root replacement only to apply visual styling.",
+    "Narrow navigation cannot preserve native composer, approvals and exact Focus Route return.",
+    "An upstream change breaks any bound source fact without a passing version-specific probe."
+  ],
+  "human_decision": {
+    "required": true,
+    "questions": [
+      "Use Tasks-first or Chat-first default landing?",
+      "Place Tasks above Workspace or inside the Workspace section?",
+      "Accept Focus Route with exact Graph focus restoration?",
+      "Keep native Chat as a route plus Task-scoped steering rather than a permanent split?"
+    ]
+  }
+}

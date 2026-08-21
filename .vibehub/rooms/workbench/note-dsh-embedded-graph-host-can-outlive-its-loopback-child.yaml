@@ -1,0 +1,37 @@
+{
+  "context_id": "note-dsh-embedded-graph-host-can-outlive-its-loopback-child",
+  "detail": "Dogfood on the packed rc.8 Profile showed the DSH shell and VibeHub bootstrap still available while the iframe Graph URL returned connection refused. Restarting the Profile created a working Graph host again. This does not invalidate the canonical Graph or Task-to-Session loop, but production integration must own the child Graph host for the full Profile lifecycle, refresh the bootstrap identity after host replacement, or remove the child-host boundary. A visual fallback must not claim the Graph is available when the loopback process is gone.",
+  "evidence": [
+    {
+      "note": "The real packed Profile visibly rendered 127.0.0.1 refused to connect inside the Tasks overlay while the native DSH shell remained loaded.",
+      "ref": "conversation:2026-08-21-current-dsh-overlay-browser-reproduction"
+    },
+    {
+      "note": "The review report preserves the failure and its production lifecycle boundary rather than treating it as a Graph design defect.",
+      "ref": "docs/DSH_PERSISTENT_SHELL_REVIEW.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-local-graph-ui-first-class",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T03:45:00Z",
+    "ref": "dogfood:real-dsh-profile-56236-graph-host-refused"
+  },
+  "state": "active",
+  "summary": "The current DSH overlay can retain a stale Graph iframe URL after its loopback child host exits, and restart is the observed recovery",
+  "tags": [
+    "deepseek-harness",
+    "dogfood",
+    "graph",
+    "iframe",
+    "lifecycle",
+    "loopback"
+  ],
+  "type": "note"
+}

@@ -22,6 +22,10 @@
         "path": "docs/DEEPSEEK_HARNESS_V1.md"
       },
       {
+        "blob": "50df858473255da7ce5584eba2936fb8df4e9e7e",
+        "path": "docs/DSH_PERSISTENT_SHELL_REVIEW.md"
+      },
+      {
         "blob": "e968b861000d86fe1e0a615ab4473af24640742f",
         "path": "docs/HARNESS_CHAT_V1_REVIEW.md"
       },
@@ -154,6 +158,10 @@
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
+        "blob": "d1c8e663603c345a32fff971963642eb735f8190",
+        "path": "docs/proposals/dsh-persistent-shell/composition-contract.json"
+      },
+      {
         "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
         "path": "docs/proposals/rooms-workbench/README.md"
       },
@@ -174,8 +182,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T01:16:58.151Z",
-    "last_aligned_commit": "b42782ec0329d29f02930531573605b75f3c29c9"
+    "checked_at": "2026-08-21T03:48:52.233Z",
+    "last_aligned_commit": "a3a23dca81a178971ba737f2eff82c92c87bf55d"
   },
   "anchors": [
     "CHANGELOG.md",
