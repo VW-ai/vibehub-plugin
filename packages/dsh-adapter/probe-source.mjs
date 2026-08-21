@@ -105,6 +105,26 @@ const checks = [
     adapterPatterns: ["connection.session.command(`/vibehub-task ${encoded}`)"],
   },
   {
+    seam: "native-session-search-and-fork",
+    file: "packages/client/runtime/src/client/contract/sessions.ts",
+    patterns: ["search(", "fork(opts: { sessionId: SessionId", "Promise<SessionId>"],
+    adapterFile: "harness.mjs",
+    adapterPatterns: ["sessions.search(input.query", "sessions.fork({ sessionId: input.conversationId"],
+  },
+  {
+    seam: "native-session-interruption",
+    file: "packages/client/runtime/src/client/contract/session.ts",
+    patterns: ["cancel(): Promise<RpcResult<{", "accepted: true"],
+    adapterFile: "harness.mjs",
+    adapterPatterns: ["binding(input.conversationId).cancel()"],
+  },
+  {
+    seam: "native-prompt-image-and-audio-boundary",
+    file: "packages/host/apiproxy/src/api/sessions.ts",
+    patterns: ["export type PromptContentPart", "type: 'text'", "type: 'image'"],
+    forbiddenPatterns: ["type: 'audio'"],
+  },
+  {
     seam: "registered-command-lifecycle",
     file: "packages/interaction/commands/src/index.ts",
     patterns: ["'command/run'", "'command/done'", "recordInput", "without sending it to the model"],
@@ -131,6 +151,26 @@ const checks = [
     adapterPatterns: ["customSkillDirs:", "skills"],
   },
   {
+    seam: "native-tool-runtime",
+    file: "packages/core/tools/src/index.ts",
+    patterns: ["export class ToolRuntime", "register(", "'tools/pre-execute'", "'tools/execute'", "'tools/post-execute'"],
+  },
+  {
+    seam: "native-approval-runtime",
+    file: "packages/interaction/user-approval/src/index.ts",
+    patterns: ["export class ApprovalService", "'approval/request'", "'approval/asked'", "'approval/decided'"],
+  },
+  {
+    seam: "native-permission-presets",
+    file: "packages/interaction/permission-presets/src/index.ts",
+    patterns: ["export class PermissionPresetService", "sandbox: 'workspace-write', approval: 'ask'", "name: 'permission'"],
+  },
+  {
+    seam: "native-delegated-work",
+    file: "packages/bundle/base/package.json",
+    patterns: ["@deepseek-ai/dsh-tool-subagent", "@deepseek-ai/dsh-subagent-fork-in-process", "@deepseek-ai/dsh-tool-subagent-control"],
+  },
+  {
     seam: "web-route-and-port-contract",
     file: "packages/host/webserver/src/index.ts",
     patterns: ["get port(): number", "register(route: WebRoute)", "registerFallback"],
@@ -152,11 +192,31 @@ const checks = [
     adapterPatterns: ["--dsw-alias-bg-base", "--dsw-alias-label-primary"],
   },
   {
+    seam: "native-theme-runtime",
+    file: "packages/client/ui-theme/src/client/index.ts",
+    patterns: ["export class ThemeRuntime", "setTheme(id: string)", "overrideTokens(source: string", "getTheme(): ThemeSnapshot"],
+  },
+  {
     seam: "native-four-surface-composition",
     file: "packages/bundle/web-app/cordis.patch.yml",
     patterns: ["@deepseek-ai/dsh-client-ui-conversation", "@deepseek-ai/dsh-client-ui-layout", "@deepseek-ai/dsh-client-runtime"],
     adapterFile: "../dsh-bundle/package.json",
     adapterPatterns: ["@deepseek-ai/dsh-client-runtime", "@deepseek-ai/dsh-client-ui-layout", "@deepseek-ai/dsh-client-ui-conversation"],
+  },
+  {
+    seam: "base-package-has-no-codex-runtime",
+    file: "packages/bundle/base/package.json",
+    patterns: ["@deepseek-ai/dsh-agent-loop", "@deepseek-ai/dsh-tools", "@deepseek-ai/dsh-user-approval"],
+    forbiddenPatterns: ["@openai/codex"],
+  },
+  {
+    seam: "web-package-has-no-codex-runtime",
+    file: "packages/bundle/web-app/package.json",
+    patterns: ["@deepseek-ai/dsh-client-runtime", "@deepseek-ai/dsh-client-ui-conversation", "@deepseek-ai/dsh-client-ui-theme"],
+    forbiddenPatterns: ["@openai/codex"],
+    adapterFile: "package.json",
+    adapterPatterns: ["@deepseek-ai/dsh"],
+    adapterForbiddenPatterns: ["@openai/codex"],
   },
 ];
 
@@ -164,18 +224,23 @@ const results = [];
 for (const check of checks) {
   const text = await readFile(join(sourceRoot, check.file), "utf8");
   const missing = check.patterns.filter((pattern) => !text.includes(pattern));
+  const forbidden = (check.forbiddenPatterns ?? []).filter((pattern) => text.includes(pattern));
   const adapterText = check.adapterFile
     ? await readFile(resolve(adapterRoot, check.adapterFile), "utf8")
     : "";
   const missingUsage = (check.adapterPatterns ?? [])
     .filter((pattern) => !adapterText.includes(pattern));
+  const forbiddenUsage = (check.adapterForbiddenPatterns ?? [])
+    .filter((pattern) => adapterText.includes(pattern));
   results.push({
     seam: check.seam,
     file: check.file,
     adapterFile: check.adapterFile ?? null,
-    proven: missing.length === 0 && missingUsage.length === 0,
+    proven: missing.length === 0 && missingUsage.length === 0 && forbidden.length === 0 && forbiddenUsage.length === 0,
     missing,
     missingUsage,
+    forbidden,
+    forbiddenUsage,
   });
 }
 

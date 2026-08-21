@@ -62,6 +62,10 @@
         "path": "docs/HARNESS_INTERACTION_RESEARCH.md"
       },
       {
+        "blob": "a747198d21cfd671a7c825aa4499696ebd029404",
+        "path": "docs/HARNESS_NEUTRAL_CORE_CONTRACT.md"
+      },
+      {
         "blob": "1e0117bb212c0b0ec5752a41b87c7a9437b30cd0",
         "path": "docs/HARNESS_PRODUCT_CONTRACT.md"
       },
@@ -202,6 +206,14 @@
         "path": "docs/proposals/dsh-persistent-shell/composition-contract.json"
       },
       {
+        "blob": "7a76027260ece98dd9233855a7721122d4bbd84c",
+        "path": "docs/proposals/harness-neutral-core/capabilities.v1.json"
+      },
+      {
+        "blob": "501e41adac8bc05f6505921e43a4ffef3bde0c27",
+        "path": "docs/proposals/harness-neutral-core/package-boundaries.json"
+      },
+      {
         "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
         "path": "docs/proposals/rooms-workbench/README.md"
       },
@@ -222,8 +234,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T08:50:44.852Z",
-    "last_aligned_commit": "5cac60286b65b9a46561705f0ddd463a513408df"
+    "checked_at": "2026-08-21T23:16:43.157Z",
+    "last_aligned_commit": "7460e0d4582f667dbcf492b489e7805c4406c44b"
   },
   "anchors": [
     "CHANGELOG.md",

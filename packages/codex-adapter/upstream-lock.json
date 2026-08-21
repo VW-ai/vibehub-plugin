@@ -73,6 +73,8 @@
     "thread/resume",
     "thread/list",
     "thread/read",
+    "thread/fork",
+    "thread/archive",
     "thread/name/set",
     "thread/delete",
     "turn/start",
@@ -105,6 +107,13 @@
     "thread/realtime/outputAudio/delta",
     "thread/realtime/error",
     "thread/realtime/closed"
+  ],
+  "capabilityItems": [
+    "collabAgentToolCall",
+    "mcpToolCall",
+    "plan",
+    "image",
+    "localImage"
   ],
   "audio": {
     "stableTurnInputs": ["audio", "localAudio"],

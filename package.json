@@ -13,6 +13,8 @@
     "probe:codex": "node packages/codex-adapter/probe-schema.mjs",
     "probe:codex:dsh": "node packages/codex-adapter/probe-dsh-source.mjs",
     "probe:codex:live": "node packages/codex-adapter/probe-live.mjs",
+    "probe:harness:isolation": "node packages/harness-core/probe-package-isolation.mjs",
+    "probe:harness:codex-only": "node packages/harness-core/probe-codex-only.mjs",
     "prototype:directions": "node scripts/vh-harness-directions.mjs",
     "prototype:directions:safari": "node scripts/vh-harness-directions.mjs --safari",
     "prototype:interaction-research": "node scripts/vh-harness-interaction-research.mjs",

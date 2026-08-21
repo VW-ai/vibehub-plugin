@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "domains": [
+    {
+      "id": "task-core",
+      "roots": ["skills", ".vibehub"],
+      "forbiddenPackagePrefixes": ["@openai/codex", "@deepseek-ai/dsh"]
+    },
+    {
+      "id": "shared-ui",
+      "roots": ["skills/vibehub-ticket-review/assets", "apps/codex-first-shell-prototype"],
+      "forbiddenPackagePrefixes": ["@openai/codex", "@deepseek-ai/dsh"]
+    },
+    {
+      "id": "harness-core",
+      "roots": ["packages/harness-core"],
+      "forbiddenPackagePrefixes": ["@openai/codex", "@deepseek-ai/dsh"]
+    },
+    {
+      "id": "codex-adapter",
+      "roots": ["packages/codex-adapter"],
+      "forbiddenPackagePrefixes": ["@deepseek-ai/dsh"]
+    },
+    {
+      "id": "dsh-adapter-and-bundle",
+      "roots": ["packages/dsh-adapter", "packages/dsh-bundle"],
+      "forbiddenPackagePrefixes": ["@openai/codex"]
+    }
+  ],
+  "rules": [
+    "Shared Task and UI code may depend on harness-core but not either upstream runtime.",
+    "Each carrier package may depend on harness-core and exactly one upstream harness.",
+    "An action is resolved by one selected adapter; fallback never dispatches through the other adapter.",
+    "Task-to-conversation association is allowed; a second transcript, Task or execution store is not."
+  ]
+}

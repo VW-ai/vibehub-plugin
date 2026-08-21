@@ -1,0 +1,12 @@
+{
+  "name": "@vibehub/harness-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./router.mjs",
+    "./shell": "./shell.mjs",
+    "./capabilities": "./capabilities.mjs",
+    "./association-store": "./association-store.mjs"
+  }
+}

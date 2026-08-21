@@ -45,6 +45,7 @@ export function probeCodexSchema({ codex = "codex" } = {}) {
       ...lock.requiredServerRequests.map((method) => ({ kind: "server-request", method, proven: serverRequestMethods.has(method) })),
       ...lock.requiredNotifications.map((method) => ({ kind: "notification", method, proven: notificationMethods.has(method) })),
       ...lock.audio.stableTurnInputs.map((type) => ({ kind: "audio-input", method: type, proven: protocolText.includes(`"${type}"`) })),
+      ...lock.capabilityItems.map((type) => ({ kind: "capability-item", method: type, proven: protocolText.includes(`"${type}"`) })),
     ];
     const schemaSha256 = sha256(protocolPath);
     checks.push({ kind: "schema", method: "protocol-sha256", proven: schemaSha256 === lock.codex.protocolSchemaSha256 });

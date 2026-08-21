@@ -1,0 +1,12 @@
+{
+  "name": "@vibehub/codex-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vibehub/harness-core": "0.1.0"
+  },
+  "peerDependencies": {
+    "@openai/codex": "0.147.0"
+  }
+}

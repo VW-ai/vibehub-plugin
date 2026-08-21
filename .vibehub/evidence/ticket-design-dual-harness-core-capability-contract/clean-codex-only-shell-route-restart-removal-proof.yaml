@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "codex-only-package-and-route-probe-is-clean",
+    "dual-harness-package-boundaries-are-decision-ready"
+  ],
+  "evidence_id": "clean-codex-only-shell-route-restart-removal-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T23:15:30Z",
+  "refs": [
+    "packages/harness-core/probe-codex-only.mjs",
+    "packages/harness-core/probe-package-isolation.mjs",
+    "packages/harness-core/fixtures.mjs",
+    "packages/codex-adapter/package.json",
+    "packages/harness-core/package.json",
+    "test/harness-core-contract.test.mjs",
+    "command:npm-run-probe-harness-codex-only-ok-shell-restart-remove"
+  ],
+  "schema_version": 1,
+  "summary": "The clean dependency-free Codex-only probe booted the shared shell twice with the Codex carrier, routed ordinary Chat as thread/start plus turn/start, serialized one canonical VibeHub handoff byte-exactly into a separate Codex Task Thread, persisted only Ticket-to-Thread origin association, recovered the same association after a fresh core and adapter instance, and removed its temporary state. Static dependency and import checks found no DSH dependency or import on the Codex route; no DSH package was installed, imported, invoked or used as fallback.",
+  "ticket_id": "ticket-design-dual-harness-core-capability-contract"
+}

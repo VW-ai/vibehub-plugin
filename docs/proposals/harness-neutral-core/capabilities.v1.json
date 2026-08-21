@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "capabilities": {
+    "projects": { "description": "Harness-native grouping of conversations; never VibeHub Project truth." },
+    "fork": { "description": "Create a conversation branch with native lineage." },
+    "search": { "description": "Search harness-owned conversation content." },
+    "audio": { "description": "Submit ordinary audio input to the selected harness." },
+    "attachments": { "description": "Submit non-audio attachments supported by the selected harness." },
+    "approvals": { "description": "Resolve a live harness-owned approval request." },
+    "tools": { "description": "Render and observe harness-owned tool execution." },
+    "plans": { "description": "Render and respond to harness-owned plan state." },
+    "delegatedWork": { "description": "Render harness-owned subagent or delegated execution without turning it into VibeHub Tasks." },
+    "replay": { "description": "Recover harness conversation history after restart." },
+    "interruption": { "description": "Interrupt the selected harness's active execution." },
+    "livePresence": { "description": "Project fresh runtime presence without making it durable Task state." }
+  },
+  "carriers": {
+    "codex": {
+      "upstream": {
+        "package": "@openai/codex",
+        "version": "0.147.0",
+        "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
+        "transport": "app-server stdio JSONL"
+      },
+      "capabilities": {
+        "projects": { "available": false, "mode": "unsupported", "source": "Codex 0.147.0 app-server has Thread cwd but no accepted Project-membership contract yet", "fallback": "Keep Threads unprojected until the Projects parity Ticket proves a versioned host mapping." },
+        "fork": { "available": true, "mode": "native", "source": "ClientRequest thread/fork", "fallback": "Disable Fork if schema probing removes thread/fork." },
+        "search": { "available": true, "mode": "native", "source": "ClientRequest thread/list searchTerm", "fallback": "Offer metadata-only local filtering and label content search unavailable." },
+        "audio": { "available": true, "mode": "native", "source": "Turn input audio and localAudio variants", "fallback": "Keep text input and hide microphone-live claims." },
+        "attachments": { "available": true, "mode": "native", "source": "Turn input image and localImage variants", "fallback": "Keep text input and identify the rejected attachment." },
+        "approvals": { "available": true, "mode": "native", "source": "ServerRequest item/commandExecution/requestApproval and item/fileChange/requestApproval", "fallback": "Fail closed and keep the request visible." },
+        "tools": { "available": true, "mode": "native", "source": "ThreadItem tool variants and item progress notifications", "fallback": "Render an unknown native item without dropping transcript identity." },
+        "plans": { "available": true, "mode": "native", "source": "turn/plan/updated and plan item schemas", "fallback": "Render plan content as a native unknown item; never mint Tasks." },
+        "delegatedWork": { "available": true, "mode": "native", "source": "ThreadItem collabAgentToolCall", "fallback": "Render a bounded unknown item; never adapt it to DSH Agent Team or VibeHub Tasks." },
+        "replay": { "available": true, "mode": "native", "source": "thread/read, thread/list and thread/resume", "fallback": "Stop reuse when stable Thread recovery fails." },
+        "interruption": { "available": true, "mode": "native", "source": "turn/interrupt", "fallback": "Show interruption unavailable and do not claim stopped." },
+        "livePresence": { "available": true, "mode": "adapted", "source": "fresh turn/started and turn/completed notifications", "fallback": "Show no live state; replay never mints presence." }
+      }
+    },
+    "dsh": {
+      "upstream": {
+        "package": "@deepseek-ai/dsh",
+        "version": "0.1.0-rc.8",
+        "commit": "141eb6fef83422698aef7a981029e843e8161534",
+        "transport": "native Session and client runtime services"
+      },
+      "capabilities": {
+        "projects": { "available": true, "mode": "adapted", "source": "IWorkspaces create, insertSessionBefore and delete", "fallback": "Expose native Workspaces without claiming they are VibeHub Projects." },
+        "fork": { "available": true, "mode": "native", "source": "ISessions.fork with parentSessionId lineage", "fallback": "Disable Fork and keep the source Session unchanged." },
+        "search": { "available": true, "mode": "native", "source": "ISessions.search over the Host visible message-content index", "fallback": "Offer list metadata filtering and label content search unavailable." },
+        "audio": { "available": false, "mode": "unsupported", "source": "PromptContentPart in rc.8 accepts text or image only", "fallback": "Keep text and image input; do not display a working microphone." },
+        "attachments": { "available": true, "mode": "native", "source": "PromptContentPart image and attachment-local durable references", "fallback": "Keep text input and identify the rejected image." },
+        "approvals": { "available": true, "mode": "native", "source": "approval/request plus PendingWait approval response", "fallback": "Fail closed and keep the pending interaction visible." },
+        "tools": { "available": true, "mode": "native", "source": "ToolRuntime register and execution pipeline", "fallback": "Render durable Session events without inventing a successful tool result." },
+        "plans": { "available": true, "mode": "native", "source": "pendingInteraction plan-review and plan-mode package", "fallback": "Keep the Session waiting and do not begin implementation." },
+        "delegatedWork": { "available": true, "mode": "native", "source": "base Bundle subagent packages and Session parent lineage", "fallback": "Render native Session lineage only; never mirror Agent Team tasks." },
+        "replay": { "available": true, "mode": "native", "source": "append-only Session log, history pagination and Session projections", "fallback": "Stop association recovery if registered projection replay fails." },
+        "interruption": { "available": true, "mode": "native", "source": "ISession.cancel and subagent interrupt", "fallback": "Show cancellation unavailable and do not claim stopped." },
+        "livePresence": { "available": true, "mode": "adapted", "source": "SessionSummary running and pendingInteraction", "fallback": "Show no live state; replay never mints presence." }
+      }
+    }
+  }
+}

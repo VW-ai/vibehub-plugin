@@ -6,5 +6,19 @@
   "distributionTag": "next",
   "node": "^22.19.0 || >=24.0.0",
   "packageManager": "pnpm@11.7.0",
-  "capturedAt": "2026-08-20T00:00:00Z"
+  "capturedAt": "2026-08-20T00:00:00Z",
+  "selectedPackageGraph": {
+    "base": "@deepseek-ai/dsh-base@0.1.0-rc.8",
+    "web": "@deepseek-ai/dsh-web-app@0.1.0-rc.8",
+    "adapter": "@vibehub/dsh-adapter@0.1.0",
+    "forbiddenDependencyPrefixes": ["@openai/codex"]
+  },
+  "stopConditions": [
+    "pinned-commit-or-package-version-changed",
+    "session-prompt-search-fork-cancel-or-replay-seam-removed",
+    "command-tool-permission-approval-slot-or-theme-seam-removed",
+    "prompt-content-no-longer-has-a-truthful-audio-boundary",
+    "selected-dsh-package-graph-imports-codex",
+    "task-linkage-requires-an-agent-team-task-or-second-task-store"
+  ]
 }
