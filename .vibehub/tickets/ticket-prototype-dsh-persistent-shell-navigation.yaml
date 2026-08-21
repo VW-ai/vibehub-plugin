@@ -1,0 +1,81 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "current-overlay-failure-is-reproduced-and-bounded",
+      "criterion": "The review pack reproduces the current packed rc.8 experience and names the exact product failures: Tasks obscures native sidebar navigation, VibeHub carries independent application chrome, Graph and Chat feel like separate applications, and the focused Inspector is not yet a first-class Task Workspace; it preserves the technical vertical-slice successes and does not misclassify the Graph itself as the defect."
+    },
+    {
+      "acceptance_id": "persistent-shell-information-architecture-is-reviewable",
+      "criterion": "A production-shaped wide and narrow prototype keeps one persistent DSH/Codex-like shell with native New Chat, Chat or Session history, Workspace or Project orientation, Tasks, Rooms or Context, and Settings arranged with quiet hierarchy; it presents at most two bounded sidebar/default-entry variants where a real owner choice remains and does not introduce a second VibeHub header, footer, sidebar, or close-to-return application switch."
+    },
+    {
+      "acceptance_id": "chat-graph-task-loop-is-complete",
+      "criterion": "The prototype traverses first boot, normal unconstrained Chat, existing Chat return, Tasks entry, Graph scan, Task selection, Focus Route into the Task Workspace, Recommended action, native Chat steering, Needs You, execution inspection, Evidence or closeout posture, and exact return to the prior Graph focus while preserving one visible Task identity and one persistent navigation model."
+    },
+    {
+      "acceptance_id": "real-dsh-composition-seams-are-proven",
+      "criterion": "Against the exact supported DSH source and a running packed Profile, the proposal maps each prototype surface to supported Theme, Slot, route, Sidebar, Conversation, Session, or single-owner composition seams; it prefers additive composition, explicitly proves any child extension seats that a shadowed owner must recreate, rejects shell.overlay as ordinary full-page scrolling content, and defines stop conditions without DOM injection or an upstream fork."
+    },
+    {
+      "acceptance_id": "prototype-is-accessible-and-native-behavior-survives",
+      "criterion": "Default desktop and exact narrow frames demonstrate keyboard navigation, focus restoration, reduced motion, no horizontal overflow, native composer, models, tools, approvals, settings and Session behavior, truthful Task state and live presence, and a visually continuous but intentionally non-final Theme treatment with no console error or repository write."
+    },
+    {
+      "acceptance_id": "owner-decision-pack-is-exact",
+      "criterion": "The checked-in review pack identifies one recommended shell composition, the bounded alternative or fallback if any, exact tradeoffs, default landing choice, sidebar hierarchy, Graph-to-Task transition, DSH implementation boundary, and the precise human decisions required before the production implementation Ticket can be refined."
+    }
+  ],
+  "constraints": [
+    "This Ticket is a product and compatibility prototype; do not change the production DSH Bundle or claim final visual authority.",
+    "Task-first means durable work identity and committed-work navigation, not removing native Chat or hiding the persistent shell.",
+    "Do not replace the DSH Root merely to style it, create a synthetic Session to host the global Graph, or copy the independent Workbench application chrome into DSH.",
+    "Preserve canonical VibeHub Task, Context, Evidence, Outcome, authority, next_action, archive and live-presence boundaries.",
+    "Do not broaden this prototype into Chat branch graphs, cross-Project federation, team collaboration, cloud sync, or the final whole-application reskin."
+  ],
+  "context": "The first real DSH vertical slice proved installation, canonical Graph projection, exact Task-to-native-Chat handoff, Skill execution, Evidence, and restart recovery. Dogfood immediately exposed the missing product layer: opening Tasks hides the DSH sidebar and presents VibeHub as a second full-screen application. The durable direction is already Task-first but not Graph-only: the native DSH shell and Chat remain first-class, a persistent sidebar holds stable destinations, the Graph is the main content of a Tasks destination, and a focused Task Workspace follows the approved Focus Route with exact return. Prototype this corrected composition against the real rc.8 shell before another production implementation is authorized.",
+  "context_refs": [
+    {
+      "purpose": "Binding authority for retaining the DSH shell and integrating one or two Workbench-derived Task surfaces without nested application chrome.",
+      "ref": ".vibehub/rooms/product/decision-dsh-shell-with-vibehub-task-pages.yaml"
+    },
+    {
+      "purpose": "Authority for Chat and Task as Human-led and Agent-led Context Spaces inside one product.",
+      "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"
+    },
+    {
+      "purpose": "Authority for Task as the durable product unit while normal Chat remains first-class.",
+      "ref": ".vibehub/rooms/product/decision-task-first-human-workbench.yaml"
+    },
+    {
+      "purpose": "Longer-term unified Graph language whose global topology must not become a second application shell.",
+      "ref": ".vibehub/rooms/workbench/decision-unified-work-graph-semantic-zoom.yaml"
+    },
+    {
+      "purpose": "Successful Focus Route research and warning against using shell.overlay for ordinary content.",
+      "ref": ".vibehub/outcomes/ticket-research-task-workbench-interaction-directions.yaml"
+    },
+    {
+      "purpose": "Successful real rc.8 Bundle, canonical Task-to-Session loop and compatibility Adapter baseline that the prototype must preserve.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    },
+    {
+      "purpose": "Complete Task-first, Chat-around, Run-during product loop the shell prototype must carry.",
+      "ref": "docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "purpose": "Current additive Slot implementation whose full-screen overlay behavior is the measured technical baseline.",
+      "ref": "packages/dsh-adapter/client.js"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A production-shaped prototype inside the real pinned DSH shell makes native Chat, Sessions, Tasks, the Task Graph, and a focused Task Workspace feel like one application with persistent ChatGPT/Codex-like navigation rather than a full-screen VibeHub overlay.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-rejects-fullscreen-graph-overlay",
+    "dogfood:real-dsh-profile-56236-persistent-sidebar-missing"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-prototype-dsh-persistent-shell-navigation"
+}

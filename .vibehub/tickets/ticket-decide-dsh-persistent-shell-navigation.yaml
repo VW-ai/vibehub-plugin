@@ -1,0 +1,41 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "persistent-shell-navigation-direction-decided",
+      "authority": "human",
+      "criterion": "After reviewing the completed prototype in the real DSH shell, the owner explicitly accepts one sidebar hierarchy, default landing, Tasks entry, Graph-to-Task transition, Chat posture, narrow behavior, and supported DSH composition boundary, or records one exact correction that produces an equally executable choice."
+    }
+  ],
+  "constraints": [
+    "This Ticket records the protected product choice only; it does not implement or claim visual completion.",
+    "Agent preference, prototype recommendation, or silence cannot satisfy the human-authority criterion.",
+    "The chosen direction must preserve native DSH Chat, Sessions, composer, tools, approvals, settings, user overrides, and the non-invasive Plugin boundary."
+  ],
+  "context": "The overall product direction is already approved, but the current real integration exposed one protected interaction choice that should not be inferred by implementation: exactly how native Chats and VibeHub Tasks share the sidebar, what the default main surface is, and how Graph focus becomes and returns from a Task Workspace. Review the production-shaped prototype and select its exact recommended composition or one bounded correction before implementation acceptance is made firm.",
+  "context_refs": [
+    {
+      "purpose": "Already-approved product boundary that narrows, but does not decide, the exact persistent navigation composition.",
+      "ref": ".vibehub/rooms/product/decision-dsh-shell-with-vibehub-task-pages.yaml"
+    },
+    {
+      "purpose": "Quality baseline for the owner review without turning this decision into a final reskin sign-off.",
+      "ref": ".vibehub/rooms/product/decision-codex-linear-whole-shell-visual-baseline.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner explicitly chooses the persistent DSH sidebar hierarchy, default landing behavior, and Graph-to-Task Workspace transition that will govern the production shell integration.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-requests-chatgpt-sidebar-and-unified-application"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner needs the real-shell review pack, interaction loop, technical seam proof, and tradeoffs before choosing the production navigation.",
+      "target_ticket_id": "ticket-prototype-dsh-persistent-shell-navigation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-dsh-persistent-shell-navigation"
+}

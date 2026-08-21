@@ -1,0 +1,46 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-native-chat-bridges-after-unified-shell",
+      "criterion": "Placeholder: after the unified shell succeeds, replan this Ticket to firm with exact actions, source-turn identity, Task and Context preview, scope selection, authority, provenance, confirmation, failure recovery, official Slot or Remote usage, wide and narrow interaction, and regression acceptance derived from real dogfood; do not manufacture final labels or silently harvest transcripts before that refinement."
+    }
+  ],
+  "constraints": [
+    "Ordinary Chat remains unconstrained and fully native; VibeHub actions are explicit additions, never a compulsory protocol.",
+    "Do not scrape rendered DOM, infer durable knowledge from a transcript, or mutate Context or Task state without a reviewable explicit action.",
+    "Do not couple the action to one model, Agent Team task, or executor-specific planning representation.",
+    "Compare and Bring Back are conversation provenance operations, not canonical Task dependencies or automatic Context writeback."
+  ],
+  "context": "The product direction requires Chat and Task to feel related rather than separated by navigation. After the unified shell is real, refine this Ticket from observed usage into the smallest native message and turn-tail bridge. The expected first boundary is explicit Create or Attach Task and governed Remember proposals; Fork, Compare and Bring Back remain eligible only where official Session seams and reviewed interaction semantics are exact.",
+  "context_refs": [
+    {
+      "purpose": "Binding official-Slot direction and current rc.8 feasibility for native Chat actions.",
+      "ref": ".vibehub/rooms/product/decision-native-chat-with-additive-task-actions.yaml"
+    },
+    {
+      "purpose": "Authority for Chat-to-Task convergence without collapsing their attention and execution semantics.",
+      "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"
+    },
+    {
+      "purpose": "Governance boundary for Remember and other durable Context proposals.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Native DSH Chat gains official, lightweight VibeHub actions that turn or attach an explicit conversation result into governed Context or bounded Task work without forcing ordinary Chat into the Task protocol.",
+  "provenance_refs": [
+    "conversation:2026-08-19-native-chat-additive-task-actions",
+    "conversation:2026-08-21-chat-and-task-must-not-feel-like-separate-applications"
+  ],
+  "relations": [
+    {
+      "rationale": "The final action placement, Task chooser and return behavior require the approved production shell and Task Workspace to exist first.",
+      "target_ticket_id": "ticket-implement-dsh-unified-shell-navigation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-build-dsh-native-chat-task-bridges"
+}

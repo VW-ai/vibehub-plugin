@@ -1,0 +1,45 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-from-approved-persistent-shell-direction",
+      "criterion": "Placeholder: after the owner decision succeeds, replan this same Ticket to firm with independently checkable acceptance derived from the chosen sidebar hierarchy, default landing, Graph-to-Task transition, Chat posture, DSH composition seam, wide and narrow behavior, and migration from the current overlay without weakening the successful vertical-slice contracts."
+    }
+  ],
+  "constraints": [
+    "Do not execute this Ticket while draft or infer the owner choice before human-origin Evidence exists.",
+    "Do not replace or fork upstream DSH, add DOM injection, create a second Task store, or couple VibeHub to DSH Agent Team tasks.",
+    "Keep every DSH version-specific call inside packages/dsh-adapter and preserve the exact source probe, packed Profile lifecycle, native Skill execution, Evidence, and independent closeout.",
+    "The production result must remove nested VibeHub application chrome rather than merely restyle the existing full-screen overlay."
+  ],
+  "context": "Implementation direction is intentionally deferred to the owner-reviewed prototype. Once the direct human decision succeeds, refine this same Ticket in place into exact production acceptance for the selected DSH composition seam, persistent sidebar, default route, Task Graph main surface, Focus Route Task Workspace, exact back restoration, native Chat continuity, existing Task-to-Session handoff, accessibility, installed Profile lifecycle, and regression boundaries.",
+  "context_refs": [
+    {
+      "purpose": "Successful technical baseline whose canonical Graph, handoff, execution, Evidence and Adapter contracts remain mandatory.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    },
+    {
+      "purpose": "Binding focused Task action hierarchy and restrained state language.",
+      "ref": ".vibehub/rooms/workbench/decision-workbench-state-signal-and-action-priority.yaml"
+    },
+    {
+      "purpose": "Current install, upgrade, runtime-truth and stop-condition contract to preserve.",
+      "ref": "docs/DEEPSEEK_HARNESS_V1.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The production DSH Plugin replaces the full-screen Tasks overlay with the approved persistent shell: native Chat and Sessions, Task Graph, and focused Task Workspace occupy one navigable application while the exact VibeHub execution loop remains intact.",
+  "provenance_refs": [
+    "conversation:2026-08-21-production-shell-must-follow-owner-reviewed-prototype"
+  ],
+  "relations": [
+    {
+      "rationale": "Production acceptance and the selected DSH composition cannot be firm until the owner records the exact persistent-shell interaction choice.",
+      "target_ticket_id": "ticket-decide-dsh-persistent-shell-navigation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-implement-dsh-unified-shell-navigation"
+}

@@ -1,0 +1,52 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-visual-system-from-complete-product-surfaces",
+      "criterion": "Placeholder: after both direct prerequisites succeed, replan this Ticket to firm with exact typography, density, spacing, palette, borders, elevation, icons, focus, hover, state, live motion, overlays, responsive behavior, DSH Theme token coverage, bounded Adapter CSS, stock-component exceptions, accessibility, deterministic screenshot corpus and upstream compatibility acceptance that an independent Agent can verify before owner review."
+    }
+  ],
+  "constraints": [
+    "Do not treat a palette swap, arbitrary dark theme, or styling only the embedded Graph as whole-application completion.",
+    "Use official DSH Theme Runtime and component extension surfaces first; isolate unavoidable version-specific exceptions and never depend on fragile DOM mutation.",
+    "Preserve native behavior, accessibility, user overrides, reduced motion and the approved four-phase plus one-substate Task semantics.",
+    "Codex and Linear are quality and interaction references, not pixel-copy or mixed-brand authorization."
+  ],
+  "context": "The owner has approved the visual direction and explicitly rejected a thin CSS skin, but exact production acceptance should follow the unified shell and native Chat bridges so the component inventory and interaction hierarchy are real. Refine this Ticket after those surfaces exist into a bounded design-system implementation ready for separate owner review rather than mixing aesthetic experimentation into functional shell work.",
+  "context_refs": [
+    {
+      "purpose": "Owner-approved quality and taste direction for the whole DSH shell.",
+      "ref": ".vibehub/rooms/product/decision-codex-linear-whole-shell-visual-baseline.yaml"
+    },
+    {
+      "purpose": "Binding scope constraint rejecting a thin CSS estimate or local-panel skin.",
+      "ref": ".vibehub/rooms/product/constraint-dsh-reskin-is-substantial-product-work.yaml"
+    },
+    {
+      "purpose": "Accessibility, hierarchy, earned emphasis and progressive-disclosure boundary.",
+      "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Installing the VibeHub Plugin gives the complete DSH application a coherent Codex-and-Linear-quality visual system across navigation, native Chat, Composer, Task Graph, Task Workspace, Run, attention, approvals, settings, overlays, and responsive states rather than styling only VibeHub surfaces.",
+  "provenance_refs": [
+    "conversation:2026-08-19-codex-linear-whole-shell-style-direction",
+    "conversation:2026-08-19-dsh-reskin-effort",
+    "conversation:2026-08-21-plugin-must-include-the-whole-application-reskin"
+  ],
+  "relations": [
+    {
+      "rationale": "The persistent shell, route hierarchy and focused Task Workspace must be real before a whole-application visual system can be inventoried and accepted.",
+      "target_ticket_id": "ticket-implement-dsh-unified-shell-navigation",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Native Chat's final VibeHub controls and turn-tail states are part of the visual-system surface and must exist before final coverage and sign-off.",
+      "target_ticket_id": "ticket-build-dsh-native-chat-task-bridges",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-build-dsh-whole-application-visual-system"
+}

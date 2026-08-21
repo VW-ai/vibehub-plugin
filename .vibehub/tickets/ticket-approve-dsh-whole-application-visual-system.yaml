@@ -1,0 +1,46 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "whole-application-visual-system-approved",
+      "authority": "human",
+      "criterion": "After reviewing the completed visual-system Outcome and the real installed DSH Profile at representative desktop and narrow states, the owner explicitly accepts the application-wide hierarchy, typography, density, palette, motion, state language, native Chat continuity, Task surfaces and overall Codex/Linear quality direction for developer-preview publication."
+    }
+  ],
+  "constraints": [
+    "This Ticket records protected visual judgment only; it does not implement fixes, weaken accessibility, or publish artifacts.",
+    "Automated screenshots, contrast tests, Agent preference, or silence cannot satisfy the human-authority criterion.",
+    "Approval covers the installed whole application, not an isolated Graph screenshot or a static design board.",
+    "Any exact visual gaps recorded by the owner keep the criterion unresolved and require replanning before public release."
+  ],
+  "context": "Visual quality is a protected human judgment and it gates independently schedulable public release work. The implementation Ticket must first produce mechanically verified Theme coverage, screenshots, accessibility and compatibility. This separate Ticket then asks the owner to inspect the real installed Profile across the complete product rather than allowing an Agent to infer aesthetic acceptance from tests or hiding visual approval inside release execution. Exact gaps recorded by the owner leave the criterion unresolved and require the visual implementation to be replanned before publication.",
+  "context_refs": [
+    {
+      "purpose": "Owner-approved reference direction against which the completed real application is judged.",
+      "ref": ".vibehub/rooms/product/decision-codex-linear-whole-shell-visual-baseline.yaml"
+    },
+    {
+      "purpose": "Authority requiring whole-application review rather than accepting a thin skin.",
+      "ref": ".vibehub/rooms/product/constraint-dsh-reskin-is-substantial-product-work.yaml"
+    },
+    {
+      "purpose": "Canonical human-origin Evidence boundary for protected owner judgment.",
+      "ref": "skills/contracts/acceptance-authority.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner explicitly accepts the complete installed DSH Plugin as a coherent Codex-and-Linear-quality application across native Chat, navigation, Task Graph, Task Workspace, execution, attention, approvals, settings, and responsive states for developer-preview publication.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-requires-uiux-review-before-public-release"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner needs the completed mechanically verified visual system and real installed Profile before making the protected publication-quality judgment.",
+      "target_ticket_id": "ticket-build-dsh-whole-application-visual-system",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-approve-dsh-whole-application-visual-system"
+}

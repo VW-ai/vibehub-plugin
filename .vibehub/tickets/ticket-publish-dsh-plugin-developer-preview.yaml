@@ -1,0 +1,51 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-public-preview-after-product-coherence",
+      "criterion": "Placeholder: after the native Chat bridge succeeds and the whole-application visual result receives successful owner approval, replan this Ticket to firm with exact npm or GitHub package identity, removal of private-only metadata, fresh-user Project selection or VibeHub setup, API-key and native-provider handoff, supported DSH and runtime matrix, source probe, reproducible tarball and checksums, clean install/start/restart/upgrade/remove, no-source-clone path, documentation and demo assets, CI, release notes, known limits, rollback, and truthful public verification criteria."
+    }
+  ],
+  "constraints": [
+    "Do not publish the current full-screen overlay as the product UI or market a feasibility slice as a public beta.",
+    "Do not require users to fork DSH, clone VibeHub source, edit DSH internals, or adopt a second canonical Task database.",
+    "Pin and publish the supported DSH baseline; a newer upstream release is unsupported until source probe and real Profile lifecycle pass.",
+    "Keep initial scope to one selected local Project and developer preview; team service, cloud sync, personal Context and native desktop packaging remain later work."
+  ],
+  "context": "The private packed Bundle already proves the official installation mechanism. Public release should wait until the unified shell, native Chat bridge and coherent visual system make that mechanism a credible product. Once the direct prerequisites are successful, refine this Ticket into the smallest developer preview release covering package identity, onboarding, one-Project setup, compatibility, reproducibility, documentation, upgrade and rollback rather than silently publishing today's technical spike.",
+  "context_refs": [
+    {
+      "purpose": "Proof that official packed install, Profile lifecycle and the real Task execution loop are technically achievable.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    },
+    {
+      "purpose": "Current private development install and compatibility runbook to productize.",
+      "ref": "docs/DEEPSEEK_HARNESS_V1.md"
+    },
+    {
+      "purpose": "Existing GitHub-first VibeHub release and reproducibility boundary.",
+      "ref": "docs/RELEASE.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A developer can install a versioned public VibeHub DSH Plugin without cloning either source repository, select or initialize one Project, use the unified Task and Chat loop, upgrade or remove it safely, and verify its supported DSH compatibility from published artifacts.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-confirms-plugin-distribution-and-reskin",
+    "conversation:2026-08-21-plan-next-dsh-product-wave"
+  ],
+  "relations": [
+    {
+      "rationale": "The release directly consumes the completed native Chat and Task bridge as a product constituent and must verify it in the published artifact, not merely inherit it through visual review.",
+      "target_ticket_id": "ticket-build-dsh-native-chat-task-bridges",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Public preview packaging may begin only after the owner explicitly approves the complete installed application; that approval transitively requires unified shell, native Chat bridges, and the mechanically verified visual system.",
+      "target_ticket_id": "ticket-approve-dsh-whole-application-visual-system",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-publish-dsh-plugin-developer-preview"
+}
