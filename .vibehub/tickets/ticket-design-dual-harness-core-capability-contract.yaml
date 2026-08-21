@@ -2,7 +2,7 @@
   "acceptance": [
     {
       "acceptance_id": "core-and-harness-ownership-matrix-is-explicit",
-      "criterion": "One checked-in contract assigns Task, Project, Context, Room, Evidence and Outcome truth to VibeHub core and assigns Chat or Thread or Session, Agent runtime, models, tools, permissions, approvals, audio and live execution facts to the selected Codex or DSH adapter; it explicitly maps semantic differences and forbids a second Task or transcript store."
+      "criterion": "One checked-in contract assigns Task, VibeHub Project, Context, Room, Chat-to-Task origin and association, Evidence and Outcome truth to VibeHub core and assigns Chat or Thread or Session, Agent runtime, models, tools, permissions, approvals, audio and live execution facts to the selected Codex or DSH adapter; it explicitly maps semantic differences and forbids a second Task or transcript store."
     },
     {
       "acceptance_id": "capability-negotiation-and-single-runtime-routing-are-executable",
@@ -13,12 +13,12 @@
       "criterion": "A minimal clean Codex-only probe with no DSH package installs and boots the shared shell and core, resolves one ordinary Chat action and one exact VibeHub Task handoff through the Codex adapter, exposes truthful capabilities, survives restart and cleanly removes without importing or invoking DSH."
     },
     {
-      "acceptance_id": "dsh-only-package-and-route-probe-is-clean",
-      "criterion": "A minimal clean official DSH Profile with no Codex app-server dependency installs and boots the shared shell and core, resolves one ordinary Chat or Session action and one exact VibeHub Task handoff through the DSH adapter, exposes truthful capabilities, survives restart and cleanly removes without importing or invoking Codex, duplicating an Agent loop or coupling to DSH Team tasks."
+      "acceptance_id": "dsh-independent-adapter-boundary-is-source-proven",
+      "criterion": "Exact probes against the pinned official DSH source and package manifests bind the required Session, Chat, command, tool, permission, lifecycle, Slot and Theme seams, prove the proposed DSH adapter and package graph have no Codex app-server dependency, and identify every capability difference or stop condition; this criterion does not install, boot or execute the future DSH carrier."
     },
     {
       "acceptance_id": "dual-harness-package-boundaries-are-decision-ready",
-      "criterion": "Source probes, package dependency assertions and isolated boot-and-route tests pin supported Codex and DSH versions, isolate every upstream translation inside its adapter, prove shared UI and Task packages contain no hard dependency on either harness, and provide a maintenance, failure, migration and downstream implementation plan; complete daily-use DSH Chat, Task, Context and Evidence proof remains owned by the later DSH Plugin Ticket and does not gate Codex implementation."
+      "criterion": "Source probes, package dependency assertions, harness-neutral fixture adapters and the Codex-only route probe pin supported Codex and DSH versions, isolate every upstream translation inside its adapter, prove shared UI and Task packages contain no hard dependency on either harness, and provide a maintenance, failure, migration and downstream implementation plan; all real DSH install, boot, Chat, Task, Context and Evidence proof remains owned by the later DSH Plugin Ticket and does not gate Codex implementation."
     }
   ],
   "constraints": [
@@ -27,11 +27,15 @@
     "Do not couple VibeHub Tasks to DSH Agent Team tasks or invent a second Task database.",
     "Keep upstream-specific imports and version translations inside bounded adapters with exact source probes."
   ],
-  "context": "Codex-first is the immediate dogfood path, but it is not the permanent product architecture. Define the shared core, capability negotiation and both package boundaries before the final shell decision hardens assumptions into production packages. This Ticket proves only isolated installation, boot and one exact routed action on each harness; it does not build the complete DSH daily-use Task loop or gate Codex production on DSH product implementation.",
+  "context": "Codex-first is the immediate dogfood path, but it is not the permanent product architecture. Define the shared core, Chat-to-Task association and origin contract, capability negotiation and both package boundaries before the final shell decision hardens assumptions into production packages. This Ticket may exercise the immediate Codex carrier and exact official DSH source seams, but it must not require a real DSH installation or executed DSH Task loop: those belong to the later DSH Plugin Ticket and cannot gate Codex production.",
   "context_refs": [
     {
       "purpose": "Binding dual-harness product and ownership decision.",
       "ref": ".vibehub/rooms/product/decision-vibehub-core-supports-codex-and-dsh-harness-bases.yaml"
+    },
+    {
+      "purpose": "Binding shared-core Chat, Task and provenance association semantics.",
+      "ref": ".vibehub/rooms/product/decision-chat-streams-birth-and-associate-independent-tasks.yaml"
     },
     {
       "purpose": "Existing DSH-native runtime ownership boundary.",
@@ -53,9 +57,10 @@
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "A versioned VibeHub core and harness-capability contract, plus minimal isolated Codex and DSH boot-and-route probes, proves the two carriers can be independently implemented without requiring the other runtime, duplicating Agent execution or creating a second Task store.",
+  "outcome": "A versioned harness-neutral VibeHub core and capability contract, backed by package-isolation assertions, a clean Codex-side route probe and exact official DSH seam analysis, proves the two carriers are independently implementable without making DSH execution a prerequisite of Codex production.",
   "provenance_refs": [
     "conversation:2026-08-21-owner-requires-dual-harness-product",
+    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin",
     "https://developers.openai.com/codex/app-server/",
     "https://github.com/openai/codex",
     "https://github.com/deepseek-ai/deepseek-harness"

@@ -1,0 +1,56 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-daily-use-alpha-after-functional-surfaces",
+      "criterion": "Placeholder: after both direct prerequisites succeed, replan this Ticket to firm with one clean installed and restartable Codex-only application exercising Project and unprojected Recent Chat, Search, streaming and rich Chat, quote or selection and voice input, creation of multiple independent Tasks from one continuing Chat, immutable origin and return, task-scoped conversation, exact Agent handoff and Run, governed Context, acceptance-linked Evidence, completion attention, wide and narrow accessibility, upgrade and removal, performance and truthful unsupported-capability acceptance."
+    }
+  ],
+  "constraints": [
+    "This is an internal daily-use alpha, not a public release or final visual approval.",
+    "Do not require DSH, mock Codex execution or bypass the official app-server adapter.",
+    "Do not collapse Chat, Task, Project, Run, Evidence or Outcome identities for convenience.",
+    "Dogfood discoveries become new or revised Tickets; they do not silently expand this integration Ticket."
+  ],
+  "context": "The owner wants a usable product early so real daily use can drive iteration. This is the integration and dogfood boundary after the production shell, Chat-to-Task bridge and audio input exist. It does not claim final visual quality or public-release readiness; it proves that the complete primary loop works in one local installation and produces a bounded review pack for the subsequent visual-system pass.",
+  "context_refs": [
+    {
+      "purpose": "Codex parity floor and VibeHub additive-value contract.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Primary Chat-to-Task and task-conversation product loop.",
+      "ref": ".vibehub/rooms/product/decision-chat-streams-birth-and-associate-independent-tasks.yaml"
+    },
+    {
+      "purpose": "Projects and unprojected Recents daily-use requirement.",
+      "ref": ".vibehub/rooms/product/contract-codex-project-and-recent-chat-parity.yaml"
+    },
+    {
+      "purpose": "Minimum coherent Light and Dark baseline before final visual polish.",
+      "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "A locally installed Codex-first VibeHub alpha is coherent enough for real daily dogfood: ordinary Codex-quality Chat and Projects, voice input, explicit Chat-to-Task creation, Task conversation and origin return, Agent execution, Context, Evidence and restart recovery work as one product without DSH.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-requires-daily-use-codex-chat-parity",
+    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin",
+    "conversation:2026-08-21-owner-asks-for-clear-development-plan"
+  ],
+  "relations": [
+    {
+      "rationale": "Daily use requires the explicit continuous-Chat to independent-Task interaction loop.",
+      "target_ticket_id": "ticket-build-codex-chat-task-bridges",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "Voice input is part of the owner's required ordinary Codex interaction floor for dogfood.",
+      "target_ticket_id": "ticket-build-codex-audio-input",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-integrate-codex-first-daily-use-alpha"
+}

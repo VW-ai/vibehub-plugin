@@ -3,7 +3,7 @@
     {
       "acceptance_id": "codex-first-shell-direction-decided",
       "authority": "human",
-      "criterion": "After reviewing the accepted real-runtime Search and attention shell, native Chat and Task Workspace studies, Codex Project and unprojected Recents parity, the specialized production Chat conformance pass, and the dual-harness core capability and package-isolation contract in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact v1 composition and sequence: Codex-like sidebar, Projects, Recents, Search, Thread and Turn rendering, fork, Composer and voice; additive VibeHub Graph, Task Workspace, Context and Rooms; a Codex-first implementation; and an independently deliverable later DSH carrier over the same Task and Context core."
+      "criterion": "After reviewing the accepted real-runtime Search and attention shell, native Chat and Task Workspace studies, Codex Project and unprojected Recents parity, the specialized production Chat conformance pass, and the dual-harness core contract in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact v1 composition and sequence: Codex-like sidebar, Projects, Recents, Search, Thread and Turn rendering, fork, Composer and voice; continuous Chat with inline Task associations; explicit creation of multiple independent Tasks with immutable origin and task-scoped conversation; additive VibeHub Graph, Context and Rooms; a Codex-first implementation; and an independently deliverable later DSH carrier."
     }
   ],
   "constraints": [
@@ -11,13 +11,17 @@
     "The owner's current '大概可以' is directional feedback, not authority-satisfying final acceptance.",
     "Agent preference, screenshots without owner review, partial enthusiasm or silence cannot satisfy the human-authority criterion.",
     "Any bounded owner correction remains unresolved and is replanned; it cannot satisfy a successful Outcome.",
-    "The choice must preserve real Codex and DSH runtime ownership, ordinary Chat without Task protocol, VibeHub Task and Context truth, zero-or-one VibeHub Project ownership and no duplicate Agent loop."
+    "The choice must preserve real Codex and DSH runtime ownership, ordinary Chat without Task protocol, explicit Chat-to-Task transfer, VibeHub Task and Context truth and no duplicate Agent loop."
   ],
-  "context": "The owner says the current low-fidelity frame is broadly workable, but gives three material corrections before production approval: Codex Projects, fork and unprojected Recents must retain their familiar behavior; Codex Chat rendering and interaction require dedicated behavioral research beyond styling; and the shared VibeHub Task product must support both a Codex-backed carrier and a DSH-only carrier. This Ticket remains the protected composition gate. Partial enthusiasm is not approval, and the exact v1 sequence is reviewed only after the three new studies succeed.",
+  "context": "The owner says the current low-fidelity frame is broadly workable, but gives material corrections before production approval: Codex Projects, fork and unprojected Recents retain familiar behavior; Chat interaction needs behavioral parity beyond styling; a continuous Chat can birth several independent Tasks while keeping its identity; each Task has immutable origin provenance and its own task-scoped conversation; and the shared VibeHub core supports Codex-backed and DSH-only carriers. This remains the protected composition gate after the three active studies succeed.",
   "context_refs": [
     {
       "purpose": "Binding shared core and independently usable Codex and DSH carrier architecture.",
       "ref": ".vibehub/rooms/product/decision-vibehub-core-supports-codex-and-dsh-harness-bases.yaml"
+    },
+    {
+      "purpose": "Binding continuous Chat, independent Task, immutable origin and task conversation relationship.",
+      "ref": ".vibehub/rooms/product/decision-chat-streams-birth-and-associate-independent-tasks.yaml"
     },
     {
       "purpose": "Binding Codex Projects, fork and Recents parity correction.",
@@ -55,41 +59,42 @@
     "conversation:2026-08-21-owner-defines-task-workspace-conversation-and-context",
     "conversation:2026-08-21-owner-requires-codex-project-parity",
     "conversation:2026-08-21-owner-requires-full-chat-parity-work",
-    "conversation:2026-08-21-owner-requires-dual-harness-product"
+    "conversation:2026-08-21-owner-requires-dual-harness-product",
+    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin"
   ],
   "relations": [
     {
-      "rationale": "The owner needs the successful real-runtime Codex-first adapter and shell baseline before choosing production composition.",
+      "rationale": "The successful real-runtime shell baseline is a preserved causal input to the final composition.",
       "target_ticket_id": "ticket-prototype-codex-first-vibehub-shell",
       "type": "depends_on"
     },
     {
-      "rationale": "The accepted Search, Inbox and Chat-default study is a direct product input to the final composition.",
+      "rationale": "The accepted Search, Inbox and Chat-default study is a direct product input.",
       "target_ticket_id": "ticket-research-codex-native-search-and-task-attention",
       "type": "depends_on"
     },
     {
-      "rationale": "The accepted native Chat protocol study is the baseline for the deeper production behavior audit.",
+      "rationale": "The accepted native Chat protocol study is the baseline for the production conformance pass.",
       "target_ticket_id": "ticket-research-codex-native-chat-parity",
       "type": "depends_on"
     },
     {
-      "rationale": "The accepted Task Workspace study is required before choosing the Task and Chat composition.",
+      "rationale": "The accepted Task Workspace study is required before choosing Task and Chat composition.",
       "target_ticket_id": "ticket-research-task-workspace-conversation-context",
       "type": "depends_on"
     },
     {
-      "rationale": "The owner requires exact Codex Project, fork and unprojected Recents behavior before the final shell choice.",
+      "rationale": "The owner requires exact Project, fork, Recents and Chat-to-Task mapping before the final shell choice.",
       "target_ticket_id": "ticket-research-codex-project-and-recent-chat-parity",
       "type": "depends_on"
     },
     {
-      "rationale": "The owner requires dedicated behavioral and renderer parity work before treating Chat composition as production-ready.",
+      "rationale": "The owner requires dedicated behavioral and renderer conformance before production approval.",
       "target_ticket_id": "ticket-audit-codex-chat-rendering-and-interaction-parity",
       "type": "depends_on"
     },
     {
-      "rationale": "The owner requires proof that the shared core is independently implementable and each adapter can boot and route a minimal exact action before the final package composition is chosen.",
+      "rationale": "The owner requires a harness-neutral core, independently implementable package boundaries, a clean Codex route and source-proven DSH seams before choosing composition; real DSH execution is not a prerequisite.",
       "target_ticket_id": "ticket-design-dual-harness-core-capability-contract",
       "type": "depends_on"
     }

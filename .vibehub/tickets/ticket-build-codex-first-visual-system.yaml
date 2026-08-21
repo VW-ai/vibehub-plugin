@@ -2,27 +2,31 @@
   "acceptance": [
     {
       "acceptance_id": "refine-visual-system-from-complete-codex-first-surfaces",
-      "criterion": "Placeholder: after all direct prerequisites succeed, replan this Ticket to firm with exact semantic tokens, typography, density, spacing, surfaces, borders, elevation, icons, focus, selection, code and diff states, microphone and live states, motion, responsive behavior, accessibility and screenshot acceptance before owner review."
+      "criterion": "Placeholder: after the integrated daily-use alpha succeeds, replan this Ticket to firm with exact semantic tokens, typography, density, spacing, surfaces, borders, elevation, icons, message and rich-item rendering, focus, selection, code and diff states, microphone and live states, Graph and Task associations, motion, responsive behavior, accessibility, performance and high-resolution screenshot acceptance before owner review."
     }
   ],
   "constraints": [
-    "Do not treat a palette swap or styling only Task surfaces as completion.",
+    "Do not treat a palette swap, screenshot imitation or styling only Task surfaces as completion.",
     "Preserve native behavior, accessibility, mode choice, reduced motion and truthful runtime states.",
     "Use accent only for earned selection, focus, links and primary action.",
-    "Keep tokens shell-agnostic enough for later DSH translation."
+    "Keep semantic tokens harness-independent enough for later DSH translation."
   ],
-  "context": "Final visual acceptance follows the real shell, Chat-to-Task and audio surfaces. Derive the application system from exact Codex Light and Dark primitives; DSH Theme translation is deferred to the later compatibility Ticket.",
+  "context": "Final visual-system implementation follows the complete daily-use alpha rather than styling isolated mock surfaces. Derive the application system from exact Codex Light and Dark primitives and real dogfood surfaces. DSH Theme translation remains a later carrier implementation, while shared semantic tokens stay harness-independent.",
   "context_refs": [
     {
-      "purpose": "Exact visual primitives.",
+      "purpose": "Exact Codex Light and Dark visual primitives.",
       "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
     },
     {
-      "purpose": "Immediate carrier and later compatibility boundary.",
-      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+      "purpose": "Boundary preventing visual work from hiding Chat behavior gaps.",
+      "ref": ".vibehub/rooms/product/constraint-codex-chat-parity-is-behavioral-product-work.yaml"
     },
     {
-      "purpose": "Accessibility and hierarchy boundary.",
+      "purpose": "Shared UI token and later DSH translation boundary.",
+      "ref": ".vibehub/rooms/product/decision-vibehub-core-supports-codex-and-dsh-harness-bases.yaml"
+    },
+    {
+      "purpose": "Accessibility and quiet hierarchy boundary.",
       "ref": ".vibehub/rooms/workbench/constraint-ui-quiet-intelligence-standard.yaml"
     }
   ],
@@ -31,22 +35,29 @@
   "maturity": "draft",
   "outcome": "The complete Codex-first VibeHub application has a coherent Codex-quality Light and Dark visual system across Chat, Composer, Task Graph, Task Workspace, execution, approvals and responsive states.",
   "provenance_refs": [
-    "conversation:2026-08-20-owner-provides-codex-light-dark-theme"
+    "conversation:2026-08-20-owner-provides-codex-light-dark-theme",
+    "conversation:2026-08-21-owner-requires-full-chat-parity-work",
+    "conversation:2026-08-21-owner-asks-for-clear-development-plan"
   ],
   "relations": [
     {
-      "rationale": "Real shell components must exist before complete visual coverage is firm.",
+      "rationale": "Preserve the checked-in causal edge: real shell components and routes are required before whole-application visual coverage.",
       "target_ticket_id": "ticket-implement-codex-first-vibehub-shell",
       "type": "depends_on"
     },
     {
-      "rationale": "Final bridge controls are part of the product surface.",
+      "rationale": "Preserve the checked-in causal edge: final Chat-to-Task controls and Task conversation are part of the visual surface.",
       "target_ticket_id": "ticket-build-codex-chat-task-bridges",
       "type": "depends_on"
     },
     {
-      "rationale": "Microphone and capability states must exist before complete visual coverage.",
+      "rationale": "Preserve the checked-in causal edge: microphone and capability states are part of the visual surface.",
       "target_ticket_id": "ticket-build-codex-audio-input",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The complete installed daily-use surface is the exact input to whole-application visual-system coverage and owner review.",
+      "target_ticket_id": "ticket-integrate-codex-first-daily-use-alpha",
       "type": "depends_on"
     }
   ],

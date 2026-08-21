@@ -6,7 +6,7 @@
     },
     {
       "acceptance_id": "project-chat-task-object-mapping-is-explicit",
-      "criterion": "One executable object and ownership contract distinguishes Codex Project or workspace, Codex Chat or Thread, VibeHub Project, VibeHub Task and Task-associated Thread or Run; it defines identity, zero-or-one membership, fork provenance, search indexing, standalone behavior, move semantics and writeback boundaries without renaming one object as another or creating a second authoritative chat registry."
+      "criterion": "One executable object and ownership contract distinguishes Codex Project or workspace, Codex Chat or Thread, VibeHub Project, VibeHub Task and Task-associated Thread or Run; it defines identity, zero-or-one membership, fork provenance, search indexing, standalone behavior and move semantics, plus one continuous Chat birthing zero or many independent Tasks whose singular immutable origin identifies exact Thread, branch and Turn range, without renaming one object as another or creating a second authoritative chat registry."
     },
     {
       "acceptance_id": "projects-recents-and-fork-prototype-is-real",
@@ -25,9 +25,10 @@
     "Do not assume Codex Project and VibeHub Project are the same object; establish and test the mapping.",
     "Do not scrape proprietary Codex Desktop state or assets, and do not infer an unsupported app-server capability.",
     "Do not use browser localStorage, DSH Agent Team tasks or a second transcript database as authority.",
-    "Recents means chats with no Codex Project membership; it is not an alias for all recent VibeHub Tasks."
+    "Recents means chats with no Codex Project membership; it is not an alias for all recent VibeHub Tasks.",
+    "Moving or continuing a Chat must not silently move, rewrite or synchronize any associated VibeHub Task or Context."
   ],
-  "context": "The owner requires the Codex carrier to preserve the familiar Codex Projects and Recents experience one-for-one: ordinary chats can remain unprojected, move into or out of a Project, fork with provenance and remain searchable. First establish what the pinned official app-server actually owns and where a bounded adapter is necessary, then exercise the exact behavior in the current real shell. This is behavioral parity research and a production-shaped carrier, not final production publication.",
+  "context": "The owner requires the Codex carrier to preserve the familiar Codex Projects and Recents experience one-for-one: ordinary chats can remain unprojected, move into or out of a Project, fork with provenance and remain searchable. A continuous Chat may birth several independent VibeHub Tasks without ceasing to be a Chat. First establish what the pinned official app-server actually owns and where a bounded adapter is necessary, then exercise the exact behavior in the current real shell.",
   "context_refs": [
     {
       "purpose": "Binding Codex Project, fork and unprojected Recents behavior.",
@@ -36,6 +37,10 @@
     {
       "purpose": "Existing VibeHub Project and standalone Task semantics that the mapping must preserve.",
       "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    },
+    {
+      "purpose": "Binding continuous Chat, multiple independent Tasks and immutable origin-provenance model.",
+      "ref": ".vibehub/rooms/product/decision-chat-streams-birth-and-associate-independent-tasks.yaml"
     },
     {
       "purpose": "Accepted Task Workspace object and host-packet baseline.",
@@ -52,6 +57,7 @@
   "outcome": "A source-backed Codex Project and Recent-chat contract plus a real-runtime prototype reproduce Project membership, chat move, fork and unprojected Recents behavior without conflating Codex Threads with VibeHub Tasks or Projects.",
   "provenance_refs": [
     "conversation:2026-08-21-owner-requires-codex-project-parity",
+    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin",
     "https://developers.openai.com/codex/app-server/",
     "https://github.com/openai/codex"
   ],

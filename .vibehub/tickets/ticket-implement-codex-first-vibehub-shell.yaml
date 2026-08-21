@@ -2,24 +2,28 @@
   "acceptance": [
     {
       "acceptance_id": "refine-production-shell-from-approved-codex-first-direction",
-      "criterion": "Placeholder: after both prerequisites succeed, replan this Ticket to firm with independently checkable acceptance for the chosen sidebar and route hierarchy, Codex Thread and Turn lifecycle, Graph and Task Workspace transitions, Composer, execution rendering, local lifecycle, restart recovery, accessibility and regression boundaries."
+      "criterion": "Placeholder: after the owner decision succeeds, replan this Ticket to firm with independently checkable acceptance for the selected sidebar, Projects and unprojected Recents, Search and navigation, Codex Thread and Turn lifecycle and conformance floor, Graph and Task Workspace routes and host extension points, local lifecycle, restart recovery, accessibility, performance and installed regression boundaries; task conversation binding, origin and Context transfer remain owned by the downstream Chat-to-Task bridge."
     }
   ],
   "constraints": [
-    "Do not execute while draft or infer the protected composition before human-origin Evidence and a successful Outcome exist.",
-    "Do not scrape Codex Desktop, create a second Task store, run duplicate Agent loops or make DSH a runtime prerequisite.",
+    "Do not execute while draft or infer protected composition before human-origin Evidence and a successful Outcome exist.",
+    "Do not scrape Codex Desktop, create a second Task or transcript store, run duplicate Agent loops or make DSH a runtime prerequisite.",
     "Keep upstream-specific calls inside bounded adapters with exact schema probes.",
-    "Preserve exact VibeHub handoff, Evidence and independent closeout semantics."
+    "Preserve ordinary Chat identity, VibeHub Task identity, exact handoff, Evidence and independent closeout semantics."
   ],
-  "context": "Production acceptance is intentionally deferred until owner review of the real adapter prototype. Refine this Ticket in place after the decision succeeds. The first production carrier must be usable without DSH; shell and runtime seams remain adapter-based so DSH compatibility can follow later.",
+  "context": "Production acceptance is intentionally deferred until the owner accepts the reviewed composition. Refine this Ticket in place after the decision succeeds. It owns the persistent application shell and native-quality Codex substrate, including Projects and Recents, while later Tickets add explicit Chat-to-Task transfer and audio. The first carrier is usable without DSH; shell and runtime seams remain adapter-based.",
   "context_refs": [
     {
-      "purpose": "Binding immediate carrier and compatibility priority.",
-      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+      "purpose": "Binding Codex carrier and shared-core boundary.",
+      "ref": ".vibehub/rooms/product/decision-vibehub-core-supports-codex-and-dsh-harness-bases.yaml"
     },
     {
-      "purpose": "Binding product parity and Task contract.",
+      "purpose": "Binding Codex interaction floor and additive Task contract.",
       "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Binding Chat and Task identity plus task-scoped conversation model.",
+      "ref": ".vibehub/rooms/product/decision-chat-streams-birth-and-associate-independent-tasks.yaml"
     },
     {
       "purpose": "Existing Task handoff, Evidence and closeout baseline to preserve.",
@@ -29,13 +33,14 @@
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "The production local application presents persistent Codex Chat and Threads plus VibeHub Task Graph and focused Task Workspace in one coherent Codex-first shell.",
+  "outcome": "The production local application presents persistent Codex-quality Chat, Projects and Recents plus VibeHub Task Graph and focused Task Workspace in one coherent Codex-first shell.",
   "provenance_refs": [
-    "conversation:2026-08-20-owner-prioritizes-real-codex-use"
+    "conversation:2026-08-20-owner-prioritizes-real-codex-use",
+    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin"
   ],
   "relations": [
     {
-      "rationale": "Production consumes the version-pinned Codex adapter and lifecycle proof.",
+      "rationale": "Production consumes the completed version-pinned Codex adapter and lifecycle proof.",
       "target_ticket_id": "ticket-spike-codex-app-server-dsh-adapter",
       "type": "depends_on"
     },
