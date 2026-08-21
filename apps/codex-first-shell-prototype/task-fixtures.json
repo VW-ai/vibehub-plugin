@@ -1,0 +1,87 @@
+{
+  "label": "Deterministic Task Workspace review fixture — not repository state",
+  "ticketId": "ticket-review-task-workspace",
+  "handoff": {
+    "kind": "vibehub_ticket_handoff",
+    "ticketId": "ticket-review-task-workspace",
+    "ticketRef": ".vibehub/tickets/ticket-review-task-workspace.yaml",
+    "maturity": "firm",
+    "operationalState": "READY",
+    "nextAction": { "action": "EXECUTE", "reason": "fixture" },
+    "outcome": "Make the Task Context Space readable, conversational, and executable through native Codex.",
+    "context": "Keep the Task contract compact above one persistent native-quality Codex conversation. The host owns Context assembly and the browser only chooses eligible Context for the next Turn.",
+    "acceptance": [
+      { "acceptance_id": "workspace-is-readable", "criterion": "Task intent, posture, Context, conversation, proof, and next action are readable without duplicating the Graph.", "authority": "agent" },
+      { "acceptance_id": "human-intervention-is-native", "criterion": "Needs You, approval, steering and interruption happen through the same Task conversation.", "authority": "human" }
+    ],
+    "humanBoundaries": [{ "acceptanceId": "human-intervention-is-native", "criterion": "Owner reviews the interaction." }],
+    "evidence": [{ "evidenceId": "fixture-proof", "acceptanceIds": ["workspace-is-readable"], "origin": "agent", "summary": "Fixture Evidence", "refs": ["browser:fixture"], "recordedAt": "2026-08-21T00:00:00Z" }],
+    "constraints": ["Task and Chat stay distinct.", "Browser code never rebuilds the Task packet."],
+    "contextRefs": [
+      { "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml", "purpose": "Product model" },
+      { "ref": "docs/proposals/codex-task-workspace/task-workspace-contract.json", "purpose": "Interaction contract" }
+    ],
+    "relations": [],
+    "provenanceRefs": ["conversation:fixture"],
+    "outcomeRecord": null,
+    "reviewInputs": { "ticketRef": ".vibehub/tickets/ticket-review-task-workspace.yaml", "commit": "fixture-not-git", "semanticDirty": false, "dirtyPaths": [] }
+  },
+  "packet": {
+    "schemaVersion": 1,
+    "kind": "vibehub_task_context_packet",
+    "operation": "continue",
+    "task": { "ticketId": "ticket-review-task-workspace", "nextAction": { "action": "EXECUTE" }, "outcome": "Make the Task Context Space readable, conversational, and executable through native Codex." },
+    "project": { "scope": "project", "projectId": "vibehub-plugin", "name": "vibehub-plugin", "branch": "codex/review", "ownership": "single_current_project" },
+    "context": {
+      "directContextIds": ["decision-human-and-agent-led-context-spaces"],
+      "selectedContextIds": [],
+      "items": [{ "contextId": "decision-human-and-agent-led-context-spaces", "room": "product", "type": "decision", "summary": "Chat and Task are distinct Context Spaces", "detail": "Chat is Human-led; Task is Agent-led and bounded.", "sourceRef": "conversation:fixture", "inclusion": "ticket_context_ref", "writebackAuthority": "none" }],
+      "rooms": [{ "room": "product", "roomId": "product", "boundary": "Product decisions", "description": "Product", "drift": "FRESH", "reasonIncluded": "owns_included_context" }],
+      "externalReferences": [{ "ref": "docs/proposals/codex-task-workspace/task-workspace-contract.json", "purpose": "Interaction contract", "authority": "read_only_reference" }],
+      "unavailableReferences": [],
+      "overflowContextIds": [],
+      "conflicts": []
+    },
+    "conversation": { "threadId": "fixture-task-thread", "runId": null, "provenance": "codex_app_server_thread", "humanMessage": null },
+    "proof": { "evidence": [], "outcome": null, "completedRunIsOutcome": false },
+    "authority": { "contextRead": "explicit_packet_only", "crossProjectRead": "explicit_reference_only", "writeback": "governed_proposal_only", "readingNeverGrantsWriteback": true, "browserMayReconstructPrompt": false },
+    "citations": [".vibehub/tickets/ticket-review-task-workspace.yaml", ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"]
+  },
+  "eligibleContexts": [
+    { "contextId": "decision-human-and-agent-led-context-spaces", "room": "product", "type": "decision", "summary": "Chat and Task are distinct Context Spaces", "sourceRef": "conversation:fixture", "defaultIncluded": true },
+    { "contextId": "contract-core-domain-semantics", "room": "knowledge", "type": "contract", "summary": "Task, Context, Room, Evidence and Outcome remain separate", "sourceRef": "conversation:fixture", "defaultIncluded": false }
+  ],
+  "rooms": [
+    { "room": "product", "roomId": "product", "description": "Product decisions", "boundary": "Product", "drift": "FRESH", "contextCount": 22 },
+    { "room": "knowledge", "roomId": "knowledge", "description": "Knowledge contracts", "boundary": "Knowledge", "drift": "FRESH", "contextCount": 16 }
+  ],
+  "thread": {
+    "id": "fixture-task-thread",
+    "title": "Review Task Workspace",
+    "preview": "Task Context packet",
+    "cwd": "/workspace/vibehub-plugin",
+    "status": { "type": "notLoaded" },
+    "taskLink": { "ticketId": "ticket-review-task-workspace", "threadId": "fixture-task-thread", "kind": "vibehub_task_context_packet" },
+    "turns": [{
+      "id": "fixture-task-turn",
+      "status": "completed",
+      "items": [
+        { "type": "userMessage", "id": "fixture-task-packet", "content": [{ "type": "text", "text": "{\"kind\":\"vibehub_task_context_packet\",\"operation\":\"continue\",\"task\":{\"ticketId\":\"ticket-review-task-workspace\",\"nextAction\":{\"action\":\"EXECUTE\"},\"outcome\":\"Make the Task Context Space readable, conversational, and executable through native Codex.\"},\"project\":{\"scope\":\"project\"},\"context\":{\"items\":[{\"contextId\":\"decision-human-and-agent-led-context-spaces\"}]},\"conversation\":{\"humanMessage\":\"Keep the Recommended action primary and make Context inspectable.\"}}" }] },
+        { "type": "plan", "id": "fixture-task-plan", "text": "- Preserve the Task contract\n- Reuse the Chat renderer\n- Verify the Context packet" },
+        { "type": "commandExecution", "id": "fixture-task-command", "command": "npm test -- codex-task-context", "cwd": "/workspace/vibehub-plugin", "status": "completed", "aggregatedOutput": "✓ packet deterministic\n✓ writeback remains governed\n", "exitCode": 0 },
+        { "type": "agentMessage", "id": "fixture-task-agent", "text": "The Task remains the durable **Context Space**. This conversation is the replaceable Codex execution carrier; completion here does not create a VibeHub Outcome." }
+      ]
+    }]
+  },
+  "pendingRequests": [{ "id": "fixture-task-approval", "fixture": true, "method": "item/commandExecution/requestApproval", "params": { "threadId": "fixture-task-thread", "turnId": "fixture-task-turn", "itemId": "fixture-task-command", "command": "npm run verify", "reason": "This Task is waiting for an exact approval." } }],
+  "variants": {
+    "draft": { "nextAction": "REFINE", "thread": false, "project": "project" },
+    "ready": { "nextAction": "EXECUTE", "thread": false, "project": "project" },
+    "running": { "nextAction": "EXECUTE", "thread": true, "live": true, "project": "project" },
+    "needs-you": { "nextAction": "NEEDS_HUMAN", "thread": true, "project": "project" },
+    "verifying": { "nextAction": "CLOSE_OUT", "thread": true, "project": "project" },
+    "deviated": { "nextAction": "REPLAN", "thread": true, "project": "project" },
+    "done": { "nextAction": "DONE", "thread": true, "project": "project", "outcome": "successful" },
+    "standalone": { "nextAction": "EXECUTE", "thread": true, "project": "standalone" }
+  }
+}

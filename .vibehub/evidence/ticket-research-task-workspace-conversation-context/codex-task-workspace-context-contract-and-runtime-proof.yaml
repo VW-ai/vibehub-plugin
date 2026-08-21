@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "task-workspace-information-and-conversation-model-is-explicit",
+    "initial-task-context-packet-is-deterministic",
+    "task-thread-run-and-prompt-boundaries-are-proven",
+    "rooms-and-context-are-readable-without-a-second-graph"
+  ],
+  "evidence_id": "codex-task-workspace-context-contract-and-runtime-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T08:50:57Z",
+  "refs": [
+    "docs/CODEX_TASK_WORKSPACE_RESEARCH.md",
+    "docs/proposals/codex-task-workspace/task-workspace-contract.json",
+    "packages/codex-adapter/task-context.mjs",
+    "packages/codex-adapter/probe-task-context-live.mjs",
+    "scripts/vh-codex-first-shell-prototype.mjs",
+    "test/codex-task-context.test.mjs",
+    "test/codex-first-shell-prototype.test.mjs",
+    "command:node-test-codex-task-context-and-shell-11-of-11",
+    "command:codex-task-context-live-probe-interrupted-recovered-resumed-cleaned",
+    "command:npm-run-verify-168-pass-0-fail-1-expected-skip"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in research and executable contract define Task, Thread, Turn, Project, Room, Context, Reference, Evidence and Outcome as separate objects and make the focused hierarchy and lifecycle disclosure exact. The local host deterministically expands direct Ticket Context first, then bounded one-Turn Human selections, with Room/source/inclusion reason, unavailable and external refs, truncation, citations, zero-or-one Project scope, no writeback authority, and explicit successful direct-prerequisite Outcomes plus their acceptance-linked Evidence. Browser code submits only IDs/message/attachments and cannot rebuild the packet. The synthetic real Codex app-server probe stored the exact packet in a persistent named Task Thread, interrupted its authoritative Turn after the user message became durable, stopped and restarted app-server, recovered the same Thread by cwd plus exact ID/name, resumed before reuse, read back interrupted history, preserved completedRunIsOutcome=false, and deleted its temporary Thread. Focused tests passed 11/11 and the full repository verification passed 168 tests with zero failures and one expected opt-in source skip.",
+  "ticket_id": "ticket-research-task-workspace-conversation-context"
+}

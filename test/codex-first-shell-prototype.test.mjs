@@ -15,10 +15,11 @@ test("Codex-first shell uses real app-server ownership and additive VibeHub Task
     source("docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"),
   ]);
   for (const label of ["New chat", "Chat", "Tasks", "Rooms", "Project", "Appearance", "Search", "Task inbox", "Recent chats"]) assert.match(html, new RegExp(label, "i"));
-  for (const request of ["thread/list", "thread/read", "thread/start", "turn/start", "turn/interrupt"]) assert.match(server, new RegExp(request.replace("/", "\\/")));
+  for (const request of ["thread/list", "thread/read", "thread/start", "thread/resume", "turn/start", "turn/steer", "turn/interrupt"]) assert.match(server, new RegExp(request.replace("/", "\\/")));
   for (const event of ["turn/started", "turn/completed", "serverRequest"]) assert.match(server + script, new RegExp(event.replace("/", "\\/")));
   assert.match(server, /buildTicketHandoff/);
-  assert.match(server, /startCodexTask/);
+  assert.match(server, /startTaskContextThread/);
+  assert.match(server, /buildTaskContextPacket/);
   assert.match(script, /vibehub_ticket_handoff/);
   assert.match(script, /relation\.prerequisiteTicketId/);
   assert.match(script, /relation\.dependentTicketId/);
@@ -133,6 +134,43 @@ test("Codex-first shell exposes ordinary audio honestly and routes real approval
   assert.match(script, /data-request-decision/);
 });
 
+test("Task Workspace reuses native Chat and keeps Context packet assembly host-owned", async () => {
+  const [html, script, css, server, module, research, contractText, fixtureText] = await Promise.all([
+    source("apps/codex-first-shell-prototype/index.html"),
+    source("apps/codex-first-shell-prototype/app.js"),
+    source("apps/codex-first-shell-prototype/app.css"),
+    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("packages/codex-adapter/task-context.mjs"),
+    source("docs/CODEX_TASK_WORKSPACE_RESEARCH.md"),
+    source("docs/proposals/codex-task-workspace/task-workspace-contract.json"),
+    source("apps/codex-first-shell-prototype/task-fixtures.json"),
+  ]);
+  const contract = JSON.parse(contractText);
+  const fixture = JSON.parse(fixtureText);
+  assert.equal(contract.contextPacket.owner, "local host");
+  assert.equal(contract.rooms.taskCreationRequiresRoom, false);
+  assert.equal(contract.rooms.crossProjectWriteback, false);
+  for (const object of ["task", "thread", "turn", "project", "room", "context", "reference", "evidence", "outcome"]) assert.ok(contract.productObjects[object]);
+  for (const state of ["draft", "ready", "running", "waitingHuman", "verifying", "deviated", "done"]) assert.ok(contract.lifecycleDisclosure[state]);
+  for (const variant of ["draft", "ready", "running", "needs-you", "verifying", "deviated", "done", "standalone"]) assert.ok(fixture.variants[variant]);
+  assert.match(script, /taskContextSelectionMarkup/);
+  assert.match(script, /renderTaskConversation/);
+  assert.match(script, /data-focus-task-composer/);
+  assert.match(script, /startTaskTurn/);
+  assert.match(script, /steerTaskTurn/);
+  assert.match(script, /selectedContextIds/);
+  assert.match(css, /\.task-conversation-timeline/);
+  assert.match(css, /\.task-context-row/);
+  assert.match(server, /buildTaskContextPacket/);
+  assert.match(server, /startTaskContextThread/);
+  assert.match(server, /turn\/steer/);
+  assert.match(module, /browserMayReconstructPrompt: false/);
+  assert.match(module, /readingNeverGrantsWriteback: true/);
+  assert.match(module, /thread\/name\/set/);
+  assert.match(research, /completed Codex Turn only\s+means the Turn completed/);
+  assert.doesNotMatch(html + script + server + module, /localStorage|sessionStorage|indexedDB/i);
+});
+
 test("Codex light and dark primitives share one responsive accessible shell", async () => {
   const [html, css, script] = await Promise.all([
     source("apps/codex-first-shell-prototype/index.html"),
@@ -208,6 +246,9 @@ test("Codex-first prototype host is loopback-only, bounded, and connected to the
   assert.equal(fixtures.status, 200);
   assert.match(fixtures.headers.get("content-type"), /application\/json/);
   assert.equal((await fixtures.json()).thread.id, "fixture-chat-parity");
+  const taskFixtures = await fetch(new URL("task-fixtures.json", url));
+  assert.equal(taskFixtures.status, 200);
+  assert.equal((await taskFixtures.json()).ticketId, "ticket-review-task-workspace");
   const exit = once(child, "exit");
   child.kill("SIGTERM");
   await exit;

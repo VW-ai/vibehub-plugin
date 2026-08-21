@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "task-workspace-information-and-conversation-model-is-explicit",
+    "task-thread-run-and-prompt-boundaries-are-proven",
+    "rooms-and-context-are-readable-without-a-second-graph",
+    "task-workspace-prototype-is-decision-ready"
+  ],
+  "evidence_id": "codex-task-workspace-real-graph-and-browser-matrix",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T08:50:57Z",
+  "refs": [
+    "apps/codex-first-shell-prototype/app.js",
+    "apps/codex-first-shell-prototype/app.css",
+    "apps/codex-first-shell-prototype/task-fixtures.json",
+    "scripts/vh-codex-first-shell-prototype.mjs",
+    "test/codex-first-shell-prototype.test.mjs",
+    "browser:codex-in-app:real-graph-current-task-open-and-exact-card-focus-return:2026-08-21",
+    "browser:codex-in-app:real-task-host-packet-prior-outcome-evidence-and-no-browser-reconstruction:2026-08-21",
+    "browser:codex-in-app:task-eight-state-matrix-wide-light-dark:2026-08-21",
+    "browser:codex-in-app:task-needs-you-390-frame-no-overflow-composer-374-approval-context:2026-08-21",
+    "command:npm-run-verify-installed-artifact-62-files-2832437-bytes"
+  ],
+  "schema_version": 1,
+  "summary": "The real loopback Codex-first shell opened the current canonical Ticket from the 21-card Task Graph into a focused READY Workspace with Start in Codex, 12 readable Context choices, the shared native conversation renderer and Composer, and a host packet containing the accepted Chat prerequisite proof and browserMayReconstructPrompt=false; Back to Tasks restored focus to the exact originating Ticket card. The same DOM exercised DRAFT/Continue, READY/Start in Codex, RUNNING/Continue, READY plus NEEDS YOU, RUNNING plus VERIFYING, DRAFT plus DEVIATED, DONE, and Standalone fixtures without conflating Chat and Task. The 390px app frame had clientWidth=scrollWidth=390 and a 374px Composer, with Task timeline, exact approval card and governed Context selector present; direct Task Context stayed checked and locked while an optional Context could be explicitly enabled for the next Turn, changing the visible count to two. Wide Light and Dark reused the same hierarchy, Dark rendered white foreground, and no false live or Outcome claim was introduced. Automated contracts cover keyboard, focus, reduced motion, fixture parity, local-only host and read-only boundaries; the full installed artifact verification produced 62 files / 2,832,437 bytes.",
+  "ticket_id": "ticket-research-task-workspace-conversation-context"
+}

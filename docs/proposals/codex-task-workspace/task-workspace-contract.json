@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "productObjects": {
+    "task": "durable bounded work Context Space owned by VibeHub",
+    "thread": "persistent Codex conversation and replaceable execution carrier linked to a Task",
+    "turn": "one Human-to-Agent interaction within a Thread; completion is never a Task Outcome",
+    "project": "zero-or-one owning work scope; repository-backed v1 uses one current Project",
+    "room": "Project-level namespace that owns durable Context, never a Task or execution",
+    "context": "explicit durable claim included by Task contract or Human choice for one Turn",
+    "reference": "read-only pointer to external reality that grants no writeback authority",
+    "evidence": "acceptance-linked recorded observation",
+    "outcome": "independent Task adjudication"
+  },
+  "workspaceOrder": [
+    "Task identity, Project or Standalone, primary posture and substate",
+    "Recommended action",
+    "Outcome or intent plus collapsed Acceptance and constraints",
+    "governed Context and Room provenance for the next Turn",
+    "persistent native Codex conversation and Composer",
+    "Evidence, Outcome and exact source provenance"
+  ],
+  "lifecycleDisclosure": {
+    "draft": "definition and blocking/deviation facts primary; conversation may explore but cannot claim execution",
+    "ready": "Start is primary; Context packet is inspectable before opening the Thread",
+    "running": "trusted current Turn and activity are primary; live state comes only from app-server",
+    "waitingHuman": "the exact approval, input or Human-authority boundary appears inside the conversation and the Task carries NEEDS YOU",
+    "verifying": "CLOSE_OUT remains RUNNING/verifying; independent adjudication is the recommended next action",
+    "deviated": "non-success Outcome returns presentation to DRAFT plus DEVIATED and preserves prior proof",
+    "done": "successful Outcome is terminal DONE; conversation remains readable history"
+  },
+  "contextPacket": {
+    "owner": "local host",
+    "kind": "vibehub_task_context_packet",
+    "ordering": "direct Ticket Context references first, then Human-selected Context IDs; lexical and de-duplicated within each group",
+    "limits": { "maxItems": 12, "maxDetailChars": 2400, "maxMessageChars": 12000 },
+    "requiredTruth": ["Task contract", "authority", "Project or Standalone", "Context inclusion reason", "Room and source", "References", "Thread or Run provenance", "current Evidence and Outcome", "successful direct-prerequisite Outcomes and their acceptance-linked Evidence", "unavailable refs", "truncation", "conflicts", "citations"],
+    "browserInput": ["ticketId", "humanMessage", "bounded attachments", "selected eligible Context IDs", "expectedTurnId when steering"],
+    "forbiddenBrowserWork": ["rebuild prompt", "load arbitrary filesystem Context", "grant writeback", "persist a second transcript", "infer completion"]
+  },
+  "threadLifecycle": {
+    "start": "host creates one persistent Thread, records a visible VibeHub Task name for bounded restart linkage, and sends the full packet in the first Turn",
+    "continue": "host rebuilds a fresh packet and starts another Turn on the linked Thread",
+    "steer": "host rebuilds the packet and calls turn/steer only with the exact active expectedTurnId",
+    "approveOrAnswer": "exact app-server server request ID and supported response",
+    "interrupt": "turn/interrupt and authoritative interrupted replay; partial items remain",
+    "refresh": "thread/read restores durable history but never live presence",
+    "restart": "thread/resume is required before new live work; Task link is recovered from persisted packet identity",
+    "additionalThread": "explicit fork or new packet-linked exploration Thread; never a Subtask",
+    "closeout": "Evidence completeness routes to an independent Agent; completed Run does not imply Outcome"
+  },
+  "rooms": {
+    "presentation": "inline inspectable list and one-Turn selector, not a permanent second graph",
+    "taskCreationRequiresRoom": false,
+    "personalRooms": "deferred",
+    "crossProjectRead": "explicit references only",
+    "crossProjectWriteback": false,
+    "automaticConversationHarvest": false
+  },
+  "reviewRoutes": [
+    "?taskFixture=draft",
+    "?taskFixture=ready",
+    "?taskFixture=running",
+    "?taskFixture=needs-you",
+    "?taskFixture=verifying",
+    "?taskFixture=deviated",
+    "?taskFixture=done",
+    "?taskFixture=standalone",
+    "&reviewFrame=narrow"
+  ],
+  "deferred": ["final visual approval", "personal Rooms", "team scope", "cross-Project writeback", "automatic Context writeback", "canonical parent or subtask ontology", "public packaging"]
+}

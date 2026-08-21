@@ -73,6 +73,7 @@
     "thread/resume",
     "thread/list",
     "thread/read",
+    "thread/name/set",
     "thread/delete",
     "turn/start",
     "turn/steer",

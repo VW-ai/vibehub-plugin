@@ -26,6 +26,10 @@
         "path": "docs/CODEX_NATIVE_SEARCH_ATTENTION_RESEARCH.md"
       },
       {
+        "blob": "6836d343b108ba8e6ec38b5a508e8f0b1cee9c0b",
+        "path": "docs/CODEX_TASK_WORKSPACE_RESEARCH.md"
+      },
+      {
         "blob": "faffbcc7a21b3abb96bc640b55b8915d386b7d76",
         "path": "docs/CONCEPT.md"
       },
@@ -190,6 +194,10 @@
         "path": "docs/proposals/codex-native-chat/chat-ui-contract.json"
       },
       {
+        "blob": "d78d1f5588133ef4f436f00b06c3c5d7f63c2b23",
+        "path": "docs/proposals/codex-task-workspace/task-workspace-contract.json"
+      },
+      {
         "blob": "d1c8e663603c345a32fff971963642eb735f8190",
         "path": "docs/proposals/dsh-persistent-shell/composition-contract.json"
       },
@@ -214,8 +222,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T08:20:13.140Z",
-    "last_aligned_commit": "0b3bdc316ac1275ede2ffdd3321598a28455d1e1"
+    "checked_at": "2026-08-21T08:50:44.852Z",
+    "last_aligned_commit": "5cac60286b65b9a46561705f0ddd463a513408df"
   },
   "anchors": [
     "CHANGELOG.md",

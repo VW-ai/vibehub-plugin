@@ -6,6 +6,8 @@ const state = {
   activeThread: null,
   activeTicketId: null,
   activeTask: null,
+  taskWorkspace: null,
+  taskSelectedContextIds: new Set(),
   activeContextId: null,
   eventCursor: 0,
   pendingRequests: [],
@@ -143,11 +145,23 @@ function setRoute(route) {
   appShell.classList.remove("sidebar-open");
   const activeRoute = route === "task" ? "tasks" : route;
   $$('[data-route]', $("#sidebar")).forEach((button) => button.classList.toggle("active", button.dataset.route === activeRoute));
-  composerWrap.hidden = route !== "chat";
+  composerWrap.hidden = route !== "chat" && route !== "task";
   if (route === "chat") renderChat();
   else if (route === "tasks") renderTasks();
   else if (route === "task") renderTaskWorkspace();
   else renderRooms();
+  syncComposerMode();
+}
+
+function syncComposerMode() {
+  const input = $("#composerInput");
+  const taskMode = state.route === "task";
+  const linked = taskMode && state.activeThreadId;
+  input.disabled = Boolean(taskMode && !linked);
+  input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : "Ask Codex to do something";
+  $("#composerNote").textContent = taskMode
+    ? (linked ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.` : "The host will open a linked Codex Thread with the canonical Task packet.")
+    : "Codex can make mistakes. Review commands and changes.";
 }
 
 function syncScrim() {
@@ -264,7 +278,9 @@ async function openSearchResult(kind, id) {
 function handoffFromText(text) {
   try {
     const parsed = JSON.parse(text);
-    return parsed?.kind === "vibehub_ticket_handoff" ? parsed : null;
+    if (parsed?.kind === "vibehub_ticket_handoff") return { kind: parsed.kind, ticketId: parsed.ticketId, outcome: parsed.outcome, nextAction: parsed.nextAction };
+    if (parsed?.kind === "vibehub_task_context_packet") return parsed;
+    return null;
   } catch {
     return null;
   }
@@ -348,7 +364,14 @@ function renderItem(item) {
   if (item.type === "userMessage") {
     const text = userInputText(item.content);
     const handoff = handoffFromText(text);
-    if (handoff) return `<div class="turn user"><article class="item-card handoff"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.nextAction?.action ?? handoff.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.ticketId))}</strong><br>${escapeHtml(handoff.outcome)}</p></article></div>`;
+    if (handoff?.kind === "vibehub_ticket_handoff") return `<div class="turn user"><article class="item-card handoff"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.nextAction?.action ?? handoff.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.ticketId))}</strong><br>${escapeHtml(handoff.outcome)}</p></article></div>`;
+    if (handoff?.kind === "vibehub_task_context_packet") {
+      const message = handoff.conversation?.humanMessage;
+      const contextCount = handoff.context?.items?.length ?? 0;
+      const media = userMediaMarkup(item.content);
+      if (message) return `<div class="turn user" data-item-id="${escapeHtml(item.id)}"><article><div>${renderMarkdown(message)}</div>${media}<small class="task-message-context">${contextCount} Context item${contextCount === 1 ? "" : "s"} · host-owned packet</small></article></div>`;
+      return `<div class="turn user"><article class="item-card handoff task-packet"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.task?.nextAction?.action ?? handoff.task?.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.task?.ticketId))}</strong><br>${escapeHtml(handoff.task?.outcome)}</p><small>${contextCount} Context item${contextCount === 1 ? "" : "s"} · ${escapeHtml(handoff.project?.scope ?? "standalone")} · host-owned packet</small></article></div>`;
+    }
     const media = userMediaMarkup(item.content);
     return `<div class="turn user" data-item-id="${escapeHtml(item.id)}"><article>${text ? `<div>${renderMarkdown(text)}</div>` : ""}${media}</article></div>`;
   }
@@ -544,6 +567,28 @@ function recommendedAction(handoff) {
   return ({ EXECUTE: "Start in Codex", REFINE: "Continue", CLOSE_OUT: "Verify & close", NEEDS_HUMAN: "Needs you", WAIT: "Waiting", REPLAN: "Replan", DONE: "Done" })[handoff.nextAction.action] ?? handoff.nextAction.action;
 }
 
+function taskContextSelectionMarkup() {
+  const workspace = state.taskWorkspace;
+  if (!workspace) return "";
+  const directIds = new Set(workspace.packet.context.directContextIds);
+  const included = new Set([...directIds, ...state.taskSelectedContextIds]);
+  const selectedItems = workspace.eligibleContexts.filter((item) => included.has(item.contextId));
+  const availableItems = workspace.eligibleContexts.filter((item) => !included.has(item.contextId)).slice(0, 8);
+  const row = (item, checked) => `<label class="task-context-row"><input type="checkbox" data-task-context-id="${escapeHtml(item.contextId)}" ${checked ? "checked" : ""} ${directIds.has(item.contextId) ? "disabled" : ""}><span><strong>${escapeHtml(item.summary)}</strong><small>${escapeHtml(item.room)} · ${directIds.has(item.contextId) ? "Task contract" : "Next Turn only"}</small></span><em>${escapeHtml(item.type)}</em></label>`;
+  return `<div class="task-context-list">${selectedItems.map((item) => row(item, true)).join("")}${availableItems.length ? `<details class="context-picker"><summary>Add Context for the next Turn <span>${availableItems.length}</span></summary><div>${availableItems.map((item) => row(item, false)).join("")}</div></details>` : ""}</div>`;
+}
+
+function renderTaskConversation({ preserveScroll = false } = {}) {
+  const timeline = $("#taskConversationTimeline");
+  if (!timeline || !state.activeThread) return;
+  const distanceFromBottom = timeline.scrollHeight - timeline.scrollTop - timeline.clientHeight;
+  timeline.innerHTML = turnsMarkup(state.activeThread);
+  requestAnimationFrame(() => {
+    if (!preserveScroll || distanceFromBottom < 96) timeline.scrollTop = timeline.scrollHeight;
+    else timeline.scrollTop = Math.max(0, timeline.scrollHeight - timeline.clientHeight - distanceFromBottom);
+  });
+}
+
 function renderTaskWorkspace() {
   if (!state.activeTask) {
     setRouteHeader("Task", "Loading canonical Context", { back: true });
@@ -557,9 +602,16 @@ function renderTaskWorkspace() {
   };
   const linked = state.threads.find((thread) => thread.taskLink?.ticketId === handoff.ticketId);
   const phase = primaryPhase(ticket);
-  const actionLabel = recommendedAction(handoff);
+  const actionLabel = linked && ["EXECUTE", "REFINE"].includes(handoff.nextAction.action) ? "Continue" : recommendedAction(handoff);
+  const packet = state.taskWorkspace?.packet;
+  const effectiveContextIds = new Set([...(packet?.context.directContextIds ?? []), ...state.taskSelectedContextIds]);
+  const effectiveContexts = state.taskWorkspace?.eligibleContexts.filter((item) => effectiveContextIds.has(item.contextId)) ?? [];
+  const contextCount = effectiveContexts.length;
+  const roomNames = [...new Set(effectiveContexts.map((item) => item.room))].sort();
+  const projectLabel = packet?.project.scope === "standalone" ? "Standalone Task" : packet?.project.name ?? state.bootstrap.graph.project.name;
   setRouteHeader(humanize(handoff.ticketId), `Task Workspace · ${handoff.nextAction.action}`, { back: true });
-  surface.innerHTML = `<div class="task-workspace"><header class="task-hero"><div><span class="eyebrow">TASK · ${escapeHtml(handoff.ticketId)}</span><h1>${escapeHtml(humanize(handoff.ticketId))}</h1><p>${escapeHtml(handoff.outcome)}</p></div><span class="task-phase"><i></i>${phase}${substate(ticket) ? ` · ${substate(ticket)}` : ""}</span></header><div class="workspace-grid"><div class="workspace-main"><section><span class="eyebrow">CONTEXT SPACE</span><h2>What Codex is being asked to complete</h2><p>${escapeHtml(handoff.context)}</p></section><section><span class="eyebrow">ACCEPTANCE</span><div class="acceptance-list">${handoff.acceptance.map((item) => `<div class="acceptance-row"><i>${handoff.evidence.some((evidence) => evidence.acceptanceIds.includes(item.acceptance_id)) ? "✓" : "○"}</i><span>${escapeHtml(item.criterion)}</span></div>`).join("")}</div></section><section><span class="eyebrow">EXECUTION</span><h2>${linked ? "A Codex Thread is linked" : "Ready for one Codex Thread"}</h2><p>${linked ? "The Task remains canonical VibeHub truth; Codex owns the conversation and execution stream." : "Starting passes the exact host-owned handoff into your Codex. It does not create a second Task record."}</p>${linked ? `<button class="linked-thread" type="button" data-thread-id="${escapeHtml(linked.id)}"><strong>${escapeHtml(titleForThread(linked))}</strong><br><small>${escapeHtml(linked.id)}</small></button>` : ""}</section></div><aside class="workspace-aside"><section><span class="eyebrow">RECOMMENDED ACTION</span><button class="recommended" type="button" data-task-action="${escapeHtml(handoff.nextAction.action)}" ${["WAIT", "DONE"].includes(handoff.nextAction.action) ? "disabled" : ""}><strong>${escapeHtml(actionLabel)}</strong><span>→</span></button></section><section><span class="eyebrow">PROOF</span><h3>${handoff.evidence.length} Evidence</h3><p>${handoff.acceptance.length} acceptance criteria · Outcome ${handoff.outcomeRecord ? handoff.outcomeRecord.status : "pending"}</p></section><section><span class="eyebrow">SOURCE</span><p>${escapeHtml(handoff.reviewInputs.ticketRef)}<br><strong>${escapeHtml(handoff.reviewInputs.commit?.slice(0, 10) ?? "working tree")}</strong></p></section></aside></div></div>`;
+  surface.innerHTML = `<div class="task-workspace"><header class="task-hero"><div><span class="eyebrow">TASK · ${escapeHtml(projectLabel)}</span><h1>${escapeHtml(humanize(handoff.ticketId))}</h1><p>${escapeHtml(handoff.outcome)}</p></div><span class="task-phase"><i></i>${phase}${substate(ticket) ? ` · ${substate(ticket)}` : ""}</span></header><div class="workspace-grid"><div class="workspace-main"><section class="task-intent"><span class="eyebrow">CONTEXT SPACE</span><h2>What this Task is here to finish</h2><p>${escapeHtml(handoff.context)}</p><details><summary>Acceptance and constraints <span>${handoff.acceptance.length}</span></summary><div class="acceptance-list">${handoff.acceptance.map((item) => `<div class="acceptance-row"><i>${handoff.evidence.some((evidence) => evidence.acceptanceIds.includes(item.acceptance_id)) ? "✓" : "○"}</i><span>${escapeHtml(item.criterion)}</span></div>`).join("")}</div>${handoff.constraints?.length ? `<ul class="constraint-list">${handoff.constraints.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}</details></section><section class="task-context-panel"><header><div><span class="eyebrow">CONTEXT FOR THE NEXT TURN</span><h2>${contextCount} governed item${contextCount === 1 ? "" : "s"}</h2></div><span>${escapeHtml(roomNames.join(" · ") || "No Room required")}</span></header><p>Included by the Task contract or selected here for one Turn. Reading never grants writeback.</p>${taskContextSelectionMarkup()}<details class="packet-inspector"><summary>Inspect host-owned packet</summary><pre>${escapeHtml(JSON.stringify(packet, null, 2))}</pre></details></section><section class="task-conversation-section"><header><div><span class="eyebrow">TASK CONVERSATION</span><h2>${linked ? escapeHtml(titleForThread(linked)) : "No Codex Thread yet"}</h2></div>${linked ? `<button class="secondary-button" type="button" data-thread-id="${escapeHtml(linked.id)}">Open as Chat</button>` : ""}</header><p>${linked ? "Human messages can explore, steer, approve or interrupt this Task. Codex owns the Thread; VibeHub owns the Task contract." : "Start the recommended action to open a persistent Codex Thread with the exact packet above."}</p><div class="task-conversation-timeline" id="taskConversationTimeline">${state.activeThread ? turnsMarkup(state.activeThread) : '<div class="task-conversation-empty">The first Turn will carry the canonical Task packet. No transcript is invented before that.</div>'}</div></section></div><aside class="workspace-aside"><section class="recommended-section"><span class="eyebrow">RECOMMENDED ACTION</span><button class="recommended" type="button" ${linked ? "data-focus-task-composer" : `data-task-action="${escapeHtml(handoff.nextAction.action)}"`} ${["WAIT", "DONE"].includes(handoff.nextAction.action) && !linked ? "disabled" : ""}><strong>${escapeHtml(actionLabel)}</strong><span>→</span></button><p>${linked ? "Continue in the Task conversation below." : "The local host assembles Project, Context, authority and source citations."}</p></section><section><span class="eyebrow">CURRENT WORK</span><h3>${linked ? `Thread ${escapeHtml(linked.id.slice(0, 8))}…` : "Not started"}</h3><p>${state.running ? "Codex is running now." : linked ? "Thread is ready for the next Turn." : "No execution claim."}</p></section><section><span class="eyebrow">PROOF</span><h3>${handoff.evidence.length} Evidence</h3><p>${handoff.acceptance.length} acceptance criteria · Outcome ${handoff.outcomeRecord ? handoff.outcomeRecord.status : "pending"}</p></section><section><span class="eyebrow">ROOMS & SOURCE</span><p>${escapeHtml(roomNames.join(" · ") || "Standalone")}</p><p>${escapeHtml(handoff.reviewInputs.ticketRef)}<br><strong>${escapeHtml(handoff.reviewInputs.commit?.slice(0, 10) ?? "working tree")}</strong></p></section></aside></div></div>`;
+  syncComposerMode();
 }
 
 function renderRooms() {
@@ -589,7 +641,7 @@ async function refreshThreads() {
   updateSidebar();
 }
 
-async function openThread(threadId) {
+async function openThread(threadId, { route = "chat" } = {}) {
   const data = await action({ action: "readThread", threadId });
   state.activeThreadId = threadId;
   state.activeThread = { ...state.threads.find((thread) => thread.id === threadId), ...data.thread };
@@ -597,7 +649,7 @@ async function openThread(threadId) {
   if (!state.running) state.liveItems.clear();
   $("#stopTurn").hidden = !state.running;
   updateSidebar();
-  setRoute("chat");
+  setRoute(route);
 }
 
 function liveItem(itemId, fallback) {
@@ -655,10 +707,11 @@ function applyChatNotification(method, params) {
 }
 
 function scheduleChatRender() {
-  if (state.chatRenderFrame || state.route !== "chat" || !state.activeThread) return;
+  if (state.chatRenderFrame || !["chat", "task"].includes(state.route) || !state.activeThread) return;
   state.chatRenderFrame = requestAnimationFrame(() => {
     state.chatRenderFrame = 0;
-    renderChat({ preserveScroll: true });
+    if (state.route === "chat") renderChat({ preserveScroll: true });
+    else renderTaskConversation({ preserveScroll: true });
   });
 }
 
@@ -685,10 +738,25 @@ async function newThread() {
 async function openTask(ticketId) {
   state.activeTicketId = ticketId;
   state.activeTask = null;
+  state.taskWorkspace = null;
+  state.taskSelectedContextIds = new Set();
   setRoute("task");
   try {
     const data = await action({ action: "readTask", ticketId });
     state.activeTask = data.handoff;
+    state.taskWorkspace = data;
+    state.taskSelectedContextIds = new Set(data.packet.context.selectedContextIds ?? []);
+    const linked = state.threads.find((thread) => thread.taskLink?.ticketId === ticketId);
+    if (linked) {
+      const threadData = await action({ action: "readThread", threadId: linked.id });
+      state.activeThreadId = linked.id;
+      state.activeThread = { ...linked, ...threadData.thread };
+      state.running = String(threadData.thread.status?.type ?? threadData.thread.status).toLowerCase().includes("active");
+    } else {
+      state.activeThreadId = null;
+      state.activeThread = null;
+      state.running = false;
+    }
     renderTaskWorkspace();
   } catch (error) { notify(error.message); setRoute("tasks"); }
 }
@@ -751,6 +819,28 @@ async function submitTurn(event) {
   const text = textarea.value.trim();
   if (!text && !state.attachments.length) return;
   try {
+    if (state.route === "task") {
+      if (!state.activeTicketId || !state.activeThreadId) return notify("Start this Task before sending a message.");
+      if (!text) return notify("Add a message for this Task Turn.");
+      const taskAction = state.running ? "steerTaskTurn" : "startTaskTurn";
+      const result = await action({
+        action: taskAction,
+        ticketId: state.activeTicketId,
+        threadId: state.activeThreadId,
+        expectedTurnId: state.running ? state.currentTurnId : undefined,
+        message: text,
+        selectedContextIds: [...state.taskSelectedContextIds],
+        attachments: state.attachments.map(({ type, url }) => ({ type, url })),
+      });
+      if (!state.running) state.currentTurnId = result.turn?.id ?? result.turnId;
+      state.running = true;
+      textarea.value = "";
+      state.attachments = [];
+      renderAttachments();
+      $("#stopTurn").hidden = false;
+      await openThread(state.activeThreadId, { route: "task" });
+      return;
+    }
     if (!state.activeThreadId) await newThread();
     const input = [];
     if (text) input.push({ type: "text", text });
@@ -793,7 +883,7 @@ async function pollEvents() {
       }
       rendered = applyChatNotification(method, params) || rendered;
     }
-    if (reconcile && state.activeThreadId) await openThread(state.activeThreadId);
+    if (reconcile && state.activeThreadId) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
     else if ((rendered || refreshRequests) && state.activeThreadId) scheduleChatRender();
     state.attentionPollCounter += 1;
     if (state.attentionPollCounter >= 12) {
@@ -839,7 +929,7 @@ document.addEventListener("click", async (event) => {
   }
   const decision = event.target.closest("[data-request-decision]");
   if (decision) {
-    try { await action({ action: "resolveRequest", requestId: decision.dataset.requestId, decision: decision.dataset.requestDecision }); await openThread(state.activeThreadId); }
+    try { await action({ action: "resolveRequest", requestId: decision.dataset.requestId, decision: decision.dataset.requestDecision }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); }
     catch (error) { notify(error.message); }
     return;
   }
@@ -850,7 +940,7 @@ document.addEventListener("click", async (event) => {
     const value = prompt(question?.question ?? "Answer Codex");
     if (value !== null) {
       await action({ action: "resolveRequest", requestId: answer.dataset.answerRequest, answers: { [question.id]: { answers: [value] } } });
-      await openThread(state.activeThreadId);
+      await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
     }
     return;
   }
@@ -860,13 +950,24 @@ document.addEventListener("click", async (event) => {
     if (next === "EXECUTE" || next === "REFINE") {
       taskAction.disabled = true;
       try {
-        const started = await action({ action: "startTask", ticketId: state.activeTicketId });
+        const started = await action({ action: "startTask", ticketId: state.activeTicketId, selectedContextIds: [...state.taskSelectedContextIds] });
         await refreshThreads();
-        await openThread(started.threadId);
+        await openThread(started.threadId, { route: "task" });
       } catch (error) { notify(error.message); taskAction.disabled = false; }
     } else if (next === "CLOSE_OUT") notify("Independent closeout remains a separate VibeHub action.");
     else if (next === "NEEDS_HUMAN") notify("This Task is waiting for your explicit decision.");
+    return;
   }
+  if (event.target.closest("[data-focus-task-composer]")) { $("#composerInput").focus(); return; }
+});
+
+document.addEventListener("change", (event) => {
+  const contextInput = event.target.closest("[data-task-context-id]");
+  if (!contextInput || contextInput.disabled) return;
+  if (contextInput.checked) state.taskSelectedContextIds.add(contextInput.dataset.taskContextId);
+  else state.taskSelectedContextIds.delete(contextInput.dataset.taskContextId);
+  renderTaskWorkspace();
+  $("#composerInput").focus();
 });
 
 $("#newThread").addEventListener("click", newThread);
@@ -941,7 +1042,42 @@ document.addEventListener("keydown", (event) => {
 async function start() {
   try {
     await refreshThreads();
-    if (new URLSearchParams(location.search).get("chatFixture") === "mixed") {
+    const params = new URLSearchParams(location.search);
+    const taskFixtureName = params.get("taskFixture");
+    if (taskFixtureName) {
+      const fixture = await fetch("/task-fixtures.json").then((response) => response.json());
+      const variant = fixture.variants[taskFixtureName] ?? fixture.variants.ready;
+      state.fixtureMode = true;
+      state.threads = state.threads.filter((thread) => thread.id !== fixture.thread.id && thread.taskLink?.ticketId !== fixture.ticketId);
+      state.activeTicketId = fixture.ticketId;
+      state.activeTask = structuredClone(fixture.handoff);
+      state.activeTask.nextAction = { action: variant.nextAction, reason: "review_fixture" };
+      state.activeTask.operationalState = variant.nextAction === "DONE" ? "DONE" : variant.nextAction === "REPLAN" ? "DEVIATED" : "READY";
+      if (variant.outcome) state.activeTask.outcomeRecord = { status: variant.outcome };
+      state.taskWorkspace = {
+        handoff: state.activeTask,
+        packet: structuredClone(fixture.packet),
+        eligibleContexts: fixture.eligibleContexts,
+        rooms: fixture.rooms,
+      };
+      state.taskWorkspace.packet.task.nextAction = state.activeTask.nextAction;
+      if (variant.project === "standalone") state.taskWorkspace.packet.project = { scope: "standalone", projectId: null, name: null, ownership: "no_project" };
+      state.taskSelectedContextIds = new Set(state.taskWorkspace.packet.context.selectedContextIds ?? []);
+      if (variant.thread) {
+        const thread = structuredClone(fixture.thread);
+        if (variant.live) thread.status = { type: "active" };
+        state.threads.unshift(thread);
+        state.activeThreadId = thread.id;
+        state.activeThread = thread;
+        state.running = Boolean(variant.live);
+        state.currentTurnId = variant.live ? thread.turns.at(-1)?.id : null;
+      }
+      state.pendingRequests = fixture.pendingRequests;
+      updateSidebar();
+      setRoute("task");
+      return;
+    }
+    if (params.get("chatFixture") === "mixed") {
       const fixture = await fetch("/chat-fixtures.json").then((response) => response.json());
       state.fixtureMode = true;
       state.activeThreadId = fixture.thread.id;

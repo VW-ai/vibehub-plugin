@@ -6,7 +6,7 @@ import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { CodexAppServerClient } from "../packages/codex-adapter/client.mjs";
-import { startCodexTask } from "../packages/codex-adapter/handoff.mjs";
+import { buildTaskContextPacket, startTaskContextThread, taskLinkFromPreview } from "../packages/codex-adapter/task-context.mjs";
 import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
 import { documents, loadRepository } from "../skills/scripts/vh.mjs";
 
@@ -54,6 +54,7 @@ const assets = new Map([
   ["/app.css", [join(assetRoot, "app.css"), "text/css; charset=utf-8"]],
   ["/app.js", [join(assetRoot, "app.js"), "text/javascript; charset=utf-8"]],
   ["/chat-fixtures.json", [join(assetRoot, "chat-fixtures.json"), "application/json; charset=utf-8"]],
+  ["/task-fixtures.json", [join(assetRoot, "task-fixtures.json"), "application/json; charset=utf-8"]],
   ["/vibehub-mark.svg", [join(sourceRoot, "assets", "brand", "vibehub-mark.svg"), "image/svg+xml"]],
 ]);
 
@@ -105,14 +106,10 @@ function threadTitle(thread) {
 }
 
 function taskLinkFromThread(thread) {
-  try {
-    const parsed = JSON.parse(thread.preview);
-    return parsed?.kind === "vibehub_ticket_handoff" && typeof parsed.ticketId === "string"
-      ? { ticketId: parsed.ticketId, threadId: thread.id }
-      : null;
-  } catch {
-    return null;
-  }
+  const named = String(thread.name ?? "").match(/^VibeHub Task · (ticket-[a-z0-9-]+)$/u);
+  if (named) return { ticketId: named[1], kind: "codex_thread_name", threadId: thread.id };
+  const link = taskLinkFromPreview(thread.preview);
+  return link ? { ...link, threadId: thread.id } : null;
 }
 
 function publicThread(thread) {
@@ -168,6 +165,79 @@ function knowledgeProjection() {
       sourceRef: document.source.ref,
     }))
     .sort((left, right) => left.summary.localeCompare(right.summary));
+}
+
+function priorAcceptedProjection(handoff, repository) {
+  return (handoff.relations ?? [])
+    .filter((relation) => relation.type === "depends_on")
+    .map((relation) => {
+      const outcomeEntry = repository.outcomes.documents.get(relation.target_ticket_id);
+      const outcome = outcomeEntry?.document;
+      if (outcome?.status !== "successful") return null;
+      return {
+        ticketId: relation.target_ticket_id,
+        rationale: relation.rationale,
+        outcomeRef: outcomeEntry.path,
+        outcome: {
+          status: outcome.status,
+          summary: outcome.summary,
+          closedAt: outcome.closed_at,
+          acceptedAcceptanceIds: outcome.accepted_acceptance_ids,
+        },
+        evidence: (outcome.evidence_ids ?? [])
+          .map((evidenceId) => repository.evidence.documents.get(evidenceId))
+          .filter(Boolean)
+          .map(({ document, path }) => ({
+            evidenceId: document.evidence_id,
+            evidenceRef: path,
+            summary: document.summary,
+            acceptanceIds: document.acceptance_ids,
+            origin: document.origin ?? "agent",
+            refs: document.refs ?? [],
+          }))
+          .sort((left, right) => left.evidenceId.localeCompare(right.evidenceId)),
+      };
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.ticketId.localeCompare(right.ticketId));
+}
+
+function taskWorkspaceProjection(ticketId, { selectedContextIds = [], thread = null, operation = "start", humanMessage = null } = {}) {
+  const handoff = buildTicketHandoff(repoRoot, ticketId);
+  const snapshot = buildUiSnapshot(repoRoot);
+  const repository = loadRepository(repoRoot);
+  const contexts = knowledgeProjection();
+  const packet = buildTaskContextPacket({
+    handoff,
+    project: snapshot.state.project,
+    contexts,
+    rooms: snapshot.state.rooms.rooms,
+    selectedContextIds,
+    priorAccepted: priorAcceptedProjection(handoff, repository),
+    thread,
+    operation,
+    humanMessage,
+  });
+  return {
+    handoff,
+    packet,
+    eligibleContexts: contexts.map((item) => ({
+      contextId: item.contextId,
+      room: item.room,
+      type: item.type,
+      summary: item.summary,
+      sourceRef: item.sourceRef,
+      defaultIncluded: packet.context.directContextIds.includes(item.contextId),
+    })),
+    rooms: snapshot.state.rooms.rooms.map((room) => ({
+      room: room.room,
+      roomId: room.roomId,
+      description: room.description,
+      boundary: room.boundary,
+      drift: room.drift.state,
+      contextCount: room.contexts.length,
+    })),
+  };
 }
 
 function attentionProjection(graph) {
@@ -265,11 +335,50 @@ async function action(payload) {
     return client.request("turn/interrupt", { threadId: payload.threadId, turnId: payload.turnId });
   }
   if (payload.action === "startTask") {
-    const handoff = buildTicketHandoff(repoRoot, payload.ticketId);
-    return startCodexTask({ client, payload: handoff, cwd: repoRoot, ephemeral: false });
+    const workspace = taskWorkspaceProjection(payload.ticketId, {
+      selectedContextIds: Array.isArray(payload.selectedContextIds) ? payload.selectedContextIds : [],
+      operation: payload.operation === "explore" ? "explore" : "start",
+    });
+    return startTaskContextThread({ client, packet: workspace.packet, cwd: repoRoot, ephemeral: false });
   }
   if (payload.action === "readTask") {
-    return { handoff: buildTicketHandoff(repoRoot, payload.ticketId) };
+    return taskWorkspaceProjection(payload.ticketId);
+  }
+  if (payload.action === "startTaskTurn" || payload.action === "steerTaskTurn") {
+    if (typeof payload.ticketId !== "string" || typeof payload.threadId !== "string" || typeof payload.message !== "string" || !payload.message.trim()) {
+      throw Object.assign(new Error("ticketId, threadId and message required"), { status: 400 });
+    }
+    const threads = await listThreads();
+    const linked = threads.find((thread) => thread.id === payload.threadId && thread.taskLink?.ticketId === payload.ticketId);
+    if (!linked) throw Object.assign(new Error("Thread is not linked to this canonical Task"), { status: 409 });
+    const operation = payload.action === "steerTaskTurn" ? "steer" : "continue";
+    const workspace = taskWorkspaceProjection(payload.ticketId, {
+      selectedContextIds: Array.isArray(payload.selectedContextIds) ? payload.selectedContextIds : [],
+      thread: { id: linked.id, activeTurnId: payload.expectedTurnId ?? null },
+      operation,
+      humanMessage: payload.message,
+    });
+    const attachments = Array.isArray(payload.attachments) ? payload.attachments : [];
+    if (attachments.length > 3 || !validInputs([{ type: "text", text: payload.message }, ...attachments])) {
+      throw Object.assign(new Error("Task Turn attachments must be bounded image or audio inputs"), { status: 400 });
+    }
+    const input = [{ type: "text", text: JSON.stringify(workspace.packet, null, 2) }, ...attachments];
+    if (operation === "steer") {
+      if (typeof payload.expectedTurnId !== "string") throw Object.assign(new Error("expectedTurnId required to steer"), { status: 400 });
+      return client.request("turn/steer", {
+        threadId: linked.id,
+        expectedTurnId: payload.expectedTurnId,
+        clientUserMessageId: `vibehub-${crypto.randomUUID()}`,
+        input,
+      });
+    }
+    await client.request("thread/resume", {
+      threadId: linked.id,
+      approvalPolicy: "on-request",
+      cwd: repoRoot,
+      sandbox: "workspace-write",
+    });
+    return client.request("turn/start", { threadId: linked.id, input });
   }
   if (payload.action === "resolveRequest") {
     const request = pendingRequests.get(String(payload.requestId));
