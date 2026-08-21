@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "codex-project-and-thread-capabilities-are-source-audited",
+    "project-chat-task-object-mapping-is-explicit",
+    "unsupported-native-membership-has-truthful-adapter-boundary"
+  ],
+  "evidence_id": "codex-project-contract-and-live-lifecycle-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T23:27:05Z",
+  "refs": [
+    "docs/CODEX_PROJECTS_RECENTS_PARITY_RESEARCH.md",
+    "docs/proposals/codex-projects/project-object-contract.json",
+    "packages/codex-adapter/projects.mjs",
+    "packages/codex-adapter/probe-projects-live.mjs",
+    "packages/codex-adapter/upstream-lock.json",
+    "https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/app-server-protocol/src/protocol/v2/thread_data.rs",
+    "https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/app-server-protocol/src/protocol/v2/thread.rs",
+    "https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/app-server/tests/suite/v2/thread_sections.rs",
+    "https://github.com/openai/codex/blob/be6e8eac029b183056b7e4402879f15d2c85f61b/codex-rs/app-server/tests/suite/v2/thread_metadata_update.rs",
+    "command:npm run probe:codex:projects (ok; create/move/fork/search/archive/restart/restore/delete/cleanup)",
+    "command:node packages/codex-adapter/probe-schema.mjs (ok; pinned schema f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2)",
+    "commit:c517dcc"
+  ],
+  "schema_version": 1,
+  "summary": "Pinned official Codex 0.147.0 source and generated schema prove server-owned ThreadSection CRUD, nullable Thread.section membership, explicit-null Recents, native move, fork lineage, title search, archive/restore and restart recovery. The executable contract keeps Codex Project, Pinned, Chat/Thread, cwd, VibeHub Project, Task, Task origin and Run distinct; one continuing Chat may birth many independent Tasks whose immutable origin never moves with the Chat. The adapter uses no shadow membership registry. Its only required composition is native fork followed by native move; if the source section disappears, the fork stays visibly unsectioned in Recents with forkedFromId and placement.applied=false. A real authenticated lifecycle probe created, moved, forked, searched, archived, restarted, restored, deleted and fully cleaned temporary native records.",
+  "ticket_id": "ticket-research-codex-project-and-recent-chat-parity"
+}

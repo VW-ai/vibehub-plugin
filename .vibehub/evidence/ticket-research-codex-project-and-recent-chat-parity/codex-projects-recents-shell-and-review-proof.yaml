@@ -1,0 +1,30 @@
+{
+  "acceptance_ids": [
+    "projects-recents-and-fork-prototype-is-real",
+    "project-parity-review-is-decision-ready"
+  ],
+  "evidence_id": "codex-projects-recents-shell-and-review-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T23:27:05Z",
+  "refs": [
+    "apps/codex-first-shell-prototype/index.html",
+    "apps/codex-first-shell-prototype/app.js",
+    "apps/codex-first-shell-prototype/app.css",
+    "apps/codex-first-shell-prototype/project-fixtures.json",
+    "scripts/vh-codex-first-shell-prototype.mjs",
+    "docs/proposals/codex-projects/review-matrix.json",
+    "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md",
+    "test/codex-projects.test.mjs",
+    "test/codex-first-shell-prototype.test.mjs",
+    "browser:codex-projects-recents-fixture-light-dark-wide-and-390x844-review",
+    "browser:authenticated-native-recents-transcript-project-selector-fork-archive-review",
+    "command:npm run verify (173 pass, 0 fail, 2 intentional skip; artifact verified)",
+    "command:node --test test/codex-projects.test.mjs test/codex-first-shell-prototype.test.mjs (13 pass, 0 fail)",
+    "command:npm run probe:codex:projects (ok; restart recovered; cleanup complete)",
+    "commit:c517dcc"
+  ],
+  "schema_version": 1,
+  "summary": "The authenticated Codex-first shell now renders built-in Pinned separately, custom native Projects with nested real Threads, and Recents only from thread/list sectionId:null. Create, rename, delete, drag, keyboard-select move, fork, Search and archive route to the versioned adapter; fork lineage and placement are visible, deleting a Project returns member Chats to Recents, and no localStorage, IndexedDB or fixture authority exists. Deterministic states cover empty, projected, unprojected, forked and archived; browser review covered Light, Dark, 1280x720, 390x844, native transcript replay and keyboard controls. Full verification passed 173 tests with two intentional skips, and the real lifecycle probe recovered the same server-owned identities after app-server restart before cleaning all probe data. The checked-in review matrix explicitly records production follow-ups without overstating this non-final visual slice.",
+  "ticket_id": "ticket-research-codex-project-and-recent-chat-parity"
+}
