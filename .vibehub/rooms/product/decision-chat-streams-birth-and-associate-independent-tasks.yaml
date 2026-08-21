@@ -1,0 +1,55 @@
+{
+  "context_id": "decision-chat-streams-birth-and-associate-independent-tasks",
+  "detail": "Chat and Task share the same conversational interaction substrate but remain distinct durable objects. To the Human, a new Chat can feel like an uncommitted Task space: it has a purpose and can accumulate useful Context, but it has no durable execution contract until an explicit Create Task or Attach to Task action occurs. A Chat never has to stop or transform identity when work becomes executable. One Chat stream or branch may birth zero, one or many Tasks and may continue indefinitely afterward. Each created Task owns its Outcome, Context scope, constraints, Acceptance, lifecycle, Evidence and Agent delegation, plus an origin provenance locator identifying the source Chat or Thread, branch and exact Turn or selected range from which it was formed. A Task may also associate with additional Chats later, but origin provenance remains singular and immutable. The Task Workspace provides a full task-scoped conversation so the Human can ask, clarify, intervene or redirect without returning to the source Chat; the Agent receives the Task's authoritative organized Context packet, not an implicit copy of the entire ever-growing source transcript. The Human may also return to the origin Chat and continue directing that broader stream. New messages in either place do not silently mutate the other Context: explicit attach, quote, Remember, Create Task or update actions govern transfer. In Chat UI, lightweight inline or turn-level Task associations may show what work was created or attached; list and Graph views may show the same provenance edge without treating a Chat fork as a Subtask or a Task dependency.",
+  "evidence": [
+    {
+      "note": "The owner explicitly separates continuous Chat identity from the independent Tasks it may produce, while requiring provenance and conversation access in both directions.",
+      "ref": "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin"
+    },
+    {
+      "note": "Existing additive actions already provide the explicit boundary for creating or attaching durable work from Chat.",
+      "ref": ".vibehub/rooms/product/decision-native-chat-with-additive-task-actions.yaml"
+    },
+    {
+      "note": "The existing Work Graph direction already treats Chat-to-Task associations as provenance edges and Chat forks as thought streams rather than Subtasks.",
+      "ref": ".vibehub/rooms/workbench/decision-unified-work-graph-semantic-zoom.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-human-and-agent-led-context-spaces",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-native-chat-with-additive-task-actions",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-unified-work-graph-semantic-zoom",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-chat-default-search-and-task-attention",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T22:11:55Z",
+    "quote": "一个 chat 里会聊出来不止一个任务；chat remain chat，user 依然可以一直在这个 stream 下继续聊。task 可以对应一个 where does it born from 的 chatstream，也可以在当前的 task 下直接问。",
+    "ref": "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin"
+  },
+  "state": "active",
+  "summary": "Chat remains a continuous conversational stream that may birth several independent Tasks, while each Task keeps origin provenance and its own context-scoped conversation",
+  "tags": [
+    "chat",
+    "task",
+    "context-space",
+    "origin-provenance",
+    "conversation",
+    "graph",
+    "interaction"
+  ],
+  "type": "decision"
+}
