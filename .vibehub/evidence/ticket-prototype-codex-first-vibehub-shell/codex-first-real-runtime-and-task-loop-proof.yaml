@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "codex-parity-floor-is-traversable",
+    "vibehub-task-layer-is-additive"
+  ],
+  "evidence_id": "codex-first-real-runtime-and-task-loop-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T06:14:48Z",
+  "refs": [
+    "apps/codex-first-shell-prototype/index.html",
+    "apps/codex-first-shell-prototype/app.js",
+    "scripts/vh-codex-first-shell-prototype.mjs",
+    "packages/codex-adapter/client.mjs",
+    "test/codex-first-shell-prototype.test.mjs",
+    "browser:codex-in-app:real-thread-task-graph-workspace-return-loop:2026-08-21",
+    "test:focused-codex-shell-and-host:21-pass",
+    "test:npm-run-verify:161-pass-1-expected-skip"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in loopback prototype owns one real authenticated Codex app-server, restores Project Threads and full Turn/item history, exposes native Composer inputs, interruption and approval routing, and keeps VibeHub additive: the canonical current Task graph, exact relations, focused Context/Acceptance/Evidence/Outcome workspace and host-owned handoff are read from Git without browser storage or a second Task system. A real in-app browser opened the owner Project Thread (1,852 rendered items including 1,311 structured tool/reasoning/change cards), traversed the 18-Ticket current graph with 17 exact canonical edges, opened the prototype Task, and returned with focus restored to the exact originating card. The focused real-runtime suite passed 21/21 and the complete repository verification passed 161 with one expected opt-in upstream-source skip.",
+  "ticket_id": "ticket-prototype-codex-first-vibehub-shell"
+}

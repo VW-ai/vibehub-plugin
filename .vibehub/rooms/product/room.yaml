@@ -14,6 +14,10 @@
         "path": "docs/CODEX_APP_SERVER_DSH_ADAPTER_SPIKE.md"
       },
       {
+        "blob": "adbd2f8d95049ce423eb2bc9edc0f71e964ac52e",
+        "path": "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"
+      },
+      {
         "blob": "faffbcc7a21b3abb96bc640b55b8915d386b7d76",
         "path": "docs/CONCEPT.md"
       },
@@ -190,8 +194,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T05:50:19.268Z",
-    "last_aligned_commit": "1caf170519af7edc0a7484afc85dd8e908f16818"
+    "checked_at": "2026-08-21T06:15:19.623Z",
+    "last_aligned_commit": "13dcdb3f6b281c0130d73be635be78bef42db1ad"
   },
   "anchors": [
     "CHANGELOG.md",

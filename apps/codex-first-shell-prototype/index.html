@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#181818">
+  <title>VibeHub · Codex-first prototype</title>
+  <link rel="icon" type="image/svg+xml" href="/vibehub-mark.svg">
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell" id="appShell" data-theme="system">
+    <aside class="sidebar" id="sidebar" aria-label="Application navigation">
+      <header class="brand-row">
+        <button class="brand" type="button" data-route="chat" aria-label="Open Codex chat">
+          <img src="/vibehub-mark.svg" alt="">
+          <span><strong>VibeHub</strong><small>Codex runtime</small></span>
+        </button>
+        <button class="icon-button" id="collapseSidebar" type="button" aria-label="Collapse sidebar" title="Collapse sidebar">‹</button>
+      </header>
+
+      <button class="new-thread" id="newThread" type="button"><span>＋</span><strong>New task</strong><kbd>⌘ N</kbd></button>
+
+      <nav class="primary-nav" aria-label="Primary destinations">
+        <button class="active" type="button" data-route="chat"><span class="nav-icon">◫</span><span>Codex</span></button>
+        <button type="button" data-route="tasks"><span class="nav-icon">⌘</span><span>Tasks</span><small id="taskCount">—</small></button>
+        <button type="button" data-route="rooms"><span class="nav-icon">◇</span><span>Rooms</span></button>
+      </nav>
+
+      <section class="project-block" aria-labelledby="projectLabel">
+        <header><span id="projectLabel">Project</span><button type="button" aria-label="Project options">•••</button></header>
+        <div class="project-row"><span class="project-dot"></span><span><strong id="projectName">Loading…</strong><small id="projectBranch">Codex app-server</small></span></div>
+      </section>
+
+      <section class="thread-section" aria-labelledby="threadLabel">
+        <header><span id="threadLabel">Tasks</span><button type="button" id="refreshThreads" aria-label="Refresh task history" title="Refresh">↻</button></header>
+        <div class="thread-list" id="threadList" aria-live="polite"><p class="muted">Connecting to your Codex…</p></div>
+      </section>
+
+      <footer class="sidebar-footer">
+        <button type="button" id="themeToggle"><span class="nav-icon">◐</span><span>Appearance</span><small id="themeLabel">System</small></button>
+        <div class="account-row"><span class="avatar">C</span><span><strong id="accountName">Codex</strong><small id="accountPlan">Connecting</small></span><i id="accountDot"></i></div>
+      </footer>
+    </aside>
+
+    <main class="main-column">
+      <header class="topbar">
+        <button class="icon-button mobile-only" id="openSidebar" type="button" aria-label="Open navigation">☰</button>
+        <div class="route-title"><button id="backButton" class="back-button" type="button" hidden>← Tasks</button><div><strong id="routeTitle">Codex</strong><small id="routeMeta">Your real Threads and Turns</small></div></div>
+        <div class="topbar-actions">
+          <span class="runtime-pill"><i></i><span id="runtimeLabel">Starting app-server</span></span>
+          <button class="icon-button" id="reviewButton" type="button" aria-label="Open prototype review notes" title="Review notes">ⓘ</button>
+        </div>
+      </header>
+
+      <section class="surface" id="surface" aria-live="polite">
+        <div class="loading"><span></span><p>Starting your local Codex runtime…</p></div>
+      </section>
+
+      <div class="composer-wrap" id="composerWrap">
+        <form class="composer" id="composer">
+          <div class="attachment-tray" id="attachmentTray" hidden></div>
+          <textarea id="composerInput" rows="1" aria-label="Message Codex" placeholder="Ask Codex to do something"></textarea>
+          <div class="composer-toolbar">
+            <div>
+              <button class="composer-icon" id="attachButton" type="button" aria-label="Attach image or audio" title="Attach image or audio">＋</button>
+              <input id="attachmentInput" type="file" accept="image/*,audio/*" hidden>
+              <button class="composer-icon" id="voiceButton" type="button" aria-label="Record voice input" title="Record voice input">◉</button>
+              <span class="mode-label">Workspace write</span>
+            </div>
+            <div>
+              <span class="model-label">Codex</span>
+              <button class="stop-button" id="stopTurn" type="button" hidden aria-label="Interrupt current turn">■</button>
+              <button class="send-button" id="sendButton" type="submit" aria-label="Send message">↑</button>
+            </div>
+          </div>
+        </form>
+        <p class="composer-note" id="composerNote">Codex can make mistakes. Review commands and changes.</p>
+      </div>
+    </main>
+  </div>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="review-panel" id="reviewPanel" hidden inert aria-labelledby="reviewTitle">
+    <header><div><small>OWNER REVIEW PACK</small><h2 id="reviewTitle">Codex-first product boundary</h2></div><button type="button" id="closeReview">Close</button></header>
+    <section><span>Promise</span><h3>Codex familiarity + VibeHub Tasks</h3><p>Codex owns Threads, Turns, tools, approvals and execution. VibeHub adds a durable Task Graph, focused Task Workspace, Context, Evidence and independent Outcome.</p></section>
+    <section><span>Current composition</span><ul><li>Codex is the default landing and persistent task history.</li><li>Tasks is an additive top-level destination in the same sidebar.</li><li>A Task opens a focused Workspace; Start routes the exact host handoff into one Codex Thread.</li><li>Voice uses ordinary Codex audio input. Realtime conversation stays unavailable until the runtime reports support.</li></ul></section>
+    <section><span>Later, not now</span><p>Final desktop wrapper, Chat→Task and Remember persistence, complete visual approval, public packaging and DSH compatibility remain separate Tickets.</p></section>
+    <section><span>Owner decision after review</span><ol><li>Should first boot land on Codex or Tasks?</li><li>Should Task focus replace the center column or open beside Chat?</li><li>Is the Task entry strong enough without making ordinary Chat feel managed?</li><li>Is voice placement familiar and quiet enough?</li></ol></section>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
