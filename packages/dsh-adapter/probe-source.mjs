@@ -2,7 +2,8 @@
 
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const sourceRoot = resolve(process.argv[2] ?? "");
 if (!process.argv[2]) {
@@ -13,6 +14,7 @@ if (!process.argv[2]) {
 const lock = JSON.parse(
   await readFile(new URL("./upstream-lock.json", import.meta.url), "utf8"),
 );
+const adapterRoot = dirname(fileURLToPath(import.meta.url));
 const commit = execFileSync("git", ["rev-parse", "HEAD"], {
   cwd: sourceRoot,
   encoding: "utf8",
@@ -36,41 +38,85 @@ const checks = [
     seam: "bundle-profile",
     file: "docs/user/develop/basic/publish.md",
     patterns: ["dsh.bundle", "dsh.profile", "dsh plugin --profile demo add"],
+    adapterFile: "../dsh-bundle/package.json",
+    adapterPatterns: ['"dsh"', '"bundle"', '"./client": "./adapter/client.js"'],
   },
   {
     seam: "additive-task-view",
     file: "packages/client/ui-conversation/src/client/contract/slots.ts",
     patterns: ["'conversation.view'", "'conversation.session.header.actions'", "'conversation.chat.assistant-actions'"],
+    adapterFile: "client.js",
+    adapterPatterns: ['ctx.slots.inject("conversation.view"', "ctx.slots.register({", 'label: () => "Tasks"'],
   },
   {
     seam: "additive-global-task-surface",
     file: "packages/client/ui-layout/src/client/index.ts",
     patterns: ["'shell.overlay'", "kind: 'list'", "scope: 'root'"],
+    adapterFile: "client.js",
+    adapterPatterns: ['ctx.slots.inject("shell.overlay"', 'id: "vibehub-task-workbench"', 'label: () => "Tasks"'],
+  },
+  {
+    seam: "slot-injection-lifecycle",
+    file: "packages/client/runtime/src/client/slots.ts",
+    patterns: ["inject(key: keyof SlotMap", "function register(this: SlotRegistry", "slots.register()"],
+    adapterFile: "client.js",
+    adapterPatterns: ["ctx.slots.inject(", "ctx.slots.register({"],
   },
   {
     seam: "native-workspace-session-routing",
     file: "packages/client/runtime/src/client/contract/workspaces.ts",
     patterns: ["create(input: { path: string })", "connectWorkspace(workspaceId", "Promise<SessionId>"],
+    adapterFile: "client.js",
+    adapterPatterns: ["ctx.workspaces.create({ path: repoRoot })", "ctx.workspaces.connectWorkspace(workspace.workspaceId)"],
+  },
+  {
+    seam: "native-session-binding-and-open",
+    file: "packages/client/runtime/src/client/sessions/service.ts",
+    patterns: ["open(id: SessionId)", "binding(id: SessionId)", "SessionBinding | undefined"],
+    adapterFile: "client.js",
+    adapterPatterns: ["ctx.sessions.open(sessionId)", "ctx.sessions.binding(sessionId)?.session"],
+  },
+  {
+    seam: "native-client-projection-hooks",
+    file: "packages/client/runtime/src/client/index.ts",
+    patterns: ["useProjection: UseProjection", "useSessions: SnapshotSelectorHook"],
+    adapterFile: "client.js",
+    adapterPatterns: ["useProjection(\"vibehubTask\")", "useSessions((state)"],
   },
   {
     seam: "trusted-session-presence",
     file: "packages/client/runtime/src/client/sessions/service.ts",
     patterns: ["running: boolean", "pendingInteraction?: PendingInteractionStatus", "completed?: boolean"],
+    adapterFile: "client.js",
+    adapterPatterns: ["Boolean(state.byId[sessionId]?.running)", "pendingInteraction"],
   },
   {
     seam: "native-session-prompt",
     file: "packages/client/runtime/src/client/sessions/session.ts",
     patterns: ["async prompt(", "mode: 'queue' | 'steer'", "this.api.sessions.prompt"],
+    adapterFile: "client.js",
+    adapterPatterns: ["connection.session.prompt([", "\"queue\""],
+  },
+  {
+    seam: "native-session-command",
+    file: "packages/client/runtime/src/client/sessions/session.ts",
+    patterns: ["async command(line: string)", "this.remote.commands.execute(this.sessionId, line, [])"],
+    adapterFile: "client.js",
+    adapterPatterns: ["connection.session.command(`/vibehub-task ${encoded}`)"],
   },
   {
     seam: "registered-command-lifecycle",
     file: "packages/interaction/commands/src/index.ts",
     patterns: ["'command/run'", "'command/done'", "recordInput", "without sending it to the model"],
+    adapterFile: "host.js",
+    adapterPatterns: ["ctx.commands.register({", 'name: "vibehub-task"', "recordInput: true"],
   },
   {
     seam: "runtime-session-projection",
     file: "packages/session/session-projection/src/index.ts",
     patterns: ["sessionProjections.register()", "register<K extends keyof SessionProjectionMap", "stateVersion"],
+    adapterFile: "host.js",
+    adapterPatterns: ["ctx.sessionProjections.register(taskLinkProjectionDefinition())"],
   },
   {
     seam: "unknown-events-stay-unsupported",
@@ -81,16 +127,36 @@ const checks = [
     seam: "project-skill-provider",
     file: "packages/skill/skill-filesystem/src/index.ts",
     patterns: ["customSkillDirs?: string[]", "PROJECT_DSH_RANK", "PROJECT_AGENTS_RANK"],
+    adapterFile: "../dsh-bundle/cordis.patch.yml",
+    adapterPatterns: ["customSkillDirs:", "skills"],
   },
   {
-    seam: "web-index-composition",
+    seam: "web-route-and-port-contract",
     file: "packages/host/webserver/src/index.ts",
-    patterns: ["tapIndex(transform", "register(route", "registerFallback"],
+    patterns: ["get port(): number", "register(route: WebRoute)", "registerFallback"],
+    adapterFile: "host.js",
+    adapterPatterns: ["ctx.webServer.port", "ctx.webServer.register({", 'path: "/vibehub/bootstrap"'],
+  },
+  {
+    seam: "cordis-effect-cleanup",
+    file: "docs/cordis-api/fiber.md",
+    patterns: ["ctx.effect(execute, label?)", "disposer"],
+    adapterFile: "host.js",
+    adapterPatterns: ["ctx.effect(() => () => graph.close()", "ctx.effect(() => ctx.webServer.register({"],
+  },
+  {
+    seam: "official-theme-aliases",
+    file: "packages/client/ui-theme/src/styles/design-platform.css",
+    patterns: ["--dsw-alias-bg-base", "--dsw-alias-label-primary"],
+    adapterFile: "client.js",
+    adapterPatterns: ["--dsw-alias-bg-base", "--dsw-alias-label-primary"],
   },
   {
     seam: "native-four-surface-composition",
     file: "packages/bundle/web-app/cordis.patch.yml",
     patterns: ["@deepseek-ai/dsh-client-ui-conversation", "@deepseek-ai/dsh-client-ui-layout", "@deepseek-ai/dsh-client-runtime"],
+    adapterFile: "../dsh-bundle/package.json",
+    adapterPatterns: ["@deepseek-ai/dsh-client-runtime", "@deepseek-ai/dsh-client-ui-layout", "@deepseek-ai/dsh-client-ui-conversation"],
   },
 ];
 
@@ -98,11 +164,18 @@ const results = [];
 for (const check of checks) {
   const text = await readFile(join(sourceRoot, check.file), "utf8");
   const missing = check.patterns.filter((pattern) => !text.includes(pattern));
+  const adapterText = check.adapterFile
+    ? await readFile(resolve(adapterRoot, check.adapterFile), "utf8")
+    : "";
+  const missingUsage = (check.adapterPatterns ?? [])
+    .filter((pattern) => !adapterText.includes(pattern));
   results.push({
     seam: check.seam,
     file: check.file,
-    proven: missing.length === 0,
+    adapterFile: check.adapterFile ?? null,
+    proven: missing.length === 0 && missingUsage.length === 0,
     missing,
+    missingUsage,
   });
 }
 

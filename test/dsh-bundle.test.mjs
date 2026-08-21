@@ -62,12 +62,14 @@ test("registered command lifecycle folds only a successful VibeHub Task link", (
 test("production Bundle is additive and routes exact host handoff into native Chat", () => {
   const manifest = JSON.parse(read("packages/dsh-bundle/package.json"));
   const patch = read("packages/dsh-bundle/cordis.patch.yml");
-  const host = read("packages/dsh-bundle/index.js");
+  const bundleEntry = read("packages/dsh-bundle/index.js");
+  const host = read("packages/dsh-adapter/host.js");
   const client = read("packages/dsh-adapter/client.js");
 
   assert.equal(manifest.exports["./client"], "./adapter/client.js");
   assert.equal(manifest.dsh.bundle.patch, "./cordis.patch.yml");
   assert.equal(manifest.dsh.client.platform, "web");
+  assert.equal(bundleEntry.trim(), 'export { apply, inject, name } from "./adapter/host.js";');
   assert.match(patch, /id: vibehub-skill-filesystem/u);
   assert.match(patch, /name: '@deepseek-ai\/dsh-skill-filesystem'/u);
   assert.match(patch, /includeDefaultRoots: false/u);
@@ -93,6 +95,7 @@ test("production Bundle is additive and routes exact host handoff into native Ch
   assert.match(client, /type: "vibehub-refresh"/u);
   assert.doesNotMatch(patch, /- id: skill-filesystem\n|ui-layout|ui-conversation|agent-team/u);
   assert.doesNotMatch(host, /vibehub\/run|localStorage|sqlite/u);
+  assert.doesNotMatch(bundleEntry, /ctx\.|@deepseek-ai\/dsh-/u);
 });
 
 test("built DSH Bundle vendors the exact current VibeHub runtime and Skills", () => {
@@ -103,6 +106,7 @@ test("built DSH Bundle vendors the exact current VibeHub runtime and Skills", ()
     for (const path of [
       "adapter/linkage.mjs",
       "adapter/client.js",
+      "adapter/host.js",
       "cordis.patch.yml",
       "index.js",
       "vendor/skills/scripts/vh-ui.mjs",

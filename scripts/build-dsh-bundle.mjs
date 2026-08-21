@@ -33,6 +33,10 @@ export function buildDshBundle({ sourceRoot = root, artifactRoot, clean = false 
     join(artifactRoot, "adapter/client.js"),
   );
   cpSync(
+    join(sourceRoot, "packages/dsh-adapter/host.js"),
+    join(artifactRoot, "adapter/host.js"),
+  );
+  cpSync(
     join(sourceRoot, "packages/dsh-adapter/linkage.mjs"),
     join(artifactRoot, "adapter/linkage.mjs"),
   );

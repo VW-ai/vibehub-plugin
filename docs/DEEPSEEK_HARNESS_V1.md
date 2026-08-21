@@ -55,8 +55,8 @@ npm run probe:dsh -- /absolute/path/to/deepseek-harness
 The probe covers only imported compatibility seams. Passing it is necessary,
 not sufficient; the clean Profile and browser loop remain required.
 Host and browser translations for these seams live under
-`packages/dsh-adapter`; `packages/dsh-bundle` owns only the installable Bundle
-manifest, Profile composition, host registration, and vendored VibeHub files.
+`packages/dsh-adapter`; `packages/dsh-bundle` owns only a one-line re-export,
+the installable manifest, Profile composition, and vendored VibeHub files.
 
 ## Build and install
 

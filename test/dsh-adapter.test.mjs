@@ -34,6 +34,7 @@ test("production source probe covers every imported DSH compatibility seam", asy
     { cwd: new URL("../", import.meta.url), encoding: "utf8" },
   );
   const result = JSON.parse(stdout);
-  assert.equal(result.checks.length, 14);
+  assert.equal(result.checks.length, 20);
   assert.equal(result.checks.every((check) => check.proven), true);
+  assert.equal(result.checks.filter((check) => check.adapterFile).length, 17);
 });
