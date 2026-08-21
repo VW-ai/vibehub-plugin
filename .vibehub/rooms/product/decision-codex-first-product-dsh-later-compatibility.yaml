@@ -1,6 +1,6 @@
 {
   "context_id": "decision-codex-first-product-dsh-later-compatibility",
-  "detail": "The immediate product path is Codex-first because the owner actually uses Codex and needs the product to improve that daily workflow. The application should use the official local Codex app-server and the owner's own Codex/OpenAI account as its primary Chat and Agent runtime, then add the VibeHub Task Graph, Task Workspace, Context, Evidence and Outcome layer. DeepSeek Harness remains a supported future compatibility, packaging and ecosystem target for people who use DSH, but DSH-specific shell composition, native Session behavior, Theme integration and public DSH Plugin packaging must not gate the first usable Codex product. Shared core packages must keep runtime and shell adapters replaceable so later DSH support does not require a fork, a duplicate Agent loop or a second Task store. In security language, Codex app-server runs locally while model Turn content may leave the machine through the owner's authenticated OpenAI service exactly as it does in Codex; this is not a separate third-party Codex service. Private Project Context must not be transmitted by probes unless explicitly authorized; synthetic fixtures should prove transport when real content is unnecessary.",
+  "detail": "The immediate product path is Codex-first because the owner actually uses Codex and needs the product to improve that daily workflow. The application should use the official local Codex app-server and the owner's own Codex/OpenAI account as its primary Chat and Agent runtime, then add the VibeHub Task Graph, Task Workspace, Context, Evidence and Outcome layer. DeepSeek Harness remains a supported future compatibility, packaging and ecosystem target for people who use DSH, but DSH-specific shell composition, native Session behavior, Theme integration and public DSH Plugin packaging must not gate the first usable Codex product. Shared core packages must keep runtime and shell adapters replaceable so later DSH support does not require a fork, a duplicate Agent loop or a second Task store. In security language, Codex app-server runs locally while model Turn content may leave the machine through the owner's authenticated OpenAI service exactly as it does in Codex; this is not a separate third-party Codex service. Project code, VibeHub Task handoff and Context are normal inputs to the owner's Codex and may be used in real integration probes for this open-source repository; credentials, access tokens and unrelated private data remain excluded. Synthetic fixtures are useful for deterministic regression, not a product privacy requirement.",
   "evidence": [
     {
       "note": "The owner explicitly moved DSH compatibility later because Codex is the product they will actually use.",
@@ -9,6 +9,10 @@
     {
       "note": "The owner rejected wording that implied an unrelated external Codex service; the correct boundary is local app-server plus the owner's authenticated Codex/OpenAI model service.",
       "ref": "conversation:2026-08-20-owner-clarifies-codex-service-boundary"
+    },
+    {
+      "note": "The owner explicitly authorized the open-source Project code and VibeHub Context to enter the owner's Codex as a normal development and product workflow; only secrets and unrelated private data remain excluded.",
+      "ref": "conversation:2026-08-20-owner-authorizes-real-project-context-in-codex"
     },
     {
       "note": "The existing runtime decision already makes official Codex app-server the single Agent runtime and keeps DSH behind an adapter.",
