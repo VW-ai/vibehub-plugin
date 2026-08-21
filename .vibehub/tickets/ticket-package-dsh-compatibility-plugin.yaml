@@ -1,25 +1,29 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-dsh-compatibility-after-codex-first-preview",
-      "criterion": "Placeholder: after the Codex-first preview succeeds, replan this Ticket to firm with exact supported DSH/Codex versions, Profile install/start/restart/upgrade/remove, Slot and Theme composition, native-user coexistence, shared core parity, no duplicate Agent loop, truthful capability fallback and public Plugin packaging acceptance."
+      "acceptance_id": "refine-dsh-plugin-after-dual-harness-contract",
+      "criterion": "Placeholder: after the dual-harness contract succeeds and this later carrier is scheduled, replan this Ticket to firm with exact supported DSH versions, Profile install, start, restart, upgrade and remove, Slot and Theme composition, DSH-native Chat and Session behavior, the complete Task, Context and Evidence loop, shared-core parity, no Codex runtime dependency, no duplicate Agent loop, truthful capability fallback and public Plugin packaging acceptance."
     }
   ],
   "constraints": [
     "Do not gate the Codex-first product or preview on this Ticket.",
-    "Do not fork DSH upstream, duplicate the Task store or route one action through DSH and Codex Agents.",
-    "Reuse shared core packages and keep DSH version translations bounded.",
-    "DSH-native Agent compatibility may be added later but is not the primary runtime contract."
+    "Do not require Codex app-server in the DSH package or route one action through both DSH and Codex Agents.",
+    "Do not fork DSH upstream, couple VibeHub Tasks to Agent Team tasks or duplicate the Task store.",
+    "Reuse shared core packages and keep DSH version translations bounded inside the DSH adapter."
   ],
-  "context": "DSH remains strategically useful for distribution and its plugin ecosystem, but it follows the first usable Codex product. Reuse the completed Profile spike and translate the stable core into official DSH Slots, Theme, settings and lifecycle only after the Codex-first preview establishes the product contract.",
+  "context": "DSH remains strategically useful for distribution and its plugin ecosystem and follows the first daily-usable Codex carrier in delivery priority. It is nevertheless an independent product carrier: ordinary Chat and Agent execution come from DSH Sessions, models, tools and permissions, not Codex app-server. Replan this Ticket after the dual-harness capability contract establishes the shared core; schedule its implementation after the Codex preview as a product priority, not as an execution prerequisite.",
   "context_refs": [
     {
-      "purpose": "Binding deferral and compatibility decision.",
-      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+      "purpose": "Binding DSH-only carrier and shared-core architecture.",
+      "ref": ".vibehub/rooms/product/decision-vibehub-core-supports-codex-and-dsh-harness-bases.yaml"
     },
     {
-      "purpose": "Existing Profile lifecycle and ecosystem findings.",
-      "ref": "docs/CODEX_APP_SERVER_DSH_ADAPTER_SPIKE.md"
+      "purpose": "Binding DSH-native runtime ownership boundary.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    },
+    {
+      "purpose": "Accepted DSH-native Profile, Session, command and extension-seam baseline.",
+      "ref": ".vibehub/outcomes/ticket-spike-deepseek-harness-foundations.yaml"
     },
     {
       "purpose": "Completed DSH Bundle and Task execution baseline.",
@@ -29,14 +33,15 @@
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "Existing DSH users can install a compatible VibeHub Plugin that reuses the Codex-first core and VibeHub Task system without forking DSH or creating another Agent loop.",
+  "outcome": "Existing DSH users can install a VibeHub Plugin that uses DSH as its complete base harness while sharing the same VibeHub Task and Context product core, with no Codex dependency, upstream fork, duplicate Agent loop or second Task store.",
   "provenance_refs": [
-    "conversation:2026-08-20-owner-defers-dsh-compatibility"
+    "conversation:2026-08-20-owner-defers-dsh-compatibility",
+    "conversation:2026-08-21-owner-requires-dual-harness-product"
   ],
   "relations": [
     {
-      "rationale": "The DSH compatibility package consumes the stable product and packaging contract established by the first Codex preview.",
-      "target_ticket_id": "ticket-publish-codex-first-developer-preview",
+      "rationale": "The DSH-only package must consume the accepted shared-core and harness capability boundary instead of inheriting Codex runtime assumptions.",
+      "target_ticket_id": "ticket-design-dual-harness-core-capability-contract",
       "type": "depends_on"
     }
   ],

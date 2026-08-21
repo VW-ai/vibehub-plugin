@@ -1,0 +1,43 @@
+{
+  "context_id": "constraint-codex-chat-parity-is-behavioral-product-work",
+  "detail": "The production Chat surface must be studied and polished as its own high-value product substrate. Parity includes the streamed rhythm and reconciliation of a Turn; Markdown, code, diffs, commands, tools, plans, subagents, approvals, citations and progress; errors, retry, cancellation and interruption; Composer, attachments, voice, model and mode controls; selection, copy, branching and fork; keyboard, focus, accessibility, wide and narrow behavior. Visual tokens, typography and spacing are necessary but insufficient. The work should use dedicated, independently attributable research and review passes for message rendering, execution and tool surfaces, and Composer and accessibility behavior. Existing low-fidelity prototypes are carriers for learning, not production approval, and unsupported app-server items must remain visible through a truthful fallback instead of being silently dropped.",
+  "evidence": [
+    {
+      "note": "The owner explicitly rejects treating the remaining Chat gap as styling and requires dedicated interaction and renderer research.",
+      "ref": "conversation:2026-08-21-owner-requires-full-chat-parity-work"
+    },
+    {
+      "note": "The existing product direction defines ordinary Codex capability as the parity floor before VibeHub additive Task value.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-parity-vibehub-task-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "constraint-dsh-reskin-is-substantial-product-work",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T21:48:25Z",
+    "quote": "我们这里差的不止是颜色、字体、质感，甚至 basic 的很多交互；如何渲染 Codex 返回的内容，都是需要专门派 subagent 去学习、调研、打磨的。",
+    "ref": "conversation:2026-08-21-owner-requires-full-chat-parity-work"
+  },
+  "state": "active",
+  "summary": "Codex-quality Chat parity is a dedicated behavioral and rendering workstream, not a palette or CSS exercise",
+  "tags": [
+    "codex",
+    "chat",
+    "renderer",
+    "interaction",
+    "accessibility",
+    "research",
+    "parity"
+  ],
+  "type": "constraint"
+}

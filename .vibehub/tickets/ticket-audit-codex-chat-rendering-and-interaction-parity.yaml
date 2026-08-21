@@ -1,0 +1,62 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "current-shell-conformance-gaps-are-measured",
+      "criterion": "A checked-in conformance report uses the accepted native-Chat inventory and renderer contract as its baseline, exercises the current authenticated shell, and records pass, partial or fail plus severity for every required Thread, Turn, rich-item, streaming, execution, Composer, navigation, recovery, accessibility and responsive behavior; any source re-audit is limited to explicitly cited protocol drift rather than recreating the accepted inventory."
+    },
+    {
+      "acceptance_id": "specialized-independent-chat-audits-are-source-backed",
+      "criterion": "At least three independently attributable checked-in audits separately review message and rich-content rendering, execution or tool or approval surfaces, and Composer or navigation or accessibility behavior; they compare relevant maintained open-source implementations with repository, license, maintenance, dependency and security facts, and converge into one prioritized recommendation without copying proprietary Codex Desktop code or assets."
+    },
+    {
+      "acceptance_id": "renderer-conformance-regressions-are-executable",
+      "criterion": "Executable conformance fixtures and tests bind the current renderer to the already accepted stable identity, incremental update, ordering, sanitization, unknown-item fallback, live versus replay, interruption and recovery contract; they fail for silently dropped supported items, duplicated transcript state, stale streaming artifacts or UI-inferred Agent lifecycle."
+    },
+    {
+      "acceptance_id": "highest-severity-chat-gaps-are-closed-in-real-shell",
+      "criterion": "The authenticated real shell receives a production-shaped but non-final renderer and interaction pass that closes every highest-severity conformance defect or records a reproducible upstream blocker; real app-server Turns and deterministic mixed fixtures prove the changes, ordinary Chat remains usable without VibeHub Task protocol, and the work changes behavior and hierarchy where needed rather than merely changing tokens or CSS."
+    },
+    {
+      "acceptance_id": "chat-production-gap-plan-is-decision-ready",
+      "criterion": "Browser and runtime review cover Light and Dark, wide and 390x844 narrow, long streaming content, code and diff, tools and approvals, plans and delegated work, citations and attachments, retry, cancellation and interruption, keyboard and focus return, reduced motion, no horizontal overflow, bounded DOM growth and zero false capability or live claim; the final report shows before and after conformance, remaining medium or low gaps, visual-system work and deliberate deferrals."
+    }
+  ],
+  "constraints": [
+    "This is not a color, font or screenshot-matching Ticket; observable Chat behavior and runtime truth are primary.",
+    "Do not scrape or redistribute proprietary Codex Desktop implementation, assets, icons or private APIs.",
+    "Do not redo the accepted source inventory, open-source survey or renderer contract unless an exact pinned-source drift is cited.",
+    "Do not call a fixture-only transcript, broad agentMessage handler or Stop button proof of conformance.",
+    "Do not merge Codex Thread or Turn semantics into VibeHub Task semantics."
+  ],
+  "context": "The accepted native-Chat research already established the source inventory, reusable options, renderer contract and first real-runtime carrier. Do not repeat that work. The owner still finds the actual Chat experience far below the Codex and ChatGPT quality bar, so audit the current implementation against the accepted contract, use specialized independent reviews, add conformance coverage and close the highest-severity behavioral gaps before production composition is approved.",
+  "context_refs": [
+    {
+      "purpose": "Binding requirement that Chat parity is dedicated behavioral product work.",
+      "ref": ".vibehub/rooms/product/constraint-codex-chat-parity-is-behavioral-product-work.yaml"
+    },
+    {
+      "purpose": "Binding Codex parity floor and additive VibeHub value.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Accepted first-pass protocol inventory and real-shell carrier to audit rather than repeat.",
+      "ref": ".vibehub/outcomes/ticket-research-codex-native-chat-parity.yaml"
+    },
+    {
+      "purpose": "Accepted Task conversation boundary the ordinary Chat renderer must remain compatible with.",
+      "ref": ".vibehub/outcomes/ticket-research-task-workspace-conversation-context.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "An independently audited conformance and gap-closure pass makes the current real-shell Chat renderer materially approach the accepted Codex-quality interaction contract, with highest-severity defects fixed and deliberate deferrals explicit.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-requires-full-chat-parity-work",
+    "https://developers.openai.com/codex/app-server/",
+    "https://github.com/openai/codex"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-audit-codex-chat-rendering-and-interaction-parity"
+}

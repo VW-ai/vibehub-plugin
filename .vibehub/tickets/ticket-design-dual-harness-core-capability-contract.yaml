@@ -1,0 +1,66 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "core-and-harness-ownership-matrix-is-explicit",
+      "criterion": "One checked-in contract assigns Task, Project, Context, Room, Evidence and Outcome truth to VibeHub core and assigns Chat or Thread or Session, Agent runtime, models, tools, permissions, approvals, audio and live execution facts to the selected Codex or DSH adapter; it explicitly maps semantic differences and forbids a second Task or transcript store."
+    },
+    {
+      "acceptance_id": "capability-negotiation-and-single-runtime-routing-are-executable",
+      "criterion": "A versioned executable capability contract covers Projects, fork, search, audio, attachments, approvals, tools, plans, delegated work, replay, interruption and live presence; every action resolves through exactly one selected harness, unsupported capabilities have truthful fallbacks, and no Codex action invokes DSH or DSH action invokes Codex."
+    },
+    {
+      "acceptance_id": "codex-only-package-and-route-probe-is-clean",
+      "criterion": "A minimal clean Codex-only probe with no DSH package installs and boots the shared shell and core, resolves one ordinary Chat action and one exact VibeHub Task handoff through the Codex adapter, exposes truthful capabilities, survives restart and cleanly removes without importing or invoking DSH."
+    },
+    {
+      "acceptance_id": "dsh-only-package-and-route-probe-is-clean",
+      "criterion": "A minimal clean official DSH Profile with no Codex app-server dependency installs and boots the shared shell and core, resolves one ordinary Chat or Session action and one exact VibeHub Task handoff through the DSH adapter, exposes truthful capabilities, survives restart and cleanly removes without importing or invoking Codex, duplicating an Agent loop or coupling to DSH Team tasks."
+    },
+    {
+      "acceptance_id": "dual-harness-package-boundaries-are-decision-ready",
+      "criterion": "Source probes, package dependency assertions and isolated boot-and-route tests pin supported Codex and DSH versions, isolate every upstream translation inside its adapter, prove shared UI and Task packages contain no hard dependency on either harness, and provide a maintenance, failure, migration and downstream implementation plan; complete daily-use DSH Chat, Task, Context and Evidence proof remains owned by the later DSH Plugin Ticket and does not gate Codex implementation."
+    }
+  ],
+  "constraints": [
+    "Codex-first is a delivery priority, not permission to make Codex a DSH runtime dependency.",
+    "One user action must never execute through both harnesses or reconcile two Agent transcripts.",
+    "Do not couple VibeHub Tasks to DSH Agent Team tasks or invent a second Task database.",
+    "Keep upstream-specific imports and version translations inside bounded adapters with exact source probes."
+  ],
+  "context": "Codex-first is the immediate dogfood path, but it is not the permanent product architecture. Define the shared core, capability negotiation and both package boundaries before the final shell decision hardens assumptions into production packages. This Ticket proves only isolated installation, boot and one exact routed action on each harness; it does not build the complete DSH daily-use Task loop or gate Codex production on DSH product implementation.",
+  "context_refs": [
+    {
+      "purpose": "Binding dual-harness product and ownership decision.",
+      "ref": ".vibehub/rooms/product/decision-vibehub-core-supports-codex-and-dsh-harness-bases.yaml"
+    },
+    {
+      "purpose": "Existing DSH-native runtime ownership boundary.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    },
+    {
+      "purpose": "Accepted pinned Codex adapter and lifecycle baseline.",
+      "ref": ".vibehub/outcomes/ticket-spike-codex-app-server-dsh-adapter.yaml"
+    },
+    {
+      "purpose": "Accepted installed DSH Bundle and VibeHub Task loop baseline.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    },
+    {
+      "purpose": "Accepted host-owned Task Workspace and Context packet baseline.",
+      "ref": ".vibehub/outcomes/ticket-research-task-workspace-conversation-context.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A versioned VibeHub core and harness-capability contract, plus minimal isolated Codex and DSH boot-and-route probes, proves the two carriers can be independently implemented without requiring the other runtime, duplicating Agent execution or creating a second Task store.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-requires-dual-harness-product",
+    "https://developers.openai.com/codex/app-server/",
+    "https://github.com/openai/codex",
+    "https://github.com/deepseek-ai/deepseek-harness"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-design-dual-harness-core-capability-contract"
+}

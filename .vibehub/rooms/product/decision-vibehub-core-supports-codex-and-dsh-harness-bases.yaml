@@ -1,0 +1,55 @@
+{
+  "context_id": "decision-vibehub-core-supports-codex-and-dsh-harness-bases",
+  "detail": "VibeHub owns the durable human-facing Task, Project, Context, Room, Evidence and Outcome product layer. A Codex carrier uses the official local Codex app-server and should feel like a reskinned Codex with additive VibeHub Task capability. A DeepSeek Harness carrier must remain usable without Codex installed by using DSH Sessions, models, tools, permissions and runtime as its base harness. One user action routes through exactly one selected harness adapter; the product must never run duplicate Codex and DSH Agent loops or maintain a second Task store. Shared UI and product packages may be reused, while adapters expose versioned capabilities and truthful fallbacks for differences such as Projects, audio, approvals, tools and Session or Thread semantics. Codex-first remains the immediate dogfood and quality priority because it is the owner's real runtime, but it is a delivery priority rather than a permanent architectural dependency of the DSH distribution.",
+  "evidence": [
+    {
+      "note": "The owner explicitly requires both a standalone DSH carrier and a Codex-backed carrier with Codex-like experience.",
+      "ref": "conversation:2026-08-21-owner-requires-dual-harness-product"
+    },
+    {
+      "note": "The existing DSH boundary already assigns native Sessions, models, tools and execution to DSH while VibeHub remains the Task product layer.",
+      "ref": ".vibehub/rooms/product/decision-dsh-runtime-opaque-plugin-boundary.yaml"
+    },
+    {
+      "note": "Codex-first remains valid as delivery priority, but its earlier wording is superseded where it implied DSH support could depend on Codex.",
+      "ref": ".vibehub/rooms/product/decision-codex-first-product-dsh-later-compatibility.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-first-product-dsh-later-compatibility",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-codex-app-server-primary-runtime",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T21:48:25Z",
+    "quote": "如果就用 DeepSeek Harness，不用 Codex，也能用；用 Codex，底层有一个 Codex，使用体验就像换皮的 Codex。",
+    "ref": "conversation:2026-08-21-owner-requires-dual-harness-product"
+  },
+  "state": "active",
+  "summary": "VibeHub is one Task and Context product core over replaceable Codex and DeepSeek Harness bases",
+  "tags": [
+    "codex",
+    "deepseek-harness",
+    "adapter",
+    "runtime",
+    "task",
+    "context",
+    "architecture"
+  ],
+  "type": "decision"
+}

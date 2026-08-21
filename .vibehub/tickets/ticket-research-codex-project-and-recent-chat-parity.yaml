@@ -1,0 +1,61 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "codex-project-and-thread-capabilities-are-source-audited",
+      "criterion": "A checked-in source-backed inventory probes the pinned Codex app-server and official Codex sources for Project or workspace identity, Thread cwd and metadata, list and search, create or rename, move or assign, remove membership, archive, fork, resume and restart behavior; each operation names the exact supported API or a truthful unsupported boundary, and no remembered desktop behavior is presented as protocol fact."
+    },
+    {
+      "acceptance_id": "project-chat-task-object-mapping-is-explicit",
+      "criterion": "One executable object and ownership contract distinguishes Codex Project or workspace, Codex Chat or Thread, VibeHub Project, VibeHub Task and Task-associated Thread or Run; it defines identity, zero-or-one membership, fork provenance, search indexing, standalone behavior, move semantics and writeback boundaries without renaming one object as another or creating a second authoritative chat registry."
+    },
+    {
+      "acceptance_id": "projects-recents-and-fork-prototype-is-real",
+      "criterion": "The authenticated Codex-first shell gains a production-shaped non-final prototype in which a real Thread can be created or resumed, moved or dragged into and out of a Project, forked with stable lineage, found through Search, and shown under Recents exactly when it has no Project membership; refresh and app-server restart recover the same result through host-owned state rather than localStorage or fixture-only state."
+    },
+    {
+      "acceptance_id": "unsupported-native-membership-has-truthful-adapter-boundary",
+      "criterion": "If the pinned Codex baseline lacks any required Project-membership operation, one versioned adapter contract and probe specifies the minimal durable mapping, migration and failure behavior; capability absence is visible, adapter state never mutates Codex transcript truth or VibeHub Task truth, and clean upgrade, restart and removal do not orphan or duplicate Threads."
+    },
+    {
+      "acceptance_id": "project-parity-review-is-decision-ready",
+      "criterion": "Deterministic fixtures, a real app-server exercise and browser review cover empty, unprojected Recent, projected, moved, removed, forked, archived and recovered Threads; Light and Dark, wide and 390x844 narrow, pointer drag plus keyboard-equivalent move, focus return, screen-reader names, no horizontal overflow and failure fallback; the review pack identifies exact v1 parity, remaining gaps and downstream production boundaries."
+    }
+  ],
+  "constraints": [
+    "Do not assume Codex Project and VibeHub Project are the same object; establish and test the mapping.",
+    "Do not scrape proprietary Codex Desktop state or assets, and do not infer an unsupported app-server capability.",
+    "Do not use browser localStorage, DSH Agent Team tasks or a second transcript database as authority.",
+    "Recents means chats with no Codex Project membership; it is not an alias for all recent VibeHub Tasks."
+  ],
+  "context": "The owner requires the Codex carrier to preserve the familiar Codex Projects and Recents experience one-for-one: ordinary chats can remain unprojected, move into or out of a Project, fork with provenance and remain searchable. First establish what the pinned official app-server actually owns and where a bounded adapter is necessary, then exercise the exact behavior in the current real shell. This is behavioral parity research and a production-shaped carrier, not final production publication.",
+  "context_refs": [
+    {
+      "purpose": "Binding Codex Project, fork and unprojected Recents behavior.",
+      "ref": ".vibehub/rooms/product/contract-codex-project-and-recent-chat-parity.yaml"
+    },
+    {
+      "purpose": "Existing VibeHub Project and standalone Task semantics that the mapping must preserve.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    },
+    {
+      "purpose": "Accepted Task Workspace object and host-packet baseline.",
+      "ref": ".vibehub/outcomes/ticket-research-task-workspace-conversation-context.yaml"
+    },
+    {
+      "purpose": "Pinned Codex app-server and replay lifecycle baseline.",
+      "ref": ".vibehub/outcomes/ticket-spike-codex-app-server-dsh-adapter.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A source-backed Codex Project and Recent-chat contract plus a real-runtime prototype reproduce Project membership, chat move, fork and unprojected Recents behavior without conflating Codex Threads with VibeHub Tasks or Projects.",
+  "provenance_refs": [
+    "conversation:2026-08-21-owner-requires-codex-project-parity",
+    "https://developers.openai.com/codex/app-server/",
+    "https://github.com/openai/codex"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-research-codex-project-and-recent-chat-parity"
+}

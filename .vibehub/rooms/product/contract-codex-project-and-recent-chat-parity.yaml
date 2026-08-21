@@ -1,0 +1,43 @@
+{
+  "context_id": "contract-codex-project-and-recent-chat-parity",
+  "detail": "For the Codex carrier, VibeHub must preserve the ordinary Codex information architecture and supported operations for Projects and chats: Project creation and navigation, moving or dragging a chat into and out of a Project, forking a chat while preserving provenance, and a Recents section that includes chats with no Project membership. This parity is behavioral and must be backed by the official Codex/app-server capabilities or by one versioned truthful adapter when an exact native seam is absent. Codex Project membership, Codex Chat or Thread identity, VibeHub Project ownership and VibeHub Task identity are not assumed to be the same object. Their mapping must be explicit so Recents, search, fork, Task association and zero-or-one VibeHub Project ownership cannot silently overwrite one another. No browser-only localStorage or second chat registry may become authoritative.",
+  "evidence": [
+    {
+      "note": "The owner explicitly requires the Codex Project and unprojected Recents behavior as a parity floor, not a VibeHub-specific replacement.",
+      "ref": "conversation:2026-08-21-owner-requires-codex-project-parity"
+    },
+    {
+      "note": "Existing VibeHub Project and standalone Task semantics remain durable and therefore require an explicit mapping rather than name-based conflation.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-parity-vibehub-task-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-project-scope-with-derived-task-hierarchy",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T21:48:25Z",
+    "quote": "我们的这个 projects，一定要有 Codex 的 projects 的那些功能，一比一复刻；拖 chat 进 project，chat 可以 fork，recents 包含所有不在 project 里的 chat。",
+    "ref": "conversation:2026-08-21-owner-requires-codex-project-parity"
+  },
+  "state": "active",
+  "summary": "The Codex carrier preserves Codex Project, fork and unprojected Recent-chat behavior instead of replacing it with VibeHub Task semantics",
+  "tags": [
+    "codex",
+    "project",
+    "chat",
+    "thread",
+    "recents",
+    "fork",
+    "parity"
+  ],
+  "type": "contract"
+}
