@@ -1,43 +1,90 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-after-authoritative-outcomes",
-      "criterion": "After both prerequisite Outcomes exist, this same Ticket is replanned to maturity firm with executable acceptance derived from the owner-approved interaction direction and the proven DeepSeek Harness seams before implementation begins."
+      "acceptance_id": "current-dsh-baseline-and-adapter-are-pinned",
+      "criterion": "Before product code is accepted, one reproducible source-contract probe pins the exact supported DeepSeek Harness package version and upstream commit, records the required Node and package-manager runtime, and proves every Bundle, Profile, command, Session, client Slot, Theme, workspace, skill, and event API used by VibeHub. All DSH imports and version-specific translations live behind one packages/dsh-adapter boundary; the implementation vendors, patches, or forks no upstream source and fails loudly at the documented stop conditions."
+    },
+    {
+      "acceptance_id": "installable-bundle-preserves-native-dsh",
+      "criterion": "A production VibeHub Bundle in this repository installs through the official DSH plugin/Profile flow after the shipped base and Web application layers, boots an isolated loopback Profile, and contributes one first-class Task Graph surface, one focused Task surface, additive native-Chat actions, and coherent Theme tokens without replacing the root shell, native Chat, composer, tools, approvals, model controls, settings, user overrides, or DSH Session ownership. Source checkout and packed installation follow the same documented start, restart, shutdown, remove, and upgrade-check path."
+    },
+    {
+      "acceptance_id": "graph-and-task-surfaces-use-canonical-vibehub-projection",
+      "criterion": "The real DSH surfaces read one selected Git Workspace through a narrow host adapter and render the existing canonical VibeHub current Task graph plus focused Task information: exact dependency topology, DRAFT/READY/RUNNING/DONE presentation, at most one truthful upper-right substate, live presence only from a trusted fresh Task-scoped runtime fact, and the host-owned Recommended action. Ticket, Context, Evidence, Outcome, authority, archive, delivery, next_action, and unlock truth remain the checked-in VibeHub documents; DSH storage holds only Session and explicitly registered projection or linkage events and never becomes a second Task database."
+    },
+    {
+      "acceptance_id": "task-handoff-enters-native-chat-exactly",
+      "criterion": "From a focused Task, the primary action creates or reuses a DSH Session linked to the exact Workspace and Ticket, transfers the exact host-owned context-aware Agent handoff into the native DSH conversation through a supported command or composer boundary, and makes the Task-to-Session association recoverable after browser refresh and DSH restart. The flow preserves normal unconstrained Chat before and around the Task, never binds to DSH Agent Team tasks or an executor-specific task model, never silently harvests an unrelated transcript, and never fabricates a user or model turn merely to mutate VibeHub state."
+    },
+    {
+      "acceptance_id": "one-real-task-completes-the-execution-evidence-loop",
+      "criterion": "An installed-profile end-to-end fixture starts one real READY VibeHub Task from its Recommended action, lets the native DSH Agent discover and invoke the checked-in VibeHub Ticket Run contract, projects trusted queued, active, waiting-human or waiting-tool, failed, completed, and independent-closeout facts back into the owning Task without inferring them from Ticket status, and records acceptance-linked canonical Evidence through the existing Skill write path. Completion leaves Outcome pending and the Task in the canonical CLOSE_OUT boundary until a separate closeout Agent adjudicates it; interruption, failed execution, missing human authority, refresh, and restart remain honest and resumable or explicitly unsupported."
+    },
+    {
+      "acceptance_id": "production-and-installed-regressions-pass",
+      "criterion": "Focused adapter, host, client, event replay, Task-to-Session identity, exact-payload, authority, no-write, failure, restart, and upstream-contract tests pass alongside the complete existing VibeHub verification suite. Fresh packed installation into an isolated DSH Profile is reviewed in the real browser at default and narrow widths with keyboard navigation, focus restoration, reduced motion, native approval and tool surfaces, no false live signal, no console error, and clean uninstall; the repository documents the exact daily development command, supported baseline, upgrade probe, known limits, and stop conditions."
     }
   ],
   "constraints": [
-    "Do not execute while maturity remains draft.",
-    "Keep current Skills and canonical Git-native Ticket, Context, Evidence, and Outcome documents working throughout the first vertical slice.",
-    "Use this repository as the initial monorepo and keep DeepSeek Harness pinned as an external dependency unless the prerequisite decision explicitly establishes a different necessity.",
-    "Do not add cross-repository federation, a native desktop wrapper, cloud sync, or a second durable state model to the first vertical slice."
+    "Keep the first production slice in this repository and use DeepSeek Harness only as a pinned external dependency; do not vendor, fork, or patch upstream.",
+    "Preserve the current VibeHub Skills, canonical Git-native documents, read/write authority, four-phase Workbench semantics, exact Agent handoff, and independent closeout boundary.",
+    "Use DSH native Chat, Sessions, models, tools, permissions, approvals, skills, settings, and user overrides; do not couple VibeHub Tasks to DSH Agent Team tasks, Codex internals, or another Plugin's task model.",
+    "Do not add cross-Project federation, personal-level Context, team collaboration, cloud sync, a native desktop wrapper, a second durable Task store, or a background daemon to this slice.",
+    "Do not make full conversation-graph visualization, Compare, Bring Back, topology-derived Task clustering, high-fidelity whole-application reskin, or a dedicated Codex streaming adapter prerequisites of this first executable loop; preserve their seams and defer them to later Tickets.",
+    "A production Run or linkage event must have a registered replay contract before it is written; ignorable events are allowed only for explicitly transitional forward-compatible records.",
+    "If the current supported DSH baseline violates a documented stop condition, stop with reproducible Evidence and replan this Ticket rather than hiding the break behind broad internal imports or upstream modifications."
   ],
-  "context": "This is intentionally a draft implementation boundary. Its exact acceptance, package structure, DSH integration shape, and compatibility plan must be refined from the successful product-direction and DSH-feasibility Outcomes rather than guessed now. The expected shape remains one current-repository vertical slice: browser-first task Chat, explicit branch operations, scoped Context, Ticket materialization, Start, replaceable execution events, attention return, and Evidence, all using the canonical Git-native VibeHub documents. Development remains in this repository as a monorepo until real distribution pressure demonstrates a reason to split repositories.",
+  "context": "The two prerequisites are now successful, and the first implementation boundary can be firm. The owner selected a non-invasive DSH Plugin rather than a fork or replacement shell, with Task as the durable unit, the Task Graph as the committed-work entry, native Chat as the Human-led Context Space, and Task execution as the Agent-led Context Space. The foundation Spike proved official out-of-tree Bundle/Profile composition, additive Chat and view slots, typed no-model commands, Session fork identity, durable event extension, local browser lifecycle, and the need for one compatibility adapter; it also proved that the shipped one-shot Codex provider is not a resumable product executor. The smallest useful production slice therefore does not first build a general Codex runtime or the complete Chat branch graph. It installs VibeHub into a current pinned DSH Web Profile, surfaces the existing canonical Graph and focused Task interaction, turns the host-owned Recommended action into an exact native-Chat handoff, lets the DSH Agent use the checked-in Ticket Run Skill, and projects trusted Session execution back to the Task until canonical Evidence and independent closeout. DSH release state is rechecked at execution time because the earlier rc.7 Spike is older than the current official next rc.8 and master commit 141eb6fef83422698aef7a981029e843e8161534 observed on 2026-08-20.",
   "context_refs": [
     {
-      "purpose": "Domain semantics the implementation must preserve.",
+      "purpose": "Successful human-approved Task-first, additive DSH Plugin composition boundary.",
+      "ref": ".vibehub/outcomes/ticket-decide-task-harness-product-direction.yaml"
+    },
+    {
+      "purpose": "Successful source-level and real-profile feasibility baseline whose assumptions must be re-probed on the current DSH version.",
+      "ref": ".vibehub/outcomes/ticket-spike-deepseek-harness-foundations.yaml"
+    },
+    {
+      "purpose": "Exact seam matrix, package recommendation, smoke tests, replay constraint, executor boundary, and stop conditions.",
+      "ref": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    },
+    {
+      "purpose": "Product loop and object authority the vertical slice must preserve while narrowing deferred scope.",
+      "ref": "docs/HARNESS_PRODUCT_LOGIC.md"
+    },
+    {
+      "purpose": "Binding current Graph, four-phase, substate, live-presence, and Recommended-action interaction contract.",
+      "ref": ".vibehub/rooms/workbench/decision-workbench-state-signal-and-action-priority.yaml"
+    },
+    {
+      "purpose": "Canonical domain separation among Task, Context, execution actor, infrastructure, Evidence, and Outcome.",
       "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
     },
     {
-      "purpose": "Existing authority for the replaceable executor boundary that the prerequisite Outcomes will narrow.",
+      "purpose": "Authority for routing a stable Ticket to replaceable execution resources rather than binding product truth to one agent.",
       "ref": ".vibehub/rooms/product/decision-ticket-routes-replaceable-agents.yaml"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "The owner-approved VibeHub Harness direction becomes the smallest real single-Workspace vertical slice from task-oriented Chat through Ticket Start to visible execution and Evidence.",
+  "maturity": "firm",
+  "outcome": "An installable non-invasive VibeHub Bundle turns one current Git Workspace into a real DSH Task Workbench: canonical Task Graph and Task Context enter native Chat through an exact handoff, one Task runs with truthful presence, and acceptance-linked Evidence returns to independent closeout without a second source of truth.",
   "provenance_refs": [
     "conversation:2026-08-17-vibehub-deepseek-harness-product-direction",
-    "conversation:2026-08-17-same-repository-initial-development"
+    "conversation:2026-08-17-same-repository-initial-development",
+    "conversation:2026-08-20-owner-selects-additive-dsh-plugin-and-task-first-workbench",
+    "conversation:2026-08-20-owner-prioritizes-source-of-truth-before-dsh-design",
+    "upstream:deepseek-harness-master-141eb6fef83422698aef7a981029e843e8161534-observed-2026-08-20",
+    "npm:@deepseek-ai/dsh-next-0.1.0-rc.8-observed-2026-08-20"
   ],
   "relations": [
     {
-      "rationale": "Permanent implementation follows explicit owner judgment of the product and interaction proposal.",
+      "rationale": "Permanent implementation follows the successful explicit owner judgment of the Task-first product and non-invasive Plugin composition.",
       "target_ticket_id": "ticket-decide-task-harness-product-direction",
       "type": "depends_on"
     },
     {
-      "rationale": "Implementation acceptance depends on the proven upstream extension and lifecycle seams.",
+      "rationale": "Implementation consumes the successful source-level and real-profile proof of the DSH extension, Session, command, event, and lifecycle seams.",
       "target_ticket_id": "ticket-spike-deepseek-harness-foundations",
       "type": "depends_on"
     }
