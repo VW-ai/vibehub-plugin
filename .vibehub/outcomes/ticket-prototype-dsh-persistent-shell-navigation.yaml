@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "current-overlay-failure-is-reproduced-and-bounded",
+    "persistent-shell-information-architecture-is-reviewable",
+    "chat-graph-task-loop-is-complete",
+    "real-dsh-composition-seams-are-proven",
+    "prototype-is-accessible-and-native-behavior-survives",
+    "owner-decision-pack-is-exact"
+  ],
+  "closed_at": "2026-08-21T03:55:08Z",
+  "evidence_ids": [
+    "persistent-shell-baseline-and-composition-proof",
+    "persistent-shell-product-loop-and-decision-pack",
+    "persistent-shell-wide-narrow-browser-regression"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout accepts all six criteria. The checked-in review pack preserves the successful rc.8 vertical slice while reproducing and bounding the current shell.overlay composition failure as obscured native navigation, duplicate application chrome, separated Chat and Graph, and an Inspector that is not yet the focused Task Workspace; it explicitly keeps the Graph itself out of the defect diagnosis and records the stale child-host lifecycle limit. The production-shaped carrier presents exactly two bounded Tasks-first and Chat-first variants in one persistent DSH/Codex-like navigation model, and its state machine plus source inspection covers first boot, normal and returning Chat, Graph scan, Task selection, Focus Route, Recommended action, Needs You, native-shaped steering, execution and Evidence posture, and exact Graph scroll/card-focus restoration. The machine-readable decision pack recommends Tasks-first, states the alternative and tradeoffs, identifies the precise owner questions, keeps DSH Root, Conversation and Details, shadows only the single Sidebar owner, recreates all five stock child seats, preserves native Session/Workspace/Theme/Chat services, and forbids overlay page content, DOM injection, synthetic Sessions, a second Task store and upstream forks. Against the clean official 141eb6fef83422698aef7a981029e843e8161534 checkout, the independent persistent-shell probe passed all 8/8 seams; focused tests passed 5/5 and full verification passed 146/146 with the 62-file installed artifact. The independent loopback run returned the declared local-only, repositoryWrites=false health identity, rejected POST with 405, and left the worktree unchanged. Canonical browser Evidence records the fresh default and 390x844 passes, exact-width no-overflow result, keyboard/focus restoration, reduced-motion behavior and zero console errors; this closeout also inspected the corresponding DOM, interaction, narrow-layout and motion contracts. The prototype remains explicitly disposable and non-final, so its mocked live review state does not replace the production requirement for a fresh trusted Task-scoped runtime fact.",
+  "ticket_id": "ticket-prototype-dsh-persistent-shell-navigation",
+  "unresolved_acceptance_ids": []
+}
