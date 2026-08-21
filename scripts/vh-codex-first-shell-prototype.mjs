@@ -55,6 +55,7 @@ const assets = new Map([
   ["/app.css", [join(assetRoot, "app.css"), "text/css; charset=utf-8"]],
   ["/app.js", [join(assetRoot, "app.js"), "text/javascript; charset=utf-8"]],
   ["/chat-model.mjs", [join(assetRoot, "chat-model.mjs"), "text/javascript; charset=utf-8"]],
+  ["/chat-renderer.mjs", [join(assetRoot, "chat-renderer.mjs"), "text/javascript; charset=utf-8"]],
   ["/chat-fixtures.json", [join(assetRoot, "chat-fixtures.json"), "application/json; charset=utf-8"]],
   ["/chat-conformance-fixtures.json", [join(assetRoot, "chat-conformance-fixtures.json"), "application/json; charset=utf-8"]],
   ["/task-fixtures.json", [join(assetRoot, "task-fixtures.json"), "application/json; charset=utf-8"]],

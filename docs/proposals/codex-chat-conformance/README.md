@@ -20,11 +20,16 @@ mapping was sound:
 6. CSS clipped rich output visually but allowed unbounded command, diff, tool and
    unknown payloads into the DOM.
 
-The implementation now uses a small executable reducer shared by the actual browser
-renderer and Node tests. It reconciles replay and live state by exact identity,
+The implementation now uses an executable reducer and pure rich-content renderer
+shared by the actual browser surface and Node tests. It reconciles replay and live
+state by compound Thread / Turn / item identity,
 replaces completed items authoritatively, retains interruption boundaries, handles
-MCP progress, leaves unknown deltas non-mutating and bounds the timeline and rich
-payload DOM. The shell preserves selection and disclosure posture during streaming,
+MCP progress, leaves unknown deltas non-mutating and enforces one aggregate mounted
+DOM budget across response text, citations, file changes and media. Generated, tool
+and unsupported image results either render from an explicitly supported source or
+show a truthful fallback. Full citation Thread identity remains accessible and
+copyable. Keyed timeline reconciliation preserves selection, focus and disclosure
+posture during streaming (with a bounded selection deferral),
 adds quoted response context to the ordinary Composer, renders all user-input
 questions inline, restores terminal failures as an explicitly new Turn, auto-grows
 the Composer, adds code copy and implements the contract's focus-scoped Escape Stop.
@@ -35,6 +40,11 @@ remain truthful future bridges.
 
 ## Truthful remaining gaps
 
+- The escape-first Markdown carrier is intentionally smaller than a mature
+  CommonMark renderer; nested/malformed constructs remain a medium-severity
+  production-shell gap.
+- Quote carries exact Thread / Turn / item identity in the active browser session.
+  Durable source-identity serialization remains a medium-severity production gap.
 - The research carrier retains a bounded 240-item tail. True viewport
   virtualization belongs in the production shell.
 - Model and collaboration-mode pickers remain absent rather than falsely enabled.
@@ -58,3 +68,9 @@ separately attributable report each under [`audits/`](audits/README.md):
 
 The executor does not author those reports. Their convergence may change the
 matrix and implementation before Evidence is recorded.
+
+The first independent message/rich-content audit found six P0 gaps in the interim
+commit. Those findings remain unchanged in the reviewer-owned report; the current
+implementation corrects compound identity, aggregate bounds, generated/tool image
+fallbacks, full citation identity, executable rich-renderer tests and keyed streaming
+updates before final Evidence is considered.

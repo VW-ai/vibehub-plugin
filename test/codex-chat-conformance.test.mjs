@@ -2,7 +2,16 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { applyChatEvent, boundedText, canonicalTimeline } from "../apps/codex-first-shell-prototype/chat-model.mjs";
+import { applyChatEvent, boundedText, canonicalTimeline, itemKey } from "../apps/codex-first-shell-prototype/chat-model.mjs";
+import {
+  createRenderBudget,
+  renderAgentMessage,
+  renderGeneratedImage,
+  renderMarkdown,
+  renderMemoryCitations,
+  renderToolContent,
+  renderUserMedia,
+} from "../apps/codex-first-shell-prototype/chat-renderer.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
@@ -24,11 +33,76 @@ test("completed items replace deltas authoritatively and unknown events remain n
   const model = { liveItems: new Map(), turnErrors: new Map() };
   applyChatEvent(model, "item/agentMessage/delta", { turnId: "turn", itemId: "answer", delta: "stale" });
   applyChatEvent(model, "item/completed", { turnId: "turn", item: { id: "answer", type: "agentMessage", text: "settled" } });
-  assert.equal(model.liveItems.get("answer").text, "settled");
-  assert.equal(model.liveItems.get("answer")._live, false);
+  const key = itemKey(undefined, "turn", "answer");
+  assert.equal(model.liveItems.get(key).text, "settled");
+  assert.equal(model.liveItems.get(key)._live, false);
   const size = model.liveItems.size;
   assert.equal(applyChatEvent(model, "item/future/delta", { turnId: "turn", itemId: "future", delta: "raw" }), false);
   assert.equal(model.liveItems.size, size);
+});
+
+test("composite identity isolates colliding item ids across Threads and Turns", () => {
+  const model = { liveItems: new Map(), turnErrors: new Map() };
+  applyChatEvent(model, "item/agentMessage/delta", { threadId: "thread-a", turnId: "turn-a", itemId: "same", delta: "A" });
+  applyChatEvent(model, "item/agentMessage/delta", { threadId: "thread-b", turnId: "turn-b", itemId: "same", delta: "B" });
+  assert.equal(model.liveItems.size, 2);
+  assert.equal(canonicalTimeline({ id: "thread-a", turns: [] }, model)[0].text, "A");
+  assert.equal(canonicalTimeline({ id: "thread-b", turns: [] }, model)[0].text, "B");
+  assert.notEqual(itemKey("thread-a", "turn-a", "same"), itemKey("thread-b", "turn-b", "same"));
+});
+
+test("pure rich renderer escapes Markdown and visibly bounds malformed code", () => {
+  const budget = createRenderBudget({ textCharacters: 160, mediaCharacters: 100 });
+  const html = renderMarkdown("<script>alert(1)</script>\n\n[good](https://example.com) [bad](javascript:alert(1))\n```js\n" + "x".repeat(400), budget, 120);
+  assert.doesNotMatch(html, /<script>/);
+  assert.match(html, /&lt;script&gt;/);
+  assert.match(html, /href="https:\/\/example\.com"/);
+  assert.doesNotMatch(html, /href="javascript:/);
+  assert.match(html, /omitted from this mounted view/);
+  assert.match(html, /tabindex="0" aria-label="Code block"/);
+});
+
+test("media, generated images, tool images and unknown rich results have truthful fallbacks", () => {
+  const image = "data:image/png;base64,AA==";
+  assert.match(renderUserMedia([{ type: "image", url: image }]), /<img/);
+  const unsupported = renderUserMedia([{ type: "image", url: "https://example.com/private.png", name: "remote" }]);
+  assert.match(unsupported, /image source is not mounted/);
+  assert.doesNotMatch(unsupported, /@undefined/);
+  assert.match(renderGeneratedImage({ result: { imageUrl: image } }), /Generated image/);
+  assert.match(renderGeneratedImage({ status: "completed" }), /not mounted by this local carrier/);
+  const tool = renderToolContent([
+    { type: "text", text: "tool result" },
+    { type: "image", data: "AA==", mimeType: "image/png" },
+    { type: "resource", uri: "file:///not-mounted" },
+  ]);
+  assert.match(tool, /tool result/);
+  assert.match(tool, /Tool image result/);
+  assert.match(tool, /resource tool result remains inspectable/);
+});
+
+test("citations preserve full accessible Thread identity and enforce aggregate counts", () => {
+  const fullThreadId = "0198d957-f8b5-72a0-a268-46de3a15e807";
+  const entries = Array.from({ length: 40 }, (_, index) => ({ path: `docs/${index}.md`, lineStart: 1, note: "source" }));
+  const html = renderMemoryCitations({ entries, threadIds: [fullThreadId] }, createRenderBudget({ citationCount: 3 }));
+  assert.match(html, new RegExp(fullThreadId));
+  assert.match(html, /Copy full source Thread id/);
+  assert.match(html, /37 citation entries omitted/);
+});
+
+test("agent-message renderer carries compound identity through Copy and Quote actions", () => {
+  const key = itemKey("thread", "turn", "answer");
+  const html = renderAgentMessage({ id: "answer", _key: key, type: "agentMessage", text: "Answer" });
+  assert.match(html, new RegExp(`data-item-id="${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
+  assert.match(html, new RegExp(`data-copy-message="${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
+  assert.match(html, new RegExp(`data-quote-message="${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
+});
+
+test("one shared render budget bounds aggregate mounted response text", () => {
+  const budget = createRenderBudget({ textCharacters: 1_000, mediaCharacters: 100 });
+  const html = Array.from({ length: 8 }, (_, index) => renderAgentMessage({ id: String(index), _key: String(index), type: "agentMessage", text: "x".repeat(500) }, budget)).join("");
+  assert.equal(budget.textRemaining, 0);
+  assert.match(html, /omitted from this mounted view/);
+  assert.ok(html.length < 12_000, `mounted HTML should stay bounded, received ${html.length}`);
 });
 
 test("timeline and rich output stay bounded without inferring lifecycle", () => {
@@ -56,6 +130,8 @@ test("current shell exposes the conformance interactions without a second transc
   assert.match(script, /applyChatEvent/);
   assert.match(script, /canonicalTimeline/);
   assert.match(script, /selectionchange/);
+  assert.match(script, /patchTimeline/);
+  assert.match(script, /preserveScroll && existingTimeline[^]*patchTimeline\(existingTimeline/);
   assert.match(script, /Quote added to your next message/);
   assert.match(script, /data-request-form/);
   assert.match(script, /Retry as a new Turn/);

@@ -54,7 +54,7 @@
       "beforeSeverity": "highest",
       "beforeFinding": "Every streamed frame replaced transcript innerHTML, clearing selection and resetting opened activity details.",
       "after": "pass",
-      "implementation": "Rendering defers while transcript selection is active and restores stable data-disclosure-id state after reconciliation.",
+      "implementation": "Keyed entry reconciliation preserves unchanged DOM nodes and restores focus/disclosures for changed entries; active selection deferral is bounded to 1.2 seconds rather than freezing updates indefinitely.",
       "proof": ["apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
     },
     {
@@ -64,8 +64,8 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "Only whole-message Copy existed; selection had no action and streaming could erase it.",
-      "after": "pass",
-      "implementation": "Selection-scoped Add to chat control plus whole-response Quote, source item identity in browser state, bounded quote chip and Markdown quote transfer into the next normal Turn.",
+      "after": "partial",
+      "implementation": "Selection-scoped Add to chat control plus whole-response Quote, compound Thread/Turn/item source identity in browser state, bounded quote chip and Markdown quote transfer into the next normal Turn. Durable quote-source serialization remains a production gap.",
       "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
     },
     {
@@ -75,9 +75,9 @@
       "before": "partial",
       "beforeSeverity": "medium",
       "beforeFinding": "Headings, paragraphs, unordered lists, links and code existed; ordered lists, block quotes and code copy did not.",
-      "after": "pass",
-      "implementation": "Ordered lists, block quotes, horizontal rules and focusable code copy were added while escape-first sanitization remains.",
-      "proof": ["apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
+      "after": "partial",
+      "implementation": "The extracted escape-first renderer adds ordered lists, block quotes, horizontal rules, focusable code copy and executable adversarial tests. A mature CommonMark renderer remains a medium-severity production gap.",
+      "proof": ["apps/codex-first-shell-prototype/chat-renderer.mjs", "apps/codex-first-shell-prototype/app.css", "test/codex-chat-conformance.test.mjs"]
     },
     {
       "id": "citations-attachments",
@@ -87,8 +87,8 @@
       "beforeSeverity": "highest",
       "beforeFinding": "Accepted correction covers citation path, lines, note and source Thread; media inputs are explicit.",
       "after": "pass",
-      "implementation": "No semantic change; regression remains in accepted fixture and current renderer.",
-      "proof": ["apps/codex-first-shell-prototype/chat-fixtures.json", ".vibehub/evidence/ticket-research-codex-native-chat-parity/codex-native-chat-citation-interruption-correction.yaml"]
+      "implementation": "The renderer mounts only supported image sources, shows truthful generated/tool/remote-image fallbacks, and preserves the full citation Thread id accessibly and copyably under aggregate budgets.",
+      "proof": ["apps/codex-first-shell-prototype/chat-renderer.mjs", "test/codex-chat-conformance.test.mjs", ".vibehub/evidence/ticket-research-codex-native-chat-parity/codex-native-chat-citation-interruption-correction.yaml"]
     },
     {
       "id": "execution-tool-progress",
@@ -109,8 +109,8 @@
       "beforeSeverity": "highest",
       "beforeFinding": "CSS bounded visible height but inserted arbitrarily large strings into the DOM.",
       "after": "pass",
-      "implementation": "boundedText caps rendered payloads and adds an explicit omitted-character notice; app-server replay remains authoritative.",
-      "proof": ["apps/codex-first-shell-prototype/chat-model.mjs", "test/codex-chat-conformance.test.mjs"]
+      "implementation": "One shared render budget caps aggregate mounted text, media, citations and file changes and discloses omissions; app-server replay remains authoritative.",
+      "proof": ["apps/codex-first-shell-prototype/chat-renderer.mjs", "test/codex-chat-conformance.test.mjs"]
     },
     {
       "id": "approvals",

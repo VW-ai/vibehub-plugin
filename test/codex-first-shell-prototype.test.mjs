@@ -100,9 +100,10 @@ test("Search, Task attention, and object semantics are explicit and source-backe
 });
 
 test("Codex-native Chat contract covers replay, live deltas, rich items, and licensed reuse", async () => {
-  const [script, model, css, research, review, contractText, fixtureText, lockText] = await Promise.all([
+  const [script, model, renderer, css, research, review, contractText, fixtureText, lockText] = await Promise.all([
     source("apps/codex-first-shell-prototype/app.js"),
     source("apps/codex-first-shell-prototype/chat-model.mjs"),
+    source("apps/codex-first-shell-prototype/chat-renderer.mjs"),
     source("apps/codex-first-shell-prototype/app.css"),
     source("docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md"),
     source("docs/proposals/codex-native-chat/README.md"),
@@ -132,12 +133,14 @@ test("Codex-native Chat contract covers replay, live deltas, rich items, and lic
   assert.match(script, /requestAnimationFrame/);
   assert.match(script, /canonicalTimeline/);
   assert.match(model, /slice\(-limit\)/);
-  assert.match(script, /renderMarkdown/);
-  assert.match(script, /memoryCitationMarkup/);
-  assert.match(script, /citation\?\.threadIds/);
+  assert.match(renderer, /renderMarkdown/);
+  assert.match(renderer, /renderMemoryCitations/);
+  assert.match(renderer, /citation\?\.threadIds/);
+  assert.match(model, /itemKey\(threadId, turnId, itemId\)/);
+  assert.match(script, /patchTimeline/);
   assert.match(script, /turnBoundary/);
   assert.match(model, /\["interrupted", "failed"\]\.includes\(turn\.status\)/);
-  assert.match(script, /noreferrer noopener/);
+  assert.match(renderer, /noreferrer noopener/);
   assert.match(script, /Unsupported item/);
   assert.match(css, /\.activity-card/);
   assert.match(css, /\.activity-group/);

@@ -1,4 +1,15 @@
-import { applyChatEvent, boundedText, canonicalTimeline } from "./chat-model.mjs";
+import { applyChatEvent, canonicalTimeline } from "./chat-model.mjs";
+import {
+  DOM_LIMITS,
+  createRenderBudget,
+  escapeHtml,
+  renderAgentMessage,
+  renderGeneratedImage,
+  renderMarkdown,
+  renderToolContent,
+  renderUserMedia,
+  takeText,
+} from "./chat-renderer.mjs";
 
 const state = {
   route: "chat",
@@ -37,6 +48,7 @@ const state = {
   composerQuote: null,
   selectedQuote: null,
   deferredChatRender: 0,
+  selectionDeferralStartedAt: 0,
 };
 
 const token = location.hash.slice(1);
@@ -63,12 +75,6 @@ window.addEventListener("resize", () => {
   cancelAnimationFrame(graphResizeFrame);
   graphResizeFrame = requestAnimationFrame(renderGraphEdges);
 });
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-  })[character]);
-}
 
 function notify(message) {
   clearTimeout(toastTimer);
@@ -335,48 +341,6 @@ function userInputText(content) {
   return (content ?? []).filter((item) => item.type === "text").map((item) => item.text).join("\n");
 }
 
-function inlineMarkdown(value) {
-  return escapeHtml(value)
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
-}
-
-function renderMarkdown(value) {
-  const chunks = String(value ?? "").split(/```/);
-  return chunks.map((chunk, index) => {
-    if (index % 2) {
-      const [language, ...lines] = chunk.replace(/^\n/, "").split("\n");
-      const body = lines.length ? lines.join("\n") : language;
-      const label = lines.length && language.trim() ? `<span>${escapeHtml(language.trim())}</span>` : "";
-      return `<div class="code-block">${label}<button type="button" data-copy-code aria-label="Copy code">Copy</button><pre><code>${escapeHtml(body)}</code></pre></div>`;
-    }
-    const blocks = [];
-    let list = [];
-    let listType = "ul";
-    const flushList = () => {
-      if (!list.length) return;
-      blocks.push(`<${listType}>${list.map((line) => `<li>${inlineMarkdown(line)}</li>`).join("")}</${listType}>`);
-      list = [];
-      listType = "ul";
-    };
-    for (const line of chunk.split("\n")) {
-      if (/^[-*] /.test(line)) { if (list.length && listType !== "ul") flushList(); listType = "ul"; list.push(line.slice(2)); continue; }
-      const ordered = line.match(/^\d+\.\s+(.+)/);
-      if (ordered) { if (list.length && listType !== "ol") flushList(); listType = "ol"; list.push(ordered[1]); continue; }
-      flushList();
-      if (!line.trim()) continue;
-      const heading = line.match(/^(#{1,3})\s+(.+)/);
-      if (heading) blocks.push(`<h${Math.min(4, heading[1].length + 1)}>${inlineMarkdown(heading[2])}</h${Math.min(4, heading[1].length + 1)}>`);
-      else if (/^>\s?/.test(line)) blocks.push(`<blockquote>${inlineMarkdown(line.replace(/^>\s?/, ""))}</blockquote>`);
-      else if (/^---+$/.test(line.trim())) blocks.push("<hr>");
-      else blocks.push(`<p>${inlineMarkdown(line)}</p>`);
-    }
-    flushList();
-    return blocks.join("");
-  }).join("");
-}
-
 function statusLabel(item) {
   if (item._live) return "running";
   if (item.status) return String(item.status).replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
@@ -387,88 +351,68 @@ function disclosureCard({ identity, kind, title, status, summary, detail = "", i
   return `<details class="activity-card ${kind}" data-disclosure-id="${escapeHtml(identity ?? `${kind}-${title}`)}" ${open ? "open" : ""}><summary><i>${icon}</i><span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(summary)}</small></span><em>${escapeHtml(status)}</em></summary>${detail ? `<div class="activity-detail">${detail}</div>` : ""}${extra}</details>`;
 }
 
-function boundedPre(value, className = "", maximum = 20_000) {
-  const bounded = boundedText(value, maximum);
+function boundedPre(value, className = "", maximum = DOM_LIMITS.outputCharacters, budget = createRenderBudget()) {
+  const bounded = takeText(budget, value, maximum);
   return `<pre${className ? ` class="${className}"` : ""}>${escapeHtml(bounded.text)}</pre>${bounded.truncated ? `<p class="truncation-note">${bounded.omitted.toLocaleString()} characters omitted from this browser view. Durable Thread history remains authoritative.</p>` : ""}`;
 }
 
-function userMediaMarkup(content) {
-  return (content ?? []).filter((entry) => ["image", "localImage", "audio", "localAudio", "skill", "mention"].includes(entry.type)).map((entry) => {
-    if (entry.type === "image" && String(entry.url).startsWith("data:image/")) return `<img class="message-image" src="${escapeHtml(entry.url)}" alt="Attached image">`;
-    if (entry.type === "audio") return '<span class="message-attachment">◉ Audio attachment</span>';
-    if (entry.type === "localImage") return `<span class="message-attachment">▧ ${escapeHtml(entry.path?.split("/").pop() ?? "Local image")}</span>`;
-    if (entry.type === "localAudio") return `<span class="message-attachment">◉ ${escapeHtml(entry.path?.split("/").pop() ?? "Local audio")}</span>`;
-    return `<span class="message-attachment">${entry.type === "skill" ? "$" : "@"}${escapeHtml(entry.name)}</span>`;
-  }).join("");
-}
-
-function memoryCitationMarkup(citation) {
-  const entries = citation?.entries ?? [];
-  if (!entries.length) return "";
-  const sourceThreads = (citation?.threadIds ?? []).filter(Boolean);
-  const sourceIdentity = sourceThreads.length
-    ? `<small>Source thread${sourceThreads.length === 1 ? "" : "s"}: ${sourceThreads.map((id) => escapeHtml(String(id).slice(0, 12))).join(", ")}</small>`
-    : "";
-  return `<aside class="source-citations" aria-label="Memory citations"><strong>Sources</strong>${entries.map((entry) => {
-    const lines = entry.lineStart ? `:${entry.lineStart}${entry.lineEnd && entry.lineEnd !== entry.lineStart ? `-${entry.lineEnd}` : ""}` : "";
-    return `<span><code>${escapeHtml(entry.path)}${escapeHtml(lines)}</code>${entry.note ? `<em>${escapeHtml(entry.note)}</em>` : ""}</span>`;
-  }).join("")}${sourceIdentity}</aside>`;
-}
-
-function renderItem(item) {
+function renderItem(item, budget) {
   if (!item) return "";
+  const identity = item._key ?? item.id;
   if (item.type === "userMessage") {
     const text = userInputText(item.content);
     const handoff = handoffFromText(text);
-    if (handoff?.kind === "vibehub_ticket_handoff") return `<div class="turn user"><article class="item-card handoff"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.nextAction?.action ?? handoff.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.ticketId))}</strong><br>${escapeHtml(handoff.outcome)}</p></article></div>`;
+    if (handoff?.kind === "vibehub_ticket_handoff") return `<div class="turn user"><article class="item-card handoff"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.nextAction?.action ?? handoff.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.ticketId))}</strong><br>${escapeHtml(takeText(budget, handoff.outcome, 8_000).text)}</p></article></div>`;
     if (handoff?.kind === "vibehub_task_context_packet") {
       const message = handoff.conversation?.humanMessage;
       const contextCount = handoff.context?.items?.length ?? 0;
-      const media = userMediaMarkup(item.content);
-      if (message) return `<div class="turn user" data-item-id="${escapeHtml(item.id)}"><article><div>${renderMarkdown(message)}</div>${media}<small class="task-message-context">${contextCount} Context item${contextCount === 1 ? "" : "s"} · host-owned packet</small></article></div>`;
-      return `<div class="turn user"><article class="item-card handoff task-packet"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.task?.nextAction?.action ?? handoff.task?.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.task?.ticketId))}</strong><br>${escapeHtml(handoff.task?.outcome)}</p><small>${contextCount} Context item${contextCount === 1 ? "" : "s"} · ${escapeHtml(handoff.project?.scope ?? "standalone")} · host-owned packet</small></article></div>`;
+      const media = renderUserMedia(item.content, budget);
+      if (message) return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article><div>${renderMarkdown(message, budget)}</div>${media}<small class="task-message-context">${contextCount} Context item${contextCount === 1 ? "" : "s"} · host-owned packet</small></article></div>`;
+      return `<div class="turn user"><article class="item-card handoff task-packet"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.task?.nextAction?.action ?? handoff.task?.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.task?.ticketId))}</strong><br>${escapeHtml(takeText(budget, handoff.task?.outcome, 8_000).text)}</p><small>${contextCount} Context item${contextCount === 1 ? "" : "s"} · ${escapeHtml(handoff.project?.scope ?? "standalone")} · host-owned packet</small></article></div>`;
     }
-    const media = userMediaMarkup(item.content);
-    return `<div class="turn user" data-item-id="${escapeHtml(item.id)}"><article>${text ? `<div>${renderMarkdown(text)}</div>` : ""}${media}</article></div>`;
+    const media = renderUserMedia(item.content, budget);
+    return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article>${text ? `<div>${renderMarkdown(text, budget)}</div>` : ""}${media}</article></div>`;
   }
-  if (item.type === "agentMessage") return `<div class="turn assistant" data-item-id="${escapeHtml(item.id)}"><span class="agent-mark">C</span><article class="agent-response${item._live ? " streaming" : ""}">${renderMarkdown(item.text)}${memoryCitationMarkup(item.memoryCitation)}<footer class="message-actions"><button type="button" data-copy-message="${escapeHtml(item.id)}">Copy</button><button type="button" data-quote-message="${escapeHtml(item.id)}">Quote</button><button type="button" disabled title="Planned VibeHub bridge">Remember</button><button type="button" disabled title="Planned VibeHub bridge">Make Task</button></footer></article></div>`;
+  if (item.type === "agentMessage") return renderAgentMessage(item, budget);
   if (item.type === "reasoning") {
     const text = [...(item.summary ?? []), ...(item.content ?? [])].join("\n");
-    return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "reasoning", icon: "✦", title: "Reasoning", status: statusLabel(item), summary: item._live ? "Thinking…" : "Reasoning summary", detail: renderMarkdown(text || "Reasoned about the request") })}</div>`;
+    return `<div class="activity-row">${disclosureCard({ identity, kind: "reasoning", icon: "✦", title: "Reasoning", status: statusLabel(item), summary: item._live ? "Thinking…" : "Reasoning summary", detail: renderMarkdown(text || "Reasoned about the request", budget) })}</div>`;
   }
-  if (item.type === "plan") return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "plan", icon: "☷", title: "Plan", status: statusLabel(item), summary: item._live ? "Updating plan…" : "Plan updated", detail: renderMarkdown(item.text), open: true })}</div>`;
+  if (item.type === "plan") return `<div class="activity-row">${disclosureCard({ identity, kind: "plan", icon: "☷", title: "Plan", status: statusLabel(item), summary: item._live ? "Updating plan…" : "Plan updated", detail: renderMarkdown(item.text, budget), open: true })}</div>`;
   if (item.type === "commandExecution") {
-    const detail = `<div class="command-meta">${escapeHtml(item.cwd ?? "")}</div><code class="command-line">${escapeHtml(item.command)}</code>${item.aggregatedOutput ? boundedPre(item.aggregatedOutput, "terminal-output") : ""}`;
+    const detail = `<div class="command-meta">${escapeHtml(takeText(budget, item.cwd, 1_024).text)}</div><code class="command-line">${escapeHtml(takeText(budget, item.command, 4_000).text)}</code>${item.aggregatedOutput ? boundedPre(item.aggregatedOutput, "terminal-output", DOM_LIMITS.outputCharacters, budget) : ""}`;
     const duration = item.durationMs ? ` · ${(item.durationMs / 1000).toFixed(1)}s` : "";
-    return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "terminal", icon: ">_", title: "Terminal", status: statusLabel(item), summary: `${item.command || "Command"}${duration}`, detail, open: item._live || item.status === "failed" })}</div>`;
+    return `<div class="activity-row">${disclosureCard({ identity, kind: "terminal", icon: ">_", title: "Terminal", status: statusLabel(item), summary: `${takeText(budget, item.command || "Command", 240).text}${duration}`, detail, open: item._live || item.status === "failed" })}</div>`;
   }
   if (item.type === "fileChange") {
     const changes = item.changes ?? [];
-    const detail = changes.map((change) => `<section class="diff-file"><header><strong>${escapeHtml(change.path)}</strong><span>${escapeHtml(change.kind?.type ?? change.kind ?? "update")}</span></header>${change.diff ? boundedPre(change.diff) : ""}</section>`).join("");
-    return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "files", icon: "±", title: "File changes", status: statusLabel(item), summary: `${changes.length} file${changes.length === 1 ? "" : "s"}`, detail, open: item._live || item.status === "failed" })}</div>`;
+    const count = Math.max(0, Math.min(changes.length, budget.changesRemaining));
+    budget.changesRemaining -= count;
+    const detail = `${changes.slice(0, count).map((change) => `<section class="diff-file"><header><strong>${escapeHtml(takeText(budget, change.path, 1_024).text)}</strong><span>${escapeHtml(change.kind?.type ?? change.kind ?? "update")}</span></header>${change.diff ? boundedPre(change.diff, "", DOM_LIMITS.outputCharacters, budget) : ""}</section>`).join("")}${changes.length > count ? `<p class="truncation-note">${changes.length - count} file changes omitted from this mounted view. Durable Thread history remains authoritative.</p>` : ""}`;
+    return `<div class="activity-row">${disclosureCard({ identity, kind: "files", icon: "±", title: "File changes", status: statusLabel(item), summary: `${changes.length} file${changes.length === 1 ? "" : "s"}`, detail, open: item._live || item.status === "failed" })}</div>`;
   }
   if (item.type === "mcpToolCall" || item.type === "dynamicToolCall") {
-    const name = item.tool ?? "Tool";
-    const server = item.server ?? item.namespace ?? "Codex";
-    const result = item.result?.content?.map((entry) => entry.text).filter(Boolean).join("\n") ?? item.contentItems?.map((entry) => entry.text ?? entry.content ?? "").join("\n") ?? item.error?.message ?? "";
-    const detail = `${boundedPre(JSON.stringify(item.arguments ?? {}, null, 2), "tool-arguments", 8_000)}${item.progress ? `<p class="tool-progress">${escapeHtml(item.progress)}</p>` : ""}${result ? `<div class="tool-result">${renderMarkdown(boundedText(result).text)}</div>` : ""}`;
-    return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "tool", icon: "◇", title: name, status: statusLabel(item), summary: `${server}${item.readOnlyHint ? " · read only" : ""}`, detail, open: item._live || item.status === "failed" })}</div>`;
+    const name = takeText(budget, item.tool ?? "Tool", 160).text;
+    const server = takeText(budget, item.server ?? item.namespace ?? "Codex", 160).text;
+    const content = item.result?.content ?? item.contentItems ?? (item.error?.message ? [{ type: "text", text: item.error.message }] : []);
+    const detail = `${boundedPre(JSON.stringify(item.arguments ?? {}, null, 2), "tool-arguments", 8_000, budget)}${item.progress ? `<p class="tool-progress">${escapeHtml(takeText(budget, item.progress, 4_000).text)}</p>` : ""}${renderToolContent(content, budget)}`;
+    return `<div class="activity-row">${disclosureCard({ identity, kind: "tool", icon: "◇", title: name, status: statusLabel(item), summary: `${server}${item.readOnlyHint ? " · read only" : ""}`, detail, open: item._live || item.status === "failed" })}</div>`;
   }
   if (item.type === "collabAgentToolCall") {
     const agents = Object.entries(item.agentsStates ?? {}).map(([id, value]) => `${id.slice(0, 8)} · ${value.status ?? value}`).join("\n");
-    return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "agents", icon: "⑂", title: "Delegated work", status: statusLabel(item), summary: `${item.receiverThreadIds?.length ?? 0} agent thread${item.receiverThreadIds?.length === 1 ? "" : "s"}`, detail: `${item.prompt ? `<p>${escapeHtml(item.prompt)}</p>` : ""}${agents ? boundedPre(agents) : ""}`, open: item._live })}</div>`;
+    return `<div class="activity-row">${disclosureCard({ identity, kind: "agents", icon: "⑂", title: "Delegated work", status: statusLabel(item), summary: `${item.receiverThreadIds?.length ?? 0} agent thread${item.receiverThreadIds?.length === 1 ? "" : "s"}`, detail: `${item.prompt ? `<p>${escapeHtml(takeText(budget, item.prompt, 4_000).text)}</p>` : ""}${agents ? boundedPre(agents, "", 8_000, budget) : ""}`, open: item._live })}</div>`;
   }
-  if (item.type === "subAgentActivity") return `<div class="timeline-divider"><span>⑂ ${escapeHtml(item.agentPath || "Agent")}</span><strong>${escapeHtml(item.kind?.type ?? item.kind ?? "activity")}</strong></div>`;
-  if (item.type === "webSearch") return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "search", icon: "⌕", title: "Web search", status: statusLabel(item), summary: item.query ?? item.action?.query ?? "Search activity", detail: item.result ? `<p>${escapeHtml(boundedText(item.result, 8_000).text)}</p>` : "" })}</div>`;
+  if (item.type === "subAgentActivity") return `<div class="timeline-divider"><span>⑂ ${escapeHtml(takeText(budget, item.agentPath || "Agent", 240).text)}</span><strong>${escapeHtml(item.kind?.type ?? item.kind ?? "activity")}</strong></div>`;
+  if (item.type === "webSearch") return `<div class="activity-row">${disclosureCard({ identity, kind: "search", icon: "⌕", title: "Web search", status: statusLabel(item), summary: takeText(budget, item.query ?? item.action?.query ?? "Search activity", 240).text, detail: item.result ? boundedPre(item.result, "", 8_000, budget) : "" })}</div>`;
   if (item.type === "imageView") return `<div class="timeline-divider"><span>▧ Viewed image</span><strong>${escapeHtml(item.path?.split("/").pop() ?? "image")}</strong></div>`;
-  if (item.type === "sleep") return `<div class="timeline-divider"><span>◷ Waiting</span><strong>${escapeHtml(item.reason ?? item.status ?? "Codex paused")}</strong></div>`;
-  if (item.type === "imageGeneration") return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "image-generation", icon: "▧", title: "Image generation", status: statusLabel(item), summary: item.prompt ?? "Generated image activity" })}</div>`;
-  if (item.type === "enteredReviewMode" || item.type === "exitedReviewMode") return `<div class="timeline-divider"><span>${item.type === "enteredReviewMode" ? "Entered" : "Finished"} review</span><strong>${escapeHtml(item.review)}</strong></div>`;
+  if (item.type === "sleep") return `<div class="timeline-divider"><span>◷ Waiting</span><strong>${escapeHtml(takeText(budget, item.reason ?? item.status ?? "Codex paused", 1_000).text)}</strong></div>`;
+  if (item.type === "imageGeneration") return `<div class="activity-row">${disclosureCard({ identity, kind: "image-generation", icon: "▧", title: "Image generation", status: statusLabel(item), summary: takeText(budget, item.prompt ?? "Generated image activity", 240).text, detail: renderGeneratedImage(item, budget), open: Boolean(item.result) })}</div>`;
+  if (item.type === "enteredReviewMode" || item.type === "exitedReviewMode") return `<div class="timeline-divider"><span>${item.type === "enteredReviewMode" ? "Entered" : "Finished"} review</span><strong>${escapeHtml(takeText(budget, item.review, 1_000).text)}</strong></div>`;
   if (item.type === "contextCompaction") return '<div class="timeline-divider"><span>Context compacted</span><strong>Earlier detail remains in Thread history</strong></div>';
   if (item.type === "hookPrompt") return `<div class="timeline-divider"><span>Project instructions</span><strong>${escapeHtml((item.fragments ?? []).map((fragment) => fragment.text ?? fragment.content ?? "").join(" ").slice(0, 120))}</strong></div>`;
-  if (item.type === "turnError") return `<section class="turn-error"><strong>${item.willRetry ? "Codex is retrying" : "This Turn stopped"}</strong><p>${escapeHtml(item.message)}</p>${item.willRetry ? '<span class="retrying">Retrying…</span>' : `<button type="button" data-retry-turn="${escapeHtml(item._turnId)}">Retry as a new Turn</button>`}</section>`;
-  if (item.type === "turnBoundary") return `<div class="turn-boundary ${escapeHtml(item.status)}"><span>${item.status === "interrupted" ? "Turn interrupted" : "Turn failed"}</span><strong>${escapeHtml(item.message ?? (item.status === "interrupted" ? "Partial output remains in Thread history." : "The error remains inspectable in this Thread."))}</strong></div>`;
-  return `<div class="activity-row">${disclosureCard({ identity: item.id, kind: "unknown", icon: "?", title: item.type ?? "Unsupported item", status: statusLabel(item), summary: "Inspect raw app-server item; no result inferred", detail: boundedPre(JSON.stringify(item, null, 2), "", 8_000) })}</div>`;
+  if (item.type === "turnError") return `<section class="turn-error"><strong>${item.willRetry ? "Codex is retrying" : "This Turn stopped"}</strong><p>${escapeHtml(takeText(budget, item.message, 4_000).text)}</p>${item.willRetry ? '<span class="retrying">Retrying…</span>' : `<button type="button" data-retry-turn="${escapeHtml(item._turnId)}">Retry as a new Turn</button>`}</section>`;
+  if (item.type === "turnBoundary") return `<div class="turn-boundary ${escapeHtml(item.status)}"><span>${item.status === "interrupted" ? "Turn interrupted" : "Turn failed"}</span><strong>${escapeHtml(takeText(budget, item.message ?? (item.status === "interrupted" ? "Partial output remains in Thread history." : "The error remains inspectable in this Thread."), 4_000).text)}</strong></div>`;
+  return `<div class="activity-row">${disclosureCard({ identity, kind: "unknown", icon: "?", title: item.type ?? "Unsupported item", status: statusLabel(item), summary: "Inspect raw app-server item; no result inferred", detail: boundedPre(JSON.stringify(item, null, 2), "", 8_000, budget) })}</div>`;
 }
 
 function approvalMarkup(request) {
@@ -487,6 +431,7 @@ function approvalMarkup(request) {
 const groupableActivityTypes = new Set(["commandExecution", "fileChange", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "sleep", "imageGeneration"]);
 
 function renderTimelineItems(items) {
+  const budget = createRenderBudget();
   const output = [];
   let group = [];
   const flush = () => {
@@ -496,8 +441,8 @@ function renderTimelineItems(items) {
     const files = group.filter((item) => item.type === "fileChange").flatMap((item) => item.changes ?? []).length;
     const label = running ? "Working…" : failed ? "Work needs attention" : "Worked on this Turn";
     const detail = `${group.length} activit${group.length === 1 ? "y" : "ies"}${files ? ` · ${files} file${files === 1 ? "" : "s"}` : ""}`;
-    const identity = group.map((item) => item.id).filter(Boolean).join("--");
-    output.push(`<details class="activity-group" data-disclosure-id="group-${escapeHtml(identity)}" ${running || failed ? "open" : ""}><summary><span><i>${running ? "↻" : failed ? "!" : "✓"}</i><strong>${label}</strong></span><em>${detail}</em></summary><div>${group.map(renderItem).join("")}</div></details>`);
+    const identity = group.map((item) => item._key ?? item.id).filter(Boolean).join("--");
+    output.push(`<details class="activity-group" data-render-key="group-${escapeHtml(identity)}" data-disclosure-id="group-${escapeHtml(identity)}" ${running || failed ? "open" : ""}><summary><span><i>${running ? "↻" : failed ? "!" : "✓"}</i><strong>${label}</strong></span><em>${detail}</em></summary><div>${group.map((item) => renderItem(item, budget)).join("")}</div></details>`);
     group = [];
   };
   for (const item of items) {
@@ -505,7 +450,7 @@ function renderTimelineItems(items) {
     else {
       flush();
       if (groupableActivityTypes.has(item.type)) group.push(item);
-      else output.push(renderItem(item));
+      else output.push(`<div class="timeline-entry" data-render-key="${escapeHtml(item._key ?? item.id)}">${renderItem(item, budget)}</div>`);
     }
   }
   flush();
@@ -515,14 +460,17 @@ function renderTimelineItems(items) {
 function turnsMarkup(thread) {
   const items = canonicalTimeline(thread, state, { limit: 240 });
   const approvals = state.pendingRequests.filter((request) => request.params?.threadId === state.activeThreadId);
-  return renderTimelineItems(items) + approvals.map(approvalMarkup).join("");
+  return renderTimelineItems(items) + approvals.map((request) => `<div class="timeline-entry" data-render-key="request-${escapeHtml(request.id)}">${approvalMarkup(request)}</div>`).join("");
 }
 
 function openDisclosureIds(root = surface) {
-  return new Set($$("details[open][data-disclosure-id]", root).map((detail) => detail.dataset.disclosureId));
+  const ids = new Set($$("details[open][data-disclosure-id]", root).map((detail) => detail.dataset.disclosureId));
+  if (root.matches?.("details[open][data-disclosure-id]")) ids.add(root.dataset.disclosureId);
+  return ids;
 }
 
 function restoreDisclosureIds(ids, root = surface) {
+  if (root.matches?.("details[data-disclosure-id]")) root.open = ids.has(root.dataset.disclosureId) || root.open;
   for (const detail of $$('details[data-disclosure-id]', root)) detail.open = ids.has(detail.dataset.disclosureId) || detail.open;
 }
 
@@ -533,25 +481,68 @@ function transcriptSelectionActive() {
   return surface.contains(range.commonAncestorContainer);
 }
 
+function focusSignature(element, entry) {
+  if (!element || !entry) return null;
+  if (element.matches("summary")) return "summary";
+  if (element.matches("pre[tabindex]")) return "pre[tabindex]";
+  for (const attribute of ["data-copy-code", "data-copy-message", "data-quote-message", "data-copy-citation-thread", "data-retry-turn", "data-request-decision"]) {
+    if (element.hasAttribute(attribute)) return `[${attribute}="${CSS.escape(element.getAttribute(attribute))}"]`;
+  }
+  return null;
+}
+
+function patchTimeline(container, markup) {
+  const template = document.createElement("template");
+  template.innerHTML = markup;
+  const nextEntries = [...template.content.children];
+  const nextKeys = new Set(nextEntries.map((entry) => entry.dataset.renderKey));
+  const current = new Map($$(":scope > [data-render-key]", container).map((entry) => [entry.dataset.renderKey, entry]));
+  nextEntries.forEach((next, index) => {
+    const key = next.dataset.renderKey;
+    const existing = current.get(key);
+    let mounted = existing;
+    if (!existing) {
+      mounted = next;
+    } else if (existing.outerHTML !== next.outerHTML) {
+      const focused = existing.contains(document.activeElement) ? document.activeElement : null;
+      const signature = focusSignature(focused, existing);
+      const expanded = openDisclosureIds(existing);
+      existing.replaceWith(next);
+      restoreDisclosureIds(expanded, next);
+      if (signature) next.querySelector(signature)?.focus({ preventScroll: true });
+      mounted = next;
+    }
+    const atIndex = container.children[index];
+    if (atIndex !== mounted) container.insertBefore(mounted, atIndex ?? null);
+  });
+  for (const [key, entry] of current) if (!nextKeys.has(key)) entry.remove();
+}
+
 function renderChat({ preserveScroll = false } = {}) {
   setRouteHeader(state.activeThread ? titleForThread(state.activeThread) : "Codex", state.activeThread ? `${state.fixtureMode ? "Review fixture · not runtime history" : `Thread ${state.activeThread.id.slice(0, 8)}…`} · ${state.bootstrap?.graph.project.name}` : "Your real Threads and Turns");
   if (!state.activeThread) {
     surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>What do you want to work on?</h1><p>Start with ordinary Codex Chat. VibeHub adds a durable Task only when the work needs an explicit outcome and stopping contract.</p><div class="welcome-actions"><button class="primary-button" type="button" data-new-thread>Start a chat</button><button class="secondary-button" type="button" data-route="tasks">Open Task Graph</button></div></div>`;
     return;
   }
-  if (preserveScroll && transcriptSelectionActive()) {
+  if (preserveScroll && transcriptSelectionActive() && (!state.selectionDeferralStartedAt || performance.now() - state.selectionDeferralStartedAt < 1_200)) {
+    if (!state.selectionDeferralStartedAt) state.selectionDeferralStartedAt = performance.now();
     clearTimeout(state.deferredChatRender);
     state.deferredChatRender = setTimeout(() => renderChat({ preserveScroll: true }), 180);
     return;
   }
+  state.selectionDeferralStartedAt = 0;
   const distanceFromBottom = surface.scrollHeight - surface.scrollTop - surface.clientHeight;
-  const expanded = openDisclosureIds();
   const activeProjectId = state.activeThread.project?.id ?? null;
   const pinnedId = state.bootstrap?.capabilities?.pinnedSectionId;
   const projectOptions = [`<option value=""${activeProjectId === null ? " selected" : ""}>Recents</option>`, ...(pinnedId ? [`<option value="${escapeHtml(pinnedId)}"${activeProjectId === pinnedId ? " selected" : ""}>Pinned</option>`] : []), ...state.projects.map((project) => `<option value="${escapeHtml(project.id)}"${activeProjectId === project.id ? " selected" : ""}>${escapeHtml(project.name)}</option>`)].join("");
   const lineage = state.activeThread.forkedFromId ? ` · Forked from ${escapeHtml(state.activeThread.forkedFromId.slice(0, 8))}…` : "";
-  surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${lineage}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}">Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
-  restoreDisclosureIds(expanded);
+  const existingTimeline = $("#turns");
+  if (preserveScroll && existingTimeline) {
+    patchTimeline(existingTimeline, turnsMarkup(state.activeThread));
+    $("#streamStatus").textContent = state.running ? "Codex response updated." : "Codex response settled.";
+  } else {
+    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${lineage}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}">Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+  }
   requestAnimationFrame(() => {
     if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
     else surface.scrollTop = Math.max(0, surface.scrollHeight - surface.clientHeight - distanceFromBottom);
@@ -658,15 +649,16 @@ function taskContextSelectionMarkup() {
 function renderTaskConversation({ preserveScroll = false } = {}) {
   const timeline = $("#taskConversationTimeline");
   if (!timeline || !state.activeThread) return;
-  if (preserveScroll && transcriptSelectionActive()) {
+  if (preserveScroll && transcriptSelectionActive() && (!state.selectionDeferralStartedAt || performance.now() - state.selectionDeferralStartedAt < 1_200)) {
+    if (!state.selectionDeferralStartedAt) state.selectionDeferralStartedAt = performance.now();
     clearTimeout(state.deferredChatRender);
     state.deferredChatRender = setTimeout(() => renderTaskConversation({ preserveScroll: true }), 180);
     return;
   }
+  state.selectionDeferralStartedAt = 0;
   const distanceFromBottom = timeline.scrollHeight - timeline.scrollTop - timeline.clientHeight;
-  const expanded = openDisclosureIds(timeline);
-  timeline.innerHTML = turnsMarkup(state.activeThread);
-  restoreDisclosureIds(expanded, timeline);
+  if (preserveScroll) patchTimeline(timeline, turnsMarkup(state.activeThread));
+  else timeline.innerHTML = turnsMarkup(state.activeThread);
   requestAnimationFrame(() => {
     if (!preserveScroll || distanceFromBottom < 96) timeline.scrollTop = timeline.scrollHeight;
     else timeline.scrollTop = Math.max(0, timeline.scrollHeight - timeline.clientHeight - distanceFromBottom);
@@ -731,15 +723,22 @@ async function refreshThreads() {
 }
 
 async function openThread(threadId, { route = "chat" } = {}) {
+  const sameSurface = state.activeThreadId === threadId && state.route === route;
   const data = await action({ action: "readThread", threadId });
   state.activeThreadId = threadId;
   state.activeThread = { ...state.threads.find((thread) => thread.id === threadId), ...data.thread };
   state.running = String(data.thread.status?.type ?? data.thread.status).toLowerCase().includes("active");
-  if (!state.running) state.liveItems.clear();
+  if (!state.running) {
+    for (const [key, item] of state.liveItems) if (item._threadId === threadId) state.liveItems.delete(key);
+  }
   $("#stopTurn").hidden = !state.running;
   updateSidebar();
-  setRoute(route);
-  if (route === "chat") afterRenderFocus("#activeThreadTitle");
+  if (sameSurface && route === "chat") { renderChat({ preserveScroll: true }); syncComposerMode(); }
+  else if (sameSurface && route === "task") { renderTaskConversation({ preserveScroll: true }); syncComposerMode(); }
+  else {
+    setRoute(route);
+    if (route === "chat") afterRenderFocus("#activeThreadTitle");
+  }
 }
 
 function applyChatNotification(method, params) {
@@ -818,13 +817,15 @@ function renderAttachments() {
 function renderComposerQuote() {
   const tray = $("#quoteTray");
   tray.hidden = !state.composerQuote;
-  tray.innerHTML = state.composerQuote ? `<span><strong>Quoted response</strong><small>${escapeHtml(state.composerQuote.text.slice(0, 180))}${state.composerQuote.text.length > 180 ? "…" : ""}</small></span><button type="button" data-remove-quote aria-label="Remove quoted response">×</button>` : "";
+  const source = state.composerQuote ? `Thread ${state.composerQuote.threadId} · Turn ${state.composerQuote.turnId} · Item ${state.composerQuote.itemId}` : "";
+  tray.innerHTML = state.composerQuote ? `<span><strong>Quoted response</strong><small>${escapeHtml(state.composerQuote.text.slice(0, 180))}${state.composerQuote.text.length > 180 ? "…" : ""}</small><small class="quote-source" title="${escapeHtml(source)}" aria-label="${escapeHtml(source)}">From this Codex Turn</small></span><button type="button" data-remove-quote aria-label="Remove quoted response">×</button>` : "";
 }
 
-function setComposerQuote({ text, itemId }) {
+function setComposerQuote({ text, itemKey: sourceKey }) {
   const clean = String(text ?? "").trim();
   if (!clean) return;
-  state.composerQuote = { text: clean.slice(0, 4_000), itemId, threadId: state.activeThreadId };
+  const source = timelineItem(sourceKey);
+  state.composerQuote = { text: clean.slice(0, 4_000), itemKey: sourceKey, threadId: source?._threadId ?? state.activeThreadId, turnId: source?._turnId, itemId: source?.id };
   renderComposerQuote();
   $("#quoteSelection").hidden = true;
   $("#composerInput").focus();
@@ -842,9 +843,12 @@ function autoSizeComposer() {
   textarea.style.height = `${Math.min(220, Math.max(24, textarea.scrollHeight))}px`;
 }
 
-function itemText(itemId) {
-  const replay = state.activeThread?.turns?.flatMap((turn) => turn.items ?? []).find((item) => item.id === itemId);
-  return (replay ?? state.liveItems.get(itemId))?.text ?? "";
+function timelineItem(itemKeyValue) {
+  return canonicalTimeline(state.activeThread, state, { limit: 240 }).find((item) => item._key === itemKeyValue);
+}
+
+function itemText(itemKeyValue) {
+  return timelineItem(itemKeyValue)?.text ?? "";
 }
 
 function updateQuoteSelection() {
@@ -858,7 +862,7 @@ function updateQuoteSelection() {
   const text = selection.toString().trim();
   if (!assistant || !surface.contains(assistant) || !text) { button.hidden = true; return; }
   const rect = range.getBoundingClientRect();
-  state.selectedQuote = { text, itemId: assistant.dataset.itemId };
+  state.selectedQuote = { text, itemKey: assistant.dataset.itemId };
   button.style.left = `${Math.max(8, Math.min(window.innerWidth - 112, rect.left + rect.width / 2 - 52))}px`;
   button.style.top = `${Math.max(8, rect.top - 42)}px`;
   button.hidden = false;
@@ -1073,20 +1077,20 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-remove-quote]")) { state.composerQuote = null; renderComposerQuote(); return; }
   if (event.target.closest("#quoteSelection") && state.selectedQuote) { setComposerQuote(state.selectedQuote); return; }
   const quoteMessage = event.target.closest("[data-quote-message]");
-  if (quoteMessage) { setComposerQuote({ text: itemText(quoteMessage.dataset.quoteMessage), itemId: quoteMessage.dataset.quoteMessage }); return; }
+  if (quoteMessage) { setComposerQuote({ text: itemText(quoteMessage.dataset.quoteMessage), itemKey: quoteMessage.dataset.quoteMessage }); return; }
   const copyCode = event.target.closest("[data-copy-code]");
   if (copyCode) { await navigator.clipboard.writeText(copyCode.parentElement.querySelector("code")?.textContent ?? ""); notify("Code copied."); return; }
   const copyMessage = event.target.closest("[data-copy-message]");
   if (copyMessage) {
-    const itemId = copyMessage.dataset.copyMessage;
-    const replay = state.activeThread?.turns?.flatMap((turn) => turn.items ?? []).find((item) => item.id === itemId);
-    const item = replay ?? state.liveItems.get(itemId);
+    const item = timelineItem(copyMessage.dataset.copyMessage);
     if (item?.text) {
       await navigator.clipboard.writeText(item.text);
       notify("Response copied.");
     }
     return;
   }
+  const copyCitationThread = event.target.closest("[data-copy-citation-thread]");
+  if (copyCitationThread) { await navigator.clipboard.writeText(copyCitationThread.dataset.copyCitationThread); notify("Source Thread id copied."); return; }
   const decision = event.target.closest("[data-request-decision]");
   if (decision) {
     try { await action({ action: "resolveRequest", requestId: decision.dataset.requestId, decision: decision.dataset.requestDecision }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); }

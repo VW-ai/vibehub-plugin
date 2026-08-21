@@ -67,9 +67,10 @@
         </div>
       </header>
 
-      <section class="surface" id="surface" aria-live="polite">
+      <section class="surface" id="surface" aria-label="Conversation">
         <div class="loading"><span></span><p>Starting your local Codex runtime…</p></div>
       </section>
+      <div class="sr-only" id="streamStatus" role="status" aria-live="polite" aria-atomic="true"></div>
 
       <div class="composer-wrap" id="composerWrap">
         <form class="composer" id="composer">
