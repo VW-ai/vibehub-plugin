@@ -1,0 +1,56 @@
+{
+  "context_id": "decision-chat-default-search-and-task-attention",
+  "detail": "The default application landing is lightweight Codex Chat, not the Task Graph. This revises only the home-surface clause of the earlier Task-first workbench direction: Task remains VibeHub's durable work unit, but Chat and Task must never be presented as the same object or share ambiguous labels. Chat is a Human-led conversational Context Space; Task is a durable Agent-led execution Context with an Outcome and stopping contract. From Chat, a Human can search for and go directly to an existing Task, or later use explicit Chat-to-Task actions. Global search is first-class and searches at least Codex Threads, VibeHub Tasks and durable Context while visibly grouping or labelling every result type so navigation never collapses their semantics. Task activity returns to the Human through a native-feeling attention system: a small bell/inbox and a restrained sidebar attention area surface completion and Needs You boundaries, with a flowing recent-activity presentation rather than making the Task Graph the default landing. The owner proposed a quiet two-signal treatment such as blue for completed work and red for required intervention; the exact color, badge, priority and aggregation rules remain an interaction-research question, not an approved visual contract. Ordinary Running progress should stay calm and inspectable rather than generating notification noise. The intended result feels native to Codex, keeps interaction simple, and lets a user begin chatting immediately while important Tasks can still reclaim attention and open at their exact Context.",
+  "evidence": [
+    {
+      "note": "The owner explicitly chose Chat as the default landing, required semantic separation between Chat and Task, made search important, and requested a native notification treatment for completion and intervention.",
+      "ref": "conversation:2026-08-21-chat-default-search-task-attention"
+    },
+    {
+      "note": "Existing semantics already distinguish Human-led Chat from Agent-led bounded Task work.",
+      "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"
+    },
+    {
+      "note": "The current product baseline requires Codex familiarity with an additive durable Task layer.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-parity-vibehub-task-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-human-and-agent-led-context-spaces",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-person-centered-ticket-attention-system",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T07:00:38Z",
+    "quote": "默认进来还是聊天；一个 chat 和一个 task 不能搞混；我们要包含一个 search；通过 notification 的方式让任务完成或需要介入冒出来。",
+    "ref": "conversation:2026-08-21-chat-default-search-task-attention"
+  },
+  "state": "active",
+  "summary": "The Codex-first shell opens as native lightweight Chat while clearly typed search and a quiet notification system bring Tasks back to the Human only when they matter",
+  "tags": [
+    "attention",
+    "chat",
+    "codex-first",
+    "default-landing",
+    "notifications",
+    "search",
+    "semantic-separation",
+    "task"
+  ],
+  "type": "decision"
+}
