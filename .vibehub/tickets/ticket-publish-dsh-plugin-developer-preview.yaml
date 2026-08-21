@@ -1,47 +1,43 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-public-preview-after-product-coherence",
-      "criterion": "Placeholder: after the native Chat bridge succeeds and the whole-application visual result receives successful owner approval, replan this Ticket to firm with exact npm or GitHub package identity, removal of private-only metadata, fresh-user Project selection or VibeHub setup, API-key and native-provider handoff, supported DSH and runtime matrix, source probe, reproducible tarball and checksums, clean install/start/restart/upgrade/remove, no-source-clone path, documentation and demo assets, CI, release notes, known limits, rollback, and truthful public verification criteria."
+      "acceptance_id": "refine-public-preview-after-codex-parity-product-approval",
+      "criterion": "Placeholder: after the direct prerequisite succeeds, replan this Ticket to firm with exact npm or GitHub package identity, fresh-user setup, Codex authentication and model handoff, Project selection or VibeHub setup, supported DSH, Codex and runtime matrix, generated-schema and source probes, reproducible tarball and checksums, clean install/start/restart/upgrade/remove, documentation, demo assets, CI, release notes, known limits, rollback and truthful verification criteria."
     }
   ],
   "constraints": [
-    "Do not publish the current full-screen overlay as the product UI or market a feasibility slice as a public beta.",
-    "Do not require users to fork DSH, clone VibeHub source, edit DSH internals, or adopt a second canonical Task database.",
-    "Pin and publish the supported DSH baseline; a newer upstream release is unsupported until source probe and real Profile lifecycle pass.",
-    "Keep initial scope to one selected local Project and developer preview; team service, cloud sync, personal Context and native desktop packaging remain later work."
+    "Do not publish a feasibility overlay, static Codex imitation or DSH-native mock execution as the product.",
+    "Do not require users to fork DSH, clone either source repository, scrape Codex Desktop, edit DSH internals or adopt a second Task database.",
+    "Pin and publish supported DSH and Codex baselines; newer upstream releases are unsupported until exact probes and real Profile lifecycle pass.",
+    "Keep initial scope to one selected local Project and developer preview; team service, cloud sync, personal Context and native desktop packaging remain later work.",
+    "Describe ordinary audio input and experimental realtime voice separately and truthfully."
   ],
-  "context": "The private packed Bundle already proves the official installation mechanism. Public release should wait until the unified shell, native Chat bridge and coherent visual system make that mechanism a credible product. Once the direct prerequisites are successful, refine this Ticket into the smallest developer preview release covering package identity, onboarding, one-Project setup, compatibility, reproducibility, documentation, upgrade and rollback rather than silently publishing today's technical spike.",
+  "context": "The private Bundle and DSH vertical slice prove installation mechanics, but public release should wait for a working Codex app-server adapter, coherent shell, audio and Task integration, and explicit owner approval. Once approval succeeds, refine this Ticket into the smallest one-Project developer preview with truthful supported Codex and DSH versions and no claim that experimental realtime voice is stable.",
   "context_refs": [
     {
-      "purpose": "Proof that official packed install, Profile lifecycle and the real Task execution loop are technically achievable.",
+      "purpose": "Existing private packed install and Task execution proof to productize.",
       "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
     },
     {
-      "purpose": "Current private development install and compatibility runbook to productize.",
-      "ref": "docs/DEEPSEEK_HARNESS_V1.md"
+      "purpose": "Runtime, authentication and compatibility contract for the release.",
+      "ref": ".vibehub/rooms/product/decision-codex-app-server-primary-runtime.yaml"
     },
     {
-      "purpose": "Existing GitHub-first VibeHub release and reproducibility boundary.",
+      "purpose": "Existing GitHub-first release and reproducibility boundary.",
       "ref": "docs/RELEASE.md"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "draft",
-  "outcome": "A developer can install a versioned public VibeHub DSH Plugin without cloning either source repository, select or initialize one Project, use the unified Task and Chat loop, upgrade or remove it safely, and verify its supported DSH compatibility from published artifacts.",
+  "outcome": "A developer can install a versioned public VibeHub DSH Plugin without cloning either source repository, authenticate the supported Codex runtime, select or initialize one Project, use the Codex-parity Chat and VibeHub Task loop, and upgrade or remove it safely.",
   "provenance_refs": [
-    "conversation:2026-08-21-owner-confirms-plugin-distribution-and-reskin",
-    "conversation:2026-08-21-plan-next-dsh-product-wave"
+    "conversation:2026-08-20-owner-confirms-codex-parity-plugin-product",
+    "conversation:2026-08-20-owner-authorizes-next-wave"
   ],
   "relations": [
     {
-      "rationale": "The release directly consumes the completed native Chat and Task bridge as a product constituent and must verify it in the published artifact, not merely inherit it through visual review.",
-      "target_ticket_id": "ticket-build-dsh-native-chat-task-bridges",
-      "type": "depends_on"
-    },
-    {
-      "rationale": "Public preview packaging may begin only after the owner explicitly approves the complete installed application; that approval transitively requires unified shell, native Chat bridges, and the mechanically verified visual system.",
+      "rationale": "Public packaging begins only after the owner approves the complete installed Codex-parity and VibeHub Task product.",
       "target_ticket_id": "ticket-approve-dsh-whole-application-visual-system",
       "type": "depends_on"
     }

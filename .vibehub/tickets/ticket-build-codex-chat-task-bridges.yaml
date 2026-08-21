@@ -1,0 +1,45 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-codex-chat-task-bridges-after-production-shell",
+      "criterion": "Placeholder: after the production shell succeeds, replan this Ticket to firm with exact actions, Codex Thread and item provenance, Task and Context preview, scope selection, confirmation, failure recovery, native interaction placement, wide and narrow behavior, restart recovery and regression acceptance derived from real dogfood; do not silently harvest transcripts or manufacture final labels before refinement."
+    }
+  ],
+  "constraints": [
+    "Ordinary Codex Chat remains fully usable without entering the VibeHub Task protocol.",
+    "Do not infer durable knowledge from a transcript or mutate Context or Task state without an explicit reviewable action.",
+    "Do not mirror Codex plans as VibeHub Tasks or couple canonical Task truth to one model or executor-private representation.",
+    "Compare and Bring Back are conversation provenance operations, not canonical Task dependency edges."
+  ],
+  "context": "The product baseline is now real Codex Threads and Turns inside the DSH shell, not stock DSH Conversation as the final interaction owner. Once the production shell exists, refine the smallest explicit Chat-to-Task and Remember bridge using stable source Thread, Turn and item identity. Fork, Compare, Bring Back and multi-pane streams remain later unless the proven app-server contract makes a bounded first slice exact.",
+  "context_refs": [
+    {
+      "purpose": "Binding ordinary-Chat parity and additive VibeHub value.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Chat-to-Task convergence without collapsing Human-led and Agent-led semantics.",
+      "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"
+    },
+    {
+      "purpose": "Governance boundary for Remember and durable Context proposals.",
+      "ref": ".vibehub/rooms/knowledge/decision-context-activation-governed-writeback.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Codex-backed Chat gains lightweight VibeHub actions that turn or attach an explicit conversation result into governed Context or bounded Task work without changing ordinary Codex interaction.",
+  "provenance_refs": [
+    "conversation:2026-08-20-codex-chat-ui-plus-vibehub-task-value"
+  ],
+  "relations": [
+    {
+      "rationale": "Final action placement and Task return behavior require the production Codex-backed shell and Task Workspace.",
+      "target_ticket_id": "ticket-implement-dsh-unified-shell-navigation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-build-codex-chat-task-bridges"
+}

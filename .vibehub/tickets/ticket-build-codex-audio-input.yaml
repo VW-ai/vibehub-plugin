@@ -1,0 +1,46 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-audio-input-after-adapter-and-composer",
+      "criterion": "Placeholder: after both prerequisites succeed, replan this Ticket to firm with exact microphone permission, push-to-talk or record interaction, audio format and size handling, cancel and retry, visual and accessible recording states, ordinary audio or localAudio Turn submission, Thread continuity, privacy and retention, unsupported fallback, optional realtime feature flag, wide and narrow behavior and installed regression acceptance."
+    }
+  ],
+  "constraints": [
+    "Do not claim microphone capture, transcript, listening or realtime output without a current trusted capability and user-visible active state.",
+    "Do not make experimental realtime voice a prerequisite for stable ordinary audio Turn input.",
+    "Do not persist raw recordings by default, copy them into VibeHub Context, or hide browser or WebView permission failures.",
+    "Do not route audio through a second Agent loop when the owning Codex Thread is known."
+  ],
+  "context": "Voice input is part of the owner's required Codex parity floor and the official app-server supports ordinary audio inputs as well as experimental realtime methods. Keep the stable ordinary Turn input and experimental realtime path as separate acceptance boundaries after the adapter and production Composer exist.",
+  "context_refs": [
+    {
+      "purpose": "Binding audio and experimental realtime ownership and capability rules.",
+      "ref": ".vibehub/rooms/product/decision-codex-app-server-primary-runtime.yaml"
+    },
+    {
+      "purpose": "Voice input is part of the approved ordinary Codex parity floor.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The Codex-backed Composer exposes trustworthy microphone and audio input with clear recording, cancel, permission, submission and capability states, while experimental realtime voice remains optional and version-gated.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-requires-codex-voice-input"
+  ],
+  "relations": [
+    {
+      "rationale": "The exact stable and experimental audio contracts must be proven before implementation acceptance is firm.",
+      "target_ticket_id": "ticket-spike-codex-app-server-dsh-adapter",
+      "type": "depends_on"
+    },
+    {
+      "rationale": "The final microphone control, permissions and Thread submission path require the production Composer and shell.",
+      "target_ticket_id": "ticket-implement-dsh-unified-shell-navigation",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-build-codex-audio-input"
+}

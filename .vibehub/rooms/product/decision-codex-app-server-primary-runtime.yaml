@@ -1,0 +1,52 @@
+{
+  "context_id": "decision-codex-app-server-primary-runtime",
+  "detail": "The preferred product architecture is a non-invasive DSH Plugin or Bundle whose principal Chat and execution path is backed by the official Codex app-server rather than a second DSH-native Agent loop pretending to be Codex. Codex app-server owns Codex Threads, Turns, streaming items, tools and skills, approvals, plans, diffs, interruption, recovery, audio inputs, and optionally experimental thread-scoped realtime voice. One version-pinned adapter owns every Codex protocol translation, generated schema, capability probe, lifecycle, authentication handoff, and compatibility fallback; raw app-server events do not become a second VibeHub lifecycle. DSH continues to supply installability, plugin composition, Theme and frontend surfaces, settings integration, and optional ecosystem capabilities. VibeHub continues to own Projects, Tasks, Context, Task-to-Thread or Run linkage, attention, Evidence proposals, and Outcomes, and must not mirror Codex private planning as canonical Task truth. The product must not run both DSH and Codex Agent loops for the same user action, imply live presence from replay alone, or claim unsupported realtime voice as stable. Ordinary audio turn input is part of the baseline; realtime voice stays capability-gated and experimental until its pinned contract is independently proven.",
+  "evidence": [
+    {
+      "note": "The owner selected the DSH-shell plus real-Codex-runtime architecture and made voice input a first-class requirement.",
+      "ref": "conversation:2026-08-20-dsh-shell-with-codex-runtime-and-voice"
+    },
+    {
+      "note": "The official Codex app-server protocol exposes Threads, Turns, events, approvals, skills, audio and localAudio input, plus experimental realtime audio and transcript methods.",
+      "ref": "https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md"
+    },
+    {
+      "note": "The completed DSH vertical slice proves official Bundle installation, VibeHub projection and Task-to-Session execution boundaries that the new adapter must preserve or deliberately replace.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-parity-vibehub-task-workbench",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-dsh-runtime-opaque-plugin-boundary",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-ticket-routes-replaceable-agents",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T04:47:28Z",
+    "quote": "DSH UI + 真正的 Codex runtime，这个我更喜欢；把 Codex 的语音输入能力暴露出来。",
+    "ref": "conversation:2026-08-20-dsh-shell-with-codex-runtime-and-voice"
+  },
+  "state": "active",
+  "summary": "Use DSH as the installable composable shell and Codex app-server as the primary Agent runtime behind a versioned adapter",
+  "tags": [
+    "adapter",
+    "audio",
+    "codex",
+    "deepseek-harness",
+    "execution",
+    "runtime",
+    "thread",
+    "voice"
+  ],
+  "type": "decision"
+}

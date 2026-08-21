@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "codex-and-dsh-baselines-are-pinned",
+      "criterion": "The spike pins one exact official Codex version and source identity, generated app-server schema identity, one exact supported DSH version and source identity, and the Node and OS runtime; every imported Codex or DSH seam is named in one machine-readable compatibility contract with explicit stop conditions for drift."
+    },
+    {
+      "acceptance_id": "app-server-lifecycle-and-auth-boundary-are-proven",
+      "criterion": "A clean installed DSH Profile starts, health-checks, stops, restarts and removes one locally scoped Codex app-server through the adapter, reports auth or model availability without copying credentials into VibeHub state, prevents duplicate processes or double Agent execution, and leaves the Project worktree unchanged outside explicit test fixtures."
+    },
+    {
+      "acceptance_id": "codex-thread-turn-and-event-loop-is-real",
+      "criterion": "A reproducible integration uses official app-server initialization plus Thread and Turn APIs and consumes streamed item, plan, diff, tool, approval, interrupt, completion and failure events needed by the product; refresh and restart recover stable Codex Thread identity without manufacturing live presence from replay or translating Codex plans into canonical VibeHub Tasks."
+    },
+    {
+      "acceptance_id": "task-thread-handoff-remains-exact",
+      "criterion": "The existing host-owned VibeHub Task handoff is passed without browser re-derivation into one Codex Thread or Turn, and a stable Project plus Task plus Codex Thread linkage can be recovered after restart without localStorage, a second Task database, Agent Team coupling, or mutation of Acceptance, Evidence or Outcome semantics."
+    },
+    {
+      "acceptance_id": "audio-and-realtime-capabilities-are-bounded",
+      "criterion": "The spike independently proves ordinary app-server audio and localAudio Turn input plus the exact experimental realtime methods, WebRTC or appendAudio transport, transcript events and capability failures available in the pinned build; ordinary audio is separated from experimental realtime voice and no microphone, recording, live transcript or audio-output claim appears when the current capability is absent."
+    },
+    {
+      "acceptance_id": "adapter-recommendation-is-decision-ready",
+      "criterion": "A checked-in recommendation maps Codex app-server, DSH and VibeHub ownership; identifies the smallest production adapter, shell, voice and Task-bridge boundaries; compares reuse of focused DSH ecosystem components without importing a mega-shell; and records executable stop, fallback, upgrade and test rules rather than broadening into a Codex clone or DSH fork."
+    }
+  ],
+  "constraints": [
+    "Do not invoke Codex as a lossy one-shot subagent or use only a Codex model while claiming the Codex runtime is integrated.",
+    "Do not run a DSH Agent turn and a Codex Turn for the same user action.",
+    "Do not scrape Codex Desktop, depend on its private UI, copy credentials, or add a new canonical Task store.",
+    "Keep every Codex and DSH version-specific translation inside bounded adapters with generated-schema or source-identity probes.",
+    "Experimental realtime voice must remain capability-gated and may fail the spike without weakening ordinary audio-input acceptance."
+  ],
+  "context": "The product direction has moved from a DSH-native Agent loop with Codex-like styling to a DSH-distributed shell backed by the real Codex runtime. Before production UI work continues, prove the exact current Codex app-server and DSH boundaries in one disposable but real Profile. The spike must exercise the official protocol rather than wrap the Codex desktop UI or route the same action through two Agent loops.",
+  "context_refs": [
+    {
+      "purpose": "Binding runtime ownership, adapter and voice direction.",
+      "ref": ".vibehub/rooms/product/decision-codex-app-server-primary-runtime.yaml"
+    },
+    {
+      "purpose": "Binding user-facing Codex parity plus VibeHub Task product contract.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Successful DSH Bundle, Task projection and execution baseline whose reusable facts must remain truthful.",
+      "ref": ".vibehub/outcomes/ticket-build-task-harness-vertical-slice.yaml"
+    },
+    {
+      "purpose": "Earlier feasibility note that already identifies app-server as richer than the shipped one-shot Codex subagent; the runtime Decision records the official current protocol source.",
+      "ref": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A version-pinned adapter spike proves whether an officially installed DSH Plugin can use Codex app-server as its single primary Chat and Agent runtime while preserving VibeHub Task linkage, audio input, restart recovery, and truthful event projection.",
+  "provenance_refs": [
+    "conversation:2026-08-20-owner-selects-dsh-shell-with-real-codex-runtime",
+    "conversation:2026-08-20-owner-requires-codex-voice-input"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-spike-codex-app-server-dsh-adapter"
+}

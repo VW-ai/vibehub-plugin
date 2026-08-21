@@ -1,0 +1,52 @@
+{
+  "context_id": "contract-codex-light-dark-theme-baseline",
+  "detail": "The first production theme baseline uses the owner-provided Codex values, not an approximate Graphite palette. Light mode uses accent #0169CC, background #FFFFFF, foreground #0D0D0D, Inter UI typography, an opaque sidebar, and reference contrast 45. Dark mode uses accent #339CFF, background #181818, foreground #FFFFFF, Apple system UI typography, a translucent sidebar where the host supports it, and reference contrast 60. These are primitives rather than permission to paint the application blue: accent is reserved for selection, focus, links and primary actions; canvas, sidebar, raised surfaces, borders, hover, muted text, code surfaces and disabled states are derived as a coherent neutral semantic scale and must meet accessibility contrast. Web translucency must have a readable opaque fallback; native material may be added only by a desktop wrapper. Light and Dark are equal product modes with system preference and explicit override. The production result should feel almost the same as Codex at the baseline interaction level while VibeHub Task surfaces use the same tokens rather than introducing a second visual language. Linear remains a secondary hierarchy and density reference, not a competing palette or brand.",
+  "evidence": [
+    {
+      "note": "The owner supplied the exact Codex Light and Dark base values, fonts, translucency choices and contrast references in a readable screenshot.",
+      "ref": "attachment:codex-clipboard-8ee62360-f600-465f-8546-5e57638f01e7.png"
+    },
+    {
+      "note": "The owner explicitly selected the supplied Codex themes as the base and required both modes.",
+      "ref": "conversation:2026-08-20-owner-provides-codex-theme-values"
+    },
+    {
+      "note": "The existing constraint requires the theme to cover the whole application and forbids treating a palette swap as completion.",
+      "ref": ".vibehub/rooms/product/constraint-dsh-reskin-is-substantial-product-work.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-parity-vibehub-task-workbench",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-codex-linear-whole-shell-visual-baseline",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "constraint-dsh-reskin-is-substantial-product-work",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T04:47:28Z",
+    "quote": "颜色上参考这个作为 base Codex 的方案；肯定要兼顾 Light 和 Dark mode。",
+    "ref": "conversation:2026-08-20-owner-provides-codex-theme-values"
+  },
+  "state": "active",
+  "summary": "Use the owner-provided Codex Light and Dark theme values as the canonical visual base and derive all product surfaces from restrained semantic tokens",
+  "tags": [
+    "accessibility",
+    "codex",
+    "color",
+    "dark-mode",
+    "light-mode",
+    "theme",
+    "tokens",
+    "visual-system"
+  ],
+  "type": "contract"
+}

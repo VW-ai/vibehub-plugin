@@ -1,38 +1,43 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "persistent-shell-navigation-direction-decided",
+      "acceptance_id": "codex-parity-shell-direction-decided",
       "authority": "human",
-      "criterion": "After reviewing the completed prototype in the real DSH shell, the owner explicitly accepts one sidebar hierarchy, default landing, Tasks entry, Graph-to-Task transition, Chat posture, narrow behavior, and supported DSH composition boundary, or records one exact correction that produces an equally executable choice."
+      "criterion": "After reviewing the installed real-runtime prototype in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact sidebar hierarchy, default landing, Chat and Composer posture, voice entry, Task Graph entry, Task-to-Thread relationship, Graph-to-Task transition and supported DSH composition boundary, or records one bounded correction that remains executable against the proven adapter."
     }
   ],
   "constraints": [
-    "This Ticket records the protected product choice only; it does not implement or claim visual completion.",
-    "Agent preference, prototype recommendation, or silence cannot satisfy the human-authority criterion.",
-    "The chosen direction must preserve native DSH Chat, Sessions, composer, tools, approvals, settings, user overrides, and the non-invasive Plugin boundary."
+    "This Ticket records the protected product composition only; it does not implement, close visual approval, or publish artifacts.",
+    "Agent preference, prototype recommendation, existing screenshots or silence cannot satisfy the human-authority criterion.",
+    "The chosen direction must preserve the real Codex runtime path, non-invasive DSH Plugin distribution, VibeHub Task truth and truthful capability fallback."
   ],
-  "context": "The overall product direction is already approved, but the current real integration exposed one protected interaction choice that should not be inferred by implementation: exactly how native Chats and VibeHub Tasks share the sidebar, what the default main surface is, and how Graph focus becomes and returns from a Task Workspace. Review the production-shaped prototype and select its exact recommended composition or one bounded correction before implementation acceptance is made firm.",
+  "context": "The owner has selected the high-level promise: ordinary usage should feel almost the same as Codex, while VibeHub adds the durable Task system and improved Chat-to-Task organization. The remaining protected choice is the exact production-shaped composition after the real adapter prototype exists: sidebar hierarchy, default landing, Tasks entry, Chat and Task transition, Composer and voice placement, narrow behavior, and which DSH surfaces are retained or shadowed.",
   "context_refs": [
     {
-      "purpose": "Already-approved product boundary that narrows, but does not decide, the exact persistent navigation composition.",
-      "ref": ".vibehub/rooms/product/decision-dsh-shell-with-vibehub-task-pages.yaml"
+      "purpose": "Owner-approved high-level parity and additive Task direction.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
     },
     {
-      "purpose": "Quality baseline for the owner review without turning this decision into a final reskin sign-off.",
-      "ref": ".vibehub/rooms/product/decision-codex-linear-whole-shell-visual-baseline.yaml"
+      "purpose": "Runtime and composition boundary the protected UI decision cannot contradict.",
+      "ref": ".vibehub/rooms/product/decision-codex-app-server-primary-runtime.yaml"
+    },
+    {
+      "purpose": "Exact visual base for the review without treating this as final design-system approval.",
+      "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The owner explicitly chooses the persistent DSH sidebar hierarchy, default landing behavior, and Graph-to-Task Workspace transition that will govern the production shell integration.",
+  "outcome": "The owner explicitly accepts the exact Codex-parity DSH shell composition and the additive VibeHub Task relationship that will govern production implementation.",
   "provenance_refs": [
-    "conversation:2026-08-21-owner-requests-chatgpt-sidebar-and-unified-application"
+    "conversation:2026-08-20-owner-selects-codex-parity-plus-vibehub-tasks",
+    "conversation:2026-08-20-owner-authorizes-next-wave"
   ],
   "relations": [
     {
-      "rationale": "The owner needs the real-shell review pack, interaction loop, technical seam proof, and tradeoffs before choosing the production navigation.",
-      "target_ticket_id": "ticket-prototype-dsh-persistent-shell-navigation",
+      "rationale": "The owner needs the installed real-runtime shell, complete interaction loop and explicit tradeoffs before choosing production composition.",
+      "target_ticket_id": "ticket-prototype-codex-parity-dsh-shell",
       "type": "depends_on"
     }
   ],

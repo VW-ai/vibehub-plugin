@@ -1,0 +1,55 @@
+{
+  "context_id": "decision-codex-parity-vibehub-task-workbench",
+  "detail": "The default product experience should be almost the same as Codex for ordinary work: familiar persistent navigation, Chat and Composer behavior, Thread history and recovery, attachments and voice input, streaming execution, tools, approvals, plans, diffs, progress, shortcuts, and coherent Light and Dark modes. A user who already understands Codex should not have to learn DSH plugin concepts, unusual configuration, or a parallel Chat protocol to begin working. VibeHub's additive value starts above that parity floor: Task is the durable unit; a Task may bind one or more Codex Threads or Runs; the product adds the Task Graph, focused Task Workspace, Project and Context scope, DRAFT/READY/RUNNING/DONE posture, Needs You and other bounded sub-state, governed Chat-to-Task and Remember actions, Evidence, independent Outcome, and return-to-work recovery. Chat remains an excellent direct interaction surface, while VibeHub organizes what the interaction is for and what durable work it produces. This supersedes the earlier assumption that stock native DSH Chat is itself the user-facing baseline; DSH remains the installable and composable host shell, but the product baseline is Codex-compatible work interaction plus VibeHub Tasks.",
+  "evidence": [
+    {
+      "note": "The owner explicitly chose Codex familiarity as the baseline experience and VibeHub Task organization as the additive product value.",
+      "ref": "conversation:2026-08-20-codex-parity-plus-vibehub-task-layer"
+    },
+    {
+      "note": "The existing product decision already makes Task, not Chat history, the durable human-facing work unit.",
+      "ref": ".vibehub/rooms/product/decision-task-first-human-workbench.yaml"
+    },
+    {
+      "note": "The existing Context-space model keeps Human-led Chat and Agent-led Task related without collapsing their operating semantics.",
+      "ref": ".vibehub/rooms/product/decision-human-and-agent-led-context-spaces.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-task-first-human-workbench",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-human-and-agent-led-context-spaces",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-native-chat-with-additive-task-actions",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "decision-dsh-shell-with-vibehub-task-pages",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-21T04:47:28Z",
+    "quote": "让用的人感觉你在用 Codex，almost the same，起码基本的功能；然后有一套额外的 Task 系统，同时有好的 Chat UI 化。",
+    "ref": "conversation:2026-08-20-codex-parity-plus-vibehub-task-layer"
+  },
+  "state": "active",
+  "summary": "The VibeHub DSH product should feel immediately familiar to a Codex user, then add a durable Task and Context work layer rather than exposing DSH complexity as the product",
+  "tags": [
+    "chat",
+    "codex",
+    "deepseek-harness",
+    "parity",
+    "product",
+    "task",
+    "workbench"
+  ],
+  "type": "decision"
+}
