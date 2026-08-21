@@ -816,14 +816,29 @@ function focusedUrl(origin, token, ticket, view) {
   return url.toString();
 }
 
-function securityHeaders(response) {
+function embeddedOrigins(value) {
+  if (!Array.isArray(value)) throw new Error("embeddedOrigins must be an array");
+  return [...new Set(value.map((candidate) => {
+    const url = new URL(candidate);
+    if (url.protocol !== "http:"
+      || !new Set(["127.0.0.1", "localhost"]).has(url.hostname)
+      || url.pathname !== "/" || url.search || url.hash) {
+      throw new Error("embeddedOrigins may contain only loopback HTTP origins");
+    }
+    return url.origin;
+  }))].sort();
+}
+
+function securityHeaders(response, frameOrigins) {
   response.setHeader("Cache-Control", "no-store");
   response.setHeader("Content-Security-Policy", [
     "default-src 'self'",
     "base-uri 'none'",
     "connect-src 'self'",
     "form-action 'none'",
-    "frame-ancestors 'none'",
+    frameOrigins.length === 0
+      ? "frame-ancestors 'none'"
+      : `frame-ancestors ${frameOrigins.join(" ")}`,
     "img-src 'self' data:",
     "object-src 'none'",
     "script-src 'self'",
@@ -831,7 +846,7 @@ function securityHeaders(response) {
   ].join("; "));
   response.setHeader("Referrer-Policy", "no-referrer");
   response.setHeader("X-Content-Type-Options", "nosniff");
-  response.setHeader("X-Frame-Options", "DENY");
+  if (frameOrigins.length === 0) response.setHeader("X-Frame-Options", "DENY");
 }
 
 function writeJson(response, status, value) {
@@ -887,6 +902,7 @@ export function startVibeHubUi({
   assetRoot = defaultAssetRoot(),
   ticket = null,
   view = null,
+  embeddedOrigins: requestedEmbeddedOrigins = [],
 } = {}) {
   if (!repoRoot) throw new Error("repoRoot is required");
   if (!Number.isInteger(port) || port < 0 || port > 65_535) {
@@ -896,6 +912,7 @@ export function startVibeHubUi({
     throw new Error("tokenLifetimeMs must be a positive integer");
   }
   validateFocus(ticket, view);
+  const frameOrigins = embeddedOrigins(requestedEmbeddedOrigins);
   if (!existsSync(resolve(repoRoot))) throw new Error(`Repository does not exist: ${repoRoot}`);
   assertAssets(assetRoot);
   const initialSnapshot = buildUiSnapshot(repoRoot);
@@ -911,7 +928,7 @@ export function startVibeHubUi({
     resolveClosed = resolveClosedPromise;
   });
   const server = http.createServer((request, response) => {
-    securityHeaders(response);
+    securityHeaders(response, frameOrigins);
     try {
       requireHost(request, origin);
       const url = new URL(request.url ?? "/", origin);

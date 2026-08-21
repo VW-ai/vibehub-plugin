@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "production-and-installed-regressions-pass"
+  ],
+  "evidence_id": "packed-profile-browser-and-regression-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T01:00:47Z",
+  "refs": [
+    "package.json",
+    "scripts/build-dsh-bundle.mjs",
+    "packages/dsh-adapter/client.js",
+    "docs/DEEPSEEK_HARNESS_V1.md",
+    "test/dsh-adapter.test.mjs",
+    "test/dsh-bundle.test.mjs",
+    "test/ui-embed.test.mjs",
+    "test/ui-host.test.mjs",
+    "test/ui-visual-system.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Focused adapter, Bundle, embedding, host and Workbench tests passed with the exact rc.8 source probe enabled. A fresh packed Profile was reviewed in the real browser at the 1280x720 default viewport and in an exact 390x844 production Workbench frame: native DSH collapsed to its mobile shell, the graph stayed usable, the focused Inspector became a bottom sheet, Start in Chat remained the dominant action, the frame had no horizontal overflow, keyboard Enter opened the exact Ticket, and no visible browser or DSH terminal error occurred. Reduced-motion, focus-visible, read-only/no-write, trusted-expiring runtime, payload, restart and installed-artifact boundaries are mechanically covered. The documented daily rebuild, package install, start, restart, shutdown, remove, upgrade probe, limitations and stop conditions match the commands exercised during this run.",
+  "ticket_id": "ticket-build-task-harness-vertical-slice"
+}

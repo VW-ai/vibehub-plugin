@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "one-real-task-completes-the-execution-evidence-loop"
+  ],
+  "evidence_id": "native-dsh-skill-and-evidence-loop",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-20T23:42:00Z",
+  "refs": [
+    "packages/dsh-adapter/client.js",
+    "packages/dsh-bundle/cordis.patch.yml",
+    "packages/dsh-adapter/linkage.mjs",
+    "test/dsh-bundle.test.mjs",
+    "test/fixtures/dsh-vibehub-run/replay.override.json",
+    "docs/DEEPSEEK_HARNESS_V1.md"
+  ],
+  "schema_version": 1,
+  "summary": "An installed DSH rc.8 Web Profile started this real READY Ticket from the embedded host-owned Recommended action, persisted the exact Workspace-to-Ticket linkage and handoff in native Chat, discovered and loaded the vendored vibehub-ticket-run Skill through the native skill tool, ran the production Bundle regression, and invoked the canonical VibeHub Evidence command. The replay adapter replaced only external model I/O; DSH Session, command, Skill, tool, sandbox, filesystem, and VibeHub write paths remained real, and no Outcome was written.",
+  "ticket_id": "ticket-build-task-harness-vertical-slice"
+}

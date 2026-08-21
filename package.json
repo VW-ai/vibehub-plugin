@@ -7,6 +7,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-plugin-artifact.mjs --out dist/plugin",
+    "build:dsh": "node scripts/build-dsh-bundle.mjs --out dist/dsh-vibehub --clean",
+    "probe:dsh": "node packages/dsh-adapter/probe-source.mjs",
     "prototype:directions": "node scripts/vh-harness-directions.mjs",
     "prototype:directions:safari": "node scripts/vh-harness-directions.mjs --safari",
     "prototype:interaction-research": "node scripts/vh-harness-interaction-research.mjs",

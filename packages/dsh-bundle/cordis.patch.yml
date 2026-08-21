@@ -1,0 +1,18 @@
+# Non-invasive VibeHub layer: native DSH remains the owner of Chat, Sessions,
+# models, tools, approvals, settings and the application shell. Web disables
+# the base global filesystem provider because ordinary model tools live in
+# per-session presets; this separate deployment provider intentionally feeds
+# VibeHub's vendored Skills into the catalog merged by every preset.
+- insert:
+    - id: vibehub-skill-filesystem
+      name: '@deepseek-ai/dsh-skill-filesystem'
+      config:
+        providerName: vibehub
+        includeDefaultRoots: false
+        customSkillDirs:
+          - !!js "process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('@vibehub/dsh-vibehub/package.json')), 'vendor', 'skills')"
+
+    - id: vibehub
+      name: '@vibehub/dsh-vibehub'
+      config:
+        repoRoot: !!js process.cwd()

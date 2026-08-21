@@ -786,7 +786,7 @@ test("read-only loopback host serves assets, current graph, inspector, and trace
   assert.match(script, /function ticketExecutionPanel/u);
   assert.doesNotMatch(script, /function renderCloseoutQueue/u);
   assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
-  assert.match(script, /label: "Copy prompt"/u);
+  assert.match(script, /embeddedParentOrigin[\s\S]*"Verify in Chat" : "Start in Chat"[\s\S]*: "Copy prompt"/u);
   assert.match(script, /label\.dataset\.fullText = nextAction\?\.detail/u);
   assert.match(script, /label\.setAttribute\("aria-describedby", "textTooltip"\)/u);
   assert.match(script, /function closeoutReviewBrief/u);

@@ -311,7 +311,7 @@ try {
   if (/id="closeoutQueue"/u.test(installedHtml)
     || /function renderCloseoutQueue/u.test(installedScript)
     || !/eyebrow\.textContent = "Recommended action"/u.test(installedScript)
-    || !/label: "Copy prompt"/u.test(installedScript)
+    || !/embeddedParentOrigin[\s\S]*"Verify in Chat" : "Start in Chat"[\s\S]*: "Copy prompt"/u.test(installedScript)
     || !/if \(contextPackage\.agentPayload\) return canonical;/u.test(installedScript)
     || !/action === "CLOSE_OUT" \|\| runtimeEligible/u.test(installedModel)
     || !/No trusted runtime source is connected/u.test(installedHost)

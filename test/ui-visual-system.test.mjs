@@ -76,7 +76,7 @@ test("production canvas exposes exactly four primary phases and one compact subs
 test("focused Ticket makes the exact copy handoff the dominant recommended action", () => {
   assert.match(script, /className = classes\("recommended-action"/u);
   assert.match(script, /eyebrow\.textContent = "Recommended action"/u);
-  assert.match(script, /label: "Copy prompt"/u);
+  assert.match(script, /embeddedParentOrigin[\s\S]*"Verify in Chat" : "Start in Chat"[\s\S]*: "Copy prompt"/u);
   assert.match(script, /if \(contextPackage\.agentPayload\) return canonical;/u);
   assert.match(css, /\.recommended-action-title \{[\s\S]*font-size: 15px/u);
   assert.match(css, /\.recommended-action \.agent-handoff \{[\s\S]*background: var\(--ink\)/u);

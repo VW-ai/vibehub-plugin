@@ -63,6 +63,17 @@
   const requestedDirection = normalizeLayoutDirection(
     focusQuery.get("direction"),
   );
+  const embeddedParentOrigin = (() => {
+    if (focusQuery.get("embed") !== "dsh") return null;
+    try {
+      const candidate = new URL(focusQuery.get("parentOrigin") || "");
+      if (candidate.protocol !== "http:"
+        || !new Set(["127.0.0.1", "localhost"]).has(candidate.hostname)) return null;
+      return candidate.origin;
+    } catch {
+      return null;
+    }
+  })();
 
   const elements = {
     projectName: document.querySelector("#projectName"),
@@ -151,8 +162,55 @@
   let selectedRoom = null;
   let roomView = "context";
   let roomFilterSnapshot = null;
+  let runtimeExpiry = null;
 
   normalizeGraphQueryUrl();
+
+  if (embeddedParentOrigin && window.parent !== window) {
+    window.addEventListener("message", (event) => {
+      if (event.origin !== embeddedParentOrigin || event.source !== window.parent) return;
+      if (event.data?.type === "vibehub-refresh") {
+        void refresh(null, { preserveLayout: true });
+        return;
+      }
+      if (event.data?.type !== "vibehub-runtime") return;
+      if (runtimeExpiry) clearTimeout(runtimeExpiry);
+      const runtime = event.data.runtime;
+      if (state && runtime?.ticketId) {
+        const ticket = state.graph.tickets.find((item) => item.ticketId === runtime.ticketId);
+        if (ticket) ticket.capabilities.runtime = { availability: "available", summary: runtime };
+        renderChrome();
+        renderGraph();
+        renderMinimap();
+        const expiresAt = Date.parse(runtime.expiresAt || "");
+        if (Number.isFinite(expiresAt)) {
+          runtimeExpiry = setTimeout(() => {
+            if (ticket) ticket.capabilities.runtime = {
+              availability: "unavailable",
+              reason: "The trusted DSH runtime observation expired.",
+            };
+            renderChrome();
+            renderGraph();
+            renderMinimap();
+          }, Math.max(0, expiresAt - Date.now()) + 25);
+        }
+        return;
+      }
+      if (state) {
+        for (const ticket of state.graph.tickets) {
+          if (ticket.capabilities.runtime?.summary?.trustedSource === "dsh-session-summary") {
+            ticket.capabilities.runtime = {
+              availability: "unavailable",
+              reason: "The linked DSH Session is not running.",
+            };
+          }
+        }
+        renderChrome();
+        renderGraph();
+        renderMinimap();
+      }
+    });
+  }
 
   function graphQuery() {
     const query = new URLSearchParams(location.search);
@@ -1531,9 +1589,11 @@
     copy.append(eyebrow, label);
     const closeout = nextAction?.action === "CLOSE_OUT";
     const handoff = actionButton({
-      label: "Copy prompt",
+      label: embeddedParentOrigin
+        ? (closeout ? "Verify in Chat" : "Start in Chat")
+        : "Copy prompt",
       className: classes("agent-handoff", closeout ? "closeout-handoff" : ""),
-      onClick: () => void copyPayload(
+      onClick: () => void dispatchAgentPayload(
         agentHandoffPayload(ticket, contextPackage, operational),
         closeout
           ? `Closeout handoff for ${ticket.ticketId} copied`
@@ -3090,6 +3150,18 @@
 
   function copyPayload(payload, copiedLabel) {
     return copyText(JSON.stringify(payload, null, 2), copiedLabel);
+  }
+
+  function dispatchAgentPayload(payload, copiedLabel) {
+    if (embeddedParentOrigin && window.parent !== window) {
+      window.parent.postMessage({
+        type: "vibehub-agent-handoff",
+        payload,
+      }, embeddedParentOrigin);
+      showToast("Sent to native Chat");
+      return Promise.resolve();
+    }
+    return copyPayload(payload, copiedLabel);
   }
 
   function dirtyPathCount(source) {

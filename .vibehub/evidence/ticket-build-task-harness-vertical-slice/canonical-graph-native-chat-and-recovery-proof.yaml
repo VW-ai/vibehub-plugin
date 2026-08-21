@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "graph-and-task-surfaces-use-canonical-vibehub-projection",
+    "task-handoff-enters-native-chat-exactly"
+  ],
+  "evidence_id": "canonical-graph-native-chat-and-recovery-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T01:00:47Z",
+  "refs": [
+    "packages/dsh-adapter/linkage.mjs",
+    "packages/dsh-bundle/index.js",
+    "packages/dsh-adapter/client.js",
+    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-ticket-review/assets/app.js",
+    "test/dsh-bundle.test.mjs",
+    "test/ui-embed.test.mjs",
+    "docs/DEEPSEEK_HARNESS_V1.md"
+  ],
+  "schema_version": 1,
+  "summary": "The real rc.8 Web application displayed the canonical current Git Task Graph as its first VibeHub surface before any Session existed, while closing the additive overlay restored untouched native DSH and the Tasks launcher. Selecting this Ticket exposed the host-owned Recommended action; Start in Chat created and opened one native Workspace/Session, recorded the registered /vibehub-task lifecycle, and queued the exact contextPackage.agentPayload JSON into native Chat without browser reconstruction. A fresh Session catalog contained the vendored vibehub-ticket-run Skill. Browser refresh and DSH restart recovered the Workspace/Ticket/Session association from the registered projection, restored the focused Tasks view, retained canonical Evidence, and showed no false live RUNNING state.",
+  "ticket_id": "ticket-build-task-harness-vertical-slice"
+}

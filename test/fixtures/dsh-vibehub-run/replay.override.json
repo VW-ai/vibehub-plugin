@@ -1,0 +1,32 @@
+[
+  {
+    "kind": "chunks",
+    "chunks": [
+      { "type": "block-start", "index": 0, "blockType": "tool-call" },
+      { "type": "tool-call-delta", "index": 0, "id": "load-vibehub-ticket-run", "name": "skill", "argumentsDelta": "{\"name\":\"vibehub-ticket-run\"}" },
+      { "type": "block-end", "index": 0, "block": { "type": "tool-call", "id": "load-vibehub-ticket-run", "name": "skill", "arguments": "{\"name\":\"vibehub-ticket-run\"}" } },
+      { "type": "usage", "usage": { "inputTokens": 64, "outputTokens": 8 } },
+      { "type": "finish", "reason": { "kind": "tool-calls" } }
+    ]
+  },
+  {
+    "kind": "chunks",
+    "chunks": [
+      { "type": "block-start", "index": 0, "blockType": "tool-call" },
+      { "type": "tool-call-delta", "index": 0, "id": "verify-and-record-vibehub", "name": "bash", "argumentsDelta": "{\"command\":\"node --test test/dsh-bundle.test.mjs && node skills/scripts/vh.mjs ticket evidence --repo . --input test/fixtures/dsh-vibehub-run/evidence.json\",\"description\":\"Verify DSH Bundle and record Evidence\",\"timeoutMs\":60000}" },
+      { "type": "block-end", "index": 0, "block": { "type": "tool-call", "id": "verify-and-record-vibehub", "name": "bash", "arguments": "{\"command\":\"node --test test/dsh-bundle.test.mjs && node skills/scripts/vh.mjs ticket evidence --repo . --input test/fixtures/dsh-vibehub-run/evidence.json\",\"description\":\"Verify DSH Bundle and record Evidence\",\"timeoutMs\":60000}" } },
+      { "type": "usage", "usage": { "inputTokens": 96, "outputTokens": 18 } },
+      { "type": "finish", "reason": { "kind": "tool-calls" } }
+    ]
+  },
+  {
+    "kind": "chunks",
+    "chunks": [
+      { "type": "block-start", "index": 0, "blockType": "text" },
+      { "type": "text-delta", "index": 0, "text": "The installed DSH Agent loaded the VibeHub Ticket Run Skill, verified the Bundle, and recorded acceptance-linked Evidence. Outcome remains pending for independent closeout." },
+      { "type": "block-end", "index": 0, "block": { "type": "text", "text": "The installed DSH Agent loaded the VibeHub Ticket Run Skill, verified the Bundle, and recorded acceptance-linked Evidence. Outcome remains pending for independent closeout." } },
+      { "type": "usage", "usage": { "inputTokens": 128, "outputTokens": 24 } },
+      { "type": "finish", "reason": { "kind": "stop" } }
+    ]
+  }
+]

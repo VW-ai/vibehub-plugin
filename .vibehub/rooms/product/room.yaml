@@ -18,6 +18,10 @@
         "path": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
       },
       {
+        "blob": "d02e3ac912cca676b8532104ea56dd78a8d71498",
+        "path": "docs/DEEPSEEK_HARNESS_V1.md"
+      },
+      {
         "blob": "e968b861000d86fe1e0a615ab4473af24640742f",
         "path": "docs/HARNESS_CHAT_V1_REVIEW.md"
       },
@@ -170,8 +174,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-20T23:17:24.714Z",
-    "last_aligned_commit": "cf680825f0f0cb3b7798443aba2696144d113eb8"
+    "checked_at": "2026-08-21T01:04:19.726Z",
+    "last_aligned_commit": "53e77ba403f4a4f250ace88e5f87d618942f0e61"
   },
   "anchors": [
     "CHANGELOG.md",
