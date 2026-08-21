@@ -1,0 +1,24 @@
+{
+  "accepted_acceptance_ids": [
+    "installable-bundle-preserves-native-dsh",
+    "graph-and-task-surfaces-use-canonical-vibehub-projection",
+    "task-handoff-enters-native-chat-exactly",
+    "one-real-task-completes-the-execution-evidence-loop",
+    "production-and-installed-regressions-pass"
+  ],
+  "closed_at": "2026-08-21T01:20:24Z",
+  "evidence_ids": [
+    "dsh-rc8-adapter-and-packed-bundle-proof",
+    "canonical-graph-native-chat-and-recovery-proof",
+    "native-dsh-skill-and-evidence-loop",
+    "packed-profile-browser-and-regression-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "partial",
+  "summary": "Independent closeout accepts five of six criteria and records a partial Outcome. The exact official rc.8 checkout at 141eb6fef83422698aef7a981029e843e8161534 passed the checked-in 14-seam probe, but the adapter-boundary criterion is not satisfied: packages/dsh-bundle/index.js directly consumes rc.8 ctx.webServer, ctx.effect, ctx.commands, ctx.sessionProjections, and ctx.logger APIs instead of keeping all host translations behind packages/dsh-adapter, while the probe does not bind every actually used host and client API such as ctx.sessions.binding, useProjection injection, Slot registration signatures, Theme tokens, ctx.effect, or ctx.webServer.port. The remaining criteria are independently reproduced. A fresh locally built npm tarball installed after the official base and Web bundles into an isolated Profile, resolved additively in dump-config, booted on loopback with the native module roster and VibeHub client present, returned HTTP 200, stopped cleanly, and uninstalled to a base/web-only Profile. The production host remains read-only and projects canonical Git-native topology, four phases, authority, Evidence, Outcome, archive, delivery, next_action, and unlock truth; trusted Task-scoped runtime observations expire and replay does not fabricate live presence. Persisted rc.8 Session logs independently show the successful vibehub-task command lifecycle, the complete host-produced handoff as the native user message, native Skill and bash tool calls, canonical Evidence writing, and a completed turn; the projection cache preserves the exact Workspace, Ticket, Session command id, and source commit across restart without Agent Team coupling or a second Task store. The keyless replay replaces only llm/stream model output, while native Session, command, Skill, tools, sandbox, filesystem, and VibeHub write paths remain real; waiting-tool and failed Graph substates are not fabricated and their native-Chat limitation is documented. Focused verification passed 30/30, full verification passed 141/141 with the exact source probe enabled, and the installed Plugin artifact contained 62 files. Canonical browser Evidence plus the independently inspected wrapper, Workbench regressions, packed Profile boot, responsive and reduced-motion contracts, absence of false live state, and clean uninstall support the documented default and 390px browser boundary. Outcome remains non-successful until the compatibility boundary and probe coverage are corrected and independently re-adjudicated.",
+  "ticket_id": "ticket-build-task-harness-vertical-slice",
+  "unresolved_acceptance_ids": [
+    "current-dsh-baseline-and-adapter-are-pinned"
+  ]
+}
