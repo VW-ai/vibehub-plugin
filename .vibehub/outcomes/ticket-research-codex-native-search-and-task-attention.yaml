@@ -1,0 +1,20 @@
+{
+  "accepted_acceptance_ids": [
+    "research-corpus-is-official-and-comparative",
+    "chat-task-search-semantics-are-explicit",
+    "attention-inbox-is-quiet-and-truthful",
+    "real-shell-prototype-makes-direction-reviewable",
+    "wide-narrow-keyboard-review-is-decision-ready"
+  ],
+  "closed_at": "2026-08-21T07:27:27Z",
+  "evidence_ids": [
+    "codex-native-search-attention-research-and-contract",
+    "codex-native-search-attention-real-shell-browser-proof"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout in a fresh isolated worktree at exact implementation commit b76bb3069f9e2bcf35b22b634740003f8d666dec accepts all five criteria. The checked-in study compares five first-party interaction families across official OpenAI, Linear, GitHub, Cursor, and Raycast sources, and names each reusable pattern, failure mode, and bounded VibeHub application. Source and contract inspection confirmed separate Chat Thread, Task, Context, notification, and live-presence ownership; typed grouped Search routes exact identities; Needs You, successful completion, deviation, and Running derive only from their declared canonical or trusted sources; initial history and replay cannot mint unread activity; Running remains outside notification count; and text, icon, grouping, and destination supplement color. The real shell keeps Chat as the default, Codex Threads and VibeHub Tasks distinct and traversable, and adds low-fidelity Search, bounded Sidebar attention, and a quiet Inbox. The canonical browser Evidence records wide and 390x844 exact-destination, keyboard, focus-return, reduced-motion, overflow, and zero-console-error review; this closeout did not claim a new browser drive because no independent browser-control binding was available, but corroborated those records against the exact DOM, CSS, focus and routing handlers, runtime projection, and review pack. Focused verification passed 5 of 5 after allowing the test to read the normal host-owned Codex configuration, full verification passed 162 with zero failures and one expected opt-in DSH-source skip, artifact verification passed with 62 files and 2832437 bytes, and an isolated read-only loopback host returned authenticated Codex app-server capability, canonical Project Context, one current Needs You item, successful Outcome history, and explicit presence-only Running semantics. Canonical Ticket and Project validation passed and all four Rooms were fresh.",
+  "ticket_id": "ticket-research-codex-native-search-and-task-attention",
+  "unresolved_acceptance_ids": []
+}
