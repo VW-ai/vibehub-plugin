@@ -1,21 +1,21 @@
 {
   "accepted_acceptance_ids": [
+    "codex-chat-state-inventory-is-complete",
     "open-source-reuse-options-are-audited",
-    "real-runtime-chat-prototype-is-production-shaped"
+    "app-server-events-map-to-one-ui-contract",
+    "real-runtime-chat-prototype-is-production-shaped",
+    "chat-parity-review-is-decision-ready"
   ],
-  "closed_at": "2026-08-21T08:13:49Z",
+  "closed_at": "2026-08-21T08:24:04Z",
   "evidence_ids": [
     "codex-native-chat-inventory-reuse-and-event-contract",
-    "codex-native-chat-real-runtime-and-browser-proof"
+    "codex-native-chat-real-runtime-and-browser-proof",
+    "codex-native-chat-citation-interruption-correction"
   ],
   "kind": "ticket_outcome",
   "schema_version": 1,
-  "status": "partial",
-  "summary": "Independent closeout in a fresh isolated worktree at exact implementation commit b77e878c26a1dccf361e7f8d2d3dc6bce5f1ecaf accepts two of five criteria and records a partial Outcome. The open-source audit compares seven first-party repository surfaces, explicitly records license or missing-license posture, current maintenance signal, dependency and security surface, reusable unit, and rejection boundary, and the checked-in decision avoids proprietary Codex Desktop code, assets, private APIs, scraping, and whole-product runtime adoption. The authenticated Codex-first shell is materially production-shaped for review: ordinary Chat remains independent of VibeHub Tasks, replay and live items share stable identity, animation-frame batching and a 240-item rendered tail bound growth, Markdown and code are escaped before selective rendering, execution activity is grouped, inline approvals retain exact request identity, the Composer supports ordinary image/audio input, and Send, Stop, completion reconciliation, focus, wide/narrow, Light/Dark, and reduced-motion behavior are implemented without a second transcript or Agent loop. Three criteria remain unresolved. First, the claimed complete first-party state inventory never identifies or specifies presentation for the pinned 0.147.0 `agentMessage.memoryCitation` field, and its inventory table does not explicitly record the directly observed or official model/mode, microphone, shortcut, focus, and accessibility behavior required by the criterion. Second, the executable contract and renderer map `agentMessage.text` but omit `memoryCitation`; the field is silently discarded rather than rendered or preserved through an explicit inspectable fallback, so the pinned item contract is incomplete. Third, the deterministic mixed fixture and canonical browser/runtime Evidence cover retry and successful completion but contain no interrupted or cancelled Turn state and no browser or current Ticket exercise of that end state; a Stop handler and prior adapter-level `turn/interrupt` capability do not satisfy this Ticket's decision-ready coverage requirement. The exact local schema probe passed and independently confirmed `memoryCitation`, `TurnStatus: interrupted`, and the pinned protocol hash. Focused verification passed 6 of 6, full verification passed 163 with zero failures and one expected opt-in DSH-source skip, artifact verification passed with 62 files and 2832437 bytes, canonical Ticket and Project validation passed, and all four Rooms were fresh. No fresh browser drive is claimed because this closeout had no browser-control binding; the canonical browser Evidence was inspected without stretching it beyond its recorded claims.",
+  "status": "successful",
+  "summary": "Independent re-closeout in a fresh isolated worktree at exact correction commit f0144d5d81d0099853d050d65e34699b753195b8 accepts all five current criteria. The correction genuinely resolves the previous three gaps: the first-party inventory now explicitly records pinned agentMessage.memoryCitation, model and collaboration-mode posture, ordinary microphone/audio input, shortcuts, focus return and accessibility; the contract and renderer preserve and display each citation entry's exact path, line range and note together with its source Thread identity; and authoritative replayed TurnStatus interrupted or failed appends one explicit terminal boundary after the Turn's already-recorded items rather than replacing or synthesizing its history. The deterministic mixed fixture contains both memoryCitation entries with source threadIds and an interrupted Turn, while the canonical correction Evidence records wide and 390x844 browser review plus a real durable Codex Thread interrupted through the production Stop control, reconciled from app-server with running cleared, history retained and exactly one interruption boundary. The source-backed reuse audit and production-shaped real-runtime shell remain accepted from the prior adjudication. Independently rerun focused verification passed 6 of 6; full verification passed 163 tests with zero failures and one expected opt-in DSH-source skip; the pinned Codex seam probe passed at @openai/codex 0.147.0 with protocol SHA-256 f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2 and proved turn/interrupt plus audio/localAudio; diff check, Ticket validation, Project validation and Context validation passed, and all four Rooms were fresh. No fresh browser drive is claimed because this closeout had no browser-control binding; the canonical browser Evidence was inspected and corroborated against the corrected contract, fixture, renderer and tests without extending its claims.",
   "ticket_id": "ticket-research-codex-native-chat-parity",
-  "unresolved_acceptance_ids": [
-    "codex-chat-state-inventory-is-complete",
-    "app-server-events-map-to-one-ui-contract",
-    "chat-parity-review-is-decision-ready"
-  ]
+  "unresolved_acceptance_ids": []
 }
