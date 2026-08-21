@@ -53,6 +53,7 @@ const assets = new Map([
   ["/index.html", [join(assetRoot, "index.html"), "text/html; charset=utf-8"]],
   ["/app.css", [join(assetRoot, "app.css"), "text/css; charset=utf-8"]],
   ["/app.js", [join(assetRoot, "app.js"), "text/javascript; charset=utf-8"]],
+  ["/chat-fixtures.json", [join(assetRoot, "chat-fixtures.json"), "application/json; charset=utf-8"]],
   ["/vibehub-mark.svg", [join(sourceRoot, "assets", "brand", "vibehub-mark.svg"), "image/svg+xml"]],
 ]);
 

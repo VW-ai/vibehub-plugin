@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "package": "@openai/codex",
+    "version": "0.147.0",
+    "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
+    "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2",
+    "sourceOfTruth": "Codex app-server Thread, Turn, ThreadItem, server request, and notification protocol"
+  },
+  "identity": {
+    "thread": "thread.id",
+    "turn": "turn.id",
+    "item": "thread.id + turn.id + item.id",
+    "pendingRequest": "request.id scoped by params.threadId and params.turnId",
+    "rule": "item/started inserts, deltas mutate the matching live item, item/completed replaces it authoritatively, and thread/read replay reconciles by stable item id"
+  },
+  "components": {
+    "userMessage": "user bubble with text, image, audio, skill, and mention attachments",
+    "hookPrompt": "quiet system context disclosure",
+    "agentMessage": "sanitized Markdown response with streaming cursor only while live",
+    "reasoning": "collapsed reasoning disclosure with streamed summary",
+    "plan": "structured plan card with streaming or final progress",
+    "commandExecution": "collapsible terminal group with cwd, command, output, duration, and exit status",
+    "fileChange": "file list and sanitized unified diff disclosure",
+    "mcpToolCall": "tool card with server, arguments, progress, result, error, and duration",
+    "dynamicToolCall": "tool card with namespace, arguments, output, and success",
+    "collabAgentToolCall": "delegated-agent group with receiver threads and agent states",
+    "subAgentActivity": "compact sub-agent timeline event",
+    "webSearch": "source/search activity card",
+    "imageView": "local image activity without embedding an unsafe path",
+    "sleep": "quiet waiting activity",
+    "imageGeneration": "generated-image activity and result affordance",
+    "enteredReviewMode": "review mode boundary",
+    "exitedReviewMode": "review mode completion boundary",
+    "contextCompaction": "quiet context-compacted divider",
+    "unknown": "inspectable unsupported-item fallback that preserves type and never invents success"
+  },
+  "streaming": {
+    "events": [
+      "item/started",
+      "item/agentMessage/delta",
+      "item/reasoning/summaryTextDelta",
+      "item/reasoning/textDelta",
+      "item/plan/delta",
+      "item/commandExecution/outputDelta",
+      "item/fileChange/patchUpdated",
+      "item/mcpToolCall/progress",
+      "item/completed",
+      "error",
+      "turn/completed"
+    ],
+    "paintCadence": "coalesce notifications into at most one animation-frame render",
+    "replay": "thread/read is authoritative durable history and never implies live presence",
+    "reconnect": "resume from host event cursor, then reconcile with thread/read before showing settled state",
+    "backpressure": "host retains a bounded 500-event window; UI retains only active live items and renders a bounded 240-item tail before virtualization",
+    "unknownDelta": "ignore visually, preserve raw host event for diagnostics, and reconcile on the next thread/read"
+  },
+  "turnLifecycle": {
+    "idle": "composer enabled and no live claim",
+    "starting": "optimistic user input may render but send is guarded until turn/start returns",
+    "running": "trusted turn/started or active thread status; Stop replaces Send",
+    "waitingHuman": "scoped server request renders inline and remains separate from VibeHub Task attention",
+    "retrying": "error notification with willRetry true; keep the Turn open and expose retry state",
+    "failed": "terminal error or failed item; keep output inspectable and offer a new Turn, never rewrite history",
+    "interrupted": "turn/interrupt followed by authoritative completion status; no false completed claim",
+    "completed": "turn/completed reconciled with thread/read; completion is not a VibeHub Outcome"
+  },
+  "composer": {
+    "inputs": ["text", "image", "localImage", "audio", "localAudio", "skill", "mention"],
+    "controls": ["attachment", "microphone", "mode", "model", "send", "stop"],
+    "keyboard": {
+      "send": "Enter",
+      "newline": "Shift+Enter",
+      "newThread": "Meta+N",
+      "search": "Meta+K",
+      "interrupt": "Escape when the composer owns the active running Turn"
+    },
+    "audioBoundary": "ordinary audio input is supported; realtime conversation remains hidden until the runtime probe reports support"
+  },
+  "security": {
+    "markdown": "escape first; allow only independently rendered links, code, emphasis, lists, and headings; no raw HTML",
+    "links": "http/https only with noreferrer noopener",
+    "diffsAndOutput": "textContent-equivalent escaping inside bounded pre elements",
+    "media": "bounded data URLs or explicitly served local assets only",
+    "approvals": "render only exact server requests and send exact supported decisions",
+    "repositoryWrites": "the shell host remains read-only; only Codex app-server execution may write under its approval and sandbox contract"
+  },
+  "performance": {
+    "initialReplayTail": 240,
+    "liveItemLimit": 64,
+    "eventWindow": 500,
+    "virtualizationThreshold": 240,
+    "longOutputCollapsedLines": 18,
+    "rule": "production must virtualize above the threshold; the research prototype bounds the DOM tail and disclosures"
+  },
+  "vibehubBoundary": {
+    "ordinaryChatRequiresTask": false,
+    "threadIsTask": false,
+    "additiveActions": ["Make Task", "Remember", "Open related Task"],
+    "rule": "VibeHub actions may reference exact Thread, Turn, item, and selection identity but never relabel Codex protocol objects"
+  }
+}

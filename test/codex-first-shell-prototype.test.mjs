@@ -60,6 +60,49 @@ test("Search, Task attention, and object semantics are explicit and source-backe
   assert.doesNotMatch(html + script + server, /localStorage|sessionStorage|indexedDB/i);
 });
 
+test("Codex-native Chat contract covers replay, live deltas, rich items, and licensed reuse", async () => {
+  const [script, css, research, review, contractText, fixtureText, lockText] = await Promise.all([
+    source("apps/codex-first-shell-prototype/app.js"),
+    source("apps/codex-first-shell-prototype/app.css"),
+    source("docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md"),
+    source("docs/proposals/codex-native-chat/README.md"),
+    source("docs/proposals/codex-native-chat/chat-ui-contract.json"),
+    source("apps/codex-first-shell-prototype/chat-fixtures.json"),
+    source("packages/codex-adapter/upstream-lock.json"),
+  ]);
+  const contract = JSON.parse(contractText);
+  const fixture = JSON.parse(fixtureText);
+  const lock = JSON.parse(lockText);
+  assert.equal(contract.baseline.version, lock.codex.version);
+  assert.equal(contract.baseline.commit, lock.codex.commit);
+  assert.equal(contract.baseline.protocolSchemaSha256, lock.codex.protocolSchemaSha256);
+  for (const type of ["userMessage", "agentMessage", "reasoning", "plan", "commandExecution", "fileChange", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "imageGeneration", "contextCompaction", "unknown"]) assert.ok(contract.components[type]);
+  for (const method of ["item/started", "item/agentMessage/delta", "item/reasoning/summaryTextDelta", "item/plan/delta", "item/commandExecution/outputDelta", "item/fileChange/patchUpdated", "item/completed", "error", "turn/completed"]) assert.ok(contract.streaming.events.includes(method));
+  assert.equal(contract.vibehubBoundary.ordinaryChatRequiresTask, false);
+  assert.equal(contract.vibehubBoundary.threadIsTask, false);
+  assert.equal(contract.performance.initialReplayTail, 240);
+  for (const repository of ["assistant-ui/assistant-ui", "yunhaoli24/codex-gateway", "lezi-fun/codex-webui", "vercel/chatbot", "0xcaff/codex-web"]) assert.match(research, new RegExp(repository.replace("/", "\\/")));
+  assert.match(research, /Do not copy code/);
+  assert.match(review, /Required v1 parity/);
+  assert.match(review, /Explicitly deferred/);
+  assert.match(script, /applyChatNotification/);
+  assert.match(script, /state\.activeThread = \{ \.\.\.data\.thread, turns: \[\] \}/);
+  assert.match(script, /groupableActivityTypes/);
+  assert.match(script, /renderTimelineItems/);
+  assert.match(script, /requestAnimationFrame/);
+  assert.match(script, /slice\(-240\)/);
+  assert.match(script, /renderMarkdown/);
+  assert.match(script, /noreferrer noopener/);
+  assert.match(script, /Unsupported item/);
+  assert.match(css, /\.activity-card/);
+  assert.match(css, /\.activity-group/);
+  assert.match(css, /\.code-block/);
+  assert.match(css, /\.turn-error/);
+  const fixtureTypes = fixture.thread.turns.flatMap((turn) => turn.items.map((item) => item.type));
+  for (const type of ["userMessage", "agentMessage", "reasoning", "plan", "commandExecution", "fileChange", "mcpToolCall", "collabAgentToolCall", "subAgentActivity", "turnError", "contextCompaction"]) assert.ok(fixtureTypes.includes(type));
+  assert.equal(fixture.pendingRequests[0].fixture, true);
+});
+
 test("Codex-first shell exposes ordinary audio honestly and routes real approvals", async () => {
   const [html, script, server, lock] = await Promise.all([
     source("apps/codex-first-shell-prototype/index.html"),
@@ -150,6 +193,10 @@ test("Codex-first prototype host is loopback-only, bounded, and connected to the
   assert.ok(payload.data.graph.tickets.some((ticket) => ticket.ticketId === "ticket-prototype-codex-first-vibehub-shell"));
   const rejected = await fetch(url, { method: "POST" });
   assert.equal(rejected.status, 405);
+  const fixtures = await fetch(new URL("chat-fixtures.json", url));
+  assert.equal(fixtures.status, 200);
+  assert.match(fixtures.headers.get("content-type"), /application\/json/);
+  assert.equal((await fixtures.json()).thread.id, "fixture-chat-parity");
   const exit = once(child, "exit");
   child.kill("SIGTERM");
   await exit;

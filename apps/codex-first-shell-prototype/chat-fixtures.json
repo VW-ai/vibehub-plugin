@@ -1,0 +1,117 @@
+{
+  "label": "Deterministic mixed-state review fixture — not runtime history",
+  "thread": {
+    "id": "fixture-chat-parity",
+    "title": "Review the Codex-native Chat renderer",
+    "cwd": "/workspace/vibehub-plugin",
+    "status": { "type": "active" },
+    "turns": [
+      {
+        "id": "fixture-turn-1",
+        "items": [
+          {
+            "type": "userMessage",
+            "id": "fixture-user",
+            "clientId": "fixture-client",
+            "content": [
+              { "type": "text", "text": "Please inspect the Chat surface, stream a concise answer, then show the implementation plan and the exact files you changed." },
+              { "type": "audio", "url": "data:audio/webm;base64,AA==" }
+            ]
+          },
+          {
+            "type": "reasoning",
+            "id": "fixture-reasoning",
+            "summary": ["I am checking the protocol mapping, responsive hierarchy, and interaction boundaries."],
+            "content": []
+          },
+          {
+            "type": "plan",
+            "id": "fixture-plan",
+            "text": "- Inventory the app-server items\n- Build one stable reducer\n- Render activity below the conversation\n- Verify wide and narrow behavior"
+          },
+          {
+            "type": "agentMessage",
+            "id": "fixture-agent",
+            "text": "The renderer now keeps the **answer** visually primary while execution stays inspectable.\n\n```js\nconst truth = threadRead.itemsById[item.id];\nrender(truth);\n```\n\n- Replay is durable history.\n- Live deltas update the same item identity.\n- VibeHub remains additive."
+          },
+          {
+            "type": "commandExecution",
+            "id": "fixture-command",
+            "command": "npm test -- codex-native-chat",
+            "cwd": "/workspace/vibehub-plugin",
+            "status": "completed",
+            "aggregatedOutput": "✓ reducer merges item deltas\n✓ unknown items remain inspectable\n✓ replay does not claim live presence\n",
+            "exitCode": 0,
+            "durationMs": 1842
+          },
+          {
+            "type": "fileChange",
+            "id": "fixture-files",
+            "status": "completed",
+            "changes": [
+              {
+                "path": "apps/codex-first-shell-prototype/app.js",
+                "kind": { "type": "update" },
+                "diff": "@@ -1,2 +1,3 @@\n const source = 'app-server';\n+const renderer = 'codex-native';"
+              }
+            ]
+          },
+          {
+            "type": "mcpToolCall",
+            "id": "fixture-tool",
+            "server": "browser",
+            "tool": "inspect_page",
+            "status": "completed",
+            "arguments": { "frame": "390x844" },
+            "readOnlyHint": true,
+            "result": { "content": [{ "type": "text", "text": "No horizontal overflow; focus remains visible." }] },
+            "durationMs": 420
+          },
+          {
+            "type": "collabAgentToolCall",
+            "id": "fixture-agents",
+            "tool": "spawnAgent",
+            "status": "completed",
+            "senderThreadId": "fixture-chat-parity",
+            "receiverThreadIds": ["fixture-subagent"],
+            "prompt": "Audit the protocol mapping independently.",
+            "model": null,
+            "reasoningEffort": null,
+            "agentsStates": { "fixture-subagent": { "status": "completed" } }
+          },
+          {
+            "type": "subAgentActivity",
+            "id": "fixture-subagent-activity",
+            "kind": { "type": "completed" },
+            "agentThreadId": "fixture-subagent",
+            "agentPath": "protocol-audit"
+          },
+          {
+            "type": "turnError",
+            "id": "fixture-retry",
+            "message": "The first stream disconnected; Codex retained the Turn and resumed it.",
+            "willRetry": true
+          },
+          {
+            "type": "contextCompaction",
+            "id": "fixture-compaction"
+          }
+        ]
+      }
+    ]
+  },
+  "pendingRequests": [
+    {
+      "id": "fixture-approval",
+      "fixture": true,
+      "method": "item/commandExecution/requestApproval",
+      "params": {
+        "threadId": "fixture-chat-parity",
+        "turnId": "fixture-turn-1",
+        "itemId": "fixture-command",
+        "command": "npm run verify",
+        "reason": "Run the full repository verification outside the restricted test sandbox."
+      }
+    }
+  ]
+}

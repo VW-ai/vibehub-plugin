@@ -75,10 +75,10 @@
               <button class="composer-icon" id="attachButton" type="button" aria-label="Attach image or audio" title="Attach image or audio">＋</button>
               <input id="attachmentInput" type="file" accept="image/*,audio/*" hidden>
               <button class="composer-icon" id="voiceButton" type="button" aria-label="Record voice input" title="Record voice input">◉</button>
-              <span class="mode-label">Workspace write</span>
+              <span class="composer-setting" title="Current mode">Agent</span>
             </div>
             <div>
-              <span class="model-label">Codex</span>
+              <span class="composer-setting" title="Current runtime">Codex</span>
               <button class="stop-button" id="stopTurn" type="button" hidden aria-label="Interrupt current turn">■</button>
               <button class="send-button" id="sendButton" type="submit" aria-label="Send message">↑</button>
             </div>
@@ -103,9 +103,9 @@
   <aside class="review-panel" id="reviewPanel" hidden inert aria-labelledby="reviewTitle">
     <header><div><small>OWNER REVIEW PACK</small><h2 id="reviewTitle">Codex-first product boundary</h2></div><button type="button" id="closeReview">Close</button></header>
     <section><span>Promise</span><h3>Codex familiarity + VibeHub Tasks</h3><p>Codex owns Threads, Turns, tools, approvals and execution. VibeHub adds a durable Task Graph, focused Task Workspace, Context, Evidence and independent Outcome.</p></section>
-    <section><span>Current composition</span><ul><li>Chat is the default landing and Recent chats contains real Codex Threads.</li><li>Tasks is a distinct top-level destination; typed Search never relabels a Chat as a Task.</li><li>The Task Inbox surfaces current Needs You boundaries and repository completion history; Running does not notify.</li><li>A Task opens a focused Workspace; Start routes the exact host handoff into one Codex Thread.</li><li>Voice uses ordinary Codex audio input. Realtime conversation stays unavailable until the runtime reports support.</li></ul></section>
+    <section><span>Current composition</span><ul><li>Chat is the default landing and Recent chats contains real Codex Threads.</li><li>Replay and live events share stable app-server item identity; answers stay primary while tool, diff and delegated work group into quiet Turn disclosures.</li><li>Inline approvals pause the exact Turn; retry, interruption and completion never become VibeHub Outcome claims.</li><li>Tasks is a distinct top-level destination; typed Search never relabels a Chat as a Task.</li><li>The Task Inbox surfaces current Needs You boundaries and repository completion history; Running does not notify.</li><li>A Task opens a focused Workspace; Start routes the exact host handoff into one Codex Thread.</li><li>Voice uses ordinary Codex audio input. Realtime conversation stays unavailable until the runtime reports support.</li></ul></section>
     <section><span>Later, not now</span><p>Final desktop wrapper, Chat→Task and Remember persistence, complete visual approval, public packaging and DSH compatibility remain separate Tickets.</p></section>
-    <section><span>Owner decision after review</span><ol><li>Does Chat-first still make important Tasks visible at the right moment?</li><li>Is Search the simplest bridge across Chat, Task and Context?</li><li>Is the bell plus small Needs You Sidebar group enough without becoming a dashboard?</li><li>Should Task focus replace the center column or open beside Chat?</li><li>Is voice placement familiar and quiet enough?</li></ol></section>
+    <section><span>Owner decision after review</span><ol><li>Does the real Thread now feel calm enough for daily Codex use?</li><li>Are grouped execution activities easy to inspect without overpowering the answer?</li><li>Does Chat-first still make important Tasks visible at the right moment?</li><li>Is Search the simplest bridge across Chat, Task and Context?</li><li>Is the bell plus small Needs You Sidebar group enough without becoming a dashboard?</li><li>Should Task focus replace the center column or open beside Chat?</li><li>Is voice placement familiar and quiet enough?</li></ol></section>
   </aside>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

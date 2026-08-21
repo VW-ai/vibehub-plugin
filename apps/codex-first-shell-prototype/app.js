@@ -22,6 +22,11 @@ const state = {
   initialCompletionKeys: new Set(),
   unreadCompletionKeys: new Set(),
   attentionPollCounter: 0,
+  liveItems: new Map(),
+  turnErrors: new Map(),
+  chatRenderFrame: 0,
+  fixtureMode: false,
+  creatingThread: null,
 };
 
 const token = location.hash.slice(1);
@@ -269,49 +274,168 @@ function userInputText(content) {
   return (content ?? []).filter((item) => item.type === "text").map((item) => item.text).join("\n");
 }
 
+function inlineMarkdown(value) {
+  return escapeHtml(value)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
+}
+
+function renderMarkdown(value) {
+  const chunks = String(value ?? "").split(/```/);
+  return chunks.map((chunk, index) => {
+    if (index % 2) {
+      const [language, ...lines] = chunk.replace(/^\n/, "").split("\n");
+      const body = lines.length ? lines.join("\n") : language;
+      const label = lines.length && language.trim() ? `<span>${escapeHtml(language.trim())}</span>` : "";
+      return `<div class="code-block">${label}<pre><code>${escapeHtml(body)}</code></pre></div>`;
+    }
+    const blocks = [];
+    let list = [];
+    const flushList = () => {
+      if (!list.length) return;
+      blocks.push(`<ul>${list.map((line) => `<li>${inlineMarkdown(line)}</li>`).join("")}</ul>`);
+      list = [];
+    };
+    for (const line of chunk.split("\n")) {
+      if (/^[-*] /.test(line)) { list.push(line.slice(2)); continue; }
+      flushList();
+      if (!line.trim()) continue;
+      const heading = line.match(/^(#{1,3})\s+(.+)/);
+      if (heading) blocks.push(`<h${Math.min(4, heading[1].length + 1)}>${inlineMarkdown(heading[2])}</h${Math.min(4, heading[1].length + 1)}>`);
+      else blocks.push(`<p>${inlineMarkdown(line)}</p>`);
+    }
+    flushList();
+    return blocks.join("");
+  }).join("");
+}
+
+function statusLabel(item) {
+  if (item._live) return "running";
+  if (item.status) return String(item.status).replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase();
+  return "complete";
+}
+
+function disclosureCard({ kind, title, status, summary, detail = "", icon = "◇", open = false, extra = "" }) {
+  return `<details class="activity-card ${kind}" ${open ? "open" : ""}><summary><i>${icon}</i><span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(summary)}</small></span><em>${escapeHtml(status)}</em></summary>${detail ? `<div class="activity-detail">${detail}</div>` : ""}${extra}</details>`;
+}
+
+function userMediaMarkup(content) {
+  return (content ?? []).filter((entry) => ["image", "localImage", "audio", "localAudio", "skill", "mention"].includes(entry.type)).map((entry) => {
+    if (entry.type === "image" && String(entry.url).startsWith("data:image/")) return `<img class="message-image" src="${escapeHtml(entry.url)}" alt="Attached image">`;
+    if (entry.type === "audio") return '<span class="message-attachment">◉ Audio attachment</span>';
+    if (entry.type === "localImage") return `<span class="message-attachment">▧ ${escapeHtml(entry.path?.split("/").pop() ?? "Local image")}</span>`;
+    if (entry.type === "localAudio") return `<span class="message-attachment">◉ ${escapeHtml(entry.path?.split("/").pop() ?? "Local audio")}</span>`;
+    return `<span class="message-attachment">${entry.type === "skill" ? "$" : "@"}${escapeHtml(entry.name)}</span>`;
+  }).join("");
+}
+
 function renderItem(item) {
   if (!item) return "";
   if (item.type === "userMessage") {
     const text = userInputText(item.content);
     const handoff = handoffFromText(text);
     if (handoff) return `<div class="turn user"><article class="item-card handoff"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.nextAction?.action ?? handoff.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.ticketId))}</strong><br>${escapeHtml(handoff.outcome)}</p></article></div>`;
-    const media = (item.content ?? []).filter((entry) => entry.type === "image" || entry.type === "audio");
-    return `<div class="turn user"><article>${escapeHtml(text || (media.length ? `${media.length} media attachment` : "User input"))}</article></div>`;
+    const media = userMediaMarkup(item.content);
+    return `<div class="turn user" data-item-id="${escapeHtml(item.id)}"><article>${text ? `<div>${renderMarkdown(text)}</div>` : ""}${media}</article></div>`;
   }
-  if (item.type === "agentMessage") return `<div class="turn assistant"><span class="agent-mark">C</span><article><p>${escapeHtml(item.text)}</p></article></div>`;
+  if (item.type === "agentMessage") return `<div class="turn assistant" data-item-id="${escapeHtml(item.id)}"><span class="agent-mark">C</span><article class="agent-response${item._live ? " streaming" : ""}">${renderMarkdown(item.text)}<footer class="message-actions"><button type="button" data-copy-message="${escapeHtml(item.id)}">Copy</button><button type="button" disabled title="Planned VibeHub bridge">Remember</button><button type="button" disabled title="Planned VibeHub bridge">Make Task</button></footer></article></div>`;
   if (item.type === "reasoning") {
     const text = [...(item.summary ?? []), ...(item.content ?? [])].join("\n");
-    return `<div class="turn assistant"><span class="agent-mark">C</span><article class="item-card"><header><strong>Reasoning</strong><span>${escapeHtml(item.status ?? "completed")}</span></header><p>${escapeHtml(text || "Reasoned about the task")}</p></article></div>`;
+    return `<div class="activity-row">${disclosureCard({ kind: "reasoning", icon: "✦", title: "Reasoning", status: statusLabel(item), summary: item._live ? "Thinking…" : "Reasoning summary", detail: renderMarkdown(text || "Reasoned about the request") })}</div>`;
   }
-  if (item.type === "plan") return `<div class="turn assistant"><span class="agent-mark">C</span><article class="item-card plan"><header><strong>Plan</strong><span>Codex</span></header><p>${escapeHtml(item.text)}</p></article></div>`;
-  if (item.type === "commandExecution") return `<div class="turn assistant"><span class="agent-mark">C</span><article class="item-card"><header><strong>Terminal</strong><span>${escapeHtml(item.status)}</span></header><code>${escapeHtml(item.command)}</code>${item.aggregatedOutput ? `<pre>${escapeHtml(item.aggregatedOutput)}</pre>` : ""}</article></div>`;
-  if (item.type === "fileChange") return `<div class="turn assistant"><span class="agent-mark">C</span><article class="item-card"><header><strong>File changes</strong><span>${escapeHtml(item.status)}</span></header><p>${escapeHtml((item.changes ?? []).map((change) => change.path).join(", ") || "Patch prepared")}</p></article></div>`;
-  if (item.type === "mcpToolCall" || item.type === "dynamicToolCall") return `<div class="turn assistant"><span class="agent-mark">C</span><article class="item-card"><header><strong>${escapeHtml(item.tool ?? item.name ?? "Tool")}</strong><span>${escapeHtml(item.status)}</span></header><p>${escapeHtml(item.result?.content?.[0]?.text ?? "Tool activity")}</p></article></div>`;
-  return `<div class="turn assistant"><span class="agent-mark">C</span><article class="item-card"><header><strong>${escapeHtml(item.type ?? "Codex item")}</strong><span>${escapeHtml(item.status ?? "")}</span></header></article></div>`;
+  if (item.type === "plan") return `<div class="activity-row">${disclosureCard({ kind: "plan", icon: "☷", title: "Plan", status: statusLabel(item), summary: item._live ? "Updating plan…" : "Plan updated", detail: renderMarkdown(item.text), open: true })}</div>`;
+  if (item.type === "commandExecution") {
+    const detail = `<div class="command-meta">${escapeHtml(item.cwd ?? "")}</div><code class="command-line">${escapeHtml(item.command)}</code>${item.aggregatedOutput ? `<pre class="terminal-output">${escapeHtml(item.aggregatedOutput)}</pre>` : ""}`;
+    const duration = item.durationMs ? ` · ${(item.durationMs / 1000).toFixed(1)}s` : "";
+    return `<div class="activity-row">${disclosureCard({ kind: "terminal", icon: ">_", title: "Terminal", status: statusLabel(item), summary: `${item.command || "Command"}${duration}`, detail, open: item._live || item.status === "failed" })}</div>`;
+  }
+  if (item.type === "fileChange") {
+    const changes = item.changes ?? [];
+    const detail = changes.map((change) => `<section class="diff-file"><header><strong>${escapeHtml(change.path)}</strong><span>${escapeHtml(change.kind?.type ?? change.kind ?? "update")}</span></header>${change.diff ? `<pre>${escapeHtml(change.diff)}</pre>` : ""}</section>`).join("");
+    return `<div class="activity-row">${disclosureCard({ kind: "files", icon: "±", title: "File changes", status: statusLabel(item), summary: `${changes.length} file${changes.length === 1 ? "" : "s"}`, detail, open: item._live || item.status === "failed" })}</div>`;
+  }
+  if (item.type === "mcpToolCall" || item.type === "dynamicToolCall") {
+    const name = item.tool ?? "Tool";
+    const server = item.server ?? item.namespace ?? "Codex";
+    const result = item.result?.content?.map((entry) => entry.text).filter(Boolean).join("\n") ?? item.contentItems?.map((entry) => entry.text ?? entry.content ?? "").join("\n") ?? item.error?.message ?? "";
+    const detail = `<pre class="tool-arguments">${escapeHtml(JSON.stringify(item.arguments ?? {}, null, 2))}</pre>${result ? `<div class="tool-result">${renderMarkdown(result)}</div>` : ""}`;
+    return `<div class="activity-row">${disclosureCard({ kind: "tool", icon: "◇", title: name, status: statusLabel(item), summary: `${server}${item.readOnlyHint ? " · read only" : ""}`, detail, open: item.status === "failed" })}</div>`;
+  }
+  if (item.type === "collabAgentToolCall") {
+    const agents = Object.entries(item.agentsStates ?? {}).map(([id, value]) => `${id.slice(0, 8)} · ${value.status ?? value}`).join("\n");
+    return `<div class="activity-row">${disclosureCard({ kind: "agents", icon: "⑂", title: "Delegated work", status: statusLabel(item), summary: `${item.receiverThreadIds?.length ?? 0} agent thread${item.receiverThreadIds?.length === 1 ? "" : "s"}`, detail: `${item.prompt ? `<p>${escapeHtml(item.prompt)}</p>` : ""}${agents ? `<pre>${escapeHtml(agents)}</pre>` : ""}`, open: item._live })}</div>`;
+  }
+  if (item.type === "subAgentActivity") return `<div class="timeline-divider"><span>⑂ ${escapeHtml(item.agentPath || "Agent")}</span><strong>${escapeHtml(item.kind?.type ?? item.kind ?? "activity")}</strong></div>`;
+  if (item.type === "webSearch") return `<div class="activity-row">${disclosureCard({ kind: "search", icon: "⌕", title: "Web search", status: statusLabel(item), summary: item.query ?? item.action?.query ?? "Search activity", detail: item.result ? `<p>${escapeHtml(String(item.result))}</p>` : "" })}</div>`;
+  if (item.type === "imageView") return `<div class="timeline-divider"><span>▧ Viewed image</span><strong>${escapeHtml(item.path?.split("/").pop() ?? "image")}</strong></div>`;
+  if (item.type === "sleep") return `<div class="timeline-divider"><span>◷ Waiting</span><strong>${escapeHtml(item.reason ?? item.status ?? "Codex paused")}</strong></div>`;
+  if (item.type === "imageGeneration") return `<div class="activity-row">${disclosureCard({ kind: "image-generation", icon: "▧", title: "Image generation", status: statusLabel(item), summary: item.prompt ?? "Generated image activity" })}</div>`;
+  if (item.type === "enteredReviewMode" || item.type === "exitedReviewMode") return `<div class="timeline-divider"><span>${item.type === "enteredReviewMode" ? "Entered" : "Finished"} review</span><strong>${escapeHtml(item.review)}</strong></div>`;
+  if (item.type === "contextCompaction") return '<div class="timeline-divider"><span>Context compacted</span><strong>Earlier detail remains in Thread history</strong></div>';
+  if (item.type === "hookPrompt") return `<div class="timeline-divider"><span>Project instructions</span><strong>${escapeHtml((item.fragments ?? []).map((fragment) => fragment.text ?? fragment.content ?? "").join(" ").slice(0, 120))}</strong></div>`;
+  if (item.type === "turnError") return `<section class="turn-error"><strong>${item.willRetry ? "Codex is retrying" : "This Turn stopped"}</strong><p>${escapeHtml(item.message)}</p>${item.willRetry ? '<span class="retrying">Retrying…</span>' : ""}</section>`;
+  return `<div class="activity-row">${disclosureCard({ kind: "unknown", icon: "?", title: item.type ?? "Unsupported item", status: statusLabel(item), summary: "Inspect raw app-server item; no result inferred", detail: `<pre>${escapeHtml(JSON.stringify(item, null, 2))}</pre>` })}</div>`;
 }
 
 function approvalMarkup(request) {
   const params = request.params ?? {};
   const title = request.method.includes("fileChange") ? "Approve file changes?" : request.method.includes("requestUserInput") ? "Codex needs your input" : "Approve command?";
   const detail = params.command ?? params.reason ?? params.questions?.[0]?.question ?? "This Turn is waiting for you.";
-  return `<section class="approval-card" data-request-id="${escapeHtml(request.id)}"><strong>${escapeHtml(title)}</strong><p>${escapeHtml(detail)}</p><footer>${request.method.includes("requestUserInput") ? `<button type="button" data-answer-request="${escapeHtml(request.id)}">Answer</button>` : `<button class="accept" type="button" data-request-decision="accept" data-request-id="${escapeHtml(request.id)}">Allow</button><button type="button" data-request-decision="decline" data-request-id="${escapeHtml(request.id)}">Decline</button>`}</footer></section>`;
+  const disabled = request.fixture ? " disabled title=\"Review fixture only\"" : "";
+  return `<section class="approval-card" data-request-id="${escapeHtml(request.id)}"><header><span>Needs your approval</span><em>${request.fixture ? "Review fixture" : "Turn paused"}</em></header><strong>${escapeHtml(title)}</strong><p>${escapeHtml(detail)}</p><footer>${request.method.includes("requestUserInput") ? `<button class="accept" type="button" data-answer-request="${escapeHtml(request.id)}"${disabled}>Answer Codex</button>` : `<button class="accept" type="button" data-request-decision="accept" data-request-id="${escapeHtml(request.id)}"${disabled}>Allow once</button><button type="button" data-request-decision="acceptForSession" data-request-id="${escapeHtml(request.id)}"${disabled}>Allow for session</button><button type="button" data-request-decision="decline" data-request-id="${escapeHtml(request.id)}"${disabled}>Decline</button>`}</footer></section>`;
+}
+
+const groupableActivityTypes = new Set(["commandExecution", "fileChange", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "sleep", "imageGeneration"]);
+
+function renderTimelineItems(items) {
+  const output = [];
+  let group = [];
+  const flush = () => {
+    if (!group.length) return;
+    const running = group.some((item) => item._live || ["inProgress", "running"].includes(item.status));
+    const failed = group.some((item) => ["failed", "declined", "errored"].includes(item.status));
+    const files = group.filter((item) => item.type === "fileChange").flatMap((item) => item.changes ?? []).length;
+    const label = running ? "Working…" : failed ? "Work needs attention" : "Worked on this Turn";
+    const detail = `${group.length} activit${group.length === 1 ? "y" : "ies"}${files ? ` · ${files} file${files === 1 ? "" : "s"}` : ""}`;
+    output.push(`<details class="activity-group" ${running || failed ? "open" : ""}><summary><span><i>${running ? "↻" : failed ? "!" : "✓"}</i><strong>${label}</strong></span><em>${detail}</em></summary><div>${group.map(renderItem).join("")}</div></details>`);
+    group = [];
+  };
+  for (const item of items) {
+    if (groupableActivityTypes.has(item.type) && (!group.length || group[0]._turnId === item._turnId)) group.push(item);
+    else {
+      flush();
+      if (groupableActivityTypes.has(item.type)) group.push(item);
+      else output.push(renderItem(item));
+    }
+  }
+  flush();
+  return output.join("");
 }
 
 function turnsMarkup(thread) {
   const turns = thread?.turns ?? [];
-  const items = turns.flatMap((turn) => turn.items ?? []);
+  const replay = turns.flatMap((turn) => (turn.items ?? []).map((item) => ({ ...item, _turnId: turn.id })));
+  const replayIds = new Set(replay.map((item) => item.id));
+  const live = [...state.liveItems.values()].filter((item) => !replayIds.has(item.id));
+  const errors = [...state.turnErrors.values()];
+  const items = [...replay, ...live, ...errors].slice(-240);
   const approvals = state.pendingRequests.filter((request) => request.params?.threadId === state.activeThreadId);
-  return items.map(renderItem).join("") + approvals.map(approvalMarkup).join("");
+  return renderTimelineItems(items) + approvals.map(approvalMarkup).join("");
 }
 
-function renderChat() {
-  setRouteHeader(state.activeThread ? titleForThread(state.activeThread) : "Codex", state.activeThread ? `Thread ${state.activeThread.id.slice(0, 8)}… · ${state.bootstrap?.graph.project.name}` : "Your real Threads and Turns");
+function renderChat({ preserveScroll = false } = {}) {
+  setRouteHeader(state.activeThread ? titleForThread(state.activeThread) : "Codex", state.activeThread ? `${state.fixtureMode ? "Review fixture · not runtime history" : `Thread ${state.activeThread.id.slice(0, 8)}…`} · ${state.bootstrap?.graph.project.name}` : "Your real Threads and Turns");
   if (!state.activeThread) {
     surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>What do you want to work on?</h1><p>Start with ordinary Codex Chat. VibeHub adds a durable Task only when the work needs an explicit outcome and stopping contract.</p><div class="welcome-actions"><button class="primary-button" type="button" data-new-thread>Start a chat</button><button class="secondary-button" type="button" data-route="tasks">Open Task Graph</button></div></div>`;
     return;
   }
-  surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><h1>${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}</p></header><div id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
-  requestAnimationFrame(() => { surface.scrollTop = surface.scrollHeight; });
+  const distanceFromBottom = surface.scrollHeight - surface.scrollTop - surface.clientHeight;
+  surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1>${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}</p></div><button class="thread-menu" type="button" aria-label="Thread actions" title="Thread actions">•••</button></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+  requestAnimationFrame(() => {
+    if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
+    else surface.scrollTop = Math.max(0, surface.scrollHeight - surface.clientHeight - distanceFromBottom);
+  });
 }
 
 function primaryPhase(ticket) {
@@ -450,16 +574,92 @@ async function openThread(threadId) {
   state.activeThreadId = threadId;
   state.activeThread = { ...state.threads.find((thread) => thread.id === threadId), ...data.thread };
   state.running = String(data.thread.status?.type ?? data.thread.status).toLowerCase().includes("active");
+  if (!state.running) state.liveItems.clear();
   $("#stopTurn").hidden = !state.running;
   updateSidebar();
   setRoute("chat");
 }
 
+function liveItem(itemId, fallback) {
+  if (!state.liveItems.has(itemId)) state.liveItems.set(itemId, { id: itemId, ...fallback, _live: true });
+  return state.liveItems.get(itemId);
+}
+
+function applyChatNotification(method, params) {
+  if (params.threadId !== state.activeThreadId) return false;
+  if (method === "item/started") {
+    state.liveItems.set(params.item.id, { ...params.item, _turnId: params.turnId, _live: true });
+    return true;
+  }
+  if (method === "item/completed") {
+    state.liveItems.set(params.item.id, { ...params.item, _turnId: params.turnId, _live: false });
+    return true;
+  }
+  if (method === "item/agentMessage/delta") {
+    const item = liveItem(params.itemId, { type: "agentMessage", text: "", phase: null });
+    item.text = `${item.text ?? ""}${params.delta ?? ""}`;
+    return true;
+  }
+  if (method === "item/plan/delta") {
+    const item = liveItem(params.itemId, { type: "plan", text: "" });
+    item.text = `${item.text ?? ""}${params.delta ?? ""}`;
+    return true;
+  }
+  if (method === "item/reasoning/summaryTextDelta") {
+    const item = liveItem(params.itemId, { type: "reasoning", summary: [], content: [] });
+    item.summary ??= [];
+    item.summary[params.summaryIndex ?? 0] = `${item.summary[params.summaryIndex ?? 0] ?? ""}${params.delta ?? ""}`;
+    return true;
+  }
+  if (method === "item/reasoning/textDelta") {
+    const item = liveItem(params.itemId, { type: "reasoning", summary: [], content: [] });
+    item.content ??= [];
+    item.content[params.contentIndex ?? 0] = `${item.content[params.contentIndex ?? 0] ?? ""}${params.delta ?? ""}`;
+    return true;
+  }
+  if (method === "item/commandExecution/outputDelta") {
+    const item = liveItem(params.itemId, { type: "commandExecution", command: "Command", status: "inProgress", aggregatedOutput: "" });
+    item.aggregatedOutput = `${item.aggregatedOutput ?? ""}${params.delta ?? ""}`;
+    return true;
+  }
+  if (method === "item/fileChange/patchUpdated") {
+    const item = liveItem(params.itemId, { type: "fileChange", status: "inProgress", changes: [] });
+    item.changes = params.changes ?? item.changes;
+    return true;
+  }
+  if (method === "error") {
+    state.turnErrors.set(params.turnId, { type: "turnError", id: `error-${params.turnId}`, _turnId: params.turnId, message: params.error?.message ?? params.error ?? "Codex encountered an error.", willRetry: params.willRetry });
+    return true;
+  }
+  return false;
+}
+
+function scheduleChatRender() {
+  if (state.chatRenderFrame || state.route !== "chat" || !state.activeThread) return;
+  state.chatRenderFrame = requestAnimationFrame(() => {
+    state.chatRenderFrame = 0;
+    renderChat({ preserveScroll: true });
+  });
+}
+
 async function newThread() {
-  const data = await action({ action: "newThread" });
-  state.threads.unshift(data.thread);
-  await openThread(data.thread.id);
-  $("#composerInput").focus();
+  if (state.creatingThread) return state.creatingThread;
+  state.creatingThread = (async () => {
+    $("#newThread").disabled = true;
+    const data = await action({ action: "newThread" });
+    state.threads.unshift(data.thread);
+    state.activeThreadId = data.thread.id;
+    state.activeThread = { ...data.thread, turns: [] };
+    state.running = false;
+    state.liveItems.clear();
+    state.turnErrors.clear();
+    updateSidebar();
+    setRoute("chat");
+    $("#composerInput").focus();
+    return data.thread;
+  })();
+  try { return await state.creatingThread; }
+  finally { state.creatingThread = null; $("#newThread").disabled = false; }
 }
 
 async function openTask(ticketId) {
@@ -551,9 +751,11 @@ async function pollEvents() {
     const data = await api(`/api/events?after=${state.eventCursor}`);
     state.eventCursor = data.cursor;
     state.pendingRequests = data.pendingRequests;
-    let refresh = false;
+    let refreshRequests = false;
+    let reconcile = false;
+    let rendered = false;
     for (const entry of data.events) {
-      if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refresh = true;
+      if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refreshRequests = true;
       if (entry.kind !== "notification") continue;
       const method = entry.value.method;
       const params = entry.value.params ?? {};
@@ -567,10 +769,12 @@ async function pollEvents() {
         state.running = false;
         state.currentTurnId = null;
         $("#stopTurn").hidden = true;
+        reconcile = true;
       }
-      refresh = true;
+      rendered = applyChatNotification(method, params) || rendered;
     }
-    if (refresh && state.activeThreadId) await openThread(state.activeThreadId);
+    if (reconcile && state.activeThreadId) await openThread(state.activeThreadId);
+    else if ((rendered || refreshRequests) && state.activeThreadId) scheduleChatRender();
     state.attentionPollCounter += 1;
     if (state.attentionPollCounter >= 12) {
       state.attentionPollCounter = 0;
@@ -602,6 +806,17 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-new-thread]")) { await newThread(); return; }
   const remove = event.target.closest("[data-remove-attachment]");
   if (remove) { state.attachments.splice(Number(remove.dataset.removeAttachment), 1); renderAttachments(); return; }
+  const copyMessage = event.target.closest("[data-copy-message]");
+  if (copyMessage) {
+    const itemId = copyMessage.dataset.copyMessage;
+    const replay = state.activeThread?.turns?.flatMap((turn) => turn.items ?? []).find((item) => item.id === itemId);
+    const item = replay ?? state.liveItems.get(itemId);
+    if (item?.text) {
+      await navigator.clipboard.writeText(item.text);
+      notify("Response copied.");
+    }
+    return;
+  }
   const decision = event.target.closest("[data-request-decision]");
   if (decision) {
     try { await action({ action: "resolveRequest", requestId: decision.dataset.requestId, decision: decision.dataset.requestDecision }); await openThread(state.activeThreadId); }
@@ -655,6 +870,12 @@ $("#attachmentInput").addEventListener("change", async (event) => {
 });
 $("#voiceButton").addEventListener("click", toggleRecording);
 $("#composer").addEventListener("submit", submitTurn);
+$("#composerInput").addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+    event.preventDefault();
+    $("#composer").requestSubmit();
+  }
+});
 $("#stopTurn").addEventListener("click", async () => {
   if (!state.activeThreadId || !state.currentTurnId) return;
   try { await action({ action: "interruptTurn", threadId: state.activeThreadId, turnId: state.currentTurnId }); }
@@ -700,8 +921,16 @@ document.addEventListener("keydown", (event) => {
 async function start() {
   try {
     await refreshThreads();
+    if (new URLSearchParams(location.search).get("chatFixture") === "mixed") {
+      const fixture = await fetch("/chat-fixtures.json").then((response) => response.json());
+      state.fixtureMode = true;
+      state.activeThreadId = fixture.thread.id;
+      state.activeThread = fixture.thread;
+      state.pendingRequests = fixture.pendingRequests;
+      state.running = true;
+    }
     setRoute("chat");
-    pollEvents();
+    if (!state.fixtureMode) pollEvents();
   } catch (error) {
     surface.innerHTML = `<div class="welcome"><h1>Unable to start Codex</h1><p>${escapeHtml(error.message)}</p></div>`;
     $("#runtimeLabel").textContent = "Runtime unavailable";

@@ -18,6 +18,10 @@
         "path": "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"
       },
       {
+        "blob": "46373458c37fb38874d1d57e29ff0be40c1df295",
+        "path": "docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md"
+      },
+      {
         "blob": "1b0489b896345091351e05f44b1819ab3777442d",
         "path": "docs/CODEX_NATIVE_SEARCH_ATTENTION_RESEARCH.md"
       },
@@ -178,6 +182,14 @@
         "path": "docs/proposals/codex-native-attention/interaction-contract.json"
       },
       {
+        "blob": "0c2f772fa6eba64b6d16ca29909ca7e65241dd6d",
+        "path": "docs/proposals/codex-native-chat/README.md"
+      },
+      {
+        "blob": "eb8e9a16c212389101d888955df3bcce8d9fa7ae",
+        "path": "docs/proposals/codex-native-chat/chat-ui-contract.json"
+      },
+      {
         "blob": "d1c8e663603c345a32fff971963642eb735f8190",
         "path": "docs/proposals/dsh-persistent-shell/composition-contract.json"
       },
@@ -202,8 +214,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-21T07:19:17.135Z",
-    "last_aligned_commit": "27cde5ac7b0fb7a6516d6e1821aed43a98c11ed4"
+    "checked_at": "2026-08-21T08:09:47.493Z",
+    "last_aligned_commit": "9728e953bdebf92cecf57aba846dbb77f7ab5d60"
   },
   "anchors": [
     "CHANGELOG.md",

@@ -1,0 +1,28 @@
+{
+  "acceptance_ids": [
+    "codex-chat-state-inventory-is-complete",
+    "open-source-reuse-options-are-audited",
+    "app-server-events-map-to-one-ui-contract"
+  ],
+  "evidence_id": "codex-native-chat-inventory-reuse-and-event-contract",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-21T08:08:59Z",
+  "refs": [
+    "docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md",
+    "docs/proposals/codex-native-chat/chat-ui-contract.json",
+    "docs/proposals/codex-native-chat/README.md",
+    "packages/codex-adapter/upstream-lock.json",
+    "https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md",
+    "https://github.com/assistant-ui/assistant-ui",
+    "https://github.com/yunhaoli24/codex-gateway",
+    "https://github.com/lezi-fun/codex-webui",
+    "https://github.com/vercel/chatbot",
+    "command:codex-app-server-generate-ts-json-experimental-schema-0.147.0",
+    "command:node-test-codex-first-shell-prototype-6-of-6",
+    "command:npm-run-verify-163-pass-1-expected-skip"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in first-party inventory covers Thread lifecycle, Turn lifecycle, every pinned 0.147.0 ThreadItem family, streaming deltas, approvals and user input, delegated agents, attachment/audio posture, failure/retry/reconnect, keyboard and accessibility boundaries. The executable contract pins the exact Codex package, upstream commit, and generated protocol hash; defines stable Thread/Turn/item/request identity, authoritative item completion, live-versus-replay truth, animation-frame batching, a 500-event/240-item bounded carrier, sanitization and unknown-item fallback; and keeps ordinary Chat independent of VibeHub Task protocol. The source-backed audit compares seven maintained or relevant clients, records exact license/maintenance/dependency/security/reuse boundaries, recommends a bounded MIT reducer pattern from codex-gateway plus selected MIT assistant-ui headless primitives, rejects whole-product/runtime adoption, and forbids reuse from the unlicensed candidate.",
+  "ticket_id": "ticket-research-codex-native-chat-parity"
+}
