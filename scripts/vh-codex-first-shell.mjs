@@ -1106,7 +1106,10 @@ async function startRuntime() {
       runtime.schemaProbe = probeCodexSchema({ codex: flags.codex });
     } catch (error) {
       runtime.schemaProbe = null;
-      runtime.schemaProbeError = `generate-json-schema unavailable: ${String(error.message).split("\n")[0].slice(0, 160)}`;
+      const reason = error.status !== undefined && error.status !== null
+        ? `exit ${error.status}${error.stderr ? `, ${String(error.stderr).trim().split("\n")[0].slice(0, 120)}` : ""}`
+        : String(error.message).split("\n")[0].slice(0, 120);
+      runtime.schemaProbeError = `generate-json-schema unavailable: ${reason}`;
     }
   }
   if (!gateRuntime()) runtime.state = "alive";

@@ -1297,3 +1297,68 @@ test("a pinned request the runtime does not know halts reuse at the first -32601
   child.kill("SIGTERM");
   assert.deepEqual(await shutdown, [0, null]);
 });
+
+test("lifecycle recovery keeps Codex as the only transcript store and the explicit import as the only repository write", async () => {
+  const [host, script, model, guard, windowSource, client, stopConditions, fixtureSource, lockText] = await Promise.all([
+    source("scripts/vh-codex-first-shell.mjs"),
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/chat-model.mjs"),
+    source("apps/codex-first-shell/browser-interaction-guard.mjs"),
+    source("apps/codex-first-shell/event-window.mjs"),
+    source("packages/codex-adapter/client.mjs"),
+    source("packages/codex-adapter/stop-conditions.mjs"),
+    source("test/fixtures/codex-app-server-fixture.mjs"),
+    source("packages/codex-adapter/upstream-lock.json"),
+  ]);
+  const lock = JSON.parse(lockText);
+  // No browser store, no host database, no second transcript anywhere on the
+  // recovery path; the fixture's persistence stands in for Codex rollouts
+  // and lives in the test double only.
+  assert.doesNotMatch(host + script + model + guard + windowSource + client + stopConditions, /localStorage|sessionStorage|indexedDB|sqlite|better-sqlite|openDatabase|caches\.open|leveldb|levelup/i);
+  assert.doesNotMatch(host, /writeFile|appendFile|createWriteStream|mkdir\(|renameSync|rmSync|unlink/);
+  assert.deepEqual([...host.matchAll(/writeDocument\((.*)\);/g)].map((match) => match[1]), ["join(repoRoot, BINDING_FILE), document"], "the binding record is the only document the host writes");
+  assert.equal([...host.matchAll(/initProject\(/g)].length, 1, "the scaffold is written once, by the explicit import");
+  const explicit = host.match(/explicitImportOnly: Object\.freeze\(\[([^\]]+)\]\)/)[1].match(/"[^"]+"/g).map((entry) => JSON.parse(entry));
+  assert.deepEqual(explicit, REPOSITORY_WRITES.explicitImportOnly, "the declared write list is exactly package D's explicit import");
+  assert.match(fixtureSource, /CODEX_FIXTURE_STATE/, "persistence across a kill is the fixture standing in for Codex, never the host");
+  assert.doesNotMatch(host, /CODEX_FIXTURE/);
+  // The restart path is host plus adapter client: the shared harness shell
+  // stays booted (router close is permanent) and only the process respawns.
+  const restartSource = host.slice(host.indexOf("async function restartRuntime"), host.indexOf("async function readAccount"));
+  assert.match(restartSource, /client\.start\(\)/);
+  assert.match(restartSource, /recoverKnownThreads\(\)/);
+  assert.match(restartSource, /gateRuntime\(\)/);
+  assert.match(restartSource, /appendEvent\("runtimeRestarted"/);
+  assert.doesNotMatch(restartSource, /harness\.close|harness\.boot/);
+  assert.match(host, /const RESTART_BACKOFF_MS = Object\.freeze\(parseBackoff\(process\.env\.VIBEHUB_CODEX_RESTART_BACKOFF_MS, \[500, 2000, 5000\]\)\)/);
+  assert.match(host, /resolution: "runtime_exited"/);
+  assert.match(host, /request\.runtimeGeneration !== runtime\.generation/, "a request from an exited generation can never be answered");
+  assert.match(client, /this\.generation = generation;/);
+  assert.match(client, /emit\("methodMissing"/);
+  // Every pinned stop condition is evaluated by the adapter module and the
+  // host halts on the first violation with one visible 409.
+  for (const id of lock.stopConditions) assert.ok(stopConditions.includes(`"${id}"`), `${id} is evaluated`);
+  assert.match(stopConditions, /export function firstViolation/);
+  for (const seam of ["firstViolation(", "haltRuntime(", "gateRuntime()", "\"runtime_halted\"", "\"runtime_restarting\"", "appendEvent(\"runtimeHalted\"", "probeCodexSchema({ codex: flags.codex })", "state: runtime.state,"]) assert.ok(host.includes(seam), seam);
+  assert.match(host, /if \(!ADAPTER_FREE_ACTIONS\.has\(payload\.action\)\) requireRuntime\(\);/);
+  assert.match(host, /const ADAPTER_FREE_ACTIONS = new Set\(\["readTask"\]\);/);
+  assert.match(windowSource, /runtimeState: runtime\.state/);
+  assert.match(windowSource, /runtimeHalt: runtime\.halt/);
+  // Browser: liveness comes from thread/read alone; a runtime exit drops the
+  // running posture, a restart re-reads, a halt raises the persistent stop,
+  // and nothing claims to reconnect on its own.
+  assert.doesNotMatch(script, /Runtime reconnecting/);
+  for (const seam of ["function markRuntimeExited", "function applyRuntimeHalt", "entry.kind === \"runtimeRestarted\"", "entry.kind === \"runtimeHalted\"", "data.runtimeHalt", "state: \"unreachable\"", "banner.dataset.conditionId", "status !== \"runtimeExited\"", "state.running && item._turnId === state.currentTurnId"]) assert.ok(script.includes(seam), seam);
+  assert.match(script, /const runtimeActive = state\.runtimeAlive && !state\.bootstrap\?\.stop &&/, "the sidebar presence dot needs a live runtime");
+  assert.match(model, /method === "runtime\/exited"/);
+  assert.match(model, /status: "runtimeExited"/);
+  assert.match(script, /Runtime exited during this Turn/);
+  for (const name of ["runtime exit clears the running posture and marks the dead Turn", "runtime halt raises a persistent stop that names the condition and disables adapter actions", "restoring the runtime posture withdraws the stop"]) assert.match(guard, new RegExp(`check\\(results, "${name}"`), name);
+  // Reload recovery: the URL names the Thread and Task; both land through the
+  // host projections that re-derive identity and linkage from Codex.
+  assert.match(script, /const requestedThreadId = params\.get\("thread"\)/);
+  assert.match(script, /const requestedTicketId = params\.get\("task"\)/);
+  assert.match(host, /function taskLinkFromThread\(thread\)/);
+  assert.match(host, /VibeHub Task · \(ticket-\[a-z0-9-\]\+\)/);
+  assert.doesNotMatch(host, /createFileAssociationStore|createMemoryAssociationStore/, "linkage is re-derived from the Codex Thread name; no association store shadows it");
+});
