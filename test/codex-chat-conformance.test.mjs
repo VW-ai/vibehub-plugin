@@ -131,6 +131,42 @@ test("pure rich renderer escapes Markdown and visibly bounds malformed code", ()
   assert.match(html, /tabindex="0" aria-label="Code block"/);
 });
 
+test("escape-first Markdown renders nested lists, nested quotes and line-start fences as structure", () => {
+  assert.equal(renderMarkdown("1. one\n   - a\n     - deep\n   - b\n2. two\n\n3. three"), "<ol><li>one<ul><li>a<ul><li>deep</li></ul></li><li>b</li></ul></li><li>two</li><li>three</li></ol>");
+  const quote = renderMarkdown("> quoted **line**\n> - item\n> ```\n> code <b>\n> ```\n> > nested");
+  assert.match(quote, /^<blockquote><p>quoted <strong>line<\/strong><\/p><ul><li>item<\/li><\/ul><div class="code-block">/);
+  assert.match(quote, /<code>code &lt;b&gt;<\/code>/);
+  assert.match(quote, /<blockquote><p>nested<\/p><\/blockquote><\/blockquote>$/);
+  assert.equal(renderMarkdown("use ```inline``` here\nnext"), "<p>use <code>inline</code> here<br>next</p>");
+  assert.equal(renderMarkdown("3. c\n4. d"), '<ol start="3"><li>c</li><li>d</li></ol>');
+  assert.equal(renderMarkdown("# T #\n###### deep\n#nothash\n***\n- - -"), "<h2>T</h2><h4>deep</h4><p>#nothash</p><hr><hr>");
+  assert.equal(renderMarkdown("- a\r\n\t- b\r\nend"), "<ul><li>a<ul><li>b</li></ul></li></ul><p>end</p>");
+  assert.equal(renderMarkdown("~~~~\ncode\n~~~\nstill\n~~~~\nafter"), '<div class="code-block"><button type="button" data-copy-code="0" aria-label="Copy code block 1">Copy</button><pre tabindex="0" aria-label="Code block"><code>code\n~~~\nstill</code></pre></div><p>after</p>');
+});
+
+test("malformed Markdown stays literal, escaped, bounded and linear", () => {
+  const unclosed = renderMarkdown("before\n```js\nconst x = 1;\n<script>alert(1)</script>");
+  assert.match(unclosed, /^<p>before<\/p><div class="code-block"><span>js<\/span>/);
+  assert.match(unclosed, /&lt;script&gt;alert\(1\)&lt;\/script&gt;<\/code>/);
+  assert.doesNotMatch(unclosed, /<script>/);
+  assert.equal(renderMarkdown("**unclosed *and `code **bold** <b>` and a_b_c and *em* and ~~gone~~"), "<p>**unclosed *and <code>code **bold** &lt;b&gt;</code> and a_b_c and <em>em</em> and <del>gone</del></p>");
+  const links = renderMarkdown("[a_b](https://e.com/a_b_c?x=1&y=2) [js](javascript:alert(1)) [x](https://e.com/\"onmouseover=\"1)");
+  assert.match(links, /<a href="https:\/\/e\.com\/a_b_c\?x=1&amp;y=2" target="_blank" rel="noreferrer noopener">a_b<\/a>/);
+  assert.doesNotMatch(links, /href="javascript:/);
+  assert.doesNotMatch(links, /[^&]"onmouseover/);
+  assert.equal(renderMarkdown("<img src=x onerror=alert(1)>\n<!-- c -->"), "<p>&lt;img src=x onerror=alert(1)&gt;<br>&lt;!-- c --&gt;</p>");
+  const bomb = renderMarkdown(`${">".repeat(40)} x`);
+  assert.equal((bomb.match(/<blockquote>/g) ?? []).length, 9, "nesting depth is capped and the remainder stays literal");
+  assert.match(bomb, /&gt;&gt;[^<]* x<\/p>/);
+  const started = performance.now();
+  for (const input of ["**a ".repeat(8_000), "*a".repeat(16_000), "`a".repeat(16_000), "[a](https://x".repeat(2_000), "- ".repeat(16_000), "> ".repeat(16_000), "1. ".repeat(10_000)]) {
+    const html = renderMarkdown(input);
+    assert.doesNotMatch(html, /[\uE000\uE001]/, "inline tokens never leak");
+    assert.ok(html.length < 400_000, `bounded output for ${input.slice(0, 8)}…, received ${html.length}`);
+  }
+  assert.ok(performance.now() - started < 1_000, "adversarial inputs stay linear");
+});
+
 test("media, generated images, tool images and unknown rich results have truthful fallbacks", () => {
   const image = "data:image/png;base64,AA==";
   assert.match(renderUserMedia([{ type: "image", url: image }]), /<img/);

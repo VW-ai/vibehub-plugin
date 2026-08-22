@@ -38,51 +38,156 @@ function omissionMarkup(omitted, noun = "characters") {
   return omitted ? `<p class="truncation-note" role="note">${omitted.toLocaleString()} ${noun} omitted from this mounted view. Durable Thread history remains authoritative.</p>` : "";
 }
 
+const INLINE_TOKEN_OPEN = "\uE000";
+const INLINE_TOKEN_CLOSE = "\uE001";
+const MAX_BLOCK_DEPTH = 8;
+const FENCE_OPEN = /^ {0,3}(?:(`{3,})[ \t]*([^`]*)|(~{3,})[ \t]*(.*))$/;
+const FENCE_CLOSE = /^ {0,3}(`{3,}|~{3,})[ \t]*$/;
+const HEADING = /^ {0,3}(#{1,6})(?:[ \t]+(.*?))?(?:[ \t]+#+)?[ \t]*$/;
+const RULE = /^ {0,3}(?:(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})$/;
+const QUOTE = /^ {0,3}> ?(.*)$/;
+const LIST_ITEM = /^( {0,3})([-*+]|\d{1,9}[.)])([ \t]+|$)(.*)$/;
+
+// Inline rules never cross a delimiter of their own kind, so each attempt is
+// bounded by the distance to the next delimiter and malformed input stays linear.
+function emphasis(text) {
+  return text
+    .replace(/\*\*(?=\S)((?:[^*\n]|\*(?!\*))*?\S)\*\*/g, "<strong>$1</strong>")
+    .replace(/__(?=\S)((?:[^_\n]|_(?!_))*?\S)__/g, "<strong>$1</strong>")
+    .replace(/(^|[^\w*])\*(?=[^\s*])([^*\n]*?[^\s*])\*(?![\w*])/g, "$1<em>$2</em>")
+    .replace(/(^|[^\w_])_(?=[^\s_])([^_\n]*?[^\s_])_(?![\w_])/g, "$1<em>$2</em>")
+    .replace(/~~(?=\S)((?:[^~\n]|~(?!~))*?\S)~~/g, "<del>$1</del>");
+}
+
+function restoreTokens(text, tokens) {
+  let output = text;
+  for (let pass = 0; pass < 4 && output.includes(INLINE_TOKEN_OPEN); pass += 1) {
+    output = output.replace(/\uE000(\d+)\uE001/g, (_, index) => tokens[Number(index)] ?? "");
+  }
+  return output.replace(/[\uE000\uE001]/g, "");
+}
+
+// Escape first; then code spans and links become opaque tokens so emphasis
+// rules can neither rewrite code nor mangle an href.
 function inlineMarkdown(value) {
-  return escapeHtml(value)
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
+  const tokens = [];
+  const hold = (html) => { tokens.push(html); return `${INLINE_TOKEN_OPEN}${tokens.length - 1}${INLINE_TOKEN_CLOSE}`; };
+  const escaped = escapeHtml(String(value ?? "").replace(/[\uE000\uE001]/g, ""));
+  const withCode = escaped.replace(/(`+)(?!`)([^`][^\n]*?[^`]|[^`])\1(?!`)/g, (_, _fence, code) => hold(`<code>${code}</code>`));
+  const withLinks = withCode.replace(/\[([^\]\n]{1,400})\]\((https?:\/\/[^\s)<>]{1,2000})\)/g, (_, label, href) => hold(`<a href="${href}" target="_blank" rel="noreferrer noopener">${restoreTokens(emphasis(label), tokens)}</a>`));
+  return restoreTokens(emphasis(withLinks), tokens);
+}
+
+function leadingSpaces(line) {
+  return line.match(/^ */)[0].length;
+}
+
+function startsBlock(line) {
+  return FENCE_OPEN.test(line) || HEADING.test(line) || RULE.test(line) || QUOTE.test(line) || LIST_ITEM.test(line);
+}
+
+function codeBlockMarkup(body, language, budget, context) {
+  const code = takeText(budget, body, DOM_LIMITS.codeCharacters);
+  const label = language ? `<span>${escapeHtml(language.slice(0, 48))}</span>` : "";
+  const identity = context.codeIndex++;
+  return `<div class="code-block">${label}<button type="button" data-copy-code="${identity}" aria-label="Copy code block ${identity + 1}">Copy</button><pre tabindex="0" aria-label="Code block"><code>${escapeHtml(code.text)}</code></pre>${omissionMarkup(code.omitted)}</div>`;
+}
+
+// A fence only opens at line start; it closes at a line-start fence of the same
+// character and at least the same length. An unclosed fence (common mid-stream)
+// stays code until the end of the bounded text.
+function parseFence(lines, start, open, budget, context) {
+  const marker = open[1] ?? open[3];
+  const info = (open[1] ? open[2] : open[4]) ?? "";
+  const body = [];
+  let index = start + 1;
+  while (index < lines.length) {
+    const close = FENCE_CLOSE.exec(lines[index]);
+    if (close && close[1][0] === marker[0] && close[1].length >= marker.length) { index += 1; break; }
+    body.push(lines[index]);
+    index += 1;
+  }
+  return { html: codeBlockMarkup(body.join("\n"), info.trim().split(/\s+/)[0] ?? "", budget, context), next: index };
+}
+
+function parseQuote(lines, start, budget, depth, context) {
+  const inner = [];
+  let index = start;
+  while (index < lines.length) {
+    const match = QUOTE.exec(lines[index]);
+    if (!match) break;
+    inner.push(match[1]);
+    index += 1;
+  }
+  return { html: `<blockquote>${renderBlocks(inner, budget, depth + 1, context)}</blockquote>`, next: index };
+}
+
+function listKind(match) {
+  const ordered = /\d/.test(match[2][0]);
+  return { ordered, kind: ordered ? match[2].at(-1) : match[2] };
+}
+
+// Items of one list share a marker kind; lines indented to the item's content
+// column belong to the item and are parsed recursively, so nested lists,
+// quotes and fences inside items render as structure instead of literal text.
+function parseList(lines, start, first, budget, depth, context) {
+  const { ordered, kind } = listKind(first);
+  const items = [];
+  let index = start;
+  while (index < lines.length) {
+    let probe = index;
+    while (probe < lines.length && !lines[probe].trim()) probe += 1;
+    const match = probe < lines.length ? LIST_ITEM.exec(lines[probe]) : null;
+    if (!match || RULE.test(lines[probe])) break;
+    const candidate = listKind(match);
+    if (candidate.ordered !== ordered || candidate.kind !== kind) break;
+    index = probe + 1;
+    const contentIndent = match[1].length + match[2].length + Math.max(1, Math.min(4, match[3].length));
+    const body = [match[4]];
+    while (index < lines.length) {
+      const line = lines[index];
+      if (!line.trim()) {
+        let next = index;
+        while (next < lines.length && !lines[next].trim()) next += 1;
+        if (next < lines.length && leadingSpaces(lines[next]) >= contentIndent) { body.push(""); index = next; continue; }
+        break;
+      }
+      if (leadingSpaces(line) >= contentIndent) { body.push(line.slice(contentIndent)); index += 1; continue; }
+      break;
+    }
+    items.push(`<li>${renderBlocks(body, budget, depth + 1, context).replace(/^<p>([\s\S]*?)<\/p>/, "$1")}</li>`);
+  }
+  const startNumber = ordered ? Number.parseInt(first[2], 10) : 1;
+  const tag = ordered ? "ol" : "ul";
+  return { html: `<${tag}${ordered && startNumber !== 1 ? ` start="${startNumber}"` : ""}>${items.join("")}</${tag}>`, next: index };
+}
+
+function renderBlocks(lines, budget, depth, context) {
+  if (depth > MAX_BLOCK_DEPTH) return lines.filter((line) => line.trim()).map((line) => `<p>${inlineMarkdown(line.trim())}</p>`).join("");
+  const blocks = [];
+  let index = 0;
+  while (index < lines.length) {
+    const line = lines[index];
+    if (!line.trim()) { index += 1; continue; }
+    const fence = FENCE_OPEN.exec(line);
+    if (fence) { const result = parseFence(lines, index, fence, budget, context); blocks.push(result.html); index = result.next; continue; }
+    const heading = HEADING.exec(line);
+    if (heading) { const level = Math.min(4, heading[1].length + 1); blocks.push(`<h${level}>${inlineMarkdown(heading[2] ?? "")}</h${level}>`); index += 1; continue; }
+    if (RULE.test(line)) { blocks.push("<hr>"); index += 1; continue; }
+    if (QUOTE.test(line)) { const result = parseQuote(lines, index, budget, depth, context); blocks.push(result.html); index = result.next; continue; }
+    const item = LIST_ITEM.exec(line);
+    if (item) { const result = parseList(lines, index, item, budget, depth, context); blocks.push(result.html); index = result.next; continue; }
+    const paragraph = [];
+    while (index < lines.length && lines[index].trim() && (!paragraph.length || !startsBlock(lines[index]))) { paragraph.push(lines[index].trim()); index += 1; }
+    blocks.push(`<p>${paragraph.map(inlineMarkdown).join("<br>")}</p>`);
+  }
+  return blocks.join("");
 }
 
 export function renderMarkdown(value, budget = createRenderBudget(), maximum = DOM_LIMITS.itemTextCharacters) {
   const bounded = takeText(budget, value, maximum);
-  const chunks = bounded.text.split(/```/);
-  let codeIndex = 0;
-  const markup = chunks.map((chunk, index) => {
-    if (index % 2) {
-      const [language, ...lines] = chunk.replace(/^\n/, "").split("\n");
-      const body = lines.length ? lines.join("\n") : language;
-      const code = takeText(budget, body, DOM_LIMITS.codeCharacters);
-      const label = lines.length && language.trim() ? `<span>${escapeHtml(language.trim().slice(0, 48))}</span>` : "";
-      const identity = codeIndex++;
-      return `<div class="code-block">${label}<button type="button" data-copy-code="${identity}" aria-label="Copy code block ${identity + 1}">Copy</button><pre tabindex="0" aria-label="Code block"><code>${escapeHtml(code.text)}</code></pre>${omissionMarkup(code.omitted)}</div>`;
-    }
-    const blocks = [];
-    let list = [];
-    let listType = "ul";
-    const flushList = () => {
-      if (!list.length) return;
-      blocks.push(`<${listType}>${list.map((line) => `<li>${inlineMarkdown(line)}</li>`).join("")}</${listType}>`);
-      list = [];
-      listType = "ul";
-    };
-    for (const line of chunk.split("\n")) {
-      if (/^[-*] /.test(line)) { if (list.length && listType !== "ul") flushList(); listType = "ul"; list.push(line.slice(2)); continue; }
-      const ordered = line.match(/^\d+\.\s+(.+)/);
-      if (ordered) { if (list.length && listType !== "ol") flushList(); listType = "ol"; list.push(ordered[1]); continue; }
-      flushList();
-      if (!line.trim()) continue;
-      const heading = line.match(/^(#{1,3})\s+(.+)/);
-      if (heading) blocks.push(`<h${Math.min(4, heading[1].length + 1)}>${inlineMarkdown(heading[2])}</h${Math.min(4, heading[1].length + 1)}>`);
-      else if (/^>\s?/.test(line)) blocks.push(`<blockquote>${inlineMarkdown(line.replace(/^>\s?/, ""))}</blockquote>`);
-      else if (/^---+$/.test(line.trim())) blocks.push("<hr>");
-      else blocks.push(`<p>${inlineMarkdown(line)}</p>`);
-    }
-    flushList();
-    return blocks.join("");
-  }).join("");
-  return `${markup}${omissionMarkup(bounded.omitted)}`;
+  const lines = bounded.text.replace(/\r\n?/g, "\n").split("\n").map((line) => line.replace(/^\t+/, (tabs) => "    ".repeat(tabs.length)));
+  return `${renderBlocks(lines, budget, 0, { codeIndex: 0 })}${omissionMarkup(bounded.omitted)}`;
 }
 
 function imageSource(entry) {
