@@ -8,6 +8,7 @@ import {
   renderMarkdown,
   renderToolContent,
   renderUserMedia,
+  renderUserMessageText,
   takeText,
 } from "./chat-renderer.mjs";
 import { requestDescriptor } from "./server-request-registry.mjs";
@@ -15,6 +16,7 @@ import { loadThreadDraft, saveThreadDraft } from "./composer-drafts.mjs";
 import { clampComposerHeight, composerBounds } from "./composer-sizing.mjs";
 import { threadLocation } from "./thread-location.mjs";
 import { answersFromDraft, applyRequestDraft, loadRequestDraft, pruneRequestDrafts, requestDraftFromForm, saveRequestDraft } from "./request-drafts.mjs";
+import { composeQuotedMessage } from "./quote-source.mjs";
 
 const state = {
   route: "chat",
@@ -477,11 +479,11 @@ function renderItem(item, budget) {
       const message = handoff.conversation?.humanMessage;
       const contextCount = handoff.context?.items?.length ?? 0;
       const media = renderUserMedia(item.content, budget);
-      if (message) return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article><div>${renderMarkdown(message, budget)}</div>${media}<small class="task-message-context">${contextCount} Context item${contextCount === 1 ? "" : "s"} · host-owned packet</small></article></div>`;
+      if (message) return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article><div>${renderUserMessageText(message, budget, { currentThreadId: item._threadId })}</div>${media}<small class="task-message-context">${contextCount} Context item${contextCount === 1 ? "" : "s"} · host-owned packet</small></article></div>`;
       return `<div class="turn user"><article class="item-card handoff task-packet"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.task?.nextAction?.action ?? handoff.task?.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.task?.ticketId))}</strong><br>${escapeHtml(takeText(budget, handoff.task?.outcome, 8_000).text)}</p><small>${contextCount} Context item${contextCount === 1 ? "" : "s"} · ${escapeHtml(handoff.project?.scope ?? "standalone")} · host-owned packet</small></article></div>`;
     }
     const media = renderUserMedia(item.content, budget);
-    return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article>${text ? `<div>${renderMarkdown(text, budget)}</div>` : ""}${media}</article></div>`;
+    return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article>${text ? `<div>${renderUserMessageText(text, budget, { currentThreadId: item._threadId })}</div>` : ""}${media}</article></div>`;
   }
   if (item.type === "agentMessage") return renderAgentMessage(item, budget);
   if (item.type === "reasoning") {
@@ -1044,11 +1046,6 @@ function setComposerQuote({ text, itemKey: sourceKey }) {
   notify("Quote added to your next message.");
 }
 
-function quotePrefix(quote) {
-  if (!quote) return "";
-  return `${quote.text.split("\n").map((line) => `> ${line}`).join("\n")}\n\n`;
-}
-
 function autoSizeComposer() {
   const textarea = $("#composerInput");
   const bounds = composerBounds(getComputedStyle(textarea));
@@ -1156,7 +1153,7 @@ async function submitTurn(event) {
   const textarea = $("#composerInput");
   const text = textarea.value.trim();
   if (!text && !state.attachments.length && !state.composerQuote) return;
-  const composedText = `${quotePrefix(state.composerQuote)}${text}`.trim();
+  const composedText = composeQuotedMessage(state.composerQuote, text);
   try {
     if (state.route === "task") {
       if (!state.activeTicketId || !state.activeThreadId) return notify("Start this Task before sending a message.");

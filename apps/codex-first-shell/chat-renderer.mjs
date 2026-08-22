@@ -1,3 +1,5 @@
+import { parseQuotedMessage } from "./quote-source.mjs";
+
 export const DOM_LIMITS = Object.freeze({
   timelineTextCharacters: 180_000,
   timelineMediaCharacters: 6_000_000,
@@ -188,6 +190,21 @@ export function renderMarkdown(value, budget = createRenderBudget(), maximum = D
   const bounded = takeText(budget, value, maximum);
   const lines = bounded.text.replace(/\r\n?/g, "\n").split("\n").map((line) => line.replace(/^\t+/, (tabs) => "    ".repeat(tabs.length)));
   return `${renderBlocks(lines, budget, 0, { codeIndex: 0 })}${omissionMarkup(bounded.omitted)}`;
+}
+
+export function renderQuoteSource(source, currentThreadId = null) {
+  if (!source) return "";
+  const identity = `Thread ${source.threadId} · Turn ${source.turnId} · Item ${source.itemId}`;
+  const where = source.threadId === currentThreadId ? "this Thread" : "another Thread";
+  return `<small class="quote-source" data-quote-thread="${escapeHtml(source.threadId)}" data-quote-turn="${escapeHtml(source.turnId)}" data-quote-item="${escapeHtml(source.itemId)}" title="${escapeHtml(identity)}" aria-label="Quoted from ${escapeHtml(identity)}">Quoted from a Codex Turn in ${where}</small>`;
+}
+
+// Human messages replayed from Thread history render their serialized quote
+// source as an identity chip between the quoted block and the message body.
+export function renderUserMessageText(text, budget = createRenderBudget(), { currentThreadId = null } = {}) {
+  const { quoted, source, body } = parseQuotedMessage(text);
+  if (!source) return renderMarkdown(text, budget);
+  return `${renderMarkdown(quoted, budget)}${renderQuoteSource(source, currentThreadId)}${renderMarkdown(body, budget)}`;
 }
 
 function imageSource(entry) {

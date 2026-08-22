@@ -13,10 +13,12 @@ import {
   renderMemoryCitations,
   renderToolContent,
   renderUserMedia,
+  renderUserMessageText,
 } from "../apps/codex-first-shell/chat-renderer.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
 import { threadLocation } from "../apps/codex-first-shell/thread-location.mjs";
 import { answersFromDraft, loadRequestDraft, MAX_REQUEST_DRAFTS, pruneRequestDrafts, saveRequestDraft } from "../apps/codex-first-shell/request-drafts.mjs";
+import { composeQuotedMessage, parseQuotedMessage } from "../apps/codex-first-shell/quote-source.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -320,6 +322,30 @@ test("request-user-input drafts survive route changes and resolve to exact answe
   assert.match(script, /state\.requestDrafts\.delete\(requestId\)/);
   assert.equal((script.match(/pruneRequestDrafts\(state\.requestDrafts, state\.knownRequestIds\)/g) ?? []).length, 2, "bootstrap and polling both prune resolved requests");
   assert.match(host, /\["\/request-drafts\.mjs", script\("request-drafts\.mjs"\)\]/);
+});
+
+test("quote source identity serializes into the Turn input and renders from replayed Thread history", async () => {
+  const quote = { text: "first line\nsecond <b>", threadId: "thread-a", turnId: "turn-1", itemId: "agent-7" };
+  const composed = composeQuotedMessage(quote, "my question");
+  assert.equal(composed, "> first line\n> second <b>\n> — Quoted from Codex thread thread-a · turn turn-1 · item agent-7\n\nmy question");
+  const parsed = parseQuotedMessage(composed);
+  assert.deepEqual(parsed, { quoted: "> first line\n> second <b>", source: { threadId: "thread-a", turnId: "turn-1", itemId: "agent-7" }, body: "my question" });
+  assert.equal(parseQuotedMessage("plain").source, null);
+  assert.equal(parseQuotedMessage("not a quote\n> — Quoted from Codex thread a · turn b · item c").source, null, "a source line must close a leading quote block");
+  assert.equal(composeQuotedMessage(null, "  text  "), "text");
+  assert.equal(composeQuotedMessage({ text: "x" }, ""), "> x", "a quote without identity still quotes");
+  const html = renderUserMessageText(composed, createRenderBudget(), { currentThreadId: "thread-a" });
+  assert.equal(html, '<blockquote><p>first line<br>second &lt;b&gt;</p></blockquote><small class="quote-source" data-quote-thread="thread-a" data-quote-turn="turn-1" data-quote-item="agent-7" title="Thread thread-a · Turn turn-1 · Item agent-7" aria-label="Quoted from Thread thread-a · Turn turn-1 · Item agent-7">Quoted from a Codex Turn in this Thread</small><p>my question</p>');
+  assert.match(renderUserMessageText(composed, createRenderBudget(), { currentThreadId: "other" }), /in another Thread/);
+  const hostile = renderUserMessageText("> — Quoted from Codex thread <img onerror=x> · turn b · item c", createRenderBudget());
+  assert.doesNotMatch(hostile, /<img/);
+  assert.doesNotMatch(renderUserMessageText(composeQuotedMessage({ ...quote, threadId: '"><script>' }, "x"), createRenderBudget()), /<script>/);
+  const [script, host] = await Promise.all([source("apps/codex-first-shell/app.js"), source("scripts/vh-codex-first-shell.mjs")]);
+  assert.match(script, /const composedText = composeQuotedMessage\(state\.composerQuote, text\);/);
+  assert.equal((script.match(/renderUserMessageText\((?:text|message), budget, \{ currentThreadId: item\._threadId \}\)/g) ?? []).length, 2, "ordinary and Task human messages both render replayed quote identity");
+  assert.doesNotMatch(script, /function quotePrefix/);
+  assert.match(host, /\["\/quote-source\.mjs", script\("quote-source\.mjs"\)\]/);
+  assert.doesNotMatch(script + host, /localStorage|sessionStorage|indexedDB/i);
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {

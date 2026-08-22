@@ -181,6 +181,8 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .agent-response a { color: var(--accent); text-decoration: none; }
 .agent-response a:hover { text-decoration: underline; }
 .agent-response code, .turn.user code { padding: 2px 4px; border-radius: 5px; background: var(--code); font: .9em/1.4 var(--mono); }
+.turn.user blockquote { margin: 0 0 6px; padding: 2px 0 2px 10px; border-left: 2px solid var(--line-strong); color: var(--muted); }
+.turn.user .quote-source { display: block; margin: 0 0 8px; color: var(--faint); font-size: 9px; }
 .message-actions { display: flex; gap: 4px; min-height: 27px; margin: 5px 0 0 -7px; opacity: 0; transition: opacity 120ms ease; }
 .turn.assistant:hover .message-actions, .turn.assistant:focus-within .message-actions { opacity: 1; }
 .message-actions button { height: 27px; padding: 0 7px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; font-size: 10px; }
