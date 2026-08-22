@@ -390,6 +390,9 @@ function projectGraph(repository, queryOptions = {}) {
       outcome: ticket.outcome,
       archived: ticketArchived(repository, ticket),
       deliveries: ticket.deliveries ?? [],
+      // Canonical birth provenance, verbatim from the checked-in Ticket and
+      // read-only here: null when the Ticket was not born from a harness Turn.
+      origin: ticket.origin ?? null,
       provenanceRefs: ticket.provenance_refs,
       relationCounts: counts.get(ticket.ticket_id),
       capabilities: {
@@ -546,6 +549,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
     contextRefs: ticket.context_refs,
     relations: ticket.relations,
     provenanceRefs: ticket.provenance_refs,
+    origin: ticket.origin ?? null,
     source: source.agentPayload,
     reviewInputs: {
       ticketRef: `.vibehub/tickets/${ticket.ticket_id}.yaml`,
@@ -579,6 +583,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
         && candidate.dependentTicketId === ticket.ticket_id)?.relationRef,
     })),
     provenanceRefs: ticket.provenance_refs.map((ref) => typedReference(source, ref)),
+    origin: ticket.origin ?? null,
     agentPayload,
   };
 }
