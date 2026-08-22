@@ -63,12 +63,16 @@ const TICKET_ORIGIN_KEYS = new Set([
   "captured_at",
 ]);
 
-class VibeHubError extends Error {
+export class VibeHubError extends Error {
   constructor(code, message, details = null) {
     super(message);
     this.code = code;
     this.details = details;
   }
+}
+
+function validRoomPath(room) {
+  return typeof room === "string" && room !== "" && room.split("/").every((segment) => ID.test(segment));
 }
 
 function parseArgs(argv) {
@@ -100,7 +104,7 @@ function parseArgs(argv) {
       "Usage: vh.mjs <context|room|ticket|project> <operation> --repo <path> [--input <json>] [--scope <current|all>] [--delivery <canonical-ref>] [--room <path>]...",
     );
   }
-  if (room !== null && (room === "" || !room.split("/").every((segment) => ID.test(segment)))) {
+  if (room !== null && !validRoomPath(room)) {
     throw new VibeHubError("invalid_argument", "--room needs a slash-separated path of kebab-case room slugs");
   }
   return {
@@ -489,7 +493,7 @@ function validateTicketOrigin(errors, origin, path) {
   }
 }
 
-function validateTicket(document, path = "ticket") {
+export function validateTicket(document, path = "ticket") {
   const errors = [];
   if (
     !strictKeys(
@@ -985,6 +989,15 @@ function contextOperation(operation, repo, input, options = {}) {
   throw new VibeHubError("unsupported_operation", `Unsupported context operation: ${operation}`);
 }
 
+// Host entry to `context put`: the same validation, Room check, and atomic
+// write the CLI performs, so a bridge write can never bypass the gate.
+export function putContext({ repo, room, context }) {
+  if (room !== undefined && room !== null && !validRoomPath(room)) {
+    throw new VibeHubError("invalid_argument", "room needs a slash-separated path of kebab-case room slugs");
+  }
+  return contextOperation("put", resolve(repo), context, { room: room ?? null });
+}
+
 export function ticketStatus(repository, ticket) {
   const outcome = repository.outcomes.documents.get(ticket.ticket_id)?.document;
   if (outcome?.status === "successful") return "DONE";
@@ -1255,47 +1268,89 @@ export function projectTicketQuery(repository, options = {}) {
   return { filters, tickets, relations, stubs };
 }
 
-function ticketOperation(operation, repo, input, options = {}) {
-  if (operation === "apply") {
-    assertCurrentProjectFormat(repo);
-    if (!Array.isArray(input.tickets) || input.tickets.length === 0) {
-      throw new VibeHubError("invalid_input", "ticket apply needs a non-empty tickets array");
-    }
-    const errors = input.tickets.flatMap((ticket, index) => validateTicket(ticket, `tickets[${index}]`));
-    const ids = new Set();
-    for (const ticket of input.tickets) {
-      if (ids.has(ticket.ticket_id)) add(errors, "tickets", `duplicate candidate Ticket: ${ticket.ticket_id}`);
-      ids.add(ticket.ticket_id);
-    }
-    assertValid(errors, "Ticket candidate is invalid");
-    const currentRepository = loadRepository(repo);
-    assertValid(currentRepository.errors);
-    const repository = loadRepository(repo, { tickets: input.tickets });
-    assertValid(repository.errors);
-    const advice = candidateDependencyAdvice(currentRepository, repository, input.tickets);
-    const written = [];
-    for (const ticket of input.tickets) {
-      const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
-      writeDocument(path, ticket);
-      written.push(path);
-    }
-    return {
-      status: "written",
-      ticket_ids: input.tickets.map((ticket) => ticket.ticket_id),
-      paths: written,
-      advice,
+function sameDocument(left, right) {
+  return JSON.stringify(stable(left)) === JSON.stringify(stable(right));
+}
+
+// Origin immutability. A Ticket's origin is fixed at birth: once the Ticket
+// exists on disk, no apply (CLI or any host path built on applyTickets) may
+// change or remove an existing origin, and none may add an origin to a Ticket
+// that was checked in without one. Only a brand-new Ticket may carry origin.
+function assertOriginImmutable(currentRepository, candidates) {
+  const violations = [];
+  candidates.forEach((candidate, index) => {
+    const existing = currentRepository.tickets.documents.get(candidate.ticket_id);
+    if (!existing) return;
+    const before = existing.document.origin;
+    const after = candidate.origin;
+    const detail = {
+      ticket_id: candidate.ticket_id,
+      ticket_path: existing.path,
+      candidate_path: `tickets[${index}].origin`,
+      existing_origin: before ?? null,
+      candidate_origin: after ?? null,
     };
+    if (before !== undefined && after === undefined) {
+      violations.push({ code: "origin_immutable", message: `Ticket ${candidate.ticket_id} already carries an origin; it cannot be removed`, ...detail });
+    } else if (before !== undefined && !sameDocument(before, after)) {
+      violations.push({ code: "origin_immutable", message: `Ticket ${candidate.ticket_id} already carries an origin; it cannot be changed`, ...detail });
+    } else if (before === undefined && after !== undefined) {
+      violations.push({ code: "origin_cannot_be_added", message: `Ticket ${candidate.ticket_id} is already checked in without an origin; origin can only be recorded when a Ticket is born`, ...detail });
+    }
+  });
+  if (violations.length > 0) {
+    throw new VibeHubError(violations[0].code, violations[0].message, { violations });
   }
-  if (operation === "evidence") {
-    assertCurrentProjectFormat(repo);
-    const errors = validateEvidence(input);
-    assertValid(errors, "Evidence document is invalid");
-    const repository = loadRepository(repo, { evidence: [input] });
-    assertValid(repository.errors);
-    const path = join(repository.paths.evidence, input.ticket_id, `${input.evidence_id}.yaml`);
-    writeDocument(path, input);
-    return { status: "written", evidence_id: input.evidence_id, path };
+}
+
+export function applyTickets({ repo, tickets }) {
+  const root = resolve(repo);
+  assertCurrentProjectFormat(root);
+  if (!Array.isArray(tickets) || tickets.length === 0) {
+    throw new VibeHubError("invalid_input", "ticket apply needs a non-empty tickets array");
   }
+  const errors = tickets.flatMap((ticket, index) => validateTicket(ticket, `tickets[${index}]`));
+  const ids = new Set();
+  for (const ticket of tickets) {
+    if (ids.has(ticket.ticket_id)) add(errors, "tickets", `duplicate candidate Ticket: ${ticket.ticket_id}`);
+    ids.add(ticket.ticket_id);
+  }
+  assertValid(errors, "Ticket candidate is invalid");
+  const currentRepository = loadRepository(root);
+  assertValid(currentRepository.errors);
+  assertOriginImmutable(currentRepository, tickets);
+  const repository = loadRepository(root, { tickets });
+  assertValid(repository.errors);
+  const advice = candidateDependencyAdvice(currentRepository, repository, tickets);
+  const written = [];
+  for (const ticket of tickets) {
+    const path = join(repository.paths.tickets, `${ticket.ticket_id}.yaml`);
+    writeDocument(path, ticket);
+    written.push(path);
+  }
+  return {
+    status: "written",
+    ticket_ids: tickets.map((ticket) => ticket.ticket_id),
+    paths: written,
+    advice,
+  };
+}
+
+export function appendEvidence({ repo, evidence }) {
+  const root = resolve(repo);
+  assertCurrentProjectFormat(root);
+  const errors = validateEvidence(evidence);
+  assertValid(errors, "Evidence document is invalid");
+  const repository = loadRepository(root, { evidence: [evidence] });
+  assertValid(repository.errors);
+  const path = join(repository.paths.evidence, evidence.ticket_id, `${evidence.evidence_id}.yaml`);
+  writeDocument(path, evidence);
+  return { status: "written", evidence_id: evidence.evidence_id, path };
+}
+
+function ticketOperation(operation, repo, input, options = {}) {
+  if (operation === "apply") return applyTickets({ repo, tickets: input.tickets });
+  if (operation === "evidence") return appendEvidence({ repo, evidence: input });
   if (operation === "closeout") {
     assertCurrentProjectFormat(repo);
     const errors = validateOutcome(input);
