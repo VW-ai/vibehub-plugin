@@ -284,8 +284,13 @@ test("thread location follows the visible Thread and preserves token and fixture
   assert.equal(threadLocation("http://127.0.0.1:1/?thread=old&x=1#token", "new"), "http://127.0.0.1:1/?thread=new&x=1#token");
   assert.equal(threadLocation("http://127.0.0.1:1/?thread=old#token", null), "http://127.0.0.1:1/#token");
   assert.equal(threadLocation("http://127.0.0.1:1/#token", null), "http://127.0.0.1:1/#token");
+  // The focused Task rides the same query as a second navigation param; it
+  // never replaces the Thread param and is dropped off the Workspace route.
+  assert.equal(threadLocation("http://127.0.0.1:1/?reviewFrame=narrow#token", "abc", "ticket-focus"), "http://127.0.0.1:1/?reviewFrame=narrow&thread=abc&task=ticket-focus#token");
+  assert.equal(threadLocation("http://127.0.0.1:1/?thread=abc&task=ticket-focus#token", "abc"), "http://127.0.0.1:1/?thread=abc#token");
+  assert.equal(threadLocation("http://127.0.0.1:1/?task=ticket-old#token", null, "ticket-new"), "http://127.0.0.1:1/?task=ticket-new#token");
   const [script, host] = await Promise.all([source("apps/codex-first-shell/app.js"), source("scripts/vh-codex-first-shell.mjs")]);
-  assert.match(script, /function syncThreadLocation\(\) \{\s*if \(state\.fixtureMode\) return;\s*const next = threadLocation\(location\.href, state\.activeThreadId\);\s*if \(next !== location\.href\) history\.replaceState\(history\.state, "", next\);/);
+  assert.match(script, /function syncThreadLocation\(\) \{\s*if \(state\.fixtureMode\) return;\s*const next = threadLocation\(location\.href, state\.activeThreadId, state\.route === "task" \? state\.activeTicketId : null\);\s*if \(next !== location\.href\) history\.replaceState\(history\.state, "", next\);/);
   const openThreadSource = script.slice(script.indexOf("async function openThread"), script.indexOf("function applyChatNotification"));
   assert.match(openThreadSource, /state\.activeThreadId = threadId;[^]*syncThreadLocation\(\);/);
   for (const name of ["async function newThread", "async function openTask"]) {
