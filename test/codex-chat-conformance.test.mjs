@@ -16,6 +16,7 @@ import {
 } from "../apps/codex-first-shell/chat-renderer.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
 import { threadLocation } from "../apps/codex-first-shell/thread-location.mjs";
+import { answersFromDraft, loadRequestDraft, MAX_REQUEST_DRAFTS, pruneRequestDrafts, saveRequestDraft } from "../apps/codex-first-shell/request-drafts.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -291,6 +292,34 @@ test("thread location follows the visible Thread and preserves token and fixture
   assert.match(script, /const requestedThreadId = params\.get\("thread"\);[^]*catch \(error\) \{[^]*syncThreadLocation\(\);[^]*setRoute\("chat"\);/, "a stale deep link lands on Chat instead of bricking the shell");
   assert.match(host, /\["\/thread-location\.mjs", script\("thread-location\.mjs"\)\]/);
   assert.doesNotMatch(script, /localStorage|sessionStorage|indexedDB/i);
+});
+
+test("request-user-input drafts survive route changes and resolve to exact answer ids", async () => {
+  const store = new Map();
+  saveRequestDraft(store, "req-1", { approach: { choice: "__other__", other: "Custom path", direct: "" }, token: { choice: null, other: "", direct: "secret" } });
+  assert.deepEqual(answersFromDraft(loadRequestDraft(store, "req-1")), { answers: { approach: { answers: ["Custom path"] }, token: { answers: ["secret"] } }, invalid: false });
+  assert.deepEqual(answersFromDraft({ approach: { choice: "Minimal", other: "ignored", direct: "" } }), { answers: { approach: { answers: ["Minimal"] } }, invalid: false }, "an unselected Other value never leaks into the answer");
+  assert.equal(answersFromDraft({ approach: { choice: "__other__", other: "   ", direct: "" } }).invalid, true, "the Other sentinel alone is not an answer");
+  assert.equal(answersFromDraft({ approach: { choice: null, other: "", direct: "" } }).invalid, true);
+  assert.equal(answersFromDraft({}).invalid, true);
+  assert.equal(loadRequestDraft(store, "missing"), null);
+  saveRequestDraft(store, "req-1", { approach: { choice: null, other: "", direct: "" } });
+  assert.equal(store.has("req-1"), false, "an emptied draft is not retained");
+  for (let index = 0; index < MAX_REQUEST_DRAFTS + 3; index += 1) saveRequestDraft(store, `req-${index}`, { q: { choice: "A", other: "", direct: "" } });
+  assert.equal(store.size, MAX_REQUEST_DRAFTS);
+  pruneRequestDrafts(store, new Set(["req-5"]));
+  assert.deepEqual([...store.keys()], ["req-5"], "drafts for requests the host no longer reports are dropped");
+  const [script, host] = await Promise.all([source("apps/codex-first-shell/app.js"), source("scripts/vh-codex-first-shell.mjs")]);
+  assert.match(script, /document\.addEventListener\("input", \(event\) => \{[^]*rememberRequestDraft\(event\.target\);/);
+  assert.match(script, /document\.addEventListener\("change", async \(event\) => \{\s*rememberRequestDraft\(event\.target\);/);
+  const renderChatSource = script.slice(script.indexOf("function renderChat("), script.indexOf("function primaryPhase"));
+  assert.match(renderChatSource, /surface\.innerHTML = `<div class="chat-view">[^]*restoreRequestDrafts\(surface\);/, "a full Chat render restores every pending request draft");
+  assert.match(script.slice(script.indexOf("function renderTaskWorkspace"), script.indexOf("function renderRooms")), /restoreRequestDrafts\(surface\)/);
+  assert.match(script.slice(script.indexOf("function patchTimeline"), script.indexOf("function renderChat(")), /restoreRequestDrafts\(next\)/);
+  assert.match(script, /const \{ answers, invalid \} = answersFromDraft\(requestDraftFromForm\(form\)\);/);
+  assert.match(script, /state\.requestDrafts\.delete\(requestId\)/);
+  assert.equal((script.match(/pruneRequestDrafts\(state\.requestDrafts, state\.knownRequestIds\)/g) ?? []).length, 2, "bootstrap and polling both prune resolved requests");
+  assert.match(host, /\["\/request-drafts\.mjs", script\("request-drafts\.mjs"\)\]/);
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {

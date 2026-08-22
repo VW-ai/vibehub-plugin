@@ -14,6 +14,7 @@ import { requestDescriptor } from "./server-request-registry.mjs";
 import { loadThreadDraft, saveThreadDraft } from "./composer-drafts.mjs";
 import { clampComposerHeight, composerBounds } from "./composer-sizing.mjs";
 import { threadLocation } from "./thread-location.mjs";
+import { answersFromDraft, applyRequestDraft, loadRequestDraft, pruneRequestDrafts, requestDraftFromForm, saveRequestDraft } from "./request-drafts.mjs";
 
 const state = {
   route: "chat",
@@ -59,6 +60,7 @@ const state = {
   runtimeAlive: false,
   knownRequestIds: new Set(),
   composerDrafts: new Map(),
+  requestDrafts: new Map(),
   requestReturnFocus: new Map(),
 };
 
@@ -616,6 +618,20 @@ function restoreDisclosureStates(states, root = surface) {
   }
 }
 
+function rememberRequestDraft(target) {
+  const form = target?.closest?.("[data-request-form]");
+  if (!form) return;
+  saveRequestDraft(state.requestDrafts, form.dataset.requestForm, requestDraftFromForm(form));
+}
+
+function restoreRequestDrafts(root) {
+  const forms = root.matches?.("[data-request-form]") ? [root] : $$("[data-request-form]", root);
+  for (const form of forms) {
+    const draft = loadRequestDraft(state.requestDrafts, form.dataset.requestForm);
+    if (draft) applyRequestDraft(form, draft);
+  }
+}
+
 function transcriptSelectionActive() {
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed || !selection.rangeCount) return false;
@@ -627,7 +643,8 @@ function focusSignature(element, entry) {
   if (!element || !entry) return null;
   if (element.matches("summary")) return "summary";
   if (element.matches("pre[tabindex]")) return "pre[tabindex]";
-  for (const attribute of ["data-copy-code", "data-copy-message", "data-quote-message", "data-copy-citation-thread", "data-retry-turn", "data-request-decision"]) {
+  if (element.matches('input[type="radio"][name]')) return `input[type="radio"][name="${CSS.escape(element.name)}"][value="${CSS.escape(element.value)}"]`;
+  for (const attribute of ["data-copy-code", "data-copy-message", "data-quote-message", "data-copy-citation-thread", "data-retry-turn", "data-request-decision", "data-request-other", "data-request-answer"]) {
     if (element.hasAttribute(attribute)) return `[${attribute}="${CSS.escape(element.getAttribute(attribute))}"]`;
   }
   return null;
@@ -644,6 +661,7 @@ function patchTimeline(container, markup) {
     const existing = current.get(key);
     let mounted = existing;
     if (!existing) {
+      restoreRequestDrafts(next);
       mounted = next;
     } else if (existing.outerHTML !== next.outerHTML) {
       const focused = existing.contains(document.activeElement) ? document.activeElement : null;
@@ -651,6 +669,7 @@ function patchTimeline(container, markup) {
       const disclosures = disclosureStates(existing);
       existing.replaceWith(next);
       restoreDisclosureStates(disclosures, next);
+      restoreRequestDrafts(next);
       if (signature) next.querySelector(signature)?.focus({ preventScroll: true });
       mounted = next;
     }
@@ -686,6 +705,7 @@ function renderChat({ preserveScroll = false } = {}) {
     $("#streamStatus").textContent = state.running ? "Codex response updated." : "Codex response settled.";
   } else {
     surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+    restoreRequestDrafts(surface);
   }
   requestAnimationFrame(() => {
     if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
@@ -802,7 +822,7 @@ function renderTaskConversation({ preserveScroll = false } = {}) {
   state.selectionDeferralStartedAt = 0;
   const distanceFromBottom = timeline.scrollHeight - timeline.scrollTop - timeline.clientHeight;
   if (preserveScroll) patchTimeline(timeline, turnsMarkup(state.activeThread));
-  else timeline.innerHTML = turnsMarkup(state.activeThread);
+  else { timeline.innerHTML = turnsMarkup(state.activeThread); restoreRequestDrafts(timeline); }
   requestAnimationFrame(() => {
     if (!preserveScroll || distanceFromBottom < 96) timeline.scrollTop = timeline.scrollHeight;
     else timeline.scrollTop = Math.max(0, timeline.scrollHeight - timeline.clientHeight - distanceFromBottom);
@@ -831,6 +851,7 @@ function renderTaskWorkspace() {
   const projectLabel = packet?.project.scope === "standalone" ? "Standalone Task" : packet?.project.name ?? state.bootstrap.graph.project.name;
   setRouteHeader(humanize(handoff.ticketId), `Task Workspace · ${handoff.nextAction.action}`, { back: true });
   surface.innerHTML = `<div class="task-workspace"><header class="task-hero"><div><span class="eyebrow">TASK · ${escapeHtml(projectLabel)}</span><h1>${escapeHtml(humanize(handoff.ticketId))}</h1><p>${escapeHtml(handoff.outcome)}</p></div><span class="task-phase"><i></i>${phase}${substate(ticket) ? ` · ${substate(ticket)}` : ""}</span></header><div class="workspace-grid"><div class="workspace-main"><section class="task-intent"><span class="eyebrow">CONTEXT SPACE</span><h2>What this Task is here to finish</h2><p>${escapeHtml(handoff.context)}</p><details><summary>Acceptance and constraints <span>${handoff.acceptance.length}</span></summary><div class="acceptance-list">${handoff.acceptance.map((item) => `<div class="acceptance-row"><i>${handoff.evidence.some((evidence) => evidence.acceptanceIds.includes(item.acceptance_id)) ? "✓" : "○"}</i><span>${escapeHtml(item.criterion)}</span></div>`).join("")}</div>${handoff.constraints?.length ? `<ul class="constraint-list">${handoff.constraints.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}</details></section><section class="task-context-panel"><header><div><span class="eyebrow">CONTEXT FOR THE NEXT TURN</span><h2>${contextCount} governed item${contextCount === 1 ? "" : "s"}</h2></div><span>${escapeHtml(roomNames.join(" · ") || "No Room required")}</span></header><p>Included by the Task contract or selected here for one Turn. Reading never grants writeback.</p>${taskContextSelectionMarkup()}<details class="packet-inspector"><summary>Inspect host-owned packet</summary><pre>${escapeHtml(JSON.stringify(packet, null, 2))}</pre></details></section><section class="task-conversation-section"><header><div><span class="eyebrow">TASK CONVERSATION</span><h2>${linked ? escapeHtml(titleForThread(linked)) : "No Codex Thread yet"}</h2></div>${linked ? `<button class="secondary-button" type="button" data-thread-id="${escapeHtml(linked.id)}">Open as Chat</button>` : ""}</header><p>${linked ? "Human messages can explore, steer, approve or interrupt this Task. Codex owns the Thread; VibeHub owns the Task contract." : "Start the recommended action to open a persistent Codex Thread with the exact packet above."}</p><div class="task-conversation-timeline" id="taskConversationTimeline">${state.activeThread ? turnsMarkup(state.activeThread) : '<div class="task-conversation-empty">The first Turn will carry the canonical Task packet. No transcript is invented before that.</div>'}</div></section></div><aside class="workspace-aside"><section class="recommended-section"><span class="eyebrow">RECOMMENDED ACTION</span><button class="recommended" type="button" ${linked ? "data-focus-task-composer" : `data-task-action="${escapeHtml(handoff.nextAction.action)}"`} ${["WAIT", "DONE"].includes(handoff.nextAction.action) && !linked ? "disabled" : ""}><strong>${escapeHtml(actionLabel)}</strong><span>→</span></button><p>${linked ? "Continue in the Task conversation below." : "The local host assembles Project, Context, authority and source citations."}</p></section><section><span class="eyebrow">CURRENT WORK</span><h3>${linked ? `Thread ${escapeHtml(linked.id.slice(0, 8))}…` : "Not started"}</h3><p>${state.running ? "Codex is running now." : linked ? "Thread is ready for the next Turn." : "No execution claim."}</p></section><section><span class="eyebrow">PROOF</span><h3>${handoff.evidence.length} Evidence</h3><p>${handoff.acceptance.length} acceptance criteria · Outcome ${handoff.outcomeRecord ? handoff.outcomeRecord.status : "pending"}</p></section><section><span class="eyebrow">ROOMS & SOURCE</span><p>${escapeHtml(roomNames.join(" · ") || "Standalone")}</p><p>${escapeHtml(handoff.reviewInputs.ticketRef)}<br><strong>${escapeHtml(handoff.reviewInputs.commit?.slice(0, 10) ?? "working tree")}</strong></p></section></aside></div></div>`;
+  restoreRequestDrafts(surface);
   syncComposerMode();
 }
 
@@ -858,6 +879,7 @@ async function refreshThreads() {
   state.eventCursor = data.eventCursor;
   state.pendingRequests = data.pendingRequests;
   state.knownRequestIds = new Set(data.pendingRequests.map((request) => String(request.id)));
+  pruneRequestDrafts(state.requestDrafts, state.knownRequestIds);
   state.runtimeGeneration = data.runtime.generation;
   state.runtimeAlive = data.runtime.alive;
   updateAttentionState(data.attention);
@@ -1192,6 +1214,7 @@ async function pollEvents() {
     state.eventCursor = data.cursor;
     state.pendingRequests = data.pendingRequests;
     state.knownRequestIds = new Set(data.pendingRequests.map((request) => String(request.id)));
+    pruneRequestDrafts(state.requestDrafts, state.knownRequestIds);
     setRuntimePosture({ alive: data.runtimeAlive, generation: data.runtimeGeneration });
     let refreshRequests = false;
     let reconcile = data.gap || data.runtimeGeneration !== previousGeneration;
@@ -1374,26 +1397,16 @@ document.addEventListener("submit", async (event) => {
   const form = event.target.closest("[data-request-form]");
   if (!form) return;
   event.preventDefault();
-  const answers = {};
-  let invalid = false;
-  for (const fieldset of $$("fieldset[data-question-id]", form)) {
-    const selected = $$("input[type=radio]:checked", fieldset).map((input) => input.value);
-    const direct = $("[data-request-answer]", fieldset)?.value.trim();
-    const other = selected.includes("__other__") ? $("[data-request-other]", fieldset)?.value.trim() : "";
-    const values = selected.filter((value) => value !== "__other__");
-    if (other) values.push(other);
-    if (direct) values.push(direct);
-    if (!values.length) invalid = true;
-    answers[fieldset.dataset.questionId] = { answers: values };
-  }
-  if (invalid || !Object.keys(answers).length) { notify("Answer every question before sending."); form.querySelector("input:not([disabled]), textarea:not([disabled])")?.focus(); return; }
+  const { answers, invalid } = answersFromDraft(requestDraftFromForm(form));
+  if (invalid) { notify("Answer every question before sending."); form.querySelector("input:not([disabled]), textarea:not([disabled])")?.focus(); return; }
   const requestId = form.dataset.requestForm;
   const returnFocus = state.requestReturnFocus.get(requestId);
-  try { await action({ action: "resolveRequest", requestId, answers }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); (returnFocus?.isConnected ? returnFocus : $("#composerInput")).focus(); state.requestReturnFocus.delete(requestId); }
+  try { await action({ action: "resolveRequest", requestId, answers }); state.requestDrafts.delete(requestId); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); (returnFocus?.isConnected ? returnFocus : $("#composerInput")).focus(); state.requestReturnFocus.delete(requestId); }
   catch (error) { notify(error.message); }
 });
 
 document.addEventListener("change", async (event) => {
+  rememberRequestDraft(event.target);
   if (event.target.id === "activeThreadProject") {
     try {
       const projectId = event.target.value || null;
@@ -1449,9 +1462,11 @@ $("#composerInput").addEventListener("keydown", (event) => {
 $("#composerInput").addEventListener("input", autoSizeComposer);
 document.addEventListener("input", (event) => {
   const other = event.target.closest?.("[data-request-other]");
-  if (!other) return;
-  const radio = other.closest(".request-other")?.querySelector('input[type="radio"]');
-  if (radio && other.value) radio.checked = true;
+  if (other) {
+    const radio = other.closest(".request-other")?.querySelector('input[type="radio"]');
+    if (radio && other.value) radio.checked = true;
+  }
+  rememberRequestDraft(event.target);
 });
 document.addEventListener("selectionchange", () => requestAnimationFrame(updateQuoteSelection));
 $("#stopTurn").addEventListener("click", async () => {
