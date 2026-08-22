@@ -4,6 +4,7 @@ import test from "node:test";
 
 import { applyChatEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT } from "../apps/codex-first-shell/chat-model.mjs";
 import { loadThreadDraft, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
+import { clampComposerHeight, composerBounds, COMPOSER_HEIGHT_FALLBACK } from "../apps/codex-first-shell/composer-sizing.mjs";
 import {
   createRenderBudget,
   renderAgentMessage,
@@ -247,6 +248,29 @@ test("timeline and rich output stay bounded without inferring lifecycle", () => 
   assert.equal(bounded.text.length, 20_000);
   assert.equal(bounded.omitted, 500);
   assert.equal(bounded.truncated, true);
+});
+
+test("Composer growth has one CSS-owned ceiling shared with the JavaScript clamp", async () => {
+  const [css, script, host] = await Promise.all([
+    source("apps/codex-first-shell/app.css"),
+    source("apps/codex-first-shell/app.js"),
+    source("scripts/vh-codex-first-shell.mjs"),
+  ]);
+  const rule = css.match(/\.composer textarea \{[^}]*min-height: (\d+)px;[^}]*max-height: (\d+)px;/);
+  assert.ok(rule, "the textarea rule declares both bounds");
+  assert.deepEqual({ min: Number(rule[1]), max: Number(rule[2]) }, { ...COMPOSER_HEIGHT_FALLBACK }, "the script fallback equals the CSS bounds");
+  assert.deepEqual(composerBounds({ minHeight: "34px", maxHeight: "190px" }), { min: 34, max: 190 });
+  assert.deepEqual(composerBounds({ minHeight: "0px", maxHeight: "none" }), { ...COMPOSER_HEIGHT_FALLBACK });
+  assert.deepEqual(composerBounds({ minHeight: "200px", maxHeight: "100px" }), { min: 200, max: 200 }, "an inverted stylesheet never yields max below min");
+  assert.equal(clampComposerHeight(900, { min: 34, max: 190 }), 190);
+  assert.equal(clampComposerHeight(3, { min: 34, max: 190 }), 34);
+  assert.equal(clampComposerHeight(120.5, { min: 34, max: 190 }), 120.5);
+  assert.equal(clampComposerHeight(Number.NaN, { min: 34, max: 190 }), 34);
+  const autoSize = script.slice(script.indexOf("function autoSizeComposer"), script.indexOf("function captureComposerDraft"));
+  assert.match(autoSize, /composerBounds\(getComputedStyle\(textarea\)\)/);
+  assert.match(autoSize, /clampComposerHeight\(textarea\.scrollHeight, bounds\)/);
+  assert.doesNotMatch(autoSize, /\d{2,}/, "autoSizeComposer carries no numeric ceiling of its own");
+  assert.match(host, /\["\/composer-sizing\.mjs", script\("composer-sizing\.mjs"\)\]/);
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {

@@ -12,6 +12,7 @@ import {
 } from "./chat-renderer.mjs";
 import { requestDescriptor } from "./server-request-registry.mjs";
 import { loadThreadDraft, saveThreadDraft } from "./composer-drafts.mjs";
+import { clampComposerHeight, composerBounds } from "./composer-sizing.mjs";
 
 const state = {
   route: "chat",
@@ -1018,8 +1019,9 @@ function quotePrefix(quote) {
 
 function autoSizeComposer() {
   const textarea = $("#composerInput");
+  const bounds = composerBounds(getComputedStyle(textarea));
   textarea.style.height = "auto";
-  textarea.style.height = `${Math.min(220, Math.max(24, textarea.scrollHeight))}px`;
+  textarea.style.height = `${clampComposerHeight(textarea.scrollHeight, bounds)}px`;
 }
 
 function captureComposerDraft(threadId = state.activeThreadId) {
