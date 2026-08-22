@@ -1,0 +1,45 @@
+name: Mirror Tickets to Issues
+
+# One-way projection of .vibehub Tickets onto GitHub Issues. Git is the source
+# of truth; this workflow never commits and nothing reads Issues back.
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".vibehub/tickets/**"
+      - ".vibehub/outcomes/**"
+      - ".vibehub/evidence/**"
+      - "scripts/sync-github-issues.mjs"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print the plan without writing to GitHub"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: sync-issues
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          node scripts/sync-github-issues.mjs
+          --repo .
+          --github "${{ github.repository }}"
+          ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}

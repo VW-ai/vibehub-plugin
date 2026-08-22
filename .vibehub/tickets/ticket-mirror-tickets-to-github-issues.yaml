@@ -1,0 +1,65 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "projection-script-is-deterministic-and-idempotent",
+      "criterion": "A checked-in Node script (no new runtime dependencies beyond gh and node) reads .vibehub/tickets, outcomes, evidence, and the shared ticket graph projection, and computes for every Ticket an Issue title, body, labels, open/closed state, and the set of Evidence comments. Running it twice against the same repository state performs zero GitHub writes on the second run, proven by a fixture-based test that asserts the computed plan is empty when the remote already matches."
+    },
+    {
+      "acceptance_id": "dry-run-prints-full-plan-without-writes",
+      "criterion": "A --dry-run flag prints every create, update, close, reopen, and comment the script would perform and makes no GitHub API write; the checked-in Evidence for this criterion includes a dry-run transcript over the real repository."
+    },
+    {
+      "acceptance_id": "ci-workflow-is-main-only-and-agent-free",
+      "criterion": "A GitHub Actions workflow runs the script on push to main filtered to .vibehub/tickets, .vibehub/outcomes, and .vibehub/evidence paths, plus workflow_dispatch with a dry_run input; it requests only issues:write and contents:read, produces no commit, and no Skill, CLAUDE.md rule, or hook asks an Agent to run or check it."
+    },
+    {
+      "acceptance_id": "issue-content-is-readable-and-linked",
+      "criterion": "Each mirrored Issue shows a humanized title derived from the Ticket, the Ticket outcome, acceptance criteria as a task list checked according to the current Outcome, constraints, context refs as links to the files on main, direct dependencies as Blocked by #N lines resolved through the ticket-id marker, state and maturity as labels, and a footer linking to the Ticket file; Evidence records appear as one comment each in recorded_at order."
+    },
+    {
+      "acceptance_id": "one-way-projection-rule-is-recorded",
+      "criterion": "A decision Context in .vibehub/rooms/product records that GitHub Issues are a read-only projection of the Ticket graph, Git stays the source of truth, human Issue comments are discussion rather than durable Context, and outside-filed Issues become Tickets only through deliberate planning with the Issue as a context ref."
+    },
+    {
+      "acceptance_id": "live-mirror-looks-good-on-github",
+      "authority": "human",
+      "criterion": "After a live run against VW-ai/vibehub-plugin, the owner reviews the Issues list, one open Issue, one closed Issue with Evidence comments, and the dependency rendering, and explicitly judges that the mirror is readable and worth keeping."
+    }
+  ],
+  "constraints": [
+    "One-way only: never read Issue titles, bodies, comments, or state back into .vibehub documents.",
+    "Never commit or push from the workflow; the repository must not gain a mapping file or Issue-number field.",
+    "Only main is projected; branch and worktree Tickets never create or touch Issues.",
+    "The first live run against the real repository happens only after the dry-run transcript is reviewed and the owner explicitly authorizes it in conversation.",
+    "Do not build bidirectional sync, a GitHub Projects board, or a webhook receiver in this Ticket."
+  ],
+  "context": "Tickets, Evidence, and Outcomes already live as Git-native documents under .vibehub/. The owner wants collaborators on GitHub to see the same Ticket graph natively in Issues so the project reads as coordinated, without adding any operational load to Agents. The governing rule is that Git remains the single source of truth and GitHub Issues are a read-only projection of it: Issue comments by humans are discussion and are never pulled back; durable decisions still enter through vibehub-ingest. Mapping lives in the Issue body as a hidden marker <!-- vibehub:ticket-id=<id> --> so no new Ticket field and no CI write-back commit is needed; each Evidence record is posted as one comment keyed by a hidden <!-- vibehub:evidence-id=<id> --> marker so reruns are idempotent. The Ticket state shown on the Issue comes from the same next-action projection the CLI and Workbench use (vh.mjs ticket graph). The repository already has GitHub Actions (verify.yml, release.yml) and gh auth, and currently holds 86 Tickets, most DONE, so the first live run will create many closed Issues; a dry-run mode must exist and be exercised before the first live run. This direction is compatible with decision-external-work-systems-compose-into-personal-tickets: that decision forbids treating an external system as the organizer of personal Tickets; here GitHub is a display surface for VibeHub truth, not an authority.",
+  "context_refs": [
+    {
+      "purpose": "External systems compose into personal Tickets without becoming the organizer; this Ticket projects outward and must stay consistent with that boundary.",
+      "ref": ".vibehub/rooms/product/decision-external-work-systems-compose-into-personal-tickets.yaml"
+    },
+    {
+      "purpose": "Definitions of Ticket, Evidence, Outcome, and typed References the Issue body renders.",
+      "ref": ".vibehub/rooms/knowledge/contract-core-domain-semantics.yaml"
+    },
+    {
+      "purpose": "Shared next-action projection whose states become Issue labels.",
+      "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Existing Actions conventions (runner, node version, checkout) the new workflow follows.",
+      "ref": ".github/workflows/verify.yml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Every checked-in VibeHub Ticket on main is visible as a GitHub Issue that a collaborator can read, filter, and follow: acceptance as a checklist, dependencies as Blocked-by links, Evidence as a comment timeline, and Outcome as issue closure. The projection is one-way, runs only in GitHub Actions on push to main, never writes back to the repository, and never requires an Agent to run or verify it.",
+  "provenance_refs": [
+    "conversation:2026-08-22-tickets-as-github-issues"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-mirror-tickets-to-github-issues"
+}
