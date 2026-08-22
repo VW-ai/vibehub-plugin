@@ -78,5 +78,6 @@
   "kind": "room",
   "room_id": "ticket-lifecycle",
   "schema_version": 1,
-  "stale": false
+  "stale": true,
+  "stale_reason": "drift: skills/scripts/vh.mjs now exports initProject, projectCompatibility, readDocument and writeDocument for the Codex-first shell import path; lifecycle room knowledge not yet re-read against it"
 }

@@ -1,17 +1,46 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-codex-chat-task-bridges-after-production-shell",
-      "criterion": "Placeholder: after the production shell succeeds, replan this Ticket to firm with exact Create Task, Attach to Task, Remember, quote and update actions; one-Chat-to-many-Task origin provenance; inline, list and Graph association presentation; Task Context preview and confirmation; task-scoped conversation and source-Chat return; explicit synchronization, failure and restart recovery; native placement; wide and narrow behavior; accessibility and installed regression acceptance."
+      "acceptance_id": "origin-provenance-is-canonical-and-immutable",
+      "criterion": "skills/contracts/ticket.schema.json gains exactly one optional origin object on schema_version 2 with no new document kind: {harness: codex, thread_id, forked_from_id: string or null, turn_id, item_id: string or null, selection: {start, end, text_sha256} or null, captured_at}; omission means no origin and is the sole compatibility rule, every existing Ticket validates unchanged, ticket validate rejects a malformed origin, and vh.mjs ticket apply together with every host path built on it refuses removing or changing an existing origin and refuses adding origin to an already checked-in Ticket; origin is never derived from Thread names, previews or transcripts."
+    },
+    {
+      "acceptance_id": "create-task-from-finalized-message-is-exact",
+      "criterion": "A Create Task action is offered only on finalized assistant messages and on an active selection inside one, never on live streaming items or user messages, and only while the Project scope is bound; it opens a confirmation surface with Task title, derived ticket_id, required outcome, context prefilled from the quoted text and exact source identity, and a preview of the Context packet the Task would send; confirming writes exactly one draft Ticket through validateTicket with that origin and one placeholder acceptance, the source Chat continues unchanged with an inline association marker at the origin Turn, the new Task appears in the Graph and Task list as REFINE, and when unbound the action is disabled with the missing scope explained."
+    },
+    {
+      "acceptance_id": "attach-and-quote-into-task-are-explicit",
+      "criterion": "Attach to Task lets the user pick an existing Task of the bound Project and appends one provenance reference of the form codex-thread:<thread_id>/turn:<turn_id> to a Task without a successful Outcome to that Ticket's provenance_refs without touching origin, deliveries, acceptance or relations; an explicit Quote into Task places the selected text into that Task's task-scoped conversation draft where it reaches the Agent only inside the host-built packet humanMessage; neither action mutates the source Chat, creates a Thread, infers content from the transcript, or turns the association into a depends_on relation."
+    },
+    {
+      "acceptance_id": "remember-is-a-governed-proposal",
+      "criterion": "Remember on a finalized assistant message or selection opens a surface listing only existing Rooms of the bound repository, prefilled summary and detail from the selection, a type from the Context schema enum, and the exact source reference and quote; confirming writes exactly one Context document through the same validation as context put with state active, the Codex Thread and Turn as source ref, and at least one evidence entry, leaving it uncommitted so Git review remains the activation gate; Remember never runs automatically, never creates a Room, never writes outside the bound repository, and is disabled with explanation when unbound."
+    },
+    {
+      "acceptance_id": "task-workspace-returns-to-source",
+      "criterion": "A Task with origin shows an origin chip in its Workspace naming the source Thread, Turn and selection excerpt, and Return to source opens that Thread on the chat route scrolled and focused to the origin item; the source Chat renders association markers for every Task born from it, the sidebar and Task list show each Task's origin, and the Graph renders a Chat-to-Task provenance edge with its own edge kind exposed as a DOM attribute, always drawn for the selected or focused Task and never rendered as or counted among depends_on relations; one Chat birthing several Tasks lists all of them."
+    },
+    {
+      "acceptance_id": "bridge-writes-are-explicit-recoverable-and-uncommitted",
+      "criterion": "The host advertises a second explicit write class beside explicitImportOnly naming the exact Ticket and Context paths the bridge may write and commits false, in both /health and bootstrap; no bridge action runs git add, commit or push and written paths surface as uncommitted changes; if anything after a bridge YAML write fails, including a later Start whose Thread naming or first Turn fails, the checked-in Ticket remains valid and its Workspace still offers its derived next action; after an app-server restart and a browser reload every origin, association and linkage is recovered from checked-in YAML and Codex-native Thread identity only, and the static no-second-store test is extended to the bridge."
+    },
+    {
+      "acceptance_id": "bridge-surfaces-hold-the-baseline",
+      "criterion": "The confirmation surfaces and pickers restore focus on close, trap Tab while open, close on Escape, and expose keyboard paths for every pointer action; new elements meet the WCAG AA floors of the existing contrast test in both themes; the browser interaction guard gains negatively controlled checks for finalized-only placement, the Create Task flow, Attach, Remember, origin chip and Return to source at 1280x800 and 390x844 in Light and Dark; the hookPrompt timeline divider no longer reads Project instructions and gains fixture coverage; npm test, npm run verify and the guard pass."
     }
   ],
   "constraints": [
     "Ordinary Codex Chat remains fully usable and continuous without entering VibeHub Task protocol.",
     "Creating a Task never converts, ends or consumes its source Chat.",
     "Continuing either conversation never silently mutates the other; transfer requires an explicit reviewable action.",
-    "Do not infer durable knowledge from a transcript, mirror Codex plans as Tasks or treat a Chat fork or origin edge as a Task dependency."
+    "Do not infer durable knowledge from a transcript, mirror Codex plans as Tasks or treat a Chat fork or origin edge as a Task dependency.",
+    "Task is the UI noun; the canonical document kind stays ticket on schema_version 2 with one optional field and no migration, move or rewrite of existing documents.",
+    "Checked-in YAML in the one bound repository and Codex-native Thread identity are the only persistence; no association store, lease, cache or second transcript store, and the Thread-name link is never the source of origin.",
+    "Bridge writes never run git add, commit or push; Git review remains the activation gate for Remembered Context.",
+    "Every bridge action is unavailable with the missing scope explained when the Project is unbound, no-repository or migration-required.",
+    "Final visual identity, audio capture, packaged install and the daily-use alpha remain owned by their own Tickets."
   ],
-  "context": "Once the production Codex shell exists, implement the smallest exact bridge between continuous ordinary Chat and durable VibeHub work. One Chat can create several Tasks without changing identity or stopping; each Task stores exact origin Thread, branch and Turn or selection range, appears inline and in Graph or list associations, and offers both a task-scoped conversation and return to source. Transfer in either direction remains explicit and reviewable.",
+  "context": "The production Codex-first shell is accepted, so this Ticket implements the smallest exact bridge between continuous ordinary Chat and durable VibeHub work. Today Make Task and Remember are disabled placeholders, no shell path writes a Ticket or Context document, Task-to-Thread linkage is derived only from the Codex Thread name, and no origin is recorded anywhere because Ticket schema v2 has no slot for it. The bridge adds one optional typed origin field to the Ticket schema following the v0.8 deliveries precedent with omission as the only compatibility rule, a Create Task action that writes one draft Ticket carrying immutable origin, an Attach action that appends a provenance reference to an existing Task, a Remember action that writes one Context document into an existing Room as a governed proposal whose activation gate remains Git review, a Workspace origin chip with return to the source Turn, and inline, list and Graph association presentation that never becomes a dependency edge. The UI noun is Task; the canonical document kind stays ticket. Every write lands uncommitted in the one bound repository and is advertised as an explicit chat-bridge write class. Audio capture, final visual identity, packaged install and the daily-use alpha remain other Tickets. A Task-update-from-Chat action beyond Attach and Quote into Task is deferred to a later Ticket.",
   "context_refs": [
     {
       "purpose": "Binding continuous Chat, independent Task, origin provenance and explicit-transfer semantics.",
@@ -28,15 +57,60 @@
     {
       "purpose": "Accepted task-scoped conversation and host-owned Context packet baseline.",
       "ref": ".vibehub/outcomes/ticket-research-task-workspace-conversation-context.yaml"
+    },
+    {
+      "purpose": "Four distinct identifier spaces and the rule against name-based identity inference.",
+      "ref": ".vibehub/rooms/product/decision-one-visible-project-single-repository-v1.yaml"
+    },
+    {
+      "purpose": "Bridge writes must resolve to the one bound repository and explain missing scope.",
+      "ref": ".vibehub/rooms/product/constraint-v1-git-native-single-repository-scope.yaml"
+    },
+    {
+      "purpose": "Accepted production shell, scope states, host write surface and proof conventions this bridge extends.",
+      "ref": ".vibehub/outcomes/ticket-implement-codex-first-vibehub-shell.yaml"
+    },
+    {
+      "purpose": "Additive action placement on finalized assistant messages with exact Thread, Turn, item and selection identity.",
+      "ref": "docs/proposals/codex-native-chat/chat-ui-contract.json"
+    },
+    {
+      "purpose": "Host-owned packet, forbidden browser work and automatic harvest prohibition.",
+      "ref": "docs/proposals/codex-task-workspace/task-workspace-contract.json"
+    },
+    {
+      "purpose": "Ticket schema v2 that gains the optional origin field.",
+      "ref": "skills/contracts/ticket.schema.json"
+    },
+    {
+      "purpose": "Context document shape Remember must produce.",
+      "ref": "skills/contracts/context.schema.json"
+    },
+    {
+      "purpose": "Git review as the activation gate and lowest-owning-room placement for Remembered Context.",
+      "ref": "skills/vibehub-ingest/references/knowledge-governance.json"
+    },
+    {
+      "purpose": "Host-built packet where quoted text reaches the Agent as humanMessage.",
+      "ref": "packages/codex-adapter/task-context.mjs"
+    },
+    {
+      "purpose": "Existing exact quote source identity serialization to extend with selection range.",
+      "ref": "apps/codex-first-shell/quote-source.mjs"
+    },
+    {
+      "purpose": "v0.8.0 deliveries precedent: one optional Ticket field with omission as the only compatibility rule.",
+      "ref": "CHANGELOG.md"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "Codex Chat remains a continuous ordinary stream while explicit native-feeling actions can create or attach several independent VibeHub Tasks and governed Context; every Task preserves immutable origin provenance, exposes its own task-scoped conversation and can return to the source Chat.",
+  "maturity": "firm",
+  "outcome": "Codex Chat remains a continuous ordinary stream while finalized assistant messages and selections offer Create Task, Attach to Task and Remember; every created Task carries one immutable canonical origin, appears in Graph, list and inline associations, exposes its task-scoped conversation and returns to its exact source Turn, and all bridge writes stay explicit, uncommitted and recoverable from checked-in YAML plus Codex-native Thread identity alone.",
   "provenance_refs": [
     "conversation:2026-08-20-codex-chat-ui-plus-vibehub-task-value",
-    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin"
+    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin",
+    "conversation:2026-08-22-owner-approves-chat-task-bridges-as-next-step"
   ],
   "relations": [
     {

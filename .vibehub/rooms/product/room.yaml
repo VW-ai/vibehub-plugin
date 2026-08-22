@@ -14,7 +14,7 @@
         "path": "docs/CODEX_APP_SERVER_DSH_ADAPTER_SPIKE.md"
       },
       {
-        "blob": "18e7474c1a0a6f1e0be2fe816e3c634c72f37547",
+        "blob": "a5886b6869518ed16c7f5416a785988a187b3484",
         "path": "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"
       },
       {
@@ -22,7 +22,7 @@
         "path": "docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md"
       },
       {
-        "blob": "1b0489b896345091351e05f44b1819ab3777442d",
+        "blob": "3afc3a88e51c750792f750ada3085b1658d6cd55",
         "path": "docs/CODEX_NATIVE_SEARCH_ATTENTION_RESEARCH.md"
       },
       {
@@ -166,7 +166,7 @@
         "path": "docs/proposals/card-corner-signal/prototype.js"
       },
       {
-        "blob": "37eb47302a13f8582b747f4c47790cd0d740d556",
+        "blob": "853b9a3f71d4bcb66fbfaf708c76a4e16fee6b7b",
         "path": "docs/proposals/codex-chat-conformance/README.md"
       },
       {
@@ -186,11 +186,11 @@
         "path": "docs/proposals/codex-chat-conformance/audits/message-rich-content-audit.md"
       },
       {
-        "blob": "4005ae0ce7310be8fec49dc52d431d30e437bb68",
+        "blob": "ef36d2ea564826604b0b47d7692c310aa6c5b448",
         "path": "docs/proposals/codex-chat-conformance/browser-runtime-review.md"
       },
       {
-        "blob": "a765c3bf209435d24d7cf9be63597463f28cf357",
+        "blob": "4363761948f7281e7a5481da42153b3feaefc3d8",
         "path": "docs/proposals/codex-chat-conformance/conformance-matrix.json"
       },
       {
@@ -222,7 +222,7 @@
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
-        "blob": "c50c25a1a20b1e5ed4c2e87b0800914b0bb1da98",
+        "blob": "41a0f499262c869626d831d55e0e898b9b8e1362",
         "path": "docs/proposals/codex-native-attention/interaction-contract.json"
       },
       {
@@ -258,11 +258,11 @@
         "path": "docs/proposals/dsh-persistent-shell/composition-contract.json"
       },
       {
-        "blob": "7a76027260ece98dd9233855a7721122d4bbd84c",
+        "blob": "65096ed3086d28573da75686718ab967874cdb0e",
         "path": "docs/proposals/harness-neutral-core/capabilities.v1.json"
       },
       {
-        "blob": "501e41adac8bc05f6505921e43a4ffef3bde0c27",
+        "blob": "c5a55498b0a207177e2219304376312a97f6b785",
         "path": "docs/proposals/harness-neutral-core/package-boundaries.json"
       },
       {
@@ -286,8 +286,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-22T05:48:04.961Z",
-    "last_aligned_commit": "7c93bc659e214822bed311db18511de2db415235"
+    "checked_at": "2026-08-22T23:28:16.354Z",
+    "last_aligned_commit": "1700c7a3f43e4a45d27edad62cee16aefa1051b0"
   },
   "anchors": [
     "CHANGELOG.md",
