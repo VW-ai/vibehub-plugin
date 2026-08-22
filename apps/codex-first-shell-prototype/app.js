@@ -654,6 +654,8 @@ function patchTimeline(container, markup) {
 
 function renderChat({ preserveScroll = false } = {}) {
   setRouteHeader(state.activeThread ? titleForThread(state.activeThread) : "Codex", state.activeThread ? `${state.fixtureMode ? "Review fixture · not runtime history" : `Thread ${state.activeThread.id.slice(0, 8)}…`} · ${state.bootstrap?.graph.project.name}` : "Your real Threads and Turns");
+  const existingFork = surface.querySelector("[data-fork-thread]");
+  if (existingFork) existingFork.disabled = state.fixtureMode || state.running;
   if (!state.activeThread) {
     surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>What do you want to work on?</h1><p>Start with ordinary Codex Chat. VibeHub adds a durable Task only when the work needs an explicit outcome and stopping contract.</p><div class="welcome-actions"><button class="primary-button" type="button" data-new-thread>Start a chat</button><button class="secondary-button" type="button" data-route="tasks">Open Task Graph</button></div></div>`;
     return;
@@ -1649,6 +1651,15 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
       restoreComposerDraft(thread.id);
       $("#stopTurn").hidden = !state.running;
       setRoute("chat");
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    },
+    reconcileFixtureThread: async (thread) => {
+      state.activeThread = structuredClone(thread);
+      state.currentTurnId = liveTurnId(state.activeThread);
+      state.running = Boolean(state.currentTurnId);
+      $("#stopTurn").hidden = !state.running;
+      renderChat({ preserveScroll: true });
+      syncComposerMode();
       await new Promise((resolve) => requestAnimationFrame(resolve));
     },
     withFixtureTransport: async (handler, callback) => {

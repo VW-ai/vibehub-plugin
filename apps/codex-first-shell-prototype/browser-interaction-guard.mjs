@@ -88,6 +88,15 @@ export async function runBrowserInteractionGuard(hooks) {
   });
   const steer = steerActions.find((entry) => entry.action === "steerTurn");
   check(results, "active submission dispatches one exact steer", steer?.threadId === fixture.activeThread.id && steer?.expectedTurnId === fixture.activeThread.turns[0].id && !steerActions.some((entry) => entry.action === "startTurn"));
+  const interrupted = structuredClone(fixture.activeThread);
+  interrupted.status = { type: "idle" };
+  interrupted.turns.at(-1).status = "interrupted";
+  let terminalForkEnabled = false;
+  await hooks.withFixtureTransport(async () => ({}), async () => {
+    await hooks.reconcileFixtureThread(interrupted);
+    terminalForkEnabled = document.querySelector("#composer").dataset.turnPosture === "idle" && document.querySelector("#stopTurn").hidden && !document.querySelector("[data-fork-thread]").disabled;
+  });
+  check(results, "terminal reconciliation re-enables Fork", terminalForkEnabled);
 
   await hooks.switchFixtureThread(fixture.secondaryThread);
   const forked = { ...structuredClone(fixture.secondaryThread), id: "fixture-forked-thread", title: "Forked fixture chat", forkedFromId: fixture.secondaryThread.id };
