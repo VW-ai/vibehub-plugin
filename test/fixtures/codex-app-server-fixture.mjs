@@ -3,19 +3,74 @@
 // Minimal stand-in for `codex app-server --listen stdio://`.
 //
 // It speaks the JSON-RPC line protocol that packages/codex-adapter/client.mjs
-// expects, keeps Threads and Turns in memory for one process, and appends every
-// inbound message to the file named by CODEX_FIXTURE_LOG so a test can prove
-// which upstream methods the production shell actually dispatched.
+// expects, keeps Threads, ThreadSections and Turns in memory for one process,
+// and appends every inbound message to the file named by CODEX_FIXTURE_LOG so
+// a test can prove which upstream methods the production shell actually
+// dispatched.
+//
+// CODEX_FIXTURE_SEED may carry JSON `{ sections: [{ id, name }], threads: [{
+// id, name, preview, cwd, sectionId, archived }] }` so a test can stage Chats
+// in several folders and ThreadSections of every import-eligibility shape
+// before the shell boots.
 
-import { appendFileSync } from "node:fs";
+import { appendFileSync, realpathSync } from "node:fs";
 import { createInterface } from "node:readline";
 
 const version = process.env.CODEX_FIXTURE_VERSION ?? "0.147.0";
 const logPath = process.env.CODEX_FIXTURE_LOG ?? null;
+const PINNED_SECTION = Object.freeze({ id: "01984de2-8f74-7c91-a3b2-5c5e937cf318", name: "Pinned" });
 const threads = new Map();
+const sections = new Map();
 let counter = 0;
 const nextId = (prefix) => `${prefix}-${++counter}`;
 const now = () => new Date().toISOString();
+
+// The real app-server compares folders by their resolved path, so a symlinked
+// /tmp and its /private/tmp target name the same folder here too.
+function realFolder(path) {
+  if (typeof path !== "string" || !path) return null;
+  try {
+    return realpathSync.native(path);
+  } catch {
+    return path;
+  }
+}
+
+function sectionRecord(section) {
+  return { id: section.id, name: section.name };
+}
+
+function requireSection(sectionId) {
+  if (sectionId === PINNED_SECTION.id) return PINNED_SECTION;
+  const section = sections.get(sectionId);
+  if (!section) throw Object.assign(new Error(`Unknown section ${sectionId}`), { code: -32602 });
+  return section;
+}
+
+function seed() {
+  const raw = process.env.CODEX_FIXTURE_SEED;
+  if (!raw) return;
+  const plan = JSON.parse(raw);
+  for (const section of plan.sections ?? []) sections.set(section.id, { id: section.id, name: section.name });
+  for (const entry of plan.threads ?? []) {
+    const thread = {
+      id: entry.id ?? nextId("seed-thread"),
+      name: entry.name ?? null,
+      preview: entry.preview ?? "",
+      cwd: entry.cwd,
+      createdAt: entry.createdAt ?? now(),
+      updatedAt: entry.updatedAt ?? now(),
+      status: { type: "idle" },
+      forkedFromId: null,
+      section: entry.sectionId ? sectionRecord(requireSection(entry.sectionId)) : null,
+      archived: Boolean(entry.archived),
+      turns: [],
+      policy: { approvalPolicy: null, sandbox: null },
+    };
+    threads.set(thread.id, thread);
+  }
+}
+seed();
 
 function record(entry) {
   if (logPath) appendFileSync(logPath, `${JSON.stringify(entry)}\n`);
@@ -48,9 +103,13 @@ function requireThread(params) {
 }
 
 function listThreads(params) {
+  const folders = params?.cwd === undefined || params?.cwd === null
+    ? null
+    : new Set((Array.isArray(params.cwd) ? params.cwd : [params.cwd]).map(realFolder));
   return [...threads.values()]
     .filter((thread) => thread.archived === Boolean(params?.archived))
     .filter((thread) => params?.sectionId === undefined || (thread.section?.id ?? null) === params.sectionId)
+    .filter((thread) => folders === null || folders.has(realFolder(thread.cwd)))
     .filter((thread) => !params?.searchTerm || `${thread.name ?? ""}\n${thread.preview}`.includes(params.searchTerm))
     .map(threadRecord);
 }
@@ -63,7 +122,28 @@ const handlers = {
     platformOs: "fixture",
   }),
   "account/read": () => ({ account: { type: "chatgpt", email: "fixture@example.com", planType: "pro" }, requiresOpenaiAuth: true }),
-  "threadSection/list": () => ({ data: [], nextCursor: null }),
+  "threadSection/list": () => ({ data: [...sections.values()].map(sectionRecord), nextCursor: null }),
+  "threadSection/create": (params) => {
+    if (typeof params?.name !== "string" || !params.name.trim()) throw Object.assign(new Error("name required"), { code: -32602 });
+    const section = { id: nextId("fixture-section"), name: params.name.trim() };
+    sections.set(section.id, section);
+    return { section: sectionRecord(section) };
+  },
+  "threadSection/update": (params) => {
+    const section = requireSection(params?.sectionId);
+    if (section === PINNED_SECTION) throw Object.assign(new Error("Pinned cannot be renamed"), { code: -32602 });
+    section.name = params.name;
+    for (const thread of threads.values()) if (thread.section?.id === section.id) thread.section = sectionRecord(section);
+    return { section: sectionRecord(section) };
+  },
+  "threadSection/delete": (params) => {
+    const section = requireSection(params?.sectionId);
+    if (section === PINNED_SECTION) throw Object.assign(new Error("Pinned cannot be deleted"), { code: -32602 });
+    // Deleting a section atomically returns its members to unsectioned Recents.
+    for (const thread of threads.values()) if (thread.section?.id === section.id) thread.section = null;
+    sections.delete(section.id);
+    return {};
+  },
   "thread/list": (params) => ({ data: listThreads(params), nextCursor: null }),
   "thread/start": (params) => {
     const thread = {
@@ -98,7 +178,11 @@ const handlers = {
     threads.set(thread.id, thread);
     return { thread: threadRecord(thread) };
   },
-  "thread/section/move": () => ({}),
+  "thread/section/move": (params) => {
+    const thread = requireThread(params);
+    thread.section = params?.sectionId === null || params?.sectionId === undefined ? null : sectionRecord(requireSection(params.sectionId));
+    return {};
+  },
   "thread/archive": (params) => {
     requireThread(params).archived = true;
     return {};
