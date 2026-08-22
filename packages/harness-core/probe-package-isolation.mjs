@@ -36,27 +36,29 @@ function importedPackages(text) {
   return result;
 }
 
+export async function probeDomainIsolation(domain) {
+  const files = (await Promise.all(domain.roots.map(filesUnder))).flat();
+  const violations = [];
+  for (const file of files) {
+    const text = await readFile(file, "utf8");
+    const packages = file.endsWith("package.json")
+      ? Object.keys({
+          ...JSON.parse(text).dependencies,
+          ...JSON.parse(text).optionalDependencies,
+          ...JSON.parse(text).peerDependencies,
+        })
+      : importedPackages(text);
+    for (const packageName of packages) {
+      const prefix = domain.forbiddenPackagePrefixes.find((value) => packageName === value || packageName.startsWith(`${value}/`));
+      if (prefix) violations.push({ file: file.slice(repoRoot.length + 1), packageName, forbiddenPrefix: prefix });
+    }
+  }
+  return { domain: domain.id, files: files.length, proven: violations.length === 0, violations };
+}
+
 export async function probePackageIsolation() {
   const checks = [];
-  for (const domain of boundaries.domains) {
-    const files = (await Promise.all(domain.roots.map(filesUnder))).flat();
-    const violations = [];
-    for (const file of files) {
-      const text = await readFile(file, "utf8");
-      const packages = file.endsWith("package.json")
-        ? Object.keys({
-            ...JSON.parse(text).dependencies,
-            ...JSON.parse(text).optionalDependencies,
-            ...JSON.parse(text).peerDependencies,
-          })
-        : importedPackages(text);
-      for (const packageName of packages) {
-        const prefix = domain.forbiddenPackagePrefixes.find((value) => packageName === value || packageName.startsWith(`${value}/`));
-        if (prefix) violations.push({ file: file.slice(repoRoot.length + 1), packageName, forbiddenPrefix: prefix });
-      }
-    }
-    checks.push({ domain: domain.id, files: files.length, proven: violations.length === 0, violations });
-  }
+  for (const domain of boundaries.domains) checks.push(await probeDomainIsolation(domain));
   return { ok: checks.every((check) => check.proven), schemaVersion: boundaries.schemaVersion, checks };
 }
 
