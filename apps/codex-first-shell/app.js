@@ -387,7 +387,11 @@ function updateInboxBadge() {
 
 function setRouteHeader(title, meta, { back = false } = {}) {
   routeTitle.textContent = title;
+  // A narrow topbar ellipsizes the title; the full text stays its accessible
+  // name and the title attribute gives the full name to a sighted hover.
+  routeTitle.title = title;
   routeMeta.textContent = meta;
+  routeMeta.title = meta;
   backButton.hidden = !back;
 }
 

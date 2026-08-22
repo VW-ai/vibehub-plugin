@@ -153,15 +153,25 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .account-row i { margin-left: auto; width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
 .account-row i.connected { background: #22a06b; }
 
+/* Rows: topbar, optional stop banner, conversation, Composer. The surface and
+   Composer are placed explicitly so an absent banner never shifts the
+   conversation into the banner's auto row and the Composer into a 0px track. */
 .main-column { min-width: 0; min-height: 0; display: grid; grid-template-rows: 52px auto minmax(0, 1fr) auto; background: var(--bg); }
+.main-column > .topbar { grid-row: 1; }
+.main-column > .stop-banner { grid-row: 2; }
+.main-column > .surface { grid-row: 3; }
+.main-column > .composer-wrap { grid-row: 4; }
 .topbar { min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 14px; border-bottom: 1px solid var(--line); }
-.route-title { min-width: 0; display: flex; align-items: center; gap: 9px; }
+.route-title { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 9px; }
+/* The title column is a flex item: without min-width: 0 its nowrap text sets
+   its minimum width and paints over the topbar actions on a narrow viewport. */
+.route-title > div { flex: 1 1 auto; min-width: 0; }
 .route-title strong, .route-title small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .route-title small { color: var(--muted); font-size: 10px; }
 .back-button { height: 30px; padding: 0 8px; border: 0; border-radius: 7px; background: transparent; }
 .back-button:hover { background: var(--hover); }
 .topbar-actions, .runtime-pill { display: flex; align-items: center; }
-.topbar-actions { gap: 7px; }
+.topbar-actions { flex: none; gap: 7px; }
 .search-trigger { min-width: 164px; height: 31px; display: flex; align-items: center; gap: 7px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--panel); }
 .search-trigger:hover { color: var(--text); border-color: var(--line-strong); }
 .search-trigger strong { font-weight: 450; }
@@ -307,8 +317,8 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .approval-card > header { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: #b06a00; font: 9px/1 var(--mono); text-transform: uppercase; }
 .approval-card > header em { color: var(--muted); font-style: normal; }
 .approval-card > p { margin: 5px 0; color: var(--muted); }
-.approval-card footer { display: flex; gap: 7px; margin-top: 10px; }
-.approval-card button { height: 31px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.approval-card footer { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.approval-card button { min-height: 31px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); white-space: nowrap; }
 .approval-card button.accept { border-color: var(--accent); color: white; background: var(--accent); }
 .approval-card button.danger { color: #b42318; }
 .approval-context { display: grid; grid-template-columns: max-content 1fr; gap: 5px 10px; margin: 10px 0; font-size: 11px; }
