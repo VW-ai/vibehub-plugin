@@ -158,6 +158,12 @@ test("Codex-native Chat contract covers replay, live deltas, rich items, and lic
   assert.ok(fixture.thread.turns.some((turn) => turn.status === "interrupted"));
   for (const term of ["Model and mode posture", "Microphone posture", "Shortcuts", "Focus and accessibility", "Memory citations"]) assert.match(research, new RegExp(term));
   assert.equal(fixture.pendingRequests[0].fixture, true);
+  const inputRequest = fixture.pendingRequests.find((request) => request.method === "item/tool/requestUserInput");
+  assert.equal(inputRequest.params.questions.length, 2);
+  assert.equal(inputRequest.params.questions.some((question) => question.isSecret), true);
+  assert.equal(inputRequest.params.questions.some((question) => question.isOther), true);
+  assert.equal(fixture.secondaryThread.status.type, "idle");
+  assert.equal(fixture.activeThread.turns.at(-1).status, "inProgress");
 });
 
 test("Codex-first shell exposes ordinary audio honestly and routes real approvals", async () => {
@@ -250,7 +256,7 @@ test("Codex light and dark primitives share one responsive accessible shell", as
   assert.match(html, /role="combobox"[^>]+aria-controls="searchResults"/);
   assert.match(script, /document\.documentElement\.dataset\.theme/);
   assert.match(script, /focusRouteHeading/);
-  for (const behavior of ["narrow drawer closes", "search traps forward Tab", "dark theme reaches overlay siblings", "page has no horizontal overflow", "Turn posture is internally coherent", "terminal mixed fixture makes no false live claim"]) assert.match(guard, new RegExp(behavior));
+  for (const behavior of ["narrow drawer closes", "search traps forward Tab", "request draft and focus survive reconciliation", "switching Thread does not leak Composer state", "active submission dispatches one exact steer", "Fork opens returned lineage", "dark theme reaches overlay siblings", "page has no horizontal overflow", "Turn posture is internally coherent", "terminal mixed fixture makes no false live claim"]) assert.match(guard, new RegExp(behavior));
   assert.match(script, /runBrowserInteractionGuard/);
   assert.match(host, /browser-interaction-guard\.mjs/);
   assert.match(css, /body\[data-review-frame="narrow"\] \{[^}]*width: 390px; height: 844px/);

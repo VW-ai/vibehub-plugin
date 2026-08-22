@@ -1,11 +1,19 @@
 const frame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+const waitFor = async (predicate, attempts = 30) => {
+  for (let index = 0; index < attempts; index += 1) {
+    if (predicate()) return true;
+    await frame();
+  }
+  return false;
+};
 
 function check(results, name, condition, detail = "") {
   results.push({ name, pass: Boolean(condition), detail });
 }
 
-export async function runBrowserInteractionGuard() {
+export async function runBrowserInteractionGuard(hooks) {
   const results = [];
+  const fixture = await fetch("/chat-fixtures.json").then((response) => response.json());
   const originalTheme = document.documentElement.dataset.theme || "system";
   const openSidebar = document.querySelector("#openSidebar");
   const closeSidebar = document.querySelector("#collapseSidebar");
@@ -37,6 +45,65 @@ export async function runBrowserInteractionGuard() {
   document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
   await frame();
   check(results, "search Escape restores focus", search.hidden && document.activeElement === searchTrigger, document.activeElement?.id);
+
+  const request = document.querySelector('[data-request-id="fixture-user-input"]');
+  const other = request?.querySelector('[data-request-other="approach"]');
+  const otherRadio = other?.closest(".request-other")?.querySelector('input[type="radio"]');
+  const secret = request?.querySelector('[data-request-answer="token"]');
+  check(results, "requestUserInput renders every blocking question", request?.dataset.blocking === "true" && request.querySelectorAll("fieldset").length === 2);
+  check(results, "requestUserInput exposes secret and Other posture", other?.type === "text" && secret?.type === "password");
+  if (other && secret) {
+    other.value = "Custom path";
+    other.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: "Custom path" }));
+    secret.value = "fixture-secret";
+    other.focus();
+    await hooks.reconcile();
+  }
+  check(results, "typing Other selects its exact option", otherRadio?.checked === true);
+  check(results, "request draft and focus survive reconciliation", other?.value === "Custom path" && secret?.value === "fixture-secret" && document.activeElement === other);
+
+  const originalComposer = document.querySelector("#composerInput");
+  originalComposer.value = "draft owned by the original Thread";
+  document.querySelector("[data-quote-message]")?.click();
+  await frame();
+  check(results, "Quote captures exact original Thread identity", document.querySelector("#quoteTray")?.textContent.includes("Quoted response") && document.querySelector("#quoteTray .quote-source")?.getAttribute("aria-label")?.includes(fixture.thread.id));
+  await hooks.switchFixtureThread(fixture.secondaryThread);
+  check(results, "switching Thread does not leak Composer state", !document.querySelector("#composerInput").value && document.querySelector("#quoteTray").hidden);
+  document.querySelector("#composerInput").value = "secondary draft";
+  await hooks.switchFixtureThread(fixture.thread);
+  check(results, "returning restores only that Thread draft", document.querySelector("#composerInput").value === "draft owned by the original Thread" && !document.querySelector("#quoteTray").hidden);
+
+  await hooks.switchFixtureThread(fixture.activeThread);
+  const activeComposer = document.querySelector("#composer");
+  check(results, "active Turn exposes coherent Steer and Stop", activeComposer.dataset.turnPosture === "running" && activeComposer.dataset.currentTurnId === fixture.activeThread.turns[0].id && !document.querySelector("#stopTurn").hidden && document.querySelector("#sendButton").getAttribute("aria-label") === "Steer current turn");
+  const steerActions = [];
+  await hooks.withFixtureTransport(async (payload) => {
+    steerActions.push(payload);
+    if (payload.action === "readThread") return { thread: structuredClone(fixture.activeThread) };
+    return {};
+  }, async () => {
+    document.querySelector("#composerInput").value = "Steer this exact active Turn";
+    document.querySelector("#composer").requestSubmit();
+    await waitFor(() => steerActions.some((entry) => entry.action === "readThread"));
+  });
+  const steer = steerActions.find((entry) => entry.action === "steerTurn");
+  check(results, "active submission dispatches one exact steer", steer?.threadId === fixture.activeThread.id && steer?.expectedTurnId === fixture.activeThread.turns[0].id && !steerActions.some((entry) => entry.action === "startTurn"));
+
+  await hooks.switchFixtureThread(fixture.secondaryThread);
+  const forked = { ...structuredClone(fixture.secondaryThread), id: "fixture-forked-thread", title: "Forked fixture chat", forkedFromId: fixture.secondaryThread.id };
+  const forkActions = [];
+  await hooks.withFixtureTransport(async (payload) => {
+    forkActions.push(payload);
+    if (payload.action === "forkThread") return { thread: structuredClone(forked) };
+    if (payload.action === "readThread") return { thread: structuredClone(forked) };
+    throw new Error(`Unexpected fixture action ${payload.action}`);
+  }, async () => {
+    document.querySelector("[data-fork-thread]")?.click();
+    await waitFor(() => forkActions.some((entry) => entry.action === "readThread"));
+  });
+  check(results, "Fork dispatches exact source Thread", forkActions[0]?.action === "forkThread" && forkActions[0]?.threadId === fixture.secondaryThread.id);
+  check(results, "Fork opens returned lineage", document.querySelector(".thread-heading")?.textContent.includes("Forked fixture chat") && forked.forkedFromId === fixture.secondaryThread.id);
+  await hooks.switchFixtureThread(fixture.thread);
 
   openSidebar.focus();
   openSidebar.click();

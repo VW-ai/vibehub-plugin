@@ -125,6 +125,60 @@
         "command": "npm run verify",
         "reason": "Run the full repository verification outside the restricted test sandbox."
       }
+    },
+    {
+      "id": "fixture-user-input",
+      "fixture": true,
+      "method": "item/tool/requestUserInput",
+      "params": {
+        "threadId": "fixture-chat-parity",
+        "turnId": "fixture-turn-2",
+        "itemId": "fixture-input-tool",
+        "isBlocking": true,
+        "questions": [
+          {
+            "id": "approach",
+            "header": "Approach",
+            "question": "Which implementation path should Codex take?",
+            "isSecret": false,
+            "isOther": true,
+            "options": [
+              { "label": "Minimal", "description": "Keep the current boundary." },
+              { "label": "Complete", "description": "Close the full interaction gap." }
+            ]
+          },
+          {
+            "id": "token",
+            "header": "Secret",
+            "question": "Provide the temporary secret if required.",
+            "isSecret": true,
+            "isOther": false,
+            "options": null
+          }
+        ]
+      }
     }
-  ]
+  ],
+  "secondaryThread": {
+    "id": "fixture-secondary-thread",
+    "title": "Independent fixture chat",
+    "cwd": "/workspace/vibehub-plugin",
+    "status": { "type": "idle" },
+    "turns": [{
+      "id": "fixture-secondary-turn",
+      "status": "completed",
+      "items": [{ "type": "agentMessage", "id": "fixture-secondary-agent", "text": "This Thread must not inherit another Thread's Composer draft." }]
+    }]
+  },
+  "activeThread": {
+    "id": "fixture-active-thread",
+    "title": "Active steering fixture",
+    "cwd": "/workspace/vibehub-plugin",
+    "status": { "type": "active" },
+    "turns": [{
+      "id": "fixture-active-turn",
+      "status": "inProgress",
+      "items": [{ "type": "agentMessage", "id": "fixture-active-agent", "text": "Working on the current Turn…" }]
+    }]
+  }
 }

@@ -135,7 +135,10 @@ async function api(path, options = {}) {
   return envelope.data;
 }
 
-const action = (payload) => api("/api/action", { method: "POST", body: JSON.stringify(payload) });
+let interactionGuardActionSink = null;
+const action = (payload) => interactionGuardActionSink
+  ? interactionGuardActionSink(payload)
+  : api("/api/action", { method: "POST", body: JSON.stringify(payload) });
 
 function titleForThread(thread) {
   if (thread.taskLink) return humanize(thread.taskLink.ticketId);
@@ -522,7 +525,7 @@ function renderItem(item, budget) {
 function approvalMarkup(request) {
   const params = request.params ?? {};
   const descriptor = requestDescriptor(request);
-  const disabled = request.fixture ? " disabled title=\"Review fixture only\"" : "";
+  const fixtureDecisionDisabled = request.fixture ? " disabled title=\"Review fixture only\"" : "";
   if (!descriptor.supported) {
     return `<section class="approval-card unsupported-request" data-request-id="${escapeHtml(request.id)}" role="status"><header><span>Unsupported runtime request</span><em>Resolved by carrier</em></header><strong>${escapeHtml(request.method)}</strong><p>This request is never presented as a command approval. Its exact payload remains inspectable in the bounded event log.</p></section>`;
   }
@@ -531,14 +534,14 @@ function approvalMarkup(request) {
     const questions = (params.questions ?? []).map((question, index) => {
     const id = question.id ?? `question-${index}`;
       const name = `request-${request.id}-${id}`;
-      const options = (question.options ?? []).map((option) => `<label class="request-option"><input type="radio" name="${escapeHtml(name)}" value="${escapeHtml(option.label ?? option)}"${disabled}> <span>${escapeHtml(option.label ?? option)}${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}</span></label>`).join("");
-      const other = question.isOther ? `<label class="request-option request-other"><input type="radio" name="${escapeHtml(name)}" value="__other__"${disabled}> <span>Other</span><input type="${question.isSecret ? "password" : "text"}" data-request-other="${escapeHtml(id)}" aria-label="Other answer for ${escapeHtml(question.header)}" autocomplete="off"${disabled}></label>` : "";
+      const options = (question.options ?? []).map((option) => `<label class="request-option"><input type="radio" name="${escapeHtml(name)}" value="${escapeHtml(option.label ?? option)}"> <span>${escapeHtml(option.label ?? option)}${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}</span></label>`).join("");
+      const other = question.isOther ? `<label class="request-option request-other"><input type="radio" name="${escapeHtml(name)}" value="__other__"> <span>Other</span><input type="${question.isSecret ? "password" : "text"}" data-request-other="${escapeHtml(id)}" aria-label="Other answer for ${escapeHtml(question.header)}" autocomplete="off"></label>` : "";
       const freeform = options
         ? `${options}${other}`
-        : `<input class="request-answer" type="${question.isSecret ? "password" : "text"}" data-request-answer="${escapeHtml(id)}" aria-label="${escapeHtml(question.question ?? "Answer Codex")}" autocomplete="off"${disabled}>`;
+        : `<input class="request-answer" type="${question.isSecret ? "password" : "text"}" data-request-answer="${escapeHtml(id)}" aria-label="${escapeHtml(question.question ?? "Answer Codex")}" autocomplete="off">`;
       return `<fieldset data-question-id="${escapeHtml(id)}" data-secret="${question.isSecret ? "true" : "false"}"><legend><span>${escapeHtml(question.header ?? "Question")}</span>${escapeHtml(question.question ?? "Your answer")}</legend>${freeform}</fieldset>`;
     }).join("");
-    return `<section class="approval-card request-input" data-request-id="${escapeHtml(request.id)}" data-blocking="${descriptor.blocking ? "true" : "false"}" role="${descriptor.blocking ? "alertdialog" : "group"}" aria-labelledby="${escapeHtml(titleId)}"><header><span>${descriptor.blocking ? "Needs your input" : "Input requested"}</span><em>${request.fixture ? "Review fixture" : descriptor.blocking ? "Turn paused" : "You can keep working"}</em></header><strong id="${escapeHtml(titleId)}">Codex needs your input</strong><form data-request-form="${escapeHtml(request.id)}">${questions}<footer><button class="accept" type="submit"${disabled}>Send answer</button></footer></form></section>`;
+    return `<section class="approval-card request-input" data-request-id="${escapeHtml(request.id)}" data-blocking="${descriptor.blocking ? "true" : "false"}" role="${descriptor.blocking ? "alertdialog" : "group"}" aria-labelledby="${escapeHtml(titleId)}"><header><span>${descriptor.blocking ? "Needs your input" : "Input requested"}</span><em>${request.fixture ? "Review fixture" : descriptor.blocking ? "Turn paused" : "You can keep working"}</em></header><strong id="${escapeHtml(titleId)}">Codex needs your input</strong><form data-request-form="${escapeHtml(request.id)}">${questions}<footer><button class="accept" type="submit"${fixtureDecisionDisabled}>Send answer</button></footer></form></section>`;
   }
   const isFile = descriptor.kind === "fileApproval";
   const title = isFile ? "Approve file changes?" : "Approve command?";
@@ -553,7 +556,7 @@ function approvalMarkup(request) {
     params.proposedNetworkPolicyAmendments?.length && ["Network policy amendment", JSON.stringify(params.proposedNetworkPolicyAmendments)],
     params.networkApprovalContext && ["Network context", JSON.stringify(params.networkApprovalContext)],
   ].filter(Boolean).map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(takeText(createRenderBudget({ textCharacters: 8_000 }), value, 2_000).text)}</dd>`).join("");
-  return `<section class="approval-card" data-request-id="${escapeHtml(request.id)}" role="alertdialog" aria-label="${escapeHtml(title)}"><header><span>Needs your approval</span><em>${request.fixture ? "Review fixture" : "Turn paused"}</em></header><strong>${escapeHtml(title)}</strong>${command}<dl class="approval-context">${context}</dl><footer><button class="accept" type="button" data-request-decision="accept" data-request-id="${escapeHtml(request.id)}"${disabled}>Allow once</button><button type="button" data-request-decision="acceptForSession" data-request-id="${escapeHtml(request.id)}"${disabled}>Allow for session</button><button type="button" data-request-decision="decline" data-request-id="${escapeHtml(request.id)}"${disabled}>Decline</button><button class="danger" type="button" data-request-decision="cancel" data-request-id="${escapeHtml(request.id)}"${disabled}>Cancel & interrupt</button></footer></section>`;
+  return `<section class="approval-card" data-request-id="${escapeHtml(request.id)}" role="alertdialog" aria-label="${escapeHtml(title)}"><header><span>Needs your approval</span><em>${request.fixture ? "Review fixture" : "Turn paused"}</em></header><strong>${escapeHtml(title)}</strong>${command}<dl class="approval-context">${context}</dl><footer><button class="accept" type="button" data-request-decision="accept" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Allow once</button><button type="button" data-request-decision="acceptForSession" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Allow for session</button><button type="button" data-request-decision="decline" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Decline</button><button class="danger" type="button" data-request-decision="cancel" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Cancel & interrupt</button></footer></section>`;
 }
 
 const groupableActivityTypes = new Set(["commandExecution", "fileChange", "turnDiff", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "sleep", "imageGeneration"]);
@@ -666,13 +669,13 @@ function renderChat({ preserveScroll = false } = {}) {
   const activeProjectId = state.activeThread.project?.id ?? null;
   const pinnedId = state.bootstrap?.capabilities?.pinnedSectionId;
   const projectOptions = [`<option value=""${activeProjectId === null ? " selected" : ""}>Recents</option>`, ...(pinnedId ? [`<option value="${escapeHtml(pinnedId)}"${activeProjectId === pinnedId ? " selected" : ""}>Pinned</option>`] : []), ...state.projects.map((project) => `<option value="${escapeHtml(project.id)}"${activeProjectId === project.id ? " selected" : ""}>${escapeHtml(project.name)}</option>`)].join("");
-  const lineage = state.activeThread.forkedFromId ? ` · Forked from ${escapeHtml(state.activeThread.forkedFromId.slice(0, 8))}…` : "";
+  const lineage = state.activeThread.forkedFromId ? ` · Fork of ${state.activeThread.forkedFromId}` : "";
   const existingTimeline = $("#turns");
   if (preserveScroll && existingTimeline) {
     patchTimeline(existingTimeline, turnsMarkup(state.activeThread));
     $("#streamStatus").textContent = state.running ? "Codex response updated." : "Codex response settled.";
   } else {
-    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${lineage}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
   }
   requestAnimationFrame(() => {
     if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
@@ -1629,5 +1632,30 @@ async function start() {
 await start();
 if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
   const { runBrowserInteractionGuard } = await import("./browser-interaction-guard.mjs");
-  await runBrowserInteractionGuard();
+  await runBrowserInteractionGuard({
+    reconcile: async () => { renderChat({ preserveScroll: true }); await new Promise((resolve) => requestAnimationFrame(resolve)); },
+    switchFixtureThread: async (thread) => {
+      captureComposerDraft();
+      state.activeThreadId = thread.id;
+      state.activeThread = structuredClone(thread);
+      state.currentTurnId = liveTurnId(state.activeThread);
+      state.running = Boolean(state.currentTurnId);
+      restoreComposerDraft(thread.id);
+      $("#stopTurn").hidden = !state.running;
+      setRoute("chat");
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    },
+    withFixtureTransport: async (handler, callback) => {
+      const priorFixtureMode = state.fixtureMode;
+      state.fixtureMode = false;
+      interactionGuardActionSink = handler;
+      renderChat();
+      try { return await callback(); }
+      finally {
+        interactionGuardActionSink = null;
+        state.fixtureMode = priorFixtureMode;
+        renderChat();
+      }
+    },
+  });
 }
