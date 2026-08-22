@@ -172,6 +172,28 @@ export function applyChatEvent(model, method, params = {}) {
     if (turnId) clearTurnTransient(model, params.threadId, turnId);
     return true;
   }
+  // The app-server process died while this Turn was in progress. The Turn
+  // is not live any more and nothing streamed for it can be trusted; a
+  // boundary records where the exit fell until replay marks the Turn
+  // terminal on its own (an authoritative Turn hides every transient entry).
+  if (method === "runtime/exited") {
+    const turnId = params.turnId ?? "unknown";
+    clearTurnTransient(model, params.threadId, turnId);
+    const id = `runtime-exit-${turnId}`;
+    const key = itemKey(params.threadId, turnId, id);
+    model.turnErrors.set(key, {
+      type: "turnBoundary",
+      id,
+      status: "runtimeExited",
+      _threadId: params.threadId,
+      _turnId: turnId,
+      _key: key,
+      _live: false,
+      message: `The local Codex app-server exited (process generation ${params.generation ?? "unknown"}) while this Turn was running. Nothing here is live; the Thread is re-read from Codex once the runtime is back.`,
+    });
+    trimMap(model.turnErrors);
+    return true;
+  }
   return false;
 }
 

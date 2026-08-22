@@ -101,6 +101,30 @@ test("authoritative Turn completion retires retry, plan, diff and live execution
   assert.deepEqual(failed.map((item) => item.type), ["turnBoundary"]);
 });
 
+test("a runtime exit ends every live claim for the Turn and leaves a boundary until replay settles it", () => {
+  const model = { liveItems: new Map(), turnErrors: new Map() };
+  applyChatEvent(model, "item/started", { threadId: "thread", turnId: "turn", item: { id: "command", type: "commandExecution", status: "inProgress" } });
+  applyChatEvent(model, "item/agentMessage/delta", { threadId: "thread", turnId: "turn", itemId: "answer", delta: "partial" });
+  applyChatEvent(model, "turn/plan/updated", { threadId: "thread", turnId: "turn", plan: [{ step: "Plan", status: "inProgress" }] });
+  assert.equal(applyChatEvent(model, "runtime/exited", { threadId: "thread", turnId: "turn", generation: 1 }), true);
+  // The orphaned Turn replays exactly as the app-server persisted it: still
+  // inProgress on a Thread that is no longer active. Nothing streamed survives,
+  // the boundary names the exit, and no entry claims to be live.
+  const orphaned = canonicalTimeline({ id: "thread", status: { type: "notLoaded" }, turns: [{ id: "turn", status: "inProgress", items: [{ id: "user", type: "userMessage", content: [{ type: "text", text: "keep running" }] }] }] }, model);
+  assert.deepEqual(orphaned.map((item) => [item.type, item._live]), [["userMessage", false], ["turnBoundary", false]]);
+  assert.equal(orphaned.at(-1).status, "runtimeExited");
+  assert.match(orphaned.at(-1).message, /app-server exited \(process generation 1\)/);
+  assert.equal(model.liveItems.size, 0);
+  assert.equal(model.turnPlans.size, 0);
+  // Once replay marks the Turn terminal on its own, the boundary yields to the
+  // authoritative record.
+  const settled = canonicalTimeline({ id: "thread", status: { type: "idle" }, turns: [{ id: "turn", status: "interrupted", items: [] }] }, model);
+  assert.deepEqual(settled.map((item) => item.status), ["interrupted"]);
+  // A later Turn of the same Thread is untouched by the old boundary.
+  const next = canonicalTimeline({ id: "thread", status: { type: "active" }, turns: [{ id: "turn", status: "interrupted", items: [] }, { id: "turn-2", status: "inProgress", items: [] }] }, model);
+  assert.deepEqual(next.map((item) => item._turnId), ["turn"]);
+});
+
 test("live reducer memory is bounded before authoritative completion", () => {
   const model = { liveItems: new Map(), turnErrors: new Map() };
   for (let index = 0; index < LIVE_ITEM_LIMIT + 20; index += 1) {
@@ -202,6 +226,12 @@ test("event-window recovery reports loss and runtime generation truthfully", () 
   assert.equal(lost.runtimeGeneration, 4);
   assert.equal(lost.runtimeAlive, false);
   assert.equal(eventWindow(retained, 1, 501, { generation: 4, alive: true }).gap, false);
+  // The window carries the host's runtime state and halt so a browser that
+  // missed runtimeExit or runtimeHalted still lands on the truth.
+  assert.deepEqual([lost.runtimeState, lost.runtimeHalt], ["exited", null]);
+  const halted = eventWindow(retained, 501, 501, { generation: 2, alive: true, state: "halted", halt: { conditionId: "thread-restart-recovery-unavailable", code: "stop-condition-violated" } });
+  assert.deepEqual([halted.runtimeState, halted.runtimeHalt.conditionId, halted.events.length], ["halted", "thread-restart-recovery-unavailable", 0]);
+  assert.equal(eventWindow(retained, 501, 501, { generation: 2, alive: false, state: "restarting" }).runtimeState, "restarting");
 });
 
 test("server-request registry never mislabels unsupported requests as approvals", () => {

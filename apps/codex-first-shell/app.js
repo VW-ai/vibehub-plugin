@@ -62,6 +62,9 @@ const state = {
   paintDeferred: false,
   runtimeGeneration: 0,
   runtimeAlive: false,
+  // alive | restarting | exited | halted, as the host reports it; the label
+  // in the topbar is derived from this, never from a guess.
+  runtimeState: "exited",
   knownRequestIds: new Set(),
   composerDrafts: new Map(),
   requestDrafts: new Map(),
@@ -204,6 +207,9 @@ function renderProjectHeader() {
   $("#inboxButton").hidden = !bound;
 }
 
+// The stop banner is the one visible halt: it names the pinned stop
+// condition the host enforced (upstream-lock.json stopConditions) and stays
+// until the shell is relaunched; no action re-enables reuse from the browser.
 function renderStopBanner() {
   const stop = state.bootstrap?.stop ?? null;
   $("#stopBanner")?.remove();
@@ -212,8 +218,46 @@ function renderStopBanner() {
   banner.id = "stopBanner";
   banner.className = "stop-banner";
   banner.setAttribute("role", "alert");
-  banner.innerHTML = `<strong>Stopped: Codex runtime does not match the pinned baseline</strong><p>${escapeHtml(stop.message)} Chat history, grouping and Tasks are not read from this runtime.</p>`;
+  banner.dataset.conditionId = stop.conditionId ?? "runtime-baseline-mismatch";
+  const title = stop.code === "runtime-baseline-mismatch"
+    ? "Stopped: Codex runtime does not match the pinned baseline"
+    : "Stopped: Codex runtime violated a pinned stop condition";
+  banner.innerHTML = `<strong>${escapeHtml(title)}</strong><p>${escapeHtml(stop.message)} Chat history, grouping and Tasks are not read from this runtime.</p><p class="stop-condition">Stop condition <code>${escapeHtml(stop.conditionId ?? "runtime-baseline-mismatch")}</code>${stop.detail && stop.detail !== stop.message ? ` · ${escapeHtml(stop.detail)}` : ""} · Relaunch VibeHub after correcting the runtime.</p>`;
   mainColumn.querySelector(".topbar").insertAdjacentElement("afterend", banner);
+}
+
+// A halt announced after boot (runtimeHalted event or the event window's
+// runtimeHalt) becomes the same stop the bootstrap would carry.
+function applyRuntimeHalt(halt) {
+  if (!halt || state.bootstrap?.stop?.conditionId === halt.conditionId) return false;
+  state.bootstrap = { ...(state.bootstrap ?? {}), stop: { code: halt.code, conditionId: halt.conditionId, message: halt.message, detail: halt.detail, observedVersion: halt.observedVersion ?? null, baselineVersion: halt.baselineVersion ?? null } };
+  state.running = false;
+  state.currentTurnId = null;
+  $("#stopTurn").hidden = true;
+  renderStopBanner();
+  renderProjectHeader();
+  setRuntimePosture({ alive: state.runtimeAlive, state: "halted" });
+  if (state.route === "chat") renderChat({ preserveScroll: true });
+  else if (state.route === "task") renderTaskWorkspace();
+  return true;
+}
+
+// The app-server died. Nothing the browser holds about its Turns is live any
+// more: the running posture is dropped, streamed partials are discarded in
+// favour of what Codex persisted, and the transcript says where the exit
+// fell. Live posture comes back only from thread/read after a restart.
+function markRuntimeExited(value) {
+  if (state.running && state.activeThreadId) {
+    applyChatEvent(state, "runtime/exited", { threadId: state.activeThreadId, turnId: state.currentTurnId, generation: value?.runtimeGeneration ?? state.runtimeGeneration });
+  }
+  state.running = false;
+  state.currentTurnId = null;
+  $("#stopTurn").hidden = true;
+  for (const map of [state.liveItems, state.turnPlans, state.turnDiffs]) map.clear();
+  setRuntimePosture({ alive: false, generation: value?.runtimeGeneration ?? state.runtimeGeneration, state: state.bootstrap?.stop ? "halted" : "restarting" });
+  updateSidebar();
+  if (state.route === "chat") renderChat({ preserveScroll: true });
+  else if (state.route === "task") renderTaskWorkspace();
 }
 
 function scopePanelMarkup(title) {
@@ -278,7 +322,9 @@ function humanize(ticketId) {
 
 function threadButton(thread) {
   const active = thread.id === state.activeThreadId;
-  const runtimeActive = String(thread.status?.type ?? thread.status ?? "").toLowerCase().includes("active");
+  // The presence dot is a live claim: it needs a live runtime as well as the
+  // last status the app-server reported for the Thread.
+  const runtimeActive = state.runtimeAlive && !state.bootstrap?.stop && String(thread.status?.type ?? thread.status ?? "").toLowerCase().includes("active");
   return `<button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
     <i class="thread-state${runtimeActive ? " active" : ""}"></i>
     <span><strong>${escapeHtml(titleForThread(thread))}</strong><small>${escapeHtml(thread.taskLink ? "VibeHub Task · Codex Thread" : (thread.preview || "Codex Thread").slice(0, 54))}</small></span>
@@ -377,18 +423,39 @@ function syncComposerMode() {
   $("#composer").dataset.turnPosture = state.running ? "running" : "idle";
   if (state.currentTurnId) $("#composer").dataset.currentTurnId = state.currentTurnId;
   else delete $("#composer").dataset.currentTurnId;
+  const halted = Boolean(state.bootstrap?.stop);
+  if (!state.creatingThread) $("#newThread").disabled = halted;
+  for (const fork of $$("[data-fork-thread]")) fork.disabled = state.fixtureMode || state.running || halted;
   input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : "Ask Codex to do something";
   $("#composerNote").textContent = taskMode
     ? (linked ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.` : "The host will open a linked Codex Thread with the canonical Task packet.")
     : "Codex can make mistakes. Review commands and changes.";
 }
 
-function setRuntimePosture({ alive, generation = state.runtimeGeneration, label } = {}) {
+function runtimeLabel() {
+  const stop = state.bootstrap?.stop;
+  if (stop) return stop.code === "runtime-baseline-mismatch" ? "Stopped: baseline mismatch" : `Stopped: ${stop.conditionId}`;
+  if (state.runtimeState === "restarting") return "Runtime restarting";
+  if (state.runtimeState === "exited") return "Runtime exited";
+  if (state.runtimeState === "halted") return "Stopped";
+  if (state.runtimeState === "unreachable") return "Host unreachable";
+  if (!state.bootstrap?.account?.authenticated && state.bootstrap) return "Authentication required";
+  return state.runtimeAlive ? "Local app-server" : "Runtime unavailable";
+}
+
+function setRuntimePosture({ alive, generation = state.runtimeGeneration, state: runtimeState, label } = {}) {
   state.runtimeAlive = Boolean(alive);
   state.runtimeGeneration = generation;
+  if (runtimeState) state.runtimeState = runtimeState;
   const stopped = Boolean(state.bootstrap?.stop);
-  $("#runtimeLabel").textContent = label ?? (stopped ? "Stopped: baseline mismatch" : state.runtimeAlive ? "Local app-server" : "Runtime unavailable");
-  $("#runtimeLabel").parentElement.dataset.stopped = String(stopped);
+  const pill = $("#runtimeLabel").parentElement;
+  $("#runtimeLabel").textContent = label ?? runtimeLabel();
+  pill.dataset.stopped = String(stopped);
+  pill.dataset.runtimeState = stopped ? "halted" : state.runtimeState;
+  const conditions = state.bootstrap?.runtime?.conditions ?? [];
+  pill.title = conditions.length
+    ? `Pinned stop conditions · ${conditions.map((entry) => `${entry.id}: ${entry.status}`).join(" · ")}`
+    : "";
   $("#accountDot").classList.toggle("connected", state.runtimeAlive && Boolean(state.bootstrap?.account?.authenticated));
   $("#stopTurn").disabled = !state.runtimeAlive;
   syncComposerMode();
@@ -820,7 +887,7 @@ function renderItem(item, budget) {
   if (item.type === "contextCompaction") return '<div class="timeline-divider"><span>Context compacted</span><strong>Earlier detail remains in Thread history</strong></div>';
   if (item.type === "hookPrompt") return `<div class="timeline-divider"><span>Project instructions</span><strong>${escapeHtml((item.fragments ?? []).map((fragment) => fragment.text ?? fragment.content ?? "").join(" ").slice(0, 120))}</strong></div>`;
   if (item.type === "turnError") return `<section class="turn-error"><strong>${item.willRetry ? "Codex is retrying" : "This Turn stopped"}</strong><p>${escapeHtml(takeText(budget, item.message, 4_000).text)}</p>${item.willRetry ? '<span class="retrying">Retrying…</span>' : `<button type="button" data-retry-turn="${escapeHtml(item._turnId)}">Retry as a new Turn</button>`}</section>`;
-  if (item.type === "turnBoundary") return `<div class="turn-boundary ${escapeHtml(item.status)}"><span>${item.status === "interrupted" ? "Turn interrupted" : "Turn failed"}</span><strong>${escapeHtml(takeText(budget, item.message ?? (item.status === "interrupted" ? "Partial output remains in Thread history." : "The error remains inspectable in this Thread."), 4_000).text)}</strong></div>`;
+  if (item.type === "turnBoundary") return `<div class="turn-boundary ${escapeHtml(item.status)}"><span>${item.status === "interrupted" ? "Turn interrupted" : item.status === "runtimeExited" ? "Runtime exited during this Turn" : "Turn failed"}</span><strong>${escapeHtml(takeText(budget, item.message ?? (item.status === "interrupted" ? "Partial output remains in Thread history." : "The error remains inspectable in this Thread."), 4_000).text)}</strong></div>`;
   return `<div class="activity-row">${disclosureCard({ identity, kind: "unknown", icon: "?", title: item.type ?? "Unsupported item", status: statusLabel(item), summary: "Inspect raw app-server item; no result inferred", detail: boundedPre(JSON.stringify(item, null, 2), "", 8_000, budget) })}</div>`;
 }
 
@@ -870,7 +937,10 @@ function renderTimelineItems(items) {
   let groupOrdinal = 0;
   const flush = () => {
     if (!group.length) return;
-    const running = group.some((item) => item._live || ["inProgress", "running"].includes(item.status));
+    // "Working…" is a live claim: it needs a streamed item or an in-progress
+    // item of the Turn thread/read says is live; replayed in-progress status
+    // from a Thread that is not active never counts.
+    const running = group.some((item) => item._live || (state.running && item._turnId === state.currentTurnId && ["inProgress", "running"].includes(item.status)));
     const failed = group.some((item) => ["failed", "declined", "errored"].includes(item.status));
     const files = group.filter((item) => item.type === "fileChange").flatMap((item) => item.changes ?? []).length;
     const label = running ? "Working…" : failed ? "Work needs attention" : "Worked on this Turn";
@@ -1260,7 +1330,7 @@ async function refreshThreads() {
   renderStopBanner();
   $("#accountName").textContent = data.account.authenticated ? "Codex" : "Sign in required";
   $("#accountPlan").textContent = data.account.planType ?? data.account.accountType ?? "Unavailable";
-  setRuntimePosture({ alive: data.runtime.alive && data.account.authenticated, generation: data.runtime.generation, label: data.stop ? "Stopped: baseline mismatch" : data.account.authenticated ? (data.runtime.alive ? "Local app-server" : "Runtime unavailable") : "Authentication required" });
+  setRuntimePosture({ alive: data.runtime.alive && data.account.authenticated, generation: data.runtime.generation, state: data.stop ? "halted" : data.runtime.state ?? (data.runtime.alive ? "alive" : "exited") });
   updateSidebar();
 }
 
@@ -1278,7 +1348,9 @@ async function openThread(threadId, { route = "chat" } = {}) {
   if (!state.running) {
     for (const [key, item] of state.liveItems) if (item._threadId === threadId) state.liveItems.delete(key);
     for (const map of [state.turnErrors, state.turnPlans, state.turnDiffs]) {
-      for (const [key, item] of map) if (item._threadId === threadId) map.delete(key);
+      // A "runtime exited during this Turn" boundary is observed history,
+      // not streamed state: it stays until replay marks the Turn terminal.
+      for (const [key, item] of map) if (item._threadId === threadId && item.status !== "runtimeExited") map.delete(key);
     }
   }
   $("#stopTurn").hidden = !state.running;
@@ -1341,7 +1413,7 @@ async function newThread() {
     return data.thread;
   })();
   try { return await state.creatingThread; }
-  finally { state.creatingThread = null; $("#newThread").disabled = false; }
+  finally { state.creatingThread = null; $("#newThread").disabled = Boolean(state.bootstrap?.stop); }
 }
 
 async function forkActiveThread() {
@@ -1582,57 +1654,83 @@ async function submitTurn(event) {
   } catch (error) { notify(error.message); }
 }
 
+// One host event window applied to the browser state. Runtime truth flows in
+// three ways and none of them mints a live Turn: runtimeExit drops every
+// live posture, runtimeRestarted (or a generation change while alive)
+// re-reads the Thread so thread/read is the only source of liveness, and
+// runtimeHalted raises the persistent stop.
+async function applyEventWindow(data) {
+  const previousRequestIds = new Set(state.pendingRequests.map((request) => String(request.id)));
+  const focusedRequestId = document.activeElement?.closest?.("[data-request-id]")?.dataset.requestId;
+  const previousGeneration = state.runtimeGeneration;
+  state.eventCursor = data.cursor;
+  state.pendingRequests = data.pendingRequests;
+  state.knownRequestIds = new Set(data.pendingRequests.map((request) => String(request.id)));
+  pruneRequestDrafts(state.requestDrafts, state.knownRequestIds);
+  let haltRaised = false;
+  let refreshRequests = false;
+  let refreshLists = false;
+  let reconcile = data.gap || (data.runtimeGeneration !== previousGeneration && data.runtimeAlive);
+  let rendered = false;
+  for (const entry of data.events) {
+    if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refreshRequests = true;
+    if (entry.kind === "runtimeExit") {
+      markRuntimeExited(entry.value);
+      reconcile = false;
+      continue;
+    }
+    if (entry.kind === "runtimeRestarted") {
+      refreshLists = true;
+      reconcile = true;
+      continue;
+    }
+    if (entry.kind === "runtimeHalted") {
+      haltRaised = applyRuntimeHalt(entry.value) || haltRaised;
+      reconcile = false;
+      continue;
+    }
+    if (entry.kind !== "notification") continue;
+    const method = entry.value.method;
+    const params = entry.value.params ?? {};
+    if (method === "serverRequest/resolved") refreshRequests = true;
+    if (params.threadId !== state.activeThreadId) continue;
+    if (method === "turn/started") {
+      state.running = true;
+      state.currentTurnId = params.turn?.id;
+      $("#stopTurn").hidden = false;
+      syncComposerMode();
+    }
+    if (method === "turn/completed") {
+      state.running = false;
+      state.currentTurnId = null;
+      $("#stopTurn").hidden = true;
+      syncComposerMode();
+      reconcile = true;
+    }
+    rendered = applyChatNotification(method, params) || rendered;
+  }
+  if (data.runtimeHalt) haltRaised = applyRuntimeHalt(data.runtimeHalt) || haltRaised;
+  setRuntimePosture({ alive: data.runtimeAlive, generation: data.runtimeGeneration, state: state.bootstrap?.stop ? "halted" : data.runtimeState ?? (data.runtimeAlive ? "alive" : "exited") });
+  if (refreshLists) await refreshThreads();
+  if (reconcile && state.activeThreadId && state.runtimeAlive && !state.bootstrap?.stop) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
+  else if ((rendered || refreshRequests || haltRaised) && state.activeThreadId) scheduleChatRender();
+  focusNewBlockingRequest(previousRequestIds);
+  if (focusedRequestId && !state.knownRequestIds.has(focusedRequestId)) requestAnimationFrame(() => $("#composerInput")?.focus({ preventScroll: true }));
+}
+
 async function pollEvents() {
   try {
-    const previousRequestIds = new Set(state.pendingRequests.map((request) => String(request.id)));
-    const focusedRequestId = document.activeElement?.closest?.("[data-request-id]")?.dataset.requestId;
-    const previousGeneration = state.runtimeGeneration;
     const data = await api(`/api/events?after=${state.eventCursor}`);
-    state.eventCursor = data.cursor;
-    state.pendingRequests = data.pendingRequests;
-    state.knownRequestIds = new Set(data.pendingRequests.map((request) => String(request.id)));
-    pruneRequestDrafts(state.requestDrafts, state.knownRequestIds);
-    setRuntimePosture({ alive: data.runtimeAlive, generation: data.runtimeGeneration });
-    let refreshRequests = false;
-    let reconcile = data.gap || data.runtimeGeneration !== previousGeneration;
-    let rendered = false;
-    for (const entry of data.events) {
-      if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refreshRequests = true;
-      if (entry.kind === "runtimeExit") {
-        setRuntimePosture({ alive: false, generation: entry.value.runtimeGeneration, label: "Runtime exited" });
-        reconcile = false;
-      }
-      if (entry.kind !== "notification") continue;
-      const method = entry.value.method;
-      const params = entry.value.params ?? {};
-      if (method === "serverRequest/resolved") refreshRequests = true;
-      if (params.threadId !== state.activeThreadId) continue;
-      if (method === "turn/started") {
-        state.running = true;
-        state.currentTurnId = params.turn?.id;
-        $("#stopTurn").hidden = false;
-        syncComposerMode();
-      }
-      if (method === "turn/completed") {
-        state.running = false;
-        state.currentTurnId = null;
-        $("#stopTurn").hidden = true;
-        syncComposerMode();
-        reconcile = true;
-      }
-      rendered = applyChatNotification(method, params) || rendered;
-    }
-    if (reconcile && state.activeThreadId && state.runtimeAlive) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
-    else if ((rendered || refreshRequests) && state.activeThreadId) scheduleChatRender();
-    focusNewBlockingRequest(previousRequestIds);
-    if (focusedRequestId && !state.knownRequestIds.has(focusedRequestId)) requestAnimationFrame(() => $("#composerInput")?.focus({ preventScroll: true }));
+    await applyEventWindow(data);
     state.attentionPollCounter += 1;
     if (state.attentionPollCounter >= 12) {
       state.attentionPollCounter = 0;
       await refreshThreads();
     }
   } catch (error) {
-    setRuntimePosture({ alive: false, label: "Runtime reconnecting" });
+    // The loopback host itself did not answer. That is all the browser knows:
+    // it never claims the runtime is reconnecting on its own behalf.
+    setRuntimePosture({ alive: false, state: "unreachable" });
   } finally {
     pollTimer = setTimeout(pollEvents, 850);
   }
@@ -2160,6 +2258,21 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
     },
     currentProject: () => state.bootstrap?.project ?? null,
     currentBootstrap: () => state.bootstrap ?? null,
+    // Host event windows fed straight into the same path pollEvents takes,
+    // and a way back to the live runtime posture once the checks are done.
+    applyEventWindow: async (window) => {
+      await applyEventWindow(window);
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    },
+    restoreRuntime: async ({ stop = null, alive = true } = {}) => {
+      state.bootstrap = { ...(state.bootstrap ?? {}), stop };
+      for (const map of [state.turnErrors]) for (const [key, item] of map) if (item.status === "runtimeExited") map.delete(key);
+      renderStopBanner();
+      renderProjectHeader();
+      setRuntimePosture({ alive, state: alive ? "alive" : "exited" });
+      if (state.route === "chat") renderChat();
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    },
     closeImport: () => closeImport(false),
     // Real host transport for checks that must read the checked-in repository
     // through the live projection rather than a fixture.

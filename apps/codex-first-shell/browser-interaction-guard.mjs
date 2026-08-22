@@ -193,6 +193,40 @@ export async function runBrowserInteractionGuard(hooks) {
   });
   check(results, "terminal reconciliation re-enables Fork", terminalForkEnabled);
 
+  // Runtime lifecycle through the same path pollEvents takes. The app-server
+  // exits under a live Turn: the running posture must go at once, a boundary
+  // must say where the exit fell, and nothing may claim to be working. A halt
+  // announced by the host must raise the persistent stop and disable every
+  // adapter action until relaunch.
+  await hooks.switchFixtureThread(fixture.activeThread);
+  const composerNode = document.querySelector("#composer");
+  const runtimeLabelNode = document.querySelector("#runtimeLabel");
+  const liveBeforeExit = composerNode.dataset.turnPosture === "running" && !document.querySelector("#stopTurn").hidden;
+  await hooks.applyEventWindow({ events: [{ sequence: 1, kind: "runtimeExit", value: { code: null, signal: "SIGKILL", generation: 1, requested: false, runtimeGeneration: 1 } }], cursor: 1, oldestCursor: 1, gap: false, runtimeGeneration: 1, runtimeAlive: false, runtimeState: "restarting", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+  const exitBoundary = document.querySelector(".turn-boundary.runtimeExited");
+  check(results, "runtime exit clears the running posture and marks the dead Turn", liveBeforeExit
+    && composerNode.dataset.turnPosture === "idle" && !composerNode.dataset.currentTurnId
+    && document.querySelector("#stopTurn").hidden && document.querySelector("#sendButton").getAttribute("aria-label") === "Send message"
+    && document.querySelector("#composerInput").disabled
+    && Boolean(exitBoundary?.textContent.includes("Runtime exited during this Turn")) && exitBoundary.textContent.includes("process generation 1")
+    && !document.querySelector(".activity-group summary strong")?.textContent.includes("Working")
+    && runtimeLabelNode.textContent === "Runtime restarting" && runtimeLabelNode.parentElement.dataset.runtimeState === "restarting",
+    `${composerNode.dataset.turnPosture}/${runtimeLabelNode.textContent}/${exitBoundary ? "boundary" : "no boundary"}`);
+  const haltFixture = { code: "stop-condition-violated", conditionId: "thread-restart-recovery-unavailable", message: "Stop condition thread-restart-recovery-unavailable: After restart (generation 2), Thread fixture-active-thread did not come back. The shell stops here instead of reusing this runtime.", detail: "After restart (generation 2), Thread fixture-active-thread did not come back.", observedVersion: "0.147.0", baselineVersion: "0.147.0", generation: 2 };
+  await hooks.applyEventWindow({ events: [{ sequence: 2, kind: "runtimeHalted", value: haltFixture }], cursor: 2, oldestCursor: 1, gap: false, runtimeGeneration: 2, runtimeAlive: true, runtimeState: "halted", runtimeHalt: haltFixture, pendingRequests: fixture.pendingRequests });
+  const haltBanner = document.querySelector("#stopBanner");
+  check(results, "runtime halt raises a persistent stop that names the condition and disables adapter actions",
+    haltBanner?.getAttribute("role") === "alert" && haltBanner.dataset.conditionId === "thread-restart-recovery-unavailable"
+      && haltBanner.querySelector("code")?.textContent === "thread-restart-recovery-unavailable" && haltBanner.textContent.includes("did not come back")
+      && document.querySelector("#composerInput").disabled && document.querySelector("#sendButton").disabled && document.querySelector("#newThread").disabled
+      && [...document.querySelectorAll("[data-fork-thread]")].every((button) => button.disabled)
+      && document.querySelector("#importProject").hidden
+      && runtimeLabelNode.textContent === "Stopped: thread-restart-recovery-unavailable" && runtimeLabelNode.parentElement.dataset.stopped === "true"
+      && composerNode.dataset.turnPosture === "idle",
+    `${haltBanner?.dataset.conditionId ?? "no banner"}/${runtimeLabelNode.textContent}`);
+  await hooks.restoreRuntime();
+  check(results, "restoring the runtime posture withdraws the stop", !document.querySelector("#stopBanner") && !document.querySelector("#composerInput").disabled && !document.querySelector("#newThread").disabled && runtimeLabelNode.parentElement.dataset.stopped === "false");
+
   await hooks.switchFixtureThread(fixture.secondaryThread);
   const forked = { ...structuredClone(fixture.secondaryThread), id: "fixture-forked-thread", title: "Forked fixture chat", forkedFromId: fixture.secondaryThread.id };
   const forkActions = [];
