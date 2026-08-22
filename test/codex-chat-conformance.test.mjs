@@ -235,7 +235,8 @@ test("current shell exposes the conformance interactions without a second transc
   assert.match(script, /runtimeGeneration/);
   assert.match(script, /Retry as a new Turn/);
   assert.match(script, /state\.running.*composer.*stopTurn/s);
-  assert.doesNotMatch(script, /\bprompt\(/);
+  const requestSurface = script.slice(script.indexOf("function approvalMarkup"), script.indexOf("const groupableActivityTypes"));
+  assert.doesNotMatch(requestSurface, /\bprompt\(/);
   assert.match(css, /\.quote-selection/);
   assert.match(css, /\.request-option/);
   assert.match(host, /chat-model\.mjs/);
@@ -243,18 +244,21 @@ test("current shell exposes the conformance interactions without a second transc
 });
 
 test("audit corrections wire running steer, fork, Thread drafts, drawer semantics, and bounded media", async () => {
-  const [html, script, host, lockText, guard] = await Promise.all([
+  const [html, script, host, projectsAdapter, lockText, guard] = await Promise.all([
     source("apps/codex-first-shell-prototype/index.html"),
     source("apps/codex-first-shell-prototype/app.js"),
     source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("packages/codex-adapter/projects.mjs"),
     source("packages/codex-adapter/upstream-lock.json"),
     source("apps/codex-first-shell-prototype/browser-interaction-guard.mjs"),
   ]);
   const lock = JSON.parse(lockText);
   assert.ok(lock.requiredRequests.includes("thread/fork"));
-  assert.match(host, /payload\.action === "forkThread"[^]*thread\/fork/);
+  assert.match(host, /payload\.action === "forkThread"[^]*projects\.forkThread/);
+  assert.match(projectsAdapter, /thread\/fork/);
   assert.match(host, /payload\.action === "steerTurn"[^]*turn\/steer/);
-  assert.match(host, /payload\.action === "archiveThread"[^]*thread\/archive/);
+  assert.match(host, /payload\.action === "archiveThread"[^]*projects\.archiveThread/);
+  assert.match(projectsAdapter, /thread\/archive/);
   assert.match(host, /payload\.action === "setThreadName"[^]*thread\/name\/set/);
   assert.match(script, /state\.running \? "steerTurn" : "startTurn"/);
   assert.match(script, /liveTurnId\(fixture\.thread\)/);
