@@ -5,11 +5,16 @@
 // DevTools protocol. A headless page is a visible document, so
 // requestAnimationFrame and selectionchange behave as in a foreground tab.
 //
-//   node scripts/vh-codex-first-shell-guard.mjs            # boots the shell on the fixture app-server, runs every frame and the lifecycle walk
+//   node scripts/vh-codex-first-shell-guard.mjs            # boots the shell on the fixture app-server, runs every frame in Light and Dark, then the lifecycle walk
 //   node scripts/vh-codex-first-shell-guard.mjs --url <printed shell url>   # guard frames against an already running shell
-//   --frames wide,narrow-window,narrow-viewport   --runs 1   --no-lifecycle   --chrome <binary>
+//   --frames wide,narrow-window,narrow-viewport   --schemes light,dark   --runs 1   --no-lifecycle   --chrome <binary>
 //
-// Exit status is non-zero when any guard check or lifecycle step fails.
+// Each frame runs once per emulated prefers-color-scheme, so the shell's
+// System theme is exercised in both modes; after the guard, prefers-reduced-
+// motion: reduce is emulated and the page's motion audit must report no
+// running animation, transition or smooth scroll.
+//
+// Exit status is non-zero when any guard check, motion audit or lifecycle step fails.
 
 import { spawn } from "node:child_process";
 import { once } from "node:events";
@@ -19,12 +24,13 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const options = { url: null, frames: ["wide", "narrow-window", "narrow-viewport"], runs: 1, lifecycle: true, chrome: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" };
+const options = { url: null, frames: ["wide", "narrow-window", "narrow-viewport"], schemes: ["light", "dark"], runs: 1, lifecycle: true, chrome: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" };
 const argv = process.argv.slice(2);
 for (let index = 0; index < argv.length; index += 1) {
   const flag = argv[index];
   if (flag === "--url") options.url = argv[++index];
   else if (flag === "--frames") options.frames = argv[++index].split(",");
+  else if (flag === "--schemes") options.schemes = argv[++index].split(",");
   else if (flag === "--runs") options.runs = Number(argv[++index]);
   else if (flag === "--no-lifecycle") options.lifecycle = false;
   else if (flag === "--chrome") options.chrome = argv[++index];
@@ -84,9 +90,11 @@ async function launchChrome(viewport) {
     await send("Emulation.setDeviceMetricsOverride", { width: viewport.width, height: viewport.height, deviceScaleFactor: 1, mobile: Boolean(viewport.mobile) }, sessionId);
     await send("Emulation.setFocusEmulationEnabled", { enabled: true }, sessionId);
     const evaluate = async (expression, awaitPromise = false) => (await send("Runtime.evaluate", { expression, awaitPromise, returnByValue: true }, sessionId)).result.value;
+    const emulateMedia = (features) => send("Emulation.setEmulatedMedia", { features }, sessionId);
     return {
       errors,
       evaluate,
+      emulateMedia,
       navigate: (url) => send("Page.navigate", { url }, sessionId),
       reload: () => send("Page.reload", {}, sessionId),
       waitFor: (expression, timeoutMs = 20_000) => evaluate(`(async () => { const deadline = Date.now() + ${timeoutMs}; while (Date.now() < deadline) { try { const value = (${expression}); if (value) return value; } catch {} await new Promise((r) => setTimeout(r, 60)); } return null; })()`, true),
@@ -96,11 +104,13 @@ async function launchChrome(viewport) {
   return { page, close: () => { ws.close(); child.kill("SIGKILL"); rmSync(profile, { recursive: true, force: true }); } };
 }
 
-async function runGuardFrame(shellUrl, frameName, run) {
+async function runGuardFrame(shellUrl, frameName, scheme, run) {
   const frame = FRAMES[frameName];
   const chrome = await launchChrome(frame);
+  const tag = `${frameName} ${frame.width}x${frame.height} ${scheme} run ${run}`;
   try {
     const page = await chrome.page();
+    await page.emulateMedia([{ name: "prefers-color-scheme", value: scheme }]);
     const url = new URL(shellUrl);
     url.searchParams.set("chatFixture", "mixed");
     url.searchParams.set("interactionGuard", "1");
@@ -110,12 +120,25 @@ async function runGuardFrame(shellUrl, frameName, run) {
       for (let i = 0; i < 900 && !window.__VIBEHUB_INTERACTION_GUARD__; i++) await new Promise((r) => setTimeout(r, 100));
       const s = window.__VIBEHUB_INTERACTION_GUARD__;
       if (!s) return { stalled: true, visibility: document.visibilityState };
-      return { ok: s.ok, passed: s.passed, total: s.total, clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth, results: s.results };
+      return { ok: s.ok, passed: s.passed, total: s.total, clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth, canvas: getComputedStyle(document.body).backgroundColor, theme: document.documentElement.dataset.theme, results: s.results };
     })()`, true);
-    const ok = Boolean(summary.ok) && page.errors.length === 0 && summary.clientWidth === summary.scrollWidth;
-    console.log(`[guard ${frameName} ${frame.width}x${frame.height} run ${run}] ${summary.stalled ? `STALLED (${summary.visibility})` : `${summary.ok ? "PASS" : "FAIL"} browser interaction guard · ${summary.passed}/${summary.total}`} · clientWidth=${summary.clientWidth} scrollWidth=${summary.scrollWidth} · consoleErrors=${page.errors.length}`);
+    const expectedCanvas = scheme === "dark" ? "rgb(24, 24, 24)" : "rgb(255, 255, 255)";
+    const schemeHonored = summary.theme === "system" && summary.canvas === expectedCanvas;
+    let ok = Boolean(summary.ok) && page.errors.length === 0 && summary.clientWidth === summary.scrollWidth && schemeHonored;
+    console.log(`[guard ${tag}] ${summary.stalled ? `STALLED (${summary.visibility})` : `${summary.ok ? "PASS" : "FAIL"} browser interaction guard · ${summary.passed}/${summary.total}`} · clientWidth=${summary.clientWidth} scrollWidth=${summary.scrollWidth} · consoleErrors=${page.errors.length} · canvas=${summary.canvas} (${schemeHonored ? "follows" : "IGNORES"} ${scheme} preference)`);
     for (const result of summary.results ?? []) if (!result.pass) console.log(`  ✕ ${result.name}${result.detail ? ` · ${result.detail}` : ""}`);
     for (const line of page.errors) console.log(`  ! ${line}`);
+    if (!summary.stalled) {
+      // Reduced motion, emulated after the guard so the same mounted document
+      // is measured with and without the preference.
+      const before = await page.evaluate("window.__VIBEHUB_MOTION_AUDIT__()");
+      await page.emulateMedia([{ name: "prefers-color-scheme", value: scheme }, { name: "prefers-reduced-motion", value: "reduce" }]);
+      const after = await page.evaluate("window.__VIBEHUB_MOTION_AUDIT__()");
+      const motionOk = before.reduced === false && before.offenders.length > 0 && after.reduced === true && after.offenders.length === 0;
+      ok = ok && motionOk;
+      console.log(`[motion ${tag}] ${motionOk ? "PASS" : "FAIL"} reduced-motion audit · ${before.offenders.length} moving without the preference, ${after.offenders.length} with prefers-reduced-motion: reduce · ${after.scanned} elements scanned`);
+      for (const line of after.offenders.slice(0, 10)) console.log(`  ✕ ${line}`);
+    }
     return ok;
   } finally {
     chrome.close();
@@ -206,7 +229,10 @@ try {
   const url = options.url ?? shell.url;
   for (const frame of options.frames) {
     if (!FRAMES[frame]) throw new Error(`unknown frame: ${frame}`);
-    for (let run = 1; run <= options.runs; run += 1) ok = (await runGuardFrame(url, frame, run)) && ok;
+    for (const scheme of options.schemes) {
+      if (!["light", "dark"].includes(scheme)) throw new Error(`unknown scheme: ${scheme}`);
+      for (let run = 1; run <= options.runs; run += 1) ok = (await runGuardFrame(url, frame, scheme, run)) && ok;
+    }
   }
   if (options.lifecycle && shell) ok = (await runLifecycle(shell)) && ok;
   else if (options.lifecycle) console.log("[lifecycle] skipped: the lifecycle walk needs a shell this driver booted (omit --url)");

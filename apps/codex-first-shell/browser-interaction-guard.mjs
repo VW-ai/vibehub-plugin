@@ -11,6 +11,74 @@ function check(results, name, condition, detail = "") {
   results.push({ name, pass: Boolean(condition), detail });
 }
 
+const describeNode = (node) => `${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ""}${node.className ? `.${String(node.className).trim().split(/\s+/)[0]}` : ""}`;
+const NATIVE_OPERABLE = "button, a[href], input, select, textarea, summary";
+const focusableByTabindex = (node) => node.hasAttribute("tabindex") && Number(node.getAttribute("tabindex")) >= 0;
+const keyboardOperable = (node) => node.matches(NATIVE_OPERABLE) || focusableByTabindex(node);
+// Every selector the delegated click handler in app.js dispatches on. A match
+// that is neither a native control nor focusable has no keyboard path.
+const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]"].join(", ");
+
+// Pointer-only gaps in the mounted document: click targets without a keyboard
+// path, and scroll regions (wheel or touch) that neither take focus nor hold a
+// focusable descendant. Closed disclosures are opened for the scan so their
+// content is measured, then restored.
+function keyboardGaps() {
+  const visible = (node) => node.getClientRects().length > 0 && !node.closest("[inert]");
+  const disclosures = [...document.querySelectorAll("details:not([open])")].filter(visible);
+  for (const node of disclosures) node.open = true;
+  try {
+    const pointerOnly = [...document.querySelectorAll(POINTER_TARGETS)].filter((node) => visible(node) && !keyboardOperable(node)).map(describeNode);
+    const scrolls = (value) => value === "auto" || value === "scroll";
+    const unreachableScroll = [...document.querySelectorAll("body *")].filter((node) => {
+      if (!visible(node) || node.closest(".interaction-guard-result")) return false;
+      const style = getComputedStyle(node);
+      if (!scrolls(style.overflowY) && !scrolls(style.overflowX)) return false;
+      if (node.scrollHeight <= node.clientHeight + 1 && node.scrollWidth <= node.clientWidth + 1) return false;
+      if (node.matches("textarea") || focusableByTabindex(node)) return false;
+      return !node.querySelector(`${NATIVE_OPERABLE.split(", ").map((selector) => `${selector}:not([disabled])`).join(", ")}, [tabindex]:not([tabindex='-1'])`);
+    }).map((node) => `${describeNode(node)} ${node.scrollWidth}x${node.scrollHeight} in ${node.clientWidth}x${node.clientHeight}`);
+    const spilling = [...document.querySelectorAll("body *")].filter((node) => {
+      if (!visible(node) || node.closest(".interaction-guard-result")) return false;
+      const style = getComputedStyle(node);
+      return style.maxHeight !== "none" && style.overflowY === "visible" && node.scrollHeight > node.clientHeight + 1;
+    }).map((node) => `${describeNode(node)} ${node.scrollHeight} in ${node.clientHeight}`);
+    return { pointerOnly, unreachableScroll, spilling };
+  } finally {
+    for (const node of disclosures) node.open = false;
+  }
+}
+
+// The route title and the search trigger share the topbar: the title must end
+// inside its own box (ellipsized, full name kept) before the trigger begins.
+function topbarBoxes() {
+  const title = document.querySelector("#routeTitle");
+  const trigger = document.querySelector("#searchButton");
+  const topbar = document.querySelector(".topbar");
+  const a = title.getBoundingClientRect();
+  const b = trigger.getBoundingClientRect();
+  const intersects = a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+  return { intersects, truncated: title.scrollWidth > title.clientWidth, fullName: title.title === title.textContent && title.textContent.length > 0, overflow: topbar.scrollWidth > topbar.clientWidth, detail: `title ${Math.round(a.left)}–${Math.round(a.right)} · search ${Math.round(b.left)}–${Math.round(b.right)} · ${title.clientWidth}/${title.scrollWidth}px` };
+}
+
+const nonZeroDuration = (value) => String(value).split(",").some((part) => Number.parseFloat(part) > 0);
+// Every element and its ::before/::after, with the durations the engine will
+// actually run. Under prefers-reduced-motion: reduce the shell must report no
+// animation or transition time and no smooth scrolling anywhere.
+export function auditMotion() {
+  const offenders = [];
+  for (const node of document.querySelectorAll("body *")) {
+    for (const pseudo of [null, "::before", "::after"]) {
+      const style = getComputedStyle(node, pseudo);
+      const animated = nonZeroDuration(style.animationDuration) && style.animationName !== "none";
+      const transitioned = nonZeroDuration(style.transitionDuration) && style.transitionProperty !== "none";
+      const smooth = !pseudo && style.scrollBehavior === "smooth";
+      if (animated || transitioned || smooth) offenders.push(`${describeNode(node)}${pseudo ?? ""} · ${animated ? `animation ${style.animationName} ${style.animationDuration}` : transitioned ? `transition ${style.transitionProperty} ${style.transitionDuration}` : "scroll-behavior smooth"}`);
+    }
+  }
+  return { reduced: matchMedia("(prefers-reduced-motion: reduce)").matches, offenders, scanned: document.querySelectorAll("body *").length };
+}
+
 export async function runBrowserInteractionGuard(hooks) {
   const results = [];
   const fixture = await fetch("/chat-fixtures.json").then((response) => response.json());
@@ -46,6 +114,13 @@ export async function runBrowserInteractionGuard(hooks) {
     check(results, "wide sidebar expands again", !appShell.classList.contains("sidebar-collapsed") && !sidebar.inert);
   }
 
+  // The Composer is the last grid row of the main column: on screen, beneath
+  // the conversation, whether or not a stop banner occupies the row above.
+  const frameBox = document.body.getBoundingClientRect();
+  const composerBox = document.querySelector("#composer").getBoundingClientRect();
+  const surfaceBox = document.querySelector("#surface").getBoundingClientRect();
+  check(results, "Composer stays on screen beneath the conversation", composerBox.height > 40 && composerBox.bottom <= frameBox.bottom + 1 && composerBox.top >= surfaceBox.bottom - 1 && surfaceBox.height > 200, `composer ${Math.round(composerBox.top)}–${Math.round(composerBox.bottom)} · surface ${Math.round(surfaceBox.top)}–${Math.round(surfaceBox.bottom)} · frame ${Math.round(frameBox.bottom)}`);
+
   const searchTrigger = document.querySelector("#searchButton");
   searchTrigger.focus();
   searchTrigger.click();
@@ -68,6 +143,11 @@ export async function runBrowserInteractionGuard(hooks) {
   const secret = request?.querySelector('[data-request-answer="token"]');
   check(results, "requestUserInput renders every blocking question", request?.dataset.blocking === "true" && request.querySelectorAll("fieldset").length === 2);
   check(results, "requestUserInput exposes secret and Other posture", other?.type === "text" && secret?.type === "password");
+  const decisionButtons = [...document.querySelectorAll("[data-request-decision], [data-request-form] button")];
+  check(results, "approval decision labels stay unclipped at this width", decisionButtons.length >= 4 && decisionButtons.every((button) => button.scrollHeight <= button.clientHeight + 1 && button.scrollWidth <= button.clientWidth + 1), decisionButtons.map((button) => `${button.textContent.trim()} ${button.clientHeight}/${button.scrollHeight}`).join(" · "));
+  const keyboardGapLog = [];
+  const auditKeyboard = (surfaceName) => { const gaps = keyboardGaps(); for (const gap of gaps.pointerOnly) keyboardGapLog.push(`${surfaceName}: click target ${gap}`); for (const gap of gaps.unreachableScroll) keyboardGapLog.push(`${surfaceName}: scroll region ${gap}`); for (const gap of gaps.spilling) keyboardGapLog.push(`${surfaceName}: bounded content spills without a scroll ${gap}`); };
+  auditKeyboard("chat fixture");
   if (other && secret) {
     other.value = "Custom path";
     other.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: "Custom path" }));
@@ -85,6 +165,7 @@ export async function runBrowserInteractionGuard(hooks) {
   document.querySelector('.primary-nav [data-route="tasks"]').click();
   await frame();
   const tasksVisible = Boolean(document.querySelector(".tasks-view"));
+  if (tasksVisible) auditKeyboard("tasks graph");
   openSidebar.click();
   await frame();
   document.querySelector('.primary-nav [data-route="chat"]').click();
@@ -321,6 +402,7 @@ export async function runBrowserInteractionGuard(hooks) {
     importFocusable.at(-1).focus();
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
     check(results, "import dialog traps forward Tab", document.activeElement === importFocusable[0], document.activeElement?.id);
+    auditKeyboard("import dialog");
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await frame();
     check(results, "import dialog Escape restores focus to its trigger without importing", importDialog.hidden && !appShell.inert && document.activeElement === importTrigger && !importActions.some((entry) => entry.action === "importProject"), document.activeElement?.id);
@@ -384,6 +466,9 @@ export async function runBrowserInteractionGuard(hooks) {
   if (rawDetails) rawDetails.open = true;
   const rawFilled = await waitFor(() => rawDetails?.querySelector("[data-packet-raw-text]")?.dataset.filled === "true");
   check(results, "Task packet transcript card discloses the persisted Turn input byte-exact", rawFilled && rawDetails.querySelector("[data-packet-raw-text]").textContent === persisted && rawDetails.querySelector("summary").textContent.includes(`${persisted.length.toLocaleString()} chars`), `${rawDetails?.querySelector("[data-packet-raw-text]")?.textContent.length ?? 0}/${persisted.length} chars`);
+  auditKeyboard("task workspace");
+  const workspaceTopbar = topbarBoxes();
+  check(results, "Workspace route title with its back button stays clear of the search trigger", !workspaceTopbar.intersects && !workspaceTopbar.overflow && workspaceTopbar.fullName && !document.querySelector("#backButton").hidden, workspaceTopbar.detail);
 
   // Deep link: `?task=` reopens the Workspace through the same landing path
   // start() takes, and leaving the Workspace drops it from the URL again.
@@ -447,9 +532,60 @@ export async function runBrowserInteractionGuard(hooks) {
   }
   await hooks.switchFixtureThread(fixture.thread);
 
+  // The two remaining overlays: the Task inbox and the product boundary notes
+  // open as contained modals, take focus, and Escape returns it to the trigger.
+  const inboxTrigger = document.querySelector("#inboxButton");
+  if (!inboxTrigger.hidden) {
+    inboxTrigger.focus();
+    inboxTrigger.click();
+    await frame();
+    const inboxPanel = document.querySelector("#inboxPanel");
+    const inboxContained = !inboxPanel.hidden && !inboxPanel.inert && appShell.inert && inboxPanel.contains(document.activeElement);
+    auditKeyboard("inbox");
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await frame();
+    check(results, "inbox opens as a contained modal and Escape restores focus to its trigger", inboxContained && inboxPanel.hidden && inboxPanel.inert && !appShell.inert && document.activeElement === inboxTrigger, document.activeElement?.id);
+  }
+  const reviewTrigger = document.querySelector("#reviewButton");
+  reviewTrigger.focus();
+  reviewTrigger.click();
+  await frame();
+  const reviewPanel = document.querySelector("#reviewPanel");
+  const reviewContained = !reviewPanel.hidden && !reviewPanel.inert && appShell.inert && reviewPanel.contains(document.activeElement);
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  await frame();
+  check(results, "boundary notes open as a contained modal and Escape restores focus to its trigger", reviewContained && reviewPanel.hidden && reviewPanel.inert && !appShell.inert && document.activeElement === reviewTrigger, document.activeElement?.id);
+
+  // A long Thread title: the topbar keeps the search trigger reachable and the
+  // title ellipsizes inside its own box with the full name still exposed.
+  const longTitled = { ...structuredClone(fixture.thread), title: `${fixture.thread.title} — ${"a deliberately long Thread title that has to truncate ".repeat(5).trim()}` };
+  await hooks.switchFixtureThread(longTitled);
+  const longTopbar = topbarBoxes();
+  check(results, "long route title truncates beside the search trigger and keeps its full accessible name", !longTopbar.intersects && longTopbar.truncated && longTopbar.fullName && !longTopbar.overflow && document.querySelector("#routeTitle").textContent === longTitled.title && document.querySelector("#routeTitle").title === longTitled.title, longTopbar.detail);
+  await hooks.switchFixtureThread(fixture.thread);
+
+  check(results, "every pointer action has a keyboard path (click targets are operable, scroll regions are reachable)", keyboardGapLog.length === 0, `${keyboardGapLog.length} gap${keyboardGapLog.length === 1 ? "" : "s"}${keyboardGapLog.length ? `: ${keyboardGapLog.slice(0, 6).join(" | ")}` : ""}`);
+
+  // Theme: system preference decides by default, an explicit override wins,
+  // and returning to System follows the preference again. (That no browser
+  // storage backs any of this is a static proof over the shell sources.)
+  const systemDark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const canvas = () => getComputedStyle(document.body).backgroundColor;
+  const lightCanvas = "rgb(255, 255, 255)";
+  const darkCanvas = "rgb(24, 24, 24)";
+  const themeToggle = document.querySelector("#themeToggle");
   openSidebar.focus();
   openSidebar.click();
-  const themeToggle = document.querySelector("#themeToggle");
+  await frame();
+  const followsSystem = document.documentElement.dataset.theme === "system" && canvas() === (systemDark ? darkCanvas : lightCanvas);
+  const override = systemDark ? "light" : "dark";
+  for (let index = 0; index < 3 && document.documentElement.dataset.theme !== override; index += 1) themeToggle.click();
+  await frame();
+  const overrideWins = document.documentElement.dataset.theme === override && canvas() === (override === "dark" ? darkCanvas : lightCanvas) && document.querySelector("#themeLabel").textContent === (override === "dark" ? "Dark" : "Light");
+  for (let index = 0; index < 3 && document.documentElement.dataset.theme !== "system"; index += 1) themeToggle.click();
+  await frame();
+  const backToSystem = document.documentElement.dataset.theme === "system" && canvas() === (systemDark ? darkCanvas : lightCanvas);
+  check(results, `theme follows the ${systemDark ? "dark" : "light"} system preference, an explicit ${override} override wins, and System follows the preference again`, followsSystem && overrideWins && backToSystem, `${followsSystem}/${overrideWins}/${backToSystem} · ${canvas()}`);
   for (let index = 0; index < 3 && document.documentElement.dataset.theme !== "dark"; index += 1) themeToggle.click();
   closeSidebar.click();
   await frame();
@@ -492,5 +628,6 @@ export async function runBrowserInteractionGuard(hooks) {
   output.append(heading, list);
   document.body.append(output);
   window.__VIBEHUB_INTERACTION_GUARD__ = summary;
+  window.__VIBEHUB_MOTION_AUDIT__ = auditMotion;
   return summary;
 }

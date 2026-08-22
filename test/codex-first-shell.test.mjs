@@ -350,12 +350,13 @@ test("Task Workspace reuses native Chat and keeps Context packet assembly host-o
 });
 
 test("Codex light and dark primitives share one responsive accessible shell", async () => {
-  const [html, css, script, guard, host] = await Promise.all([
+  const [html, css, script, guard, host, driver] = await Promise.all([
     source("apps/codex-first-shell/index.html"),
     source("apps/codex-first-shell/app.css"),
     source("apps/codex-first-shell/app.js"),
     source("apps/codex-first-shell/browser-interaction-guard.mjs"),
     source("scripts/vh-codex-first-shell.mjs"),
+    source("scripts/vh-codex-first-shell-guard.mjs"),
   ]);
   for (const exact of ["#0169cc", "#fff", "#0d0d0d", "#339cff", "#181818"]) assert.match(css.toLowerCase(), new RegExp(exact));
   assert.match(css, /Inter, -apple-system/);
@@ -379,6 +380,27 @@ test("Codex light and dark primitives share one responsive accessible shell", as
   assert.match(script, /document\.documentElement\.dataset\.theme/);
   assert.match(script, /focusRouteHeading/);
   for (const behavior of ["narrow drawer closes", "wide sidebar collapses without trapping focus", "search traps forward Tab", "request draft and focus survive reconciliation", "request draft survives an intentional route change", "streaming never replaces a selected transcript entry", "releasing the selection reconciles the held entry", "switching Thread does not leak Composer state", "Quote serializes exact source identity into the Turn input", "replayed quote renders its durable source identity", "Composer growth stops at the CSS ceiling", "active submission dispatches one exact steer", "terminal reconciliation re-enables Fork", "Fork opens returned lineage", "Fork navigation updates the Thread deep link", "mounted timeline discloses its bound", "deferred model, mode and realtime controls make no contrary claim", "dark theme reaches overlay siblings", "page has no horizontal overflow", "Turn posture is internally coherent", "terminal mixed fixture makes no false live claim"]) assert.match(guard, new RegExp(behavior));
+  // Responsive and accessible baseline: the narrow topbar, the Composer row,
+  // the keyboard audit, the remaining overlays, the theme preference walk and
+  // the reduced-motion audit the driver runs under emulation.
+  for (const behavior of ["Composer stays on screen beneath the conversation", "approval decision labels stay unclipped at this width", "Workspace route title with its back button stays clear of the search trigger", "long route title truncates beside the search trigger and keeps its full accessible name", "every pointer action has a keyboard path", "inbox opens as a contained modal and Escape restores focus to its trigger", "boundary notes open as a contained modal and Escape restores focus to its trigger", "theme follows the \\$\\{systemDark \\? \"dark\" : \"light\"\\} system preference, an explicit \\$\\{override\\} override wins"]) assert.match(guard, new RegExp(behavior));
+  assert.match(guard, /export function auditMotion/);
+  assert.match(guard, /window\.__VIBEHUB_MOTION_AUDIT__ = auditMotion/);
+  assert.match(guard, /const focusableByTabindex = \(node\) => node\.hasAttribute\("tabindex"\)/, "an absent tabindex never counts as focusable");
+  assert.match(driver, /prefers-reduced-motion", value: "reduce"/);
+  assert.match(driver, /prefers-color-scheme", value: scheme/);
+  assert.match(driver, /schemes: \["light", "dark"\]/);
+  assert.match(css, /\.route-title > div \{ flex: 1 1 auto; min-width: 0; \}/, "the title column shrinks instead of painting over the topbar actions");
+  assert.match(css, /\.topbar-actions \{ flex: none;/);
+  assert.match(css, /\.main-column > \.surface \{ grid-row: 3; \}\n\.main-column > \.composer-wrap \{ grid-row: 4; \}/, "an absent stop banner never shifts the Composer into a 0px track");
+  assert.match(css, /\.approval-card footer \{ display: flex; flex-wrap: wrap;/);
+  assert.match(css, /\.sidebar \{[^}]*overflow: hidden auto;/);
+  assert.match(css, /\.terminal-output, \.tool-arguments \{[^}]*overflow: auto;/);
+  assert.match(script, /routeTitle\.title = title;/);
+  assert.match(script, /tabindex="0" aria-label="Task Context packet"/);
+  assert.match(script, /tabindex="0" aria-label="Persisted Turn input"/);
+  assert.match(script, /BOUNDED_PRE_LABELS\[className\] \?\? "Output"/);
+  assert.match(html, /<dl id="projectInspectList" tabindex="0" aria-label="Project details">/);
   assert.match(guard, /history\.replaceState\(history\.state, "", originalHref\)/, "the guard restores the review URL it changed");
   assert.match(script, /runBrowserInteractionGuard/);
   assert.match(host, /browser-interaction-guard\.mjs/);
