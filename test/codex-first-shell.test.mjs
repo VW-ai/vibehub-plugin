@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { once } from "node:events";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { existsSync, realpathSync } from "node:fs";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -23,8 +24,8 @@ function olderThan(version, baseline) {
   return false;
 }
 
-async function launchShell(context, { codex = null, env = {} } = {}) {
-  const args = ["scripts/vh-codex-first-shell.mjs", "--repo", ".", "--port", "0", "--json", ...(codex ? ["--codex", codex] : [])];
+async function launchShell(context, { codex = null, env = {}, repo = "." } = {}) {
+  const args = ["scripts/vh-codex-first-shell.mjs", "--repo", repo, "--port", "0", "--json", ...(codex ? ["--codex", codex] : [])];
   const child = spawn(process.execPath, args, { cwd: new URL(".", root), stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, ...env } });
   context.after(() => child.kill("SIGTERM"));
   const timer = setTimeout(() => child.kill("SIGKILL"), 20_000);
@@ -51,15 +52,23 @@ async function launchShell(context, { codex = null, env = {} } = {}) {
   return { child, envelope, url, token, api, action };
 }
 
+// The host writes nothing by default; the explicit import is the single
+// exception and it names every path it may touch, all left uncommitted.
+const REPOSITORY_WRITES = {
+  default: false,
+  explicitImportOnly: [".vibehub/version.yaml", ".vibehub/rooms/", ".vibehub/tickets/", ".vibehub/evidence/", ".vibehub/outcomes/", ".vibehub/codex-project.yaml"],
+  commits: false,
+};
+
 async function assertHostBoundary({ envelope, url }) {
   assert.equal(envelope.localOnly, true);
-  assert.equal(envelope.repositoryWrites, false);
+  assert.deepEqual(envelope.repositoryWrites, REPOSITORY_WRITES);
   assert.equal(envelope.codexRuntime, true);
   assert.equal(envelope.shell, "codex-first-shell");
   assert.equal(envelope.harness, "codex");
   assert.equal(url.hostname, "127.0.0.1");
   const health = await fetch(new URL("health", url));
-  assert.deepEqual(await health.json(), { ok: true, shell: "codex-first-shell", harness: "codex", localOnly: true, repositoryWrites: false, codexRuntime: true });
+  assert.deepEqual(await health.json(), { ok: true, shell: "codex-first-shell", harness: "codex", localOnly: true, repositoryWrites: REPOSITORY_WRITES, codexRuntime: true });
   const unauthorized = await fetch(new URL("api/bootstrap", url));
   assert.equal(unauthorized.status, 401);
   const rejected = await fetch(url, { method: "POST" });
@@ -385,6 +394,11 @@ test("production shell routes ordinary Chat, approvals, interruption, and Tasks 
   assert.equal(bootstrap.body.data.runtime.realtimeConversation, false);
   assert.equal(bootstrap.body.data.runtime.alive, true);
   assert.deepEqual(bootstrap.body.data.projects, []);
+  assert.equal(bootstrap.body.data.project.scope, "bound", "this repository carries a CURRENT .vibehub scaffold");
+  assert.equal(bootstrap.body.data.project.taskActions.available, true);
+  assert.equal(bootstrap.body.data.project.binding, null, "a CLI-scaffolded repository is bound without a Codex binding record");
+  assert.equal(bootstrap.body.data.project.visibility.cwd, fileURLToPath(root).replace(/\/$/u, ""));
+  assert.equal(bootstrap.body.data.stop, null);
   const ticketId = bootstrap.body.data.graph.tickets.find((ticket) => ticket.ticketId.startsWith("ticket-"))?.ticketId;
   assert.ok(ticketId, "the repository graph must expose at least one current Ticket");
 
@@ -428,6 +442,7 @@ test("production shell routes ordinary Chat, approvals, interruption, and Tasks 
     "account/read",
     "threadSection/list",
     "thread/list",
+    "thread/list",
     "thread/start",
     "turn/start",
     "respond:{\"decision\":\"accept\"}",
@@ -442,6 +457,9 @@ test("production shell routes ordinary Chat, approvals, interruption, and Tasks 
   ]);
   const threadStarts = calls.filter((call) => call.method === "thread/start");
   for (const call of threadStarts) assert.deepEqual(call.params, { approvalPolicy: "on-request", sandbox: "workspace-write", cwd: fileURLToPath(root).replace(/\/$/u, ""), ephemeral: false });
+  const [scopedRecents, unscopedCount] = calls.filter((call) => call.method === "thread/list");
+  assert.deepEqual([scopedRecents.params.sectionId, scopedRecents.params.cwd], [null, fileURLToPath(root).replace(/\/$/u, "")], "Recents is the native unsectioned query scoped to this folder");
+  assert.equal(unscopedCount.params.cwd, undefined, "the one unscoped query only counts hidden history");
   assert.equal(calls.find((call) => call.method === "thread/name/set").params.name, `VibeHub Task · ${ticketId}`);
   assert.deepEqual(Object.keys(calls.find((call) => call.method === "thread/resume").params).sort(), ["approvalPolicy", "cwd", "sandbox", "threadId"]);
   assert.equal(calls.find((call) => call.method === "turn/interrupt").params.turnId, turnId);
@@ -498,4 +516,223 @@ test("Codex-first shell host is loopback-only, bounded, and connected to the rea
   const exit = once(child, "exit");
   child.kill("SIGTERM");
   await exit;
+});
+
+function git(cwd, args) {
+  return execFileSync("git", ["-c", "core.fsmonitor=false", ...args], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+}
+
+async function temporaryRepository(context, { initGit = true } = {}) {
+  const folder = await mkdtemp(join(tmpdir(), "vibehub-scope-"));
+  context.after(() => rm(folder, { recursive: true, force: true }));
+  await writeFile(join(folder, "README.md"), "# scope fixture\n");
+  if (initGit) {
+    git(folder, ["init", "-q", "-b", "main"]);
+    git(folder, ["config", "user.email", "fixture@example.com"]);
+    git(folder, ["config", "user.name", "Fixture"]);
+    git(folder, ["add", "README.md"]);
+    git(folder, ["commit", "-q", "-m", "fixture"]);
+  }
+  // The seed deliberately uses the unresolved temp path so the proof covers
+  // macOS /var -> /private/var real-path matching on both sides.
+  return { folder, realFolder: realpathSync.native(folder) };
+}
+
+function scopeSeed(folder) {
+  const elsewhere = join(tmpdir(), "vibehub-scope-elsewhere-not-a-repo");
+  return {
+    sections: [
+      { id: "section-match", name: "Matching single folder" },
+      { id: "section-foreign", name: "Foreign single folder" },
+      { id: "section-multi", name: "Spans two folders" },
+      { id: "section-empty", name: "Empty group" },
+    ],
+    threads: [
+      { id: "seed-recent-here", name: "Recent in this folder", preview: "here", cwd: folder },
+      { id: "seed-recent-elsewhere", name: "Recent elsewhere", preview: "elsewhere", cwd: elsewhere },
+      { id: "seed-match-a", name: "Matching a", preview: "match", cwd: folder, sectionId: "section-match" },
+      { id: "seed-match-archived", name: "Matching archived", preview: "match", cwd: folder, sectionId: "section-match", archived: true },
+      { id: "seed-foreign-a", name: "Foreign a", preview: "foreign", cwd: elsewhere, sectionId: "section-foreign" },
+      { id: "seed-multi-here", name: "Multi here", preview: "multi", cwd: folder, sectionId: "section-multi" },
+      { id: "seed-multi-there", name: "Multi there", preview: "multi", cwd: elsewhere, sectionId: "section-multi" },
+    ],
+  };
+}
+
+test("an unbound Git repository hides foreign Codex history, refuses Task actions, and binds only through an eligible single-folder import", async (context) => {
+  const { folder, realFolder } = await temporaryRepository(context);
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
+  if (!shell) return;
+  const { child, api, action } = shell;
+  await assertHostBoundary(shell);
+
+  const before = (await api("api/bootstrap")).body.data;
+  assert.equal(before.project.scope, "unbound");
+  assert.equal(before.project.repositoryRoot, realFolder);
+  assert.equal(before.project.worktreeRoot, realFolder);
+  assert.equal(before.project.branch, "main");
+  assert.equal(before.project.compatibility.detectedFormat, "uninitialized");
+  assert.equal(before.project.binding, null);
+  assert.deepEqual(before.project.taskActions, { available: false, reason: before.project.reason });
+  assert.match(before.project.reason, /not set up as a VibeHub Project/);
+  assert.deepEqual(before.recents.map((thread) => thread.id), ["seed-recent-here"], "Recents is native unsectioned Threads in this folder only");
+  assert.deepEqual(before.projects.map((group) => [group.id, group.threads.map((thread) => thread.id), group.hiddenElsewhere]), [
+    ["section-match", ["seed-match-a"], 0],
+    ["section-multi", ["seed-multi-here"], 1],
+    ["section-empty", [], 0],
+  ], "a group is listed when it has a member here or no members at all; foreign-only groups are never listed");
+  assert.ok(!before.threads.some((thread) => realpathSync.native(thread.cwd) !== realFolder), "no Thread from another folder reaches the browser");
+  assert.deepEqual(before.project.visibility, { cwd: realFolder, scopedCount: 3, totalCount: 6, hiddenChats: 3, hiddenGroups: 1 });
+  assert.deepEqual(before.graph.tickets, []);
+  assert.deepEqual(before.contexts, []);
+
+  for (const payload of [{ action: "startTask", ticketId: "ticket-anything" }, { action: "readTask", ticketId: "ticket-anything" }, { action: "startTaskTurn", ticketId: "ticket-anything", threadId: "seed-recent-here", message: "go" }]) {
+    const refused = await action(payload);
+    assert.equal(refused.status, 409, payload.action);
+    assert.equal(refused.body.error.code, "scope_unavailable");
+    assert.match(refused.body.error.message, /not set up as a VibeHub Project/);
+  }
+  const chat = await action({ action: "newThread" });
+  assert.equal(chat.status, 200, "Chat stays fully usable without a bound Project");
+  assert.equal(chat.body.data.thread.cwd, realFolder, "new Chats carry this folder as their native cwd");
+  const turn = await action({ action: "startTurn", threadId: chat.body.data.thread.id, input: [{ type: "text", text: "hello" }] });
+  assert.equal(turn.status, 200);
+  const search = await action({ action: "searchThreads", searchTerm: "Recent" });
+  assert.deepEqual(search.body.data.threads.map((thread) => thread.id), ["seed-recent-here"], "host search never lists foreign history either");
+
+  const candidates = (await action({ action: "listImportableProjects" })).body.data;
+  assert.equal(candidates.scope, "unbound");
+  assert.equal(candidates.canImport, true);
+  assert.equal(candidates.repositoryRoot, realFolder);
+  assert.deepEqual(candidates.writes, REPOSITORY_WRITES.explicitImportOnly);
+  assert.deepEqual(Object.fromEntries(candidates.projects.map((item) => [item.id, [item.eligibility, item.matchesRepository, item.memberCount, item.archivedCount]])), {
+    "section-match": ["single-folder", true, 2, 1],
+    "section-foreign": ["single-folder", false, 1, 0],
+    "section-multi": ["multi-folder", false, 2, 0],
+    "section-empty": ["empty", false, 0, 0],
+  });
+  assert.deepEqual(candidates.projects.find((item) => item.id === "section-match").folders, [realFolder]);
+
+  for (const [sectionId, reason] of [["section-foreign", /different repository/], ["section-multi", /spans 2 folders/], ["section-empty", /no chats/], ["section-missing", /no longer exists/]]) {
+    const refused = await action({ action: "importProject", sectionId });
+    assert.equal(refused.status, 409, sectionId);
+    assert.equal(refused.body.error.code, "import_ineligible");
+    assert.match(refused.body.error.message, reason);
+    assert.equal(existsSync(join(folder, ".vibehub")), false, `${sectionId} wrote nothing`);
+  }
+
+  const imported = await action({ action: "importProject", sectionId: "section-match" });
+  assert.equal(imported.status, 200, JSON.stringify(imported.body));
+  assert.equal(imported.body.data.committed, false);
+  assert.equal(imported.body.data.scaffold.created, true);
+  assert.deepEqual(imported.body.data.writtenPaths, [".vibehub/version.yaml", ".vibehub/rooms/", ".vibehub/tickets/", ".vibehub/evidence/", ".vibehub/outcomes/", ".vibehub/codex-project.yaml"]);
+  for (const path of [".vibehub/version.yaml", ".vibehub/rooms", ".vibehub/tickets", ".vibehub/evidence", ".vibehub/outcomes", ".vibehub/codex-project.yaml"]) assert.ok(existsSync(join(folder, path)), path);
+  assert.deepEqual(JSON.parse(await readFile(join(folder, ".vibehub/version.yaml"), "utf8")), { format_version: 2, kind: "vibehub_project", schema_version: 1 });
+  const binding = JSON.parse(await readFile(join(folder, ".vibehub/codex-project.yaml"), "utf8"));
+  assert.deepEqual(Object.keys(binding).sort(), ["codex_version", "folder", "harness", "imported_at", "kind", "schema_version", "section_id", "section_name_at_import"]);
+  assert.deepEqual([binding.kind, binding.harness, binding.section_id, binding.section_name_at_import, binding.folder, binding.codex_version], ["codex_project_binding", "codex", "section-match", "Matching single folder", realFolder, "0.147.0"]);
+  assert.equal(existsSync(join(folder, ".vibehub/rooms/room.yaml")), false, "import never fabricates a Room tree");
+  assert.equal(git(folder, ["status", "--porcelain", "--untracked-files=all"]).split("\n").filter(Boolean).every((line) => line.startsWith("?? .vibehub/")), true, "the scaffold stays untracked");
+  assert.equal(git(folder, ["rev-list", "--count", "HEAD"]), "1", "import never commits");
+
+  const after = (await api("api/bootstrap")).body.data;
+  assert.equal(after.project.scope, "bound");
+  assert.equal(after.project.taskActions.available, true);
+  assert.equal(after.project.compatibility.state, "CURRENT");
+  assert.deepEqual(after.project.rooms, { coldStart: true, count: 0 });
+  assert.deepEqual(after.project.binding, { sectionId: "section-match", sectionName: "Matching single folder", folder: realFolder, importedAt: binding.imported_at, codexVersion: "0.147.0", sectionPresent: true, recordPath: ".vibehub/codex-project.yaml" });
+  assert.ok(after.project.uncommitted.paths.includes(".vibehub/codex-project.yaml"));
+  assert.ok(after.project.uncommitted.paths.includes(".vibehub/version.yaml"));
+  assert.equal(after.project.uncommitted.committed, false);
+  assert.equal(after.project.sync.automaticCommit, false);
+  const again = await action({ action: "importProject", sectionId: "section-match" });
+  assert.equal(again.status, 409);
+  assert.equal(again.body.error.code, "already_bound");
+  const afterChat = await action({ action: "newThread" });
+  assert.equal(afterChat.body.data.thread.cwd, realFolder, "after binding, new Chats still sync to the checked-in folder natively");
+  assert.equal((await action({ action: "readTask", ticketId: "ticket-missing" })).status, 500, "Task actions are gated by scope, not by the absence of Tickets");
+
+  await action({ action: "deleteProject", projectId: "section-match" });
+  const afterDelete = (await api("api/bootstrap")).body.data;
+  assert.equal(afterDelete.project.binding.sectionPresent, false, "the binding record is provenance; the native section list is re-read on every boot");
+  assert.ok(afterDelete.recents.some((thread) => thread.id === "seed-match-a"), "deleting a group returns its members to Recents");
+  const exit = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await exit, [0, null]);
+});
+
+test("a folder outside any Git repository keeps Chat usable while import and Task actions explain the missing scope", async (context) => {
+  const { folder, realFolder } = await temporaryRepository(context, { initGit: false });
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
+  if (!shell) return;
+  const { child, api, action } = shell;
+  const bootstrap = (await api("api/bootstrap")).body.data;
+  assert.equal(bootstrap.project.scope, "no-repository");
+  assert.equal(bootstrap.project.repositoryRoot, null);
+  assert.equal(bootstrap.project.worktreeRoot, realFolder);
+  assert.equal(bootstrap.project.branch, null);
+  assert.match(bootstrap.project.reason, /not inside a Git repository/);
+  assert.equal(bootstrap.project.taskActions.available, false);
+  assert.deepEqual(bootstrap.recents.map((thread) => thread.id), ["seed-recent-here"]);
+  const candidates = (await action({ action: "listImportableProjects" })).body.data;
+  assert.equal(candidates.canImport, false);
+  assert.match(candidates.blockedReason, /not inside a Git repository/);
+  const refused = await action({ action: "importProject", sectionId: "section-match" });
+  assert.equal(refused.status, 409);
+  assert.equal(refused.body.error.code, "scope_unavailable");
+  assert.equal(existsSync(join(folder, ".vibehub")), false);
+  const task = await action({ action: "startTask", ticketId: "ticket-anything" });
+  assert.equal(task.status, 409);
+  assert.equal(task.body.error.code, "scope_unavailable");
+  const chat = await action({ action: "newThread" });
+  assert.equal(chat.status, 200);
+  assert.equal(chat.body.data.thread.cwd, realFolder);
+  const exit = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await exit, [0, null]);
+});
+
+test("a repository whose VibeHub data needs migration is neither bound nor importable and says why", async (context) => {
+  const { folder } = await temporaryRepository(context);
+  execFileSync("mkdir", ["-p", join(folder, ".vibehub", "tickets")]);
+  await writeFile(join(folder, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 1 }, null, 2));
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
+  if (!shell) return;
+  const { child, api, action } = shell;
+  const bootstrap = (await api("api/bootstrap")).body.data;
+  assert.equal(bootstrap.project.scope, "migration-required");
+  assert.equal(bootstrap.project.compatibility.state, "MIGRATION_REQUIRED");
+  assert.match(bootstrap.project.reason, /explicit VibeHub data migration/);
+  const refused = await action({ action: "importProject", sectionId: "section-match" });
+  assert.equal(refused.status, 409);
+  assert.equal(refused.body.error.code, "scope_unavailable");
+  assert.equal(existsSync(join(folder, ".vibehub", "codex-project.yaml")), false);
+  assert.equal((await action({ action: "newThread" })).status, 200);
+  const exit = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await exit, [0, null]);
+});
+
+test("a runtime that misses the pinned baseline surfaces a stop instead of a 500 and refuses reuse", async (context) => {
+  const { folder } = await temporaryRepository(context);
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.144.1" } });
+  if (!shell) return;
+  const { child, envelope, api, action } = shell;
+  assert.equal(envelope.runtime.baselineMatch, false);
+  const bootstrap = await api("api/bootstrap");
+  assert.equal(bootstrap.status, 200);
+  assert.deepEqual(bootstrap.body.data.stop, {
+    code: "runtime-baseline-mismatch",
+    message: `Codex app-server 0.144.1 is running but VibeHub pins ${envelope.runtime.baselineVersion}. The shell stops here instead of reusing an unverified runtime.`,
+    observedVersion: "0.144.1",
+    baselineVersion: envelope.runtime.baselineVersion,
+  });
+  assert.deepEqual([bootstrap.body.data.projects, bootstrap.body.data.recents, bootstrap.body.data.threads], [[], [], []]);
+  assert.equal(bootstrap.body.data.project.scope, "unbound");
+  const refused = await action({ action: "newThread" });
+  assert.equal(refused.status, 409);
+  assert.equal(refused.body.error.code, "runtime_baseline_mismatch");
+  const exit = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await exit, [0, null]);
 });

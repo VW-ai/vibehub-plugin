@@ -137,7 +137,7 @@ function serialize(document) {
   return `${JSON.stringify(stable(document), null, 2)}\n`;
 }
 
-function readDocument(path) {
+export function readDocument(path) {
   const stat = lstatSync(path);
   if (!stat.isFile() || stat.isSymbolicLink()) {
     throw new VibeHubError("invalid_document", `Expected a regular file: ${path}`);
@@ -155,7 +155,7 @@ function readDocument(path) {
   }
 }
 
-function writeDocument(path, document) {
+export function writeDocument(path, document) {
   mkdirSync(dirname(path), { recursive: true });
   const temporary = `${path}.tmp-${process.pid}`;
   writeFileSync(temporary, serialize(document), { flag: "wx" });
@@ -260,7 +260,7 @@ function canonicalProjectFormat() {
   };
 }
 
-function projectCompatibility(repo) {
+export function projectCompatibility(repo) {
   const path = projectFormatPath(repo);
   if (existsSync(path)) {
     let document;
@@ -847,7 +847,7 @@ export function documents(map) {
   return [...map.values()].map((entry) => entry.document);
 }
 
-function initProject(repo) {
+export function initProject(repo) {
   const paths = dirs(repo);
   const compatibility = projectCompatibility(repo);
   if (

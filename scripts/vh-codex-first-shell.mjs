@@ -6,25 +6,26 @@
 // packages/codex-adapter/client.mjs, the single-harness routing is owned by
 // packages/harness-core (shell.mjs over router.mjs), Codex Projects and Task
 // Context packets are owned by packages/codex-adapter, and this script owns
-// only the loopback host, the short-lived bearer URL and the host-side
-// projections of the Git-native repository.
+// only the loopback host, the short-lived bearer URL, the host-side
+// projections of the Git-native repository and the one explicit repository
+// write: importing a single-folder Codex Project as this VibeHub Project.
 
 import crypto from "node:crypto";
-import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
+import { execFileSync, spawn } from "node:child_process";
+import { existsSync, realpathSync } from "node:fs";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { CodexAppServerClient } from "../packages/codex-adapter/client.mjs";
 import { createCodexHarnessAdapter } from "../packages/codex-adapter/harness.mjs";
-import { CodexProjectsAdapter, publicCodexThread } from "../packages/codex-adapter/projects.mjs";
+import { CODEX_PROJECT_CAPABILITIES, CodexProjectsAdapter, publicCodexThread } from "../packages/codex-adapter/projects.mjs";
 import { buildTaskContextPacket, startTaskContextThread, taskLinkFromPreview } from "../packages/codex-adapter/task-context.mjs";
 import { createSharedHarnessShell } from "../packages/harness-core/shell.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
-import { documents, loadRepository } from "../skills/scripts/vh.mjs";
+import { documents, initProject, loadRepository, projectCompatibility, readDocument, writeDocument } from "../skills/scripts/vh.mjs";
 
 const LOOPBACK_HOST = "127.0.0.1";
 const SHELL_ID = "codex-first-shell";
@@ -32,6 +33,24 @@ const EVENT_LIMIT = 500;
 const BODY_LIMIT = 12 * 1024 * 1024;
 const APP_SERVER_TIMEOUT_MS = 120_000;
 const THREAD_POLICY = Object.freeze({ approvalPolicy: "on-request", sandbox: "workspace-write" });
+// The Codex Project binding record is provenance only. Chat membership stays
+// in the native ThreadSection, which is re-read on every bootstrap; the
+// record says which single-folder Codex Project the human imported and when.
+const BINDING_FILE = join(".vibehub", "codex-project.yaml");
+// The only repository write this host ever performs is the explicit import:
+// the VibeHub scaffold plus the binding record, all left uncommitted.
+const REPOSITORY_WRITES = Object.freeze({
+  default: false,
+  explicitImportOnly: Object.freeze([
+    ".vibehub/version.yaml",
+    ".vibehub/rooms/",
+    ".vibehub/tickets/",
+    ".vibehub/evidence/",
+    ".vibehub/outcomes/",
+    ".vibehub/codex-project.yaml",
+  ]),
+  commits: false,
+});
 
 const sourceRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const assetRoot = join(sourceRoot, "apps", SHELL_ID);
@@ -69,7 +88,8 @@ try {
   process.stderr.write(`${error.message}\n`);
   process.exit(1);
 }
-const repoRoot = flags.repo;
+// The selected folder is the one real path every native cwd comparison uses.
+const repoRoot = realpathSync.native(flags.repo);
 const token = crypto.randomBytes(32).toString("hex");
 
 // Runtime ownership: the app-server child process lives inside the codex
@@ -238,8 +258,7 @@ async function listThreads() {
   return (result.data ?? result.threads ?? []).map(publicThread);
 }
 
-function graphProjection() {
-  const snapshot = buildUiSnapshot(repoRoot);
+function graphProjection(snapshot = buildUiSnapshot(repoRoot)) {
   return {
     snapshotId: snapshot.state.graph.snapshotId,
     project: snapshot.state.project,
@@ -247,6 +266,99 @@ function graphProjection() {
     relations: snapshot.state.graph.relations,
     source: snapshot.state.graph.source,
   };
+}
+
+function gitTopLevel() {
+  try {
+    return realpathSync.native(execFileSync("git", ["-c", "core.fsmonitor=false", "rev-parse", "--show-toplevel"], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim());
+  } catch {
+    return null;
+  }
+}
+
+function bindingRecord() {
+  const path = join(repoRoot, BINDING_FILE);
+  if (!existsSync(path)) return null;
+  try {
+    const document = readDocument(path);
+    if (document?.kind !== "codex_project_binding" || typeof document.section_id !== "string") {
+      return { path, invalid: true, reason: "The binding record is not a codex_project_binding document." };
+    }
+    return { path, invalid: false, document };
+  } catch (error) {
+    return { path, invalid: true, reason: error.message };
+  }
+}
+
+// The four scope states the shell can truthfully be in. Only `bound` unlocks
+// VibeHub Task actions; Chat stays fully usable in every state.
+function scopeState({ repositoryRoot, compatibility }) {
+  if (repositoryRoot === null) return "no-repository";
+  if (compatibility.state === "CURRENT") return "bound";
+  if (compatibility.detected_format === "uninitialized") return "unbound";
+  return "migration-required";
+}
+
+function scopeReason(scope, compatibility) {
+  if (scope === "bound") return null;
+  if (scope === "no-repository") return "This folder is not inside a Git repository. VibeHub Tasks, Context, Evidence and Outcomes live in a checked-in .vibehub tree, so Task actions are unavailable here.";
+  if (scope === "unbound") return "This repository is not set up as a VibeHub Project yet. Import the single-folder Codex Project for this folder to write the .vibehub scaffold.";
+  return compatibility.reason ?? "This repository's VibeHub data cannot be used by this version.";
+}
+
+function projectProjection(snapshot, folderScope, sections) {
+  const repositoryRoot = gitTopLevel();
+  const compatibility = projectCompatibility(repoRoot);
+  const scope = scopeState({ repositoryRoot, compatibility });
+  const record = bindingRecord();
+  const binding = record && !record.invalid
+    ? {
+        sectionId: record.document.section_id,
+        sectionName: record.document.section_name_at_import ?? null,
+        folder: record.document.folder ?? null,
+        importedAt: record.document.imported_at ?? null,
+        codexVersion: record.document.codex_version ?? null,
+        sectionPresent: sections.some((section) => section.id === record.document.section_id),
+        recordPath: BINDING_FILE,
+      }
+    : null;
+  const source = snapshot.state.graph.source;
+  return {
+    scope,
+    reason: scopeReason(scope, compatibility),
+    name: basename(repositoryRoot ?? repoRoot),
+    repositoryRoot,
+    worktreeRoot: repoRoot,
+    branch: repositoryRoot ? snapshot.state.project.branch : null,
+    compatibility: {
+      state: compatibility.state,
+      detectedFormat: compatibility.detected_format,
+      currentFormat: compatibility.current_format,
+      targetFormat: compatibility.target_format,
+      reason: compatibility.reason,
+    },
+    binding,
+    bindingRecord: record?.invalid ? { path: BINDING_FILE, invalid: true, reason: record.reason } : null,
+    rooms: { coldStart: snapshot.state.rooms.coldStart, count: snapshot.state.rooms.rooms.length },
+    uncommitted: { paths: source.dirtyPaths, truncated: source.dirtyPathsTruncated, committed: !source.semanticDirty },
+    taskActions: { available: scope === "bound", reason: scopeReason(scope, compatibility) },
+    visibility: folderScope,
+    sync: {
+      chatFolder: repoRoot,
+      rule: "Threads this shell creates carry this folder as their native cwd; Tasks, Context and Evidence are YAML under .vibehub that stays uncommitted until you commit it.",
+      automaticCommit: false,
+    },
+  };
+}
+
+function requireBoundScope() {
+  const project = projectProjection(buildUiSnapshot(repoRoot), null, []);
+  if (project.scope !== "bound") throw new HostError(409, "scope_unavailable", project.reason);
+  return project;
 }
 
 function knowledgeProjection() {
@@ -388,19 +500,88 @@ function runtimeProjection() {
   };
 }
 
+function runtimeStop() {
+  const runtimeState = runtimeProjection();
+  if (runtimeState.baselineMatch) return null;
+  return {
+    code: "runtime-baseline-mismatch",
+    message: `Codex app-server ${runtimeState.version ?? "unknown"} is running but VibeHub pins ${runtimeState.baselineVersion}. The shell stops here instead of reusing an unverified runtime.`,
+    observedVersion: runtimeState.version,
+    baselineVersion: runtimeState.baselineVersion,
+  };
+}
+
 async function bootstrap() {
-  const [account, projectSnapshot] = await Promise.all([client.accountStatus(), projects.snapshot()]);
-  const graph = graphProjection();
+  const stop = runtimeStop();
+  const snapshot = buildUiSnapshot(repoRoot);
+  // Every default list is scoped to this folder through the native filter.
+  // Groups whose members all live elsewhere are counted, never listed.
+  const [account, projectSnapshot] = await Promise.all([
+    client.accountStatus(),
+    stop
+      ? Promise.resolve({ projects: [], pinned: [], recents: [], threads: [], capabilities: CODEX_PROJECT_CAPABILITIES, folderScope: null })
+      : projects.snapshot({ cwd: repoRoot }),
+  ]);
+  const { folderScope, projects: groups, ...lists } = projectSnapshot;
+  const visibleGroups = groups.filter((group) => group.scopedCount > 0 || group.totalCount === 0);
+  const graph = graphProjection(snapshot);
+  const project = projectProjection(snapshot, folderScope, groups);
   return {
     account,
-    ...projectSnapshot,
+    ...lists,
+    projects: visibleGroups,
+    project,
     graph,
     contexts: knowledgeProjection(),
     attention: attentionProjection(graph),
     harness: carrier,
     runtime: runtimeProjection(),
+    stop,
     pendingRequests: [...pendingRequests.values()],
     eventCursor: sequence,
+  };
+}
+
+async function importProject(sectionId) {
+  const snapshot = buildUiSnapshot(repoRoot);
+  const before = projectProjection(snapshot, null, []);
+  if (before.scope === "no-repository" || before.scope === "migration-required") {
+    throw new HostError(409, "scope_unavailable", before.reason);
+  }
+  if (before.binding || before.bindingRecord) {
+    throw new HostError(409, "already_bound", `This repository already carries ${BINDING_FILE}; exactly one Codex Project binds this VibeHub Project.`);
+  }
+  const candidates = await projects.importableProjects({ repositoryRoot: repoRoot });
+  const candidate = candidates.projects.find((item) => item.id === sectionId);
+  if (!candidate) throw new HostError(409, "import_ineligible", "That Codex Project no longer exists in the app-server.");
+  if (!candidate.importable) throw new HostError(409, "import_ineligible", candidate.reason);
+  const scaffold = { created: false, directories: [], versionPath: null };
+  if (before.compatibility.detectedFormat === "uninitialized") {
+    const initialized = initProject(repoRoot);
+    scaffold.created = true;
+    scaffold.directories = initialized.directories.map((path) => path.slice(repoRoot.length + 1));
+    scaffold.versionPath = initialized.version_path.slice(repoRoot.length + 1);
+  }
+  const document = {
+    schema_version: 1,
+    kind: "codex_project_binding",
+    harness: "codex",
+    section_id: candidate.id,
+    section_name_at_import: candidate.name,
+    folder: candidate.folders[0],
+    imported_at: new Date().toISOString(),
+    codex_version: runtime.version,
+  };
+  writeDocument(join(repoRoot, BINDING_FILE), document);
+  appendEvent("clientAction", { action: "importProject", sectionId: candidate.id, sectionName: candidate.name, folder: candidate.folders[0], scaffoldCreated: scaffold.created });
+  const after = buildUiSnapshot(repoRoot);
+  const projectSnapshot = await projects.snapshot({ cwd: repoRoot });
+  return {
+    project: projectProjection(after, projectSnapshot.folderScope, projectSnapshot.projects),
+    binding: document,
+    scaffold,
+    writtenPaths: [...(scaffold.versionPath ? [scaffold.versionPath] : []), ...scaffold.directories.map((path) => `${path}/`), BINDING_FILE],
+    committed: false,
   };
 }
 
@@ -433,6 +614,8 @@ function requireThreadId(payload) {
 
 async function action(payload) {
   if (!payload || typeof payload.action !== "string") throw invalid("Unknown action");
+  const stop = runtimeStop();
+  if (stop) throw new HostError(409, "runtime_baseline_mismatch", stop.message);
   if (payload.action === "newThread") {
     const created = await harness.newChat({ ...THREAD_POLICY, cwd: repoRoot, ephemeral: false });
     return { thread: publicThread(created.value.thread) };
@@ -469,7 +652,21 @@ async function action(payload) {
   }
   if (payload.action === "searchThreads") {
     if (typeof payload.searchTerm !== "string" || !payload.searchTerm.trim()) return { threads: [] };
-    return { threads: await projects.listThreads({ searchTerm: payload.searchTerm.trim() }) };
+    return { threads: await projects.listThreads({ searchTerm: payload.searchTerm.trim(), cwd: repoRoot }) };
+  }
+  if (payload.action === "listImportableProjects") {
+    const project = projectProjection(buildUiSnapshot(repoRoot), null, []);
+    const candidates = await projects.importableProjects({ repositoryRoot: repoRoot });
+    const blocked = project.scope === "no-repository" || project.scope === "migration-required"
+      ? project.reason
+      : project.binding || project.bindingRecord
+        ? `This repository already carries ${BINDING_FILE}.`
+        : null;
+    return { ...candidates, scope: project.scope, canImport: blocked === null, blockedReason: blocked, writes: REPOSITORY_WRITES.explicitImportOnly };
+  }
+  if (payload.action === "importProject") {
+    if (typeof payload.sectionId !== "string" || !payload.sectionId) throw invalid("sectionId required");
+    return importProject(payload.sectionId);
   }
   if (payload.action === "setThreadName") {
     if (typeof payload.threadId !== "string" || typeof payload.name !== "string" || !payload.name.trim() || payload.name.length > 160) {
@@ -506,6 +703,7 @@ async function action(payload) {
     return interrupted.value;
   }
   if (payload.action === "startTask") {
+    requireBoundScope();
     const workspace = taskWorkspaceProjection(payload.ticketId, {
       selectedContextIds: Array.isArray(payload.selectedContextIds) ? payload.selectedContextIds : [],
       operation: payload.operation === "explore" ? "explore" : "start",
@@ -515,9 +713,11 @@ async function action(payload) {
     return startTaskContextThread({ client, packet: workspace.packet, cwd: repoRoot, ephemeral: false, ...THREAD_POLICY });
   }
   if (payload.action === "readTask") {
+    requireBoundScope();
     return taskWorkspaceProjection(payload.ticketId);
   }
   if (payload.action === "startTaskTurn" || payload.action === "steerTaskTurn") {
+    requireBoundScope();
     if (typeof payload.ticketId !== "string" || typeof payload.threadId !== "string" || typeof payload.message !== "string" || !payload.message.trim()) {
       throw invalid("ticketId, threadId and message required");
     }
@@ -597,7 +797,7 @@ const server = createServer(async (request, response) => {
     requireHost(request);
     const url = new URL(request.url ?? "/", origin);
     if (url.pathname === "/health") {
-      json(response, 200, { ok: true, shell: SHELL_ID, harness: carrier.carrierId, localOnly: true, repositoryWrites: false, codexRuntime: true });
+      json(response, 200, { ok: true, shell: SHELL_ID, harness: carrier.carrierId, localOnly: true, repositoryWrites: REPOSITORY_WRITES, codexRuntime: true });
       return;
     }
     if (assets.has(url.pathname)) {
@@ -666,7 +866,7 @@ server.listen(flags.port, LOOPBACK_HOST, () => {
     harness: carrier.carrierId,
     runtime: runtimeProjection(),
     localOnly: true,
-    repositoryWrites: false,
+    repositoryWrites: REPOSITORY_WRITES,
     codexRuntime: true,
   };
   process.stdout.write(`${flags.json ? JSON.stringify(envelope) : `VibeHub Codex-first shell: ${url}`}\n`);
