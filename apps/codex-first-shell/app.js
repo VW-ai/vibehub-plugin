@@ -723,7 +723,7 @@ function topologicalTickets(tickets, relations) {
 
 function renderGraphEdges() {
   const graph = $(".graph");
-  const svg = $(".graph-edges", graph);
+  const svg = graph ? $(".graph-edges", graph) : null;
   if (!graph || !svg) return;
   const graphRect = graph.getBoundingClientRect();
   const paths = [];

@@ -1,10 +1,11 @@
 export const MAX_DRAFT_THREADS = 5;
 
-function cloneDraft(draft = {}) {
+function cloneDraft(draft) {
+  const source = draft ?? {};
   return {
-    text: String(draft.text ?? "").slice(0, 32_000),
-    quote: draft.quote ? structuredClone(draft.quote) : null,
-    attachments: (draft.attachments ?? []).slice(0, 3).map((item) => ({ ...item })),
+    text: String(source.text ?? "").slice(0, 32_000),
+    quote: source.quote ? structuredClone(source.quote) : null,
+    attachments: (source.attachments ?? []).slice(0, 3).map((item) => ({ ...item })),
   };
 }
 

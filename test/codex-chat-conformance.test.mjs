@@ -113,6 +113,7 @@ test("Composer text, Quote identity, and attachments are isolated and bounded by
   const drafts = new Map();
   saveThreadDraft(drafts, "thread-a", { text: "draft A", quote: { threadId: "thread-a", turnId: "turn-a", itemId: "item-a" }, attachments: [{ type: "image", url: "data:image/png;base64,AA==" }] });
   assert.deepEqual(loadThreadDraft(drafts, "thread-b"), { text: "", quote: null, attachments: [] });
+  assert.deepEqual(loadThreadDraft(drafts, null), { text: "", quote: null, attachments: [] });
   assert.equal(loadThreadDraft(drafts, "thread-a").quote.threadId, "thread-a");
   for (let index = 0; index < MAX_DRAFT_THREADS + 2; index += 1) saveThreadDraft(drafts, `thread-${index}`, { text: String(index) });
   assert.equal(drafts.size, MAX_DRAFT_THREADS);
