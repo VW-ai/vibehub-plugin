@@ -1,0 +1,33 @@
+{
+  "acceptance_ids": [
+    "lifecycle-restart-recovery-is-proven"
+  ],
+  "evidence_id": "lifecycle-restart-recovery-and-stop-conditions-proven-on-fixture",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-22T12:08:54Z",
+  "refs": [
+    "commit:12b82f8",
+    "commit:12deb76",
+    "commit:a0fad0f",
+    "commit:3c13314",
+    "commit:23023ec",
+    "commit:8a1a125",
+    "commit:492c6e6",
+    "commit:2604016",
+    "packages/codex-adapter/client.mjs",
+    "packages/codex-adapter/stop-conditions.mjs",
+    "packages/codex-adapter/upstream-lock.json",
+    "scripts/vh-codex-first-shell.mjs",
+    "apps/codex-first-shell/app.js",
+    "apps/codex-first-shell/chat-model.mjs",
+    "test/codex-first-shell.test.mjs",
+    "test/codex-adapter.test.mjs",
+    "test/fixtures/codex-app-server-fixture.mjs",
+    "docs/proposals/codex-chat-conformance/conformance-matrix.json",
+    "docs/proposals/codex-chat-conformance/browser-runtime-review.md"
+  ],
+  "schema_version": 1,
+  "summary": "Commits 12b82f8 through 2604016 give the launcher a real lifecycle. packages/codex-adapter/client.mjs gains process generations and restart, and the new packages/codex-adapter/stop-conditions.mjs evaluates all eight upstream-lock stop conditions with a table test; the host halts on the first violation at boot, after a restart and at the first runtime -32601, exposes runtime.state alive, restarting, exited or halted with the halting conditionId and detail, answers 409 runtime_halted or 503 runtime_restarting for adapter verbs, restarts a dead app-server with 500, 2000 and 5000 millisecond backoff, voids every pending request as requestResolved runtime_exited, re-verifies known Thread ids after restart and resumes unloaded Threads before new Turns. The UI never shows a dead Turn as live: runtimeExit clears running posture and writes the transcript boundary Runtime exited during this Turn, a restart reconciles from thread/read so that is the only live source, and a persistent stop banner names the halting condition while adapter actions are disabled. A static test proves Codex remains the only transcript store, no localStorage, IndexedDB or SQLite appears, and the only repository writes are exactly the explicit import paths. Host tests kill the fixture app-server mid-Turn and observe runtimeExit generation 1, requestResolved, runtimeRestarted generation 2 with identical Thread ids and intact ticket-to-thread linkage, the orphaned Turn replayed inProgress on a notLoaded Thread without live presence, a stale approval rejected, two pids and two initializes; a launcher restart over the same persisted fixture state recovers ids and links; auth unavailable, an unknown pinned request, an unrecoverable restart and restart exhaustion each halt with their condition id. Suite 235 tests, 232 pass, 0 fail, 3 skipped, lifecycle tests stable over five runs; guard 57/57 at 1280x800 and 58/58 narrow at 390x844 with zero console errors, plus a six-step real-UI lifecycle walk from live Turn through SIGKILL, restart, and ?thread= and ?task= reloads recovering the same Thread. Boundary: every proof ran on the fixture app-server because the local Codex is 0.144.1; generated-protocol-hash-changed and audio-input-removed remain unverified until the pinned binary runs the boot schema probe, the status a real app-server reports for a Turn interrupted by its own death is unconfirmed, and the resume-before-turn model for unloaded Threads has not executed against the binary.",
+  "ticket_id": "ticket-implement-codex-first-vibehub-shell"
+}
