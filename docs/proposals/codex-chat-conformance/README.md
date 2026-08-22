@@ -113,6 +113,7 @@ The independent Composer/navigation/accessibility audit found six further P0
 families: conflicting running submission, cross-Thread Composer state, a trapped
 narrow Sidebar, unbounded live reducer state, a dead Thread action and no browser
 interaction guard. All six now have concrete corrections. The audit report remains
-immutable and correctly records its FAIL verdict against the earlier commit; the
-matrix marks browser-dependent corrections `pending-browser` until the exact final
-commit is repeated through the root browser matrix.
+immutable and correctly records its FAIL verdict against the earlier commit. The
+final application commit then passed the 25-check real-DOM guard, wide Light/Dark
+review and a bounded authenticated Codex steer, interrupt and Fork flow recorded in
+[`browser-runtime-review.md`](browser-runtime-review.md).

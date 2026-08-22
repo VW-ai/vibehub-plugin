@@ -152,9 +152,9 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "Enter behavior existed, but Escape only closed overlays and never invoked the documented Stop control.",
-      "after": "pending-browser",
-      "implementation": "Escape delegates to exact Stop when Composer owns the active Turn. Running submission is explicit turn/steer against expectedTurnId, so an enabled Send cannot issue a conflicting turn/start; a repeat real-browser guard remains required.",
-      "proof": ["apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+      "after": "pass",
+      "implementation": "Escape delegates to exact Stop when Composer owns the active Turn. Running submission is explicit turn/steer against expectedTurnId, so an enabled Send cannot issue a conflicting turn/start. The final browser guard and bounded real-runtime review exercise the complete active-to-interrupted posture.",
+      "proof": ["apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
     },
     {
       "id": "retry",
@@ -207,9 +207,9 @@
       "before": "partial",
       "beforeSeverity": "medium",
       "beforeFinding": "Search and Inbox restored focus; requestUserInput used an inaccessible blocking prompt.",
-      "after": "pending-browser",
-      "implementation": "Search, Inbox, Review and the narrow drawer now use contained modal/inert posture, Escape and scrim dismissal, focus entry/return and logical route-heading focus. Search exposes combobox/listbox active-descendant identity and Sidebar refresh preserves its focused control. Repeat browser proof remains required.",
-      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs", "apps/codex-first-shell-prototype/app.css"]
+      "after": "pass",
+      "implementation": "Search, Inbox, Review and the narrow drawer now use contained modal/inert posture, Escape and scrim dismissal, focus entry/return and logical route-heading focus. Search exposes combobox/listbox active-descendant identity and Sidebar refresh preserves its focused control. The final 25-check browser guard exercises these behaviors in the real DOM.",
+      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs", "apps/codex-first-shell-prototype/app.css", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
     },
     {
       "id": "wide-narrow-theme-motion",
@@ -218,9 +218,9 @@
       "before": "pass",
       "beforeSeverity": "highest",
       "beforeFinding": "Accepted browser proof covered the prior mixed fixture.",
-      "after": "pending-browser",
-      "implementation": "Theme tokens now scope from the document root so overlay siblings inherit Light/Dark; meaningful faint text meets stronger contrast, the narrow drawer has one accessible state and a browser-executable guard checks modal theme, focus and overflow. Theme preference intentionally remains non-persistent because browser storage is outside carrier authority; final current-commit browser matrix is still required.",
-      "proof": ["apps/codex-first-shell-prototype/app.css", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs"]
+      "after": "pass",
+      "implementation": "Theme tokens now scope from the document root so overlay siblings inherit Light/Dark; meaningful faint text meets stronger contrast, the narrow drawer has one accessible state and a browser-executable guard checks modal theme, focus and overflow. Theme preference intentionally remains non-persistent because browser storage is outside carrier authority. Final wide Light/Dark and 390x844 review found no horizontal overflow or false live posture.",
+      "proof": ["apps/codex-first-shell-prototype/app.css", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
     },
     {
       "id": "narrow-sidebar-drawer",
@@ -229,9 +229,9 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "The transformed-offscreen Sidebar stayed focusable and its visible collapse control could not remove sidebar-open.",
-      "after": "pending-browser",
+      "after": "pass",
       "implementation": "One narrow drawer state controls transform, inert and aria-modal posture; Open/Close, Escape and scrim share the same lifecycle and preserve trigger focus.",
-      "proof": ["apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs"]
+      "proof": ["apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
     },
     {
       "id": "running-composer-steer",
@@ -240,9 +240,9 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "Stop and enabled Send were simultaneous while submit always dispatched turn/start.",
-      "after": "pending-browser",
+      "after": "pass",
       "implementation": "Running Composer labels Send as Steer current Turn and dispatches pinned turn/steer with exact Thread and expectedTurnId; idle submission alone uses turn/start.",
-      "proof": ["scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "packages/codex-adapter/upstream-lock.json", "test/codex-chat-conformance.test.mjs"]
+      "proof": ["scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "packages/codex-adapter/upstream-lock.json", "test/codex-chat-conformance.test.mjs", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
     },
     {
       "id": "thread-owned-composer-drafts",
@@ -262,9 +262,9 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "The visible Thread actions button was dead and no browser-to-host fork action existed.",
-      "after": "pending-browser",
+      "after": "pass",
       "implementation": "The dead menu is replaced by Fork, the host calls pinned thread/fork, and successful creation opens and focuses the new Codex Thread; live and fixture Threads disable the action.",
-      "proof": ["packages/codex-adapter/upstream-lock.json", "scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+      "proof": ["packages/codex-adapter/upstream-lock.json", "scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
     },
     {
       "id": "current-thread-url-recovery",
@@ -295,9 +295,9 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "The green suite booted the host but never operated current UI controls.",
-      "after": "pending-browser",
-      "implementation": "The opt-in deterministic fixture guard operates the real DOM and publishes a structured window result plus visible pass/fail status; root browser execution is required on the final commit.",
-      "proof": ["apps/codex-first-shell-prototype/browser-interaction-guard.mjs", "scripts/vh-codex-first-shell-prototype.mjs", "test/codex-first-shell-prototype.test.mjs"]
+      "after": "pass",
+      "implementation": "The opt-in deterministic fixture guard operates the real DOM and publishes a structured result plus visible per-check status. It passed all 25 checks on the exact final application commit, including active-to-terminal Fork-state reconciliation.",
+      "proof": ["apps/codex-first-shell-prototype/browser-interaction-guard.mjs", "scripts/vh-codex-first-shell-prototype.mjs", "test/codex-first-shell-prototype.test.mjs", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
     },
     {
       "id": "virtualized-production-list",
