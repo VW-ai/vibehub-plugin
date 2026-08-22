@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "one-project-import-and-scope-states-are-real"
+  ],
+  "evidence_id": "one-project-import-and-scope-states-implemented",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-22T11:00:51Z",
+  "refs": [
+    "commit:b8c4626",
+    "commit:74713e5",
+    "commit:d15c72d",
+    "commit:a9adbf3",
+    "packages/codex-adapter/projects.mjs",
+    "scripts/vh-codex-first-shell.mjs",
+    "apps/codex-first-shell/app.js",
+    "apps/codex-first-shell/index.html",
+    "test/codex-projects.test.mjs",
+    "test/codex-first-shell.test.mjs",
+    "test/fixtures/codex-app-server-fixture.mjs",
+    ".vibehub/rooms/product/decision-one-project-noun-with-native-chat-grouping.yaml",
+    ".vibehub/rooms/product/decision-codex-project-import-binds-the-vibehub-project.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "Commits b8c4626, 74713e5, d15c72d and a9adbf3 implement the one-Project composition. The adapter derives Codex Project import eligibility from member Thread folders (single-folder, multi-folder or empty) and matches by realpath only, never by name, while ThreadSection stays the sole membership authority. The host bootstrap exposes project scope bound, unbound, no-repository or migration-required, lists only Threads and groups scoped to the repository cwd with hidden counts for the rest, gates every Task action with 409 scope_unavailable when unbound, and implements listImportableProjects and importProject, which writes the .vibehub scaffold plus .vibehub/codex-project.yaml binding into the target repository without any git commit; repositoryWrites now truthfully declares default false with six exact explicit-import paths. The UI renders a VibeHub Project header with scope pill, a Rooms cold-start line that hands off to distill instead of fabricating a Room tree, an Inspect details block as the only place cwd, binding and uncommitted paths appear, the import dialog enabling only eligible matching rows, and the label Chat groups for every former ThreadSection Project string; Chat stays fully usable in every scope state. Suite 223 tests, 220 pass, 0 fail, 3 skipped; guard 48/48 at 1280x800 Light and Dark and 49/49 narrow at 390x844; an end-to-end import on a temporary unbound repository flipped scope to Bound, created version.yaml plus four directories and the binding, left git status showing only untracked .vibehub, and passed ticket validate, context validate, project compatibility CURRENT and room drift cold_start true. Live Codex verification was skipped because the local binary is 0.144.1.",
+  "ticket_id": "ticket-implement-codex-first-vibehub-shell"
+}

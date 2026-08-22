@@ -1,0 +1,27 @@
+{
+  "acceptance_ids": [
+    "graph-and-task-workspace-routes-are-production"
+  ],
+  "evidence_id": "graph-workspace-and-search-routes-canonical",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-22T11:28:35Z",
+  "refs": [
+    "commit:6e39f61",
+    "commit:ed294d6",
+    "commit:a321c46",
+    "commit:54f8c72",
+    "scripts/vh-codex-first-shell.mjs",
+    "apps/codex-first-shell/app.js",
+    "apps/codex-first-shell/thread-location.mjs",
+    "packages/codex-adapter/task-context.mjs",
+    "skills/scripts/vh-ui.mjs",
+    "test/codex-first-shell.test.mjs",
+    "test/codex-chat-conformance.test.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs",
+    "docs/proposals/codex-native-attention/interaction-contract.json"
+  ],
+  "schema_version": 1,
+  "summary": "Commits 6e39f61, ed294d6, a321c46 and 54f8c72 make the Graph and Task Workspace routes production. The host bootstrap graph deep-equals buildUiSnapshot state for snapshotId, project, tickets, relations and source, and the Context projection is built only from the canonical rooms projection with superseded Context excluded; the host no longer imports loadRepository. readTask returns evidence, outcome and nextAction straight from buildTicketHandoff, and the Workspace renders a PROOF section with each Evidence record, the Outcome record and the nextAction reason. The packet deep-equals buildTaskContextPacket output, packetText equals its two-space JSON serialization, the Workspace pre element textContent equals that text, start, continue and steer payloads equal the Workspace packetText, and thread/read replays those exact bytes as the Turn userMessage which transcript cards disclose on open. start ends on the chat route, setRoute tasks appears nowhere in app.js, openTask failure lands on Chat, and the new ?task= location reopens a Workspace through the same landing path while an unknown id lands on Chat with a toast. Search is one entry with groups labelled Chats (Codex), Tasks (VibeHub) and Context (Rooms); native thread/list searchTerm is cwd-scoped, archived excluded, limited to 20, with stale replies dropped and the unbound scoping from the import package preserved. Suite 225 tests, 222 pass, 0 fail, 3 skipped; guard 54/54 at 1280x800 and 55/55 narrow at 390x844 with zero console errors, including a live Workspace for ticket-decide-codex-first-shell-direction whose 113507-character host packet rendered verbatim; a literal reload of ?task= landed on that Workspace.",
+  "ticket_id": "ticket-implement-codex-first-vibehub-shell"
+}

@@ -1,0 +1,29 @@
+{
+  "acceptance_ids": [
+    "chat-conformance-floor-holds-in-production"
+  ],
+  "evidence_id": "conformance-floor-closed-in-production-shell",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-22T11:00:51Z",
+  "refs": [
+    "commit:88f1674",
+    "commit:49cc964",
+    "commit:afbb36d",
+    "commit:5792de9",
+    "commit:439a605",
+    "commit:c2b1b70",
+    "commit:bea5444",
+    "commit:30dc40f",
+    "commit:157b20e",
+    "commit:e0c7562",
+    "docs/proposals/codex-chat-conformance/conformance-matrix.json",
+    "docs/proposals/codex-chat-conformance/browser-runtime-review.md",
+    "test/codex-chat-conformance.test.mjs",
+    "test/codex-first-shell.test.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Commits 88f1674 through e0c7562 close the five partial checks and the URL recovery check of docs/proposals/codex-chat-conformance/conformance-matrix.json in the promoted production shell apps/codex-first-shell: escape-first Markdown hardened for nested and malformed constructs; Composer growth converged on its CSS ceiling; Thread deep link follows the visible Thread after in-app navigation via history.replaceState; request-user-input drafts survive intentional route changes; Quote source identity serialized into durable Thread history with no browser storage; selection-preserving reconciliation never replaces a selected transcript entry while a Turn streams. The matrix now records 26 pass and 3 deferred with every proof field naming a test or guard check, and the deferred model, mode, realtime and virtualization items are bound by tests proving no contrary UI claim and a disclosed 240-item mounted bound. Node suite 216 tests, 213 pass, 0 fail, 3 skipped; real-DOM browser interaction guard 35/35 at 1280x800 and 36/36 with the narrow frame at 390x844, zero console errors, no horizontal overflow. The guard ran against the pinned-protocol fixture app-server test/fixtures/codex-app-server-fixture.mjs because the locally installed Codex is 0.144.1 and predates the 0.147.0 baseline; the earlier authenticated runtime review at fac258a was not repeated.",
+  "ticket_id": "ticket-implement-codex-first-vibehub-shell"
+}
