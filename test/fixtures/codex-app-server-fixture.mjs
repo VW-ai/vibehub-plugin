@@ -12,18 +12,45 @@
 // id, name, preview, cwd, sectionId, archived }] }` so a test can stage Chats
 // in several folders and ThreadSections of every import-eligibility shape
 // before the shell boots.
+//
+// Restart proofs use four more knobs, all off by default:
+//   CODEX_FIXTURE_STATE=<path>   persist sections, Threads and Turns to that
+//                                file on every mutation and load them on
+//                                start, the way the real app-server replays
+//                                rollouts: a reloaded Thread is `notLoaded`
+//                                until resumed, and a Turn that was in
+//                                progress when the process died keeps its
+//                                persisted status instead of being repaired;
+//   CODEX_FIXTURE_PIDFILE=<path> append this process id so a test can kill
+//                                the app-server from outside;
+//   CODEX_FIXTURE_AUTH=unavailable   make account/read fail;
+//   CODEX_FIXTURE_DROP_METHODS=a,b   answer those methods with -32601.
 
-import { appendFileSync, realpathSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
+
+// Only the app-server transport is impersonated; any other subcommand (for
+// example generate-json-schema) exits loudly so a caller never mistakes this
+// fixture for the pinned binary.
+if (process.argv[2] !== "app-server" || !process.argv.includes("--listen")) {
+  process.stderr.write(`codex-app-server-fixture: unsupported invocation ${process.argv.slice(2).join(" ")}\n`);
+  process.exit(2);
+}
 
 const version = process.env.CODEX_FIXTURE_VERSION ?? "0.147.0";
 const logPath = process.env.CODEX_FIXTURE_LOG ?? null;
+const statePath = process.env.CODEX_FIXTURE_STATE ?? null;
+const pidPath = process.env.CODEX_FIXTURE_PIDFILE ?? null;
+const authUnavailable = process.env.CODEX_FIXTURE_AUTH === "unavailable";
+const droppedMethods = new Set((process.env.CODEX_FIXTURE_DROP_METHODS ?? "").split(",").map((entry) => entry.trim()).filter(Boolean));
 const PINNED_SECTION = Object.freeze({ id: "01984de2-8f74-7c91-a3b2-5c5e937cf318", name: "Pinned" });
 const threads = new Map();
 const sections = new Map();
 let counter = 0;
 const nextId = (prefix) => `${prefix}-${++counter}`;
 const now = () => new Date().toISOString();
+
+if (pidPath) appendFileSync(pidPath, `${process.pid}\n`);
 
 // The real app-server compares folders by their resolved path, so a symlinked
 // /tmp and its /private/tmp target name the same folder here too.
@@ -70,7 +97,34 @@ function seed() {
     threads.set(thread.id, thread);
   }
 }
-seed();
+
+function loadState() {
+  if (!statePath || !existsSync(statePath)) return false;
+  const raw = readFileSync(statePath, "utf8");
+  if (!raw.trim()) return false;
+  const state = JSON.parse(raw);
+  counter = state.counter ?? 0;
+  for (const section of state.sections ?? []) sections.set(section.id, { id: section.id, name: section.name });
+  for (const thread of state.threads ?? []) {
+    // A Thread read back from disk is not loaded into this process until it
+    // is resumed; its Turns are exactly what was persisted, orphaned
+    // in-progress status included.
+    threads.set(thread.id, { ...thread, status: { type: "notLoaded" } });
+  }
+  return true;
+}
+
+function persist() {
+  if (!statePath) return;
+  const state = { counter, sections: [...sections.values()], threads: [...threads.values()] };
+  writeFileSync(`${statePath}.next`, `${JSON.stringify(state)}\n`);
+  renameSync(`${statePath}.next`, statePath);
+}
+
+if (!loadState()) {
+  seed();
+  persist();
+}
 
 function record(entry) {
   if (logPath) appendFileSync(logPath, `${JSON.stringify(entry)}\n`);
@@ -121,7 +175,10 @@ const handlers = {
     platformFamily: "unix",
     platformOs: "fixture",
   }),
-  "account/read": () => ({ account: { type: "chatgpt", email: "fixture@example.com", planType: "pro" }, requiresOpenaiAuth: true }),
+  "account/read": () => {
+    if (authUnavailable) throw Object.assign(new Error("account status unavailable (fixture)"), { code: -32603 });
+    return { account: { type: "chatgpt", email: "fixture@example.com", planType: "pro" }, requiresOpenaiAuth: true };
+  },
   "threadSection/list": () => ({ data: [...sections.values()].map(sectionRecord), nextCursor: null }),
   "threadSection/create": (params) => {
     if (typeof params?.name !== "string" || !params.name.trim()) throw Object.assign(new Error("name required"), { code: -32602 });
@@ -167,7 +224,11 @@ const handlers = {
     const thread = requireThread(params);
     return { thread: { ...threadRecord(thread), turns: params?.includeTurns ? thread.turns : [] } };
   },
-  "thread/resume": (params) => ({ thread: threadRecord(requireThread(params)) }),
+  "thread/resume": (params) => {
+    const thread = requireThread(params);
+    if (thread.status?.type === "notLoaded") thread.status = { type: "idle" };
+    return { thread: threadRecord(thread) };
+  },
   "thread/name/set": (params) => {
     requireThread(params).name = params.name;
     return {};
@@ -227,6 +288,12 @@ const handlers = {
   },
 };
 
+const MUTATING_METHODS = new Set([
+  "threadSection/create", "threadSection/update", "threadSection/delete",
+  "thread/start", "thread/resume", "thread/name/set", "thread/fork", "thread/section/move", "thread/archive", "thread/unarchive",
+  "turn/start", "turn/steer", "turn/interrupt",
+]);
+
 createInterface({ input: process.stdin }).on("line", (line) => {
   let message;
   try {
@@ -239,13 +306,15 @@ createInterface({ input: process.stdin }).on("line", (line) => {
     return;
   }
   record({ kind: "request", id: message.id ?? null, method: message.method, params: message.params ?? null });
-  const handler = handlers[message.method];
+  const handler = droppedMethods.has(message.method) ? null : handlers[message.method];
   if (!handler) {
     send({ id: message.id, error: { code: -32601, message: `Invalid request: unknown variant \`${message.method}\`` } });
     return;
   }
   try {
-    send({ id: message.id, result: handler(message.params, message.id) });
+    const result = handler(message.params, message.id);
+    if (MUTATING_METHODS.has(message.method)) persist();
+    send({ id: message.id, result });
   } catch (error) {
     send({ id: message.id, error: { code: error.code ?? -32603, message: error.message } });
   }
