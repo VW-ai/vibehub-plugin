@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-08-21T23:58:07Z",
+  "authority": "Codex in-app browser against the loopback shell backed by the authenticated official Codex app-server",
+  "fixture": {
+    "projectId": "01a026bc-2a66-73e3-b9a3-c34868e8240a",
+    "projectName": "__VIBEHUB_PROJECT_BROWSER_E2E__",
+    "threadId": "01a026bc-2a6e-7780-b6ce-8fa77e85240e",
+    "threadName": "__VIBEHUB_PROJECT_BROWSER_E2E_THREAD__",
+    "materialization": "thread/start, thread/name/set, then one bounded no-tool Turn so the persistent Thread enters thread/list"
+  },
+  "openingFocus": {
+    "result": "pass",
+    "activeElement": "H1#activeThreadTitle",
+    "bodyFallback": false
+  },
+  "paths": [
+    {
+      "id": "wide-light-pointer",
+      "result": "pass",
+      "input": "real in-app-browser pointer drag",
+      "mutation": "Recents to Project",
+      "viewport": "1280x720",
+      "theme": "light",
+      "focusAfter": "moved Thread button",
+      "announcement": "Chat moved to __VIBEHUB_PROJECT_BROWSER_E2E__ Project.",
+      "liveRegion": { "role": "status", "ariaLive": "polite", "ariaAtomic": "true" },
+      "bodyWidth": 1280,
+      "scrollWidth": 1280
+    },
+    {
+      "id": "wide-dark-keyboard-equivalent",
+      "result": "pass",
+      "input": "native select end-to-end input/change via browser selectOption",
+      "mutation": "Project to Recents",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "focusAfter": "SELECT#activeThreadProject",
+      "announcement": "Chat moved to Recents.",
+      "horizontalOverflow": false,
+      "note": "The control is a native labeled select and preserves the keyboard-equivalent semantic path. In-app-browser OS arrow-key synthesis did not change the native select value, so this run does not claim physical key-event coverage."
+    },
+    {
+      "id": "narrow-light-pointer",
+      "result": "pass",
+      "input": "real in-app-browser pointer drag in the open Sidebar",
+      "mutation": "Recents to Project",
+      "viewport": "390x844",
+      "theme": "light",
+      "focusAfter": "moved Thread button remained active after 1.6 seconds and a membership rerender",
+      "announcement": "Chat moved to __VIBEHUB_PROJECT_BROWSER_E2E__ Project.",
+      "sidebarOpen": true,
+      "bodyWidth": 390,
+      "scrollWidth": 390
+    },
+    {
+      "id": "narrow-dark-keyboard-equivalent",
+      "result": "pass",
+      "input": "native select end-to-end input/change via browser selectOption",
+      "mutation": "Project to Recents",
+      "viewport": "390x844",
+      "theme": "dark",
+      "focusAfter": "SELECT#activeThreadProject with value Recents",
+      "announcement": "Chat moved to Recents.",
+      "bodyWidth": 390,
+      "scrollWidth": 390
+    }
+  ],
+  "invariants": {
+    "threadIdUnchangedAcrossMoves": true,
+    "cwdUnchangedAcrossMoves": true,
+    "freshBootstrapRecoveredEachMembership": true,
+    "fixtureDataNeverSubstitutedForRuntimeMembership": true
+  },
+  "cleanup": {
+    "command": "npm run probe:codex:projects:browser-cleanup",
+    "status": "pass",
+    "removed": {
+      "projectId": "01a026bc-2a66-73e3-b9a3-c34868e8240a",
+      "threadId": "01a026bc-2a6e-7780-b6ce-8fa77e85240e"
+    },
+    "verificationPass": {
+      "threadIds": [],
+      "projectIds": []
+    }
+  }
+}

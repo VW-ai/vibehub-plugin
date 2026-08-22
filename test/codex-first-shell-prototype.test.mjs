@@ -53,7 +53,9 @@ test("Projects, unprojected Recents, drag, keyboard move, and Fork use the nativ
   for (const action of ["createProject", "renameProject", "deleteProject", "moveThread", "forkThread", "archiveThread", "searchThreads"]) assert.match(server, new RegExp(action));
   assert.match(html, /id="projectList"/);
   assert.match(html, /data-project-drop="recent"/);
-  assert.match(script, /text\/x-vibehub-thread/);
+  assert.match(script, /document\.addEventListener\("pointerdown"/);
+  assert.match(script, /document\.elementFromPoint\(event\.clientX, event\.clientY\)/);
+  assert.doesNotMatch(script, /dataTransfer/);
   assert.match(script, /data-toggle-project/);
   assert.match(script, /id="activeThreadProject"/);
   assert.match(script, /data-fork-thread/);

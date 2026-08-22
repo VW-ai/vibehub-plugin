@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "fixture": {
+    "setup": "node packages/codex-adapter/prepare-project-browser-e2e.mjs setup",
+    "cleanup": "node packages/codex-adapter/prepare-project-browser-e2e.mjs cleanup",
+    "projectName": "__VIBEHUB_PROJECT_BROWSER_E2E__",
+    "threadName": "__VIBEHUB_PROJECT_BROWSER_E2E_THREAD__",
+    "authority": "real authenticated Codex app-server; the browser never substitutes fixture membership"
+  },
+  "requiredPaths": [
+    {
+      "id": "wide-light-pointer",
+      "viewport": "1280x720",
+      "theme": "light",
+      "from": "Recents",
+      "to": "Project",
+      "input": "real pointer drag",
+      "focusAfter": "moved Thread button",
+      "announcement": "Chat moved to __VIBEHUB_PROJECT_BROWSER_E2E__ Project."
+    },
+    {
+      "id": "wide-dark-keyboard",
+      "viewport": "1280x720",
+      "theme": "dark",
+      "from": "Project",
+      "to": "Recents",
+      "input": "native Project select",
+      "focusAfter": "Move Chat to Project select",
+      "announcement": "Chat moved to Recents."
+    },
+    {
+      "id": "narrow-light-pointer",
+      "viewport": "390x844",
+      "theme": "light",
+      "from": "Recents",
+      "to": "Project",
+      "input": "real pointer drag in open Sidebar",
+      "focusAfter": "moved Thread button",
+      "announcement": "Chat moved to __VIBEHUB_PROJECT_BROWSER_E2E__ Project."
+    },
+    {
+      "id": "narrow-dark-keyboard",
+      "viewport": "390x844",
+      "theme": "dark",
+      "from": "Project",
+      "to": "Recents",
+      "input": "native Project select",
+      "focusAfter": "Move Chat to Project select",
+      "announcement": "Chat moved to Recents."
+    }
+  ],
+  "globalAssertions": [
+    "Opening the temporary Thread deliberately focuses #activeThreadTitle instead of BODY.",
+    "Every membership mutation is recovered from a fresh /api/bootstrap response.",
+    "The status live region is polite and atomic.",
+    "Project movement does not change the Thread id or cwd.",
+    "Each viewport has no horizontal overflow.",
+    "Cleanup hard-deletes the temporary Thread and Project and a fresh list proves both absent."
+  ]
+}

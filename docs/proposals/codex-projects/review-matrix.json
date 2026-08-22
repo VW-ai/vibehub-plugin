@@ -1,5 +1,5 @@
 {
-  "reviewedAt": "2026-08-21T23:24:38Z",
+  "reviewedAt": "2026-08-21T23:58:07Z",
   "baseline": {
     "codexVersion": "0.147.0",
     "codexCommit": "be6e8eac029b183056b7e4402879f15d2c85f61b"
@@ -58,8 +58,11 @@
     }
   ],
   "interactionCoverage": {
-    "pointerDrag": "implemented against data-project-drop and covered structurally; no user-owned real Thread was mutated during browser review",
-    "keyboardEquivalent": "native select in the Chat header calls the same moveThread action",
+    "pointerDrag": "real temporary Codex Thread moved Recents to Project through actual in-app-browser pointer gestures at 1280x720 Light and 390x844 Light; fresh bootstrap recovered membership, exact live status was announced, and the rerendered Thread button retained focus",
+    "keyboardEquivalent": "the same real Thread moved Project to Recents through the labeled native select at 1280x720 Dark and 390x844 Dark; end-to-end input/change, membership recovery, exact live status, and select focus restoration passed. Browser selectOption exercised the native control because in-app-browser OS arrow-key synthesis did not change its value; physical key-event coverage is not claimed",
+    "openingFocus": "opening the real temporary Thread focuses H1#activeThreadTitle rather than BODY",
+    "responsiveAndTheme": "all four required paths were reviewed at their declared viewport/theme and had no horizontal overflow",
+    "runArtifact": "docs/proposals/codex-projects/browser-e2e-run.json",
     "liveLifecycle": "probe-projects-live.mjs independently exercises create, move, fork, search, archive, restart, restore, delete and cleanup against authenticated app-server",
     "fixtureAuthority": "visual only; projectFixture=matrix is visibly isolated and never used by runtime membership"
   },
@@ -67,7 +70,7 @@
     "polished pointer insertion and manual reordering",
     "archived-history browsing",
     "pagination virtualization for very large Recents lists",
-    "final focus restoration and screen-reader live wording",
+    "broader screen-reader wording review beyond the verified Project-movement live status",
     "final visual token pass"
   ]
 }

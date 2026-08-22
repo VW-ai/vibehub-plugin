@@ -12,6 +12,8 @@
     "probe:dsh-shell": "node packages/dsh-adapter/probe-persistent-shell.mjs",
     "probe:codex": "node packages/codex-adapter/probe-schema.mjs",
     "probe:codex:projects": "node packages/codex-adapter/probe-projects-live.mjs",
+    "probe:codex:projects:browser-setup": "node packages/codex-adapter/prepare-project-browser-e2e.mjs setup",
+    "probe:codex:projects:browser-cleanup": "node packages/codex-adapter/prepare-project-browser-e2e.mjs cleanup",
     "probe:codex:dsh": "node packages/codex-adapter/probe-dsh-source.mjs",
     "probe:codex:live": "node packages/codex-adapter/probe-live.mjs",
     "probe:harness:isolation": "node packages/harness-core/probe-package-isolation.mjs",

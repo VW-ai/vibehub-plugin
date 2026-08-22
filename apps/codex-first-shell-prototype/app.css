@@ -96,7 +96,7 @@ button:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline
 .project-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 .thread-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .thread-list { min-height: 0; overflow: auto; scrollbar-width: thin; }
-.thread-button { position: relative; width: 100%; min-width: 0; gap: 8px; padding: 7px 9px; border: 0; border-radius: 7px; text-align: left; background: transparent; }
+.thread-button { position: relative; width: 100%; min-width: 0; gap: 8px; padding: 7px 9px; border: 0; border-radius: 7px; text-align: left; background: transparent; touch-action: pan-y; }
 .thread-button:hover, .thread-button.active { background: var(--hover); }
 .thread-button.dragging { opacity: .38; }
 .thread-button .thread-state { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
@@ -153,6 +153,7 @@ button:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline
 .chat-view { width: min(800px, calc(100% - 40px)); margin: 0 auto; padding: 18px 0 52px; }
 .thread-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 4px 4px 22px; }
 .thread-heading h1 { margin: 0; font-size: 20px; letter-spacing: -.025em; }
+.thread-heading h1:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 3px; }
 .thread-heading p { margin: 4px 0 0; color: var(--muted); font: 10px/1.4 var(--mono); }
 .thread-actions { display: flex; align-items: center; gap: 6px; }
 .thread-actions select, .thread-actions button { height: 30px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--panel); font-size: 10px; }

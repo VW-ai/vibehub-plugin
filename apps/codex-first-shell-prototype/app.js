@@ -49,6 +49,9 @@ const toast = $("#toast");
 let toastTimer;
 let pollTimer;
 let graphResizeFrame;
+let pointerDrag = null;
+let suppressThreadClick = null;
+let rerenderFocusSelector = null;
 
 window.addEventListener("resize", () => {
   if (state.route !== "tasks") return;
@@ -67,6 +70,34 @@ function notify(message) {
   toast.textContent = message;
   toast.hidden = false;
   toastTimer = setTimeout(() => { toast.hidden = true; }, 2600);
+}
+
+function afterRenderFocus(selector) {
+  rerenderFocusSelector = selector;
+  requestAnimationFrame(() => requestAnimationFrame(() => document.querySelector(selector)?.focus()));
+}
+
+function restoreRerenderedFocus() {
+  if (!rerenderFocusSelector || (document.activeElement !== document.body && document.activeElement?.isConnected)) return;
+  requestAnimationFrame(() => document.querySelector(rerenderFocusSelector)?.focus());
+}
+
+function projectDestinationName(projectId) {
+  if (projectId === null) return "Recents";
+  if (projectId === state.bootstrap?.capabilities?.pinnedSectionId) return "Pinned";
+  return `${state.projects.find((project) => project.id === projectId)?.name ?? "selected"} Project`;
+}
+
+function announceThreadMove(projectId) {
+  notify(`Chat moved to ${projectDestinationName(projectId)}.`);
+}
+
+async function moveThreadToProject(threadId, projectId, focusSelector) {
+  await action({ action: "moveThread", threadId, projectId });
+  await refreshThreads();
+  if (state.route === "chat" && state.activeThreadId === threadId) renderChat();
+  announceThreadMove(projectId);
+  afterRenderFocus(focusSelector);
 }
 
 async function api(path, options = {}) {
@@ -93,7 +124,7 @@ function humanize(ticketId) {
 function threadButton(thread) {
   const active = thread.id === state.activeThreadId;
   const runtimeActive = String(thread.status?.type ?? thread.status ?? "").toLowerCase().includes("active");
-  return `<button class="thread-button${active ? " active" : ""}" type="button" draggable="true" data-thread-id="${escapeHtml(thread.id)}">
+  return `<button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
     <i class="thread-state${runtimeActive ? " active" : ""}"></i>
     <span><strong>${escapeHtml(titleForThread(thread))}</strong><small>${escapeHtml(thread.taskLink ? "VibeHub Task · Codex Thread" : (thread.preview || "Codex Thread").slice(0, 54))}</small></span>
     ${thread.taskLink ? "<em>TASK</em>" : ""}
@@ -115,6 +146,7 @@ function updateSidebar() {
       </section>`).join("")
     : '<p class="muted">No Projects yet. Chats stay in Recents.</p>';
   list.innerHTML = state.recents.map(threadButton).join("") || '<p class="muted">No unprojected chats.</p>';
+  restoreRerenderedFocus();
 }
 
 function completionKey(item) {
@@ -486,7 +518,7 @@ function renderChat({ preserveScroll = false } = {}) {
   const pinnedId = state.bootstrap?.capabilities?.pinnedSectionId;
   const projectOptions = [`<option value=""${activeProjectId === null ? " selected" : ""}>Recents</option>`, ...(pinnedId ? [`<option value="${escapeHtml(pinnedId)}"${activeProjectId === pinnedId ? " selected" : ""}>Pinned</option>`] : []), ...state.projects.map((project) => `<option value="${escapeHtml(project.id)}"${activeProjectId === project.id ? " selected" : ""}>${escapeHtml(project.name)}</option>`)].join("");
   const lineage = state.activeThread.forkedFromId ? ` · Forked from ${escapeHtml(state.activeThread.forkedFromId.slice(0, 8))}…` : "";
-  surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1>${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${lineage}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}">Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+  surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${lineage}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}">Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
   requestAnimationFrame(() => {
     if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
     else surface.scrollTop = Math.max(0, surface.scrollHeight - surface.clientHeight - distanceFromBottom);
@@ -667,6 +699,7 @@ async function openThread(threadId, { route = "chat" } = {}) {
   $("#stopTurn").hidden = !state.running;
   updateSidebar();
   setRoute(route);
+  if (route === "chat") afterRenderFocus("#activeThreadTitle");
 }
 
 function liveItem(itemId, fallback) {
@@ -926,6 +959,11 @@ document.addEventListener("click", async (event) => {
     return;
   }
   const thread = event.target.closest("[data-thread-id]");
+  if (thread && suppressThreadClick === thread.dataset.threadId) {
+    event.preventDefault();
+    suppressThreadClick = null;
+    return;
+  }
   if (thread) { await openThread(thread.dataset.threadId); return; }
   const ticket = event.target.closest("[data-ticket-id]");
   if (ticket) { closeInbox(false); await openTask(ticket.dataset.ticketId); return; }
@@ -1030,13 +1068,15 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-focus-task-composer]")) { $("#composerInput").focus(); return; }
 });
 
+document.addEventListener("focusin", (event) => {
+  if (rerenderFocusSelector && !event.target.matches(rerenderFocusSelector)) rerenderFocusSelector = null;
+});
+
 document.addEventListener("change", async (event) => {
   if (event.target.id === "activeThreadProject") {
     try {
-      await action({ action: "moveThread", threadId: state.activeThreadId, projectId: event.target.value || null });
-      await refreshThreads();
-      renderChat();
-      notify(event.target.value ? "Chat moved to Project." : "Chat moved to Recents.");
+      const projectId = event.target.value || null;
+      await moveThreadToProject(state.activeThreadId, projectId, "#activeThreadProject");
     } catch (error) { notify(error.message); }
     return;
   }
@@ -1123,41 +1163,54 @@ document.addEventListener("keydown", (event) => {
   if (event.metaKey && event.key.toLowerCase() === "n") { event.preventDefault(); newThread(); }
 });
 
-document.addEventListener("dragstart", (event) => {
-  const thread = event.target.closest(".thread-button[data-thread-id]");
-  if (!thread || !event.dataTransfer) return;
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/x-vibehub-thread", thread.dataset.threadId);
-  thread.classList.add("dragging");
-});
-
-document.addEventListener("dragend", (event) => {
-  event.target.closest(".thread-button")?.classList.remove("dragging");
+function clearPointerDrag() {
+  pointerDrag?.source?.classList.remove("dragging");
   $$("[data-project-drop]").forEach((target) => target.classList.remove("drag-over"));
+  pointerDrag = null;
+}
+
+function pointerDropTarget(event) {
+  return document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-project-drop]") ?? null;
+}
+
+document.addEventListener("pointerdown", (event) => {
+  const thread = event.target.closest(".thread-button[data-thread-id]");
+  if (!thread || event.button !== 0 || !event.isPrimary) return;
+  pointerDrag = {
+    pointerId: event.pointerId,
+    threadId: thread.dataset.threadId,
+    source: thread,
+    startX: event.clientX,
+    startY: event.clientY,
+    dragging: false,
+  };
+  thread.setPointerCapture?.(event.pointerId);
 });
 
-document.addEventListener("dragover", (event) => {
-  const target = event.target.closest("[data-project-drop]");
+document.addEventListener("pointermove", (event) => {
+  if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
+  if (!pointerDrag.dragging && Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY) < 8) return;
+  pointerDrag.dragging = true;
+  pointerDrag.source.classList.add("dragging");
+  event.preventDefault();
+  const target = pointerDropTarget(event);
+  $$("[data-project-drop]").forEach((candidate) => candidate.classList.toggle("drag-over", candidate === target));
+});
+
+document.addEventListener("pointercancel", clearPointerDrag);
+
+document.addEventListener("pointerup", async (event) => {
+  if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
+  const drag = pointerDrag;
+  const target = drag.dragging ? pointerDropTarget(event) : null;
+  clearPointerDrag();
   if (!target) return;
   event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
-  target.classList.add("drag-over");
-});
-
-document.addEventListener("dragleave", (event) => event.target.closest("[data-project-drop]")?.classList.remove("drag-over"));
-
-document.addEventListener("drop", async (event) => {
-  const target = event.target.closest("[data-project-drop]");
-  const threadId = event.dataTransfer?.getData("text/x-vibehub-thread");
-  if (!target || !threadId) return;
-  event.preventDefault();
-  target.classList.remove("drag-over");
+  suppressThreadClick = drag.threadId;
+  setTimeout(() => { if (suppressThreadClick === drag.threadId) suppressThreadClick = null; }, 0);
   const projectId = target.dataset.projectDrop === "recent" ? null : target.dataset.projectDrop;
   try {
-    await action({ action: "moveThread", threadId, projectId });
-    await refreshThreads();
-    if (state.route === "chat" && state.activeThreadId === threadId) renderChat();
-    notify(projectId ? "Chat moved to Project." : "Chat moved to Recents.");
+    await moveThreadToProject(drag.threadId, projectId, `[data-thread-id="${CSS.escape(drag.threadId)}"]`);
   } catch (error) { notify(error.message); }
 });
 

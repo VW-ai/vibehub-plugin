@@ -119,3 +119,35 @@ test("object contract keeps Codex Project, cwd, VibeHub Project, Chat, and Task 
   assert.equal(review.surfaces[1].checks.horizontalOverflow, false);
   assert.equal(review.surfaces[3].checks.keyboardProjectSelectorPresent, true);
 });
+
+test("browser Project movement contract requires real pointer, keyboard, focus, live region, and cleanup proof", async () => {
+  const [scenarioText, script, html, preparer] = await Promise.all([
+    readFile(new URL("../docs/proposals/codex-projects/browser-e2e-contract.json", import.meta.url), "utf8"),
+    readFile(new URL("../apps/codex-first-shell-prototype/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../apps/codex-first-shell-prototype/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../packages/codex-adapter/prepare-project-browser-e2e.mjs", import.meta.url), "utf8"),
+  ]);
+  const scenario = JSON.parse(scenarioText);
+  assert.deepEqual(scenario.requiredPaths.map(({ viewport, theme, input }) => [viewport, theme, input]), [
+    ["1280x720", "light", "real pointer drag"],
+    ["1280x720", "dark", "native Project select"],
+    ["390x844", "light", "real pointer drag in open Sidebar"],
+    ["390x844", "dark", "native Project select"],
+  ]);
+  assert.match(script, /id="activeThreadTitle" tabindex="-1"/);
+  assert.match(script, /afterRenderFocus\("#activeThreadTitle"\)/);
+  assert.match(script, /moveThreadToProject\(state\.activeThreadId, projectId, "#activeThreadProject"\)/);
+  assert.match(script, /moveThreadToProject\(drag\.threadId, projectId, `\[data-thread-id=/);
+  assert.match(script, /function restoreRerenderedFocus\(\)/);
+  assert.match(script, /document\.activeElement !== document\.body/);
+  assert.match(script, /document\.addEventListener\("focusin"/);
+  assert.match(script, /document\.addEventListener\("pointerdown"/);
+  assert.match(script, /document\.elementFromPoint\(event\.clientX, event\.clientY\)/);
+  assert.match(script, /moveThreadToProject\(drag\.threadId, projectId/);
+  assert.doesNotMatch(script, /dataTransfer/);
+  assert.match(html, /role="status" aria-live="polite" aria-atomic="true"/);
+  assert.match(preparer, /waitForNotification\("turn\/completed"/);
+  assert.match(preparer, /PROJECT-BROWSER-E2E-READY/);
+  assert.match(preparer, /thread\/delete/);
+  assert.match(preparer, /threadSection\/delete/);
+});
