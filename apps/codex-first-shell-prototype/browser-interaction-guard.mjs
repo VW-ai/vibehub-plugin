@@ -12,6 +12,7 @@ export async function runBrowserInteractionGuard() {
   const sidebar = document.querySelector("#sidebar");
   const main = document.querySelector(".main-column");
 
+  openSidebar.focus();
   openSidebar.click();
   await frame();
   check(results, "narrow drawer opens", openSidebar.getAttribute("aria-expanded") === "true" && !sidebar.inert && main.inert);
@@ -22,6 +23,7 @@ export async function runBrowserInteractionGuard() {
   check(results, "drawer returns focus", document.activeElement === openSidebar, document.activeElement?.id);
 
   const searchTrigger = document.querySelector("#searchButton");
+  searchTrigger.focus();
   searchTrigger.click();
   await frame();
   const search = document.querySelector("#searchDialog");
@@ -36,15 +38,18 @@ export async function runBrowserInteractionGuard() {
   await frame();
   check(results, "search Escape restores focus", search.hidden && document.activeElement === searchTrigger, document.activeElement?.id);
 
+  openSidebar.focus();
   openSidebar.click();
   const themeToggle = document.querySelector("#themeToggle");
   for (let index = 0; index < 3 && document.documentElement.dataset.theme !== "dark"; index += 1) themeToggle.click();
   closeSidebar.click();
   await frame();
+  searchTrigger.focus();
   searchTrigger.click();
   await frame();
   check(results, "dark theme reaches overlay siblings", getComputedStyle(search).backgroundColor !== "rgb(255, 255, 255)", getComputedStyle(search).backgroundColor);
   document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  openSidebar.focus();
   openSidebar.click();
   for (let index = 0; index < 3 && document.documentElement.dataset.theme !== originalTheme; index += 1) themeToggle.click();
   closeSidebar.click();
@@ -57,7 +62,16 @@ export async function runBrowserInteractionGuard() {
   output.id = "interactionGuardResult";
   output.className = `interaction-guard-result ${summary.ok ? "pass" : "fail"}`;
   output.setAttribute("role", "status");
-  output.textContent = `${summary.ok ? "PASS" : "FAIL"} browser interaction guard · ${summary.passed}/${summary.total}`;
+  const heading = document.createElement("strong");
+  heading.textContent = `${summary.ok ? "PASS" : "FAIL"} browser interaction guard · ${summary.passed}/${summary.total}`;
+  const list = document.createElement("ul");
+  for (const result of results) {
+    const item = document.createElement("li");
+    item.dataset.pass = String(result.pass);
+    item.textContent = `${result.pass ? "✓" : "✕"} ${result.name}${result.detail ? ` · ${result.detail}` : ""}`;
+    list.append(item);
+  }
+  output.append(heading, list);
   document.body.append(output);
   window.__VIBEHUB_INTERACTION_GUARD__ = summary;
   return summary;
