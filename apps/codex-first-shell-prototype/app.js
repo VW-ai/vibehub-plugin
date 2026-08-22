@@ -142,6 +142,13 @@ function titleForThread(thread) {
   return thread.title || "Untitled chat";
 }
 
+function liveTurnId(thread) {
+  const threadActive = String(thread?.status?.type ?? thread?.status ?? "").toLowerCase().includes("active");
+  const turn = thread?.turns?.at(-1);
+  const turnStatus = String(turn?.status?.type ?? turn?.status ?? "").toLowerCase();
+  return threadActive && ["inprogress", "running"].includes(turnStatus) ? turn.id : null;
+}
+
 function humanize(ticketId) {
   return String(ticketId).replace(/^ticket-/, "").split("-").map((part) => part[0]?.toUpperCase() + part.slice(1)).join(" ");
 }
@@ -229,6 +236,9 @@ function syncComposerMode() {
   $("#sendButton").disabled = input.disabled;
   $("#sendButton").setAttribute("aria-label", state.running ? "Steer current turn" : "Send message");
   $("#sendButton").title = state.running ? "Steer current Turn" : "Send message";
+  $("#composer").dataset.turnPosture = state.running ? "running" : "idle";
+  if (state.currentTurnId) $("#composer").dataset.currentTurnId = state.currentTurnId;
+  else delete $("#composer").dataset.currentTurnId;
   input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : "Ask Codex to do something";
   $("#composerNote").textContent = taskMode
     ? (linked ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.` : "The host will open a linked Codex Thread with the canonical Task packet.")
@@ -852,8 +862,8 @@ async function openThread(threadId, { route = "chat" } = {}) {
   const data = await action({ action: "readThread", threadId });
   state.activeThreadId = threadId;
   state.activeThread = { ...state.threads.find((thread) => thread.id === threadId), ...data.thread };
-  state.running = String(data.thread.status?.type ?? data.thread.status).toLowerCase().includes("active");
-  state.currentTurnId = state.running ? data.thread.turns?.at(-1)?.id ?? null : null;
+  state.currentTurnId = liveTurnId(state.activeThread);
+  state.running = Boolean(state.currentTurnId);
   if (switchingThread) restoreComposerDraft(threadId);
   if (!state.running) {
     for (const [key, item] of state.liveItems) if (item._threadId === threadId) state.liveItems.delete(key);
@@ -952,8 +962,8 @@ async function openTask(ticketId) {
       const threadData = await action({ action: "readThread", threadId: linked.id });
       state.activeThreadId = linked.id;
       state.activeThread = { ...linked, ...threadData.thread };
-      state.running = String(threadData.thread.status?.type ?? threadData.thread.status).toLowerCase().includes("active");
-      state.currentTurnId = state.running ? threadData.thread.turns?.at(-1)?.id ?? null : null;
+      state.currentTurnId = liveTurnId(state.activeThread);
+      state.running = Boolean(state.currentTurnId);
       restoreComposerDraft(linked.id);
     } else {
       state.activeThreadId = null;
@@ -1583,12 +1593,15 @@ async function start() {
       state.taskSelectedContextIds = new Set(state.taskWorkspace.packet.context.selectedContextIds ?? []);
       if (variant.thread) {
         const thread = structuredClone(fixture.thread);
-        if (variant.live) thread.status = { type: "active" };
+        if (variant.live) {
+          thread.status = { type: "active" };
+          thread.turns.at(-1).status = "inProgress";
+        }
         state.threads.unshift(thread);
         state.activeThreadId = thread.id;
         state.activeThread = thread;
-        state.running = Boolean(variant.live);
-        state.currentTurnId = variant.live ? thread.turns.at(-1)?.id : null;
+        state.currentTurnId = liveTurnId(thread);
+        state.running = Boolean(state.currentTurnId);
       }
       state.pendingRequests = fixture.pendingRequests;
       updateSidebar();
@@ -1601,7 +1614,9 @@ async function start() {
       state.activeThreadId = fixture.thread.id;
       state.activeThread = fixture.thread;
       state.pendingRequests = fixture.pendingRequests;
-      state.running = true;
+      state.currentTurnId = liveTurnId(fixture.thread);
+      state.running = Boolean(state.currentTurnId);
+      $("#stopTurn").hidden = !state.running;
     }
     setRoute("chat");
     if (!state.fixtureMode) pollEvents();

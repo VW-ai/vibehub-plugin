@@ -250,7 +250,7 @@ test("Codex light and dark primitives share one responsive accessible shell", as
   assert.match(html, /role="combobox"[^>]+aria-controls="searchResults"/);
   assert.match(script, /document\.documentElement\.dataset\.theme/);
   assert.match(script, /focusRouteHeading/);
-  for (const behavior of ["narrow drawer closes", "search traps forward Tab", "dark theme reaches overlay siblings", "page has no horizontal overflow"]) assert.match(guard, new RegExp(behavior));
+  for (const behavior of ["narrow drawer closes", "search traps forward Tab", "dark theme reaches overlay siblings", "page has no horizontal overflow", "Turn posture is internally coherent", "terminal mixed fixture makes no false live claim"]) assert.match(guard, new RegExp(behavior));
   assert.match(script, /runBrowserInteractionGuard/);
   assert.match(host, /browser-interaction-guard\.mjs/);
   assert.match(css, /body\[data-review-frame="narrow"\] \{[^}]*width: 390px; height: 844px/);

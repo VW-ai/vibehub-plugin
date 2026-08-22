@@ -56,6 +56,14 @@ export async function runBrowserInteractionGuard() {
 
   check(results, "page has no horizontal overflow", document.documentElement.scrollWidth <= document.documentElement.clientWidth, `${document.documentElement.scrollWidth}/${document.documentElement.clientWidth}`);
   check(results, "reduced-motion contract is queryable", typeof matchMedia("(prefers-reduced-motion: reduce)").matches === "boolean");
+  const composer = document.querySelector("#composer");
+  const send = document.querySelector("#sendButton");
+  const stop = document.querySelector("#stopTurn");
+  const running = composer.dataset.turnPosture === "running";
+  check(results, "Turn posture is internally coherent", running
+    ? Boolean(composer.dataset.currentTurnId) && !stop.hidden && send.getAttribute("aria-label") === "Steer current turn"
+    : !composer.dataset.currentTurnId && stop.hidden && send.getAttribute("aria-label") === "Send message");
+  check(results, "terminal mixed fixture makes no false live claim", !document.querySelector(".turn-boundary") || !running);
 
   const summary = { ok: results.every((entry) => entry.pass), passed: results.filter((entry) => entry.pass).length, total: results.length, results };
   const output = document.createElement("section");
