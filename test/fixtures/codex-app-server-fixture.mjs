@@ -23,6 +23,9 @@
 //                                persisted status instead of being repaired;
 //   CODEX_FIXTURE_PIDFILE=<path> append this process id so a test can kill
 //                                the app-server from outside;
+//   CODEX_FIXTURE_MAX_STARTS=<n> with a pidfile, refuse to start once n
+//                                processes have been recorded (exit 3), so a
+//                                test can prove restart exhaustion;
 //   CODEX_FIXTURE_AUTH=unavailable   make account/read fail;
 //   CODEX_FIXTURE_DROP_METHODS=a,b   answer those methods with -32601.
 
@@ -50,7 +53,15 @@ let counter = 0;
 const nextId = (prefix) => `${prefix}-${++counter}`;
 const now = () => new Date().toISOString();
 
-if (pidPath) appendFileSync(pidPath, `${process.pid}\n`);
+if (pidPath) {
+  const maxStarts = Number(process.env.CODEX_FIXTURE_MAX_STARTS ?? 0);
+  const started = existsSync(pidPath) ? readFileSync(pidPath, "utf8").split("\n").filter(Boolean).length : 0;
+  if (maxStarts > 0 && started >= maxStarts) {
+    process.stderr.write(`codex-app-server-fixture: refusing start ${started + 1} (CODEX_FIXTURE_MAX_STARTS=${maxStarts})\n`);
+    process.exit(3);
+  }
+  appendFileSync(pidPath, `${process.pid}\n`);
+}
 
 // The real app-server compares folders by their resolved path, so a symlinked
 // /tmp and its /private/tmp target name the same folder here too.
