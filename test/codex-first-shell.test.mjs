@@ -2,13 +2,16 @@ import assert from "node:assert/strict";
 import { execFileSync, spawn } from "node:child_process";
 import { once } from "node:events";
 import { existsSync, realpathSync } from "node:fs";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { threadLocation } from "../apps/codex-first-shell/thread-location.mjs";
+import { buildTaskContextPacket } from "../packages/codex-adapter/task-context.mjs";
 import { capabilitySnapshot } from "../packages/harness-core/capabilities.mjs";
 import { probeDomainIsolation } from "../packages/harness-core/probe-package-isolation.mjs";
+import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
@@ -796,4 +799,213 @@ test("a runtime that misses the pinned baseline surfaces a stop instead of a 500
   const exit = once(child, "exit");
   child.kill("SIGTERM");
   assert.deepEqual(await exit, [0, null]);
+});
+
+// A bound repository with two Tickets, one accepted prerequisite, Evidence for
+// one of two criteria, one active and one superseded Context: enough for the
+// canonical projection, the Context packet and the proof state to be
+// predicted exactly.
+async function proofRepository(context) {
+  const { folder, realFolder } = await temporaryRepository(context);
+  const write = async (path, document) => {
+    await mkdir(join(folder, path, ".."), { recursive: true });
+    await writeFile(join(folder, path), `${JSON.stringify(document, null, 2)}\n`);
+  };
+  await write(".vibehub/version.yaml", { format_version: 2, kind: "vibehub_project", schema_version: 1 });
+  await write(".vibehub/rooms/product/room.yaml", { schema_version: 1, kind: "room", room_id: "product", description: "Product direction", boundary: "What the shell promises", anchors: ["README.md"], stale: false });
+  await write(".vibehub/rooms/product/decision-proof-direction.yaml", {
+    schema_version: 1, kind: "context", context_id: "decision-proof-direction", type: "decision", state: "active",
+    summary: "The Workspace shows the exact host packet", detail: "Every Task Workspace shows its host-built packet verbatim.", tags: ["proof", "packet"],
+    source: { ref: "conversation:proof-direction", captured_at: "2026-08-20T10:00:00Z" },
+    evidence: [{ ref: "conversation:proof-direction", note: "Owner decision." }], relations: [],
+  });
+  await write(".vibehub/rooms/product/note-superseded-proof.yaml", {
+    schema_version: 1, kind: "context", context_id: "note-superseded-proof", type: "note", state: "superseded",
+    summary: "An older note that search and packets must not surface", detail: "Superseded.", tags: [],
+    source: { ref: "conversation:proof-direction", captured_at: "2026-08-19T10:00:00Z" },
+    evidence: [{ ref: "conversation:proof-direction", note: "Superseded note." }], relations: [],
+  });
+  await write(".vibehub/tickets/ticket-proof-prerequisite.yaml", {
+    schema_version: 2, kind: "ticket", ticket_id: "ticket-proof-prerequisite", maturity: "firm", outcome: "The prerequisite is accepted.", deliveries: [],
+    context: "Closes first.", acceptance: [{ acceptance_id: "prereq-holds", criterion: "The prerequisite holds." }], constraints: [], context_refs: [], relations: [], provenance_refs: [],
+  });
+  await write(".vibehub/tickets/ticket-proof-workspace.yaml", {
+    schema_version: 2, kind: "ticket", ticket_id: "ticket-proof-workspace", maturity: "firm", outcome: "The Task Workspace proves its packet and proof state.", deliveries: [],
+    context: "Shows contract, Evidence, Outcome and the host packet.",
+    acceptance: [{ acceptance_id: "workspace-renders", criterion: "The Workspace renders the contract." }, { acceptance_id: "packet-is-exact", criterion: "The packet is byte-exact." }],
+    constraints: ["No second store."],
+    context_refs: [{ ref: ".vibehub/rooms/product/decision-proof-direction.yaml", purpose: "Binding direction." }],
+    relations: [{ type: "depends_on", target_ticket_id: "ticket-proof-prerequisite", rationale: "Prerequisite must be accepted first." }],
+    provenance_refs: ["conversation:proof-direction"],
+  });
+  await write(".vibehub/evidence/ticket-proof-prerequisite/prereq-proof.yaml", { schema_version: 1, kind: "ticket_evidence", evidence_id: "prereq-proof", ticket_id: "ticket-proof-prerequisite", acceptance_ids: ["prereq-holds"], summary: "Prerequisite proven.", refs: ["README.md"], origin: "agent", recorded_at: "2026-08-20T11:00:00Z" });
+  await write(".vibehub/evidence/ticket-proof-workspace/workspace-proof.yaml", { schema_version: 1, kind: "ticket_evidence", evidence_id: "workspace-proof", ticket_id: "ticket-proof-workspace", acceptance_ids: ["workspace-renders"], summary: "The Workspace rendered the contract.", refs: ["apps/codex-first-shell/app.js"], origin: "agent", recorded_at: "2026-08-21T09:00:00Z" });
+  await write(".vibehub/outcomes/ticket-proof-prerequisite.yaml", { schema_version: 1, kind: "ticket_outcome", ticket_id: "ticket-proof-prerequisite", status: "successful", accepted_acceptance_ids: ["prereq-holds"], unresolved_acceptance_ids: [], evidence_ids: ["prereq-proof"], summary: "Independently accepted.", closed_at: "2026-08-20T12:00:00Z" });
+  git(folder, ["add", ".vibehub"]);
+  git(folder, ["commit", "-q", "-m", "vibehub proof graph"]);
+  return { folder, realFolder };
+}
+
+// The contexts input the host hands task-context.mjs, rebuilt from the
+// canonical Room projection alone (an independent oracle for bootstrap.contexts).
+function canonicalContexts(snapshot) {
+  return snapshot.state.rooms.rooms
+    .flatMap((room) => room.contexts.filter((item) => item.state === "active").map((item) => {
+      const document = snapshot.repository.contexts.documents.get(item.contextId).document;
+      return { contextId: item.contextId, type: item.type, summary: item.summary, detail: document.detail, tags: document.tags, room: room.room, sourceRef: document.source.ref, contextRef: item.path, source: "canonical_room_projection" };
+    }))
+    .sort((left, right) => left.summary.localeCompare(right.summary));
+}
+
+test("Graph and Task Workspace routes serve the canonical projection, and the Workspace packet is exactly the adapter's", async (context) => {
+  const { folder, realFolder } = await proofRepository(context);
+  const temp = await mkdtemp(join(tmpdir(), "vibehub-codex-proof-"));
+  context.after(() => rm(temp, { recursive: true, force: true }));
+  const logPath = join(temp, "app-server-calls.jsonl");
+  const elsewhere = join(tmpdir(), "vibehub-scope-elsewhere-not-a-repo");
+  const seed = {
+    sections: [{ id: "section-proof", name: "Proof group" }],
+    threads: [
+      { id: "seed-proof-recent", name: "Proof thread in Recents", preview: "proof", cwd: folder },
+      { id: "seed-proof-grouped", name: "Proof thread in a group", preview: "proof", cwd: folder, sectionId: "section-proof" },
+      { id: "seed-proof-archived", name: "Proof thread archived", preview: "proof", cwd: folder, archived: true },
+      { id: "seed-proof-elsewhere", name: "Proof thread elsewhere", preview: "proof", cwd: elsewhere },
+      { id: "seed-other", name: "Unrelated chat", preview: "other", cwd: folder },
+    ],
+  };
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_SEED: JSON.stringify(seed) } });
+  if (!shell) return;
+  const { child, api, action } = shell;
+
+  // Graph route: the host projection is the canonical read-only snapshot, field for field.
+  const snapshot = buildUiSnapshot(realFolder);
+  const bootstrap = (await api("api/bootstrap")).body.data;
+  assert.equal(bootstrap.project.scope, "bound");
+  assert.deepEqual(bootstrap.graph, {
+    snapshotId: snapshot.state.graph.snapshotId,
+    project: snapshot.state.project,
+    tickets: snapshot.state.graph.tickets,
+    relations: snapshot.state.graph.relations,
+    source: snapshot.state.graph.source,
+  }, "the Graph is the canonical buildUiSnapshot graph, not a host re-derivation");
+  assert.deepEqual(bootstrap.graph.tickets.map((ticket) => [ticket.ticketId, ticket.capabilities.operational.summary.label, ticket.capabilities.nextAction.summary.action]), [
+    ["ticket-proof-prerequisite", "DONE", "DONE"],
+    ["ticket-proof-workspace", "READY", "EXECUTE"],
+  ]);
+  assert.deepEqual(bootstrap.contexts, canonicalContexts(snapshot), "durable Context comes through the canonical Room projection and excludes superseded entries");
+  assert.deepEqual(bootstrap.contexts.map((item) => item.contextId), ["decision-proof-direction"]);
+
+  // Task Workspace route: contract, Evidence, Outcome and the packet exactly as task-context.mjs assembles it.
+  const workspace = await action({ action: "readTask", ticketId: "ticket-proof-workspace" });
+  assert.equal(workspace.status, 200, JSON.stringify(workspace.body));
+  const handoff = buildTicketHandoff(realFolder, "ticket-proof-workspace");
+  assert.deepEqual(workspace.body.data.handoff, handoff, "the Workspace contract is the canonical handoff");
+  const priorAccepted = [{
+    ticketId: "ticket-proof-prerequisite",
+    rationale: "Prerequisite must be accepted first.",
+    outcomeRef: join(realFolder, ".vibehub", "outcomes", "ticket-proof-prerequisite.yaml"),
+    outcome: { status: "successful", summary: "Independently accepted.", closedAt: "2026-08-20T12:00:00Z", acceptedAcceptanceIds: ["prereq-holds"] },
+    evidence: [{ evidenceId: "prereq-proof", evidenceRef: join(realFolder, ".vibehub", "evidence", "ticket-proof-prerequisite", "prereq-proof.yaml"), summary: "Prerequisite proven.", acceptanceIds: ["prereq-holds"], origin: "agent", refs: ["README.md"] }],
+  }];
+  const packetInputs = { handoff, project: snapshot.state.project, contexts: canonicalContexts(snapshot), rooms: snapshot.state.rooms.rooms, selectedContextIds: [], priorAccepted };
+  const expectedPacket = buildTaskContextPacket({ ...packetInputs, thread: null, operation: "start", humanMessage: null });
+  assert.deepEqual(workspace.body.data.packet, expectedPacket, "the read-time packet is exactly the adapter's assembly");
+  assert.equal(workspace.body.data.packetText, JSON.stringify(expectedPacket, null, 2), "packetText is the host serialization the browser shows verbatim");
+  assert.deepEqual(workspace.body.data.evidence, handoff.evidence);
+  assert.deepEqual(workspace.body.data.evidence.map((item) => [item.evidenceId, item.acceptanceIds, item.origin, item.refs]), [["workspace-proof", ["workspace-renders"], "agent", ["apps/codex-first-shell/app.js"]]]);
+  assert.equal(workspace.body.data.outcome, null, "no Outcome is recorded for the open Ticket");
+  assert.deepEqual(workspace.body.data.nextAction, { action: "EXECUTE", reason: "acceptance_evidence_incomplete", detail: "Executable criteria still need reproducible acceptance-linked Evidence.", acceptanceIds: ["packet-is-exact"], blockingTicketIds: [] });
+  assert.equal(workspace.body.data.packet.context.items[0].contextId, "decision-proof-direction");
+  assert.deepEqual(workspace.body.data.source, { handoff: "vh-ui.buildTicketHandoff", packet: "codex-adapter/task-context.buildTaskContextPacket", contexts: "canonical_room_projection", snapshotId: snapshot.state.graph.snapshotId });
+  const closed = (await action({ action: "readTask", ticketId: "ticket-proof-prerequisite" })).body.data;
+  assert.deepEqual([closed.outcome.status, closed.outcome.accepted_acceptance_ids, closed.outcome.evidence_ids, closed.outcome.closed_at], ["successful", ["prereq-holds"], ["prereq-proof"], "2026-08-20T12:00:00Z"], "a closed Ticket's Workspace carries its canonical Outcome record");
+  assert.equal(closed.nextAction.reason, "successful_outcome");
+
+  // The packet a Start sends is the same bytes, persisted by the app-server as the Turn's user input.
+  const started = (await action({ action: "startTask", ticketId: "ticket-proof-workspace", selectedContextIds: [] })).body.data;
+  assert.equal(started.payloadText, workspace.body.data.packetText);
+  const replayed = (await action({ action: "readThread", threadId: started.threadId })).body.data.thread;
+  assert.equal(replayed.turns[0].items[0].type, "userMessage");
+  assert.equal(replayed.turns[0].items[0].content[0].text, started.payloadText, "thread/read replays the exact packet bytes; no second store is consulted");
+
+  // Continue and steer rebuild the packet for their operation; each response names the exact bytes it sent.
+  const continued = (await action({ action: "startTaskTurn", ticketId: "ticket-proof-workspace", threadId: started.threadId, message: "continue the proof" })).body.data;
+  assert.deepEqual([continued.ticketId, continued.threadId, continued.operation], ["ticket-proof-workspace", started.threadId, "continue"]);
+  assert.deepEqual(JSON.parse(continued.payloadText), buildTaskContextPacket({ ...packetInputs, thread: { id: started.threadId, activeTurnId: null }, operation: "continue", humanMessage: "continue the proof" }));
+  const steered = (await action({ action: "steerTaskTurn", ticketId: "ticket-proof-workspace", threadId: started.threadId, expectedTurnId: continued.turn.id, message: "steer the proof" })).body.data;
+  assert.deepEqual([steered.operation, steered.turnId], ["steer", continued.turn.id]);
+  assert.deepEqual(JSON.parse(steered.payloadText), buildTaskContextPacket({ ...packetInputs, thread: { id: started.threadId, activeTurnId: continued.turn.id }, operation: "steer", humanMessage: "steer the proof" }));
+  const afterTurns = (await action({ action: "readThread", threadId: started.threadId })).body.data.thread.turns;
+  assert.equal(afterTurns.at(-1).items.filter((item) => item.type === "userMessage").map((item) => item.content[0].text).join("\n"), `${continued.payloadText}\n${steered.payloadText}`, "continue and steer inputs are persisted verbatim in the Thread");
+
+  // Typed Search: native thread/list searchTerm scoped to this folder, bounded, never the archived or foreign history.
+  const search = (await action({ action: "searchThreads", searchTerm: "Proof", limit: 99 })).body.data;
+  assert.deepEqual(search.threads.map((thread) => thread.id).sort(), ["seed-proof-grouped", "seed-proof-recent"], "search spans Recents and groups in this folder only");
+  assert.deepEqual([search.total, search.limit, search.searchTerm, search.scope.cwd, search.scope.method, search.scope.filter], [2, 20, "Proof", realFolder, "thread/list", "searchTerm"]);
+  const bounded = (await action({ action: "searchThreads", searchTerm: "Proof", limit: 1 })).body.data;
+  assert.deepEqual([bounded.threads.length, bounded.total, bounded.limit], [1, 2, 1]);
+  assert.deepEqual((await action({ action: "searchThreads", searchTerm: "   " })).body.data.threads, []);
+  const calls = (await readFile(logPath, "utf8")).trim().split("\n").map((line) => JSON.parse(line));
+  const searches = calls.filter((call) => call.method === "thread/list" && call.params?.searchTerm);
+  assert.equal(searches.length, 2, "each non-empty search is one native thread/list query");
+  for (const call of searches) assert.deepEqual([call.params.searchTerm, call.params.cwd, call.params.archived, call.params.sectionId], ["Proof", realFolder, false, undefined]);
+  assert.equal(calls.filter((call) => call.method === "thread/list" && call.params?.searchTerm === "   ").length, 0, "a blank query never reaches the app-server");
+  const exit = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await exit, [0, null]);
+});
+
+test("Chat is the default landing, the Graph is never a fallback, and the Workspace shows proof and the verbatim packet", async () => {
+  const [html, script, css, host, guard, contractText] = await Promise.all([
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/app.css"),
+    source("scripts/vh-codex-first-shell.mjs"),
+    source("apps/codex-first-shell/browser-interaction-guard.mjs"),
+    source("docs/proposals/codex-native-attention/interaction-contract.json"),
+  ]);
+  const contract = JSON.parse(contractText);
+  // Landing: start() ends on Chat; no code path routes to the Graph except a real click.
+  const startSource = script.slice(script.indexOf("async function start()"), script.indexOf("await start();"));
+  const routeCalls = [...startSource.matchAll(/setRoute\("([a-z]+)"\)/g)].map((match) => match[1]);
+  assert.equal(routeCalls.at(-1), "chat", "the tail of start() lands on Chat");
+  assert.ok(!routeCalls.includes("tasks"), "start() never routes to the Graph");
+  assert.doesNotMatch(script, /setRoute\("tasks"\)/, "the Graph is reached only through a data-route click, never as a programmatic landing or fallback");
+  assert.match(html, /id="backButton"[^>]+data-route="tasks"/, "the Workspace back button is the one data-route path");
+  const openTaskSource = script.slice(script.indexOf("async function openTask"), script.indexOf("function addAttachment"));
+  assert.match(openTaskSource, /catch \(error\) \{[^]*state\.activeTicketId = null;[^]*setRoute\("chat"\);/, "an unreadable Task lands on Chat");
+  assert.match(script, /async function landFromLocation\(params\) \{\s*const requestedTicketId = params\.get\("task"\);\s*if \(requestedTicketId\) \{[^]*await openTask\(requestedTicketId\);/, "?task= reopens the Workspace on landing");
+  assert.match(script, /if \(await landFromLocation\(params\)\) \{\s*pollEvents\(\);\s*return;\s*\}/);
+  assert.match(script, /threadLocation\(location\.href, state\.activeThreadId, state\.route === "task" \? state\.activeTicketId : null\)/);
+  assert.match(script, /function setRoute\(route\) \{[^]*syncThreadLocation\(\);\s*syncComposerMode\(\);\s*\}/, "leaving the Workspace drops ?task= from the URL");
+  assert.equal(threadLocation("http://127.0.0.1:1/?chatFixture=mixed&thread=t1#tok", "t1", "ticket-a"), "http://127.0.0.1:1/?chatFixture=mixed&thread=t1&task=ticket-a#tok");
+  assert.equal(threadLocation("http://127.0.0.1:1/?chatFixture=mixed&thread=t1&task=ticket-a#tok", "t1"), "http://127.0.0.1:1/?chatFixture=mixed&thread=t1#tok");
+  // Workspace: contract, Evidence, Outcome, next action reason, and the packet verbatim from the host.
+  assert.match(host, /packetText: JSON\.stringify\(packet, null, 2\),\s*evidence: handoff\.evidence,\s*outcome: handoff\.outcomeRecord,\s*nextAction: handoff\.nextAction,/);
+  assert.match(host, /const payloadText = workspace\.packetText;/, "Task Turns send the same bytes the Workspace shows");
+  assert.match(host, /function knowledgeProjection\(snapshot = buildUiSnapshot\(repoRoot\)\)/);
+  assert.match(host, /source: KNOWLEDGE_SOURCE,/);
+  assert.match(host, /const KNOWLEDGE_SOURCE = "canonical_room_projection";/);
+  assert.doesNotMatch(host, /loadRepository/, "the host reads the repository only through the canonical snapshot");
+  assert.match(host, /const SEARCH_LIMIT = 20;/);
+  const proofSource = script.slice(script.indexOf("function proofMarkup"), script.indexOf("function renderTaskWorkspace"));
+  assert.match(proofSource, /workspace\?\.evidence \?\? handoff\.evidence/);
+  assert.match(proofSource, /workspace\?\.outcome \?\? handoff\.outcomeRecord/);
+  assert.match(proofSource, /nextAction\.reason/);
+  for (const field of ["evidenceId", "summary", "acceptanceIds", "origin", "refs", "outcome.status", "outcome.summary", "outcome.closed_at", "accepted_acceptance_ids", "unresolved_acceptance_ids"]) assert.ok(proofSource.includes(field), field);
+  assert.match(script, /<pre data-packet-text>\$\{escapeHtml\(packetText\)\}<\/pre>/, "the packet is rendered as the host's own bytes");
+  assert.match(script, /const packetText = workspace\?\.packetText \?\? /);
+  assert.match(script, /function packetRawDisclosure/);
+  assert.match(script, /pre\.textContent = userInputText\(item\.content\);/, "the transcript raw packet is the replayed Turn input");
+  assert.match(script, /capabilities\.operational\?\.summary\?\.label/, "phase prefers the canonical operational summary");
+  for (const rule of [".proof-section", ".evidence-list", ".outcome-record", ".packet-raw", ".search-status"]) assert.match(css, new RegExp(rule.replace(".", "\\.")));
+  // Search: one entry, three labelled owners, native Thread search merged with local Tasks and Context.
+  assert.deepEqual(contract.search.labels, ["Chats (Codex)", "Tasks (VibeHub)", "Context (Rooms)"]);
+  for (const label of contract.search.labels) assert.ok(script.includes(`"${label}"`), label);
+  assert.match(script, /action: "searchThreads", searchTerm: query, limit: SEARCH_NATIVE_LIMIT/);
+  assert.match(script, /const SEARCH_NATIVE_LIMIT = 20;/);
+  assert.match(script, /if \(sequence !== searchSequence \|\| \$\("#searchDialog"\)\.hidden\) return;/, "a stale native reply never overwrites the typed query");
+  assert.match(script, /data-search-source="\$\{item\.source\}"/);
+  for (const behavior of ["search groups are labelled by owner and include a native Thread result", "Task Workspace shows canonical PROOF, Evidence, Outcome and the fixture packet verbatim", "Task packet transcript card discloses the persisted Turn input byte-exact", "task deep link reopens the Workspace through the landing path", "leaving the Workspace drops the task deep link", "live Task Workspace renders the host PROOF and packet verbatim"]) assert.match(guard, new RegExp(behavior.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.doesNotMatch(html + script + host, /localStorage|sessionStorage|indexedDB/i);
 });

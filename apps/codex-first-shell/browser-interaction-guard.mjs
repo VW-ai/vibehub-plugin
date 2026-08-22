@@ -298,6 +298,121 @@ export async function runBrowserInteractionGuard(hooks) {
   await frame();
   await hooks.switchFixtureThread(fixture.thread);
 
+  // Typed Search from one entry: Chats are native Codex Threads (the
+  // app-server's thread/list searchTerm answers through the transport), Tasks
+  // and Context stay local to the canonical bootstrap; every group carries its
+  // owner label and every result its object type.
+  const searchActions = [];
+  const nativeHit = { id: "fixture-native-hit", title: "Native hit beyond the listed tail", preview: "Found by thread/list searchTerm", cwd: "/fixture", status: { type: "idle" }, forkedFromId: null, project: null, taskLink: null };
+  await hooks.withFixtureTransport(async (payload) => {
+    searchActions.push(payload);
+    if (payload.action === "searchThreads") return { threads: [structuredClone(nativeHit)], total: 1, limit: payload.limit, searchTerm: payload.searchTerm };
+    if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+    return {};
+  }, async () => {
+    searchTrigger.focus();
+    searchTrigger.click();
+    await frame();
+    searchInput.value = "codex";
+    searchInput.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: "codex" }));
+    const nativeArrived = await waitFor(() => document.querySelector('.search-result[data-search-source="native"][data-search-id="fixture-native-hit"]'), 90);
+    const labels = [...document.querySelectorAll(".search-group-label")].map((node) => node.textContent);
+    const bound = hooks.currentProject()?.scope === "bound";
+    const dispatched = searchActions.filter((entry) => entry.action === "searchThreads");
+    const typed = [...document.querySelectorAll(".search-result")].every((node) => node.querySelector("em")?.textContent === ({ chat: "Chat", task: "Task", context: "Context" })[node.dataset.searchKind]);
+    check(results, "search groups are labelled by owner and include a native Thread result", nativeArrived && dispatched.length === 1 && dispatched[0].searchTerm === "codex" && dispatched[0].limit === 20 && labels[0] === "Chats (Codex)" && (!bound || (labels.includes("Tasks (VibeHub)") && labels.includes("Context (Rooms)"))) && typed, `${labels.join(" | ")} · ${dispatched.length} native quer${dispatched.length === 1 ? "y" : "ies"}`);
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await frame();
+  });
+
+  // Task Workspace through the review fixture: the contract, PROOF (Evidence
+  // and Outcome handed over from the canonical handoff, with the next-action
+  // reason), the packet verbatim, and the persisted Turn input on the
+  // transcript card, filled from the replayed Thread item on open.
+  const taskFixture = await fetch("/task-fixtures.json").then((response) => response.json());
+  const fixtureWorkspace = await hooks.applyTaskFixture(taskFixture, "done");
+  const workspaceNode = document.querySelector(".task-workspace");
+  const proof = workspaceNode?.querySelector(".proof-section");
+  const packetPre = workspaceNode?.querySelector(".packet-inspector pre[data-packet-text]");
+  const evidenceIds = (node) => [...(node?.querySelectorAll("[data-evidence-id]") ?? [])].map((item) => item.dataset.evidenceId).join(",");
+  check(results, "Task Workspace shows canonical PROOF, Evidence, Outcome and the fixture packet verbatim",
+    workspaceNode?.dataset.ticketWorkspace === taskFixture.ticketId
+      && proof?.dataset.evidenceCount === String(taskFixture.handoff.evidence.length)
+      && evidenceIds(proof) === taskFixture.handoff.evidence.map((item) => item.evidenceId).join(",")
+      && proof.querySelector(".outcome-record")?.dataset.outcomeStatus === "successful"
+      && proof.querySelector(".proof-next code")?.textContent === "review_fixture"
+      && packetPre?.textContent === fixtureWorkspace.packetText
+      && fixtureWorkspace.packetText === JSON.stringify(fixtureWorkspace.packet, null, 2)
+      && document.querySelector("#routeTitle").textContent === "Review Task Workspace",
+    `${proof?.dataset.evidenceCount ?? "no proof"} evidence · ${proof?.dataset.outcomeStatus ?? "?"} · ${packetPre?.textContent.length ?? 0}/${fixtureWorkspace.packetText.length} chars`);
+  const rawDetails = document.querySelector("#taskConversationTimeline .packet-raw[data-packet-raw]");
+  const persisted = taskFixture.thread.turns[0].items[0].content[0].text;
+  if (rawDetails) rawDetails.open = true;
+  const rawFilled = await waitFor(() => rawDetails?.querySelector("[data-packet-raw-text]")?.dataset.filled === "true");
+  check(results, "Task packet transcript card discloses the persisted Turn input byte-exact", rawFilled && rawDetails.querySelector("[data-packet-raw-text]").textContent === persisted && rawDetails.querySelector("summary").textContent.includes(`${persisted.length.toLocaleString()} chars`), `${rawDetails?.querySelector("[data-packet-raw-text]")?.textContent.length ?? 0}/${persisted.length} chars`);
+
+  // Deep link: `?task=` reopens the Workspace through the same landing path
+  // start() takes, and leaving the Workspace drops it from the URL again.
+  const deepLinkActions = [];
+  await hooks.withFixtureTransport(async (payload) => {
+    deepLinkActions.push(payload);
+    if (payload.action === "readTask") return { handoff: structuredClone(taskFixture.handoff), packet: structuredClone(taskFixture.packet), packetText: JSON.stringify(taskFixture.packet, null, 2), evidence: taskFixture.handoff.evidence, outcome: null, nextAction: taskFixture.handoff.nextAction, eligibleContexts: taskFixture.eligibleContexts, rooms: taskFixture.rooms };
+    if (payload.action === "readThread") return { thread: structuredClone(taskFixture.thread) };
+    return {};
+  }, async () => {
+    openSidebar.click();
+    await frame();
+    document.querySelector('.primary-nav [data-route="chat"]').click();
+    await frame();
+    const deepLink = new URL(location.href);
+    deepLink.searchParams.set("task", taskFixture.ticketId);
+    history.replaceState(history.state, "", deepLink.href);
+    const landed = await hooks.landFromLocation();
+    await frame();
+    const reopened = document.querySelector(".task-workspace");
+    check(results, "task deep link reopens the Workspace through the landing path", landed === true && reopened?.dataset.ticketWorkspace === taskFixture.ticketId && deepLinkActions.some((entry) => entry.action === "readTask" && entry.ticketId === taskFixture.ticketId) && new URL(location.href).searchParams.get("task") === taskFixture.ticketId && reopened.querySelector(".packet-inspector pre[data-packet-text]")?.textContent === JSON.stringify(taskFixture.packet, null, 2), location.search);
+    document.querySelector("#backButton").click();
+    await frame();
+    check(results, "leaving the Workspace drops the task deep link", !new URL(location.href).searchParams.has("task") && !document.querySelector(".task-workspace") && Boolean(document.querySelector(".tasks-view, .scope-panel")), location.search);
+    openSidebar.click();
+    await frame();
+    document.querySelector('.primary-nav [data-route="chat"]').click();
+    await frame();
+  });
+
+  // With a bound Project the same Workspace is read through the live host:
+  // the packet bytes and proof state come from the checked-in repository.
+  const liveBootstrap = hooks.currentBootstrap();
+  if (liveBootstrap?.project?.scope === "bound" && liveBootstrap.graph.tickets.length) {
+    const liveTicketId = liveBootstrap.attention.recentCompletions[0]?.ticketId ?? liveBootstrap.graph.tickets[0].ticketId;
+    const liveActions = [];
+    await hooks.withFixtureTransport(async (payload) => {
+      const data = await hooks.hostAction(payload);
+      liveActions.push({ payload, data });
+      return data;
+    }, async () => {
+      await hooks.openTask(liveTicketId);
+      await frame();
+      const read = liveActions.find((entry) => entry.payload.action === "readTask")?.data;
+      const liveWorkspace = document.querySelector(".task-workspace");
+      const liveProof = liveWorkspace?.querySelector(".proof-section");
+      const livePre = liveWorkspace?.querySelector(".packet-inspector pre[data-packet-text]");
+      check(results, "live Task Workspace renders the host PROOF and packet verbatim",
+        Boolean(read) && liveWorkspace?.dataset.ticketWorkspace === liveTicketId
+          && livePre?.textContent === read.packetText && read.packetText === JSON.stringify(read.packet, null, 2) && read.packet.kind === "vibehub_task_context_packet"
+          && liveProof?.dataset.evidenceCount === String(read.evidence.length)
+          && evidenceIds(liveProof) === read.evidence.map((item) => item.evidenceId).join(",")
+          && liveProof.dataset.outcomeStatus === (read.outcome?.status ?? "pending")
+          && liveProof.querySelector(".proof-next code")?.textContent === read.nextAction.reason,
+        `${liveTicketId} · ${read?.evidence.length ?? "?"} evidence · ${read?.outcome?.status ?? "pending"} · ${read?.packetText.length ?? 0} chars`);
+      openSidebar.click();
+      await frame();
+      document.querySelector('.primary-nav [data-route="chat"]').click();
+      await frame();
+    });
+  }
+  await hooks.switchFixtureThread(fixture.thread);
+
   openSidebar.focus();
   openSidebar.click();
   const themeToggle = document.querySelector("#themeToggle");

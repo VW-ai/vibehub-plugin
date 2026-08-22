@@ -36,6 +36,12 @@
   "search": {
     "shortcut": "Meta+K",
     "groups": ["Chats", "Tasks", "Context"],
+    "sources": {
+      "Chats": "codex_app_server thread/list searchTerm scoped to the Project folder, merged with the listed tail",
+      "Tasks": "vibehub_git canonical graph projection",
+      "Context": "vibehub_room durable Context through the canonical Room projection"
+    },
+    "labels": ["Chats (Codex)", "Tasks (VibeHub)", "Context (Rooms)"],
     "requirements": [
       "Every result shows its object type.",
       "Opening a result preserves its source identity.",
