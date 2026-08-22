@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "responsive-accessible-baseline-holds"
+  ],
+  "evidence_id": "responsive-accessible-baseline-proven-both-themes",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-22T12:45:33Z",
+  "refs": [
+    "commit:57a01ad",
+    "commit:c06925b",
+    "commit:60371e8",
+    "commit:db3f1e8",
+    "apps/codex-first-shell/app.css",
+    "apps/codex-first-shell/app.js",
+    "apps/codex-first-shell/index.html",
+    "apps/codex-first-shell/browser-interaction-guard.mjs",
+    "test/codex-first-shell-contrast.test.mjs",
+    "test/codex-first-shell.test.mjs",
+    ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "Commits 57a01ad, c06925b, 60371e8 and db3f1e8 hold the audited baseline in both themes. test/codex-first-shell-contrast.test.mjs parses the Light and Dark tokens in apps/codex-first-shell/app.css and asserts WCAG AA ratios of at least 4.5 to 1 for text and 3 to 1 for focus indicators and text-entry boundaries while also asserting the baseline primitives are unchanged at Light #0169CC, #FFFFFF, #0D0D0D and Dark #339CFF, #181818, #FFFFFF and that each explicit override block equals its system block. Failing pairs were corrected only through the neutral and semantic scale: faint text on sidebar, code and hover surfaces raised to at least 4.55 to 1; the Dark primary label on accent raised from 2.86 to 6.21 with an on-accent token; amber, green and red state colours replaced by warn, ok and danger tokens now between 5.07 and 8.79 to 1; Composer focus border to full accent at 5.39 and 6.21; text-entry boundaries to at least 3.05; placeholder to at least 5.74; and the selected Search result to an inset accent outline at 5.39 and 5.96. Decorative borders, hover backgrounds and disabled controls are reported informationally as exempt. The narrow topbar title now truncates with an accessible full name instead of overlapping the search trigger, the Composer stays on screen through explicit grid placement, the approval footer wraps at 390, the sidebar scrolls instead of collapsing the groups block, and every bounded scroll region that was wheel-only, including Inspect, packet, persisted input, command output and tool arguments, is keyboard reachable with an accessible name; the guard keyboard-path audit reports zero gaps where the old code reported seven. Guard runs through npm run guard:codex pass 65 of 65 at 1280x800 and 66 of 66 at 390x844 in both Light and Dark with zero console errors and clientWidth equal to scrollWidth, the reduced-motion audit passes six times with the two moving elements dropping to zero under reduce, system preference and explicit override are walked without storage, and the lifecycle walk remains 6 of 6. Every new guard check was negatively controlled against the old code. Suite 239 tests, 236 pass, 0 fail, 3 skipped, confirmed by the orchestrator on a fresh run. Proofs ran on the fixture app-server because the local Codex is 0.144.1; no visual-identity verdict is claimed, which remains owned by the visual-system Ticket.",
+  "ticket_id": "ticket-implement-codex-first-vibehub-shell"
+}
