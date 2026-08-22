@@ -15,6 +15,7 @@ import {
   renderUserMedia,
 } from "../apps/codex-first-shell/chat-renderer.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
+import { threadLocation } from "../apps/codex-first-shell/thread-location.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -271,6 +272,25 @@ test("Composer growth has one CSS-owned ceiling shared with the JavaScript clamp
   assert.match(autoSize, /clampComposerHeight\(textarea\.scrollHeight, bounds\)/);
   assert.doesNotMatch(autoSize, /\d{2,}/, "autoSizeComposer carries no numeric ceiling of its own");
   assert.match(host, /\["\/composer-sizing\.mjs", script\("composer-sizing\.mjs"\)\]/);
+});
+
+test("thread location follows the visible Thread and preserves token and fixture context", async () => {
+  assert.equal(threadLocation("http://127.0.0.1:1/?reviewFrame=narrow#token", "abc"), "http://127.0.0.1:1/?reviewFrame=narrow&thread=abc#token");
+  assert.equal(threadLocation("http://127.0.0.1:1/?thread=old&x=1#token", "new"), "http://127.0.0.1:1/?thread=new&x=1#token");
+  assert.equal(threadLocation("http://127.0.0.1:1/?thread=old#token", null), "http://127.0.0.1:1/#token");
+  assert.equal(threadLocation("http://127.0.0.1:1/#token", null), "http://127.0.0.1:1/#token");
+  const [script, host] = await Promise.all([source("apps/codex-first-shell/app.js"), source("scripts/vh-codex-first-shell.mjs")]);
+  assert.match(script, /function syncThreadLocation\(\) \{\s*if \(state\.fixtureMode\) return;\s*const next = threadLocation\(location\.href, state\.activeThreadId\);\s*if \(next !== location\.href\) history\.replaceState\(history\.state, "", next\);/);
+  const openThreadSource = script.slice(script.indexOf("async function openThread"), script.indexOf("function applyChatNotification"));
+  assert.match(openThreadSource, /state\.activeThreadId = threadId;[^]*syncThreadLocation\(\);/);
+  for (const name of ["async function newThread", "async function openTask"]) {
+    const body = script.slice(script.indexOf(name), script.indexOf("\n}\n", script.indexOf(name)));
+    assert.match(body, /syncThreadLocation\(\)/, `${name} keeps the URL on the visible Thread`);
+  }
+  assert.match(script, /archiveThread[^]*state\.activeThreadId = null;\s*state\.activeThread = null;\s*syncThreadLocation\(\);/);
+  assert.match(script, /const requestedThreadId = params\.get\("thread"\);[^]*catch \(error\) \{[^]*syncThreadLocation\(\);[^]*setRoute\("chat"\);/, "a stale deep link lands on Chat instead of bricking the shell");
+  assert.match(host, /\["\/thread-location\.mjs", script\("thread-location\.mjs"\)\]/);
+  assert.doesNotMatch(script, /localStorage|sessionStorage|indexedDB/i);
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {

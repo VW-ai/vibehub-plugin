@@ -13,6 +13,7 @@ import {
 import { requestDescriptor } from "./server-request-registry.mjs";
 import { loadThreadDraft, saveThreadDraft } from "./composer-drafts.mjs";
 import { clampComposerHeight, composerBounds } from "./composer-sizing.mjs";
+import { threadLocation } from "./thread-location.mjs";
 
 const state = {
   route: "chat",
@@ -217,6 +218,12 @@ function setRouteHeader(title, meta, { back = false } = {}) {
   routeTitle.textContent = title;
   routeMeta.textContent = meta;
   backButton.hidden = !back;
+}
+
+function syncThreadLocation() {
+  if (state.fixtureMode) return;
+  const next = threadLocation(location.href, state.activeThreadId);
+  if (next !== location.href) history.replaceState(history.state, "", next);
 }
 
 function setRoute(route) {
@@ -870,6 +877,7 @@ async function openThread(threadId, { route = "chat" } = {}) {
   state.activeThread = { ...state.threads.find((thread) => thread.id === threadId), ...data.thread };
   state.currentTurnId = liveTurnId(state.activeThread);
   state.running = Boolean(state.currentTurnId);
+  syncThreadLocation();
   if (switchingThread) restoreComposerDraft(threadId);
   if (!state.running) {
     for (const [key, item] of state.liveItems) if (item._threadId === threadId) state.liveItems.delete(key);
@@ -925,6 +933,7 @@ async function newThread() {
     state.activeThreadId = data.thread.id;
     state.activeThread = { ...data.thread, turns: [] };
     state.running = false;
+    syncThreadLocation();
     state.liveItems.clear();
     state.turnErrors.clear();
     state.turnPlans.clear();
@@ -978,6 +987,7 @@ async function openTask(ticketId) {
       state.currentTurnId = null;
       restoreComposerDraft(null);
     }
+    syncThreadLocation();
     renderTaskWorkspace();
   } catch (error) { notify(error.message); setRoute("tasks"); }
 }
@@ -1295,6 +1305,7 @@ document.addEventListener("click", async (event) => {
       await action({ action: "archiveThread", threadId: archiveThread.dataset.archiveThread });
       state.activeThreadId = null;
       state.activeThread = null;
+      syncThreadLocation();
       await refreshThreads();
       setRoute("chat");
       notify("Chat archived.");
@@ -1580,7 +1591,17 @@ async function start() {
     }
     const requestedThreadId = params.get("thread");
     if (requestedThreadId) {
-      await openThread(requestedThreadId);
+      try {
+        await openThread(requestedThreadId);
+      } catch (error) {
+        // A stale deep link (archived or foreign Thread) must not brick the
+        // shell: drop it from the URL and land on ordinary Chat.
+        state.activeThreadId = null;
+        state.activeThread = null;
+        syncThreadLocation();
+        setRoute("chat");
+        notify(`Could not reopen Thread ${requestedThreadId.slice(0, 8)}…: ${error.message}`);
+      }
       pollEvents();
       return;
     }

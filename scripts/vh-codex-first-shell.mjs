@@ -130,6 +130,7 @@ const assets = new Map([
   ["/browser-interaction-guard.mjs", script("browser-interaction-guard.mjs")],
   ["/composer-drafts.mjs", script("composer-drafts.mjs")],
   ["/composer-sizing.mjs", script("composer-sizing.mjs")],
+  ["/thread-location.mjs", script("thread-location.mjs")],
   ["/chat-fixtures.json", fixture("chat-fixtures.json")],
   ["/chat-conformance-fixtures.json", fixture("chat-conformance-fixtures.json")],
   ["/task-fixtures.json", fixture("task-fixtures.json")],
