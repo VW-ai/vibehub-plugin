@@ -55,6 +55,51 @@ async function launchShell(context, { codex = null, env = {}, repo = "." } = {})
   return { child, envelope, url, token, api, action };
 }
 
+// Lifecycle proofs drive the fixture app-server through its persistence,
+// pidfile and fault knobs; the restart backoff is shortened so a test can
+// observe the restarting window without waiting on production delays.
+async function lifecycleTemp(context) {
+  const temp = await mkdtemp(join(tmpdir(), "vibehub-codex-lifecycle-"));
+  context.after(() => rm(temp, { recursive: true, force: true }));
+  return {
+    temp,
+    statePath: join(temp, "codex-state.json"),
+    pidPath: join(temp, "codex-pids"),
+    logPath: join(temp, "app-server-calls.jsonl"),
+    env: (extra = {}) => ({
+      CODEX_FIXTURE_VERSION: "0.147.0",
+      CODEX_FIXTURE_STATE: join(temp, "codex-state.json"),
+      CODEX_FIXTURE_PIDFILE: join(temp, "codex-pids"),
+      CODEX_FIXTURE_LOG: join(temp, "app-server-calls.jsonl"),
+      VIBEHUB_CODEX_RESTART_BACKOFF_MS: "300,600,900",
+      ...extra,
+    }),
+  };
+}
+
+async function fixturePids(pidPath) {
+  return (await readFile(pidPath, "utf8")).split("\n").filter(Boolean).map(Number);
+}
+
+async function appServerCalls(logPath) {
+  return (await readFile(logPath, "utf8")).trim().split("\n").filter(Boolean).map((line) => JSON.parse(line));
+}
+
+// Poll the host event window until `predicate` accepts it (or time runs out);
+// returns the last window read.
+async function pollEventsUntil(api, predicate, { timeoutMs = 15_000, after = 0 } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  let window = null;
+  while (Date.now() < deadline) {
+    window = (await api(`api/events?after=${after}`)).body.data;
+    if (predicate(window)) return window;
+    await new Promise((resolve) => setTimeout(resolve, 15));
+  }
+  throw new Error(`event window never satisfied the predicate; last kinds: ${window?.events.map((event) => event.kind).join(",")}`);
+}
+
+const hostEvents = (window) => window.events.filter((event) => !["notification", "runtimeStderr", "serverRequest"].includes(event.kind));
+
 // The host writes nothing by default; the explicit import is the single
 // exception and it names every path it may touch, all left uncommitted.
 const REPOSITORY_WRITES = {
@@ -504,6 +549,7 @@ test("production shell routes ordinary Chat, approvals, interruption, and Tasks 
   assert.deepEqual(calls.map((call) => call.kind === "request" ? call.method : `respond:${JSON.stringify(call.result)}`), [
     "initialize",
     "account/read",
+    "account/read",
     "threadSection/list",
     "thread/list",
     "thread/list",
@@ -783,19 +829,32 @@ test("a runtime that misses the pinned baseline surfaces a stop instead of a 500
   if (!shell) return;
   const { child, envelope, api, action } = shell;
   assert.equal(envelope.runtime.baselineMatch, false);
+  // The stop is the pinned condition itself: a different binary is a
+  // different generated protocol, so reuse halts before any Thread is read.
+  assert.equal(envelope.runtime.state, "halted");
+  assert.equal(envelope.runtime.halt.conditionId, "generated-protocol-hash-changed");
   const bootstrap = await api("api/bootstrap");
   assert.equal(bootstrap.status, 200);
   assert.deepEqual(bootstrap.body.data.stop, {
     code: "runtime-baseline-mismatch",
+    conditionId: "generated-protocol-hash-changed",
     message: `Codex app-server 0.144.1 is running but VibeHub pins ${envelope.runtime.baselineVersion}. The shell stops here instead of reusing an unverified runtime.`,
+    detail: `Codex app-server 0.144.1 is running but the lock pins ${envelope.runtime.baselineVersion} (protocol schema f3dec1e031d9…).`,
     observedVersion: "0.144.1",
     baselineVersion: envelope.runtime.baselineVersion,
   });
   assert.deepEqual([bootstrap.body.data.projects, bootstrap.body.data.recents, bootstrap.body.data.threads], [[], [], []]);
   assert.equal(bootstrap.body.data.project.scope, "unbound");
+  assert.equal(bootstrap.body.data.runtime.state, "halted");
+  assert.equal(bootstrap.body.data.runtime.conditions.find((entry) => entry.id === "generated-protocol-hash-changed").status, "violated");
   const refused = await action({ action: "newThread" });
   assert.equal(refused.status, 409);
-  assert.equal(refused.body.error.code, "runtime_baseline_mismatch");
+  assert.equal(refused.body.error.code, "runtime_halted");
+  assert.equal(refused.body.error.conditionId, "generated-protocol-hash-changed");
+  const events = await api("api/events?after=0");
+  assert.equal(events.body.data.runtimeState, "halted");
+  assert.equal(events.body.data.runtimeHalt.conditionId, "generated-protocol-hash-changed");
+  assert.deepEqual(events.body.data.events.map((event) => event.kind), ["runtimeHalted"]);
   const exit = once(child, "exit");
   child.kill("SIGTERM");
   assert.deepEqual(await exit, [0, null]);
@@ -1008,4 +1067,233 @@ test("Chat is the default landing, the Graph is never a fallback, and the Worksp
   assert.match(script, /data-search-source="\$\{item\.source\}"/);
   for (const behavior of ["search groups are labelled by owner and include a native Thread result", "Task Workspace shows canonical PROOF, Evidence, Outcome and the fixture packet verbatim", "Task packet transcript card discloses the persisted Turn input byte-exact", "task deep link reopens the Workspace through the landing path", "leaving the Workspace drops the task deep link", "live Task Workspace renders the host PROOF and packet verbatim"]) assert.match(guard, new RegExp(behavior.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(html + script + host, /localStorage|sessionStorage|indexedDB/i);
+});
+
+test("killing the app-server mid-Turn restarts it and recovers the same Thread identities, Task linkage and running-Turn truth", async (context) => {
+  const { folder } = await proofRepository(context);
+  const lifecycle = await lifecycleTemp(context);
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: lifecycle.env() });
+  if (!shell) return;
+  const { child, envelope, api, action } = shell;
+  assert.equal(envelope.runtime.state, "alive");
+  assert.equal(envelope.runtime.generation, 1);
+  assert.equal(envelope.runtime.halt, null);
+  const conditionStatus = (runtime, id) => runtime.conditions.find((entry) => entry.id === id)?.status;
+  assert.equal(conditionStatus(envelope.runtime, "thread-restart-recovery-unavailable"), "unverified", "recovery is unproven until a restart is observed");
+  assert.equal(conditionStatus(envelope.runtime, "generated-protocol-hash-changed"), "unverified", "the fixture cannot emit the generated schema; the hash stays unverified, never assumed");
+  assert.equal(conditionStatus(envelope.runtime, "managed-auth-status-unavailable"), "pass");
+
+  // One ordinary Chat with a live Turn and one Task-linked Thread, both
+  // known to this folder before the process dies.
+  const chat = (await action({ action: "newThread" })).body.data.thread;
+  const task = (await action({ action: "startTask", ticketId: "ticket-proof-workspace", selectedContextIds: [] })).body.data;
+  const turn = (await action({ action: "startTurn", threadId: chat.id, input: [{ type: "text", text: "keep running" }] })).body.data.turn;
+  await pollEventsUntil(api, (window) => window.pendingRequests.some((request) => request.params?.turnId === turn.id));
+  const before = (await api("api/bootstrap")).body.data;
+  const identity = (threads) => threads.map((thread) => [thread.id, thread.taskLink?.ticketId ?? null]).sort();
+  assert.deepEqual(identity(before.threads), [[chat.id, null], [task.threadId, "ticket-proof-workspace"]]);
+  const liveBefore = (await action({ action: "readThread", threadId: chat.id })).body.data.thread;
+  assert.deepEqual([liveBefore.status.type, liveBefore.turns.at(-1).status], ["active", "inProgress"], "before the kill the Turn is truthfully live");
+  const pendingBefore = before.pendingRequests.map((request) => request.id);
+  assert.ok(pendingBefore.length >= 1);
+
+  const [firstPid] = await fixturePids(lifecycle.pidPath);
+  process.kill(firstPid, "SIGKILL");
+  const exited = await pollEventsUntil(api, (window) => window.events.some((event) => event.kind === "runtimeExit"));
+  if (!exited.events.some((event) => event.kind === "runtimeRestarted")) {
+    // Inside the restart window every adapter verb is refused as temporary,
+    // and the bootstrap says so instead of failing.
+    const refused = await action({ action: "newThread" });
+    if (refused.status === 503) {
+      assert.equal(refused.body.error.code, "runtime_restarting");
+      assert.equal(refused.body.error.runtimeState, "restarting");
+      const restarting = (await api("api/bootstrap")).body.data;
+      assert.equal(restarting.runtime.alive, false);
+      assert.deepEqual([restarting.threads, restarting.pendingRequests], [[], []], "nothing is invented from memory while the process is gone");
+    } else assert.equal(refused.status, 200, "the restart had already completed");
+  }
+  const restarted = await pollEventsUntil(api, (window) => window.events.some((event) => event.kind === "runtimeRestarted"));
+  const sequence = hostEvents(restarted).map((event) => event.kind);
+  const exitIndex = sequence.indexOf("runtimeExit");
+  assert.ok(exitIndex >= 0);
+  assert.deepEqual(sequence.slice(exitIndex), ["runtimeExit", ...pendingBefore.map(() => "requestResolved"), "runtimeRestarted"], "exit, every pending request voided, then one restart");
+  const exit = restarted.events.find((event) => event.kind === "runtimeExit").value;
+  assert.deepEqual([exit.generation, exit.signal, exit.requested, exit.runtimeGeneration], [1, "SIGKILL", false, 1]);
+  const voided = restarted.events.filter((event) => event.kind === "requestResolved").map((event) => event.value);
+  assert.deepEqual(voided.map((value) => [value.id, value.resolution, value.runtimeGeneration]).sort(), pendingBefore.map((id) => [id, "runtime_exited", 1]).sort());
+  const recovery = restarted.events.find((event) => event.kind === "runtimeRestarted").value;
+  assert.deepEqual([recovery.generation, recovery.version, recovery.attempt], [2, "0.147.0", 1]);
+  assert.deepEqual([...recovery.recoveredThreadIds].sort(), [chat.id, task.threadId].sort());
+  assert.deepEqual(recovery.recoveredTaskLinks, [{ ticketId: "ticket-proof-workspace", threadId: task.threadId }]);
+  assert.deepEqual([restarted.runtimeGeneration, restarted.runtimeAlive, restarted.runtimeState, restarted.runtimeHalt, restarted.pendingRequests], [2, true, "alive", null, []]);
+  assert.ok(!restarted.events.some((event) => event.kind === "notification" && event.value.method === "turn/started" && event.sequence > exit.sequence), "no live Turn is minted by the restart");
+
+  // Same identities and links after the restart, read from Codex again, and
+  // the orphaned Turn is replayed as persisted (still inProgress) on a
+  // Thread that is no longer active: not live.
+  const after = (await api("api/bootstrap")).body.data;
+  assert.deepEqual(identity(after.threads), identity(before.threads));
+  assert.deepEqual([after.runtime.state, after.runtime.generation, after.stop, after.runtime.restart.attempts], ["alive", 2, null, 1]);
+  assert.equal(conditionStatus(after.runtime, "thread-restart-recovery-unavailable"), "pass");
+  assert.match(after.runtime.conditions.find((entry) => entry.id === "thread-restart-recovery-unavailable").detail, /2 known Thread identities and 1 Task link resolved from Codex again/);
+  const replayed = (await action({ action: "readThread", threadId: chat.id })).body.data.thread;
+  assert.deepEqual([replayed.id, replayed.status.type, replayed.turns.at(-1).id, replayed.turns.at(-1).status], [chat.id, "notLoaded", turn.id, "inProgress"]);
+  const stale = await action({ action: "resolveRequest", requestId: pendingBefore[0], decision: "accept" });
+  assert.equal(stale.status, 409, "a request the dead process asked for is never answered to the new one");
+  assert.equal(stale.body.error.code, "request_not_pending");
+
+  // Work continues in the new generation: a history Thread is resumed into
+  // the process before its next Turn; the Task link is usable as before.
+  const resumedTurn = await action({ action: "startTurn", threadId: chat.id, input: [{ type: "text", text: "after restart" }] });
+  assert.equal(resumedTurn.status, 200, JSON.stringify(resumedTurn.body));
+  const continued = await action({ action: "startTaskTurn", ticketId: "ticket-proof-workspace", threadId: task.threadId, message: "continue after restart" });
+  assert.equal(continued.status, 200, JSON.stringify(continued.body));
+  assert.equal(continued.body.data.operation, "continue");
+  const calls = await appServerCalls(lifecycle.logPath);
+  assert.equal(calls.filter((call) => call.method === "initialize").length, 2, "the second process initialized on its own");
+  const secondInitialize = calls.findIndex((call, index) => call.method === "initialize" && index > calls.findIndex((entry) => entry.method === "initialize"));
+  const afterRestart = calls.slice(secondInitialize).map((call) => call.method);
+  assert.deepEqual(afterRestart.slice(0, 3), ["initialize", "account/read", "thread/list"], "restart re-reads auth and the folder's Threads before reuse");
+  assert.deepEqual(afterRestart.filter((method) => ["thread/resume", "turn/start"].includes(method)).slice(0, 2), ["thread/resume", "turn/start"], "a Thread unknown to the new process is resumed before its Turn starts");
+  const pids = await fixturePids(lifecycle.pidPath);
+  assert.equal(pids.length, 2);
+  assert.notEqual(pids[0], pids[1]);
+  const shutdown = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await shutdown, [0, null]);
+});
+
+test("a launcher restart over the same persisted Codex state recovers identities and Task links without a second store", async (context) => {
+  const { folder } = await proofRepository(context);
+  const lifecycle = await lifecycleTemp(context);
+  const first = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: lifecycle.env() });
+  if (!first) return;
+  const chat = (await first.action({ action: "newThread" })).body.data.thread;
+  const task = (await first.action({ action: "startTask", ticketId: "ticket-proof-workspace", selectedContextIds: [] })).body.data;
+  const turn = (await first.action({ action: "startTurn", threadId: chat.id, input: [{ type: "text", text: "left running" }] })).body.data.turn;
+  const before = (await first.api("api/bootstrap")).body.data;
+  const identity = (threads) => threads.map((thread) => [thread.id, thread.taskLink?.ticketId ?? null]).sort();
+  const firstExit = once(first.child, "exit");
+  first.child.kill("SIGTERM");
+  assert.deepEqual(await firstExit, [0, null]);
+
+  const second = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: lifecycle.env() });
+  if (!second) return;
+  const after = (await second.api("api/bootstrap")).body.data;
+  assert.deepEqual(identity(after.threads), identity(before.threads));
+  assert.deepEqual(identity(after.threads), [[chat.id, null], [task.threadId, "ticket-proof-workspace"]]);
+  assert.equal(after.threads.find((thread) => thread.id === task.threadId).taskLink.kind, "codex_thread_name", "the link is re-derived from the Codex Thread name, not read from a VibeHub store");
+  const replayed = (await second.action({ action: "readThread", threadId: chat.id })).body.data.thread;
+  assert.deepEqual([replayed.status.type, replayed.turns.at(-1).id, replayed.turns.at(-1).status], ["notLoaded", turn.id, "inProgress"], "the orphaned Turn replays as persisted on an unloaded Thread");
+  assert.equal(after.pendingRequests.length, 0);
+  assert.equal(after.runtime.generation, 1, "a new launcher is a new process generation 1; nothing carries over");
+  assert.equal(after.runtime.conditions.find((entry) => entry.id === "thread-restart-recovery-unavailable").status, "unverified");
+  const packet = (await second.action({ action: "readThread", threadId: task.threadId })).body.data.thread.turns[0].items[0].content[0].text;
+  assert.equal(packet, task.payloadText, "the Task packet is replayed byte-exact from Codex after the launcher restart");
+  assert.equal(existsSync(join(folder, ".vibehub", "codex-project.yaml")), false);
+  assert.equal(git(folder, ["status", "--porcelain", "--untracked-files=all"]), "", "neither launcher wrote anything into the repository");
+  const shutdown = once(second.child, "exit");
+  second.child.kill("SIGTERM");
+  assert.deepEqual(await shutdown, [0, null]);
+});
+
+test("a restart that cannot recover the known Thread identities halts reuse visibly", async (context) => {
+  const { folder } = await proofRepository(context);
+  const lifecycle = await lifecycleTemp(context);
+  // No CODEX_FIXTURE_STATE: the respawned app-server knows nothing, like a
+  // runtime whose rollouts were lost.
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { ...lifecycle.env(), CODEX_FIXTURE_STATE: "" } });
+  if (!shell) return;
+  const { child, api, action } = shell;
+  const chat = (await action({ action: "newThread" })).body.data.thread;
+  const task = (await action({ action: "startTask", ticketId: "ticket-proof-workspace", selectedContextIds: [] })).body.data;
+  const [firstPid] = await fixturePids(lifecycle.pidPath);
+  process.kill(firstPid, "SIGKILL");
+  const halted = await pollEventsUntil(api, (window) => window.events.some((event) => event.kind === "runtimeHalted"));
+  const kinds = hostEvents(halted).map((event) => event.kind);
+  assert.deepEqual(kinds.slice(kinds.indexOf("runtimeExit")), ["runtimeExit", "requestResolved", "runtimeHalted"], "the Task Turn's pending approval is voided between the exit and the halt; no restart is announced");
+  const halt = halted.events.find((event) => event.kind === "runtimeHalted").value;
+  assert.deepEqual([halt.code, halt.conditionId, halt.generation], ["stop-condition-violated", "thread-restart-recovery-unavailable", 2]);
+  assert.match(halt.detail, new RegExp(`After restart \\(generation 2\\), Threads ${[chat.id, task.threadId].join(", ")} did not come back; Task link ticket-proof-workspace→${task.threadId} lost`));
+  assert.deepEqual([halted.runtimeState, halted.runtimeHalt.conditionId, halted.runtimeAlive], ["halted", "thread-restart-recovery-unavailable", true]);
+  const bootstrap = (await api("api/bootstrap")).body.data;
+  assert.deepEqual([bootstrap.runtime.state, bootstrap.stop.code, bootstrap.stop.conditionId, bootstrap.threads], ["halted", "stop-condition-violated", "thread-restart-recovery-unavailable", []]);
+  assert.equal(bootstrap.runtime.conditions.find((entry) => entry.id === "thread-restart-recovery-unavailable").status, "violated");
+  for (const payload of [{ action: "newThread" }, { action: "readThread", threadId: chat.id }, { action: "startTaskTurn", ticketId: "ticket-proof-workspace", threadId: task.threadId, message: "go" }]) {
+    const refused = await action(payload);
+    assert.equal(refused.status, 409, payload.action);
+    assert.equal(refused.body.error.code, "runtime_halted");
+    assert.equal(refused.body.error.conditionId, "thread-restart-recovery-unavailable");
+  }
+  const workspace = await action({ action: "readTask", ticketId: "ticket-proof-workspace" });
+  assert.equal(workspace.status, 200, "the checked-in Task contract is still readable; only the runtime is halted");
+  assert.equal((await fixturePids(lifecycle.pidPath)).length, 2, "exactly one respawn happened before the halt");
+  const shutdown = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await shutdown, [0, null]);
+});
+
+test("restart exhaustion halts instead of looping", async (context) => {
+  const { folder } = await temporaryRepository(context);
+  const lifecycle = await lifecycleTemp(context);
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: lifecycle.env({ CODEX_FIXTURE_MAX_STARTS: "1", VIBEHUB_CODEX_RESTART_BACKOFF_MS: "40,40,40" }) });
+  if (!shell) return;
+  const { child, api, action } = shell;
+  const [firstPid] = await fixturePids(lifecycle.pidPath);
+  process.kill(firstPid, "SIGKILL");
+  const halted = await pollEventsUntil(api, (window) => window.events.some((event) => event.kind === "runtimeHalted"));
+  const kinds = hostEvents(halted).map((event) => event.kind);
+  assert.equal(kinds.filter((kind) => kind === "runtimeRestartFailed").length, 3, "every backoff step was tried");
+  assert.equal(kinds.at(-1), "runtimeHalted");
+  const halt = halted.events.find((event) => event.kind === "runtimeHalted").value;
+  assert.equal(halt.conditionId, "thread-restart-recovery-unavailable");
+  assert.match(halt.detail, /could not be restarted after 3 attempts/);
+  assert.deepEqual([halted.runtimeState, halted.runtimeAlive], ["halted", false]);
+  const refused = await action({ action: "newThread" });
+  assert.deepEqual([refused.status, refused.body.error.code], [409, "runtime_halted"]);
+  assert.equal((await fixturePids(lifecycle.pidPath)).length, 1, "the fixture refused every further start");
+  const shutdown = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await shutdown, [0, null]);
+});
+
+test("an unreadable managed auth status halts reuse at boot", async (context) => {
+  const { folder } = await temporaryRepository(context);
+  const lifecycle = await lifecycleTemp(context);
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: lifecycle.env({ CODEX_FIXTURE_AUTH: "unavailable" }) });
+  if (!shell) return;
+  const { child, envelope, api, action } = shell;
+  assert.deepEqual([envelope.runtime.state, envelope.runtime.halt.conditionId, envelope.runtime.halt.code], ["halted", "managed-auth-status-unavailable", "stop-condition-violated"]);
+  assert.match(envelope.runtime.halt.detail, /account\/read did not answer: account status unavailable \(fixture\)/);
+  const bootstrap = (await api("api/bootstrap")).body.data;
+  assert.deepEqual([bootstrap.stop.conditionId, bootstrap.account.authenticated, bootstrap.threads], ["managed-auth-status-unavailable", false, []]);
+  const refused = await action({ action: "newThread" });
+  assert.deepEqual([refused.status, refused.body.error.code, refused.body.error.conditionId], [409, "runtime_halted", "managed-auth-status-unavailable"]);
+  const shutdown = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await shutdown, [0, null]);
+});
+
+test("a pinned request the runtime does not know halts reuse at the first -32601", async (context) => {
+  const { folder } = await temporaryRepository(context);
+  const lifecycle = await lifecycleTemp(context);
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: lifecycle.env({ CODEX_FIXTURE_DROP_METHODS: "turn/steer" }) });
+  if (!shell) return;
+  const { child, envelope, api, action } = shell;
+  assert.equal(envelope.runtime.state, "alive", "the drop is invisible until the pinned request is used");
+  const chat = (await action({ action: "newThread" })).body.data.thread;
+  const turn = (await action({ action: "startTurn", threadId: chat.id, input: [{ type: "text", text: "hello" }] })).body.data.turn;
+  const steered = await action({ action: "steerTurn", threadId: chat.id, expectedTurnId: turn.id, input: [{ type: "text", text: "steer" }] });
+  assert.deepEqual([steered.status, steered.body.error.code, steered.body.error.conditionId], [409, "runtime_halted", "required-request-or-event-missing"], "the failing call itself reports the halt, not a bare 500");
+  assert.match(steered.body.error.detail, /rejected pinned request turn\/steer as unknown \(-32601\)/);
+  const events = (await api("api/events?after=0")).body.data;
+  assert.deepEqual([events.runtimeState, events.runtimeHalt.conditionId, events.runtimeAlive], ["halted", "required-request-or-event-missing", true]);
+  assert.ok(events.events.some((event) => event.kind === "runtimeHalted"));
+  const refused = await action({ action: "newThread" });
+  assert.deepEqual([refused.status, refused.body.error.code], [409, "runtime_halted"]);
+  const bootstrap = (await api("api/bootstrap")).body.data;
+  assert.deepEqual([bootstrap.stop.code, bootstrap.stop.conditionId, bootstrap.threads], ["stop-condition-violated", "required-request-or-event-missing", []]);
+  const shutdown = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await shutdown, [0, null]);
 });

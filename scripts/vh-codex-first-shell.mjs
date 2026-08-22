@@ -19,7 +19,9 @@ import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { CodexAppServerClient } from "../packages/codex-adapter/client.mjs";
 import { createCodexHarnessAdapter } from "../packages/codex-adapter/harness.mjs";
+import { probeCodexSchema } from "../packages/codex-adapter/probe-schema.mjs";
 import { CODEX_PROJECT_CAPABILITIES, CodexProjectsAdapter, publicCodexThread } from "../packages/codex-adapter/projects.mjs";
+import { evaluateStopConditions, firstViolation, observedRuntimeVersion } from "../packages/codex-adapter/stop-conditions.mjs";
 import { buildTaskContextPacket, startTaskContextThread, taskLinkFromPreview } from "../packages/codex-adapter/task-context.mjs";
 import { createSharedHarnessShell } from "../packages/harness-core/shell.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
@@ -33,6 +35,12 @@ const EVENT_LIMIT = 500;
 const BODY_LIMIT = 12 * 1024 * 1024;
 const APP_SERVER_TIMEOUT_MS = 120_000;
 const SEARCH_LIMIT = 20;
+// When the app-server exits on its own the host respawns it with this
+// backoff; after the last attempt the runtime halts visibly instead of looping.
+const RESTART_BACKOFF_MS = Object.freeze(parseBackoff(process.env.VIBEHUB_CODEX_RESTART_BACKOFF_MS, [500, 2000, 5000]));
+// Only readTask is served from the repository alone; every other action needs
+// the live app-server and is refused truthfully while it is restarting or halted.
+const ADAPTER_FREE_ACTIONS = new Set(["readTask"]);
 const THREAD_POLICY = Object.freeze({ approvalPolicy: "on-request", sandbox: "workspace-write" });
 // The Codex Project binding record is provenance only. Chat membership stays
 // in the native ThreadSection, which is re-read on every bootstrap; the
@@ -55,6 +63,15 @@ const REPOSITORY_WRITES = Object.freeze({
 
 const sourceRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const assetRoot = join(sourceRoot, "apps", SHELL_ID);
+
+function parseBackoff(raw, fallback) {
+  if (!raw) return fallback;
+  const delays = raw.split(",").map((entry) => Number(entry.trim()));
+  if (!delays.length || delays.some((delay) => !Number.isInteger(delay) || delay < 0)) {
+    throw new Error("VIBEHUB_CODEX_RESTART_BACKOFF_MS must be a comma-separated list of non-negative integers");
+  }
+  return delays;
+}
 
 function parseShellFlags(argv) {
   const flags = { repo: process.cwd(), port: 0, codex: "codex", json: false, open: false };
@@ -105,7 +122,33 @@ const pendingRequests = new Map();
 let sequence = 0;
 let origin = null;
 let stopping = false;
-const runtime = { generation: 1, alive: false, version: null };
+let restartTimer = null;
+let restarting = false;
+// Runtime truth the host holds about the one app-server process:
+//   state      alive | restarting | exited | halted
+//   halt       null, or the violated stop condition that ended reuse
+//   generation the process generation currently (or last) bound
+//   known      Thread ids and Task links this folder has shown, so a restart
+//              can prove the same identities resolve from Codex again
+//   loaded     Threads loaded into the current process generation
+const runtime = {
+  generation: 0,
+  alive: false,
+  state: "exited",
+  version: null,
+  halt: null,
+  account: null,
+  accountError: null,
+  schemaProbe: null,
+  schemaProbeError: null,
+  missingMethods: new Set(),
+  recovery: null,
+  conditions: [],
+  restartAttempt: 0,
+  knownThreadIds: new Set(),
+  knownTaskLinks: new Map(),
+  loadedThreadIds: new Set(),
+};
 
 function appendEvent(kind, value) {
   events.push({ sequence: ++sequence, kind, value, observedAt: new Date().toISOString() });
@@ -123,7 +166,7 @@ client.on("serverRequest", (value) => {
     appendEvent("requestResolved", { id: value.id, method: value.method, resolution: "unsupported" });
     return;
   }
-  pendingRequests.set(String(value.id), value);
+  pendingRequests.set(String(value.id), { ...value, runtimeGeneration: runtime.generation });
   appendEvent("serverRequest", value);
 });
 client.on("notification:serverRequest/resolved", (params) => {
@@ -131,11 +174,185 @@ client.on("notification:serverRequest/resolved", (params) => {
   appendEvent("requestResolved", { id: params.requestId, threadId: params.threadId, resolution: "external" });
 });
 client.on("stderr", (line) => appendEvent("runtimeStderr", { line }));
+client.on("methodMissing", ({ method, generation }) => {
+  runtime.missingMethods.add(method);
+  // A pinned request the runtime does not know halts reuse right away; the
+  // caller's own rejection arrives after this and is reported as the halt.
+  if (!runtime.halt) {
+    const violation = firstViolation(evaluateStopConditions(stopConditionInputs()));
+    if (violation) haltRuntime(violation, { generation });
+  }
+});
 client.on("exit", (value) => {
   runtime.alive = false;
-  runtime.generation += 1;
+  runtime.loadedThreadIds.clear();
   appendEvent("runtimeExit", { ...value, runtimeGeneration: runtime.generation });
+  // Every approval or input request the dead process asked for is void: it
+  // is resolved visibly as runtime_exited and never replayed to a new process.
+  for (const request of pendingRequests.values()) {
+    appendEvent("requestResolved", { id: request.id, method: request.method, threadId: request.params?.threadId ?? null, resolution: "runtime_exited", runtimeGeneration: runtime.generation });
+  }
+  pendingRequests.clear();
+  if (stopping || value.requested) {
+    runtime.state = runtime.halt ? "halted" : "exited";
+    return;
+  }
+  if (runtime.halt) {
+    runtime.state = "halted";
+    return;
+  }
+  runtime.state = "restarting";
+  if (!restarting) scheduleRestart(0);
 });
+
+function scheduleRestart(attempt) {
+  clearTimeout(restartTimer);
+  restartTimer = setTimeout(() => {
+    restartTimer = null;
+    void restartRuntime(attempt);
+  }, RESTART_BACKOFF_MS[attempt]);
+}
+
+function haltRuntime(violation, { generation = runtime.generation } = {}) {
+  if (runtime.halt) return runtime.halt;
+  const baseline = harness.capabilities.upstream.version;
+  const versionMismatch = violation.id === "generated-protocol-hash-changed" && runtime.version !== null && runtime.version !== baseline;
+  runtime.halt = {
+    code: versionMismatch ? "runtime-baseline-mismatch" : "stop-condition-violated",
+    conditionId: violation.id,
+    detail: violation.detail,
+    message: versionMismatch
+      ? `Codex app-server ${runtime.version} is running but VibeHub pins ${baseline}. The shell stops here instead of reusing an unverified runtime.`
+      : `Stop condition ${violation.id}: ${violation.detail} The shell stops here instead of reusing this runtime.`,
+    observedVersion: runtime.version,
+    baselineVersion: baseline,
+    generation,
+    observedAt: new Date().toISOString(),
+  };
+  runtime.state = "halted";
+  clearTimeout(restartTimer);
+  restartTimer = null;
+  appendEvent("runtimeHalted", runtime.halt);
+  // A halt at boot is announced after the URL line so the envelope stays the
+  // first thing a caller reads; a later halt is announced as it happens.
+  if (origin) process.stderr.write(haltNotice());
+  return runtime.halt;
+}
+
+function haltNotice() {
+  return `VibeHub halted Codex runtime reuse (${runtime.halt.conditionId}): ${runtime.halt.detail}\n`;
+}
+
+function stopConditionInputs() {
+  return {
+    initialized: client.initialized,
+    observedVersion: runtime.version,
+    account: runtime.account,
+    accountError: runtime.accountError,
+    schemaProbe: runtime.schemaProbe,
+    schemaProbeError: runtime.schemaProbeError,
+    missingMethods: [...runtime.missingMethods],
+    recovery: runtime.recovery,
+    staleRequestIds: [...pendingRequests.values()].filter((request) => request.runtimeGeneration !== runtime.generation).map((request) => String(request.id)),
+    carrierIds: [harness.carrierId],
+  };
+}
+
+// Evaluate every pinned stop condition against what this process has
+// observed; a violation halts reuse and is returned, otherwise null.
+function gateRuntime() {
+  const report = evaluateStopConditions(stopConditionInputs());
+  runtime.conditions = report.conditions;
+  const violation = firstViolation(report);
+  return violation ? haltRuntime(violation) : null;
+}
+
+function rememberThreads(threads) {
+  for (const thread of threads) {
+    runtime.knownThreadIds.add(thread.id);
+    if (thread.taskLink?.ticketId) runtime.knownTaskLinks.set(thread.id, thread.taskLink.ticketId);
+  }
+}
+
+// After a respawn every Thread identity and Task link this folder has shown
+// must resolve from Codex again: the scoped list first, then thread/read for
+// anything the bounded list no longer carries (archived, beyond the tail).
+async function recoverKnownThreads() {
+  const listed = await listThreads();
+  const recovered = new Map(listed.map((thread) => [thread.id, thread]));
+  const missingThreadIds = [];
+  for (const threadId of runtime.knownThreadIds) {
+    if (recovered.has(threadId)) continue;
+    try {
+      const read = await client.request("thread/read", { threadId, includeTurns: false });
+      recovered.set(threadId, publicThread(read.thread));
+    } catch {
+      missingThreadIds.push(threadId);
+    }
+  }
+  const recoveredTaskLinks = [];
+  const lostTaskLinks = [];
+  for (const [threadId, ticketId] of runtime.knownTaskLinks) {
+    if (recovered.get(threadId)?.taskLink?.ticketId === ticketId) recoveredTaskLinks.push({ ticketId, threadId });
+    else lostTaskLinks.push({ ticketId, threadId });
+  }
+  return {
+    generation: runtime.generation,
+    knownThreadIds: [...runtime.knownThreadIds],
+    recoveredThreadIds: [...runtime.knownThreadIds].filter((threadId) => recovered.has(threadId)),
+    missingThreadIds,
+    recoveredTaskLinks,
+    lostTaskLinks,
+  };
+}
+
+async function restartRuntime(attempt) {
+  if (stopping || runtime.halt || restarting) return;
+  restarting = true;
+  try {
+    const initialized = await client.start();
+    runtime.generation = client.generation;
+    runtime.version = observedRuntimeVersion(initialized);
+    // The process is back; the shell reuses it only once the gate passes.
+    runtime.alive = true;
+    await readAccount();
+    runtime.restartAttempt = attempt + 1;
+    runtime.recovery = await recoverKnownThreads();
+    if (gateRuntime()) return;
+    runtime.state = "alive";
+    appendEvent("runtimeRestarted", {
+      generation: runtime.generation,
+      version: runtime.version,
+      attempt: attempt + 1,
+      recoveredThreadIds: runtime.recovery.recoveredThreadIds,
+      recoveredTaskLinks: runtime.recovery.recoveredTaskLinks,
+    });
+  } catch (error) {
+    appendEvent("runtimeRestartFailed", { attempt: attempt + 1, error: error.message });
+    if (stopping || runtime.halt) return;
+    if (attempt + 1 >= RESTART_BACKOFF_MS.length) {
+      runtime.recovery = { generation: client.generation, error: error.message, attempts: attempt + 1 };
+      gateRuntime();
+      return;
+    }
+    // Let the exit handler of a process that died mid-restart settle first.
+    runtime.state = "restarting";
+    scheduleRestart(attempt + 1);
+  } finally {
+    restarting = false;
+  }
+}
+
+async function readAccount() {
+  try {
+    runtime.account = await client.accountStatus();
+    runtime.accountError = null;
+  } catch (error) {
+    runtime.account = null;
+    runtime.accountError = error.message;
+  }
+  return runtime.account;
+}
 
 const script = (name) => [join(assetRoot, name), "text/javascript; charset=utf-8"];
 const fixture = (name) => [join(assetRoot, name), "application/json; charset=utf-8"];
@@ -171,10 +388,11 @@ const headers = {
 };
 
 class HostError extends Error {
-  constructor(status, code, message) {
+  constructor(status, code, message, details = {}) {
     super(message);
     this.status = status;
     this.code = code;
+    this.details = details;
   }
 }
 
@@ -186,9 +404,25 @@ function json(response, status, value) {
 }
 
 function fail(response, error) {
+  // A request the runtime rejected as unknown has already halted reuse by the
+  // time it is reported; the caller sees the halt, not a bare 500.
+  if (runtime.halt && error?.rpcError?.code === -32601) error = haltError();
   const status = error instanceof HostError ? error.status : error?.name === "UnsupportedHarnessCapabilityError" ? 409 : 500;
   const code = error instanceof HostError ? error.code : error?.name === "UnsupportedHarnessCapabilityError" ? "unsupported_capability" : "internal_error";
-  json(response, status, { ok: false, error: { code, message: error instanceof Error ? error.message : String(error) } });
+  const details = error instanceof HostError ? error.details : {};
+  json(response, status, { ok: false, error: { code, message: error instanceof Error ? error.message : String(error), ...details } });
+}
+
+function haltError() {
+  return new HostError(409, "runtime_halted", runtime.halt.message, { conditionId: runtime.halt.conditionId, detail: runtime.halt.detail });
+}
+
+// Adapter verbs need the live app-server: a halt is permanent (409), a
+// restart in progress is temporary (503), and both say which.
+function requireRuntime() {
+  if (runtime.halt) throw haltError();
+  if (runtime.state === "restarting") throw new HostError(503, "runtime_restarting", `The Codex app-server exited and is being restarted (attempt ${runtime.restartAttempt + 1} of ${RESTART_BACKOFF_MS.length}); retry in a moment.`, { runtimeState: runtime.state });
+  if (!runtime.alive) throw new HostError(503, "runtime_unavailable", "The Codex app-server is not running.", { runtimeState: runtime.state });
 }
 
 function safeEqual(left, right) {
@@ -256,7 +490,9 @@ async function listThreads() {
     sortDirection: "desc",
     sortKey: "updated_at",
   });
-  return (result.data ?? result.threads ?? []).map(publicThread);
+  const threads = (result.data ?? result.threads ?? []).map(publicThread);
+  rememberThreads(threads);
+  return threads;
 }
 
 function graphProjection(snapshot = buildUiSnapshot(repoRoot)) {
@@ -531,17 +767,26 @@ function runtimeProjection() {
     realtimeConversation: false,
     generation: runtime.generation,
     alive: runtime.alive,
+    state: runtime.state,
+    halt: runtime.halt,
+    conditions: runtime.conditions,
+    restart: { attempts: runtime.restartAttempt, backoffMs: [...RESTART_BACKOFF_MS] },
+    recovery: runtime.recovery,
   };
 }
 
+// The stop the browser shows is the halt itself: which pinned condition
+// ended reuse, with the observed and pinned versions beside it.
 function runtimeStop() {
-  const runtimeState = runtimeProjection();
-  if (runtimeState.baselineMatch) return null;
+  const halt = runtime.halt;
+  if (!halt) return null;
   return {
-    code: "runtime-baseline-mismatch",
-    message: `Codex app-server ${runtimeState.version ?? "unknown"} is running but VibeHub pins ${runtimeState.baselineVersion}. The shell stops here instead of reusing an unverified runtime.`,
-    observedVersion: runtimeState.version,
-    baselineVersion: runtimeState.baselineVersion,
+    code: halt.code,
+    conditionId: halt.conditionId,
+    message: halt.message,
+    detail: halt.detail,
+    observedVersion: halt.observedVersion,
+    baselineVersion: halt.baselineVersion,
   };
 }
 
@@ -549,13 +794,16 @@ async function bootstrap() {
   const stop = runtimeStop();
   const snapshot = buildUiSnapshot(repoRoot);
   // Every default list is scoped to this folder through the native filter.
-  // Groups whose members all live elsewhere are counted, never listed.
+  // Groups whose members all live elsewhere are counted, never listed. A
+  // halted or absent runtime yields empty lists, never a guess from memory.
+  const unavailable = Boolean(stop) || !runtime.alive;
   const [account, projectSnapshot] = await Promise.all([
-    client.accountStatus(),
-    stop
+    runtime.alive ? readAccount().then((value) => value ?? { authenticated: false, requiresOpenaiAuth: false }) : Promise.resolve({ authenticated: false, requiresOpenaiAuth: false }),
+    unavailable
       ? Promise.resolve({ projects: [], pinned: [], recents: [], threads: [], capabilities: CODEX_PROJECT_CAPABILITIES, folderScope: null })
       : projects.snapshot({ cwd: repoRoot }),
   ]);
+  rememberThreads(projectSnapshot.threads);
   const { folderScope, projects: groups, ...lists } = projectSnapshot;
   const visibleGroups = groups.filter((group) => group.scopedCount > 0 || group.totalCount === 0);
   const graph = graphProjection(snapshot);
@@ -646,13 +894,28 @@ function requireThreadId(payload) {
   return payload.threadId;
 }
 
+function rememberCreatedThread(thread) {
+  runtime.loadedThreadIds.add(thread.id);
+  rememberThreads([thread]);
+  return thread;
+}
+
+// A Thread that is not loaded into the current process generation (opened
+// from history, or every Thread after a restart) is resumed before its next
+// Turn, the way the app-server expects; a Thread this generation created or
+// already resumed goes straight to turn/start.
+async function ensureLoaded(threadId) {
+  if (runtime.loadedThreadIds.has(threadId)) return;
+  await harness.resumeChat({ conversationId: threadId });
+  runtime.loadedThreadIds.add(threadId);
+}
+
 async function action(payload) {
   if (!payload || typeof payload.action !== "string") throw invalid("Unknown action");
-  const stop = runtimeStop();
-  if (stop) throw new HostError(409, "runtime_baseline_mismatch", stop.message);
+  if (!ADAPTER_FREE_ACTIONS.has(payload.action)) requireRuntime();
   if (payload.action === "newThread") {
     const created = await harness.newChat({ ...THREAD_POLICY, cwd: repoRoot, ephemeral: false });
-    return { thread: publicThread(created.value.thread) };
+    return { thread: rememberCreatedThread(publicThread(created.value.thread)) };
   }
   if (payload.action === "readThread") {
     return client.request("thread/read", { threadId: requireThreadId(payload), includeTurns: true });
@@ -675,6 +938,7 @@ async function action(payload) {
   if (payload.action === "forkThread") {
     const threadId = requireThreadId(payload);
     const result = await projects.forkThread(threadId, { lastTurnId: payload.lastTurnId ?? null });
+    rememberCreatedThread(result.thread);
     appendEvent("clientAction", { action: "forkThread", sourceThreadId: threadId, createdThreadId: result.thread.id, forkedFromId: result.thread.forkedFromId });
     return result;
   }
@@ -720,6 +984,7 @@ async function action(payload) {
     if (typeof payload.threadId !== "string" || !validInputs(payload.input)) {
       throw invalid("threadId and bounded text/image/audio input required");
     }
+    await ensureLoaded(payload.threadId);
     const started = await sendThroughHarness(payload.threadId, payload.input);
     return started.value;
   }
@@ -751,7 +1016,11 @@ async function action(payload) {
     });
     // The Task Workspace contract sends the host-owned Context packet and names
     // the Thread; that composition lives in codex-adapter/task-context.mjs.
-    return startTaskContextThread({ client, packet: workspace.packet, cwd: repoRoot, ephemeral: false, ...THREAD_POLICY });
+    const started = await startTaskContextThread({ client, packet: workspace.packet, cwd: repoRoot, ephemeral: false, ...THREAD_POLICY });
+    runtime.loadedThreadIds.add(started.threadId);
+    runtime.knownThreadIds.add(started.threadId);
+    runtime.knownTaskLinks.set(started.threadId, started.ticketId);
+    return started;
   }
   if (payload.action === "readTask") {
     requireBoundScope();
@@ -791,12 +1060,15 @@ async function action(payload) {
       return { ...steered, ticketId: payload.ticketId, threadId: linked.id, operation, payloadText };
     }
     await client.request("thread/resume", { threadId: linked.id, cwd: repoRoot, ...THREAD_POLICY });
+    runtime.loadedThreadIds.add(linked.id);
     const continued = await sendThroughHarness(linked.id, input);
     return { ...continued.value, ticketId: payload.ticketId, threadId: linked.id, operation, payloadText };
   }
   if (payload.action === "resolveRequest") {
     const request = pendingRequests.get(String(payload.requestId));
-    if (!request) throw new HostError(409, "request_not_pending", "Approval or input request is no longer pending");
+    // Only the process generation that asked can be answered; a request from
+    // an exited process was resolved as runtime_exited and is never replayed.
+    if (!request || request.runtimeGeneration !== runtime.generation) throw new HostError(409, "request_not_pending", "Approval or input request is no longer pending");
     let result;
     if (["item/commandExecution/requestApproval", "item/fileChange/requestApproval"].includes(request.method)) {
       if (!validateRequestDecision(request, payload.decision)) throw invalid("Invalid approval decision");
@@ -815,17 +1087,30 @@ async function action(payload) {
   throw invalid(`Unsupported action: ${payload.action}`);
 }
 
-function observedRuntimeVersion(initialized) {
-  return String(initialized?.userAgent ?? "").match(/^[^/\s]+\/(\d+\.\d+\.\d+)/u)?.[1] ?? null;
-}
-
+// Boot: spawn the app-server, read what it reports about itself, then pass
+// every pinned stop condition before the shell reuses it. The generated
+// protocol schema is re-hashed when the binary can emit it; when it cannot
+// (the fixture, or a binary without generate-json-schema) the condition is
+// shown as unverified rather than assumed.
 async function startRuntime() {
   const started = client.start();
   const spawnFailure = new Promise((_, reject) => client.child?.once("error", reject));
   const initialized = await Promise.race([started, spawnFailure]);
+  runtime.generation = client.generation;
   runtime.version = observedRuntimeVersion(initialized);
   runtime.alive = true;
-  return harness.boot();
+  const carrier = harness.boot();
+  await readAccount();
+  if (runtime.version === harness.capabilities.upstream.version) {
+    try {
+      runtime.schemaProbe = probeCodexSchema({ codex: flags.codex });
+    } catch (error) {
+      runtime.schemaProbe = null;
+      runtime.schemaProbeError = `generate-json-schema unavailable: ${String(error.message).split("\n")[0].slice(0, 160)}`;
+    }
+  }
+  if (!gateRuntime()) runtime.state = "alive";
+  return carrier;
 }
 
 let carrier;
@@ -915,12 +1200,15 @@ server.listen(flags.port, LOOPBACK_HOST, () => {
     codexRuntime: true,
   };
   process.stdout.write(`${flags.json ? JSON.stringify(envelope) : `VibeHub Codex-first shell: ${url}`}\n`);
+  if (runtime.halt) process.stderr.write(haltNotice());
   if (flags.open) openBrowser(url);
 });
 
 async function stop() {
   if (stopping) return;
   stopping = true;
+  clearTimeout(restartTimer);
+  restartTimer = null;
   // Closing the shared shell closes the selected adapter, which stops the
   // app-server child owned by the codex adapter client.
   await harness.close();
