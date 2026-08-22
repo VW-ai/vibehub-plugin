@@ -1052,7 +1052,7 @@ test("Chat is the default landing, the Graph is never a fallback, and the Worksp
   assert.match(proofSource, /workspace\?\.outcome \?\? handoff\.outcomeRecord/);
   assert.match(proofSource, /nextAction\.reason/);
   for (const field of ["evidenceId", "summary", "acceptanceIds", "origin", "refs", "outcome.status", "outcome.summary", "outcome.closed_at", "accepted_acceptance_ids", "unresolved_acceptance_ids"]) assert.ok(proofSource.includes(field), field);
-  assert.match(script, /<pre data-packet-text>\$\{escapeHtml\(packetText\)\}<\/pre>/, "the packet is rendered as the host's own bytes");
+  assert.match(script, /<pre data-packet-text[^>]*>\$\{escapeHtml\(packetText\)\}<\/pre>/, "the packet is rendered as the host's own bytes");
   assert.match(script, /const packetText = workspace\?\.packetText \?\? /);
   assert.match(script, /function packetRawDisclosure/);
   assert.match(script, /pre\.textContent = userInputText\(item\.content\);/, "the transcript raw packet is the replayed Turn input");
