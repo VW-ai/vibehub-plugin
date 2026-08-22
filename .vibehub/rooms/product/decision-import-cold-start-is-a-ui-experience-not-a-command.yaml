@@ -1,0 +1,47 @@
+{
+  "context_id": "decision-import-cold-start-is-a-ui-experience-not-a-command",
+  "detail": "The owner confirms the shipped v1 reading of import: binding a single-folder Codex Project writes the .vibehub scaffold and surfaces the Room cold-start state instead of fabricating a Room tree. The qualification is that VibeHub now has a UI, so the cold-start handoff has to be designed as user experience: the shell should guide the user from the imported Project into Room setup inside the product, with clear state, progress and outcome, rather than ending at a line that names a Skill to run elsewhere. Room content remains distill-owned Agent judgment; this decision governs how that step is entered and experienced from the shell, not who writes Rooms. The concrete interaction is unresolved and belongs to the daily-use alpha or a focused follow-up Ticket.",
+  "evidence": [
+    {
+      "note": "The owner accepted scaffold plus cold-start handoff and required that the handoff respect the UI user experience.",
+      "ref": "conversation:2026-08-22-owner-confirms-import-cold-start-handoff-with-ui-experience"
+    },
+    {
+      "note": "The independent closeout flagged the narrowing from Room setup to cold-start handoff for owner confirmation; this record resolves it.",
+      "ref": ".vibehub/outcomes/ticket-implement-codex-first-vibehub-shell.yaml"
+    },
+    {
+      "note": "The import decision this qualifies.",
+      "ref": ".vibehub/rooms/product/decision-codex-project-import-binds-the-vibehub-project.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-project-import-binds-the-vibehub-project",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "intent-room-cold-start-from-codex-session-history",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T23:25:30Z",
+    "quote": "我觉得是可以的。大概是这个意思，只不过就是，因为我们有做ui，所以呢，我们这个东西需要做的兼顾一下uiux端的用户体验。",
+    "ref": "conversation:2026-08-22-owner-confirms-import-cold-start-handoff-with-ui-experience"
+  },
+  "state": "active",
+  "summary": "Import writes the scaffold and hands off Room cold start, but that handoff must be an in-product experience rather than a message telling the user to run distill",
+  "tags": [
+    "import",
+    "cold-start",
+    "rooms",
+    "distill",
+    "ux",
+    "codex",
+    "v1"
+  ],
+  "type": "decision"
+}
