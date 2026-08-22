@@ -1,0 +1,51 @@
+{
+  "context_id": "decision-one-visible-project-single-repository-v1",
+  "detail": "VibeHub v1 presents one Project concept rather than asking the user to distinguish Workspace, folder, Codex Project and VibeHub Project. The active folder or Git repository is the physical execution, storage and authority boundary; the visible Project is the human-facing work container for that same boundary. In v1 their relationship is one-to-one: opening a VibeHub-enabled repository opens its one VibeHub Project, and Workspace or cwd remains an inspectable implementation property rather than a peer navigation object. Codex app-server remains authoritative for native Thread, ThreadSection, fork, archive, search and execution behavior, while VibeHub remains authoritative for the Project's Task graph, Rooms, governed Context, Evidence and Outcomes. The shell may compose those capabilities behind one Project surface but must not merge their internal identifiers, infer identity by name, or create a second chat-membership store. Recents continues to mean native Chats without Codex Project membership; ordinary Chat remains usable without entering Task protocol. Multi-folder Projects and cross-folder VibeHub Context are explicitly outside v1.",
+  "evidence": [
+    {
+      "note": "The owner explicitly chose one visible Project concept and a one-folder/one-repository VibeHub v1 boundary so Workspace does not overload the user.",
+      "ref": "conversation:2026-08-21-owner-chooses-one-project-single-repository-v1"
+    },
+    {
+      "note": "Accepted Codex Project research proves the native ThreadSection, Recents, fork and membership seams that remain internally owned by Codex.",
+      "ref": ".vibehub/outcomes/ticket-research-codex-project-and-recent-chat-parity.yaml"
+    },
+    {
+      "note": "The existing Task scope decision remains the durable domain boundary for Project-owned or standalone Tasks.",
+      "ref": ".vibehub/rooms/product/decision-project-scope-with-derived-task-hierarchy.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "contract-codex-project-and-recent-chat-parity",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-project-scope-with-derived-task-hierarchy",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-chat-streams-birth-and-associate-independent-tasks",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T05:43:46Z",
+    "quote": "VibeHub 只支持一个 folder（也就是一个 repository）；我们的存储跟 Git、folder 强绑定，所以现在一个结构就跟一个 Project。",
+    "ref": "conversation:2026-08-21-owner-chooses-one-project-single-repository-v1"
+  },
+  "state": "active",
+  "summary": "V1 exposes one Project for one active repository and keeps Workspace or cwd as an implementation property rather than another user-facing container",
+  "tags": [
+    "project",
+    "workspace",
+    "repository",
+    "codex",
+    "thread-section",
+    "v1",
+    "information-architecture"
+  ],
+  "type": "decision"
+}

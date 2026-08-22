@@ -1,0 +1,46 @@
+{
+  "context_id": "intent-future-detached-context-storage-and-sharing-policy",
+  "detail": "After the single-repository Codex-first product is useful in daily work, VibeHub may explore detaching durable Context from one Git working tree through an explicit local storage layer, enabling multi-folder or cross-repository views without making hidden state authoritative by accident. That exploration must separately decide identity, migration, export, deletion, conflict, recovery, permission and Git interoperability before any database becomes canonical. A nearer optional policy may let a user choose whether VibeHub documents remain local-only or are shared through ordinary Git push, but the product must distinguish storage policy from synchronization outcome and must never silently edit ignore rules, commit or push. Research into existing Git/context integrations for DeepSeek Harness may inform the later adapter, but it is deferred and does not gate the Codex-first shell. None of these future directions authorizes a database, cross-folder Context activation, automatic Git mutation or a new active implementation Ticket in v1.",
+  "evidence": [
+    {
+      "note": "The owner proposed a future local database and local-versus-pushed setting only after the shell is useful, and explicitly deprioritized the work for now.",
+      "ref": "conversation:2026-08-21-owner-defers-detached-context-and-git-policy"
+    },
+    {
+      "note": "An existing draft already reserves cross-repository work until dogfood reveals one concrete workflow.",
+      "ref": ".vibehub/tickets/ticket-invisible-git-cross-repo-actions.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-v1-git-native-single-repository-scope",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "intent-context-compounding-action-system",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T05:43:46Z",
+    "quote": "后面 context 可以跟 Git detach，用本地数据库；也可以让用户选本地存还是 push，但先把整个 shell 做好再看。",
+    "ref": "conversation:2026-08-21-owner-defers-detached-context-and-git-policy"
+  },
+  "state": "active",
+  "summary": "Future work may detach Context storage and add explicit local-versus-shared policy, but it does not change the single-repository Git-native V1",
+  "tags": [
+    "future",
+    "database",
+    "git",
+    "multi-folder",
+    "sharing-policy",
+    "deepseek-harness"
+  ],
+  "type": "intent"
+}

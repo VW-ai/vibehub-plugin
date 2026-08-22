@@ -12,7 +12,7 @@
     "The first refined workflow must preserve portable canonical Context, Ticket, Evidence, and Outcome semantics and continued Codex and Claude Code compatibility.",
     "App and hosted-service implementation are out of scope; they become separate Tickets only after observed product evidence."
   ],
-  "context": "Direction only. VibeHub currently exposes Git-native Ticket cycles for coding agents. The owner wants a future action terminal whose Tickets cover software and non-software work, whose accumulated Context compounds across weeks and months, and whose implementation can dispatch work across repositories without making users manage Git. Candidate examples include spreadsheet work and travel planning stored in background repositories created under explicit user authority. This Ticket deliberately stops before implementation because the first target workflow, permission model, repository ownership, recovery semantics, and product surface are not yet known. Refine only after real dogfood exposes one concrete cross-repository or non-software workflow; do not build a generic platform from the vision alone.",
+  "context": "Direction only. VibeHub v1 is intentionally one visible Project over one selected Git repository, with checked-in Context, Tickets, Evidence, Outcomes and Rooms as canonical truth. The owner wants a later action system whose accumulated Context may detach from one working tree, span folders or repositories and offer an explicit local-only versus shared-through-Git policy without making users manage Git mechanics. Candidate implementations include a local database or background repositories, but identity, migration, permissions, conflict, export, deletion, recovery and Git interoperability are unresolved. Research into existing DSH Git or Context integrations is optional later input. Refine only after real single-repository dogfood exposes one concrete cross-repository, detached-storage or non-software workflow; do not build a generic platform from the vision alone.",
   "context_refs": [
     {
       "purpose": "The long-term product intent and the authority/portability boundary governing this future work.",
@@ -25,6 +25,14 @@
     {
       "purpose": "Canonical document handoff contract that future App or service surfaces must preserve until separately revised.",
       "ref": ".vibehub/rooms/workbench/contract-canonical-agent-output.yaml"
+    },
+    {
+      "purpose": "Current one-repository boundary this future Ticket may not silently bypass.",
+      "ref": ".vibehub/rooms/product/constraint-v1-git-native-single-repository-scope.yaml"
+    },
+    {
+      "purpose": "Explicit future detached-storage and local-versus-shared policy intent.",
+      "ref": ".vibehub/rooms/product/intent-future-detached-context-storage-and-sharing-policy.yaml"
     }
   ],
   "deliveries": [],
@@ -33,7 +41,9 @@
   "outcome": "VibeHub proves its first user-authorized workflow in which a bounded Ticket crosses repository boundaries while Git mechanics stay out of the user's way, non-software artifacts can participate, and durable Context plus Evidence-backed completion remain portable and inspectable.",
   "provenance_refs": [
     "conversation:2026-08-03-context-compounding-action-vision",
-    "context:intent-context-compounding-action-system"
+    "context:intent-context-compounding-action-system",
+    "conversation:2026-08-21-owner-chooses-one-project-single-repository-v1",
+    "conversation:2026-08-21-owner-defers-detached-context-and-git-policy"
   ],
   "relations": [],
   "schema_version": 2,

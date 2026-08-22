@@ -1,0 +1,42 @@
+{
+  "context_id": "constraint-v1-git-native-single-repository-scope",
+  "detail": "The first daily-use Codex carrier and its VibeHub Task system operate against exactly one selected folder containing one Git repository. Checked-in .vibehub Context, Tickets, Evidence, Outcomes and Room alignment remain the canonical durable truth inside that repository. V1 does not aggregate Task graphs, activate Context, inherit Rooms, dispatch write authority or synchronize state across multiple folders or repositories. A Chat may still be ordinary or unprojected in Codex, but creating, attaching or running a VibeHub Task must resolve to the one active repository and its Project scope. The UI must show that scope clearly without introducing a separate Workspace hierarchy. If no eligible repository is open, VibeHub Task actions must be unavailable or explain the missing scope rather than silently creating hidden storage. This is a bounded delivery constraint, not a claim that Project and repository are permanently identical in the long-term domain model.",
+  "evidence": [
+    {
+      "note": "The owner explicitly accepts single-folder V1 because current Context storage and Git history are repository-bound.",
+      "ref": "conversation:2026-08-21-owner-chooses-one-project-single-repository-v1"
+    },
+    {
+      "note": "Current architecture makes checked-in Git documents the source of truth and forbids a hidden database or second lifecycle.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-one-visible-project-single-repository-v1",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T05:43:46Z",
+    "quote": "我们现在不支持跨 folder 的 context；存储跟 Git 的，Git 是跟 folder 的。",
+    "ref": "conversation:2026-08-21-owner-chooses-one-project-single-repository-v1"
+  },
+  "state": "active",
+  "summary": "V1 keeps all VibeHub Task and Context truth inside one selected Git repository and does not imply cross-folder scope",
+  "tags": [
+    "single-repository",
+    "git-native",
+    "context",
+    "scope",
+    "authority",
+    "v1"
+  ],
+  "type": "constraint"
+}

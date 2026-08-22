@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "codex-first-shell-direction-decided"
+  ],
+  "evidence_id": "owner-accepts-one-project-single-repository-codex-v1",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-22T05:43:46Z",
+  "refs": [
+    "conversation:2026-08-20-owner-prioritizes-real-codex-use",
+    "conversation:2026-08-21-chat-default-search-task-attention",
+    "conversation:2026-08-21-owner-requires-codex-project-parity",
+    "conversation:2026-08-21-owner-requires-full-chat-parity-work",
+    "conversation:2026-08-21-owner-requires-dual-harness-product",
+    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin",
+    "conversation:2026-08-21-owner-chooses-one-project-single-repository-v1",
+    "conversation:2026-08-21-owner-defers-detached-context-and-git-policy",
+    ".vibehub/rooms/product/decision-one-visible-project-single-repository-v1.yaml",
+    ".vibehub/rooms/product/constraint-v1-git-native-single-repository-scope.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "The owner accepts the reviewed Codex-first V1 composition and resolves its remaining Project or Workspace ambiguity. Ordinary use should retain the complete familiar Codex Chat experience, including sidebar, Recents, Search, Thread and Turn rendering, fork, Composer and voice, while VibeHub adds explicit Chat-to-Task actions, Task Graph, task-scoped conversation, Rooms, governed Context, Evidence and Outcome. The UI exposes one Project concept instead of a peer Workspace hierarchy. In V1, the VibeHub Project is bound one-to-one to the active folder or Git repository because canonical VibeHub truth remains checked-in there; Codex still owns native Chat grouping and execution internally, and internal identifiers are not merged or inferred by name. One continuing Chat may create several independent Tasks with immutable origin. Codex-first dogfood proceeds now, DSH remains a later independent carrier, and multi-folder scope, Git-detached database storage, local-only versus pushed policy, automatic Git mutation and DSH Git integration are explicitly deferred rather than prerequisites.",
+  "ticket_id": "ticket-decide-codex-first-shell-direction"
+}

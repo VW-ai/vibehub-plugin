@@ -3,17 +3,17 @@
     {
       "acceptance_id": "codex-first-shell-direction-decided",
       "authority": "human",
-      "criterion": "After reviewing the accepted real-runtime Search and attention shell, native Chat and Task Workspace studies, Codex Project and unprojected Recents parity, the specialized production Chat conformance pass, and the dual-harness core contract in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact v1 composition and sequence: Codex-like sidebar, Projects, Recents, Search, Thread and Turn rendering, fork, Composer and voice; continuous Chat with inline Task associations; explicit creation of multiple independent Tasks with immutable origin and task-scoped conversation; additive VibeHub Graph, Context and Rooms; a Codex-first implementation; and an independently deliverable later DSH carrier."
+      "criterion": "After reviewing the accepted Search and attention shell, native Chat and Task Workspace studies, Codex Project and unprojected Recents parity, specialized production Chat conformance, and the dual-harness core contract in representative Light, Dark, wide and narrow states, the owner explicitly accepts one exact v1 composition and sequence: a Codex-familiar Chat-first shell with sidebar, one visible Project concept, Recents, Search, Thread and Turn rendering, fork, Composer and voice; the Project is bound one-to-one to the active folder or Git repository in v1, while Codex remains authoritative for native Chat grouping and execution and VibeHub adds that same Project's Task Graph, Rooms, governed Context, Evidence and Outcomes; Workspace or cwd is an inspectable implementation property rather than another peer container; a continuous Chat may create several independent Tasks with immutable origin and task-scoped conversation; Codex-first implementation proceeds now, DSH remains an independently deliverable later carrier, and multi-folder or Git-detached Context storage remains future work rather than a v1 prerequisite."
     }
   ],
   "constraints": [
     "This Ticket records protected product composition only; it does not implement or publish artifacts.",
-    "The owner's current '大概可以' is directional feedback, not authority-satisfying final acceptance.",
-    "Agent preference, screenshots without owner review, partial enthusiasm or silence cannot satisfy the human-authority criterion.",
-    "Any bounded owner correction remains unresolved and is replanned; it cannot satisfy a successful Outcome.",
-    "The choice must preserve real Codex and DSH runtime ownership, ordinary Chat without Task protocol, explicit Chat-to-Task transfer, VibeHub Task and Context truth and no duplicate Agent loop."
+    "Only explicit human-origin Evidence for this exact one-Project, single-repository composition may satisfy the criterion; earlier broad enthusiasm or screenshots alone remain insufficient.",
+    "A bounded owner correction remains unresolved and is replanned; it cannot satisfy a successful Outcome.",
+    "The choice must preserve real Codex and DSH runtime ownership, ordinary Chat without Task protocol, explicit Chat-to-Task transfer, VibeHub Task and Context truth and no duplicate Agent loop.",
+    "V1 may not introduce cross-folder Context activation, a local database, automatic Git commit or push, or a second Workspace hierarchy; those remain explicit future decisions."
   ],
-  "context": "The owner says the current low-fidelity frame is broadly workable, but gives material corrections before production approval: Codex Projects, fork and unprojected Recents retain familiar behavior; Chat interaction needs behavioral parity beyond styling; a continuous Chat can birth several independent Tasks while keeping its identity; each Task has immutable origin provenance and its own task-scoped conversation; and the shared VibeHub core supports Codex-backed and DSH-only carriers. This remains the protected composition gate after the three active studies succeed.",
+  "context": "The owner now resolves the remaining Project and Workspace ambiguity. V1 exposes one Project concept and binds its VibeHub scope one-to-one to the active folder or Git repository. Codex-native Chat, ThreadSection, Recents, fork and execution remain internal carrier capabilities; VibeHub adds Tasks, Graph, Rooms, governed Context, Evidence and Outcomes to the same human-facing Project rather than presenting another Workspace. Continuous Chat and independent Task semantics remain unchanged. Git-detached Context, multi-folder aggregation, local database storage, local-only versus shared or pushed policy and DSH Git-integration research are deferred and do not gate the Codex-first shell.",
   "context_refs": [
     {
       "purpose": "Binding shared core and independently usable Codex and DSH carrier architecture.",
@@ -46,12 +46,24 @@
     {
       "purpose": "Exact Light and Dark visual primitives for review.",
       "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+    },
+    {
+      "purpose": "Owner-selected one-Project information architecture and internal ownership boundary.",
+      "ref": ".vibehub/rooms/product/decision-one-visible-project-single-repository-v1.yaml"
+    },
+    {
+      "purpose": "Binding single-folder and Git-native V1 delivery constraint.",
+      "ref": ".vibehub/rooms/product/constraint-v1-git-native-single-repository-scope.yaml"
+    },
+    {
+      "purpose": "Explicitly deferred multi-folder, detached storage and sharing-policy direction.",
+      "ref": ".vibehub/rooms/product/intent-future-detached-context-storage-and-sharing-policy.yaml"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
   "maturity": "firm",
-  "outcome": "The owner explicitly accepts the exact VibeHub application composition across Codex and DeepSeek Harness bases, with Codex Project and Chat parity plus additive VibeHub Task and Context semantics governing production implementation.",
+  "outcome": "The owner explicitly accepts a Codex-first application with one visible Project bound to one active repository in v1, native Codex Chat behavior, and additive VibeHub Task, Graph, Rooms, Context, Evidence and Outcome semantics; Workspace remains an internal property and detached or multi-folder storage stays future work.",
   "provenance_refs": [
     "conversation:2026-08-20-owner-prioritizes-real-codex-use",
     "conversation:2026-08-21-chat-default-search-task-attention",
@@ -60,7 +72,9 @@
     "conversation:2026-08-21-owner-requires-codex-project-parity",
     "conversation:2026-08-21-owner-requires-full-chat-parity-work",
     "conversation:2026-08-21-owner-requires-dual-harness-product",
-    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin"
+    "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin",
+    "conversation:2026-08-21-owner-chooses-one-project-single-repository-v1",
+    "conversation:2026-08-21-owner-defers-detached-context-and-git-policy"
   ],
   "relations": [
     {
