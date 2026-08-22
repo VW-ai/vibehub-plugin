@@ -1,21 +1,85 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
+import { capabilitySnapshot } from "../packages/harness-core/capabilities.mjs";
+import { probeDomainIsolation } from "../packages/harness-core/probe-package-isolation.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
+const fixtureAppServer = fileURLToPath(new URL("fixtures/codex-app-server-fixture.mjs", import.meta.url));
+
+function olderThan(version, baseline) {
+  const parse = (value) => String(value ?? "").split(".").map(Number);
+  const [left, right] = [parse(version), parse(baseline)];
+  if (left.length !== 3 || right.length !== 3 || [...left, ...right].some(Number.isNaN)) return false;
+  for (let index = 0; index < 3; index += 1) {
+    if (left[index] !== right[index]) return left[index] < right[index];
+  }
+  return false;
+}
+
+async function launchShell(context, { codex = null, env = {} } = {}) {
+  const args = ["scripts/vh-codex-first-shell.mjs", "--repo", ".", "--port", "0", "--json", ...(codex ? ["--codex", codex] : [])];
+  const child = spawn(process.execPath, args, { cwd: new URL(".", root), stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, ...env } });
+  context.after(() => child.kill("SIGTERM"));
+  const timer = setTimeout(() => child.kill("SIGKILL"), 20_000);
+  const startup = await Promise.race([
+    once(child.stdout, "data").then(([chunk]) => ({ type: "ready", text: String(chunk).trim() })),
+    once(child.stderr, "data").then(([chunk]) => ({ type: "error", text: String(chunk).trim() })),
+    once(child, "exit").then(([code]) => ({ type: "exit", text: `exit ${code}` })),
+  ]);
+  clearTimeout(timer);
+  if (startup.type !== "ready" && /EPERM|Operation not permitted/.test(startup.text)) {
+    context.skip("local app-server or loopback sockets are unavailable in this sandbox");
+    return null;
+  }
+  assert.equal(startup.type, "ready", startup.text);
+  const envelope = JSON.parse(startup.text);
+  const url = new URL(envelope.url);
+  const token = url.hash.slice(1);
+  url.hash = "";
+  const api = async (path, options = {}) => {
+    const response = await fetch(new URL(path, url), { ...options, headers: { authorization: `Bearer ${token}`, "content-type": "application/json", ...(options.headers ?? {}) } });
+    return { status: response.status, body: await response.json() };
+  };
+  const action = (payload) => api("api/action", { method: "POST", body: JSON.stringify(payload) });
+  return { child, envelope, url, token, api, action };
+}
+
+async function assertHostBoundary({ envelope, url }) {
+  assert.equal(envelope.localOnly, true);
+  assert.equal(envelope.repositoryWrites, false);
+  assert.equal(envelope.codexRuntime, true);
+  assert.equal(envelope.shell, "codex-first-shell");
+  assert.equal(envelope.harness, "codex");
+  assert.equal(url.hostname, "127.0.0.1");
+  const health = await fetch(new URL("health", url));
+  assert.deepEqual(await health.json(), { ok: true, shell: "codex-first-shell", harness: "codex", localOnly: true, repositoryWrites: false, codexRuntime: true });
+  const unauthorized = await fetch(new URL("api/bootstrap", url));
+  assert.equal(unauthorized.status, 401);
+  const rejected = await fetch(url, { method: "POST" });
+  assert.equal(rejected.status, 405);
+}
 
 test("Codex-first shell uses real app-server ownership and additive VibeHub Tasks", async () => {
-  const [html, script, server, review] = await Promise.all([
+  const [html, script, server, adapter, review] = await Promise.all([
     source("apps/codex-first-shell/index.html"),
     source("apps/codex-first-shell/app.js"),
     source("scripts/vh-codex-first-shell.mjs"),
+    source("packages/codex-adapter/harness.mjs"),
     source("docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"),
   ]);
   for (const label of ["New chat", "Chat", "Tasks", "Rooms", "Projects", "Appearance", "Search", "Task inbox", "Recents"]) assert.match(html, new RegExp(label, "i"));
-  for (const request of ["thread/list", "thread/read", "thread/start", "thread/resume", "turn/start", "turn/steer", "turn/interrupt"]) assert.match(server, new RegExp(request.replace("/", "\\/")));
+  for (const seam of ["createSharedHarnessShell", "createCodexHarnessAdapter", "harness.boot()", "harness.newChat(", "harness.sendChat(", "harness.sendChatAttachments(", "harness.sendChatAudio(", "harness.interruptChat(", "harness.resolveInteraction(", "harness.close()"]) assert.ok(server.includes(seam), seam);
+  for (const request of ["thread/start", "turn/start", "turn/interrupt"]) assert.match(adapter, new RegExp(request.replace("/", "\\/")));
+  for (const request of ["thread/list", "thread/read", "thread/resume", "turn/steer", "thread/name/set"]) assert.match(server, new RegExp(request.replace("/", "\\/")));
+  assert.doesNotMatch(server, /client\.request\("(?:thread\/start|turn\/start|turn\/interrupt)"/);
+  assert.doesNotMatch(server, /client\.respond\(request/);
   for (const event of ["turn/started", "turn/completed", "serverRequest"]) assert.match(server + script, new RegExp(event.replace("/", "\\/")));
   assert.match(server, /buildTicketHandoff/);
   assert.match(server, /startTaskContextThread/);
@@ -179,7 +243,8 @@ test("Codex-first shell exposes ordinary audio honestly and routes real approval
   assert.match(script, /navigator\.mediaDevices\.getUserMedia/);
   assert.match(script, /MediaRecorder/);
   assert.match(script, /ordinary Codex audio input/);
-  assert.match(server, /audioInput: true/);
+  assert.match(server, /audioInput: harness\.capabilities\.capabilities\.audio\.available/);
+  assert.equal(capabilitySnapshot("codex").capabilities.audio.available, true);
   assert.match(server, /realtimeConversation: false/);
   assert.match(lock, /"stableTurnInputs": \["audio", "localAudio"\]/);
   for (const decision of ["accept", "acceptForSession", "decline", "cancel"]) assert.match(registry, new RegExp(`"${decision}"`));
@@ -269,50 +334,126 @@ test("Codex light and dark primitives share one responsive accessible shell", as
   assert.match(html, /meta name="color-scheme"/);
 });
 
-test("Codex-first shell host is loopback-only, bounded, and connected to the real runtime", async (context) => {
-  const child = spawn(process.execPath, ["scripts/vh-codex-first-shell.mjs", "--repo", ".", "--port", "0", "--json"], {
-    cwd: new URL(".", root),
-    stdio: ["ignore", "pipe", "pipe"],
+test("promoted shell keeps upstream runtime packages out of the browser app", async () => {
+  const result = await probeDomainIsolation({
+    id: "codex-first-shell",
+    roots: ["apps/codex-first-shell"],
+    forbiddenPackagePrefixes: ["@openai/codex", "@deepseek-ai/dsh"],
   });
-  context.after(() => child.kill("SIGTERM"));
-  const timer = setTimeout(() => child.kill("SIGKILL"), 20_000);
-  const startup = await Promise.race([
-    once(child.stdout, "data").then(([chunk]) => ({ type: "ready", text: String(chunk).trim() })),
-    once(child.stderr, "data").then(([chunk]) => ({ type: "error", text: String(chunk).trim() })),
-    once(child, "exit").then(([code]) => ({ type: "exit", text: `exit ${code}` })),
-  ]);
-  clearTimeout(timer);
-  if (startup.type !== "ready" && /EPERM|Operation not permitted/.test(startup.text)) {
-    context.skip("local app-server or loopback sockets are unavailable in this sandbox");
-    return;
+  assert.ok(result.files >= 7, `expected the promoted app modules to be scanned, saw ${result.files}`);
+  assert.deepEqual(result.violations, []);
+  assert.equal(result.proven, true);
+});
+
+test("launcher rejects unknown, repeated, and malformed flags before touching the runtime", async () => {
+  for (const [args, message] of [
+    [["--bogus"], /unknown flag: --bogus/u],
+    [["--port", "70000"], /--port must be an integer from 0 to 65535/u],
+    [["--repo"], /--repo requires a value/u],
+    [["--json", "--json"], /repeated flag: --json/u],
+    [["--repo", "/nonexistent/vibehub-repo"], /Repository does not exist/u],
+  ]) {
+    const child = spawn(process.execPath, ["scripts/vh-codex-first-shell.mjs", ...args], { cwd: new URL(".", root), stdio: ["ignore", "pipe", "pipe"] });
+    let stderr = "";
+    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    const [code] = await once(child, "exit");
+    assert.equal(code, 1, args.join(" "));
+    assert.match(stderr, message);
   }
-  assert.equal(startup.type, "ready", startup.text);
-  const envelope = JSON.parse(startup.text);
-  assert.equal(envelope.localOnly, true);
-  assert.equal(envelope.repositoryWrites, false);
-  assert.equal(envelope.codexRuntime, true);
-  const url = new URL(envelope.url);
-  const token = url.hash.slice(1);
-  url.hash = "";
-  const health = await fetch(new URL("health", url));
-  assert.deepEqual(await health.json(), { ok: true, shell: "codex-first-shell", localOnly: true, repositoryWrites: false, codexRuntime: true });
-  const unauthorized = await fetch(new URL("api/bootstrap", url));
-  assert.equal(unauthorized.status, 401);
-  const bootstrap = await fetch(new URL("api/bootstrap", url), { headers: { authorization: `Bearer ${token}` } });
-  const payload = await bootstrap.json();
-  assert.equal(payload.ok, true);
-  assert.equal(payload.data.account.authenticated, true);
-  assert.equal(payload.data.runtime.provider, "Codex app-server");
-  assert.equal(payload.data.runtime.alive, true);
-  assert.ok(payload.data.runtime.generation >= 1);
-  assert.equal(payload.data.runtime.realtimeConversation, false);
-  assert.ok(payload.data.contexts.some((context) => context.contextId === "decision-chat-default-search-and-task-attention"));
-  assert.equal(payload.data.attention.semantics.running, "presence_only_never_notification");
-  assert.ok(Array.isArray(payload.data.attention.needsYou));
-  assert.ok(Array.isArray(payload.data.attention.recentCompletions));
-  assert.ok(payload.data.graph.tickets.some((ticket) => ticket.ticketId === "ticket-prototype-codex-first-vibehub-shell"));
-  const rejected = await fetch(url, { method: "POST" });
-  assert.equal(rejected.status, 405);
+});
+
+test("production shell routes ordinary Chat, approvals, interruption, and Tasks through the harness shell into one app-server", async (context) => {
+  const temp = await mkdtemp(join(tmpdir(), "vibehub-codex-shell-"));
+  context.after(() => rm(temp, { recursive: true, force: true }));
+  const logPath = join(temp, "app-server-calls.jsonl");
+  const shell = await launchShell(context, { codex: fixtureAppServer, env: { CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_VERSION: "0.147.0" } });
+  if (!shell) return;
+  const { child, envelope, url, api, action } = shell;
+  await assertHostBoundary(shell);
+  assert.equal(envelope.runtime.version, "0.147.0");
+  assert.equal(envelope.runtime.baselineVersion, capabilitySnapshot("codex").upstream.version);
+  assert.equal(envelope.runtime.baselineMatch, true);
+  assert.equal(envelope.runtime.command, fixtureAppServer);
+
+  const bootstrap = await api("api/bootstrap");
+  assert.equal(bootstrap.body.ok, true);
+  assert.equal(bootstrap.body.data.account.authenticated, true);
+  assert.equal(bootstrap.body.data.harness.carrierId, "codex");
+  assert.deepEqual(bootstrap.body.data.harness.capabilities, capabilitySnapshot("codex"));
+  assert.equal(bootstrap.body.data.runtime.audioInput, true);
+  assert.equal(bootstrap.body.data.runtime.realtimeConversation, false);
+  assert.equal(bootstrap.body.data.runtime.alive, true);
+  assert.deepEqual(bootstrap.body.data.projects, []);
+  const ticketId = bootstrap.body.data.graph.tickets.find((ticket) => ticket.ticketId.startsWith("ticket-"))?.ticketId;
+  assert.ok(ticketId, "the repository graph must expose at least one current Ticket");
+
+  const created = await action({ action: "newThread" });
+  assert.equal(created.body.ok, true);
+  const threadId = created.body.data.thread.id;
+  assert.equal(created.body.data.thread.taskLink, null);
+  const started = await action({ action: "startTurn", threadId, input: [{ type: "text", text: "hello" }, { type: "image", url: "data:image/png;base64,AA==" }] });
+  assert.equal(started.body.ok, true);
+  const turnId = started.body.data.turn.id;
+  assert.match(turnId, /^fixture-turn-/u);
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  const events = await api("api/events?after=0");
+  assert.equal(events.body.data.runtimeAlive, true);
+  assert.deepEqual(events.body.data.events.map((event) => event.kind), ["notification", "serverRequest"]);
+  const [pending] = events.body.data.pendingRequests;
+  assert.equal(pending.method, "item/commandExecution/requestApproval");
+  const invalidDecision = await action({ action: "resolveRequest", requestId: pending.id, decision: "nope" });
+  assert.equal(invalidDecision.status, 400);
+  const resolved = await action({ action: "resolveRequest", requestId: pending.id, decision: "accept" });
+  assert.deepEqual(resolved.body.data, { resolved: true });
+  const stale = await action({ action: "resolveRequest", requestId: pending.id, decision: "accept" });
+  assert.equal(stale.status, 409);
+  const interrupted = await action({ action: "interruptTurn", threadId, turnId });
+  assert.equal(interrupted.body.ok, true);
+  const unsupported = await action({ action: "teleport" });
+  assert.equal(unsupported.status, 400);
+
+  const task = await action({ action: "startTask", ticketId, selectedContextIds: [] });
+  assert.equal(task.body.ok, true);
+  assert.equal(task.body.data.ticketId, ticketId);
+  assert.equal(JSON.parse(task.body.data.payloadText).kind, "vibehub_task_context_packet");
+  const continued = await action({ action: "startTaskTurn", ticketId, threadId: task.body.data.threadId, message: "continue" });
+  assert.equal(continued.body.ok, true);
+  const unlinked = await action({ action: "startTaskTurn", ticketId, threadId, message: "continue" });
+  assert.equal(unlinked.status, 409);
+
+  const calls = (await readFile(logPath, "utf8")).trim().split("\n").map((line) => JSON.parse(line));
+  assert.deepEqual(calls.map((call) => call.kind === "request" ? call.method : `respond:${JSON.stringify(call.result)}`), [
+    "initialize",
+    "account/read",
+    "threadSection/list",
+    "thread/list",
+    "thread/start",
+    "turn/start",
+    "respond:{\"decision\":\"accept\"}",
+    "turn/interrupt",
+    "thread/start",
+    "thread/name/set",
+    "turn/start",
+    "thread/list",
+    "thread/resume",
+    "turn/start",
+    "thread/list",
+  ]);
+  const threadStarts = calls.filter((call) => call.method === "thread/start");
+  for (const call of threadStarts) assert.deepEqual(call.params, { approvalPolicy: "on-request", sandbox: "workspace-write", cwd: fileURLToPath(root).replace(/\/$/u, ""), ephemeral: false });
+  assert.equal(calls.find((call) => call.method === "thread/name/set").params.name, `VibeHub Task · ${ticketId}`);
+  assert.deepEqual(Object.keys(calls.find((call) => call.method === "thread/resume").params).sort(), ["approvalPolicy", "cwd", "sandbox", "threadId"]);
+  assert.equal(calls.find((call) => call.method === "turn/interrupt").params.turnId, turnId);
+  const exit = once(child, "exit");
+  child.kill("SIGTERM");
+  assert.deepEqual(await exit, [0, null]);
+});
+
+test("Codex-first shell host is loopback-only, bounded, and connected to the real runtime", async (context) => {
+  const shell = await launchShell(context);
+  if (!shell) return;
+  const { child, envelope, url, api } = shell;
+  await assertHostBoundary(shell);
   const fixtures = await fetch(new URL("chat-fixtures.json", url));
   assert.equal(fixtures.status, 200);
   assert.match(fixtures.headers.get("content-type"), /application\/json/);
@@ -323,16 +464,36 @@ test("Codex-first shell host is loopback-only, bounded, and connected to the rea
   const projectFixtures = await fetch(new URL("project-fixtures.json", url));
   assert.equal(projectFixtures.status, 200);
   assert.equal((await projectFixtures.json()).projects[0].name, "Launch VibeHub");
-  const eventRecovery = await fetch(new URL("api/events?after=-1", url), { headers: { authorization: `Bearer ${token}` } });
-  const eventPayload = await eventRecovery.json();
-  assert.equal(eventPayload.data.gap, true);
-  assert.ok(Number.isInteger(eventPayload.data.oldestCursor));
-  assert.equal(eventPayload.data.runtimeAlive, true);
-  for (const moduleName of ["chat-renderer.mjs", "event-window.mjs", "server-request-registry.mjs"]) {
+  const eventRecovery = await api("api/events?after=-1");
+  assert.equal(eventRecovery.body.data.gap, true);
+  assert.ok(Number.isInteger(eventRecovery.body.data.oldestCursor));
+  assert.equal(eventRecovery.body.data.runtimeAlive, true);
+  for (const moduleName of ["chat-renderer.mjs", "event-window.mjs", "server-request-registry.mjs", "browser-interaction-guard.mjs"]) {
     const module = await fetch(new URL(moduleName, url));
     assert.equal(module.status, 200);
     assert.match(module.headers.get("content-type"), /text\/javascript/);
   }
+  assert.equal(envelope.runtime.baselineVersion, capabilitySnapshot("codex").upstream.version);
+  if (olderThan(envelope.runtime.version, envelope.runtime.baselineVersion)) {
+    context.skip(`local Codex app-server ${envelope.runtime.version} predates the pinned ${envelope.runtime.baselineVersion} baseline`);
+    return;
+  }
+  const bootstrap = await api("api/bootstrap");
+  const payload = bootstrap.body;
+  assert.equal(payload.ok, true, JSON.stringify(payload.error ?? null));
+  assert.equal(payload.data.account.authenticated, true);
+  assert.equal(payload.data.harness.carrierId, "codex");
+  assert.equal(payload.data.runtime.provider, "Codex app-server");
+  assert.equal(payload.data.runtime.alive, true);
+  assert.ok(payload.data.runtime.generation >= 1);
+  assert.equal(payload.data.runtime.audioInput, true);
+  assert.equal(payload.data.runtime.realtimeConversation, false);
+  assert.ok(payload.data.contexts.some((context) => context.contextId === "decision-chat-default-search-and-task-attention"));
+  assert.equal(payload.data.attention.semantics.running, "presence_only_never_notification");
+  assert.ok(Array.isArray(payload.data.attention.needsYou));
+  assert.ok(Array.isArray(payload.data.attention.recentCompletions));
+  assert.ok(payload.data.graph.tickets.length > 0);
+  assert.ok(payload.data.graph.tickets.every((ticket) => typeof ticket.ticketId === "string"));
   const exit = once(child, "exit");
   child.kill("SIGTERM");
   await exit;
