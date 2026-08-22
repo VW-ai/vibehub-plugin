@@ -1,0 +1,31 @@
+{
+  "acceptance_ids": [
+    "project-parity-review-is-decision-ready"
+  ],
+  "evidence_id": "codex-project-browser-movement-focus-correction",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-22T00:02:22Z",
+  "refs": [
+    "apps/codex-first-shell-prototype/app.js",
+    "apps/codex-first-shell-prototype/app.css",
+    "apps/codex-first-shell-prototype/index.html",
+    "packages/codex-adapter/prepare-project-browser-e2e.mjs",
+    "docs/proposals/codex-projects/browser-e2e-contract.json",
+    "docs/proposals/codex-projects/browser-e2e-run.json",
+    "docs/proposals/codex-projects/review-matrix.json",
+    "test/codex-projects.test.mjs",
+    "test/codex-first-shell-prototype.test.mjs",
+    "browser:authenticated-real-codex-thread-wide-light-pointer-recents-to-project-pass",
+    "browser:authenticated-real-codex-thread-wide-dark-native-select-project-to-recents-pass",
+    "browser:authenticated-real-codex-thread-narrow-light-pointer-recents-to-project-focus-stable-after-1.6s-pass",
+    "browser:authenticated-real-codex-thread-narrow-dark-native-select-project-to-recents-pass",
+    "command:node --test test/codex-projects.test.mjs test/codex-first-shell-prototype.test.mjs (14 pass, 0 fail; real loopback/app-server allowed)",
+    "command:npm run verify (181 pass, 0 fail, 2 intentional skip; artifact verified)",
+    "command:npm run probe:codex:projects:browser-cleanup (removed exact marker Project and Thread; repeat returned empty IDs)",
+    "commit:443ccad8842c791d359448ef01389040cfb41f07"
+  ],
+  "schema_version": 1,
+  "summary": "Correction at commit 443ccad8842c791d359448ef01389040cfb41f07 replaces the structurally asserted HTML5 dataTransfer path with a real PointerEvent gesture, preserves explicit focus across Project-membership rerenders, and records a real authenticated browser matrix. One temporary official Codex Thread moved Recents to the temporary Project by actual pointer drag in Wide Light and Narrow Light; it moved Project to Recents through the labeled native Project select in Wide Dark and Narrow Dark. Fresh app-server bootstrap recovered each membership, opening focused H1#activeThreadTitle instead of BODY, rerenders restored the moved Thread button or native select, exact polite atomic status messages were observed, and all four surfaces had no horizontal overflow. The native select was exercised end-to-end with browser selectOption because the in-app-browser OS arrow-key synthesis did not change its value; physical key-event coverage is explicitly not claimed. The marker Project and Thread were hard-deleted, and a second cleanup pass returned empty IDs. Focused real-runtime tests passed 14/14 and full verification passed 181 with two intentional skips and an artifact check.",
+  "ticket_id": "ticket-research-codex-project-and-recent-chat-parity"
+}
