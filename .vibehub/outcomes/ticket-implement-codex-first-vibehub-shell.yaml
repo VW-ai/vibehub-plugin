@@ -1,0 +1,25 @@
+{
+  "accepted_acceptance_ids": [
+    "chat-conformance-floor-holds-in-production",
+    "one-project-import-and-scope-states-are-real",
+    "graph-and-task-workspace-routes-are-production",
+    "lifecycle-restart-recovery-is-proven",
+    "capability-contract-is-refreshed-and-consistent",
+    "responsive-accessible-baseline-holds"
+  ],
+  "closed_at": "2026-08-22T12:58:12Z",
+  "evidence_ids": [
+    "conformance-floor-closed-in-production-shell",
+    "one-project-import-and-scope-states-implemented",
+    "graph-workspace-and-search-routes-canonical",
+    "lifecycle-restart-recovery-and-stop-conditions-proven-on-fixture",
+    "capability-contract-refreshed-and-bound",
+    "responsive-accessible-baseline-proven-both-themes"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "successful",
+  "summary": "Independent closeout at HEAD 8645630 on codex/deepseek-harness-v1 accepts all six agent-authority criteria from reproduced proof, not executor summaries. Reproduced personally: npm test 239 tests, 236 pass, 0 fail, 3 skipped (one real-runtime test skipped because the local Codex is 0.144.1, two DSH source skips); npm run verify passed with the plugin artifact; npm run guard:codex passed 65 of 65 at 1280x800 and 66 of 66 at 390x844 in both Light and Dark with zero console errors, clientWidth equal to scrollWidth, the reduced-motion audit dropping 2 moving elements to 0 six times, and the real-DOM lifecycle walk 6 of 6, leaving this repository's working tree clean. Beyond the Evidence, the production launcher was booted against the real local codex 0.144.1: it spawned the actual app-server on 127.0.0.1, read account/read, and halted visibly on generated-protocol-hash-changed with a 409 posture, so the violated-pin stop is proven on a real binary, not only the fixture. Spot-read proofs: the conformance matrix moved from 20 pass, 5 partial, 4 deferred at 2d1ef64 to 26 pass, 0 partial, 3 deferred, and its proof-resolution test binds every path::name entry to a declared test or guard check; the canonical-projection test deep-equals buildUiSnapshot, buildTicketHandoff and buildTaskContextPacket, asserts packetText byte equality and thread/read replay of the same bytes for start, continue and steer, and uses the fixture call log to prove cwd-scoped bounded search; the import test asserts 409 for foreign, multi-folder, empty and missing sections, exact writtenPaths, git status showing only untracked .vibehub, rev-list count 1, no room.yaml, coldStart true, and the host refuses a second import with already_bound; stop-conditions.mjs evaluates all eight upstream-lock ids and the static no-second-store test pins the host write surface to writeDocument(binding) plus one initProject with no browser or host storage APIs; capabilities.v1.json projects is native on ThreadSection authority, realtime is absent from the twelve-capability map, audio and localAudio stay pinned, and the lock was untouched by this Ticket; the contrast test asserts 4.5 to 1 text and 3 to 1 boundary floors, unchanged baseline primitives and explicit-override equality, and fails 4 of 4 against the pre-fix app.css when run as a negative control. Boundary accepted explicitly: every Evidence record truthfully states its proofs ran on the pinned-protocol fixture because the local Codex is 0.144.1; the criteria name executable tests and guard proofs rather than a live-binary run, the adapter contract was reproduced on real 0.147.0 by the accepted dependency closeouts, and the UI reconciles liveness only from thread/read, so this is compatible with success while the protocol-hash and audio-input probes, the real app-server's status for a Turn interrupted by its own death, and resume-before-turn remain unverified on the pinned binary. Findings that do not overturn acceptance: a latent hookPrompt timeline divider in apps/codex-first-shell/app.js still reads Project instructions and no fixture renders hookPrompt, so the noun sweep is complete only for ThreadSection strings; criterion one-project-import-and-scope-states-are-real was narrowed mid-execution at ca4ae90 from Room tree present to cold-start state with a distill handoff, which matches distill ownership but the owner's decision record says import includes Room setup, so that handoff deserves owner confirmation; the host keeps seven direct client.request calls whose upstream method names are all pinned in the lock but live outside the adapter modules. Constraints hold: .vibehub changed only through the plan correction and the three Evidence commits, no second store, no DSH import, no commit or push, one binding at most, no fabricated Room tree, and no bridge, audio capture, visual-identity or packaging claim was made.",
+  "ticket_id": "ticket-implement-codex-first-vibehub-shell",
+  "unresolved_acceptance_ids": []
+}
