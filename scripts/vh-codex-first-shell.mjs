@@ -795,8 +795,9 @@ async function bootstrap() {
   const snapshot = buildUiSnapshot(repoRoot);
   // Every default list is scoped to this folder through the native filter.
   // Groups whose members all live elsewhere are counted, never listed. A
-  // halted or absent runtime yields empty lists, never a guess from memory.
-  const unavailable = Boolean(stop) || !runtime.alive;
+  // halted, absent or not-yet-gated runtime yields empty lists, never a
+  // guess from memory.
+  const unavailable = Boolean(stop) || !runtime.alive || runtime.state !== "alive";
   const [account, projectSnapshot] = await Promise.all([
     runtime.alive ? readAccount().then((value) => value ?? { authenticated: false, requiresOpenaiAuth: false }) : Promise.resolve({ authenticated: false, requiresOpenaiAuth: false }),
     unavailable

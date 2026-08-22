@@ -416,7 +416,9 @@ function syncComposerMode() {
   const input = $("#composerInput");
   const taskMode = state.route === "task";
   const linked = taskMode && state.activeThreadId;
-  input.disabled = !state.runtimeAlive || Boolean(state.bootstrap?.stop) || Boolean(taskMode && !linked);
+  // The composer needs a runtime the host says is usable: alive, gated
+  // (state alive, not restarting or halted), authenticated, and no stop.
+  input.disabled = !state.runtimeAlive || state.runtimeState !== "alive" || Boolean(state.bootstrap?.stop) || Boolean(taskMode && !linked);
   $("#sendButton").disabled = input.disabled;
   $("#sendButton").setAttribute("aria-label", state.running ? "Steer current turn" : "Send message");
   $("#sendButton").title = state.running ? "Steer current Turn" : "Send message";
@@ -456,8 +458,8 @@ function setRuntimePosture({ alive, generation = state.runtimeGeneration, state:
   pill.title = conditions.length
     ? `Pinned stop conditions · ${conditions.map((entry) => `${entry.id}: ${entry.status}`).join(" · ")}`
     : "";
-  $("#accountDot").classList.toggle("connected", state.runtimeAlive && Boolean(state.bootstrap?.account?.authenticated));
-  $("#stopTurn").disabled = !state.runtimeAlive;
+  $("#accountDot").classList.toggle("connected", state.runtimeAlive && state.runtimeState === "alive" && Boolean(state.bootstrap?.account?.authenticated));
+  $("#stopTurn").disabled = !state.runtimeAlive || state.runtimeState !== "alive";
   syncComposerMode();
 }
 
