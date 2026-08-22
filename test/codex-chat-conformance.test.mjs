@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { applyChatEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT } from "../apps/codex-first-shell-prototype/chat-model.mjs";
-import { loadThreadDraft, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell-prototype/composer-drafts.mjs";
+import { applyChatEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT } from "../apps/codex-first-shell/chat-model.mjs";
+import { loadThreadDraft, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
 import {
   createRenderBudget,
   renderAgentMessage,
@@ -12,9 +12,9 @@ import {
   renderMemoryCitations,
   renderToolContent,
   renderUserMedia,
-} from "../apps/codex-first-shell-prototype/chat-renderer.mjs";
-import { eventWindow } from "../apps/codex-first-shell-prototype/event-window.mjs";
-import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell-prototype/server-request-registry.mjs";
+} from "../apps/codex-first-shell/chat-renderer.mjs";
+import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
+import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
@@ -23,7 +23,7 @@ test("checked-in protocol census classifies every pinned required event", async 
   const [lock, census, fixture] = await Promise.all([
     source("packages/codex-adapter/upstream-lock.json").then(JSON.parse),
     source("docs/proposals/codex-chat-conformance/protocol-event-census.json").then(JSON.parse),
-    source("apps/codex-first-shell-prototype/chat-fixtures.json").then(JSON.parse),
+    source("apps/codex-first-shell/chat-fixtures.json").then(JSON.parse),
   ]);
   assert.equal(census.baseline.protocolSchemaSha256, lock.codex.protocolSchemaSha256);
   for (const method of lock.requiredNotifications) assert.ok(census.notifications[method], `missing notification classification: ${method}`);
@@ -33,7 +33,7 @@ test("checked-in protocol census classifies every pinned required event", async 
 });
 
 test("Codex Chat reducer shares stable identity across replay, deltas, completion, and interruption", async () => {
-  const fixture = JSON.parse(await source("apps/codex-first-shell-prototype/chat-conformance-fixtures.json"));
+  const fixture = JSON.parse(await source("apps/codex-first-shell/chat-conformance-fixtures.json"));
   const model = { liveItems: new Map(), turnErrors: new Map() };
   for (const event of fixture.events) assert.equal(applyChatEvent(model, event.method, event.params), true);
   const timeline = canonicalTimeline(fixture.thread, model);
@@ -214,10 +214,10 @@ test("timeline and rich output stay bounded without inferring lifecycle", () => 
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {
   const [html, script, css, host] = await Promise.all([
-    source("apps/codex-first-shell-prototype/index.html"),
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("apps/codex-first-shell-prototype/app.css"),
-    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/app.css"),
+    source("scripts/vh-codex-first-shell.mjs"),
   ]);
   assert.match(html, /type="module"/);
   assert.match(html, /id="quoteSelection"/);
@@ -245,12 +245,12 @@ test("current shell exposes the conformance interactions without a second transc
 
 test("audit corrections wire running steer, fork, Thread drafts, drawer semantics, and bounded media", async () => {
   const [html, script, host, projectsAdapter, lockText, guard] = await Promise.all([
-    source("apps/codex-first-shell-prototype/index.html"),
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("scripts/vh-codex-first-shell.mjs"),
     source("packages/codex-adapter/projects.mjs"),
     source("packages/codex-adapter/upstream-lock.json"),
-    source("apps/codex-first-shell-prototype/browser-interaction-guard.mjs"),
+    source("apps/codex-first-shell/browser-interaction-guard.mjs"),
   ]);
   const lock = JSON.parse(lockText);
   assert.ok(lock.requiredRequests.includes("thread/fork"));

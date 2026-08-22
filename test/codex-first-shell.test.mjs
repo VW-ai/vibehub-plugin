@@ -9,9 +9,9 @@ const source = (path) => readFile(new URL(path, root), "utf8");
 
 test("Codex-first shell uses real app-server ownership and additive VibeHub Tasks", async () => {
   const [html, script, server, review] = await Promise.all([
-    source("apps/codex-first-shell-prototype/index.html"),
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("scripts/vh-codex-first-shell.mjs"),
     source("docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"),
   ]);
   for (const label of ["New chat", "Chat", "Tasks", "Rooms", "Projects", "Appearance", "Search", "Task inbox", "Recents"]) assert.match(html, new RegExp(label, "i"));
@@ -34,14 +34,14 @@ test("Codex-first shell uses real app-server ownership and additive VibeHub Task
 
 test("Projects, unprojected Recents, drag, keyboard move, and Fork use the native Codex adapter", async () => {
   const [html, script, css, server, adapter, research, contractText, fixtureText] = await Promise.all([
-    source("apps/codex-first-shell-prototype/index.html"),
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("apps/codex-first-shell-prototype/app.css"),
-    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/app.css"),
+    source("scripts/vh-codex-first-shell.mjs"),
     source("packages/codex-adapter/projects.mjs"),
     source("docs/CODEX_PROJECTS_RECENTS_PARITY_RESEARCH.md"),
     source("docs/proposals/codex-projects/project-object-contract.json"),
-    source("apps/codex-first-shell-prototype/project-fixtures.json"),
+    source("apps/codex-first-shell/project-fixtures.json"),
   ]);
   const contract = JSON.parse(contractText);
   const fixture = JSON.parse(fixtureText);
@@ -72,9 +72,9 @@ test("Projects, unprojected Recents, drag, keyboard move, and Fork use the nativ
 
 test("Search, Task attention, and object semantics are explicit and source-backed", async () => {
   const [html, script, server, research, contractText] = await Promise.all([
-    source("apps/codex-first-shell-prototype/index.html"),
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("scripts/vh-codex-first-shell.mjs"),
     source("docs/CODEX_NATIVE_SEARCH_ATTENTION_RESEARCH.md"),
     source("docs/proposals/codex-native-attention/interaction-contract.json"),
   ]);
@@ -102,14 +102,14 @@ test("Search, Task attention, and object semantics are explicit and source-backe
 
 test("Codex-native Chat contract covers replay, live deltas, rich items, and licensed reuse", async () => {
   const [script, model, renderer, css, research, review, contractText, fixtureText, lockText] = await Promise.all([
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("apps/codex-first-shell-prototype/chat-model.mjs"),
-    source("apps/codex-first-shell-prototype/chat-renderer.mjs"),
-    source("apps/codex-first-shell-prototype/app.css"),
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/chat-model.mjs"),
+    source("apps/codex-first-shell/chat-renderer.mjs"),
+    source("apps/codex-first-shell/app.css"),
     source("docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md"),
     source("docs/proposals/codex-native-chat/README.md"),
     source("docs/proposals/codex-native-chat/chat-ui-contract.json"),
-    source("apps/codex-first-shell-prototype/chat-fixtures.json"),
+    source("apps/codex-first-shell/chat-fixtures.json"),
     source("packages/codex-adapter/upstream-lock.json"),
   ]);
   const contract = JSON.parse(contractText);
@@ -168,11 +168,11 @@ test("Codex-native Chat contract covers replay, live deltas, rich items, and lic
 
 test("Codex-first shell exposes ordinary audio honestly and routes real approvals", async () => {
   const [html, script, server, eventWindow, registry, lock] = await Promise.all([
-    source("apps/codex-first-shell-prototype/index.html"),
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("scripts/vh-codex-first-shell-prototype.mjs"),
-    source("apps/codex-first-shell-prototype/event-window.mjs"),
-    source("apps/codex-first-shell-prototype/server-request-registry.mjs"),
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("scripts/vh-codex-first-shell.mjs"),
+    source("apps/codex-first-shell/event-window.mjs"),
+    source("apps/codex-first-shell/server-request-registry.mjs"),
     source("packages/codex-adapter/upstream-lock.json"),
   ]);
   assert.match(html, /Record voice input/);
@@ -192,14 +192,14 @@ test("Codex-first shell exposes ordinary audio honestly and routes real approval
 
 test("Task Workspace reuses native Chat and keeps Context packet assembly host-owned", async () => {
   const [html, script, css, server, module, research, contractText, fixtureText] = await Promise.all([
-    source("apps/codex-first-shell-prototype/index.html"),
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("apps/codex-first-shell-prototype/app.css"),
-    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/app.css"),
+    source("scripts/vh-codex-first-shell.mjs"),
     source("packages/codex-adapter/task-context.mjs"),
     source("docs/CODEX_TASK_WORKSPACE_RESEARCH.md"),
     source("docs/proposals/codex-task-workspace/task-workspace-contract.json"),
-    source("apps/codex-first-shell-prototype/task-fixtures.json"),
+    source("apps/codex-first-shell/task-fixtures.json"),
   ]);
   const contract = JSON.parse(contractText);
   const fixture = JSON.parse(fixtureText);
@@ -229,11 +229,11 @@ test("Task Workspace reuses native Chat and keeps Context packet assembly host-o
 
 test("Codex light and dark primitives share one responsive accessible shell", async () => {
   const [html, css, script, guard, host] = await Promise.all([
-    source("apps/codex-first-shell-prototype/index.html"),
-    source("apps/codex-first-shell-prototype/app.css"),
-    source("apps/codex-first-shell-prototype/app.js"),
-    source("apps/codex-first-shell-prototype/browser-interaction-guard.mjs"),
-    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.css"),
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/browser-interaction-guard.mjs"),
+    source("scripts/vh-codex-first-shell.mjs"),
   ]);
   for (const exact of ["#0169cc", "#fff", "#0d0d0d", "#339cff", "#181818"]) assert.match(css.toLowerCase(), new RegExp(exact));
   assert.match(css, /Inter, -apple-system/);
@@ -269,8 +269,8 @@ test("Codex light and dark primitives share one responsive accessible shell", as
   assert.match(html, /meta name="color-scheme"/);
 });
 
-test("Codex-first prototype host is loopback-only, bounded, and connected to the real runtime", async (context) => {
-  const child = spawn(process.execPath, ["scripts/vh-codex-first-shell-prototype.mjs", "--repo", ".", "--port", "0", "--json"], {
+test("Codex-first shell host is loopback-only, bounded, and connected to the real runtime", async (context) => {
+  const child = spawn(process.execPath, ["scripts/vh-codex-first-shell.mjs", "--repo", ".", "--port", "0", "--json"], {
     cwd: new URL(".", root),
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -295,7 +295,7 @@ test("Codex-first prototype host is loopback-only, bounded, and connected to the
   const token = url.hash.slice(1);
   url.hash = "";
   const health = await fetch(new URL("health", url));
-  assert.deepEqual(await health.json(), { ok: true, prototype: "codex-first-shell", localOnly: true, repositoryWrites: false, codexRuntime: true });
+  assert.deepEqual(await health.json(), { ok: true, shell: "codex-first-shell", localOnly: true, repositoryWrites: false, codexRuntime: true });
   const unauthorized = await fetch(new URL("api/bootstrap", url));
   assert.equal(unauthorized.status, 401);
   const bootstrap = await fetch(new URL("api/bootstrap", url), { headers: { authorization: `Bearer ${token}` } });

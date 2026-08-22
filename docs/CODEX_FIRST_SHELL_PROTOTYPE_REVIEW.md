@@ -6,7 +6,7 @@ not final visual approval, a public release, or a DSH dependency.
 Run:
 
 ```text
-npm run prototype:codex-shell
+npm run shell:codex
 ```
 
 The host binds only to loopback, starts one local Codex app-server, prints a

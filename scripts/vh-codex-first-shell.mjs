@@ -8,13 +8,13 @@ import { fileURLToPath } from "node:url";
 import { CodexAppServerClient } from "../packages/codex-adapter/client.mjs";
 import { CodexProjectsAdapter, publicCodexThread } from "../packages/codex-adapter/projects.mjs";
 import { buildTaskContextPacket, startTaskContextThread, taskLinkFromPreview } from "../packages/codex-adapter/task-context.mjs";
-import { eventWindow } from "../apps/codex-first-shell-prototype/event-window.mjs";
-import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell-prototype/server-request-registry.mjs";
+import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
+import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
 import { documents, loadRepository } from "../skills/scripts/vh.mjs";
 
 const sourceRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const assetRoot = join(sourceRoot, "apps", "codex-first-shell-prototype");
+const assetRoot = join(sourceRoot, "apps", "codex-first-shell");
 const argv = process.argv.slice(2);
 const flag = (name) => {
   const index = argv.indexOf(name);
@@ -489,7 +489,7 @@ const server = createServer(async (request, response) => {
     requireLocal(request);
     const url = new URL(request.url ?? "/", origin);
     if (url.pathname === "/health") {
-      json(response, 200, { ok: true, prototype: "codex-first-shell", localOnly: true, repositoryWrites: false, codexRuntime: true });
+      json(response, 200, { ok: true, shell: "codex-first-shell", localOnly: true, repositoryWrites: false, codexRuntime: true });
       return;
     }
     if (assets.has(url.pathname)) {
@@ -528,7 +528,7 @@ const server = createServer(async (request, response) => {
 });
 
 server.on("error", (error) => {
-  process.stderr.write(`Unable to start Codex-first prototype: ${error.code ?? error.message}\n`);
+  process.stderr.write(`Unable to start the Codex-first shell: ${error.code ?? error.message}\n`);
   process.exitCode = 1;
 });
 
@@ -537,7 +537,7 @@ server.listen(requestedPort, "127.0.0.1", () => {
   origin = `http://127.0.0.1:${address.port}`;
   const url = `${origin}/#${token}`;
   const envelope = { ok: true, url, pid: process.pid, localOnly: true, repositoryWrites: false, codexRuntime: true };
-  process.stdout.write(`${argv.includes("--json") ? JSON.stringify(envelope) : `VibeHub Codex-first prototype: ${url}`}\n`);
+  process.stdout.write(`${argv.includes("--json") ? JSON.stringify(envelope) : `VibeHub Codex-first shell: ${url}`}\n`);
 });
 
 async function stop() {

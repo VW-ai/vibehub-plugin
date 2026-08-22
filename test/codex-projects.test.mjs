@@ -123,8 +123,8 @@ test("object contract keeps Codex Project, cwd, VibeHub Project, Chat, and Task 
 test("browser Project movement contract requires real pointer, keyboard, focus, live region, and cleanup proof", async () => {
   const [scenarioText, script, html, preparer] = await Promise.all([
     readFile(new URL("../docs/proposals/codex-projects/browser-e2e-contract.json", import.meta.url), "utf8"),
-    readFile(new URL("../apps/codex-first-shell-prototype/app.js", import.meta.url), "utf8"),
-    readFile(new URL("../apps/codex-first-shell-prototype/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../apps/codex-first-shell/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../apps/codex-first-shell/index.html", import.meta.url), "utf8"),
     readFile(new URL("../packages/codex-adapter/prepare-project-browser-e2e.mjs", import.meta.url), "utf8"),
   ]);
   const scenario = JSON.parse(scenarioText);

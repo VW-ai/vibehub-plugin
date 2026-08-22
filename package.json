@@ -26,7 +26,7 @@
     "prototype:codex-base": "node scripts/vh-harness-codex-base.mjs",
     "prototype:dsh-palette": "node scripts/vh-dsh-palette-explorer.mjs",
     "prototype:dsh-shell": "node scripts/vh-dsh-persistent-shell-prototype.mjs",
-    "prototype:codex-shell": "node scripts/vh-codex-first-shell-prototype.mjs",
+    "shell:codex": "node scripts/vh-codex-first-shell.mjs",
     "prototype:harness": "node scripts/vh-harness-prototype.mjs",
     "prototype:harness:safari": "node scripts/vh-harness-prototype.mjs --safari",
     "test": "node --test test/*.test.mjs",

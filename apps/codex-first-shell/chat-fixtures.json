@@ -56,7 +56,7 @@
             "status": "completed",
             "changes": [
               {
-                "path": "apps/codex-first-shell-prototype/app.js",
+                "path": "apps/codex-first-shell/app.js",
                 "kind": { "type": "update" },
                 "diff": "@@ -1,2 +1,3 @@\n const source = 'app-server';\n+const renderer = 'codex-native';"
               }

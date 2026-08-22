@@ -46,7 +46,7 @@ The executable form of these semantics is checked in at
 
 ## Prototype review path
 
-Run `npm run prototype:codex-shell`, then verify:
+Run `npm run shell:codex`, then verify:
 
 1. first load lands on the Chat welcome and the Composer remains available;
 2. Sidebar labels are `Needs you` and `Recent chats`, never two different lists
