@@ -232,6 +232,7 @@ function syncThreadLocation() {
 }
 
 function setRoute(route) {
+  captureRequestDrafts(surface);
   state.route = route;
   closeMobileSidebar(false);
   const activeRoute = route === "task" ? "tasks" : route;
@@ -627,6 +628,12 @@ function rememberRequestDraft(target) {
   saveRequestDraft(state.requestDrafts, form.dataset.requestForm, requestDraftFromForm(form));
 }
 
+// Snapshot every pending request form before its DOM is torn down, so values
+// set without an input event (autofill, password managers) survive as well.
+function captureRequestDrafts(root) {
+  for (const form of $$("[data-request-form]", root)) saveRequestDraft(state.requestDrafts, form.dataset.requestForm, requestDraftFromForm(form));
+}
+
 function restoreRequestDrafts(root) {
   const forms = root.matches?.("[data-request-form]") ? [root] : $$("[data-request-form]", root);
   for (const form of forms) {
@@ -687,6 +694,7 @@ function patchTimeline(container, markup) {
       const focused = existing.contains(document.activeElement) ? document.activeElement : null;
       const signature = focusSignature(focused, existing);
       const disclosures = disclosureStates(existing);
+      captureRequestDrafts(existing);
       existing.replaceWith(next);
       restoreDisclosureStates(disclosures, next);
       restoreRequestDrafts(next);
@@ -725,6 +733,7 @@ function renderChat({ preserveScroll = false } = {}) {
       ? "Codex response updated. The selected passage keeps its current text until you release the selection."
       : state.running ? "Codex response updated." : "Codex response settled.";
   } else {
+    captureRequestDrafts(surface);
     surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
     restoreRequestDrafts(surface);
   }
@@ -839,7 +848,7 @@ function renderTaskConversation({ preserveScroll = false } = {}) {
   const heldScrollTop = timeline.scrollTop;
   const distanceFromBottom = timeline.scrollHeight - timeline.scrollTop - timeline.clientHeight;
   if (preserveScroll) patchTimeline(timeline, turnsMarkup(state.activeThread));
-  else { timeline.innerHTML = turnsMarkup(state.activeThread); restoreRequestDrafts(timeline); }
+  else { captureRequestDrafts(timeline); timeline.innerHTML = turnsMarkup(state.activeThread); restoreRequestDrafts(timeline); }
   requestAnimationFrame(() => {
     if (selecting) timeline.scrollTop = heldScrollTop;
     else if (!preserveScroll || distanceFromBottom < 96) timeline.scrollTop = timeline.scrollHeight;
@@ -868,6 +877,7 @@ function renderTaskWorkspace() {
   const roomNames = [...new Set(effectiveContexts.map((item) => item.room))].sort();
   const projectLabel = packet?.project.scope === "standalone" ? "Standalone Task" : packet?.project.name ?? state.bootstrap.graph.project.name;
   setRouteHeader(humanize(handoff.ticketId), `Task Workspace · ${handoff.nextAction.action}`, { back: true });
+  captureRequestDrafts(surface);
   surface.innerHTML = `<div class="task-workspace"><header class="task-hero"><div><span class="eyebrow">TASK · ${escapeHtml(projectLabel)}</span><h1>${escapeHtml(humanize(handoff.ticketId))}</h1><p>${escapeHtml(handoff.outcome)}</p></div><span class="task-phase"><i></i>${phase}${substate(ticket) ? ` · ${substate(ticket)}` : ""}</span></header><div class="workspace-grid"><div class="workspace-main"><section class="task-intent"><span class="eyebrow">CONTEXT SPACE</span><h2>What this Task is here to finish</h2><p>${escapeHtml(handoff.context)}</p><details><summary>Acceptance and constraints <span>${handoff.acceptance.length}</span></summary><div class="acceptance-list">${handoff.acceptance.map((item) => `<div class="acceptance-row"><i>${handoff.evidence.some((evidence) => evidence.acceptanceIds.includes(item.acceptance_id)) ? "✓" : "○"}</i><span>${escapeHtml(item.criterion)}</span></div>`).join("")}</div>${handoff.constraints?.length ? `<ul class="constraint-list">${handoff.constraints.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}</details></section><section class="task-context-panel"><header><div><span class="eyebrow">CONTEXT FOR THE NEXT TURN</span><h2>${contextCount} governed item${contextCount === 1 ? "" : "s"}</h2></div><span>${escapeHtml(roomNames.join(" · ") || "No Room required")}</span></header><p>Included by the Task contract or selected here for one Turn. Reading never grants writeback.</p>${taskContextSelectionMarkup()}<details class="packet-inspector"><summary>Inspect host-owned packet</summary><pre>${escapeHtml(JSON.stringify(packet, null, 2))}</pre></details></section><section class="task-conversation-section"><header><div><span class="eyebrow">TASK CONVERSATION</span><h2>${linked ? escapeHtml(titleForThread(linked)) : "No Codex Thread yet"}</h2></div>${linked ? `<button class="secondary-button" type="button" data-thread-id="${escapeHtml(linked.id)}">Open as Chat</button>` : ""}</header><p>${linked ? "Human messages can explore, steer, approve or interrupt this Task. Codex owns the Thread; VibeHub owns the Task contract." : "Start the recommended action to open a persistent Codex Thread with the exact packet above."}</p><div class="task-conversation-timeline" id="taskConversationTimeline">${state.activeThread ? turnsMarkup(state.activeThread) : '<div class="task-conversation-empty">The first Turn will carry the canonical Task packet. No transcript is invented before that.</div>'}</div></section></div><aside class="workspace-aside"><section class="recommended-section"><span class="eyebrow">RECOMMENDED ACTION</span><button class="recommended" type="button" ${linked ? "data-focus-task-composer" : `data-task-action="${escapeHtml(handoff.nextAction.action)}"`} ${["WAIT", "DONE"].includes(handoff.nextAction.action) && !linked ? "disabled" : ""}><strong>${escapeHtml(actionLabel)}</strong><span>→</span></button><p>${linked ? "Continue in the Task conversation below." : "The local host assembles Project, Context, authority and source citations."}</p></section><section><span class="eyebrow">CURRENT WORK</span><h3>${linked ? `Thread ${escapeHtml(linked.id.slice(0, 8))}…` : "Not started"}</h3><p>${state.running ? "Codex is running now." : linked ? "Thread is ready for the next Turn." : "No execution claim."}</p></section><section><span class="eyebrow">PROOF</span><h3>${handoff.evidence.length} Evidence</h3><p>${handoff.acceptance.length} acceptance criteria · Outcome ${handoff.outcomeRecord ? handoff.outcomeRecord.status : "pending"}</p></section><section><span class="eyebrow">ROOMS & SOURCE</span><p>${escapeHtml(roomNames.join(" · ") || "Standalone")}</p><p>${escapeHtml(handoff.reviewInputs.ticketRef)}<br><strong>${escapeHtml(handoff.reviewInputs.commit?.slice(0, 10) ?? "working tree")}</strong></p></section></aside></div></div>`;
   restoreRequestDrafts(surface);
   syncComposerMode();

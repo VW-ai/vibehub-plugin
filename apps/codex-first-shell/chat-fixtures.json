@@ -107,7 +107,7 @@
             "type": "userMessage",
             "id": "fixture-interrupt-user",
             "clientId": "fixture-interrupt-client",
-            "content": [{ "type": "text", "text": "Stop this Turn before it finishes." }]
+            "content": [{ "type": "text", "text": "> Replay is durable history.\n> — Quoted from Codex thread fixture-chat-parity · turn fixture-turn-1 · item fixture-agent\n\nStop this Turn before it finishes." }]
           }
         ]
       }

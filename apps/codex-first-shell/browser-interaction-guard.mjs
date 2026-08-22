@@ -15,20 +15,36 @@ export async function runBrowserInteractionGuard(hooks) {
   const results = [];
   const fixture = await fetch("/chat-fixtures.json").then((response) => response.json());
   const originalTheme = document.documentElement.dataset.theme || "system";
+  const originalHref = location.href;
   const openSidebar = document.querySelector("#openSidebar");
   const closeSidebar = document.querySelector("#collapseSidebar");
   const sidebar = document.querySelector("#sidebar");
   const main = document.querySelector(".main-column");
 
-  openSidebar.focus();
-  openSidebar.click();
-  await frame();
-  check(results, "narrow drawer opens", openSidebar.getAttribute("aria-expanded") === "true" && !sidebar.inert && main.inert);
-  check(results, "drawer receives focus", sidebar.contains(document.activeElement), document.activeElement?.id);
-  closeSidebar.click();
-  await frame();
-  check(results, "narrow drawer closes", openSidebar.getAttribute("aria-expanded") === "false" && sidebar.inert && !main.inert);
-  check(results, "drawer returns focus", document.activeElement === openSidebar, document.activeElement?.id);
+  const appShell = document.querySelector("#appShell");
+  const narrowLayout = () => document.body.dataset.reviewFrame === "narrow" || matchMedia("(max-width: 760px)").matches;
+  if (narrowLayout()) {
+    openSidebar.focus();
+    openSidebar.click();
+    await frame();
+    check(results, "narrow drawer opens", openSidebar.getAttribute("aria-expanded") === "true" && !sidebar.inert && main.inert);
+    check(results, "drawer receives focus", sidebar.contains(document.activeElement), document.activeElement?.id);
+    closeSidebar.click();
+    await frame();
+    check(results, "narrow drawer closes", openSidebar.getAttribute("aria-expanded") === "false" && sidebar.inert && !main.inert);
+    check(results, "drawer returns focus", document.activeElement === openSidebar, document.activeElement?.id);
+  } else {
+    // Wide layout: the sidebar is persistent, never inert, and the collapse
+    // control toggles width without trapping or moving focus.
+    check(results, "wide sidebar is persistent and reachable", !sidebar.inert && sidebar.getAttribute("aria-hidden") === "false" && !sidebar.hasAttribute("aria-modal") && getComputedStyle(openSidebar).display === "none" && !main.inert);
+    closeSidebar.focus();
+    closeSidebar.click();
+    await frame();
+    check(results, "wide sidebar collapses without trapping focus", appShell.classList.contains("sidebar-collapsed") && !sidebar.inert && !main.inert && document.activeElement === closeSidebar, document.activeElement?.id);
+    closeSidebar.click();
+    await frame();
+    check(results, "wide sidebar expands again", !appShell.classList.contains("sidebar-collapsed") && !sidebar.inert);
+  }
 
   const searchTrigger = document.querySelector("#searchButton");
   searchTrigger.focus();
@@ -62,6 +78,50 @@ export async function runBrowserInteractionGuard(hooks) {
   check(results, "typing Other selects its exact option", otherRadio?.checked === true);
   check(results, "request draft and focus survive reconciliation", other?.value === "Custom path" && secret?.value === "fixture-secret" && document.activeElement === other);
 
+  // An intentional route change through the real navigation rebuilds the
+  // Chat surface; the request card must come back with its typed draft.
+  openSidebar.click();
+  await frame();
+  document.querySelector('.primary-nav [data-route="tasks"]').click();
+  await frame();
+  const tasksVisible = Boolean(document.querySelector(".tasks-view"));
+  openSidebar.click();
+  await frame();
+  document.querySelector('.primary-nav [data-route="chat"]').click();
+  await frame();
+  const restoredRequest = document.querySelector('[data-request-id="fixture-user-input"]');
+  const restoredOther = restoredRequest?.querySelector('[data-request-other="approach"]');
+  const restoredRadio = restoredOther?.closest(".request-other")?.querySelector('input[type="radio"]');
+  const restoredSecret = restoredRequest?.querySelector('[data-request-answer="token"]');
+  check(results, "request draft survives an intentional route change", tasksVisible && restoredRequest && restoredRequest !== request && restoredOther?.value === "Custom path" && restoredRadio?.checked === true && restoredSecret?.value === "fixture-secret", `${tasksVisible}/${restoredOther?.value}/${restoredSecret?.value}`);
+
+  // Selection held across a streamed update: the selected entry keeps its
+  // mounted node while the rest of the Turn streams, then reconciles once
+  // the selection is released.
+  const agentEntry = document.querySelector('[data-item-id$="fixture-agent"]');
+  const paragraph = agentEntry?.querySelector(".agent-response p");
+  const selection = window.getSelection();
+  let heldText = "";
+  if (paragraph) {
+    const range = document.createRange();
+    range.selectNodeContents(paragraph);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    heldText = selection.toString();
+  }
+  const streamed = structuredClone(fixture.thread);
+  const streamedAgent = streamed.turns[0].items.find((item) => item.id === "fixture-agent");
+  streamedAgent.text = `${streamedAgent.text}\n\nStreamed continuation that must not replace the selected passage.`;
+  const streamedCommand = streamed.turns[0].items.find((item) => item.id === "fixture-command");
+  streamedCommand.aggregatedOutput = `${streamedCommand.aggregatedOutput}✓ streamed while a passage was selected\n`;
+  await hooks.reconcileFixtureThread(streamed);
+  const heldEntry = document.querySelector('[data-item-id$="fixture-agent"]')?.closest(".timeline-entry");
+  check(results, "streaming never replaces a selected transcript entry", heldText.length > 20 && selection.toString() === heldText && heldEntry?.hasAttribute("data-paint-deferred") && agentEntry?.isConnected && !agentEntry.textContent.includes("Streamed continuation"), `${heldText.length}/${selection.toString().length}`);
+  check(results, "unselected entries keep streaming around the selection", Boolean(document.querySelector(".terminal-output")?.textContent.includes("streamed while a passage was selected")));
+  selection.removeAllRanges();
+  const released = await waitFor(() => document.querySelector('[data-item-id$="fixture-agent"]')?.textContent.includes("Streamed continuation") && !document.querySelector("[data-paint-deferred]"));
+  check(results, "releasing the selection reconciles the held entry", released);
+
   const originalComposer = document.querySelector("#composerInput");
   originalComposer.value = "draft owned by the original Thread";
   document.querySelector("[data-quote-message]")?.click();
@@ -72,6 +132,41 @@ export async function runBrowserInteractionGuard(hooks) {
   document.querySelector("#composerInput").value = "secondary draft";
   await hooks.switchFixtureThread(fixture.thread);
   check(results, "returning restores only that Thread draft", document.querySelector("#composerInput").value === "draft owned by the original Thread" && !document.querySelector("#quoteTray").hidden);
+
+  const quoteActions = [];
+  await hooks.withFixtureTransport(async (payload) => {
+    quoteActions.push(payload);
+    if (payload.action === "startTurn") return { turn: { id: "fixture-quote-turn" } };
+    if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+    return {};
+  }, async () => {
+    document.querySelector("#composer").requestSubmit();
+    await waitFor(() => quoteActions.some((entry) => entry.action === "readThread"));
+  });
+  const sentText = quoteActions.find((entry) => entry.action === "startTurn")?.input?.find((entry) => entry.type === "text")?.text ?? "";
+  check(results, "Quote serializes exact source identity into the Turn input", sentText.includes(`> — Quoted from Codex thread ${fixture.thread.id} · turn fixture-turn-1 · item fixture-agent`) && sentText.endsWith("draft owned by the original Thread"), sentText.slice(0, 80));
+  const replayed = structuredClone(fixture.thread);
+  replayed.turns.push({ id: "fixture-turn-quote", status: "completed", items: [{ type: "userMessage", id: "fixture-quote-user", content: [{ type: "text", text: sentText }] }] });
+  await hooks.reconcileFixtureThread(replayed);
+  const replayedChip = document.querySelector('.turn.user .quote-source[data-quote-item="fixture-agent"]');
+  check(results, "replayed quote renders its durable source identity", replayedChip?.getAttribute("aria-label") === `Quoted from Thread ${fixture.thread.id} · Turn fixture-turn-1 · Item fixture-agent` && replayedChip.textContent.includes("this Thread"), replayedChip?.getAttribute("aria-label") ?? "missing");
+
+  const composerInput = document.querySelector("#composerInput");
+  composerInput.value = Array.from({ length: 80 }, (_, index) => `line ${index + 1}`).join("\n");
+  composerInput.dispatchEvent(new InputEvent("input", { bubbles: true }));
+  await frame();
+  const ceiling = Number.parseFloat(getComputedStyle(composerInput).maxHeight);
+  check(results, "Composer growth stops at the CSS ceiling", Number.isFinite(ceiling) && Number.parseFloat(composerInput.style.height) === ceiling && composerInput.getBoundingClientRect().height <= ceiling + 1 && composerInput.scrollHeight > ceiling, `${composerInput.style.height}/${ceiling}px`);
+  composerInput.value = "";
+  composerInput.dispatchEvent(new InputEvent("input", { bubbles: true }));
+  document.querySelector("[data-quote-message]")?.click();
+  await frame();
+  const quoteTray = document.querySelector("#quoteTray");
+  const quoteShown = !quoteTray.hidden;
+  quoteTray.querySelector("[data-remove-quote]")?.click();
+  await frame();
+  const attachmentInput = document.querySelector("#attachmentInput");
+  check(results, "text, image and ordinary audio inputs stay available and quote context is removable", quoteShown && quoteTray.hidden && attachmentInput?.accept === "image/*,audio/*" && document.querySelector("#voiceButton")?.getAttribute("aria-label") === "Record voice input" && composerInput.getAttribute("aria-label") === "Message Codex");
 
   await hooks.switchFixtureThread(fixture.activeThread);
   const activeComposer = document.querySelector("#composer");
@@ -112,6 +207,14 @@ export async function runBrowserInteractionGuard(hooks) {
   });
   check(results, "Fork dispatches exact source Thread", forkActions[0]?.action === "forkThread" && forkActions[0]?.threadId === fixture.secondaryThread.id);
   check(results, "Fork opens returned lineage", document.querySelector(".thread-heading")?.textContent.includes("Forked fixture chat") && forked.forkedFromId === fixture.secondaryThread.id);
+  check(results, "Fork navigation updates the Thread deep link", new URL(location.href).searchParams.get("thread") === forked.id, location.search);
+  const longThread = structuredClone(fixture.secondaryThread);
+  longThread.turns = [{ id: "fixture-long-turn", status: "completed", items: Array.from({ length: 300 }, (_, index) => ({ type: "agentMessage", id: `fixture-long-${index}`, text: `Item ${index}` })) }];
+  await hooks.reconcileFixtureThread(longThread);
+  const omissionNote = document.querySelector("#turns > .timeline-omission");
+  const mountedEntries = document.querySelectorAll("#turns > .timeline-entry:not(.timeline-omission)").length;
+  check(results, "mounted timeline discloses its bound", Boolean(omissionNote?.textContent.includes("60 earlier items")) && mountedEntries === 240, `${mountedEntries} mounted · ${omissionNote?.textContent.slice(0, 40) ?? "no disclosure"}`);
+  check(results, "deferred model, mode and realtime controls make no contrary claim", [...document.querySelectorAll(".composer-setting")].every((node) => node.tagName === "SPAN") && !document.querySelector("[data-model-picker], [data-mode-picker], [aria-label*='realtime' i], [aria-label*='model' i], [aria-label*='collaboration mode' i]"));
   await hooks.switchFixtureThread(fixture.thread);
 
   openSidebar.focus();
@@ -141,6 +244,7 @@ export async function runBrowserInteractionGuard(hooks) {
     : !composer.dataset.currentTurnId && stop.hidden && send.getAttribute("aria-label") === "Send message");
   check(results, "terminal mixed fixture makes no false live claim", !document.querySelector(".turn-boundary") || !running);
 
+  if (location.href !== originalHref) history.replaceState(history.state, "", originalHref);
   const summary = { ok: results.every((entry) => entry.pass), passed: results.filter((entry) => entry.pass).length, total: results.length, results };
   const output = document.createElement("section");
   output.id = "interactionGuardResult";

@@ -320,6 +320,8 @@ test("request-user-input drafts survive route changes and resolve to exact answe
   assert.match(renderChatSource, /surface\.innerHTML = `<div class="chat-view">[^]*restoreRequestDrafts\(surface\);/, "a full Chat render restores every pending request draft");
   assert.match(script.slice(script.indexOf("function renderTaskWorkspace"), script.indexOf("function renderRooms")), /restoreRequestDrafts\(surface\)/);
   assert.match(script.slice(script.indexOf("function patchTimeline"), script.indexOf("function renderChat(")), /restoreRequestDrafts\(next\)/);
+  assert.match(script, /function setRoute\(route\) \{\s*captureRequestDrafts\(surface\);/, "a route change snapshots pending request forms before the surface is torn down");
+  assert.match(script.slice(script.indexOf("function patchTimeline"), script.indexOf("function renderChat(")), /captureRequestDrafts\(existing\);\s*existing\.replaceWith\(next\);/);
   assert.match(script, /const \{ answers, invalid \} = answersFromDraft\(requestDraftFromForm\(form\)\);/);
   assert.match(script, /state\.requestDrafts\.delete\(requestId\)/);
   assert.equal((script.match(/pruneRequestDrafts\(state\.requestDrafts, state\.knownRequestIds\)/g) ?? []).length, 2, "bootstrap and polling both prune resolved requests");
