@@ -1,4 +1,4 @@
-import { applyChatEvent, canonicalTimeline } from "./chat-model.mjs";
+import { applyChatEvent, canonicalTimeline, timelineWindow } from "./chat-model.mjs";
 import {
   DOM_LIMITS,
   createRenderBudget,
@@ -6,6 +6,7 @@ import {
   renderAgentMessage,
   renderGeneratedImage,
   renderMarkdown,
+  renderTimelineOmission,
   renderToolContent,
   renderUserMedia,
   renderUserMessageText,
@@ -602,9 +603,9 @@ function renderTimelineItems(items) {
 }
 
 function turnsMarkup(thread) {
-  const items = canonicalTimeline(thread, state, { limit: 240 });
+  const mounted = timelineWindow(thread, state, { limit: 240 });
   const approvals = state.pendingRequests.filter((request) => request.params?.threadId === state.activeThreadId);
-  return renderTimelineItems(items) + approvals.map((request) => `<div class="timeline-entry" data-render-key="request-${escapeHtml(request.id)}">${approvalMarkup(request)}</div>`).join("");
+  return renderTimelineOmission(mounted.omitted) + renderTimelineItems(mounted.items) + approvals.map((request) => `<div class="timeline-entry" data-render-key="request-${escapeHtml(request.id)}">${approvalMarkup(request)}</div>`).join("");
 }
 
 function disclosureStates(root = surface) {

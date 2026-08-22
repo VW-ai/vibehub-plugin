@@ -192,6 +192,11 @@ export function renderMarkdown(value, budget = createRenderBudget(), maximum = D
   return `${renderBlocks(lines, budget, 0, { codeIndex: 0 })}${omissionMarkup(bounded.omitted)}`;
 }
 
+export function renderTimelineOmission(omitted) {
+  if (!omitted) return "";
+  return `<div class="timeline-entry timeline-omission" data-render-key="timeline-omission" role="note">${omitted.toLocaleString()} earlier items are not mounted in this view. Durable Thread history remains authoritative.</div>`;
+}
+
 export function renderQuoteSource(source, currentThreadId = null) {
   if (!source) return "";
   const identity = `Thread ${source.threadId} · Turn ${source.turnId} · Item ${source.itemId}`;

@@ -175,7 +175,9 @@ export function applyChatEvent(model, method, params = {}) {
   return false;
 }
 
-export function canonicalTimeline(thread, model, { limit = 240 } = {}) {
+// The mounted window is the accepted 240-item tail; the omitted count is
+// returned so the UI can disclose the bound instead of silently truncating.
+export function timelineWindow(thread, model, { limit = 240 } = {}) {
   const threadId = thread?.id;
   const replay = (thread?.turns ?? []).flatMap((turn) => {
     const items = (turn.items ?? []).map((item) => {
@@ -207,7 +209,13 @@ export function canonicalTimeline(thread, model, { limit = 240 } = {}) {
   const live = transient.filter((item) => item._threadId === threadId && !authoritativeTurnIds.has(item._turnId) && !replayIds.has(item._key));
   const errorIds = new Set(replay.map((item) => item._key));
   const errors = [...model.turnErrors.values()].filter((item) => item._threadId === threadId && !authoritativeTurnIds.has(item._turnId) && !errorIds.has(item._key));
-  return [...replay, ...live, ...errors].slice(-limit);
+  const all = [...replay, ...live, ...errors];
+  const items = all.slice(-limit);
+  return { items, omitted: all.length - items.length, total: all.length };
+}
+
+export function canonicalTimeline(thread, model, options = {}) {
+  return timelineWindow(thread, model, options).items;
 }
 
 export function boundedText(value, maximum = 20_000) {

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { applyChatEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT } from "../apps/codex-first-shell/chat-model.mjs";
+import { applyChatEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
 import { loadThreadDraft, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
 import { clampComposerHeight, composerBounds, COMPOSER_HEIGHT_FALLBACK } from "../apps/codex-first-shell/composer-sizing.mjs";
 import {
@@ -11,6 +11,7 @@ import {
   renderGeneratedImage,
   renderMarkdown,
   renderMemoryCitations,
+  renderTimelineOmission,
   renderToolContent,
   renderUserMedia,
   renderUserMessageText,
@@ -375,6 +376,36 @@ test("selection-preserving reconciliation defers only the entries a live selecti
   assert.doesNotMatch(script, /selectionDeferralStartedAt|deferredChatRender|1_200/, "no timer-bounded whole-paint deferral remains");
   assert.match(css, /\[data-paint-deferred\]/);
   assert.match(host, /\["\/timeline-reconcile\.mjs", script\("timeline-reconcile\.mjs"\)\]/);
+});
+
+test("mounted timeline discloses its 240-item bound instead of truncating silently", async () => {
+  const model = { liveItems: new Map(), turnErrors: new Map() };
+  const thread = { id: "long", turns: [{ id: "many", status: "completed", items: Array.from({ length: 300 }, (_, index) => ({ id: `item-${index}`, type: "agentMessage", text: String(index) })) }] };
+  const mounted = timelineWindow(thread, model, { limit: 240 });
+  assert.deepEqual([mounted.items.length, mounted.omitted, mounted.total], [240, 60, 300]);
+  assert.equal(mounted.items[0].id, "item-60");
+  assert.deepEqual(timelineWindow({ id: "short", turns: [] }, model), { items: [], omitted: 0, total: 0 });
+  assert.equal(renderTimelineOmission(0), "");
+  assert.match(renderTimelineOmission(60), /^<div class="timeline-entry timeline-omission" data-render-key="timeline-omission" role="note">60 earlier items are not mounted in this view\. Durable Thread history remains authoritative\.<\/div>$/);
+  const script = await source("apps/codex-first-shell/app.js");
+  assert.match(script, /const mounted = timelineWindow\(thread, state, \{ limit: 240 \}\);[^]*renderTimelineOmission\(mounted\.omitted\) \+ renderTimelineItems\(mounted\.items\)/);
+});
+
+test("deferred model, mode, realtime-voice and virtualization checks make no contrary UI claim", async () => {
+  const [html, script, host] = await Promise.all([
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("scripts/vh-codex-first-shell.mjs"),
+  ]);
+  assert.match(html, /<span class="composer-setting" title="Current mode">Agent<\/span>/);
+  assert.match(html, /<span class="composer-setting" title="Current runtime">Codex<\/span>/);
+  const interactive = [...html.matchAll(/<(?:select|button|input|details)\b[^>]*>/g)].map((match) => match[0]);
+  assert.ok(interactive.length > 10);
+  for (const tag of interactive) assert.doesNotMatch(tag, /\b(?:model|mode|picker|realtime)\b/i, `no enabled model, mode or realtime control: ${tag}`);
+  assert.doesNotMatch(script, /realtime/i, "the browser never renders a realtime voice control");
+  assert.match(host, /realtimeConversation: false/);
+  assert.match(html, /Realtime conversation stays unavailable until the runtime reports support/);
+  assert.match(script, /renderTimelineOmission\(mounted\.omitted\)/, "the 240-item mounted bound discloses itself");
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {
