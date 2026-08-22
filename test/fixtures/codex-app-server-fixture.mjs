@@ -193,7 +193,9 @@ const handlers = {
   },
   "turn/start": (params, id) => {
     const thread = requireThread(params);
-    const turn = { id: nextId("fixture-turn"), status: "inProgress", items: [] };
+    // Like the real app-server, the Turn input is persisted as this Turn's
+    // userMessage item, so thread/read replays the exact bytes a client sent.
+    const turn = { id: nextId("fixture-turn"), status: "inProgress", items: [{ type: "userMessage", id: nextId("fixture-item"), content: params.input }] };
     thread.turns.push(turn);
     thread.preview = thread.preview || params.input.find((item) => item.type === "text")?.text?.slice(0, 4_000) || "";
     thread.updatedAt = now();
@@ -209,7 +211,10 @@ const handlers = {
     return { turn };
   },
   "turn/steer": (params) => {
-    requireThread(params);
+    const thread = requireThread(params);
+    const turn = thread.turns.find((item) => item.id === params.expectedTurnId);
+    if (!turn) throw Object.assign(new Error(`Unknown turn ${params.expectedTurnId}`), { code: -32602 });
+    turn.items.push({ type: "userMessage", id: nextId("fixture-item"), content: params.input });
     return { turnId: params.expectedTurnId };
   },
   "turn/interrupt": (params) => {
