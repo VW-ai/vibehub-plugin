@@ -1,15 +1,19 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { CODEX_PROJECT_CAPABILITIES, CodexProjectsAdapter, PINNED_THREAD_SECTION_ID } from "../packages/codex-adapter/projects.mjs";
+import { CODEX_PROJECT_CAPABILITIES, CodexProjectsAdapter, PINNED_THREAD_SECTION_ID, canonicalFolder, sectionEligibility } from "../packages/codex-adapter/projects.mjs";
+
+// Stands in for the app-server's own realpath: the symlinked macOS /tmp and
+// its real /private/tmp target name the same folder.
+const resolveFolder = (path) => (typeof path === "string" ? path.replace(/^\/tmp\//u, "/private/tmp/") : null);
 
 class FakeClient {
   constructor() {
     this.calls = [];
     this.sections = [{ id: "section-a", name: "Alpha" }];
     this.threads = [
-      { id: "thread-recent", name: "Recent", preview: "", section: null, forkedFromId: null },
-      { id: "thread-alpha", name: "Alpha chat", preview: "", section: this.sections[0], forkedFromId: null },
+      { id: "thread-recent", name: "Recent", preview: "", cwd: "/tmp/repo", section: null, forkedFromId: null },
+      { id: "thread-alpha", name: "Alpha chat", preview: "", cwd: "/tmp/repo", section: this.sections[0], forkedFromId: null },
     ];
   }
 
@@ -17,9 +21,13 @@ class FakeClient {
     this.calls.push({ method, params });
     if (method === "threadSection/list") return { data: this.sections, nextCursor: null };
     if (method === "thread/list") {
-      let data = this.threads;
+      let data = this.threads.filter((thread) => Boolean(thread.archived) === Boolean(params.archived));
       if (Object.hasOwn(params, "sectionId")) data = data.filter((thread) => (thread.section?.id ?? null) === params.sectionId);
       if (params.searchTerm) data = data.filter((thread) => thread.name.includes(params.searchTerm));
+      if (params.cwd !== undefined) {
+        const wanted = new Set((Array.isArray(params.cwd) ? params.cwd : [params.cwd]).map(resolveFolder));
+        data = data.filter((thread) => wanted.has(resolveFolder(thread.cwd)));
+      }
       return { data, nextCursor: null };
     }
     if (method === "thread/read") return { thread: this.threads.find((thread) => thread.id === params.threadId) };
@@ -101,6 +109,79 @@ test("fork placement failure stays truthful and leaves the native fork visible i
     fallback: "fork-remains-visible-in-unsectioned-recents",
     error: "Project disappeared",
   });
+});
+
+test("a folder scope forwards cwd to every native list and only counts the history that lives elsewhere", async () => {
+  const client = new FakeClient();
+  const elsewhere = { id: "section-elsewhere", name: "Other repo" };
+  const mixed = { id: "section-mixed", name: "Mixed" };
+  const fresh = { id: "section-fresh", name: "Fresh" };
+  client.sections.push(elsewhere, mixed, fresh);
+  client.threads.push(
+    { id: "thread-foreign-recent", name: "Foreign recent", preview: "", cwd: "/tmp/other", section: null, forkedFromId: null },
+    { id: "thread-foreign-grouped", name: "Foreign grouped", preview: "", cwd: "/tmp/other", section: elsewhere, forkedFromId: null },
+    { id: "thread-mixed-here", name: "Mixed here", preview: "", cwd: "/private/tmp/repo", section: mixed, forkedFromId: null },
+    { id: "thread-mixed-there", name: "Mixed there", preview: "", cwd: "/tmp/other", section: mixed, forkedFromId: null },
+    { id: "thread-archived-here", name: "Archived here", preview: "", cwd: "/tmp/repo", section: null, forkedFromId: null, archived: true },
+  );
+  const adapter = new CodexProjectsAdapter({ client, resolveFolder });
+  const snapshot = await adapter.snapshot({ cwd: "/tmp/repo" });
+  const lists = client.calls.filter(({ method }) => method === "thread/list");
+  const scopedLists = lists.filter(({ params }) => params.cwd !== undefined);
+  assert.equal(scopedLists.length, 5, "Recents plus every section is queried through the native folder filter");
+  for (const { params } of scopedLists) assert.equal(params.cwd, "/private/tmp/repo", "the filter carries the resolved real path");
+  assert.equal(lists.filter(({ params }) => params.cwd === undefined).length, 1, "one unscoped query yields the hidden counts");
+  assert.deepEqual(snapshot.recents.map((thread) => thread.id), ["thread-recent"]);
+  assert.deepEqual(snapshot.projects.map(({ id, scopedCount, totalCount, hiddenElsewhere }) => [id, scopedCount, totalCount, hiddenElsewhere]), [
+    ["section-a", 1, 1, 0],
+    ["section-elsewhere", 0, 1, 1],
+    ["section-mixed", 1, 2, 1],
+    ["section-fresh", 0, 0, 0],
+  ]);
+  assert.ok(!snapshot.threads.some((thread) => resolveFolder(thread.cwd) !== "/private/tmp/repo"), "no Thread from another folder is ever listed");
+  assert.deepEqual(snapshot.folderScope, { cwd: "/private/tmp/repo", scopedCount: 3, totalCount: 6, hiddenChats: 3, hiddenGroups: 1 });
+  const unscoped = await new CodexProjectsAdapter({ client: new FakeClient(), resolveFolder }).snapshot();
+  assert.equal(unscoped.folderScope, null);
+  assert.equal(Object.hasOwn(unscoped.projects[0], "scopedCount"), false);
+});
+
+test("import eligibility is derived from member folders and matched by real path, never by name", async () => {
+  const client = new FakeClient();
+  const repoName = "repo";
+  const namesake = { id: "section-namesake", name: repoName };
+  const multi = { id: "section-multi", name: "Spans two folders" };
+  const empty = { id: "section-empty", name: "Nothing yet" };
+  const archivedOnly = { id: "section-archived", name: "Archived member elsewhere" };
+  client.sections.push({ id: PINNED_THREAD_SECTION_ID, name: "Pinned" }, namesake, multi, empty, archivedOnly);
+  client.threads.push(
+    { id: "thread-namesake", name: "Named like the repo", preview: "", cwd: "/tmp/other", section: namesake, forkedFromId: null },
+    { id: "thread-multi-a", name: "Multi a", preview: "", cwd: "/tmp/repo", section: multi, forkedFromId: null },
+    { id: "thread-multi-b", name: "Multi b", preview: "", cwd: "/tmp/other", section: multi, forkedFromId: null, archived: true },
+    { id: "thread-archived-elsewhere", name: "Archived elsewhere", preview: "", cwd: "/tmp/other", section: archivedOnly, forkedFromId: null, archived: true },
+    { id: "thread-pinned", name: "Pinned chat", preview: "", cwd: "/tmp/repo", section: client.sections.at(-5), forkedFromId: null },
+  );
+  const adapter = new CodexProjectsAdapter({ client, resolveFolder });
+  const result = await adapter.importableProjects({ repositoryRoot: "/tmp/repo" });
+  assert.equal(result.repositoryRoot, "/private/tmp/repo");
+  assert.equal(result.rule.byName, false);
+  assert.ok(!result.projects.some((project) => project.id === PINNED_THREAD_SECTION_ID), "Pinned is never offered for import");
+  const byId = Object.fromEntries(result.projects.map((project) => [project.id, project]));
+  assert.deepEqual([byId["section-a"].eligibility, byId["section-a"].matchesRepository, byId["section-a"].importable], ["single-folder", true, true]);
+  assert.deepEqual(byId["section-a"].folders, ["/private/tmp/repo"]);
+  assert.deepEqual([byId["section-namesake"].eligibility, byId["section-namesake"].importable], ["single-folder", false], "a matching name with a foreign folder never matches");
+  assert.match(byId["section-namesake"].reason, /different repository/);
+  assert.deepEqual([byId["section-multi"].eligibility, byId["section-multi"].importable, byId["section-multi"].memberCount, byId["section-multi"].archivedCount], ["multi-folder", false, 2, 1], "archived members still count toward the folder set");
+  assert.deepEqual([byId["section-empty"].eligibility, byId["section-empty"].importable, byId["section-empty"].folders], ["empty", false, []]);
+  assert.deepEqual([byId["section-archived"].eligibility, byId["section-archived"].importable], ["single-folder", false]);
+  const archivedQueries = client.calls.filter(({ method, params }) => method === "thread/list" && params.archived === true);
+  assert.equal(archivedQueries.length, result.projects.length, "every candidate section is read with archived true as well as false");
+  assert.equal(sectionEligibility({ memberCount: 0, folders: [] }), "empty");
+  assert.equal(sectionEligibility({ memberCount: 2, folders: ["/a"] }), "single-folder");
+  assert.equal(sectionEligibility({ memberCount: 2, folders: ["/a", "/b"] }), "multi-folder");
+  assert.equal(canonicalFolder("/definitely/not/a/real/folder"), "/definitely/not/a/real/folder", "a vanished folder keeps its recorded identity");
+  assert.equal(canonicalFolder(null), null);
+  assert.equal(CODEX_PROJECT_CAPABILITIES.scope.defaultVisibility, "repository-folder-only");
+  assert.equal(CODEX_PROJECT_CAPABILITIES.binding.neverMatchedBy.includes("section name"), true);
 });
 
 test("object contract keeps Codex Project, cwd, VibeHub Project, Chat, and Task separate", async () => {
