@@ -51,6 +51,17 @@ const PROJECT_FORMAT_FILE = "version.yaml";
 const PULL_REQUEST_REF = /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/u;
 const COMMIT_REF = /^commit:[0-9a-f]{40}$/u;
 const COMMIT_HASH = /^[0-9a-f]{40}$/u;
+const SHA256_HEX = /^[0-9a-f]{64}$/u;
+const TICKET_ORIGIN_HARNESSES = new Set(["codex"]);
+const TICKET_ORIGIN_KEYS = new Set([
+  "harness",
+  "thread_id",
+  "forked_from_id",
+  "turn_id",
+  "item_id",
+  "selection",
+  "captured_at",
+]);
 
 class VibeHubError extends Error {
   constructor(code, message, details = null) {
@@ -444,6 +455,40 @@ function validateRoom(document, path = "room") {
   return errors;
 }
 
+// Ticket origin is canonical provenance: the exact harness Thread, Turn, item
+// and selection a Ticket was born from. Every key is present (null where the
+// value is absent) so one origin has exactly one serialization. It is never
+// derived from Thread names, previews, or transcripts.
+function validateTicketOrigin(errors, origin, path) {
+  if (!strictKeys(errors, origin, TICKET_ORIGIN_KEYS, path)) return;
+  if (!TICKET_ORIGIN_HARNESSES.has(origin.harness)) add(errors, `${path}.harness`, "must equal codex");
+  requiredString(errors, origin, "thread_id", path);
+  requiredString(errors, origin, "turn_id", path);
+  for (const key of ["forked_from_id", "item_id"]) {
+    if (origin[key] !== null && (typeof origin[key] !== "string" || origin[key].trim() === "")) {
+      add(errors, `${path}.${key}`, "must be a non-empty string or null");
+    }
+  }
+  if (origin.selection === undefined) {
+    add(errors, `${path}.selection`, "must be an object or null");
+  } else if (origin.selection !== null) {
+    const selectionPath = `${path}.selection`;
+    if (strictKeys(errors, origin.selection, new Set(["start", "end", "text_sha256"]), selectionPath)) {
+      const { start, end, text_sha256: textSha256 } = origin.selection;
+      const startValid = Number.isInteger(start) && start >= 0;
+      const endValid = Number.isInteger(end) && end >= 0;
+      if (!startValid) add(errors, `${selectionPath}.start`, "must be a non-negative integer");
+      if (!endValid) add(errors, `${selectionPath}.end`, "must be a non-negative integer");
+      else if (startValid && end < start) add(errors, `${selectionPath}.end`, "must be greater than or equal to start");
+      if (!SHA256_HEX.test(textSha256 ?? "")) add(errors, `${selectionPath}.text_sha256`, "must be 64 lowercase hex characters");
+    }
+  }
+  requiredString(errors, origin, "captured_at", path);
+  if (typeof origin.captured_at === "string" && Number.isNaN(Date.parse(origin.captured_at))) {
+    add(errors, `${path}.captured_at`, "must be an ISO-compatible date-time");
+  }
+}
+
 function validateTicket(document, path = "ticket") {
   const errors = [];
   if (
@@ -463,6 +508,7 @@ function validateTicket(document, path = "ticket") {
         "context_refs",
         "relations",
         "provenance_refs",
+        "origin",
       ]),
       path,
     )
@@ -548,6 +594,8 @@ function validateTicket(document, path = "ticket") {
     }
   });
   stringArray(errors, document.provenance_refs, `${path}.provenance_refs`);
+  // Omission is the only compatibility rule: no origin means no origin.
+  if (document.origin !== undefined) validateTicketOrigin(errors, document.origin, `${path}.origin`);
   return errors;
 }
 
