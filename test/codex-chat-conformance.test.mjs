@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { applyChatEvent, boundedText, canonicalTimeline, itemKey } from "../apps/codex-first-shell-prototype/chat-model.mjs";
+import { applyChatEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT } from "../apps/codex-first-shell-prototype/chat-model.mjs";
+import { loadThreadDraft, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell-prototype/composer-drafts.mjs";
 import {
   createRenderBudget,
   renderAgentMessage,
@@ -91,6 +92,31 @@ test("authoritative Turn completion retires retry, plan, diff and live execution
   applyChatEvent(model, "error", { threadId: "thread", turnId: "failed", error: { message: "terminal" }, willRetry: false });
   const failed = canonicalTimeline({ id: "thread", turns: [{ id: "failed", status: "failed", error: { message: "terminal" }, items: [] }] }, model);
   assert.deepEqual(failed.map((item) => item.type), ["turnBoundary"]);
+});
+
+test("live reducer memory is bounded before authoritative completion", () => {
+  const model = { liveItems: new Map(), turnErrors: new Map() };
+  for (let index = 0; index < LIVE_ITEM_LIMIT + 20; index += 1) {
+    applyChatEvent(model, "item/started", { threadId: "thread", turnId: "turn", item: { id: `item-${index}`, type: "commandExecution", status: "inProgress" } });
+  }
+  assert.equal(model.liveItems.size, LIVE_ITEM_LIMIT);
+  applyChatEvent(model, "item/agentMessage/delta", { threadId: "thread", turnId: "large", itemId: "answer", delta: "x".repeat(100_000) });
+  assert.equal(model.liveItems.get(itemKey("thread", "large", "answer")).text.length, 32_000);
+  assert.equal(model.liveItems.get(itemKey("thread", "large", "answer"))._omittedCharacters, 68_000);
+  applyChatEvent(model, "item/fileChange/patchUpdated", { threadId: "thread", turnId: "large", itemId: "files", changes: Array.from({ length: 80 }, (_, index) => ({ path: `file-${index}`, diff: "d".repeat(40_000) })) });
+  const files = model.liveItems.get(itemKey("thread", "large", "files"));
+  assert.equal(files.changes.length, 32);
+  assert.equal(files.changes[0].diff.length, 20_000);
+});
+
+test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {
+  const drafts = new Map();
+  saveThreadDraft(drafts, "thread-a", { text: "draft A", quote: { threadId: "thread-a", turnId: "turn-a", itemId: "item-a" }, attachments: [{ type: "image", url: "data:image/png;base64,AA==" }] });
+  assert.deepEqual(loadThreadDraft(drafts, "thread-b"), { text: "", quote: null, attachments: [] });
+  assert.equal(loadThreadDraft(drafts, "thread-a").quote.threadId, "thread-a");
+  for (let index = 0; index < MAX_DRAFT_THREADS + 2; index += 1) saveThreadDraft(drafts, `thread-${index}`, { text: String(index) });
+  assert.equal(drafts.size, MAX_DRAFT_THREADS);
+  assert.equal(drafts.has("thread-a"), false);
 });
 
 test("pure rich renderer escapes Markdown and visibly bounds malformed code", () => {
@@ -214,4 +240,25 @@ test("current shell exposes the conformance interactions without a second transc
   assert.match(css, /\.request-option/);
   assert.match(host, /chat-model\.mjs/);
   assert.doesNotMatch(html + script + host, /localStorage|sessionStorage|indexedDB/i);
+});
+
+test("audit corrections wire running steer, fork, Thread drafts, drawer semantics, and bounded media", async () => {
+  const [html, script, host, lockText, guard] = await Promise.all([
+    source("apps/codex-first-shell-prototype/index.html"),
+    source("apps/codex-first-shell-prototype/app.js"),
+    source("scripts/vh-codex-first-shell-prototype.mjs"),
+    source("packages/codex-adapter/upstream-lock.json"),
+    source("apps/codex-first-shell-prototype/browser-interaction-guard.mjs"),
+  ]);
+  const lock = JSON.parse(lockText);
+  assert.ok(lock.requiredRequests.includes("thread/fork"));
+  assert.match(host, /payload\.action === "forkThread"[^]*thread\/fork/);
+  assert.match(host, /payload\.action === "steerTurn"[^]*turn\/steer/);
+  assert.match(script, /state\.running \? "steerTurn" : "startTurn"/);
+  assert.match(script, /saveThreadDraft\(state\.composerDrafts/);
+  assert.match(script, /sidebar\.inert = narrow && !open/);
+  assert.match(script, /MAX_ATTACHMENT_BYTES/);
+  assert.match(script, /MAX_RECORDING_MS/);
+  assert.match(html, /id="routeTitle" tabindex="-1"/);
+  assert.match(guard, /window\.__VIBEHUB_INTERACTION_GUARD__/);
 });

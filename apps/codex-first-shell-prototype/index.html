@@ -58,7 +58,7 @@
     <main class="main-column">
       <header class="topbar">
         <button class="icon-button mobile-only" id="openSidebar" type="button" aria-label="Open navigation">☰</button>
-        <div class="route-title"><button id="backButton" class="back-button" type="button" hidden>← Tasks</button><div><strong id="routeTitle">Codex</strong><small id="routeMeta">Your real Threads and Turns</small></div></div>
+        <div class="route-title"><button id="backButton" class="back-button" type="button" hidden>← Tasks</button><div><strong id="routeTitle" tabindex="-1">Codex</strong><small id="routeMeta">Your real Threads and Turns</small></div></div>
         <div class="topbar-actions">
           <button class="search-trigger" id="searchButton" type="button" aria-label="Search Chats, Tasks, and Context" title="Search"><span>⌕</span><strong>Search</strong><kbd>⌘ K</kbd></button>
           <button class="icon-button inbox-trigger" id="inboxButton" type="button" aria-label="Open Task inbox" title="Task inbox"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M5.7 8.1a4.3 4.3 0 0 1 8.6 0c0 4 1.6 4.4 1.6 5.3H4.1c0-.9 1.6-1.3 1.6-5.3Z"></path><path d="M8.4 15.2c.3.7.8 1 1.6 1s1.3-.3 1.6-1"></path></svg><em id="inboxBadge" hidden></em></button>
@@ -91,23 +91,23 @@
             </div>
           </div>
         </form>
-        <p class="composer-note" id="composerNote">Codex can make mistakes. Review commands and changes.</p>
+        <p class="composer-note" id="composerNote" role="status" aria-live="polite">Codex can make mistakes. Review commands and changes.</p>
       </div>
     </main>
   </div>
 
   <div class="scrim" id="scrim" hidden></div>
   <section class="search-dialog" id="searchDialog" role="dialog" aria-modal="true" aria-labelledby="searchTitle" hidden inert>
-    <header><span aria-hidden="true">⌕</span><input id="searchInput" type="search" autocomplete="off" aria-label="Search Chats, Tasks, and Context" placeholder="Search chats, tasks, and context"><kbd>esc</kbd></header>
+    <header><span aria-hidden="true">⌕</span><input id="searchInput" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="searchResults" autocomplete="off" aria-label="Search Chats, Tasks, and Context" placeholder="Search chats, tasks, and context"><kbd>esc</kbd></header>
     <div class="search-results" id="searchResults" role="listbox" aria-labelledby="searchTitle"></div>
     <footer><strong id="searchTitle">Go to anything</strong><span>↑↓ Navigate · ↵ Open</span></footer>
   </section>
-  <aside class="inbox-panel" id="inboxPanel" hidden inert aria-labelledby="inboxTitle">
+  <aside class="inbox-panel" id="inboxPanel" role="dialog" aria-modal="true" hidden inert aria-labelledby="inboxTitle">
     <header><div><small>TASK ATTENTION</small><h2 id="inboxTitle">Inbox</h2></div><button type="button" id="closeInbox">Close</button></header>
     <p class="inbox-intro">Only Tasks that need a decision or have reached a durable Outcome appear here. Running stays quiet.</p>
     <div id="inboxContent"></div>
   </aside>
-  <aside class="review-panel" id="reviewPanel" hidden inert aria-labelledby="reviewTitle">
+  <aside class="review-panel" id="reviewPanel" role="dialog" aria-modal="true" hidden inert aria-labelledby="reviewTitle">
     <header><div><small>OWNER REVIEW PACK</small><h2 id="reviewTitle">Codex-first product boundary</h2></div><button type="button" id="closeReview">Close</button></header>
     <section><span>Promise</span><h3>Codex familiarity + VibeHub Tasks</h3><p>Codex owns Threads, Turns, tools, approvals and execution. VibeHub adds a durable Task Graph, focused Task Workspace, Context, Evidence and independent Outcome.</p></section>
     <section><span>Current composition</span><ul><li>Chat is the default landing. Projects are native Codex Thread Sections; Recents contains only unsectioned real Codex Threads.</li><li>Drag and the Chat-header selector move native membership. Fork preserves lineage and source Project; deletion returns member Chats to Recents.</li><li>Replay and live events share stable app-server item identity; answers stay primary while tool, diff and delegated work group into quiet Turn disclosures.</li><li>Inline approvals pause the exact Turn; retry, interruption and completion never become VibeHub Outcome claims.</li><li>Tasks is a distinct top-level destination; typed Search never relabels a Chat as a Task.</li><li>The Task Inbox surfaces current Needs You boundaries and repository completion history; Running does not notify.</li><li>A Task opens a focused Workspace; Start routes the exact host handoff into one Codex Thread.</li><li>Voice uses ordinary Codex audio input. Realtime conversation stays unavailable until the runtime reports support.</li></ul></section>

@@ -1,4 +1,29 @@
 const LIVE_STATUSES = new Set(["inProgress", "running"]);
+export const LIVE_ITEM_LIMIT = 64;
+const LIVE_TEXT_LIMIT = 32_000;
+const LIVE_OUTPUT_LIMIT = 20_000;
+const LIVE_CHANGE_LIMIT = 32;
+
+function trimMap(map, limit = LIVE_ITEM_LIMIT) {
+  while (map.size > limit) map.delete(map.keys().next().value);
+}
+
+function appendLiveText(item, field, delta, maximum = LIVE_TEXT_LIMIT) {
+  const prior = String(item[field] ?? "");
+  const source = String(delta ?? "");
+  const remaining = Math.max(0, maximum - prior.length);
+  const accepted = source.slice(0, remaining);
+  item[field] = `${prior}${accepted}`;
+  item._omittedCharacters = (item._omittedCharacters ?? 0) + source.length - accepted.length;
+}
+
+function boundedChanges(changes) {
+  return (changes ?? []).slice(0, LIVE_CHANGE_LIMIT).map((change) => ({
+    ...change,
+    path: String(change.path ?? "").slice(0, 1_024),
+    diff: change.diff == null ? change.diff : String(change.diff).slice(0, LIVE_OUTPUT_LIMIT),
+  }));
+}
 
 export function itemKey(threadId, turnId, itemId) {
   return `${encodeURIComponent(String(threadId ?? "unknown"))}::${encodeURIComponent(String(turnId ?? "unknown"))}::${encodeURIComponent(String(itemId ?? "unknown"))}`;
@@ -8,6 +33,7 @@ function liveItem(model, threadId, itemId, fallback, turnId) {
   const key = itemKey(threadId, turnId, itemId);
   if (!model.liveItems.has(key)) {
     model.liveItems.set(key, { id: itemId, ...fallback, _threadId: threadId, _turnId: turnId, _key: key, _live: true });
+    trimMap(model.liveItems);
   }
   const item = model.liveItems.get(key);
   if (threadId && !item._threadId) item._threadId = threadId;
@@ -33,83 +59,97 @@ export function applyChatEvent(model, method, params = {}) {
   if (!model?.liveItems || !model?.turnErrors) throw new TypeError("Chat model requires liveItems and turnErrors Maps");
   if (method === "item/started") {
     const key = itemKey(params.threadId, params.turnId, params.item.id);
-    model.liveItems.set(key, { ...params.item, _threadId: params.threadId, _turnId: params.turnId, _key: key, _live: true });
+    model.liveItems.set(key, { ...params.item, changes: boundedChanges(params.item.changes), _threadId: params.threadId, _turnId: params.turnId, _key: key, _live: true });
+    trimMap(model.liveItems);
     return true;
   }
   if (method === "item/completed") {
     const key = itemKey(params.threadId, params.turnId, params.item.id);
-    model.liveItems.set(key, { ...params.item, _threadId: params.threadId, _turnId: params.turnId, _key: key, _live: false });
+    model.liveItems.set(key, { ...params.item, text: params.item.text == null ? params.item.text : String(params.item.text).slice(0, LIVE_TEXT_LIMIT), aggregatedOutput: params.item.aggregatedOutput == null ? params.item.aggregatedOutput : String(params.item.aggregatedOutput).slice(0, LIVE_OUTPUT_LIMIT), changes: boundedChanges(params.item.changes), _threadId: params.threadId, _turnId: params.turnId, _key: key, _live: false });
+    trimMap(model.liveItems);
     return true;
   }
   if (method === "turn/plan/updated") {
     const id = `plan-${params.turnId}`;
     const key = itemKey(params.threadId, params.turnId, id);
-    transientMap(model, "turnPlans").set(key, {
+    const plans = transientMap(model, "turnPlans");
+    plans.set(key, {
       id,
       type: "turnPlan",
-      plan: params.plan ?? [],
-      explanation: params.explanation ?? null,
+      plan: (params.plan ?? []).slice(0, LIVE_ITEM_LIMIT).map((entry) => ({ ...entry, step: String(entry.step ?? "").slice(0, 2_000) })),
+      explanation: params.explanation == null ? null : String(params.explanation).slice(0, 4_000),
       _threadId: params.threadId,
       _turnId: params.turnId,
       _key: key,
       _live: true,
     });
+    trimMap(plans);
     return true;
   }
   if (method === "turn/diff/updated") {
     const id = `diff-${params.turnId}`;
     const key = itemKey(params.threadId, params.turnId, id);
-    transientMap(model, "turnDiffs").set(key, {
+    const diffs = transientMap(model, "turnDiffs");
+    diffs.set(key, {
       id,
       type: "turnDiff",
-      diff: params.diff ?? "",
+      diff: String(params.diff ?? "").slice(0, LIVE_OUTPUT_LIMIT),
       _threadId: params.threadId,
       _turnId: params.turnId,
       _key: key,
       _live: true,
     });
+    trimMap(diffs);
     return true;
   }
   if (method === "item/agentMessage/delta") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "agentMessage", text: "", phase: null }, params.turnId);
-    item.text = `${item.text ?? ""}${params.delta ?? ""}`;
+    appendLiveText(item, "text", params.delta);
     return true;
   }
   if (method === "item/plan/delta") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "plan", text: "" }, params.turnId);
-    item.text = `${item.text ?? ""}${params.delta ?? ""}`;
+    appendLiveText(item, "text", params.delta);
     return true;
   }
   if (method === "item/reasoning/summaryTextDelta") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "reasoning", summary: [], content: [] }, params.turnId);
     item.summary ??= [];
-    item.summary[params.summaryIndex ?? 0] = `${item.summary[params.summaryIndex ?? 0] ?? ""}${params.delta ?? ""}`;
+    const index = Math.min(15, Math.max(0, params.summaryIndex ?? 0));
+    const holder = { value: item.summary[index] ?? "", _omittedCharacters: item._omittedCharacters ?? 0 };
+    appendLiveText(holder, "value", params.delta, 8_000);
+    item.summary[index] = holder.value;
+    item._omittedCharacters = holder._omittedCharacters;
     return true;
   }
   if (method === "item/reasoning/textDelta") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "reasoning", summary: [], content: [] }, params.turnId);
     item.content ??= [];
-    item.content[params.contentIndex ?? 0] = `${item.content[params.contentIndex ?? 0] ?? ""}${params.delta ?? ""}`;
+    const index = Math.min(15, Math.max(0, params.contentIndex ?? 0));
+    const holder = { value: item.content[index] ?? "", _omittedCharacters: item._omittedCharacters ?? 0 };
+    appendLiveText(holder, "value", params.delta, 8_000);
+    item.content[index] = holder.value;
+    item._omittedCharacters = holder._omittedCharacters;
     return true;
   }
   if (method === "item/commandExecution/outputDelta") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "commandExecution", command: "Command", status: "inProgress", aggregatedOutput: "" }, params.turnId);
-    item.aggregatedOutput = `${item.aggregatedOutput ?? ""}${params.delta ?? ""}`;
+    appendLiveText(item, "aggregatedOutput", params.delta, LIVE_OUTPUT_LIMIT);
     return true;
   }
   if (method === "item/fileChange/patchUpdated") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "fileChange", status: "inProgress", changes: [] }, params.turnId);
-    item.changes = params.changes ?? item.changes;
+    item.changes = boundedChanges(params.changes ?? item.changes);
     return true;
   }
   if (method === "item/fileChange/outputDelta") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "fileChange", status: "inProgress", changes: [], output: "" }, params.turnId);
-    item.output = `${item.output ?? ""}${params.delta ?? ""}`;
+    appendLiveText(item, "output", params.delta, LIVE_OUTPUT_LIMIT);
     return true;
   }
   if (method === "item/mcpToolCall/progress") {
     const item = liveItem(model, params.threadId, params.itemId, { type: "mcpToolCall", status: "inProgress", arguments: {} }, params.turnId);
-    item.progress = `${item.progress ?? ""}${params.message ?? params.delta ?? ""}`;
+    appendLiveText(item, "progress", params.message ?? params.delta ?? "", 4_000);
     return true;
   }
   if (method === "error") {
@@ -124,6 +164,7 @@ export function applyChatEvent(model, method, params = {}) {
       message: params.error?.message ?? params.error ?? "Codex encountered an error.",
       willRetry: Boolean(params.willRetry),
     });
+    trimMap(model.turnErrors);
     return true;
   }
   if (method === "turn/completed") {

@@ -70,6 +70,7 @@
     "initialize",
     "account/read",
     "thread/start",
+    "thread/fork",
     "thread/resume",
     "thread/fork",
     "thread/archive",

@@ -8,7 +8,7 @@
   --hover: #ededed;
   --text: #0d0d0d;
   --muted: #666;
-  --faint: #929292;
+  --faint: #737373;
   --line: #e5e5e5;
   --line-strong: #cecece;
   --code: #f4f4f4;
@@ -27,7 +27,7 @@
     --hover: #2d2d2d;
     --text: #fff;
     --muted: #aaa;
-    --faint: #777;
+    --faint: #999;
     --line: #303030;
     --line-strong: #474747;
     --code: #242424;
@@ -35,8 +35,8 @@
   }
 }
 
-[data-theme="light"] { color-scheme: light; --accent:#0169cc; --bg:#fff; --sidebar:#f7f7f7; --panel:#fff; --raised:#f7f7f7; --hover:#ededed; --text:#0d0d0d; --muted:#666; --faint:#929292; --line:#e5e5e5; --line-strong:#cecece; --code:#f4f4f4; --shadow:0 12px 36px rgb(0 0 0 / .10); }
-[data-theme="dark"] { color-scheme: dark; --accent:#339cff; --bg:#181818; --sidebar:#202020; --panel:#1c1c1c; --raised:#262626; --hover:#2d2d2d; --text:#fff; --muted:#aaa; --faint:#777; --line:#303030; --line-strong:#474747; --code:#242424; --shadow:0 14px 42px rgb(0 0 0 / .34); }
+[data-theme="light"] { color-scheme: light; --accent:#0169cc; --bg:#fff; --sidebar:#f7f7f7; --panel:#fff; --raised:#f7f7f7; --hover:#ededed; --text:#0d0d0d; --muted:#666; --faint:#737373; --line:#e5e5e5; --line-strong:#cecece; --code:#f4f4f4; --shadow:0 12px 36px rgb(0 0 0 / .10); }
+[data-theme="dark"] { color-scheme: dark; --accent:#339cff; --bg:#181818; --sidebar:#202020; --panel:#1c1c1c; --raised:#262626; --hover:#2d2d2d; --text:#fff; --muted:#aaa; --faint:#999; --line:#303030; --line-strong:#474747; --code:#242424; --shadow:0 14px 42px rgb(0 0 0 / .34); }
 
 * { box-sizing: border-box; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
@@ -419,6 +419,9 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .review-panel p, .review-panel li { color: var(--muted); }
 .review-panel li { margin: 6px 0; }
 .toast { position: fixed; z-index: 80; left: 50%; bottom: 20px; transform: translateX(-50%); padding: 8px 12px; border-radius: 9px; color: var(--bg); background: var(--text); box-shadow: var(--shadow); }
+.interaction-guard-result { position: fixed; z-index: 90; right: 12px; bottom: 12px; padding: 7px 10px; border: 1px solid var(--line-strong); border-radius: 8px; color: var(--text); background: var(--panel); box-shadow: var(--shadow); font: 11px/1.3 var(--mono); }
+.interaction-guard-result.pass { border-color: #33845b; }
+.interaction-guard-result.fail { border-color: #c84848; }
 .mobile-only { display: none; }
 
 .app-shell.sidebar-collapsed { grid-template-columns: 64px minmax(0, 1fr); }
@@ -429,7 +432,7 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 @media (max-width: 760px) {
   .app-shell { grid-template-columns: 1fr; }
   .sidebar { position: fixed; z-index: 35; inset: 0 auto 0 0; width: min(300px, 86vw); transform: translateX(-102%); box-shadow: var(--shadow); }
-  .app-shell.sidebar-open .sidebar { transform: translateX(0); }
+  .app-shell.sidebar-open .sidebar { z-index: 50; transform: translateX(0); }
   .main-column { grid-template-rows: 50px minmax(0, 1fr) auto; }
   .mobile-only { display: grid; }
   .topbar { padding: 0 8px; }
@@ -464,7 +467,7 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 body[data-review-frame="narrow"] { position: relative; width: 390px; height: 844px; margin: 0 auto; overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px var(--line); }
 body[data-review-frame="narrow"] .app-shell { width: 390px; height: 844px; grid-template-columns: 1fr; }
 body[data-review-frame="narrow"] .sidebar { position: absolute; z-index: 35; inset: 0 auto 0 0; width: min(300px, 86%); transform: translateX(-102%); box-shadow: var(--shadow); }
-body[data-review-frame="narrow"] .app-shell.sidebar-open .sidebar { transform: translateX(0); }
+body[data-review-frame="narrow"] .app-shell.sidebar-open .sidebar { z-index: 50; transform: translateX(0); }
 body[data-review-frame="narrow"] .main-column { grid-template-rows: 50px minmax(0, 1fr) auto; }
 body[data-review-frame="narrow"] .mobile-only { display: grid; }
 body[data-review-frame="narrow"] .topbar { padding: 0 8px; }

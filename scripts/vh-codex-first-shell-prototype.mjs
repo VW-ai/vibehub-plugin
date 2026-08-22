@@ -78,6 +78,8 @@ const assets = new Map([
   ["/chat-renderer.mjs", [join(assetRoot, "chat-renderer.mjs"), "text/javascript; charset=utf-8"]],
   ["/event-window.mjs", [join(assetRoot, "event-window.mjs"), "text/javascript; charset=utf-8"]],
   ["/server-request-registry.mjs", [join(assetRoot, "server-request-registry.mjs"), "text/javascript; charset=utf-8"]],
+  ["/browser-interaction-guard.mjs", [join(assetRoot, "browser-interaction-guard.mjs"), "text/javascript; charset=utf-8"]],
+  ["/composer-drafts.mjs", [join(assetRoot, "composer-drafts.mjs"), "text/javascript; charset=utf-8"]],
   ["/chat-fixtures.json", [join(assetRoot, "chat-fixtures.json"), "application/json; charset=utf-8"]],
   ["/chat-conformance-fixtures.json", [join(assetRoot, "chat-conformance-fixtures.json"), "application/json; charset=utf-8"]],
   ["/task-fixtures.json", [join(assetRoot, "task-fixtures.json"), "application/json; charset=utf-8"]],
@@ -380,6 +382,17 @@ async function action(payload) {
       throw Object.assign(new Error("threadId and bounded text/image/audio input required"), { status: 400 });
     }
     return client.request("turn/start", { threadId: payload.threadId, input: payload.input });
+  }
+  if (payload.action === "steerTurn") {
+    if (typeof payload.threadId !== "string" || typeof payload.expectedTurnId !== "string" || !validInputs(payload.input)) {
+      throw Object.assign(new Error("threadId, expectedTurnId and bounded text/image/audio input required"), { status: 400 });
+    }
+    return client.request("turn/steer", {
+      threadId: payload.threadId,
+      expectedTurnId: payload.expectedTurnId,
+      clientUserMessageId: `vibehub-${crypto.randomUUID()}`,
+      input: payload.input,
+    });
   }
   if (payload.action === "interruptTurn") {
     if (typeof payload.threadId !== "string" || typeof payload.turnId !== "string") {

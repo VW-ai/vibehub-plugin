@@ -53,8 +53,8 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "Every streamed frame replaced transcript innerHTML, clearing selection and resetting opened activity details.",
-      "after": "pass",
-      "implementation": "Keyed entry reconciliation preserves unchanged DOM nodes and restores focus/disclosures for changed entries; active selection deferral is bounded to 1.2 seconds rather than freezing updates indefinitely.",
+      "after": "partial",
+      "implementation": "Keyed entry reconciliation preserves unchanged DOM nodes and restores focus/disclosures for changed entries. Active selection replacement after the bounded 1.2 second deferral remains a measured medium-severity production gap.",
       "proof": ["apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
     },
     {
@@ -65,8 +65,8 @@
       "beforeSeverity": "highest",
       "beforeFinding": "Only whole-message Copy existed; selection had no action and streaming could erase it.",
       "after": "partial",
-      "implementation": "Selection-scoped Add to chat control plus whole-response Quote, compound Thread/Turn/item source identity in browser state, bounded quote chip and Markdown quote transfer into the next normal Turn. Durable quote-source serialization remains a production gap.",
-      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
+      "implementation": "Selection-scoped Add to chat plus whole-response Quote preserve compound source identity in a bounded Thread-owned draft. Durable quote-source serialization and an executable selection-under-stream test remain measured production gaps.",
+      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/composer-drafts.mjs", "test/codex-chat-conformance.test.mjs"]
     },
     {
       "id": "markdown-rich-content",
@@ -130,8 +130,8 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "A blocking browser prompt displayed only the first question and discarded rich options.",
-      "after": "pass",
-      "implementation": "Semantic keyed inline form renders every question and exact header, blocking, secret, radio and Other posture; validates every answer id and preserves typed DOM/focus during unrelated streaming patches.",
+      "after": "partial",
+      "implementation": "Semantic keyed inline form renders every question and exact blocking, secret, radio and Other posture, validates answer ids, auto-selects a typed Other value, scrolls new blocking requests into view and returns focus after resolution. Request draft persistence across route changes remains a measured medium-severity gap.",
       "proof": ["apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
     },
     {
@@ -141,9 +141,9 @@
       "before": "partial",
       "beforeSeverity": "medium",
       "beforeFinding": "Attachments and audio worked, but textarea did not resize and quote context was absent.",
-      "after": "pass",
-      "implementation": "Auto-growing textarea, removable quote tray, attachment tray and existing MediaRecorder flow share the ordinary Turn input.",
-      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js"]
+      "after": "partial",
+      "implementation": "Auto-growing textarea, removable Thread-owned quote/attachment drafts and ordinary MediaRecorder flow share Turn input. File reads are rejected above 8 MiB before encoding; recording is bounded to 8 MiB or 90 seconds and announced. The CSS/JS height constant mismatch remains measured.",
+      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/composer-drafts.mjs", "test/codex-chat-conformance.test.mjs"]
     },
     {
       "id": "composer-keyboard-stop",
@@ -152,8 +152,8 @@
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "Enter behavior existed, but Escape only closed overlays and never invoked the documented Stop control.",
-      "after": "pass",
-      "implementation": "Escape delegates to the exact Stop button when no overlay is open, the Turn is trusted running and focus is inside Composer.",
+      "after": "pending-browser",
+      "implementation": "Escape delegates to exact Stop when Composer owns the active Turn. Running submission is explicit turn/steer against expectedTurnId, so an enabled Send cannot issue a conflicting turn/start; a repeat real-browser guard remains required.",
       "proof": ["apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
     },
     {
@@ -207,9 +207,9 @@
       "before": "partial",
       "beforeSeverity": "medium",
       "beforeFinding": "Search and Inbox restored focus; requestUserInput used an inaccessible blocking prompt.",
-      "after": "pass",
-      "implementation": "Inline semantic request forms remove the blocking prompt; existing dialog focus return and focus-visible styles remain.",
-      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css"]
+      "after": "pending-browser",
+      "implementation": "Search, Inbox, Review and the narrow drawer now use contained modal/inert posture, Escape and scrim dismissal, focus entry/return and logical route-heading focus. Search exposes combobox/listbox active-descendant identity and Sidebar refresh preserves its focused control. Repeat browser proof remains required.",
+      "proof": ["apps/codex-first-shell-prototype/index.html", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs", "apps/codex-first-shell-prototype/app.css"]
     },
     {
       "id": "wide-narrow-theme-motion",
@@ -219,8 +219,74 @@
       "beforeSeverity": "highest",
       "beforeFinding": "Accepted browser proof covered the prior mixed fixture.",
       "after": "pending-browser",
-      "implementation": "New quote and inline-input controls use the existing responsive shell; final current-commit browser matrix is recorded separately.",
-      "proof": ["apps/codex-first-shell-prototype/app.css"]
+      "implementation": "Theme tokens now scope from the document root so overlay siblings inherit Light/Dark; meaningful faint text meets stronger contrast, the narrow drawer has one accessible state and a browser-executable guard checks modal theme, focus and overflow. Theme preference intentionally remains non-persistent because browser storage is outside carrier authority; final current-commit browser matrix is still required.",
+      "proof": ["apps/codex-first-shell-prototype/app.css", "apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs"]
+    },
+    {
+      "id": "narrow-sidebar-drawer",
+      "area": "Responsive navigation",
+      "requirement": "The 390x844 Sidebar has one dismissible state with inert offscreen content, visible Close, scrim/Escape dismissal and focus entry/return.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "The transformed-offscreen Sidebar stayed focusable and its visible collapse control could not remove sidebar-open.",
+      "after": "pending-browser",
+      "implementation": "One narrow drawer state controls transform, inert and aria-modal posture; Open/Close, Escape and scrim share the same lifecycle and preserve trigger focus.",
+      "proof": ["apps/codex-first-shell-prototype/app.js", "apps/codex-first-shell-prototype/app.css", "apps/codex-first-shell-prototype/browser-interaction-guard.mjs"]
+    },
+    {
+      "id": "running-composer-steer",
+      "area": "Composer and Turn lifecycle",
+      "requirement": "Submitting while one trusted Turn is live can steer that exact Turn but cannot start a conflicting second Turn.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Stop and enabled Send were simultaneous while submit always dispatched turn/start.",
+      "after": "pending-browser",
+      "implementation": "Running Composer labels Send as Steer current Turn and dispatches pinned turn/steer with exact Thread and expectedTurnId; idle submission alone uses turn/start.",
+      "proof": ["scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "packages/codex-adapter/upstream-lock.json", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "thread-owned-composer-drafts",
+      "area": "Composer and Thread navigation",
+      "requirement": "Text, Quote source identity and attachments belong to one Thread and never leak into a new or different Thread.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Composer state was global and a quoted fixture response remained mounted in a newly created real Thread.",
+      "after": "pass",
+      "implementation": "A bounded five-Thread draft store saves and restores text, exact quote identity and at most three attachments; absent and newly created Threads restore an explicitly empty draft.",
+      "proof": ["apps/codex-first-shell-prototype/composer-drafts.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "thread-fork-action",
+      "area": "Thread navigation",
+      "requirement": "Fork is a real pinned app-server behavior with source Thread identity, focus on the created fork and explicit failure posture.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "The visible Thread actions button was dead and no browser-to-host fork action existed.",
+      "after": "pending-browser",
+      "implementation": "The dead menu is replaced by Fork, the host calls pinned thread/fork, and successful creation opens and focuses the new Codex Thread; live and fixture Threads disable the action.",
+      "proof": ["packages/codex-adapter/upstream-lock.json", "scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "bounded-live-browser-state",
+      "area": "Performance and recovery",
+      "requirement": "Reducer state, not only mounted DOM, remains finite throughout a noisy or long-running Turn.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "Live item/plan/diff/error Maps, delta strings and file changes grew until authoritative completion.",
+      "after": "pass",
+      "implementation": "Live Maps cap at 64 entries, text/output/progress and file-change arrays have explicit limits, omissions are disclosed, and authoritative replay remains the recovery source.",
+      "proof": ["apps/codex-first-shell-prototype/chat-model.mjs", "apps/codex-first-shell-prototype/chat-renderer.mjs", "test/codex-chat-conformance.test.mjs"]
+    },
+    {
+      "id": "browser-interaction-guard",
+      "area": "Executable interaction coverage",
+      "requirement": "A browser-executable guard must fail on drawer, modal focus, overlay theme or responsive overflow regressions instead of relying on source regex alone.",
+      "before": "fail",
+      "beforeSeverity": "highest",
+      "beforeFinding": "The green suite booted the host but never operated current UI controls.",
+      "after": "pending-browser",
+      "implementation": "The opt-in deterministic fixture guard operates the real DOM and publishes a structured window result plus visible pass/fail status; root browser execution is required on the final commit.",
+      "proof": ["apps/codex-first-shell-prototype/browser-interaction-guard.mjs", "scripts/vh-codex-first-shell-prototype.mjs", "test/codex-first-shell-prototype.test.mjs"]
     },
     {
       "id": "virtualized-production-list",

@@ -11,6 +11,7 @@ import {
   takeText,
 } from "./chat-renderer.mjs";
 import { requestDescriptor } from "./server-request-registry.mjs";
+import { loadThreadDraft, saveThreadDraft } from "./composer-drafts.mjs";
 
 const state = {
   route: "chat",
@@ -55,7 +56,12 @@ const state = {
   runtimeGeneration: 0,
   runtimeAlive: false,
   knownRequestIds: new Set(),
+  composerDrafts: new Map(),
+  requestReturnFocus: new Map(),
 };
+
+const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
+const MAX_RECORDING_MS = 90_000;
 
 const token = location.hash.slice(1);
 const reviewFrame = new URLSearchParams(location.search).get("reviewFrame");
@@ -68,6 +74,8 @@ const routeTitle = $("#routeTitle");
 const routeMeta = $("#routeMeta");
 const backButton = $("#backButton");
 const appShell = $("#appShell");
+const sidebar = $("#sidebar");
+const mainColumn = $(".main-column");
 const toast = $("#toast");
 let toastTimer;
 let pollTimer;
@@ -150,6 +158,9 @@ function threadButton(thread) {
 
 function updateSidebar() {
   const list = $("#threadList");
+  const focused = sidebar.contains(document.activeElement)
+    ? { threadId: document.activeElement.dataset.threadId, ticketId: document.activeElement.dataset.ticketId, id: document.activeElement.id }
+    : null;
   const needsYou = state.bootstrap?.attention?.needsYou ?? [];
   const attention = $("#sidebarAttention");
   attention.hidden = needsYou.length === 0;
@@ -199,7 +210,7 @@ function setRouteHeader(title, meta, { back = false } = {}) {
 
 function setRoute(route) {
   state.route = route;
-  appShell.classList.remove("sidebar-open");
+  closeMobileSidebar(false);
   const activeRoute = route === "task" ? "tasks" : route;
   $$('[data-route]', $("#sidebar")).forEach((button) => button.classList.toggle("active", button.dataset.route === activeRoute));
   composerWrap.hidden = route !== "chat" && route !== "task";
@@ -216,6 +227,8 @@ function syncComposerMode() {
   const linked = taskMode && state.activeThreadId;
   input.disabled = !state.runtimeAlive || Boolean(taskMode && !linked);
   $("#sendButton").disabled = input.disabled;
+  $("#sendButton").setAttribute("aria-label", state.running ? "Steer current turn" : "Send message");
+  $("#sendButton").title = state.running ? "Steer current Turn" : "Send message";
   input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : "Ask Codex to do something";
   $("#composerNote").textContent = taskMode
     ? (linked ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.` : "The host will open a linked Codex Thread with the canonical Task packet.")
@@ -232,7 +245,53 @@ function setRuntimePosture({ alive, generation = state.runtimeGeneration, label 
 }
 
 function syncScrim() {
-  $("#scrim").hidden = $("#searchDialog").hidden && $("#inboxPanel").hidden && $("#reviewPanel").hidden;
+  const overlayOpen = !$("#searchDialog").hidden || !$("#inboxPanel").hidden || !$("#reviewPanel").hidden;
+  const mobileNavigationOpen = appShell.classList.contains("sidebar-open") && isNarrowLayout();
+  $("#scrim").hidden = !overlayOpen && !mobileNavigationOpen;
+  appShell.inert = overlayOpen;
+  if (!overlayOpen) mainColumn.inert = mobileNavigationOpen;
+}
+
+function isNarrowLayout() {
+  return reviewFrame === "narrow" || window.matchMedia("(max-width: 760px)").matches;
+}
+
+function syncSidebarAccessibility() {
+  const narrow = isNarrowLayout();
+  const open = narrow && appShell.classList.contains("sidebar-open");
+  sidebar.inert = narrow && !open;
+  sidebar.setAttribute("aria-hidden", narrow && !open ? "true" : "false");
+  if (narrow) {
+    sidebar.setAttribute("role", "dialog");
+    sidebar.setAttribute("aria-modal", "true");
+  } else {
+    sidebar.removeAttribute("role");
+    sidebar.removeAttribute("aria-modal");
+    mainColumn.inert = false;
+  }
+  $("#openSidebar").setAttribute("aria-expanded", open ? "true" : "false");
+  $("#collapseSidebar").setAttribute("aria-label", narrow ? "Close navigation" : "Collapse sidebar");
+}
+
+function openMobileSidebar() {
+  if (!isNarrowLayout()) return;
+  state.overlayReturnFocus = document.activeElement;
+  appShell.classList.add("sidebar-open");
+  syncSidebarAccessibility();
+  syncScrim();
+  $("#collapseSidebar").focus();
+}
+
+function closeMobileSidebar(restore = true) {
+  if (!appShell.classList.contains("sidebar-open")) { syncSidebarAccessibility(); return; }
+  appShell.classList.remove("sidebar-open");
+  syncSidebarAccessibility();
+  syncScrim();
+  if (restore) state.overlayReturnFocus?.focus?.();
+}
+
+function focusRouteHeading() {
+  requestAnimationFrame(() => routeTitle.focus({ preventScroll: true }));
 }
 
 function searchCorpus(query) {
@@ -269,10 +328,13 @@ function renderSearchResults() {
     if (!matches.length) return "";
     return `<div class="search-group-label">${label}</div>${matches.map((item) => {
       const index = state.searchResults.indexOf(item);
-      return `<button class="search-result" type="button" role="option" aria-selected="${index === state.searchIndex}" data-search-kind="${item.kind}" data-search-id="${escapeHtml(item.id)}"><i>${item.glyph}</i><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span><em>${kind === "chat" ? "Chat" : kind === "task" ? "Task" : "Context"}</em></button>`;
+      return `<button class="search-result" id="search-result-${index}" type="button" role="option" aria-selected="${index === state.searchIndex}" data-search-kind="${item.kind}" data-search-id="${escapeHtml(item.id)}"><i>${item.glyph}</i><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span><em>${kind === "chat" ? "Chat" : kind === "task" ? "Task" : "Context"}</em></button>`;
     }).join("")}`;
   }).join("");
   $("#searchResults").innerHTML = markup || '<div class="search-empty">No matching Chat, Task, or Context.</div>';
+  const active = state.searchResults.length ? `search-result-${state.searchIndex}` : null;
+  if (active) $("#searchInput").setAttribute("aria-activedescendant", active);
+  else $("#searchInput").removeAttribute("aria-activedescendant");
   $(".search-result[aria-selected=\"true\"]")?.scrollIntoView({ block: "nearest" });
 }
 
@@ -282,6 +344,7 @@ function openSearch() {
   const dialog = $("#searchDialog");
   dialog.hidden = false;
   dialog.inert = false;
+  $("#searchInput").setAttribute("aria-expanded", "true");
   $("#searchInput").value = "";
   state.searchIndex = 0;
   renderSearchResults();
@@ -294,6 +357,7 @@ function closeSearch(restore = true) {
   if (dialog.hidden) return;
   dialog.hidden = true;
   dialog.inert = true;
+  $("#searchInput").setAttribute("aria-expanded", "false");
   syncScrim();
   if (restore) state.overlayReturnFocus?.focus?.();
 }
@@ -340,6 +404,7 @@ async function openSearchResult(kind, id) {
     state.activeContextId = id;
     setRoute("rooms");
   }
+  focusRouteHeading();
 }
 
 function handoffFromText(text) {
@@ -372,6 +437,12 @@ function boundedPre(value, className = "", maximum = DOM_LIMITS.outputCharacters
   return `<pre${className ? ` class="${className}"` : ""}>${escapeHtml(bounded.text)}</pre>${bounded.truncated ? `<p class="truncation-note">${bounded.omitted.toLocaleString()} characters omitted from this browser view. Durable Thread history remains authoritative.</p>` : ""}`;
 }
 
+function liveOmission(item) {
+  return item._omittedCharacters
+    ? `<p class="truncation-note">${item._omittedCharacters.toLocaleString()} characters omitted from this mounted live view. Durable Thread history remains authoritative.</p>`
+    : "";
+}
+
 function renderItem(item, budget) {
   if (!item) return "";
   const identity = item._key ?? item.id;
@@ -392,7 +463,7 @@ function renderItem(item, budget) {
   if (item.type === "agentMessage") return renderAgentMessage(item, budget);
   if (item.type === "reasoning") {
     const text = [...(item.summary ?? []), ...(item.content ?? [])].join("\n");
-    return `<div class="activity-row">${disclosureCard({ identity, kind: "reasoning", icon: "✦", title: "Reasoning", status: statusLabel(item), summary: item._live ? "Thinking…" : "Reasoning summary", detail: renderMarkdown(text || "Reasoned about the request", budget) })}</div>`;
+    return `<div class="activity-row">${disclosureCard({ identity, kind: "reasoning", icon: "✦", title: "Reasoning", status: statusLabel(item), summary: item._live ? "Thinking…" : "Reasoning summary", detail: `${renderMarkdown(text || "Reasoned about the request", budget)}${liveOmission(item)}` })}</div>`;
   }
   if (item.type === "plan") return `<div class="activity-row">${disclosureCard({ identity, kind: "plan", icon: "☷", title: "Plan", status: statusLabel(item), summary: item._live ? "Updating plan…" : "Plan updated", detail: renderMarkdown(item.text, budget), open: true })}</div>`;
   if (item.type === "turnPlan") {
@@ -402,7 +473,7 @@ function renderItem(item, budget) {
   }
   if (item.type === "turnDiff") return `<div class="activity-row">${disclosureCard({ identity, kind: "files", icon: "±", title: "Turn diff", status: "running", summary: "Latest aggregate diff", detail: boundedPre(item.diff, "", DOM_LIMITS.outputCharacters, budget), open: true })}</div>`;
   if (item.type === "commandExecution") {
-    const detail = `<div class="command-meta">${escapeHtml(takeText(budget, item.cwd, 1_024).text)}</div><code class="command-line">${escapeHtml(takeText(budget, item.command, 4_000).text)}</code>${item.aggregatedOutput ? boundedPre(item.aggregatedOutput, "terminal-output", DOM_LIMITS.outputCharacters, budget) : ""}`;
+    const detail = `<div class="command-meta">${escapeHtml(takeText(budget, item.cwd, 1_024).text)}</div><code class="command-line">${escapeHtml(takeText(budget, item.command, 4_000).text)}</code>${item.aggregatedOutput ? boundedPre(item.aggregatedOutput, "terminal-output", DOM_LIMITS.outputCharacters, budget) : ""}${liveOmission(item)}`;
     const duration = item.durationMs ? ` · ${(item.durationMs / 1000).toFixed(1)}s` : "";
     return `<div class="activity-row">${disclosureCard({ identity, kind: "terminal", icon: ">_", title: "Terminal", status: statusLabel(item), summary: `${takeText(budget, item.command || "Command", 240).text}${duration}`, detail, open: item._live || item.status === "failed" })}</div>`;
   }
@@ -410,7 +481,7 @@ function renderItem(item, budget) {
     const changes = item.changes ?? [];
     const count = Math.max(0, Math.min(changes.length, budget.changesRemaining));
     budget.changesRemaining -= count;
-    const detail = `${changes.slice(0, count).map((change) => `<section class="diff-file"><header><strong>${escapeHtml(takeText(budget, change.path, 1_024).text)}</strong><span>${escapeHtml(change.kind?.type ?? change.kind ?? "update")}</span></header>${change.diff ? boundedPre(change.diff, "", DOM_LIMITS.outputCharacters, budget) : ""}</section>`).join("")}${item.output ? boundedPre(item.output, "file-change-output", DOM_LIMITS.outputCharacters, budget) : ""}${changes.length > count ? `<p class="truncation-note">${changes.length - count} file changes omitted from this mounted view. Durable Thread history remains authoritative.</p>` : ""}`;
+    const detail = `${changes.slice(0, count).map((change) => `<section class="diff-file"><header><strong>${escapeHtml(takeText(budget, change.path, 1_024).text)}</strong><span>${escapeHtml(change.kind?.type ?? change.kind ?? "update")}</span></header>${change.diff ? boundedPre(change.diff, "", DOM_LIMITS.outputCharacters, budget) : ""}</section>`).join("")}${item.output ? boundedPre(item.output, "file-change-output", DOM_LIMITS.outputCharacters, budget) : ""}${changes.length > count ? `<p class="truncation-note">${changes.length - count} file changes omitted from this mounted view. Durable Thread history remains authoritative.</p>` : ""}${liveOmission(item)}`;
     return `<div class="activity-row">${disclosureCard({ identity, kind: "files", icon: "±", title: "File changes", status: statusLabel(item), summary: `${changes.length} file${changes.length === 1 ? "" : "s"}`, detail, open: item._live || item.status === "failed" })}</div>`;
   }
   if (item.type === "mcpToolCall" || item.type === "dynamicToolCall") {
@@ -591,7 +662,7 @@ function renderChat({ preserveScroll = false } = {}) {
     patchTimeline(existingTimeline, turnsMarkup(state.activeThread));
     $("#streamStatus").textContent = state.running ? "Codex response updated." : "Codex response settled.";
   } else {
-    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${lineage}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}">Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${lineage}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
   }
   requestAnimationFrame(() => {
     if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
@@ -776,10 +847,14 @@ async function refreshThreads() {
 
 async function openThread(threadId, { route = "chat" } = {}) {
   const sameSurface = state.activeThreadId === threadId && state.route === route;
+  const switchingThread = state.activeThreadId !== threadId;
+  if (switchingThread) captureComposerDraft();
   const data = await action({ action: "readThread", threadId });
   state.activeThreadId = threadId;
   state.activeThread = { ...state.threads.find((thread) => thread.id === threadId), ...data.thread };
   state.running = String(data.thread.status?.type ?? data.thread.status).toLowerCase().includes("active");
+  state.currentTurnId = state.running ? data.thread.turns?.at(-1)?.id ?? null : null;
+  if (switchingThread) restoreComposerDraft(threadId);
   if (!state.running) {
     for (const [key, item] of state.liveItems) if (item._threadId === threadId) state.liveItems.delete(key);
     for (const map of [state.turnErrors, state.turnPlans, state.turnDiffs]) {
@@ -815,7 +890,10 @@ function focusNewBlockingRequest(previousIds) {
   if (!request) return;
   requestAnimationFrame(() => {
     const card = surface.querySelector(`[data-request-id="${CSS.escape(String(request.id))}"]`);
-    card?.querySelector("input:not([disabled]), textarea:not([disabled]), button:not([disabled])")?.focus({ preventScroll: true });
+    state.requestReturnFocus.set(String(request.id), document.activeElement);
+    const target = card?.querySelector("input:not([disabled]), textarea:not([disabled]), button:not([disabled])");
+    target?.scrollIntoView({ block: "center", behavior: "instant" });
+    target?.focus();
     $("#streamStatus").textContent = "Codex needs your input.";
   });
 }
@@ -824,6 +902,7 @@ async function newThread() {
   if (state.creatingThread) return state.creatingThread;
   state.creatingThread = (async () => {
     $("#newThread").disabled = true;
+    captureComposerDraft();
     const data = await action({ action: "newThread" });
     state.threads.unshift(data.thread);
     state.recents.unshift(data.thread);
@@ -834,6 +913,7 @@ async function newThread() {
     state.turnErrors.clear();
     state.turnPlans.clear();
     state.turnDiffs.clear();
+    restoreComposerDraft(data.thread.id);
     updateSidebar();
     setRoute("chat");
     $("#composerInput").focus();
@@ -843,7 +923,20 @@ async function newThread() {
   finally { state.creatingThread = null; $("#newThread").disabled = false; }
 }
 
+async function forkActiveThread() {
+  if (!state.activeThreadId || state.fixtureMode || state.running) return;
+  const sourceThreadId = state.activeThreadId;
+  try {
+    const data = await action({ action: "forkThread", threadId: sourceThreadId });
+    state.threads.unshift(data.thread);
+    await openThread(data.thread.id);
+    $("#composerInput").focus();
+    notify("Forked into a new Codex Chat.");
+  } catch (error) { notify(error.message); }
+}
+
 async function openTask(ticketId) {
+  captureComposerDraft();
   state.activeTicketId = ticketId;
   state.activeTask = null;
   state.taskWorkspace = null;
@@ -860,10 +953,14 @@ async function openTask(ticketId) {
       state.activeThreadId = linked.id;
       state.activeThread = { ...linked, ...threadData.thread };
       state.running = String(threadData.thread.status?.type ?? threadData.thread.status).toLowerCase().includes("active");
+      state.currentTurnId = state.running ? threadData.thread.turns?.at(-1)?.id ?? null : null;
+      restoreComposerDraft(linked.id);
     } else {
       state.activeThreadId = null;
       state.activeThread = null;
       state.running = false;
+      state.currentTurnId = null;
+      restoreComposerDraft(null);
     }
     renderTaskWorkspace();
   } catch (error) { notify(error.message); setRoute("tasks"); }
@@ -910,6 +1007,25 @@ function autoSizeComposer() {
   textarea.style.height = `${Math.min(220, Math.max(24, textarea.scrollHeight))}px`;
 }
 
+function captureComposerDraft(threadId = state.activeThreadId) {
+  if (!threadId) return;
+  saveThreadDraft(state.composerDrafts, threadId, {
+    text: $("#composerInput").value,
+    quote: state.composerQuote ? structuredClone(state.composerQuote) : null,
+    attachments: state.attachments.map((item) => ({ ...item })),
+  });
+}
+
+function restoreComposerDraft(threadId) {
+  const draft = loadThreadDraft(state.composerDrafts, threadId);
+  $("#composerInput").value = draft.text;
+  state.composerQuote = draft.quote;
+  state.attachments = draft.attachments;
+  renderComposerQuote();
+  renderAttachments();
+  autoSizeComposer();
+}
+
 function timelineItem(itemKeyValue) {
   return canonicalTimeline(state.activeThread, state, { limit: 240 }).find((item) => item._key === itemKeyValue);
 }
@@ -953,14 +1069,25 @@ async function toggleRecording() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const chunks = [];
+    let recordedBytes = 0;
     const recorder = new MediaRecorder(stream);
     state.recorder = recorder;
     state.recordingStream = stream;
-    recorder.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
+    const stopTimer = setTimeout(() => {
+      if (recorder.state === "recording") recorder.stop();
+    }, MAX_RECORDING_MS);
+    recorder.ondataavailable = (event) => {
+      if (!event.data.size) return;
+      recordedBytes += event.data.size;
+      if (recordedBytes <= MAX_ATTACHMENT_BYTES) chunks.push(event.data);
+      if (recordedBytes > MAX_ATTACHMENT_BYTES && recorder.state === "recording") recorder.stop();
+    };
     recorder.onstop = async () => {
+      clearTimeout(stopTimer);
+      if (recordedBytes > MAX_ATTACHMENT_BYTES) notify("Voice recording exceeded the 8 MiB local attachment limit and was not attached.");
       const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
       const file = new File([blob], "Voice recording.webm", { type: blob.type });
-      addAttachment(file, await fileToDataUrl(file));
+      if (recordedBytes <= MAX_ATTACHMENT_BYTES) addAttachment(file, await fileToDataUrl(file));
       stream.getTracks().forEach((track) => track.stop());
       state.recorder = null;
       state.recordingStream = null;
@@ -968,7 +1095,7 @@ async function toggleRecording() {
       $("#voiceButton").setAttribute("aria-label", "Record voice input");
       $("#composerNote").textContent = "Voice recording is attached as ordinary Codex audio input.";
     };
-    recorder.start();
+    recorder.start(1_000);
     $("#voiceButton").classList.add("recording");
     $("#voiceButton").setAttribute("aria-label", "Stop recording");
     $("#composerNote").textContent = "Recording locally… Select the microphone again to stop.";
@@ -1003,6 +1130,7 @@ async function submitTurn(event) {
       autoSizeComposer();
       state.attachments = [];
       renderAttachments();
+      state.composerDrafts.delete(state.activeThreadId);
       $("#stopTurn").hidden = false;
       await openThread(state.activeThreadId, { route: "task" });
       return;
@@ -1011,8 +1139,9 @@ async function submitTurn(event) {
     const input = [];
     if (composedText) input.push({ type: "text", text: composedText });
     input.push(...state.attachments.map(({ type, url }) => ({ type, url })));
-    const result = await action({ action: "startTurn", threadId: state.activeThreadId, input });
-    state.currentTurnId = result.turn.id;
+    if (state.running && !state.currentTurnId) return notify("Wait for the active Turn identity before steering it.");
+    const result = await action({ action: state.running ? "steerTurn" : "startTurn", threadId: state.activeThreadId, expectedTurnId: state.running ? state.currentTurnId : undefined, input });
+    if (!state.running) state.currentTurnId = result.turn.id;
     state.running = true;
     textarea.value = "";
     state.composerQuote = null;
@@ -1020,7 +1149,9 @@ async function submitTurn(event) {
     autoSizeComposer();
     state.attachments = [];
     renderAttachments();
+    state.composerDrafts.delete(state.activeThreadId);
     $("#stopTurn").hidden = false;
+    syncComposerMode();
     await openThread(state.activeThreadId);
   } catch (error) { notify(error.message); }
 }
@@ -1053,11 +1184,13 @@ async function pollEvents() {
         state.running = true;
         state.currentTurnId = params.turn?.id;
         $("#stopTurn").hidden = false;
+        syncComposerMode();
       }
       if (method === "turn/completed") {
         state.running = false;
         state.currentTurnId = null;
         $("#stopTurn").hidden = true;
+        syncComposerMode();
         reconcile = true;
       }
       rendered = applyChatNotification(method, params) || rendered;
@@ -1094,7 +1227,7 @@ document.addEventListener("click", async (event) => {
     suppressThreadClick = null;
     return;
   }
-  if (thread) { await openThread(thread.dataset.threadId); return; }
+  if (thread) { await openThread(thread.dataset.threadId); focusRouteHeading(); return; }
   const ticket = event.target.closest("[data-ticket-id]");
   if (ticket) { closeInbox(false); await openTask(ticket.dataset.ticketId); return; }
   if (event.target.closest("[data-clear-context]")) { state.activeContextId = null; renderRooms(); return; }
@@ -1172,7 +1305,9 @@ document.addEventListener("click", async (event) => {
   if (copyCitationThread) { await navigator.clipboard.writeText(copyCitationThread.dataset.copyCitationThread); notify("Source Thread id copied."); return; }
   const decision = event.target.closest("[data-request-decision]");
   if (decision) {
-    try { await action({ action: "resolveRequest", requestId: decision.dataset.requestId, decision: decision.dataset.requestDecision }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); $("#composerInput").focus(); }
+    const requestId = decision.dataset.requestId;
+    const returnFocus = state.requestReturnFocus.get(requestId);
+    try { await action({ action: "resolveRequest", requestId, decision: decision.dataset.requestDecision }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); (returnFocus?.isConnected ? returnFocus : $("#composerInput")).focus(); state.requestReturnFocus.delete(requestId); }
     catch (error) { notify(error.message); }
     return;
   }
@@ -1224,7 +1359,9 @@ document.addEventListener("submit", async (event) => {
     answers[fieldset.dataset.questionId] = { answers: values };
   }
   if (invalid || !Object.keys(answers).length) { notify("Answer every question before sending."); form.querySelector("input:not([disabled]), textarea:not([disabled])")?.focus(); return; }
-  try { await action({ action: "resolveRequest", requestId: form.dataset.requestForm, answers }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); $("#composerInput").focus(); }
+  const requestId = form.dataset.requestForm;
+  const returnFocus = state.requestReturnFocus.get(requestId);
+  try { await action({ action: "resolveRequest", requestId, answers }); await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" }); (returnFocus?.isConnected ? returnFocus : $("#composerInput")).focus(); state.requestReturnFocus.delete(requestId); }
   catch (error) { notify(error.message); }
 });
 
@@ -1256,8 +1393,11 @@ $("#searchButton").addEventListener("click", openSearch);
 $("#searchInput").addEventListener("input", () => { state.searchIndex = 0; renderSearchResults(); });
 $("#inboxButton").addEventListener("click", openInbox);
 $("#closeInbox").addEventListener("click", () => closeInbox());
-$("#collapseSidebar").addEventListener("click", () => appShell.classList.toggle("sidebar-collapsed"));
-$("#openSidebar").addEventListener("click", () => appShell.classList.toggle("sidebar-open"));
+$("#collapseSidebar").addEventListener("click", () => {
+  if (isNarrowLayout()) closeMobileSidebar();
+  else appShell.classList.toggle("sidebar-collapsed");
+});
+$("#openSidebar").addEventListener("click", openMobileSidebar);
 backButton.addEventListener("click", () => {
   const ticketId = state.activeTicketId;
   setRoute("tasks");
@@ -1266,7 +1406,8 @@ backButton.addEventListener("click", () => {
 $("#attachButton").addEventListener("click", () => $("#attachmentInput").click());
 $("#attachmentInput").addEventListener("change", async (event) => {
   const file = event.target.files?.[0];
-  if (file) addAttachment(file, await fileToDataUrl(file));
+  if (file?.size > MAX_ATTACHMENT_BYTES) notify("Attachments must be 8 MiB or smaller before encoding.");
+  else if (file) addAttachment(file, await fileToDataUrl(file));
   event.target.value = "";
 });
 $("#voiceButton").addEventListener("click", toggleRecording);
@@ -1278,6 +1419,12 @@ $("#composerInput").addEventListener("keydown", (event) => {
   }
 });
 $("#composerInput").addEventListener("input", autoSizeComposer);
+document.addEventListener("input", (event) => {
+  const other = event.target.closest?.("[data-request-other]");
+  if (!other) return;
+  const radio = other.closest(".request-other")?.querySelector('input[type="radio"]');
+  if (radio && other.value) radio.checked = true;
+});
 document.addEventListener("selectionchange", () => requestAnimationFrame(updateQuoteSelection));
 $("#stopTurn").addEventListener("click", async () => {
   if (!state.activeThreadId || !state.currentTurnId) return;
@@ -1290,15 +1437,29 @@ $("#scrim").addEventListener("click", () => {
   if (!$("#searchDialog").hidden) closeSearch();
   else if (!$("#inboxPanel").hidden) closeInbox();
   else if (!$("#reviewPanel").hidden) $("#closeReview").click();
+  else if (appShell.classList.contains("sidebar-open")) closeMobileSidebar();
 });
 $("#themeToggle").addEventListener("click", () => {
   const themes = ["system", "light", "dark"];
   state.themeIndex = (state.themeIndex + 1) % themes.length;
-  appShell.dataset.theme = themes[state.themeIndex];
-  $("#themeLabel").textContent = themes[state.themeIndex][0].toUpperCase() + themes[state.themeIndex].slice(1);
+  const theme = themes[state.themeIndex];
+  document.documentElement.dataset.theme = theme;
+  appShell.dataset.theme = theme;
+  $("#themeLabel").textContent = theme[0].toUpperCase() + theme.slice(1);
 });
 
 document.addEventListener("keydown", (event) => {
+  const modal = [$("#searchDialog"), $("#inboxPanel"), $("#reviewPanel"), appShell.classList.contains("sidebar-open") ? sidebar : null].find((element) => element && !element.hidden && !element.inert);
+  if (event.key === "Tab" && modal) {
+    const focusable = $$("button:not([disabled]), input:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex='-1'])", modal).filter((element) => !element.hidden && element.getClientRects().length);
+    if (focusable.length) {
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!modal.contains(document.activeElement)) { event.preventDefault(); first.focus(); }
+      else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
+  }
   if (!$("#searchDialog").hidden && ["ArrowDown", "ArrowUp"].includes(event.key)) {
     event.preventDefault();
     const direction = event.key === "ArrowDown" ? 1 : -1;
@@ -1316,6 +1477,7 @@ document.addEventListener("keydown", (event) => {
     if (!$("#searchDialog").hidden) closeSearch();
     else if (!$("#inboxPanel").hidden) closeInbox();
     else if (!$("#reviewPanel").hidden) $("#closeReview").click();
+    else if (appShell.classList.contains("sidebar-open")) closeMobileSidebar();
     else if (state.running && $("#composer").contains(document.activeElement)) $("#stopTurn").click();
   }
   if (event.metaKey && event.key.toLowerCase() === "k") { event.preventDefault(); openSearch(); }
@@ -1373,8 +1535,21 @@ document.addEventListener("pointerup", async (event) => {
   } catch (error) { notify(error.message); }
 });
 
+window.matchMedia("(max-width: 760px)").addEventListener("change", () => {
+  if (!isNarrowLayout()) appShell.classList.remove("sidebar-open");
+  syncSidebarAccessibility();
+  syncScrim();
+});
+
 async function start() {
   try {
+    const themes = ["system", "light", "dark"];
+    state.themeIndex = 0;
+    const theme = themes[state.themeIndex];
+    document.documentElement.dataset.theme = theme;
+    appShell.dataset.theme = theme;
+    $("#themeLabel").textContent = theme[0].toUpperCase() + theme.slice(1);
+    syncSidebarAccessibility();
     await refreshThreads();
     const params = new URLSearchParams(location.search);
     if (params.get("projectFixture") === "matrix") {
@@ -1436,4 +1611,8 @@ async function start() {
   }
 }
 
-start();
+await start();
+if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
+  const { runBrowserInteractionGuard } = await import("./browser-interaction-guard.mjs");
+  await runBrowserInteractionGuard();
+}

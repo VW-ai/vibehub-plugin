@@ -34,6 +34,15 @@ adds quoted response context to the ordinary Composer, renders all user-input
 questions inline, restores terminal failures as an explicitly new Turn, auto-grows
 the Composer, adds code copy and implements the contract's focus-scoped Escape Stop.
 
+The third audit exposed that mounted-output bounds were not browser-state bounds
+and that several controls were only structural. The corrected carrier now caps
+live Maps, deltas and file-change arrays; keeps Composer text, Quote identity and
+attachments in a bounded Thread-owned draft store; routes live submission through
+exact `turn/steer`; and implements pinned `thread/fork`. The narrow Sidebar and all
+overlay panels share explicit inert, modal, scrim, Escape and focus-return posture.
+An opt-in deterministic browser guard operates those controls and reports its
+structured result instead of treating source inspection as interaction proof.
+
 Task semantics did not enter this path. A quote is normal Chat input; it creates no
 VibeHub Task, Evidence or Outcome. The disabled `Remember` and `Make Task` controls
 remain truthful future bridges.
@@ -45,6 +54,16 @@ remain truthful future bridges.
   production-shell gap.
 - Quote carries exact Thread / Turn / item identity in the active browser session.
   Durable source-identity serialization remains a medium-severity production gap.
+- A changed entry selected continuously beyond the bounded streaming deferral can
+  still be replaced. Selection-under-stream remains an explicit medium-severity
+  browser-test and product-policy gap.
+- Request-user-input values survive keyed streaming patches, but draft persistence
+  across an intentional route change remains a medium-severity production gap.
+- Theme preference intentionally resets with the page because the carrier does not
+  claim browser storage as a second persistence authority. Document-root theme
+  tokens do cover Search, Inbox, Review, toast and selection overlays.
+- The Composer's JavaScript growth ceiling and CSS max-height differ slightly; the
+  browser remains bounded, but the constants should converge in production polish.
 - The research carrier retains a bounded 240-item tail. True viewport
   virtualization belongs in the production shell.
 - Model and collaboration-mode pickers remain absent rather than falsely enabled.
@@ -86,3 +105,11 @@ distinguishes blocking/secret/Other semantics, and validates every question.
 Unsupported dynamic tools and future requests receive an immediate truthful
 response rather than a false command-approval card. Tool/delegated non-text or
 identity-bearing output remains visible or has an explicit fallback.
+
+The independent Composer/navigation/accessibility audit found six further P0
+families: conflicting running submission, cross-Thread Composer state, a trapped
+narrow Sidebar, unbounded live reducer state, a dead Thread action and no browser
+interaction guard. All six now have concrete corrections. The audit report remains
+immutable and correctly records its FAIL verdict against the earlier commit; the
+matrix marks browser-dependent corrections `pending-browser` until the exact final
+commit is repeated through the root browser matrix.

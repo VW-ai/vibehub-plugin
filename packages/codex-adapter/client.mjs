@@ -57,7 +57,8 @@ export class CodexAppServerClient extends EventEmitter {
       this.emit("stderr", line);
     });
     child.once("exit", (code, signal) => {
-      const error = new Error(`codex app-server exited (${code ?? "null"}, ${signal ?? "none"})`);
+      const diagnostic = this.stderr.slice(-3).join("\n");
+      const error = new Error(`codex app-server exited (${code ?? "null"}, ${signal ?? "none"})${diagnostic ? `:\n${diagnostic}` : ""}`);
       for (const pending of this.pending.values()) pending.reject(error);
       this.pending.clear();
       this.child = null;

@@ -87,7 +87,8 @@ test("Search, Task attention, and object semantics are explicit and source-backe
   for (const object of ["chat", "task", "context", "notification", "livePresence"]) assert.ok(contract.objects[object]);
   for (const sourceUrl of ["developers.openai.com", "linear.app/docs/inbox", "docs.github.com/en/subscriptions-and-notifications", "docs.cursor.com/background-agent", "manual.raycast.com"]) assert.match(research, new RegExp(sourceUrl.replaceAll(".", "\\.")));
   assert.match(html, /id="searchDialog"/);
-  assert.match(html, /id="inboxPanel"/);
+  assert.match(html, /id="inboxPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
+  assert.match(html, /id="reviewPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
   assert.match(html, /id="sidebarAttention"/);
   assert.match(script, /Meta\+K|metaKey/);
   assert.match(script, /Chat|Task|Context/);
@@ -221,10 +222,12 @@ test("Task Workspace reuses native Chat and keeps Context packet assembly host-o
 });
 
 test("Codex light and dark primitives share one responsive accessible shell", async () => {
-  const [html, css, script] = await Promise.all([
+  const [html, css, script, guard, host] = await Promise.all([
     source("apps/codex-first-shell-prototype/index.html"),
     source("apps/codex-first-shell-prototype/app.css"),
     source("apps/codex-first-shell-prototype/app.js"),
+    source("apps/codex-first-shell-prototype/browser-interaction-guard.mjs"),
+    source("scripts/vh-codex-first-shell-prototype.mjs"),
   ]);
   for (const exact of ["#0169cc", "#fff", "#0d0d0d", "#339cff", "#181818"]) assert.match(css.toLowerCase(), new RegExp(exact));
   assert.match(css, /Inter, -apple-system/);
@@ -239,6 +242,17 @@ test("Codex light and dark primitives share one responsive accessible shell", as
   assert.match(css, /\.inbox-panel/);
   assert.match(css, /\.attention-item/);
   assert.match(script, /reviewFrame === "narrow"/);
+  assert.match(script, /sidebar\.inert = narrow && !open/);
+  assert.match(script, /mainColumn\.inert = mobileNavigationOpen/);
+  assert.match(script, /closeMobileSidebar/);
+  assert.match(script, /event\.key === "Tab" && modal/);
+  assert.match(script, /aria-expanded/);
+  assert.match(html, /role="combobox"[^>]+aria-controls="searchResults"/);
+  assert.match(script, /document\.documentElement\.dataset\.theme/);
+  assert.match(script, /focusRouteHeading/);
+  for (const behavior of ["narrow drawer closes", "search traps forward Tab", "dark theme reaches overlay siblings", "page has no horizontal overflow"]) assert.match(guard, new RegExp(behavior));
+  assert.match(script, /runBrowserInteractionGuard/);
+  assert.match(host, /browser-interaction-guard\.mjs/);
   assert.match(css, /body\[data-review-frame="narrow"\] \{[^}]*width: 390px; height: 844px/);
   assert.match(css, /body\[data-review-frame="narrow"\] \.search-dialog/);
   assert.match(css, /body\[data-review-frame="narrow"\] \.inbox-panel/);
