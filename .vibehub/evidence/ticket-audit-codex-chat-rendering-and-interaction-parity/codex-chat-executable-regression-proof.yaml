@@ -1,0 +1,23 @@
+{
+  "acceptance_ids": [
+    "renderer-conformance-regressions-are-executable"
+  ],
+  "evidence_id": "codex-chat-executable-regression-proof",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-22T00:22:52Z",
+  "refs": [
+    "commit:fac258a",
+    "test/codex-chat-conformance.test.mjs",
+    "test/codex-first-shell-prototype.test.mjs",
+    "apps/codex-first-shell-prototype/chat-conformance-fixtures.json",
+    "apps/codex-first-shell-prototype/chat-model.mjs",
+    "apps/codex-first-shell-prototype/chat-renderer.mjs",
+    "docs/proposals/codex-chat-conformance/protocol-event-census.json",
+    "command:2026-08-22-npm-test-185-pass-0-fail-2-skip",
+    "command:2026-08-22-npm-run-probe-codex-pass"
+  ],
+  "schema_version": 1,
+  "summary": "Executable pure reducer, renderer, request-registry, event-window, Composer-draft and host tests bind replay and live behavior to compound Thread/Turn/item identity, authoritative completion, deterministic ordering, escape-first sanitization, unknown-item fallback, bounded live state, interruption and recovery. The final full suite passed 185 of 187 tests with zero failures and two intentional environment skips; the pinned schema probe passed Codex 0.147.0 and protocol SHA-256 f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2.",
+  "ticket_id": "ticket-audit-codex-chat-rendering-and-interaction-parity"
+}

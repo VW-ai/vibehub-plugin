@@ -1,0 +1,21 @@
+{
+  "acceptance_ids": [
+    "current-shell-conformance-gaps-are-measured",
+    "specialized-independent-chat-audits-are-source-backed"
+  ],
+  "evidence_id": "codex-chat-conformance-matrix-and-audits",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-22T00:22:52Z",
+  "refs": [
+    "commit:4f94d2a42f201fea6bd2e863db3f04e4b1dfef87",
+    "docs/proposals/codex-chat-conformance/conformance-matrix.json",
+    "docs/proposals/codex-chat-conformance/audits/message-rich-content-audit.md",
+    "docs/proposals/codex-chat-conformance/audits/execution-tool-approval-audit.md",
+    "docs/proposals/codex-chat-conformance/audits/composer-navigation-accessibility-audit.md",
+    "docs/proposals/codex-chat-conformance/README.md"
+  ],
+  "schema_version": 1,
+  "summary": "The checked-in incremental matrix measures the accepted native-Chat contract across Thread, Turn, rich content, streaming, execution, Composer, navigation, recovery, accessibility and responsive behavior with before/after status and severity. Three independently attributable reports separately audited message/rich content, execution/tool/approval, and Composer/navigation/accessibility against stable interim commits; their FAIL verdicts remain immutable while later commits correct every P0 family. The converged recommendation uses pinned Codex 0.147.0 protocol facts and maintained repository implementations without copying proprietary Codex Desktop code or assets.",
+  "ticket_id": "ticket-audit-codex-chat-rendering-and-interaction-parity"
+}
