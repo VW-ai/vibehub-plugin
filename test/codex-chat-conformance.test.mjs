@@ -254,9 +254,12 @@ test("audit corrections wire running steer, fork, Thread drafts, drawer semantic
   assert.ok(lock.requiredRequests.includes("thread/fork"));
   assert.match(host, /payload\.action === "forkThread"[^]*thread\/fork/);
   assert.match(host, /payload\.action === "steerTurn"[^]*turn\/steer/);
+  assert.match(host, /payload\.action === "archiveThread"[^]*thread\/archive/);
+  assert.match(host, /payload\.action === "setThreadName"[^]*thread\/name\/set/);
   assert.match(script, /state\.running \? "steerTurn" : "startTurn"/);
   assert.match(script, /liveTurnId\(fixture\.thread\)/);
   assert.match(script, /dataset\.turnPosture/);
+  assert.match(script, /params\.get\("thread"\)/);
   assert.match(script, /saveThreadDraft\(state\.composerDrafts/);
   assert.match(script, /sidebar\.inert = narrow && !open/);
   assert.match(script, /MAX_ATTACHMENT_BYTES/);

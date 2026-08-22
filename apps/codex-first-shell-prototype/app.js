@@ -1574,6 +1574,12 @@ async function start() {
       state.threads = [...state.pinned, ...fixture.recents, ...fixture.projects.flatMap((project) => project.threads)];
       updateSidebar();
     }
+    const requestedThreadId = params.get("thread");
+    if (requestedThreadId) {
+      await openThread(requestedThreadId);
+      pollEvents();
+      return;
+    }
     const taskFixtureName = params.get("taskFixture");
     if (taskFixtureName) {
       const fixture = await fetch("/task-fixtures.json").then((response) => response.json());

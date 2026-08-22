@@ -377,6 +377,18 @@ async function action(payload) {
     if (typeof payload.searchTerm !== "string" || !payload.searchTerm.trim()) return { threads: [] };
     return { threads: await projects.listThreads({ searchTerm: payload.searchTerm.trim() }) };
   }
+  if (payload.action === "setThreadName") {
+    if (typeof payload.threadId !== "string" || typeof payload.name !== "string" || !payload.name.trim() || payload.name.length > 160) {
+      throw Object.assign(new Error("bounded threadId and name required"), { status: 400 });
+    }
+    await client.request("thread/name/set", { threadId: payload.threadId, name: payload.name.trim() });
+    return { threadId: payload.threadId, name: payload.name.trim() };
+  }
+  if (payload.action === "archiveThread") {
+    if (typeof payload.threadId !== "string") throw Object.assign(new Error("threadId required"), { status: 400 });
+    await client.request("thread/archive", { threadId: payload.threadId });
+    return { threadId: payload.threadId, archived: true };
+  }
   if (payload.action === "startTurn") {
     if (typeof payload.threadId !== "string" || !validInputs(payload.input)) {
       throw Object.assign(new Error("threadId and bounded text/image/audio input required"), { status: 400 });

@@ -71,6 +71,7 @@
     "account/read",
     "thread/start",
     "thread/fork",
+    "thread/archive",
     "thread/resume",
     "thread/fork",
     "thread/archive",
