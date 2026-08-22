@@ -267,6 +267,17 @@
       "proof": ["packages/codex-adapter/upstream-lock.json", "scripts/vh-codex-first-shell-prototype.mjs", "apps/codex-first-shell-prototype/app.js", "test/codex-chat-conformance.test.mjs"]
     },
     {
+      "id": "current-thread-url-recovery",
+      "area": "Thread navigation",
+      "requirement": "After in-app Thread navigation, browser reload should recover the currently visible Thread rather than a stale prior deep link.",
+      "before": "partial",
+      "beforeSeverity": "medium",
+      "beforeFinding": "The exact-Thread query supports bounded review entry, but opening a fork does not replace the browser query; reload returns to the source Thread.",
+      "after": "deferred",
+      "implementation": "Recorded as a medium production navigation gap. This Ticket does not introduce browser persistence or claim current-Thread URL recovery.",
+      "proof": ["docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
+    },
+    {
       "id": "bounded-live-browser-state",
       "area": "Performance and recovery",
       "requirement": "Reducer state, not only mounted DOM, remains finite throughout a noisy or long-running Turn.",

@@ -365,7 +365,10 @@ async function action(payload) {
     return projects.moveThread(payload.threadId, payload.projectId, { beforeThreadId: payload.beforeThreadId ?? null });
   }
   if (payload.action === "forkThread") {
-    return projects.forkThread(payload.threadId, { lastTurnId: payload.lastTurnId ?? null });
+    if (typeof payload.threadId !== "string") throw Object.assign(new Error("threadId required"), { status: 400 });
+    const result = await projects.forkThread(payload.threadId, { lastTurnId: payload.lastTurnId ?? null });
+    appendEvent("clientAction", { action: "forkThread", sourceThreadId: payload.threadId, createdThreadId: result.thread.id, forkedFromId: result.thread.forkedFromId });
+    return result;
   }
   if (payload.action === "archiveThread") {
     return projects.archiveThread(payload.threadId);
@@ -384,11 +387,6 @@ async function action(payload) {
     await client.request("thread/name/set", { threadId: payload.threadId, name: payload.name.trim() });
     return { threadId: payload.threadId, name: payload.name.trim() };
   }
-  if (payload.action === "archiveThread") {
-    if (typeof payload.threadId !== "string") throw Object.assign(new Error("threadId required"), { status: 400 });
-    await client.request("thread/archive", { threadId: payload.threadId });
-    return { threadId: payload.threadId, archived: true };
-  }
   if (payload.action === "startTurn") {
     if (typeof payload.threadId !== "string" || !validInputs(payload.input)) {
       throw Object.assign(new Error("threadId and bounded text/image/audio input required"), { status: 400 });
@@ -399,12 +397,14 @@ async function action(payload) {
     if (typeof payload.threadId !== "string" || typeof payload.expectedTurnId !== "string" || !validInputs(payload.input)) {
       throw Object.assign(new Error("threadId, expectedTurnId and bounded text/image/audio input required"), { status: 400 });
     }
-    return client.request("turn/steer", {
+    const result = await client.request("turn/steer", {
       threadId: payload.threadId,
       expectedTurnId: payload.expectedTurnId,
       clientUserMessageId: `vibehub-${crypto.randomUUID()}`,
       input: payload.input,
     });
+    appendEvent("clientAction", { action: "steerTurn", threadId: payload.threadId, expectedTurnId: payload.expectedTurnId });
+    return result;
   }
   if (payload.action === "interruptTurn") {
     if (typeof payload.threadId !== "string" || typeof payload.turnId !== "string") {

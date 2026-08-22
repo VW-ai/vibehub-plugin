@@ -62,6 +62,9 @@ remain truthful future bridges.
 - Theme preference intentionally resets with the page because the carrier does not
   claim browser storage as a second persistence authority. Document-root theme
   tokens do cover Search, Inbox, Review, toast and selection overlays.
+- Opening a fork changes the in-memory current Thread but does not replace an
+  existing `?thread=` review deep link. Reload therefore returns to that source
+  Thread; current-Thread URL recovery remains a medium navigation gap.
 - The Composer's JavaScript growth ceiling and CSS max-height differ slightly; the
   browser remains bounded, but the constants should converge in production polish.
 - The research carrier retains a bounded 240-item tail. True viewport
