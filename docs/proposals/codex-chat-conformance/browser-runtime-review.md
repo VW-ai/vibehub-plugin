@@ -90,18 +90,57 @@ the single interrupted Turn and partial Agent message. Nothing was deleted.
   interruption, unknown items, escape-first Markdown, media/citation fallbacks,
   aggregate DOM bounds and bounded live reducer state.
 
+## Production shell conformance closure
+
+This section records the run that upgraded `selection-during-stream`,
+`quote-add-to-chat`, `markdown-rich-content`, `request-user-input`,
+`composer-inputs` and `current-thread-url-recovery` to pass in the production
+shell (`apps/codex-first-shell/`) at application commit `30dc40f`.
+
+- `npm test`: 216 tests, 213 passed, 0 failed, 3 intentional environment skips
+  (206 / 203 / 0 / 3 before the closure).
+- The opt-in guard ran through the production host
+  (`scripts/vh-codex-first-shell.mjs`) in a fresh headless Chrome driven over
+  the DevTools protocol with a visible document state, so
+  `requestAnimationFrame` and `selectionchange` behave as in a foreground tab:
+  - `?chatFixture=mixed&interactionGuard=1` at 1280x800:
+    `PASS browser interaction guard · 35/35`, zero console errors or uncaught
+    exceptions, `clientWidth = scrollWidth = 1280`, stable across five runs;
+  - `…&reviewFrame=narrow` inside a 1280x800 window: `PASS 36/36`;
+  - `…&reviewFrame=narrow` at a 390x844 viewport: `PASS 36/36`,
+    `clientWidth = scrollWidth = 390`.
+  - The sidebar checks branch on layout: the narrow frame exercises the
+    drawer's inert, focus-entry and focus-return lifecycle; the wide layout
+    verifies the persistent, never-inert sidebar and its collapse toggle.
+- The app-server behind the host was the pinned-protocol fixture
+  (`test/fixtures/codex-app-server-fixture.mjs` with
+  `CODEX_FIXTURE_VERSION=0.147.0`), because the locally installed Codex 0.144.1
+  predates the pinned 0.147.0 baseline and its bootstrap fails truthfully on
+  `threadSection/list`. The bounded authenticated runtime review above is not
+  repeated and still stands at `fac258a`; this closure changes no adapter
+  behavior.
+
+The new real-DOM checks proved, through the actual controls: a request draft
+(chosen Other option, its text and the secret answer) surviving a Tasks round
+trip through the real navigation; a selection held across a streamed update,
+with the selected entry keeping its node while the command output streamed,
+then reconciling once the selection was released; Quote submitting a
+`turn/start` input whose quoted block closes with the exact source Thread, Turn
+and item line, and a replayed human message rendering that identity chip; the
+Composer stopping at the 190px CSS ceiling with quote context removable; Fork
+navigation rewriting `?thread=` to the opened Thread; a 300-item Thread
+mounting 240 entries behind a visible "60 earlier items" disclosure; and no
+model, mode or realtime control anywhere in the shell.
+
 ## Remaining non-highest gaps
 
-All highest-severity findings from the three independent audits are corrected.
-The following remain explicit medium or low production work:
+All highest-severity findings from the three independent audits are corrected
+and the five partial checks plus current-Thread URL recovery now pass. The
+following remain explicit medium or low production work:
 
-- mature CommonMark breadth and a production virtualized conversation list;
-- durable Quote-source serialization and a product policy/test for selection
-  held longer than the bounded streaming deferral;
-- request-user-input draft persistence across intentional route changes;
-- convergence of the small CSS/JavaScript Composer-height constant mismatch;
-- current-Thread URL recovery after in-app Fork navigation (today a stale
-  `?thread=` review link reloads the source Thread);
+- full CommonMark breadth (tables, setext headings, indented code fall back to
+  literal text) and a production virtualized conversation list behind the
+  disclosed 240-item bound;
 - model/mode pickers, realtime voice when the runtime exposes it, final visual
   system work and theme-preference persistence.
 

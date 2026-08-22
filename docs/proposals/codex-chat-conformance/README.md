@@ -43,32 +43,36 @@ overlay panels share explicit inert, modal, scrim, Escape and focus-return postu
 An opt-in deterministic browser guard operates those controls and reports its
 structured result instead of treating source inspection as interaction proof.
 
+The production shell (`apps/codex-first-shell/`) then closed the five partial
+checks and the navigation gap that remained open at `fac258a`. A
+selection-preserving patch policy replaces the timer-bounded whole-paint
+deferral: the entry a live selection touches keeps its mounted node while the
+rest of the Turn streams, and releasing the selection reconciles it. Quote source
+identity serializes into the Turn input itself, so durable Thread history carries
+the exact Thread, Turn and item and any replay renders it. The escape-first
+Markdown renderer is now a line-start block parser with nested lists, nested
+quotes, line-start fences and delimiter-bounded inline rules. Request-user-input
+drafts survive intentional route changes. The Composer growth ceiling has one
+CSS owner. The `?thread=` query follows the visible Thread after every in-app
+navigation. Each upgrade has an exact node test and, except Markdown, a real-DOM
+guard check named in the matrix proof fields; the mounted 240-item bound now
+discloses itself, and a test pins that no model, mode or realtime control exists.
+
 Task semantics did not enter this path. A quote is normal Chat input; it creates no
 VibeHub Task, Evidence or Outcome. The disabled `Remember` and `Make Task` controls
 remain truthful future bridges.
 
 ## Truthful remaining gaps
 
-- The escape-first Markdown carrier is intentionally smaller than a mature
-  CommonMark renderer; nested/malformed constructs remain a medium-severity
-  production-shell gap.
-- Quote carries exact Thread / Turn / item identity in the active browser session.
-  Durable source-identity serialization remains a medium-severity production gap.
-- A changed entry selected continuously beyond the bounded streaming deferral can
-  still be replaced. Selection-under-stream remains an explicit medium-severity
-  browser-test and product-policy gap.
-- Request-user-input values survive keyed streaming patches, but draft persistence
-  across an intentional route change remains a medium-severity production gap.
-- Theme preference intentionally resets with the page because the carrier does not
-  claim browser storage as a second persistence authority. Document-root theme
-  tokens do cover Search, Inbox, Review, toast and selection overlays.
-- Opening a fork changes the in-memory current Thread but does not replace an
-  existing `?thread=` review deep link. Reload therefore returns to that source
-  Thread; current-Thread URL recovery remains a medium navigation gap.
-- The Composer's JavaScript growth ceiling and CSS max-height differ slightly; the
-  browser remains bounded, but the constants should converge in production polish.
-- The research carrier retains a bounded 240-item tail. True viewport
-  virtualization belongs in the production shell.
+- The escape-first Markdown carrier renders nested lists, nested quotes and
+  line-start fences with bounded malformed-input handling, but it remains
+  intentionally smaller than CommonMark: tables, setext headings and indented
+  code fall back to literal escaped text.
+- Theme preference intentionally resets with the page because the carrier does
+  not claim browser storage as a second persistence authority. Document-root
+  theme tokens do cover Search, Inbox, Review, toast and selection overlays.
+- The carrier retains a bounded 240-item tail and discloses how many earlier
+  items are not mounted. True viewport virtualization remains deferred.
 - Model and collaboration-mode pickers remain absent rather than falsely enabled.
 - Ordinary audio remains supported; realtime voice remains hidden because the
   pinned runtime probe reports it unsupported.
@@ -116,4 +120,6 @@ interaction guard. All six now have concrete corrections. The audit report remai
 immutable and correctly records its FAIL verdict against the earlier commit. The
 final application commit then passed the 25-check real-DOM guard, wide Light/Dark
 review and a bounded authenticated Codex steer, interrupt and Fork flow recorded in
-[`browser-runtime-review.md`](browser-runtime-review.md).
+[`browser-runtime-review.md`](browser-runtime-review.md). The production
+closure extended that guard to 35 checks at 1280 and 36 in the narrow review
+frame; those runs are recorded in the same review.

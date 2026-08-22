@@ -410,6 +410,41 @@ test("deferred model, mode, realtime-voice and virtualization checks make no con
   assert.match(script, /renderTimelineOmission\(mounted\.omitted\)/, "the 240-item mounted bound discloses itself");
 });
 
+test("conformance matrix proof entries resolve to existing files, exact tests and guard checks", async () => {
+  const matrix = JSON.parse(await source("docs/proposals/codex-chat-conformance/conformance-matrix.json"));
+  assert.match(matrix.baseline.proofNotation, /path::name/);
+  const cache = new Map();
+  const read = async (path) => {
+    if (!cache.has(path)) cache.set(path, await source(path).catch(() => null));
+    return cache.get(path);
+  };
+  for (const check of matrix.checks) {
+    assert.ok(check.proof.length, `${check.id} records proof`);
+    for (const entry of check.proof) {
+      const [path, name] = entry.split("::");
+      assert.doesNotMatch(path, /codex-first-shell-prototype/, `${check.id} proof points at the production shell, not the retired prototype`);
+      const text = await read(path);
+      assert.ok(typeof text === "string", `${check.id} proof path exists: ${path}`);
+      if (name) {
+        const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        assert.match(text, new RegExp(`(?:test|check\\(results,)\\s*\\(?\\s*"${escaped}"`), `${check.id}: ${path} declares no test or guard check named "${name}"`);
+      }
+    }
+  }
+  for (const id of ["selection-during-stream", "quote-add-to-chat", "markdown-rich-content", "request-user-input", "composer-inputs", "current-thread-url-recovery"]) {
+    const check = matrix.checks.find((entry) => entry.id === id);
+    assert.equal(check.after, "pass", `${id} is upgraded`);
+    assert.ok(check.proof.some((entry) => entry.startsWith("test/") && entry.includes("::")), `${id} names an exact node test`);
+    assert.ok(check.proof.some((entry) => entry.includes("browser-interaction-guard.mjs::")) || id === "markdown-rich-content", `${id} names a real-DOM guard check`);
+  }
+  for (const id of ["virtualized-production-list", "model-mode-pickers", "realtime-voice"]) {
+    const check = matrix.checks.find((entry) => entry.id === id);
+    assert.equal(check.after, "deferred", `${id} stays deferred`);
+    assert.ok(check.proof.some((entry) => entry.includes("::")), `${id} pins that the UI makes no contrary claim`);
+  }
+  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 26, partial: 0, deferred: 3, fail: 0 });
+});
+
 test("current shell exposes the conformance interactions without a second transcript", async () => {
   const [html, script, css, host] = await Promise.all([
     source("apps/codex-first-shell/index.html"),
