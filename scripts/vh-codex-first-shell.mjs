@@ -25,13 +25,14 @@ import { createSharedHarnessShell } from "../packages/harness-core/shell.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
-import { documents, initProject, loadRepository, projectCompatibility, readDocument, writeDocument } from "../skills/scripts/vh.mjs";
+import { documents, initProject, projectCompatibility, readDocument, writeDocument } from "../skills/scripts/vh.mjs";
 
 const LOOPBACK_HOST = "127.0.0.1";
 const SHELL_ID = "codex-first-shell";
 const EVENT_LIMIT = 500;
 const BODY_LIMIT = 12 * 1024 * 1024;
 const APP_SERVER_TIMEOUT_MS = 120_000;
+const SEARCH_LIMIT = 20;
 const THREAD_POLICY = Object.freeze({ approvalPolicy: "on-request", sandbox: "workspace-write" });
 // The Codex Project binding record is provenance only. Chat membership stays
 // in the native ThreadSection, which is re-read on every bootstrap; the
@@ -361,19 +362,38 @@ function requireBoundScope() {
   return project;
 }
 
-function knowledgeProjection() {
-  const repository = loadRepository(repoRoot);
-  return [...repository.contexts.documents.values()]
-    .filter(({ document }) => document.state === "active")
-    .map(({ document, path }) => ({
-      contextId: document.context_id,
-      type: document.type,
-      summary: document.summary,
-      detail: document.detail,
-      tags: document.tags,
-      room: path.split(".vibehub/rooms/")[1]?.split("/").slice(0, -1).join("/") ?? "project",
-      sourceRef: document.source.ref,
-    }))
+// Durable Context is read through the canonical Room projection
+// (vh-ui.mjs buildUiSnapshot -> projectRooms): Room membership, state and the
+// checked-in path come from there, and only the document body (detail, tags,
+// source ref) is looked up by that canonical Context id. The host never walks
+// .vibehub itself to decide which Context exists or which Room owns it.
+const KNOWLEDGE_SOURCE = "canonical_room_projection";
+
+function knowledgeProjection(snapshot = buildUiSnapshot(repoRoot)) {
+  const owners = new Map();
+  for (const room of snapshot.state.rooms.rooms) {
+    for (const context of room.contexts) {
+      // A nested Room lists its ancestors' prefix too; the deepest Room owns it.
+      const current = owners.get(context.contextId);
+      if (!current || room.room.length > current.room.length) owners.set(context.contextId, { room: room.room, context });
+    }
+  }
+  return [...owners.values()]
+    .filter(({ context }) => context.state === "active")
+    .map(({ room, context }) => {
+      const document = snapshot.repository.contexts.documents.get(context.contextId).document;
+      return {
+        contextId: context.contextId,
+        type: context.type,
+        summary: context.summary,
+        detail: document.detail,
+        tags: document.tags,
+        room,
+        sourceRef: document.source.ref,
+        contextRef: context.path,
+        source: KNOWLEDGE_SOURCE,
+      };
+    })
     .sort((left, right) => left.summary.localeCompare(right.summary));
 }
 
@@ -412,18 +432,23 @@ function priorAcceptedProjection(handoff, repository) {
     .sort((left, right) => left.ticketId.localeCompare(right.ticketId));
 }
 
+// The Task Workspace is one read of the canonical projection: the handoff is
+// vh-ui.mjs buildTicketHandoff, and the packet is exactly what
+// codex-adapter/task-context.mjs assembles from it. packetText is the byte
+// sequence the browser shows and the Turn input the host sends; the browser
+// never rebuilds either, and Evidence, Outcome and next action are handed over
+// from the same handoff rather than re-derived anywhere else.
 function taskWorkspaceProjection(ticketId, { selectedContextIds = [], thread = null, operation = "start", humanMessage = null } = {}) {
   const handoff = buildTicketHandoff(repoRoot, ticketId);
   const snapshot = buildUiSnapshot(repoRoot);
-  const repository = loadRepository(repoRoot);
-  const contexts = knowledgeProjection();
+  const contexts = knowledgeProjection(snapshot);
   const packet = buildTaskContextPacket({
     handoff,
     project: snapshot.state.project,
     contexts,
     rooms: snapshot.state.rooms.rooms,
     selectedContextIds,
-    priorAccepted: priorAcceptedProjection(handoff, repository),
+    priorAccepted: priorAcceptedProjection(handoff, snapshot.repository),
     thread,
     operation,
     humanMessage,
@@ -431,6 +456,16 @@ function taskWorkspaceProjection(ticketId, { selectedContextIds = [], thread = n
   return {
     handoff,
     packet,
+    packetText: JSON.stringify(packet, null, 2),
+    evidence: handoff.evidence,
+    outcome: handoff.outcomeRecord,
+    nextAction: handoff.nextAction,
+    source: {
+      handoff: "vh-ui.buildTicketHandoff",
+      packet: "codex-adapter/task-context.buildTaskContextPacket",
+      contexts: KNOWLEDGE_SOURCE,
+      snapshotId: snapshot.state.graph.snapshotId,
+    },
     eligibleContexts: contexts.map((item) => ({
       contextId: item.contextId,
       room: item.room,
@@ -450,8 +485,7 @@ function taskWorkspaceProjection(ticketId, { selectedContextIds = [], thread = n
   };
 }
 
-function attentionProjection(graph) {
-  const repository = loadRepository(repoRoot);
+function attentionProjection(graph, repository) {
   const tickets = new Map(documents(repository.tickets.documents).map((ticket) => [ticket.ticket_id, ticket]));
   const needsYou = graph.tickets
     .filter((ticket) => ticket.capabilities.nextAction.summary.action === "NEEDS_HUMAN")
@@ -532,8 +566,8 @@ async function bootstrap() {
     projects: visibleGroups,
     project,
     graph,
-    contexts: knowledgeProjection(),
-    attention: attentionProjection(graph),
+    contexts: knowledgeProjection(snapshot),
+    attention: attentionProjection(graph, snapshot.repository),
     harness: carrier,
     runtime: runtimeProjection(),
     stop,
@@ -651,8 +685,15 @@ async function action(payload) {
     return projects.unarchiveThread(payload.threadId);
   }
   if (payload.action === "searchThreads") {
-    if (typeof payload.searchTerm !== "string" || !payload.searchTerm.trim()) return { threads: [] };
-    return { threads: await projects.listThreads({ searchTerm: payload.searchTerm.trim(), cwd: repoRoot }) };
+    // Native Thread search: the app-server's own thread/list searchTerm over
+    // every group in this folder, so Threads beyond the listed tail are found
+    // without any host-side index. The result is bounded, never paged forward.
+    const limit = Number.isInteger(payload.limit) ? Math.min(Math.max(payload.limit, 1), SEARCH_LIMIT) : SEARCH_LIMIT;
+    const searchTerm = typeof payload.searchTerm === "string" ? payload.searchTerm.trim() : "";
+    const scope = { cwd: repoRoot, method: "thread/list", filter: "searchTerm", groups: "all sections and Recents in this folder", archived: false };
+    if (!searchTerm) return { threads: [], total: 0, limit, searchTerm, scope };
+    const threads = await projects.listThreads({ searchTerm: payload.searchTerm.trim(), cwd: repoRoot });
+    return { threads: threads.slice(0, limit), total: threads.length, limit, searchTerm, scope };
   }
   if (payload.action === "listImportableProjects") {
     const project = projectProjection(buildUiSnapshot(repoRoot), null, []);
@@ -735,19 +776,23 @@ async function action(payload) {
     if (attachments.length > 3 || !validInputs([{ type: "text", text: payload.message }, ...attachments])) {
       throw invalid("Task Turn attachments must be bounded image or audio inputs");
     }
-    const input = [{ type: "text", text: JSON.stringify(workspace.packet, null, 2) }, ...attachments];
+    // payloadText is the exact Turn input: the same bytes the Workspace shows
+    // and the app-server persists as this Turn's user message.
+    const payloadText = workspace.packetText;
+    const input = [{ type: "text", text: payloadText }, ...attachments];
     if (operation === "steer") {
       if (typeof payload.expectedTurnId !== "string") throw invalid("expectedTurnId required to steer");
-      return client.request("turn/steer", {
+      const steered = await client.request("turn/steer", {
         threadId: linked.id,
         expectedTurnId: payload.expectedTurnId,
         clientUserMessageId: `vibehub-${crypto.randomUUID()}`,
         input,
       });
+      return { ...steered, ticketId: payload.ticketId, threadId: linked.id, operation, payloadText };
     }
     await client.request("thread/resume", { threadId: linked.id, cwd: repoRoot, ...THREAD_POLICY });
     const continued = await sendThroughHarness(linked.id, input);
-    return continued.value;
+    return { ...continued.value, ticketId: payload.ticketId, threadId: linked.id, operation, payloadText };
   }
   if (payload.action === "resolveRequest") {
     const request = pendingRequests.get(String(payload.requestId));
