@@ -64,12 +64,45 @@
         }
       }
     },
-    "provenance_refs": { "type": "array", "items": { "$ref": "#/$defs/text" } }
+    "provenance_refs": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+    "origin": {
+      "$ref": "#/$defs/origin",
+      "description": "Canonical provenance of the harness Turn this Ticket was born from. Omission means no origin and is the only compatibility rule. Once a Ticket is checked in, its origin is immutable: ticket apply refuses to add, change, or remove it. Origin is recorded only from exact harness identity, never derived from Thread names, previews, or transcripts."
+    }
   },
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
     "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["harness", "thread_id", "forked_from_id", "turn_id", "item_id", "selection", "captured_at"],
+      "properties": {
+        "harness": { "type": "string", "enum": ["codex"] },
+        "thread_id": { "$ref": "#/$defs/text" },
+        "forked_from_id": { "oneOf": [{ "$ref": "#/$defs/text" }, { "type": "null" }] },
+        "turn_id": { "$ref": "#/$defs/text" },
+        "item_id": { "oneOf": [{ "$ref": "#/$defs/text" }, { "type": "null" }] },
+        "selection": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["start", "end", "text_sha256"],
+              "properties": {
+                "start": { "type": "integer", "minimum": 0 },
+                "end": { "type": "integer", "minimum": 0, "description": "Must be greater than or equal to start; the validator enforces the ordering the schema cannot express." },
+                "text_sha256": { "$ref": "#/$defs/sha256" }
+              }
+            }
+          ]
+        },
+        "captured_at": { "type": "string", "format": "date-time" }
+      }
+    },
     "commit_ref": { "type": "string", "pattern": "^commit:[0-9a-f]{40}$" },
     "pull_request_ref": { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[1-9][0-9]*$" },
     "delivery": {
