@@ -9,6 +9,7 @@ import { createFixtureClient } from "../packages/harness-core/fixtures.mjs";
 import { probeCodexOnlyRoute } from "../packages/harness-core/probe-codex-only.mjs";
 import { probePackageIsolation } from "../packages/harness-core/probe-package-isolation.mjs";
 import { createHarnessRouter, UnsupportedHarnessCapabilityError } from "../packages/harness-core/router.mjs";
+import { createSharedHarnessShell } from "../packages/harness-core/shell.mjs";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
@@ -46,6 +47,47 @@ test("one router dispatches through exactly one selected harness and never cross
   await assert.rejects(router.dispatch("chat.send", { harnessId: "codex" }), /codex, but dsh is selected/u);
   await assert.rejects(router.dispatch("chat.sendAudio", { conversationId: "session-1" }), UnsupportedHarnessCapabilityError);
   assert.deepEqual(calls, ["chat.send"]);
+});
+
+test("shared shell exposes one seam per router verb, gates them behind boot, and inherits capability gating", async () => {
+  const dispatched = [];
+  const recordingAdapter = (id) => ({
+    id,
+    async execute(action, input) {
+      dispatched.push({ action, input });
+      return { harnessId: id, conversationId: input.conversationId ?? `${id}-thread-1`, runId: input.runId ?? null };
+    },
+  });
+  const shell = createSharedHarnessShell({ adapter: recordingAdapter("codex"), associations: createMemoryAssociationStore() });
+  assert.throws(() => shell.sendChat({ conversationId: "thread-1", content: [] }), /not booted/u);
+  assert.throws(() => shell.recoverTask("ticket-shell-seams"), /not booted/u);
+  assert.deepEqual(shell.boot(), { carrierId: "codex", capabilities: capabilitySnapshot("codex") });
+  const text = [{ type: "text", text: "hello" }];
+  const seams = [
+    ["newChat", { cwd: "/work" }, "chat.create"],
+    ["resumeChat", { conversationId: "thread-1" }, "chat.resume"],
+    ["sendChat", { conversationId: "thread-1", content: text }, "chat.send"],
+    ["sendChatAttachments", { conversationId: "thread-1", content: [...text, { type: "image", url: "data:image/png;base64,AA==" }] }, "chat.sendAttachments"],
+    ["sendChatAudio", { conversationId: "thread-1", content: [{ type: "audio", url: "data:audio/webm;base64,AA==" }] }, "chat.sendAudio"],
+    ["forkChat", { conversationId: "thread-1" }, "chat.fork"],
+    ["searchChats", { query: "hello" }, "chat.search"],
+    ["interruptChat", { conversationId: "thread-1", runId: "turn-1" }, "chat.interrupt"],
+    ["resolveInteraction", { conversationId: "thread-1", requestId: 7, result: { decision: "accept" } }, "interaction.resolveApproval"],
+    ["startTask", { cwd: "/work", payload: { kind: "vibehub_ticket_handoff", ticketId: "ticket-shell-seams" } }, "task.start"],
+  ];
+  for (const [method, input] of seams) await shell[method](input);
+  assert.deepEqual(dispatched.map(({ action }) => action), seams.map(([, , action]) => action));
+  assert.ok(dispatched.every(({ input }) => input.harnessId === "codex"));
+  assert.deepEqual(dispatched[0].input.options, { cwd: "/work" });
+  assert.equal((await shell.recoverTask("ticket-shell-seams")).conversationId, "codex-thread-1");
+  await shell.close();
+  assert.throws(() => shell.newChat(), /not booted/u);
+
+  const dsh = createSharedHarnessShell({ adapter: recordingAdapter("dsh") });
+  dsh.boot();
+  await assert.rejects(dsh.sendChatAudio({ conversationId: "session-1", content: [] }), UnsupportedHarnessCapabilityError);
+  await dsh.sendChatAttachments({ conversationId: "session-1", content: [] });
+  await dsh.close();
 });
 
 test("Codex adapter routes ordinary Chat and exact Task handoff through app-server only", async () => {
