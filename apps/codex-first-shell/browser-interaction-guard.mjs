@@ -217,6 +217,87 @@ export async function runBrowserInteractionGuard(hooks) {
   check(results, "deferred model, mode and realtime controls make no contrary claim", [...document.querySelectorAll(".composer-setting")].every((node) => node.tagName === "SPAN") && !document.querySelector("[data-model-picker], [data-mode-picker], [aria-label*='realtime' i], [aria-label*='model' i], [aria-label*='collaboration mode' i]"));
   await hooks.switchFixtureThread(fixture.thread);
 
+  // One Project, four scope states: the header, the Tasks gate, the Room
+  // cold-start handoff and the explicit import dialog are exercised through
+  // the real controls with host-shaped fixtures, then the live Project is
+  // restored.
+  const projectFixture = await fetch("/project-fixtures.json").then((response) => response.json());
+  const originalProject = hooks.currentProject();
+  const projectHeader = document.querySelector("#projectHeader");
+  const scopeStates = [
+    ["bound", "Bound", "scope state bound renders"],
+    ["unbound", "Not set up", "scope state unbound renders"],
+    ["no-repository", "No repository", "scope state no-repository renders"],
+    ["migration-required", "Migration required", "scope state migration-required renders"],
+  ];
+  for (const [scope, label, name] of scopeStates) {
+    await hooks.applyScopeFixture(projectFixture.scopes[scope]);
+    const tasksNav = document.querySelector('.primary-nav [data-route="tasks"]');
+    const importButton = document.querySelector("#importProject");
+    const pill = document.querySelector("#projectScope");
+    const inspect = document.querySelector("#projectInspectList")?.textContent ?? "";
+    check(results, name, projectHeader.dataset.scope === scope
+      && pill.textContent === label
+      && tasksNav.getAttribute("aria-disabled") === String(scope !== "bound")
+      && importButton.hidden === (scope !== "unbound")
+      && document.querySelector("#inboxButton").hidden === (scope !== "bound")
+      && inspect.includes("Working folder (cwd)")
+      && (scope === "bound" || document.querySelector("#projectNote")?.textContent.length > 20), `${projectHeader.dataset.scope}/${pill.textContent}/${tasksNav.getAttribute("aria-disabled")}/${importButton.hidden}`);
+  }
+  check(results, "cwd appears only as inspectable metadata", !document.querySelector("#projectName").textContent.includes("/") && !document.querySelector("#projectBranch").textContent.includes("/") && document.querySelector("#projectInspect").tagName === "DETAILS");
+  await hooks.applyScopeFixture(projectFixture.scopes.unbound);
+  openSidebar.click();
+  await frame();
+  document.querySelector('.primary-nav [data-route="tasks"]').click();
+  await frame();
+  const scopePanel = document.querySelector(".scope-panel");
+  check(results, "unbound Tasks route explains the missing scope instead of a graph", scopePanel?.dataset.scope === "unbound" && !document.querySelector(".tasks-view") && scopePanel.textContent.includes("uncommitted") && scopePanel.textContent.includes("Chat keeps working") && Boolean(scopePanel.querySelector("[data-open-import]")));
+  await hooks.applyScopeFixture(projectFixture.scopes.bound);
+  check(results, "bound cold start hands off to distill without inventing a Room tree", document.querySelector("#projectRooms")?.textContent === "Rooms: cold start pending — run distill" && (document.querySelector("#projectInspectList")?.textContent ?? "").includes("no Room tree checked in") && Boolean(document.querySelector(".tasks-view")));
+  check(results, "grouping copy never says Project for a Codex ThreadSection", !/Create Project|Move Chat to Project|No Projects yet|New Project name/u.test(document.querySelector("#sidebar").innerHTML) && document.querySelector("#projectLabel").textContent === "Chat groups" && document.querySelector("#createProject").getAttribute("aria-label") === "Create chat group");
+
+  await hooks.applyScopeFixture(projectFixture.scopes.unbound);
+  const importTrigger = document.querySelector("#importProject");
+  const importActions = [];
+  await hooks.withFixtureTransport(async (payload) => {
+    importActions.push(payload);
+    if (payload.action === "listImportableProjects") return structuredClone(projectFixture.importCandidates);
+    if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+    return {};
+  }, async () => {
+    // The trigger lives in the Sidebar: on the narrow frame the drawer must be
+    // open (and therefore not inert) before it can take focus, as for the nav.
+    openSidebar.click();
+    await frame();
+    importTrigger.focus();
+    importTrigger.click();
+    await waitFor(() => document.querySelectorAll(".import-row").length === projectFixture.importCandidates.projects.length);
+    const importDialog = document.querySelector("#importDialog");
+    const rows = [...document.querySelectorAll(".import-row")];
+    const eligible = rows.filter((row) => !row.disabled);
+    check(results, "import dialog is a contained modal that lands focus on the first eligible Codex Project", !importDialog.hidden && appShell.inert && eligible.length === 1 && document.activeElement === eligible[0], document.activeElement?.id || document.activeElement?.className);
+    check(results, "ineligible Codex Projects stay visible but disabled with their reason", rows.filter((row) => row.disabled).length === 3 && rows.filter((row) => row.disabled).every((row) => row.title.length > 0) && rows.some((row) => row.textContent.includes("Different folder")) && rows.some((row) => row.textContent.includes("2 folders")) && rows.some((row) => row.textContent.includes("No chats")));
+    const confirmButton = document.querySelector("#confirmImport");
+    const disabledBefore = confirmButton.disabled;
+    eligible[0].click();
+    await frame();
+    const selectionText = document.querySelector("#importSelection").textContent;
+    check(results, "selecting an eligible Codex Project names the uncommitted scaffold it will write", disabledBefore && !document.querySelector("#confirmImport").disabled && document.querySelector('.import-row[aria-pressed="true"]')?.dataset.importSection === eligible[0].dataset.importSection && selectionText.includes(".vibehub/codex-project.yaml") && selectionText.includes("uncommitted"));
+    const importFocusable = [...importDialog.querySelectorAll("button:not([disabled])")].filter((element) => element.getClientRects().length);
+    importFocusable.at(-1).focus();
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+    check(results, "import dialog traps forward Tab", document.activeElement === importFocusable[0], document.activeElement?.id);
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await frame();
+    check(results, "import dialog Escape restores focus to its trigger without importing", importDialog.hidden && !appShell.inert && document.activeElement === importTrigger && !importActions.some((entry) => entry.action === "importProject"), document.activeElement?.id);
+  });
+  await hooks.applyScopeFixture(originalProject);
+  openSidebar.click();
+  await frame();
+  document.querySelector('.primary-nav [data-route="chat"]').click();
+  await frame();
+  await hooks.switchFixtureThread(fixture.thread);
+
   openSidebar.focus();
   openSidebar.click();
   const themeToggle = document.querySelector("#themeToggle");

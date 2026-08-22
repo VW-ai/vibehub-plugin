@@ -83,7 +83,7 @@ test("Codex-first shell uses real app-server ownership and additive VibeHub Task
     source("packages/codex-adapter/harness.mjs"),
     source("docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"),
   ]);
-  for (const label of ["New chat", "Chat", "Tasks", "Rooms", "Projects", "Appearance", "Search", "Task inbox", "Recents"]) assert.match(html, new RegExp(label, "i"));
+  for (const label of ["New chat", "Chat", "Tasks", "Rooms", "Chat groups", "Project", "Appearance", "Search", "Task inbox", "Recents"]) assert.match(html, new RegExp(label, "i"));
   for (const seam of ["createSharedHarnessShell", "createCodexHarnessAdapter", "harness.boot()", "harness.newChat(", "harness.sendChat(", "harness.sendChatAttachments(", "harness.sendChatAudio(", "harness.interruptChat(", "harness.resolveInteraction(", "harness.close()"]) assert.ok(server.includes(seam), seam);
   for (const request of ["thread/start", "turn/start", "turn/interrupt"]) assert.match(adapter, new RegExp(request.replace("/", "\\/")));
   for (const request of ["thread/list", "thread/read", "thread/resume", "turn/steer", "thread/name/set"]) assert.match(server, new RegExp(request.replace("/", "\\/")));
@@ -342,6 +342,67 @@ test("Codex light and dark primitives share one responsive accessible shell", as
   assert.match(html, /aria-label="Application navigation"/);
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /meta name="color-scheme"/);
+});
+
+test("Project names only the repository-bound VibeHub Project while chat grouping stays native under its own label", async () => {
+  const [html, script, css, host, fixtureText, guard] = await Promise.all([
+    source("apps/codex-first-shell/index.html"),
+    source("apps/codex-first-shell/app.js"),
+    source("apps/codex-first-shell/app.css"),
+    source("scripts/vh-codex-first-shell.mjs"),
+    source("apps/codex-first-shell/project-fixtures.json"),
+    source("apps/codex-first-shell/browser-interaction-guard.mjs"),
+  ]);
+  const fixture = JSON.parse(fixtureText);
+  assert.doesNotMatch(html + script, /Create Project|Move Chat to Project|No Projects yet|New Project name|Loading Codex Projects|Project renamed|Project deleted|Project created|source Project/);
+  assert.match(html, /id="projectLabel">Chat groups</);
+  assert.match(html, /aria-label="Create chat group"/);
+  assert.match(script, /aria-label="Move Chat to group"/);
+  assert.match(script, /prompt\("New chat group name"\)/);
+  assert.match(script, /prompt\("Rename chat group"/);
+  assert.match(script, /chat group\? Its Chats will return to Recents/);
+  assert.match(script, /Chat group deleted\. Chats returned to Recents/);
+  assert.match(script, /\$\{project\.name\}\)? group`|selected"\} group`/);
+  assert.match(html, /id="projectHeader"/);
+  assert.match(html, /id="projectHeaderLabel">Project</);
+  assert.match(html, /id="importProject"[^>]*>Set up from Codex…/);
+  assert.match(html, /id="importDialog"[^>]+role="dialog"[^>]+aria-modal="true"/);
+  assert.match(html, /nothing is committed, and no Room tree is invented/);
+  assert.match(html, /id="recentsFootnote"/);
+  assert.match(script, /in other folders hidden/);
+  assert.match(script, /Rooms: cold start pending — run distill/);
+  assert.match(script, /this shell never invents one/);
+  assert.match(script, /Working folder \(cwd\)/, "cwd is inspectable metadata, not a heading");
+  for (const scope of ["bound", "unbound", "no-repository", "migration-required"]) {
+    assert.equal(fixture.scopes[scope]?.scope, scope, `${scope} fixture variant`);
+    assert.match(script, new RegExp(`"${scope}"`), `${scope} rendered by the shell`);
+    assert.match(host, new RegExp(`"${scope}"`), `${scope} projected by the host`);
+    assert.match(guard, new RegExp(`"scope state ${scope} renders"`), `${scope} proven in the real DOM`);
+  }
+  assert.equal(fixture.scopes.bound.rooms.coldStart, true, "the review fixture shows the deferred Room state, not a fabricated tree");
+  assert.equal(fixture.importCandidates.projects.filter((project) => project.importable).length, 1);
+  assert.equal(fixture.importCandidates.projects.find((project) => project.name === "vibehub-plugin").importable, false, "a namesake with a foreign folder is never importable");
+  for (const behavior of ["import dialog is a contained modal that lands focus on the first eligible Codex Project", "ineligible Codex Projects stay visible but disabled with their reason", "selecting an eligible Codex Project names the uncommitted scaffold it will write", "import dialog traps forward Tab", "import dialog Escape restores focus to its trigger without importing", "unbound Tasks route explains the missing scope instead of a graph", "bound cold start hands off to distill without inventing a Room tree", "grouping copy never says Project for a Codex ThreadSection", "cwd appears only as inspectable metadata"]) assert.match(guard, new RegExp(behavior.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.match(script, /function scopeBound\(\)/);
+  assert.match(script, /function renderProjectHeader\(\)/);
+  assert.match(script, /action: "listImportableProjects"/);
+  assert.match(script, /action: "importProject"/);
+  assert.match(script, /const tasks = \(bound \? state\.bootstrap\?\.graph\.tickets \?\? \[\] : \[\]\)/, "search drops Task results outside a bound Project");
+  assert.match(script, /const contexts = \(bound \? state\.bootstrap\?\.contexts \?\? \[\] : \[\]\)/, "search drops Context results outside a bound Project");
+  assert.match(script, /\$\("#inboxButton"\)\.hidden = !bound/);
+  assert.match(script, /\[\$\("#searchDialog"\), \$\("#importDialog"\), \$\("#inboxPanel"\), \$\("#reviewPanel"\)/, "the import dialog joins the shared focus trap");
+  assert.match(script, /runtime-baseline-mismatch|Stopped: Codex runtime does not match the pinned baseline/);
+  assert.match(host, /requireBoundScope\(\)/);
+  assert.match(host, /"scope_unavailable"/);
+  assert.match(host, /"import_ineligible"/);
+  assert.match(host, /"already_bound"/);
+  assert.match(host, /realpathSync\.native\(flags\.repo\)/);
+  assert.match(host, /projects\.snapshot\(\{ cwd: repoRoot \}\)/);
+  assert.match(host, /searchTerm: payload\.searchTerm\.trim\(\), cwd: repoRoot/);
+  assert.doesNotMatch(host, /git\b[^\n]*\bcommit\b/, "the host never commits");
+  for (const rule of [".project-header", ".scope-pill", ".import-dialog", ".import-row", ".scope-panel", ".stop-banner", ".scope-footnote"]) assert.match(css, new RegExp(rule.replace(".", "\\.")));
+  assert.match(css, /body\[data-review-frame="narrow"\] \.import-dialog/);
+  assert.doesNotMatch(html + script + host, /localStorage|sessionStorage|indexedDB/i);
 });
 
 test("promoted shell keeps upstream runtime packages out of the browser app", async () => {

@@ -8,10 +8,15 @@
       "createdAt": 1787340000,
       "updatedAt": 1787359900,
       "recencyAt": 1787359900,
-      "status": { "type": "notLoaded" },
+      "status": {
+        "type": "notLoaded"
+      },
       "source": "appServer",
       "forkedFromId": null,
-      "project": { "id": "01984de2-8f74-7c91-a3b2-5c5e937cf318", "name": "Pinned" },
+      "project": {
+        "id": "01984de2-8f74-7c91-a3b2-5c5e937cf318",
+        "name": "Pinned"
+      },
       "taskLink": null
     }
   ],
@@ -28,10 +33,15 @@
           "createdAt": 1787355600,
           "updatedAt": 1787359200,
           "recencyAt": 1787359200,
-          "status": { "type": "notLoaded" },
+          "status": {
+            "type": "notLoaded"
+          },
           "source": "appServer",
           "forkedFromId": null,
-          "project": { "id": "fixture-project-launch", "name": "Launch VibeHub" },
+          "project": {
+            "id": "fixture-project-launch",
+            "name": "Launch VibeHub"
+          },
           "taskLink": null
         },
         {
@@ -42,10 +52,15 @@
           "createdAt": 1787356500,
           "updatedAt": 1787359800,
           "recencyAt": 1787359800,
-          "status": { "type": "notLoaded" },
+          "status": {
+            "type": "notLoaded"
+          },
           "source": "appServer",
           "forkedFromId": "fixture-project-chat",
-          "project": { "id": "fixture-project-launch", "name": "Launch VibeHub" },
+          "project": {
+            "id": "fixture-project-launch",
+            "name": "Launch VibeHub"
+          },
           "taskLink": null
         }
       ]
@@ -65,7 +80,9 @@
       "createdAt": 1787350000,
       "updatedAt": 1787358600,
       "recencyAt": 1787358600,
-      "status": { "type": "notLoaded" },
+      "status": {
+        "type": "notLoaded"
+      },
       "source": "appServer",
       "forkedFromId": null,
       "project": null,
@@ -79,5 +96,258 @@
       "project": null,
       "visibleInRecents": false
     }
-  ]
+  ],
+  "scopes": {
+    "bound": {
+      "scope": "bound",
+      "reason": null,
+      "name": "vibehub-plugin",
+      "repositoryRoot": "/workspace/vibehub-plugin",
+      "worktreeRoot": "/workspace/vibehub-plugin",
+      "branch": "main",
+      "compatibility": {
+        "state": "CURRENT",
+        "detectedFormat": 2,
+        "currentFormat": 2,
+        "targetFormat": 2,
+        "reason": null
+      },
+      "binding": {
+        "sectionId": "fixture-project-launch",
+        "sectionName": "Launch VibeHub",
+        "folder": "/workspace/vibehub-plugin",
+        "importedAt": "2026-08-22T09:00:00.000Z",
+        "codexVersion": "0.147.0",
+        "sectionPresent": true,
+        "recordPath": ".vibehub/codex-project.yaml"
+      },
+      "bindingRecord": null,
+      "rooms": {
+        "coldStart": true,
+        "count": 0
+      },
+      "uncommitted": {
+        "paths": [
+          ".vibehub/codex-project.yaml",
+          ".vibehub/version.yaml"
+        ],
+        "truncated": false,
+        "committed": false
+      },
+      "taskActions": {
+        "available": true,
+        "reason": null
+      },
+      "visibility": {
+        "cwd": "/workspace/vibehub-plugin",
+        "scopedCount": 3,
+        "totalCount": 5,
+        "hiddenChats": 2,
+        "hiddenGroups": 1
+      },
+      "sync": {
+        "chatFolder": "/workspace/vibehub-plugin",
+        "rule": "Threads this shell creates carry this folder as their native cwd; Tasks, Context and Evidence are YAML under .vibehub that stays uncommitted until you commit it.",
+        "automaticCommit": false
+      }
+    },
+    "unbound": {
+      "scope": "unbound",
+      "reason": "This repository is not set up as a VibeHub Project yet. Import the single-folder Codex Project for this folder to write the .vibehub scaffold.",
+      "name": "vibehub-plugin",
+      "repositoryRoot": "/workspace/vibehub-plugin",
+      "worktreeRoot": "/workspace/vibehub-plugin",
+      "branch": "main",
+      "compatibility": {
+        "state": "MIGRATION_REQUIRED",
+        "detectedFormat": "uninitialized",
+        "currentFormat": null,
+        "targetFormat": 2,
+        "reason": "This repository has not been initialized for VibeHub."
+      },
+      "binding": null,
+      "bindingRecord": null,
+      "rooms": {
+        "coldStart": true,
+        "count": 0
+      },
+      "uncommitted": {
+        "paths": [],
+        "truncated": false,
+        "committed": true
+      },
+      "taskActions": {
+        "available": false,
+        "reason": "This repository is not set up as a VibeHub Project yet. Import the single-folder Codex Project for this folder to write the .vibehub scaffold."
+      },
+      "visibility": {
+        "cwd": "/workspace/vibehub-plugin",
+        "scopedCount": 3,
+        "totalCount": 5,
+        "hiddenChats": 2,
+        "hiddenGroups": 1
+      },
+      "sync": {
+        "chatFolder": "/workspace/vibehub-plugin",
+        "rule": "Threads this shell creates carry this folder as their native cwd; Tasks, Context and Evidence are YAML under .vibehub that stays uncommitted until you commit it.",
+        "automaticCommit": false
+      }
+    },
+    "no-repository": {
+      "scope": "no-repository",
+      "reason": "This folder is not inside a Git repository. VibeHub Tasks, Context, Evidence and Outcomes live in a checked-in .vibehub tree, so Task actions are unavailable here.",
+      "name": "scratch",
+      "repositoryRoot": null,
+      "worktreeRoot": "/workspace/scratch",
+      "branch": null,
+      "compatibility": {
+        "state": "MIGRATION_REQUIRED",
+        "detectedFormat": "uninitialized",
+        "currentFormat": null,
+        "targetFormat": 2,
+        "reason": "This repository has not been initialized for VibeHub."
+      },
+      "binding": null,
+      "bindingRecord": null,
+      "rooms": {
+        "coldStart": true,
+        "count": 0
+      },
+      "uncommitted": {
+        "paths": [],
+        "truncated": false,
+        "committed": true
+      },
+      "taskActions": {
+        "available": false,
+        "reason": "This folder is not inside a Git repository. VibeHub Tasks, Context, Evidence and Outcomes live in a checked-in .vibehub tree, so Task actions are unavailable here."
+      },
+      "visibility": {
+        "cwd": "/workspace/scratch",
+        "scopedCount": 1,
+        "totalCount": 5,
+        "hiddenChats": 4,
+        "hiddenGroups": 2
+      },
+      "sync": {
+        "chatFolder": "/workspace/scratch",
+        "rule": "Threads this shell creates carry this folder as their native cwd; Tasks, Context and Evidence are YAML under .vibehub that stays uncommitted until you commit it.",
+        "automaticCommit": false
+      }
+    },
+    "migration-required": {
+      "scope": "migration-required",
+      "reason": "This repository needs an explicit VibeHub data migration before writes are allowed.",
+      "name": "vibehub-plugin",
+      "repositoryRoot": "/workspace/vibehub-plugin",
+      "worktreeRoot": "/workspace/vibehub-plugin",
+      "branch": "main",
+      "compatibility": {
+        "state": "MIGRATION_REQUIRED",
+        "detectedFormat": 1,
+        "currentFormat": 1,
+        "targetFormat": 2,
+        "reason": "This repository needs an explicit VibeHub data migration before writes are allowed."
+      },
+      "binding": null,
+      "bindingRecord": null,
+      "rooms": {
+        "coldStart": true,
+        "count": 0
+      },
+      "uncommitted": {
+        "paths": [],
+        "truncated": false,
+        "committed": true
+      },
+      "taskActions": {
+        "available": false,
+        "reason": "This repository needs an explicit VibeHub data migration before writes are allowed."
+      },
+      "visibility": {
+        "cwd": "/workspace/vibehub-plugin",
+        "scopedCount": 3,
+        "totalCount": 5,
+        "hiddenChats": 2,
+        "hiddenGroups": 1
+      },
+      "sync": {
+        "chatFolder": "/workspace/vibehub-plugin",
+        "rule": "Threads this shell creates carry this folder as their native cwd; Tasks, Context and Evidence are YAML under .vibehub that stays uncommitted until you commit it.",
+        "automaticCommit": false
+      }
+    }
+  },
+  "importCandidates": {
+    "repositoryRoot": "/workspace/vibehub-plugin",
+    "scope": "unbound",
+    "canImport": true,
+    "blockedReason": null,
+    "writes": [
+      ".vibehub/version.yaml",
+      ".vibehub/rooms/",
+      ".vibehub/tickets/",
+      ".vibehub/evidence/",
+      ".vibehub/outcomes/",
+      ".vibehub/codex-project.yaml"
+    ],
+    "rule": {
+      "eligibility": "single-folder",
+      "match": "realpath(folder) === realpath(repositoryRoot)",
+      "byName": false
+    },
+    "projects": [
+      {
+        "id": "fixture-project-launch",
+        "name": "Launch VibeHub",
+        "memberCount": 2,
+        "archivedCount": 0,
+        "folders": [
+          "/workspace/vibehub-plugin"
+        ],
+        "eligibility": "single-folder",
+        "matchesRepository": true,
+        "importable": true,
+        "reason": null
+      },
+      {
+        "id": "fixture-project-research",
+        "name": "Interaction research",
+        "memberCount": 0,
+        "archivedCount": 0,
+        "folders": [],
+        "eligibility": "empty",
+        "matchesRepository": false,
+        "importable": false,
+        "reason": "This Codex Project has no chats, so it has no folder to match."
+      },
+      {
+        "id": "fixture-project-elsewhere",
+        "name": "vibehub-plugin",
+        "memberCount": 3,
+        "archivedCount": 1,
+        "folders": [
+          "/workspace/other-repo"
+        ],
+        "eligibility": "single-folder",
+        "matchesRepository": false,
+        "importable": false,
+        "reason": "This Codex Project's only folder is a different repository."
+      },
+      {
+        "id": "fixture-project-multi",
+        "name": "Spans two repositories",
+        "memberCount": 4,
+        "archivedCount": 0,
+        "folders": [
+          "/workspace/other-repo",
+          "/workspace/vibehub-plugin"
+        ],
+        "eligibility": "multi-folder",
+        "matchesRepository": false,
+        "importable": false,
+        "reason": "This Codex Project spans 2 folders; only a single-folder Codex Project can be imported."
+      }
+    ]
+  }
 }

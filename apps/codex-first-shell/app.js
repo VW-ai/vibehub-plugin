@@ -65,6 +65,9 @@ const state = {
   composerDrafts: new Map(),
   requestDrafts: new Map(),
   requestReturnFocus: new Map(),
+  importCandidates: null,
+  importSelectedId: null,
+  importing: false,
 };
 
 const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
@@ -114,10 +117,119 @@ function restoreRerenderedFocus() {
   requestAnimationFrame(() => document.querySelector(rerenderFocusSelector)?.focus());
 }
 
+// "Project" names only the repository-bound VibeHub Project. Native Codex
+// ThreadSections are chat groups here so nobody is asked to tell two kinds
+// of Project apart; membership stays entirely in the app-server.
 function projectDestinationName(projectId) {
   if (projectId === null) return "Recents";
   if (projectId === state.bootstrap?.capabilities?.pinnedSectionId) return "Pinned";
-  return `${state.projects.find((project) => project.id === projectId)?.name ?? "selected"} Project`;
+  return `the ${state.projects.find((project) => project.id === projectId)?.name ?? "selected"} group`;
+}
+
+function scopeBound() {
+  return state.bootstrap?.project?.scope === "bound";
+}
+
+function scopeLabel(project) {
+  if (!project) return "Reading";
+  if (project.scope === "bound") return "Bound";
+  if (project.scope === "unbound") return "Not set up";
+  if (project.scope === "no-repository") return "No repository";
+  if (project.scope === "migration-required") return project.compatibility?.state === "UNSUPPORTED_NEWER" ? "Newer format" : "Migration required";
+  return "Unknown scope";
+}
+
+function inspectRows(project) {
+  const binding = project.binding
+    ? `${project.binding.sectionName ?? "unnamed"} · ${project.binding.sectionId} · imported ${project.binding.importedAt ?? "unknown"} · ${project.binding.sectionPresent ? "section present in Codex" : "section no longer in Codex"}`
+    : project.bindingRecord?.invalid ? `invalid record: ${project.bindingRecord.reason}` : "none";
+  const rooms = project.rooms?.coldStart ? "cold start · no Room tree checked in" : `${project.rooms?.count ?? 0} room${project.rooms?.count === 1 ? "" : "s"}`;
+  const uncommitted = project.uncommitted?.paths?.length ? `${project.uncommitted.paths.join(", ")}${project.uncommitted.truncated ? " …" : ""}` : "nothing pending under .vibehub";
+  const visibility = project.visibility
+    ? `${project.visibility.scopedCount} of ${project.visibility.totalCount} Codex chats are in this folder · ${project.visibility.hiddenChats} hidden in other folders · ${project.visibility.hiddenGroups} group${project.visibility.hiddenGroups === 1 ? "" : "s"} hidden`
+    : "not read";
+  return [
+    ["Scope", `${project.scope}${project.reason ? ` · ${project.reason}` : ""}`],
+    ["Repository root", project.repositoryRoot ?? "none (not a Git repository)"],
+    ["Working folder (cwd)", project.worktreeRoot],
+    ["Branch", project.branch ?? "none"],
+    ["VibeHub format", `${project.compatibility?.state ?? "unknown"} · detected ${project.compatibility?.detectedFormat ?? "unknown"} · target ${project.compatibility?.targetFormat ?? "unknown"}`],
+    ["Codex binding", binding],
+    ["Rooms", rooms],
+    ["Uncommitted", uncommitted],
+    ["Chat visibility", visibility],
+    ["Sync", project.sync ? `${project.sync.rule} Automatic commit: ${project.sync.automaticCommit ? "yes" : "never"}.` : "not read"],
+  ];
+}
+
+function renderProjectHeader() {
+  const project = state.bootstrap?.project ?? null;
+  const header = $("#projectHeader");
+  header.dataset.scope = project?.scope ?? "loading";
+  $("#projectScope").textContent = scopeLabel(project);
+  $("#projectName").textContent = project?.name ?? "—";
+  $("#projectBranch").textContent = !project
+    ? "Resolving the selected folder"
+    : project.scope === "no-repository"
+      ? "Not inside a Git repository"
+      : `${project.branch ?? "detached"} · Git repository`;
+  const rooms = $("#projectRooms");
+  rooms.hidden = !(project && project.scope === "bound");
+  rooms.textContent = project?.scope === "bound"
+    ? (project.rooms?.coldStart ? "Rooms: cold start pending — run distill" : `Rooms: ${project.rooms.count} checked in`)
+    : "";
+  // The header keeps one short line; the full reason lives in Inspect and on
+  // the Tasks route, which explains the missing scope in full.
+  const note = $("#projectNote");
+  const shortNote = project?.scope === "unbound"
+    ? "Tasks wait for an explicit Codex Project import."
+    : project?.scope === "no-repository"
+      ? "Not a Git repository: Tasks unavailable, Chat works."
+      : project?.scope === "migration-required"
+        ? "VibeHub data needs migration: Tasks unavailable, Chat works."
+        : "";
+  note.hidden = !shortNote;
+  note.textContent = shortNote;
+  const importButton = $("#importProject");
+  importButton.hidden = project?.scope !== "unbound" || Boolean(state.bootstrap?.stop);
+  $("#projectInspectList").innerHTML = project
+    ? inspectRows(project).map(([term, detail]) => `<dt>${escapeHtml(term)}</dt><dd>${escapeHtml(detail)}</dd>`).join("")
+    : "";
+  const tasksNav = $('.primary-nav [data-route="tasks"]');
+  const bound = scopeBound();
+  tasksNav.setAttribute("aria-disabled", bound ? "false" : "true");
+  tasksNav.title = bound ? "" : `Tasks unavailable: ${project?.reason ?? "no bound Project"}`;
+  $("#taskCount").textContent = bound ? String(state.bootstrap?.graph.tickets.length ?? 0) : "—";
+  $("#inboxButton").hidden = !bound;
+}
+
+function renderStopBanner() {
+  const stop = state.bootstrap?.stop ?? null;
+  $("#stopBanner")?.remove();
+  if (!stop) return;
+  const banner = document.createElement("div");
+  banner.id = "stopBanner";
+  banner.className = "stop-banner";
+  banner.setAttribute("role", "alert");
+  banner.innerHTML = `<strong>Stopped: Codex runtime does not match the pinned baseline</strong><p>${escapeHtml(stop.message)} Chat history, grouping and Tasks are not read from this runtime.</p>`;
+  mainColumn.querySelector(".topbar").insertAdjacentElement("afterend", banner);
+}
+
+function scopePanelMarkup(title) {
+  const project = state.bootstrap?.project;
+  const scope = project?.scope ?? "no-repository";
+  const reason = project?.reason ?? "No bound VibeHub Project.";
+  const next = scope === "unbound"
+    ? "Importing the single-folder Codex Project for this folder writes the .vibehub scaffold into the working tree, uncommitted. Room creation stays with the distill Skill."
+    : scope === "no-repository"
+      ? "Open VibeHub inside a Git repository to use Tasks. No hidden storage is created for an unversioned folder."
+      : scope === "migration-required"
+        ? "Run the VibeHub migrate Skill on this repository first; nothing is rewritten in place."
+        : "No bound VibeHub Project is available for this folder.";
+  const actions = scope === "unbound" && !state.bootstrap?.stop
+    ? '<button class="primary-button" type="button" data-open-import>Set up from Codex…</button>'
+    : "";
+  return `<section class="scope-panel" data-scope="${escapeHtml(scope)}"><span class="eyebrow">VIBEHUB · ${escapeHtml(scopeLabel(project).toUpperCase())}</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(reason)}</p><p>${escapeHtml(next)}</p><p>Chat keeps working exactly as before: new Chats carry this folder as their Codex cwd.</p><div class="scope-actions">${actions}<button class="secondary-button" type="button" data-route="chat">Back to Chat</button></div></section>`;
 }
 
 function announceThreadMove(projectId) {
@@ -178,7 +290,7 @@ function updateSidebar() {
   const focused = sidebar.contains(document.activeElement)
     ? { threadId: document.activeElement.dataset.threadId, ticketId: document.activeElement.dataset.ticketId, id: document.activeElement.id }
     : null;
-  const needsYou = state.bootstrap?.attention?.needsYou ?? [];
+  const needsYou = scopeBound() ? state.bootstrap?.attention?.needsYou ?? [] : [];
   const attention = $("#sidebarAttention");
   attention.hidden = needsYou.length === 0;
   $("#sidebarAttentionList").innerHTML = needsYou.slice(0, 3).map((item) => `<button class="attention-item" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Task · Needs you</small></span></button>`).join("");
@@ -186,11 +298,18 @@ function updateSidebar() {
   $("#pinnedList").innerHTML = state.pinned.map(threadButton).join("");
   $("#projectList").innerHTML = state.projects.length
     ? state.projects.map((project) => `<section class="project-group" data-project-drop="${escapeHtml(project.id)}">
-        <header><button class="project-toggle" type="button" data-toggle-project="${escapeHtml(project.id)}" aria-expanded="true" aria-label="Collapse ${escapeHtml(project.name)} Project"><span class="project-dot"></span><strong>${escapeHtml(project.name)}</strong><small>${project.threads.length}</small></button><details class="project-menu"><summary aria-label="${escapeHtml(project.name)} Project actions">•••</summary><div><button type="button" data-rename-project="${escapeHtml(project.id)}">Rename</button><button type="button" data-delete-project="${escapeHtml(project.id)}">Delete</button></div></details></header>
+        <header><button class="project-toggle" type="button" data-toggle-project="${escapeHtml(project.id)}" aria-expanded="true" aria-label="Collapse ${escapeHtml(project.name)} group"><span class="project-dot"></span><strong>${escapeHtml(project.name)}</strong><small title="${project.hiddenElsewhere ? `${project.threads.length} here · ${project.hiddenElsewhere} in other folders hidden` : `${project.threads.length} in this folder`}">${project.threads.length}${project.hiddenElsewhere ? "+" : ""}</small></button><details class="project-menu"><summary aria-label="${escapeHtml(project.name)} group actions">•••</summary><div><button type="button" data-rename-project="${escapeHtml(project.id)}">Rename</button><button type="button" data-delete-project="${escapeHtml(project.id)}">Delete</button></div></details></header>
         <div class="project-threads">${project.threads.map(threadButton).join("") || '<p class="muted">Drop a Chat here</p>'}</div>
       </section>`).join("")
-    : '<p class="muted">No Projects yet. Chats stay in Recents.</p>';
-  list.innerHTML = state.recents.map(threadButton).join("") || '<p class="muted">No unprojected chats.</p>';
+    : '<p class="muted">No chat groups yet. Chats stay in Recents.</p>';
+  list.innerHTML = state.recents.map(threadButton).join("") || '<p class="muted">No ungrouped chats in this folder.</p>';
+  const hidden = state.bootstrap?.project?.visibility;
+  const footnote = $("#recentsFootnote");
+  const hiddenParts = [];
+  if (hidden?.hiddenChats) hiddenParts.push(`${hidden.hiddenChats} chat${hidden.hiddenChats === 1 ? "" : "s"}`);
+  if (hidden?.hiddenGroups) hiddenParts.push(`${hidden.hiddenGroups} group${hidden.hiddenGroups === 1 ? "" : "s"}`);
+  footnote.hidden = hiddenParts.length === 0;
+  footnote.textContent = hiddenParts.length ? `${hiddenParts.join(" and ")} in other folders hidden` : "";
   restoreRerenderedFocus();
 }
 
@@ -249,7 +368,7 @@ function syncComposerMode() {
   const input = $("#composerInput");
   const taskMode = state.route === "task";
   const linked = taskMode && state.activeThreadId;
-  input.disabled = !state.runtimeAlive || Boolean(taskMode && !linked);
+  input.disabled = !state.runtimeAlive || Boolean(state.bootstrap?.stop) || Boolean(taskMode && !linked);
   $("#sendButton").disabled = input.disabled;
   $("#sendButton").setAttribute("aria-label", state.running ? "Steer current turn" : "Send message");
   $("#sendButton").title = state.running ? "Steer current Turn" : "Send message";
@@ -265,14 +384,16 @@ function syncComposerMode() {
 function setRuntimePosture({ alive, generation = state.runtimeGeneration, label } = {}) {
   state.runtimeAlive = Boolean(alive);
   state.runtimeGeneration = generation;
-  $("#runtimeLabel").textContent = label ?? (state.runtimeAlive ? "Local app-server" : "Runtime unavailable");
+  const stopped = Boolean(state.bootstrap?.stop);
+  $("#runtimeLabel").textContent = label ?? (stopped ? "Stopped: baseline mismatch" : state.runtimeAlive ? "Local app-server" : "Runtime unavailable");
+  $("#runtimeLabel").parentElement.dataset.stopped = String(stopped);
   $("#accountDot").classList.toggle("connected", state.runtimeAlive && Boolean(state.bootstrap?.account?.authenticated));
   $("#stopTurn").disabled = !state.runtimeAlive;
   syncComposerMode();
 }
 
 function syncScrim() {
-  const overlayOpen = !$("#searchDialog").hidden || !$("#inboxPanel").hidden || !$("#reviewPanel").hidden;
+  const overlayOpen = !$("#searchDialog").hidden || !$("#inboxPanel").hidden || !$("#reviewPanel").hidden || !$("#importDialog").hidden;
   const mobileNavigationOpen = appShell.classList.contains("sidebar-open") && isNarrowLayout();
   $("#scrim").hidden = !overlayOpen && !mobileNavigationOpen;
   appShell.inert = overlayOpen;
@@ -331,11 +452,12 @@ function searchCorpus(query) {
     .filter((thread) => includes(titleForThread(thread), thread.preview, thread.id))
     .slice(0, 6)
     .map((thread) => ({ kind: "chat", id: thread.id, title: titleForThread(thread), detail: thread.preview || "Codex Thread", glyph: "C" }));
-  const tasks = (state.bootstrap?.graph.tickets ?? [])
+  const bound = scopeBound();
+  const tasks = (bound ? state.bootstrap?.graph.tickets ?? [] : [])
     .filter((ticket) => includes(ticket.ticketId, ticket.outcome, ticket.capabilities.nextAction.summary.action))
     .slice(0, 8)
     .map((ticket) => ({ kind: "task", id: ticket.ticketId, title: humanize(ticket.ticketId), detail: ticket.outcome, glyph: "T" }));
-  const contexts = (state.bootstrap?.contexts ?? [])
+  const contexts = (bound ? state.bootstrap?.contexts ?? [] : [])
     .filter((context) => includes(context.contextId, context.summary, context.detail, ...(context.tags ?? [])))
     .slice(0, 6)
     .map((context) => ({ kind: "context", id: context.contextId, title: context.summary, detail: `${context.room} · ${context.type}`, glyph: "◇" }));
@@ -358,7 +480,7 @@ function renderSearchResults() {
       return `<button class="search-result" id="search-result-${index}" type="button" role="option" aria-selected="${index === state.searchIndex}" data-search-kind="${item.kind}" data-search-id="${escapeHtml(item.id)}"><i>${item.glyph}</i><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.detail)}</small></span><em>${kind === "chat" ? "Chat" : kind === "task" ? "Task" : "Context"}</em></button>`;
     }).join("")}`;
   }).join("");
-  $("#searchResults").innerHTML = markup || '<div class="search-empty">No matching Chat, Task, or Context.</div>';
+  $("#searchResults").innerHTML = markup || `<div class="search-empty">${scopeBound() ? "No matching Chat, Task, or Context." : "No matching Chat. Tasks and Context need a bound VibeHub Project."}</div>`;
   const active = state.searchResults.length ? `search-result-${state.searchIndex}` : null;
   if (active) $("#searchInput").setAttribute("aria-activedescendant", active);
   else $("#searchInput").removeAttribute("aria-activedescendant");
@@ -367,6 +489,7 @@ function renderSearchResults() {
 
 function openSearch() {
   closeInbox(false);
+  closeImport(false);
   state.overlayReturnFocus = document.activeElement;
   const dialog = $("#searchDialog");
   dialog.hidden = false;
@@ -403,6 +526,7 @@ function renderInbox() {
 
 function openInbox() {
   closeSearch(false);
+  closeImport(false);
   state.overlayReturnFocus = document.activeElement;
   renderInbox();
   const panel = $("#inboxPanel");
@@ -421,6 +545,95 @@ function closeInbox(restore = true) {
   panel.inert = true;
   syncScrim();
   if (restore) state.overlayReturnFocus?.focus?.();
+}
+
+function importRowMarkup(row) {
+  const eligibility = { "single-folder": "Single folder", "multi-folder": `${row.folders.length} folders`, empty: "No chats" }[row.eligibility] ?? row.eligibility;
+  const match = row.eligibility === "single-folder" ? (row.matchesRepository ? "Matches this repository" : "Different folder") : "Not importable";
+  const selected = state.importSelectedId === row.id;
+  return `<button class="import-row" type="button" data-import-section="${escapeHtml(row.id)}" data-importable="${row.importable ? "true" : "false"}" aria-pressed="${selected ? "true" : "false"}" ${row.importable ? "" : "disabled"} title="${escapeHtml(row.reason ?? "Eligible: its only folder is this repository")}"><span><strong>${escapeHtml(row.name)}</strong><small>${escapeHtml(row.folders.join(" · ") || "No folder yet")}</small></span><em>${row.memberCount} chat${row.memberCount === 1 ? "" : "s"}${row.archivedCount ? ` (${row.archivedCount} archived)` : ""}<br>${escapeHtml(eligibility)} · ${escapeHtml(match)}</em></button>`;
+}
+
+function renderImportRows() {
+  const candidates = state.importCandidates;
+  const content = $("#importContent");
+  const confirm = $("#confirmImport");
+  const selection = $("#importSelection");
+  if (!candidates) {
+    content.innerHTML = '<p class="muted">Reading your Codex Projects…</p>';
+    confirm.disabled = true;
+    return;
+  }
+  if (!candidates.canImport) {
+    content.innerHTML = `<p class="muted">${escapeHtml(candidates.blockedReason ?? "Import is unavailable here.")}</p>`;
+    confirm.disabled = true;
+    selection.textContent = "Import unavailable.";
+    return;
+  }
+  content.innerHTML = candidates.projects.length
+    ? candidates.projects.map(importRowMarkup).join("")
+    : '<p class="muted">Codex has no Projects yet. Create one in Codex with chats in this folder, then import it here.</p>';
+  const selected = candidates.projects.find((row) => row.id === state.importSelectedId && row.importable) ?? null;
+  confirm.disabled = !selected || state.importing;
+  selection.textContent = selected
+    ? `Import “${selected.name}”: writes ${candidates.writes.join(", ")} into the working tree, uncommitted.`
+    : candidates.projects.some((row) => row.importable) ? "Select an eligible Codex Project." : "No Codex Project matches this repository's folder.";
+}
+
+async function openImport() {
+  closeSearch(false);
+  closeInbox(false);
+  state.overlayReturnFocus = document.activeElement;
+  state.importSelectedId = null;
+  state.importCandidates = null;
+  const dialog = $("#importDialog");
+  dialog.hidden = false;
+  dialog.inert = false;
+  renderImportRows();
+  syncScrim();
+  $("#closeImport").focus();
+  try {
+    state.importCandidates = await action({ action: "listImportableProjects" });
+  } catch (error) {
+    state.importCandidates = { canImport: false, blockedReason: error.message, projects: [], writes: [] };
+  }
+  if (dialog.hidden) return;
+  renderImportRows();
+  const firstEligible = dialog.querySelector('.import-row[data-importable="true"]');
+  if (firstEligible && document.activeElement === $("#closeImport")) firstEligible.focus();
+}
+
+function closeImport(restore = true) {
+  const dialog = $("#importDialog");
+  if (dialog.hidden) return;
+  dialog.hidden = true;
+  dialog.inert = true;
+  syncScrim();
+  if (restore) state.overlayReturnFocus?.focus?.();
+}
+
+async function confirmImport() {
+  const candidates = state.importCandidates;
+  const selected = candidates?.projects.find((row) => row.id === state.importSelectedId && row.importable);
+  if (!selected || state.importing) return;
+  state.importing = true;
+  renderImportRows();
+  try {
+    const result = await action({ action: "importProject", sectionId: selected.id });
+    closeImport(false);
+    await refreshThreads();
+    if (state.route === "tasks") renderTasks();
+    else if (state.route === "rooms") renderRooms();
+    else if (state.route === "chat" && !state.activeThread) renderChat();
+    notify(`Imported “${selected.name}” as this Project. ${result.writtenPaths.length} paths written under .vibehub, uncommitted. Rooms: cold start pending — run distill.`);
+    afterRenderFocus("#projectInspect > summary");
+  } catch (error) {
+    notify(error.message);
+    try { state.importCandidates = await action({ action: "listImportableProjects" }); } catch {}
+  } finally {
+    state.importing = false;
+    if (!$("#importDialog").hidden) renderImportRows();
+  }
 }
 
 async function openSearchResult(kind, id) {
@@ -716,7 +929,18 @@ function renderChat({ preserveScroll = false } = {}) {
   const existingFork = surface.querySelector("[data-fork-thread]");
   if (existingFork) existingFork.disabled = state.fixtureMode || state.running;
   if (!state.activeThread) {
-    surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>What do you want to work on?</h1><p>Start with ordinary Codex Chat. VibeHub adds a durable Task only when the work needs an explicit outcome and stopping contract.</p><div class="welcome-actions"><button class="primary-button" type="button" data-new-thread>Start a chat</button><button class="secondary-button" type="button" data-route="tasks">Open Task Graph</button></div></div>`;
+    const project = state.bootstrap?.project;
+    const secondary = scopeBound()
+      ? '<button class="secondary-button" type="button" data-route="tasks">Open Task Graph</button>'
+      : project?.scope === "unbound" && !state.bootstrap?.stop
+        ? '<button class="secondary-button" type="button" data-open-import>Set up from Codex…</button>'
+        : `<button class="secondary-button" type="button" data-route="tasks">Why Tasks are unavailable</button>`;
+    const note = scopeBound()
+      ? "VibeHub adds a durable Task only when the work needs an explicit outcome and stopping contract."
+      : project?.scope === "unbound"
+        ? "This repository is not set up as a VibeHub Project yet. Chat works as usual; Tasks wait for an explicit Codex Project import."
+        : `VibeHub Task actions are unavailable here: ${project?.reason ?? "no bound Project"}`;
+    surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>What do you want to work on?</h1><p>Start with ordinary Codex Chat. ${escapeHtml(note)}</p><div class="welcome-actions"><button class="primary-button" type="button" data-new-thread ${state.bootstrap?.stop ? "disabled" : ""}>Start a chat</button>${secondary}</div></div>`;
     return;
   }
   const selecting = preserveScroll && transcriptSelectionActive();
@@ -734,7 +958,7 @@ function renderChat({ preserveScroll = false } = {}) {
       : state.running ? "Codex response updated." : "Codex response settled.";
   } else {
     captureRequestDrafts(surface);
-    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to group</span><select id="activeThreadProject" aria-label="Move Chat to group">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
     restoreRequestDrafts(surface);
   }
   requestAnimationFrame(() => {
@@ -819,6 +1043,11 @@ function renderGraphEdges() {
 }
 
 function renderTasks() {
+  if (!scopeBound()) {
+    setRouteHeader("Tasks", `Unavailable · ${state.bootstrap?.project?.name ?? "no Project"}`);
+    surface.innerHTML = scopePanelMarkup("VibeHub Tasks need a bound Project");
+    return;
+  }
   setRouteHeader("Tasks", `Current graph · ${state.bootstrap.graph.project.name}`);
   const tickets = topologicalTickets(state.bootstrap.graph.tickets, state.bootstrap.graph.relations);
   const phases = tickets.reduce((counts, ticket) => ({ ...counts, [primaryPhase(ticket)]: (counts[primaryPhase(ticket)] ?? 0) + 1 }), {});
@@ -890,6 +1119,15 @@ function renderRooms() {
     surface.innerHTML = `<div class="task-workspace context-focus"><header class="task-hero"><div><span class="eyebrow">CONTEXT · ${escapeHtml(context.room)}</span><h1>${escapeHtml(context.summary)}</h1><p>${escapeHtml(context.type)} · ${escapeHtml(context.contextId)}</p></div><span class="task-phase"><i></i>CONTEXT</span></header><div class="workspace-grid"><div class="workspace-main"><section><span class="eyebrow">DURABLE CLAIM</span><p>${escapeHtml(context.detail)}</p></section><section><span class="eyebrow">TAGS</span><p>${escapeHtml((context.tags ?? []).join(" · "))}</p></section></div><aside class="workspace-aside"><section><span class="eyebrow">SOURCE</span><p>${escapeHtml(context.sourceRef)}</p></section><section><button class="secondary-button" type="button" data-clear-context>Back to Rooms</button></section></aside></div></div>`;
     return;
   }
+  if (!scopeBound()) {
+    surface.innerHTML = scopePanelMarkup("Rooms need a bound Project");
+    return;
+  }
+  const rooms = state.bootstrap?.project?.rooms;
+  if (rooms?.coldStart) {
+    surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>Rooms: cold start pending</h1><p>No Room tree is checked in under .vibehub/rooms yet, and this shell never invents one. Run the VibeHub distill Skill to build the Room tree from the repository; durable Context will appear here once it is checked in.</p><p class="muted">Handoff: <code>vibehub-distill</code> in an Agent session for this repository.</p></div>`;
+    return;
+  }
   surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>Rooms stay Project-native</h1><p>Search can open exact durable Context here. Writeback remains a governed VibeHub action, not automatic Chat harvesting.</p><button class="secondary-button" type="button" id="roomsSearch">Search Context</button></div>`;
 }
 
@@ -911,10 +1149,11 @@ async function refreshThreads() {
   state.runtimeGeneration = data.runtime.generation;
   state.runtimeAlive = data.runtime.alive;
   updateAttentionState(data.attention);
-  $("#taskCount").textContent = data.graph.tickets.length;
+  renderProjectHeader();
+  renderStopBanner();
   $("#accountName").textContent = data.account.authenticated ? "Codex" : "Sign in required";
   $("#accountPlan").textContent = data.account.planType ?? data.account.accountType ?? "Unavailable";
-  setRuntimePosture({ alive: data.runtime.alive && data.account.authenticated, generation: data.runtime.generation, label: data.account.authenticated ? (data.runtime.alive ? "Local app-server" : "Runtime unavailable") : "Authentication required" });
+  setRuntimePosture({ alive: data.runtime.alive && data.account.authenticated, generation: data.runtime.generation, label: data.stop ? "Stopped: baseline mismatch" : data.account.authenticated ? (data.runtime.alive ? "Local app-server" : "Runtime unavailable") : "Authentication required" });
   updateSidebar();
 }
 
@@ -1306,20 +1545,29 @@ document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-clear-context]")) { state.activeContextId = null; renderRooms(); return; }
   if (event.target.closest("#roomsSearch")) { openSearch(); return; }
   if (event.target.closest("[data-new-thread]")) { await newThread(); return; }
+  if (event.target.closest("[data-open-import]")) { await openImport(); return; }
+  const importRow = event.target.closest("[data-import-section]");
+  if (importRow) {
+    if (importRow.disabled) return;
+    state.importSelectedId = state.importSelectedId === importRow.dataset.importSection ? null : importRow.dataset.importSection;
+    renderImportRows();
+    $(`[data-import-section="${CSS.escape(importRow.dataset.importSection)}"]`)?.focus();
+    return;
+  }
   const toggleProject = event.target.closest("[data-toggle-project]");
   if (toggleProject) {
     const group = toggleProject.closest(".project-group");
     const collapsed = group.classList.toggle("collapsed");
     toggleProject.setAttribute("aria-expanded", String(!collapsed));
-    toggleProject.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${toggleProject.querySelector("strong").textContent} Project`);
+    toggleProject.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${toggleProject.querySelector("strong").textContent} group`);
     return;
   }
   const renameProject = event.target.closest("[data-rename-project]");
   if (renameProject) {
     const project = state.projects.find((item) => item.id === renameProject.dataset.renameProject);
-    const name = prompt("Rename Project", project?.name ?? "");
+    const name = prompt("Rename chat group", project?.name ?? "");
     if (name?.trim()) {
-      try { await action({ action: "renameProject", projectId: renameProject.dataset.renameProject, name }); await refreshThreads(); notify("Project renamed."); }
+      try { await action({ action: "renameProject", projectId: renameProject.dataset.renameProject, name }); await refreshThreads(); notify("Chat group renamed."); }
       catch (error) { notify(error.message); }
     }
     return;
@@ -1327,8 +1575,8 @@ document.addEventListener("click", async (event) => {
   const deleteProject = event.target.closest("[data-delete-project]");
   if (deleteProject) {
     const project = state.projects.find((item) => item.id === deleteProject.dataset.deleteProject);
-    if (confirm(`Delete “${project?.name ?? "Project"}”? Its Chats will return to Recents.`)) {
-      try { await action({ action: "deleteProject", projectId: deleteProject.dataset.deleteProject }); await refreshThreads(); if (state.route === "chat") renderChat(); notify("Project deleted. Chats returned to Recents."); }
+    if (confirm(`Delete the “${project?.name ?? "selected"}” chat group? Its Chats will return to Recents.`)) {
+      try { await action({ action: "deleteProject", projectId: deleteProject.dataset.deleteProject }); await refreshThreads(); if (state.route === "chat") renderChat(); notify("Chat group deleted. Chats returned to Recents."); }
       catch (error) { notify(error.message); }
     }
     return;
@@ -1340,8 +1588,8 @@ document.addEventListener("click", async (event) => {
       await refreshThreads();
       await openThread(result.thread.id);
       notify(result.placement?.applied
-        ? "Chat forked with its source Project and lineage."
-        : "Chat forked; its source Project changed, so the fork stayed in Recents.");
+        ? "Chat forked with its source group and lineage."
+        : "Chat forked; its source group changed, so the fork stayed in Recents.");
     } catch (error) { notify(error.message); }
     return;
   }
@@ -1447,11 +1695,14 @@ document.addEventListener("change", async (event) => {
 
 $("#newThread").addEventListener("click", newThread);
 $("#createProject").addEventListener("click", async () => {
-  const name = prompt("New Project name");
+  const name = prompt("New chat group name");
   if (!name?.trim()) return;
-  try { await action({ action: "createProject", name }); await refreshThreads(); notify("Project created."); }
+  try { await action({ action: "createProject", name }); await refreshThreads(); notify("Chat group created."); }
   catch (error) { notify(error.message); }
 });
+$("#importProject").addEventListener("click", openImport);
+$("#closeImport").addEventListener("click", () => closeImport());
+$("#confirmImport").addEventListener("click", confirmImport);
 $("#refreshThreads").addEventListener("click", async () => { await refreshThreads(); updateSidebar(); notify("Codex Chat history refreshed."); });
 $("#searchButton").addEventListener("click", openSearch);
 $("#searchInput").addEventListener("input", () => { state.searchIndex = 0; renderSearchResults(); });
@@ -1500,10 +1751,11 @@ $("#stopTurn").addEventListener("click", async () => {
   try { await action({ action: "interruptTurn", threadId: state.activeThreadId, turnId: state.currentTurnId }); }
   catch (error) { notify(error.message); }
 });
-$("#reviewButton").addEventListener("click", () => { closeSearch(false); closeInbox(false); $("#reviewPanel").hidden = false; $("#reviewPanel").inert = false; syncScrim(); $("#closeReview").focus(); });
+$("#reviewButton").addEventListener("click", () => { closeSearch(false); closeInbox(false); closeImport(false); $("#reviewPanel").hidden = false; $("#reviewPanel").inert = false; syncScrim(); $("#closeReview").focus(); });
 $("#closeReview").addEventListener("click", () => { $("#reviewPanel").hidden = true; $("#reviewPanel").inert = true; syncScrim(); $("#reviewButton").focus(); });
 $("#scrim").addEventListener("click", () => {
   if (!$("#searchDialog").hidden) closeSearch();
+  else if (!$("#importDialog").hidden) closeImport();
   else if (!$("#inboxPanel").hidden) closeInbox();
   else if (!$("#reviewPanel").hidden) $("#closeReview").click();
   else if (appShell.classList.contains("sidebar-open")) closeMobileSidebar();
@@ -1518,7 +1770,7 @@ $("#themeToggle").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  const modal = [$("#searchDialog"), $("#inboxPanel"), $("#reviewPanel"), appShell.classList.contains("sidebar-open") ? sidebar : null].find((element) => element && !element.hidden && !element.inert);
+  const modal = [$("#searchDialog"), $("#importDialog"), $("#inboxPanel"), $("#reviewPanel"), appShell.classList.contains("sidebar-open") ? sidebar : null].find((element) => element && !element.hidden && !element.inert);
   if (event.key === "Tab" && modal) {
     const focusable = $$("button:not([disabled]), input:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex='-1'])", modal).filter((element) => !element.hidden && element.getClientRects().length);
     if (focusable.length) {
@@ -1544,6 +1796,7 @@ document.addEventListener("keydown", (event) => {
   }
   if (event.key === "Escape") {
     if (!$("#searchDialog").hidden) closeSearch();
+    else if (!$("#importDialog").hidden) closeImport();
     else if (!$("#inboxPanel").hidden) closeInbox();
     else if (!$("#reviewPanel").hidden) $("#closeReview").click();
     else if (appShell.classList.contains("sidebar-open")) closeMobileSidebar();
@@ -1628,6 +1881,12 @@ async function start() {
       state.pinned = fixture.pinned ?? [];
       state.recents = fixture.recents;
       state.threads = [...state.pinned, ...fixture.recents, ...fixture.projects.flatMap((project) => project.threads)];
+      const scopeVariant = fixture.scopes?.[params.get("scope") ?? ""];
+      if (scopeVariant) {
+        state.bootstrap = { ...state.bootstrap, project: scopeVariant, stop: null };
+        renderProjectHeader();
+        renderStopBanner();
+      }
       updateSidebar();
     }
     const requestedThreadId = params.get("thread");
@@ -1738,5 +1997,17 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
         renderChat();
       }
     },
+    applyScopeFixture: async (project) => {
+      // Swap only the host-owned Project projection; Chat lists stay as read.
+      state.bootstrap = { ...state.bootstrap, project };
+      renderProjectHeader();
+      updateSidebar();
+      if (state.route === "tasks") renderTasks();
+      else if (state.route === "rooms") renderRooms();
+      else if (state.route === "chat" && !state.activeThread) renderChat();
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    },
+    currentProject: () => state.bootstrap?.project ?? null,
+    closeImport: () => closeImport(false),
   });
 }

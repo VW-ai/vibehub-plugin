@@ -23,6 +23,15 @@
 
       <button class="new-thread" id="newThread" type="button"><span>＋</span><strong>New chat</strong><kbd>⌘ N</kbd></button>
 
+      <section class="project-header" id="projectHeader" aria-labelledby="projectHeaderLabel" data-scope="loading">
+        <header><span id="projectHeaderLabel">Project</span><span class="scope-pill" id="projectScope">Reading</span></header>
+        <div class="project-identity"><strong id="projectName">—</strong><small id="projectBranch">Resolving the selected folder</small></div>
+        <p class="project-rooms" id="projectRooms" hidden></p>
+        <p class="project-note" id="projectNote" hidden></p>
+        <button class="project-import" id="importProject" type="button" hidden>Set up from Codex…</button>
+        <details class="project-inspect" id="projectInspect"><summary>Inspect</summary><dl id="projectInspectList"></dl></details>
+      </section>
+
       <nav class="primary-nav" aria-label="Primary destinations">
         <button class="active" type="button" data-route="chat"><span class="nav-icon">◫</span><span>Chat</span></button>
         <button type="button" data-route="tasks"><span class="nav-icon">⌘</span><span>Tasks</span><small id="taskCount">—</small></button>
@@ -35,8 +44,8 @@
       </section>
 
       <section class="project-block" aria-labelledby="projectLabel">
-        <header><span id="projectLabel">Projects</span><button type="button" id="createProject" aria-label="Create Project" title="Create Project">＋</button></header>
-        <div class="project-list" id="projectList" aria-live="polite"><p class="muted">Loading Codex Projects…</p></div>
+        <header><span id="projectLabel">Chat groups</span><button type="button" id="createProject" aria-label="Create chat group" title="Create chat group">＋</button></header>
+        <div class="project-list" id="projectList" aria-live="polite"><p class="muted">Loading Codex chat groups…</p></div>
       </section>
 
       <section class="attention-section" id="sidebarAttention" aria-labelledby="attentionLabel" hidden>
@@ -47,6 +56,7 @@
       <section class="thread-section recent-drop-target" aria-labelledby="threadLabel" data-project-drop="recent">
         <header><span id="threadLabel">Recents</span><button type="button" id="refreshThreads" aria-label="Refresh Chat history" title="Refresh">↻</button></header>
         <div class="thread-list" id="threadList" aria-live="polite"><p class="muted">Connecting to your Codex…</p></div>
+        <p class="scope-footnote" id="recentsFootnote" hidden></p>
       </section>
 
       <footer class="sidebar-footer">
@@ -107,10 +117,16 @@
     <p class="inbox-intro">Only Tasks that need a decision or have reached a durable Outcome appear here. Running stays quiet.</p>
     <div id="inboxContent"></div>
   </aside>
+  <section class="import-dialog" id="importDialog" role="dialog" aria-modal="true" aria-labelledby="importTitle" hidden inert>
+    <header><div><small>VIBEHUB PROJECT</small><h2 id="importTitle">Set up from a Codex Project</h2></div><button type="button" id="closeImport">Close</button></header>
+    <p class="import-intro" id="importIntro">Choose the Codex Project whose only folder is this repository. Importing writes the <code>.vibehub</code> scaffold and a binding record into the working tree; nothing is committed, and no Room tree is invented.</p>
+    <div class="import-list" id="importContent" aria-live="polite"><p class="muted">Reading your Codex Projects…</p></div>
+    <footer><span id="importSelection">Select an eligible Codex Project.</span><button class="primary-button" type="button" id="confirmImport" disabled>Import as this Project</button></footer>
+  </section>
   <aside class="review-panel" id="reviewPanel" role="dialog" aria-modal="true" hidden inert aria-labelledby="reviewTitle">
     <header><div><small>OWNER REVIEW PACK</small><h2 id="reviewTitle">Codex-first product boundary</h2></div><button type="button" id="closeReview">Close</button></header>
     <section><span>Promise</span><h3>Codex familiarity + VibeHub Tasks</h3><p>Codex owns Threads, Turns, tools, approvals and execution. VibeHub adds a durable Task Graph, focused Task Workspace, Context, Evidence and independent Outcome.</p></section>
-    <section><span>Current composition</span><ul><li>Chat is the default landing. Projects are native Codex Thread Sections; Recents contains only unsectioned real Codex Threads.</li><li>Drag and the Chat-header selector move native membership. Fork preserves lineage and source Project; deletion returns member Chats to Recents.</li><li>Replay and live events share stable app-server item identity; answers stay primary while tool, diff and delegated work group into quiet Turn disclosures.</li><li>Inline approvals pause the exact Turn; retry, interruption and completion never become VibeHub Outcome claims.</li><li>Tasks is a distinct top-level destination; typed Search never relabels a Chat as a Task.</li><li>The Task Inbox surfaces current Needs You boundaries and repository completion history; Running does not notify.</li><li>A Task opens a focused Workspace; Start routes the exact host handoff into one Codex Thread.</li><li>Voice uses ordinary Codex audio input. Realtime conversation stays unavailable until the runtime reports support.</li></ul></section>
+    <section><span>Current composition</span><ul><li>Chat is the default landing. Project names only the repository-bound VibeHub Project; chat groups are native Codex Thread Sections, and Recents contains only unsectioned real Codex Threads in this folder.</li><li>Drag and the Chat-header selector move native group membership. Fork preserves lineage and source group; deleting a group returns member Chats to Recents.</li><li>Codex history from other folders is counted, never listed. Explicit single-folder Codex Project import writes the .vibehub scaffold uncommitted and hands Room creation to distill.</li><li>Replay and live events share stable app-server item identity; answers stay primary while tool, diff and delegated work group into quiet Turn disclosures.</li><li>Inline approvals pause the exact Turn; retry, interruption and completion never become VibeHub Outcome claims.</li><li>Tasks is a distinct top-level destination; typed Search never relabels a Chat as a Task.</li><li>The Task Inbox surfaces current Needs You boundaries and repository completion history; Running does not notify.</li><li>A Task opens a focused Workspace; Start routes the exact host handoff into one Codex Thread.</li><li>Voice uses ordinary Codex audio input. Realtime conversation stays unavailable until the runtime reports support.</li></ul></section>
     <section><span>Later, not now</span><p>Final desktop wrapper, Chat→Task and Remember persistence, complete visual approval, public packaging and DSH compatibility remain separate Tickets.</p></section>
     <section><span>Owner decision after review</span><ol><li>Does the real Thread now feel calm enough for daily Codex use?</li><li>Are grouped execution activities easy to inspect without overpowering the answer?</li><li>Does Chat-first still make important Tasks visible at the right moment?</li><li>Is Search the simplest bridge across Chat, Task and Context?</li><li>Is the bell plus small Needs You Sidebar group enough without becoming a dashboard?</li><li>Should Task focus replace the center column or open beside Chat?</li><li>Is voice placement familiar and quiet enough?</li></ol></section>
   </aside>
