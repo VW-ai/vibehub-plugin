@@ -8,7 +8,7 @@
     },
     {
       "id": "shared-ui",
-      "roots": ["skills/vibehub-ticket-review/assets", "apps/codex-first-shell-prototype"],
+      "roots": ["skills/vibehub-ticket-review/assets", "apps/codex-first-shell"],
       "forbiddenPackagePrefixes": ["@openai/codex", "@deepseek-ai/dsh"]
     },
     {

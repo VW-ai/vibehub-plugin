@@ -23,10 +23,10 @@
         "transport": "app-server stdio JSONL"
       },
       "capabilities": {
-        "projects": { "available": false, "mode": "unsupported", "source": "Codex 0.147.0 app-server has Thread cwd but no accepted Project-membership contract yet", "fallback": "Keep Threads unprojected until the Projects parity Ticket proves a versioned host mapping." },
+        "projects": { "available": true, "mode": "native", "source": "ClientRequest threadSection/list, threadSection/create, threadSection/update, threadSection/delete and thread/section/move; Thread.section is the sole membership authority with built-in Pinned and sectionId-null Recents", "fallback": "If fork placement races with Project deletion, the fork stays visible in unsectioned Recents with placement.applied=false; threadSection/delete returns member Threads to Recents." },
         "fork": { "available": true, "mode": "native", "source": "ClientRequest thread/fork", "fallback": "Disable Fork if schema probing removes thread/fork." },
         "search": { "available": true, "mode": "native", "source": "ClientRequest thread/list searchTerm", "fallback": "Offer metadata-only local filtering and label content search unavailable." },
-        "audio": { "available": true, "mode": "native", "source": "Turn input audio and localAudio variants", "fallback": "Keep text input and hide microphone-live claims." },
+        "audio": { "available": true, "mode": "native", "source": "Turn input audio and localAudio variants", "fallback": "Keep text input; hide microphone-live, transcript-live and audio-output claims while the pinned experimental thread/realtime probe reports protocol-present-current-ephemeral-thread-unsupported." },
         "attachments": { "available": true, "mode": "native", "source": "Turn input image and localImage variants", "fallback": "Keep text input and identify the rejected attachment." },
         "approvals": { "available": true, "mode": "native", "source": "ServerRequest item/commandExecution/requestApproval and item/fileChange/requestApproval", "fallback": "Fail closed and keep the request visible." },
         "tools": { "available": true, "mode": "native", "source": "ThreadItem tool variants and item progress notifications", "fallback": "Render an unknown native item without dropping transcript identity." },

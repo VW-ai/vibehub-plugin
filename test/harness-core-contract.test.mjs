@@ -3,7 +3,7 @@ import test from "node:test";
 import { readFile } from "node:fs/promises";
 import { createCodexHarnessAdapter } from "../packages/codex-adapter/harness.mjs";
 import { createDshHarnessAdapter } from "../packages/dsh-adapter/harness.mjs";
-import { assertCapabilityContract, capabilitySnapshot } from "../packages/harness-core/capabilities.mjs";
+import { assertCapabilityContract, capabilitySnapshot, harnessCapabilityContract } from "../packages/harness-core/capabilities.mjs";
 import { createMemoryAssociationStore } from "../packages/harness-core/association-store.mjs";
 import { createFixtureClient } from "../packages/harness-core/fixtures.mjs";
 import { probeCodexOnlyRoute } from "../packages/harness-core/probe-codex-only.mjs";
@@ -25,10 +25,29 @@ test("capability contract is complete, pinned, and truthful about different audi
     available: true,
     mode: "native",
     source: "Turn input audio and localAudio variants",
-    fallback: "Keep text input and hide microphone-live claims.",
+    fallback: "Keep text input; hide microphone-live, transcript-live and audio-output claims while the pinned experimental thread/realtime probe reports protocol-present-current-ephemeral-thread-unsupported.",
   });
   assert.equal(dsh.capabilities.audio.available, false);
   assert.match(dsh.capabilities.audio.source, /text or image only/u);
+});
+
+test("refreshed Codex declarations bind native ThreadSection Projects, hidden realtime, and ordinary audio", () => {
+  const codex = capabilitySnapshot("codex");
+  assert.deepEqual(codex.capabilities.projects, {
+    available: true,
+    mode: "native",
+    source: "ClientRequest threadSection/list, threadSection/create, threadSection/update, threadSection/delete and thread/section/move; Thread.section is the sole membership authority with built-in Pinned and sectionId-null Recents",
+    fallback: "If fork placement races with Project deletion, the fork stays visible in unsectioned Recents with placement.applied=false; threadSection/delete returns member Threads to Recents.",
+  });
+  assert.match(codex.capabilities.projects.fallback, /placement\.applied=false/u);
+  assert.equal(Object.hasOwn(harnessCapabilityContract.capabilities, "realtime"), false);
+  assert.equal(Object.hasOwn(harnessCapabilityContract.carriers.codex.capabilities, "realtime"), false);
+  assert.equal(Object.hasOwn(harnessCapabilityContract.carriers.dsh.capabilities, "realtime"), false);
+  assert.equal(codex.capabilities.audio.available, true);
+  assert.equal(codex.capabilities.audio.mode, "native");
+  assert.match(codex.capabilities.audio.source, /audio and localAudio/u);
+  assert.match(codex.capabilities.audio.fallback, /protocol-present-current-ephemeral-thread-unsupported/u);
+  assert.equal(capabilitySnapshot("dsh").capabilities.projects.mode, "adapted");
 });
 
 test("one router dispatches through exactly one selected harness and never cross-falls back", async () => {
