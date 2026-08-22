@@ -132,6 +132,55 @@ navigation rewriting `?thread=` to the opened Thread; a 300-item Thread
 mounting 240 entries behind a visible "60 earlier items" disclosure; and no
 model, mode or realtime control anywhere in the shell.
 
+## Lifecycle restart recovery closure
+
+This section records the run that turned `transport-gap-runtime-recovery`
+from a host signal into a proven restart path (acceptance
+`lifecycle-restart-recovery-is-proven` of
+`ticket-implement-codex-first-vibehub-shell`).
+
+- `npm test`: 235 tests, 232 passed, 0 failed, 3 intentional environment skips
+  (225 / 222 / 0 / 3 before this closure).
+- `npm run guard:codex` (`scripts/vh-codex-first-shell-guard.mjs`, a fresh
+  headless Chrome over the DevTools protocol against the production host on
+  the pinned-protocol fixture app-server with `CODEX_FIXTURE_STATE` and
+  `CODEX_FIXTURE_PIDFILE`):
+  - `?chatFixture=mixed&interactionGuard=1` at 1280x800:
+    `PASS browser interaction guard · 57/57`, zero console errors,
+    `clientWidth = scrollWidth = 1280`, stable across three runs;
+  - `…&reviewFrame=narrow` inside a 1280x800 window: `PASS 58/58`;
+  - `…&reviewFrame=narrow` at a 390x844 viewport: `PASS 58/58`,
+    `clientWidth = scrollWidth = 390`;
+  - the real-DOM lifecycle walk (`PASS runtime lifecycle walk · 6/6`): a
+    Chat with a live Turn in the production UI, the app-server killed with
+    SIGKILL under it, the composer dropping to idle with the
+    "Runtime exited during this Turn" boundary, the approval cards voided
+    and the presence dots off; the restart re-reading the same Thread with no
+    live claim; a browser reload recovering the same `?thread=`; and a reload
+    into `?task=` recovering the Task-linked Thread from the Codex Thread
+    name alone.
+- The three new guard checks (`runtime exit clears the running posture and
+  marks the dead Turn`, `runtime halt raises a persistent stop that names the
+  condition and disables adapter actions`, `restoring the runtime posture
+  withdraws the stop`) feed host event windows through the same
+  `applyEventWindow` path `pollEvents` takes.
+- Host proofs (`test/codex-first-shell.test.mjs`): kill mid-Turn → `runtimeExit`,
+  every pending request `requestResolved runtime_exited`, `runtimeRestarted`
+  generation 2 with identical Thread identities and the Task link, the
+  orphaned Turn replayed `inProgress` on a `notLoaded` Thread and never live,
+  `503 runtime_restarting` inside the window; a launcher restart over the same
+  persisted Codex state; and the halts for a lost identity, restart exhaustion,
+  an unreadable `account/read`, and a `-32601` on a pinned request, each a
+  single visible `409 runtime_halted` naming its `upstream-lock.json` stop
+  condition.
+- Still needing the real pinned binary (local Codex is 0.144.1, the lock pins
+  0.147.0): `generated-protocol-hash-changed` and `audio-input-removed` stay
+  `unverified` on the fixture because it cannot emit `generate-json-schema`;
+  `npm run probe:codex` against 0.147.0 turns them into observed results at
+  boot, and the exact status a real app-server reports for a Turn that was in
+  progress when it died (the fixture keeps the persisted `inProgress`, the
+  strictest case) is still to be read from that binary.
+
 ## Remaining non-highest gaps
 
 All highest-severity findings from the three independent audits are corrected
