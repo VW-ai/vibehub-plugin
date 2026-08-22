@@ -17,6 +17,7 @@ import { clampComposerHeight, composerBounds } from "./composer-sizing.mjs";
 import { threadLocation } from "./thread-location.mjs";
 import { answersFromDraft, applyRequestDraft, loadRequestDraft, pruneRequestDrafts, requestDraftFromForm, saveRequestDraft } from "./request-drafts.mjs";
 import { composeQuotedMessage } from "./quote-source.mjs";
+import { planTimelineReconciliation } from "./timeline-reconcile.mjs";
 
 const state = {
   route: "chat",
@@ -56,8 +57,7 @@ const state = {
   creatingThread: null,
   composerQuote: null,
   selectedQuote: null,
-  deferredChatRender: 0,
-  selectionDeferralStartedAt: 0,
+  paintDeferred: false,
   runtimeGeneration: 0,
   runtimeAlive: false,
   knownRequestIds: new Set(),
@@ -652,20 +652,37 @@ function focusSignature(element, entry) {
   return null;
 }
 
+// Keys of mounted entries the live selection touches. Those nodes are held in
+// place (and flagged) until the selection ends; see timeline-reconcile.mjs.
+function selectionProtectedKeys(container) {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed || !selection.rangeCount) return new Set();
+  const range = selection.getRangeAt(0);
+  if (!range.intersectsNode(container)) return new Set();
+  return new Set($$(":scope > [data-render-key]", container).filter((entry) => range.intersectsNode(entry)).map((entry) => entry.dataset.renderKey));
+}
+
 function patchTimeline(container, markup) {
   const template = document.createElement("template");
   template.innerHTML = markup;
   const nextEntries = [...template.content.children];
-  const nextKeys = new Set(nextEntries.map((entry) => entry.dataset.renderKey));
+  const nextByKey = new Map(nextEntries.map((entry) => [entry.dataset.renderKey, entry]));
   const current = new Map($$(":scope > [data-render-key]", container).map((entry) => [entry.dataset.renderKey, entry]));
-  nextEntries.forEach((next, index) => {
-    const key = next.dataset.renderKey;
+  const plan = planTimelineReconciliation(
+    [...current].map(([key, entry]) => ({ key, html: entry.outerHTML })),
+    nextEntries.map((entry) => ({ key: entry.dataset.renderKey, html: entry.outerHTML })),
+    selectionProtectedKeys(container),
+  );
+  const replace = new Set(plan.replace);
+  const defer = new Set(plan.defer);
+  plan.order.forEach((key, index) => {
     const existing = current.get(key);
+    const next = nextByKey.get(key);
     let mounted = existing;
     if (!existing) {
       restoreRequestDrafts(next);
       mounted = next;
-    } else if (existing.outerHTML !== next.outerHTML) {
+    } else if (replace.has(key)) {
       const focused = existing.contains(document.activeElement) ? document.activeElement : null;
       const signature = focusSignature(focused, existing);
       const disclosures = disclosureStates(existing);
@@ -675,10 +692,14 @@ function patchTimeline(container, markup) {
       if (signature) next.querySelector(signature)?.focus({ preventScroll: true });
       mounted = next;
     }
+    mounted.toggleAttribute("data-paint-deferred", defer.has(key));
     const atIndex = container.children[index];
     if (atIndex !== mounted) container.insertBefore(mounted, atIndex ?? null);
   });
-  for (const [key, entry] of current) if (!nextKeys.has(key)) entry.remove();
+  for (const key of plan.remove) current.get(key).remove();
+  for (const key of plan.defer) current.get(key)?.toggleAttribute("data-paint-deferred", true);
+  state.paintDeferred = plan.defer.length > 0;
+  return plan;
 }
 
 function renderChat({ preserveScroll = false } = {}) {
@@ -689,13 +710,8 @@ function renderChat({ preserveScroll = false } = {}) {
     surface.innerHTML = `<div class="welcome"><img class="welcome-mark" src="/vibehub-mark.svg" alt=""><h1>What do you want to work on?</h1><p>Start with ordinary Codex Chat. VibeHub adds a durable Task only when the work needs an explicit outcome and stopping contract.</p><div class="welcome-actions"><button class="primary-button" type="button" data-new-thread>Start a chat</button><button class="secondary-button" type="button" data-route="tasks">Open Task Graph</button></div></div>`;
     return;
   }
-  if (preserveScroll && transcriptSelectionActive() && (!state.selectionDeferralStartedAt || performance.now() - state.selectionDeferralStartedAt < 1_200)) {
-    if (!state.selectionDeferralStartedAt) state.selectionDeferralStartedAt = performance.now();
-    clearTimeout(state.deferredChatRender);
-    state.deferredChatRender = setTimeout(() => renderChat({ preserveScroll: true }), 180);
-    return;
-  }
-  state.selectionDeferralStartedAt = 0;
+  const selecting = preserveScroll && transcriptSelectionActive();
+  const heldScrollTop = surface.scrollTop;
   const distanceFromBottom = surface.scrollHeight - surface.scrollTop - surface.clientHeight;
   const activeProjectId = state.activeThread.project?.id ?? null;
   const pinnedId = state.bootstrap?.capabilities?.pinnedSectionId;
@@ -704,13 +720,16 @@ function renderChat({ preserveScroll = false } = {}) {
   const existingTimeline = $("#turns");
   if (preserveScroll && existingTimeline) {
     patchTimeline(existingTimeline, turnsMarkup(state.activeThread));
-    $("#streamStatus").textContent = state.running ? "Codex response updated." : "Codex response settled.";
+    $("#streamStatus").textContent = state.paintDeferred
+      ? "Codex response updated. The selected passage keeps its current text until you release the selection."
+      : state.running ? "Codex response updated." : "Codex response settled.";
   } else {
     surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to Project</span><select id="activeThreadProject" aria-label="Move Chat to Project">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
     restoreRequestDrafts(surface);
   }
   requestAnimationFrame(() => {
-    if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
+    if (selecting) surface.scrollTop = heldScrollTop;
+    else if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
     else surface.scrollTop = Math.max(0, surface.scrollHeight - surface.clientHeight - distanceFromBottom);
   });
 }
@@ -815,18 +834,14 @@ function taskContextSelectionMarkup() {
 function renderTaskConversation({ preserveScroll = false } = {}) {
   const timeline = $("#taskConversationTimeline");
   if (!timeline || !state.activeThread) return;
-  if (preserveScroll && transcriptSelectionActive() && (!state.selectionDeferralStartedAt || performance.now() - state.selectionDeferralStartedAt < 1_200)) {
-    if (!state.selectionDeferralStartedAt) state.selectionDeferralStartedAt = performance.now();
-    clearTimeout(state.deferredChatRender);
-    state.deferredChatRender = setTimeout(() => renderTaskConversation({ preserveScroll: true }), 180);
-    return;
-  }
-  state.selectionDeferralStartedAt = 0;
+  const selecting = preserveScroll && transcriptSelectionActive();
+  const heldScrollTop = timeline.scrollTop;
   const distanceFromBottom = timeline.scrollHeight - timeline.scrollTop - timeline.clientHeight;
   if (preserveScroll) patchTimeline(timeline, turnsMarkup(state.activeThread));
   else { timeline.innerHTML = turnsMarkup(state.activeThread); restoreRequestDrafts(timeline); }
   requestAnimationFrame(() => {
-    if (!preserveScroll || distanceFromBottom < 96) timeline.scrollTop = timeline.scrollHeight;
+    if (selecting) timeline.scrollTop = heldScrollTop;
+    else if (!preserveScroll || distanceFromBottom < 96) timeline.scrollTop = timeline.scrollHeight;
     else timeline.scrollTop = Math.max(0, timeline.scrollHeight - timeline.clientHeight - distanceFromBottom);
   });
 }
@@ -1465,7 +1480,10 @@ document.addEventListener("input", (event) => {
   }
   rememberRequestDraft(event.target);
 });
-document.addEventListener("selectionchange", () => requestAnimationFrame(updateQuoteSelection));
+document.addEventListener("selectionchange", () => {
+  requestAnimationFrame(updateQuoteSelection);
+  if (state.paintDeferred && !transcriptSelectionActive()) scheduleChatRender();
+});
 $("#stopTurn").addEventListener("click", async () => {
   if (!state.activeThreadId || !state.currentTurnId) return;
   try { await action({ action: "interruptTurn", threadId: state.activeThreadId, turnId: state.currentTurnId }); }

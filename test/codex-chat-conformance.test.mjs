@@ -19,6 +19,7 @@ import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
 import { threadLocation } from "../apps/codex-first-shell/thread-location.mjs";
 import { answersFromDraft, loadRequestDraft, MAX_REQUEST_DRAFTS, pruneRequestDrafts, saveRequestDraft } from "../apps/codex-first-shell/request-drafts.mjs";
 import { composeQuotedMessage, parseQuotedMessage } from "../apps/codex-first-shell/quote-source.mjs";
+import { planTimelineReconciliation } from "../apps/codex-first-shell/timeline-reconcile.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -346,6 +347,34 @@ test("quote source identity serializes into the Turn input and renders from repl
   assert.doesNotMatch(script, /function quotePrefix/);
   assert.match(host, /\["\/quote-source\.mjs", script\("quote-source\.mjs"\)\]/);
   assert.doesNotMatch(script + host, /localStorage|sessionStorage|indexedDB/i);
+});
+
+test("selection-preserving reconciliation defers only the entries a live selection touches", async () => {
+  const current = [{ key: "a", html: "<a1>" }, { key: "b", html: "<b1>" }, { key: "c", html: "<c1>" }, { key: "req", html: "<r1>" }];
+  const next = [{ key: "a", html: "<a1>" }, { key: "b", html: "<b2>" }, { key: "c", html: "<c2>" }, { key: "d", html: "<d1>" }];
+  assert.deepEqual(planTimelineReconciliation(current, next, new Set(["b", "req"])), {
+    order: ["a", "b", "c", "d"],
+    mount: ["d"],
+    replace: ["c"],
+    keep: ["a"],
+    defer: ["b", "req"],
+    remove: [],
+  }, "a selected changed entry and a selected retired entry both hold their mounted node while everything else streams");
+  const released = planTimelineReconciliation(current, next, new Set());
+  assert.deepEqual([released.defer, released.replace, released.remove], [[], ["b", "c"], ["req"]], "releasing the selection reconciles every held entry");
+  assert.deepEqual(planTimelineReconciliation(current, next, new Set(["a"])).defer, [], "an unchanged selected entry needs no deferral");
+  const [script, host, css] = await Promise.all([source("apps/codex-first-shell/app.js"), source("scripts/vh-codex-first-shell.mjs"), source("apps/codex-first-shell/app.css")]);
+  const patch = script.slice(script.indexOf("function selectionProtectedKeys"), script.indexOf("function renderChat("));
+  assert.match(patch, /range\.intersectsNode\(entry\)/);
+  assert.match(patch, /planTimelineReconciliation\(/);
+  assert.match(patch, /toggleAttribute\("data-paint-deferred", defer\.has\(key\)\)/);
+  assert.match(patch, /state\.paintDeferred = plan\.defer\.length > 0/);
+  assert.match(script, /document\.addEventListener\("selectionchange", \(\) => \{[^]*if \(state\.paintDeferred && !transcriptSelectionActive\(\)\) scheduleChatRender\(\);/);
+  assert.match(script, /if \(selecting\) surface\.scrollTop = heldScrollTop;/, "an active selection is never scrolled out from under the pointer");
+  assert.match(script, /keeps its current text until you release the selection/);
+  assert.doesNotMatch(script, /selectionDeferralStartedAt|deferredChatRender|1_200/, "no timer-bounded whole-paint deferral remains");
+  assert.match(css, /\[data-paint-deferred\]/);
+  assert.match(host, /\["\/timeline-reconcile\.mjs", script\("timeline-reconcile\.mjs"\)\]/);
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {
