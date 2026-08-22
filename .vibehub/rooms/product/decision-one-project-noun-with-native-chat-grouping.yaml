@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-one-project-noun-with-native-chat-grouping",
+  "detail": "The owner resolves the noun collision between the one visible VibeHub Project and Codex's native chat grouping. In the UI the word Project refers only to the VibeHub Project bound one-to-one to the active folder and Git repository. Codex ThreadSection grouping remains fully operable inside that Project - create, rename, delete, move a chat in and out, and return members to Recents when a section is deleted - but it is labelled with a distinct chat-organizing noun so a user is never asked to distinguish two kinds of Project. ThreadSection remains the sole membership authority and no second membership store is created. The exact label is copy owned by the visual-system pass; the binding rule is that it is not the word Project.",
+  "evidence": [
+    {
+      "note": "The owner chose the option binding Project to the repository and giving native chat grouping a different label.",
+      "ref": "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
+    },
+    {
+      "note": "The accepted v1 decision that a user must not be asked to distinguish Workspace, folder, Codex Project and VibeHub Project.",
+      "ref": ".vibehub/rooms/product/decision-one-visible-project-single-repository-v1.yaml"
+    },
+    {
+      "note": "Accepted research proving ThreadSection is the sole native membership authority with Recents as sectionId null.",
+      "ref": ".vibehub/outcomes/ticket-research-codex-project-and-recent-chat-parity.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-one-visible-project-single-repository-v1",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "contract-codex-project-and-recent-chat-parity",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T08:31:30Z",
+    "quote": "我觉得肯定是1。",
+    "ref": "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
+  },
+  "state": "active",
+  "summary": "Project names only the repository-bound VibeHub Project; native Codex chat grouping is surfaced under a distinct label",
+  "tags": [
+    "project",
+    "naming",
+    "information-architecture",
+    "codex",
+    "thread-section",
+    "v1"
+  ],
+  "type": "decision"
+}

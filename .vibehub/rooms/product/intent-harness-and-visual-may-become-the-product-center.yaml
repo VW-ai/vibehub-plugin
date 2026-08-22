@@ -1,0 +1,39 @@
+{
+  "context_id": "intent-harness-and-visual-may-become-the-product-center",
+  "detail": "A speculative direction the owner wants on record before dogfood, not an approved change of composition. If real use shows that development keeps happening inside Codex because its feature ecosystem is more mature, then VibeHub's chat surface may matter less than its planning and board harness. In that outcome the product becomes a well-built Task planning and board harness offered to Codex as a background console with several monitoring granularities - explicitly more than a board, but with the value concentrated in harness plus visual rather than in hosting the conversation. Under that reading DSH is mainly a convenient way to build the console and can interoperate with Codex; once a Codex-served capability exists, whether DeepSeek is used at all stops mattering much. The owner states they would accept this outcome. Nothing here changes the accepted Codex-first v1 composition; it is a hypothesis dogfood is expected to confirm or refute.",
+  "evidence": [
+    {
+      "note": "The owner asked for this hypothesis to be recorded and stated they would accept the outcome.",
+      "ref": "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
+    },
+    {
+      "note": "The shared-core and replaceable-carrier architecture that makes such a shift possible without rework.",
+      "ref": ".vibehub/rooms/product/decision-vibehub-core-supports-codex-and-dsh-harness-bases.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-vibehub-core-supports-codex-and-dsh-harness-bases",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T08:31:30Z",
+    "quote": "我们这个如果后面发现，可能更适合，轻量化的对话，更多价值在这个看板，那我们也可以接受",
+    "ref": "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
+  },
+  "state": "active",
+  "summary": "The owner would accept dogfood concluding that VibeHub's center of value is the harness plus visual console served to Codex, not the chat surface",
+  "tags": [
+    "product-direction",
+    "harness",
+    "visual",
+    "dogfood",
+    "codex",
+    "dsh",
+    "speculative"
+  ],
+  "type": "intent"
+}

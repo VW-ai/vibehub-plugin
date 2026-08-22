@@ -1,17 +1,38 @@
 {
   "acceptance": [
     {
-      "acceptance_id": "refine-production-shell-from-approved-codex-first-direction",
-      "criterion": "Placeholder: after the owner decision succeeds, replan this Ticket to firm with independently checkable acceptance for a Chat-first Codex-familiar sidebar; one visible Project bound to exactly one active folder or Git repository; Codex-native Project or ThreadSection and unprojected Recents behavior without a second membership store; Search and navigation; Codex Thread and Turn lifecycle and conformance floor; Graph and Task Workspace routes inside the same Project; explicit repository-scope and no-repository states; local lifecycle, restart recovery, accessibility, performance and installed regression boundaries. Workspace or cwd remains inspectable metadata rather than a peer container, while task conversation binding, origin and Context transfer remain owned by the downstream Chat-to-Task bridge."
+      "acceptance_id": "chat-conformance-floor-holds-in-production",
+      "criterion": "The production shell passes every check that docs/proposals/codex-chat-conformance/conformance-matrix.json records as pass, upgrades selection-during-stream, quote-add-to-chat, markdown-rich-content, request-user-input and composer-inputs from partial to pass with executable coverage recorded in the matrix proof fields and test/*.test.mjs, and resolves current-thread-url-recovery so reload after in-app navigation recovers the visible Thread; virtualized-production-list, model-mode-pickers and realtime-voice may remain deferred only while the UI makes no contrary claim; npm test and the browser interaction guard pass against the production shell, not only the prototype."
+    },
+    {
+      "acceptance_id": "one-project-import-and-scope-states-are-real",
+      "criterion": "The UI word Project refers only to the repository-bound VibeHub Project; Codex ThreadSection grouping operates under a distinct label with create, rename, delete, move in and out, and delete returning members to Recents, backed solely by native ThreadSection authority. By default the shell lists no Codex chats or repositories outside this VibeHub Project; an explicit import flow lets the user select and match exactly one single-folder Codex Project as this Project, leaves the repository with its .vibehub project scaffold and Room tree present, and after binding new VibeHub-side chats and work sync to the checked-in repository by default. With no eligible repository or no completed import, Chat remains fully usable while VibeHub Task actions are unavailable with the missing scope explained; Recents means native Threads with null sectionId; Workspace or cwd appears only as inspectable metadata."
+    },
+    {
+      "acceptance_id": "graph-and-task-workspace-routes-are-production",
+      "criterion": "Inside the one Project the shell serves the Task Graph route and a focused Task Workspace route from the checked-in repository through the canonical read-only projection with no second store; a Task Workspace shows the Task's contract, Evidence and Outcome state and its host-built Context packet exactly as packages/codex-adapter/task-context.mjs assembles it; Chat remains the default landing, the Graph is never the default, and typed grouped Search spans native Threads, VibeHub Tasks and durable Context from one entry."
+    },
+    {
+      "acceptance_id": "lifecycle-restart-recovery-is-proven",
+      "criterion": "One production launcher boots the loopback host and the pinned Codex app-server through packages/harness-core with single-harness routing; killing and restarting the app-server or reloading the browser recovers the same Thread identities, running-Turn truth and Task linkage without minting live presence from replay; the adapter stop conditions in packages/codex-adapter/upstream-lock.json are enforced so a violated pin halts reuse visibly; no localStorage, IndexedDB, SQLite or second transcript store appears."
+    },
+    {
+      "acceptance_id": "capability-contract-is-refreshed-and-consistent",
+      "criterion": "docs/proposals/harness-neutral-core/capabilities.v1.json is corrected so the Codex projects capability reflects the proven native ThreadSection support and every capability the shell exposes matches a truthful probe result, with realtime voice hidden while unsupported and ordinary audio and localAudio inputs accepted; harness-core contract tests bind the refreshed declarations."
+    },
+    {
+      "acceptance_id": "responsive-accessible-baseline-holds",
+      "criterion": "The production shell holds the audited interaction baseline at 1280 wide and 390x844 in Light and Dark: no page-level horizontal overflow, the narrow sidebar drawer with inert offscreen content and focus return, search and overlay focus restoration, keyboard paths for every pointer action, reduced-motion honoring, and WCAG AA contrast for text and interactive states using the baseline Light and Dark tokens; final visual identity remains owned by the visual-system Ticket."
     }
   ],
   "constraints": [
-    "Do not execute while draft or infer protected composition before human-origin Evidence and a successful Outcome exist.",
-    "Do not scrape Codex Desktop, create a second Task or transcript store, run duplicate Agent loops or make DSH a runtime prerequisite.",
-    "Keep upstream-specific calls inside bounded adapters with exact schema probes.",
-    "Preserve ordinary Chat identity, VibeHub Task identity, exact handoff, Evidence and independent closeout semantics."
+    "Do not scrape Codex Desktop, create a second Task, transcript or chat-membership store, run duplicate Agent loops or make DSH a runtime prerequisite.",
+    "Keep upstream-specific calls inside bounded adapters with exact schema probes against the pinned baseline; a stop condition failure must surface, never silently degrade.",
+    "Preserve ordinary Chat identity, VibeHub Task identity, exact host-owned handoff, Evidence and independent closeout semantics; Chat-to-Task transfer, Context writeback, audio capture UX (this shell only keeps ordinary audio and localAudio inputs available), final visual tokens, packaged install, upgrade and removal stay in their own Tickets.",
+    "Import binds at most one single-folder Codex Project to the one VibeHub Project; the shell never lists unrelated Codex history by default and never activates cross-folder Context, a local database, automatic Git commit or push, or a second Workspace hierarchy.",
+    "Session-history Room mining at import cold start is recorded direction, not part of this Ticket."
   ],
-  "context": "Production acceptance is intentionally deferred until the owner decision succeeds. Refine this Ticket in place afterward. It owns the persistent Chat-first application shell and native-quality Codex substrate for one active repository, with one human-facing Project surface that composes Codex Chat organization and VibeHub Graph or Task routes without merging their internal identities. V1 has no multi-folder Context, local database or second Workspace hierarchy. Later Tickets add explicit Chat-to-Task transfer and audio; the first carrier remains usable without DSH.",
+  "context": "Owner decision succeeded; this replans the placeholder to firm. The Ticket promotes the accepted disposable prototype (apps/codex-first-shell-prototype plus scripts/vh-codex-first-shell-prototype.mjs) into the production application on packages/harness-core and packages/codex-adapter, against pinned Codex 0.147.0. It owns the persistent Chat-first shell for exactly one active repository: native Chat, grouping, Recents, Search, Project import and scope states, Graph and Task Workspace routes, restart recovery inside a running install, and the executable regression boundary. The word Project names only the repository-bound VibeHub Project; Codex ThreadSection grouping stays fully operable under a distinct chat-organizing label. Non-VibeHub Codex chats and repositories stay hidden by default; explicit single-folder Codex Project import binds the one VibeHub Project. Downstream Tickets own Chat-to-Task bridges, audio capture, the final visual system, the installed alpha including packaged upgrade and removal, and DSH packaging; this shell must stay usable without any of them.",
   "context_refs": [
     {
       "purpose": "Binding Codex carrier and shared-core boundary.",
@@ -36,17 +57,66 @@
     {
       "purpose": "Exact single-repository production scope and no-repository behavior.",
       "ref": ".vibehub/rooms/product/constraint-v1-git-native-single-repository-scope.yaml"
+    },
+    {
+      "purpose": "Project noun resolution and the distinct chat-grouping label rule.",
+      "ref": ".vibehub/rooms/product/decision-one-project-noun-with-native-chat-grouping.yaml"
+    },
+    {
+      "purpose": "Default hidden visibility and the explicit single-folder import binding act.",
+      "ref": ".vibehub/rooms/product/decision-codex-project-import-binds-the-vibehub-project.yaml"
+    },
+    {
+      "purpose": "Recorded non-gating direction for session-derived Room material at import.",
+      "ref": ".vibehub/rooms/knowledge/intent-room-cold-start-from-codex-session-history.yaml"
+    },
+    {
+      "purpose": "Native ThreadSection, Recents and fork parity contract.",
+      "ref": ".vibehub/rooms/product/contract-codex-project-and-recent-chat-parity.yaml"
+    },
+    {
+      "purpose": "Behavioral parity scope the conformance floor criterion enforces.",
+      "ref": ".vibehub/rooms/product/constraint-codex-chat-parity-is-behavioral-product-work.yaml"
+    },
+    {
+      "purpose": "Baseline Light and Dark tokens for the responsive accessible criterion.",
+      "ref": ".vibehub/rooms/product/contract-codex-light-dark-theme-baseline.yaml"
+    },
+    {
+      "purpose": "The 29-check executable conformance floor with current pass, partial and deferred states.",
+      "ref": "docs/proposals/codex-chat-conformance/conformance-matrix.json"
+    },
+    {
+      "purpose": "Pinned Codex 0.147.0 baseline, protocol hash and stop conditions.",
+      "ref": "packages/codex-adapter/upstream-lock.json"
+    },
+    {
+      "purpose": "Capability declarations the shell must refresh and honor.",
+      "ref": "docs/proposals/harness-neutral-core/capabilities.v1.json"
+    },
+    {
+      "purpose": "Accepted prototype review pack whose proven shell behavior this Ticket promotes to production.",
+      "ref": "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"
+    },
+    {
+      "purpose": "The successful owner decision this firm plan implements.",
+      "ref": ".vibehub/outcomes/ticket-decide-codex-first-shell-direction.yaml"
+    },
+    {
+      "purpose": "Binding Chat default landing, typed grouped Search and quiet attention direction.",
+      "ref": ".vibehub/rooms/product/decision-chat-default-search-and-task-attention.yaml"
     }
   ],
   "deliveries": [],
   "kind": "ticket",
-  "maturity": "draft",
-  "outcome": "The production local application presents persistent Codex-quality Chat and Recents plus one repository-bound Project containing VibeHub Task Graph and focused Task Workspace routes in one coherent Codex-first shell.",
+  "maturity": "firm",
+  "outcome": "The production local application presents persistent Codex-quality Chat and Recents plus one repository-bound Project, entered through explicit single-folder Codex Project import, containing VibeHub Task Graph and focused Task Workspace routes in one coherent Codex-first shell.",
   "provenance_refs": [
     "conversation:2026-08-20-owner-prioritizes-real-codex-use",
     "conversation:2026-08-21-owner-defines-chat-stream-and-task-origin",
     "conversation:2026-08-21-owner-chooses-one-project-single-repository-v1",
-    "conversation:2026-08-21-owner-defers-detached-context-and-git-policy"
+    "conversation:2026-08-21-owner-defers-detached-context-and-git-policy",
+    "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
   ],
   "relations": [
     {

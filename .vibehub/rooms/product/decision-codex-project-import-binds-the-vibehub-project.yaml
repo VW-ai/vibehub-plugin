@@ -1,0 +1,47 @@
+{
+  "context_id": "decision-codex-project-import-binds-the-vibehub-project",
+  "detail": "VibeHub does not display the user's Codex repositories or chats that are not part of VibeHub by default. Binding happens by explicit human action: the user selects and matches an existing Codex Project, importing it as this VibeHub Project. Only a single-folder Codex Project is eligible, which keeps the binding consistent with the one-repository v1 scope. Import is the moment VibeHub cold-starts that Project, including Room setup. Once bound, anything created on the VibeHub side syncs to VibeHub by default, chats included, so the imported Project and the VibeHub Project are one workspace rather than two mirrored stores. This preserves the Codex-native way of working while keeping VibeHub's surface free of unrelated Codex history.",
+  "evidence": [
+    {
+      "note": "The owner defined default hidden visibility, explicit single-folder import as the binding act, cold start with Room setup on import, and sync-by-default including chats.",
+      "ref": "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
+    },
+    {
+      "note": "Single-folder eligibility keeps import inside the binding one-repository v1 delivery scope.",
+      "ref": ".vibehub/rooms/product/constraint-v1-git-native-single-repository-scope.yaml"
+    },
+    {
+      "note": "The one-to-one Project and repository binding this import act establishes.",
+      "ref": ".vibehub/rooms/product/decision-one-visible-project-single-repository-v1.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "constraint-v1-git-native-single-repository-scope",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-one-project-noun-with-native-chat-grouping",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T08:31:30Z",
+    "quote": "我们不去展示codex的仓库/chats that is not in vibehub here by default。…我们允许用户，去选定，然后match（导入）一个codex的project作为我们的project（只能是单folder的project）",
+    "ref": "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
+  },
+  "state": "active",
+  "summary": "Non-VibeHub Codex repositories and chats stay hidden by default; the VibeHub Project is bound by explicit single-folder Codex Project import",
+  "tags": [
+    "project",
+    "import",
+    "visibility",
+    "codex",
+    "cold-start",
+    "rooms",
+    "v1"
+  ],
+  "type": "decision"
+}

@@ -1,0 +1,38 @@
+{
+  "context_id": "intent-room-cold-start-from-codex-session-history",
+  "detail": "When an imported Codex Project cold-starts its VibeHub Rooms, the owner wants the material to come from more than the repository and its code. Prior Codex session history is expected to carry durable reasoning that belongs in Rooms and cannot be recovered from source files. The extraction mechanism is deliberately left open - what a session yields, how a candidate becomes Context, what human confirmation it needs, and how it stays inside the existing distill and ingest boundaries are unresolved. This is direction for a later focused Ticket; it does not gate the Codex-first shell and must not become an automatic background capture cadence.",
+  "evidence": [
+    {
+      "note": "The owner asked for session-derived Room material at import cold start and explicitly deferred the mechanism.",
+      "ref": "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
+    },
+    {
+      "note": "Import is the moment cold start and Room setup occur, which is where this material would be needed.",
+      "ref": ".vibehub/rooms/product/decision-codex-project-import-binds-the-vibehub-project.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-project-import-binds-the-vibehub-project",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T08:31:30Z",
+    "quote": "可能需要后面单独想一下机制，从 session 里去挖掘出一些可以填充 room 的预料而不只是代码库/项目库。",
+    "ref": "conversation:2026-08-22-owner-defines-codex-project-import-and-visibility"
+  },
+  "state": "active",
+  "summary": "Room cold start after Project import should mine Codex session history for Room material, not only the code base; mechanism undecided",
+  "tags": [
+    "rooms",
+    "cold-start",
+    "distill",
+    "codex",
+    "sessions",
+    "future"
+  ],
+  "type": "intent"
+}
