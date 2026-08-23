@@ -1,0 +1,35 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "refine-after-install-decision",
+      "criterion": "After the decision Ticket has a successful Outcome, replan this Ticket to firm with exact acceptance for the chosen install path, including a clean-directory install and init test for each supported host and the setup-time GitHub mirror option."
+    }
+  ],
+  "constraints": [
+    "Do not execute this Ticket while draft.",
+    "Do not add a daemon, MCP server, background process, or hidden state regardless of the chosen path."
+  ],
+  "context": "Direction is known; exact acceptance depends on the owner's choice between a skills.sh-compatible layout, an npx-published CLI, or marketplace-only. Replan this Ticket to firm after the decision Outcome exists, deriving acceptance from the chosen path: files restructured or published, README and docs/INSTALL.md rewritten, manifests and artifact verification updated, setup flow extended, and an end-to-end install test from a clean scratch directory per host.",
+  "context_refs": [
+    {
+      "purpose": "Document to rewrite for the chosen path.",
+      "ref": "docs/INSTALL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "Users install VibeHub into any supported agent with one command and initialize a project with one more, the shared helper and contracts are reachable from every installed Skill, and project setup offers the GitHub Issues mirror as a one-time option.",
+  "provenance_refs": [
+    "conversation:2026-08-22-tickets-as-github-issues"
+  ],
+  "relations": [
+    {
+      "rationale": "Acceptance cannot be firm until the owner chooses the install path.",
+      "target_ticket_id": "ticket-decide-npx-first-install-experience",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-implement-npx-first-install-experience"
+}
