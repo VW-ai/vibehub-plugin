@@ -225,7 +225,11 @@ test("browser Project movement contract requires real pointer, keyboard, focus, 
   assert.match(script, /document\.addEventListener\("pointerdown"/);
   assert.match(script, /document\.elementFromPoint\(event\.clientX, event\.clientY\)/);
   assert.match(script, /moveThreadToProject\(drag\.threadId, projectId/);
-  assert.doesNotMatch(script, /dataTransfer/);
+  // Chat rows move by a real pointer drag, never HTML5 drag-and-drop; the
+  // only dataTransfer the shell reads is the file list dropped on the Composer.
+  const pointerDrag = script.slice(script.indexOf('document.addEventListener("pointerdown"'), script.indexOf('window.matchMedia("(max-width: 760px)")'));
+  assert.doesNotMatch(pointerDrag, /dataTransfer/);
+  assert.doesNotMatch(script, /draggable|"dragstart"|"dragend"/);
   assert.match(html, /role="status" aria-live="polite" aria-atomic="true"/);
   assert.match(preparer, /waitForNotification\("turn\/completed"/);
   assert.match(preparer, /PROJECT-BROWSER-E2E-READY/);

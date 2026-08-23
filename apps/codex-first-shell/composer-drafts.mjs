@@ -1,11 +1,13 @@
 export const MAX_DRAFT_THREADS = 5;
+// The same bound the Composer applies (composer-attachments.mjs MAX_ATTACHMENTS).
+export const MAX_DRAFT_ATTACHMENTS = 6;
 
 function cloneDraft(draft) {
   const source = draft ?? {};
   return {
     text: String(source.text ?? "").slice(0, 32_000),
     quote: source.quote ? structuredClone(source.quote) : null,
-    attachments: (source.attachments ?? []).slice(0, 3).map((item) => ({ ...item })),
+    attachments: (source.attachments ?? []).slice(0, MAX_DRAFT_ATTACHMENTS).map((item) => ({ ...item })),
   };
 }
 

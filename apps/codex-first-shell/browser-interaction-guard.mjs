@@ -546,6 +546,54 @@ export async function runBrowserInteractionGuard(hooks) {
   await hooks.resetModels();
   await hooks.switchFixtureThread(fixture.thread);
 
+  // --- Images: paste, drop, several per Turn, removable chips --------------
+  // A clipboard image and dropped image files attach beside the plus picker,
+  // each chip carries an accessible name and a remove control, and every
+  // image travels as the image variant with a data URL (never localImage)
+  // and renders as an image in the user message after send.
+  const attachmentTray = document.querySelector("#attachmentTray");
+  const pngFile = (name) => new File([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])], name, { type: "image/png" });
+  const chipLabels = () => [...attachmentTray.querySelectorAll(".attachment-chip")].map((chip) => chip.getAttribute("aria-label"));
+  try {
+    const pasteTransfer = new DataTransfer();
+    pasteTransfer.items.add(pngFile(""));
+    composerInput.dispatchEvent(new ClipboardEvent("paste", { clipboardData: pasteTransfer, bubbles: true, cancelable: true }));
+    await waitFor(() => attachmentTray.querySelectorAll(".attachment-chip").length === 1);
+    check(results, "pasting an image attaches it as a removable chip with an accessible name", chipLabels().join("|") === "Attached image Pasted image 1.png" && Boolean(attachmentTray.querySelector('.attachment-chip[role="group"] img')) && attachmentTray.querySelector("[data-remove-attachment]")?.getAttribute("aria-label") === "Remove Pasted image 1.png" && !attachmentTray.hidden, chipLabels().join("|") || "no chip");
+    const dropTransfer = new DataTransfer();
+    dropTransfer.items.add(pngFile("guard-a.png"));
+    dropTransfer.items.add(pngFile("guard-b.png"));
+    const composerForm = document.querySelector("#composer");
+    composerForm.dispatchEvent(new DragEvent("dragover", { dataTransfer: dropTransfer, bubbles: true, cancelable: true }));
+    const dropMarked = composerForm.classList.contains("drop-target");
+    composerForm.dispatchEvent(new DragEvent("drop", { dataTransfer: dropTransfer, bubbles: true, cancelable: true }));
+    await waitFor(() => attachmentTray.querySelectorAll(".attachment-chip").length === 3);
+    const dropped = chipLabels();
+    attachmentTray.querySelector('[data-remove-attachment="1"]')?.click();
+    await frame();
+    check(results, "dropped images attach beside the pasted one and a chip removes exactly its image", dropMarked && !composerForm.classList.contains("drop-target") && dropped.join("|") === "Attached image Pasted image 1.png|Attached image guard-a.png|Attached image guard-b.png" && chipLabels().join("|") === "Attached image Pasted image 1.png|Attached image guard-b.png", `${dropped.join("|")} → ${chipLabels().join("|")}`);
+    const imageActions = [];
+    await hooks.withFixtureTransport(async (payload) => {
+      imageActions.push(payload);
+      if (payload.action === "startTurn") return { turn: { id: "guard-image-turn" }, settings: null };
+      if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+      return {};
+    }, async () => {
+      composerInput.value = "Two images";
+      composerForm.requestSubmit();
+      await waitFor(() => imageActions.some((entry) => entry.action === "readThread"));
+      const start = imageActions.find((entry) => entry.action === "startTurn");
+      const images = start?.input.filter((item) => item.type === "image") ?? [];
+      const replayed = structuredClone(fixture.thread);
+      replayed.turns.push({ id: "guard-image-turn", status: "completed", items: [{ type: "userMessage", id: "guard-image-user", content: structuredClone(start?.input ?? []) }] });
+      await hooks.reconcileFixtureThread(replayed);
+      const rendered = document.querySelectorAll('.turn.user[data-item-id$="guard-image-user"] img.message-image').length;
+      check(results, "several images travel as data-URL image inputs and render as images in the user message", images.length === 2 && images.every((item) => /^data:image\/png;base64,/.test(item.url)) && start.input.every((item) => item.type !== "localImage") && start.input[0]?.text === "Two images" && rendered === 2 && attachmentTray.hidden, `${images.length} image inputs · ${rendered} rendered`);
+    });
+  } catch (error) { check(results, "image attachment checks completed", false, `threw: ${error?.message ?? error}`); }
+  for (const remove of attachmentTray.querySelectorAll("[data-remove-attachment]")) remove.click();
+  await hooks.switchFixtureThread(fixture.thread);
+
   // One Project, four scope states: the header, the Tasks gate, the Room
   // cold-start handoff and the explicit import dialog are exercised through
   // the real controls with host-shaped fixtures, then the live Project is

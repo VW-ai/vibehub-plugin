@@ -1,5 +1,6 @@
 import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, rememberThreadSettings, threadQueue, threadSettings, timelineWindow } from "./chat-model.mjs";
 import { describeTurnSettings, effortOptionLabel, findModel, imageRefusal, modelOptionLabel, pendingOverrides, selectedEffort, selectedModel } from "./composer-settings.mjs";
+import { acceptAttachment, attachmentKind, imageFilesFrom, MAX_ATTACHMENT_BYTES, renderAttachmentChips } from "./composer-attachments.mjs";
 import { emptyQueue, pausedMessage, queuedMediaSummary, queuedText, replaceQueuedText } from "./composer-queue.mjs";
 import {
   DOM_LIMITS,
@@ -112,7 +113,6 @@ const state = {
 // (steer the live Turn). The flag is read once by submitTurn.
 let composerSubmitMode = "default";
 
-const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
 const MAX_RECORDING_MS = 90_000;
 
 const token = location.hash.slice(1);
@@ -1761,21 +1761,36 @@ async function openTask(ticketId) {
   }
 }
 
+// One more attachment, or the reason it was refused: the next Turn's model
+// must accept images, and the count and byte bounds are named.
 function addAttachment(file, url) {
-  const type = file.type.startsWith("audio/") ? "audio" : "image";
-  if (type === "image") {
+  if (attachmentKind(file) === "image") {
     const refusal = imageRefusal(nextTurnModel());
     if (refusal) { notify(refusal); return false; }
   }
-  state.attachments = [...state.attachments, { type, url, name: file.name || (type === "audio" ? "Voice recording" : "Image") }].slice(-3);
+  const { attachments, refused } = acceptAttachment(state.attachments, { file, url });
+  if (refused) { notify(refused); return false; }
+  state.attachments = attachments;
   renderAttachments();
   return true;
+}
+
+// Files from the picker, the clipboard or a drop, read one by one into data
+// URLs; a file over the byte bound is refused before it is read.
+async function addAttachmentFiles(files) {
+  let added = 0;
+  for (const file of files) {
+    if (file.size > MAX_ATTACHMENT_BYTES) { notify(`${file.name || "The attachment"} is larger than the 8 MiB attachment limit.`); continue; }
+    if (addAttachment(file, await fileToDataUrl(file))) added += 1;
+  }
+  if (added) $("#streamStatus").textContent = `${added} attachment${added === 1 ? "" : "s"} added to your next message.`;
+  return added;
 }
 
 function renderAttachments() {
   const tray = $("#attachmentTray");
   tray.hidden = state.attachments.length === 0;
-  tray.innerHTML = state.attachments.map((item, index) => `<span class="attachment-chip">${item.type === "audio" ? "◉" : "▧"}<span>${escapeHtml(item.name)}</span><button type="button" data-remove-attachment="${index}" aria-label="Remove attachment">×</button></span>`).join("");
+  tray.innerHTML = renderAttachmentChips(state.attachments);
 }
 
 function renderComposerQuote() {
@@ -3165,10 +3180,38 @@ $("#collapseSidebar").addEventListener("click", () => {
 $("#openSidebar").addEventListener("click", openMobileSidebar);
 $("#attachButton").addEventListener("click", () => $("#attachmentInput").click());
 $("#attachmentInput").addEventListener("change", async (event) => {
-  const file = event.target.files?.[0];
-  if (file?.size > MAX_ATTACHMENT_BYTES) notify("Attachments must be 8 MiB or smaller before encoding.");
-  else if (file) addAttachment(file, await fileToDataUrl(file));
+  const files = [...(event.target.files ?? [])];
   event.target.value = "";
+  await addAttachmentFiles(files);
+});
+// Images pasted from the clipboard attach beside the typed text; a paste
+// without an image file is the ordinary text paste.
+$("#composerInput").addEventListener("paste", async (event) => {
+  const images = imageFilesFrom(event.clipboardData);
+  if (!images.length) return;
+  event.preventDefault();
+  await addAttachmentFiles(images);
+});
+// Image files dropped anywhere on the Composer attach the same way; the
+// drop target is marked while a file drag hovers it.
+const composerForm = $("#composer");
+composerForm.addEventListener("dragover", (event) => {
+  if (![...(event.dataTransfer?.types ?? [])].includes("Files")) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "copy";
+  composerForm.classList.add("drop-target");
+});
+composerForm.addEventListener("dragleave", (event) => {
+  if (!composerForm.contains(event.relatedTarget)) composerForm.classList.remove("drop-target");
+});
+composerForm.addEventListener("drop", async (event) => {
+  composerForm.classList.remove("drop-target");
+  if (![...(event.dataTransfer?.types ?? [])].includes("Files")) return;
+  event.preventDefault();
+  const images = imageFilesFrom(event.dataTransfer);
+  if (!images.length) { notify("Only image files can be dropped here; use + for audio."); return; }
+  await addAttachmentFiles(images);
+  $("#composerInput").focus();
 });
 $("#voiceButton").addEventListener("click", toggleRecording);
 $("#composer").addEventListener("submit", submitTurn);

@@ -80,3 +80,16 @@ test("model and effort pickers carry no option string in source and code against
   assert.match(contract.bootstrap["threads[].settings"], /^null until the runtime reported this Thread's settings/);
   assert.doesNotMatch(html + script, /localStorage|sessionStorage|indexedDB|document\.cookie/i);
 });
+
+test("images paste and drop into the Composer as data-URL image inputs, never localImage", async () => {
+  const { html, script, contract } = await shellSources();
+  assert.match(html, /<input id="attachmentInput" type="file" accept="image\/\*,audio\/\*" multiple hidden>/, "the plus picker stays and takes several files");
+  assert.match(script, /\$\("#composerInput"\)\.addEventListener\("paste", async \(event\) => \{\s*const images = imageFilesFrom\(event\.clipboardData\);/);
+  assert.match(script, /composerForm\.addEventListener\("drop", async \(event\) => \{[^]*?const images = imageFilesFrom\(event\.dataTransfer\);/);
+  assert.match(script, /composerForm\.addEventListener\("dragover"/);
+  assert.match(script, /await addAttachmentFiles\(images\);/);
+  assert.match(script, /input\.push\(\.\.\.state\.attachments\.map\(\(\{ type, url \}\) => \(\{ type, url \}\)\)\);/, "every attachment travels as its variant with the data URL");
+  assert.doesNotMatch(script, /localImage|localAudio/, "a browser File carries no filesystem path");
+  assert.match(contract.inputs.never, /localImage and localAudio are never produced/);
+  assert.match(script, /if \(file\.size > MAX_ATTACHMENT_BYTES\)/, "the byte bound is applied before a file is read");
+});

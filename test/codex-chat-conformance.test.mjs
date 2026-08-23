@@ -5,7 +5,8 @@ import test from "node:test";
 import { applyChatEvent, applyHostEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, rememberQueue, rememberThreadSettings, settingsRecordFromNotification, threadQueue, threadSettings, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
 import { describePosture, describeTurnSettings, effortOptionLabel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "../apps/codex-first-shell/composer-settings.mjs";
 import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
-import { loadThreadDraft, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
+import { loadThreadDraft, MAX_DRAFT_ATTACHMENTS, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
+import { acceptAttachment, attachmentName, imageFilesFrom, MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS, renderAttachmentChips } from "../apps/codex-first-shell/composer-attachments.mjs";
 import { clampComposerHeight, composerBounds, COMPOSER_HEIGHT_FALLBACK } from "../apps/codex-first-shell/composer-sizing.mjs";
 import {
   createRenderBudget,
@@ -238,6 +239,38 @@ test("Thread settings follow the host record and thread/settings/updated, and th
   assert.equal(describeTurnSettings({ model: "fixture-text", effort: "high", approvalPolicy: "never", sandboxPolicy: { type: "dangerFullAccess" } }, models), "Fixture Text Only · high · never · dangerFullAccess");
   assert.equal(describeTurnSettings({ model: "unlisted" }, models), "unlisted");
   assert.equal(describeTurnSettings({}, models), null);
+});
+
+test("pasted and dropped images attach as bounded data-URL inputs with removable, accessibly named chips", () => {
+  const file = (name, type, size = 8) => ({ name, type, size });
+  // A paste or drop carries files, or file items as a fallback; only images count.
+  assert.deepEqual(imageFilesFrom({ files: [file("a.png", "image/png"), file("notes.txt", "text/plain"), file("b.webp", "image/webp")] }).map((entry) => entry.name), ["a.png", "b.webp"]);
+  assert.deepEqual(imageFilesFrom({ files: [], items: [{ kind: "string" }, { kind: "file", getAsFile: () => file("", "image/png") }, { kind: "file", getAsFile: () => null }] }).map((entry) => entry.type), ["image/png"]);
+  assert.deepEqual(imageFilesFrom(null), []);
+  assert.equal(attachmentName(file("", "image/png"), 2), "Pasted image 3.png");
+  assert.equal(attachmentName(file("shot.png", "image/png")), "shot.png");
+  assert.equal(attachmentName(file("", "audio/webm")), "Voice recording");
+  // Several images travel in one Turn, up to the count bound; every refusal is named.
+  let attachments = [];
+  for (let index = 0; index < MAX_ATTACHMENTS; index += 1) {
+    const accepted = acceptAttachment(attachments, { file: file(`${index}.png`, "image/png"), url: "data:image/png;base64,AA==" });
+    assert.equal(accepted.refused, null);
+    attachments = accepted.attachments;
+  }
+  assert.equal(attachments.length, MAX_ATTACHMENTS);
+  assert.equal(MAX_DRAFT_ATTACHMENTS, MAX_ATTACHMENTS, "Thread drafts keep the same bound");
+  assert.match(acceptAttachment(attachments, { file: file("more.png", "image/png"), url: "data:image/png;base64,AA==" }).refused, /At most 6 attachments/);
+  assert.match(acceptAttachment([], { file: file("big.png", "image/png", MAX_ATTACHMENT_BYTES + 1), url: "data:image/png;base64,AA==" }).refused, /big\.png is larger than the 8 MiB attachment limit/);
+  assert.match(acceptAttachment([], { file: file("x.png", "image/png"), url: "https://example.com/x.png" }).refused, /data URL/);
+  assert.deepEqual(acceptAttachment([], { file: file("clip.webm", "audio/webm"), url: "data:audio/webm;base64,AA==" }).attachments, [{ type: "audio", url: "data:audio/webm;base64,AA==", name: "clip.webm" }]);
+  // Chips: a group named for the attachment, a thumbnail for images, a remove button named for the file.
+  const chips = renderAttachmentChips([{ type: "image", url: "data:image/png;base64,AA==", name: "shot.png" }, { type: "audio", url: "data:audio/webm;base64,AA==", name: "clip.webm" }]);
+  assert.match(chips, /<span class="attachment-chip" role="group" data-attachment-index="0" data-attachment-type="image" aria-label="Attached image shot\.png"><img src="data:image\/png;base64,AA==" alt=""><span>shot\.png<\/span><button type="button" data-remove-attachment="0" aria-label="Remove shot\.png">×<\/button><\/span>/);
+  assert.match(chips, /data-attachment-index="1" data-attachment-type="audio" aria-label="Attached audio clip\.webm"><i aria-hidden="true">◉<\/i>/);
+  assert.match(renderAttachmentChips([{ type: "image", url: "data:image/png;base64,AA==", name: '<img src=x onerror="1">' }]), /aria-label="Attached image &lt;img src=x onerror=&quot;1&quot;&gt;"/);
+  // After send the image variant renders as an image in the user message; several may.
+  const rendered = renderUserMedia([{ type: "image", url: "data:image/png;base64,AA==" }, { type: "image", url: "data:image/webp;base64,AA==" }, { type: "text", text: "ignored" }]);
+  assert.equal((rendered.match(/<img class="message-image"/g) ?? []).length, 2);
 });
 
 test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {
