@@ -819,6 +819,31 @@ export async function runBrowserInteractionGuard(hooks) {
           noOrdinaryTurn: !actionsOf("startTurn").length && !actionsOf("steerTurn").length,
         }, `${pendingQuote ? "draft held" : "no draft"} · start ${started ? "sent" : "missing"} · humanMessage ${startCall?.payload.humanMessage?.length ?? 0} chars · ${workspaceDetail} · ${sheetState} · ${quoteDialogState}`);
 
+        // Quote into a Task that already has a Thread: the passage goes into
+        // that Thread's own Composer draft, shown when the Workspace opens on
+        // the linked Thread, and nothing is sent or written until the human
+        // sends a Task Turn.
+        await hooks.openThread(seedThread.id);
+        await frame();
+        document.querySelector('.turn.assistant[data-finalized="true"] [data-attach-task]').click();
+        await waitFor(() => !document.querySelector("#attachTaskDialog").hidden && document.querySelectorAll(".attach-row").length >= 2, 120);
+        document.querySelector(`.attach-row[data-attach-target="${CSS.escape(ticketId)}"]`).click();
+        await frame();
+        const linkedSelection = document.querySelector("#attachTaskSelection").textContent;
+        const taskTurnsBefore = actionsOf("startTaskTurn").length + actionsOf("steerTaskTurn").length;
+        document.querySelector("#quoteIntoTask").click();
+        const linkedShown = await waitFor(() => document.querySelector(".task-workspace")?.dataset.ticketWorkspace === ticketId && !document.querySelector("#quoteTray").hidden && new URLSearchParams(location.search).get("thread") === startCall?.data?.threadId, 120);
+        checkAll(results, "Quote into a Task with a linked Thread lands in that Thread's Composer draft and sends nothing", {
+          pickerNamesTheDraft: linkedSelection.includes("adds the passage to its Codex conversation draft"),
+          workspaceOpensOnLinkedThread: linkedShown,
+          trayNamesSourceThread: Boolean(document.querySelector("#quoteTray .quote-source")?.textContent.includes(seedThread.id)),
+          noTaskScopedDraft: hooks.taskQuoteDraft(ticketId) === null,
+          composerIsTheTaskConversation: document.querySelector("#composerInput").placeholder === "Message this Task",
+          nothingSentOrWritten: actionsOf("startTaskTurn").length + actionsOf("steerTaskTurn").length === taskTurnsBefore && actionsOf("startTask").length === 1 && actionsOf("createTask").length === 1 && actionsOf("attachTask").length === 1,
+        }, `${linkedShown ? "shown" : "not shown"} · ${new URLSearchParams(location.search).get("thread")}`);
+        document.querySelector("#quoteTray [data-remove-quote]")?.click();
+        await frame();
+
         // Remember: existing Rooms only, prefilled from the selection, the
         // exact source reference shown, one Context written uncommitted.
         await hooks.openThread(seedThread.id);

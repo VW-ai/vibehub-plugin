@@ -222,6 +222,7 @@ test("bridge surfaces are contained modals with keyboard paths, exact action sha
     "Graph lists the new Task as DRAFT · REFINE with its origin and draws a provenance edge for the focused Task without touching depends_on",
     "Attach to Task lists every open Task the host returns, appends one exact provenance reference and marks the Turn as attached",
     "Quote into Task lands in the Task-scoped Composer draft and reaches the Agent only as startTask humanMessage inside the host packet",
+    "Quote into a Task with a linked Thread lands in that Thread's Composer draft and sends nothing",
     "Remember lists only existing Rooms, keeps the exact source reference and writes one uncommitted Context the Rooms now project",
     "Task Workspace origin chip names the source Thread, Turn and excerpt, and Return to source focuses the exact origin item on the chat route",
   ]) assert.ok(guard.includes(`"${behavior}"`), behavior);
