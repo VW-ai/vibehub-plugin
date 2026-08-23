@@ -38,3 +38,22 @@ deliverable continues without another user command.
    validate`. Prove setup by reading the files from a fresh
    process. Installation is complete when Skills and folders are available;
    no host handshake or background activation state exists.
+6. Optional, asked once: if `git remote get-url origin` points at
+   `github.com`, ask the user whether to mirror Tickets to GitHub Issues
+   (one workflow plus a small script; runs only in GitHub Actions on push to
+   `main`; nothing for an Agent to run or check). On yes, copy these five
+   files and nothing else, then record the copy as setup Evidence:
+
+   ```text
+   ../vibehub-core/templates/github/sync-issues.yml        → .github/workflows/sync-issues.yml
+   ../vibehub-core/templates/github/sync-github-issues.mjs → scripts/vibehub/sync-github-issues.mjs
+   ../vibehub-core/scripts/vh.mjs                          → scripts/vibehub/scripts/vh.mjs
+   ../vibehub-core/contracts/versions.json                 → scripts/vibehub/contracts/versions.json
+   ../vibehub-core/contracts/dependency-hygiene.json       → scripts/vibehub/contracts/dependency-hygiene.json
+   ```
+
+   The copy is self-contained so the workflow runs in a clean Actions
+   checkout without the plugin. Do not add any instruction, hook, or Skill
+   text that asks an Agent to run the sync; Git stays the source of truth and
+   the Issues are a read-only projection. On no, skip without recording
+   anything; the user can ask for it later.

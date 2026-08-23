@@ -27,22 +27,15 @@ Describe one coding request and say the line above. The request and exact Contex
 
 ## Installation
 
-**Codex**
+One line for any skills-capable agent (Claude Code, Codex, Cursor, and more):
 
 ```bash
-codex plugin marketplace add VW-ai/vibehub-plugin
-codex plugin add vibehub@vibehub
+npx skills add VW-ai/vibehub-plugin --all
 ```
 
+Or through the host marketplaces — Codex: `codex plugin marketplace add VW-ai/vibehub-plugin` then `codex plugin add vibehub@vibehub`;
+Claude Code: `/plugin marketplace add VW-ai/vibehub-plugin`, `/plugin install vibehub@vibehub`, `/reload-plugins`.
 Then start a new task and use the single entry above. Tickets on `main` also mirror one-way to [GitHub Issues](https://github.com/VW-ai/vibehub-plugin/issues) — see the [mirror guide](docs/GITHUB_ISSUES.md).
-
-**Claude Code**
-
-```text
-/plugin marketplace add VW-ai/vibehub-plugin
-/plugin install vibehub@vibehub
-/reload-plugins
-```
 
 ## Upgrades
 
