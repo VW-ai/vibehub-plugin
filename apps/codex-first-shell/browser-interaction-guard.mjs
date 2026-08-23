@@ -318,7 +318,10 @@ export async function runBrowserInteractionGuard(hooks) {
     throw new Error(`Unexpected fixture action ${payload.action}`);
   }, async () => {
     document.querySelector("[data-fork-thread]")?.click();
-    await waitFor(() => forkActions.some((entry) => entry.action === "readThread"));
+    // The fork refreshes the Thread list through the live host before it
+    // opens the returned Thread; on the real app-server that bootstrap takes
+    // seconds, not frames.
+    await waitFor(() => forkActions.some((entry) => entry.action === "readThread"), 900);
   });
   check(results, "Fork dispatches exact source Thread", forkActions[0]?.action === "forkThread" && forkActions[0]?.threadId === fixture.secondaryThread.id);
   check(results, "Fork opens returned lineage", document.querySelector(".thread-heading")?.textContent.includes("Forked fixture chat") && forked.forkedFromId === fixture.secondaryThread.id);

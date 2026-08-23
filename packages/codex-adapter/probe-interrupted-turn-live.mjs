@@ -10,10 +10,40 @@
 // SIGKILLed under it. A second process then lists the folder, reads the
 // Thread before and after thread/resume, and deletes it.
 
+import { execFileSync } from "node:child_process";
 import { CodexAppServerClient } from "./client.mjs";
 
 const cwd = process.cwd();
 const name = "VibeHub interrupted-Turn probe";
+
+function isAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// The npm `codex` launcher is a Node wrapper around the native app-server
+// binary; the process that owns the Thread is the deepest descendant. Killing
+// that one is the faithful "the app-server died" case, and the wrapper then
+// exits on its own, which is what the client observes.
+function appServerProcessTree(pid) {
+  const tree = [pid];
+  let current = pid;
+  for (;;) {
+    let children = [];
+    try {
+      children = execFileSync("pgrep", ["-P", String(current)], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim().split("\n").filter(Boolean).map(Number);
+    } catch {
+      children = [];
+    }
+    if (children.length !== 1) return tree;
+    current = children[0];
+    tree.push(current);
+  }
+}
 
 async function list(client) {
   return client.request("thread/list", { archived: false, cursor: null, cwd, limit: 100, searchTerm: null, sortDirection: "desc", sortKey: "updated_at" });
@@ -50,10 +80,14 @@ async function main() {
     const command = await commandStarted;
     const live = await first.request("thread/read", { threadId, includeTurns: true });
     const before = turnView(live.thread, turnId);
-    const pid = first.child.pid;
+    const tree = appServerProcessTree(first.child.pid);
+    const pid = tree.at(-1);
     const exited = new Promise((resolve) => first.once("exit", resolve));
+    const killedAt = Date.now();
     process.kill(pid, "SIGKILL");
     const exit = await exited;
+    while (tree.some(isAlive) && Date.now() - killedAt < 5_000) await new Promise((resolve) => setTimeout(resolve, 25));
+    const treeGoneAfterMs = tree.some(isAlive) ? null : Date.now() - killedAt;
 
     second = new CodexAppServerClient({ cwd, timeoutMs: 60_000 });
     await second.start();
@@ -66,12 +100,12 @@ async function main() {
 
     process.stdout.write(`${JSON.stringify({
       ok: true,
-      runtime: { userAgent: initialized.userAgent, pid },
+      runtime: { userAgent: initialized.userAgent, processTree: tree, killedPid: pid },
       threadId: replayBeforeResume.thread.id,
       turnId,
       commandItem: { id: command.item.id, command: command.item.command ?? null },
       beforeKill: before,
-      kill: { signal: exit.signal, code: exit.code, requested: exit.requested },
+      kill: { signal: exit.signal, code: exit.code, requested: exit.requested, treeGoneAfterMs },
       afterRestart: {
         listedInFolder: Boolean(listed),
         listedStatus: listed?.status ?? null,
