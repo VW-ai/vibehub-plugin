@@ -242,7 +242,8 @@ test("app-server client restarts into a new process generation without carrying 
   const thread = await client.request("thread/start", { cwd: fileURLToPath(root) });
   await client.request("turn/start", { threadId: thread.thread.id, input: [{ type: "text", text: "hello" }] });
   await client.waitForNotification("turn/started", (params) => params.threadId === thread.thread.id);
-  assert.equal(client.notifications.length, 1);
+  // thread/status/changed { active } precedes turn/started, as on 0.149.0.
+  assert.deepEqual(client.notifications.map((entry) => entry.method), ["thread/status/changed", "turn/started"]);
   await assert.rejects(client.request("thread/realtime/start", {}), (error) => error.rpcError?.code === -32601 && error.method === "thread/realtime/start");
   assert.deepEqual(missing.map((entry) => [entry.method, entry.generation]), [["thread/realtime/start", 1]]);
 

@@ -408,6 +408,44 @@ test("compaction is refused while a Turn is live and renders as a contextCompact
   assert.deepEqual(await nullable.stop(), [0, null]);
 });
 
+test("the fixture lists a brand-new Thread only once its first userMessage is durable, in the real 0.149.0 order, and the immediate knob restores the old listing", async (context) => {
+  const { folder } = await temporaryRepository(context);
+  const shell = await launchShell(context, { repo: folder, env: { CODEX_FIXTURE_USER_MESSAGE_DELAY_MS: "400" } });
+  if (!shell) return;
+  const { api, action } = shell;
+  const thread = (await action({ action: "newThread" })).body.data.thread;
+  const listedIds = async () => (await api("api/bootstrap")).body.data.threads.map((entry) => entry.id);
+  assert.equal((await listedIds()).includes(thread.id), false, "absent right after thread/start");
+  const turn = (await action({ action: "startTurn", threadId: thread.id, input: [{ type: "text", text: "hello" }] })).body.data.turn;
+  const started = await pollEventsUntil(api, (window) => window.events.some((event) => event.kind === "notification" && event.value.method === "turn/started" && event.value.params.turn.id === turn.id));
+  const methodsAtStart = started.events.filter((event) => event.kind === "notification").map((event) => event.value.method);
+  assert.deepEqual(methodsAtStart.slice(-2), ["thread/status/changed", "turn/started"], "thread/status/changed { active } precedes turn/started");
+  assert.deepEqual(started.events.filter((event) => event.kind === "notification" && event.value.method === "thread/status/changed").at(-1).value.params, { threadId: thread.id, status: { type: "active" } });
+  assert.equal((await listedIds()).includes(thread.id), false, "still absent at turn/started: the userMessage is not durable yet");
+  assert.equal(started.events.some((event) => event.kind === "notification" && event.value.method === "item/completed"), false);
+  const durable = await pollEventsUntil(api, (window) => window.events.some((event) => event.kind === "notification" && event.value.method === "item/completed" && event.value.params.item?.type === "userMessage" && event.value.params.turnId === turn.id));
+  const order = durable.events.filter((event) => event.kind === "notification" || event.kind === "serverRequest").map((event) => (event.kind === "notification" ? `${event.value.method}${event.value.params.item ? `:${event.value.params.item.type}` : ""}` : `request:${event.value.method}`));
+  assert.deepEqual(order.slice(order.indexOf("turn/started")), ["turn/started", "item/started:userMessage", "item/completed:userMessage", "request:item/commandExecution/requestApproval"], "the durable userMessage precedes the model's first request");
+  const listedAfter = await listedIds();
+  assert.equal(listedAfter.includes(thread.id), true, "listed once the userMessage item completed");
+  const listed = (await api("api/bootstrap")).body.data.threads.find((entry) => entry.id === thread.id);
+  assert.deepEqual(listed.status, { type: "active" }, "listed active while the Turn runs");
+  const interrupted = await action({ action: "interruptTurn", threadId: thread.id, turnId: turn.id });
+  assert.equal(interrupted.status, 200);
+  const completed = await pollEventsUntil(api, (window) => window.events.some((event) => event.kind === "notification" && event.value.method === "turn/completed" && event.value.params.turn.id === turn.id));
+  const tail = completed.events.filter((event) => event.kind === "notification").map((event) => event.value.method);
+  assert.deepEqual(tail.slice(-2), ["thread/status/changed", "turn/completed"], "thread/status/changed { idle } precedes turn/completed");
+  assert.deepEqual(completed.events.filter((event) => event.kind === "notification" && event.value.method === "thread/status/changed").at(-1).value.params.status, { type: "idle" });
+  assert.deepEqual((await api("api/bootstrap")).body.data.threads.find((entry) => entry.id === thread.id).status, { type: "idle" }, "listed idle at turn/completed");
+  assert.deepEqual(await shell.stop(), [0, null]);
+
+  const immediate = await launchShell(context, { repo: folder, env: { CODEX_FIXTURE_LIST_NEW_THREADS: "immediate" } });
+  if (!immediate) return;
+  const early = (await immediate.action({ action: "newThread" })).body.data.thread;
+  assert.equal((await immediate.api("api/bootstrap")).body.data.threads.some((entry) => entry.id === early.id), true, "the immediate knob lists right after thread/start, the fixture's former behaviour");
+  assert.deepEqual(await immediate.stop(), [0, null]);
+});
+
 test("searchFiles and listSkills discover the bound repository through fuzzyFileSearch and skills/list", async (context) => {
   const { folder, realFolder } = await temporaryRepository(context);
   const temp = await mkdtemp(join(tmpdir(), "vibehub-parity-discover-"));
@@ -560,7 +598,7 @@ test("the queue, settings and preference live in host memory only, with no store
   assert.match(host, /Array\.isArray\(model\.inputModalities\) \? model\.inputModalities : \["text", "image"\]/, "the schema default for inputModalities is the only fallback");
   assert.match(host, /filter\(\(model\) => !model\.hidden\)/);
   // The fixture knobs exist only in the test double.
-  for (const knob of ["CODEX_FIXTURE_COMPLETE_ON_APPROVAL", "CODEX_FIXTURE_CONTEXT_WINDOW", "CODEX_FIXTURE_SKILLS", "CODEX_FIXTURE_LOG_NOTIFICATIONS"]) assert.ok(fixture.includes(knob), knob);
+  for (const knob of ["CODEX_FIXTURE_COMPLETE_ON_APPROVAL", "CODEX_FIXTURE_CONTEXT_WINDOW", "CODEX_FIXTURE_SKILLS", "CODEX_FIXTURE_LOG_NOTIFICATIONS", "CODEX_FIXTURE_LIST_NEW_THREADS", "CODEX_FIXTURE_USER_MESSAGE_DELAY_MS"]) assert.ok(fixture.includes(knob), knob);
   assert.doesNotMatch(host, /CODEX_FIXTURE/);
   assert.match(fixture, /deprecated thread\/compacted notification is not sent by the\s*\/\/\s*0\.149\.0 v2 path/);
 });

@@ -547,7 +547,11 @@ test("production shell routes ordinary Chat, approvals, interruption, and Tasks 
   await new Promise((resolve) => setTimeout(resolve, 50));
   const events = await api("api/events?after=0");
   assert.equal(events.body.data.runtimeAlive, true);
-  assert.deepEqual(events.body.data.events.map((event) => event.kind), ["notification", "serverRequest"]);
+  // The 0.149.0 sequence of a first Turn: thread/status/changed { active },
+  // turn/started, then the durable userMessage item, then the model's first
+  // request; the Thread joins thread/list only with that item.
+  assert.deepEqual(events.body.data.events.map((event) => (event.kind === "notification" ? `notification:${event.value.method}` : event.kind)), ["notification:thread/status/changed", "notification:turn/started", "notification:item/started", "notification:item/completed", "serverRequest"]);
+  assert.equal(events.body.data.events[3].value.params.item.type, "userMessage");
   const [pending] = events.body.data.pendingRequests;
   assert.equal(pending.method, "item/commandExecution/requestApproval");
   const invalidDecision = await action({ action: "resolveRequest", requestId: pending.id, decision: "nope" });
@@ -1256,6 +1260,9 @@ test("a restart that cannot recover the known Thread identities halts reuse visi
   const { child, api, action } = shell;
   const chat = (await action({ action: "newThread" })).body.data.thread;
   const task = (await action({ action: "startTask", ticketId: "ticket-proof-workspace", selectedContextIds: [] })).body.data;
+  // The Task Turn's approval request follows its durable userMessage, a
+  // moment after turn/started; the kill lands on that pending card.
+  await pollEventsUntil(api, (window) => window.pendingRequests.some((request) => request.params?.turnId === task.turnId));
   const [firstPid] = await fixturePids(lifecycle.pidPath);
   process.kill(firstPid, "SIGKILL");
   const halted = await pollEventsUntil(api, (window) => window.events.some((event) => event.kind === "runtimeHalted"));

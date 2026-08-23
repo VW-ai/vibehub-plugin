@@ -47,7 +47,19 @@
 //   CODEX_FIXTURE_LOG_NOTIFICATIONS=1  also append every outbound notification
 //                                and server request to CODEX_FIXTURE_LOG, so a
 //                                proof can order turn/start requests against
-//                                the turn/completed notifications between them.
+//                                the turn/completed notifications between them;
+//   CODEX_FIXTURE_LIST_NEW_THREADS=durable|immediate  when thread/list first
+//                                carries a brand-new Thread. `durable` (the
+//                                default, what the real 0.149.0 server does)
+//                                omits it until its first userMessage item is
+//                                completed; `immediate` lists it right after
+//                                thread/start, the fixture's former behaviour;
+//   CODEX_FIXTURE_USER_MESSAGE_DELAY_MS=<int>  the delay between a Turn's
+//                                turn/started and its userMessage item/started
+//                                and item/completed (default 0, still a later
+//                                macrotask; the real server was observed at
+//                                about 430 ms), after which the approval
+//                                request follows.
 //
 // What the fixture mirrors from Codex 0.149.0 (rust-v0.149.0 app-server and
 // core sources) for the daily-use seams:
@@ -63,7 +75,14 @@
 //   thread/name/set answers first and then sends thread/name/updated;
 //   model/list lists the fixture's hidden model too, unlike the real server
 //   (which omits hidden presets unless includeHidden), so the host-side
-//   hidden filter is exercised by the proof.
+//   hidden filter is exercised by the proof;
+//   a brand-new Thread is absent from thread/list until its first userMessage
+//   item is durable (probed on the installed 0.149.0 binary: unlisted at
+//   turn/started, listed active about 1.2 s later, listed idle at
+//   turn/completed), and thread/status/changed { active } precedes
+//   turn/started while { idle } precedes turn/completed, in that order;
+//   fuzzyFileSearch walks .git like the real server does (the host drops
+//   those entries), node_modules stands in for what .gitignore excludes.
 
 import { appendFileSync, existsSync, readdirSync, readFileSync, realpathSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
@@ -85,6 +104,12 @@ const authUnavailable = process.env.CODEX_FIXTURE_AUTH === "unavailable";
 const droppedMethods = new Set((process.env.CODEX_FIXTURE_DROP_METHODS ?? "").split(",").map((entry) => entry.trim()).filter(Boolean));
 const completeOnApproval = process.env.CODEX_FIXTURE_COMPLETE_ON_APPROVAL === "1";
 const logNotifications = process.env.CODEX_FIXTURE_LOG_NOTIFICATIONS === "1";
+const listNewThreads = process.env.CODEX_FIXTURE_LIST_NEW_THREADS ?? "durable";
+if (!["durable", "immediate"].includes(listNewThreads)) {
+  process.stderr.write(`codex-app-server-fixture: CODEX_FIXTURE_LIST_NEW_THREADS must be durable or immediate, not ${listNewThreads}\n`);
+  process.exit(2);
+}
+const userMessageDelayMs = Math.max(0, Number(process.env.CODEX_FIXTURE_USER_MESSAGE_DELAY_MS ?? 0) || 0);
 const contextWindow = process.env.CODEX_FIXTURE_CONTEXT_WINDOW === undefined
   ? 272_000
   : process.env.CODEX_FIXTURE_CONTEXT_WINDOW === "null" ? null : Number(process.env.CODEX_FIXTURE_CONTEXT_WINDOW);
@@ -252,14 +277,34 @@ function completeTurn(thread, turn, items) {
   }
   sendTokenUsage(thread, turn.id);
   turn.status = "completed";
-  thread.status = { type: "idle" };
+  setThreadStatus(thread, { type: "idle" });
   thread.updatedAt = now();
   send({ method: "turn/completed", params: { threadId: thread.id, turn } });
   persist();
 }
 
+// The Thread's status as the real server reports it: thread/status/changed
+// { active } right before turn/started, { idle } right before turn/completed.
+function setThreadStatus(thread, status) {
+  thread.status = status;
+  send({ method: "thread/status/changed", params: { threadId: thread.id, status } });
+}
+
+// The Turn's userMessage item becomes durable: item/started and
+// item/completed for it, and from now on thread/list carries the Thread.
+function persistUserMessage(thread, turn) {
+  const item = turn.items.find((entry) => entry.type === "userMessage");
+  if (!item) return;
+  send({ method: "item/started", params: { threadId: thread.id, turnId: turn.id, item } });
+  send({ method: "item/completed", params: { threadId: thread.id, turnId: turn.id, item, completedAtMs: Date.now() } });
+  thread.durable = true;
+  persist();
+}
+
 // A bounded walk of the search roots for fuzzyFileSearch: every file and
-// directory path relative to its root, .git and node_modules excluded.
+// directory path relative to its root. .git is walked, as the real server's
+// search does (observed on 0.149.0: it offers .git internals, which the host
+// drops); node_modules stands in for what .gitignore keeps out.
 function walkRoot(root, limit = 5_000) {
   const entries = [];
   const visit = (folder) => {
@@ -272,7 +317,7 @@ function walkRoot(root, limit = 5_000) {
     }
     for (const entry of names) {
       if (entries.length >= limit) return;
-      if (entry.name === ".git" || entry.name === "node_modules") continue;
+      if (entry.name === "node_modules") continue;
       const absolute = join(folder, entry.name);
       const path = relative(root, absolute).split(sep).join("/");
       if (entry.isDirectory()) {
@@ -341,6 +386,8 @@ function seed() {
       policy: { approvalPolicy: null, sandbox: null },
       settings: defaultSettings(null),
       tokens: { total: 0, last: 0 },
+      // Seeded history is listed: it stands for Threads with durable Turns.
+      durable: true,
     };
     threads.set(thread.id, thread);
   }
@@ -359,7 +406,10 @@ function loadState() {
     // process died replays as interrupted, as the real app-server reports
     // it; no live status survives a process boundary.
     const turns = (thread.turns ?? []).map((turn) => (turn.status === "inProgress" ? { ...turn, status: "interrupted" } : turn));
-    threads.set(thread.id, { ...thread, turns, status: { type: "notLoaded" }, settings: thread.settings ?? defaultSettings(null), tokens: thread.tokens ?? { total: 0, last: 0 } });
+    // A reloaded Thread is listed when it was durable before, or when a
+    // persisted Turn carries its userMessage (a state file written by hand).
+    const durable = thread.durable ?? turns.some((turn) => (turn.items ?? []).some((item) => item.type === "userMessage"));
+    threads.set(thread.id, { ...thread, turns, durable, status: { type: "notLoaded" }, settings: thread.settings ?? defaultSettings(null), tokens: thread.tokens ?? { total: 0, last: 0 } });
   }
   return true;
 }
@@ -414,6 +464,9 @@ function listThreads(params) {
     ? null
     : new Set((Array.isArray(params.cwd) ? params.cwd : [params.cwd]).map(realFolder));
   return [...threads.values()]
+    // A brand-new Thread joins the listing once its first userMessage is
+    // durable, as on the real server; `immediate` restores the old listing.
+    .filter((thread) => listNewThreads === "immediate" || thread.durable === true)
     .filter((thread) => thread.archived === Boolean(params?.archived))
     .filter((thread) => params?.sectionId === undefined || (thread.section?.id ?? null) === params.sectionId)
     .filter((thread) => folders === null || folders.has(realFolder(thread.cwd)))
@@ -474,6 +527,7 @@ const handlers = {
       policy: { approvalPolicy: params?.approvalPolicy ?? null, sandbox: params?.sandbox ?? null },
       settings: defaultSettings(params),
       tokens: { total: 0, last: 0 },
+      durable: false,
     };
     threads.set(thread.id, thread);
     return threadStartResponse(thread);
@@ -514,6 +568,7 @@ const handlers = {
     thread.turns.push(turn);
     thread.status = { type: "active" };
     queueMicrotask(() => {
+      setThreadStatus(thread, { type: "active" });
       send({ method: "turn/started", params: { threadId: thread.id, turn: { ...turn, items: [] } } });
       thread.tokens = { total: Math.min(thread.tokens?.total ?? 0, 400), last: 0 };
       completeTurn(thread, turn, [{ type: "contextCompaction", id: nextId("fixture-item") }]);
@@ -549,14 +604,26 @@ const handlers = {
     thread.preview = thread.preview || params.input.find((item) => item.type === "text")?.text?.slice(0, 4_000) || "";
     thread.updatedAt = now();
     thread.status = { type: "active" };
+    const approvalItemId = nextId("fixture-item");
     queueMicrotask(() => {
       applyTurnSettings(thread, params);
+      setThreadStatus(thread, { type: "active" });
       send({ method: "turn/started", params: { threadId: thread.id, turn } });
-      send({
-        id: `fixture-request-${turn.id}`,
-        method: "item/commandExecution/requestApproval",
-        params: { threadId: thread.id, turnId: turn.id, itemId: nextId("fixture-item"), command: ["echo", "fixture"], cwd: thread.cwd, reason: "fixture approval" },
-      });
+      // The userMessage becomes durable a moment after turn/started (the
+      // real server: about 430 ms), and only then does the Thread join
+      // thread/list; the model's first request follows it.
+      setTimeout(() => {
+        // An interrupt inside that window still leaves the userMessage
+        // durable (core writes it before the model is asked); only the
+        // model's request is gone with the Turn.
+        persistUserMessage(thread, turn);
+        if (turn.status !== "inProgress") return;
+        send({
+          id: `fixture-request-${turn.id}`,
+          method: "item/commandExecution/requestApproval",
+          params: { threadId: thread.id, turnId: turn.id, itemId: approvalItemId, command: ["echo", "fixture"], cwd: thread.cwd, reason: "fixture approval" },
+        });
+      }, userMessageDelayMs);
     });
     return { turn };
   },
@@ -572,7 +639,10 @@ const handlers = {
     const turn = thread.turns.find((item) => item.id === params.turnId);
     if (turn) turn.status = "interrupted";
     thread.status = { type: "idle" };
-    queueMicrotask(() => send({ method: "turn/completed", params: { threadId: thread.id, turn: { ...turn, status: "interrupted" } } }));
+    queueMicrotask(() => {
+      setThreadStatus(thread, { type: "idle" });
+      send({ method: "turn/completed", params: { threadId: thread.id, turn: { ...turn, status: "interrupted" } } });
+    });
     return {};
   },
 };
