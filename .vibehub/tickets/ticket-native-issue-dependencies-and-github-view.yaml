@@ -1,0 +1,61 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "native-dependencies-are-projected-idempotently",
+      "criterion": "The sync script projects every Ticket depends_on relation as a native GitHub blocked_by relationship between the two mirrored Issues, adds missing ones, removes stale ones whose blocker is itself a mirrored Ticket Issue, leaves relationships to non-mirrored Issues alone, and a second run against an unchanged repository plans zero dependency writes; fixture tests cover add, remove, keep-foreign, and no-op, and the dry-run output lists each dependency write."
+    },
+    {
+      "acceptance_id": "live-relationships-render-natively",
+      "criterion": "After a live run, every open mirrored Issue with Ticket dependencies shows them in the sidebar Relationships section and gh issue view prints matching Blocked by rows; the transcript and at least one Issue URL are recorded as Evidence."
+    },
+    {
+      "acceptance_id": "github-view-comparison-is-decision-ready",
+      "criterion": "A short checked-in comparison under docs/ evaluates at least three ways to follow the Ticket graph on GitHub (the Issues list with label filters, a Projects board or roadmap fed by the mirror, and the per-Issue sidebar), states for each what the sync provides automatically, what needs one-time human setup, and what it cannot show, and names one recommended default with its exact URL or setup steps."
+    },
+    {
+      "acceptance_id": "owner-picks-github-view",
+      "authority": "human",
+      "criterion": "The owner reads the comparison and explicitly chooses the recommended default view (or another option); the choice is recorded as human-origin Evidence and linked from the README installation section."
+    }
+  ],
+  "constraints": [
+    "Relations flow one way from Ticket depends_on to GitHub; never read GitHub relationships back into .vibehub documents.",
+    "The Actions workflow keeps issues:write and contents:read only; any view that needs a Project or a PAT is documented as one-time human setup, not automated in CI.",
+    "Do not add a runtime dependency beyond node and gh."
+  ],
+  "context": "The first live mirror showed dependencies only as Blocked by #N text in the body; the sidebar Relationships section stayed empty. GitHub exposes a REST API for issue dependencies (GET/POST/DELETE /repos/{owner}/{repo}/issues/{n}/dependencies/blocked_by with an integer issue_id) and it was verified working on VW-ai/vibehub-plugin: #35 now natively shows Blocked by #44 and #44 shows Blocking #35. GitHub marks blocked issues with a Blocked icon on the Issues page and on Projects boards, and gh issue view prints Blocked by and Blocking rows. The documented Issues search syntax has no blocked/blocking qualifier; Projects views can group, filter by field, and show roadmap and board layouts, but creating a Project cannot be done with the Actions GITHUB_TOKEN, so any Project-based view is a one-time human setup that the sync then feeds. The owner asked for native dependencies and for picking or building the most suitable GitHub view. The one-way rule from decision-github-issues-are-a-read-only-ticket-projection applies unchanged: relations flow from Ticket relations to GitHub, never back.",
+  "context_refs": [
+    {
+      "purpose": "Governing one-way projection rule.",
+      "ref": ".vibehub/rooms/product/decision-github-issues-are-a-read-only-ticket-projection.yaml"
+    },
+    {
+      "purpose": "Implementation baseline the dependency projection extends.",
+      "ref": "scripts/sync-github-issues.mjs"
+    },
+    {
+      "purpose": "Fixture and planning tests to extend.",
+      "ref": "test/sync-github-issues.test.mjs"
+    },
+    {
+      "purpose": "Permission boundary the view recommendation must respect.",
+      "ref": ".github/workflows/sync-issues.yml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Ticket dependencies appear as native GitHub issue relationships (Blocked by / Blocking in the sidebar, the Blocked icon in lists and boards), kept idempotent by the same one-way sync, and the owner has chosen one recommended GitHub view for following the Ticket graph from a decision-ready comparison.",
+  "provenance_refs": [
+    "conversation:2026-08-22-tickets-as-github-issues"
+  ],
+  "relations": [
+    {
+      "rationale": "The mirrored Issues, their marker mapping, and the owner's judgment that the mirror is worth keeping are the exact inputs this Ticket extends; without them there are no Issues to relate.",
+      "target_ticket_id": "ticket-mirror-tickets-to-github-issues",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-native-issue-dependencies-and-github-view"
+}

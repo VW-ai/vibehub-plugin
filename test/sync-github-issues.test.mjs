@@ -4,7 +4,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tempRepo } from "./helpers.mjs";
 import {
-  computeProjection, humanizeTicketId, markerValue, planSync, planUpdates,
+  computeProjection, humanizeTicketId, markerValue, planSync, planUpdates, planDependencies,
   TICKET_MARKER, EVIDENCE_MARKER,
 } from "../scripts/sync-github-issues.mjs";
 
@@ -109,4 +109,17 @@ test("drift in state, labels, or missing evidence is repaired without touching t
   assert.deepEqual(ops.map((o) => `${o.kind}:${o.ticket_id}`), ["comment:ticket-done", "comment:ticket-done", "close:ticket-done", "update:ticket-open"]);
   assert.deepEqual(ops[3].addLabels, ["state: needs-human", "maturity: firm"]);
   assert.deepEqual(ops[3].removeLabels, ["state: done"]);
+});
+
+test("native dependencies: add missing, remove stale mirrored, keep foreign, no-op when matching", () => {
+  const p = computeProjection(fixtureRepo(), GITHUB);
+  const { byTicket } = planSync(p, remoteFrom(p, 1)); // ticket-done=#1, ticket-open=#2
+  // nothing on remote → add #2 blocked by #1
+  assert.deepEqual(planDependencies(p, byTicket, new Map()), [{ kind: "dep-add", number: 2, ticket_id: "ticket-open", blocker: 1 }]);
+  // matching → no-op
+  assert.deepEqual(planDependencies(p, byTicket, new Map([[2, [1]]])), []);
+  // stale mirrored relation on #1 (blocked by #2) is removed; foreign blocker #99 on #2 is kept
+  assert.deepEqual(planDependencies(p, byTicket, new Map([[1, [2]], [2, [1, 99]]])), [
+    { kind: "dep-remove", number: 1, ticket_id: "ticket-done", blocker: 2 },
+  ]);
 });

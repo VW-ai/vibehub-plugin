@@ -164,6 +164,7 @@ export function computeProjection(repoRoot, github) {
       state: status === "DONE" ? "closed" : "open",
       labels: [STATE_LABELS[nextAction.action].name, MATURITY_LABELS[ticket.maturity ?? "firm"].name],
       comments: evidence.map((e) => ({ evidence_id: e.evidence_id, body: renderEvidenceComment(e, github) })),
+      depends_on: (ticket.relations ?? []).map((r) => r.target_ticket_id),
       renderBody: (numbers) => renderIssueBody({ ticket, outcome, nextAction, status, numbers, github }),
     });
   }
@@ -224,6 +225,31 @@ export function planUpdates(projection, byTicket) {
   return ops;
 }
 
+/**
+ * Diff desired native blocked_by relationships against remote ones.
+ * remoteDeps: Map<issueNumber, number[]> (current blockers per mirrored Issue).
+ * Only relationships between two mirrored Issues are managed; a blocker that is
+ * not a mirrored Ticket Issue is left untouched.
+ */
+export function planDependencies(projection, byTicket, remoteDeps) {
+  const numbers = new Map([...byTicket].map(([id, issue]) => [id, issue.number]));
+  const mirrored = new Set(numbers.values());
+  const ops = [];
+  for (const item of projection) {
+    const number = numbers.get(item.ticket_id);
+    if (!number) continue;
+    const desired = new Set(item.depends_on.map((id) => numbers.get(id)).filter(Boolean));
+    const current = new Set(remoteDeps.get(number) ?? []);
+    for (const blocker of [...desired].sort((a, b) => a - b)) {
+      if (!current.has(blocker)) ops.push({ kind: "dep-add", number, ticket_id: item.ticket_id, blocker });
+    }
+    for (const blocker of [...current].sort((a, b) => a - b)) {
+      if (!desired.has(blocker) && mirrored.has(blocker)) ops.push({ kind: "dep-remove", number, ticket_id: item.ticket_id, blocker });
+    }
+  }
+  return ops;
+}
+
 // ---------- gh adapter ----------
 
 function gh(args, { input } = {}) {
@@ -244,6 +270,23 @@ export function fetchRemoteIssues(github) {
     "--json", "number,title,body,state,labels,comments",
   ]);
   return JSON.parse(out);
+}
+
+function fetchRemoteDependencies(github, numbers) {
+  const deps = new Map();
+  for (const number of numbers) {
+    const out = gh(["api", `repos/${github}/issues/${number}/dependencies/blocked_by`, "--paginate"]);
+    deps.set(number, JSON.parse(out).map((issue) => issue.number));
+  }
+  return deps;
+}
+
+const databaseIds = new Map();
+function issueDatabaseId(github, number) {
+  if (!databaseIds.has(number)) {
+    databaseIds.set(number, JSON.parse(gh(["api", `repos/${github}/issues/${number}`])).id);
+  }
+  return databaseIds.get(number);
 }
 
 function ensureLabels(github, dryRun, log) {
@@ -302,8 +345,24 @@ export async function sync({ repoRoot, github, dryRun, log = console.log, writeD
       if (!dryRun) { gh(["issue", op.kind, String(op.number), "-R", github]); await wait(); }
     }
   }
-  log(`${dryRun ? "dry-run: would apply" : "applied"} ${creates.length} creates, ${ops.length} follow-up operations`);
-  return { creates: creates.length, ops: ops.length };
+
+  // Pass 3: native blocked_by relationships between mirrored Issues.
+  const existingNumbers = [...byTicket.values()].map((i) => i.number).filter(Boolean);
+  const remoteDeps = fetchRemoteDependencies(github, existingNumbers);
+  const depOps = planDependencies(projection, byTicket, remoteDeps);
+  for (const op of depOps) {
+    const ref = op.number ? `#${op.number}` : "(new)";
+    log(`${op.kind === "dep-add" ? "dep+  " : "dep-  "} ${ref} ${op.ticket_id} blocked by #${op.blocker}`);
+    if (dryRun) continue;
+    if (op.kind === "dep-add") {
+      gh(["api", "-X", "POST", `repos/${github}/issues/${op.number}/dependencies/blocked_by`, "-F", `issue_id=${issueDatabaseId(github, op.blocker)}`]);
+    } else {
+      gh(["api", "-X", "DELETE", `repos/${github}/issues/${op.number}/dependencies/blocked_by/${issueDatabaseId(github, op.blocker)}`]);
+    }
+    await wait();
+  }
+  log(`${dryRun ? "dry-run: would apply" : "applied"} ${creates.length} creates, ${ops.length} follow-up operations, ${depOps.length} dependency changes`);
+  return { creates: creates.length, ops: ops.length, deps: depOps.length };
 }
 
 // ---------- CLI ----------
