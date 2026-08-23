@@ -32,11 +32,6 @@ concurrency:
   group: media-${{ github.ref }}
   cancel-in-progress: false
 
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: auto
-
 jobs:
   verify-pointers:
     if: github.event_name != 'workflow_dispatch'
@@ -49,8 +44,11 @@ jobs:
           python-version: "3.12"
       - name: Install DVC
         run: pip install -q "dvc[s3]"
-      - name: Use CI credentials instead of the local profile
-        run: dvc remote modify --local r2 profile --unset
+      - name: R2 credentials as the aws profile the committed .dvc/config expects
+        run: |
+          mkdir -p ~/.aws && chmod 700 ~/.aws
+          printf '[r2]\naws_access_key_id = %s\naws_secret_access_key = %s\n' "${{ secrets.R2_ACCESS_KEY_ID }}" "${{ secrets.R2_SECRET_ACCESS_KEY }}" > ~/.aws/credentials
+          chmod 600 ~/.aws/credentials
       - name: Every committed pointer must exist in R2
         run: |
           dvc status -c --json > status.json
@@ -83,7 +81,11 @@ jobs:
           pip install -q "dvc[s3]"
           sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
           npx --yes playwright install --with-deps chromium >/dev/null
-          dvc remote modify --local r2 profile --unset
+      - name: R2 credentials as the aws profile the committed .dvc/config expects
+        run: |
+          mkdir -p ~/.aws && chmod 700 ~/.aws
+          printf '[r2]\naws_access_key_id = %s\naws_secret_access_key = %s\n' "${{ secrets.R2_ACCESS_KEY_ID }}" "${{ secrets.R2_SECRET_ACCESS_KEY }}" > ~/.aws/credentials
+          chmod 600 ~/.aws/credentials
       - name: Pull footage and music stems
         run: dvc pull assets/video/${{ inputs.clip }} assets/video/audio
       - name: Render
