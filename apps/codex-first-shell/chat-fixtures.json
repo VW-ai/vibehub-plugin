@@ -93,6 +93,13 @@
             "agentPath": "protocol-audit"
           },
           {
+            "type": "hookPrompt",
+            "id": "fixture-hook-prompt",
+            "fragments": [
+              { "hookRunId": "fixture-hook-run", "text": "AGENTS.md: Tasks, Context and Evidence are YAML under .vibehub; never commit from the shell." }
+            ]
+          },
+          {
             "type": "contextCompaction",
             "id": "fixture-compaction"
           }

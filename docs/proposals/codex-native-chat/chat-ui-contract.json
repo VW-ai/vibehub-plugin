@@ -97,7 +97,7 @@
   "vibehubBoundary": {
     "ordinaryChatRequiresTask": false,
     "threadIsTask": false,
-    "additiveActions": ["Make Task", "Remember", "Open related Task"],
+    "additiveActions": ["Create Task", "Attach to Task", "Remember", "Open related Task"],
     "rule": "VibeHub actions may reference exact Thread, Turn, item, and selection identity but never relabel Codex protocol objects"
   }
 }

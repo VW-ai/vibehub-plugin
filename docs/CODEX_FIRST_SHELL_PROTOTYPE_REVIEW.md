@@ -90,8 +90,11 @@ decision chooses:
 
 ## Boundaries and later work
 
-- Chat→Task, Attach Task and Remember persistence belong to the dedicated
-  bridge Ticket.
+- Chat→Task, Attach to Task, Quote into Task and Remember are the explicit
+  bridge on finalized assistant messages and selections: each confirms into one
+  host action that writes one Ticket or Context document uncommitted, records
+  exact origin provenance, and never rewrites the source Chat. A Task-update
+  action beyond Attach and Quote into Task stays deferred.
 - Complete microphone UX, audio preprocessing and capability fallback belong
   to the audio Ticket. Experimental realtime voice remains separately gated.
 - Final typography, spacing, motion, translucency and every visual state belong

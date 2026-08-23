@@ -59,8 +59,9 @@ guard check named in the matrix proof fields; the mounted 240-item bound now
 discloses itself, and a test pins that no model, mode or realtime control exists.
 
 Task semantics did not enter this path. A quote is normal Chat input; it creates no
-VibeHub Task, Evidence or Outcome. The disabled `Remember` and `Make Task` controls
-remain truthful future bridges.
+VibeHub Task, Evidence or Outcome. `Create Task`, `Attach to Task` and `Remember`
+are the explicit bridge on finalized assistant messages: each confirms into one
+host action that writes one document uncommitted and never rewrites the Chat.
 
 ## Truthful remaining gaps
 

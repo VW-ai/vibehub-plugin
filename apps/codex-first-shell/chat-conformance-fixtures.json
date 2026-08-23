@@ -8,6 +8,7 @@
         "status": "completed",
         "items": [
           { "id": "user-replay", "type": "userMessage", "content": [{ "type": "text", "text": "Retain replay exactly once." }] },
+          { "id": "hook-replay", "type": "hookPrompt", "fragments": [{ "hookRunId": "hook-run-replay", "text": "Repository hook context replayed with the Turn." }] },
           { "id": "agent-shared", "type": "agentMessage", "text": "Durable completed answer." }
         ]
       },
