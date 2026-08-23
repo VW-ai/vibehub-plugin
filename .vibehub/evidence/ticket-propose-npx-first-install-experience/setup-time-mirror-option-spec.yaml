@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "setup-offers-github-mirror-as-one-time-option"
+  ],
+  "evidence_id": "setup-time-mirror-option-spec",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T01:54:19Z",
+  "refs": [
+    "docs/proposals/npx-first-install-experience.md",
+    ".vibehub/rooms/product/decision-github-issues-are-a-read-only-ticket-projection.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "The proposal specifies the setup-time option: detect a github.com origin remote, ask once, copy exactly .github/workflows/sync-issues.yml and scripts/sync-github-issues.mjs from templates in the installed skill tree with the helper import rewritten, record the copy as setup Evidence, and state that no Skill, instruction block, or hook asks an Agent to run or check the sync afterwards.",
+  "ticket_id": "ticket-propose-npx-first-install-experience"
+}

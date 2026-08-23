@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
+import { buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 
 const root = process.cwd();
 const assets = join(root, "skills/vibehub-ticket-review/assets");
@@ -13,7 +13,7 @@ const script = readFileSync(join(assets, "app.js"), "utf8");
 test("production host projects canonical Rooms and consuming Tickets", () => {
   const snapshot = buildUiSnapshot(root).state;
   assert.deepEqual(snapshot.rooms.rooms.map((room) => room.room), [
-    "knowledge", "product", "ticket-lifecycle", "workbench",
+    "knowledge", "marketing", "marketing/video", "product", "ticket-lifecycle", "workbench",
   ]);
   const workbench = snapshot.rooms.rooms.find((room) => room.room === "workbench");
   assert.equal(workbench.boundary.includes("read-only local graph workbench"), true);

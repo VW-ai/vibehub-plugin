@@ -2,7 +2,7 @@
 // re-exports this adapter and owns no DSH service calls.
 import { resolve } from "node:path";
 import { decodeTaskLink, taskLinkProjectionDefinition } from "./linkage.mjs";
-import { buildUiSnapshot, startVibeHubUi } from "../vendor/skills/scripts/vh-ui.mjs";
+import { buildUiSnapshot, startVibeHubUi } from "../vendor/skills/vibehub-core/scripts/vh-ui.mjs";
 
 export const name = "vibehub";
 export const inject = ["commands", "sessionProjections", "webServer"];

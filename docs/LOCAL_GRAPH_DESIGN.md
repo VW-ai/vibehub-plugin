@@ -70,7 +70,7 @@ Git remains the only durable truth; selection, layout, pan, and zoom are
 disposable view state.
 
 Compatibility is also checked-in truth, not a permissive parser fallback.
-`skills/contracts/versions.json` is the runtime version contract. Project
+`skills/vibehub-core/contracts/versions.json` is the runtime version contract. Project
 format 2 requires Ticket schema v2, including an explicit `deliveries` array;
 the format-1-to-format-2 migration declares that document transition and must
 upgrade canonical Tickets before advancing the project marker.

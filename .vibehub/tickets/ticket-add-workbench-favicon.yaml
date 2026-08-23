@@ -31,7 +31,7 @@
     },
     {
       "purpose": "Read-only loopback asset allowlist that must serve the icon exactly.",
-      "ref": "skills/scripts/vh-ui.mjs"
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
   "deliveries": [],

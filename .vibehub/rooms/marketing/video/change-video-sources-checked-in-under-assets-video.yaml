@@ -1,0 +1,43 @@
+{
+  "context_id": "change-video-sources-checked-in-under-assets-video",
+  "detail": "On 2026-08-23 the owner asked to keep the video work in the repository rather than the scratchpad. assets/video/glance/ holds clip #1 (functional, 22.3s, v2) and assets/video/taskstory/ holds clip #2 (narrative, 26.6s, v3); each is a standalone HyperFrames project (index.html + hyperframes.json + assets/). assets/video/renders/ keeps the latest MP4s; assets/video/STORYBOARD.md is the beat sheet; assets/video/README.md records how to render, how the real footage was recorded, and the known gaps before publishing (footage tickets do not match the onboarding story; zoom-out field is a grid; no audio; third-party logos need review). The video Room's anchors now point at assets/video/ so drift is detected when these files change.",
+  "evidence": [
+    {
+      "note": "Production notes and gap list.",
+      "ref": "assets/video/README.md"
+    },
+    {
+      "note": "Current beats for both clips.",
+      "ref": "assets/video/STORYBOARD.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-two-launch-videos",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-hyperframes-playwright-pipeline",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-video-visual-rules-reduction-and-object",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-23T01:30:00Z",
+    "quote": "你可以放进assets 里面去",
+    "ref": "conversation:2026-08-23-video-assets-checkin"
+  },
+  "state": "active",
+  "summary": "Video compositions, real-footage recordings, latest renders, storyboard and production README are checked in under assets/video/ (glance/, taskstory/, renders/)",
+  "tags": [
+    "video",
+    "repository-layout",
+    "assets"
+  ],
+  "type": "change"
+}

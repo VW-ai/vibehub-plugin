@@ -11,7 +11,7 @@ import { threadLocation } from "../apps/codex-first-shell/thread-location.mjs";
 import { buildTaskContextPacket } from "../packages/codex-adapter/task-context.mjs";
 import { capabilitySnapshot } from "../packages/harness-core/capabilities.mjs";
 import { probeDomainIsolation } from "../packages/harness-core/probe-package-isolation.mjs";
-import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
+import { buildTicketHandoff, buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");

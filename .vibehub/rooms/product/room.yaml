@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "13da7eda9d85e44dac78aa99ec862e9e7181309f",
+        "blob": "7de4b4a3b24c8c9df9b718b00ebd2e8d2ef6a828",
         "path": "README.md"
       },
       {
@@ -14,7 +14,7 @@
         "path": "docs/CODEX_APP_SERVER_DSH_ADAPTER_SPIKE.md"
       },
       {
-        "blob": "a5886b6869518ed16c7f5416a785988a187b3484",
+        "blob": "92342fa9aecd982219c0de52720c3f8c6396be90",
         "path": "docs/CODEX_FIRST_SHELL_PROTOTYPE_REVIEW.md"
       },
       {
@@ -54,6 +54,10 @@
         "path": "docs/DSH_PERSISTENT_SHELL_REVIEW.md"
       },
       {
+        "blob": "e813eebb932d23a0a7e23c9cb9296b8c2744d80f",
+        "path": "docs/GITHUB_ISSUES.md"
+      },
+      {
         "blob": "e968b861000d86fe1e0a615ab4473af24640742f",
         "path": "docs/HARNESS_CHAT_V1_REVIEW.md"
       },
@@ -66,7 +70,7 @@
         "path": "docs/HARNESS_INTERACTION_RESEARCH.md"
       },
       {
-        "blob": "a747198d21cfd671a7c825aa4499696ebd029404",
+        "blob": "2cdb598639eac05a2543b997f1794c01abf2d3a6",
         "path": "docs/HARNESS_NEUTRAL_CORE_CONTRACT.md"
       },
       {
@@ -86,7 +90,7 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "9778b289bdbd130fbb830c55e4013260d68f313e",
+        "blob": "dc5c7417c6eaed656ad38e5f4ddd579d34b1f54b",
         "path": "docs/INSTALL.md"
       },
       {
@@ -94,7 +98,7 @@
         "path": "docs/LEGACY_PROOF_REVISION_POLICY.md"
       },
       {
-        "blob": "8f19d098f116896f4294c5482db8fa016e8444d5",
+        "blob": "a1bd4b0842407d81092fcd62c613cc8c02773086",
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
@@ -104,6 +108,14 @@
       {
         "blob": "b5d11fecb58d9e15c672264523a6e4cdda0bb0e0",
         "path": "docs/SPEED_FIRST_CLEANUP.md"
+      },
+      {
+        "blob": "579612a343167c8240b7e690e5ce2eb462cba429",
+        "path": "docs/assets/github-issues/issue-blocked-by-2x.png"
+      },
+      {
+        "blob": "edd5b9b287edb76dde1f05fa1cc5110a3f6bb03c",
+        "path": "docs/assets/github-issues/issues-list-2x.png"
       },
       {
         "blob": "2961f14f4d201094a6fda525117a7b19980b529b",
@@ -118,7 +130,7 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       },
       {
-        "blob": "ea2f3c13ce59e51e5ab564a004edffd82758af38",
+        "blob": "f057f2e1f1fbb0f24f09e122a8d7c98d0be4f588",
         "path": "docs/assets/local-graph/readme-capture-manifest.json"
       },
       {
@@ -166,7 +178,7 @@
         "path": "docs/proposals/card-corner-signal/prototype.js"
       },
       {
-        "blob": "853b9a3f71d4bcb66fbfaf708c76a4e16fee6b7b",
+        "blob": "d41efe377b1a420656d0cd84baa47b95d0165c41",
         "path": "docs/proposals/codex-chat-conformance/README.md"
       },
       {
@@ -186,15 +198,19 @@
         "path": "docs/proposals/codex-chat-conformance/audits/message-rich-content-audit.md"
       },
       {
-        "blob": "ef36d2ea564826604b0b47d7692c310aa6c5b448",
+        "blob": "d1b85a61cba7b9497b3ce02d364baed84f1d7d5d",
         "path": "docs/proposals/codex-chat-conformance/browser-runtime-review.md"
       },
       {
-        "blob": "4363761948f7281e7a5481da42153b3feaefc3d8",
+        "blob": "f6cfbca53ca4e2b2f23adb289a4376f2df8a2095",
         "path": "docs/proposals/codex-chat-conformance/conformance-matrix.json"
       },
       {
-        "blob": "dcd7fd86449eddf4e367ec3e185874457abb9160",
+        "blob": "3907cbcf5abf2b56889f26864948d59cb0a47d55",
+        "path": "docs/proposals/codex-chat-conformance/daily-use-host-contract.json"
+      },
+      {
+        "blob": "9694c9aea3117d448771c517e930c184a19a2481",
         "path": "docs/proposals/codex-chat-conformance/protocol-event-census.json"
       },
       {
@@ -230,7 +246,7 @@
         "path": "docs/proposals/codex-native-chat/README.md"
       },
       {
-        "blob": "8f4fc23a5e75ef3306cff7fbb4611a3f387c683e",
+        "blob": "3546bb31b268f73a45ca04cf4ae30c5fc9997fa1",
         "path": "docs/proposals/codex-native-chat/chat-ui-contract.json"
       },
       {
@@ -258,12 +274,16 @@
         "path": "docs/proposals/dsh-persistent-shell/composition-contract.json"
       },
       {
-        "blob": "65096ed3086d28573da75686718ab967874cdb0e",
+        "blob": "a8584d8217f81ec758ff03fbf262954c20d1b54d",
         "path": "docs/proposals/harness-neutral-core/capabilities.v1.json"
       },
       {
         "blob": "c5a55498b0a207177e2219304376312a97f6b785",
         "path": "docs/proposals/harness-neutral-core/package-boundaries.json"
+      },
+      {
+        "blob": "7f317eea2f5dd522f0f0de592cf96f3d58a975ea",
+        "path": "docs/proposals/npx-first-install-experience.md"
       },
       {
         "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
@@ -286,8 +306,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-22T23:28:16.354Z",
-    "last_aligned_commit": "1700c7a3f43e4a45d27edad62cee16aefa1051b0"
+    "checked_at": "2026-08-23T21:26:37.044Z",
+    "last_aligned_commit": "349357cc029b2e031a51701d97973e6aa823286e"
   },
   "anchors": [
     "CHANGELOG.md",

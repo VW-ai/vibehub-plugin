@@ -44,7 +44,7 @@
     },
     {
       "purpose": "Dependency-free Context and Ticket validation helper.",
-      "ref": "skills/scripts/vh.mjs"
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
     }
   ],
   "deliveries": [

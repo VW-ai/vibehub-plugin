@@ -1,0 +1,45 @@
+{
+  "context_id": "decision-hyperframes-playwright-pipeline",
+  "detail": "Feasibility proven 2026-08-22: a 15s 1080x1920 sample (hook card \u2192 simulated terminal \u2192 real Workbench recording \u2192 tagline + install CTA) rendered in ~20s with 'npx hyperframes render'. Recording: launch 'node skills/scripts/vh-ui.mjs --repo . --no-open --json --port <p>', open the bearer URL in Playwright chromium with recordVideo, drive clicks, trim with ffmpeg, embed as a <video> clip. HyperFrames has no dedicated screen-recording skill; footage is an ordinary timed <video>. Relevant bundled skills: /product-launch-video (warm-start from the public site URL \u2014 video 1), /motion-graphics and /hyperframes-creative (video 2), /media-use and /hyperframes-audio (TTS via HeyGen/ElevenLabs/local Kokoro with voiceover ducking), /embedded-captions. Chosen over Remotion because agents write plain HTML more reliably, timing is human-readable inline, output is byte-deterministic, and Apache 2.0 has no team-size license.",
+  "evidence": [
+    {
+      "note": "Sample MP4 delivered to the owner in the conversation; owner approved the plan and asked to persist the production context in VibeHub format.",
+      "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+    },
+    {
+      "note": "Framework, bundled skills, and CLI (init/preview/check/render).",
+      "ref": "https://github.com/heygen-com/hyperframes"
+    },
+    {
+      "note": "Official prompting guidance used for the conventions.",
+      "ref": "https://hyperframes.heygen.com/prompting/overview"
+    },
+    {
+      "ref": "assets/video/README.md",
+      "note": "Checked-in projects, render command, and recording procedure."
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-two-launch-videos",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T09:30:00Z",
+    "quote": "\u6211\u53ea\u60f3\u628a\u53d9\u4e8b\u7ed9layout \u7136\u540e\u9762\u7684\uff0c\u89c6\u9891\u5236\u4f5c\u6211\u7529\u624b\u4e0d\u5e72",
+    "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+  },
+  "state": "active",
+  "summary": "Videos are produced end to end by the Agent with HyperFrames (HTML + data-start timeline \u2192 deterministic MP4) plus Playwright headless recordings of the real Workbench served by scripts/vh-ui.mjs; the owner only writes the narrative/storyboard",
+  "tags": [
+    "video",
+    "toolchain",
+    "hyperframes",
+    "playwright",
+    "workbench-recording"
+  ],
+  "type": "decision"
+}

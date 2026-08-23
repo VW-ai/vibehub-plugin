@@ -11,7 +11,7 @@
     "DONE": { "owner": "vibehub-ticket-review", "independent_agent": false }
   },
   "planning_contracts": {
-    "dependency_hygiene": "../../contracts/dependency-hygiene.json"
+    "dependency_hygiene": "../../vibehub-core/contracts/dependency-hygiene.json"
   },
   "resource_policy": {
     "scope": "current-agent-task",

@@ -28,8 +28,8 @@ import { buildTaskContextPacket, startTaskContextThread, taskLinkFromPreview } f
 import { createSharedHarnessShell } from "../packages/harness-core/shell.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
-import { buildCandidateTicketHandoff, buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
-import { VibeHubError, applyTickets, documents, initProject, projectCompatibility, putContext, readDocument, validateTicket, writeDocument } from "../skills/scripts/vh.mjs";
+import { buildCandidateTicketHandoff, buildTicketHandoff, buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
+import { VibeHubError, applyTickets, documents, initProject, projectCompatibility, putContext, readDocument, validateTicket, writeDocument } from "../skills/vibehub-core/scripts/vh.mjs";
 
 const LOOPBACK_HOST = "127.0.0.1";
 const SHELL_ID = "codex-first-shell";

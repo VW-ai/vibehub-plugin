@@ -109,15 +109,15 @@ test("built DSH Bundle vendors the exact current VibeHub runtime and Skills", ()
       "adapter/host.js",
       "cordis.patch.yml",
       "index.js",
-      "vendor/skills/scripts/vh-ui.mjs",
+      "vendor/skills/vibehub-core/scripts/vh-ui.mjs",
       "vendor/skills/vibehub-ticket-run/SKILL.md",
       "vendor/skills/vibehub-ticket-review/assets/app.js",
     ]) assert.equal(existsSync(join(artifact, path)), true, path);
     const manifest = JSON.parse(readFileSync(join(artifact, "package.json"), "utf8"));
     assert.equal(manifest.private, false);
     assert.equal(
-      readFileSync(join(artifact, "vendor/skills/scripts/vh-ui.mjs"), "utf8"),
-      read("skills/scripts/vh-ui.mjs"),
+      readFileSync(join(artifact, "vendor/skills/vibehub-core/scripts/vh-ui.mjs"), "utf8"),
+      read("skills/vibehub-core/scripts/vh-ui.mjs"),
     );
     buildDshBundle({ artifactRoot: artifact, clean: true });
     assert.equal(JSON.parse(readFileSync(join(artifact, "package.json"), "utf8")).private, false);

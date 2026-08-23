@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "ci-workflow-is-main-only-and-agent-free"
+  ],
+  "evidence_id": "workflow-main-only-agent-free",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-22T09:15:35Z",
+  "refs": [
+    "commit:dd64bef3b9b30727cbfdbd0c23756b04fb36466c",
+    ".github/workflows/sync-issues.yml",
+    "CLAUDE.md"
+  ],
+  "schema_version": 1,
+  "summary": ".github/workflows/sync-issues.yml triggers on push to main with a paths filter for .vibehub/tickets, .vibehub/outcomes, .vibehub/evidence and the script itself, plus workflow_dispatch with a dry_run boolean input defaulting to true; permissions are contents: read and issues: write only; the job runs the script once and has no commit, push, or PR step. No Skill, CLAUDE.md rule, hook, or package script instructs an Agent to run or verify the sync; the only added package script is issues:sync:dry-run for humans.",
+  "ticket_id": "ticket-mirror-tickets-to-github-issues"
+}

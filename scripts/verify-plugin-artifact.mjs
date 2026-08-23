@@ -49,8 +49,8 @@ try {
     "docs/RELEASE.md",
     "skills/vibehub-ingest/SKILL.md",
     "skills/vibehub-ticket-run/SKILL.md",
-    "skills/scripts/vh.mjs",
-    "skills/scripts/vh-ui.mjs",
+    "skills/vibehub-core/scripts/vh.mjs",
+    "skills/vibehub-core/scripts/vh-ui.mjs",
     "skills/vibehub-ticket-review/assets/index.html",
     "skills/vibehub-ticket-review/assets/app.css",
     "skills/vibehub-ticket-review/assets/app-layout.js",
@@ -61,13 +61,13 @@ try {
     "skills/vibehub-ingest/references/knowledge-governance.json",
     "skills/vibehub-migrate/SKILL.md",
     "skills/vibehub-migrate/references/migrations.json",
-    "skills/contracts/project-format.schema.json",
-    "skills/contracts/context.schema.json",
-    "skills/contracts/ticket.schema.json",
-    "skills/contracts/evidence.schema.json",
-    "skills/contracts/acceptance-authority.md",
-    "skills/contracts/dependency-hygiene.json",
-    "skills/contracts/ticket-next-action.md",
+    "skills/vibehub-core/contracts/project-format.schema.json",
+    "skills/vibehub-core/contracts/context.schema.json",
+    "skills/vibehub-core/contracts/ticket.schema.json",
+    "skills/vibehub-core/contracts/evidence.schema.json",
+    "skills/vibehub-core/contracts/acceptance-authority.md",
+    "skills/vibehub-core/contracts/dependency-hygiene.json",
+    "skills/vibehub-core/contracts/ticket-next-action.md",
   ]) {
     if (!existsSync(join(artifact, required))) throw new Error(`artifact missing ${required}`);
   }
@@ -131,14 +131,14 @@ try {
   ), "utf8"));
   if (lifecycle.presenter !== "vibehub-ticket-review"
     || lifecycle.resource_policy?.cross_task_discovery !== "forbidden"
-    || lifecycle.planning_contracts?.dependency_hygiene !== "../../contracts/dependency-hygiene.json"
+    || lifecycle.planning_contracts?.dependency_hygiene !== "../../vibehub-core/contracts/dependency-hygiene.json"
     || lifecycle.next_action_routing?.EXECUTE?.owner !== "vibehub-ticket-run"
     || lifecycle.next_action_routing?.CLOSE_OUT?.owner !== "vibehub-ticket-closeout"
     || lifecycle.next_action_routing?.CLOSE_OUT?.independent_agent !== true) {
     throw new Error("installed Ticket lifecycle contract is invalid");
   }
 
-  const helper = join(artifact, "skills", "scripts", "vh.mjs");
+  const helper = join(artifact, "skills", "vibehub-core", "scripts", "vh.mjs");
   mkdirSync(repo, { recursive: true });
   invoke(helper, "project", "init");
   mkdirSync(join(repo, ".vibehub", "rooms", "product"), { recursive: true });
@@ -272,7 +272,7 @@ try {
     "utf8",
   );
   const installedHost = readFileSync(
-    join(artifact, "skills", "scripts", "vh-ui.mjs"),
+    join(artifact, "skills", "vibehub-core", "scripts", "vh-ui.mjs"),
     "utf8",
   );
   const installedHtml = readFileSync(
@@ -321,7 +321,7 @@ try {
     throw new Error("installed local UI is missing the bounded independent-closeout handoff");
   }
   const uiModule = await import(pathToFileURL(
-    join(artifact, "skills", "scripts", "vh-ui.mjs"),
+    join(artifact, "skills", "vibehub-core", "scripts", "vh-ui.mjs"),
   ).href);
   uiHost = uiModule.startVibeHubUi({
     repoRoot: repo,

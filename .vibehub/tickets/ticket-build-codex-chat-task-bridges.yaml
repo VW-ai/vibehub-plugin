@@ -80,11 +80,11 @@
     },
     {
       "purpose": "Ticket schema v2 that gains the optional origin field.",
-      "ref": "skills/contracts/ticket.schema.json"
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
     },
     {
       "purpose": "Context document shape Remember must produce.",
-      "ref": "skills/contracts/context.schema.json"
+      "ref": "skills/vibehub-core/contracts/context.schema.json"
     },
     {
       "purpose": "Git review as the activation gate and lowest-owning-room placement for Remembered Context.",

@@ -10,7 +10,7 @@ import {
   ticketArchived,
   ticketNextAction,
   ticketStatus,
-} from "../skills/scripts/vh.mjs";
+} from "../skills/vibehub-core/scripts/vh.mjs";
 
 function git(repo, args, { allowFailure = false } = {}) {
   const result = spawnSync("git", ["-C", repo, ...args], {

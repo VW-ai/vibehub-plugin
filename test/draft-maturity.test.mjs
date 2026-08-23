@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
+import { buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 import { run, tempRepo, ticket } from "./helpers.mjs";
 
 function draft(id, dependencies = []) {

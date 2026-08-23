@@ -7,14 +7,14 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { CodexAppServerClient } from "./client.mjs";
 import { startCodexTask } from "./handoff.mjs";
-import { buildTicketHandoff } from "../../skills/scripts/vh-ui.mjs";
+import { buildTicketHandoff } from "../../skills/vibehub-core/scripts/vh-ui.mjs";
 
 const cwd = process.cwd();
 const sentinel = "VIBEHUB_CODEX_ADAPTER_OK";
 
 function syntheticHandoff() {
   const repo = mkdtempSync(join(tmpdir(), "vibehub-codex-handoff-"));
-  const vh = resolve(cwd, "skills/scripts/vh.mjs");
+  const vh = resolve(cwd, "skills/vibehub-core/scripts/vh.mjs");
   const input = join(repo, "ticket.json");
   execFileSync("git", ["init", "-q"], { cwd: repo });
   execFileSync(process.execPath, [vh, "project", "init", "--repo", repo]);

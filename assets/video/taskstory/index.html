@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=1920, height=1080"/>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+:root{--canvas:#fafaf8;--ink:#252523;--muted:#6d6d68;--faint:#969690;--line:#e2e2de;--done:#496351;--done-soft:#f0f3f0;--running:#3267a8;--running-soft:#edf4ff;
+--mono:ui-monospace,"SFMono-Regular","SF Mono",Menlo,Consolas,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--canvas)}
+body{font-family:var(--mono);color:var(--ink);font-weight:400}
+#stage{position:absolute;inset:0;background:var(--canvas);background-image:radial-gradient(#d8d8d3 1.2px,transparent 1.2px);background-size:24px 24px;background-position:12px 12px}
+#light{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 900px 600px at 50% 50%,rgba(250,250,248,0) 0%,rgba(250,250,248,0) 100%)}
+.clip{position:absolute;inset:0}
+/* the sentence */
+#sentence{position:absolute;left:0;right:0;top:470px;text-align:center;font-size:44px;line-height:1.3;font-weight:500}
+#sentence .w{display:inline-block;margin:0 .18em}
+#from{position:absolute;left:0;right:0;top:420px;text-align:center;font-size:18px;color:var(--faint)}
+/* agent cards — same shape as the real ticket node, running phase */
+.agent{position:absolute;width:330px;background:#fff;border:1px solid #dcdcd7;border-radius:10px;padding:0;font-size:13px;color:#3a3a37;overflow:hidden;box-shadow:0 10px 24px rgba(27,27,25,.10)}
+.agent .hd{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #ececE8;background:#fafaf8}
+.agent .hd img{width:16px;height:16px}.agent .hd .nm{font-weight:600;color:#252523;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agent .dot{width:8px;height:8px;border-radius:50%;background:#3267a8;box-shadow:0 0 0 3px #edf4ff}.agent .tm{color:#969690;font-size:12px}
+.agent .bd{padding:9px 12px;font-size:12.5px;line-height:1.5;color:#55554f}.agent .bd .tc{color:#252523}.agent .bd .tc span{display:inline-block;background:#f1f1ee;border-radius:4px;padding:0 6px;margin-right:6px;font-weight:600;font-size:11px;color:#6d6d68}
+.agent .pg{height:3px;background:#ececE8}.agent .pg i{display:block;height:100%;background:#3267a8}
+.agent.waiting .dot{background:#c8c8c2;box-shadow:0 0 0 3px #f1f1ee}.agent.waiting .pg i{background:#c8c8c2}
+.agent.blocked .dot{background:#895d0a;box-shadow:0 0 0 3px #fff4df}.agent.blocked .pg i{background:#895d0a}
+.agent.retry .dot{background:#a7433b;box-shadow:0 0 0 3px #fff0ee}.agent.retry .pg i{background:#a7433b}
+.agent.sub{width:270px;font-size:12px}.agent.sub .bd{font-size:11.5px}
+.wire{position:absolute;height:1.5px;background:#aaa9a3;transform-origin:0 50%;opacity:.7}
+/* the task card — rebuilt from the real ticket-node tokens, done phase */
+#task{position:absolute;left:650px;top:400px;width:620px;background:var(--done-soft);border:1px solid var(--line);border-radius:16px;padding:26px 30px 28px;box-shadow:0 30px 70px rgba(27,27,25,.14),0 4px 12px rgba(27,27,25,.06);overflow:hidden}
+#task:after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--done)}
+#task .id{font-size:17px;color:var(--muted);font-weight:500;letter-spacing:.012em}
+#task .o{font-size:30px;line-height:1.3;font-weight:600;margin:14px 0 22px}
+#task .meta{display:flex;justify-content:space-between;font-size:16px;color:var(--faint)}
+#task .meta .st{color:var(--done);font-weight:700;letter-spacing:.07em;font-size:15px}
+.n{position:absolute;width:300px;height:118px;border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:14px;color:var(--muted);background:#fff;overflow:hidden;opacity:0}
+.n b{display:block;color:var(--faint);font-weight:500;margin-bottom:8px;font-size:13px}.n:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px}
+.n.done{background:#f0f3f0}.n.done:after{background:#496351}.n.ready{background:#f2f2ef}.n.ready:after{background:#575751}
+.n.running{background:#edf4ff}.n.running:after{background:#3267a8}.n.needs{background:#fff4df;border-color:#895d0a}.n.needs:after{background:#895d0a}.n.draft{background:#f7f7f5}.n.draft:after{background:#c8c8c2}
+.n i{position:absolute;right:14px;bottom:12px;font-style:normal;font-weight:700;font-size:12px;letter-spacing:.07em}
+.n.done i{color:#496351}.n.ready i{color:#575751}.n.running i{color:#3267a8}.n.needs i{color:#895d0a}.n.draft i{color:#969690}
+.edge{position:absolute;background:#aaa9a3;height:2px;transform-origin:0 50%;opacity:0}
+.label{position:absolute;left:120px;top:96px;font-size:30px;color:var(--ink);font-weight:500}
+.label.q{color:var(--muted)}
+#open{position:absolute;left:0;top:0;width:1920px;height:1080px}
+.end{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;background:var(--canvas)}
+.end h1{font-size:64px;font-weight:600;letter-spacing:-.02em;text-align:center;line-height:1.15}
+.end .cta{font-size:22px;color:var(--muted)}
+</style></head>
+<body>
+<div id="root" data-composition-id="taskstory" data-start="0" data-duration="34" data-width="1920" data-height="1080">
+  <div id="scene" class="clip" data-start="0" data-duration="28" data-track-index="1">
+    <div id="world" style="position:absolute;inset:0;transform-origin:960px 470px"><div id="stage"></div>
+    <div id="from">from your lead · Monday 9:12</div>
+    <div id="sentence"><span class="w">Ship</span><span class="w">the</span><span class="w">new</span><span class="w">onboarding</span><span class="w">flow</span><span class="w">by</span><span class="w">Friday.</span></div>
+
+    <div id="swarm"></div>
+
+    <div id="task"><div class="id">ticket-ship-new-onboarding-flow</div><div class="o">New users can complete onboarding end to end and land on the dashboard.</div><div class="meta"><span>2 in · 1 out · 6/6 evidence</span><span class="st">✓ DONE</span></div></div>
+    <div id="near"></div>
+    <div id="far"></div>
+    </div>
+    <div id="light"></div>
+  </div>
+
+  <div id="l1" class="clip label q" data-start="16.2" data-duration="3.0" data-track-index="2" style="background:rgba(250,250,248,.94);padding:8px 14px;left:106px;right:auto;bottom:auto;border-radius:8px">Lost in the agent sessions.</div>
+  <div id="l2" class="clip label" data-start="21.2" data-duration="3" data-track-index="2">It was always one task.</div>
+
+  <video id="fit" src="assets/fit.mp4" data-start="27.4" data-duration="3.6" data-track-index="1" muted playsinline style="position:absolute;left:0;top:0;width:1920px;height:1080px"></video>
+
+  <div id="end" class="clip end" data-start="31" data-duration="3" data-track-index="1">
+    <h1>Manage the task.<br>VibeHub manages the rest.</h1>
+    <div class="cta">npx skills add VW-ai/vibehub-plugin</div>
+  </div>
+</div>
+<script>
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+// ---- swarm (unchanged data) ----
+const swarm=document.getElementById("swarm");
+const SW=[
+ ["planner","running","claude","Read","src/onboarding/*.ts","breaking down the flow into steps…",140,150,"",62,"1m 12s"],
+ ["coder-1","running","cursor","Edit","app/signup/page.tsx","new signup screen…",1480,120,"",41,"4m 03s"],
+ ["coder-2","running","openai","Edit","api/verify-email.ts","email verification step…",1520,540,"",77,"2m 40s"],
+ ["tester","retry","claude","Bash","npm run e2e","e2e failed · retrying (3)",1300,880,"",18,"9m 51s"],
+ ["reviewer","waiting","googlegemini","—","","waiting for coder-1…",110,820,"",0,"idle 6m"],
+ ["docs","running","kimi","Write","CHANGELOG.md","release notes draft…",420,560,"",55,"0m 48s"],
+ ["sub-a · validation","running","cursor","Edit","form-schema.ts","zod rules…",1440,250,"sub",30,"1m 05s"],
+ ["sub-b · tokens","blocked","cursor","—","","needs a design token",1660,320,"sub",0,"blocked"],
+ ["research","running","claude","Grep","auth session","reading auth module…",230,270,"sub",88,"0m 22s"],
+ ["fixtures","waiting","claude","—","","seed users…",1130,960,"sub",0,"queued"],
+ ["orchestrator","running","openai","Task","re-assign coder-2","re-assigning coder-2…",760,140,"",12,"11m 30s"],
+ ["migrator","blocked","anthropic","—","","waiting for your decision",1200,180,"",0,"blocked 14m"],
+ ["coder-3","running","openai","Edit","app/signup/page.tsx","also touching signup screen",1380,420,"",66,"3m 12s"],
+ ["lint","retry","googlegemini","Bash","eslint .","flaky · retrying",300,940,"sub",20,"retry 2"],
+ ["screenshots","running","kimi","Bash","playwright shot","capturing…",560,700,"sub",49,"0m 31s"],
+ ["security","waiting","github","—","","idle",920,860,"",0,"idle"],
+ ["sub-c","running","openai","Read","coder-1 diff","copying coder-1's work?",1700,640,"sub",35,"0m 58s"],
+ ["qa","running","cursor","Bash","npm test","\"looks done to me\"",640,300,"",100,"done?"]];
+SW.forEach(([n,st,logo,tool,arg,msg,x,y,cls,pg,tm])=>{const d=document.createElement("div");d.className="agent "+st+" "+cls;d.style.left=x+"px";d.style.top=y+"px";
+ d.innerHTML=`<div class="hd"><img src="assets/logos/${logo}.svg" alt=""><span class="nm">${n}</span><span class="dot"></span><span class="tm">${tm}</span></div><div class="bd">${tool!=="—"?`<div class="tc"><span>${tool}</span>${arg}</div>`:""}${msg}</div><div class="pg"><i style="width:${pg}%"></i></div>`;swarm.appendChild(d);});
+const WIRES=[[290,210,1480,180],[290,210,470,620],[1630,180,1590,250],[1630,180,1810,380],[1630,180,1530,480],[1670,600,1850,700],[1450,940,1280,1020],[260,880,450,1000],[910,200,1350,240],[910,200,1530,480],[790,360,910,200],[1350,240,1590,250],[1070,920,1450,940]];
+WIRES.forEach(([x1,y1,x2,y2])=>{const e=document.createElement("div");e.className="wire";const L=Math.hypot(x2-x1,y2-y1);e.style.left=x1+"px";e.style.top=y1+"px";e.style.width=L+"px";e.style.transform=`rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;e.style.opacity=0;swarm.appendChild(e);});
+const words = gsap.utils.toArray("#sentence .w");
+const agents = gsap.utils.toArray(".agent");
+gsap.set(agents, {opacity:0});
+gsap.set("#task", {opacity:0, y:24});
+
+// ---- 起 0–5: the sentence arrives and holds ----
+tl.from("#from", {opacity:0, duration:.5}, .4);
+tl.from(words, {opacity:0, y:8, stagger:.09, duration:.4}, .8);
+
+// ---- 承 5.5–13: it spreads; the camera loses its footing ----
+const targets=[[290,230],[1630,200],[1670,620],[1450,960],[260,900],[570,640],[910,220]];
+const mains=agents.filter(a=>!a.classList.contains("sub")), subs=agents.filter(a=>a.classList.contains("sub"));
+// agents arrive accelerating: first one alone, then faster and faster
+mains.forEach((a,i)=>tl.to(a,{opacity:1,duration:.3}, i<3 ? 5.6+i*1.5 : 10.0+(i-3)*.55));
+subs.forEach((a,i)=>tl.to(a,{opacity:1,duration:.25}, 12.4 + i*.32));
+words.forEach((w,i)=>{ const r=w.getBoundingClientRect(); const [tx,ty]=targets[i];
+  tl.to(w,{x:tx-r.left-r.width/2, y:ty-r.top, duration:1.2, ease:"power2.inOut"}, 6.4+i*.6);
+  tl.to(w,{opacity:0, duration:.3}, 7.6+i*.6); });
+tl.to("#from",{opacity:0,duration:.4},6.0);
+tl.to(".wire",{opacity:.7,duration:.3,stagger:.08},11.0);
+// each agent never settles
+agents.forEach((a,i)=>tl.to(a,{x:((i*37)%41)-20, y:((i*53)%31)-15, rotation:((i*7)%5)-2, duration:.8+(i%4)*.15, repeat:12, yoyo:true, ease:"sine.inOut"}, 7+(i%5)*.1));
+// camera: drift → shake, amplitude growing; focus hunts (blur pulses)
+// [time, x, y, rot, duration] — slow drift, a pause, a jolt, drift again; amplitude grows
+const shake=[[7.2,4,-3,0,.9],[8.1,-6,4,-.1,.8],[8.9,3,2,0,1.1],[10.0,-12,7,.2,.5],[10.5,-11,8,.2,.6],[11.1,14,-9,-.3,.35],[11.45,10,-6,-.2,.5],[12.0,-18,11,.3,.45],[12.45,-16,12,.3,.7],
+ [13.15,24,-14,-.5,.3],[13.45,20,-10,-.4,.4],[13.85,-28,16,.5,.35],[14.2,-26,18,.5,.55],[14.75,34,-20,-.6,.3],[15.05,30,-17,-.5,.45],[15.5,-40,24,.7,.3],[15.8,-36,22,.6,.6],
+ [16.4,44,-26,-.8,.3],[16.7,40,-22,-.7,.5],[17.2,-48,28,.8,.3],[17.5,-44,26,.7,.6],[18.1,52,-30,-.9,.3],[18.4,46,-26,-.8,.6]];
+shake.forEach(([t,x,y,r,d])=>tl.to("#world",{x:x,y:y,rotation:r,duration:d,ease:"sine.inOut"},t));
+tl.to("#world",{scale:1.07,duration:11.8,ease:"none"},7.2);
+[9.4,10.8,12.2,13.3,14.3,15.2,16.0,16.9,17.7,18.4].forEach((t,i)=>{ tl.to("#world",{filter:"blur("+(2+i*.8)+"px)",duration:.22,ease:"power1.in"},t); tl.to("#world",{filter:"blur(0px)",duration:.3,ease:"power1.out"},t+.26); });
+
+// ---- 转 13–16: hard stop ----
+tl.from("#l1",{opacity:0,duration:.4},16.3);
+
+// ---- 合 16–28: light closes in, it becomes one task ----
+tl.to("#world",{x:0,y:0,rotation:0,scale:1,filter:"blur(0px)",duration:1.8,ease:"power2.inOut"},19.0);
+tl.to("#light",{background:"radial-gradient(ellipse 900px 600px at 50% 50%, rgba(250,250,248,0) 0%, rgba(250,250,248,0.92) 100%)", duration:1.6, ease:"power2.inOut"}, 19.0);
+tl.to(agents,{opacity:0, duration:1.2}, 19.2);
+tl.to(".wire",{opacity:0,duration:.6},19.2);
+words.forEach((w,i)=>{ tl.to(w,{opacity:1,duration:.01},19.6+i*.05); tl.to(w,{x:0,y:0,duration:.9,ease:"power2.inOut"},19.6+i*.05); });
+tl.to(words,{opacity:0,duration:.25},20.9);
+tl.to("#task",{opacity:1,y:0,duration:.6,ease:"power2.out"},21.0);
+tl.from("#l2",{opacity:0,duration:.4},21.3);
+// neighbours, field, zoom out
+const near=document.getElementById("near");
+const N=[["done","ticket-auth-session","Users stay signed in across sessions.",650,190],["ready","ticket-dashboard-empty-state","First-run dashboard shows next steps.",650,640],
+         ["done","ticket-signup-api","Signup API accepts verified emails.",250,400],["needs","ticket-welcome-email","You approve the welcome email copy.",1370,400]];
+N.forEach(([st,id,o,x,y])=>{const d=document.createElement("div");d.className="n "+st;d.style.left=x+"px";d.style.top=y+"px";d.innerHTML=`<b>${id}</b>${o}<i>${st==="needs"?"NEEDS YOU":st.toUpperCase()}</i>`;near.appendChild(d);});
+const E=[[960,400,960,308],[960,540,960,640],[650,470,550,470],[1270,470,1370,470]];
+E.forEach(([x1,y1,x2,y2])=>{const e=document.createElement("div");e.className="edge";const L=Math.hypot(x2-x1,y2-y1);e.style.left=x1+"px";e.style.top=y1+"px";e.style.width=L+"px";e.style.transform=`rotate(${Math.atan2(y2-y1,x2-x1)}rad)`;near.appendChild(e);});
+const far=document.getElementById("far");
+const states=["done","done","done","done","running","needs","ready","ready","draft","draft"];
+for(let c=0;c<9;c++)for(let r=0;r<7;r++){ if(c>=3&&c<=5&&r>=2&&r<=4) continue;
+  const d=document.createElement("div"); const band=c<3?[0,4]:c<6?[3,7]:[6,10]; const st=states[band[0]+((c*7+r*3)%(band[1]-band[0]))];
+  d.className="n "+st; d.style.left=(-1200+c*560)+"px"; d.style.top=(-700+r*330)+"px"; d.innerHTML=`<b>ticket-${c}${r}</b><i>${st==="needs"?"NEEDS YOU":st.toUpperCase()}</i>`; far.appendChild(d);}
+tl.to(".edge",{opacity:1,duration:.4,stagger:.12},23.6);
+tl.to("#near .n",{opacity:1,duration:.5,stagger:.15},23.8);
+tl.to("#far .n",{opacity:1,duration:.8,stagger:{each:.02,from:"center"}},25.4);
+tl.to("#world",{scale:.33,duration:3.0,ease:"power2.inOut"},25.6);
+tl.to("#light",{opacity:0,duration:1},25.6);
+tl.from("#fit",{opacity:0,duration:.8},27.4);
+tl.from("#end h1",{opacity:0,y:10,duration:.5},31.1);
+tl.from("#end .cta",{opacity:0,duration:.4},31.6);
+window.__timelines["taskstory"] = tl;
+</script>
+</body></html>

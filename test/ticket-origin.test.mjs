@@ -8,8 +8,8 @@ import {
   applyTickets,
   putContext,
   validateTicket,
-} from "../skills/scripts/vh.mjs";
-import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
+} from "../skills/vibehub-core/scripts/vh.mjs";
+import { buildTicketHandoff, buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 import { context, room, root, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 
 const SHA = "c".repeat(64);
@@ -55,7 +55,7 @@ function hostError(fn) {
 }
 
 test("the schema gains exactly one optional origin object on schema_version 2", () => {
-  const schema = JSON.parse(readFileSync(join(root, "skills", "contracts", "ticket.schema.json"), "utf8"));
+  const schema = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "ticket.schema.json"), "utf8"));
   assert.equal(schema.$id, "https://vibehub.dev/schemas/ticket.v2.json");
   assert.equal(schema.properties.schema_version.const, 2);
   assert.equal(schema.properties.kind.const, "ticket");

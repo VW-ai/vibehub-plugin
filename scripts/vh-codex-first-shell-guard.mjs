@@ -45,7 +45,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { commitCount, createBridgeRepository, porcelain, resetBridgeRepository } from "../test/fixtures/bridge-repository.mjs";
-import { validateTicket } from "../skills/scripts/vh.mjs";
+import { validateTicket } from "../skills/vibehub-core/scripts/vh.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const options = { url: null, frames: ["wide", "narrow-window", "narrow-viewport"], schemes: ["light", "dark"], runs: 1, lifecycle: true, chrome: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", runtime: "fixture", repo: null, codex: "codex" };

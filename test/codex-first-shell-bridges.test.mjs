@@ -14,8 +14,8 @@ import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { buildTaskContextPacket } from "../packages/codex-adapter/task-context.mjs";
-import { buildCandidateTicketHandoff, buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
-import { VibeHubError, applyTickets, validateTicket } from "../skills/scripts/vh.mjs";
+import { buildCandidateTicketHandoff, buildTicketHandoff, buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
+import { VibeHubError, applyTickets, validateTicket } from "../skills/vibehub-core/scripts/vh.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");
@@ -743,7 +743,7 @@ test("the Chat bridge is the second explicit write class and adds no second stor
   const [host, script, uiHost] = await Promise.all([
     source("scripts/vh-codex-first-shell.mjs"),
     source("apps/codex-first-shell/app.js"),
-    source("skills/scripts/vh-ui.mjs"),
+    source("skills/vibehub-core/scripts/vh-ui.mjs"),
   ]);
   const declared = (name) => host.match(new RegExp(`${name}: Object\\.freeze\\(\\[([^\\]]+)\\]\\)`, "u"))[1].match(/"[^"]+"/g).map((entry) => JSON.parse(entry));
   assert.deepEqual(declared("explicitImportOnly"), REPOSITORY_WRITES.explicitImportOnly);

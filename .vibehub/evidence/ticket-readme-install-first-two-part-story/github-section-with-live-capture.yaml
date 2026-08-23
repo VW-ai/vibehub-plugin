@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "github-collaboration-is-shown-not-told"
+  ],
+  "evidence_id": "github-section-with-live-capture",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T06:57:00Z",
+  "refs": [
+    "commit:88ec41b",
+    "docs/assets/github-issues/issue-blocked-by-2x.png",
+    "docs/assets/local-graph/readme-capture-manifest.json",
+    "scripts/build-plugin-artifact.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "New section shows docs/assets/github-issues/issue-blocked-by-2x.png captured from the live Issue #35 (headless Chrome, device scale 2, 2560x1440) with the red Blocked-by pill, state/maturity labels, and Last edited by github-actions; three sentences explain the one-way mirror and link docs/GITHUB_ISSUES.md. Both new PNGs are registered in readme-capture-manifest.json with sha256, viewport, source_url, and captured_at, and the artifact build includes the README image.",
+  "ticket_id": "ticket-readme-install-first-two-part-story"
+}

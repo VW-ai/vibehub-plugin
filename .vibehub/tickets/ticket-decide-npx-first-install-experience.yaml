@@ -1,0 +1,35 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "install-path-decided",
+      "authority": "human",
+      "criterion": "The owner reads the proposal and explicitly chooses one install and init path (or a named variant), including whether the GitHub Issues mirror is offered during setup; the choice is recorded as human-origin Evidence with a readable reference to the conversation."
+    }
+  ],
+  "constraints": [
+    "Do not implement anything in this Ticket."
+  ],
+  "context": "A protected product choice: it changes the public install surface, may add an npm release step, and defines whether skills.sh is a supported path. The proposal Ticket produces the comparison; this Ticket records the decision.",
+  "context_refs": [
+    {
+      "purpose": "Current install contract the decision changes.",
+      "ref": "docs/INSTALL.md"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The owner has chosen the install and init path VibeHub commits to, recorded as human-origin Evidence, so implementation can be planned for real.",
+  "provenance_refs": [
+    "conversation:2026-08-22-tickets-as-github-issues"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner decides on the written proposal; without it there is nothing to choose.",
+      "target_ticket_id": "ticket-propose-npx-first-install-experience",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-decide-npx-first-install-experience"
+}

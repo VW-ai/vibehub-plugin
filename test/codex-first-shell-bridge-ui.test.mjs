@@ -12,7 +12,7 @@ import { itemKey, timelineWindow } from "../apps/codex-first-shell/chat-model.mj
 import { bridgeHintId, messageFinalized, renderAgentMessage, renderBridgeActions, renderTurnAssociations } from "../apps/codex-first-shell/chat-renderer.mjs";
 import { buildOrigin, codexThreadRef, composeQuotedMessage, describeSelection, locateSelection, sha256Hex, sourceIdentityLabel } from "../apps/codex-first-shell/quote-source.mjs";
 import { BRIDGE_REPOSITORY_DOCUMENTS } from "./fixtures/bridge-repository.mjs";
-import { validateTicket } from "../skills/scripts/vh.mjs";
+import { validateTicket } from "../skills/vibehub-core/scripts/vh.mjs";
 
 const root = new URL("../", import.meta.url);
 const source = (path) => readFile(new URL(path, root), "utf8");

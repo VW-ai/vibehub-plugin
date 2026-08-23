@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync, rmSync } from "node:fs";
 import { afterEach, test } from "node:test";
-import { startVibeHubUi } from "../skills/scripts/vh-ui.mjs";
+import { startVibeHubUi } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 import { run, tempRepo, ticket } from "./helpers.mjs";
 
 const repos = [];

@@ -16,7 +16,7 @@ import {
   buildUiSnapshot,
   parseUiFlags,
   startVibeHubUi,
-} from "../skills/scripts/vh-ui.mjs";
+} from "../skills/vibehub-core/scripts/vh-ui.mjs";
 import { context, room, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 
 const repos = [];

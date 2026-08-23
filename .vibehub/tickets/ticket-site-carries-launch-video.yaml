@@ -1,0 +1,42 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "placement-decided",
+      "criterion": "Direction only: the owner has decided where (or whether) the video sits relative to the live Workbench and which headline the site carries; real acceptance is rewritten at REFINE."
+    }
+  ],
+  "constraints": [
+    "Do not weaken the site tests in site/tests/rendered-html.test.mjs to fit a video block.",
+    "Keep one tagline across site and videos.",
+    "Credit CC BY performers wherever the Schubert mix is used."
+  ],
+  "context": "On 2026-08-23 the owner and Agent decided NOT to add the current clips (assets/video/renders/) to vibehub.icu: the hero is already the live Workbench, the rendered-html tests protect a concise single-narrative page, and the site headline ('Stop managing chats. Manage the work.') does not yet match the video narrative ('Don't manage agents. Manage the task.'). Revisit when the videos are next-level (real voice or no narration finalised, captions burned in, demo repo footage) and the site copy has been reconciled with .vibehub/rooms/marketing/decision-manage-the-task-narrative.yaml. Candidate placement: between the hero and 'What is a Ticket?', poster + click-to-play, web-encoded copies under site/public/video/ (Cloudflare Pages 25 MB per-file limit), music attribution for the CC BY recording. Acceptance is deliberately unwritten until the headline decision exists.",
+  "context_refs": [
+    {
+      "purpose": "The narrative the site copy must reconcile with first.",
+      "ref": ".vibehub/rooms/marketing/decision-manage-the-task-narrative.yaml"
+    },
+    {
+      "purpose": "Current audio direction of the clips.",
+      "ref": ".vibehub/rooms/marketing/video/decision-no-narration-music-carries-the-arc.yaml"
+    },
+    {
+      "purpose": "Clip inventory and known gaps.",
+      "ref": "assets/video/README.md"
+    },
+    {
+      "purpose": "Boundaries the site keeps.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "draft",
+  "outcome": "The public site carries the launch video once the clips reach the next level, without duplicating the live Ticket Workbench or introducing a second tagline.",
+  "provenance_refs": [
+    "conversation:2026-08-23-site-video-placement"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-site-carries-launch-video"
+}

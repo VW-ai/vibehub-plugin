@@ -119,7 +119,7 @@ export async function sha256Hex(text, subtle = globalThis.crypto?.subtle) {
 }
 
 // The origin a Create Task confirmation sends, shaped exactly as
-// skills/contracts/ticket.schema.json declares it. `selection` is null when
+// skills/vibehub-core/contracts/ticket.schema.json declares it. `selection` is null when
 // the whole finalized message is the source.
 export function buildOrigin({ threadId, forkedFromId = null, turnId, itemId = null, selection = null, capturedAt = new Date().toISOString() }) {
   return {

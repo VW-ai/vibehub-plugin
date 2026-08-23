@@ -64,7 +64,7 @@ export function apply(ctx, config = {}) {
     handler: async ({ rawInput }) => {
       const ticketId = rawInput.trim();
       try {
-        const source = pathToFileURL(join(repoRoot, "skills/scripts/vh-ui.mjs")).href;
+        const source = pathToFileURL(join(repoRoot, "skills/vibehub-core/scripts/vh-ui.mjs")).href;
         const { buildTicketHandoff } = await import(source);
         const payload = buildTicketHandoff(repoRoot, ticketId);
         const started = await startCodexTask({ client, payload, cwd: repoRoot });

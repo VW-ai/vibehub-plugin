@@ -19,6 +19,8 @@ test("static arrival is one statement plus the real Ticket Graph", async () => {
   assert.match(html, /VIBEHUB FOR CODING AGENTS/);
   assert.match(html, /THE REAL VIBEHUB VIEW/);
   assert.match(html, /Interactive guided Ticket causal graph/);
+  assert.match(html, /npx skills add VW-ai\/vibehub-plugin/);
+  assert.match(html, /any skills-capable agent/);
   assert.match(html, /Install for Codex/);
   assert.match(html, /Claude Code/);
   assert.match(html, /Copy for Agent/);
@@ -29,8 +31,12 @@ test("static arrival is one statement plus the real Ticket Graph", async () => {
 test("installation, Agent handoff, founders, and local assets stay truthful", async () => {
   const page = await source("app/page.tsx");
 
-  assert.match(page, /const CODEX_INSTALL = "codex plugin marketplace add VW-ai\/vibehub-plugin"/);
+  assert.match(page, /const SKILLS_INSTALL = "npx skills add VW-ai\/vibehub-plugin"/);
+  assert.match(page, /const CODEX_INSTALL = "codex plugin marketplace add VW-ai\/vibehub-plugin\\ncodex plugin add vibehub@vibehub"/);
   assert.match(page, /\/plugin marketplace add VW-ai\/vibehub-plugin/);
+  assert.ok(page.indexOf("${SKILLS_INSTALL}") < page.indexOf("${CODEX_INSTALL}"), "Agent brief must list the skills.sh command before the marketplace commands");
+  assert.match(page, /mirror one-way to GitHub Issues/);
+  assert.match(page, /className="install-primary"/);
   assert.match(page, /function SiteHeader/);
   assert.match(page, /function InstallActions/);
   assert.match(page, /function BrandIcon/);

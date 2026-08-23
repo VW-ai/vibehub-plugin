@@ -1,0 +1,87 @@
+88 tickets on disk, 87 issues on VW-ai/vibehub-plugin
+label  ensure "state: done"
+label  ensure "state: ready"
+label  ensure "state: close-out"
+label  ensure "state: needs-human"
+label  ensure "state: blocked"
+label  ensure "state: refine"
+label  ensure "state: replan"
+label  ensure "maturity: firm"
+label  ensure "maturity: draft"
+create ticket-native-issue-dependencies-and-github-view → "Native issue dependencies and GitHub view"
+update #69 ticket-mirror-tickets-to-github-issues +[state: done] -[state: needs-human]
+comment #69 ticket-mirror-tickets-to-github-issues evidence owner-judges-live-mirror-readable
+close  #69 ticket-mirror-tickets-to-github-issues
+update #115 ticket-native-issue-dependencies-and-github-view
+dep+   #28 ticket-add-site-copy-for-agent blocked by #65
+dep+   #33 ticket-ambient-distill-workflow blocked by #54
+dep+   #33 ticket-ambient-distill-workflow blocked by #104
+dep+   #34 ticket-apply-codex-like-workbench-visual-language blocked by #43
+dep+   #34 ticket-apply-codex-like-workbench-visual-language blocked by #47
+dep+   #34 ticket-apply-codex-like-workbench-visual-language blocked by #89
+dep+   #35 ticket-bind-proof-to-acceptance-revision blocked by #51
+dep+   #36 ticket-build-task-harness-vertical-slice blocked by #48
+dep+   #36 ticket-build-task-harness-vertical-slice blocked by #108
+dep+   #37 ticket-coding-agent-first-public-site blocked by #100
+dep+   #38 ticket-complete-public-domain-discovery blocked by #46
+dep+   #38 ticket-complete-public-domain-discovery blocked by #50
+dep+   #39 ticket-context-always-roomed blocked by #104
+dep+   #40 ticket-contractize-skill-system blocked by #103
+dep+   #41 ticket-correct-public-founder-identity blocked by #84
+dep+   #42 ticket-curate-pr18-ui-only blocked by #45
+dep+   #43 ticket-decide-codex-like-workbench-visual-language blocked by #79
+dep+   #44 ticket-decide-legacy-proof-revision-policy blocked by #81
+dep+   #47 ticket-decide-rooms-workbench-direction blocked by #73
+dep+   #49 ticket-decide-workbench-task-state-contract blocked by #78
+dep+   #50 ticket-deploy-public-site-cloudflare blocked by #41
+dep+   #50 ticket-deploy-public-site-cloudflare blocked by #46
+dep+   #50 ticket-deploy-public-site-cloudflare blocked by #56
+dep+   #53 ticket-draft-ticket-maturity blocked by #103
+dep+   #54 ticket-drift-check-mechanical blocked by #104
+dep+   #55 ticket-encode-human-acceptance-authority blocked by #67
+dep+   #57 ticket-explicit-firm-maturity blocked by #53
+dep+   #60 ticket-focus-product-on-one-line-entry blocked by #74
+dep+   #61 ticket-formal-public-agent-entry blocked by #37
+dep+   #62 ticket-format-gated-plugin-upgrades blocked by #110
+dep+   #63 ticket-integrate-workbench-web-upgrade-pr blocked by #105
+dep+   #66 ticket-make-closeout-first-class-handoff blocked by #51
+dep+   #67 ticket-make-static-graph-actionable blocked by #91
+dep+   #68 ticket-make-workflow-present-itself blocked by #99
+dep+   #115 ticket-native-issue-dependencies-and-github-view blocked by #69
+dep+   #70 ticket-polish-workbench-state-action-affordances blocked by #106
+dep+   #71 ticket-pr-room-aware-gate blocked by #72
+dep+   #72 ticket-pr-room-merge-semantics blocked by #40
+dep+   #73 ticket-prepare-rooms-workbench-proposal blocked by #39
+dep+   #73 ticket-prepare-rooms-workbench-proposal blocked by #54
+dep+   #74 ticket-prepare-v040-release blocked by #67
+dep+   #74 ticket-prepare-v040-release blocked by #68
+dep+   #75 ticket-prepare-v060-release blocked by #55
+dep+   #75 ticket-prepare-v060-release blocked by #57
+dep+   #76 ticket-prepare-v070-ui-release blocked by #42
+dep+   #79 ticket-propose-codex-like-workbench-visual-language blocked by #87
+dep+   #80 ticket-propose-large-graph-clarity-and-card-copy blocked by #63
+dep+   #83 ticket-public-cycle-evolution blocked by #85
+dep+   #84 ticket-public-embed-real-workbench blocked by #63
+dep+   #84 ticket-public-embed-real-workbench blocked by #83
+dep+   #85 ticket-public-founders-brand-icons blocked by #61
+dep+   #86 ticket-publish-v060-release blocked by #75
+dep+   #87 ticket-publish-v070-ui-release blocked by #97
+dep+   #88 ticket-publish-v080-workbench-release blocked by #63
+dep+   #89 ticket-queryable-archived-ticket-history blocked by #113
+dep+   #91 ticket-refine-local-ticket-interaction blocked by #101
+dep+   #93 ticket-refresh-readme-for-v080-workbench blocked by #63
+dep+   #94 ticket-refresh-readme-workbench-screenshots blocked by #70
+dep+   #95 ticket-release-v050 blocked by #110
+dep+   #97 ticket-repair-refine-workbench-projection blocked by #76
+dep+   #100 ticket-restore-public-hero-ticket-graph blocked by #28
+dep+   #101 ticket-restore-quiet-intelligence-graph-ui blocked by #90
+dep+   #103 ticket-room-retrieval-and-discovery blocked by #39
+dep+   #105 ticket-rooms-into-workbench blocked by #34
+dep+   #105 ticket-rooms-into-workbench blocked by #47
+dep+   #105 ticket-rooms-into-workbench blocked by #89
+dep+   #106 ticket-simplify-workbench-primary-state-language blocked by #49
+dep+   #112 ticket-workbench-canvas-first-overview blocked by #87
+dep+   #113 ticket-workbench-dense-graph-layout blocked by #114
+dep+   #114 ticket-workbench-layout-direction-choice blocked by #112
+applied 1 creates, 4 follow-up operations, 70 dependency changes
+exit=0

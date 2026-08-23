@@ -8,26 +8,78 @@
     {
       "path": "docs/assets/local-graph/quiet-workbench-desktop-2x.png",
       "subject": "current causal graph",
-      "css_viewport": { "width": 1280, "height": 720 },
+      "css_viewport": {
+        "width": 1280,
+        "height": 720
+      },
       "dpr": 2,
-      "output_pixels": { "width": 2560, "height": 1440 },
+      "output_pixels": {
+        "width": 2560,
+        "height": 1440
+      },
       "sha256": "44ee942e17dd0a64e8b876c0fc0162ec32654cb6a07d52d13d3030549c19841f"
     },
     {
       "path": "docs/assets/local-graph/workbench-ticket-action-2x.png",
       "subject": "focused Ticket Recommended action",
-      "css_viewport": { "width": 1180, "height": 820 },
+      "css_viewport": {
+        "width": 1180,
+        "height": 820
+      },
       "dpr": 2,
-      "output_pixels": { "width": 2360, "height": 1640 },
+      "output_pixels": {
+        "width": 2360,
+        "height": 1640
+      },
       "sha256": "b3d861181a8965bce9ef8fb641119dd4936be0fdf30d8b919239950b427fa4e8"
     },
     {
       "path": "docs/assets/local-graph/workbench-rooms-narrow-2x.png",
       "subject": "selected Workbench Room at narrow width",
-      "css_viewport": { "width": 390, "height": 844 },
+      "css_viewport": {
+        "width": 390,
+        "height": 844
+      },
       "dpr": 2,
-      "output_pixels": { "width": 780, "height": 1688 },
+      "output_pixels": {
+        "width": 780,
+        "height": 1688
+      },
       "sha256": "d73dc2f48a79dabd88123e551e71056218af301d738e71a86b3726d0c87b3222"
+    },
+    {
+      "path": "docs/assets/github-issues/issue-blocked-by-2x.png",
+      "subject": "mirrored Ticket as a GitHub Issue with native Blocked-by relationship",
+      "css_viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "dpr": 2,
+      "output_pixels": {
+        "width": 2560,
+        "height": 1440
+      },
+      "sha256": "7e39d7524e37e6f3d0ee3e88e2fbdc0b1f3e30444aa17a62f0d0bceea1577e40",
+      "source_url": "https://github.com/VW-ai/vibehub-plugin/issues/35",
+      "captured_at": "2026-08-23T05:40:00Z",
+      "capture_contract": "Public GitHub page rendered by headless Chrome at device scale factor 2 against the live mirror produced by the sync-issues workflow on main; no resizing."
+    },
+    {
+      "path": "docs/assets/github-issues/issues-list-2x.png",
+      "subject": "open mirrored Issues list with state and maturity labels",
+      "css_viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "dpr": 2,
+      "output_pixels": {
+        "width": 2560,
+        "height": 1440
+      },
+      "sha256": "daa98b5b0911932b7712d9a976892aa90b96a9f50ff15c8b831772370235b3ee",
+      "source_url": "https://github.com/VW-ai/vibehub-plugin/issues?q=is%3Aissue+state%3Aopen",
+      "captured_at": "2026-08-23T05:40:00Z",
+      "capture_contract": "Public GitHub page rendered by headless Chrome at device scale factor 2 against the live mirror produced by the sync-issues workflow on main; no resizing."
     }
   ]
 }
