@@ -54,7 +54,6 @@ In Codex, run `codex plugin marketplace upgrade vibehub` followed by
 (or use `/reload-plugins` after a marketplace refresh). If project data needs
 migration, the new session previews that separate Git change through the
 migrate Skill; installing a plugin never rewrites `.vibehub/`.
-Every Ticket on `main` is also mirrored one-way to a [GitHub Issue](https://github.com/VW-ai/vibehub-plugin/issues) — see [the mirror guide](docs/GITHUB_ISSUES.md).
 Read the [product concept](docs/CONCEPT.md), [installation and coexistence](docs/INSTALL.md),
-[local graph design](docs/LOCAL_GRAPH_DESIGN.md), or [release procedure](docs/RELEASE.md).
+[local graph design](docs/LOCAL_GRAPH_DESIGN.md), [release procedure](docs/RELEASE.md), or how Tickets mirror to [GitHub Issues](docs/GITHUB_ISSUES.md).
 Apache-2.0
