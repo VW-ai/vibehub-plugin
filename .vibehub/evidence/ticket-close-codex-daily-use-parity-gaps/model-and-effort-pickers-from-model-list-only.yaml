@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "model-and-effort-pickers-are-truthful"
+  ],
+  "evidence_id": "model-and-effort-pickers-from-model-list-only",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-23T08:41:03Z",
+  "refs": [
+    "commit:4ef3908",
+    "commit:801c536",
+    "commit:0beda38",
+    "scripts/vh-codex-first-shell.mjs",
+    "apps/codex-first-shell/app.js",
+    "docs/proposals/codex-chat-conformance/conformance-matrix.json",
+    "test/codex-first-shell-parity-host.test.mjs",
+    "test/codex-chat-conformance.test.mjs",
+    "test/codex-first-shell-parity-ui.test.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Commits 4ef3908, 801c536 and 0beda38 add truthful pickers. The host listModels action returns the model/list records with hidden models dropped, attaches a settings record with model, effort, approvalPolicy, sandboxPolicy, source and observedAt to every Thread, null until thread/start, thread/resume or thread/settings/updated reported it, and startTurn and queueTurn accept settings whose model slug and effort become the turn/start keys. The pickers beneath the composer stay disabled with a not-loaded label until listModels returns, draw their options only from the response with isDefault marked and effort options from the selected model's supportedReasoningEfforts with defaultReasoningEffort preselected, show the settings record as the current value without claiming a default is set, send the selection as settings on startTurn and queueTurn, label each Turn with the model and effort it used from the startTurn response, and refuse image attachments on a model whose inputModalities lacks image with a refusal naming the displayName and its inputModalities. A static test proves no option string exists in source, the deferred assertion in test/codex-chat-conformance.test.mjs is narrowed to mode and realtime which stay absent, the matrix row model-mode-pickers moves from deferred to pass with proofs, and four guard checks cover the not-loaded state, exact options and defaults, the text-only refusal and the settings keys on turn/start with the Turn label.",
+  "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
+}

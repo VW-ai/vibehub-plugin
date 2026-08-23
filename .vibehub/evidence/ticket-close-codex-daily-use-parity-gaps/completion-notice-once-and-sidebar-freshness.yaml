@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "turn-completion-notifies-once-and-sidebar-stays-fresh"
+  ],
+  "evidence_id": "completion-notice-once-and-sidebar-freshness",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-23T08:41:03Z",
+  "refs": [
+    "commit:801c536",
+    "commit:40da15d",
+    "apps/codex-first-shell/app.js",
+    "scripts/vh-codex-first-shell.mjs",
+    "test/codex-first-shell-parity-host.test.mjs",
+    "test/codex-chat-conformance.test.mjs",
+    "test/codex-first-shell-parity-ui.test.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Commits 801c536 and 40da15d add once-per-Turn completion notices and sidebar freshness. When turn/completed arrives for a Thread not on the active route or while the document is unfocused, the shell shows one in-app notice and constructs one browser Notification when permitted, deduplicated per Turn id across live delivery and replay after reconnect, governed by an Always, Only when unfocused or Never preference set through the host setNotificationPreference action, exposed in bootstrap.preferences, defaulting to unfocused, transient and absent after host restart, with a static test proving no localStorage, sessionStorage, IndexedDB or cookie write; when turn/started arrives for a Thread the sidebar does not list, the shell refreshes bootstrap so a brand-new Chat's first Turn shows its live dot. The node test delivers turn/completed for one Turn id twice, live then replayed, and asserts one notice and one stubbed Notification construction; guard checks cover once-only notice, Never silencing and the sidebar refresh; the driver walk shows a real background completion notice and badge. Commit 40da15d also fixes a pre-existing event loss where a bootstrap refresh advanced eventCursor past events appended since the last poll, now pinned statically.",
+  "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
+}
