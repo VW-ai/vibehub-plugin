@@ -20,7 +20,7 @@ test("the public-site release workflow is repository-local and discoverable", as
   ]);
 
   assert.match(skill, /name: vibehub-site-release/);
-  assert.match(skill, /vibehub\.icu/);
+  assert.match(skill, /vibehub\.team/);
   assert.match(skill, /vibehub-website-v1/);
   assert.match(skill, /Cloudflare Pages/);
   assert.doesNotMatch(skill, /Sites hosting Skill|saved Sites version/);
@@ -28,7 +28,7 @@ test("the public-site release workflow is repository-local and discoverable", as
   assert.match(packageJson, /"release:preflight"/);
   assert.match(packageJson, /"release:deploy"/);
   assert.match(packageJson, /"release:verify"/);
-  assert.match(readme, /Production: \[vibehub\.icu\]\(https:\/\/vibehub\.icu\)/);
+  assert.match(readme, /Production: \[vibehub\.team\]\(https:\/\/vibehub\.team\)/);
   assert.match(manifest, /"skills": "\.\/skills\/"/);
   assert.doesNotMatch(artifactBuilder, /["']site\/release["']/);
   await assert.rejects(access(new URL("site/.openai/hosting.json", root)), { code: "ENOENT" });
@@ -44,7 +44,7 @@ test("the release checker accepts the checked-in production identity", () => {
   assert.equal(result.status, 0, result.stderr);
   const output = JSON.parse(result.stdout);
   assert.equal(output.ok, true);
-  assert.equal(output.canonical_url, "https://vibehub.icu");
+  assert.equal(output.canonical_url, "https://vibehub.team");
   assert.equal(output.cloudflare_account_id, "72091e7e079e357ced7f9603c03a926e");
   assert.equal(output.pages_project_name, "vibehub-website-v1");
   assert.equal(output.production_branch, "main");

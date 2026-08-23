@@ -1,0 +1,14 @@
+{
+  "acceptance_ids": [
+    "owner-dns-steps-are-explicit"
+  ],
+  "evidence_id": "evidence-owner-dns-steps",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T09:06:15Z",
+  "refs": [
+    "site/release/SKILL.md"
+  ],
+  "schema_version": 1,
+  "summary": "SKILL.md Publish step 4 states domain binding, DNS, and redirect rules for vibehub.team/icu/systems are owner-performed Cloudflare actions, forbids Agent DNS mutation, lists the read-only wrangler inspection commands, and step 5 lists verify and verify-redirects; stop conditions unchanged.",
+  "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
+}

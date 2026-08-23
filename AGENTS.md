@@ -13,5 +13,5 @@ conversation checkpoints or background capture.
 ## Public site releases
 
 For changes, deployment, verification, or rollback of `site/` and
-`https://vibehub.icu`, use the repository-local Skill at
+`https://vibehub.team`, use the repository-local Skill at
 `site/release/SKILL.md`.

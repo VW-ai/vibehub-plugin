@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "preflight-passes-locally"
+  ],
+  "evidence_id": "evidence-preflight-passes",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T09:06:15Z",
+  "refs": [
+    "command:node site/release/scripts/release.mjs preflight",
+    "git:eae2e6ab45c7aa8e46412069f292c17b4b931fd6"
+  ],
+  "schema_version": 1,
+  "summary": "node site/release/scripts/release.mjs preflight returned ok with canonical_url https://vibehub.team; lint passed and site/tests reported 9 pass 0 fail.",
+  "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
+}

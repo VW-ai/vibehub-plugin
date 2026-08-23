@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "preflight-passes-locally"
+  ],
+  "evidence_id": "evidence-production-deploy-2026-08-23",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T09:14:16Z",
+  "refs": [
+    "git:652dfd347afaf57e0f4a6d790155368f5a21ff9e",
+    "https://02c7f063.vibehub-website-v1.pages.dev",
+    "command:npm run release:deploy"
+  ],
+  "schema_version": 1,
+  "summary": "Owner-authorized production deploy on 2026-08-23: source commit 652dfd347afaf57e0f4a6d790155368f5a21ff9e, Pages project vibehub-website-v1 branch main, immutable deployment https://02c7f063.vibehub-website-v1.pages.dev verified ok (200 html/robots/sitemap/og/favicon). vibehub.icu still serves the site and now emits canonical https://vibehub.team/; vibehub.team and vibehub.systems are not yet bound (ENOTFOUND), so verify and verify-redirects against the custom domains remain pending owner DNS work.",
+  "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
+}

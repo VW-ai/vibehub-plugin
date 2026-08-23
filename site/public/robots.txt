@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vibehub.icu/sitemap.xml
+Sitemap: https://vibehub.team/sitemap.xml

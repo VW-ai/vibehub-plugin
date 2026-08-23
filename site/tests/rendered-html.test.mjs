@@ -13,7 +13,7 @@ test("static arrival is one statement plus the real Ticket Graph", async () => {
 
   assert.match(html, /<title>VibeHub — The Git-native development cycle<\/title>/i);
   assert.match(html, /vibehub-favicon\.svg/);
-  assert.doesNotMatch(html, /href="(?:https:\/\/vibehub\.icu)?\/favicon\.svg"/);
+  assert.doesNotMatch(html, /href="(?:https:\/\/vibehub\.team)?\/favicon\.svg"/);
   assert.match(html, /<h1 id="showcase-title">Stop managing chats\. Manage the work\.<\/h1>/);
   assert.match(html, /<p>Turn every coding request into a Ticket with your context\.<\/p>/);
   assert.match(html, /VIBEHUB FOR CODING AGENTS/);
@@ -228,9 +228,9 @@ test("production artifact stays static and Cloudflare-ready", async () => {
   assert.match(layout, /NEXT_PUBLIC_SITE_URL/);
   assert.match(layout, /alternates:\s*{\s*canonical: "\/"/);
   assert.match(layout, /\/og\.png/);
-  assert.match(robotsSource, /User-agent: \*\s+Allow: \/\s+Sitemap: https:\/\/vibehub\.icu\/sitemap\.xml/i);
-  assert.match(sitemapSource, /<loc>https:\/\/vibehub\.icu\/<\/loc>/i);
-  assert.doesNotMatch(`${layout}\n${robotsSource}\n${sitemapSource}`, /www\.vibehub\.icu/);
+  assert.match(robotsSource, /User-agent: \*\s+Allow: \/\s+Sitemap: https:\/\/vibehub\.team\/sitemap\.xml/i);
+  assert.match(sitemapSource, /<loc>https:\/\/vibehub\.team\/<\/loc>/i);
+  assert.doesNotMatch(`${layout}\n${robotsSource}\n${sitemapSource}`, /(?:www\.vibehub\.(?:team|icu|systems)|vibehub\.(?:icu|systems))/);
   assert.equal(favicon, mark);
   assert.equal((layout.match(/\/vibehub-favicon\.svg/g) ?? []).length, 2);
   assert.doesNotMatch(layout, /["']\/favicon\.svg["']/);
@@ -257,9 +257,9 @@ test("rendered discovery metadata names one canonical production identity", asyn
     source("dist/client/sitemap.xml"),
   ]);
 
-  assert.match(html, /<link rel="canonical" href="https:\/\/vibehub\.icu\/"\s*\/>/i);
-  assert.match(robots, /User-agent: \*\s+Allow: \/\s+Sitemap: https:\/\/vibehub\.icu\/sitemap\.xml/i);
-  assert.match(sitemap, /<loc>https:\/\/vibehub\.icu\/<\/loc>/i);
+  assert.match(html, /<link rel="canonical" href="https:\/\/vibehub\.team\/"\s*\/>/i);
+  assert.match(robots, /User-agent: \*\s+Allow: \/\s+Sitemap: https:\/\/vibehub\.team\/sitemap\.xml/i);
+  assert.match(sitemap, /<loc>https:\/\/vibehub\.team\/<\/loc>/i);
   assert.equal((sitemap.match(/<url>/g) ?? []).length, 1);
-  assert.doesNotMatch(`${html}\n${robots}\n${sitemap}`, /www\.vibehub\.icu/);
+  assert.doesNotMatch(`${html}\n${robots}\n${sitemap}`, /(?:www\.vibehub\.(?:team|icu|systems)|vibehub\.(?:icu|systems))/);
 });

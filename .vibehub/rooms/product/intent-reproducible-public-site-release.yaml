@@ -1,6 +1,6 @@
 {
   "context_id": "intent-reproducible-public-site-release",
-  "detail": "Keep the VibeHub public-site release workflow in this repository as a project-local Agent Skill backed by small deterministic checks. The durable workflow covers production build metadata, the existing Sites project, deployment, the canonical vibehub.icu hostname, protected DNS replacement, HTTPS and rendered-content verification, and checked-in release evidence. Keep credentials and transient platform state out of Git. The Skill is repository-local so VibeHub Plugin users do not receive an irrelevant publisher for VibeHub's own website.",
+  "detail": "Keep the VibeHub public-site release workflow in this repository as a project-local Agent Skill backed by small deterministic checks. The durable workflow covers production build metadata, the existing Sites project, deployment, the canonical vibehub.team hostname (vibehub.icu, vibehub.systems, and all www hostnames are owner-managed permanent redirects to it), owner-performed DNS and custom-domain binding, HTTPS and rendered-content verification, and checked-in release evidence. Keep credentials and transient platform state out of Git. The Skill is repository-local so VibeHub Plugin users do not receive an irrelevant publisher for VibeHub's own website.",
   "evidence": [
     {
       "note": "The repository owner explicitly requested that the working public-site release process be preserved as reusable documentation or a Skill with scripts for future site changes.",

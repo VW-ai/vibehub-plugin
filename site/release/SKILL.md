@@ -1,12 +1,12 @@
 ---
 name: vibehub-site-release
-description: Release, verify, or roll back the VibeHub public website through the existing vibehub-website-v1 Cloudflare Pages project and vibehub.icu custom domain. Use when the user asks to publish, deploy, update, verify, or roll back the VibeHub website in site/.
+description: Release, verify, or roll back the VibeHub public website through the existing vibehub-website-v1 Cloudflare Pages project and vibehub.team custom domain. Use when the user asks to publish, deploy, update, verify, or roll back the VibeHub website in site/.
 ---
 
 # VibeHub Site Release
 
 Keep one exact source commit, one existing Cloudflare Pages project, and one
-canonical hostname. The production project is `vibehub-website-v1` in account
+canonical hostname (`https://vibehub.team`; all other hostnames redirect). The production project is `vibehub-website-v1` in account
 `72091e7e079e357ced7f9603c03a926e`; do not create a replacement project.
 
 ## Prepare
@@ -19,7 +19,7 @@ canonical hostname. The production project is `vibehub-website-v1` in account
    ```
 
    It validates the Pages identity, lints, builds with
-   `NEXT_PUBLIC_SITE_URL=https://vibehub.icu`, and tests the rendered static
+   `NEXT_PUBLIC_SITE_URL=https://vibehub.team`, and tests the rendered static
    artifact in `site/dist/client`.
 3. Review the diff and Git status. Commit and push the intended source before
    deployment. The deployment command refuses a dirty worktree and attaches
@@ -57,21 +57,33 @@ instruction.
    node site/release/scripts/release.mjs verify <deployment-url>
    ```
 
-4. Bind `vibehub.icu` through the existing Pages project's Custom domains
-   flow. Perform read-only conflict inspection first. If the apex still points
-   to the temporary origin, replace only the exact preflighted obsolete apex
-   records needed by Pages. Retain the Search Console TXT proof, the
-   redirect-only `www` record, and every unrelated DNS record. Do not add a
-   manual CNAME without the Pages custom-domain association.
-5. Wait until the Pages custom domain and certificate are active, then verify:
+4. Domain binding is an owner-performed Cloudflare action, not an Agent
+   step. The owner binds `vibehub.team` as the canonical custom domain of the
+   existing Pages project and keeps `vibehub.icu`, `vibehub.systems`, and every
+   `www` hostname as permanent (301/308) redirects to
+   `https://vibehub.team` that preserve path and query. The Agent performs
+   only read-only inspection before and after:
 
    ```text
-   node site/release/scripts/release.mjs verify https://vibehub.icu
-   node site/release/scripts/release.mjs verify-www
+   cd site
+   npx wrangler pages project list
+   npx wrangler pages deployment list --project-name vibehub-website-v1
    ```
 
-   Both HTTP and HTTPS `www` requests must permanently redirect to the apex
-   while preserving the exact path and query.
+   Never add, replace, or delete DNS records, custom domains, or redirect
+   rules from an Agent session; ask the owner to do it and report back.
+5. After the owner confirms the custom domain, certificate, and redirects are
+   active, verify mechanically:
+
+   ```text
+   node site/release/scripts/release.mjs verify https://vibehub.team
+   node site/release/scripts/release.mjs verify-redirects
+   ```
+
+   `verify-redirects` requires HTTP and HTTPS requests to `www.vibehub.team`,
+   `vibehub.icu`, `www.vibehub.icu`, `vibehub.systems`, and
+   `www.vibehub.systems` to permanently redirect to the canonical apex with
+   the exact path and query preserved.
 6. Record acceptance-linked VibeHub Evidence with the source commit, Pages
    project, immutable deployment URL, domain state, and successful checks.
    Never record credentials, cookies, authorization headers, OAuth state, or
@@ -83,7 +95,7 @@ Rollback is another production mutation. After explicit authorization, use
 Cloudflare Pages deployment rollback for the previous known-successful
 production deployment, or redeploy the exact prior committed build if rollback
 is unavailable. Do not change DNS. Verify both the immutable deployment and
-`https://vibehub.icu`, then record new Evidence describing the rollback.
+`https://vibehub.team`, then record new Evidence describing the rollback.
 
 ## Stop conditions
 

@@ -1,0 +1,58 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "team-is-the-only-canonical-url",
+      "criterion": "release.mjs, SKILL.md, package.json release scripts, README.md, robots.txt, sitemap.xml, and the product Room intent name https://vibehub.team as canonical; no vibehub.icu reference remains except as a documented redirect-only host."
+    },
+    {
+      "acceptance_id": "all-redirect-hosts-are-verified",
+      "criterion": "A single verify-redirects command (replacing verify-www) checks http and https for vibehub.icu, www.vibehub.icu, vibehub.systems, www.vibehub.systems, and www.vibehub.team, requiring a 301/308 to https://vibehub.team with the exact path and query preserved, and the build-artifact sitemap check rejects every redirect-only hostname."
+    },
+    {
+      "acceptance_id": "preflight-passes-locally",
+      "criterion": "node site/release/scripts/release.mjs preflight succeeds with NEXT_PUBLIC_SITE_URL=https://vibehub.team, and site/tests pass."
+    },
+    {
+      "acceptance_id": "owner-dns-steps-are-explicit",
+      "criterion": "SKILL.md states that DNS, Pages custom-domain binding, and redirect rules for the three domains are owner-performed Cloudflare actions, lists the exact read-only inspection and verification commands the Agent runs afterwards, and keeps the existing stop conditions."
+    }
+  ],
+  "constraints": [
+    "Do not create a second Pages project, Worker, CI deploy job, or change DNS from code.",
+    "Do not perform the production deploy or any Cloudflare mutation inside this Ticket.",
+    "Keep credentials, OAuth state, and DNS validation values out of Git."
+  ],
+  "context": "The owner decided on 2026-08-23 that vibehub.team replaces vibehub.icu as the canonical production hostname, with vibehub.systems as an additional redirect-only domain. Today site/release/scripts/release.mjs, site/release/SKILL.md, site/package.json, site/README.md, site/public/robots.txt, site/public/sitemap.xml, and the product Room intent all hardcode vibehub.icu and only check the single www.vibehub.icu redirect. Neither new domain resolves yet; the owner performs DNS, Pages custom-domain binding, and certificate activation manually in Cloudflare. There is no CI auto-deploy for the site and none is added; publishing stays the manual wrangler direct upload from a clean commit.",
+  "context_refs": [
+    {
+      "purpose": "Durable intent for reproducible site release that must be amended to name the new canonical hostname.",
+      "ref": ".vibehub/rooms/product/intent-reproducible-public-site-release.yaml"
+    },
+    {
+      "purpose": "Release Skill and mechanical checks that currently hardcode vibehub.icu.",
+      "ref": "site/release/SKILL.md"
+    },
+    {
+      "purpose": "Release script: canonicalUrl, preflight, verify, verify-www.",
+      "ref": "site/release/scripts/release.mjs"
+    },
+    {
+      "purpose": "Prior hostname decision and discovery this decision supersedes.",
+      "ref": ".vibehub/tickets/ticket-decide-public-site-cloudflare-hostname.yaml"
+    },
+    {
+      "purpose": "Prior domain discovery and www redirect verification pattern.",
+      "ref": ".vibehub/tickets/ticket-complete-public-domain-discovery.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The public-site release workflow treats https://vibehub.team as the single canonical hostname, and vibehub.icu, vibehub.systems, and all www hostnames are verified as permanent path-and-query-preserving redirects to it.",
+  "provenance_refs": [
+    "conversation:2026-08-23-owner-chooses-vibehub-team-canonical"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
+}

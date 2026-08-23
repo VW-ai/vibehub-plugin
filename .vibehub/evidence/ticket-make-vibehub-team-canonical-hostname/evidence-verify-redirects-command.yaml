@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "all-redirect-hosts-are-verified"
+  ],
+  "evidence_id": "evidence-verify-redirects-command",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T09:06:15Z",
+  "refs": [
+    "git:eae2e6ab45c7aa8e46412069f292c17b4b931fd6",
+    "site/release/scripts/release.mjs",
+    "site/tests/rendered-html.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "verify-www replaced by verify-redirects iterating redirectHosts (www.vibehub.team, vibehub.icu, www.vibehub.icu, vibehub.systems, www.vibehub.systems) over http and https, asserting 301/308 and exact path+query at https://vibehub.team; checkConfiguration and verify reject every redirect host in sitemap.xml; the test suite regex rejects all redirect hosts. Run against unbound DNS it fails explicitly with ENOTFOUND per hostname (commit eae2e6a).",
+  "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
+}

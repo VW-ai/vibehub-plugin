@@ -14,8 +14,8 @@
     "release:check": "node release/scripts/release.mjs check",
     "release:preflight": "node release/scripts/release.mjs preflight",
     "release:deploy": "node release/scripts/release.mjs deploy",
-    "release:verify": "node release/scripts/release.mjs verify https://vibehub.icu",
-    "release:verify-www": "node release/scripts/release.mjs verify-www"
+    "release:verify": "node release/scripts/release.mjs verify https://vibehub.team",
+    "release:verify-redirects": "node release/scripts/release.mjs verify-redirects"
   },
   "dependencies": {
     "next": "16.2.6",
