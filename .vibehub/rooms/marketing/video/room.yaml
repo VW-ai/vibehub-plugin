@@ -2,7 +2,7 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "17e34928c6594b14399003a92129a8cd17c3e7c2",
+        "blob": "103b5604be1dab17e4138e1668a547dc124237d5",
         "path": "assets/video/README.md"
       },
       {
@@ -10,12 +10,20 @@
         "path": "assets/video/STORYBOARD.md"
       },
       {
-        "blob": "ad264af6e7a5dab4f8bb2fe969b27c22e3f3fa2c",
+        "blob": "c4e5ccd5790bace0b2bffa10e687362bcf9e6458",
+        "path": "assets/video/audio/.gitignore"
+      },
+      {
+        "blob": "afdd19edb05a1ebb9eeefe066d5579cce32f3017",
         "path": "assets/video/audio/README.md"
       },
       {
-        "blob": "10153cd3c392fdff15740844f5d427d4fa626d89",
-        "path": "assets/video/audio/bach-goldberg-aria.ogg"
+        "blob": "2a0f006eb0ef5592ce2d3cf34b05773a375eea1a",
+        "path": "assets/video/audio/bach-goldberg-aria.ogg.dvc"
+      },
+      {
+        "blob": "1d1b723e5b4ac5576b1d66883cb199e5ecc6cbd6",
+        "path": "assets/video/audio/fetch.sh"
       },
       {
         "blob": "30231f62244c34c150d9f896fe868343adea75a5",
@@ -26,12 +34,32 @@
         "path": "assets/video/audio/mix-taskstory.sh"
       },
       {
-        "blob": "edd9b79b6e00fab8451fe9178061b52c240b2300",
-        "path": "assets/video/audio/schubert-impromptu-gflat.ogg"
+        "blob": "fef430487a6aa388a397aa40cbe6eadf56a53cb4",
+        "path": "assets/video/audio/schubert-impromptu-gflat.ogg.dvc"
       },
       {
         "blob": "ca3e6c73d2a51e60a5d33841a62d9efeb89fd5ea",
         "path": "assets/video/demo-onboarding.tar.gz"
+      },
+      {
+        "blob": "395a1490468d6302481551654b410298e9521f8c",
+        "path": "assets/video/glance-portrait/assets/wb.mp4"
+      },
+      {
+        "blob": "dc9ec2eb28c67a93113c201a65a3155a19915d7c",
+        "path": "assets/video/glance-portrait/hyperframes.json"
+      },
+      {
+        "blob": "f28362bbb6f474a3ddf37ad44468e34cb61423c6",
+        "path": "assets/video/glance-portrait/index.html"
+      },
+      {
+        "blob": "5514b40cbc9e8b51dcb577ea3fd9e0f740b4bd8f",
+        "path": "assets/video/glance-portrait/meta.json"
+      },
+      {
+        "blob": "ec874d68240beee80e884de132c466c5f7df5c59",
+        "path": "assets/video/glance-portrait/package.json"
       },
       {
         "blob": "395a1490468d6302481551654b410298e9521f8c",
@@ -54,12 +82,76 @@
         "path": "assets/video/glance/package.json"
       },
       {
-        "blob": "50d38829c1f7971b3b846b0a12c1620ca8455e7b",
-        "path": "assets/video/renders/glance-v4.mp4"
+        "blob": "6e6672068d9c5b7772b3845f0e21c5e2ce86491f",
+        "path": "assets/video/renders/.gitignore"
       },
       {
-        "blob": "de367d35f459707c295a15a3973dc2cee2362202",
-        "path": "assets/video/renders/taskstory-v7.mp4"
+        "blob": "d2fe64cb4d56bbc487c558424d1030d3f59bcd44",
+        "path": "assets/video/renders/MANIFEST.md"
+      },
+      {
+        "blob": "948d3a1a4e3d844ddfea3d9de3f3b331aa7d013e",
+        "path": "assets/video/renders/glance-portrait-v1.mp4.dvc"
+      },
+      {
+        "blob": "de516e262ca3a6edbca8f893a26f9f626b90a722",
+        "path": "assets/video/renders/glance-v4.mp4.dvc"
+      },
+      {
+        "blob": "ff7c30224a97b82f86d561c2c737a4714a29cbd7",
+        "path": "assets/video/renders/taskstory-portrait-v1.mp4.dvc"
+      },
+      {
+        "blob": "263b7fbcc4b893e66f541dc8115447a4ea709e88",
+        "path": "assets/video/renders/taskstory-v7.mp4.dvc"
+      },
+      {
+        "blob": "84cf294f8198bb13b0471391c3ca27728eb41968",
+        "path": "assets/video/taskstory-portrait/assets/fit.mp4"
+      },
+      {
+        "blob": "88dc7450b144f0d94d955733d214c82205b68845",
+        "path": "assets/video/taskstory-portrait/assets/logos/anthropic.svg"
+      },
+      {
+        "blob": "29bb61bb9eed5694d5e59cb8e15524f2a709e339",
+        "path": "assets/video/taskstory-portrait/assets/logos/claude.svg"
+      },
+      {
+        "blob": "14085aac899f79f6cf0a19a618acbf7be3864cef",
+        "path": "assets/video/taskstory-portrait/assets/logos/cursor.svg"
+      },
+      {
+        "blob": "81920ca332522d9e2bdb4110f95c9bc1b0d3fc16",
+        "path": "assets/video/taskstory-portrait/assets/logos/github.svg"
+      },
+      {
+        "blob": "e15e53ce01fecd30937474f51dcb55a32b186e1b",
+        "path": "assets/video/taskstory-portrait/assets/logos/googlegemini.svg"
+      },
+      {
+        "blob": "a8ab1198d73caf061e3110735c36a8cf60166889",
+        "path": "assets/video/taskstory-portrait/assets/logos/kimi.svg"
+      },
+      {
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "path": "assets/video/taskstory-portrait/assets/logos/openai.svg"
+      },
+      {
+        "blob": "dc9ec2eb28c67a93113c201a65a3155a19915d7c",
+        "path": "assets/video/taskstory-portrait/hyperframes.json"
+      },
+      {
+        "blob": "8b1db475dcf64c6009807f4927a7088225753c7c",
+        "path": "assets/video/taskstory-portrait/index.html"
+      },
+      {
+        "blob": "5514b40cbc9e8b51dcb577ea3fd9e0f740b4bd8f",
+        "path": "assets/video/taskstory-portrait/meta.json"
+      },
+      {
+        "blob": "ec874d68240beee80e884de132c466c5f7df5c59",
+        "path": "assets/video/taskstory-portrait/package.json"
       },
       {
         "blob": "84cf294f8198bb13b0471391c3ca27728eb41968",
@@ -110,8 +202,8 @@
         "path": "assets/video/taskstory/package.json"
       }
     ],
-    "checked_at": "2026-08-23T08:14:02.684Z",
-    "last_aligned_commit": "4c1008916c555ca762bd2357f42eaadded73e643"
+    "checked_at": "2026-08-23T09:32:06.616Z",
+    "last_aligned_commit": "17aa7f206b9fbaa1e39f68e7705ad067b7855d48"
   },
   "anchors": [
     "assets/video/"
