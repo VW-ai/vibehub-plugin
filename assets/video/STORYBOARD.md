@@ -2,14 +2,15 @@
 
 Rules: one proposition per clip · hook ≤3s · the Task never leaves the centre of frame · only Workbench tokens · final frames are the real UI.
 
-## #1 Glance — functional (22.3s) `glance/`
+## #1 Glance — functional (25s) `glance/`
 | t | beat | on screen |
 |---|------|-----------|
 | 0–2.4 | install | `❯ /plugin install vibehub` typed on the Workbench canvas |
 | 2.4–10 | you talk | Claude Code-style chat (you → agent asks → "I approve the email copy myself"); on the right, three Tickets form one by one with their Context source; the third is NEEDS YOU |
 | 10–12.5 | one sentence | `❯ Start this with VibeHub.` — "Then you say one thing." |
-| 12.5–19.3 | glance | real Workbench: graph → click DONE ticket → Contract; camera pushes to "6 acceptance conditions · 6/6 accepted · Independent Outcome recorded" |
-| 19.3–22.3 | end | Manage the task. VibeHub manages the rest. · /plugin install vibehub |
+| 12.5–19 | glance | real Workbench of the demo repo: graph → click `ticket-verify-email-step` (DONE) → Contract; camera pushes to "3 acceptance conditions · 3/3 accepted · Independent Outcome recorded" — "And you know exactly where it is." |
+| 19–22 | waiting for you | camera pulls back; click `ticket-welcome-email-copy` → NEEDS YOU · Respond · human-authority criterion awaits human-origin Evidence — "…and where it is waiting for you." |
+| 22–25 | end | Manage the task. VibeHub manages the rest. · /plugin install vibehub |
 
 ## #2 Task story — narrative (26.6s) `taskstory/`
 | t | beat | on screen |

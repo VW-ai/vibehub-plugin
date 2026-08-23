@@ -2,15 +2,19 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "06732ec696b4d8e8346b0af263bf492278cbfee2",
+        "blob": "aec9d67b4d733e2b11b31f4650c5f5d9d756b661",
         "path": "assets/video/README.md"
       },
       {
-        "blob": "94cb80c57b6eea37a6e1cc152cc5af6a4d754532",
+        "blob": "e7dc23fc22d94241cb62bd6333a0ce51835eb802",
         "path": "assets/video/STORYBOARD.md"
       },
       {
-        "blob": "49b935e128d318a3317644c38248b2e45af63837",
+        "blob": "ca3e6c73d2a51e60a5d33841a62d9efeb89fd5ea",
+        "path": "assets/video/demo-onboarding.tar.gz"
+      },
+      {
+        "blob": "395a1490468d6302481551654b410298e9521f8c",
         "path": "assets/video/glance/assets/wb.mp4"
       },
       {
@@ -18,7 +22,7 @@
         "path": "assets/video/glance/hyperframes.json"
       },
       {
-        "blob": "2f4d1d8cd6963a45656c6f756e833ea6ae3e9470",
+        "blob": "fe6b77863db48da170405955210e4bbdd018ddac",
         "path": "assets/video/glance/index.html"
       },
       {
@@ -30,8 +34,8 @@
         "path": "assets/video/glance/package.json"
       },
       {
-        "blob": "2ae3d62f7b82c4bdccd1761478c06ae4442d7cac",
-        "path": "assets/video/renders/glance-v2.mp4"
+        "blob": "b9ff2897f41dfc8bff77d10c8d51754030c292ae",
+        "path": "assets/video/renders/glance-v3.mp4"
       },
       {
         "blob": "35e32202216ccdab240ce22dc14c5ddfd9373a07",
@@ -86,8 +90,8 @@
         "path": "assets/video/taskstory/package.json"
       }
     ],
-    "checked_at": "2026-08-23T07:01:37.792Z",
-    "last_aligned_commit": "bfde86906c17580812286420cf12e80f10e44961"
+    "checked_at": "2026-08-23T07:09:48.853Z",
+    "last_aligned_commit": "ba21fe159325ee5b0e3e5a8cd7efe164d3727506"
   },
   "anchors": [
     "assets/video/"

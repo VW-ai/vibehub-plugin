@@ -1,0 +1,39 @@
+{
+  "context_id": "change-glance-footage-from-demo-onboarding-repo",
+  "detail": "assets/video/demo-onboarding.tar.gz is a tiny acme-app with .vibehub rooms auth/ and dashboard/, two decision Contexts captured from the scoping conversation shown in the clip, and tickets ticket-verify-email-step (DONE, 3/3 accepted), ticket-dashboard-first-run (DONE) and ticket-welcome-email-copy (READY · NEEDS YOU — its copy-approved criterion has human authority and awaits human-origin Evidence). glance v3 (25s) records that Workbench: push-in on the 3/3 Contract, pull back, click the NEEDS YOU ticket. The remaining gap for #1 is audio only. Recorded 2026-08-23.",
+  "evidence": [
+    {
+      "note": "The demo repository with its Git history, tickets, evidence and outcomes.",
+      "ref": "assets/video/demo-onboarding.tar.gz"
+    },
+    {
+      "note": "Render using the new footage.",
+      "ref": "assets/video/renders/glance-v3.mp4"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "change-video-sources-checked-in-under-assets-video",
+      "type": "supersedes"
+    },
+    {
+      "target_context_id": "intent-two-launch-videos",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-23T03:10:00Z",
+    "ref": "conversation:2026-08-23-demo-repo-footage"
+  },
+  "state": "active",
+  "summary": "Clip #1 footage now comes from a real demo repository whose three onboarding tickets were planned, run, evidenced and closed out with VibeHub, so the chat beat and the Workbench beat tell the same story",
+  "tags": [
+    "video",
+    "footage",
+    "demo-repo",
+    "glance"
+  ],
+  "type": "change"
+}
