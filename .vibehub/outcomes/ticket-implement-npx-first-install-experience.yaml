@@ -4,23 +4,23 @@
     "all-live-references-repointed",
     "skills-sh-install-works-end-to-end",
     "marketplace-bundles-ship-the-same-layout",
-    "setup-offers-github-mirror-once"
+    "setup-offers-github-mirror-once",
+    "install-docs-lead-with-one-line"
   ],
-  "closed_at": "2026-08-23T04:10:00Z",
+  "closed_at": "2026-08-23T04:40:00Z",
   "evidence_ids": [
     "core-folder-relocation",
     "references-repointed-suite-green",
     "skills-sh-e2e-both-hosts",
     "artifact-and-marketplace-tests",
     "setup-mirror-step-and-templates",
-    "readme-and-install-docs"
+    "readme-and-install-docs",
+    "install-docs-mirror-paragraph-and-prose-restored"
   ],
   "kind": "ticket_outcome",
   "schema_version": 1,
-  "status": "partial",
-  "summary": "Independent adjudication at HEAD fc698c1. Reproduced: npm test 142/142; npm run verify:artifact ok (65 files); project validate valid (91 tickets); grep over skills/, scripts/, test/, docs/INSTALL.md, docs/LOCAL_GRAPH_DESIGN.md, and both manifests leaves only vh.mjs's own ../contracts loads and test imports of the repo's top-level scripts/ (not skills/scripts); skills/scripts and skills/contracts are gone; vibehub-core SKILL.md describes itself as shared helper not invoked directly; ticket-lifecycle.json planning_contracts points at ../../vibehub-core/contracts; README is 52 lines and leads with npx skills add; setup SKILL.md step lists the exact five-file copy and tests cover template equality and a no-plugin scratch projection. Re-ran skills.sh end to end in a fresh scratch dir: claude-code and codex each copied 12 folders including vibehub-core, the helper ran project init and validate through .claude/skills/vibehub-ticket-plan/../vibehub-core/scripts/vh.mjs, templates/github arrived, and copied SKILL.md files have no dangling ../scripts or ../contracts references. Five criteria accepted. Unresolved install-docs-lead-with-one-line: docs/INSTALL.md covers the skills.sh path, the vibehub-core folder, and the install-all caveat, but contains no description of the setup-time GitHub Issues mirror option (grep -i mirror finds nothing), contrary to Evidence readme-and-install-docs. Constraint deviation recorded: beyond context_refs, the relocation also rewrote prose in three pre-existing Tickets (ticket-propose-npx-first-install-experience criterion and context, ticket-room-taxonomy-foundation criterion, ticket-vibehub-cli context), substituting skills/vibehub-core/... into historical text; the propose Ticket's context now states skills.sh omits skills/vibehub-core/scripts because it carries no SKILL.md, which is false after the move, so historical meaning was altered. Follow-up: add the mirror option paragraph to docs/INSTALL.md and restore the three Tickets' prose to the original paths.",
+  "status": "successful",
+  "summary": "Independent re-adjudication from scratch at HEAD d1419e1 after the partial Outcome at fc698c1. Reproduced: npm test 142/142; npm run verify:artifact ok; project validate valid (91 tickets, 257 evidence); grep over skills/, scripts/, test/, docs/INSTALL.md, docs/LOCAL_GRAPH_DESIGN.md, and both plugin manifests leaves only vh.mjs's own ../contracts loads; skills/scripts and skills/contracts do not exist; skills/vibehub-core/SKILL.md describes itself as the shared helper and contracts never invoked directly with scripts/, contracts/, and templates/github/ present; ticket-lifecycle.json planning_contracts points at ../../vibehub-core/contracts/dependency-hygiene.json and verify-plugin-artifact asserts it; README is 52 lines and leads with npx skills add VW-ai/vibehub-plugin with marketplace commands retained; docs/INSTALL.md now covers the skills.sh path, the vibehub-core folder, the install-all caveat, and the setup-time mirror option (lines 81-83); setup SKILL.md asks once on github.com origin and lists the exact five-file copy, with tests proving template equality and a no-plugin scratch projection. skills.sh end to end re-run earlier in this closeout in a fresh scratch dir (local path form, claude-code and codex): 12 folders each including vibehub-core, helper ran project init and validate through the copied relative path, templates arrived, no dangling refs; the checked-in transcript matches. Constraints: git diff 751d768 -- .vibehub/tickets now changes only context_refs paths in the 26 pre-existing Tickets (zero non-ref line changes outside the implement Ticket's own rewrite), so the prior deviation is resolved; vh.mjs content unchanged by the move (rename with 0 diff lines); no npm publish, CLI, daemon, or MCP server added; installer tests ran only in scratch directories. All six criteria accepted on reproducible evidence.",
   "ticket_id": "ticket-implement-npx-first-install-experience",
-  "unresolved_acceptance_ids": [
-    "install-docs-lead-with-one-line"
-  ]
+  "unresolved_acceptance_ids": []
 }
