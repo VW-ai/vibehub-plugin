@@ -103,8 +103,6 @@
     "thread/fork",
     "thread/archive",
     "thread/resume",
-    "thread/fork",
-    "thread/archive",
     "thread/unarchive",
     "thread/list",
     "thread/read",
@@ -114,10 +112,13 @@
     "threadSection/update",
     "threadSection/delete",
     "thread/name/set",
+    "thread/compact/start",
     "thread/delete",
     "turn/start",
     "turn/steer",
     "turn/interrupt",
+    "model/list",
+    "fuzzyFileSearch",
     "skills/list"
   ],
   "requiredServerRequests": [
@@ -131,6 +132,10 @@
     "thread/status/changed",
     "turn/started",
     "turn/completed",
+    "thread/settings/updated",
+    "thread/tokenUsage/updated",
+    "thread/name/updated",
+    "thread/compacted",
     "turn/plan/updated",
     "turn/diff/updated",
     "item/started",
@@ -151,8 +156,21 @@
     "mcpToolCall",
     "plan",
     "image",
-    "localImage"
+    "localImage",
+    "contextCompaction"
   ],
+  "stableTurnInputs": ["text", "image", "localImage", "audio", "localAudio", "skill", "mention"],
+  "dailyUseSeams": {
+    "provenAt": "rust-v0.149.0 codex-rs/app-server/src (bespoke_event_handling.rs, request_processors/thread_processor.rs, request_processors/token_usage_replay.rs, request_processors/thread_processor.rs thread_compact_start_inner, models.rs, fuzzy_file_search.rs) and codex-rs/core/src/session/turn_input.rs",
+    "thread/settings/updated": "sent only when a turn/start or turn/steer carries changed settings overrides (core ThreadSettingsApplied, app-server note_thread_settings); the effective model, reasoningEffort, approvalPolicy and sandbox of a Thread are read from the thread/start and thread/resume responses",
+    "thread/tokenUsage/updated": "sent on every core TokenCount inside a Turn, so the last update of a Turn lands before its turn/completed; replayed connection-scoped on thread/resume",
+    "thread/name/updated": "sent after the thread/name/set response, carrying threadName",
+    "thread/compacted": "pinned for schema presence only: the 0.149.0 v2 path drops EventMsg::ContextCompacted and the contextCompaction ThreadItem inside the compaction Turn is the canonical signal",
+    "thread/compact/start": "submits Op::Compact without a liveness check and core replaces the running task, so the host refuses it while a Turn is live",
+    "model/list": "excludes hidden models unless includeHidden; the host filters hidden again",
+    "turn/start": "model, effort, approvalPolicy and sandboxPolicy override this Turn and subsequent Turns",
+    "followUpQueue": "thread/queue/* stays experimental and unpinned; the follow-up queue is host-owned transient session state"
+  },
   "audio": {
     "stableTurnInputs": ["audio", "localAudio"],
     "experimentalRequests": [

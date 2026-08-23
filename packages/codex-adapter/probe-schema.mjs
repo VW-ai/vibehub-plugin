@@ -27,6 +27,17 @@ function sha256(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
+// The `type` discriminators of a tagged union such as UserInput or ThreadItem.
+function variantTypes(definition) {
+  const types = new Set();
+  for (const variant of definition?.oneOf ?? definition?.anyOf ?? []) {
+    const type = variant?.properties?.type;
+    if (typeof type?.const === "string") types.add(type.const);
+    for (const item of type?.enum ?? []) if (typeof item === "string") types.add(item);
+  }
+  return types;
+}
+
 export function probeCodexSchema({ codex = "codex" } = {}) {
   const temp = mkdtempSync(join(tmpdir(), "vibehub-codex-schema-"));
   try {
@@ -40,12 +51,19 @@ export function probeCodexSchema({ codex = "codex" } = {}) {
     const serverRequestMethods = methodNames(serverRequest);
     const notificationMethods = methodNames(notification);
     const protocolText = readFileSync(protocolPath, "utf8");
+    const protocol = JSON.parse(protocolText);
+    // Turn inputs are proven as UserInput variants and capability items as
+    // ThreadItem or UserInput variants of the generated v2 protocol, never by
+    // a bare string match.
+    const userInputTypes = variantTypes(protocol.definitions?.UserInput);
+    const threadItemTypes = variantTypes(protocol.definitions?.ThreadItem);
     const checks = [
       ...lock.requiredRequests.map((method) => ({ kind: "request", method, proven: clientMethods.has(method) })),
       ...lock.requiredServerRequests.map((method) => ({ kind: "server-request", method, proven: serverRequestMethods.has(method) })),
       ...lock.requiredNotifications.map((method) => ({ kind: "notification", method, proven: notificationMethods.has(method) })),
-      ...lock.audio.stableTurnInputs.map((type) => ({ kind: "audio-input", method: type, proven: protocolText.includes(`"${type}"`) })),
-      ...lock.capabilityItems.map((type) => ({ kind: "capability-item", method: type, proven: protocolText.includes(`"${type}"`) })),
+      ...lock.audio.stableTurnInputs.map((type) => ({ kind: "audio-input", method: type, proven: userInputTypes.has(type) })),
+      ...lock.stableTurnInputs.map((type) => ({ kind: "turn-input", method: type, proven: userInputTypes.has(type) })),
+      ...lock.capabilityItems.map((type) => ({ kind: "capability-item", method: type, proven: threadItemTypes.has(type) || userInputTypes.has(type) })),
     ];
     const schemaSha256 = sha256(protocolPath);
     checks.push({ kind: "schema", method: "protocol-sha256", proven: schemaSha256 === lock.codex.protocolSchemaSha256 });

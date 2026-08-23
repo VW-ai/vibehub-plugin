@@ -9,6 +9,10 @@
     "thread/status/changed": "reconcile",
     "turn/started": "render",
     "turn/completed": "reconcile",
+    "thread/settings/updated": "consumed-host-thread-settings",
+    "thread/tokenUsage/updated": "consumed-context-indicator",
+    "thread/name/updated": "consumed-sidebar-name",
+    "thread/compacted": "consumed-deprecated-item-authoritative",
     "turn/plan/updated": "render",
     "turn/diff/updated": "render",
     "item/started": "render",
@@ -38,5 +42,11 @@
     "item/tool/call": "truthful-unsupported-result-immediate",
     "unknown": "json-rpc-method-not-found-immediate"
   },
-  "rule": "No pinned protocol event may disappear silently. Replay from thread/read remains authoritative after every reconcile path."
+  "rule": "No pinned protocol event may disappear silently. Replay from thread/read remains authoritative after every reconcile path.",
+  "consumed": {
+    "thread/settings/updated": "The host keeps one settings record per Thread from the thread/start and thread/resume responses and overwrites it from threadSettings.model, effort, approvalPolicy and sandboxPolicy; forwarded to the browser unchanged. Sent by 0.149.0 only when a turn/start or turn/steer carried changed overrides.",
+    "thread/tokenUsage/updated": "Forwarded unchanged; the browser derives the context indicator from tokenUsage.total.totalTokens against tokenUsage.modelContextWindow, which stays null-aware. Sent inside a Turn before its turn/completed and replayed on thread/resume.",
+    "thread/name/updated": "Forwarded unchanged after thread/name/set; the browser applies threadName (nullable) to the sidebar without a refresh.",
+    "thread/compacted": "Forwarded if ever sent, but the 0.149.0 v2 path drops it; the contextCompaction ThreadItem carried by the compaction Turn is what the transcript renders as the boundary row."
+  }
 }
