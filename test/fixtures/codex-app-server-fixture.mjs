@@ -32,8 +32,41 @@
 //                                test can prove restart exhaustion;
 //   CODEX_FIXTURE_AUTH=unavailable   make account/read fail;
 //   CODEX_FIXTURE_DROP_METHODS=a,b   answer those methods with -32601.
+//
+// Daily-use parity knobs, all off by default:
+//   CODEX_FIXTURE_COMPLETE_ON_APPROVAL=1  answering a Turn's approval request
+//                                finishes that Turn: one agentMessage item,
+//                                thread/tokenUsage/updated, then turn/completed
+//                                (status completed). Without it the fixture
+//                                never finishes a Turn on its own;
+//   CODEX_FIXTURE_CONTEXT_WINDOW=<int>|null  the modelContextWindow reported by
+//                                thread/tokenUsage/updated (default 272000;
+//                                `null` reports the nullable variant);
+//   CODEX_FIXTURE_SKILLS=<json>  the SkillMetadata records skills/list returns
+//                                for every cwd asked;
+//   CODEX_FIXTURE_LOG_NOTIFICATIONS=1  also append every outbound notification
+//                                and server request to CODEX_FIXTURE_LOG, so a
+//                                proof can order turn/start requests against
+//                                the turn/completed notifications between them.
+//
+// What the fixture mirrors from Codex 0.149.0 (rust-v0.149.0 app-server and
+// core sources) for the daily-use seams:
+//   thread/start and thread/resume answer with the effective model,
+//   reasoningEffort, approvalPolicy and sandbox beside the Thread;
+//   thread/settings/updated is sent only when a turn/start carries settings
+//   overrides that change the Thread's settings, before that Turn's
+//   turn/started; thread/tokenUsage/updated lands inside a Turn before its
+//   turn/completed and is replayed on thread/resume; thread/compact/start runs
+//   a compaction Turn of its own whose contextCompaction item is the canonical
+//   signal (the deprecated thread/compacted notification is not sent by the
+//   0.149.0 v2 path, so the fixture does not send it either);
+//   thread/name/set answers first and then sends thread/name/updated;
+//   model/list lists the fixture's hidden model too, unlike the real server
+//   (which omits hidden presets unless includeHidden), so the host-side
+//   hidden filter is exercised by the proof.
 
-import { appendFileSync, existsSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readdirSync, readFileSync, realpathSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 import { createInterface } from "node:readline";
 
 // Only the app-server transport is impersonated; any other subcommand (for
@@ -50,7 +83,59 @@ const statePath = process.env.CODEX_FIXTURE_STATE ?? null;
 const pidPath = process.env.CODEX_FIXTURE_PIDFILE ?? null;
 const authUnavailable = process.env.CODEX_FIXTURE_AUTH === "unavailable";
 const droppedMethods = new Set((process.env.CODEX_FIXTURE_DROP_METHODS ?? "").split(",").map((entry) => entry.trim()).filter(Boolean));
+const completeOnApproval = process.env.CODEX_FIXTURE_COMPLETE_ON_APPROVAL === "1";
+const logNotifications = process.env.CODEX_FIXTURE_LOG_NOTIFICATIONS === "1";
+const contextWindow = process.env.CODEX_FIXTURE_CONTEXT_WINDOW === undefined
+  ? 272_000
+  : process.env.CODEX_FIXTURE_CONTEXT_WINDOW === "null" ? null : Number(process.env.CODEX_FIXTURE_CONTEXT_WINDOW);
 const PINNED_SECTION = Object.freeze({ id: "01984de2-8f74-7c91-a3b2-5c5e937cf318", name: "Pinned" });
+// The model catalog model/list answers with: one default model that takes
+// text and images with three efforts, one text-only model with a single
+// effort, and one hidden model a truthful picker must never show.
+const MODELS = Object.freeze([
+  {
+    id: "fixture-default",
+    model: "fixture-default",
+    displayName: "Fixture Default",
+    description: "Default fixture model that accepts text and images.",
+    hidden: false,
+    isDefault: true,
+    defaultReasoningEffort: "medium",
+    supportedReasoningEfforts: [
+      { reasoningEffort: "low", description: "Fast answers." },
+      { reasoningEffort: "medium", description: "Balanced." },
+      { reasoningEffort: "high", description: "Thorough." },
+    ],
+    inputModalities: ["text", "image"],
+  },
+  {
+    id: "fixture-text",
+    model: "fixture-text",
+    displayName: "Fixture Text Only",
+    description: "Fixture model that accepts text only.",
+    hidden: false,
+    isDefault: false,
+    defaultReasoningEffort: "medium",
+    supportedReasoningEfforts: [{ reasoningEffort: "medium", description: "Balanced." }],
+    inputModalities: ["text"],
+  },
+  {
+    id: "fixture-hidden",
+    model: "fixture-hidden",
+    displayName: "Fixture Hidden",
+    description: "Hidden fixture model that no picker may list.",
+    hidden: true,
+    isDefault: false,
+    defaultReasoningEffort: "medium",
+    supportedReasoningEfforts: [{ reasoningEffort: "medium", description: "Balanced." }],
+    inputModalities: ["text"],
+  },
+]);
+const DEFAULT_SKILLS = Object.freeze([
+  { name: "fixture-review", path: "/tmp/codex-fixture/skills/fixture-review/SKILL.md", description: "Review the current change the fixture way.", enabled: true, scope: "repo" },
+  { name: "fixture-release", path: "/tmp/codex-fixture/skills/fixture-release/SKILL.md", description: "Cut a fixture release.", enabled: true, scope: "user" },
+]);
+const skills = process.env.CODEX_FIXTURE_SKILLS ? JSON.parse(process.env.CODEX_FIXTURE_SKILLS) : [...DEFAULT_SKILLS];
 const threads = new Map();
 const sections = new Map();
 let counter = 0;
@@ -89,6 +174,152 @@ function requireSection(sectionId) {
   return section;
 }
 
+// thread/start and thread/resume take a SandboxMode string and answer with
+// the effective SandboxPolicy object, the way the real server does.
+function sandboxPolicyFromMode(mode) {
+  if (mode === "read-only") return { type: "readOnly", networkAccess: false };
+  if (mode === "danger-full-access") return { type: "dangerFullAccess" };
+  return { type: "workspaceWrite", networkAccess: false, excludeSlashTmp: false, excludeTmpdirEnvVar: false, writableRoots: [] };
+}
+
+function defaultSettings(params) {
+  return {
+    model: params?.model ?? MODELS[0].model,
+    effort: MODELS[0].defaultReasoningEffort,
+    approvalPolicy: params?.approvalPolicy ?? "on-request",
+    sandboxPolicy: sandboxPolicyFromMode(params?.sandbox ?? "workspace-write"),
+  };
+}
+
+function threadSettingsRecord(thread) {
+  return {
+    model: thread.settings.model,
+    effort: thread.settings.effort,
+    approvalPolicy: thread.settings.approvalPolicy,
+    sandboxPolicy: thread.settings.sandboxPolicy,
+    modelProvider: "fixture",
+    cwd: thread.cwd,
+    approvalsReviewer: "user",
+    collaborationMode: { mode: "default", settings: { model: thread.settings.model, reasoning_effort: thread.settings.effort } },
+  };
+}
+
+// The effective settings beside the Thread in a thread/start or
+// thread/resume response (ThreadStartResponse model, reasoningEffort,
+// approvalPolicy, sandbox).
+function threadStartResponse(thread) {
+  return {
+    thread: threadRecord(thread),
+    model: thread.settings.model,
+    modelProvider: "fixture",
+    reasoningEffort: thread.settings.effort,
+    approvalPolicy: thread.settings.approvalPolicy,
+    sandbox: thread.settings.sandboxPolicy,
+    cwd: thread.cwd,
+  };
+}
+
+function tokenUsage(thread) {
+  const usage = thread.tokens ?? { total: 0, last: 0 };
+  const breakdown = (total) => ({ totalTokens: total, inputTokens: Math.max(total - 150, 0), cachedInputTokens: 0, outputTokens: Math.min(total, 150), reasoningOutputTokens: 0 });
+  return { total: breakdown(usage.total), last: breakdown(usage.last), modelContextWindow: contextWindow };
+}
+
+function sendTokenUsage(thread, turnId) {
+  send({ method: "thread/tokenUsage/updated", params: { threadId: thread.id, turnId, tokenUsage: tokenUsage(thread) } });
+}
+
+// Applies turn/start settings overrides to the Thread and, when they change
+// its effective settings, broadcasts thread/settings/updated (the server
+// sends it only on an effective change).
+function applyTurnSettings(thread, params) {
+  const next = {
+    model: params?.model ?? thread.settings.model,
+    effort: params?.effort === undefined ? thread.settings.effort : params.effort,
+    approvalPolicy: params?.approvalPolicy ?? thread.settings.approvalPolicy,
+    sandboxPolicy: params?.sandboxPolicy ?? thread.settings.sandboxPolicy,
+  };
+  const changed = JSON.stringify(next) !== JSON.stringify(thread.settings);
+  thread.settings = next;
+  if (changed) send({ method: "thread/settings/updated", params: { threadId: thread.id, threadSettings: threadSettingsRecord(thread) } });
+}
+
+function completeTurn(thread, turn, items) {
+  for (const item of items) {
+    send({ method: "item/started", params: { threadId: thread.id, turnId: turn.id, item } });
+    turn.items.push(item);
+    send({ method: "item/completed", params: { threadId: thread.id, turnId: turn.id, item, completedAtMs: Date.now() } });
+  }
+  sendTokenUsage(thread, turn.id);
+  turn.status = "completed";
+  thread.status = { type: "idle" };
+  thread.updatedAt = now();
+  send({ method: "turn/completed", params: { threadId: thread.id, turn } });
+  persist();
+}
+
+// A bounded walk of the search roots for fuzzyFileSearch: every file and
+// directory path relative to its root, .git and node_modules excluded.
+function walkRoot(root, limit = 5_000) {
+  const entries = [];
+  const visit = (folder) => {
+    if (entries.length >= limit) return;
+    let names;
+    try {
+      names = readdirSync(folder, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of names) {
+      if (entries.length >= limit) return;
+      if (entry.name === ".git" || entry.name === "node_modules") continue;
+      const absolute = join(folder, entry.name);
+      const path = relative(root, absolute).split(sep).join("/");
+      if (entry.isDirectory()) {
+        entries.push({ path, fileName: entry.name, matchType: "directory" });
+        visit(absolute);
+      } else entries.push({ path, fileName: entry.name, matchType: "file" });
+    }
+  };
+  visit(root);
+  return entries;
+}
+
+// Case-insensitive subsequence match over the relative path; the score
+// rewards a short span and a file-name hit, and indices name the matched
+// characters the way the real search reports them.
+function fuzzyMatch(query, path, fileName) {
+  const haystack = path.toLowerCase();
+  const needle = query.toLowerCase();
+  const indices = [];
+  let position = 0;
+  for (const character of needle) {
+    const index = haystack.indexOf(character, position);
+    if (index === -1) return null;
+    indices.push(index);
+    position = index + 1;
+  }
+  const span = indices.length ? indices.at(-1) - indices[0] + 1 : 0;
+  const score = Math.max(1, 1_000 - span * 10 - path.length + (fileName.toLowerCase().includes(needle) ? 500 : 0));
+  return { score, indices };
+}
+
+function fuzzyFileSearch(params) {
+  const query = String(params?.query ?? "");
+  const files = [];
+  for (const root of params?.roots ?? []) {
+    const resolvedRoot = realFolder(root) ?? root;
+    if (!existsSync(resolvedRoot) || !statSync(resolvedRoot).isDirectory()) continue;
+    for (const entry of walkRoot(resolvedRoot)) {
+      const match = query ? fuzzyMatch(query, entry.path, entry.fileName) : { score: 1, indices: [] };
+      if (!match) continue;
+      files.push({ root: resolvedRoot, path: entry.path, file_name: entry.fileName, match_type: entry.matchType, score: match.score, indices: match.indices });
+    }
+  }
+  files.sort((left, right) => right.score - left.score || left.path.localeCompare(right.path));
+  return { files: files.slice(0, 50) };
+}
+
 function seed() {
   const raw = process.env.CODEX_FIXTURE_SEED;
   if (!raw) return;
@@ -108,6 +339,8 @@ function seed() {
       archived: Boolean(entry.archived),
       turns: [],
       policy: { approvalPolicy: null, sandbox: null },
+      settings: defaultSettings(null),
+      tokens: { total: 0, last: 0 },
     };
     threads.set(thread.id, thread);
   }
@@ -126,7 +359,7 @@ function loadState() {
     // process died replays as interrupted, as the real app-server reports
     // it; no live status survives a process boundary.
     const turns = (thread.turns ?? []).map((turn) => (turn.status === "inProgress" ? { ...turn, status: "interrupted" } : turn));
-    threads.set(thread.id, { ...thread, turns, status: { type: "notLoaded" } });
+    threads.set(thread.id, { ...thread, turns, status: { type: "notLoaded" }, settings: thread.settings ?? defaultSettings(null), tokens: thread.tokens ?? { total: 0, last: 0 } });
   }
   return true;
 }
@@ -148,6 +381,9 @@ function record(entry) {
 }
 
 function send(message) {
+  if (logNotifications && message.method) {
+    record(Object.hasOwn(message, "id") ? { kind: "serverRequest", id: message.id, method: message.method, params: message.params ?? null } : { kind: "notification", method: message.method, params: message.params ?? null });
+  }
   process.stdout.write(`${JSON.stringify(message)}\n`);
 }
 
@@ -219,6 +455,9 @@ const handlers = {
     return {};
   },
   "thread/list": (params) => ({ data: listThreads(params), nextCursor: null }),
+  "model/list": () => ({ data: MODELS.map((model) => ({ ...model })), nextCursor: null }),
+  "skills/list": (params) => ({ data: (params?.cwds?.length ? params.cwds : [process.cwd()]).map((cwd) => ({ cwd, errors: [], skills: skills.map((skill) => ({ ...skill })) })) }),
+  fuzzyFileSearch: (params) => fuzzyFileSearch(params),
   "thread/start": (params) => {
     const thread = {
       id: nextId("fixture-thread"),
@@ -233,9 +472,11 @@ const handlers = {
       archived: false,
       turns: [],
       policy: { approvalPolicy: params?.approvalPolicy ?? null, sandbox: params?.sandbox ?? null },
+      settings: defaultSettings(params),
+      tokens: { total: 0, last: 0 },
     };
     threads.set(thread.id, thread);
-    return { thread: threadRecord(thread) };
+    return threadStartResponse(thread);
   },
   "thread/read": (params) => {
     const thread = requireThread(params);
@@ -244,10 +485,39 @@ const handlers = {
   "thread/resume": (params) => {
     const thread = requireThread(params);
     if (thread.status?.type === "notLoaded") thread.status = { type: "idle" };
-    return { thread: threadRecord(thread) };
+    if (params?.approvalPolicy || params?.sandbox || params?.model) {
+      thread.settings = {
+        ...thread.settings,
+        model: params.model ?? thread.settings.model,
+        approvalPolicy: params.approvalPolicy ?? thread.settings.approvalPolicy,
+        sandboxPolicy: params.sandbox ? sandboxPolicyFromMode(params.sandbox) : thread.settings.sandboxPolicy,
+      };
+    }
+    // Persisted usage is replayed to the attaching client after the reply.
+    if (thread.tokens?.total > 0) {
+      const lastTurn = thread.turns.at(-1);
+      queueMicrotask(() => sendTokenUsage(thread, lastTurn?.id ?? "replay"));
+    }
+    return threadStartResponse(thread);
   },
   "thread/name/set": (params) => {
-    requireThread(params).name = params.name;
+    const thread = requireThread(params);
+    thread.name = params.name;
+    queueMicrotask(() => send({ method: "thread/name/updated", params: { threadId: thread.id, threadName: params.name } }));
+    return {};
+  },
+  "thread/compact/start": (params) => {
+    const thread = requireThread(params);
+    // Compaction is a Turn of its own: turn/started, the contextCompaction
+    // item, a reduced usage update, then turn/completed.
+    const turn = { id: nextId("fixture-turn"), status: "inProgress", items: [] };
+    thread.turns.push(turn);
+    thread.status = { type: "active" };
+    queueMicrotask(() => {
+      send({ method: "turn/started", params: { threadId: thread.id, turn: { ...turn, items: [] } } });
+      thread.tokens = { total: Math.min(thread.tokens?.total ?? 0, 400), last: 0 };
+      completeTurn(thread, turn, [{ type: "contextCompaction", id: nextId("fixture-item") }]);
+    });
     return {};
   },
   "thread/fork": (params) => {
@@ -272,13 +542,15 @@ const handlers = {
   "turn/start": (params, id) => {
     const thread = requireThread(params);
     // Like the real app-server, the Turn input is persisted as this Turn's
-    // userMessage item, so thread/read replays the exact bytes a client sent.
+    // userMessage item, so thread/read replays the exact bytes a client sent
+    // (text_elements, skill and mention items included).
     const turn = { id: nextId("fixture-turn"), status: "inProgress", items: [{ type: "userMessage", id: nextId("fixture-item"), content: params.input }] };
     thread.turns.push(turn);
     thread.preview = thread.preview || params.input.find((item) => item.type === "text")?.text?.slice(0, 4_000) || "";
     thread.updatedAt = now();
     thread.status = { type: "active" };
     queueMicrotask(() => {
+      applyTurnSettings(thread, params);
       send({ method: "turn/started", params: { threadId: thread.id, turn } });
       send({
         id: `fixture-request-${turn.id}`,
@@ -308,8 +580,23 @@ const handlers = {
 const MUTATING_METHODS = new Set([
   "threadSection/create", "threadSection/update", "threadSection/delete",
   "thread/start", "thread/resume", "thread/name/set", "thread/fork", "thread/section/move", "thread/archive", "thread/unarchive",
-  "turn/start", "turn/steer", "turn/interrupt",
+  "turn/start", "turn/steer", "turn/interrupt", "thread/compact/start",
 ]);
+
+// With CODEX_FIXTURE_COMPLETE_ON_APPROVAL the client's answer to a Turn's
+// approval request finishes that Turn the way the real model would after the
+// command ran: one agentMessage, the Turn's usage, then turn/completed.
+function finishApprovedTurn(requestId) {
+  const turnId = String(requestId).replace(/^fixture-request-/u, "");
+  for (const thread of threads.values()) {
+    const turn = thread.turns.find((entry) => entry.id === turnId);
+    if (!turn || turn.status !== "inProgress") continue;
+    const total = (thread.tokens?.total ?? 0) + 1_200 + 300 * thread.turns.length;
+    thread.tokens = { total, last: 1_200 + 300 * thread.turns.length };
+    completeTurn(thread, turn, [{ type: "agentMessage", id: nextId("fixture-item"), text: `Fixture answer for ${turn.id}.` }]);
+    return;
+  }
+}
 
 createInterface({ input: process.stdin }).on("line", (line) => {
   let message;
@@ -320,6 +607,7 @@ createInterface({ input: process.stdin }).on("line", (line) => {
   }
   if (Object.hasOwn(message, "id") && !Object.hasOwn(message, "method")) {
     record({ kind: "response", id: message.id, result: message.result ?? null, error: message.error ?? null });
+    if (completeOnApproval && message.result) queueMicrotask(() => finishApprovedTurn(message.id));
     return;
   }
   record({ kind: "request", id: message.id ?? null, method: message.method, params: message.params ?? null });
