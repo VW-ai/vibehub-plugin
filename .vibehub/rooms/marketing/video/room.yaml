@@ -86,7 +86,7 @@
         "path": "assets/video/renders/.gitignore"
       },
       {
-        "blob": "d2fe64cb4d56bbc487c558424d1030d3f59bcd44",
+        "blob": "187e897f6de83c4acd56ee899cbdb84e3190b7d5",
         "path": "assets/video/renders/MANIFEST.md"
       },
       {
@@ -202,8 +202,8 @@
         "path": "assets/video/taskstory/package.json"
       }
     ],
-    "checked_at": "2026-08-23T09:32:06.616Z",
-    "last_aligned_commit": "17aa7f206b9fbaa1e39f68e7705ad067b7855d48"
+    "checked_at": "2026-08-23T09:36:53.563Z",
+    "last_aligned_commit": "15cea707b6224159a9f27f8a42fc13164576ec18"
   },
   "anchors": [
     "assets/video/"

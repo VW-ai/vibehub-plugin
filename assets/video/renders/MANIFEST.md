@@ -3,15 +3,36 @@
 Finished MP4s and music stems are versioned with **DVC**, stored in Cloudflare R2 (bucket `vibehub`). Git keeps the `*.dvc`
 pointers, so every commit names the exact render it was made with.
 
-```bash
-# first time on a machine: install DVC and add your R2 keys locally (never committed)
-python3 -m venv ~/.cache/vh-dvc && ~/.cache/vh-dvc/bin/pip install "dvc[s3]"
-~/.cache/vh-dvc/bin/dvc remote modify --local r2 access_key_id '<S3 access key id>'
-~/.cache/vh-dvc/bin/dvc remote modify --local r2 secret_access_key '<S3 secret access key>'
+## Setup once per machine
 
-# get the files        # publish a new render
-~/.cache/vh-dvc/bin/dvc pull        ~/.cache/vh-dvc/bin/dvc add renders/<clip>.mp4 && ~/.cache/vh-dvc/bin/dvc push
+```bash
+python3 -m venv ~/.cache/vh-dvc && ~/.cache/vh-dvc/bin/pip install "dvc[s3]"
 ```
+
+Auth is an AWS-style profile named `r2` in `~/.aws/credentials` (the committed `.dvc/config` says `profile = r2`; no keys in git):
+
+```ini
+[r2]
+aws_access_key_id = <R2 S3 access key id>
+aws_secret_access_key = <R2 S3 secret access key>
+```
+
+CI uses the same pair from repository secrets `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` (`.github/workflows/media.yml`).
+
+## Publish a new render
+
+```bash
+D=~/.cache/vh-dvc/bin/dvc
+npx hyperframes render assets/video/<clip> --output /tmp/silent.mp4
+assets/video/audio/fetch.sh                                   # stems, once
+assets/video/audio/mix-<clip>.sh /tmp/silent.mp4 "$PWD/assets/video/renders/<clip>-vN.mp4"
+$D add assets/video/renders/<clip>-vN.mp4 && $D push          # bytes → R2
+git add assets/video/renders/<clip>-vN.mp4.dvc assets/video/renders/.gitignore && git commit   # pointer → git
+gh release upload <tag> assets/video/renders/<clip>-vN.mp4   # only for a public link
+```
+
+Or run the **Media** workflow (Actions → Media → Run) with the clip name: it renders, mixes, pushes to R2 and commits the pointer for you.
+`dvc pull` fetches everything on another machine. CI fails any PR whose pointer has no object in R2.
 
 | clip | format | length | pointer |
 |------|--------|--------|---------|
