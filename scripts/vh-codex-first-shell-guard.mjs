@@ -286,9 +286,14 @@ async function bootShell() {
   const repo = realRuntime ? null : createBridgeRepository({ prefix: "vibehub-guard-repo-" });
   const repoFolder = realRuntime ? options.repo : repo.folder;
   if (repo) seedFixtureState(join(temp, "codex-state.json"), repo.realFolder);
+  // On the fixture, answering a Turn's approval finishes that Turn and every
+  // outbound notification joins the call log, so the daily-use walk can
+  // order turn/start requests against the turn/completed between them. The
+  // lifecycle walk never answers its approval, so its kill still lands on
+  // the pending card; the bridge checks never answer theirs either.
   const env = realRuntime
     ? { ...process.env, VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" }
-    : { ...process.env, CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_STATE: join(temp, "codex-state.json"), CODEX_FIXTURE_PIDFILE: pidPath, CODEX_FIXTURE_LOG: logPath, VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" };
+    : { ...process.env, CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_STATE: join(temp, "codex-state.json"), CODEX_FIXTURE_PIDFILE: pidPath, CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_COMPLETE_ON_APPROVAL: "1", CODEX_FIXTURE_LOG_NOTIFICATIONS: "1", VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" };
   const codex = realRuntime ? options.codex : join(root, "test/fixtures/codex-app-server-fixture.mjs");
   const shell = spawn(process.execPath, [join(root, "scripts/vh-codex-first-shell.mjs"), "--repo", repoFolder, "--port", "0", "--json", "--codex", codex], { cwd: root, stdio: ["ignore", "pipe", "pipe"], env });
   const close = async () => {
@@ -358,7 +363,7 @@ async function runLifecycle(shell) {
     // durable, after the shell's newThread refresh, so a brand-new Chat's
     // first Turn carries no dot there; the fixture lists Threads at once.
     // The dot is recorded on the real runtime and asserted on the fixture.
-    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Steer current turn" && !live.stopHidden && (realRuntime ? live.working : live.requests > 0 && live.activeDots === 1), `${live.posture}/${realRuntime ? `working=${live.working}, ` : ""}${live.requests} request cards, send="${live.sendLabel}", stopHidden=${live.stopHidden}, activeDots=${live.activeDots} · active ${live.activeThreads || "none"}`);
+    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Queue message" && !live.stopHidden && (realRuntime ? live.working : live.requests > 0 && live.activeDots === 1), `${live.posture}/${realRuntime ? `working=${live.working}, ` : ""}${live.requests} request cards, send="${live.sendLabel}", stopHidden=${live.stopHidden}, activeDots=${live.activeDots} · active ${live.activeThreads || "none"}`);
     process.kill(shell.lastPid(), "SIGKILL");
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Runtime restarting'`);
     const exited = await snapshot();
@@ -392,6 +397,92 @@ async function runLifecycle(shell) {
   return ok;
 }
 
+// Real-DOM daily-use walk on the fixture shell: follow-ups typed while a Turn
+// streams queue by default and become their own turn/start after the prior
+// turn/completed, an interrupt pauses the queue until an explicit Resume,
+// and a queued row can steer the exact live Turn. The fixture's call log is
+// the proof: N queued messages become N turn/start requests with distinct
+// Turn ids, each after the prior turn/completed, nothing between the
+// interrupt and the Resume, and turn/steer naming the live Turn.
+async function runQueueWalk(shell) {
+  const chrome = await launchChrome(FRAMES.wide);
+  const steps = [];
+  const step = (name, pass, detail) => { steps.push(pass); console.log(`  ${pass ? "✓" : "✕"} ${name}${detail ? ` · ${detail}` : ""}`); };
+  const calls = () => (existsSync(shell.logPath) ? readFileSync(shell.logPath, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)) : []);
+  try {
+    const page = await chrome.page();
+    await page.navigate(shell.url);
+    await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Local app-server' && document.querySelector('#newThread') && !document.querySelector('#newThread').disabled`);
+    await page.evaluate(`document.querySelector('#newThread').click()`);
+    await page.waitFor(`document.querySelector('.thread-heading') && new URLSearchParams(location.search).get('thread')`);
+    const threadId = await page.evaluate(`new URLSearchParams(location.search).get('thread')`);
+    const type = (text, { alt = false } = {}) => page.evaluate(`(() => { const input = document.querySelector('#composerInput'); input.value = ${JSON.stringify(text)}; input.dispatchEvent(new InputEvent('input', { bubbles: true })); input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', altKey: ${alt}, bubbles: true })); })()`);
+    const queueRows = () => page.evaluate(`[...document.querySelectorAll('#queueTray .queue-row .queue-text')].map((n) => n.textContent)`);
+    const userMessages = () => page.evaluate(`[...document.querySelectorAll('.turn.user article > div')].map((n) => n.textContent.trim())`);
+    const startsFor = () => calls().filter((call) => call.kind === "request" && call.method === "turn/start" && call.params?.threadId === threadId);
+    // The approval card of the live Turn, never a card of an earlier Turn:
+    // the fixture (like the runtime) does not withdraw an interrupted Turn's
+    // pending approval, so the answer must name the Turn that is running.
+    const liveApproval = `document.querySelector('[data-request-turn="' + document.querySelector('#composer').dataset.currentTurnId + '"] [data-request-decision="accept"]')`;
+    const awaitApproval = () => page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'running' && ${liveApproval}`, 30_000);
+    const accept = () => page.evaluate(`${liveApproval}.click()`);
+
+    await type("first");
+    await awaitApproval();
+    await type("follow-up one");
+    await page.waitFor(`document.querySelectorAll('#queueTray .queue-row').length === 1`);
+    await type("follow-up two");
+    await page.waitFor(`document.querySelectorAll('#queueTray .queue-row').length === 2`);
+    const sendLabel = await page.evaluate(`document.querySelector('#sendButton').getAttribute('aria-label') + '/' + document.querySelector('#sendButton').textContent`);
+    step("two follow-ups typed during the live Turn are queued, not sent", JSON.stringify(await queueRows()) === JSON.stringify(["follow-up one", "follow-up two"]) && startsFor().length === 1 && sendLabel === "Queue message/Queue", `${(await queueRows()).join("|")} · ${startsFor().length} turn/start · send=${sendLabel}`);
+
+    await accept();
+    await page.waitFor(`[...document.querySelectorAll('.turn.user article > div')].some((n) => n.textContent.trim() === 'follow-up one') && document.querySelectorAll('#queueTray .queue-row').length === 1`, 30_000);
+    step("the first queued follow-up starts as its own Turn after turn/completed", (await userMessages()).slice(-1)[0] === "follow-up one" && JSON.stringify(await queueRows()) === JSON.stringify(["follow-up two"]) && startsFor().length === 2, `${(await userMessages()).join("|")} · queue ${(await queueRows()).join("|")}`);
+
+    await awaitApproval();
+    await page.evaluate(`document.querySelector('#stopTurn').click()`);
+    await page.waitFor(`document.querySelector('#queueTray .queue-paused') && document.querySelector('#composer').dataset.turnPosture === 'idle'`);
+    await new Promise((resolve) => setTimeout(resolve, 1_200));
+    const pausedCopy = await page.evaluate(`document.querySelector('#queueTray .queue-paused')?.textContent ?? ''`);
+    step("the interrupt pauses the queue and nothing is sent until Resume", pausedCopy.includes("Queue paused because you interrupted") && startsFor().length === 2 && JSON.stringify(await queueRows()) === JSON.stringify(["follow-up two"]), `${pausedCopy.slice(0, 60)} · ${startsFor().length} turn/start`);
+
+    await page.evaluate(`document.querySelector('[data-resume-queue]').click()`);
+    await page.waitFor(`[...document.querySelectorAll('.turn.user article > div')].some((n) => n.textContent.trim() === 'follow-up two') && document.querySelector('#queueTray').hidden`, 30_000);
+    step("Resume starts the paused head as its own Turn", startsFor().length === 3 && (await userMessages()).slice(-1)[0] === "follow-up two", `${(await userMessages()).join("|")}`);
+    await awaitApproval();
+    await accept();
+    await page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'idle'`, 30_000);
+
+    await type("fourth");
+    await awaitApproval();
+    const liveTurnId = await page.evaluate(`document.querySelector('#composer').dataset.currentTurnId`);
+    await type("steer from the row");
+    await page.waitFor(`document.querySelectorAll('#queueTray .queue-row').length === 1`);
+    await page.evaluate(`document.querySelector('[data-steer-queued]').click()`);
+    await page.waitFor(`document.querySelector('#queueTray').hidden`);
+    await type("alt steer", { alt: true });
+    await page.waitFor(`[...document.querySelectorAll('.turn.user article > div')].some((n) => n.textContent.trim() === 'alt steer')`, 30_000);
+    const steers = calls().filter((call) => call.kind === "request" && call.method === "turn/steer" && call.params?.threadId === threadId).map((call) => [call.params.expectedTurnId, call.params.input[0].text]);
+    step("a queued row and Alt+Enter steer the exact live Turn through turn/steer", JSON.stringify(steers) === JSON.stringify([[liveTurnId, "steer from the row"], [liveTurnId, "alt steer"]]) && startsFor().length === 4, JSON.stringify(steers));
+    await accept();
+    await page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'idle'`, 30_000);
+
+    const timeline = calls()
+      .filter((call) => (call.kind === "request" && call.method === "turn/start" && call.params?.threadId === threadId) || (call.kind === "notification" && call.method === "turn/completed" && call.params?.threadId === threadId))
+      .map((call) => (call.kind === "request" ? `start:${call.params.input[0].text}` : `completed:${call.params.turn.status}`));
+    const turnIds = calls().filter((call) => call.kind === "notification" && call.method === "turn/started" && call.params?.threadId === threadId).map((call) => call.params.turn.id);
+    const expected = ["start:first", "completed:completed", "start:follow-up one", "completed:interrupted", "start:follow-up two", "completed:completed", "start:fourth", "completed:completed"];
+    step("the fixture call log shows each queued message as its own turn/start with a distinct Turn id after the prior turn/completed", JSON.stringify(timeline) === JSON.stringify(expected) && turnIds.length === 4 && new Set(turnIds).size === 4, `${timeline.join(" → ")} · ids ${turnIds.join(",")}`);
+    step("no console errors or uncaught exceptions", page.errors.length === 0, page.errors.join(" | "));
+  } finally {
+    chrome.close();
+  }
+  const ok = steps.every(Boolean);
+  console.log(`[queue wide 1280x800 ${options.runtime}] ${ok ? "PASS" : "FAIL"} follow-up queue walk · ${steps.filter(Boolean).length}/${steps.length}`);
+  return ok;
+}
+
 let ok = true;
 const shell = options.url ? null : await bootShell();
 try {
@@ -405,6 +496,9 @@ try {
   }
   if (options.lifecycle && shell) ok = (await runLifecycle(shell)) && ok;
   else if (options.lifecycle) console.log("[lifecycle] skipped: the lifecycle walk needs a shell this driver booted (omit --url)");
+  // The queue walk costs four model Turns, so it runs on the fixture only.
+  if (options.lifecycle && shell && !realRuntime) ok = (await runQueueWalk(shell)) && ok;
+  else if (options.lifecycle) console.log(`[queue] skipped: the follow-up queue walk runs on the fixture shell this driver booted (${realRuntime ? "the real runtime would spend model Turns" : "omit --url"})`);
 } finally {
   await shell?.close();
 }

@@ -1,4 +1,5 @@
-import { applyChatEvent, canonicalTimeline, itemKey, timelineWindow } from "./chat-model.mjs";
+import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, threadQueue, threadSettings, timelineWindow } from "./chat-model.mjs";
+import { emptyQueue, pausedMessage, queuedMediaSummary, queuedText, replaceQueuedText } from "./composer-queue.mjs";
 import {
   DOM_LIMITS,
   createRenderBudget,
@@ -81,7 +82,26 @@ const state = {
   // keyed by Task id, in memory only, sent solely as startTask.humanMessage.
   taskQuoteDrafts: new Map(),
   overlayReturnSelector: null,
+  // Host-owned transient records mirrored per Thread (chat-model.mjs): the
+  // follow-up queue, the last token usage and the settings record. They are
+  // read from bootstrap, the host responses and the event feed; nothing is
+  // persisted in the browser.
+  queues: new Map(),
+  queueShadow: new Map(),
+  tokenUsage: new Map(),
+  threadSettings: new Map(),
+  // The queued follow-up being edited inline, if any.
+  queueEdit: null,
+  // What each Turn this browser session started was sent with: the settings
+  // record the host attached to the startTurn response merged with the
+  // overrides that Turn carried. Never claimed for Turns replayed from history.
+  turnSettings: new Map(),
 };
+
+// The Composer submit path: Enter takes the Send label's own action (Queue
+// while a Turn is live, Send otherwise); Alt+Enter takes the opposite
+// (steer the live Turn). The flag is read once by submitTurn.
+let composerSubmitMode = "default";
 
 const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
 const MAX_RECORDING_MS = 90_000;
@@ -376,6 +396,24 @@ function liveTurnId(thread) {
   return threadActive && ["inprogress", "running"].includes(turnStatus) ? turn.id : null;
 }
 
+// The settings record the host last reported for a Thread, null until the
+// runtime reported them: the forwarded thread/settings/updated or a host
+// response first, then the record every listed Thread carries in bootstrap.
+function threadSettingsRecord(threadId) {
+  if (!threadId) return null;
+  return threadSettings(state, threadId) ?? state.threads.find((thread) => thread.id === threadId)?.settings ?? null;
+}
+
+// What a Turn this session started was sent with: the Thread's reported
+// record (as known at that moment) under the overrides the Turn carried.
+// The first attribution wins; a later event never rewrites it.
+function attributeTurnSettings(turnId, threadId, overrides = null, record = threadSettingsRecord(threadId)) {
+  if (!turnId || state.turnSettings.has(turnId)) return;
+  const { source, observedAt, ...reported } = record ?? {};
+  state.turnSettings.set(turnId, { ...reported, ...(overrides ?? {}), _source: record ? source ?? null : null, _overrides: Object.keys(overrides ?? {}) });
+  while (state.turnSettings.size > 64) state.turnSettings.delete(state.turnSettings.keys().next().value);
+}
+
 function humanize(ticketId) {
   return String(ticketId).replace(/^ticket-/, "").split("-").map((part) => part[0]?.toUpperCase() + part.slice(1)).join(" ");
 }
@@ -507,23 +545,34 @@ function syncComposerMode() {
   // The composer needs a runtime the host says is usable: alive, gated
   // (state alive, not restarting or halted), authenticated, and no stop.
   input.disabled = !state.runtimeAlive || state.runtimeState !== "alive" || Boolean(state.bootstrap?.stop) || Boolean(taskMode && !linked);
-  $("#sendButton").disabled = input.disabled;
-  $("#sendButton").setAttribute("aria-label", state.running ? "Steer current turn" : "Send message");
-  $("#sendButton").title = state.running ? "Steer current Turn" : "Send message";
+  const send = $("#sendButton");
+  send.disabled = input.disabled;
+  // Ordinary Chat while a Turn streams: Enter queues the follow-up in the
+  // host-owned queue and the label says so; Alt+Enter is the explicit
+  // opposite (steer that exact Turn). The Task Workspace composer keeps its
+  // host-built packet path: Turn steering there stays explicit in its label.
+  const queueing = state.running && !taskMode;
+  send.textContent = queueing ? "Queue" : "↑";
+  send.dataset.sendMode = queueing ? "queue" : state.running ? "steer" : "send";
+  send.setAttribute("aria-label", queueing ? "Queue message" : state.running ? "Steer current turn" : "Send message");
+  send.title = queueing ? "Queue for after this Turn (Enter) · Steer this Turn now (Alt+Enter)" : state.running ? "Steer current Turn" : "Send message";
   $("#composer").dataset.turnPosture = state.running ? "running" : "idle";
   if (state.currentTurnId) $("#composer").dataset.currentTurnId = state.currentTurnId;
   else delete $("#composer").dataset.currentTurnId;
   const halted = Boolean(state.bootstrap?.stop);
   if (!state.creatingThread) $("#newThread").disabled = halted;
   for (const fork of $$("[data-fork-thread]")) fork.disabled = state.fixtureMode || state.running || halted;
-  input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : "Ask Codex to do something";
+  input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : queueing ? "Queue a follow-up for after this Turn" : "Ask Codex to do something";
   $("#composerNote").textContent = taskMode
     ? (linked
       ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.`
       : state.composerQuote
         ? "Pending quote: Start sends it as this Task's first message inside the host-built packet. Nothing is written to the source Chat."
         : "The host will open a linked Codex Thread with the canonical Task packet.")
-    : "Codex can make mistakes. Review commands and changes.";
+    : queueing
+      ? "Enter queues this message for after the running Turn · Alt+Enter steers the running Turn now."
+      : "Codex can make mistakes. Review commands and changes.";
+  renderQueue();
 }
 
 function runtimeLabel() {
@@ -1026,7 +1075,7 @@ function approvalMarkup(request) {
     params.proposedNetworkPolicyAmendments?.length && ["Network policy amendment", JSON.stringify(params.proposedNetworkPolicyAmendments)],
     params.networkApprovalContext && ["Network context", JSON.stringify(params.networkApprovalContext)],
   ].filter(Boolean).map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(takeText(createRenderBudget({ textCharacters: 8_000 }), value, 2_000).text)}</dd>`).join("");
-  return `<section class="approval-card" data-request-id="${escapeHtml(request.id)}" role="alertdialog" aria-label="${escapeHtml(title)}"><header><span>Needs your approval</span><em>${request.fixture ? "Review fixture" : "Turn paused"}</em></header><strong>${escapeHtml(title)}</strong>${command}<dl class="approval-context">${context}</dl><footer><button class="accept" type="button" data-request-decision="accept" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Allow once</button><button type="button" data-request-decision="acceptForSession" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Allow for session</button><button type="button" data-request-decision="decline" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Decline</button><button class="danger" type="button" data-request-decision="cancel" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Cancel & interrupt</button></footer></section>`;
+  return `<section class="approval-card" data-request-id="${escapeHtml(request.id)}" data-request-turn="${escapeHtml(params.turnId ?? "")}" role="alertdialog" aria-label="${escapeHtml(title)}"><header><span>Needs your approval</span><em>${request.fixture ? "Review fixture" : "Turn paused"}</em></header><strong>${escapeHtml(title)}</strong>${command}<dl class="approval-context">${context}</dl><footer><button class="accept" type="button" data-request-decision="accept" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Allow once</button><button type="button" data-request-decision="acceptForSession" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Allow for session</button><button type="button" data-request-decision="decline" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Decline</button><button class="danger" type="button" data-request-decision="cancel" data-request-id="${escapeHtml(request.id)}"${fixtureDecisionDisabled}>Cancel & interrupt</button></footer></section>`;
 }
 
 const groupableActivityTypes = new Set(["commandExecution", "fileChange", "turnDiff", "mcpToolCall", "dynamicToolCall", "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView", "sleep", "imageGeneration"]);
@@ -1526,6 +1575,9 @@ async function refreshThreads() {
   pruneRequestDrafts(state.requestDrafts, state.knownRequestIds);
   state.runtimeGeneration = data.runtime.generation;
   state.runtimeAlive = data.runtime.alive;
+  // bootstrap.queues lists every Thread with queued follow-ups (media elided);
+  // a Thread absent from it has an empty queue in the host.
+  mirrorBootstrapQueues(data.queues ?? []);
   updateAttentionState(data.attention);
   renderProjectHeader();
   renderStopBanner();
@@ -1546,6 +1598,9 @@ async function openThread(threadId, { route = "chat" } = {}) {
   state.running = Boolean(state.currentTurnId);
   syncThreadLocation();
   if (switchingThread) restoreComposerDraft(threadId);
+  // The host-owned queue of this Thread, with full media, on every open; a
+  // host that cannot answer leaves the mirror as it was.
+  if (switchingThread || !threadQueue(state, threadId)) await loadQueue(threadId);
   if (!state.running) {
     for (const [key, item] of state.liveItems) if (item._threadId === threadId) state.liveItems.delete(key);
     for (const map of [state.turnErrors, state.turnPlans, state.turnDiffs]) {
@@ -1836,8 +1891,20 @@ async function toggleRecording() {
   } catch (error) { notify(`Microphone unavailable: ${error.message}`); }
 }
 
+function clearComposerAfterSend(textarea) {
+  textarea.value = "";
+  state.composerQuote = null;
+  renderComposerQuote();
+  autoSizeComposer();
+  state.attachments = [];
+  renderAttachments();
+  state.composerDrafts.delete(state.activeThreadId);
+}
+
 async function submitTurn(event) {
   event.preventDefault();
+  const mode = composerSubmitMode;
+  composerSubmitMode = "default";
   const textarea = $("#composerInput");
   const text = textarea.value.trim();
   if (!text && !state.attachments.length && !state.composerQuote) return;
@@ -1870,24 +1937,161 @@ async function submitTurn(event) {
       return;
     }
     if (!state.activeThreadId) await newThread();
+    const threadId = state.activeThreadId;
     const input = [];
     if (composedText) input.push({ type: "text", text: composedText });
     input.push(...state.attachments.map(({ type, url }) => ({ type, url })));
-    if (state.running && !state.currentTurnId) return notify("Wait for the active Turn identity before steering it.");
-    const result = await action({ action: state.running ? "steerTurn" : "startTurn", threadId: state.activeThreadId, expectedTurnId: state.running ? state.currentTurnId : undefined, input });
-    if (!state.running) state.currentTurnId = result.turn.id;
+    // While a Turn streams, Enter queues the follow-up in the host-owned
+    // queue (started as its own turn/start after turn/completed) and
+    // Alt+Enter steers that exact Turn instead. Idle submission alone starts
+    // a Turn; Alt+Enter while idle is the same plain send.
+    const steer = state.running && mode === "opposite";
+    if (steer && !state.currentTurnId) return notify("Wait for the active Turn identity before steering it.");
+    const dispatch = steer ? "steerTurn" : state.running ? "queueTurn" : "startTurn";
+    const result = await action({ action: dispatch, threadId, ...(steer ? { expectedTurnId: state.currentTurnId } : {}), input });
+    if (dispatch === "queueTurn") {
+      rememberQueue(state, result.queue);
+      clearComposerAfterSend(textarea);
+      if (result.started) {
+        // No Turn was live after all: the head started at once as its own Turn.
+        state.currentTurnId = result.started.turnId;
+        state.running = true;
+        $("#stopTurn").hidden = false;
+        syncComposerMode();
+        await openThread(threadId);
+      } else {
+        renderQueue();
+        $("#streamStatus").textContent = `Queued for after the running Turn (${result.queue.items.length} waiting).`;
+      }
+      return;
+    }
+    if (dispatch === "startTurn") state.currentTurnId = result.turn.id;
     state.running = true;
-    textarea.value = "";
-    state.composerQuote = null;
-    renderComposerQuote();
-    autoSizeComposer();
-    state.attachments = [];
-    renderAttachments();
-    state.composerDrafts.delete(state.activeThreadId);
+    clearComposerAfterSend(textarea);
     $("#stopTurn").hidden = false;
     syncComposerMode();
-    await openThread(state.activeThreadId);
+    await openThread(threadId);
   } catch (error) { notify(error.message); }
+}
+
+// --- The host-owned follow-up queue ---------------------------------------
+
+function mirrorBootstrapQueues(queues) {
+  const listed = new Set(queues.map((queue) => queue.threadId));
+  for (const threadId of [...state.queues.keys()]) if (!listed.has(threadId)) state.queues.delete(threadId);
+  for (const queue of queues) applyHostEvent(state, "queueChanged", { threadId: queue.threadId, queue });
+  renderQueue();
+}
+
+async function loadQueue(threadId) {
+  try {
+    const data = await action({ action: "listQueue", threadId });
+    if (data?.queue?.threadId === threadId) rememberQueue(state, data.queue);
+  } catch {
+    // The mirror keeps what bootstrap or the event feed last said.
+  }
+  renderQueue();
+}
+
+function activeQueue() {
+  return state.activeThreadId ? threadQueue(state, state.activeThreadId) ?? emptyQueue(state.activeThreadId) : null;
+}
+
+function queueRowMarkup(item, index, queue) {
+  const text = queuedText(item);
+  const media = queuedMediaSummary(item);
+  const editing = state.queueEdit?.threadId === queue.threadId && state.queueEdit.queuedId === item.queuedId;
+  if (editing) {
+    return `<li class="queue-row editing" data-queued-id="${escapeHtml(item.queuedId)}"><span class="queue-order">${index + 1}</span><form class="queue-edit" data-queue-edit="${escapeHtml(item.queuedId)}"><textarea rows="2" aria-label="Edit queued message ${index + 1}" maxlength="32000">${escapeHtml(text)}</textarea>${media ? `<small class="queue-media">${escapeHtml(media)} kept</small>` : ""}<div class="queue-actions"><button type="submit">Save</button><button type="button" data-cancel-queued="${escapeHtml(item.queuedId)}">Cancel</button></div></form></li>`;
+  }
+  const steerable = state.running && Boolean(state.currentTurnId) && !item.starting;
+  const busy = item.starting ? " disabled" : "";
+  return `<li class="queue-row" data-queued-id="${escapeHtml(item.queuedId)}" data-starting="${item.starting ? "true" : "false"}"><span class="queue-order">${index + 1}</span><div class="queue-body"><p class="queue-text">${escapeHtml(text || "(no text)")}</p>${media ? `<small class="queue-media">${escapeHtml(media)}</small>` : ""}${item.starting ? '<small class="queue-media">Starting as its own Turn…</small>' : ""}</div><div class="queue-actions"><button type="button" data-edit-queued="${escapeHtml(item.queuedId)}" aria-label="Edit queued message ${index + 1}"${busy}>Edit</button><button type="button" data-steer-queued="${escapeHtml(item.queuedId)}" aria-label="Steer the running Turn with queued message ${index + 1}"${steerable ? "" : " disabled"} title="${steerable ? "Send now as a steer of the running Turn" : "Steer needs a running Turn"}">Steer</button><button type="button" data-delete-queued="${escapeHtml(item.queuedId)}" aria-label="Delete queued message ${index + 1}"${busy}>Delete</button></div></li>`;
+}
+
+// The queued follow-ups of the visible Thread, above the Composer: every row
+// is the host's record, the paused state names the host's pausedReason, and
+// Resume is the only way anything is sent after an interrupt.
+function renderQueue() {
+  const tray = $("#queueTray");
+  if (!tray) return;
+  const queue = state.route === "chat" ? activeQueue() : null;
+  const items = queue?.items ?? [];
+  if (!queue || (!items.length && !queue.paused)) {
+    tray.hidden = true;
+    tray.innerHTML = "";
+    tray.dataset.count = "0";
+    delete tray.dataset.paused;
+    return;
+  }
+  const focused = tray.contains(document.activeElement) ? { queuedId: document.activeElement.closest("[data-queued-id]")?.dataset.queuedId, attribute: ["data-edit-queued", "data-steer-queued", "data-delete-queued", "data-cancel-queued", "data-resume-queue"].find((name) => document.activeElement.hasAttribute(name)), textarea: document.activeElement.matches("textarea") } : null;
+  tray.hidden = false;
+  tray.dataset.count = String(items.length);
+  tray.dataset.paused = queue.paused ? "true" : "false";
+  if (queue.pausedReason) tray.dataset.pausedReason = queue.pausedReason; else delete tray.dataset.pausedReason;
+  const paused = queue.paused
+    ? `<p class="queue-paused" role="status" data-paused-reason="${escapeHtml(queue.pausedReason ?? "")}">${escapeHtml(pausedMessage(queue))} <button type="button" data-resume-queue="${escapeHtml(queue.threadId)}">Resume</button></p>`
+    : "";
+  const summary = items.length ? `${items.length} waiting · ${state.running ? "each starts as its own Turn after the running one completes" : queue.paused ? "paused" : "starts next"}` : "Nothing waiting";
+  tray.innerHTML = `<header><strong>Queued follow-ups</strong><small>${escapeHtml(summary)}</small></header>${paused}<ol class="queue-list" aria-label="Queued follow-ups">${items.map((item, index) => queueRowMarkup(item, index, queue)).join("")}</ol>`;
+  if (focused) {
+    const row = focused.queuedId ? tray.querySelector(`[data-queued-id="${CSS.escape(focused.queuedId)}"]`) : null;
+    const target = focused.textarea ? row?.querySelector("textarea") : focused.attribute ? (row ?? tray).querySelector(`[${focused.attribute}]`) : null;
+    (target ?? tray.querySelector("button:not([disabled]), textarea"))?.focus({ preventScroll: true });
+  }
+}
+
+async function queueAction(payload, { focusSelector = null } = {}) {
+  try {
+    const data = await action(payload);
+    if (data?.queue) rememberQueue(state, data.queue);
+    renderQueue();
+    if (focusSelector) requestAnimationFrame(() => $(focusSelector)?.focus({ preventScroll: true }));
+    return data;
+  } catch (error) {
+    notify(error.message);
+    await loadQueue(payload.threadId);
+    return null;
+  }
+}
+
+function beginQueueEdit(queuedId) {
+  const queue = activeQueue();
+  if (!queue?.items.some((item) => item.queuedId === queuedId)) return;
+  state.queueEdit = { threadId: queue.threadId, queuedId };
+  renderQueue();
+  const textarea = $(`#queueTray [data-queue-edit="${CSS.escape(queuedId)}"] textarea`);
+  textarea?.focus();
+  textarea?.setSelectionRange(textarea.value.length, textarea.value.length);
+}
+
+function cancelQueueEdit() {
+  const queuedId = state.queueEdit?.queuedId;
+  state.queueEdit = null;
+  renderQueue();
+  if (queuedId) $(`#queueTray [data-edit-queued="${CSS.escape(queuedId)}"]`)?.focus();
+}
+
+async function saveQueueEdit(form) {
+  const queuedId = form.dataset.queueEdit;
+  const queue = activeQueue();
+  const item = queue?.items.find((entry) => entry.queuedId === queuedId);
+  if (!item) { state.queueEdit = null; renderQueue(); return; }
+  const text = form.querySelector("textarea").value;
+  // An elided record (from bootstrap or the event feed) cannot resend its
+  // media bytes: read the full follow-up first, then replace its text only.
+  let input = item.input;
+  if (input.some((entry) => entry.elided)) {
+    try {
+      const listed = await action({ action: "listQueue", threadId: queue.threadId });
+      rememberQueue(state, listed.queue);
+      input = listed.queue.items.find((entry) => entry.queuedId === queuedId)?.input ?? input;
+    } catch (error) { notify(error.message); return; }
+  }
+  const next = replaceQueuedText(input, text);
+  if (!next.length) { notify("A queued message needs text or an attachment; delete it instead."); return; }
+  state.queueEdit = null;
+  await queueAction({ action: "updateQueued", threadId: queue.threadId, queuedId, input: next }, { focusSelector: `#queueTray [data-edit-queued="${CSS.escape(queuedId)}"]` });
 }
 
 // One host event window applied to the browser state. Runtime truth flows in
@@ -1908,6 +2112,7 @@ async function applyEventWindow(data) {
   let refreshLists = false;
   let reconcile = data.gap || (data.runtimeGeneration !== previousGeneration && data.runtimeAlive);
   let rendered = false;
+  let queueDirty = false;
   for (const entry of data.events) {
     if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refreshRequests = true;
     if (entry.kind === "runtimeExit") {
@@ -1923,6 +2128,22 @@ async function applyEventWindow(data) {
     if (entry.kind === "runtimeHalted") {
       haltRaised = applyRuntimeHalt(entry.value) || haltRaised;
       reconcile = false;
+      continue;
+    }
+    if (entry.kind === "queueChanged" || entry.kind === "queuedStarted" || entry.kind === "queuedFailed") {
+      const applied = applyHostEvent(state, entry.kind, entry.value);
+      if (applied?.threadId === state.activeThreadId) {
+        queueDirty = true;
+        if (entry.kind === "queuedStarted") {
+          // The follow-up became its own Turn with a runtime-minted id: the
+          // Thread is re-read so the new Turn's user message enters the
+          // transcript, and the Turn is attributed the settings it carried.
+          attributeTurnSettings(applied.turnId, applied.threadId, applied.item?.settings ?? null);
+          reconcile = true;
+          $("#streamStatus").textContent = "A queued follow-up started as its own Turn.";
+        }
+        if (entry.kind === "queuedFailed") notify(`Queued follow-up could not start: ${applied.error ?? "the runtime refused it"}`);
+      }
       continue;
     }
     if (entry.kind !== "notification") continue;
@@ -1947,6 +2168,7 @@ async function applyEventWindow(data) {
   }
   if (data.runtimeHalt) haltRaised = applyRuntimeHalt(data.runtimeHalt) || haltRaised;
   setRuntimePosture({ alive: data.runtimeAlive, generation: data.runtimeGeneration, state: state.bootstrap?.stop ? "halted" : data.runtimeState ?? (data.runtimeAlive ? "alive" : "exited") });
+  if (queueDirty) renderQueue();
   if (refreshLists) await refreshThreads();
   if (reconcile && state.activeThreadId && state.runtimeAlive && !state.bootstrap?.stop) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
   else if ((rendered || refreshRequests || haltRaised) && state.activeThreadId) scheduleChatRender();
@@ -2552,6 +2774,42 @@ document.addEventListener("click", async (event) => {
     $(`[data-attach-target="${CSS.escape(attachRow.dataset.attachTarget)}"]`)?.focus();
     return;
   }
+  const editQueued = event.target.closest("[data-edit-queued]");
+  if (editQueued) { beginQueueEdit(editQueued.dataset.editQueued); return; }
+  if (event.target.closest("[data-cancel-queued]")) { cancelQueueEdit(); return; }
+  const deleteQueued = event.target.closest("[data-delete-queued]");
+  if (deleteQueued) {
+    const queue = activeQueue();
+    if (!queue) return;
+    const index = queue.items.findIndex((item) => item.queuedId === deleteQueued.dataset.deleteQueued);
+    const next = queue.items[index + 1] ?? queue.items[index - 1] ?? null;
+    await queueAction({ action: "deleteQueued", threadId: queue.threadId, queuedId: deleteQueued.dataset.deleteQueued }, { focusSelector: next ? `#queueTray [data-delete-queued="${CSS.escape(next.queuedId)}"]` : "#composerInput" });
+    return;
+  }
+  const steerQueued = event.target.closest("[data-steer-queued]");
+  if (steerQueued) {
+    const queue = activeQueue();
+    if (!queue || !state.running || !state.currentTurnId) return notify("Steer needs a running Turn.");
+    // The queued follow-up leaves the queue and steers the exact live Turn.
+    const steered = await queueAction({ action: "steerQueued", threadId: queue.threadId, queuedId: steerQueued.dataset.steerQueued, expectedTurnId: state.currentTurnId }, { focusSelector: "#composerInput" });
+    if (steered) { notify("Queued message steered the running Turn."); await openThread(queue.threadId); }
+    return;
+  }
+  const resumeQueue = event.target.closest("[data-resume-queue]");
+  if (resumeQueue) {
+    const threadId = resumeQueue.dataset.resumeQueue;
+    const head = threadQueue(state, threadId)?.items[0] ?? null;
+    const resumed = await queueAction({ action: "resumeQueue", threadId }, { focusSelector: "#composerInput" });
+    if (resumed?.started) {
+      attributeTurnSettings(resumed.started.turnId, threadId, head?.queuedId === resumed.started.queuedId ? head.settings : null);
+      state.currentTurnId = resumed.started.turnId;
+      state.running = true;
+      $("#stopTurn").hidden = false;
+      syncComposerMode();
+      await openThread(resumeQueue.dataset.resumeQueue);
+    }
+    return;
+  }
   const remove = event.target.closest("[data-remove-attachment]");
   if (remove) { state.attachments.splice(Number(remove.dataset.removeAttachment), 1); renderAttachments(); return; }
   if (event.target.closest("[data-remove-quote]")) { state.composerQuote = null; renderComposerQuote(); return; }
@@ -2629,6 +2887,8 @@ document.addEventListener("toggle", (event) => {
 }, true);
 
 document.addEventListener("submit", async (event) => {
+  const queueEdit = event.target.closest("[data-queue-edit]");
+  if (queueEdit) { event.preventDefault(); await saveQueueEdit(queueEdit); return; }
   const form = event.target.closest("[data-request-form]");
   if (!form) return;
   event.preventDefault();
@@ -2697,8 +2957,17 @@ $("#composer").addEventListener("submit", submitTurn);
 $("#composerInput").addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
     event.preventDefault();
+    // Alt+Enter is the opposite of the Send label for this one message.
+    composerSubmitMode = event.altKey ? "opposite" : "default";
     $("#composer").requestSubmit();
   }
+});
+// Inline queue edit: Enter saves, Escape cancels and returns focus to Edit.
+$("#queueTray").addEventListener("keydown", (event) => {
+  const form = event.target.closest?.("[data-queue-edit]");
+  if (!form || !event.target.matches("textarea")) return;
+  if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); form.requestSubmit(); }
+  else if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); cancelQueueEdit(); }
 });
 $("#composerInput").addEventListener("input", autoSizeComposer);
 document.addEventListener("input", (event) => {
@@ -2715,7 +2984,12 @@ document.addEventListener("selectionchange", () => {
 });
 $("#stopTurn").addEventListener("click", async () => {
   if (!state.activeThreadId || !state.currentTurnId) return;
-  try { await action({ action: "interruptTurn", threadId: state.activeThreadId, turnId: state.currentTurnId }); }
+  try {
+    // The interrupt pauses a non-empty queue (pausedReason interrupted):
+    // nothing queued is sent until an explicit Resume.
+    const result = await action({ action: "interruptTurn", threadId: state.activeThreadId, turnId: state.currentTurnId });
+    if (result?.queue) { applyHostEvent(state, "queueChanged", { threadId: result.queue.threadId, queue: result.queue }); renderQueue(); }
+  }
   catch (error) { notify(error.message); }
 });
 $("#reviewButton").addEventListener("click", () => { closeSearch(false); closeInbox(false); closeImport(false); $("#reviewPanel").hidden = false; $("#reviewPanel").inert = false; syncScrim(); $("#closeReview").focus(); });

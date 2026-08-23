@@ -564,6 +564,7 @@ const assets = new Map([
   ["/request-drafts.mjs", script("request-drafts.mjs")],
   ["/quote-source.mjs", script("quote-source.mjs")],
   ["/timeline-reconcile.mjs", script("timeline-reconcile.mjs")],
+  ["/composer-queue.mjs", script("composer-queue.mjs")],
   ["/chat-fixtures.json", fixture("chat-fixtures.json")],
   ["/chat-conformance-fixtures.json", fixture("chat-conformance-fixtures.json")],
   ["/task-fixtures.json", fixture("task-fixtures.json")],

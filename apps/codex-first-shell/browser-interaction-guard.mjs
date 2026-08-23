@@ -260,19 +260,137 @@ export async function runBrowserInteractionGuard(hooks) {
 
   await hooks.switchFixtureThread(fixture.activeThread);
   const activeComposer = document.querySelector("#composer");
-  check(results, "active Turn exposes coherent Steer and Stop", activeComposer.dataset.turnPosture === "running" && activeComposer.dataset.currentTurnId === fixture.activeThread.turns[0].id && !document.querySelector("#stopTurn").hidden && document.querySelector("#sendButton").getAttribute("aria-label") === "Steer current turn");
-  const steerActions = [];
-  await hooks.withFixtureTransport(async (payload) => {
-    steerActions.push(payload);
+  const sendButton = document.querySelector("#sendButton");
+  check(results, "active Turn exposes coherent Queue and Stop", activeComposer.dataset.turnPosture === "running" && activeComposer.dataset.currentTurnId === fixture.activeThread.turns[0].id && !document.querySelector("#stopTurn").hidden && sendButton.getAttribute("aria-label") === "Queue message" && sendButton.textContent === "Queue" && sendButton.dataset.sendMode === "queue" && document.querySelector("#composerNote").textContent.includes("Alt+Enter steers"), `${sendButton.textContent}/${sendButton.getAttribute("aria-label")}`);
+
+  // --- The host-owned follow-up queue ------------------------------------
+  // Enter while a Turn streams queues through queueTurn (never turn/start,
+  // never turn/steer); the host's record renders as rows above the Composer;
+  // Alt+Enter is the explicit opposite and steers the exact live Turn.
+  const liveTurn = fixture.activeThread.turns[0].id;
+  const queueRecord = (items, extra = {}) => ({ threadId: fixture.activeThread.id, paused: false, pausedReason: null, lastError: null, limit: 20, items, ...extra });
+  const queuedItem = (queuedId, text, extra = {}) => ({ queuedId, queuedAt: "2026-08-22T00:00:00.000Z", settings: null, starting: false, input: [{ type: "text", text }], ...extra });
+  let queueTray = document.querySelector("#queueTray");
+  const queueActions = [];
+  let mirrored = queueRecord([]);
+  const queueFailure = (name, error) => check(results, name, false, `threw: ${error?.message ?? error}`);
+  try { await hooks.withFixtureTransport(async (payload) => {
+    queueActions.push(payload);
+    if (payload.action === "queueTurn") {
+      mirrored = queueRecord([...mirrored.items, queuedItem(`queued-${mirrored.items.length + 1}`, payload.input.find((item) => item.type === "text")?.text ?? "")]);
+      return { queuedId: mirrored.items.at(-1).queuedId, started: null, queue: structuredClone(mirrored) };
+    }
+    if (payload.action === "updateQueued") {
+      mirrored = queueRecord(mirrored.items.map((item) => (item.queuedId === payload.queuedId ? { ...item, input: payload.input } : item)));
+      return { queuedId: payload.queuedId, queue: structuredClone(mirrored) };
+    }
+    if (payload.action === "deleteQueued") {
+      mirrored = queueRecord(mirrored.items.filter((item) => item.queuedId !== payload.queuedId));
+      return { queuedId: payload.queuedId, queue: structuredClone(mirrored) };
+    }
+    if (payload.action === "steerQueued") {
+      mirrored = queueRecord(mirrored.items.filter((item) => item.queuedId !== payload.queuedId));
+      return { turnId: payload.expectedTurnId, queuedId: payload.queuedId, queue: structuredClone(mirrored) };
+    }
+    if (payload.action === "steerTurn") return { turnId: payload.expectedTurnId };
     if (payload.action === "readThread") return { thread: structuredClone(fixture.activeThread) };
+    if (payload.action === "listQueue") return { queue: structuredClone(mirrored) };
     return {};
   }, async () => {
-    document.querySelector("#composerInput").value = "Steer this exact active Turn";
+    const composerInput = document.querySelector("#composerInput");
+    composerInput.value = "Queued follow-up one";
+    composerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await waitFor(() => document.querySelectorAll("#queueTray .queue-row").length === 1);
+    composerInput.value = "Queued follow-up two";
     document.querySelector("#composer").requestSubmit();
-    await waitFor(() => steerActions.some((entry) => entry.action === "readThread"));
-  });
-  const steer = steerActions.find((entry) => entry.action === "steerTurn");
-  check(results, "active submission dispatches one exact steer", steer?.threadId === fixture.activeThread.id && steer?.expectedTurnId === fixture.activeThread.turns[0].id && !steerActions.some((entry) => entry.action === "startTurn"));
+    await waitFor(() => document.querySelectorAll("#queueTray .queue-row").length === 2);
+    queueTray = document.querySelector("#queueTray");
+    const rows = [...queueTray.querySelectorAll(".queue-row")];
+    const queued = queueActions.filter((entry) => entry.action === "queueTurn");
+    checkAll(results, "submission during a live Turn queues by default through queueTurn", {
+      twoQueueTurns: queued.length === 2 && queued.every((entry) => entry.threadId === fixture.activeThread.id && entry.input[0].type === "text"),
+      noStartOrSteer: !queueActions.some((entry) => entry.action === "startTurn" || entry.action === "steerTurn"),
+      rowsAboveComposer: rows.length === 2 && rows.map((row) => row.querySelector(".queue-text").textContent).join("|") === "Queued follow-up one|Queued follow-up two" && queueTray.getBoundingClientRect().bottom <= document.querySelector("#composer").getBoundingClientRect().top + 1,
+      composerCleared: composerInput.value === "",
+      rowActions: rows.every((row) => row.querySelector("[data-edit-queued]") && row.querySelector("[data-steer-queued]:not([disabled])") && row.querySelector("[data-delete-queued]")),
+      stillRunning: activeComposer.dataset.turnPosture === "running" && sendButton.textContent === "Queue",
+    }, `${queued.length} queueTurn · ${rows.length} rows`);
+
+    // Alt+Enter: the opposite of the Queue label, one exact turn/steer.
+    composerInput.value = "Steer this exact active Turn";
+    composerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", altKey: true, bubbles: true }));
+    await waitFor(() => queueActions.some((entry) => entry.action === "steerTurn"));
+    const steer = queueActions.find((entry) => entry.action === "steerTurn");
+    check(results, "Alt+Enter steers the exact live Turn instead of queueing", steer?.threadId === fixture.activeThread.id && steer?.expectedTurnId === liveTurn && steer.input[0].text === "Steer this exact active Turn" && queueActions.filter((entry) => entry.action === "queueTurn").length === 2 && !queueActions.some((entry) => entry.action === "startTurn"), JSON.stringify(steer ?? null).slice(0, 120));
+
+    // Per-row Edit (inline, Enter saves, focus returns to Edit), Delete and
+    // Steer (turn/steer with the exact expectedTurnId) through the host.
+    const editButton = queueTray.querySelector('[data-edit-queued="queued-1"]');
+    editButton.focus();
+    editButton.click();
+    await frame();
+    const editor = queueTray.querySelector('[data-queue-edit="queued-1"] textarea');
+    const editorFocused = document.activeElement === editor;
+    editor.value = "Queued follow-up one, edited";
+    editor.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await waitFor(() => queueTray.querySelector(".queue-text")?.textContent === "Queued follow-up one, edited");
+    const update = queueActions.find((entry) => entry.action === "updateQueued");
+    const editFocusReturned = document.activeElement === queueTray.querySelector('[data-edit-queued="queued-1"]');
+    queueTray.querySelector('[data-delete-queued="queued-2"]').click();
+    await waitFor(() => queueTray.querySelectorAll(".queue-row").length === 1);
+    const deletion = queueActions.find((entry) => entry.action === "deleteQueued");
+    queueTray.querySelector('[data-steer-queued="queued-1"]').click();
+    await waitFor(() => queueActions.some((entry) => entry.action === "steerQueued"));
+    await waitFor(() => document.querySelector("#queueTray").hidden);
+    const rowSteer = queueActions.find((entry) => entry.action === "steerQueued");
+    checkAll(results, "queued rows edit, delete and steer through the host queue actions", {
+      editorFocused,
+      updateCarriesEditedText: update?.queuedId === "queued-1" && update.input.length === 1 && update.input[0].text === "Queued follow-up one, edited" && update.settings === undefined,
+      editFocusReturned,
+      deleteNamesRow: deletion?.queuedId === "queued-2" && deletion.threadId === fixture.activeThread.id,
+      steerNamesExactTurn: rowSteer?.queuedId === "queued-1" && rowSteer.expectedTurnId === liveTurn,
+      queueEmptied: document.querySelector("#queueTray").hidden,
+    }, `${queueActions.map((entry) => entry.action).join(",")}`);
+
+    // The interrupt pauses the queue (host pausedReason interrupted): the
+    // paused copy names the cause and Resume is the only way out; the
+    // resumed head starts as its own Turn and the transcript is re-read.
+    mirrored = queueRecord([queuedItem("queued-7", "Paused follow-up")], { paused: true, pausedReason: "interrupted" });
+    await hooks.applyEventWindow({ events: [{ sequence: 21, kind: "queueChanged", value: { threadId: fixture.activeThread.id, queue: structuredClone(mirrored) } }], cursor: 21, oldestCursor: 1, gap: false, runtimeGeneration: 2, runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+    queueTray = document.querySelector("#queueTray");
+    const pausedNote = queueTray.querySelector(".queue-paused");
+    const pausedShown = !queueTray.hidden && queueTray.dataset.paused === "true" && queueTray.dataset.pausedReason === "interrupted" && pausedNote?.textContent.includes("Queue paused because you interrupted") && Boolean(pausedNote.querySelector("[data-resume-queue]"));
+    const actionsBeforeResume = queueActions.length;
+    await frame();
+    const nothingSentWhilePaused = queueActions.length === actionsBeforeResume;
+    pausedNote?.querySelector("[data-resume-queue]")?.click();
+    await waitFor(() => queueActions.some((entry) => entry.action === "resumeQueue"));
+    const resume = queueActions.find((entry) => entry.action === "resumeQueue");
+    check(results, "an interrupted queue stays paused until an explicit Resume", pausedShown && nothingSentWhilePaused && resume?.threadId === fixture.activeThread.id && !queueActions.some((entry) => entry.action === "startTurn"), `${queueTray.dataset.paused}/${queueTray.dataset.pausedReason} · ${pausedNote?.textContent.slice(0, 60) ?? "no paused note"}`);
+  }); } catch (error) { queueFailure("queue checks completed", error); }
+
+  // queuedStarted: the follow-up became its own Turn with a runtime-minted
+  // id. The row leaves the queue and the re-read Thread carries the new
+  // Turn's user message as the next transcript entry.
+  const startedThread = structuredClone(fixture.activeThread);
+  startedThread.turns = [{ ...startedThread.turns[0], status: "completed" }, { id: "fixture-queued-turn", status: "inProgress", items: [{ type: "userMessage", id: "fixture-queued-user", content: [{ type: "text", text: "Paused follow-up" }] }] }];
+  const startedActions = [];
+  try { await hooks.withFixtureTransport(async (payload) => {
+    startedActions.push(payload);
+    if (payload.action === "readThread") return { thread: structuredClone(startedThread) };
+    if (payload.action === "listQueue") return { queue: queueRecord([]) };
+    return {};
+  }, async () => {
+    await hooks.applyEventWindow({ events: [
+      { sequence: 22, kind: "queuedStarted", value: { threadId: fixture.activeThread.id, queuedId: "queued-7", turnId: "fixture-queued-turn" } },
+      { sequence: 23, kind: "queueChanged", value: { threadId: fixture.activeThread.id, queue: queueRecord([]) } },
+      { sequence: 24, kind: "notification", value: { method: "turn/started", params: { threadId: fixture.activeThread.id, turn: { id: "fixture-queued-turn", status: "inProgress", items: [] } } } },
+    ], cursor: 24, oldestCursor: 1, gap: false, runtimeGeneration: 2, runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+    await waitFor(() => document.querySelector('.turn.user[data-item-id$="fixture-queued-user"]'));
+    const userEntries = [...document.querySelectorAll(".turn.user")];
+    check(results, "queuedStarted moves the follow-up into the transcript as its own Turn", startedActions.some((entry) => entry.action === "readThread" && entry.threadId === fixture.activeThread.id) && document.querySelector("#queueTray").hidden && userEntries.at(-1)?.textContent.includes("Paused follow-up") && userEntries.at(-1).closest(".timeline-entry")?.dataset.renderKey?.includes("fixture-queued-turn") && document.querySelector("#composer").dataset.currentTurnId === "fixture-queued-turn", `${userEntries.length} user entries · ${startedActions.map((entry) => entry.action).join(",")}`);
+  }); } catch (error) { queueFailure("queuedStarted check completed", error); }
+  await hooks.switchFixtureThread(fixture.activeThread);
   const interrupted = structuredClone(fixture.activeThread);
   interrupted.status = { type: "idle" };
   interrupted.turns.at(-1).status = "interrupted";
@@ -986,8 +1104,8 @@ export async function runBrowserInteractionGuard(hooks) {
   const stop = document.querySelector("#stopTurn");
   const running = composer.dataset.turnPosture === "running";
   check(results, "Turn posture is internally coherent", running
-    ? Boolean(composer.dataset.currentTurnId) && !stop.hidden && send.getAttribute("aria-label") === "Steer current turn"
-    : !composer.dataset.currentTurnId && stop.hidden && send.getAttribute("aria-label") === "Send message");
+    ? Boolean(composer.dataset.currentTurnId) && !stop.hidden && send.getAttribute("aria-label") === "Queue message" && send.textContent === "Queue"
+    : !composer.dataset.currentTurnId && stop.hidden && send.getAttribute("aria-label") === "Send message" && send.textContent === "↑");
   check(results, "terminal mixed fixture makes no false live claim", !document.querySelector(".turn-boundary") || !running);
 
   if (location.href !== originalHref) history.replaceState(history.state, "", originalHref);

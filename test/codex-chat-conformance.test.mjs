@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { applyChatEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
+import { applyChatEvent, applyHostEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, rememberQueue, threadQueue, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
+import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
 import { loadThreadDraft, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
 import { clampComposerHeight, composerBounds, COMPOSER_HEIGHT_FALLBACK } from "../apps/codex-first-shell/composer-sizing.mjs";
 import {
@@ -138,6 +139,45 @@ test("live reducer memory is bounded before authoritative completion", () => {
   const files = model.liveItems.get(itemKey("thread", "large", "files"));
   assert.equal(files.changes.length, 32);
   assert.equal(files.changes[0].diff.length, 20_000);
+});
+
+test("the host-owned follow-up queue mirrors queueChanged, queuedStarted and queuedFailed without inventing state", () => {
+  const model = { liveItems: new Map(), turnErrors: new Map() };
+  const image = { type: "image", url: "data:image/png;base64,AA==" };
+  const full = { threadId: "thread-q", paused: false, pausedReason: null, lastError: null, limit: 20, items: [{ queuedId: "queued-1", queuedAt: "2026-08-22T00:00:00.000Z", settings: { effort: "low" }, starting: false, input: [{ type: "text", text: "A" }, image] }] };
+  assert.equal(rememberQueue(model, full), full);
+  assert.equal(threadQueue(model, "thread-q"), full);
+  assert.equal(threadQueue(model, "elsewhere"), null);
+  // The event feed elides media; the mirror keeps the bytes a full read carried.
+  const elided = { ...full, items: [{ ...full.items[0], input: [{ type: "text", text: "A" }, { type: "image", elided: true, byteLength: 26 }] }, { queuedId: "queued-2", queuedAt: "2026-08-22T00:00:01.000Z", settings: null, starting: false, input: [{ type: "text", text: "B" }] }] };
+  const changed = applyHostEvent(model, "queueChanged", { threadId: "thread-q", queue: elided });
+  assert.equal(changed.kind, "queueChanged");
+  assert.deepEqual(changed.queue.items.map((item) => item.input), [[{ type: "text", text: "A" }, image], [{ type: "text", text: "B" }]]);
+  assert.deepEqual(mergeQueueRecord(null, elided).items[0].input[1], { type: "image", elided: true, byteLength: 26 }, "without a prior full read the elided entry stays elided");
+  assert.equal(mergeQueueRecord(full, null), full);
+  // queuedStarted names the follow-up that became its own Turn; the item is
+  // still in the mirror at that moment so the Turn can be attributed its settings.
+  const started = applyHostEvent(model, "queuedStarted", { threadId: "thread-q", queuedId: "queued-1", turnId: "turn-minted" });
+  assert.deepEqual([started.kind, started.turnId, started.item?.queuedId, started.item?.settings], ["queuedStarted", "turn-minted", "queued-1", { effort: "low" }]);
+  assert.deepEqual(applyHostEvent(model, "queuedFailed", { threadId: "thread-q", queuedId: "queued-1", error: "refused" }), { kind: "queuedFailed", threadId: "thread-q", queuedId: "queued-1", error: "refused" });
+  // Records without a Thread, unknown kinds and malformed queues change nothing.
+  assert.equal(applyHostEvent(model, "queueChanged", { queue: full }), null);
+  assert.equal(applyHostEvent(model, "queueChanged", { threadId: "thread-q", queue: "nope" }), null);
+  assert.equal(applyHostEvent(model, "somethingElse", { threadId: "thread-q" }), null);
+  assert.equal(threadQueue(model, "thread-q").items.length, 2);
+  for (let index = 0; index < 70; index += 1) rememberQueue(model, { ...full, threadId: `thread-${index}` });
+  assert.equal(threadQueue(model, "thread-q"), null, "the mirror is bounded");
+  // Paused copy comes from the host's pausedReason alone.
+  assert.equal(pausedMessage({ paused: true, pausedReason: "interrupted" }), "Queue paused because you interrupted. Nothing is sent until you resume.");
+  assert.equal(pausedMessage({ paused: true, pausedReason: "start_failed", lastError: { message: "Unknown thread" } }), "Queue paused because the next follow-up could not start. Unknown thread Nothing is sent until you resume.");
+  assert.match(pausedMessage({ paused: true, pausedReason: "later_reason" }), /^Queue paused \(later_reason\)\./);
+  assert.equal(pausedMessage({ paused: false }), "");
+  assert.deepEqual(Object.keys(QUEUE_PAUSE_MESSAGES), ["interrupted", "turn_failed", "runtime_exited", "start_failed"]);
+  // An inline edit replaces the text input only; stale byte ranges never survive it.
+  assert.deepEqual(replaceQueuedText([{ type: "text", text: "old", text_elements: [{ byteRange: { start: 0, end: 3 } }] }, { type: "mention", name: "x", path: "/x" }], "new"), [{ type: "text", text: "new" }, { type: "mention", name: "x", path: "/x" }]);
+  assert.deepEqual(replaceQueuedText([{ type: "text", text: "new" }], "new @x", [{ byteRange: { start: 4, end: 6 }, placeholder: "@x" }]), [{ type: "text", text: "new @x", text_elements: [{ byteRange: { start: 4, end: 6 }, placeholder: "@x" }] }]);
+  assert.deepEqual(replaceQueuedText([image], "   "), [image]);
+  assert.deepEqual([queuedText(full.items[0]), queuedMediaSummary(full.items[0]), queuedMediaSummary({ input: [image, image, { type: "skill", name: "s", path: "/s" }] })], ["A", "1 image", "2 images · 1 skill"]);
 });
 
 test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {
@@ -462,7 +502,7 @@ test("conformance matrix proof entries resolve to existing files, exact tests an
       assert.ok(typeof text === "string", `${check.id} proof path exists: ${path}`);
       if (name) {
         const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        assert.match(text, new RegExp(`(?:test|check\\(results,)\\s*\\(?\\s*"${escaped}"`), `${check.id}: ${path} declares no test or guard check named "${name}"`);
+        assert.match(text, new RegExp(`(?:test|check(?:All)?\\(results,)\\s*\\(?\\s*"${escaped}"`), `${check.id}: ${path} declares no test or guard check named "${name}"`);
       }
     }
   }
@@ -528,7 +568,20 @@ test("audit corrections wire running steer, fork, Thread drafts, drawer semantic
   assert.match(host, /payload\.action === "archiveThread"[^]*projects\.archiveThread/);
   assert.match(projectsAdapter, /thread\/archive/);
   assert.match(host, /payload\.action === "setThreadName"[^]*thread\/name\/set/);
-  assert.match(script, /state\.running \? "steerTurn" : "startTurn"/);
+  // Queue is the default while a Turn streams; steer is the explicit opposite
+  // (Alt+Enter) and names the exact live Turn; idle submission starts a Turn.
+  assert.match(script, /const steer = state\.running && mode === "opposite";/);
+  assert.match(script, /const dispatch = steer \? "steerTurn" : state\.running \? "queueTurn" : "startTurn";/);
+  assert.match(script, /\.\.\.\(steer \? \{ expectedTurnId: state\.currentTurnId \} : \{\}\)/);
+  assert.match(script, /composerSubmitMode = event\.altKey \? "opposite" : "default";/);
+  assert.match(script, /queueing \? "Queue message" : state\.running \? "Steer current turn" : "Send message"/);
+  assert.match(script, /action: "interruptTurn"[^]*applyHostEvent\(state, "queueChanged"/, "the interrupt response carries the paused queue");
+  assert.match(script, /action: "steerQueued", threadId: queue\.threadId, queuedId: steerQueued\.dataset\.steerQueued, expectedTurnId: state\.currentTurnId/);
+  assert.match(script, /action: "resumeQueue", threadId/);
+  assert.match(script, /action: "updateQueued", threadId: queue\.threadId, queuedId, input: next/);
+  assert.match(script, /action: "deleteQueued", threadId: queue\.threadId/);
+  assert.match(script, /action: "listQueue", threadId/);
+  assert.doesNotMatch(script, /thread\/queue\//, "the experimental server-side queue stays out of the browser too");
   assert.match(script, /liveTurnId\(fixture\.thread\)/);
   assert.match(script, /dataset\.turnPosture/);
   assert.match(script, /params\.get\("thread"\)/);

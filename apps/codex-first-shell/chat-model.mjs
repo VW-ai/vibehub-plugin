@@ -1,5 +1,8 @@
+import { mergeQueueRecord } from "./composer-queue.mjs";
+
 const LIVE_STATUSES = new Set(["inProgress", "running"]);
 export const LIVE_ITEM_LIMIT = 64;
+const THREAD_RECORD_LIMIT = 64;
 const LIVE_TEXT_LIMIT = 32_000;
 const LIVE_OUTPUT_LIMIT = 20_000;
 const LIVE_CHANGE_LIMIT = 32;
@@ -55,8 +58,123 @@ function clearTurnTransient(model, threadId, turnId) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Per-Thread records the runtime reports beside the transcript. Each one is
+// exactly what the app-server or the host sent: the last
+// thread/tokenUsage/updated (no value exists before the first one), the
+// settings record the host attached or the forwarded thread/settings/updated,
+// and the host-owned follow-up queue. None of it is persisted in the browser.
+// ---------------------------------------------------------------------------
+
+// thread/tokenUsage/updated: { threadId, turnId, tokenUsage: { total, last,
+// modelContextWindow } } — inside a Turn before its turn/completed, and
+// replayed on thread/resume.
+export function applyTokenUsage(model, params = {}) {
+  if (typeof params.threadId !== "string" || !params.tokenUsage || typeof params.tokenUsage !== "object") return false;
+  const usage = transientMap(model, "tokenUsage");
+  const total = params.tokenUsage.total ?? null;
+  usage.delete(params.threadId);
+  usage.set(params.threadId, {
+    threadId: params.threadId,
+    turnId: params.turnId ?? null,
+    totalTokens: Number.isFinite(total?.totalTokens) ? total.totalTokens : null,
+    modelContextWindow: Number.isFinite(params.tokenUsage.modelContextWindow) ? params.tokenUsage.modelContextWindow : null,
+    total,
+    last: params.tokenUsage.last ?? null,
+  });
+  trimMap(usage, THREAD_RECORD_LIMIT);
+  return true;
+}
+
+// The settings record shape the host attaches (daily-use-host-contract.json
+// settingsRecord): model, effort, approvalPolicy, sandboxPolicy, source,
+// observedAt. A forwarded thread/settings/updated becomes the same record
+// with source thread/settings/updated; note effort, not reasoningEffort.
+export function settingsRecordFromNotification(params = {}) {
+  const settings = params.threadSettings;
+  if (typeof params.threadId !== "string" || !settings || typeof settings !== "object") return null;
+  return {
+    model: settings.model ?? null,
+    effort: settings.effort ?? null,
+    approvalPolicy: settings.approvalPolicy ?? null,
+    sandboxPolicy: settings.sandboxPolicy ?? null,
+    source: "thread/settings/updated",
+    observedAt: new Date().toISOString(),
+  };
+}
+
+export function rememberThreadSettings(model, threadId, record) {
+  if (typeof threadId !== "string" || !threadId) return false;
+  const settings = transientMap(model, "threadSettings");
+  settings.delete(threadId);
+  if (record) settings.set(threadId, record);
+  trimMap(settings, THREAD_RECORD_LIMIT);
+  return true;
+}
+
+export function threadSettings(model, threadId) {
+  return transientMap(model, "threadSettings").get(threadId) ?? null;
+}
+
+export function threadTokenUsage(model, threadId) {
+  return transientMap(model, "tokenUsage").get(threadId) ?? null;
+}
+
+export function threadQueue(model, threadId) {
+  return transientMap(model, "queues").get(threadId) ?? null;
+}
+
+// Host events about the follow-up queue. queueChanged carries the whole
+// record (media elided), queuedStarted names the follow-up that became its
+// own Turn (the record that follows drops it), queuedFailed names the one
+// whose turn/start was refused (it stays at the head, the queue pauses with
+// start_failed). The started item is returned so the caller can attribute
+// the new Turn's settings.
+export function applyHostEvent(model, kind, value = {}) {
+  if (typeof value.threadId !== "string") return null;
+  const queues = transientMap(model, "queues");
+  if (kind === "queueChanged") {
+    if (!value.queue || typeof value.queue !== "object") return null;
+    const prior = transientMap(model, "queueShadow").get(value.threadId) ?? queues.get(value.threadId) ?? null;
+    queues.delete(value.threadId);
+    queues.set(value.threadId, mergeQueueRecord(prior, value.queue));
+    trimMap(queues, THREAD_RECORD_LIMIT);
+    return { kind, threadId: value.threadId, queue: queues.get(value.threadId) };
+  }
+  if (kind === "queuedStarted") {
+    const queue = queues.get(value.threadId);
+    const item = queue?.items.find((entry) => entry.queuedId === value.queuedId) ?? null;
+    return { kind, threadId: value.threadId, queuedId: value.queuedId, turnId: value.turnId, item };
+  }
+  if (kind === "queuedFailed") {
+    return { kind, threadId: value.threadId, queuedId: value.queuedId, error: value.error ?? null };
+  }
+  return null;
+}
+
+// A queue record read with full media (listQueue, queueTurn, updateQueued,
+// deleteQueued, resumeQueue, steerQueued responses) replaces the mirror and
+// is kept as the shadow that later elided events borrow their media from.
+export function rememberQueue(model, queue) {
+  if (!queue || typeof queue.threadId !== "string") return null;
+  const queues = transientMap(model, "queues");
+  const shadows = transientMap(model, "queueShadow");
+  queues.delete(queue.threadId);
+  queues.set(queue.threadId, queue);
+  shadows.delete(queue.threadId);
+  shadows.set(queue.threadId, queue);
+  trimMap(queues, THREAD_RECORD_LIMIT);
+  trimMap(shadows, THREAD_RECORD_LIMIT);
+  return queue;
+}
+
 export function applyChatEvent(model, method, params = {}) {
   if (!model?.liveItems || !model?.turnErrors) throw new TypeError("Chat model requires liveItems and turnErrors Maps");
+  if (method === "thread/tokenUsage/updated") return applyTokenUsage(model, params);
+  if (method === "thread/settings/updated") {
+    const record = settingsRecordFromNotification(params);
+    return record ? rememberThreadSettings(model, params.threadId, record) : false;
+  }
   if (method === "item/started") {
     const key = itemKey(params.threadId, params.turnId, params.item.id);
     model.liveItems.set(key, { ...params.item, changes: boundedChanges(params.item.changes), _threadId: params.threadId, _turnId: params.turnId, _key: key, _live: true });
