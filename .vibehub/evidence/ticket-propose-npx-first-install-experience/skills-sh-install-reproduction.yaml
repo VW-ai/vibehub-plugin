@@ -1,0 +1,14 @@
+{
+  "acceptance_ids": [
+    "skills-sh-breakage-is-reproduced-and-recorded"
+  ],
+  "evidence_id": "skills-sh-install-reproduction",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T01:54:19Z",
+  "refs": [
+    ".vibehub/evidence/ticket-propose-npx-first-install-experience/skills-sh-install-transcript-2026-08-22.txt"
+  ],
+  "schema_version": 1,
+  "summary": "In a scratch git project, npx skills add VW-ai/vibehub-plugin with -a claude-code and -a codex copied all 11 skills into .claude/skills/ and .agents/skills/ respectively (including agents/, references/, assets/ subfolders) but no skills/scripts/ or skills/contracts/; the copied SKILL.md files contain 45 ../scripts or ../contracts references and node import of the expected helper path fails with ERR_MODULE_NOT_FOUND. Transcript checked in beside this Evidence.",
+  "ticket_id": "ticket-propose-npx-first-install-experience"
+}
