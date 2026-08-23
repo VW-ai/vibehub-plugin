@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "two-part-structure-is-scannable"
+  ],
+  "evidence_id": "two-part-layout-62-lines",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T06:57:00Z",
+  "refs": [
+    "commit:88ec41b",
+    "README.md",
+    "docs/INSTALL.md"
+  ],
+  "schema_version": 1,
+  "summary": "Top part: logo, tagline, Install, entry line, three-item What you get, one hero screenshot. Lower part: How it works (loop sentence plus four steps), See what matters now (two Workbench screenshots), Work with your team on GitHub, Learn more. Upgrades text moved to docs/INSTALL.md with skills update added; README is 62 lines under the raised 90-line budget.",
+  "ticket_id": "ticket-readme-install-first-two-part-story"
+}
