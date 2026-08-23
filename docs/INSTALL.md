@@ -77,6 +77,13 @@ and a small managed project-instruction block. Validate with:
 node <plugin>/skills/vibehub-core/scripts/vh.mjs project validate --repo <repository>
 ```
 
+Setup then asks one optional question when the repository's `origin` is on
+GitHub: whether to mirror Tickets to GitHub Issues. Saying yes copies one
+workflow and a self-contained `scripts/vibehub/` folder (the sync script, the
+helper, and two contract files) so the mirror runs in GitHub Actions on push
+to `main` without the plugin; no Agent ever runs or checks it. See
+[GITHUB_ISSUES.md](GITHUB_ISSUES.md).
+
 ## Upgrade the plugin and project data
 
 Plugin code and checked-in project data have separate lifecycles. Updating a

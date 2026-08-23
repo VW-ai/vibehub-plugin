@@ -2,7 +2,7 @@
   "acceptance": [
     {
       "acceptance_id": "room-schema",
-      "criterion": "skills/vibehub-core/contracts/room.schema.json defines room.yaml (description, boundary, anchor globs, alignment block with last_aligned_commit, checked_at and per-file blob hashes, stale flag with optional reason) and validates every checked-in room.yaml."
+      "criterion": "skills/contracts/room.schema.json defines room.yaml (description, boundary, anchor globs, alignment block with last_aligned_commit, checked_at and per-file blob hashes, stale flag with optional reason) and validates every checked-in room.yaml."
     },
     {
       "acceptance_id": "vh-room-validation",
