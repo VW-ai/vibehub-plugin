@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "all-redirect-hosts-are-verified",
+    "preflight-passes-locally",
+    "owner-dns-steps-are-explicit"
+  ],
+  "closed_at": "2026-08-23T10:30:00Z",
+  "evidence_ids": [
+    "evidence-team-canonical-references",
+    "evidence-verify-redirects-command",
+    "evidence-preflight-passes",
+    "evidence-owner-dns-steps"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "partial",
+  "summary": "Independent adjudication at commits f0373f5 and eae2e6a. Accepted all-redirect-hosts-are-verified: release.mjs exposes verify-redirects (verify-www removed, usage rejects it) iterating www.vibehub.team, vibehub.icu, www.vibehub.icu, vibehub.systems, www.vibehub.systems over http and https, asserting 301/308 plus exact path-and-query Location at https://vibehub.team; checkConfiguration, verify, and tests/rendered-html.test.mjs reject every redirect host in sitemap.xml; a live run fails only with ENOTFOUND because the domains are not yet bound, which is expected. Accepted preflight-passes-locally: release.mjs check and preflight return ok with canonical_url https://vibehub.team and site/tests pass 9/9 with NEXT_PUBLIC_SITE_URL=https://vibehub.team. Accepted owner-dns-steps-are-explicit: SKILL.md Publish step 4 names DNS, Pages custom-domain binding, and redirect rules for the three domains as owner-performed Cloudflare actions, forbids Agent mutation, lists the read-only wrangler inspection commands, step 5 lists verify and verify-redirects, and the Stop conditions section is unchanged. Rejected team-is-the-only-canonical-url: the listed files (release.mjs, SKILL.md, package.json release:verify, site/README.md, root README.md, robots.txt, sitemap.xml, product Room intent) do name https://vibehub.team with vibehub.icu only as redirect-only prose, but vibehub.icu references remain as the canonical expectation in repository checks outside the listed files: test/site-release-workflow.test.mjs line 47 asserts canonical_url https://vibehub.icu, test/release.test.mjs and the README test still require the vibehub.icu href and 'Production: [vibehub.icu]' line, and scripts/verify-plugin-artifact.mjs line 87 requires the installed README to carry the vibehub.icu link. Consequence: root npm test drops from 143/143 at the base commit to 139/143 (4 failures) and node scripts/verify-plugin-artifact.mjs fails, so the artifact verification path no longer passes. The criterion's 'no vibehub.icu reference remains except as a documented redirect-only host' is not met and the change regresses the repository suite. Follow-up: update those four checks to vibehub.team, then re-adjudicate.",
+  "ticket_id": "ticket-make-vibehub-team-canonical-hostname",
+  "unresolved_acceptance_ids": [
+    "team-is-the-only-canonical-url"
+  ]
+}
