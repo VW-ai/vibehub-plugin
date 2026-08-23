@@ -333,6 +333,15 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .turn-boundary span { color: var(--text); font-weight: 560; }
 .turn-boundary strong { font-weight: 400; }
 .turn-boundary.runtimeExited { border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
+.turn-boundary.compacted { border-style: dashed; }
+.turn-boundary.compacted span { color: var(--accent); }
+/* Context use in the Chat header: a meter only when the runtime reported a
+   window, the label always the runtime's own numbers. */
+.thread-context { display: flex; align-items: center; gap: 8px; min-height: 18px; margin-top: 6px; color: var(--muted); font-size: 10px; }
+.thread-context[data-state="unknown"] { color: var(--faint); }
+.context-meter { display: inline-block; width: 96px; height: 6px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--raised); }
+.context-meter i { display: block; height: 100%; background: var(--accent); }
+.thread-actions button[disabled] { opacity: .55; cursor: not-allowed; }
 .turn-boundary.runtimeExited span { color: var(--danger); }
 .approval-card { margin: 14px 0 14px 38px; padding: 12px; border: 1px solid color-mix(in srgb, #d89b00 45%, var(--line)); border-radius: 11px; background: color-mix(in srgb, #d89b00 7%, var(--panel)); }
 .approval-card > header { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--warn); font: 9px/1 var(--mono); text-transform: uppercase; }

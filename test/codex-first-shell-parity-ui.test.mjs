@@ -94,6 +94,20 @@ test("images paste and drop into the Composer as data-URL image inputs, never lo
   assert.match(script, /if \(file\.size > MAX_ATTACHMENT_BYTES\)/, "the byte bound is applied before a file is read");
 });
 
+test("the context indicator reads thread/tokenUsage/updated only and Compact calls compactThread when no Turn is live", async () => {
+  const { script, contract } = await shellSources();
+  assert.match(script, /const usage = contextUsage\(threadTokenUsage\(state, state\.activeThreadId\)\);/);
+  assert.match(script, /const meter = usage\.state === "known" \? `<span class="context-meter" role="img"/, "a meter only when the runtime reported a window");
+  assert.match(script, /fill\.style\.width = `\$\{Math\.min\(100, Math\.max\(0, usage\.percent\)\)\}%`;/, "the CSP forbids inline style attributes; the fill is set through the CSSOM");
+  assert.match(script, /const result = await action\(\{ action: "compactThread", threadId \}\);/);
+  assert.match(script, /error\.code === "turn_live"/, "the host's 409 turn_live refusal is shown as its own message");
+  assert.match(script, /compactDisabledReason\(\{ running: state\.running, fixture: state\.fixtureMode, runtimeAlive/);
+  assert.match(script, /if \(item\.type === "contextCompaction"\) return `<div class="turn-boundary compacted" data-context-compaction=/, "the contextCompaction item is a boundary row");
+  assert.doesNotMatch(script, /thread\/compacted/, "the browser waits for no thread/compacted: the item is the signal");
+  assert.match(contract.forwardedNotifications["thread/tokenUsage/updated"], /show no value before the first one and no percentage while modelContextWindow is null/);
+  assert.match(contract.actions.compactThread.rules, /409 turn_live/);
+});
+
 test("@ and $ mentions are picked from searchFiles and listSkills and sent as text_elements with mention and skill items", async () => {
   const { html, script, renderer, contract } = await shellSources();
   assert.match(html, /<div class="mention-picker" id="mentionPicker" role="listbox" aria-label="Mention suggestions" hidden><\/div>/);

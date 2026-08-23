@@ -328,7 +328,9 @@ export function timelineWindow(thread, model, { limit = 240 } = {}) {
     const turnLive = turnIsLive(turn);
     const items = (turn.items ?? []).map((item) => {
       const key = itemKey(threadId, turn.id, item.id);
-      return { ...item, _threadId: threadId, _turnId: turn.id, _key: key, _live: false, _turnLive: turnLive };
+      // A contextCompaction item is the transcript boundary of its
+      // compaction Turn (the 0.149.0 v2 path sends no thread/compacted).
+      return { ...item, _threadId: threadId, _turnId: turn.id, _key: key, _live: false, _turnLive: turnLive, ...(item.type === "contextCompaction" ? { _boundary: "compacted" } : {}) };
     });
     if (["interrupted", "failed"].includes(turn.status)) {
       const boundaryKey = itemKey(threadId, turn.id, `boundary-${turn.id}`);

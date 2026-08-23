@@ -1,7 +1,8 @@
-import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, rememberThreadSettings, threadQueue, threadSettings, timelineWindow } from "./chat-model.mjs";
+import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, rememberThreadSettings, threadQueue, threadSettings, threadTokenUsage, timelineWindow } from "./chat-model.mjs";
 import { describeTurnSettings, effortOptionLabel, findModel, imageRefusal, modelOptionLabel, pendingOverrides, selectedEffort, selectedModel } from "./composer-settings.mjs";
 import { acceptAttachment, attachmentKind, imageFilesFrom, MAX_ATTACHMENT_BYTES, renderAttachmentChips } from "./composer-attachments.mjs";
 import { activeTrigger, chipsFromItems, composeTextElements, insertPlaceholder, placeholderFor, removePlaceholder } from "./composer-mentions.mjs";
+import { compactDisabledReason, contextUsage } from "./context-usage.mjs";
 import { emptyQueue, pausedMessage, queuedMediaSummary, queuedText, replaceQueuedText } from "./composer-queue.mjs";
 import {
   DOM_LIMITS,
@@ -586,6 +587,7 @@ function syncComposerMode() {
   const halted = Boolean(state.bootstrap?.stop);
   if (!state.creatingThread) $("#newThread").disabled = halted;
   for (const fork of $$("[data-fork-thread]")) fork.disabled = state.fixtureMode || state.running || halted;
+  renderContextIndicator();
   input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : queueing ? "Queue a follow-up for after this Turn" : "Ask Codex to do something";
   $("#composerNote").textContent = taskMode
     ? (linked
@@ -1073,7 +1075,7 @@ function renderItem(item, budget, { posture = "" } = {}) {
   if (item.type === "sleep") return `<div class="timeline-divider"><span>◷ Waiting</span><strong>${escapeHtml(takeText(budget, item.reason ?? item.status ?? "Codex paused", 1_000).text)}</strong></div>`;
   if (item.type === "imageGeneration") return `<div class="activity-row">${disclosureCard({ identity, kind: "image-generation", icon: "▧", title: "Image generation", status: statusLabel(item), summary: takeText(budget, item.prompt ?? "Generated image activity", 240).text, detail: renderGeneratedImage(item, budget), open: Boolean(item.result) })}</div>`;
   if (item.type === "enteredReviewMode" || item.type === "exitedReviewMode") return `<div class="timeline-divider"><span>${item.type === "enteredReviewMode" ? "Entered" : "Finished"} review</span><strong>${escapeHtml(takeText(budget, item.review, 1_000).text)}</strong></div>`;
-  if (item.type === "contextCompaction") return '<div class="timeline-divider"><span>Context compacted</span><strong>Earlier detail remains in Thread history</strong></div>';
+  if (item.type === "contextCompaction") return `<div class="turn-boundary compacted" data-context-compaction="${escapeHtml(item.id ?? identity)}" role="note"><span>Context compacted</span><strong>Codex continues from a summary of the earlier Turns; the full detail remains in Thread history.</strong></div>`;
   if (item.type === "hookPrompt") return `<div class="timeline-divider" data-hook-prompt="${escapeHtml(identity)}"><span>Repository instructions</span><strong>${escapeHtml((item.fragments ?? []).map((fragment) => fragment.text ?? fragment.content ?? "").join(" ").slice(0, 120))}</strong></div>`;
   if (item.type === "turnError") return `<section class="turn-error"><strong>${item.willRetry ? "Codex is retrying" : "This Turn stopped"}</strong><p>${escapeHtml(takeText(budget, item.message, 4_000).text)}</p>${item.willRetry ? '<span class="retrying">Retrying…</span>' : `<button type="button" data-retry-turn="${escapeHtml(item._turnId)}">Retry as a new Turn</button>`}</section>`;
   if (item.type === "turnBoundary") return `<div class="turn-boundary ${escapeHtml(item.status)}"><span>${item.status === "interrupted" ? "Turn interrupted" : item.status === "runtimeExited" ? "Runtime exited during this Turn" : "Turn failed"}</span><strong>${escapeHtml(takeText(budget, item.message ?? (item.status === "interrupted" ? "Partial output remains in Thread history." : "The error remains inspectable in this Thread."), 4_000).text)}</strong></div>`;
@@ -1319,9 +1321,10 @@ function renderChat({ preserveScroll = false } = {}) {
       : state.running ? "Codex response updated." : "Codex response settled.";
   } else {
     captureRequestDrafts(surface);
-    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p></div><div class="thread-actions"><label><span class="sr-only">Move Chat to group</span><select id="activeThreadProject" aria-label="Move Chat to group">${projectOptions}</select></label><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p><div class="thread-context" id="contextIndicator" data-state="unknown"></div></div><div class="thread-actions"><label><span class="sr-only">Move Chat to group</span><select id="activeThreadProject" aria-label="Move Chat to group">${projectOptions}</select></label><button type="button" data-compact-thread="${escapeHtml(state.activeThread.id)}" aria-label="Compact this chat's context" disabled>Compact</button><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
     restoreRequestDrafts(surface);
   }
+  renderContextIndicator();
   requestAnimationFrame(() => {
     if (selecting) surface.scrollTop = heldScrollTop;
     else if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
@@ -2227,6 +2230,44 @@ function chooseEffort(effort) {
   renderComposerSettings();
 }
 
+// --- Context use and compaction ---------------------------------------------
+// The indicator is computed only from thread/tokenUsage/updated: nothing
+// before the first notification, no percentage without a modelContextWindow.
+// Compact calls the host's compactThread, which refuses while a Turn is live.
+
+function renderContextIndicator() {
+  const indicator = $("#contextIndicator");
+  if (!indicator || !state.activeThread) return;
+  const usage = contextUsage(threadTokenUsage(state, state.activeThreadId));
+  indicator.dataset.state = usage.state;
+  indicator.title = usage.detail;
+  const meter = usage.state === "known" ? `<span class="context-meter" role="img" aria-label="${escapeHtml(usage.label)}"><i></i></span>` : "";
+  indicator.innerHTML = `${meter}<span class="context-label" id="contextLabel">${escapeHtml(usage.label)}</span>`;
+  // The host's CSP allows no inline style attribute; the fill is set through the CSSOM.
+  const fill = indicator.querySelector(".context-meter i");
+  if (fill) fill.style.width = `${Math.min(100, Math.max(0, usage.percent))}%`;
+  const compact = $("[data-compact-thread]");
+  if (compact) {
+    const reason = compactDisabledReason({ running: state.running, fixture: state.fixtureMode, runtimeAlive: state.runtimeAlive && state.runtimeState === "alive" && !state.bootstrap?.stop });
+    compact.disabled = Boolean(reason);
+    compact.title = reason ?? "Start a compaction Turn: thread/compact/start";
+  }
+}
+
+async function compactActiveThread(button) {
+  const threadId = button.dataset.compactThread;
+  if (!threadId || button.disabled) return;
+  button.disabled = true;
+  try {
+    const result = await action({ action: "compactThread", threadId });
+    if (result?.compacting) notify("Compacting the context as its own Turn…");
+  } catch (error) {
+    // 409 turn_live is the host's own refusal: a Turn is still running.
+    notify(error.code === "turn_live" ? `${error.message}` : error.message);
+  }
+  renderContextIndicator();
+}
+
 // --- File and skill mentions ------------------------------------------------
 
 function renderMentions() {
@@ -2522,6 +2563,7 @@ async function applyEventWindow(data) {
   let rendered = false;
   let queueDirty = false;
   let settingsDirty = false;
+  let contextDirty = false;
   for (const entry of data.events) {
     if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refreshRequests = true;
     if (entry.kind === "runtimeExit") {
@@ -2564,7 +2606,10 @@ async function applyEventWindow(data) {
     if (method === "thread/settings/updated" || method === "thread/tokenUsage/updated") {
       applyChatEvent(state, method, params);
       if (method === "thread/settings/updated" && threadSettings(state, params.threadId)) rememberSettingsRecord(params.threadId, threadSettings(state, params.threadId));
-      if (params.threadId === state.activeThreadId) settingsDirty = true;
+      if (params.threadId === state.activeThreadId) {
+        if (method === "thread/settings/updated") settingsDirty = true;
+        else contextDirty = true;
+      }
       continue;
     }
     if (params.threadId !== state.activeThreadId) continue;
@@ -2587,6 +2632,7 @@ async function applyEventWindow(data) {
   setRuntimePosture({ alive: data.runtimeAlive, generation: data.runtimeGeneration, state: state.bootstrap?.stop ? "halted" : data.runtimeState ?? (data.runtimeAlive ? "alive" : "exited") });
   if (queueDirty) renderQueue();
   if (settingsDirty) renderComposerSettings();
+  if (contextDirty) renderContextIndicator();
   if (refreshLists) await refreshThreads();
   if (reconcile && state.activeThreadId && state.runtimeAlive && !state.bootstrap?.stop) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
   else if ((rendered || refreshRequests || haltRaised) && state.activeThreadId) scheduleChatRender();
@@ -3154,6 +3200,8 @@ document.addEventListener("click", async (event) => {
     } catch (error) { notify(error.message); }
     return;
   }
+  const compactThread = event.target.closest("[data-compact-thread]");
+  if (compactThread) { await compactActiveThread(compactThread); return; }
   const archiveThread = event.target.closest("[data-archive-thread]");
   if (archiveThread) {
     try {
@@ -3761,6 +3809,9 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
     },
     currentProject: () => state.bootstrap?.project ?? null,
     currentBootstrap: () => state.bootstrap ?? null,
+    // The process generation the browser currently holds, so a synthetic
+    // event window can name it and never trigger a generation-change re-read.
+    currentRuntimeGeneration: () => state.runtimeGeneration,
     // Host event windows fed straight into the same path pollEvents takes,
     // and a way back to the live runtime posture once the checks are done.
     applyEventWindow: async (window) => {

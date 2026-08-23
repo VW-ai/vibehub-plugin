@@ -39,13 +39,13 @@
     {
       "id": "interruption-recovery",
       "area": "Thread and Turn",
-      "requirement": "Interrupted and failed Turns retain partial history and exactly one terminal boundary.",
+      "requirement": "Interrupted and failed Turns retain partial history and exactly one terminal boundary; a compaction Turn's contextCompaction item is the transcript's compaction boundary.",
       "before": "pass",
       "beforeSeverity": "highest",
       "beforeFinding": "Accepted correction already proved real interrupt and replay.",
       "after": "pass",
-      "implementation": "canonicalTimeline preserves replay items and derives one boundary from authoritative Turn status.",
-      "proof": [".vibehub/evidence/ticket-research-codex-native-chat-parity/codex-native-chat-citation-interruption-correction.yaml", "test/codex-chat-conformance.test.mjs"]
+      "implementation": "canonicalTimeline preserves replay items and derives one boundary from authoritative Turn status. The contextCompaction ThreadItem of a thread/compact/start Turn is marked as the compaction boundary by canonicalTimeline and rendered as a boundary row (the 0.149.0 v2 path sends no thread/compacted, so the item is the only signal); the Chat header's context indicator is computed from thread/tokenUsage/updated alone, shows no value before the first notification and no percentage while modelContextWindow is null, and Compact calls the host's compactThread, which refuses with 409 turn_live while a Turn is live.",
+      "proof": [".vibehub/evidence/ticket-research-codex-native-chat-parity/codex-native-chat-citation-interruption-correction.yaml", "test/codex-chat-conformance.test.mjs", "apps/codex-first-shell/context-usage.mjs", "apps/codex-first-shell/chat-model.mjs", "test/codex-first-shell-parity-host.test.mjs::compaction is refused while a Turn is live and renders as a contextCompaction item with usage updates after", "test/codex-chat-conformance.test.mjs::context use follows thread/tokenUsage/updated alone and the contextCompaction item is the transcript boundary", "test/codex-first-shell-parity-ui.test.mjs::the context indicator reads thread/tokenUsage/updated only and Compact calls compactThread when no Turn is live", "apps/codex-first-shell/browser-interaction-guard.mjs::context indicator shows no value before the first tokenUsage, the total against the window after it, and no percentage without a window", "apps/codex-first-shell/browser-interaction-guard.mjs::a contextCompaction item renders as a boundary row in the transcript", "apps/codex-first-shell/browser-interaction-guard.mjs::Compact calls compactThread when no Turn is live and is disabled while one is", "apps/codex-first-shell/browser-interaction-guard.mjs::a 409 turn_live refusal of compactThread is shown in the host's own words", "scripts/vh-codex-first-shell-guard.mjs"]
     },
     {
       "id": "selection-during-stream",

@@ -503,6 +503,23 @@ async function runQueueWalk(shell) {
     step("@ and $ pickers read fuzzyFileSearch and skills/list, and the app-server log carries the exact input arrays with UTF-8 byte ranges", JSON.stringify(mentionStart) === JSON.stringify(expectedInput) && chips.join("|") === "File mention @README.md|Skill mention $fixture-review" && searched.some((params) => params.query === "READ" && params.roots.length === 1) && calls().some((call) => call.kind === "request" && call.method === "skills/list") && replayedChips.join("|") === "@README.md|$fixture-review", `${JSON.stringify(mentionStart)} · replay ${replayedChips.join("|")}`);
     await accept();
     await page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'idle'`, 30_000);
+
+    // Context use on the real host: the indicator carries the fixture's own
+    // thread/tokenUsage/updated total against its 272,000 window, Compact
+    // runs thread/compact/start as its own Turn whose contextCompaction item
+    // is the boundary row, and the next usage update is smaller.
+    const usageBefore = calls().filter((call) => call.kind === "notification" && call.method === "thread/tokenUsage/updated" && call.params?.threadId === threadId).at(-1)?.params.tokenUsage;
+    const expectedBefore = `Context ${Math.round((usageBefore?.total.totalTokens / usageBefore?.modelContextWindow) * 100)}% · ${usageBefore?.total.totalTokens.toLocaleString("en-US")} of ${usageBefore?.modelContextWindow.toLocaleString("en-US")} tokens`;
+    // The log is written at once; the browser polls, so wait for it to catch up.
+    await page.waitFor(`document.querySelector('#contextLabel')?.textContent === ${JSON.stringify(expectedBefore)} && !document.querySelector('[data-compact-thread]').disabled`);
+    const labelBefore = await page.evaluate(`document.querySelector('#contextLabel').textContent`);
+    await page.evaluate(`document.querySelector('[data-compact-thread]').click()`);
+    await page.waitFor(`document.querySelector('.turn-boundary.compacted') && document.querySelector('#composer').dataset.turnPosture === 'idle'`, 30_000);
+    await page.waitFor(`document.querySelector('#contextLabel').textContent !== ${JSON.stringify(labelBefore)}`);
+    const labelAfter = await page.evaluate(`document.querySelector('#contextLabel').textContent`);
+    const usageAfter = calls().filter((call) => call.kind === "notification" && call.method === "thread/tokenUsage/updated" && call.params?.threadId === threadId).at(-1)?.params.tokenUsage;
+    const compactRequests = calls().filter((call) => call.kind === "request" && call.method === "thread/compact/start" && call.params?.threadId === threadId).length;
+    step("the context indicator carries the runtime's own token usage and Compact runs thread/compact/start as a boundary Turn", labelBefore === expectedBefore && compactRequests === 1 && usageAfter?.total.totalTokens < usageBefore?.total.totalTokens && labelAfter.includes(`${usageAfter?.total.totalTokens.toLocaleString("en-US")} of`) && !calls().some((call) => call.kind === "notification" && call.method === "thread/compacted"), `${labelBefore} → ${labelAfter} · ${compactRequests} thread/compact/start`);
     step("no console errors or uncaught exceptions", page.errors.length === 0, page.errors.join(" | "));
   } finally {
     chrome.close();

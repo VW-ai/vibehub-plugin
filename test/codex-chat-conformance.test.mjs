@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { applyChatEvent, applyHostEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, rememberQueue, rememberThreadSettings, settingsRecordFromNotification, threadQueue, threadSettings, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
+import { applyChatEvent, applyHostEvent, applyTokenUsage, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, rememberQueue, rememberThreadSettings, settingsRecordFromNotification, threadQueue, threadSettings, threadTokenUsage, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
+import { compactDisabledReason, contextUsage } from "../apps/codex-first-shell/context-usage.mjs";
 import { describePosture, describeTurnSettings, effortOptionLabel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "../apps/codex-first-shell/composer-settings.mjs";
 import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
 import { loadThreadDraft, MAX_DRAFT_ATTACHMENTS, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
@@ -341,6 +342,38 @@ test("@ and $ mentions become text_elements whose byte ranges are the UTF-8 span
   assert.equal(renderUserMessageText("no elements _here_", createRenderBudget(), { textElements: [] }), "<p>no elements <em>here</em></p>");
   assert.equal(renderUserMedia([{ type: "mention", name: "a.md", path: "/a.md" }, { type: "skill", name: "s", path: "/s" }], createRenderBudget(), { inlineMentions: true }), "");
   assert.match(renderUserMedia([{ type: "mention", name: "a.md", path: "/a.md" }], createRenderBudget()), /@a\.md/, "without text_elements the items still show as chips");
+});
+
+test("context use follows thread/tokenUsage/updated alone and the contextCompaction item is the transcript boundary", () => {
+  const model = { liveItems: new Map(), turnErrors: new Map() };
+  assert.equal(threadTokenUsage(model, "thread-c"), null);
+  assert.deepEqual(contextUsage(null), { state: "unknown", totalTokens: null, modelContextWindow: null, percent: null, label: "Context use not reported yet", detail: "The runtime reports token usage inside each Turn; nothing has been reported for this Chat in this session." }, "no value before the first notification");
+  const usage = (total, window, turnId = "turn-1") => ({ threadId: "thread-c", turnId, tokenUsage: { total: { totalTokens: total, inputTokens: total - 150, cachedInputTokens: 0, outputTokens: 150, reasoningOutputTokens: 0 }, last: { totalTokens: 1_200 }, modelContextWindow: window } });
+  assert.equal(applyChatEvent(model, "thread/tokenUsage/updated", usage(34_000, 272_000)), true);
+  const known = contextUsage(threadTokenUsage(model, "thread-c"));
+  assert.deepEqual([known.state, known.totalTokens, known.modelContextWindow, known.percent, known.label, known.detail], ["known", 34_000, 272_000, 13, "Context 13% · 34,000 of 272,000 tokens", "Last reported by Turn turn-1."]);
+  // A later notification replaces the record; a null window means no percentage.
+  assert.equal(applyTokenUsage(model, usage(400, null, "turn-compaction")), true);
+  const noWindow = contextUsage(threadTokenUsage(model, "thread-c"));
+  assert.deepEqual([noWindow.state, noWindow.totalTokens, noWindow.modelContextWindow, noWindow.percent, noWindow.label], ["no-window", 400, null, null, "Context 400 tokens · window not reported"]);
+  assert.equal(threadTokenUsage(model, "thread-c").turnId, "turn-compaction");
+  assert.equal(applyTokenUsage(model, { threadId: "thread-c" }), false, "a notification without tokenUsage changes nothing");
+  assert.equal(applyTokenUsage(model, { tokenUsage: usage(1, 2).tokenUsage }), false, "a notification without a Thread changes nothing");
+  assert.equal(contextUsage({ totalTokens: 10, modelContextWindow: 0 }).state, "no-window", "a zero window is no window");
+  assert.equal(contextUsage({ totalTokens: 300_000, modelContextWindow: 272_000 }).percent, 110, "over the window is reported as such, never clamped to a claim");
+  for (let index = 0; index < 70; index += 1) applyTokenUsage(model, { ...usage(1, 2), threadId: `thread-${index}` });
+  assert.equal(threadTokenUsage(model, "thread-c"), null, "the per-Thread record is bounded");
+  assert.equal(compactDisabledReason({ running: false, fixture: false, runtimeAlive: true }), null);
+  assert.match(compactDisabledReason({ running: true, fixture: false, runtimeAlive: true }), /running Turn/);
+  assert.match(compactDisabledReason({ running: false, fixture: true, runtimeAlive: true }), /Review fixture/);
+  assert.match(compactDisabledReason({ running: false, fixture: false, runtimeAlive: false }), /needs the runtime/);
+  // The contextCompaction ThreadItem of the compaction Turn is the boundary.
+  const thread = { id: "thread-c", turns: [{ id: "turn-1", status: "completed", items: [{ id: "u1", type: "userMessage", content: [{ type: "text", text: "work" }] }] }, { id: "turn-compaction", status: "completed", items: [{ id: "compacted-1", type: "contextCompaction" }] }] };
+  const timeline = canonicalTimeline(thread, model);
+  const boundary = timeline.find((item) => item.type === "contextCompaction");
+  assert.deepEqual([boundary._boundary, boundary._turnId, boundary._live, boundary._turnLive], ["compacted", "turn-compaction", false, false]);
+  assert.equal(timeline.filter((item) => item._boundary).length, 1);
+  assert.equal(timeline.find((item) => item.id === "u1")._boundary, undefined);
 });
 
 test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {

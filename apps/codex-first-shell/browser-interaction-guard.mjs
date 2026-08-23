@@ -356,7 +356,7 @@ export async function runBrowserInteractionGuard(hooks) {
     // paused copy names the cause and Resume is the only way out; the
     // resumed head starts as its own Turn and the transcript is re-read.
     mirrored = queueRecord([queuedItem("queued-7", "Paused follow-up")], { paused: true, pausedReason: "interrupted" });
-    await hooks.applyEventWindow({ events: [{ sequence: 21, kind: "queueChanged", value: { threadId: fixture.activeThread.id, queue: structuredClone(mirrored) } }], cursor: 21, oldestCursor: 1, gap: false, runtimeGeneration: 2, runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+    await hooks.applyEventWindow({ events: [{ sequence: 21, kind: "queueChanged", value: { threadId: fixture.activeThread.id, queue: structuredClone(mirrored) } }], cursor: 21, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
     queueTray = document.querySelector("#queueTray");
     const pausedNote = queueTray.querySelector(".queue-paused");
     const pausedShown = !queueTray.hidden && queueTray.dataset.paused === "true" && queueTray.dataset.pausedReason === "interrupted" && pausedNote?.textContent.includes("Queue paused because you interrupted") && Boolean(pausedNote.querySelector("[data-resume-queue]"));
@@ -385,7 +385,7 @@ export async function runBrowserInteractionGuard(hooks) {
       { sequence: 22, kind: "queuedStarted", value: { threadId: fixture.activeThread.id, queuedId: "queued-7", turnId: "fixture-queued-turn" } },
       { sequence: 23, kind: "queueChanged", value: { threadId: fixture.activeThread.id, queue: queueRecord([]) } },
       { sequence: 24, kind: "notification", value: { method: "turn/started", params: { threadId: fixture.activeThread.id, turn: { id: "fixture-queued-turn", status: "inProgress", items: [] } } } },
-    ], cursor: 24, oldestCursor: 1, gap: false, runtimeGeneration: 2, runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+    ], cursor: 24, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
     await waitFor(() => document.querySelector('.turn.user[data-item-id$="fixture-queued-user"]'));
     const userEntries = [...document.querySelectorAll(".turn.user")];
     check(results, "queuedStarted moves the follow-up into the transcript as its own Turn", startedActions.some((entry) => entry.action === "readThread" && entry.threadId === fixture.activeThread.id) && document.querySelector("#queueTray").hidden && userEntries.at(-1)?.textContent.includes("Paused follow-up") && userEntries.at(-1).closest(".timeline-entry")?.dataset.renderKey?.includes("fixture-queued-turn") && document.querySelector("#composer").dataset.currentTurnId === "fixture-queued-turn", `${userEntries.length} user entries · ${startedActions.map((entry) => entry.action).join(",")}`);
@@ -671,6 +671,64 @@ export async function runBrowserInteractionGuard(hooks) {
         && replayedChips.join("|") === "mention:@README.md|skill:$guard-review" && repeatedAsAttachments === 0 && mentionTray.hidden,
       `${JSON.stringify(sentText?.text_elements ?? null)} · ${replayedChips.join("|")}`);
   }); } catch (error) { check(results, "mention checks completed", false, `threw: ${error?.message ?? error}`); }
+  await hooks.switchFixtureThread(fixture.thread);
+
+  // --- Context use and compaction -------------------------------------------
+  // The indicator is computed only from thread/tokenUsage/updated: no value
+  // before the first notification, no percentage while the window is null;
+  // Compact calls compactThread and is disabled while a Turn is live; the
+  // contextCompaction item is a boundary row.
+  const contextIndicator = () => document.querySelector("#contextIndicator");
+  const contextLabel = () => document.querySelector("#contextLabel")?.textContent ?? "";
+  const usageWindow = (sequence, tokenUsage) => ({ events: [{ sequence, kind: "notification", value: { method: "thread/tokenUsage/updated", params: { threadId: fixture.thread.id, turnId: "fixture-turn-1", tokenUsage } } }], cursor: sequence, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+  const breakdown = (totalTokens) => ({ totalTokens, inputTokens: totalTokens, cachedInputTokens: 0, outputTokens: 0, reasoningOutputTokens: 0 });
+  try {
+    const before = { state: contextIndicator()?.dataset.state, label: contextLabel(), meter: Boolean(document.querySelector(".context-meter")) };
+    await hooks.applyEventWindow(usageWindow(31, { total: breakdown(34_000), last: breakdown(1_200), modelContextWindow: 272_000 }));
+    const known = { state: contextIndicator()?.dataset.state, label: contextLabel(), width: document.querySelector(".context-meter i")?.style.width, meterLabel: document.querySelector(".context-meter")?.getAttribute("aria-label") };
+    await hooks.applyEventWindow(usageWindow(32, { total: breakdown(41_000), last: breakdown(7_000), modelContextWindow: null }));
+    const noWindow = { state: contextIndicator()?.dataset.state, label: contextLabel(), meter: Boolean(document.querySelector(".context-meter")) };
+    check(results, "context indicator shows no value before the first tokenUsage, the total against the window after it, and no percentage without a window",
+      before.state === "unknown" && before.label === "Context use not reported yet" && !before.meter
+        && known.state === "known" && known.label === "Context 13% · 34,000 of 272,000 tokens" && known.width === "13%" && known.meterLabel === known.label
+        && noWindow.state === "no-window" && noWindow.label === "Context 41,000 tokens · window not reported" && !noWindow.meter,
+      `${before.label} → ${known.label} (${known.width}) → ${noWindow.label}`);
+    const compactionRow = document.querySelector('.turn-boundary.compacted[data-context-compaction="fixture-compaction"]');
+    check(results, "a contextCompaction item renders as a boundary row in the transcript", Boolean(compactionRow) && compactionRow.querySelector("span")?.textContent === "Context compacted" && !document.querySelector(".timeline-divider[data-context-compaction]"), compactionRow?.textContent.slice(0, 60) ?? "no boundary row");
+    const compactActions = [];
+    await hooks.withFixtureTransport(async (payload) => {
+      compactActions.push(payload);
+      if (payload.action === "compactThread") return { threadId: payload.threadId, compacting: true };
+      if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+      return {};
+    }, async () => {
+      const compact = document.querySelector("[data-compact-thread]");
+      const idleEnabled = compact && !compact.disabled;
+      compact?.click();
+      await waitFor(() => compactActions.some((entry) => entry.action === "compactThread"));
+      const call = compactActions.find((entry) => entry.action === "compactThread");
+      await waitFor(() => document.querySelector("#toast").textContent.includes("Compacting"));
+      const started = document.querySelector("#toast").textContent;
+      await hooks.switchFixtureThread(fixture.activeThread);
+      const liveDisabled = document.querySelector("[data-compact-thread]")?.disabled === true;
+      const liveReason = document.querySelector("[data-compact-thread]")?.title ?? "";
+      check(results, "Compact calls compactThread when no Turn is live and is disabled while one is", idleEnabled && call?.threadId === fixture.thread.id && started.includes("Compacting the context as its own Turn") && liveDisabled && liveReason.includes("running Turn"), `${JSON.stringify(call ?? null)} · live: ${liveDisabled}/${liveReason}`);
+    });
+    const refusedActions = [];
+    await hooks.withFixtureTransport(async (payload) => {
+      refusedActions.push(payload);
+      if (payload.action === "compactThread") { const error = new Error("A Turn is still running in this Thread (fixture-active-turn); compaction would replace it."); error.code = "turn_live"; error.status = 409; throw error; }
+      if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+      return {};
+    }, async () => {
+      await hooks.switchFixtureThread(fixture.thread);
+      const compact = document.querySelector("[data-compact-thread]");
+      compact.disabled = false;
+      compact.click();
+      await waitFor(() => document.querySelector("#toast").textContent.includes("compaction would replace it"));
+      check(results, "a 409 turn_live refusal of compactThread is shown in the host's own words", refusedActions.some((entry) => entry.action === "compactThread") && document.querySelector("#toast").textContent.includes("A Turn is still running in this Thread (fixture-active-turn); compaction would replace it."), document.querySelector("#toast").textContent);
+    });
+  } catch (error) { check(results, "context and compaction checks completed", false, `threw: ${error?.message ?? error}`); }
   await hooks.switchFixtureThread(fixture.thread);
 
   // One Project, four scope states: the header, the Tasks gate, the Room
