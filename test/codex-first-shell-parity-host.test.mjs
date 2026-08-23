@@ -395,6 +395,13 @@ test("compaction is refused while a Turn is live and renders as a contextCompact
   assert.ok(later[1] < later[0], "compaction reduced the reported total");
   const calls = await appServerCalls(logPath);
   assert.deepEqual(calls.filter((call) => call.method === "thread/compact/start").map((call) => call.params), [{ threadId: thread.id }]);
+  // A Thread the runtime does not know is a typed 404, never a 500: the
+  // runtime's refusal of the identity (thread/resume here) is named.
+  const unknown = await action({ action: "compactThread", threadId: "fixture-thread-does-not-exist" });
+  assert.equal(unknown.status, 404, JSON.stringify(unknown.body));
+  assert.deepEqual([unknown.body.ok, unknown.body.error.code, unknown.body.error.threadId, unknown.body.error.method], [false, "thread_not_found", "fixture-thread-does-not-exist", "thread/resume"]);
+  assert.match(unknown.body.error.runtimeMessage, /Unknown thread fixture-thread-does-not-exist/u);
+  assert.equal((await appServerCalls(logPath)).filter((call) => call.method === "thread/compact/start").length, 1, "nothing reaches thread/compact/start for an unknown Thread");
   assert.deepEqual(await shell.stop(), [0, null]);
 
   // The nullable window variant reaches the browser as null, never a guess.
@@ -469,6 +476,15 @@ test("searchFiles and listSkills discover the bound repository through fuzzyFile
   assert.equal(bounded.body.data.files.length, 2);
   assert.ok(bounded.body.data.total >= 2);
   assert.equal((await action({ action: "searchFiles", query: "x".repeat(257) })).status, 400);
+  // The runtime's search walks .git (the fixture does too, like 0.149.0):
+  // the host drops every entry inside a .git directory, at any depth, so the
+  // @ picker never offers HEAD, config or an object.
+  const gitQuery = await action({ action: "searchFiles", query: "git", limit: 20 });
+  assert.equal(gitQuery.status, 200, JSON.stringify(gitQuery.body));
+  assert.ok(gitQuery.body.data.files.every((file) => !file.path.split("/").includes(".git")), gitQuery.body.data.files.map((file) => file.path).join(", "));
+  const headQuery = await action({ action: "searchFiles", query: "HEAD", limit: 20 });
+  assert.deepEqual(headQuery.body.data.files.map((file) => file.path), [], "the repository's own .git/HEAD is never offered");
+  assert.equal(headQuery.body.data.total, 0, "total counts what the picker may offer");
   const listed = await action({ action: "listSkills" });
   assert.equal(listed.status, 200, JSON.stringify(listed.body));
   assert.deepEqual(listed.body.data, {
@@ -478,8 +494,8 @@ test("searchFiles and listSkills discover the bound repository through fuzzyFile
   });
   const calls = await appServerCalls(logPath);
   const searches = calls.filter((call) => call.method === "fuzzyFileSearch").map((call) => call.params);
-  assert.equal(searches.length, 2, "an empty query asks nothing");
-  assert.deepEqual(searches.map((params) => [params.query, params.roots]), [["readme", [realFolder]], ["d", [realFolder]]]);
+  assert.equal(searches.length, 4, "an empty query asks nothing");
+  assert.deepEqual(searches.map((params) => [params.query, params.roots]), [["readme", [realFolder]], ["d", [realFolder]], ["git", [realFolder]], ["HEAD", [realFolder]]]);
   assert.ok(searches.every((params) => /^vibehub-[0-9a-f-]{36}$/u.test(params.cancellationToken)));
   assert.notEqual(searches[0].cancellationToken, searches[1].cancellationToken, "a fresh cancellation token per request");
   assert.deepEqual(calls.filter((call) => call.method === "skills/list").map((call) => call.params), [{ cwds: [realFolder], forceReload: false }]);

@@ -598,6 +598,25 @@ class HostError extends Error {
 
 const invalid = (message) => new HostError(400, "invalid_request", message);
 
+// A fuzzyFileSearch path inside a .git directory at any depth (the
+// repository's own or a nested checkout's): `.git`, `.git/...`, `a/.git/...`.
+function gitInternal(path) {
+  return String(path ?? "").split("/").includes(".git");
+}
+
+// The runtime refusing a Thread identity on thread/resume or thread/read,
+// as the installed 0.149.0 binary words it (-32600 "no rollout found for
+// thread id …", "thread not found: …", "thread not loaded: …", "invalid
+// thread id: …", "invalid session id: …") and as the fixture does (-32602
+// "Unknown thread …"): a typed 404 naming the Thread and the runtime's own
+// message. Any other failure is returned as is.
+const THREAD_REFUSALS = /no rollout found for thread id|thread not found|thread not loaded|unknown thread|invalid (?:thread|session) id/iu;
+function threadNotFound(error, threadId) {
+  const rpc = error?.rpcError;
+  if (!rpc || ![-32600, -32602].includes(rpc.code) || !THREAD_REFUSALS.test(String(rpc.message ?? ""))) return null;
+  return new HostError(404, "thread_not_found", `Codex does not know Thread ${threadId}: ${rpc.message}`, { threadId, runtimeMessage: rpc.message, method: error.method ?? null });
+}
+
 function json(response, status, value) {
   response.writeHead(status, { ...headers, "content-type": "application/json; charset=utf-8" });
   response.end(JSON.stringify(value));
@@ -1628,8 +1647,14 @@ async function action(payload) {
     // refuses it here: the host's own record first, then the runtime's.
     const refuse = (turnId) => new HostError(409, "turn_live", `A Turn is still running in this Thread${turnId ? ` (${turnId})` : ""}; compaction would replace it. Wait for it to complete or interrupt it first.`, { threadId, turnId: turnId ?? null });
     if (liveTurns.has(threadId)) throw refuse(liveTurns.get(threadId));
-    await ensureLoaded(threadId);
-    const read = await client.request("thread/read", { threadId, includeTurns: false });
+    // A Thread the runtime does not know is a typed refusal, not a 500.
+    let read;
+    try {
+      await ensureLoaded(threadId);
+      read = await client.request("thread/read", { threadId, includeTurns: false });
+    } catch (error) {
+      throw threadNotFound(error, threadId) ?? error;
+    }
     if (read.thread?.status?.type === "active") throw refuse(liveTurns.get(threadId) ?? null);
     await harness.compactChat({ conversationId: threadId });
     appendEvent("clientAction", { action: "compactThread", threadId });
@@ -1644,7 +1669,9 @@ async function action(payload) {
     if (!query) return { query, root: repoRoot, limit, total: 0, files: [] };
     const cancellationToken = `vibehub-${crypto.randomUUID()}`;
     const searched = await harness.searchFiles({ query, roots: [repoRoot], cancellationToken });
-    const files = searched.value.files ?? [];
+    // The runtime's search walks .git too (observed on 0.149.0), so its
+    // internals are dropped here: the @ picker offers no .git entry.
+    const files = (searched.value.files ?? []).filter((file) => !gitInternal(file.path));
     return {
       query,
       root: repoRoot,
