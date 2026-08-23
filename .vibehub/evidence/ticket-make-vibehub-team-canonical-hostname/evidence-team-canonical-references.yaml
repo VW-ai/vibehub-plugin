@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "team-is-the-only-canonical-url"
+  ],
+  "evidence_id": "evidence-team-canonical-references",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T09:06:15Z",
+  "refs": [
+    "git:f0373f5c269b88008ebfed5fc67e63887dec78d2",
+    "site/release/scripts/release.mjs",
+    "site/release/SKILL.md",
+    ".vibehub/rooms/product/intent-reproducible-public-site-release.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "release.mjs canonicalUrl, SKILL.md, package.json release:verify, site/README.md, root README.md, AGENTS.md, robots.txt, sitemap.xml, and the product Room intent now name https://vibehub.team; grep shows vibehub.icu remains only inside the redirect-host list and redirect-only prose. Commit f0373f5.",
+  "ticket_id": "ticket-make-vibehub-team-canonical-hostname"
+}
