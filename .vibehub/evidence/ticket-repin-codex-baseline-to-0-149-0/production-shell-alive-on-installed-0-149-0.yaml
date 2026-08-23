@@ -1,0 +1,19 @@
+{
+  "acceptance_ids": [
+    "production-shell-boots-on-installed-codex"
+  ],
+  "evidence_id": "production-shell-alive-on-installed-0-149-0",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-23T00:41:46Z",
+  "refs": [
+    "commit:4e10cd5",
+    "scripts/vh-codex-first-shell.mjs",
+    "packages/codex-adapter/stop-conditions.mjs",
+    "docs/proposals/codex-chat-conformance/browser-runtime-review.md",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "node scripts/vh-codex-first-shell.mjs --repo on a disposable bound repository with the installed 0.149.0 binary reports version 0.149.0, baselineMatch true, runtime.state alive, halt null and scope bound; the eight stop conditions evaluate as four pass for generated-protocol-hash-changed, required-request-or-event-missing, managed-auth-status-unavailable and audio-input-removed, one unverified for thread-restart-recovery-unavailable, two structural and one not-applicable with zero violated; after SIGKILLing the native app-server under the shell the host emits runtimeExit then runtimeRestarted at generation 2 with every Thread identity and Task link recovered and no condition violated. Commit 4e10cd5 gives the guard driver --runtime real, --repo, --frames none and --codex; against the real runtime the browser interaction guard passes 65 of 65 wide in both schemes and 66 of 66 narrow in all four configurations with zero console errors and passing motion audits, and the lifecycle walk passes 6 of 6 including kill, exit posture, authoritative Turn interrupted replay after restart, reload recovery and ?task= recovery from the Codex Thread name; the default fixture guard still passes. The run is recorded as a dated 0.149.0 real-runtime section in docs/proposals/codex-chat-conformance/browser-runtime-review.md. One observed real-runtime difference is recorded, not asserted: a brand-new Chat's first Turn has no sidebar dot until the app-server lists the Thread after its first durable user message.",
+  "ticket_id": "ticket-repin-codex-baseline-to-0-149-0"
+}

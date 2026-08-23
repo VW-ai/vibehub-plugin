@@ -1,0 +1,25 @@
+{
+  "acceptance_ids": [
+    "create-task-from-finalized-message-is-exact"
+  ],
+  "evidence_id": "create-task-finalized-only-with-exact-origin",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-23T02:00:31Z",
+  "refs": [
+    "commit:2984481",
+    "commit:e6f7e5c",
+    "commit:fc4c1fd",
+    "commit:3ddbabf",
+    "apps/codex-first-shell/chat-renderer.mjs",
+    "apps/codex-first-shell/quote-source.mjs",
+    "apps/codex-first-shell/app.js",
+    "scripts/vh-codex-first-shell.mjs",
+    "test/codex-first-shell-bridges.test.mjs",
+    "test/codex-first-shell-bridge-ui.test.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "Commits 2984481, e6f7e5c, fc4c1fd and 3ddbabf implement Create Task. The renderer offers bridge actions only on finalized assistant messages of settled Turns and on a selection inside one, never on live items or user messages, and disables them with a title, aria-describedby and visible hint naming the missing scope when the Project is not bound; review fixtures render them disabled so a fixture can never write. The Create Task sheet shows the Task title, the ticketId derived live by previewCreateTask, a required outcome, context prefilled with the quoted text and exact source identity, and a verbatim pre of the host packetText; Confirm calls createTask with the previewed id, and the host writes exactly one draft Ticket through applyTickets with origin harness codex, thread_id, forked_from_id, turn_id, item_id, selection and captured_at and one placeholder acceptance, never creating a Thread or Turn. The guard proves on the fixture that the packet pre equals previewCreateTask.packetText byte for byte, that after Confirm the Ticket is on disk, valid, draft, carrying the seeded origin verbatim, that the source Thread still has one Turn and unchanged text with an association marker at the origin Turn, that the Graph lists the Task as DRAFT REFINE, and that a second Task previews a free id; test/codex-first-shell-bridges.test.mjs proves previewCreateTask, readTask and startTask packet text and the thread/read replay are byte-identical, ticket_exists, malformed origin 400 and unbound 409. Unit tests pin placement, the schema-valid origin and locateSelection plus sha256 exactness; against the pre-change UI the new guard fails 65 of 68.",
+  "ticket_id": "ticket-build-codex-chat-task-bridges"
+}

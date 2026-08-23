@@ -1,0 +1,24 @@
+{
+  "acceptance_ids": [
+    "origin-provenance-is-canonical-and-immutable"
+  ],
+  "evidence_id": "origin-field-added-validated-and-immutable",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-23T00:33:49Z",
+  "refs": [
+    "commit:3fb8399",
+    "commit:37463e2",
+    "commit:69ea589",
+    "commit:dbc75f3",
+    "commit:2b1c128",
+    "skills/contracts/ticket.schema.json",
+    "skills/scripts/vh.mjs",
+    "skills/scripts/vh-ui.mjs",
+    "test/ticket-origin.test.mjs",
+    "CHANGELOG.md"
+  ],
+  "schema_version": 1,
+  "summary": "Commits 3fb8399, 37463e2, 69ea589, dbc75f3 and 2b1c128 add exactly one optional origin object to skills/contracts/ticket.schema.json on schema_version 2 with no new document kind: harness enum codex, thread_id, forked_from_id or null, turn_id, item_id or null, selection null or start, end and 64-hex text_sha256, and captured_at date-time, with end at least start enforced in code. validateTicket mirrors the shape so ticket validate, project validate and buildUiSnapshot reject a malformed origin on disk, and omission remains the only compatibility rule: this repository's 105 checked-in Tickets validate unchanged without origin. The apply path loads each candidate's existing document before any write and refuses a changed or removed origin with origin_immutable and an origin added to an originless checked-in Ticket with origin_cannot_be_added, leaving the tree untouched when a batch is refused, while a brand-new Ticket may be born with origin and re-applying an identical origin stays allowed. vh.mjs now exports validateTicket, applyTickets, appendEvidence, putContext and VibeHubError so host paths share the same guard, and vh-ui.mjs carries origin verbatim through the graph node and the handoff while the Agent-facing packet whitelist is unchanged. test/ticket-origin.test.mjs proves the shape, the unchanged repository, twenty malformed variants, hand-edited rejection, immutability including batch atomicity, CLI and applyTickets byte-identical refusal, and the projections; the orchestrator re-ran it at 9 of 9 and confirmed the schema and guard in source. Suite 248 tests, 246 pass, 0 fail, 2 skipped after the package.",
+  "ticket_id": "ticket-build-codex-chat-task-bridges"
+}

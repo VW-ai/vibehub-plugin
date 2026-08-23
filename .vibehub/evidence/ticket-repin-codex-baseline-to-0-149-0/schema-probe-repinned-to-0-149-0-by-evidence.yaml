@@ -1,0 +1,20 @@
+{
+  "acceptance_ids": [
+    "schema-probe-passes-on-0-149-0"
+  ],
+  "evidence_id": "schema-probe-repinned-to-0-149-0-by-evidence",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-23T00:41:46Z",
+  "refs": [
+    "commit:5d0af1b",
+    "packages/codex-adapter/upstream-lock.json",
+    "packages/codex-adapter/probe-schema.mjs",
+    "packages/codex-adapter/projects.mjs",
+    "docs/proposals/harness-neutral-core/capabilities.v1.json",
+    "docs/proposals/codex-chat-conformance/protocol-event-census.json"
+  ],
+  "schema_version": 1,
+  "summary": "Commit 5d0af1b moves packages/codex-adapter/upstream-lock.json to @openai/codex 0.149.0, tag rust-v0.149.0, commit 758ef40f50c1a458425c7cfbf1eb12cbc07af0b0 and protocol schema SHA-256 9b3de71a5a2ffc980b792a18aa8f8dec3f85f48829560222a0264fe494b679a9, obtained by running the installed binary's generate-json-schema and confirmed byte-identical to upstream's checked-in codex_app_server_protocol.v2.schemas.json at that tag, while the 0.147.0 hash f3dec1e0 reproduces the same way at rust-v0.147.0. Before the change npm run probe:codex reported ok false with exactly one failing check, the protocol hash; after it reports ok true at 52 of 52 with all 22 required requests, 4 server requests, 18 notifications, 2 ordinary audio inputs and 5 capability items present. The diff from 0.147.0 is purely additive and recorded in the lock's baselineDiff with removedOrRenamedSeams empty: five new notifications classified as unpinned and ignored in the event census, the new app-server-owned Thread.projectId recorded as observed and never read as membership with Thread.section remaining the sole authority in capabilities.v1.json and projects.mjs, and ThreadSection.appearance, agentMessage.delivery, imageGeneration.failure and nullable account usage params recorded as not consumed. The projects adapter and its probe now read the lock instead of a second copy.",
+  "ticket_id": "ticket-repin-codex-baseline-to-0-149-0"
+}

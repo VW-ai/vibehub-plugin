@@ -1,0 +1,22 @@
+{
+  "acceptance_ids": [
+    "task-workspace-returns-to-source"
+  ],
+  "evidence_id": "origin-chip-return-to-source-and-provenance-edge",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-23T02:00:31Z",
+  "refs": [
+    "commit:3ddbabf",
+    "commit:e6f7e5c",
+    "commit:2984481",
+    "skills/scripts/vh-ui.mjs",
+    "apps/codex-first-shell/app.js",
+    "apps/codex-first-shell/chat-renderer.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs",
+    "test/codex-first-shell-bridge-ui.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "The Task Workspace renders an origin chip from handoff.associations naming the source Thread, Turn and selection excerpt, and Return to source opens that Thread on the chat route and scrolls and focuses the exact origin item; the guard asserts the active element is the origin item's data-item-id anchor, in view, with ?thread= set. The source Chat renders association markers on every Turn that is an origin or attached reference of any Task, listing both Tasks when one Turn birthed two, sidebar Chat rows count born Tasks, and attention, inbox and Graph cards show origin. The Graph draws a Chat-to-Task provenance edge as path data-edge-kind provenance for the focused Task; the guard proves the depends_on path count equals the relation count before and after and the data-relation-counts element is unchanged, so provenance is never rendered as or counted among depends_on. Associations are parsed host-side only from origin and provenance_refs by commit 3ddbabf.",
+  "ticket_id": "ticket-build-codex-chat-task-bridges"
+}
