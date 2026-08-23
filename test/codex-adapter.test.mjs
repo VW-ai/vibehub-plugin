@@ -23,7 +23,7 @@ test("Codex adapter pins exact runtime and protocol identities", () => {
   const lock = JSON.parse(read("packages/codex-adapter/upstream-lock.json"));
   assert.deepEqual(
     { version: lock.codex.version, tag: lock.codex.releaseTag, commit: lock.codex.commit },
-    { version: "0.147.0", tag: "rust-v0.147.0", commit: "be6e8eac029b183056b7e4402879f15d2c85f61b" },
+    { version: "0.149.0", tag: "rust-v0.149.0", commit: "758ef40f50c1a458425c7cfbf1eb12cbc07af0b0" },
   );
   assert.equal(lock.dsh.commit, "141eb6fef83422698aef7a981029e843e8161534");
   assert.deepEqual(lock.dsh.requiredHostServices, [
@@ -197,7 +197,7 @@ test("stop conditions resolve every pinned id from runtime observations and neve
 
   // Each violation names its own observation.
   const violations = [
-    [{ initialized: { userAgent: "codex/0.146.0 (x)" }, account }, "generated-protocol-hash-changed", /0\.146\.0 is running but the lock pins 0\.147\.0/],
+    [{ initialized: { userAgent: "codex/0.146.0 (x)" }, account }, "generated-protocol-hash-changed", /0\.146\.0 is running but the lock pins 0\.149\.0/],
     [{ initialized, account, schemaProbe: { ...provenProbe, schemaSha256: "0".repeat(64) } }, "generated-protocol-hash-changed", /hashes to 000000000000…, not the pinned/],
     [{ initialized, account, missingMethods: ["turn/steer", "not/pinned"] }, "required-request-or-event-missing", /rejected pinned request turn\/steer as unknown \(-32601\)/],
     [{ initialized, account, schemaProbe: { ...provenProbe, checks: provenProbe.checks.map((check) => check.method === "thread/fork" ? { ...check, proven: false } : check) } }, "required-request-or-event-missing", /omits request thread\/fork/],
@@ -228,7 +228,7 @@ test("stop conditions resolve every pinned id from runtime observations and neve
 // The client counts process generations: after the app-server dies, nothing
 // from the dead generation answers for the next one.
 test("app-server client restarts into a new process generation without carrying replies, notifications or waits across", async (context) => {
-  const client = new CodexAppServerClient({ command: fixtureAppServer, cwd: fileURLToPath(root), timeoutMs: 5_000, env: { ...process.env, CODEX_FIXTURE_VERSION: "0.147.0" } });
+  const client = new CodexAppServerClient({ command: fixtureAppServer, cwd: fileURLToPath(root), timeoutMs: 5_000, env: { ...process.env, CODEX_FIXTURE_VERSION: "0.149.0" } });
   context.after(() => client.stop());
   const exits = [];
   const missing = [];
@@ -237,7 +237,7 @@ test("app-server client restarts into a new process generation without carrying 
   const first = await client.start();
   assert.equal(client.generation, 1);
   assert.equal(client.alive, true);
-  assert.match(first.userAgent, /0\.147\.0/);
+  assert.match(first.userAgent, /0\.149\.0/);
   assert.equal(await client.start(), first, "start() is idempotent while the process is alive");
   const thread = await client.request("thread/start", { cwd: fileURLToPath(root) });
   await client.request("turn/start", { threadId: thread.thread.id, input: [{ type: "text", text: "hello" }] });
@@ -262,13 +262,13 @@ test("app-server client restarts into a new process generation without carrying 
   const second = await client.start();
   assert.equal(client.generation, 2);
   assert.notEqual(client.child.pid, pid);
-  assert.match(second.userAgent, /0\.147\.0/);
+  assert.match(second.userAgent, /0\.149\.0/);
   assert.deepEqual(client.notifications, [], "notifications of the dead generation are gone");
   assert.equal(client.pending.size, 0);
   await assert.rejects(client.waitForNotification("turn/started", () => true, { timeoutMs: 60 }), /timed out/, "a pre-restart notification never satisfies a new wait");
   const restarted = await client.restart();
   assert.equal(client.generation, 3);
-  assert.match(restarted.userAgent, /0\.147\.0/);
+  assert.match(restarted.userAgent, /0\.149\.0/);
   assert.deepEqual(exits.map((entry) => [entry.generation, entry.requested]), [[1, false], [2, true]]);
   await client.stop();
   assert.equal(client.child, null);

@@ -2,11 +2,41 @@
   "schemaVersion": 1,
   "codex": {
     "package": "@openai/codex",
-    "version": "0.147.0",
-    "releaseTag": "rust-v0.147.0",
-    "tagObject": "3ed6f04f6bf8b7c46299d1cb1ff99c74ce21a51d",
-    "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
-    "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2"
+    "version": "0.149.0",
+    "releaseTag": "rust-v0.149.0",
+    "tagObject": "a4e15bf371341b067c8278d3b70b1a8c7b3d793e",
+    "commit": "758ef40f50c1a458425c7cfbf1eb12cbc07af0b0",
+    "protocolSchemaSha256": "9b3de71a5a2ffc980b792a18aa8f8dec3f85f48829560222a0264fe494b679a9",
+    "previousBaseline": {
+      "version": "0.147.0",
+      "releaseTag": "rust-v0.147.0",
+      "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
+      "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2"
+    },
+    "baselineDiff": {
+      "method": "codex app-server generate-json-schema on the installed 0.149.0 binary, byte-identical to codex-rs/app-server-protocol/schema/json at rust-v0.149.0; the previous pin reproduces from the same path at rust-v0.147.0",
+      "removedOrRenamedSeams": [],
+      "removedDefinitions": [],
+      "addedNotifications": [
+        "autoApprovalReview/strictReviewRequired",
+        "project/changed",
+        "thread/project/updated",
+        "thread/queue/changed",
+        "thread/reverted"
+      ],
+      "addedToPinnedShapes": [
+        "Thread.projectId (required, nullable): canonical project assignment owned by app-server; no ClientRequest assigns it, so Thread.section stays the membership authority this adapter consumes",
+        "ThreadSection.appearance, threadSection/create.appearance, threadSection/update.appearance (optional color/icon): not consumed",
+        "ThreadItem agentMessage.delivery (optional async) and imageGeneration.failure (optional): not consumed",
+        "account/usage/read params became nullable GetAccountTokenUsageParams: not a pinned request"
+      ],
+      "unchanged": [
+        "ClientRequest method set (95)",
+        "ServerRequest schema bytes (10 methods)",
+        "TurnStatus enum completed, interrupted, failed, inProgress",
+        "ThreadStatus variants and UserInput text, image, localImage, audio, localAudio, skill, mention"
+      ]
+    }
   },
   "dsh": {
     "package": "@deepseek-ai/dsh",

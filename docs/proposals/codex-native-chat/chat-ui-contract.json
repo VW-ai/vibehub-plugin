@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "baseline": {
     "package": "@openai/codex",
-    "version": "0.147.0",
-    "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
-    "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2",
+    "version": "0.149.0",
+    "commit": "758ef40f50c1a458425c7cfbf1eb12cbc07af0b0",
+    "protocolSchemaSha256": "9b3de71a5a2ffc980b792a18aa8f8dec3f85f48829560222a0264fe494b679a9",
     "sourceOfTruth": "Codex app-server Thread, Turn, ThreadItem, server request, and notification protocol"
   },
   "identity": {
