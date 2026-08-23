@@ -1,0 +1,71 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "install-is-above-the-fold",
+      "criterion": "The npx skills add VW-ai/vibehub-plugin command and the Start this with VibeHub entry line appear before the first screenshot and before any explanatory paragraph longer than two lines; the marketplace commands stay as a one-line alternative; a test asserts the install command's index precedes the first image's index."
+    },
+    {
+      "acceptance_id": "two-part-structure-is-scannable",
+      "criterion": "The top part (logo, tagline, install, entry line, a three-item what-you-get list, one hero image) fits in roughly one screen; the lower part carries How it works, the Workbench, and a GitHub collaboration section; Upgrades moves to docs/INSTALL.md with a one-line pointer; total README length stays within a raised test budget of 90 lines."
+    },
+    {
+      "acceptance_id": "github-collaboration-is-shown-not-told",
+      "criterion": "A section shows the Issues mirror with at least one checked-in screenshot captured from the live VW-ai/vibehub-plugin Issues (list or an Issue with the native Blocked-by pill), explains in two or three sentences that Tickets on main mirror one-way to Issues with acceptance checklists, Evidence comments, and native dependencies, and links docs/GITHUB_ISSUES.md; screenshots are PNG and registered in the capture manifest with source URL and date."
+    },
+    {
+      "acceptance_id": "core-value-sentences-survive",
+      "criterion": "Every sentence and phrase the release test pins today remains present exactly once where it says once (tagline, one-line value, entry line, Memory-tools line, the loop sentence, the four phases, Recommended action, both marketplace commands, a single vibehub.icu href) and the release and README tests pass after the budget and ordering assertions are updated."
+    },
+    {
+      "acceptance_id": "owner-judges-readme",
+      "authority": "human",
+      "criterion": "The owner reads the rendered README on GitHub and explicitly judges that it is scannable, leads with install, shows the new capabilities, and keeps the core value."
+    }
+  ],
+  "constraints": [
+    "Do not change the site in this Ticket.",
+    "Keep the existing brand assets and the three Workbench screenshots; add, do not replace, capture-manifest entries.",
+    "No marketing superlatives or claims the repository cannot back; every feature named must exist on main."
+  ],
+  "context": "After PR 116 the README still opens with three Workbench screenshots and a dense paragraph; Installation sits around line 30, the Upgrades section takes a fifth of the file, and the new capabilities (one-line install for any skills-capable agent, one-way Ticket mirror to GitHub Issues with native Blocked-by relationships) are a single trailing sentence. test/release.test.mjs pins the README to 60 lines and to specific sentences (tagline, entry line once, loop sentence, Memory-tools line, DRAFT/READY/RUNNING/DONE, Recommended action, marketplace commands, one vibehub.icu href, PNG assets with a capture manifest). The owner asked for install first, a story that surfaces the new features including GitHub collaboration, a two-part layout that is scannable without losing the core value, and explicitly left the design to the Agent. The site already leads with the one-line install, so README and site should tell the same story.",
+  "context_refs": [
+    {
+      "purpose": "Current document to restructure.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Pinned sentences and line budget to update deliberately.",
+      "ref": "test/release.test.mjs"
+    },
+    {
+      "purpose": "Screenshot registry to extend.",
+      "ref": "docs/assets/local-graph/readme-capture-manifest.json"
+    },
+    {
+      "purpose": "Mirror guide the new section links.",
+      "ref": "docs/GITHUB_ISSUES.md"
+    },
+    {
+      "purpose": "Destination for the Upgrades text.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Story and install order the README should match.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "What the collaboration section may claim.",
+      "ref": ".vibehub/rooms/product/decision-github-issues-are-a-read-only-ticket-projection.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The README reads in two parts: a ten-second top that installs VibeHub, gives the single entry line, and states what the reader gets, followed by the story for readers who want it — the Ticket cycle, the Workbench, and the new GitHub Issues collaboration surface — so nobody misses the core value and nobody has to scroll to install.",
+  "provenance_refs": [
+    "conversation:2026-08-23-readme-refresh"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-readme-install-first-two-part-story"
+}
