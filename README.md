@@ -34,7 +34,7 @@ codex plugin marketplace add VW-ai/vibehub-plugin
 codex plugin add vibehub@vibehub
 ```
 
-Then start a new task and use the single entry above.
+Then start a new task and use the single entry above. Tickets on `main` also mirror one-way to [GitHub Issues](https://github.com/VW-ai/vibehub-plugin/issues) — see the [mirror guide](docs/GITHUB_ISSUES.md).
 
 **Claude Code**
 
@@ -55,5 +55,5 @@ In Codex, run `codex plugin marketplace upgrade vibehub` followed by
 migration, the new session previews that separate Git change through the
 migrate Skill; installing a plugin never rewrites `.vibehub/`.
 Read the [product concept](docs/CONCEPT.md), [installation and coexistence](docs/INSTALL.md),
-[local graph design](docs/LOCAL_GRAPH_DESIGN.md), [release procedure](docs/RELEASE.md), or how Tickets mirror to [GitHub Issues](docs/GITHUB_ISSUES.md).
+[local graph design](docs/LOCAL_GRAPH_DESIGN.md), or [release procedure](docs/RELEASE.md).
 Apache-2.0
