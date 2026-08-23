@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "13da7eda9d85e44dac78aa99ec862e9e7181309f",
+        "blob": "aba66f4fe7b28bb7b098ac65f1c0ab1be245d0ac",
         "path": "README.md"
       },
       {
@@ -16,6 +16,10 @@
       {
         "blob": "31f81498982a9b3f14bcf7b16fd235022d473561",
         "path": "docs/DEEPSEEK_HARNESS_FEASIBILITY.md"
+      },
+      {
+        "blob": "e813eebb932d23a0a7e23c9cb9296b8c2744d80f",
+        "path": "docs/GITHUB_ISSUES.md"
       },
       {
         "blob": "e968b861000d86fe1e0a615ab4473af24640742f",
@@ -170,8 +174,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-20T23:17:24.714Z",
-    "last_aligned_commit": "cf680825f0f0cb3b7798443aba2696144d113eb8"
+    "checked_at": "2026-08-23T00:19:27.946Z",
+    "last_aligned_commit": "b987bb1b6940890588c3f8762202e0d69f4684d8"
   },
   "anchors": [
     "CHANGELOG.md",
