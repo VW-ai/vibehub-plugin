@@ -44,6 +44,13 @@ Then start a new task and use the single entry above.
 /reload-plugins
 ```
 
+**Follow the Tickets on GitHub**
+
+Every Ticket on `main` is mirrored one-way to a GitHub Issue with its
+acceptance checklist, native Blocked-by relationships, Evidence comments, and
+closure on Outcome. Browse the [Issues list](https://github.com/VW-ai/vibehub-plugin/issues)
+or read [how the mirror works and which view to use](docs/GITHUB_ISSUES.md).
+
 ## Upgrades
 
 The host updates the plugin bundle; VibeHub never updates itself in the
