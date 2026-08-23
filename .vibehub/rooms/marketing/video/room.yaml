@@ -1,0 +1,101 @@
+{
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "06732ec696b4d8e8346b0af263bf492278cbfee2",
+        "path": "assets/video/README.md"
+      },
+      {
+        "blob": "94cb80c57b6eea37a6e1cc152cc5af6a4d754532",
+        "path": "assets/video/STORYBOARD.md"
+      },
+      {
+        "blob": "49b935e128d318a3317644c38248b2e45af63837",
+        "path": "assets/video/glance/assets/wb.mp4"
+      },
+      {
+        "blob": "dc9ec2eb28c67a93113c201a65a3155a19915d7c",
+        "path": "assets/video/glance/hyperframes.json"
+      },
+      {
+        "blob": "2f4d1d8cd6963a45656c6f756e833ea6ae3e9470",
+        "path": "assets/video/glance/index.html"
+      },
+      {
+        "blob": "5514b40cbc9e8b51dcb577ea3fd9e0f740b4bd8f",
+        "path": "assets/video/glance/meta.json"
+      },
+      {
+        "blob": "ec874d68240beee80e884de132c466c5f7df5c59",
+        "path": "assets/video/glance/package.json"
+      },
+      {
+        "blob": "2ae3d62f7b82c4bdccd1761478c06ae4442d7cac",
+        "path": "assets/video/renders/glance-v2.mp4"
+      },
+      {
+        "blob": "35e32202216ccdab240ce22dc14c5ddfd9373a07",
+        "path": "assets/video/renders/taskstory-v3.mp4"
+      },
+      {
+        "blob": "84cf294f8198bb13b0471391c3ca27728eb41968",
+        "path": "assets/video/taskstory/assets/fit.mp4"
+      },
+      {
+        "blob": "88dc7450b144f0d94d955733d214c82205b68845",
+        "path": "assets/video/taskstory/assets/logos/anthropic.svg"
+      },
+      {
+        "blob": "29bb61bb9eed5694d5e59cb8e15524f2a709e339",
+        "path": "assets/video/taskstory/assets/logos/claude.svg"
+      },
+      {
+        "blob": "14085aac899f79f6cf0a19a618acbf7be3864cef",
+        "path": "assets/video/taskstory/assets/logos/cursor.svg"
+      },
+      {
+        "blob": "81920ca332522d9e2bdb4110f95c9bc1b0d3fc16",
+        "path": "assets/video/taskstory/assets/logos/github.svg"
+      },
+      {
+        "blob": "e15e53ce01fecd30937474f51dcb55a32b186e1b",
+        "path": "assets/video/taskstory/assets/logos/googlegemini.svg"
+      },
+      {
+        "blob": "a8ab1198d73caf061e3110735c36a8cf60166889",
+        "path": "assets/video/taskstory/assets/logos/kimi.svg"
+      },
+      {
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "path": "assets/video/taskstory/assets/logos/openai.svg"
+      },
+      {
+        "blob": "dc9ec2eb28c67a93113c201a65a3155a19915d7c",
+        "path": "assets/video/taskstory/hyperframes.json"
+      },
+      {
+        "blob": "9ca811ce5bfda539245b0588075f31a7d608a1ac",
+        "path": "assets/video/taskstory/index.html"
+      },
+      {
+        "blob": "5514b40cbc9e8b51dcb577ea3fd9e0f740b4bd8f",
+        "path": "assets/video/taskstory/meta.json"
+      },
+      {
+        "blob": "ec874d68240beee80e884de132c466c5f7df5c59",
+        "path": "assets/video/taskstory/package.json"
+      }
+    ],
+    "checked_at": "2026-08-23T07:01:37.792Z",
+    "last_aligned_commit": "bfde86906c17580812286420cf12e80f10e44961"
+  },
+  "anchors": [
+    "assets/video/"
+  ],
+  "boundary": "Video clips and how they are produced. Messaging propositions themselves live in the parent marketing room.",
+  "description": "Short-form video production for LinkedIn and 小红书: clip format, storyboards, and the HyperFrames + Playwright toolchain.",
+  "kind": "room",
+  "room_id": "video",
+  "schema_version": 1,
+  "stale": false
+}

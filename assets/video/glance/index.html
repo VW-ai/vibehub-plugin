@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=1920, height=1080"/>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+:root{--canvas:#fafaf8;--ink:#252523;--muted:#6d6d68;--faint:#969690;--line:#e2e2de;--done:#496351;--done-soft:#f0f3f0;--ready:#575751;--ready-soft:#f2f2ef;--draft-soft:#f7f7f5;--running:#3267a8;--running-soft:#edf4ff;
+--mono:ui-monospace,"SFMono-Regular","SF Mono",Menlo,Consolas,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--canvas)}
+body{font-family:var(--mono);color:var(--ink)}
+.clip{position:absolute;inset:0}
+#bg{position:absolute;inset:0;background:var(--canvas);background-image:radial-gradient(#d8d8d3 1.2px,transparent 1.2px);background-size:24px 24px;background-position:12px 12px}
+.label{position:absolute;left:120px;top:96px;font-size:30px;font-weight:500;color:var(--ink)}
+.label.q{color:var(--muted)}
+.cmd{position:absolute;left:120px;top:470px;font-size:40px;font-weight:500}
+.cmd .p{color:var(--faint);margin-right:.4em}.cmd .cur{display:inline-block;width:.55em;height:1.05em;background:var(--ink);vertical-align:-.15em;margin-left:.1em}
+/* chat panel — same card language */
+#chat{position:absolute;left:120px;top:200px;width:900px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(27,27,25,.08);overflow:hidden}
+#chat .hd{padding:12px 18px;border-bottom:1px solid var(--line);background:var(--draft-soft);font-size:14px;color:var(--muted);display:flex;gap:10px;align-items:center}
+#chat .hd i{width:8px;height:8px;border-radius:50%;background:var(--running);display:inline-block}
+#chat .m{padding:18px 22px;font-size:19px;line-height:1.55;border-bottom:1px solid #f1f1ee;opacity:0}
+#chat .m b{display:block;font-size:13px;color:var(--faint);font-weight:500;margin-bottom:6px}
+#chat .m.ai{background:#fcfcfb}
+/* tickets forming on the right */
+#side{position:absolute;left:1100px;top:200px;width:700px}
+#side .h{font-size:14px;color:var(--faint);margin-bottom:14px;opacity:0}
+.t{position:relative;width:620px;background:var(--draft-soft);border:1px solid var(--line);border-radius:14px;padding:16px 20px 18px;margin-bottom:14px;overflow:hidden;opacity:0}
+.t:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:#c8c8c2}
+.t.ready{background:var(--ready-soft)}.t.ready:after{background:var(--ready)}
+.t .id{font-size:13px;color:var(--muted)}.t .o{font-size:19px;line-height:1.35;font-weight:600;margin:8px 0 10px}
+.t .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--faint)}.t .meta .st{font-weight:700;letter-spacing:.07em;color:var(--ready)}
+.t .ctx{font-size:13px;color:var(--faint);margin-top:4px;opacity:0}
+#wb{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+.end{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;background:var(--canvas)}
+.end h1{font-size:64px;font-weight:600;letter-spacing:-.02em;text-align:center;line-height:1.15}
+.end .cta{font-size:22px;color:var(--muted)}
+</style></head>
+<body>
+<div id="root" data-composition-id="glance2" data-start="0" data-duration="22.3" data-width="1920" data-height="1080">
+  <div id="bgc" class="clip" data-start="0" data-duration="12.5" data-track-index="1"><div id="bg"></div></div>
+
+  <div id="s1" class="clip" data-start="0" data-duration="2.4" data-track-index="2">
+    <div class="cmd"><span class="p">❯</span><span id="c1"></span><span class="cur"></span></div>
+  </div>
+
+  <div id="s2" class="clip" data-start="2.4" data-duration="7.6" data-track-index="2">
+    <div id="l1" class="label q">You talk about the work.</div>
+    <div id="chat"><div class="hd"><i></i> claude code · onboarding</div>
+      <div class="m" id="m1"><b>YOU</b>Let's do the onboarding flow. New users verify email, then land on the dashboard — not the marketing page.</div>
+      <div class="m ai" id="m2"><b>AGENT</b>Got it. Two pieces: the verification step in the API, and a first-run dashboard state. Should the welcome email go out before or after verification?</div>
+      <div class="m" id="m3"><b>YOU</b>After. And I want to approve the email copy myself.</div>
+    </div>
+    <div id="side"><div class="h">VIBEHUB · tickets forming from this conversation</div>
+      <div class="t" id="t1"><div class="id">ticket-verify-email-step</div><div class="o">Signup requires a verified email before the dashboard.</div><div class="meta"><span>0 in · 1 out</span><span class="st">READY</span></div><div class="ctx">context · rooms/auth · decision-session-policy</div></div>
+      <div class="t" id="t2"><div class="id">ticket-dashboard-first-run</div><div class="o">First-run dashboard shows next steps, not marketing.</div><div class="meta"><span>1 in · 0 out</span><span class="st">READY</span></div><div class="ctx">context · rooms/dashboard</div></div>
+      <div class="t" id="t3"><div class="id">ticket-welcome-email-copy</div><div class="o">You approve the welcome email before it ships.</div><div class="meta"><span>1 in · 0 out</span><span class="st" style="color:#895d0a">NEEDS YOU</span></div><div class="ctx">authority · human accepts</div></div>
+    </div>
+  </div>
+
+  <div id="s3" class="clip" data-start="10" data-duration="2.5" data-track-index="2">
+    <div class="cmd"><span class="p">❯</span><span id="c2"></span><span class="cur"></span></div>
+    <div id="l2" class="label q">Then you say one thing.</div>
+  </div>
+
+  <video id="wb" src="assets/wb.mp4" data-start="12.5" data-duration="6.8" data-track-index="1" muted playsinline></video>
+  <div id="l3" class="clip label" data-start="12.8" data-duration="3.6" data-track-index="2" style="background:rgba(250,250,248,.92);padding:6px 12px;left:108px;right:auto;bottom:auto;border-radius:8px">Later, you glance at it.</div>
+  <div id="l4" class="clip label" data-start="15.8" data-duration="3.5" data-track-index="2" style="background:rgba(250,250,248,.92);padding:6px 12px;left:108px;right:auto;bottom:auto;border-radius:8px">And you know exactly where it is.</div>
+
+  <div id="end" class="clip end" data-start="19.3" data-duration="3" data-track-index="1">
+    <h1>Manage the task.<br>VibeHub manages the rest.</h1>
+    <div class="cta">/plugin install vibehub</div>
+  </div>
+</div>
+<script>
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+// typing helpers (deterministic)
+function type(sel, text, at, per){ const el=document.querySelector(sel); for(let i=1;i<=text.length;i++){ tl.call(()=>{el.textContent=text.slice(0,i)}, null, at+i*per);} }
+type("#c1","/plugin install vibehub",0.3,0.055);
+type("#c2","Start this with VibeHub.",10.2,0.06);
+// chat messages
+tl.to("#m1",{opacity:1,duration:.3},2.8);
+tl.to("#m2",{opacity:1,duration:.3},4.2);
+tl.to("#m3",{opacity:1,duration:.3},6.2);
+// tickets form quietly on the right, slightly after each message
+tl.to("#side .h",{opacity:1,duration:.3},3.4);
+tl.to("#t1",{opacity:1,duration:.4},3.8); tl.to("#t1 .ctx",{opacity:1,duration:.3},4.4);
+tl.to("#t2",{opacity:1,duration:.4},5.2); tl.to("#t2 .ctx",{opacity:1,duration:.3},5.8);
+tl.to("#t3",{opacity:1,duration:.4},7.0); tl.to("#t3 .ctx",{opacity:1,duration:.3},7.6);
+tl.from("#l1",{opacity:0,duration:.4},2.5);
+tl.from("#l2",{opacity:0,duration:.4},10.1);
+// footage: slow push toward the right-hand panel during the contract view
+tl.from("#wb",{opacity:0,duration:.6},12.5);
+tl.to("#wb",{scale:1.7,x:-1400,y:-40,duration:2.0,ease:"power2.inOut"},16.0);
+tl.from("#l3",{opacity:0,duration:.4},12.9);
+tl.from("#l4",{opacity:0,duration:.4},15.9);
+tl.from("#end h1",{opacity:0,y:10,duration:.5},19.4);
+tl.from("#end .cta",{opacity:0,duration:.4},19.9);
+window.__timelines["glance2"] = tl;
+</script>
+</body></html>

@@ -1,0 +1,35 @@
+{
+  "context_id": "convention-hyperframes-authoring",
+  "detail": "Workflow is preview → lint → check → render. Every timed element needs a stable id; a <video> with data-start must be a direct child of the stage or it renders frozen (caught by the linter in the sample). Overlay timecodes must not exceed the underlying clip's duration. State dimensions explicitly (9:16 for 小红书) or the default is 1920x1080. Prompt skeleton: duration, dimensions, mood, structure (hook → beats → end card), media (voice/music/footage), specifics. Tell the agent to use catalog blocks rather than reaching for Three.js/Lottie. Music level stated explicitly (e.g. subtle BGM under -18dB); captions 40–50 chars per segment with a font that covers Chinese. Expect ~3 min local render per 30s of 1080p. Division of labor: Wayne writes only the storyboard/narrative; the Agent records, composes, renders, and returns the MP4 for review.",
+  "evidence": [
+    {
+      "note": "Linter output during the sample render flagged the nested-video and missing-id errors; the remaining rules come from community best-practice research summarized in the conversation.",
+      "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+    },
+    {
+      "note": "Non-developer Claude Code workflow editing STORYBOARD/SCRIPT/DESIGN files.",
+      "ref": "https://www.sabrina.dev/p/hyperframes-makes-unlimited-free-videos"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-hyperframes-playwright-pipeline",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T09:30:00Z",
+    "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+  },
+  "state": "active",
+  "summary": "HyperFrames authoring rules: keep BRIEF/STORYBOARD/SCRIPT/DESIGN files and edit them instead of re-prompting; never nest a timed <video> inside a timed div; one brand file per aspect ratio; prefer catalog blocks; Variables for zh/en versions; always run check before render",
+  "tags": [
+    "video",
+    "hyperframes",
+    "conventions",
+    "authoring"
+  ],
+  "type": "convention"
+}

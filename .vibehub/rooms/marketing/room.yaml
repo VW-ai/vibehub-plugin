@@ -1,0 +1,125 @@
+{
+  "alignment": {
+    "anchor_hashes": [
+      {
+        "blob": "236cfc6d3a6920733c15d4e92c3ecb3d06890463",
+        "path": "site/.gitignore"
+      },
+      {
+        "blob": "f96c156cdf01324f9d59f2b6578ca8583e5bafcf",
+        "path": "site/README.md"
+      },
+      {
+        "blob": "e386fb0f290f25160764ad8a824b29126eb9aa10",
+        "path": "site/app/globals.css"
+      },
+      {
+        "blob": "d411127abe415e850683b94a0596d0314d7713b8",
+        "path": "site/app/layout.tsx"
+      },
+      {
+        "blob": "525c2d8a5a75c0240962802f7f73dae5701eb760",
+        "path": "site/app/page.tsx"
+      },
+      {
+        "blob": "05e726d1b4201bc8c7716d2b058279676582e8c0",
+        "path": "site/eslint.config.mjs"
+      },
+      {
+        "blob": "65c102b9243fdedf36d0d22d3db8cc5f6809ec70",
+        "path": "site/next.config.ts"
+      },
+      {
+        "blob": "5ee2c7798ffd8504351bd5cd47a822f31bd97e65",
+        "path": "site/package-lock.json"
+      },
+      {
+        "blob": "7afbbe7c5ef78f57766dc94997f7725925e3fc8e",
+        "path": "site/package.json"
+      },
+      {
+        "blob": "a78cd87f8ce6118e7bc67277ed6c47775a222225",
+        "path": "site/public/brands/claude-code.png"
+      },
+      {
+        "blob": "c214f33c57ad91d46ef03b9c9b1743732219d05f",
+        "path": "site/public/brands/codex.png"
+      },
+      {
+        "blob": "81920ca332522d9e2bdb4110f95c9bc1b0d3fc16",
+        "path": "site/public/brands/github.svg"
+      },
+      {
+        "blob": "5df1ed39634d37cd55f13f5563b36b88337f1c54",
+        "path": "site/public/founders/victor-zhang.jpg"
+      },
+      {
+        "blob": "67c4c9c21d19d99074fab87e816efc77331a2f32",
+        "path": "site/public/founders/wayne-wang.jpg"
+      },
+      {
+        "blob": "a48c34594517dda1c279dec69d95533dc6feae85",
+        "path": "site/public/og.png"
+      },
+      {
+        "blob": "13ab54799633cb3409adbd6a2895744cde95767d",
+        "path": "site/public/robots.txt"
+      },
+      {
+        "blob": "b98cb986b29cb19725c2f7cf6434c7d9b54395af",
+        "path": "site/public/sitemap.xml"
+      },
+      {
+        "blob": "76c7d1a1e6c75d145043f00b009d7f11d2e556e6",
+        "path": "site/public/vibehub-favicon.svg"
+      },
+      {
+        "blob": "b2c1787a8de1399894544ee0339b7e1fa523aafd",
+        "path": "site/public/vibehub-logo.svg"
+      },
+      {
+        "blob": "76c7d1a1e6c75d145043f00b009d7f11d2e556e6",
+        "path": "site/public/vibehub-mark.svg"
+      },
+      {
+        "blob": "f41a77bd5a045dafa28c7511f4e37b677980982c",
+        "path": "site/release/SKILL.md"
+      },
+      {
+        "blob": "5186082665e10267fcf71552f3963a12f4ac2172",
+        "path": "site/release/agents/openai.yaml"
+      },
+      {
+        "blob": "8093afee06719fcc9ac237fbcfb0cb559725b27d",
+        "path": "site/release/scripts/release.mjs"
+      },
+      {
+        "blob": "a924e9cbadcabc54424857d50d468b7546c04da2",
+        "path": "site/tests/rendered-html.test.mjs"
+      },
+      {
+        "blob": "3a13f90a773b0facb675bf5b1a8239c8f33d36f5",
+        "path": "site/tsconfig.json"
+      },
+      {
+        "blob": "9bf0a39e416db232bd11d12c447d723d4c9c6ad5",
+        "path": "site/vite.config.ts"
+      },
+      {
+        "blob": "b3cd137862c517c1053481cf6efdf6dd4d423cdc",
+        "path": "site/worker/index.ts"
+      }
+    ],
+    "checked_at": "2026-08-23T07:01:37.403Z",
+    "last_aligned_commit": "bfde86906c17580812286420cf12e80f10e44961"
+  },
+  "anchors": [
+    "site/"
+  ],
+  "boundary": "Public narrative and its production pipeline. Not product behavior, not the public site's build or release mechanics (those stay in product).",
+  "description": "How VibeHub is explained to the outside world: positioning, messaging propositions, channel strategy, and content production.",
+  "kind": "room",
+  "room_id": "marketing",
+  "schema_version": 1,
+  "stale": false
+}
