@@ -7,6 +7,7 @@ Messaging, format rules, toolchain and visual rules live in `.vibehub/rooms/mark
 |-----|------|--------|--------|
 | `glance/` | #1 functional demo: install → chat while Tickets form → "Start this with VibeHub." → real Workbench (demo repo), push to 3/3 accepted, ends on NEEDS YOU | 25s | v4, music (Schubert) |
 | `taskstory/` | #2 narrative: lead's sentence → agent swarm, camera loses its footing → "Lost in the agent sessions." → collapses into one Task → neighbours → zoom out → real All+Fit | 34s | v7, music (Bach) |
+| `taskstory-portrait/`, `glance-portrait/` | 9:16 小红书 versions of the two clips, relaid out (not cropped), Chinese captions; same footage and mix scripts | 34s / 25s | v1, music |
 | `renders/` | latest MP4s (16:9, 1920×1080) | | |
 | `audio/` | music stems, licenses, mix scripts — see `audio/README.md` | | |
 
