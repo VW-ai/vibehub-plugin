@@ -1,0 +1,26 @@
+{
+  "acceptance_ids": [
+    "turn-completion-notifies-once-and-sidebar-stays-fresh"
+  ],
+  "evidence_id": "sidebar-freshness-keyed-on-durable-user-message",
+  "kind": "ticket_evidence",
+  "origin": "agent",
+  "recorded_at": "2026-08-23T09:57:26Z",
+  "refs": [
+    "commit:1a371e4",
+    "commit:219c6f9",
+    "commit:68f6d05",
+    "apps/codex-first-shell/sidebar-freshness.mjs",
+    "apps/codex-first-shell/app.js",
+    "test/fixtures/codex-app-server-fixture.mjs",
+    "scripts/vh-codex-first-shell.mjs",
+    "test/codex-chat-conformance.test.mjs",
+    "test/codex-first-shell-parity-host.test.mjs",
+    "apps/codex-first-shell/browser-interaction-guard.mjs",
+    "scripts/vh-codex-first-shell-guard.mjs",
+    ".vibehub/rooms/product/constraint-codex-lists-a-new-thread-only-after-its-user-message-is-durable.yaml"
+  ],
+  "schema_version": 1,
+  "summary": "Fix cycle after the partial Outcome. A single probe on the installed 0.149.0 showed thread/status/changed active and turn/started arriving in the same millisecond, the userMessage item/started and item/completed about 430 milliseconds later, and the first thread/list that carried the Thread issued about 1.2 seconds after turn/started while a list issued at turn/started missed it. Commit 219c6f9 adds apps/codex-first-shell/sidebar-freshness.mjs: the browser keeps the thread/start record it already holds as a provisional row with the live dot, keys the bootstrap refresh on the watched Thread's userMessage item/completed or its turn/completed while still unlisted, backed by a bounded retry of at most four refreshes 750 milliseconds apart each scheduled after the previous settled and ended the moment a bootstrap lists the Thread, never a perpetual poll, and moves row status from thread/status/changed so the dot settles on idle; a runtime exit ends every watch. Commit 1a371e4 makes the fixture truthful: a new Thread is omitted from thread/list until its first userMessage item is completed, thread/status/changed precedes turn/started and turn/completed in the real order, forks and reloaded history count as durable, and CODEX_FIXTURE_LIST_NEW_THREADS immediate restores the old listing for comparison; three sequence-pinned tests moved to the truthful order. The same fact broke Tasks, so startTask now returns the Thread's public record and startTaskTurn and steerTaskTurn fall back to thread/read with the Codex Thread name still the authority, covered by a host test with a 1.5 second delay. Commit 68f6d05 maps compactThread on an unknown Thread to a typed 404 thread_not_found and drops .git paths from searchFiles. Suite 295 tests, 293 pass, 0 fail, 2 DSH skips; npm run verify passes; the fixture guard with a 2 second durable delay passes 109 of 109 wide and 110 of 110 narrow in both schemes with the lifecycle step recording two thread/list calls issued between turn/started and the durable userMessage and own dot true, queue walk 12 of 12; the real-runtime lifecycle walk on the installed 0.149.0 passes 6 of 6 with the brand-new Chat's own row asserted live, own dot true, and both walk Threads deleted afterwards. The in-page freshness checks run on the fixture shell only because a real startTurn would spend a model Turn; the real walk asserts the dot after a bounded wait and cannot observe the gap itself.",
+  "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
+}
