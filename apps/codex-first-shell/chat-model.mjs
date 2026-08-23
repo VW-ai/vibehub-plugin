@@ -201,10 +201,16 @@ export function applyChatEvent(model, method, params = {}) {
 // returned so the UI can disclose the bound instead of silently truncating.
 export function timelineWindow(thread, model, { limit = 240 } = {}) {
   const threadId = thread?.id;
+  // `_turnLive` marks whether the owning Turn is still running as the
+  // app-server reports it: a replayed item of a terminal Turn is finalized, a
+  // replayed or streamed item of a live Turn is not, whatever the item's own
+  // streaming state. Additive VibeHub actions are offered on finalized
+  // assistant messages only.
   const replay = (thread?.turns ?? []).flatMap((turn) => {
+    const turnLive = turnIsLive(turn);
     const items = (turn.items ?? []).map((item) => {
       const key = itemKey(threadId, turn.id, item.id);
-      return { ...item, _threadId: threadId, _turnId: turn.id, _key: key, _live: false };
+      return { ...item, _threadId: threadId, _turnId: turn.id, _key: key, _live: false, _turnLive: turnLive };
     });
     if (["interrupted", "failed"].includes(turn.status)) {
       const boundaryKey = itemKey(threadId, turn.id, `boundary-${turn.id}`);
@@ -217,6 +223,7 @@ export function timelineWindow(thread, model, { limit = 240 } = {}) {
         status: turn.status,
         message: turn.error?.message,
         _live: false,
+        _turnLive: turnLive,
       });
     }
     return items;
@@ -228,7 +235,9 @@ export function timelineWindow(thread, model, { limit = 240 } = {}) {
     ...transientMap(model, "turnDiffs").values(),
     ...model.liveItems.values(),
   ];
-  const live = transient.filter((item) => item._threadId === threadId && !authoritativeTurnIds.has(item._turnId) && !replayIds.has(item._key));
+  const live = transient
+    .filter((item) => item._threadId === threadId && !authoritativeTurnIds.has(item._turnId) && !replayIds.has(item._key))
+    .map((item) => ({ ...item, _turnLive: true }));
   const errorIds = new Set(replay.map((item) => item._key));
   const errors = [...model.turnErrors.values()].filter((item) => item._threadId === threadId && !authoritativeTurnIds.has(item._turnId) && !errorIds.has(item._key));
   const all = [...replay, ...live, ...errors];

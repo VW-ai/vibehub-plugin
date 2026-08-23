@@ -290,7 +290,48 @@ export function renderToolContent(content, budget = createRenderBudget()) {
   return `${output}${Array.isArray(content) && content.length > entries.length ? omissionMarkup(content.length - entries.length, "tool result entries") : ""}`;
 }
 
-export function renderAgentMessage(item, budget = createRenderBudget()) {
+// An assistant message is finalized once neither the item nor its Turn is
+// live: replayed items of a terminal Turn, never a streaming delta and never
+// an item of a Turn the app-server still reports running.
+export function messageFinalized(item) {
+  return Boolean(item) && !item._live && !item._turnLive;
+}
+
+export function bridgeHintId(key) {
+  return `bridge-hint-${String(key).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
+// The explicit VibeHub bridge on a finalized assistant message. `bridge` is
+// the host-owned availability: { available, reason }. Unavailable actions
+// stay visible but disabled, and both the title and aria-describedby explain
+// the missing scope in the host's own words.
+export function renderBridgeActions(key, bridge) {
+  const hintId = bridgeHintId(key);
+  const reason = bridge?.reason ?? "No bound VibeHub Project.";
+  const disabled = bridge?.available ? "" : ` disabled aria-describedby="${hintId}" title="${escapeHtml(reason)}"`;
+  const button = (attribute, label) => `<button type="button" ${attribute}="${escapeHtml(key)}"${disabled}>${label}</button>`;
+  const hint = bridge?.available ? "" : `<small class="bridge-hint" id="${hintId}" role="note">Create Task, Attach to Task and Remember need a bound VibeHub Project: ${escapeHtml(reason)}</small>`;
+  return `<span class="bridge-actions" data-bridge-available="${bridge?.available ? "true" : "false"}">${button("data-create-task", "Create Task")}${button("data-attach-task", "Attach to Task")}${button("data-remember", "Remember")}${hint}</span>`;
+}
+
+// Inline association marker at a Turn of the source Chat: every Task born
+// from (origin) or attached to this Turn, from checked-in Ticket YAML alone.
+// Each entry links to the Task Workspace; nothing here is a dependency.
+export function renderTurnAssociations({ turnId, entries }) {
+  if (!entries?.length) return "";
+  const links = entries.map((entry) => `<button type="button" class="association-link" data-ticket-id="${escapeHtml(entry.ticketId)}" data-association-ticket="${escapeHtml(entry.ticketId)}" data-association-kind="${escapeHtml(entry.kind)}" title="Open the Task Workspace"><strong>${escapeHtml(entry.label)}</strong><small>${entry.kind === "origin" ? "born from this Turn" : "attached to this Turn"}${entry.status ? ` · ${escapeHtml(entry.status)}` : ""}</small></button>`).join("");
+  return `<div class="turn-associations" data-turn-id="${escapeHtml(turnId)}" data-association-turn="${escapeHtml(turnId)}" role="group" aria-label="VibeHub Tasks associated with this Turn"><span class="turn-associations-label">VibeHub Tasks</span>${links}</div>`;
+}
+
+// `bridge` (host-owned availability) turns on the Create Task, Attach to Task
+// and Remember actions; without it the message renders only the native Copy
+// and Quote actions. The bridge is offered on finalized messages only, never
+// on a streaming item or an item of a live Turn. The Turn id and item id are
+// stable DOM anchors so Return to source can scroll to and focus the exact
+// origin item.
+export function renderAgentMessage(item, budget = createRenderBudget(), { bridge = null } = {}) {
   const key = item._key ?? item.id;
-  return `<div class="turn assistant" data-item-id="${escapeHtml(key)}" data-render-key="${escapeHtml(key)}"><span class="agent-mark">C</span><article class="agent-response${item._live ? " streaming" : ""}">${renderMarkdown(item.text, budget)}${omissionMarkup(item._omittedCharacters)}${renderMemoryCitations(item.memoryCitation, budget)}<footer class="message-actions"><button type="button" data-copy-message="${escapeHtml(key)}">Copy</button><button type="button" data-quote-message="${escapeHtml(key)}">Quote</button><button type="button" disabled title="Planned VibeHub bridge">Remember</button><button type="button" disabled title="Planned VibeHub bridge">Make Task</button></footer></article></div>`;
+  const finalized = messageFinalized(item);
+  const actions = bridge && finalized ? renderBridgeActions(key, bridge) : "";
+  return `<div class="turn assistant" data-item-id="${escapeHtml(key)}" data-turn-id="${escapeHtml(item._turnId ?? "")}" data-source-item="${escapeHtml(item.id ?? "")}" data-finalized="${finalized ? "true" : "false"}" data-render-key="${escapeHtml(key)}" tabindex="-1"><span class="agent-mark">C</span><article class="agent-response${item._live ? " streaming" : ""}">${renderMarkdown(item.text, budget)}${omissionMarkup(item._omittedCharacters)}${renderMemoryCitations(item.memoryCitation, budget)}<footer class="message-actions"><button type="button" data-copy-message="${escapeHtml(key)}">Copy</button><button type="button" data-quote-message="${escapeHtml(key)}">Quote</button>${actions}</footer></article></div>`;
 }
