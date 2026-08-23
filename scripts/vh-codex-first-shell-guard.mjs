@@ -5,8 +5,8 @@
 // DevTools protocol. A headless page is a visible document, so
 // requestAnimationFrame and selectionchange behave as in a foreground tab.
 //
-//   node scripts/vh-codex-first-shell-guard.mjs            # boots the shell on the fixture app-server, runs every frame in Light and Dark, then the lifecycle walk
-//   node scripts/vh-codex-first-shell-guard.mjs --url <printed shell url>   # guard frames against an already running shell
+//   node scripts/vh-codex-first-shell-guard.mjs            # boots the shell on the fixture app-server over a temporary bound repository, runs every frame in Light and Dark, then the lifecycle walk
+//   node scripts/vh-codex-first-shell-guard.mjs --url <printed shell url>   # guard frames against an already running shell (bridge write checks are skipped: no driver-owned repository)
 //   --frames wide,narrow-window,narrow-viewport   --schemes light,dark   --runs 1   --no-lifecycle   --chrome <binary>
 //
 // Each frame runs once per emulated prefers-color-scheme, so the shell's
@@ -14,14 +14,24 @@
 // motion: reduce is emulated and the page's motion audit must report no
 // running animation, transition or smooth scroll.
 //
-// Exit status is non-zero when any guard check, motion audit or lifecycle step fails.
+// The shell this driver boots serves a copy of the bridge fixture repository
+// (test/fixtures/bridge-repository.mjs), never the checkout it lives in, and
+// the fixture app-server replays one seeded Chat with a finalized assistant
+// message. The explicit Chat bridge (Create Task, Attach to Task, Quote into
+// Task, Remember) therefore writes real YAML, which this driver verifies on
+// disk after every frame and discards before the next one.
+//
+// Exit status is non-zero when any guard check, motion audit, bridge write
+// verification or lifecycle step fails.
 
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { commitCount, createBridgeRepository, porcelain, resetBridgeRepository } from "../test/fixtures/bridge-repository.mjs";
+import { validateTicket } from "../skills/scripts/vh.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const options = { url: null, frames: ["wide", "narrow-window", "narrow-viewport"], schemes: ["light", "dark"], runs: 1, lifecycle: true, chrome: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" };
@@ -104,7 +114,7 @@ async function launchChrome(viewport) {
   return { page, close: () => { ws.close(); child.kill("SIGKILL"); rmSync(profile, { recursive: true, force: true }); } };
 }
 
-async function runGuardFrame(shellUrl, frameName, scheme, run) {
+async function runGuardFrame(shellUrl, frameName, scheme, run, shell = null) {
   const frame = FRAMES[frameName];
   const chrome = await launchChrome(frame);
   const tag = `${frameName} ${frame.width}x${frame.height} ${scheme} run ${run}`;
@@ -114,13 +124,15 @@ async function runGuardFrame(shellUrl, frameName, scheme, run) {
     const url = new URL(shellUrl);
     url.searchParams.set("chatFixture", "mixed");
     url.searchParams.set("interactionGuard", "1");
+    // Bridge writes land only in the repository this driver owns.
+    if (shell) url.searchParams.set("bridgeWrites", "1");
     if (frame.narrow) url.searchParams.set("reviewFrame", "narrow");
     await page.navigate(url.href);
     const summary = await page.evaluate(`(async () => {
       for (let i = 0; i < 900 && !window.__VIBEHUB_INTERACTION_GUARD__; i++) await new Promise((r) => setTimeout(r, 100));
       const s = window.__VIBEHUB_INTERACTION_GUARD__;
       if (!s) return { stalled: true, visibility: document.visibilityState };
-      return { ok: s.ok, passed: s.passed, total: s.total, clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth, canvas: getComputedStyle(document.body).backgroundColor, theme: document.documentElement.dataset.theme, results: s.results };
+      return { ok: s.ok, passed: s.passed, total: s.total, clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth, canvas: getComputedStyle(document.body).backgroundColor, theme: document.documentElement.dataset.theme, results: s.results, bridge: window.__VIBEHUB_BRIDGE_GUARD__ ?? null };
     })()`, true);
     const expectedCanvas = scheme === "dark" ? "rgb(24, 24, 24)" : "rgb(255, 255, 255)";
     const schemeHonored = summary.theme === "system" && summary.canvas === expectedCanvas;
@@ -139,19 +151,93 @@ async function runGuardFrame(shellUrl, frameName, scheme, run) {
       console.log(`[motion ${tag}] ${motionOk ? "PASS" : "FAIL"} reduced-motion audit · ${before.offenders.length} moving without the preference, ${after.offenders.length} with prefers-reduced-motion: reduce · ${after.scanned} elements scanned`);
       for (const line of after.offenders.slice(0, 10)) console.log(`  ✕ ${line}`);
     }
+    if (shell) {
+      ok = verifyBridgeWrites(shell, summary.bridge, tag) && ok;
+      await settleStartedTurn(shell, summary.bridge);
+    }
     return ok;
   } finally {
     chrome.close();
   }
 }
 
+// What the browser's bridge checks claim to have written, read back from the
+// driver-owned repository and the fixture app-server's call log: exactly one
+// draft Ticket with its origin, one grown provenance list, one Context, no
+// commit, and the quoted passage reaching the app-server only inside the
+// Task packet. The repository is then returned to its committed graph.
+function verifyBridgeWrites(shell, bridge, tag) {
+  const steps = [];
+  const step = (name, pass, detail) => { steps.push(pass); console.log(`  ${pass ? "✓" : "✕"} ${name}${detail ? ` · ${detail}` : ""}`); };
+  const readJson = (path) => { try { return JSON.parse(readFileSync(join(shell.repo.folder, path), "utf8")); } catch { return null; } };
+  const dirty = porcelain(shell.repo.folder).sort();
+  const ticket = bridge?.ticketPath ? readJson(bridge.ticketPath) : null;
+  const context = bridge?.contextPath ? readJson(bridge.contextPath) : null;
+  const attached = bridge?.attachPath ? readJson(bridge.attachPath) : null;
+  step("browser ran the bridge writes against the seeded Thread", bridge?.seeded === true && bridge.writes === true && Boolean(bridge.ticketId && bridge.ticketPath && bridge.attachPath && bridge.contextPath && bridge.startedThreadId), JSON.stringify(bridge));
+  step("the created Ticket is on disk, valid, a draft, and carries the seeded origin verbatim", Boolean(ticket) && validateTicket(ticket).length === 0 && ticket.ticket_id === bridge?.ticketId && ticket.maturity === "draft" && ticket.origin?.harness === "codex" && ticket.origin.thread_id === SEED_THREAD.id && ticket.origin.turn_id === SEED_THREAD.turnId && ticket.origin.item_id === SEED_THREAD.itemId && ticket.origin.selection === null && ticket.provenance_refs?.[0] === `codex-thread:${SEED_THREAD.id}/turn:${SEED_THREAD.turnId}` && ticket.acceptance?.length === 1, ticket ? `${ticket.ticket_id} · ${validateTicket(ticket).length} validation errors` : "no Ticket file");
+  step("Attach grew only the open Ticket's provenance_refs", Boolean(attached) && attached.ticket_id === "ticket-bridge-open" && attached.provenance_refs.includes(`codex-thread:${SEED_THREAD.id}/turn:${SEED_THREAD.turnId}`) && attached.origin === undefined && validateTicket(attached).length === 0 && attached.relations.length === 1, attached ? attached.provenance_refs.join(" | ") : "no Ticket file");
+  step("Remember wrote one active Context with the exact source reference", Boolean(context) && context.kind === "context" && context.state === "active" && context.type === "decision" && context.source?.ref === `codex-thread:${SEED_THREAD.id}/turn:${SEED_THREAD.turnId}/item:${SEED_THREAD.itemId}` && context.evidence?.[0]?.ref === context.source.ref && JSON.stringify(context.tags) === JSON.stringify(["login", "reliability"]), context ? `${context.context_id} · ${context.source?.ref}` : "no Context file");
+  const expectedDirty = bridge?.ticketPath ? [` M ${bridge.attachPath}`, `?? ${bridge.contextPath}`, `?? ${bridge.ticketPath}`].sort() : [];
+  step("exactly the three bridge paths are uncommitted and nothing was committed", JSON.stringify(dirty) === JSON.stringify(expectedDirty) && commitCount(shell.repo.folder) === shell.repo.commits, `${dirty.join(", ")} · ${commitCount(shell.repo.folder)} commits`);
+  const calls = existsSync(shell.logPath) ? readFileSync(shell.logPath, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)) : [];
+  const turnStarts = calls.filter((call) => call.kind === "request" && call.method === "turn/start" && call.params?.threadId === bridge?.startedThreadId);
+  const packets = turnStarts.map((call) => { try { return JSON.parse(call.params.input?.[0]?.text ?? ""); } catch { return null; } });
+  const quotedPacket = packets.find((packet) => packet?.kind === "vibehub_task_context_packet" && packet.task?.ticketId === bridge?.ticketId && packet.conversation?.humanMessage?.includes("account type"));
+  const plainQuote = calls.some((call) => call.kind === "request" && call.method === "turn/start" && call.params?.input?.some((item) => item.type === "text" && item.text.includes("account type") && !item.text.startsWith("{")));
+  step("the quoted passage reached the app-server only as the Task packet's humanMessage", Boolean(quotedPacket) && quotedPacket.conversation.humanMessage.includes(`Quoted from Codex thread ${SEED_THREAD.id}`) && !plainQuote && turnStarts.length === 1, quotedPacket ? `${quotedPacket.conversation.humanMessage.length} chars in ${turnStarts.length} turn/start` : "no packet with the quote");
+  const afterReset = shell.reset();
+  step("the repository returns to its committed graph for the next frame", afterReset.length === 0, afterReset.join(", ") || "clean");
+  const ok = steps.every(Boolean);
+  console.log(`[bridge ${tag}] ${ok ? "PASS" : "FAIL"} bridge writes verified on disk · ${steps.filter(Boolean).length}/${steps.length}`);
+  return ok;
+}
+
+// The fixture app-server never finishes a Turn on its own, so the Task Turn
+// a frame started is interrupted here: no frame leaves a live Turn behind
+// for the next frame or the lifecycle walk to mistake for its own.
+async function settleStartedTurn(shell, bridge) {
+  if (!bridge?.startedThreadId) return;
+  const thread = (await shell.action({ action: "readThread", threadId: bridge.startedThreadId })).body.data?.thread;
+  const turn = thread?.turns?.at(-1);
+  if (turn && ["inProgress", "running"].includes(turn.status?.type ?? turn.status)) await shell.action({ action: "interruptTurn", threadId: thread.id, turnId: turn.id });
+}
+
+// The one Chat the fixture app-server replays for the bridge: a finalized
+// Turn with a user message and an assistant answer, in the bound repository's
+// own folder so the shell lists it.
+const SEED_THREAD = Object.freeze({ id: "seed-source-thread", turnId: "seed-turn-1", itemId: "seed-agent-1", title: "Bridge source chat" });
+
+function seedFixtureState(statePath, folder) {
+  const now = new Date().toISOString();
+  const state = {
+    counter: 100,
+    sections: [],
+    threads: [{
+      id: SEED_THREAD.id, name: SEED_THREAD.title, preview: "Explain the login flow and propose a fix.", cwd: folder, createdAt: now, updatedAt: now,
+      status: { type: "idle" }, forkedFromId: null, section: null, archived: false, policy: { approvalPolicy: null, sandbox: null },
+      turns: [{ id: SEED_THREAD.turnId, status: "completed", items: [
+        { type: "userMessage", id: "seed-user-1", content: [{ type: "text", text: "Explain the login flow and propose a fix." }] },
+        { type: "agentMessage", id: SEED_THREAD.itemId, text: "The login flow retries silently. Every **account type** must log in on the first attempt; retries hide the defect.\n\n- Remove the silent retry.\n- Surface the failure to the human." },
+      ] }],
+    }],
+  };
+  writeFileSync(statePath, `${JSON.stringify(state)}\n`);
+}
+
 // Boot the production shell on the fixture app-server with persisted state
 // and a pidfile, so the lifecycle walk can kill the app-server from outside.
+// The repository it serves is a temporary copy of the bridge fixture graph,
+// never this checkout, so bridge writes land where the driver can verify and
+// discard them.
 async function bootShell() {
   const temp = mkdtempSync(join(tmpdir(), "vibehub-guard-shell-"));
   const pidPath = join(temp, "codex-pids");
-  const env = { ...process.env, CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_STATE: join(temp, "codex-state.json"), CODEX_FIXTURE_PIDFILE: pidPath, VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" };
-  const shell = spawn(process.execPath, [join(root, "scripts/vh-codex-first-shell.mjs"), "--repo", root, "--port", "0", "--json", "--codex", join(root, "test/fixtures/codex-app-server-fixture.mjs")], { cwd: root, stdio: ["ignore", "pipe", "pipe"], env });
+  const logPath = join(temp, "app-server-calls.jsonl");
+  const repo = createBridgeRepository({ prefix: "vibehub-guard-repo-" });
+  seedFixtureState(join(temp, "codex-state.json"), repo.realFolder);
+  const env = { ...process.env, CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_STATE: join(temp, "codex-state.json"), CODEX_FIXTURE_PIDFILE: pidPath, CODEX_FIXTURE_LOG: logPath, VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" };
+  const shell = spawn(process.execPath, [join(root, "scripts/vh-codex-first-shell.mjs"), "--repo", repo.folder, "--port", "0", "--json", "--codex", join(root, "test/fixtures/codex-app-server-fixture.mjs")], { cwd: root, stdio: ["ignore", "pipe", "pipe"], env });
   const [chunk] = await once(shell.stdout, "data");
   const envelope = JSON.parse(String(chunk));
   const token = new URL(envelope.url).hash.slice(1);
@@ -164,12 +250,16 @@ async function bootShell() {
   return {
     url: envelope.url,
     api,
+    repo,
+    logPath,
     action: (payload) => api("api/action", { method: "POST", body: JSON.stringify(payload) }),
     lastPid: () => Number(readFileSync(pidPath, "utf8").trim().split("\n").at(-1)),
+    reset: () => resetBridgeRepository(repo.folder),
     async close() {
       shell.kill("SIGTERM");
       await once(shell, "exit").catch(() => {});
       rmSync(temp, { recursive: true, force: true });
+      rmSync(repo.folder, { recursive: true, force: true });
     },
   };
 }
@@ -185,7 +275,7 @@ async function runLifecycle(shell) {
     const bootstrap = (await shell.api("api/bootstrap")).body.data;
     const ticketId = bootstrap.graph.tickets.find((ticket) => ticket.capabilities.nextAction.summary.action !== "DONE")?.ticketId ?? bootstrap.graph.tickets[0]?.ticketId;
     const task = ticketId ? (await shell.action({ action: "startTask", ticketId, selectedContextIds: [] })).body.data : null;
-    const snapshot = () => page.evaluate(`({ label: document.querySelector('#runtimeLabel').textContent, posture: document.querySelector('#composer').dataset.turnPosture, currentTurnId: document.querySelector('#composer').dataset.currentTurnId ?? null, stopHidden: document.querySelector('#stopTurn').hidden, sendLabel: document.querySelector('#sendButton').getAttribute('aria-label'), inputDisabled: document.querySelector('#composerInput').disabled, boundary: Boolean(document.querySelector('.turn-boundary.runtimeExited')), working: [...document.querySelectorAll('.activity-group summary strong')].some((n) => n.textContent.includes('Working')), requests: document.querySelectorAll('.timeline-entry [data-request-id]').length, activeDots: document.querySelectorAll('.thread-state.active').length, banner: document.querySelector('#stopBanner')?.dataset.conditionId ?? null, thread: new URLSearchParams(location.search).get('thread'), forkDisabled: document.querySelector('[data-fork-thread]')?.disabled ?? null })`);
+    const snapshot = () => page.evaluate(`({ label: document.querySelector('#runtimeLabel').textContent, posture: document.querySelector('#composer').dataset.turnPosture, currentTurnId: document.querySelector('#composer').dataset.currentTurnId ?? null, stopHidden: document.querySelector('#stopTurn').hidden, sendLabel: document.querySelector('#sendButton').getAttribute('aria-label'), inputDisabled: document.querySelector('#composerInput').disabled, boundary: Boolean(document.querySelector('.turn-boundary.runtimeExited')), working: [...document.querySelectorAll('.activity-group summary strong')].some((n) => n.textContent.includes('Working')), requests: document.querySelectorAll('.timeline-entry [data-request-id]').length, activeDots: document.querySelectorAll('.thread-state.active').length, activeThreads: [...document.querySelectorAll('.thread-button')].filter((b) => b.querySelector('.thread-state.active')).map((b) => b.dataset.threadId).join('|'), banner: document.querySelector('#stopBanner')?.dataset.conditionId ?? null, thread: new URLSearchParams(location.search).get('thread'), forkDisabled: document.querySelector('[data-fork-thread]')?.disabled ?? null })`);
     await page.navigate(shell.url);
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Local app-server' && document.querySelector('#newThread') && !document.querySelector('#newThread').disabled`);
     await page.evaluate(`document.querySelector('#newThread').click()`);
@@ -193,7 +283,7 @@ async function runLifecycle(shell) {
     await page.evaluate(`(() => { const input = document.querySelector('#composerInput'); input.value = 'keep running'; input.dispatchEvent(new InputEvent('input', { bubbles: true })); document.querySelector('#composer').requestSubmit(); })()`);
     await page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'running' && document.querySelectorAll('.timeline-entry [data-request-id]').length > 0`);
     const live = await snapshot();
-    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Steer current turn" && !live.stopHidden && live.requests > 0 && live.activeDots === 1, `${live.posture}/${live.requests} request cards`);
+    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Steer current turn" && !live.stopHidden && live.requests > 0 && live.activeDots === 1, `${live.posture}/${live.requests} request cards · active ${live.activeThreads}`);
     process.kill(shell.lastPid(), "SIGKILL");
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Runtime restarting'`);
     const exited = await snapshot();
@@ -231,7 +321,7 @@ try {
     if (!FRAMES[frame]) throw new Error(`unknown frame: ${frame}`);
     for (const scheme of options.schemes) {
       if (!["light", "dark"].includes(scheme)) throw new Error(`unknown scheme: ${scheme}`);
-      for (let run = 1; run <= options.runs; run += 1) ok = (await runGuardFrame(url, frame, scheme, run)) && ok;
+      for (let run = 1; run <= options.runs; run += 1) ok = (await runGuardFrame(url, frame, scheme, run, shell)) && ok;
     }
   }
   if (options.lifecycle && shell) ok = (await runLifecycle(shell)) && ok;

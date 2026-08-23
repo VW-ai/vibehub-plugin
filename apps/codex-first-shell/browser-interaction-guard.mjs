@@ -1,3 +1,5 @@
+import { itemKey } from "./chat-model.mjs";
+
 const frame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 const waitFor = async (predicate, attempts = 30) => {
   for (let index = 0; index < attempts; index += 1) {
@@ -11,13 +13,20 @@ function check(results, name, condition, detail = "") {
   results.push({ name, pass: Boolean(condition), detail });
 }
 
+// A compound check: every named condition must hold; the failing names are
+// the detail, so a red line says which clause broke instead of only that one did.
+function checkAll(results, name, conditions, detail = "") {
+  const failed = Object.entries(conditions).filter(([, value]) => !value).map(([key]) => key);
+  check(results, name, failed.length === 0, `${failed.length ? `failed: ${failed.join(", ")}` : "all clauses hold"}${detail ? ` · ${detail}` : ""}`);
+}
+
 const describeNode = (node) => `${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ""}${node.className ? `.${String(node.className).trim().split(/\s+/)[0]}` : ""}`;
 const NATIVE_OPERABLE = "button, a[href], input, select, textarea, summary";
 const focusableByTabindex = (node) => node.hasAttribute("tabindex") && Number(node.getAttribute("tabindex")) >= 0;
 const keyboardOperable = (node) => node.matches(NATIVE_OPERABLE) || focusableByTabindex(node);
 // Every selector the delegated click handler in app.js dispatches on. A match
 // that is neither a native control nor focusable has no keyboard path.
-const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]"].join(", ");
+const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]", "[data-create-task]", "[data-attach-task]", "[data-remember]", "[data-selection-bridge]", "[data-attach-target]", "[data-return-to-source]", "[data-graph-chat]", "[data-association-ticket]"].join(", ");
 
 // Pointer-only gaps in the mounted document: click targets without a keyboard
 // path, and scroll regions (wheel or touch) that neither take focus nor hold a
@@ -531,6 +540,349 @@ export async function runBrowserInteractionGuard(hooks) {
     });
   }
   await hooks.switchFixtureThread(fixture.thread);
+
+
+  // --- The explicit Chat bridge -------------------------------------------
+  // Placement first, on the review fixture: Create Task, Attach to Task and
+  // Remember exist only on finalized assistant messages (disabled here, since
+  // a fixture is never a source of a real write), never on a user message,
+  // never on an item of a live Turn and never on a streaming item. The
+  // hookPrompt divider the fixture now carries reads Repository instructions.
+  const bridgeSelector = "[data-create-task], [data-attach-task], [data-remember]";
+  const fixtureAgent = document.querySelector('.turn.assistant[data-item-id$="fixture-agent"]');
+  const fixtureBridge = [...(fixtureAgent?.querySelectorAll(bridgeSelector) ?? [])];
+  const fixtureUserBridge = document.querySelectorAll(`.turn.user ${bridgeSelector.split(", ").join(", .turn.user ")}`).length;
+  const hookDivider = document.querySelector("[data-hook-prompt]");
+  check(results, "hookPrompt divider reads Repository instructions from the fixture", hookDivider?.querySelector("span")?.textContent === "Repository instructions" && hookDivider.querySelector("strong")?.textContent.includes("AGENTS.md") && !document.body.textContent.includes("Project instructions"), hookDivider?.textContent.slice(0, 60) ?? "no divider");
+  await hooks.switchFixtureThread(fixture.activeThread);
+  const liveTurnAgent = document.querySelector('.turn.assistant[data-item-id$="fixture-active-agent"]');
+  const liveTurnBridge = liveTurnAgent?.querySelectorAll(bridgeSelector).length ?? -1;
+  let streamingAgent = null;
+  let streamingBridge = -1;
+  // Against a shell without the bridge, a missing hook or anchor is a failed
+  // check with its reason, never a stalled run.
+  const bridgeFailure = (name, error) => check(results, name, false, `threw: ${error?.message ?? error}`);
+  try { await hooks.withFixtureTransport(async (payload) => (payload.action === "readThread" ? { thread: structuredClone(fixture.activeThread) } : {}), async () => {
+    // Generation 2 is where the halt window above left the shell; a streamed
+    // item of the live Turn arrives through the same path pollEvents takes.
+    await hooks.applyEventWindow({ events: [
+      { sequence: 11, kind: "notification", value: { method: "item/started", params: { threadId: fixture.activeThread.id, turnId: fixture.activeThread.turns[0].id, item: { id: "guard-streaming-agent", type: "agentMessage", text: "" } } } },
+      { sequence: 12, kind: "notification", value: { method: "item/agentMessage/delta", params: { threadId: fixture.activeThread.id, turnId: fixture.activeThread.turns[0].id, itemId: "guard-streaming-agent", delta: "A streaming answer that is not finalized." } } },
+    ], cursor: 12, oldestCursor: 1, gap: false, runtimeGeneration: 2, runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+    streamingAgent = document.querySelector('.turn.assistant[data-item-id$="guard-streaming-agent"]');
+    streamingBridge = streamingAgent?.querySelectorAll(bridgeSelector).length ?? -1;
+  }); } catch (error) { bridgeFailure("streamed item check completed", error); }
+  check(results, "bridge actions appear only on finalized assistant messages",
+    fixtureAgent?.dataset.finalized === "true" && fixtureBridge.length === 3 && fixtureBridge.every((button) => button.disabled && button.title.includes("Review fixture"))
+      && fixtureUserBridge === 0
+      && liveTurnAgent?.dataset.finalized === "false" && liveTurnBridge === 0
+      && streamingAgent?.dataset.finalized === "false" && streamingAgent.querySelector(".streaming") && streamingBridge === 0,
+    `finalized ${fixtureBridge.length} · user ${fixtureUserBridge} · live Turn ${liveTurnBridge} · streaming ${streamingBridge}`);
+  await hooks.switchFixtureThread(fixture.thread);
+
+  // The real bridge runs on a Thread the fixture app-server replays for the
+  // bound repository the driver booted: one finalized assistant message. Every
+  // host call goes through the live transport and is recorded.
+  const bridgeWrites = new URLSearchParams(location.search).get("bridgeWrites") === "1";
+  const bridgeBootstrap = hooks.currentBootstrap();
+  const seedThread = bridgeBootstrap?.threads.find((thread) => thread.title === "Bridge source chat") ?? null;
+  const bridgeSummary = { seeded: Boolean(seedThread), writes: bridgeWrites, ticketId: null, ticketPath: null, attachPath: null, contextPath: null, startedThreadId: null };
+  if (seedThread && bridgeBootstrap.project.scope === "bound") {
+    const bridgeActions = [];
+    try { await hooks.withFixtureTransport(async (payload) => {
+      const data = await hooks.hostAction(payload);
+      bridgeActions.push({ payload, data });
+      return data;
+    }, async () => {
+      const actionsOf = (name) => bridgeActions.filter((entry) => entry.payload.action === name);
+      const selectIn = (node, start, end) => {
+        const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+        const texts = [];
+        while (walker.nextNode()) texts.push(walker.currentNode);
+        const from = texts.find((text) => text.textContent.includes(start));
+        const to = texts.find((text) => text.textContent.includes(end));
+        const range = document.createRange();
+        range.setStart(from, from.textContent.indexOf(start));
+        range.setEnd(to, to.textContent.indexOf(end) + end.length);
+        const live = window.getSelection();
+        live.removeAllRanges();
+        live.addRange(range);
+        return live.toString();
+      };
+      await hooks.openThread(seedThread.id);
+      await frame();
+      const seedMessage = document.querySelector('.turn.assistant[data-finalized="true"]');
+      const seedItem = { threadId: seedThread.id, turnId: seedMessage?.dataset.turnId, itemId: seedMessage?.dataset.sourceItem };
+      const seedText = seedMessage?.querySelector(".agent-response")?.textContent ?? "";
+      const seedSourceText = (await hooks.hostAction({ action: "readThread", threadId: seedThread.id })).thread.turns.flatMap((turn) => turn.items).find((item) => item.id === seedItem.itemId)?.text ?? "";
+      const enabledBridge = [...(seedMessage?.querySelectorAll(bridgeSelector) ?? [])];
+      check(results, "bridge actions are enabled on the finalized message of a bound real Thread", enabledBridge.length === 3 && enabledBridge.every((button) => !button.disabled && !button.hasAttribute("aria-describedby")) && seedItem.turnId && seedItem.itemId, `${enabledBridge.length} enabled · ${seedItem.turnId}/${seedItem.itemId}`);
+
+      // Unbound: the same actions stay visible but disabled, and both the
+      // footer and the selection sheet explain the missing scope.
+      await hooks.applyScopeFixture(projectFixture.scopes.unbound);
+      await hooks.reconcile();
+      const unboundMessage = document.querySelector('.turn.assistant[data-finalized="true"]');
+      const unboundBridge = [...(unboundMessage?.querySelectorAll(bridgeSelector) ?? [])];
+      const unboundHint = unboundBridge[0] ? document.getElementById(unboundBridge[0].getAttribute("aria-describedby") ?? "") : null;
+      const unboundReason = projectFixture.scopes.unbound.reason;
+      selectIn(unboundMessage.querySelector(".agent-response"), "account type", "first attempt");
+      await waitFor(() => !document.querySelector("#selectionSheet").hidden);
+      const sheet = document.querySelector("#selectionSheet");
+      const sheetBridge = [...sheet.querySelectorAll("[data-selection-bridge]")];
+      check(results, "bridge actions are disabled with the missing scope explained while unbound",
+        unboundBridge.length === 3 && unboundBridge.every((button) => button.disabled && button.title === unboundReason && button.getAttribute("aria-describedby") === unboundHint?.id)
+          && unboundHint?.textContent.includes(unboundReason) && unboundHint.getClientRects().length > 0
+          && sheetBridge.length === 3 && sheetBridge.every((button) => !button.hidden && button.disabled && button.title === unboundReason && button.getAttribute("aria-describedby") === "selectionSheetHint")
+          && !document.querySelector("#selectionSheetHint").hidden && document.querySelector("#selectionSheetHint").textContent.includes(unboundReason),
+        `${unboundBridge.filter((button) => button.disabled).length}/3 disabled · hint ${unboundHint ? "present" : "missing"} · sheet ${sheetBridge.filter((button) => button.disabled).length}/3 disabled`);
+      window.getSelection().removeAllRanges();
+      await hooks.applyScopeFixture(bridgeBootstrap.project);
+      await hooks.reconcile();
+      sheet.hidden = true;
+
+      // Create Task: the sheet is a contained modal that previews through the
+      // host (derived id, packet bytes) and writes only on confirmation.
+      const createTrigger = document.querySelector('.turn.assistant[data-finalized="true"] [data-create-task]');
+      const createDialog = document.querySelector("#createTaskDialog");
+      const guardTitle = `Guard login fix ${Date.now().toString(36)}`;
+      const guardOutcome = "Login succeeds on the first attempt for every account type.";
+      const fillCreate = async () => {
+        const title = document.querySelector("#createTaskTitleInput");
+        const outcome = document.querySelector("#createTaskOutcome");
+        title.value = guardTitle;
+        title.dispatchEvent(new InputEvent("input", { bubbles: true }));
+        outcome.value = guardOutcome;
+        outcome.dispatchEvent(new InputEvent("input", { bubbles: true }));
+        return waitFor(() => document.querySelector("#createTaskId").textContent.startsWith("ticket-") && !document.querySelector("#confirmCreateTask").disabled, 120);
+      };
+      createTrigger.focus();
+      createTrigger.click();
+      await frame();
+      const createContained = !createDialog.hidden && appShell.inert && createDialog.contains(document.activeElement);
+      const previewed = await fillCreate();
+      const previewCall = actionsOf("previewCreateTask").at(-1);
+      const previewOrigin = previewCall?.payload.origin;
+      const expectedPreview = previewCall ? await hooks.hostAction({ action: "previewCreateTask", title: guardTitle, outcome: guardOutcome, context: document.querySelector("#createTaskContext").value, origin: previewOrigin }) : null;
+      const packetShown = document.querySelector("#createTaskPacket")?.textContent ?? "";
+      check(results, "Create Task sheet previews the derived id and the host packet byte for byte from an exact whole-message origin",
+        createContained && previewed && expectedPreview
+          && previewOrigin?.harness === "codex" && previewOrigin.thread_id === seedThread.id && previewOrigin.turn_id === seedItem.turnId && previewOrigin.item_id === seedItem.itemId && previewOrigin.selection === null && previewOrigin.forked_from_id === null && !Number.isNaN(Date.parse(previewOrigin.captured_at))
+          && document.querySelector("#createTaskId").textContent === expectedPreview.ticketId && packetShown === expectedPreview.packetText && packetShown.includes(`"ticketId": "${expectedPreview.ticketId}"`)
+          && document.querySelector("#createTaskContext").value.includes(`> — Quoted from Codex thread ${seedThread.id} · turn ${seedItem.turnId} · item ${seedItem.itemId}`)
+          && document.querySelector("#createTaskSource").textContent.includes(seedItem.turnId) && document.querySelector("#createTaskSource").textContent.includes("whole message")
+          && actionsOf("createTask").length === 0,
+        `${document.querySelector("#createTaskId").textContent} · ${packetShown.length}/${expectedPreview?.packetText.length ?? "?"} chars`);
+      const createFocusable = [...createDialog.querySelectorAll("button:not([disabled]), input:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex='-1'])")].filter((element) => element.getClientRects().length);
+      createFocusable.at(-1).focus();
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+      const createTrapped = document.activeElement === createFocusable[0];
+      auditKeyboard("create task sheet");
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      await frame();
+      check(results, "Create Task sheet traps Tab, and Escape restores focus to its trigger without writing", createTrapped && createDialog.hidden && !appShell.inert && document.activeElement === createTrigger && actionsOf("createTask").length === 0, document.activeElement?.outerHTML.slice(0, 60));
+
+      if (bridgeWrites) {
+        createTrigger.click();
+        await frame();
+        await fillCreate();
+        const ticketId = document.querySelector("#createTaskId").textContent;
+        document.querySelector("#confirmCreateTask").click();
+        const markerSelector = `.turn-associations [data-association-ticket="${CSS.escape(ticketId)}"][data-association-kind="origin"]`;
+        const marked = await waitFor(() => document.querySelector(markerSelector) && createDialog.hidden && document.querySelector("#toast").textContent.includes(actionsOf("createTask").at(-1)?.data?.path ?? "\u0000"), 120);
+        const createCall = actionsOf("createTask").at(-1);
+        // The confirmation re-previews first; the Ticket is written with the
+        // origin that preview validated, captured when this sheet opened.
+        const confirmedPreview = actionsOf("previewCreateTask").at(-1);
+        const createdRow = hooks.currentBootstrap()?.graph.tickets.find((ticket) => ticket.ticketId === ticketId);
+        const marker = document.querySelector(markerSelector);
+        const sourceAfter = (await hooks.hostAction({ action: "readThread", threadId: seedThread.id })).thread;
+        bridgeSummary.ticketId = ticketId;
+        bridgeSummary.ticketPath = createCall?.data?.path ?? null;
+        check(results, "Create Task writes one uncommitted draft Ticket with its origin, marks the origin Turn inline and leaves the source Chat unchanged",
+          marked && createCall?.payload.ticketId === ticketId && JSON.stringify(createCall.payload.origin) === JSON.stringify(confirmedPreview?.payload.origin) && JSON.stringify({ ...createCall.payload.origin, captured_at: null }) === JSON.stringify({ ...previewOrigin, captured_at: null }) && createCall.data.uncommitted === true && createCall.data.path === `.vibehub/tickets/${ticketId}.yaml`
+            && document.querySelector("#toast")?.textContent.includes(createCall.data.path) && document.querySelector("#toast").textContent.includes("uncommitted")
+            && createdRow?.capabilities.operational.summary.label === "REFINE" && createdRow.origin?.thread_id === seedThread.id && createdRow.associations[0]?.kind === "origin" && createdRow.associations[0].turnId === seedItem.turnId
+            && hooks.currentBootstrap().project.uncommitted.paths.includes(createCall.data.path) && hooks.currentBootstrap().project.uncommitted.committed === false
+            && marker.closest(".turn-associations").dataset.associationTurn === seedItem.turnId && marker.textContent.includes("born from this Turn") && marker.textContent.includes("REFINE")
+            && sourceAfter.turns.length === 1 && document.querySelector('.turn.assistant[data-finalized="true"] .agent-response')?.textContent === seedText
+            && document.querySelector(`.thread-button[data-thread-id="${CSS.escape(seedThread.id)}"] [data-born-tasks]`)?.dataset.bornTasks === "1"
+            && document.activeElement === document.querySelector('.turn.assistant[data-finalized="true"] [data-create-task]'),
+          `${ticketId} · ${createdRow?.capabilities.operational.summary.label ?? "no row"} · ${sourceAfter.turns.length} Turn · focus ${document.activeElement?.outerHTML.slice(0, 40)}`);
+
+        // Second Task from the same Turn and title: the preview moves to a
+        // free id, and the Chat lists both Tasks at the Turn.
+        createTrigger.click();
+        await frame();
+        await fillCreate();
+        const secondId = document.querySelector("#createTaskId").textContent;
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        await frame();
+        check(results, "a second Task from the same Turn and title previews a free id instead of the taken one", secondId === `${ticketId}-2`, secondId);
+
+        // Graph: the new Task is DRAFT · REFINE with its origin; focusing it
+        // draws the provenance edge from its source Chat with its own edge
+        // kind, and no depends_on edge or count changes.
+        openSidebar.click();
+        await frame();
+        document.querySelector('.primary-nav [data-route="tasks"]').click();
+        await frame();
+        const relationCount = hooks.currentBootstrap().graph.relations.length;
+        const countsBefore = [...document.querySelectorAll(".task-card [data-relation-counts]")].map((node) => node.dataset.relationCounts).join(",");
+        const dependsBefore = document.querySelectorAll('.graph-edges path[data-edge-kind="depends_on"]').length;
+        const card = document.querySelector(`.task-card[data-ticket-id="${CSS.escape(ticketId)}"]`);
+        card?.focus();
+        await frame();
+        const provenanceEdges = [...document.querySelectorAll('.graph-edges path[data-edge-kind="provenance"]')];
+        const chatNode = document.querySelector(`#graphSources [data-graph-chat="${CSS.escape(seedThread.id)}"]`);
+        const countsAfter = [...document.querySelectorAll(".task-card [data-relation-counts]")].map((node) => node.dataset.relationCounts).join(",");
+        check(results, "Graph lists the new Task as DRAFT · REFINE with its origin and draws a provenance edge for the focused Task without touching depends_on",
+          card?.dataset.phase === "DRAFT" && card.dataset.operational === "REFINE" && card.querySelector(".substate")?.textContent === "REFINE" && card.querySelector(".task-origin")?.dataset.originThread === seedThread.id
+            && chatNode?.dataset.graphTurn === seedItem.turnId && chatNode.dataset.associationKind === "origin"
+            && provenanceEdges.length === 1 && provenanceEdges[0].dataset.provenanceTicket === ticketId && provenanceEdges[0].dataset.provenanceThread === seedThread.id
+            && dependsBefore === relationCount && document.querySelectorAll('.graph-edges path[data-edge-kind="depends_on"]').length === relationCount && relationCount === 1
+            && countsBefore === countsAfter && card.querySelector("[data-relation-counts]").dataset.relationCounts === "0:0"
+            && !hooks.currentBootstrap().graph.relations.some((relation) => relation.dependentTicketId === ticketId || relation.prerequisiteTicketId === ticketId),
+          `${card?.dataset.phase}/${card?.dataset.operational} · provenance ${provenanceEdges.length} · depends_on ${dependsBefore}→${document.querySelectorAll('.graph-edges path[data-edge-kind="depends_on"]').length} of ${relationCount} · counts ${countsBefore} → ${countsAfter}`);
+        auditKeyboard("task graph with provenance");
+
+        // Attach to Task: the picker lists every open Task the host returns,
+        // and Attach appends one provenance reference to the chosen one.
+        await hooks.openThread(seedThread.id);
+        await frame();
+        const attachTrigger = document.querySelector('.turn.assistant[data-finalized="true"] [data-attach-task]');
+        attachTrigger.focus();
+        attachTrigger.click();
+        const attachDialog = document.querySelector("#attachTaskDialog");
+        await waitFor(() => document.querySelectorAll(".attach-row").length >= 2, 120);
+        const targets = actionsOf("listTaskTargets").at(-1)?.data.tasks ?? [];
+        const rows = [...document.querySelectorAll(".attach-row")];
+        const attachContained = !attachDialog.hidden && appShell.inert && attachDialog.contains(document.activeElement);
+        const bornRow = rows.find((row) => row.dataset.attachTarget === ticketId);
+        const openRow = rows.find((row) => row.dataset.attachTarget === "ticket-bridge-open");
+        const attachBefore = document.querySelector("#confirmAttachTask").disabled;
+        openRow?.click();
+        await frame();
+        const attachSelection = document.querySelector("#attachTaskSelection").textContent;
+        auditKeyboard("attach to task sheet");
+        document.querySelector("#confirmAttachTask").click();
+        const attachedMarkerSelector = '.turn-associations [data-association-ticket="ticket-bridge-open"][data-association-kind="attached"]';
+        const attachedMarked = await waitFor(() => document.querySelector(attachedMarkerSelector) && attachDialog.hidden && document.querySelector("#toast").textContent.includes(actionsOf("attachTask").at(-1)?.data?.path ?? "\u0000"), 120);
+        const attachCall = actionsOf("attachTask").at(-1);
+        bridgeSummary.attachPath = attachCall?.data?.path ?? null;
+        check(results, "Attach to Task lists every open Task the host returns, appends one exact provenance reference and marks the Turn as attached",
+          attachContained && rows.length === targets.length && targets.length >= 2 && !targets.some((task) => task.ticketId === "ticket-bridge-closed")
+            && rows.every((row) => row.dataset.taskStatus === targets.find((task) => task.ticketId === row.dataset.attachTarget)?.status)
+            && bornRow?.textContent.includes("born from a Chat") && bornRow.dataset.taskStatus === "REFINE"
+            && attachBefore && attachSelection.includes(`codex-thread:${seedThread.id}/turn:${seedItem.turnId}`) && attachSelection.includes("uncommitted")
+            && attachedMarked && attachCall?.payload.threadId === seedThread.id && attachCall.payload.turnId === seedItem.turnId && attachCall.data.added === true && attachCall.data.provenanceRef === `codex-thread:${seedThread.id}/turn:${seedItem.turnId}`
+            && document.querySelector("#toast").textContent.includes(attachCall.data.path) && hooks.currentBootstrap().project.uncommitted.paths.includes(attachCall.data.path)
+            && hooks.currentBootstrap().graph.tickets.find((ticket) => ticket.ticketId === "ticket-bridge-open")?.relationCounts.prerequisites === 1
+            && document.querySelectorAll(".turn-associations [data-association-ticket]").length === 2 && document.activeElement === document.querySelector('.turn.assistant[data-finalized="true"] [data-attach-task]'),
+          `${rows.length}/${targets.length} rows · added ${attachCall?.data?.added} · markers ${document.querySelectorAll(".turn-associations [data-association-ticket]").length}`);
+
+        // Quote into Task: the selected passage lands in the new Task's own
+        // conversation draft, shown in the Workspace Composer, and reaches
+        // the Agent only as startTask.humanMessage inside the host packet.
+        const quoteText = selectIn(document.querySelector('.turn.assistant[data-finalized="true"] .agent-response'), "account type", "first attempt");
+        const sheetShown = await waitFor(() => !document.querySelector("#selectionSheet").hidden, 60);
+        const sheetState = `sheet ${sheetShown ? "shown" : "hidden"} · selection "${window.getSelection().toString()}" · buttons ${[...document.querySelectorAll("[data-selection-bridge]")].map((button) => `${button.dataset.selectionBridge}:${button.hidden ? "hidden" : "visible"}:${button.disabled ? "disabled" : "enabled"}`).join(",")}`;
+        document.querySelector('[data-selection-bridge="attach-task"]').click();
+        await waitFor(() => !document.querySelector("#attachTaskDialog").hidden && document.querySelectorAll(".attach-row").length >= 2, 120);
+        const quoteDialogState = `dialog ${document.querySelector("#attachTaskDialog").hidden ? "hidden" : "open"} · rows ${document.querySelectorAll(".attach-row").length}`;
+        document.querySelector(`.attach-row[data-attach-target="${CSS.escape(ticketId)}"]`).click();
+        await frame();
+        const quoteSourceLine = document.querySelector("#attachTaskSource").textContent;
+        document.querySelector("#quoteIntoTask").click();
+        const workspaceShown = await waitFor(() => document.querySelector(".task-workspace")?.dataset.ticketWorkspace === ticketId && !document.querySelector("#quoteTray").hidden, 120);
+        const workspaceDetail = `${document.querySelector(".task-workspace")?.dataset.ticketWorkspace ?? "no workspace"} · tray ${document.querySelector("#quoteTray").hidden ? "hidden" : "shown"} · toast ${document.querySelector("#toast").textContent.slice(0, 80)}`;
+        const pendingQuote = hooks.taskQuoteDraft(ticketId);
+        const composerNote = document.querySelector("#composerNote").textContent;
+        const trayBeforeStart = document.querySelector("#quoteTray .quote-source")?.textContent ?? "";
+        const quotedPacketBefore = actionsOf("startTask").length;
+        document.querySelector('[data-task-action="REFINE"]')?.click();
+        const started = await waitFor(() => actionsOf("startTask").length > quotedPacketBefore && document.querySelector(".task-workspace") && new URLSearchParams(location.search).get("thread"), 200);
+        const startCall = actionsOf("startTask").at(-1);
+        const sentPacket = startCall?.data?.payloadText ? JSON.parse(startCall.data.payloadText) : null;
+        bridgeSummary.startedThreadId = startCall?.data?.threadId ?? null;
+        checkAll(results, "Quote into Task lands in the Task-scoped Composer draft and reaches the Agent only as startTask humanMessage inside the host packet", {
+          selectedPassage: quoteText.includes("account type"),
+          exactSelectionRange: quoteSourceLine.includes("characters "),
+          workspaceShowsPendingQuote: workspaceShown,
+          draftKeyedToTask: pendingQuote?.threadId === seedThread.id && pendingQuote.turnId === seedItem.turnId && pendingQuote.itemId === seedItem.itemId && pendingQuote.text.includes("account type"),
+          trayNamesSourceThread: Boolean(document.querySelector("#quoteTray .quote-source")?.textContent.includes(seedThread.id)) || trayBeforeStart.includes(seedThread.id),
+          composerNoteExplains: composerNote.includes("Pending quote"),
+          startSent: started && startCall?.payload.ticketId === ticketId,
+          humanMessageCarriesQuote: Boolean(startCall?.payload.humanMessage?.includes(pendingQuote?.text ?? "\u0000")) && startCall.payload.humanMessage.includes(`> — Quoted from Codex thread ${seedThread.id} · turn ${seedItem.turnId} · item ${seedItem.itemId}`),
+          packetCarriesItAsHumanMessage: sentPacket?.conversation.humanMessage === startCall?.payload.humanMessage && sentPacket?.task.ticketId === ticketId,
+          draftConsumed: hooks.taskQuoteDraft(ticketId) === null && document.querySelector("#quoteTray").hidden,
+          noOrdinaryTurn: !actionsOf("startTurn").length && !actionsOf("steerTurn").length,
+        }, `${pendingQuote ? "draft held" : "no draft"} · start ${started ? "sent" : "missing"} · humanMessage ${startCall?.payload.humanMessage?.length ?? 0} chars · ${workspaceDetail} · ${sheetState} · ${quoteDialogState}`);
+
+        // Remember: existing Rooms only, prefilled from the selection, the
+        // exact source reference shown, one Context written uncommitted.
+        await hooks.openThread(seedThread.id);
+        await frame();
+        const rememberTrigger = document.querySelector('.turn.assistant[data-finalized="true"] [data-remember]');
+        rememberTrigger.focus();
+        rememberTrigger.click();
+        const rememberDialog = document.querySelector("#rememberDialog");
+        await waitFor(() => document.querySelectorAll("#rememberRoom option[value]").length >= 2 && document.querySelector("#rememberRoom option[value='product']"), 120);
+        const roomOptions = [...document.querySelectorAll("#rememberRoom option")].map((option) => option.value);
+        const listedRooms = actionsOf("listRooms").at(-1)?.data.rooms.map((room) => room.room) ?? [];
+        const rememberContained = !rememberDialog.hidden && appShell.inert && rememberDialog.contains(document.activeElement);
+        document.querySelector("#rememberRoom").value = "product";
+        document.querySelector("#rememberType").value = "decision";
+        const rememberSummary = `Guard remembered claim ${Date.now().toString(36)}`;
+        document.querySelector("#rememberSummary").value = rememberSummary;
+        document.querySelector("#rememberTags").value = "login, reliability";
+        auditKeyboard("remember sheet");
+        document.querySelector("#confirmRemember").click();
+        const remembered = await waitFor(() => actionsOf("remember").length && rememberDialog.hidden && hooks.currentBootstrap()?.project.uncommitted.paths.includes(actionsOf("remember").at(-1)?.data?.path) && document.querySelector("#toast").textContent.includes(actionsOf("remember").at(-1)?.data?.path), 120);
+        const rememberCall = actionsOf("remember").at(-1);
+        const projectedContext = hooks.currentBootstrap()?.contexts.find((item) => item.contextId === rememberCall?.data?.contextId);
+        bridgeSummary.contextPath = rememberCall?.data?.path ?? null;
+        checkAll(results, "Remember lists only existing Rooms, keeps the exact source reference and writes one uncommitted Context the Rooms now project", {
+          containedModal: rememberContained,
+          existingRoomsOnly: roomOptions.join(",") === listedRooms.join(",") && listedRooms.includes("product") && listedRooms.includes("product/ux"),
+          exactSourceRef: document.querySelector("#rememberSource").textContent.includes(`codex-thread:${seedThread.id}/turn:${seedItem.turnId}/item:${seedItem.itemId}`),
+          written: remembered && rememberCall?.payload.room === "product" && rememberCall.payload.type === "decision" && JSON.stringify(rememberCall.payload.tags) === JSON.stringify(["login", "reliability"]),
+          sourceIdentityAndQuote: rememberCall?.payload.source.threadId === seedThread.id && rememberCall.payload.source.turnId === seedItem.turnId && rememberCall.payload.source.itemId === seedItem.itemId && rememberCall.payload.source.quote === seedSourceText && rememberCall.payload.detail === seedSourceText,
+          uncommittedPath: rememberCall?.data.uncommitted === true && rememberCall.data.path === `.vibehub/rooms/product/${rememberCall.data.contextId}.yaml`,
+          toastAndBootstrapNamePath: Boolean(rememberCall) && document.querySelector("#toast").textContent.includes(rememberCall.data.path) && hooks.currentBootstrap().project.uncommitted.paths.includes(rememberCall.data.path),
+          roomsProjectIt: projectedContext?.room === "product" && projectedContext.type === "decision" && projectedContext.sourceRef === rememberCall?.data.sourceRef,
+          focusRestored: document.activeElement === document.querySelector('.turn.assistant[data-finalized="true"] [data-remember]'),
+        }, `${rememberCall?.data?.contextId ?? "not written"} · rooms ${roomOptions.join("|")}`);
+
+        // Origin chip and Return to source: the Workspace names the source
+        // Thread, Turn, item and excerpt; Return reopens the Thread on the
+        // chat route, scrolled and focused on the exact origin item.
+        await hooks.openTask(ticketId);
+        await frame();
+        const chip = document.querySelector(`.origin-chip[data-task-origin="${CSS.escape(seedThread.id)}"]`);
+        const chipText = chip?.textContent ?? "";
+        const attachedList = document.querySelectorAll('.origin-attached [data-return-to-source][data-association-kind="attached"]').length;
+        chip?.querySelector("[data-return-to-source]")?.click();
+        const originKey = itemKey(seedThread.id, seedItem.turnId, seedItem.itemId);
+        const returned = await waitFor(() => document.querySelector(".chat-view") && document.activeElement?.dataset?.itemId === originKey, 120);
+        const originNode = document.querySelector(`[data-item-id="${CSS.escape(originKey)}"]`);
+        const originBox = originNode?.getBoundingClientRect();
+        const surfaceBox = document.querySelector("#surface").getBoundingClientRect();
+        check(results, "Task Workspace origin chip names the source Thread, Turn and excerpt, and Return to source focuses the exact origin item on the chat route",
+          chip?.dataset.originTurn === seedItem.turnId && chip.dataset.originItem === seedItem.itemId && chipText.includes(seedThread.title) && chipText.includes(seedItem.turnId) && chipText.includes("whole message") && chip.querySelector(".origin-excerpt")?.textContent.includes("account type")
+            && returned && new URLSearchParams(location.search).get("thread") === seedThread.id && originNode?.dataset.sourceFocus === "true" && originBox.top >= surfaceBox.top - 1 && originBox.bottom <= surfaceBox.bottom + 1
+            && document.querySelector("#streamStatus").textContent.includes("Returned to the source Turn"),
+          `${returned ? "focused" : "not focused"} · attached ${attachedList} · ${chipText.slice(0, 60)}`);
+        window.getSelection().removeAllRanges();
+      } else {
+        check(results, "bridge write checks are skipped without a driver-owned repository (pass bridgeWrites=1 from the guard driver)", true, "preview, placement and scope checks ran; no write was attempted");
+      }
+    }); } catch (error) { bridgeFailure("bridge flow checks completed", error); }
+    await hooks.switchFixtureThread(fixture.thread);
+  } else {
+    check(results, "bridge write checks need the seeded source Thread on a bound repository", !bridgeWrites, `seeded ${Boolean(seedThread)} · scope ${bridgeBootstrap?.project?.scope}`);
+  }
+  window.__VIBEHUB_BRIDGE_GUARD__ = bridgeSummary;
 
   // The two remaining overlays: the Task inbox and the product boundary notes
   // open as contained modals, take focus, and Escape returns it to the trigger.
