@@ -1,0 +1,6 @@
+[core]
+    remote = r2
+['remote "r2"']
+    url = s3://vibehub
+    endpointurl = https://72091e7e079e357ced7f9603c03a926e.r2.cloudflarestorage.com
+    region = auto

@@ -1,6 +1,6 @@
 # Audio
 
-Stems are fetched with `./fetch.sh` (GitHub Release). Both clips are **music only** — narration was tried (local Kokoro TTS, female voices) and rejected: flat delivery, and reading the on-screen text aloud felt wrong. The story is carried by picture, captions and music changes.
+Stems are DVC-tracked in R2; `./fetch.sh` pulls them. Both clips are **music only** — narration was tried (local Kokoro TTS, female voices) and rejected: flat delivery, and reading the on-screen text aloud felt wrong. The story is carried by picture, captions and music changes.
 
 | file | work | performer | license | used in |
 |------|------|-----------|---------|---------|

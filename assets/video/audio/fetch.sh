@@ -1,5 +1,3 @@
 #!/usr/bin/env bash
-# Music stems are not in git; pull them from the GitHub Release before mixing.
-set -e; cd "$(dirname "$0")"
-for f in bach-goldberg-aria.ogg schubert-impromptu-gflat.ogg; do [ -f "$f" ] || curl -sL -o "$f" "https://github.com/VW-ai/vibehub-plugin/releases/download/video-drafts-2026-08-23/$f"; done
-ls -la *.ogg
+# Music stems are DVC-tracked (Cloudflare R2). Pull them before mixing.
+set -e; cd "$(dirname "$0")"; ~/.cache/vh-dvc/bin/dvc pull bach-goldberg-aria.ogg.dvc schubert-impromptu-gflat.ogg.dvc; ls -la *.ogg
