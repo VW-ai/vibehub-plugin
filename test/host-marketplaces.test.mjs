@@ -133,7 +133,7 @@ function exerciseInstalledHelper(helper, label) {
 
 async function exerciseInstalledFavicon(pluginRoot, label) {
   const repo = temporaryRoot(`vibehub-${label}-favicon-`);
-  const helper = join(pluginRoot, "skills", "scripts", "vh.mjs");
+  const helper = join(pluginRoot, "skills", "vibehub-core", "scripts", "vh.mjs");
   assert.equal(invoke(helper, repo, "project", "init").status, 0);
   const faviconPath = join(
     pluginRoot,
@@ -157,7 +157,7 @@ async function exerciseInstalledFavicon(pluginRoot, label) {
     /<link rel="icon" type="image\/svg\+xml" href="\/vibehub-mark\.svg">/u,
   );
   const uiModule = await import(pathToFileURL(
-    join(pluginRoot, "skills", "scripts", "vh-ui.mjs"),
+    join(pluginRoot, "skills", "vibehub-core", "scripts", "vh-ui.mjs"),
   ).href);
   const host = uiModule.startVibeHubUi({
     repoRoot: repo,
@@ -193,9 +193,9 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
   const claude = buildClaudeMarketplace({ outputRoot: join(output, "claude"), offline: true });
 
   for (const pluginRoot of [codex.pluginRoot, claude.pluginRoot]) {
-    assert.ok(existsSync(join(pluginRoot, "skills", "contracts", "project-format.schema.json")));
-    assert.ok(existsSync(join(pluginRoot, "skills", "contracts", "acceptance-authority.md")));
-    assert.ok(existsSync(join(pluginRoot, "skills", "contracts", "dependency-hygiene.json")));
+    assert.ok(existsSync(join(pluginRoot, "skills", "vibehub-core", "contracts", "project-format.schema.json")));
+    assert.ok(existsSync(join(pluginRoot, "skills", "vibehub-core", "contracts", "acceptance-authority.md")));
+    assert.ok(existsSync(join(pluginRoot, "skills", "vibehub-core", "contracts", "dependency-hygiene.json")));
     assert.ok(existsSync(join(pluginRoot, "skills", "vibehub-migrate", "references", "migrations.json")));
   }
   const codexVersion = JSON.parse(
@@ -218,9 +218,9 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
   assert.match(codexReadme, /work produces acceptance-linked Evidence; a separate Agent decides the Outcome; accepted learning returns to Context/u);
   assert.doesNotMatch(codexReadme, /https:\/\/www\.vibehub\.icu|https:\/\/[^"<\s]*\.pages\.dev/iu);
   for (const relativePath of [
-    join("skills", "contracts", "project-format.schema.json"),
-    join("skills", "contracts", "acceptance-authority.md"),
-    join("skills", "contracts", "dependency-hygiene.json"),
+    join("skills", "vibehub-core", "contracts", "project-format.schema.json"),
+    join("skills", "vibehub-core", "contracts", "acceptance-authority.md"),
+    join("skills", "vibehub-core", "contracts", "dependency-hygiene.json"),
     join("skills", "vibehub-migrate", "references", "migrations.json"),
   ]) {
     assert.equal(
@@ -230,11 +230,11 @@ test("Codex and Claude Code marketplace artifacts expose identical format behavi
   }
 
   const codexBehavior = exerciseInstalledHelper(
-    join(codex.pluginRoot, "skills", "scripts", "vh.mjs"),
+    join(codex.pluginRoot, "skills", "vibehub-core", "scripts", "vh.mjs"),
     "codex",
   );
   const claudeBehavior = exerciseInstalledHelper(
-    join(claude.pluginRoot, "skills", "scripts", "vh.mjs"),
+    join(claude.pluginRoot, "skills", "vibehub-core", "scripts", "vh.mjs"),
     "claude",
   );
   assert.deepEqual(codexBehavior, {

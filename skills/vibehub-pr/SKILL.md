@@ -5,12 +5,16 @@ description: Prepare or review a pull request whose code and lightweight VibeHub
 
 # VibeHub PR
 
+> If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
+> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
 This Skill owns `pr-review-ready`; it does not own UI launch mechanics.
 
 1. Inspect the branch diff, current Ticket, Evidence, Outcome, and relevant
-   Context. Run `node ../scripts/vh.mjs project validate --repo <root>` and
-   `node ../scripts/vh.mjs room drift --repo <root>`. Rooms this branch
+   Context. Run `node ../vibehub-core/scripts/vh.mjs project validate --repo <root>` and
+   `node ../vibehub-core/scripts/vh.mjs room drift --repo <root>`. Rooms this branch
    entered must be aligned: an unexplained DRIFTED room blocks the handoff
    until it is aligned or honestly marked, while `drift:`-prefixed marks are
    recorded debt and may ship. Never export staleness the branch created;

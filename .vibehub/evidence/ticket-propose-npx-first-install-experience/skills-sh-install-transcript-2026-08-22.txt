@@ -1,0 +1,105 @@
+## claude-code
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│    copy → Claude Code                      │
+│  ✓ vibehub-distill (copied)                    │
+│    → ./.claude/skills/vibehub-distill          │
+│  ✓ vibehub-ingest (copied)                     │
+│    → ./.claude/skills/vibehub-ingest           │
+│  ✓ vibehub-migrate (copied)                    │
+│    → ./.claude/skills/vibehub-migrate          │
+│  ✓ vibehub-pr (copied)                         │
+│    → ./.claude/skills/vibehub-pr               │
+│  ✓ vibehub-query (copied)                      │
+│    → ./.claude/skills/vibehub-query            │
+│  ✓ vibehub-setup (copied)                      │
+│    → ./.claude/skills/vibehub-setup            │
+│  ✓ vibehub-ticket-closeout (copied)            │
+│    → ./.claude/skills/vibehub-ticket-closeout  │
+│  ✓ vibehub-ticket-plan (copied)                │
+│    → ./.claude/skills/vibehub-ticket-plan      │
+│  ✓ vibehub-ticket-review (copied)              │
+│    → ./.claude/skills/vibehub-ticket-review    │
+│  ✓ vibehub-ticket-run (copied)                 │
+│    → ./.claude/skills/vibehub-ticket-run       │
+│  ✓ vibehub-ticket-validate (copied)            │
+│    → ./.claude/skills/vibehub-ticket-validate  │
+└  Done!  Review skills before use; they run with full agent permissions.
+## codex
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│    copy → Codex                            │
+│  ✓ vibehub-distill (copied)                    │
+│    → ./.agents/skills/vibehub-distill          │
+│  ✓ vibehub-ingest (copied)                     │
+│    → ./.agents/skills/vibehub-ingest           │
+│  ✓ vibehub-migrate (copied)                    │
+│    → ./.agents/skills/vibehub-migrate          │
+│  ✓ vibehub-pr (copied)                         │
+│    → ./.agents/skills/vibehub-pr               │
+│  ✓ vibehub-query (copied)                      │
+│    → ./.agents/skills/vibehub-query            │
+│  ✓ vibehub-setup (copied)                      │
+│    → ./.agents/skills/vibehub-setup            │
+│  ✓ vibehub-ticket-closeout (copied)            │
+│    → ./.agents/skills/vibehub-ticket-closeout  │
+│  ✓ vibehub-ticket-plan (copied)                │
+│    → ./.agents/skills/vibehub-ticket-plan      │
+│  ✓ vibehub-ticket-review (copied)              │
+│    → ./.agents/skills/vibehub-ticket-review    │
+│  ✓ vibehub-ticket-run (copied)                 │
+│    → ./.agents/skills/vibehub-ticket-run       │
+│  ✓ vibehub-ticket-validate (copied)            │
+│    → ./.agents/skills/vibehub-ticket-validate  │
+└  Done!  Review skills before use; they run with full agent permissions.
+## files copied
+.agents
+.agents/skills
+.agents/skills/vibehub-distill
+.agents/skills/vibehub-ingest
+.agents/skills/vibehub-migrate
+.agents/skills/vibehub-pr
+.agents/skills/vibehub-query
+.agents/skills/vibehub-setup
+.agents/skills/vibehub-ticket-closeout
+.agents/skills/vibehub-ticket-plan
+.agents/skills/vibehub-ticket-review
+.agents/skills/vibehub-ticket-run
+.agents/skills/vibehub-ticket-validate
+.claude
+.claude/skills
+.claude/skills/vibehub-distill
+.claude/skills/vibehub-ingest
+.claude/skills/vibehub-migrate
+.claude/skills/vibehub-pr
+.claude/skills/vibehub-query
+.claude/skills/vibehub-setup
+.claude/skills/vibehub-ticket-closeout
+.claude/skills/vibehub-ticket-plan
+.claude/skills/vibehub-ticket-review
+.claude/skills/vibehub-ticket-run
+.claude/skills/vibehub-ticket-validate
+## shared helper present?
+ls: .agents/skills/scripts: No such file or directory
+ls: .claude/skills/contracts: No such file or directory
+ls: .claude/skills/scripts: No such file or directory
+## dangling refs in copied SKILL.md
+45 references
+## resolve attempt
+ERR_MODULE_NOT_FOUND Cannot find module '/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/skills-test2/.claude/skills/scripts/vh.mjs' imported from /private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/skills-test2/[eval]

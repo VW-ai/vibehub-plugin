@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "native-dependencies-are-projected-idempotently"
+  ],
+  "evidence_id": "dependency-planner-and-fixture-tests",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T00:01:13Z",
+  "refs": [
+    "scripts/sync-github-issues.mjs",
+    "test/sync-github-issues.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "planDependencies in scripts/sync-github-issues.mjs diffs Ticket depends_on against remote blocked_by per mirrored Issue: adds missing, removes stale only when the blocker is itself a mirrored Ticket Issue, leaves foreign blockers alone; writes go through the REST dependencies API with the blocker database id. Fixture test covers add, no-op, stale-removal, and keep-foreign; suite 137/137 passes and verify:artifact is ok. Dry-run lists every dep+ / dep- line; a dry-run immediately after the live run reported 0 dependency changes.",
+  "ticket_id": "ticket-native-issue-dependencies-and-github-view"
+}

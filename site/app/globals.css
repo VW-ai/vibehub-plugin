@@ -2710,3 +2710,21 @@ button:disabled { cursor: default; }
   .showcase-actions > a { transition: none; transform: none; }
   .composer-caret { animation: none; opacity: 1; }
 }
+
+/* One-line install: primary row above the marketplace actions. */
+.showcase-actions > .install-primary {
+  grid-column: 1 / -1;
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--surface, #fff);
+}
+.showcase-actions > .install-primary b { font-size: 10px; }
+.showcase-actions > .install-primary code { font: 650 10.5px/1.2 var(--mono); letter-spacing: -0.01em; }
+.showcase-actions > .install-primary small { color: rgba(255, 255, 255, 0.72); }
+.showcase-actions > .install-primary .copy-glyph { color: inherit; }
+.brand-symbol-terminal { color: inherit; }
+.showcase-utilities > .utility-primary { border-color: var(--ink); background: var(--ink); color: var(--surface, #fff); }
+@media (max-width: 720px) {
+  .showcase-actions { grid-template-columns: 1fr; }
+  .showcase-actions > .install-primary code { white-space: normal; }
+}

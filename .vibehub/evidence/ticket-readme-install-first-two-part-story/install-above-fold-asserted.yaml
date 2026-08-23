@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "install-is-above-the-fold"
+  ],
+  "evidence_id": "install-above-fold-asserted",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T06:57:00Z",
+  "refs": [
+    "commit:88ec41b",
+    "README.md",
+    "test/release.test.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "README now opens logo, tagline, value line, then ## Install with the one-line npx command, a one-line marketplace alternative, and the Start this with VibeHub entry, all before the first screenshot and before ## How it works; test/release.test.mjs asserts the command index precedes the first docs/assets image and the story, and that the entry line sits between them.",
+  "ticket_id": "ticket-readme-install-first-two-part-story"
+}

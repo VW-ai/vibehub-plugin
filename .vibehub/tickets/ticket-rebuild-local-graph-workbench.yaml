@@ -52,7 +52,7 @@
     },
     {
       "purpose": "Loopback host, authorized URL, browser launcher, and security boundary to preserve.",
-      "ref": "skills/scripts/vh-ui.mjs"
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
   "deliveries": [

@@ -7,6 +7,27 @@ daemon. The read-only UI host starts in the foreground when a Ticket lifecycle
 moment needs a visual review, or when explicitly requested as a fallback, and
 exits with its launcher process.
 
+## Install
+
+**Any skills-capable agent (recommended).** One command installs every
+VibeHub Skill into the agent directories it detects (`.claude/skills/`,
+`.agents/skills/`, …) through [skills.sh](https://skills.sh):
+
+```bash
+npx skills add VW-ai/vibehub-plugin
+```
+
+Choose **Select all** in the picker. The shared helper and contracts ship
+inside the `vibehub-core` skill folder; a partial install that omits
+`vibehub-core` leaves the other Skills without `../vibehub-core/scripts/vh.mjs`
+— each Skill detects that and tells the Agent to run
+`npx skills add VW-ai/vibehub-plugin -s vibehub-core`.
+`vibehub-core` is infrastructure, not a workflow — nothing in it is invoked
+directly. Update later with `npx skills update`.
+
+**Host marketplaces.** The same layout ships through the Codex and Claude Code
+marketplaces; see the README for the exact commands.
+
 ## Requirements
 
 - Claude Code or Codex with plugin/Skill support
@@ -55,8 +76,15 @@ After consent, setup creates only:
 and a small managed project-instruction block. Validate with:
 
 ```bash
-node <plugin>/skills/scripts/vh.mjs project validate --repo <repository>
+node <plugin>/skills/vibehub-core/scripts/vh.mjs project validate --repo <repository>
 ```
+
+Setup then asks one optional question when the repository's `origin` is on
+GitHub: whether to mirror Tickets to GitHub Issues. Saying yes copies one
+workflow and a self-contained `scripts/vibehub/` folder (the sync script, the
+helper, and two contract files) so the mirror runs in GitHub Actions on push
+to `main` without the plugin; no Agent ever runs or checks it. See
+[GITHUB_ISSUES.md](GITHUB_ISSUES.md).
 
 ## Upgrade the plugin and project data
 
@@ -65,7 +93,7 @@ plugin bundle never writes `.vibehub/`. The installed helper first reports the
 repository compatibility state:
 
 ```bash
-node <plugin>/skills/scripts/vh.mjs project compatibility --repo <repository>
+node <plugin>/skills/vibehub-core/scripts/vh.mjs project compatibility --repo <repository>
 ```
 
 `CURRENT` permits normal work. `MIGRATION_REQUIRED` routes through
@@ -98,7 +126,7 @@ stays quiet. To open the graph explicitly as a fallback, ask the Agent to use
 `$vibehub-ticket-review` or launch the bundled helper:
 
 ```bash
-node <plugin>/skills/scripts/vh-ui.mjs --repo <repository>
+node <plugin>/skills/vibehub-core/scripts/vh-ui.mjs --repo <repository>
 ```
 
 The default command opens the complete short-lived URL in your normal system

@@ -16,7 +16,7 @@
   "context_refs": [
     {
       "purpose": "The 1,131-line multi-domain implementation whose responsibilities and seams need evaluation.",
-      "ref": "skills/scripts/vh.mjs"
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
     },
     {
       "purpose": "Current contract proving every command cited by Skills resolves against the helper.",

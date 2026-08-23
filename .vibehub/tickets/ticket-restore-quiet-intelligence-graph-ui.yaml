@@ -69,7 +69,7 @@
     },
     {
       "purpose": "Read-only loopback, validation, portable authorization, and launcher boundary that must survive.",
-      "ref": "skills/scripts/vh-ui.mjs"
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
   "deliveries": [

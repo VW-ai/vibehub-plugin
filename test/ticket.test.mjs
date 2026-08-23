@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ticketArchived } from "../skills/scripts/vh.mjs";
+import { ticketArchived } from "../skills/vibehub-core/scripts/vh.mjs";
 import { context, room, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 
 const at = "2026-07-31T22:00:00.000Z";

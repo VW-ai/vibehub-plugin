@@ -17,7 +17,8 @@
     "prototype:harness:safari": "node scripts/vh-harness-prototype.mjs --safari",
     "test": "node --test test/*.test.mjs",
     "verify:artifact": "node scripts/verify-plugin-artifact.mjs",
-    "verify": "node --test test/*.test.mjs && node scripts/verify-plugin-artifact.mjs"
+    "verify": "node --test test/*.test.mjs && node scripts/verify-plugin-artifact.mjs",
+    "issues:sync:dry-run": "node scripts/sync-github-issues.mjs --repo . --dry-run"
   },
   "engines": {
     "node": ">=20"

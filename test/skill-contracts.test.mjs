@@ -76,7 +76,7 @@ test("skills point at their governing shared references", () => {
   }
 
   const migrations = JSON.parse(readFileSync(join(root, "skills", "vibehub-migrate", "references", "migrations.json"), "utf8"));
-  const versions = JSON.parse(readFileSync(join(root, "skills", "contracts", "versions.json"), "utf8"));
+  const versions = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "versions.json"), "utf8"));
   assert.equal(migrations.owner, "vibehub-migrate");
   assert.equal(migrations.current_format, versions.project_format);
   assert.ok(Array.isArray(migrations.migrations) && migrations.migrations.length >= 1);
@@ -99,13 +99,13 @@ test("skills point at their governing shared references", () => {
   assert.ok(deliveryAudit.steps.some((step) => step.includes("format_version 2")));
   assert.ok(bodies.get("vibehub-migrate").includes("references/migrations.json"), "vibehub-migrate misses its migrations pointer");
 
-  const projectFormat = JSON.parse(readFileSync(join(root, "skills", "contracts", "project-format.schema.json"), "utf8"));
+  const projectFormat = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "project-format.schema.json"), "utf8"));
   assert.equal(projectFormat.properties.format_version.type, "integer");
   assert.equal(projectFormat.properties.kind.const, "vibehub_project");
   const currentProject = JSON.parse(readFileSync(join(root, ".vibehub", "version.yaml"), "utf8"));
   assert.equal(currentProject.format_version, versions.project_format);
 
-  const currentTicket = JSON.parse(readFileSync(join(root, "skills", "contracts", "ticket.schema.json"), "utf8"));
+  const currentTicket = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "ticket.schema.json"), "utf8"));
   assert.equal(currentTicket.$id, "https://vibehub.dev/schemas/ticket.v2.json");
   assert.equal(currentTicket.properties.schema_version.const, versions.document_schemas.ticket);
   assert.equal(
@@ -113,7 +113,7 @@ test("skills point at their governing shared references", () => {
     versions.document_schemas.ticket,
   );
 
-  const authority = "contracts/acceptance-authority.md";
+  const authority = "vibehub-core/contracts/acceptance-authority.md";
   assert.ok(existsSync(join(root, "skills", authority)));
   for (const name of [
     "vibehub-ticket-plan",
@@ -127,7 +127,7 @@ test("skills point at their governing shared references", () => {
     );
   }
 
-  const dependencyHygiene = "contracts/dependency-hygiene.json";
+  const dependencyHygiene = "vibehub-core/contracts/dependency-hygiene.json";
   const dependencyContract = JSON.parse(readFileSync(join(root, "skills", dependencyHygiene), "utf8"));
   assert.equal(dependencyContract.owner, "vibehub-ticket-plan");
   assert.equal(dependencyContract.scope, "newly-proposed-dependency-edges");
@@ -147,9 +147,9 @@ test("skills point at their governing shared references", () => {
 });
 
 test("human decision boundaries stay in the Ticket graph", () => {
-  const authority = "contracts/acceptance-authority.md";
+  const authority = "vibehub-core/contracts/acceptance-authority.md";
   const authorityBody = readFileSync(join(root, "skills", authority), "utf8");
-  const ticketSchema = JSON.parse(readFileSync(join(root, "skills", "contracts", "ticket.schema.json"), "utf8"));
+  const ticketSchema = JSON.parse(readFileSync(join(root, "skills", "vibehub-core", "contracts", "ticket.schema.json"), "utf8"));
   assert.deepEqual(ticketSchema.properties.maturity.enum, ["firm", "draft"]);
   assert.equal(ticketSchema.properties.maturity.default, "firm");
   assert.match(authorityBody, /decision owner/u);

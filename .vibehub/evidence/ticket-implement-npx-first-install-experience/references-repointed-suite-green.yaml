@@ -1,0 +1,17 @@
+{
+  "acceptance_ids": [
+    "all-live-references-repointed"
+  ],
+  "evidence_id": "references-repointed-suite-green",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T02:26:00Z",
+  "refs": [
+    "commit:f25a75d",
+    "commit:bd7b4e8",
+    "skills/vibehub-ticket-review/references/ticket-lifecycle.json",
+    "scripts/verify-plugin-artifact.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "grep over skills/, scripts/, test/, docs/INSTALL.md, docs/LOCAL_GRAPH_DESIGN.md and both plugin manifests finds no ../scripts/, ../contracts/, skills/scripts, or skills/contracts references (only vh.mjs's own ../contracts, which moved with it, and vh-ui.mjs's corrected ../../vibehub-ticket-review/assets); ticket-lifecycle.json planning_contracts points at ../../vibehub-core/contracts/dependency-hygiene.json and verify-plugin-artifact asserts exactly that; 35 historical Ticket context_refs were updated as file paths only; npm test passes 142/142.",
+  "ticket_id": "ticket-implement-npx-first-install-experience"
+}

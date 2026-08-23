@@ -1,0 +1,47 @@
+{
+  "context_id": "decision-github-issues-are-a-read-only-ticket-projection",
+  "detail": "Every Ticket on main is projected onto a GitHub Issue by a script that runs only inside GitHub Actions on push to main (scripts/sync-github-issues.mjs, .github/workflows/sync-issues.yml). The Issue shows the Ticket outcome, acceptance as a task list checked from the current Outcome, constraints, context refs as links, direct dependencies as Blocked-by links, state and maturity as labels, each Evidence record as one comment, and closure when a successful Outcome exists. Mapping is a hidden marker in the Issue body, so the repository gains no Issue-number field and CI never commits. The projection is strictly one way: nothing in an Issue — title edits, comments, manual closure — is read back into .vibehub documents, and the next run restores repository truth. Human comments on Issues are conversation; a durable decision still enters through vibehub-ingest. An Issue filed from outside becomes a Ticket only through deliberate planning that cites the Issue URL as a context ref. No Agent is asked to run, verify, or babysit the sync; a failure is a red check in Actions, not a conversation event. This is consistent with the decision that external work systems compose into personal Tickets without organizing them: here GitHub is a display surface for VibeHub truth, never an authority over it.",
+  "evidence": [
+    {
+      "note": "Owner intent: Tickets become native Issues so collaborators can track work, with zero Agent load and script-driven one-way sync.",
+      "ref": "conversation:2026-08-22-tickets-as-github-issues"
+    },
+    {
+      "note": "External systems remain sources and action surfaces rather than organizers of personal Tickets; this projection runs the other direction and keeps VibeHub authoritative.",
+      "ref": ".vibehub/rooms/product/decision-external-work-systems-compose-into-personal-tickets.yaml"
+    },
+    {
+      "note": "The Ticket that delivers the projection script, workflow, and tests.",
+      "ref": ".vibehub/tickets/ticket-mirror-tickets-to-github-issues.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-external-work-systems-compose-into-personal-tickets",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T00:00:00Z",
+    "quote": "I don't want any extra load for AI to operate this issue and ticket sync. This can be done by scripts automatically. And I didn't even want the agent to run a script.",
+    "ref": "conversation:2026-08-22-tickets-as-github-issues"
+  },
+  "state": "active",
+  "summary": "GitHub Issues mirror the checked-in Ticket graph one way from main; Git stays the source of truth and Issue comments are discussion, not durable Context",
+  "tags": [
+    "github",
+    "issues",
+    "projection",
+    "ci",
+    "one-way",
+    "source-of-truth",
+    "tickets"
+  ],
+  "type": "decision"
+}

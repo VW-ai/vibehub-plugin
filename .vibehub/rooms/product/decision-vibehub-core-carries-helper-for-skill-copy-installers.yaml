@@ -1,0 +1,52 @@
+{
+  "context_id": "decision-vibehub-core-carries-helper-for-skill-copy-installers",
+  "detail": "skills.sh copies every directory containing a SKILL.md and nothing else, so a helper kept beside the skills was silently dropped and every copied Skill dangled. The fix is structural, not a wrapper: vh.mjs, vh-ui.mjs, contracts/, and templates/github/ live in skills/vibehub-core/, whose SKILL.md states it is infrastructure that nothing invokes directly, and every other Skill references ../vibehub-core/… . The same layout ships through the Codex and Claude Code marketplaces, so one tree serves both paths with no version skew and no network after install. The owner chose this over publishing an npm package that Skills would call through npx (deferred until a human needs to initialize a project outside an agent; the npm name vibehub is taken by an unrelated package) and over declaring skills.sh unsupported (which would leave the silent breakage in place). Project setup offers the GitHub Issues mirror once as a self-contained five-file copy (workflow, sync script, vh.mjs, versions.json, dependency-hygiene.json under scripts/vibehub/) because vh.mjs loads its contracts at import time and a user's Actions checkout has no plugin. Historical documents keep their meaning; only file-path context_refs to the moved files are updated, since the validator requires readable refs and a compatibility shim at the old path is rejected. skills.sh offers no required-skill mechanism and its picker pre-selects nothing, so the advertised command stays bare (no --all) and every Skill opens with a repair line: if ../vibehub-core/scripts/vh.mjs is missing, run npx skills add VW-ai/vibehub-plugin -s vibehub-core. A partial install therefore fails loudly and self-repairs instead of dangling.",
+  "evidence": [
+    {
+      "note": "Owner chose path A of the proposal after reading the three-way comparison.",
+      "ref": ".vibehub/evidence/ticket-decide-npx-first-install-experience/owner-chooses-path-a.yaml"
+    },
+    {
+      "note": "Reproduction of the skills.sh breakage and the empirical comparison of install paths.",
+      "ref": "docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "note": "End-to-end proof that the relocated layout installs and runs on Claude Code and Codex.",
+      "ref": ".vibehub/evidence/ticket-implement-npx-first-install-experience/skills-sh-install-e2e-2026-08-22.txt"
+    },
+    {
+      "note": "Dependency-free Skill-first packaging boundary this decision stays inside.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-speed-first-skill-plugin",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-github-issues-are-a-read-only-ticket-projection",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T00:00:00Z",
+    "quote": "A",
+    "ref": "conversation:2026-08-22-tickets-as-github-issues"
+  },
+  "state": "active",
+  "summary": "The shared helper, contracts, and templates live inside the non-invocable skills/vibehub-core skill folder so installers that copy skill folders one by one (skills.sh, marketplaces) ship a working VibeHub; npx skills add VW-ai/vibehub-plugin is a supported install path",
+  "tags": [
+    "install",
+    "skills-sh",
+    "npx",
+    "packaging",
+    "vibehub-core",
+    "marketplace",
+    "setup",
+    "github-issues"
+  ],
+  "type": "decision"
+}
