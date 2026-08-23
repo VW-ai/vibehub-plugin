@@ -100,11 +100,13 @@ async function pollEventsUntil(api, predicate, { timeoutMs = 15_000, after = 0 }
 
 const hostEvents = (window) => window.events.filter((event) => !["notification", "runtimeStderr", "serverRequest"].includes(event.kind));
 
-// The host writes nothing by default; the explicit import is the single
-// exception and it names every path it may touch, all left uncommitted.
+// The host writes nothing by default; the explicit import and the explicit
+// Chat bridge are the two exceptions, each naming every path it may touch,
+// all left uncommitted.
 const REPOSITORY_WRITES = {
   default: false,
   explicitImportOnly: [".vibehub/version.yaml", ".vibehub/rooms/", ".vibehub/tickets/", ".vibehub/evidence/", ".vibehub/outcomes/", ".vibehub/codex-project.yaml"],
+  explicitChatBridge: [".vibehub/tickets/<ticket_id>.yaml", ".vibehub/rooms/<room_id>/<context_id>.yaml"],
   commits: false,
 };
 
@@ -1338,10 +1340,12 @@ test("lifecycle recovery keeps Codex as the only transcript store and the explic
   // and lives in the test double only.
   assert.doesNotMatch(host + script + model + guard + windowSource + client + stopConditions, /localStorage|sessionStorage|indexedDB|sqlite|better-sqlite|openDatabase|caches\.open|leveldb|levelup/i);
   assert.doesNotMatch(host, /writeFile|appendFile|createWriteStream|mkdir\(|renameSync|rmSync|unlink/);
-  assert.deepEqual([...host.matchAll(/writeDocument\((.*)\);/g)].map((match) => match[1]), ["join(repoRoot, BINDING_FILE), document"], "the binding record is the only document the host writes");
+  assert.deepEqual([...host.matchAll(/writeDocument\((.*)\);/g)].map((match) => match[1]), ["join(repoRoot, BINDING_FILE), document"], "the binding record is the only document the host writes directly; the Chat bridge writes through applyTickets and putContext");
   assert.equal([...host.matchAll(/initProject\(/g)].length, 1, "the scaffold is written once, by the explicit import");
-  const explicit = host.match(/explicitImportOnly: Object\.freeze\(\[([^\]]+)\]\)/)[1].match(/"[^"]+"/g).map((entry) => JSON.parse(entry));
-  assert.deepEqual(explicit, REPOSITORY_WRITES.explicitImportOnly, "the declared write list is exactly package D's explicit import");
+  const declared = (name) => host.match(new RegExp(`${name}: Object\\.freeze\\(\\[([^\\]]+)\\]\\)`, "u"))[1].match(/"[^"]+"/g).map((entry) => JSON.parse(entry));
+  assert.deepEqual(declared("explicitImportOnly"), REPOSITORY_WRITES.explicitImportOnly, "the declared write list is exactly package D's explicit import");
+  assert.deepEqual(declared("explicitChatBridge"), REPOSITORY_WRITES.explicitChatBridge, "the Chat bridge is the second declared write class: exactly one Ticket path and one Context path");
+  assert.deepEqual(Object.keys(REPOSITORY_WRITES), ["default", "explicitImportOnly", "explicitChatBridge", "commits"], "two explicit write classes, commits false, nothing else");
   assert.match(fixtureSource, /CODEX_FIXTURE_STATE/, "persistence across a kill is the fixture standing in for Codex, never the host");
   assert.doesNotMatch(host, /CODEX_FIXTURE/);
   // The restart path is host plus adapter client: the shared harness shell
@@ -1363,7 +1367,9 @@ test("lifecycle recovery keeps Codex as the only transcript store and the explic
   assert.match(stopConditions, /export function firstViolation/);
   for (const seam of ["firstViolation(", "haltRuntime(", "gateRuntime()", "\"runtime_halted\"", "\"runtime_restarting\"", "appendEvent(\"runtimeHalted\"", "probeCodexSchema({ codex: flags.codex })", "state: runtime.state,"]) assert.ok(host.includes(seam), seam);
   assert.match(host, /if \(!ADAPTER_FREE_ACTIONS\.has\(payload\.action\)\) requireRuntime\(\);/);
-  assert.match(host, /const ADAPTER_FREE_ACTIONS = new Set\(\["readTask"\]\);/);
+  // readTask and the explicit Chat bridge read and write the checked-in
+  // repository alone; every other action needs the live app-server.
+  assert.match(host, /const ADAPTER_FREE_ACTIONS = new Set\(\["readTask", "listTaskTargets", "listRooms", "previewCreateTask", "createTask", "attachTask", "remember"\]\);/);
   assert.match(windowSource, /runtimeState: runtime\.state/);
   assert.match(windowSource, /runtimeHalt: runtime\.halt/);
   // Browser: liveness comes from thread/read alone; a runtime exit drops the

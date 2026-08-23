@@ -7,8 +7,10 @@
 // packages/harness-core (shell.mjs over router.mjs), Codex Projects and Task
 // Context packets are owned by packages/codex-adapter, and this script owns
 // only the loopback host, the short-lived bearer URL, the host-side
-// projections of the Git-native repository and the one explicit repository
-// write: importing a single-folder Codex Project as this VibeHub Project.
+// projections of the Git-native repository and two explicit repository write
+// classes: importing a single-folder Codex Project as this VibeHub Project,
+// and the Chat bridge (Create Task, Attach to Task, Remember) that writes one
+// Ticket or one Context document through vh.mjs's validated entry points.
 
 import crypto from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
@@ -26,8 +28,8 @@ import { buildTaskContextPacket, startTaskContextThread, taskLinkFromPreview } f
 import { createSharedHarnessShell } from "../packages/harness-core/shell.mjs";
 import { eventWindow } from "../apps/codex-first-shell/event-window.mjs";
 import { requestDescriptor, unsupportedServerRequestResult, validateRequestDecision } from "../apps/codex-first-shell/server-request-registry.mjs";
-import { buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
-import { documents, initProject, projectCompatibility, readDocument, writeDocument } from "../skills/scripts/vh.mjs";
+import { buildCandidateTicketHandoff, buildTicketHandoff, buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
+import { VibeHubError, applyTickets, documents, initProject, projectCompatibility, putContext, readDocument, validateTicket, writeDocument } from "../skills/scripts/vh.mjs";
 
 const LOOPBACK_HOST = "127.0.0.1";
 const SHELL_ID = "codex-first-shell";
@@ -38,16 +40,21 @@ const SEARCH_LIMIT = 20;
 // When the app-server exits on its own the host respawns it with this
 // backoff; after the last attempt the runtime halts visibly instead of looping.
 const RESTART_BACKOFF_MS = Object.freeze(parseBackoff(process.env.VIBEHUB_CODEX_RESTART_BACKOFF_MS, [500, 2000, 5000]));
-// Only readTask is served from the repository alone; every other action needs
-// the live app-server and is refused truthfully while it is restarting or halted.
-const ADAPTER_FREE_ACTIONS = new Set(["readTask"]);
+// readTask and the explicit Chat bridge are served from the checked-in
+// repository alone, so they stay usable while the app-server is restarting or
+// halted; every other action needs the live app-server and is refused
+// truthfully while it is unavailable.
+const ADAPTER_FREE_ACTIONS = new Set(["readTask", "listTaskTargets", "listRooms", "previewCreateTask", "createTask", "attachTask", "remember"]);
 const THREAD_POLICY = Object.freeze({ approvalPolicy: "on-request", sandbox: "workspace-write" });
 // The Codex Project binding record is provenance only. Chat membership stays
 // in the native ThreadSection, which is re-read on every bootstrap; the
 // record says which single-folder Codex Project the human imported and when.
 const BINDING_FILE = join(".vibehub", "codex-project.yaml");
-// The only repository write this host ever performs is the explicit import:
-// the VibeHub scaffold plus the binding record, all left uncommitted.
+// The repository writes this host performs, each explicit and left
+// uncommitted: the import (the VibeHub scaffold plus the binding record) and
+// the Chat bridge (exactly one Ticket for Create Task or Attach to Task,
+// exactly one Context document for Remember). Review stays the activation
+// gate: no host action ever stages, commits or pushes.
 const REPOSITORY_WRITES = Object.freeze({
   default: false,
   explicitImportOnly: Object.freeze([
@@ -57,6 +64,10 @@ const REPOSITORY_WRITES = Object.freeze({
     ".vibehub/evidence/",
     ".vibehub/outcomes/",
     ".vibehub/codex-project.yaml",
+  ]),
+  explicitChatBridge: Object.freeze([
+    ".vibehub/tickets/<ticket_id>.yaml",
+    ".vibehub/rooms/<room_id>/<context_id>.yaml",
   ]),
   commits: false,
 });
@@ -674,8 +685,11 @@ function priorAcceptedProjection(handoff, repository) {
 // sequence the browser shows and the Turn input the host sends; the browser
 // never rebuilds either, and Evidence, Outcome and next action are handed over
 // from the same handoff rather than re-derived anywhere else.
-function taskWorkspaceProjection(ticketId, { selectedContextIds = [], thread = null, operation = "start", humanMessage = null } = {}) {
-  const handoff = buildTicketHandoff(repoRoot, ticketId);
+// A `candidate` Ticket (previewCreateTask) is projected by the same canonical
+// path as if it were already written uncommitted, so the preview packet is the
+// packet a Start would send once the Task exists.
+function taskWorkspaceProjection(ticketId, { selectedContextIds = [], thread = null, operation = "start", humanMessage = null, candidate = null } = {}) {
+  const handoff = candidate ? buildCandidateTicketHandoff(repoRoot, candidate) : buildTicketHandoff(repoRoot, ticketId);
   const snapshot = buildUiSnapshot(repoRoot);
   const contexts = knowledgeProjection(snapshot);
   const packet = buildTaskContextPacket({
@@ -820,6 +834,9 @@ async function bootstrap() {
     harness: carrier,
     runtime: runtimeProjection(),
     stop,
+    // The explicit write classes, advertised here as in /health; the paths a
+    // bridge write touched show up in project.uncommitted on the next read.
+    repositoryWrites: REPOSITORY_WRITES,
     pendingRequests: [...pendingRequests.values()],
     eventCursor: sequence,
   };
@@ -866,6 +883,307 @@ async function importProject(sectionId) {
     writtenPaths: [...(scaffold.versionPath ? [scaffold.versionPath] : []), ...scaffold.directories.map((path) => `${path}/`), BINDING_FILE],
     committed: false,
   };
+}
+
+// ---------------------------------------------------------------------------
+// The explicit Chat bridge. Every action here is gated on the bound scope,
+// reads the repository through the canonical snapshot only, and writes (if it
+// writes at all) exactly one document through vh.mjs's validated entry points:
+// applyTickets for a Ticket, putContext for a Context. Source identity (the
+// Codex Thread, Turn and item) is what the browser captured from the native
+// transcript it is showing; the host never derives it from Thread names,
+// previews or transcripts, never creates a Thread or Turn here, and never
+// runs git. Written paths surface as uncommitted changes on the next bootstrap.
+// ---------------------------------------------------------------------------
+
+const TEXT_LIMITS = Object.freeze({ title: 200, outcome: 2_000, summary: 300, evidenceNote: 1_000, long: 20_000, tag: 64, tags: 16 });
+const TICKET_SLUG_LIMIT = 64;
+const CONTEXT_ID_LIMIT = 60;
+// Thread, Turn and item identities are opaque Codex strings; the reference
+// grammar only needs them free of whitespace and slashes.
+const CODEX_IDENTITY = /^[^\s/]{1,128}$/u;
+const TICKET_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+const ROOM_PATH = /^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/u;
+const CONTEXT_TYPES = new Set(["intent", "decision", "constraint", "contract", "convention", "change", "note"]);
+const PLACEHOLDER_ACCEPTANCE = Object.freeze({
+  acceptance_id: "refine-after-creation",
+  criterion: "Acceptance is written at refinement: this draft Task was created from a Codex Chat and needs a firm, executable acceptance contract before it can be executed.",
+});
+
+function codexThreadRef({ threadId, turnId, itemId = null }) {
+  return `codex-thread:${threadId}/turn:${turnId}${itemId ? `/item:${itemId}` : ""}`;
+}
+
+function boundedText(payload, key, limit, { required = true } = {}) {
+  const value = payload[key];
+  if (value === undefined || value === null) {
+    if (required) throw invalid(`${key} required`);
+    return null;
+  }
+  if (typeof value !== "string" || (required && !value.trim())) throw invalid(`${key} must be a non-empty string`);
+  if (value.length > limit) throw invalid(`${key} must be at most ${limit} characters`);
+  return required ? value.trim() : value.trim() || null;
+}
+
+function codexIdentity(payload, key, { required = true } = {}) {
+  const value = payload?.[key];
+  if (value === undefined || value === null) {
+    if (required) throw invalid(`${key} required`);
+    return null;
+  }
+  if (typeof value !== "string" || !CODEX_IDENTITY.test(value)) throw invalid(`${key} must be a Codex identity without whitespace or slashes`);
+  return value;
+}
+
+function kebab(value) {
+  return String(value).normalize("NFKD").toLowerCase().replace(/[^a-z0-9]+/gu, "-").replace(/^-+|-+$/gu, "");
+}
+
+function clampSlug(slug, limit) {
+  if (slug.length <= limit) return slug;
+  const cut = slug.slice(0, limit);
+  return (cut.includes("-") ? cut.slice(0, cut.lastIndexOf("-")) : cut).replace(/-+$/u, "");
+}
+
+function shortHash(value, length) {
+  return crypto.createHash("sha256").update(String(value)).digest("hex").slice(0, length);
+}
+
+// VibeHubError from the validated entry points becomes the host's own error
+// envelope: validator errors keep their exact path and message, origin guard
+// violations keep their code, and nothing is ever written on refusal.
+function bridgeFailure(error) {
+  if (!(error instanceof VibeHubError)) return error;
+  const errors = error.details?.errors;
+  if (error.code === "validation_error" && Array.isArray(errors)) {
+    return new HostError(400, "validation_error", `${error.message}: ${errors.map((item) => `${item.path} ${item.message}`).join("; ")}`, { errors });
+  }
+  if (error.code === "origin_immutable" || error.code === "origin_cannot_be_added") {
+    return new HostError(409, error.code, error.message, { violations: error.details?.violations ?? [] });
+  }
+  if (error.code === "not_found") return new HostError(404, "not_found", error.message);
+  return new HostError(409, error.code, error.message, error.details ? { details: error.details } : {});
+}
+
+function listTaskTargets(snapshot = buildUiSnapshot(repoRoot)) {
+  return snapshot.state.graph.tickets
+    .filter((row) => snapshot.repository.outcomes.documents.get(row.ticketId)?.document.status !== "successful")
+    .map((row) => {
+      const ticket = snapshot.repository.tickets.documents.get(row.ticketId).document;
+      return {
+        ticketId: row.ticketId,
+        outcome: row.outcome,
+        maturity: ticket.maturity ?? "firm",
+        status: row.capabilities.operational.summary.label,
+        nextAction: row.capabilities.nextAction.summary,
+        hasOrigin: row.origin !== null,
+        associations: row.associations,
+      };
+    })
+    .sort((left, right) => left.ticketId.localeCompare(right.ticketId));
+}
+
+function listRooms(snapshot = buildUiSnapshot(repoRoot)) {
+  return snapshot.state.rooms.rooms.map((room) => ({
+    room: room.room,
+    roomId: room.roomId,
+    description: room.description,
+    boundary: room.boundary,
+    path: `.vibehub/rooms/${room.room}`,
+    contextCount: room.contexts.length,
+  }));
+}
+
+// Origin arrives from the browser as the exact identity of the finalized
+// assistant message or selection it is showing. The host canonicalizes absence
+// (a missing nullable key is null) and stamps captured_at when the browser
+// left it out; every other key is validated verbatim by validateTicket.
+function originFromPayload(payload) {
+  const origin = payload.origin;
+  if (!origin || typeof origin !== "object" || Array.isArray(origin)) throw invalid("origin required: the exact Codex Thread, Turn, item and selection the Task is born from");
+  return {
+    ...origin,
+    forked_from_id: origin.forked_from_id ?? null,
+    item_id: origin.item_id ?? null,
+    selection: origin.selection ?? null,
+    captured_at: origin.captured_at ?? new Date().toISOString(),
+  };
+}
+
+function deriveTicketId(title, snapshot) {
+  const slug = clampSlug(kebab(title), TICKET_SLUG_LIMIT);
+  const base = slug ? `ticket-${slug}` : `ticket-${shortHash(title.trim(), 12)}`;
+  const taken = (id) => snapshot.repository.tickets.documents.has(id);
+  let ticketId = base;
+  for (let suffix = 2; taken(ticketId); suffix += 1) ticketId = `${base}-${suffix}`;
+  return ticketId;
+}
+
+// The draft Ticket a Create Task confirmation writes: schema v2, maturity
+// draft (so it surfaces as REFINE), one placeholder criterion, the origin
+// verbatim, and one provenance reference naming the source Turn.
+function draftTicketCandidate(payload, snapshot) {
+  const title = boundedText(payload, "title", TEXT_LIMITS.title);
+  const outcome = boundedText(payload, "outcome", TEXT_LIMITS.outcome);
+  const context = boundedText(payload, "context", TEXT_LIMITS.long);
+  const origin = originFromPayload(payload);
+  const ticketId = deriveTicketId(title, snapshot);
+  const candidate = {
+    schema_version: 2,
+    kind: "ticket",
+    ticket_id: ticketId,
+    maturity: "draft",
+    outcome,
+    deliveries: [],
+    context,
+    acceptance: [{ ...PLACEHOLDER_ACCEPTANCE }],
+    constraints: [],
+    context_refs: [],
+    relations: [],
+    provenance_refs: [codexThreadRef({ threadId: String(origin.thread_id), turnId: String(origin.turn_id) })],
+    origin,
+  };
+  const validation = validateTicket(candidate, "ticket");
+  if (validation.length > 0) {
+    throw new HostError(400, "validation_error", `Task candidate is invalid: ${validation.map((item) => `${item.path} ${item.message}`).join("; ")}`, { errors: validation });
+  }
+  // The identities also have to fit the provenance reference grammar.
+  for (const key of ["thread_id", "turn_id", "item_id"]) {
+    if (origin[key] !== null && !CODEX_IDENTITY.test(origin[key])) throw invalid(`origin.${key} must be a Codex identity without whitespace or slashes`);
+  }
+  return { title, ticketId, candidate };
+}
+
+function previewCreateTask(payload) {
+  const snapshot = buildUiSnapshot(repoRoot);
+  const { ticketId, candidate } = draftTicketCandidate(payload, snapshot);
+  let workspace;
+  try {
+    workspace = taskWorkspaceProjection(ticketId, { candidate });
+  } catch (error) {
+    throw bridgeFailure(error);
+  }
+  return {
+    ticketId,
+    path: `.vibehub/tickets/${ticketId}.yaml`,
+    candidate,
+    validation: [],
+    packet: workspace.packet,
+    packetText: workspace.packetText,
+    nextAction: workspace.nextAction,
+  };
+}
+
+function createTask(payload) {
+  const snapshot = buildUiSnapshot(repoRoot);
+  const { ticketId, candidate } = draftTicketCandidate(payload, snapshot);
+  // The confirmation surface names the id it derived; if that id was taken
+  // meanwhile the derivation has moved on and the write is refused rather
+  // than landing under a name the human did not confirm.
+  if (payload.ticketId !== undefined && payload.ticketId !== ticketId) {
+    if (typeof payload.ticketId === "string" && snapshot.repository.tickets.documents.has(payload.ticketId)) {
+      throw new HostError(409, "ticket_exists", `Task ${payload.ticketId} already exists in this repository; preview again to derive a free id.`, { ticketId: payload.ticketId, derivedTicketId: ticketId });
+    }
+    throw invalid(`ticketId ${String(payload.ticketId)} does not match the id derived from the title (${ticketId})`);
+  }
+  let written;
+  try {
+    written = applyTickets({ repo: repoRoot, tickets: [candidate] });
+  } catch (error) {
+    throw bridgeFailure(error);
+  }
+  const path = `.vibehub/tickets/${ticketId}.yaml`;
+  appendEvent("clientAction", { action: "createTask", ticketId, path, threadId: candidate.origin.thread_id, turnId: candidate.origin.turn_id, itemId: candidate.origin.item_id });
+  return { ticketId, path, writtenPaths: written.paths.map((absolute) => absolute.slice(repoRoot.length + 1)), uncommitted: true };
+}
+
+function attachTask(payload) {
+  if (typeof payload.ticketId !== "string" || !TICKET_ID.test(payload.ticketId)) throw invalid("ticketId must be a kebab-case Task id");
+  const ticketId = payload.ticketId;
+  const threadId = codexIdentity(payload, "threadId");
+  const turnId = codexIdentity(payload, "turnId");
+  const snapshot = buildUiSnapshot(repoRoot);
+  const entry = snapshot.repository.tickets.documents.get(ticketId);
+  if (!entry) throw new HostError(404, "task_not_found", `Task ${ticketId} does not exist in this repository.`);
+  if (snapshot.repository.outcomes.documents.get(ticketId)?.document.status === "successful") {
+    throw new HostError(409, "task_closed", `Task ${ticketId} has a successful Outcome; closed work does not take new associations.`);
+  }
+  const provenanceRef = codexThreadRef({ threadId, turnId });
+  const path = `.vibehub/tickets/${ticketId}.yaml`;
+  if (entry.document.provenance_refs.includes(provenanceRef)) {
+    return { ticketId, provenanceRef, added: false, path, writtenPaths: [] };
+  }
+  // Only provenance_refs grows; origin, deliveries, acceptance and relations
+  // are re-applied untouched, so the origin guard sees the same origin.
+  const candidate = { ...entry.document, provenance_refs: [...entry.document.provenance_refs, provenanceRef] };
+  try {
+    applyTickets({ repo: repoRoot, tickets: [candidate] });
+  } catch (error) {
+    throw bridgeFailure(error);
+  }
+  appendEvent("clientAction", { action: "attachTask", ticketId, path, threadId, turnId });
+  return { ticketId, provenanceRef, added: true, path, writtenPaths: [path] };
+}
+
+function deriveContextId(summary, type, content, snapshot) {
+  const slug = clampSlug(kebab(summary), CONTEXT_ID_LIMIT);
+  const base = slug || `${type}-${shortHash(content, 12)}`;
+  const taken = (id) => snapshot.repository.contexts.documents.has(id);
+  if (!taken(base)) return base;
+  const hash = shortHash(content, 6);
+  const hashed = `${clampSlug(base, CONTEXT_ID_LIMIT - hash.length - 1)}-${hash}`;
+  let contextId = hashed;
+  for (let suffix = 2; taken(contextId); suffix += 1) contextId = `${hashed}-${suffix}`;
+  return contextId;
+}
+
+function remember(payload) {
+  const room = typeof payload.room === "string" ? payload.room : "";
+  if (!ROOM_PATH.test(room)) throw invalid("room must be a slash-separated path of kebab-case Room slugs");
+  const type = payload.type;
+  if (!CONTEXT_TYPES.has(type)) throw invalid(`type must be one of ${[...CONTEXT_TYPES].join(", ")}`);
+  const summary = boundedText(payload, "summary", TEXT_LIMITS.summary);
+  const detail = boundedText(payload, "detail", TEXT_LIMITS.long);
+  const tags = payload.tags === undefined ? [] : payload.tags;
+  if (!Array.isArray(tags) || tags.length > TEXT_LIMITS.tags || tags.some((tag) => typeof tag !== "string" || !tag.trim() || tag.length > TEXT_LIMITS.tag)) {
+    throw invalid(`tags must be at most ${TEXT_LIMITS.tags} non-empty strings`);
+  }
+  const source = payload.source;
+  if (!source || typeof source !== "object" || Array.isArray(source)) throw invalid("source required: the Codex Thread and Turn the claim comes from");
+  const threadId = codexIdentity(source, "threadId");
+  const turnId = codexIdentity(source, "turnId");
+  const itemId = codexIdentity(source, "itemId", { required: false });
+  const quote = boundedText(source, "quote", TEXT_LIMITS.long, { required: false });
+  const ref = codexThreadRef({ threadId, turnId, itemId });
+  const evidenceNote = boundedText(payload, "evidenceNote", TEXT_LIMITS.evidenceNote, { required: false })
+    ?? `Remembered by the human from Codex Thread ${threadId}, Turn ${turnId}${itemId ? `, item ${itemId}` : ""}.`;
+  const snapshot = buildUiSnapshot(repoRoot);
+  if (!snapshot.state.rooms.rooms.some((entry) => entry.room === room)) {
+    throw new HostError(409, "room_missing", `Room ${room} does not exist in this repository; Remember never creates a Room. Choose an existing Room or distill one first.`, { room, rooms: listRooms(snapshot).map((entry) => entry.room) });
+  }
+  const contextId = deriveContextId(summary, type, `${ref}\n${summary}\n${detail}`, snapshot);
+  const context = {
+    schema_version: 1,
+    kind: "context",
+    context_id: contextId,
+    type,
+    state: "active",
+    summary,
+    detail,
+    tags: [...new Set(tags.map((tag) => tag.trim()))],
+    source: { ref, ...(quote ? { quote } : {}), captured_at: new Date().toISOString() },
+    evidence: [{ ref, note: evidenceNote }],
+    relations: [],
+  };
+  let written;
+  try {
+    written = putContext({ repo: repoRoot, room, context });
+  } catch (error) {
+    throw bridgeFailure(error);
+  }
+  const path = written.path.slice(repoRoot.length + 1);
+  appendEvent("clientAction", { action: "remember", contextId, room, path, threadId, turnId, itemId });
+  return { contextId, room, path, writtenPaths: [path], sourceRef: ref, uncommitted: true };
 }
 
 function validInputs(input) {
@@ -1011,9 +1329,16 @@ async function action(payload) {
   }
   if (payload.action === "startTask") {
     requireBoundScope();
+    // An explicit Quote into Task on a Task without a Thread yet reaches the
+    // Agent only here, as the packet's conversation.humanMessage, exactly as
+    // a later Task Turn carries its message; nothing else in the packet moves.
+    if (payload.humanMessage !== undefined && payload.humanMessage !== null && (typeof payload.humanMessage !== "string" || !payload.humanMessage.trim())) {
+      throw invalid("humanMessage must be a non-empty string when present");
+    }
     const workspace = taskWorkspaceProjection(payload.ticketId, {
       selectedContextIds: Array.isArray(payload.selectedContextIds) ? payload.selectedContextIds : [],
       operation: payload.operation === "explore" ? "explore" : "start",
+      humanMessage: typeof payload.humanMessage === "string" ? payload.humanMessage : null,
     });
     // The Task Workspace contract sends the host-owned Context packet and names
     // the Thread; that composition lives in codex-adapter/task-context.mjs.
@@ -1026,6 +1351,32 @@ async function action(payload) {
   if (payload.action === "readTask") {
     requireBoundScope();
     return taskWorkspaceProjection(payload.ticketId);
+  }
+  // The explicit Chat bridge: unavailable with the missing scope explained
+  // unless the Project is bound; each write is one validated document.
+  if (payload.action === "listTaskTargets") {
+    requireBoundScope();
+    return { tasks: listTaskTargets() };
+  }
+  if (payload.action === "listRooms") {
+    requireBoundScope();
+    return { rooms: listRooms() };
+  }
+  if (payload.action === "previewCreateTask") {
+    requireBoundScope();
+    return previewCreateTask(payload);
+  }
+  if (payload.action === "createTask") {
+    requireBoundScope();
+    return createTask(payload);
+  }
+  if (payload.action === "attachTask") {
+    requireBoundScope();
+    return attachTask(payload);
+  }
+  if (payload.action === "remember") {
+    requireBoundScope();
+    return remember(payload);
   }
   if (payload.action === "startTaskTurn" || payload.action === "steerTaskTurn") {
     requireBoundScope();
