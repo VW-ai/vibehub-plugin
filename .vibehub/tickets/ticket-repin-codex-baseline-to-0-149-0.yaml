@@ -1,0 +1,59 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "schema-probe-passes-on-0-149-0",
+      "criterion": "packages/codex-adapter/upstream-lock.json pins @openai/codex 0.149.0 with its exact tag, commit and generated protocol SHA-256, and npm run probe:codex reports ok true against the installed 0.149.0 binary with every required request, notification, server request, capability item and ordinary audio and localAudio Turn input present; any seam that 0.149.0 removed or renamed is listed in the lock and mapped to a truthful capability fallback in docs/proposals/harness-neutral-core/capabilities.v1.json rather than silently dropped."
+    },
+    {
+      "acceptance_id": "live-lifecycle-proofs-rerun-on-0-149-0",
+      "criterion": "npm run probe:codex:live, npm run probe:codex:projects and packages/codex-adapter/probe-task-context-live.mjs pass against the real 0.149.0 app-server, recording an authenticated streamed Turn, restart recovery of the same Thread identity, ThreadSection create, move, fork, search, archive, restore and delete, the exact host handoff and interrupt, and the status the real app-server reports for a Turn that was in progress when the process died; the fixture app-server default version and test/codex-first-shell.test.mjs version expectations move to 0.149.0 and the suite passes with the former 0.144.1 skip gone."
+    },
+    {
+      "acceptance_id": "production-shell-boots-on-installed-codex",
+      "criterion": "node scripts/vh-codex-first-shell.mjs --repo on a bound repository boots with runtime.state alive and baselineMatch true on the installed 0.149.0 binary, all eight stop conditions evaluate pass, structural, not-applicable or unverified with none violated, and the browser interaction guard and lifecycle walk pass once against the real runtime with the results recorded in docs/proposals/codex-chat-conformance/browser-runtime-review.md."
+    }
+  ],
+  "constraints": [
+    "Move the pin only with a passing schema probe and live probes; never edit the version string or protocol hash by hand.",
+    "Do not fork, vendor or patch Codex; removed seams become capability fallbacks, not workarounds.",
+    "Keep the Chat-to-Task bridges and the shell independent of this Ticket; they remain fixture-proven.",
+    "No automatic git commit or push."
+  ],
+  "context": "The owner upgraded the local Codex CLI to 0.149.0 on 2026-08-22. The production shell correctly halts reuse with generated-protocol-hash-changed because packages/codex-adapter/upstream-lock.json pins 0.147.0 with protocol schema f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2, which makes the shell unusable on this machine until the baseline is re-verified. This Ticket moves the pin by evidence, not by editing the version string: the schema probe, the live probes and the fixture version must agree on 0.149.0, every stop condition must be re-evaluated, and any removed or renamed seam must be surfaced as a capability fallback rather than papered over. It is a prerequisite for real daily use, not for the fixture-proven Chat-to-Task bridges.",
+  "context_refs": [
+    {
+      "purpose": "The pin, required seams and stop conditions to re-verify.",
+      "ref": "packages/codex-adapter/upstream-lock.json"
+    },
+    {
+      "purpose": "Runtime evaluation that must report no violation on the new pin.",
+      "ref": "packages/codex-adapter/stop-conditions.mjs"
+    },
+    {
+      "purpose": "Living capability declarations that must track any seam change.",
+      "ref": "docs/proposals/harness-neutral-core/capabilities.v1.json"
+    },
+    {
+      "purpose": "How the 0.147.0 baseline was originally proven; the same proof set applies.",
+      "ref": ".vibehub/outcomes/ticket-spike-codex-app-server-dsh-adapter.yaml"
+    },
+    {
+      "purpose": "The accepted shell whose halt on a stale pin this Ticket resolves.",
+      "ref": ".vibehub/outcomes/ticket-implement-codex-first-vibehub-shell.yaml"
+    },
+    {
+      "purpose": "Fixture whose default version and persisted-Turn status should mirror the real 0.149.0 behavior.",
+      "ref": "test/fixtures/codex-app-server-fixture.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The Codex carrier is pinned to app-server 0.149.0 with a re-verified protocol hash, required requests, notifications, server requests, audio inputs and live lifecycle proofs, so the production shell boots on the owner's installed Codex instead of halting on the stale 0.147.0 pin.",
+  "provenance_refs": [
+    "conversation:2026-08-22-owner-upgrades-local-codex-to-0-149-0"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-repin-codex-baseline-to-0-149-0"
+}
