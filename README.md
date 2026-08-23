@@ -44,13 +44,6 @@ Then start a new task and use the single entry above.
 /reload-plugins
 ```
 
-**Follow the Tickets on GitHub**
-
-Every Ticket on `main` is mirrored one-way to a GitHub Issue with its
-acceptance checklist, native Blocked-by relationships, Evidence comments, and
-closure on Outcome. Browse the [Issues list](https://github.com/VW-ai/vibehub-plugin/issues)
-or read [how the mirror works and which view to use](docs/GITHUB_ISSUES.md).
-
 ## Upgrades
 
 The host updates the plugin bundle; VibeHub never updates itself in the
@@ -61,6 +54,7 @@ In Codex, run `codex plugin marketplace upgrade vibehub` followed by
 (or use `/reload-plugins` after a marketplace refresh). If project data needs
 migration, the new session previews that separate Git change through the
 migrate Skill; installing a plugin never rewrites `.vibehub/`.
+Every Ticket on `main` is also mirrored one-way to a [GitHub Issue](https://github.com/VW-ai/vibehub-plugin/issues) — see [the mirror guide](docs/GITHUB_ISSUES.md).
 Read the [product concept](docs/CONCEPT.md), [installation and coexistence](docs/INSTALL.md),
 [local graph design](docs/LOCAL_GRAPH_DESIGN.md), or [release procedure](docs/RELEASE.md).
 Apache-2.0
