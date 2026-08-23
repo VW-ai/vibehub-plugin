@@ -82,9 +82,9 @@ try {
       throw new Error(`installed README is missing public-site narrative: ${narrative}`);
     }
   }
-  if ([...installedReadme.matchAll(/href="https:\/\/vibehub\.icu"/gu)].length !== 1
-    || /https:\/\/www\.vibehub\.icu|https:\/\/[^"<\s]*\.pages\.dev/iu.test(installedReadme)) {
-    throw new Error("installed README does not retain the one canonical vibehub.icu link");
+  if ([...installedReadme.matchAll(/href="https:\/\/vibehub\.team"/gu)].length !== 1
+    || /https:\/\/www\.vibehub\.team|https:\/\/[^"<\s]*\.pages\.dev/iu.test(installedReadme)) {
+    throw new Error("installed README does not retain the one canonical vibehub.team link");
   }
   const readmeImageRefs = new Set([
     ...[...installedReadme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/gu)]
