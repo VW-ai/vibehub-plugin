@@ -2,3 +2,7 @@ node_modules/
 dist/
 coverage/
 test-results/
+
+# video renders and music stems live on GitHub Releases (see assets/video/renders/MANIFEST.md)
+assets/video/renders/*.mp4
+assets/video/audio/*.ogg
