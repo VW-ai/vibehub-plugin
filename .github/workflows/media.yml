@@ -1,0 +1,111 @@
+name: Media (DVC on R2)
+
+# Large media (video renders, music stems) is versioned with DVC and stored in
+# Cloudflare R2. Git holds only *.dvc pointers. This workflow keeps the two in
+# step and can render a clip on demand.
+on:
+  pull_request:
+    paths: ["assets/video/**", ".dvc/**"]
+  push:
+    branches: [main]
+    paths: ["assets/video/**", ".dvc/**"]
+  workflow_dispatch:
+    inputs:
+      clip:
+        description: "Clip directory under assets/video to render"
+        type: choice
+        options: [glance, taskstory, glance-portrait, taskstory-portrait]
+        required: true
+      mix:
+        description: "Mix music after rendering (uses audio/mix-*.sh)"
+        type: boolean
+        default: true
+      release_tag:
+        description: "Optional GitHub Release tag to also upload the MP4 to"
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: media-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: auto
+
+jobs:
+  verify-pointers:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install DVC
+        run: pip install -q "dvc[s3]"
+      - name: Use CI credentials instead of the local profile
+        run: dvc remote modify --local r2 profile ""
+      - name: Every committed pointer must exist in R2
+        run: |
+          dvc status -c --json > status.json
+          python3 - <<'PY'
+          import json, sys
+          s = json.load(open("status.json"))
+          missing = [k for k, v in s.items() if v in ("missing", "new")] if isinstance(s, dict) else []
+          if missing:
+              print("Pointers without an object in R2:\n  " + "\n  ".join(missing)); sys.exit(1)
+          print("All DVC pointers resolve in R2.")
+          PY
+
+  render:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install DVC, ffmpeg, Chrome dependencies
+        run: |
+          pip install -q "dvc[s3]"
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+          npx --yes playwright install --with-deps chromium >/dev/null
+          dvc remote modify --local r2 profile ""
+      - name: Pull footage and music stems
+        run: dvc pull assets/video/${{ inputs.clip }} assets/video/audio
+      - name: Render
+        run: npx --yes hyperframes render assets/video/${{ inputs.clip }} --output /tmp/silent.mp4
+      - name: Mix
+        id: mix
+        run: |
+          clip="${{ inputs.clip }}"; base="${clip%-portrait}"
+          out="assets/video/renders/${clip}-ci-${GITHUB_RUN_NUMBER}.mp4"
+          if [ "${{ inputs.mix }}" = "true" ]; then bash "assets/video/audio/mix-${base}.sh" /tmp/silent.mp4 "$PWD/$out"; else cp /tmp/silent.mp4 "$out"; fi
+          echo "out=$out" >> "$GITHUB_OUTPUT"
+      - name: Track and push to R2
+        run: |
+          dvc add "${{ steps.mix.outputs.out }}"
+          dvc push "${{ steps.mix.outputs.out }}.dvc"
+      - name: Commit the pointer
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${{ steps.mix.outputs.out }}.dvc" assets/video/renders/.gitignore
+          git commit -m "media: CI render of ${{ inputs.clip }} (run ${GITHUB_RUN_NUMBER})" && git push
+      - name: Upload to Release
+        if: inputs.release_tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ inputs.release_tag }}" "${{ steps.mix.outputs.out }}" --clobber
