@@ -61,6 +61,7 @@
 
       <footer class="sidebar-footer">
         <button type="button" id="themeToggle"><span class="nav-icon">◐</span><span>Appearance</span><small id="themeLabel">System</small></button>
+        <label class="notification-setting" id="notificationSetting"><span class="nav-icon">◔</span><span>Notify</span><select id="notificationMode" aria-label="Turn completion notifications" disabled><option value="">Not loaded</option></select></label>
         <div class="account-row"><span class="avatar">C</span><span><strong id="accountName">Codex</strong><small id="accountPlan">Connecting</small></span><i id="accountDot"></i></div>
       </footer>
     </aside>
@@ -81,6 +82,7 @@
         <div class="loading"><span></span><p>Starting your local Codex runtime…</p></div>
       </section>
       <div class="sr-only" id="streamStatus" role="status" aria-live="polite" aria-atomic="true"></div>
+      <div class="sr-only" id="noticeStatus" role="status" aria-live="polite" aria-atomic="true"></div>
 
       <div class="composer-wrap" id="composerWrap">
         <section class="queue-tray" id="queueTray" aria-label="Queued follow-ups" data-count="0" hidden></section>

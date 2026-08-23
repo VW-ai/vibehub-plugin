@@ -866,6 +866,75 @@ export async function runBrowserInteractionGuard(hooks) {
   }
   await hooks.switchFixtureThread(fixture.thread);
 
+  // --- Turn completion notices and Sidebar freshness ---------------------
+  // A turn/completed in a Thread off the active route is noticed exactly
+  // once per Turn id (live, then replayed after a reconnect): one in-app
+  // notice and one browser Notification through a stubbed constructor; the
+  // preference is a host action; Never silences; turn/started for a Thread
+  // the Sidebar does not list refreshes the lists.
+  const notificationControl = document.querySelector("#notificationMode");
+  const realNotification = window.Notification;
+  const constructed = [];
+  window.Notification = class GuardNotification {
+    static permission = "granted";
+    constructor(title, options) { constructed.push({ title, options }); }
+  };
+  const completionWindow = (sequence, threadId, turnId) => ({ events: [{ sequence, kind: "notification", value: { method: "turn/completed", params: { threadId, turn: { id: turnId, status: "completed", items: [] } } } }], cursor: sequence, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+  // The preference is host memory, served without the runtime: it goes to
+  // the real host so the periodic bootstrap refresh agrees with the control.
+  const preferenceActions = [];
+  try { await hooks.withFixtureTransport(async (payload) => {
+    preferenceActions.push(payload);
+    if (payload.action === "setNotificationPreference") return hooks.hostAction(payload);
+    if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+    return {};
+  }, async () => {
+    const offered = [...notificationControl.options].map((option) => `${option.value}=${option.text}`);
+    notificationControl.value = "always";
+    notificationControl.dispatchEvent(new Event("change", { bubbles: true }));
+    await waitFor(() => preferenceActions.some((entry) => entry.action === "setNotificationPreference"));
+    await frame();
+    const setAlways = preferenceActions.find((entry) => entry.action === "setNotificationPreference");
+    const logBefore = hooks.completionLog().length;
+    await hooks.applyEventWindow(completionWindow(71, fixture.secondaryThread.id, "guard-background-turn"));
+    const afterLive = { log: hooks.completionLog().filter((entry) => entry.turnId === "guard-background-turn"), toast: document.querySelector("#toast").textContent, status: document.querySelector("#noticeStatus").textContent, constructed: constructed.length };
+    // The same turn/completed replayed after a reconnect (a gap window).
+    await hooks.applyEventWindow({ ...completionWindow(72, fixture.secondaryThread.id, "guard-background-turn"), gap: false });
+    const afterReplay = { log: hooks.completionLog().filter((entry) => entry.turnId === "guard-background-turn"), constructed: constructed.length };
+    check(results, "a Turn completing in a background Thread is noticed once in-app and once through a stubbed Notification, live then replayed",
+      offered.join("|") === "always=Always|unfocused=Only when unfocused|never=Never" && setAlways?.mode === "always" && notificationControl.value === "always"
+        && hooks.completionLog().length === logBefore + 1 && afterLive.log.length === 1 && afterLive.log[0].browser === true && afterLive.log[0].threadId === fixture.secondaryThread.id
+        && afterLive.toast === "Codex finished a Turn in Chat fixture-…" && afterLive.status === afterLive.toast && afterLive.constructed === 1 && constructed[0]?.options?.tag === "guard-background-turn"
+        && afterReplay.log.length === 1 && afterReplay.constructed === 1,
+      `${afterLive.toast} · log ${afterLive.log.length}/${afterReplay.log.length} · Notification ${afterLive.constructed}/${afterReplay.constructed}`);
+
+    notificationControl.value = "never";
+    notificationControl.dispatchEvent(new Event("change", { bubbles: true }));
+    await waitFor(() => preferenceActions.filter((entry) => entry.action === "setNotificationPreference").length === 2);
+    await frame();
+    const logBeforeNever = hooks.completionLog().length;
+    await hooks.applyEventWindow(completionWindow(73, fixture.secondaryThread.id, "guard-silenced-turn"));
+    check(results, "Never, set through setNotificationPreference, silences completion notices", preferenceActions.filter((entry) => entry.action === "setNotificationPreference").at(-1)?.mode === "never" && notificationControl.value === "never" && hooks.completionLog().length === logBeforeNever && constructed.length === 1, `log ${hooks.completionLog().length} · Notification ${constructed.length}`);
+    notificationControl.value = "unfocused";
+    notificationControl.dispatchEvent(new Event("change", { bubbles: true }));
+    await waitFor(() => preferenceActions.filter((entry) => entry.action === "setNotificationPreference").length === 3);
+  }); } catch (error) { check(results, "notification checks completed", false, `threw: ${error?.message ?? error}`); }
+  window.Notification = realNotification;
+
+  // turn/started for a Thread the Sidebar does not list (and turn/completed
+  // for the unlisted review fixture): the lists refresh through the live
+  // bootstrap, the only source of the listing.
+  try { await hooks.withFixtureTransport(async (payload) => (payload.action === "readThread" ? { thread: structuredClone(fixture.thread) } : {}), async () => {
+    const refreshesBefore = hooks.bootstrapRefreshes();
+    await hooks.applyEventWindow({ events: [{ sequence: 74, kind: "notification", value: { method: "turn/started", params: { threadId: "guard-unlisted-thread", turn: { id: "guard-unlisted-turn", status: "inProgress", items: [] } } } }], cursor: 74, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+    const refreshedForUnlisted = hooks.bootstrapRefreshes() === refreshesBefore + 1;
+    const listedBefore = hooks.bootstrapRefreshes();
+    await hooks.applyEventWindow({ events: [{ sequence: 75, kind: "notification", value: { method: "turn/completed", params: { threadId: fixture.thread.id, turn: { id: "guard-listed-idle-turn", status: "completed", items: [] } } } }], cursor: 75, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+    const refreshedForFixture = hooks.bootstrapRefreshes() === listedBefore + 1;
+    check(results, "turn/started for a Thread the Sidebar does not list refreshes the Sidebar from the live bootstrap", refreshedForUnlisted && refreshedForFixture, `refreshes ${refreshesBefore} → ${hooks.bootstrapRefreshes()}`);
+  }); } catch (error) { check(results, "sidebar freshness check completed", false, `threw: ${error?.message ?? error}`); }
+  await hooks.switchFixtureThread(fixture.thread);
+
   // One Project, four scope states: the header, the Tasks gate, the Room
   // cold-start handoff and the explicit import dialog are exercised through
   // the real controls with host-shaped fixtures, then the live Project is

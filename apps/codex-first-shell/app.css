@@ -147,6 +147,11 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .thread-button .thread-state.active { background: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
 .thread-button strong { font-weight: 500; }
 .thread-button em { position: absolute; right: 8px; top: 8px; color: var(--accent); font: 8px/1 var(--mono); font-style: normal; }
+.thread-button em.completion-badge { padding: 2px 4px; border-radius: 4px; color: var(--ok); background: color-mix(in srgb, var(--ok) 10%, transparent); }
+/* Turn completion notifications: the host's transient preference. */
+.notification-setting { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 34px; padding: 0 9px; color: var(--text); font-size: 13px; }
+.notification-setting select { flex: 1 1 auto; min-width: 0; height: 26px; padding: 0 5px; border: 1px solid var(--line); border-radius: 7px; color: var(--text); background: var(--panel); font-size: 10px; }
+.notification-setting select[disabled] { opacity: .6; cursor: not-allowed; }
 .attention-section { flex: none; }
 .attention-section > header button { font-size: 9px; text-transform: none; letter-spacing: 0; }
 .attention-item { width: 100%; min-width: 0; display: grid !important; grid-template-columns: 8px minmax(0, 1fr); gap: 8px; padding: 7px 9px !important; border: 0; border-radius: 7px; text-align: left; background: transparent; }
@@ -713,6 +718,7 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 
 .app-shell.sidebar-collapsed { grid-template-columns: 64px minmax(0, 1fr); }
 .app-shell.sidebar-collapsed .sidebar { padding-inline: 8px; }
+.app-shell.sidebar-collapsed .notification-setting,
 .app-shell.sidebar-collapsed .brand span, .app-shell.sidebar-collapsed .new-thread strong, .app-shell.sidebar-collapsed .new-thread kbd, .app-shell.sidebar-collapsed .primary-nav button span:not(.nav-icon), .app-shell.sidebar-collapsed .primary-nav button small, .app-shell.sidebar-collapsed .project-header, .app-shell.sidebar-collapsed .project-block, .app-shell.sidebar-collapsed .pinned-section, .app-shell.sidebar-collapsed .attention-section, .app-shell.sidebar-collapsed .thread-section, .app-shell.sidebar-collapsed .sidebar-footer span:not(.avatar), .app-shell.sidebar-collapsed .sidebar-footer small, .app-shell.sidebar-collapsed .account-row i { display: none; }
 .app-shell.sidebar-collapsed .new-thread, .app-shell.sidebar-collapsed .primary-nav button, .app-shell.sidebar-collapsed .sidebar-footer button, .app-shell.sidebar-collapsed .account-row { justify-content: center; padding-inline: 0; }
 

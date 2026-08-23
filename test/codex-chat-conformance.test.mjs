@@ -5,6 +5,7 @@ import test from "node:test";
 import { applyChatEvent, applyHostEvent, applyTokenUsage, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, rememberQueue, rememberThreadSettings, settingsRecordFromNotification, threadQueue, threadSettings, threadTokenUsage, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
 import { compactDisabledReason, contextUsage } from "../apps/codex-first-shell/context-usage.mjs";
 import { renameThreadRecord, threadTitleFromName } from "../apps/codex-first-shell/thread-name.mjs";
+import { browserNotification, completionDecision, createCompletionNotifier, NOTIFICATION_MODE_LABELS, noticeForCompletion } from "../apps/codex-first-shell/completion-notifier.mjs";
 import { describePosture, describeTurnSettings, effortOptionLabel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "../apps/codex-first-shell/composer-settings.mjs";
 import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
 import { loadThreadDraft, MAX_DRAFT_ATTACHMENTS, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
@@ -388,6 +389,52 @@ test("thread/name/updated renames the Thread record the way the host titles it",
   assert.deepEqual(renameThreadRecord(thread, 42), { ...thread, name: "42", title: "42" });
 });
 
+test("a Turn completing in the background notifies once per Turn id, live then replayed, through one in-app notice and one stubbed Notification", () => {
+  // The decision follows the host's transient preference.
+  assert.deepEqual(completionDecision({ mode: "unfocused", onActiveRoute: true, focused: true }), { notice: false, browser: false }, "a completion the human is looking at needs no notice");
+  assert.deepEqual(completionDecision({ mode: "unfocused", onActiveRoute: false, focused: true }), { notice: true, browser: false }, "a background Chat is noticed in-app; the browser Notification waits for an unfocused window");
+  assert.deepEqual(completionDecision({ mode: "unfocused", onActiveRoute: true, focused: false }), { notice: true, browser: true });
+  assert.deepEqual(completionDecision({ mode: "always", onActiveRoute: false, focused: true }), { notice: true, browser: true });
+  assert.deepEqual(completionDecision({ mode: "always", onActiveRoute: true, focused: true }), { notice: false, browser: false });
+  assert.deepEqual(completionDecision({ mode: "never", onActiveRoute: false, focused: false }), { notice: false, browser: false });
+  assert.deepEqual(NOTIFICATION_MODE_LABELS, { always: "Always", unfocused: "Only when unfocused", never: "Never" });
+
+  // A stubbed Notification records every construction.
+  const constructed = [];
+  class StubNotification {
+    static permission = "granted";
+    constructor(title, options) { constructed.push({ title, options }); }
+  }
+  const notifier = createCompletionNotifier();
+  const completed = { threadId: "thread-bg", turn: { id: "turn-9", status: "completed" } };
+  const context = { mode: "unfocused", activeThreadId: "thread-fg", route: "chat", focused: false, threadTitle: "Background chat", NotificationClass: StubNotification };
+  const live = noticeForCompletion(notifier, completed, context);
+  assert.deepEqual([live.notice, live.turnId, live.threadId], ["Codex finished a Turn in Background chat", "turn-9", "thread-bg"]);
+  assert.ok(live.notification instanceof StubNotification);
+  assert.deepEqual(constructed, [{ title: "Codex finished a Turn", options: { body: "Background chat", tag: "turn-9" } }]);
+  // The same turn/completed replayed after a reconnect: nothing more.
+  const replayed = noticeForCompletion(notifier, structuredClone(completed), context);
+  assert.deepEqual([replayed.notice, replayed.notification, replayed.turnId], [null, null, "turn-9"]);
+  assert.equal(constructed.length, 1, "exactly one Notification construction for one Turn id");
+  assert.equal(notifier.has("turn-9"), true);
+  // Another Turn: noticed; an interrupted one names its status; never silences.
+  assert.equal(noticeForCompletion(notifier, { threadId: "thread-bg", turn: { id: "turn-10", status: "interrupted" } }, { ...context, focused: true }).notice, "Codex interrupted a Turn in Background chat");
+  assert.equal(constructed.length, 1, "focused with Only when unfocused: no browser Notification");
+  assert.equal(noticeForCompletion(notifier, { threadId: "thread-bg", turn: { id: "turn-11" } }, { ...context, mode: "never" }).notice, null);
+  assert.equal(noticeForCompletion(notifier, { threadId: "thread-fg", turn: { id: "turn-12" } }, { ...context, focused: true }).notice, null, "the active Chat in a focused window is not a notice");
+  assert.equal(noticeForCompletion(notifier, { threadId: "thread-x", turn: { id: "turn-13" } }, { ...context, threadTitle: null }).notice, "Codex finished a Turn in Chat thread-x…");
+  assert.equal(noticeForCompletion(notifier, { threadId: "thread-x" }, context).notice, null, "no Turn id, no notice");
+  // Permission decides the browser Notification; a missing API is never an error.
+  assert.equal(browserNotification({ title: "t", body: "b", tag: "x" }, class { static permission = "denied"; }), null);
+  assert.equal(browserNotification({ title: "t", body: "b", tag: "x" }, undefined), null);
+  class Throwing { static permission = "granted"; constructor() { throw new Error("no window"); } }
+  assert.equal(browserNotification({ title: "t", body: "b", tag: "x" }, Throwing), null);
+  // The dedupe is bounded.
+  const small = createCompletionNotifier({ limit: 2 });
+  assert.deepEqual(["a", "b", "c"].map((id) => small.claim(id)), [true, true, true]);
+  assert.deepEqual([small.has("a"), small.has("b"), small.has("c"), small.claim("b")], [false, true, true, false]);
+});
+
 test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {
   const drafts = new Map();
   saveThreadDraft(drafts, "thread-a", { text: "draft A", quote: { threadId: "thread-a", turnId: "turn-a", itemId: "item-a" }, attachments: [{ type: "image", url: "data:image/png;base64,AA==" }] });
@@ -729,7 +776,7 @@ test("conformance matrix proof entries resolve to existing files, exact tests an
     assert.equal(check.after, "deferred", `${id} stays deferred`);
     assert.ok(check.proof.some((entry) => entry.includes("::")), `${id} pins that the UI makes no contrary claim`);
   }
-  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 28, partial: 0, deferred: 2, fail: 0 });
+  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 29, partial: 0, deferred: 2, fail: 0 });
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {

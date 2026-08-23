@@ -136,6 +136,29 @@ test("inline rename uses setThreadName and thread/name/updated, and the Permissi
   assert.deepEqual(postures, contract.turnSettings.posture, "the postures in source are the host contract's verbatim");
 });
 
+test("completion notices come from turn/completed once per Turn, the preference is a host action, and turn/started refreshes an unlisted Thread", async () => {
+  const { html, script, contract } = await shellSources();
+  assert.match(script, /if \(method === "turn\/completed" && typeof params\.threadId === "string"\) \{\s*if \(!state\.threads\.some\(\(thread\) => thread\.id === params\.threadId\)\) refreshLists = true;\s*handleTurnCompletion\(params\);/);
+  assert.match(script, /noticeForCompletion\(state\.completionNotifier, params, \{\s*mode: state\.notificationMode \?\? "unfocused",\s*activeThreadId: state\.activeThreadId,\s*route: state\.route,\s*focused: document\.hasFocus\(\),/);
+  assert.match(script, /applyNotificationPreferences\(data\.preferences\);/, "the preference is read from bootstrap.preferences");
+  assert.match(script, /const data = await action\(\{ action: "setNotificationPreference", mode \}\);/);
+  assert.match(script, /state\.notificationModes\.map\(\(mode\) => \(\{ label: NOTIFICATION_MODE_LABELS\[mode\] \?\? mode, value: mode \}\)\)/, "the control offers the modes the host reported");
+  assert.match(html, /<select id="notificationMode" aria-label="Turn completion notifications" disabled><option value="">Not loaded<\/option><\/select>/);
+  assert.match(contract.bootstrap.preferences, /default unfocused, absent after a host restart/);
+  assert.match(contract.actions.setNotificationPreference.rules, /host memory only/);
+  // Sidebar freshness: turn/started for an unlisted or idle-listed Thread refreshes the lists.
+  assert.match(script, /if \(method === "turn\/started" && typeof params\.threadId === "string"\) \{\s*const listed = state\.threads\.find\(\(thread\) => thread\.id === params\.threadId\);\s*if \(!listed\) refreshLists = true;/);
+  const notifier = await source("apps/codex-first-shell/completion-notifier.mjs");
+  assert.match(notifier, /NotificationClass\.permission !== "granted"\) return null;/, "a browser Notification only when permission was granted");
+  assert.equal((script.match(/new Notification\(/g) ?? []).length, 0, "app.js constructs no Notification itself; the notifier does, once per Turn");
+  assert.doesNotMatch(html + script + notifier, /localStorage|sessionStorage|indexedDB|document\.cookie/i, "no browser persistence of the preference or the dedupe");
+  // A bootstrap refresh never jumps the event cursor past unread events: the
+  // stream opens at the bootstrap's cursor once, then the browser's own
+  // cursor stands, so no turn/completed (or approval request) is dropped.
+  assert.match(script, /if \(!state\.eventStreamOpened\) \{\s*state\.eventCursor = data\.eventCursor;\s*state\.eventStreamOpened = true;\s*\}/);
+  assert.equal((script.match(/state\.eventCursor = /g) ?? []).length, 2, "the cursor is written by the stream opening and by each applied window only");
+});
+
 test("@ and $ mentions are picked from searchFiles and listSkills and sent as text_elements with mention and skill items", async () => {
   const { html, script, renderer, contract } = await shellSources();
   assert.match(html, /<div class="mention-picker" id="mentionPicker" role="listbox" aria-label="Mention suggestions" hidden><\/div>/);

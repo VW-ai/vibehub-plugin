@@ -358,12 +358,13 @@ async function runLifecycle(shell) {
       ? `document.querySelector('#composer').dataset.turnPosture === 'running' && [...document.querySelectorAll('.activity-group summary strong')].some((n) => n.textContent.includes('Working'))`
       : `document.querySelector('#composer').dataset.turnPosture === 'running' && document.querySelectorAll('.timeline-entry [data-request-id]').length > 0`, 60_000);
     const live = await snapshot();
-    // The sidebar presence dot needs the Thread in thread/list. The real
-    // app-server lists a new Thread only once its first user message is
-    // durable, after the shell's newThread refresh, so a brand-new Chat's
-    // first Turn carries no dot there; the fixture lists Threads at once.
-    // The dot is recorded on the real runtime and asserted on the fixture.
-    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Queue message" && !live.stopHidden && (realRuntime ? live.working : live.requests > 0 && live.activeDots === 1), `${live.posture}/${realRuntime ? `working=${live.working}, ` : ""}${live.requests} request cards, send="${live.sendLabel}", stopHidden=${live.stopHidden}, activeDots=${live.activeDots} · active ${live.activeThreads || "none"}`);
+    // The brand-new Chat's own Sidebar row carries the live dot: turn/started
+    // marks the listed entry active and refreshes the lists from thread/list
+    // (the Task Thread the walk started above is live too, with its own
+    // dot). The dot is recorded on the real runtime and asserted on the
+    // fixture.
+    const ownDot = live.activeThreads.split("|").includes(live.thread);
+    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Queue message" && !live.stopHidden && (realRuntime ? live.working : live.requests > 0 && ownDot), `${live.posture}/${realRuntime ? `working=${live.working}, ` : ""}${live.requests} request cards, send="${live.sendLabel}", stopHidden=${live.stopHidden}, activeDots=${live.activeDots} · own dot ${ownDot} · active ${live.activeThreads || "none"}`);
     process.kill(shell.lastPid(), "SIGKILL");
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Runtime restarting'`);
     const exited = await snapshot();
@@ -552,6 +553,23 @@ async function runQueueWalk(shell) {
     step("Full access is confirmed, travels as approvalPolicy never and sandboxPolicy dangerFullAccess, and the runtime's thread/settings/updated becomes the reported posture; Ask for approval switches back",
       postureBefore === "Approval on-request · Sandbox workspaceWrite · reported by thread/start" && postureStart?.approvalPolicy === "never" && postureStart?.sandboxPolicy?.type === "dangerFullAccess" && postureAfter === "Approval never · Sandbox dangerFullAccess · reported by thread/settings/updated" && postureTurnLine.includes("never · dangerFullAccess") && askStart?.approvalPolicy === "on-request" && askStart?.sandboxPolicy?.type === "workspaceWrite",
       `${postureBefore} → ${postureAfter} · turn ${JSON.stringify({ approvalPolicy: postureStart?.approvalPolicy, sandboxPolicy: postureStart?.sandboxPolicy })} then ${JSON.stringify({ approvalPolicy: askStart?.approvalPolicy, sandboxPolicy: askStart?.sandboxPolicy })} · Turn line: ${postureTurnLine}`);
+    // A completion in a background Chat on the real host: the Turn starts
+    // here, the human opens a new Chat, the approval is answered from
+    // outside, and turn/completed from the event feed raises one in-app
+    // notice with the Sidebar badge; the default preference (unfocused) and
+    // the page's focus emulation mean no browser Notification is due.
+    await type("finish in the background");
+    await awaitApproval();
+    // The live Turn's own approval: an interrupted Turn's approval stays
+    // pending in the host, so the request is chosen by Turn id.
+    const backgroundTurnId = await page.evaluate(`document.querySelector('#composer').dataset.currentTurnId`);
+    const backgroundRequest = (await shell.api("api/bootstrap")).body.data.pendingRequests.find((request) => request.params?.threadId === threadId && request.params?.turnId === backgroundTurnId);
+    await page.evaluate(`document.querySelector('#newThread').click()`);
+    await page.waitFor(`new URLSearchParams(location.search).get('thread') !== ${JSON.stringify(threadId)} && document.querySelector('.thread-heading')`);
+    const resolved = await shell.action({ action: "resolveRequest", requestId: backgroundRequest.id, decision: "accept" });
+    await page.waitFor(`document.querySelector('#noticeStatus').textContent.includes('finished a Turn')`, 30_000);
+    const noticed = await page.evaluate(`({ status: document.querySelector('#noticeStatus').textContent, badge: document.querySelector('[data-thread-id="${threadId}"] .completion-badge')?.textContent ?? null, active: new URLSearchParams(location.search).get('thread') })`);
+    step("a Turn completing in a background Chat on the real host raises one in-app notice and the Sidebar badge", resolved.status === 200 && noticed.status === "Codex finished a Turn in Walk renamed chat" && noticed.badge === "DONE" && noticed.active !== threadId, `${noticed.status} · badge ${noticed.badge}`);
     step("no console errors or uncaught exceptions", page.errors.length === 0, page.errors.join(" | "));
   } finally {
     chrome.close();

@@ -4,6 +4,7 @@ import { acceptAttachment, attachmentKind, imageFilesFrom, MAX_ATTACHMENT_BYTES,
 import { activeTrigger, chipsFromItems, composeTextElements, insertPlaceholder, placeholderFor, removePlaceholder } from "./composer-mentions.mjs";
 import { compactDisabledReason, contextUsage } from "./context-usage.mjs";
 import { renameThreadRecord } from "./thread-name.mjs";
+import { createCompletionNotifier, NOTIFICATION_MODE_LABELS, noticeForCompletion } from "./completion-notifier.mjs";
 import { emptyQueue, pausedMessage, queuedMediaSummary, queuedText, replaceQueuedText } from "./composer-queue.mjs";
 import {
   DOM_LIMITS,
@@ -43,6 +44,7 @@ const state = {
   taskSelectedContextIds: new Set(),
   activeContextId: null,
   eventCursor: 0,
+  eventStreamOpened: false,
   pendingRequests: [],
   running: false,
   currentTurnId: null,
@@ -118,6 +120,16 @@ const state = {
   // The Permissions control's pending full-access confirmation: the Thread
   // it was asked for and the control to return focus to.
   fullAccess: null,
+  // Turn completion notices: the host's transient preference
+  // (bootstrap.preferences.notifications), the once-per-Turn dedupe, the
+  // Threads whose completion was noticed but not yet opened, and a bounded
+  // in-memory log of the notices raised in this session.
+  notificationMode: null,
+  notificationModes: [],
+  completionNotifier: createCompletionNotifier(),
+  unseenCompletions: new Set(),
+  completionLog: [],
+  bootstrapRefreshes: 0,
 };
 
 // The mention picker: `@` searches files through the host (debounced), `$`
@@ -468,9 +480,11 @@ function threadButton(thread) {
   // last status the app-server reported for the Thread.
   const runtimeActive = state.runtimeAlive && !state.bootstrap?.stop && String(thread.status?.type ?? thread.status ?? "").toLowerCase().includes("active");
   const born = sidebarTasksByThread.get(thread.id) ?? new Set();
-  const badge = thread.taskLink
-    ? "<em>TASK</em>"
-    : born.size ? `<em data-born-tasks="${born.size}" title="${born.size} Task${born.size === 1 ? "" : "s"} born from or attached to this Chat">${born.size} TASK${born.size === 1 ? "" : "S"}</em>` : "";
+  const badge = state.unseenCompletions.has(thread.id)
+    ? '<em class="completion-badge" data-unseen-completion="true" title="A Turn completed here while you were away">DONE</em>'
+    : thread.taskLink
+      ? "<em>TASK</em>"
+      : born.size ? `<em data-born-tasks="${born.size}" title="${born.size} Task${born.size === 1 ? "" : "s"} born from or attached to this Chat">${born.size} TASK${born.size === 1 ? "" : "S"}</em>` : "";
   if (state.renaming?.threadId === thread.id && state.renaming.where === "sidebar") return `<div class="thread-row renaming" data-thread-row="${escapeHtml(thread.id)}">${renameFormMarkup(thread, "sidebar")}</div>`;
   return `<div class="thread-row" data-thread-row="${escapeHtml(thread.id)}"><button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
     <i class="thread-state${runtimeActive ? " active" : ""}"></i>
@@ -1711,7 +1725,9 @@ function renderRooms() {
 
 async function refreshThreads() {
   const data = await api("/api/bootstrap");
+  state.bootstrapRefreshes += 1;
   state.bootstrap = data;
+  applyNotificationPreferences(data.preferences);
   state.threads = data.threads;
   state.projects = data.projects;
   state.pinned = data.pinned;
@@ -1720,7 +1736,14 @@ async function refreshThreads() {
     const metadata = state.threads.find((thread) => thread.id === state.activeThreadId);
     if (metadata && state.activeThread) state.activeThread = { ...state.activeThread, ...metadata };
   }
-  state.eventCursor = data.eventCursor;
+  // The event stream opens at the bootstrap's cursor once, so history is
+  // never replayed as live; every later bootstrap keeps the browser's own
+  // cursor, because adopting a newer one would drop the events appended
+  // since the last poll (a turn/completed, an approval request).
+  if (!state.eventStreamOpened) {
+    state.eventCursor = data.eventCursor;
+    state.eventStreamOpened = true;
+  }
   state.pendingRequests = data.pendingRequests;
   state.knownRequestIds = new Set(data.pendingRequests.map((request) => String(request.id)));
   pruneRequestDrafts(state.requestDrafts, state.knownRequestIds);
@@ -1748,6 +1771,7 @@ async function openThread(threadId, { route = "chat" } = {}) {
   if (switchingThread) captureComposerDraft();
   const data = await action({ action: "readThread", threadId });
   state.activeThreadId = threadId;
+  state.unseenCompletions.delete(threadId);
   state.activeThread = { ...state.threads.find((thread) => thread.id === threadId), ...data.thread };
   state.currentTurnId = liveTurnId(state.activeThread);
   state.running = Boolean(state.currentTurnId);
@@ -2334,6 +2358,69 @@ function chooseEffort(effort) {
   renderComposerSettings();
 }
 
+// --- Turn completion notices ------------------------------------------------
+
+function applyNotificationPreferences(preferences) {
+  const notifications = preferences?.notifications;
+  state.notificationMode = typeof notifications?.mode === "string" ? notifications.mode : null;
+  state.notificationModes = Array.isArray(notifications?.modes) ? notifications.modes : [];
+  renderNotificationSetting();
+}
+
+// The control offers exactly the modes the host reported, labelled here,
+// and shows the host's current mode; it is disabled until bootstrap said.
+function renderNotificationSetting() {
+  const control = $("#notificationMode");
+  if (!control) return;
+  if (!state.notificationMode || !state.notificationModes.length) {
+    replaceOptions(control, [{ label: "Not loaded", value: "" }], "");
+    control.disabled = true;
+    return;
+  }
+  replaceOptions(control, state.notificationModes.map((mode) => ({ label: NOTIFICATION_MODE_LABELS[mode] ?? mode, value: mode })), state.notificationMode);
+  control.disabled = false;
+  control.title = "Turn completion notifications · host session setting, reset when the host restarts";
+}
+
+async function chooseNotificationMode(mode, control) {
+  try {
+    const data = await action({ action: "setNotificationPreference", mode });
+    applyNotificationPreferences(data.preferences);
+    // A browser Notification needs the human's permission; ask from this
+    // gesture when it was never decided.
+    if (mode !== "never" && typeof Notification === "function" && Notification.permission === "default") {
+      Notification.requestPermission().catch(() => {});
+    }
+    notify(`Turn completion notifications: ${NOTIFICATION_MODE_LABELS[mode] ?? mode}.`);
+  } catch (error) {
+    notify(error.message);
+    renderNotificationSetting();
+  }
+  control?.focus?.({ preventScroll: true });
+}
+
+// One turn/completed from the event feed, live or replayed: noticed once per
+// Turn id, in-app (toast, live region, Sidebar badge) and as a browser
+// Notification when the preference and the permission allow.
+function handleTurnCompletion(params) {
+  const { notice, notification, turnId, threadId } = noticeForCompletion(state.completionNotifier, params, {
+    mode: state.notificationMode ?? "unfocused",
+    activeThreadId: state.activeThreadId,
+    route: state.route,
+    focused: document.hasFocus(),
+    threadTitle: threadTitleById(params.threadId),
+  });
+  if (!notice) return;
+  state.completionLog.push({ turnId, threadId, notice, browser: Boolean(notification), observedAt: new Date().toISOString() });
+  while (state.completionLog.length > 32) state.completionLog.shift();
+  state.unseenCompletions.add(threadId);
+  notify(notice);
+  // Notices have their own live region: the stream region is rewritten by
+  // the next transcript render.
+  $("#noticeStatus").textContent = notice;
+  updateSidebar();
+}
+
 // --- Approval posture -------------------------------------------------------
 // The header shows the approval policy and sandbox the runtime reported for
 // this Thread (the settings record); the Permissions control switches between
@@ -2774,6 +2861,18 @@ async function applyEventWindow(data) {
     if (method === "thread/name/updated") {
       if (typeof params.threadId === "string") applyThreadName(params.threadId, params.threadName ?? null);
       continue;
+    }
+    // A Turn starting in a Thread the Sidebar does not list (or lists idle)
+    // is the cue to refresh the lists; the runtime said it started, so the
+    // listed entry shows the live dot at once.
+    if (method === "turn/started" && typeof params.threadId === "string") {
+      const listed = state.threads.find((thread) => thread.id === params.threadId);
+      if (!listed) refreshLists = true;
+      else if (!String(listed.status?.type ?? listed.status ?? "").toLowerCase().includes("active")) { listed.status = { type: "active" }; refreshLists = true; }
+    }
+    if (method === "turn/completed" && typeof params.threadId === "string") {
+      if (!state.threads.some((thread) => thread.id === params.threadId)) refreshLists = true;
+      handleTurnCompletion(params);
     }
     if (method === "thread/settings/updated" || method === "thread/tokenUsage/updated") {
       applyChatEvent(state, method, params);
@@ -3550,6 +3649,7 @@ document.addEventListener("change", async (event) => {
   if (event.target.id === "modelPicker") { chooseModel(event.target.value); return; }
   if (event.target.id === "effortPicker") { chooseEffort(event.target.value); return; }
   if (event.target.id === "permissionsControl") { choosePosture(event.target.value, event.target); return; }
+  if (event.target.id === "notificationMode") { await chooseNotificationMode(event.target.value, event.target); return; }
   if (event.target.id === "activeThreadProject") {
     try {
       const projectId = event.target.value || null;
@@ -4005,6 +4105,9 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
     // The process generation the browser currently holds, so a synthetic
     // event window can name it and never trigger a generation-change re-read.
     currentRuntimeGeneration: () => state.runtimeGeneration,
+    // Completion notices raised in this session and bootstrap refreshes so far.
+    completionLog: () => structuredClone(state.completionLog),
+    bootstrapRefreshes: () => state.bootstrapRefreshes,
     // Host event windows fed straight into the same path pollEvents takes,
     // and a way back to the live runtime posture once the checks are done.
     applyEventWindow: async (window) => {
