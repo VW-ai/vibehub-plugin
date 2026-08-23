@@ -17,8 +17,20 @@ test("capability contract is complete, pinned, and truthful about different audi
   assert.equal(assertCapabilityContract(), true);
   const codex = capabilitySnapshot("codex");
   const dsh = capabilitySnapshot("dsh");
-  assert.equal(Object.keys(codex.capabilities).length, 12);
+  assert.equal(Object.keys(codex.capabilities).length, 15);
   assert.deepEqual(Object.keys(codex.capabilities), Object.keys(dsh.capabilities));
+  // The daily-use seams are native on Codex and truthfully unsupported on
+  // DSH until a seam is pinned: no picker, indicator or @ menu is invented.
+  for (const id of ["settings", "compaction", "mentions"]) {
+    assert.equal(codex.capabilities[id].mode, "native", id);
+    assert.equal(dsh.capabilities[id].available, false, id);
+    assert.equal(dsh.capabilities[id].mode, "unsupported", id);
+  }
+  assert.match(codex.capabilities.settings.source, /model\/list/u);
+  assert.match(codex.capabilities.settings.source, /thread\/settings\/updated/u);
+  assert.match(codex.capabilities.compaction.source, /thread\/compact\/start/u);
+  assert.match(codex.capabilities.compaction.source, /contextCompaction/u);
+  assert.match(codex.capabilities.mentions.source, /fuzzyFileSearch and skills\/list/u);
   assert.equal(codex.upstream.version, "0.149.0");
   assert.equal(dsh.upstream.version, "0.1.0-rc.8");
   assert.deepEqual(codex.capabilities.audio, {
@@ -66,7 +78,14 @@ test("one router dispatches through exactly one selected harness and never cross
   await router.dispatch("chat.send", { conversationId: "session-1", content: [{ type: "text", text: "hello" }] });
   await assert.rejects(router.dispatch("chat.send", { harnessId: "codex" }), /codex, but dsh is selected/u);
   await assert.rejects(router.dispatch("chat.sendAudio", { conversationId: "session-1" }), UnsupportedHarnessCapabilityError);
-  assert.deepEqual(calls, ["chat.send"]);
+  // A per-Turn settings override rides on chat.send and is gated by the
+  // settings capability the carrier does not have; the plain send still goes.
+  await assert.rejects(router.dispatch("chat.send", { conversationId: "session-1", content: [{ type: "text", text: "hello" }], settings: { model: "x" } }), (error) => error instanceof UnsupportedHarnessCapabilityError && error.capability === "settings");
+  await router.dispatch("chat.send", { conversationId: "session-1", content: [{ type: "text", text: "hello" }], settings: {} });
+  for (const action of ["chat.listModels", "chat.compact", "chat.searchFiles", "chat.listSkills"]) {
+    await assert.rejects(router.dispatch(action, { conversationId: "session-1" }), UnsupportedHarnessCapabilityError);
+  }
+  assert.deepEqual(calls, ["chat.send", "chat.send"]);
 });
 
 test("shared shell exposes one seam per router verb, gates them behind boot, and inherits capability gating", async () => {
@@ -92,6 +111,10 @@ test("shared shell exposes one seam per router verb, gates them behind boot, and
     ["forkChat", { conversationId: "thread-1" }, "chat.fork"],
     ["searchChats", { query: "hello" }, "chat.search"],
     ["interruptChat", { conversationId: "thread-1", runId: "turn-1" }, "chat.interrupt"],
+    ["listModels", {}, "chat.listModels"],
+    ["compactChat", { conversationId: "thread-1" }, "chat.compact"],
+    ["searchFiles", { query: "read", roots: ["/work"] }, "chat.searchFiles"],
+    ["listSkills", { cwds: ["/work"] }, "chat.listSkills"],
     ["resolveInteraction", { conversationId: "thread-1", requestId: 7, result: { decision: "accept" } }, "interaction.resolveApproval"],
     ["startTask", { cwd: "/work", payload: { kind: "vibehub_ticket_handoff", ticketId: "ticket-shell-seams" } }, "task.start"],
   ];
@@ -107,6 +130,10 @@ test("shared shell exposes one seam per router verb, gates them behind boot, and
   dsh.boot();
   await assert.rejects(dsh.sendChatAudio({ conversationId: "session-1", content: [] }), UnsupportedHarnessCapabilityError);
   await dsh.sendChatAttachments({ conversationId: "session-1", content: [] });
+  await assert.rejects(dsh.listModels(), UnsupportedHarnessCapabilityError);
+  await assert.rejects(dsh.compactChat({ conversationId: "session-1" }), UnsupportedHarnessCapabilityError);
+  await assert.rejects(dsh.searchFiles({ query: "x", roots: ["/work"] }), UnsupportedHarnessCapabilityError);
+  await assert.rejects(dsh.listSkills({ cwds: ["/work"] }), UnsupportedHarnessCapabilityError);
   await dsh.close();
 });
 
@@ -120,6 +147,18 @@ test("Codex adapter routes ordinary Chat and exact Task handoff through app-serv
   const task = await router.dispatch("task.start", { cwd: "/work", payload, origin: { threadId: chat.conversationId } });
   assert.deepEqual(client.calls.map((call) => call.method), ["thread/start", "turn/start", "thread/start", "turn/start"]);
   assert.deepEqual(JSON.parse(client.calls[3].params.input[0].text), payload);
+  assert.deepEqual(Object.keys(client.calls[1].params).sort(), ["input", "threadId"], "a send without settings carries no override key");
+  // Per-Turn overrides are the exact turn/start keys and nothing is defaulted.
+  await router.dispatch("chat.send", { conversationId: chat.conversationId, content: [{ type: "text", text: "again" }], settings: { model: "gpt-5.3-codex", effort: "high", approvalPolicy: "never", sandboxPolicy: { type: "dangerFullAccess" }, ignored: true } });
+  assert.deepEqual(client.calls.at(-1).params, { threadId: chat.conversationId, input: [{ type: "text", text: "again" }], model: "gpt-5.3-codex", effort: "high", approvalPolicy: "never", sandboxPolicy: { type: "dangerFullAccess" } });
+  await router.dispatch("chat.compact", { conversationId: chat.conversationId });
+  await router.dispatch("chat.searchFiles", { query: "read", roots: ["/work"], cancellationToken: "token-1" });
+  await router.dispatch("chat.listSkills", { cwds: ["/work"] });
+  assert.deepEqual(client.calls.slice(-3).map((call) => [call.method, call.params]), [
+    ["thread/compact/start", { threadId: chat.conversationId }],
+    ["fuzzyFileSearch", { query: "read", roots: ["/work"], cancellationToken: "token-1" }],
+    ["skills/list", { cwds: ["/work"], forceReload: false }],
+  ]);
   assert.deepEqual(await associations.get(payload.ticketId), {
     ticketId: payload.ticketId,
     harnessId: "codex",

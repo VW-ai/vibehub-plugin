@@ -1,4 +1,4 @@
-import { capabilityForAction, capabilitySnapshot } from "./capabilities.mjs";
+import { capabilitiesForInput, capabilitySnapshot } from "./capabilities.mjs";
 
 function validateTaskHandoff(input) {
   if (input?.payload?.kind !== "vibehub_ticket_handoff" || typeof input.payload.ticketId !== "string") {
@@ -31,10 +31,11 @@ export function createHarnessRouter({ adapter, associations }) {
       if (input.harnessId && input.harnessId !== selectedHarnessId) {
         throw new Error(`Action targets ${input.harnessId}, but ${selectedHarnessId} is selected`);
       }
-      const capabilityId = capabilityForAction(action);
-      const capability = capabilities.capabilities[capabilityId];
-      if (!capability.available) {
-        throw new UnsupportedHarnessCapabilityError(selectedHarnessId, capabilityId, capability.fallback);
+      for (const capabilityId of capabilitiesForInput(action, input)) {
+        const capability = capabilities.capabilities[capabilityId];
+        if (!capability.available) {
+          throw new UnsupportedHarnessCapabilityError(selectedHarnessId, capabilityId, capability.fallback);
+        }
       }
       if (action === "task.start") validateTaskHandoff(input);
       const result = await adapter.execute(action, { ...input, harnessId: selectedHarnessId });

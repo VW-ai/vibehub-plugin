@@ -148,7 +148,13 @@ export class CodexAppServerClient extends EventEmitter {
           this.emit("methodMissing", { method: pending.method, generation: this.generation, error: message.error });
         }
         pending.reject(Object.assign(new Error(message.error.message), { rpcError: message.error, method: pending.method }));
-      } else pending.resolve(message.result);
+      } else {
+        // Every successful reply is observable by method before its caller
+        // sees it, so a host can read what thread/start and thread/resume
+        // report about a Thread no matter which seam issued the request.
+        this.emit("result", { method: pending.method, params: pending.params, result: message.result, generation: this.generation });
+        pending.resolve(message.result);
+      }
       return;
     }
     if (message.method && Object.hasOwn(message, "id")) {
@@ -170,7 +176,7 @@ export class CodexAppServerClient extends EventEmitter {
         this.pending.delete(String(id));
         reject(timeoutError(method, timeoutMs));
       }, timeoutMs);
-      this.pending.set(String(id), { method, resolve, reject, timer });
+      this.pending.set(String(id), { method, params, resolve, reject, timer });
       this.child.stdin.write(`${JSON.stringify({ method, id, params })}\n`);
     });
   }

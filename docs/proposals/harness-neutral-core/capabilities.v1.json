@@ -12,7 +12,10 @@
     "delegatedWork": { "description": "Render harness-owned subagent or delegated execution without turning it into VibeHub Tasks." },
     "replay": { "description": "Recover harness conversation history after restart." },
     "interruption": { "description": "Interrupt the selected harness's active execution." },
-    "livePresence": { "description": "Project fresh runtime presence without making it durable Task state." }
+    "livePresence": { "description": "Project fresh runtime presence without making it durable Task state." },
+    "settings": { "description": "List the models and reasoning efforts the selected harness offers, read a conversation's effective settings, and override model, effort, approval and sandbox posture per Turn." },
+    "compaction": { "description": "Observe the selected harness's context usage and ask it to compact a conversation." },
+    "mentions": { "description": "Discover files and skills of the bound repository to mention in a message as harness-native input variants." }
   },
   "carriers": {
     "codex": {
@@ -34,7 +37,10 @@
         "delegatedWork": { "available": true, "mode": "native", "source": "ThreadItem collabAgentToolCall", "fallback": "Render a bounded unknown item; never adapt it to DSH Agent Team or VibeHub Tasks." },
         "replay": { "available": true, "mode": "native", "source": "thread/read, thread/list and thread/resume", "fallback": "Stop reuse when stable Thread recovery fails." },
         "interruption": { "available": true, "mode": "native", "source": "turn/interrupt", "fallback": "Show interruption unavailable and do not claim stopped." },
-        "livePresence": { "available": true, "mode": "adapted", "source": "fresh turn/started and turn/completed notifications", "fallback": "Show no live state; replay never mints presence." }
+        "livePresence": { "available": true, "mode": "adapted", "source": "fresh turn/started and turn/completed notifications", "fallback": "Show no live state; replay never mints presence." },
+        "settings": { "available": true, "mode": "native", "source": "ClientRequest model/list; the model, reasoningEffort, approvalPolicy and sandbox of the thread/start and thread/resume responses; turn/start model, effort, approvalPolicy and sandboxPolicy; thread/settings/updated", "fallback": "Keep the pickers disabled with a not-loaded label and show no posture until the runtime reports one." },
+        "compaction": { "available": true, "mode": "native", "source": "thread/tokenUsage/updated, ClientRequest thread/compact/start and the contextCompaction ThreadItem of the compaction Turn", "fallback": "Show no context value and no Compact action; never estimate usage locally." },
+        "mentions": { "available": true, "mode": "native", "source": "ClientRequest fuzzyFileSearch and skills/list; Turn input mention and skill variants with text_elements byte ranges", "fallback": "Keep plain text input; offer no @ or $ picker." }
       }
     },
     "dsh": {
@@ -56,7 +62,10 @@
         "delegatedWork": { "available": true, "mode": "native", "source": "base Bundle subagent packages and Session parent lineage", "fallback": "Render native Session lineage only; never mirror Agent Team tasks." },
         "replay": { "available": true, "mode": "native", "source": "append-only Session log, history pagination and Session projections", "fallback": "Stop association recovery if registered projection replay fails." },
         "interruption": { "available": true, "mode": "native", "source": "ISession.cancel and subagent interrupt", "fallback": "Show cancellation unavailable and do not claim stopped." },
-        "livePresence": { "available": true, "mode": "adapted", "source": "SessionSummary running and pendingInteraction", "fallback": "Show no live state; replay never mints presence." }
+        "livePresence": { "available": true, "mode": "adapted", "source": "SessionSummary running and pendingInteraction", "fallback": "Show no live state; replay never mints presence." },
+        "settings": { "available": false, "mode": "unsupported", "source": "No pinned rc.8 seam lists models or efforts or overrides a Session's posture per prompt; prompts go through ISession.prompt with the Session's own configuration", "fallback": "Show no model, effort or posture control; the Session configuration stays native." },
+        "compaction": { "available": false, "mode": "unsupported", "source": "No pinned rc.8 seam reports token usage or starts a context compaction", "fallback": "Show no context indicator and no Compact action." },
+        "mentions": { "available": false, "mode": "unsupported", "source": "PromptContentPart in rc.8 accepts text or image only and no file or skill discovery seam is pinned", "fallback": "Keep plain text input; offer no @ or $ picker." }
       }
     }
   }

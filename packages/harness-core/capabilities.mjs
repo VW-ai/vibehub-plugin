@@ -12,9 +12,25 @@ const ACTION_CAPABILITY = Object.freeze({
   "chat.sendAttachments": "attachments",
   "chat.sendAudio": "audio",
   "chat.interrupt": "interruption",
+  "chat.listModels": "settings",
+  "chat.compact": "compaction",
+  "chat.searchFiles": "mentions",
+  "chat.listSkills": "mentions",
   "interaction.resolveApproval": "approvals",
   "task.start": "replay",
 });
+
+// Per-Turn settings overrides ride on chat.send*; they need the settings
+// capability on top of the action's own.
+const TURN_SETTING_KEYS = Object.freeze(["model", "effort", "approvalPolicy", "sandboxPolicy"]);
+
+export function capabilitiesForInput(action, input) {
+  const required = [capabilityForAction(action)];
+  if (action.startsWith("chat.send") && TURN_SETTING_KEYS.some((key) => input?.settings?.[key] !== undefined && input.settings[key] !== null)) {
+    required.push("settings");
+  }
+  return required;
+}
 
 function deepFreeze(value) {
   if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;

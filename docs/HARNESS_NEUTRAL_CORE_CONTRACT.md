@@ -47,7 +47,9 @@ Outcome from runtime completion.
 [`capabilities.v1.json`](proposals/harness-neutral-core/capabilities.v1.json)
 is the machine-readable negotiation contract. It covers Projects, fork,
 search, audio, attachments, approvals, tools, plans, delegated work, replay,
-interruption, and live presence.
+interruption, live presence, settings (model and effort catalog, effective
+posture, per-Turn overrides), compaction (context usage and compact), and
+mentions (file and skill discovery for mention and skill inputs).
 
 Each value is one of:
 

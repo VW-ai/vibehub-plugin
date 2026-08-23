@@ -11,6 +11,10 @@ export function createFixtureClient({ prefix }) {
       if (method === "thread/list") return { data: [], nextCursor: null };
       if (method === "turn/start") return { turn: { id: `${prefix}-turn-${next++}` } };
       if (method === "turn/interrupt") return {};
+      if (method === "model/list") return { data: [], nextCursor: null };
+      if (method === "thread/compact/start") return {};
+      if (method === "fuzzyFileSearch") return { files: [] };
+      if (method === "skills/list") return { data: [] };
       throw new Error(`fixture does not implement ${method}`);
     },
     respond(id, result) {

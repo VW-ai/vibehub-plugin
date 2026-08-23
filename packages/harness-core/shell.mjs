@@ -39,6 +39,18 @@ export function createSharedHarnessShell({ adapter, associations }) {
     interruptChat(input) {
       return dispatch("chat.interrupt", input);
     },
+    listModels(input = {}) {
+      return dispatch("chat.listModels", input);
+    },
+    compactChat(input) {
+      return dispatch("chat.compact", input);
+    },
+    searchFiles(input) {
+      return dispatch("chat.searchFiles", input);
+    },
+    listSkills(input) {
+      return dispatch("chat.listSkills", input);
+    },
     resolveInteraction(input) {
       return dispatch("interaction.resolveApproval", input);
     },
