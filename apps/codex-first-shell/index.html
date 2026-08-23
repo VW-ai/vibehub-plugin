@@ -180,6 +180,12 @@
     <footer><span id="rememberWrite">Writes one active Context document into the chosen Room, uncommitted. Git review activates it; no Room is ever created.</span><div><button type="button" id="cancelRemember">Cancel</button><button class="primary-button" type="submit" form="rememberForm" id="confirmRemember" disabled>Remember</button></div></footer>
   </section>
 
+  <section class="bridge-dialog confirm-dialog" id="fullAccessDialog" role="alertdialog" aria-modal="true" aria-labelledby="fullAccessTitle" aria-describedby="fullAccessBody" hidden inert>
+    <header><div><small>PERMISSIONS · NEXT TURN</small><h2 id="fullAccessTitle">Allow full access?</h2></div><button type="button" id="closeFullAccess">Close</button></header>
+    <p class="bridge-intro" id="fullAccessBody">Full access sends <code>approvalPolicy: never</code> and <code>sandboxPolicy: dangerFullAccess</code> with the next Turn of this Chat: Codex runs commands and edits files without asking and outside the workspace sandbox, for that Turn and the Turns after it, until you switch back to Ask for approval. Nothing changes until that Turn starts.</p>
+    <footer><span>Applies to the next Turn of this Chat.</span><div><button type="button" id="cancelFullAccess">Keep asking for approval</button><button class="primary-button danger-button" type="button" id="confirmFullAccess">Allow full access</button></div></footer>
+  </section>
+
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
   <div class="selection-sheet" id="selectionSheet" role="toolbar" aria-label="Selected passage actions" hidden>
     <button class="quote-selection" id="quoteSelection" type="button">Add to chat</button>

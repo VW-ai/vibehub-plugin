@@ -569,6 +569,7 @@ const assets = new Map([
   ["/composer-attachments.mjs", script("composer-attachments.mjs")],
   ["/composer-mentions.mjs", script("composer-mentions.mjs")],
   ["/context-usage.mjs", script("context-usage.mjs")],
+  ["/thread-name.mjs", script("thread-name.mjs")],
   ["/chat-fixtures.json", fixture("chat-fixtures.json")],
   ["/chat-conformance-fixtures.json", fixture("chat-conformance-fixtures.json")],
   ["/task-fixtures.json", fixture("task-fixtures.json")],

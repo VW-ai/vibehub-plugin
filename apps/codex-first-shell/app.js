@@ -1,8 +1,9 @@
 import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, rememberThreadSettings, threadQueue, threadSettings, threadTokenUsage, timelineWindow } from "./chat-model.mjs";
-import { describeTurnSettings, effortOptionLabel, findModel, imageRefusal, modelOptionLabel, pendingOverrides, selectedEffort, selectedModel } from "./composer-settings.mjs";
+import { describePosture, describeTurnSettings, effortOptionLabel, findModel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "./composer-settings.mjs";
 import { acceptAttachment, attachmentKind, imageFilesFrom, MAX_ATTACHMENT_BYTES, renderAttachmentChips } from "./composer-attachments.mjs";
 import { activeTrigger, chipsFromItems, composeTextElements, insertPlaceholder, placeholderFor, removePlaceholder } from "./composer-mentions.mjs";
 import { compactDisabledReason, contextUsage } from "./context-usage.mjs";
+import { renameThreadRecord } from "./thread-name.mjs";
 import { emptyQueue, pausedMessage, queuedMediaSummary, queuedText, replaceQueuedText } from "./composer-queue.mjs";
 import {
   DOM_LIMITS,
@@ -112,6 +113,11 @@ const state = {
   // the skills catalog as listSkills returned it, read once per session.
   mentions: [],
   skills: null,
+  // The inline rename in progress, if any: the Thread and where it was opened.
+  renaming: null,
+  // The Permissions control's pending full-access confirmation: the Thread
+  // it was asked for and the control to return focus to.
+  fullAccess: null,
 };
 
 // The mention picker: `@` searches files through the host (debounced), `$`
@@ -465,14 +471,109 @@ function threadButton(thread) {
   const badge = thread.taskLink
     ? "<em>TASK</em>"
     : born.size ? `<em data-born-tasks="${born.size}" title="${born.size} Task${born.size === 1 ? "" : "s"} born from or attached to this Chat">${born.size} TASK${born.size === 1 ? "" : "S"}</em>` : "";
-  return `<button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
+  if (state.renaming?.threadId === thread.id && state.renaming.where === "sidebar") return `<div class="thread-row renaming" data-thread-row="${escapeHtml(thread.id)}">${renameFormMarkup(thread, "sidebar")}</div>`;
+  return `<div class="thread-row" data-thread-row="${escapeHtml(thread.id)}"><button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
     <i class="thread-state${runtimeActive ? " active" : ""}"></i>
     <span><strong>${escapeHtml(titleForThread(thread))}</strong><small>${escapeHtml(thread.taskLink ? "VibeHub Task · Codex Thread" : (thread.preview || "Codex Thread").slice(0, 54))}</small></span>
     ${badge}
-  </button>`;
+  </button><button class="thread-rename" type="button" data-rename-thread="${escapeHtml(thread.id)}" data-rename-where="sidebar" aria-label="Rename chat ${escapeHtml(titleForThread(thread))}" title="Rename chat">✎</button></div>`;
+}
+
+// --- Inline rename --------------------------------------------------------
+// The header and the sidebar row rename through the existing setThreadName
+// host action (thread/name/set); the runtime's thread/name/updated then
+// renames every surface without a refresh.
+
+function renameFormMarkup(thread, where) {
+  const value = state.renaming?.draft ?? thread.name ?? titleForThread(thread);
+  return `<form class="rename-form" data-rename-form="${escapeHtml(thread.id)}" data-rename-where="${escapeHtml(where)}"><input type="text" aria-label="Chat name" maxlength="160" autocomplete="off" value="${escapeHtml(value)}" required><button type="submit">Save</button><button type="button" data-cancel-rename="${escapeHtml(thread.id)}">Cancel</button></form>`;
+}
+
+// A re-render while a rename is typed (the sidebar refreshes on a poll, the
+// Chat re-reads on a Turn) keeps the typed draft and the caret.
+function withRenameFocus(render) {
+  const before = document.activeElement?.closest?.("[data-rename-form]") ? document.activeElement : null;
+  const caret = before ? [before.selectionStart, before.selectionEnd] : null;
+  render();
+  if (!before || !state.renaming) return;
+  const input = $(`[data-rename-form="${CSS.escape(state.renaming.threadId)}"][data-rename-where="${state.renaming.where}"] input`);
+  if (!input) return;
+  input.focus({ preventScroll: true });
+  if (caret) input.setSelectionRange(Math.min(caret[0], input.value.length), Math.min(caret[1], input.value.length));
+}
+
+function beginRename(threadId, where) {
+  const thread = state.threads.find((entry) => entry.id === threadId) ?? (state.activeThread?.id === threadId ? state.activeThread : null);
+  if (!thread) return;
+  state.renaming = { threadId, where };
+  if (where === "sidebar") updateSidebar();
+  else renderThreadTitle();
+  const input = $(`[data-rename-form="${CSS.escape(threadId)}"][data-rename-where="${where}"] input`);
+  input?.focus();
+  input?.select();
+}
+
+function endRename({ restore = true } = {}) {
+  const renaming = state.renaming;
+  if (!renaming) return;
+  state.renaming = null;
+  if (renaming.where === "sidebar") updateSidebar();
+  else renderThreadTitle();
+  if (restore) $(`[data-rename-thread="${CSS.escape(renaming.threadId)}"][data-rename-where="${renaming.where}"]`)?.focus({ preventScroll: true });
+}
+
+async function submitRename(form) {
+  const threadId = form.dataset.renameForm;
+  const name = form.querySelector("input").value.trim();
+  if (!name) { notify("A chat name cannot be empty."); return; }
+  try {
+    const result = await action({ action: "setThreadName", threadId, name });
+    // The host answered with the name it set; thread/name/updated follows
+    // in the event feed and is applied the same way.
+    applyThreadName(result.threadId ?? threadId, result.name ?? name);
+    endRename();
+    notify("Chat renamed.");
+  } catch (error) { notify(error.message); }
+}
+
+// thread/name/updated { threadId, threadName } and the setThreadName
+// response both land here: the list entry, the open Chat and every surface
+// that shows the name follow, with no bootstrap refresh.
+function applyThreadName(threadId, threadName) {
+  let changed = false;
+  for (const thread of [...state.threads, ...state.pinned, ...state.recents, ...state.projects.flatMap((project) => project.threads ?? [])]) {
+    if (thread.id !== threadId) continue;
+    Object.assign(thread, renameThreadRecord(thread, threadName));
+    changed = true;
+  }
+  if (state.activeThread?.id === threadId) {
+    state.activeThread = renameThreadRecord(state.activeThread, threadName);
+    changed = true;
+    renderThreadTitle();
+  }
+  if (changed) updateSidebar();
+  return changed;
+}
+
+// The Chat header's title block: the name with its Rename control, or the
+// inline form while renaming there; the route title follows.
+function renderThreadTitle() {
+  const block = $("#threadTitleBlock");
+  if (!block || !state.activeThread) return;
+  const thread = state.activeThread;
+  withRenameFocus(() => {
+    block.innerHTML = state.renaming?.threadId === thread.id && state.renaming.where === "header"
+      ? renameFormMarkup(thread, "header")
+      : `<h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(thread))}</h1><button class="thread-rename" type="button" data-rename-thread="${escapeHtml(thread.id)}" data-rename-where="header" aria-label="Rename chat" title="Rename chat"${state.fixtureMode ? " disabled" : ""}>Rename</button>`;
+  });
+  if (state.route === "chat") setRouteHeader(titleForThread(thread), `${state.fixtureMode ? "Review fixture · not runtime history" : `Thread ${thread.id.slice(0, 8)}…`} · ${state.bootstrap?.graph.project.name}`);
 }
 
 function updateSidebar() {
+  withRenameFocus(renderSidebar);
+}
+
+function renderSidebar() {
   const list = $("#threadList");
   sidebarTasksByThread = tasksByThread();
   const focused = sidebar.contains(document.activeElement)
@@ -600,6 +701,7 @@ function syncComposerMode() {
       : "Codex can make mistakes. Review commands and changes.";
   renderQueue();
   renderComposerSettings();
+  renderPosture();
 }
 
 function runtimeLabel() {
@@ -635,7 +737,7 @@ const BRIDGE_DIALOG_IDS = ["createTaskDialog", "attachTaskDialog", "rememberDial
 const openBridgeDialog = () => BRIDGE_DIALOG_IDS.map((id) => $(`#${id}`)).find((dialog) => dialog && !dialog.hidden) ?? null;
 
 function syncScrim() {
-  const overlayOpen = !$("#searchDialog").hidden || !$("#inboxPanel").hidden || !$("#reviewPanel").hidden || !$("#importDialog").hidden || Boolean(openBridgeDialog());
+  const overlayOpen = !$("#searchDialog").hidden || !$("#inboxPanel").hidden || !$("#reviewPanel").hidden || !$("#importDialog").hidden || !$("#fullAccessDialog").hidden || Boolean(openBridgeDialog());
   const mobileNavigationOpen = appShell.classList.contains("sidebar-open") && isNarrowLayout();
   $("#scrim").hidden = !overlayOpen && !mobileNavigationOpen;
   appShell.inert = overlayOpen;
@@ -1010,7 +1112,7 @@ function turnPostureMarkup(turnId) {
   if (!line) return "";
   const overridden = turn._overrides?.length ? ` · sent ${turn._overrides.join(", ")}` : "";
   const source = turn._source ? ` · reported by ${turn._source}` : "";
-  return `<small class="turn-posture" data-turn-posture="${escapeHtml(turnId)}" title="Model, effort, approval policy and sandbox this Turn was sent with">${escapeHtml(line)}${escapeHtml(overridden)}${escapeHtml(source)}</small>`;
+  return `<small class="turn-posture" data-turn-settings="${escapeHtml(turnId)}" title="Model, effort, approval policy and sandbox this Turn was sent with">${escapeHtml(line)}${escapeHtml(overridden)}${escapeHtml(source)}</small>`;
 }
 
 function renderItem(item, budget, { posture = "" } = {}) {
@@ -1321,10 +1423,12 @@ function renderChat({ preserveScroll = false } = {}) {
       : state.running ? "Codex response updated." : "Codex response settled.";
   } else {
     captureRequestDrafts(surface);
-    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><h1 id="activeThreadTitle" tabindex="-1">${escapeHtml(titleForThread(state.activeThread))}</h1><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p><div class="thread-context" id="contextIndicator" data-state="unknown"></div></div><div class="thread-actions"><label><span class="sr-only">Move Chat to group</span><select id="activeThreadProject" aria-label="Move Chat to group">${projectOptions}</select></label><button type="button" data-compact-thread="${escapeHtml(state.activeThread.id)}" aria-label="Compact this chat's context" disabled>Compact</button><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
+    surface.innerHTML = `<div class="chat-view"><header class="thread-heading"><div><div class="thread-title-block" id="threadTitleBlock"></div><p>${escapeHtml(state.activeThread.cwd ?? state.bootstrap.graph.project.repositoryRoot)} · ${escapeHtml(state.activeThread.id)}${escapeHtml(lineage)}</p><p class="thread-posture" id="threadPosture" data-posture="unknown"></p><div class="thread-context" id="contextIndicator" data-state="unknown"></div></div><div class="thread-actions"><label><span class="sr-only">Move Chat to group</span><select id="activeThreadProject" aria-label="Move Chat to group">${projectOptions}</select></label><label><span class="sr-only">Permissions</span><select id="permissionsControl" aria-label="Permissions"></select></label><button type="button" data-compact-thread="${escapeHtml(state.activeThread.id)}" aria-label="Compact this chat's context" disabled>Compact</button><button type="button" data-fork-thread="${escapeHtml(state.activeThread.id)}" aria-label="Fork this chat" title="Fork this chat" ${state.fixtureMode || state.running ? "disabled" : ""}>Fork</button><button type="button" data-archive-thread="${escapeHtml(state.activeThread.id)}">Archive</button></div></header><div class="transcript" id="turns">${turnsMarkup(state.activeThread)}</div><div id="streamAnchor"></div></div>`;
     restoreRequestDrafts(surface);
+    renderThreadTitle();
   }
   renderContextIndicator();
+  renderPosture();
   requestAnimationFrame(() => {
     if (selecting) surface.scrollTop = heldScrollTop;
     else if (!preserveScroll || distanceFromBottom < 96) surface.scrollTop = surface.scrollHeight;
@@ -2118,7 +2222,7 @@ function rememberSettingsRecord(threadId, record) {
   for (const name of Object.keys(overrides)) if (name in pending) kept[name] = overrides[name];
   state.settingsOverrides.delete(overrideKey(threadId));
   if (Object.keys(kept).length) state.settingsOverrides.set(overrideKey(threadId), kept);
-  if (threadId === state.activeThreadId) renderComposerSettings();
+  if (threadId === state.activeThreadId) { renderComposerSettings(); renderPosture(); }
 }
 
 async function loadModels({ force = false } = {}) {
@@ -2228,6 +2332,70 @@ function chooseModel(slug) {
 function chooseEffort(effort) {
   setOverrides({ effort: effort || null });
   renderComposerSettings();
+}
+
+// --- Approval posture -------------------------------------------------------
+// The header shows the approval policy and sandbox the runtime reported for
+// this Thread (the settings record); the Permissions control switches between
+// the two contract postures for the next Turn, with a confirmation before
+// full access. Nothing changes until that turn/start carries the keys.
+
+function renderPosture() {
+  const line = $("#threadPosture");
+  const control = $("#permissionsControl");
+  if (!line || !control || !state.activeThread) return;
+  const record = threadSettingsRecord(state.activeThreadId);
+  const overrides = overridesFor();
+  const reported = postureOf(record);
+  const pending = pendingOverrides(record, overrides);
+  const pendingPosture = pending?.approvalPolicy || pending?.sandboxPolicy ? postureOf({ approvalPolicy: pending.approvalPolicy ?? record?.approvalPolicy, sandboxPolicy: pending.sandboxPolicy ?? record?.sandboxPolicy }) : null;
+  line.dataset.posture = reported ?? "unknown";
+  line.dataset.pending = pendingPosture ?? "";
+  const current = record && reported ? `Approval <strong>${escapeHtml(record.approvalPolicy ?? "not reported")}</strong> · Sandbox <strong>${escapeHtml(record.sandboxPolicy?.type ?? "not reported")}</strong> · reported by ${escapeHtml(record.source)}` : "Approval posture not reported for this Chat yet";
+  const next = pendingPosture ? ` · next Turn sends <strong>${escapeHtml(POSTURE_LABELS[pendingPosture] ?? describePosture(pending))}</strong> (${escapeHtml(describePosture({ approvalPolicy: pending.approvalPolicy ?? record?.approvalPolicy, sandboxPolicy: pending.sandboxPolicy ?? record?.sandboxPolicy }))})` : "";
+  line.innerHTML = `${current}${next}`;
+  const shown = pendingPosture ?? reported;
+  const options = Object.entries(POSTURE_LABELS).map(([value, label]) => ({ value, label }));
+  if (!shown || shown === "other") options.unshift({ value: "", label: reported === "other" ? describePosture(record) : "Not reported", disabled: true });
+  replaceOptions(control, options, shown && shown !== "other" ? shown : "");
+  control.disabled = state.fixtureMode || $("#composerInput").disabled;
+  control.title = pendingPosture ? "Applies to the next Turn" : "Sent as approvalPolicy and sandboxPolicy on the next Turn";
+}
+
+function choosePosture(value, control) {
+  if (value === "fullAccess") {
+    openFullAccessDialog(control);
+    return;
+  }
+  if (value === "askForApproval") setOverrides({ ...POSTURES.askForApproval });
+  renderPosture();
+  renderComposerSettings();
+}
+
+function openFullAccessDialog(control) {
+  closeSearch(false);
+  closeInbox(false);
+  closeImport(false);
+  state.fullAccess = { threadId: state.activeThreadId, returnTo: control };
+  const dialog = $("#fullAccessDialog");
+  dialog.hidden = false;
+  dialog.inert = false;
+  syncScrim();
+  requestAnimationFrame(() => $("#cancelFullAccess").focus());
+}
+
+function closeFullAccessDialog({ confirmed = false, restore = true } = {}) {
+  const dialog = $("#fullAccessDialog");
+  if (dialog.hidden) return;
+  const request = state.fullAccess;
+  state.fullAccess = null;
+  dialog.hidden = true;
+  dialog.inert = true;
+  if (confirmed && request?.threadId) setOverrides({ ...POSTURES.fullAccess }, request.threadId);
+  renderPosture();
+  renderComposerSettings();
+  syncScrim();
+  if (restore) (request?.returnTo?.isConnected ? request.returnTo : $("#permissionsControl"))?.focus?.({ preventScroll: true });
 }
 
 // --- Context use and compaction ---------------------------------------------
@@ -2603,6 +2771,10 @@ async function applyEventWindow(data) {
     if (method === "serverRequest/resolved") refreshRequests = true;
     // Per-Thread records the runtime reports for any Thread, listed or not:
     // the settings after a Turn carried overrides, and the token usage.
+    if (method === "thread/name/updated") {
+      if (typeof params.threadId === "string") applyThreadName(params.threadId, params.threadName ?? null);
+      continue;
+    }
     if (method === "thread/settings/updated" || method === "thread/tokenUsage/updated") {
       applyChatEvent(state, method, params);
       if (method === "thread/settings/updated" && threadSettings(state, params.threadId)) rememberSettingsRecord(params.threadId, threadSettings(state, params.threadId));
@@ -2631,7 +2803,7 @@ async function applyEventWindow(data) {
   if (data.runtimeHalt) haltRaised = applyRuntimeHalt(data.runtimeHalt) || haltRaised;
   setRuntimePosture({ alive: data.runtimeAlive, generation: data.runtimeGeneration, state: state.bootstrap?.stop ? "halted" : data.runtimeState ?? (data.runtimeAlive ? "alive" : "exited") });
   if (queueDirty) renderQueue();
-  if (settingsDirty) renderComposerSettings();
+  if (settingsDirty) { renderComposerSettings(); renderPosture(); }
   if (contextDirty) renderContextIndicator();
   if (refreshLists) await refreshThreads();
   if (reconcile && state.activeThreadId && state.runtimeAlive && !state.bootstrap?.stop) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
@@ -3202,6 +3374,9 @@ document.addEventListener("click", async (event) => {
   }
   const compactThread = event.target.closest("[data-compact-thread]");
   if (compactThread) { await compactActiveThread(compactThread); return; }
+  const renameThread = event.target.closest("[data-rename-thread]");
+  if (renameThread) { if (!renameThread.disabled) beginRename(renameThread.dataset.renameThread, renameThread.dataset.renameWhere ?? "header"); return; }
+  if (event.target.closest("[data-cancel-rename]")) { endRename(); return; }
   const archiveThread = event.target.closest("[data-archive-thread]");
   if (archiveThread) {
     try {
@@ -3357,6 +3532,8 @@ document.addEventListener("toggle", (event) => {
 document.addEventListener("submit", async (event) => {
   const queueEdit = event.target.closest("[data-queue-edit]");
   if (queueEdit) { event.preventDefault(); await saveQueueEdit(queueEdit); return; }
+  const renameForm = event.target.closest("[data-rename-form]");
+  if (renameForm) { event.preventDefault(); await submitRename(renameForm); return; }
   const form = event.target.closest("[data-request-form]");
   if (!form) return;
   event.preventDefault();
@@ -3372,6 +3549,7 @@ document.addEventListener("change", async (event) => {
   rememberRequestDraft(event.target);
   if (event.target.id === "modelPicker") { chooseModel(event.target.value); return; }
   if (event.target.id === "effortPicker") { chooseEffort(event.target.value); return; }
+  if (event.target.id === "permissionsControl") { choosePosture(event.target.value, event.target); return; }
   if (event.target.id === "activeThreadProject") {
     try {
       const projectId = event.target.value || null;
@@ -3406,6 +3584,9 @@ $("#confirmAttachTask").addEventListener("click", confirmAttachTask);
 $("#quoteIntoTask").addEventListener("click", quoteIntoTask);
 $("#rememberForm").addEventListener("submit", (event) => { event.preventDefault(); confirmRemember(); });
 $("#refreshThreads").addEventListener("click", async () => { await refreshThreads(); updateSidebar(); notify("Codex Chat history refreshed."); });
+$("#closeFullAccess").addEventListener("click", () => closeFullAccessDialog());
+$("#cancelFullAccess").addEventListener("click", () => closeFullAccessDialog());
+$("#confirmFullAccess").addEventListener("click", () => closeFullAccessDialog({ confirmed: true }));
 $("#searchButton").addEventListener("click", openSearch);
 $("#searchInput").addEventListener("input", () => { state.searchIndex = 0; runSearch(); });
 $("#inboxButton").addEventListener("click", openInbox);
@@ -3484,6 +3665,15 @@ $("#mentionPicker").addEventListener("click", (event) => {
   const option = event.target.closest("[data-mention-option]");
   if (option) chooseMention(Number(option.dataset.mentionOption));
 });
+// Inline rename: Escape cancels and returns focus to the Rename control.
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  const form = event.target.closest?.("[data-rename-form]");
+  if (!form) return;
+  event.preventDefault();
+  event.stopPropagation();
+  endRename();
+}, true);
 // Inline queue edit: Enter saves, Escape cancels and returns focus to Edit.
 $("#queueTray").addEventListener("keydown", (event) => {
   const form = event.target.closest?.("[data-queue-edit]");
@@ -3493,6 +3683,7 @@ $("#queueTray").addEventListener("keydown", (event) => {
 });
 $("#composerInput").addEventListener("input", () => { autoSizeComposer(); syncMentionPicker(); });
 document.addEventListener("input", (event) => {
+  if (state.renaming && event.target.closest?.("[data-rename-form]")) state.renaming.draft = event.target.value;
   const other = event.target.closest?.("[data-request-other]");
   if (other) {
     const radio = other.closest(".request-other")?.querySelector('input[type="radio"]');
@@ -3519,6 +3710,7 @@ $("#closeReview").addEventListener("click", () => { $("#reviewPanel").hidden = t
 $("#scrim").addEventListener("click", () => {
   if (!$("#searchDialog").hidden) closeSearch();
   else if (openBridgeDialog()) closeOpenBridgeDialog();
+  else if (!$("#fullAccessDialog").hidden) closeFullAccessDialog();
   else if (!$("#importDialog").hidden) closeImport();
   else if (!$("#inboxPanel").hidden) closeInbox();
   else if (!$("#reviewPanel").hidden) $("#closeReview").click();
@@ -3534,7 +3726,7 @@ $("#themeToggle").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  const modal = [$("#searchDialog"), $("#importDialog"), $("#inboxPanel"), $("#reviewPanel"), ...BRIDGE_DIALOG_IDS.map((id) => $(`#${id}`)), appShell.classList.contains("sidebar-open") ? sidebar : null].find((element) => element && !element.hidden && !element.inert);
+  const modal = [$("#searchDialog"), $("#importDialog"), $("#inboxPanel"), $("#reviewPanel"), ...BRIDGE_DIALOG_IDS.map((id) => $(`#${id}`)), $("#fullAccessDialog"), appShell.classList.contains("sidebar-open") ? sidebar : null].find((element) => element && !element.hidden && !element.inert);
   if (event.key === "Tab" && modal) {
     const focusable = $$("button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex='-1'])", modal).filter((element) => !element.hidden && element.getClientRects().length);
     if (focusable.length) {
@@ -3561,6 +3753,7 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     if (!$("#searchDialog").hidden) closeSearch();
     else if (openBridgeDialog()) closeOpenBridgeDialog();
+    else if (!$("#fullAccessDialog").hidden) closeFullAccessDialog();
     else if (!$("#importDialog").hidden) closeImport();
     else if (!$("#inboxPanel").hidden) closeInbox();
     else if (!$("#reviewPanel").hidden) $("#closeReview").click();

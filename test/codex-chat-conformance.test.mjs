@@ -4,6 +4,7 @@ import test from "node:test";
 
 import { applyChatEvent, applyHostEvent, applyTokenUsage, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, rememberQueue, rememberThreadSettings, settingsRecordFromNotification, threadQueue, threadSettings, threadTokenUsage, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
 import { compactDisabledReason, contextUsage } from "../apps/codex-first-shell/context-usage.mjs";
+import { renameThreadRecord, threadTitleFromName } from "../apps/codex-first-shell/thread-name.mjs";
 import { describePosture, describeTurnSettings, effortOptionLabel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "../apps/codex-first-shell/composer-settings.mjs";
 import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
 import { loadThreadDraft, MAX_DRAFT_ATTACHMENTS, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
@@ -376,6 +377,17 @@ test("context use follows thread/tokenUsage/updated alone and the contextCompact
   assert.equal(timeline.find((item) => item.id === "u1")._boundary, undefined);
 });
 
+test("thread/name/updated renames the Thread record the way the host titles it", () => {
+  assert.equal(threadTitleFromName("Named", "preview"), "Named");
+  assert.equal(threadTitleFromName(null, "first line\nsecond"), "first line");
+  assert.equal(threadTitleFromName("", `${"x".repeat(80)}`), "x".repeat(72), "the preview title is bounded like the host's");
+  assert.equal(threadTitleFromName(null, ""), "Untitled chat");
+  const thread = { id: "t", name: null, preview: "preview line", title: "preview line", taskLink: null };
+  assert.deepEqual(renameThreadRecord(thread, "Renamed"), { ...thread, name: "Renamed", title: "Renamed" });
+  assert.deepEqual(renameThreadRecord({ ...thread, name: "Renamed", title: "Renamed" }, null), { ...thread, name: null, title: "preview line" }, "a null threadName clears the name and the title falls back to the preview");
+  assert.deepEqual(renameThreadRecord(thread, 42), { ...thread, name: "42", title: "42" });
+});
+
 test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {
   const drafts = new Map();
   saveThreadDraft(drafts, "thread-a", { text: "draft A", quote: { threadId: "thread-a", turnId: "turn-a", itemId: "item-a" }, attachments: [{ type: "image", url: "data:image/png;base64,AA==" }] });
@@ -717,7 +729,7 @@ test("conformance matrix proof entries resolve to existing files, exact tests an
     assert.equal(check.after, "deferred", `${id} stays deferred`);
     assert.ok(check.proof.some((entry) => entry.includes("::")), `${id} pins that the UI makes no contrary claim`);
   }
-  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 27, partial: 0, deferred: 2, fail: 0 });
+  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 28, partial: 0, deferred: 2, fail: 0 });
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {

@@ -540,7 +540,7 @@ export async function runBrowserInteractionGuard(hooks) {
     const labelled = structuredClone(fixture.secondaryThread);
     labelled.turns.push({ id: "guard-picker-turn", status: "completed", items: [{ type: "userMessage", id: "guard-picker-user", content: [{ type: "text", text: "Use the text model" }] }] });
     await hooks.reconcileFixtureThread(labelled);
-    const postureLine = document.querySelector('[data-turn-posture="guard-picker-turn"]');
+    const postureLine = document.querySelector('[data-turn-settings="guard-picker-turn"]');
     check(results, "picked model and effort travel as turn/start settings and label the Turn", start?.settings?.model === "guard-text" && start.settings.effort === "medium" && Object.keys(start.settings).sort().join(",") === "effort,model" && sentLine.includes("next Turn sends model guard-text, effort medium") && postureLine?.textContent.startsWith("Guard Text Only · medium") && postureLine.textContent.includes("sent model, effort"), `${JSON.stringify(start?.settings ?? null)} · ${postureLine?.textContent ?? "no posture line"}`);
   }); } catch (error) { check(results, "picker checks completed", false, `threw: ${error?.message ?? error}`); }
   await hooks.resetModels();
@@ -729,6 +729,141 @@ export async function runBrowserInteractionGuard(hooks) {
       check(results, "a 409 turn_live refusal of compactThread is shown in the host's own words", refusedActions.some((entry) => entry.action === "compactThread") && document.querySelector("#toast").textContent.includes("A Turn is still running in this Thread (fixture-active-turn); compaction would replace it."), document.querySelector("#toast").textContent);
     });
   } catch (error) { check(results, "context and compaction checks completed", false, `threw: ${error?.message ?? error}`); }
+  await hooks.switchFixtureThread(fixture.thread);
+
+  // --- Approval posture and the Permissions control --------------------------
+  // The header shows the approval policy and sandbox the runtime reported;
+  // Full access needs a confirmation (a contained alertdialog that traps Tab,
+  // closes on Escape and restores focus to the control) and then travels as
+  // the exact posture keys on the next turn/start, shown on that Turn.
+  const postureLine = () => document.querySelector("#threadPosture");
+  const permissions = () => document.querySelector("#permissionsControl");
+  const fullAccessDialog = document.querySelector("#fullAccessDialog");
+  const postureActions = [];
+  try { await hooks.withFixtureTransport(async (payload) => {
+    postureActions.push(payload);
+    if (payload.action === "startTurn") return { turn: { id: "guard-posture-turn" }, settings: null };
+    if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+    return {};
+  }, async () => {
+    const unknown = { posture: postureLine()?.dataset.posture, text: postureLine()?.textContent, value: permissions()?.value, options: [...(permissions()?.options ?? [])].map((option) => `${option.value}=${option.text}${option.disabled ? " (disabled)" : ""}`) };
+    await hooks.applyEventWindow({ events: [{ sequence: 41, kind: "notification", value: { method: "thread/settings/updated", params: { threadId: fixture.thread.id, threadSettings: { model: "guard-default", effort: "medium", approvalPolicy: "on-request", sandboxPolicy: { type: "workspaceWrite", networkAccess: false, writableRoots: [] } } } } }], cursor: 41, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
+    const reported = { posture: postureLine()?.dataset.posture, text: postureLine()?.textContent, value: permissions()?.value, options: [...(permissions()?.options ?? [])].map((option) => `${option.value}=${option.text}`) };
+    check(results, "the header shows the reported approval policy and sandbox and the Permissions control reads the same record",
+      unknown.posture === "unknown" && unknown.text === "Approval posture not reported for this Chat yet" && unknown.value === "" && unknown.options[0] === "=Not reported (disabled)"
+        && reported.posture === "askForApproval" && reported.text === "Approval on-request · Sandbox workspaceWrite · reported by thread/settings/updated" && reported.value === "askForApproval" && reported.options.join("|") === "askForApproval=Ask for approval|fullAccess=Full access",
+      `${unknown.text} → ${reported.text} · ${reported.value}`);
+
+    const control = permissions();
+    control.focus();
+    control.value = "fullAccess";
+    control.dispatchEvent(new Event("change", { bubbles: true }));
+    await frame();
+    const opened = !fullAccessDialog.hidden && !fullAccessDialog.inert && appShell.inert && fullAccessDialog.getAttribute("role") === "alertdialog" && fullAccessDialog.contains(document.activeElement);
+    const dialogFocusable = [...fullAccessDialog.querySelectorAll("button:not([disabled])")].filter((element) => element.getClientRects().length);
+    dialogFocusable.at(-1)?.focus();
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+    const trapped = document.activeElement === dialogFocusable[0];
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await frame();
+    const escaped = fullAccessDialog.hidden && fullAccessDialog.inert && !appShell.inert && document.activeElement === permissions() && permissions().value === "askForApproval" && postureLine().dataset.pending === "" && !postureActions.some((entry) => entry.action === "startTurn");
+    check(results, "Full access asks for confirmation in a contained alertdialog that traps Tab, closes on Escape and restores focus without changing the posture", opened && trapped && escaped, `open ${opened} · trap ${trapped} · escaped ${escaped} (${document.activeElement?.id})`);
+
+    permissions().value = "fullAccess";
+    permissions().dispatchEvent(new Event("change", { bubbles: true }));
+    await frame();
+    document.querySelector("#confirmFullAccess").click();
+    await frame();
+    const pending = { text: postureLine().textContent, pendingPosture: postureLine().dataset.pending, value: permissions().value, focus: document.activeElement === permissions() };
+    composerInput.value = "Run with full access";
+    document.querySelector("#composer").requestSubmit();
+    await waitFor(() => postureActions.some((entry) => entry.action === "readThread"));
+    const start = postureActions.find((entry) => entry.action === "startTurn");
+    const labelled = structuredClone(fixture.thread);
+    labelled.turns.push({ id: "guard-posture-turn", status: "completed", items: [{ type: "userMessage", id: "guard-posture-user", content: [{ type: "text", text: "Run with full access" }] }] });
+    await hooks.reconcileFixtureThread(labelled);
+    const turnLine = document.querySelector('[data-turn-settings="guard-posture-turn"]')?.textContent ?? "";
+    check(results, "a confirmed Full access travels as approvalPolicy never and sandboxPolicy dangerFullAccess on the next turn/start and labels that Turn",
+      pending.pendingPosture === "fullAccess" && pending.text.includes("next Turn sends Full access (never · dangerFullAccess)") && pending.value === "fullAccess" && pending.focus
+        && JSON.stringify(start?.settings) === JSON.stringify({ approvalPolicy: "never", sandboxPolicy: { type: "dangerFullAccess" } })
+        && turnLine.includes("never · dangerFullAccess") && turnLine.includes("sent approvalPolicy, sandboxPolicy"),
+      `${JSON.stringify(start?.settings ?? null)} · ${turnLine}`);
+    permissions().value = "askForApproval";
+    permissions().dispatchEvent(new Event("change", { bubbles: true }));
+  }); } catch (error) { check(results, "posture checks completed", false, `threw: ${error?.message ?? error}`); }
+  await hooks.switchFixtureThread(fixture.thread);
+
+  // --- Inline rename ----------------------------------------------------------
+  // The seeded real Thread renames from the header and from its Sidebar row
+  // through setThreadName (thread/name/set); thread/name/updated renames the
+  // header, the route title and the row with no bootstrap refresh.
+  const renameBootstrap = hooks.currentBootstrap();
+  const renameSeed = renameBootstrap?.threads.find((thread) => thread.title === "Bridge source chat") ?? null;
+  if (renameSeed) {
+    const renameActions = [];
+    try { await hooks.withFixtureTransport(async (payload) => {
+      const data = await hooks.hostAction(payload);
+      renameActions.push({ payload, data });
+      return data;
+    }, async () => {
+      const rowTitle = () => document.querySelector(`[data-thread-row="${CSS.escape(renameSeed.id)}"] .thread-button strong`)?.textContent ?? null;
+      const headerTitle = () => document.querySelector("#activeThreadTitle")?.textContent ?? null;
+      await hooks.openThread(renameSeed.id);
+      await frame();
+      const renameTrigger = document.querySelector('[data-rename-thread][data-rename-where="header"]');
+      renameTrigger.focus();
+      renameTrigger.click();
+      await frame();
+      const headerInput = document.querySelector('[data-rename-form][data-rename-where="header"] input');
+      const headerFormFocused = document.activeElement === headerInput && headerInput?.value === "Bridge source chat";
+      headerInput.value = "Guard renamed chat";
+      headerInput.dispatchEvent(new InputEvent("input", { bubbles: true }));
+      headerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      await frame();
+      const escapedRename = !document.querySelector("[data-rename-form]") && headerTitle() === "Bridge source chat" && document.activeElement === document.querySelector('[data-rename-thread][data-rename-where="header"]') && !renameActions.some((entry) => entry.payload.action === "setThreadName");
+      document.querySelector('[data-rename-thread][data-rename-where="header"]').click();
+      await frame();
+      const input = document.querySelector('[data-rename-form][data-rename-where="header"] input');
+      input.value = "Guard renamed chat";
+      input.dispatchEvent(new InputEvent("input", { bubbles: true }));
+      input.closest("form").requestSubmit();
+      await waitFor(() => headerTitle() === "Guard renamed chat" && rowTitle() === "Guard renamed chat", 90);
+      const setName = renameActions.find((entry) => entry.payload.action === "setThreadName");
+      const renamed = { header: headerTitle(), route: document.querySelector("#routeTitle").textContent, row: rowTitle(), focus: document.activeElement === document.querySelector('[data-rename-thread][data-rename-where="header"]') };
+      // thread/name/updated alone, no action and no bootstrap: the same
+      // handler renames every surface from the runtime's notification.
+      const actionsBefore = renameActions.length;
+      await hooks.applyEventWindow({ events: [{ sequence: 51, kind: "notification", value: { method: "thread/name/updated", params: { threadId: renameSeed.id, threadName: "Guard renamed by the runtime" } } }], cursor: 51, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: [] });
+      const fromRuntime = { header: headerTitle(), route: document.querySelector("#routeTitle").textContent, row: rowTitle(), noAction: renameActions.length === actionsBefore };
+      check(results, "header Rename sends setThreadName and thread/name/updated renames the header, route title and Sidebar row without a refresh",
+        headerFormFocused && escapedRename && setName?.payload.threadId === renameSeed.id && setName.payload.name === "Guard renamed chat" && setName.data.name === "Guard renamed chat"
+          && renamed.header === "Guard renamed chat" && renamed.route === "Guard renamed chat" && renamed.row === "Guard renamed chat" && renamed.focus
+          && fromRuntime.header === "Guard renamed by the runtime" && fromRuntime.route === "Guard renamed by the runtime" && fromRuntime.row === "Guard renamed by the runtime" && fromRuntime.noAction,
+        `${renamed.header}/${renamed.row} → ${fromRuntime.header}/${fromRuntime.row}`);
+
+      // The Sidebar row renames the same way, and restores the seeded name
+      // the later bridge checks look up.
+      openSidebar.click();
+      await frame();
+      const rowRename = document.querySelector(`[data-thread-row="${CSS.escape(renameSeed.id)}"] [data-rename-thread]`);
+      rowRename.focus();
+      rowRename.click();
+      await frame();
+      const rowInput = document.querySelector(`[data-rename-form="${CSS.escape(renameSeed.id)}"][data-rename-where="sidebar"] input`);
+      const rowFormFocused = document.activeElement === rowInput;
+      rowInput.value = "Bridge source chat";
+      rowInput.dispatchEvent(new InputEvent("input", { bubbles: true }));
+      rowInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      rowInput.closest("form").requestSubmit();
+      await waitFor(() => rowTitle() === "Bridge source chat" && headerTitle() === "Bridge source chat", 90);
+      const restored = (await hooks.hostAction({ action: "readThread", threadId: renameSeed.id })).thread.name;
+      check(results, "the Sidebar row renames inline through the same action and the runtime keeps the name", rowFormFocused && rowTitle() === "Bridge source chat" && headerTitle() === "Bridge source chat" && restored === "Bridge source chat" && renameActions.filter((entry) => entry.payload.action === "setThreadName").length === 2, `${rowTitle()} · runtime name ${restored}`);
+      if (narrowLayout()) closeSidebar.click();
+      await frame();
+    }); } catch (error) { check(results, "rename checks completed", false, `threw: ${error?.message ?? error}`); }
+  } else {
+    check(results, "rename checks need the seeded source Thread on the driver's shell", !new URLSearchParams(location.search).get("bridgeWrites"), "no seeded Thread: rename checks skipped");
+  }
   await hooks.switchFixtureThread(fixture.thread);
 
   // One Project, four scope states: the header, the Tasks gate, the Room

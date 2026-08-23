@@ -520,6 +520,38 @@ async function runQueueWalk(shell) {
     const usageAfter = calls().filter((call) => call.kind === "notification" && call.method === "thread/tokenUsage/updated" && call.params?.threadId === threadId).at(-1)?.params.tokenUsage;
     const compactRequests = calls().filter((call) => call.kind === "request" && call.method === "thread/compact/start" && call.params?.threadId === threadId).length;
     step("the context indicator carries the runtime's own token usage and Compact runs thread/compact/start as a boundary Turn", labelBefore === expectedBefore && compactRequests === 1 && usageAfter?.total.totalTokens < usageBefore?.total.totalTokens && labelAfter.includes(`${usageAfter?.total.totalTokens.toLocaleString("en-US")} of`) && !calls().some((call) => call.kind === "notification" && call.method === "thread/compacted"), `${labelBefore} → ${labelAfter} · ${compactRequests} thread/compact/start`);
+
+    // Rename and posture on the real host: thread/name/set then
+    // thread/name/updated rename every surface; Full access is confirmed,
+    // travels as the exact turn/start keys, and the runtime's
+    // thread/settings/updated becomes the header's reported posture.
+    await page.evaluate(`document.querySelector('[data-rename-thread][data-rename-where="header"]').click()`);
+    await page.evaluate(`(() => { const input = document.querySelector('[data-rename-form] input'); input.value = 'Walk renamed chat'; input.dispatchEvent(new InputEvent('input', { bubbles: true })); input.closest('form').requestSubmit(); })()`);
+    await page.waitFor(`document.querySelector('#activeThreadTitle')?.textContent === 'Walk renamed chat' && document.querySelector('#routeTitle').textContent === 'Walk renamed chat' && [...document.querySelectorAll('.thread-button strong')].some((n) => n.textContent === 'Walk renamed chat')`);
+    const nameCalls = calls().filter((call) => call.params?.threadId === threadId && ((call.kind === "request" && call.method === "thread/name/set") || (call.kind === "notification" && call.method === "thread/name/updated"))).map((call) => `${call.method}:${call.params.name ?? call.params.threadName}`);
+    step("header Rename runs thread/name/set and thread/name/updated renames the header, route title and Sidebar row", JSON.stringify(nameCalls) === JSON.stringify(["thread/name/set:Walk renamed chat", "thread/name/updated:Walk renamed chat"]), nameCalls.join(" → "));
+    const postureBefore = await page.evaluate(`document.querySelector('#threadPosture').textContent`);
+    await page.evaluate(`(() => { const control = document.querySelector('#permissionsControl'); control.value = 'fullAccess'; control.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    await page.waitFor(`!document.querySelector('#fullAccessDialog').hidden`);
+    await page.evaluate(`document.querySelector('#confirmFullAccess').click()`);
+    await page.waitFor(`document.querySelector('#threadPosture').dataset.pending === 'fullAccess'`);
+    await type("with full access");
+    await awaitApproval();
+    await page.waitFor(`document.querySelector('#threadPosture').textContent.includes('reported by thread/settings/updated')`);
+    const postureAfter = await page.evaluate(`document.querySelector('#threadPosture').textContent`);
+    const postureTurnLine = await page.evaluate(`[...document.querySelectorAll('[data-turn-settings]')].at(-1)?.textContent ?? ''`);
+    const postureStart = calls().filter((call) => call.kind === "request" && call.method === "turn/start" && call.params?.threadId === threadId).at(-1)?.params;
+    await accept();
+    await page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'idle'`, 30_000);
+    await page.evaluate(`(() => { const control = document.querySelector('#permissionsControl'); control.value = 'askForApproval'; control.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    await type("back to asking");
+    await awaitApproval();
+    const askStart = calls().filter((call) => call.kind === "request" && call.method === "turn/start" && call.params?.threadId === threadId).at(-1)?.params;
+    await accept();
+    await page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'idle'`, 30_000);
+    step("Full access is confirmed, travels as approvalPolicy never and sandboxPolicy dangerFullAccess, and the runtime's thread/settings/updated becomes the reported posture; Ask for approval switches back",
+      postureBefore === "Approval on-request · Sandbox workspaceWrite · reported by thread/start" && postureStart?.approvalPolicy === "never" && postureStart?.sandboxPolicy?.type === "dangerFullAccess" && postureAfter === "Approval never · Sandbox dangerFullAccess · reported by thread/settings/updated" && postureTurnLine.includes("never · dangerFullAccess") && askStart?.approvalPolicy === "on-request" && askStart?.sandboxPolicy?.type === "workspaceWrite",
+      `${postureBefore} → ${postureAfter} · turn ${JSON.stringify({ approvalPolicy: postureStart?.approvalPolicy, sandboxPolicy: postureStart?.sandboxPolicy })} then ${JSON.stringify({ approvalPolicy: askStart?.approvalPolicy, sandboxPolicy: askStart?.sandboxPolicy })} · Turn line: ${postureTurnLine}`);
     step("no console errors or uncaught exceptions", page.errors.length === 0, page.errors.join(" | "));
   } finally {
     chrome.close();

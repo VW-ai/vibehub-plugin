@@ -108,6 +108,34 @@ test("the context indicator reads thread/tokenUsage/updated only and Compact cal
   assert.match(contract.actions.compactThread.rules, /409 turn_live/);
 });
 
+test("inline rename uses setThreadName and thread/name/updated, and the Permissions control sends the contract postures after a confirmation", async () => {
+  const { html, script, contract } = await shellSources();
+  // Rename: header and Sidebar row forms, one host action, the notification applied the same way.
+  assert.match(script, /const result = await action\(\{ action: "setThreadName", threadId, name \}\);/);
+  assert.match(script, /applyThreadName\(result\.threadId \?\? threadId, result\.name \?\? name\);/);
+  assert.match(script, /if \(method === "thread\/name\/updated"\) \{\s*if \(typeof params\.threadId === "string"\) applyThreadName\(params\.threadId, params\.threadName \?\? null\);/);
+  assert.match(script, /data-rename-thread="\$\{escapeHtml\(thread\.id\)\}" data-rename-where="sidebar"/);
+  assert.match(script, /data-rename-thread="\$\{escapeHtml\(thread\.id\)\}" data-rename-where="header"/);
+  assert.match(script, /<form class="rename-form" data-rename-form=/);
+  assert.match(contract.actions.setThreadName.rules, /thread\/name\/updated \{ threadId, threadName \} follows/);
+  // Posture: the header reads the settings record, the control offers the two
+  // contract postures, full access is confirmed in an alertdialog first.
+  assert.match(script, /const reported = postureOf\(record\);/);
+  assert.match(script, /const options = Object\.entries\(POSTURE_LABELS\)\.map\(\(\[value, label\]\) => \(\{ value, label \}\)\);/);
+  assert.match(script, /if \(value === "fullAccess"\) \{\s*openFullAccessDialog\(control\);\s*return;\s*\}/);
+  assert.match(script, /if \(value === "askForApproval"\) setOverrides\(\{ \.\.\.POSTURES\.askForApproval \}\);/);
+  assert.match(script, /if \(confirmed && request\?\.threadId\) setOverrides\(\{ \.\.\.POSTURES\.fullAccess \}, request\.threadId\);/);
+  assert.match(html, /<section class="bridge-dialog confirm-dialog" id="fullAccessDialog" role="alertdialog" aria-modal="true" aria-labelledby="fullAccessTitle" aria-describedby="fullAccessBody" hidden inert>/);
+  assert.match(html, /<code>approvalPolicy: never<\/code> and <code>sandboxPolicy: dangerFullAccess<\/code>/, "the confirmation names the exact keys it will send");
+  assert.match(script, /\.\.\.BRIDGE_DIALOG_IDS\.map\(\(id\) => \$\(`#\$\{id\}`\)\), \$\("#fullAccessDialog"\), appShell/, "the confirmation joins the shared focus trap");
+  assert.match(script, /else if \(!\$\("#fullAccessDialog"\)\.hidden\) closeFullAccessDialog\(\);/, "Escape and the scrim close it");
+  assert.match(script, /!\$\("#fullAccessDialog"\)\.hidden \|\| Boolean\(openBridgeDialog\(\)\)/, "it raises the scrim and inerts the shell");
+  assert.match(script, /\(request\?\.returnTo\?\.isConnected \? request\.returnTo : \$\("#permissionsControl"\)\)\?\.focus\?\.\(\{ preventScroll: true \}\);/, "focus returns to the control");
+  const composerSettings = await source("apps/codex-first-shell/composer-settings.mjs");
+  const postures = JSON.parse(composerSettings.match(/export const POSTURES = Object\.freeze\((\{[^]*?\})\);\n/)[1].replace(/Object\.freeze\(/g, "").replace(/\)/g, "").replace(/(\w+):/g, '"$1":').replace(/,(\s*[}\]])/g, "$1"));
+  assert.deepEqual(postures, contract.turnSettings.posture, "the postures in source are the host contract's verbatim");
+});
+
 test("@ and $ mentions are picked from searchFiles and listSkills and sent as text_elements with mention and skill items", async () => {
   const { html, script, renderer, contract } = await shellSources();
   assert.match(html, /<div class="mention-picker" id="mentionPicker" role="listbox" aria-label="Mention suggestions" hidden><\/div>/);
