@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "purpose": "The exact host actions, responses and event-feed entries the production shell host (scripts/vh-codex-first-shell.mjs) exposes for the Codex daily-use parity gaps. The browser codes against these verbatim; every value comes from the app-server or from host session state, never from the browser.",
+  "transport": {
+    "actions": "POST /api/action with a JSON body { action, ...params }; success is { ok: true, data }, refusal is { ok: false, error: { code, message, ...details } } with the HTTP status named per action",
+    "events": "GET /api/events?after=<cursor>; host entries are { sequence, kind, value, observedAt }; app-server notifications arrive as kind notification with value { method, params } unchanged",
+    "bootstrap": "GET /api/bootstrap"
+  },
+  "bootstrap": {
+    "threads[].settings": "null until the runtime reported this Thread's settings, else { model, effort, approvalPolicy, sandboxPolicy, source, observedAt } (also on pinned[], recents[] and projects[].threads[])",
+    "queues": "[{ threadId, paused, pausedReason, lastError, limit, items: [{ queuedId, queuedAt, settings, starting, input }] }] for every Thread with queued follow-ups; media inputs elided as { type, elided: true, byteLength, detail? }",
+    "preferences": "{ notifications: { mode: always|unfocused|never, modes: [always, unfocused, never], transient: true } }; default unfocused, absent after a host restart"
+  },
+  "settingsRecord": {
+    "shape": "{ model: string|null, effort: string|null, approvalPolicy: untrusted|on-request|never|null, sandboxPolicy: SandboxPolicy|null, source: thread/start|thread/resume|thread/settings/updated, observedAt: ISO-8601 }",
+    "sources": "thread/start and thread/resume responses (model, reasoningEffort, approvalPolicy, sandbox); thread/settings/updated threadSettings (model, effort, approvalPolicy, sandboxPolicy)",
+    "delivery": "newThread.thread.settings, readThread.settings, startTurn.settings, every Thread record in bootstrap, and the forwarded thread/settings/updated notification; the host emits no event of its own for settings",
+    "runtimeTruth": "0.149.0 sends thread/settings/updated only when a turn/start or turn/steer carried overrides that changed the effective settings; a plain thread/start sends none"
+  },
+  "turnSettings": {
+    "shape": "{ model?: string (the Model.model slug, not Model.id), effort?: string (a supportedReasoningEfforts[].reasoningEffort of that model), approvalPolicy?: untrusted|on-request|never, sandboxPolicy?: { type: dangerFullAccess } | { type: readOnly, networkAccess?: boolean } | { type: workspaceWrite, networkAccess?: boolean, writableRoots?: string[], excludeSlashTmp?: boolean, excludeTmpdirEnvVar?: boolean } | { type: externalSandbox, networkAccess?: restricted|enabled } }",
+    "posture": { "askForApproval": { "approvalPolicy": "on-request", "sandboxPolicy": { "type": "workspaceWrite" } }, "fullAccess": { "approvalPolicy": "never", "sandboxPolicy": { "type": "dangerFullAccess" } } },
+    "effect": "sent as the exact turn/start keys; the app-server applies them to this Turn and subsequent Turns and answers with thread/settings/updated when they changed",
+    "refusal": "400 invalid_request naming settings.<key>"
+  },
+  "inputs": {
+    "bound": "1 to 16 items per Turn",
+    "variants": {
+      "text": "{ type: text, text: non-empty string, text_elements?: [{ byteRange: { start, end }, placeholder?: string }] } — each byteRange is a UTF-8 byte span inside text; with a placeholder, Buffer.byteLength(placeholder) must equal end - start and the bytes at the range must equal the placeholder; ranges must not overlap or cut a character",
+      "image": "{ type: image, url: data: URL of at most 12 MiB, detail?: auto|low|high|original }",
+      "audio": "{ type: audio, url: data: URL of at most 12 MiB }",
+      "skill": "{ type: skill, name: string (≤256), path: string (≤4096) } — from listSkills.skills[].name and .path",
+      "mention": "{ type: mention, name: string (≤256), path: string (≤4096) } — from searchFiles.files[].file_name and .absolutePath (or .path, root-relative)"
+    },
+    "never": "localImage and localAudio are never produced: a browser File carries no filesystem path",
+    "refusal": "400 invalid_request naming input[<index>].<field>"
+  },
+  "actions": {
+    "listModels": {
+      "request": "{ action: listModels }",
+      "response": "{ models: [{ id, model, displayName, description, isDefault, defaultReasoningEffort, supportedReasoningEfforts: [{ reasoningEffort, description }], inputModalities: [text|image|audio] }] }",
+      "rules": "hidden models are never listed; a record without inputModalities carries the pinned schema default [text, image]; send Model.model back as turnSettings.model"
+    },
+    "readThread": {
+      "request": "{ action: readThread, threadId }",
+      "response": "{ thread: thread/read Thread with turns, settings: settingsRecord|null }"
+    },
+    "startTurn": {
+      "request": "{ action: startTurn, threadId, input: inputs[], settings?: turnSettings } (model, effort, approvalPolicy, sandboxPolicy are also accepted at the top level)",
+      "response": "{ turn: turn/start Turn, settings: settingsRecord|null }",
+      "rules": "resumes a Thread not loaded into this process generation first; the host records the Turn as live"
+    },
+    "steerTurn": {
+      "request": "{ action: steerTurn, threadId, expectedTurnId, input: inputs[] }",
+      "response": "turn/steer result { turnId }",
+      "rules": "unchanged: the exact expectedTurnId, never the default while a Turn streams"
+    },
+    "queueTurn": {
+      "request": "{ action: queueTurn, threadId, input: inputs[], settings?: turnSettings }",
+      "response": "{ queuedId, started: null | { queuedId, turnId }, queue: queueRecord (full media) }",
+      "rules": "appends to the Thread's host-owned queue (409 queue_full beyond 20); when no Turn is live and the queue is not paused the head starts at once and started names its Turn"
+    },
+    "listQueue": { "request": "{ action: listQueue, threadId }", "response": "{ queue: queueRecord (full media) }", "rules": "served without the runtime" },
+    "updateQueued": { "request": "{ action: updateQueued, threadId, queuedId, input: inputs[], settings?: turnSettings|null }", "response": "{ queuedId, queue }", "rules": "settings omitted keeps the item's settings, null clears them; 409 queued_not_found, 409 queued_starting while the item's turn/start is in flight; served without the runtime" },
+    "deleteQueued": { "request": "{ action: deleteQueued, threadId, queuedId }", "response": "{ queuedId, queue }", "rules": "an emptied queue is never left paused; served without the runtime" },
+    "resumeQueue": { "request": "{ action: resumeQueue, threadId }", "response": "{ started: null | { queuedId, turnId }, queue }", "rules": "clears the pause; with no Turn live the head starts at once, otherwise after the live Turn's turn/completed" },
+    "steerQueued": { "request": "{ action: steerQueued, threadId, queuedId, expectedTurnId }", "response": "{ turnId, queuedId, queue }", "rules": "the queued input leaves the queue and steers the exact live Turn through turn/steer; a refused steer keeps it queued" },
+    "interruptTurn": { "request": "{ action: interruptTurn, threadId, turnId }", "response": "{ ...turn/interrupt result, queue: queueRecord (elided media) }", "rules": "pauses a non-empty queue with pausedReason interrupted" },
+    "compactThread": { "request": "{ action: compactThread, threadId }", "response": "{ threadId, compacting: true }", "rules": "409 turn_live { threadId, turnId } while a Turn is live (the host's record, then thread/read status active); the compaction runs as its own Turn whose contextCompaction item is the transcript boundary; thread/tokenUsage/updated follows" },
+    "searchFiles": { "request": "{ action: searchFiles, query, limit?: 1..20 }", "response": "{ query, root, limit, total, files: [{ root, path, file_name, match_type: file|directory, score, indices, absolutePath }] }", "rules": "fuzzyFileSearch rooted at the bound repository with a fresh cancellationToken per request; an empty query asks nothing; query ≤ 256 characters" },
+    "listSkills": { "request": "{ action: listSkills, forceReload?: boolean }", "response": "{ cwd, skills: [{ name, path, description, shortDescription, enabled, scope, cwd }], errors: [{ path, message, cwd }] }", "rules": "skills/list with cwds [repository]; disabled skills are listed with enabled false" },
+    "setNotificationPreference": { "request": "{ action: setNotificationPreference, mode: always|unfocused|never }", "response": "{ preferences }", "rules": "host memory only; served without the runtime; 400 for any other mode" },
+    "setThreadName": { "request": "{ action: setThreadName, threadId, name }", "response": "{ threadId, name }", "rules": "unchanged; thread/name/updated { threadId, threadName } follows in the event feed" }
+  },
+  "queueRecord": {
+    "shape": "{ threadId, paused: boolean, pausedReason: null|interrupted|turn_failed|runtime_exited|start_failed, lastError: null|{ queuedId, message, observedAt }, limit: 20, items: [{ queuedId, queuedAt, settings: turnSettings|null, starting: boolean, input }] }",
+    "lifecycle": "host-owned transient state per Thread, like pendingRequests: it survives browser route changes and reloads, and is lost on a host restart; never written to the browser or the repository",
+    "dequeue": "on turn/completed with status completed the host starts the head as its own turn/start with a Turn id the runtime mints, one at a time; status interrupted or failed pauses the queue; nothing is sent after turn/interrupt until resumeQueue",
+    "experimental": "thread/queue/* stays unpinned and unused"
+  },
+  "hostEvents": {
+    "queueChanged": "{ threadId, queue: queueRecord (elided media) } after every change, including automatic starts",
+    "queuedStarted": "{ threadId, queuedId, turnId } when a queued follow-up became its own Turn",
+    "queuedFailed": "{ threadId, queuedId, error } when its turn/start was refused; the item stays at the head and the queue is paused with pausedReason start_failed",
+    "clientAction": "{ action: compactThread|steerQueued|steerTurn|setNotificationPreference, ... } as for the existing actions"
+  },
+  "forwardedNotifications": {
+    "thread/settings/updated": "{ threadId, threadSettings: { model, effort, approvalPolicy, sandboxPolicy, ... } } — note effort, not reasoningEffort",
+    "thread/tokenUsage/updated": "{ threadId, turnId, tokenUsage: { total: { totalTokens, inputTokens, cachedInputTokens, outputTokens, reasoningOutputTokens }, last, modelContextWindow: number|null } } — inside a Turn before its turn/completed, and replayed on thread/resume; show no value before the first one and no percentage while modelContextWindow is null",
+    "thread/name/updated": "{ threadId, threadName: string|null } after thread/name/set",
+    "thread/compacted": "{ threadId, turnId } forwarded if ever sent; the 0.149.0 v2 path does not send it, the contextCompaction item does the work",
+    "turn/started, turn/completed": "unchanged; turn/completed for a Thread the sidebar does not list is the cue to refresh it"
+  }
+}

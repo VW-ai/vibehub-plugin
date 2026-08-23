@@ -564,3 +564,23 @@ test("the queue, settings and preference live in host memory only, with no store
   assert.doesNotMatch(host, /CODEX_FIXTURE/);
   assert.match(fixture, /deprecated thread\/compacted notification is not sent by the\s*\/\/\s*0\.149\.0 v2 path/);
 });
+
+test("the checked-in daily-use host contract names only actions, events and notifications the host implements", async () => {
+  const [host, contractText, lockText] = await Promise.all([
+    source("scripts/vh-codex-first-shell.mjs"),
+    source("docs/proposals/codex-chat-conformance/daily-use-host-contract.json"),
+    source("packages/codex-adapter/upstream-lock.json"),
+  ]);
+  const contract = JSON.parse(contractText);
+  const lock = JSON.parse(lockText);
+  for (const name of Object.keys(contract.actions)) assert.match(host, new RegExp(`payload\\.action === "${name}"`, "u"), `${name} is a host action`);
+  for (const kind of Object.keys(contract.hostEvents)) assert.match(host, new RegExp(`appendEvent\\("${kind}"`, "u"), `${kind} is a host event`);
+  for (const method of Object.keys(contract.forwardedNotifications)) {
+    for (const name of method.split(",").map((entry) => entry.trim())) assert.ok(lock.requiredNotifications.includes(name), `${name} is pinned`);
+  }
+  assert.match(contract.queueRecord.shape, /interrupted\|turn_failed\|runtime_exited\|start_failed/u);
+  for (const reason of ["interrupted", "turn_failed", "runtime_exited", "start_failed"]) assert.ok(host.includes(`"${reason}"`), reason);
+  assert.match(contract.turnSettings.shape, /Model\.model slug, not Model\.id/u);
+  assert.match(contract.inputs.never, /localImage and localAudio are never produced/u);
+  assert.equal(contract.bootstrap.preferences.includes("default unfocused"), true);
+});
