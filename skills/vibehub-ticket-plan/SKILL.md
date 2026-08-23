@@ -10,7 +10,7 @@ Split only at a real scheduling, dependency, retry, authority, or verification
 boundary.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
-Read `../contracts/acceptance-authority.md` before assigning acceptance
+Read `../vibehub-core/contracts/acceptance-authority.md` before assigning acceptance
 authority. Omit `authority` (or use `agent`) for independently checkable work;
 use `human` only for the exact criterion whose decision owner must be a person.
 When that decision gates independently schedulable downstream work, make the
@@ -19,10 +19,10 @@ implementation. Mark the dependent implementation `maturity: draft` when the
 decision determines its real acceptance; do not manufacture a firm downstream
 plan before the choice exists. Keep terminal human sign-off in the delivery
 Ticket when no downstream work needs a separate scheduling boundary.
-Read `../contracts/dependency-hygiene.json` before choosing `depends_on` versus
+Read `../vibehub-core/contracts/dependency-hygiene.json` before choosing `depends_on` versus
 `context_refs`; it is the single classification and preservation contract for
 new dependency edges.
-Read `../contracts/ticket-next-action.md`. This Skill owns plans reached through
+Read `../vibehub-core/contracts/ticket-next-action.md`. This Skill owns plans reached through
 `REFINE` and `REPLAN`; it preserves any non-success Outcome while revising the
 current contract for a later execution cycle.
 This Skill owns `plan-applied`, `execution-discovers-work`, and
@@ -52,7 +52,7 @@ is implied.
 2. Check Room alignment before planning:
 
    ```text
-   node ../scripts/vh.mjs room drift --repo <root>
+   node ../vibehub-core/scripts/vh.mjs room drift --repo <root>
    ```
 
    `cold_start:true` routes through `$vibehub-distill` first — the one
@@ -66,14 +66,14 @@ is implied.
 3. Read the current graph and any named Ticket:
 
    ```text
-   node ../scripts/vh.mjs ticket graph --repo <root>
-   node ../scripts/vh.mjs ticket get --repo <root> --input <id.json>
+   node ../vibehub-core/scripts/vh.mjs ticket graph --repo <root>
+   node ../vibehub-core/scripts/vh.mjs ticket get --repo <root> --input <id.json>
    ```
 
 4. Query Context only for facts that govern the deliverable or fill a real
    planning gap. The Ticket itself carries enough `context`, `context_refs`,
    constraints, and acceptance for a fresh Agent.
-5. Draft complete Ticket documents using `../contracts/ticket.schema.json`.
+5. Draft complete Ticket documents using `../vibehub-core/contracts/ticket.schema.json`.
    Write `maturity: firm` when acceptance is executable and `maturity: draft`
    when direction is known but acceptance is not; omitted maturity remains
    legacy-compatible firm, but new or rewritten Tickets state it explicitly.
@@ -91,7 +91,7 @@ is implied.
 7. Apply the unchanged passing batch:
 
    ```text
-   node ../scripts/vh.mjs ticket apply --repo <root> --input <tickets.json>
+   node ../vibehub-core/scripts/vh.mjs ticket apply --repo <root> --input <tickets.json>
    ```
 
    Read any structured `advice` in the success envelope. A completed-dependency
@@ -108,7 +108,7 @@ is implied.
 
 - Never edit around failed schema or graph validation.
 - Never add a second lifecycle, source-token protocol, lease, or hidden state.
-- Preserve the authority semantics in `../contracts/acceptance-authority.md`;
+- Preserve the authority semantics in `../vibehub-core/contracts/acceptance-authority.md`;
   never turn comments, Agent suggestions, or suggestive prose into human
   authority or human-origin Evidence.
 - Planning output stays inside

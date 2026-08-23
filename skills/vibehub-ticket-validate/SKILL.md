@@ -8,21 +8,21 @@ description: Independently validate a proposed or current lightweight VibeHub Ti
 Be independent and read-only. Do not rewrite or apply the candidate.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
-Read `../contracts/acceptance-authority.md` and verify that `human` appears only
+Read `../vibehub-core/contracts/acceptance-authority.md` and verify that `human` appears only
 on the exact acceptance criteria that genuinely reserve human judgment. Never
 infer or remove authority from criterion wording.
-Read `../contracts/dependency-hygiene.json` and use its exact classification
+Read `../vibehub-core/contracts/dependency-hygiene.json` and use its exact classification
 when reviewing proposed dependency edges. It is advice about planning truth,
 not another schema gate.
 This Skill owns `validation-needs-human`; an unapplied candidate cannot be
 projected as canonical UI state.
 
-1. Read `../contracts/ticket.schema.json` and the raw candidate.
+1. Read `../vibehub-core/contracts/ticket.schema.json` and the raw candidate.
 2. Run mechanical validation against a disposable copy or, for the current
    worktree, run:
 
    ```text
-   node ../scripts/vh.mjs ticket validate --repo <root>
+   node ../vibehub-core/scripts/vh.mjs ticket validate --repo <root>
    ```
 
    When disposable `ticket apply` returns structured dependency advice, report

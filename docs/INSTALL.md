@@ -55,7 +55,7 @@ After consent, setup creates only:
 and a small managed project-instruction block. Validate with:
 
 ```bash
-node <plugin>/skills/scripts/vh.mjs project validate --repo <repository>
+node <plugin>/skills/vibehub-core/scripts/vh.mjs project validate --repo <repository>
 ```
 
 ## Upgrade the plugin and project data
@@ -65,7 +65,7 @@ plugin bundle never writes `.vibehub/`. The installed helper first reports the
 repository compatibility state:
 
 ```bash
-node <plugin>/skills/scripts/vh.mjs project compatibility --repo <repository>
+node <plugin>/skills/vibehub-core/scripts/vh.mjs project compatibility --repo <repository>
 ```
 
 `CURRENT` permits normal work. `MIGRATION_REQUIRED` routes through
@@ -98,7 +98,7 @@ stays quiet. To open the graph explicitly as a fallback, ask the Agent to use
 `$vibehub-ticket-review` or launch the bundled helper:
 
 ```bash
-node <plugin>/skills/scripts/vh-ui.mjs --repo <repository>
+node <plugin>/skills/vibehub-core/scripts/vh-ui.mjs --repo <repository>
 ```
 
 The default command opens the complete short-lived URL in your normal system

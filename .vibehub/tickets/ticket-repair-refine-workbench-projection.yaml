@@ -38,7 +38,7 @@
     },
     {
       "purpose": "Mechanical projection that already emits REFINE and the complete human-attention package correctly.",
-      "ref": "skills/scripts/vh-ui.mjs"
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     },
     {
       "purpose": "Browser consumer whose state whitelist, summaries, handoff, and rendering require repair.",

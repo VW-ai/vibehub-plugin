@@ -28,11 +28,11 @@
     },
     {
       "purpose": "Current Evidence contract whose future revision depends on the policy decision.",
-      "ref": "skills/contracts/evidence.schema.json"
+      "ref": "skills/vibehub-core/contracts/evidence.schema.json"
     },
     {
       "purpose": "Current Outcome contract whose future revision depends on the policy decision.",
-      "ref": "skills/contracts/outcome.schema.json"
+      "ref": "skills/vibehub-core/contracts/outcome.schema.json"
     }
   ],
   "deliveries": [],

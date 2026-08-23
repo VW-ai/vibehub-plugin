@@ -40,7 +40,7 @@ function validateLifecycle(contract) {
   assert.equal(contract.presenter, "vibehub-ticket-review");
   assert.equal(
     contract.planning_contracts.dependency_hygiene,
-    "../../contracts/dependency-hygiene.json",
+    "../../vibehub-core/contracts/dependency-hygiene.json",
   );
   assert.equal(contract.resource_policy.scope, "current-agent-task");
   assert.equal(contract.resource_policy.reuse_live_host, true);

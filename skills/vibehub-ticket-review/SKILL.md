@@ -9,7 +9,7 @@ Read `references/ticket-lifecycle.json` before acting. This Skill owns
 `explicit-review` and is the sole presenter for every event whose
 `presentation` is `review`; semantic transition ownership remains with the
 calling Ticket Skill.
-Read `../contracts/ticket-next-action.md`. Present the host-derived next action
+Read `../vibehub-core/contracts/ticket-next-action.md`. Present the host-derived next action
 beside operational state and human attention; never infer it again from UI
 copy, Evidence counts, or browser state.
 
@@ -18,8 +18,8 @@ copy, Evidence counts, or browser state.
 Open the exact checkout in the dependency-free local UI:
 
 ```text
-node ../scripts/vh-ui.mjs --repo <root>
-node ../scripts/vh-ui.mjs --repo <root> --ticket <ticket-id> --view <execution|contract|log>
+node ../vibehub-core/scripts/vh-ui.mjs --repo <root>
+node ../vibehub-core/scripts/vh-ui.mjs --repo <root> --ticket <ticket-id> --view <execution|contract|log>
 ```
 
 The launcher binds an ephemeral loopback port, creates a short-lived bearer
@@ -60,10 +60,10 @@ closeout Agent; it is not a browser write or a model turn.
 When a browser is unavailable, read the same graph directly:
 
 ```text
-node ../scripts/vh.mjs ticket graph --repo <root>
-node ../scripts/vh.mjs ticket graph --repo <root> --scope all
-node ../scripts/vh.mjs ticket graph --repo <root> --delivery <canonical-ref> --room <room-slug>
-node ../scripts/vh.mjs ticket get --repo <root> --input <id.json>
+node ../vibehub-core/scripts/vh.mjs ticket graph --repo <root>
+node ../vibehub-core/scripts/vh.mjs ticket graph --repo <root> --scope all
+node ../vibehub-core/scripts/vh.mjs ticket graph --repo <root> --delivery <canonical-ref> --room <room-slug>
+node ../vibehub-core/scripts/vh.mjs ticket get --repo <root> --input <id.json>
 ```
 
 Present outcomes, READY/BLOCKED/DONE/DEVIATED state, derived next action,

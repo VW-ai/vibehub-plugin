@@ -48,7 +48,7 @@
     },
     {
       "purpose": "Current project format, archive derivation, compatibility gates, and shared graph projection.",
-      "ref": "skills/scripts/vh.mjs"
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
     },
     {
       "purpose": "Single source for explicit project-format upgrade steps.",

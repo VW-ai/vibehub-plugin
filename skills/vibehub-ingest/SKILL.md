@@ -18,17 +18,17 @@ checkpoint cadence.
 2. Query current Context first:
 
    ```text
-   node ../scripts/vh.mjs context query --repo <root> --input <query.json>
+   node ../vibehub-core/scripts/vh.mjs context query --repo <root> --input <query.json>
    ```
 
 3. Create one atomic document per claim using
-   `../contracts/context.schema.json`. Preserve the user's exact source ref and,
+   `../vibehub-core/contracts/context.schema.json`. Preserve the user's exact source ref and,
    when useful, a short exact quote. Every document needs readable evidence.
 4. Choose the owning room per the placement rule in
    `references/knowledge-governance.json`, then write the complete document:
 
    ```text
-   node ../scripts/vh.mjs context put --repo <root> --room <path> --input <context.json>
+   node ../vibehub-core/scripts/vh.mjs context put --repo <root> --room <path> --input <context.json>
    ```
 
    The `.yaml` file uses JSON-compatible YAML so the installed plugin needs no

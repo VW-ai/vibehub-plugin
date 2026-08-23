@@ -30,11 +30,11 @@
     },
     {
       "purpose": "Canonical Ticket schema whose maturity enum changes.",
-      "ref": "skills/contracts/ticket.schema.json"
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
     },
     {
       "purpose": "Deterministic validator and unchanged status calculation.",
-      "ref": "skills/scripts/vh.mjs"
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
     },
     {
       "purpose": "Planning instructions for new Tickets and draft refinement.",

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
-import { buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
+import { buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 import { run, tempRepo, ticket } from "./helpers.mjs";
 
 const NOW = "2026-08-20T19:30:00.000Z";

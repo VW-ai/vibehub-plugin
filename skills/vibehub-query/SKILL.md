@@ -13,8 +13,8 @@ database or cache elsewhere to refresh. When reporting answers, distinguish
 trust layers per `../vibehub-ingest/references/knowledge-governance.json`.
 
 ```text
-node ../scripts/vh.mjs context query --repo <root> --input <query.json>
-node ../scripts/vh.mjs context get --repo <root> --input <id.json>
+node ../vibehub-core/scripts/vh.mjs context query --repo <root> --input <query.json>
+node ../vibehub-core/scripts/vh.mjs context get --repo <root> --input <id.json>
 ```
 
 `query.json` may contain `query`, `context_ids`, and `include_inactive`.

@@ -28,7 +28,7 @@ deliverable continues without another user command.
    folders:
 
    ```text
-   node ../scripts/vh.mjs project init --repo <root>
+   node ../vibehub-core/scripts/vh.mjs project init --repo <root>
    ```
 
 4. Add a small managed instruction block: development starts from Tickets;

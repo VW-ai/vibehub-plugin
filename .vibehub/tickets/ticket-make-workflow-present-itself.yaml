@@ -74,7 +74,7 @@
     },
     {
       "purpose": "Narrow loopback launcher to extend with mechanical focus only.",
-      "ref": "skills/scripts/vh-ui.mjs"
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     },
     {
       "purpose": "Read-only graph interaction that can consume focus parameters.",

@@ -50,7 +50,7 @@
     },
     {
       "purpose": "Current direct Git-YAML reader, validator, graph state, and potential shared projection boundary.",
-      "ref": "skills/scripts/vh.mjs"
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
     },
     {
       "purpose": "Current conversation-only review entrypoint that must gain local UI launch guidance.",

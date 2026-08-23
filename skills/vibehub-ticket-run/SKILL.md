@@ -10,12 +10,12 @@ referenced Context, and Git status are the execution boundary, inside
 `../vibehub-setup/references/architecture-boundary.md`.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
-Read `../contracts/acceptance-authority.md`. An executor may satisfy
+Read `../vibehub-core/contracts/acceptance-authority.md`. An executor may satisfy
 Agent-authority criteria autonomously. It must not satisfy a human-authority
 criterion, set `origin: human`, or treat its own recommendation as the user's
 decision; only explicit human input with a readable reference can become
 human-origin Evidence.
-Read `../contracts/ticket-next-action.md`. Routine execution starts only from
+Read `../vibehub-core/contracts/ticket-next-action.md`. Routine execution starts only from
 `next_action.action: EXECUTE`; status `READY` alone may instead route to human
 input or independent closeout.
 This Skill owns `ready-execution` and `execution-needs-human`; it does not own
@@ -26,8 +26,8 @@ UI launch mechanics.
 1. Read `ready_to_execute` from the frontier and select the requested Ticket:
 
    ```text
-   node ../scripts/vh.mjs ticket frontier --repo <root>
-   node ../scripts/vh.mjs ticket get --repo <root> --input <id.json>
+   node ../vibehub-core/scripts/vh.mjs ticket frontier --repo <root>
+   node ../vibehub-core/scripts/vh.mjs ticket get --repo <root> --input <id.json>
    ```
 
 2. Read every `context_ref` from the exact checkout. Use `$vibehub-query` only
@@ -47,10 +47,10 @@ UI launch mechanics.
    A durable cross-ticket fact surfaced by execution is delegated to
    `$vibehub-ingest`, placed in the room this Ticket entered.
 4. Test in proportion to risk. For each criterion with real proof, append one
-   or more Evidence documents using `../contracts/evidence.schema.json`:
+   or more Evidence documents using `../vibehub-core/contracts/evidence.schema.json`:
 
    ```text
-   node ../scripts/vh.mjs ticket evidence --repo <root> --input <evidence.json>
+   node ../vibehub-core/scripts/vh.mjs ticket evidence --repo <root> --input <evidence.json>
    ```
 
 5. Read the exact Ticket back after Evidence is appended. If its host-derived

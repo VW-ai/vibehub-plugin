@@ -54,15 +54,15 @@
     },
     {
       "purpose": "Canonical decision-owner, Evidence, and graph-boundary semantics.",
-      "ref": "skills/contracts/acceptance-authority.md"
+      "ref": "skills/vibehub-core/contracts/acceptance-authority.md"
     },
     {
       "purpose": "Canonical per-acceptance authority carrier.",
-      "ref": "skills/contracts/ticket.schema.json"
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
     },
     {
       "purpose": "Canonical human-origin Evidence carrier.",
-      "ref": "skills/contracts/evidence.schema.json"
+      "ref": "skills/vibehub-core/contracts/evidence.schema.json"
     },
     {
       "purpose": "Existing execution-discovers-work transition reused for late boundaries.",

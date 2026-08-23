@@ -2,7 +2,7 @@
   "acceptance": [
     {
       "acceptance_id": "core-folder-carries-helper-and-contracts",
-      "criterion": "skills/vibehub-core/ exists with a SKILL.md whose frontmatter description states it is the shared helper and contracts for the other VibeHub Skills and is not invoked directly, plus scripts/vh.mjs, scripts/vh-ui.mjs, contracts/*, and templates/github/; skills/scripts/ and skills/contracts/ no longer exist."
+      "criterion": "skills/vibehub-core/ exists with a SKILL.md whose frontmatter description states it is the shared helper and contracts for the other VibeHub Skills and is not invoked directly, plus scripts/vh.mjs, scripts/vh-ui.mjs, contracts/*, and templates/github/; skills/vibehub-core/scripts/ and skills/vibehub-core/contracts/ no longer exist."
     },
     {
       "acceptance_id": "all-live-references-repointed",
@@ -31,7 +31,7 @@
     "Do not change vh.mjs behavior; this is a relocation.",
     "Third-party installer tests run only in scratch directories outside the repository."
   ],
-  "context": "The owner chose path A of docs/proposals/npx-first-install-experience.md. Today skills/scripts/ (vh.mjs, vh-ui.mjs) and skills/contracts/ are siblings of the eleven skill folders and are referenced 45 times as ../scripts and ../contracts from SKILL.md files, plus from skills/vibehub-ticket-review/references/ticket-lifecycle.json (../../contracts), test files, scripts/verify-plugin-artifact.mjs, scripts/audit-legacy-proof.mjs, scripts/sync-github-issues.mjs, docs/INSTALL.md, and docs/LOCAL_GRAPH_DESIGN.md. skills.sh copies only folders containing SKILL.md and does so with subfolders intact, so a skills/vibehub-core/ folder with its own SKILL.md carries scripts/ and contracts/ to every host. The Codex manifest points at ./skills/ as a directory; the Claude plugin manifest has no skill paths. A user project's mirror workflow runs in a clean GitHub Actions checkout where no plugin is installed, so the setup-time copy must place the helper itself into the project next to the sync script. META/ and docs/proposals/ and docs/SPEED_FIRST_CLEANUP.md are historical records and keep their old paths.",
+  "context": "The owner chose path A of docs/proposals/npx-first-install-experience.md. Today skills/vibehub-core/scripts/ (vh.mjs, vh-ui.mjs) and skills/vibehub-core/contracts/ are siblings of the eleven skill folders and are referenced 45 times as ../scripts and ../contracts from SKILL.md files, plus from skills/vibehub-ticket-review/references/ticket-lifecycle.json (../../contracts), test files, scripts/verify-plugin-artifact.mjs, scripts/audit-legacy-proof.mjs, scripts/sync-github-issues.mjs, docs/INSTALL.md, and docs/LOCAL_GRAPH_DESIGN.md. skills.sh copies only folders containing SKILL.md and does so with subfolders intact, so a skills/vibehub-core/ folder with its own SKILL.md carries scripts/ and contracts/ to every host. The Codex manifest points at ./skills/ as a directory; the Claude plugin manifest has no skill paths. A user project's mirror workflow runs in a clean GitHub Actions checkout where no plugin is installed, so the setup-time copy must place the helper itself into the project next to the sync script. META/ and docs/proposals/ and docs/SPEED_FIRST_CLEANUP.md are historical records and keep their old paths.",
   "context_refs": [
     {
       "purpose": "Chosen path A and the setup-time mirror specification.",

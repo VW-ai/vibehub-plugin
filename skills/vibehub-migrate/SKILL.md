@@ -6,7 +6,7 @@ description: Upgrade a project's checked-in .vibehub data from an older VibeHub 
 # VibeHub Migrate
 
 Upgrading is a restructure, not a compatibility layer. Current project and
-document versions live in `../contracts/versions.json`; the matching upgrade
+document versions live in `../vibehub-core/contracts/versions.json`; the matching upgrade
 steps live once in `references/migrations.json`. Their targets must agree
 mechanically before a migration is complete; this Skill supplies the judgment.
 
@@ -15,7 +15,7 @@ mechanically before a migration is complete; this Skill supplies the judgment.
 1. Run the read-only compatibility preflight and inspect the `.vibehub/` tree:
 
    ```text
-   node ../scripts/vh.mjs project compatibility --repo <root>
+   node ../vibehub-core/scripts/vh.mjs project compatibility --repo <root>
    ```
 
    `CURRENT` stops with no work. For `MIGRATION_REQUIRED`, find the complete

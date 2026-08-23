@@ -11,7 +11,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
-import { buildUiSnapshot, parseUiFlags, startVibeHubUi } from "../skills/scripts/vh-ui.mjs";
+import { buildUiSnapshot, parseUiFlags, startVibeHubUi } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 import { context, room, run, tempRepo, ticket, writeRoom } from "./helpers.mjs";
 
 const repos = [];
