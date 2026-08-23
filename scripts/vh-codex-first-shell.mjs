@@ -37,6 +37,25 @@ const EVENT_LIMIT = 500;
 const BODY_LIMIT = 12 * 1024 * 1024;
 const APP_SERVER_TIMEOUT_MS = 120_000;
 const SEARCH_LIMIT = 20;
+const FILE_SEARCH_LIMIT = 20;
+const FILE_QUERY_LIMIT = 256;
+// One Turn input carries at most this many items: text, attachments and the
+// mention or skill item each chip emits.
+const INPUT_ITEM_LIMIT = 16;
+const TEXT_ELEMENT_LIMIT = 64;
+// Follow-ups queued behind a live Turn, per Thread.
+const QUEUE_LIMIT = 20;
+const NOTIFICATION_MODES = Object.freeze(["always", "unfocused", "never"]);
+// The stable AskForApproval strings; the granular object form stays out.
+const APPROVAL_POLICIES = Object.freeze(["untrusted", "on-request", "never"]);
+// SandboxPolicy variants of the pinned schema with the fields each accepts.
+const SANDBOX_POLICIES = Object.freeze({
+  dangerFullAccess: Object.freeze([]),
+  readOnly: Object.freeze(["networkAccess"]),
+  workspaceWrite: Object.freeze(["networkAccess", "writableRoots", "excludeSlashTmp", "excludeTmpdirEnvVar"]),
+  externalSandbox: Object.freeze(["networkAccess"]),
+});
+const IMAGE_DETAILS = new Set(["auto", "low", "high", "original"]);
 // When the app-server exits on its own the host respawns it with this
 // backoff; after the last attempt the runtime halts visibly instead of looping.
 const RESTART_BACKOFF_MS = Object.freeze(parseBackoff(process.env.VIBEHUB_CODEX_RESTART_BACKOFF_MS, [500, 2000, 5000]));
@@ -45,6 +64,9 @@ const RESTART_BACKOFF_MS = Object.freeze(parseBackoff(process.env.VIBEHUB_CODEX_
 // halted; every other action needs the live app-server and is refused
 // truthfully while it is unavailable.
 const ADAPTER_FREE_ACTIONS = new Set(["readTask", "listTaskTargets", "listRooms", "previewCreateTask", "createTask", "attachTask", "remember"]);
+// Transient host session state is read and edited without the runtime: the
+// queued follow-ups of a Thread and the notification preference.
+const HOST_STATE_ACTIONS = new Set(["listQueue", "updateQueued", "deleteQueued", "setNotificationPreference"]);
 const THREAD_POLICY = Object.freeze({ approvalPolicy: "on-request", sandbox: "workspace-write" });
 // The Codex Project binding record is provenance only. Chat membership stays
 // in the native ThreadSection, which is re-read on every bootstrap; the
@@ -204,6 +226,12 @@ client.on("exit", (value) => {
     appendEvent("requestResolved", { id: request.id, method: request.method, threadId: request.params?.threadId ?? null, resolution: "runtime_exited", runtimeGeneration: runtime.generation });
   }
   pendingRequests.clear();
+  // Nothing the dead process reported stays live: no Turn, no settings. A
+  // queued follow-up is kept but paused until the human resumes it, so no
+  // message is fired into a respawned process on its own.
+  liveTurns.clear();
+  threadSettings.clear();
+  for (const threadId of queues.keys()) pauseQueue(threadId, "runtime_exited");
   if (stopping || value.requested) {
     runtime.state = runtime.halt ? "halted" : "exited";
     return;
@@ -215,6 +243,159 @@ client.on("exit", (value) => {
   runtime.state = "restarting";
   if (!restarting) scheduleRestart(0);
 });
+
+// ---------------------------------------------------------------------------
+// Transient host session state for ordinary Chat, held exactly like
+// pendingRequests: the follow-up queue of each Thread, the live Turn of each
+// Thread, the settings each Thread reported, and the notification preference.
+// All of it lives as long as this host process and no longer: nothing here
+// is written to the repository, to a store or to the browser, and a host
+// restart starts empty. A queue survives browser route changes because it
+// lives here, and it is never a second durable store.
+// ---------------------------------------------------------------------------
+const queues = new Map();
+const liveTurns = new Map();
+const threadSettings = new Map();
+let notificationPreference = "unfocused";
+
+// The settings a Thread reported, null until the runtime reported them: the
+// thread/start or thread/resume response first, then every
+// thread/settings/updated the runtime sends for it. The browser reads them
+// from the newThread, readThread and startTurn responses and from the
+// forwarded thread/settings/updated notification; no host event restates
+// them.
+function threadSettingsProjection(threadId) {
+  return threadSettings.get(threadId) ?? null;
+}
+
+function rememberSettings(threadId, settings, source) {
+  const record = { model: settings.model ?? null, effort: settings.effort ?? null, approvalPolicy: settings.approvalPolicy ?? null, sandboxPolicy: settings.sandboxPolicy ?? null, source, observedAt: new Date().toISOString() };
+  threadSettings.set(threadId, record);
+  return record;
+}
+
+client.on("result", ({ method, result }) => {
+  if ((method === "thread/start" || method === "thread/resume") && typeof result?.thread?.id === "string") {
+    rememberSettings(result.thread.id, { model: result.model, effort: result.reasoningEffort, approvalPolicy: result.approvalPolicy, sandboxPolicy: result.sandbox }, method);
+  }
+});
+client.on("notification:thread/settings/updated", (params) => {
+  const settings = params?.threadSettings;
+  if (typeof params?.threadId !== "string" || !settings || typeof settings !== "object") return;
+  rememberSettings(params.threadId, { model: settings.model, effort: settings.effort, approvalPolicy: settings.approvalPolicy, sandboxPolicy: settings.sandboxPolicy }, "thread/settings/updated");
+});
+client.on("notification:turn/started", (params) => {
+  if (typeof params?.threadId === "string" && typeof params.turn?.id === "string") liveTurns.set(params.threadId, params.turn.id);
+});
+client.on("notification:turn/completed", (params) => {
+  if (typeof params?.threadId !== "string") return;
+  const live = liveTurns.get(params.threadId);
+  if (live === undefined || typeof params.turn?.id !== "string" || live === params.turn.id) liveTurns.delete(params.threadId);
+  settleQueueAfterTurn(params.threadId, params.turn?.status ?? "completed");
+});
+
+function queueRecord(threadId) {
+  let queue = queues.get(threadId);
+  if (!queue) {
+    queue = { paused: false, pausedReason: null, lastError: null, draining: false, items: [] };
+    queues.set(threadId, queue);
+  }
+  return queue;
+}
+
+// Media inputs are carried in full by the queue reads and elided from the
+// event feed, which only has to say what is queued, not carry the bytes.
+function elideMedia(input) {
+  return input.map((item) => (item.type === "image" || item.type === "audio" ? { type: item.type, elided: true, byteLength: Buffer.byteLength(item.url), ...(item.detail ? { detail: item.detail } : {}) } : item));
+}
+
+function queueProjection(threadId, { media = "elided" } = {}) {
+  const queue = queues.get(threadId);
+  return {
+    threadId,
+    paused: queue?.paused ?? false,
+    pausedReason: queue?.pausedReason ?? null,
+    lastError: queue?.lastError ?? null,
+    limit: QUEUE_LIMIT,
+    items: (queue?.items ?? []).map((item) => ({
+      queuedId: item.queuedId,
+      queuedAt: item.queuedAt,
+      settings: item.settings,
+      starting: item.starting === true,
+      input: media === "full" ? item.input : elideMedia(item.input),
+    })),
+  };
+}
+
+function queueProjections() {
+  return [...queues.keys()].filter((threadId) => queues.get(threadId).items.length > 0).map((threadId) => queueProjection(threadId));
+}
+
+function announceQueue(threadId) {
+  appendEvent("queueChanged", { threadId, queue: queueProjection(threadId) });
+}
+
+// A pause only means something while follow-ups are queued; it ends with an
+// explicit resumeQueue. An empty queue is never left paused.
+function pauseQueue(threadId, reason) {
+  const queue = queues.get(threadId);
+  if (!queue || queue.items.length === 0 || (queue.paused && queue.pausedReason === reason)) return false;
+  queue.paused = true;
+  queue.pausedReason = reason;
+  announceQueue(threadId);
+  return true;
+}
+
+function settleQueueAfterTurn(threadId, status) {
+  const queue = queues.get(threadId);
+  if (!queue || queue.items.length === 0) return;
+  if (status === "completed") {
+    void drainQueue(threadId);
+    return;
+  }
+  // An interrupted or failed Turn stops the queue: nothing is sent until
+  // the human resumes it.
+  pauseQueue(threadId, status === "interrupted" ? "interrupted" : "turn_failed");
+}
+
+// Starts the head of a Thread's queue as its own turn/start with a Turn id
+// the runtime mints, one at a time: only when no Turn is live, the queue is
+// not paused and nothing is already starting. A start that fails keeps the
+// follow-up at the head and pauses the queue with the error in view.
+async function drainQueue(threadId) {
+  const queue = queues.get(threadId);
+  if (!queue || queue.paused || queue.draining || queue.items.length === 0 || liveTurns.has(threadId)) return null;
+  if (runtime.halt || !runtime.alive || runtime.state !== "alive") return null;
+  const item = queue.items[0];
+  queue.draining = true;
+  item.starting = true;
+  try {
+    await ensureLoaded(threadId);
+    const started = await sendThroughHarness(threadId, item.input, item.settings);
+    const turnId = started.value.turn.id;
+    liveTurns.set(threadId, turnId);
+    queue.items.shift();
+    queue.lastError = null;
+    appendEvent("queuedStarted", { threadId, queuedId: item.queuedId, turnId });
+    announceQueue(threadId);
+    return { queuedId: item.queuedId, turnId };
+  } catch (error) {
+    item.starting = false;
+    queue.lastError = { queuedId: item.queuedId, message: error.message, observedAt: new Date().toISOString() };
+    queue.paused = true;
+    queue.pausedReason = "start_failed";
+    appendEvent("queuedFailed", { threadId, queuedId: item.queuedId, error: error.message });
+    announceQueue(threadId);
+    return null;
+  } finally {
+    item.starting = false;
+    queue.draining = false;
+  }
+}
+
+function preferencesProjection() {
+  return { notifications: { mode: notificationPreference, modes: [...NOTIFICATION_MODES], transient: true } };
+}
 
 function scheduleRestart(attempt) {
   clearTimeout(restartTimer);
@@ -486,6 +667,7 @@ function publicThread(thread) {
     ...publicCodexThread(thread),
     title: threadTitle(thread),
     taskLink: taskLinkFromThread(thread),
+    settings: threadSettingsProjection(thread.id),
   };
 }
 
@@ -838,6 +1020,11 @@ async function bootstrap() {
     // bridge write touched show up in project.uncommitted on the next read.
     repositoryWrites: REPOSITORY_WRITES,
     pendingRequests: [...pendingRequests.values()],
+    // Transient host session state beside the pending requests: the queued
+    // follow-ups of every Thread and the notification preference, both gone
+    // after a host restart.
+    queues: queueProjections(),
+    preferences: preferencesProjection(),
     eventCursor: sequence,
   };
 }
@@ -1187,25 +1374,174 @@ function remember(payload) {
 }
 
 function validInputs(input) {
-  if (!Array.isArray(input) || input.length === 0 || input.length > 8) return false;
-  return input.every((item) => {
-    if (!item || typeof item !== "object") return false;
-    if (item.type === "text") return typeof item.text === "string" && item.text.trim().length > 0;
-    if (item.type === "image" || item.type === "audio") {
-      return typeof item.url === "string" && item.url.startsWith("data:") && item.url.length <= BODY_LIMIT;
-    }
+  try {
+    validateInputs(input);
+    return true;
+  } catch {
     return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Turn input and settings validation. The host sends the app-server exactly
+// the pinned UserInput variants: text (with UI-defined text_elements), image
+// and audio as bounded data URLs, and skill and mention with name and path.
+// A browser File carries no filesystem path, so localImage and localAudio are
+// never produced here. Each text_elements entry must occupy the UTF-8 byte
+// span its placeholder says it does, measured with Buffer.byteLength.
+// ---------------------------------------------------------------------------
+
+function validateInputs(input, label = "input") {
+  if (!Array.isArray(input) || input.length === 0) throw invalid(`${label} must be a non-empty array of Turn inputs`);
+  if (input.length > INPUT_ITEM_LIMIT) throw invalid(`${label} may carry at most ${INPUT_ITEM_LIMIT} items`);
+  return input.map((item, index) => validateInput(item, `${label}[${index}]`));
+}
+
+function validateInput(item, label) {
+  if (!item || typeof item !== "object" || Array.isArray(item)) throw invalid(`${label} must be a Turn input object`);
+  if (item.type === "text") {
+    if (typeof item.text !== "string" || !item.text.trim()) throw invalid(`${label}.text must be a non-empty string`);
+    if (item.text_elements === undefined || item.text_elements === null) return { type: "text", text: item.text };
+    return { type: "text", text: item.text, text_elements: validateTextElements(item.text_elements, item.text, label) };
+  }
+  if (item.type === "image" || item.type === "audio") {
+    if (typeof item.url !== "string" || !item.url.startsWith("data:") || item.url.length > BODY_LIMIT) throw invalid(`${label}.url must be a data: URL of at most ${BODY_LIMIT} bytes`);
+    if (item.type === "image" && item.detail !== undefined && item.detail !== null) {
+      if (!IMAGE_DETAILS.has(item.detail)) throw invalid(`${label}.detail must be one of ${[...IMAGE_DETAILS].join(", ")}`);
+      return { type: "image", url: item.url, detail: item.detail };
+    }
+    return { type: item.type, url: item.url };
+  }
+  if (item.type === "skill" || item.type === "mention") {
+    if (typeof item.name !== "string" || !item.name.trim() || item.name.length > 256) throw invalid(`${label}.name must be a non-empty string of at most 256 characters`);
+    if (typeof item.path !== "string" || !item.path.trim() || item.path.length > 4096) throw invalid(`${label}.path must be a non-empty string of at most 4096 characters`);
+    return { type: item.type, name: item.name, path: item.path };
+  }
+  throw invalid(`${label}.type must be text, image, audio, skill or mention`);
+}
+
+function validateTextElements(elements, text, label) {
+  if (!Array.isArray(elements)) throw invalid(`${label}.text_elements must be an array`);
+  if (elements.length > TEXT_ELEMENT_LIMIT) throw invalid(`${label}.text_elements may carry at most ${TEXT_ELEMENT_LIMIT} elements`);
+  const bytes = Buffer.from(text, "utf8");
+  const validated = elements.map((element, index) => {
+    const name = `${label}.text_elements[${index}]`;
+    const range = element?.byteRange;
+    if (!range || !Number.isInteger(range.start) || !Number.isInteger(range.end) || range.start < 0 || range.end <= range.start || range.end > bytes.byteLength) {
+      throw invalid(`${name}.byteRange must be a non-empty byte span inside the ${bytes.byteLength}-byte UTF-8 text`);
+    }
+    const placeholder = element.placeholder === undefined ? null : element.placeholder;
+    if (placeholder !== null && typeof placeholder !== "string") throw invalid(`${name}.placeholder must be a string or null`);
+    const span = bytes.subarray(range.start, range.end).toString("utf8");
+    if (Buffer.byteLength(span, "utf8") !== range.end - range.start) throw invalid(`${name}.byteRange cuts through a UTF-8 character`);
+    if (placeholder !== null && (Buffer.byteLength(placeholder, "utf8") !== range.end - range.start || span !== placeholder)) {
+      throw invalid(`${name}.placeholder ${JSON.stringify(placeholder)} does not occupy bytes ${range.start}-${range.end} of the text (found ${JSON.stringify(span)})`);
+    }
+    return placeholder === null ? { byteRange: { start: range.start, end: range.end } } : { byteRange: { start: range.start, end: range.end }, placeholder };
   });
+  const ordered = [...validated].sort((left, right) => left.byteRange.start - right.byteRange.start);
+  for (let index = 1; index < ordered.length; index += 1) {
+    if (ordered[index].byteRange.start < ordered[index - 1].byteRange.end) throw invalid(`${label}.text_elements must not overlap`);
+  }
+  return validated;
+}
+
+function validateSandboxPolicy(policy) {
+  if (!policy || typeof policy !== "object" || Array.isArray(policy) || !Object.hasOwn(SANDBOX_POLICIES, policy.type)) {
+    throw invalid(`settings.sandboxPolicy.type must be one of ${Object.keys(SANDBOX_POLICIES).join(", ")}`);
+  }
+  const allowed = SANDBOX_POLICIES[policy.type];
+  const validated = { type: policy.type };
+  for (const [key, value] of Object.entries(policy)) {
+    if (key === "type") continue;
+    if (!allowed.includes(key)) throw invalid(`settings.sandboxPolicy.${key} is not a field of ${policy.type}`);
+    if (key === "writableRoots") {
+      if (!Array.isArray(value) || value.length > 32 || value.some((root) => typeof root !== "string" || !root.trim())) throw invalid("settings.sandboxPolicy.writableRoots must be an array of at most 32 paths");
+    } else if (key === "networkAccess" && policy.type === "externalSandbox") {
+      if (value !== "restricted" && value !== "enabled") throw invalid("settings.sandboxPolicy.networkAccess must be restricted or enabled for externalSandbox");
+    } else if (typeof value !== "boolean") throw invalid(`settings.sandboxPolicy.${key} must be a boolean`);
+    validated[key] = value;
+  }
+  return validated;
+}
+
+// Per-Turn settings overrides, exactly the turn/start keys the app-server
+// accepts: model, effort, approvalPolicy and sandboxPolicy. They come from a
+// `settings` object, or from the same keys at the top level of startTurn.
+// Returns null when nothing is overridden, so nothing is defaulted.
+function turnSettingsFromPayload(payload) {
+  const source = payload.settings === undefined ? payload : payload.settings;
+  if (source === null) return null;
+  if (typeof source !== "object" || Array.isArray(source)) throw invalid("settings must be an object");
+  const settings = {};
+  if (source.model !== undefined && source.model !== null) {
+    if (typeof source.model !== "string" || !source.model.trim() || source.model.length > 128) throw invalid("settings.model must be a non-empty string of at most 128 characters");
+    settings.model = source.model;
+  }
+  if (source.effort !== undefined && source.effort !== null) {
+    if (typeof source.effort !== "string" || !source.effort.trim() || source.effort.length > 32) throw invalid("settings.effort must be a non-empty string of at most 32 characters");
+    settings.effort = source.effort;
+  }
+  if (source.approvalPolicy !== undefined && source.approvalPolicy !== null) {
+    if (!APPROVAL_POLICIES.includes(source.approvalPolicy)) throw invalid(`settings.approvalPolicy must be one of ${APPROVAL_POLICIES.join(", ")}`);
+    settings.approvalPolicy = source.approvalPolicy;
+  }
+  if (source.sandboxPolicy !== undefined && source.sandboxPolicy !== null) settings.sandboxPolicy = validateSandboxPolicy(source.sandboxPolicy);
+  return Object.keys(settings).length ? settings : null;
 }
 
 // Every ordinary Turn start goes through the shared harness shell so the
-// selected carrier's audio and attachment capabilities gate the request.
-function sendThroughHarness(threadId, content) {
+// selected carrier's audio, attachment and settings capabilities gate the
+// request; settings, when present, are the exact turn/start override keys.
+function sendThroughHarness(threadId, content, settings = null) {
   const types = new Set(content.map((item) => item.type));
-  const input = { conversationId: threadId, content };
+  const input = { conversationId: threadId, content, ...(settings ? { settings } : {}) };
   if (types.has("audio")) return harness.sendChatAudio(input);
   if (types.has("image")) return harness.sendChatAttachments(input);
   return harness.sendChat(input);
+}
+
+function requireQueued(queue, queuedId, threadId) {
+  if (typeof queuedId !== "string" || !queuedId) throw invalid("queuedId required");
+  const index = queue.items.findIndex((item) => item.queuedId === queuedId);
+  if (index === -1) throw new HostError(409, "queued_not_found", `Queued follow-up ${queuedId} is not in the queue of Thread ${threadId}.`, { threadId, queuedId });
+  if (queue.items[index].starting) throw new HostError(409, "queued_starting", `Queued follow-up ${queuedId} is being started right now.`, { threadId, queuedId });
+  return index;
+}
+
+// Host-owned transient state, served without the runtime.
+function hostStateAction(payload) {
+  if (payload.action === "setNotificationPreference") {
+    if (!NOTIFICATION_MODES.includes(payload.mode)) throw invalid(`mode must be one of ${NOTIFICATION_MODES.join(", ")}`);
+    notificationPreference = payload.mode;
+    appendEvent("clientAction", { action: "setNotificationPreference", mode: payload.mode });
+    return { preferences: preferencesProjection() };
+  }
+  const threadId = requireThreadId(payload);
+  if (payload.action === "listQueue") {
+    return { queue: queueProjection(threadId, { media: "full" }) };
+  }
+  const queue = queueRecord(threadId);
+  if (payload.action === "updateQueued") {
+    const index = requireQueued(queue, payload.queuedId, threadId);
+    const input = validateInputs(payload.input);
+    const item = queue.items[index];
+    item.input = input;
+    if (payload.settings !== undefined) item.settings = turnSettingsFromPayload({ settings: payload.settings });
+    announceQueue(threadId);
+    return { queuedId: item.queuedId, queue: queueProjection(threadId, { media: "full" }) };
+  }
+  if (payload.action === "deleteQueued") {
+    const index = requireQueued(queue, payload.queuedId, threadId);
+    queue.items.splice(index, 1);
+    if (queue.items.length === 0) {
+      queue.paused = false;
+      queue.pausedReason = null;
+    }
+    announceQueue(threadId);
+    return { queuedId: payload.queuedId, queue: queueProjection(threadId, { media: "full" }) };
+  }
+  throw invalid(`Unsupported action: ${payload.action}`);
 }
 
 function requireThreadId(payload) {
@@ -1231,13 +1567,130 @@ async function ensureLoaded(threadId) {
 
 async function action(payload) {
   if (!payload || typeof payload.action !== "string") throw invalid("Unknown action");
+  if (HOST_STATE_ACTIONS.has(payload.action)) return hostStateAction(payload);
   if (!ADAPTER_FREE_ACTIONS.has(payload.action)) requireRuntime();
   if (payload.action === "newThread") {
     const created = await harness.newChat({ ...THREAD_POLICY, cwd: repoRoot, ephemeral: false });
     return { thread: rememberCreatedThread(publicThread(created.value.thread)) };
   }
   if (payload.action === "readThread") {
-    return client.request("thread/read", { threadId: requireThreadId(payload), includeTurns: true });
+    const threadId = requireThreadId(payload);
+    const read = await client.request("thread/read", { threadId, includeTurns: true });
+    return { ...read, settings: threadSettingsProjection(threadId) };
+  }
+  if (payload.action === "listModels") {
+    // The picker's options, from model/list alone: hidden models are dropped
+    // again here, and a record without inputModalities takes the pinned
+    // schema default of text and image. Send `model` (the slug) back as the
+    // turn/start model override, not `id`.
+    const listed = await harness.listModels({});
+    const models = listed.value.models.filter((model) => !model.hidden).map((model) => ({
+      id: model.id,
+      model: model.model,
+      displayName: model.displayName,
+      description: model.description ?? null,
+      isDefault: Boolean(model.isDefault),
+      defaultReasoningEffort: model.defaultReasoningEffort ?? null,
+      supportedReasoningEfforts: (model.supportedReasoningEfforts ?? []).map((option) => ({ reasoningEffort: option.reasoningEffort, description: option.description ?? null })),
+      inputModalities: Array.isArray(model.inputModalities) ? model.inputModalities : ["text", "image"],
+    }));
+    return { models };
+  }
+  if (payload.action === "compactThread") {
+    const threadId = requireThreadId(payload);
+    // thread/compact/start replaces a running task in core, so a live Turn
+    // refuses it here: the host's own record first, then the runtime's.
+    const refuse = (turnId) => new HostError(409, "turn_live", `A Turn is still running in this Thread${turnId ? ` (${turnId})` : ""}; compaction would replace it. Wait for it to complete or interrupt it first.`, { threadId, turnId: turnId ?? null });
+    if (liveTurns.has(threadId)) throw refuse(liveTurns.get(threadId));
+    await ensureLoaded(threadId);
+    const read = await client.request("thread/read", { threadId, includeTurns: false });
+    if (read.thread?.status?.type === "active") throw refuse(liveTurns.get(threadId) ?? null);
+    await harness.compactChat({ conversationId: threadId });
+    appendEvent("clientAction", { action: "compactThread", threadId });
+    return { threadId, compacting: true };
+  }
+  if (payload.action === "searchFiles") {
+    // fuzzyFileSearch rooted at the bound repository, bounded, with a fresh
+    // cancellation token per request; an empty query asks nothing.
+    const query = typeof payload.query === "string" ? payload.query.trim() : "";
+    if (query.length > FILE_QUERY_LIMIT) throw invalid(`query must be at most ${FILE_QUERY_LIMIT} characters`);
+    const limit = Number.isInteger(payload.limit) ? Math.min(Math.max(payload.limit, 1), FILE_SEARCH_LIMIT) : FILE_SEARCH_LIMIT;
+    if (!query) return { query, root: repoRoot, limit, total: 0, files: [] };
+    const cancellationToken = `vibehub-${crypto.randomUUID()}`;
+    const searched = await harness.searchFiles({ query, roots: [repoRoot], cancellationToken });
+    const files = searched.value.files ?? [];
+    return {
+      query,
+      root: repoRoot,
+      limit,
+      total: files.length,
+      files: files.slice(0, limit).map((file) => ({ ...file, absolutePath: resolve(file.root, file.path) })),
+    };
+  }
+  if (payload.action === "listSkills") {
+    const listed = await harness.listSkills({ cwds: [repoRoot], forceReload: payload.forceReload === true });
+    const entries = listed.value.data ?? [];
+    return {
+      cwd: repoRoot,
+      skills: entries.flatMap((entry) => (entry.skills ?? []).map((skill) => ({
+        name: skill.name,
+        path: skill.path,
+        description: skill.description ?? null,
+        shortDescription: skill.shortDescription ?? null,
+        enabled: skill.enabled !== false,
+        scope: skill.scope ?? null,
+        cwd: entry.cwd,
+      }))),
+      errors: entries.flatMap((entry) => (entry.errors ?? []).map((error) => ({ path: error.path, message: error.message, cwd: entry.cwd }))),
+    };
+  }
+  if (payload.action === "queueTurn") {
+    // A follow-up typed while a Turn streams: queued in the host-owned
+    // transient queue of this Thread and started as its own turn/start after
+    // the live Turn's turn/completed. With no Turn live and no pause it starts
+    // right away, so a submission that raced a completion is never stranded.
+    const threadId = requireThreadId(payload);
+    const input = validateInputs(payload.input);
+    const settings = turnSettingsFromPayload({ settings: payload.settings ?? null });
+    const queue = queueRecord(threadId);
+    if (queue.items.length >= QUEUE_LIMIT) throw new HostError(409, "queue_full", `At most ${QUEUE_LIMIT} follow-ups can wait in one Thread.`, { threadId, limit: QUEUE_LIMIT });
+    const item = { queuedId: `queued-${crypto.randomUUID()}`, queuedAt: new Date().toISOString(), input, settings, starting: false };
+    queue.items.push(item);
+    announceQueue(threadId);
+    const started = await drainQueue(threadId);
+    return { queuedId: item.queuedId, started, queue: queueProjection(threadId, { media: "full" }) };
+  }
+  if (payload.action === "resumeQueue") {
+    const threadId = requireThreadId(payload);
+    const queue = queueRecord(threadId);
+    queue.paused = false;
+    queue.pausedReason = null;
+    announceQueue(threadId);
+    const started = await drainQueue(threadId);
+    return { started, queue: queueProjection(threadId, { media: "full" }) };
+  }
+  if (payload.action === "steerQueued") {
+    // The per-row opposite of waiting: the queued follow-up leaves the queue
+    // and steers the exact live Turn through turn/steer.
+    const threadId = requireThreadId(payload);
+    if (typeof payload.expectedTurnId !== "string" || !payload.expectedTurnId) throw invalid("expectedTurnId required");
+    const queue = queueRecord(threadId);
+    const index = requireQueued(queue, payload.queuedId, threadId);
+    const item = queue.items[index];
+    const result = await client.request("turn/steer", {
+      threadId,
+      expectedTurnId: payload.expectedTurnId,
+      clientUserMessageId: `vibehub-${crypto.randomUUID()}`,
+      input: item.input,
+    });
+    queue.items.splice(index, 1);
+    if (queue.items.length === 0) {
+      queue.paused = false;
+      queue.pausedReason = null;
+    }
+    appendEvent("clientAction", { action: "steerQueued", threadId, queuedId: item.queuedId, expectedTurnId: payload.expectedTurnId });
+    announceQueue(threadId);
+    return { ...result, queuedId: item.queuedId, queue: queueProjection(threadId, { media: "full" }) };
   }
   if (payload.action === "createProject") {
     return projects.createProject(payload.name);
@@ -1300,22 +1753,24 @@ async function action(payload) {
     return { threadId: payload.threadId, name: payload.name.trim() };
   }
   if (payload.action === "startTurn") {
-    if (typeof payload.threadId !== "string" || !validInputs(payload.input)) {
-      throw invalid("threadId and bounded text/image/audio input required");
-    }
-    await ensureLoaded(payload.threadId);
-    const started = await sendThroughHarness(payload.threadId, payload.input);
-    return started.value;
+    const threadId = requireThreadId(payload);
+    const input = validateInputs(payload.input);
+    const settings = turnSettingsFromPayload(payload);
+    await ensureLoaded(threadId);
+    const started = await sendThroughHarness(threadId, input, settings);
+    liveTurns.set(threadId, started.value.turn.id);
+    return { ...started.value, settings: threadSettingsProjection(threadId) };
   }
   if (payload.action === "steerTurn") {
-    if (typeof payload.threadId !== "string" || typeof payload.expectedTurnId !== "string" || !validInputs(payload.input)) {
-      throw invalid("threadId, expectedTurnId and bounded text/image/audio input required");
-    }
+    // Steering stays exact: the live Turn named by expectedTurnId, or the
+    // runtime's own refusal.
+    if (typeof payload.threadId !== "string" || typeof payload.expectedTurnId !== "string") throw invalid("threadId and expectedTurnId required");
+    const input = validateInputs(payload.input);
     const result = await client.request("turn/steer", {
       threadId: payload.threadId,
       expectedTurnId: payload.expectedTurnId,
       clientUserMessageId: `vibehub-${crypto.randomUUID()}`,
-      input: payload.input,
+      input,
     });
     appendEvent("clientAction", { action: "steerTurn", threadId: payload.threadId, expectedTurnId: payload.expectedTurnId });
     return result;
@@ -1325,7 +1780,9 @@ async function action(payload) {
       throw invalid("threadId and turnId required");
     }
     const interrupted = await harness.interruptChat({ conversationId: payload.threadId, runId: payload.turnId });
-    return interrupted.value;
+    // Nothing queued is sent after an interrupt until an explicit Resume.
+    pauseQueue(payload.threadId, "interrupted");
+    return { ...interrupted.value, queue: queueProjection(payload.threadId) };
   }
   if (payload.action === "startTask") {
     requireBoundScope();
