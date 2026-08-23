@@ -1,0 +1,46 @@
+{
+  "context_id": "decision-no-narration-music-carries-the-arc",
+  "detail": "Narration was tried with local Kokoro TTS (voices bf_emma, af_bella) on 2026-08-23 and rejected by the owner: flat delivery with no emotion, no 起承转合, zero gaps between lines felt suffocating, and reading the on-screen captions aloud sounded wrong. Decision: no voiceover. Structure instead: 起 (0–5.5s) the sentence alone, clean quiet Bach Goldberg Aria; 承 (5.5–16s) agents appear slowly then faster, camera drifts/pauses/jolts/tilts with focus hunting, the same recording low-passed with vibrato and tremolo fades in and keeps growing; 转 (16–19s) the shaking continues under the caption 'Lost in the agent sessions.' (owner replaced 'Where is it now?' as too abstract) — the music is NOT cut; 合 (19s→) the camera settles, light closes in, clean Aria returns over 2.5s. glance uses Schubert Impromptu Op.90/3 (CC BY 3.0, Chiara Bertoglio) throughout with two gentle lifts. Music must be freely licensed recordings, not just public-domain compositions; Rachmaninoff Op.32/10 (CC BY) auditioned and set aside as too heavy. Owner's taste: Rachmaninoff, Bach, Schubert. Mixing is ffmpeg (assets/video/audio/*.sh) after the silent HyperFrames render.",
+  "evidence": [
+    {
+      "note": "Licenses, performers, and the mix scripts.",
+      "ref": "assets/video/audio/README.md"
+    },
+    {
+      "note": "Render with the three-state Bach mix and continuous shake through 转.",
+      "ref": "assets/video/renders/taskstory-v7.mp4"
+    },
+    {
+      "note": "Music-only glance.",
+      "ref": "assets/video/renders/glance-v4.mp4"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-video-visual-rules-reduction-and-object",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "convention-hyperframes-authoring",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-23T06:30:00Z",
+    "quote": "我觉得旁白很拉，我们通过文字，视频里面的这个内容，还有就是音乐的切换，我们来实现",
+    "ref": "conversation:2026-08-23-audio-direction"
+  },
+  "state": "active",
+  "summary": "The launch clips have no narration: the story is told by picture, two captions and the music changing state; taskstory's 起承转合 lives in one Bach recording going clean → warped and growing → clean again",
+  "tags": [
+    "video",
+    "audio",
+    "music",
+    "narration",
+    "arc",
+    "licensing"
+  ],
+  "type": "decision"
+}

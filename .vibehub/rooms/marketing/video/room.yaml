@@ -2,12 +2,32 @@
   "alignment": {
     "anchor_hashes": [
       {
-        "blob": "aec9d67b4d733e2b11b31f4650c5f5d9d756b661",
+        "blob": "17e34928c6594b14399003a92129a8cd17c3e7c2",
         "path": "assets/video/README.md"
       },
       {
-        "blob": "fc8fb00e52d394131e8e2b147b9bcabefc0b57ce",
+        "blob": "0cfcb5e5e72efdfcc79e77aa69f1ae12393e9852",
         "path": "assets/video/STORYBOARD.md"
+      },
+      {
+        "blob": "ad264af6e7a5dab4f8bb2fe969b27c22e3f3fa2c",
+        "path": "assets/video/audio/README.md"
+      },
+      {
+        "blob": "10153cd3c392fdff15740844f5d427d4fa626d89",
+        "path": "assets/video/audio/bach-goldberg-aria.ogg"
+      },
+      {
+        "blob": "30231f62244c34c150d9f896fe868343adea75a5",
+        "path": "assets/video/audio/mix-glance.sh"
+      },
+      {
+        "blob": "cd69875a2e1c30fa60871efa0c9f13fec99fe545",
+        "path": "assets/video/audio/mix-taskstory.sh"
+      },
+      {
+        "blob": "edd9b79b6e00fab8451fe9178061b52c240b2300",
+        "path": "assets/video/audio/schubert-impromptu-gflat.ogg"
       },
       {
         "blob": "ca3e6c73d2a51e60a5d33841a62d9efeb89fd5ea",
@@ -34,12 +54,12 @@
         "path": "assets/video/glance/package.json"
       },
       {
-        "blob": "bc35a9c2f11f0581ac81535a298f4d7123d55dd8",
-        "path": "assets/video/renders/glance-v3.mp4"
+        "blob": "50d38829c1f7971b3b846b0a12c1620ca8455e7b",
+        "path": "assets/video/renders/glance-v4.mp4"
       },
       {
-        "blob": "c8d1beb1971cc982a3ecdac8dbd98c04ec21f487",
-        "path": "assets/video/renders/taskstory-v3.mp4"
+        "blob": "de367d35f459707c295a15a3973dc2cee2362202",
+        "path": "assets/video/renders/taskstory-v7.mp4"
       },
       {
         "blob": "84cf294f8198bb13b0471391c3ca27728eb41968",
@@ -78,7 +98,7 @@
         "path": "assets/video/taskstory/hyperframes.json"
       },
       {
-        "blob": "dadf7049b6b763eb86cd357ec4271108b95a9ac1",
+        "blob": "7ace0abd6add1d715625836f31fb172446ca3b11",
         "path": "assets/video/taskstory/index.html"
       },
       {
@@ -90,8 +110,8 @@
         "path": "assets/video/taskstory/package.json"
       }
     ],
-    "checked_at": "2026-08-23T07:13:47.631Z",
-    "last_aligned_commit": "3ac979dc97269f6be284fc1691c9c1e8feb25675"
+    "checked_at": "2026-08-23T08:14:02.684Z",
+    "last_aligned_commit": "4c1008916c555ca762bd2357f42eaadded73e643"
   },
   "anchors": [
     "assets/video/"

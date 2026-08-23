@@ -5,9 +5,10 @@ Messaging, format rules, toolchain and visual rules live in `.vibehub/rooms/mark
 
 | dir | clip | length | status |
 |-----|------|--------|--------|
-| `glance/` | #1 functional demo: install → chat while Tickets form → "Start this with VibeHub." → real Workbench (demo repo), push to 3/3 accepted, ends on NEEDS YOU | 25s | v3 draft, no audio |
-| `taskstory/` | #2 narrative: lead's sentence → agent swarm → "Where is it now?" → collapses into one Task → neighbours → zoom out → real All+Fit | 26.6s | v3 draft, no audio |
+| `glance/` | #1 functional demo: install → chat while Tickets form → "Start this with VibeHub." → real Workbench (demo repo), push to 3/3 accepted, ends on NEEDS YOU | 25s | v4, music (Schubert) |
+| `taskstory/` | #2 narrative: lead's sentence → agent swarm, camera loses its footing → "Lost in the agent sessions." → collapses into one Task → neighbours → zoom out → real All+Fit | 34s | v7, music (Bach) |
 | `renders/` | latest MP4s (16:9, 1920×1080) | | |
+| `audio/` | music stems, licenses, mix scripts — see `audio/README.md` | | |
 
 ## Render
 
@@ -30,5 +31,6 @@ npx --yes hyperframes render assets/video/taskstory --output assets/video/render
 ## Known gaps before publishing
 
 - taskstory: the zoom-out field is a regular grid; should follow the real graph layout.
-- both: no voiceover/music/captions yet (HyperFrames `/hyperframes-audio`, `/media-use`).
+- taskstory: the 承 shake is hand-tuned keyframes; revisit once seen on a phone.
+- both: no burned-in captions; add for sound-off feeds.
 - third-party logos in `taskstory/assets/logos/` are nominative use; review before publishing.

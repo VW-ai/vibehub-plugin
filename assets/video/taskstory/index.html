@@ -49,8 +49,8 @@ body{font-family:var(--mono);color:var(--ink);font-weight:400}
 .end .cta{font-size:22px;color:var(--muted)}
 </style></head>
 <body>
-<div id="root" data-composition-id="taskstory" data-start="0" data-duration="26.6" data-width="1920" data-height="1080">
-  <div id="scene" class="clip" data-start="0" data-duration="20.6" data-track-index="1">
+<div id="root" data-composition-id="taskstory" data-start="0" data-duration="34" data-width="1920" data-height="1080">
+  <div id="scene" class="clip" data-start="0" data-duration="28" data-track-index="1">
     <div id="world" style="position:absolute;inset:0;transform-origin:960px 470px"><div id="stage"></div>
     <div id="from">from your lead · Monday 9:12</div>
     <div id="sentence"><span class="w">Ship</span><span class="w">the</span><span class="w">new</span><span class="w">onboarding</span><span class="w">flow</span><span class="w">by</span><span class="w">Friday.</span></div>
@@ -64,13 +64,12 @@ body{font-family:var(--mono);color:var(--ink);font-weight:400}
     <div id="light"></div>
   </div>
 
-  <div id="l1" class="clip label q" data-start="6.2" data-duration="2.4" data-track-index="2">Where is it now?</div>
-  <div id="l2" class="clip label" data-start="11.6" data-duration="2.6" data-track-index="2">It was always one task.</div>
+  <div id="l1" class="clip label q" data-start="16.2" data-duration="3.0" data-track-index="2" style="background:rgba(250,250,248,.94);padding:8px 14px;left:106px;right:auto;bottom:auto;border-radius:8px">Lost in the agent sessions.</div>
+  <div id="l2" class="clip label" data-start="21.2" data-duration="3" data-track-index="2">It was always one task.</div>
 
-  <video id="fit" src="assets/fit.mp4" data-start="20" data-duration="3.6" data-track-index="1" muted playsinline style="position:absolute;left:0;top:0;width:1920px;height:1080px"></video>
+  <video id="fit" src="assets/fit.mp4" data-start="27.4" data-duration="3.6" data-track-index="1" muted playsinline style="position:absolute;left:0;top:0;width:1920px;height:1080px"></video>
 
-  <div id="l3" class="clip label" data-start="14.4" data-duration="5.6" data-track-index="2">And every task knows where it sits.</div>
-  <div id="end" class="clip end" data-start="23.6" data-duration="3" data-track-index="1">
+  <div id="end" class="clip end" data-start="31" data-duration="3" data-track-index="1">
     <h1>Manage the task.<br>VibeHub manages the rest.</h1>
     <div class="cta">npx skills add VW-ai/vibehub-plugin</div>
   </div>
@@ -78,6 +77,7 @@ body{font-family:var(--mono);color:var(--ink);font-weight:400}
 <script>
 window.__timelines = window.__timelines || {};
 const tl = gsap.timeline({ paused: true });
+// ---- swarm (unchanged data) ----
 const swarm=document.getElementById("swarm");
 const SW=[
  ["planner","running","claude","Read","src/onboarding/*.ts","breaking down the flow into steps…",140,150,"",62,"1m 12s"],
@@ -106,28 +106,46 @@ const words = gsap.utils.toArray("#sentence .w");
 const agents = gsap.utils.toArray(".agent");
 gsap.set(agents, {opacity:0});
 gsap.set("#task", {opacity:0, y:24});
-gsap.set(".label", {});
-// 0–3 sentence arrives
-tl.from("#from", {opacity:0, duration:.4}, .2);
-tl.from(words, {opacity:0, y:10, stagger:.08, duration:.35}, .5);
-// 3–7 dismember: each word flies to an agent
+
+// ---- 起 0–5: the sentence arrives and holds ----
+tl.from("#from", {opacity:0, duration:.5}, .4);
+tl.from(words, {opacity:0, y:8, stagger:.09, duration:.4}, .8);
+
+// ---- 承 5.5–13: it spreads; the camera loses its footing ----
 const targets=[[290,230],[1630,200],[1670,620],[1450,960],[260,900],[570,640],[910,220]];
-tl.to(".agent:not(.sub)", {opacity:1, stagger:.08, duration:.35}, 2.6);
-tl.to(".agent.sub", {opacity:1, stagger:.07, duration:.3}, 4.4);
+const mains=agents.filter(a=>!a.classList.contains("sub")), subs=agents.filter(a=>a.classList.contains("sub"));
+// agents arrive accelerating: first one alone, then faster and faster
+mains.forEach((a,i)=>tl.to(a,{opacity:1,duration:.3}, i<3 ? 5.6+i*1.5 : 10.0+(i-3)*.55));
+subs.forEach((a,i)=>tl.to(a,{opacity:1,duration:.25}, 12.4 + i*.32));
 words.forEach((w,i)=>{ const r=w.getBoundingClientRect(); const [tx,ty]=targets[i];
-  tl.to(w,{x:tx-r.left-r.width/2, y:ty-r.top, duration:.9, ease:"power2.inOut"}, 2.9+i*.12);
-  tl.to(w,{opacity:0, duration:.3}, 4.0+i*.12); });
-tl.to("#from",{opacity:0,duration:.3},2.9);
-// 7–10 human looks: nothing at center; periphery keeps "working" (subtle drift only)
-agents.forEach((a,i)=>tl.to(a,{x:((i*37)%41)-20, y:((i*53)%31)-15, rotation:((i*7)%5)-2, duration:.9+(i%4)*.2, repeat:4, yoyo:true, ease:"sine.inOut"}, 3.3+(i%5)*.1));
-tl.to(".wire",{opacity:.7,duration:.3,stagger:.06},3.6);
-tl.to(".wire",{opacity:0,duration:.6},8.9);
-// 10–13 light collapses to center; agents fade; words return into the task card
-tl.to("#light",{background:"radial-gradient(ellipse 900px 600px at 50% 50%, rgba(250,250,248,0) 0%, rgba(250,250,248,0.92) 100%)", duration:1.6, ease:"power2.inOut"}, 8.6);
-tl.to(agents,{opacity:0, duration:1.2}, 8.8);
-words.forEach((w,i)=>{ tl.to(w,{opacity:1,duration:.01},9.2+i*.05); tl.to(w,{x:0,y:0,duration:.9,ease:"power2.inOut"},9.2+i*.05); });
-tl.to(words,{opacity:0,duration:.25},10.5);
-tl.to("#task",{opacity:1,y:0,duration:.6,ease:"power2.out"},10.6);
+  tl.to(w,{x:tx-r.left-r.width/2, y:ty-r.top, duration:1.2, ease:"power2.inOut"}, 6.4+i*.6);
+  tl.to(w,{opacity:0, duration:.3}, 7.6+i*.6); });
+tl.to("#from",{opacity:0,duration:.4},6.0);
+tl.to(".wire",{opacity:.7,duration:.3,stagger:.08},11.0);
+// each agent never settles
+agents.forEach((a,i)=>tl.to(a,{x:((i*37)%41)-20, y:((i*53)%31)-15, rotation:((i*7)%5)-2, duration:.8+(i%4)*.15, repeat:12, yoyo:true, ease:"sine.inOut"}, 7+(i%5)*.1));
+// camera: drift → shake, amplitude growing; focus hunts (blur pulses)
+// [time, x, y, rot, duration] — slow drift, a pause, a jolt, drift again; amplitude grows
+const shake=[[7.2,4,-3,0,.9],[8.1,-6,4,-.1,.8],[8.9,3,2,0,1.1],[10.0,-12,7,.2,.5],[10.5,-11,8,.2,.6],[11.1,14,-9,-.3,.35],[11.45,10,-6,-.2,.5],[12.0,-18,11,.3,.45],[12.45,-16,12,.3,.7],
+ [13.15,24,-14,-.5,.3],[13.45,20,-10,-.4,.4],[13.85,-28,16,.5,.35],[14.2,-26,18,.5,.55],[14.75,34,-20,-.6,.3],[15.05,30,-17,-.5,.45],[15.5,-40,24,.7,.3],[15.8,-36,22,.6,.6],
+ [16.4,44,-26,-.8,.3],[16.7,40,-22,-.7,.5],[17.2,-48,28,.8,.3],[17.5,-44,26,.7,.6],[18.1,52,-30,-.9,.3],[18.4,46,-26,-.8,.6]];
+shake.forEach(([t,x,y,r,d])=>tl.to("#world",{x:x,y:y,rotation:r,duration:d,ease:"sine.inOut"},t));
+tl.to("#world",{scale:1.07,duration:11.8,ease:"none"},7.2);
+[9.4,10.8,12.2,13.3,14.3,15.2,16.0,16.9,17.7,18.4].forEach((t,i)=>{ tl.to("#world",{filter:"blur("+(2+i*.8)+"px)",duration:.22,ease:"power1.in"},t); tl.to("#world",{filter:"blur(0px)",duration:.3,ease:"power1.out"},t+.26); });
+
+// ---- 转 13–16: hard stop ----
+tl.from("#l1",{opacity:0,duration:.4},16.3);
+
+// ---- 合 16–28: light closes in, it becomes one task ----
+tl.to("#world",{x:0,y:0,rotation:0,scale:1,filter:"blur(0px)",duration:1.8,ease:"power2.inOut"},19.0);
+tl.to("#light",{background:"radial-gradient(ellipse 900px 600px at 50% 50%, rgba(250,250,248,0) 0%, rgba(250,250,248,0.92) 100%)", duration:1.6, ease:"power2.inOut"}, 19.0);
+tl.to(agents,{opacity:0, duration:1.2}, 19.2);
+tl.to(".wire",{opacity:0,duration:.6},19.2);
+words.forEach((w,i)=>{ tl.to(w,{opacity:1,duration:.01},19.6+i*.05); tl.to(w,{x:0,y:0,duration:.9,ease:"power2.inOut"},19.6+i*.05); });
+tl.to(words,{opacity:0,duration:.25},20.9);
+tl.to("#task",{opacity:1,y:0,duration:.6,ease:"power2.out"},21.0);
+tl.from("#l2",{opacity:0,duration:.4},21.3);
+// neighbours, field, zoom out
 const near=document.getElementById("near");
 const N=[["done","ticket-auth-session","Users stay signed in across sessions.",650,190],["ready","ticket-dashboard-empty-state","First-run dashboard shows next steps.",650,640],
          ["done","ticket-signup-api","Signup API accepts verified emails.",250,400],["needs","ticket-welcome-email","You approve the welcome email copy.",1370,400]];
@@ -139,18 +157,14 @@ const states=["done","done","done","done","running","needs","ready","ready","dra
 for(let c=0;c<9;c++)for(let r=0;r<7;r++){ if(c>=3&&c<=5&&r>=2&&r<=4) continue;
   const d=document.createElement("div"); const band=c<3?[0,4]:c<6?[3,7]:[6,10]; const st=states[band[0]+((c*7+r*3)%(band[1]-band[0]))];
   d.className="n "+st; d.style.left=(-1200+c*560)+"px"; d.style.top=(-700+r*330)+"px"; d.innerHTML=`<b>ticket-${c}${r}</b><i>${st==="needs"?"NEEDS YOU":st.toUpperCase()}</i>`; far.appendChild(d);}
-tl.to(".edge",{opacity:1,duration:.4,stagger:.12},14.2);
-tl.to("#near .n",{opacity:1,duration:.5,stagger:.15},14.4);
-tl.to("#far .n",{opacity:1,duration:.8,stagger:{each:.02,from:"center"}},16.6);
-tl.to("#world",{scale:.33,duration:3.2,ease:"power2.inOut"},17);
-tl.to("#light",{opacity:0,duration:1},17);
-// labels
-tl.from("#l1",{opacity:0,duration:.4},6.3);
-tl.from("#l2",{opacity:0,duration:.4},11.7);
-tl.from("#fit",{opacity:0,duration:.8},20);
-tl.from("#l3",{opacity:0,duration:.4},14.5);
-tl.from("#end h1",{opacity:0,y:10,duration:.5},23.7);
-tl.from("#end .cta",{opacity:0,duration:.4},24.2);
+tl.to(".edge",{opacity:1,duration:.4,stagger:.12},23.6);
+tl.to("#near .n",{opacity:1,duration:.5,stagger:.15},23.8);
+tl.to("#far .n",{opacity:1,duration:.8,stagger:{each:.02,from:"center"}},25.4);
+tl.to("#world",{scale:.33,duration:3.0,ease:"power2.inOut"},25.6);
+tl.to("#light",{opacity:0,duration:1},25.6);
+tl.from("#fit",{opacity:0,duration:.8},27.4);
+tl.from("#end h1",{opacity:0,y:10,duration:.5},31.1);
+tl.from("#end .cta",{opacity:0,duration:.4},31.6);
 window.__timelines["taskstory"] = tl;
 </script>
 </body></html>
