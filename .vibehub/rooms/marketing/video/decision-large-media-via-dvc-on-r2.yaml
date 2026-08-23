@@ -1,0 +1,45 @@
+{
+  "context_id": "decision-large-media-via-dvc-on-r2",
+  "detail": "Chosen 2026-08-23 after the first push of ~90MB of renders was slow and the branch history was rewritten (git filter-repo, force-push of the unmerged branch) to drop them. Google Drive as a DVC remote was tried and abandoned: Google blocks DVC's unverified OAuth client for the sensitive Drive scope, and an own OAuth client in Testing mode expires weekly. R2 is free at this volume, has zero egress, and needs no OAuth — S3 keys go in .dvc/config.local (gitignored), never in chat or in git. DVC lives in its own venv (~/.cache/vh-dvc) because dvc[gdrive] pulled incompatible pyOpenSSL/cryptography into the system Python. Workflow: render → dvc add → dvc push → commit the pointer; dvc pull on a fresh machine. Verified by a byte-identical round trip.",
+  "evidence": [
+    {
+      "note": "Setup and daily commands.",
+      "ref": "assets/video/renders/MANIFEST.md"
+    },
+    {
+      "note": "Remote definition (endpoint, bucket); keys are local-only.",
+      "ref": ".dvc/config"
+    },
+    {
+      "note": "Release archive of the same files.",
+      "ref": "https://github.com/VW-ai/vibehub-plugin/releases/tag/video-drafts-2026-08-23"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "convention-hyperframes-authoring",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "change-video-sources-checked-in-under-assets-video",
+      "type": "supersedes"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-23T09:30:00Z",
+    "quote": "视频文件传youtube/drive，我们这里只有这个link to the file 在git上",
+    "ref": "conversation:2026-08-23-media-storage"
+  },
+  "state": "active",
+  "summary": "Renders and music stems are versioned with DVC backed by Cloudflare R2 (bucket vibehub); git holds only *.dvc pointers, GitHub Releases archive published versions, and no video binaries enter git history",
+  "tags": [
+    "video",
+    "storage",
+    "dvc",
+    "r2",
+    "repository-hygiene"
+  ],
+  "type": "decision"
+}

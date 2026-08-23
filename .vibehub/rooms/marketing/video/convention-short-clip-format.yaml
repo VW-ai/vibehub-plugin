@@ -1,0 +1,32 @@
+{
+  "context_id": "convention-short-clip-format",
+  "detail": "Owner judged 60s too long for LinkedIn/小红书 feeds where the first 3 seconds decide. Planned proposition clips: 'Agent said done' vs Evidence (15s); one sentence → Task runs with its Context (20s); second Task reuses the first Task's Context without re-explaining the project (20s); Codex starts, Claude Code continues, Task stays stable (15s). 小红书 is always 9:16; LinkedIn primarily 16:9 with 9:16 acceptable.",
+  "evidence": [
+    {
+      "note": "Owner asked for shorter clips; the 2s/10s/3s structure and one-proposition rule were agreed in reply.",
+      "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-manage-the-task-narrative",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T09:30:00Z",
+    "quote": "感觉60s都有点久了",
+    "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+  },
+  "state": "active",
+  "summary": "Every feed clip is 15–30 seconds, carries exactly one proposition, and follows hook (2s) → real footage (~10s) → tagline + install CTA (3s); 60s versions are for the landing page only",
+  "tags": [
+    "video",
+    "format",
+    "duration",
+    "hook"
+  ],
+  "type": "convention"
+}

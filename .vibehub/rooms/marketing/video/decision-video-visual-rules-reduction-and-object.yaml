@@ -1,0 +1,42 @@
+{
+  "context_id": "decision-video-visual-rules-reduction-and-object",
+  "detail": "Owner rejected three styled concepts (Workbench-language with orange accent, paper/editorial with red italics and stamps, black-white poster with one orange number) as all AI-flavoured; the editorial one in particular is the default 'tasteful' move every model makes. Good design here means unpredictable-but-justified, and right now the trope is adding things, so the only anti-trope direction is subtracting. Rules: (1) Use only the real Workbench tokens — canvas #fafaf8 with dot grid, ink #252523, muted #6d6d68, faint #969690, line #e2e2de, the phase colours done #496351/#f0f3f0, ready #575751/#f2f2ef, running #3267a8/#edf4ff, needs-you #895d0a/#fff4df, draft #c8c8c2/#f7f7f5, and the monospace UI font. (2) One shape: the ticket card (rounded 14–16px, 1px line, 4–5px phase bar at the bottom); agents, neighbours and far tickets are the same card at other sizes and shades. (3) One font weight family; hierarchy by size and shade, never by colour or decoration. (4) No accent colour; emphasis comes from ad-film techniques instead — a single object lit with soft shadow, scale contrast (one big vs many small), held pauses, and camera motion (push/zoom) rather than object bounce. (5) Motion is translation and light only; no fades-as-emphasis, no overshoot. (6) Visual focus is a single Task that stays in the centre of frame for the whole clip while changing form: lead's sentence → dismembered into an agent swarm → empty centre ('Where is it now?') → light collapses and the sentence reassembles into the real-style DONE card → four neighbours attach with different phases → zoom out to a field where DONE clusters left and READY/DRAFT right (causal flow) → crossfade to the real Workbench All+Fit view. The final frames must be the real UI so the video and the installed product look identical. Owner approved this direction on 2026-08-22 and asked only that the agent swarm be bigger and messier.",
+  "evidence": [
+    {
+      "note": "Owner's critique of concepts A/B/C and approval of the reduction frame and the taskstory v2 render.",
+      "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+    },
+    {
+      "note": "Source of the real Workbench tokens reused verbatim in the video CSS.",
+      "ref": "skills/vibehub-ticket-review/assets/app.css"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "intent-two-launch-videos",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "convention-hyperframes-authoring",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T12:30:00Z",
+    "quote": "好的设计，它并不一定就是说是一定要好看，但是它一定要反套路",
+    "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+  },
+  "state": "active",
+  "summary": "Video visual language is anti-trope by subtraction: only the Workbench's own tokens, one shape, one weight, no accent color, the Task treated as a lit physical object that never leaves the centre of frame",
+  "tags": [
+    "video",
+    "design",
+    "visual-language",
+    "anti-trope",
+    "workbench-tokens",
+    "task-as-object"
+  ],
+  "type": "decision"
+}

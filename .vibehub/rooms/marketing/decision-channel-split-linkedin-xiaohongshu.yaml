@@ -1,0 +1,32 @@
+{
+  "context_id": "decision-channel-split-linkedin-xiaohongshu",
+  "detail": "LinkedIn targets AI coding tool builders, indie developers, engineering leaders, agent-infra people; formats are strong-opinion posts, 30–90s vertical demos, screenshot carousels, dogfood retros, founder origin story (Victor and Wayne productized how they already worked together). 小红书 targets Codex/Claude Code heavy users, indie devs, AI PMs, vibe coders; it opens from experience ('开了 20 个对话后不知道哪个做完了', '我不想管理我的 AI Agents，我只想让事情做完'), never from Git-native ticket graphs; formats are 6–9 card 图文, 30–60s screen recordings, 踩坑复盘. Each week one real VibeHub Task yields a mother asset (1 problem, 1 opinion, 1 recording, 3–6 screenshots, 1 Outcome, 1 surprise/failure) that is cut per channel. First-round content builds problem awareness (manifesto, problem demo, completion demo, context demo, replaceable-agent demo, dogfood report), not a launch announcement. Early metrics, in priority order: target users commenting with their own agent-work pain; installs that create a first Task; users creating a second Task within a week (most important — Context compounding starts at the second Task).",
+  "evidence": [
+    {
+      "note": "Codex proposed the split and the metrics; owner accepted and moved to video production.",
+      "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-manage-the-task-narrative",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T09:30:00Z",
+    "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+  },
+  "state": "active",
+  "summary": "LinkedIn and 小红书 share one weekly mother asset but get different narrative entry points: founder POV and paradigm on LinkedIn, personal 'I don't want to manage my AI' pain on 小红书; never word-for-word sync",
+  "tags": [
+    "channels",
+    "linkedin",
+    "xiaohongshu",
+    "content-system",
+    "metrics"
+  ],
+  "type": "decision"
+}

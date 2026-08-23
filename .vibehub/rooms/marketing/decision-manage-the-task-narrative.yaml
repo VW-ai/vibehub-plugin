@@ -1,0 +1,40 @@
+{
+  "context_id": "decision-manage-the-task-narrative",
+  "detail": "VibeHub is not marketed as a plugin or as another coding agent; the plugin is only the lowest-friction install form. The category claim is the Task layer for coding agents: a Task is an agent-runnable Context package (Objective, selected Context, acceptance contract, dependencies, authority boundary, execution trace, Evidence, Outcome, Context writeback). The human only manages the Task; everything below it is infrastructure and only what needs human judgment rises to the Task. Three supporting propositions, repeated everywhere: (1) Chat is not a unit of work. (2) Memory is not enough — memory preserves what was said, VibeHub preserves the development cycle. (3) Agent work needs evidence, not confidence — deliberately demoted from headline to trust mechanism: Evidence is what lets the user NOT supervise the Agent ('Don't supervise the Agent. Inspect the Outcome.'). Contrast line: Linear tells your team what should happen; VibeHub gives Agents what they need to make it happen and brings back what was learned. Chinese form: 你不是来管理 AI 的，你只是想把事情做完。管理 Task，其余交给 VibeHub。",
+  "evidence": [
+    {
+      "note": "Owner and Codex converged on this narrative after rejecting 'Git-native ticket plugin' and 'chat → trackable work' as too feature-like; owner confirmed it as clear.",
+      "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+    },
+    {
+      "note": "The narrative is the external voice of the product's attention-routing decision.",
+      "ref": ".vibehub/rooms/product/decision-outcome-facing-attention-routing.yaml"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-outcome-facing-attention-routing",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "decision-plugin-wedge-solo-small-team-coordination",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T09:30:00Z",
+    "quote": "You have work to finish—not agents to manage. Manage the Task. VibeHub manages everything underneath.",
+    "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+  },
+  "state": "active",
+  "summary": "Top-level public narrative: Don't manage chats. Don't manage Agents. Manage the Task — VibeHub manages the Context, execution, Evidence, and everything underneath",
+  "tags": [
+    "positioning",
+    "narrative",
+    "task-layer",
+    "messaging"
+  ],
+  "type": "decision"
+}

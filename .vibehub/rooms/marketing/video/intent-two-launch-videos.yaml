@@ -1,0 +1,40 @@
+{
+  "context_id": "intent-two-launch-videos",
+  "detail": "Video 1 (functional, real footage, LinkedIn): install the plugin in a project; chat, scope requirements or brainstorm while VibeHub collects Context and Tickets in the background; everything is in place when work starts; the Task system runs development stably; the decisive final beat is a human glancing at the Workbench and knowing what the system is doing \u2014 cut from a pile of agent chat windows to the Task graph. Must be recorded from a real session, not simulated; install and chat beats get ~3s each so the clip stays short. Video 2 (narrative, motion graphics, no screen recording): everyone is building agent teams \u2014 orchestrators, subagents, dashboards \u2014 but your tech lead and your customer don't care how your agents are organized, they care whether the task is done; so don't micromanage agents, manage the task; VibeHub handles the context, the plan, and the report (GUI). Wording caution: 'doesn't care how you do your job' must land as 'process is infrastructure, not human attention', so close on an Evidence/GUI frame.",
+  "evidence": [
+    {
+      "note": "Owner described both videos; assistant proposed the tightened wording for video 2 and the glance-at-Workbench climax for video 1.",
+      "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+    },
+    {
+      "ref": "assets/video/STORYBOARD.md",
+      "note": "Both storylines as currently cut (glance v2, taskstory v3); #2 ending extended to neighbours \u2192 zoom out \u2192 real All+Fit per owner on 2026-08-22."
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "convention-short-clip-format",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "decision-channel-split-linkedin-xiaohongshu",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-22T09:30:00Z",
+    "quote": "\u4f5c\u4e3a\u4eba\uff0c\u4e00\u773c\u626b\u8fc7\u53bb\uff0c\u5c31\u77e5\u9053\u7cfb\u7edf\u5728\u5e72\u5565\u4e86",
+    "ref": "conversation:2026-08-22-propaganda-strategy-and-video-pipeline"
+  },
+  "state": "active",
+  "summary": "Two first videos: #1 a functional LinkedIn demo of install \u2192 chat while VibeHub gathers Context and Tickets \u2192 work starts \u2192 a human understands the whole system at a glance; #2 a narrative motion-graphics piece: don't micromanage agents, manage the task",
+  "tags": [
+    "video",
+    "storyboard",
+    "linkedin",
+    "motion-graphics"
+  ],
+  "type": "intent"
+}

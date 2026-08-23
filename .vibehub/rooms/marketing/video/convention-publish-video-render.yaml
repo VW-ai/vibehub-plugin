@@ -1,0 +1,46 @@
+{
+  "context_id": "convention-publish-video-render",
+  "detail": "Local: DVC lives in ~/.cache/vh-dvc (own venv). Credentials are never in git or chat — ~/.aws/credentials has a [r2] profile and .dvc/config references profile = r2. Steps: npx hyperframes render assets/video/<clip> → assets/video/audio/mix-<clip>.sh (after audio/fetch.sh) → dvc add renders/<clip>-vN.mp4 → dvc push → git commit the .dvc pointer and renders/.gitignore → optionally gh release upload <tag> for a stable public URL (Releases are the public archive; R2 is the working store). CI (.github/workflows/media.yml): verify-pointers fails any PR/push touching assets/video/** whose pointer has no object in R2; the render job (workflow_dispatch: clip, mix, release_tag) installs ffmpeg + Chromium, pulls footage and stems, renders, mixes, pushes to R2, commits the pointer as github-actions[bot], and optionally uploads to a Release. The Cloudflare account id 72091e7e079e357ced7f9603c03a926e and bucket 'vibehub' are not secrets and sit in .dvc/config. Rotate the S3 key pair in Cloudflare if it is ever exposed (the first pair was pasted into a chat on 2026-08-23 and should be rotated).",
+  "evidence": [
+    {
+      "note": "The same steps as commands.",
+      "ref": "assets/video/renders/MANIFEST.md"
+    },
+    {
+      "note": "verify-pointers and render jobs.",
+      "ref": ".github/workflows/media.yml"
+    },
+    {
+      "note": "remote r2: url, endpoint, region, profile.",
+      "ref": ".dvc/config"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-large-media-via-dvc-on-r2",
+      "type": "depends_on"
+    },
+    {
+      "target_context_id": "convention-hyperframes-authoring",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-23T10:30:00Z",
+    "quote": "记得加上关于如何发布上传video的context，关于如何使用R2",
+    "ref": "conversation:2026-08-23-media-storage"
+  },
+  "state": "active",
+  "summary": "How a video render is published: render → mix → dvc add/push to R2 → commit only the .dvc pointer → (public link) gh release upload; auth is the aws profile r2 locally and repo secrets R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY in CI; the Media workflow can do the whole chain on demand",
+  "tags": [
+    "video",
+    "publishing",
+    "dvc",
+    "r2",
+    "ci",
+    "secrets"
+  ],
+  "type": "convention"
+}
