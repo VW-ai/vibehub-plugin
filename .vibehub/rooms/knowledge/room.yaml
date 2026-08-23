@@ -3,14 +3,14 @@
     "anchor_hashes": [
       {
         "blob": "956fb8cf65743894e27e167c6da586dfc716107e",
-        "path": "skills/contracts/context.schema.json"
+        "path": "skills/vibehub-core/contracts/context.schema.json"
       },
       {
         "blob": "bf8884197dba4632d84d96d42c315baf5b767d63",
-        "path": "skills/contracts/room.schema.json"
+        "path": "skills/vibehub-core/contracts/room.schema.json"
       },
       {
-        "blob": "55bb0678f89717b7947ba4509e03d4e896fe1b5f",
+        "blob": "fd2a2d6cfaa907b0fae158b8f537b4f4dfab08c1",
         "path": "skills/vibehub-distill/SKILL.md"
       },
       {
@@ -18,7 +18,7 @@
         "path": "skills/vibehub-distill/agents/openai.yaml"
       },
       {
-        "blob": "9a8f293ebdab3f02cad4f7501ebde9fd87990061",
+        "blob": "a9b7006a9e2a399d39cf88a886f5fbc19e875bc5",
         "path": "skills/vibehub-ingest/SKILL.md"
       },
       {
@@ -30,7 +30,7 @@
         "path": "skills/vibehub-ingest/references/knowledge-governance.json"
       },
       {
-        "blob": "55ff13eed0e8c0413928cd58cb062ac71958ee9d",
+        "blob": "d9681a4a7aa10fa37ba179b4c05c6c91e48c5937",
         "path": "skills/vibehub-migrate/SKILL.md"
       },
       {
@@ -42,7 +42,7 @@
         "path": "skills/vibehub-migrate/references/migrations.json"
       },
       {
-        "blob": "c20a6246e4b73a88e3cf1ab055da0573dd6760d3",
+        "blob": "b4d5a0341c9382b5f8b0b13be6970a2cc381f91f",
         "path": "skills/vibehub-query/SKILL.md"
       },
       {
@@ -50,12 +50,12 @@
         "path": "skills/vibehub-query/agents/openai.yaml"
       }
     ],
-    "checked_at": "2026-08-20T00:30:45.717Z",
-    "last_aligned_commit": "b47a9b3f9b0cc8d995c5a8793396c704aa303ca5"
+    "checked_at": "2026-08-23T02:30:33.749Z",
+    "last_aligned_commit": "17760a81098befc78b58d4aad0a31f6a9d802a60"
   },
   "anchors": [
-    "skills/contracts/context.schema.json",
-    "skills/contracts/room.schema.json",
+    "skills/vibehub-core/contracts/context.schema.json",
+    "skills/vibehub-core/contracts/room.schema.json",
     "skills/vibehub-distill/",
     "skills/vibehub-ingest/",
     "skills/vibehub-migrate/",

@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "aba66f4fe7b28bb7b098ac65f1c0ab1be245d0ac",
+        "blob": "d84cabe0dc37ec69ebe838fcd17cda3c1b0e7041",
         "path": "README.md"
       },
       {
@@ -50,7 +50,7 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "9778b289bdbd130fbb830c55e4013260d68f313e",
+        "blob": "e2a69416b73c01ec5c3b727bbf039e0e6885d7d8",
         "path": "docs/INSTALL.md"
       },
       {
@@ -58,7 +58,7 @@
         "path": "docs/LEGACY_PROOF_REVISION_POLICY.md"
       },
       {
-        "blob": "8f19d098f116896f4294c5482db8fa016e8444d5",
+        "blob": "a1bd4b0842407d81092fcd62c613cc8c02773086",
         "path": "docs/LOCAL_GRAPH_DESIGN.md"
       },
       {
@@ -154,6 +154,10 @@
         "path": "docs/proposals/codex-like-workbench/tokens.json"
       },
       {
+        "blob": "7f317eea2f5dd522f0f0de592cf96f3d58a975ea",
+        "path": "docs/proposals/npx-first-install-experience.md"
+      },
+      {
         "blob": "ec36655c97522bb511648c69abf3109ec79abe51",
         "path": "docs/proposals/rooms-workbench/README.md"
       },
@@ -174,8 +178,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-23T00:19:27.946Z",
-    "last_aligned_commit": "b987bb1b6940890588c3f8762202e0d69f4684d8"
+    "checked_at": "2026-08-23T02:30:33.898Z",
+    "last_aligned_commit": "17760a81098befc78b58d4aad0a31f6a9d802a60"
   },
   "anchors": [
     "CHANGELOG.md",
