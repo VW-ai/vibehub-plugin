@@ -5,6 +5,10 @@ description: Upgrade a project's checked-in .vibehub data from an older VibeHub 
 
 # VibeHub Migrate
 
+> If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
+> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+
 Upgrading is a restructure, not a compatibility layer. Current project and
 document versions live in `../vibehub-core/contracts/versions.json`; the matching upgrade
 steps live once in `references/migrations.json`. Their targets must agree

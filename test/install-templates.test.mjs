@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { existsSync, readFileSync } from "node:fs";
+import * as fsSync from "node:fs";
 import { join } from "node:path";
 import { root } from "./helpers.mjs";
 
@@ -59,4 +60,13 @@ test("the five-file project copy runs from scripts/vibehub in a clean checkout",
   const projection = mod.computeProjection(project, "acme/demo");
   assert.equal(projection.length, 1);
   assert.equal(projection[0].title, "Demo");
+});
+
+test("every VibeHub Skill tells an Agent how to repair a partial install", () => {
+  const { readdirSync } = fsSync;
+  for (const name of readdirSync(join(root, "skills"))) {
+    if (name === "vibehub-core" || !name.startsWith("vibehub-")) continue;
+    const skill = readFileSync(join(root, "skills", name, "SKILL.md"), "utf8");
+    assert.match(skill, /npx skills add VW-ai\/vibehub-plugin -s vibehub-core/, `${name} lacks the partial-install repair line`);
+  }
 });

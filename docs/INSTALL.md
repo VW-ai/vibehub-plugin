@@ -14,12 +14,14 @@ VibeHub Skill into the agent directories it detects (`.claude/skills/`,
 `.agents/skills/`, …) through [skills.sh](https://skills.sh):
 
 ```bash
-npx skills add VW-ai/vibehub-plugin --all
+npx skills add VW-ai/vibehub-plugin
 ```
 
-Install all skills together. The shared helper and contracts ship inside the
-`vibehub-core` skill folder; a partial install (`-s <one-skill>`) that omits
-`vibehub-core` leaves the other Skills without `../vibehub-core/scripts/vh.mjs`.
+Choose **Select all** in the picker. The shared helper and contracts ship
+inside the `vibehub-core` skill folder; a partial install that omits
+`vibehub-core` leaves the other Skills without `../vibehub-core/scripts/vh.mjs`
+— each Skill detects that and tells the Agent to run
+`npx skills add VW-ai/vibehub-plugin -s vibehub-core`.
 `vibehub-core` is infrastructure, not a workflow — nothing in it is invoked
 directly. Update later with `npx skills update`.
 

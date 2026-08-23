@@ -5,6 +5,10 @@ description: Independently adjudicate one lightweight VibeHub Ticket against eve
 
 # VibeHub Ticket Closeout
 
+> If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
+> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+
 The closeout Agent must be independent from the executor.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.

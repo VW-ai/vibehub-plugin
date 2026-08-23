@@ -30,7 +30,7 @@ Describe one coding request and say the line above. The request and exact Contex
 One line for any skills-capable agent (Claude Code, Codex, Cursor, and more):
 
 ```bash
-npx skills add VW-ai/vibehub-plugin --all
+npx skills add VW-ai/vibehub-plugin
 ```
 
 Or through the host marketplaces — Codex: `codex plugin marketplace add VW-ai/vibehub-plugin` then `codex plugin add vibehub@vibehub`;

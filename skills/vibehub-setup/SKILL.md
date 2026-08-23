@@ -5,6 +5,10 @@ description: Set up the lightweight Skill-first VibeHub folders and project inst
 
 # VibeHub Setup
 
+> If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
+> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+
 VibeHub installs as Skills plus checked-in Git YAML, inside the product
 boundary defined once in `references/architecture-boundary.md`.
 When Ticket Plan invokes Setup for the canonical “Start this with VibeHub.”

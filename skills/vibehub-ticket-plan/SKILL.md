@@ -5,6 +5,10 @@ description: Turn a deliverable into the smallest executable Git-native VibeHub 
 
 # VibeHub Ticket Plan
 
+> If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
+> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+
 Plan outcomes, not ceremony. One coherent deliverable is usually one Ticket.
 Split only at a real scheduling, dependency, retry, authority, or verification
 boundary.

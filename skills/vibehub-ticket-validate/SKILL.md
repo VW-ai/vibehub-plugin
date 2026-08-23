@@ -5,6 +5,10 @@ description: Independently validate a proposed or current lightweight VibeHub Ti
 
 # VibeHub Ticket Validate
 
+> If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
+> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+
 Be independent and read-only. Do not rewrite or apply the candidate.
 
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.

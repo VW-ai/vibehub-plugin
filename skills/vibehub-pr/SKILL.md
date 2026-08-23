@@ -5,6 +5,10 @@ description: Prepare or review a pull request whose code and lightweight VibeHub
 
 # VibeHub PR
 
+> If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
+> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+
 Read `../vibehub-ticket-review/references/ticket-lifecycle.json` before acting.
 This Skill owns `pr-review-ready`; it does not own UI launch mechanics.
 
