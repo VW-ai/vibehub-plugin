@@ -33,6 +33,15 @@ async function exists(relativePath) {
   }
 }
 
+async function fetchOrExplain(target, init) {
+  try {
+    return await fetch(target, init);
+  } catch (error) {
+    const cause = error?.cause?.code ?? error?.cause?.message ?? error.message;
+    throw new Error(`Request to ${target} failed (${cause}); the hostname may not resolve or the Pages custom domain may not be active yet`);
+  }
+}
+
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd ?? repoRoot,
@@ -147,7 +156,7 @@ async function verify(target = canonicalUrl) {
   const url = new URL(target);
   assertion(url.protocol === "https:", "Release verification requires an HTTPS URL");
 
-  const response = await fetch(url, {
+  const response = await fetchOrExplain(url, {
     redirect: "follow",
     signal: AbortSignal.timeout(20_000),
     headers: { "user-agent": "VibeHub release verifier" },
@@ -196,7 +205,7 @@ async function verifyRedirects() {
 
   for (const host of redirectHosts) for (const protocol of ["http:", "https:"]) {
     const requested = `${protocol}//${host}${pathAndQuery}`;
-    const response = await fetch(requested, {
+    const response = await fetchOrExplain(requested, {
       redirect: "manual",
       signal: AbortSignal.timeout(20_000),
       headers: { "user-agent": "VibeHub release verifier" },
