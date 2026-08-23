@@ -89,6 +89,8 @@
     "thread/tokenUsage/updated": "{ threadId, turnId, tokenUsage: { total: { totalTokens, inputTokens, cachedInputTokens, outputTokens, reasoningOutputTokens }, last, modelContextWindow: number|null } } — inside a Turn before its turn/completed, and replayed on thread/resume; show no value before the first one and no percentage while modelContextWindow is null",
     "thread/name/updated": "{ threadId, threadName: string|null } after thread/name/set",
     "thread/compacted": "{ threadId, turnId } forwarded if ever sent; the 0.149.0 v2 path does not send it, the contextCompaction item does the work",
-    "turn/started, turn/completed": "unchanged; turn/completed for a Thread the sidebar does not list is the cue to refresh it"
+    "turn/started, turn/completed": "unchanged. turn/started for a Thread the last bootstrap did not list (a brand-new Chat: 0.149.0 lists a Thread only once its first userMessage is durable, about 0.4 to 1.2 s after turn/started) keeps the browser's own record as a provisional row with the live dot and starts a bounded retry of at most 4 bootstrap refreshes 750 ms apart that ends the moment a bootstrap lists the Thread; turn/completed for a Thread still unlisted refreshes too",
+    "item/completed": "{ threadId, turnId, item, completedAtMs } unchanged; the userMessage item of a Thread under that watch is the durable listing cue: the lists are refreshed from bootstrap at once",
+    "thread/status/changed": "{ threadId, status } applied to every local row as the runtime's own status, so the dot settles on idle without a refresh; its active variant lands with turn/started, before the durable write, so it is no listing cue"
   }
 }

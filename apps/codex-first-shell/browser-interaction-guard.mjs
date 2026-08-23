@@ -879,8 +879,8 @@ export async function runBrowserInteractionGuard(hooks) {
   // A turn/completed in a Thread off the active route is noticed exactly
   // once per Turn id (live, then replayed after a reconnect): one in-app
   // notice and one browser Notification through a stubbed constructor; the
-  // preference is a host action; Never silences; turn/started for a Thread
-  // the Sidebar does not list refreshes the lists.
+  // preference is a host action; Never silences. Sidebar freshness for a
+  // brand-new Chat follows below.
   const notificationControl = document.querySelector("#notificationMode");
   const realNotification = window.Notification;
   const constructed = [];
@@ -931,18 +931,80 @@ export async function runBrowserInteractionGuard(hooks) {
   }); } catch (error) { check(results, "notification checks completed", false, `threw: ${error?.message ?? error}`); }
   window.Notification = realNotification;
 
-  // turn/started for a Thread the Sidebar does not list (and turn/completed
-  // for the unlisted review fixture): the lists refresh through the live
-  // bootstrap, the only source of the listing.
-  try { await hooks.withFixtureTransport(async (payload) => (payload.action === "readThread" ? { thread: structuredClone(fixture.thread) } : {}), async () => {
-    const refreshesBefore = hooks.bootstrapRefreshes();
-    await hooks.applyEventWindow({ events: [{ sequence: 74, kind: "notification", value: { method: "turn/started", params: { threadId: "guard-unlisted-thread", turn: { id: "guard-unlisted-turn", status: "inProgress", items: [] } } } }], cursor: 74, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
-    const refreshedForUnlisted = hooks.bootstrapRefreshes() === refreshesBefore + 1;
-    const listedBefore = hooks.bootstrapRefreshes();
-    await hooks.applyEventWindow({ events: [{ sequence: 75, kind: "notification", value: { method: "turn/completed", params: { threadId: fixture.thread.id, turn: { id: "guard-listed-idle-turn", status: "completed", items: [] } } } }], cursor: 75, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: fixture.pendingRequests });
-    const refreshedForFixture = hooks.bootstrapRefreshes() === listedBefore + 1;
-    check(results, "turn/started for a Thread the Sidebar does not list refreshes the Sidebar from the live bootstrap", refreshedForUnlisted && refreshedForFixture, `refreshes ${refreshesBefore} → ${hooks.bootstrapRefreshes()}`);
-  }); } catch (error) { check(results, "sidebar freshness check completed", false, `threw: ${error?.message ?? error}`); }
+  // --- Sidebar freshness for a brand-new Chat --------------------------
+  // The driver's fixture host lists a Thread only once its first userMessage
+  // is durable, as the real 0.149.0 app-server does (about 2 s after
+  // turn/started under the driver's CODEX_FIXTURE_USER_MESSAGE_DELAY_MS). A
+  // Thread created through the live host is opened so the browser holds its
+  // thread/start record; a bootstrap proves the host does not list it; then
+  // turn/started is delivered: no refresh, the held record is the row with
+  // the live dot and a bounded retry is pending. The first retry's bootstrap
+  // still misses the Thread and the row survives; the durable cue
+  // (item/completed of the userMessage) refreshes at once; once a bootstrap
+  // lists the Thread the host's own record replaces the row, the watch ends
+  // and no refresh follows; thread/status/changed { idle } settles the dot.
+  const bridgeShell = Boolean(new URLSearchParams(location.search).get("bridgeWrites"));
+  if (bridgeShell) {
+    try {
+      const created = (await hooks.hostAction({ action: "newThread" })).thread;
+      const rowFor = (threadId) => document.querySelector(`[data-thread-row="${CSS.escape(threadId)}"]`);
+      const dotFor = (threadId) => Boolean(rowFor(threadId)?.querySelector(".thread-state.active"));
+      const watchedEntry = () => hooks.listingWatch().watched.find((entry) => entry.threadId === created.id) ?? null;
+      const window74 = (sequence, events) => ({ events: events.map((value, index) => ({ sequence: sequence + index, kind: "notification", value })), cursor: sequence + events.length - 1, oldestCursor: 1, gap: false, runtimeGeneration: hooks.currentRuntimeGeneration(), runtimeAlive: true, runtimeState: "alive", runtimeHalt: null, pendingRequests: hooks.currentBootstrap()?.pendingRequests ?? [] });
+      await hooks.openThread(created.id);
+      await hooks.refreshBootstrap();
+      await frame();
+      const unlistedBefore = !hooks.listingWatch().listed.includes(created.id) && !rowFor(created.id);
+      const refreshesAtStart = hooks.bootstrapRefreshes();
+      // The real Turn first, so the host's durable write lands about 2 s from
+      // now; the browser sees its turn/started through the event feed.
+      const turn = (await hooks.hostAction({ action: "startTurn", threadId: created.id, input: [{ type: "text", text: "guard listing walk" }] })).turn;
+      await hooks.applyEventWindow(window74(74, [
+        { method: "thread/status/changed", params: { threadId: created.id, status: { type: "active" } } },
+        { method: "turn/started", params: { threadId: created.id, turn: { id: turn.id, status: "inProgress", items: [] } } },
+      ]));
+      const atStart = { refreshes: hooks.bootstrapRefreshes(), row: Boolean(rowFor(created.id)), dot: dotFor(created.id), watched: watchedEntry() };
+      check(results, "turn/started for a Thread the host does not list yet draws the held record as a live row at once, refreshes nothing, and arms a bounded retry",
+        unlistedBefore && atStart.refreshes === refreshesAtStart && atStart.row && atStart.dot && atStart.watched?.provisional === true && atStart.watched.retryPending === true && atStart.watched.refreshes === 0 && hooks.listingWatch().attempts === 4 && hooks.listingWatch().delayMs === 750,
+        `unlisted before ${unlistedBefore} · refreshes ${refreshesAtStart} → ${atStart.refreshes} · row ${atStart.row} dot ${atStart.dot} · ${JSON.stringify(atStart.watched)}`);
+      // The first retry, 750 ms later: its bootstrap does not carry the
+      // Thread yet, and the row stays, still live.
+      const retried = await waitFor(() => hooks.bootstrapRefreshes() === refreshesAtStart + 1, 120);
+      await frame();
+      const afterRetry = { refreshes: hooks.bootstrapRefreshes(), row: Boolean(rowFor(created.id)), dot: dotFor(created.id), watched: watchedEntry(), listed: hooks.listingWatch().listed.includes(created.id) };
+      check(results, "the first retry's bootstrap misses the Thread (not durable yet) and the provisional row survives it, live",
+        retried && afterRetry.refreshes === refreshesAtStart + 1 && afterRetry.row && afterRetry.dot && !afterRetry.listed && afterRetry.watched?.refreshes === 1,
+        `refreshes ${afterRetry.refreshes} · row ${afterRetry.row} dot ${afterRetry.dot} · listed ${afterRetry.listed} · ${JSON.stringify(afterRetry.watched)}`);
+      // The durable cue refreshes at once (here still before the host's
+      // write lands, so the row is kept once more).
+      const beforeCue = hooks.bootstrapRefreshes();
+      await hooks.applyEventWindow(window74(80, [{ method: "item/completed", params: { threadId: created.id, turnId: turn.id, item: { type: "userMessage", id: "guard-user-message", content: [{ type: "text", text: "guard listing walk" }] } } }]));
+      const afterCue = { refreshes: hooks.bootstrapRefreshes(), row: Boolean(rowFor(created.id)), dot: dotFor(created.id) };
+      check(results, "the userMessage item/completed of the watched Thread refreshes the Sidebar from the live bootstrap at once", afterCue.refreshes === beforeCue + 1 && afterCue.row && afterCue.dot, `refreshes ${beforeCue} → ${afterCue.refreshes} · row ${afterCue.row} dot ${afterCue.dot}`);
+      // Once the host lists it (the durable write landed; the cue or a later
+      // retry reads it), the host's record replaces the row, the watch ends
+      // and the refreshes stop.
+      const listed = await waitFor(() => hooks.listingWatch().listed.includes(created.id) && !watchedEntry(), 600);
+      await frame();
+      const hostTitle = rowFor(created.id)?.querySelector(".thread-button strong")?.textContent ?? null;
+      const settledAt = hooks.bootstrapRefreshes();
+      await new Promise((resolve) => setTimeout(resolve, 1_300));
+      const afterSettle = { refreshes: hooks.bootstrapRefreshes(), row: Boolean(rowFor(created.id)), dot: dotFor(created.id), watched: watchedEntry(), timers: hooks.listingWatch().watched.filter((entry) => entry.retryPending).length };
+      check(results, "a bootstrap that lists the Thread replaces the provisional row with the host's record (the dot stays live), ends the watch and the retries stop: never a perpetual poll",
+        listed && hostTitle === "guard listing walk" && afterSettle.row && afterSettle.dot && afterSettle.watched === null && afterSettle.refreshes === settledAt && afterSettle.refreshes <= refreshesAtStart + 5,
+        `listed ${listed} · title ${hostTitle} · refreshes ${refreshesAtStart} → ${afterSettle.refreshes} (stable after ${settledAt}) · dot ${afterSettle.dot} · pending timers ${afterSettle.timers}`);
+      await hooks.applyEventWindow(window74(90, [{ method: "thread/status/changed", params: { threadId: created.id, status: { type: "idle" } } }]));
+      check(results, "thread/status/changed { idle } settles the row's dot without a refresh", Boolean(rowFor(created.id)) && !dotFor(created.id) && hooks.bootstrapRefreshes() === afterSettle.refreshes, `dot ${dotFor(created.id)} · refreshes ${hooks.bootstrapRefreshes()}`);
+      // The Turn is finished on the host (its approval answered) so no live
+      // Turn or pending request outlives this check.
+      await hooks.refreshBootstrap();
+      const approval = (hooks.currentBootstrap()?.pendingRequests ?? []).find((request) => request.params?.turnId === turn.id);
+      if (approval) await hooks.hostAction({ action: "resolveRequest", requestId: approval.id, decision: "accept" });
+      else await hooks.hostAction({ action: "interruptTurn", threadId: created.id, turnId: turn.id });
+    } catch (error) { check(results, "sidebar freshness checks completed", false, `threw: ${error?.message ?? error}`); }
+  } else {
+    check(results, "sidebar freshness checks need the driver's fixture shell (a real Turn would spend a model Turn)", true, "no driver-owned repository: the real-runtime lifecycle walk asserts the own dot instead");
+  }
   await hooks.switchFixtureThread(fixture.thread);
 
   // One Project, four scope states: the header, the Tasks gate, the Room

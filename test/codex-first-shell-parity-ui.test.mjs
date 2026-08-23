@@ -136,9 +136,9 @@ test("inline rename uses setThreadName and thread/name/updated, and the Permissi
   assert.deepEqual(postures, contract.turnSettings.posture, "the postures in source are the host contract's verbatim");
 });
 
-test("completion notices come from turn/completed once per Turn, the preference is a host action, and turn/started refreshes an unlisted Thread", async () => {
+test("completion notices come from turn/completed once per Turn, the preference is a host action, and a brand-new Thread's listing is keyed on its durable userMessage", async () => {
   const { html, script, contract } = await shellSources();
-  assert.match(script, /if \(method === "turn\/completed" && typeof params\.threadId === "string"\) \{\s*if \(!state\.threads\.some\(\(thread\) => thread\.id === params\.threadId\)\) refreshLists = true;\s*handleTurnCompletion\(params\);/);
+  assert.match(script, /if \(method === "turn\/completed" && typeof params\.threadId === "string"\) \{\s*if \(!state\.threads\.some\(\(thread\) => thread\.id === params\.threadId\) \|\| state\.listingWatch\.cue\(method, params\)\) refreshLists = true;\s*handleTurnCompletion\(params\);/);
   assert.match(script, /noticeForCompletion\(state\.completionNotifier, params, \{\s*mode: state\.notificationMode \?\? "unfocused",\s*activeThreadId: state\.activeThreadId,\s*route: state\.route,\s*focused: document\.hasFocus\(\),/);
   assert.match(script, /applyNotificationPreferences\(data\.preferences\);/, "the preference is read from bootstrap.preferences");
   assert.match(script, /const data = await action\(\{ action: "setNotificationPreference", mode \}\);/);
@@ -146,8 +146,27 @@ test("completion notices come from turn/completed once per Turn, the preference 
   assert.match(html, /<select id="notificationMode" aria-label="Turn completion notifications" disabled><option value="">Not loaded<\/option><\/select>/);
   assert.match(contract.bootstrap.preferences, /default unfocused, absent after a host restart/);
   assert.match(contract.actions.setNotificationPreference.rules, /host memory only/);
-  // Sidebar freshness: turn/started for an unlisted or idle-listed Thread refreshes the lists.
-  assert.match(script, /if \(method === "turn\/started" && typeof params\.threadId === "string"\) \{\s*const listed = state\.threads\.find\(\(thread\) => thread\.id === params\.threadId\);\s*if \(!listed\) refreshLists = true;/);
+  // Sidebar freshness: the real 0.149.0 app-server lists a brand-new Thread
+  // only once its first userMessage is durable, so turn/started for a Thread
+  // the last bootstrap did not list starts a watch (the held record stays as
+  // a provisional row with the dot, a bounded retry runs), the refresh is
+  // keyed on that Thread's userMessage item/completed, thread/status/changed
+  // only moves the row's status, and a bootstrap that lists the Thread ends
+  // the watch. A listed Thread starting a Turn is marked live and re-read.
+  assert.match(script, /if \(method === "turn\/started" && typeof params\.threadId === "string"\) \{\s*const held = state\.threads\.find\(\(thread\) => thread\.id === params\.threadId\);\s*if \(state\.listedThreadIds\.has\(params\.threadId\)\) \{\s*if \(held && !threadIsActive\(held\)\) \{ held\.status = \{ type: "active" \}; refreshLists = true; \}\s*\} else \{/);
+  assert.match(script, /if \(record\) record\.status = \{ type: "active" \};\s*holdUnlistedThread\(params\.threadId, record\);\s*sidebarDirty = true;/);
+  assert.match(script, /if \(started\.thread\) holdUnlistedThread\(started\.threadId, started\.thread\);\s*await refreshThreads\(\);/, "a started Task Thread is held the same way until the runtime lists it");
+  assert.match(script, /if \(method === "item\/completed" && state\.listingWatch\.cue\(method, params\)\) refreshLists = true;/);
+  assert.match(script, /if \(method === "thread\/status\/changed" && typeof params\.threadId === "string"\) \{\s*if \(applyThreadStatus\(allThreadRecords\(\), params\.threadId, params\.status\)\) sidebarDirty = true;\s*continue;/);
+  assert.match(script, /const lists = settleListings\(data\);\s*state\.threads = lists\.threads;/);
+  assert.match(script, /const retry = state\.listingWatch\.nextRetry\(threadId\);\s*if \(!retry\) return;/, "the retry chain ends when the budget is spent");
+  assert.match(script, /if \(state\.listingWatch\.has\(threadId\)\) scheduleListingRetry\(threadId\);/, "and as soon as a bootstrap lists the Thread");
+  assert.equal((script.match(/setInterval\(/g) ?? []).length, 0, "no interval polls for the listing");
+  const freshness = await source("apps/codex-first-shell/sidebar-freshness.mjs");
+  assert.match(freshness, /export const LISTING_RETRY_ATTEMPTS = 4;\s*export const LISTING_RETRY_DELAY_MS = 750;/);
+  assert.match(freshness, /if \(method === "item\/completed" && params\.item\?\.type === "userMessage"\) return "userMessage durable";/);
+  assert.doesNotMatch(freshness.replace(/\/\/[^\n]*/g, ""), /thread\/status\/changed/, "thread/status/changed is not a listing cue in code");
+  assert.match(contract.forwardedNotifications["turn/started, turn/completed"], /userMessage/, "the contract names the durable cue");
   const notifier = await source("apps/codex-first-shell/completion-notifier.mjs");
   assert.match(notifier, /NotificationClass\.permission !== "granted"\) return null;/, "a browser Notification only when permission was granted");
   assert.equal((script.match(/new Notification\(/g) ?? []).length, 0, "app.js constructs no Notification itself; the notifier does, once per Turn");

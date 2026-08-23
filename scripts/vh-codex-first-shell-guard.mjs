@@ -290,10 +290,15 @@ async function bootShell() {
   // outbound notification joins the call log, so the daily-use walk can
   // order turn/start requests against the turn/completed between them. The
   // lifecycle walk never answers its approval, so its kill still lands on
-  // the pending card; the bridge checks never answer theirs either.
+  // the pending card; the bridge checks never answer theirs either. The
+  // userMessage of a Turn becomes durable 2 s after its turn/started (the
+  // real server: about 0.4 s, listed about 1.2 s after), wider than the
+  // browser's 850 ms poll plus the 750 ms listing retry, so the frames and
+  // the lifecycle walk see a bootstrap miss a brand-new Thread before its
+  // durable cue lists it.
   const env = realRuntime
     ? { ...process.env, VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" }
-    : { ...process.env, CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_STATE: join(temp, "codex-state.json"), CODEX_FIXTURE_PIDFILE: pidPath, CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_COMPLETE_ON_APPROVAL: "1", CODEX_FIXTURE_LOG_NOTIFICATIONS: "1", VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" };
+    : { ...process.env, CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_STATE: join(temp, "codex-state.json"), CODEX_FIXTURE_PIDFILE: pidPath, CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_COMPLETE_ON_APPROVAL: "1", CODEX_FIXTURE_LOG_NOTIFICATIONS: "1", CODEX_FIXTURE_USER_MESSAGE_DELAY_MS: "2000", VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" };
   const codex = realRuntime ? options.codex : join(root, "test/fixtures/codex-app-server-fixture.mjs");
   const shell = spawn(process.execPath, [join(root, "scripts/vh-codex-first-shell.mjs"), "--repo", repoFolder, "--port", "0", "--json", "--codex", codex], { cwd: root, stdio: ["ignore", "pipe", "pipe"], env });
   const close = async () => {
@@ -358,13 +363,27 @@ async function runLifecycle(shell) {
       ? `document.querySelector('#composer').dataset.turnPosture === 'running' && [...document.querySelectorAll('.activity-group summary strong')].some((n) => n.textContent.includes('Working'))`
       : `document.querySelector('#composer').dataset.turnPosture === 'running' && document.querySelectorAll('.timeline-entry [data-request-id]').length > 0`, 60_000);
     const live = await snapshot();
-    // The brand-new Chat's own Sidebar row carries the live dot: turn/started
-    // marks the listed entry active and refreshes the lists from thread/list
-    // (the Task Thread the walk started above is live too, with its own
-    // dot). The dot is recorded on the real runtime and asserted on the
-    // fixture.
-    const ownDot = live.activeThreads.split("|").includes(live.thread);
-    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Queue message" && !live.stopHidden && (realRuntime ? live.working : live.requests > 0 && ownDot), `${live.posture}/${realRuntime ? `working=${live.working}, ` : ""}${live.requests} request cards, send="${live.sendLabel}", stopHidden=${live.stopHidden}, activeDots=${live.activeDots} · own dot ${ownDot} · active ${live.activeThreads || "none"}`);
+    // The brand-new Chat's own Sidebar row carries the live dot, on the real
+    // runtime as on the fixture: the app-server lists the Thread only once
+    // its first userMessage is durable, so until then the row is the
+    // browser's own thread/start record marked live by turn/started, and a
+    // bootstrap the durable cue or the bounded retry fires lists it (the
+    // Task Thread the walk started above is live too, with its own dot).
+    // The dot is waited for, bounded, then asserted in both modes.
+    await page.waitFor(`[...document.querySelectorAll('.thread-button')].some((b) => b.querySelector('.thread-state.active') && b.dataset.threadId === new URLSearchParams(location.search).get('thread'))`, 15_000).catch(() => {});
+    const dotted = await snapshot();
+    const ownDot = dotted.activeThreads.split("|").includes(dotted.thread);
+    // On the fixture the call log proves a bootstrap missed the Thread first:
+    // a thread/list issued after its turn/started and before its userMessage
+    // item/completed, while the row stayed live.
+    const listGap = realRuntime ? null : (() => {
+      const calls = existsSync(shell.logPath) ? readFileSync(shell.logPath, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)) : [];
+      const startedAt = calls.findIndex((call) => call.kind === "notification" && call.method === "turn/started" && call.params?.threadId === dotted.thread);
+      const durableAt = calls.findIndex((call, index) => index > startedAt && call.kind === "notification" && call.method === "item/completed" && call.params?.threadId === dotted.thread && call.params?.item?.type === "userMessage");
+      const lists = startedAt >= 0 && durableAt > startedAt ? calls.slice(startedAt + 1, durableAt).filter((call) => call.kind === "request" && call.method === "thread/list").length : -1;
+      return { startedAt, durableAt, lists };
+    })();
+    step("live Turn before the kill, the brand-new Chat's own row live", live.posture === "running" && live.sendLabel === "Queue message" && !live.stopHidden && (realRuntime ? live.working : live.requests > 0) && ownDot && (realRuntime || listGap.lists >= 1), `${live.posture}/${realRuntime ? `working=${live.working}, ` : ""}${live.requests} request cards, send="${live.sendLabel}", stopHidden=${live.stopHidden}, activeDots=${dotted.activeDots} · own dot ${ownDot} (${dotted.thread}) · active ${dotted.activeThreads || "none"}${listGap ? ` · thread/list issued between turn/started and the durable userMessage: ${listGap.lists}` : ""}`);
     process.kill(shell.lastPid(), "SIGKILL");
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Runtime restarting'`);
     const exited = await snapshot();

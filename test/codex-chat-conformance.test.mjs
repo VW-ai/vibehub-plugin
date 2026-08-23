@@ -6,6 +6,7 @@ import { applyChatEvent, applyHostEvent, applyTokenUsage, boundedText, canonical
 import { compactDisabledReason, contextUsage } from "../apps/codex-first-shell/context-usage.mjs";
 import { renameThreadRecord, threadTitleFromName } from "../apps/codex-first-shell/thread-name.mjs";
 import { browserNotification, completionDecision, createCompletionNotifier, NOTIFICATION_MODE_LABELS, noticeForCompletion } from "../apps/codex-first-shell/completion-notifier.mjs";
+import { applyThreadStatus, createListingWatch, LISTING_RETRY_ATTEMPTS, LISTING_RETRY_DELAY_MS, listingCue, threadIsActive, withProvisionalThreads } from "../apps/codex-first-shell/sidebar-freshness.mjs";
 import { describePosture, describeTurnSettings, effortOptionLabel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "../apps/codex-first-shell/composer-settings.mjs";
 import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
 import { loadThreadDraft, MAX_DRAFT_ATTACHMENTS, MAX_DRAFT_MENTIONS, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
@@ -433,6 +434,137 @@ test("a Turn completing in the background notifies once per Turn id, live then r
   const small = createCompletionNotifier({ limit: 2 });
   assert.deepEqual(["a", "b", "c"].map((id) => small.claim(id)), [true, true, true]);
   assert.deepEqual([small.has("a"), small.has("b"), small.has("c"), small.claim("b")], [false, true, true, false]);
+});
+
+test("a brand-new Thread's Sidebar listing refreshes on its durable userMessage, with a bounded retry after turn/started that stops once a bootstrap lists it", () => {
+  // The cue is the userMessage item/completed (and the Turn's completion
+  // while still unlisted); turn/started and thread/status/changed { active }
+  // land before the durable write on 0.149.0 and are no cue.
+  assert.equal(listingCue("item/completed", { threadId: "t-new", turnId: "turn-1", item: { type: "userMessage", id: "u1" } }), "userMessage durable");
+  assert.equal(listingCue("item/completed", { threadId: "t-new", turnId: "turn-1", item: { type: "agentMessage", id: "a1" } }), null);
+  assert.equal(listingCue("turn/completed", { threadId: "t-new", turn: { id: "turn-1", status: "completed" } }), "turn completed");
+  for (const method of ["turn/started", "thread/status/changed", "item/started", "thread/tokenUsage/updated"]) assert.equal(listingCue(method, { threadId: "t-new", status: { type: "active" }, item: { type: "userMessage" } }), null, method);
+  assert.equal(listingCue("item/completed", { item: { type: "userMessage" } }), null, "no Thread id, no cue");
+
+  // The browser simulated: a fake clock drives the retry timers the way
+  // app.js schedules them (one refresh per timer, the next timer only after
+  // the refresh settled), a fake host answers bootstrap from `hostLists`.
+  const watch = createListingWatch();
+  assert.deepEqual([watch.attempts, watch.delayMs, LISTING_RETRY_ATTEMPTS, LISTING_RETRY_DELAY_MS], [4, 750, 4, 750]);
+  let clock = 0;
+  const timers = [];
+  const refreshes = [];
+  let hostLists = [];
+  const state = { threads: [], recents: [] };
+  const refresh = () => {
+    refreshes.push(clock);
+    const { settled, pending } = watch.settle(hostLists.map((thread) => thread.id));
+    const lists = withProvisionalThreads({ threads: [...hostLists], recents: [...hostLists] }, watch);
+    state.threads = lists.threads;
+    state.recents = lists.recents;
+    return { settled, pending };
+  };
+  const schedule = (threadId) => {
+    const retry = watch.nextRetry(threadId);
+    if (!retry) return;
+    timers.push({ at: clock + retry.delayMs, threadId, attempt: retry.attempt });
+  };
+  const advance = (ms) => {
+    const until = clock + ms;
+    for (;;) {
+      const next = timers.filter((timer) => timer.at <= until).sort((a, b) => a.at - b.at)[0];
+      if (!next) break;
+      timers.splice(timers.indexOf(next), 1);
+      clock = next.at;
+      if (!watch.has(next.threadId)) continue;
+      refresh();
+      if (watch.has(next.threadId)) schedule(next.threadId);
+    }
+    clock = until;
+  };
+  const observe = (method, params) => {
+    if (method === "turn/started") {
+      const record = state.threads.find((thread) => thread.id === params.threadId) ?? params.record ?? null;
+      if (record) record.status = { type: "active" };
+      const fresh = !watch.has(params.threadId);
+      watch.watch(params.threadId, record);
+      if (fresh) schedule(params.threadId);
+      return;
+    }
+    if (method === "thread/status/changed") { applyThreadStatus([...state.threads, ...state.recents], params.threadId, params.status); return; }
+    if (watch.cue(method, params)) refresh();
+  };
+
+  // 1. The real sequence: turn/started for the Chat this browser created
+  // (its thread/start record is held), the durable userMessage 400 ms
+  // later, the host listing it from a later bootstrap.
+  const created = { id: "t-new", title: "New chat", status: { type: "idle" } };
+  state.threads = [created]; state.recents = [created];
+  observe("thread/status/changed", { threadId: "t-new", status: { type: "active" } });
+  observe("turn/started", { threadId: "t-new", turn: { id: "turn-1" } });
+  assert.equal(refreshes.length, 0, "turn/started itself refreshes nothing: the list would not carry the Thread yet");
+  assert.ok(watch.has("t-new") && threadIsActive(state.threads[0]), "the held record is the provisional row, live");
+  advance(400);
+  observe("item/completed", { threadId: "t-new", turnId: "turn-1", item: { type: "userMessage", id: "u1" } });
+  assert.deepEqual(refreshes, [400], "the durable cue refreshes at once");
+  assert.deepEqual(state.threads.map((thread) => [thread.id, thread.status.type]), [["t-new", "active"]], "the host did not list it yet: the provisional row stays, still live");
+  hostLists = [{ id: "t-new", title: "Reply with OK", status: { type: "active" } }];
+  advance(750);
+  assert.deepEqual(refreshes, [400, 750], "the first retry, 750 ms after turn/started");
+  assert.equal(watch.has("t-new"), false, "a bootstrap listed it: the watch ended");
+  assert.deepEqual(state.threads, hostLists, "the host's own record replaced the provisional row");
+  advance(10_000);
+  assert.deepEqual(refreshes, [400, 750], "and nothing polls after that");
+  observe("thread/status/changed", { threadId: "t-new", status: { type: "idle" } });
+  assert.equal(threadIsActive(state.threads[0]), false, "turn/completed's thread/status/changed settles the dot");
+  assert.equal(timers.length, 0);
+
+  // 2. A Thread the host never lists (another client's, no record held):
+  // exactly LISTING_RETRY_ATTEMPTS refreshes, 750 ms apart, then silence.
+  refreshes.length = 0;
+  hostLists = [];
+  clock = 0;
+  observe("turn/started", { threadId: "t-foreign", turn: { id: "turn-9" } });
+  assert.equal(watch.record("t-foreign"), null, "no record, no row");
+  assert.equal(state.threads.some((thread) => thread.id === "t-foreign"), false, "nothing is drawn for it");
+  advance(60_000);
+  assert.deepEqual(refreshes, [750, 1_500, 2_250, 3_000], "four bounded retries and no perpetual poll");
+  assert.equal(watch.refreshes("t-foreign"), 4);
+  assert.equal(watch.nextRetry("t-foreign"), null, "the budget is spent");
+  observe("item/completed", { threadId: "t-foreign", turnId: "turn-9", item: { type: "userMessage", id: "u9" } });
+  assert.equal(refreshes.length, 5, "the cue still refreshes once after the budget");
+  observe("turn/completed", { threadId: "t-foreign", turn: { id: "turn-9", status: "completed" } });
+  assert.equal(refreshes.length, 6, "and so does its completion while unlisted");
+  advance(60_000);
+  assert.equal(refreshes.length, 6);
+  // A repeated turn/started for the same watched Thread starts no second chain.
+  observe("turn/started", { threadId: "t-foreign", turn: { id: "turn-10" } });
+  advance(60_000);
+  assert.equal(refreshes.length, 6);
+
+  // 3. Provisional rows go to the head of threads and recents, newest first,
+  // and never duplicate a listed Thread; the watch map is bounded.
+  const bounded = createListingWatch({ attempts: 2, delayMs: 10 });
+  bounded.watch("a", { id: "a", status: { type: "active" } });
+  bounded.watch("b", { id: "b", status: { type: "active" } });
+  bounded.watch("c", null);
+  assert.deepEqual(withProvisionalThreads({ threads: [{ id: "x" }], recents: [{ id: "x" }] }, bounded), { threads: [{ id: "b", status: { type: "active" } }, { id: "a", status: { type: "active" } }, { id: "x" }], recents: [{ id: "b", status: { type: "active" } }, { id: "a", status: { type: "active" } }, { id: "x" }] });
+  assert.deepEqual(withProvisionalThreads({ threads: [{ id: "a" }], recents: [] }, bounded).threads.map((thread) => thread.id), ["b", "a"]);
+  assert.deepEqual(bounded.settle(["a", "c"]), { settled: ["a", "c"], pending: ["b"] });
+  assert.deepEqual([bounded.nextRetry("b")?.attempt, bounded.nextRetry("b")?.attempt, bounded.nextRetry("b")], [1, 2, null]);
+  assert.equal(bounded.watch("b").attemptsLeft, 0, "re-watching keeps the spent budget");
+  for (let index = 0; index < 20; index += 1) bounded.watch(`many-${index}`);
+  assert.equal(bounded.size(), 16, "at most 16 Threads are watched");
+  assert.equal(bounded.has("b"), false, "the oldest watch is dropped first");
+  bounded.clear();
+  assert.equal(bounded.size(), 0);
+  assert.equal(createListingWatch().watch(""), null);
+  // thread/status/changed applies to every local copy of the row and reports whether anything changed.
+  const copies = [{ id: "t", status: { type: "active" } }, { id: "t", status: { type: "active" } }, { id: "other", status: { type: "active" } }];
+  assert.equal(applyThreadStatus(copies, "t", { type: "idle" }), true);
+  assert.deepEqual(copies.map((thread) => thread.status.type), ["idle", "idle", "active"]);
+  assert.equal(applyThreadStatus(copies, "t", { type: "idle" }), false, "an unchanged status reports no change");
+  assert.equal(applyThreadStatus(copies, "t", null), false);
 });
 
 test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {

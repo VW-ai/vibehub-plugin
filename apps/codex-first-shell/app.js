@@ -5,6 +5,7 @@ import { activeTrigger, chipsFromItems, composeTextElements, insertPlaceholder, 
 import { compactDisabledReason, contextUsage } from "./context-usage.mjs";
 import { renameThreadRecord } from "./thread-name.mjs";
 import { createCompletionNotifier, NOTIFICATION_MODE_LABELS, noticeForCompletion } from "./completion-notifier.mjs";
+import { applyThreadStatus, createListingWatch, threadIsActive, withProvisionalThreads } from "./sidebar-freshness.mjs";
 import { emptyQueue, pausedMessage, queuedMediaSummary, queuedText, replaceQueuedText } from "./composer-queue.mjs";
 import {
   DOM_LIMITS,
@@ -130,6 +131,12 @@ const state = {
   unseenCompletions: new Set(),
   completionLog: [],
   bootstrapRefreshes: 0,
+  // Sidebar freshness for a Thread the host's lists do not carry yet
+  // (sidebar-freshness.mjs): the ids the last bootstrap listed, the Threads
+  // watched until a bootstrap lists them, and their bounded retry timers.
+  listedThreadIds: new Set(),
+  listingWatch: createListingWatch(),
+  listingTimers: new Map(),
 };
 
 // The mention picker: `@` searches files through the host (debounced), `$`
@@ -240,6 +247,72 @@ function taskOrigin(ticketId) {
 function threadTitleById(threadId) {
   const thread = state.threads.find((entry) => entry.id === threadId);
   return thread ? titleForThread(thread) : null;
+}
+
+// Every local Thread record the lists hold (a bootstrap parses each list
+// separately, so the same Thread is a distinct object in each).
+function allThreadRecords() {
+  return [...state.threads, ...state.pinned, ...state.recents, ...state.projects.flatMap((project) => project.threads ?? [])];
+}
+
+// --- Sidebar freshness for a Thread the host does not list yet -------------
+// The real app-server lists a brand-new Thread only once its first
+// userMessage is durable, about 0.4 to 1.2 s after turn/started (see
+// sidebar-freshness.mjs). turn/started for a Thread outside the last
+// bootstrap's listing starts a watch: the record this browser holds stays in
+// the lists as a provisional row with the runtime's status, the refresh is
+// keyed on that Thread's userMessage item/completed, and a bounded retry
+// (LISTING_RETRY_ATTEMPTS refreshes, LISTING_RETRY_DELAY_MS apart) runs
+// until a bootstrap lists the Thread. Nothing here polls for good.
+
+function watchListing(threadId, record) {
+  const fresh = !state.listingWatch.has(threadId);
+  state.listingWatch.watch(threadId, record);
+  if (fresh) scheduleListingRetry(threadId);
+}
+
+// A Thread the host does not list yet, held by its own record (thread/start
+// or startTask answered with it): the row joins the lists where newThread
+// puts a new Chat, and the watch keeps it there until a bootstrap lists it.
+function holdUnlistedThread(threadId, record) {
+  if (record && !state.threads.some((thread) => thread.id === threadId)) {
+    state.threads.unshift(record);
+    state.recents.unshift(record);
+  }
+  watchListing(threadId, record);
+}
+
+function scheduleListingRetry(threadId) {
+  const retry = state.listingWatch.nextRetry(threadId);
+  if (!retry) return;
+  clearTimeout(state.listingTimers.get(threadId));
+  state.listingTimers.set(threadId, setTimeout(async () => {
+    state.listingTimers.delete(threadId);
+    if (!state.listingWatch.has(threadId)) return;
+    // A bootstrap the host cannot answer right now is reported by the next
+    // poll; the retry chain stays bounded either way.
+    try { await refreshThreads(); } catch { /* posture comes from pollEvents */ }
+    if (state.listingWatch.has(threadId)) scheduleListingRetry(threadId);
+  }, retry.delayMs));
+}
+
+function endListingWatch(threadId) {
+  clearTimeout(state.listingTimers.get(threadId));
+  state.listingTimers.delete(threadId);
+  state.listingWatch.drop(threadId);
+}
+
+function clearListingWatches() {
+  for (const threadId of state.listingWatch.ids()) endListingWatch(threadId);
+}
+
+// A bootstrap listed these Thread ids: the watches it settles end, and the
+// lists carry the provisional rows it did not list.
+function settleListings(data) {
+  state.listedThreadIds = new Set(data.threads.map((thread) => thread.id));
+  const { settled } = state.listingWatch.settle(state.listedThreadIds);
+  for (const threadId of settled) endListingWatch(threadId);
+  return withProvisionalThreads({ threads: data.threads, recents: data.recents }, state.listingWatch);
 }
 
 function originLabel(ticketId) {
@@ -368,6 +441,10 @@ function markRuntimeExited(value) {
   state.currentTurnId = null;
   $("#stopTurn").hidden = true;
   for (const map of [state.liveItems, state.turnPlans, state.turnDiffs]) map.clear();
+  // A provisional Sidebar row carried the dead process's status: the watch
+  // ends with it, and the bootstrap after the restart lists whatever the
+  // runtime made durable.
+  clearListingWatches();
   setRuntimePosture({ alive: false, generation: value?.runtimeGeneration ?? state.runtimeGeneration, state: state.bootstrap?.stop ? "halted" : "restarting" });
   updateSidebar();
   if (state.route === "chat") renderChat({ preserveScroll: true });
@@ -1728,10 +1805,13 @@ async function refreshThreads() {
   state.bootstrapRefreshes += 1;
   state.bootstrap = data;
   applyNotificationPreferences(data.preferences);
-  state.threads = data.threads;
+  // The host's lists, plus the provisional row of any watched Thread the
+  // runtime has not listed yet (sidebar-freshness.mjs).
+  const lists = settleListings(data);
+  state.threads = lists.threads;
   state.projects = data.projects;
   state.pinned = data.pinned;
-  state.recents = data.recents;
+  state.recents = lists.recents;
   if (state.activeThreadId) {
     const metadata = state.threads.find((thread) => thread.id === state.activeThreadId);
     if (metadata && state.activeThread) state.activeThread = { ...state.activeThread, ...metadata };
@@ -2828,6 +2908,7 @@ async function applyEventWindow(data) {
   let queueDirty = false;
   let settingsDirty = false;
   let contextDirty = false;
+  let sidebarDirty = false;
   for (const entry of data.events) {
     if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refreshRequests = true;
     if (entry.kind === "runtimeExit") {
@@ -2871,16 +2952,36 @@ async function applyEventWindow(data) {
       if (typeof params.threadId === "string") applyThreadName(params.threadId, params.threadName ?? null);
       continue;
     }
-    // A Turn starting in a Thread the Sidebar does not list (or lists idle)
-    // is the cue to refresh the lists; the runtime said it started, so the
-    // listed entry shows the live dot at once.
+    // A Turn starting in a Thread the last bootstrap listed marks that row
+    // live at once and re-reads the lists. A Turn starting in a Thread the
+    // host does not list yet (a brand-new Chat: the real app-server lists it
+    // only once its first userMessage is durable) keeps the record this
+    // browser holds as a provisional row with the live dot and starts the
+    // watch; the refresh waits for the durable cue below, with a bounded
+    // retry meanwhile.
     if (method === "turn/started" && typeof params.threadId === "string") {
-      const listed = state.threads.find((thread) => thread.id === params.threadId);
-      if (!listed) refreshLists = true;
-      else if (!String(listed.status?.type ?? listed.status ?? "").toLowerCase().includes("active")) { listed.status = { type: "active" }; refreshLists = true; }
+      const held = state.threads.find((thread) => thread.id === params.threadId);
+      if (state.listedThreadIds.has(params.threadId)) {
+        if (held && !threadIsActive(held)) { held.status = { type: "active" }; refreshLists = true; }
+      } else {
+        const record = held ?? (state.activeThread?.id === params.threadId ? (({ turns, ...rest }) => rest)(state.activeThread) : null);
+        if (record) record.status = { type: "active" };
+        holdUnlistedThread(params.threadId, record);
+        sidebarDirty = true;
+      }
     }
+    // thread/status/changed is the runtime's own status for the Thread, so
+    // every local row follows it (the dot settles on idle without a
+    // refresh); its active variant lands with turn/started, before the
+    // durable write, so it is no refresh cue.
+    if (method === "thread/status/changed" && typeof params.threadId === "string") {
+      if (applyThreadStatus(allThreadRecords(), params.threadId, params.status)) sidebarDirty = true;
+      continue;
+    }
+    // The durable cue: the watched Thread's userMessage item/completed.
+    if (method === "item/completed" && state.listingWatch.cue(method, params)) refreshLists = true;
     if (method === "turn/completed" && typeof params.threadId === "string") {
-      if (!state.threads.some((thread) => thread.id === params.threadId)) refreshLists = true;
+      if (!state.threads.some((thread) => thread.id === params.threadId) || state.listingWatch.cue(method, params)) refreshLists = true;
       handleTurnCompletion(params);
     }
     if (method === "thread/settings/updated" || method === "thread/tokenUsage/updated") {
@@ -2914,6 +3015,7 @@ async function applyEventWindow(data) {
   if (settingsDirty) { renderComposerSettings(); renderPosture(); }
   if (contextDirty) renderContextIndicator();
   if (refreshLists) await refreshThreads();
+  else if (sidebarDirty) updateSidebar();
   if (reconcile && state.activeThreadId && state.runtimeAlive && !state.bootstrap?.stop) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
   else if ((rendered || refreshRequests || haltRaised) && state.activeThreadId) scheduleChatRender();
   focusNewBlockingRequest(previousRequestIds);
@@ -3614,6 +3716,10 @@ document.addEventListener("click", async (event) => {
         $("#composerInput").value = "";
         renderComposerQuote();
         autoSizeComposer();
+        // The host answered with the Task Thread's own linked record; the
+        // runtime lists it only once the packet is durable, so the record
+        // is held until a bootstrap lists it (sidebar-freshness.mjs).
+        if (started.thread) holdUnlistedThread(started.threadId, started.thread);
         await refreshThreads();
         await openThread(started.threadId, { route: "task" });
       } catch (error) { notify(error.message); taskAction.disabled = false; }
@@ -4117,6 +4223,15 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
     // Completion notices raised in this session and bootstrap refreshes so far.
     completionLog: () => structuredClone(state.completionLog),
     bootstrapRefreshes: () => state.bootstrapRefreshes,
+    // The Sidebar freshness watch: each Thread watched until a bootstrap
+    // lists it (its provisional row, bootstraps that missed it, a retry
+    // pending), and the ids the last bootstrap listed.
+    listingWatch: () => ({
+      watched: state.listingWatch.ids().map((threadId) => ({ threadId, provisional: Boolean(state.listingWatch.record(threadId)), refreshes: state.listingWatch.refreshes(threadId), retryPending: state.listingTimers.has(threadId) })),
+      listed: [...state.listedThreadIds],
+      attempts: state.listingWatch.attempts,
+      delayMs: state.listingWatch.delayMs,
+    }),
     // Host event windows fed straight into the same path pollEvents takes,
     // and a way back to the live runtime posture once the checks are done.
     applyEventWindow: async (window) => {

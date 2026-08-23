@@ -589,6 +589,7 @@ test("production shell routes ordinary Chat, approvals, interruption, and Tasks 
     "thread/start",
     "thread/name/set",
     "turn/start",
+    "thread/read",
     "thread/list",
     "thread/resume",
     "turn/start",
@@ -968,6 +969,34 @@ function canonicalContexts(snapshot) {
     .sort((left, right) => left.summary.localeCompare(right.summary));
 }
 
+// The real app-server lists a brand-new Thread only once its first
+// userMessage is durable: a Task Turn sent right after Start falls in that
+// window, and the link is read from the Thread's own name instead.
+test("a Task Turn sent before the listing carries the started Thread is linked through thread/read, never refused", async (context) => {
+  const { folder } = await proofRepository(context);
+  const temp = await mkdtemp(join(tmpdir(), "vibehub-codex-task-window-"));
+  context.after(() => rm(temp, { recursive: true, force: true }));
+  const logPath = join(temp, "app-server-calls.jsonl");
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_USER_MESSAGE_DELAY_MS: "1500" } });
+  if (!shell) return;
+  const { api, action } = shell;
+  const started = (await action({ action: "startTask", ticketId: "ticket-proof-workspace", selectedContextIds: [] })).body.data;
+  const listedAtStart = (await api("api/bootstrap")).body.data.threads.some((thread) => thread.id === started.threadId);
+  assert.equal(listedAtStart, false, "the started Task Thread is not listed before its packet is durable");
+  assert.equal(started.thread.taskLink.ticketId, "ticket-proof-workspace", "the Start response carries the linked record anyway");
+  const continued = await action({ action: "startTaskTurn", ticketId: "ticket-proof-workspace", threadId: started.threadId, message: "continue inside the window" });
+  assert.equal(continued.status, 200, JSON.stringify(continued.body));
+  assert.deepEqual([continued.body.data.threadId, continued.body.data.operation], [started.threadId, "continue"]);
+  const unlinked = await action({ action: "startTaskTurn", ticketId: "ticket-proof-prerequisite", threadId: started.threadId, message: "wrong Task" });
+  assert.equal(unlinked.status, 409, "the name links exactly one Task");
+  assert.equal(unlinked.body.error.code, "task_not_linked");
+  const calls = (await readFile(logPath, "utf8")).trim().split("\n").map((line) => JSON.parse(line));
+  const reads = calls.filter((call) => call.method === "thread/read" && call.params?.threadId === started.threadId && call.params.includeTurns === false);
+  assert.ok(reads.length >= 2, "thread/read carried the link for the Start response and for the Task Turn inside the window");
+  await new Promise((resolve) => setTimeout(resolve, 1_700));
+  assert.equal((await api("api/bootstrap")).body.data.threads.some((thread) => thread.id === started.threadId), true, "listed once the packet is durable");
+});
+
 test("Graph and Task Workspace routes serve the canonical projection, and the Workspace packet is exactly the adapter's", async (context) => {
   const { folder, realFolder } = await proofRepository(context);
   const temp = await mkdtemp(join(tmpdir(), "vibehub-codex-proof-"));
@@ -1035,6 +1064,9 @@ test("Graph and Task Workspace routes serve the canonical projection, and the Wo
   // The packet a Start sends is the same bytes, persisted by the app-server as the Turn's user input.
   const started = (await action({ action: "startTask", ticketId: "ticket-proof-workspace", selectedContextIds: [] })).body.data;
   assert.equal(started.payloadText, workspace.body.data.packetText);
+  // The response carries the Thread's own linked record (thread/read, linked
+  // by its Codex name), held by the browser until the listing carries it.
+  assert.deepEqual([started.thread.id, started.thread.taskLink, started.thread.title, started.thread.status], [started.threadId, { ticketId: "ticket-proof-workspace", kind: "codex_thread_name", threadId: started.threadId }, "VibeHub Task · ticket-proof-workspace", { type: "active" }]);
   const replayed = (await action({ action: "readThread", threadId: started.threadId })).body.data.thread;
   assert.equal(replayed.turns[0].items[0].type, "userMessage");
   assert.equal(replayed.turns[0].items[0].content[0].text, started.payloadText, "thread/read replays the exact packet bytes; no second store is consulted");

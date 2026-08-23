@@ -571,6 +571,7 @@ const assets = new Map([
   ["/context-usage.mjs", script("context-usage.mjs")],
   ["/thread-name.mjs", script("thread-name.mjs")],
   ["/completion-notifier.mjs", script("completion-notifier.mjs")],
+  ["/sidebar-freshness.mjs", script("sidebar-freshness.mjs")],
   ["/chat-fixtures.json", fixture("chat-fixtures.json")],
   ["/chat-conformance-fixtures.json", fixture("chat-conformance-fixtures.json")],
   ["/task-fixtures.json", fixture("task-fixtures.json")],
@@ -660,6 +661,24 @@ async function body(request) {
 
 function threadTitle(thread) {
   return thread.name || thread.preview?.split("\n")[0]?.slice(0, 72) || "Untitled task";
+}
+
+// The Thread a Task Turn names, linked to the Task by its Codex Thread name
+// (the linkage authority): from the scoped listing, which carries a Thread
+// only once its first userMessage is durable, or else from thread/read,
+// which carries the name from thread/name/set on, so a Task Turn sent in
+// that window right after Start is not refused.
+async function linkedTaskThread(threadId, ticketId) {
+  let thread = (await listThreads()).find((entry) => entry.id === threadId) ?? null;
+  if (!thread) {
+    try {
+      thread = publicThread((await client.request("thread/read", { threadId, includeTurns: false })).thread);
+      rememberThreads([thread]);
+    } catch {
+      thread = null;
+    }
+  }
+  return thread?.taskLink?.ticketId === ticketId ? thread : null;
 }
 
 function taskLinkFromThread(thread) {
@@ -1810,7 +1829,11 @@ async function action(payload) {
     runtime.loadedThreadIds.add(started.threadId);
     runtime.knownThreadIds.add(started.threadId);
     runtime.knownTaskLinks.set(started.threadId, started.ticketId);
-    return started;
+    // The Thread's own record, linked by its Codex name: the scoped listing
+    // carries it only once its first userMessage (the packet) is durable,
+    // so the browser holds this record until a bootstrap lists it.
+    const read = await client.request("thread/read", { threadId: started.threadId, includeTurns: false });
+    return { ...started, thread: publicThread(read.thread) };
   }
   if (payload.action === "readTask") {
     requireBoundScope();
@@ -1847,8 +1870,7 @@ async function action(payload) {
     if (typeof payload.ticketId !== "string" || typeof payload.threadId !== "string" || typeof payload.message !== "string" || !payload.message.trim()) {
       throw invalid("ticketId, threadId and message required");
     }
-    const threads = await listThreads();
-    const linked = threads.find((thread) => thread.id === payload.threadId && thread.taskLink?.ticketId === payload.ticketId);
+    const linked = await linkedTaskThread(payload.threadId, payload.ticketId);
     if (!linked) throw new HostError(409, "task_not_linked", "Thread is not linked to this canonical Task");
     const operation = payload.action === "steerTaskTurn" ? "steer" : "continue";
     const workspace = taskWorkspaceProjection(payload.ticketId, {
