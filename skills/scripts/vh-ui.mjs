@@ -138,23 +138,46 @@ function typedReference(source, reference) {
   };
 }
 
-function gitSource(repo, graphDigest) {
+// Dirty .vibehub paths in git's own order: tracked changes first, then
+// untracked files, each group sorted bytewise by path. The NUL-separated
+// porcelain form is read untrimmed because the two-column status of a
+// tracked change begins with a space (" M path") that trimming would eat.
+function dirtyVibehubEntries(repo) {
+  let output;
+  try {
+    output = execFileSync("git", ["-c", "core.fsmonitor=false", "status", "--porcelain", "--untracked-files=all", "--no-renames", "-z", "--", ".vibehub"], {
+      cwd: repo,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+  } catch {
+    return { tracked: [], untracked: [] };
+  }
+  const entries = output.split("\0").filter((entry) => entry.length > 3);
+  return {
+    tracked: entries.filter((entry) => !entry.startsWith("??")).map((entry) => entry.slice(3)),
+    untracked: entries.filter((entry) => entry.startsWith("??")).map((entry) => entry.slice(3)),
+  };
+}
+
+function byteOrder(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+// `pendingPaths` name documents that are not on disk yet but would be written
+// uncommitted at those paths (candidate projections); they join the untracked
+// group in git's order so the projection reads exactly as it will once the
+// document lands.
+function gitSource(repo, graphDigest, pendingPaths = []) {
   const repositoryRoot = git(repo, ["rev-parse", "--show-toplevel"]) || repo;
   const worktreeRoot = realpathSync(repo);
   const branch = git(repo, ["symbolic-ref", "--quiet", "--short", "HEAD"]);
   const resolvedCommit = git(repo, ["rev-parse", "--verify", "HEAD"]);
   const remoteOrigin = git(repo, ["config", "--get", "remote.origin.url"]);
   const githubBase = githubWebBase(remoteOrigin);
-  const status = git(repo, [
-    "status",
-    "--short",
-    "--untracked-files=all",
-    "--",
-    ".vibehub",
-  ]);
-  const allDirtyPaths = status
-    ? status.split("\n").map((line) => line.slice(3).trim()).filter(Boolean)
-    : [];
+  const { tracked, untracked } = dirtyVibehubEntries(repo);
+  const pending = pendingPaths.filter((path) => !tracked.includes(path) && !untracked.includes(path));
+  const allDirtyPaths = [...tracked, ...[...untracked, ...pending].sort(byteOrder)];
   const dirtyPaths = allDirtyPaths.slice(0, MAX_DIRTY_PATHS);
   const source = {
     mode: "worktree",
@@ -195,6 +218,41 @@ function gitSource(repo, graphDigest) {
 
 function relationRef(prerequisiteTicketId, dependentTicketId) {
   return `rel-${digest({ prerequisiteTicketId, dependentTicketId }).slice(7, 23)}`;
+}
+
+// A Chat association is a provenance reference of the exact form
+// codex-thread:<thread_id>/turn:<turn_id>[/item:<item_id>]. It is read from
+// the checked-in Ticket alone (origin first, then provenance_refs) and never
+// from Thread names, previews or transcripts. Associations are presentation
+// provenance: they are not relations and never count as depends_on edges.
+const CODEX_THREAD_REF = /^codex-thread:([^\s/]+)\/turn:([^\s/]+)(?:\/item:([^\s/]+))?$/u;
+
+function chatAssociations(ticket) {
+  const origin = ticket.origin ?? null;
+  const associations = [];
+  const seen = new Set();
+  const push = (entry) => {
+    const key = `${entry.threadId}\n${entry.turnId}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    associations.push(entry);
+  };
+  if (origin) {
+    push({
+      kind: "origin",
+      ref: `codex-thread:${origin.thread_id}/turn:${origin.turn_id}`,
+      harness: origin.harness,
+      threadId: origin.thread_id,
+      turnId: origin.turn_id,
+      itemId: origin.item_id ?? null,
+    });
+  }
+  for (const ref of ticket.provenance_refs ?? []) {
+    const match = typeof ref === "string" ? ref.match(CODEX_THREAD_REF) : null;
+    if (!match) continue;
+    push({ kind: "attached", ref, harness: "codex", threadId: match[1], turnId: match[2], itemId: match[3] ?? null });
+  }
+  return associations;
 }
 
 function outcomeState(outcome) {
@@ -394,6 +452,9 @@ function projectGraph(repository, queryOptions = {}) {
       // read-only here: null when the Ticket was not born from a harness Turn.
       origin: ticket.origin ?? null,
       provenanceRefs: ticket.provenance_refs,
+      // Every Chat this Ticket is associated with, parsed from origin and the
+      // codex-thread provenance references; never a dependency.
+      associations: chatAssociations(ticket),
       relationCounts: counts.get(ticket.ticket_id),
       capabilities: {
         operational: {
@@ -550,6 +611,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
     relations: ticket.relations,
     provenanceRefs: ticket.provenance_refs,
     origin: ticket.origin ?? null,
+    associations: chatAssociations(ticket),
     source: source.agentPayload,
     reviewInputs: {
       ticketRef: `.vibehub/tickets/${ticket.ticket_id}.yaml`,
@@ -588,11 +650,7 @@ function ticketContextPackage(ticket, relations, repository, source) {
   };
 }
 
-export function buildTicketHandoff(repoRoot, ticketId) {
-  if (typeof ticketId !== "string" || !TICKET_ID_PATTERN.test(ticketId)) {
-    throw new Error(`Invalid Ticket ID: ${ticketId}`);
-  }
-  const snapshot = buildUiSnapshot(repoRoot);
+function handoffFromSnapshot(snapshot, ticketId) {
   const ticket = snapshot.repository.tickets.documents.get(ticketId)?.document;
   const node = snapshot.graph.tickets.find((item) => item.ticketId === ticketId);
   if (!ticket || !node) throw new Error(`Ticket not found: ${ticketId}`);
@@ -602,6 +660,26 @@ export function buildTicketHandoff(repoRoot, ticketId) {
     snapshot.repository,
     snapshot.state.graph.source,
   ).agentPayload;
+}
+
+export function buildTicketHandoff(repoRoot, ticketId) {
+  if (typeof ticketId !== "string" || !TICKET_ID_PATTERN.test(ticketId)) {
+    throw new Error(`Invalid Ticket ID: ${ticketId}`);
+  }
+  return handoffFromSnapshot(buildUiSnapshot(repoRoot), ticketId);
+}
+
+// A candidate Ticket that is not on disk is projected exactly as it will read
+// once written uncommitted at its canonical path: it joins the loaded
+// repository as a candidate in its serialized (key-stable) form, validates
+// with it, and its path counts among the dirty paths. Nothing is written; an
+// invalid candidate is refused the way the repository would refuse it.
+export function buildCandidateTicketHandoff(repoRoot, candidate) {
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)
+    || typeof candidate.ticket_id !== "string" || !TICKET_ID_PATTERN.test(candidate.ticket_id)) {
+    throw new Error("Candidate Ticket needs a valid ticket_id");
+  }
+  return handoffFromSnapshot(projectSnapshot(realpathSync(resolve(repoRoot)), {}, [stable(candidate)]), candidate.ticket_id);
 }
 
 function evidenceTrace(evidence, source) {
@@ -673,15 +751,21 @@ function traceRecords(repository, source, ticketId = null) {
 }
 
 export function buildUiSnapshot(repoRoot, queryOptions = {}) {
-  const repo = realpathSync(resolve(repoRoot));
-  const repository = loadRepository(repo);
+  return projectSnapshot(realpathSync(resolve(repoRoot)), queryOptions, []);
+}
+
+// `candidates` are Ticket documents projected as if already written
+// uncommitted at .vibehub/tickets/<ticket_id>.yaml; the on-disk tree itself is
+// never touched by a projection.
+function projectSnapshot(repo, queryOptions, candidates) {
+  const repository = loadRepository(repo, candidates.length > 0 ? { tickets: candidates } : {});
   assertValid(repository.errors);
   const contexts = documents(repository.contexts.documents);
   const rawTickets = documents(repository.tickets.documents);
   const rawEvidence = documents(repository.evidence.documents);
   const rawOutcomes = documents(repository.outcomes.documents);
   const graphDigest = digest({ contexts, tickets: rawTickets, evidence: rawEvidence, outcomes: rawOutcomes });
-  const source = gitSource(repo, graphDigest);
+  const source = gitSource(repo, graphDigest, candidates.map((ticket) => `.vibehub/tickets/${ticket.ticket_id}.yaml`));
   const graph = projectGraph(repository, queryOptions);
   const rooms = projectRooms(repo, repository);
   const protectedBoundaries = graph.tickets
