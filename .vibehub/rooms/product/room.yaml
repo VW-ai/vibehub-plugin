@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "d84cabe0dc37ec69ebe838fcd17cda3c1b0e7041",
+        "blob": "b4139e5398bdc0b8888e4b89b03f06cee2cb84d7",
         "path": "README.md"
       },
       {
@@ -50,7 +50,7 @@
         "path": "docs/HARNESS_VISUAL_DIRECTION_REVIEW.md"
       },
       {
-        "blob": "e2a69416b73c01ec5c3b727bbf039e0e6885d7d8",
+        "blob": "dc5c7417c6eaed656ad38e5f4ddd579d34b1f54b",
         "path": "docs/INSTALL.md"
       },
       {
@@ -178,8 +178,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-23T02:30:33.898Z",
-    "last_aligned_commit": "17760a81098befc78b58d4aad0a31f6a9d802a60"
+    "checked_at": "2026-08-23T04:14:12.744Z",
+    "last_aligned_commit": "49868c0a52526934d6e931953e6c37fadf680896"
   },
   "anchors": [
     "CHANGELOG.md",
