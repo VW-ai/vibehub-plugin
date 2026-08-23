@@ -1,0 +1,70 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "skills-sh-breakage-is-reproduced-and-recorded",
+      "criterion": "A checked-in transcript reproduces npx skills add VW-ai/vibehub-plugin into a scratch project for at least Claude Code and Codex targets, lists which files were copied, and proves that the copied Skills cannot reach skills/scripts/vh.mjs or skills/contracts."
+    },
+    {
+      "acceptance_id": "install-paths-are-compared-empirically",
+      "criterion": "A proposal under docs/proposals/ compares at least three install and init paths (skills.sh-compatible layout, npx-published CLI used by Skills and humans, marketplace-only), each with exact commands a user types, what lands on disk per host, how the shared helper and contracts stay reachable, version-skew and upgrade behavior, offline and network requirements, and conformance with decision-speed-first-skill-plugin; every claim about a tool's behavior is backed by a run, a doc link, or marked as untested."
+    },
+    {
+      "acceptance_id": "setup-offers-github-mirror-as-one-time-option",
+      "criterion": "The proposal specifies how project setup (vibehub-setup and any npx init) detects a GitHub remote and offers to drop the Issues mirror workflow and script into the project once, with the exact files copied, what is asked of the user, and an explicit statement that no Skill or instruction asks an Agent to run the sync afterwards."
+    },
+    {
+      "acceptance_id": "recommendation-is-decision-ready",
+      "criterion": "The proposal ends with one recommended path, its cost in files and release steps, what it deliberately does not do, and the exact question the owner must answer, so that the owner can decide without reading the comparison twice."
+    }
+  ],
+  "constraints": [
+    "Do not change README, docs/INSTALL.md, manifests, or skill text in this Ticket; it produces a proposal only.",
+    "Do not publish anything to npm or any registry.",
+    "Tests of third-party installers run only in scratch directories outside the repository."
+  ],
+  "context": "The owner wants the install story to feel like the current generation of agent tools (for example heygen-com/hyperframes: npx skills add <repo> for agents plus npx <tool> init for the project), instead of three host-specific marketplace commands. An empirical test on 2026-08-22 showed that npx skills add VW-ai/vibehub-plugin already copies all eleven skills into .claude/skills/ (and .agents/skills/ for Codex and Cursor) but silently omits skills/scripts/ and skills/contracts/ because they carry no SKILL.md, so every copied Skill's ../scripts/vh.mjs and ../contracts references break. The plugin is deliberately dependency-free Skills plus one helper script, with no global CLI, MCP server, daemon, or background activation, and the owner wants zero ongoing Agent load. Candidate directions include: (a) make the shared helper reachable by every skill after a skills.sh copy (for example a bootstrap that locates or fetches vh.mjs, or restructuring so each skill is self-contained); (b) publish a small npm package so Skills call npx vibehub <command> and humans run npx vibehub init, with version pinning between Skill text and package; (c) keep marketplaces as the only supported path and document skills.sh as unsupported. The owner also asked that the GitHub Issues mirror (scripts/sync-github-issues.mjs and its workflow) become an optional, one-time choice offered during project setup rather than something an Agent runs later.",
+  "context_refs": [
+    {
+      "purpose": "Current install contract and the no-global-CLI, no-daemon boundary.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Current three-command host-specific install surface the proposal replaces or supplements.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Project setup flow that would offer the GitHub mirror option.",
+      "ref": "skills/vibehub-setup/SKILL.md"
+    },
+    {
+      "purpose": "Claude Code plugin manifest skills.sh also reads.",
+      "ref": ".claude-plugin/plugin.json"
+    },
+    {
+      "purpose": "Product authority for dependency-free Skill-first packaging.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    },
+    {
+      "purpose": "Mirror script that setup would offer to copy.",
+      "ref": "scripts/sync-github-issues.mjs"
+    },
+    {
+      "purpose": "Mirror workflow that setup would offer to copy.",
+      "ref": ".github/workflows/sync-issues.yml"
+    },
+    {
+      "purpose": "Rule that the mirror stays Agent-free.",
+      "ref": ".vibehub/rooms/product/decision-github-issues-are-a-read-only-ticket-projection.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "A decision-ready proposal compares concrete ways to make VibeHub installable and initializable with one or two commands across Claude Code, Codex, Cursor, and other skills-capable agents, grounded in an empirical test of each path against this repository, and recommends one.",
+  "provenance_refs": [
+    "conversation:2026-08-22-tickets-as-github-issues"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-propose-npx-first-install-experience"
+}

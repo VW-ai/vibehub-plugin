@@ -1,0 +1,85 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "core-folder-carries-helper-and-contracts",
+      "criterion": "skills/vibehub-core/ exists with a SKILL.md whose frontmatter description states it is the shared helper and contracts for the other VibeHub Skills and is not invoked directly, plus scripts/vh.mjs, scripts/vh-ui.mjs, contracts/*, and templates/github/; skills/scripts/ and skills/contracts/ no longer exist."
+    },
+    {
+      "acceptance_id": "all-live-references-repointed",
+      "criterion": "No file under skills/, scripts/, test/, docs/INSTALL.md, docs/LOCAL_GRAPH_DESIGN.md, or the plugin manifests references ../scripts/, ../contracts/, skills/scripts, or skills/contracts; ticket-lifecycle.json planning_contracts points at the new contracts path and verify-plugin-artifact asserts that; the whole test suite passes."
+    },
+    {
+      "acceptance_id": "skills-sh-install-works-end-to-end",
+      "criterion": "In a scratch project, npx skills add of this repository (local path or branch) for both claude-code and codex targets copies twelve folders including vibehub-core, and running the installed helper through the copied path (for example .claude/skills/vibehub-ticket-plan/../vibehub-core/scripts/vh.mjs project validate against a fixture repository) succeeds; the transcript is checked in as Evidence."
+    },
+    {
+      "acceptance_id": "marketplace-bundles-ship-the-same-layout",
+      "criterion": "npm run build produces an artifact containing skills/vibehub-core/scripts/vh.mjs and contracts, verify-plugin-artifact passes with its required-file list updated, and the host-marketplace and release tests pass unchanged in intent."
+    },
+    {
+      "acceptance_id": "setup-offers-github-mirror-once",
+      "criterion": "vibehub-setup SKILL.md gains one optional step after project validation: when git remote origin is on github.com, ask once whether to mirror Tickets to GitHub Issues; on yes copy exactly five files from skills/vibehub-core into the project (.github/workflows/sync-issues.yml, scripts/vibehub/sync-github-issues.mjs, scripts/vibehub/scripts/vh.mjs, scripts/vibehub/contracts/versions.json, scripts/vibehub/contracts/dependency-hygiene.json) so the workflow runs in a clean Actions checkout because vh.mjs loads those two contract files at import time, record the copy as setup Evidence, and add no instruction, hook, or Skill text that asks an Agent to run or check the sync; tests prove the template script equals its source except for the import path and a version header, that the workflow template equals its source except for the script path, and that the five-file copy computes a projection in a scratch project with no plugin installed."
+    },
+    {
+      "acceptance_id": "install-docs-lead-with-one-line",
+      "criterion": "README Installation shows npx skills add VW-ai/vibehub-plugin first with the marketplace commands retained, stays within its 60-line test budget, and docs/INSTALL.md describes the skills.sh path, the vibehub-core folder, the install-all caveat for partial installs, and the setup-time mirror option."
+    }
+  ],
+  "constraints": [
+    "Do not publish to npm or add a CLI, daemon, MCP server, or background process.",
+    "Historical records keep their meaning: META/, docs/proposals/, docs/SPEED_FIRST_CLEANUP.md, Evidence, Outcomes, and Context prose are not rewritten; the only change allowed in checked-in .vibehub documents is updating file-path context_refs that point at the moved helper or contracts, because the validator requires every context_ref to be readable and a compatibility shim at the old path is rejected by product decisions.",
+    "Do not change vh.mjs behavior; this is a relocation.",
+    "Third-party installer tests run only in scratch directories outside the repository."
+  ],
+  "context": "The owner chose path A of docs/proposals/npx-first-install-experience.md. Today skills/scripts/ (vh.mjs, vh-ui.mjs) and skills/contracts/ are siblings of the eleven skill folders and are referenced 45 times as ../scripts and ../contracts from SKILL.md files, plus from skills/vibehub-ticket-review/references/ticket-lifecycle.json (../../contracts), test files, scripts/verify-plugin-artifact.mjs, scripts/audit-legacy-proof.mjs, scripts/sync-github-issues.mjs, docs/INSTALL.md, and docs/LOCAL_GRAPH_DESIGN.md. skills.sh copies only folders containing SKILL.md and does so with subfolders intact, so a skills/vibehub-core/ folder with its own SKILL.md carries scripts/ and contracts/ to every host. The Codex manifest points at ./skills/ as a directory; the Claude plugin manifest has no skill paths. A user project's mirror workflow runs in a clean GitHub Actions checkout where no plugin is installed, so the setup-time copy must place the helper itself into the project next to the sync script. META/ and docs/proposals/ and docs/SPEED_FIRST_CLEANUP.md are historical records and keep their old paths. Execution discovered that vh.mjs reads ../contracts/versions.json and ../contracts/dependency-hygiene.json at module load, so the project copy must carry those two files beside a verbatim vh.mjs (five files, not three), and that 35 historical Tickets cite the old helper paths as context_refs which the validator requires to be readable; the constraint was narrowed to allow those path-only updates.",
+  "context_refs": [
+    {
+      "purpose": "Chosen path A and the setup-time mirror specification.",
+      "ref": "docs/proposals/npx-first-install-experience.md"
+    },
+    {
+      "purpose": "The owner's decision this implements.",
+      "ref": ".vibehub/outcomes/ticket-decide-npx-first-install-experience.yaml"
+    },
+    {
+      "purpose": "Setup flow gaining the optional mirror step.",
+      "ref": "skills/vibehub-setup/SKILL.md"
+    },
+    {
+      "purpose": "Required-file list and lifecycle contract path assertion to update.",
+      "ref": "scripts/verify-plugin-artifact.mjs"
+    },
+    {
+      "purpose": "Source of the sync template.",
+      "ref": "scripts/sync-github-issues.mjs"
+    },
+    {
+      "purpose": "Source of the workflow template.",
+      "ref": ".github/workflows/sync-issues.yml"
+    },
+    {
+      "purpose": "Codex manifest pointing at ./skills/.",
+      "ref": ".codex-plugin/plugin.json"
+    },
+    {
+      "purpose": "Boundary: dependency-free Skills, no CLI.",
+      "ref": ".vibehub/rooms/product/decision-speed-first-skill-plugin.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "npx skills add VW-ai/vibehub-plugin installs a working VibeHub into any skills-capable agent because the shared helper and contracts travel inside a vibehub-core skill folder; the marketplace bundles ship the same layout; project setup offers the GitHub Issues mirror once as an optional copy; README and INSTALL lead with the one-line install.",
+  "provenance_refs": [
+    "conversation:2026-08-22-tickets-as-github-issues"
+  ],
+  "relations": [
+    {
+      "rationale": "The owner's choice of path A determines this acceptance.",
+      "target_ticket_id": "ticket-decide-npx-first-install-experience",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-implement-npx-first-install-experience"
+}

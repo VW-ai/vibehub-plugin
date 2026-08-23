@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "site-tests-and-build-pass"
+  ],
+  "evidence_id": "site-lint-build-tests",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T04:12:31Z",
+  "refs": [
+    "commit:c9349e0",
+    "site/tests/rendered-html.test.mjs",
+    "site/release/scripts/release.mjs"
+  ],
+  "schema_version": 1,
+  "summary": "site/tests/rendered-html.test.mjs asserts the rendered HTML contains the npx command and the any-skills-capable-agent note, the source defines SKILLS_INSTALL and the two-line CODEX_INSTALL, the brief order, the GitHub Issues sentence, and the install-primary class; npm run lint is clean and NEXT_PUBLIC_SITE_URL=https://vibehub.icu npm test (the release.mjs invocation) passes 9/9 after a static build. Without that env var one pre-existing canonical-link test fails identically on HEAD before this change.",
+  "ticket_id": "ticket-site-leads-with-one-line-install"
+}

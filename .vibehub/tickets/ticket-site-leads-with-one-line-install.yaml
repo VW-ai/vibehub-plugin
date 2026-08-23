@@ -1,0 +1,68 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "primary-install-action-is-skills-sh",
+      "criterion": "InstallActions and the header utilities present npx skills add VW-ai/vibehub-plugin as the first, visually primary copy action with a one-line note that it works with Claude Code, Codex, Cursor, and any skills-capable agent; the Codex and Claude Code marketplace actions remain as secondary actions and the Codex command is completed to both lines."
+    },
+    {
+      "acceptance_id": "agent-brief-matches-readme-order",
+      "criterion": "SITE_AGENT_BRIEF lists the skills.sh command first and the marketplace commands as alternatives, keeps the Start this with VibeHub entry, and mentions that Tickets mirror one-way to GitHub Issues when the project opts in during setup."
+    },
+    {
+      "acceptance_id": "site-tests-and-build-pass",
+      "criterion": "site/tests assertions are updated to the new install surface (primary command present, both marketplace commands complete, brief order) and the site lint, static build, and rendered-html tests pass from a clean install."
+    },
+    {
+      "acceptance_id": "visual-check-at-two-widths",
+      "criterion": "A rendered screenshot at desktop and at 390px shows the three install actions readable with the primary one first, no overflow, and no layout regression in the header, hero, or footer; screenshots are checked in as Evidence."
+    }
+  ],
+  "constraints": [
+    "Do not deploy or touch Cloudflare in this Ticket; release is the owner's separate action.",
+    "Do not change the site narrative, walkthrough, founders, or graph sections beyond the install surface.",
+    "Keep the 60-line README budget untouched (README is not part of this Ticket)."
+  ],
+  "context": "After path A landed, README and INSTALL lead with the bare npx skills add VW-ai/vibehub-plugin command (no --all; the picker's first row is Select all, and every Skill now self-repairs a partial install). The site at site/app/page.tsx still shows only two marketplace buttons in the header utilities, the hero InstallActions, and the footer, and its SITE_AGENT_BRIEF embeds the same two command sets; the Codex command on the site is incomplete (marketplace add only, missing codex plugin add vibehub@vibehub). The site is a Next static export with its own tests under site/tests and a separate release flow (site/release) that deploys one exact commit to Cloudflare Pages; publishing is a production action the owner triggers after merge and is not part of this Ticket.",
+  "context_refs": [
+    {
+      "purpose": "Install surface and Agent brief to update.",
+      "ref": "site/app/page.tsx"
+    },
+    {
+      "purpose": "Assertions that pin the install surface.",
+      "ref": "site/tests/rendered-html.test.mjs"
+    },
+    {
+      "purpose": "Install order the site must match.",
+      "ref": "README.md"
+    },
+    {
+      "purpose": "Wording for the picker and partial-install behaviour.",
+      "ref": "docs/INSTALL.md"
+    },
+    {
+      "purpose": "Release flow that happens after this Ticket, not inside it.",
+      "ref": "site/release/SKILL.md"
+    },
+    {
+      "purpose": "Packaging decision the site copy reflects.",
+      "ref": ".vibehub/rooms/product/decision-vibehub-core-carries-helper-for-skill-copy-installers.yaml"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "The public site's install surface matches the repository: one primary copy action for npx skills add VW-ai/vibehub-plugin that works for any skills-capable agent, the Codex and Claude Code marketplace commands kept as complete secondary actions, and the Agent brief updated to the same order, with site tests asserting all of it.",
+  "provenance_refs": [
+    "conversation:2026-08-22-tickets-as-github-issues"
+  ],
+  "relations": [
+    {
+      "rationale": "The site may only advertise the one-line install once it actually works, which that Ticket's successful Outcome established.",
+      "target_ticket_id": "ticket-implement-npx-first-install-experience",
+      "type": "depends_on"
+    }
+  ],
+  "schema_version": 2,
+  "ticket_id": "ticket-site-leads-with-one-line-install"
+}

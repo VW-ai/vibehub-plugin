@@ -85,15 +85,15 @@
     },
     {
       "purpose": "Canonical Ticket and acceptance semantics represented by the public scenario.",
-      "ref": "skills/contracts/ticket.schema.json"
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
     },
     {
       "purpose": "Canonical acceptance-linked Evidence semantics represented by the public scenario.",
-      "ref": "skills/contracts/evidence.schema.json"
+      "ref": "skills/vibehub-core/contracts/evidence.schema.json"
     },
     {
       "purpose": "Canonical independent Outcome and unlock semantics represented by the public scenario.",
-      "ref": "skills/contracts/outcome.schema.json"
+      "ref": "skills/vibehub-core/contracts/outcome.schema.json"
     }
   ],
   "deliveries": [

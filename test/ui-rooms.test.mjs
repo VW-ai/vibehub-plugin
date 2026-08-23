@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
-import { buildUiSnapshot } from "../skills/scripts/vh-ui.mjs";
+import { buildUiSnapshot } from "../skills/vibehub-core/scripts/vh-ui.mjs";
 
 const root = process.cwd();
 const assets = join(root, "skills/vibehub-ticket-review/assets");

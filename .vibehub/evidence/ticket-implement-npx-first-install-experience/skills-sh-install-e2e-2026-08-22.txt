@@ -1,0 +1,44 @@
+## source: local checkout of branch claude/tickets-issues-sync-5a183b at bd7b4e8
+## claude-code
+│  ✓ vibehub-core (copied)                       │
+│  ✓ vibehub-distill (copied)                    │
+│  ✓ vibehub-ingest (copied)                     │
+│  ✓ vibehub-migrate (copied)                    │
+│  ✓ vibehub-pr (copied)                         │
+│  ✓ vibehub-query (copied)                      │
+│  ✓ vibehub-setup (copied)                      │
+│  ✓ vibehub-ticket-closeout (copied)            │
+│  ✓ vibehub-ticket-plan (copied)                │
+│  ✓ vibehub-ticket-review (copied)              │
+│  ✓ vibehub-ticket-run (copied)                 │
+│  ✓ vibehub-ticket-validate (copied)            │
+└  Done!  Review skills before use; they run with full agent permissions.
+## codex
+│  ✓ vibehub-core (copied)                       │
+│  ✓ vibehub-distill (copied)                    │
+│  ✓ vibehub-ingest (copied)                     │
+│  ✓ vibehub-migrate (copied)                    │
+│  ✓ vibehub-pr (copied)                         │
+│  ✓ vibehub-query (copied)                      │
+│  ✓ vibehub-setup (copied)                      │
+│  ✓ vibehub-ticket-closeout (copied)            │
+│  ✓ vibehub-ticket-plan (copied)                │
+│  ✓ vibehub-ticket-review (copied)              │
+│  ✓ vibehub-ticket-run (copied)                 │
+│  ✓ vibehub-ticket-validate (copied)            │
+└  Done!  Review skills before use; they run with full agent permissions.
+## folders
+vibehub-core vibehub-distill vibehub-ingest vibehub-migrate vibehub-pr vibehub-query vibehub-setup vibehub-ticket-closeout vibehub-ticket-plan vibehub-ticket-review vibehub-ticket-run vibehub-ticket-validate 
+vibehub-core vibehub-distill vibehub-ingest vibehub-migrate vibehub-pr vibehub-query vibehub-setup vibehub-ticket-closeout vibehub-ticket-plan vibehub-ticket-review vibehub-ticket-run vibehub-ticket-validate 
+## helper and contracts present via a copied skill's relative path
+.claude/skills/vibehub-ticket-plan/../vibehub-core/contracts/: acceptance-authority.md context.schema.json dependency-hygiene.json evidence.schema.json outcome.schema.json project-format.schema.json room.schema.json ticket-next-action.md ticket.schema.json versions.json  .claude/skills/vibehub-ticket-plan/../vibehub-core/scripts/: vh-ui.mjs vh.mjs 
+## dangling old refs in copied SKILL.md
+0 references
+## run helper through the copied path (claude-code) against a fixture project
+{"ok":true,"data":{"root":"/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/e2e/fx/.vibehub","format_version":2,"version_path":"/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/e2e/fx/.vibehub/version.yaml","directories":["/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/e2e/fx/.vibehub/rooms","/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/e2e/fx/.vibehub/tickets","/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/e2e/fx/.vibehub/evidence","/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/e2e/fx/.vibehub/outcomes"]}}
+{"ok":true,"data":{"valid":true,"format_version":2,"rooms":0,"contexts":0,"tickets":0,"evidence":0,"outcomes":0}}
+## run helper through the copied path (codex)
+{"ok":true,"data":{"state":"CURRENT","current_format":2,"target_format":2,"detected_format":2,"version_path":"/private/tmp/claude-501/-Users-waynewang-vibehub-plugin--claude-worktrees-tickets-issues-sync-5a183b/f6497838-4359-4a63-b8d4-3c8b652f9012/scratchpad/e2e/fx/.vibehub/version.yaml","reason":null}}
+## templates arrived
+sync-github-issues.mjs
+sync-issues.yml

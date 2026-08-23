@@ -1,0 +1,500 @@
+87 tickets on disk, 0 issues on VW-ai/vibehub-plugin
+label  ensure "state: done"
+label  ensure "state: ready"
+label  ensure "state: close-out"
+label  ensure "state: needs-human"
+label  ensure "state: blocked"
+label  ensure "state: refine"
+label  ensure "state: replan"
+label  ensure "maturity: firm"
+label  ensure "maturity: draft"
+create ticket-add-site-copy-for-agent → "Add site copy for agent"
+create ticket-add-workbench-favicon → "Add workbench favicon"
+create ticket-align-card-state-icon-baseline → "Align card state icon baseline"
+create ticket-align-public-graph-with-real-workbench → "Align public graph with real workbench"
+create ticket-align-readme-with-public-site-narrative → "Align readme with public site narrative"
+create ticket-ambient-distill-workflow → "Ambient distill workflow"
+create ticket-apply-codex-like-workbench-visual-language → "Apply codex like workbench visual language"
+create ticket-bind-proof-to-acceptance-revision → "Bind proof to acceptance revision"
+create ticket-build-task-harness-vertical-slice → "Build task harness vertical slice"
+create ticket-coding-agent-first-public-site → "Coding agent first public site"
+create ticket-complete-public-domain-discovery → "Complete public domain discovery"
+create ticket-context-always-roomed → "Context always roomed"
+create ticket-contractize-skill-system → "Contractize skill system"
+create ticket-correct-public-founder-identity → "Correct public founder identity"
+create ticket-curate-pr18-ui-only → "Curate PR18 UI only"
+create ticket-decide-codex-like-workbench-visual-language → "Decide codex like workbench visual language"
+create ticket-decide-legacy-proof-revision-policy → "Decide legacy proof revision policy"
+create ticket-decide-pr18-ui-only-scope → "Decide PR18 UI only scope"
+create ticket-decide-public-site-cloudflare-hostname → "Decide public site cloudflare hostname"
+create ticket-decide-rooms-workbench-direction → "Decide rooms workbench direction"
+create ticket-decide-task-harness-product-direction → "Decide task harness product direction"
+create ticket-decide-workbench-task-state-contract → "Decide workbench task state contract"
+create ticket-deploy-public-site-cloudflare → "Deploy public site cloudflare"
+create ticket-derive-closeout-ready-next-action → "Derive closeout ready next action"
+create ticket-document-dogfood-phase → "Document dogfood phase"
+create ticket-draft-ticket-maturity → "Draft ticket maturity"
+create ticket-drift-check-mechanical → "Drift check mechanical"
+create ticket-encode-human-acceptance-authority → "Encode human acceptance authority"
+create ticket-encode-public-site-release-workflow → "Encode public site release workflow"
+create ticket-explicit-firm-maturity → "Explicit firm maturity"
+create ticket-fix-archived-stub-label-visibility → "Fix archived stub label visibility"
+create ticket-fix-public-graph-connector-alignment → "Fix public graph connector alignment"
+create ticket-focus-product-on-one-line-entry → "Focus product on one line entry"
+create ticket-formal-public-agent-entry → "Formal public agent entry"
+create ticket-format-gated-plugin-upgrades → "Format gated plugin upgrades"
+create ticket-integrate-workbench-web-upgrade-pr → "Integrate workbench web upgrade PR"
+create ticket-invisible-git-cross-repo-actions → "Invisible git cross repo actions"
+create ticket-launch-public-causal-canvas-site → "Launch public causal canvas site"
+create ticket-make-closeout-first-class-handoff → "Make closeout first class handoff"
+create ticket-make-static-graph-actionable → "Make static graph actionable"
+create ticket-make-workflow-present-itself → "Make workflow present itself"
+create ticket-mirror-tickets-to-github-issues → "Mirror tickets to GitHub issues"
+create ticket-polish-workbench-state-action-affordances → "Polish workbench state action affordances"
+create ticket-pr-room-aware-gate → "PR room aware gate"
+create ticket-pr-room-merge-semantics → "PR room merge semantics"
+create ticket-prepare-rooms-workbench-proposal → "Prepare rooms workbench proposal"
+create ticket-prepare-v040-release → "Prepare v040 release"
+create ticket-prepare-v060-release → "Prepare v060 release"
+create ticket-prepare-v070-ui-release → "Prepare v070 UI release"
+create ticket-prioritize-near-term-plugin-improvements → "Prioritize near term plugin improvements"
+create ticket-propose-card-corner-signal-contract → "Propose card corner signal contract"
+create ticket-propose-codex-like-workbench-visual-language → "Propose codex like workbench visual language"
+create ticket-propose-large-graph-clarity-and-card-copy → "Propose large graph clarity and card copy"
+create ticket-propose-legacy-proof-revision-policy → "Propose legacy proof revision policy"
+create ticket-prototype-task-harness-experience → "Prototype task harness experience"
+create ticket-public-cycle-evolution → "Public cycle evolution"
+create ticket-public-embed-real-workbench → "Public embed real workbench"
+create ticket-public-founders-brand-icons → "Public founders brand icons"
+create ticket-publish-v060-release → "Publish v060 release"
+create ticket-publish-v070-ui-release → "Publish v070 UI release"
+create ticket-publish-v080-workbench-release → "Publish v080 workbench release"
+create ticket-queryable-archived-ticket-history → "Queryable archived ticket history"
+create ticket-rebuild-local-graph-workbench → "Rebuild local graph workbench"
+create ticket-refine-local-ticket-interaction → "Refine local ticket interaction"
+create ticket-refresh-public-site-favicon → "Refresh public site favicon"
+create ticket-refresh-readme-for-v080-workbench → "Refresh readme for v080 workbench"
+create ticket-refresh-readme-workbench-screenshots → "Refresh readme workbench screenshots"
+create ticket-release-v050 → "Release v050"
+create ticket-repair-current-scope-and-delivery-upgrade → "Repair current scope and delivery upgrade"
+create ticket-repair-refine-workbench-projection → "Repair refine workbench projection"
+create ticket-research-task-workbench-interaction-directions → "Research task workbench interaction directions"
+create ticket-restore-local-graph-ui → "Restore local graph UI"
+create ticket-restore-public-hero-ticket-graph → "Restore public hero ticket graph"
+create ticket-restore-quiet-intelligence-graph-ui → "Restore quiet intelligence graph UI"
+create ticket-restore-transitive-public-causal-cone → "Restore transitive public causal cone"
+create ticket-room-retrieval-and-discovery → "Room retrieval and discovery"
+create ticket-room-taxonomy-foundation → "Room taxonomy foundation"
+create ticket-rooms-into-workbench → "Rooms into workbench"
+create ticket-simplify-workbench-primary-state-language → "Simplify workbench primary state language"
+create ticket-speed-first-cleanup → "Speed first cleanup"
+create ticket-spike-deepseek-harness-foundations → "Spike deepseek harness foundations"
+create ticket-tighten-completed-dependency-hygiene → "Tighten completed dependency hygiene"
+create ticket-upgrade-migration-skill → "Upgrade migration skill"
+create ticket-vibehub-cli → "Vibehub CLI"
+create ticket-workbench-canvas-first-overview → "Workbench canvas first overview"
+create ticket-workbench-dense-graph-layout → "Workbench dense graph layout"
+create ticket-workbench-layout-direction-choice → "Workbench layout direction choice"
+update (new) ticket-add-site-copy-for-agent +[state: done,maturity: firm]
+comment (new) ticket-add-site-copy-for-agent evidence site-copy-agent-verification
+comment (new) ticket-add-site-copy-for-agent evidence site-copy-agent-brief-and-action
+close  (new) ticket-add-site-copy-for-agent
+update (new) ticket-add-workbench-favicon +[state: done,maturity: firm]
+comment (new) ticket-add-workbench-favicon evidence workbench-favicon-source-installed-host-proof
+close  (new) ticket-add-workbench-favicon
+update (new) ticket-align-card-state-icon-baseline +[state: done,maturity: firm]
+comment (new) ticket-align-card-state-icon-baseline evidence card-phase-native-centering-proof
+close  (new) ticket-align-card-state-icon-baseline
+update (new) ticket-align-public-graph-with-real-workbench +[state: done,maturity: firm]
+comment (new) ticket-align-public-graph-with-real-workbench evidence public-graph-real-workbench-verification
+comment (new) ticket-align-public-graph-with-real-workbench evidence public-graph-real-workbench-visual-implementation
+comment (new) ticket-align-public-graph-with-real-workbench evidence public-graph-production-deployment-v2
+close  (new) ticket-align-public-graph-with-real-workbench
+update (new) ticket-align-readme-with-public-site-narrative +[state: done,maturity: firm]
+comment (new) ticket-align-readme-with-public-site-narrative evidence readme-site-installed-parity-proof
+comment (new) ticket-align-readme-with-public-site-narrative evidence readme-site-narrative-and-link-proof
+close  (new) ticket-align-readme-with-public-site-narrative
+update (new) ticket-ambient-distill-workflow +[state: done,maturity: firm]
+comment (new) ticket-ambient-distill-workflow evidence coldstart-resume-proof
+comment (new) ticket-ambient-distill-workflow evidence one-line-perception-proof
+comment (new) ticket-ambient-distill-workflow evidence ticket-plan-drift-step-proof
+comment (new) ticket-ambient-distill-workflow evidence trust-layering-proof
+close  (new) ticket-ambient-distill-workflow
+update (new) ticket-apply-codex-like-workbench-visual-language +[state: done,maturity: firm]
+comment (new) ticket-apply-codex-like-workbench-visual-language evidence production-visual-system-and-browser-proof
+close  (new) ticket-apply-codex-like-workbench-visual-language
+update (new) ticket-bind-proof-to-acceptance-revision +[state: blocked,maturity: draft]
+update (new) ticket-build-task-harness-vertical-slice +[state: refine,maturity: draft]
+update (new) ticket-coding-agent-first-public-site +[state: done,maturity: firm]
+comment (new) ticket-coding-agent-first-public-site evidence agent-first-browser-and-build-verification
+comment (new) ticket-coding-agent-first-public-site evidence agent-first-interaction-implementation
+close  (new) ticket-coding-agent-first-public-site
+update (new) ticket-complete-public-domain-discovery +[state: done,maturity: firm]
+comment (new) ticket-complete-public-domain-discovery evidence canonical-discovery-artifact-preflight
+comment (new) ticket-complete-public-domain-discovery evidence canonical-www-redirect-production-verification
+comment (new) ticket-complete-public-domain-discovery evidence search-console-domain-property-verification
+comment (new) ticket-complete-public-domain-discovery evidence cloudflare-pages-canonical-production-verification
+comment (new) ticket-complete-public-domain-discovery evidence search-console-sitemap-and-recrawl
+close  (new) ticket-complete-public-domain-discovery
+update (new) ticket-context-always-roomed +[state: done,maturity: firm]
+comment (new) ticket-context-always-roomed evidence dogfood-product-room-proof
+comment (new) ticket-context-always-roomed evidence no-root-context-proof
+comment (new) ticket-context-always-roomed evidence put-requires-room-proof
+comment (new) ticket-context-always-roomed evidence skills-docs-sweep-proof
+comment (new) ticket-context-always-roomed evidence ui-roomed-refs-proof
+close  (new) ticket-context-always-roomed
+update (new) ticket-contractize-skill-system +[state: done,maturity: firm]
+comment (new) ticket-contractize-skill-system evidence boundary-once-proof
+comment (new) ticket-contractize-skill-system evidence command-surface-proof
+comment (new) ticket-contractize-skill-system evidence governance-reference-proof
+comment (new) ticket-contractize-skill-system evidence taxonomy-visible-proof
+close  (new) ticket-contractize-skill-system
+update (new) ticket-correct-public-founder-identity +[state: done,maturity: firm]
+comment (new) ticket-correct-public-founder-identity evidence public-founder-identity-correction
+comment (new) ticket-correct-public-founder-identity evidence public-founder-identity-verification
+close  (new) ticket-correct-public-founder-identity
+update (new) ticket-curate-pr18-ui-only +[state: done,maturity: firm]
+comment (new) ticket-curate-pr18-ui-only evidence pr18-current-main-contracts-preserved
+comment (new) ticket-curate-pr18-ui-only evidence pr18-desktop-runtime-scope-excluded
+comment (new) ticket-curate-pr18-ui-only evidence pr18-ledger-history-preserved
+comment (new) ticket-curate-pr18-ui-only evidence pr18-quiet-ui-integrated
+comment (new) ticket-curate-pr18-ui-only evidence pr18-retained-host-fsmonitor-safe
+comment (new) ticket-curate-pr18-ui-only evidence pr18-ui-verification-passed
+comment (new) ticket-curate-pr18-ui-only evidence pr18-real-browser-ui-smoke
+close  (new) ticket-curate-pr18-ui-only
+update (new) ticket-decide-codex-like-workbench-visual-language +[state: done,maturity: firm]
+comment (new) ticket-decide-codex-like-workbench-visual-language evidence codex-like-visual-direction-owner-decision
+close  (new) ticket-decide-codex-like-workbench-visual-language
+update (new) ticket-decide-legacy-proof-revision-policy +[state: needs-human,maturity: firm]
+update (new) ticket-decide-pr18-ui-only-scope +[state: done,maturity: firm]
+comment (new) ticket-decide-pr18-ui-only-scope evidence pr18-ui-only-scope-owner-decision
+close  (new) ticket-decide-pr18-ui-only-scope
+update (new) ticket-decide-public-site-cloudflare-hostname +[state: done,maturity: firm]
+comment (new) ticket-decide-public-site-cloudflare-hostname evidence vibehub-icu-hostname-and-replacement-decision
+close  (new) ticket-decide-public-site-cloudflare-hostname
+update (new) ticket-decide-rooms-workbench-direction +[state: done,maturity: firm]
+comment (new) ticket-decide-rooms-workbench-direction evidence rooms-workbench-direction-owner-decision
+close  (new) ticket-decide-rooms-workbench-direction
+update (new) ticket-decide-task-harness-product-direction +[state: done,maturity: firm]
+comment (new) ticket-decide-task-harness-product-direction evidence owner-requires-whole-application-shell
+comment (new) ticket-decide-task-harness-product-direction evidence owner-records-current-task-workbench-direction
+close  (new) ticket-decide-task-harness-product-direction
+update (new) ticket-decide-workbench-task-state-contract +[state: done,maturity: firm]
+comment (new) ticket-decide-workbench-task-state-contract evidence owner-corrects-and-accepts-production-state-contract
+close  (new) ticket-decide-workbench-task-state-contract
+update (new) ticket-deploy-public-site-cloudflare +[state: done,maturity: firm]
+comment (new) ticket-deploy-public-site-cloudflare evidence cloudflare-pages-production-cutover
+comment (new) ticket-deploy-public-site-cloudflare evidence cloudflare-pages-release-contract
+comment (new) ticket-deploy-public-site-cloudflare evidence cloudflare-pages-current-state-reverification
+close  (new) ticket-deploy-public-site-cloudflare
+update (new) ticket-derive-closeout-ready-next-action +[state: done,maturity: firm]
+comment (new) ticket-derive-closeout-ready-next-action evidence next-action-cli-workbench-parity-proof
+comment (new) ticket-derive-closeout-ready-next-action evidence next-action-derivation-and-frontier-proof
+comment (new) ticket-derive-closeout-ready-next-action evidence next-action-real-corpus-and-artifact-proof
+close  (new) ticket-derive-closeout-ready-next-action
+update (new) ticket-document-dogfood-phase +[state: done,maturity: firm]
+comment (new) ticket-document-dogfood-phase evidence readme-contract-verification-proof
+comment (new) ticket-document-dogfood-phase evidence readme-dogfood-loop-proof
+comment (new) ticket-document-dogfood-phase evidence readme-dogfood-phase-proof
+close  (new) ticket-document-dogfood-phase
+update (new) ticket-draft-ticket-maturity +[state: done,maturity: firm]
+comment (new) ticket-draft-ticket-maturity evidence draft-suite-proof
+comment (new) ticket-draft-ticket-maturity evidence maturity-field-proof
+comment (new) ticket-draft-ticket-maturity evidence projection-refine-proof
+comment (new) ticket-draft-ticket-maturity evidence refine-never-ready-proof
+comment (new) ticket-draft-ticket-maturity evidence refinement-owned-proof
+close  (new) ticket-draft-ticket-maturity
+update (new) ticket-drift-check-mechanical +[state: done,maturity: firm]
+comment (new) ticket-drift-check-mechanical evidence atomic-align-proof
+comment (new) ticket-drift-check-mechanical evidence audited-edges-proof
+comment (new) ticket-drift-check-mechanical evidence drift-states-proof
+comment (new) ticket-drift-check-mechanical evidence stale-writeback-proof
+close  (new) ticket-drift-check-mechanical
+update (new) ticket-encode-human-acceptance-authority +[state: done,maturity: firm]
+comment (new) ticket-encode-human-acceptance-authority evidence authority-contract-and-skill-proof
+comment (new) ticket-encode-human-acceptance-authority evidence clean-authority-plugin-verification
+comment (new) ticket-encode-human-acceptance-authority evidence human-attention-projection-and-handoff-proof
+comment (new) ticket-encode-human-acceptance-authority evidence decision-boundary-policy-approval
+comment (new) ticket-encode-human-acceptance-authority evidence decision-boundary-prompt-proof
+comment (new) ticket-encode-human-acceptance-authority evidence rooms-decision-graph-proof
+comment (new) ticket-encode-human-acceptance-authority evidence draft-after-decision-policy-approval
+close  (new) ticket-encode-human-acceptance-authority
+update (new) ticket-encode-public-site-release-workflow +[state: done,maturity: firm]
+comment (new) ticket-encode-public-site-release-workflow evidence public-site-release-workflow-implementation
+comment (new) ticket-encode-public-site-release-workflow evidence public-site-release-workflow-verification
+close  (new) ticket-encode-public-site-release-workflow
+update (new) ticket-explicit-firm-maturity +[state: done,maturity: firm]
+comment (new) ticket-explicit-firm-maturity evidence explicit-maturity-contract-proof
+comment (new) ticket-explicit-firm-maturity evidence explicit-maturity-verification-proof
+close  (new) ticket-explicit-firm-maturity
+update (new) ticket-fix-archived-stub-label-visibility +[state: done,maturity: firm]
+comment (new) ticket-fix-archived-stub-label-visibility evidence archived-stub-direction-and-narrow-automated-proof
+comment (new) ticket-fix-archived-stub-label-visibility evidence archived-stub-geometry-and-focus-regression
+comment (new) ticket-fix-archived-stub-label-visibility evidence archived-stub-integrated-browser-matrix
+close  (new) ticket-fix-archived-stub-label-visibility
+update (new) ticket-fix-public-graph-connector-alignment +[state: done,maturity: firm]
+comment (new) ticket-fix-public-graph-connector-alignment evidence public-graph-rendered-geometry-fix
+comment (new) ticket-fix-public-graph-connector-alignment evidence public-graph-rendered-geometry-verification
+comment (new) ticket-fix-public-graph-connector-alignment evidence public-graph-rendered-geometry-production
+close  (new) ticket-fix-public-graph-connector-alignment
+update (new) ticket-focus-product-on-one-line-entry +[state: done,maturity: firm]
+comment (new) ticket-focus-product-on-one-line-entry evidence canonical-entry-clean-install-and-pr
+comment (new) ticket-focus-product-on-one-line-entry evidence one-line-readme-and-dark-wordmark
+close  (new) ticket-focus-product-on-one-line-entry
+update (new) ticket-formal-public-agent-entry +[state: done,maturity: firm]
+comment (new) ticket-formal-public-agent-entry evidence formal-public-entry-implementation
+comment (new) ticket-formal-public-agent-entry evidence formal-public-entry-verification
+close  (new) ticket-formal-public-agent-entry
+update (new) ticket-format-gated-plugin-upgrades +[state: done,maturity: firm]
+comment (new) ticket-format-gated-plugin-upgrades evidence codex-claude-contract-proof
+comment (new) ticket-format-gated-plugin-upgrades evidence compatibility-write-gate-proof
+comment (new) ticket-format-gated-plugin-upgrades evidence cross-host-clean-install-proof
+comment (new) ticket-format-gated-plugin-upgrades evidence explicit-migration-proof
+comment (new) ticket-format-gated-plugin-upgrades evidence project-format-contract-proof
+close  (new) ticket-format-gated-plugin-upgrades
+update (new) ticket-integrate-workbench-web-upgrade-pr +[state: done,maturity: firm]
+comment (new) ticket-integrate-workbench-web-upgrade-pr evidence workbench-shortened-text-tooltip-browser-proof
+comment (new) ticket-integrate-workbench-web-upgrade-pr evidence workbench-canvas-done-count-browser-proof
+comment (new) ticket-integrate-workbench-web-upgrade-pr evidence v080-exact-head-cross-feature-browser-proof
+comment (new) ticket-integrate-workbench-web-upgrade-pr evidence v080-focused-pr-and-delivery-membership
+comment (new) ticket-integrate-workbench-web-upgrade-pr evidence v080-main-contract-release-and-boundary-proof
+close  (new) ticket-integrate-workbench-web-upgrade-pr
+update (new) ticket-invisible-git-cross-repo-actions +[state: refine,maturity: draft]
+update (new) ticket-launch-public-causal-canvas-site +[state: done,maturity: firm]
+comment (new) ticket-launch-public-causal-canvas-site evidence public-site-static-build
+comment (new) ticket-launch-public-causal-canvas-site evidence public-site-content-and-cycle
+comment (new) ticket-launch-public-causal-canvas-site evidence public-site-interaction-and-visual
+close  (new) ticket-launch-public-causal-canvas-site
+update (new) ticket-make-closeout-first-class-handoff +[state: done,maturity: firm]
+comment (new) ticket-make-closeout-first-class-handoff evidence closeout-handoff-and-routing-proof
+comment (new) ticket-make-closeout-first-class-handoff evidence closeout-workbench-review-surface-proof
+comment (new) ticket-make-closeout-first-class-handoff evidence closeout-integrated-browser-review
+close  (new) ticket-make-closeout-first-class-handoff
+update (new) ticket-make-static-graph-actionable +[state: done,maturity: firm]
+comment (new) ticket-make-static-graph-actionable evidence actionable-static-graph-engineering
+comment (new) ticket-make-static-graph-actionable evidence dense-causal-browser-fixture
+comment (new) ticket-make-static-graph-actionable evidence context-handoff-refinement
+comment (new) ticket-make-static-graph-actionable evidence bound-context-agent-only-actions
+comment (new) ticket-make-static-graph-actionable evidence ticket-header-and-reference-alignment
+comment (new) ticket-make-static-graph-actionable evidence contract-definition-of-done-hierarchy
+comment (new) ticket-make-static-graph-actionable evidence evidence-language-alignment
+comment (new) ticket-make-static-graph-actionable evidence log-navigation-language
+comment (new) ticket-make-static-graph-actionable evidence owner-authorizes-main-release-direction
+close  (new) ticket-make-static-graph-actionable
+update (new) ticket-make-workflow-present-itself +[state: done,maturity: firm]
+comment (new) ticket-make-workflow-present-itself evidence lifecycle-driven-focused-review
+close  (new) ticket-make-workflow-present-itself
+update (new) ticket-mirror-tickets-to-github-issues +[state: needs-human,maturity: firm]
+update (new) ticket-polish-workbench-state-action-affordances +[state: done,maturity: firm]
+comment (new) ticket-polish-workbench-state-action-affordances evidence production-state-pair-and-action-disclosure-proof
+comment (new) ticket-polish-workbench-state-action-affordances evidence workbench-polish-source-installed-regression-proof
+close  (new) ticket-polish-workbench-state-action-affordances
+update (new) ticket-pr-room-aware-gate +[state: done,maturity: firm]
+comment (new) ticket-pr-room-aware-gate evidence drift-gate-proof
+comment (new) ticket-pr-room-aware-gate evidence gate-suite-proof
+comment (new) ticket-pr-room-aware-gate evidence room-lens-summary-proof
+close  (new) ticket-pr-room-aware-gate
+update (new) ticket-pr-room-merge-semantics +[state: done,maturity: firm]
+comment (new) ticket-pr-room-merge-semantics evidence merge-suite-proof
+comment (new) ticket-pr-room-merge-semantics evidence overlap-detection-proof
+comment (new) ticket-pr-room-merge-semantics evidence pr-judgment-proof
+comment (new) ticket-pr-room-merge-semantics evidence stale-origins-proof
+close  (new) ticket-pr-room-merge-semantics
+update (new) ticket-prepare-rooms-workbench-proposal +[state: done,maturity: firm]
+comment (new) ticket-prepare-rooms-workbench-proposal evidence rooms-tree-drift-detail-and-browser-proof
+close  (new) ticket-prepare-rooms-workbench-proposal
+update (new) ticket-prepare-v040-release +[state: done,maturity: firm]
+comment (new) ticket-prepare-v040-release evidence release-readme-and-lifecycle-story
+comment (new) ticket-prepare-v040-release evidence v040-github-release-mechanics
+comment (new) ticket-prepare-v040-release evidence main-pr-release-readiness
+close  (new) ticket-prepare-v040-release
+update (new) ticket-prepare-v060-release +[state: done,maturity: firm]
+comment (new) ticket-prepare-v060-release evidence release-candidate-verification-proof
+comment (new) ticket-prepare-v060-release evidence release-identity-and-changelog-proof
+comment (new) ticket-prepare-v060-release evidence release-pr-readiness-proof
+comment (new) ticket-prepare-v060-release evidence release-scope-human-authorization
+close  (new) ticket-prepare-v060-release
+update (new) ticket-prepare-v070-ui-release +[state: done,maturity: firm]
+comment (new) ticket-prepare-v070-ui-release evidence v070-origin-main-and-pr15-alignment
+comment (new) ticket-prepare-v070-ui-release evidence v070-release-candidate-verification
+comment (new) ticket-prepare-v070-ui-release evidence v070-release-identity-and-changelog
+comment (new) ticket-prepare-v070-ui-release evidence v070-replacement-pr-readiness
+comment (new) ticket-prepare-v070-ui-release evidence v070-semver-feature-classification
+comment (new) ticket-prepare-v070-ui-release evidence v070-ui-release-owner-authorization
+close  (new) ticket-prepare-v070-ui-release
+update (new) ticket-prioritize-near-term-plugin-improvements +[state: done,maturity: firm]
+comment (new) ticket-prioritize-near-term-plugin-improvements evidence hosted-service-boundary
+comment (new) ticket-prioritize-near-term-plugin-improvements evidence near-term-candidate-ranking
+comment (new) ticket-prioritize-near-term-plugin-improvements evidence plugin-loop-and-gap-audit
+comment (new) ticket-prioritize-near-term-plugin-improvements evidence v070-candidate-ranking
+comment (new) ticket-prioritize-near-term-plugin-improvements evidence v070-open-graph-reconciliation
+comment (new) ticket-prioritize-near-term-plugin-improvements evidence v070-plugin-loop-refresh
+close  (new) ticket-prioritize-near-term-plugin-improvements
+update (new) ticket-propose-card-corner-signal-contract +[state: done,maturity: firm]
+comment (new) ticket-propose-card-corner-signal-contract evidence card-signal-semantic-contract-proof
+comment (new) ticket-propose-card-corner-signal-contract evidence card-signal-wide-narrow-review-proof
+close  (new) ticket-propose-card-corner-signal-contract
+update (new) ticket-propose-codex-like-workbench-visual-language +[state: done,maturity: firm]
+comment (new) ticket-propose-codex-like-workbench-visual-language evidence codex-like-token-state-and-browser-proposal-proof
+close  (new) ticket-propose-codex-like-workbench-visual-language
+update (new) ticket-propose-large-graph-clarity-and-card-copy +[state: ready,maturity: firm]
+update (new) ticket-propose-legacy-proof-revision-policy +[state: done,maturity: firm]
+comment (new) ticket-propose-legacy-proof-revision-policy evidence legacy-proof-audit-and-policy-proposal
+comment (new) ticket-propose-legacy-proof-revision-policy evidence legacy-proof-head-ancestry-and-impact-correction
+close  (new) ticket-propose-legacy-proof-revision-policy
+update (new) ticket-prototype-task-harness-experience +[state: done,maturity: firm]
+comment (new) ticket-prototype-task-harness-experience evidence harness-prototype-product-loop
+comment (new) ticket-prototype-task-harness-experience evidence codex-base-low-fidelity-product-logic
+comment (new) ticket-prototype-task-harness-experience evidence graph-first-ticket-workspace-correction
+close  (new) ticket-prototype-task-harness-experience
+update (new) ticket-public-cycle-evolution +[state: done,maturity: firm]
+comment (new) ticket-public-cycle-evolution evidence public-cycle-evolution-implementation
+comment (new) ticket-public-cycle-evolution evidence public-cycle-evolution-verification
+close  (new) ticket-public-cycle-evolution
+update (new) ticket-public-embed-real-workbench +[state: done,maturity: firm]
+comment (new) ticket-public-embed-real-workbench evidence public-workbench-scene-verification
+comment (new) ticket-public-embed-real-workbench evidence public-static-ticket-showcase-implementation
+comment (new) ticket-public-embed-real-workbench evidence public-dark-storytelling-implementation
+comment (new) ticket-public-embed-real-workbench evidence public-dark-storytelling-verification
+comment (new) ticket-public-embed-real-workbench evidence public-room-context-content
+comment (new) ticket-public-embed-real-workbench evidence public-ticket-anatomy-story
+comment (new) ticket-public-embed-real-workbench evidence public-real-ticket-room-files
+comment (new) ticket-public-embed-real-workbench evidence owner-accepts-public-site-product-feel
+close  (new) ticket-public-embed-real-workbench
+update (new) ticket-public-founders-brand-icons +[state: done,maturity: firm]
+comment (new) ticket-public-founders-brand-icons evidence public-founders-brand-icons-implementation
+comment (new) ticket-public-founders-brand-icons evidence public-founders-brand-icons-verification
+close  (new) ticket-public-founders-brand-icons
+update (new) ticket-publish-v060-release +[state: done,maturity: firm]
+comment (new) ticket-publish-v060-release evidence v060-github-release-verified-proof
+comment (new) ticket-publish-v060-release evidence v060-release-pr-merged-proof
+comment (new) ticket-publish-v060-release evidence v060-tagged-merged-main-proof
+close  (new) ticket-publish-v060-release
+update (new) ticket-publish-v070-ui-release +[state: done,maturity: firm]
+comment (new) ticket-publish-v070-ui-release evidence v070-merged-main-release-and-pr-retirement
+close  (new) ticket-publish-v070-ui-release
+update (new) ticket-publish-v080-workbench-release +[state: done,maturity: firm]
+comment (new) ticket-publish-v080-workbench-release evidence v080-merged-pr-and-authoritative-delivery-proof
+comment (new) ticket-publish-v080-workbench-release evidence v080-tag-workflow-release-and-archive-proof
+close  (new) ticket-publish-v080-workbench-release
+update (new) ticket-queryable-archived-ticket-history +[state: done,maturity: firm]
+comment (new) ticket-queryable-archived-ticket-history evidence archive-query-contract-cli-and-browser-proof
+close  (new) ticket-queryable-archived-ticket-history
+update (new) ticket-rebuild-local-graph-workbench +[state: done,maturity: firm]
+comment (new) ticket-rebuild-local-graph-workbench evidence flat-workbench-design-proof
+comment (new) ticket-rebuild-local-graph-workbench evidence normal-browser-entry-proof
+comment (new) ticket-rebuild-local-graph-workbench evidence portable-authorized-link-proof
+comment (new) ticket-rebuild-local-graph-workbench evidence workbench-readonly-boundary-proof
+close  (new) ticket-rebuild-local-graph-workbench
+update (new) ticket-refine-local-ticket-interaction +[state: done,maturity: firm]
+comment (new) ticket-refine-local-ticket-interaction evidence ticket-interaction-lightweight-boundary
+comment (new) ticket-refine-local-ticket-interaction evidence ticket-interaction-real-browser-loop
+comment (new) ticket-refine-local-ticket-interaction evidence ticket-interaction-owner-approval
+close  (new) ticket-refine-local-ticket-interaction
+update (new) ticket-refresh-public-site-favicon +[state: done,maturity: firm]
+comment (new) ticket-refresh-public-site-favicon evidence public-site-favicon-cache-bust-implementation
+comment (new) ticket-refresh-public-site-favicon evidence public-site-favicon-production-build-verification
+comment (new) ticket-refresh-public-site-favicon evidence public-favicon-production-deployment-v2
+close  (new) ticket-refresh-public-site-favicon
+update (new) ticket-refresh-readme-for-v080-workbench +[state: done,maturity: firm]
+comment (new) ticket-refresh-readme-for-v080-workbench evidence readme-v080-current-surface-and-verification
+comment (new) ticket-refresh-readme-for-v080-workbench evidence readme-v080-three-scene-capability-story
+close  (new) ticket-refresh-readme-for-v080-workbench
+update (new) ticket-refresh-readme-workbench-screenshots +[state: done,maturity: firm]
+comment (new) ticket-refresh-readme-workbench-screenshots evidence readme-installed-artifact-parity-proof
+comment (new) ticket-refresh-readme-workbench-screenshots evidence readme-retina-capture-and-render-proof
+close  (new) ticket-refresh-readme-workbench-screenshots
+update (new) ticket-release-v050 +[state: done,maturity: firm]
+comment (new) ticket-release-v050 evidence version-identity-proof
+comment (new) ticket-release-v050 evidence release-pr-merged-proof
+comment (new) ticket-release-v050 evidence tag-release-verified-proof
+close  (new) ticket-release-v050
+update (new) ticket-repair-current-scope-and-delivery-upgrade +[state: done,maturity: firm]
+comment (new) ticket-repair-current-scope-and-delivery-upgrade evidence actionable-current-scope-proof
+comment (new) ticket-repair-current-scope-and-delivery-upgrade evidence current-scope-migration-regression-proof
+comment (new) ticket-repair-current-scope-and-delivery-upgrade evidence format-two-delivery-audit-proof
+comment (new) ticket-repair-current-scope-and-delivery-upgrade evidence schema-evolution-gate-proof
+close  (new) ticket-repair-current-scope-and-delivery-upgrade
+update (new) ticket-repair-refine-workbench-projection +[state: done,maturity: firm]
+comment (new) ticket-repair-refine-workbench-projection evidence refine-workbench-production-projection
+close  (new) ticket-repair-refine-workbench-projection
+update (new) ticket-research-task-workbench-interaction-directions +[state: done,maturity: firm]
+comment (new) ticket-research-task-workbench-interaction-directions evidence task-workbench-interaction-research
+close  (new) ticket-research-task-workbench-interaction-directions
+update (new) ticket-restore-local-graph-ui +[state: done,maturity: firm]
+comment (new) ticket-restore-local-graph-ui evidence clean-artifact-ui-proof
+comment (new) ticket-restore-local-graph-ui evidence direct-yaml-inspector-proof
+comment (new) ticket-restore-local-graph-ui evidence local-graph-browser-proof
+comment (new) ticket-restore-local-graph-ui evidence narrow-launcher-security-proof
+comment (new) ticket-restore-local-graph-ui evidence ui-footprint-boundary-proof
+comment (new) ticket-restore-local-graph-ui evidence canonical-output-consumer-proof
+close  (new) ticket-restore-local-graph-ui
+update (new) ticket-restore-public-hero-ticket-graph +[state: done,maturity: firm]
+comment (new) ticket-restore-public-hero-ticket-graph evidence ticket-shelf-browser-and-build-proof
+comment (new) ticket-restore-public-hero-ticket-graph evidence ticket-shelf-implementation-proof
+close  (new) ticket-restore-public-hero-ticket-graph
+update (new) ticket-restore-quiet-intelligence-graph-ui +[state: done,maturity: firm]
+comment (new) ticket-restore-quiet-intelligence-graph-ui evidence causal-progressive-interaction-proof
+comment (new) ticket-restore-quiet-intelligence-graph-ui evidence lightweight-ui-boundary-proof
+comment (new) ticket-restore-quiet-intelligence-graph-ui evidence quiet-intelligence-design-proof
+comment (new) ticket-restore-quiet-intelligence-graph-ui evidence single-ticket-focus-boundary-proof
+comment (new) ticket-restore-quiet-intelligence-graph-ui evidence owner-quiet-ui-direction-approval
+close  (new) ticket-restore-quiet-intelligence-graph-ui
+update (new) ticket-restore-transitive-public-causal-cone +[state: done,maturity: firm]
+comment (new) ticket-restore-transitive-public-causal-cone evidence transitive-causal-cone-implementation-and-browser-proof
+comment (new) ticket-restore-transitive-public-causal-cone evidence transitive-causal-cone-production-proof
+close  (new) ticket-restore-transitive-public-causal-cone
+update (new) ticket-room-retrieval-and-discovery +[state: done,maturity: firm]
+comment (new) ticket-room-retrieval-and-discovery evidence discovery-single-source-proof
+comment (new) ticket-room-retrieval-and-discovery evidence query-room-scope-proof
+comment (new) ticket-room-retrieval-and-discovery evidence retrieval-suite-proof
+comment (new) ticket-room-retrieval-and-discovery evidence settlement-moment-proof
+close  (new) ticket-room-retrieval-and-discovery
+update (new) ticket-room-taxonomy-foundation +[state: done,maturity: firm]
+comment (new) ticket-room-taxonomy-foundation evidence context-room-placement-proof
+comment (new) ticket-room-taxonomy-foundation evidence dogfood-rooms-migration-proof
+comment (new) ticket-room-taxonomy-foundation evidence room-schema-contract-proof
+comment (new) ticket-room-taxonomy-foundation evidence vh-room-tree-validation-proof
+close  (new) ticket-room-taxonomy-foundation
+update (new) ticket-rooms-into-workbench +[state: done,maturity: firm]
+comment (new) ticket-rooms-into-workbench evidence production-rooms-projection-and-interface-proof
+comment (new) ticket-rooms-into-workbench evidence room-filter-closeout-repair-proof
+comment (new) ticket-rooms-into-workbench evidence exact-room-viewport-restoration-proof
+comment (new) ticket-rooms-into-workbench evidence narrow-causal-control-repair-proof
+comment (new) ticket-rooms-into-workbench evidence canonical-room-state-presentation-proof
+close  (new) ticket-rooms-into-workbench
+update (new) ticket-simplify-workbench-primary-state-language +[state: done,maturity: firm]
+comment (new) ticket-simplify-workbench-primary-state-language evidence workbench-four-phase-and-action-contract-proof
+comment (new) ticket-simplify-workbench-primary-state-language evidence workbench-state-browser-and-installed-regression-proof
+close  (new) ticket-simplify-workbench-primary-state-language
+update (new) ticket-speed-first-cleanup +[state: done,maturity: firm]
+comment (new) ticket-speed-first-cleanup evidence baseline-checkpoint-proof
+comment (new) ticket-speed-first-cleanup evidence context-minimum-proof
+comment (new) ticket-speed-first-cleanup evidence ticket-vertical-proof
+comment (new) ticket-speed-first-cleanup evidence legacy-runtime-removal-proof
+comment (new) ticket-speed-first-cleanup evidence plugin-clean-install-proof
+comment (new) ticket-speed-first-cleanup evidence footprint-gap-proof
+close  (new) ticket-speed-first-cleanup
+update (new) ticket-spike-deepseek-harness-foundations +[state: done,maturity: firm]
+comment (new) ticket-spike-deepseek-harness-foundations evidence deepseek-harness-foundation-spikes
+close  (new) ticket-spike-deepseek-harness-foundations
+update (new) ticket-tighten-completed-dependency-hygiene +[state: done,maturity: firm]
+comment (new) ticket-tighten-completed-dependency-hygiene evidence dependency-hygiene-contract-advice-and-parity
+close  (new) ticket-tighten-completed-dependency-hygiene
+update (new) ticket-upgrade-migration-skill +[state: done,maturity: firm]
+comment (new) ticket-upgrade-migration-skill evidence migrate-skill-proof
+comment (new) ticket-upgrade-migration-skill evidence migration-rehearsal-proof
+comment (new) ticket-upgrade-migration-skill evidence migration-suite-proof
+comment (new) ticket-upgrade-migration-skill evidence migrations-reference-proof
+close  (new) ticket-upgrade-migration-skill
+update (new) ticket-vibehub-cli +[state: refine,maturity: draft]
+update (new) ticket-workbench-canvas-first-overview +[state: done,maturity: firm]
+comment (new) ticket-workbench-canvas-first-overview evidence canvas-first-overview-implementation-and-browser-proof
+close  (new) ticket-workbench-canvas-first-overview
+update (new) ticket-workbench-dense-graph-layout +[state: done,maturity: firm]
+comment (new) ticket-workbench-dense-graph-layout evidence dense-layout-fixtures-metrics-and-browser-proof
+close  (new) ticket-workbench-dense-graph-layout
+update (new) ticket-workbench-layout-direction-choice +[state: done,maturity: firm]
+comment (new) ticket-workbench-layout-direction-choice evidence layout-direction-contract-and-browser-proof
+close  (new) ticket-workbench-layout-direction-choice
+dry-run: would apply 87 creates, 402 follow-up operations

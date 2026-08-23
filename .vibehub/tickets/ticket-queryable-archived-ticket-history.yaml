@@ -55,19 +55,19 @@
     },
     {
       "purpose": "Current Ticket contract lacking archive and delivery-PR membership.",
-      "ref": "skills/contracts/ticket.schema.json"
+      "ref": "skills/vibehub-core/contracts/ticket.schema.json"
     },
     {
       "purpose": "Current completion contract whose relationship to post-PR archive timing must be designed.",
-      "ref": "skills/contracts/outcome.schema.json"
+      "ref": "skills/vibehub-core/contracts/outcome.schema.json"
     },
     {
       "purpose": "Current graph/frontier commands and future deterministic query surface.",
-      "ref": "skills/scripts/vh.mjs"
+      "ref": "skills/vibehub-core/scripts/vh.mjs"
     },
     {
       "purpose": "Current all-Ticket projection that future filtered Web views must share rather than fork.",
-      "ref": "skills/scripts/vh-ui.mjs"
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
   "kind": "ticket",

@@ -784,7 +784,7 @@ function traceFrom(snapshot, url) {
 }
 
 function defaultAssetRoot() {
-  return resolve(dirname(fileURLToPath(import.meta.url)), "../vibehub-ticket-review/assets");
+  return resolve(dirname(fileURLToPath(import.meta.url)), "../../vibehub-ticket-review/assets");
 }
 
 function assertAssets(assetRoot) {

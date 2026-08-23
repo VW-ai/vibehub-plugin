@@ -45,7 +45,7 @@
     },
     {
       "purpose": "Canonical machine routing values that presentation must not rename or mutate.",
-      "ref": "skills/contracts/ticket-next-action.md"
+      "ref": "skills/vibehub-core/contracts/ticket-next-action.md"
     },
     {
       "purpose": "Shared browser-side projection and Agent handoff routing to extend once.",
@@ -61,7 +61,7 @@
     },
     {
       "purpose": "Read-only host projection and exact Agent handoff payload boundary.",
-      "ref": "skills/scripts/vh-ui.mjs"
+      "ref": "skills/vibehub-core/scripts/vh-ui.mjs"
     }
   ],
   "deliveries": [],

@@ -5,6 +5,10 @@ description: Build or resume a repository's Room tree when drift reports COLD_ST
 
 # VibeHub Distill
 
+> If `../vibehub-core/scripts/vh.mjs` is missing, the install was partial. Run
+> `npx skills add VW-ai/vibehub-plugin -s vibehub-core` (or reinstall through
+> the host marketplace) before continuing; every VibeHub Skill needs that folder.
+
 Cold start is the one alignment experience allowed to be perceptible, and it
 runs once per project. Everything afterwards is align-on-use at Ticket start.
 
@@ -13,7 +17,7 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
 1. Run `project compatibility` before any Room write. Proceed only for
    `CURRENT`, except when `$vibehub-migrate` invoked this Skill after the
    explicit migration boundary for a registered legacy step.
-2. `node ../scripts/vh.mjs room drift --repo <root>` decides the mode.
+2. `node ../vibehub-core/scripts/vh.mjs room drift --repo <root>` decides the mode.
    `cold_start:true` means propose a tree. Otherwise distill only rooms
    reporting UNKNOWN: the alignment stamp is the resume marker, so an
    interrupted cold start continues exactly where stamps are missing — there
@@ -24,13 +28,13 @@ runs once per project. Everything afterwards is align-on-use at Ticket start.
    honest tree beats an exhaustive one — rooms are cheap to split later with
    `git mv`.
 4. Read enough of each room's territory to describe it truthfully, then write
-   its `room.yaml` (`../contracts/room.schema.json`): a description, a
+   its `room.yaml` (`../vibehub-core/contracts/room.schema.json`): a description, a
    boundary that also says what the room is not, and anchors as
    segment-boundary path prefixes covering what its knowledge is about. Stamp
    it immediately:
 
    ```text
-   node ../scripts/vh.mjs room align --repo <root> --room <path>
+   node ../vibehub-core/scripts/vh.mjs room align --repo <root> --room <path>
    ```
 
 5. Distilled output follows the trust and placement rules in

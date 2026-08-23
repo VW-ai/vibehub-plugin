@@ -1,0 +1,15 @@
+{
+  "acceptance_ids": [
+    "visual-check-at-two-widths"
+  ],
+  "evidence_id": "screenshots-desktop-and-390",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T04:12:31Z",
+  "refs": [
+    ".vibehub/evidence/ticket-site-leads-with-one-line-install/install-desktop-1280.png",
+    ".vibehub/evidence/ticket-site-leads-with-one-line-install/install-mobile-390.png"
+  ],
+  "schema_version": 1,
+  "summary": "Headless Chrome screenshots of the static build served locally: at 1280x900 the header shows npx skills add, Codex, Claude, GitHub, Copy for Agent, and the hero shows the primary command row above the three secondary actions with no overflow; at 390 wide the actions stack in one column with the primary first and the header keeps the primary icon. The workbench panel extending past the right edge at 390 is the existing diagonal-scroll canvas behaviour, unchanged.",
+  "ticket_id": "ticket-site-leads-with-one-line-install"
+}

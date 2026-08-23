@@ -41,7 +41,7 @@
     },
     {
       "purpose": "Current canonical next-action precedence and raw compatibility contract.",
-      "ref": "skills/contracts/ticket-next-action.md"
+      "ref": "skills/vibehub-core/contracts/ticket-next-action.md"
     },
     {
       "purpose": "Authority for cross-cutting human attention independent of operational state.",

@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
 export const root = resolve(new URL("..", import.meta.url).pathname);
-export const helper = join(root, "skills", "scripts", "vh.mjs");
+export const helper = join(root, "skills", "vibehub-core", "scripts", "vh.mjs");
 
 export function tempRepo(label) {
   return mkdtempSync(join(tmpdir(), `vibehub-${label}-`));

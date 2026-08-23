@@ -1,0 +1,16 @@
+{
+  "acceptance_ids": [
+    "install-path-decided"
+  ],
+  "evidence_id": "owner-chooses-path-a",
+  "kind": "ticket_evidence",
+  "origin": "human",
+  "recorded_at": "2026-08-23T02:17:28Z",
+  "refs": [
+    "conversation:2026-08-22-tickets-as-github-issues",
+    "docs/proposals/npx-first-install-experience.md"
+  ],
+  "schema_version": 1,
+  "summary": "The owner read the proposal's three-way comparison and the single closing question and answered in conversation: A — the self-contained vibehub-core skill folder so skills.sh becomes a supported install path, the GitHub Issues mirror offered once during project setup, and the npm-published init deferred until a human asks for it.",
+  "ticket_id": "ticket-decide-npx-first-install-experience"
+}

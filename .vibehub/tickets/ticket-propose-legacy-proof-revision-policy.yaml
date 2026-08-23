@@ -47,11 +47,11 @@
     },
     {
       "purpose": "Current legacy ID-only Evidence contract under audit.",
-      "ref": "skills/contracts/evidence.schema.json"
+      "ref": "skills/vibehub-core/contracts/evidence.schema.json"
     },
     {
       "purpose": "Current legacy Outcome contract under audit.",
-      "ref": "skills/contracts/outcome.schema.json"
+      "ref": "skills/vibehub-core/contracts/outcome.schema.json"
     }
   ],
   "deliveries": [],
