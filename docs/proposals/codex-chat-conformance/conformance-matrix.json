@@ -314,13 +314,13 @@
     {
       "id": "model-mode-pickers",
       "area": "Composer",
-      "requirement": "Model and collaboration-mode controls never claim choices the current carrier has not loaded.",
+      "requirement": "Model and reasoning-effort controls offer only what the runtime reported through model/list, read their current value from the Thread's settings record, and never claim a choice the carrier has not loaded; collaboration-mode controls stay absent until the mode API leaves the experimental surface.",
       "before": "pass",
       "beforeSeverity": "low",
       "beforeFinding": "The prototype truthfully labels fixed Agent and Codex posture.",
-      "after": "deferred",
-      "implementation": "Production picker remains separate; the Composer shows static Agent and Codex posture labels only and a test pins that no model or mode control exists.",
-      "proof": ["docs/CODEX_NATIVE_CHAT_PARITY_RESEARCH.md", "apps/codex-first-shell/index.html", "test/codex-chat-conformance.test.mjs::deferred model, mode, realtime-voice and virtualization checks make no contrary UI claim", "apps/codex-first-shell/browser-interaction-guard.mjs::deferred model, mode and realtime controls make no contrary claim"]
+      "after": "pass",
+      "implementation": "Model and effort pickers beneath the Composer stay disabled and read Not loaded until the host's listModels (model/list, hidden models dropped) answers; options are that response alone with isDefault and defaultReasoningEffort marked and efforts drawn from the selected model's supportedReasoningEfforts; no option string exists in source. The current value comes from the Thread's settings record (thread/start, thread/resume, thread/settings/updated as the host attaches it), and a null record shows the loaded default as default without claiming it is set. A pick travels as the exact turn/start settings.model (the Model.model slug) and settings.effort only when it differs from the record, each Turn this session started shows the model and effort it was sent with, and a model whose inputModalities lack image refuses image attachments naming its displayName and inputModalities from the Model record. The static Agent posture label and the absence of mode and realtime controls remain pinned.",
+      "proof": ["scripts/vh-codex-first-shell.mjs", "apps/codex-first-shell/index.html", "apps/codex-first-shell/app.js", "apps/codex-first-shell/composer-settings.mjs", "apps/codex-first-shell/chat-model.mjs", "docs/proposals/codex-chat-conformance/daily-use-host-contract.json", "test/codex-first-shell-parity-host.test.mjs::listModels offers only what model/list returned, hidden models dropped, with the picker fields exact", "test/codex-first-shell-parity-host.test.mjs::Thread settings are null until the runtime reported them, then follow thread/start, thread/resume and thread/settings/updated", "test/codex-chat-conformance.test.mjs::Thread settings follow the host record and thread/settings/updated, and the pickers never invent a value", "test/codex-first-shell-parity-ui.test.mjs::model and effort pickers carry no option string in source and code against the host contract verbatim", "test/codex-chat-conformance.test.mjs::deferred mode, realtime-voice and virtualization checks make no contrary UI claim", "apps/codex-first-shell/browser-interaction-guard.mjs::model and effort pickers stay disabled and say not loaded until model/list answers", "apps/codex-first-shell/browser-interaction-guard.mjs::model and effort pickers offer exactly what listModels returned with defaults marked", "apps/codex-first-shell/browser-interaction-guard.mjs::a text-only model refuses image attachments naming its input modalities", "apps/codex-first-shell/browser-interaction-guard.mjs::picked model and effort travel as turn/start settings and label the Turn", "apps/codex-first-shell/browser-interaction-guard.mjs::deferred mode and realtime controls make no contrary claim"]
     },
     {
       "id": "realtime-voice",
@@ -331,7 +331,7 @@
       "beforeFinding": "Ordinary audio is supported and realtime is false.",
       "after": "deferred",
       "implementation": "No false realtime control; ordinary MediaRecorder input remains and the host reports realtimeConversation: false. A test pins that the browser never renders a realtime control.",
-      "proof": ["scripts/vh-codex-first-shell.mjs", "apps/codex-first-shell/app.js", "test/codex-chat-conformance.test.mjs::deferred model, mode, realtime-voice and virtualization checks make no contrary UI claim", "apps/codex-first-shell/browser-interaction-guard.mjs::deferred model, mode and realtime controls make no contrary claim"]
+      "proof": ["scripts/vh-codex-first-shell.mjs", "apps/codex-first-shell/app.js", "test/codex-chat-conformance.test.mjs::deferred mode, realtime-voice and virtualization checks make no contrary UI claim", "apps/codex-first-shell/browser-interaction-guard.mjs::deferred mode and realtime controls make no contrary claim"]
     }
   ]
 }

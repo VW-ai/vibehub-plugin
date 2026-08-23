@@ -1,4 +1,5 @@
-import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, threadQueue, threadSettings, timelineWindow } from "./chat-model.mjs";
+import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, rememberThreadSettings, threadQueue, threadSettings, timelineWindow } from "./chat-model.mjs";
+import { describeTurnSettings, effortOptionLabel, findModel, imageRefusal, modelOptionLabel, pendingOverrides, selectedEffort, selectedModel } from "./composer-settings.mjs";
 import { emptyQueue, pausedMessage, queuedMediaSummary, queuedText, replaceQueuedText } from "./composer-queue.mjs";
 import {
   DOM_LIMITS,
@@ -96,6 +97,14 @@ const state = {
   // record the host attached to the startTurn response merged with the
   // overrides that Turn carried. Never claimed for Turns replayed from history.
   turnSettings: new Map(),
+  // The model catalog exactly as listModels returned it: null until model/list
+  // answered, so the pickers stay disabled and say so.
+  models: null,
+  modelsError: null,
+  modelsLoading: false,
+  // The next-Turn overrides the human picked, per Thread ("" before a Thread
+  // exists): only keys that still differ from the reported record are sent.
+  settingsOverrides: new Map(),
 };
 
 // The Composer submit path: Enter takes the Send label's own action (Queue
@@ -573,6 +582,7 @@ function syncComposerMode() {
       ? "Enter queues this message for after the running Turn · Alt+Enter steers the running Turn now."
       : "Codex can make mistakes. Review commands and changes.";
   renderQueue();
+  renderComposerSettings();
 }
 
 function runtimeLabel() {
@@ -974,7 +984,19 @@ function liveOmission(item) {
     : "";
 }
 
-function renderItem(item, budget) {
+// The settings a Turn this session started was sent with, as one line under
+// its first user message: the host-attached record under the overrides the
+// Turn carried. Turns replayed from history make no such claim.
+function turnPostureMarkup(turnId) {
+  const turn = state.turnSettings.get(turnId);
+  const line = describeTurnSettings(turn, state.models);
+  if (!line) return "";
+  const overridden = turn._overrides?.length ? ` · sent ${turn._overrides.join(", ")}` : "";
+  const source = turn._source ? ` · reported by ${turn._source}` : "";
+  return `<small class="turn-posture" data-turn-posture="${escapeHtml(turnId)}" title="Model, effort, approval policy and sandbox this Turn was sent with">${escapeHtml(line)}${escapeHtml(overridden)}${escapeHtml(source)}</small>`;
+}
+
+function renderItem(item, budget, { posture = "" } = {}) {
   if (!item) return "";
   const identity = item._key ?? item.id;
   if (item.type === "userMessage") {
@@ -990,7 +1012,7 @@ function renderItem(item, budget) {
       return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article class="item-card handoff task-packet"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.task?.nextAction?.action ?? handoff.task?.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.task?.ticketId))}</strong><br>${escapeHtml(takeText(budget, handoff.task?.outcome, 8_000).text)}</p><small>${contextCount} Context item${contextCount === 1 ? "" : "s"} · ${escapeHtml(handoff.project?.scope ?? "standalone")} · host-owned packet</small>${raw}</article></div>`;
     }
     const media = renderUserMedia(item.content, budget);
-    return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article>${text ? `<div>${renderUserMessageText(text, budget, { currentThreadId: item._threadId })}</div>` : ""}${media}</article></div>`;
+    return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article>${text ? `<div>${renderUserMessageText(text, budget, { currentThreadId: item._threadId })}</div>` : ""}${media}${posture}</article></div>`;
   }
   if (item.type === "agentMessage") return renderAgentMessage(item, budget, { bridge: bridgeAvailability() });
   if (item.type === "reasoning") {
@@ -1092,6 +1114,7 @@ function renderTimelineItems(items) {
   const associations = associationsForThread(threadId);
   let currentTurnId = null;
   let turnOpen = false;
+  const labeledTurns = new Set();
   const closeTurn = () => {
     if (!turnOpen) return;
     turnOpen = false;
@@ -1125,7 +1148,11 @@ function renderTimelineItems(items) {
     else {
       flush();
       if (groupableActivityTypes.has(item.type)) group.push(item);
-      else output.push(`<div class="timeline-entry" data-render-key="${escapeHtml(item._key ?? item.id)}">${renderItem(item, budget)}</div>`);
+      else {
+        const posture = item.type === "userMessage" && !labeledTurns.has(item._turnId) ? turnPostureMarkup(item._turnId) : "";
+        if (posture) labeledTurns.add(item._turnId);
+        output.push(`<div class="timeline-entry" data-render-key="${escapeHtml(item._key ?? item.id)}">${renderItem(item, budget, { posture })}</div>`);
+      }
     }
   }
   flush();
@@ -1585,6 +1612,10 @@ async function refreshThreads() {
   $("#accountPlan").textContent = data.account.planType ?? data.account.accountType ?? "Unavailable";
   setRuntimePosture({ alive: data.runtime.alive && data.account.authenticated, generation: data.runtime.generation, state: data.stop ? "halted" : data.runtime.state ?? (data.runtime.alive ? "alive" : "exited") });
   updateSidebar();
+  // The model catalog is read once the runtime can answer; until then the
+  // pickers stay disabled and say they are not loaded.
+  if (state.runtimeAlive && state.runtimeState === "alive" && !data.stop && state.models === null) void loadModels();
+  renderComposerSettings();
 }
 
 async function openThread(threadId, { route = "chat" } = {}) {
@@ -1596,6 +1627,7 @@ async function openThread(threadId, { route = "chat" } = {}) {
   state.activeThread = { ...state.threads.find((thread) => thread.id === threadId), ...data.thread };
   state.currentTurnId = liveTurnId(state.activeThread);
   state.running = Boolean(state.currentTurnId);
+  if (data.settings) rememberSettingsRecord(threadId, data.settings);
   syncThreadLocation();
   if (switchingThread) restoreComposerDraft(threadId);
   // The host-owned queue of this Thread, with full media, on every open; a
@@ -1657,6 +1689,11 @@ async function newThread() {
     state.activeThreadId = data.thread.id;
     state.activeThread = { ...data.thread, turns: [] };
     state.running = false;
+    if (state.settingsOverrides.has("")) {
+      state.settingsOverrides.set(data.thread.id, state.settingsOverrides.get(""));
+      state.settingsOverrides.delete("");
+    }
+    if (data.thread.settings) rememberSettingsRecord(data.thread.id, data.thread.settings);
     syncThreadLocation();
     state.liveItems.clear();
     state.turnErrors.clear();
@@ -1726,8 +1763,13 @@ async function openTask(ticketId) {
 
 function addAttachment(file, url) {
   const type = file.type.startsWith("audio/") ? "audio" : "image";
+  if (type === "image") {
+    const refusal = imageRefusal(nextTurnModel());
+    if (refusal) { notify(refusal); return false; }
+  }
   state.attachments = [...state.attachments, { type, url, name: file.name || (type === "audio" ? "Voice recording" : "Image") }].slice(-3);
   renderAttachments();
+  return true;
 }
 
 function renderAttachments() {
@@ -1948,12 +1990,16 @@ async function submitTurn(event) {
     const steer = state.running && mode === "opposite";
     if (steer && !state.currentTurnId) return notify("Wait for the active Turn identity before steering it.");
     const dispatch = steer ? "steerTurn" : state.running ? "queueTurn" : "startTurn";
-    const result = await action({ action: dispatch, threadId, ...(steer ? { expectedTurnId: state.currentTurnId } : {}), input });
+    // Only the keys the human changed away from the reported record travel,
+    // as the exact turn/start settings; a steer carries none.
+    const settings = steer ? undefined : pendingTurnSettings(threadId);
+    const result = await action({ action: dispatch, threadId, ...(steer ? { expectedTurnId: state.currentTurnId } : {}), input, ...(settings ? { settings } : {}) });
     if (dispatch === "queueTurn") {
       rememberQueue(state, result.queue);
       clearComposerAfterSend(textarea);
       if (result.started) {
         // No Turn was live after all: the head started at once as its own Turn.
+        attributeTurnSettings(result.started.turnId, threadId, settings ?? null);
         state.currentTurnId = result.started.turnId;
         state.running = true;
         $("#stopTurn").hidden = false;
@@ -1965,13 +2011,173 @@ async function submitTurn(event) {
       }
       return;
     }
-    if (dispatch === "startTurn") state.currentTurnId = result.turn.id;
+    if (dispatch === "startTurn") {
+      state.currentTurnId = result.turn.id;
+      // The startTurn response attaches the Thread's settings record; the
+      // Turn is attributed that record under the overrides it carried.
+      if (result.settings) rememberSettingsRecord(threadId, result.settings);
+      attributeTurnSettings(result.turn.id, threadId, settings ?? null, result.settings ?? threadSettingsRecord(threadId));
+    }
     state.running = true;
     clearComposerAfterSend(textarea);
     $("#stopTurn").hidden = false;
     syncComposerMode();
     await openThread(threadId);
   } catch (error) { notify(error.message); }
+}
+
+// --- Composer settings: model, effort and the Turn posture ------------------
+// The pickers offer only what listModels returned, read their current value
+// from the Thread's settings record, and send only the keys the human changed
+// as the exact turn/start settings of the next Turn.
+
+function overrideKey(threadId = state.activeThreadId) {
+  return threadId ?? "";
+}
+
+function overridesFor(threadId = state.activeThreadId) {
+  return state.settingsOverrides.get(overrideKey(threadId)) ?? {};
+}
+
+function setOverrides(patch, threadId = state.activeThreadId) {
+  const key = overrideKey(threadId);
+  const next = { ...overridesFor(threadId), ...patch };
+  for (const name of Object.keys(next)) if (next[name] == null) delete next[name];
+  if (Object.keys(next).length) state.settingsOverrides.set(key, next);
+  else state.settingsOverrides.delete(key);
+  while (state.settingsOverrides.size > 64) state.settingsOverrides.delete(state.settingsOverrides.keys().next().value);
+}
+
+// The overrides still differing from the record, or undefined when the next
+// Turn needs no settings keys at all.
+function pendingTurnSettings(threadId = state.activeThreadId) {
+  return pendingOverrides(threadSettingsRecord(threadId), overridesFor(threadId)) ?? undefined;
+}
+
+// A reported record makes equal overrides redundant; they are dropped so the
+// picker reads the runtime's own value again.
+function rememberSettingsRecord(threadId, record) {
+  if (!threadId || !record) return;
+  rememberThreadSettings(state, threadId, record);
+  const thread = state.threads.find((entry) => entry.id === threadId);
+  if (thread) thread.settings = record;
+  if (state.activeThread?.id === threadId) state.activeThread.settings = record;
+  const overrides = overridesFor(threadId);
+  const pending = pendingOverrides(record, overrides) ?? {};
+  const kept = {};
+  for (const name of Object.keys(overrides)) if (name in pending) kept[name] = overrides[name];
+  state.settingsOverrides.delete(overrideKey(threadId));
+  if (Object.keys(kept).length) state.settingsOverrides.set(overrideKey(threadId), kept);
+  if (threadId === state.activeThreadId) renderComposerSettings();
+}
+
+async function loadModels({ force = false } = {}) {
+  if (state.modelsLoading || (state.models && !force)) return state.models;
+  state.modelsLoading = true;
+  try {
+    const data = await action({ action: "listModels" });
+    if (!Array.isArray(data?.models)) throw new Error("model/list answered without a model catalog");
+    state.models = data.models;
+    state.modelsError = null;
+  } catch (error) {
+    state.models = null;
+    state.modelsError = error.message;
+  } finally {
+    state.modelsLoading = false;
+  }
+  renderComposerSettings();
+  return state.models;
+}
+
+function replaceOptions(select, options, value) {
+  select.textContent = "";
+  for (const entry of options) {
+    const option = new Option(entry.label, entry.value);
+    if (entry.title) option.title = entry.title;
+    if (entry.disabled) option.disabled = true;
+    select.append(option);
+  }
+  select.value = value ?? "";
+  if (value != null && select.value !== value && options.length) select.selectedIndex = 0;
+}
+
+function settingsSourceLine(record, model, catalog) {
+  if (!catalog) return state.modelsError ? `Model list unavailable: ${state.modelsError}` : "Model list not loaded from the runtime yet.";
+  const reported = record ? `Reported by ${record.source}` : "Not reported for this Chat yet; showing the runtime default";
+  const unlisted = model.slug && !model.model ? ` · ${model.slug} is not in model/list` : "";
+  const pending = pendingTurnSettings();
+  const keys = pending ? Object.keys(pending).filter((key) => ["model", "effort"].includes(key)) : [];
+  const next = keys.length ? ` · next Turn sends ${keys.map((key) => `${key} ${pending[key]}`).join(", ")}` : "";
+  return `${reported}${unlisted}${next}`;
+}
+
+// Model and effort pickers beneath the Composer. Disabled until listModels
+// answered; options are the response alone (hidden models never arrive);
+// isDefault and defaultReasoningEffort are marked; the current value comes
+// from the Thread's settings record, or the loaded default when the record
+// is null, without claiming it is set.
+function renderComposerSettings() {
+  const container = $("#composerSettings");
+  if (!container) return;
+  const modelPicker = $("#modelPicker");
+  const effortPicker = $("#effortPicker");
+  const source = $("#settingsSource");
+  const catalog = Array.isArray(state.models) && state.models.length > 0;
+  const record = threadSettingsRecord(state.activeThreadId);
+  const overrides = overridesFor();
+  const model = selectedModel(state.models, record, overrides);
+  const effort = selectedEffort(model.model, record, overrides, model.slug);
+  container.dataset.models = catalog ? "loaded" : state.modelsError ? "error" : "not-loaded";
+  container.dataset.settingsSource = record?.source ?? "none";
+  const composerDisabled = $("#composerInput").disabled;
+  if (!catalog) {
+    replaceOptions(modelPicker, [{ label: "Not loaded", value: "" }], "");
+    replaceOptions(effortPicker, [{ label: "Not loaded", value: "" }], "");
+    modelPicker.disabled = true;
+    effortPicker.disabled = true;
+    source.textContent = settingsSourceLine(record, model, false);
+    return;
+  }
+  const modelOptions = state.models.map((entry) => ({ label: modelOptionLabel(entry), value: entry.model, title: entry.description ?? "" }));
+  if (model.slug && !model.model) modelOptions.unshift({ label: `${model.slug} (reported by the runtime, not listed)`, value: model.slug });
+  replaceOptions(modelPicker, modelOptions, model.slug);
+  const effortOptions = (model.model?.supportedReasoningEfforts ?? []).map((option) => ({ label: effortOptionLabel(option, model.model), value: option.reasoningEffort, title: option.description ?? "" }));
+  if (effort.effort && !effortOptions.some((option) => option.value === effort.effort)) effortOptions.unshift({ label: `${effort.effort} (reported by the runtime, not listed)`, value: effort.effort });
+  replaceOptions(effortPicker, effortOptions.length ? effortOptions : [{ label: "No effort choice for this model", value: "" }], effort.effort ?? "");
+  modelPicker.disabled = composerDisabled;
+  effortPicker.disabled = composerDisabled || effortOptions.length === 0;
+  modelPicker.dataset.valueSource = model.source;
+  effortPicker.dataset.valueSource = effort.source;
+  source.textContent = settingsSourceLine(record, model, true);
+}
+
+// The model the next Turn would use, for the image refusal: the picker's
+// selection, which is the record's model or the loaded default.
+function nextTurnModel() {
+  const record = threadSettingsRecord(state.activeThreadId);
+  return selectedModel(state.models, record, overridesFor()).model;
+}
+
+function chooseModel(slug) {
+  const model = findModel(state.models, slug);
+  if (!model) return;
+  const refusal = state.attachments.some((item) => item.type === "image") ? imageRefusal(model) : null;
+  if (refusal) {
+    notify(`${refusal} — remove the attached images first.`);
+    renderComposerSettings();
+    return;
+  }
+  const record = threadSettingsRecord(state.activeThreadId);
+  // A different model takes its own default effort unless the record already
+  // names this model with an effort it supports.
+  const effort = selectedEffort(model, record, {}, slug).effort;
+  setOverrides({ model: slug, effort });
+  renderComposerSettings();
+}
+
+function chooseEffort(effort) {
+  setOverrides({ effort: effort || null });
+  renderComposerSettings();
 }
 
 // --- The host-owned follow-up queue ---------------------------------------
@@ -2113,6 +2319,7 @@ async function applyEventWindow(data) {
   let reconcile = data.gap || (data.runtimeGeneration !== previousGeneration && data.runtimeAlive);
   let rendered = false;
   let queueDirty = false;
+  let settingsDirty = false;
   for (const entry of data.events) {
     if (entry.kind === "serverRequest" || entry.kind === "requestResolved") refreshRequests = true;
     if (entry.kind === "runtimeExit") {
@@ -2150,6 +2357,14 @@ async function applyEventWindow(data) {
     const method = entry.value.method;
     const params = entry.value.params ?? {};
     if (method === "serverRequest/resolved") refreshRequests = true;
+    // Per-Thread records the runtime reports for any Thread, listed or not:
+    // the settings after a Turn carried overrides, and the token usage.
+    if (method === "thread/settings/updated" || method === "thread/tokenUsage/updated") {
+      applyChatEvent(state, method, params);
+      if (method === "thread/settings/updated" && threadSettings(state, params.threadId)) rememberSettingsRecord(params.threadId, threadSettings(state, params.threadId));
+      if (params.threadId === state.activeThreadId) settingsDirty = true;
+      continue;
+    }
     if (params.threadId !== state.activeThreadId) continue;
     if (method === "turn/started") {
       state.running = true;
@@ -2169,6 +2384,7 @@ async function applyEventWindow(data) {
   if (data.runtimeHalt) haltRaised = applyRuntimeHalt(data.runtimeHalt) || haltRaised;
   setRuntimePosture({ alive: data.runtimeAlive, generation: data.runtimeGeneration, state: state.bootstrap?.stop ? "halted" : data.runtimeState ?? (data.runtimeAlive ? "alive" : "exited") });
   if (queueDirty) renderQueue();
+  if (settingsDirty) renderComposerSettings();
   if (refreshLists) await refreshThreads();
   if (reconcile && state.activeThreadId && state.runtimeAlive && !state.bootstrap?.stop) await openThread(state.activeThreadId, { route: state.route === "task" ? "task" : "chat" });
   else if ((rendered || refreshRequests || haltRaised) && state.activeThreadId) scheduleChatRender();
@@ -2902,6 +3118,8 @@ document.addEventListener("submit", async (event) => {
 
 document.addEventListener("change", async (event) => {
   rememberRequestDraft(event.target);
+  if (event.target.id === "modelPicker") { chooseModel(event.target.value); return; }
+  if (event.target.id === "effortPicker") { chooseEffort(event.target.value); return; }
   if (event.target.id === "activeThreadProject") {
     try {
       const projectId = event.target.value || null;
@@ -3303,6 +3521,16 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
       await new Promise((resolve) => requestAnimationFrame(resolve));
     },
     closeImport: () => closeImport(false),
+    // The model catalog through the current transport (the guard's fixture
+    // transport or the live host), and the not-loaded posture again.
+    loadModels: () => loadModels({ force: true }),
+    resetModels: async () => {
+      state.models = null;
+      state.modelsError = null;
+      state.settingsOverrides.clear();
+      renderComposerSettings();
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    },
     // Real host transport for checks that must read the checked-in repository
     // through the live projection rather than a fixture.
     hostAction: (payload) => api("/api/action", { method: "POST", body: JSON.stringify(payload) }),

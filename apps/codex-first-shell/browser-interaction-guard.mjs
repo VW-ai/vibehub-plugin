@@ -459,7 +459,91 @@ export async function runBrowserInteractionGuard(hooks) {
   const omissionNote = document.querySelector("#turns > .timeline-omission");
   const mountedEntries = document.querySelectorAll("#turns > .timeline-entry:not(.timeline-omission)").length;
   check(results, "mounted timeline discloses its bound", Boolean(omissionNote?.textContent.includes("60 earlier items")) && mountedEntries === 240, `${mountedEntries} mounted · ${omissionNote?.textContent.slice(0, 40) ?? "no disclosure"}`);
-  check(results, "deferred model, mode and realtime controls make no contrary claim", [...document.querySelectorAll(".composer-setting")].every((node) => node.tagName === "SPAN") && !document.querySelector("[data-model-picker], [data-mode-picker], [aria-label*='realtime' i], [aria-label*='model' i], [aria-label*='collaboration mode' i]"));
+  check(results, "deferred mode and realtime controls make no contrary claim", [...document.querySelectorAll(".composer-setting")].every((node) => node.tagName === "SPAN") && !document.querySelector("[data-mode-picker], [aria-label*='realtime' i], [aria-label*='collaboration mode' i]"));
+
+  // --- Model and effort pickers --------------------------------------------
+  // Disabled and labelled not-loaded until model/list answers; then exactly
+  // the catalog the host returned (hidden models never arrive), the default
+  // marked, efforts from the selected model, and the value read from the
+  // Thread's settings record or shown as the runtime default without
+  // claiming it is set.
+  const pickerCatalog = [
+    { id: "guard-default", model: "guard-default", displayName: "Guard Default", description: "Takes text and images.", isDefault: true, defaultReasoningEffort: "medium", supportedReasoningEfforts: [{ reasoningEffort: "low", description: "Fast." }, { reasoningEffort: "medium", description: "Balanced." }, { reasoningEffort: "high", description: "Thorough." }], inputModalities: ["text", "image"] },
+    { id: "guard-text", model: "guard-text", displayName: "Guard Text Only", description: "Takes text only.", isDefault: false, defaultReasoningEffort: "medium", supportedReasoningEfforts: [{ reasoningEffort: "medium", description: "Balanced." }], inputModalities: ["text"] },
+  ];
+  const modelPicker = document.querySelector("#modelPicker");
+  const effortPicker = document.querySelector("#effortPicker");
+  const settingsSource = document.querySelector("#settingsSource");
+  const optionsOf = (select) => [...select.options].map((option) => `${option.value}=${option.text}`);
+  await hooks.resetModels();
+  check(results, "model and effort pickers stay disabled and say not loaded until model/list answers", modelPicker.disabled && effortPicker.disabled && optionsOf(modelPicker).join("|") === "=Not loaded" && optionsOf(effortPicker).join("|") === "=Not loaded" && document.querySelector("#composerSettings").dataset.models === "not-loaded" && settingsSource.textContent === "Model list not loaded from the runtime yet.", `${optionsOf(modelPicker).join("|")} · ${settingsSource.textContent}`);
+  const pickerActions = [];
+  try { await hooks.withFixtureTransport(async (payload) => {
+    pickerActions.push(payload);
+    if (payload.action === "listModels") return { models: structuredClone(pickerCatalog) };
+    if (payload.action === "startTurn") return { turn: { id: "guard-picker-turn" }, settings: null };
+    if (payload.action === "readThread") return { thread: structuredClone(fixture.secondaryThread) };
+    return {};
+  }, async () => {
+    await hooks.loadModels();
+    const loadedModels = optionsOf(modelPicker);
+    const loadedEfforts = optionsOf(effortPicker);
+    check(results, "model and effort pickers offer exactly what listModels returned with defaults marked", !modelPicker.disabled && !effortPicker.disabled
+      && loadedModels.join("|") === "guard-default=Guard Default (default)|guard-text=Guard Text Only"
+      && loadedEfforts.join("|") === "low=low|medium=medium (default)|high=high"
+      && modelPicker.value === "guard-default" && effortPicker.value === "medium"
+      && modelPicker.dataset.valueSource === "default" && effortPicker.dataset.valueSource === "default"
+      && settingsSource.textContent.startsWith("Not reported for this Chat yet; showing the runtime default")
+      && pickerActions.filter((entry) => entry.action === "listModels").length === 1,
+      `${loadedModels.join("|")} · ${loadedEfforts.join("|")} · ${settingsSource.textContent}`);
+
+    // A text-only model refuses an image attachment, naming itself and what
+    // it accepts, from the Model record; the image-capable default takes it.
+    const attachImage = () => {
+      const transfer = new DataTransfer();
+      transfer.items.add(new File([new Uint8Array([137, 80, 78, 71])], "guard-shot.png", { type: "image/png" }));
+      const input = document.querySelector("#attachmentInput");
+      input.files = transfer.files;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    modelPicker.value = "guard-text";
+    modelPicker.dispatchEvent(new Event("change", { bubbles: true }));
+    await frame();
+    const textEfforts = optionsOf(effortPicker);
+    const toast = document.querySelector("#toast");
+    attachImage();
+    // The file is read asynchronously before the refusal; wait for the
+    // refusal itself, not for whatever toast was still showing.
+    await waitFor(() => toast.textContent.includes("accepts:"));
+    const refusal = toast.textContent;
+    const refusedChips = document.querySelectorAll("#attachmentTray .attachment-chip").length;
+    modelPicker.value = "guard-default";
+    modelPicker.dispatchEvent(new Event("change", { bubbles: true }));
+    await frame();
+    attachImage();
+    await waitFor(() => document.querySelectorAll("#attachmentTray .attachment-chip").length === 1);
+    const acceptedChips = document.querySelectorAll("#attachmentTray .attachment-chip").length;
+    check(results, "a text-only model refuses image attachments naming its input modalities", textEfforts.join("|") === "medium=medium (default)" && refusal === "Guard Text Only accepts: text" && refusedChips === 0 && acceptedChips === 1, `${refusal} · ${refusedChips}/${acceptedChips} chips`);
+    document.querySelector("[data-remove-attachment]")?.click();
+    await waitFor(() => document.querySelector("#attachmentTray").hidden);
+
+    // The picked model and effort travel as the exact turn/start settings
+    // keys and label the Turn they started.
+    modelPicker.value = "guard-text";
+    modelPicker.dispatchEvent(new Event("change", { bubbles: true }));
+    await frame();
+    const sentLine = settingsSource.textContent;
+    document.querySelector("#composerInput").value = "Use the text model";
+    document.querySelector("#composer").requestSubmit();
+    await waitFor(() => pickerActions.some((entry) => entry.action === "readThread"));
+    const start = pickerActions.find((entry) => entry.action === "startTurn");
+    const labelled = structuredClone(fixture.secondaryThread);
+    labelled.turns.push({ id: "guard-picker-turn", status: "completed", items: [{ type: "userMessage", id: "guard-picker-user", content: [{ type: "text", text: "Use the text model" }] }] });
+    await hooks.reconcileFixtureThread(labelled);
+    const postureLine = document.querySelector('[data-turn-posture="guard-picker-turn"]');
+    check(results, "picked model and effort travel as turn/start settings and label the Turn", start?.settings?.model === "guard-text" && start.settings.effort === "medium" && Object.keys(start.settings).sort().join(",") === "effort,model" && sentLine.includes("next Turn sends model guard-text, effort medium") && postureLine?.textContent.startsWith("Guard Text Only · medium") && postureLine.textContent.includes("sent model, effort"), `${JSON.stringify(start?.settings ?? null)} · ${postureLine?.textContent ?? "no posture line"}`);
+  }); } catch (error) { check(results, "picker checks completed", false, `threw: ${error?.message ?? error}`); }
+  await hooks.resetModels();
   await hooks.switchFixtureThread(fixture.thread);
 
   // One Project, four scope states: the header, the Tasks gate, the Room

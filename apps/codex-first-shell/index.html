@@ -101,6 +101,11 @@
               <button class="send-button" id="sendButton" type="submit" aria-label="Send message">↑</button>
             </div>
           </div>
+          <div class="composer-settings" id="composerSettings" data-models="not-loaded">
+            <label class="composer-picker"><span>Model</span><select id="modelPicker" disabled aria-describedby="settingsSource"><option value="">Not loaded</option></select></label>
+            <label class="composer-picker"><span>Effort</span><select id="effortPicker" disabled aria-describedby="settingsSource"><option value="">Not loaded</option></select></label>
+            <small class="settings-source" id="settingsSource">Model list not loaded from the runtime yet.</small>
+          </div>
         </form>
         <p class="composer-note" id="composerNote" role="status" aria-live="polite">Codex can make mistakes. Review commands and changes.</p>
       </div>

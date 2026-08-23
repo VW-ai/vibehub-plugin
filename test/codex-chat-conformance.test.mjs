@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { applyChatEvent, applyHostEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, rememberQueue, threadQueue, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
+import { applyChatEvent, applyHostEvent, boundedText, canonicalTimeline, itemKey, LIVE_ITEM_LIMIT, rememberQueue, rememberThreadSettings, settingsRecordFromNotification, threadQueue, threadSettings, timelineWindow } from "../apps/codex-first-shell/chat-model.mjs";
+import { describePosture, describeTurnSettings, effortOptionLabel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "../apps/codex-first-shell/composer-settings.mjs";
 import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
 import { loadThreadDraft, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
 import { clampComposerHeight, composerBounds, COMPOSER_HEIGHT_FALLBACK } from "../apps/codex-first-shell/composer-sizing.mjs";
@@ -178,6 +179,65 @@ test("the host-owned follow-up queue mirrors queueChanged, queuedStarted and que
   assert.deepEqual(replaceQueuedText([{ type: "text", text: "new" }], "new @x", [{ byteRange: { start: 4, end: 6 }, placeholder: "@x" }]), [{ type: "text", text: "new @x", text_elements: [{ byteRange: { start: 4, end: 6 }, placeholder: "@x" }] }]);
   assert.deepEqual(replaceQueuedText([image], "   "), [image]);
   assert.deepEqual([queuedText(full.items[0]), queuedMediaSummary(full.items[0]), queuedMediaSummary({ input: [image, image, { type: "skill", name: "s", path: "/s" }] })], ["A", "1 image", "2 images · 1 skill"]);
+});
+
+test("Thread settings follow the host record and thread/settings/updated, and the pickers never invent a value", async () => {
+  const model = { liveItems: new Map(), turnErrors: new Map() };
+  assert.equal(threadSettings(model, "thread-s"), null, "null until the runtime reported settings");
+  // The forwarded notification carries effort (not reasoningEffort) and becomes a record with its source.
+  assert.equal(applyChatEvent(model, "thread/settings/updated", { threadId: "thread-s", threadSettings: { model: "fixture-text", effort: "high", approvalPolicy: "on-request", sandboxPolicy: { type: "workspaceWrite", networkAccess: false }, cwd: "/x" } }), true);
+  const record = threadSettings(model, "thread-s");
+  assert.deepEqual([record.model, record.effort, record.approvalPolicy, record.sandboxPolicy.type, record.source], ["fixture-text", "high", "on-request", "workspaceWrite", "thread/settings/updated"]);
+  assert.match(record.observedAt, /^\d{4}-\d{2}-\d{2}T/u);
+  assert.equal(applyChatEvent(model, "thread/settings/updated", { threadId: "thread-s" }), false, "a notification without threadSettings changes nothing");
+  assert.equal(settingsRecordFromNotification({ threadSettings: {} }), null);
+  assert.equal(rememberThreadSettings(model, "", record), false);
+  const contract = JSON.parse(await source("docs/proposals/codex-chat-conformance/daily-use-host-contract.json"));
+  assert.deepEqual(POSTURES, contract.turnSettings.posture, "the two postures are the host contract's exact turn/start keys");
+  assert.deepEqual(POSTURE_LABELS, { askForApproval: "Ask for approval", fullAccess: "Full access" });
+  assert.equal(postureOf(record), "askForApproval");
+  assert.equal(postureOf({ approvalPolicy: "never", sandboxPolicy: { type: "dangerFullAccess" } }), "fullAccess");
+  assert.equal(postureOf({ approvalPolicy: "never", sandboxPolicy: { type: "readOnly" } }), "other");
+  assert.equal(postureOf(null), null);
+  assert.equal(postureOf({ model: "x" }), null);
+  assert.deepEqual([describePosture(null), describePosture(record), describePosture({ approvalPolicy: "untrusted" })], ["not reported yet", "on-request · workspaceWrite", "untrusted · sandbox not reported"]);
+
+  const models = [
+    { id: "d", model: "fixture-default", displayName: "Fixture Default", isDefault: true, defaultReasoningEffort: "medium", supportedReasoningEfforts: [{ reasoningEffort: "low" }, { reasoningEffort: "medium" }, { reasoningEffort: "high" }], inputModalities: ["text", "image"] },
+    { id: "t", model: "fixture-text", displayName: "Fixture Text Only", isDefault: false, defaultReasoningEffort: "medium", supportedReasoningEfforts: [{ reasoningEffort: "medium" }], inputModalities: ["text"] },
+  ];
+  // Not loaded: no model, whatever the record says.
+  assert.deepEqual(selectedModel(null, record, {}), { model: null, slug: "fixture-text", source: "not-loaded" });
+  // Loaded, no record: the default is shown as a default, never as set.
+  assert.deepEqual(selectedModel(models, null, {}), { model: models[0], slug: "fixture-default", source: "default" });
+  assert.deepEqual(selectedEffort(models[0], null, {}, "fixture-default"), { effort: "medium", source: "default" });
+  // The record names the current value; the record's effort applies to the record's model only.
+  assert.deepEqual(selectedModel(models, record, {}), { model: models[1], slug: "fixture-text", source: "record" });
+  assert.deepEqual(selectedEffort(models[1], record, {}, "fixture-text"), { effort: "high", source: "record" });
+  assert.deepEqual(selectedEffort(models[0], record, {}, "fixture-default"), { effort: "medium", source: "default" }, "another model takes its own default effort");
+  // A record naming an unlisted model is shown as reported, not replaced.
+  assert.deepEqual(selectedModel(models, { model: "unlisted" }, {}), { model: null, slug: "unlisted", source: "record" });
+  // Overrides win, and only overrides that differ from the record travel.
+  assert.deepEqual(selectedModel(models, record, { model: "fixture-default" }), { model: models[0], slug: "fixture-default", source: "override" });
+  assert.deepEqual(selectedEffort(models[0], record, { effort: "low" }, "fixture-default"), { effort: "low", source: "override" });
+  assert.deepEqual(selectedEffort(models[1], record, { effort: "xhigh" }, "fixture-text"), { effort: "high", source: "record" }, "an override the model does not support is ignored");
+  assert.equal(pendingOverrides(record, { model: "fixture-text", effort: "high" }), null, "equal to the record: nothing to send");
+  assert.deepEqual(pendingOverrides(record, { model: "fixture-default", effort: "high" }), { model: "fixture-default" });
+  assert.deepEqual(pendingOverrides(null, { model: "fixture-default", effort: "low" }), { model: "fixture-default", effort: "low" });
+  assert.deepEqual(pendingOverrides(record, POSTURES.fullAccess), { approvalPolicy: "never", sandboxPolicy: { type: "dangerFullAccess" } });
+  assert.equal(pendingOverrides(record, POSTURES.askForApproval), null, "the reported posture already is Ask for approval");
+  assert.deepEqual(pendingOverrides({ approvalPolicy: "on-request", sandboxPolicy: { type: "readOnly" } }, POSTURES.askForApproval), { approvalPolicy: "on-request", sandboxPolicy: { type: "workspaceWrite" } }, "a posture is one unit");
+  assert.equal(pendingOverrides(record, {}), null);
+  // Labels mark the defaults; the image refusal names the model and its modalities.
+  assert.deepEqual(models.map(modelOptionLabel), ["Fixture Default (default)", "Fixture Text Only"]);
+  assert.deepEqual(models[0].supportedReasoningEfforts.map((option) => effortOptionLabel(option, models[0])), ["low", "medium (default)", "high"]);
+  assert.equal(imageRefusal(models[0]), null);
+  assert.equal(imageRefusal(models[1]), "Fixture Text Only accepts: text");
+  assert.equal(imageRefusal({ model: "bare", displayName: "Bare", inputModalities: [] }), "Bare accepts: no reported input modality");
+  assert.equal(imageRefusal(null), null, "no model record, no refusal");
+  assert.equal(describeTurnSettings({ model: "fixture-text", effort: "high", approvalPolicy: "never", sandboxPolicy: { type: "dangerFullAccess" } }, models), "Fixture Text Only · high · never · dangerFullAccess");
+  assert.equal(describeTurnSettings({ model: "unlisted" }, models), "unlisted");
+  assert.equal(describeTurnSettings({}, models), null);
 });
 
 test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {
@@ -468,7 +528,7 @@ test("mounted timeline discloses its 240-item bound instead of truncating silent
   assert.match(script, /const mounted = timelineWindow\(thread, state, \{ limit: 240 \}\);[^]*renderTimelineOmission\(mounted\.omitted\) \+ renderTimelineItems\(mounted\.items\)/);
 });
 
-test("deferred model, mode, realtime-voice and virtualization checks make no contrary UI claim", async () => {
+test("deferred mode, realtime-voice and virtualization checks make no contrary UI claim", async () => {
   const [html, script, host] = await Promise.all([
     source("apps/codex-first-shell/index.html"),
     source("apps/codex-first-shell/app.js"),
@@ -478,7 +538,9 @@ test("deferred model, mode, realtime-voice and virtualization checks make no con
   assert.match(html, /<span class="composer-setting" title="Current runtime">Codex<\/span>/);
   const interactive = [...html.matchAll(/<(?:select|button|input|details)\b[^>]*>/g)].map((match) => match[0]);
   assert.ok(interactive.length > 10);
-  for (const tag of interactive) assert.doesNotMatch(tag, /\b(?:model|mode|picker|realtime)\b/i, `no enabled model, mode or realtime control: ${tag}`);
+  // Collaboration mode and realtime stay absent; the model and effort pickers
+  // exist and are pinned by test/codex-first-shell-parity-ui.test.mjs.
+  for (const tag of interactive) assert.doesNotMatch(tag, /\b(?:mode|realtime)\b/i, `no mode or realtime control: ${tag}`);
   assert.doesNotMatch(script, /realtime/i, "the browser never renders a realtime voice control");
   assert.match(host, /realtimeConversation: false/);
   assert.match(html, /Realtime conversation stays unavailable until the runtime reports support/);
@@ -506,18 +568,18 @@ test("conformance matrix proof entries resolve to existing files, exact tests an
       }
     }
   }
-  for (const id of ["selection-during-stream", "quote-add-to-chat", "markdown-rich-content", "request-user-input", "composer-inputs", "current-thread-url-recovery"]) {
+  for (const id of ["selection-during-stream", "quote-add-to-chat", "markdown-rich-content", "request-user-input", "composer-inputs", "current-thread-url-recovery", "running-composer-steer", "model-mode-pickers"]) {
     const check = matrix.checks.find((entry) => entry.id === id);
     assert.equal(check.after, "pass", `${id} is upgraded`);
     assert.ok(check.proof.some((entry) => entry.startsWith("test/") && entry.includes("::")), `${id} names an exact node test`);
     assert.ok(check.proof.some((entry) => entry.includes("browser-interaction-guard.mjs::")) || id === "markdown-rich-content", `${id} names a real-DOM guard check`);
   }
-  for (const id of ["virtualized-production-list", "model-mode-pickers", "realtime-voice"]) {
+  for (const id of ["virtualized-production-list", "realtime-voice"]) {
     const check = matrix.checks.find((entry) => entry.id === id);
     assert.equal(check.after, "deferred", `${id} stays deferred`);
     assert.ok(check.proof.some((entry) => entry.includes("::")), `${id} pins that the UI makes no contrary claim`);
   }
-  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 26, partial: 0, deferred: 3, fail: 0 });
+  assert.deepEqual(Object.fromEntries(["pass", "partial", "deferred", "fail"].map((state) => [state, matrix.checks.filter((check) => check.after === state).length])), { pass: 27, partial: 0, deferred: 2, fail: 0 });
 });
 
 test("current shell exposes the conformance interactions without a second transcript", async () => {
