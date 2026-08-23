@@ -1,0 +1,22 @@
+{
+  "accepted_acceptance_ids": [
+    "native-dependencies-are-projected-idempotently",
+    "live-relationships-render-natively",
+    "github-view-comparison-is-decision-ready"
+  ],
+  "closed_at": "2026-08-23T00:40:00Z",
+  "evidence_ids": [
+    "dependency-planner-and-fixture-tests",
+    "live-dependency-run-transcript",
+    "github-view-comparison-doc",
+    "owner-picks-issues-list-default-view"
+  ],
+  "kind": "ticket_outcome",
+  "schema_version": 1,
+  "status": "partial",
+  "summary": "Independent adjudication at HEAD 5331e72. Accepted: planDependencies (scripts/sync-github-issues.mjs) diffs Ticket depends_on against remote blocked_by, adds missing, removes stale only for mirrored blockers, keeps foreign blockers; fixture test covers add/no-op/remove/keep-foreign; npm test 137/137 and verify:artifact ok; a fresh dry-run against the live repo plans 0 dependency changes (idempotent). Live: gh api shows #35 blocked_by [44 open, 51 closed] and #44 blocking [35]; transcript (70 changes, 0 failures) is checked in. Note: gh issue view does not render native relationship rows, only the body's Blocked by lines, which match the native set. docs/GITHUB_ISSUES.md compares Issues list, per-Issue sidebar, and Projects board with automatic/manual/cannot-show for each and names the Issues list with exact URLs as the default. Unresolved: owner-picks-github-view. The human-origin Evidence faithfully records the owner accepting the recommendation, but the criterion also requires the choice to be linked from the README installation section; commit 5331e72 folded the link into the README footer (line 58) and the Installation section no longer references GitHub Issues, so the Evidence summary's claim about the installation section is stale. Concrete gap: add one line to the README Installation section linking the Issues list URL and docs/GITHUB_ISSUES.md, or rewrite the criterion to accept the footer placement with the owner's explicit agreement, then re-close.",
+  "ticket_id": "ticket-native-issue-dependencies-and-github-view",
+  "unresolved_acceptance_ids": [
+    "owner-picks-github-view"
+  ]
+}
