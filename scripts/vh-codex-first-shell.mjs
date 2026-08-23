@@ -567,6 +567,7 @@ const assets = new Map([
   ["/composer-queue.mjs", script("composer-queue.mjs")],
   ["/composer-settings.mjs", script("composer-settings.mjs")],
   ["/composer-attachments.mjs", script("composer-attachments.mjs")],
+  ["/composer-mentions.mjs", script("composer-mentions.mjs")],
   ["/chat-fixtures.json", fixture("chat-fixtures.json")],
   ["/chat-conformance-fixtures.json", fixture("chat-conformance-fixtures.json")],
   ["/task-fixtures.json", fixture("task-fixtures.json")],

@@ -85,9 +85,11 @@
       <div class="composer-wrap" id="composerWrap">
         <section class="queue-tray" id="queueTray" aria-label="Queued follow-ups" data-count="0" hidden></section>
         <form class="composer" id="composer">
+          <div class="mention-picker" id="mentionPicker" role="listbox" aria-label="Mention suggestions" hidden></div>
           <div class="quote-tray" id="quoteTray" hidden></div>
           <div class="attachment-tray" id="attachmentTray" hidden></div>
-          <textarea id="composerInput" rows="1" aria-label="Message Codex" placeholder="Ask Codex to do something"></textarea>
+          <div class="mention-tray" id="mentionTray" aria-label="Mentions in this message" hidden></div>
+          <textarea id="composerInput" rows="1" aria-label="Message Codex" placeholder="Ask Codex to do something" aria-autocomplete="list" aria-controls="mentionPicker" aria-expanded="false"></textarea>
           <div class="composer-toolbar">
             <div>
               <button class="composer-icon" id="attachButton" type="button" aria-label="Attach image or audio" title="Attach image or audio">＋</button>

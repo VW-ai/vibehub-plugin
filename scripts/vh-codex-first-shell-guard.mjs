@@ -474,6 +474,35 @@ async function runQueueWalk(shell) {
     const turnIds = calls().filter((call) => call.kind === "notification" && call.method === "turn/started" && call.params?.threadId === threadId).map((call) => call.params.turn.id);
     const expected = ["start:first", "completed:completed", "start:follow-up one", "completed:interrupted", "start:follow-up two", "completed:completed", "start:fourth", "completed:completed"];
     step("the fixture call log shows each queued message as its own turn/start with a distinct Turn id after the prior turn/completed", JSON.stringify(timeline) === JSON.stringify(expected) && turnIds.length === 4 && new Set(turnIds).size === 4, `${timeline.join(" → ")} · ids ${turnIds.join(",")}`);
+
+    // @ and $ on the real host: the file picker is fuzzyFileSearch over the
+    // bound repository, the skill picker is skills/list, and the app-server
+    // log carries the exact input arrays with UTF-8 byte ranges.
+    const pick = async (text, optionText) => {
+      await page.evaluate(`(() => { const input = document.querySelector('#composerInput'); input.focus(); input.value = ${JSON.stringify(text)}; input.setSelectionRange(input.value.length, input.value.length); input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText' })); })()`);
+      await page.waitFor(`[...document.querySelectorAll('#mentionPicker [role="option"] strong')].some((n) => n.textContent === ${JSON.stringify(optionText)})`);
+      await page.evaluate(`(() => { const input = document.querySelector('#composerInput'); const options = [...document.querySelectorAll('#mentionPicker [role="option"] strong')]; const index = options.findIndex((n) => n.textContent === ${JSON.stringify(optionText)}); for (let i = 0; i < index; i += 1) input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })); input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); })()`);
+      await page.waitFor(`document.querySelector('#mentionPicker').hidden`);
+      return page.evaluate(`document.querySelector('#composerInput').value`);
+    };
+    const afterFile = await pick("voir @READ", "@README.md");
+    const afterSkill = await pick(`${afterFile}puis $fixture-rev`, "$fixture-review");
+    const chips = await page.evaluate(`[...document.querySelectorAll('#mentionTray .mention-chip')].map((n) => n.getAttribute('aria-label'))`);
+    await type(`${afterSkill}merci`);
+    await awaitApproval();
+    const mentionStart = calls().filter((call) => call.kind === "request" && call.method === "turn/start" && call.params?.threadId === threadId).at(-1)?.params.input ?? null;
+    const mentionText = "voir @README.md puis $fixture-review merci";
+    const byteRange = (prefix, placeholder) => ({ start: Buffer.byteLength(prefix, "utf8"), end: Buffer.byteLength(prefix, "utf8") + Buffer.byteLength(placeholder, "utf8") });
+    const expectedInput = [
+      { type: "text", text: mentionText, text_elements: [{ byteRange: byteRange("voir ", "@README.md"), placeholder: "@README.md" }, { byteRange: byteRange("voir @README.md puis ", "$fixture-review"), placeholder: "$fixture-review" }] },
+      { type: "mention", name: "README.md", path: join(shell.repo.realFolder, "README.md") },
+      { type: "skill", name: "fixture-review", path: "/tmp/codex-fixture/skills/fixture-review/SKILL.md" },
+    ];
+    const searched = calls().filter((call) => call.kind === "request" && call.method === "fuzzyFileSearch").map((call) => call.params);
+    const replayedChips = await page.evaluate(`[...document.querySelectorAll('.turn.user .mention-chip')].map((n) => n.textContent)`);
+    step("@ and $ pickers read fuzzyFileSearch and skills/list, and the app-server log carries the exact input arrays with UTF-8 byte ranges", JSON.stringify(mentionStart) === JSON.stringify(expectedInput) && chips.join("|") === "File mention @README.md|Skill mention $fixture-review" && searched.some((params) => params.query === "READ" && params.roots.length === 1) && calls().some((call) => call.kind === "request" && call.method === "skills/list") && replayedChips.join("|") === "@README.md|$fixture-review", `${JSON.stringify(mentionStart)} · replay ${replayedChips.join("|")}`);
+    await accept();
+    await page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'idle'`, 30_000);
     step("no console errors or uncaught exceptions", page.errors.length === 0, page.errors.join(" | "));
   } finally {
     chrome.close();

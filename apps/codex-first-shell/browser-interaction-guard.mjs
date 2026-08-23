@@ -594,6 +594,85 @@ export async function runBrowserInteractionGuard(hooks) {
   for (const remove of attachmentTray.querySelectorAll("[data-remove-attachment]")) remove.click();
   await hooks.switchFixtureThread(fixture.thread);
 
+  // --- @ file and $ skill mentions ------------------------------------------
+  // `@` opens a keyboard-navigable picker fed by searchFiles, `$` one fed by
+  // listSkills; a pick inserts a placeholder and a chip; at send each chip is
+  // one text_elements entry (the UTF-8 byte span of its placeholder) plus one
+  // mention or skill item, and replay renders the chips inline.
+  const mentionPicker = document.querySelector("#mentionPicker");
+  const mentionTray = document.querySelector("#mentionTray");
+  const mentionActions = [];
+  const typeInComposer = (text) => {
+    composerInput.focus();
+    composerInput.value = text;
+    composerInput.setSelectionRange(text.length, text.length);
+    composerInput.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText" }));
+  };
+  const pickerOptions = () => [...mentionPicker.querySelectorAll('[role="option"]')].map((option) => option.querySelector("strong").textContent);
+  const mentionChips = () => [...mentionTray.querySelectorAll(".mention-chip")].map((chip) => chip.getAttribute("aria-label"));
+  const utf8 = (text) => new TextEncoder().encode(text).length;
+  try { await hooks.withFixtureTransport(async (payload) => {
+    mentionActions.push(payload);
+    if (payload.action === "searchFiles") return { query: payload.query, root: "/repo", limit: payload.limit, total: 2, files: [{ root: "/repo", path: "docs/RÉSUMÉ.md", file_name: "RÉSUMÉ.md", match_type: "file", score: 900, indices: [], absolutePath: "/repo/docs/RÉSUMÉ.md" }, { root: "/repo", path: "README.md", file_name: "README.md", match_type: "file", score: 800, indices: [], absolutePath: "/repo/README.md" }] };
+    if (payload.action === "listSkills") return { cwd: "/repo", skills: [{ name: "guard-review", path: "/skills/guard-review/SKILL.md", description: "Review it.", shortDescription: null, enabled: true, scope: "repo", cwd: "/repo" }, { name: "guard-off", path: "/skills/guard-off/SKILL.md", description: "Disabled.", shortDescription: null, enabled: false, scope: "user", cwd: "/repo" }], errors: [] };
+    if (payload.action === "startTurn") return { turn: { id: "guard-mention-turn" }, settings: null };
+    if (payload.action === "readThread") return { thread: structuredClone(fixture.thread) };
+    return {};
+  }, async () => {
+    typeInComposer("héllo @re");
+    await waitFor(() => pickerOptions().length === 2, 60);
+    const fileSearch = mentionActions.find((entry) => entry.action === "searchFiles");
+    const openedForFiles = !mentionPicker.hidden && mentionPicker.getAttribute("role") === "listbox" && composerInput.getAttribute("aria-expanded") === "true" && composerInput.getAttribute("aria-controls") === "mentionPicker";
+    composerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    const movedTo = composerInput.getAttribute("aria-activedescendant");
+    const highlighted = mentionPicker.querySelector('[aria-selected="true"] strong')?.textContent;
+    composerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await frame();
+    check(results, "@ opens a keyboard-navigable file picker fed by searchFiles and inserts a mention chip", openedForFiles && fileSearch?.query === "re" && fileSearch.limit === 10 && pickerOptions().length === 0 && movedTo === "mention-option-1" && highlighted === "@README.md" && composerInput.value === "héllo @README.md " && mentionChips().join("|") === "File mention @README.md" && document.activeElement === composerInput && mentionPicker.hidden, `${composerInput.value} · ${mentionChips().join("|")} · ${JSON.stringify(fileSearch ?? null)}`);
+
+    typeInComposer(`${composerInput.value}then $gu`);
+    await waitFor(() => pickerOptions().length === 1, 60);
+    const skillsCall = mentionActions.filter((entry) => entry.action === "listSkills");
+    const skillOptions = pickerOptions();
+    composerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await frame();
+    const escaped = mentionPicker.hidden && document.activeElement === composerInput && composerInput.getAttribute("aria-expanded") === "false" && document.querySelector("#composer").dataset.turnPosture === "idle";
+    typeInComposer(`${composerInput.value}a`);
+    await waitFor(() => pickerOptions().length === 1, 60);
+    composerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+    await frame();
+    check(results, "$ opens a skill picker fed by listSkills, Escape closes it in place, and Tab inserts a skill chip", skillsCall.length === 1 && skillOptions.join("|") === "$guard-review" && escaped && composerInput.value === "héllo @README.md then $guard-review " && mentionChips().join("|") === "File mention @README.md|Skill mention $guard-review" && document.activeElement === composerInput, `${composerInput.value} · ${mentionChips().join("|")} · ${skillsCall.length} listSkills`);
+
+    // A removed chip takes its placeholder out of the text; the rest travel.
+    typeInComposer(`${composerInput.value}and $gua`);
+    await waitFor(() => pickerOptions().length === 1, 60);
+    composerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await frame();
+    mentionTray.querySelector('[data-remove-mention="2"]')?.click();
+    await frame();
+    const textBeforeSend = composerInput.value;
+    document.querySelector("#composer").requestSubmit();
+    await waitFor(() => mentionActions.some((entry) => entry.action === "readThread"));
+    const start = mentionActions.find((entry) => entry.action === "startTurn");
+    const sentText = start?.input?.[0];
+    const expectedElements = [
+      { byteRange: { start: utf8("héllo "), end: utf8("héllo @README.md") }, placeholder: "@README.md" },
+      { byteRange: { start: utf8("héllo @README.md then "), end: utf8("héllo @README.md then $guard-review") }, placeholder: "$guard-review" },
+    ];
+    const replayed = structuredClone(fixture.thread);
+    replayed.turns.push({ id: "guard-mention-turn", status: "completed", items: [{ type: "userMessage", id: "guard-mention-user", content: structuredClone(start?.input ?? []) }] });
+    await hooks.reconcileFixtureThread(replayed);
+    const replayedChips = [...document.querySelectorAll('.turn.user[data-item-id$="guard-mention-user"] .mention-chip')].map((chip) => `${chip.dataset.mentionKind}:${chip.textContent}`);
+    const repeatedAsAttachments = document.querySelectorAll('.turn.user[data-item-id$="guard-mention-user"] .message-attachment').length;
+    check(results, "mentions travel as text_elements with UTF-8 byte ranges plus mention and skill items, and replay renders them as chips",
+      textBeforeSend === "héllo @README.md then $guard-review and " && sentText?.text === "héllo @README.md then $guard-review and"
+        && JSON.stringify(sentText?.text_elements) === JSON.stringify(expectedElements)
+        && JSON.stringify(start?.input?.slice(1)) === JSON.stringify([{ type: "mention", name: "README.md", path: "/repo/README.md" }, { type: "skill", name: "guard-review", path: "/skills/guard-review/SKILL.md" }])
+        && replayedChips.join("|") === "mention:@README.md|skill:$guard-review" && repeatedAsAttachments === 0 && mentionTray.hidden,
+      `${JSON.stringify(sentText?.text_elements ?? null)} · ${replayedChips.join("|")}`);
+  }); } catch (error) { check(results, "mention checks completed", false, `threw: ${error?.message ?? error}`); }
+  await hooks.switchFixtureThread(fixture.thread);
+
   // One Project, four scope states: the header, the Tasks gate, the Room
   // cold-start handoff and the explicit import dialog are exercised through
   // the real controls with host-shaped fixtures, then the live Project is

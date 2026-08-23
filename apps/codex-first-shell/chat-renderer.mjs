@@ -1,4 +1,5 @@
 import { parseQuotedMessage } from "./quote-source.mjs";
+import { parseTextElements } from "./composer-mentions.mjs";
 
 export const DOM_LIMITS = Object.freeze({
   timelineTextCharacters: 180_000,
@@ -204,12 +205,38 @@ export function renderQuoteSource(source, currentThreadId = null) {
   return `<small class="quote-source" data-quote-thread="${escapeHtml(source.threadId)}" data-quote-turn="${escapeHtml(source.turnId)}" data-quote-item="${escapeHtml(source.itemId)}" title="${escapeHtml(identity)}" aria-label="Quoted from ${escapeHtml(identity)}">Quoted from a Codex Turn in ${where}</small>`;
 }
 
+// The placeholders a user message's text_elements name become opaque tokens
+// before Markdown runs (a file name's underscores or dots are never
+// emphasis) and chips afterwards; the byte spans are resolved with
+// TextEncoder by composer-mentions.mjs.
+const ELEMENT_TOKEN_OPEN = "\uE002";
+const ELEMENT_TOKEN_CLOSE = "\uE003";
+
+function tokenizeTextElements(text, elements) {
+  const chips = [];
+  const tokenized = parseTextElements(text, elements).map((segment) => (segment.placeholder ? `${ELEMENT_TOKEN_OPEN}${chips.push(segment) - 1}${ELEMENT_TOKEN_CLOSE}` : segment.text)).join("");
+  return { tokenized, chips };
+}
+
+export function renderMentionChip(segment) {
+  return `<span class="mention-chip" data-mention-kind="${escapeHtml(segment.kind)}" title="${escapeHtml(segment.kind === "skill" ? "Skill" : "File")} mention">${escapeHtml(segment.placeholder)}</span>`;
+}
+
+function restoreTextElements(html, chips) {
+  return html.replace(/\uE002(\d+)\uE003/g, (_, index) => (chips[Number(index)] ? renderMentionChip(chips[Number(index)]) : "")).replace(/[\uE002\uE003]/g, "");
+}
+
 // Human messages replayed from Thread history render their serialized quote
-// source as an identity chip between the quoted block and the message body.
-export function renderUserMessageText(text, budget = createRenderBudget(), { currentThreadId = null } = {}) {
-  const { quoted, source, body } = parseQuotedMessage(text);
-  if (!source) return renderMarkdown(text, budget);
-  return `${renderMarkdown(quoted, budget)}${renderQuoteSource(source, currentThreadId)}${renderMarkdown(body, budget)}`;
+// source as an identity chip between the quoted block and the message body,
+// and their text_elements as inline mention chips.
+export function renderUserMessageText(text, budget = createRenderBudget(), { currentThreadId = null, textElements = null } = {}) {
+  const elements = Array.isArray(textElements) && textElements.length ? textElements : null;
+  const { tokenized, chips } = elements ? tokenizeTextElements(String(text ?? "").replace(/[\uE002\uE003]/g, ""), elements) : { tokenized: String(text ?? ""), chips: [] };
+  const { quoted, source, body } = parseQuotedMessage(tokenized);
+  const html = !source
+    ? renderMarkdown(tokenized, budget)
+    : `${renderMarkdown(quoted, budget)}${renderQuoteSource(source, currentThreadId)}${renderMarkdown(body, budget)}`;
+  return elements ? restoreTextElements(html, chips) : html;
 }
 
 function imageSource(entry) {
@@ -231,8 +258,11 @@ function safeImageMarkup(source, label, budget) {
   return `<img class="message-image" src="${escapeHtml(url)}" alt="${escapeHtml(label)}">`;
 }
 
-export function renderUserMedia(content, budget = createRenderBudget()) {
-  const supported = (content ?? []).filter((entry) => ["image", "localImage", "audio", "localAudio", "skill", "mention"].includes(entry.type));
+// `inlineMentions` says the message's mention and skill items already render
+// inline from its text_elements, so they are not repeated as attachments.
+export function renderUserMedia(content, budget = createRenderBudget(), { inlineMentions = false } = {}) {
+  const types = inlineMentions ? ["image", "localImage", "audio", "localAudio"] : ["image", "localImage", "audio", "localAudio", "skill", "mention"];
+  const supported = (content ?? []).filter((entry) => types.includes(entry.type));
   const mounted = supported.slice(0, Math.max(0, budget.mediaCountRemaining));
   const markup = mounted.map((entry) => {
     if (entry.type === "image") return safeImageMarkup(entry.url, entry.name ?? "Attached image", budget);

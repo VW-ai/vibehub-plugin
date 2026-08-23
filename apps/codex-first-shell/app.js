@@ -1,6 +1,7 @@
 import { applyChatEvent, applyHostEvent, canonicalTimeline, itemKey, rememberQueue, rememberThreadSettings, threadQueue, threadSettings, timelineWindow } from "./chat-model.mjs";
 import { describeTurnSettings, effortOptionLabel, findModel, imageRefusal, modelOptionLabel, pendingOverrides, selectedEffort, selectedModel } from "./composer-settings.mjs";
 import { acceptAttachment, attachmentKind, imageFilesFrom, MAX_ATTACHMENT_BYTES, renderAttachmentChips } from "./composer-attachments.mjs";
+import { activeTrigger, chipsFromItems, composeTextElements, insertPlaceholder, placeholderFor, removePlaceholder } from "./composer-mentions.mjs";
 import { emptyQueue, pausedMessage, queuedMediaSummary, queuedText, replaceQueuedText } from "./composer-queue.mjs";
 import {
   DOM_LIMITS,
@@ -106,7 +107,21 @@ const state = {
   // The next-Turn overrides the human picked, per Thread ("" before a Thread
   // exists): only keys that still differ from the reported record are sent.
   settingsOverrides: new Map(),
+  // File and skill mention chips in the Composer, Thread-owned like the text;
+  // the skills catalog as listSkills returned it, read once per session.
+  mentions: [],
+  skills: null,
 };
+
+// The mention picker: `@` searches files through the host (debounced), `$`
+// lists skills; both are keyboard-navigable and never claim an entry the
+// host did not return.
+const MENTION_SEARCH_DEBOUNCE_MS = 160;
+const MENTION_RESULT_LIMIT = 10;
+const INPUT_ITEM_LIMIT = 16;
+const mentionPicker = { open: false, kind: null, trigger: null, query: "", items: [], index: 0, pending: false, error: null };
+let mentionSearchTimer = 0;
+let mentionSearchSequence = 0;
 
 // The Composer submit path: Enter takes the Send label's own action (Queue
 // while a Turn is live, Send otherwise); Alt+Enter takes the opposite
@@ -1011,8 +1026,10 @@ function renderItem(item, budget, { posture = "" } = {}) {
       if (message) return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article><div>${renderUserMessageText(message, budget, { currentThreadId: item._threadId })}</div>${media}<small class="task-message-context">${contextCount} Context item${contextCount === 1 ? "" : "s"} · host-owned packet</small>${raw}</article></div>`;
       return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article class="item-card handoff task-packet"><header><strong>VibeHub Task</strong><span>${escapeHtml(handoff.task?.nextAction?.action ?? handoff.task?.operationalState)}</span></header><p><strong>${escapeHtml(humanize(handoff.task?.ticketId))}</strong><br>${escapeHtml(takeText(budget, handoff.task?.outcome, 8_000).text)}</p><small>${contextCount} Context item${contextCount === 1 ? "" : "s"} · ${escapeHtml(handoff.project?.scope ?? "standalone")} · host-owned packet</small>${raw}</article></div>`;
     }
-    const media = renderUserMedia(item.content, budget);
-    return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article>${text ? `<div>${renderUserMessageText(text, budget, { currentThreadId: item._threadId })}</div>` : ""}${media}${posture}</article></div>`;
+    const textElements = item.content?.find((entry) => entry.type === "text")?.text_elements ?? null;
+    const inlineMentions = Array.isArray(textElements) && textElements.length > 0;
+    const media = renderUserMedia(item.content, budget, { inlineMentions });
+    return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article>${text ? `<div>${renderUserMessageText(text, budget, { currentThreadId: item._threadId, textElements })}</div>` : ""}${media}${posture}</article></div>`;
   }
   if (item.type === "agentMessage") return renderAgentMessage(item, budget, { bridge: bridgeAvailability() });
   if (item.type === "reasoning") {
@@ -1831,8 +1848,11 @@ function restoreTaskQuoteDraft(ticketId) {
   $("#composerInput").value = "";
   state.composerQuote = state.taskQuoteDrafts.get(ticketId) ? structuredClone(state.taskQuoteDrafts.get(ticketId)) : null;
   state.attachments = [];
+  state.mentions = [];
+  closeMentionPicker();
   renderComposerQuote();
   renderAttachments();
+  renderMentions();
   autoSizeComposer();
 }
 
@@ -1842,6 +1862,7 @@ function captureComposerDraft(threadId = state.activeThreadId) {
     text: $("#composerInput").value,
     quote: state.composerQuote ? structuredClone(state.composerQuote) : null,
     attachments: state.attachments.map((item) => ({ ...item })),
+    mentions: state.mentions.map((item) => ({ ...item })),
   });
 }
 
@@ -1850,8 +1871,11 @@ function restoreComposerDraft(threadId) {
   $("#composerInput").value = draft.text;
   state.composerQuote = draft.quote;
   state.attachments = draft.attachments;
+  state.mentions = draft.mentions;
+  closeMentionPicker();
   renderComposerQuote();
   renderAttachments();
+  renderMentions();
   autoSizeComposer();
 }
 
@@ -1955,6 +1979,9 @@ function clearComposerAfterSend(textarea) {
   autoSizeComposer();
   state.attachments = [];
   renderAttachments();
+  state.mentions = [];
+  renderMentions();
+  closeMentionPicker();
   state.composerDrafts.delete(state.activeThreadId);
 }
 
@@ -1996,8 +2023,13 @@ async function submitTurn(event) {
     if (!state.activeThreadId) await newThread();
     const threadId = state.activeThreadId;
     const input = [];
-    if (composedText) input.push({ type: "text", text: composedText });
+    // Each mention chip still present in the text is one text_elements entry
+    // (the UTF-8 byte span of its placeholder) and one mention or skill item.
+    const { elements, items } = composeTextElements(composedText, state.mentions);
+    if (composedText) input.push(elements.length ? { type: "text", text: composedText, text_elements: elements } : { type: "text", text: composedText });
     input.push(...state.attachments.map(({ type, url }) => ({ type, url })));
+    input.push(...items);
+    if (input.length > INPUT_ITEM_LIMIT) return notify(`A Turn carries at most ${INPUT_ITEM_LIMIT} inputs; this message has ${input.length}. Remove some attachments or mentions.`);
     // While a Turn streams, Enter queues the follow-up in the host-owned
     // queue (started as its own turn/start after turn/completed) and
     // Alt+Enter steers that exact Turn instead. Idle submission alone starts
@@ -2195,6 +2227,158 @@ function chooseEffort(effort) {
   renderComposerSettings();
 }
 
+// --- File and skill mentions ------------------------------------------------
+
+function renderMentions() {
+  const tray = $("#mentionTray");
+  if (!tray) return;
+  tray.hidden = state.mentions.length === 0;
+  tray.innerHTML = state.mentions.map((chip, index) => `<span class="mention-chip composer-mention" role="group" data-mention-kind="${escapeHtml(chip.kind)}" aria-label="${escapeHtml(chip.kind === "skill" ? "Skill" : "File")} mention ${escapeHtml(chip.placeholder)}" title="${escapeHtml(chip.path)}"><span>${escapeHtml(chip.placeholder)}</span><button type="button" data-remove-mention="${index}" aria-label="Remove ${escapeHtml(chip.placeholder)}">×</button></span>`).join("");
+}
+
+function closeMentionPicker() {
+  clearTimeout(mentionSearchTimer);
+  mentionSearchSequence += 1;
+  const wasOpen = mentionPicker.open;
+  Object.assign(mentionPicker, { open: false, kind: null, trigger: null, query: "", items: [], index: 0, pending: false, error: null });
+  if (wasOpen) renderMentionPicker();
+}
+
+function mentionOptionMarkup(item, index) {
+  const selected = index === mentionPicker.index;
+  const detail = item.kind === "skill" ? (item.description ?? item.path) : item.path;
+  return `<button type="button" role="option" id="mention-option-${index}" aria-selected="${selected}" data-mention-option="${index}" tabindex="-1"><strong>${escapeHtml(item.placeholder)}</strong><small>${escapeHtml(detail ?? "")}</small></button>`;
+}
+
+function renderMentionPicker() {
+  const picker = $("#mentionPicker");
+  const textarea = $("#composerInput");
+  if (!picker || !textarea) return;
+  if (!mentionPicker.open) {
+    picker.hidden = true;
+    picker.innerHTML = "";
+    textarea.setAttribute("aria-expanded", "false");
+    textarea.removeAttribute("aria-activedescendant");
+    return;
+  }
+  const kindLabel = mentionPicker.kind === "skill" ? "Skills" : "Files";
+  const status = mentionPicker.error
+    ? `<div class="mention-status" role="status">${escapeHtml(kindLabel)} unavailable: ${escapeHtml(mentionPicker.error)}</div>`
+    : mentionPicker.pending
+      ? `<div class="mention-status" role="status">Searching ${escapeHtml(kindLabel.toLowerCase())}…</div>`
+      : !mentionPicker.items.length
+        ? `<div class="mention-status" role="status">${mentionPicker.kind === "mention" && !mentionPicker.query ? "Type to search files in this repository" : `No ${escapeHtml(kindLabel.toLowerCase())} match ${escapeHtml(mentionPicker.query ? `“${mentionPicker.query}”` : "yet")}`}</div>`
+        : "";
+  picker.dataset.kind = mentionPicker.kind;
+  picker.hidden = false;
+  picker.innerHTML = `<header><strong>${escapeHtml(kindLabel)}</strong><small>↑↓ choose · ↵ or Tab insert · Esc close</small></header>${mentionPicker.items.map(mentionOptionMarkup).join("")}${status}`;
+  textarea.setAttribute("aria-expanded", "true");
+  if (mentionPicker.items.length) textarea.setAttribute("aria-activedescendant", `mention-option-${mentionPicker.index}`);
+  else textarea.removeAttribute("aria-activedescendant");
+  picker.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest" });
+}
+
+function fileMentionItems(data) {
+  return (data?.files ?? []).slice(0, MENTION_RESULT_LIMIT).map((file) => ({
+    kind: "mention",
+    name: file.file_name ?? file.path.split("/").pop(),
+    path: file.absolutePath ?? file.path,
+    detail: file.path,
+    placeholder: placeholderFor("mention", file.file_name ?? file.path.split("/").pop()),
+  }));
+}
+
+function skillMentionItems(query) {
+  const needle = query.trim().toLowerCase();
+  return (state.skills ?? [])
+    .filter((skill) => skill.enabled !== false && (!needle || skill.name.toLowerCase().includes(needle)))
+    .slice(0, MENTION_RESULT_LIMIT)
+    .map((skill) => ({ kind: "skill", name: skill.name, path: skill.path, description: skill.shortDescription ?? skill.description ?? null, placeholder: placeholderFor("skill", skill.name) }));
+}
+
+// The picker follows the trigger token the caret sits in: a new query asks
+// the host again (files, debounced; skills from the one listSkills read) and
+// a reply for a query no longer typed is dropped.
+function syncMentionPicker() {
+  const textarea = $("#composerInput");
+  const trigger = state.route === "chat" && !textarea.disabled && document.activeElement === textarea ? activeTrigger(textarea.value, textarea.selectionStart) : null;
+  if (!trigger) { closeMentionPicker(); return; }
+  if (mentionPicker.open && mentionPicker.kind === trigger.kind && mentionPicker.query === trigger.query) { mentionPicker.trigger = trigger; return; }
+  const sequence = ++mentionSearchSequence;
+  clearTimeout(mentionSearchTimer);
+  Object.assign(mentionPicker, { open: true, kind: trigger.kind, trigger, query: trigger.query, index: 0, error: null });
+  if (trigger.kind === "mention") {
+    mentionPicker.items = trigger.query ? mentionPicker.items.filter((item) => item.kind === "mention") : [];
+    mentionPicker.pending = Boolean(trigger.query);
+    renderMentionPicker();
+    if (!trigger.query) return;
+    mentionSearchTimer = setTimeout(async () => {
+      let next;
+      try { next = { items: fileMentionItems(await action({ action: "searchFiles", query: trigger.query, limit: MENTION_RESULT_LIMIT })), error: null }; }
+      catch (error) { next = { items: [], error: error.message }; }
+      if (sequence !== mentionSearchSequence || !mentionPicker.open) return;
+      Object.assign(mentionPicker, next, { pending: false, index: 0 });
+      renderMentionPicker();
+    }, MENTION_SEARCH_DEBOUNCE_MS);
+    return;
+  }
+  mentionPicker.items = skillMentionItems(trigger.query);
+  mentionPicker.pending = state.skills === null;
+  renderMentionPicker();
+  if (state.skills !== null) return;
+  void (async () => {
+    let error = null;
+    try {
+      const data = await action({ action: "listSkills" });
+      if (!Array.isArray(data?.skills)) throw new Error("skills/list answered without a skills list");
+      state.skills = data.skills;
+    } catch (caught) { error = caught.message; }
+    if (sequence !== mentionSearchSequence || !mentionPicker.open) return;
+    Object.assign(mentionPicker, { items: error ? [] : skillMentionItems(mentionPicker.query), pending: false, error, index: 0 });
+    renderMentionPicker();
+  })();
+}
+
+function moveMentionSelection(direction) {
+  if (!mentionPicker.items.length) return;
+  mentionPicker.index = (mentionPicker.index + direction + mentionPicker.items.length) % mentionPicker.items.length;
+  renderMentionPicker();
+}
+
+// A pick replaces the trigger token with the placeholder and keeps the chip;
+// the chip's name and path are exactly the host's own record.
+function chooseMention(index = mentionPicker.index) {
+  const item = mentionPicker.items[index];
+  const trigger = mentionPicker.trigger;
+  if (!item || !trigger) return false;
+  if (state.mentions.length >= INPUT_ITEM_LIMIT - 2) { notify(`At most ${INPUT_ITEM_LIMIT - 2} mentions travel in one Turn.`); return false; }
+  const textarea = $("#composerInput");
+  const inserted = insertPlaceholder(textarea.value, trigger, item.placeholder);
+  textarea.value = inserted.text;
+  textarea.setSelectionRange(inserted.caret, inserted.caret);
+  state.mentions = [...state.mentions, { kind: item.kind, name: item.name, path: item.path, placeholder: item.placeholder }];
+  closeMentionPicker();
+  renderMentions();
+  autoSizeComposer();
+  textarea.focus();
+  $("#streamStatus").textContent = `${item.kind === "skill" ? "Skill" : "File"} ${item.placeholder} added to your message.`;
+  return true;
+}
+
+function removeMention(index) {
+  const chip = state.mentions[index];
+  if (!chip) return;
+  const textarea = $("#composerInput");
+  // The chip's own occurrence of the placeholder leaves the text: the n-th
+  // chip with this placeholder is its n-th occurrence.
+  const ordinal = state.mentions.slice(0, index).filter((entry) => entry.placeholder === chip.placeholder).length;
+  state.mentions = state.mentions.filter((_, at) => at !== index);
+  textarea.value = removePlaceholder(textarea.value, chip.placeholder, ordinal);
+  renderMentions();
+  autoSizeComposer();
+  textarea.focus();
+}
+
 // --- The host-owned follow-up queue ---------------------------------------
 
 function mirrorBootstrapQueues(queues) {
@@ -2309,7 +2493,10 @@ async function saveQueueEdit(form) {
       input = listed.queue.items.find((entry) => entry.queuedId === queuedId)?.input ?? input;
     } catch (error) { notify(error.message); return; }
   }
-  const next = replaceQueuedText(input, text);
+  // Fresh byte ranges over the edited text; a mention whose placeholder the
+  // edit removed leaves with it.
+  const { elements, items } = composeTextElements(text, chipsFromItems(input));
+  const next = [...replaceQueuedText(input.filter((entry) => entry.type !== "mention" && entry.type !== "skill"), text, elements), ...items];
   if (!next.length) { notify("A queued message needs text or an attachment; delete it instead."); return; }
   state.queueEdit = null;
   await queueAction({ action: "updateQueued", threadId: queue.threadId, queuedId, input: next }, { focusSelector: `#queueTray [data-edit-queued="${CSS.escape(queuedId)}"]` });
@@ -3043,6 +3230,8 @@ document.addEventListener("click", async (event) => {
   }
   const remove = event.target.closest("[data-remove-attachment]");
   if (remove) { state.attachments.splice(Number(remove.dataset.removeAttachment), 1); renderAttachments(); return; }
+  const removeMentionButton = event.target.closest("[data-remove-mention]");
+  if (removeMentionButton) { removeMention(Number(removeMentionButton.dataset.removeMention)); return; }
   if (event.target.closest("[data-remove-quote]")) { state.composerQuote = null; renderComposerQuote(); return; }
   if (event.target.closest("#quoteSelection") && state.selectedQuote) { setComposerQuote(state.selectedQuote); return; }
   const quoteMessage = event.target.closest("[data-quote-message]");
@@ -3216,12 +3405,36 @@ composerForm.addEventListener("drop", async (event) => {
 $("#voiceButton").addEventListener("click", toggleRecording);
 $("#composer").addEventListener("submit", submitTurn);
 $("#composerInput").addEventListener("keydown", (event) => {
+  // The open mention picker takes the navigation keys: ↑↓ move, ↵ or Tab
+  // insert the highlighted entry, Escape closes it and keeps focus here.
+  if (mentionPicker.open) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); moveMentionSelection(event.key === "ArrowDown" ? 1 : -1); return; }
+    if ((event.key === "Enter" && !event.shiftKey && !event.isComposing) || event.key === "Tab") {
+      if (mentionPicker.items.length) { event.preventDefault(); chooseMention(); return; }
+      if (event.key === "Tab") return;
+    }
+    if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); closeMentionPicker(); return; }
+  }
   if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
     event.preventDefault();
     // Alt+Enter is the opposite of the Send label for this one message.
     composerSubmitMode = event.altKey ? "opposite" : "default";
     $("#composer").requestSubmit();
   }
+});
+$("#composerInput").addEventListener("keyup", (event) => {
+  if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) syncMentionPicker();
+});
+$("#composerInput").addEventListener("click", syncMentionPicker);
+$("#composerInput").addEventListener("blur", () => {
+  // An option click moves focus for an instant; the picker closes only when
+  // focus really left the Composer.
+  requestAnimationFrame(() => { if (!$("#composer").contains(document.activeElement)) closeMentionPicker(); });
+});
+$("#mentionPicker").addEventListener("pointerdown", (event) => event.preventDefault());
+$("#mentionPicker").addEventListener("click", (event) => {
+  const option = event.target.closest("[data-mention-option]");
+  if (option) chooseMention(Number(option.dataset.mentionOption));
 });
 // Inline queue edit: Enter saves, Escape cancels and returns focus to Edit.
 $("#queueTray").addEventListener("keydown", (event) => {
@@ -3230,7 +3443,7 @@ $("#queueTray").addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); form.requestSubmit(); }
   else if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); cancelQueueEdit(); }
 });
-$("#composerInput").addEventListener("input", autoSizeComposer);
+$("#composerInput").addEventListener("input", () => { autoSizeComposer(); syncMentionPicker(); });
 document.addEventListener("input", (event) => {
   const other = event.target.closest?.("[data-request-other]");
   if (other) {

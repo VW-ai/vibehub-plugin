@@ -93,3 +93,32 @@ test("images paste and drop into the Composer as data-URL image inputs, never lo
   assert.match(contract.inputs.never, /localImage and localAudio are never produced/);
   assert.match(script, /if \(file\.size > MAX_ATTACHMENT_BYTES\)/, "the byte bound is applied before a file is read");
 });
+
+test("@ and $ mentions are picked from searchFiles and listSkills and sent as text_elements with mention and skill items", async () => {
+  const { html, script, renderer, contract } = await shellSources();
+  assert.match(html, /<div class="mention-picker" id="mentionPicker" role="listbox" aria-label="Mention suggestions" hidden><\/div>/);
+  assert.match(html, /<textarea id="composerInput"[^>]*aria-autocomplete="list" aria-controls="mentionPicker" aria-expanded="false">/);
+  // The pickers are fed by the host alone and never invent an entry.
+  assert.match(script, /action: "searchFiles", query: trigger\.query, limit: MENTION_RESULT_LIMIT/);
+  assert.match(script, /const data = await action\(\{ action: "listSkills" \}\);/);
+  assert.match(script, /name: file\.file_name \?\? file\.path\.split\("\/"\)\.pop\(\),\s*path: file\.absolutePath \?\? file\.path,/, "a mention's name and path are searchFiles' file_name and absolutePath");
+  assert.match(script, /\{ kind: "skill", name: skill\.name, path: skill\.path,/, "a skill's name and path are listSkills' own");
+  assert.match(script, /\.filter\(\(skill\) => skill\.enabled !== false/, "disabled skills are not offered");
+  // Keyboard paths: arrows move, Enter/Tab insert, Escape closes in place.
+  assert.match(script, /if \(event\.key === "ArrowDown" \|\| event\.key === "ArrowUp"\) \{ event\.preventDefault\(\); moveMentionSelection/);
+  assert.match(script, /if \(event\.key === "Escape"\) \{ event\.preventDefault\(\); event\.stopPropagation\(\); closeMentionPicker\(\); return; \}/);
+  // Send: one text_elements entry and one item per chip; byte spans from TextEncoder.
+  assert.match(script, /const \{ elements, items \} = composeTextElements\(composedText, state\.mentions\);/);
+  assert.match(script, /input\.push\(elements\.length \? \{ type: "text", text: composedText, text_elements: elements \} : \{ type: "text", text: composedText \}\);/);
+  assert.match(script, /input\.push\(\.\.\.items\);/);
+  assert.match(script, /if \(input\.length > INPUT_ITEM_LIMIT\) return notify/);
+  assert.match(script, /const INPUT_ITEM_LIMIT = 16;/);
+  assert.match(contract.inputs.bound, /^1 to 16 items per Turn/);
+  const mentions = await source("apps/codex-first-shell/composer-mentions.mjs");
+  assert.match(mentions, /const encoder = new TextEncoder\(\);/);
+  assert.match(mentions, /return \{ byteRange: \{ start, end: start \+ byteLength\(placeholder\) \}, placeholder \};/);
+  assert.match(contract.inputs.variants.text, /byteRange is a UTF-8 byte span inside text/);
+  // Replay: placeholders become chips inside the Markdown; items are not repeated.
+  assert.match(renderer, /export function renderUserMessageText\(text, budget = createRenderBudget\(\), \{ currentThreadId = null, textElements = null \} = \{\}\)/);
+  assert.match(script, /renderUserMedia\(item\.content, budget, \{ inlineMentions \}\)/);
+});

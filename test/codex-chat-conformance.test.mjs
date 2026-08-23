@@ -7,6 +7,7 @@ import { describePosture, describeTurnSettings, effortOptionLabel, imageRefusal,
 import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
 import { loadThreadDraft, MAX_DRAFT_ATTACHMENTS, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
 import { acceptAttachment, attachmentName, imageFilesFrom, MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS, renderAttachmentChips } from "../apps/codex-first-shell/composer-attachments.mjs";
+import { activeTrigger, byteLength, chipsFromItems, composeTextElements, insertPlaceholder, MENTION_TRIGGERS, parseTextElements, placeholderFor, removePlaceholder } from "../apps/codex-first-shell/composer-mentions.mjs";
 import { clampComposerHeight, composerBounds, COMPOSER_HEIGHT_FALLBACK } from "../apps/codex-first-shell/composer-sizing.mjs";
 import {
   createRenderBudget,
@@ -273,11 +274,82 @@ test("pasted and dropped images attach as bounded data-URL inputs with removable
   assert.equal((rendered.match(/<img class="message-image"/g) ?? []).length, 2);
 });
 
+test("@ and $ mentions become text_elements whose byte ranges are the UTF-8 spans of their placeholders, plus mention and skill items", () => {
+  assert.deepEqual(MENTION_TRIGGERS, { "@": "mention", "$": "skill" });
+  // The trigger token is the @ or $ word the caret sits in, at a word start only.
+  assert.deepEqual(activeTrigger("see @REA", 8), { kind: "mention", start: 4, end: 8, query: "REA" });
+  assert.deepEqual(activeTrigger("$", 1), { kind: "skill", start: 0, end: 1, query: "" });
+  assert.equal(activeTrigger("mail@example", 12), null, "an @ inside a word is not a trigger");
+  assert.equal(activeTrigger("see @README.md done", 19), null, "the caret has left the token");
+  assert.equal(activeTrigger("see @READ", 4), null, "the caret is before the trigger");
+  assert.equal(activeTrigger(`@${"x".repeat(81)}`, 82), null, "an over-long query is not a trigger");
+  // A pick replaces the token with the placeholder and a space; removal takes it back out.
+  assert.deepEqual(insertPlaceholder("see @REA now", activeTrigger("see @REA now", 8), "@README.md"), { text: "see @README.md now", caret: 15 });
+  assert.equal(removePlaceholder("see @README.md now", "@README.md"), "see now");
+  assert.equal(removePlaceholder("see @README.mdx @README.md", "@README.md"), "see @README.mdx ", "a placeholder never matches inside a longer token");
+  assert.equal(removePlaceholder("@a.md one @a.md two", "@a.md", 1), "@a.md one two", "the chip's own occurrence leaves, not the first");
+  assert.equal(removePlaceholder("@a.md once", "@a.md", 3), "@a.md once", "a missing ordinal changes nothing");
+  assert.deepEqual([placeholderFor("mention", "a.md"), placeholderFor("skill", "review")], ["@a.md", "$review"]);
+
+  // Byte math: each element's byteRange equals the UTF-8 byte span of its
+  // placeholder in the text, as Buffer.byteLength measures it; the bytes at
+  // the range are the placeholder (the host's own validation).
+  const text = "héllo @README.md then $review-change — and @README.md again";
+  const chips = [
+    { kind: "mention", name: "README.md", path: "/repo/README.md", placeholder: "@README.md" },
+    { kind: "skill", name: "review-change", path: "/skills/review-change/SKILL.md", placeholder: "$review-change" },
+    { kind: "mention", name: "README.md", path: "/repo/README.md", placeholder: "@README.md" },
+    { kind: "mention", name: "gone.md", path: "/repo/gone.md", placeholder: "@gone.md" },
+  ];
+  const { elements, items } = composeTextElements(text, chips);
+  const at = Buffer.byteLength("héllo ", "utf8");
+  const dollar = Buffer.byteLength("héllo @README.md then ", "utf8");
+  const again = Buffer.byteLength("héllo @README.md then $review-change — and ", "utf8");
+  assert.deepEqual(elements, [
+    { byteRange: { start: at, end: at + Buffer.byteLength("@README.md", "utf8") }, placeholder: "@README.md" },
+    { byteRange: { start: dollar, end: dollar + Buffer.byteLength("$review-change", "utf8") }, placeholder: "$review-change" },
+    { byteRange: { start: again, end: again + Buffer.byteLength("@README.md", "utf8") }, placeholder: "@README.md" },
+  ]);
+  const bytes = Buffer.from(text, "utf8");
+  for (const element of elements) {
+    assert.equal(Buffer.byteLength(element.placeholder, "utf8"), element.byteRange.end - element.byteRange.start);
+    assert.equal(bytes.subarray(element.byteRange.start, element.byteRange.end).toString("utf8"), element.placeholder);
+  }
+  assert.equal(byteLength(text), bytes.byteLength, "TextEncoder and Buffer agree on the byte length");
+  assert.deepEqual(items, [
+    { type: "mention", name: "README.md", path: "/repo/README.md" },
+    { type: "skill", name: "review-change", path: "/skills/review-change/SKILL.md" },
+    { type: "mention", name: "README.md", path: "/repo/README.md" },
+  ], "one item per chip still present in the text; a removed placeholder drops its chip");
+  assert.deepEqual(composeTextElements("plain", chips), { elements: [], items: [] });
+
+  // Replay parses the same elements back, by byte span, into text and chips;
+  // a malformed range is ignored and never hides text.
+  assert.deepEqual(parseTextElements(text, elements), [
+    { text: "héllo " }, { placeholder: "@README.md", kind: "mention" }, { text: " then " }, { placeholder: "$review-change", kind: "skill" }, { text: " — and " }, { placeholder: "@README.md", kind: "mention" }, { text: " again" },
+  ]);
+  assert.deepEqual(parseTextElements(text, [{ byteRange: { start: 1, end: 2 } }, { byteRange: { start: 0, end: 999 } }, { byteRange: { start: 5, end: 3 } }, null]), [{ text }]);
+  assert.deepEqual(parseTextElements(text, null), [{ text }]);
+  assert.deepEqual(chipsFromItems([{ type: "text", text: "x" }, { type: "mention", name: "a.md", path: "/a.md" }, { type: "skill", name: "s", path: "/s" }]), [
+    { kind: "mention", name: "a.md", path: "/a.md", placeholder: "@a.md" }, { kind: "skill", name: "s", path: "/s", placeholder: "$s" },
+  ]);
+  // The replayed user message renders each placeholder as a chip inside the
+  // Markdown, so a file name's underscores never become emphasis, and the
+  // mention and skill items are not repeated as attachments.
+  const html = renderUserMessageText("use @my_file_name.md and $do_it _soon_", createRenderBudget(), { textElements: [{ byteRange: { start: 4, end: 20 }, placeholder: "@my_file_name.md" }, { byteRange: { start: 25, end: 31 }, placeholder: "$do_it" }] });
+  assert.equal(html, '<p>use <span class="mention-chip" data-mention-kind="mention" title="File mention">@my_file_name.md</span> and <span class="mention-chip" data-mention-kind="skill" title="Skill mention">$do_it</span> <em>soon</em></p>');
+  assert.equal(renderUserMessageText("no elements _here_", createRenderBudget(), { textElements: [] }), "<p>no elements <em>here</em></p>");
+  assert.equal(renderUserMedia([{ type: "mention", name: "a.md", path: "/a.md" }, { type: "skill", name: "s", path: "/s" }], createRenderBudget(), { inlineMentions: true }), "");
+  assert.match(renderUserMedia([{ type: "mention", name: "a.md", path: "/a.md" }], createRenderBudget()), /@a\.md/, "without text_elements the items still show as chips");
+});
+
 test("Composer text, Quote identity, and attachments are isolated and bounded by Thread", () => {
   const drafts = new Map();
   saveThreadDraft(drafts, "thread-a", { text: "draft A", quote: { threadId: "thread-a", turnId: "turn-a", itemId: "item-a" }, attachments: [{ type: "image", url: "data:image/png;base64,AA==" }] });
-  assert.deepEqual(loadThreadDraft(drafts, "thread-b"), { text: "", quote: null, attachments: [] });
-  assert.deepEqual(loadThreadDraft(drafts, null), { text: "", quote: null, attachments: [] });
+  assert.deepEqual(loadThreadDraft(drafts, "thread-b"), { text: "", quote: null, attachments: [], mentions: [] });
+  assert.deepEqual(loadThreadDraft(drafts, null), { text: "", quote: null, attachments: [], mentions: [] });
+  saveThreadDraft(drafts, "thread-m", { text: "see @a.md", mentions: [{ kind: "mention", name: "a.md", path: "/a.md", placeholder: "@a.md" }] });
+  assert.deepEqual(loadThreadDraft(drafts, "thread-m").mentions, [{ kind: "mention", name: "a.md", path: "/a.md", placeholder: "@a.md" }], "mention chips are Thread-owned like the text");
   assert.equal(loadThreadDraft(drafts, "thread-a").quote.threadId, "thread-a");
   for (let index = 0; index < MAX_DRAFT_THREADS + 2; index += 1) saveThreadDraft(drafts, `thread-${index}`, { text: String(index) });
   assert.equal(drafts.size, MAX_DRAFT_THREADS);
@@ -514,7 +586,7 @@ test("quote source identity serializes into the Turn input and renders from repl
   assert.doesNotMatch(renderUserMessageText(composeQuotedMessage({ ...quote, threadId: '"><script>' }, "x"), createRenderBudget()), /<script>/);
   const [script, host] = await Promise.all([source("apps/codex-first-shell/app.js"), source("scripts/vh-codex-first-shell.mjs")]);
   assert.match(script, /const composedText = composeQuotedMessage\(state\.composerQuote, text\);/);
-  assert.equal((script.match(/renderUserMessageText\((?:text|message), budget, \{ currentThreadId: item\._threadId \}\)/g) ?? []).length, 2, "ordinary and Task human messages both render replayed quote identity");
+  assert.equal((script.match(/renderUserMessageText\((?:text|message), budget, \{ currentThreadId: item\._threadId(?:, textElements)? \}\)/g) ?? []).length, 2, "ordinary and Task human messages both render replayed quote identity");
   assert.doesNotMatch(script, /function quotePrefix/);
   assert.match(host, /\["\/quote-source\.mjs", script\("quote-source\.mjs"\)\]/);
   assert.doesNotMatch(script + host, /localStorage|sessionStorage|indexedDB/i);

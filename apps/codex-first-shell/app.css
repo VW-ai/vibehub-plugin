@@ -535,6 +535,23 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .attachment-chip button { flex: none; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 5px; color: var(--muted); background: transparent; }
 .attachment-chip button:hover { color: var(--text); background: var(--hover); }
 .composer.drop-target { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+/* @ file and $ skill mentions: chips in the Composer and in replayed user
+   messages, and the keyboard-navigable picker floating above the Composer. */
+.composer { position: relative; }
+.mention-tray { display: flex; flex-wrap: wrap; gap: 6px; padding: 2px 5px 7px; }
+.mention-chip { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 1px 6px; border: 1px solid color-mix(in srgb, var(--accent) 70%, var(--line)); border-radius: 6px; color: var(--text); background: color-mix(in srgb, var(--accent) 6%, var(--panel)); font: 500 10px/1.5 var(--mono); vertical-align: baseline; overflow-wrap: anywhere; }
+.turn.user .mention-chip { margin: 0 1px; }
+.composer-mention button { width: 18px; height: 18px; padding: 0; border: 0; border-radius: 4px; color: var(--muted); background: transparent; font-size: 12px; }
+.composer-mention button:hover { color: var(--text); background: var(--hover); }
+.mention-picker { position: absolute; z-index: 30; right: 0; bottom: calc(100% + 6px); left: 0; max-height: 280px; display: grid; overflow: auto; scrollbar-width: thin; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+.mention-picker > header { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 7px 10px 5px; border-bottom: 1px solid var(--line); font-size: 11px; }
+.mention-picker > header small { color: var(--muted); font-size: 9px; }
+.mention-picker [role="option"] { display: grid; gap: 1px; width: 100%; padding: 6px 10px; border: 0; text-align: left; background: transparent; }
+.mention-picker [role="option"] strong { font: 500 11px/1.4 var(--mono); }
+.mention-picker [role="option"] small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 10px; }
+.mention-picker [role="option"]:hover { background: var(--hover); }
+.mention-picker [role="option"][aria-selected="true"] { outline: 2px solid var(--accent); outline-offset: -2px; background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.mention-status { padding: 7px 10px; color: var(--muted); font-size: 10px; }
 .composer-note { margin: 5px auto 0; color: var(--faint); text-align: center; font-size: 9px; }
 
 .scrim { position: fixed; z-index: 40; inset: 0; background: rgb(0 0 0 / .28); }

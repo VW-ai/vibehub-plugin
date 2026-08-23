@@ -1,6 +1,8 @@
 export const MAX_DRAFT_THREADS = 5;
 // The same bound the Composer applies (composer-attachments.mjs MAX_ATTACHMENTS).
 export const MAX_DRAFT_ATTACHMENTS = 6;
+// A Turn carries at most 16 inputs (daily-use-host-contract.json inputs.bound).
+export const MAX_DRAFT_MENTIONS = 14;
 
 function cloneDraft(draft) {
   const source = draft ?? {};
@@ -8,6 +10,7 @@ function cloneDraft(draft) {
     text: String(source.text ?? "").slice(0, 32_000),
     quote: source.quote ? structuredClone(source.quote) : null,
     attachments: (source.attachments ?? []).slice(0, MAX_DRAFT_ATTACHMENTS).map((item) => ({ ...item })),
+    mentions: (source.mentions ?? []).slice(0, MAX_DRAFT_MENTIONS).map((item) => ({ ...item })),
   };
 }
 
@@ -15,7 +18,7 @@ export function saveThreadDraft(store, threadId, draft, maximum = MAX_DRAFT_THRE
   if (!threadId) return;
   const bounded = cloneDraft(draft);
   store.delete(threadId);
-  if (bounded.text || bounded.quote || bounded.attachments.length) store.set(threadId, bounded);
+  if (bounded.text || bounded.quote || bounded.attachments.length || bounded.mentions.length) store.set(threadId, bounded);
   while (store.size > maximum) store.delete(store.keys().next().value);
 }
 
