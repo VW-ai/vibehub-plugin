@@ -7,7 +7,8 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const siteRoot = join(repoRoot, "site");
-const canonicalUrl = "https://vibehub.icu";
+const canonicalUrl = "https://vibehub.team";
+const redirectHosts = ["www.vibehub.team", "vibehub.icu", "www.vibehub.icu", "vibehub.systems", "www.vibehub.systems"];
 const cloudflareAccountId = "72091e7e079e357ced7f9603c03a926e";
 const pagesProjectName = "vibehub-website-v1";
 const productionBranch = "main";
@@ -68,6 +69,9 @@ async function checkConfiguration() {
   assertion(robotsSource.includes("User-agent: *"), "robots.txt must allow public crawler rules");
   assertion(robotsSource.includes(`Sitemap: ${canonicalUrl}/sitemap.xml`), "robots.txt must name the canonical sitemap");
   assertion(sitemapSource.includes(`<loc>${canonicalUrl}/</loc>`), "sitemap.xml must name the canonical homepage");
+  for (const host of redirectHosts) {
+    assertion(!sitemapSource.includes(host), `sitemap.xml must not publish the redirect-only hostname ${host}`);
+  }
 
   return {
     cloudflare_account_id: cloudflareAccountId,
@@ -170,7 +174,9 @@ async function verify(target = canonicalUrl) {
   const [robots, sitemap] = await Promise.all([robotsResponse.text(), sitemapResponse.text()]);
   assertion(robots.includes(`Sitemap: ${canonicalUrl}/sitemap.xml`), "robots.txt does not name the canonical sitemap");
   assertion(sitemap.includes(`<loc>${canonicalUrl}/</loc>`), "sitemap.xml does not name the canonical homepage");
-  assertion(!sitemap.includes("www.vibehub.icu"), "sitemap.xml must not publish the redirect-only www hostname");
+  for (const host of redirectHosts) {
+    assertion(!sitemap.includes(host), `sitemap.xml must not publish the redirect-only hostname ${host}`);
+  }
 
   return {
     requested_url: url.href,
@@ -183,13 +189,13 @@ async function verify(target = canonicalUrl) {
   };
 }
 
-async function verifyWww() {
+async function verifyRedirects() {
   const pathAndQuery = "/domain-discovery-check?source=vibehub";
   const expected = `${canonicalUrl}${pathAndQuery}`;
   const checks = [];
 
-  for (const protocol of ["http:", "https:"]) {
-    const requested = `${protocol}//www.vibehub.icu${pathAndQuery}`;
+  for (const host of redirectHosts) for (const protocol of ["http:", "https:"]) {
+    const requested = `${protocol}//${host}${pathAndQuery}`;
     const response = await fetch(requested, {
       redirect: "manual",
       signal: AbortSignal.timeout(20_000),
@@ -230,13 +236,13 @@ async function main() {
     process.stdout.write(`${JSON.stringify({ ok: true, command, ...result })}\n`);
     return;
   }
-  if (command === "verify-www") {
-    assertion(args.length === 0, "verify-www does not accept a URL argument");
-    const result = await verifyWww();
+  if (command === "verify-redirects") {
+    assertion(args.length === 0, "verify-redirects does not accept a URL argument");
+    const result = await verifyRedirects();
     process.stdout.write(`${JSON.stringify({ ok: true, command, ...result })}\n`);
     return;
   }
-  throw new Error("Usage: release.mjs <check|preflight|deploy|verify|verify-www> [https-url]");
+  throw new Error("Usage: release.mjs <check|preflight|deploy|verify|verify-redirects> [https-url]");
 }
 
 main().catch((error) => {

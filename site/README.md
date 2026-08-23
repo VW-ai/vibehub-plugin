@@ -1,6 +1,6 @@
 # VibeHub public site
 
-Production: [vibehub.icu](https://vibehub.icu)
+Production: [vibehub.team](https://vibehub.team)
 
 The public surface is one content-first causal narrative. It reads through
 normal vertical scrolling, while the Ticket cycle advances from the upper left
@@ -34,7 +34,7 @@ After deployment, verify the canonical site mechanically:
 
 ```bash
 npm run release:verify
-npm run release:verify-www
+npm run release:verify-redirects
 ```
 
 The site uses Next-compatible static export through vinext. The deployable
@@ -49,6 +49,7 @@ The deploy command accepts only a clean committed source state and attaches its
 full Git commit to the Pages deployment. Credentials, OAuth state, DNS
 validation values, certificate state, and Wrangler logs never belong in Git.
 
-`https://vibehub.icu` is the canonical production URL. The `www` hostname is
-redirect-only and its release check preserves path and query. Routine releases
-reuse these active bindings and do not edit DNS.
+`https://vibehub.team` is the canonical production URL. `vibehub.icu`,
+`vibehub.systems`, and every `www` hostname are redirect-only; the release
+check requires a permanent redirect that preserves path and query. Routine
+releases reuse these active bindings and do not edit DNS.

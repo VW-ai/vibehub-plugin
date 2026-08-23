@@ -6,7 +6,7 @@
   </picture>
 </p>
 <p align="center"><strong>Stop managing chats. Manage the work.</strong><br>Turn one coding request into a Git-native Ticket with the exact Context needed to plan, execute, prove, and close it.</p>
-<p align="center"><a href="https://vibehub.icu"><strong>vibehub.icu</strong></a> · <em>Memory tools preserve the conversation; VibeHub preserves the development cycle.</em></p>
+<p align="center"><a href="https://vibehub.team"><strong>vibehub.team</strong></a> · <em>Memory tools preserve the conversation; VibeHub preserves the development cycle.</em></p>
 
 ## Install
 
