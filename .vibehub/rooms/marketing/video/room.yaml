@@ -6,7 +6,7 @@
         "path": "assets/video/README.md"
       },
       {
-        "blob": "e7dc23fc22d94241cb62bd6333a0ce51835eb802",
+        "blob": "fc8fb00e52d394131e8e2b147b9bcabefc0b57ce",
         "path": "assets/video/STORYBOARD.md"
       },
       {
@@ -22,7 +22,7 @@
         "path": "assets/video/glance/hyperframes.json"
       },
       {
-        "blob": "fe6b77863db48da170405955210e4bbdd018ddac",
+        "blob": "48e2117a1e71a5e6ee0326096e6a7a5e7050baa5",
         "path": "assets/video/glance/index.html"
       },
       {
@@ -34,11 +34,11 @@
         "path": "assets/video/glance/package.json"
       },
       {
-        "blob": "b9ff2897f41dfc8bff77d10c8d51754030c292ae",
+        "blob": "bc35a9c2f11f0581ac81535a298f4d7123d55dd8",
         "path": "assets/video/renders/glance-v3.mp4"
       },
       {
-        "blob": "35e32202216ccdab240ce22dc14c5ddfd9373a07",
+        "blob": "c8d1beb1971cc982a3ecdac8dbd98c04ec21f487",
         "path": "assets/video/renders/taskstory-v3.mp4"
       },
       {
@@ -78,7 +78,7 @@
         "path": "assets/video/taskstory/hyperframes.json"
       },
       {
-        "blob": "9ca811ce5bfda539245b0588075f31a7d608a1ac",
+        "blob": "dadf7049b6b763eb86cd357ec4271108b95a9ac1",
         "path": "assets/video/taskstory/index.html"
       },
       {
@@ -90,8 +90,8 @@
         "path": "assets/video/taskstory/package.json"
       }
     ],
-    "checked_at": "2026-08-23T07:09:48.853Z",
-    "last_aligned_commit": "ba21fe159325ee5b0e3e5a8cd7efe164d3727506"
+    "checked_at": "2026-08-23T07:13:47.631Z",
+    "last_aligned_commit": "3ac979dc97269f6be284fc1691c9c1e8feb25675"
   },
   "anchors": [
     "assets/video/"

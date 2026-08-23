@@ -69,7 +69,7 @@ body{font-family:var(--mono);color:var(--ink)}
 
   <div id="end" class="clip end" data-start="22" data-duration="3" data-track-index="1">
     <h1>Manage the task.<br>VibeHub manages the rest.</h1>
-    <div class="cta">/plugin install vibehub</div>
+    <div class="cta">npx skills add VW-ai/vibehub-plugin</div>
   </div>
 </div>
 <script>
@@ -77,7 +77,7 @@ window.__timelines = window.__timelines || {};
 const tl = gsap.timeline({ paused: true });
 // typing helpers (deterministic)
 function type(sel, text, at, per){ const el=document.querySelector(sel); for(let i=1;i<=text.length;i++){ tl.call(()=>{el.textContent=text.slice(0,i)}, null, at+i*per);} }
-type("#c1","/plugin install vibehub",0.3,0.055);
+type("#c1","npx skills add VW-ai/vibehub-plugin",0.2,0.06);
 type("#c2","Start this with VibeHub.",10.2,0.06);
 // chat messages
 tl.to("#m1",{opacity:1,duration:.3},2.8);

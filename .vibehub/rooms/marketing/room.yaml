@@ -10,7 +10,7 @@
         "path": "site/README.md"
       },
       {
-        "blob": "e386fb0f290f25160764ad8a824b29126eb9aa10",
+        "blob": "7a236797727f7e1f09e7d23e1aa0e3d19bf20b65",
         "path": "site/app/globals.css"
       },
       {
@@ -18,7 +18,7 @@
         "path": "site/app/layout.tsx"
       },
       {
-        "blob": "525c2d8a5a75c0240962802f7f73dae5701eb760",
+        "blob": "3b6ffe553fd78ce319755e7d215cc23362366ba7",
         "path": "site/app/page.tsx"
       },
       {
@@ -94,7 +94,7 @@
         "path": "site/release/scripts/release.mjs"
       },
       {
-        "blob": "a924e9cbadcabc54424857d50d468b7546c04da2",
+        "blob": "26f17ce8425ee767e0260290e9b9f9e67644a9bd",
         "path": "site/tests/rendered-html.test.mjs"
       },
       {
@@ -110,8 +110,8 @@
         "path": "site/worker/index.ts"
       }
     ],
-    "checked_at": "2026-08-23T07:01:37.403Z",
-    "last_aligned_commit": "bfde86906c17580812286420cf12e80f10e44961"
+    "checked_at": "2026-08-23T07:13:47.414Z",
+    "last_aligned_commit": "3ac979dc97269f6be284fc1691c9c1e8feb25675"
   },
   "anchors": [
     "site/"
