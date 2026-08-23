@@ -1,0 +1,14 @@
+{
+  "acceptance_ids": [
+    "skills-sh-install-works-end-to-end"
+  ],
+  "evidence_id": "skills-sh-e2e-both-hosts",
+  "kind": "ticket_evidence",
+  "recorded_at": "2026-08-23T02:26:00Z",
+  "refs": [
+    ".vibehub/evidence/ticket-implement-npx-first-install-experience/skills-sh-install-e2e-2026-08-22.txt"
+  ],
+  "schema_version": 1,
+  "summary": "In a scratch project, npx skills add <local checkout at bd7b4e8> for -a claude-code and -a codex copied twelve folders including vibehub-core into .claude/skills/ and .agents/skills/; copied SKILL.md files have 0 dangling ../scripts or ../contracts references; node .claude/skills/vibehub-ticket-plan/../vibehub-core/scripts/vh.mjs project init and project validate succeeded against a fixture project and the codex copy answered project compatibility CURRENT; templates/github arrived. skills.sh cannot clone a branch whose name contains a slash (it parsed claude/tickets-issues-sync-5a183b as branch claude), so the test used the local path form; after merge the owner/repo form resolves main.",
+  "ticket_id": "ticket-implement-npx-first-install-experience"
+}
