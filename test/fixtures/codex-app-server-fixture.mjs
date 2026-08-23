@@ -19,8 +19,12 @@
 //                                start, the way the real app-server replays
 //                                rollouts: a reloaded Thread is `notLoaded`
 //                                until resumed, and a Turn that was in
-//                                progress when the process died keeps its
-//                                persisted status instead of being repaired;
+//                                progress when the process died replays as
+//                                `interrupted` (observed on Codex 0.149.0 by
+//                                packages/codex-adapter/probe-interrupted-turn-live.mjs:
+//                                the orphaned Turn is never repaired back to
+//                                inProgress, and nothing streamed for it is
+//                                persisted beyond the items already durable);
 //   CODEX_FIXTURE_PIDFILE=<path> append this process id so a test can kill
 //                                the app-server from outside;
 //   CODEX_FIXTURE_MAX_STARTS=<n> with a pidfile, refuse to start once n
@@ -40,7 +44,7 @@ if (process.argv[2] !== "app-server" || !process.argv.includes("--listen")) {
   process.exit(2);
 }
 
-const version = process.env.CODEX_FIXTURE_VERSION ?? "0.147.0";
+const version = process.env.CODEX_FIXTURE_VERSION ?? "0.149.0";
 const logPath = process.env.CODEX_FIXTURE_LOG ?? null;
 const statePath = process.env.CODEX_FIXTURE_STATE ?? null;
 const pidPath = process.env.CODEX_FIXTURE_PIDFILE ?? null;
@@ -118,9 +122,11 @@ function loadState() {
   for (const section of state.sections ?? []) sections.set(section.id, { id: section.id, name: section.name });
   for (const thread of state.threads ?? []) {
     // A Thread read back from disk is not loaded into this process until it
-    // is resumed; its Turns are exactly what was persisted, orphaned
-    // in-progress status included.
-    threads.set(thread.id, { ...thread, status: { type: "notLoaded" } });
+    // is resumed. A Turn that was still in progress when the previous
+    // process died replays as interrupted, as the real app-server reports
+    // it; no live status survives a process boundary.
+    const turns = (thread.turns ?? []).map((turn) => (turn.status === "inProgress" ? { ...turn, status: "interrupted" } : turn));
+    threads.set(thread.id, { ...thread, turns, status: { type: "notLoaded" } });
   }
   return true;
 }
