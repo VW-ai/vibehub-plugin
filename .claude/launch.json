@@ -1,6 +1,0 @@
-{
-  "version": "0.0.1",
-  "configurations": [
-    { "name": "site-static", "runtimeExecutable": "npx", "runtimeArgs": ["-y", "serve", "-l", "4173", "site/dist/client"], "port": 4173 }
-  ]
-}
