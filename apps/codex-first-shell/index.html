@@ -126,12 +126,59 @@
   <aside class="review-panel" id="reviewPanel" role="dialog" aria-modal="true" hidden inert aria-labelledby="reviewTitle">
     <header><div><small>OWNER REVIEW PACK</small><h2 id="reviewTitle">Codex-first product boundary</h2></div><button type="button" id="closeReview">Close</button></header>
     <section><span>Promise</span><h3>Codex familiarity + VibeHub Tasks</h3><p>Codex owns Threads, Turns, tools, approvals and execution. VibeHub adds a durable Task Graph, focused Task Workspace, Context, Evidence and independent Outcome.</p></section>
-    <section><span>Current composition</span><ul><li>Chat is the default landing. Project names only the repository-bound VibeHub Project; chat groups are native Codex Thread Sections, and Recents contains only unsectioned real Codex Threads in this folder.</li><li>Drag and the Chat-header selector move native group membership. Fork preserves lineage and source group; deleting a group returns member Chats to Recents.</li><li>Codex history from other folders is counted, never listed. Explicit single-folder Codex Project import writes the .vibehub scaffold uncommitted and hands Room creation to distill.</li><li>Replay and live events share stable app-server item identity; answers stay primary while tool, diff and delegated work group into quiet Turn disclosures.</li><li>Inline approvals pause the exact Turn; retry, interruption and completion never become VibeHub Outcome claims.</li><li>Tasks is a distinct top-level destination; typed Search never relabels a Chat as a Task.</li><li>The Task Inbox surfaces current Needs You boundaries and repository completion history; Running does not notify.</li><li>A Task opens a focused Workspace; Start routes the exact host handoff into one Codex Thread.</li><li>Voice uses ordinary Codex audio input. Realtime conversation stays unavailable until the runtime reports support.</li></ul></section>
-    <section><span>Later, not now</span><p>Final desktop wrapper, Chat→Task and Remember persistence, complete visual approval, public packaging and DSH compatibility remain separate Tickets.</p></section>
+    <section><span>Current composition</span><ul><li>Chat is the default landing. Project names only the repository-bound VibeHub Project; chat groups are native Codex Thread Sections, and Recents contains only unsectioned real Codex Threads in this folder.</li><li>Drag and the Chat-header selector move native group membership. Fork preserves lineage and source group; deleting a group returns member Chats to Recents.</li><li>Codex history from other folders is counted, never listed. Explicit single-folder Codex Project import writes the .vibehub scaffold uncommitted and hands Room creation to distill.</li><li>Replay and live events share stable app-server item identity; answers stay primary while tool, diff and delegated work group into quiet Turn disclosures.</li><li>Inline approvals pause the exact Turn; retry, interruption and completion never become VibeHub Outcome claims.</li><li>Tasks is a distinct top-level destination; typed Search never relabels a Chat as a Task.</li><li>The Task Inbox surfaces current Needs You boundaries and repository completion history; Running does not notify.</li><li>A Task opens a focused Workspace; Start routes the exact host handoff into one Codex Thread.</li><li>Finalized assistant messages and selections offer Create Task, Attach to Task and Remember. Each confirms into one host action that writes one Ticket or Context document uncommitted with exact origin provenance; the Chat is never rewritten, Quote into Task reaches the Agent only inside the host-built packet, and associations never become dependencies.</li><li>Voice uses ordinary Codex audio input. Realtime conversation stays unavailable until the runtime reports support.</li></ul></section>
+    <section><span>Later, not now</span><p>Final desktop wrapper, a Task-update action beyond Attach and Quote into Task, complete visual approval, public packaging and DSH compatibility remain separate Tickets.</p></section>
     <section><span>Owner decision after review</span><ol><li>Does the real Thread now feel calm enough for daily Codex use?</li><li>Are grouped execution activities easy to inspect without overpowering the answer?</li><li>Does Chat-first still make important Tasks visible at the right moment?</li><li>Is Search the simplest bridge across Chat, Task and Context?</li><li>Is the bell plus small Needs You Sidebar group enough without becoming a dashboard?</li><li>Should Task focus replace the center column or open beside Chat?</li><li>Is voice placement familiar and quiet enough?</li></ol></section>
   </aside>
 
+  <section class="bridge-dialog" id="createTaskDialog" role="dialog" aria-modal="true" aria-labelledby="createTaskTitle" hidden inert>
+    <header><div><small>VIBEHUB TASK · EXPLICIT WRITE</small><h2 id="createTaskTitle">Create Task from this message</h2></div><button type="button" id="closeCreateTask">Close</button></header>
+    <form class="bridge-form" id="createTaskForm">
+      <p class="bridge-source" id="createTaskSource"></p>
+      <label><span>Task title</span><input id="createTaskTitleInput" type="text" maxlength="200" autocomplete="off" required></label>
+      <p class="bridge-derived">Task id <output id="createTaskId" for="createTaskTitleInput" aria-live="polite">—</output></p>
+      <label><span>Outcome <em>required</em></span><textarea id="createTaskOutcome" rows="2" maxlength="2000" required placeholder="What must be true for this Task to be done?"></textarea></label>
+      <label><span>Context</span><textarea id="createTaskContext" rows="5" maxlength="20000" required></textarea></label>
+      <details class="bridge-packet" id="createTaskPacketDetails" data-disclosure-id="create-task-packet" open><summary>Context packet the Task would send <span id="createTaskPacketSize"></span></summary><pre id="createTaskPacket" data-packet-preview tabindex="0" aria-label="Previewed Task Context packet"></pre></details>
+      <p class="bridge-status" id="createTaskStatus" role="status" aria-live="polite">Write the outcome to preview the Task.</p>
+    </form>
+    <footer><span id="createTaskWrite">Writes one draft Ticket, uncommitted. Nothing is committed.</span><div><button type="button" id="cancelCreateTask">Cancel</button><button class="primary-button" type="submit" form="createTaskForm" id="confirmCreateTask" disabled>Create Task</button></div></footer>
+  </section>
+  <section class="bridge-dialog" id="attachTaskDialog" role="dialog" aria-modal="true" aria-labelledby="attachTaskTitle" hidden inert>
+    <header><div><small>VIBEHUB TASK · EXPLICIT WRITE</small><h2 id="attachTaskTitle">Attach this message to a Task</h2></div><button type="button" id="closeAttachTask">Close</button></header>
+    <p class="bridge-source" id="attachTaskSource"></p>
+    <p class="bridge-intro">Attach appends one provenance reference to the chosen Task; origin, acceptance and relations stay untouched. Quote into Task places the passage into that Task's own conversation draft instead, where it reaches the Agent only inside the host-built packet. Neither touches this Chat.</p>
+    <div class="attach-list" id="attachTaskList" aria-live="polite"><p class="muted">Reading Tasks…</p></div>
+    <p class="bridge-status" id="attachTaskStatus" role="status" aria-live="polite"></p>
+    <footer><span id="attachTaskSelection">Select a Task.</span><div><button type="button" id="cancelAttachTask">Cancel</button><button type="button" id="quoteIntoTask" disabled>Quote into Task</button><button class="primary-button" type="button" id="confirmAttachTask" disabled>Attach</button></div></footer>
+  </section>
+  <section class="bridge-dialog" id="rememberDialog" role="dialog" aria-modal="true" aria-labelledby="rememberTitle" hidden inert>
+    <header><div><small>VIBEHUB CONTEXT · GOVERNED PROPOSAL</small><h2 id="rememberTitle">Remember as durable Context</h2></div><button type="button" id="closeRemember">Close</button></header>
+    <form class="bridge-form" id="rememberForm">
+      <p class="bridge-source" id="rememberSource"></p>
+      <blockquote class="bridge-quote" id="rememberQuote" tabindex="0" aria-label="Quoted passage"></blockquote>
+      <div class="bridge-row">
+        <label><span>Room <em>existing only</em></span><select id="rememberRoom" required></select></label>
+        <label><span>Type</span><select id="rememberType"><option value="intent">intent</option><option value="decision">decision</option><option value="constraint">constraint</option><option value="contract">contract</option><option value="convention">convention</option><option value="change">change</option><option value="note" selected>note</option></select></label>
+      </div>
+      <label><span>Summary</span><input id="rememberSummary" type="text" maxlength="300" autocomplete="off" required></label>
+      <label><span>Detail</span><textarea id="rememberDetail" rows="4" maxlength="20000" required></textarea></label>
+      <div class="bridge-row">
+        <label><span>Tags <em>comma separated</em></span><input id="rememberTags" type="text" autocomplete="off" placeholder="login, reliability"></label>
+        <label><span>Evidence note <em>optional</em></span><input id="rememberEvidence" type="text" maxlength="1000" autocomplete="off" placeholder="Why this claim holds"></label>
+      </div>
+      <p class="bridge-status" id="rememberStatus" role="status" aria-live="polite"></p>
+    </form>
+    <footer><span id="rememberWrite">Writes one active Context document into the chosen Room, uncommitted. Git review activates it; no Room is ever created.</span><div><button type="button" id="cancelRemember">Cancel</button><button class="primary-button" type="submit" form="rememberForm" id="confirmRemember" disabled>Remember</button></div></footer>
+  </section>
+
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
-  <button class="quote-selection" id="quoteSelection" type="button" hidden>Add to chat</button>
+  <div class="selection-sheet" id="selectionSheet" role="toolbar" aria-label="Selected passage actions" hidden>
+    <button class="quote-selection" id="quoteSelection" type="button">Add to chat</button>
+    <button class="quote-selection" type="button" data-selection-bridge="create-task" hidden>Create Task</button>
+    <button class="quote-selection" type="button" data-selection-bridge="attach-task" hidden>Attach to Task</button>
+    <button class="quote-selection" type="button" data-selection-bridge="remember" hidden>Remember</button>
+    <small class="bridge-hint" id="selectionSheetHint" role="note" hidden></small>
+  </div>
 </body>
 </html>

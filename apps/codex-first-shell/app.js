@@ -1,13 +1,15 @@
-import { applyChatEvent, canonicalTimeline, timelineWindow } from "./chat-model.mjs";
+import { applyChatEvent, canonicalTimeline, itemKey, timelineWindow } from "./chat-model.mjs";
 import {
   DOM_LIMITS,
   createRenderBudget,
   escapeHtml,
   renderAgentMessage,
   renderGeneratedImage,
+  messageFinalized,
   renderMarkdown,
   renderTimelineOmission,
   renderToolContent,
+  renderTurnAssociations,
   renderUserMedia,
   renderUserMessageText,
   takeText,
@@ -17,7 +19,7 @@ import { loadThreadDraft, saveThreadDraft } from "./composer-drafts.mjs";
 import { clampComposerHeight, composerBounds } from "./composer-sizing.mjs";
 import { threadLocation } from "./thread-location.mjs";
 import { answersFromDraft, applyRequestDraft, loadRequestDraft, pruneRequestDrafts, requestDraftFromForm, saveRequestDraft } from "./request-drafts.mjs";
-import { composeQuotedMessage } from "./quote-source.mjs";
+import { buildOrigin, codexThreadRef, composeQuotedMessage, describeSelection, locateSelection, parseQuotedMessage, sha256Hex, sourceIdentityLabel } from "./quote-source.mjs";
 import { planTimelineReconciliation } from "./timeline-reconcile.mjs";
 
 const state = {
@@ -72,6 +74,13 @@ const state = {
   importCandidates: null,
   importSelectedId: null,
   importing: false,
+  // The open explicit bridge surface (Create Task, Attach to Task, Remember):
+  // the exact source identity it acts on and the host preview it shows.
+  bridge: null,
+  // Quote into Task for a Task without a Codex Thread yet: the pending quote
+  // keyed by Task id, in memory only, sent solely as startTask.humanMessage.
+  taskQuoteDrafts: new Map(),
+  overlayReturnSelector: null,
 };
 
 const MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024;
@@ -132,6 +141,48 @@ function projectDestinationName(projectId) {
 
 function scopeBound() {
   return state.bootstrap?.project?.scope === "bound";
+}
+
+// Availability of the explicit Chat bridge, in the host's own words: the
+// Project must be bound, and a review fixture is never a source of a real
+// Ticket or Context write.
+function bridgeAvailability() {
+  if (state.fixtureMode) return { available: false, reason: "Review fixture only: this Thread is not Codex history." };
+  if (scopeBound()) return { available: true, reason: null };
+  return { available: false, reason: state.bootstrap?.project?.reason ?? "No bound VibeHub Project is available for this folder." };
+}
+
+// Chat associations of every Task, from the canonical graph rows alone
+// (origin and codex-thread provenance references, never a Thread name).
+function taskAssociations() {
+  return scopeBound() ? (state.bootstrap?.graph?.tickets ?? []).flatMap((ticket) => ticket.associations?.map((association) => ({ ...association, ticketId: ticket.ticketId, status: ticket.capabilities?.operational?.summary?.label ?? null })) ?? []) : [];
+}
+
+function associationsForThread(threadId) {
+  const byTurn = new Map();
+  for (const association of taskAssociations()) {
+    if (association.threadId !== threadId) continue;
+    if (!byTurn.has(association.turnId)) byTurn.set(association.turnId, []);
+    byTurn.get(association.turnId).push(association);
+  }
+  // Tasks born from the Turn come before Tasks merely attached to it.
+  for (const entries of byTurn.values()) entries.sort((left, right) => (left.kind === right.kind ? 0 : left.kind === "origin" ? -1 : 1));
+  return byTurn;
+}
+
+function taskOrigin(ticketId) {
+  return state.bootstrap?.graph?.tickets?.find((ticket) => ticket.ticketId === ticketId)?.associations?.find((association) => association.kind === "origin") ?? null;
+}
+
+function threadTitleById(threadId) {
+  const thread = state.threads.find((entry) => entry.id === threadId);
+  return thread ? titleForThread(thread) : null;
+}
+
+function originLabel(ticketId) {
+  const origin = taskOrigin(ticketId);
+  if (!origin) return "";
+  return `Born from Chat ${threadTitleById(origin.threadId) ?? `${origin.threadId.slice(0, 8)}…`} · Turn ${origin.turnId}`;
 }
 
 function scopeLabel(project) {
@@ -295,7 +346,16 @@ async function api(path, options = {}) {
     headers: { authorization: `Bearer ${token}`, "content-type": "application/json", ...(options.headers ?? {}) },
   });
   const envelope = await response.json();
-  if (!response.ok || !envelope.ok) throw new Error(envelope.error?.message ?? `Request failed (${response.status})`);
+  if (!response.ok || !envelope.ok) {
+    // The host's error envelope keeps its code and details (ticket_exists
+    // names the derived id, room_missing lists the Rooms, validation_error
+    // carries the validator's paths) so a surface can explain the refusal.
+    const error = new Error(envelope.error?.message ?? `Request failed (${response.status})`);
+    error.code = envelope.error?.code ?? null;
+    error.status = response.status;
+    error.details = envelope.error ?? null;
+    throw error;
+  }
   return envelope.data;
 }
 
@@ -320,27 +380,45 @@ function humanize(ticketId) {
   return String(ticketId).replace(/^ticket-/, "").split("-").map((part) => part[0]?.toUpperCase() + part.slice(1)).join(" ");
 }
 
+// Tasks each Chat birthed or was attached to, from checked-in Ticket YAML;
+// computed once per sidebar render.
+let sidebarTasksByThread = new Map();
+
+function tasksByThread() {
+  const byThread = new Map();
+  for (const association of taskAssociations()) {
+    if (!byThread.has(association.threadId)) byThread.set(association.threadId, new Set());
+    byThread.get(association.threadId).add(association.ticketId);
+  }
+  return byThread;
+}
+
 function threadButton(thread) {
   const active = thread.id === state.activeThreadId;
   // The presence dot is a live claim: it needs a live runtime as well as the
   // last status the app-server reported for the Thread.
   const runtimeActive = state.runtimeAlive && !state.bootstrap?.stop && String(thread.status?.type ?? thread.status ?? "").toLowerCase().includes("active");
+  const born = sidebarTasksByThread.get(thread.id) ?? new Set();
+  const badge = thread.taskLink
+    ? "<em>TASK</em>"
+    : born.size ? `<em data-born-tasks="${born.size}" title="${born.size} Task${born.size === 1 ? "" : "s"} born from or attached to this Chat">${born.size} TASK${born.size === 1 ? "" : "S"}</em>` : "";
   return `<button class="thread-button${active ? " active" : ""}" type="button" data-thread-id="${escapeHtml(thread.id)}">
     <i class="thread-state${runtimeActive ? " active" : ""}"></i>
     <span><strong>${escapeHtml(titleForThread(thread))}</strong><small>${escapeHtml(thread.taskLink ? "VibeHub Task · Codex Thread" : (thread.preview || "Codex Thread").slice(0, 54))}</small></span>
-    ${thread.taskLink ? "<em>TASK</em>" : ""}
+    ${badge}
   </button>`;
 }
 
 function updateSidebar() {
   const list = $("#threadList");
+  sidebarTasksByThread = tasksByThread();
   const focused = sidebar.contains(document.activeElement)
     ? { threadId: document.activeElement.dataset.threadId, ticketId: document.activeElement.dataset.ticketId, id: document.activeElement.id }
     : null;
   const needsYou = scopeBound() ? state.bootstrap?.attention?.needsYou ?? [] : [];
   const attention = $("#sidebarAttention");
   attention.hidden = needsYou.length === 0;
-  $("#sidebarAttentionList").innerHTML = needsYou.slice(0, 3).map((item) => `<button class="attention-item" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Task · Needs you</small></span></button>`).join("");
+  $("#sidebarAttentionList").innerHTML = needsYou.slice(0, 3).map((item) => `<button class="attention-item" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Task · Needs you${taskOrigin(item.ticketId) ? ` · ${escapeHtml(originLabel(item.ticketId))}` : ""}</small></span></button>`).join("");
   $("#pinnedSection").hidden = state.pinned.length === 0;
   $("#pinnedList").innerHTML = state.pinned.map(threadButton).join("");
   $("#projectList").innerHTML = state.projects.length
@@ -403,6 +481,12 @@ function syncThreadLocation() {
 
 function setRoute(route) {
   captureRequestDrafts(surface);
+  // Leaving a Task Workspace that has no Codex Thread yet: its pending Quote
+  // into Task stays keyed to the Task, and never leaks into ordinary Chat.
+  if (state.route === "task" && route !== "task" && !state.activeThreadId) {
+    captureTaskQuoteDraft();
+    restoreComposerDraft(null);
+  }
   state.route = route;
   closeMobileSidebar(false);
   const activeRoute = route === "task" ? "tasks" : route;
@@ -434,7 +518,11 @@ function syncComposerMode() {
   for (const fork of $$("[data-fork-thread]")) fork.disabled = state.fixtureMode || state.running || halted;
   input.placeholder = taskMode ? (linked ? "Message this Task" : "Start the Task to open its Codex conversation") : "Ask Codex to do something";
   $("#composerNote").textContent = taskMode
-    ? (linked ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.` : "The host will open a linked Codex Thread with the canonical Task packet.")
+    ? (linked
+      ? `${state.taskSelectedContextIds.size} Context item${state.taskSelectedContextIds.size === 1 ? "" : "s"} included in the next Turn · Browser never rebuilds the packet.`
+      : state.composerQuote
+        ? "Pending quote: Start sends it as this Task's first message inside the host-built packet. Nothing is written to the source Chat."
+        : "The host will open a linked Codex Thread with the canonical Task packet.")
     : "Codex can make mistakes. Review commands and changes.";
 }
 
@@ -467,8 +555,11 @@ function setRuntimePosture({ alive, generation = state.runtimeGeneration, state:
   syncComposerMode();
 }
 
+const BRIDGE_DIALOG_IDS = ["createTaskDialog", "attachTaskDialog", "rememberDialog"];
+const openBridgeDialog = () => BRIDGE_DIALOG_IDS.map((id) => $(`#${id}`)).find((dialog) => dialog && !dialog.hidden) ?? null;
+
 function syncScrim() {
-  const overlayOpen = !$("#searchDialog").hidden || !$("#inboxPanel").hidden || !$("#reviewPanel").hidden || !$("#importDialog").hidden;
+  const overlayOpen = !$("#searchDialog").hidden || !$("#inboxPanel").hidden || !$("#reviewPanel").hidden || !$("#importDialog").hidden || Boolean(openBridgeDialog());
   const mobileNavigationOpen = appShell.classList.contains("sidebar-open") && isNarrowLayout();
   $("#scrim").hidden = !overlayOpen && !mobileNavigationOpen;
   appShell.inert = overlayOpen;
@@ -650,8 +741,9 @@ function formatWhen(value) {
 
 function renderInbox() {
   const attention = state.bootstrap?.attention ?? { needsYou: [], recentCompletions: [] };
-  const needs = attention.needsYou.map((item) => `<button class="inbox-row needs-you" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Needs your explicit decision</small></span><em>Task</em></button>`).join("");
-  const completed = attention.recentCompletions.map((item) => `<button class="inbox-row" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Successful Outcome · ${escapeHtml(formatWhen(item.closedAt))}</small></span><em>${state.unreadCompletionKeys.has(completionKey(item)) ? "New" : "History"}</em></button>`).join("");
+  const originNote = (ticketId) => (taskOrigin(ticketId) ? ` · ${escapeHtml(originLabel(ticketId))}` : "");
+  const needs = attention.needsYou.map((item) => `<button class="inbox-row needs-you" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Needs your explicit decision${originNote(item.ticketId)}</small></span><em>Task</em></button>`).join("");
+  const completed = attention.recentCompletions.map((item) => `<button class="inbox-row" type="button" data-ticket-id="${escapeHtml(item.ticketId)}"><i></i><span><strong>${escapeHtml(humanize(item.ticketId))}</strong><small>Successful Outcome · ${escapeHtml(formatWhen(item.closedAt))}${originNote(item.ticketId)}</small></span><em>${state.unreadCompletionKeys.has(completionKey(item)) ? "New" : "History"}</em></button>`).join("");
   $("#inboxContent").innerHTML = `<section class="inbox-section"><header><span>Needs you</span><span>${attention.needsYou.length}</span></header>${needs || '<p class="inbox-empty">Nothing currently needs your decision.</p>'}</section><section class="inbox-section"><header><span>Recently completed</span><span>Repository history</span></header>${completed || '<p class="inbox-empty">No successful Outcomes yet.</p>'}</section>`;
 }
 
@@ -851,7 +943,7 @@ function renderItem(item, budget) {
     const media = renderUserMedia(item.content, budget);
     return `<div class="turn user" data-item-id="${escapeHtml(identity)}"><article>${text ? `<div>${renderUserMessageText(text, budget, { currentThreadId: item._threadId })}</div>` : ""}${media}</article></div>`;
   }
-  if (item.type === "agentMessage") return renderAgentMessage(item, budget);
+  if (item.type === "agentMessage") return renderAgentMessage(item, budget, { bridge: bridgeAvailability() });
   if (item.type === "reasoning") {
     const text = [...(item.summary ?? []), ...(item.content ?? [])].join("\n");
     return `<div class="activity-row">${disclosureCard({ identity, kind: "reasoning", icon: "✦", title: "Reasoning", status: statusLabel(item), summary: item._live ? "Thinking…" : "Reasoning summary", detail: `${renderMarkdown(text || "Reasoned about the request", budget)}${liveOmission(item)}` })}</div>`;
@@ -894,7 +986,7 @@ function renderItem(item, budget) {
   if (item.type === "imageGeneration") return `<div class="activity-row">${disclosureCard({ identity, kind: "image-generation", icon: "▧", title: "Image generation", status: statusLabel(item), summary: takeText(budget, item.prompt ?? "Generated image activity", 240).text, detail: renderGeneratedImage(item, budget), open: Boolean(item.result) })}</div>`;
   if (item.type === "enteredReviewMode" || item.type === "exitedReviewMode") return `<div class="timeline-divider"><span>${item.type === "enteredReviewMode" ? "Entered" : "Finished"} review</span><strong>${escapeHtml(takeText(budget, item.review, 1_000).text)}</strong></div>`;
   if (item.type === "contextCompaction") return '<div class="timeline-divider"><span>Context compacted</span><strong>Earlier detail remains in Thread history</strong></div>';
-  if (item.type === "hookPrompt") return `<div class="timeline-divider"><span>Project instructions</span><strong>${escapeHtml((item.fragments ?? []).map((fragment) => fragment.text ?? fragment.content ?? "").join(" ").slice(0, 120))}</strong></div>`;
+  if (item.type === "hookPrompt") return `<div class="timeline-divider" data-hook-prompt="${escapeHtml(identity)}"><span>Repository instructions</span><strong>${escapeHtml((item.fragments ?? []).map((fragment) => fragment.text ?? fragment.content ?? "").join(" ").slice(0, 120))}</strong></div>`;
   if (item.type === "turnError") return `<section class="turn-error"><strong>${item.willRetry ? "Codex is retrying" : "This Turn stopped"}</strong><p>${escapeHtml(takeText(budget, item.message, 4_000).text)}</p>${item.willRetry ? '<span class="retrying">Retrying…</span>' : `<button type="button" data-retry-turn="${escapeHtml(item._turnId)}">Retry as a new Turn</button>`}</section>`;
   if (item.type === "turnBoundary") return `<div class="turn-boundary ${escapeHtml(item.status)}"><span>${item.status === "interrupted" ? "Turn interrupted" : item.status === "runtimeExited" ? "Runtime exited during this Turn" : "Turn failed"}</span><strong>${escapeHtml(takeText(budget, item.message ?? (item.status === "interrupted" ? "Partial output remains in Thread history." : "The error remains inspectable in this Thread."), 4_000).text)}</strong></div>`;
   return `<div class="activity-row">${disclosureCard({ identity, kind: "unknown", icon: "?", title: item.type ?? "Unsupported item", status: statusLabel(item), summary: "Inspect raw app-server item; no result inferred", detail: boundedPre(JSON.stringify(item, null, 2), "", 8_000, budget) })}</div>`;
@@ -944,6 +1036,21 @@ function renderTimelineItems(items) {
   const output = [];
   let group = [];
   let groupOrdinal = 0;
+  // Every Task born from or attached to a Turn of this Thread, rendered as
+  // one inline marker after the Turn's last item. The marker is read from the
+  // canonical graph rows; the Chat itself is never rewritten.
+  const threadId = items[0]?._threadId ?? state.activeThreadId;
+  const associations = associationsForThread(threadId);
+  let currentTurnId = null;
+  let turnOpen = false;
+  const closeTurn = () => {
+    if (!turnOpen) return;
+    turnOpen = false;
+    const entries = associations.get(currentTurnId);
+    if (!entries?.length) return;
+    const key = `associations-${threadId ?? "thread"}--${currentTurnId ?? "turn"}`;
+    output.push(`<div class="timeline-entry turn-associations-entry" data-render-key="${escapeHtml(key)}">${renderTurnAssociations({ turnId: currentTurnId, entries: entries.map((entry) => ({ ticketId: entry.ticketId, label: humanize(entry.ticketId), kind: entry.kind, status: entry.status })) })}</div>`);
+  };
   const flush = () => {
     if (!group.length) return;
     // "Working…" is a live claim: it needs a streamed item or an in-progress
@@ -959,6 +1066,12 @@ function renderTimelineItems(items) {
     group = [];
   };
   for (const item of items) {
+    if (item._turnId !== currentTurnId || !turnOpen) {
+      flush();
+      closeTurn();
+      currentTurnId = item._turnId;
+      turnOpen = true;
+    }
     if (groupableActivityTypes.has(item.type) && (!group.length || group[0]._turnId === item._turnId)) group.push(item);
     else {
       flush();
@@ -967,6 +1080,7 @@ function renderTimelineItems(items) {
     }
   }
   flush();
+  closeTurn();
   return output.join("");
 }
 
@@ -1140,7 +1254,7 @@ function primaryPhase(ticket) {
 
 function substate(ticket) {
   const operational = operationalLabel(ticket);
-  if (operational === "BLOCKED" || operational === "DEVIATED") return operational;
+  if (["BLOCKED", "DEVIATED", "REFINE"].includes(operational)) return operational;
   const actionName = ticket.capabilities.nextAction.summary.action;
   return ({ NEEDS_HUMAN: "NEEDS YOU", CLOSE_OUT: "VERIFYING" })[actionName] ?? "";
 }
@@ -1167,12 +1281,54 @@ function topologicalTickets(tickets, relations) {
   return ordered.length === tickets.length ? ordered : tickets;
 }
 
+// The Task whose provenance the Graph draws: the focused card, else the Task
+// the Workspace was last opened on. Selection is presentation state only.
+function focusedGraphTicketId() {
+  const focused = document.activeElement?.closest?.(".task-card")?.dataset.ticketId;
+  if (focused) return focused;
+  return state.activeTicketId && $(`.graph .task-card[data-ticket-id="${CSS.escape(state.activeTicketId)}"]`) ? state.activeTicketId : null;
+}
+
+// Source Chats of the focused Task as nodes above the cards, so a Chat-to-Task
+// provenance edge has a Chat end. Associations come from checked-in Ticket
+// YAML; clicking a node opens that Codex Thread as ordinary Chat.
+function renderGraphSources() {
+  const strip = $("#graphSources");
+  if (!strip) return;
+  const ticketId = focusedGraphTicketId();
+  const associations = ticketId ? taskAssociations().filter((association) => association.ticketId === ticketId) : [];
+  strip.dataset.provenanceTicket = ticketId ?? "";
+  if (!ticketId) {
+    strip.innerHTML = '<p class="graph-sources-empty">Focus a Task to see the Chats it was born from or attached to. Provenance is never a dependency.</p>';
+    return;
+  }
+  if (!associations.length) {
+    strip.innerHTML = `<p class="graph-sources-empty">${escapeHtml(humanize(ticketId))} was not born from a Codex Chat and has no attached Turn.</p>`;
+    return;
+  }
+  strip.innerHTML = `<span class="graph-sources-label">Provenance of ${escapeHtml(humanize(ticketId))}</span>${associations.map((association) => `<button type="button" class="graph-chat" data-thread-id="${escapeHtml(association.threadId)}" data-graph-chat="${escapeHtml(association.threadId)}" data-graph-turn="${escapeHtml(association.turnId)}" data-association-kind="${escapeHtml(association.kind)}" title="Open this Codex Chat"><i>◫</i><span><strong>${escapeHtml(threadTitleById(association.threadId) ?? `Chat ${association.threadId.slice(0, 8)}…`)}</strong><small>Codex Chat · Turn ${escapeHtml(association.turnId)} · ${association.kind === "origin" ? "origin" : "attached"}</small></span></button>`).join("")}`;
+}
+
 function renderGraphEdges() {
   const graph = $(".graph");
   const svg = graph ? $(".graph-edges", graph) : null;
   if (!graph || !svg) return;
   const graphRect = graph.getBoundingClientRect();
   const paths = [];
+  // Provenance edges: from each source Chat node to the focused Task card.
+  // They carry their own edge kind and are never relations, never counted.
+  const provenanceTicketId = focusedGraphTicketId();
+  const provenanceTarget = provenanceTicketId ? graph.querySelector(`.task-card[data-ticket-id="${CSS.escape(provenanceTicketId)}"]`) : null;
+  for (const node of provenanceTarget ? $$("[data-graph-chat]", graph) : []) {
+    const nodeRect = node.getBoundingClientRect();
+    const targetRect = provenanceTarget.getBoundingClientRect();
+    const x1 = nodeRect.left - graphRect.left + nodeRect.width / 2;
+    const y1 = nodeRect.bottom - graphRect.top;
+    const x2 = targetRect.left - graphRect.left + targetRect.width / 2;
+    const y2 = targetRect.top - graphRect.top;
+    const bend = Math.max(20, Math.abs(y2 - y1) * .48);
+    paths.push(`<path data-edge-kind="provenance" data-provenance-ticket="${escapeHtml(provenanceTicketId)}" data-provenance-thread="${escapeHtml(node.dataset.graphChat)}" d="M ${x1} ${y1} C ${x1} ${y1 + bend}, ${x2} ${y2 - bend}, ${x2} ${y2}" marker-end="url(#graphProvenanceArrow)"><title>${escapeHtml(`${node.dataset.associationKind === "origin" ? "Born from" : "Attached to"} Codex Chat ${node.dataset.graphChat} · Turn ${node.dataset.graphTurn} (provenance, not a dependency)`)}</title></path>`);
+  }
   for (const relation of state.bootstrap.graph.relations) {
     const source = graph.querySelector(`[data-ticket-id="${CSS.escape(relation.prerequisiteTicketId)}"]`);
     const target = graph.querySelector(`[data-ticket-id="${CSS.escape(relation.dependentTicketId)}"]`);
@@ -1199,10 +1355,10 @@ function renderGraphEdges() {
       const bend = Math.max(20, Math.abs(y2 - y1) * .48);
       d = `M ${x1} ${y1} C ${x1} ${y1 + bend}, ${x2} ${y2 - bend}, ${x2} ${y2}`;
     }
-    paths.push(`<path d="${d}" marker-end="url(#graphArrow)"><title>${escapeHtml(relation.rationale)}</title></path>`);
+    paths.push(`<path data-edge-kind="depends_on" d="${d}" marker-end="url(#graphArrow)"><title>${escapeHtml(relation.rationale)}</title></path>`);
   }
   svg.setAttribute("viewBox", `0 0 ${graphRect.width} ${graphRect.height}`);
-  svg.innerHTML = `<defs><marker id="graphArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 8 4 L 0 8 z"></path></marker></defs>${paths.join("")}`;
+  svg.innerHTML = `<defs><marker id="graphArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 8 4 L 0 8 z"></path></marker><marker id="graphProvenanceArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path class="provenance-arrow" d="M 0 0 L 8 4 L 0 8 z"></path></marker></defs>${paths.join("")}`;
 }
 
 function renderTasks() {
@@ -1214,7 +1370,15 @@ function renderTasks() {
   setRouteHeader("Tasks", `Current graph · ${state.bootstrap.graph.project.name}`);
   const tickets = topologicalTickets(state.bootstrap.graph.tickets, state.bootstrap.graph.relations);
   const phases = tickets.reduce((counts, ticket) => ({ ...counts, [primaryPhase(ticket)]: (counts[primaryPhase(ticket)] ?? 0) + 1 }), {});
-  surface.innerHTML = `<div class="tasks-view"><header class="tasks-heading"><div><span class="eyebrow">VIBEHUB · CURRENT WORK</span><h1>Task Graph</h1><p>Tasks organize what Codex work is for, how it progresses, and what counts as done.</p></div><div class="task-summary">${["DRAFT", "READY", "RUNNING", "DONE"].map((phase) => `<span>${phases[phase] ?? 0} ${phase}</span>`).join("")}</div></header><div class="graph"><svg class="graph-edges" aria-hidden="true"></svg>${tickets.map((ticket) => `<button class="task-card" type="button" data-ticket-id="${escapeHtml(ticket.ticketId)}" data-phase="${primaryPhase(ticket)}"><header><span class="phase"><i></i>${primaryPhase(ticket)}</span>${substate(ticket) ? `<span class="substate">${substate(ticket)}</span>` : ""}</header><strong>${escapeHtml(humanize(ticket.ticketId))}</strong><p>${escapeHtml(ticket.outcome)}</p><footer><span>${ticket.relationCounts.prerequisites} in · ${ticket.relationCounts.dependents} out</span><span>→</span></footer></button>`).join("")}</div></div>`;
+  const cardOrigin = (ticket) => {
+    const origin = ticket.associations?.find((association) => association.kind === "origin") ?? null;
+    const attached = (ticket.associations ?? []).filter((association) => association.kind === "attached").length;
+    if (!origin && !attached) return "";
+    const text = origin ? originLabel(ticket.ticketId) : `Attached to ${attached} Chat Turn${attached === 1 ? "" : "s"}`;
+    return `<small class="task-origin" data-origin-thread="${escapeHtml(origin?.threadId ?? "")}" data-origin-turn="${escapeHtml(origin?.turnId ?? "")}">${escapeHtml(text)}${origin && attached ? ` · +${attached} attached` : ""}</small>`;
+  };
+  surface.innerHTML = `<div class="tasks-view"><header class="tasks-heading"><div><span class="eyebrow">VIBEHUB · CURRENT WORK</span><h1>Task Graph</h1><p>Tasks organize what Codex work is for, how it progresses, and what counts as done.</p></div><div class="task-summary">${["DRAFT", "READY", "RUNNING", "DONE"].map((phase) => `<span>${phases[phase] ?? 0} ${phase}</span>`).join("")}</div></header><div class="graph"><div class="graph-sources" id="graphSources" aria-label="Source Chats of the focused Task"></div><svg class="graph-edges" aria-hidden="true"></svg>${tickets.map((ticket) => `<button class="task-card" type="button" data-ticket-id="${escapeHtml(ticket.ticketId)}" data-phase="${primaryPhase(ticket)}" data-operational="${escapeHtml(operationalLabel(ticket) ?? "")}"><header><span class="phase"><i></i>${primaryPhase(ticket)}</span>${substate(ticket) ? `<span class="substate">${substate(ticket)}</span>` : ""}</header><strong>${escapeHtml(humanize(ticket.ticketId))}</strong><p>${escapeHtml(ticket.outcome)}</p>${cardOrigin(ticket)}<footer><span data-relation-counts="${ticket.relationCounts.prerequisites}:${ticket.relationCounts.dependents}">${ticket.relationCounts.prerequisites} in · ${ticket.relationCounts.dependents} out</span><span>→</span></footer></button>`).join("")}</div></div>`;
+  renderGraphSources();
   requestAnimationFrame(renderGraphEdges);
 }
 
@@ -1266,6 +1430,34 @@ function proofMarkup(handoff, workspace) {
   return `<section class="proof-section" data-evidence-count="${evidence.length}" data-outcome-status="${escapeHtml(outcome?.status ?? "pending")}"><span class="eyebrow">PROOF</span><h3>${evidence.length} Evidence</h3><p>${evidencedCount} of ${acceptanceCount} acceptance criteria evidenced · Outcome ${escapeHtml(outcome ? outcome.status : "pending")}</p><p class="proof-next" data-next-action="${escapeHtml(nextAction.action)}"><strong>${escapeHtml(nextAction.action)}</strong> · <code>${escapeHtml(nextAction.reason ?? "unknown")}</code>${nextAction.detail ? `<br>${escapeHtml(nextAction.detail)}` : ""}</p><h4>Evidence</h4>${evidenceList}<h4>Outcome</h4>${outcomeRecord}</section>`;
 }
 
+// The quoted passage a Create Task confirmation recorded in the Task's own
+// context (the checked-in Ticket), shown as the origin excerpt. Nothing is
+// read back from the source transcript to build it.
+function originExcerpt(handoff) {
+  const { quoted } = parseQuotedMessage(handoff.context ?? "");
+  const text = quoted.split("\n").map((line) => line.replace(/^> ?/, "")).join("\n").trim();
+  return text.length > 220 ? `${text.slice(0, 220)}…` : text;
+}
+
+// Origin chip and attached associations of a Task, from handoff.associations
+// (checked-in YAML) alone. Return to source reopens the exact Thread on the
+// chat route and focuses the origin item; an attached Turn opens the same way.
+function taskAssociationsMarkup(handoff) {
+  const associations = handoff.associations ?? [];
+  const origin = associations.find((association) => association.kind === "origin") ?? null;
+  const attached = associations.filter((association) => association.kind === "attached");
+  if (!origin && !attached.length) return "";
+  const sourceButton = (association, label, className) => `<button class="${className}" type="button" data-return-to-source data-source-thread="${escapeHtml(association.threadId)}" data-source-turn="${escapeHtml(association.turnId)}" data-source-item="${escapeHtml(association.itemId ?? "")}" data-association-kind="${escapeHtml(association.kind)}">${label}</button>`;
+  const excerpt = origin ? originExcerpt(handoff) : "";
+  const chip = origin
+    ? `<div class="origin-chip" data-task-origin="${escapeHtml(origin.threadId)}" data-origin-turn="${escapeHtml(origin.turnId)}" data-origin-item="${escapeHtml(origin.itemId ?? "")}"><span class="eyebrow">ORIGIN</span><p><strong>${escapeHtml(threadTitleById(origin.threadId) ?? `Chat ${origin.threadId.slice(0, 8)}…`)}</strong> · Turn <code>${escapeHtml(origin.turnId)}</code>${origin.itemId ? ` · Item <code>${escapeHtml(origin.itemId)}</code>` : ""} · ${escapeHtml(describeSelection(handoff.origin?.selection ?? null))}</p>${excerpt ? `<blockquote class="origin-excerpt">${escapeHtml(excerpt)}</blockquote>` : ""}${sourceButton(origin, "Return to source", "secondary-button")}</div>`
+    : "";
+  const others = attached.length
+    ? `<div class="origin-attached"><span class="eyebrow">ATTACHED TURNS</span>${attached.map((association) => sourceButton(association, `<strong>${escapeHtml(threadTitleById(association.threadId) ?? `Chat ${association.threadId.slice(0, 8)}…`)}</strong><small>attached · Turn ${escapeHtml(association.turnId)}</small>`, "association-link")).join("")}</div>`
+    : "";
+  return `<div class="task-associations" data-association-count="${associations.length}">${chip}${others}</div>`;
+}
+
 function renderTaskWorkspace() {
   if (!state.activeTask) {
     setRouteHeader("Task", "Loading canonical Context", { back: true });
@@ -1293,7 +1485,7 @@ function renderTaskWorkspace() {
   const projectLabel = packet?.project.scope === "standalone" ? "Standalone Task" : packet?.project.name ?? state.bootstrap.graph.project.name;
   setRouteHeader(humanize(handoff.ticketId), `Task Workspace · ${handoff.nextAction.action}`, { back: true });
   captureRequestDrafts(surface);
-  surface.innerHTML = `<div class="task-workspace" data-ticket-workspace="${escapeHtml(handoff.ticketId)}"><header class="task-hero"><div><span class="eyebrow">TASK · ${escapeHtml(projectLabel)}</span><h1>${escapeHtml(humanize(handoff.ticketId))}</h1><p>${escapeHtml(handoff.outcome)}</p></div><span class="task-phase"><i></i>${phase}${substate(ticket) ? ` · ${substate(ticket)}` : ""}</span></header><div class="workspace-grid"><div class="workspace-main"><section class="task-intent"><span class="eyebrow">CONTEXT SPACE</span><h2>What this Task is here to finish</h2><p>${escapeHtml(handoff.context)}</p><details><summary>Acceptance and constraints <span>${handoff.acceptance.length}</span></summary><div class="acceptance-list">${handoff.acceptance.map((item) => `<div class="acceptance-row"><i>${handoff.evidence.some((evidence) => evidence.acceptanceIds.includes(item.acceptance_id)) ? "✓" : "○"}</i><span>${escapeHtml(item.criterion)}</span></div>`).join("")}</div>${handoff.constraints?.length ? `<ul class="constraint-list">${handoff.constraints.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}</details></section><section class="task-context-panel"><header><div><span class="eyebrow">CONTEXT FOR THE NEXT TURN</span><h2>${contextCount} governed item${contextCount === 1 ? "" : "s"}</h2></div><span>${escapeHtml(roomNames.join(" · ") || "No Room required")}</span></header><p>Included by the Task contract or selected here for one Turn. Reading never grants writeback.</p>${taskContextSelectionMarkup()}<details class="packet-inspector" data-disclosure-id="packet-inspector"><summary>${packetLabel} <span>${packetText.length.toLocaleString()} chars</span></summary><pre data-packet-text tabindex="0" aria-label="Task Context packet">${escapeHtml(packetText)}</pre></details></section><section class="task-conversation-section"><header><div><span class="eyebrow">TASK CONVERSATION</span><h2>${linked ? escapeHtml(titleForThread(linked)) : "No Codex Thread yet"}</h2></div>${linked ? `<button class="secondary-button" type="button" data-thread-id="${escapeHtml(linked.id)}">Open as Chat</button>` : ""}</header><p>${linked ? "Human messages can explore, steer, approve or interrupt this Task. Codex owns the Thread; VibeHub owns the Task contract." : "Start the recommended action to open a persistent Codex Thread with the exact packet above."}</p><div class="task-conversation-timeline" id="taskConversationTimeline">${state.activeThread ? turnsMarkup(state.activeThread) : '<div class="task-conversation-empty">The first Turn will carry the canonical Task packet. No transcript is invented before that.</div>'}</div></section></div><aside class="workspace-aside"><section class="recommended-section"><span class="eyebrow">RECOMMENDED ACTION</span><button class="recommended" type="button" ${linked ? "data-focus-task-composer" : `data-task-action="${escapeHtml(handoff.nextAction.action)}"`} ${["WAIT", "DONE"].includes(handoff.nextAction.action) && !linked ? "disabled" : ""}><strong>${escapeHtml(actionLabel)}</strong><span>→</span></button><p>${linked ? "Continue in the Task conversation below." : "The local host assembles Project, Context, authority and source citations."}</p></section><section><span class="eyebrow">CURRENT WORK</span><h3>${linked ? `Thread ${escapeHtml(linked.id.slice(0, 8))}…` : "Not started"}</h3><p>${state.running ? "Codex is running now." : linked ? "Thread is ready for the next Turn." : "No execution claim."}</p></section>${proofMarkup(handoff, workspace)}<section><span class="eyebrow">ROOMS & SOURCE</span><p>${escapeHtml(roomNames.join(" · ") || "Standalone")}</p><p>${escapeHtml(handoff.reviewInputs.ticketRef)}<br><strong>${escapeHtml(handoff.reviewInputs.commit?.slice(0, 10) ?? "working tree")}</strong></p></section></aside></div></div>`;
+  surface.innerHTML = `<div class="task-workspace" data-ticket-workspace="${escapeHtml(handoff.ticketId)}"><header class="task-hero"><div><span class="eyebrow">TASK · ${escapeHtml(projectLabel)}</span><h1>${escapeHtml(humanize(handoff.ticketId))}</h1><p>${escapeHtml(handoff.outcome)}</p>${taskAssociationsMarkup(handoff)}</div><span class="task-phase"><i></i>${phase}${substate(ticket) ? ` · ${substate(ticket)}` : ""}</span></header><div class="workspace-grid"><div class="workspace-main"><section class="task-intent"><span class="eyebrow">CONTEXT SPACE</span><h2>What this Task is here to finish</h2><p>${escapeHtml(handoff.context)}</p><details><summary>Acceptance and constraints <span>${handoff.acceptance.length}</span></summary><div class="acceptance-list">${handoff.acceptance.map((item) => `<div class="acceptance-row"><i>${handoff.evidence.some((evidence) => evidence.acceptanceIds.includes(item.acceptance_id)) ? "✓" : "○"}</i><span>${escapeHtml(item.criterion)}</span></div>`).join("")}</div>${handoff.constraints?.length ? `<ul class="constraint-list">${handoff.constraints.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}</details></section><section class="task-context-panel"><header><div><span class="eyebrow">CONTEXT FOR THE NEXT TURN</span><h2>${contextCount} governed item${contextCount === 1 ? "" : "s"}</h2></div><span>${escapeHtml(roomNames.join(" · ") || "No Room required")}</span></header><p>Included by the Task contract or selected here for one Turn. Reading never grants writeback.</p>${taskContextSelectionMarkup()}<details class="packet-inspector" data-disclosure-id="packet-inspector"><summary>${packetLabel} <span>${packetText.length.toLocaleString()} chars</span></summary><pre data-packet-text tabindex="0" aria-label="Task Context packet">${escapeHtml(packetText)}</pre></details></section><section class="task-conversation-section"><header><div><span class="eyebrow">TASK CONVERSATION</span><h2>${linked ? escapeHtml(titleForThread(linked)) : "No Codex Thread yet"}</h2></div>${linked ? `<button class="secondary-button" type="button" data-thread-id="${escapeHtml(linked.id)}">Open as Chat</button>` : ""}</header><p>${linked ? "Human messages can explore, steer, approve or interrupt this Task. Codex owns the Thread; VibeHub owns the Task contract." : "Start the recommended action to open a persistent Codex Thread with the exact packet above."}</p><div class="task-conversation-timeline" id="taskConversationTimeline">${state.activeThread ? turnsMarkup(state.activeThread) : '<div class="task-conversation-empty">The first Turn will carry the canonical Task packet. No transcript is invented before that.</div>'}</div></section></div><aside class="workspace-aside"><section class="recommended-section"><span class="eyebrow">RECOMMENDED ACTION</span><button class="recommended" type="button" ${linked ? "data-focus-task-composer" : `data-task-action="${escapeHtml(handoff.nextAction.action)}"`} ${["WAIT", "DONE"].includes(handoff.nextAction.action) && !linked ? "disabled" : ""}><strong>${escapeHtml(actionLabel)}</strong><span>→</span></button><p>${linked ? "Continue in the Task conversation below." : "The local host assembles Project, Context, authority and source citations."}</p></section><section><span class="eyebrow">CURRENT WORK</span><h3>${linked ? `Thread ${escapeHtml(linked.id.slice(0, 8))}…` : "Not started"}</h3><p>${state.running ? "Codex is running now." : linked ? "Thread is ready for the next Turn." : "No execution claim."}</p></section>${proofMarkup(handoff, workspace)}<section><span class="eyebrow">ROOMS & SOURCE</span><p>${escapeHtml(roomNames.join(" · ") || "Standalone")}</p><p>${escapeHtml(handoff.reviewInputs.ticketRef)}<br><strong>${escapeHtml(handoff.reviewInputs.commit?.slice(0, 10) ?? "working tree")}</strong></p></section></aside></div></div>`;
   restoreRequestDrafts(surface);
   syncComposerMode();
 }
@@ -1462,7 +1654,7 @@ async function openTask(ticketId) {
       state.activeThread = null;
       state.running = false;
       state.currentTurnId = null;
-      restoreComposerDraft(null);
+      restoreTaskQuoteDraft(ticketId);
     }
     syncThreadLocation();
     renderTaskWorkspace();
@@ -1493,7 +1685,8 @@ function renderComposerQuote() {
   const tray = $("#quoteTray");
   tray.hidden = !state.composerQuote;
   const source = state.composerQuote ? `Thread ${state.composerQuote.threadId} · Turn ${state.composerQuote.turnId} · Item ${state.composerQuote.itemId}` : "";
-  tray.innerHTML = state.composerQuote ? `<span><strong>Quoted response</strong><small>${escapeHtml(state.composerQuote.text.slice(0, 180))}${state.composerQuote.text.length > 180 ? "…" : ""}</small><small class="quote-source" title="${escapeHtml(source)}" aria-label="${escapeHtml(source)}">From this Codex Turn</small></span><button type="button" data-remove-quote aria-label="Remove quoted response">×</button>` : "";
+  const where = state.composerQuote && state.composerQuote.threadId !== state.activeThreadId ? `From Codex Thread ${state.composerQuote.threadId} · Turn ${state.composerQuote.turnId}` : "From this Codex Turn";
+  tray.innerHTML = state.composerQuote ? `<span><strong>Quoted response</strong><small>${escapeHtml(state.composerQuote.text.slice(0, 180))}${state.composerQuote.text.length > 180 ? "…" : ""}</small><small class="quote-source" title="${escapeHtml(source)}" aria-label="${escapeHtml(source)}">${escapeHtml(where)}</small></span><button type="button" data-remove-quote aria-label="Remove quoted response">×</button>` : "";
 }
 
 function setComposerQuote({ text, itemKey: sourceKey }) {
@@ -1502,7 +1695,7 @@ function setComposerQuote({ text, itemKey: sourceKey }) {
   const source = timelineItem(sourceKey);
   state.composerQuote = { text: clean.slice(0, 4_000), itemKey: sourceKey, threadId: source?._threadId ?? state.activeThreadId, turnId: source?._turnId, itemId: source?.id };
   renderComposerQuote();
-  $("#quoteSelection").hidden = true;
+  $("#selectionSheet").hidden = true;
   $("#composerInput").focus();
   notify("Quote added to your next message.");
 }
@@ -1514,8 +1707,25 @@ function autoSizeComposer() {
   textarea.style.height = `${clampComposerHeight(textarea.scrollHeight, bounds)}px`;
 }
 
+// A Task without a Codex Thread keeps its pending Quote into Task keyed by
+// Task id, in memory only; it is sent solely as startTask.humanMessage.
+function captureTaskQuoteDraft() {
+  if (state.route !== "task" || state.activeThreadId || !state.activeTicketId) return;
+  if (state.composerQuote) state.taskQuoteDrafts.set(state.activeTicketId, structuredClone(state.composerQuote));
+  else state.taskQuoteDrafts.delete(state.activeTicketId);
+}
+
+function restoreTaskQuoteDraft(ticketId) {
+  $("#composerInput").value = "";
+  state.composerQuote = state.taskQuoteDrafts.get(ticketId) ? structuredClone(state.taskQuoteDrafts.get(ticketId)) : null;
+  state.attachments = [];
+  renderComposerQuote();
+  renderAttachments();
+  autoSizeComposer();
+}
+
 function captureComposerDraft(threadId = state.activeThreadId) {
-  if (!threadId) return;
+  if (!threadId) { captureTaskQuoteDraft(); return; }
   saveThreadDraft(state.composerDrafts, threadId, {
     text: $("#composerInput").value,
     quote: state.composerQuote ? structuredClone(state.composerQuote) : null,
@@ -1541,21 +1751,38 @@ function itemText(itemKeyValue) {
   return timelineItem(itemKeyValue)?.text ?? "";
 }
 
+// The selection sheet: Add to chat on any assistant passage; Create Task,
+// Attach to Task and Remember only on a finalized assistant message, and
+// disabled with the missing scope explained while the Project is unbound.
 function updateQuoteSelection() {
-  const button = $("#quoteSelection");
+  const sheet = $("#selectionSheet");
   const selection = window.getSelection();
-  if (!selection || selection.isCollapsed || !selection.rangeCount) { button.hidden = true; return; }
+  if (!selection || selection.isCollapsed || !selection.rangeCount) { sheet.hidden = true; return; }
   const range = selection.getRangeAt(0);
   const assistant = range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE
     ? range.commonAncestorContainer.closest?.(".turn.assistant")
     : range.commonAncestorContainer.parentElement?.closest(".turn.assistant");
   const text = selection.toString().trim();
-  if (!assistant || !surface.contains(assistant) || !text) { button.hidden = true; return; }
+  if (!assistant || !surface.contains(assistant) || !text) { sheet.hidden = true; return; }
   const rect = range.getBoundingClientRect();
   state.selectedQuote = { text, itemKey: assistant.dataset.itemId };
-  button.style.left = `${Math.max(8, Math.min(window.innerWidth - 112, rect.left + rect.width / 2 - 52))}px`;
-  button.style.top = `${Math.max(8, rect.top - 42)}px`;
-  button.hidden = false;
+  const finalized = assistant.dataset.finalized === "true";
+  const bridge = bridgeAvailability();
+  sheet.dataset.finalized = finalized ? "true" : "false";
+  sheet.dataset.bridgeAvailable = bridge.available ? "true" : "false";
+  const hint = $("#selectionSheetHint");
+  hint.hidden = !(finalized && !bridge.available);
+  hint.textContent = finalized && !bridge.available ? `Create Task, Attach to Task and Remember need a bound VibeHub Project: ${bridge.reason}` : "";
+  for (const button of $$("[data-selection-bridge]", sheet)) {
+    button.hidden = !finalized;
+    button.disabled = !bridge.available;
+    if (bridge.available) { button.removeAttribute("title"); button.removeAttribute("aria-describedby"); }
+    else { button.title = bridge.reason; button.setAttribute("aria-describedby", "selectionSheetHint"); }
+  }
+  sheet.hidden = false;
+  const width = sheet.offsetWidth || 112;
+  sheet.style.left = `${Math.max(8, Math.min(window.innerWidth - width - 8, rect.left + rect.width / 2 - width / 2))}px`;
+  sheet.style.top = `${Math.max(8, rect.top - sheet.offsetHeight - 10)}px`;
 }
 
 function fileToDataUrl(file) {
@@ -1745,6 +1972,476 @@ async function pollEvents() {
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// The explicit Chat bridge: Create Task, Attach to Task (with Quote into
+// Task) and Remember. Each surface acts on one exact source identity (the
+// finalized assistant message or a located selection inside it), shows the
+// host's own preview, and confirms into one host action that writes one
+// document uncommitted. The source Chat is never rewritten; no browser storage
+// is involved, and the only persistence is the checked-in YAML the host wrote.
+// ---------------------------------------------------------------------------
+
+const BRIDGE_QUOTE_LIMIT = 12_000;
+
+// The exact source the bridge acts on: the mounted item's own text, and when
+// a passage is selected, its span inside that text plus the hash of exactly
+// that slice. A passage that cannot be placed exactly falls back to the whole
+// message as the origin while the quoted text still carries what was chosen.
+async function bridgeSource({ itemKey: sourceKey, selectionText = null }) {
+  const item = timelineItem(sourceKey);
+  if (!item || item.type !== "agentMessage") throw new Error("This message is no longer mounted; Thread history remains authoritative.");
+  if (!messageFinalized(item)) throw new Error("Only a finalized assistant message can become a Task or Context.");
+  const sourceText = String(item.text ?? "");
+  let selection = null;
+  let located = null;
+  let selectionNote = "";
+  if (selectionText) {
+    located = locateSelection(sourceText, selectionText);
+    if (located) {
+      selection = { start: located.start, end: located.end, text_sha256: await sha256Hex(sourceText.slice(located.start, located.end)) };
+    } else {
+      selectionNote = "The selected passage could not be placed exactly in the message text; the origin names the whole message and the quote keeps your selection.";
+    }
+  }
+  const fullQuote = located ? sourceText.slice(located.start, located.end) : (selectionText ?? sourceText);
+  const quoteText = fullQuote.slice(0, BRIDGE_QUOTE_LIMIT);
+  const threadId = item._threadId ?? state.activeThreadId;
+  const identity = { threadId, turnId: item._turnId, itemId: item.id };
+  const forkedFromId = state.activeThread?.id === threadId ? state.activeThread.forkedFromId ?? null : null;
+  return {
+    key: sourceKey,
+    identity,
+    origin: buildOrigin({ threadId, forkedFromId, turnId: item._turnId, itemId: item.id, selection }),
+    quote: { text: quoteText, itemKey: sourceKey, ...identity },
+    selection,
+    selectionNote,
+    truncated: quoteText.length < fullQuote.length,
+  };
+}
+
+function bridgeSourceLine(source) {
+  return `${sourceIdentityLabel(source.identity)} · ${describeSelection(source.selection)}${source.truncated ? ` · quote cut to ${BRIDGE_QUOTE_LIMIT.toLocaleString()} characters` : ""}${source.selectionNote ? ` · ${source.selectionNote}` : ""}`;
+}
+
+function firstLine(text, limit) {
+  const line = String(text ?? "").split("\n").map((entry) => entry.replace(/^[\s>#*\-]+/, "").replace(/[*_`~]+/g, "").trim()).find(Boolean) ?? "";
+  return line.length > limit ? `${line.slice(0, limit - 1).trimEnd()}…` : line;
+}
+
+function bridgeTriggerSelector(trigger, source) {
+  const itemSelector = `[data-item-id="${CSS.escape(source.key)}"]`;
+  if (trigger?.dataset?.createTask) return `[data-create-task="${CSS.escape(source.key)}"]`;
+  if (trigger?.dataset?.attachTask) return `[data-attach-task="${CSS.escape(source.key)}"]`;
+  if (trigger?.dataset?.remember) return `[data-remember="${CSS.escape(source.key)}"]`;
+  return itemSelector;
+}
+
+function openBridgeDialogElement(id, { trigger, source }) {
+  closeSearch(false);
+  closeInbox(false);
+  closeImport(false);
+  for (const other of BRIDGE_DIALOG_IDS) if (other !== id) closeBridgeDialog(other, { restore: false });
+  state.overlayReturnFocus = trigger ?? document.activeElement;
+  state.overlayReturnSelector = source ? bridgeTriggerSelector(trigger, source) : null;
+  $("#selectionSheet").hidden = true;
+  const dialog = $(`#${id}`);
+  dialog.hidden = false;
+  dialog.inert = false;
+  syncScrim();
+  return dialog;
+}
+
+function closeBridgeDialog(id, { restore = true } = {}) {
+  const dialog = $(`#${id}`);
+  if (!dialog || dialog.hidden) return;
+  dialog.hidden = true;
+  dialog.inert = true;
+  if (state.bridge?.dialogId === id) {
+    clearTimeout(state.bridge.previewTimer);
+    state.bridge = null;
+  }
+  syncScrim();
+  if (!restore) return;
+  const returnTo = state.overlayReturnFocus?.isConnected && !state.overlayReturnFocus.hidden && state.overlayReturnFocus.getClientRects().length
+    ? state.overlayReturnFocus
+    : state.overlayReturnSelector ? document.querySelector(state.overlayReturnSelector) : null;
+  returnTo?.focus?.({ preventScroll: true });
+}
+
+function closeOpenBridgeDialog({ restore = true } = {}) {
+  const dialog = openBridgeDialog();
+  if (dialog) closeBridgeDialog(dialog.id, { restore });
+}
+
+function bridgeStatus(id, message, { error = false } = {}) {
+  const node = $(`#${id}`);
+  node.textContent = message;
+  node.dataset.error = error ? "true" : "false";
+}
+
+async function refuseUnlessAvailable() {
+  const bridge = bridgeAvailability();
+  if (bridge.available) return true;
+  notify(bridge.reason);
+  return false;
+}
+
+// Re-read the canonical projection after a bridge write and repaint whatever
+// presents associations: the source Chat marker, the Workspace, the Graph and
+// the sidebar. The transcript itself is patched in place, never rewritten.
+async function afterBridgeWrite() {
+  await refreshThreads();
+  if (state.route === "chat" && state.activeThread) renderChat({ preserveScroll: true });
+  else if (state.route === "task" && state.activeTask) {
+    try {
+      const data = await action({ action: "readTask", ticketId: state.activeTicketId });
+      state.activeTask = data.handoff;
+      state.taskWorkspace = data;
+    } catch {}
+    renderTaskWorkspace();
+  } else if (state.route === "tasks") renderTasks();
+}
+
+// --- Create Task -----------------------------------------------------------
+
+async function openCreateTask({ itemKey: sourceKey, selectionText = null, trigger = null }) {
+  if (!(await refuseUnlessAvailable())) return;
+  let source;
+  try { source = await bridgeSource({ itemKey: sourceKey, selectionText }); }
+  catch (error) { notify(error.message); return; }
+  state.bridge = { kind: "create", dialogId: "createTaskDialog", source, preview: null, sequence: 0, previewTimer: 0, busy: false };
+  $("#createTaskSource").textContent = `Source: ${bridgeSourceLine(source)}`;
+  $("#createTaskTitleInput").value = firstLine(source.quote.text, 80);
+  $("#createTaskOutcome").value = "";
+  $("#createTaskContext").value = composeQuotedMessage(source.quote, "");
+  $("#createTaskId").textContent = "—";
+  $("#createTaskPacket").textContent = "";
+  $("#createTaskPacketSize").textContent = "";
+  $("#createTaskWrite").textContent = "Writes one draft Ticket, uncommitted. Nothing is committed.";
+  $("#confirmCreateTask").disabled = true;
+  bridgeStatus("createTaskStatus", "Write the outcome to preview the Task.");
+  openBridgeDialogElement("createTaskDialog", { trigger, source });
+  scheduleCreatePreview(0);
+  requestAnimationFrame(() => $("#createTaskOutcome").focus());
+}
+
+function createTaskFields() {
+  return {
+    title: $("#createTaskTitleInput").value.trim(),
+    outcome: $("#createTaskOutcome").value.trim(),
+    context: $("#createTaskContext").value.trim(),
+  };
+}
+
+const CREATE_PREVIEW_DEBOUNCE_MS = 240;
+
+function scheduleCreatePreview(delay = CREATE_PREVIEW_DEBOUNCE_MS) {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "create") return;
+  clearTimeout(bridge.previewTimer);
+  bridge.previewTimer = setTimeout(() => { runCreatePreview(); }, delay);
+}
+
+// One preview per settled edit: the host derives the Task id, validates the
+// full draft candidate and returns the packet a Start would send. A reply for
+// an edit that is no longer current is dropped.
+async function runCreatePreview() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "create") return null;
+  clearTimeout(bridge.previewTimer);
+  const sequence = ++bridge.sequence;
+  const fields = createTaskFields();
+  const missing = ["title", "outcome", "context"].filter((field) => !fields[field]);
+  if (missing.length) {
+    bridge.preview = null;
+    $("#createTaskId").textContent = "—";
+    $("#confirmCreateTask").disabled = true;
+    bridgeStatus("createTaskStatus", `Write the ${missing.join(", ")} to preview the Task.`);
+    return null;
+  }
+  bridgeStatus("createTaskStatus", "Previewing through the host…");
+  try {
+    const preview = await action({ action: "previewCreateTask", ...fields, origin: bridge.source.origin });
+    if (sequence !== bridge.sequence || state.bridge !== bridge) return null;
+    bridge.preview = preview;
+    $("#createTaskId").textContent = preview.ticketId;
+    $("#createTaskPacket").textContent = preview.packetText;
+    $("#createTaskPacketSize").textContent = `${preview.packetText.length.toLocaleString()} chars`;
+    $("#createTaskWrite").textContent = `Writes ${preview.path}, uncommitted. Nothing is committed.`;
+    $("#confirmCreateTask").disabled = bridge.busy;
+    bridgeStatus("createTaskStatus", `Ready: ${preview.ticketId} will be a draft Task (${preview.nextAction.action}) with one placeholder acceptance criterion.`);
+    return preview;
+  } catch (error) {
+    if (sequence !== bridge.sequence || state.bridge !== bridge) return null;
+    bridge.preview = null;
+    $("#createTaskId").textContent = "—";
+    $("#confirmCreateTask").disabled = true;
+    const details = Array.isArray(error.details?.errors) ? ` ${error.details.errors.map((entry) => `${entry.path}: ${entry.message}`).join("; ")}` : "";
+    bridgeStatus("createTaskStatus", `${error.message}${details}`, { error: true });
+    return null;
+  }
+}
+
+async function confirmCreateTask() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "create" || bridge.busy) return;
+  bridge.busy = true;
+  $("#confirmCreateTask").disabled = true;
+  try {
+    // The id the human confirms is the one the host derived for these exact
+    // fields; a stale id is refused by the host, never silently renamed.
+    const preview = await runCreatePreview();
+    if (!preview || state.bridge !== bridge) return;
+    const created = await action({ action: "createTask", ...createTaskFields(), origin: bridge.source.origin, ticketId: preview.ticketId });
+    closeBridgeDialog("createTaskDialog", { restore: true });
+    await afterBridgeWrite();
+    notify(`Task ${created.ticketId} created as a draft at ${created.path}, uncommitted. It appears in the Graph and Task list as REFINE; this Chat is unchanged.`);
+  } catch (error) {
+    if (state.bridge !== bridge) return;
+    if (error.code === "ticket_exists") {
+      bridgeStatus("createTaskStatus", `${error.message} The derived id is now ${error.details?.derivedTicketId ?? "being re-derived"}; confirm again to create it.`, { error: true });
+      bridge.busy = false;
+      await runCreatePreview();
+      return;
+    }
+    bridgeStatus("createTaskStatus", error.message, { error: true });
+  } finally {
+    if (state.bridge === bridge) {
+      bridge.busy = false;
+      $("#confirmCreateTask").disabled = !bridge.preview;
+    }
+  }
+}
+
+// --- Attach to Task / Quote into Task ----------------------------------------
+
+function attachRowMarkup(task) {
+  const selected = state.bridge?.selectedTicketId === task.ticketId;
+  const associations = task.associations?.length ?? 0;
+  const provenance = [task.hasOrigin ? "born from a Chat" : "", associations ? `${associations} Chat association${associations === 1 ? "" : "s"}` : ""].filter(Boolean).join(" · ");
+  return `<button class="attach-row" type="button" data-attach-target="${escapeHtml(task.ticketId)}" data-task-status="${escapeHtml(task.status)}" aria-pressed="${selected ? "true" : "false"}"><span><strong>${escapeHtml(humanize(task.ticketId))}</strong><small>${escapeHtml(takeText(createRenderBudget({ textCharacters: 400 }), task.outcome, 140).text)}</small>${provenance ? `<small class="attach-provenance">${escapeHtml(provenance)}</small>` : ""}</span><em>${escapeHtml(task.status)} · ${escapeHtml(task.nextAction?.action ?? "")}<br>${escapeHtml(task.maturity)}${task.nextAction?.reason ? ` · ${escapeHtml(task.nextAction.reason)}` : ""}</em></button>`;
+}
+
+function renderAttachRows() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "attach") return;
+  const list = $("#attachTaskList");
+  if (!bridge.targets) { list.innerHTML = '<p class="muted">Reading Tasks…</p>'; }
+  else if (!bridge.targets.length) { list.innerHTML = '<p class="muted">No open Task in this Project. Create one from this message instead; closed Tasks never take new associations.</p>'; }
+  else list.innerHTML = bridge.targets.map(attachRowMarkup).join("");
+  const selected = bridge.targets?.find((task) => task.ticketId === bridge.selectedTicketId) ?? null;
+  $("#confirmAttachTask").disabled = !selected || bridge.busy;
+  $("#quoteIntoTask").disabled = !selected || bridge.busy;
+  const linked = selected ? state.threads.find((thread) => thread.taskLink?.ticketId === selected.ticketId) : null;
+  $("#attachTaskSelection").textContent = selected
+    ? `Attach appends ${codexThreadRef(bridge.source.identity).replace(/\/item:.*$/u, "")} to .vibehub/tickets/${selected.ticketId}.yaml, uncommitted. Quote into Task ${linked ? "adds the passage to its Codex conversation draft" : "keeps the passage for its first Turn"}; nothing is written.`
+    : bridge.targets?.length ? "Select a Task." : "";
+}
+
+async function openAttachTask({ itemKey: sourceKey, selectionText = null, trigger = null }) {
+  if (!(await refuseUnlessAvailable())) return;
+  let source;
+  try { source = await bridgeSource({ itemKey: sourceKey, selectionText }); }
+  catch (error) { notify(error.message); return; }
+  state.bridge = { kind: "attach", dialogId: "attachTaskDialog", source, targets: null, selectedTicketId: null, busy: false };
+  $("#attachTaskSource").textContent = `Source: ${bridgeSourceLine(source)}`;
+  bridgeStatus("attachTaskStatus", "");
+  renderAttachRows();
+  const dialog = openBridgeDialogElement("attachTaskDialog", { trigger, source });
+  $("#closeAttachTask").focus();
+  await loadAttachTargets();
+  if (dialog.hidden) return;
+  const firstRow = dialog.querySelector(".attach-row");
+  if (firstRow && document.activeElement === $("#closeAttachTask")) firstRow.focus();
+}
+
+async function loadAttachTargets() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "attach") return;
+  try {
+    const data = await action({ action: "listTaskTargets" });
+    if (state.bridge !== bridge) return;
+    bridge.targets = data.tasks;
+  } catch (error) {
+    if (state.bridge !== bridge) return;
+    bridge.targets = [];
+    bridgeStatus("attachTaskStatus", error.message, { error: true });
+  }
+  renderAttachRows();
+}
+
+async function confirmAttachTask() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "attach" || bridge.busy || !bridge.selectedTicketId) return;
+  bridge.busy = true;
+  renderAttachRows();
+  const ticketId = bridge.selectedTicketId;
+  try {
+    const attached = await action({ action: "attachTask", ticketId, threadId: bridge.source.identity.threadId, turnId: bridge.source.identity.turnId });
+    closeBridgeDialog("attachTaskDialog", { restore: true });
+    await afterBridgeWrite();
+    notify(attached.added
+      ? `Attached this Turn to Task ${attached.ticketId}: ${attached.path} now carries ${attached.provenanceRef}, uncommitted. This Chat is unchanged.`
+      : `Task ${attached.ticketId} already carries ${attached.provenanceRef}; nothing was written.`);
+  } catch (error) {
+    if (state.bridge !== bridge) return;
+    bridge.busy = false;
+    bridgeStatus("attachTaskStatus", error.message, { error: true });
+    if (error.code === "task_closed" || error.code === "task_not_found") await loadAttachTargets();
+    else renderAttachRows();
+  }
+}
+
+// Quote into Task: the passage becomes the Task's own conversation draft. A
+// Task with a linked Thread takes it into that Thread's Composer draft; a Task
+// without one keeps it keyed by Task id. Either way it reaches the Agent only
+// as the host-built packet's conversation.humanMessage, and nothing is written.
+async function quoteIntoTask() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "attach" || bridge.busy || !bridge.selectedTicketId) return;
+  const ticketId = bridge.selectedTicketId;
+  const quote = structuredClone(bridge.source.quote);
+  const linked = state.threads.find((thread) => thread.taskLink?.ticketId === ticketId) ?? null;
+  closeBridgeDialog("attachTaskDialog", { restore: false });
+  if (linked && linked.id === state.activeThreadId) {
+    state.composerQuote = quote;
+    renderComposerQuote();
+  } else if (linked) {
+    saveThreadDraft(state.composerDrafts, linked.id, { ...loadThreadDraft(state.composerDrafts, linked.id), quote });
+  } else {
+    state.taskQuoteDrafts.set(ticketId, quote);
+  }
+  await openTask(ticketId);
+  notify(`Quoted into Task ${ticketId}. It is sent only as that Task's next message inside the host-built packet; nothing was written and this Chat is unchanged.`);
+}
+
+// --- Remember ---------------------------------------------------------------
+
+function renderRememberRooms() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "remember") return;
+  const select = $("#rememberRoom");
+  const current = select.value;
+  if (!bridge.rooms) { select.innerHTML = '<option value="">Reading Rooms…</option>'; }
+  else if (!bridge.rooms.length) { select.innerHTML = '<option value="">No Room is checked in</option>'; }
+  else select.innerHTML = bridge.rooms.map((room) => `<option value="${escapeHtml(room.room)}"${room.room === current ? " selected" : ""}>${escapeHtml(room.room)} · ${escapeHtml(room.description)} (${room.contextCount})</option>`).join("");
+  const ready = Boolean(bridge.rooms?.length);
+  $("#confirmRemember").disabled = !ready || bridge.busy;
+  if (bridge.rooms && !bridge.rooms.length) bridgeStatus("rememberStatus", "No Room tree is checked in under .vibehub/rooms. Remember never creates a Room; run the distill Skill first.", { error: true });
+}
+
+async function loadRememberRooms() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "remember") return;
+  try {
+    const data = await action({ action: "listRooms" });
+    if (state.bridge !== bridge) return;
+    bridge.rooms = data.rooms;
+  } catch (error) {
+    if (state.bridge !== bridge) return;
+    bridge.rooms = [];
+    bridgeStatus("rememberStatus", error.message, { error: true });
+  }
+  renderRememberRooms();
+}
+
+async function openRemember({ itemKey: sourceKey, selectionText = null, trigger = null }) {
+  if (!(await refuseUnlessAvailable())) return;
+  let source;
+  try { source = await bridgeSource({ itemKey: sourceKey, selectionText }); }
+  catch (error) { notify(error.message); return; }
+  state.bridge = { kind: "remember", dialogId: "rememberDialog", source, rooms: null, busy: false };
+  $("#rememberSource").textContent = `Source ref: ${codexThreadRef(source.identity)} · ${describeSelection(source.selection)}`;
+  $("#rememberQuote").textContent = source.quote.text;
+  $("#rememberSummary").value = firstLine(source.quote.text, 120);
+  $("#rememberDetail").value = source.quote.text;
+  $("#rememberTags").value = "";
+  $("#rememberEvidence").value = "";
+  $("#rememberType").value = "note";
+  bridgeStatus("rememberStatus", "");
+  renderRememberRooms();
+  openBridgeDialogElement("rememberDialog", { trigger, source });
+  requestAnimationFrame(() => $("#rememberRoom").focus());
+  await loadRememberRooms();
+}
+
+function rememberFields() {
+  const tags = [...new Set($("#rememberTags").value.split(",").map((tag) => tag.trim()).filter(Boolean))];
+  const evidenceNote = $("#rememberEvidence").value.trim();
+  return {
+    room: $("#rememberRoom").value,
+    type: $("#rememberType").value,
+    summary: $("#rememberSummary").value.trim(),
+    detail: $("#rememberDetail").value.trim(),
+    ...(tags.length ? { tags } : {}),
+    ...(evidenceNote ? { evidenceNote } : {}),
+  };
+}
+
+async function confirmRemember() {
+  const bridge = state.bridge;
+  if (bridge?.kind !== "remember" || bridge.busy) return;
+  const fields = rememberFields();
+  if (!fields.room) { bridgeStatus("rememberStatus", "Choose an existing Room.", { error: true }); return; }
+  if (!fields.summary || !fields.detail) { bridgeStatus("rememberStatus", "Summary and detail are required.", { error: true }); return; }
+  bridge.busy = true;
+  $("#confirmRemember").disabled = true;
+  try {
+    const remembered = await action({
+      action: "remember",
+      ...fields,
+      source: { threadId: bridge.source.identity.threadId, turnId: bridge.source.identity.turnId, itemId: bridge.source.identity.itemId, quote: bridge.source.quote.text },
+    });
+    closeBridgeDialog("rememberDialog", { restore: true });
+    await afterBridgeWrite();
+    notify(`Remembered into Room ${remembered.room}: ${remembered.path}, uncommitted. Git review activates it; source ${remembered.sourceRef}.`);
+  } catch (error) {
+    if (state.bridge !== bridge) return;
+    bridge.busy = false;
+    if (error.code === "room_missing") {
+      bridgeStatus("rememberStatus", `${error.message} Rooms now: ${(error.details?.rooms ?? []).join(", ") || "none"}.`, { error: true });
+      await loadRememberRooms();
+      return;
+    }
+    bridgeStatus("rememberStatus", error.message, { error: true });
+    $("#confirmRemember").disabled = false;
+  }
+}
+
+// --- Return to source -----------------------------------------------------
+
+// Scroll to and focus the exact origin item (or the Turn's marker when the
+// origin names no item) once the source Chat is mounted.
+function focusSourceItem({ threadId, turnId, itemId }) {
+  const selector = itemId
+    ? `[data-item-id="${CSS.escape(itemKey(threadId, turnId, itemId))}"]`
+    : `[data-turn-id="${CSS.escape(turnId)}"]`;
+  rerenderFocusSelector = selector;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const node = surface.querySelector(selector);
+    if (!node) {
+      notify("The origin Turn is not mounted in this view; Thread history remains authoritative.");
+      return;
+    }
+    node.scrollIntoView({ block: "center", behavior: "instant" });
+    node.dataset.sourceFocus = "true";
+    node.addEventListener("blur", () => { delete node.dataset.sourceFocus; }, { once: true });
+    node.focus({ preventScroll: true });
+    $("#streamStatus").textContent = "Returned to the source Turn of this Task.";
+  }));
+}
+
+async function returnToSource({ sourceThread, sourceTurn, sourceItem }) {
+  try {
+    await openThread(sourceThread, { route: "chat" });
+  } catch (error) {
+    notify(`Could not open the source Chat ${sourceThread.slice(0, 8)}…: ${error.message}`);
+    return;
+  }
+  focusSourceItem({ threadId: sourceThread, turnId: sourceTurn, itemId: sourceItem || null });
+}
+
 document.addEventListener("click", async (event) => {
   const searchResult = event.target.closest("[data-search-kind]");
   if (searchResult) { await openSearchResult(searchResult.dataset.searchKind, searchResult.dataset.searchId); return; }
@@ -1830,6 +2527,31 @@ document.addEventListener("click", async (event) => {
     } catch (error) { notify(error.message); }
     return;
   }
+  const returnButton = event.target.closest("[data-return-to-source]");
+  if (returnButton) { await returnToSource(returnButton.dataset); return; }
+  const createTask = event.target.closest("[data-create-task]");
+  if (createTask) { if (!createTask.disabled) await openCreateTask({ itemKey: createTask.dataset.createTask, trigger: createTask }); return; }
+  const attachTask = event.target.closest("[data-attach-task]");
+  if (attachTask) { if (!attachTask.disabled) await openAttachTask({ itemKey: attachTask.dataset.attachTask, trigger: attachTask }); return; }
+  const rememberButton = event.target.closest("[data-remember]");
+  if (rememberButton) { if (!rememberButton.disabled) await openRemember({ itemKey: rememberButton.dataset.remember, trigger: rememberButton }); return; }
+  const selectionBridge = event.target.closest("[data-selection-bridge]");
+  if (selectionBridge) {
+    if (selectionBridge.disabled || !state.selectedQuote) return;
+    const request = { itemKey: state.selectedQuote.itemKey, selectionText: state.selectedQuote.text, trigger: selectionBridge };
+    if (selectionBridge.dataset.selectionBridge === "create-task") await openCreateTask(request);
+    else if (selectionBridge.dataset.selectionBridge === "attach-task") await openAttachTask(request);
+    else await openRemember(request);
+    return;
+  }
+  const attachRow = event.target.closest("[data-attach-target]");
+  if (attachRow) {
+    if (state.bridge?.kind !== "attach") return;
+    state.bridge.selectedTicketId = state.bridge.selectedTicketId === attachRow.dataset.attachTarget ? null : attachRow.dataset.attachTarget;
+    renderAttachRows();
+    $(`[data-attach-target="${CSS.escape(attachRow.dataset.attachTarget)}"]`)?.focus();
+    return;
+  }
   const remove = event.target.closest("[data-remove-attachment]");
   if (remove) { state.attachments.splice(Number(remove.dataset.removeAttachment), 1); renderAttachments(); return; }
   if (event.target.closest("[data-remove-quote]")) { state.composerQuote = null; renderComposerQuote(); return; }
@@ -1873,7 +2595,16 @@ document.addEventListener("click", async (event) => {
     if (next === "EXECUTE" || next === "REFINE") {
       taskAction.disabled = true;
       try {
-        const started = await action({ action: "startTask", ticketId: state.activeTicketId, selectedContextIds: [...state.taskSelectedContextIds] });
+        // A pending Quote into Task reaches the Agent only here, as the
+        // host-built packet's conversation.humanMessage.
+        const ticketId = state.activeTicketId;
+        const humanMessage = composeQuotedMessage(state.composerQuote, $("#composerInput").value) || null;
+        const started = await action({ action: "startTask", ticketId, selectedContextIds: [...state.taskSelectedContextIds], ...(humanMessage ? { humanMessage } : {}) });
+        state.taskQuoteDrafts.delete(ticketId);
+        state.composerQuote = null;
+        $("#composerInput").value = "";
+        renderComposerQuote();
+        autoSizeComposer();
         await refreshThreads();
         await openThread(started.threadId, { route: "task" });
       } catch (error) { notify(error.message); taskAction.disabled = false; }
@@ -1886,6 +2617,11 @@ document.addEventListener("click", async (event) => {
 
 document.addEventListener("focusin", (event) => {
   if (rerenderFocusSelector && !event.target.matches(rerenderFocusSelector)) rerenderFocusSelector = null;
+  // The Graph draws provenance for the focused Task; focus moves it.
+  if (state.route === "tasks" && event.target.closest?.(".task-card") && $("#graphSources")) {
+    renderGraphSources();
+    renderGraphEdges();
+  }
 });
 
 document.addEventListener("toggle", (event) => {
@@ -1931,6 +2667,14 @@ $("#createProject").addEventListener("click", async () => {
 $("#importProject").addEventListener("click", openImport);
 $("#closeImport").addEventListener("click", () => closeImport());
 $("#confirmImport").addEventListener("click", confirmImport);
+for (const [id, dialogId] of [["closeCreateTask", "createTaskDialog"], ["cancelCreateTask", "createTaskDialog"], ["closeAttachTask", "attachTaskDialog"], ["cancelAttachTask", "attachTaskDialog"], ["closeRemember", "rememberDialog"], ["cancelRemember", "rememberDialog"]]) {
+  $(`#${id}`).addEventListener("click", () => closeBridgeDialog(dialogId));
+}
+$("#createTaskForm").addEventListener("submit", (event) => { event.preventDefault(); confirmCreateTask(); });
+$("#createTaskForm").addEventListener("input", () => scheduleCreatePreview());
+$("#confirmAttachTask").addEventListener("click", confirmAttachTask);
+$("#quoteIntoTask").addEventListener("click", quoteIntoTask);
+$("#rememberForm").addEventListener("submit", (event) => { event.preventDefault(); confirmRemember(); });
 $("#refreshThreads").addEventListener("click", async () => { await refreshThreads(); updateSidebar(); notify("Codex Chat history refreshed."); });
 $("#searchButton").addEventListener("click", openSearch);
 $("#searchInput").addEventListener("input", () => { state.searchIndex = 0; runSearch(); });
@@ -1978,6 +2722,7 @@ $("#reviewButton").addEventListener("click", () => { closeSearch(false); closeIn
 $("#closeReview").addEventListener("click", () => { $("#reviewPanel").hidden = true; $("#reviewPanel").inert = true; syncScrim(); $("#reviewButton").focus(); });
 $("#scrim").addEventListener("click", () => {
   if (!$("#searchDialog").hidden) closeSearch();
+  else if (openBridgeDialog()) closeOpenBridgeDialog();
   else if (!$("#importDialog").hidden) closeImport();
   else if (!$("#inboxPanel").hidden) closeInbox();
   else if (!$("#reviewPanel").hidden) $("#closeReview").click();
@@ -1993,9 +2738,9 @@ $("#themeToggle").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  const modal = [$("#searchDialog"), $("#importDialog"), $("#inboxPanel"), $("#reviewPanel"), appShell.classList.contains("sidebar-open") ? sidebar : null].find((element) => element && !element.hidden && !element.inert);
+  const modal = [$("#searchDialog"), $("#importDialog"), $("#inboxPanel"), $("#reviewPanel"), ...BRIDGE_DIALOG_IDS.map((id) => $(`#${id}`)), appShell.classList.contains("sidebar-open") ? sidebar : null].find((element) => element && !element.hidden && !element.inert);
   if (event.key === "Tab" && modal) {
-    const focusable = $$("button:not([disabled]), input:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex='-1'])", modal).filter((element) => !element.hidden && element.getClientRects().length);
+    const focusable = $$("button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex='-1'])", modal).filter((element) => !element.hidden && element.getClientRects().length);
     if (focusable.length) {
       const first = focusable[0];
       const last = focusable.at(-1);
@@ -2019,6 +2764,7 @@ document.addEventListener("keydown", (event) => {
   }
   if (event.key === "Escape") {
     if (!$("#searchDialog").hidden) closeSearch();
+    else if (openBridgeDialog()) closeOpenBridgeDialog();
     else if (!$("#importDialog").hidden) closeImport();
     else if (!$("#inboxPanel").hidden) closeInbox();
     else if (!$("#reviewPanel").hidden) $("#closeReview").click();
@@ -2286,6 +3032,9 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
     // Real host transport for checks that must read the checked-in repository
     // through the live projection rather than a fixture.
     hostAction: (payload) => api("/api/action", { method: "POST", body: JSON.stringify(payload) }),
+    refreshBootstrap: () => refreshThreads(),
+    taskQuoteDraft: (ticketId) => (state.taskQuoteDrafts.has(ticketId) ? structuredClone(state.taskQuoteDrafts.get(ticketId)) : null),
+    openThread: (threadId, options) => openThread(threadId, options),
     openTask,
     landFromLocation: () => landFromLocation(new URLSearchParams(location.search)),
     applyTaskFixture: async (fixture, variantName) => {

@@ -240,11 +240,23 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .agent-response code, .turn.user code { padding: 2px 4px; border-radius: 5px; background: var(--code); font: .9em/1.4 var(--mono); }
 .turn.user blockquote { margin: 0 0 6px; padding: 2px 0 2px 10px; border-left: 2px solid var(--line-strong); color: var(--muted); }
 .turn.user .quote-source { display: block; margin: 0 0 8px; color: var(--faint); font-size: 9px; }
+.turn.assistant[data-source-focus] { outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 8px; }
 .message-actions { display: flex; gap: 4px; min-height: 27px; margin: 5px 0 0 -7px; opacity: 0; transition: opacity 120ms ease; }
 .turn.assistant:hover .message-actions, .turn.assistant:focus-within .message-actions { opacity: 1; }
 .message-actions button { height: 27px; padding: 0 7px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; font-size: 10px; }
 .message-actions button:hover:not([disabled]) { color: var(--text); background: var(--hover); }
 .message-actions button[disabled] { opacity: .4; cursor: default; }
+.message-actions { flex-wrap: wrap; align-items: center; }
+.bridge-actions { display: contents; }
+.bridge-hint { flex-basis: 100%; margin: 2px 0 0 7px; color: var(--muted); font-size: 10px; }
+/* One Turn's VibeHub associations: Tasks born here or attached here, each a
+   link to its Workspace. Presentation provenance, never a dependency. */
+.turn-associations { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -8px 0 18px 38px; }
+.turn-associations-label { color: var(--muted); font: 9px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.association-link { display: inline-grid; gap: 1px; min-height: 34px; padding: 4px 10px; border: 1px solid color-mix(in srgb, var(--accent) 70%, var(--line)); border-radius: 9px; text-align: left; color: var(--text); background: color-mix(in srgb, var(--accent) 6%, var(--panel)); }
+.association-link:hover { border-color: var(--accent); }
+.association-link strong { font-size: 10px; font-weight: 600; }
+.association-link small { color: var(--muted); font: 9px/1.3 var(--mono); }
 .source-citations { display: grid; gap: 5px; margin: 14px 0 7px; padding: 9px 10px; border-left: 2px solid var(--line-strong); color: var(--muted); font-size: 10px; }
 .source-citations > strong { color: var(--text); font-weight: 550; }
 .source-citations > span { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
@@ -360,6 +372,18 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .graph-edges { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .graph-edges path { fill: none; stroke: color-mix(in srgb, var(--muted) 48%, transparent); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .graph-edges marker path { fill: color-mix(in srgb, var(--muted) 72%, transparent); stroke: none; }
+.graph-edges path[data-edge-kind="provenance"] { stroke: color-mix(in srgb, var(--accent) 75%, transparent); stroke-dasharray: 5 4; }
+.graph-edges marker path.provenance-arrow { fill: color-mix(in srgb, var(--accent) 75%, transparent); }
+/* Source Chats of the focused Task: the Chat end of a provenance edge. */
+.graph-sources { grid-column: 1 / -1; position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 1px dashed var(--line-strong); border-radius: 12px; background: color-mix(in srgb, var(--panel) 92%, transparent); }
+.graph-sources-label, .graph-sources-empty { margin: 0; color: var(--muted); font: 10px/1.4 var(--mono); }
+.graph-chat { display: inline-grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px; min-height: 36px; padding: 4px 10px; border: 1px solid color-mix(in srgb, var(--accent) 70%, var(--line)); border-radius: 9px; text-align: left; color: var(--text); background: color-mix(in srgb, var(--accent) 6%, var(--panel)); }
+.graph-chat:hover { border-color: var(--accent); }
+.graph-chat i { color: var(--accent); font-style: normal; }
+.graph-chat strong, .graph-chat small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.graph-chat strong { font-size: 10px; font-weight: 600; }
+.graph-chat small { color: var(--muted); font: 9px/1.3 var(--mono); }
+.task-origin { display: block; margin-top: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font: 9px/1.4 var(--mono); }
 .task-card { position: relative; z-index: 1; min-height: 158px; display: flex; flex-direction: column; padding: 14px; border: 1px solid var(--line); border-radius: 12px; text-align: left; background: color-mix(in srgb, var(--panel) 97%, transparent); box-shadow: 0 1px 2px rgb(0 0 0 / .04); }
 .task-card:hover { border-color: var(--line-strong); box-shadow: 0 6px 18px rgb(0 0 0 / .07); transform: translateY(-1px); }
 .task-card header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -377,6 +401,15 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .task-hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 30px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
 .task-phase { display: flex; align-items: center; gap: 7px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 9px; font: 10px/1 var(--mono); }
 .task-phase i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+/* Origin chip: the exact source Thread, Turn, item and selection a Task was
+   born from, with the way back. Attached Turns list beside it. */
+.task-associations { display: grid; gap: 8px; margin-top: 14px; }
+.origin-chip { display: grid; gap: 6px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 70%, var(--line)); border-radius: 10px; background: var(--raised); }
+.origin-chip p { margin: 0; color: var(--text); font-size: 11px; overflow-wrap: anywhere; }
+.origin-chip code { font: 10px/1.4 var(--mono); }
+.origin-chip .secondary-button { justify-self: start; min-height: 32px; }
+.origin-excerpt { margin: 0; padding: 2px 0 2px 10px; border-left: 2px solid var(--line-strong); color: var(--muted); font-size: 11px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.origin-attached { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .workspace-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; padding-top: 22px; }
 .workspace-main section, .workspace-aside section { margin-bottom: 14px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .workspace-main h2, .workspace-aside h3 { margin: 5px 0 8px; }
@@ -455,7 +488,11 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .quote-tray strong { font-size: 10px; }
 .quote-tray small { color: var(--muted); font-size: 9px; }
 .quote-tray button { align-self: center; width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; }
-.quote-selection { position: fixed; z-index: 90; height: 31px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 8px; color: var(--text); background: var(--panel); box-shadow: var(--shadow); font-size: 10px; }
+.selection-sheet { position: fixed; z-index: 90; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; max-width: min(360px, calc(100vw - 16px)); padding: 4px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel); box-shadow: var(--shadow); }
+.selection-sheet .bridge-hint { margin: 2px 4px 3px; }
+.quote-selection { height: 29px; padding: 0 10px; border: 0; border-radius: 7px; color: var(--text); background: transparent; font-size: 10px; }
+.quote-selection:hover:not([disabled]) { background: var(--hover); }
+.quote-selection[disabled] { opacity: .4; cursor: default; }
 .attachment-chip { display: flex; align-items: center; gap: 6px; max-width: 210px; padding: 5px 7px; border-radius: 7px; background: var(--raised); font-size: 10px; }
 .attachment-chip button { border: 0; background: transparent; }
 .composer-note { margin: 5px auto 0; color: var(--faint); text-align: center; font-size: 9px; }
@@ -526,6 +563,47 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
 .import-dialog > footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
 .import-dialog > footer .primary-button { border-color: var(--accent); color: var(--on-accent); background: var(--accent); }
 .import-dialog > footer .primary-button[disabled] { opacity: .5; cursor: not-allowed; }
+/* The explicit bridge surfaces share the import dialog's frame. */
+.bridge-dialog { position: fixed; z-index: 65; top: min(8vh, 70px); left: 50%; width: min(680px, calc(100% - 28px)); max-height: min(760px, 86vh); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; transform: translateX(-50%); overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--panel); box-shadow: var(--shadow); }
+#attachTaskDialog { grid-template-rows: auto auto auto minmax(0, 1fr) auto auto; }
+.bridge-dialog > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 16px 18px 10px; }
+.bridge-dialog h2 { margin: 4px 0 0; font-size: 16px; }
+.bridge-dialog > header small { color: var(--muted); font: 9px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.bridge-dialog > header button, .bridge-dialog > footer button { min-height: 32px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.bridge-form { display: grid; gap: 10px; min-height: 0; padding: 0 18px 10px; overflow: auto; scrollbar-width: thin; }
+.bridge-form label, .bridge-row label { display: grid; gap: 4px; min-width: 0; }
+.bridge-form label > span { color: var(--muted); font-size: 10px; font-weight: 600; }
+.bridge-form label > span em { color: var(--faint); font-style: normal; font-weight: 400; }
+.bridge-form input, .bridge-form textarea, .bridge-form select { width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--field-line); border-radius: 8px; color: var(--text); background: var(--panel); font-size: 12px; }
+.bridge-form textarea { resize: vertical; font-family: var(--ui); }
+.bridge-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bridge-source, .bridge-intro { margin: 0 18px 8px; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
+.bridge-form .bridge-source { margin: 0; }
+.bridge-source { font-family: var(--mono); }
+.bridge-derived { margin: 0; color: var(--muted); font-size: 10px; }
+.bridge-derived output { color: var(--text); font: 11px/1.4 var(--mono); }
+.bridge-quote { max-height: 120px; margin: 0; padding: 2px 0 2px 10px; overflow: auto; border-left: 2px solid var(--line-strong); color: var(--muted); font-size: 11px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bridge-packet { border-top: 1px solid var(--line); }
+.bridge-packet > summary { padding: 8px 0 2px; color: var(--muted); cursor: pointer; font-size: 10px; }
+.bridge-packet > summary span { float: right; color: var(--faint); font: 9px/1.5 var(--mono); }
+.bridge-packet pre { max-height: 200px; margin: 8px 0 0; padding: 10px; overflow: auto; border-radius: 8px; color: var(--muted); background: var(--code); font: 9px/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.bridge-status { min-height: 16px; margin: 0; color: var(--muted); font-size: 10px; }
+.bridge-status[data-error="true"] { color: var(--danger); }
+#attachTaskDialog .bridge-status { margin: 0 18px 6px; }
+.attach-list { min-height: 120px; overflow: auto; padding: 0 10px 10px; scrollbar-width: thin; }
+.attach-row { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 9px; border: 1px solid transparent; border-radius: 9px; text-align: left; background: transparent; }
+.attach-row > span { min-width: 0; }
+.attach-row:hover { background: var(--hover); }
+.attach-row[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.attach-row strong, .attach-row small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attach-row strong { font-weight: 560; }
+.attach-row small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+.attach-row .attach-provenance { color: var(--accent); font: 9px/1.4 var(--mono); }
+.attach-row > em { color: var(--faint); font: 9px/1.4 var(--mono); font-style: normal; text-align: right; white-space: nowrap; }
+.bridge-dialog > footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+.bridge-dialog > footer > div { display: flex; flex: none; flex-wrap: wrap; gap: 6px; }
+.bridge-dialog > footer .primary-button { border-color: var(--accent); color: var(--on-accent); background: var(--accent); }
+.bridge-dialog > footer .primary-button[disabled] { opacity: .5; cursor: not-allowed; }
 .scope-panel { max-width: 560px; margin: 48px auto; padding: 22px 24px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
 .scope-panel .eyebrow { display: block; margin-bottom: 8px; color: var(--muted); font: 9px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 .scope-panel h1 { margin: 0 0 8px; font-size: 20px; letter-spacing: -.02em; }
@@ -560,6 +638,12 @@ button:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus
   .import-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .import-row > em { text-align: left; white-space: normal; }
   .import-dialog > footer { flex-direction: column; align-items: stretch; gap: 8px; }
+  .bridge-dialog { top: 12px; max-height: calc(100% - 24px); }
+  .bridge-dialog > footer { flex-direction: column; align-items: stretch; gap: 8px; }
+  .bridge-row { grid-template-columns: 1fr; }
+  .attach-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .attach-row > em { text-align: left; white-space: normal; }
+  .turn-associations { margin-left: 0; }
   .runtime-pill span { display: none; }
   .search-trigger { min-width: 32px; width: 32px; justify-content: center; padding: 0; }
   .search-trigger strong, .search-trigger kbd { display: none; }
@@ -634,6 +718,12 @@ body[data-review-frame="narrow"] .inbox-panel,
 body[data-review-frame="narrow"] .review-panel { position: absolute; }
 body[data-review-frame="narrow"] .search-dialog { top: 54px; left: 195px; width: 362px; max-height: 690px; }
 body[data-review-frame="narrow"] .import-dialog { top: 40px; left: 195px; width: 362px; max-height: 740px; }
+body[data-review-frame="narrow"] .bridge-dialog { position: absolute; top: 12px; left: 195px; width: 362px; max-height: 820px; }
+body[data-review-frame="narrow"] .bridge-dialog > footer { flex-direction: column; align-items: stretch; gap: 8px; }
+body[data-review-frame="narrow"] .bridge-row { grid-template-columns: 1fr; }
+body[data-review-frame="narrow"] .attach-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+body[data-review-frame="narrow"] .attach-row > em { text-align: left; white-space: normal; }
+body[data-review-frame="narrow"] .turn-associations { margin-left: 0; }
 body[data-review-frame="narrow"] .import-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 body[data-review-frame="narrow"] .import-row > em { text-align: left; white-space: normal; }
 body[data-review-frame="narrow"] .import-dialog > footer { flex-direction: column; align-items: stretch; gap: 8px; }
