@@ -39,7 +39,8 @@ type WorkbenchRoom = {
 };
 
 const GITHUB = "https://github.com/VW-ai/vibehub-plugin";
-const CODEX_INSTALL = "codex plugin marketplace add VW-ai/vibehub-plugin";
+const SKILLS_INSTALL = "npx skills add VW-ai/vibehub-plugin";
+const CODEX_INSTALL = "codex plugin marketplace add VW-ai/vibehub-plugin\ncodex plugin add vibehub@vibehub";
 const CLAUDE_INSTALL = "/plugin marketplace add VW-ai/vibehub-plugin\n/plugin install vibehub@vibehub\n/reload-plugins";
 const EXAMPLE_REQUEST = "Add dark mode to this task app.";
 const EXAMPLE_AGENT_MESSAGE = `${EXAMPLE_REQUEST} Start this with VibeHub.`;
@@ -378,7 +379,10 @@ const SITE_AGENT_BRIEF = `Help me install and use VibeHub in this repository.
 
 VibeHub is a lightweight, Skill-first plugin that turns one concrete development request into a Git-native Ticket cycle a coding Agent can plan, execute, prove, and independently close.
 
-Codex marketplace:
+Install for any skills-capable agent (Claude Code, Codex, Cursor, and more), choosing "Select all" in the picker:
+${SKILLS_INSTALL}
+
+Or through a host marketplace — Codex:
 ${CODEX_INSTALL}
 
 Claude Code:
@@ -386,7 +390,7 @@ ${CLAUDE_INSTALL}
 
 After installation, open the repository in a fresh Agent session. Describe one concrete deliverable, then say exactly: "Start this with VibeHub."
 
-Request and existing Context shape one Ticket. Work produces acceptance-linked Evidence. A separate Agent decides the Outcome. Durable learning returns to Context. Checked-in files remain the source of truth; Git owns history, review, rollback, and collaboration.
+Request and existing Context shape one Ticket. Work produces acceptance-linked Evidence. A separate Agent decides the Outcome. Durable learning returns to Context. Checked-in files remain the source of truth; Git owns history, review, rollback, and collaboration. If the project opts in during setup, Tickets also mirror one-way to GitHub Issues.
 
 Source: ${GITHUB}`;
 
@@ -414,6 +418,15 @@ async function writeClipboard(value: string) {
   if (!copied) throw new Error("Clipboard copy was rejected");
 }
 
+function TerminalGlyph() {
+  return (
+    <svg className="brand-symbol brand-symbol-terminal" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+      <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M7 9.5 10.5 12 7 14.5M12.5 15h4.5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function CopyGlyph() {
   return <span className="copy-glyph" aria-hidden="true" />;
 }
@@ -436,6 +449,7 @@ function SiteHeader({ copied, onCopy, pastHero }: { copied: string | null; onCop
           <strong>VibeHub</strong>
         </a>
         <nav className="showcase-utilities" aria-label="Install and source actions">
+          <button type="button" className="utility-primary" aria-label="Copy the one-line install command" title="npx skills add VW-ai/vibehub-plugin" onClick={() => onCopy(SKILLS_INSTALL, "skills")}><TerminalGlyph /><span>{copied === "skills" ? "Copied" : "npx skills add"}</span></button>
           <button type="button" aria-label="Copy Codex installation command" title="Install for Codex" onClick={() => onCopy(CODEX_INSTALL, "codex")}><BrandIcon brand="codex" /><span>{copied === "codex" ? "Copied" : "Codex"}</span></button>
           <button type="button" aria-label="Copy Claude Code installation steps" title="Install for Claude Code" onClick={() => onCopy(CLAUDE_INSTALL, "claude")}><BrandIcon brand="claude" /><span>{copied === "claude" ? "Copied" : "Claude"}</span></button>
           <a href={GITHUB} target="_blank" rel="noreferrer" aria-label="Open VibeHub on GitHub" title="GitHub"><BrandIcon brand="github" /><span>GitHub</span></a>
@@ -449,8 +463,9 @@ function SiteHeader({ copied, onCopy, pastHero }: { copied: string | null; onCop
 function InstallActions({ copied, onCopy }: { copied: string | null; onCopy: (value: string, key: string) => void }) {
   return (
     <div className="showcase-actions" aria-label="Install and view VibeHub">
-      <button type="button" onClick={() => onCopy(CODEX_INSTALL, "codex")}><BrandIcon brand="codex" /><span><b>Install for Codex</b><small>{copied === "codex" ? "Command copied" : "Copy command"}</small></span><CopyGlyph /></button>
-      <button type="button" onClick={() => onCopy(CLAUDE_INSTALL, "claude")}><BrandIcon brand="claude" /><span><b>Claude Code</b><small>{copied === "claude" ? "Steps copied" : "Copy install steps"}</small></span><CopyGlyph /></button>
+      <button type="button" className="install-primary" aria-label="Copy the one-line install command" onClick={() => onCopy(SKILLS_INSTALL, "skills")}><TerminalGlyph /><span><b><code>{SKILLS_INSTALL}</code></b><small>{copied === "skills" ? "Command copied" : "One line for Claude Code, Codex, Cursor, and any skills-capable agent"}</small></span><CopyGlyph /></button>
+      <button type="button" onClick={() => onCopy(CODEX_INSTALL, "codex")}><BrandIcon brand="codex" /><span><b>Install for Codex</b><small>{copied === "codex" ? "Commands copied" : "Marketplace commands"}</small></span><CopyGlyph /></button>
+      <button type="button" onClick={() => onCopy(CLAUDE_INSTALL, "claude")}><BrandIcon brand="claude" /><span><b>Claude Code</b><small>{copied === "claude" ? "Steps copied" : "Marketplace steps"}</small></span><CopyGlyph /></button>
       <a href={GITHUB} target="_blank" rel="noreferrer"><BrandIcon brand="github" /><span><b>GitHub</b><small>Source and docs</small></span><ArrowGlyph /></a>
     </div>
   );
@@ -970,7 +985,7 @@ export default function Home() {
       <footer className="showcase-footer"><Founders /><div><strong>Start one real development cycle.</strong><InstallActions copied={copied} onCopy={copy} /></div></footer>
 
       <span className="copy-status" role="status" aria-live="polite">
-        {copied === "agent" ? "VibeHub brief copied for your Agent." : copied === "codex" ? "Codex marketplace command copied." : copied === "claude" ? "Claude Code installation steps copied." : copied?.endsWith("-error") ? "Copy was blocked. Try again." : ""}
+        {copied === "agent" ? "VibeHub brief copied for your Agent." : copied === "skills" ? "Install command copied." : copied === "codex" ? "Codex marketplace commands copied." : copied === "claude" ? "Claude Code installation steps copied." : copied?.endsWith("-error") ? "Copy was blocked. Try again." : ""}
       </span>
     </main>
   );
