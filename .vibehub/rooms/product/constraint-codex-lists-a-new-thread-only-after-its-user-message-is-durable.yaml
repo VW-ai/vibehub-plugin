@@ -1,0 +1,38 @@
+{
+  "context_id": "constraint-codex-lists-a-new-thread-only-after-its-user-message-is-durable",
+  "detail": "Observed three times on the installed 0.149.0 runtime during the independent closeout of the daily-use parity Ticket and once by the executor: after thread/start and turn/start, a thread/list issued at turn/started does not include the new Thread; it appears about 1.5 to 3 seconds later once the userMessage item is durable, and at turn/completed it is listed idle. The fixture app-server lists a Thread immediately, so a guard running on the fixture cannot see this difference. Any sidebar freshness logic must therefore key on a later cue, such as the userMessage item/completed, thread/status/changed, or a bounded retry after turn/started, and the real-runtime lifecycle walk must assert the new Thread's own live dot.",
+  "evidence": [
+    {
+      "note": "The partial Outcome that left turn-completion-notifies-once-and-sidebar-stays-fresh unresolved on this fact.",
+      "ref": ".vibehub/outcomes/ticket-close-codex-daily-use-parity-gaps.yaml"
+    },
+    {
+      "note": "The 0.149.0 real-runtime section already recorded that the real app-server lists after the userMessage item completes.",
+      "ref": "docs/proposals/codex-chat-conformance/browser-runtime-review.md"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-daily-use-parity-major-features-not-niche",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-23T09:00:04Z",
+    "ref": "closeout:2026-08-23-ticket-close-codex-daily-use-parity-gaps-partial"
+  },
+  "state": "active",
+  "summary": "The real Codex 0.149.0 app-server lists a brand-new Thread in thread/list only after its first userMessage is durable, about 1.5 to 3 seconds after turn/started, so turn/started is the wrong cue for sidebar freshness",
+  "tags": [
+    "codex",
+    "app-server",
+    "thread-list",
+    "sidebar",
+    "real-runtime",
+    "fixture-gap",
+    "0.149.0"
+  ],
+  "type": "constraint"
+}
