@@ -23,15 +23,26 @@ test("README is a dark-safe one-line product surface", () => {
     "docs/assets/local-graph/quiet-workbench-desktop-2x.png",
     "docs/assets/local-graph/workbench-ticket-action-2x.png",
     "docs/assets/local-graph/workbench-rooms-narrow-2x.png",
+    "docs/assets/github-issues/issue-blocked-by-2x.png",
     "docs/CONCEPT.md",
     "docs/INSTALL.md",
     "docs/LOCAL_GRAPH_DESIGN.md",
+    "docs/GITHUB_ISSUES.md",
   ]) {
     assert.ok(readme.includes(asset), `README missing ${asset}`);
     assert.ok(existsSync(join(root, asset)), `README target missing ${asset}`);
   }
   assert.ok(existsSync(join(root, "docs/assets/local-graph/readme-capture-manifest.json")));
-  assert.ok(readme.split("\n").length <= 60, "README is no longer one-line focused");
+  assert.ok(readme.split("\n").length <= 90, "README grew past its two-part budget");
+  // Install is above the fold: the one-line command and the entry line precede every image and the story.
+  const installAt = readme.indexOf("npx skills add VW-ai/vibehub-plugin");
+  const entryAt = readme.indexOf("Start this with VibeHub.");
+  const firstImageAt = readme.indexOf("<img src=\"docs/assets/");
+  const storyAt = readme.indexOf("## How it works");
+  assert.ok(installAt > 0 && installAt < firstImageAt && installAt < storyAt, "install command must precede the first image and the story");
+  assert.ok(entryAt > installAt && entryAt < firstImageAt, "entry line must follow install and precede the first image");
+  assert.match(readme, /## Work with your team on GitHub/u);
+  assert.match(readme, /mirrors one-way to a GitHub Issue/u);
   assert.match(readme, /Stop managing chats\. Manage the work\./u);
   assert.match(readme, /Turn one coding request into a Git-native Ticket with the exact Context needed/u);
   assert.equal([...readme.matchAll(/href="https:\/\/vibehub\.icu"/gu)].length, 1);
@@ -58,6 +69,8 @@ test("README Workbench screenshots match the checked-in Retina capture manifest"
     ["docs/assets/local-graph/quiet-workbench-desktop-2x.png", [1280, 720, 2560, 1440]],
     ["docs/assets/local-graph/workbench-ticket-action-2x.png", [1180, 820, 2360, 1640]],
     ["docs/assets/local-graph/workbench-rooms-narrow-2x.png", [390, 844, 780, 1688]],
+    ["docs/assets/github-issues/issue-blocked-by-2x.png", [1280, 720, 2560, 1440]],
+    ["docs/assets/github-issues/issues-list-2x.png", [1280, 720, 2560, 1440]],
   ]);
   assert.equal(manifest.captures.length, expected.size);
   for (const capture of manifest.captures) {

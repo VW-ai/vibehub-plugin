@@ -6,7 +6,7 @@
         "path": "CHANGELOG.md"
       },
       {
-        "blob": "b4139e5398bdc0b8888e4b89b03f06cee2cb84d7",
+        "blob": "7de4b4a3b24c8c9df9b718b00ebd2e8d2ef6a828",
         "path": "README.md"
       },
       {
@@ -70,6 +70,14 @@
         "path": "docs/SPEED_FIRST_CLEANUP.md"
       },
       {
+        "blob": "579612a343167c8240b7e690e5ce2eb462cba429",
+        "path": "docs/assets/github-issues/issue-blocked-by-2x.png"
+      },
+      {
+        "blob": "edd5b9b287edb76dde1f05fa1cc5110a3f6bb03c",
+        "path": "docs/assets/github-issues/issues-list-2x.png"
+      },
+      {
         "blob": "2961f14f4d201094a6fda525117a7b19980b529b",
         "path": "docs/assets/local-graph/quiet-workbench-desktop-2x.png"
       },
@@ -82,7 +90,7 @@
         "path": "docs/assets/local-graph/quiet-workbench-narrow.jpg"
       },
       {
-        "blob": "ea2f3c13ce59e51e5ab564a004edffd82758af38",
+        "blob": "f057f2e1f1fbb0f24f09e122a8d7c98d0be4f588",
         "path": "docs/assets/local-graph/readme-capture-manifest.json"
       },
       {
@@ -178,8 +186,8 @@
         "path": "docs/proposals/rooms-workbench/rooms.js"
       }
     ],
-    "checked_at": "2026-08-23T04:14:28.693Z",
-    "last_aligned_commit": "ae1d1eeeb54458b23728e478f6a8bd056228693a"
+    "checked_at": "2026-08-23T07:00:32.087Z",
+    "last_aligned_commit": "8a8f71340969b2264b20e5cc1fd1eaea1c2f4b60"
   },
   "anchors": [
     "CHANGELOG.md",

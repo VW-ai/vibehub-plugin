@@ -24,6 +24,8 @@ const PLUGIN_PATHS = [
   "docs/assets/local-graph/workbench-ticket-action-2x.png",
   "docs/assets/local-graph/workbench-rooms-narrow-2x.png",
   "docs/assets/local-graph/readme-capture-manifest.json",
+  "docs/assets/github-issues/issue-blocked-by-2x.png",
+  "docs/GITHUB_ISSUES.md",
   "skills",
   "LICENSE",
   "README.md",
