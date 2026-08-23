@@ -50,7 +50,7 @@ jobs:
       - name: Install DVC
         run: pip install -q "dvc[s3]"
       - name: Use CI credentials instead of the local profile
-        run: dvc remote modify --local r2 profile ""
+        run: dvc remote modify --local r2 profile --unset
       - name: Every committed pointer must exist in R2
         run: |
           dvc status -c --json > status.json
@@ -83,7 +83,7 @@ jobs:
           pip install -q "dvc[s3]"
           sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
           npx --yes playwright install --with-deps chromium >/dev/null
-          dvc remote modify --local r2 profile ""
+          dvc remote modify --local r2 profile --unset
       - name: Pull footage and music stems
         run: dvc pull assets/video/${{ inputs.clip }} assets/video/audio
       - name: Render
