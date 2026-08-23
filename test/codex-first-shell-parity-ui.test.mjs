@@ -159,6 +159,29 @@ test("completion notices come from turn/completed once per Turn, the preference 
   assert.equal((script.match(/state\.eventCursor = /g) ?? []).length, 2, "the cursor is written by the stream opening and by each applied window only");
 });
 
+test("the new surfaces keep the baseline: keyboard paths audited, contrast modelled, both frames and both schemes driven, no browser storage", async () => {
+  const { html, script, css, guard } = await shellSources();
+  const [contrast, driver] = await Promise.all([source("test/codex-first-shell-contrast.test.mjs"), source("scripts/vh-codex-first-shell-guard.mjs")]);
+  // Every new click target is a native button and is listed for the
+  // keyboard audit, which runs on each new surface while it is open.
+  for (const selector of ["[data-edit-queued]", "[data-steer-queued]", "[data-delete-queued]", "[data-cancel-queued]", "[data-resume-queue]", "[data-remove-mention]", "[data-mention-option]", "[data-compact-thread]", "[data-rename-thread]", "[data-cancel-rename]"]) {
+    assert.ok(guard.includes(`"${selector}"`), `${selector} is audited for a keyboard path`);
+    const attribute = selector.slice(1, -1);
+    assert.match(script, new RegExp(`<button[^>]*${attribute.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}=`), `${selector} is rendered as a button`);
+  }
+  for (const surface of ["queue tray", "mention picker", "full access confirmation", "rename form"]) assert.ok(guard.includes(`auditKeyboard("${surface}")`), `${surface} is audited`);
+  // Every new rule with a colour is modelled by the contrast test in both themes.
+  for (const rule of [".queue-tray", ".queue-paused", ".queue-actions button", ".queue-edit textarea", ".composer-picker select", ".settings-source", ".turn-posture", ".attachment-chip", ".mention-chip", ".mention-picker", ".thread-context", ".context-meter", ".turn-boundary.compacted span", ".thread-rename", ".rename-form input", ".thread-posture", ".danger-button", ".completion-badge", ".notification-setting select"]) {
+    assert.ok(css.includes(`${rule} {`) || css.includes(`${rule.replace(".danger-button", ".bridge-dialog > footer .danger-button")} {`) || css.includes(`${rule.replace(".completion-badge", ".thread-button em.completion-badge")} {`), `${rule} exists in app.css`);
+    assert.ok(contrast.includes(`"${rule}"`), `${rule} is modelled by the contrast test`);
+  }
+  // The driver runs every frame in both schemes and the real-DOM walks on the fixture.
+  assert.match(driver, /frames: \["wide", "narrow-window", "narrow-viewport"\], schemes: \["light", "dark"\]/);
+  assert.match(driver, /async function runQueueWalk\(shell\)/);
+  assert.match(driver, /CODEX_FIXTURE_COMPLETE_ON_APPROVAL: "1", CODEX_FIXTURE_LOG_NOTIFICATIONS: "1"/);
+  assert.doesNotMatch(html + script + css + guard, /localStorage|sessionStorage|indexedDB|document\.cookie/i);
+});
+
 test("@ and $ mentions are picked from searchFiles and listSkills and sent as text_elements with mention and skill items", async () => {
   const { html, script, renderer, contract } = await shellSources();
   assert.match(html, /<div class="mention-picker" id="mentionPicker" role="listbox" aria-label="Mention suggestions" hidden><\/div>/);

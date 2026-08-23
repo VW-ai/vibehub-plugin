@@ -8,7 +8,7 @@ import { renameThreadRecord, threadTitleFromName } from "../apps/codex-first-she
 import { browserNotification, completionDecision, createCompletionNotifier, NOTIFICATION_MODE_LABELS, noticeForCompletion } from "../apps/codex-first-shell/completion-notifier.mjs";
 import { describePosture, describeTurnSettings, effortOptionLabel, imageRefusal, modelOptionLabel, pendingOverrides, POSTURE_LABELS, POSTURES, postureOf, selectedEffort, selectedModel } from "../apps/codex-first-shell/composer-settings.mjs";
 import { mergeQueueRecord, pausedMessage, QUEUE_PAUSE_MESSAGES, queuedMediaSummary, queuedText, replaceQueuedText } from "../apps/codex-first-shell/composer-queue.mjs";
-import { loadThreadDraft, MAX_DRAFT_ATTACHMENTS, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
+import { loadThreadDraft, MAX_DRAFT_ATTACHMENTS, MAX_DRAFT_MENTIONS, MAX_DRAFT_THREADS, saveThreadDraft } from "../apps/codex-first-shell/composer-drafts.mjs";
 import { acceptAttachment, attachmentName, imageFilesFrom, MAX_ATTACHMENT_BYTES, MAX_ATTACHMENTS, renderAttachmentChips } from "../apps/codex-first-shell/composer-attachments.mjs";
 import { activeTrigger, byteLength, chipsFromItems, composeTextElements, insertPlaceholder, MENTION_TRIGGERS, parseTextElements, placeholderFor, removePlaceholder } from "../apps/codex-first-shell/composer-mentions.mjs";
 import { clampComposerHeight, composerBounds, COMPOSER_HEIGHT_FALLBACK } from "../apps/codex-first-shell/composer-sizing.mjs";
@@ -442,6 +442,7 @@ test("Composer text, Quote identity, and attachments are isolated and bounded by
   assert.deepEqual(loadThreadDraft(drafts, null), { text: "", quote: null, attachments: [], mentions: [] });
   saveThreadDraft(drafts, "thread-m", { text: "see @a.md", mentions: [{ kind: "mention", name: "a.md", path: "/a.md", placeholder: "@a.md" }] });
   assert.deepEqual(loadThreadDraft(drafts, "thread-m").mentions, [{ kind: "mention", name: "a.md", path: "/a.md", placeholder: "@a.md" }], "mention chips are Thread-owned like the text");
+  assert.equal(MAX_DRAFT_MENTIONS, 14, "a Turn carries at most 16 inputs: the text, an attachment and up to 14 mentions");
   assert.equal(loadThreadDraft(drafts, "thread-a").quote.threadId, "thread-a");
   for (let index = 0; index < MAX_DRAFT_THREADS + 2; index += 1) saveThreadDraft(drafts, `thread-${index}`, { text: String(index) });
   assert.equal(drafts.size, MAX_DRAFT_THREADS);

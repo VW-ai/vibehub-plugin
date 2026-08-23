@@ -26,7 +26,7 @@ const focusableByTabindex = (node) => node.hasAttribute("tabindex") && Number(no
 const keyboardOperable = (node) => node.matches(NATIVE_OPERABLE) || focusableByTabindex(node);
 // Every selector the delegated click handler in app.js dispatches on. A match
 // that is neither a native control nor focusable has no keyboard path.
-const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]", "[data-create-task]", "[data-attach-task]", "[data-remember]", "[data-selection-bridge]", "[data-attach-target]", "[data-return-to-source]", "[data-graph-chat]", "[data-association-ticket]"].join(", ");
+const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]", "[data-create-task]", "[data-attach-task]", "[data-remember]", "[data-selection-bridge]", "[data-attach-target]", "[data-return-to-source]", "[data-graph-chat]", "[data-association-ticket]", "[data-edit-queued]", "[data-steer-queued]", "[data-delete-queued]", "[data-cancel-queued]", "[data-resume-queue]", "[data-remove-mention]", "[data-mention-option]", "[data-compact-thread]", "[data-rename-thread]", "[data-cancel-rename]"].join(", ");
 
 // Pointer-only gaps in the mounted document: click targets without a keyboard
 // path, and scroll regions (wheel or touch) that neither take focus nor hold a
@@ -305,6 +305,7 @@ export async function runBrowserInteractionGuard(hooks) {
     document.querySelector("#composer").requestSubmit();
     await waitFor(() => document.querySelectorAll("#queueTray .queue-row").length === 2);
     queueTray = document.querySelector("#queueTray");
+    auditKeyboard("queue tray");
     const rows = [...queueTray.querySelectorAll(".queue-row")];
     const queued = queueActions.filter((entry) => entry.action === "queueTurn");
     checkAll(results, "submission during a live Turn queues by default through queueTurn", {
@@ -474,9 +475,14 @@ export async function runBrowserInteractionGuard(hooks) {
   const modelPicker = document.querySelector("#modelPicker");
   const effortPicker = document.querySelector("#effortPicker");
   const settingsSource = document.querySelector("#settingsSource");
-  const optionsOf = (select) => [...select.options].map((option) => `${option.value}=${option.text}`);
-  await hooks.resetModels();
-  check(results, "model and effort pickers stay disabled and say not loaded until model/list answers", modelPicker.disabled && effortPicker.disabled && optionsOf(modelPicker).join("|") === "=Not loaded" && optionsOf(effortPicker).join("|") === "=Not loaded" && document.querySelector("#composerSettings").dataset.models === "not-loaded" && settingsSource.textContent === "Model list not loaded from the runtime yet.", `${optionsOf(modelPicker).join("|")} · ${settingsSource.textContent}`);
+  const optionsOf = (select) => [...(select?.options ?? [])].map((option) => `${option.value}=${option.text}`);
+  // A shell without the daily-use hooks (an older build) fails these checks
+  // with the missing hook named instead of stalling the run.
+  const resetModels = async () => { if (typeof hooks.resetModels !== "function") throw new Error("hooks.resetModels is not a function"); await hooks.resetModels(); };
+  try {
+    await resetModels();
+    check(results, "model and effort pickers stay disabled and say not loaded until model/list answers", modelPicker.disabled && effortPicker.disabled && optionsOf(modelPicker).join("|") === "=Not loaded" && optionsOf(effortPicker).join("|") === "=Not loaded" && document.querySelector("#composerSettings").dataset.models === "not-loaded" && settingsSource.textContent === "Model list not loaded from the runtime yet.", `${optionsOf(modelPicker).join("|")} · ${settingsSource.textContent}`);
+  } catch (error) { check(results, "model and effort pickers stay disabled and say not loaded until model/list answers", false, `threw: ${error?.message ?? error}`); }
   const pickerActions = [];
   try { await hooks.withFixtureTransport(async (payload) => {
     pickerActions.push(payload);
@@ -543,7 +549,7 @@ export async function runBrowserInteractionGuard(hooks) {
     const postureLine = document.querySelector('[data-turn-settings="guard-picker-turn"]');
     check(results, "picked model and effort travel as turn/start settings and label the Turn", start?.settings?.model === "guard-text" && start.settings.effort === "medium" && Object.keys(start.settings).sort().join(",") === "effort,model" && sentLine.includes("next Turn sends model guard-text, effort medium") && postureLine?.textContent.startsWith("Guard Text Only · medium") && postureLine.textContent.includes("sent model, effort"), `${JSON.stringify(start?.settings ?? null)} · ${postureLine?.textContent ?? "no posture line"}`);
   }); } catch (error) { check(results, "picker checks completed", false, `threw: ${error?.message ?? error}`); }
-  await hooks.resetModels();
+  try { await resetModels(); } catch {}
   await hooks.switchFixtureThread(fixture.thread);
 
   // --- Images: paste, drop, several per Turn, removable chips --------------
@@ -623,6 +629,7 @@ export async function runBrowserInteractionGuard(hooks) {
     await waitFor(() => pickerOptions().length === 2, 60);
     const fileSearch = mentionActions.find((entry) => entry.action === "searchFiles");
     const openedForFiles = !mentionPicker.hidden && mentionPicker.getAttribute("role") === "listbox" && composerInput.getAttribute("aria-expanded") === "true" && composerInput.getAttribute("aria-controls") === "mentionPicker";
+    auditKeyboard("mention picker");
     composerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
     const movedTo = composerInput.getAttribute("aria-activedescendant");
     const highlighted = mentionPicker.querySelector('[aria-selected="true"] strong')?.textContent;
@@ -760,6 +767,7 @@ export async function runBrowserInteractionGuard(hooks) {
     control.dispatchEvent(new Event("change", { bubbles: true }));
     await frame();
     const opened = !fullAccessDialog.hidden && !fullAccessDialog.inert && appShell.inert && fullAccessDialog.getAttribute("role") === "alertdialog" && fullAccessDialog.contains(document.activeElement);
+    auditKeyboard("full access confirmation");
     const dialogFocusable = [...fullAccessDialog.querySelectorAll("button:not([disabled])")].filter((element) => element.getClientRects().length);
     dialogFocusable.at(-1)?.focus();
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
@@ -816,6 +824,7 @@ export async function runBrowserInteractionGuard(hooks) {
       await frame();
       const headerInput = document.querySelector('[data-rename-form][data-rename-where="header"] input');
       const headerFormFocused = document.activeElement === headerInput && headerInput?.value === "Bridge source chat";
+      auditKeyboard("rename form");
       headerInput.value = "Guard renamed chat";
       headerInput.dispatchEvent(new InputEvent("input", { bubbles: true }));
       headerInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
@@ -890,10 +899,12 @@ export async function runBrowserInteractionGuard(hooks) {
     return {};
   }, async () => {
     const offered = [...notificationControl.options].map((option) => `${option.value}=${option.text}`);
+    // The host answers with the preference it set; the control shows that
+    // answer, so wait for it before the completion is delivered.
+    const modeApplied = (mode, count) => waitFor(() => preferenceActions.filter((entry) => entry.action === "setNotificationPreference").length === count && notificationControl.value === mode && document.querySelector("#toast").textContent === `Turn completion notifications: ${{ always: "Always", unfocused: "Only when unfocused", never: "Never" }[mode]}.`, 120);
     notificationControl.value = "always";
     notificationControl.dispatchEvent(new Event("change", { bubbles: true }));
-    await waitFor(() => preferenceActions.some((entry) => entry.action === "setNotificationPreference"));
-    await frame();
+    await modeApplied("always", 1);
     const setAlways = preferenceActions.find((entry) => entry.action === "setNotificationPreference");
     const logBefore = hooks.completionLog().length;
     await hooks.applyEventWindow(completionWindow(71, fixture.secondaryThread.id, "guard-background-turn"));
@@ -910,14 +921,13 @@ export async function runBrowserInteractionGuard(hooks) {
 
     notificationControl.value = "never";
     notificationControl.dispatchEvent(new Event("change", { bubbles: true }));
-    await waitFor(() => preferenceActions.filter((entry) => entry.action === "setNotificationPreference").length === 2);
-    await frame();
+    await modeApplied("never", 2);
     const logBeforeNever = hooks.completionLog().length;
     await hooks.applyEventWindow(completionWindow(73, fixture.secondaryThread.id, "guard-silenced-turn"));
     check(results, "Never, set through setNotificationPreference, silences completion notices", preferenceActions.filter((entry) => entry.action === "setNotificationPreference").at(-1)?.mode === "never" && notificationControl.value === "never" && hooks.completionLog().length === logBeforeNever && constructed.length === 1, `log ${hooks.completionLog().length} · Notification ${constructed.length}`);
     notificationControl.value = "unfocused";
     notificationControl.dispatchEvent(new Event("change", { bubbles: true }));
-    await waitFor(() => preferenceActions.filter((entry) => entry.action === "setNotificationPreference").length === 3);
+    await modeApplied("unfocused", 3);
   }); } catch (error) { check(results, "notification checks completed", false, `threw: ${error?.message ?? error}`); }
   window.Notification = realNotification;
 

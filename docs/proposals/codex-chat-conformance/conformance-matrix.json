@@ -149,13 +149,13 @@
     {
       "id": "composer-keyboard-stop",
       "area": "Composer and keyboard",
-      "requirement": "Enter sends, Shift+Enter adds a line, and Escape interrupts only when Composer owns the active running Turn.",
+      "requirement": "Enter sends (or queues while a Turn streams), Alt+Enter is the opposite of the Send label, Shift+Enter adds a line, and Escape closes an open picker or inline edit first and interrupts only when Composer owns the active running Turn.",
       "before": "fail",
       "beforeSeverity": "highest",
       "beforeFinding": "Enter behavior existed, but Escape only closed overlays and never invoked the documented Stop control.",
       "after": "pass",
-      "implementation": "Escape delegates to exact Stop when Composer owns the active Turn. Running submission is explicit turn/steer against expectedTurnId, so an enabled Send cannot issue a conflicting turn/start. The final browser guard and bounded real-runtime review exercise the complete active-to-interrupted posture.",
-      "proof": ["apps/codex-first-shell/app.js", "test/codex-chat-conformance.test.mjs", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
+      "implementation": "Escape delegates to exact Stop when Composer owns the active Turn; an open mention picker, an inline queue edit or an inline rename takes Escape first and stops it there. While a Turn streams Enter queues through the host-owned queue (queueTurn) and Alt+Enter steers that exact Turn (turn/steer with expectedTurnId), so an enabled Send can never issue a conflicting turn/start; the running-composer-steer row carries the queue proofs.",
+      "proof": ["apps/codex-first-shell/app.js", "test/codex-chat-conformance.test.mjs", "docs/proposals/codex-chat-conformance/browser-runtime-review.md", "test/codex-chat-conformance.test.mjs::audit corrections wire running steer, fork, Thread drafts, drawer semantics, and bounded media", "apps/codex-first-shell/browser-interaction-guard.mjs::Alt+Enter steers the exact live Turn instead of queueing", "apps/codex-first-shell/browser-interaction-guard.mjs::$ opens a skill picker fed by listSkills, Escape closes it in place, and Tab inserts a skill chip"]
     },
     {
       "id": "retry",
@@ -209,8 +209,8 @@
       "beforeSeverity": "medium",
       "beforeFinding": "Search and Inbox restored focus; requestUserInput used an inaccessible blocking prompt.",
       "after": "pass",
-      "implementation": "Search, Inbox, Review and the narrow drawer now use contained modal/inert posture, Escape and scrim dismissal, focus entry/return and logical route-heading focus. Search exposes combobox/listbox active-descendant identity and Sidebar refresh preserves its focused control. The final 25-check browser guard exercises these behaviors in the real DOM.",
-      "proof": ["apps/codex-first-shell/index.html", "apps/codex-first-shell/app.js", "apps/codex-first-shell/browser-interaction-guard.mjs", "apps/codex-first-shell/app.css", "docs/proposals/codex-chat-conformance/browser-runtime-review.md"]
+      "implementation": "Search, Inbox, Review and the narrow drawer now use contained modal/inert posture, Escape and scrim dismissal, focus entry/return and logical route-heading focus. Search exposes combobox/listbox active-descendant identity and Sidebar refresh preserves its focused control. The final 25-check browser guard exercises these behaviors in the real DOM. The daily-use surfaces keep the baseline: the Full access confirmation is a contained alertdialog in the shared Tab trap that closes on Escape and the scrim and returns focus to the Permissions control; the mention picker is a listbox driven from the Composer (arrows, Enter, Tab, Escape in place, aria-activedescendant); inline queue edits and renames return focus to their trigger on Save and Escape; every new click target is a native button audited for a keyboard path on the queue tray, the mention picker, the confirmation and the rename form.",
+      "proof": ["apps/codex-first-shell/index.html", "apps/codex-first-shell/app.js", "apps/codex-first-shell/browser-interaction-guard.mjs", "apps/codex-first-shell/app.css", "docs/proposals/codex-chat-conformance/browser-runtime-review.md", "apps/codex-first-shell/browser-interaction-guard.mjs::Full access asks for confirmation in a contained alertdialog that traps Tab, closes on Escape and restores focus without changing the posture", "apps/codex-first-shell/browser-interaction-guard.mjs::@ opens a keyboard-navigable file picker fed by searchFiles and inserts a mention chip", "apps/codex-first-shell/browser-interaction-guard.mjs::queued rows edit, delete and steer through the host queue actions", "apps/codex-first-shell/browser-interaction-guard.mjs::header Rename sends setThreadName and thread/name/updated renames the header, route title and Sidebar row without a refresh", "apps/codex-first-shell/browser-interaction-guard.mjs::every pointer action has a keyboard path (click targets are operable, scroll regions are reachable)", "test/codex-first-shell-contrast.test.mjs::the contrast pair table models rules that still exist in app.css", "test/codex-first-shell-contrast.test.mjs"]
     },
     {
       "id": "wide-narrow-theme-motion",

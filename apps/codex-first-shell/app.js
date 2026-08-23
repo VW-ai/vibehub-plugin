@@ -2267,15 +2267,22 @@ async function loadModels({ force = false } = {}) {
   return state.models;
 }
 
+// Options are rebuilt only when they changed: the pickers re-render on every
+// event window, and rebuilding an open native select would close it.
 function replaceOptions(select, options, value) {
-  select.textContent = "";
-  for (const entry of options) {
-    const option = new Option(entry.label, entry.value);
-    if (entry.title) option.title = entry.title;
-    if (entry.disabled) option.disabled = true;
-    select.append(option);
+  const signature = options.map((entry) => `${entry.value}\u0000${entry.label}\u0000${entry.title ?? ""}\u0000${entry.disabled ? "1" : "0"}`).join("\n");
+  if (select.dataset.optionsSignature !== signature) {
+    select.textContent = "";
+    for (const entry of options) {
+      const option = new Option(entry.label, entry.value);
+      if (entry.title) option.title = entry.title;
+      if (entry.disabled) option.disabled = true;
+      select.append(option);
+    }
+    select.dataset.optionsSignature = signature;
   }
-  select.value = value ?? "";
+  const next = value ?? "";
+  if (select.value !== next) select.value = next;
   if (value != null && select.value !== value && options.length) select.selectedIndex = 0;
 }
 
@@ -2396,7 +2403,9 @@ async function chooseNotificationMode(mode, control) {
     notify(error.message);
     renderNotificationSetting();
   }
-  control?.focus?.({ preventScroll: true });
+  // The control re-rendered under the pointer; only a focus the re-render
+  // dropped comes back, never one the human moved elsewhere meanwhile.
+  if (document.activeElement === document.body) control?.focus?.({ preventScroll: true });
 }
 
 // One turn/completed from the event feed, live or replayed: noticed once per
