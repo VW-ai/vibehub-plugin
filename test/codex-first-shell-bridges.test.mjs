@@ -34,7 +34,7 @@ const BRIDGE_ACTIONS = ["listTaskTargets", "listRooms", "previewCreateTask", "cr
 
 async function launchShell(context, { repo, env = {} }) {
   const args = ["scripts/vh-codex-first-shell.mjs", "--repo", repo, "--port", "0", "--json", "--codex", fixtureAppServer];
-  const child = spawn(process.execPath, args, { cwd: new URL(".", root), stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, CODEX_FIXTURE_VERSION: "0.147.0", ...env } });
+  const child = spawn(process.execPath, args, { cwd: new URL(".", root), stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, CODEX_FIXTURE_VERSION: "0.149.0", ...env } });
   context.after(() => child.kill("SIGTERM"));
   const timer = setTimeout(() => child.kill("SIGKILL"), 20_000);
   const startup = await Promise.race([

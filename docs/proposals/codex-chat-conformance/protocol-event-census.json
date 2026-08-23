@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "codexVersion": "0.147.0",
-    "protocolSchemaSha256": "f3dec1e031d99a420b137b903f02196d4325eece57620c925bb7130b25f168d2"
+    "codexVersion": "0.149.0",
+    "protocolSchemaSha256": "9b3de71a5a2ffc980b792a18aa8f8dec3f85f48829560222a0264fe494b679a9"
   },
   "notifications": {
     "thread/started": "reconcile",
@@ -24,7 +24,12 @@
     "thread/realtime/transcript/done": "deliberate-deferral-hidden",
     "thread/realtime/outputAudio/delta": "deliberate-deferral-hidden",
     "thread/realtime/error": "diagnostic-only",
-    "thread/realtime/closed": "diagnostic-only"
+    "thread/realtime/closed": "diagnostic-only",
+    "autoApprovalReview/strictReviewRequired": "unpinned-ignored-replay-authoritative",
+    "project/changed": "unpinned-ignored-replay-authoritative",
+    "thread/project/updated": "unpinned-ignored-not-membership-authority",
+    "thread/queue/changed": "unpinned-ignored-replay-authoritative",
+    "thread/reverted": "unpinned-ignored-replay-authoritative"
   },
   "serverRequests": {
     "item/commandExecution/requestApproval": "render-and-resolve",

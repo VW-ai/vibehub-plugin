@@ -1,4 +1,5 @@
 import { realpathSync } from "node:fs";
+import lock from "./upstream-lock.json" with { type: "json" };
 
 const PAGE_LIMIT = 100;
 export const PINNED_THREAD_SECTION_ID = "01984de2-8f74-7c91-a3b2-5c5e937cf318";
@@ -39,14 +40,19 @@ async function collectPages(client, method, params = {}) {
 
 export const CODEX_PROJECT_CAPABILITIES = Object.freeze({
   schemaVersion: 1,
+  // The baseline is the pinned lock itself, so the Project contract cannot
+  // name a different Codex than the one the schema probe proved.
   baseline: {
-    package: "@openai/codex",
-    version: "0.147.0",
-    commit: "be6e8eac029b183056b7e4402879f15d2c85f61b",
+    package: lock.codex.package,
+    version: lock.codex.version,
+    commit: lock.codex.commit,
   },
   projectObject: "ThreadSection",
   projectIdentity: "server-generated UUIDv7",
   projectMembership: "Thread.section",
+  // 0.149.0 added an app-server-owned Thread.projectId with no ClientRequest
+  // that assigns it; it is not read as membership.
+  notMembership: ["Thread.projectId"],
   pinnedSectionId: PINNED_THREAD_SECTION_ID,
   recentsQuery: { method: "thread/list", sectionId: null, sortKey: "recency_at" },
   methods: {

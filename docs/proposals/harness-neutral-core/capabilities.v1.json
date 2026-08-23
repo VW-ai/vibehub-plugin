@@ -18,12 +18,12 @@
     "codex": {
       "upstream": {
         "package": "@openai/codex",
-        "version": "0.147.0",
-        "commit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
+        "version": "0.149.0",
+        "commit": "758ef40f50c1a458425c7cfbf1eb12cbc07af0b0",
         "transport": "app-server stdio JSONL"
       },
       "capabilities": {
-        "projects": { "available": true, "mode": "native", "source": "ClientRequest threadSection/list, threadSection/create, threadSection/update, threadSection/delete and thread/section/move; Thread.section is the sole membership authority with built-in Pinned and sectionId-null Recents", "fallback": "If fork placement races with Project deletion, the fork stays visible in unsectioned Recents with placement.applied=false; threadSection/delete returns member Threads to Recents." },
+        "projects": { "available": true, "mode": "native", "source": "ClientRequest threadSection/list, threadSection/create, threadSection/update, threadSection/delete and thread/section/move; Thread.section is the sole membership authority with built-in Pinned and sectionId-null Recents. 0.149.0 adds an app-server-owned Thread.projectId with project/changed and thread/project/updated notifications but no ClientRequest that assigns it; it is observed, never read as membership", "fallback": "If fork placement races with Project deletion, the fork stays visible in unsectioned Recents with placement.applied=false; threadSection/delete returns member Threads to Recents. If a later pin makes Thread.projectId assignable, membership stays on Thread.section until a probe proves the new seam; projectId is never merged into it." },
         "fork": { "available": true, "mode": "native", "source": "ClientRequest thread/fork", "fallback": "Disable Fork if schema probing removes thread/fork." },
         "search": { "available": true, "mode": "native", "source": "ClientRequest thread/list searchTerm", "fallback": "Offer metadata-only local filtering and label content search unavailable." },
         "audio": { "available": true, "mode": "native", "source": "Turn input audio and localAudio variants", "fallback": "Keep text input; hide microphone-live, transcript-live and audio-output claims while the pinned experimental thread/realtime probe reports protocol-present-current-ephemeral-thread-unsupported." },

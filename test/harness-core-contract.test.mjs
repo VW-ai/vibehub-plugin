@@ -19,7 +19,7 @@ test("capability contract is complete, pinned, and truthful about different audi
   const dsh = capabilitySnapshot("dsh");
   assert.equal(Object.keys(codex.capabilities).length, 12);
   assert.deepEqual(Object.keys(codex.capabilities), Object.keys(dsh.capabilities));
-  assert.equal(codex.upstream.version, "0.147.0");
+  assert.equal(codex.upstream.version, "0.149.0");
   assert.equal(dsh.upstream.version, "0.1.0-rc.8");
   assert.deepEqual(codex.capabilities.audio, {
     available: true,
@@ -36,10 +36,11 @@ test("refreshed Codex declarations bind native ThreadSection Projects, hidden re
   assert.deepEqual(codex.capabilities.projects, {
     available: true,
     mode: "native",
-    source: "ClientRequest threadSection/list, threadSection/create, threadSection/update, threadSection/delete and thread/section/move; Thread.section is the sole membership authority with built-in Pinned and sectionId-null Recents",
-    fallback: "If fork placement races with Project deletion, the fork stays visible in unsectioned Recents with placement.applied=false; threadSection/delete returns member Threads to Recents.",
+    source: "ClientRequest threadSection/list, threadSection/create, threadSection/update, threadSection/delete and thread/section/move; Thread.section is the sole membership authority with built-in Pinned and sectionId-null Recents. 0.149.0 adds an app-server-owned Thread.projectId with project/changed and thread/project/updated notifications but no ClientRequest that assigns it; it is observed, never read as membership",
+    fallback: "If fork placement races with Project deletion, the fork stays visible in unsectioned Recents with placement.applied=false; threadSection/delete returns member Threads to Recents. If a later pin makes Thread.projectId assignable, membership stays on Thread.section until a probe proves the new seam; projectId is never merged into it.",
   });
   assert.match(codex.capabilities.projects.fallback, /placement\.applied=false/u);
+  assert.match(codex.capabilities.projects.source, /Thread\.projectId[^.]*never read as membership/u);
   assert.equal(Object.hasOwn(harnessCapabilityContract.capabilities, "realtime"), false);
   assert.equal(Object.hasOwn(harnessCapabilityContract.carriers.codex.capabilities, "realtime"), false);
   assert.equal(Object.hasOwn(harnessCapabilityContract.carriers.dsh.capabilities, "realtime"), false);

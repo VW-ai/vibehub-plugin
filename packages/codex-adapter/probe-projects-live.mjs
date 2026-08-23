@@ -2,7 +2,7 @@
 
 import { resolve } from "node:path";
 import { CodexAppServerClient } from "./client.mjs";
-import { CodexProjectsAdapter } from "./projects.mjs";
+import { CODEX_PROJECT_CAPABILITIES, CodexProjectsAdapter } from "./projects.mjs";
 
 const cwd = resolve(process.cwd());
 const marker = `VibeHub Project Probe ${Date.now()}`;
@@ -88,7 +88,7 @@ try {
 
   const result = {
     ok: true,
-    baseline: { codex: "0.147.0", commit: "be6e8eac029b183056b7e4402879f15d2c85f61b" },
+    baseline: { codex: CODEX_PROJECT_CAPABILITIES.baseline.version, commit: CODEX_PROJECT_CAPABILITIES.baseline.commit },
     project: { created: true, stableId: createdProject.section.id, recoveredAfterRestart: true, deletedToRecents: true },
     original: { threadId: originalId, movedIn: true, movedOut: true, searchable: true, archived: true, unarchived: true },
     fork: { threadId: forkId, forkedFromId: forked.thread.forkedFromId, inheritedProject: true, recoveredAfterRestart: true },

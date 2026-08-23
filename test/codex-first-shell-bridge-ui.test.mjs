@@ -226,12 +226,17 @@ test("bridge surfaces are contained modals with keyboard paths, exact action sha
     "Remember lists only existing Rooms, keeps the exact source reference and writes one uncommitted Context the Rooms now project",
     "Task Workspace origin chip names the source Thread, Turn and excerpt, and Return to source focuses the exact origin item on the chat route",
   ]) assert.ok(guard.includes(`"${behavior}"`), behavior);
-  // The driver never serves this checkout: bridge writes land in a temporary
-  // copy of the fixture repository and are verified on disk, then discarded.
-  assert.match(driver, /const repo = createBridgeRepository\(\{ prefix: "vibehub-guard-repo-" \}\);/);
-  assert.match(driver, /"--repo", repo\.folder/);
+  // The driver never serves this checkout: on the fixture runtime bridge
+  // writes land in a temporary copy of the fixture repository and are verified
+  // on disk, then discarded; the real runtime serves only a repository named
+  // on purpose, and the browser is told to write only where the driver owns.
+  assert.match(driver, /const repo = realRuntime \? null : createBridgeRepository\(\{ prefix: "vibehub-guard-repo-" \}\);/);
+  assert.match(driver, /const repoFolder = realRuntime \? options\.repo : repo\.folder;/);
+  assert.match(driver, /"--repo", repoFolder/);
   assert.doesNotMatch(driver, /"--repo", root/);
-  assert.match(driver, /if \(shell\) url\.searchParams\.set\("bridgeWrites", "1"\);/);
+  assert.doesNotMatch(driver, /options\.repo \?\? root/);
+  assert.match(driver, /--repo applies to --runtime real only/);
+  assert.match(driver, /if \(shell\?\.repo\) url\.searchParams\.set\("bridgeWrites", "1"\);/);
   assert.match(driver, /function verifyBridgeWrites\(shell, bridge, tag\)/);
   assert.match(driver, /validateTicket\(ticket\)\.length === 0/);
   assert.match(driver, /commitCount\(shell\.repo\.folder\) === shell\.repo\.commits/);

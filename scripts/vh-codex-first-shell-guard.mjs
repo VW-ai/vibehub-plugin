@@ -7,24 +7,38 @@
 //
 //   node scripts/vh-codex-first-shell-guard.mjs            # boots the shell on the fixture app-server over a temporary bound repository, runs every frame in Light and Dark, then the lifecycle walk
 //   node scripts/vh-codex-first-shell-guard.mjs --url <printed shell url>   # guard frames against an already running shell (bridge write checks are skipped: no driver-owned repository)
-//   --frames wide,narrow-window,narrow-viewport   --schemes light,dark   --runs 1   --no-lifecycle   --chrome <binary>
+//   node scripts/vh-codex-first-shell-guard.mjs --runtime real --repo <bound repo>   # the same frames and lifecycle walk on the installed codex binary (bridge write checks are skipped: the repository is not driver-owned)
+//   --frames wide,narrow-window,narrow-viewport|none   --schemes light,dark   --runs 1   --no-lifecycle   --chrome <binary>   --codex <command>
+//
+// `--runtime real` boots the production shell on the real app-server (the
+// `codex` on PATH, or --codex) against an explicitly named repository, so the
+// lifecycle walk's kill, restart and Task recovery are observed on the pinned
+// binary instead of the fixture. The repository must be named on purpose: the
+// walk starts a Task Turn from its first open Ticket and creates Threads in
+// that folder, so point it at a disposable bound repository, never at a
+// checkout whose Tickets should not be handed to the model. Nothing is seeded
+// there: the bridge runs its preview, placement and scope checks only when
+// that repository already lists a finalized "Bridge source chat" Thread, and
+// it never writes, because the write verification needs the fixture's call
+// log and a repository this driver may reset.
 //
 // Each frame runs once per emulated prefers-color-scheme, so the shell's
 // System theme is exercised in both modes; after the guard, prefers-reduced-
 // motion: reduce is emulated and the page's motion audit must report no
 // running animation, transition or smooth scroll.
 //
-// The shell this driver boots serves a copy of the bridge fixture repository
-// (test/fixtures/bridge-repository.mjs), never the checkout it lives in, and
-// the fixture app-server replays one seeded Chat with a finalized assistant
-// message. The explicit Chat bridge (Create Task, Attach to Task, Quote into
-// Task, Remember) therefore writes real YAML, which this driver verifies on
-// disk after every frame and discards before the next one.
+// On the fixture runtime the shell this driver boots serves a copy of the
+// bridge fixture repository (test/fixtures/bridge-repository.mjs), never the
+// checkout it lives in, and the fixture app-server replays one seeded Chat
+// with a finalized assistant message. The explicit Chat bridge (Create Task,
+// Attach to Task, Quote into Task, Remember) therefore writes real YAML, which
+// this driver verifies on disk after every frame and discards before the next
+// one.
 //
 // Exit status is non-zero when any guard check, motion audit, bridge write
 // verification or lifecycle step fails.
 
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { once } from "node:events";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -34,19 +48,29 @@ import { commitCount, createBridgeRepository, porcelain, resetBridgeRepository }
 import { validateTicket } from "../skills/scripts/vh.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const options = { url: null, frames: ["wide", "narrow-window", "narrow-viewport"], schemes: ["light", "dark"], runs: 1, lifecycle: true, chrome: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" };
+const options = { url: null, frames: ["wide", "narrow-window", "narrow-viewport"], schemes: ["light", "dark"], runs: 1, lifecycle: true, chrome: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", runtime: "fixture", repo: null, codex: "codex" };
 const argv = process.argv.slice(2);
 for (let index = 0; index < argv.length; index += 1) {
   const flag = argv[index];
   if (flag === "--url") options.url = argv[++index];
-  else if (flag === "--frames") options.frames = argv[++index].split(",");
+  else if (flag === "--frames") {
+    const value = argv[++index];
+    options.frames = value === "none" ? [] : value.split(",");
+  }
   else if (flag === "--schemes") options.schemes = argv[++index].split(",");
   else if (flag === "--runs") options.runs = Number(argv[++index]);
   else if (flag === "--no-lifecycle") options.lifecycle = false;
   else if (flag === "--chrome") options.chrome = argv[++index];
+  else if (flag === "--runtime") options.runtime = argv[++index];
+  else if (flag === "--repo") options.repo = argv[++index];
+  else if (flag === "--codex") options.codex = argv[++index];
   else throw new Error(`unknown flag: ${flag}`);
 }
 if (!existsSync(options.chrome)) throw new Error(`Chrome binary not found: ${options.chrome} (pass --chrome)`);
+if (!["fixture", "real"].includes(options.runtime)) throw new Error(`--runtime must be fixture or real, not ${options.runtime}`);
+if (options.runtime === "real" && !options.repo) throw new Error("--runtime real needs an explicit --repo: the lifecycle walk hands that repository's first open Ticket to the installed codex");
+if (options.runtime !== "real" && options.repo) throw new Error("--repo applies to --runtime real only: the fixture runtime serves a temporary copy of the bridge fixture repository, so bridge writes never land in a real checkout");
+const realRuntime = options.runtime === "real";
 const FRAMES = {
   wide: { width: 1280, height: 800, narrow: false, mobile: false },
   "narrow-window": { width: 1280, height: 800, narrow: true, mobile: false },
@@ -125,7 +149,7 @@ async function runGuardFrame(shellUrl, frameName, scheme, run, shell = null) {
     url.searchParams.set("chatFixture", "mixed");
     url.searchParams.set("interactionGuard", "1");
     // Bridge writes land only in the repository this driver owns.
-    if (shell) url.searchParams.set("bridgeWrites", "1");
+    if (shell?.repo) url.searchParams.set("bridgeWrites", "1");
     if (frame.narrow) url.searchParams.set("reviewFrame", "narrow");
     await page.navigate(url.href);
     const summary = await page.evaluate(`(async () => {
@@ -151,9 +175,15 @@ async function runGuardFrame(shellUrl, frameName, scheme, run, shell = null) {
       console.log(`[motion ${tag}] ${motionOk ? "PASS" : "FAIL"} reduced-motion audit · ${before.offenders.length} moving without the preference, ${after.offenders.length} with prefers-reduced-motion: reduce · ${after.scanned} elements scanned`);
       for (const line of after.offenders.slice(0, 10)) console.log(`  ✕ ${line}`);
     }
-    if (shell) {
+    if (shell?.repo) {
       ok = verifyBridgeWrites(shell, summary.bridge, tag) && ok;
       await settleStartedTurn(shell, summary.bridge);
+    } else {
+      // No driver-owned repository to write into, read back and reset: the
+      // browser ran the bridge's preview, placement and scope checks only if
+      // the shell listed a seeded source Thread, and attempted no write.
+      const where = shell ? `the real runtime serves ${shell.repoFolder} as it is` : "--url: a shell this driver did not boot";
+      console.log(`[bridge ${tag}] skipped: bridge write checks need a driver-owned repository (${where}) · seeded source Thread ${summary.bridge?.seeded ? "present, so the preview, placement and scope checks ran without writing" : "absent"}`);
     }
     return ok;
   } finally {
@@ -225,21 +255,57 @@ function seedFixtureState(statePath, folder) {
   writeFileSync(statePath, `${JSON.stringify(state)}\n`);
 }
 
-// Boot the production shell on the fixture app-server with persisted state
-// and a pidfile, so the lifecycle walk can kill the app-server from outside.
-// The repository it serves is a temporary copy of the bridge fixture graph,
-// never this checkout, so bridge writes land where the driver can verify and
-// discard them.
+// The app-server process the lifecycle walk kills. The fixture records its
+// pid in a pidfile; the real `codex` on PATH is a Node launcher around the
+// native binary, so the process that owns the Thread is the shell's deepest
+// single descendant, and the launcher exits on its own once it is gone.
+function descendantPid(pid) {
+  let current = pid;
+  for (;;) {
+    let children = [];
+    try {
+      children = execFileSync("pgrep", ["-P", String(current)], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim().split("\n").filter(Boolean).map(Number);
+    } catch {
+      children = [];
+    }
+    if (children.length !== 1) return current;
+    current = children[0];
+  }
+}
+
+// Boot the production shell so the lifecycle walk can kill the app-server
+// from outside. By default that is the fixture app-server with persisted
+// state, a pidfile and a call log, serving a temporary copy of the bridge
+// fixture graph, never this checkout, so bridge writes land where the driver
+// can verify and discard them. With --runtime real it is the installed codex
+// against the named repository as it is: nothing is seeded or reset there.
 async function bootShell() {
   const temp = mkdtempSync(join(tmpdir(), "vibehub-guard-shell-"));
   const pidPath = join(temp, "codex-pids");
-  const logPath = join(temp, "app-server-calls.jsonl");
-  const repo = createBridgeRepository({ prefix: "vibehub-guard-repo-" });
-  seedFixtureState(join(temp, "codex-state.json"), repo.realFolder);
-  const env = { ...process.env, CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_STATE: join(temp, "codex-state.json"), CODEX_FIXTURE_PIDFILE: pidPath, CODEX_FIXTURE_LOG: logPath, VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" };
-  const shell = spawn(process.execPath, [join(root, "scripts/vh-codex-first-shell.mjs"), "--repo", repo.folder, "--port", "0", "--json", "--codex", join(root, "test/fixtures/codex-app-server-fixture.mjs")], { cwd: root, stdio: ["ignore", "pipe", "pipe"], env });
+  const logPath = realRuntime ? null : join(temp, "app-server-calls.jsonl");
+  const repo = realRuntime ? null : createBridgeRepository({ prefix: "vibehub-guard-repo-" });
+  const repoFolder = realRuntime ? options.repo : repo.folder;
+  if (repo) seedFixtureState(join(temp, "codex-state.json"), repo.realFolder);
+  const env = realRuntime
+    ? { ...process.env, VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" }
+    : { ...process.env, CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_STATE: join(temp, "codex-state.json"), CODEX_FIXTURE_PIDFILE: pidPath, CODEX_FIXTURE_LOG: logPath, VIBEHUB_CODEX_RESTART_BACKOFF_MS: "1500,2000,5000" };
+  const codex = realRuntime ? options.codex : join(root, "test/fixtures/codex-app-server-fixture.mjs");
+  const shell = spawn(process.execPath, [join(root, "scripts/vh-codex-first-shell.mjs"), "--repo", repoFolder, "--port", "0", "--json", "--codex", codex], { cwd: root, stdio: ["ignore", "pipe", "pipe"], env });
+  const close = async () => {
+    shell.kill("SIGTERM");
+    await once(shell, "exit").catch(() => {});
+    rmSync(temp, { recursive: true, force: true });
+    if (repo) rmSync(repo.folder, { recursive: true, force: true });
+  };
   const [chunk] = await once(shell.stdout, "data");
   const envelope = JSON.parse(String(chunk));
+  const conditions = envelope.runtime.conditions.map((entry) => `${entry.id}=${entry.status}`).join(" ");
+  console.log(`[shell ${options.runtime}] ${envelope.runtime.provider} ${envelope.runtime.version} (pin ${envelope.runtime.baselineVersion}, baselineMatch=${envelope.runtime.baselineMatch}) state=${envelope.runtime.state} halt=${envelope.runtime.halt?.conditionId ?? "none"} repo=${repoFolder}`);
+  console.log(`[shell ${options.runtime}] conditions: ${conditions}`);
+  if (envelope.runtime.state !== "alive") {
+    await close();
+    throw new Error(`the shell is ${envelope.runtime.state} on ${envelope.runtime.provider} ${envelope.runtime.version}: ${envelope.runtime.halt?.detail ?? "no runtime"}`);
+  }
   const token = new URL(envelope.url).hash.slice(1);
   const api = async (path, init = {}) => {
     const base = new URL(envelope.url);
@@ -250,17 +316,15 @@ async function bootShell() {
   return {
     url: envelope.url,
     api,
+    // The driver-owned bridge repository on the fixture runtime; null on the
+    // real runtime, where the named repository is served as it is.
     repo,
+    repoFolder,
     logPath,
     action: (payload) => api("api/action", { method: "POST", body: JSON.stringify(payload) }),
-    lastPid: () => Number(readFileSync(pidPath, "utf8").trim().split("\n").at(-1)),
-    reset: () => resetBridgeRepository(repo.folder),
-    async close() {
-      shell.kill("SIGTERM");
-      await once(shell, "exit").catch(() => {});
-      rmSync(temp, { recursive: true, force: true });
-      rmSync(repo.folder, { recursive: true, force: true });
-    },
+    lastPid: () => (realRuntime ? descendantPid(shell.pid) : Number(readFileSync(pidPath, "utf8").trim().split("\n").at(-1))),
+    reset: () => (repo ? resetBridgeRepository(repo.folder) : []),
+    close,
   };
 }
 
@@ -275,23 +339,38 @@ async function runLifecycle(shell) {
     const bootstrap = (await shell.api("api/bootstrap")).body.data;
     const ticketId = bootstrap.graph.tickets.find((ticket) => ticket.capabilities.nextAction.summary.action !== "DONE")?.ticketId ?? bootstrap.graph.tickets[0]?.ticketId;
     const task = ticketId ? (await shell.action({ action: "startTask", ticketId, selectedContextIds: [] })).body.data : null;
-    const snapshot = () => page.evaluate(`({ label: document.querySelector('#runtimeLabel').textContent, posture: document.querySelector('#composer').dataset.turnPosture, currentTurnId: document.querySelector('#composer').dataset.currentTurnId ?? null, stopHidden: document.querySelector('#stopTurn').hidden, sendLabel: document.querySelector('#sendButton').getAttribute('aria-label'), inputDisabled: document.querySelector('#composerInput').disabled, boundary: Boolean(document.querySelector('.turn-boundary.runtimeExited')), working: [...document.querySelectorAll('.activity-group summary strong')].some((n) => n.textContent.includes('Working')), requests: document.querySelectorAll('.timeline-entry [data-request-id]').length, activeDots: document.querySelectorAll('.thread-state.active').length, activeThreads: [...document.querySelectorAll('.thread-button')].filter((b) => b.querySelector('.thread-state.active')).map((b) => b.dataset.threadId).join('|'), banner: document.querySelector('#stopBanner')?.dataset.conditionId ?? null, thread: new URLSearchParams(location.search).get('thread'), forkDisabled: document.querySelector('[data-fork-thread]')?.disabled ?? null })`);
+    const snapshot = () => page.evaluate(`({ label: document.querySelector('#runtimeLabel').textContent, posture: document.querySelector('#composer').dataset.turnPosture, currentTurnId: document.querySelector('#composer').dataset.currentTurnId ?? null, stopHidden: document.querySelector('#stopTurn').hidden, sendLabel: document.querySelector('#sendButton').getAttribute('aria-label'), inputDisabled: document.querySelector('#composerInput').disabled, boundary: Boolean(document.querySelector('.turn-boundary.runtimeExited')), interruptedBoundary: Boolean(document.querySelector('.turn-boundary.interrupted')), working: [...document.querySelectorAll('.activity-group summary strong')].some((n) => n.textContent.includes('Working')), requests: document.querySelectorAll('.timeline-entry [data-request-id]').length, activeDots: document.querySelectorAll('.thread-state.active').length, activeThreads: [...document.querySelectorAll('.thread-button')].filter((b) => b.querySelector('.thread-state.active')).map((b) => b.dataset.threadId).join('|'), banner: document.querySelector('#stopBanner')?.dataset.conditionId ?? null, thread: new URLSearchParams(location.search).get('thread'), forkDisabled: document.querySelector('[data-fork-thread]')?.disabled ?? null })`);
     await page.navigate(shell.url);
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Local app-server' && document.querySelector('#newThread') && !document.querySelector('#newThread').disabled`);
     await page.evaluate(`document.querySelector('#newThread').click()`);
     await page.waitFor(`document.querySelector('.thread-heading') && new URLSearchParams(location.search).get('thread')`);
-    await page.evaluate(`(() => { const input = document.querySelector('#composerInput'); input.value = 'keep running'; input.dispatchEvent(new InputEvent('input', { bubbles: true })); document.querySelector('#composer').requestSubmit(); })()`);
-    await page.waitFor(`document.querySelector('#composer').dataset.turnPosture === 'running' && document.querySelectorAll('.timeline-entry [data-request-id]').length > 0`);
+    // The fixture answers every Turn with an approval request, so the kill
+    // lands on a pending card; the real model is asked for a long read-only
+    // command instead, so the Turn is still running when the process dies.
+    const message = realRuntime ? "Use the shell to run exactly `sleep 120` and nothing else, then reply with exactly SLEEP-DONE. Do not read or modify any file." : "keep running";
+    await page.evaluate(`(() => { const input = document.querySelector('#composerInput'); input.value = ${JSON.stringify(message)}; input.dispatchEvent(new InputEvent('input', { bubbles: true })); document.querySelector('#composer').requestSubmit(); })()`);
+    await page.waitFor(realRuntime
+      ? `document.querySelector('#composer').dataset.turnPosture === 'running' && [...document.querySelectorAll('.activity-group summary strong')].some((n) => n.textContent.includes('Working'))`
+      : `document.querySelector('#composer').dataset.turnPosture === 'running' && document.querySelectorAll('.timeline-entry [data-request-id]').length > 0`, 60_000);
     const live = await snapshot();
-    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Steer current turn" && !live.stopHidden && live.requests > 0 && live.activeDots === 1, `${live.posture}/${live.requests} request cards · active ${live.activeThreads}`);
+    // The sidebar presence dot needs the Thread in thread/list. The real
+    // app-server lists a new Thread only once its first user message is
+    // durable, after the shell's newThread refresh, so a brand-new Chat's
+    // first Turn carries no dot there; the fixture lists Threads at once.
+    // The dot is recorded on the real runtime and asserted on the fixture.
+    step("live Turn before the kill", live.posture === "running" && live.sendLabel === "Steer current turn" && !live.stopHidden && (realRuntime ? live.working : live.requests > 0 && live.activeDots === 1), `${live.posture}/${realRuntime ? `working=${live.working}, ` : ""}${live.requests} request cards, send="${live.sendLabel}", stopHidden=${live.stopHidden}, activeDots=${live.activeDots} · active ${live.activeThreads || "none"}`);
     process.kill(shell.lastPid(), "SIGKILL");
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Runtime restarting'`);
     const exited = await snapshot();
     step("runtime exit drops the running posture, voids requests, marks the dead Turn", exited.posture === "idle" && !exited.currentTurnId && exited.stopHidden && exited.sendLabel === "Send message" && exited.inputDisabled && exited.boundary && !exited.working && exited.requests === 0 && exited.activeDots === 0 && exited.forkDisabled === false, `${exited.label}/${exited.posture}`);
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Local app-server'`, 30_000);
-    await new Promise((resolve) => setTimeout(resolve, 1_200));
+    // Replay is authoritative after the restart: the app-server reports the
+    // Turn that died with the process as interrupted, so its boundary
+    // replaces the transient "runtime exited" one and nothing is live. The
+    // re-read of a real Thread takes longer than a frame, so wait for it.
+    await page.waitFor(`document.querySelector('.turn-boundary.interrupted') && !document.querySelector('.turn-boundary.runtimeExited')`, 15_000);
     const restarted = await snapshot();
-    step("restart re-reads the same Thread without minting a live Turn", restarted.thread === live.thread && restarted.posture === "idle" && !restarted.inputDisabled && restarted.boundary && !restarted.working && restarted.activeDots === 0 && restarted.banner === null, `${restarted.label}/${restarted.thread}`);
+    step("restart re-reads the same Thread, replay marks the dead Turn interrupted, no live Turn is minted", restarted.thread === live.thread && restarted.posture === "idle" && !restarted.inputDisabled && restarted.interruptedBoundary && !restarted.boundary && !restarted.working && restarted.activeDots === 0 && restarted.banner === null, `${restarted.label}/${restarted.thread}/${restarted.interruptedBoundary ? "interrupted boundary" : "no interrupted boundary"}${restarted.boundary ? " + stale exit boundary" : ""}`);
     await page.reload();
     await page.waitFor(`document.querySelector('#runtimeLabel').textContent === 'Local app-server' && document.querySelector('.thread-heading')`);
     const reloaded = await snapshot();
@@ -309,7 +388,7 @@ async function runLifecycle(shell) {
     chrome.close();
   }
   const ok = steps.every(Boolean);
-  console.log(`[lifecycle wide 1280x800] ${ok ? "PASS" : "FAIL"} runtime lifecycle walk · ${steps.filter(Boolean).length}/${steps.length}`);
+  console.log(`[lifecycle wide 1280x800 ${options.runtime}] ${ok ? "PASS" : "FAIL"} runtime lifecycle walk · ${steps.filter(Boolean).length}/${steps.length}`);
   return ok;
 }
 

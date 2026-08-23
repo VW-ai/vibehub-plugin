@@ -1,4 +1,6 @@
-export const SERVER_REQUEST_REGISTRY_VERSION = "codex-app-server-0.147.0";
+// ServerRequest.json is byte-identical between rust-v0.147.0 and rust-v0.149.0;
+// the registry below was re-verified against the 0.149.0 generated schema.
+export const SERVER_REQUEST_REGISTRY_VERSION = "codex-app-server-0.149.0";
 
 export const SERVER_REQUEST_REGISTRY = Object.freeze({
   "item/commandExecution/requestApproval": Object.freeze({

@@ -7,6 +7,6 @@
     "@vibehub/harness-core": "0.1.0"
   },
   "peerDependencies": {
-    "@openai/codex": "0.147.0"
+    "@openai/codex": "0.149.0"
   }
 }

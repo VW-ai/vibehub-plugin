@@ -67,7 +67,7 @@ async function lifecycleTemp(context) {
     pidPath: join(temp, "codex-pids"),
     logPath: join(temp, "app-server-calls.jsonl"),
     env: (extra = {}) => ({
-      CODEX_FIXTURE_VERSION: "0.147.0",
+      CODEX_FIXTURE_VERSION: "0.149.0",
       CODEX_FIXTURE_STATE: join(temp, "codex-state.json"),
       CODEX_FIXTURE_PIDFILE: join(temp, "codex-pids"),
       CODEX_FIXTURE_LOG: join(temp, "app-server-calls.jsonl"),
@@ -509,11 +509,11 @@ test("production shell routes ordinary Chat, approvals, interruption, and Tasks 
   const temp = await mkdtemp(join(tmpdir(), "vibehub-codex-shell-"));
   context.after(() => rm(temp, { recursive: true, force: true }));
   const logPath = join(temp, "app-server-calls.jsonl");
-  const shell = await launchShell(context, { codex: fixtureAppServer, env: { CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_VERSION: "0.147.0" } });
+  const shell = await launchShell(context, { codex: fixtureAppServer, env: { CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_VERSION: "0.149.0" } });
   if (!shell) return;
   const { child, envelope, url, api, action } = shell;
   await assertHostBoundary(shell);
-  assert.equal(envelope.runtime.version, "0.147.0");
+  assert.equal(envelope.runtime.version, "0.149.0");
   assert.equal(envelope.runtime.baselineVersion, capabilitySnapshot("codex").upstream.version);
   assert.equal(envelope.runtime.baselineMatch, true);
   assert.equal(envelope.runtime.command, fixtureAppServer);
@@ -631,6 +631,29 @@ test("Codex-first shell host is loopback-only, bounded, and connected to the rea
     context.skip(`local Codex app-server ${envelope.runtime.version} predates the pinned ${envelope.runtime.baselineVersion} baseline`);
     return;
   }
+  const conditionStatus = (id) => envelope.runtime.conditions.find((entry) => entry.id === id)?.status;
+  if (envelope.runtime.version !== envelope.runtime.baselineVersion) {
+    // A newer binary is a different generated protocol until a repin proves
+    // it: the shell halts visibly on the pinned condition instead of reusing
+    // the runtime, and says so in the envelope rather than failing later.
+    assert.equal(envelope.runtime.baselineMatch, false);
+    assert.equal(envelope.runtime.state, "halted");
+    assert.equal(envelope.runtime.halt?.conditionId, "generated-protocol-hash-changed");
+    const exit = once(child, "exit");
+    child.kill("SIGTERM");
+    await exit;
+    return;
+  }
+  // The installed binary is the pinned one: the shell re-hashes its generated
+  // protocol schema at boot, so the pin is an observed pass, not an assumption.
+  assert.equal(envelope.runtime.baselineMatch, true);
+  assert.equal(envelope.runtime.state, "alive", JSON.stringify(envelope.runtime.halt));
+  assert.equal(envelope.runtime.halt, null);
+  assert.equal(conditionStatus("generated-protocol-hash-changed"), "pass");
+  assert.equal(conditionStatus("required-request-or-event-missing"), "pass");
+  assert.equal(conditionStatus("audio-input-removed"), "pass");
+  assert.equal(conditionStatus("managed-auth-status-unavailable"), "pass");
+  assert.deepEqual(envelope.runtime.conditions.filter((entry) => entry.status === "violated"), []);
   const bootstrap = await api("api/bootstrap");
   const payload = bootstrap.body;
   assert.equal(payload.ok, true, JSON.stringify(payload.error ?? null));
@@ -695,7 +718,7 @@ function scopeSeed(folder) {
 
 test("an unbound Git repository hides foreign Codex history, refuses Task actions, and binds only through an eligible single-folder import", async (context) => {
   const { folder, realFolder } = await temporaryRepository(context);
-  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
   if (!shell) return;
   const { child, api, action } = shell;
   await assertHostBoundary(shell);
@@ -764,7 +787,7 @@ test("an unbound Git repository hides foreign Codex history, refuses Task action
   assert.deepEqual(JSON.parse(await readFile(join(folder, ".vibehub/version.yaml"), "utf8")), { format_version: 2, kind: "vibehub_project", schema_version: 1 });
   const binding = JSON.parse(await readFile(join(folder, ".vibehub/codex-project.yaml"), "utf8"));
   assert.deepEqual(Object.keys(binding).sort(), ["codex_version", "folder", "harness", "imported_at", "kind", "schema_version", "section_id", "section_name_at_import"]);
-  assert.deepEqual([binding.kind, binding.harness, binding.section_id, binding.section_name_at_import, binding.folder, binding.codex_version], ["codex_project_binding", "codex", "section-match", "Matching single folder", realFolder, "0.147.0"]);
+  assert.deepEqual([binding.kind, binding.harness, binding.section_id, binding.section_name_at_import, binding.folder, binding.codex_version], ["codex_project_binding", "codex", "section-match", "Matching single folder", realFolder, "0.149.0"]);
   assert.equal(existsSync(join(folder, ".vibehub/rooms/room.yaml")), false, "import never fabricates a Room tree");
   assert.equal(git(folder, ["status", "--porcelain", "--untracked-files=all"]).split("\n").filter(Boolean).every((line) => line.startsWith("?? .vibehub/")), true, "the scaffold stays untracked");
   assert.equal(git(folder, ["rev-list", "--count", "HEAD"]), "1", "import never commits");
@@ -774,7 +797,7 @@ test("an unbound Git repository hides foreign Codex history, refuses Task action
   assert.equal(after.project.taskActions.available, true);
   assert.equal(after.project.compatibility.state, "CURRENT");
   assert.deepEqual(after.project.rooms, { coldStart: true, count: 0 });
-  assert.deepEqual(after.project.binding, { sectionId: "section-match", sectionName: "Matching single folder", folder: realFolder, importedAt: binding.imported_at, codexVersion: "0.147.0", sectionPresent: true, recordPath: ".vibehub/codex-project.yaml" });
+  assert.deepEqual(after.project.binding, { sectionId: "section-match", sectionName: "Matching single folder", folder: realFolder, importedAt: binding.imported_at, codexVersion: "0.149.0", sectionPresent: true, recordPath: ".vibehub/codex-project.yaml" });
   assert.ok(after.project.uncommitted.paths.includes(".vibehub/codex-project.yaml"));
   assert.ok(after.project.uncommitted.paths.includes(".vibehub/version.yaml"));
   assert.equal(after.project.uncommitted.committed, false);
@@ -797,7 +820,7 @@ test("an unbound Git repository hides foreign Codex history, refuses Task action
 
 test("a folder outside any Git repository keeps Chat usable while import and Task actions explain the missing scope", async (context) => {
   const { folder, realFolder } = await temporaryRepository(context, { initGit: false });
-  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
   if (!shell) return;
   const { child, api, action } = shell;
   const bootstrap = (await api("api/bootstrap")).body.data;
@@ -830,7 +853,7 @@ test("a repository whose VibeHub data needs migration is neither bound nor impor
   const { folder } = await temporaryRepository(context);
   execFileSync("mkdir", ["-p", join(folder, ".vibehub", "tickets")]);
   await writeFile(join(folder, ".vibehub", "version.yaml"), JSON.stringify({ schema_version: 1, kind: "vibehub_project", format_version: 1 }, null, 2));
-  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_SEED: JSON.stringify(scopeSeed(folder)) } });
   if (!shell) return;
   const { child, api, action } = shell;
   const bootstrap = (await api("api/bootstrap")).body.data;
@@ -849,7 +872,7 @@ test("a repository whose VibeHub data needs migration is neither bound nor impor
 
 test("a runtime that misses the pinned baseline surfaces a stop instead of a 500 and refuses reuse", async (context) => {
   const { folder } = await temporaryRepository(context);
-  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.144.1" } });
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_VERSION: "0.147.0" } });
   if (!shell) return;
   const { child, envelope, api, action } = shell;
   assert.equal(envelope.runtime.baselineMatch, false);
@@ -862,9 +885,9 @@ test("a runtime that misses the pinned baseline surfaces a stop instead of a 500
   assert.deepEqual(bootstrap.body.data.stop, {
     code: "runtime-baseline-mismatch",
     conditionId: "generated-protocol-hash-changed",
-    message: `Codex app-server 0.144.1 is running but VibeHub pins ${envelope.runtime.baselineVersion}. The shell stops here instead of reusing an unverified runtime.`,
-    detail: `Codex app-server 0.144.1 is running but the lock pins ${envelope.runtime.baselineVersion} (protocol schema f3dec1e031d9…).`,
-    observedVersion: "0.144.1",
+    message: `Codex app-server 0.147.0 is running but VibeHub pins ${envelope.runtime.baselineVersion}. The shell stops here instead of reusing an unverified runtime.`,
+    detail: `Codex app-server 0.147.0 is running but the lock pins ${envelope.runtime.baselineVersion} (protocol schema 9b3de71a5a2f…).`,
+    observedVersion: "0.147.0",
     baselineVersion: envelope.runtime.baselineVersion,
   });
   assert.deepEqual([bootstrap.body.data.projects, bootstrap.body.data.recents, bootstrap.body.data.threads], [[], [], []]);
@@ -956,7 +979,7 @@ test("Graph and Task Workspace routes serve the canonical projection, and the Wo
       { id: "seed-other", name: "Unrelated chat", preview: "other", cwd: folder },
     ],
   };
-  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_VERSION: "0.147.0", CODEX_FIXTURE_SEED: JSON.stringify(seed) } });
+  const shell = await launchShell(context, { codex: fixtureAppServer, repo: folder, env: { CODEX_FIXTURE_LOG: logPath, CODEX_FIXTURE_VERSION: "0.149.0", CODEX_FIXTURE_SEED: JSON.stringify(seed) } });
   if (!shell) return;
   const { child, api, action } = shell;
 
@@ -1146,22 +1169,23 @@ test("killing the app-server mid-Turn restarts it and recovers the same Thread i
   const voided = restarted.events.filter((event) => event.kind === "requestResolved").map((event) => event.value);
   assert.deepEqual(voided.map((value) => [value.id, value.resolution, value.runtimeGeneration]).sort(), pendingBefore.map((id) => [id, "runtime_exited", 1]).sort());
   const recovery = restarted.events.find((event) => event.kind === "runtimeRestarted").value;
-  assert.deepEqual([recovery.generation, recovery.version, recovery.attempt], [2, "0.147.0", 1]);
+  assert.deepEqual([recovery.generation, recovery.version, recovery.attempt], [2, "0.149.0", 1]);
   assert.deepEqual([...recovery.recoveredThreadIds].sort(), [chat.id, task.threadId].sort());
   assert.deepEqual(recovery.recoveredTaskLinks, [{ ticketId: "ticket-proof-workspace", threadId: task.threadId }]);
   assert.deepEqual([restarted.runtimeGeneration, restarted.runtimeAlive, restarted.runtimeState, restarted.runtimeHalt, restarted.pendingRequests], [2, true, "alive", null, []]);
   assert.ok(!restarted.events.some((event) => event.kind === "notification" && event.value.method === "turn/started" && event.sequence > exit.sequence), "no live Turn is minted by the restart");
 
   // Same identities and links after the restart, read from Codex again, and
-  // the orphaned Turn is replayed as persisted (still inProgress) on a
-  // Thread that is no longer active: not live.
+  // the orphaned Turn is replayed as interrupted (what Codex 0.149.0 reports
+  // for a Turn that was in progress when the process died) on a Thread that
+  // is no longer active: not live.
   const after = (await api("api/bootstrap")).body.data;
   assert.deepEqual(identity(after.threads), identity(before.threads));
   assert.deepEqual([after.runtime.state, after.runtime.generation, after.stop, after.runtime.restart.attempts], ["alive", 2, null, 1]);
   assert.equal(conditionStatus(after.runtime, "thread-restart-recovery-unavailable"), "pass");
   assert.match(after.runtime.conditions.find((entry) => entry.id === "thread-restart-recovery-unavailable").detail, /2 known Thread identities and 1 Task link resolved from Codex again/);
   const replayed = (await action({ action: "readThread", threadId: chat.id })).body.data.thread;
-  assert.deepEqual([replayed.id, replayed.status.type, replayed.turns.at(-1).id, replayed.turns.at(-1).status], [chat.id, "notLoaded", turn.id, "inProgress"]);
+  assert.deepEqual([replayed.id, replayed.status.type, replayed.turns.at(-1).id, replayed.turns.at(-1).status], [chat.id, "notLoaded", turn.id, "interrupted"]);
   const stale = await action({ action: "resolveRequest", requestId: pendingBefore[0], decision: "accept" });
   assert.equal(stale.status, 409, "a request the dead process asked for is never answered to the new one");
   assert.equal(stale.body.error.code, "request_not_pending");
@@ -1208,7 +1232,7 @@ test("a launcher restart over the same persisted Codex state recovers identities
   assert.deepEqual(identity(after.threads), [[chat.id, null], [task.threadId, "ticket-proof-workspace"]]);
   assert.equal(after.threads.find((thread) => thread.id === task.threadId).taskLink.kind, "codex_thread_name", "the link is re-derived from the Codex Thread name, not read from a VibeHub store");
   const replayed = (await second.action({ action: "readThread", threadId: chat.id })).body.data.thread;
-  assert.deepEqual([replayed.status.type, replayed.turns.at(-1).id, replayed.turns.at(-1).status], ["notLoaded", turn.id, "inProgress"], "the orphaned Turn replays as persisted on an unloaded Thread");
+  assert.deepEqual([replayed.status.type, replayed.turns.at(-1).id, replayed.turns.at(-1).status], ["notLoaded", turn.id, "interrupted"], "the orphaned Turn replays as interrupted on an unloaded Thread, as the real app-server reports it");
   assert.equal(after.pendingRequests.length, 0);
   assert.equal(after.runtime.generation, 1, "a new launcher is a new process generation 1; nothing carries over");
   assert.equal(after.runtime.conditions.find((entry) => entry.id === "thread-restart-recovery-unavailable").status, "unverified");
