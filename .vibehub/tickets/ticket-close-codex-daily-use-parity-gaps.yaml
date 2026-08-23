@@ -1,0 +1,98 @@
+{
+  "acceptance": [
+    {
+      "acceptance_id": "follow-ups-queue-by-default-and-steer-is-explicit",
+      "criterion": "Submitting while the active Turn streams queues the message by default in a host-owned transient per-Thread queue: the queued list renders above the composer with edit, delete and a per-row Steer, the Send control reads Queue while a Turn is live and Alt+Enter performs the opposite of the Send label for one message, each queued message starts as its own turn/start with a new Turn id after turn/completed, nothing is sent after turn/interrupt until an explicit Resume, and Steer uses turn/steer with the exact expectedTurnId; the conformance row running-composer-steer is rewritten to this contract with its proof fields, and a node test plus a guard check cover queue then start, interrupt then paused then resume, and steer, with the fixture call log showing N queued messages becoming N turn/start requests with distinct Turn ids each after the prior turn/completed."
+    },
+    {
+      "acceptance_id": "model-and-effort-pickers-are-truthful",
+      "criterion": "The composer offers a model picker and an effort picker whose options come only from model/list, hiding hidden models, showing displayName and marking isDefault, with effort options drawn from the selected model's supportedReasoningEfforts and defaultReasoningEffort preselected; the pickers stay disabled with a not-loaded label until model/list returns and no option string exists in source; the current value is read from thread/settings/updated effort and model or the thread/start and thread/resume responses; the selection is sent as turn/start model and effort and shown on the Turn; a model without image in inputModalities refuses image attachments with a refusal naming the displayName and its inputModalities computed from the Model record; model-mode-pickers moves from deferred to pass in the conformance matrix with proofs and the node assertion in test/codex-chat-conformance.test.mjs that no model control exists is narrowed to mode and realtime, which stay absent, while guard checks cover the loaded options."
+    },
+    {
+      "acceptance_id": "images-paste-drop-and-multi-attach",
+      "criterion": "Pasting an image from the clipboard or dropping image files onto the composer attaches them alongside the existing plus file picker, several images may be attached to one Turn, attachments render as removable chips with accessible names before send and as images in the user message after send, and every pasted, dropped or picked image is sent as the image variant with a data URL within the existing 8 MiB bound because a browser File carries no filesystem path, so localImage is not produced by this criterion and the host validInputs gains nothing beyond text, image and audio here; a node test and a guard check prove paste, drop, multi-attach and removal."
+    },
+    {
+      "acceptance_id": "file-and-skill-mentions-from-the-composer",
+      "criterion": "Typing @ in the composer opens a keyboard-navigable picker fed by fuzzyFileSearch rooted at the bound repository and inserts a mention sent as the mention UserInput variant with name and path; typing $ opens a picker fed by skills/list and inserts a skill sent as the skill variant; both render as chips in the composer and in the persisted user message on replay, each chip is one text_elements entry whose byteRange equals the UTF-8 byte span of its placeholder in the text as asserted with Buffer.byteLength, each chip also emits one mention or skill item with name and path, and the fixture app-server log proves the exact input arrays."
+    },
+    {
+      "acceptance_id": "context-usage-and-compaction-are-visible",
+      "criterion": "The Chat shows a context indicator computed only from thread/tokenUsage/updated total tokens against modelContextWindow, updating as Turns complete, showing no value before the first notification and no percentage while modelContextWindow is null, and offers a Compact action that calls thread/compact/start, is disabled while a Turn is live, and renders the resulting contextCompaction ThreadItem as a boundary row in the transcript; a node test drives the notification and the guard proves the indicator and the action."
+    },
+    {
+      "acceptance_id": "rename-and-settings-posture-per-thread",
+      "criterion": "A Chat can be renamed inline from its header and the sidebar through the existing setThreadName host action and thread/name/set, and the sidebar reflects thread/name/updated without a refresh; the Chat header shows the current approval policy and sandbox from the thread/start or thread/resume response and a Permissions control switches between Ask for approval, sent as approvalPolicy on-request with sandboxPolicy type workspaceWrite, and Full access, sent as approvalPolicy never with sandboxPolicy type dangerFullAccess, on the next turn/start, with a confirmation before full access and the active posture visible on every Turn that used it."
+    },
+    {
+      "acceptance_id": "turn-completion-notifies-once-and-sidebar-stays-fresh",
+      "criterion": "When a Turn completes in a Thread that is not on the active route or while the window is unfocused, the shell notifies exactly once per Turn from turn/completed through an in-app notice and the browser Notification API when permitted, proven by a node test that delivers turn/completed for one Turn id twice, live then replayed after reconnect, and asserts one notice and one stubbed Notification construction, governed by an Always, Only when unfocused or Never setting set through a host action, absent after host restart, with no localStorage, sessionStorage, IndexedDB or cookie write in source; when turn/started arrives for a Thread the sidebar does not yet list, the sidebar refreshes so a brand-new Chat's first Turn shows its live dot on the real runtime; node tests and guard checks cover both."
+    },
+    {
+      "acceptance_id": "parity-surfaces-hold-the-baseline",
+      "criterion": "Every new surface restores focus on close, traps Tab while open, closes on Escape and exposes keyboard paths for each pointer action; new elements are covered by the existing contrast test in both themes; the browser interaction guard gains negatively controlled checks for the queue, pickers, paste and drop, mentions, context indicator, rename, permissions and notifications at 1280x800 and 390x844 in Light and Dark; the conformance matrix proof fields name the tests; packages/codex-adapter/upstream-lock.json requiredRequests, requiredNotifications, stable inputs and capability items gain every seam consumed here, at least model/list, thread/compact/start, fuzzyFileSearch, thread/settings/updated, thread/tokenUsage/updated, thread/name/updated, thread/compacted, the skill and mention inputs and the contextCompaction item, and npm run probe:codex passes; npm test, npm run verify and npm run guard:codex pass on the fixture and the lifecycle walk passes on the installed 0.149.0 runtime."
+    }
+  ],
+  "constraints": [
+    "Every option, value and posture shown must come from the app-server or the pinned lock; nothing is invented or hard-coded when the runtime has not reported it.",
+    "Use only seams in the stable 0.149.0 schema; pin every newly consumed seam in packages/codex-adapter/upstream-lock.json; experimental thread/queue/*, collaborationMode and permission profiles stay out until promoted.",
+    "The queue is transient host session state like pending requests, never a second durable store, and nothing is persisted in the browser.",
+    "Steering a live Turn remains available but is never the default while a Turn streams.",
+    "Niche Codex features stay out: photos library, appshot, pasted text as file, open in terminal or Finder, client-side auto titling, plan mode.",
+    "Final visual identity remains owned by the visual-system Ticket; the audio capture experience remains owned by the audio Ticket.",
+    "No automatic git commit or push."
+  ],
+  "context": "Owner dogfood of the accepted production shell against the real Codex app surfaced behavioural gaps in ordinary Chat. A read-only audit of the 0.149.0 app-server schema, upstream source at rust-v0.149.0 and the installed Codex desktop app established the seams. Today the shell steers any submission made during a live Turn through turn/steer, while Codex desktop keeps a client-side queue of follow-ups sent as turn/start after turn/completed, with Queue as the default, Steer as the per-message opposite, and per-row edit, delete and steer; the app-server's own thread/queue/* requests exist only under the experimental API and are not pinned, so the shell mirrors desktop with a host-owned transient queue rather than depending on unstable seams. model/list returns displayName, isDefault, supportedReasoningEfforts, defaultReasoningEffort and inputModalities, thread/start and thread/resume return the effective model and reasoningEffort, thread/settings/updated broadcasts the current thread settings, and turn/start accepts model and effort, so a truthful picker is possible; the conformance row model-mode-pickers moves from deferred to pass. The stable UserInput variants are text, image, localImage, audio, localAudio, skill and mention; fuzzyFileSearch and skills/list are stable discovery seams; the composer today accepts only a file input with no paste or drop handling. thread/tokenUsage/updated, thread/compact/start, thread/name/set and thread/name/updated are stable. Collaboration mode, permission profiles and the server-side queue stay out until they leave the experimental API; photos library, appshot, pasted-text-as-file, open-in-terminal and client-side auto titling are niche and excluded. Sidebar freshness when a brand-new Chat's first Turn starts on the real runtime, recorded during the 0.149.0 repin, is closed here because it is the same daily-use surface.",
+  "context_refs": [
+    {
+      "purpose": "Owner rule that major Codex features must work the Codex way and reversal of the picker deferral.",
+      "ref": ".vibehub/rooms/product/decision-codex-daily-use-parity-major-features-not-niche.yaml"
+    },
+    {
+      "purpose": "Parity is behavioural, covering Composer, attachments, model and mode controls, retry, cancellation and interruption.",
+      "ref": ".vibehub/rooms/product/constraint-codex-chat-parity-is-behavioral-product-work.yaml"
+    },
+    {
+      "purpose": "The Codex interaction floor this Ticket completes for daily use.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "purpose": "Accepted production shell and its proof conventions.",
+      "ref": ".vibehub/outcomes/ticket-implement-codex-first-vibehub-shell.yaml"
+    },
+    {
+      "purpose": "The 0.149.0 pin, real-runtime guard and the recorded sidebar freshness gap.",
+      "ref": ".vibehub/outcomes/ticket-repin-codex-baseline-to-0-149-0.yaml"
+    },
+    {
+      "purpose": "Pinned stable requests, notifications and inputs; experimental seams excluded.",
+      "ref": "packages/codex-adapter/upstream-lock.json"
+    },
+    {
+      "purpose": "Rows running-composer-steer and model-mode-pickers to rewrite with proofs.",
+      "ref": "docs/proposals/codex-chat-conformance/conformance-matrix.json"
+    },
+    {
+      "purpose": "submitTurn, syncComposerMode, attachment handling and composer to change.",
+      "ref": "apps/codex-first-shell/app.js"
+    },
+    {
+      "purpose": "Host actions startTurn, steerTurn, setThreadName and input validation to extend.",
+      "ref": "scripts/vh-codex-first-shell.mjs"
+    },
+    {
+      "purpose": "Adapter surface through which every new request must pass.",
+      "ref": "packages/codex-adapter/client.mjs"
+    }
+  ],
+  "deliveries": [],
+  "kind": "ticket",
+  "maturity": "firm",
+  "outcome": "Ordinary Chat in the production shell behaves like Codex for the features daily engineering work depends on: follow-ups typed during a streaming Turn queue by default with steer as the explicit opposite, model and reasoning effort are chosen from what the app-server actually offers, images paste and drop into the composer, files and skills are mentioned with @ and $, context use and compaction are visible, chats can be renamed, the approval posture is visible and switchable, and a completed Turn in a background Chat notifies once.",
+  "provenance_refs": [
+    "conversation:2026-08-22-owner-dogfoods-shell-and-requires-codex-daily-use-parity"
+  ],
+  "relations": [],
+  "schema_version": 2,
+  "ticket_id": "ticket-close-codex-daily-use-parity-gaps"
+}

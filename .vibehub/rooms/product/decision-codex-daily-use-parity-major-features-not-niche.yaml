@@ -1,0 +1,48 @@
+{
+  "context_id": "decision-codex-daily-use-parity-major-features-not-niche",
+  "detail": "Dogfooding the production shell against the real Codex app, the owner found that follow-ups typed while a Turn streams are routed straight into the running Turn as a steer, whereas Codex queues them and sends them after the Turn completes; that no model or reasoning effort can be chosen; and that attachment entry points such as the plus menu and image paste are missing. The owner's rule: VibeHub does not need to maintain every Codex feature, but the major ones that daily engineering work depends on must work the Codex way, and similar gaps found by comparison should be closed in the same pass. This reverses the earlier deferral of model and mode pickers. The shell remains VibeHub's own web application driving the official Codex app-server; it uses neither DSH nor Cordis, which belong to the separate DSH carrier.",
+  "evidence": [
+    {
+      "note": "The owner named queue-versus-steer, model and effort selection and attachment entry points as gaps while using the shell, and set the major-not-niche rule.",
+      "ref": "conversation:2026-08-22-owner-dogfoods-shell-and-requires-codex-daily-use-parity"
+    },
+    {
+      "note": "The Codex parity floor this decision sharpens for daily use.",
+      "ref": ".vibehub/rooms/product/decision-codex-parity-vibehub-task-workbench.yaml"
+    },
+    {
+      "note": "Where model-mode-pickers was recorded as deferred before this decision.",
+      "ref": "docs/proposals/codex-chat-conformance/conformance-matrix.json"
+    }
+  ],
+  "kind": "context",
+  "relations": [
+    {
+      "target_context_id": "decision-codex-parity-vibehub-task-workbench",
+      "type": "relates_to"
+    },
+    {
+      "target_context_id": "constraint-codex-chat-parity-is-behavioral-product-work",
+      "type": "relates_to"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "captured_at": "2026-08-23T05:24:11Z",
+    "quote": "咱们弄一个最 major 的这样一个东西，工程上面可以用。但是我刚刚说的这几个，或者你看一下有没有类似的这种东西，我觉得我们还是需要去给它 push 掉的。",
+    "ref": "conversation:2026-08-22-owner-dogfoods-shell-and-requires-codex-daily-use-parity"
+  },
+  "state": "active",
+  "summary": "Daily engineering use requires the major Codex chat features to behave like Codex, including queued follow-ups, model and effort selection and attachments; niche features may stay out",
+  "tags": [
+    "codex",
+    "parity",
+    "daily-use",
+    "queue",
+    "model-picker",
+    "attachments",
+    "dogfood",
+    "v1"
+  ],
+  "type": "decision"
+}
