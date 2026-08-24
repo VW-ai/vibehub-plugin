@@ -1,0 +1,295 @@
+{
+  "label": "Deterministic fork-lineage review fixture — not runtime history",
+  "note": "One Thread family for the fork chat interaction proposal: a source Chat, a point-fork that kept only the shared prefix, a prompt-variant fork that fell back to Recents, a nested fork, and a fork whose source is not listed in this folder. Turn ids inside a fork repeat the source's ids exactly as thread/fork replays them; divergence turns carry their own ids.",
+  "project": { "id": "fork-grp-auth", "name": "Auth hardening" },
+  "openByVariant": {
+    "chip": "fork-risky-cleanup",
+    "chip-source": "fork-src-login",
+    "chip-missing": "fork-of-unlisted",
+    "sidebar": "fork-src-login",
+    "bringback": "fork-prompt-variant"
+  },
+  "directionsByVariant": {
+    "chip": "chip",
+    "chip-source": "chip",
+    "chip-missing": "chip",
+    "sidebar": "sidebar",
+    "bringback": "bringback"
+  },
+  "threads": [
+    {
+      "id": "fork-src-login",
+      "title": "Harden login retry backoff",
+      "preview": "Our login e2e test flakes about twice a week",
+      "cwd": "/workspace/vibehub-plugin",
+      "status": { "type": "idle" },
+      "forkedFromId": null,
+      "project": { "id": "fork-grp-auth", "name": "Auth hardening" },
+      "createdAt": "2026-08-20T09:12:00Z",
+      "updatedAt": "2026-08-22T17:40:00Z",
+      "turns": [
+        {
+          "id": "src-t1",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "src-t1-user",
+              "content": [{ "type": "text", "text": "Our login e2e test flakes about twice a week. The retry wrapper in auth/session.ts seems to swallow the first failure. Find where and explain why." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "src-t1-agent",
+              "text": "The flake hides inside `withRetry` in `auth/session.ts`.\n\n- `withRetry` retries **any** rejection three times with a fixed 250 ms delay.\n- The first failure is a real `401` from the token exchange, not a transient network error.\n- Because the second attempt reuses the cached nonce, it intermittently succeeds and the test goes green without the defect being fixed.\n\nThe retry is masking an authentication bug, not absorbing network noise."
+            }
+          ]
+        },
+        {
+          "id": "src-t2",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "src-t2-user",
+              "content": [{ "type": "text", "text": "Show me the exact call path and the smallest change that stops the mask without removing retries for real network errors." }]
+            },
+            {
+              "type": "commandExecution",
+              "id": "src-t2-grep",
+              "command": "rg -n \"withRetry\" src/auth",
+              "cwd": "/workspace/vibehub-plugin",
+              "status": "completed",
+              "aggregatedOutput": "src/auth/session.ts:41:export async function withRetry(fn, attempts = 3)\nsrc/auth/session.ts:88:  return withRetry(() => exchangeToken(nonce));\n",
+              "exitCode": 0,
+              "durationMs": 412
+            },
+            {
+              "type": "agentMessage",
+              "id": "src-t2-agent",
+              "text": "Call path: `login()` → `exchangeToken(nonce)` wrapped by `withRetry` at `session.ts:88`.\n\nSmallest honest change:\n\n```ts\nreturn withRetry(() => exchangeToken(nonce), {\n  retryOn: (error) => error.status >= 500 || error.code === \"ECONNRESET\",\n});\n```\n\n- A `401` now fails the first attempt loudly.\n- Transient `5xx` and socket resets keep their three attempts.\n- The e2e test will fail deterministically until the nonce reuse is fixed."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fork-risky-cleanup",
+      "title": "Harden login retry backoff (2)",
+      "preview": "Fork sandbox: try deleting the legacy sessions table",
+      "cwd": "/workspace/vibehub-plugin",
+      "status": { "type": "idle" },
+      "forkedFromId": "fork-src-login",
+      "project": { "id": "fork-grp-auth", "name": "Auth hardening" },
+      "createdAt": "2026-08-22T18:05:00Z",
+      "updatedAt": "2026-08-22T18:30:00Z",
+      "turns": [
+        {
+          "id": "src-t1",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "src-t1-user",
+              "content": [{ "type": "text", "text": "Our login e2e test flakes about twice a week. The retry wrapper in auth/session.ts seems to swallow the first failure. Find where and explain why." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "src-t1-agent",
+              "text": "The flake hides inside `withRetry` in `auth/session.ts`.\n\n- `withRetry` retries **any** rejection three times with a fixed 250 ms delay.\n- The first failure is a real `401` from the token exchange, not a transient network error.\n- Because the second attempt reuses the cached nonce, it intermittently succeeds and the test goes green without the defect being fixed.\n\nThe retry is masking an authentication bug, not absorbing network noise."
+            }
+          ]
+        },
+        {
+          "id": "risky-t2",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "risky-t2-user",
+              "content": [{ "type": "text", "text": "In this fork only: assume we can drop the legacy sessions_legacy table entirely. Rewrite the migration on that assumption and show me the blast radius. If this goes wrong we discard the fork and the main chat stays clean." }]
+            },
+            {
+              "type": "commandExecution",
+              "id": "risky-t2-cmd",
+              "command": "npm run db:migrate -- --dry-run --drop sessions_legacy",
+              "cwd": "/workspace/vibehub-plugin",
+              "status": "completed",
+              "aggregatedOutput": "DRY RUN — no changes applied\nwould drop table sessions_legacy (11,204 rows)\nwould rewrite 2 foreign keys on audit_log\n1 code reference remains: src/auth/legacy-import.ts:17\n",
+              "exitCode": 0,
+              "durationMs": 2144
+            },
+            {
+              "type": "agentMessage",
+              "id": "risky-t2-agent",
+              "text": "Blast radius of dropping `sessions_legacy`:\n\n- 11,204 rows removed; they are read only by `legacy-import.ts:17`, which last ran in the 0.6 release.\n- Two foreign keys on `audit_log` must be rewritten in the same migration.\n- The rewritten migration is 40 lines shorter and removes the nonce-reuse path entirely, which also fixes the retry mask found in the source chat.\n\nIf you keep this direction, the result worth carrying back to the main chat is: **dropping the table removes the nonce-reuse path and the retry mask with it.**"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fork-prompt-variant",
+      "title": "Harden login retry backoff (3)",
+      "preview": "Variant prompt: jittered backoff instead of retryOn",
+      "cwd": "/workspace/vibehub-plugin",
+      "status": { "type": "idle" },
+      "forkedFromId": "fork-src-login",
+      "project": null,
+      "createdAt": "2026-08-22T19:10:00Z",
+      "updatedAt": "2026-08-22T19:25:00Z",
+      "turns": [
+        {
+          "id": "src-t1",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "src-t1-user",
+              "content": [{ "type": "text", "text": "Our login e2e test flakes about twice a week. The retry wrapper in auth/session.ts seems to swallow the first failure. Find where and explain why." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "src-t1-agent",
+              "text": "The flake hides inside `withRetry` in `auth/session.ts`.\n\n- `withRetry` retries **any** rejection three times with a fixed 250 ms delay.\n- The first failure is a real `401` from the token exchange, not a transient network error.\n- Because the second attempt reuses the cached nonce, it intermittently succeeds and the test goes green without the defect being fixed.\n\nThe retry is masking an authentication bug, not absorbing network noise."
+            }
+          ]
+        },
+        {
+          "id": "src-t2",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "src-t2-user",
+              "content": [{ "type": "text", "text": "Show me the exact call path and the smallest change that stops the mask without removing retries for real network errors." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "src-t2-agent",
+              "text": "Call path: `login()` → `exchangeToken(nonce)` wrapped by `withRetry` at `session.ts:88`.\n\nSmallest honest change:\n\n```ts\nreturn withRetry(() => exchangeToken(nonce), {\n  retryOn: (error) => error.status >= 500 || error.code === \"ECONNRESET\",\n});\n```"
+            }
+          ]
+        },
+        {
+          "id": "variant-t3",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "variant-t3-user",
+              "content": [{ "type": "text", "text": "Same problem, different framing: instead of filtering which errors retry, design the retry so a masked failure cannot stay green. Compare against the retryOn answer from the shared turns." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "variant-t3-agent",
+              "text": "Variant answer: make the retry loud instead of selective.\n\n```ts\nreturn withRetry(() => exchangeToken(nonce), {\n  backoff: jittered(250, 4_000),\n  onRetry: (error, attempt) => metrics.count(\"login.retry\", { attempt, code: error.code }),\n});\n```\n\n- Every retry emits a metric, so a weekly flake becomes a visible counter instead of a silent second attempt.\n- Jittered backoff removes the fixed 250 ms rhythm that let the cached nonce win races.\n- Compared to `retryOn`: this version never argues about which errors are transient; it makes **any** retry observable and lets the alert threshold decide.\n\nRecommendation for the source chat: keep `retryOn` for the 401 mask, and take the `onRetry` metric from this variant."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fork-nested-refine",
+      "title": "Harden login retry backoff (4)",
+      "preview": "Refine the jittered-backoff variant only",
+      "cwd": "/workspace/vibehub-plugin",
+      "status": { "type": "idle" },
+      "forkedFromId": "fork-prompt-variant",
+      "project": null,
+      "createdAt": "2026-08-22T20:02:00Z",
+      "updatedAt": "2026-08-22T20:15:00Z",
+      "turns": [
+        {
+          "id": "variant-t3",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "variant-t3-user",
+              "content": [{ "type": "text", "text": "Same problem, different framing: instead of filtering which errors retry, design the retry so a masked failure cannot stay green. Compare against the retryOn answer from the shared turns." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "variant-t3-agent",
+              "text": "Variant answer: make the retry loud instead of selective. Every retry emits a metric; jittered backoff removes the fixed rhythm."
+            }
+          ]
+        },
+        {
+          "id": "nested-t4",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "nested-t4-user",
+              "content": [{ "type": "text", "text": "Take only the jittered-backoff half and size the jitter window from the p99 token-exchange latency we measured last week." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "nested-t4-agent",
+              "text": "With last week's p99 at 1.8 s, the window becomes `jittered(400, 5_400)`: floor above the p50 so a retry never lands inside the same nonce cache window, ceiling at 3× p99 so three attempts still fit the 15 s login budget."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fork-of-unlisted",
+      "title": "Imported repro session (2)",
+      "preview": "Fork of a session whose source is not in this folder",
+      "cwd": "/workspace/vibehub-plugin",
+      "status": { "type": "idle" },
+      "forkedFromId": "0198f000-dead-7000-a000-000000000000",
+      "project": null,
+      "createdAt": "2026-08-21T08:00:00Z",
+      "updatedAt": "2026-08-21T08:20:00Z",
+      "turns": [
+        {
+          "id": "orphan-t1",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "orphan-t1-user",
+              "content": [{ "type": "text", "text": "Continue the repro from the imported rollout: the 401 only appears when the clock skew exceeds 30 s." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "orphan-t1-agent",
+              "text": "Confirmed: with skew above 30 s the nonce timestamp check fails first, and the retry mask hides it exactly as in the flaky e2e run."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plain-brainstorm",
+      "title": "Sketch the release notes",
+      "preview": "Not part of any fork family",
+      "cwd": "/workspace/vibehub-plugin",
+      "status": { "type": "idle" },
+      "forkedFromId": null,
+      "project": null,
+      "createdAt": "2026-08-19T10:00:00Z",
+      "updatedAt": "2026-08-19T10:30:00Z",
+      "turns": [
+        {
+          "id": "plain-t1",
+          "status": "completed",
+          "items": [
+            {
+              "type": "userMessage",
+              "id": "plain-t1-user",
+              "content": [{ "type": "text", "text": "Draft three bullet points for the 0.8 release notes." }]
+            },
+            {
+              "type": "agentMessage",
+              "id": "plain-t1-agent",
+              "text": "- Codex-native Chat parity with grouped activity.\n- Explicit Chat-to-Task bridge with exact origin provenance.\n- Follow-up queue with steer and resume."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
