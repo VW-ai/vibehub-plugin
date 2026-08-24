@@ -1005,6 +1005,10 @@ function runtimeProjection() {
     baselineMatch: runtime.version === baselineVersion,
     local: true,
     audioInput: harness.capabilities.capabilities.audio.available,
+    // The truthful no-claim explanation the browser shows on the disabled
+    // microphone whenever audioInput is not granted: the capability
+    // contract's own fallback text, never a working-microphone claim.
+    audioInputFallback: harness.capabilities.capabilities.audio.fallback,
     realtimeConversation: false,
     generation: runtime.generation,
     alive: runtime.alive,
