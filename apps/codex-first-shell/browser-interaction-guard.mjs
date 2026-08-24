@@ -26,7 +26,7 @@ const focusableByTabindex = (node) => node.hasAttribute("tabindex") && Number(no
 const keyboardOperable = (node) => node.matches(NATIVE_OPERABLE) || focusableByTabindex(node);
 // Every selector the delegated click handler in app.js dispatches on. A match
 // that is neither a native control nor focusable has no keyboard path.
-const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-open-lineage]", "[data-bring-back]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]", "[data-create-task]", "[data-attach-task]", "[data-remember]", "[data-selection-bridge]", "[data-attach-target]", "[data-return-to-source]", "[data-graph-chat]", "[data-association-ticket]", "[data-edit-queued]", "[data-steer-queued]", "[data-delete-queued]", "[data-cancel-queued]", "[data-resume-queue]", "[data-remove-mention]", "[data-mention-option]", "[data-compact-thread]", "[data-rename-thread]", "[data-cancel-rename]", "[data-cancel-recording]", "[data-dismiss-recording]"].join(", ");
+const POINTER_TARGETS = ["[data-search-kind]", "[data-open-inbox]", "[data-route]", "[data-thread-id]", "[data-ticket-id]", "[data-clear-context]", "#roomsSearch", "[data-new-thread]", "[data-open-import]", "[data-import-section]", "[data-toggle-project]", "[data-rename-project]", "[data-delete-project]", "[data-fork-thread]", "[data-fork-from]", "[data-open-lineage]", "[data-bring-back]", "[data-bring-back-message]", "[data-archive-thread]", "[data-remove-attachment]", "[data-remove-quote]", "#quoteSelection", "[data-quote-message]", "[data-copy-code]", "[data-copy-message]", "[data-copy-citation-thread]", "[data-request-decision]", "[data-retry-turn]", "[data-task-action]", "[data-focus-task-composer]", "[data-create-task]", "[data-attach-task]", "[data-remember]", "[data-selection-bridge]", "[data-attach-target]", "[data-return-to-source]", "[data-graph-chat]", "[data-association-ticket]", "[data-edit-queued]", "[data-steer-queued]", "[data-delete-queued]", "[data-cancel-queued]", "[data-resume-queue]", "[data-remove-mention]", "[data-mention-option]", "[data-compact-thread]", "[data-rename-thread]", "[data-cancel-rename]", "[data-cancel-recording]", "[data-dismiss-recording]"].join(", ");
 
 // Pointer-only gaps in the mounted document: click targets without a keyboard
 // path, and scroll regions (wheel or touch) that neither take focus nor hold a
@@ -454,6 +454,245 @@ export async function runBrowserInteractionGuard(hooks) {
   check(results, "Fork dispatches exact source Thread", forkActions[0]?.action === "forkThread" && forkActions[0]?.threadId === fixture.secondaryThread.id);
   check(results, "Fork opens returned lineage", document.querySelector(".thread-heading")?.textContent.includes("Forked fixture chat") && forked.forkedFromId === fixture.secondaryThread.id);
   check(results, "Fork navigation updates the Thread deep link", new URL(location.href).searchParams.get("thread") === forked.id, location.search);
+
+  // --- Production fork lineage: chip, listing, missing state ---------------
+  // The opened fork's source is not listed by this shell, so the heading must
+  // carry the dashed non-navigable missing state naming the id — and the raw
+  // " · Fork of <uuid>" line must be gone.
+  const forkedHeading = document.querySelector(".thread-heading");
+  checkAll(results, "the raw Fork-of UUID line is gone and an unlisted source renders the dashed non-navigable state naming the id", {
+    rawLineGone: !forkedHeading?.textContent.includes("Fork of "),
+    missingStateShown: document.querySelector("#threadLineage .lineage-chip.is-missing")?.tagName === "SPAN",
+    notNavigable: !document.querySelector("#threadLineage .lineage-chip.is-missing[data-open-lineage]"),
+    namesTheId: document.querySelector("#threadLineage .lineage-chip.is-missing")?.getAttribute("title") === `Source thread ${fixture.secondaryThread.id}`,
+    noteNamesShortId: document.querySelector("#threadLineage .lineage-note")?.textContent.includes(`${fixture.secondaryThread.id.slice(0, 8)}…`) === true,
+  }, forkedHeading?.textContent.slice(0, 100));
+
+  // The fork family fixture stands in for listed rows and replayed
+  // transcripts; the production surfaces render with no ?forkFixture gate.
+  const forkFamily = await fetch("/fork-fixtures.json").then((response) => response.json());
+  const familyThreads = forkFamily.threads.map((thread) => structuredClone(thread));
+  const familyById = (id) => familyThreads.find((thread) => thread.id === id);
+  const familyLists = {
+    threads: familyThreads,
+    recents: familyThreads.filter((thread) => !thread.project),
+    projects: [{ ...forkFamily.project, threads: familyThreads.filter((thread) => thread.project?.id === forkFamily.project.id) }],
+  };
+  const familyTransport = (log = null, extra = null) => async (payload) => {
+    log?.push(structuredClone(payload));
+    const handled = extra ? await extra(payload) : undefined;
+    if (handled !== undefined) return handled;
+    if (payload.action === "readThread") {
+      const thread = familyById(payload.threadId);
+      if (!thread) throw new Error(`no fixture thread ${payload.threadId}`);
+      return { thread: structuredClone(thread) };
+    }
+    if (payload.action === "listQueue") return { queue: { threadId: payload.threadId, paused: false, pausedReason: null, lastError: null, limit: 20, items: [] } };
+    throw new Error(`Unexpected fork action ${payload.action}`);
+  };
+  try {
+    await hooks.withFixtureTransport(familyTransport(), async () => {
+      await hooks.withThreadLists(familyLists, async () => {
+        await hooks.openThread("fork-risky-cleanup");
+        await frame();
+        const chip = document.querySelector("#threadLineage button.lineage-chip[data-open-lineage]");
+        const noteText = () => document.querySelector("#threadLineage [data-lineage-note]")?.textContent ?? "";
+        const derivedNote = await waitFor(() => noteText().includes("shares 1 of 2 source Turns, then diverges"), 90);
+        checkAll(results, "a fork's heading renders the navigable production source chip with the derived shared-Turn note", {
+          chipIsButton: chip?.tagName === "BUTTON",
+          chipNamesSourceTitle: chip?.textContent.includes("Harden login retry backoff") === true,
+          chipAccessibleName: chip?.getAttribute("aria-label") === "Open the source chat: Harden login retry backoff",
+          derivedNoteFromTurnIds: derivedNote,
+          rawLineGone: !document.querySelector(".thread-heading p")?.textContent.includes("Fork of "),
+          neverTaskLanguage: !/Task|Subtask|dependency/u.test(document.querySelector("#threadLineage")?.textContent ?? ""),
+        }, noteText());
+        // Keyboard path: the chip is an ordinary button; activating it opens
+        // the source on the chat route and focus lands on the opened title.
+        chip?.focus();
+        chip?.click();
+        await waitFor(() => new URL(location.href).searchParams.get("thread") === "fork-src-login", 60);
+        const focusOnTitle = await waitFor(() => document.activeElement?.id === "activeThreadTitle", 60);
+        const forkListing = document.querySelector("#threadLineage .fork-list");
+        const forkRows = [...document.querySelectorAll("#threadLineage .fork-row[data-open-lineage]")];
+        checkAll(results, "the source chip opens the source on the chat route and the source heading lists each fork by title", {
+          sourceOpened: new URL(location.href).searchParams.get("thread") === "fork-src-login",
+          focusOnOpenedTitle: focusOnTitle,
+          listingPresent: Boolean(forkListing) && forkListing.textContent.includes("2 forks of this chat"),
+          rowsAreButtons: forkRows.length === 2 && forkRows.every((row) => row.tagName === "BUTTON"),
+          rowsNameTitles: forkRows.map((row) => row.querySelector("strong")?.textContent).join("|") === "Harden login retry backoff (2)|Harden login retry backoff (3)",
+        });
+        forkRows[1]?.focus();
+        forkRows[1]?.click();
+        await waitFor(() => new URL(location.href).searchParams.get("thread") === "fork-prompt-variant", 60);
+        check(results, "a fork listing row opens the named fork with its own source chip", new URL(location.href).searchParams.get("thread") === "fork-prompt-variant" && Boolean(document.querySelector("#threadLineage button.lineage-chip[data-open-lineage]")), location.search);
+        // Per-message fork actions: finalized assistant messages of a fork
+        // offer Bring back to source and Fork from here; user messages never
+        // carry either.
+        const finalizedMessages = [...document.querySelectorAll('.turn.assistant[data-finalized="true"]')];
+        checkAll(results, "finalized assistant messages of a fork offer Bring back to source and Fork from here; user messages never do", {
+          everyFinalizedOffersForkFrom: finalizedMessages.length >= 2 && finalizedMessages.every((node) => node.querySelector("[data-fork-from]:not([disabled])")),
+          everyFinalizedOffersBringBack: finalizedMessages.every((node) => node.querySelector("[data-bring-back-message]")),
+          userMessagesCarryNeither: ![...document.querySelectorAll(".turn.user")].some((node) => node.querySelector("[data-fork-from], [data-bring-back-message]")),
+        }, `${finalizedMessages.length} finalized messages`);
+        // A running Turn disables Fork from here (the settled-Turn actions
+        // stay visible but inert, like the header's whole-Thread Fork).
+        const liveSource = structuredClone(familyById("fork-src-login"));
+        liveSource.status = { type: "active" };
+        liveSource.turns.at(-1).status = "inProgress";
+        await hooks.switchFixtureThread(liveSource);
+        const liveForkButtons = [...document.querySelectorAll("[data-fork-from]")];
+        check(results, "Fork from here is disabled while a Turn runs and absent on the live Turn's items", liveForkButtons.length > 0 && liveForkButtons.every((button) => button.disabled) && !document.querySelector('.turn.assistant[data-finalized="false"] [data-fork-from]'), `${liveForkButtons.length} buttons`);
+        // While the runtime is halted the per-message fork action is absent.
+        const forkHalt = { code: "stop-condition-violated", conditionId: "generated-protocol-hash-changed", message: "Stop condition generated-protocol-hash-changed: fork guard halt. The shell stops here instead of reusing this runtime.", detail: "fork guard halt.", observedVersion: "0.149.0", baselineVersion: "0.149.0", generation: 3 };
+        await hooks.applyEventWindow({ events: [{ sequence: 60, kind: "runtimeHalted", value: forkHalt }], cursor: 60, oldestCursor: 60, gap: false, runtimeGeneration: 3, runtimeAlive: true, runtimeState: "halted", runtimeHalt: forkHalt, pendingRequests: [] });
+        const absentWhileHalted = document.querySelectorAll("[data-fork-from]").length === 0;
+        await hooks.restoreRuntime();
+        check(results, "Fork from here is absent while the runtime is halted", absentWhileHalted);
+        // The missing source, through the production open path.
+        await hooks.openThread("fork-of-unlisted");
+        await frame();
+        const missingChip = document.querySelector("#threadLineage .lineage-chip.is-missing");
+        checkAll(results, "a fork whose source is not listed renders the dashed non-navigable state and no Bring Back", {
+          missingIsNotAButton: missingChip?.tagName === "SPAN",
+          notNavigable: !missingChip?.hasAttribute("data-open-lineage"),
+          namesTheId: missingChip?.getAttribute("title") === "Source thread 0198f000-dead-7000-a000-000000000000",
+          noBringBackAnywhere: !document.querySelector("[data-bring-back-message]"),
+        });
+      });
+    });
+  } catch (error) { check(results, "production fork lineage checks completed", false, `threw: ${error?.message ?? error}`); }
+
+  // --- Bring Back: explicit labeled send into the source composer ----------
+  try {
+    const bringBackLog = [];
+    let bringBackSent = "";
+    await hooks.withFixtureTransport(familyTransport(bringBackLog, async (payload) => {
+      if (payload.action === "startTurn") {
+        bringBackSent = payload.input?.find((entry) => entry.type === "text")?.text ?? "";
+        return { turn: { id: "guard-bringback-turn", status: "inProgress" }, settings: null };
+      }
+      return undefined;
+    }), async () => {
+      await hooks.withThreadLists(familyLists, async () => {
+        await hooks.openThread("fork-prompt-variant");
+        await frame();
+        const message = [...document.querySelectorAll('.turn.assistant[data-finalized="true"]')].find((node) => node.dataset.itemId.endsWith("variant-t3-agent"));
+        // Selecting a finalized passage offers Bring back to source in the
+        // selection sheet.
+        const passage = message?.querySelector(".agent-response p") ?? message?.querySelector(".agent-response");
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(passage);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        document.dispatchEvent(new Event("selectionchange"));
+        await frame();
+        await frame();
+        const sheet = document.querySelector("#selectionSheet");
+        const sheetButton = sheet?.querySelector("[data-bring-back]");
+        const sheetOffered = !sheet.hidden && Boolean(sheetButton) && !sheetButton.hidden;
+        selection.removeAllRanges();
+        // The whole-message action: the labeled quote lands in the SOURCE
+        // Thread's composer draft and navigation opens the source with the
+        // draft visible; nothing is sent and neither transcript is touched.
+        const actionsBefore = bringBackLog.length;
+        message.querySelector("[data-bring-back-message]").click();
+        await waitFor(() => new URL(location.href).searchParams.get("thread") === "fork-src-login", 60);
+        await frame();
+        const tray = document.querySelector("#quoteTray");
+        const traySource = tray?.querySelector(".quote-source");
+        const focusStaysOnTitle = await waitFor(() => document.activeElement?.id === "activeThreadTitle", 60);
+        const sideEffects = bringBackLog.slice(actionsBefore).map((entry) => entry.action);
+        checkAll(results, "Bring back to source lands the labeled quote in the source composer draft, navigates with the draft visible and sends nothing", {
+          selectionSheetOfferedIt: sheetOffered,
+          navigatedToSource: new URL(location.href).searchParams.get("thread") === "fork-src-login",
+          trayVisible: tray && !tray.hidden,
+          labeledAsBroughtBack: traySource?.textContent === "Brought back from fork fork-prompt-variant · Turn variant-t3",
+          exactForkIdentity: traySource?.getAttribute("aria-label") === "Thread fork-prompt-variant · Turn variant-t3 · Item variant-t3-agent",
+          focusStaysOnThreadTitle: focusStaysOnTitle,
+          nothingSent: !sideEffects.some((name) => ["startTurn", "queueTurn", "steerTurn"].includes(name)),
+          onlyReadsDispatched: sideEffects.every((name) => ["readThread", "listQueue"].includes(name)),
+        }, sideEffects.join(","));
+        // The quote is the source Thread's own composer draft: leaving and
+        // returning restores it with the draft.
+        await hooks.openThread("plain-brainstorm");
+        await frame();
+        const clearedElsewhere = document.querySelector("#quoteTray").hidden;
+        await hooks.openThread("fork-src-login");
+        await frame();
+        check(results, "the brought-back quote is the source Thread's own composer draft, restored on return", clearedElsewhere && !document.querySelector("#quoteTray").hidden && document.querySelector("#quoteTray .quote-source")?.textContent === "Brought back from fork fork-prompt-variant · Turn variant-t3", document.querySelector("#quoteTray .quote-source")?.textContent ?? "no tray");
+        // The single explicit human send serializes the fork identity into
+        // one turn/start; replay renders the quote with that identity.
+        const composerInput = document.querySelector("#composerInput");
+        composerInput.value = "Adopt the metric half in the main direction.";
+        composerInput.dispatchEvent(new InputEvent("input", { bubbles: true }));
+        const sendIndex = bringBackLog.length;
+        document.querySelector("#composer").requestSubmit();
+        // The submit path ends with its own openThread re-read; wait for it
+        // so the replay reconciliation below is not raced by that render.
+        await waitFor(() => bringBackLog.some((entry) => entry.action === "startTurn"), 60);
+        await waitFor(() => bringBackLog.slice(sendIndex).some((entry) => entry.action === "readThread"), 60);
+        await frame();
+        const starts = bringBackLog.filter((entry) => entry.action === "startTurn");
+        checkAll(results, "the explicit send is a single turn/start whose input carries the quote with the fork's exact identity", {
+          exactlyOneStart: starts.length === 1,
+          startsInSource: starts[0]?.threadId === "fork-src-login",
+          quotedBlockFirst: bringBackSent.startsWith("> "),
+          forkIdentitySerialized: bringBackSent.includes("> — Quoted from Codex thread fork-prompt-variant · turn variant-t3 · item variant-t3-agent"),
+          humanBodyLast: bringBackSent.endsWith("Adopt the metric half in the main direction."),
+        }, bringBackSent.slice(0, 90));
+        const replayedSource = structuredClone(familyById("fork-src-login"));
+        replayedSource.turns.push({ id: "guard-bringback-turn", status: "completed", items: [{ type: "userMessage", id: "guard-bringback-user", content: [{ type: "text", text: bringBackSent }] }] });
+        await hooks.reconcileFixtureThread(replayedSource);
+        const replayedQuote = document.querySelector('.turn.user .quote-source[data-quote-thread="fork-prompt-variant"]');
+        check(results, "the sent message replays the quote with its fork identity", replayedQuote?.getAttribute("aria-label") === "Quoted from Thread fork-prompt-variant · Turn variant-t3 · Item variant-t3-agent" && replayedQuote.getAttribute("data-quote-item") === "variant-t3-agent", replayedQuote?.getAttribute("aria-label") ?? "missing");
+      });
+    });
+  } catch (error) { check(results, "Bring Back checks completed", false, `threw: ${error?.message ?? error}`); }
+
+  // --- Fork from here on the driver's fixture host --------------------------
+  // The driver seeds a two-Turn source Thread; the per-message action must
+  // create a fork whose transcript ends at the chosen Turn through the real
+  // host action (thread/fork with lastTurnId on the fixture app-server), and
+  // the opened fork must show its production source chip. The created fork is
+  // archived afterwards so repeat frames stay clean.
+  const forkSeedExpected = new URLSearchParams(location.search).get("bridgeWrites") === "1";
+  if (forkSeedExpected) {
+    try {
+      await hooks.withFixtureTransport(null, async () => {
+        await hooks.refreshBootstrap();
+        await frame();
+        await hooks.openThread("fork-seed-thread");
+        await frame();
+        const seedMessages = [...document.querySelectorAll('.turn.assistant[data-finalized="true"]')];
+        const firstTurnButton = seedMessages.find((node) => node.dataset.turnId === "fork-seed-turn-1")?.querySelector("[data-fork-from]");
+        const offeredOnBoth = seedMessages.length === 2 && seedMessages.every((node) => node.querySelector("[data-fork-from]:not([disabled])"));
+        firstTurnButton.click();
+        await waitFor(() => new URL(location.href).searchParams.get("thread") !== "fork-seed-thread", 240);
+        await frame();
+        const forkId = new URL(location.href).searchParams.get("thread");
+        const forkRead = (await hooks.hostAction({ action: "readThread", threadId: forkId })).thread;
+        const chipNote = await waitFor(() => (document.querySelector("#threadLineage [data-lineage-note]")?.textContent ?? "").includes("shares 1 of 2 source Turns"), 120);
+        checkAll(results, "Fork from here creates a point fork whose transcript ends at the chosen Turn and opens it with its source chip", {
+          offeredOnEveryFinalizedMessage: offeredOnBoth,
+          forkOpened: Boolean(forkId) && forkId !== "fork-seed-thread",
+          lineageRecorded: forkRead.forkedFromId === "fork-seed-thread",
+          transcriptEndsAtChosenTurn: forkRead.turns.map((turn) => turn.id).join(",") === "fork-seed-turn-1",
+          laterTurnOmittedFromView: !document.querySelector("#turns").textContent.includes("Second seed question"),
+          chosenTurnMounted: document.querySelector("#turns").textContent.includes("First seed answer"),
+          sourceChipNavigable: document.querySelector("#threadLineage button.lineage-chip[data-open-lineage]")?.textContent.includes("Fork seed chat") === true,
+          derivedNoteFromBothTranscripts: chipNote,
+        }, `fork ${forkId} · turns ${forkRead.turns?.map((turn) => turn.id).join(",")}`);
+        const sourceRead = (await hooks.hostAction({ action: "readThread", threadId: "fork-seed-thread" })).thread;
+        check(results, "the point fork leaves the source transcript untruncated", sourceRead.turns.map((turn) => turn.id).join(",") === "fork-seed-turn-1,fork-seed-turn-2", sourceRead.turns.map((turn) => turn.id).join(","));
+        await hooks.hostAction({ action: "archiveThread", threadId: forkId });
+        await hooks.refreshBootstrap();
+      });
+    } catch (error) { check(results, "fork-from-here fixture-host checks completed", false, `threw: ${error?.message ?? error}`); }
+  } else {
+    check(results, "fork-from-here fixture-host checks need the driver's seeded fork source", true, "no driver-owned shell: the transport checks above prove the production surfaces");
+  }
+  await hooks.switchFixtureThread(forked);
   const longThread = structuredClone(fixture.secondaryThread);
   longThread.turns = [{ id: "fixture-long-turn", status: "completed", items: Array.from({ length: 300 }, (_, index) => ({ type: "agentMessage", id: `fixture-long-${index}`, text: `Item ${index}` })) }];
   await hooks.reconcileFixtureThread(longThread);

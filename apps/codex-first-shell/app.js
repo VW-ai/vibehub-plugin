@@ -4475,6 +4475,23 @@ if (new URLSearchParams(location.search).get("interactionGuard") === "1") {
         renderChat();
       }
     },
+    // Swap the listed Thread rows (the canonical data the fork lineage
+    // projections read) for the callback, then restore the live lists: the
+    // production chip, fork listing and Bring Back availability are checked
+    // against a known family without touching the host's own listing.
+    withThreadLists: async (lists, callback) => {
+      const prior = { threads: state.threads, pinned: state.pinned, recents: state.recents, projects: state.projects };
+      state.threads = lists.threads ?? [];
+      state.pinned = lists.pinned ?? [];
+      state.recents = lists.recents ?? state.threads;
+      state.projects = lists.projects ?? [];
+      updateSidebar();
+      try { return await callback(); }
+      finally {
+        Object.assign(state, prior);
+        updateSidebar();
+      }
+    },
     applyScopeFixture: async (project) => {
       // Swap only the host-owned Project projection; Chat lists stay as read.
       state.bootstrap = { ...state.bootstrap, project };

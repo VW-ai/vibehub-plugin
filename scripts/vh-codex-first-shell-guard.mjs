@@ -235,8 +235,11 @@ async function settleStartedTurn(shell, bridge) {
 
 // The one Chat the fixture app-server replays for the bridge: a finalized
 // Turn with a user message and an assistant answer, in the bound repository's
-// own folder so the shell lists it.
+// own folder so the shell lists it. Beside it, a two-Turn source Thread the
+// Fork-from-here guard check cuts at its first Turn through the real host
+// action, proving the fixture app-server's lastTurnId truncation end to end.
 const SEED_THREAD = Object.freeze({ id: "seed-source-thread", turnId: "seed-turn-1", itemId: "seed-agent-1", title: "Bridge source chat" });
+const FORK_SEED_THREAD = Object.freeze({ id: "fork-seed-thread", title: "Fork seed chat" });
 
 function seedFixtureState(statePath, folder) {
   const now = new Date().toISOString();
@@ -250,6 +253,19 @@ function seedFixtureState(statePath, folder) {
         { type: "userMessage", id: "seed-user-1", content: [{ type: "text", text: "Explain the login flow and propose a fix." }] },
         { type: "agentMessage", id: SEED_THREAD.itemId, text: "The login flow retries silently. Every **account type** must log in on the first attempt; retries hide the defect.\n\n- Remove the silent retry.\n- Surface the failure to the human." },
       ] }],
+    }, {
+      id: FORK_SEED_THREAD.id, name: FORK_SEED_THREAD.title, preview: "First seed question", cwd: folder, createdAt: now, updatedAt: now,
+      status: { type: "idle" }, forkedFromId: null, section: null, archived: false, policy: { approvalPolicy: null, sandbox: null },
+      turns: [
+        { id: "fork-seed-turn-1", status: "completed", items: [
+          { type: "userMessage", id: "fork-seed-user-1", content: [{ type: "text", text: "First seed question" }] },
+          { type: "agentMessage", id: "fork-seed-agent-1", text: "First seed answer" },
+        ] },
+        { id: "fork-seed-turn-2", status: "completed", items: [
+          { type: "userMessage", id: "fork-seed-user-2", content: [{ type: "text", text: "Second seed question" }] },
+          { type: "agentMessage", id: "fork-seed-agent-2", text: "Second seed answer" },
+        ] },
+      ],
     }],
   };
   writeFileSync(statePath, `${JSON.stringify(state)}\n`);
